@@ -1,0 +1,582 @@
+"""Crash-safe one-shot ObservationSchedule tick. systemd is the only time trigger."""
+
+from __future__ import annotations
+
+import hashlib
+from collections.abc import Callable, Mapping, Sequence
+from datetime import UTC, datetime, timedelta
+from decimal import Decimal, InvalidOperation
+from typing import Any
+from uuid import uuid4
+
+from solana_alpha_lab.factory.observation_panel_publisher import publish_observation_batch
+from solana_alpha_lab.factory.observation_primitives import (
+    BUY_AMOUNT,
+    RECENT_URL,
+    SOL_MINT,
+    execute_primitive,
+    parse_anchor,
+    quote_url,
+    request_sha256,
+    search_url,
+)
+from solana_alpha_lab.factory.observation_schedule import (
+    parse_utc,
+    render_utc,
+    schedule_sha256,
+)
+from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+
+OWNER = "tick-once"
+BUNDLE_TO_PRIMITIVE = {
+    "BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+    "BUNDLE-JUPITER-QUOTE-BUY-001": "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001",
+    "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001": "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001",
+}
+SCHEMA_REQUIRED_KEYS = {
+    "PRIM-JUPITER-TOKENS-V2-RECENT-001": ("id",),
+    "PRIM-JUPITER-TOKENS-V2-SEARCH-001": ("id",),
+    "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001": ("outAmount",),
+    "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001": ("outAmount",),
+}
+DEPENDENT_SELL = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001"
+QUOTE_BUY = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001"
+
+
+class ObservationSchedulerError(ValueError):
+    """Typed scheduler failure."""
+
+
+def _sample_included(*, seed: str, entity_id: str, schedule_digest: str, probability: str) -> bool:
+    digest = hashlib.sha256(f"{seed}|{entity_id}|{schedule_digest}".encode("utf-8")).hexdigest()
+    bucket = int(digest[:8], 16) / 0xFFFFFFFF
+    return bucket <= float(probability)
+
+
+def poll_slot_id(*, primitive_id: str, query_profile_id: str, period_seconds: int, now: datetime) -> str:
+    epoch = int(now.astimezone(UTC).timestamp())
+    slot = epoch - (epoch % int(period_seconds))
+    return hashlib.sha256(
+        f"{primitive_id}|{query_profile_id}|{period_seconds}|{slot}".encode("utf-8")
+    ).hexdigest()
+
+
+def _due_times(anchor: datetime, offset: int, lateness: int) -> tuple[str, str]:
+    due = anchor + timedelta(seconds=offset)
+    deadline = due + timedelta(seconds=lateness)
+    return render_utc(due), render_utc(deadline)
+
+
+def _row_field(row: Mapping[str, Any], field_id: str) -> object:
+    first_pool = row.get("firstPool") if isinstance(row.get("firstPool"), Mapping) else {}
+    mapping = {
+        "FIELD-TOKEN-MINT-001": row.get("id") or row.get("mint"),
+        "FIELD-FIRST-POOL-CREATED-AT-001": first_pool.get("createdAt") if isinstance(first_pool, Mapping) else None,
+        "FIELD-FIRST-POOL-SOURCE-001": first_pool.get("source") if isinstance(first_pool, Mapping) else row.get("source"),
+        "FIELD-LIQUIDITY-USD-001": row.get("liquidity") or row.get("liquidityUsd"),
+        "FIELD-FIRST-SEEN-AT-001": row.get("first_seen_at"),
+    }
+    return mapping.get(field_id)
+
+
+def _predicate_holds(predicate: Mapping[str, Any], row: Mapping[str, Any]) -> bool:
+    value = _row_field(row, str(predicate["field_id"]))
+    if value is None:
+        return False
+    operator = str(predicate["operator"])
+    if operator == "EQ":
+        return str(value) == str(predicate.get("value_text") or predicate.get("value_decimal") or "")
+    if operator == "GTE":
+        try:
+            return Decimal(str(value)) >= Decimal(str(predicate["value_decimal"]))
+        except (InvalidOperation, KeyError):
+            return False
+    return False
+
+
+def _population_eligible(schedule: Mapping[str, Any], row: Mapping[str, Any]) -> bool:
+    population = schedule["population"]
+    for predicate in list(population["source_predicates"]) + list(population["x_eligibility_predicates"]):
+        if not _predicate_holds(predicate, row):
+            return False
+    return True
+
+
+def tick_once(
+    *,
+    root,
+    data_root,
+    store: ObservationScheduleStore,
+    schedule: Mapping[str, Any],
+    activation_id: str,
+    now: datetime,
+    opener: object | None = None,
+    credential_loader: Callable[[], str] | None = None,
+    producer_git_sha: str,
+    max_claims: int = 60,
+    discovery_rows: Sequence[Mapping[str, Any]] | None = None,
+    last_tick_at: datetime | None = None,
+    redact_with: str | None = None,
+) -> dict[str, Any]:
+    if now.tzinfo is None:
+        raise ObservationSchedulerError("TIMESTAMP_INVALID")
+    now = now.astimezone(UTC)
+    if last_tick_at is not None and now < last_tick_at.astimezone(UTC):
+        raise ObservationSchedulerError("CLOCK_WENT_BACKWARDS")
+    if store.restore_marker_unresolved():
+        raise ObservationSchedulerError("RESTORE_MARKER_UNRESOLVED")
+    digest = str(schedule.get("schedule_sha256") or schedule_sha256(schedule))
+    if schedule_sha256(schedule) != digest:
+        raise ObservationSchedulerError("INVALID_IDENTITY")
+    activation = store.get_activation(digest, activation_id)
+    if activation is None:
+        raise ObservationSchedulerError("ACTIVATION_MISSING")
+    state = str(activation["state"])
+    if state in {"PAUSED_OPERATOR", "ABORTED_SAFETY", "BLOCKED_AUTHORITY", "BLOCKED_BUDGET"}:
+        return {"terminal": state, "provider_calls": 0, "credential_reads": 0}
+    if not store.acquire_lease(OWNER, clock=now):
+        raise ObservationSchedulerError("WRITER_BUSY")
+    credential_reads = 0
+    provider_calls = 0
+    published_rows: list[dict[str, Any]] = []
+    try:
+        if discovery_rows is not None and state == "ACTIVE":
+            _admit_candidates(
+                store=store,
+                schedule=schedule,
+                activation_id=activation_id,
+                rows=discovery_rows,
+                now=now,
+            )
+        recovered = store.due_in_states(("CLAIMED",), due_at_max=now)
+        claims = recovered + store.claim_due(limit=max_claims, now=now, owner=OWNER)
+        holder = redact_with
+        for claim in claims:
+            deadline = parse_utc(claim["deadline_at"])
+            if now > deadline:
+                store.insert_due(
+                    _due_copy(claim, state="CENSORED", payload={"missing_reason": "CENSORED_LATE"}),
+                    clock=now,
+                )
+                continue
+            url_result = _url_for_claim(schedule, claim)
+            if url_result is None:
+                store.insert_due(
+                    _due_copy(
+                        claim,
+                        state="DEPENDENCY_MISSING",
+                        payload={"missing_reason": "DEPENDENCY_MISSING"},
+                    ),
+                    clock=now,
+                )
+                published_rows.append(_observation_row(claim, "DEPENDENCY_MISSING", now, None))
+                continue
+            url, version = url_result
+            request_digest = request_sha256(
+                method="GET",
+                url=url,
+                body=None,
+                primitive_version=version,
+            )
+            prior = store.call_state(request_digest)
+            if prior == "STARTED":
+                store.insert_due(
+                    _due_copy(
+                        claim,
+                        state="IN_FLIGHT_CALL_INDETERMINATE",
+                        request_sha256=request_digest,
+                        payload={"missing_reason": "IN_FLIGHT_CALL_INDETERMINATE"},
+                    ),
+                    clock=now,
+                )
+                published_rows.append(
+                    _observation_row(claim, "IN_FLIGHT_CALL_INDETERMINATE", now, request_digest)
+                )
+                continue
+            if prior == "COMPLETED":
+                ledger_payload = store.call_payload(request_digest) or {}
+                recovered_state = str(ledger_payload.get("status") or "OBSERVED")
+                if recovered_state != "OBSERVED":
+                    recovered_state = "MISSING_TYPED"
+                store.insert_due(
+                    _due_copy(
+                        claim,
+                        state=recovered_state,
+                        request_sha256=request_digest,
+                        payload={
+                            "missing_reason": ledger_payload.get("missing_reason")
+                            or "RECOVERED_COMPLETED_LEDGER",
+                            "response_sha256": ledger_payload.get("response_sha256"),
+                            "buy_out_amount": ledger_payload.get("buy_out_amount"),
+                        },
+                    ),
+                    clock=now,
+                )
+                published_rows.append(
+                    _observation_row(
+                        claim,
+                        recovered_state,
+                        now,
+                        request_digest,
+                        ledger_payload.get("buy_out_amount"),
+                    )
+                )
+                continue
+            if opener is None:
+                continue
+            if holder is None and credential_loader is not None:
+                holder = credential_loader()
+                credential_reads += 1
+            attempt_id = f"ATT-{uuid4().hex[:12].upper()}"
+            start_state = store.start_call(
+                request_sha256=request_digest,
+                attempt_id=attempt_id,
+                primitive_id=str(claim["primitive_id"]),
+                payload={"url": url},
+                clock=now,
+            )
+            if start_state != "STARTED":
+                store.insert_due(
+                    _due_copy(
+                        claim,
+                        state=start_state,
+                        request_sha256=request_digest,
+                        payload={"missing_reason": start_state},
+                    ),
+                    clock=now,
+                )
+                continue
+            result = execute_primitive(
+                primitive_id=str(claim["primitive_id"]),
+                primitive_version=version,
+                method="GET",
+                url=url,
+                opener=opener,
+                clock=lambda: now,
+                redact_with=holder,
+                expected_entities=[str(claim["entity_id"])],
+                schema_required_keys=SCHEMA_REQUIRED_KEYS.get(str(claim["primitive_id"])),
+            )
+            provider_calls += 1
+            buy_out = None
+            body = result.get("body")
+            if isinstance(body, Mapping):
+                buy_out = body.get("outAmount")
+            store.complete_call(
+                request_sha256=request_digest,
+                attempt_id=attempt_id,
+                payload={
+                    "response_sha256": result.get("response_sha256"),
+                    "status": result.get("status"),
+                    "buy_out_amount": buy_out,
+                },
+                clock=now,
+            )
+            terminal_state = "OBSERVED" if result["status"] == "OBSERVED" else "MISSING_TYPED"
+            store.insert_due(
+                _due_copy(
+                    claim,
+                    state=terminal_state,
+                    request_sha256=request_digest,
+                    payload={
+                        "missing_reason": result.get("missing_reason"),
+                        "late_seconds": max(
+                            0,
+                            int((now - parse_utc(claim["due_at"])).total_seconds()),
+                        ),
+                        "response_sha256": result.get("response_sha256"),
+                        "buy_out_amount": buy_out,
+                    },
+                ),
+                clock=now,
+            )
+            if terminal_state == "OBSERVED" and str(claim["primitive_id"]) == QUOTE_BUY and buy_out:
+                _propagate_buy_out(
+                    store,
+                    schedule=schedule,
+                    activation_id=activation_id,
+                    entity_id=str(claim["entity_id"]),
+                    buy_out_amount=str(buy_out),
+                    now=now,
+                )
+                for later in claims:
+                    if (
+                        later.get("entity_id") == claim["entity_id"]
+                        and later.get("primitive_id") == DEPENDENT_SELL
+                    ):
+                        payload = dict(later.get("payload") or {})
+                        payload["buy_out_amount"] = str(buy_out)
+                        later["payload"] = payload
+            published_rows.append(
+                _observation_row(claim, terminal_state, now, request_digest, buy_out)
+            )
+        if published_rows:
+            members = [
+                {
+                    "schedule_sha256": digest,
+                    "activation_id": activation_id,
+                    "entity_id": row["entity_id"],
+                    "event_time": row["event_time"],
+                    "first_reliable_available_at": row["first_reliable_available_at"],
+                }
+                for row in published_rows
+            ]
+            publish_observation_batch(
+                data_root=data_root,
+                root=root,
+                schedule=schedule,
+                activation_id=activation_id,
+                now=now,
+                producer_git_sha=producer_git_sha,
+                members=members,
+                observations=published_rows,
+            )
+        store.record_event(
+            "TICK",
+            {
+                "schedule_sha256": digest,
+                "provider_calls": provider_calls,
+                "credential_reads": credential_reads,
+                "claims": len(claims),
+            },
+            clock=now,
+        )
+        return {
+            "terminal": "TICK_COMPLETE",
+            "provider_calls": provider_calls,
+            "credential_reads": credential_reads,
+            "claims": len(claims),
+            "published": len(published_rows),
+        }
+    finally:
+        store.release_lease(OWNER)
+
+
+def _due_copy(
+    claim: Mapping[str, Any],
+    *,
+    state: str,
+    payload: Mapping[str, Any],
+    request_sha256: str | None = None,
+) -> dict[str, Any]:
+    return {
+        "schedule_sha256": claim["schedule_sha256"],
+        "activation_id": claim["activation_id"],
+        "entity_id": claim["entity_id"],
+        "point_id": claim["point_id"],
+        "primitive_id": claim["primitive_id"],
+        "due_at": claim["due_at"],
+        "deadline_at": claim["deadline_at"],
+        "state": state,
+        "request_sha256": request_sha256,
+        "payload": dict(payload),
+    }
+
+
+def _observation_row(
+    claim: Mapping[str, Any],
+    state: str,
+    now: datetime,
+    request_digest: str | None,
+    buy_out: object | None = None,
+) -> dict[str, Any]:
+    return {
+        "schedule_sha256": claim["schedule_sha256"],
+        "activation_id": claim["activation_id"],
+        "entity_id": claim["entity_id"],
+        "point_id": claim["point_id"],
+        "primitive_id": claim["primitive_id"],
+        "state": state,
+        "event_time": claim["due_at"],
+        "first_reliable_available_at": render_utc(now),
+        "request_sha256": request_digest,
+        "buy_out_amount": buy_out,
+    }
+
+
+def _url_for_claim(schedule: Mapping[str, Any], claim: Mapping[str, Any]) -> tuple[str, str] | None:
+    primitive_id = str(claim["primitive_id"])
+    entity_id = str(claim["entity_id"])
+    if primitive_id == "PRIM-JUPITER-TOKENS-V2-RECENT-001":
+        return RECENT_URL, "1.0"
+    if primitive_id == "PRIM-JUPITER-TOKENS-V2-SEARCH-001":
+        return search_url([entity_id]), "1.0"
+    if primitive_id == QUOTE_BUY:
+        return quote_url(input_mint=SOL_MINT, output_mint=entity_id, amount=BUY_AMOUNT), "1.0"
+    if primitive_id == DEPENDENT_SELL:
+        payload = claim.get("payload") or {}
+        amount = payload.get("buy_out_amount")
+        if not amount:
+            return None
+        return quote_url(input_mint=entity_id, output_mint=SOL_MINT, amount=str(amount)), "1.0"
+    raise ObservationSchedulerError("CHANGE_LANE_PRIMITIVE_GAP")
+
+
+def _propagate_buy_out(
+    store: ObservationScheduleStore,
+    *,
+    schedule: Mapping[str, Any],
+    activation_id: str,
+    entity_id: str,
+    buy_out_amount: str,
+    now: datetime,
+) -> None:
+    digest = str(schedule["schedule_sha256"])
+    pending = store.due_in_states(("PENDING", "DUE", "CLAIMED"))
+    for row in pending:
+        if (
+            row["schedule_sha256"] == digest
+            and row["activation_id"] == activation_id
+            and row["entity_id"] == entity_id
+            and row["primitive_id"] == DEPENDENT_SELL
+        ):
+            store.merge_due_payload(row, {"buy_out_amount": buy_out_amount}, clock=now)
+
+
+def _admit_candidates(
+    *,
+    store: ObservationScheduleStore,
+    schedule: Mapping[str, Any],
+    activation_id: str,
+    rows: Sequence[Mapping[str, Any]],
+    now: datetime,
+) -> None:
+    digest = str(schedule["schedule_sha256"])
+    sampling = schedule["sampling"]
+    member_cap = int(sampling["max_members_per_utc_day"])
+    admitted = 0
+    stops = parse_utc(schedule["activation"]["stops_admitting_at"])
+    if now >= stops:
+        return
+    for row in rows:
+        entity_id = str(row.get("id") or row.get("mint") or "")
+        if not entity_id:
+            continue
+        inserted = store.insert_candidate(
+            {
+                "schedule_sha256": digest,
+                "activation_id": activation_id,
+                "entity_id": entity_id,
+                "state": "CANDIDATE",
+                "payload": {
+                    "first_seen_at": render_utc(now),
+                    "inclusion_probability": sampling["inclusion_probability"],
+                    "sampling_seed": sampling["seed"],
+                },
+            },
+            clock=now,
+        )
+        if inserted is False:
+            continue
+        if not _population_eligible(schedule, row):
+            store.set_candidate_state(
+                {
+                    "schedule_sha256": digest,
+                    "activation_id": activation_id,
+                    "entity_id": entity_id,
+                    "state": "NOT_SELECTED_PREDICATE",
+                    "payload": {"reason": "POPULATION_PREDICATE_FAIL_CLOSED"},
+                },
+                clock=now,
+            )
+            continue
+        if not _sample_included(
+            seed=str(sampling["seed"]),
+            entity_id=entity_id,
+            schedule_digest=digest,
+            probability=str(sampling["inclusion_probability"]),
+        ):
+            store.set_candidate_state(
+                {
+                    "schedule_sha256": digest,
+                    "activation_id": activation_id,
+                    "entity_id": entity_id,
+                    "state": "NOT_SELECTED_HASH_SAMPLE",
+                    "payload": {"inclusion_probability": sampling["inclusion_probability"]},
+                },
+                clock=now,
+            )
+            continue
+        if admitted >= member_cap:
+            store.set_candidate_state(
+                {
+                    "schedule_sha256": digest,
+                    "activation_id": activation_id,
+                    "entity_id": entity_id,
+                    "state": "NOT_SELECTED_CAPACITY",
+                    "payload": {"universe_count": len(rows), "admitted": admitted},
+                },
+                clock=now,
+            )
+            continue
+        anchor = parse_anchor(row)
+        if anchor is None:
+            store.set_candidate_state(
+                {
+                    "schedule_sha256": digest,
+                    "activation_id": activation_id,
+                    "entity_id": entity_id,
+                    "state": "ANCHOR_UNKNOWN",
+                    "payload": {"scheduling_fallback": schedule["population"]["scheduling_fallback"]},
+                },
+                clock=now,
+            )
+            continue
+        admitted += 1
+        store.set_candidate_state(
+            {
+                "schedule_sha256": digest,
+                "activation_id": activation_id,
+                "entity_id": entity_id,
+                "state": "ADMITTED",
+                "payload": {"anchor_event_time": render_utc(anchor)},
+            },
+            clock=now,
+        )
+        _enqueue_points(store, schedule, activation_id, entity_id, anchor, now)
+
+
+def _enqueue_points(
+    store: ObservationScheduleStore,
+    schedule: Mapping[str, Any],
+    activation_id: str,
+    entity_id: str,
+    anchor: datetime,
+    now: datetime,
+) -> None:
+    digest = str(schedule["schedule_sha256"])
+    points = [schedule["x_point"], *list(schedule["y_points"])]
+    for point in points:
+        for bundle_id in point["bundle_ids"]:
+            primitive_id = BUNDLE_TO_PRIMITIVE[str(bundle_id)]
+            due_at, deadline_at = _due_times(
+                anchor,
+                int(point["due_offset_seconds"]),
+                int(point["allowed_lateness_seconds"]),
+            )
+            store.insert_due(
+                {
+                    "schedule_sha256": digest,
+                    "activation_id": activation_id,
+                    "entity_id": entity_id,
+                    "point_id": str(point["point_id"]),
+                    "primitive_id": primitive_id,
+                    "state": "PENDING",
+                    "due_at": due_at,
+                    "deadline_at": deadline_at,
+                    "payload": {},
+                },
+                clock=now,
+            )
+
+
+def apply_recovery_gap(store: ObservationScheduleStore, *, cutoff: datetime) -> int:
+    return store.mark_recovery_gap(cutoff=cutoff)
+
+
+__all__ = [
+    "ObservationSchedulerError",
+    "apply_recovery_gap",
+    "poll_slot_id",
+    "tick_once",
+]

@@ -110,6 +110,15 @@
     "non_claims": {
       "type": "array",
       "items": {"type": "string"}
+    },
+    "observation_schedule_sha256": {
+      "anyOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]
+    },
+    "observation_schedule_authority_sha256": {
+      "anyOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]
+    },
+    "observation_panel_snapshot_sha256": {
+      "anyOf": [{"type": "null"}, {"$ref": "#/$defs/sha256"}]
     }
   },
   "$defs": {

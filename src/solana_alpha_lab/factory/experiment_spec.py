@@ -11,6 +11,7 @@ import yaml
 
 SCHEMA_RELATIVE = "catalog/schemas/experiment_spec.schema.json"
 SCHEMA_V1_1_RELATIVE = "catalog/schemas/experiment_spec_v1_1.schema.json"
+SCHEMA_V1_2_RELATIVE = "catalog/schemas/experiment_spec_v1_2.schema.json"
 
 
 class ExperimentSpecError(ValueError):
@@ -34,6 +35,8 @@ def _schema_for_document(root: Path, document: Mapping[str, Any]) -> dict[str, A
         relative = SCHEMA_RELATIVE
     elif version == "1.1":
         relative = SCHEMA_V1_1_RELATIVE
+    elif version == "1.2":
+        relative = SCHEMA_V1_2_RELATIVE
     else:
         raise ExperimentSpecError("EXPERIMENT_SPEC_SCHEMA_INVALID")
     try:

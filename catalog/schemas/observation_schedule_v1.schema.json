@@ -1,0 +1,297 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/observation_schedule_v1.schema.json",
+  "title": "SMIAL ObservationSchedule v1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "schedule_key",
+    "activation",
+    "source_poll",
+    "population",
+    "sampling",
+    "x_point",
+    "y_points",
+    "missingness",
+    "disappearance",
+    "budgets",
+    "retention",
+    "authority",
+    "outputs"
+  ],
+  "properties": {
+    "schema": {"const": "smial.observation-schedule"},
+    "schema_version": {"const": "1.0"},
+    "schedule_key": {
+      "type": "string",
+      "pattern": "^OBS-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "schedule_sha256": {"$ref": "#/$defs/sha256"},
+    "activation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["starts_at", "stops_admitting_at", "cadence_alignment"],
+      "properties": {
+        "starts_at": {"$ref": "#/$defs/timestamp"},
+        "stops_admitting_at": {"$ref": "#/$defs/timestamp"},
+        "cadence_alignment": {"const": "UTC_EPOCH"}
+      }
+    },
+    "source_poll": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["primitive_id", "query_profile_id", "period_seconds"],
+      "properties": {
+        "primitive_id": {"$ref": "#/$defs/primitive_id"},
+        "query_profile_id": {"$ref": "#/$defs/query_profile_id"},
+        "period_seconds": {"enum": [60, 300, 900, 3600, 86400]}
+      }
+    },
+    "population": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entity_type",
+        "entity_key_field_id",
+        "anchor_field_id",
+        "scheduling_fallback",
+        "source_predicates",
+        "x_eligibility_predicates"
+      ],
+      "properties": {
+        "entity_type": {"const": "TOKEN_MINT"},
+        "entity_key_field_id": {"$ref": "#/$defs/field_id"},
+        "anchor_field_id": {"$ref": "#/$defs/field_id"},
+        "scheduling_fallback": {"enum": ["FIRST_SEEN_AT_ONLY", "NONE"]},
+        "source_predicates": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/predicate"}
+        },
+        "x_eligibility_predicates": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/predicate"}
+        }
+      }
+    },
+    "sampling": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "policy",
+        "seed",
+        "inclusion_probability",
+        "max_candidates_per_utc_day",
+        "max_members_per_utc_day",
+        "overflow_state"
+      ],
+      "properties": {
+        "policy": {"enum": ["ALL_UNDER_CAP", "DETERMINISTIC_HASH_BERNOULLI"]},
+        "seed": {"type": "string", "minLength": 4, "maxLength": 120},
+        "inclusion_probability": {
+          "type": "string",
+          "pattern": "^(0\\.[0-9]{1,8}|1(\\.0{1,8})?)$"
+        },
+        "max_candidates_per_utc_day": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000
+        },
+        "max_members_per_utc_day": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "overflow_state": {"const": "NOT_SELECTED_CAPACITY"}
+      }
+    },
+    "x_point": {"$ref": "#/$defs/point"},
+    "y_points": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {"$ref": "#/$defs/point"}
+    },
+    "missingness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value_policy",
+        "unknown_is_zero",
+        "missing_point_deletes_member",
+        "continue_later_points_after_missing"
+      ],
+      "properties": {
+        "value_policy": {"const": "TYPED_NULL_NO_IMPUTATION"},
+        "unknown_is_zero": {"const": false},
+        "missing_point_deletes_member": {"const": false},
+        "continue_later_points_after_missing": {"type": "boolean"}
+      }
+    },
+    "disappearance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default",
+        "single_absence_is_terminal",
+        "explicit_registered_terminal"
+      ],
+      "properties": {
+        "default": {"enum": ["CONTINUE_UNTIL_FINAL_HORIZON", "CENSOR_REMAINING_POINTS"]},
+        "single_absence_is_terminal": {"const": false},
+        "explicit_registered_terminal": {"const": "CENSOR_REMAINING_POINTS"}
+      }
+    },
+    "budgets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "cash_usd_max",
+        "provider_calls_per_tick_max",
+        "provider_calls_per_utc_day_max",
+        "provider_calls_lifetime_max",
+        "modeled_provider_credits_per_utc_day_max",
+        "raw_bytes_per_utc_day_max",
+        "canonical_bytes_lifetime_max",
+        "min_provider_pace_seconds",
+        "retry",
+        "fallback"
+      ],
+      "properties": {
+        "cash_usd_max": {"const": "0"},
+        "provider_calls_per_tick_max": {"type": "integer", "minimum": 1, "maximum": 60},
+        "provider_calls_per_utc_day_max": {"type": "integer", "minimum": 1, "maximum": 100000},
+        "provider_calls_lifetime_max": {"type": "integer", "minimum": 1, "maximum": 1000000},
+        "modeled_provider_credits_per_utc_day_max": {"type": "integer", "minimum": 1, "maximum": 10000000},
+        "raw_bytes_per_utc_day_max": {"type": "integer", "minimum": 1},
+        "canonical_bytes_lifetime_max": {"type": "integer", "minimum": 1},
+        "min_provider_pace_seconds": {"type": "integer", "minimum": 1, "maximum": 3600},
+        "retry": {"const": false},
+        "fallback": {"const": false}
+      }
+    },
+    "retention": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw_retention_days",
+        "canonical_panel_retention",
+        "active_journal_backup"
+      ],
+      "properties": {
+        "raw_retention_days": {"type": "integer", "minimum": 8, "maximum": 365},
+        "canonical_panel_retention": {"const": "IMMUTABLE"},
+        "active_journal_backup": {"const": "REQUIRED"}
+      }
+    },
+    "authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile_id", "activation_receipt_required"],
+      "properties": {
+        "profile_id": {"$ref": "#/$defs/authority_profile_id"},
+        "activation_receipt_required": {"const": true}
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "membership_schema_id",
+        "observation_index_schema_id",
+        "partition_period",
+        "publication"
+      ],
+      "properties": {
+        "membership_schema_id": {"$ref": "#/$defs/schema_id"},
+        "observation_index_schema_id": {"$ref": "#/$defs/schema_id"},
+        "partition_period": {"const": "UTC_DAY"},
+        "publication": {"const": "MANIFEST_LAST"}
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    },
+    "field_id": {
+      "type": "string",
+      "pattern": "^FIELD-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "primitive_id": {
+      "type": "string",
+      "pattern": "^PRIM-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "query_profile_id": {
+      "type": "string",
+      "pattern": "^QUERY-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "bundle_id": {
+      "type": "string",
+      "pattern": "^BUNDLE-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "authority_profile_id": {
+      "type": "string",
+      "pattern": "^AUTH-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "schema_id": {
+      "type": "string",
+      "pattern": "^SCHEMA-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "point_id": {
+      "type": "string",
+      "pattern": "^[XY][0-9]{1,7}$"
+    },
+    "predicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["field_id", "operator"],
+      "properties": {
+        "field_id": {"$ref": "#/$defs/field_id"},
+        "operator": {"enum": ["EQ", "NEQ", "GT", "GTE", "LT", "LTE"]},
+        "value_text": {"type": "string", "minLength": 1, "maxLength": 120},
+        "value_decimal": {
+          "type": "string",
+          "pattern": "^-?[0-9]+(?:\\.[0-9]{1,18})?$"
+        }
+      },
+      "oneOf": [
+        {"required": ["value_text"], "not": {"required": ["value_decimal"]}},
+        {"required": ["value_decimal"], "not": {"required": ["value_text"]}}
+      ]
+    },
+    "point": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "point_id",
+        "due_offset_seconds",
+        "allowed_lateness_seconds",
+        "bundle_ids"
+      ],
+      "properties": {
+        "point_id": {"$ref": "#/$defs/point_id"},
+        "due_offset_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2592000
+        },
+        "allowed_lateness_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 2592000
+        },
+        "bundle_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/bundle_id"}
+        }
+      }
+    }
+  }
+}

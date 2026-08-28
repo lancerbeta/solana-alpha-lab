@@ -25,6 +25,8 @@ import yaml
 
 CONFIG_RELATIVE = "configs/factory_remote_operations_v1.yaml"
 SCHEMA_RELATIVE = "catalog/schemas/factory_remote_operations.schema.json"
+CONFIG_V1_1_RELATIVE = "configs/factory_remote_operations_v1_1.yaml"
+SCHEMA_V1_1_RELATIVE = "catalog/schemas/factory_remote_operations_v1_1.schema.json"
 FORBIDDEN_HEALTHY = "HEALTHY"
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 UNRESOLVED_STATES = frozenset(
@@ -69,6 +71,36 @@ def load_config(root: Path) -> dict[str, Any]:
     return loaded
 
 
+def load_config_v1_1(root: Path) -> dict[str, Any]:
+    path = root / CONFIG_V1_1_RELATIVE
+    if path.is_file() is False:
+        raise RemoteOpsError("REMOTE_OPS_CONFIG_MISSING")
+    loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise RemoteOpsError("REMOTE_OPS_CONFIG_INVALID")
+    schema = json.loads((root / SCHEMA_V1_1_RELATIVE).read_text(encoding="utf-8"))
+    jsonschema.validate(loaded, schema)
+    return loaded
+
+
+def consistent_sqlite_backup(source: Path, dest: Path) -> None:
+    import sqlite3
+
+    if dest.is_absolute() is False:
+        raise RemoteOpsError("REMOTE_PATH_UNSAFE")
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.exists():
+        dest.unlink()
+    conn = sqlite3.connect(f"file:{source}?mode=ro", uri=True)
+    replica = sqlite3.connect(dest)
+    try:
+        conn.backup(replica)
+        replica.commit()
+    finally:
+        replica.close()
+        conn.close()
+
+
 def require_secret(name: str, environ: Mapping[str, str] | None = None) -> str:
     """Fail closed. A missing secret is an error, never a default."""
 
@@ -100,6 +132,13 @@ def verify_security_templates(root: Path, config: Mapping[str, Any] | None = Non
         str(loaded["units"]["backup_service_relative"]),
         str(loaded["units"]["paper_heartbeat_relative"]),
     ]
+    extra_units = loaded["units"]
+    for key in (
+        "observation_schedule_service_relative",
+        "observation_schedule_timer_relative",
+    ):
+        if key in extra_units:
+            unit_relatives.append(str(extra_units[key]))
     units = {relative: _read_text(root, relative) for relative in unit_relatives}
     failures: list[str] = []
     if "PasswordAuthentication no" not in sshd:

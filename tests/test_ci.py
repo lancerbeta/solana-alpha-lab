@@ -67,7 +67,7 @@ class CiWorkflowTests(unittest.TestCase):
             },
         )
         job = document["jobs"]["validate"]
-        self.assertEqual(job["timeout-minutes"], "15")
+        self.assertEqual(job["timeout-minutes"], "25")
         self.assertEqual(job["concurrency"] if "concurrency" in job else None, None)
         self.assertEqual(document["concurrency"]["cancel-in-progress"], "true")
         self.assertEqual(
@@ -118,7 +118,7 @@ class CiWorkflowTests(unittest.TestCase):
                 "git config --local core.hooksPath .githooks\n",
                 "",
             ),
-            self.text.replace("timeout-minutes: 15\n", ""),
+            self.text.replace("timeout-minutes: 25\n", ""),
             self.text.replace("cancel-in-progress: true", "cancel-in-progress: false"),
         )
         for mutation in mutations:

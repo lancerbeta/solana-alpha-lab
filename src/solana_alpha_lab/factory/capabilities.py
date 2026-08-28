@@ -61,6 +61,7 @@ CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE = (
 CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER = (
     "CAP-JUPITER-FREE-KEY-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
 )
+CAP_OBSERVATION_SCHEDULE_COMPILE_BIND = "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001"
 INPUT_KINDS = frozenset(
     {
         "GIT_CANONICAL_RECEIPT",
@@ -613,12 +614,40 @@ def capture_early_icp_first_hit_mix_falsifier(
     }
 
 
+def compile_observation_schedule(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    authority_phrase: str | None = None,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Compile or bind an ObservationSchedule. Does not discard spec. Zero provider calls."""
+
+    del authority_phrase
+    from solana_alpha_lab.factory.observation_schedule_capability import (
+        compile_and_bind_observation_schedule,
+    )
+
+    hooks = dict(capture_hooks or {})
+    return compile_and_bind_observation_schedule(
+        spec,
+        root=root,
+        coverage=hooks.get("coverage"),
+        closed_family=bool(hooks.get("closed_family")),
+        data_root=hooks.get("data_root"),
+        producer_git_sha=hooks.get("producer_git_sha"),
+        hypothesis_version_id=hooks.get("hypothesis_version_id"),
+        run_id=hooks.get("run_id"),
+    )
+
+
 CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_OFFLINE_CANONICAL_RECEIPT_REPLAY: replay_canonical_receipts,
     CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE: capture_quote_native_free_key,
     CAP_JUPITER_FREE_KEY_FORWARD_H900_QUOTE_CAPTURE: capture_forward_h900_quote,
     CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER: capture_early_icp_first_hit_mix_falsifier,
     CAP_OFFLINE_MARKET_FEATURE_RESOLVE: resolve_market_feature_surface,
+    CAP_OBSERVATION_SCHEDULE_COMPILE_BIND: compile_observation_schedule,
 }
 
 
@@ -650,6 +679,8 @@ def execute_capability(
     if capability_id == CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER:
         if budget < 1 or budget > 60:
             raise CapabilityError("PROVIDER_BUDGET_INVALID")
+    if capability_id == CAP_OBSERVATION_SCHEDULE_COMPILE_BIND and budget != 0:
+        raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     return handler(
         spec,
         root=root,

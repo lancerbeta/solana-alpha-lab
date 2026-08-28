@@ -1,0 +1,10 @@
+[Unit]
+Description=Factory ObservationSchedule tick --once
+Documentation=docs/tasks/DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1.md
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solana-alpha-lab
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once
+NoNewPrivileges=true

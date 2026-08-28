@@ -61,6 +61,12 @@ _PROJECTION_VIEWS = (
     "promotion_candidates",
     "prior_work",
     "capability_gaps",
+    "observation_schedules",
+    "observation_schedule_authorities",
+    "observation_members",
+    "observation_batches",
+    "observation_panel_snapshots",
+    "observation_schedule_bindings",
 )
 _PROJECTION_COLUMNS = (
     "record_id",
@@ -133,6 +139,13 @@ class RecordKind(StrEnum):
     EVIDENCE_BINDING = "EVIDENCE_BINDING"
     PROMOTION_CANDIDATE = "PROMOTION_CANDIDATE"
     CAPABILITY_GAP = "CAPABILITY_GAP"
+    OBSERVATION_SCHEDULE = "OBSERVATION_SCHEDULE"
+    OBSERVATION_SCHEDULE_AUTHORITY = "OBSERVATION_SCHEDULE_AUTHORITY"
+    OBSERVATION_SCHEDULE_STATE = "OBSERVATION_SCHEDULE_STATE"
+    OBSERVATION_MEMBER_BATCH = "OBSERVATION_MEMBER_BATCH"
+    OBSERVATION_BATCH = "OBSERVATION_BATCH"
+    OBSERVATION_PANEL_SNAPSHOT = "OBSERVATION_PANEL_SNAPSHOT"
+    OBSERVATION_SCHEDULE_BINDING = "OBSERVATION_SCHEDULE_BINDING"
 
 
 class ResearchEvent(BaseModel):
@@ -538,6 +551,13 @@ _STABLE_ID_FIELDS = {
     RecordKind.EVIDENCE_BINDING: "evidence_binding_id",
     RecordKind.PROMOTION_CANDIDATE: "promotion_candidate_id",
     RecordKind.CAPABILITY_GAP: "capability_gap_id",
+    RecordKind.OBSERVATION_SCHEDULE: "schedule_sha256",
+    RecordKind.OBSERVATION_SCHEDULE_AUTHORITY: "authority_id",
+    RecordKind.OBSERVATION_SCHEDULE_STATE: "state_event_id",
+    RecordKind.OBSERVATION_MEMBER_BATCH: "batch_id",
+    RecordKind.OBSERVATION_BATCH: "batch_id",
+    RecordKind.OBSERVATION_PANEL_SNAPSHOT: "snapshot_id",
+    RecordKind.OBSERVATION_SCHEDULE_BINDING: "binding_id",
 }
 
 

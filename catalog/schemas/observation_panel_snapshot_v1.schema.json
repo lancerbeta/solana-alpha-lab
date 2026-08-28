@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/observation_panel_snapshot_v1.schema.json",
+  "title": "SMIAL ObservationPanelSnapshot v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "snapshot_id",
+    "schedule_sha256",
+    "availability_cutoff",
+    "dataset_manifest_ids",
+    "dataset_fingerprints",
+    "snapshot_sha256",
+    "first_reliable_available_at"
+  ],
+  "properties": {
+    "schema": {"const": "smial.observation-panel-snapshot"},
+    "schema_version": {"const": "1.0"},
+    "snapshot_id": {
+      "type": "string",
+      "pattern": "^SNAP-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "schedule_sha256": {"$ref": "#/$defs/sha256"},
+    "activation_id": {
+      "type": "string",
+      "pattern": "^ACT-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "availability_cutoff": {"$ref": "#/$defs/timestamp"},
+    "dataset_manifest_ids": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 8, "maxLength": 256}
+    },
+    "dataset_fingerprints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/sha256"}
+    },
+    "snapshot_sha256": {"$ref": "#/$defs/sha256"},
+    "first_reliable_available_at": {"$ref": "#/$defs/timestamp"},
+    "evidence_role": {
+      "enum": [
+        "PROSPECTIVE_OOS",
+        "PROSPECTIVE_OUTCOME_BLIND_CONDITIONAL",
+        "EXPLORATORY_REUSE",
+        "CONSUMED_PRIOR_EVIDENCE"
+      ]
+    }
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "timestamp": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(?:\\.[0-9]+)?Z$"
+    }
+  }
+}

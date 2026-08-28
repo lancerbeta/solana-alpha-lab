@@ -405,6 +405,9 @@ class RunPassport(BaseModel):
     artifact_manifest_sha256: Hash64
     limitations: tuple[str, ...]
     non_claims: tuple[str, ...]
+    observation_schedule_sha256: Hash64 | None = None
+    observation_schedule_authority_sha256: Hash64 | None = None
+    observation_panel_snapshot_sha256: Hash64 | None = None
 
     @model_validator(mode="after")
     def validate_passport(self) -> RunPassport:
