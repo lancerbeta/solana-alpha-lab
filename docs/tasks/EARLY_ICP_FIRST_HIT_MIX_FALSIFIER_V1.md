@@ -25,6 +25,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/capabilities.py
 - scripts/run_early_icp_first_hit_mix_falsifier.py
 - tests/test_early_icp_first_hit_mix_falsifier.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - catalog/catalog_manifest.yaml
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml

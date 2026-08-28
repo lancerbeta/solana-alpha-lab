@@ -27657,7 +27657,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 0543f8e4ad5b88d257d004145c7344d11bc01ee15e4ff56046b9a91df665d137}
+  integrity: {kind: sha256, sha256: 6730f57b938327325d21cb734873663e3d1aa3d45609327903328bad3b6f70d0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -32614,7 +32614,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1.md', repository_path: docs/tasks/EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1.md}
-  integrity: {kind: sha256, sha256: ec486d78dee972fda6ab1178d9e87ac0bc20557394c65e0a4e244e19ed2a1d7a}
+  integrity: {kind: sha256, sha256: c53492fa1b9c08fd49ff68c612034ac56acc95443649b37df240075e85d7a3cf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001}
