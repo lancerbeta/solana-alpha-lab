@@ -9,22 +9,23 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/early_icp_first_hit_mix_falsifier/a1_delivery_factory_fit_v1.json",
-    "sha256": "c03cc7acd7b060d0ca2034f2fd2c61d11a063824679179881589415e9506824a",
+    "sha256": "afb69f71a84f073443dbc6e2aa467fff2dcd5e0bbc49c60ca0e260949c6060a8",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "a9dcd5cb366e60530c25b71bb5b44bec75b2fe898525a6bfb378b39ddab9a751",
+    "catalog/assets/core.yaml": "774f1cc2389772141a3f51347df433e61f43744d9e19ce5b2b8fe3f416772bbd",
     "catalog/assets/lifecycle.yaml": "ca09933503ce427e8b6937feb6da6f6721c52d48d818dc48cd0d60fe4a660fbb",
     "catalog/catalog_manifest.yaml": "9b461b9e467d7fd975312954939799b1ac3360d793cf539efd856d0388254201",
     "catalog/generated/asset_edges.json": "f9a8715d04c44a7342d6e0b83aef382081deaf35698fe536857503e2faec88c5",
     "configs/early_icp_first_hit_mix_falsifier_v1.yaml": "beceffda1d98a85519c8bc64cfddf774c452c043b93a8e7c94d0622bff0f1e55",
     "configs/experiment_capability_registry_v1.yaml": "7581c17704c312beb29579032ac7077898b3218dc431e8f8be95032d1d6ab118",
     "docs/PROJECT_MAP.md": "edcd1cef45e19a93ca4a3cc969c4d788a6e021ad63fe8408f3ba607abac615b7",
-    "docs/tasks/EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1.md": "ec486d78dee972fda6ab1178d9e87ac0bc20557394c65e0a4e244e19ed2a1d7a",
+    "docs/tasks/EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1.md": "c53492fa1b9c08fd49ff68c612034ac56acc95443649b37df240075e85d7a3cf",
     "scripts/run_early_icp_first_hit_mix_falsifier.py": "d2c04407c0d62ed3ca30ac06ad8ee65c13def590f3b02764aebb33280b4a1e27",
     "src/solana_alpha_lab/factory/capabilities.py": "f9466bd43a6323085f40871ea9b01b5505bb472b32ffe9908d012f619439dd5d",
     "src/solana_alpha_lab/factory/early_icp_first_hit_mix_falsifier.py": "a293c011d5034eb4e2791d5fd168d9dee198eb10d93c43617ef87440c7d9b6e2",
-    "tests/test_early_icp_first_hit_mix_falsifier.py": "672cb5dd9336bba521654b774c86b2261ebde713a14cc6e328515ce58a4a374a"
+    "tests/test_early_icp_first_hit_mix_falsifier.py": "672cb5dd9336bba521654b774c86b2261ebde713a14cc6e328515ce58a4a374a",
+    "tests/test_factory_ordinary_market_hypothesis.py": "6730f57b938327325d21cb734873663e3d1aa3d45609327903328bad3b6f70d0"
   },
   "non_claims": [
     "NO_ALPHA",
@@ -60,7 +61,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/early_icp_first_hit_mix_falsifier/a1_delivery_independent_review_v1.json",
-      "sha256": "61feb78512138e8b3748d5bc5bd75f36f3f4ce8f55d25a6e2bb67b90b3f7d6f8",
+      "sha256": "79a56a9f41b146dd4655cd5c278fcc761dae89f98433e37966cfc6760ceed160",
       "verdict": "PASS"
     },
     "project_checks": [
