@@ -72,6 +72,7 @@ managed_write_set:
 - .github/workflows/ci.yml
 - scripts/validate_ci.py
 - tests/test_ci.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - catalog/catalog_manifest.yaml
 - catalog/generated/asset_edges.json
 - docs/PROJECT_MAP.md
