@@ -519,6 +519,146 @@ class ObservationSchedulerTests(unittest.TestCase):
             self.assertEqual(search_states[missing], "MISSING_TYPED")
             store.close()
 
+    def test_two_mint_started_search_is_not_replayed(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        other = "Mint222222222222222222222222222222222222222"
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            activation_id = _activate(store, schedule)
+            for entity in (MINT, other):
+                store.insert_due(
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "activation_id": activation_id,
+                        "entity_id": entity,
+                        "point_id": "X300",
+                        "primitive_id": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+                        "state": "PENDING",
+                        "due_at": "2026-09-01T00:05:00Z",
+                        "deadline_at": "2026-09-01T00:20:00Z",
+                        "payload": {},
+                    },
+                    clock=NOW,
+                )
+            from solana_alpha_lab.factory.observation_primitives import (
+                request_sha256,
+                search_url,
+            )
+
+            url = search_url([MINT, other])
+            digest = request_sha256(
+                method="GET", url=url, body=None, primitive_version="1.0"
+            )
+            store.start_call(
+                request_sha256=digest,
+                attempt_id="ATT-BATCH",
+                primitive_id="PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+                payload={"url": url},
+                clock=NOW,
+            )
+            opener = _Opener()
+            tick_once(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule=schedule,
+                activation_id=activation_id,
+                now=NOW,
+                opener=opener,
+                producer_git_sha=GIT_SHA,
+                discovery_rows=[],
+            )
+            self.assertEqual(opener.urls, [])
+            self.assertEqual(store.due_counts().get("IN_FLIGHT_CALL_INDETERMINATE"), 2)
+            store.close()
+
+    def test_source_poll_slot_is_reused(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            activation_id = _activate(store, schedule)
+            opener = _Opener()
+            first = tick_once(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule=schedule,
+                activation_id=activation_id,
+                now=NOW,
+                opener=opener,
+                producer_git_sha=GIT_SHA,
+            )
+            recents = [url for url in opener.urls if "/tokens/v2/recent" in url]
+            self.assertEqual(len(recents), 1)
+            self.assertFalse(first.get("source_poll_reused"))
+            second = tick_once(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule=schedule,
+                activation_id=activation_id,
+                now=NOW,
+                opener=opener,
+                producer_git_sha=GIT_SHA,
+            )
+            recents_after = [url for url in opener.urls if "/tokens/v2/recent" in url]
+            self.assertEqual(len(recents_after), 1)
+            self.assertTrue(second.get("source_poll_reused"))
+            store.close()
+
+    def test_rejected_members_remain_in_denominator(self) -> None:
+        import pyarrow.parquet as pq
+
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        rejected = "MintReject1111111111111111111111111111111"
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            activation_id = _activate(store, schedule)
+            tick_once(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule=schedule,
+                activation_id=activation_id,
+                now=NOW,
+                opener=_Opener(),
+                producer_git_sha=GIT_SHA,
+                discovery_rows=[
+                    {
+                        "id": MINT,
+                        "liquidity": "2000",
+                        "firstPool": {
+                            "createdAt": "2026-09-01T00:00:00Z",
+                            "source": "pump.fun",
+                        },
+                    },
+                    {
+                        "id": rejected,
+                        "liquidity": "10",
+                        "firstPool": {
+                            "createdAt": "2026-09-01T00:00:00Z",
+                            "source": "other",
+                        },
+                    },
+                ],
+            )
+            members_path = next((data_root / "datasets" / "parquet").rglob("members.parquet"))
+            states = set(pq.read_table(members_path).column("membership_state").to_pylist())
+            self.assertIn("PREDICATE_REJECTED", states)
+            store.close()
+
 
 if __name__ == "__main__":
     unittest.main()

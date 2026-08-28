@@ -140,6 +140,110 @@ class ObservationPanelPublisherTests(unittest.TestCase):
             compute_dataset_manifest_id("observation-panel-abc", "20260901-1-deadbeef"),
         )
 
+    def test_provisional_rows_leave_event_clocks_null(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            published = publish_observation_batch(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+                members=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "entity_id": "MintA",
+                        "membership_state": "ADMITTED",
+                        "event_time": None,
+                    }
+                ],
+                observations=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "entity_id": "MintA",
+                        "point_id": "X300",
+                        "state": "OBSERVED",
+                        "event_time": None,
+                        "first_reliable_available_at": "2026-09-01T00:10:00Z",
+                        "provisional_due": True,
+                    }
+                ],
+            )
+            self.assertIsNone(published["min_event_time"])
+            partition = json.loads(
+                next(
+                    (data_root / "datasets" / "manifests" / "partitions").glob("*.json")
+                ).read_text(encoding="utf-8")
+            )
+            self.assertIsNone(partition["min_event_time"])
+            self.assertIsNone(partition["max_event_time"])
+            self.assertNotEqual(
+                partition["min_event_time"],
+                partition["first_reliable_available_at"],
+            )
+
+    def test_y_rows_prove_first_y_availability(self) -> None:
+        from solana_alpha_lab.factory.observation_panel_coverage import (
+            derive_first_y_available_at,
+        )
+
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            publish_observation_batch(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+                members=[{"schedule_sha256": schedule["schedule_sha256"], "entity_id": "MintA"}],
+                observations=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "entity_id": "MintA",
+                        "point_id": "X300",
+                        "state": "OBSERVED",
+                        "event_time": "2026-09-01T00:05:00Z",
+                        "first_reliable_available_at": "2026-09-01T00:10:00Z",
+                    }
+                ],
+            )
+            _, x_only = derive_first_y_available_at(data_root, schedule["schedule_sha256"])
+            self.assertFalse(x_only)
+            publish_observation_batch(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=datetime(2026, 9, 1, 0, 16, tzinfo=UTC),
+                producer_git_sha=GIT_SHA,
+                members=[{"schedule_sha256": schedule["schedule_sha256"], "entity_id": "MintA"}],
+                observations=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "entity_id": "MintA",
+                        "point_id": "Y900",
+                        "state": "OBSERVED",
+                        "event_time": "2026-09-01T00:15:00Z",
+                        "first_reliable_available_at": "2026-09-01T00:16:00Z",
+                    }
+                ],
+            )
+            instant, proven = derive_first_y_available_at(
+                data_root, schedule["schedule_sha256"]
+            )
+            self.assertTrue(proven)
+            self.assertIsNotNone(instant)
+
     def test_publication_faults_repair_to_one_complete_dataset(self) -> None:
         schedule = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"

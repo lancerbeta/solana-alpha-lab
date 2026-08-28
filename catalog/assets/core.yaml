@@ -19875,7 +19875,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: 095a52a8c089428dcb39257170e9d811d7678ef000f23859c5d35082313b9520}
+  integrity: {kind: sha256, sha256: cc6c5559df42eec1683d06000236c0b6022c4df6dad87114cea026a8083f0fb8}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -31940,7 +31940,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: 879bdbf716b81883c91f3e62e8d7cbbf26ed3890dc5c430ccb31fe8896835748}
+  integrity: {kind: sha256, sha256: 73e9e485f6e50aa493f604c6a8a1986c28eb1fd1e2f50de40c02d8708eb74c2d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32899,7 +32899,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/observation_primitive_registry_v1.yaml', repository_path: configs/observation_primitive_registry_v1.yaml}
-  integrity: {kind: sha256, sha256: 16ac6b040b3b36be4ba54130553e34c8bc5dac85b08259f78400e7af1a048a05}
+  integrity: {kind: sha256, sha256: ba9bbe024d7efd8eb5562c9894a3c810cb18c16c802f187e99c2be5d279286d5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -32984,7 +32984,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 872e9d08317d92cc8a1ab27f08abf6314076b4efb53acb5c45e9df49db177ceb}
+  integrity: {kind: sha256, sha256: 0235baad3f72bcdf60084fc76b37ed147c099147bbf6f607eea3ac5a65167596}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33001,7 +33001,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_compiler.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_compiler.py}
-  integrity: {kind: sha256, sha256: b8a36a6282159004931e362cc65b86b9469f032a9da0fd02df79cd2eebf2b9d0}
+  integrity: {kind: sha256, sha256: ce6841fe7896e27dcb3feed3307cbb6b31c10c5447e11a620914d3fb689e5037}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33018,7 +33018,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_primitives.py', repository_path: src/solana_alpha_lab/factory/observation_primitives.py}
-  integrity: {kind: sha256, sha256: b0496d74b378ac86234e01ca4b1b6322c3d1edb88d530dffba7c88e35f9bd261}
+  integrity: {kind: sha256, sha256: 5258a97c1ac1c96adf12049e2a2bce9544b4beda62843b266a4203bb2e3549f5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33035,7 +33035,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: aa528aee27bb8164c116e48bfcbbe8aa47365a784d1fd74527b25812049b5138}
+  integrity: {kind: sha256, sha256: 91c8fe7f2011194b847b6ea574145f45ae637d484ca0562940d9b942b717326b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -33052,7 +33052,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_schedule_lifecycle.py', repository_path: tests/test_observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 6edf9d57eb2ecea3c3967144a9e640f9e0e982baf8c9dff6ca03f9a326be065f}
+  integrity: {kind: sha256, sha256: 0b16ec760af3084e7419afee8b6c2838eaaf132a4534b200ef9e1ed9b2648f62}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33069,7 +33069,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_schedule_commissioning.py', repository_path: tests/test_observation_schedule_commissioning.py}
-  integrity: {kind: sha256, sha256: 5fcf2d7a797deace22d8a995fda6cfd67c8d8220b1219a0805efa8e1419c8394}
+  integrity: {kind: sha256, sha256: 6ef2ce173c19d8a866ad478b2792a9dfb6219a9573fa31a78f869488b83949e3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

@@ -8,6 +8,7 @@ from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from typing import Any
+from urllib.parse import parse_qs, urlsplit
 from uuid import uuid4
 
 from solana_alpha_lab.factory.observation_panel_publisher import (
@@ -229,6 +230,32 @@ def _entity_terminal(
     return "MISSING_TYPED", str(result.get("missing_reason") or "ENTITY_ABSENT_FROM_RESPONSE")
 
 
+def _mints_from_search_url(url: str) -> set[str]:
+    query = parse_qs(urlsplit(url).query).get("query", [""])[0]
+    return {item for item in query.split(",") if item}
+
+
+def _resolve_search_ledger(
+    store: ObservationScheduleStore,
+    live_ids: Sequence[str],
+) -> tuple[str, str, str | None]:
+    url = search_url(list(live_ids))
+    digest = request_sha256(method="GET", url=url, body=None, primitive_version="1.0")
+    prior = store.call_state(digest)
+    if prior is not None:
+        return url, digest, prior
+    live_set = {str(item) for item in live_ids}
+    for row in store.list_calls(primitive_id=SEARCH):
+        payload = row.get("payload") or {}
+        stored_url = str(payload.get("url") or "")
+        stored_mints = _mints_from_search_url(stored_url)
+        if not stored_mints:
+            continue
+        if live_set <= stored_mints:
+            return stored_url, str(row["request_sha256"]), str(row["state"])
+    return url, digest, None
+
+
 def _discover(
     *,
     store: ObservationScheduleStore,
@@ -239,7 +266,7 @@ def _discover(
     credential_loader: Callable[[], str] | None,
     redact_with: str | None,
     accounts: _Accounting,
-) -> tuple[list[Mapping[str, Any]], str | None, int, str | None]:
+) -> tuple[list[Mapping[str, Any]], str | None, int, str | None, bool]:
     slot = poll_slot_id(
         primitive_id=str(schedule["source_poll"]["primitive_id"]),
         query_profile_id=str(schedule["source_poll"]["query_profile_id"]),
@@ -249,10 +276,10 @@ def _discover(
     cached = store.load_poll_slot(slot)
     if cached is not None:
         rows = list(cached["payload"].get("rows") or [])
-        return rows, None, 0, redact_with
+        return rows, None, 0, redact_with, True
     blocked = accounts.gate()
     if blocked:
-        return [], blocked, 0, redact_with
+        return [], blocked, 0, redact_with, False
     holder = redact_with
     credential_reads = 0
     if holder is None and credential_loader is not None:
@@ -277,7 +304,7 @@ def _discover(
         payload={"rows": rows, "response_sha256": result.get("response_sha256")},
         clock=now,
     )
-    return list(rows), None, credential_reads, holder
+    return list(rows), None, credential_reads, holder, False
 
 
 def tick_once(
@@ -319,6 +346,7 @@ def tick_once(
     provider_calls = 0
     published_rows: list[dict[str, Any]] = []
     stop_reason: str | None = None
+    source_poll_reused = False
     try:
         try:
             load_observation_primitive_registry(root).verify_implementation_hashes()
@@ -335,15 +363,17 @@ def tick_once(
         )
         accounts = _Accounting(store, schedule, activation_id, now)
         if discovery_rows is None and opener is not None and state == "ACTIVE":
-            discovery_rows, stop_reason, credential_reads, holder_disc = _discover(
-                store=store,
-                schedule=schedule,
-                activation_id=activation_id,
-                now=now,
-                opener=opener,
-                credential_loader=credential_loader,
-                redact_with=redact_with,
-                accounts=accounts,
+            discovery_rows, stop_reason, credential_reads, holder_disc, source_poll_reused = (
+                _discover(
+                    store=store,
+                    schedule=schedule,
+                    activation_id=activation_id,
+                    now=now,
+                    opener=opener,
+                    credential_loader=credential_loader,
+                    redact_with=redact_with,
+                    accounts=accounts,
+                )
             )
             if holder_disc is not None:
                 redact_with = holder_disc
@@ -365,6 +395,7 @@ def tick_once(
                     "terminal": stop_reason,
                     "provider_calls": accounts.tick_calls,
                     "credential_reads": credential_reads,
+                    "source_poll_reused": source_poll_reused,
                 }
         if discovery_rows is not None and state == "ACTIVE":
             _admit_candidates(
@@ -398,13 +429,62 @@ def tick_once(
                     )
                 else:
                     live.append(claim)
-            if not live or opener is None:
+            if not live:
                 continue
-            url = search_url([str(item["entity_id"]) for item in live])
-            request_digest = request_sha256(
-                method="GET", url=url, body=None, primitive_version="1.0"
+            url, request_digest, prior = _resolve_search_ledger(
+                store, [str(item["entity_id"]) for item in live]
             )
-            if store.call_state(request_digest) is not None:
+            if prior == "STARTED":
+                for claim in live:
+                    store.insert_due(
+                        _due_copy(
+                            claim,
+                            state="IN_FLIGHT_CALL_INDETERMINATE",
+                            request_sha256=request_digest,
+                            payload={"missing_reason": "IN_FLIGHT_CALL_INDETERMINATE"},
+                        ),
+                        clock=now,
+                    )
+                    published_rows.append(
+                        _observation_row(
+                            claim, "IN_FLIGHT_CALL_INDETERMINATE", now, request_digest
+                        )
+                    )
+                continue
+            if prior == "COMPLETED":
+                ledger_payload = store.call_payload(request_digest) or {}
+                recovered_result = {
+                    "status": ledger_payload.get("status"),
+                    "missing_reason": ledger_payload.get("missing_reason"),
+                    "entities": ledger_payload.get("entities") or {},
+                    "response_sha256": ledger_payload.get("response_sha256"),
+                }
+                for claim in live:
+                    previously = str(claim.get("payload", {}).get("previously_observed") or "") == "1"
+                    terminal_state, missing_reason = _entity_terminal(
+                        recovered_result,
+                        str(claim["entity_id"]),
+                        previously_observed=previously,
+                    )
+                    store.insert_due(
+                        _due_copy(
+                            claim,
+                            state=terminal_state,
+                            request_sha256=request_digest,
+                            payload={
+                                "missing_reason": missing_reason
+                                or ledger_payload.get("missing_reason")
+                                or "RECOVERED_COMPLETED_LEDGER",
+                                "response_sha256": ledger_payload.get("response_sha256"),
+                            },
+                        ),
+                        clock=now,
+                    )
+                    published_rows.append(
+                        _observation_row(claim, terminal_state, now, request_digest)
+                    )
+                continue
+            if opener is None:
                 continue
             blocked = accounts.gate()
             if blocked:
@@ -473,6 +553,8 @@ def tick_once(
                     _observation_row(claim, terminal_state, now, request_digest)
                 )
         for claim in claims:
+            if str(claim["primitive_id"]) == SEARCH:
+                continue
             deadline = parse_utc(claim["deadline_at"])
             if now > deadline:
                 store.insert_due(
@@ -555,8 +637,6 @@ def tick_once(
                 )
                 continue
             if opener is None:
-                continue
-            if str(claim["primitive_id"]) == SEARCH:
                 continue
             blocked = accounts.gate()
             if blocked:
@@ -659,28 +739,10 @@ def tick_once(
             published_rows.append(
                 _observation_row(claim, terminal_state, now, request_digest, buy_out)
             )
-        if published_rows:
-            members = _member_snapshot(
-                store, digest=digest, activation_id=activation_id, now=now
-            )
-            if not members:
-                seen: set[str] = set()
-                for row in published_rows:
-                    entity_id = str(row["entity_id"])
-                    if entity_id in seen:
-                        continue
-                    seen.add(entity_id)
-                    members.append(
-                        {
-                            "schedule_sha256": digest,
-                            "activation_id": activation_id,
-                            "entity_id": entity_id,
-                            "membership_state": row["state"],
-                            "candidate_state": "ADMITTED",
-                            "event_time": row.get("event_time"),
-                            "first_reliable_available_at": row.get("first_reliable_available_at"),
-                        }
-                    )
+        members = _member_snapshot(
+            store, digest=digest, activation_id=activation_id, now=now
+        )
+        if members and published_rows:
             publish_observation_batch(
                 data_root=data_root,
                 root=root,
@@ -708,6 +770,7 @@ def tick_once(
             "credential_reads": credential_reads,
             "claims": len(claims),
             "published": len(published_rows),
+            "source_poll_reused": source_poll_reused,
         }
     finally:
         store.release_lease(OWNER)

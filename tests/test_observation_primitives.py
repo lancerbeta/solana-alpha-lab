@@ -109,7 +109,7 @@ class ObservationPrimitiveTests(unittest.TestCase):
                 redact_with="super-secret",
             )
 
-    def test_mint_order_changes_search_request_hash(self) -> None:
+    def test_mint_order_is_canonical_in_search_request_hash(self) -> None:
         first = request_sha256(
             method="GET",
             url=search_url(["MintA", "MintB"]),
@@ -122,7 +122,14 @@ class ObservationPrimitiveTests(unittest.TestCase):
             body=None,
             primitive_version="1.0",
         )
-        self.assertNotEqual(first, second)
+        self.assertEqual(first, second)
+        third = request_sha256(
+            method="GET",
+            url=search_url(["MintA"]),
+            body=None,
+            primitive_version="1.0",
+        )
+        self.assertNotEqual(first, third)
 
     def test_endpoint_drift_is_rejected(self) -> None:
         with self.assertRaisesRegex(ObservationPrimitiveError, "ENDPOINT_DRIFT"):

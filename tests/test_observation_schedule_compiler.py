@@ -265,6 +265,21 @@ class ObservationScheduleCompilerTests(unittest.TestCase):
             "CONSUMED_PRIOR_EVIDENCE",
         )
 
+    def test_hundred_members_fit_one_search_batch(self) -> None:
+        from solana_alpha_lab.factory.observation_primitive_registry import (
+            load_observation_primitive_registry,
+        )
+        from solana_alpha_lab.factory.observation_schedule_compiler import _compute_budget
+
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/common_panel.yaml"
+        )
+        mutated = dict(schedule)
+        mutated["sampling"] = dict(schedule["sampling"])
+        mutated["sampling"]["max_members_per_utc_day"] = 100
+        envelope = _compute_budget(mutated, load_observation_primitive_registry(ROOT))
+        self.assertEqual(envelope.batch_snapshot_calls, 1)
+
 
 if __name__ == "__main__":
     unittest.main()

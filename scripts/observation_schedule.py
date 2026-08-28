@@ -27,6 +27,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     authorize_schedule,
     pause_schedule,
     register_schedule,
+    resume_schedule,
     snapshot_schedule,
     status_schedule,
 )
@@ -109,6 +110,7 @@ def main(argv: list[str] | None = None) -> int:
         "authorize",
         "activate",
         "pause",
+        "resume",
         "status",
         "snapshot",
         "doctor",
@@ -119,10 +121,12 @@ def main(argv: list[str] | None = None) -> int:
         cmd.add_argument("--data-root")
         if name == "authorize":
             cmd.add_argument("--phrase", required=True)
-        if name in {"activate", "pause", "snapshot"}:
+        if name in {"activate", "pause", "resume", "snapshot"}:
             cmd.add_argument("--activation-id", required=True)
-        if name in {"authorize", "activate", "pause", "snapshot", "status"}:
+        if name in {"authorize", "activate", "pause", "resume", "snapshot", "status"}:
             cmd.add_argument("--schedule-sha256")
+        if name == "status":
+            cmd.add_argument("--activation-id")
     tick = sub.add_parser("tick")
     tick.add_argument("--once", action="store_true", required=True)
     tick.add_argument("--runtime-config", default=DEFAULT_RUNTIME_RELATIVE)
@@ -196,9 +200,12 @@ def main(argv: list[str] | None = None) -> int:
                 now=now,
                 producer_git_sha=producer,
             )
-            return _emit(result, 0)
+            code = 0 if result.get("terminal") in {"ACTIVATED", "ACTIVATE_REPLAY"} else 2
+            return _emit(result, code)
         if args.command == "pause":
             digest = args.schedule_sha256 or config.get("schedule_sha256")
+            if not digest and args.schedule:
+                digest = load_observation_schedule(ROOT, args.schedule)["schedule_sha256"]
             if not digest:
                 return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
             result = pause_schedule(
@@ -210,6 +217,22 @@ def main(argv: list[str] | None = None) -> int:
                 producer_git_sha=producer,
             )
             return _emit(result, 0)
+        if args.command == "resume":
+            digest = args.schedule_sha256 or config.get("schedule_sha256")
+            if not digest and args.schedule:
+                digest = load_observation_schedule(ROOT, args.schedule)["schedule_sha256"]
+            if not digest:
+                return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
+            result = resume_schedule(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=digest,
+                activation_id=args.activation_id,
+                now=now,
+                producer_git_sha=producer,
+            )
+            code = 0 if result.get("terminal") in {"RESUMED", "RESUME_REPLAY"} else 2
+            return _emit(result, code)
         if args.command == "status":
             result = status_schedule(
                 store,
@@ -219,6 +242,8 @@ def main(argv: list[str] | None = None) -> int:
             return _emit(result, 0)
         if args.command == "snapshot":
             digest = args.schedule_sha256 or config.get("schedule_sha256")
+            if not digest and args.schedule:
+                digest = load_observation_schedule(ROOT, args.schedule)["schedule_sha256"]
             if not digest:
                 return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
             result = snapshot_schedule(
@@ -233,13 +258,36 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "doctor":
             unresolved = store.restore_marker_unresolved()
             activations = store.list_activations()
+            live = any(row["state"] == "ACTIVE" for row in activations)
+            if unresolved:
+                return _emit(
+                    {
+                        "terminal": "DOCTOR_RESTORE_MARKER_UNRESOLVED",
+                        "live_activation": live,
+                        "restore_marker_unresolved": True,
+                        "activation_count": len(activations),
+                        "next_action": "RESOLVE_RESTORE_MARKER",
+                    },
+                    2,
+                )
+            if not live:
+                return _emit(
+                    {
+                        "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
+                        "live_activation": False,
+                        "restore_marker_unresolved": False,
+                        "activation_count": len(activations),
+                        "next_action": "REGISTER_AUTHORIZE_ACTIVATE",
+                    },
+                    2,
+                )
             return _emit(
                 {
                     "terminal": "DOCTOR_OK",
-                    "live_activation": any(row["state"] == "ACTIVE" for row in activations),
-                    "restore_marker_unresolved": unresolved,
+                    "live_activation": True,
+                    "restore_marker_unresolved": False,
                     "activation_count": len(activations),
-                    "ops_store": str(store.path),
+                    "next_action": "TICK_ONCE",
                 },
                 0,
             )
@@ -294,7 +342,7 @@ def main(argv: list[str] | None = None) -> int:
                 fault_after=os.environ.get("OBSERVATION_SCHEDULE_PUBLISH_FAULT")
                 or config.get("publish_fault_after"),
             )
-            return _emit(result, 0 if result.get("terminal") == "TICK_COMPLETE" else 2)
+            return _emit(result, 0 if result.get("terminal") in {"TICK_COMPLETE", "PACE_WAIT"} else 2)
         return _emit({"terminal": "COMMAND_UNKNOWN"}, 2)
     except (
         ObservationLifecycleError,

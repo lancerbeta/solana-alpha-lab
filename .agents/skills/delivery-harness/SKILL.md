@@ -61,7 +61,9 @@ Run code review for every delivery. Add goal/DoD review for a new/changed
 outcome, architecture review for boundaries/contracts/schemas/security or
 multiple components, owner-UX review when CLI/console/readouts/manual operator
 flows change, and refactor review only after correctness with measured cost.
-Launch critics in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK` is
+Launch critics in isolated context. Dispatch `code-reviewer` with exact Base
+and Head SHAs, the task contract path, a short implemented-description and no
+parent history. `SINGLE_AGENT_REVIEW_FALLBACK` is
 `NOT_READY` for merge; deterministic checks remain mandatory.
 
 ## Finish and merge

@@ -248,6 +248,24 @@ class DeliveryHarnessAdapterTests(unittest.TestCase):
             self.assertIn("SINGLE_AGENT_REVIEW_FALLBACK", text)
             self.assertIn("merge is denied", text.casefold())
 
+    def test_code_reviewer_uses_superpowers_review_techniques(self) -> None:
+        text = (CURSOR / "agents" / "code-reviewer.md").read_text(encoding="utf-8")
+        for marker in (
+            "git diff --stat",
+            "Intended surface coverage",
+            "COVERED",
+            "PARTIAL",
+            "MISSING",
+            "False success",
+            "Critical (Must Fix)",
+            "Ready to merge?",
+            "looks good",
+        ):
+            self.assertIn(marker, text)
+        review = (CURSOR / "commands" / "delivery-review.md").read_text(encoding="utf-8")
+        self.assertIn("no parent chat", review.casefold())
+        self.assertIn("40-hex", review)
+
     def test_agents_front_door_denies_fallback_at_merge(self) -> None:
         text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
         self.assertIn("SINGLE_AGENT_REVIEW_FALLBACK", text)

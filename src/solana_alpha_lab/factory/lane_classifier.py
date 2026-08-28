@@ -369,7 +369,7 @@ def classify_lane(
             compile_observation_request,
         )
 
-        compiled = compile_observation_request(spec, root=root)
+        compiled = compile_observation_request(spec, root=root, data_root=data_root)
         if compiled.terminal in {
             "CHANGE_LANE_PRIMITIVE_GAP",
             "CHANGE_LANE_ESTIMATOR_GAP",

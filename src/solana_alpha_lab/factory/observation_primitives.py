@@ -63,7 +63,7 @@ def _validate_url(url: str) -> None:
 
 
 def search_url(mints: Sequence[str]) -> str:
-    ordered = list(mints)
+    ordered = sorted({str(item) for item in mints if str(item)})
     query = ",".join(ordered)
     return f"https://api.jup.ag/tokens/v2/search?{urlencode({'query': query})}"
 

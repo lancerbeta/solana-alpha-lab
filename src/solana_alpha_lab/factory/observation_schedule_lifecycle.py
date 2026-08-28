@@ -261,9 +261,42 @@ def activate_schedule(
     document = registered["document"]
     receipt = _require_live_authority(store, schedule_sha256=schedule_sha256, now=now)
     existing = store.get_activation(schedule_sha256, activation_id)
+    if existing is None:
+        live = [
+            row
+            for row in store.list_activations()
+            if row["schedule_sha256"] == schedule_sha256 and row["state"] == "ACTIVE"
+        ]
+        if live:
+            raise ObservationLifecycleError("ACTIVATION_ALREADY_LIVE")
     if existing is not None:
         if str(existing.get("authority_receipt_sha256")) != receipt["receipt_sha256"]:
             raise ObservationLifecycleError("ACTIVATION_IDENTITY_CONFLICT")
+        replay_event = _research_event(
+            record_id=f"OBS-STATE-{activation_id}",
+            record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
+            entity_id=schedule_sha256,
+            payload={
+                "state_event_id": f"OBS-STATE-{activation_id}",
+                "activation_id": activation_id,
+                "state": "ACTIVE",
+                "schedule_sha256": schedule_sha256,
+            },
+            now=now,
+            producer_git_sha=producer_git_sha,
+            run_id=activation_id,
+            transaction_id=f"RESEARCH-TXN-OBS-ACT-{activation_id.replace('-', '')}",
+        )
+        _append_or_replay(data_root, replay_event)
+        if existing["state"] != "ACTIVE":
+            return {
+                "terminal": "ACTIVATE_STILL_PAUSED"
+                if existing["state"] == "PAUSED_OPERATOR"
+                else "ACTIVATE_NOT_ACTIVE",
+                "activation_id": activation_id,
+                "schedule_sha256": schedule_sha256,
+                "state": existing["state"],
+            }
         return {
             "terminal": "ACTIVATE_REPLAY",
             "activation_id": activation_id,
@@ -351,6 +384,65 @@ def pause_schedule(
         "activation_id": activation_id,
         "schedule_sha256": schedule_sha256,
         "state": "PAUSED_OPERATOR",
+    }
+
+
+def resume_schedule(
+    *,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    schedule_sha256: str,
+    activation_id: str,
+    now: datetime,
+    producer_git_sha: str,
+) -> dict[str, Any]:
+    existing = store.get_activation(schedule_sha256, activation_id)
+    if existing is None:
+        raise ObservationLifecycleError("ACTIVATION_MISSING")
+    if existing["state"] == "ACTIVE":
+        return {
+            "terminal": "RESUME_REPLAY",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+            "state": "ACTIVE",
+        }
+    if existing["state"] != "PAUSED_OPERATOR":
+        raise ObservationLifecycleError("RESUME_NOT_PAUSED")
+    receipt = _require_live_authority(store, schedule_sha256=schedule_sha256, now=now)
+    store.upsert_activation(
+        {
+            **existing,
+            "state": "ACTIVE",
+            "authority_receipt_sha256": receipt["receipt_sha256"],
+            "payload": {"resumed": True},
+        },
+        clock=now,
+    )
+    event = _research_event(
+        record_id=f"OBS-RESUME-{activation_id}",
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
+        entity_id=schedule_sha256,
+        payload={
+            "state_event_id": f"OBS-RESUME-{activation_id}",
+            "activation_id": activation_id,
+            "state": "ACTIVE",
+            "schedule_sha256": schedule_sha256,
+        },
+        now=now,
+        producer_git_sha=producer_git_sha,
+        run_id=activation_id,
+        transaction_id=f"RESEARCH-TXN-OBS-RESUME-{activation_id.replace('-', '')}",
+    )
+    _append_or_replay(data_root, event)
+    resumed = store.get_activation(schedule_sha256, activation_id)
+    if resumed is None or resumed["state"] != "ACTIVE":
+        raise ObservationLifecycleError("RESUME_NOT_PERSISTED")
+    return {
+        "terminal": "RESUMED",
+        "activation_id": activation_id,
+        "schedule_sha256": schedule_sha256,
+        "state": "ACTIVE",
+        "receipt_sha256": receipt["receipt_sha256"],
     }
 
 
@@ -448,7 +540,7 @@ def snapshot_schedule(
     return {
         "terminal": "SNAPSHOT",
         "snapshot_sha256": snapshot["snapshot_sha256"],
-        "dataset_manifest_ids": dataset_ids,
+        "dataset_manifest_ids": kept,
         "first_y_proven": proven,
         "evidence_role": evidence_role,
     }
@@ -460,6 +552,7 @@ __all__ = [
     "authorize_schedule",
     "pause_schedule",
     "register_schedule",
+    "resume_schedule",
     "snapshot_schedule",
     "status_schedule",
 ]

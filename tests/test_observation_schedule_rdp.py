@@ -98,7 +98,11 @@ class ObservationScheduleRdpTests(unittest.TestCase):
             self.assertIn(kind, enum)
 
     def test_snapshot_bind_writes_rdp_and_validates_passport(self) -> None:
-        from solana_alpha_lab.factory.observation_panel_coverage import CoverageIndex
+        from solana_alpha_lab.factory.observation_panel_publisher import (
+            build_panel_snapshot,
+            persist_observation_schedule,
+            persist_panel_snapshot_binding,
+        )
         from solana_alpha_lab.factory.observation_schedule_capability import (
             bind_observation_run_passport,
             compile_and_bind_observation_schedule,
@@ -110,22 +114,11 @@ class ObservationScheduleRdpTests(unittest.TestCase):
         requested = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
         )
-        from solana_alpha_lab.factory.observation_panel_publisher import build_panel_snapshot
-
         snapshot = build_panel_snapshot(
             schedule_sha256=covering["schedule_sha256"],
             availability_cutoff=NOW,
             dataset_manifest_ids=["dataset-" + "b" * 64],
             dataset_fingerprints=["c" * 64],
-        )
-        index = CoverageIndex()
-        index.add_snapshot(
-            snapshot_sha256=snapshot["snapshot_sha256"],
-            schedule=covering,
-            availability_cutoff=NOW,
-            first_y_available_at=datetime(2026, 8, 15, tzinfo=UTC),
-            dataset_manifest_ids=list(snapshot["dataset_manifest_ids"]),
-            dataset_fingerprints=list(snapshot["dataset_fingerprints"]),
         )
         payload = {
             "run_id": "RUN-OBS-BIND-001",
@@ -164,6 +157,22 @@ class ObservationScheduleRdpTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            persist_observation_schedule(
+                data_root=data_root,
+                schedule=covering,
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+            )
+            persist_panel_snapshot_binding(
+                data_root=data_root,
+                schedule=covering,
+                snapshot=snapshot,
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+                evidence_role="EXPLORATORY_REUSE",
+                hypothesis_version_id="HYP-VERSION-OBS-BIND-001",
+                run_id="RUN-OBS-BIND-001",
+            )
             bound = compile_and_bind_observation_schedule(
                 {
                     "observation_request": {
@@ -175,7 +184,6 @@ class ObservationScheduleRdpTests(unittest.TestCase):
                     "as_of": "2026-09-01T12:00:00Z",
                 },
                 root=ROOT,
-                coverage=index,
                 data_root=data_root,
                 producer_git_sha=GIT_SHA,
                 hypothesis_version_id="HYP-VERSION-OBS-BIND-001",

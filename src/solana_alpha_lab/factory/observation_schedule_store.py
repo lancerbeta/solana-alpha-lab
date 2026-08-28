@@ -726,6 +726,32 @@ class ObservationScheduleStore:
         ).fetchall()
         return [dict(row) for row in rows]
 
+    def list_calls(self, *, primitive_id: str | None = None) -> list[dict[str, Any]]:
+        if primitive_id:
+            rows = self._conn.execute(
+                """
+                SELECT request_sha256, state, primitive_id, payload_json
+                FROM call_ledger
+                WHERE primitive_id = ?
+                ORDER BY updated_at ASC
+                """,
+                (primitive_id,),
+            ).fetchall()
+        else:
+            rows = self._conn.execute(
+                """
+                SELECT request_sha256, state, primitive_id, payload_json
+                FROM call_ledger
+                ORDER BY updated_at ASC
+                """
+            ).fetchall()
+        decoded: list[dict[str, Any]] = []
+        for row in rows:
+            payload = dict(row)
+            payload["payload"] = json.loads(payload.pop("payload_json") or "{}")
+            decoded.append(payload)
+        return decoded
+
     def list_candidates(
         self,
         *,

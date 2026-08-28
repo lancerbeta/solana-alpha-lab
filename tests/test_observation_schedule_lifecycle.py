@@ -20,6 +20,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     authorize_schedule,
     pause_schedule,
     register_schedule,
+    resume_schedule,
     status_schedule,
 )
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -78,6 +79,15 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 producer_git_sha=GIT,
             )
             self.assertEqual(activated["terminal"], "ACTIVATED")
+            with self.assertRaisesRegex(ObservationLifecycleError, "ACTIVATION_ALREADY_LIVE"):
+                activate_schedule(
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=digest,
+                    activation_id="ACT-OBS-LIFE-LIVE-2",
+                    now=NOW,
+                    producer_git_sha=GIT,
+                )
             paused = pause_schedule(
                 data_root=data_root,
                 store=store,
@@ -87,13 +97,40 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 producer_git_sha=GIT,
             )
             self.assertEqual(paused["terminal"], "PAUSED")
+            still = activate_schedule(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=digest,
+                activation_id="ACT-OBS-LIFE-001",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            self.assertEqual(still["terminal"], "ACTIVATE_STILL_PAUSED")
+            resumed = resume_schedule(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=digest,
+                activation_id="ACT-OBS-LIFE-001",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            self.assertEqual(resumed["terminal"], "RESUMED")
+            replay = resume_schedule(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=digest,
+                activation_id="ACT-OBS-LIFE-001",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            self.assertEqual(replay["terminal"], "RESUME_REPLAY")
             status = status_schedule(
                 store,
                 schedule_sha256=digest,
                 activation_id="ACT-OBS-LIFE-001",
             )
             self.assertEqual(status["terminal"], "STATUS")
-            self.assertEqual(status["activations"][0]["state"], "PAUSED_OPERATOR")
+            self.assertEqual(status["activations"][0]["state"], "ACTIVE")
             store.close()
 
     def test_activate_without_authority_fails_before_network(self) -> None:
@@ -142,8 +179,8 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                     ]
                 )
         payload = json.loads(buf.getvalue())
-        self.assertEqual(code, 0)
-        self.assertEqual(payload["terminal"], "DOCTOR_OK")
+        self.assertEqual(code, 2)
+        self.assertEqual(payload["terminal"], "DOCTOR_NO_LIVE_ACTIVATION")
         self.assertNotIn("_RECORDED", payload["terminal"])
 
 

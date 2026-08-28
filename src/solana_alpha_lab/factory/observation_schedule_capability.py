@@ -51,8 +51,15 @@ def compile_and_bind_observation_schedule(
             activation_id=run_id,
         )
         snapshot_record = None
-        if coverage is not None and result.snapshot_sha256:
-            snapshot_record = dict(coverage.snapshots.get(result.snapshot_sha256) or {})
+        if result.snapshot_sha256:
+            from solana_alpha_lab.factory.observation_panel_coverage import (
+                load_coverage_from_rdp,
+            )
+
+            snapshot_record = dict(
+                load_coverage_from_rdp(data_root).snapshots.get(result.snapshot_sha256)
+                or {}
+            )
         if (
             result.terminal == "PANEL_REUSE_READY"
             and snapshot_record

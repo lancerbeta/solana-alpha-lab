@@ -69,18 +69,18 @@ def _clocks_from_rows(
     rows: Sequence[Mapping[str, Any]],
     *,
     fallback: datetime,
-) -> tuple[datetime, datetime, datetime, datetime]:
+) -> tuple[datetime | None, datetime | None, datetime, datetime]:
     events: list[datetime] = []
     available: list[datetime] = []
     for row in rows:
         event_raw = row.get("event_time")
-        if isinstance(event_raw, str):
+        if isinstance(event_raw, str) and event_raw:
             events.append(parse_utc(event_raw))
         avail_raw = row.get("first_reliable_available_at")
-        if isinstance(avail_raw, str):
+        if isinstance(avail_raw, str) and avail_raw:
             available.append(parse_utc(avail_raw))
-    min_event = min(events) if events else fallback
-    max_event = max(events) if events else fallback
+    min_event = min(events) if events else None
+    max_event = max(events) if events else None
     min_available = min(available) if available else fallback
     max_available = max(available) if available else fallback
     return min_event, max_event, min_available, max_available
@@ -471,7 +471,7 @@ def publish_observation_batch(
         "dataset_manifest_id": dataset_manifest_id,
         "dataset_fingerprint": manifest.dataset_fingerprint,
         "snapshot_cutoff": render_utc(max_available),
-        "min_event_time": render_utc(min_event),
+        "min_event_time": None if min_event is None else render_utc(min_event),
         "first_reliable_available_at": render_utc(max_available),
         "replay": False,
         "member_count": len(member_rows),

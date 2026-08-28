@@ -218,7 +218,14 @@ def compile_observation_request(
         mode = str(request["collection_mode"])
         cutoff = parse_utc(spec["availability_cutoff"])
         registered_at = hypothesis_registered_at or parse_utc(spec["as_of"])
-        index = coverage or CoverageIndex()
+        if data_root is not None:
+            from solana_alpha_lab.factory.observation_panel_coverage import (
+                load_coverage_from_rdp,
+            )
+
+            index = load_coverage_from_rdp(data_root)
+        else:
+            index = coverage or CoverageIndex()
         snapshot_record = index.covering_snapshot_record(validated, cutoff)
         y_proven = False
         first_y = None

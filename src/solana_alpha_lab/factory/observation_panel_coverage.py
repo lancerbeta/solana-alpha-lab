@@ -44,6 +44,40 @@ def _x_cover_compatible(requested: Mapping[str, Any], available: Mapping[str, An
     return set(requested["x_point"]["bundle_ids"]).issubset(set(available["x_point"]["bundle_ids"]))
 
 
+def _manifest_has_y_observation(root, loaded: Mapping[str, Any]) -> bool:
+    import json
+
+    import pyarrow.parquet as pq
+
+    manifest_id = str(loaded.get("dataset_manifest_id") or "")
+    candidates = []
+    if manifest_id:
+        candidates.append(root / "datasets" / "parquet" / manifest_id / "observations.parquet")
+    partitions_dir = root / "datasets" / "manifests" / "partitions"
+    if partitions_dir.is_dir():
+        for path in partitions_dir.glob("*.json"):
+            part = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(part, Mapping):
+                continue
+            if str(part.get("dataset_manifest_id") or "") != manifest_id:
+                continue
+            partition_id = str(part.get("partition_id") or "").lower()
+            location = part.get("logical_location")
+            if not location or "member" in partition_id:
+                continue
+            candidates.append(root / str(location))
+    for parquet_path in candidates:
+        if not parquet_path.is_file():
+            continue
+        table = pq.read_table(parquet_path)
+        if "point_id" not in table.column_names:
+            continue
+        for value in table.column("point_id").to_pylist():
+            if str(value).startswith("Y"):
+                return True
+    return False
+
+
 def derive_first_y_available_at(
     data_root,
     schedule_sha256: str,
@@ -82,6 +116,8 @@ def derive_first_y_available_at(
         if manifest_id not in member_ids:
             continue
         loaded = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if not _manifest_has_y_observation(root, loaded):
+            continue
         available = loaded.get("first_reliable_available_at")
         if not available:
             continue
@@ -95,6 +131,66 @@ def derive_first_y_available_at(
         if earliest is None or instant < earliest:
             earliest = instant
     return earliest, proven
+
+
+def load_coverage_from_rdp(data_root) -> CoverageIndex:
+    """Rebuild CoverageIndex from committed RDP schedule, state and snapshot events."""
+    from pathlib import Path
+
+    import json
+
+    from solana_alpha_lab.factory.observation_schedule import parse_utc
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    root = Path(data_root)
+    index = CoverageIndex()
+    try:
+        store = ResearchStore(root)
+    except Exception:
+        return index
+    schedules: dict[str, dict[str, Any]] = {}
+    snapshots: list[dict[str, Any]] = []
+    states: dict[tuple[str, str], str] = {}
+    for record in store.iter_committed_records():
+        kind = str(record.record_kind)
+        payload = json.loads(record.payload_json)
+        if kind == "OBSERVATION_SCHEDULE":
+            digest = str(payload.get("schedule_sha256") or "")
+            document = payload.get("schedule")
+            if digest and isinstance(document, Mapping):
+                schedules[digest] = dict(document)
+        elif kind == "OBSERVATION_PANEL_SNAPSHOT":
+            if isinstance(payload, Mapping):
+                snapshots.append(dict(payload))
+        elif kind == "OBSERVATION_SCHEDULE_STATE":
+            key = (
+                str(payload.get("schedule_sha256") or ""),
+                str(payload.get("activation_id") or ""),
+            )
+            states[key] = str(payload.get("state") or "")
+    for digest, _activation in {key for key, state in states.items() if state == "ACTIVE"}:
+        document = schedules.get(digest)
+        if document is not None:
+            index.add_active_schedule(document)
+    for snap in snapshots:
+        digest = str(snap.get("schedule_sha256") or "")
+        document = schedules.get(digest)
+        cutoff_raw = snap.get("availability_cutoff")
+        snapshot_sha = snap.get("snapshot_sha256")
+        if document is None or not isinstance(cutoff_raw, str) or not snapshot_sha:
+            continue
+        try:
+            cutoff = parse_utc(cutoff_raw)
+        except Exception:
+            continue
+        index.add_snapshot(
+            snapshot_sha256=str(snapshot_sha),
+            schedule=document,
+            availability_cutoff=cutoff,
+            dataset_manifest_ids=list(snap.get("dataset_manifest_ids") or []),
+            dataset_fingerprints=list(snap.get("dataset_fingerprints") or []),
+        )
+    return index
 
 
 def compute_evidence_role(
@@ -220,6 +316,7 @@ __all__ = [
     "CoverageIndex",
     "compute_evidence_role",
     "derive_first_y_available_at",
+    "load_coverage_from_rdp",
     "schedule_covers",
     "source_population_key",
 ]

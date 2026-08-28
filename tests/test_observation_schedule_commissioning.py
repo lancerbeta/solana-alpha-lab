@@ -94,6 +94,10 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             self.assertEqual(code, 0, activated)
             self.assertEqual(activated["terminal"], "ACTIVATED")
 
+            code, doctor = _cli(["doctor", *base])
+            self.assertEqual(code, 0, doctor)
+            self.assertEqual(doctor["terminal"], "DOCTOR_OK")
+
             missing_env = dict(os.environ)
             missing_env.pop("JUPITER_FREE_API_KEY", None)
             code, refused = _cli(
@@ -129,11 +133,29 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             self.assertEqual(ticked["terminal"], "TICK_COMPLETE")
             self.assertNotIn(TOKEN, json.dumps(ticked))
 
+            store = ObservationScheduleStore(Path(data_root) / "observation_schedule_state.sqlite")
+            candidates = {
+                row["entity_id"]: row["state"]
+                for row in store.list_candidates(schedule_sha256=digest, activation_id=ACT)
+            }
+            self.assertEqual(
+                candidates.get("MintCCCC111111111111111111111111111111111"),
+                "NOT_SELECTED_PREDICATE",
+            )
+
+            code, reused = _cli(
+                ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z"},
+            )
+            self.assertEqual(code, 0, reused)
+            self.assertTrue(reused.get("source_poll_reused"))
+
             code, y900 = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
                 env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:16:00Z"},
             )
-            self.assertIn(y900["terminal"], {"TICK_COMPLETE", "PACE_WAIT"})
+            self.assertEqual(code, 0, y900)
+            self.assertEqual(y900["terminal"], "TICK_COMPLETE")
 
             code, h24 = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
@@ -142,7 +164,21 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             self.assertEqual(code, 0, h24)
             self.assertEqual(h24["terminal"], "TICK_COMPLETE")
 
-            store = ObservationScheduleStore(Path(data_root) / "observation_schedule_state.sqlite")
+            code, snapped = _cli(
+                [
+                    "snapshot",
+                    "--schedule-sha256",
+                    digest,
+                    "--activation-id",
+                    ACT,
+                    *base,
+                ],
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-02T00:05:00Z"},
+            )
+            self.assertEqual(code, 0, snapped)
+            self.assertEqual(snapped["terminal"], "SNAPSHOT")
+            self.assertTrue(snapped.get("first_y_proven"))
+
             dues = store.due_in_states(("OBSERVED", "MISSING_TYPED", "DISAPPEARED"))
             states = {row["state"] for row in dues}
             self.assertTrue({"OBSERVED", "MISSING_TYPED"} & states)
@@ -205,6 +241,7 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
 
             covering = load_observation_schedule(ROOT, COMMON)
             successor = load_observation_schedule(ROOT, SUCCESSOR)
+            requested = load_observation_schedule(ROOT, NARROW)
             index = CoverageIndex()
             index.add_snapshot(
                 snapshot_sha256="b" * 64,
@@ -219,7 +256,7 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             bound = compile_observation_request(
                 {
                     "observation_request": {
-                        **successor,
+                        **requested,
                         "collection_mode": "REUSE_OR_SCHEDULE",
                         "requested_evidence_role": "PROSPECTIVE_OOS",
                     },
@@ -231,6 +268,7 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
                 data_root=Path(data_root),
             )
             self.assertEqual(bound.terminal, "PANEL_REUSE_READY")
+            self.assertNotEqual(bound.snapshot_sha256, "b" * 64)
             empty = Path(tmp) / "empty-rdp"
             empty.mkdir()
             unproven = compile_observation_request(
@@ -247,8 +285,8 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
                 coverage=index,
                 data_root=empty,
             )
-            self.assertEqual(unproven.terminal, "PANEL_REUSE_READY")
-            self.assertEqual(unproven.evidence_role, "EXPLORATORY_REUSE")
+            self.assertNotEqual(unproven.terminal, "PANEL_REUSE_READY")
+            self.assertEqual(unproven.terminal, "SCHEDULE_ACTIVATION_REQUIRED")
 
             leaked = dict(successor)
             leaked["population"] = dict(successor["population"])
@@ -276,30 +314,29 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
     def test_exact_execstart_dispatches_tick(self) -> None:
         unit = (ROOT / UNIT_RELATIVE).read_text(encoding="utf-8")
         self.assertIn("tick --once", unit)
-        self.assertIn("--runtime-config", unit)
-        os.environ["OBSERVATION_SCHEDULE_RUNTIME_CONFIG"] = RUNTIME
-        try:
-            argv = parse_unit_exec_start(unit)
-            self.assertIn("scripts/observation_schedule.py", argv)
-            self.assertIn("tick", argv)
-            self.assertIn("--once", argv)
-            script_at = argv.index("scripts/observation_schedule.py")
-            with tempfile.TemporaryDirectory() as tmp:
-                data_root = str((Path(tmp) / "rdp").resolve())
-                Path(data_root).mkdir()
-                cli_args = argv[script_at + 1 :] + ["--data-root", data_root]
-                completed = subprocess.run(
-                    [sys.executable, "-B", str(ROOT / "scripts/observation_schedule.py"), *cli_args],
-                    cwd=str(ROOT),
-                    capture_output=True,
-                    text=True,
-                    check=False,
-                )
-                payload = json.loads(completed.stdout)
-                self.assertEqual(completed.returncode, 2)
-                self.assertEqual(payload["terminal"], "TICK_REFUSED_NO_LIVE_DEFAULT")
-        finally:
-            os.environ.pop("OBSERVATION_SCHEDULE_RUNTIME_CONFIG", None)
+        self.assertIn("--runtime-config configs/observation_schedule_runtime_v1.yaml", unit)
+        self.assertNotIn("/opt/solana-alpha-lab/configs/", unit)
+        self.assertIn("EnvironmentFile=-/etc/solana-alpha-lab/secrets.env", unit)
+        argv = parse_unit_exec_start(unit)
+        self.assertIn("scripts/observation_schedule.py", argv)
+        self.assertIn("tick", argv)
+        self.assertIn("--once", argv)
+        self.assertIn("configs/observation_schedule_runtime_v1.yaml", argv)
+        script_at = argv.index("scripts/observation_schedule.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = str((Path(tmp) / "rdp").resolve())
+            Path(data_root).mkdir()
+            cli_args = argv[script_at + 1 :] + ["--data-root", data_root]
+            completed = subprocess.run(
+                [sys.executable, "-B", str(ROOT / "scripts/observation_schedule.py"), *cli_args],
+                cwd=str(ROOT),
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            payload = json.loads(completed.stdout)
+            self.assertEqual(completed.returncode, 2)
+            self.assertEqual(payload["terminal"], "TICK_REFUSED_NO_LIVE_DEFAULT")
 
     def test_implementation_hash_drift_fails_before_network(self) -> None:
         with patch.object(
