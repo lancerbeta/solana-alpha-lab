@@ -28,7 +28,6 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     authorize_schedule,
     observation_ops_store_path,
     prepare_schedule_authority,
-    require_production_producer_git_sha,
 )
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.run_passport import canonical_sha256, validate_run_passport
@@ -95,7 +94,8 @@ def compile_and_bind_observation_schedule(
     pending_binding = None
     git_sha = producer_git_sha
     if data_root is not None:
-        git_sha = require_production_producer_git_sha(producer_git_sha)
+        if not isinstance(git_sha, str) or len(git_sha) != 40:
+            raise ObservationLifecycleError("PRODUCER_GIT_SHA_REQUIRED")
         if result.schedule is not None:
             persist_observation_schedule(
                 data_root=data_root,

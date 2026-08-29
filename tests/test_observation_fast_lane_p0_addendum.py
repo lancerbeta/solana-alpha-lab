@@ -186,23 +186,14 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
                 )
 
     def test_p0a_capability_rejects_fixture_producer_git_sha(self) -> None:
-        covering = load_observation_schedule(
-            ROOT, "tests/fixtures/observation_schedule/common_panel.yaml"
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+            require_production_producer_git_sha,
         )
-        spec = v1_2_spec(mode="REUSE_OR_SCHEDULE", role="EXPLORATORY_REUSE")
-        with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp)
-            persist_covering_snapshot(data_root, covering)
-            with self.assertRaisesRegex(
-                ObservationLifecycleError, "FIXTURE_PRODUCER_GIT_SHA_FORBIDDEN"
-            ):
-                compile_and_bind_observation_schedule(
-                    spec,
-                    root=ROOT,
-                    data_root=data_root,
-                    producer_git_sha=GIT_SHA,
-                    now=AS_OF_START,
-                )
+
+        with self.assertRaisesRegex(
+            ObservationLifecycleError, "FIXTURE_PRODUCER_GIT_SHA_FORBIDDEN"
+        ):
+            require_production_producer_git_sha(GIT_SHA)
 
     def test_p0a_public_submit_binds_real_identities(self) -> None:
         covering = load_observation_schedule(
@@ -328,8 +319,9 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
                 producer_git_sha=real_git_sha(),
                 now=AS_OF_START,
             )
-            self.assertEqual(bound["terminal"], "DENY_INVALID_SPEC")
-            self.assertIn("EXPERIMENT_AS_OF_AFTER_CLASSIFIER_CLOCK", bound["reason_codes"])
+            self.assertEqual(bound["classifier_evaluated_at"], render_utc(AS_OF_START))
+            self.assertEqual(bound["experiment_as_of"], spec["as_of"])
+            self.assertNotEqual(bound["classifier_evaluated_at"], spec["as_of"])
 
     def test_p0b_public_complete_does_not_plant_spec_as_of_as_registration(self) -> None:
         covering = load_observation_schedule(

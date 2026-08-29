@@ -25648,7 +25648,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 6487815fa9d54cf810d488269aee2db04400fb61cfcbaddb05e92d471111f105}
+  integrity: {kind: sha256, sha256: 906509c3176fa8aa92543f9252703387b96c501ac85154b0a3fd81e683d3935c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25965,7 +25965,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: 6487815fa9d54cf810d488269aee2db04400fb61cfcbaddb05e92d471111f105}
+  integrity: {kind: sha256, sha256: 906509c3176fa8aa92543f9252703387b96c501ac85154b0a3fd81e683d3935c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -33001,7 +33001,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_compiler.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_compiler.py}
-  integrity: {kind: sha256, sha256: 480c08c8016a0d5b6b53a8fc213991515abf1cf4361ec50d434dfdaff8d0392a}
+  integrity: {kind: sha256, sha256: 7ff897e7ff1ff9bbe89da81a16c74769067f37fa71f4eb2b0375918f3a7a37d6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

@@ -12,7 +12,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from solana_alpha_lab.factory.capabilities import CapabilityError, execute_capability
+from solana_alpha_lab.factory.capabilities import (
+    CAP_OBSERVATION_SCHEDULE_COMPILE_BIND,
+    CapabilityError,
+    execute_capability,
+)
 from solana_alpha_lab.factory.data_resolver import (
     EvidenceResolutionError,
     resolve_evidence_bindings,
@@ -23,6 +27,11 @@ from solana_alpha_lab.factory.observation_fast_lane_terminals import (
 )
 from solana_alpha_lab.factory.observation_schedule_capability import (
     bind_observation_run_passport,
+    compile_and_bind_observation_schedule,
+)
+from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    ObservationLifecycleError,
+    require_production_producer_git_sha,
 )
 from solana_alpha_lab.factory.git_write_fence import (
     RepositoryGitSnapshot,
@@ -285,14 +294,46 @@ class DocumentRunner(ExperimentRunner):
                 "now",
                 run_context.classifier_evaluated_at or _event_time(spec),
             )
-        try:
-            capability_result = execute_capability(
-                spec,
-                root=self.root,
-                authority_phrase=authority_phrase,
-                capture_hooks=hooks,
+            hooks["producer_git_sha"] = require_production_producer_git_sha(
+                hooks.get("producer_git_sha")
+                if isinstance(hooks.get("producer_git_sha"), str)
+                else producer_git_sha
             )
-        except CapabilityError as exc:
+        try:
+            if observation_routing is not None:
+                capability_ids = list(spec.get("capabilities") or [])
+                if (
+                    len(capability_ids) != 1
+                    or str(capability_ids[0]) != CAP_OBSERVATION_SCHEDULE_COMPILE_BIND
+                ):
+                    raise CapabilityError("CAPABILITY_SET_NOT_SINGLE")
+                if int(spec["evidence_budget"]["provider_api_rpc_wss_calls"]) != 0:
+                    raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
+                capability_result = compile_and_bind_observation_schedule(
+                    spec,
+                    root=self.root,
+                    coverage=hooks.get("coverage"),
+                    closed_family=bool(hooks.get("closed_family")),
+                    data_root=hooks.get("data_root"),
+                    producer_git_sha=hooks.get("producer_git_sha"),
+                    hypothesis_version_id=hooks.get("hypothesis_version_id"),
+                    run_id=hooks.get("run_id"),
+                    now=hooks.get("now"),
+                    hypothesis_definition_sha256=hooks.get(
+                        "hypothesis_definition_sha256"
+                    ),
+                    experiment_spec_sha256=hooks.get("experiment_spec_sha256"),
+                    run_key_sha256=hooks.get("run_key_sha256"),
+                    authority_phrase=authority_phrase,
+                )
+            else:
+                capability_result = execute_capability(
+                    spec,
+                    root=self.root,
+                    authority_phrase=authority_phrase,
+                    capture_hooks=hooks,
+                )
+        except (CapabilityError, ObservationLifecycleError) as exc:
             return _document_response(
                 lane_decision=lane,
                 execution_status="FAILED_INFRA",

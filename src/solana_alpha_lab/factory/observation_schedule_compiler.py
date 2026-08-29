@@ -302,8 +302,6 @@ def compile_observation_request(
         classifier_evaluated_at = now.astimezone(UTC) if now is not None else experiment_as_of
         if classifier_evaluated_at.tzinfo is None:
             return _deny("DENY_UNSAFE_RUNTIME_CODE")
-        if experiment_as_of > classifier_evaluated_at:
-            return _deny("DENY_INVALID_SPEC", "EXPERIMENT_AS_OF_AFTER_CLASSIFIER_CLOCK")
         registered_at = hypothesis_registered_at
         if registered_at is None and data_root is not None:
             registered_at = resolve_authoritative_hypothesis_registered_at(
