@@ -1456,6 +1456,56 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         )
         self.assertTrue(checks["write_set_pass"])
 
+    def test_live_pr_head_write_set_allows_observation_fast_lane_paths(self) -> None:
+        observation_paths = (
+            "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_completion_evidence_v1.json",
+            "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json",
+            "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json",
+            "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md",
+            "src/solana_alpha_lab/factory/lane_classifier.py",
+            "src/solana_alpha_lab/factory/observation_fast_lane_terminals.py",
+            "src/solana_alpha_lab/factory/observation_panel_coverage.py",
+            "src/solana_alpha_lab/factory/observation_panel_publisher.py",
+            "src/solana_alpha_lab/factory/observation_schedule_capability.py",
+            "src/solana_alpha_lab/factory/observation_schedule_compiler.py",
+            "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py",
+            "src/solana_alpha_lab/factory/observation_scheduler.py",
+            "tests/test_observation_fast_lane_p0_addendum.py",
+            "tests/test_observation_fast_lane_routing_closure.py",
+        )
+        live = yaml.safe_load(
+            (ROOT / "delivery-harness/harness.yaml").read_text(encoding="utf-8")
+        )
+        live_prefixes = live["merge_policy"]["harness_control_write_prefixes"]
+        for path in observation_paths:
+            self.assertNotIn("/**", path)
+            self.assertIn(path, live_prefixes)
+            self.assertTrue(
+                self.module.path_in_managed_write_set(path, live_prefixes),
+                path,
+            )
+
+        receipt = live_pr_head_receipt(self.module)
+        runner = FakeRunner()
+        payload = "".join(f"{path}\0" for path in observation_paths).encode()
+
+        def observation_diff(args: list[str], cwd: Path) -> bytes:
+            if tuple(args[:3]) == ("git", "diff", "--name-only"):
+                return payload
+            if args and args[0] == "uv":
+                return b""
+            return runner(args, cwd)
+
+        checks = self.module.build_delivery_checks(
+            ROOT,
+            context_receipt=receipt,
+            local_head=HEAD,
+            local_tree=TREE,
+            ci_pass=True,
+            runner=observation_diff,
+        )
+        self.assertTrue(checks["write_set_pass"])
+
     def test_live_pr_head_write_set_rejects_sibling_kcdn_atom_a_evidence(self) -> None:
         receipt = live_pr_head_receipt(self.module)
         runner = FakeRunner()

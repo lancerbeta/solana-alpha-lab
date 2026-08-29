@@ -50,6 +50,8 @@ managed_write_set:
 - docs/evidence/control/delivery_harness_acceptance_v1.json
 - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 - docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json
+- delivery-harness/harness.yaml
+- tests/test_delivery_harness_merge_guard.py
 external_caps:
   network: false
   credentials: false

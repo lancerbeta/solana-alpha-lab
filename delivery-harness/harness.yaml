@@ -70,6 +70,20 @@ merge_policy:
     - src/solana_alpha_lab/factory/hfic_identity.py
     - src/solana_alpha_lab/factory/hfic_preflight.py
     - src/solana_alpha_lab/factory/hfic_session.py
+    - src/solana_alpha_lab/factory/lane_classifier.py
+    - src/solana_alpha_lab/factory/observation_fast_lane_terminals.py
+    - src/solana_alpha_lab/factory/observation_panel_coverage.py
+    - src/solana_alpha_lab/factory/observation_panel_publisher.py
+    - src/solana_alpha_lab/factory/observation_schedule_capability.py
+    - src/solana_alpha_lab/factory/observation_schedule_compiler.py
+    - src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
+    - src/solana_alpha_lab/factory/observation_scheduler.py
+    - docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md
+    - docs/evidence/observation_fast_lane_routing_closure/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json
+    - docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json
+    - tests/test_observation_fast_lane_p0_addendum.py
+    - tests/test_observation_fast_lane_routing_closure.py
     - tests/fixtures/hypothesis_forge/**
     - tests/test_hfic_cli.py
     - tests/test_hfic_identity.py
