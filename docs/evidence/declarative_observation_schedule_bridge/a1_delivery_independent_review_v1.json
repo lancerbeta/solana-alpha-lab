@@ -17,8 +17,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-INDEPENDENT-REVIEW-002",
-  "reviewed_bindings_sha256": "40b0eac4457a0de410398197933d88c7946a18dbba2d26975958e5893da33b7f",
-  "reviewed_inventory_sha256": "7f6e88f3978e0781ac019d0429acaac834b5451837a9501bb029bd5ba538d323",
+  "reviewed_bindings_sha256": "6c94d795ffb5d3e5ba033fe8857194f09c53cf9fe008645967e4b7b7f446f124",
+  "reviewed_inventory_sha256": "0881aebc8b0ba78dacb315c828ae90145eb337a227f90a9843c4b2abd0df78e1",
   "reviews": [
     {
       "findings": [

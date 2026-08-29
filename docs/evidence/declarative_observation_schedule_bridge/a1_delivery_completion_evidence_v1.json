@@ -9,12 +9,11 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/declarative_observation_schedule_bridge/a1_delivery_factory_fit_v1.json",
-    "sha256": "73051baf9c8d7c90e8f3e89fe1a745bab6f1594c99d280afff0f0cc245efb106",
+    "sha256": "0782a6ac6252551ab6acd163dcbc820671c1687071039b9786f871e5825f9bd0",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    ".github/workflows/ci.yml": "48fe2fe9572132917b0f8719310a095f8ea0fbf7b1c0d5c6b79f2abaa1de8620",
-    "catalog/assets/core.yaml": "38864246efc038a716e97d1309bbe5eba8866fb900edaff8f1bd6f4a7a263ff6",
+    "catalog/assets/core.yaml": "6c6b9a4c614fcdaaf494d4ddd01bc579042611a540acbc9ee42933ee8662cc78",
     "catalog/assets/lifecycle.yaml": "afc09b2e8f8fbeec24b75a845e87e29b99290bf59385de8274dddcff27374505",
     "catalog/catalog_manifest.yaml": "12f3c6afdd9d020d5cae08cff5328397834f6926854d185642b2c7831e18780f",
     "catalog/generated/asset_edges.json": "c2936b9568ae15c06df41a2038ee8a0118f1df2b08c325ebaf6cea8b8aeae40e",
@@ -39,7 +38,6 @@
     "docs/tasks/DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1.md": "650ff4cb0a85ed54ee6c835104c7cca12eb05c61d32b90296f009ae347625339",
     "schemas/research_memory_projection_v1.sql": "c95c04766095df5c4183daa2fe09a76676d2fcda1be8220f9f55c028dd8b45ff",
     "scripts/observation_schedule.py": "3173f4cda56cfd0e48afdbb80ece523e7011345ecc40e45f774d128c80e3edcb",
-    "scripts/validate_ci.py": "76080a56668244d2a7e0add0f08fa8d63c218d8a1f4069e0e0705deaab76e286",
     "src/solana_alpha_lab/factory/capabilities.py": "906509c3176fa8aa92543f9252703387b96c501ac85154b0a3fd81e683d3935c",
     "src/solana_alpha_lab/factory/experiment_spec.py": "09eb649b2bbf453bcd3da0e8f0dc6a26f5311493cb71749a9058e77092ecf8e3",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "f0db34f5992ac4b16fa8b5fee8c5cd872d10a2f3cbba9b25566fd9f8ce208361",
@@ -63,7 +61,6 @@
     "tests/fixtures/observation_schedule/runtime_commissioning.yaml": "ce145fd9e26b709789df08cf05d6662c6d90d374acfc4ccb4e7850f8ef4cc8ac",
     "tests/fixtures/observation_schedule/successor_y259200.yaml": "b298f1de4d8d70eabf4bd55521fe326ded64d7d768260ddd2e180a13ef8eb349",
     "tests/fixtures/observation_schedule/x300_y900.yaml": "8a59ebd5dbb182836d207329bb98b9e33c023f1e77a929ac86ef8fd0839cc5f8",
-    "tests/test_ci.py": "59f309277bdb73903d7250a2396d9e16bc3afa9d99fffcb41fdffc8e92bba96f",
     "tests/test_factory_ordinary_market_hypothesis.py": "650f7844580beada1821004abb99d7f2cccaef70b16610be859654285069e085",
     "tests/test_hfic_preflight.py": "cc4684e34d496f7434446f4102c9325bb58235d6183810ad28b7df0f42c247d9",
     "tests/test_observation_panel_publisher.py": "b27da92fe1b1a2837860041546c9ba88d297b6b5ce90c57f9015dbc325470711",
@@ -115,7 +112,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/declarative_observation_schedule_bridge/a1_delivery_independent_review_v1.json",
-      "sha256": "5ba234b51f255ae97ef287e30ea3636a4228cf3f343353001661641585c5435d",
+      "sha256": "1e34c85f546f45057a768b91df97568c4be7fb4667a15e209510ac102cea6875",
       "verdict": "PASS"
     },
     "project_checks": [
