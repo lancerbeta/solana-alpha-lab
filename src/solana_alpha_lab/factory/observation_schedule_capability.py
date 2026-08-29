@@ -142,36 +142,45 @@ def compile_and_bind_observation_schedule(
                     except ObservationLifecycleError:
                         authority_status = "PROPOSED_NOT_AUTHORITY"
                     else:
-                        activate_schedule(
-                            root=root,
-                            data_root=Path(data_root),
-                            store=store,
-                            schedule_sha256=str(authority_request["schedule_sha256"]),
-                            activation_id=str(authority_request["activation_id"]),
-                            now=persist_clock,
-                            producer_git_sha=git_sha,
-                        )
-                        authority_status = "AUTHORIZED"
-                        result = compile_observation_request(
-                            spec,
-                            root=root,
-                            coverage=coverage,
-                            closed_family=closed_family,
-                            data_root=data_root,
-                            now=classifier_now,
-                            hypothesis_version_id=version_id,
-                            hypothesis_definition_sha256=hypothesis_definition_sha256,
-                        )
-                        passport_bindings = {}
-                        bound_schedule = (
-                            result.covering_schedule_sha256 or result.schedule_sha256
-                        )
-                        if bound_schedule:
-                            passport_bindings["observation_schedule_sha256"] = bound_schedule
-                        if result.snapshot_sha256:
-                            passport_bindings["observation_panel_snapshot_sha256"] = (
-                                result.snapshot_sha256
+                        try:
+                            activate_schedule(
+                                root=root,
+                                data_root=Path(data_root),
+                                store=store,
+                                schedule_sha256=str(authority_request["schedule_sha256"]),
+                                activation_id=str(authority_request["activation_id"]),
+                                now=persist_clock,
+                                producer_git_sha=git_sha,
                             )
+                        except ObservationLifecycleError as exc:
+                            if str(exc) == "COHORT_CUTOVER_REQUIRED":
+                                authority_status = "AUTHORIZED"
+                            else:
+                                authority_status = "PROPOSED_NOT_AUTHORITY"
+                        else:
+                            authority_status = "AUTHORIZED"
+                            result = compile_observation_request(
+                                spec,
+                                root=root,
+                                coverage=coverage,
+                                closed_family=closed_family,
+                                data_root=data_root,
+                                now=classifier_now,
+                                hypothesis_version_id=version_id,
+                                hypothesis_definition_sha256=hypothesis_definition_sha256,
+                            )
+                            passport_bindings = {}
+                            bound_schedule = (
+                                result.covering_schedule_sha256 or result.schedule_sha256
+                            )
+                            if bound_schedule:
+                                passport_bindings["observation_schedule_sha256"] = (
+                                    bound_schedule
+                                )
+                            if result.snapshot_sha256:
+                                passport_bindings["observation_panel_snapshot_sha256"] = (
+                                    result.snapshot_sha256
+                                )
                 finally:
                     store.close()
         if result.terminal == ATTACHED_TO_ACTIVE_SCHEDULE and result.schedule is not None:

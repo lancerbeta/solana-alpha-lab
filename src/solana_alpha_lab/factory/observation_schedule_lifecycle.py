@@ -374,7 +374,6 @@ def prepare_schedule_authority(
         successor_schedule_sha256=successor,
         cutover_at=cutover,
     )
-    request["data_root"] = str(Path(data_root).resolve())
     request["activation_id"] = "ACT-" + str(registered["schedule_sha256"])[:16].upper()
     return {
         "terminal": registered["terminal"],

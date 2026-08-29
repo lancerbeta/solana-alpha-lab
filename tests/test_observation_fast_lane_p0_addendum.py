@@ -558,10 +558,24 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
             )
             self.assertEqual(request["successor_schedule_sha256"], request["schedule_sha256"])
             self.assertTrue(request["cutover_at"])
-            self.assertEqual(
-                predecessor["activation"]["stops_admitting_at"],
-                predecessor["activation"]["stops_admitting_at"],
+            self.assertNotIn("data_root", request)
+            phrased = execute_submit(
+                ROOT,
+                data_root,
+                write_packet(data_root, packet_for(spec)),
+                AS_OF_START,
+                run=True,
+                authority_phrase=request["exact_owner_phrase"],
             )
+            self.assertEqual(phrased["authority_status"], "AUTHORIZED")
+            self.assertIn(
+                phrased["observation_terminal"],
+                {
+                    "NEW_VERSION_FOR_FUTURE_COHORTS_REQUIRED",
+                    "ATTACHED_TO_ACTIVE_SCHEDULE",
+                },
+            )
+            self.assertIsNone(phrased["run_id_or_null"])
 
     def test_p0d_admission_stop_drains_and_blocks_new_members(self) -> None:
         schedule = load_observation_schedule(
