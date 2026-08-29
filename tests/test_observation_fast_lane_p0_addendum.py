@@ -551,10 +551,15 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
         )
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
+            covering_spec = v1_2_spec(
+                fixture="x300_y900.yaml",
+                mode="SCHEDULE_ONLY",
+                role="PROSPECTIVE_OOS",
+            )
             covering_prepared = execute_submit(
                 ROOT,
                 data_root,
-                write_packet(data_root, packet_for(v1_2_spec())),
+                write_packet(data_root, packet_for(covering_spec)),
                 AS_OF_START,
                 run=True,
                 authority_phrase=None,
@@ -565,7 +570,7 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
             execute_submit(
                 ROOT,
                 data_root,
-                write_packet(data_root, packet_for(v1_2_spec())),
+                write_packet(data_root, packet_for(covering_spec)),
                 AS_OF_START,
                 run=True,
                 authority_phrase=covering_phrase,
@@ -902,6 +907,7 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
             role="PROSPECTIVE_OOS",
         )
         reuse_spec = v1_2_spec(
+            fixture="x300_y900.yaml",
             mode="REUSE_OR_SCHEDULE",
             role="EXPLORATORY_REUSE",
             as_of=render_utc(Y86400_AT),
