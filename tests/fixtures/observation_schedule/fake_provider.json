@@ -1,0 +1,33 @@
+{
+  "recent": [
+    {
+      "id": "MintAAAA111111111111111111111111111111111",
+      "liquidity": "2500",
+      "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "pump.fun"}
+    },
+    {
+      "id": "MintBBBB111111111111111111111111111111111",
+      "liquidity": "2500",
+      "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "pump.fun"}
+    },
+    {
+      "id": "MintCCCC111111111111111111111111111111111",
+      "liquidity": "2500",
+      "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "raydium"}
+    }
+  ],
+  "search": [
+    {
+      "id": "MintAAAA111111111111111111111111111111111",
+      "liquidity": "2500",
+      "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "pump.fun"}
+    },
+    {
+      "id": "MintBBBB111111111111111111111111111111111",
+      "liquidity": "2500",
+      "firstPool": {"createdAt": "2026-09-01T00:00:00Z", "source": "pump.fun"}
+    }
+  ],
+  "quote": {"outAmount": "9900000"},
+  "omit": ["MintBBBB111111111111111111111111111111111"]
+}

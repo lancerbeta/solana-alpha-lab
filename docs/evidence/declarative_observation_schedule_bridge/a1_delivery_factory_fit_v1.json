@@ -1,0 +1,40 @@
+{
+  "as_of": "2026-08-29",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_BOUNDED_OBSERVATION_SCHEDULE_COMMISSIONING"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_PROVIDER_CALL_BEFORE_MERGE",
+    "NO_LIVE_OBSERVATION_SCHEDULE_ACTIVATION",
+    "NO_DEPLOYMENT_OR_COMMISSIONING",
+    "NO_NEW_PROVIDER",
+    "NO_RETRY_OR_FALLBACK",
+    "NO_WALLET_SIGNER_TRANSACTION",
+    "FACTORY_V1_1_FAST_LANE_UNCHANGED",
+    "COMPLETED_V2_SLEEP_PR211_BYTES_UNCHANGED"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-FACTORY-FIT-002",
+  "reviewed_bindings_sha256": "317ac2d040fd91b655a3ce0bdb729030394e38164f6a36f4a35cb2d1934451f8",
+  "reviewed_inventory_sha256": "b8a9cc04ba591a9dba1324cc9d2078f36acf1e1d53f51c4b8eb0c5d6bbc4dfea",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1",
+  "verdict": "PASS"
+}

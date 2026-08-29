@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/observation_primitive_descriptor_v1.schema.json",
+  "title": "SMIAL observation primitive descriptor v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "primitive_id",
+    "version",
+    "status",
+    "kind",
+    "provider_route_ids",
+    "access_class",
+    "implementation_asset_ids",
+    "implementation_git_hashes",
+    "parameter_schema_asset_id",
+    "output_schema_asset_id",
+    "output_field_ids",
+    "pit_support",
+    "authoritative_clock_field_ids",
+    "request_cardinality",
+    "max_batch_size",
+    "call_cost",
+    "modeled_credit_cost",
+    "dependency_contract",
+    "terminal_classes",
+    "missing_classes",
+    "error_classes",
+    "retry",
+    "fallback",
+    "idempotency_policy",
+    "data_zone",
+    "raw_retention_class",
+    "redaction_profile"
+  ],
+  "properties": {
+    "primitive_id": {
+      "type": "string",
+      "pattern": "^PRIM-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+    },
+    "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+    "status": {"enum": ["ACCEPTED", "PROPOSED", "RETIRED"]},
+    "kind": {
+      "enum": [
+        "DISCOVERY",
+        "BATCH_SNAPSHOT",
+        "POINT_OBSERVATION",
+        "DEPENDENT_OBSERVATION"
+      ]
+    },
+    "provider_route_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+      }
+    },
+    "access_class": {
+      "enum": ["KEYLESS", "LOCAL_ENV_CREDENTIAL"]
+    },
+    "implementation_asset_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+      }
+    },
+    "implementation_git_hashes": {
+      "type": "object",
+      "additionalProperties": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+      "minProperties": 1
+    },
+    "parameter_schema_asset_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "output_schema_asset_id": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "output_field_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^FIELD-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+      }
+    },
+    "pit_support": {"const": true},
+    "authoritative_clock_field_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^FIELD-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+      }
+    },
+    "request_cardinality": {"enum": ["ONE", "BATCH"]},
+    "max_batch_size": {"type": "integer", "minimum": 1, "maximum": 100},
+    "call_cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "calls_per_request"],
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "pattern": "^COST-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+        },
+        "calls_per_request": {"type": "integer", "minimum": 1, "maximum": 1}
+      }
+    },
+    "modeled_credit_cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["model_id", "credits_per_request", "status"],
+      "properties": {
+        "model_id": {
+          "type": "string",
+          "pattern": "^CREDIT-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+        },
+        "credits_per_request": {"type": "integer", "minimum": 1},
+        "status": {"enum": ["ACCEPTED", "UNPROVED"]}
+      }
+    },
+    "dependency_contract": {
+      "oneOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["recipe_id", "requires_bundle_id"],
+          "properties": {
+            "recipe_id": {"const": "DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001"},
+            "requires_bundle_id": {
+              "type": "string",
+              "pattern": "^BUNDLE-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+            }
+          }
+        }
+      ]
+    },
+    "terminal_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+    },
+    "missing_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+    },
+    "error_classes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}
+    },
+    "retry": {"const": false},
+    "fallback": {"const": false},
+    "idempotency_policy": {"const": "EXACT_REQUEST_HASH"},
+    "data_zone": {"const": "DATA_ROOT_ONLY"},
+    "raw_retention_class": {"enum": ["RAW_BOUNDED", "CANONICAL_IMMUTABLE"]},
+    "redaction_profile": {"const": "NO_SECRETS_NO_CREDENTIAL_HEADERS"}
+  }
+}

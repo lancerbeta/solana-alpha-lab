@@ -33,10 +33,12 @@ from solana_alpha_lab.factory.run_passport import (
 )
 
 SPEC_SCHEMA_RELATIVE = "catalog/schemas/experiment_spec_v1_1.schema.json"
+SPEC_SCHEMA_V1_2_RELATIVE = "catalog/schemas/experiment_spec_v1_2.schema.json"
 DESCRIPTOR_SCHEMA_RELATIVE = (
     "catalog/schemas/experiment_capability_descriptor.schema.json"
 )
 CAPABILITY_REGISTRY_RELATIVE = "configs/experiment_capability_registry_v1.yaml"
+CAPABILITY_REGISTRY_V2_RELATIVE = "configs/experiment_capability_registry_v2.yaml"
 _SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 _GIT_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
 
@@ -84,8 +86,12 @@ def _load_json_object(path: Path) -> dict[str, Any]:
     return loaded
 
 
-def _load_capabilities(root: Path) -> dict[str, Mapping[str, Any]]:
-    registry_path = root / CAPABILITY_REGISTRY_RELATIVE
+def _load_capabilities(
+    root: Path,
+    *,
+    registry_relative: str = CAPABILITY_REGISTRY_RELATIVE,
+) -> dict[str, Mapping[str, Any]]:
+    registry_path = root / registry_relative
     loaded = yaml.safe_load(registry_path.read_text(encoding="utf-8"))
     if not isinstance(loaded, Mapping) or not isinstance(
         loaded.get("capabilities"), list
@@ -120,8 +126,14 @@ def _validate_spec(
     spec = submission.get("experiment_spec")
     if not isinstance(spec, Mapping):
         return None
+    version = spec.get("schema_version")
+    schema_relative = SPEC_SCHEMA_RELATIVE
+    if version == "1.2":
+        schema_relative = SPEC_SCHEMA_V1_2_RELATIVE
+    elif version not in {None, "1.1"}:
+        return None
     try:
-        jsonschema.validate(dict(spec), _load_json_object(root / SPEC_SCHEMA_RELATIVE))
+        jsonschema.validate(dict(spec), _load_json_object(root / schema_relative))
         capabilities = spec["capabilities"]
         if (
             not isinstance(capabilities, list)
@@ -317,8 +329,13 @@ def classify_lane(
         )
 
     capability_id = str(spec["capability_id"])
+    registry_relative = (
+        CAPABILITY_REGISTRY_V2_RELATIVE
+        if spec.get("schema_version") == "1.2"
+        else CAPABILITY_REGISTRY_RELATIVE
+    )
     try:
-        descriptor = _load_capabilities(root).get(capability_id)
+        descriptor = _load_capabilities(root, registry_relative=registry_relative).get(capability_id)
     except (OSError, ValueError, yaml.YAMLError, jsonschema.ValidationError):
         return _decision(
             Lane.DENY,
@@ -346,6 +363,47 @@ def classify_lane(
         return _change_lane("GUARDRAIL_CHANGE_REQUIRED")
     if requested_calls > int(descriptor["max_provider_calls"]):
         return _change_lane("GUARDRAIL_CHANGE_REQUIRED")
+
+    if spec.get("schema_version") == "1.2":
+        from solana_alpha_lab.factory.observation_schedule_compiler import (
+            compile_observation_request,
+        )
+
+        compiled = compile_observation_request(spec, root=root, data_root=data_root)
+        if compiled.terminal in {
+            "CHANGE_LANE_PRIMITIVE_GAP",
+            "CHANGE_LANE_ESTIMATOR_GAP",
+            "CHANGE_LANE_SAFETY_CONTRACT_GAP",
+        }:
+            return _decision(
+                Lane.CHANGE_LANE,
+                compiled.terminal,
+                reason_codes=compiled.reason_codes,
+                next_action="OPEN_BOUNDED_CAPABILITY_CHANGE",
+            )
+        if compiled.terminal in {
+            "DENY_OUTCOME_LEAKAGE",
+            "DENY_RETROACTIVE_MUTATION",
+            "DENY_UNSAFE_RUNTIME_CODE",
+        }:
+            return _decision(
+                Lane.DENY,
+                compiled.terminal,
+                reason_codes=compiled.reason_codes,
+                next_action="CORRECT_EXPERIMENT_SPEC",
+            )
+        if compiled.terminal in {"BLOCKED_BUDGET", "BLOCKED_AUTHORITY"}:
+            return _decision(
+                Lane.DENY,
+                compiled.terminal,
+                reason_codes=compiled.reason_codes,
+                next_action="NARROW_RUNTIME_REQUEST",
+            )
+        observation_terminal = compiled.terminal
+        observation_next = compiled.next_action
+    else:
+        observation_terminal = None
+        observation_next = None
 
     try:
         resolve_catalog_asset(
@@ -451,6 +509,15 @@ def classify_lane(
             reason_codes=("OWNER_AUTHORITY_REQUIRED",),
             run_key_sha256=run_key_sha256,
             next_action="PROVIDE_EXACT_OWNER_AUTHORITY",
+        )
+
+    if observation_terminal is not None:
+        return _decision(
+            Lane.FAST_LANE,
+            observation_terminal,
+            reason_codes=(),
+            run_key_sha256=run_key_sha256,
+            next_action=observation_next or "EXECUTE_ACCEPTED_CAPABILITY",
         )
 
     return _decision(

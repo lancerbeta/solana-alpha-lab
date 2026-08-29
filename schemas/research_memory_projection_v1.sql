@@ -473,3 +473,75 @@ WHERE session_state IN (
     'AWAITING_CLASSIFICATION',
     'CRITIC_RESULT_READY'
 );
+
+CREATE VIEW observation_schedules AS
+SELECT
+    stable_id AS schedule_sha256,
+    json_extract_string(payload_json, '$.schedule_key') AS schedule_key,
+    json_extract_string(payload_json, '$.state') AS state,
+    effective_at,
+    first_reliable_available_at,
+    record_id,
+    payload_sha256
+FROM _research_events
+WHERE record_kind = 'OBSERVATION_SCHEDULE';
+
+CREATE VIEW observation_schedule_authorities AS
+SELECT
+    stable_id AS authority_id,
+    json_extract_string(payload_json, '$.schedule_sha256') AS schedule_sha256,
+    json_extract_string(payload_json, '$.receipt_sha256') AS receipt_sha256,
+    effective_at,
+    first_reliable_available_at,
+    record_id
+FROM _research_events
+WHERE record_kind = 'OBSERVATION_SCHEDULE_AUTHORITY';
+
+CREATE VIEW observation_members AS
+SELECT
+    stable_id AS batch_id,
+    json_extract_string(payload_json, '$.schedule_sha256') AS schedule_sha256,
+    json_extract_string(payload_json, '$.dataset_manifest_id') AS dataset_manifest_id,
+    effective_at,
+    first_reliable_available_at,
+    record_id
+FROM _research_events
+WHERE record_kind = 'OBSERVATION_MEMBER_BATCH';
+
+CREATE VIEW observation_batches AS
+SELECT
+    stable_id AS batch_id,
+    json_extract_string(payload_json, '$.schedule_sha256') AS schedule_sha256,
+    json_extract_string(payload_json, '$.dataset_manifest_id') AS dataset_manifest_id,
+    json_extract_string(payload_json, '$.dataset_fingerprint') AS dataset_fingerprint,
+    effective_at,
+    first_reliable_available_at,
+    record_id,
+    payload_sha256
+FROM _research_events
+WHERE record_kind = 'OBSERVATION_BATCH';
+
+CREATE VIEW observation_panel_snapshots AS
+SELECT
+    stable_id AS snapshot_id,
+    json_extract_string(payload_json, '$.schedule_sha256') AS schedule_sha256,
+    json_extract_string(payload_json, '$.snapshot_sha256') AS snapshot_sha256,
+    json_extract_string(payload_json, '$.availability_cutoff') AS availability_cutoff,
+    effective_at,
+    first_reliable_available_at,
+    record_id
+FROM _research_events
+WHERE record_kind = 'OBSERVATION_PANEL_SNAPSHOT';
+
+CREATE VIEW observation_schedule_bindings AS
+SELECT
+    stable_id AS binding_id,
+    json_extract_string(payload_json, '$.schedule_sha256') AS schedule_sha256,
+    json_extract_string(payload_json, '$.hypothesis_version_id') AS bound_hypothesis_version_id,
+    json_extract_string(payload_json, '$.snapshot_sha256') AS snapshot_sha256,
+    json_extract_string(payload_json, '$.evidence_role') AS evidence_role,
+    effective_at,
+    first_reliable_available_at,
+    record_id
+FROM _research_events
+WHERE record_kind = 'OBSERVATION_SCHEDULE_BINDING';

@@ -1,0 +1,147 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/observation_primitive_registry_v1.schema.json",
+  "title": "SMIAL observation primitive registry v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "registry_id",
+    "as_of",
+    "fields",
+    "query_profiles",
+    "bundles",
+    "primitives",
+    "authority_profiles"
+  ],
+  "properties": {
+    "schema": {"const": "smial.observation-primitive-registry"},
+    "schema_version": {"const": "1.0"},
+    "registry_id": {"const": "OBSERVATION_PRIMITIVE_REGISTRY_V1"},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "field_id",
+          "availability_class",
+          "value_kind",
+          "parser_asset_id"
+        ],
+        "properties": {
+          "field_id": {
+            "type": "string",
+            "pattern": "^FIELD-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          },
+          "availability_class": {
+            "enum": ["ANCHOR", "SOURCE", "X_TIME", "Y_TIME", "DISCOVERY"]
+          },
+          "value_kind": {"enum": ["TEXT", "DECIMAL", "TIMESTAMP", "TOKEN_MINT"]},
+          "parser_asset_id": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+          }
+        }
+      }
+    },
+    "query_profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["query_profile_id", "primitive_id", "parameters"],
+        "properties": {
+          "query_profile_id": {
+            "type": "string",
+            "pattern": "^QUERY-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          },
+          "primitive_id": {
+            "type": "string",
+            "pattern": "^PRIM-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          },
+          "parameters": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source_eq"],
+            "properties": {
+              "source_eq": {"type": "string", "minLength": 1, "maxLength": 64}
+            }
+          }
+        }
+      }
+    },
+    "bundles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["bundle_id", "primitive_id", "field_ids"],
+        "properties": {
+          "bundle_id": {
+            "type": "string",
+            "pattern": "^BUNDLE-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          },
+          "primitive_id": {
+            "type": "string",
+            "pattern": "^PRIM-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          },
+          "field_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^FIELD-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+            }
+          }
+        }
+      }
+    },
+    "primitives": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "object"}
+    },
+    "authority_profiles": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "profile_id",
+          "cash_usd_max",
+          "retry",
+          "fallback",
+          "build_execute_wallet_signer_transaction",
+          "allowed_route_ids"
+        ],
+        "properties": {
+          "profile_id": {
+            "type": "string",
+            "pattern": "^AUTH-[A-Z0-9]+(?:-[A-Z0-9]+)+$"
+          },
+          "cash_usd_max": {"const": "0"},
+          "retry": {"const": false},
+          "fallback": {"const": false},
+          "build_execute_wallet_signer_transaction": {"const": false},
+          "allowed_route_ids": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "string",
+              "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+            }
+          }
+        }
+      }
+    }
+  }
+}

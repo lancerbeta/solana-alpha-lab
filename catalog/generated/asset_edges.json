@@ -13,6 +13,11 @@
       "target_asset_id": "ADR-MVP-STACK-002"
     },
     {
+      "source_asset_id": "ADR-007-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "ADR-CATALOG-BASELINE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
@@ -593,6 +598,11 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
+      "source_asset_id": "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-V2-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "CONFIG-EXPERIMENT-SPEC-FACTORY-V1-COMMISSIONING-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-001"
@@ -721,6 +731,11 @@
       "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
       "source_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-COHORT-FIXTURE-001",
@@ -876,6 +891,16 @@
       "source_asset_id": "CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
+    },
+    {
+      "source_asset_id": "CONFIG-OBSERVATION-PRIMITIVE-REGISTRY-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-OBSERVATION-SCHEDULE-RUNTIME-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
       "source_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
@@ -2281,6 +2306,11 @@
       "source_asset_id": "CTRL-CURSOR-WORKPLACE-RECONCILIATION-001",
       "relation": "validated_by",
       "target_asset_id": "SCRIPT-BATON-VALIDATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001",
+      "relation": "depends_on",
+      "target_asset_id": "ADR-006-HYPOTHESIS-FAST-LANE-001"
     },
     {
       "source_asset_id": "CTRL-DELIVERY-HARNESS-001",
@@ -9318,6 +9348,26 @@
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-001"
     },
     {
+      "source_asset_id": "MODULE-OBSERVATION-PRIMITIVES-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULE-COMPILER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULE-LIFECYCLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULE-RUNTIME-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
@@ -11528,9 +11578,24 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
     },
     {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-2-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-1-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-2-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-V1-1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
       "source_asset_id": "SCHEMA-FACTORY-V1-COMMISSIONING-001",
@@ -11621,6 +11686,36 @@
       "source_asset_id": "SCHEMA-HYPOTHESIS-FORGE-SYNTHESIS-HANDOFF-V1-1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-OBSERVATION-PANEL-SNAPSHOT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-OBSERVATION-PRIMITIVE-REGISTRY-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-OBSERVATION-SCHEDULE-AUTHORITY-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-OBSERVATION-SCHEDULE-RUNTIME-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-OBSERVATION-SCHEDULE-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
       "source_asset_id": "SCHEMA-OWNER-AUTHORITY-PACKET-001",
@@ -12411,6 +12506,11 @@
       "source_asset_id": "SCRIPT-MATURITY-PROBE-LOOKUP-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-OBSERVATION-SCHEDULE-CLI-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULE-COMPILER-001"
     },
     {
       "source_asset_id": "SCRIPT-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
@@ -13561,6 +13661,21 @@
       "source_asset_id": "TEST-KCDN-ATOM-B-STABLE-CONTEXT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "TEST-OBSERVATION-SCHEDULE-COMMISSIONING-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "TEST-OBSERVATION-SCHEDULE-LIFECYCLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "TEST-OBSERVATION-SCHEDULE-SCHEMAS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
       "source_asset_id": "TEST-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",

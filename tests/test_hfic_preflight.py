@@ -18,6 +18,7 @@ from solana_alpha_lab.factory.data_root import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     HficPreflightError,
+    enumerate_rdp_datasets,
     prove_fast_lane_commissioned,
 )
 
@@ -189,3 +190,31 @@ class CommissioningProofTests(unittest.TestCase):
             self.assertNotIn(str(default_root), rendered)
             self.assertNotIn(":\\", rendered)
             self.assertNotIn("SMIAL_DATA_ROOT", rendered)
+
+
+class ObservationScheduleInventoryRepairTests(unittest.TestCase):
+    def test_sidecars_are_ignored_and_canonical_corrupt_warns(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            manifests = Path(tmp) / "datasets" / "manifests"
+            manifests.mkdir(parents=True)
+            (manifests / "DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.decision.json").write_text(
+                "{not-json",
+                encoding="utf-8",
+            )
+            (manifests / "DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.labels.json").write_text(
+                "{not-json",
+                encoding="utf-8",
+            )
+            canonical = manifests / ("dataset-" + ("a" * 64) + ".json")
+            canonical.write_text("{not-json", encoding="utf-8")
+            stable = manifests / "DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.json"
+            stable.write_text("{not-json", encoding="utf-8")
+            entries, warnings = enumerate_rdp_datasets(Path(tmp))
+            self.assertEqual(entries, [])
+            codes = [item["code"] for item in warnings]
+            self.assertIn("DATASET_MANIFEST_CORRUPT", codes)
+            self.assertEqual(codes.count("DATASET_MANIFEST_CORRUPT"), 1)
+            self.assertEqual(
+                [item["dataset_manifest_id"] for item in warnings if item["code"] == "DATASET_MANIFEST_CORRUPT"],
+                [canonical.stem],
+            )

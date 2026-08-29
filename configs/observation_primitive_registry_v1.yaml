@@ -1,0 +1,233 @@
+schema: smial.observation-primitive-registry
+schema_version: '1.0'
+registry_id: OBSERVATION_PRIMITIVE_REGISTRY_V1
+as_of: '2026-08-28'
+fields:
+  - field_id: FIELD-TOKEN-MINT-001
+    availability_class: SOURCE
+    value_kind: TOKEN_MINT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-FIRST-POOL-CREATED-AT-001
+    availability_class: ANCHOR
+    value_kind: TIMESTAMP
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-FIRST-POOL-SOURCE-001
+    availability_class: SOURCE
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-FIRST-SEEN-AT-001
+    availability_class: DISCOVERY
+    value_kind: TIMESTAMP
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-LIQUIDITY-USD-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-STATS5M-TAKER-VOLUME-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-R0-TAKER-VOLUME-MIX-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-BUY-OUT-AMOUNT-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-SELL-OUT-AMOUNT-001
+    availability_class: Y_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+query_profiles:
+  - query_profile_id: QUERY-JUPITER-PUMPFUN-RECENT-001
+    primitive_id: PRIM-JUPITER-TOKENS-V2-RECENT-001
+    parameters:
+      source_eq: pump.fun
+bundles:
+  - bundle_id: BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001
+    primitive_id: PRIM-JUPITER-TOKENS-V2-SEARCH-001
+    field_ids:
+      - FIELD-TOKEN-MINT-001
+      - FIELD-LIQUIDITY-USD-001
+      - FIELD-STATS5M-TAKER-VOLUME-001
+      - FIELD-R0-TAKER-VOLUME-MIX-001
+      - FIELD-FIRST-POOL-CREATED-AT-001
+      - FIELD-FIRST-POOL-SOURCE-001
+  - bundle_id: BUNDLE-JUPITER-QUOTE-BUY-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001
+    field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+  - bundle_id: BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001
+    field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+primitives:
+  - primitive_id: PRIM-JUPITER-TOKENS-V2-RECENT-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: DISCOVERY
+    provider_route_ids:
+      - JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-TOKEN-MINT-001
+      - FIELD-FIRST-SEEN-AT-001
+      - FIELD-FIRST-POOL-CREATED-AT-001
+      - FIELD-FIRST-POOL-SOURCE-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-TOKENS-RECENT-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract: null
+    terminal_classes: [OBSERVED, MISSING_TYPED]
+    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, INVALID_RESPONSE]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-TOKENS-V2-SEARCH-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: BATCH_SNAPSHOT
+    provider_route_ids:
+      - JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-TOKEN-MINT-001
+      - FIELD-LIQUIDITY-USD-001
+      - FIELD-STATS5M-TAKER-VOLUME-001
+      - FIELD-R0-TAKER-VOLUME-MIX-001
+      - FIELD-FIRST-POOL-CREATED-AT-001
+      - FIELD-FIRST-POOL-SOURCE-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: BATCH
+    max_batch_size: 100
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-TOKENS-SEARCH-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract: null
+    terminal_classes: [OBSERVED, MISSING_TYPED]
+    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, FIELD_ABSENT, NON_FINITE]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: POINT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract: null
+    terminal_classes: [OBSERVED, MISSING_TYPED]
+    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: DEPENDENT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract:
+      recipe_id: DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001
+      requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-001
+    terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
+    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+authority_profiles:
+  - profile_id: AUTH-PROVIDER-READONLY-ZERO-CASH-SCHEDULE-V1
+    cash_usd_max: '0'
+    retry: false
+    fallback: false
+    build_execute_wallet_signer_transaction: false
+    allowed_route_ids:
+      - JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+      - JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001

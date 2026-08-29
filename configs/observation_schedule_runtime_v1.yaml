@@ -1,0 +1,5 @@
+schema: smial.observation-schedule-runtime
+schema_version: '1.0'
+data_root: local/factory_v1/observation_rdp
+ops_store_relative: local/factory_v1/observation_schedule_state.sqlite
+credential_env: JUPITER_FREE_API_KEY

@@ -386,7 +386,11 @@ def enumerate_rdp_datasets(
     if not manifests_dir.is_dir():
         return [], warnings
     for path in sorted(manifests_dir.glob("*.json")):
-        if path.name.endswith(".labels.json"):
+        if path.name.endswith(".labels.json") or path.name.endswith(".decision.json"):
+            continue
+        canonical = bool(re.fullmatch(r"dataset-[0-9a-f]{64}\.json", path.name))
+        stable = bool(re.fullmatch(r"[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)*\.json", path.name))
+        if not canonical and not stable:
             continue
         if _is_symlink_path(path):
             warnings.append(
@@ -399,12 +403,13 @@ def enumerate_rdp_datasets(
         try:
             manifest = DatasetManifest.model_validate_json(path.read_bytes())
         except (OSError, UnicodeDecodeError, json.JSONDecodeError, Exception):
-            warnings.append(
-                {
-                    "code": "DATASET_MANIFEST_CORRUPT",
-                    "dataset_manifest_id": path.stem,
-                }
-            )
+            if canonical:
+                warnings.append(
+                    {
+                        "code": "DATASET_MANIFEST_CORRUPT",
+                        "dataset_manifest_id": path.stem,
+                    }
+                )
             continue
         labels_path = manifests_dir / f"{manifest.dataset_manifest_id}.labels.json"
         labels: dict[str, Any] | None = None
@@ -539,6 +544,10 @@ def enumerate_rdp_datasets(
                 "feature_hint": (labels or {}).get("feature_hint"),
             }
         )
+    unique: dict[str, dict[str, Any]] = {}
+    for item in entries:
+        unique.setdefault(str(item["dataset_manifest_id"]), item)
+    entries = list(unique.values())
     entries.sort(key=lambda item: item["dataset_manifest_id"])
     return entries, warnings
 
