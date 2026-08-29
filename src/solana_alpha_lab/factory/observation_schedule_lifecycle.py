@@ -56,6 +56,8 @@ def require_production_producer_git_sha(producer_git_sha: str | None) -> str:
 
     if not isinstance(producer_git_sha, str) or len(producer_git_sha) != 40:
         raise ObservationLifecycleError("PRODUCER_GIT_SHA_REQUIRED")
+    if producer_git_sha == FIXTURE_PRODUCER_GIT_SHA:
+        raise ObservationLifecycleError("FIXTURE_PRODUCER_GIT_SHA_FORBIDDEN")
     return producer_git_sha
 
 
@@ -372,6 +374,8 @@ def prepare_schedule_authority(
         successor_schedule_sha256=successor,
         cutover_at=cutover,
     )
+    request["data_root"] = str(Path(data_root).resolve())
+    request["activation_id"] = "ACT-" + str(registered["schedule_sha256"])[:16].upper()
     return {
         "terminal": registered["terminal"],
         "operational_registered": True,
@@ -1216,18 +1220,21 @@ def rollover_schedule(
         authority_receipt_sha256=successor_receipt["receipt_sha256"],
         clock=now,
     )
-    predecessor_transition = store.transition_activation(
-        schedule_sha256=predecessor_schedule_sha256,
-        activation_id=predecessor_activation_id,
-        new_state="DRAINING",
-        authority_receipt_sha256=predecessor.get("authority_receipt_sha256"),
-        effective_at=cutover_text,
-        payload={
-            "cutover_at": cutover_text,
-            "successor_schedule_sha256": successor_schedule_sha256,
-        },
-        clock=now,
-    )
+    predecessor_already_draining = predecessor["state"] == "DRAINING"
+    predecessor_transition = None
+    if not predecessor_already_draining:
+        predecessor_transition = store.transition_activation(
+            schedule_sha256=predecessor_schedule_sha256,
+            activation_id=predecessor_activation_id,
+            new_state="DRAINING",
+            authority_receipt_sha256=predecessor.get("authority_receipt_sha256"),
+            effective_at=cutover_text,
+            payload={
+                "cutover_at": cutover_text,
+                "successor_schedule_sha256": successor_schedule_sha256,
+            },
+            clock=now,
+        )
     successor_transition = store.transition_activation(
         schedule_sha256=successor_schedule_sha256,
         activation_id=successor_activation_id,
@@ -1243,10 +1250,14 @@ def rollover_schedule(
         },
         clock=now,
     )
-    for transition, digest in (
-        (predecessor_transition, predecessor_schedule_sha256),
+    transitions_to_write: list[tuple[dict[str, Any], str]] = [
         (successor_transition, successor_schedule_sha256),
-    ):
+    ]
+    if predecessor_transition is not None:
+        transitions_to_write.insert(
+            0, (predecessor_transition, predecessor_schedule_sha256)
+        )
+    for transition, digest in transitions_to_write:
         event = _research_event(
             record_id=str(transition["event_id"]),
             record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
@@ -1272,7 +1283,16 @@ def rollover_schedule(
         _append_or_replay(data_root, event)
     return {
         "terminal": "ROLLOVER_REPLAY"
-        if predecessor_transition.get("replayed") and successor_transition.get("replayed")
+        if (
+            successor_transition.get("replayed")
+            and (
+                predecessor_already_draining
+                or (
+                    predecessor_transition is not None
+                    and predecessor_transition.get("replayed")
+                )
+            )
+        )
         else "ROLLOVER_COMMITTED",
         "rollover_id": rollover_id,
         "cutover_at": render_utc(cutover),

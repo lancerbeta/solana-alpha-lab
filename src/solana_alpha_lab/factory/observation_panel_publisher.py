@@ -256,6 +256,7 @@ def _research_event(
     run_id: str | None,
     transaction_id: str,
     hypothesis_version_id: str | None = None,
+    supersedes_record_id: str | None = None,
 ) -> ResearchEvent:
     payload_json = json.dumps(
         dict(payload),
@@ -272,7 +273,7 @@ def _research_event(
         transaction_id=transaction_id,
         effective_at=now,
         first_reliable_available_at=now,
-        supersedes_record_id=None,
+        supersedes_record_id=supersedes_record_id,
         payload_json=payload_json,
         payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
         schema_version="1.0",
@@ -526,6 +527,7 @@ def satisfy_pending_observation_binding(
         hypothesis_version_id=satisfied.get("hypothesis_version_id")
         if isinstance(satisfied.get("hypothesis_version_id"), str)
         else None,
+        supersedes_record_id=f"OBS-PEND-{pending_binding_sha256[:16].upper()}",
     )
     store = ResearchStore(data_root)
     try:

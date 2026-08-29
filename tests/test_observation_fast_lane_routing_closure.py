@@ -215,7 +215,7 @@ def classify(packet: dict, data_root: Path, as_of: datetime) -> object:
     return classify_lane(packet, root=ROOT, data_root=data_root, as_of=as_of)
 
 
-def forge_classify(packet: dict, data_root: Path) -> dict[str, object]:
+def forge_classify(packet: dict, data_root: Path, as_of: datetime) -> dict[str, object]:
     store = ResearchStore(data_root)
     frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt())
     finalize_session(
@@ -227,6 +227,7 @@ def forge_classify(packet: dict, data_root: Path) -> dict[str, object]:
     )
     live_packet = dict(packet)
     live_packet["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+    live_packet["classifier_evaluated_at"] = as_of.isoformat().replace("+00:00", "Z")
     done = apply_classification(
         frozen,
         live_packet,
@@ -286,7 +287,7 @@ class ObservationFastLaneRoutingClosureTests(unittest.TestCase):
             decision = classify(packet, data_root, AS_OF_NOON)
             self.assertEqual(decision.lane, Lane.FAST_LANE)
             self.assertEqual(decision.terminal, "PANEL_REUSE_READY")
-            forged = forge_classify(packet, data_root)
+            forged = forge_classify(packet, data_root, AS_OF_NOON)
             self.assertEqual(forged["hfic_terminal"], "PASS_FAST_LANE_READY")
             self.assertEqual(forged["classifier_terminal"], "PANEL_REUSE_READY")
             self.assertEqual(forged["error"], None)
@@ -300,7 +301,7 @@ class ObservationFastLaneRoutingClosureTests(unittest.TestCase):
             decision = classify(packet, data_root, AS_OF_START)
             self.assertEqual(decision.lane, Lane.FAST_LANE)
             self.assertEqual(decision.terminal, "SCHEDULE_ACTIVATION_REQUIRED")
-            forged = forge_classify(packet, data_root)
+            forged = forge_classify(packet, data_root, AS_OF_START)
             self.assertEqual(forged["hfic_terminal"], "OWNER_DECISION_REQUIRED")
             self.assertEqual(forged["classifier_terminal"], "SCHEDULE_ACTIVATION_REQUIRED")
             self.assertEqual(forged["lane"], "FAST_LANE")
@@ -323,7 +324,7 @@ class ObservationFastLaneRoutingClosureTests(unittest.TestCase):
             decision = classify(packet, data_root, AS_OF_START)
             self.assertEqual(decision.terminal, "ATTACHED_TO_ACTIVE_SCHEDULE")
             self.assertEqual(decision.next_action, "ATTACH_HYPOTHESIS_BINDING")
-            forged = forge_classify(packet, data_root)
+            forged = forge_classify(packet, data_root, AS_OF_START)
             self.assertEqual(forged["hfic_terminal"], "PASS_FAST_LANE_READY")
             self.assertEqual(forged["classifier_terminal"], "ATTACHED_TO_ACTIVE_SCHEDULE")
             self.assertEqual(forged["next_action"], "ATTACH_HYPOTHESIS_BINDING")
@@ -343,7 +344,7 @@ class ObservationFastLaneRoutingClosureTests(unittest.TestCase):
             packet = packet_for(spec)
             decision = classify(packet, data_root, AS_OF_START)
             self.assertEqual(decision.terminal, "NEW_VERSION_FOR_FUTURE_COHORTS_REQUIRED")
-            forged = forge_classify(packet, data_root)
+            forged = forge_classify(packet, data_root, AS_OF_START)
             self.assertEqual(forged["hfic_terminal"], "OWNER_DECISION_REQUIRED")
             self.assertEqual(
                 forged["classifier_terminal"],

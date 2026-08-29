@@ -23,6 +23,9 @@ from solana_alpha_lab.factory.observation_panel_publisher import (
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_compiler import compile_observation_request
 from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    ObservationLifecycleError,
+    activate_schedule,
+    authorize_schedule,
     observation_ops_store_path,
     prepare_schedule_authority,
     require_production_producer_git_sha,
@@ -61,6 +64,7 @@ def compile_and_bind_observation_schedule(
     hypothesis_definition_sha256: str | None = None,
     experiment_spec_sha256: str | None = None,
     run_key_sha256: str | None = None,
+    authority_phrase: str | None = None,
 ) -> dict[str, Any]:
     persist_clock = now or datetime.now(UTC)
     if persist_clock.tzinfo is None:
@@ -70,10 +74,6 @@ def compile_and_bind_observation_schedule(
         str(spec["hypothesis_version"]) if spec.get("hypothesis_version") else None
     )
     classifier_now = persist_clock
-    if spec.get("as_of"):
-        experiment_as_of = parse_utc(str(spec["as_of"]))
-        if now is None:
-            classifier_now = experiment_as_of
     result = compile_observation_request(
         spec,
         root=root,
@@ -91,6 +91,7 @@ def compile_and_bind_observation_schedule(
     if result.snapshot_sha256:
         passport_bindings["observation_panel_snapshot_sha256"] = result.snapshot_sha256
     authority_request = None
+    authority_status = None
     pending_binding = None
     git_sha = producer_git_sha
     if data_root is not None:
@@ -123,6 +124,56 @@ def compile_and_bind_observation_schedule(
             finally:
                 store.close()
             authority_request = prepared.get("authority_request")
+            if authority_request is not None:
+                authority_status = "PROPOSED_NOT_AUTHORITY"
+            if authority_request is not None and authority_phrase:
+                store = ObservationScheduleStore(observation_ops_store_path(Path(data_root)))
+                try:
+                    try:
+                        authorize_schedule(
+                            root=root,
+                            data_root=Path(data_root),
+                            store=store,
+                            schedule_sha256=str(authority_request["schedule_sha256"]),
+                            phrase=str(authority_phrase),
+                            now=persist_clock,
+                            producer_git_sha=git_sha,
+                        )
+                    except ObservationLifecycleError:
+                        authority_status = "PROPOSED_NOT_AUTHORITY"
+                    else:
+                        activate_schedule(
+                            root=root,
+                            data_root=Path(data_root),
+                            store=store,
+                            schedule_sha256=str(authority_request["schedule_sha256"]),
+                            activation_id=str(authority_request["activation_id"]),
+                            now=persist_clock,
+                            producer_git_sha=git_sha,
+                        )
+                        authority_status = "AUTHORIZED"
+                        result = compile_observation_request(
+                            spec,
+                            root=root,
+                            coverage=coverage,
+                            closed_family=closed_family,
+                            data_root=data_root,
+                            now=classifier_now,
+                            hypothesis_version_id=version_id,
+                            hypothesis_definition_sha256=hypothesis_definition_sha256,
+                        )
+                        passport_bindings = {}
+                        bound_schedule = (
+                            result.covering_schedule_sha256 or result.schedule_sha256
+                        )
+                        if bound_schedule:
+                            passport_bindings["observation_schedule_sha256"] = bound_schedule
+                        if result.snapshot_sha256:
+                            passport_bindings["observation_panel_snapshot_sha256"] = (
+                                result.snapshot_sha256
+                            )
+                finally:
+                    store.close()
         if result.terminal == ATTACHED_TO_ACTIVE_SCHEDULE and result.schedule is not None:
             registered_at = result.hypothesis_registered_at
             pending_payload = {
@@ -182,16 +233,24 @@ def compile_and_bind_observation_schedule(
             )
             if snapshot["snapshot_sha256"] != result.snapshot_sha256:
                 raise ValueError("SNAPSHOT_IDENTITY_MISMATCH")
-            persist_panel_snapshot_binding(
-                data_root=data_root,
-                schedule=result.schedule,
-                snapshot=snapshot,
-                now=persist_clock,
-                producer_git_sha=git_sha,
-                evidence_role=result.evidence_role,
-                hypothesis_version_id=version_id,
-                run_id=run_id,
+            snap_record_id = f"OBS-SNAP-{result.snapshot_sha256[:16].upper()}"
+            from solana_alpha_lab.factory.research_store import ResearchStore
+
+            already_durable = any(
+                item.record_id == snap_record_id
+                for item in ResearchStore(data_root).iter_committed_records()
             )
+            if not already_durable:
+                persist_panel_snapshot_binding(
+                    data_root=data_root,
+                    schedule=result.schedule,
+                    snapshot=snapshot,
+                    now=persist_clock,
+                    producer_git_sha=git_sha,
+                    evidence_role=result.evidence_role,
+                    hypothesis_version_id=version_id,
+                    run_id=run_id,
+                )
     snapshot_ready = bool(
         result.terminal == PANEL_REUSE_READY
         and result.snapshot_sha256
@@ -221,9 +280,7 @@ def compile_and_bind_observation_schedule(
         "next_action": result.next_action,
         "reason_codes": list(result.reason_codes),
         "passport_bindings": passport_bindings,
-        "authority_status": (
-            "PROPOSED_NOT_AUTHORITY" if authority_request is not None else None
-        ),
+        "authority_status": authority_status,
         "authority_request": authority_request,
         "pending_binding": pending_binding,
         "result_digest_sha256": canonical_sha256(

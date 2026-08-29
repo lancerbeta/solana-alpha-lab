@@ -25648,7 +25648,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: f738eef378aed2cdc0a2c07b4bfdc2b1930fcff3992cf3bc244140b9a2e4fdfe}
+  integrity: {kind: sha256, sha256: 6487815fa9d54cf810d488269aee2db04400fb61cfcbaddb05e92d471111f105}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25965,7 +25965,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: f738eef378aed2cdc0a2c07b4bfdc2b1930fcff3992cf3bc244140b9a2e4fdfe}
+  integrity: {kind: sha256, sha256: 6487815fa9d54cf810d488269aee2db04400fb61cfcbaddb05e92d471111f105}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -32275,7 +32275,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: a4ae38ddb6bd2fec4262e24f2c6336dae106379b16b70a0db533f69e9cc67c1b}
+  integrity: {kind: sha256, sha256: 419b593730212c22fbdf8178b50e54dbc4c8cc6e3f0d850c1e50a0ec68be7398}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32984,7 +32984,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 25c37a14c43a904a1f971fd3ee90827469890c273e0030a9e00e6a66eb51e069}
+  integrity: {kind: sha256, sha256: 979bdb33d805b15ad02d734ee3cc279277fa79413594498d58049d630ea8897f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

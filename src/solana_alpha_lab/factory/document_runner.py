@@ -118,8 +118,10 @@ def _scientific_outcome(
     capability_result: Mapping[str, Any],
 ) -> tuple[str, str, str]:
     status = str(capability_result.get("status") or "")
-    if status == "BLOCKED_DATA":
+    if status in {"BLOCKED_DATA", "WAITING_FOR_PANEL"}:
         return "BLOCKED_DATA", "INVALID", "INVALID"
+    if status == "BLOCKED_AUTHORITY":
+        return "BLOCKED_AUTHORITY", "INVALID", "INVALID"
     if status != "COMPLETE":
         return "FAILED_INFRA", "INVALID", "INVALID"
     terminal = str(capability_result.get("terminal") or "")
@@ -305,7 +307,12 @@ class DocumentRunner(ExperimentRunner):
         git_mutation_count = 0 if git_before.unchanged(git_after) else 1
 
         capability_id = str(spec["capability_id"])
-        now = _event_time(spec)
+        now = (
+            run_context.classifier_evaluated_at
+            if observation_routing is not None
+            and run_context.classifier_evaluated_at is not None
+            else _event_time(spec)
+        )
         if observation_routing is not None and not observation_routing.persist_completed_run:
             extra: dict[str, Any] = {
                 "observation_terminal": str(
@@ -541,37 +548,51 @@ class DocumentRunner(ExperimentRunner):
                 next_action="CORRECT_RUN_PASSPORT",
             )
 
-        records: list[ResearchEvent] = [
-            _research_event(
-                record_id=f"HYPOTHESIS-VERSION-{transaction_id[-16:]}",
-                record_kind=RecordKind.HYPOTHESIS_VERSION,
-                entity_id=str(spec["hypothesis_version"]),
-                hypothesis_version_id=str(spec["hypothesis_version"]),
-                run_id=None,
-                transaction_id=transaction_id,
-                effective_at=now,
-                payload={
-                    "hypothesis_version_id": str(spec["hypothesis_version"]),
-                    "family_id": "HYP-FAMILY-FAST-LANE-001",
-                    "version_ordinal": 1,
-                    "origin_id": "HYP-ORIGIN-FAST-LANE-001",
-                    "origin_kind": "DATA_ANALYSIS",
-                    "research_cycle_id": "RESEARCH-CYCLE-FAST-LANE-001",
-                    "definition_sha256": run_context.hypothesis_definition_sha256,
-                    "statement": str(spec.get("question") or ""),
-                    "mechanism": str(spec.get("method") or ""),
-                    "falsifier": str(spec.get("falsifier") or ""),
-                    "expected_regime_terms": [],
-                    "what_changed": (
-                        str(spec["what_changed"][0])
-                        if isinstance(spec.get("what_changed"), list)
-                        and spec["what_changed"]
-                        else "FAST_LANE_RUN"
-                    ),
-                },
-                producer_capability_id=capability_id,
-                producer_git_sha=producer_git_sha,
-            ),
+        records: list[ResearchEvent] = []
+        store = ResearchStore(run_context.data_root)
+        hypothesis_already_registered = any(
+            str(item.record_kind) == RecordKind.HYPOTHESIS_VERSION.value
+            and (
+                str(item.entity_id) == str(spec["hypothesis_version"])
+                or str(item.hypothesis_version_id or "") == str(spec["hypothesis_version"])
+            )
+            for item in store.iter_committed_records()
+        )
+        if not hypothesis_already_registered:
+            records.append(
+                _research_event(
+                    record_id=f"HYPOTHESIS-VERSION-{transaction_id[-16:]}",
+                    record_kind=RecordKind.HYPOTHESIS_VERSION,
+                    entity_id=str(spec["hypothesis_version"]),
+                    hypothesis_version_id=str(spec["hypothesis_version"]),
+                    run_id=None,
+                    transaction_id=transaction_id,
+                    effective_at=now,
+                    payload={
+                        "hypothesis_version_id": str(spec["hypothesis_version"]),
+                        "family_id": "HYP-FAMILY-FAST-LANE-001",
+                        "version_ordinal": 1,
+                        "origin_id": "HYP-ORIGIN-FAST-LANE-001",
+                        "origin_kind": "DATA_ANALYSIS",
+                        "research_cycle_id": "RESEARCH-CYCLE-FAST-LANE-001",
+                        "definition_sha256": run_context.hypothesis_definition_sha256,
+                        "statement": str(spec.get("question") or ""),
+                        "mechanism": str(spec.get("method") or ""),
+                        "falsifier": str(spec.get("falsifier") or ""),
+                        "expected_regime_terms": [],
+                        "what_changed": (
+                            str(spec["what_changed"][0])
+                            if isinstance(spec.get("what_changed"), list)
+                            and spec["what_changed"]
+                            else "FAST_LANE_RUN"
+                        ),
+                    },
+                    producer_capability_id=capability_id,
+                    producer_git_sha=producer_git_sha,
+                )
+            )
+        records.extend(
+            [
             _research_event(
                 record_id=f"RUN-STARTED-{transaction_id[-16:]}",
                 record_kind=RecordKind.RUN_STARTED,
@@ -599,7 +620,8 @@ class DocumentRunner(ExperimentRunner):
                 producer_capability_id=capability_id,
                 producer_git_sha=producer_git_sha,
             ),
-        ]
+            ]
+        )
         metric_id = f"METRIC-TERMINAL-MATCH-{transaction_id[-8:]}"
         records.append(
             _research_event(

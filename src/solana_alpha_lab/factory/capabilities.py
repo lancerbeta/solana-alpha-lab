@@ -623,7 +623,6 @@ def compile_observation_schedule(
 ) -> dict[str, Any]:
     """Compile or bind an ObservationSchedule. Does not discard spec. Zero provider calls."""
 
-    del authority_phrase
     from solana_alpha_lab.factory.observation_schedule_capability import (
         compile_and_bind_observation_schedule,
     )
@@ -642,6 +641,7 @@ def compile_observation_schedule(
         hypothesis_definition_sha256=hooks.get("hypothesis_definition_sha256"),
         experiment_spec_sha256=hooks.get("experiment_spec_sha256"),
         run_key_sha256=hooks.get("run_key_sha256"),
+        authority_phrase=authority_phrase,
     )
 
 
