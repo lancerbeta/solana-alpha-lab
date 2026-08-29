@@ -375,6 +375,12 @@ def prepare_schedule_authority(
         cutover_at=cutover,
     )
     request["activation_id"] = "ACT-" + str(registered["schedule_sha256"])[:16].upper()
+    if predecessor_schedule_sha256:
+        predecessor_activation_id = _unique_live_activation_id(
+            store, predecessor_schedule_sha256
+        )
+        if predecessor_activation_id is not None:
+            request["predecessor_activation_id"] = predecessor_activation_id
     return {
         "terminal": registered["terminal"],
         "operational_registered": True,
@@ -387,6 +393,21 @@ def prepare_schedule_authority(
         "authority_request": request,
         "exact_owner_phrase": request["exact_owner_phrase"],
     }
+
+
+def _unique_live_activation_id(
+    store: ObservationScheduleStore, schedule_sha256: str
+) -> str | None:
+    rows = [
+        row
+        for row in store.list_activations()
+        if str(row.get("schedule_sha256") or "") == schedule_sha256
+        and str(row.get("state") or "") in {"ACTIVE", "DRAINING"}
+    ]
+    if len(rows) != 1:
+        return None
+    activation_id = str(rows[0].get("activation_id") or "")
+    return activation_id or None
 
 
 def drain_expired_admission(
@@ -482,31 +503,70 @@ def materialize_pending_observation_snapshots(
 
     from solana_alpha_lab.factory.observation_panel_coverage import (
         load_coverage_from_rdp,
+        pending_consumer_satisfiable,
+        required_point_ids,
+        snapshot_proves_required_points,
     )
 
     outcomes: list[dict[str, Any]] = []
     coverage = load_coverage_from_rdp(data_root)
+    due_rows = store.due_in_states(
+        tuple(
+            {
+                "OBSERVED",
+                "MISSING_TYPED",
+                "DISAPPEARED",
+                "CENSORED",
+                "CENSORED_LATE",
+                "X_POPULATION_INELIGIBLE",
+                "DEPENDENCY_MISSING",
+                "PENDING",
+                "DUE",
+                "CLAIMED",
+                "IN_FLIGHT_CALL_INDETERMINATE",
+                "BLOCKED_BUDGET",
+            }
+        )
+    )
+    publication_complete = not has_open_publication_jobs(
+        data_root=data_root,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+    )
     for pending in load_pending_observation_bindings(data_root):
         if pending.get("state") != "WAITING_FOR_PANEL":
             continue
         covering = str(pending.get("covering_schedule_sha256") or "")
         if covering != schedule_sha256:
             continue
-        existing_snapshot = None
+        required = required_point_ids(pending)
+        proving_snapshot = None
         for item in coverage.snapshots.values():
             schedule = item.get("schedule")
             if not isinstance(schedule, Mapping):
                 continue
             digest = str(schedule.get("schedule_sha256") or "")
-            if digest == schedule_sha256:
-                existing_snapshot = item
+            if digest != schedule_sha256:
+                continue
+            if snapshot_proves_required_points(
+                data_root=data_root,
+                snapshot=item,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+            ):
+                proving_snapshot = item
                 break
-        if existing_snapshot is not None:
-            snapshot = {
-                "terminal": "SNAPSHOT_REPLAY",
-                "snapshot_sha256": existing_snapshot["snapshot_sha256"],
-            }
-        else:
+        if proving_snapshot is None:
+            if not pending_consumer_satisfiable(
+                data_root=data_root,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+                snapshot=None,
+                publication_complete=publication_complete,
+            ):
+                continue
             try:
                 snapshot = snapshot_schedule(
                     data_root=data_root,
@@ -523,6 +583,33 @@ def materialize_pending_observation_snapshots(
                 if str(exc) == "SNAPSHOT_NO_PUBLISHED_PANEL":
                     continue
                 raise
+            proving_snapshot = {
+                "snapshot_sha256": snapshot["snapshot_sha256"],
+                "dataset_manifest_ids": snapshot.get("dataset_manifest_ids") or [],
+                "schedule": {"schedule_sha256": schedule_sha256},
+            }
+            if not snapshot_proves_required_points(
+                data_root=data_root,
+                snapshot=proving_snapshot,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+            ):
+                continue
+        else:
+            if not pending_consumer_satisfiable(
+                data_root=data_root,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+                snapshot=proving_snapshot,
+                publication_complete=publication_complete,
+            ):
+                continue
+            snapshot = {
+                "terminal": "SNAPSHOT_REPLAY",
+                "snapshot_sha256": proving_snapshot["snapshot_sha256"],
+            }
         satisfied = satisfy_pending_observation_binding(
             data_root=data_root,
             pending_binding_sha256=str(pending["pending_binding_sha256"]),

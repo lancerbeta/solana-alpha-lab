@@ -6,6 +6,7 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from solana_alpha_lab.factory.observation_panel_coverage import (
@@ -310,15 +311,39 @@ def compile_observation_request(
                 or (str(spec["hypothesis_version"]) if spec.get("hypothesis_version") else None),
                 hypothesis_definition_sha256=hypothesis_definition_sha256,
             )
+        due_rows: list[dict[str, Any]] = []
         if data_root is not None:
             from solana_alpha_lab.factory.observation_panel_coverage import (
+                SCIENTIFIC_CLOSED_DUE_STATES,
+                UNRESOLVED_REQUIRED_DUE_STATES,
                 load_coverage_from_rdp,
+            )
+            from solana_alpha_lab.factory.observation_schedule_store import (
+                ObservationScheduleStore,
             )
 
             index = load_coverage_from_rdp(data_root)
+            sqlite_path = Path(data_root) / "observation_schedule_state.sqlite"
+            if sqlite_path.is_file():
+                store = ObservationScheduleStore(sqlite_path)
+                try:
+                    due_rows = store.due_in_states(
+                        tuple(
+                            SCIENTIFIC_CLOSED_DUE_STATES
+                            | UNRESOLVED_REQUIRED_DUE_STATES
+                            | {"BLOCKED_BUDGET"}
+                        )
+                    )
+                finally:
+                    store.close()
         else:
             index = coverage or CoverageIndex()
-        snapshot_record = index.covering_snapshot_record(validated, cutoff)
+        snapshot_record = index.covering_snapshot_record(
+            validated,
+            cutoff,
+            data_root=data_root,
+            due_rows=due_rows,
+        )
         y_proven = False
         first_y = None
         if snapshot_record is not None and data_root is not None:

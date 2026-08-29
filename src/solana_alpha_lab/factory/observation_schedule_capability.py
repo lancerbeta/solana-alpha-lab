@@ -28,6 +28,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     authorize_schedule,
     observation_ops_store_path,
     prepare_schedule_authority,
+    rollover_schedule,
 )
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.run_passport import canonical_sha256, validate_run_passport
@@ -126,6 +127,7 @@ def compile_and_bind_observation_schedule(
             authority_request = prepared.get("authority_request")
             if authority_request is not None:
                 authority_status = "PROPOSED_NOT_AUTHORITY"
+            compiled_terminal = result.terminal
             if authority_request is not None and authority_phrase:
                 store = ObservationScheduleStore(observation_ops_store_path(Path(data_root)))
                 try:
@@ -142,6 +144,7 @@ def compile_and_bind_observation_schedule(
                     except ObservationLifecycleError:
                         authority_status = "PROPOSED_NOT_AUTHORITY"
                     else:
+                        activated = False
                         try:
                             activate_schedule(
                                 root=root,
@@ -152,12 +155,56 @@ def compile_and_bind_observation_schedule(
                                 now=persist_clock,
                                 producer_git_sha=git_sha,
                             )
+                            activated = True
                         except ObservationLifecycleError as exc:
-                            if str(exc) == "COHORT_CUTOVER_REQUIRED":
+                            if str(exc) != "COHORT_CUTOVER_REQUIRED":
+                                authority_status = "PROPOSED_NOT_AUTHORITY"
+                            elif compiled_terminal != NEW_VERSION_FOR_FUTURE_COHORTS_REQUIRED:
                                 authority_status = "AUTHORIZED"
                             else:
-                                authority_status = "PROPOSED_NOT_AUTHORITY"
-                        else:
+                                predecessor_sha = authority_request.get(
+                                    "predecessor_schedule_sha256"
+                                )
+                                predecessor_act = authority_request.get(
+                                    "predecessor_activation_id"
+                                )
+                                cutover_at = authority_request.get("cutover_at")
+                                if predecessor_act is None and predecessor_sha:
+                                    from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+                                        _unique_live_activation_id,
+                                    )
+
+                                    predecessor_act = _unique_live_activation_id(
+                                        store, str(predecessor_sha)
+                                    )
+                                if predecessor_sha and predecessor_act and cutover_at:
+                                    try:
+                                        rollover_schedule(
+                                            root=root,
+                                            data_root=Path(data_root),
+                                            store=store,
+                                            predecessor_schedule_sha256=str(
+                                                predecessor_sha
+                                            ),
+                                            predecessor_activation_id=str(
+                                                predecessor_act
+                                            ),
+                                            successor_schedule_sha256=str(
+                                                authority_request["schedule_sha256"]
+                                            ),
+                                            successor_activation_id=str(
+                                                authority_request["activation_id"]
+                                            ),
+                                            cutover_at=str(cutover_at),
+                                            now=persist_clock,
+                                            producer_git_sha=git_sha,
+                                        )
+                                        activated = True
+                                    except ObservationLifecycleError:
+                                        authority_status = "AUTHORIZED"
+                                else:
+                                    authority_status = "AUTHORIZED"
+                        if activated:
                             authority_status = "AUTHORIZED"
                             result = compile_observation_request(
                                 spec,

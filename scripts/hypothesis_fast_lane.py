@@ -99,6 +99,19 @@ def parse_as_of(value: str) -> datetime:
         raise FastLaneCliError("AS_OF_INVALID") from exc
 
 
+def resolve_runtime_clock(
+    value: str | None, *, now: datetime | None = None
+) -> datetime:
+    """Ordinary runtime uses one trusted UTC instant; explicit --as-of stays historical."""
+
+    if value:
+        return parse_as_of(value)
+    instant = now or datetime.now(UTC)
+    if instant.tzinfo is None:
+        instant = instant.replace(tzinfo=UTC)
+    return instant.astimezone(UTC)
+
+
 def load_packet(path: Path) -> dict[str, Any]:
     if path.is_symlink() or not path.is_file():
         raise FastLaneCliError("PACKET_UNAVAILABLE")
@@ -287,6 +300,9 @@ def execute_classify(
     decision = classify_lane(packet, root=root, data_root=data_root, as_of=as_of)
     payload = decision_payload(decision)
     payload["run_key_sha256"] = decision.run_key_sha256
+    payload["classifier_evaluated_at"] = as_of.astimezone(UTC).isoformat().replace(
+        "+00:00", "Z"
+    )
     return payload
 
 
@@ -304,6 +320,9 @@ def execute_submit(
     if not run:
         payload = decision_payload(decision)
         payload["run_key_sha256"] = decision.run_key_sha256
+        payload["classifier_evaluated_at"] = as_of.astimezone(UTC).isoformat().replace(
+            "+00:00", "Z"
+        )
         return payload
 
     spec = packet.get("experiment_spec")
@@ -336,6 +355,9 @@ def execute_submit(
 
     payload = runner_payload(result)
     payload["run_key_sha256"] = result.get("run_key_sha256")
+    payload["classifier_evaluated_at"] = as_of.astimezone(UTC).isoformat().replace(
+        "+00:00", "Z"
+    )
     return payload
 
 
@@ -839,11 +861,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     classify = subparsers.add_parser("classify")
     classify.add_argument("--packet", type=Path, required=True)
-    classify.add_argument("--as-of", default=DEFAULT_AS_OF)
+    classify.add_argument("--as-of", default=None)
 
     submit = subparsers.add_parser("submit")
     submit.add_argument("--packet", type=Path, required=True)
-    submit.add_argument("--as-of", default=DEFAULT_AS_OF)
+    submit.add_argument("--as-of", default=None)
     submit.add_argument("--run", action="store_true")
     submit.add_argument("--authority-phrase")
 
@@ -896,18 +918,20 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "rebuild-projection":
             return cmd_rebuild_projection(data_root)
         if args.command == "classify":
+            runtime_clock = resolve_runtime_clock(args.as_of)
             return cmd_classify(
                 root,
                 data_root,
                 args.packet.resolve(),
-                parse_as_of(args.as_of),
+                runtime_clock,
             )
         if args.command == "submit":
+            runtime_clock = resolve_runtime_clock(args.as_of)
             return cmd_submit(
                 root,
                 data_root,
                 args.packet.resolve(),
-                parse_as_of(args.as_of),
+                runtime_clock,
                 run=bool(args.run),
                 authority_phrase=args.authority_phrase,
             )

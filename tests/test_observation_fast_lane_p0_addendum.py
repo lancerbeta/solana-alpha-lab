@@ -14,7 +14,11 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from scripts.hypothesis_fast_lane import execute_submit  # noqa: E402
+from scripts.hypothesis_fast_lane import (  # noqa: E402
+    build_parser,
+    execute_submit,
+    resolve_runtime_clock,
+)
 from solana_alpha_lab.factory.lane_classifier import Lane, classify_lane  # noqa: E402
 from solana_alpha_lab.factory.observation_panel_coverage import (  # noqa: E402
     compute_evidence_role,
@@ -37,6 +41,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     ObservationLifecycleError,
     activate_schedule,
     authorize_schedule,
+    materialize_pending_observation_snapshots,
     observation_ops_store_path,
 )
 from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
@@ -510,27 +515,61 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
                 authority_phrase=phrase,
             )
             self.assertEqual(authorized["authority_status"], "AUTHORIZED")
-            self.assertIn(
-                authorized["observation_terminal"],
-                {"ATTACHED_TO_ACTIVE_SCHEDULE", "SCHEDULE_ACTIVATION_REQUIRED"},
+            self.assertEqual(
+                authorized["observation_terminal"], "ATTACHED_TO_ACTIVE_SCHEDULE"
             )
+            self.assertEqual(authorized["status"], "BLOCKED_DATA")
+            self.assertEqual(authorized["scientific_terminal"], "INVALID")
             self.assertIsNone(authorized["run_id_or_null"])
+            self.assertNotEqual(authorized["next_action"], "AUTHORIZE_COMPILED_SCHEDULE")
+            self.assertNotEqual(authorized["next_action"], "PROVIDE_EXACT_OWNER_AUTHORITY")
             self.assertIsNone(
                 ResearchStore(data_root).find_completed_run(authorized["run_key_sha256"])
             )
+            replay = execute_submit(
+                ROOT,
+                data_root,
+                write_packet(data_root, packet_for(spec)),
+                AS_OF_START,
+                run=True,
+                authority_phrase=phrase,
+            )
+            self.assertEqual(replay["status"], "BLOCKED_DATA")
+            self.assertEqual(
+                replay["observation_terminal"], "ATTACHED_TO_ACTIVE_SCHEDULE"
+            )
+            self.assertNotEqual(replay["next_action"], "AUTHORIZE_COMPILED_SCHEDULE")
+            self.assertNotEqual(replay["next_action"], "PROVIDE_EXACT_OWNER_AUTHORITY")
+            self.assertIsNone(replay.get("authority_request") or None)
 
     def test_p0c_successor_packet_names_predecessor(self) -> None:
-        predecessor = load_observation_schedule(
-            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
-        )
         spec = v1_2_spec(
             fixture="successor_y259200.yaml",
             mode="SCHEDULE_ONLY",
             role="PROSPECTIVE_OOS",
+            experiment_id="EXP-OBS-FAST-LANE-SUCCESSOR-001",
         )
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
-            persist_active_schedule(data_root, predecessor)
+            covering_prepared = execute_submit(
+                ROOT,
+                data_root,
+                write_packet(data_root, packet_for(v1_2_spec())),
+                AS_OF_START,
+                run=True,
+                authority_phrase=None,
+            )
+            covering_phrase = covering_prepared["authority_request"]["exact_owner_phrase"]
+            covering_sha = covering_prepared["authority_request"]["schedule_sha256"]
+            covering_act = covering_prepared["authority_request"]["activation_id"]
+            execute_submit(
+                ROOT,
+                data_root,
+                write_packet(data_root, packet_for(v1_2_spec())),
+                AS_OF_START,
+                run=True,
+                authority_phrase=covering_phrase,
+            )
             result = execute_submit(
                 ROOT,
                 data_root,
@@ -544,11 +583,9 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
                 "NEW_VERSION_FOR_FUTURE_COHORTS_REQUIRED",
             )
             request = result["authority_request"]
-            self.assertEqual(
-                request["predecessor_schedule_sha256"],
-                predecessor["schedule_sha256"],
-            )
+            self.assertEqual(request["predecessor_schedule_sha256"], covering_sha)
             self.assertEqual(request["successor_schedule_sha256"], request["schedule_sha256"])
+            self.assertEqual(request["predecessor_activation_id"], covering_act)
             self.assertTrue(request["cutover_at"])
             self.assertNotIn("data_root", request)
             phrased = execute_submit(
@@ -560,14 +597,45 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
                 authority_phrase=request["exact_owner_phrase"],
             )
             self.assertEqual(phrased["authority_status"], "AUTHORIZED")
-            self.assertIn(
-                phrased["observation_terminal"],
-                {
-                    "NEW_VERSION_FOR_FUTURE_COHORTS_REQUIRED",
-                    "ATTACHED_TO_ACTIVE_SCHEDULE",
-                },
+            self.assertEqual(
+                phrased["observation_terminal"], "ATTACHED_TO_ACTIVE_SCHEDULE"
             )
+            self.assertEqual(phrased["status"], "BLOCKED_DATA")
             self.assertIsNone(phrased["run_id_or_null"])
+            self.assertIsNone(
+                ResearchStore(data_root).find_completed_run(phrased["run_key_sha256"])
+            )
+            store = ObservationScheduleStore(observation_ops_store_path(data_root))
+            try:
+                self.assertEqual(
+                    store.get_activation(covering_sha, covering_act)["state"],
+                    "DRAINING",
+                )
+                self.assertEqual(
+                    store.get_activation(
+                        request["schedule_sha256"], request["activation_id"]
+                    )["state"],
+                    "ACTIVE",
+                )
+            finally:
+                store.close()
+            replay = execute_submit(
+                ROOT,
+                data_root,
+                write_packet(data_root, packet_for(spec)),
+                AS_OF_START,
+                run=True,
+                authority_phrase=None,
+            )
+            self.assertEqual(
+                replay["observation_terminal"], "ATTACHED_TO_ACTIVE_SCHEDULE"
+            )
+            self.assertNotEqual(
+                replay.get("observation_terminal"),
+                "NEW_VERSION_FOR_FUTURE_COHORTS_REQUIRED",
+            )
+            self.assertNotEqual(replay["next_action"], "AUTHORIZE_SUCCESSOR_SCHEDULE")
+            self.assertNotEqual(replay["next_action"], "AUTHORIZE_COMPILED_SCHEDULE")
 
     def test_p0d_admission_stop_drains_and_blocks_new_members(self) -> None:
         schedule = load_observation_schedule(
@@ -938,6 +1006,217 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
                 as_of=Y86400_AT,
             )
             self.assertEqual(replay.terminal, "REPLAY_AVAILABLE")
+
+    def test_p01_x_is_not_y_and_old_snapshot_cannot_satisfy_long_pending(self) -> None:
+        covering = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/common_panel.yaml"
+        )
+        short_spec = v1_2_spec(
+            fixture="x300_y900.yaml",
+            mode="SCHEDULE_ONLY",
+            role="PROSPECTIVE_OOS",
+            experiment_id="EXP-OBS-P01-SHORT-001",
+        )
+        long_spec = v1_2_spec(
+            fixture="successor_y259200.yaml",
+            mode="SCHEDULE_ONLY",
+            role="PROSPECTIVE_OOS",
+            experiment_id="EXP-OBS-P01-LONG-001",
+        )
+        reuse_short = v1_2_spec(
+            fixture="x300_y900.yaml",
+            mode="REUSE_OR_SCHEDULE",
+            role="EXPLORATORY_REUSE",
+            experiment_id="EXP-OBS-P01-SHORT-REUSE-001",
+            as_of=render_utc(Y900_AT),
+            availability_cutoff=render_utc(Y900_AT),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            persist_hypothesis_version(
+                data_root,
+                hypothesis_version_id=str(short_spec["hypothesis_version"]),
+                definition_sha256=HYPOTHESIS_DEFINITION_SHA256,
+                created_at=T0,
+            )
+            prepared = execute_submit(
+                ROOT,
+                data_root,
+                write_packet(data_root, packet_for(v1_2_spec())),
+                AS_OF_START,
+                run=True,
+                authority_phrase=None,
+            )
+            request = prepared["authority_request"]
+            store = ObservationScheduleStore(observation_ops_store_path(data_root))
+            try:
+                authorize_schedule(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=request["schedule_sha256"],
+                    phrase=request["exact_owner_phrase"],
+                    now=AS_OF_START,
+                    producer_git_sha=real_git_sha(),
+                )
+                activate_schedule(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=request["schedule_sha256"],
+                    activation_id="ACT-P01-001",
+                    now=AS_OF_START,
+                    producer_git_sha=real_git_sha(),
+                )
+                first = execute_submit(
+                    ROOT,
+                    data_root,
+                    write_packet(data_root, packet_for(short_spec)),
+                    AS_OF_START,
+                    run=True,
+                    authority_phrase=None,
+                )
+                self.assertEqual(first["observation_terminal"], "ATTACHED_TO_ACTIVE_SCHEDULE")
+                pending_sha = first["pending_binding"]["pending_binding_sha256"]
+                opener = _commissioning_opener()
+                _tick(data_root, store, covering, "ACT-P01-001", PACE_AT, opener)
+                _tick(data_root, store, covering, "ACT-P01-001", ADMIT_AT, opener)
+                waiting = [
+                    item
+                    for item in load_pending_observation_bindings(data_root)
+                    if item["pending_binding_sha256"] == pending_sha
+                ]
+                self.assertEqual(waiting[0]["state"], "WAITING_FOR_PANEL")
+                self.assertFalse(
+                    any(
+                        item.get("state") == "SATISFIED"
+                        and item["pending_binding_sha256"] == pending_sha
+                        for item in load_pending_observation_bindings(data_root)
+                    )
+                )
+                after_x = classify_lane(
+                    packet_for(reuse_short),
+                    root=ROOT,
+                    data_root=data_root,
+                    as_of=ADMIT_AT,
+                )
+                self.assertNotEqual(after_x.terminal, "PANEL_REUSE_READY")
+                snapshots_after_x = [
+                    record
+                    for record in ResearchStore(data_root).iter_committed_records()
+                    if str(record.record_kind) == RecordKind.OBSERVATION_PANEL_SNAPSHOT.value
+                ]
+                self.assertEqual(len(snapshots_after_x), 0)
+                _tick(data_root, store, covering, "ACT-P01-001", Y900_AT, opener)
+                matured = [
+                    item
+                    for item in load_pending_observation_bindings(data_root)
+                    if item["pending_binding_sha256"] == pending_sha
+                ]
+                self.assertEqual(matured[0]["state"], "SATISFIED")
+                self.assertTrue(matured[0].get("snapshot_sha256"))
+                after_y900 = classify_lane(
+                    packet_for(reuse_short),
+                    root=ROOT,
+                    data_root=data_root,
+                    as_of=Y900_AT,
+                )
+                self.assertEqual(after_y900.terminal, "PANEL_REUSE_READY")
+                second = execute_submit(
+                    ROOT,
+                    data_root,
+                    write_packet(data_root, packet_for(long_spec)),
+                    AS_OF_START,
+                    run=True,
+                    authority_phrase=None,
+                )
+                self.assertEqual(
+                    second["observation_terminal"], "ATTACHED_TO_ACTIVE_SCHEDULE"
+                )
+                long_sha = second["pending_binding"]["pending_binding_sha256"]
+                _tick(data_root, store, covering, "ACT-P01-001", Y86400_AT, opener)
+                long_waiting = [
+                    item
+                    for item in load_pending_observation_bindings(data_root)
+                    if item["pending_binding_sha256"] == long_sha
+                ]
+                self.assertEqual(long_waiting[0]["state"], "WAITING_FOR_PANEL")
+                reuse_long = v1_2_spec(
+                    fixture="successor_y259200.yaml",
+                    mode="REUSE_OR_SCHEDULE",
+                    role="EXPLORATORY_REUSE",
+                    experiment_id="EXP-OBS-P01-LONG-REUSE-001",
+                    as_of=render_utc(Y86400_AT),
+                    availability_cutoff=render_utc(Y86400_AT),
+                )
+                self.assertNotEqual(
+                    classify_lane(
+                        packet_for(reuse_long),
+                        root=ROOT,
+                        data_root=data_root,
+                        as_of=Y86400_AT,
+                    ).terminal,
+                    "PANEL_REUSE_READY",
+                )
+                _tick(data_root, store, covering, "ACT-P01-001", Y259200_AT, opener)
+                long_done = [
+                    item
+                    for item in load_pending_observation_bindings(data_root)
+                    if item["pending_binding_sha256"] == long_sha
+                ]
+                self.assertEqual(long_done[0]["state"], "SATISFIED")
+                first_snapshot = matured[0]["snapshot_sha256"]
+                self.assertNotEqual(long_done[0]["snapshot_sha256"], first_snapshot)
+                materialize_pending_observation_snapshots(
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=str(covering["schedule_sha256"]),
+                    activation_id="ACT-P01-001",
+                    now=Y259200_AT,
+                    producer_git_sha=real_git_sha(),
+                )
+                satisfied = [
+                    item
+                    for item in load_pending_observation_bindings(data_root)
+                    if item["state"] == "SATISFIED"
+                    and item["pending_binding_sha256"] == long_sha
+                ]
+                self.assertEqual(len(satisfied), 1)
+            finally:
+                store.close()
+
+    def test_p04_runtime_clock_is_trusted_now_not_commissioning_date(self) -> None:
+        parser = build_parser()
+        args = parser.parse_args(["classify", "--packet", "packet.yaml"])
+        self.assertIsNone(args.as_of)
+        trusted = datetime(2026, 9, 1, 12, 0, tzinfo=UTC)
+        self.assertEqual(resolve_runtime_clock(None, now=trusted), trusted)
+        historical = resolve_runtime_clock("2026-08-25T00:00:00Z")
+        self.assertEqual(historical, datetime(2026, 8, 25, tzinfo=UTC))
+        spec = v1_2_spec(
+            as_of=render_utc(trusted),
+            availability_cutoff=render_utc(trusted),
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            decision = classify_lane(
+                packet_for(spec),
+                root=ROOT,
+                data_root=data_root,
+                as_of=trusted,
+            )
+            self.assertNotEqual(decision.terminal, "DENY_INVALID_SPEC")
+            future = v1_2_spec(
+                as_of="2026-09-01T12:00:01Z",
+                availability_cutoff="2026-09-01T00:00:00Z",
+            )
+            denied = classify_lane(
+                packet_for(future),
+                root=ROOT,
+                data_root=data_root,
+                as_of=trusted,
+            )
+            self.assertEqual(denied.terminal, "DENY_INVALID_SPEC")
 
 
 if __name__ == "__main__":

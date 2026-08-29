@@ -348,6 +348,11 @@ class DocumentRunner(ExperimentRunner):
         git_mutation_count = 0 if git_before.unchanged(git_after) else 1
 
         capability_id = str(spec["capability_id"])
+        if observation_routing is not None:
+            final_terminal = str(capability_result.get("terminal") or lane.terminal)
+            final_routing = observation_fast_lane_routing(final_terminal)
+            if final_routing is not None:
+                observation_routing = final_routing
         now = (
             run_context.classifier_evaluated_at
             if observation_routing is not None
@@ -361,11 +366,19 @@ class DocumentRunner(ExperimentRunner):
                 ),
                 "capability_result": capability_result,
             }
+            if run_context.classifier_evaluated_at is not None:
+                extra["classifier_evaluated_at"] = run_context.classifier_evaluated_at.astimezone(
+                    UTC
+                ).isoformat().replace("+00:00", "Z")
             if isinstance(capability_result.get("authority_request"), Mapping):
                 extra["authority_request"] = capability_result["authority_request"]
+            if capability_result.get("authority_status") is not None:
                 extra["authority_status"] = capability_result.get("authority_status")
             if isinstance(capability_result.get("pending_binding"), Mapping):
                 extra["pending_binding"] = capability_result["pending_binding"]
+            final_next = capability_result.get("next_action")
+            if not isinstance(final_next, str) or not final_next:
+                final_next = lane.next_action
             return _document_response(
                 lane_decision=lane,
                 execution_status=observation_routing.execution_status,
@@ -376,7 +389,7 @@ class DocumentRunner(ExperimentRunner):
                 provider_calls_actual=int(
                     capability_result.get("provider_api_rpc_wss_calls") or 0
                 ),
-                next_action=lane.next_action,
+                next_action=str(final_next),
                 extra=extra,
             )
         transaction_id = f"RESEARCH-TXN-{uuid.uuid4().hex[:16].upper()}"
