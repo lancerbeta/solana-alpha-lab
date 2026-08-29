@@ -2000,6 +2000,13 @@ def _effective_cycle_phase(
 
 def _classifier_to_hfic_terminal(receipt: Mapping[str, Any]) -> str:
     outcome = str(receipt.get("lane_classifier_terminal") or "")
+    from solana_alpha_lab.factory.observation_fast_lane_terminals import (
+        hfic_terminal_for_classifier,
+    )
+
+    observation_mapped = hfic_terminal_for_classifier(outcome)
+    if observation_mapped is not None:
+        return observation_mapped
     mapping = {
         "FAST_LANE_READY": "PASS_FAST_LANE_READY",
         "REPLAY_AVAILABLE": "PASS_FAST_LANE_READY",

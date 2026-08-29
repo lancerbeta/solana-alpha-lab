@@ -638,6 +638,10 @@ def compile_observation_schedule(
         producer_git_sha=hooks.get("producer_git_sha"),
         hypothesis_version_id=hooks.get("hypothesis_version_id"),
         run_id=hooks.get("run_id"),
+        now=hooks.get("now"),
+        hypothesis_definition_sha256=hooks.get("hypothesis_definition_sha256"),
+        experiment_spec_sha256=hooks.get("experiment_spec_sha256"),
+        run_key_sha256=hooks.get("run_key_sha256"),
     )
 
 

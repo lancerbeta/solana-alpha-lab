@@ -182,7 +182,7 @@ def decision_payload(decision: Any) -> dict[str, Any]:
 
 
 def runner_payload(result: dict[str, Any]) -> dict[str, Any]:
-    return owner_fields(
+    payload = owner_fields(
         lane=str(result["lane"]),
         status=str(result["status"]),
         scientific_terminal=str(result["scientific_terminal"]),
@@ -192,6 +192,37 @@ def runner_payload(result: dict[str, Any]) -> dict[str, Any]:
         provider_calls_actual=int(result.get("provider_calls_actual") or 0),
         next_action=str(result["next_action"]),
     )
+    observation_terminal = result.get("observation_terminal")
+    if isinstance(observation_terminal, str) and observation_terminal:
+        payload["observation_terminal"] = observation_terminal
+    for key in (
+        "authority_status",
+        "authority_request",
+        "pending_binding",
+    ):
+        value = result.get(key)
+        if value is not None:
+            payload[key] = value
+    capability_result = result.get("capability_result")
+    if isinstance(capability_result, Mapping):
+        for key in (
+            "authority_status",
+            "authority_request",
+            "pending_binding",
+            "hypothesis_registered_at",
+        ):
+            if key not in payload and capability_result.get(key) is not None:
+                payload[key] = capability_result[key]
+    passport = result.get("passport")
+    if isinstance(passport, Mapping):
+        for key in (
+            "observation_schedule_sha256",
+            "observation_panel_snapshot_sha256",
+        ):
+            value = passport.get(key)
+            if isinstance(value, str) and len(value) == 64:
+                payload[key] = value
+    return payload
 
 
 def store_diagnostics_payload(store: ResearchStore) -> dict[str, Any]:
@@ -296,6 +327,7 @@ def execute_submit(
                 data_root=data_root,
                 hypothesis_definition_sha256=hypothesis_definition_sha256,
                 lane_decision=decision,
+                classifier_evaluated_at=as_of,
             ),
             authority_phrase=authority_phrase,
         )

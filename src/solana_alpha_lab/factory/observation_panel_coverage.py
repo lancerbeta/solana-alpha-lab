@@ -9,6 +9,7 @@ from typing import Any
 
 from solana_alpha_lab.factory.observation_schedule import (
     collection_projection,
+    parse_utc,
     schedule_sha256,
 )
 
@@ -206,7 +207,7 @@ def load_coverage_from_rdp(data_root) -> CoverageIndex:
 
 def compute_evidence_role(
     *,
-    hypothesis_registered_at: datetime,
+    hypothesis_registered_at: datetime | None,
     first_admission_at: datetime,
     first_y_available_at: datetime | None,
     closed_or_consumed: bool,
@@ -214,6 +215,8 @@ def compute_evidence_role(
 ) -> str:
     if closed_or_consumed:
         return "CONSUMED_PRIOR_EVIDENCE"
+    if hypothesis_registered_at is None:
+        return "EXPLORATORY_REUSE"
     if not y_availability_proven:
         return "EXPLORATORY_REUSE"
     if first_y_available_at is not None and hypothesis_registered_at >= first_y_available_at:
@@ -221,6 +224,66 @@ def compute_evidence_role(
     if hypothesis_registered_at < first_admission_at:
         return "PROSPECTIVE_OOS"
     return "PROSPECTIVE_OUTCOME_BLIND_CONDITIONAL"
+
+
+def admission_window_open(schedule: Mapping[str, Any], now: datetime) -> bool:
+    """True only while new admission/discovery is still authorized."""
+
+    activation = schedule.get("activation")
+    if not isinstance(activation, Mapping):
+        return False
+    starts = parse_utc(activation["starts_at"])
+    stops = parse_utc(activation["stops_admitting_at"])
+    return starts <= now < stops
+
+
+def resolve_authoritative_hypothesis_registered_at(
+    data_root,
+    *,
+    hypothesis_version_id: str | None = None,
+    hypothesis_definition_sha256: str | None = None,
+) -> datetime | None:
+    """Resolve immutable HFIC/RDP hypothesis registration time. Never uses spec.as_of."""
+
+    from pathlib import Path
+
+    import json
+
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    if not hypothesis_version_id and not hypothesis_definition_sha256:
+        return None
+    try:
+        store = ResearchStore(Path(data_root))
+    except Exception:
+        return None
+    earliest: datetime | None = None
+    for record in store.iter_committed_records():
+        if str(record.record_kind) != "HYPOTHESIS_VERSION":
+            continue
+        payload = json.loads(record.payload_json)
+        if not isinstance(payload, Mapping):
+            continue
+        version_match = bool(hypothesis_version_id) and (
+            str(payload.get("hypothesis_version_id") or "") == hypothesis_version_id
+            or str(record.entity_id) == hypothesis_version_id
+            or str(record.hypothesis_version_id or "") == hypothesis_version_id
+        )
+        definition_match = bool(hypothesis_definition_sha256) and str(
+            payload.get("definition_sha256") or ""
+        ) == hypothesis_definition_sha256
+        if not version_match and not definition_match:
+            continue
+        instant = record.created_at
+        payload_created = payload.get("created_at")
+        if isinstance(payload_created, str):
+            try:
+                instant = min(instant, parse_utc(payload_created))
+            except Exception:
+                pass
+        if earliest is None or instant < earliest:
+            earliest = instant
+    return earliest
 
 
 def _lateness_compatible(requested: Mapping[str, Any], available: Mapping[str, Any]) -> bool:
@@ -303,13 +366,24 @@ class CoverageIndex:
             return None
         return str(record["snapshot_sha256"])
 
-    def covering_active_schedule(self, requested: Mapping[str, Any]) -> str | None:
+    def covering_active_schedule(
+        self,
+        requested: Mapping[str, Any],
+        now: datetime | None = None,
+    ) -> str | None:
         digest = schedule_sha256(requested)
+        candidates: list[tuple[str, dict[str, Any]]] = []
         if digest in self.active_schedules:
-            return digest
+            candidates.append((digest, self.active_schedules[digest]))
         for existing_digest, schedule in self.active_schedules.items():
+            if existing_digest == digest:
+                continue
             if schedule_covers(requested, schedule):
-                return existing_digest
+                candidates.append((existing_digest, schedule))
+        for existing_digest, schedule in candidates:
+            if now is not None and not admission_window_open(schedule, now):
+                continue
+            return existing_digest
         return None
 
     def admission_overlap_predecessor(self, requested: Mapping[str, Any]) -> str | None:
@@ -325,9 +399,11 @@ class CoverageIndex:
 
 __all__ = [
     "CoverageIndex",
+    "admission_window_open",
     "compute_evidence_role",
     "derive_first_y_available_at",
     "load_coverage_from_rdp",
+    "resolve_authoritative_hypothesis_registered_at",
     "schedule_covers",
     "source_population_key",
 ]
