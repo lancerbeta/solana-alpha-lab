@@ -8,5 +8,6 @@ Type=oneshot
 WorkingDirectory=/opt/solana-alpha-lab
 EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
 Environment=OBSERVATION_SCHEDULE_RUNTIME_CONFIG=configs/observation_schedule_runtime_v1.yaml
+ExecStartPre=/usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --heartbeat
 ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once --runtime-config configs/observation_schedule_runtime_v1.yaml
 NoNewPrivileges=true

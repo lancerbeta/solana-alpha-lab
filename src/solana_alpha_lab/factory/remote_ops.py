@@ -12,12 +12,14 @@ import io
 import json
 import os
 import shutil
+import sqlite3
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
 from datetime import UTC, datetime
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any, Callable, Mapping
 
 import jsonschema
@@ -54,9 +56,40 @@ def _sha256_file(path: Path) -> str:
 
 def _safe_relative(root: Path, relative: str) -> Path:
     candidate = Path(relative)
-    if candidate.is_absolute() or ".." in candidate.parts:
+    posix = PurePosixPath(relative)
+    windows = PureWindowsPath(relative)
+    if (
+        candidate.is_absolute()
+        or posix.is_absolute()
+        or windows.is_absolute()
+        or bool(windows.drive)
+        or ".." in candidate.parts
+        or ".." in posix.parts
+        or ".." in windows.parts
+    ):
         raise RemoteOpsError("REMOTE_PATH_UNSAFE")
-    return (root / candidate).resolve()
+    root_resolved = root.resolve()
+    current = root
+    for part in candidate.parts:
+        current = current / part
+        if current.is_symlink():
+            raise RemoteOpsError("REMOTE_PATH_UNSAFE")
+    resolved = current.resolve()
+    try:
+        resolved.relative_to(root_resolved)
+    except ValueError as exc:
+        raise RemoteOpsError("REMOTE_PATH_UNSAFE") from exc
+    return resolved
+
+
+def _reject_symlink_components(path: Path) -> None:
+    if path.is_absolute() is False:
+        raise RemoteOpsError("REMOTE_PATH_UNSAFE")
+    current = Path(path.anchor)
+    for part in path.parts[1:]:
+        current /= part
+        if current.is_symlink():
+            raise RemoteOpsError("REMOTE_PATH_UNSAFE")
 
 
 def load_config(root: Path) -> dict[str, Any]:
@@ -83,15 +116,32 @@ def load_config_v1_1(root: Path) -> dict[str, Any]:
     return loaded
 
 
+def _select_v1_1_config(root: Path, loaded: Mapping[str, Any]) -> dict[str, Any]:
+    if (
+        str(loaded.get("schema_version") or "") != "1.1"
+        and (root / CONFIG_V1_1_RELATIVE).is_file()
+    ):
+        return load_config_v1_1(root)
+    return dict(loaded)
+
+
 def consistent_sqlite_backup(source: Path, dest: Path) -> None:
     import sqlite3
 
-    if dest.is_absolute() is False:
+    if (
+        source.is_absolute() is False
+        or dest.is_absolute() is False
+    ):
         raise RemoteOpsError("REMOTE_PATH_UNSAFE")
+    _reject_symlink_components(source)
+    _reject_symlink_components(dest)
+    source = source.resolve()
+    if source.is_file() is False:
+        raise RemoteOpsError("BACKUP_SOURCE_MISSING")
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists():
         dest.unlink()
-    conn = sqlite3.connect(f"file:{source}?mode=ro", uri=True)
+    conn = sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True)
     replica = sqlite3.connect(dest)
     try:
         conn.backup(replica)
@@ -428,7 +478,10 @@ def write_heartbeat(
     kind: str = "PAPER_HEARTBEAT",
     progress_at: str | None = None,
 ) -> Path:
-    loaded = dict(config) if config is not None else load_config(root)
+    loaded = (
+        dict(config) if config is not None else load_config(root)
+    )
+    loaded = _select_v1_1_config(root, loaded)
     path = _safe_relative(root, str(loaded["monitoring"]["heartbeat_relative"]))
     path.parent.mkdir(parents=True, exist_ok=True)
     stamp = _now()
@@ -439,6 +492,16 @@ def write_heartbeat(
         "deploy_version": loaded["deploy"]["version"],
     }
     path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    observation_relative = loaded["monitoring"].get("observation_heartbeat_relative")
+    if observation_relative:
+        observation_path = _safe_relative(root, str(observation_relative))
+        observation_path.parent.mkdir(parents=True, exist_ok=True)
+        observation_payload = dict(payload)
+        observation_payload["kind"] = "OBSERVATION_SCHEDULE_HEARTBEAT"
+        observation_path.write_text(
+            json.dumps(observation_payload, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
     return path
 
 
@@ -446,7 +509,10 @@ def _assert_independent_sink(root: Path, loaded: Mapping[str, Any], sink: Path) 
     if loaded["backup"]["same_parent_forbidden"] is not True:
         raise RemoteOpsError("INDEPENDENT_FLAG_DRIFT")
     parents = []
-    for relative in loaded["backup"]["source_relative_paths"]:
+    relatives = list(loaded["backup"]["source_relative_paths"]) + list(
+        loaded["backup"].get("recursive_relative_paths") or []
+    )
+    for relative in relatives:
         source = _safe_relative(root, relative)
         parents.append(source.parent.resolve())
     sink_parent = sink.parent.resolve() if sink.suffix == ".zip" else sink.resolve()
@@ -459,6 +525,34 @@ def _assert_independent_sink(root: Path, loaded: Mapping[str, Any], sink: Path) 
             raise RemoteOpsError("BACKUP_SINK_NOT_INDEPENDENT")
 
 
+def _backup_source_paths(
+    root: Path,
+    loaded: Mapping[str, Any],
+) -> list[tuple[str, Path, bool]]:
+    result: list[tuple[str, Path, bool]] = []
+    seen: set[str] = set()
+    for relative in loaded["backup"]["source_relative_paths"]:
+        normalized = str(relative).replace("\\", "/")
+        source = _safe_relative(root, normalized)
+        if source.is_file() is False:
+            raise RemoteOpsError(f"BACKUP_SOURCE_MISSING:{normalized}")
+        if normalized not in seen:
+            result.append((normalized, source, normalized.endswith(".sqlite")))
+            seen.add(normalized)
+    for relative in loaded["backup"].get("recursive_relative_paths") or []:
+        normalized_root = str(relative).replace("\\", "/").rstrip("/")
+        source_root = _safe_relative(root, normalized_root)
+        if source_root.is_dir() is False:
+            raise RemoteOpsError(f"BACKUP_SOURCE_MISSING:{normalized_root}")
+        for source in sorted(path for path in source_root.rglob("*") if path.is_file()):
+            normalized = source.relative_to(root).as_posix()
+            source = _safe_relative(root, normalized)
+            if normalized not in seen:
+                result.append((normalized, source, normalized.endswith(".sqlite")))
+                seen.add(normalized)
+    return result
+
+
 def package_backup(
     root: Path,
     *,
@@ -467,33 +561,85 @@ def package_backup(
     environ: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     loaded = dict(config) if config is not None else load_config(root)
-    sink = (
-        sink_override.resolve()
-        if sink_override is not None
-        else resolve_backup_sink(root, loaded, environ)
-    )
+    loaded = _select_v1_1_config(root, loaded)
+    if sink_override is not None:
+        raw_sink = sink_override.absolute()
+        _reject_symlink_components(raw_sink)
+        sink = raw_sink.resolve()
+    else:
+        sink = resolve_backup_sink(root, loaded, environ)
+    if sink.is_absolute() is False:
+        raise RemoteOpsError("REMOTE_PATH_UNSAFE")
+    _reject_symlink_components(sink)
     _assert_independent_sink(root, loaded, sink)
     sink.mkdir(parents=True, exist_ok=True)
+    sources = _backup_source_paths(root, loaded)
     entries: list[dict[str, Any]] = []
     buffer = io.BytesIO()
-    with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_STORED) as archive:
-        for relative in loaded["backup"]["source_relative_paths"]:
-            source = _safe_relative(root, relative)
-            if source.is_file() is False:
-                raise RemoteOpsError(f"BACKUP_SOURCE_MISSING:{relative}")
-            digest = _sha256_file(source)
-            info = zipfile.ZipInfo(filename=relative.replace("\\", "/"), date_time=ZIP_TIMESTAMP)
+    with tempfile.TemporaryDirectory(prefix="factory-backup-", dir=str(sink.parent)) as staging_name:
+        staging = Path(staging_name)
+        with zipfile.ZipFile(buffer, "w", compression=zipfile.ZIP_STORED) as archive:
+            for relative, source, is_sqlite in sources:
+                snapshot = staging / relative
+                if is_sqlite and str(loaded.get("schema_version")) == "1.1":
+                    consistent_sqlite_backup(source, snapshot)
+                    data = snapshot.read_bytes()
+                    kind = "SQLITE_BACKUP_API"
+                else:
+                    data = source.read_bytes()
+                    kind = "FILE_SNAPSHOT"
+                digest = _sha256_bytes(data)
+                info = zipfile.ZipInfo(filename=relative, date_time=ZIP_TIMESTAMP)
+                info.external_attr = 0o100644 << 16
+                archive.writestr(info, data)
+                entries.append(
+                    {
+                        "path": relative,
+                        "sha256": digest,
+                        "bytes": len(data),
+                        "kind": kind,
+                    }
+                )
+            rdp_entries = [
+                item
+                for item in entries
+                if item["path"] == "local/factory_v1/observation_rdp"
+                or item["path"].startswith("local/factory_v1/observation_rdp/")
+            ]
+            journal_entries = [
+                item
+                for item in entries
+                if "/publication_jobs/" in item["path"]
+                or "/journals/" in item["path"]
+            ]
+            manifest = {
+                "kind": "FACTORY_REMOTE_BACKUP_MANIFEST",
+                "schema_version": str(loaded.get("schema_version") or "1.0"),
+                "backup_consistency": (
+                    "SQLITE_BACKUP_API_AND_RDP_MANIFESTS"
+                    if str(loaded.get("schema_version")) == "1.1"
+                    else "FILE_SNAPSHOT"
+                ),
+                "created_at": _now(),
+                "entries": entries,
+                "rdp_inventory": {
+                    "count": len(rdp_entries),
+                    "fingerprint": _sha256_bytes(
+                        json.dumps(rdp_entries, sort_keys=True).encode("utf-8")
+                    ),
+                },
+                "active_journal_inventory": {
+                    "count": len(journal_entries),
+                    "fingerprint": _sha256_bytes(
+                        json.dumps(journal_entries, sort_keys=True).encode("utf-8")
+                    ),
+                },
+            }
+            info = zipfile.ZipInfo(filename="BACKUP_MANIFEST.json", date_time=ZIP_TIMESTAMP)
             info.external_attr = 0o100644 << 16
-            archive.writestr(info, source.read_bytes())
-            entries.append({"path": relative.replace("\\", "/"), "sha256": digest, "bytes": source.stat().st_size})
-        manifest = {
-            "kind": "FACTORY_REMOTE_BACKUP_MANIFEST",
-            "created_at": _now(),
-            "entries": entries,
-        }
-        info = zipfile.ZipInfo(filename="BACKUP_MANIFEST.json", date_time=ZIP_TIMESTAMP)
-        info.external_attr = 0o100644 << 16
-        archive.writestr(info, json.dumps(manifest, indent=2, sort_keys=True).encode("utf-8"))
+            archive.writestr(
+                info, json.dumps(manifest, indent=2, sort_keys=True).encode("utf-8")
+            )
     payload = buffer.getvalue()
     digest = _sha256_bytes(payload)
     dest = sink / f"BACKUP_{digest}.zip"
@@ -514,21 +660,95 @@ def restore_backup_isolated(
 ) -> dict[str, Any]:
     if bundle.is_file() is False:
         raise RemoteOpsError("BACKUP_BUNDLE_MISSING")
+    bundle_digest = _sha256_file(bundle)
+    if bundle.name.startswith("BACKUP_") and bundle.suffix == ".zip":
+        declared_digest = bundle.stem.removeprefix("BACKUP_")
+        if (
+            len(declared_digest) != 64
+            or any(character not in "0123456789abcdef" for character in declared_digest)
+            or declared_digest != bundle_digest
+        ):
+            raise RemoteOpsError("BACKUP_BUNDLE_HASH_MISMATCH")
+    if dest_root.is_absolute() is False:
+        raise RemoteOpsError("RESTORE_ROOT_NOT_ISOLATED")
+    if dest_root.resolve() == bundle.parent.resolve():
+        raise RemoteOpsError("RESTORE_ROOT_NOT_ISOLATED")
+    if dest_root.is_symlink():
+        raise RemoteOpsError("RESTORE_ROOT_NOT_ISOLATED")
+    _reject_symlink_components(dest_root)
     dest_root.mkdir(parents=True, exist_ok=True)
     restored: list[dict[str, Any]] = []
+    sqlite_integrity: list[dict[str, Any]] = []
     with zipfile.ZipFile(bundle, "r") as archive:
         names = archive.namelist()
         if "BACKUP_MANIFEST.json" not in names:
             raise RemoteOpsError("BACKUP_MANIFEST_MISSING")
-        manifest = json.loads(archive.read("BACKUP_MANIFEST.json").decode("utf-8"))
-        expected = {item["path"]: item["sha256"] for item in manifest["entries"]}
+        if names.count("BACKUP_MANIFEST.json") != 1 or len(names) != len(set(names)):
+            raise RemoteOpsError("BACKUP_ARCHIVE_ENTRIES_INVALID")
+        try:
+            manifest = json.loads(archive.read("BACKUP_MANIFEST.json").decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise RemoteOpsError("BACKUP_MANIFEST_INVALID") from exc
+        if (
+            not isinstance(manifest, dict)
+            or manifest.get("kind") != "FACTORY_REMOTE_BACKUP_MANIFEST"
+            or not isinstance(manifest.get("entries"), list)
+        ):
+            raise RemoteOpsError("BACKUP_MANIFEST_INVALID")
+        expected: dict[str, str] = {}
+        entry_kinds: dict[str, str] = {}
+        for item in manifest["entries"]:
+            if not isinstance(item, dict):
+                raise RemoteOpsError("BACKUP_MANIFEST_INVALID")
+            name = item.get("path")
+            digest = item.get("sha256")
+            if (
+                not isinstance(name, str)
+                or not name
+                or "\\" in name
+                or PureWindowsPath(name).is_absolute()
+                or bool(PureWindowsPath(name).drive)
+                or Path(name).is_absolute()
+                or ".." in Path(name).parts
+                or ".." in PureWindowsPath(name).parts
+                or not isinstance(digest, str)
+                or len(digest) != 64
+                or any(character not in "0123456789abcdef" for character in digest)
+                or name in expected
+            ):
+                raise RemoteOpsError("BACKUP_MANIFEST_INVALID")
+            expected[name] = digest
+            entry_kinds[name] = str(item.get("kind") or "")
+        if manifest.get("schema_version") == "1.1" and any(
+            name.endswith(".sqlite") and entry_kinds.get(name) != "SQLITE_BACKUP_API"
+            for name in expected
+        ):
+            raise RemoteOpsError("BACKUP_MANIFEST_INVALID")
+        archive_entries = {
+            name.replace("\\", "/")
+            for name in names
+            if name != "BACKUP_MANIFEST.json"
+        }
+        if archive_entries != set(expected):
+            raise RemoteOpsError("BACKUP_MANIFEST_ENTRIES_MISMATCH")
         for name in names:
             if name == "BACKUP_MANIFEST.json":
                 continue
             candidate = Path(name)
-            if candidate.is_absolute() or ".." in candidate.parts:
+            if (
+                "\\" in name
+                or candidate.is_absolute()
+                or PureWindowsPath(name).is_absolute()
+                or bool(PureWindowsPath(name).drive)
+                or ".." in candidate.parts
+                or ".." in PureWindowsPath(name).parts
+            ):
                 raise RemoteOpsError("BACKUP_ENTRY_UNSAFE")
             target = dest_root / candidate
+            if target.exists() or target.is_symlink():
+                raise RemoteOpsError(f"RESTORE_TARGET_EXISTS:{name}")
+            if any(parent.is_symlink() for parent in target.parents if parent.exists()):
+                raise RemoteOpsError("BACKUP_ENTRY_UNSAFE")
             target.parent.mkdir(parents=True, exist_ok=True)
             data = archive.read(name)
             digest = _sha256_bytes(data)
@@ -536,7 +756,107 @@ def restore_backup_isolated(
                 raise RemoteOpsError(f"BACKUP_HASH_MISMATCH:{name}")
             target.write_bytes(data)
             restored.append({"path": name.replace("\\", "/"), "sha256": digest, "bytes": len(data)})
-    return {"restored": restored, "count": len(restored)}
+            if (
+                name.replace("\\", "/").endswith(".sqlite")
+                and entry_kinds.get(name.replace("\\", "/")) == "SQLITE_BACKUP_API"
+            ):
+                try:
+                    conn = sqlite3.connect(target)
+                    try:
+                        check = str(conn.execute("PRAGMA integrity_check").fetchone()[0])
+                    finally:
+                        conn.close()
+                except sqlite3.Error as exc:
+                    raise RemoteOpsError(f"RESTORE_SQLITE_INTEGRITY_FAILED:{name}") from exc
+                if check != "ok":
+                    raise RemoteOpsError(f"RESTORE_SQLITE_INTEGRITY_FAILED:{name}")
+                sqlite_integrity.append({"path": name.replace("\\", "/"), "result": check})
+        rdp_entries = [
+            item
+            for item in manifest["entries"]
+            if str(item["path"]) == "local/factory_v1/observation_rdp"
+            or str(item["path"]).startswith("local/factory_v1/observation_rdp/")
+        ]
+        expected_rdp_fingerprint = _sha256_bytes(
+            json.dumps(rdp_entries, sort_keys=True).encode("utf-8")
+        )
+        rdp_inventory = manifest.get("rdp_inventory") or {}
+        if rdp_inventory and (
+            int(rdp_inventory.get("count", -1)) != len(rdp_entries)
+            or str(rdp_inventory.get("fingerprint")) != expected_rdp_fingerprint
+        ):
+            raise RemoteOpsError("BACKUP_RDP_INVENTORY_MISMATCH")
+        journal_entries = [
+            item
+            for item in manifest["entries"]
+            if "/publication_jobs/" in str(item["path"])
+            or "/journals/" in str(item["path"])
+        ]
+        journal_inventory = manifest.get("active_journal_inventory") or {}
+        expected_journal_fingerprint = _sha256_bytes(
+            json.dumps(journal_entries, sort_keys=True).encode("utf-8")
+        )
+        if journal_inventory and (
+            int(journal_inventory.get("count", -1)) != len(journal_entries)
+            or str(journal_inventory.get("fingerprint")) != expected_journal_fingerprint
+        ):
+            raise RemoteOpsError("BACKUP_JOURNAL_INVENTORY_MISMATCH")
+        observation_stores = [
+            item["path"]
+            for item in manifest["entries"]
+            if str(item["path"]).endswith("observation_schedule_state.sqlite")
+        ]
+    for relative in observation_stores:
+        target = dest_root / str(relative)
+        conn = sqlite3.connect(target)
+        try:
+            recovery_epoch = f"RESTORE-{bundle_digest[:24]}"
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS restore_markers (
+                    marker_id TEXT PRIMARY KEY,
+                    recovery_epoch TEXT NOT NULL,
+                    resolved INTEGER NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                )
+                """
+            )
+            conn.execute(
+                """
+                INSERT INTO restore_markers(
+                    marker_id, recovery_epoch, resolved, payload_json, created_at
+                ) VALUES ('UNRESOLVED', ?, 0, ?, ?)
+                ON CONFLICT(marker_id) DO UPDATE SET
+                    recovery_epoch=excluded.recovery_epoch,
+                    resolved=0,
+                    payload_json=excluded.payload_json,
+                    created_at=excluded.created_at
+                """,
+                (
+                    recovery_epoch,
+                    json.dumps({"recovery_epoch": recovery_epoch}, sort_keys=True),
+                    _now(),
+                ),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+    return {
+        "restored": restored,
+        "count": len(restored),
+        "sqlite_integrity": sqlite_integrity,
+        "rdp_inventory": {
+            "count": len(rdp_entries),
+            "fingerprint": expected_rdp_fingerprint,
+        },
+        "active_journal_inventory": {
+            "count": len(journal_entries),
+            "fingerprint": expected_journal_fingerprint,
+        },
+        "recovery_gap": bool(observation_stores),
+        "restore_marker_unresolved": bool(observation_stores),
+    }
 
 
 ALERT_CODE_RU = {

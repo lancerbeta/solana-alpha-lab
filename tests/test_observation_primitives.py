@@ -31,11 +31,38 @@ class _Opener:
         return self.result
 
 
+class _AdvancingClock:
+    def __init__(self) -> None:
+        self.values = [
+            datetime(2026, 9, 1, 0, 10, tzinfo=UTC),
+            datetime(2026, 9, 1, 0, 10, 7, tzinfo=UTC),
+            datetime(2026, 9, 1, 0, 10, 7, tzinfo=UTC),
+        ]
+
+    def __call__(self) -> datetime:
+        return self.values.pop(0)
+
+
 def _clock() -> datetime:
     return datetime(2026, 9, 1, 0, 5, tzinfo=UTC)
 
 
 class ObservationPrimitiveTests(unittest.TestCase):
+    def test_pit_clocks_preserve_transport_completion_latency(self) -> None:
+        result = execute_primitive(
+            primitive_id="PRIM-JUPITER-TOKENS-V2-RECENT-001",
+            primitive_version="1.0",
+            method="GET",
+            url="https://api.jup.ag/tokens/v2/recent",
+            opener=_Opener({"http_status": 200, "body": [{"id": "MintA"}]}),
+            clock=_AdvancingClock(),
+        )
+
+        self.assertEqual(result["request_started_at"], "2026-09-01T00:10:00Z")
+        self.assertEqual(result["response_received_at"], "2026-09-01T00:10:07Z")
+        self.assertEqual(result["first_reliable_available_at"], "2026-09-01T00:10:07Z")
+        self.assertNotEqual(result["first_reliable_available_at"], result["request_started_at"])
+
     def test_injected_opener_observes_without_network(self) -> None:
         opener = _Opener(
             {
@@ -160,6 +187,33 @@ class ObservationPrimitiveTests(unittest.TestCase):
         )
         self.assertEqual(result["status"], "MISSING_TYPED")
         self.assertEqual(result["missing_reason"], "PROVIDER_SCHEMA_DRIFT")
+
+    def test_jupiter_readonly_opener_puts_secret_only_in_header(self) -> None:
+        from io import BytesIO
+        from unittest.mock import MagicMock, patch
+
+        from solana_alpha_lab.factory.observation_schedule_runtime import (
+            JupiterReadonlyOpener,
+        )
+
+        response = MagicMock()
+        response.status = 200
+        response.read.return_value = b'[{"id":"MintA"}]'
+        response.__enter__.return_value = response
+        response.__exit__.return_value = None
+        with patch(
+            "solana_alpha_lab.factory.observation_schedule_runtime.urllib.request.urlopen",
+            return_value=response,
+        ) as opener:
+            result = JupiterReadonlyOpener("secret-key-value").open(
+                "https://api.jup.ag/tokens/v2/search?query=MintA"
+            )
+        request = opener.call_args.args[0]
+        self.assertEqual(request.get_method(), "GET")
+        self.assertEqual(request.headers.get("x-api-key") or request.get_header("X-api-key"), "secret-key-value")
+        self.assertNotIn("secret-key-value", request.full_url)
+        self.assertEqual(result["http_status"], 200)
+        self.assertFalse(result["url_has_api_key"])
 
 
 if __name__ == "__main__":

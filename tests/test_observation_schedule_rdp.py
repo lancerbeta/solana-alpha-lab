@@ -4,7 +4,7 @@ import json
 import sys
 import tempfile
 import unittest
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -13,6 +13,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
+    rebuild_observation_panel_from_rdp,
     publish_observation_batch,
 )
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
@@ -26,6 +27,178 @@ NOW = datetime(2026, 9, 1, 0, 10, tzinfo=UTC)
 
 
 class ObservationScheduleRdpTests(unittest.TestCase):
+    def test_rebuild_preserves_typed_values_and_terminal_states_without_sqlite(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            publish_observation_batch(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+                members=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "activation_id": "ACT-OBS-001",
+                        "entity_id": "MintA",
+                        "membership_state": "ADMITTED",
+                    }
+                ],
+                observations=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "activation_id": "ACT-OBS-001",
+                        "entity_id": "MintA",
+                        "point_id": "X300",
+                        "primitive_id": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+                        "state": "OBSERVED",
+                        "event_time": "2026-09-01T00:05:00Z",
+                        "first_reliable_available_at": "2026-09-01T00:10:07Z",
+                        "request_started_at": "2026-09-01T00:10:00Z",
+                        "response_received_at": "2026-09-01T00:10:07Z",
+                        "request_sha256": "a" * 64,
+                        "call_occurrence_id": "b" * 64,
+                        "field_values": [
+                            {
+                                "field_id": "FIELD-LIQUIDITY-USD-001",
+                                "value_kind": "DECIMAL",
+                                "typed_value_or_null": "1234.50",
+                                "state": "OBSERVED",
+                                "missing_reason": None,
+                                "primitive_id": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+                                "point_id": "X300",
+                                "event_time": "2026-09-01T00:05:00Z",
+                                "first_reliable_available_at": "2026-09-01T00:10:07Z",
+                                "request_sha256": "a" * 64,
+                                "call_occurrence_id": "b" * 64,
+                            }
+                        ],
+                    },
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "activation_id": "ACT-OBS-001",
+                        "entity_id": "MintA",
+                        "point_id": "Y900",
+                        "primitive_id": "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001",
+                        "state": "CENSORED_LATE",
+                        "event_time": None,
+                        "first_reliable_available_at": "2026-09-01T00:10:07Z",
+                        "request_sha256": "c" * 64,
+                        "call_occurrence_id": "d" * 64,
+                        "missing_reason": "AUTHORITATIVE_ANCHOR_RESOLVED_TOO_LATE",
+                        "field_values": [
+                            {
+                                "field_id": "FIELD-QUOTE-SELL-OUT-AMOUNT-001",
+                                "value_kind": "DECIMAL",
+                                "typed_value_or_null": None,
+                                "state": "CENSORED_LATE",
+                                "missing_reason": "AUTHORITATIVE_ANCHOR_RESOLVED_TOO_LATE",
+                                "primitive_id": "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001",
+                                "point_id": "Y900",
+                                "event_time": None,
+                                "first_reliable_available_at": "2026-09-01T00:10:07Z",
+                                "request_sha256": "c" * 64,
+                                "call_occurrence_id": "d" * 64,
+                            }
+                        ],
+                    },
+                ],
+            )
+            for path in data_root.glob("**/*.sqlite"):
+                path.unlink()
+            rebuilt = rebuild_observation_panel_from_rdp(
+                data_root=data_root,
+                schedule_sha256=schedule["schedule_sha256"],
+            )
+            self.assertEqual(len(rebuilt["members"]), 1)
+            observations = {
+                row["point_id"]: row for row in rebuilt["observations"]
+            }
+            x_values = {
+                value["field_id"]: value
+                for value in observations["X300"]["field_values"]
+            }
+            self.assertEqual(
+                x_values["FIELD-LIQUIDITY-USD-001"]["typed_value_or_null"],
+                "1234.50",
+            )
+            self.assertEqual(observations["Y900"]["state"], "CENSORED_LATE")
+            self.assertEqual(
+                observations["Y900"]["field_values"][0]["missing_reason"],
+                "AUTHORITATIVE_ANCHOR_RESOLVED_TOO_LATE",
+            )
+
+    def test_rebuild_deduplicates_repeated_member_snapshots(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        member = {
+            "schedule_sha256": schedule["schedule_sha256"],
+            "activation_id": "ACT-OBS-001",
+            "entity_id": "MintA",
+            "membership_state": "ADMITTED",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            publish_observation_batch(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+                members=[member],
+                observations=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "activation_id": "ACT-OBS-001",
+                        "entity_id": "MintA",
+                        "point_id": "X300",
+                        "state": "MISSING_TYPED",
+                        "event_time": None,
+                        "first_reliable_available_at": "2026-09-01T00:10:00Z",
+                        "missing_reason": "FIRST",
+                    }
+                ],
+            )
+            publish_observation_batch(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=NOW + timedelta(seconds=1),
+                producer_git_sha=GIT_SHA,
+                members=[{**member, "membership_state": "OBSERVED"}],
+                observations=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "activation_id": "ACT-OBS-001",
+                        "entity_id": "MintA",
+                        "point_id": "Y900",
+                        "state": "MISSING_TYPED",
+                        "event_time": None,
+                        "first_reliable_available_at": "2026-09-01T00:10:01Z",
+                        "missing_reason": "SECOND",
+                    }
+                ],
+            )
+            rebuilt = rebuild_observation_panel_from_rdp(
+                data_root=data_root,
+                schedule_sha256=schedule["schedule_sha256"],
+            )
+            self.assertEqual(len(rebuilt["members"]), 1)
+            self.assertEqual(rebuilt["members"][0]["membership_state"], "OBSERVED")
+            self.assertEqual(
+                {row["point_id"] for row in rebuilt["observations"]},
+                {"X300", "Y900"},
+            )
+
     def test_batch_event_and_projection_views(self) -> None:
         schedule = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"

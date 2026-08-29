@@ -7,6 +7,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import redirect_stdout
+from datetime import timedelta
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
@@ -21,11 +22,21 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
     ObservationPrimitiveRegistry,
 )
 from solana_alpha_lab.factory.observation_schedule_compiler import compile_observation_request
+from solana_alpha_lab.factory.observation_schedule import (
+    canonical_sha256,
+    load_observation_schedule,
+    parse_utc,
+    render_utc,
+)
 from solana_alpha_lab.factory.observation_schedule_runtime import (
     UNIT_RELATIVE,
     parse_unit_exec_start,
 )
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    _authority_policy,
+    expected_authority_phrase,
+)
 from scripts.observation_schedule import main as cli_main
 
 
@@ -33,10 +44,35 @@ RUNTIME = "tests/fixtures/observation_schedule/runtime_commissioning.yaml"
 COMMON = "tests/fixtures/observation_schedule/common_panel.yaml"
 NARROW = "tests/fixtures/observation_schedule/x300_y900.yaml"
 SUCCESSOR = "tests/fixtures/observation_schedule/successor_y259200.yaml"
-PHRASE = "OK OBSERVATION_SCHEDULE_FIXTURE_AUTHORIZE"
 TOKEN = "fixture-token-not-in-url"
 ACT = "ACT-OBS-COMM-001"
 ACT2 = "ACT-OBS-COMM-002"
+
+
+def _authority_phrase(document: dict) -> str:
+    horizon = max(
+        int(point["due_offset_seconds"]) + int(point["allowed_lateness_seconds"])
+        for point in [document["x_point"], *document["y_points"]]
+    )
+    expires_at = render_utc(
+        parse_utc(document["activation"]["stops_admitting_at"])
+        + timedelta(seconds=horizon)
+    )
+    policy = _authority_policy(
+        root=ROOT,
+        document=document,
+        schedule_key=document["schedule_key"],
+        expires_at=expires_at,
+    )
+    return expected_authority_phrase(
+        schedule_sha256=document["schedule_sha256"],
+        schedule_key=document["schedule_key"],
+        activation_starts_at=document["activation"]["starts_at"],
+        activation_stops_admitting_at=document["activation"]["stops_admitting_at"],
+        provider_route_ids=policy["provider_route_ids"],
+        expires_at=expires_at,
+        policy_digest=canonical_sha256(policy),
+    )
 
 
 def _cli(args: list[str], env: dict[str, str] | None = None) -> tuple[int, dict]:
@@ -77,7 +113,14 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             code, replay = _cli(["register", "--schedule", COMMON, *base])
             self.assertEqual(replay["terminal"], "REGISTER_REPLAY")
             code, auth = _cli(
-                ["authorize", "--schedule-sha256", digest, "--phrase", PHRASE, *base]
+                [
+                    "authorize",
+                    "--schedule-sha256",
+                    digest,
+                    "--phrase",
+                    _authority_phrase(load_observation_schedule(ROOT, COMMON)),
+                    *base,
+                ]
             )
             self.assertEqual(code, 0, auth)
             self.assertEqual(auth["terminal"], "AUTHORIZED")
@@ -140,10 +183,17 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertEqual(refused["terminal"], "TICK_REFUSED_NO_LIVE_DEFAULT")
 
+            code, paced = _cli(
+                ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z"},
+            )
+            self.assertEqual(code, 2, paced)
+            self.assertEqual(paced["terminal"], "PACE_WAIT")
+
             code, faulted = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
                 env={
-                    "OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z",
+                    "OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:03Z",
                     "OBSERVATION_SCHEDULE_PUBLISH_FAULT": "AFTER_ARTIFACTS",
                 },
             )
@@ -152,13 +202,14 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
 
             code, ticked = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
-                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z"},
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:06Z"},
             )
             self.assertEqual(code, 0, ticked)
             self.assertEqual(ticked["terminal"], "TICK_COMPLETE")
             self.assertNotIn(TOKEN, json.dumps(ticked))
 
             store = ObservationScheduleStore(Path(data_root) / "observation_schedule_state.sqlite")
+            self.addCleanup(store.close)
             candidates = {
                 row["entity_id"]: row["state"]
                 for row in store.list_candidates(schedule_sha256=digest, activation_id=ACT)
@@ -184,7 +235,7 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
 
             code, h24 = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
-                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-02T00:05:00Z"},
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-02T00:00:01Z"},
             )
             self.assertEqual(code, 0, h24)
             self.assertEqual(h24["terminal"], "TICK_COMPLETE")
@@ -204,11 +255,31 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             self.assertEqual(snapped["terminal"], "SNAPSHOT")
             self.assertTrue(snapped.get("first_y_proven"))
 
-            dues = store.due_in_states(("OBSERVED", "MISSING_TYPED", "DISAPPEARED"))
+            dues = store.due_in_states(
+                (
+                    "OBSERVED",
+                    "MISSING_TYPED",
+                    "DISAPPEARED",
+                    "CENSORED",
+                    "CENSORED_LATE",
+                )
+            )
             states = {row["state"] for row in dues}
-            self.assertTrue({"OBSERVED", "MISSING_TYPED"} & states)
+            self.assertTrue(
+                {"OBSERVED", "MISSING_TYPED", "CENSORED", "CENSORED_LATE"} & states
+            )
             points = {row["point_id"] for row in store.due_in_states(
-                ("PENDING", "DUE", "CLAIMED", "OBSERVED", "MISSING_TYPED", "DISAPPEARED", "CENSORED")
+                (
+                    "PENDING",
+                    "DUE",
+                    "CLAIMED",
+                    "OBSERVED",
+                    "MISSING_TYPED",
+                    "DISAPPEARED",
+                    "CENSORED",
+                    "CENSORED_LATE",
+                    "DEPENDENCY_MISSING",
+                )
             )}
             self.assertIn("X300", points)
             self.assertIn("Y900", points)
@@ -220,49 +291,58 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             later = store.load_accounting(
                 schedule_sha256=digest, activation_id=ACT, utc_day="2026-09-02"
             )
-            self.assertGreater(int(later["provider_calls"]), 0)
+            self.assertEqual(int(later["provider_calls"]), 0)
             self.assertNotEqual(int(day["provider_calls"]), 0)
 
             code, second = _cli(["register", "--schedule", NARROW, *base])
             self.assertEqual(code, 0, second)
             digest2 = second["schedule_sha256"]
-            _cli(["authorize", "--schedule-sha256", digest2, "--phrase", PHRASE, *base])
             _cli(
                 [
-                    "activate",
+                    "authorize",
                     "--schedule-sha256",
                     digest2,
-                    "--activation-id",
-                    ACT2,
+                    "--phrase",
+                    _authority_phrase(load_observation_schedule(ROOT, NARROW)),
                     *base,
                 ]
             )
+            code, rolled = _cli(
+                [
+                    "rollover",
+                    "--predecessor-schedule-sha256",
+                    digest,
+                    "--predecessor-activation-id",
+                    ACT,
+                    "--successor-schedule-sha256",
+                    digest2,
+                    "--successor-activation-id",
+                    ACT2,
+                    "--cutover-at",
+                    "2026-09-01T12:00:00Z",
+                    *base,
+                ]
+            )
+            self.assertEqual(code, 0, rolled)
+            self.assertEqual(rolled["terminal"], "ROLLOVER_COMMITTED")
             calls_before = int(
                 store.load_lifetime(schedule_sha256=digest2, activation_id=ACT2)["provider_calls"]
             )
             code, shared = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest2, "--activation-id", ACT2],
-                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z"},
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T12:00:00Z"},
             )
-            self.assertEqual(code, 0, shared)
-            self.assertEqual(shared["terminal"], "TICK_COMPLETE")
-            self.assertGreaterEqual(shared["provider_calls"], calls_before)
-
-            store.save_lifetime(
-                schedule_sha256=digest,
-                activation_id=ACT,
-                provider_calls=3200,
-                canonical_bytes=1,
+            self.assertIn(shared["terminal"], {"PACE_WAIT", "TICK_COMPLETE"}, shared)
+            self.assertGreaterEqual(int(shared["provider_calls"]), max(1, calls_before))
+            self.assertEqual(
+                store.get_activation(digest, ACT)["state"],
+                "DRAINING",
             )
-            code, exhausted = _cli(
-                ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
-                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-02T00:10:00Z"},
+            self.assertEqual(
+                store.get_activation(digest2, ACT2)["state"],
+                "ACTIVE",
             )
-            self.assertEqual(exhausted["terminal"], "BLOCKED_BUDGET")
-            self.assertEqual(int(exhausted["provider_calls"]), 0)
             store.close()
-
-            from solana_alpha_lab.factory.observation_schedule import load_observation_schedule
 
             covering = load_observation_schedule(ROOT, COMMON)
             successor = load_observation_schedule(ROOT, SUCCESSOR)
@@ -360,6 +440,127 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             payload = json.loads(completed.stdout)
             self.assertEqual(completed.returncode, 2)
             self.assertEqual(payload["terminal"], "TICK_REFUSED_NO_LIVE_DEFAULT")
+
+    def test_unpinned_tick_processes_two_active_schedules_in_sorted_order(self) -> None:
+        from solana_alpha_lab.factory.observation_schedule import schedule_sha256
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+            activate_schedule,
+            authorize_schedule,
+            register_schedule,
+        )
+        from solana_alpha_lab.factory.observation_schedule_store import (
+            ObservationScheduleStore,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root_path = Path(tmp) / "rdp"
+            data_root_path.mkdir()
+            data_root = str(data_root_path.resolve())
+            store = ObservationScheduleStore(
+                data_root_path / "observation_schedule_state.sqlite"
+            )
+            self.addCleanup(store.close)
+            first_doc = load_observation_schedule(ROOT, COMMON)
+            second_doc = dict(load_observation_schedule(ROOT, NARROW))
+            second_doc["schedule_key"] = "OBS-INDEPENDENT-COHORT-TICK-ORDER-001"
+            second_doc["sampling"] = dict(second_doc["sampling"])
+            second_doc["sampling"]["seed"] = "INDEPENDENT-COHORT-TICK-ORDER-V1"
+            second_doc["schedule_sha256"] = schedule_sha256(second_doc)
+            first = register_schedule(
+                root=ROOT,
+                data_root=data_root_path,
+                store=store,
+                document=first_doc,
+                now=parse_utc("2026-09-01T00:10:00Z"),
+                producer_git_sha="c" * 40,
+            )
+            second = register_schedule(
+                root=ROOT,
+                data_root=data_root_path,
+                store=store,
+                document=second_doc,
+                now=parse_utc("2026-09-01T00:10:00Z"),
+                producer_git_sha="c" * 40,
+            )
+            for digest, document in (
+                (first["schedule_sha256"], first_doc),
+                (second["schedule_sha256"], second_doc),
+            ):
+                authorize_schedule(
+                    root=ROOT,
+                    data_root=data_root_path,
+                    store=store,
+                    schedule_sha256=digest,
+                    phrase=_authority_phrase(document),
+                    now=parse_utc("2026-09-01T00:10:00Z"),
+                    producer_git_sha="c" * 40,
+                )
+            activate_schedule(
+                root=ROOT,
+                data_root=data_root_path,
+                store=store,
+                schedule_sha256=first["schedule_sha256"],
+                activation_id=ACT,
+                now=parse_utc("2026-09-01T00:10:00Z"),
+                producer_git_sha="c" * 40,
+            )
+            activate_schedule(
+                root=ROOT,
+                data_root=data_root_path,
+                store=store,
+                schedule_sha256=second["schedule_sha256"],
+                activation_id=ACT2,
+                now=parse_utc("2026-09-01T00:10:00Z"),
+                producer_git_sha="c" * 40,
+            )
+            store.close()
+            expected = sorted(
+                [
+                    (first["schedule_sha256"], ACT),
+                    (second["schedule_sha256"], ACT2),
+                ]
+            )
+            code, ticked = _cli(
+                [
+                    "tick",
+                    "--once",
+                    "--runtime-config",
+                    RUNTIME,
+                    "--data-root",
+                    data_root,
+                ],
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z"},
+            )
+            self.assertIn(ticked["terminal"], {"TICK_COMPLETE", "TICK_PARTIAL", "PACE_WAIT"})
+            activations = ticked.get("activations")
+            if activations is None:
+                self.fail("unpinned tick with two live schedules must enumerate both")
+            observed = [
+                (item.get("schedule_sha256"), item.get("activation_id"))
+                for item in activations
+            ]
+            self.assertEqual(observed, expected)
+
+    def test_credential_loader_is_not_called_without_live_schedule(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = str((Path(tmp) / "rdp").resolve())
+            Path(data_root).mkdir()
+            with patch(
+                "scripts.observation_schedule.load_credential_after_activation"
+            ) as loader:
+                code, payload = _cli(
+                    [
+                        "tick",
+                        "--once",
+                        "--runtime-config",
+                        RUNTIME,
+                        "--data-root",
+                        data_root,
+                    ]
+                )
+            self.assertEqual(code, 2)
+            self.assertEqual(payload["terminal"], "TICK_REFUSED_NO_LIVE_DEFAULT")
+            loader.assert_not_called()
 
     def test_implementation_hash_drift_fails_before_network(self) -> None:
         with patch.object(

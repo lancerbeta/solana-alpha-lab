@@ -41,6 +41,36 @@ class ObservationScheduleCompilerTests(unittest.TestCase):
         self.assertIsNotNone(result.schedule_sha256)
         self.assertEqual(result.budget.min_raw_retention_days, 10)
         self.assertLessEqual(result.budget.provider_calls_per_tick_max, 60)
+        self.assertEqual(result.budget.discovery_calls, 1440)
+        self.assertEqual(result.budget.provider_calls_lifetime_max, 1561)
+
+    def test_multi_day_activation_scales_lifetime_budget(self) -> None:
+        document = _fixture("common_panel.yaml")
+        document["activation"] = dict(document["activation"])
+        document["activation"]["stops_admitting_at"] = "2026-09-03T00:00:00Z"
+        document["budgets"] = dict(document["budgets"])
+        document["budgets"]["provider_calls_lifetime_max"] = 10000
+        result = compile_schedule_document(document, root=ROOT)
+        self.assertEqual(result.terminal, "SCHEDULE_ACTIVATION_REQUIRED")
+        self.assertEqual(result.budget.provider_calls_per_utc_day_max, 1561)
+        self.assertEqual(result.budget.provider_calls_lifetime_max, 3122)
+
+    def test_credit_envelope_sums_per_primitive_costs(self) -> None:
+        from solana_alpha_lab.factory.observation_primitive_registry import (
+            load_observation_primitive_registry,
+        )
+        from solana_alpha_lab.factory.observation_schedule_compiler import _compute_budget
+
+        document = _fixture("x300_y900.yaml")
+        registry = load_observation_primitive_registry(ROOT)
+        registry.primitives["PRIM-JUPITER-TOKENS-V2-RECENT-001"]["modeled_credit_cost"][
+            "credits_per_request"
+        ] = 2
+        registry.primitives["PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001"]["modeled_credit_cost"][
+            "credits_per_request"
+        ] = 5
+        envelope = _compute_budget(document, registry)
+        self.assertEqual(envelope.modeled_credits_per_utc_day_max, 3001)
 
     def test_two_schedule_keys_share_collection_hash(self) -> None:
         first = _fixture("common_panel.yaml")
@@ -192,6 +222,18 @@ class ObservationScheduleCompilerTests(unittest.TestCase):
                 "field_id": "FIELD-QUOTE-SELL-OUT-AMOUNT-001",
                 "operator": "GTE",
                 "value_decimal": "1",
+            }
+        )
+        result = compile_schedule_document(document, root=ROOT)
+        self.assertEqual(result.terminal, "DENY_OUTCOME_LEAKAGE")
+
+    def test_x_time_field_in_source_predicates_is_outcome_leakage(self) -> None:
+        document = _fixture("common_panel.yaml")
+        document["population"]["source_predicates"].append(
+            {
+                "field_id": "FIELD-LIQUIDITY-USD-001",
+                "operator": "GTE",
+                "value_decimal": "1000",
             }
         )
         result = compile_schedule_document(document, root=ROOT)

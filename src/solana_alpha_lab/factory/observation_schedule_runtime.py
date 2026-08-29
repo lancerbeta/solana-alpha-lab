@@ -5,6 +5,8 @@ from __future__ import annotations
 import json
 import os
 import re
+import urllib.error
+import urllib.request
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath, PureWindowsPath
@@ -47,7 +49,13 @@ def _safe_relative(root: Path, relative: str) -> Path:
     normalized = relative.replace("\\", "/")
     if not normalized.startswith(SAFE_CONFIG_PREFIXES):
         raise ObservationRuntimeError("PATH_UNSAFE")
-    return root / relative
+    root_resolved = root.resolve()
+    candidate = (root / relative).resolve()
+    try:
+        candidate.relative_to(root_resolved)
+    except ValueError as exc:
+        raise ObservationRuntimeError("PATH_UNSAFE") from exc
+    return candidate
 
 
 def parse_unit_exec_start(unit_text: str) -> list[str]:
@@ -148,10 +156,49 @@ class FakeProviderOpener:
         raise ObservationRuntimeError("FAKE_PROVIDER_PATH_UNKNOWN")
 
 
-def build_opener(root: Path, config: Mapping[str, Any]) -> object | None:
+class JupiterReadonlyOpener:
+    """The sole production transport: GET-only Jupiter readonly routes."""
+
+    def __init__(self, api_key: str, *, timeout_seconds: float = 20.0) -> None:
+        if not api_key:
+            raise ObservationRuntimeError("CREDENTIAL_ENV_MISSING")
+        self._api_key = api_key
+        self._timeout_seconds = timeout_seconds
+
+    def open(self, url: str) -> dict[str, Any]:
+        request = urllib.request.Request(
+            url,
+            method="GET",
+            headers={"x-api-key": self._api_key, "Accept": "application/json"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self._timeout_seconds) as response:
+                body_bytes = response.read()
+                body = json.loads(body_bytes.decode("utf-8"))
+                return {
+                    "http_status": int(response.status),
+                    "body": body,
+                    "url_has_api_key": False,
+                }
+        except urllib.error.HTTPError as exc:
+            return {
+                "http_status": int(exc.code),
+                "body": None,
+                "url_has_api_key": False,
+            }
+        except (urllib.error.URLError, TimeoutError, OSError):
+            raise OSError("JUPITER_TRANSPORT_ERROR") from None
+
+
+def build_opener(
+    root: Path,
+    config: Mapping[str, Any],
+    *,
+    credential: str | None = None,
+) -> object | None:
     fixture_rel = config.get("fake_provider_fixture")
     if not fixture_rel:
-        return None
+        return JupiterReadonlyOpener(credential) if credential is not None else None
     path = _safe_relative(root, str(fixture_rel))
     loaded = json.loads(path.read_text(encoding="utf-8"))
     if not isinstance(loaded, Mapping):
@@ -184,6 +231,7 @@ __all__ = [
     "ALLOWED_CREDENTIAL_ENV",
     "DEFAULT_RUNTIME_RELATIVE",
     "FakeProviderOpener",
+    "JupiterReadonlyOpener",
     "ObservationRuntimeError",
     "UNIT_RELATIVE",
     "build_opener",

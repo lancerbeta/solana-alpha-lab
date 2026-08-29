@@ -110,6 +110,7 @@
         "kind",
         "independent_sink_relative",
         "source_relative_paths",
+        "recursive_relative_paths",
         "same_parent_forbidden",
         "google_drive_role"
       ],
@@ -119,6 +120,12 @@
         "source_relative_paths": {
           "type": "array",
           "minItems": 2,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 8}
+        },
+        "recursive_relative_paths": {
+          "type": "array",
+          "minItems": 1,
           "uniqueItems": true,
           "items": {"type": "string", "minLength": 8}
         },

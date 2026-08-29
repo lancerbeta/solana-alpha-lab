@@ -87,12 +87,18 @@ def compile_and_bind_observation_schedule(
                 hypothesis_version_id=hypothesis_version_id,
                 run_id=run_id,
             )
+    completed = result.schedule_sha256 is not None and result.terminal not in {
+        "CHANGE_LANE_PRIMITIVE_GAP",
+        "CHANGE_LANE_ESTIMATOR_GAP",
+        "CHANGE_LANE_SAFETY_CONTRACT_GAP",
+        "BLOCKED_BUDGET",
+        "BLOCKED_AUTHORITY",
+        "DENY_OUTCOME_LEAKAGE",
+        "DENY_RETROACTIVE_MUTATION",
+        "DENY_UNSAFE_RUNTIME_CODE",
+    }
     return {
-        "status": "COMPLETE" if result.terminal not in {
-            "DENY_OUTCOME_LEAKAGE",
-            "DENY_RETROACTIVE_MUTATION",
-            "DENY_UNSAFE_RUNTIME_CODE",
-        } else "FAILED",
+        "status": "COMPLETE" if completed else "FAILED",
         "blocker": "NONE" if result.schedule_sha256 else result.terminal,
         "terminal": result.terminal,
         "result": result.terminal,

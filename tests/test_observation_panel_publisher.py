@@ -17,8 +17,10 @@ from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
     PublicationFault,
     build_panel_snapshot,
     publish_observation_batch,
+    repair_open_publication_jobs,
 )
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
+    canonical_sha256,
     load_observation_schedule,
 )
 from solana_alpha_lab.storage.manifests import compute_dataset_manifest_id  # noqa: E402
@@ -102,24 +104,31 @@ class ObservationPanelPublisherTests(unittest.TestCase):
             self.assertTrue(second["replay"])
             self.assertEqual(second["dataset_manifest_id"], first["dataset_manifest_id"])
 
-    def test_empty_observations_are_forbidden(self) -> None:
+    def test_members_only_dataset_preserves_rejected_denominator(self) -> None:
         schedule = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
         )
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
-            with self.assertRaisesRegex(
-                ObservationPanelPublisherError, "PARTIAL_DATASET_FORBIDDEN"
-            ):
-                publish_observation_batch(
-                    data_root=data_root,
-                    root=ROOT,
-                    schedule=schedule,
-                    activation_id="ACT-OBS-001",
-                    now=NOW,
-                    producer_git_sha=GIT_SHA,
-                )
+            published = publish_observation_batch(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+                members=[
+                    {
+                        "schedule_sha256": schedule["schedule_sha256"],
+                        "entity_id": "MintRejected",
+                        "membership_state": "PREDICATE_REJECTED",
+                    }
+                ],
+                observations=[],
+            )
+            self.assertEqual(published["observation_count"], 0)
+            self.assertEqual(published["member_count"], 1)
 
     def test_snapshot_hash_is_canonical(self) -> None:
         snapshot = build_panel_snapshot(
@@ -317,6 +326,67 @@ class ObservationPanelPublisherTests(unittest.TestCase):
                 }
                 self.assertIn("OBSERVATION_BATCH", kinds)
                 self.assertIn("OBSERVATION_MEMBER_BATCH", kinds)
+
+    def test_repair_preserves_original_publication_identity(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        members = [
+            {
+                "schedule_sha256": schedule["schedule_sha256"],
+                "entity_id": "MintA",
+            }
+        ]
+        observations = [
+            {
+                "schedule_sha256": schedule["schedule_sha256"],
+                "entity_id": "MintA",
+                "point_id": "X300",
+                "primitive_id": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+                "state": "OBSERVED",
+                "event_time": "2026-09-01T00:05:00Z",
+                "first_reliable_available_at": "2026-09-01T00:10:00Z",
+            }
+        ]
+        content = canonical_sha256(
+            {"members": members, "observations": observations}
+        )
+        expected_id = compute_dataset_manifest_id(
+            f"observation-panel-{schedule['schedule_sha256'][:12]}",
+            f"20260901-1-{content[:12]}",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                publish_observation_batch(
+                    data_root=data_root,
+                    root=ROOT,
+                    schedule=schedule,
+                    activation_id="ACT-OBS-001",
+                    now=NOW,
+                    producer_git_sha=GIT_SHA,
+                    members=members,
+                    observations=observations,
+                    fault_after="AFTER_ARTIFACTS",
+                )
+            repaired = repair_open_publication_jobs(
+                data_root=data_root,
+                root=ROOT,
+                schedule=schedule,
+                activation_id="ACT-OBS-001",
+                now=NOW,
+                producer_git_sha=GIT_SHA,
+            )
+            self.assertEqual(repaired[0]["dataset_manifest_id"], expected_id)
+            self.assertTrue(
+                (
+                    data_root
+                    / "datasets"
+                    / "manifests"
+                    / f"{expected_id}.published"
+                ).is_file()
+            )
 
     def test_repair_after_utc_day_keeps_frozen_dataset_id(self) -> None:
         schedule = load_observation_schedule(

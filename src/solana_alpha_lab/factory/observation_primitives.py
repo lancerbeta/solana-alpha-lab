@@ -42,6 +42,30 @@ def request_sha256(*, method: str, url: str, body: Mapping[str, Any] | None, pri
     )
 
 
+def call_occurrence_id(
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+    primitive_id: str,
+    point_id: str,
+    due_at: str,
+    claim_identity_set: Sequence[str],
+    request_digest: str,
+) -> str:
+    """Hash one logical PIT call slot, independently of transport equivalence."""
+    return canonical_sha256(
+        {
+            "schedule_sha256": schedule_sha256,
+            "activation_id": activation_id,
+            "primitive_id": primitive_id,
+            "point_id": point_id,
+            "due_at": due_at,
+            "claim_identity_set": sorted({str(item) for item in claim_identity_set}),
+            "request_sha256": request_digest,
+        }
+    )
+
+
 def redact(value: object, redact_with: str | None) -> object:
     if redact_with and isinstance(value, str) and redact_with and redact_with in value:
         raise ObservationPrimitiveError("SECRET_LEAK")
@@ -101,27 +125,29 @@ def execute_primitive(
         body=None,
         primitive_version=primitive_version,
     )
-    observed_at = render_utc(clock())
+    request_started_at = render_utc(clock())
+
+    def typed_missing(reason: str, response_received_at: str) -> dict[str, Any]:
+        return {
+            "status": "MISSING_TYPED",
+            "missing_reason": reason,
+            "request_sha256": digest,
+            "observed_at": response_received_at,
+            "request_started_at": request_started_at,
+            "response_received_at": response_received_at,
+            "first_reliable_available_at": response_received_at,
+            "response_sha256": None,
+            "entities": {},
+            "primitive_id": primitive_id,
+        }
+
     try:
         result = opener.open(url)  # type: ignore[union-attr]
     except TimeoutError:
-        return {
-            "status": "MISSING_TYPED",
-            "missing_reason": "TIMEOUT",
-            "request_sha256": digest,
-            "observed_at": observed_at,
-            "response_sha256": None,
-            "entities": {},
-        }
+        return typed_missing("TIMEOUT", render_utc(clock()))
     except OSError:
-        return {
-            "status": "MISSING_TYPED",
-            "missing_reason": "HTTP_ERROR",
-            "request_sha256": digest,
-            "observed_at": observed_at,
-            "response_sha256": None,
-            "entities": {},
-        }
+        return typed_missing("HTTP_ERROR", render_utc(clock()))
+    response_received_at = render_utc(clock())
     if not isinstance(result, Mapping):
         raise ObservationPrimitiveError("INVALID_RESPONSE")
     if result.get("url_has_api_key") is True:
@@ -130,14 +156,7 @@ def execute_primitive(
     if raw_status is None:
         raw_status = result.get("status")
     if raw_status is None:
-        return {
-            "status": "MISSING_TYPED",
-            "missing_reason": "PROVIDER_SCHEMA_DRIFT",
-            "request_sha256": digest,
-            "observed_at": observed_at,
-            "response_sha256": None,
-            "entities": {},
-        }
+        return typed_missing("PROVIDER_SCHEMA_DRIFT", response_received_at)
     status = int(raw_status)
     body = result.get("body")
     if redact_with:
@@ -145,43 +164,19 @@ def execute_primitive(
         if redact_with in payload_text:
             raise ObservationPrimitiveError("SECRET_LEAK")
     if status in {404}:
-        return {
-            "status": "MISSING_TYPED",
-            "missing_reason": "NO_ROUTE",
-            "request_sha256": digest,
-            "observed_at": observed_at,
-            "response_sha256": None,
-            "entities": {},
-        }
+        return typed_missing("NO_ROUTE", response_received_at)
     if status >= 400:
-        return {
-            "status": "MISSING_TYPED",
-            "missing_reason": "HTTP_ERROR",
-            "request_sha256": digest,
-            "observed_at": observed_at,
-            "response_sha256": None,
-            "entities": {},
-        }
+        return typed_missing("HTTP_ERROR", response_received_at)
     if schema_required_keys:
         if not isinstance(body, Mapping) and not isinstance(body, list):
-            return {
-                "status": "MISSING_TYPED",
-                "missing_reason": "PROVIDER_SCHEMA_DRIFT",
-                "request_sha256": digest,
-                "observed_at": observed_at,
-                "response_sha256": None,
-                "entities": {},
-            }
-        sample = body if isinstance(body, Mapping) else (body[0] if body else {})
-        if isinstance(sample, Mapping) and any(key not in sample for key in schema_required_keys):
-            return {
-                "status": "MISSING_TYPED",
-                "missing_reason": "PROVIDER_SCHEMA_DRIFT",
-                "request_sha256": digest,
-                "observed_at": observed_at,
-                "response_sha256": None,
-                "entities": {},
-            }
+            return typed_missing("PROVIDER_SCHEMA_DRIFT", response_received_at)
+        # An empty list is a valid "all entities absent" signal for batch snapshots.
+        if not (isinstance(body, list) and not body and expected_entities):
+            sample = body if isinstance(body, Mapping) else (body[0] if body else {})
+            if isinstance(sample, Mapping) and any(
+                key not in sample for key in schema_required_keys
+            ):
+                return typed_missing("PROVIDER_SCHEMA_DRIFT", response_received_at)
     response_hash = canonical_sha256(body)
     entities: dict[str, Any] = {}
     if expected_entities:
@@ -211,11 +206,21 @@ def execute_primitive(
                     }
                 else:
                     entities[entity_id] = {"status": "OBSERVED", "row": body}
+    available_at = clock()
+    try:
+        first_reliable_available_at = render_utc(
+            max(available_at, parse_utc(response_received_at))
+        )
+    except Exception:
+        first_reliable_available_at = response_received_at
     return {
         "status": "OBSERVED",
         "missing_reason": None,
         "request_sha256": digest,
-        "observed_at": observed_at,
+        "observed_at": first_reliable_available_at,
+        "request_started_at": request_started_at,
+        "response_received_at": response_received_at,
+        "first_reliable_available_at": first_reliable_available_at,
         "response_sha256": response_hash,
         "body": body,
         "entities": entities,
@@ -256,6 +261,7 @@ __all__ = [
     "ObservationPrimitiveError",
     "RECENT_URL",
     "SOL_MINT",
+    "call_occurrence_id",
     "execute_primitive",
     "parse_anchor",
     "parse_first_seen",

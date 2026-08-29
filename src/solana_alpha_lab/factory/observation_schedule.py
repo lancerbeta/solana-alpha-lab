@@ -73,7 +73,9 @@ def parse_utc(value: object) -> datetime:
 def render_utc(value: datetime) -> str:
     if value.tzinfo is None:
         raise ObservationScheduleError("TIMESTAMP_INVALID")
-    return value.astimezone(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    normalized = value.astimezone(UTC)
+    timespec = "microseconds" if normalized.microsecond else "seconds"
+    return normalized.isoformat(timespec=timespec).replace("+00:00", "Z")
 
 
 def _load_schema(root: Path) -> dict[str, Any]:

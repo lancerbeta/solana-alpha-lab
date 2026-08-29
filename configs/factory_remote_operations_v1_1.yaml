@@ -43,6 +43,8 @@ backup:
     - local/factory_v1/operational_state.sqlite
     - local/factory_v1/paper_plane_state.sqlite
     - local/factory_v1/observation_schedule_state.sqlite
+  recursive_relative_paths:
+    - local/factory_v1/observation_rdp
   same_parent_forbidden: true
   google_drive_role: OPTIONAL_COLD_COPY_NOT_DOD
 monitoring:

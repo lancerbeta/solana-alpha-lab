@@ -150,7 +150,7 @@ def load_coverage_from_rdp(data_root) -> CoverageIndex:
         return index
     schedules: dict[str, dict[str, Any]] = {}
     snapshots: list[dict[str, Any]] = []
-    states: dict[tuple[str, str], str] = {}
+    state_records: list[tuple[str, str, str, int, str]] = []
     for record in store.iter_committed_records():
         kind = str(record.record_kind)
         payload = json.loads(record.payload_json)
@@ -163,11 +163,22 @@ def load_coverage_from_rdp(data_root) -> CoverageIndex:
             if isinstance(payload, Mapping):
                 snapshots.append(dict(payload))
         elif kind == "OBSERVATION_SCHEDULE_STATE":
-            key = (
-                str(payload.get("schedule_sha256") or ""),
-                str(payload.get("activation_id") or ""),
+            state_records.append(
+                (
+                    str(payload.get("schedule_sha256") or ""),
+                    str(payload.get("activation_id") or ""),
+                    str(payload.get("state") or ""),
+                    int(payload.get("transition_sequence") or 0),
+                    record.record_id,
+                )
             )
-            states[key] = str(payload.get("state") or "")
+    states: dict[tuple[str, str], str] = {}
+    for schedule_digest, activation_id, state, sequence, record_id in sorted(
+        state_records,
+        key=lambda item: (item[0], item[1], item[3], item[4]),
+    ):
+        del sequence, record_id
+        states[(schedule_digest, activation_id)] = state
     for digest, _activation in {key for key, state in states.items() if state == "ACTIVE"}:
         document = schedules.get(digest)
         if document is not None:

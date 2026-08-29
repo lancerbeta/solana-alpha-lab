@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import sys
+from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -23,11 +24,13 @@ from solana_alpha_lab.factory.observation_schedule_compiler import (  # noqa: E4
 )
 from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E402
     ObservationLifecycleError,
+    _require_live_authority,
     activate_schedule,
     authorize_schedule,
     pause_schedule,
     register_schedule,
     resume_schedule,
+    rollover_schedule,
     snapshot_schedule,
     status_schedule,
 )
@@ -111,6 +114,7 @@ def main(argv: list[str] | None = None) -> int:
         "activate",
         "pause",
         "resume",
+        "rollover",
         "status",
         "snapshot",
         "doctor",
@@ -123,6 +127,12 @@ def main(argv: list[str] | None = None) -> int:
             cmd.add_argument("--phrase", required=True)
         if name in {"activate", "pause", "resume", "snapshot"}:
             cmd.add_argument("--activation-id", required=True)
+        if name == "rollover":
+            cmd.add_argument("--predecessor-schedule-sha256", required=True)
+            cmd.add_argument("--predecessor-activation-id", required=True)
+            cmd.add_argument("--successor-schedule-sha256", required=True)
+            cmd.add_argument("--successor-activation-id", required=True)
+            cmd.add_argument("--cutover-at", required=True)
         if name in {"authorize", "activate", "pause", "resume", "snapshot", "status"}:
             cmd.add_argument("--schedule-sha256")
         if name == "status":
@@ -193,6 +203,7 @@ def main(argv: list[str] | None = None) -> int:
             if not digest:
                 return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
             result = activate_schedule(
+                root=ROOT,
                 data_root=data_root,
                 store=store,
                 schedule_sha256=digest,
@@ -232,6 +243,26 @@ def main(argv: list[str] | None = None) -> int:
                 producer_git_sha=producer,
             )
             code = 0 if result.get("terminal") in {"RESUMED", "RESUME_REPLAY"} else 2
+            return _emit(result, code)
+        if args.command == "rollover":
+            result = rollover_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                predecessor_schedule_sha256=args.predecessor_schedule_sha256,
+                predecessor_activation_id=args.predecessor_activation_id,
+                successor_schedule_sha256=args.successor_schedule_sha256,
+                successor_activation_id=args.successor_activation_id,
+                cutover_at=args.cutover_at,
+                now=now,
+                producer_git_sha=producer,
+            )
+            code = (
+                0
+                if result.get("terminal")
+                in {"ROLLOVER_COMMITTED", "ROLLOVER_REPLAY"}
+                else 2
+            )
             return _emit(result, code)
         if args.command == "status":
             result = status_schedule(
@@ -304,78 +335,148 @@ def main(argv: list[str] | None = None) -> int:
                 0,
             )
         if args.command == "tick":
-            digest = args.schedule_sha256 or config.get("schedule_sha256")
-            activation_id = args.activation_id or config.get("activation_id")
-            if not digest or not activation_id:
+            if store.restore_marker_unresolved():
+                return _emit(
+                    {
+                        "terminal": "RESTORE_MARKER_UNRESOLVED",
+                        "provider_calls": 0,
+                        "credential_reads": 0,
+                    },
+                    2,
+                )
+            requested_digest = args.schedule_sha256
+            requested_activation = args.activation_id
+            if requested_digest and requested_activation:
+                candidates = [
+                    (str(requested_digest), str(requested_activation))
+                ]
+            elif requested_digest or requested_activation:
+                return _emit(
+                    {
+                        "terminal": "TICK_REFUSED_AMBIGUOUS_SELECTION",
+                        "reason": "schedule and activation overrides must be supplied together",
+                    },
+                    2,
+                )
+            else:
+                candidates = sorted(
+                    (
+                        str(row["schedule_sha256"]),
+                        str(row["activation_id"]),
+                    )
+                    for row in store.list_activations()
+                    if str(row["state"]) in {"ACTIVE", "DRAINING"}
+                )
+            if not candidates:
                 return _emit(
                     {
                         "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",
-                        "reason": "runtime config has no authorized activation",
+                        "provider_calls": 0,
+                        "credential_reads": 0,
+                        "next_action": "REGISTER_AUTHORIZE_ACTIVATE",
                     },
                     2,
                 )
-            registered = store.get_registered_schedule(digest)
-            activation = store.get_activation(digest, str(activation_id))
-            if registered is None or activation is None:
-                return _emit(
-                    {
-                        "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",
-                        "reason": "activation missing or not ACTIVE",
-                        "schedule_sha256": digest,
-                        "activation_id": activation_id,
-                    },
-                    2,
-                )
-            if activation["state"] == "PAUSED_OPERATOR":
-                return _emit(
-                    {
-                        "terminal": "PAUSED_OPERATOR",
-                        "reason": "activation is paused; resume before tick",
-                        "schedule_sha256": digest,
-                        "activation_id": activation_id,
-                        "next_action": "RESUME",
-                    },
-                    2,
-                )
-            if activation["state"] != "ACTIVE":
-                return _emit(
-                    {
-                        "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",
-                        "reason": "activation missing or not ACTIVE",
-                        "schedule_sha256": digest,
-                        "activation_id": activation_id,
-                    },
-                    2,
-                )
-            authority = store.latest_authority_for_schedule(digest)
-            if authority is None:
-                return _emit({"terminal": "AUTHORITY_MISSING"}, 2)
-            from solana_alpha_lab.factory.observation_schedule import parse_utc as _parse_utc
+            results: list[dict] = []
+            for digest, activation_id in candidates:
+                registered = store.get_registered_schedule(digest)
+                activation = store.get_activation(digest, activation_id)
+                if registered is None or activation is None:
+                    if registered is None and activation is None:
+                        return _emit(
+                            {
+                                "terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",
+                                "schedule_sha256": digest,
+                                "activation_id": activation_id,
+                                "provider_calls": 0,
+                                "credential_reads": 0,
+                            },
+                            2,
+                        )
+                    return _emit(
+                        {
+                            "terminal": "TICK_REFUSED_AMBIGUOUS_SELECTION",
+                            "schedule_sha256": digest,
+                            "activation_id": activation_id,
+                        },
+                        2,
+                    )
+                if str(activation["state"]) == "PAUSED_OPERATOR":
+                    return _emit(
+                        {
+                            "terminal": "PAUSED_OPERATOR",
+                            "reason": "activation is paused; resume before tick",
+                            "schedule_sha256": digest,
+                            "activation_id": activation_id,
+                            "next_action": "RESUME",
+                        },
+                        2,
+                    )
+                try:
+                    authority = _require_live_authority(
+                        store,
+                        root=ROOT,
+                        document=registered["document"],
+                        schedule_sha256=digest,
+                        now=now,
+                        receipt_sha256=str(
+                            activation.get("authority_receipt_sha256") or ""
+                        ),
+                    )
+                except ObservationLifecycleError as exc:
+                    return _emit({"terminal": str(exc)}, 2)
+                credential_holder: dict[str, str] = {}
 
-            if _parse_utc(str(authority["expires_at"])) <= now:
-                return _emit({"terminal": "AUTHORITY_EXPIRED"}, 2)
-            opener = build_opener(ROOT, config)
-            credential_holder: dict[str, str] = {}
+                def _load() -> str:
+                    if "value" not in credential_holder:
+                        credential_holder["value"] = load_credential_after_activation(config)
+                    return credential_holder["value"]
 
-            def _load() -> str:
-                if "value" not in credential_holder:
-                    credential_holder["value"] = load_credential_after_activation(config)
-                return credential_holder["value"]
-
-            result = tick_once(
-                root=ROOT,
-                data_root=data_root,
-                store=store,
-                schedule=registered["document"],
-                activation_id=str(activation_id),
-                now=now,
-                opener=opener,
-                credential_loader=_load if opener is not None else None,
-                producer_git_sha=producer,
-                fault_after=os.environ.get("OBSERVATION_SCHEDULE_PUBLISH_FAULT")
-                or config.get("publish_fault_after"),
+                if config.get("fake_provider_fixture"):
+                    opener = build_opener(ROOT, config)
+                    credential_loader = _load
+                else:
+                    # The exact authority check above precedes the sole secret read.
+                    opener = build_opener(ROOT, config, credential=_load())
+                    credential_loader = None
+                result = tick_once(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule=registered["document"],
+                    activation_id=activation_id,
+                    now=now,
+                    opener=opener,
+                    credential_loader=credential_loader,
+                    producer_git_sha=producer,
+                    clock=(
+                        (lambda: datetime.now(UTC))
+                        if not config.get("fake_provider_fixture")
+                        else None
+                    ),
+                    fault_after=os.environ.get("OBSERVATION_SCHEDULE_PUBLISH_FAULT")
+                    or config.get("publish_fault_after"),
+                )
+                result["schedule_sha256"] = digest
+                result["activation_id"] = activation_id
+                results.append(result)
+            if len(results) == 1:
+                result = results[0]
+                return _emit(
+                    result,
+                    0 if result.get("terminal") == "TICK_COMPLETE" else 2,
+                )
+            return _emit(
+                {
+                    "terminal": "TICK_COMPLETE"
+                    if all(item.get("terminal") == "TICK_COMPLETE" for item in results)
+                    else "TICK_PARTIAL",
+                    "activations": results,
+                    "provider_calls": sum(int(item.get("provider_calls", 0)) for item in results),
+                    "credential_reads": sum(int(item.get("credential_reads", 0)) for item in results),
+                },
+                0 if all(item.get("terminal") == "TICK_COMPLETE" for item in results) else 2,
             )
-            return _emit(result, 0 if result.get("terminal") in {"TICK_COMPLETE", "PACE_WAIT"} else 2)
         return _emit({"terminal": "COMMAND_UNKNOWN"}, 2)
     except (
         ObservationLifecycleError,

@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from solana_alpha_lab.factory.observation_panel_coverage import (
@@ -94,52 +94,75 @@ def _compute_budget(
 ) -> BudgetEnvelope:
     members = int(schedule["sampling"]["max_members_per_utc_day"])
     discovery = registry.require_primitive(str(schedule["source_poll"]["primitive_id"]))
-    discovery_calls = int(discovery["call_cost"]["calls_per_request"])
-    search_bundle = None
-    x_calls = 0
-    for bundle_id in schedule["x_point"]["bundle_ids"]:
-        bundle = registry.require_bundle(str(bundle_id))
-        primitive = registry.require_primitive(str(bundle["primitive_id"]))
-        if primitive["kind"] == "BATCH_SNAPSHOT":
-            search_bundle = primitive
-        else:
-            x_calls += members * int(primitive["call_cost"]["calls_per_request"])
+    starts_at = parse_utc(str(schedule["activation"]["starts_at"]))
+    stops_at = parse_utc(str(schedule["activation"]["stops_admitting_at"]))
+    period_seconds = max(1, int(schedule["source_poll"]["period_seconds"]))
+    epoch = datetime(1970, 1, 1, tzinfo=UTC)
+    period_micros = period_seconds * 1_000_000
+    start_micros = int((starts_at - epoch).total_seconds() * 1_000_000)
+    stop_micros = int((stops_at - epoch).total_seconds() * 1_000_000)
+    start_tick = math.ceil(start_micros / period_micros)
+    last_tick = (stop_micros - 1) // period_micros
+    discovery_slots = max(0, last_tick - start_tick + 1)
+    if discovery_slots:
+        first_slot = epoch + timedelta(seconds=start_tick * period_seconds)
+        last_slot = epoch + timedelta(seconds=last_tick * period_seconds)
+        admission_days = (last_slot.date() - first_slot.date()).days + 1
+    else:
+        admission_days = 0
+    discovery_calls = discovery_slots * int(discovery["call_cost"]["calls_per_request"])
+    max_slots_per_utc_day = min(
+        discovery_slots,
+        (86400 + period_seconds - 1) // period_seconds,
+    )
+    discovery_calls_per_day = max_slots_per_utc_day * int(
+        discovery["call_cost"]["calls_per_request"]
+    )
     batch_calls = 0
-    if search_bundle is not None:
-        batch_size = max(1, int(search_bundle["max_batch_size"]))
-        batch_calls = math.ceil(members / batch_size) * int(
-            search_bundle["call_cost"]["calls_per_request"]
-        )
+    x_calls = 0
     y_calls = 0
-    for point in schedule["y_points"]:
+    member_calls_per_admission_day = 0
+    point_primitives: list[tuple[Mapping[str, Any], int]] = []
+    for point in [schedule["x_point"], *schedule["y_points"]]:
         for bundle_id in point["bundle_ids"]:
             bundle = registry.require_bundle(str(bundle_id))
             primitive = registry.require_primitive(str(bundle["primitive_id"]))
-            y_calls += members * int(primitive["call_cost"]["calls_per_request"])
-    per_day = discovery_calls + batch_calls + x_calls + y_calls
-    credits = 0
-    for primitive_id in {
-        str(schedule["source_poll"]["primitive_id"]),
-        *[
-            str(registry.require_bundle(str(bundle_id))["primitive_id"])
-            for bundle_id in list(schedule["x_point"]["bundle_ids"])
-            + [item for point in schedule["y_points"] for item in point["bundle_ids"]]
-        ],
-    }:
-        primitive = registry.require_primitive(primitive_id)
-        model = primitive["modeled_credit_cost"]
-        if model["status"] != "ACCEPTED":
+            if primitive["kind"] == "BATCH_SNAPSHOT":
+                requests = math.ceil(
+                    members / max(1, int(primitive["max_batch_size"]))
+                )
+            else:
+                requests = members
+            calls = requests * int(primitive["call_cost"]["calls_per_request"])
+            point_primitives.append((primitive, calls))
+            if primitive["kind"] == "BATCH_SNAPSHOT":
+                batch_calls += calls
+            elif str(point["point_id"]) == str(schedule["x_point"]["point_id"]):
+                x_calls += calls
+            else:
+                y_calls += calls
+            member_calls_per_admission_day += calls
+
+    def credits_for(primitive: Mapping[str, Any], requests: int) -> int:
+        model = primitive.get("modeled_credit_cost") or {}
+        if model.get("status") != "ACCEPTED":
             raise ObservationScheduleError("PROVIDER_CREDIT_MODEL_UNPROVED")
-        credits += int(model["credits_per_request"]) * per_day
+        return int(model["credits_per_request"]) * requests
+
+    credits = credits_for(discovery, discovery_calls_per_day)
+    for primitive, calls in point_primitives:
+        credits += credits_for(primitive, calls)
+    per_day = discovery_calls_per_day + member_calls_per_admission_day
+    lifetime = discovery_calls + member_calls_per_admission_day * admission_days
     max_y = int(schedule["y_points"][-1]["due_offset_seconds"])
     return BudgetEnvelope(
-        discovery_calls=discovery_calls,
+        discovery_calls=discovery_calls_per_day,
         batch_snapshot_calls=batch_calls,
         x_point_calls=x_calls,
         y_point_calls=y_calls,
         provider_calls_per_tick_max=min(60, per_day),
         provider_calls_per_utc_day_max=per_day,
-        provider_calls_lifetime_max=per_day,
+        provider_calls_lifetime_max=lifetime,
         modeled_credits_per_utc_day_max=credits,
         raw_bytes_per_utc_day_max=int(schedule["budgets"]["raw_bytes_per_utc_day_max"]),
         canonical_bytes_lifetime_max=int(
@@ -162,10 +185,30 @@ def _resolve_registered(
         str(schedule["source_poll"]["query_profile_id"]),
         str(schedule["source_poll"]["primitive_id"]),
     )
-    registry.require_authority_profile(str(schedule["authority"]["profile_id"]))
-    for predicate in list(schedule["population"]["source_predicates"]) + list(
-        schedule["population"]["x_eligibility_predicates"]
-    ):
+    authority_profile = registry.require_authority_profile(
+        str(schedule["authority"]["profile_id"])
+    )
+    used_primitive_ids = [str(schedule["source_poll"]["primitive_id"])]
+    for point in [schedule["x_point"], *list(schedule["y_points"])]:
+        for bundle_id in point["bundle_ids"]:
+            used_primitive_ids.append(
+                str(registry.require_bundle(str(bundle_id))["primitive_id"])
+            )
+    used_routes = {
+        str(route)
+        for primitive_id in set(used_primitive_ids)
+        for route in registry.require_primitive(primitive_id)["provider_route_ids"]
+    }
+    allowed_routes = {
+        str(route) for route in authority_profile.get("allowed_route_ids") or []
+    }
+    if not used_routes.issubset(allowed_routes):
+        raise ObservationScheduleError("BLOCKED_AUTHORITY")
+    for predicate in schedule["population"]["source_predicates"]:
+        field = registry.require_field(str(predicate["field_id"]))
+        if field["availability_class"] in Y_FIELD_CLASSES or field["availability_class"] == "X_TIME":
+            raise ObservationScheduleError("DENY_OUTCOME_LEAKAGE")
+    for predicate in schedule["population"]["x_eligibility_predicates"]:
         field = registry.require_field(str(predicate["field_id"]))
         if field["availability_class"] in Y_FIELD_CLASSES:
             raise ObservationScheduleError("DENY_OUTCOME_LEAKAGE")
