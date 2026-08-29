@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-END-TO-END-SMOKE-REPAIR-LOOP-FACTORY-FIT-001",
+  "as_of": "2026-08-29",
+  "task_id": "HFIC_END_TO_END_SMOKE_REPAIR_LOOP_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_WALLET_SIGNER_TX",
+    "NO_LIVE_SCHEDULE_ACTIVATION"
+  ]
+}

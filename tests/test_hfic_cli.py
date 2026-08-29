@@ -175,6 +175,185 @@ class HficCliContractTests(unittest.TestCase):
                     "STOP",
                 })
 
+    def test_preflight_accepts_multiline_owner_focus(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            completed = run_cli(
+                "preflight",
+                "--owner-focus",
+                "SMOKE_VALIDATION_ONLY:\nUse existing declarative primitives only.",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(completed.returncode, 0, completed.stderr)
+            payload = json.loads(completed.stdout)
+            self.assertEqual(payload["action"], "START_NEW_SESSION")
+            self.assertNotIn(str(data_root), completed.stdout)
+            self.assertNotIn(str(ROOT), completed.stdout)
+
+    def test_preflight_does_not_misclassify_url_as_windows_path(self) -> None:
+        for owner_focus in (
+            "Inspect https://example.invalid/research only as a textual focus.",
+            "Inspect x://example.invalid/research only as a textual focus.",
+            "Compare horizon D:1/2 vs D:2/3 on the existing panel.",
+            "primary_x:wallet/cluster remains a textual family token.",
+        ):
+            with self.subTest(owner_focus=owner_focus), tempfile.TemporaryDirectory() as tmp:
+                completed = run_cli(
+                    "preflight",
+                    "--owner-focus",
+                    owner_focus,
+                    "--format",
+                    "json",
+                    "--no-auto-commission",
+                    data_root=Path(tmp) / "rdp",
+                )
+                self.assertEqual(completed.returncode, 2, completed.stderr)
+                self.assertNotIn("PHYSICAL_PATH_LEAK", completed.stderr)
+                self.assertEqual(
+                    json.loads(completed.stdout)["terminal"],
+                    "FAST_LANE_NOT_COMMISSIONABLE",
+                )
+
+    def test_preflight_rejects_raw_windows_path_before_rdp_write(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            completed = run_cli(
+                "preflight",
+                "--owner-focus",
+                r"focus C:\private\path",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertNotEqual(completed.returncode, 0, completed.stdout)
+            self.assertIn("PHYSICAL_PATH_LEAK", completed.stderr)
+            self.assertFalse(data_root.exists())
+
+    def test_preflight_rejects_windows_slash_and_unc_paths(self) -> None:
+        for owner_focus in (
+            "focus C:/private/path",
+            r"focus C:relative\path",
+            r"focus \\server\share\path",
+            r"focus \\?\C:\private\path",
+            "focus //server/share/path",
+            r"focus //server\share",
+            r"focus //server\share\path",
+            "focus //./PhysicalDrive0",
+            r"focus \Device\HarddiskVolume1",
+            r"focus \rooted\path",
+        ):
+            with self.subTest(owner_focus=owner_focus), tempfile.TemporaryDirectory() as tmp:
+                completed = run_cli(
+                    "preflight",
+                    "--owner-focus",
+                    owner_focus,
+                    "--format",
+                    "json",
+                    "--no-auto-commission",
+                    data_root=Path(tmp) / "rdp",
+                )
+                self.assertNotEqual(completed.returncode, 0, completed.stdout)
+                self.assertIn("PHYSICAL_PATH_LEAK", completed.stderr)
+
+    def test_backfill_rejects_paths_before_emit_or_persist(self) -> None:
+        fixture = json.loads(
+            (
+                ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        for persist in (False, True):
+            with self.subTest(persist=persist), tempfile.TemporaryDirectory() as tmp:
+                packet = {
+                    "phase": "LEGACY_PARTIAL",
+                    "source": "OWNER_SUPPLIED_TRANSCRIPT",
+                    "candidates": fixture["candidates"],
+                    "owner_focus": "focus C:/private/path",
+                }
+                packet_path = Path(tmp) / "legacy.json"
+                packet_path.write_text(json.dumps(packet), encoding="utf-8")
+                data_root = Path(tmp) / "rdp"
+                args = [
+                    "backfill-legacy",
+                    "--packet",
+                    str(packet_path),
+                    "--format",
+                    "json",
+                ]
+                if persist:
+                    args.append("--persist")
+                completed = run_cli(*args, data_root=data_root)
+                rendered = completed.stdout + completed.stderr
+                self.assertNotEqual(completed.returncode, 0, rendered)
+                self.assertIn("PHYSICAL_PATH_LEAK", completed.stderr)
+                self.assertNotIn(packet["owner_focus"], rendered)
+                self.assertFalse(data_root.exists())
+
+    def test_persistence_commands_reject_path_input_before_rdp_open(self) -> None:
+        fixture = json.loads(
+            (
+                ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        for command in ("freeze", "finalize", "revise", "classify"):
+            with self.subTest(command=command), tempfile.TemporaryDirectory() as tmp:
+                workspace = Path(tmp)
+                data_root = workspace / "rdp"
+                payload_path = workspace / "payload.json"
+                if command in {"freeze", "revise"}:
+                    payload = dict(fixture)
+                    payload["owner_focus"] = "focus C:/private/path"
+                else:
+                    payload = {"untrusted_value": "focus C:/private/path"}
+                payload_path.write_text(json.dumps(payload), encoding="utf-8")
+                if command == "freeze":
+                    receipt_path = workspace / "preflight.json"
+                    receipt_path.write_text("{}", encoding="utf-8")
+                    args = (
+                        "freeze",
+                        "--draft",
+                        str(payload_path),
+                        "--preflight-receipt",
+                        str(receipt_path),
+                        "--format",
+                        "json",
+                    )
+                elif command == "finalize":
+                    args = (
+                        "finalize",
+                        "--session-id",
+                        "HFIC-SESS-UNUSED",
+                        "--critic-result",
+                        str(payload_path),
+                        "--format",
+                        "json",
+                    )
+                elif command == "revise":
+                    args = (
+                        "revise",
+                        "--session-id",
+                        "HFIC-SESS-UNUSED",
+                        "--draft",
+                        str(payload_path),
+                        "--format",
+                        "json",
+                    )
+                else:
+                    args = (
+                        "classify",
+                        "--session-id",
+                        "HFIC-SESS-UNUSED",
+                        "--experiment-spec",
+                        str(payload_path),
+                        "--format",
+                        "json",
+                    )
+                completed = run_cli(*args, data_root=data_root)
+                self.assertNotEqual(completed.returncode, 0, completed.stdout)
+                self.assertIn("PHYSICAL_PATH_LEAK", completed.stderr)
+                self.assertFalse(data_root.exists())
+
     def test_c3_c4_mismatch_is_blocked_before_critic(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
