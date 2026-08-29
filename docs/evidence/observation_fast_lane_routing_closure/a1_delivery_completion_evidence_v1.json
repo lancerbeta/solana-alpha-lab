@@ -11,9 +11,15 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "6c235880069086a7c135a1943d290fbf02d1d04d66f9ffc81acd98ebdb5e1f43",
-    "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "ed41e70a460c897c4313a38b80b97751cee971b3344876291dc70a949f788faf",
+    ".github/workflows/ci.yml": "48fe2fe9572132917b0f8719310a095f8ea0fbf7b1c0d5c6b79f2abaa1de8620",
+    "catalog/assets/core.yaml": "79cef05492f4d62e04beb4dc47142351b4f7a4fe9ae95313eb19773bf8658fcd",
+    "delivery-harness/policies/solana-alpha-lab.md": "176972b1ce358b9a055ec28da020d3ba312e422a16e1afd60d1d033692de08e8",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "73307ee8868de1b4472fd37a7a64ae863ed2598a1b97b5b5123dcfd7c1b0b323",
+    "docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json": "6cb39710e3548778ef886c7ac37e8387fc8fbc500544e78b2f9e795610abfad4",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "f74adbf85092437ef1d430e2316601cde7186a7d1d9f38afb61cf14ea23e9bff",
+    "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "8db8109b16dabdfdc0785d743bef46e0eee6ac47a50c53b289f31bc2e9567f2b",
     "scripts/hypothesis_fast_lane.py": "af36517947f92c3b5d87f56d9804859f7db0c5729783db25432aaef7e43db6d6",
+    "scripts/validate_ci.py": "4283d7c5bf1501be480d9aa5286f079d4cc775ed4b8b28f10d5897a8b662764b",
     "src/solana_alpha_lab/factory/document_runner.py": "d85d43a589a752d5b34e221ce010d5a576efe80fa08305f755ee2bd6406cfb7e",
     "src/solana_alpha_lab/factory/hfic_session.py": "419b593730212c22fbdf8178b50e54dbc4c8cc6e3f0d850c1e50a0ec68be7398",
     "src/solana_alpha_lab/factory/lane_classifier.py": "2bb6e94b59c4301d938a8bc17154534eb70e0892116416e8f26039326266cf23",
@@ -24,6 +30,7 @@
     "src/solana_alpha_lab/factory/observation_schedule_compiler.py": "a6c8c057e772188cc9faefde598eab76431090f2829e531e5220e19d9826cda9",
     "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "d86262aed0cea36521c24b1b8b04d7c9dd7e008d2cf01e94417997017c433cf3",
     "src/solana_alpha_lab/factory/observation_scheduler.py": "b3de038b6705ffd845a7caaf727f72088b17b5bf173db23e7a79f61993e5c426",
+    "tests/test_ci.py": "7bd5116bf61fae666f4f25801a404f388037e72beda05bfdb26ead248e3cd9bf",
     "tests/test_observation_fast_lane_p0_addendum.py": "e10def66a9e89d88dab8fc41670286218bd0ef93e16729c718fdadcd4e0c3da7",
     "tests/test_observation_fast_lane_routing_closure.py": "486517c9a22d1eaf318331a4f513e107481e49cefd6e4ea8b56a014f848f9c03"
   },
@@ -37,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "8e5e3ef5805d01cf538ddcc5ced7b03fdda2063534d0b8a8110f90b98a72afb7",
+    "sha256": "2b6fa5e9668c5a9e4c2b5c316d1aa2fa7a748a5b86827f83b5d24ec2cf92e753",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_FAST_LANE_ROUTING_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "5a7eb9376e449dc9fd2c1f4be9c9cef46f58c7d67fafc972cf13bddcd0b97845",
+      "sha256": "7df55e067330d93d50eed7887bb4cc19a390eb52c34136f37120786fa74a8a11",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

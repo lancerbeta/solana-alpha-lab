@@ -16,8 +16,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "OBSERVATION-FAST-LANE-ROUTING-CLOSURE-INDEPENDENT-REVIEW-002",
-  "reviewed_bindings_sha256": "6324bb321dca2bd8dd9bb37c89c351199cb816005659a88a025aa6c366d4545c",
-  "reviewed_inventory_sha256": "ce7cfb300963ee2b285d1c953060c8723037141a3aa5fa50174901b027e34292",
+  "reviewed_bindings_sha256": "6aed234a1ca72adb0d8199bdebcbbf658b9aff010d3eb0e591786337fa1a8a70",
+  "reviewed_inventory_sha256": "fd3d83c1c1d6efdbdcb2bd84eda3db851c05ac765f8f70716103ff79a82e949e",
   "reviews": [
     {
       "findings": [
