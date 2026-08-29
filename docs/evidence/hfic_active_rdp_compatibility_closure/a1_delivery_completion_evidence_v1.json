@@ -1,0 +1,57 @@
+{
+  "acceptance_id": "HFIC-ACTIVE-RDP-COMPATIBILITY-CLOSURE-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-29",
+  "base_main": "811d79c6c5343a14451f4309b6b1de1a35a387c1",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hfic_active_rdp_compatibility_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {},
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_DESTRUCTIVE_RDP_REWRITE",
+    "NO_FABRICATED_HYPOTHESIS_IDENTITY"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credentials_read": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "wallet_signer_transaction": 0
+  },
+  "state_change": "CLOSE_HFIC_ACTIVE_RDP_COMPATIBILITY_LOOP_PRE_MERGE",
+  "task_id": "HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_active_rdp_compatibility_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_HFIC_COMMISSIONING_COMPATIBILITY_TESTS",
+      "PASS_CATALOG_VALIDATE",
+      "PASS_NAVIGATION_GENERATOR_CHECK"
+    ],
+    "targeted": "PASS_HFIC_COMMISSIONING_COMPATIBILITY_TESTS"
+  }
+}

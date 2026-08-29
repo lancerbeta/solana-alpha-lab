@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -13,7 +15,12 @@ from solana_alpha_lab.factory.fast_lane_cold_copy import (
     ColdCopyError,
     load_run_result_artifact,
 )
-from solana_alpha_lab.factory.research_store import RecordKind, ResearchStore, ResearchStoreError
+from solana_alpha_lab.factory.research_store import (
+    RecordKind,
+    ResearchEvent,
+    ResearchStore,
+    ResearchStoreError,
+)
 from solana_alpha_lab.factory.run_passport import (
     RunPassport,
     RunPassportError,
@@ -37,7 +44,12 @@ REQUIRED_RUN_RECORD_COUNTS = {
     RecordKind.RESEARCH_ARTIFACT: 1,
     RecordKind.EVIDENCE_BINDING: 1,
 }
-RUN_PASSPORT_REQUIRED_FIELDS = tuple(RunPassport.model_fields)
+RUN_PASSPORT_REQUIRED_FIELDS = tuple(
+    name
+    for name, field in RunPassport.model_fields.items()
+    if field.is_required()
+)
+COMPAT_HYPOTHESIS_LINK_KIND = "HFIC-COMPAT-HVLINK-V1"
 
 
 def _kind_name(record: Any) -> str:
@@ -141,6 +153,24 @@ def verify_commissioning_records(
     }
 
 
+def _count_run_records(store: ResearchStore, run_id: str) -> dict[str, int]:
+    counts: dict[str, int] = {kind.value: 0 for kind in REQUIRED_RUN_RECORD_COUNTS}
+    for record in store.iter_committed_records():
+        if record.run_id != run_id:
+            continue
+        kind_name = _kind_name(record)
+        if kind_name in counts:
+            counts[kind_name] += 1
+    return counts
+
+
+def _required_run_records_complete(counts: dict[str, int]) -> bool:
+    return all(
+        counts.get(kind.value, 0) >= minimum
+        for kind, minimum in REQUIRED_RUN_RECORD_COUNTS.items()
+    )
+
+
 def verify_result_integrity(data_root: Path, run_id: str) -> dict[str, Any]:
     try:
         row = ResearchStore(Path(data_root)).find_completed_run_by_id(run_id)
@@ -174,11 +204,9 @@ def verify_result_integrity(data_root: Path, run_id: str) -> dict[str, Any]:
     }
 
 
-def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
-    try:
-        store = ResearchStore(Path(data_root))
-    except ResearchStoreError as exc:
-        raise CommissioningProofError("FAST_LANE_NOT_COMMISSIONED") from exc
+def _iter_commissioning_completed(
+    store: ResearchStore,
+) -> list[tuple[Any, dict[str, Any]]]:
     candidates: list[tuple[Any, dict[str, Any]]] = []
     for record in store.iter_committed_records():
         if _kind_name(record) != RecordKind.RUN_COMPLETED.value:
@@ -187,9 +215,163 @@ def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
         if COMMISSIONING_DATASET_MANIFEST_ID not in _manifest_ids(payload):
             continue
         candidates.append((record, payload))
+    return candidates
+
+
+def _select_unique_hypothesis_source(
+    sources: list[Any],
+) -> Any:
+    if not sources:
+        raise CommissioningProofError("REAL_DATA_MIGRATION_AMBIGUOUS")
+    hashes = {str(record.payload_sha256) for record in sources}
+    if len(hashes) != 1:
+        raise CommissioningProofError("REAL_DATA_MIGRATION_AMBIGUOUS")
+    return sources[0]
+
+
+def apply_legacy_commissioning_hypothesis_link(
+    data_root: Path,
+    *,
+    now: datetime,
+) -> dict[str, Any]:
+    """Append-only unique HYPOTHESIS_VERSION proof-link for a legacy run.
+
+    Copies an already-committed payload byte-for-byte. Invents no hypothesis
+    identity. Idempotent via a deterministic record_id.
+    """
+
+    try:
+        store = ResearchStore(Path(data_root))
+    except ResearchStoreError as exc:
+        raise CommissioningProofError("FAST_LANE_NOT_COMMISSIONED") from exc
+
+    proven = 0
+    missing_link: list[tuple[dict[str, Any], Any]] = []
+    for record, payload in _iter_commissioning_completed(store):
+        try:
+            passport = verify_commissioning_passport(payload)
+            run_id = str(passport["run_id"])
+            verify_commissioning_records(
+                store,
+                run_id,
+                hypothesis_version_id=str(passport["hypothesis_version_id"]),
+            )
+            verify_result_integrity(Path(data_root), run_id)
+        except CommissioningProofError as exc:
+            if str(exc) != "COMMISSION_HYPOTHESIS_VERSION_MISSING":
+                continue
+            try:
+                passport = verify_commissioning_passport(payload)
+                run_id = str(passport["run_id"])
+                if not _required_run_records_complete(
+                    _count_run_records(store, run_id)
+                ):
+                    continue
+                verify_result_integrity(Path(data_root), run_id)
+            except CommissioningProofError:
+                continue
+            missing_link.append((passport, record))
+            continue
+        proven += 1
+
+    if proven:
+        return {"status": "ALREADY_PROVEN", "appended": 0}
+
+    if not missing_link:
+        return {"status": "NO_REPAIRABLE_CANDIDATE", "appended": 0}
+
+    hyp_ids = {
+        str(passport["hypothesis_version_id"]) for passport, _record in missing_link
+    }
+    if len(hyp_ids) != 1:
+        raise CommissioningProofError("REAL_DATA_MIGRATION_AMBIGUOUS")
+    hyp_id = next(iter(hyp_ids))
+
+    sources: list[Any] = []
+    for record in store.iter_committed_records():
+        if _kind_name(record) != RecordKind.HYPOTHESIS_VERSION.value:
+            continue
+        payload = _payload(record)
+        source_id = str(payload.get("hypothesis_version_id") or record.entity_id or "")
+        if source_id != hyp_id:
+            continue
+        sources.append(record)
+    source = _select_unique_hypothesis_source(sources)
+    source_payload = _payload(source)
+    source_definition = str(source_payload.get("definition_sha256") or "")
+    passport_definitions = {
+        str(passport.get("hypothesis_definition_sha256") or "")
+        for passport, _record in missing_link
+    }
+    if source_definition and any(
+        definition and definition != source_definition
+        for definition in passport_definitions
+    ):
+        raise CommissioningProofError("REAL_DATA_MIGRATION_AMBIGUOUS")
+
+    appended = 0
+    existing_ids = {str(record.record_id) for record in store.iter_committed_records()}
+    for passport, _completed in missing_link:
+        run_id = str(passport["run_id"])
+        digest = hashlib.sha256(
+            "\n".join(
+                (
+                    COMPAT_HYPOTHESIS_LINK_KIND,
+                    run_id,
+                    hyp_id,
+                    str(source.payload_sha256),
+                )
+            ).encode("utf-8")
+        ).hexdigest()
+        token = digest[:16].upper()
+        record_id = f"HYPOTHESIS-VERSION-COMPAT-{token}"
+        transaction_id = f"RESEARCH-TXN-HFIC-COMPAT-{token}"
+        if record_id in existing_ids:
+            continue
+        event = ResearchEvent(
+            record_id=record_id,
+            record_kind=RecordKind.HYPOTHESIS_VERSION,
+            entity_id=hyp_id,
+            hypothesis_version_id=hyp_id,
+            run_id=run_id,
+            transaction_id=transaction_id,
+            effective_at=now,
+            first_reliable_available_at=now,
+            supersedes_record_id=None,
+            payload_json=source.payload_json,
+            payload_sha256=source.payload_sha256,
+            schema_version=source.schema_version,
+            producer_capability_id=source.producer_capability_id,
+            producer_git_sha=source.producer_git_sha,
+            created_at=now,
+        )
+        try:
+            store.append([event], transaction_id=transaction_id)
+        except ResearchStoreError as exc:
+            if str(exc) in {"DUPLICATE_RECORD_ID", "TRANSACTION_CONFLICT"}:
+                continue
+            raise CommissioningProofError(str(exc)) from exc
+        existing_ids.add(record_id)
+        appended += 1
+
+    return {
+        "status": "APPLIED" if appended else "ALREADY_BOUND",
+        "appended": appended,
+        "hypothesis_version_id": hyp_id,
+        "compatibility_kind": COMPAT_HYPOTHESIS_LINK_KIND,
+    }
+
+
+def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
+    try:
+        store = ResearchStore(Path(data_root))
+    except ResearchStoreError as exc:
+        raise CommissioningProofError("FAST_LANE_NOT_COMMISSIONED") from exc
+    candidates = _iter_commissioning_completed(store)
     if not candidates:
         raise CommissioningProofError("FAST_LANE_NOT_COMMISSIONED")
     last_error = "FAST_LANE_NOT_COMMISSIONED"
+    missing_link_only = False
     for record, payload in candidates:
         try:
             passport = verify_commissioning_passport(payload)
@@ -202,6 +384,17 @@ def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
             integrity = verify_result_integrity(Path(data_root), run_id)
         except CommissioningProofError as exc:
             last_error = str(exc)
+            if str(exc) == "COMMISSION_HYPOTHESIS_VERSION_MISSING":
+                try:
+                    passport = verify_commissioning_passport(payload)
+                    run_id = str(passport["run_id"])
+                    if _required_run_records_complete(
+                        _count_run_records(store, run_id)
+                    ):
+                        verify_result_integrity(Path(data_root), run_id)
+                        missing_link_only = True
+                except CommissioningProofError:
+                    pass
             continue
         return {
             "status": "NO_GIT_FAST_LANE_PROVEN",
@@ -215,4 +408,6 @@ def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
             "store_inventory_digest": store.diagnostics().committed_inventory_sha256,
             "research_memory_as_of": str(passport.get("completed_at") or ""),
         }
+    if missing_link_only:
+        raise CommissioningProofError("COMMISSION_HYPOTHESIS_VERSION_MISSING")
     raise CommissioningProofError(last_error)

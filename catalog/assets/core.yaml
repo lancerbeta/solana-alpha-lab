@@ -32387,6 +32387,43 @@ records:
   evidence: []
   search_terms: [HYPOTHESIS_FORGE, HFIC]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-HFIC-ACTIVE-RDP-COMPATIBILITY-CLOSURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for routine /hypothesis-forge on historical Fast Lane RDP without owner commissioning repair.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-29'
+  truth_owner: HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1.md', repository_path: docs/tasks/HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1.md}
+  integrity: {kind: sha256, sha256: 4bf8fc489ae3ffcab55ca1380862b58d610dcd8540b62f732841ca4f20eeb9a3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-COMMISSIONING-COMPATIBILITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, COMMISSIONING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HFIC-COMMISSIONING-COMPATIBILITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network proofs for historical commissioning HYPOTHESIS_VERSION compatibility repair, idempotency, already-current stores and fail-closed ambiguity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-29'
+  truth_owner: HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_preflight.py', repository_path: tests/test_hfic_preflight.py}
+  integrity: {kind: sha256, sha256: 329d3f3d287835e0e8955a1090ea6992cf9d12c0a66cb7bd52733b597f86c6bb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-ACTIVE-RDP-COMPATIBILITY-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, COMMISSIONING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: CTRL-HFIC-NEXT-FORWARD-EVIDENCE-EXECUTION-001
   record_version: '1.0'
   asset_type: control_document
