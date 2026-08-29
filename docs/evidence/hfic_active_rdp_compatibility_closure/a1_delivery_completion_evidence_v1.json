@@ -9,10 +9,20 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_active_rdp_compatibility_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "7ccd1c8a7008dde50b89f6e98be0de3bd1345c439b5dd4f33dd4ccb21ed62664",
     "verdict": "PASS"
   },
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "0464787ae49ca2e5411ec5cdc1aca555864c031612658025b7d04c88b3c6fafd",
+    "catalog/assets/lifecycle.yaml": "ce7b159cf6bd1f1667b3057177b29c3c914ba2fbf0d775caba8e04d06a06947f",
+    "catalog/catalog_manifest.yaml": "3ce8947f8f4232c77ee10228399e3afbf3a1348f5331782d96f6dc86668c959c",
+    "catalog/generated/asset_edges.json": "5483ae2ad352d1c790c0f75c0d4920276c7308cdce14de5a938b53a399f0c2a8",
+    "docs/PROJECT_MAP.md": "f8f398946a0f0be2e4a8b3a2dd5cdf949afeea012fc189d90562cb79744dc998",
+    "docs/tasks/HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1.md": "4bf8fc489ae3ffcab55ca1380862b58d610dcd8540b62f732841ca4f20eeb9a3",
+    "src/solana_alpha_lab/factory/commissioning_proof.py": "3738e5b24bab5017d9dc3d1493ff8dc26d3794a6e5ec98d41cb18eb809c0b83d",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "3a70ef7749cf689ef92b6647d97b1b553e075f2e9fc57963ef2fd0da29e68bca",
+    "tests/test_hfic_preflight.py": "329d3f3d287835e0e8955a1090ea6992cf9d12c0a66cb7bd52733b597f86c6bb"
+  },
   "non_claims": [
     "NO_ALPHA",
     "NO_CANONICAL_DONE",
@@ -44,7 +54,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_active_rdp_compatibility_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "9a7c0181b905e63c96fee3f161f825b4355d30301d71602e089ad3637c3323c6",
       "verdict": "PASS"
     },
     "project_checks": [
