@@ -661,6 +661,20 @@ decision after collection
 - Публичный research — только точечная независимая проверка material claim; он не заменяет собственную execution truth.
 - Не исправляй фундаментально слабый механизм добавлением features, ML, данных или инфраструктуры.
 - Не генерируй новый портфель. Сначала вынеси terminal по переданному кандидату.
+- Не принимай внешний frozen envelope, Forge narrative или скрытый `session_id`.
+- Identity поля `hypothesis_critic_result_v1` — copied/bound, never generated:
+  `session_id` ← `CRITIC_INPUT_PACKET.session_id`;
+  `selected_candidate_id` ← `selected_candidate.candidate_id`;
+  `critic_input_packet_sha256` ← canonical SHA256 тех же packet bytes;
+  `selected_definition_sha256` ← canonical identity hash выбранного кандидата
+  из полей packet (read-only repo truth), as applicable.
+  Не изобретай `HFIC-UNBOUND-*` и не восстанавливай `session_id` из
+  `candidate_id`. Если `packet_version=1.1` и `session_id` отсутствует —
+  не эмитируй `hypothesis_critic_result_v1`. Верни
+  `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` и
+  `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_SESSION_ID`.
+  Если позже `finalize` вернул `CRITIC_SESSION_MISMATCH` — скопируй
+  `session_id` из packet и повтори один раз; не изобретай id.
 
 ## B1. Независимо разреши контекст
 
@@ -851,6 +865,11 @@ Post-merge path back to no-Git Fast Lane
 
 ## B7. Обязательный формат ответа
 
+Machine result `hypothesis_critic_result_v1` must carry copied/bound identity
+from the packet only: `session_id`, `selected_candidate_id`,
+`critic_input_packet_sha256`, and `selected_definition_sha256` as applicable.
+Never generate those fields.
+
 1. `CRITIC TERMINAL` — один terminal и одна фраза.
 2. `INDEPENDENT REALITY RECEIPT`.
 3. `STRONGEST KILL CASE`.
@@ -878,6 +897,7 @@ Post-merge path back to no-Git Fast Lane
 - Реально ли PASS/FAIL меняют decision?
 - Получен ли lane от classifier?
 - Ровно ли одна execution unit и один NEXT?
+- Скопирован ли `session_id` из packet, а не сгенерирован?
 
 При любом критическом нарушении PASS запрещён.
 

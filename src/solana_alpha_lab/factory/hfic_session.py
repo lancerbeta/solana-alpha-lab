@@ -555,6 +555,7 @@ def freeze_draft(
                 "prompt_version": PROMPT_VERSION,
             }
         )[:16].upper()
+    _bind_packet_session_id(packet, session_id)
     if repo_root is not None:
         _validate_json_schema(
             packet,
@@ -1761,6 +1762,13 @@ def _canonical_json_hash(document: Mapping[str, Any]) -> str:
     return hashlib.sha256(_canonical_bytes(document)).hexdigest()
 
 
+def _bind_packet_session_id(packet: dict[str, Any], session_id: str) -> None:
+    existing = packet.get("session_id")
+    if existing not in (None, "", session_id):
+        raise HficSessionError("CRITIC_SESSION_MISMATCH")
+    packet["session_id"] = session_id
+
+
 def _validate_draft_forge_context_binding(
     draft: Mapping[str, Any],
     receipt: Mapping[str, Any],
@@ -2449,6 +2457,7 @@ def apply_revision(
         revised_draft.get("prior_work_receipts") or revised_draft.get("prior_work_queries"),
         code="PRIOR_WORK_RECEIPTS_REQUIRED",
     )
+    _bind_packet_session_id(packet, str(frozen["session_id"]))
     if repo_root is not None:
         _validate_json_schema(
             packet,

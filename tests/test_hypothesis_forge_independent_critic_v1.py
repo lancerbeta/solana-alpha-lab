@@ -65,7 +65,20 @@ class HypothesisForgeIndependentCriticV1Tests(unittest.TestCase):
         packet = load_json(CRITIC_PACKET_FIXTURE)
         self.assertEqual(packet["packet_schema"], "smial.hypothesis-critic-input")
         self.assertEqual(packet["generator_prompt_version"], "HFIC-V1.0")
+        self.assertEqual(packet["packet_version"], "1.0")
+        self.assertNotIn("session_id", packet)
         self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+
+    def test_v11_packet_rejects_missing_session_id(self) -> None:
+        packet = load_json(CRITIC_PACKET_FIXTURE)
+        packet["packet_version"] = "1.1"
+        packet["generator_prompt_version"] = "HFIC-V1.1"
+        self.assertNotIn("session_id", packet)
+        self.assertNotEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+        packet["session_id"] = "HFIC-SESS-TESTBIND0001"
+        self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+        packet["session_id"] = "HFIC-UNBOUND-548FED55D34C"
+        self.assertNotEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
 
     def test_critic_packet_rejects_wrong_prompt_version(self) -> None:
         invalid = load_json(CRITIC_PACKET_FIXTURE)
@@ -169,6 +182,11 @@ class HypothesisForgeIndependentCriticV1Tests(unittest.TestCase):
         self.assertIn("PASS_TO_CLASSIFICATION", text)
         self.assertIn("classify_lane()", text)
         self.assertIn("lane_classifier_terminal", text)
+        self.assertIn("copied/bound", text.casefold())
+        self.assertIn("never generated", text.casefold())
+        self.assertIn("HFIC-UNBOUND", text)
+        self.assertIn("INCOMPLETE_CRITIC_INPUT_PACKET", text)
+        self.assertIn("CRITIC_SESSION_MISMATCH", text)
         self.assertRegex(text, re.compile(r"Do not emit `PASS_FAST_LANE_READY`"))
 
     def test_operator_pack_contains_hfic_prompts(self) -> None:

@@ -1,0 +1,57 @@
+{
+  "as_of": "2026-08-29",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_WALLET_SIGNER_TX"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "HFIC-CRITIC-SESSION-IDENTITY-TRANSPORT-REVIEW-001",
+  "reviewed_bindings_sha256": "acbc3749c87c55e254eb0e5a7a8b1212961173f064c59b94ce1b4bf00e38b9d2",
+  "reviewed_inventory_sha256": "4baca330e26df1f7f273b4fc2eced74ef3eefd45c726206a0af8841c6c9d8f0d",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_V11_SESSION_ID_BOUND_BEFORE_PACKET_HASH",
+        "CHECKED_PACKET_SESSION_EQUALS_FROZEN_SESSION",
+        "CHECKED_FINALIZE_WRONG_SESSION_STILL_MISMATCH",
+        "CHECKED_PACKET_ONLY_KILL_MECHANISM_FINALIZES",
+        "CHECKED_HISTORICAL_V10_FIXTURE_READABLE",
+        "CHECKED_NO_POST_HASH_ENRICHMENT",
+        "CHECKED_OWNER_UX_INCOMPLETE_PACKET_AND_MISMATCH_NEXT"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_PACKET_TRUTH_OWNER_IS_FORGE_BIND",
+        "CHECKED_CRITIC_COPIES_NEVER_GENERATES_SESSION_ID",
+        "CHECKED_ISOLATION_NOT_WEAKENED",
+        "CHECKED_V10_OPTIONAL_V11_REQUIRED_COMPAT",
+        "CHECKED_TESTS_CANNOT_ACCEPT_WRONG_SESSION"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_DECISION_DELTA_SESSION_ID_IN_PACKET",
+        "CHECKED_CHEAPEST_FALSIFIER_PRESENT",
+        "CHECKED_NAMED_CONSUMER_ISOLATED_CRITIC",
+        "CHECKED_STOP_BEFORE_MERGE"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "HFIC_CRITIC_SESSION_IDENTITY_TRANSPORT_P0_V1",
+  "verdict": "PASS"
+}

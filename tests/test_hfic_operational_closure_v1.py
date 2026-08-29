@@ -89,6 +89,11 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         allowed = version.get("enum") or [version.get("const")]
         self.assertIn("HFIC-V1.0", allowed)
         self.assertIn("HFIC-V1.1", allowed)
+        self.assertIn("session_id", schema["properties"])
+        self.assertEqual(
+            schema["properties"]["session_id"]["pattern"],
+            "^HFIC-SESS-[A-Z0-9]+$",
+        )
 
     def test_projection_declares_hfic_views(self) -> None:
         sql = PROJECTION_SQL.read_text(encoding="utf-8")
@@ -136,6 +141,12 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("hypothesis_critic_result_v1", text)
         self.assertIn("does not persist", text.casefold())
         self.assertIn("finalize", text.casefold())
+        self.assertIn("copied/bound", text.casefold())
+        operator = OPERATOR_PATH.read_text(encoding="utf-8")
+        self.assertIn("copied/bound", operator)
+        self.assertIn("HFIC-UNBOUND", operator)
+        self.assertIn("INCOMPLETE_CRITIC_INPUT_PACKET", operator)
+        self.assertIn("CRITIC_SESSION_MISMATCH", operator)
 
     def test_slash_command_happy_path_is_single_owner_action(self) -> None:
         text = FORGE_COMMAND_PATH.read_text(encoding="utf-8")

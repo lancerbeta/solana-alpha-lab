@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-CRITIC-SESSION-IDENTITY-TRANSPORT-P0-COMPLETION-001",
+  "as_of": "2026-08-29",
+  "task_id": "HFIC_CRITIC_SESSION_IDENTITY_TRANSPORT_P0_V1",
+  "state_change": "HFIC_CRITIC_SESSION_IDENTITY_TRANSPORT_CANDIDATE",
+  "base_main": "edb705c0b47c07a60ee976c489aa576008d72ac1",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "edf4a7b5913f430ba87f6d960fb4f238f2b1f5b9299525b1039a50468193dca1",
+    ".cursor/commands/independent-hypothesis-critic.md": "7903c8751897a6fc00c628602dc81f7b2b5f31cbeef0544c6661285b961fcac0",
+    "catalog/assets/core.yaml": "2ac5540fe81718239a591529035925546d1b921bb61c3a591a93506cb15b6716",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "afac2ec10dccfa28817c13459263cc5c534bc629e9ead7e0b5ce3c9170063314",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "9adfe38eb2af1fbd2910194b4b8a0f6544aa070a0cbf03a84fa2236e0c70e067",
+    "docs/tasks/HFIC_CRITIC_SESSION_IDENTITY_TRANSPORT_P0_V1.md": "a4e88f87dff776f86c812f3bd7cccf4547c3a4ca8efeebccde712ffcee5400b7",
+    "src/solana_alpha_lab/factory/hfic_session.py": "21e881fb07b244169788221005c555c2a1150d9b3c8ff20828f2d302ea8c6ba6",
+    "tests/test_hfic_cli.py": "7fbb3674faf37031d8e5ea94c99412b5a3aa9c3ef93039e590abd4bd73771f63",
+    "tests/test_hfic_operational_closure_v1.py": "a6bc92b295198c0171acf1f3b1e7bbe7f8004c2cbd83122ae20fdbfb98312583",
+    "tests/test_hfic_session.py": "29aa0c84585294eda64a0b8f79de8f4a632723582b3c8e1fbf8c0e7dd9955299",
+    "tests/test_hypothesis_forge_independent_critic_v1.py": "fe51dbd7523c8cabd8da89cc2f6cdb5e82ab7eb0371bbc5847387e47145904d4"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_critic_session_identity_transport_p0/a1_delivery_factory_fit_v1.json",
+    "sha256": "32360ed68db6fb89bc0616b968a9e91ec03fd7a20800af3afa1fc9f15aad9244",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_CRITIC_SESSION_IDENTITY_TRANSPORT",
+    "independent_review": {
+      "path": "docs/evidence/hfic_critic_session_identity_transport_p0/a1_delivery_independent_review_v1.json",
+      "sha256": "6d35d84a174b2fe9b1d77c1a11538a8b999c96ec208b6bf1b63e52e13b523f21",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_LIVE_SCHEDULE_ACTIVATION",
+    "NO_SCIENTIFIC_OUTCOME_FROM_PREPARATION"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}
