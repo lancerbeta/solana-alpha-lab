@@ -25,6 +25,7 @@ from solana_alpha_lab.factory.early_market_panel_importer import (
 )
 from solana_alpha_lab.factory.commissioning_proof import (
     CommissioningProofError,
+    apply_legacy_commissioning_hypothesis_link,
     prove_fast_lane_commissioned as _prove_fast_lane_commissioned,
 )
 from solana_alpha_lab.factory.hfic_clock import (
@@ -949,15 +950,44 @@ def run_preflight(
     git_snapshot: Mapping[str, Any] | None = None,
     clock: Clock | None = None,
 ) -> dict[str, Any]:
+    compatibility_repair: dict[str, Any] = {"status": "NONE", "appended": 0}
     try:
         proof = prove_fast_lane_commissioned(data_root)
         commissioned_now = False
-    except HficPreflightError:
-        if not auto_commission or commission_fn is None:
+    except HficPreflightError as exc:
+        code = str(exc)
+        if code == "COMMISSION_HYPOTHESIS_VERSION_MISSING":
+            try:
+                now = capture_stage_time(clock)
+            except HficClockError as clock_exc:
+                raise HficPreflightError(str(clock_exc)) from clock_exc
+            try:
+                repair = apply_legacy_commissioning_hypothesis_link(
+                    Path(data_root),
+                    now=now,
+                )
+            except CommissioningProofError as repair_exc:
+                raise HficPreflightError(str(repair_exc)) from repair_exc
+            compatibility_repair = {
+                "status": str(repair.get("status") or "NONE"),
+                "appended": int(repair.get("appended") or 0),
+            }
+            if compatibility_repair["status"] == "NO_REPAIRABLE_CANDIDATE":
+                raise HficPreflightError("COMMISSION_HYPOTHESIS_VERSION_MISSING")
+            proof = prove_fast_lane_commissioned(data_root)
+            commissioned_now = False
+        elif (
+            auto_commission
+            and commission_fn is not None
+            and code == "FAST_LANE_NOT_COMMISSIONED"
+        ):
+            commission_fn(Path(repo_root), Path(data_root))
+            proof = prove_fast_lane_commissioned(data_root)
+            commissioned_now = True
+        elif not auto_commission or commission_fn is None:
             raise HficPreflightError("FAST_LANE_NOT_COMMISSIONABLE")
-        commission_fn(Path(repo_root), Path(data_root))
-        proof = prove_fast_lane_commissioned(data_root)
-        commissioned_now = True
+        else:
+            raise
 
     try:
         store = ResearchStore(Path(data_root))
@@ -1024,6 +1054,7 @@ def run_preflight(
             "provider_calls_actual": int(proof.get("provider_calls_actual") or 0),
             "git_mutation_count": int(proof.get("git_mutation_count") or 0),
             "run_id": proof.get("run_id"),
+            "compatibility_repair": compatibility_repair,
         },
         "forge_context_packet": {},
         "authority": {
