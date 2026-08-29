@@ -12,11 +12,26 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from solana_alpha_lab.factory.capabilities import CapabilityError, execute_capability
+from solana_alpha_lab.factory.capabilities import (
+    CAP_OBSERVATION_SCHEDULE_COMPILE_BIND,
+    CapabilityError,
+    execute_capability,
+)
 from solana_alpha_lab.factory.data_resolver import (
     EvidenceResolutionError,
     resolve_evidence_bindings,
     resolve_query_recipe_hashes,
+)
+from solana_alpha_lab.factory.observation_fast_lane_terminals import (
+    observation_fast_lane_routing,
+)
+from solana_alpha_lab.factory.observation_schedule_capability import (
+    bind_observation_run_passport,
+    compile_and_bind_observation_schedule,
+)
+from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    ObservationLifecycleError,
+    require_production_producer_git_sha,
 )
 from solana_alpha_lab.factory.git_write_fence import (
     RepositoryGitSnapshot,
@@ -43,6 +58,7 @@ class RunContext:
     data_root: Path
     hypothesis_definition_sha256: str
     lane_decision: LaneDecision
+    classifier_evaluated_at: datetime | None = None
 
 
 def _git_head_sha(root: Path) -> str:
@@ -111,8 +127,10 @@ def _scientific_outcome(
     capability_result: Mapping[str, Any],
 ) -> tuple[str, str, str]:
     status = str(capability_result.get("status") or "")
-    if status == "BLOCKED_DATA":
+    if status in {"BLOCKED_DATA", "WAITING_FOR_PANEL"}:
         return "BLOCKED_DATA", "INVALID", "INVALID"
+    if status == "BLOCKED_AUTHORITY":
+        return "BLOCKED_AUTHORITY", "INVALID", "INVALID"
     if status != "COMPLETE":
         return "FAILED_INFRA", "INVALID", "INVALID"
     terminal = str(capability_result.get("terminal") or "")
@@ -238,7 +256,11 @@ class DocumentRunner(ExperimentRunner):
                 provider_calls_actual=0,
                 next_action=lane.next_action,
             )
-        if lane.terminal not in {"FAST_LANE_READY", "FAST_LANE_OWNER_GATE_REQUIRED"}:
+        observation_routing = observation_fast_lane_routing(lane.terminal)
+        executable_terminals = {"FAST_LANE_READY", "FAST_LANE_OWNER_GATE_REQUIRED"}
+        if observation_routing is not None:
+            executable_terminals.add(lane.terminal)
+        if lane.terminal not in executable_terminals:
             return _document_response(
                 lane_decision=lane,
                 execution_status="FAILED_INFRA",
@@ -253,15 +275,65 @@ class DocumentRunner(ExperimentRunner):
         if lane.run_key_sha256 is None:
             raise ExperimentRunnerError("RUN_KEY_SHA256_REQUIRED")
 
+        run_id = _run_id(lane.run_key_sha256)
+        producer_git_sha = _git_head_sha(self.root)
         git_before = repository_git_snapshot(self.root)
-        try:
-            capability_result = execute_capability(
-                spec,
-                root=self.root,
-                authority_phrase=authority_phrase,
-                capture_hooks=capture_hooks,
+        hooks = dict(capture_hooks or {})
+        if observation_routing is not None:
+            hooks.setdefault("data_root", run_context.data_root)
+            hooks.setdefault("hypothesis_version_id", str(spec["hypothesis_version"]))
+            hooks.setdefault("producer_git_sha", producer_git_sha)
+            hooks.setdefault("run_id", run_id)
+            hooks.setdefault(
+                "hypothesis_definition_sha256",
+                run_context.hypothesis_definition_sha256,
             )
-        except CapabilityError as exc:
+            hooks.setdefault("experiment_spec_sha256", spec_sha256)
+            hooks.setdefault("run_key_sha256", lane.run_key_sha256)
+            hooks.setdefault(
+                "now",
+                run_context.classifier_evaluated_at or _event_time(spec),
+            )
+            hooks["producer_git_sha"] = require_production_producer_git_sha(
+                hooks.get("producer_git_sha")
+                if isinstance(hooks.get("producer_git_sha"), str)
+                else producer_git_sha
+            )
+        try:
+            if observation_routing is not None:
+                capability_ids = list(spec.get("capabilities") or [])
+                if (
+                    len(capability_ids) != 1
+                    or str(capability_ids[0]) != CAP_OBSERVATION_SCHEDULE_COMPILE_BIND
+                ):
+                    raise CapabilityError("CAPABILITY_SET_NOT_SINGLE")
+                if int(spec["evidence_budget"]["provider_api_rpc_wss_calls"]) != 0:
+                    raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
+                capability_result = compile_and_bind_observation_schedule(
+                    spec,
+                    root=self.root,
+                    coverage=hooks.get("coverage"),
+                    closed_family=bool(hooks.get("closed_family")),
+                    data_root=hooks.get("data_root"),
+                    producer_git_sha=hooks.get("producer_git_sha"),
+                    hypothesis_version_id=hooks.get("hypothesis_version_id"),
+                    run_id=hooks.get("run_id"),
+                    now=hooks.get("now"),
+                    hypothesis_definition_sha256=hooks.get(
+                        "hypothesis_definition_sha256"
+                    ),
+                    experiment_spec_sha256=hooks.get("experiment_spec_sha256"),
+                    run_key_sha256=hooks.get("run_key_sha256"),
+                    authority_phrase=authority_phrase,
+                )
+            else:
+                capability_result = execute_capability(
+                    spec,
+                    root=self.root,
+                    authority_phrase=authority_phrase,
+                    capture_hooks=hooks,
+                )
+        except (CapabilityError, ObservationLifecycleError) as exc:
             return _document_response(
                 lane_decision=lane,
                 execution_status="FAILED_INFRA",
@@ -275,10 +347,51 @@ class DocumentRunner(ExperimentRunner):
         git_after = repository_git_snapshot(self.root)
         git_mutation_count = 0 if git_before.unchanged(git_after) else 1
 
-        run_id = _run_id(lane.run_key_sha256)
         capability_id = str(spec["capability_id"])
-        producer_git_sha = _git_head_sha(self.root)
-        now = _event_time(spec)
+        if observation_routing is not None:
+            final_terminal = str(capability_result.get("terminal") or lane.terminal)
+            final_routing = observation_fast_lane_routing(final_terminal)
+            if final_routing is not None:
+                observation_routing = final_routing
+        now = (
+            run_context.classifier_evaluated_at
+            if observation_routing is not None
+            and run_context.classifier_evaluated_at is not None
+            else _event_time(spec)
+        )
+        if observation_routing is not None and not observation_routing.persist_completed_run:
+            extra: dict[str, Any] = {
+                "observation_terminal": str(
+                    capability_result.get("terminal") or lane.terminal
+                ),
+                "capability_result": capability_result,
+            }
+            if run_context.classifier_evaluated_at is not None:
+                extra["classifier_evaluated_at"] = run_context.classifier_evaluated_at.astimezone(
+                    UTC
+                ).isoformat().replace("+00:00", "Z")
+            if isinstance(capability_result.get("authority_request"), Mapping):
+                extra["authority_request"] = capability_result["authority_request"]
+            if capability_result.get("authority_status") is not None:
+                extra["authority_status"] = capability_result.get("authority_status")
+            if isinstance(capability_result.get("pending_binding"), Mapping):
+                extra["pending_binding"] = capability_result["pending_binding"]
+            final_next = capability_result.get("next_action")
+            if not isinstance(final_next, str) or not final_next:
+                final_next = lane.next_action
+            return _document_response(
+                lane_decision=lane,
+                execution_status=observation_routing.execution_status,
+                scientific_terminal=observation_routing.scientific_terminal,
+                reason_codes=lane.reason_codes,
+                run_id=None,
+                git_mutation_count=git_mutation_count,
+                provider_calls_actual=int(
+                    capability_result.get("provider_api_rpc_wss_calls") or 0
+                ),
+                next_action=str(final_next),
+                extra=extra,
+            )
         transaction_id = f"RESEARCH-TXN-{uuid.uuid4().hex[:16].upper()}"
 
         if git_mutation_count:
@@ -454,7 +567,29 @@ class DocumentRunner(ExperimentRunner):
             "non_claims": ["NO_ALPHA", "NO_NETRETURN"],
         }
         try:
-            passport = validate_run_passport(passport_payload)
+            if (
+                observation_routing is not None
+                and observation_routing.persist_completed_run
+            ):
+                bindings = capability_result.get("passport_bindings")
+                if not isinstance(bindings, Mapping):
+                    raise RunPassportError("OBSERVATION_PASSPORT_BINDINGS_REQUIRED")
+                schedule_sha = bindings.get("observation_schedule_sha256")
+                snapshot_sha = bindings.get("observation_panel_snapshot_sha256")
+                if (
+                    not isinstance(schedule_sha, str)
+                    or len(schedule_sha) != 64
+                    or not isinstance(snapshot_sha, str)
+                    or len(snapshot_sha) != 64
+                ):
+                    raise RunPassportError("OBSERVATION_PASSPORT_BINDINGS_REQUIRED")
+                passport = bind_observation_run_passport(
+                    passport_payload,
+                    observation_schedule_sha256=schedule_sha,
+                    observation_panel_snapshot_sha256=snapshot_sha,
+                )
+            else:
+                passport = validate_run_passport(passport_payload)
         except RunPassportError as exc:
             return _document_response(
                 lane_decision=lane,
@@ -467,37 +602,51 @@ class DocumentRunner(ExperimentRunner):
                 next_action="CORRECT_RUN_PASSPORT",
             )
 
-        records: list[ResearchEvent] = [
-            _research_event(
-                record_id=f"HYPOTHESIS-VERSION-{transaction_id[-16:]}",
-                record_kind=RecordKind.HYPOTHESIS_VERSION,
-                entity_id=str(spec["hypothesis_version"]),
-                hypothesis_version_id=str(spec["hypothesis_version"]),
-                run_id=None,
-                transaction_id=transaction_id,
-                effective_at=now,
-                payload={
-                    "hypothesis_version_id": str(spec["hypothesis_version"]),
-                    "family_id": "HYP-FAMILY-FAST-LANE-001",
-                    "version_ordinal": 1,
-                    "origin_id": "HYP-ORIGIN-FAST-LANE-001",
-                    "origin_kind": "DATA_ANALYSIS",
-                    "research_cycle_id": "RESEARCH-CYCLE-FAST-LANE-001",
-                    "definition_sha256": run_context.hypothesis_definition_sha256,
-                    "statement": str(spec.get("question") or ""),
-                    "mechanism": str(spec.get("method") or ""),
-                    "falsifier": str(spec.get("falsifier") or ""),
-                    "expected_regime_terms": [],
-                    "what_changed": (
-                        str(spec["what_changed"][0])
-                        if isinstance(spec.get("what_changed"), list)
-                        and spec["what_changed"]
-                        else "FAST_LANE_RUN"
-                    ),
-                },
-                producer_capability_id=capability_id,
-                producer_git_sha=producer_git_sha,
-            ),
+        records: list[ResearchEvent] = []
+        store = ResearchStore(run_context.data_root)
+        hypothesis_already_registered = any(
+            str(item.record_kind) == RecordKind.HYPOTHESIS_VERSION.value
+            and (
+                str(item.entity_id) == str(spec["hypothesis_version"])
+                or str(item.hypothesis_version_id or "") == str(spec["hypothesis_version"])
+            )
+            for item in store.iter_committed_records()
+        )
+        if not hypothesis_already_registered:
+            records.append(
+                _research_event(
+                    record_id=f"HYPOTHESIS-VERSION-{transaction_id[-16:]}",
+                    record_kind=RecordKind.HYPOTHESIS_VERSION,
+                    entity_id=str(spec["hypothesis_version"]),
+                    hypothesis_version_id=str(spec["hypothesis_version"]),
+                    run_id=None,
+                    transaction_id=transaction_id,
+                    effective_at=now,
+                    payload={
+                        "hypothesis_version_id": str(spec["hypothesis_version"]),
+                        "family_id": "HYP-FAMILY-FAST-LANE-001",
+                        "version_ordinal": 1,
+                        "origin_id": "HYP-ORIGIN-FAST-LANE-001",
+                        "origin_kind": "DATA_ANALYSIS",
+                        "research_cycle_id": "RESEARCH-CYCLE-FAST-LANE-001",
+                        "definition_sha256": run_context.hypothesis_definition_sha256,
+                        "statement": str(spec.get("question") or ""),
+                        "mechanism": str(spec.get("method") or ""),
+                        "falsifier": str(spec.get("falsifier") or ""),
+                        "expected_regime_terms": [],
+                        "what_changed": (
+                            str(spec["what_changed"][0])
+                            if isinstance(spec.get("what_changed"), list)
+                            and spec["what_changed"]
+                            else "FAST_LANE_RUN"
+                        ),
+                    },
+                    producer_capability_id=capability_id,
+                    producer_git_sha=producer_git_sha,
+                )
+            )
+        records.extend(
+            [
             _research_event(
                 record_id=f"RUN-STARTED-{transaction_id[-16:]}",
                 record_kind=RecordKind.RUN_STARTED,
@@ -525,7 +674,8 @@ class DocumentRunner(ExperimentRunner):
                 producer_capability_id=capability_id,
                 producer_git_sha=producer_git_sha,
             ),
-        ]
+            ]
+        )
         metric_id = f"METRIC-TERMINAL-MATCH-{transaction_id[-8:]}"
         records.append(
             _research_event(
@@ -598,6 +748,12 @@ class DocumentRunner(ExperimentRunner):
         store.append(records, transaction_id=transaction_id)
         store.rebuild_projection()
 
+        extra: dict[str, Any] = {
+            "passport": passport.payload,
+            "capability_result": capability_result,
+        }
+        if observation_routing is not None:
+            extra["observation_terminal"] = lane.terminal
         return _document_response(
             lane_decision=lane,
             execution_status=execution_status,
@@ -607,7 +763,7 @@ class DocumentRunner(ExperimentRunner):
             git_mutation_count=0,
             provider_calls_actual=provider_calls_actual,
             next_action="SEARCH_PRIOR_WORK",
-            extra={"passport": passport.payload, "capability_result": capability_result},
+            extra=extra,
         )
 
 

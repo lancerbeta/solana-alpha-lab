@@ -369,7 +369,19 @@ def classify_lane(
             compile_observation_request,
         )
 
-        compiled = compile_observation_request(spec, root=root, data_root=data_root)
+        definition_sha = None
+        try:
+            definition_sha = _hypothesis_definition_sha256(submission)
+        except ValueError:
+            definition_sha = None
+        compiled = compile_observation_request(
+            spec,
+            root=root,
+            data_root=data_root,
+            now=as_of,
+            hypothesis_version_id=str(spec.get("hypothesis_version") or "") or None,
+            hypothesis_definition_sha256=definition_sha,
+        )
         if compiled.terminal in {
             "CHANGE_LANE_PRIMITIVE_GAP",
             "CHANGE_LANE_ESTIMATOR_GAP",
@@ -385,6 +397,7 @@ def classify_lane(
             "DENY_OUTCOME_LEAKAGE",
             "DENY_RETROACTIVE_MUTATION",
             "DENY_UNSAFE_RUNTIME_CODE",
+            "DENY_INVALID_SPEC",
         }:
             return _decision(
                 Lane.DENY,

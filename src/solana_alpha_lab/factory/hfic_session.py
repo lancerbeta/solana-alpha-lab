@@ -2000,6 +2000,13 @@ def _effective_cycle_phase(
 
 def _classifier_to_hfic_terminal(receipt: Mapping[str, Any]) -> str:
     outcome = str(receipt.get("lane_classifier_terminal") or "")
+    from solana_alpha_lab.factory.observation_fast_lane_terminals import (
+        hfic_terminal_for_classifier,
+    )
+
+    observation_mapped = hfic_terminal_for_classifier(outcome)
+    if observation_mapped is not None:
+        return observation_mapped
     mapping = {
         "FAST_LANE_READY": "PASS_FAST_LANE_READY",
         "REPLAY_AVAILABLE": "PASS_FAST_LANE_READY",
@@ -2079,10 +2086,18 @@ def run_live_classifier(
     except ExperimentSpecError as exc:
         raise HficSessionError("EXPERIMENT_SPEC_INVALID") from exc
     spec_sha = experiment_spec_sha256(validated)
-    as_of_raw = str(validated.get("as_of") or frozen.get("research_memory_as_of") or "")
-    if not as_of_raw:
-        raise HficSessionError("EXPERIMENT_SPEC_INVALID")
-    as_of = datetime.fromisoformat(as_of_raw.replace("Z", "+00:00")).astimezone(UTC)
+    as_of_raw = ""
+    for candidate in (
+        submission.get("classifier_evaluated_at") if isinstance(submission, Mapping) else None,
+        frozen.get("classifier_evaluated_at"),
+    ):
+        if isinstance(candidate, str) and candidate.strip():
+            as_of_raw = candidate.strip()
+            break
+    if as_of_raw:
+        as_of = datetime.fromisoformat(as_of_raw.replace("Z", "+00:00")).astimezone(UTC)
+    else:
+        as_of = datetime.now(UTC)
     packet = dict(submission)
     packet.setdefault("hypothesis_definition_sha256", frozen.get("selected_definition_sha256"))
     decision = classify_lane(

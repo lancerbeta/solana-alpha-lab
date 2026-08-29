@@ -1060,8 +1060,26 @@ def tick_once(
             and now < parse_utc(str(item["cutover_at"]))
             for item in store.list_rollovers()
         )
-        can_admit_before_cutover = state == "ACTIVE" or (
-            state == "DRAINING" and predecessor_before_cutover
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+            drain_expired_admission,
+            materialize_pending_observation_snapshots,
+        )
+
+        drained = drain_expired_admission(
+            data_root=data_root,
+            store=store,
+            schedule_sha256=digest,
+            activation_id=activation_id,
+            now=now,
+            producer_git_sha=producer_git_sha,
+        )
+        if drained is not None and drained.get("state") == "DRAINING":
+            state = "DRAINING"
+        stops_admitting_at = parse_utc(str(activation["stops_admitting_at"]))
+        admission_open = now < stops_admitting_at
+        can_admit_before_cutover = admission_open and (
+            state == "ACTIVE"
+            or (state == "DRAINING" and predecessor_before_cutover)
         )
         if (
             discovery_rows is None
@@ -1945,6 +1963,14 @@ def tick_once(
                 now=now,
                 producer_git_sha=producer_git_sha,
             )
+        materialize_pending_observation_snapshots(
+            data_root=data_root,
+            store=store,
+            schedule_sha256=digest,
+            activation_id=activation_id,
+            now=now,
+            producer_git_sha=producer_git_sha,
+        )
         store.record_event(
             "TICK",
             {

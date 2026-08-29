@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 35abf9951dd5204737bd3715113793d48dfdbe1834c1ed7a2e51f0a836dda0f5
+    sha256: 48fe2fe9572132917b0f8719310a095f8ea0fbf7b1c0d5c6b79f2abaa1de8620
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 81223661a47ed2666b54f73676b8f0d74330bc9288f251699c785ad4c6ed8b8c
+    sha256: 4283d7c5bf1501be480d9aa5286f079d4cc775ed4b8b28f10d5897a8b662764b
   access:
     mode: read_only
     method: command
@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 7312f8bc7357c5bde47a7b62c885665dd5449e8a81b5abca8acc553b5dfacfb8}
+  integrity: {kind: sha256, sha256: f74adbf85092437ef1d430e2316601cde7186a7d1d9f38afb61cf14ea23e9bff}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -19729,7 +19729,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 80401bfbb49dc6197dbdbcd62eba02d69f0629a49c6b7af27a2abe1846c039b1}
+  integrity: {kind: sha256, sha256: 317a2475d813fadf86b8f8a54608beb9d354d0dbc46095e1088c765cf230d024}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -31940,7 +31940,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: 73e9e485f6e50aa493f604c6a8a1986c28eb1fd1e2f50de40c02d8708eb74c2d}
+  integrity: {kind: sha256, sha256: 2bb6e94b59c4301d938a8bc17154534eb70e0892116416e8f26039326266cf23}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32033,7 +32033,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_fast_lane.py', repository_path: scripts/hypothesis_fast_lane.py}
-  integrity: {kind: sha256, sha256: 9cd8e01517457ebf56c7cb7499514aaea71119561157c31e8cb675b44a8268e0}
+  integrity: {kind: sha256, sha256: af36517947f92c3b5d87f56d9804859f7db0c5729783db25432aaef7e43db6d6}
   access: {mode: read_only, method: command, recipe_id: QUERY-HYPOTHESIS-FAST-LANE-CLASSIFY-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32275,7 +32275,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 0a04776d121a73c597cdd831574a719a12e0d969a0a19e2c1585f0fb64bc595e}
+  integrity: {kind: sha256, sha256: 419b593730212c22fbdf8178b50e54dbc4c8cc6e3f0d850c1e50a0ec68be7398}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32984,7 +32984,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 55d70ea55d8fc30cdb2eaa116d387c5362635c14ff1f1316182b134b46edaeb2}
+  integrity: {kind: sha256, sha256: d86262aed0cea36521c24b1b8b04d7c9dd7e008d2cf01e94417997017c433cf3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33001,7 +33001,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_compiler.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_compiler.py}
-  integrity: {kind: sha256, sha256: 2d36bd0aca7c33bf0e34c2e4791e1f183c73026574b17438332a8b395dfefb60}
+  integrity: {kind: sha256, sha256: a6c8c057e772188cc9faefde598eab76431090f2829e531e5220e19d9826cda9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

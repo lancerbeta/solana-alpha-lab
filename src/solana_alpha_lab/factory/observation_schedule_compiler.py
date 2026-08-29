@@ -6,11 +6,13 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Any
 
 from solana_alpha_lab.factory.observation_panel_coverage import (
     CoverageIndex,
     compute_evidence_role,
+    resolve_authoritative_hypothesis_registered_at,
 )
 from solana_alpha_lab.factory.observation_primitive_registry import (
     ObservationPrimitiveRegistry,
@@ -72,6 +74,9 @@ class CompilerResult:
     evidence_role: str | None
     budget: BudgetEnvelope | None
     next_action: str
+    hypothesis_registered_at: datetime | None = None
+    experiment_as_of: datetime | None = None
+    classifier_evaluated_at: datetime | None = None
 
 
 def _deny(terminal: str, *reasons: str) -> CompilerResult:
@@ -234,6 +239,37 @@ def _budget_fits(declared: Mapping[str, Any], envelope: BudgetEnvelope) -> bool:
     )
 
 
+def _compiler_result(
+    *,
+    terminal: str,
+    reason_codes: tuple[str, ...],
+    schedule: dict[str, Any] | None,
+    schedule_sha256: str | None,
+    covering_schedule_sha256: str | None,
+    snapshot_sha256: str | None,
+    evidence_role: str | None,
+    budget: BudgetEnvelope | None,
+    next_action: str,
+    hypothesis_registered_at: datetime | None,
+    experiment_as_of: datetime | None,
+    classifier_evaluated_at: datetime | None,
+) -> CompilerResult:
+    return CompilerResult(
+        terminal=terminal,
+        reason_codes=reason_codes,
+        schedule=schedule,
+        schedule_sha256=schedule_sha256,
+        covering_schedule_sha256=covering_schedule_sha256,
+        snapshot_sha256=snapshot_sha256,
+        evidence_role=evidence_role,
+        budget=budget,
+        next_action=next_action,
+        hypothesis_registered_at=hypothesis_registered_at,
+        experiment_as_of=experiment_as_of,
+        classifier_evaluated_at=classifier_evaluated_at,
+    )
+
+
 def compile_observation_request(
     spec: Mapping[str, Any],
     *,
@@ -242,6 +278,9 @@ def compile_observation_request(
     hypothesis_registered_at: datetime | None = None,
     closed_family: bool = False,
     data_root=None,
+    now: datetime | None = None,
+    hypothesis_version_id: str | None = None,
+    hypothesis_definition_sha256: str | None = None,
 ) -> CompilerResult:
     try:
         request = spec["observation_request"]
@@ -260,16 +299,51 @@ def compile_observation_request(
         digest = str(validated["schedule_sha256"])
         mode = str(request["collection_mode"])
         cutoff = parse_utc(spec["availability_cutoff"])
-        registered_at = hypothesis_registered_at or parse_utc(spec["as_of"])
+        experiment_as_of = parse_utc(spec["as_of"])
+        classifier_evaluated_at = now.astimezone(UTC) if now is not None else experiment_as_of
+        if classifier_evaluated_at.tzinfo is None:
+            return _deny("DENY_UNSAFE_RUNTIME_CODE")
+        registered_at = hypothesis_registered_at
+        if registered_at is None and data_root is not None:
+            registered_at = resolve_authoritative_hypothesis_registered_at(
+                data_root,
+                hypothesis_version_id=hypothesis_version_id
+                or (str(spec["hypothesis_version"]) if spec.get("hypothesis_version") else None),
+                hypothesis_definition_sha256=hypothesis_definition_sha256,
+            )
+        due_rows: list[dict[str, Any]] = []
         if data_root is not None:
             from solana_alpha_lab.factory.observation_panel_coverage import (
+                SCIENTIFIC_CLOSED_DUE_STATES,
+                UNRESOLVED_REQUIRED_DUE_STATES,
                 load_coverage_from_rdp,
+            )
+            from solana_alpha_lab.factory.observation_schedule_store import (
+                ObservationScheduleStore,
             )
 
             index = load_coverage_from_rdp(data_root)
+            sqlite_path = Path(data_root) / "observation_schedule_state.sqlite"
+            if sqlite_path.is_file():
+                store = ObservationScheduleStore(sqlite_path)
+                try:
+                    due_rows = store.due_in_states(
+                        tuple(
+                            SCIENTIFIC_CLOSED_DUE_STATES
+                            | UNRESOLVED_REQUIRED_DUE_STATES
+                            | {"BLOCKED_BUDGET"}
+                        )
+                    )
+                finally:
+                    store.close()
         else:
             index = coverage or CoverageIndex()
-        snapshot_record = index.covering_snapshot_record(validated, cutoff)
+        snapshot_record = index.covering_snapshot_record(
+            validated,
+            cutoff,
+            data_root=data_root,
+            due_rows=due_rows,
+        )
         y_proven = False
         first_y = None
         if snapshot_record is not None and data_root is not None:
@@ -294,7 +368,7 @@ def compile_observation_request(
                 snapshot_record["schedule"].get("schedule_sha256")
                 or schedule_sha256(snapshot_record["schedule"])
             )
-            return CompilerResult(
+            return _compiler_result(
                 terminal="PANEL_REUSE_READY",
                 reason_codes=(),
                 schedule=validated,
@@ -304,12 +378,15 @@ def compile_observation_request(
                 evidence_role=role,
                 budget=envelope,
                 next_action="BIND_PANEL_SNAPSHOT",
+                hypothesis_registered_at=registered_at,
+                experiment_as_of=experiment_as_of,
+                classifier_evaluated_at=classifier_evaluated_at,
             )
         if mode == "REUSE_ONLY":
             return _deny("BLOCKED_BUDGET", "NO_COVERING_SNAPSHOT")
-        active = index.covering_active_schedule(validated)
+        active = index.covering_active_schedule(validated, now=classifier_evaluated_at)
         if active is not None:
-            return CompilerResult(
+            return _compiler_result(
                 terminal="ATTACHED_TO_ACTIVE_SCHEDULE",
                 reason_codes=(),
                 schedule=validated,
@@ -319,10 +396,13 @@ def compile_observation_request(
                 evidence_role=role,
                 budget=envelope,
                 next_action="ATTACH_HYPOTHESIS_BINDING",
+                hypothesis_registered_at=registered_at,
+                experiment_as_of=experiment_as_of,
+                classifier_evaluated_at=classifier_evaluated_at,
             )
         predecessor = index.admission_overlap_predecessor(validated)
         if predecessor is not None and predecessor != digest:
-            return CompilerResult(
+            return _compiler_result(
                 terminal="NEW_VERSION_FOR_FUTURE_COHORTS_REQUIRED",
                 reason_codes=("FORWARD_ROLLOVER",),
                 schedule=validated,
@@ -332,8 +412,11 @@ def compile_observation_request(
                 evidence_role=role,
                 budget=envelope,
                 next_action="AUTHORIZE_SUCCESSOR_SCHEDULE",
+                hypothesis_registered_at=registered_at,
+                experiment_as_of=experiment_as_of,
+                classifier_evaluated_at=classifier_evaluated_at,
             )
-        return CompilerResult(
+        return _compiler_result(
             terminal="SCHEDULE_ACTIVATION_REQUIRED",
             reason_codes=(),
             schedule=validated,
@@ -343,6 +426,9 @@ def compile_observation_request(
             evidence_role=role,
             budget=envelope,
             next_action="AUTHORIZE_COMPILED_SCHEDULE",
+            hypothesis_registered_at=registered_at,
+            experiment_as_of=experiment_as_of,
+            classifier_evaluated_at=classifier_evaluated_at,
         )
     except PrimitiveRegistryError as exc:
         code = str(exc)

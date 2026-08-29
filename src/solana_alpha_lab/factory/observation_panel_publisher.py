@@ -256,6 +256,7 @@ def _research_event(
     run_id: str | None,
     transaction_id: str,
     hypothesis_version_id: str | None = None,
+    supersedes_record_id: str | None = None,
 ) -> ResearchEvent:
     payload_json = json.dumps(
         dict(payload),
@@ -272,7 +273,7 @@ def _research_event(
         transaction_id=transaction_id,
         effective_at=now,
         first_reliable_available_at=now,
-        supersedes_record_id=None,
+        supersedes_record_id=supersedes_record_id,
         payload_json=payload_json,
         payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
         schema_version="1.0",
@@ -425,6 +426,145 @@ def persist_panel_snapshot_binding(
         ):
             return
         raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+
+
+def pending_observation_binding_sha256(payload: Mapping[str, Any]) -> str:
+    identity = {
+        "hypothesis_version_id": payload.get("hypothesis_version_id"),
+        "hypothesis_definition_sha256": payload.get("hypothesis_definition_sha256"),
+        "experiment_spec_sha256": payload.get("experiment_spec_sha256"),
+        "run_key_sha256": payload.get("run_key_sha256"),
+        "requested_schedule_sha256": payload.get("requested_schedule_sha256"),
+        "covering_schedule_sha256": payload.get("covering_schedule_sha256"),
+        "requested_availability_semantics": payload.get(
+            "requested_availability_semantics"
+        ),
+        "required_x_point": payload.get("required_x_point"),
+        "required_y_points": payload.get("required_y_points"),
+        "evidence_role_basis": payload.get("evidence_role_basis"),
+    }
+    return canonical_sha256(identity)
+
+
+def persist_pending_observation_binding(
+    *,
+    data_root: Path,
+    payload: Mapping[str, Any],
+    now: datetime,
+    producer_git_sha: str,
+    run_id: str | None = None,
+) -> dict[str, Any]:
+    identity = dict(payload)
+    identity.setdefault("state", "WAITING_FOR_PANEL")
+    digest = pending_observation_binding_sha256(identity)
+    identity["pending_binding_sha256"] = digest
+    identity["state"] = "WAITING_FOR_PANEL"
+    record_id = f"OBS-PEND-{digest[:16].upper()}"
+    txn = f"RESEARCH-TXN-OBS-PEND-{digest[:12].upper()}"
+    event = _research_event(
+        record_id=record_id,
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_BINDING,
+        entity_id=digest,
+        payload=identity,
+        now=now,
+        producer_git_sha=producer_git_sha,
+        run_id=run_id,
+        transaction_id=txn,
+        hypothesis_version_id=identity.get("hypothesis_version_id")
+        if isinstance(identity.get("hypothesis_version_id"), str)
+        else None,
+    )
+    store = ResearchStore(data_root)
+    try:
+        store.append([event], transaction_id=txn)
+        return {"terminal": "PENDING_BOUND", "pending_binding_sha256": digest}
+    except Exception:
+        existing = list(store.iter_committed_records())
+        match = next((item for item in existing if item.record_id == event.record_id), None)
+        if match is not None and match.payload_sha256 == event.payload_sha256:
+            return {"terminal": "PENDING_REPLAY", "pending_binding_sha256": digest}
+        if match is not None:
+            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+        raise
+
+
+def satisfy_pending_observation_binding(
+    *,
+    data_root: Path,
+    pending_binding_sha256: str,
+    snapshot_sha256: str,
+    now: datetime,
+    producer_git_sha: str,
+    run_id: str | None = None,
+) -> dict[str, Any]:
+    waiting = None
+    for item in load_pending_observation_bindings(data_root):
+        if item["pending_binding_sha256"] == pending_binding_sha256:
+            waiting = item
+            break
+    if waiting is None:
+        raise ObservationPanelPublisherError("PENDING_BINDING_MISSING")
+    if waiting.get("state") == "SATISFIED" and waiting.get("snapshot_sha256") == snapshot_sha256:
+        return {
+            "terminal": "PENDING_SATISFIED_REPLAY",
+            "pending_binding_sha256": pending_binding_sha256,
+            "snapshot_sha256": snapshot_sha256,
+        }
+    satisfied = dict(waiting)
+    satisfied["state"] = "SATISFIED"
+    satisfied["snapshot_sha256"] = snapshot_sha256
+    record_id = f"OBS-PEND-SAT-{pending_binding_sha256[:16].upper()}"
+    txn = f"RESEARCH-TXN-OBS-PEND-SAT-{pending_binding_sha256[:12].upper()}"
+    event = _research_event(
+        record_id=record_id,
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_BINDING,
+        entity_id=pending_binding_sha256,
+        payload=satisfied,
+        now=now,
+        producer_git_sha=producer_git_sha,
+        run_id=run_id,
+        transaction_id=txn,
+        hypothesis_version_id=satisfied.get("hypothesis_version_id")
+        if isinstance(satisfied.get("hypothesis_version_id"), str)
+        else None,
+        supersedes_record_id=f"OBS-PEND-{pending_binding_sha256[:16].upper()}",
+    )
+    store = ResearchStore(data_root)
+    try:
+        store.append([event], transaction_id=txn)
+        return {
+            "terminal": "PENDING_SATISFIED",
+            "pending_binding_sha256": pending_binding_sha256,
+            "snapshot_sha256": snapshot_sha256,
+        }
+    except Exception:
+        existing = list(store.iter_committed_records())
+        match = next((item for item in existing if item.record_id == event.record_id), None)
+        if match is not None and match.payload_sha256 == event.payload_sha256:
+            return {
+                "terminal": "PENDING_SATISFIED_REPLAY",
+                "pending_binding_sha256": pending_binding_sha256,
+                "snapshot_sha256": snapshot_sha256,
+            }
+        if match is not None:
+            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+        raise
+
+
+def load_pending_observation_bindings(data_root: Path) -> list[dict[str, Any]]:
+    store = ResearchStore(data_root)
+    latest: dict[str, dict[str, Any]] = {}
+    for record in store.iter_committed_records():
+        if str(record.record_kind) != "OBSERVATION_SCHEDULE_BINDING":
+            continue
+        payload = json.loads(record.payload_json)
+        if not isinstance(payload, Mapping):
+            continue
+        digest = str(payload.get("pending_binding_sha256") or "")
+        if len(digest) != 64:
+            continue
+        latest[digest] = dict(payload)
+    return [latest[key] for key in sorted(latest)]
 
 
 def _job_path(data_root: Path, content: str) -> Path:
@@ -971,9 +1111,13 @@ __all__ = [
     "PublicationFault",
     "build_panel_snapshot",
     "has_open_publication_jobs",
+    "load_pending_observation_bindings",
+    "pending_observation_binding_sha256",
     "persist_observation_schedule",
     "persist_panel_snapshot_binding",
+    "persist_pending_observation_binding",
     "publish_observation_batch",
     "rebuild_observation_panel_from_rdp",
     "repair_open_publication_jobs",
+    "satisfy_pending_observation_binding",
 ]

@@ -67,7 +67,14 @@ class CiWorkflowTests(unittest.TestCase):
             },
         )
         job = document["jobs"]["validate"]
-        self.assertEqual(job["timeout-minutes"], "15")
+        self.assertEqual(
+            job["timeout-minutes"],
+            str(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES),
+        )
+        self.assertEqual(
+            ci.DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
+            ci.GITHUB_VALIDATE_TIMEOUT_MINUTES * 60,
+        )
         self.assertEqual(job["concurrency"] if "concurrency" in job else None, None)
         self.assertEqual(document["concurrency"]["cancel-in-progress"], "true")
         self.assertEqual(
@@ -118,7 +125,10 @@ class CiWorkflowTests(unittest.TestCase):
                 "git config --local core.hooksPath .githooks\n",
                 "",
             ),
-            self.text.replace("timeout-minutes: 15\n", ""),
+            self.text.replace(
+                f"timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}\n",
+                "",
+            ),
             self.text.replace("cancel-in-progress: true", "cancel-in-progress: false"),
         )
         for mutation in mutations:
@@ -154,7 +164,10 @@ class TrackedOnlyDeliveryPreflightTests(unittest.TestCase):
         text = (ROOT / "delivery-harness/policies/solana-alpha-lab.md").read_text(encoding="utf-8")
         self.assertIn("## TRACKED_ONLY_DELIVERY_PREFLIGHT", text)
         self.assertIn(ci.DELIVERY_PREFLIGHT_COMMAND, text)
-        self.assertIn("wall-time cap is 15 minutes", text)
+        self.assertIn(
+            f"wall-time cap is {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES} minutes",
+            text,
+        )
         self.assertIn("copies no untracked or ignored inputs", text)
         self.assertIn("not an implementation-loop or per-atom hook", text)
 

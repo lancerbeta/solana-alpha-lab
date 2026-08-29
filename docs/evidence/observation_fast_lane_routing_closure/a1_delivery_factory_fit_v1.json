@@ -1,0 +1,34 @@
+{
+  "as_of": "2026-08-29",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "LIVE_OBSERVATION_SCHEDULE_COMMISSIONING_AFTER_ROUTING_CLOSURE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ONE_SHARED_TERMINAL_CONTRACT_NO_NEW_ENGINE",
+    "context_efficiency": "PASS_ONE_BOUNDED_ROUTING_AND_P0_ATOM",
+    "execution_to_cashflow": "PASS_NO_LIVE_AUTHORITY_NO_CASHFLOW",
+    "flexibility_and_history": "PASS_V11_FAST_LANE_TERMINALS_UNCHANGED",
+    "mission": "PASS_IN_ENVELOPE_V12_STAYS_NO_PR",
+    "monitoring_and_recovery": "PASS_TYPED_PENDING_DRAIN_AND_MATURATION",
+    "owner_operability": "PASS_EXACT_PHRASE_AUTHORITY_PACKET",
+    "red_team": "PASS_TRUSTED_CLOCK_NO_FALSE_COMPLETE_NO_FIXTURE_SHA",
+    "research_truth": "PASS_REGISTRATION_CLOCK_AND_SNAPSHOT_BIND",
+    "security": "PASS_NO_SECRETS_NO_NETWORK_NO_ABSOLUTE_DATA_ROOT"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_SCHEDULE_ACTIVATION",
+    "NO_SCIENTIFIC_OUTCOME_FROM_PREPARATION"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT_THIS_ATOM; OBSERVATION_COMPILER_AND_V11_FAST_LANE_UNCHANGED",
+  "review_id": "OBSERVATION-FAST-LANE-ROUTING-CLOSURE-FACTORY-FIT-002",
+  "reviewed_bindings_sha256": "3b82b9d189991d49a24b947ddf04b0b1466da7b5ab86497135453bd2495868fe",
+  "reviewed_inventory_sha256": "23d512ac27bfcc99e9dc593eaf089416c57199c8794de778e0fafc5a8f710048",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1",
+  "verdict": "PASS"
+}

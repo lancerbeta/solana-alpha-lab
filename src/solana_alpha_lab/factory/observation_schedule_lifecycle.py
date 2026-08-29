@@ -14,8 +14,10 @@ import jsonschema
 from solana_alpha_lab.factory.observation_panel_publisher import (
     build_panel_snapshot,
     has_open_publication_jobs,
+    load_pending_observation_bindings,
     persist_observation_schedule,
     persist_panel_snapshot_binding,
+    satisfy_pending_observation_binding,
 )
 from solana_alpha_lab.factory.observation_primitive_registry import (
     load_observation_primitive_registry,
@@ -37,6 +39,26 @@ from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, R
 AUTHORITY_SCHEMA_RELATIVE = "catalog/schemas/observation_schedule_authority_v1.schema.json"
 PRODUCER_CAPABILITY = "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001"
 APPROVED_CAPABILITY = "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001"
+OPS_STORE_FILENAME = "observation_schedule_state.sqlite"
+FIXTURE_PRODUCER_GIT_SHA = "c" * 40
+
+
+def observation_ops_store_path(data_root: Path) -> Path:
+    return Path(data_root) / OPS_STORE_FILENAME
+
+
+def require_production_producer_git_sha(producer_git_sha: str | None) -> str:
+    """Fail closed when a durable write has no explicit producer Git SHA.
+
+    An explicit 40-hex value is required. The implicit fixture fallback is
+    forbidden. Test-only callers may pass a fixture SHA themselves.
+    """
+
+    if not isinstance(producer_git_sha, str) or len(producer_git_sha) != 40:
+        raise ObservationLifecycleError("PRODUCER_GIT_SHA_REQUIRED")
+    if producer_git_sha == FIXTURE_PRODUCER_GIT_SHA:
+        raise ObservationLifecycleError("FIXTURE_PRODUCER_GIT_SHA_FORBIDDEN")
+    return producer_git_sha
 
 
 class ObservationLifecycleError(ValueError):
@@ -242,6 +264,362 @@ def register_schedule(
         "schedule_key": validated["schedule_key"],
         "next_action": compiled.next_action,
     }
+
+
+def build_authority_request(
+    *,
+    root: Path,
+    document: Mapping[str, Any],
+    predecessor_schedule_sha256: str | None = None,
+    successor_schedule_sha256: str | None = None,
+    cutover_at: str | None = None,
+) -> dict[str, Any]:
+    """Build the exact owner-authority envelope without authorizing."""
+
+    digest = str(document["schedule_sha256"])
+    _primitive_ids, routes = _used_provider_route_ids(root, document)
+    del _primitive_ids
+    minimum_expiry = _minimum_expiry(document)
+    expires = render_utc(minimum_expiry)
+    policy = _authority_policy(
+        root=root,
+        document=document,
+        schedule_key=str(document["schedule_key"]),
+        expires_at=expires,
+    )
+    policy_digest = canonical_sha256(policy)
+    phrase = expected_authority_phrase(
+        schedule_sha256=digest,
+        schedule_key=str(document["schedule_key"]),
+        activation_starts_at=str(document["activation"]["starts_at"]),
+        activation_stops_admitting_at=str(document["activation"]["stops_admitting_at"]),
+        provider_route_ids=routes,
+        expires_at=expires,
+        policy_digest=policy_digest,
+    )
+    request = {
+        "schedule_sha256": digest,
+        "schedule_key": str(document["schedule_key"]),
+        "activation_starts_at": document["activation"]["starts_at"],
+        "activation_stops_admitting_at": document["activation"]["stops_admitting_at"],
+        "provider_route_ids": routes,
+        "provider_calls_per_utc_day_max": int(
+            document["budgets"]["provider_calls_per_utc_day_max"]
+        ),
+        "provider_calls_lifetime_max": int(
+            document["budgets"]["provider_calls_lifetime_max"]
+        ),
+        "modeled_provider_credits_per_utc_day_max": int(
+            document["budgets"]["modeled_provider_credits_per_utc_day_max"]
+        ),
+        "minimum_expiry_at": expires,
+        "cash_usd_max": "0",
+        "retry": False,
+        "fallback": False,
+        "exact_owner_phrase": phrase,
+        "authority_status": "PROPOSED_NOT_AUTHORITY",
+        "policy_digest": policy_digest,
+    }
+    if predecessor_schedule_sha256:
+        request["predecessor_schedule_sha256"] = predecessor_schedule_sha256
+    if successor_schedule_sha256:
+        request["successor_schedule_sha256"] = successor_schedule_sha256
+    if cutover_at:
+        request["cutover_at"] = cutover_at
+    return request
+
+
+def prepare_schedule_authority(
+    *,
+    root: Path,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    document: Mapping[str, Any],
+    now: datetime,
+    producer_git_sha: str,
+    predecessor_schedule_sha256: str | None = None,
+) -> dict[str, Any]:
+    """Register the compiled schedule and return a PROPOSED_NOT_AUTHORITY packet."""
+
+    registered = register_schedule(
+        root=root,
+        data_root=data_root,
+        store=store,
+        document=document,
+        now=now,
+        producer_git_sha=producer_git_sha,
+    )
+    if registered.get("schedule_sha256") is None:
+        return {
+            "terminal": registered.get("terminal") or "BLOCKED_AUTHORITY",
+            "operational_registered": False,
+            "authority_receipt_exists": False,
+            "authority_status": "PROPOSED_NOT_AUTHORITY",
+            "provider_calls": 0,
+            "credential_reads": 0,
+            "authority_request": None,
+        }
+    canonical = store.get_registered_schedule(str(registered["schedule_sha256"]))
+    if canonical is None:
+        raise ObservationLifecycleError("SCHEDULE_NOT_PERSISTED")
+    successor = None
+    cutover = None
+    if predecessor_schedule_sha256:
+        successor = str(registered["schedule_sha256"])
+        cutover = str(canonical["document"]["activation"]["starts_at"])
+    request = build_authority_request(
+        root=root,
+        document=canonical["document"],
+        predecessor_schedule_sha256=predecessor_schedule_sha256,
+        successor_schedule_sha256=successor,
+        cutover_at=cutover,
+    )
+    request["activation_id"] = "ACT-" + str(registered["schedule_sha256"])[:16].upper()
+    if predecessor_schedule_sha256:
+        predecessor_activation_id = _unique_live_activation_id(
+            store, predecessor_schedule_sha256
+        )
+        if predecessor_activation_id is not None:
+            request["predecessor_activation_id"] = predecessor_activation_id
+    return {
+        "terminal": registered["terminal"],
+        "operational_registered": True,
+        "authority_receipt_exists": False,
+        "authority_status": "PROPOSED_NOT_AUTHORITY",
+        "schedule_sha256": registered["schedule_sha256"],
+        "schedule_key": registered["schedule_key"],
+        "provider_calls": 0,
+        "credential_reads": 0,
+        "authority_request": request,
+        "exact_owner_phrase": request["exact_owner_phrase"],
+    }
+
+
+def _unique_live_activation_id(
+    store: ObservationScheduleStore, schedule_sha256: str
+) -> str | None:
+    rows = [
+        row
+        for row in store.list_activations()
+        if str(row.get("schedule_sha256") or "") == schedule_sha256
+        and str(row.get("state") or "") in {"ACTIVE", "DRAINING"}
+    ]
+    if len(rows) != 1:
+        return None
+    activation_id = str(rows[0].get("activation_id") or "")
+    return activation_id or None
+
+
+def drain_expired_admission(
+    *,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    schedule_sha256: str,
+    activation_id: str,
+    now: datetime,
+    producer_git_sha: str,
+) -> dict[str, Any] | None:
+    """ACTIVE -> DRAINING when the authorized admission window has closed."""
+
+    existing = store.get_activation(schedule_sha256, activation_id)
+    if existing is None:
+        return None
+    if existing["state"] != "ACTIVE":
+        return {
+            "terminal": "NOT_ACTIVE",
+            "state": existing["state"],
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+        }
+    stops = parse_utc(str(existing["stops_admitting_at"]))
+    if now < stops:
+        return {
+            "terminal": "ADMISSION_OPEN",
+            "state": "ACTIVE",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+        }
+    rollover_before_cutover = any(
+        str(item["predecessor_schedule_sha256"]) == schedule_sha256
+        and str(item["predecessor_activation_id"]) == activation_id
+        and now < parse_utc(str(item["cutover_at"]))
+        for item in store.list_rollovers()
+    )
+    if rollover_before_cutover:
+        return {
+            "terminal": "ROLLOVER_CUTOVER_PENDING",
+            "state": "ACTIVE",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+        }
+    transition = store.transition_activation(
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        new_state="DRAINING",
+        authority_receipt_sha256=existing.get("authority_receipt_sha256"),
+        effective_at=render_utc(now),
+        payload={"admission_window_closed": True},
+        clock=now,
+    )
+    event = _research_event(
+        record_id=str(transition["event_id"]),
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
+        entity_id=schedule_sha256,
+        payload={
+            "state_event_id": transition["event_id"],
+            "activation_id": activation_id,
+            "state": "DRAINING",
+            "schedule_sha256": schedule_sha256,
+            "prior_state": transition["prior_state"],
+            "transition_sequence": transition["transition_sequence"],
+            "authority_receipt_sha256": existing.get("authority_receipt_sha256"),
+            "admission_window_closed": True,
+        },
+        now=now,
+        producer_git_sha=producer_git_sha,
+        run_id=activation_id,
+        transaction_id=f"RESEARCH-TXN-{transition['event_id'].upper()}",
+    )
+    _append_or_replay(data_root, event)
+    return {
+        "terminal": "DRAIN_REPLAY" if transition.get("replayed") else "DRAINED",
+        "state": "DRAINING",
+        "activation_id": activation_id,
+        "schedule_sha256": schedule_sha256,
+        "transition_event_id": transition["event_id"],
+    }
+
+
+def materialize_pending_observation_snapshots(
+    *,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    schedule_sha256: str,
+    activation_id: str,
+    now: datetime,
+    producer_git_sha: str,
+) -> list[dict[str, Any]]:
+    """Materialize the exact snapshot needed by named pending consumers."""
+
+    from solana_alpha_lab.factory.observation_panel_coverage import (
+        load_coverage_from_rdp,
+        pending_consumer_satisfiable,
+        required_point_ids,
+        snapshot_proves_required_points,
+    )
+
+    outcomes: list[dict[str, Any]] = []
+    coverage = load_coverage_from_rdp(data_root)
+    due_rows = store.due_in_states(
+        tuple(
+            {
+                "OBSERVED",
+                "MISSING_TYPED",
+                "DISAPPEARED",
+                "CENSORED",
+                "CENSORED_LATE",
+                "X_POPULATION_INELIGIBLE",
+                "DEPENDENCY_MISSING",
+                "PENDING",
+                "DUE",
+                "CLAIMED",
+                "IN_FLIGHT_CALL_INDETERMINATE",
+                "BLOCKED_BUDGET",
+            }
+        )
+    )
+    publication_complete = not has_open_publication_jobs(
+        data_root=data_root,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+    )
+    for pending in load_pending_observation_bindings(data_root):
+        if pending.get("state") != "WAITING_FOR_PANEL":
+            continue
+        covering = str(pending.get("covering_schedule_sha256") or "")
+        if covering != schedule_sha256:
+            continue
+        required = required_point_ids(pending)
+        proving_snapshot = None
+        for item in coverage.snapshots.values():
+            schedule = item.get("schedule")
+            if not isinstance(schedule, Mapping):
+                continue
+            digest = str(schedule.get("schedule_sha256") or "")
+            if digest != schedule_sha256:
+                continue
+            if snapshot_proves_required_points(
+                data_root=data_root,
+                snapshot=item,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+            ):
+                proving_snapshot = item
+                break
+        if proving_snapshot is None:
+            if not pending_consumer_satisfiable(
+                data_root=data_root,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+                snapshot=None,
+                publication_complete=publication_complete,
+            ):
+                continue
+            try:
+                snapshot = snapshot_schedule(
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=schedule_sha256,
+                    activation_id=activation_id,
+                    now=now,
+                    producer_git_sha=producer_git_sha,
+                    hypothesis_version_id=pending.get("hypothesis_version_id")
+                    if isinstance(pending.get("hypothesis_version_id"), str)
+                    else None,
+                )
+            except ObservationLifecycleError as exc:
+                if str(exc) == "SNAPSHOT_NO_PUBLISHED_PANEL":
+                    continue
+                raise
+            proving_snapshot = {
+                "snapshot_sha256": snapshot["snapshot_sha256"],
+                "dataset_manifest_ids": snapshot.get("dataset_manifest_ids") or [],
+                "schedule": {"schedule_sha256": schedule_sha256},
+            }
+            if not snapshot_proves_required_points(
+                data_root=data_root,
+                snapshot=proving_snapshot,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+            ):
+                continue
+        else:
+            if not pending_consumer_satisfiable(
+                data_root=data_root,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=due_rows,
+                snapshot=proving_snapshot,
+                publication_complete=publication_complete,
+            ):
+                continue
+            snapshot = {
+                "terminal": "SNAPSHOT_REPLAY",
+                "snapshot_sha256": proving_snapshot["snapshot_sha256"],
+            }
+        satisfied = satisfy_pending_observation_binding(
+            data_root=data_root,
+            pending_binding_sha256=str(pending["pending_binding_sha256"]),
+            snapshot_sha256=str(snapshot["snapshot_sha256"]),
+            now=now,
+            producer_git_sha=producer_git_sha,
+            run_id=activation_id,
+        )
+        outcomes.append({**snapshot, **satisfied})
+    return outcomes
 
 
 def authorize_schedule(
@@ -928,18 +1306,21 @@ def rollover_schedule(
         authority_receipt_sha256=successor_receipt["receipt_sha256"],
         clock=now,
     )
-    predecessor_transition = store.transition_activation(
-        schedule_sha256=predecessor_schedule_sha256,
-        activation_id=predecessor_activation_id,
-        new_state="DRAINING",
-        authority_receipt_sha256=predecessor.get("authority_receipt_sha256"),
-        effective_at=cutover_text,
-        payload={
-            "cutover_at": cutover_text,
-            "successor_schedule_sha256": successor_schedule_sha256,
-        },
-        clock=now,
-    )
+    predecessor_already_draining = predecessor["state"] == "DRAINING"
+    predecessor_transition = None
+    if not predecessor_already_draining:
+        predecessor_transition = store.transition_activation(
+            schedule_sha256=predecessor_schedule_sha256,
+            activation_id=predecessor_activation_id,
+            new_state="DRAINING",
+            authority_receipt_sha256=predecessor.get("authority_receipt_sha256"),
+            effective_at=cutover_text,
+            payload={
+                "cutover_at": cutover_text,
+                "successor_schedule_sha256": successor_schedule_sha256,
+            },
+            clock=now,
+        )
     successor_transition = store.transition_activation(
         schedule_sha256=successor_schedule_sha256,
         activation_id=successor_activation_id,
@@ -955,10 +1336,14 @@ def rollover_schedule(
         },
         clock=now,
     )
-    for transition, digest in (
-        (predecessor_transition, predecessor_schedule_sha256),
+    transitions_to_write: list[tuple[dict[str, Any], str]] = [
         (successor_transition, successor_schedule_sha256),
-    ):
+    ]
+    if predecessor_transition is not None:
+        transitions_to_write.insert(
+            0, (predecessor_transition, predecessor_schedule_sha256)
+        )
+    for transition, digest in transitions_to_write:
         event = _research_event(
             record_id=str(transition["event_id"]),
             record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
@@ -984,7 +1369,16 @@ def rollover_schedule(
         _append_or_replay(data_root, event)
     return {
         "terminal": "ROLLOVER_REPLAY"
-        if predecessor_transition.get("replayed") and successor_transition.get("replayed")
+        if (
+            successor_transition.get("replayed")
+            and (
+                predecessor_already_draining
+                or (
+                    predecessor_transition is not None
+                    and predecessor_transition.get("replayed")
+                )
+            )
+        )
         else "ROLLOVER_COMMITTED",
         "rollover_id": rollover_id,
         "cutover_at": render_utc(cutover),
@@ -1097,8 +1491,15 @@ __all__ = [
     "ObservationLifecycleError",
     "activate_schedule",
     "authorize_schedule",
+    "build_authority_request",
+    "drain_expired_admission",
+    "expected_authority_phrase",
+    "materialize_pending_observation_snapshots",
+    "observation_ops_store_path",
     "pause_schedule",
+    "prepare_schedule_authority",
     "register_schedule",
+    "require_production_producer_git_sha",
     "rollover_schedule",
     "resume_schedule",
     "snapshot_schedule",
