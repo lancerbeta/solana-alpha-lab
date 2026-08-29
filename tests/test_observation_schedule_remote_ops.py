@@ -181,13 +181,13 @@ class ObservationScheduleRemoteOpsTests(unittest.TestCase):
             root.mkdir()
             source = root / "source.sqlite"
             source.write_bytes(b"not-a-live-store")
-            link = root / "link.sqlite"
-            try:
-                os.symlink(source, link)
-            except (OSError, NotImplementedError):
-                self.skipTest("symlink creation is unavailable")
-            with self.assertRaisesRegex(RemoteOpsError, "REMOTE_PATH_UNSAFE"):
-                _safe_relative(root, "link.sqlite")
+
+            def fake_is_symlink(self: Path) -> bool:
+                return self.name == "source.sqlite"
+
+            with patch.object(Path, "is_symlink", fake_is_symlink):
+                with self.assertRaisesRegex(RemoteOpsError, "REMOTE_PATH_UNSAFE"):
+                    _safe_relative(root, "source.sqlite")
 
     def test_backup_package_dispatches_v1_1_for_legacy_entrypoint(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
