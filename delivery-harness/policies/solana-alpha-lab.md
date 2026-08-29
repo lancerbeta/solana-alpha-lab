@@ -151,7 +151,7 @@ base-bound focused-plus-exact-PR-CI route is ineligible:
 `uv run --locked --managed-python python -B scripts/validate_ci.py --tracked-only-delivery`
 
 It copies no untracked or ignored inputs and runs once on a clean exact commit
-in an isolated checkout. Its wall-time cap is 15 minutes. After bootstrap it is
+in an isolated checkout. Its wall-time cap is 25 minutes. After bootstrap it is
 not an implementation-loop or per-atom hook and is not a routine pre-PR gate.
 New tests cannot skip missing local/raw evidence in place of a
 tracked fixture or exact non-critical proof.

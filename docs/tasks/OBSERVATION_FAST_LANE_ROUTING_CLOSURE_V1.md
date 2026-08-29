@@ -43,6 +43,10 @@ managed_write_set:
 - catalog/catalog_manifest.yaml
 - catalog/generated/asset_edges.json
 - docs/PROJECT_MAP.md
+- .github/workflows/ci.yml
+- scripts/validate_ci.py
+- tests/test_ci.py
+- delivery-harness/policies/solana-alpha-lab.md
 external_caps:
   network: false
   credentials: false

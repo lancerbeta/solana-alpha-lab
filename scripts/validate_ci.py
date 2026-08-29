@@ -33,7 +33,13 @@ DELIVERY_PREFLIGHT_COMMAND = (
 DELIVERY_PREFLIGHT_SCHEMA = (
     "solana-alpha-lab.tracked-only-delivery-preflight.v1"
 )
-DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = 900
+# Temporary 25m wall-time: GitHub job timeout includes the full suite, and
+# 15m cancelled PR #213 validate at 15m15s while tests were still running.
+# The same workflow covers pull_request and post-merge push to main.
+# Local tracked-only merge fallback must match, because .github/ changes are
+# CI-owned ineligible and use this timeout instead of the 120s focused gate.
+GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
+DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = GITHUB_VALIDATE_TIMEOUT_MINUTES * 60
 DELIVERY_PREFLIGHT_RECEIPT_DIR = ROOT / "local/delivery_preflight"
 CI_OWNED_DELIVERY_COMMAND = VALIDATION_COMMAND + " --ci-owned-delivery"
 CI_OWNED_DELIVERY_SCHEMA = "solana-alpha-lab.ci-owned-delivery-preflight.v1"
@@ -554,7 +560,7 @@ def expected_workflow() -> dict[str, Any]:
         "jobs": {
             "validate": {
                 "runs-on": "ubuntu-24.04",
-                "timeout-minutes": "15",
+                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
                 "env": {
                     "UV_NO_ENV_FILE": "1",
                     "PYTHONDONTWRITEBYTECODE": "1",
