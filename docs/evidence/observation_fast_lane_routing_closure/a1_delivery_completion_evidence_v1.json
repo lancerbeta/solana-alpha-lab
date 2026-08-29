@@ -12,12 +12,13 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".github/workflows/ci.yml": "48fe2fe9572132917b0f8719310a095f8ea0fbf7b1c0d5c6b79f2abaa1de8620",
-    "catalog/assets/core.yaml": "79cef05492f4d62e04beb4dc47142351b4f7a4fe9ae95313eb19773bf8658fcd",
+    "catalog/assets/core.yaml": "865e557d2ad91b05fd97545666b7d5df50b31afa7ae4316d72716374a7957272",
+    "delivery-harness/harness.yaml": "317a2475d813fadf86b8f8a54608beb9d354d0dbc46095e1088c765cf230d024",
     "delivery-harness/policies/solana-alpha-lab.md": "176972b1ce358b9a055ec28da020d3ba312e422a16e1afd60d1d033692de08e8",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "73307ee8868de1b4472fd37a7a64ae863ed2598a1b97b5b5123dcfd7c1b0b323",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "aa2154232e0e841c4b25455f10171642b9e2c5e48f912cbd74c8b1ac4e6bcd0a",
     "docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json": "6cb39710e3548778ef886c7ac37e8387fc8fbc500544e78b2f9e795610abfad4",
     "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "f74adbf85092437ef1d430e2316601cde7186a7d1d9f38afb61cf14ea23e9bff",
-    "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "8db8109b16dabdfdc0785d743bef46e0eee6ac47a50c53b289f31bc2e9567f2b",
+    "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "9034af9fd11e03b05b33f6f124e1c8bf23d338dc66422f896c5620c11cbdd02d",
     "scripts/hypothesis_fast_lane.py": "af36517947f92c3b5d87f56d9804859f7db0c5729783db25432aaef7e43db6d6",
     "scripts/validate_ci.py": "4283d7c5bf1501be480d9aa5286f079d4cc775ed4b8b28f10d5897a8b662764b",
     "src/solana_alpha_lab/factory/document_runner.py": "d85d43a589a752d5b34e221ce010d5a576efe80fa08305f755ee2bd6406cfb7e",
@@ -31,6 +32,7 @@
     "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "d86262aed0cea36521c24b1b8b04d7c9dd7e008d2cf01e94417997017c433cf3",
     "src/solana_alpha_lab/factory/observation_scheduler.py": "b3de038b6705ffd845a7caaf727f72088b17b5bf173db23e7a79f61993e5c426",
     "tests/test_ci.py": "7bd5116bf61fae666f4f25801a404f388037e72beda05bfdb26ead248e3cd9bf",
+    "tests/test_delivery_harness_merge_guard.py": "5b7f01c4e7151dc49936888db46644ba17ba02dfaa1499f6f8ff4be7bf6dbd8e",
     "tests/test_observation_fast_lane_p0_addendum.py": "e10def66a9e89d88dab8fc41670286218bd0ef93e16729c718fdadcd4e0c3da7",
     "tests/test_observation_fast_lane_routing_closure.py": "486517c9a22d1eaf318331a4f513e107481e49cefd6e4ea8b56a014f848f9c03"
   },
@@ -44,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "2b6fa5e9668c5a9e4c2b5c316d1aa2fa7a748a5b86827f83b5d24ec2cf92e753",
+    "sha256": "ea2278a1a882811da8aa9afe25262a7e9c192098f0258f826418fb58763fa1d0",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_FAST_LANE_ROUTING_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "7df55e067330d93d50eed7887bb4cc19a390eb52c34136f37120786fa74a8a11",
+      "sha256": "2e160cffe0a4a7d542c473c7b6ec651fa4f7d53555f6447aad4dc2e80094c768",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
