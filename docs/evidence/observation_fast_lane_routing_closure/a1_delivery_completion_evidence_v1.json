@@ -11,20 +11,20 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "1e899ff7cbe82fc4eade864486cc8ee753af66d323b46d9d21e541733245ba43",
+    "catalog/assets/core.yaml": "6c235880069086a7c135a1943d290fbf02d1d04d66f9ffc81acd98ebdb5e1f43",
     "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "ed41e70a460c897c4313a38b80b97751cee971b3344876291dc70a949f788faf",
-    "scripts/hypothesis_fast_lane.py": "1364c78e4a26edec420f244a415f07660f1ebcc2e330c1161c3e29d037a37de6",
-    "src/solana_alpha_lab/factory/document_runner.py": "25a3948c290c86e66d1a4d87e7aefeee1cf48c88ebfbbf1d509a66cb273a0c54",
+    "scripts/hypothesis_fast_lane.py": "af36517947f92c3b5d87f56d9804859f7db0c5729783db25432aaef7e43db6d6",
+    "src/solana_alpha_lab/factory/document_runner.py": "d85d43a589a752d5b34e221ce010d5a576efe80fa08305f755ee2bd6406cfb7e",
     "src/solana_alpha_lab/factory/hfic_session.py": "419b593730212c22fbdf8178b50e54dbc4c8cc6e3f0d850c1e50a0ec68be7398",
     "src/solana_alpha_lab/factory/lane_classifier.py": "2bb6e94b59c4301d938a8bc17154534eb70e0892116416e8f26039326266cf23",
     "src/solana_alpha_lab/factory/observation_fast_lane_terminals.py": "bb9fb0f12248f51e33873afae0c56206f887727188f8dcf04c1d2215ab31c265",
-    "src/solana_alpha_lab/factory/observation_panel_coverage.py": "4c46cc719346527cdfa8775864b685d0bf8ef9eecd92aed51ad31ce06764a299",
+    "src/solana_alpha_lab/factory/observation_panel_coverage.py": "950b341b0fa2b023ebcf456ba9427e4fd00d730e0d98f6a56206a2d9b47d5515",
     "src/solana_alpha_lab/factory/observation_panel_publisher.py": "cd454522ad9a71d857e9434016fc1b53400261fdb90fab2a0bd7710e42e98fca",
-    "src/solana_alpha_lab/factory/observation_schedule_capability.py": "72bff194db6b6a7a47a8a4b2978bd38361ec1087c3b41a629914b17ae91b219b",
-    "src/solana_alpha_lab/factory/observation_schedule_compiler.py": "7ff897e7ff1ff9bbe89da81a16c74769067f37fa71f4eb2b0375918f3a7a37d6",
-    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "23736c5d5b99998b1e3b7873c02ba96ae08e9a1bba586a7dff6a15d0c200144e",
+    "src/solana_alpha_lab/factory/observation_schedule_capability.py": "8a3700abdc79ce1a46f73cc7db640d9d173c03d299edc91ce836d7aaa369255d",
+    "src/solana_alpha_lab/factory/observation_schedule_compiler.py": "a6c8c057e772188cc9faefde598eab76431090f2829e531e5220e19d9826cda9",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "d86262aed0cea36521c24b1b8b04d7c9dd7e008d2cf01e94417997017c433cf3",
     "src/solana_alpha_lab/factory/observation_scheduler.py": "b3de038b6705ffd845a7caaf727f72088b17b5bf173db23e7a79f61993e5c426",
-    "tests/test_observation_fast_lane_p0_addendum.py": "1199707161de8f60e1ec70d1cdc451d7cb99617c889197b1a7a68ee3b56b1886",
+    "tests/test_observation_fast_lane_p0_addendum.py": "e10def66a9e89d88dab8fc41670286218bd0ef93e16729c718fdadcd4e0c3da7",
     "tests/test_observation_fast_lane_routing_closure.py": "486517c9a22d1eaf318331a4f513e107481e49cefd6e4ea8b56a014f848f9c03"
   },
   "active_stop_conditions": [],
@@ -37,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "1ed567ba2555d04f6b12ac04af1c25759fc57868073e4cfcb3943e31333dfba9",
+    "sha256": "8e5e3ef5805d01cf538ddcc5ced7b03fdda2063534d0b8a8110f90b98a72afb7",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_FAST_LANE_ROUTING_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "5f759fbb431f7308f28d67ebdb1a51b77272454db352202ff73d40450a9849db",
+      "sha256": "5a7eb9376e449dc9fd2c1f4be9c9cef46f58c7d67fafc972cf13bddcd0b97845",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
