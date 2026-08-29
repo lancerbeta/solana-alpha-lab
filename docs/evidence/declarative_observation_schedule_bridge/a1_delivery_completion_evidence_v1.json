@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/declarative_observation_schedule_bridge/a1_delivery_factory_fit_v1.json",
-    "sha256": "0782a6ac6252551ab6acd163dcbc820671c1687071039b9786f871e5825f9bd0",
+    "sha256": "d8f3bbfbeae5ba85e020b9ef86767c7f4c54c7e886e0408ad2cd69302e25f482",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -71,7 +71,7 @@
     "tests/test_observation_schedule_compiler.py": "52d6cb187eec0e27f80e2d943cdd897b2ef65b539c571f266cfd50d740a801f2",
     "tests/test_observation_schedule_lifecycle.py": "82b5f718ff5a60e851a79b6bd22c8c5cdac94768cb6d08244fcadc190e561ed1",
     "tests/test_observation_schedule_rdp.py": "3aa9049496685457727b626967b37f5d2d32a75db9cde0b28b6c84f1b4484572",
-    "tests/test_observation_schedule_remote_ops.py": "258f5e02a6a41ddb4ea290e45ecdef2de12e352c305632cb214e55a91e302b58",
+    "tests/test_observation_schedule_remote_ops.py": "7cd61de1f01be5c4e5560b9ddeb8d9d6b2e8c2f9fdf539f978301a76ff78b8d9",
     "tests/test_observation_schedule_schemas.py": "ecc81d2aebc8b463d058937294943a212141cf69042b381400022532c21321f7",
     "tests/test_observation_schedule_store.py": "f6bfca4f909a150c131dad5a321264e30a29e986d8494c7ba9c19d2c80d3cef4",
     "tests/test_observation_scheduler.py": "cdd292f504030944614f82d2989d6adf3db06b1dde3823fb1a86ec720b82cf39"
@@ -112,7 +112,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/declarative_observation_schedule_bridge/a1_delivery_independent_review_v1.json",
-      "sha256": "1e34c85f546f45057a768b91df97568c4be7fb4667a15e209510ac102cea6875",
+      "sha256": "46a706f3c27f97b414de1482f06680a2bfcc603e85f6f0d516ada3a124b87a2c",
       "verdict": "PASS"
     },
     "project_checks": [
