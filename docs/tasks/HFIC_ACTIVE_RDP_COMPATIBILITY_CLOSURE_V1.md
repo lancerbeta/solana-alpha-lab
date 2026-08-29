@@ -56,7 +56,8 @@ context_requirements:
   catalog_asset_ids:
   - CTRL-HFIC-ACTIVE-RDP-COMPATIBILITY-CLOSURE-001
   - TEST-HFIC-COMMISSIONING-COMPATIBILITY-001
-  l2_roles: []
+  l2_roles:
+  - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:

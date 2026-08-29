@@ -32396,7 +32396,7 @@ records:
   as_of: '2026-08-29'
   truth_owner: HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1.md', repository_path: docs/tasks/HFIC_ACTIVE_RDP_COMPATIBILITY_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: 4bf8fc489ae3ffcab55ca1380862b58d610dcd8540b62f732841ca4f20eeb9a3}
+  integrity: {kind: sha256, sha256: 44b1b4e30ab10f411a420cf625895d058f2434dc8be053bc03f3b0e3e1e8a01e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
