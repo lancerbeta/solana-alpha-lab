@@ -12,8 +12,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "HFIC-CRITIC-SESSION-IDENTITY-TRANSPORT-REVIEW-001",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "acbc3749c87c55e254eb0e5a7a8b1212961173f064c59b94ce1b4bf00e38b9d2",
+  "reviewed_inventory_sha256": "4baca330e26df1f7f273b4fc2eced74ef3eefd45c726206a0af8841c6c9d8f0d",
   "reviews": [
     {
       "findings": [
