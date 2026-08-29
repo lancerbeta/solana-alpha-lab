@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-END-TO-END-SMOKE-REPAIR-LOOP-COMPLETION-001",
+  "as_of": "2026-08-29",
+  "task_id": "HFIC_END_TO_END_SMOKE_REPAIR_LOOP_V1",
+  "state_change": "HFIC_END_TO_END_SMOKE_REPAIR_LOOP_CANDIDATE",
+  "base_main": "b0146d6e7a766e7d753b2d09a88e6c8067badd62",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "fbc82756144bcfc830e6e8e06a97502372c0739e148183a43cda6ecda0ade7e8",
+    "docs/tasks/HFIC_END_TO_END_SMOKE_REPAIR_LOOP_V1.md": "e9f2b01b46c48a084b747a8f2f918c26e7a93b250675e30ec76348b64ca3ec0a",
+    "scripts/hypothesis_forge.py": "13e3de0160d48404cb94869e7ce727b13ef9fc4286ea564981a83cd6d5054a62",
+    "tests/test_hfic_cli.py": "1f5de4b971c63dd2afe697870abcbe1271bcfe9cfd709be65ae005b096f3d8c1"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_end_to_end_smoke_repair_loop/a1_delivery_factory_fit_v1.json",
+    "sha256": "95c1d99d9ca3bc4477ffe06ef966faffd8c8d37decea79f53611efe8c941fdca",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_END_TO_END_SMOKE_REPAIR_LOOP",
+    "independent_review": {
+      "path": "docs/evidence/hfic_end_to_end_smoke_repair_loop/a1_delivery_independent_review_v1.json",
+      "sha256": "2562ef3347d18874002553735dc27f8f8682b49c8f4a315e64723d580677744f",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_LIVE_SCHEDULE_ACTIVATION",
+    "NO_SCIENTIFIC_OUTCOME_FROM_PREPARATION"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

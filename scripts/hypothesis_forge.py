@@ -84,7 +84,17 @@ from solana_alpha_lab.factory.research_store import (  # noqa: E402
 
 
 MAX_JSON_BYTES = 262144
-_DRIVE_RE = re.compile(r"[A-Za-z]:\\")
+_WINDOWS_PHYSICAL_PATH_RE = re.compile(
+    r"""
+    (?:
+        (?<![A-Za-z0-9+.-])[A-Za-z]:(?:(?!//)[\\/]|[^\s\\/:]+\\)
+        | (?<!:)//[^/\\\s]+[\\/][^\\\s]+
+        | \\\\[^\\/]+[\\/][^\\/]+
+        | (?<!\\)\\[^\\/\s]+\\[^\\/\s]+
+    )
+    """,
+    re.VERBOSE,
+)
 
 
 class HficCliError(Exception):
@@ -105,12 +115,28 @@ def emit_error(code: str, *, exit_code: int = 1) -> int:
 
 
 def _assert_no_path_leak(payload: dict[str, Any], *forbidden: str) -> None:
-    rendered = json.dumps(payload, ensure_ascii=False)
-    if _DRIVE_RE.search(rendered) or "SMIAL_DATA_ROOT" in rendered:
-        raise HficCliError("PHYSICAL_PATH_LEAK")
-    for item in forbidden:
-        if item and item in rendered:
+    needles = ("SMIAL_DATA_ROOT", *(item for item in forbidden if item))
+
+    def assert_safe_text(value: str) -> None:
+        if _WINDOWS_PHYSICAL_PATH_RE.search(value) or any(
+            needle in value for needle in needles
+        ):
             raise HficCliError("PHYSICAL_PATH_LEAK")
+
+    def walk(value: Any) -> None:
+        if isinstance(value, str):
+            assert_safe_text(value)
+            return
+        if isinstance(value, dict):
+            for key, child in value.items():
+                assert_safe_text(str(key))
+                walk(child)
+            return
+        if isinstance(value, (list, tuple)):
+            for child in value:
+                walk(child)
+
+    walk(payload)
 
 
 def _load_json_file(path: Path) -> dict[str, Any]:
@@ -176,6 +202,7 @@ def cmd_preflight(
     auto_commission: bool,
     explicit_data_root: Path | None,
 ) -> int:
+    _assert_no_path_leak({"owner_focus": owner_focus}, str(repo_root))
     try:
         active = _active_root(repo_root, explicit_data_root)
         data_root = active.root
@@ -233,12 +260,15 @@ def cmd_freeze(
 ) -> int:
     git_before = repository_git_snapshot(repo_root)
     draft = _load_json_file(draft_path)
+    _assert_no_path_leak(draft, str(repo_root))
     if preflight_path is None:
         raise HficCliError("PREFLIGHT_RECEIPT_REQUIRED")
     receipt = _load_json_file(preflight_path)
+    _assert_no_path_leak(receipt, str(repo_root))
     next_action_draft = None
     if next_action_path is not None:
         next_action_draft = _load_json_file(next_action_path)
+        _assert_no_path_leak(next_action_draft, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
     frozen = freeze_draft(
@@ -291,6 +321,7 @@ def cmd_finalize(
 
     git_before = repository_git_snapshot(repo_root)
     critic_result = _load_json_file(critic_path)
+    _assert_no_path_leak(critic_result, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
     frozen = load_session_bundle(store, session_id)
@@ -320,6 +351,7 @@ def cmd_revise(
 
     git_before = repository_git_snapshot(repo_root)
     draft = _load_json_file(draft_path)
+    _assert_no_path_leak(draft, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
     frozen = load_session_bundle(store, session_id)
@@ -348,6 +380,7 @@ def cmd_classify(
 
     git_before = repository_git_snapshot(repo_root)
     packet = _load_json_file(spec_path)
+    _assert_no_path_leak(packet, str(repo_root))
     data_root = _store_root(repo_root, explicit_data_root)
     store = ResearchStore(data_root)
     frozen = load_session_bundle(store, session_id)
@@ -512,19 +545,21 @@ def cmd_backfill(
     explicit_data_root: Path | None,
 ) -> int:
     packet = _load_json_file(packet_path)
-    store = None
-    if persist:
-        data_root = _store_root(repo_root, explicit_data_root)
-        store = ResearchStore(data_root)
-        result = backfill_legacy(
-            packet,
-            persist=True,
-            store=store,
-            repo_root=repo_root,
-        )
-        _assert_no_path_leak(result, str(data_root), str(repo_root))
-        return emit(result)
-    result = backfill_legacy(packet, persist=False)
+    _assert_no_path_leak(packet, str(repo_root))
+    preview = backfill_legacy(packet, persist=False)
+    _assert_no_path_leak(preview, str(repo_root))
+    if not persist:
+        return emit(preview)
+
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root)
+    result = backfill_legacy(
+        packet,
+        persist=True,
+        store=store,
+        repo_root=repo_root,
+    )
+    _assert_no_path_leak(result, str(data_root), str(repo_root))
     return emit(result)
 
 

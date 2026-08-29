@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-END-TO-END-SMOKE-REPAIR-LOOP-REVIEW-001",
+  "as_of": "2026-08-29",
+  "task_id": "HFIC_END_TO_END_SMOKE_REPAIR_LOOP_V1",
+  "reviewed_bindings_sha256": "c921543e8bc7ac04080489b20f0f6a863c89b04b1deb9dfb4f6f4f633896dbf0",
+  "reviewed_inventory_sha256": "4cee156291dfe2a32982232dde02dd6e31e13cdbab5841f28dbe5178d24c7433",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_RAW_STRING_WALK_NOT_JSON_DUMP",
+        "CHECKED_MULTILINE_FOCUS_COLON_NEWLINE",
+        "CHECKED_WINDOWS_DRIVE_SLASH_UNC_DEVICE",
+        "CHECKED_INGRESS_BEFORE_RDP_OPEN",
+        "CHECKED_URI_SCHEME_NOT_DRIVE_PATH",
+        "CHECKED_LETTER_TOKEN_SLASH_NOT_LEAK"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_PRE_MKDIR_LEAK_GUARD",
+        "CHECKED_MIXED_UNC_HOST_SHARE",
+        "CHECKED_CATALOG_SCRIPT_SHA_BOUND",
+        "CHECKED_IDENTITY_AND_ESTIMAND_UNCHANGED"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_CHEAPEST_FALSIFIER_IN_CLI_TESTS",
+        "CHECKED_BOUNDED_PATH_PRIVACY_ATOM",
+        "CHECKED_NO_EXTERNAL_AUTHORITY_WIDENING",
+        "CHECKED_STOP_BEFORE_MERGE"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_WALLET_SIGNER_TX"
+  ]
+}

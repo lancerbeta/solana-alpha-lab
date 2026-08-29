@@ -32256,7 +32256,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 0e70acf6b4ac219c1ca1dc096e5cdf669baff131ec297d60ecda2f1b860fb441}
+  integrity: {kind: sha256, sha256: 13e3de0160d48404cb94869e7ce727b13ef9fc4286ea564981a83cd6d5054a62}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
