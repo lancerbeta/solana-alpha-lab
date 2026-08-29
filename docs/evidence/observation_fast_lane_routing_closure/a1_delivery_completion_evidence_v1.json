@@ -11,7 +11,22 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "06d82a9febfb7d9e2cdd70884731ca2b0582c4f528dc668cd0a63bd0f46f9604",
+    "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "ed41e70a460c897c4313a38b80b97751cee971b3344876291dc70a949f788faf",
+    "scripts/hypothesis_fast_lane.py": "1364c78e4a26edec420f244a415f07660f1ebcc2e330c1161c3e29d037a37de6",
+    "src/solana_alpha_lab/factory/capabilities.py": "6487815fa9d54cf810d488269aee2db04400fb61cfcbaddb05e92d471111f105",
+    "src/solana_alpha_lab/factory/document_runner.py": "99952cf83e30a9969cb7c05c92895515228ee4e06b6edfa50bb49b311418f77a",
+    "src/solana_alpha_lab/factory/hfic_session.py": "419b593730212c22fbdf8178b50e54dbc4c8cc6e3f0d850c1e50a0ec68be7398",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "2bb6e94b59c4301d938a8bc17154534eb70e0892116416e8f26039326266cf23",
+    "src/solana_alpha_lab/factory/observation_fast_lane_terminals.py": "bb9fb0f12248f51e33873afae0c56206f887727188f8dcf04c1d2215ab31c265",
+    "src/solana_alpha_lab/factory/observation_panel_coverage.py": "4c46cc719346527cdfa8775864b685d0bf8ef9eecd92aed51ad31ce06764a299",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "cd454522ad9a71d857e9434016fc1b53400261fdb90fab2a0bd7710e42e98fca",
+    "src/solana_alpha_lab/factory/observation_schedule_capability.py": "e504b465f2bf26d835d5182ac4246b3adf131e4875848e304f682b8748df665b",
+    "src/solana_alpha_lab/factory/observation_schedule_compiler.py": "480c08c8016a0d5b6b53a8fc213991515abf1cf4361ec50d434dfdaff8d0392a",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "23736c5d5b99998b1e3b7873c02ba96ae08e9a1bba586a7dff6a15d0c200144e",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "b3de038b6705ffd845a7caaf727f72088b17b5bf173db23e7a79f61993e5c426",
+    "tests/test_observation_fast_lane_p0_addendum.py": "7b4cfbcd9b170b51c5bab095e7030c16b32ccdad4cf035c5368455103817364b",
+    "tests/test_observation_fast_lane_routing_closure.py": "486517c9a22d1eaf318331a4f513e107481e49cefd6e4ea8b56a014f848f9c03"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "5b7c7f94f97d2fe7f0ca93926e076f2bd5e78c80bad7287f7c65451cf7af3397",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_FAST_LANE_ROUTING_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "2ce8db6b3415ff3240a63487cc158a9cc0719f4c526b4fdba26ee6cb37925c5c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
