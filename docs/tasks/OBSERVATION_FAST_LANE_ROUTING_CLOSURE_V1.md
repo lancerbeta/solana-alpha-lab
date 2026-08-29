@@ -47,6 +47,9 @@ managed_write_set:
 - scripts/validate_ci.py
 - tests/test_ci.py
 - delivery-harness/policies/solana-alpha-lab.md
+- docs/evidence/control/delivery_harness_acceptance_v1.json
+- docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
+- docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json
 external_caps:
   network: false
   credentials: false

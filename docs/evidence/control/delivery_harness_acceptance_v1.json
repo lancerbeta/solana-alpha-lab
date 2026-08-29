@@ -40,7 +40,7 @@
     "delivery-harness/capability-radar.yaml": "6f68bfa257f5e227a96552f785c8f9eede7126c9e1f84eb2a5ed4bdf64d0d0e8",
     "delivery-harness/context-map.yaml": "9bfd7b35b4e5836f64e918eff5b8495ebb1f5e515e19841f35b44c55b44fe949",
     "delivery-harness/harness.yaml": "80401bfbb49dc6197dbdbcd62eba02d69f0629a49c6b7af27a2abe1846c039b1",
-    "delivery-harness/policies/solana-alpha-lab.md": "61e5dfaa50b3f6cbe99c430c794257aafd9ec33a183b973fa9091cc8c5379d4e",
+    "delivery-harness/policies/solana-alpha-lab.md": "176972b1ce358b9a055ec28da020d3ba312e422a16e1afd60d1d033692de08e8",
     "delivery-harness/project-profile.yaml": "311c76061dcf41e29ac5942b9fc421076f22e10300dc9cbf976c16ecc564af02",
     "delivery-harness/templates/bootstrap-prompt.md": "0af2660e84b4f37d917832db88e5a03069fc85c3a331bc9476e24eddee171aef",
     "delivery-harness/templates/portable-bundle-manifest.json": "aeb5d6ee2098c953bf902e884c931e66fdbeba532c7b6a3f0206bc44d1db031b",
