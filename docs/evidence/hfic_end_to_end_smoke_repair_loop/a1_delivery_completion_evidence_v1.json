@@ -11,7 +11,10 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/HFIC_END_TO_END_SMOKE_REPAIR_LOOP_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "fbc82756144bcfc830e6e8e06a97502372c0739e148183a43cda6ecda0ade7e8",
+    "docs/tasks/HFIC_END_TO_END_SMOKE_REPAIR_LOOP_V1.md": "e9f2b01b46c48a084b747a8f2f918c26e7a93b250675e30ec76348b64ca3ec0a",
+    "scripts/hypothesis_forge.py": "13e3de0160d48404cb94869e7ce727b13ef9fc4286ea564981a83cd6d5054a62",
+    "tests/test_hfic_cli.py": "1f5de4b971c63dd2afe697870abcbe1271bcfe9cfd709be65ae005b096f3d8c1"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +26,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_end_to_end_smoke_repair_loop/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "95c1d99d9ca3bc4477ffe06ef966faffd8c8d37decea79f53611efe8c941fdca",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_END_TO_END_SMOKE_REPAIR_LOOP",
     "independent_review": {
       "path": "docs/evidence/hfic_end_to_end_smoke_repair_loop/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "2562ef3347d18874002553735dc27f8f8682b49c8f4a315e64723d580677744f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

@@ -6,8 +6,8 @@
   "task_id": "HFIC_END_TO_END_SMOKE_REPAIR_LOOP_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "c921543e8bc7ac04080489b20f0f6a863c89b04b1deb9dfb4f6f4f633896dbf0",
+  "reviewed_inventory_sha256": "4cee156291dfe2a32982232dde02dd6e31e13cdbab5841f28dbe5178d24c7433",
   "dimensions": {
     "mission": "PASS",
     "flexibility_and_history": "PASS",
