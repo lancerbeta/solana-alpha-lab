@@ -554,7 +554,7 @@ def expected_workflow() -> dict[str, Any]:
         "jobs": {
             "validate": {
                 "runs-on": "ubuntu-24.04",
-                "timeout-minutes": "25",
+                "timeout-minutes": "15",
                 "env": {
                     "UV_NO_ENV_FILE": "1",
                     "PYTHONDONTWRITEBYTECODE": "1",
