@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OBSERVATION-FAST-LANE-ROUTING-CLOSURE-COMPLETION-002",
+  "as_of": "2026-08-29",
+  "task_id": "OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1",
+  "state_change": "OBSERVATION_FAST_LANE_ROUTING_CLOSURE_CANDIDATE",
+  "base_main": "0e733c5a4434f936d51b27f3bdc49735c78be3a5",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OBSERVATION_FAST_LANE_ROUTING_CLOSURE",
+    "independent_review": {
+      "path": "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_LIVE_SCHEDULE_ACTIVATION",
+    "NO_SCIENTIFIC_OUTCOME_FROM_PREPARATION"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}
