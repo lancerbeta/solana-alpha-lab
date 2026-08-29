@@ -18,6 +18,48 @@ if str(SRC) not in sys.path:
 CLI = ROOT / "scripts" / "hypothesis_forge.py"
 
 
+def critic_result_from_packet_only(
+    packet: dict,
+    terminal: str = "KILL_MECHANISM",
+) -> dict:
+    from solana_alpha_lab.factory.hfic_identity import candidate_identity
+    from solana_alpha_lab.factory.hfic_session import _canonical_json_hash
+
+    selected = packet["selected_candidate"]
+    identity = candidate_identity(
+        {
+            "claim": selected["claim"],
+            "mechanism": selected["mechanism"],
+            "actor_counterparty": selected["actor_counterparty"],
+            "population": selected["population"],
+            "decision_timestamp": selected["decision_timestamp"],
+            "primary_x_family": selected["primary_x"],
+            "primary_y": selected["primary_y"],
+            "horizon_notional": selected["horizon_notional"],
+            "negative_control": selected["negative_control"],
+            "cheapest_falsifier": selected["cheapest_falsifier"],
+        }
+    )
+    return {
+        "schema": "smial.hypothesis-critic-result",
+        "schema_version": "1.1",
+        "session_id": packet["session_id"],
+        "critic_input_packet_sha256": _canonical_json_hash(packet),
+        "selected_candidate_id": selected["candidate_id"],
+        "selected_definition_sha256": identity.full_sha256,
+        "critic_prompt_version": "HFIC-V1.1",
+        "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+        "critic_terminal": terminal,
+        "next": "STOP",
+        "authority": {
+            "git_mutation": 0,
+            "experiment_execution": 0,
+            "provider_api_rpc_wss_calls": 0,
+        },
+        "non_claims": ["NO_ALPHA", "PACKET_ONLY_CRITIC"],
+    }
+
+
 def bind_draft(draft: dict, receipt: dict) -> dict:
     bound = dict(draft)
     bound["preflight_receipt_id"] = receipt["receipt_id"]
@@ -473,5 +515,72 @@ class HficTempRootE2ETests(unittest.TestCase):
             self.assertTrue(restored_payload["artifacts_retrievable"])
             self.assertIn("critic_input_packet", restored_payload)
 
+        git_after = repository_git_snapshot(ROOT)
+        self.assertTrue(git_before.unchanged(git_after))
+
+    def test_preflight_freeze_packet_only_kill_finalize(self) -> None:
+        from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+
+        git_before = repository_git_snapshot(ROOT)
+        happy = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            preflight = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(preflight.returncode, 0, preflight.stderr)
+            preflight_payload = json.loads(preflight.stdout)
+            self.assertEqual(preflight_payload["action"], "START_NEW_SESSION")
+            receipt_path = Path(tmp) / "preflight.json"
+            receipt_path.write_text(preflight.stdout, encoding="utf-8")
+            happy_bound = Path(tmp) / "draft_bound.json"
+            happy_bound.write_text(
+                json.dumps(bind_draft(json.loads(happy.read_text(encoding="utf-8")), preflight_payload)),
+                encoding="utf-8",
+            )
+            frozen_run = run_cli(
+                "freeze",
+                "--draft",
+                str(happy_bound),
+                "--preflight-receipt",
+                str(receipt_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(frozen_run.returncode, 0, frozen_run.stderr)
+            frozen = json.loads(frozen_run.stdout)
+            self.assertEqual(frozen["session_state"], "FROZEN_AWAITING_CRITIC")
+            packet = json.loads(json.dumps(frozen["critic_input_packet"]))
+            outer_session = frozen["session_id"]
+            self.assertEqual(packet["packet_version"], "1.1")
+            self.assertEqual(packet["session_id"], outer_session)
+            del frozen
+            critic = critic_result_from_packet_only(packet, "KILL_MECHANISM")
+            self.assertEqual(critic["session_id"], packet["session_id"])
+            critic_path = Path(tmp) / "critic_packet_only.json"
+            critic_path.write_text(json.dumps(critic), encoding="utf-8")
+            finalized = run_cli(
+                "finalize",
+                "--session-id",
+                str(packet["session_id"]),
+                "--critic-result",
+                str(critic_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(finalized.returncode, 0, finalized.stderr)
+            receipt = json.loads(finalized.stdout)
+            self.assertEqual(receipt["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(receipt["critic_terminal"], "KILL_MECHANISM")
+            self.assertEqual(receipt["session_id"], outer_session)
+            self.assertEqual(receipt["session_id"], packet["session_id"])
         git_after = repository_git_snapshot(ROOT)
         self.assertTrue(git_before.unchanged(git_after))

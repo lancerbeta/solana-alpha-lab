@@ -11,8 +11,10 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory.hfic_identity import candidate_identity  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
+    _canonical_json_hash,
     backfill_legacy,
     evidence_epoch_sha256,
     freeze_draft,
@@ -61,6 +63,46 @@ def _critic_result(frozen: dict[str, object], terminal: str = "KILL_PREPARATORY_
             "provider_api_rpc_wss_calls": 0,
         },
         "non_claims": ["NO_ALPHA"],
+    }
+
+
+def critic_result_from_packet_only(
+    packet: dict[str, object],
+    terminal: str = "KILL_MECHANISM",
+) -> dict[str, object]:
+    selected = packet["selected_candidate"]
+    assert isinstance(selected, dict)
+    identity = candidate_identity(
+        {
+            "claim": selected["claim"],
+            "mechanism": selected["mechanism"],
+            "actor_counterparty": selected["actor_counterparty"],
+            "population": selected["population"],
+            "decision_timestamp": selected["decision_timestamp"],
+            "primary_x_family": selected["primary_x"],
+            "primary_y": selected["primary_y"],
+            "horizon_notional": selected["horizon_notional"],
+            "negative_control": selected["negative_control"],
+            "cheapest_falsifier": selected["cheapest_falsifier"],
+        }
+    )
+    return {
+        "schema": "smial.hypothesis-critic-result",
+        "schema_version": "1.1",
+        "session_id": packet["session_id"],
+        "critic_input_packet_sha256": _canonical_json_hash(packet),
+        "selected_candidate_id": selected["candidate_id"],
+        "selected_definition_sha256": identity.full_sha256,
+        "critic_prompt_version": "HFIC-V1.1",
+        "isolated_context_attestation": "NEW_CONTEXT_REQUIRED",
+        "critic_terminal": terminal,
+        "next": "STOP",
+        "authority": {
+            "git_mutation": 0,
+            "experiment_execution": 0,
+            "provider_api_rpc_wss_calls": 0,
+        },
+        "non_claims": ["NO_ALPHA", "PACKET_ONLY_CRITIC"],
     }
 
 
@@ -161,6 +203,68 @@ class HficFreezeFinalizeTests(unittest.TestCase):
         self.assertEqual(packet["strongest_rejected_alternative"], frozen["rejected_alternative_id"])
         self.assertEqual(packet["truth_roots_used"], ["catalog/catalog_manifest.yaml"])
         self.assertFalse(packet["research_memory_as_of"].startswith("1970-01-01"))
+
+    def test_v11_freeze_transports_session_id_before_packet_hash(self) -> None:
+        frozen = freeze_draft(
+            valid_draft(),
+            preflight_receipt=_preflight_receipt(),
+            repo_root=ROOT,
+        )
+        packet = frozen["critic_input_packet"]
+        self.assertEqual(packet["packet_version"], "1.1")
+        self.assertIn("session_id", packet)
+        self.assertTrue(str(packet["session_id"]).startswith("HFIC-SESS-"))
+        self.assertEqual(packet["session_id"], frozen["session_id"])
+        bound_hash = _canonical_json_hash(packet)
+        self.assertEqual(frozen["critic_input_packet_sha256"], bound_hash)
+        stripped = dict(packet)
+        stripped.pop("session_id")
+        self.assertNotEqual(bound_hash, _canonical_json_hash(stripped))
+        mutated = dict(packet)
+        mutated["session_id"] = "HFIC-SESS-DEADBEEFDEADBEEF"
+        self.assertNotEqual(bound_hash, _canonical_json_hash(mutated))
+
+    def test_packet_only_critic_finalizes_kill_mechanism(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(
+                valid_draft(),
+                preflight_receipt=_preflight_receipt(),
+                repo_root=ROOT,
+            )
+            packet = dict(frozen["critic_input_packet"])
+            critic = critic_result_from_packet_only(packet, "KILL_MECHANISM")
+            self.assertEqual(critic["session_id"], packet["session_id"])
+            self.assertNotIn("frozen", critic)
+            receipt = finalize_session(
+                frozen,
+                critic,
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(receipt["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertEqual(receipt["critic_terminal"], "KILL_MECHANISM")
+
+    def test_wrong_session_id_still_fail_closed(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import finalize_session
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            frozen = freeze_draft(
+                valid_draft(),
+                preflight_receipt=_preflight_receipt(),
+                repo_root=ROOT,
+            )
+            packet = dict(frozen["critic_input_packet"])
+            critic = critic_result_from_packet_only(packet, "KILL_MECHANISM")
+            critic["session_id"] = "HFIC-SESS-DEADBEEFDEADBEEF"
+            with self.assertRaises(HficSessionError) as raised:
+                finalize_session(frozen, critic, store=store, repo_root=ROOT)
+            self.assertEqual(str(raised.exception), "CRITIC_SESSION_MISMATCH")
 
     def test_selected_missing_is_rejected(self) -> None:
         draft = valid_draft()

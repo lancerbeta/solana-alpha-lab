@@ -126,6 +126,23 @@
     "provisional_execution_unit": {"type": "string", "minLength": 1},
     "strongest_rejected_alternative": {"type": "string", "minLength": 1},
     "known_unknowns": {"type": "array", "items": {"type": "string"}},
-    "non_claims": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}
-  }
+    "non_claims": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "session_id": {
+      "type": "string",
+      "pattern": "^HFIC-SESS-[A-Z0-9]+$"
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "packet_version": {"const": "1.1"}
+        },
+        "required": ["packet_version"]
+      },
+      "then": {
+        "required": ["session_id"]
+      }
+    }
+  ]
 }
