@@ -1123,9 +1123,9 @@ def bound_delivery_evidence(
             and isinstance(review.get("as_of"), str)
             and re.fullmatch(r"20[0-9]{2}-[0-9]{2}-[0-9]{2}", review["as_of"])
             and isinstance(review.get("required_roles"), list)
-            and all(isinstance(item, str) for item in review["required_roles"])
-            and set(review["required_roles"]) == REQUIRED_REVIEW_ROLES
-            and len(review["required_roles"]) == len(REQUIRED_REVIEW_ROLES)
+            and all(isinstance(item, str) and bool(item) for item in review["required_roles"])
+            and len(set(review["required_roles"])) == len(review["required_roles"])
+            and REQUIRED_REVIEW_ROLES <= set(review["required_roles"])
             and isinstance(review.get("reviews"), list)
             and isinstance(review.get("non_claims"), list)
             and all(isinstance(item, str) and bool(item) for item in review["non_claims"])
@@ -1152,12 +1152,11 @@ def bound_delivery_evidence(
             reviews_by_role.setdefault(item["role"], []).append(item)
         if not (
             review_shape_valid
-            and set(reviews_by_role) == REQUIRED_REVIEW_ROLES
-            and len(review["reviews"]) == len(REQUIRED_REVIEW_ROLES)
+            and set(reviews_by_role) == set(review["required_roles"])
             and all(
                 len(reviews_by_role[role]) == 1
                 and reviews_by_role[role][0]["verdict"] == "PASS"
-                for role in REQUIRED_REVIEW_ROLES
+                for role in reviews_by_role
             )
             and not review_records_single_agent_fallback(review)
         ):

@@ -778,6 +778,36 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+
+            def add_owner_ux(value: dict[str, object]) -> None:
+                roles = value["required_roles"]
+                reviews = value["reviews"]
+                assert isinstance(roles, list)
+                assert isinstance(reviews, list)
+                roles.append("OWNER_UX_CRITIC")
+                reviews.append(
+                    {
+                        "role": "OWNER_UX_CRITIC",
+                        "verdict": "PASS",
+                        "findings": ["CHECKED_STOP_COPYABLE"],
+                    }
+                )
+
+            receipt = write_delivery_evidence_fixture(
+                self.module, root, mutate_review=add_owner_ux
+            )
+            self.assertTrue(
+                self.module.bound_delivery_evidence(
+                    root,
+                    receipt,
+                    expected_base=BASE,
+                    head=HEAD,
+                    inventory_builder=lambda *args, **kwargs: "1" * 64,
+                )["factory_fit_pass"]
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
             receipt = write_delivery_evidence_fixture(self.module, root)
             fit_path = root / "docs/evidence/fit.json"
             fit_path.write_text(

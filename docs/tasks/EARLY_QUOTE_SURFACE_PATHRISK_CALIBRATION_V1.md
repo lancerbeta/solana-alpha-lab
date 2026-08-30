@@ -27,6 +27,11 @@ managed_write_set:
 - tests/test_pathrisk_calibration.py
 - tests/test_observation_primitive_registry.py
 - tests/test_observation_schedule_lifecycle.py
+- tests/test_delivery_harness_context.py
+- tests/test_delivery_harness_merge_guard.py
+- scripts/delivery_harness.py
+- scripts/owner_attention_gate.py
+- delivery-harness/templates/portable-core/scripts/delivery_harness.py
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_completion_evidence_v1.json
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_independent_review_v1.json
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_factory_fit_v1.json
@@ -66,6 +71,7 @@ context_requirements:
   - CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001
   l2_roles:
   - ARCHITECTURE_DECISIONS
+  - DELIVERY_EVIDENCE
   - EXTERNAL_ROUTE_KNOWLEDGE
   l3_roles: []
   roadmap_path: configs/factory_v1_operational_readiness_v1.yaml
