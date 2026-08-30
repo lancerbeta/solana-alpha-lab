@@ -19,6 +19,8 @@ objective: Restore at least 30 percent real exact-head CI wall-clock headroom ag
 managed_write_set:
 - docs/tasks/EXACT_HEAD_CI_WALL_CLOCK_HEADROOM_V1.md
 - .github/workflows/ci.yml
+- delivery-harness/harness.yaml
+- delivery-harness/templates/portable-core/delivery-harness/harness.yaml
 - scripts/validate_ci.py
 - scripts/validate_baseline.py
 - scripts/profile_test_wall_clock.py
