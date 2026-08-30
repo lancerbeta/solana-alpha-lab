@@ -662,9 +662,6 @@ def resolve_required_context(
     assets_by_role = role_asset_ids(requirements)
     catalog_records = records if records is not None else {}
     for role_id in L2_L3_ROLE_ORDER:
-        if paths_by_role.get(role_id) or assets_by_role.get(role_id):
-            required.add(role_id)
-    for role_id in L2_L3_ROLE_ORDER:
         role = role_by_id[role_id]
         if role_id not in required:
             gaps.append(explicit_gap(role, "DEFERRED_ON_DEMAND"))

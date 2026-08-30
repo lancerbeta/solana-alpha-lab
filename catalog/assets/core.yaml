@@ -16308,7 +16308,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: e834e052bff626eab414fd42caf3cef6034542d96d0efbe4d2df38c2a6218e7d}
+  integrity: {kind: sha256, sha256: dd2b77e0db202aacd5fad9c2119bbd3ee32e30019eb466fbf9a858bbfe89441b}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19802,7 +19802,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: b3fae65fbe82ea5f178ebefd7041ff3775e696d5de0b72d2dc8d03eb2a41ccbe}
+  integrity: {kind: sha256, sha256: e6210b55274b8e70c736202e778668e5ffa04a2097cba5182bc511e8bc6aaa0e}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19821,7 +19821,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: 236a7858a01757edeb1f16ded1bcbb175039202e5991b977303db2cf1a5c528d}
+  integrity: {kind: sha256, sha256: afb7d1a560f666ae22ad2b326709a5c589d606339f487791081a699232b01fbc}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
@@ -33234,7 +33234,7 @@ records:
   as_of: '2026-08-30'
   truth_owner: EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1.md', repository_path: docs/tasks/EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1.md}
-  integrity: {kind: sha256, sha256: 0cb109a185635c7a04ca190b161488ba178e63e50682f52e6b577557f9804a16}
+  integrity: {kind: sha256, sha256: d31f43009201b0de08cd4bcd25ca83d0840b7de5003084fa6ad0f2c6b80e6a3f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

@@ -86,12 +86,12 @@
     {
       "source": "delivery-harness/templates/portable-core/scripts/delivery_harness.py",
       "destination": "scripts/delivery_harness.py",
-      "sha256": "d7119184c33d05abf8c2fe572bb07ac52ff8cd3114bc615c290c68ec4bacb470"
+      "sha256": "07e5cf99d33c4eb62041f0de8ec2c417d92723abb034546f7332a83241b4fd60"
     },
     {
       "source": "scripts/owner_attention_gate.py",
       "destination": "scripts/owner_attention_gate.py",
-      "sha256": "e834e052bff626eab414fd42caf3cef6034542d96d0efbe4d2df38c2a6218e7d"
+      "sha256": "dd2b77e0db202aacd5fad9c2119bbd3ee32e30019eb466fbf9a858bbfe89441b"
     },
     {
       "source": "delivery-harness/templates/portable-core/AGENTS.md.tmpl",

@@ -664,9 +664,6 @@ def build_context_receipt(
         raise ValueError("REQUIRED_CATALOG_ASSET_NOT_RESOLVED")
     required_roles = set(requirements["l2_roles"]) | set(requirements["l3_roles"])
     for role_id in ON_DEMAND_ROLE_ORDER:
-        if requirements["exact_role_paths"].get(role_id):
-            required_roles.add(role_id)
-    for role_id in ON_DEMAND_ROLE_ORDER:
         role = roles[role_id]
         if role_id not in required_roles:
             gaps.append({"semantic_role": role_id, "lane": role["lane"], "truth_owner": role["truth_owner"], "state": "EXPLICIT_GAP", "reason_code": "DEFERRED_ON_DEMAND"})

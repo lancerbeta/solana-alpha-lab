@@ -274,26 +274,6 @@ class DeliveryHarnessContextTests(unittest.TestCase):
         )
         self.assertTrue(all(gap["state"] == "EXPLICIT_GAP" for gap in receipt["gaps"]))
 
-    def test_bound_exact_role_paths_load_without_l2_role_listing(self) -> None:
-        metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
-        metadata["context_requirements"]["l2_roles"] = ["ARCHITECTURE_DECISIONS"]
-        selected, gaps = self.module.resolve_required_context(
-            ROOT,
-            metadata,
-            self.module.load_closed_document(
-                ROOT / "delivery-harness/context-map.yaml",
-                ROOT / "catalog/schemas/delivery_harness_context_map.schema.json",
-            ),
-            max_inline_bytes=102400,
-        )
-        self.assertIn(
-            "DELIVERY_EVIDENCE",
-            {item["semantic_role"] for item in selected},
-        )
-        self.assertFalse(
-            any(gap["semantic_role"] == "DELIVERY_EVIDENCE" for gap in gaps)
-        )
-
     def test_required_role_without_exact_path_fails_closed(self) -> None:
         metadata = self.module.parse_task_contract(ROOT, TASK_CONTRACT, TASK_ID)
         metadata["context_requirements"]["exact_role_paths"][
