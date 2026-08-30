@@ -16,7 +16,7 @@
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/harness.yaml",
       "destination": "delivery-harness/harness.yaml",
-      "sha256": "0aebf3b5de8b1762117b63c329cbd6b872079572b744598973dbf6dbf7841ac9"
+      "sha256": "ad3bc689e9d384505b55ac9d44544883bbcb3a78d4e5f10c71e9322f7735dce4"
     },
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml",
