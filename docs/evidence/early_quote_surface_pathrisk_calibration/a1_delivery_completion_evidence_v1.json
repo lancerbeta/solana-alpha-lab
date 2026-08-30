@@ -11,16 +11,18 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "fbe96072dc2a8391c6d2798da908dc4ed7649aa052c27a56ad769108a4734df7",
+    "catalog/assets/core.yaml": "3838c61638ef416edcaf87acf4dce1c76ec9ebb9333c8b4fc5f664c91ea4e6f4",
     "catalog/assets/lifecycle.yaml": "43e5a2cee119094837e43dbc749f3f53b75d079e8e24dbc0cb89740066e8521c",
     "catalog/catalog_manifest.yaml": "56117f9b7df9b507e0aa6fceed95d7b22fe87edfc51bfe5ab06711b2a1403eb3",
     "catalog/generated/asset_edges.json": "1977201fd04f00ae744c04030889ea020a16c757f6d38682c434c8a2e176c1c7",
     "configs/early_quote_surface_pathrisk_calibration_v1.yaml": "c252fbabb127c847e6618ff3bb3fe64766f63b30cce0c123619f6d3bdd39a0aa",
     "configs/observation_primitive_registry_v1.yaml": "85674ba8d3f9e595d9cba8eef7629bfca742a84daf61edb0606baf9f20996932",
+    "delivery-harness/templates/portable-bundle-manifest.json": "b3fae65fbe82ea5f178ebefd7041ff3775e696d5de0b72d2dc8d03eb2a41ccbe",
     "delivery-harness/templates/portable-core/scripts/delivery_harness.py": "d7119184c33d05abf8c2fe572bb07ac52ff8cd3114bc615c290c68ec4bacb470",
     "docs/PROJECT_MAP.md": "3bbd6ccb7f972c4d0ed17ae73e6466ef635bc5a786b7de75a88360ec94848fa3",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "10704245d309f0b8844b4f1d985ca854891ce6e9a89cd9ebff8c0b128331e2f0",
     "docs/reports/early_quote_surface_pathrisk_calibration/a1_owner_readout_v1.md": "cbba044325de8c9241ed3b9098027d0a95c27b0b433317c8a85fdfffda96efb9",
-    "docs/tasks/EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1.md": "73b5acef6e5dfe8c6ead5d58b074d9f3e0614c50fba3bf22931e0af218e60256",
+    "docs/tasks/EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1.md": "0cb109a185635c7a04ca190b161488ba178e63e50682f52e6b577557f9804a16",
     "scripts/delivery_harness.py": "236a7858a01757edeb1f16ded1bcbb175039202e5991b977303db2cf1a5c528d",
     "scripts/early_quote_surface_pathrisk_calibration.py": "9653a26b19b76bce493f43276da7a9c4bdd45fb4954a8a30eabea40226917f67",
     "scripts/owner_attention_gate.py": "e834e052bff626eab414fd42caf3cef6034542d96d0efbe4d2df38c2a6218e7d",
@@ -45,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_factory_fit_v1.json",
-    "sha256": "9599e86c33be92aeb480a99adedfd41349ba5537966601ca874f2c67817cd3be",
+    "sha256": "93adf3a2c2b013770aacd222eb1c577da211c04db9784c51b10d41f1db73bd9d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PATHRISK_CALIBRATION_SUITE",
     "independent_review": {
       "path": "docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_independent_review_v1.json",
-      "sha256": "3ef532122eb2657935c6bf9219acf8f8992f1a29ed20fee79cc935919ae7d206",
+      "sha256": "49b0259962d2a34a7cc4a0007937cf9ec71c6c4afce6f52b33f03c47b4671efa",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
