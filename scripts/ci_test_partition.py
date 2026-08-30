@@ -122,6 +122,13 @@ def load_plan(path: Path) -> dict[str, Any]:
         raise PartitionError("PLAN_SCHEMA_INVALID")
     if len(document["shards"]) != document["shard_count"]:
         raise PartitionError("PLAN_SHARD_LENGTH_MISMATCH")
+    union, duplicates = union_and_duplicates(document)
+    if duplicates:
+        raise PartitionError(
+            "PLAN_DUPLICATE_MODULES:" + ",".join(sorted(duplicates)[:20])
+        )
+    if not union:
+        raise PartitionError("PLAN_EMPTY_UNION")
     return document
 
 

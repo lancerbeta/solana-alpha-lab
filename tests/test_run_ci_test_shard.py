@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 import importlib.util
-import json
-import os
-import subprocess
 import sys
 import tempfile
 import textwrap
@@ -52,6 +49,54 @@ class RunCiTestShardTests(unittest.TestCase):
                 ["--index", "0", "--count", "3", "--plan", str(plan_path)]
             )
             self.assertEqual(code, 2)
+
+    def test_test_failure_returns_nonzero(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tests = root / "tests"
+            tests.mkdir()
+            (tests / "test_ok.py").write_text(
+                textwrap.dedent(
+                    """\
+                    import unittest
+                    class Ok(unittest.TestCase):
+                        def test_pass(self):
+                            self.assertTrue(True)
+                    """
+                ),
+                encoding="utf-8",
+            )
+            (tests / "test_bad.py").write_text(
+                textwrap.dedent(
+                    """\
+                    import unittest
+                    class Bad(unittest.TestCase):
+                        def test_fail(self):
+                            self.fail("boom")
+                    """
+                ),
+                encoding="utf-8",
+            )
+            plan = partition.plan_shards(
+                {
+                    "tests/test_ok.py": 1.0,
+                    "tests/test_bad.py": 2.0,
+                },
+                shard_count=2,
+                source_profile_sha256="x",
+            )
+            plan_path = root / "plan.json"
+            partition.write_plan(plan_path, plan)
+            codes = [
+                runner.run_shard(
+                    index=index,
+                    count=2,
+                    plan_path=plan_path,
+                    root=root,
+                )
+                for index in (0, 1)
+            ]
+            self.assertIn(1, codes)
 
 
 if __name__ == "__main__":

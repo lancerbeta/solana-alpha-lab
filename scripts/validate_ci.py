@@ -617,6 +617,20 @@ def load_shard_plan() -> dict[str, Any]:
         raise CiValidationError("ci_test_shards_plan_count_invalid")
     if not isinstance(shards, list) or len(shards) != count:
         raise CiValidationError("ci_test_shards_plan_shards_invalid")
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    for shard in shards:
+        if not isinstance(shard, list):
+            raise CiValidationError("ci_test_shards_plan_shards_invalid")
+        for path in shard:
+            key = str(path).replace("\\", "/")
+            if key in seen:
+                duplicates.add(key)
+            seen.add(key)
+    if duplicates:
+        raise CiValidationError("ci_test_shards_plan_duplicate_modules")
+    if not seen:
+        raise CiValidationError("ci_test_shards_plan_empty")
     return document
 
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import importlib.util
+import json
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -50,6 +52,47 @@ class CiTestPartitionTests(unittest.TestCase):
         )
         _, duplicates = partition.union_and_duplicates(plan)
         self.assertEqual(duplicates, set())
+
+    def test_load_plan_rejects_duplicate_modules(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "plan.json"
+            bad = {
+                "schema": "smial.ci-test-shards.v1",
+                "shard_count": 2,
+                "source_profile_sha256": "x",
+                "projected_seconds": [1.0, 1.0],
+                "projected_max_seconds": 1.0,
+                "shards": [
+                    ["tests/test_a.py", "tests/test_dup.py"],
+                    ["tests/test_dup.py"],
+                ],
+            }
+            path.write_text(json.dumps(bad), encoding="utf-8")
+            with self.assertRaises(partition.PartitionError):
+                partition.load_plan(path)
+
+    def test_committed_plan_covers_current_inventory_once(self) -> None:
+        plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
+        current = sorted(
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / "tests").glob("test_*.py")
+            if path.is_file()
+        )
+        union, duplicates = partition.union_and_duplicates(plan)
+        self.assertEqual(duplicates, set())
+        # Stale plan paths are allowed as warnings; current modules must all map.
+        covered: list[str] = []
+        for index in range(plan["shard_count"]):
+            covered.extend(
+                partition.select_modules_for_shard(
+                    current,
+                    plan=plan,
+                    index=index,
+                    count=plan["shard_count"],
+                )
+            )
+        self.assertEqual(sorted(covered), current)
+        self.assertEqual(len(covered), len(set(covered)))
 
     def test_new_module_absent_from_plan_is_assigned(self) -> None:
         plan = partition.plan_shards(

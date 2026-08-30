@@ -53,6 +53,9 @@ def run_shard(
         for path in profiler.discover_module_paths(root / "tests")
     ]
     full_hash = inventory_hash(current)
+    canonical_count = profiler.count_cases(
+        unittest.defaultTestLoader.discover(str(root / "tests"), pattern="test_*.py")
+    )
     selected = partition.select_modules_for_shard(
         current,
         plan=plan,
@@ -61,21 +64,44 @@ def run_shard(
     )
     if not selected:
         raise ShardError("EMPTY_SHARD_REFUSED")
+    # Prove current inventory is fully covered exactly once across the plan.
+    covered: list[str] = []
+    for shard_index in range(count):
+        covered.extend(
+            partition.select_modules_for_shard(
+                current,
+                plan=plan,
+                index=shard_index,
+                count=count,
+            )
+        )
+    if len(covered) != len(set(covered)):
+        raise ShardError("SHARD_UNION_HAS_DUPLICATES")
+    if set(covered) != set(current):
+        missing = sorted(set(current) - set(covered))
+        extra = sorted(set(covered) - set(current))
+        raise ShardError(
+            "SHARD_UNION_MISMATCH:"
+            f"missing={len(missing)}:extra={len(extra)}"
+        )
     suite = load_suite_for_paths(selected, root=root)
     case_count = profiler.count_cases(suite)
+    if case_count < 1:
+        raise ShardError("SHARD_ZERO_CASES")
     stream = io.StringIO()
     runner = unittest.TextTestRunner(stream=stream, verbosity=1)
     started = time.perf_counter()
     result = runner.run(suite)
     elapsed = time.perf_counter() - started
     print(f"inventory_sha256={full_hash}")
+    print(f"canonical_case_count={canonical_count}")
     print(f"shard_index={index} shard_count={count}")
     print(f"selected_modules={len(selected)} selected_cases={case_count}")
     print(
         f"failures={len(result.failures)} errors={len(result.errors)} "
         f"skipped={len(result.skipped)} elapsed_seconds={elapsed:.3f}"
     )
-    if result.failures or result.errors:
+    if not result.wasSuccessful() or result.failures or result.errors:
         print(stream.getvalue())
         return 1
     return 0

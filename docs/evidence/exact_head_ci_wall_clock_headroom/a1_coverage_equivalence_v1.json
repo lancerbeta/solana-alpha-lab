@@ -1,0 +1,42 @@
+{
+  "schema": "smial.exact-head-ci-wall-clock-headroom.coverage-equivalence.v1",
+  "as_of": "2026-08-30",
+  "base_commit_sha": "7c04306ae3169df557a4a589e1a8eb4d07890ac2",
+  "head_commit_sha": "5b204cc8df6ac4531317a613b6460192c2a906b9",
+  "exact_head_ci_run": 33288174739,
+  "exact_head_ci_url": "https://github.com/lancerbeta/solana-alpha-lab/actions/runs/33288174739",
+  "reference_budget_seconds": 900,
+  "critical_path_seconds": 312,
+  "headroom_fraction": 0.653333,
+  "configured_work_timeout_minutes": 15,
+  "configured_aggregator_timeout_minutes": 5,
+  "base_module_count": 329,
+  "head_module_count": 332,
+  "base_test_case_count": 3720,
+  "intentional_new_test_case_count": 12,
+  "head_test_case_count": 3732,
+  "base_skipped_count": 75,
+  "head_skipped_count": 75,
+  "shard_count": 4,
+  "shard_module_counts": [59, 91, 91, 91],
+  "shard_test_case_counts": [715, 1042, 1023, 952],
+  "shard_skipped_counts": [12, 29, 24, 10],
+  "union_module_count": 332,
+  "duplicate_module_count": 0,
+  "missing_module_count": 0,
+  "inventory_sha256": "79681e5c266c71cd920ac65e719e71e86b634c571c6ec466ac81719c6a5b4752",
+  "job_wall_seconds": {
+    "validate-core": 55,
+    "validate-tests_0": 51,
+    "validate-tests_1": 174,
+    "validate-tests_2": 291,
+    "validate-tests_3": 307,
+    "validate": 2
+  },
+  "notes": [
+    "critical_path = earliest worker start through final validate completion",
+    "intentional_new_tests are profiler/partition/shard/workflow adversarial cases",
+    "head_test_case_count == sum(shard_test_case_counts) == 3732",
+    "head_skipped_count == sum(shard_skipped_counts) == 75"
+  ]
+}
