@@ -32,6 +32,8 @@ managed_write_set:
 - scripts/delivery_harness.py
 - scripts/owner_attention_gate.py
 - delivery-harness/templates/portable-core/scripts/delivery_harness.py
+- delivery-harness/templates/portable-bundle-manifest.json
+- docs/evidence/control/delivery_harness_acceptance_v1.json
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_completion_evidence_v1.json
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_independent_review_v1.json
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_factory_fit_v1.json
