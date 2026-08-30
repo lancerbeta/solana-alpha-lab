@@ -97,7 +97,12 @@ merge_policy:
     - docs/tasks/CTRL-CI-OWNED-PRODUCT-RESEARCH-DDL-ELIGIBILITY-V1.md
     - docs/tasks/CTRL-CI-OWNED-HFIC-CURSOR-COMMAND-ELIGIBILITY-V1.md
     - docs/tasks/CTRL-AUTONOMOUS-DELIVERY-SKILL-V1.md
-    - docs/tasks/CTRL-HARNESS-SYNC-DERIVED-HASHES-V1.md
+    - docs/tasks/INCREMENTAL_HARNESS_SYNC_V1.md
+    - docs/evidence/incremental_harness_sync/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/incremental_harness_sync/a1_delivery_independent_review_v1.json
+    - docs/evidence/incremental_harness_sync/a1_delivery_factory_fit_v1.json
+    - docs/evidence/incremental_harness_sync/a1_benchmark_receipt_v1.json
+    - docs/reports/incremental_harness_sync/a1_owner_readout_v1.md
     - docs/tasks/CTRL-HARNESS-SYNC-DELIVERY-EVIDENCE-BINDINGS-V1.md
     - docs/tasks/CTRL-HARNESS-SYNC-CI-FAIL-CLOSED-MESSAGES-V1.md
     - docs/tasks/CTRL-PROCESS-THROUGHPUT-GUARDRAILS-V1.md

@@ -1,0 +1,24 @@
+{
+  "schema": "smial.incremental-harness-sync-benchmark",
+  "schema_version": "1.0",
+  "as_of": "2026-08-30",
+  "task_id": "INCREMENTAL_HARNESS_SYNC_V1",
+  "machine_class": "owner_windows_dev",
+  "base": "0b594f5479960d22d22b69098da649ee85e79881",
+  "benchmark": {
+    "full_seconds": 845.541,
+    "incremental_seconds": 7.532,
+    "speedup_x": 112.26,
+    "total_registered_sha_assets": 1422,
+    "incremental_hashed_assets": 2,
+    "full_hashed_assets": 4266,
+    "full_nav_runs": 3,
+    "incremental_nav_runs": 0,
+    "representative_candidate_paths": 6
+  },
+  "equivalence": {
+    "tracked_derived_byte_diff_count": 0,
+    "full_check_after_incremental": "PASS",
+    "notes": "First incremental applied protocol/harness pins (2 assets, nav=0). Subsequent full oracle on same tree was no-op for registries and reported UNCHANGED navigation. Fixture matrix T14 also asserts incremental==full derived bytes."
+  }
+}

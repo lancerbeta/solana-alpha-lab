@@ -563,5 +563,248 @@ class SyncGoldenTests(unittest.TestCase):
         self.assertNotEqual(status_after_first.strip(), "")
 
 
+class IncrementalSyncTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.worktree = Path(self._tmp.name) / "repo"
+        self.addCleanup(self._tmp.cleanup)
+        SyncGoldenTests._build_fixture(self)
+        first = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+        _commit_all(self.worktree, "synced fixture")
+        self.base = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+        self.assertRegex(self.base, r"^[0-9a-f]{40}$")
+        for index in range(8):
+            dummy = self.worktree / f"docs/unrelated_{index}.txt"
+            dummy.write_bytes(f"unrelated-{index}\n".encode("utf-8"))
+            core = (self.worktree / "catalog/assets/core.yaml").read_text(encoding="utf-8")
+            digest = hashlib.sha256(dummy.read_bytes()).hexdigest()
+            core += (
+                f"- asset_id: UNRELATED-{index:03d}\n"
+                "  record_version: '1.0'\n"
+                "  asset_type: evidence\n"
+                "  purpose: unrelated filler for work-count contract\n"
+                "  status: IMPLEMENTED_UNVERIFIED\n"
+                "  origin: REPOSITORY\n"
+                "  as_of: '2026-08-22'\n"
+                "  truth_owner: TASK-99\n"
+                "  location:\n"
+                "    kind: git_path\n"
+                f"    logical_uri: repo://docs/unrelated_{index}.txt\n"
+                f"    repository_path: docs/unrelated_{index}.txt\n"
+                "  integrity:\n"
+                "    kind: sha256\n"
+                f"    sha256: {digest}\n"
+                "  access:\n"
+                "    mode: read_only\n"
+                "    method: file\n"
+                "    network_required: false\n"
+                "    secrets_required: false\n"
+                "  relations: []\n"
+                "  consumers: [TASK-99]\n"
+                "  evidence: []\n"
+                "  classification:\n"
+                "    contains_secrets: false\n"
+                "    contains_raw_data: false\n"
+                "    sensitivity: INTERNAL_NON_SECRET\n"
+            )
+            (self.worktree / "catalog/assets/core.yaml").write_text(core, encoding="utf-8")
+        filler = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(filler.returncode, 0, filler.stderr or filler.stdout)
+        _commit_all(self.worktree, "unrelated filler assets")
+        self.base = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+
+    def _apply_incremental(self) -> dict:
+        result = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        return json.loads(result.stdout)
+
+    def _apply_full(self) -> dict:
+        result = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply", "--full"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        return json.loads(result.stdout)
+
+    def test_t1_one_registered_source_skips_navigation(self) -> None:
+        target = self.worktree / "docs/generated_target.txt"
+        target.write_bytes(b"alpha\nbeta\ngamma\n")
+        payload = self._apply_incremental()
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertFalse(payload["full_fallback"])
+        self.assertEqual(payload["navigation_runs"], 0)
+        self.assertEqual(payload["hashed_assets"], 1)
+        self.assertLess(payload["hashed_assets"], payload["registered_sha_assets_total"])
+        self.assertIn(
+            hashlib.sha256(target.read_bytes()).hexdigest().encode(),
+            (self.worktree / "catalog/assets/core.yaml").read_bytes(),
+        )
+
+    def test_t3_unregistered_file_is_noop(self) -> None:
+        (self.worktree / "docs/scratch_unregistered.txt").write_bytes(b"scratch\n")
+        before = (self.worktree / "catalog/assets/core.yaml").read_bytes()
+        payload = self._apply_incremental()
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertEqual(payload["hashed_assets"], 0)
+        self.assertEqual(payload["navigation_runs"], 0)
+        self.assertEqual(before, (self.worktree / "catalog/assets/core.yaml").read_bytes())
+
+    def test_t4_semantic_registry_edit_requires_navigation(self) -> None:
+        core = (self.worktree / "catalog/assets/core.yaml").read_text(encoding="utf-8")
+        core = core.replace(
+            "purpose: golden fixture with stale inline sha",
+            "purpose: golden fixture purpose changed",
+            1,
+        )
+        (self.worktree / "catalog/assets/core.yaml").write_text(core, encoding="utf-8")
+        payload = self._apply_incremental()
+        self.assertTrue(payload["impact_plan"]["navigation_required"])
+        self.assertGreaterEqual(payload["navigation_runs"], 1)
+
+    def test_t5_nav_output_drift_forces_navigation(self) -> None:
+        project_map = self.worktree / "docs/PROJECT_MAP.md"
+        if not project_map.is_file():
+            self.skipTest("project map not generated in fixture")
+        project_map.write_bytes(project_map.read_bytes() + b"\n")
+        payload = self._apply_incremental()
+        self.assertTrue(payload["impact_plan"]["navigation_required"])
+        self.assertIn("NAV_OUTPUT_DRIFT", payload["impact_plan"]["navigation_reason"])
+
+    def test_t10_staged_only_is_in_candidate_inventory(self) -> None:
+        target = self.worktree / "docs/generated_target.txt"
+        original = target.read_bytes()
+        target.write_bytes(b"staged-only\n")
+        _run(["git", "add", "docs/generated_target.txt"], cwd=self.worktree)
+        target.write_bytes(original)
+        from harness_sync import candidate_paths
+
+        paths = candidate_paths(self.base, root=self.worktree)
+        self.assertIn("docs/generated_target.txt", paths)
+
+    def test_t5b_integrity_only_registry_skips_navigation(self) -> None:
+        core = self.worktree / "catalog/assets/core.yaml"
+        text = core.read_text(encoding="utf-8")
+        # Flip one hex nibble in an existing sha256 pin without semantic edits.
+        import re as _re
+
+        match = _re.search(r"sha256: ([0-9a-f]{64})", text)
+        self.assertIsNotNone(match)
+        old = match.group(1)
+        flipped = ("0" if old[0] != "0" else "1") + old[1:]
+        core.write_text(text.replace(old, flipped, 1), encoding="utf-8")
+        payload = self._apply_incremental()
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertFalse(payload["full_fallback"])
+        self.assertEqual(payload["navigation_runs"], 0)
+        self.assertFalse(payload["impact_plan"]["navigation_required"])
+        self.assertGreaterEqual(payload["hashed_assets"], 1)
+        self.assertLess(payload["hashed_assets"], 50)
+
+    def test_t6_generator_source_requires_navigation(self) -> None:
+        generator = self.worktree / "scripts/generate_navigation.py"
+        generator.write_bytes(generator.read_bytes() + b"\n")
+        payload = self._apply_incremental()
+        self.assertTrue(payload["impact_plan"]["navigation_required"])
+        self.assertGreaterEqual(payload["navigation_runs"], 1)
+
+    def test_t11_invalid_base_falls_back_full(self) -> None:
+        result = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                "0" * 40,
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(result.returncode, 2, result.stdout)
+        self.assertIn("BASE_REF_UNRESOLVABLE", result.stderr)
+
+    def test_t12_second_incremental_is_noop(self) -> None:
+        (self.worktree / "docs/generated_target.txt").write_bytes(b"alpha\nbeta\ndelta\n")
+        first = self._apply_incremental()
+        self.assertEqual(first["mode"], "incremental")
+        second = self._apply_incremental()
+        self.assertEqual(second["mode"], "incremental")
+        self.assertEqual(second["idempotency"], "PASS_IMPACTED_CLOSURE_NOOP")
+        self.assertEqual(second["navigation_runs"], 0)
+
+    def test_t13_full_flag_preserved(self) -> None:
+        payload = self._apply_full()
+        self.assertEqual(payload["mode"], "apply")
+        self.assertGreaterEqual(payload["navigation_runs"], 3)
+
+    def test_t14_incremental_matches_full_oracle_bytes(self) -> None:
+        target = self.worktree / "docs/generated_target.txt"
+        target.write_bytes(b"alpha\nbeta\noracle\n")
+        incremental = self._apply_incremental()
+        self.assertEqual(incremental["mode"], "incremental")
+        derived = [
+            "catalog/assets/core.yaml",
+            "catalog/catalog_manifest.yaml",
+            "docs/PROJECT_MAP.md",
+            "catalog/generated/asset_edges.json",
+            "docs/OPERATOR_NAVIGATION.md",
+        ]
+        after_incremental = {
+            relative: (self.worktree / relative).read_bytes()
+            for relative in derived
+            if (self.worktree / relative).is_file()
+        }
+        _run(["git", "checkout", "--", "."], cwd=self.worktree)
+        target.write_bytes(b"alpha\nbeta\noracle\n")
+        full = self._apply_full()
+        self.assertEqual(full["mode"], "apply")
+        for relative, expected in after_incremental.items():
+            self.assertEqual(
+                expected,
+                (self.worktree / relative).read_bytes(),
+                relative,
+            )
+
+    def test_t16_staged_check_still_fail_closed(self) -> None:
+        target = self.worktree / "docs/generated_target.txt"
+        target.write_bytes(b"alpha\nbeta\nstaged\n")
+        _run(["git", "add", "docs/generated_target.txt"], cwd=self.worktree)
+        checked = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--check",
+                "--paths-from-staging",
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(checked.returncode, 1)
+        self.assertIn("DERIVED_HASH_DRIFT", checked.stderr)
+
+    def test_t17_primary_source_not_overwritten(self) -> None:
+        target = self.worktree / "docs/generated_target.txt"
+        payload_bytes = b"alpha\nbeta\nkeep-primary\n"
+        target.write_bytes(payload_bytes)
+        self._apply_incremental()
+        self.assertEqual(payload_bytes, target.read_bytes())
+
+
 if __name__ == "__main__":
     unittest.main()

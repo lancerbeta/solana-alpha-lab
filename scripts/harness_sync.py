@@ -9,6 +9,7 @@ import json
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any
 
@@ -29,6 +30,8 @@ MANIFEST_RELATIVE = "catalog/catalog_manifest.yaml"
 ASSET_REGISTRIES = (
     "catalog/assets/core.yaml",
     "catalog/assets/lifecycle.yaml",
+    "catalog/assets/pre_git.yaml",
+    "catalog/assets/architecture.yaml",
 )
 NAV_OUTPUTS = (
     "docs/PROJECT_MAP.md",
@@ -117,11 +120,24 @@ def desired_sha256(repository_path: str) -> str:
     return resolved.sha256
 
 
-def apply_asset_hashes(changed_files: set[str]) -> list[str]:
+def apply_asset_hashes(
+    changed_files: set[str],
+    *,
+    only_asset_ids: set[str] | None = None,
+    stats: dict[str, int] | None = None,
+) -> list[str]:
     updates: list[str] = []
     records = collect_asset_records()
+    selected = records
+    if only_asset_ids is not None:
+        selected = {
+            asset_id: info
+            for asset_id, info in records.items()
+            if asset_id in only_asset_ids
+        }
     by_registry: dict[str, dict[str, str]] = {}
-    for asset_id, info in sorted(records.items()):
+    hashed = 0
+    for asset_id, info in sorted(selected.items()):
         target = ROOT / info["repository_path"]
         if not target.is_file():
             # Generated views may legitimately not exist before the first nav
@@ -130,6 +146,10 @@ def apply_asset_hashes(changed_files: set[str]) -> list[str]:
         by_registry.setdefault(info["registry"], {})[asset_id] = desired_sha256(
             info["repository_path"]
         )
+        hashed += 1
+    if stats is not None:
+        stats["hashed_assets"] = stats.get("hashed_assets", 0) + hashed
+        stats["desired_sha_calls"] = stats.get("desired_sha_calls", 0) + hashed
     for registry_relative, desired_map in sorted(by_registry.items()):
         registry_file = ROOT / registry_relative
         text = registry_file.read_text(encoding="utf-8")
@@ -314,42 +334,479 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
     return problems
 
 
-def apply_sync() -> dict[str, Any]:
+NAV_RENDERED_INPUTS = frozenset(
+    {
+        "scripts/generate_navigation.py",
+        "scripts/validate_catalog.py",
+        "src/solana_alpha_lab/task34a_documentation_foundation.py",
+        "src/solana_alpha_lab/catalog_discovery.py",
+        "catalog/query_recipes.yaml",
+        "docs/project_sources/release_registry_v1.yaml",
+    }
+)
+REGISTRY_RELATIVES = frozenset(ASSET_REGISTRIES)
+DERIVED_REGISTRY_FIELDS = frozenset({"sha256"})
+
+
+def _posix_relative(value: str) -> str:
+    return value.replace("\\", "/")
+
+
+def _git_nul_paths(args: list[str], root: Path) -> set[str]:
+    raw = _run_git(args, root)
+    return {_posix_relative(item.decode("utf-8")) for item in raw.split(b"\0") if item}
+
+
+def _git_blob_or_none(root: Path, oid: str, relative: str) -> bytes | None:
+    completed = subprocess.run(
+        ["git", "show", f"{oid}:{relative}"],
+        cwd=str(root),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if completed.returncode != 0:
+        return None
+    return completed.stdout
+
+
+def candidate_paths(base_ref: str, *, root: Path | None = None) -> set[str]:
+    """Tracked+untracked candidate delta versus an exact 40-hex base."""
+
+    target = root or ROOT
+    if re.fullmatch(r"[0-9a-f]{40}", base_ref) is None:
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    try:
+        resolved = _run_git(["git", "rev-parse", "--verify", f"{base_ref}^{{commit}}"], target)
+    except HarnessSyncError as exc:
+        raise HarnessSyncError("BASE_REF_UNRESOLVABLE") from exc
+    if resolved.decode("ascii", errors="strict").strip() != base_ref:
+        raise HarnessSyncError("BASE_REF_UNRESOLVABLE")
+    try:
+        paths = _git_nul_paths(
+            ["git", "diff", "--name-only", "--no-renames", "-z", base_ref],
+            target,
+        )
+        # Include staged-only paths where the index differs from base even if
+        # the worktree was restored to match HEAD/base.
+        paths |= _git_nul_paths(
+            ["git", "diff", "--cached", "--name-only", "--no-renames", "-z", base_ref],
+            target,
+        )
+        paths |= _git_nul_paths(
+            ["git", "ls-files", "--others", "--exclude-standard", "-z"],
+            target,
+        )
+    except HarnessSyncError as exc:
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from exc
+    return paths
+
+
+def _semantic_registry_projection(payload: bytes) -> bytes:
+    document = yaml.safe_load(payload.decode("utf-8"))
+    if not isinstance(document, dict):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    header = {key: value for key, value in document.items() if key != "records"}
+    records: list[Any] = []
+    for record in document.get("records") or []:
+        if not isinstance(record, dict):
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        copy = dict(record)
+        integrity = copy.get("integrity")
+        if isinstance(integrity, dict) and integrity.get("kind") == "sha256":
+            stripped = {
+                key: value
+                for key, value in integrity.items()
+                if key not in DERIVED_REGISTRY_FIELDS
+            }
+            copy["integrity"] = stripped
+        records.append(copy)
+    return json.dumps(
+        {"header": header, "records": records},
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def _semantic_manifest_projection(payload: bytes) -> bytes:
+    document = yaml.safe_load(payload.decode("utf-8"))
+    if not isinstance(document, dict):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    copy = dict(document)
+    copy.pop("current_checkpoint", None)
+    return json.dumps(
+        copy, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+
+
+def _worktree_bytes(relative: str, root: Path) -> bytes | None:
+    target = root / relative
+    if not target.is_file():
+        return None
+    return target.read_bytes()
+
+
+def _registry_sha256_pins(payload: bytes) -> dict[str, str]:
+    document = yaml.safe_load(payload.decode("utf-8"))
+    if not isinstance(document, dict):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    pins: dict[str, str] = {}
+    for record in document.get("records") or []:
+        if not isinstance(record, dict):
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        integrity = record.get("integrity")
+        if not isinstance(integrity, dict) or integrity.get("kind") != "sha256":
+            continue
+        sha = integrity.get("sha256")
+        asset_id = record.get("asset_id")
+        if not isinstance(asset_id, str) or not isinstance(sha, str):
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        pins[asset_id] = sha
+    return pins
+
+
+def registry_integrity_delta_asset_ids(
+    relative: str, base_ref: str, *, root: Path
+) -> list[str]:
+    """Asset ids whose sha256 pin differs between worktree and base (or is new/removed)."""
+    live = _worktree_bytes(relative, root)
+    base = _git_blob_or_none(root, base_ref, relative)
+    if live is None and base is None:
+        return []
+    if live is None or base is None:
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    try:
+        live_pins = _registry_sha256_pins(live)
+        base_pins = _registry_sha256_pins(base)
+    except (UnicodeDecodeError, yaml.YAMLError, HarnessSyncError):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from None
+    changed = {
+        asset_id
+        for asset_id in live_pins.keys() | base_pins.keys()
+        if live_pins.get(asset_id) != base_pins.get(asset_id)
+    }
+    return sorted(changed)
+
+
+def registry_semantic_changed(relative: str, base_ref: str, *, root: Path) -> bool:
+    live = _worktree_bytes(relative, root)
+    base = _git_blob_or_none(root, base_ref, relative)
+    if live is None and base is None:
+        return False
+    if live is None or base is None:
+        return True
+    try:
+        return _semantic_registry_projection(live) != _semantic_registry_projection(base)
+    except (UnicodeDecodeError, yaml.YAMLError, HarnessSyncError):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from None
+
+
+def manifest_semantic_changed(base_ref: str, *, root: Path) -> bool:
+    relative = MANIFEST_RELATIVE
+    live = _worktree_bytes(relative, root)
+    base = _git_blob_or_none(root, base_ref, relative)
+    if live is None and base is None:
+        return False
+    if live is None or base is None:
+        return True
+    try:
+        return _semantic_manifest_projection(live) != _semantic_manifest_projection(base)
+    except (UnicodeDecodeError, yaml.YAMLError, HarnessSyncError):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from None
+
+
+def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, Any]:
+    target = root or ROOT
+    try:
+        paths = candidate_paths(base_ref, root=target)
+    except HarnessSyncError as exc:
+        if str(exc) == "INCREMENTAL_SCOPE_UNPROVEN":
+            return {
+                "mode": "FULL_FALLBACK",
+                "candidate_paths": [],
+                "direct_sha_assets": [],
+                "registries_to_rewrite": [],
+                "checkpoint_required": True,
+                "navigation_required": True,
+                "navigation_reason": ["INCREMENTAL_SCOPE_UNPROVEN"],
+                "fallback_reason": "INCREMENTAL_SCOPE_UNPROVEN",
+            }
+        raise
+    records = collect_asset_records()
+    by_path: dict[str, list[str]] = {}
+    for asset_id, info in records.items():
+        by_path.setdefault(info["repository_path"], []).append(asset_id)
+    nav_output_set = set(NAV_OUTPUTS)
+    source_paths = {
+        _posix_relative(path)
+        for path in paths
+        if path not in REGISTRY_RELATIVES
+        and path != MANIFEST_RELATIVE
+        and path not in nav_output_set
+    }
+    direct: list[str] = []
+    for relative in sorted(source_paths):
+        matched = by_path.get(relative)
+        if matched is None:
+            continue
+        if len(set(matched)) != len(matched):
+            return {
+                "mode": "FULL_FALLBACK",
+                "candidate_paths": sorted(paths),
+                "direct_sha_assets": [],
+                "registries_to_rewrite": [],
+                "checkpoint_required": True,
+                "navigation_required": True,
+                "navigation_reason": ["AMBIGUOUS_ASSET_PATH"],
+                "fallback_reason": "AMBIGUOUS_ASSET_PATH",
+            }
+        direct.extend(sorted(matched))
+    nav_reasons: list[str] = []
+    checkpoint_required = False
+    try:
+        for relative in ASSET_REGISTRIES:
+            if relative not in paths:
+                continue
+            if registry_semantic_changed(relative, base_ref, root=target):
+                nav_reasons.append(f"REGISTRY_SEMANTIC:{relative}")
+                checkpoint_required = True
+                # Semantic add/move/edit: hash every sha256 member so a new
+                # record pointing at an unchanged path cannot keep a stale pin.
+                direct.extend(
+                    sorted(
+                        asset_id
+                        for asset_id, info in records.items()
+                        if info["registry"] == relative
+                    )
+                )
+            else:
+                # Integrity-only churn: rehash pins that differ from base so
+                # hand-edits repair even alongside unrelated candidates, without
+                # rehashing the entire registry after routine prior syncs.
+                direct.extend(
+                    registry_integrity_delta_asset_ids(
+                        relative, base_ref, root=target
+                    )
+                )
+        if MANIFEST_RELATIVE in paths and manifest_semantic_changed(
+            base_ref, root=target
+        ):
+            nav_reasons.append("MANIFEST_SEMANTIC")
+            checkpoint_required = True
+    except HarnessSyncError:
+        return {
+            "mode": "FULL_FALLBACK",
+            "candidate_paths": sorted(paths),
+            "direct_sha_assets": [],
+            "registries_to_rewrite": [],
+            "checkpoint_required": True,
+            "navigation_required": True,
+            "navigation_reason": ["INCREMENTAL_SCOPE_UNPROVEN"],
+            "fallback_reason": "INCREMENTAL_SCOPE_UNPROVEN",
+        }
+    for relative in sorted(paths & NAV_RENDERED_INPUTS):
+        nav_reasons.append(f"NAV_INPUT:{relative}")
+    if paths & nav_output_set:
+        nav_reasons.append("NAV_OUTPUT_DRIFT")
+    registries = sorted(path for path in paths if path in REGISTRY_RELATIVES)
+    return {
+        "mode": "INCREMENTAL",
+        "candidate_paths": sorted(paths),
+        "direct_sha_assets": sorted(set(direct)),
+        "registries_to_rewrite": registries,
+        "checkpoint_required": checkpoint_required,
+        "navigation_required": bool(nav_reasons),
+        "navigation_reason": nav_reasons,
+        "fallback_reason": None,
+    }
+
+
+def _sync_result(
+    *,
+    mode: str,
+    updates: list[str],
+    changed_files: set[str],
+    idempotency: str,
+    stats: dict[str, Any],
+    started: float,
+    plan: dict[str, Any] | None = None,
+    full_fallback: bool = False,
+) -> dict[str, Any]:
+    payload = {
+        "mode": mode,
+        "updates": updates,
+        "changed_files": sorted(changed_files),
+        "idempotency": idempotency,
+        "registered_sha_assets_total": len(collect_asset_records()),
+        "hashed_assets": stats.get("hashed_assets", 0),
+        "desired_sha_calls": stats.get("desired_sha_calls", 0),
+        "registries_rewritten": stats.get("registries_rewritten", 0),
+        "checkpoint_updated": bool(stats.get("checkpoint_updated")),
+        "navigation_runs": stats.get("navigation_runs", 0),
+        "full_fallback": full_fallback,
+        "elapsed_ms": int((time.perf_counter() - started) * 1000),
+    }
+    if plan is not None:
+        payload["base"] = stats.get("base")
+        payload["candidate_paths"] = len(plan.get("candidate_paths") or [])
+        payload["fallback_reason"] = plan.get("fallback_reason")
+        payload["impact_plan"] = {
+            "mode": plan.get("mode"),
+            "checkpoint_required": plan.get("checkpoint_required"),
+            "navigation_required": plan.get("navigation_required"),
+            "navigation_reason": plan.get("navigation_reason"),
+            "direct_sha_assets": plan.get("direct_sha_assets"),
+            "fallback_reason": plan.get("fallback_reason"),
+        }
+    return payload
+
+
+def apply_sync_full() -> dict[str, Any]:
+    started = time.perf_counter()
     changed_files: set[str] = set()
     updates: list[str] = []
-    # Pass 1: fix asset hashes, then regenerate views, then re-fix the view
-    # hashes that the regeneration itself changed.
-    updates += apply_asset_hashes(changed_files)
-    updates += update_manifest_checkpoint(changed_files)
+    stats: dict[str, int] = {}
+    updates += apply_asset_hashes(changed_files, stats=stats)
+    checkpoint = update_manifest_checkpoint(changed_files)
+    updates += checkpoint
+    stats["checkpoint_updated"] = 1 if checkpoint else 0
     updates += run_nav_generator()
-    updates += apply_asset_hashes(changed_files)
+    stats["navigation_runs"] = stats.get("navigation_runs", 0) + 1
+    updates += apply_asset_hashes(changed_files, stats=stats)
     updates += run_nav_generator()
+    stats["navigation_runs"] = stats.get("navigation_runs", 0) + 1
     changed_files.update(NAV_OUTPUTS)
 
-    # Idempotency proof: a second full pass must be a byte-level no-op.
     second_changed: set[str] = set()
     second_before = {
         relative: (ROOT / relative).read_bytes()
         for relative in ("catalog/catalog_manifest.yaml", *NAV_OUTPUTS)
     }
-    second_updates = apply_asset_hashes(second_changed)
+    second_updates = apply_asset_hashes(second_changed, stats=stats)
     second_updates += update_manifest_checkpoint(second_changed)
     second_updates += run_nav_generator()
-    # The generator prints UNCHANGED on a stable pass; only treat actual
-    # rewrites as drift. Compare bytes instead of parsing its output.
+    stats["navigation_runs"] = stats.get("navigation_runs", 0) + 1
     _require(not second_changed, "NON_IDEMPOTENT_APPLY:" + "; ".join(second_updates))
     for relative, before in second_before.items():
         _require(
             (ROOT / relative).read_bytes() == before,
             f"NON_IDEMPOTENT_APPLY:{relative}",
         )
+    stats["registries_rewritten"] = sum(
+        1 for relative in ASSET_REGISTRIES if relative in changed_files
+    )
+    return _sync_result(
+        mode="apply",
+        updates=updates,
+        changed_files=changed_files,
+        idempotency="PASS_SECOND_PASS_NOOP",
+        stats=stats,
+        started=started,
+        full_fallback=False,
+    )
 
-    return {
-        "mode": "apply",
-        "updates": updates,
-        "changed_files": sorted(changed_files),
-        "idempotency": "PASS_SECOND_PASS_NOOP",
+
+def apply_sync_incremental(base_ref: str) -> dict[str, Any]:
+    started = time.perf_counter()
+    plan = build_impact_plan(base_ref)
+    if plan["mode"] != "INCREMENTAL":
+        result = apply_sync_full()
+        result["full_fallback"] = True
+        result["fallback_reason"] = plan.get("fallback_reason")
+        result["base"] = base_ref
+        result["candidate_paths"] = len(plan.get("candidate_paths") or [])
+        result["impact_plan"] = {
+            "mode": plan.get("mode"),
+            "checkpoint_required": plan.get("checkpoint_required"),
+            "navigation_required": plan.get("navigation_required"),
+            "navigation_reason": plan.get("navigation_reason"),
+            "direct_sha_assets": plan.get("direct_sha_assets"),
+            "fallback_reason": plan.get("fallback_reason"),
+        }
+        return result
+
+    changed_files: set[str] = set()
+    updates: list[str] = []
+    stats: dict[str, Any] = {"base": base_ref, "hashed_assets": 0, "desired_sha_calls": 0}
+    only = set(plan["direct_sha_assets"])
+    updates += apply_asset_hashes(changed_files, only_asset_ids=only, stats=stats)
+    first_hashed = stats.get("hashed_assets", 0)
+    first_sha_calls = stats.get("desired_sha_calls", 0)
+    stats["registries_rewritten"] = sum(
+        1 for relative in ASSET_REGISTRIES if relative in changed_files
+    )
+    if plan["checkpoint_required"]:
+        checkpoint = update_manifest_checkpoint(changed_files)
+        updates += checkpoint
+        stats["checkpoint_updated"] = 1 if checkpoint else 0
+    else:
+        stats["checkpoint_updated"] = 0
+    if plan["navigation_required"]:
+        updates += run_nav_generator()
+        stats["navigation_runs"] = 1
+        updates += apply_asset_hashes(
+            changed_files,
+            only_asset_ids=only
+            | {
+                asset_id
+                for asset_id, info in collect_asset_records().items()
+                if info["repository_path"] in NAV_OUTPUTS
+            },
+        )
+        if plan["checkpoint_required"]:
+            checkpoint = update_manifest_checkpoint(changed_files)
+            updates += checkpoint
+            if checkpoint:
+                stats["checkpoint_updated"] = 1
+    else:
+        stats["navigation_runs"] = 0
+
+    second_changed: set[str] = set()
+    watch = set(changed_files)
+    if plan["checkpoint_required"]:
+        watch.add(MANIFEST_RELATIVE)
+    if plan["navigation_required"]:
+        watch.update(NAV_OUTPUTS)
+    second_before = {
+        relative: (ROOT / relative).read_bytes()
+        for relative in sorted(watch)
+        if (ROOT / relative).is_file()
     }
+    second_updates = apply_asset_hashes(
+        second_changed, only_asset_ids=only
+    )
+    if plan["checkpoint_required"]:
+        second_updates += update_manifest_checkpoint(second_changed)
+    if plan["navigation_required"]:
+        second_updates += run_nav_generator()
+        stats["navigation_runs"] = stats.get("navigation_runs", 0) + 1
+    _require(
+        not second_changed,
+        "NON_IDEMPOTENT_APPLY:" + "; ".join(second_updates),
+    )
+    for relative, before in second_before.items():
+        _require(
+            (ROOT / relative).read_bytes() == before,
+            f"NON_IDEMPOTENT_APPLY:{relative}",
+        )
+    return _sync_result(
+        mode="incremental",
+        updates=updates,
+        changed_files=changed_files,
+        idempotency="PASS_IMPACTED_CLOSURE_NOOP",
+        stats=stats,
+        started=started,
+        plan=plan,
+        full_fallback=False,
+    )
+
+
+def apply_sync(*, base_ref: str | None = None, full: bool = False) -> dict[str, Any]:
+    if full or base_ref is None:
+        return apply_sync_full()
+    return apply_sync_incremental(base_ref)
 
 
 def _run_git(args: list[str], root: Path | None = None) -> bytes:
@@ -801,9 +1258,21 @@ def sync_main(argv: list[str]) -> int:
         action="store_true",
         help="with --check, verify drift only for git-staged paths",
     )
+    parser.add_argument(
+        "--base-ref",
+        help="exact 40-hex task/control base for incremental --apply",
+    )
+    parser.add_argument(
+        "--full",
+        action="store_true",
+        help="with --apply, force the full Catalog oracle",
+    )
     args = parser.parse_args(argv)
 
     if args.check:
+        if args.full or args.base_ref:
+            print("HARNESS_SYNC_ERROR: CHECK_MODE_REJECTS_APPLY_FLAGS", file=sys.stderr)
+            return 2
         if args.paths_from_staging:
             problems = check_drift(scoped_paths=read_staged_paths())
         else:
@@ -815,7 +1284,13 @@ def sync_main(argv: list[str]) -> int:
         print("HARNESS_SYNC_CHECK: PASS")
         return 0
 
-    result = apply_sync()
+    if args.full and args.base_ref:
+        print("HARNESS_SYNC_ERROR: FULL_AND_BASE_REF_CONFLICT", file=sys.stderr)
+        return 2
+    if args.base_ref is not None and re.fullmatch(r"[0-9a-f]{40}", args.base_ref) is None:
+        print("HARNESS_SYNC_ERROR: BASE_REF_INVALID", file=sys.stderr)
+        return 2
+    result = apply_sync(base_ref=args.base_ref, full=args.full)
     print(json.dumps(result, indent=2))
     return 0
 
