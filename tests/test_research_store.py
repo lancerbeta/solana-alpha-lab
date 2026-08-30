@@ -579,6 +579,7 @@ class WriterLeaseStaleRecoveryTests(unittest.TestCase):
             try:
                 link.symlink_to(outside)
             except OSError:
+                # DELIVERY_PREFLIGHT_NONCRITICAL_SKIP: docs/evidence/research_store_stale_writer_lease_recovery/a1_delivery_completion_evidence_v1.json
                 self.skipTest("symlink creation not permitted")
             with self.assertRaises(ResearchStoreError):
                 with ResearchStore(root).writer_lease():
