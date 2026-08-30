@@ -10,7 +10,25 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "bf0b54fbf61a232cf654a3ca76e24211faee93d91a4e02493a28177f92408e7a",
+    "catalog/assets/lifecycle.yaml": "43e5a2cee119094837e43dbc749f3f53b75d079e8e24dbc0cb89740066e8521c",
+    "catalog/catalog_manifest.yaml": "56117f9b7df9b507e0aa6fceed95d7b22fe87edfc51bfe5ab06711b2a1403eb3",
+    "catalog/generated/asset_edges.json": "1977201fd04f00ae744c04030889ea020a16c757f6d38682c434c8a2e176c1c7",
+    "configs/early_quote_surface_pathrisk_calibration_v1.yaml": "c252fbabb127c847e6618ff3bb3fe64766f63b30cce0c123619f6d3bdd39a0aa",
+    "configs/observation_primitive_registry_v1.yaml": "85674ba8d3f9e595d9cba8eef7629bfca742a84daf61edb0606baf9f20996932",
+    "docs/PROJECT_MAP.md": "3bbd6ccb7f972c4d0ed17ae73e6466ef635bc5a786b7de75a88360ec94848fa3",
+    "docs/reports/early_quote_surface_pathrisk_calibration/a1_owner_readout_v1.md": "cbba044325de8c9241ed3b9098027d0a95c27b0b433317c8a85fdfffda96efb9",
+    "docs/tasks/EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1.md": "e2ee52583c3d49e7f99e570c167c88cfb2f6e9aa70189a17f7ade281ecd46eff",
+    "scripts/early_quote_surface_pathrisk_calibration.py": "9653a26b19b76bce493f43276da7a9c4bdd45fb4954a8a30eabea40226917f67",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "b898a7ac85b5521802f912f9907104f3f44fe19939436076372e7c9121218ab4",
+    "src/solana_alpha_lab/factory/pathrisk_calibration.py": "37ac1904cce9dfebc4b85dcfbc192d1b002265f6d33a183a5fa560080f1d3c9b",
+    "src/solana_alpha_lab/factory/quote_surface_projection.py": "d347d78a7d4a0ba2e428d1d0dc250522b685569d78f646f49df148085d59bfe5",
+    "tests/fixtures/observation_schedule/pathrisk_calibration.yaml": "d1244d31857167132440db3874fc16dd032898396e0e571aad655c606220ae14",
+    "tests/test_observation_primitive_registry.py": "48cc1ee551f15783a65484ac3825a2f7078ecaad013beb026d432201e2a1d97e",
+    "tests/test_pathrisk_calibration.py": "4fb2bdd674c2d47071755e41c26551c710a217decf6cea2695381a4b0814438f",
+    "tests/test_quote_surface_projection.py": "bf6b319144dd4113855e5ccdc0016449c8a5ec9561fbe19d04aba886d8fdcc09"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "5f2ada339d29f3078e354b45ae2146d1709ab1a9941373291eb28fd93f7adc3f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PATHRISK_CALIBRATION_SUITE",
     "independent_review": {
       "path": "docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "77eb113f9e13f03438b96bce7905027f26cd3de30832779e036583595d7e3687",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
