@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "RESEARCH-STORE-STALE-WRITER-LEASE-RECOVERY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-31",
+  "task_id": "RESEARCH_STORE_STALE_WRITER_LEASE_RECOVERY_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "7151d34fab1fadc4db75fff2f6bce3ad798a8638a24fb766cd03f4f48ebe3317",
+  "reviewed_inventory_sha256": "7151d34fab1fadc4db75fff2f6bce3ad798a8638a24fb766cd03f4f48ebe3317",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_FAIL_CLOSED_LIVE_REMOTE_UNKNOWN_MALFORMED",
+        "CHECKED_CREATE_ONLY_RECOVERY_ARTIFACT",
+        "CHECKED_OS_LINK_QUARANTINE_CLAIM",
+        "FIXED_ORPHAN_QUARANTINE_RESUME",
+        "FIXED_WINDOWS_PERMISSIONERROR_ON_SUCCESSOR_UNLINK_MAPPED_TO_RACE",
+        "FIXED_PARENT_MKDIR_RACE",
+        "CHECKED_NON_DESTRUCTIVE_WINDOWS_PID_PROBE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "FIXED_ORPHAN_QUARANTINE_REWEDGE_AFTER_LINK_BEFORE_UNLINK",
+        "CHECKED_T7_KILLED_WRITER_RECOVERY",
+        "CHECKED_T13_ORPHAN_QUARANTINE_RESUME",
+        "CHECKED_T1_T12_FAIL_CLOSED_MATRIX",
+        "CHECKED_NAMED_CONSUMER_WRITER_LEASE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_INODE_IDENTITY_BEFORE_UNLINK_BLOCKS_SUCCESSOR_DELETE",
+        "CHECKED_EXPIRY_PLUS_DEAD_PID_REQUIRED",
+        "CHECKED_REMOTE_HOST_NOT_AUTHORITY",
+        "CHECKED_PID_UNKNOWN_FAILS_CLOSED",
+        "CHECKED_NO_DISTRIBUTED_LOCK_OR_MULTI_WRITER"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_PROVIDER_CALLS",
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK"
+  ]
+}

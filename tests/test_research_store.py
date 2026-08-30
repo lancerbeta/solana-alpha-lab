@@ -2,11 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import socket
 import sys
 import tempfile
+import threading
 import unittest
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from unittest import mock
 
 import jsonschema
 
@@ -15,10 +19,14 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory import research_store as research_store_module
 from solana_alpha_lab.factory.research_store import (
+    PidLiveness,
     ResearchEvent,
     ResearchStore,
     ResearchStoreError,
+    _timestamp_text,
+    probe_local_pid,
 )
 
 
@@ -256,6 +264,371 @@ class ResearchStoreTests(unittest.TestCase):
             ).read_text(encoding="utf-8")
             self.assertNotIn(str(Path(tmp)), manifest_bytes)
             self.assertNotIn("\\", manifest_bytes)
+
+
+class WriterLeaseStaleRecoveryTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self._clock_backup = research_store_module._lease_clock
+        self._probe_backup = research_store_module._pid_liveness_probe
+        self.addCleanup(self._restore_hooks)
+
+    def _restore_hooks(self) -> None:
+        research_store_module._lease_clock = self._clock_backup
+        research_store_module._pid_liveness_probe = self._probe_backup
+
+    def _write_lease(
+        self,
+        root: Path,
+        *,
+        expiry: datetime,
+        opened_at: datetime,
+        pid: int,
+        token: str = "a" * 32,
+        host: str | None = None,
+        raw: bytes | None = None,
+    ) -> Path:
+        locks = root / "locks"
+        locks.mkdir(parents=True, exist_ok=True)
+        path = locks / "research-writer.lock"
+        if raw is not None:
+            path.write_bytes(raw)
+            return path
+        payload = {
+            "expiry": _timestamp_text(expiry),
+            "host": socket.gethostname() if host is None else host,
+            "opened_at": _timestamp_text(opened_at),
+            "pid": pid,
+            "token": token,
+        }
+        path.write_text(
+            json.dumps(payload, sort_keys=True, separators=(",", ":")),
+            encoding="utf-8",
+        )
+        return path
+
+    def test_t1_ordinary_acquire_release_unchanged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            store = ResearchStore(root)
+            with store.writer_lease():
+                lock = root / "locks" / "research-writer.lock"
+                self.assertTrue(lock.is_file())
+                lease = json.loads(lock.read_text(encoding="utf-8"))
+                self.assertEqual(lease["pid"], os.getpid())
+                self.assertEqual(lease["host"], socket.gethostname())
+            self.assertFalse((root / "locks" / "research-writer.lock").exists())
+
+    def test_t2_non_expired_lease_not_recovered(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_lease(
+                root,
+                expiry=now + timedelta(minutes=2),
+                opened_at=now - timedelta(minutes=1),
+                pid=os.getpid(),
+                token="b" * 32,
+            )
+            original = path.read_bytes()
+            store = ResearchStore(root)
+            with self.assertRaisesRegex(ResearchStoreError, "WRITER_BUSY"):
+                with store.writer_lease():
+                    pass
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_t3_expired_but_owner_alive_not_recovered(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.ALIVE
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=1),
+                opened_at=now - timedelta(minutes=10),
+                pid=424242,
+                token="c" * 32,
+            )
+            original = path.read_bytes()
+            with self.assertRaisesRegex(ResearchStoreError, "WRITER_BUSY"):
+                with ResearchStore(root).writer_lease():
+                    pass
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_t4_expired_remote_host_not_recovered(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.DEAD
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=1),
+                opened_at=now - timedelta(minutes=10),
+                pid=424242,
+                token="d" * 32,
+                host="other-host.example",
+            )
+            original = path.read_bytes()
+            with self.assertRaisesRegex(
+                ResearchStoreError,
+                "WRITER_LEASE_REMOTE_OR_AMBIGUOUS",
+            ):
+                with ResearchStore(root).writer_lease():
+                    pass
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_t5_malformed_lease_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_lease(
+                root,
+                expiry=datetime(2020, 1, 1, tzinfo=UTC),
+                opened_at=datetime(2020, 1, 1, tzinfo=UTC),
+                pid=1,
+                raw=b"{not-json",
+            )
+            original = path.read_bytes()
+            with self.assertRaisesRegex(ResearchStoreError, "WRITER_LEASE_INVALID"):
+                with ResearchStore(root).writer_lease():
+                    pass
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_t6_pid_unknown_fails_closed(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.UNKNOWN
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=1),
+                opened_at=now - timedelta(minutes=10),
+                pid=424242,
+                token="e" * 32,
+            )
+            original = path.read_bytes()
+            with self.assertRaisesRegex(
+                ResearchStoreError,
+                "WRITER_LEASE_REMOTE_OR_AMBIGUOUS",
+            ):
+                with ResearchStore(root).writer_lease():
+                    pass
+            self.assertEqual(path.read_bytes(), original)
+
+    def test_t7_killed_writer_shape_recovers(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.DEAD
+        token = "f" * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=30),
+                opened_at=now - timedelta(minutes=10),
+                pid=2**30 - 3,
+                token=token,
+            )
+            store = ResearchStore(root)
+            with store.writer_lease():
+                lock = root / "locks" / "research-writer.lock"
+                lease = json.loads(lock.read_text(encoding="utf-8"))
+                self.assertNotEqual(lease["token"], token)
+                self.assertEqual(lease["pid"], os.getpid())
+            artifact = root / "locks" / "recovery" / f"{token}.json"
+            self.assertTrue(artifact.is_file())
+            body = json.loads(artifact.read_text(encoding="utf-8"))
+            self.assertEqual(body["classification"], "EXPIRED_LOCAL_OWNER_DEAD")
+            self.assertEqual(body["old_token"], token)
+            self.assertNotIn(str(root), artifact.read_text(encoding="utf-8"))
+
+    def test_t8_recovery_artifact_create_only(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.DEAD
+        token = "1" * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            recovery = root / "locks" / "recovery"
+            recovery.mkdir(parents=True)
+            prior = recovery / f"{token}.json"
+            prior.write_text('{"kept":true}', encoding="utf-8")
+            self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=1),
+                opened_at=now - timedelta(minutes=5),
+                pid=2**30 - 5,
+                token=token,
+            )
+            with ResearchStore(root).writer_lease():
+                pass
+            self.assertEqual(prior.read_text(encoding="utf-8"), '{"kept":true}')
+
+    def test_t9_concurrent_recovery_race(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.DEAD
+        token = "2" * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=1),
+                opened_at=now - timedelta(minutes=5),
+                pid=2**30 - 7,
+                token=token,
+            )
+            start = threading.Barrier(2)
+            hold = threading.Event()
+            outcomes: list[str] = []
+            guard = threading.Lock()
+
+            def contender() -> None:
+                store = ResearchStore(root)
+                start.wait(timeout=5)
+                try:
+                    with store.writer_lease():
+                        with guard:
+                            outcomes.append("acquired")
+                        hold.wait(timeout=5)
+                except ResearchStoreError as exc:
+                    with guard:
+                        outcomes.append(exc.code)
+
+            threads = [
+                threading.Thread(target=contender),
+                threading.Thread(target=contender),
+            ]
+            for thread in threads:
+                thread.start()
+            # Wait until one side has either acquired or failed.
+            deadline = datetime.now(UTC).timestamp() + 5
+            while datetime.now(UTC).timestamp() < deadline:
+                with guard:
+                    if len(outcomes) >= 1:
+                        break
+                hold.wait(0.01)
+            hold.set()
+            for thread in threads:
+                thread.join(timeout=10)
+            self.assertEqual(outcomes.count("acquired"), 1)
+            self.assertEqual(len(outcomes), 2)
+            loser_codes = {code for code in outcomes if code != "acquired"}
+            self.assertTrue(
+                loser_codes <= {"WRITER_BUSY", "WRITER_LEASE_RECOVERY_RACE"}
+            )
+
+    def test_t10_lease_changed_after_inspection(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.DEAD
+        token = "3" * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=1),
+                opened_at=now - timedelta(minutes=5),
+                pid=2**30 - 9,
+                token=token,
+            )
+            successor = {
+                "expiry": _timestamp_text(now + timedelta(minutes=5)),
+                "host": socket.gethostname(),
+                "opened_at": _timestamp_text(now),
+                "pid": os.getpid(),
+                "token": "4" * 32,
+            }
+            successor_bytes = json.dumps(
+                successor,
+                sort_keys=True,
+                separators=(",", ":"),
+            ).encode("utf-8")
+            original_read = path.read_bytes()
+
+            real_link = os.link
+
+            def link_then_swap(src: str | os.PathLike[str], dst: str | os.PathLike[str]) -> None:
+                # After exclusive claim of observed stale bytes, swap lock to successor.
+                real_link(src, dst)
+                Path(src).write_bytes(successor_bytes)
+
+            with mock.patch("os.link", side_effect=link_then_swap):
+                with self.assertRaisesRegex(
+                    ResearchStoreError,
+                    "WRITER_BUSY|WRITER_LEASE_RECOVERY_RACE",
+                ):
+                    with ResearchStore(root).writer_lease():
+                        pass
+            self.assertEqual(path.read_bytes(), successor_bytes)
+            self.assertNotEqual(path.read_bytes(), original_read)
+
+    def test_t11_symlink_lock_fails_closed(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.DEAD
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            locks = root / "locks"
+            locks.mkdir(parents=True)
+            outside = Path(tmp) / "outside.lock"
+            outside.write_text("{}", encoding="utf-8")
+            link = locks / "research-writer.lock"
+            try:
+                link.symlink_to(outside)
+            except OSError:
+                self.skipTest("symlink creation not permitted")
+            with self.assertRaises(ResearchStoreError):
+                with ResearchStore(root).writer_lease():
+                    pass
+            self.assertTrue(link.is_symlink())
+
+    def test_t12_append_flow_still_passes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            receipt = store.append(
+                [event_fixture()],
+                transaction_id="RESEARCH-TXN-001",
+            )
+            self.assertEqual(receipt.disposition.value, "CREATED")
+            self.assertEqual(len(tuple(store.iter_committed_records())), 1)
+
+    def test_t13_orphan_quarantine_after_link_still_recovers(self) -> None:
+        now = datetime(2026, 8, 31, 12, 0, tzinfo=UTC)
+        research_store_module._lease_clock = lambda: now
+        research_store_module._pid_liveness_probe = lambda _pid: PidLiveness.DEAD
+        token = "5" * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = self._write_lease(
+                root,
+                expiry=now - timedelta(seconds=1),
+                opened_at=now - timedelta(minutes=5),
+                pid=2**30 - 11,
+                token=token,
+            )
+            stale_bytes = path.read_bytes()
+            recovery = root / "locks" / "recovery"
+            recovery.mkdir(parents=True)
+            quarantine = recovery / f"reclaimed-{token}.lock"
+            os.link(path, quarantine)
+            self.assertEqual(quarantine.read_bytes(), stale_bytes)
+            self.assertTrue(path.is_file())
+            with ResearchStore(root).writer_lease():
+                lease = json.loads(path.read_text(encoding="utf-8"))
+                self.assertNotEqual(lease["token"], token)
+                self.assertEqual(lease["pid"], os.getpid())
+            self.assertFalse(path.exists())
+            artifact = recovery / f"{token}.json"
+            self.assertTrue(artifact.is_file())
+
+    def test_probe_local_pid_dead_and_alive(self) -> None:
+        self.assertEqual(probe_local_pid(2**30 - 3), PidLiveness.DEAD)
+        self.assertEqual(probe_local_pid(os.getpid()), PidLiveness.ALIVE)
+        self.assertEqual(probe_local_pid(0), PidLiveness.UNKNOWN)
+        self.assertEqual(probe_local_pid(-1), PidLiveness.UNKNOWN)
 
 
 if __name__ == "__main__":

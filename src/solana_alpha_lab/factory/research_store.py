@@ -2,15 +2,17 @@
 
 from __future__ import annotations
 
+import ctypes
 import errno
 import hashlib
 import json
 import os
 import re
 import socket
+import sys
 import tempfile
 import uuid
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -89,6 +91,13 @@ _PROJECTION_COLUMNS = (
     "created_at",
 )
 _LEASE_DURATION = timedelta(minutes=5)
+_WRITER_LOCK_LOCATION = "locks/research-writer.lock"
+_WRITER_LEASE_RECOVERY_SCHEMA = "smial.research_store.writer_lease_recovery"
+_WRITER_LEASE_RECOVERY_SCHEMA_VERSION = "1.0"
+_WRITER_LEASE_REQUIRED_KEYS = frozenset(
+    {"expiry", "host", "opened_at", "pid", "token"}
+)
+_TOKEN_RE = re.compile(r"^[0-9a-f]{32}$")
 _TRANSACTION_ID_RE = re.compile(
     r"RESEARCH-TXN-[A-Z0-9][A-Z0-9._-]{0,243}"
 )
@@ -218,6 +227,286 @@ class ResearchStoreError(RuntimeError):
     def __init__(self, code: str) -> None:
         self.code = code
         super().__init__(code)
+
+
+class PidLiveness(StrEnum):
+    ALIVE = "ALIVE"
+    DEAD = "DEAD"
+    UNKNOWN = "UNKNOWN"
+
+
+@dataclass(frozen=True, slots=True)
+class _ParsedWriterLease:
+    expiry: datetime
+    host: str
+    opened_at: datetime
+    pid: int
+    token: str
+    raw_bytes: bytes
+
+
+_lease_clock: Callable[[], datetime] = lambda: datetime.now(UTC)
+_pid_liveness_probe: Callable[[int], PidLiveness] | None = None
+
+
+def _current_lease_time() -> datetime:
+    return _lease_clock().astimezone(UTC)
+
+
+def probe_local_pid(pid: int) -> PidLiveness:
+    """Non-destructive local PID probe with fail-closed UNKNOWN."""
+    if _pid_liveness_probe is not None:
+        return _pid_liveness_probe(pid)
+    if not isinstance(pid, int) or isinstance(pid, bool) or pid <= 0:
+        return PidLiveness.UNKNOWN
+    if sys.platform == "win32":
+        # PROCESS_QUERY_LIMITED_INFORMATION — query only, never terminate.
+        process_query_limited_information = 0x1000
+        kernel32 = ctypes.windll.kernel32  # type: ignore[attr-defined]
+        handle = kernel32.OpenProcess(
+            process_query_limited_information,
+            False,
+            pid,
+        )
+        if handle:
+            kernel32.CloseHandle(handle)
+            return PidLiveness.ALIVE
+        error = int(kernel32.GetLastError())
+        # ERROR_INVALID_PARAMETER (87): PID is not an active process.
+        if error == 87:
+            return PidLiveness.DEAD
+        # ACCESS_DENIED (5) and other errors remain ambiguous.
+        return PidLiveness.UNKNOWN
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return PidLiveness.DEAD
+    except PermissionError:
+        return PidLiveness.UNKNOWN
+    except OSError:
+        return PidLiveness.UNKNOWN
+    return PidLiveness.ALIVE
+
+
+def _parse_writer_lease_bytes(raw: bytes) -> _ParsedWriterLease | None:
+    try:
+        payload = json.loads(raw.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError, ValueError):
+        return None
+    if not isinstance(payload, dict) or set(payload) != _WRITER_LEASE_REQUIRED_KEYS:
+        return None
+    token = payload.get("token")
+    host = payload.get("host")
+    pid = payload.get("pid")
+    if (
+        not isinstance(token, str)
+        or _TOKEN_RE.fullmatch(token) is None
+        or not isinstance(host, str)
+        or not host
+        or "\x00" in host
+        or not isinstance(pid, int)
+        or isinstance(pid, bool)
+        or pid <= 0
+    ):
+        return None
+    try:
+        expiry = datetime.fromisoformat(
+            str(payload["expiry"]).replace("Z", "+00:00")
+        )
+        opened_at = datetime.fromisoformat(
+            str(payload["opened_at"]).replace("Z", "+00:00")
+        )
+    except (TypeError, ValueError):
+        return None
+    if expiry.tzinfo is None or opened_at.tzinfo is None:
+        return None
+    return _ParsedWriterLease(
+        expiry=expiry.astimezone(UTC),
+        host=host,
+        opened_at=opened_at.astimezone(UTC),
+        pid=pid,
+        token=token,
+        raw_bytes=raw,
+    )
+
+
+def _write_writer_lease_recovery_artifact(
+    root: Path,
+    lease: _ParsedWriterLease,
+    *,
+    recovered_at: datetime,
+) -> None:
+    recovered_at_text = _timestamp_text(recovered_at)
+    body = {
+        "classification": "EXPIRED_LOCAL_OWNER_DEAD",
+        "old_expiry": _timestamp_text(lease.expiry),
+        "old_host": lease.host,
+        "old_opened_at": _timestamp_text(lease.opened_at),
+        "old_pid": lease.pid,
+        "old_token": lease.token,
+        "recovered_at": recovered_at_text,
+        "schema": _WRITER_LEASE_RECOVERY_SCHEMA,
+        "schema_version": _WRITER_LEASE_RECOVERY_SCHEMA_VERSION,
+    }
+    integrity = _sha256(
+        json.dumps(
+            body,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+    )
+    body["integrity_sha256"] = integrity
+    artifact_bytes = json.dumps(
+        body,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    artifact_path = _target_path(
+        root,
+        f"locks/recovery/{lease.token}.json",
+        create_parents=True,
+    )
+    try:
+        with artifact_path.open("xb") as handle:
+            handle.write(artifact_bytes)
+            handle.flush()
+            os.fsync(handle.fileno())
+    except OSError as exc:
+        if _destination_exists(exc):
+            # Prior recovery evidence for this token must stay create-only.
+            return
+        raise ResearchStoreError("WRITER_LEASE_RECOVERY_FAILED") from exc
+
+
+def _recover_expired_local_dead_writer_lease(
+    root: Path,
+    lock_path: Path,
+    lease: _ParsedWriterLease,
+    *,
+    now: datetime,
+) -> None:
+    if lock_path.is_symlink():
+        raise ResearchStoreError("WRITER_LEASE_REMOTE_OR_AMBIGUOUS")
+    quarantine_path = _target_path(
+        root,
+        f"locks/recovery/reclaimed-{lease.token}.lock",
+        create_parents=True,
+    )
+    if quarantine_path.is_symlink():
+        raise ResearchStoreError("WRITER_LEASE_REMOTE_OR_AMBIGUOUS")
+    claimed = False
+    try:
+        os.link(lock_path, quarantine_path)
+        claimed = True
+    except FileExistsError:
+        # Crash after link / before unlink can leave an exact quarantine claim.
+        try:
+            if (
+                not quarantine_path.is_file()
+                or quarantine_path.is_symlink()
+                or quarantine_path.read_bytes() != lease.raw_bytes
+            ):
+                raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE")
+        except ResearchStoreError:
+            raise
+        except OSError as exc:
+            raise ResearchStoreError("WRITER_LEASE_RECOVERY_FAILED") from exc
+    except FileNotFoundError as exc:
+        raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE") from exc
+    except OSError as exc:
+        raise ResearchStoreError("WRITER_LEASE_RECOVERY_FAILED") from exc
+
+    try:
+        if quarantine_path.read_bytes() != lease.raw_bytes:
+            if claimed:
+                quarantine_path.unlink(missing_ok=True)
+            raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE")
+        if not lock_path.exists():
+            _write_writer_lease_recovery_artifact(
+                root,
+                lease,
+                recovered_at=now,
+            )
+            return
+        if lock_path.is_symlink() or not lock_path.is_file():
+            if claimed:
+                quarantine_path.unlink(missing_ok=True)
+            raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE")
+        # Same inode as quarantine => still the hardlinked stale lease, not a successor.
+        lock_stat = lock_path.stat()
+        quarantine_stat = quarantine_path.stat()
+        if (
+            lock_stat.st_ino != quarantine_stat.st_ino
+            or lock_stat.st_dev != quarantine_stat.st_dev
+        ):
+            if claimed:
+                quarantine_path.unlink(missing_ok=True)
+            raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE")
+        if lock_path.read_bytes() != lease.raw_bytes:
+            if claimed:
+                quarantine_path.unlink(missing_ok=True)
+            raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE")
+        _write_writer_lease_recovery_artifact(
+            root,
+            lease,
+            recovered_at=now,
+        )
+        try:
+            # Re-check identity immediately before unlink to avoid deleting a successor.
+            lock_stat = lock_path.stat()
+            quarantine_stat = quarantine_path.stat()
+            if (
+                lock_stat.st_ino != quarantine_stat.st_ino
+                or lock_stat.st_dev != quarantine_stat.st_dev
+            ):
+                raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE")
+            lock_path.unlink()
+        except FileNotFoundError:
+            pass
+        except PermissionError as exc:
+            # On Windows the path may already be the successor held open by a winner.
+            raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE") from exc
+    except ResearchStoreError:
+        raise
+    except OSError as exc:
+        raise ResearchStoreError("WRITER_LEASE_RECOVERY_FAILED") from exc
+
+
+def _attempt_stale_writer_lease_recovery(root: Path, lock_path: Path) -> None:
+    if lock_path.is_symlink():
+        raise ResearchStoreError("WRITER_LEASE_REMOTE_OR_AMBIGUOUS")
+    if not lock_path.is_file():
+        # Concurrent recovery may have already reclaimed the path.
+        raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE")
+    try:
+        raw = lock_path.read_bytes()
+    except FileNotFoundError as exc:
+        raise ResearchStoreError("WRITER_LEASE_RECOVERY_RACE") from exc
+    except OSError as exc:
+        raise ResearchStoreError("WRITER_LEASE_INVALID") from exc
+    lease = _parse_writer_lease_bytes(raw)
+    if lease is None:
+        raise ResearchStoreError("WRITER_LEASE_INVALID")
+    now = _current_lease_time()
+    if lease.expiry >= now:
+        raise ResearchStoreError("WRITER_BUSY")
+    if lease.host != socket.gethostname():
+        raise ResearchStoreError("WRITER_LEASE_REMOTE_OR_AMBIGUOUS")
+    liveness = probe_local_pid(lease.pid)
+    if liveness is PidLiveness.ALIVE:
+        raise ResearchStoreError("WRITER_BUSY")
+    if liveness is PidLiveness.UNKNOWN:
+        raise ResearchStoreError("WRITER_LEASE_REMOTE_OR_AMBIGUOUS")
+    _recover_expired_local_dead_writer_lease(
+        root,
+        lock_path,
+        lease,
+        now=now,
+    )
 
 
 class CommitDisposition(StrEnum):
@@ -685,6 +974,17 @@ def _target_path(
             candidate.mkdir()
             resolved = candidate.resolve(strict=True)
         except OSError as exc:
+            if _destination_exists(exc) or candidate.exists() or candidate.is_symlink():
+                try:
+                    resolved = candidate.resolve(strict=True)
+                except OSError as resolve_exc:
+                    raise ResearchStoreError(
+                        "LOGICAL_PARENT_UNRESOLVABLE"
+                    ) from resolve_exc
+                if not _is_within(resolved, root) or not resolved.is_dir():
+                    raise ResearchStoreError("LOGICAL_PARENT_UNSAFE") from exc
+                current = resolved
+                continue
             raise ResearchStoreError("LOGICAL_PARENT_CREATION_FAILED") from exc
         if not _is_within(resolved, root):
             raise ResearchStoreError("LOGICAL_PARENT_UNSAFE")
@@ -808,11 +1108,11 @@ class ResearchStore:
     def writer_lease(self) -> Iterator[None]:
         lock_path = _target_path(
             self._root,
-            "locks/research-writer.lock",
+            _WRITER_LOCK_LOCATION,
             create_parents=True,
         )
         token = uuid.uuid4().hex
-        opened_at = datetime.now(UTC)
+        opened_at = _current_lease_time()
         lease = {
             "expiry": _timestamp_text(opened_at + _LEASE_DURATION),
             "host": socket.gethostname(),
@@ -827,15 +1127,30 @@ class ResearchStore:
             separators=(",", ":"),
             allow_nan=False,
         ).encode("utf-8")
-        try:
+
+        def _acquire() -> None:
             with lock_path.open("xb") as handle:
                 handle.write(lease_bytes)
                 handle.flush()
                 os.fsync(handle.fileno())
+
+        try:
+            _acquire()
         except OSError as exc:
-            if _destination_exists(exc):
-                raise ResearchStoreError("WRITER_BUSY") from exc
-            raise ResearchStoreError("WRITER_LEASE_CREATE_FAILED") from exc
+            if not _destination_exists(exc):
+                raise ResearchStoreError("WRITER_LEASE_CREATE_FAILED") from exc
+            try:
+                _attempt_stale_writer_lease_recovery(self._root, lock_path)
+            except ResearchStoreError as recovery_exc:
+                if recovery_exc.code != "WRITER_LEASE_RECOVERY_RACE":
+                    raise
+                # Another recoverer won the reclaim; fall through to one acquire retry.
+            try:
+                _acquire()
+            except OSError as retry_exc:
+                if _destination_exists(retry_exc):
+                    raise ResearchStoreError("WRITER_BUSY") from retry_exc
+                raise ResearchStoreError("WRITER_LEASE_CREATE_FAILED") from retry_exc
 
         try:
             yield
@@ -1546,7 +1861,14 @@ class ResearchStore:
         return count
 
     def _writer_lease_state(self) -> str:
-        lock_path = self._root / "locks" / "research-writer.lock"
+        try:
+            lock_path = _target_path(
+                self._root,
+                _WRITER_LOCK_LOCATION,
+                create_parents=False,
+            )
+        except ResearchStoreError:
+            return "UNVERIFIABLE"
         if not lock_path.exists():
             return "FREE"
         if lock_path.is_symlink() or not lock_path.is_file():
@@ -1564,7 +1886,7 @@ class ResearchStore:
             expiry = datetime.fromisoformat(expiry_raw.replace("Z", "+00:00"))
         except ValueError:
             return "HELD"
-        if expiry.astimezone(UTC) <= datetime.now(UTC):
+        if expiry.astimezone(UTC) <= _current_lease_time():
             return "STALE"
         return "HELD"
 
@@ -1616,6 +1938,7 @@ class ResearchStore:
 __all__ = [
     "CommitDisposition",
     "CommitReceipt",
+    "PidLiveness",
     "ProjectionReceipt",
     "RESEARCH_EVENT_ARROW_SCHEMA",
     "RecordKind",
@@ -1624,4 +1947,5 @@ __all__ = [
     "ResearchStoreError",
     "RunPassport",
     "StoreDiagnostics",
+    "probe_local_pid",
 ]
