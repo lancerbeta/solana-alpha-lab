@@ -676,10 +676,22 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
             self.assertEqual(receipt["used_primitive_ids"], primitive_ids)
             self.assertEqual(receipt["provider_route_ids"], routes)
             registry = load_observation_primitive_registry(ROOT)
-            unused_primitives = sorted(set(registry.primitives) - set(primitive_ids))
+            used = set(primitive_ids)
+            unused_primitives = sorted(set(registry.primitives) - used)
+            self.assertTrue(unused_primitives)
             for primitive_id in unused_primitives:
-                for route in registry.require_primitive(primitive_id)["provider_route_ids"]:
-                    self.assertNotIn(route, receipt["provider_route_ids"])
+                self.assertNotIn(primitive_id, receipt["used_primitive_ids"])
+            # Unused primitives may share a provider route with used ones
+            # (1M quote primitives reuse the Fast Lane Jupiter swap endpoint).
+            # Exclusive unused routes must not leak into this schedule's receipt.
+            used_routes = set(routes)
+            exclusive_unused_routes = {
+                str(route)
+                for primitive_id in unused_primitives
+                for route in registry.require_primitive(primitive_id)["provider_route_ids"]
+                if str(route) not in used_routes
+            }
+            self.assertTrue(exclusive_unused_routes.isdisjoint(receipt["provider_route_ids"]))
             self.assertEqual(
                 receipt["expires_at"],
                 render_utc(_minimum_expiry(document)),

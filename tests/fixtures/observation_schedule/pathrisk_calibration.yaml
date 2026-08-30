@@ -1,0 +1,80 @@
+schema: smial.observation-schedule
+schema_version: '1.0'
+schedule_key: OBS-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001
+activation:
+  starts_at: '2026-09-01T00:00:00Z'
+  stops_admitting_at: '2026-09-02T00:00:00Z'
+  cadence_alignment: UTC_EPOCH
+source_poll:
+  primitive_id: PRIM-JUPITER-TOKENS-V2-RECENT-001
+  query_profile_id: QUERY-JUPITER-PUMPFUN-RECENT-001
+  period_seconds: 60
+population:
+  entity_type: TOKEN_MINT
+  entity_key_field_id: FIELD-TOKEN-MINT-001
+  anchor_field_id: FIELD-FIRST-POOL-CREATED-AT-001
+  scheduling_fallback: FIRST_SEEN_AT_ONLY
+  source_predicates:
+    - field_id: FIELD-FIRST-POOL-SOURCE-001
+      operator: EQ
+      value_text: pump.fun
+  x_eligibility_predicates:
+    - field_id: FIELD-LIQUIDITY-USD-001
+      operator: GTE
+      value_decimal: '1000'
+sampling:
+  policy: DETERMINISTIC_HASH_BERNOULLI
+  seed: EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-V1
+  inclusion_probability: '1.0'
+  max_candidates_per_utc_day: 2000
+  max_members_per_utc_day: 4
+  overflow_state: NOT_SELECTED_CAPACITY
+x_point:
+  point_id: X300
+  due_offset_seconds: 300
+  allowed_lateness_seconds: 300
+  bundle_ids:
+    - BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001
+    - BUNDLE-JUPITER-QUOTE-BUY-001
+    - BUNDLE-JUPITER-QUOTE-BUY-1M-001
+    - BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001
+    - BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-1M-001
+y_points:
+  - point_id: Y900
+    due_offset_seconds: 900
+    allowed_lateness_seconds: 120
+    bundle_ids:
+      - BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001
+      - BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-1M-001
+missingness:
+  value_policy: TYPED_NULL_NO_IMPUTATION
+  unknown_is_zero: false
+  missing_point_deletes_member: false
+  continue_later_points_after_missing: true
+disappearance:
+  default: CONTINUE_UNTIL_FINAL_HORIZON
+  single_absence_is_terminal: false
+  explicit_registered_terminal: CENSOR_REMAINING_POINTS
+budgets:
+  cash_usd_max: '0'
+  provider_calls_per_tick_max: 60
+  provider_calls_per_utc_day_max: 3200
+  provider_calls_lifetime_max: 3200
+  modeled_provider_credits_per_utc_day_max: 10000
+  raw_bytes_per_utc_day_max: 1073741824
+  canonical_bytes_lifetime_max: 5368709120
+  min_provider_pace_seconds: 3
+  retry: false
+  fallback: false
+retention:
+  raw_retention_days: 10
+  canonical_panel_retention: IMMUTABLE
+  active_journal_backup: REQUIRED
+authority:
+  profile_id: AUTH-PROVIDER-READONLY-ZERO-CASH-SCHEDULE-V1
+  activation_receipt_required: true
+outputs:
+  membership_schema_id: SCHEMA-OBSERVATION-PANEL-MEMBER-001
+  observation_index_schema_id: SCHEMA-OBSERVATION-PANEL-INDEX-001
+  partition_period: UTC_DAY
+  publication: MANIFEST_LAST

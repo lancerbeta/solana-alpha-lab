@@ -563,6 +563,11 @@
       "target_asset_id": "CTRL-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
     },
     {
+      "source_asset_id": "CONFIG-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
       "source_asset_id": "CONFIG-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
@@ -2466,6 +2471,51 @@
       "source_asset_id": "CTRL-EARLY-ICP-RETAINED-COHORT-MATURITY-CORRECTIVE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-QUOTE-SURFACE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-OBSERVATION-PRIMITIVE-REGISTRY-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULER-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PATHRISK-CALIBRATION-001"
     },
     {
       "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
@@ -9428,6 +9478,16 @@
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-SURFACE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "MODULE-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001"
@@ -9511,6 +9571,11 @@
       "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
       "relation": "governed_by",
       "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-PATHRISK-CALIBRATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
     },
     {
       "source_asset_id": "MODULE-PMF-QUOTE-ATTEMPT-PREP-001",
@@ -9711,6 +9776,11 @@
       "source_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-EVIDENCE-FIT-PANEL-001"
+    },
+    {
+      "source_asset_id": "MODULE-QUOTE-SURFACE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
     },
     {
       "source_asset_id": "MODULE-QUOTE-SURFACE-RETENTION-CLOCK-001",
@@ -12423,6 +12493,16 @@
       "target_asset_id": "MODULE-EARLY-ICP-FREEZE-ACCEPTANCE-001"
     },
     {
+      "source_asset_id": "SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "derived_from",
+      "target_asset_id": "MODULE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
       "source_asset_id": "SCRIPT-EARLY-STATE-RUNNER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
@@ -13843,6 +13923,16 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
     },
     {
+      "source_asset_id": "TEST-PATHRISK-CALIBRATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "TEST-PATHRISK-CALIBRATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
       "source_asset_id": "TEST-PMF-QUOTE-ATTEMPT-PREP-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-PMF-QUOTE-ATTEMPT-PREP-001"
@@ -14066,6 +14156,16 @@
       "source_asset_id": "TEST-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-QUOTED-BUY-H900-CLOCK-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-QUOTE-SURFACE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-QUOTE-SURFACE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
     },
     {
       "source_asset_id": "TEST-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001",

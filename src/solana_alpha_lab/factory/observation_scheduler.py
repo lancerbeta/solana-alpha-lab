@@ -35,6 +35,12 @@ from solana_alpha_lab.factory.observation_primitives import (
     request_sha256,
     search_url,
 )
+from solana_alpha_lab.factory.quote_surface_projection import (
+    OBSERVED as SURFACE_OBSERVED,
+    QuoteSurfaceProjectionError,
+    hash_raw_response,
+    project_quote_surface,
+)
 from solana_alpha_lab.factory.observation_schedule import (
     parse_utc,
     render_utc,
@@ -50,19 +56,43 @@ from solana_alpha_lab.factory.observation_schedule_store import ObservationSched
 OWNER = "tick-once"
 SEARCH = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
 DISCOVERY = "PRIM-JUPITER-TOKENS-V2-RECENT-001"
+DEPENDENT_SELL = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001"
+QUOTE_BUY = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001"
+BUY_1M = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-1M-001"
+REVERSE_1M = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-1M-001"
+REVERSE_FOR_BUY = {QUOTE_BUY: DEPENDENT_SELL, BUY_1M: REVERSE_1M}
 BUNDLE_TO_PRIMITIVE = {
     "BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
-    "BUNDLE-JUPITER-QUOTE-BUY-001": "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001",
-    "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001": "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001",
+    "BUNDLE-JUPITER-QUOTE-BUY-001": QUOTE_BUY,
+    "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001": DEPENDENT_SELL,
+    "BUNDLE-JUPITER-QUOTE-BUY-1M-001": BUY_1M,
+    "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-1M-001": REVERSE_1M,
 }
 SCHEMA_REQUIRED_KEYS = {
     "PRIM-JUPITER-TOKENS-V2-RECENT-001": ("id",),
     "PRIM-JUPITER-TOKENS-V2-SEARCH-001": ("id",),
-    "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001": ("outAmount",),
-    "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001": ("outAmount",),
+    QUOTE_BUY: ("outAmount",),
+    DEPENDENT_SELL: ("outAmount",),
+    BUY_1M: ("outAmount",),
+    REVERSE_1M: ("outAmount",),
 }
-DEPENDENT_SELL = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001"
-QUOTE_BUY = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001"
+QUOTE_AMOUNT = {
+    QUOTE_BUY: BUY_AMOUNT,
+    BUY_1M: "1000000",
+}
+BUY_PRIMITIVES = frozenset(QUOTE_AMOUNT)
+SELL_PRIMITIVES = frozenset(REVERSE_FOR_BUY.values())
+SURFACE_FIELD_KEYS = {
+    "FIELD-QUOTE-IN-AMOUNT-001": "in_amount",
+    "FIELD-QUOTE-PRICE-IMPACT-PCT-001": "price_impact_pct",
+    "FIELD-QUOTE-FEE-BPS-001": "fee_bps",
+    "FIELD-QUOTE-PLATFORM-FEE-001": "platform_fee",
+    "FIELD-QUOTE-ROUTER-001": "router",
+    "FIELD-QUOTE-MODE-001": "mode",
+    "FIELD-QUOTE-ROUTE-HOP-COUNT-001": "route_hop_count",
+    "FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001": "route_fee_amounts_present",
+    "FIELD-QUOTE-RESPONSE-SHA256-001": "response_sha256",
+}
 
 
 class ObservationSchedulerError(ValueError):
@@ -385,6 +415,13 @@ def _apply_x_phase(
     """Run X eligibility only against the observed X response row."""
     if str(claim["point_id"]) != str(schedule["x_point"]["point_id"]):
         return terminal_state, missing_reason, []
+    x_primitive_ids = {
+        BUNDLE_TO_PRIMITIVE[str(bundle_id)]
+        for bundle_id in schedule["x_point"]["bundle_ids"]
+        if BUNDLE_TO_PRIMITIVE[str(bundle_id)] not in SELL_PRIMITIVES
+    }
+    if str(claim["primitive_id"]) not in x_primitive_ids:
+        return terminal_state, missing_reason, []
     if not store.candidate_exists(
         schedule_sha256=str(claim["schedule_sha256"]),
         activation_id=activation_id,
@@ -469,10 +506,6 @@ def _apply_x_phase(
     if isinstance(x_row, Mapping):
         x_evidence.update(dict(x_row))
         x_predicate_evidence.update(dict(x_row))
-    x_primitive_ids = {
-        BUNDLE_TO_PRIMITIVE[str(bundle_id)]
-        for bundle_id in schedule["x_point"]["bundle_ids"]
-    }
     x_terminal_states = {
         "OBSERVED",
         "MISSING_TYPED",
@@ -1508,9 +1541,13 @@ def tick_once(
                     )
                     for item in censored_points
                 )
-        for claim in claims:
-            if str(claim["primitive_id"]) == SEARCH:
-                continue
+        quote_claims = [
+            item for item in claims if str(item["primitive_id"]) != SEARCH
+        ]
+        quote_claims.sort(
+            key=lambda item: 1 if str(item["primitive_id"]) in SELL_PRIMITIVES else 0
+        )
+        for claim in quote_claims:
             current_due = store.get_due(claim)
             current_due_state = current_due.get("state") if current_due else None
             if current_due_state != "CLAIMED":
@@ -1630,6 +1667,27 @@ def tick_once(
                     ),
                     clock=now,
                 )
+                recovered_buy = _first_non_none(
+                    (ledger_payload.get("entities") or {})
+                    .get(str(claim["entity_id"]), {})
+                    .get("buy_out_amount"),
+                    ledger_payload.get("buy_out_amount"),
+                )
+                if (
+                    recovered_state == "OBSERVED"
+                    and str(claim["primitive_id"]) in BUY_PRIMITIVES
+                    and recovered_buy is not None
+                    and str(recovered_buy) != ""
+                ):
+                    _propagate_buy_out(
+                        store,
+                        schedule=schedule,
+                        activation_id=activation_id,
+                        entity_id=str(claim["entity_id"]),
+                        buy_out_amount=str(recovered_buy),
+                        reverse_primitive_id=REVERSE_FOR_BUY[str(claim["primitive_id"])],
+                        now=now,
+                    )
                 published_rows.append(
                     _observation_row(
                         claim,
@@ -1845,19 +1903,26 @@ def tick_once(
                 now=completion,
             )
             censored_points.extend(x_censored_points)
-            if terminal_state == "OBSERVED" and str(claim["primitive_id"]) == QUOTE_BUY and buy_out:
+            if (
+                terminal_state == "OBSERVED"
+                and str(claim["primitive_id"]) in BUY_PRIMITIVES
+                and buy_out is not None
+                and str(buy_out) != ""
+            ):
+                reverse_id = REVERSE_FOR_BUY[str(claim["primitive_id"])]
                 _propagate_buy_out(
                     store,
                     schedule=schedule,
                     activation_id=activation_id,
                     entity_id=str(claim["entity_id"]),
                     buy_out_amount=str(buy_out),
+                    reverse_primitive_id=reverse_id,
                     now=now,
                 )
                 for later in claims:
                     if (
                         later.get("entity_id") == claim["entity_id"]
-                        and later.get("primitive_id") == DEPENDENT_SELL
+                        and later.get("primitive_id") == reverse_id
                     ):
                         payload = dict(later.get("payload") or {})
                         payload["buy_out_amount"] = str(buy_out)
@@ -2292,7 +2357,7 @@ def _observation_row(
         "sell_out_amount": (
             response_payload.get("outAmount")
             if isinstance(response_payload, Mapping)
-            and str(claim["primitive_id"]) == DEPENDENT_SELL
+            and str(claim["primitive_id"]) in SELL_PRIMITIVES
             else None
         ),
         "provisional_due": provisional,
@@ -2313,9 +2378,24 @@ def _typed_observation_values(
 ) -> list[dict[str, Any]]:
     primitive_id = str(claim["primitive_id"])
     fields = _registered_output_fields(_value_registry(registry), primitive_id)
+    projection = None
+    if isinstance(response_payload, Mapping) and primitive_id in BUY_PRIMITIVES | SELL_PRIMITIVES:
+        pointer = None
+        payload_pointer = claim.get("payload") if isinstance(claim.get("payload"), Mapping) else {}
+        raw_pointer = payload_pointer.get("response_sha256") if isinstance(payload_pointer, Mapping) else None
+        if isinstance(raw_pointer, str) and len(raw_pointer) == 64:
+            pointer = raw_pointer
+        elif response_payload is not None:
+            pointer = hash_raw_response(response_payload)
+        try:
+            projection = project_quote_surface(response_payload, response_sha256=pointer)
+        except QuoteSurfaceProjectionError:
+            projection = None
+            missing_reason = missing_reason or "INVALID_RESPONSE"
     result: list[dict[str, Any]] = []
     for field_id, value_kind in fields:
         value: object | None
+        missing_for_field = missing_reason
         if field_id == "FIELD-QUOTE-BUY-OUT-AMOUNT-001":
             value = buy_out
         elif field_id == "FIELD-QUOTE-SELL-OUT-AMOUNT-001":
@@ -2324,6 +2404,14 @@ def _typed_observation_values(
                 if isinstance(response_payload, Mapping)
                 else None
             )
+        elif field_id in SURFACE_FIELD_KEYS and projection is not None:
+            surface = projection.get(SURFACE_FIELD_KEYS[field_id]) or {}
+            status = str(surface.get("status") or "")
+            if status == SURFACE_OBSERVED:
+                value = surface.get("value")
+            else:
+                value = None
+                missing_for_field = status or "FIELD_ABSENT"
         elif isinstance(response_payload, Mapping):
             value = _row_field(response_payload, field_id)
         else:
@@ -2338,7 +2426,7 @@ def _typed_observation_values(
                     state if state != "OBSERVED" else "MISSING_TYPED"
                 ),
                 "missing_reason": None if present else (
-                    missing_reason or "FIELD_ABSENT"
+                    missing_for_field or "FIELD_ABSENT"
                 ),
                 "primitive_id": primitive_id,
                 "point_id": claim["point_id"],
@@ -2360,9 +2448,13 @@ def _url_for_claim(schedule: Mapping[str, Any], claim: Mapping[str, Any]) -> tup
         return RECENT_URL, "1.0"
     if primitive_id == "PRIM-JUPITER-TOKENS-V2-SEARCH-001":
         return search_url([entity_id]), "1.0"
-    if primitive_id == QUOTE_BUY:
-        return quote_url(input_mint=SOL_MINT, output_mint=entity_id, amount=BUY_AMOUNT), "1.0"
-    if primitive_id == DEPENDENT_SELL:
+    if primitive_id in QUOTE_AMOUNT:
+        return quote_url(
+            input_mint=SOL_MINT,
+            output_mint=entity_id,
+            amount=QUOTE_AMOUNT[primitive_id],
+        ), "1.0"
+    if primitive_id in SELL_PRIMITIVES:
         payload = claim.get("payload") or {}
         amount = payload.get("buy_out_amount")
         if not amount:
@@ -2378,6 +2470,7 @@ def _propagate_buy_out(
     activation_id: str,
     entity_id: str,
     buy_out_amount: str,
+    reverse_primitive_id: str,
     now: datetime,
 ) -> None:
     digest = str(schedule["schedule_sha256"])
@@ -2387,7 +2480,7 @@ def _propagate_buy_out(
             row["schedule_sha256"] == digest
             and row["activation_id"] == activation_id
             and row["entity_id"] == entity_id
-            and row["primitive_id"] == DEPENDENT_SELL
+            and row["primitive_id"] == reverse_primitive_id
         ):
             store.merge_due_payload(row, {"buy_out_amount": buy_out_amount}, clock=now)
 

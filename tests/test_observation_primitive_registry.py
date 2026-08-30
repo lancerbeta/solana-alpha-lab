@@ -27,6 +27,8 @@ class ObservationPrimitiveRegistryTests(unittest.TestCase):
             "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
             "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001",
             "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001",
+            "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-1M-001",
+            "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-1M-001",
         ):
             primitive = registry.require_primitive(primitive_id)
             self.assertEqual(primitive["status"], "ACCEPTED")

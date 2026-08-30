@@ -1,7 +1,7 @@
 schema: smial.observation-primitive-registry
 schema_version: '1.0'
 registry_id: OBSERVATION_PRIMITIVE_REGISTRY_V1
-as_of: '2026-08-28'
+as_of: '2026-08-30'
 fields:
   - field_id: FIELD-TOKEN-MINT-001
     availability_class: SOURCE
@@ -39,6 +39,42 @@ fields:
     availability_class: Y_TIME
     value_kind: DECIMAL
     parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-IN-AMOUNT-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-PRICE-IMPACT-PCT-001
+    availability_class: X_TIME
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-FEE-BPS-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-PLATFORM-FEE-001
+    availability_class: X_TIME
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-ROUTER-001
+    availability_class: X_TIME
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-MODE-001
+    availability_class: X_TIME
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-ROUTE-HOP-COUNT-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+    availability_class: X_TIME
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-QUOTE-RESPONSE-SHA256-001
+    availability_class: X_TIME
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
 query_profiles:
   - query_profile_id: QUERY-JUPITER-PUMPFUN-RECENT-001
     primitive_id: PRIM-JUPITER-TOKENS-V2-RECENT-001
@@ -58,10 +94,54 @@ bundles:
     primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001
     field_ids:
       - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
   - bundle_id: BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001
     primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001
     field_ids:
       - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+  - bundle_id: BUNDLE-JUPITER-QUOTE-BUY-1M-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-1M-001
+    field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+  - bundle_id: BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-1M-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-1M-001
+    field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
 primitives:
   - primitive_id: PRIM-JUPITER-TOKENS-V2-RECENT-001
     version: '1.0'
@@ -160,6 +240,15 @@ primitives:
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
       - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
     pit_support: true
     authoritative_clock_field_ids:
       - FIELD-FIRST-POOL-CREATED-AT-001
@@ -174,7 +263,53 @@ primitives:
       status: ACCEPTED
     dependency_contract: null
     terminal_classes: [OBSERVED, MISSING_TYPED]
-    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT]
+    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-1M-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: POINT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract: null
+    terminal_classes: [OBSERVED, MISSING_TYPED]
+    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false
@@ -197,6 +332,15 @@ primitives:
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
       - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
     pit_support: true
     authoritative_clock_field_ids:
       - FIELD-FIRST-POOL-CREATED-AT-001
@@ -213,7 +357,55 @@ primitives:
       recipe_id: DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001
       requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-001
     terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
-    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE]
+    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-1M-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: DEPENDENT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract:
+      recipe_id: DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001
+      requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-1M-001
+    terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
+    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false

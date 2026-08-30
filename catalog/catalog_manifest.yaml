@@ -1,10 +1,10 @@
 schema_version: '1.1'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.120.0
+catalog_version: 0.121.0
 as_of: '2026-08-25'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1575
+  assets: 1583
   asset_registries: 4
   schemas: 80
   queries: 19
