@@ -687,6 +687,17 @@ class IncrementalSyncTests(unittest.TestCase):
         self.assertTrue(payload["impact_plan"]["navigation_required"])
         self.assertIn("NAV_OUTPUT_DRIFT", payload["impact_plan"]["navigation_reason"])
 
+    def test_t10_staged_only_is_in_candidate_inventory(self) -> None:
+        target = self.worktree / "docs/generated_target.txt"
+        original = target.read_bytes()
+        target.write_bytes(b"staged-only\n")
+        _run(["git", "add", "docs/generated_target.txt"], cwd=self.worktree)
+        target.write_bytes(original)
+        from harness_sync import candidate_paths
+
+        paths = candidate_paths(self.base, root=self.worktree)
+        self.assertIn("docs/generated_target.txt", paths)
+
     def test_t5b_integrity_only_registry_skips_navigation(self) -> None:
         core = self.worktree / "catalog/assets/core.yaml"
         text = core.read_text(encoding="utf-8")
@@ -703,6 +714,8 @@ class IncrementalSyncTests(unittest.TestCase):
         self.assertFalse(payload["full_fallback"])
         self.assertEqual(payload["navigation_runs"], 0)
         self.assertFalse(payload["impact_plan"]["navigation_required"])
+        self.assertGreaterEqual(payload["hashed_assets"], 1)
+        self.assertLess(payload["hashed_assets"], 50)
 
     def test_t6_generator_source_requires_navigation(self) -> None:
         generator = self.worktree / "scripts/generate_navigation.py"

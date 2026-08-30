@@ -388,6 +388,12 @@ def candidate_paths(base_ref: str, *, root: Path | None = None) -> set[str]:
             ["git", "diff", "--name-only", "--no-renames", "-z", base_ref],
             target,
         )
+        # Include staged-only paths where the index differs from base even if
+        # the worktree was restored to match HEAD/base.
+        paths |= _git_nul_paths(
+            ["git", "diff", "--cached", "--name-only", "--no-renames", "-z", base_ref],
+            target,
+        )
         paths |= _git_nul_paths(
             ["git", "ls-files", "--others", "--exclude-standard", "-z"],
             target,
@@ -440,6 +446,48 @@ def _worktree_bytes(relative: str, root: Path) -> bytes | None:
     if not target.is_file():
         return None
     return target.read_bytes()
+
+
+def _registry_sha256_pins(payload: bytes) -> dict[str, str]:
+    document = yaml.safe_load(payload.decode("utf-8"))
+    if not isinstance(document, dict):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    pins: dict[str, str] = {}
+    for record in document.get("records") or []:
+        if not isinstance(record, dict):
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        integrity = record.get("integrity")
+        if not isinstance(integrity, dict) or integrity.get("kind") != "sha256":
+            continue
+        sha = integrity.get("sha256")
+        asset_id = record.get("asset_id")
+        if not isinstance(asset_id, str) or not isinstance(sha, str):
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        pins[asset_id] = sha
+    return pins
+
+
+def registry_integrity_delta_asset_ids(
+    relative: str, base_ref: str, *, root: Path
+) -> list[str]:
+    """Asset ids whose sha256 pin differs between worktree and base (or is new/removed)."""
+    live = _worktree_bytes(relative, root)
+    base = _git_blob_or_none(root, base_ref, relative)
+    if live is None and base is None:
+        return []
+    if live is None or base is None:
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    try:
+        live_pins = _registry_sha256_pins(live)
+        base_pins = _registry_sha256_pins(base)
+    except (UnicodeDecodeError, yaml.YAMLError, HarnessSyncError):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from None
+    changed = {
+        asset_id
+        for asset_id in live_pins.keys() | base_pins.keys()
+        if live_pins.get(asset_id) != base_pins.get(asset_id)
+    }
+    return sorted(changed)
 
 
 def registry_semantic_changed(relative: str, base_ref: str, *, root: Path) -> bool:
@@ -519,18 +567,27 @@ def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, A
     checkpoint_required = False
     try:
         for relative in ASSET_REGISTRIES:
-            if relative in paths and registry_semantic_changed(
-                relative, base_ref, root=target
-            ):
+            if relative not in paths:
+                continue
+            if registry_semantic_changed(relative, base_ref, root=target):
                 nav_reasons.append(f"REGISTRY_SEMANTIC:{relative}")
                 checkpoint_required = True
-                # New/moved/edited registry members must be hashed even when
-                # their repository_path was not itself in the candidate set.
+                # Semantic add/move/edit: hash every sha256 member so a new
+                # record pointing at an unchanged path cannot keep a stale pin.
                 direct.extend(
                     sorted(
                         asset_id
                         for asset_id, info in records.items()
                         if info["registry"] == relative
+                    )
+                )
+            else:
+                # Integrity-only churn: rehash pins that differ from base so
+                # hand-edits repair even alongside unrelated candidates, without
+                # rehashing the entire registry after routine prior syncs.
+                direct.extend(
+                    registry_integrity_delta_asset_ids(
+                        relative, base_ref, root=target
                     )
                 )
         if MANIFEST_RELATIVE in paths and manifest_semantic_changed(
@@ -554,27 +611,6 @@ def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, A
     if paths & nav_output_set:
         nav_reasons.append("NAV_OUTPUT_DRIFT")
     registries = sorted(path for path in paths if path in REGISTRY_RELATIVES)
-    integrity_only_registry = (
-        bool(registries) and not nav_reasons and not source_paths
-    )
-    if integrity_only_registry:
-        # Derived-only integrity churn: repair hashes for members of those
-        # registries without regenerating navigation.
-        only = sorted(
-            asset_id
-            for asset_id, info in records.items()
-            if info["registry"] in registries
-        )
-        return {
-            "mode": "INCREMENTAL",
-            "candidate_paths": sorted(paths),
-            "direct_sha_assets": only,
-            "registries_to_rewrite": registries,
-            "checkpoint_required": False,
-            "navigation_required": False,
-            "navigation_reason": [],
-            "fallback_reason": None,
-        }
     return {
         "mode": "INCREMENTAL",
         "candidate_paths": sorted(paths),

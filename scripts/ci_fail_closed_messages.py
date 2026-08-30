@@ -14,7 +14,7 @@ DERIVED_HASH_DRIFT_MARKERS = (
 )
 
 HARNESS_SYNC_APPLY = (
-    "uv run --locked --managed-python python -B scripts/harness_sync.py --apply --base-ref <exact expected_base>"
+    "uv run --locked --managed-python python -B scripts/harness_sync.py --apply"
 )
 
 
