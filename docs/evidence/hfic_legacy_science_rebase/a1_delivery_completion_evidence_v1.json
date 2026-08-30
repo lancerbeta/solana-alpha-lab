@@ -1,0 +1,75 @@
+{
+  "acceptance_id": "HFIC-LEGACY-SCIENCE-REBASE-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-30",
+  "base_main": "f98d41a4813d0ec73ffcbbb684bbad64577d8ccd",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hfic_legacy_science_rebase/a1_delivery_factory_fit_v1.json",
+    "sha256": "da1ff0b7cf7f266ee18d4279d3eb29fa1a738032be6f3322585220467b46989c",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "85d49aa170d04a55f981c89ef79d6a2a275f740ed94fb1d8f199aca738677c7f",
+    "catalog/assets/lifecycle.yaml": "c60cf147a84451fb31e736ce36eba66f0d18236807698889c898b93285e2e139",
+    "catalog/catalog_manifest.yaml": "785ea5369cd717b034440eba7c951caa147e909883377be3c453543459e40291",
+    "catalog/generated/asset_edges.json": "0ebe4576e7d8544e00e3b7754ee98c70e7b4c6b9652ca577fd85b2957504a372",
+    "docs/PROJECT_MAP.md": "36d9d7d8b73cbee511406ac9bf387e6611c020ab9a2007c24a89df9566b3a27a",
+    "docs/evidence/hfic_legacy_science_rebase/a1_acceptance_v1.json": "efee65a09113849fb8f0bccad57553b4040b2b977a59b3fd925f94f67e84046a",
+    "docs/evidence/hfic_legacy_science_rebase/a1_inventory_v1.json": "a2fd7dd380c8e0320225ebfdeb71ffeb2892c99bcfb11ef25e645141039ba13c",
+    "docs/tasks/HFIC_LEGACY_SCIENCE_REBASE_AND_SUPPRESSION_SEMANTICS_V1.md": "17d74109c14d81beb62bd1a2652e264fd6b74aba31cb54237a966ab2f880b1e9",
+    "scripts/hypothesis_forge.py": "2254fd5463322affa3cf513c21807b00b1a042db375ea30461338d4410735ac5",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "d7b33b1ab81348d2e4c9ce534e0e24f24cf665c62595683350f10d2b5f5add7f",
+    "src/solana_alpha_lab/factory/hfic_session.py": "045977e435b51e2ae18b38a34ecbf58e4fb750856d5192638256c57bb647ec93",
+    "src/solana_alpha_lab/factory/hfic_suppression_semantics.py": "e923a64f21c09fbf3f3aa7175b722fcfda311e32662601f22d433088d199325d",
+    "tests/test_hfic_cli.py": "31e7de30cf3a596814d818ff7b5475a2af1f44c404a41c9e42b291a18a9389f6",
+    "tests/test_hfic_epistemic_memory_semantics.py": "fe12f97d4b610b10489d82722e1a4e3e30226f1d79446721d8078e8442b837d7",
+    "tests/test_hfic_legacy_science_rebase.py": "427b94f33c2bd2240fd02f08d2a85f77e2e34d54b3fc31a096038e92361512b3"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_FULL_FORGE_SEARCH_TO_PROVE_FIX",
+    "NO_H900_ESTIMAND_REPAIR",
+    "NO_HISTORICAL_RESEARCH_REWRITE",
+    "NO_POSITIVE_HOLDER_RESULT"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credentials_read": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "wallet_signer_transaction": 0
+  },
+  "state_change": "CLOSE_HFIC_LEGACY_SCIENCE_REBASE_PRE_MERGE",
+  "task_id": "HFIC_LEGACY_SCIENCE_REBASE_AND_SUPPRESSION_SEMANTICS_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_legacy_science_rebase/a1_delivery_independent_review_v1.json",
+      "sha256": "7e2c3104ed393c5b8a52bbaa0ad5cf65bde4ed52c482ed13ec207fc267333fc0",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_HFIC_LEGACY_SCIENCE_REBASE_TESTS",
+      "PASS_LIVE_ACTIVE_RDP_REBASE_AND_PREFLIGHT",
+      "PASS_CATALOG_VALIDATE"
+    ],
+    "targeted": "PASS_HFIC_LEGACY_SCIENCE_REBASE_TESTS"
+  }
+}

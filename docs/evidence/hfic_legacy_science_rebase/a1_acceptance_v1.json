@@ -1,0 +1,87 @@
+{
+  "acceptance_id": "HFIC-LEGACY-SCIENCE-REBASE-ACCEPTANCE-001",
+  "as_of": "2026-08-30",
+  "schema": "smial.hfic-legacy-science-rebase-acceptance",
+  "schema_version": "1.0",
+  "task_id": "HFIC_LEGACY_SCIENCE_REBASE_AND_SUPPRESSION_SEMANTICS_V1",
+  "active_rdp": "local/factory_v1/data_plane",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Science-memory rebase does not mutate Project Sources release registry or UI packs."
+  },
+  "tests": {
+    "t1_priority_park_not_scientific_hard_close": "PASS",
+    "t2_typed_scientific_close_remains_forbidden": "PASS",
+    "t3_route_specific_close_does_not_close_broader_family": "PASS",
+    "t4_legacy_h900_does_not_block_paired_estimand": "PASS",
+    "t5_killed_hfic_prior_remains_after_rebase": "PASS",
+    "t6_later_authoritative_source_wins": "PASS",
+    "t7_free_form_park_ambiguous_fail_closed": "PASS",
+    "t8_projection_rebuild_keeps_ledger": "PASS",
+    "t9_hfic_self_memory_does_not_advance_epoch": "PASS",
+    "t10_science_rebase_decision_advances_epoch": "PASS"
+  },
+  "inventory": {
+    "suppressors_total": 10,
+    "scientific_close_valid": 6,
+    "scope_limited_close": 2,
+    "owner_priority_park": 2,
+    "legacy_measurement_limited": 0,
+    "replayable_current_science": 0,
+    "non_identifiable_need_new_evidence": 0,
+    "superseded": 0,
+    "ambiguous": 0
+  },
+  "h900": {
+    "raw_preserved": true,
+    "old_actionability_portable": false,
+    "paired_replay": "NOT_IDENTIFIABLE",
+    "family_hard_closed": false
+  },
+  "forge_memory": {
+    "prior_work_visible": true,
+    "valid_scientific_closures_preserved": true,
+    "priority_park_hard_close_count": 0,
+    "scope_overclosure_count": 0,
+    "packet_dropped_visible_parks": 0,
+    "parks_in_consumer_packet": [
+      "PARK_H11_FROM_PRIORITY",
+      "PARK_H13_FROM_PRIORITY"
+    ]
+  },
+  "epoch": {
+    "before": "f6eb4b3674c953030e29ee8b69b810d790411a1386345f45740790f64a3df184",
+    "after": "f2919cf5ffd7a135a9818119455974c952ae7e6e490b0d388da143af75e8d846",
+    "change_justified": true,
+    "justification": "Append-only non-HFIC DECISION_EVENT SCIENCE-REBASE-SUPPRESSION-SEMANTICS-V1 changed decision-bearing research truth."
+  },
+  "rebase": {
+    "status": "APPENDED",
+    "record_id": "SCIENCE-REBASE-SUPPRESSION-SEMANTICS-V1",
+    "decision_event_id": "DECISION-HFIC-LEGACY-SCIENCE-REBASE-001",
+    "historical_bytes_rewritten": false,
+    "hfic_self_memory": false
+  },
+  "preflight": {
+    "action": "START_NEW_SESSION",
+    "session_id": null,
+    "new_session_persisted": false,
+    "freeze_or_critic_launched": false,
+    "evidence_epoch_sha256": "f2919cf5ffd7a135a9818119455974c952ae7e6e490b0d388da143af75e8d846",
+    "taker_mix_hard_closed": true,
+        "parks_in_full_ledger_not_hard_closed": true,
+        "parks_in_consumer_packet": true,
+        "false_park_hard_close_absent": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_FULL_FORGE_SEARCH_TO_PROVE_FIX",
+    "NO_H900_ESTIMAND_REPAIR",
+    "NO_HISTORICAL_RESEARCH_REWRITE",
+    "NO_POSITIVE_HOLDER_RESULT"
+  ]
+}

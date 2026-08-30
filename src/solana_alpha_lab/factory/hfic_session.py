@@ -25,6 +25,11 @@ from solana_alpha_lab.factory.hfic_identity import (
     canonical_candidate_definition,
     normalize_text,
 )
+from solana_alpha_lab.factory.hfic_suppression_semantics import (
+    candidate_matches_hard_close,
+    family_hard_close_terminals,
+    ledger_from_receipt,
+)
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 
@@ -162,25 +167,7 @@ def search_key_sha256(epoch: str, owner_focus: str, prompt_version: str) -> str:
 
 
 def closed_family_terminals_from_receipt(receipt: Mapping[str, Any] | None) -> list[str]:
-    if not isinstance(receipt, Mapping):
-        return []
-    packet = receipt.get("forge_context_packet")
-    if not isinstance(packet, Mapping):
-        return []
-    ledger = packet.get("closed_family_ledger")
-    if not isinstance(ledger, list):
-        return []
-    terminals: list[str] = []
-    seen: set[str] = set()
-    for item in ledger:
-        if not isinstance(item, Mapping):
-            continue
-        terminal = item.get("terminal")
-        if not isinstance(terminal, str) or not terminal or terminal in seen:
-            continue
-        seen.add(terminal)
-        terminals.append(terminal)
-    return terminals
+    return family_hard_close_terminals(ledger_from_receipt(receipt))
 
 
 def _closed_family_stems(terminal: str) -> list[str]:
@@ -482,12 +469,12 @@ def freeze_draft(
     runner_up = identities[runner_up_index]
     rejected = identities[rejected_index]
     selected_card = candidates[selected_index]
-    closed_family_terminals = closed_family_terminals_from_receipt(
+    closed_family_ledger = ledger_from_receipt(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None
     )
-    if store is not None and closed_family_terminals:
+    if store is not None and closed_family_ledger:
         for card in candidates:
-            hit = candidate_reopens_closed_family(card, closed_family_terminals)
+            hit = candidate_matches_hard_close(card, closed_family_ledger)
             if hit is not None:
                 raise HficSessionError("CLOSED_FAMILY_REOPEN")
     truth_roots = _nonempty_str_list(
@@ -588,7 +575,7 @@ def freeze_draft(
         "provisional_execution_unit": "NONE",
         "strongest_rejected_alternative": rejected.candidate_id,
         "known_unknowns": critic_known_unknowns_with_closed_families(
-            closed_family_terminals
+            family_hard_close_terminals(closed_family_ledger)
         ),
         "non_claims": draft.get("non_claims") or ["NO_ALPHA"],
     }

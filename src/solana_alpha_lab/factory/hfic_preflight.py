@@ -45,6 +45,10 @@ from solana_alpha_lab.factory.hfic_session import (
     pick_session,
     search_key_sha256,
 )
+from solana_alpha_lab.factory.hfic_suppression_semantics import (
+    classify_source_payload,
+    dedupe_suppression_ledger,
+)
 from solana_alpha_lab.factory.research_store import (
     RESEARCH_PROJECTION_LOCATION,
     RecordKind,
@@ -594,21 +598,8 @@ def enumerate_accepted_capabilities(repo_root: Path) -> list[dict[str, Any]]:
     return entries
 
 
-def _closed_family_source_rank(source: str) -> tuple[int, str]:
-    if source.startswith("registries/") or source.startswith("docs/"):
-        return (0, source)
-    return (1, source)
-
-
 def _dedupe_closed_families(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    ordered = sorted(
-        items,
-        key=lambda item: (item["terminal"], *_closed_family_source_rank(item["source_receipt"])),
-    )
-    unique: dict[str, dict[str, Any]] = {}
-    for item in ordered:
-        unique.setdefault(str(item["terminal"]), item)
-    return [unique[key] for key in sorted(unique)]
+    return dedupe_suppression_ledger(items)
 
 
 def _is_rdp_closed_family_source(source: str) -> bool:
@@ -620,26 +611,46 @@ def select_closed_family_ledger_for_packet(
     *,
     limit: int = MAX_CLOSED_FAMILIES,
 ) -> list[dict[str, Any]]:
-    """Keep typed RDP closures before applying the packet cap.
+    """Keep typed RDP hard-closes, then other hard-closes, then visible memory.
 
     Git scrape can already fill MAX_CLOSED_FAMILIES. Alphabetical truncation
     would otherwise drop an authoritative datasets/*.decision.json terminal.
+    Owner-priority parks remain on the consumer packet even when hard-closes
+    already occupy the cap: Prompt A / freeze read this packet, not the
+    untruncated enumerator.
     """
-    rdp = [
+    rdp_hard = [
         item
         for item in items
         if _is_rdp_closed_family_source(str(item.get("source_receipt") or ""))
+        and item.get("reopen_forbidden") is True
     ]
-    git = [
+    git_hard = [
         item
         for item in items
         if not _is_rdp_closed_family_source(str(item.get("source_receipt") or ""))
+        and item.get("reopen_forbidden") is True
     ]
-    rdp.sort(key=lambda item: str(item["terminal"]))
-    git.sort(key=lambda item: str(item["terminal"]))
-    if len(rdp) >= limit:
-        return rdp
-    return rdp + git[: limit - len(rdp)]
+    visible = [item for item in items if item.get("reopen_forbidden") is not True]
+    rdp_hard.sort(key=lambda item: str(item["terminal"]))
+    git_hard.sort(key=lambda item: str(item["terminal"]))
+    visible.sort(key=lambda item: str(item["terminal"]))
+    if len(rdp_hard) >= limit:
+        selected: list[dict[str, Any]] = list(rdp_hard)
+    else:
+        selected = list(rdp_hard)
+        for item in git_hard:
+            if len(selected) >= limit:
+                break
+            selected.append(item)
+    seen = {str(item.get("terminal") or "") for item in selected}
+    for item in visible:
+        terminal = str(item.get("terminal") or "")
+        if not terminal or terminal in seen:
+            continue
+        selected.append(item)
+        seen.add(terminal)
+    return selected
 
 
 def enumerate_rdp_closed_family_terminals(data_root: Path) -> list[dict[str, Any]]:
@@ -672,13 +683,8 @@ def enumerate_rdp_closed_family_terminals(data_root: Path) -> list[dict[str, Any
             continue
         if decision.get("dataset_fingerprint") != item.get("dataset_fingerprint"):
             continue
-        found.append(
-            {
-                "terminal": terminal,
-                "source_receipt": f"datasets/manifests/{manifest_id}.decision.json",
-                "reopen_forbidden": True,
-            }
-        )
+        source = f"datasets/manifests/{manifest_id}.decision.json"
+        found.append(classify_source_payload(decision, terminal=terminal, source_receipt=source))
     return found
 
 
@@ -689,15 +695,15 @@ def enumerate_closed_park_terminals(
     root = Path(repo_root)
     found: dict[tuple[str, str], dict[str, Any]] = {}
 
-    def _add(terminal: str, source: str) -> None:
+    def _add(terminal: str, source: str, payload: Mapping[str, Any] | None) -> None:
         if _CLOSED_PARK_RE.fullmatch(terminal) is None:
             return
         key = (terminal, source)
-        found[key] = {
-            "terminal": terminal,
-            "source_receipt": source,
-            "reopen_forbidden": True,
-        }
+        found[key] = classify_source_payload(
+            payload,
+            terminal=terminal,
+            source_receipt=source,
+        )
 
     registry = root / NEGATIVE_RESULTS_RELATIVE
     if registry.is_file() and not _is_symlink_path(registry):
@@ -712,7 +718,7 @@ def enumerate_closed_park_terminals(
                     for key in ("record_id", "summary", "status")
                 )
                 for match in _CLOSED_PARK_RE.findall(blob):
-                    _add(match, NEGATIVE_RESULTS_RELATIVE)
+                    _add(match, NEGATIVE_RESULTS_RELATIVE, row)
     evidence_root = root / "docs" / "evidence"
     for path in sorted(evidence_root.rglob("*acceptance*.json")) if evidence_root.is_dir() else []:
         if _is_symlink_path(path) or not path.is_file():
@@ -735,10 +741,10 @@ def enumerate_closed_park_terminals(
         ):
             value = payload.get(key)
             if isinstance(value, str):
-                _add(value, relative)
+                _add(value, relative, payload)
     if data_root is not None:
         for item in enumerate_rdp_closed_family_terminals(Path(data_root)):
-            _add(str(item["terminal"]), str(item["source_receipt"]))
+            found[(str(item["terminal"]), str(item["source_receipt"]))] = dict(item)
     return _dedupe_closed_families(list(found.values()))
 
 
@@ -905,11 +911,15 @@ def build_forge_context_packet(
     closed_family_ledger = enumerate_closed_park_terminals(repo_root, data_root)
     if not any(item["terminal"] == CLOSED_FAMILY for item in closed_family_ledger):
         closed_family_ledger.append(
-            {
-                "terminal": CLOSED_FAMILY,
-                "source_receipt": CLOSED_FAMILY_ACCEPTANCE_RELATIVE,
-                "reopen_forbidden": True,
-            }
+            classify_source_payload(
+                {
+                    "scientific_terminal": CLOSED_FAMILY,
+                    "verdict": CLOSED_FAMILY,
+                    "family_close": True,
+                },
+                terminal=CLOSED_FAMILY,
+                source_receipt=CLOSED_FAMILY_ACCEPTANCE_RELATIVE,
+            )
         )
         closed_family_ledger.sort(
             key=lambda item: (item["terminal"], item["source_receipt"])
@@ -989,6 +999,13 @@ def build_forge_context_packet(
             1
             for item in packet_ledger
             if _is_rdp_closed_family_source(str(item.get("source_receipt") or ""))
+        )
+        packet_terminals = {str(item.get("terminal") or "") for item in packet_ledger}
+        truncation["dropped_visible_prior_work"] = sum(
+            1
+            for item in closed_family_ledger
+            if item.get("reopen_forbidden") is not True
+            and str(item.get("terminal") or "") not in packet_terminals
         )
     closed_family_ledger = packet_ledger
     if dropped_priors:

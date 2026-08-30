@@ -77,6 +77,10 @@ from solana_alpha_lab.factory.hfic_provenance import (  # noqa: E402
     apply_provenance_correction,
     inventory_placeholder_hfic_records,
 )
+from solana_alpha_lab.factory.hfic_suppression_semantics import (  # noqa: E402
+    HficSuppressionError,
+    run_science_memory_rebase,
+)
 from solana_alpha_lab.factory.research_store import (  # noqa: E402
     ResearchStore,
     ResearchStoreError,
@@ -537,6 +541,33 @@ def cmd_apply_provenance_correction(
     return emit(payload)
 
 
+def cmd_rebase_science_memory(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    confirm_append_only: bool,
+) -> int:
+    if not confirm_append_only:
+        raise HficCliError("SCIENCE_REBASE_CONFIRM_REQUIRED")
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root)
+    payload = run_science_memory_rebase(
+        store,
+        repo_root=repo_root,
+        data_root=data_root,
+    )
+    safe = {
+        key: value
+        for key, value in payload.items()
+        if key != "after_ledger"
+    }
+    safe["suppressors_total"] = int(
+        (payload.get("after_counts") or {}).get("suppressors_total") or 0
+    )
+    _assert_no_path_leak(safe, str(data_root), str(repo_root))
+    return emit(safe)
+
+
 def cmd_backfill(
     packet_path: Path,
     *,
@@ -639,6 +670,17 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="required; does not rewrite RDP bytes or recover an exact original time",
     )
+
+    rebase = subparsers.add_parser(
+        "rebase-science-memory",
+        help="append-only science-memory suppression rebase; requires --confirm-append-only",
+    )
+    rebase.add_argument("--format", choices=("json",), default="json")
+    rebase.add_argument(
+        "--confirm-append-only",
+        action="store_true",
+        help="required; appends DECISION_EVENT only; never rewrites historical RDP bytes",
+    )
     return parser
 
 
@@ -726,8 +768,14 @@ def main(argv: list[str] | None = None) -> int:
                 args.data_root,
                 confirm_append_only=bool(args.confirm_append_only),
             )
+        if args.command == "rebase-science-memory":
+            return cmd_rebase_science_memory(
+                repo_root,
+                explicit_data_root=args.data_root,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
-    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, DataRootError, ResearchStoreError) as exc:
+    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, HficSuppressionError, DataRootError, ResearchStoreError) as exc:
         return emit_error(str(exc))
     except (OSError, ValueError, json.JSONDecodeError):
         return emit_error("HFIC_PROTOCOL_INVALID")

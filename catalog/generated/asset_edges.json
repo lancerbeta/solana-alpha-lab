@@ -2858,6 +2858,26 @@
       "target_asset_id": "TEST-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001"
     },
     {
+      "source_asset_id": "CTRL-HFIC-LEGACY-SCIENCE-REBASE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SUPPRESSION-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-LEGACY-SCIENCE-REBASE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-LEGACY-SCIENCE-REBASE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-LEGACY-SCIENCE-REBASE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-LEGACY-SCIENCE-REBASE-001"
+    },
+    {
       "source_asset_id": "CTRL-HFIC-NEXT-FORWARD-EVIDENCE-EXECUTION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-FORWARD-H900-QUOTE-CAPTURE-001"
@@ -9208,6 +9228,16 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-SUPPRESSION-SEMANTICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-SUPPRESSION-SEMANTICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-LEGACY-SCIENCE-REBASE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-FAST-LANE-001"
@@ -12515,6 +12545,11 @@
     {
       "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001",
       "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SUPPRESSION-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001",
+      "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
     },
     {
@@ -13601,6 +13636,16 @@
       "source_asset_id": "TEST-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-LEGACY-SCIENCE-REBASE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-LEGACY-SCIENCE-REBASE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-LEGACY-SCIENCE-REBASE-001"
     },
     {
       "source_asset_id": "TEST-HFIC-OPERATIONAL-CLOSURE-001",

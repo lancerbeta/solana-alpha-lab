@@ -118,8 +118,20 @@ class HficCliContractTests(unittest.TestCase):
             "inventory-placeholder-times",
             "apply-provenance-correction",
             "prospects",
+            "rebase-science-memory",
         ):
             self.assertIn(command, completed.stdout)
+
+    def test_rebase_science_memory_requires_confirm_flag(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            completed = run_cli(
+                "rebase-science-memory",
+                "--format",
+                "json",
+                data_root=Path(tmp),
+            )
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        self.assertIn("SCIENCE_REBASE_CONFIRM_REQUIRED", completed.stderr)
 
     def test_apply_provenance_correction_requires_confirm_flag(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
