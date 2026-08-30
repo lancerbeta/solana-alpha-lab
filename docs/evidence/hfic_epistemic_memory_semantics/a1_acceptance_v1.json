@@ -5,6 +5,10 @@
   "schema_version": "1.0",
   "task_id": "HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1",
   "active_rdp": "local/factory_v1/data_plane",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "HFIC epistemic-memory semantics do not mutate Project Sources release registry or UI packs."
+  },
   "tests": {
     "a1_self_memory_does_not_advance_epoch": "PASS",
     "a2_external_dataset_advances_epoch": "PASS",
