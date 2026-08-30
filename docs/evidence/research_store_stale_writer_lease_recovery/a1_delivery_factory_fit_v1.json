@@ -6,8 +6,8 @@
   "task_id": "RESEARCH_STORE_STALE_WRITER_LEASE_RECOVERY_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "7151d34fab1fadc4db75fff2f6bce3ad798a8638a24fb766cd03f4f48ebe3317",
-  "reviewed_inventory_sha256": "7151d34fab1fadc4db75fff2f6bce3ad798a8638a24fb766cd03f4f48ebe3317",
+  "reviewed_bindings_sha256": "94579afde77cd599e3183bde4d3b3f5e3fc9fe0d037d1ea26771d41dec5b9aea",
+  "reviewed_inventory_sha256": "a8630419988361fc5b63da5b26aaec9e372cb688b4d02c2dae30ee757a75eb2a",
   "capability_radar": {
     "now": "NONE",
     "watch": "RETURN_TO_HYPOTHESIS_FORGE_AFTER_MERGE"
