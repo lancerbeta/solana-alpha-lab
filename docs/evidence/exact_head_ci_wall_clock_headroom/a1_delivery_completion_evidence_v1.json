@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "EXACT-HEAD-CI-WALL-CLOCK-HEADROOM-COMPLETION-001",
+  "as_of": "2026-08-30",
+  "task_id": "EXACT_HEAD_CI_WALL_CLOCK_HEADROOM_V1",
+  "state_change": "EXACT_HEAD_CI_HEADROOM_RESTORED",
+  "base_main": "7c04306ae3169df557a4a589e1a8eb4d07890ac2",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".github/workflows/ci.yml": "fdbf9cd5ac9a09c24caab2eb79fa6392d45ae9650db31fd6e08c838342467e7f",
+    "catalog/assets/core.yaml": "4fbad880259ecd7ad3ca397c7c67416cca69b0fae7e8e7f48259780ae7700e1c",
+    "configs/ci_test_shards_v1.json": "468d14df5fe6a4017cf6fe7437c57881f039420f7207e35c407e61270d5a716e",
+    "docs/evidence/exact_head_ci_wall_clock_headroom/a1_baseline_receipt_v1.json": "a2dd9d9d5e065b01b4371a0d03dabb7f77a134df1e22ea97ed57880b08d710eb",
+    "docs/evidence/exact_head_ci_wall_clock_headroom/a1_coverage_equivalence_v1.json": "c54ba3b57eca86bd7cef603f3768ff64c5d9f80575a88bac96a3bd6bb1a0f4e6",
+    "docs/tasks/EXACT_HEAD_CI_WALL_CLOCK_HEADROOM_V1.md": "7f129da0740993ee335fd4c5492566c450a20d56fb04c35a6180467eda06939c",
+    "scripts/ci_test_partition.py": "3a137c7831fbb624ad39967a9cdc1926d2117656ac4888509b65c3414ad452e6",
+    "scripts/profile_test_wall_clock.py": "e7d93cd0d6935e592143db1d4100a3e56c845c855899f0454362c45faf8001ff",
+    "scripts/render_ci_workflow.py": "e6b64fea5fff6e6b687479142eb40096ed83c56ccfc89123d91342b5f4085e05",
+    "scripts/run_ci_test_shard.py": "97ac633bbda96eadb76c8d3195736dbab061479659dbd621e16fca6b0621bc9a",
+    "scripts/validate_baseline.py": "23dd61493f33078e8b81a5377044cc938dfc1ad4492965fb9ee1c38ca6a3b3bd",
+    "scripts/validate_ci.py": "2f999fe25f8c1f483a267b5466a66a40909aa8ee59fd107d1cd74cf0cc68e711",
+    "tests/test_ci.py": "d530041035d44cf8b5e33ea295269ebdf5ecdb7f0a62613a7c90eafecf75ba6b",
+    "tests/test_ci_test_partition.py": "ee5124af19490f78de232ebe734d4fdc5aad27552c00273acba61f5a21fc445a",
+    "tests/test_profile_test_wall_clock.py": "197d1a39410b37eea749e847c0cf3a9e8cc1d25491c9d349dea71b02abe4ba28",
+    "tests/test_run_ci_test_shard.py": "e835b265ccce8b7e819449afeeb934268a5516cf454287aa5f82ead5d4ea2c56"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_factory_fit_v1.json",
+    "sha256": "6b57c587431af93bee5cc2c4c945ddd2f27e03cb678f695fb24ac46f322af86c",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_EXACT_HEAD_CI_SHARD_EQUIVALENCE",
+    "independent_review": {
+      "path": "docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_independent_review_v1.json",
+      "sha256": "e7cf2e037d4b519a6c74e64ae361f0817e8116ad1e0de546641f4400ce3c0b6c",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_EXACT_HEAD_CI_SHARD_EQUIVALENCE"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_BRANCH_PROTECTION_MUTATION",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

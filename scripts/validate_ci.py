@@ -33,13 +33,37 @@ DELIVERY_PREFLIGHT_COMMAND = (
 DELIVERY_PREFLIGHT_SCHEMA = (
     "solana-alpha-lab.tracked-only-delivery-preflight.v1"
 )
-# Temporary 25m wall-time: GitHub job timeout includes the full suite, and
-# 15m cancelled PR #213 validate at 15m15s while tests were still running.
-# The same workflow covers pull_request and post-merge push to main.
-# Local tracked-only merge fallback must match, because .github/ changes are
-# CI-owned ineligible and use this timeout instead of the 120s focused gate.
-GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
-DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = GITHUB_VALIDATE_TIMEOUT_MINUTES * 60
+# Work jobs restore the fixed 15-minute wall after sharding. Tracked-only
+# delivery preflight still runs the full sequential suite locally and keeps a
+# separate 25-minute cap; that is measurement headroom for the local full
+# gate, not the claimed exact-head performance fix.
+GITHUB_VALIDATE_TIMEOUT_MINUTES = 15
+GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
+DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
+DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
+CI_TEST_SHARDS_PLAN = ROOT / "configs/ci_test_shards_v1.json"
+SHARD_RUN_COMMAND_TEMPLATE = (
+    "uv run --locked --managed-python python -B scripts/run_ci_test_shard.py "
+    "--index ${{{{ matrix.shard }}}} --count {shard_count} "
+    "--plan configs/ci_test_shards_v1.json"
+)
+CORE_ONLY_COMMAND = VALIDATION_COMMAND + " --core-only"
+AGGREGATOR_DENY_SCRIPT = """python - <<'PY'
+import os
+import sys
+
+required = {
+    "validate-core": os.environ.get("CORE_RESULT", ""),
+    "validate-tests": os.environ.get("TESTS_RESULT", ""),
+}
+failed = {name: value for name, value in required.items() if value != "success"}
+if failed:
+    print("AGGREGATOR_DENY:" + ",".join(f"{k}={v}" for k, v in sorted(failed.items())))
+    sys.exit(1)
+print("AGGREGATOR_OK")
+PY
+"""
+
 DELIVERY_PREFLIGHT_RECEIPT_DIR = ROOT / "local/delivery_preflight"
 CI_OWNED_DELIVERY_COMMAND = VALIDATION_COMMAND + " --ci-owned-delivery"
 CI_OWNED_DELIVERY_SCHEMA = "solana-alpha-lab.ci-owned-delivery-preflight.v1"
@@ -544,88 +568,6 @@ def run_tracked_only_delivery_preflight(*, base_ref: str = "origin/main") -> Non
     print("TRACKED_ONLY_DELIVERY_PREFLIGHT: PASS")
 
 
-def expected_workflow() -> dict[str, Any]:
-    return {
-        "name": "Repository validation",
-        "on": {
-            "workflow_dispatch": "",
-            "pull_request": {"branches": ["main"]},
-            "push": {"branches": ["main"]},
-        },
-        "permissions": {"contents": "read"},
-        "concurrency": {
-            "group": "${{ github.workflow }}-${{ github.ref }}",
-            "cancel-in-progress": "true",
-        },
-        "jobs": {
-            "validate": {
-                "runs-on": "ubuntu-24.04",
-                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
-                "env": {
-                    "UV_NO_ENV_FILE": "1",
-                    "PYTHONDONTWRITEBYTECODE": "1",
-                },
-                "steps": [
-                    {
-                        "name": "Check out repository",
-                        "uses": CHECKOUT_PIN,
-                        "with": {
-                            "persist-credentials": "false",
-                            "fetch-depth": "0",
-                        },
-                    },
-                    {
-                        "name": "Install pinned uv and Python",
-                        "uses": SETUP_UV_PIN,
-                        "with": {
-                            "version": EXPECTED_UV,
-                            "checksum": LINUX_UV_CHECKSUM,
-                            "python-version": ".".join(map(str, EXPECTED_PYTHON)),
-                            "enable-cache": "false",
-                        },
-                    },
-                    {
-                        "name": "Configure local hooks",
-                        "run": "git config --local core.hooksPath .githooks",
-                    },
-                    {
-                        "name": "Validate repository",
-                        "run": VALIDATION_COMMAND,
-                    },
-                ],
-            }
-        },
-    }
-
-
-def validate_workflow_text(text: str) -> None:
-    lowered = text.lower()
-    forbidden = (
-        "secrets.",
-        "pull_request_target",
-        "id-token:",
-        "actions/cache@",
-        "actions/upload-artifact@",
-        "actions/download-artifact@",
-    )
-    for marker in forbidden:
-        if marker in lowered:
-            raise CiValidationError(f"forbidden_workflow_marker:{marker}")
-
-    try:
-        document = yaml.load(text, Loader=yaml.BaseLoader)
-    except yaml.YAMLError as exc:
-        raise CiValidationError("workflow_yaml_invalid") from exc
-    if document != expected_workflow():
-        raise CiValidationError("workflow_exact_contract_mismatch")
-
-    uses = re.findall(r"(?m)^\s*uses:\s*([^\s#]+)", text)
-    if uses != [CHECKOUT_PIN, SETUP_UV_PIN]:
-        raise CiValidationError("workflow_action_set_mismatch")
-    if any(not re.search(r"@[0-9a-f]{40}$", reference) for reference in uses):
-        raise CiValidationError("workflow_action_not_immutable")
-
-
 def validate_python_version(version: tuple[int, int, int]) -> None:
     if version != EXPECTED_PYTHON:
         raise CiValidationError(f"python_version_mismatch:{version}")
@@ -658,8 +600,172 @@ def assert_lock_unchanged(before: bytes, after: bytes) -> None:
         raise CiValidationError("uv_lock_mutated")
 
 
-def child_commands() -> list[tuple[str, list[str]]]:
+def load_shard_plan() -> dict[str, Any]:
+    if not CI_TEST_SHARDS_PLAN.is_file():
+        raise CiValidationError("ci_test_shards_plan_missing")
+    try:
+        document = json.loads(CI_TEST_SHARDS_PLAN.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise CiValidationError("ci_test_shards_plan_invalid_json") from exc
+    if not isinstance(document, dict):
+        raise CiValidationError("ci_test_shards_plan_not_object")
+    count = document.get("shard_count")
+    shards = document.get("shards")
+    if document.get("schema") != "smial.ci-test-shards.v1":
+        raise CiValidationError("ci_test_shards_plan_schema_mismatch")
+    if not isinstance(count, int) or count < 3 or count > 4:
+        raise CiValidationError("ci_test_shards_plan_count_invalid")
+    if not isinstance(shards, list) or len(shards) != count:
+        raise CiValidationError("ci_test_shards_plan_shards_invalid")
+    seen: set[str] = set()
+    duplicates: set[str] = set()
+    for shard in shards:
+        if not isinstance(shard, list):
+            raise CiValidationError("ci_test_shards_plan_shards_invalid")
+        for path in shard:
+            key = str(path).replace("\\", "/")
+            if key in seen:
+                duplicates.add(key)
+            seen.add(key)
+    if duplicates:
+        raise CiValidationError("ci_test_shards_plan_duplicate_modules")
+    if not seen:
+        raise CiValidationError("ci_test_shards_plan_empty")
+    return document
+
+
+def setup_steps(*, validate_command: str) -> list[dict[str, Any]]:
+    return [
+        {
+            "name": "Check out repository",
+            "uses": CHECKOUT_PIN,
+            "with": {
+                "persist-credentials": "false",
+                "fetch-depth": "0",
+            },
+        },
+        {
+            "name": "Install pinned uv and Python",
+            "uses": SETUP_UV_PIN,
+            "with": {
+                "version": EXPECTED_UV,
+                "checksum": LINUX_UV_CHECKSUM,
+                "python-version": ".".join(map(str, EXPECTED_PYTHON)),
+                "enable-cache": "false",
+            },
+        },
+        {
+            "name": "Configure local hooks",
+            "run": "git config --local core.hooksPath .githooks",
+        },
+        {
+            "name": "Validate repository",
+            "run": validate_command,
+        },
+    ]
+
+
+def expected_workflow() -> dict[str, Any]:
+    plan = load_shard_plan()
+    shard_count = plan["shard_count"]
+    shard_values = [str(index) for index in range(shard_count)]
+    shard_command = SHARD_RUN_COMMAND_TEMPLATE.format(shard_count=shard_count)
+    return {
+        "name": "Repository validation",
+        "on": {
+            "workflow_dispatch": "",
+            "pull_request": {"branches": ["main"]},
+            "push": {"branches": ["main"]},
+        },
+        "permissions": {"contents": "read"},
+        "concurrency": {
+            "group": "${{ github.workflow }}-${{ github.ref }}",
+            "cancel-in-progress": "true",
+        },
+        "jobs": {
+            "validate-core": {
+                "runs-on": "ubuntu-24.04",
+                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
+                "env": {
+                    "UV_NO_ENV_FILE": "1",
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                },
+                "steps": setup_steps(validate_command=CORE_ONLY_COMMAND),
+            },
+            "validate-tests": {
+                "runs-on": "ubuntu-24.04",
+                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
+                "env": {
+                    "UV_NO_ENV_FILE": "1",
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                },
+                "strategy": {
+                    "fail-fast": "false",
+                    "max-parallel": str(shard_count),
+                    "matrix": {
+                        "shard": shard_values,
+                    },
+                },
+                "steps": setup_steps(validate_command=shard_command),
+            },
+            "validate": {
+                "if": "${{ always() }}",
+                "needs": ["validate-core", "validate-tests"],
+                "runs-on": "ubuntu-24.04",
+                "timeout-minutes": str(GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
+                "env": {
+                    "CORE_RESULT": "${{ needs.validate-core.result }}",
+                    "TESTS_RESULT": "${{ needs.validate-tests.result }}",
+                },
+                "steps": [
+                    {
+                        "name": "Deny non-success core or shard results",
+                        "run": AGGREGATOR_DENY_SCRIPT,
+                    }
+                ],
+            },
+        },
+    }
+
+
+def validate_workflow_text(text: str) -> None:
+    lowered = text.lower()
+    forbidden = (
+        "secrets.",
+        "pull_request_target",
+        "id-token:",
+        "actions/cache@",
+        "actions/upload-artifact@",
+        "actions/download-artifact@",
+    )
+    for marker in forbidden:
+        if marker in lowered:
+            raise CiValidationError(f"forbidden_workflow_marker:{marker}")
+
+    try:
+        document = yaml.load(text, Loader=yaml.BaseLoader)
+    except yaml.YAMLError as exc:
+        raise CiValidationError("workflow_yaml_invalid") from exc
+    if document != expected_workflow():
+        raise CiValidationError("workflow_exact_contract_mismatch")
+
+    uses = re.findall(r"(?m)^\s*uses:\s*([^\s#]+)", text)
+    expected_uses = [CHECKOUT_PIN, SETUP_UV_PIN, CHECKOUT_PIN, SETUP_UV_PIN]
+    if uses != expected_uses:
+        raise CiValidationError("workflow_action_set_mismatch")
+    if any(not re.search(r"@[0-9a-f]{40}$", reference) for reference in uses):
+        raise CiValidationError("workflow_action_not_immutable")
+    if "if: ${{ always() }}" not in text and "if: always()" not in text:
+        raise CiValidationError("workflow_aggregator_missing_always")
+    if "fail-fast: false" not in text:
+        raise CiValidationError("workflow_fail_fast_required")
+
+
+def child_commands(*, policy_only_baseline: bool = False) -> list[tuple[str, list[str]]]:
     python = sys.executable
+    baseline = [python, "-B", "scripts/validate_baseline.py"]
+    if policy_only_baseline:
+        baseline.append("--policy-only")
     return [
         (
             "SECRET_REJECTION",
@@ -688,9 +794,10 @@ def child_commands() -> list[tuple[str, list[str]]]:
             [python, "-B", "scripts/validate_pre_git_import.py"],
         ),
         ("TASK04_ARCHITECTURE", [python, "-B", "scripts/validate_task04.py"]),
-        ("REPOSITORY_POLICY", [python, "-B", "scripts/validate_baseline.py"]),
+        ("REPOSITORY_POLICY", baseline),
         ("PRE_COMMIT_HOOK", ["git", "config", "--local", "--get", "core.hooksPath"]),
     ]
+
 
 
 def ci_owned_child_commands() -> list[tuple[str, list[str]]]:
@@ -938,7 +1045,7 @@ def run_ci_owned_delivery_preflight(*, base_ref: str = "origin/main") -> None:
     print("CI_OWNED_DELIVERY_PREFLIGHT: PASS")
 
 
-def validate() -> None:
+def validate(*, core_only: bool = False) -> None:
     validate_python_version(sys.version_info[:3])
     print("PYTHON_RUNTIME: PASS")
 
@@ -957,7 +1064,7 @@ def validate() -> None:
     assert_lock_unchanged(before, LOCK_PATH.read_bytes())
     print("UV_LOCK_IMMUTABLE: PASS")
 
-    for label, command in child_commands():
+    for label, command in child_commands(policy_only_baseline=core_only):
         completed = run_checked(label, command)
         if label == "CATALOG_RESOLUTION" and '"asset_id": "CATALOG-ROOT-001"' not in completed.stdout:
             raise CiValidationError("catalog_resolution_contract_mismatch")
@@ -986,6 +1093,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="run focused local controls and delegate the full clean-checkout suite to PR CI",
     )
+    delivery_mode.add_argument(
+        "--core-only",
+        action="store_true",
+        help="run all non-test validation commands for sharded CI core job",
+    )
     parser.add_argument(
         "--base-ref",
         default="origin/main",
@@ -1006,7 +1118,7 @@ def main(argv: list[str] | None = None) -> int:
         elif args.ci_owned_delivery:
             run_ci_owned_delivery_preflight(base_ref=args.base_ref)
         else:
-            validate()
+            validate(core_only=args.core_only)
     except Exception as exc:
         print("RESULT: FAIL")
         print(f"ERROR_TYPE: {type(exc).__name__}")

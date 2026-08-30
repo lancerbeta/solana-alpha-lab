@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "EXACT-HEAD-CI-WALL-CLOCK-HEADROOM-FACTORY-FIT-001",
+  "as_of": "2026-08-30",
+  "task_id": "EXACT_HEAD_CI_WALL_CLOCK_HEADROOM_V1",
+  "reviewed_bindings_sha256": "a4031b90235adf189f42a73229d7f98adf8bccce4d3507cb28fddd44682f6aa0",
+  "reviewed_inventory_sha256": "7ca7ec591b0c451954d059cdab8b0240d14485f574725dfe04a8d236bd3377bf",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_BRANCH_PROTECTION_MUTATION",
+    "NO_PAID_OR_LARGER_RUNNER",
+    "NO_ALPHA"
+  ]
+}

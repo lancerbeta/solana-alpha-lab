@@ -103,6 +103,13 @@ merge_policy:
     - docs/tasks/CTRL-PROCESS-THROUGHPUT-GUARDRAILS-V1.md
     - docs/tasks/CTRL-PROFILE-PIN-VALIDATION-SUBSET-V1.md
     - docs/tasks/CTRL-FACTORY-V1-READINESS-PROFILE-BIND-V1.md
+    - docs/tasks/EXACT_HEAD_CI_WALL_CLOCK_HEADROOM_V1.md
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_baseline_receipt_v1.json
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_coverage_equivalence_v1.json
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_factory_fit_v1.json
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_independent_review_v1.json
+    - configs/ci_test_shards_v1.json
     - scripts/delivery_harness.py
     - scripts/delivery_efficiency.py
     - scripts/validate_factory_static.py
@@ -110,6 +117,10 @@ merge_policy:
     - scripts/owner_attention_gate.py
     - scripts/validate_ci.py
     - scripts/ci_fail_closed_messages.py
+    - scripts/ci_test_partition.py
+    - scripts/profile_test_wall_clock.py
+    - scripts/render_ci_workflow.py
+    - scripts/run_ci_test_shard.py
     - scripts/harness_sync.py
     - scripts/validate.ps1
     - scripts/validate_baton.py
@@ -120,6 +131,9 @@ merge_policy:
     - delivery-harness/policies/solana-alpha-lab.md
     - catalog/schemas/delivery_harness_completion_evidence.schema.json
     - tests/test_ci.py
+    - tests/test_ci_test_partition.py
+    - tests/test_profile_test_wall_clock.py
+    - tests/test_run_ci_test_shard.py
     - tests/test_quote_native_quoted_buy_h900_clock.py
     - tests/test_quote_native_friction_h900_falsifier.py
     - tests/test_ci_messages.py

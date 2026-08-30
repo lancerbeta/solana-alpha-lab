@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 48fe2fe9572132917b0f8719310a095f8ea0fbf7b1c0d5c6b79f2abaa1de8620
+    sha256: fdbf9cd5ac9a09c24caab2eb79fa6392d45ae9650db31fd6e08c838342467e7f
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 4283d7c5bf1501be480d9aa5286f079d4cc775ed4b8b28f10d5897a8b662764b
+    sha256: 2f999fe25f8c1f483a267b5466a66a40909aa8ee59fd107d1cd74cf0cc68e711
   access:
     mode: read_only
     method: command
@@ -2180,7 +2180,7 @@ records:
     repository_path: scripts/validate_baseline.py
   integrity:
     kind: sha256
-    sha256: 01015422e37cc3099813c2fc5dd134902d73fae2163f549597ef1fa08c55ddca
+    sha256: 23dd61493f33078e8b81a5377044cc938dfc1ad4492965fb9ee1c38ca6a3b3bd
   access:
     mode: read_only
     method: command
@@ -19729,7 +19729,7 @@ records:
   as_of: '2026-08-15'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/harness.yaml', repository_path: delivery-harness/harness.yaml}
-  integrity: {kind: sha256, sha256: 317a2475d813fadf86b8f8a54608beb9d354d0dbc46095e1088c765cf230d024}
+  integrity: {kind: sha256, sha256: d036e90b3232a7813ab2d056c5d4549a354df61c6bfe3a3d9d66c8edd4d3dfa7}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19802,7 +19802,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: aeb5d6ee2098c953bf902e884c931e66fdbeba532c7b6a3f0206bc44d1db031b}
+  integrity: {kind: sha256, sha256: e6210b55274b8e70c736202e778668e5ffa04a2097cba5182bc511e8bc6aaa0e}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
