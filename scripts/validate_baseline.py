@@ -4810,7 +4810,7 @@ def validate_task09_finalization_staged_style_policy() -> None:
     )
 
 
-def validate() -> None:
+def validate(*, policy_only: bool = False) -> None:
     github_actions = os.environ.get("GITHUB_ACTIONS", "").lower() == "true"
     tracked_only_delivery_marker = (
         os.environ.get("SMIAL_TRACKED_ONLY_DELIVERY", "") == "1"
@@ -5922,18 +5922,31 @@ def validate() -> None:
         validate_task09_atom4_probe_staged_style_policy()
     if state == "TASK09_FINALIZATION_STAGED":
         validate_task09_finalization_staged_style_policy()
-    tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
-    if tests.stdout.strip(): print(tests.stdout.strip())
-    if tests.stderr.strip(): print(tests.stderr.strip())
-    assert_check("unit_tests", tests.returncode == 0)
+    if not policy_only:
+        tests = run([sys.executable,"-B","-m","unittest","discover","-s","tests","-p","test_*.py"])
+        if tests.stdout.strip(): print(tests.stdout.strip())
+        if tests.stderr.strip(): print(tests.stderr.strip())
+        assert_check("unit_tests", tests.returncode == 0)
+    else:
+        print("UNIT_TESTS: SKIPPED_POLICY_ONLY")
     print(f"GIT_TOPOLOGY: {topology}")
     print(f"REPOSITORY_STATE: {state}")
     print("RESULT: PASS")
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--policy-only",
+        action="store_true",
+        help="run repository policy checks without canonical unittest discovery",
+    )
+    args = parser.parse_args(argv)
     print("=== TASK-03 REPOSITORY STATE VALIDATION ===")
-    try: validate()
+    try:
+        validate(policy_only=args.policy_only)
     except Exception as exc:
         print("RESULT: FAIL"); print(f"ERROR_TYPE: {type(exc).__name__}"); print(f"ERROR: {exc}"); return 1
     return 0

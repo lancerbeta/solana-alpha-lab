@@ -66,29 +66,52 @@ class CiWorkflowTests(unittest.TestCase):
                 "push": {"branches": ["main"]},
             },
         )
-        job = document["jobs"]["validate"]
         self.assertEqual(
-            job["timeout-minutes"],
+            set(document["jobs"]),
+            {"validate-core", "validate-tests", "validate"},
+        )
+        core = document["jobs"]["validate-core"]
+        tests = document["jobs"]["validate-tests"]
+        final = document["jobs"]["validate"]
+        self.assertEqual(
+            core["timeout-minutes"],
             str(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES),
         )
         self.assertEqual(
-            ci.DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
-            ci.GITHUB_VALIDATE_TIMEOUT_MINUTES * 60,
+            tests["timeout-minutes"],
+            str(ci.GITHUB_VALIDATE_TIMEOUT_MINUTES),
         )
-        self.assertEqual(job["concurrency"] if "concurrency" in job else None, None)
-        self.assertEqual(document["concurrency"]["cancel-in-progress"], "true")
         self.assertEqual(
-            job["steps"][0]["with"],
+            final["timeout-minutes"],
+            str(ci.GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
+        )
+        self.assertEqual(
+            ci.DELIVERY_PREFLIGHT_TIMEOUT_SECONDS,
+            ci.DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60,
+        )
+        self.assertEqual(core.get("concurrency"), None)
+        self.assertEqual(document["concurrency"]["cancel-in-progress"], "true")
+        self.assertEqual(tests["strategy"]["fail-fast"], "false")
+        self.assertEqual(final["if"], "${{ always() }}")
+        self.assertEqual(
+            final["needs"],
+            ["validate-core", "validate-tests"],
+        )
+        self.assertEqual(
+            core["steps"][0]["with"],
             {"persist-credentials": "false", "fetch-depth": "0"},
         )
-        self.assertEqual(job["steps"][1]["with"]["enable-cache"], "false")
+        self.assertEqual(core["steps"][1]["with"]["enable-cache"], "false")
         self.assertEqual(
-            job["steps"][2],
+            core["steps"][2],
             {
                 "name": "Configure local hooks",
                 "run": "git config --local core.hooksPath .githooks",
             },
         )
+        self.assertIn("--core-only", core["steps"][3]["run"])
+        self.assertIn("run_ci_test_shard.py", tests["steps"][3]["run"])
+        self.assertIn("AGGREGATOR_DENY", final["steps"][0]["run"])
 
     def test_tag_based_action_reference_fails(self) -> None:
         self.assert_invalid(self.text.replace(ci.CHECKOUT_PIN, "actions/checkout@v7"))
@@ -100,13 +123,18 @@ class CiWorkflowTests(unittest.TestCase):
     def test_forbidden_secrets_permissions_and_triggers_fail(self) -> None:
         mutations = (
             self.text + "\n# " + "secr" + "ets.REPOSITORY_TOKEN\n",
-            self.text.replace("contents: read", "contents: write"),
-            self.text.replace("push:\n", "pull_request_target:\n"),
+            self.text.replace("contents: read", "contents: write", 1),
+            self.text.replace("push:\n", "pull_request_target:\n", 1),
             self.text.replace(
                 "  workflow_dispatch:\n",
                 "  workflow_dispatch:\n    inputs:\n      branch:\n        description: forbidden\n",
+                1,
             ),
-            self.text.replace("contents: read", "contents: read\n  id-token: write"),
+            self.text.replace(
+                "contents: read\n",
+                "contents: read\n  id-token: write\n",
+                1,
+            ),
         )
         for mutation in mutations:
             with self.subTest():
@@ -114,26 +142,43 @@ class CiWorkflowTests(unittest.TestCase):
 
     def test_checkout_cache_timeout_and_concurrency_drift_fail(self) -> None:
         mutations = (
-            self.text.replace("persist-credentials: false", "persist-credentials: true"),
-            self.text.replace("fetch-depth: 0", "fetch-depth: 1"),
-            self.text.replace("enable-cache: false", "enable-cache: true"),
+            self.text.replace(
+                "persist-credentials: false",
+                "persist-credentials: true",
+                1,
+            ),
+            self.text.replace("fetch-depth: 0", "fetch-depth: 1", 1),
+            self.text.replace("enable-cache: false", "enable-cache: true", 1),
             self.text.replace(
                 "git config --local core.hooksPath .githooks",
                 "git config --global core.hooksPath .githooks",
+                1,
             ),
             self.text.replace(
                 "git config --local core.hooksPath .githooks\n",
                 "",
+                1,
             ),
             self.text.replace(
                 f"timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}\n",
-                "",
+                "timeout-minutes: 99\n",
+                1,
             ),
-            self.text.replace("cancel-in-progress: true", "cancel-in-progress: false"),
+            self.text.replace("cancel-in-progress: true", "cancel-in-progress: false", 1),
+            self.text.replace("fail-fast: false", "fail-fast: true", 1),
+            self.text.replace("if: ${{ always() }}", "if: success()", 1),
         )
         for mutation in mutations:
             with self.subTest():
                 self.assert_invalid(mutation)
+
+    def test_aggregator_denies_non_success_dependency_results(self) -> None:
+        document = yaml.load(self.text, Loader=yaml.BaseLoader)
+        script = document["jobs"]["validate"]["steps"][0]["run"]
+        self.assertIn('value != "success"', script)
+        self.assertIn("AGGREGATOR_DENY", script)
+        self.assertIn("validate-core", script)
+        self.assertIn("validate-tests", script)
 
 
 class CleanCloneDocumentationTests(unittest.TestCase):
@@ -165,7 +210,7 @@ class TrackedOnlyDeliveryPreflightTests(unittest.TestCase):
         self.assertIn("## TRACKED_ONLY_DELIVERY_PREFLIGHT", text)
         self.assertIn(ci.DELIVERY_PREFLIGHT_COMMAND, text)
         self.assertIn(
-            f"wall-time cap is {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES} minutes",
+            f"wall-time cap is {ci.DELIVERY_PREFLIGHT_TIMEOUT_MINUTES} minutes",
             text,
         )
         self.assertIn("copies no untracked or ignored inputs", text)

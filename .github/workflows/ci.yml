@@ -17,9 +17,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  validate-core:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    timeout-minutes: 15
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"
@@ -39,4 +39,65 @@ jobs:
       - name: Configure local hooks
         run: git config --local core.hooksPath .githooks
       - name: Validate repository
-        run: uv run --locked --managed-python python -B scripts/validate_ci.py
+        run: uv run --locked --managed-python python -B scripts/validate_ci.py --core-only
+
+  validate-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      UV_NO_ENV_FILE: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard:
+          - 0
+          - 1
+          - 2
+          - 3
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install pinned uv and Python
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.29"
+          checksum: "04f8b82f5d47f0512dcd32c67a4a6f16a0ea27c81537c338fd0ad6b23cebe829"
+          python-version: "3.13.14"
+          enable-cache: false
+      - name: Configure local hooks
+        run: git config --local core.hooksPath .githooks
+      - name: Validate repository
+        run: uv run --locked --managed-python python -B scripts/run_ci_test_shard.py --index ${{ matrix.shard }} --count 4 --plan configs/ci_test_shards_v1.json
+
+  validate:
+    if: ${{ always() }}
+    needs:
+      - validate-core
+      - validate-tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      CORE_RESULT: ${{ needs.validate-core.result }}
+      TESTS_RESULT: ${{ needs.validate-tests.result }}
+    steps:
+      - name: Deny non-success core or shard results
+        run: |
+          python - <<'PY'
+          import os
+          import sys
+
+          required = {
+              "validate-core": os.environ.get("CORE_RESULT", ""),
+              "validate-tests": os.environ.get("TESTS_RESULT", ""),
+          }
+          failed = {name: value for name, value in required.items() if value != "success"}
+          if failed:
+              print("AGGREGATOR_DENY:" + ",".join(f"{k}={v}" for k, v in sorted(failed.items())))
+              sys.exit(1)
+          print("AGGREGATOR_OK")
+          PY
