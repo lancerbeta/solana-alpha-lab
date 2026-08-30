@@ -28,6 +28,7 @@ managed_write_set:
 - delivery-harness/templates/portable-core/scripts/delivery_harness.py
 - delivery-harness/templates/portable-bundle-manifest.json
 - docs/evidence/control/delivery_harness_acceptance_v1.json
+- docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
 - docs/agent/EXECUTION_ROUTER_PROTOCOL.md
 - .cursor/commands/delivery-finish.md
