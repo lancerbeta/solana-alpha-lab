@@ -4,7 +4,7 @@
   "review_id": "RESEARCH-STORE-STALE-WRITER-LEASE-RECOVERY-FACTORY-FIT-001",
   "as_of": "2026-08-31",
   "task_id": "RESEARCH_STORE_STALE_WRITER_LEASE_RECOVERY_V1",
-  "mode": "PROPORTIONAL_REVIEW",
+  "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "reviewed_bindings_sha256": "7151d34fab1fadc4db75fff2f6bce3ad798a8638a24fb766cd03f4f48ebe3317",
   "reviewed_inventory_sha256": "7151d34fab1fadc4db75fff2f6bce3ad798a8638a24fb766cd03f4f48ebe3317",

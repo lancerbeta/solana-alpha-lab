@@ -42,9 +42,9 @@
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "T1_T13_LEASE_RECOVERY_MATRIX",
-      "ORPHAN_QUARANTINE_RESUME",
-      "INODE_SAFE_UNLINK"
+      "PASS_T1_T13_LEASE_RECOVERY_MATRIX",
+      "PASS_ORPHAN_QUARANTINE_RESUME",
+      "PASS_INODE_SAFE_UNLINK"
     ]
   },
   "non_claims": [

@@ -42,6 +42,7 @@ context_requirements:
   catalog_asset_ids: []
   l2_roles:
   - ARCHITECTURE_DECISIONS
+  - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
@@ -49,7 +50,10 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
     - docs/decisions/ADR-006-hypothesis-fast-lane-research-data-plane.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/research_store_stale_writer_lease_recovery/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/research_store_stale_writer_lease_recovery/a1_delivery_independent_review_v1.json
+    - docs/evidence/research_store_stale_writer_lease_recovery/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
