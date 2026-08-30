@@ -1,19 +1,36 @@
 {
-  "schema": "smial.factory-fit-review",
+  "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "review_id": "INCREMENTAL-HARNESS-SYNC-FACTORY-FIT-001",
   "as_of": "2026-08-30",
   "task_id": "INCREMENTAL_HARNESS_SYNC_V1",
+  "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "findings": [
-    "CONTROL_PLANE_REPEATED_FRICTION_EXCEPTION_ONLY",
-    "NO_PRODUCT_SCIENCE_MUTATION",
-    "NO_PROVIDER_OR_CREDENTIAL_SURFACE",
-    "ROUTINE_FINISH_FASTER_WITHOUT_WEAKENING_CI",
-    "NEXT_IS_FACTORY_OR_FORGE_NOT_MORE_CONTROL_OPT"
-  ],
-  "non_claims": [
+  "reviewed_bindings_sha256": "PENDING",
+  "reviewed_inventory_sha256": "PENDING",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "RETURN_TO_FACTORY_OR_FORGE_AFTER_MERGE"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
     "NO_ALPHA",
-    "NO_EXTERNAL_AUTHORITY"
-  ]
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_PERSISTENT_HASH_CACHE",
+    "BARE_APPLY_REMAINS_FULL_ORACLE",
+    "NO_WALL_CLOCK_ASSERTION_IN_CI"
+  ],
+  "recovery": "REVERT"
 }

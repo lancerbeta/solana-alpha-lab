@@ -21,7 +21,7 @@
   },
   "factory_fit": {
     "path": "docs/evidence/incremental_harness_sync/a1_delivery_factory_fit_v1.json",
-    "sha256": "efad7b46e80510f791c6c8b9665c779f234ba6468ad0327086cd4241ef40b62a",
+    "sha256": "5aa11ac7b6081b80750610067292590fb2475d253c974d0cdf07243f2f6eea70",
     "verdict": "PASS"
   },
   "validation": {
