@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.hfic_clock import (
     capture_stage_time,
     render_canonical_utc,
 )
+from solana_alpha_lab.factory.hfic_provenance import is_hfic_record
 from solana_alpha_lab.factory.hfic_session import (
     PENDING_STATES,
     PROMPT_VERSION,
@@ -73,6 +74,9 @@ CLOSED_FAMILY_ACCEPTANCE_RELATIVE = (
     "a1_acceptance_v1.json"
 )
 _CLOSED_PARK_RE = re.compile(r"\b((?:CLOSE|PARK)_[A-Z0-9_]+)\b")
+_TYPED_RUNTIME_RECEIPT_RE = re.compile(
+    r"^smial\.[a-z0-9]+(?:[.-][a-z0-9]+)*\.runtime-receipt$"
+)
 GOLDEN_OFFLINE_SPEC = (
     "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml"
 )
@@ -130,11 +134,16 @@ def evidence_epoch_material(
         try:
             store = ResearchStore(Path(data_root))
             for record in store.iter_committed_records():
-                payload = json.loads(record.payload_json)
-                if payload.get("hfic_protocol"):
+                try:
+                    payload = json.loads(record.payload_json)
+                except (ValueError, json.JSONDecodeError):
+                    continue
+                if not isinstance(payload, dict):
+                    continue
+                if is_hfic_record(record, payload):
                     continue
                 prior_parts.append(f"{record.record_id}:{record.payload_sha256}")
-        except (ResearchStoreError, ValueError, json.JSONDecodeError):
+        except ResearchStoreError:
             prior_parts = []
     prior_digest = hashlib.sha256(
         "\n".join(sorted(prior_parts)).encode("utf-8")
@@ -150,7 +159,8 @@ def evidence_epoch_material(
             dataset_manifest_ids = [item["dataset_manifest_id"] for item in enumerated]
             dataset_fingerprints = [item["dataset_fingerprint"] for item in enumerated]
     lifecycle_terminals.extend(
-        item["terminal"] for item in enumerate_closed_park_terminals(root)
+        item["terminal"]
+        for item in enumerate_closed_park_terminals(root, data_root)
     )
     lifecycle_terminals = list(dict.fromkeys(lifecycle_terminals))
     return {
@@ -584,7 +594,98 @@ def enumerate_accepted_capabilities(repo_root: Path) -> list[dict[str, Any]]:
     return entries
 
 
-def enumerate_closed_park_terminals(repo_root: Path) -> list[dict[str, Any]]:
+def _closed_family_source_rank(source: str) -> tuple[int, str]:
+    if source.startswith("registries/") or source.startswith("docs/"):
+        return (0, source)
+    return (1, source)
+
+
+def _dedupe_closed_families(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    ordered = sorted(
+        items,
+        key=lambda item: (item["terminal"], *_closed_family_source_rank(item["source_receipt"])),
+    )
+    unique: dict[str, dict[str, Any]] = {}
+    for item in ordered:
+        unique.setdefault(str(item["terminal"]), item)
+    return [unique[key] for key in sorted(unique)]
+
+
+def _is_rdp_closed_family_source(source: str) -> bool:
+    return source.startswith("datasets/")
+
+
+def select_closed_family_ledger_for_packet(
+    items: list[dict[str, Any]],
+    *,
+    limit: int = MAX_CLOSED_FAMILIES,
+) -> list[dict[str, Any]]:
+    """Keep typed RDP closures before applying the packet cap.
+
+    Git scrape can already fill MAX_CLOSED_FAMILIES. Alphabetical truncation
+    would otherwise drop an authoritative datasets/*.decision.json terminal.
+    """
+    rdp = [
+        item
+        for item in items
+        if _is_rdp_closed_family_source(str(item.get("source_receipt") or ""))
+    ]
+    git = [
+        item
+        for item in items
+        if not _is_rdp_closed_family_source(str(item.get("source_receipt") or ""))
+    ]
+    rdp.sort(key=lambda item: str(item["terminal"]))
+    git.sort(key=lambda item: str(item["terminal"]))
+    if len(rdp) >= limit:
+        return rdp
+    return rdp + git[: limit - len(rdp)]
+
+
+def enumerate_rdp_closed_family_terminals(data_root: Path) -> list[dict[str, Any]]:
+    datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
+    found: list[dict[str, Any]] = []
+    manifests_dir = Path(data_root) / "datasets" / "manifests"
+    for item in datasets:
+        manifest_id = str(item.get("dataset_manifest_id") or "")
+        if not manifest_id:
+            continue
+        decision_path = manifests_dir / f"{manifest_id}.decision.json"
+        if not decision_path.is_file() or _is_symlink_path(decision_path):
+            continue
+        published_path = manifests_dir / f"{manifest_id}.published"
+        if not published_path.is_file() or _is_symlink_path(published_path):
+            continue
+        try:
+            decision = json.loads(decision_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            continue
+        if not isinstance(decision, dict):
+            continue
+        schema = decision.get("schema")
+        if not isinstance(schema, str) or _TYPED_RUNTIME_RECEIPT_RE.fullmatch(schema) is None:
+            continue
+        terminal = decision.get("scientific_terminal")
+        if not isinstance(terminal, str) or _CLOSED_PARK_RE.fullmatch(terminal) is None:
+            continue
+        if decision.get("outcome_consumed") is not True:
+            continue
+        if decision.get("dataset_fingerprint") != item.get("dataset_fingerprint"):
+            continue
+        found.append(
+            {
+                "terminal": terminal,
+                "source_receipt": f"datasets/manifests/{manifest_id}.decision.json",
+                "reopen_forbidden": True,
+            }
+        )
+    return found
+
+
+def enumerate_closed_park_terminals(
+    repo_root: Path,
+    data_root: Path | None = None,
+) -> list[dict[str, Any]]:
     root = Path(repo_root)
     found: dict[tuple[str, str], dict[str, Any]] = {}
 
@@ -635,8 +736,10 @@ def enumerate_closed_park_terminals(repo_root: Path) -> list[dict[str, Any]]:
             value = payload.get(key)
             if isinstance(value, str):
                 _add(value, relative)
-    ordered = sorted(found.values(), key=lambda item: (item["terminal"], item["source_receipt"]))
-    return ordered
+    if data_root is not None:
+        for item in enumerate_rdp_closed_family_terminals(Path(data_root)):
+            _add(str(item["terminal"]), str(item["source_receipt"]))
+    return _dedupe_closed_families(list(found.values()))
 
 
 def _forge_context_blob_path(data_root: Path, digest: str) -> Path:
@@ -799,7 +902,7 @@ def build_forge_context_packet(
             }
         ]
     capabilities = enumerate_accepted_capabilities(repo_root)
-    closed_family_ledger = enumerate_closed_park_terminals(repo_root)
+    closed_family_ledger = enumerate_closed_park_terminals(repo_root, data_root)
     if not any(item["terminal"] == CLOSED_FAMILY for item in closed_family_ledger):
         closed_family_ledger.append(
             {
@@ -876,9 +979,18 @@ def build_forge_context_packet(
     if len(capabilities) > MAX_CAPABILITIES:
         capabilities = capabilities[:MAX_CAPABILITIES]
         truncation["truncated"] = True
-    if len(closed_family_ledger) > MAX_CLOSED_FAMILIES:
-        closed_family_ledger = closed_family_ledger[:MAX_CLOSED_FAMILIES]
+    packet_ledger = select_closed_family_ledger_for_packet(closed_family_ledger)
+    if len(packet_ledger) < len(closed_family_ledger):
         truncation["truncated"] = True
+        truncation["dropped_closed_families"] = len(closed_family_ledger) - len(
+            packet_ledger
+        )
+        truncation["kept_rdp_closed_families"] = sum(
+            1
+            for item in packet_ledger
+            if _is_rdp_closed_family_source(str(item.get("source_receipt") or ""))
+        )
+    closed_family_ledger = packet_ledger
     if dropped_priors:
         truncation["truncated"] = True
     if warnings:

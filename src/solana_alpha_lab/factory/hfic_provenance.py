@@ -23,6 +23,18 @@ from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonica
 CORRECTION_SCHEMA = "smial.hfic-provenance-time-correction"
 CORRECTION_SCHEMA_VERSION = "1.0"
 CORRECTION_ARTIFACT_KIND = "PROVENANCE_TIME_CORRECTION"
+_HFIC_ARTIFACT_KINDS = frozenset(
+    {
+        "FORGE_CONTEXT_PACKET",
+        "FORGE_DRAFT",
+        "CRITIC_INPUT_PACKET",
+        "CRITIC_RESULT",
+        "SESSION_RECEIPT",
+        "NEXT_EPISTEMIC_ACTION",
+        "CLASSIFIER_RECEIPT",
+        CORRECTION_ARTIFACT_KIND,
+    }
+)
 CORRECTION_REASON = "HFIC_PLACEHOLDER_PROVENANCE_TIME"
 ORIGINAL_PLACEHOLDER = "1970-01-01T00:00:00Z"
 PROVENANCE_VALID = "VALID"
@@ -50,8 +62,11 @@ def is_hfic_record(record: Any, payload: Mapping[str, Any] | None = None) -> boo
     session_id = body.get("session_id")
     if isinstance(session_id, str) and session_id.startswith("HFIC-SESS-"):
         return True
+    hypothesis_version_id = body.get("hypothesis_version_id")
+    if isinstance(hypothesis_version_id, str) and hypothesis_version_id.startswith("HFIC-"):
+        return True
     artifact_kind = body.get("artifact_kind")
-    if artifact_kind in {"FORGE_CONTEXT_PACKET", CORRECTION_ARTIFACT_KIND}:
+    if artifact_kind in _HFIC_ARTIFACT_KINDS:
         return True
     return False
 

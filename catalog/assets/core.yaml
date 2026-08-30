@@ -32275,7 +32275,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 21e881fb07b244169788221005c555c2a1150d9b3c8ff20828f2d302ea8c6ba6}
+  integrity: {kind: sha256, sha256: c86472b14ad38dc2ecc16f1932c451c6d9dacab1d916afd28cc8218bf3cd32d3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -33130,4 +33130,41 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [OBSERVATION_SCHEDULE, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract so Forge evidence_epoch excludes endogenous HFIC memory and admits typed RDP family closures.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-30'
+  truth_owner: HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1.md', repository_path: docs/tasks/HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1.md}
+  integrity: {kind: sha256, sha256: 5e9d95a50ecd086c98d2efdaefed82677cfc118b0d550d76c8b1ae916d187449}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, EVIDENCE_EPOCH, CLOSED_FAMILY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network A1-A5 proofs that HFIC self-memory does not advance evidence_epoch and typed RDP closures enter closed_family_ledger fail-closed.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-30'
+  truth_owner: HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_epistemic_memory_semantics.py', repository_path: tests/test_hfic_epistemic_memory_semantics.py}
+  integrity: {kind: sha256, sha256: aeed86c0da1362370ba0ac5e029a9643ed79614ac0d3a84f3070f9bdbb66a4eb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, EVIDENCE_EPOCH, CLOSED_FAMILY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
