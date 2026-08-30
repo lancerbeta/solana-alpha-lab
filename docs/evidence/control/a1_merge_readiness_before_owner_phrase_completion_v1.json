@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-COMPLETION-001",
+  "as_of": "2026-08-31",
+  "task_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-V1",
+  "state_change": "MERGE_READINESS_REQUIRED_BEFORE_OWNER_PHRASE",
+  "base_main": "6850bdb15d6c2547f7f768bfc6c1b97c9a1b4636",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-V1.md": "pending"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_merge_readiness_before_owner_phrase_factory_fit_v1.json",
+    "sha256": "pending",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_MERGE_READINESS_AND_IDENTITY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_merge_readiness_before_owner_phrase_review_v1.json",
+      "sha256": "pending",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_MERGE_READINESS_WITHOUT_PHRASE",
+      "PASS_LIVE_PR_HEAD_PRODUCT_REFUSE",
+      "PASS_STAGED_TASK_CONTRACT_SCHEMA"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_LIVE_PR_HEAD_FOR_PRODUCT"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd": 0
+  }
+}

@@ -34,6 +34,12 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
         self.assertIn("Do not document a five-second mechanical miss", text)
         self.assertFalse((ROOT / ".cursor/skills").exists())
 
+    def test_pre_commit_runs_staged_task_contract_schema_probe(self) -> None:
+        text = (ROOT / "scripts/validate.ps1").read_text(encoding="utf-8")
+        self.assertIn("check-task-contracts", text)
+        self.assertIn("--staged", text)
+        self.assertIn("PRE_COMMIT_TASK_CONTRACT_SCHEMA_INVALID", text)
+
     def test_skill_preserves_decision_atoms_replan_and_single_effort_advice(self) -> None:
         text = SKILL.read_text(encoding="utf-8")
         for marker in (
@@ -50,6 +56,16 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
             self.assertIn(marker, text)
         self.assertIn("once before a substantial chain", text)
         self.assertIn("never on microsteps", text)
+        self.assertIn("--merge-readiness", text)
+        self.assertIn("ready_for_owner_phrase", text)
+        self.assertIn("IDENTITY_MODE_MISMATCH", text)
+        self.assertIn("Do not widen those prefixes", text)
+
+    def test_portable_skill_does_not_route_control_work_to_live_pr_head(self) -> None:
+        text = PORTABLE_SKILL.read_text(encoding="utf-8")
+        self.assertIn("Do not widen those prefixes", text)
+        self.assertIn("task contract still uses `--contract`", text)
+        self.assertNotIn("instead of a product task contract", text)
 
     def test_skill_routes_cloud_export_and_plugins_fail_closed(self) -> None:
         text = SKILL.read_text(encoding="utf-8")

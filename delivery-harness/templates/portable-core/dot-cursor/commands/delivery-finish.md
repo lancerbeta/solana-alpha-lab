@@ -1,10 +1,13 @@
 # Delivery finish
 
-Bind targeted evidence and stop for exact PR/head approval after CI. The owner
-never clicks GitHub Merge. Harness or control PRs bind `LIVE_PR_HEAD` via
-`scripts/delivery_harness.py context --pr`; product work still uses an exact
-task contract. Then let
-`scripts/owner_attention_gate.py --guarded-merge` execute the elected
+Bind targeted evidence, run `--merge-readiness`, and stop for exact PR/head
+approval only after `ready_for_owner_phrase: true`. Order:
+`CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
+The owner never clicks GitHub Merge. Product work uses `--contract`.
+`context --pr` (`LIVE_PR_HEAD`) is refused with `IDENTITY_MODE_MISMATCH` when a
+changed path is outside `harness_control_write_prefixes`. Do not widen those
+prefixes. Control work with a task contract still uses `--contract`.
+Then let `scripts/owner_attention_gate.py --guarded-merge` execute the elected
 project-bound gate once, consume existing exact-head PR CI and re-read live
 merge facts before one standard merge; do not supply
 pre-asserted green booleans. Treat its `merge_commit` as the expected default-branch head and

@@ -1812,6 +1812,63 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 context_builder=exact_context_builder(self.module),
             )
 
+    def test_merge_readiness_is_ready_without_phrase_and_does_not_merge(self) -> None:
+        runner = FakeRunner()
+        result = self.module.evaluate_merge_readiness(
+            ROOT,
+            repository="lancerbeta/solana-alpha-lab",
+            pr_number=PR,
+            route="DIRECT_CURSOR_DELIVERY",
+            actor="CURSOR",
+            context_receipt=context_receipt(self.module),
+            runner=runner,
+            context_builder=exact_context_builder(self.module),
+            evidence_builder=grounded_evidence,
+            delivery_checks_builder=grounded_delivery_checks,
+        )
+        self.assertTrue(result["ready_for_owner_phrase"])
+        self.assertEqual(result["schema"], "smial.merge-readiness")
+        self.assertFalse(result["merge_submitted"])
+        self.assertNotEqual(result["decision"], "AUTONOMOUS")
+        self.assertEqual(result["reasons"], ["EXACT_MERGE_APPROVAL_REQUIRED"])
+        self.assertTrue(result["merge_checks"]["write_set_pass"])
+        self.assertFalse(any(call[:3] == ("gh", "pr", "merge") for call in runner.calls))
+
+    def test_merge_readiness_reports_write_set_fail_without_phrase(self) -> None:
+        def failing_write_set(
+            root: Path,
+            *,
+            context_receipt: dict[str, object],
+            local_head: str,
+            local_tree: str,
+            ci_pass: bool,
+            runner: object,
+        ) -> dict[str, bool]:
+            return {
+                "required_tests_pass": True,
+                "full_gate_pass": True,
+                "write_set_pass": False,
+                "secret_scan_pass": True,
+            }
+
+        result = self.module.evaluate_merge_readiness(
+            ROOT,
+            repository="lancerbeta/solana-alpha-lab",
+            pr_number=PR,
+            route="DIRECT_CURSOR_DELIVERY",
+            actor="CURSOR",
+            context_receipt=context_receipt(self.module),
+            runner=FakeRunner(),
+            context_builder=exact_context_builder(self.module),
+            evidence_builder=grounded_evidence,
+            delivery_checks_builder=failing_write_set,
+        )
+        self.assertFalse(result["ready_for_owner_phrase"])
+        self.assertEqual(result["decision"], "DENY")
+        self.assertIn("MERGE_CHECK_FAILED:write_set_pass", result["reasons"])
+        self.assertFalse(result["merge_checks"]["write_set_pass"])
+        self.assertFalse(result["merge_submitted"])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -338,8 +338,23 @@ class DeliveryHarnessContextTests(unittest.TestCase):
                     pass
 
     def test_live_pr_head_receipt_does_not_require_a_task_contract(self) -> None:
-        _metadata, git_text = self.frozen_task_git_text()
-        with mock.patch.object(self.module, "git_text", side_effect=git_text):
+        merge_base = "c" * 40
+        values = {
+            ("rev-parse", "HEAD"): "a" * 40,
+            ("rev-parse", "HEAD^{tree}"): "b" * 40,
+            ("branch", "--show-current"): "control-branch",
+            ("status", "--porcelain=v1"): "",
+            ("remote", "get-url", "origin"): "git@github.com:lancerbeta/solana-alpha-lab.git",
+            ("merge-base", "HEAD", "origin/main"): merge_base,
+            ("diff", "--name-only", "--no-renames", f"{merge_base}...HEAD"): "AGENTS.md",
+        }
+
+        def respond(_root: Path, *args: str) -> str:
+            if args not in values:
+                raise AssertionError(f"unexpected git fixture call: {args!r}")
+            return values[args]
+
+        with mock.patch.object(self.module, "git_text", side_effect=respond):
             receipt = self.module.build_live_pr_head_receipt(
                 ROOT, pr_number=104, route="DIRECT_CURSOR_DELIVERY"
             )
@@ -356,6 +371,88 @@ class DeliveryHarnessContextTests(unittest.TestCase):
             self.assertTrue(path.name.startswith("control-pr-104-"))
         finally:
             path.unlink(missing_ok=True)
+
+    def test_live_pr_head_receipt_refuses_product_diff(self) -> None:
+        merge_base = "c" * 40
+        values = {
+            ("rev-parse", "HEAD"): "a" * 40,
+            ("rev-parse", "HEAD^{tree}"): "b" * 40,
+            ("branch", "--show-current"): "product-branch",
+            ("status", "--porcelain=v1"): "",
+            ("remote", "get-url", "origin"): "git@github.com:lancerbeta/solana-alpha-lab.git",
+            ("merge-base", "HEAD", "origin/main"): merge_base,
+            (
+                "diff",
+                "--name-only",
+                "--no-renames",
+                f"{merge_base}...HEAD",
+            ): "src/solana_alpha_lab/factory/research_store.py",
+        }
+
+        def respond(_root: Path, *args: str) -> str:
+            if args not in values:
+                raise AssertionError(f"unexpected git fixture call: {args!r}")
+            return values[args]
+
+        with mock.patch.object(self.module, "git_text", side_effect=respond):
+            with self.assertRaisesRegex(ValueError, "IDENTITY_MODE_MISMATCH"):
+                self.module.build_live_pr_head_receipt(
+                    ROOT, pr_number=222, route="DIRECT_CURSOR_DELIVERY"
+                )
+
+    def test_staged_task_contract_schema_rejects_implementation_unverified(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            relative = "docs/tasks/BAD.md"
+            path = root / relative
+            path.parent.mkdir(parents=True)
+            path.write_text(
+                "---\n"
+                "task_id: BAD-TASK-V1\n"
+                "task_version: '1.0'\n"
+                "status: IMPLEMENTATION_UNVERIFIED\n"
+                "as_of: '2026-08-31'\n"
+                "owner: GOAL_OWNER\n"
+                "allowed_routes: [DIRECT_CURSOR_DELIVERY]\n"
+                "expected_repository: lancerbeta/solana-alpha-lab\n"
+                "git_binding:\n"
+                "  expected_base: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+                "  expected_upstream: origin/main\n"
+                "  expected_upstream_oid: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\n"
+                "  expected_branch: cursor/bad\n"
+                "  dirty_mode: ALLOW_REPORTED\n"
+                "objective: This objective text is long enough to pass schema minLength.\n"
+                "managed_write_set: [docs/tasks/BAD.md]\n"
+                "external_caps:\n"
+                "  network: false\n"
+                "  credentials: false\n"
+                "  external_system: false\n"
+                "  signing_or_financial_action: false\n"
+                "  cash_spend: false\n"
+                "  deployment: false\n"
+                "stop_conditions: [SECRET_IN_RECEIPTS]\n"
+                "context_requirements:\n"
+                "  catalog_asset_ids: []\n"
+                "  l2_roles: []\n"
+                "  l3_roles: []\n"
+                "  roadmap_path: null\n"
+                "  exact_role_paths:\n"
+                "    LIFECYCLE: []\n"
+                "    EXTERNAL_ROUTE_KNOWLEDGE: []\n"
+                "    ARCHITECTURE_DECISIONS: []\n"
+                "    DELIVERY_EVIDENCE: []\n"
+                "    HISTORICAL_CONTEXT: []\n"
+                "---\n\n# BAD\n",
+                encoding="utf-8",
+            )
+            (root / "catalog/schemas").mkdir(parents=True)
+            schema_src = ROOT / "catalog/schemas/delivery_harness_task_contract.schema.json"
+            (root / "catalog/schemas/delivery_harness_task_contract.schema.json").write_bytes(
+                schema_src.read_bytes()
+            )
+            with self.assertRaisesRegex(ValueError, "TASK_CONTRACT_SCHEMA_INVALID"):
+                self.module.validate_task_contract_paths(root, [relative])
+
 
     def test_large_file_is_never_inlined(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

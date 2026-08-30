@@ -712,6 +712,37 @@ def build_live_pr_head_receipt(
         raise ValueError("LIVE_PR_HEAD_NOT_ENABLED")
     if route not in harness["active_routes"]:
         raise ValueError("TASK_ROUTE_NOT_ALLOWED")
+    prefixes = merge_policy.get("harness_control_write_prefixes")
+    default_branch = profile["repository"]["default_branch"]
+    if not (
+        isinstance(prefixes, list)
+        and prefixes
+        and all(isinstance(item, str) and item for item in prefixes)
+        and isinstance(default_branch, str)
+        and default_branch
+    ):
+        raise ValueError("IDENTITY_MODE_MISMATCH")
+    merge_base = git(root, "merge-base", "HEAD", f"origin/{default_branch}")
+    if re.fullmatch(r"[0-9a-f]{40}", merge_base) is None:
+        raise ValueError("IDENTITY_MODE_MISMATCH")
+    changed = [
+        path.replace("\\", "/")
+        for path in git(root, "diff", "--name-only", "--no-renames", f"{merge_base}...HEAD").splitlines()
+        if path
+    ]
+    if not changed:
+        raise ValueError("IDENTITY_MODE_EMPTY_DIFF")
+    def in_prefixes(path: str) -> bool:
+        for entry in prefixes:
+            if entry.endswith("/**"):
+                prefix = entry[:-3]
+                if path == prefix or path.startswith(prefix + "/"):
+                    return True
+            elif path == entry:
+                return True
+        return False
+    if any(not in_prefixes(path) for path in changed):
+        raise ValueError("IDENTITY_MODE_MISMATCH: use --contract")
     repository = profile["repository"]["name"]
     cloud_boundaries = historical_cloud_boundaries(profile)
     if github_repository_from_origin(git(root, "remote", "get-url", "origin")) != repository:

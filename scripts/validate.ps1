@@ -85,6 +85,16 @@ try {
             }
 
             Write-Output "PRE_COMMIT_DERIVED_SYNC: PASS"
+
+            $contractCheck = Invoke-NativeResult -File "uv.exe" -Arguments @(
+                "run", "--locked", "--managed-python", "python", "-B",
+                ".\scripts\delivery_harness.py", "check-task-contracts", "--staged"
+            )
+            $contractCheck.Lines | ForEach-Object { Write-Output $_ }
+            if ($contractCheck.ExitCode -ne 0) {
+                throw "PRE_COMMIT_TASK_CONTRACT_SCHEMA_INVALID"
+            }
+
             Write-Output "PRE_COMMIT_JIT: PASS"
             Write-Output "RESULT: PASS"
         }

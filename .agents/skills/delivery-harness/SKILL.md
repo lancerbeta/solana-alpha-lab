@@ -78,19 +78,21 @@ tracked-only fallback once for an explicitly ineligible control/validation
 change. Do not run that local full gate both before PR and at merge. First
 installation alone uses the predecessor route and one pre-PR tracked-only gate.
 Bind exact inventory, tests, head/tree, limitations and rollback. Push/open PR
-inside routine authority, require exact-head CI and stop for one exact owner
-approval bound to PR/head. The owner never clicks GitHub Merge. Re-read every
-machine precondition, evaluate `OWNER_ATTENTION_GATE_V2`, then perform at most
-one ordinary guarded merge and read back the profile's exact default
-branch/post-merge CI. Harness or control PRs use
-`scripts/delivery_harness.py context --pr <N> --route <ROUTE> --write-receipt`
-for a local `LIVE_PR_HEAD` receipt instead of inventing a product `TASK-XX`.
-Use the repository-owned
-`scripts/owner_attention_gate.py --guarded-merge` entrypoint so the agent cannot
-supply pre-asserted test/CI/Factory-Fit booleans: it verifies the self-hashed
-context receipt, exact local head/tree, required live GitHub check, unresolved
-review threads and hash-bound FULL_REVIEW evidence before invoking one standard
-merge without branch deletion.
+inside routine authority (draft CI overlap is allowed). Isolated critics run on
+the inventory that `bind-evidence` will hash; FAIL or later content change
+requires re-review and rebind before merge-readiness. After exact-head CI run
+`scripts/owner_attention_gate.py --merge-readiness` (no phrase, no `gh pr merge`).
+STOP for one exact owner approval only when `ready_for_owner_phrase` is true.
+Order: `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
+The owner never clicks GitHub Merge. Product work uses
+`context --contract --task-id`. `context --pr` is `LIVE_PR_HEAD` only when every
+changed path is inside `harness_control_write_prefixes`; otherwise
+`IDENTITY_MODE_MISMATCH` (use `--contract`). Do not widen those prefixes to
+admit a product write set. Re-read every machine precondition, evaluate
+`OWNER_ATTENTION_GATE_V2`, then perform at most one ordinary guarded merge and
+read back the profile's exact default branch/post-merge CI. Use
+`scripts/owner_attention_gate.py --guarded-merge` so the agent cannot supply
+pre-asserted test/CI/Factory-Fit booleans.
 
 The merge submission is not the terminal receipt. Persist its self-hashed JSON,
 bind its `merge_commit` as the expected default-branch head and require

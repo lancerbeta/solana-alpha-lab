@@ -380,6 +380,100 @@ def git_text(root: Path, *args: str) -> str:
     return completed.stdout.decode("utf-8", errors="strict").strip()
 
 
+def path_in_control_write_prefixes(path: str, prefixes: list[str]) -> bool:
+    normalized = path.replace("\\", "/")
+    if normalized.startswith("./"):
+        normalized = normalized[2:]
+    for entry in prefixes:
+        if not isinstance(entry, str) or not entry:
+            continue
+        if entry.endswith("/**"):
+            prefix = entry[:-3]
+            if normalized == prefix or normalized.startswith(prefix + "/"):
+                return True
+        elif normalized == entry:
+            return True
+    return False
+
+
+def require_live_pr_control_diff(
+    root: Path,
+    *,
+    prefixes: list[str],
+    default_branch: str,
+) -> None:
+    upstream = f"origin/{default_branch}"
+    merge_base = git_text(root, "merge-base", "HEAD", upstream)
+    if re.fullmatch(r"[0-9a-f]{40}", merge_base) is None:
+        raise ValueError("IDENTITY_MODE_MISMATCH")
+    changed = [
+        path.replace("\\", "/")
+        for path in git_text(
+            root, "diff", "--name-only", "--no-renames", f"{merge_base}...HEAD"
+        ).splitlines()
+        if path
+    ]
+    if not changed:
+        raise ValueError("IDENTITY_MODE_EMPTY_DIFF")
+    if any(not path_in_control_write_prefixes(path, prefixes) for path in changed):
+        raise ValueError("IDENTITY_MODE_MISMATCH: use --contract")
+
+
+def is_harness_task_contract_text(text: str) -> bool:
+    match = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n", text, re.DOTALL)
+    if match is None:
+        return False
+    try:
+        metadata = load_yaml_unique(match.group(1))
+    except (OSError, YAML_ERROR):
+        return False
+    return (
+        isinstance(metadata, dict)
+        and isinstance(metadata.get("task_id"), str)
+        and isinstance(metadata.get("allowed_routes"), list)
+    )
+
+
+def validate_task_contract_paths(root: Path, relatives: list[str]) -> None:
+    for relative in relatives:
+        normalized = relative.replace("\\", "/")
+        if not normalized.startswith("docs/tasks/") or not normalized.endswith(".md"):
+            continue
+        path = resolve_bounded(root, normalized, code="TASK_CONTRACT_UNSAFE_PATH")
+        try:
+            text = path.read_text(encoding="utf-8")
+        except OSError as exc:
+            raise ValueError("TASK_CONTRACT_NOT_FOUND") from exc
+        if not is_harness_task_contract_text(text):
+            continue
+        match = re.match(r"\A---\r?\n(.*?)\r?\n---\r?\n", text, re.DOTALL)
+        if match is None:
+            raise ValueError("TASK_CONTRACT_SCHEMA_INVALID")
+        metadata = load_yaml_unique(match.group(1))
+        if not isinstance(metadata, dict) or not isinstance(metadata.get("task_id"), str):
+            raise ValueError("TASK_CONTRACT_SCHEMA_INVALID")
+        parse_task_contract(root, normalized, metadata["task_id"])
+
+
+def staged_task_contract_relatives(root: Path) -> list[str]:
+    raw = subprocess.run(
+        ["git", "diff", "--cached", "--name-only", "--no-renames", "-z"],
+        cwd=root,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if raw.returncode != 0:
+        raise ValueError("GIT_IDENTITY_UNKNOWN")
+    relatives: list[str] = []
+    for item in raw.stdout.split(b"\0"):
+        if not item:
+            continue
+        relatives.append(item.decode("utf-8", errors="strict").replace("\\", "/"))
+    return relatives
+
+
 def git_identity(root: Path) -> dict[str, Any]:
     head = git_text(root, "rev-parse", "HEAD")
     tree = git_text(root, "rev-parse", "HEAD^{tree}")
@@ -879,6 +973,19 @@ def build_live_pr_head_receipt(
     profile = load_closed_document(
         root / profile_relative,
         root / "catalog/schemas/delivery_harness_project_profile.schema.json",
+    )
+    prefixes = merge_policy.get("harness_control_write_prefixes")
+    default_branch = profile["repository"]["default_branch"]
+    if not (
+        isinstance(prefixes, list)
+        and prefixes
+        and all(isinstance(item, str) and item for item in prefixes)
+        and isinstance(default_branch, str)
+        and default_branch
+    ):
+        raise ValueError("IDENTITY_MODE_MISMATCH")
+    require_live_pr_control_diff(
+        root, prefixes=prefixes, default_branch=default_branch
     )
     validate_repository_origin(root, profile["repository"]["name"])
     context_map = load_closed_document(
@@ -1529,6 +1636,10 @@ def parse_args() -> argparse.Namespace:
     check = sub.add_parser("check")
     check.add_argument("--root", type=Path, default=ROOT)
     check.add_argument("--format", choices=("json",), default="json")
+    staged = sub.add_parser("check-task-contracts")
+    staged.add_argument("--root", type=Path, default=ROOT)
+    staged.add_argument("--staged", action="store_true")
+    staged.add_argument("--format", choices=("json",), default="json")
     context = sub.add_parser("context")
     context.add_argument("--root", type=Path, default=ROOT)
     context.add_argument("--task-id")
@@ -1560,6 +1671,27 @@ def main() -> int:
         result = check_harness(args.root.resolve())
         print(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True))
         return 0 if result["status"] == "PASS" else 2
+    if args.command == "check-task-contracts":
+        if not args.staged:
+            raise ValueError("TASK_CONTRACT_CHECK_STAGED_REQUIRED")
+        root = args.root.resolve()
+        relatives = staged_task_contract_relatives(root)
+        validate_task_contract_paths(root, relatives)
+        print(json.dumps(
+            {
+                "schema": "smial.task-contract-check",
+                "status": "PASS",
+                "checked": [
+                    path for path in relatives
+                    if path.replace("\\", "/").startswith("docs/tasks/")
+                    and path.replace("\\", "/").endswith(".md")
+                ],
+            },
+            indent=2,
+            ensure_ascii=False,
+            sort_keys=True,
+        ))
+        return 0
     if args.command == "radar":
         events_path = resolve_bounded(
             args.root.resolve(), args.events, code="CAPABILITY_EVENTS_PATH_INVALID"
