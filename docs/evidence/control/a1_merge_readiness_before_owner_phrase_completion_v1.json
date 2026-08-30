@@ -13,15 +13,15 @@
   "implementation_bindings": {
     ".agents/skills/delivery-harness/SKILL.md": "65c70e5060d0947962bd15bf3b4a552b0ad9d67f758b4e033ec8bc9107027ac3",
     ".cursor/commands/delivery-finish.md": "5b5836571a47bb84f16c1d468292d6946aaef755fb9cf7329247e5aee8c50e5c",
-    "AGENTS.md": "0f24ceae335e59d6caad9be4b38d3a53c31df440fa87dd81bf11f17a31431c8a",
-    "catalog/assets/core.yaml": "01f64159be1a8b9d28901ca353cad7fb6324d60ecfdcdf14227467a4783a3a10",
+    "AGENTS.md": "6dbc2ba902c059f6a599f3f74897ef95d9e5be4df36be6d43b12e03f3c136571",
+    "catalog/assets/core.yaml": "ae281a9cb2516004e387fac5a95582aa7af775822cdcd322fea153fd4da674be",
     "delivery-harness/templates/portable-bundle-manifest.json": "c5d6e3de00f7fd10873bdd09ebff0c17acca9d57a594d76ad8016ca0116d801d",
     "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md": "51034d7a1e2ed0daa07bfc75d0bde7c007ab764a1b6bea69346f2e73f9ab428c",
     "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md": "b4507738285ebd757e51ae5df87a967efe176d3f323c032304eb12f5d38450d2",
     "delivery-harness/templates/portable-core/scripts/delivery_harness.py": "82fe8395015108a0bc3c2c06970cc9d88b29f6da8444f919b518955a71783738",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "8acb49843a0a19a827e971e4fa9faac188513e232e5c4e5f885c0d8d2fa829c1",
     "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "e8e784854f70faa86a471fa36913f093a0808d58fcc28a3226865514ce1282fa",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "729a95abde7e2d346ccf821802a64d57b73a2a8e598cb87eb35ab9a198c1767b",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "b863218678fafc48749256b6730ae3fd3fc21ce053d92e4c32c8856c30f98839",
     "docs/tasks/CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-V1.md": "92393102cacdf2854d2f342d4f8beb0346c261dac0f80519626bd3ce2e98ed64",
     "scripts/delivery_harness.py": "7f3dbf8c630ee78bed0d4faa3f6a9e7a2a296eeb2e8700ee29152f4c3e183be8",
     "scripts/owner_attention_gate.py": "217a82a003e6c88bdb6b243fd04712de20497ad0e65c96ebcc26f339b7b45d68",
@@ -40,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_merge_readiness_before_owner_phrase_factory_fit_v1.json",
-    "sha256": "a680b545aeaedd9e7ca7846b6808304e678216644822065aa97713f346e3fbee",
+    "sha256": "f5fcfff22dc1878e004d8b272b6f8fddfc916f98c92d9fd09bfea0b23d992a38",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MERGE_READINESS_AND_IDENTITY_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_merge_readiness_before_owner_phrase_review_v1.json",
-      "sha256": "cd5766f21a01f9ca2b23ccffc4df20e08feeea8ea7ec520b887deb2f6095ebc2",
+      "sha256": "b7eaebf57a00e3dcde58ba8ba71b8f9b71f1dd122dd22ab91717e047d855b1b6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
