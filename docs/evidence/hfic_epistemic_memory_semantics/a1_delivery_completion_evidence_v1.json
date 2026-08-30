@@ -1,0 +1,70 @@
+{
+  "acceptance_id": "HFIC-EPISTEMIC-MEMORY-SEMANTICS-DELIVERY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-08-30",
+  "base_main": "10aa265690c2c7a3fce5cd616b730a23daf34440",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/hfic_epistemic_memory_semantics/a1_delivery_factory_fit_v1.json",
+    "sha256": "c522ddce960cd97b9fe36d6a6dbec4f2886add906abbb633febceeb79d752217",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "1320fcf88b370d0bbd226e166f221d0b9ae5492ef7b5ece0e1bf3b71fa9ab992",
+    "catalog/assets/lifecycle.yaml": "ee23ba44c7593d42ac3a921220c6119b5768157bee531682bd7828f1262a7f38",
+    "catalog/catalog_manifest.yaml": "3cf69f9b3910e51ebc1ac4bf4860a2de6ea2a70f9c8ef22cb696ed161d37f7a7",
+    "catalog/generated/asset_edges.json": "462d58b325fe359c7be543c62f3dbaf3c6add4ad069cc0e63db18ff9845093e3",
+    "docs/PROJECT_MAP.md": "98bc6a6891d276dafaa13bfacc844175d5e0b7e4e3da1939afbea56b90368ecd",
+    "docs/evidence/hfic_epistemic_memory_semantics/a1_acceptance_v1.json": "f29ed53bf1412876b43546281129e6d7be97659de8fb461a3ebc87507a1e7a93",
+    "docs/tasks/HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1.md": "5e9d95a50ecd086c98d2efdaefed82677cfc118b0d550d76c8b1ae916d187449",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "4455bb7c5fe8a4618f77c90cc79e725d9f7b20ee797a26a2ee557cf572375775",
+    "src/solana_alpha_lab/factory/hfic_provenance.py": "fd5b24894351d79edec04dd40f51e4f6e1cd4da77600057d023e388fcdc07d87",
+    "src/solana_alpha_lab/factory/hfic_session.py": "c86472b14ad38dc2ecc16f1932c451c6d9dacab1d916afd28cc8218bf3cd32d3",
+    "tests/test_hfic_epistemic_memory_semantics.py": "aeed86c0da1362370ba0ac5e029a9643ed79614ac0d3a84f3070f9bdbb66a4eb"
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_FULL_FORGE_SEARCH_TO_PROVE_FIX",
+    "NO_H900_ESTIMAND_REPAIR",
+    "NO_DESTRUCTIVE_RDP_REWRITE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credentials_read": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "wallet_signer_transaction": 0
+  },
+  "state_change": "CLOSE_HFIC_EPISTEMIC_MEMORY_SEMANTICS_PRE_MERGE",
+  "task_id": "HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1",
+  "validation": {
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_epistemic_memory_semantics/a1_delivery_independent_review_v1.json",
+      "sha256": "2fe6d5a891bb2e12e6c8c43ae69b65959575bccfbce0ff4bba4b95d27d881cbd",
+      "verdict": "PASS"
+    },
+    "project_checks": [
+      "PASS_HFIC_EPISTEMIC_MEMORY_TESTS",
+      "PASS_LIVE_ACTIVE_RDP_PREFLIGHT",
+      "PASS_CATALOG_VALIDATE"
+    ],
+    "targeted": "PASS_HFIC_EPISTEMIC_MEMORY_TESTS"
+  }
+}

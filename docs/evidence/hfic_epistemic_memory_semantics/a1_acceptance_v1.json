@@ -1,0 +1,64 @@
+{
+  "acceptance_id": "HFIC-EPISTEMIC-MEMORY-SEMANTICS-ACCEPTANCE-001",
+  "as_of": "2026-08-30",
+  "schema": "smial.hfic-epistemic-memory-semantics-acceptance",
+  "schema_version": "1.0",
+  "task_id": "HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1",
+  "active_rdp": "local/factory_v1/data_plane",
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "HFIC epistemic-memory semantics do not mutate Project Sources release registry or UI packs."
+  },
+  "tests": {
+    "a1_self_memory_does_not_advance_epoch": "PASS",
+    "a2_external_dataset_advances_epoch": "PASS",
+    "a3_typed_rdp_decision_enters_ledger": "PASS",
+    "a3_late_alphabet_rdp_survives_packet_cap": "PASS",
+    "a4_arbitrary_label_fail_closed": "PASS",
+    "a4_unpublished_typed_decision_fail_closed": "PASS",
+    "a5_freeze_preserves_closed_family_and_rejects_reopen": "PASS"
+  },
+  "epoch_semantics": {
+    "prior_epoch": "01cc4494506d18259bf3215475daa5920c1997da80af1968ceaf10b0b46b3aeb",
+    "recomputed_epoch": "28eab6b9138b53df01b978299b9cb5bafb11857dd88a76faa8b13e0d98b3673b",
+    "hfic_self_memory_changes_epoch": false,
+    "preflight_write_left_epoch_unchanged": true,
+    "external_evidence_changes_epoch_test": "PASS",
+    "epoch_delta_reasons": [
+      "RDP_TYPED_CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY_NOW_IN_LIFECYCLE_TERMINALS",
+      "CATALOG_CHECKPOINT_ASSETS_1570_TO_1572"
+    ]
+  },
+  "closed_family_memory": {
+    "taker_mix_found_in_active_rdp": true,
+    "authority_proven": true,
+    "included_in_forge_ledger": true,
+    "provenance_ref": "datasets/manifests/DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.decision.json",
+    "authority_gates": [
+      "smial.*.runtime-receipt",
+      "scientific_terminal_CLOSE_OR_PARK",
+      "outcome_consumed_true",
+      "dataset_fingerprint_match",
+      "published_marker_required"
+    ],
+    "arbitrary_label_fail_closed_test": "PASS"
+  },
+  "real_preflight": {
+    "active_rdp_used": true,
+    "unchanged_external_evidence": false,
+    "action": "START_NEW_SESSION",
+    "accidental_new_search": false,
+    "freeze_or_critic_launched": false,
+    "taker_mix_in_packet": true
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_FULL_FORGE_SEARCH_TO_PROVE_FIX",
+    "NO_H900_ESTIMAND_REPAIR",
+    "NO_HISTORICAL_RESEARCH_REWRITE"
+  ]
+}

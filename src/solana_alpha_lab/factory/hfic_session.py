@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
@@ -105,6 +106,8 @@ _FINAL_PASS_TERMINALS = frozenset(
     }
 )
 _CLASSIFIER_RECEIPT_SCHEMA = "smial.hfic-classifier-receipt"
+_CLOSED_FAMILY_MARKER_PREFIX = "CLOSED_FAMILY:"
+_CLOSED_FAMILY_STEM_RE = re.compile(r"^(?:CLOSE|PARK)_(.+?)(?:_FAMILY)?$")
 _FORBIDDEN_DECISION_TERMINALS = frozenset({"PROMOTE", "PROMOTION_LANE"})
 _INTERMEDIATE_CRITIC_TERMINALS = frozenset({"REVISE_ONCE", "PASS_TO_CLASSIFICATION"})
 
@@ -156,6 +159,71 @@ def focus_key_sha256(owner_focus: str) -> str:
 def search_key_sha256(epoch: str, owner_focus: str, prompt_version: str) -> str:
     payload = f"{epoch}{focus_key_sha256(owner_focus)}{prompt_version}"
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def closed_family_terminals_from_receipt(receipt: Mapping[str, Any] | None) -> list[str]:
+    if not isinstance(receipt, Mapping):
+        return []
+    packet = receipt.get("forge_context_packet")
+    if not isinstance(packet, Mapping):
+        return []
+    ledger = packet.get("closed_family_ledger")
+    if not isinstance(ledger, list):
+        return []
+    terminals: list[str] = []
+    seen: set[str] = set()
+    for item in ledger:
+        if not isinstance(item, Mapping):
+            continue
+        terminal = item.get("terminal")
+        if not isinstance(terminal, str) or not terminal or terminal in seen:
+            continue
+        seen.add(terminal)
+        terminals.append(terminal)
+    return terminals
+
+
+def _closed_family_stems(terminal: str) -> list[str]:
+    match = _CLOSED_FAMILY_STEM_RE.fullmatch(terminal.strip())
+    if match is None:
+        return []
+    stem = match.group(1)
+    stems = [stem]
+    parts = stem.split("_")
+    if len(parts) >= 3:
+        stems.append("_".join(parts[1:]))
+    return stems
+
+
+def _normalize_reopen_blob(value: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", value.upper())
+
+
+def candidate_reopens_closed_family(
+    card: Mapping[str, Any],
+    terminals: Sequence[str],
+) -> str | None:
+    blob = _normalize_reopen_blob(
+        " ".join(
+            str(card.get(key) or "")
+            for key in ("primary_x_family", "claim", "mechanism")
+        )
+    )
+    if not blob:
+        return None
+    for terminal in terminals:
+        for stem in _closed_family_stems(terminal):
+            compact = _normalize_reopen_blob(stem)
+            if len(compact) < 12:
+                continue
+            if compact in blob:
+                return terminal
+    return None
+
+
+def critic_known_unknowns_with_closed_families(terminals: Sequence[str]) -> list[str]:
+    markers = [f"{_CLOSED_FAMILY_MARKER_PREFIX}{terminal}" for terminal in terminals]
+    return ["HFIC_FREEZE_BOUNDED", *markers]
 
 
 def phase_rank(state: object) -> int:
@@ -414,6 +482,14 @@ def freeze_draft(
     runner_up = identities[runner_up_index]
     rejected = identities[rejected_index]
     selected_card = candidates[selected_index]
+    closed_family_terminals = closed_family_terminals_from_receipt(
+        preflight_receipt if isinstance(preflight_receipt, Mapping) else None
+    )
+    if store is not None and closed_family_terminals:
+        for card in candidates:
+            hit = candidate_reopens_closed_family(card, closed_family_terminals)
+            if hit is not None:
+                raise HficSessionError("CLOSED_FAMILY_REOPEN")
     truth_roots = _nonempty_str_list(
         draft.get("truth_roots_used"),
         code="TRUTH_ROOTS_REQUIRED",
@@ -511,7 +587,9 @@ def freeze_draft(
         },
         "provisional_execution_unit": "NONE",
         "strongest_rejected_alternative": rejected.candidate_id,
-        "known_unknowns": ["HFIC_FREEZE_BOUNDED"],
+        "known_unknowns": critic_known_unknowns_with_closed_families(
+            closed_family_terminals
+        ),
         "non_claims": draft.get("non_claims") or ["NO_ALPHA"],
     }
     owner_focus = str(draft.get("owner_focus") or "AUTO")
