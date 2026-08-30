@@ -286,6 +286,21 @@ class PathRiskCalibrationTests(unittest.TestCase):
         self.assertIn("BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-1M-001", y_bundles)
         self.assertEqual(BUNDLE_TO_PRIMITIVE["BUNDLE-JUPITER-QUOTE-BUY-1M-001"], BUY_1M)
 
+    def test_fast_lane_schedule_does_not_bind_1m_primitives(self) -> None:
+        from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+            _used_provider_route_ids,
+        )
+
+        document = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        primitive_ids, routes = _used_provider_route_ids(ROOT, document)
+        self.assertNotIn(BUY_1M, primitive_ids)
+        self.assertNotIn(REVERSE_1M, primitive_ids)
+        self.assertIn(BUY_10M, primitive_ids)
+        self.assertIn(REVERSE_10M, primitive_ids)
+        self.assertIn("JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001", routes)
+
     def test_below_floor_makes_zero_quote_calls(self) -> None:
         policy = load_policy(ROOT)
         sample = select_r0_sample(

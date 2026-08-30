@@ -26,6 +26,7 @@ managed_write_set:
 - tests/test_quote_surface_projection.py
 - tests/test_pathrisk_calibration.py
 - tests/test_observation_primitive_registry.py
+- tests/test_observation_schedule_lifecycle.py
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_completion_evidence_v1.json
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_independent_review_v1.json
 - docs/evidence/early_quote_surface_pathrisk_calibration/a1_delivery_factory_fit_v1.json
