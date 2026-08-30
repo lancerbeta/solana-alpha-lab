@@ -61,7 +61,8 @@ override it.
 
 Both direct agents stop once after exact-head CI **and**
 `scripts/owner_attention_gate.py --merge-readiness` reports
-`ready_for_owner_phrase: true` on the unchanged 40-hex head. Order is
+`ready_for_owner_phrase: true` for the exact owner phrase bound to the
+current PR and unchanged 40-hex head. Order is
 `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
 The owner never clicks GitHub Merge. Do not ask the phrase before readiness.
 Product diffs use `context --contract`. `context --pr` (`LIVE_PR_HEAD`) is
