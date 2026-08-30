@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_epistemic_memory_semantics/a1_delivery_factory_fit_v1.json",
-    "sha256": "d5de238e275f178a348441406f3f64ca5ef209d616ab0720861ff041f9fccf8b",
+    "sha256": "c522ddce960cd97b9fe36d6a6dbec4f2886add906abbb633febceeb79d752217",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -18,7 +18,7 @@
     "catalog/catalog_manifest.yaml": "3cf69f9b3910e51ebc1ac4bf4860a2de6ea2a70f9c8ef22cb696ed161d37f7a7",
     "catalog/generated/asset_edges.json": "462d58b325fe359c7be543c62f3dbaf3c6add4ad069cc0e63db18ff9845093e3",
     "docs/PROJECT_MAP.md": "98bc6a6891d276dafaa13bfacc844175d5e0b7e4e3da1939afbea56b90368ecd",
-    "docs/evidence/hfic_epistemic_memory_semantics/a1_acceptance_v1.json": "74f60b318304cc42729b8a66727728d0febd966d11da139adf9df46aa0832dd6",
+    "docs/evidence/hfic_epistemic_memory_semantics/a1_acceptance_v1.json": "f29ed53bf1412876b43546281129e6d7be97659de8fb461a3ebc87507a1e7a93",
     "docs/tasks/HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1.md": "5e9d95a50ecd086c98d2efdaefed82677cfc118b0d550d76c8b1ae916d187449",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "4455bb7c5fe8a4618f77c90cc79e725d9f7b20ee797a26a2ee557cf572375775",
     "src/solana_alpha_lab/factory/hfic_provenance.py": "fd5b24894351d79edec04dd40f51e4f6e1cd4da77600057d023e388fcdc07d87",
@@ -57,7 +57,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_epistemic_memory_semantics/a1_delivery_independent_review_v1.json",
-      "sha256": "9baa80267fb66b4824ebfa7289008b4cac363454f99e74695e34f2049b705c0c",
+      "sha256": "2fe6d5a891bb2e12e6c8c43ae69b65959575bccfbce0ff4bba4b95d27d881cbd",
       "verdict": "PASS"
     },
     "project_checks": [
