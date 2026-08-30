@@ -62,7 +62,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_legacy_science_rebase/a1_delivery_independent_review_v1.json",
-      "sha256": "657fdc06fca05be066847666749ca9cc71e4a5ec98a9a800b473f35081200953",
+      "sha256": "7e2c3104ed393c5b8a52bbaa0ad5cf65bde4ed52c482ed13ec207fc267333fc0",
       "verdict": "PASS"
     },
     "project_checks": [
