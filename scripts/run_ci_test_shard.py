@@ -84,6 +84,16 @@ def run_shard(
             "SHARD_UNION_MISMATCH:"
             f"missing={len(missing)}:extra={len(extra)}"
         )
+    # Live equivalence: module-path union is not enough — the cases loaded from
+    # those modules must match unittest discover on the same tests root.
+    loaded_union_count = profiler.count_cases(
+        load_suite_for_paths(sorted(set(covered)), root=root)
+    )
+    if loaded_union_count != canonical_count:
+        raise ShardError(
+            "SHARD_CASE_COUNT_MISMATCH:"
+            f"loaded_union={loaded_union_count}:discover={canonical_count}"
+        )
     suite = load_suite_for_paths(selected, root=root)
     case_count = profiler.count_cases(suite)
     if case_count < 1:
@@ -93,15 +103,23 @@ def run_shard(
     started = time.perf_counter()
     result = runner.run(suite)
     elapsed = time.perf_counter() - started
+    unexpected = list(getattr(result, "unexpectedSuccesses", []) or [])
     print(f"inventory_sha256={full_hash}")
     print(f"canonical_case_count={canonical_count}")
+    print(f"loaded_union_case_count={loaded_union_count}")
     print(f"shard_index={index} shard_count={count}")
     print(f"selected_modules={len(selected)} selected_cases={case_count}")
     print(
         f"failures={len(result.failures)} errors={len(result.errors)} "
-        f"skipped={len(result.skipped)} elapsed_seconds={elapsed:.3f}"
+        f"skipped={len(result.skipped)} unexpected_successes={len(unexpected)} "
+        f"elapsed_seconds={elapsed:.3f}"
     )
-    if not result.wasSuccessful() or result.failures or result.errors:
+    if (
+        (not result.wasSuccessful())
+        or result.failures
+        or result.errors
+        or unexpected
+    ):
         print(stream.getvalue())
         return 1
     return 0
