@@ -10,7 +10,18 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "6996f78d24280c82a1160f27cc9c5782b174cd0799adbd4b7d8b91ee0e668b2b",
+    "delivery-harness/harness.yaml": "1320b065dab646ba5e566c5b7bc045041b0ec53c37c885c69a34bbbb3e8e197f",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "4115d64df6c9693f8785cc093cf4f5376c9533a050e2c3d8f7d8a9a3e5852fc9",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "ebba9fb886d15aed83cb20e67cc46df526b9ecc05fc9e5a9b946977b511e5cf2",
+    "docs/evidence/incremental_harness_sync/a1_benchmark_receipt_v1.json": "0cc61cc4236d276ad1f9a898338de9b842af17fa5754787d32ee20a120f2ccaa",
+    "docs/reports/incremental_harness_sync/a1_owner_readout_v1.md": "a9267031eb87c40793ec9c9a6999b75944efc42ae6eda781fa287291ff324351",
+    "docs/tasks/INCREMENTAL_HARNESS_SYNC_V1.md": "678cfcddd5ce195c0423f57e346aeba069d42eb209b7218a0304af6dd7d918d0",
+    "scripts/ci_fail_closed_messages.py": "d742d4013d9c3a8a8a1edbdbdb0a056963430acf75aef2c3e146615d230d1bb9",
+    "scripts/harness_sync.py": "62770b5f7512db41ca97d39ac531acc3645bdf4d8f0fd4a883e6f1443a4a1fc7",
+    "tests/test_harness_sync.py": "5406851b5d82ee16cdbfc64502cee9e565976a2442eb569da93b6144515bec38"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/incremental_harness_sync/a1_delivery_factory_fit_v1.json",
-    "sha256": "5aa11ac7b6081b80750610067292590fb2475d253c974d0cdf07243f2f6eea70",
+    "sha256": "1b5a4f7579bc99aa4c21835af0f9e04b7ef9959f59a951385bad42960299cc64",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HARNESS_SYNC_AND_CI_MESSAGE_TESTS",
     "independent_review": {
       "path": "docs/evidence/incremental_harness_sync/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING",
+      "sha256": "c40ed46630fdfb830bac41741065841d4f05e2933e661924d1f989ca8332811a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

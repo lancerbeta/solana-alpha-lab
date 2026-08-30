@@ -6,8 +6,8 @@
   "task_id": "INCREMENTAL_HARNESS_SYNC_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "PENDING",
-  "reviewed_inventory_sha256": "PENDING",
+  "reviewed_bindings_sha256": "1dcc06ff872e0207a0f13690738a406a383274013615383c3f2aa81bf7b13bb2",
+  "reviewed_inventory_sha256": "4213898593b316311aca82c264b8ffff6f79da42a9cfb6242057923750cd0ff9",
   "capability_radar": {
     "now": "NONE",
     "watch": "RETURN_TO_FACTORY_OR_FORGE_AFTER_MERGE"
