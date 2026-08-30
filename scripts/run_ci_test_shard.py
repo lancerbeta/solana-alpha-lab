@@ -40,6 +40,20 @@ def inventory_hash(paths: list[str]) -> str:
     return hashlib.sha256(joined.encode("utf-8")).hexdigest()
 
 
+def ensure_repo_import_path(root: Path = ROOT) -> None:
+    """Match `python -m unittest discover -s tests` launched from repo root.
+
+    Script invocation (`python scripts/run_ci_test_shard.py`) puts `scripts/` on
+    ``sys.path[0]`` instead of the repo root; without the root, discover can
+    collapse whole modules into a single import-failure case while
+    ``loadTestsFromModule`` (which inserts root) still expands them.
+    """
+    root_s = str(root.resolve())
+    if root_s in sys.path:
+        sys.path.remove(root_s)
+    sys.path.insert(0, root_s)
+
+
 def run_shard(
     *,
     index: int,
@@ -47,6 +61,7 @@ def run_shard(
     plan_path: Path,
     root: Path = ROOT,
 ) -> int:
+    ensure_repo_import_path(root)
     plan = partition.load_plan(plan_path)
     current = [
         profiler.posix_relative(path, root)
