@@ -1,7 +1,7 @@
 ---
 task_id: RESEARCH_STORE_STALE_WRITER_LEASE_RECOVERY_V1
 task_version: '1.0'
-status: IMPLEMENTATION_UNVERIFIED
+status: IMPLEMENTED_UNVERIFIED
 as_of: '2026-08-31'
 owner: GOAL_OWNER
 allowed_routes:
