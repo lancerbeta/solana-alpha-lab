@@ -1,0 +1,39 @@
+{
+  "as_of": "2026-08-30",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "AUTONOMOUS_GENERATOR_DEFERRED"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_AUTONOMOUS_GENERATOR",
+    "NO_PROVIDER_CALLS",
+    "NO_EXPERIMENT_EXECUTION",
+    "NO_FULL_FORGE_SEARCH_TO_PROVE_FIX",
+    "NO_H900_ESTIMAND_REPAIR",
+    "PACKET_HARD_CLOSE_CAP_STILL_DROPS_EXTRA_GIT_FAMILY_CLOSES",
+    "FREEZE_REOPEN_IS_SUBSTRING_NOT_TYPED_FAMILY_ID"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "HFIC-LEGACY-SCIENCE-REBASE-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "HFIC_LEGACY_SCIENCE_REBASE_AND_SUPPRESSION_SEMANTICS_V1",
+  "verdict": "PASS"
+}

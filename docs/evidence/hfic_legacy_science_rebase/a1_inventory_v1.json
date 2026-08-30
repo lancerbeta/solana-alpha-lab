@@ -1,0 +1,217 @@
+{
+  "acceptance_id": "HFIC-LEGACY-SCIENCE-REBASE-INVENTORY-001",
+  "as_of": "2026-08-30",
+  "schema": "smial.hfic-legacy-science-rebase-inventory",
+  "schema_version": "1.0",
+  "task_id": "HFIC_LEGACY_SCIENCE_REBASE_AND_SUPPRESSION_SEMANTICS_V1",
+  "active_rdp": "local/factory_v1/data_plane",
+  "named_consumer": "HFIC-PREFLIGHT-CLOSED-FAMILY-LEDGER",
+  "scope": "memory that can currently suppress or materially bias Hypothesis Forge candidate generation or freeze adjudication",
+  "historical_bytes_rewritten": false,
+  "taxonomy_version": "1.0",
+  "counts": {
+    "suppressors_total": 10,
+    "scientific_close_valid": 6,
+    "scope_limited_close": 2,
+    "owner_priority_park": 2,
+    "legacy_measurement_limited": 0,
+    "replayable_current_science": 0,
+    "non_identifiable_need_new_evidence": 0,
+    "superseded": 0,
+    "ambiguous": 0
+  },
+  "h900": {
+    "rule_id": "HOLDER_CONCENTRATION_TOP_QUARTILE_VETO_V1",
+    "historical_terminal": "REPLICATED_RELATION_NOT_ACTIONABLE_AS_TOP_QUARTILE_VETO",
+    "enters_live_closed_park_scrape": false,
+    "raw_preserved": true,
+    "old_actionability_portable": false,
+    "paired_replay": "NOT_IDENTIFIABLE",
+    "family_hard_closed": false,
+    "note": "Old Y_RAW actionability is LEGACY_MEASUREMENT_LIMITED when classified; it is not a CLOSE_/PARK_ terminal so it does not enter the live Forge suppression ledger."
+  },
+  "delta_vs_prefix_era": {
+    "hard_closed_before": [
+      "CLOSE_EARLY_PATH_CANDIDATE",
+      "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+      "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY",
+      "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+      "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+      "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+      "CLOSE_TASK40_WITH_CREATE_AT_GAP_AND_BOUND_MIGRATION_AT",
+      "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
+      "PARK_H11_FROM_PRIORITY",
+      "PARK_H13_FROM_PRIORITY"
+    ],
+    "hard_closed_after": [
+      "CLOSE_EARLY_PATH_CANDIDATE",
+      "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+      "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY",
+      "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+      "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+      "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+      "CLOSE_TASK40_WITH_CREATE_AT_GAP_AND_BOUND_MIGRATION_AT",
+      "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY"
+    ],
+    "priority_parks_removed_from_hard_close": [
+      "PARK_H11_FROM_PRIORITY",
+      "PARK_H13_FROM_PRIORITY"
+    ],
+    "scope_limited_closes_narrowed": [
+      "CLOSE_EARLY_PATH_CANDIDATE",
+      "CLOSE_TASK40_WITH_CREATE_AT_GAP_AND_BOUND_MIGRATION_AT"
+    ],
+    "legacy_measurement_closes_reclassified": [],
+    "unchanged_valid_closes": [
+      "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+      "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY",
+      "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+      "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+      "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+      "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY"
+    ],
+    "ambiguous_items": []
+  },
+  "suppressors": [
+    {
+      "terminal": "CLOSE_EARLY_PATH_CANDIDATE",
+      "source": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json",
+      "scope": "CANDIDATE",
+      "scope_id": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
+      "original_decision_meaning": "Close the ordinary-recent early-path H900 failed-quotes MEU reproject atom after selected-quartile MEU bind; not a family close.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCOPE_LIMITED_CLOSE",
+      "affected": "ORDINARY_RECENT_EARLY_PATH_H900_FAILED_QUOTES_MEU_REPROJECT_V1",
+      "provenance_refs": [
+        "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+      "source": "docs/evidence/early_structural_backing_pit_commissioning/a1_acceptance_v1.json",
+      "scope": "FAMILY",
+      "scope_id": "EARLY_STRUCTURAL_BACKING_PIT_COMMISSIONING_V1",
+      "original_decision_meaning": "Scientific family close of early structural backing after PIT commissioning.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+      "affected": "EARLY_STRUCTURAL_BACKING_FAMILY",
+      "provenance_refs": [
+        "docs/evidence/early_structural_backing_pit_commissioning/a1_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY",
+      "source": "datasets/manifests/DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.decision.json",
+      "scope": "FAMILY",
+      "scope_id": "EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1",
+      "original_decision_meaning": "Typed RDP runtime-receipt family close with outcome_consumed and published marker.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+      "affected": "EARLY_TAKER_VOLUME_MIX_FAMILY",
+      "provenance_refs": [
+        "datasets/manifests/DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.decision.json"
+      ]
+    },
+    {
+      "terminal": "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+      "source": "docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json",
+      "scope": "FAMILY",
+      "scope_id": "FRESH_OOS_BASELINE_VS_FRICTION_VETO_V1",
+      "original_decision_meaning": "Typed family_close true for exact friction veto.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+      "affected": "EXACT_FRICTION_VETO_FAMILY",
+      "provenance_refs": [
+        "docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+      "source": "docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_acceptance_v1.json",
+      "scope": "FAMILY",
+      "scope_id": "PMF-QUOTE-STAY-OVERLAY-V1",
+      "original_decision_meaning": "Scientific family close of exact quote-surface retention.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+      "affected": "EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+      "provenance_refs": [
+        "docs/evidence/pmf_quote_slice/a1_pmf_quote_stay_overlay_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+      "source": "docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json",
+      "scope": "FAMILY",
+      "scope_id": "PRIOR_GIT_T0_FRICTION_SCREEN_V1",
+      "original_decision_meaning": "Typed family_close true for T0 friction screen.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+      "affected": "EXACT_T0_FRICTION_SCREEN_FAMILY",
+      "provenance_refs": [
+        "docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "CLOSE_TASK40_WITH_CREATE_AT_GAP_AND_BOUND_MIGRATION_AT",
+      "source": "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_task40_close_create_at_gap_migration_at_bound_acceptance_v1.json",
+      "scope": "ROUTE",
+      "scope_id": "RC002-H11-TASK40-CLOSE-CREATE-AT-GAP-MIGRATION-AT-BOUND-V1",
+      "original_decision_meaning": "Close the TASK-40 create_at-gap / migration_at-bound route, not the H11 family.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCOPE_LIMITED_CLOSE",
+      "affected": "RC002-H11-TASK40-CLOSE-CREATE-AT-GAP-MIGRATION-AT-BOUND-V1",
+      "provenance_refs": [
+        "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_task40_close_create_at_gap_migration_at_bound_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
+      "source": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json",
+      "scope": "FAMILY",
+      "scope_id": "EARLY_VALUATION_LIQUIDITY_DIVERGENCE_CONFIRMATION_V1",
+      "original_decision_meaning": "Scientific family close of valuation-liquidity divergence.",
+      "current_reopen_forbidden": true,
+      "suppression_class": "SCIENTIFIC_CLOSE_VALID",
+      "affected": "VALUATION_LIQUIDITY_DIVERGENCE_FAMILY",
+      "provenance_refs": [
+        "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "PARK_H11_FROM_PRIORITY",
+      "source": "docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json",
+      "scope": "PRIORITY_PARK",
+      "scope_id": "RC002-H11-PARK-FROM-PRIORITY-OFFLINE-V1",
+      "original_decision_meaning": "Owner parks H11 from priority; science retained; hypothesis NOT_REFUTED_NOT_SUPPORTED.",
+      "current_reopen_forbidden": false,
+      "suppression_class": "OWNER_PRIORITY_PARK",
+      "affected": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+      "provenance_refs": [
+        "docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json"
+      ]
+    },
+    {
+      "terminal": "PARK_H13_FROM_PRIORITY",
+      "source": "docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json",
+      "scope": "PRIORITY_PARK",
+      "scope_id": "RC001-H13-PARK-FROM-PRIORITY-OFFLINE-V1",
+      "original_decision_meaning": "Owner parks H13 from priority; science retained; hypothesis NOT_REFUTED_NOT_SUPPORTED.",
+      "current_reopen_forbidden": false,
+      "suppression_class": "OWNER_PRIORITY_PARK",
+      "affected": "RC001-H13-COMPOSITE-VETO",
+      "provenance_refs": [
+        "docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json"
+      ]
+    }
+  ],
+  "sources_consumed_with_no_unique_terminal_after_dedupe": [
+    "registries/decisions_negative_results.yaml"
+  ],
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_FULL_REPOSITORY_AUDIT",
+    "NO_POSITIVE_HOLDER_RESULT",
+    "NO_HISTORICAL_RESEARCH_REWRITE"
+  ]
+}

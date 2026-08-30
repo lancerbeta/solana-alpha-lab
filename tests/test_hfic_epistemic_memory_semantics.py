@@ -425,9 +425,15 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
                 match[0]["source_receipt"],
                 f"datasets/manifests/{LATE_MANIFEST_ID}.decision.json",
             )
+            hard_in_packet = [
+                item
+                for item in packet["closed_family_ledger"]
+                if item.get("reopen_forbidden") is True
+            ]
+            self.assertLessEqual(len(hard_in_packet), 8)
             self.assertTrue(
                 packet["truncation_receipt"].get("truncated")
-                or len(packet["closed_family_ledger"]) <= 8
+                or len(hard_in_packet) <= 8
             )
 
     def test_a4_unpublished_typed_decision_cannot_close(self) -> None:
