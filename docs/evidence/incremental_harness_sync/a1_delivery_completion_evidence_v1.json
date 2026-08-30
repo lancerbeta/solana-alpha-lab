@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "INCREMENTAL-HARNESS-SYNC-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-30",
+  "task_id": "INCREMENTAL_HARNESS_SYNC_V1",
+  "state_change": "INCREMENTAL_HARNESS_SYNC_CAPABILITY_READY",
+  "base_main": "0b594f5479960d22d22b69098da649ee85e79881",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/incremental_harness_sync/a1_delivery_factory_fit_v1.json",
+    "sha256": "efad7b46e80510f791c6c8b9665c779f234ba6468ad0327086cd4241ef40b62a",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HARNESS_SYNC_AND_CI_MESSAGE_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/incremental_harness_sync/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "INCREMENTAL_FULL_EQUIVALENCE_ON_FIXTURE",
+      "INCREMENTAL_WORK_COUNT_BOUNDED"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA_OR_CASHFLOW_CLAIM",
+    "NO_PROVIDER_CREDENTIAL_WALLET_OR_CASH_AUTHORITY",
+    "NO_PERSISTENT_HASH_CACHE_TRUTH_OWNER",
+    "NO_WALL_CLOCK_ASSERTION_IN_CI",
+    "BARE_APPLY_REMAINS_FULL_ORACLE"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd": 0
+  }
+}

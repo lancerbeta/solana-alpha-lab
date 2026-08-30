@@ -54,8 +54,11 @@ Catalog integrity hashes, generated navigation views and manifest checkpoints
 are derived state. The only sanctioned repair is:
 
 ```text
-uv run --locked --managed-python python -B scripts/harness_sync.py --apply
+uv run --locked --managed-python python -B scripts/harness_sync.py --apply --base-ref <exact expected_base>
 ```
+
+Bare `--apply` (or `--apply --full`) remains the explicit full Catalog
+oracle and recovery path. Never hand-edit a derived `sha256:`
 
 `--check` reports drift without writing. Never hand-edit a derived `sha256:`
 field or generated projection; manual rebinding caused repeated red CI runs on
@@ -82,7 +85,7 @@ When derived hashes drift, child validators still fail closed. Before their
 details, `validate_ci.py` and `validate_baton.py` print one actionable line:
 
 ```text
-DERIVED_HASH_DRIFT: run uv run --locked --managed-python python -B scripts/harness_sync.py --apply
+DERIVED_HASH_DRIFT: run uv run --locked --managed-python python -B scripts/harness_sync.py --apply --base-ref <exact expected_base>
 ```
 
 Pre-commit runs a scoped staging check only:
