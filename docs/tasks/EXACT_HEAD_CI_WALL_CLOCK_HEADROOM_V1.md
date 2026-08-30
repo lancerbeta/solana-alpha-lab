@@ -1,7 +1,7 @@
 ---
 task_id: EXACT_HEAD_CI_WALL_CLOCK_HEADROOM_V1
 task_version: '1.0'
-status: IN_PROGRESS
+status: VALIDATED
 as_of: '2026-08-30'
 owner: GOAL_OWNER
 allowed_routes:
@@ -74,7 +74,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_independent_review_v1.json
+    - docs/evidence/exact_head_ci_wall_clock_headroom/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
