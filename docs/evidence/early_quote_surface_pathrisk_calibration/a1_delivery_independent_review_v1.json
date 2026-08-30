@@ -11,8 +11,8 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviewed_bindings_sha256": "a8a61c02d0331d665be018053a1597fd78835865d2161cdbab3368f1b4624718",
-  "reviewed_inventory_sha256": "7990f4d8cc850b9ffc96d7300907091e7d8b5aa76b8f425d18a4fe829c844923",
+  "reviewed_bindings_sha256": "77ee9ed4c90d06fe61d5dba805ee62e93eb388592d9cc7d2f0f862d9762f0b6e",
+  "reviewed_inventory_sha256": "42c998609a9998f491ed7807545aa0622fb58d75f0bef1b24b36a0f249e81b76",
   "reviews": [
     {
       "role": "CODE_REVIEWER",
