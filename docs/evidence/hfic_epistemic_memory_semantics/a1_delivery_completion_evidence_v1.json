@@ -9,11 +9,21 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/hfic_epistemic_memory_semantics/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "d5de238e275f178a348441406f3f64ca5ef209d616ab0720861ff041f9fccf8b",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "docs/tasks/HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "1320fcf88b370d0bbd226e166f221d0b9ae5492ef7b5ece0e1bf3b71fa9ab992",
+    "catalog/assets/lifecycle.yaml": "ee23ba44c7593d42ac3a921220c6119b5768157bee531682bd7828f1262a7f38",
+    "catalog/catalog_manifest.yaml": "3cf69f9b3910e51ebc1ac4bf4860a2de6ea2a70f9c8ef22cb696ed161d37f7a7",
+    "catalog/generated/asset_edges.json": "462d58b325fe359c7be543c62f3dbaf3c6add4ad069cc0e63db18ff9845093e3",
+    "docs/PROJECT_MAP.md": "98bc6a6891d276dafaa13bfacc844175d5e0b7e4e3da1939afbea56b90368ecd",
+    "docs/evidence/hfic_epistemic_memory_semantics/a1_acceptance_v1.json": "74f60b318304cc42729b8a66727728d0febd966d11da139adf9df46aa0832dd6",
+    "docs/tasks/HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1.md": "5e9d95a50ecd086c98d2efdaefed82677cfc118b0d550d76c8b1ae916d187449",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "4455bb7c5fe8a4618f77c90cc79e725d9f7b20ee797a26a2ee557cf572375775",
+    "src/solana_alpha_lab/factory/hfic_provenance.py": "fd5b24894351d79edec04dd40f51e4f6e1cd4da77600057d023e388fcdc07d87",
+    "src/solana_alpha_lab/factory/hfic_session.py": "c86472b14ad38dc2ecc16f1932c451c6d9dacab1d916afd28cc8218bf3cd32d3",
+    "tests/test_hfic_epistemic_memory_semantics.py": "aeed86c0da1362370ba0ac5e029a9643ed79614ac0d3a84f3070f9bdbb66a4eb"
   },
   "non_claims": [
     "NO_ALPHA",
@@ -47,7 +57,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/hfic_epistemic_memory_semantics/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "9baa80267fb66b4824ebfa7289008b4cac363454f99e74695e34f2049b705c0c",
       "verdict": "PASS"
     },
     "project_checks": [
