@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RESEARCH-STORE-STALE-WRITER-LEASE-RECOVERY-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-31",
+  "task_id": "RESEARCH_STORE_STALE_WRITER_LEASE_RECOVERY_V1",
+  "state_change": "RESEARCH_STORE_STALE_WRITER_LEASE_RECOVERY_CAPABILITY_READY",
+  "base_main": "11c9e81c20fe0e55a33c27a62ad83f88c03fa819",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "a80fa83d66cf8f4213ee33ed429699c47fffd9fc509026a310212ee8e686baed",
+    "docs/reports/research_store_stale_writer_lease_recovery/a1_owner_readout_v1.md": "922e52efc16fdd08eabf7223370047ad5d98acfeb5768990c22e222529a5a4b4",
+    "docs/tasks/RESEARCH_STORE_STALE_WRITER_LEASE_RECOVERY_V1.md": "3dbbc4b714bdce7d2643c78bd17badc5dee5ceed3fffa99f180e2ce4c3c50286",
+    "src/solana_alpha_lab/factory/research_store.py": "aa14e66e9cd64ab51aa4596ef5d8d207487709cbf17a9d3813bd15eb05cc47d1",
+    "tests/test_research_store.py": "5839e5dfba73ed0903be2fb36780ba8588400cbfafa5a9adc108dedd4911446f"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/research_store_stale_writer_lease_recovery/a1_delivery_factory_fit_v1.json",
+    "sha256": "e2dd40abb8f932433ff4710675ed014e19ac21be2db734f551b2f81268aa2e94",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_RESEARCH_STORE_UNITTESTS",
+    "independent_review": {
+      "path": "docs/evidence/research_store_stale_writer_lease_recovery/a1_delivery_independent_review_v1.json",
+      "sha256": "6a16e1e989180b61dd30caac4414a0ee9a3fb45bfc2c0de0c1930b7c0962b095",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_T1_T13_LEASE_RECOVERY_MATRIX",
+      "PASS_ORPHAN_QUARANTINE_RESUME",
+      "PASS_INODE_SAFE_UNLINK"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA_OR_CASHFLOW_CLAIM",
+    "NO_PROVIDER_CREDENTIAL_WALLET_OR_CASH_AUTHORITY",
+    "NO_MULTI_WRITER",
+    "NO_DISTRIBUTED_LOCK_SERVICE"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd": 0
+  }
+}
