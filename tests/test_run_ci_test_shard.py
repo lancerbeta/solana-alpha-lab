@@ -164,10 +164,15 @@ class RunCiTestShardTests(unittest.TestCase):
             root = Path(tmp)
             other = str((root / "other").resolve())
             root_s = str(root.resolve())
-            sys.path[:] = [other, root_s, other]
-            runner.ensure_repo_import_path(root)
-            self.assertEqual(sys.path[0], root_s)
-            self.assertEqual(sys.path.count(root_s), 1)
+            saved_path = list(sys.path)
+            try:
+                sys.path[:] = [other, root_s, other]
+                runner.ensure_repo_import_path(root)
+                self.assertEqual(sys.path[0], root_s)
+                self.assertEqual(sys.path.count(root_s), 1)
+            finally:
+                # This test shares a process with later shard modules in CI.
+                sys.path[:] = saved_path
 
     def test_case_count_mismatch_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
