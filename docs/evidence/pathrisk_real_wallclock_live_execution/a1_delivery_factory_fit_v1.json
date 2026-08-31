@@ -6,8 +6,8 @@
   "task_id": "PATHRISK_REAL_WALLCLOCK_LIVE_EXECUTION_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "6748b84ee32af6621e7f869844e4db481f779448f748f993e8d93aadcf9707d7",
+  "reviewed_inventory_sha256": "b7f44f59da44571a3ee55d52211cd2f5d01720349ed8f0b2d8ae807313845ea8",
   "capability_radar": {
     "now": "NONE",
     "watch": "PATHRISK_LIVE_PREEXECUTION_GATE_AFTER_MERGE_THEN_OWNER_PHRASE"
