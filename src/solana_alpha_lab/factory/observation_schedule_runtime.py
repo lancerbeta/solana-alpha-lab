@@ -186,7 +186,17 @@ class JupiterReadonlyOpener:
                 "body": None,
                 "url_has_api_key": False,
             }
-        except (urllib.error.URLError, TimeoutError, OSError):
+        except TimeoutError:
+            raise TimeoutError("JUPITER_TIMEOUT") from None
+        except urllib.error.URLError as exc:
+            reason = exc.reason
+            if isinstance(reason, TimeoutError) or (
+                isinstance(reason, OSError)
+                and "timed out" in str(reason).casefold()
+            ):
+                raise TimeoutError("JUPITER_TIMEOUT") from None
+            raise OSError("JUPITER_TRANSPORT_ERROR") from None
+        except OSError:
             raise OSError("JUPITER_TRANSPORT_ERROR") from None
 
 

@@ -153,7 +153,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -193,7 +193,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -235,7 +235,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -281,7 +281,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -327,7 +327,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -375,7 +375,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2"
+      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:

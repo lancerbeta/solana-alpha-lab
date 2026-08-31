@@ -31,6 +31,15 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
     load_observation_primitive_registry,
 )
 from solana_alpha_lab.factory.observation_primitives import (
+    HTTP_CLASS_401,
+    HTTP_CLASS_403,
+    HTTP_CLASS_429,
+    HTTP_CLASS_5XX,
+    HTTP_CLASS_NO_RESPONSE,
+    HTTP_CLASS_OK,
+    HTTP_CLASS_OTHER_4XX,
+    HTTP_CLASS_TIMEOUT,
+    HTTP_CLASS_TRANSPORT,
     RECENT_URL,
     call_occurrence_id,
     execute_primitive,
@@ -78,6 +87,17 @@ CALL_CAP = 26
 SEARCH_PRIMITIVE = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
 R0_RECENT_DUE = "PATHRISK-R0-RECENT"
 R0_SEARCH_DUE = "PATHRISK-R0-SEARCH"
+UNKNOWN_NOT_RECORDED_AT_TIME = "UNKNOWN_NOT_RECORDED_AT_TIME"
+R0_RECENT_HTTP_TERMINALS = {
+    HTTP_CLASS_401: "R0_RECENT_HTTP_401_UNAUTHORIZED",
+    HTTP_CLASS_403: "R0_RECENT_HTTP_403_FORBIDDEN",
+    HTTP_CLASS_429: "R0_RECENT_HTTP_429_RATE_LIMITED",
+    HTTP_CLASS_OTHER_4XX: "R0_RECENT_HTTP_OTHER_4XX",
+    HTTP_CLASS_5XX: "R0_RECENT_HTTP_5XX",
+    HTTP_CLASS_TIMEOUT: "R0_RECENT_TIMEOUT",
+    HTTP_CLASS_TRANSPORT: "R0_RECENT_TRANSPORT_ERROR",
+    HTTP_CLASS_NO_RESPONSE: "R0_RECENT_NO_HTTP_RESPONSE",
+}
 ACTIVATION_ID = "ACT-PATHRISK-LIVE-001"
 LIVE_SCHEDULE_RELATIVE = "tests/fixtures/observation_schedule/pathrisk_live_window.yaml"
 FORBIDDEN_SEARCH_BUNDLE = "BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001"
@@ -253,6 +273,75 @@ def require_owner_phrase(policy: Mapping[str, Any], phrase: str) -> None:
     expected = str(policy["external_authority"]["future_owner_phrase"])
     if phrase != expected:
         raise PathRiskLiveError("OWNER_PHRASE_MISMATCH")
+
+
+def transport_probe_owner_phrase(policy: Mapping[str, Any]) -> str:
+    return str(policy["transport_probe"]["future_owner_phrase"])
+
+
+def require_transport_probe_phrase(policy: Mapping[str, Any], phrase: str) -> None:
+    if phrase != transport_probe_owner_phrase(policy):
+        raise PathRiskLiveError("OWNER_PHRASE_MISMATCH")
+
+
+def _http_fields(result: Mapping[str, Any]) -> dict[str, Any]:
+    http_class = result.get("http_class")
+    http_status = result.get("http_status")
+    if isinstance(http_class, str) and http_class:
+        return {"http_status": http_status, "http_class": http_class}
+    return {
+        "http_status": http_status,
+        "http_class": UNKNOWN_NOT_RECORDED_AT_TIME,
+    }
+
+
+def r0_recent_operational_terminal(recent: Mapping[str, Any]) -> str | None:
+    http_class = str((_http_fields(recent).get("http_class") or ""))
+    if http_class == HTTP_CLASS_OK:
+        return None
+    return R0_RECENT_HTTP_TERMINALS.get(http_class)
+
+
+def _body_kind_and_count(body: object) -> tuple[str, int]:
+    if body is None:
+        return "null", 0
+    if isinstance(body, list):
+        return "list", len(body)
+    if isinstance(body, Mapping):
+        return "mapping", len(body)
+    return "other", 0
+
+
+def run_transport_probe_recent(
+    *,
+    opener: object,
+    clock: object | None = None,
+) -> dict[str, Any]:
+    tick = clock if callable(clock) else SystemClock()
+    result = execute_primitive(
+        primitive_id=DISCOVERY,
+        primitive_version="1.0",
+        method="GET",
+        url=RECENT_URL,
+        opener=opener,
+        clock=tick,
+    )
+    kind, count = _body_kind_and_count(result.get("body"))
+    fields = _http_fields(result)
+    return {
+        "provider_calls": 1,
+        "http_status": fields["http_status"],
+        "http_class": fields["http_class"],
+        "body_kind": kind,
+        "body_count": count,
+        "credential_env_name": CREDENTIAL_ENV_NAME,
+        "git_mutation": False,
+        "rdp_mutation": 0,
+        "scientific_window_started": False,
+        "retry": False,
+        "fallback": False,
+        "activation_id": None,
+    }
 
 
 def _walk_mints(node: object, mints: set[str]) -> None:
@@ -659,6 +748,7 @@ def _oneshot(
             "response_sha256": payload.get("response_sha256"),
             "body": payload.get("body"),
             "rows": list(payload.get("rows") or []),
+            **_http_fields(payload),
         }
     while True:
         blocked = accounts.gate(
@@ -689,6 +779,7 @@ def _oneshot(
             "response_sha256": payload.get("response_sha256"),
             "body": payload.get("body"),
             "rows": list(payload.get("rows") or []),
+            **_http_fields(payload),
         }
     if start_state != "STARTED":
         raise PathRiskLiveError(str(start_state))
@@ -710,6 +801,7 @@ def _oneshot(
     )
     body = result.get("body")
     rows = body if isinstance(body, list) else []
+    fields = _http_fields(result)
     store.complete_call(
         request_sha256=request_digest,
         call_occurrence_id=occurrence,
@@ -721,6 +813,8 @@ def _oneshot(
             "body": body,
             "rows": rows,
             "call_occurrence_id": occurrence,
+            "http_status": fields["http_status"],
+            "http_class": fields["http_class"],
         },
         clock=completion,
     )
@@ -732,6 +826,7 @@ def _oneshot(
         "response_sha256": result.get("response_sha256"),
         "body": body,
         "rows": list(rows),
+        **fields,
     }
 
 
@@ -995,6 +1090,21 @@ def run_live_window(
         ]
         recent_ids = [item for item in recent_ids if item]
         if not recent_ids:
+            operational = r0_recent_operational_terminal(recent)
+            if operational:
+                return {
+                    "terminal": operational,
+                    "http_status": _http_fields(recent)["http_status"],
+                    "http_class": _http_fields(recent)["http_class"],
+                    "provider_calls": _lifetime_calls(store, schedule),
+                    "quote_calls": 0,
+                    "urls": list(capped.urls),
+                    "exclusion": exclusion,
+                    "git_mutated": False,
+                    "retry": False,
+                    "fallback": False,
+                    "scientific_outcome": False,
+                }
             raise PathRiskLiveError("R0_SINGLE_SNAPSHOT_BINDING_NOT_PROVEN")
         search = _oneshot(
             store=store,
@@ -1274,4 +1384,6 @@ __all__ = [
     "prospective_time_admissible",
     "resolve_consumed_exclusions",
     "run_live_window",
+    "run_transport_probe_recent",
+    "transport_probe_owner_phrase",
 ]

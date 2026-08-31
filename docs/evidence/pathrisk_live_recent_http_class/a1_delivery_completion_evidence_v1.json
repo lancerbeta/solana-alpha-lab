@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PATHRISK-LIVE-RECENT-HTTP-CLASS-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-31",
+  "task_id": "PATHRISK_LIVE_RECENT_HTTP_CLASS_V1",
+  "state_change": "PATHRISK_LIVE_RECENT_HTTP_CLASS_PASS_READY_FOR_MERGE_GATE",
+  "base_main": "ec76045ab487f7408ee876a3dbe0db0fc791a19f",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/PATHRISK_LIVE_RECENT_HTTP_CLASS_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/pathrisk_live_recent_http_class/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PATHRISK_RECENT_HTTP_CLASS_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/pathrisk_live_recent_http_class/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PATHRISK_RECENT_HTTP_CLASS_SUITE",
+      "PASS_PATHRISK_LIVE_WINDOW_SUITE",
+      "PASS_OBSERVATION_PRIMITIVES_SUITE",
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_REALIZED_VWAP",
+    "NO_FILL",
+    "QUOTE_ONLY",
+    "PATHRISK_PROXY_NOT_PROFITABILITY",
+    "NO_PROVIDER_CALLS",
+    "NO_LIVE_CALIBRATION",
+    "NO_REAL_CREDENTIAL_VALUE_READ"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

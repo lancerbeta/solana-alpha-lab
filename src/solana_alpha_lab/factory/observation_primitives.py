@@ -22,10 +22,52 @@ ALLOWED_PATHS = frozenset(
     }
 )
 RECENT_URL = "https://api.jup.ag/tokens/v2/recent"
+HTTP_CLASS_OK = "HTTP_OK"
+HTTP_CLASS_401 = "HTTP_401_UNAUTHORIZED"
+HTTP_CLASS_403 = "HTTP_403_FORBIDDEN"
+HTTP_CLASS_429 = "HTTP_429_RATE_LIMITED"
+HTTP_CLASS_OTHER_4XX = "HTTP_OTHER_4XX"
+HTTP_CLASS_5XX = "HTTP_5XX"
+HTTP_CLASS_TIMEOUT = "TIMEOUT"
+HTTP_CLASS_TRANSPORT = "TRANSPORT_ERROR"
+HTTP_CLASS_NO_RESPONSE = "NO_HTTP_RESPONSE"
 
 
 class ObservationPrimitiveError(ValueError):
     """Typed primitive execution failure."""
+
+
+def classify_http_transport(
+    *,
+    http_status: object = None,
+    timeout: bool = False,
+    transport_error: bool = False,
+) -> tuple[int | None, str]:
+    """Map a transport outcome to (status or None, canonical class)."""
+
+    if timeout:
+        return None, HTTP_CLASS_TIMEOUT
+    if transport_error:
+        return None, HTTP_CLASS_TRANSPORT
+    if http_status is None:
+        return None, HTTP_CLASS_NO_RESPONSE
+    try:
+        status = int(http_status)
+    except (TypeError, ValueError):
+        return None, HTTP_CLASS_NO_RESPONSE
+    if 200 <= status <= 399:
+        return status, HTTP_CLASS_OK
+    if status == 401:
+        return status, HTTP_CLASS_401
+    if status == 403:
+        return status, HTTP_CLASS_403
+    if status == 429:
+        return status, HTTP_CLASS_429
+    if 400 <= status <= 499:
+        return status, HTTP_CLASS_OTHER_4XX
+    if 500 <= status <= 599:
+        return status, HTTP_CLASS_5XX
+    return status, HTTP_CLASS_NO_RESPONSE
 
 
 def request_sha256(*, method: str, url: str, body: Mapping[str, Any] | None, primitive_version: str) -> str:
@@ -127,7 +169,19 @@ def execute_primitive(
     )
     request_started_at = render_utc(clock())
 
-    def typed_missing(reason: str, response_received_at: str) -> dict[str, Any]:
+    def typed_missing(
+        reason: str,
+        response_received_at: str,
+        *,
+        http_status: object = None,
+        timeout: bool = False,
+        transport_error: bool = False,
+    ) -> dict[str, Any]:
+        status, http_class = classify_http_transport(
+            http_status=http_status,
+            timeout=timeout,
+            transport_error=transport_error,
+        )
         return {
             "status": "MISSING_TYPED",
             "missing_reason": reason,
@@ -139,14 +193,16 @@ def execute_primitive(
             "response_sha256": None,
             "entities": {},
             "primitive_id": primitive_id,
+            "http_status": status,
+            "http_class": http_class,
         }
 
     try:
         result = opener.open(url)  # type: ignore[union-attr]
     except TimeoutError:
-        return typed_missing("TIMEOUT", render_utc(clock()))
+        return typed_missing("TIMEOUT", render_utc(clock()), timeout=True)
     except OSError:
-        return typed_missing("HTTP_ERROR", render_utc(clock()))
+        return typed_missing("HTTP_ERROR", render_utc(clock()), transport_error=True)
     response_received_at = render_utc(clock())
     if not isinstance(result, Mapping):
         raise ObservationPrimitiveError("INVALID_RESPONSE")
@@ -164,19 +220,27 @@ def execute_primitive(
         if redact_with in payload_text:
             raise ObservationPrimitiveError("SECRET_LEAK")
     if status in {404}:
-        return typed_missing("NO_ROUTE", response_received_at)
+        return typed_missing("NO_ROUTE", response_received_at, http_status=status)
     if status >= 400:
-        return typed_missing("HTTP_ERROR", response_received_at)
+        return typed_missing("HTTP_ERROR", response_received_at, http_status=status)
     if schema_required_keys:
         if not isinstance(body, Mapping) and not isinstance(body, list):
-            return typed_missing("PROVIDER_SCHEMA_DRIFT", response_received_at)
+            return typed_missing(
+                "PROVIDER_SCHEMA_DRIFT",
+                response_received_at,
+                http_status=status,
+            )
         # An empty list is a valid "all entities absent" signal for batch snapshots.
         if not (isinstance(body, list) and not body and expected_entities):
             sample = body if isinstance(body, Mapping) else (body[0] if body else {})
             if isinstance(sample, Mapping) and any(
                 key not in sample for key in schema_required_keys
             ):
-                return typed_missing("PROVIDER_SCHEMA_DRIFT", response_received_at)
+                return typed_missing(
+                    "PROVIDER_SCHEMA_DRIFT",
+                    response_received_at,
+                    http_status=status,
+                )
     response_hash = canonical_sha256(body)
     entities: dict[str, Any] = {}
     if expected_entities:
@@ -213,6 +277,7 @@ def execute_primitive(
         )
     except Exception:
         first_reliable_available_at = response_received_at
+    observed_status, http_class = classify_http_transport(http_status=status)
     return {
         "status": "OBSERVED",
         "missing_reason": None,
@@ -225,6 +290,8 @@ def execute_primitive(
         "body": body,
         "entities": entities,
         "primitive_id": primitive_id,
+        "http_status": observed_status,
+        "http_class": http_class,
     }
 
 
@@ -258,10 +325,20 @@ def parse_anchor(row: Mapping[str, Any]) -> datetime | None:
 
 __all__ = [
     "BUY_AMOUNT",
+    "HTTP_CLASS_401",
+    "HTTP_CLASS_403",
+    "HTTP_CLASS_429",
+    "HTTP_CLASS_5XX",
+    "HTTP_CLASS_NO_RESPONSE",
+    "HTTP_CLASS_OK",
+    "HTTP_CLASS_OTHER_4XX",
+    "HTTP_CLASS_TIMEOUT",
+    "HTTP_CLASS_TRANSPORT",
     "ObservationPrimitiveError",
     "RECENT_URL",
     "SOL_MINT",
     "call_occurrence_id",
+    "classify_http_transport",
     "execute_primitive",
     "parse_anchor",
     "parse_first_seen",
