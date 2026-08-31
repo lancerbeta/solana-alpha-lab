@@ -519,7 +519,11 @@ def proposed_capture_packet(
         "pace_seconds": int(document["runtime_limits"]["min_interval_seconds"]),
         "raw_retention": dict(document["raw_retention"]),
         "forbidden_actions": list(document["forbidden_actions"]),
-        "future_owner_phrase": str(document["external_authority"]["future_owner_phrase"]),
+        "future_owner_phrase": None,
+        "owner_phrase_source": str(
+            document.get("external_authority", {}).get("owner_phrase_source")
+            or "SUCCESSOR_DETERMINISTIC_RENDERER"
+        ),
         "live_authorized": False,
         "live_window": dict(document.get("live_window") or {}),
         "informative_complete_dual_notional_floor": COMPLETE_DUAL_FLOOR,

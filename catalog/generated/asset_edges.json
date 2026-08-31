@@ -3363,6 +3363,31 @@
       "target_asset_id": "TEST-PATHRISK-WALLCLOCK-LIVE-001"
     },
     {
+      "source_asset_id": "CTRL-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PATHRISK-LIVE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001"
+    },
+    {
       "source_asset_id": "CTRL-PMF-QUOTE-ATTEMPT-PREP-001",
       "relation": "contains",
       "target_asset_id": "MODULE-PMF-QUOTE-ATTEMPT-PREP-001"
@@ -9748,6 +9773,11 @@
       "target_asset_id": "CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001"
     },
     {
+      "source_asset_id": "MODULE-PATHRISK-LIVE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001"
+    },
+    {
       "source_asset_id": "MODULE-PMF-QUOTE-ATTEMPT-PREP-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-PMF-QUOTE-ATTEMPT-PREP-001"
@@ -14151,6 +14181,16 @@
       "source_asset_id": "TEST-PATHRISK-RECENT-HTTP-CLASS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001"
+    },
+    {
+      "source_asset_id": "TEST-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PATHRISK-LIVE-001"
+    },
+    {
+      "source_asset_id": "TEST-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-SUCCESSOR-WINDOW-IDENTITY-001"
     },
     {
       "source_asset_id": "TEST-PATHRISK-WALLCLOCK-LIVE-001",

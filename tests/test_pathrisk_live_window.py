@@ -16,7 +16,15 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+if str(ROOT / "tests") not in sys.path:
+    sys.path.insert(0, str(ROOT / "tests"))
 
+from pathrisk_live_testkit import (
+    ACT_003,
+    ensure_act002_below_floor,
+    live_identity_kwargs,
+    successor_phrase,
+)
 from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
 from solana_alpha_lab.factory.pathrisk_calibration import (
     NOTIONAL_10M,
@@ -38,7 +46,6 @@ from solana_alpha_lab.factory.pathrisk_live import (
     compile_live_schedule,
     count_url_kinds,
     resolve_consumed_exclusions,
-    resolve_live_window_identity,
     run_live_window,
 )
 
@@ -65,7 +72,7 @@ def _row(mint: str, *, liquidity: str = "2000") -> dict:
 
 
 def _phrase() -> str:
-    return str(load_policy(ROOT)["external_authority"]["future_owner_phrase"])
+    return successor_phrase()
 
 
 def _fixture(mints: tuple[str, ...] | list[str], *, order: Sequence[str] | None = None) -> dict:
@@ -77,6 +84,7 @@ def _fixture(mints: tuple[str, ...] | list[str], *, order: Sequence[str] | None 
 
 
 def _run(*, data_root: Path, opener, stop_after: str | None = None, policy=None):
+    ensure_act002_below_floor(data_root)
     return run_live_window(
         root=ROOT,
         data_root=data_root,
@@ -89,6 +97,7 @@ def _run(*, data_root: Path, opener, stop_after: str | None = None, policy=None)
         store_path=data_root / "observation_schedule_state.sqlite",
         policy=policy,
         production=False,
+        **live_identity_kwargs(),
     )
 
 
@@ -192,7 +201,7 @@ class PathRiskLiveWindowTests(unittest.TestCase):
             self.assertIn("NO_ALPHA", result["non_claims"])
             self.assertIn("PATHRISK_PROXY_NOT_PROFITABILITY", result["non_claims"])
             self.assertTrue(result["all_published_panels_labeled"])
-            self.assertTrue((data_root / "pathrisk_live" / resolve_live_window_identity(load_policy(ROOT)).activation_id / "readout.json").is_file())
+            self.assertTrue((data_root / "pathrisk_live" / ACT_003 / "readout.json").is_file())
             self.assertGreaterEqual(
                 len(result["readout"]["complete_dual_notional_mints"]), 3
             )
@@ -377,6 +386,8 @@ class PathRiskLiveWindowTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             fixture_path = Path(tmp) / "fixture.json"
             fixture_path.write_text(json.dumps(_fixture(MINTS[:3])), encoding="utf-8")
+            data_root = Path(tmp) / "rdp"
+            ensure_act002_below_floor(data_root)
             completed = subprocess.run(
                 [
                     sys.executable,
@@ -388,9 +399,13 @@ class PathRiskLiveWindowTests(unittest.TestCase):
                     "--owner-phrase",
                     _phrase(),
                     "--data-root",
-                    str(Path(tmp) / "rdp"),
+                    str(data_root),
                     "--producer-git-sha",
                     GIT_SHA,
+                    "--activation-id",
+                    ACT_003,
+                    "--predecessor-activation-id",
+                    "ACT-PATHRISK-LIVE-002",
                     "--fake-provider-fixture",
                     str(fixture_path),
                     "--now",
