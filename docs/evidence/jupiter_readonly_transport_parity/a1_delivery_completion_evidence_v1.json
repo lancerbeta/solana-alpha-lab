@@ -10,7 +10,20 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "9f782d9088a0894ef82868894525526c2a5d0492af7e1ca7e82f4d6109f85832",
+    "catalog/assets/lifecycle.yaml": "1e957ebd101a4242dba8dc9de439f5fcf0804f59f60b6ff335468afb272f988f",
+    "catalog/catalog_manifest.yaml": "3e7152ed72773f6bcd6a06ca35c5c43ea045230471037efa0cb2c9aa9fc51e7e",
+    "catalog/generated/asset_edges.json": "d3924a80286ac4e86123440f7ef654bf88859f10e0facdcd7e00b72ca8199aac",
+    "docs/PROJECT_MAP.md": "18539525d5ce5353a9b988334cbe55e6d7d5ed46094be91c77973f5e9bc7bab8",
+    "docs/reports/jupiter_readonly_transport_parity/a1_owner_readout_v1.md": "a42d56cfd1f957db1c2dc37ed61d75231a8e22fbe24ee7a94afae23f5b55fea6",
+    "docs/tasks/JUPITER_READONLY_TRANSPORT_PARITY_V1.md": "3722ee76913685befd5ecebeb02ebe04001bebf92cbfb15bc31a65cc1a05bfe1",
+    "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "1692763d4cf3be5d2c51f3652a94b857728c78d5409866875296f09d2a260dff",
+    "tests/test_jupiter_readonly_transport_parity.py": "94d954aee8eed344fa9e50d4a15bb6db68510bfa1277b5f4367777d156233696",
+    "tests/test_observation_primitives.py": "076ed7b5376c6e5ac3d77f88452bbe32b8634e3a9541dbc2fbeb3040ca19098b",
+    "tests/test_pathrisk_recent_http_class.py": "a053abbdba9d3b3b9a5d9773e1d16a676969367945cf317db7755ec19bfee59e",
+    "tests/test_pathrisk_wallclock_live.py": "f1daf526e73b26df449ae3cadeaa1509320049abbde3da20d609b8e2a5e067fd"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/jupiter_readonly_transport_parity/a1_delivery_factory_fit_v1.json",
-    "sha256": "0",
+    "sha256": "f2cd5141df222edc46a28ad5e26abd2ce839913641efb6b26aadacd7f4a5605a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_JUPITER_READONLY_TRANSPORT_PARITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/jupiter_readonly_transport_parity/a1_delivery_independent_review_v1.json",
-      "sha256": "0",
+      "sha256": "5ceafd02c06faa07eecd6535a12e2a26d9e1ac49b8d3bc6362b7e042899454ab",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
