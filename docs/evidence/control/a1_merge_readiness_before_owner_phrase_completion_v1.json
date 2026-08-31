@@ -1,0 +1,72 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-COMPLETION-001",
+  "as_of": "2026-08-31",
+  "task_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-V1",
+  "state_change": "MERGE_READINESS_REQUIRED_BEFORE_OWNER_PHRASE",
+  "base_main": "6850bdb15d6c2547f7f768bfc6c1b97c9a1b4636",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "28a457198c116acf92ae5295899f9446b9011bd4f1e51e1392a5c5c004296f36",
+    ".cursor/commands/delivery-finish.md": "5b5836571a47bb84f16c1d468292d6946aaef755fb9cf7329247e5aee8c50e5c",
+    "AGENTS.md": "6dbc2ba902c059f6a599f3f74897ef95d9e5be4df36be6d43b12e03f3c136571",
+    "catalog/assets/core.yaml": "752bb48373a86017658fb9c3a9fb2a99c88dab7f8f9a41cfd81437c24f322d98",
+    "delivery-harness/templates/portable-bundle-manifest.json": "72e641f5b9cf8cf5d6890f501bb5de658d7b1fc90ff76c18c125dc0de604301e",
+    "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md": "374314c70e71ff2a1055c1bda0fa7730fab93963da5f0d46a175c2c54e267290",
+    "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md": "b4507738285ebd757e51ae5df87a967efe176d3f323c032304eb12f5d38450d2",
+    "delivery-harness/templates/portable-core/scripts/delivery_harness.py": "82fe8395015108a0bc3c2c06970cc9d88b29f6da8444f919b518955a71783738",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "8acb49843a0a19a827e971e4fa9faac188513e232e5c4e5f885c0d8d2fa829c1",
+    "docs/agent/EXECUTION_ROUTER_PROTOCOL.md": "e8e784854f70faa86a471fa36913f093a0808d58fcc28a3226865514ce1282fa",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "486ca35619119803a529781feb21bfd84ce3f248d56183a4be971c887e443bf2",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "a8c2ab1b3d89c50ff5ca1b3208b50925b906344d0eee1a1b9460666b258a847f",
+    "docs/tasks/CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-V1.md": "89caa2b8e75628344908eb516a38d7fe5bc238a7c75dcd822fb435959888f168",
+    "scripts/delivery_harness.py": "7f3dbf8c630ee78bed0d4faa3f6a9e7a2a296eeb2e8700ee29152f4c3e183be8",
+    "scripts/owner_attention_gate.py": "6263154180508da9d3777d594586405ea787b4577a42839db8e2cdcdbf1bb3e8",
+    "scripts/validate.ps1": "b8cfec45d197bc9c0fcfa9ca8776efcc17383e3853b7bf810cc8c408c66ae993",
+    "tests/test_delivery_harness_context.py": "9582303e74db564c31dea99630f21f1ea0ef70e569477b0fbe12daf5c3bdfd59",
+    "tests/test_delivery_harness_merge_guard.py": "d723726fab75d7d8d97686d97b34aabc14c9cc7122ea1394cfe0b3d8dea314ef",
+    "tests/test_delivery_harness_skill.py": "ab6f62667957aaa40c1a7409e029ad0ccd7500e2efbd044d39d3ac807d020463"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_merge_readiness_before_owner_phrase_factory_fit_v1.json",
+    "sha256": "219aa044f27f5f478f5fc864c35bce9f20588c8885f9c72c3436fb36eb3ce098",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_MERGE_READINESS_AND_IDENTITY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_merge_readiness_before_owner_phrase_review_v1.json",
+      "sha256": "ad79e9adc924ab6b362e61436135af4c913340a49f2459a8435dd5a74e31f806",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_MERGE_READINESS_WITHOUT_PHRASE",
+      "PASS_LIVE_PR_HEAD_PRODUCT_REFUSE",
+      "PASS_STAGED_TASK_CONTRACT_SCHEMA"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_LIVE_PR_HEAD_FOR_PRODUCT"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd": 0
+  }
+}

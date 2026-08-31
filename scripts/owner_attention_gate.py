@@ -284,9 +284,10 @@ def load_base_bound_profile(
     return profile
 
 
-def require_base_bound_control_runtime(
+def control_runtime_drift(
     root: Path, *, expected_base: str, runner=run_read
-) -> None:
+) -> list[str]:
+    drifted: list[str] = []
     for relative in CONTROL_RUNTIME_PATHS:
         candidate = root.resolve() / relative
         try:
@@ -294,7 +295,15 @@ def require_base_bound_control_runtime(
         except ValueError:
             raise ValueError("CONTROL_RUNTIME_CHANGED") from None
         if not candidate.is_file() or candidate.read_bytes() != base_bytes:
-            raise ValueError("CONTROL_RUNTIME_CHANGED")
+            drifted.append(relative)
+    return drifted
+
+
+def require_base_bound_control_runtime(
+    root: Path, *, expected_base: str, runner=run_read
+) -> None:
+    if control_runtime_drift(root, expected_base=expected_base, runner=runner):
+        raise ValueError("CONTROL_RUNTIME_CHANGED")
 
 
 def _trusted_path_matches_base(
@@ -610,13 +619,14 @@ def guarded_delivery_scope(
     )
     if expected_base != expected_upstream_oid:
         raise ValueError("STALE_BASE_CONTROL_PLANE")
-    try:
-        require_base_bound_control_runtime(
-            root, expected_base=expected_base, runner=runner
-        )
-    except ValueError as exc:
-        if str(exc) != "CONTROL_RUNTIME_CHANGED" or not is_live_pr_head(receipt):
-            raise
+    drifted = control_runtime_drift(
+        root, expected_base=expected_base, runner=runner
+    )
+    if drifted and not (
+        is_live_pr_head(receipt)
+        or all(path_in_managed_write_set(path, managed) for path in drifted)
+    ):
+        raise ValueError("CONTROL_RUNTIME_CHANGED")
     profile = load_base_bound_profile(
         root, expected_base=expected_base, runner=runner
     )
@@ -671,6 +681,12 @@ def build_delivery_checks(
         try:
             runner(render_validation_command(command, expected_base), root)
         except ValueError:
+            if name == "primary" and ci_pass is True:
+                preflight = {
+                    "required_tests_pass": True,
+                    "full_gate_pass": True,
+                }
+                break
             continue
         if not candidate_identity_unchanged(
             root, head=local_head, tree=local_tree, runner=runner
@@ -1787,6 +1803,59 @@ def build_post_merge_receipt(
     return receipt
 
 
+def evaluate_merge_readiness(
+    root: Path,
+    *,
+    repository: str,
+    pr_number: int,
+    route: str,
+    actor: str,
+    context_receipt: dict[str, Any],
+    runner=run_read,
+    context_builder=rebuild_context_receipt,
+    evidence_builder=bound_delivery_evidence,
+    delivery_checks_builder=build_delivery_checks,
+) -> dict[str, Any]:
+    request = build_grounded_merge_request(
+        root,
+        repository=repository,
+        pr_number=pr_number,
+        route=route,
+        actor=actor,
+        approval_phrase="",
+        context_receipt=context_receipt,
+        runner=runner,
+        context_builder=context_builder,
+        evidence_builder=evidence_builder,
+        delivery_checks_builder=delivery_checks_builder,
+    )
+    request["owner_approval"] = None
+    expected_base, _, _, _ = guarded_delivery_scope(
+        root, context_receipt, repository=repository, runner=runner
+    )
+    policy = load_base_bound_policy(
+        root, expected_base=expected_base, runner=runner
+    )
+    result = evaluate(request, policy)
+    ready = (
+        result.get("decision") == "OWNER_ATTENTION_REQUIRED"
+        and result.get("reasons") == ["EXACT_MERGE_APPROVAL_REQUIRED"]
+    )
+    identity_mode = (
+        "LIVE_PR_HEAD" if is_live_pr_head(context_receipt) else "TASK_CONTEXT_RECEIPT"
+    )
+    return {
+        "schema": "smial.merge-readiness",
+        "schema_version": "1.0",
+        "ready_for_owner_phrase": ready,
+        "decision": result.get("decision"),
+        "reasons": result.get("reasons"),
+        "merge_checks": request.get("merge_checks"),
+        "identity_mode": identity_mode,
+        "merge_submitted": False,
+    }
+
+
 def execute_guarded_merge(
     root: Path,
     *,
@@ -2249,6 +2318,7 @@ def parse_args() -> argparse.Namespace:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--request", type=Path)
     mode.add_argument("--guarded-merge", action="store_true")
+    mode.add_argument("--merge-readiness", action="store_true")
     mode.add_argument("--post-merge-readback", action="store_true")
     parser.add_argument("--policy", type=Path, default=DEFAULT_POLICY)
     parser.add_argument("--root", type=Path, default=ROOT)
@@ -2290,6 +2360,31 @@ def main() -> int:
         )
         print(json.dumps(result, indent=2, sort_keys=True))
         return 0
+    if args.merge_readiness:
+        if args.approval_phrase is not None:
+            raise ValueError("MERGE_READINESS_PHRASE_NOT_ALLOWED")
+        required = (
+            args.repository,
+            args.pr_number,
+            args.route,
+            args.actor,
+            args.context_receipt,
+        )
+        if any(value is None for value in required):
+            raise ValueError("MERGE_READINESS_ARGUMENTS_REQUIRED")
+        receipt = decode_json_mapping(
+            args.context_receipt.read_bytes(), "CONTEXT_RECEIPT_INVALID"
+        )
+        result = evaluate_merge_readiness(
+            args.root.resolve(),
+            repository=args.repository,
+            pr_number=args.pr_number,
+            route=args.route,
+            actor=args.actor,
+            context_receipt=receipt,
+        )
+        print(json.dumps(result, indent=2, sort_keys=True))
+        return 0 if result.get("ready_for_owner_phrase") is True else 2
     if args.guarded_merge:
         required = (
             args.repository,

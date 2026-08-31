@@ -59,15 +59,19 @@ change, real money/wallet/signer/transaction, unresolved truth/safety conflict,
 or a stricter task stop. Failed machine evidence is `DENY`; reassurance cannot
 override it.
 
-Both direct agents stop once after exact-head CI for the exact owner phrase bound
-to the current PR and unchanged 40-hex head. The owner never clicks GitHub Merge.
-After re-reading repository, PR, head, mergeability, checks, unresolved reviews,
-write set and exclusions, the elected direct agent performs one ordinary guarded
-merge only when the v2 gate returns `AUTONOMOUS`. Harness or control PRs bind a
-local `LIVE_PR_HEAD` receipt via `scripts/delivery_harness.py context --pr`;
-product work still uses an exact task contract. Then read back exact `main` and
-post-merge CI. No force push, history rewrite, branch deletion or settings
-change.
+Both direct agents stop once after exact-head CI **and**
+`scripts/owner_attention_gate.py --merge-readiness` reports
+`ready_for_owner_phrase: true` for the exact owner phrase bound to the
+current PR and unchanged 40-hex head. Order is
+`CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
+The owner never clicks GitHub Merge. Do not ask the phrase before readiness.
+Product diffs use `context --contract`. `context --pr` (`LIVE_PR_HEAD`) is
+only for a candidate whose changed paths are entirely inside
+`harness_control_write_prefixes`; a product path is `IDENTITY_MODE_MISMATCH`.
+Do not widen those prefixes to admit a product write set. After the phrase,
+the elected direct agent performs one ordinary guarded merge only when the v2
+gate returns `AUTONOMOUS`. Then read back exact `main` and post-merge CI. No
+force push, history rewrite, branch deletion or settings change.
 
 ## DELIVERY_WORKFLOW
 

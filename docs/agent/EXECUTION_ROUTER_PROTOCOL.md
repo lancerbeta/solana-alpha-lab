@@ -92,10 +92,15 @@ Both direct routes stop for exactly:
 
 `PR #<number>, head <40 lowercase hex> проверен; ready + merge разрешаю.`
 
+only after `scripts/owner_attention_gate.py --merge-readiness` returns
+`ready_for_owner_phrase: true` on that head. Order:
+`CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
 The owner never clicks GitHub Merge. After that phrase, the elected direct
-agent runs `scripts/owner_attention_gate.py --guarded-merge`. Harness or
-control PRs bind a local `LIVE_PR_HEAD` receipt; product tasks still bind an
-exact task contract.
+agent runs `scripts/owner_attention_gate.py --guarded-merge`. Product tasks bind
+an exact task contract (`context --contract`). `context --pr` (`LIVE_PR_HEAD`)
+is only when the candidate diff is entirely inside
+`harness_control_write_prefixes`; otherwise `IDENTITY_MODE_MISMATCH`.
+Do not widen those prefixes to admit a product write set.
 
 Immediately before mutation re-read repository, PR, head, mergeability,
 required tests/CI/full gate/Factory Fit, write set, secret scan, unresolved
