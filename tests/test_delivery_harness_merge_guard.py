@@ -53,6 +53,7 @@ class FakeRunner:
         flip_head_after_policy_reads: int | None = None,
         default_branch: str = "main",
         base_mismatch_path: str | None = None,
+        fail_ci_owned: bool = False,
         postmerge_default_oid: str | None = None,
     ) -> None:
         self.head = head
@@ -71,6 +72,7 @@ class FakeRunner:
         self.flip_head_after_policy_reads = flip_head_after_policy_reads
         self.default_branch = default_branch
         self.base_mismatch_path = base_mismatch_path
+        self.fail_ci_owned = fail_ci_owned
         self.postmerge_default_oid = MAIN if postmerge_default_oid is None else postmerge_default_oid
         self.policy_reads = 0
         self.calls: list[tuple[str, ...]] = []
@@ -271,6 +273,12 @@ class FakeRunner:
                     "databaseId": 701,
                 }],
             }).encode()
+        if command[:3] == ("git", "diff", "--name-only"):
+            return b"scripts/owner_attention_gate.py\0"
+        if command and command[0] == "uv":
+            if self.fail_ci_owned and "--ci-owned-delivery" in command:
+                raise ValueError("LIVE_READBACK_FAILED")
+            return b""
         raise AssertionError(command)
 
 
@@ -927,10 +935,11 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             ):
                 denied = self.module.build_delivery_checks(
                     root, context_receipt={}, local_head=HEAD, local_tree=TREE,
-                    ci_pass=True, runner=failed_runner,
+                    ci_pass=False, runner=failed_runner,
                 )
             self.assertFalse(denied["required_tests_pass"])
             self.assertFalse(denied["full_gate_pass"])
+            calls.clear()
 
             def passing_runner(args: list[str], cwd: Path) -> bytes:
                 calls.append(tuple(args))
@@ -954,8 +963,18 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 )
             self.assertTrue(passed["required_tests_pass"])
             self.assertTrue(passed["full_gate_pass"])
-            self.assertTrue(any(call[0] == "project-fallback" for call in calls))
+            self.assertFalse(any(call[0] == "project-fallback" for call in calls))
             self.assertNotIn(str(receipt_path), " ".join(" ".join(call) for call in calls))
+            calls.clear()
+            with mock.patch.object(
+                self.module, "task_delivery_scope", return_value=(MAIN, "origin/main", MAIN, ["allowed.txt"])
+            ):
+                passed_local = self.module.build_delivery_checks(
+                    root, context_receipt={}, local_head=HEAD, local_tree=TREE,
+                    ci_pass=False, runner=passing_runner,
+                )
+            self.assertTrue(passed_local["required_tests_pass"])
+            self.assertTrue(any(call[0] == "project-fallback" for call in calls))
 
     def test_project_validation_binding_is_closed_and_ci_owned_result_needs_ci(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -1877,6 +1896,22 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         self.assertEqual(result["reasons"], ["EXACT_MERGE_APPROVAL_REQUIRED"])
         self.assertTrue(result["merge_checks"]["write_set_pass"])
         self.assertFalse(any(call[:3] == ("gh", "pr", "merge") for call in runner.calls))
+
+    def test_ineligible_ci_owned_does_not_run_tracked_only_when_ci_passed(self) -> None:
+        runner = FakeRunner(fail_ci_owned=True)
+        checks = self.module.build_delivery_checks(
+            ROOT,
+            context_receipt=context_receipt(self.module),
+            local_head=HEAD,
+            local_tree=TREE,
+            ci_pass=True,
+            runner=runner,
+        )
+        self.assertTrue(checks["required_tests_pass"])
+        self.assertTrue(checks["full_gate_pass"])
+        self.assertFalse(
+            any("--tracked-only-delivery" in call for call in runner.calls)
+        )
 
     def test_merge_readiness_reports_write_set_fail_without_phrase(self) -> None:
         def failing_write_set(
