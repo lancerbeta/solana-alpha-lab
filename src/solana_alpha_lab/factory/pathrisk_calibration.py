@@ -508,6 +508,10 @@ def proposed_capture_packet(
         "provider_route_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
         "route_id": str(document["routes"]["quote"]["route_id"]),
         "credential_mode": CREDENTIAL_MODE,
+        "credential_env_name": str(
+            document.get("external_authority", {}).get("credential_name")
+            or "JUPITER_API_KEY"
+        ),
         "population": str(document["population"]["icp_id"]),
         "notionals_lamports": list(document["notionals_lamports"]),
         "sample_floor": int(document["sample"]["floor"]),

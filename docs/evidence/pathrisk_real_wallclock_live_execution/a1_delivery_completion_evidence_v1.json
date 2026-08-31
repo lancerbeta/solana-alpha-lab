@@ -1,0 +1,76 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-DELIVERY-COMPLETION-001",
+  "as_of": "2026-08-31",
+  "task_id": "PATHRISK_REAL_WALLCLOCK_LIVE_EXECUTION_V1",
+  "state_change": "PATHRISK_REAL_WALLCLOCK_LIVE_EXECUTION_PASS_READY_FOR_MERGE_GATE",
+  "base_main": "5ccfc2b1dc95f94d6b95a0a2d74925d93482af7b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "a6ca3a7ddc25355fda3a36f8ef6aaf0bafffe502cf69e2c0b836bc036937937d",
+    "catalog/assets/lifecycle.yaml": "9086a9f3167afb0935503c04886ab9a13fd6f4bbe457329541539996a8f28b7d",
+    "catalog/catalog_manifest.yaml": "4f492247ce452b76412bf1052056725b218b1c85e8748b1899adc9fc406aee0d",
+    "catalog/generated/asset_edges.json": "d51324534afd64d6e5cf338862ad20950970f8f40a4b61a1ec345d6706cbf1cd",
+    "configs/early_quote_surface_pathrisk_calibration_v1.yaml": "f2e935332ba9c28f48c43e065efab197b18ba91a38135e49711738042c743c0c",
+    "docs/PROJECT_MAP.md": "ad4fc082a40fe9c49b6c279f945d9ef5fe66e40d55eb1159eab7c4fd17d8be6a",
+    "docs/reports/pathrisk_real_wallclock_live_execution/a1_owner_readout_v1.md": "62ba9d70ba7046d5fb1037d128822b9e073d17c41f3c12e958bc6aca33215d2c",
+    "docs/tasks/PATHRISK_REAL_WALLCLOCK_LIVE_EXECUTION_V1.md": "a0a72d821e684e0b3b3c7e3b9e59b6dbd9bdcabcab82794b2013afc3adadd044",
+    "scripts/early_quote_surface_pathrisk_calibration.py": "6fd31330778a94066e8b6771bc914244c0b124f36e58451bfdf15f48280ad0c3",
+    "src/solana_alpha_lab/factory/pathrisk_calibration.py": "dc83b2d361011caa11b82af48e70bb00e2cb017149f25d4adcba16a1b3bec9e4",
+    "src/solana_alpha_lab/factory/pathrisk_live.py": "40f6d316cbd2a41c51b69b414665c29899051c0acd844e9cd89876cdc8052053",
+    "tests/test_pathrisk_calibration.py": "7ecc7bd243aaeca8714d20d7e21c5f9ad6db2baa4e32b25f4dc7050beaa1ba1c",
+    "tests/test_pathrisk_live_window.py": "674562692a5ffa59507a265259322b3c790993d610d644ed849220c5d89f7f85",
+    "tests/test_pathrisk_wallclock_live.py": "62da0d0367ebe9ab7a5b2a0798f36d4b2e07864c81b5f738d4954f88526f3af0"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/pathrisk_real_wallclock_live_execution/a1_delivery_factory_fit_v1.json",
+    "sha256": "b549dca2d286ddb870e438d4d8199eaee8f761ce9c1deaba042130b6b885afc9",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PATHRISK_WALLCLOCK_LIVE_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/pathrisk_real_wallclock_live_execution/a1_delivery_independent_review_v1.json",
+      "sha256": "c4b0845bdcc45a7cee066720d994d1406c22ea3f3e08b8838e1302c0864a6803",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PATHRISK_WALLCLOCK_LIVE_SUITE",
+      "PASS_PATHRISK_LIVE_WINDOW_SUITE",
+      "PASS_PATHRISK_CALIBRATION_SUITE",
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_REALIZED_VWAP",
+    "NO_FILL",
+    "QUOTE_ONLY",
+    "PATHRISK_PROXY_NOT_PROFITABILITY",
+    "NO_PROVIDER_CALLS",
+    "NO_LIVE_CALIBRATION",
+    "NO_REAL_CREDENTIAL_VALUE_READ"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

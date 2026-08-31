@@ -4,6 +4,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import sys
+import time
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -12,6 +15,7 @@ from urllib.parse import parse_qs, urlsplit
 from uuid import uuid4
 
 import pyarrow.parquet as pq
+import yaml
 
 from solana_alpha_lab.factory.commissioning_fixture import COMMISSIONING_DATASET_MANIFEST_ID
 from solana_alpha_lab.factory.forward_h900_quote_capture import consumed_mints_from_git
@@ -30,9 +34,11 @@ from solana_alpha_lab.factory.observation_primitives import (
     RECENT_URL,
     call_occurrence_id,
     execute_primitive,
+    parse_anchor,
     request_sha256,
     search_url,
 )
+from solana_alpha_lab.factory.observation_schedule_runtime import JupiterReadonlyOpener
 from solana_alpha_lab.factory.observation_schedule import (
     canonical_sha256,
     load_observation_schedule,
@@ -63,6 +69,7 @@ from solana_alpha_lab.factory.pathrisk_calibration import (
     TERMINAL_BELOW_FLOOR,
     build_readout,
     load_policy,
+    proposed_capture_packet,
     require_exact_main_sha,
     select_r0_sample,
 )
@@ -74,6 +81,11 @@ R0_SEARCH_DUE = "PATHRISK-R0-SEARCH"
 ACTIVATION_ID = "ACT-PATHRISK-LIVE-001"
 LIVE_SCHEDULE_RELATIVE = "tests/fixtures/observation_schedule/pathrisk_live_window.yaml"
 FORBIDDEN_SEARCH_BUNDLE = "BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001"
+CREDENTIAL_ENV_NAME = "JUPITER_API_KEY"
+TERMINAL_CREDENTIAL_MISSING = "CREDENTIAL_ENV_MISSING_BEFORE_PROVIDER"
+ADMISSION_SECONDS = 180
+RUNTIME_SCHEDULE_NAME = "runtime_schedule.yaml"
+RUNTIME_BINDING_NAME = "runtime_binding.json"
 
 
 class PathRiskLiveError(ValueError):
@@ -96,15 +108,46 @@ class HardCapOpener:
 
 
 class FrozenClock:
+    """Injectable test clock. Forbidden on the production PathRisk path."""
+
     def __init__(self, now: datetime) -> None:
         self.now = now.astimezone(UTC)
 
     def __call__(self) -> datetime:
         return self.now
 
+    def sleep(self, seconds: float) -> None:
+        if seconds > 0:
+            self.now = self.now + timedelta(seconds=seconds)
+
     def advance(self, seconds: int = 4) -> datetime:
-        self.now = self.now + timedelta(seconds=seconds)
+        self.sleep(seconds)
         return self.now
+
+
+class SystemClock:
+    """UTC wall clock. No manual advance."""
+
+    def __call__(self) -> datetime:
+        return datetime.now(UTC)
+
+    def sleep(self, seconds: float) -> None:
+        if seconds > 0:
+            time.sleep(seconds)
+
+
+class ControllableClock:
+    """Test clock that treats sleep as simulated elapsed time."""
+
+    def __init__(self, now: datetime) -> None:
+        self.now = now.astimezone(UTC)
+
+    def __call__(self) -> datetime:
+        return self.now
+
+    def sleep(self, seconds: float) -> None:
+        if seconds > 0:
+            self.now = self.now + timedelta(seconds=seconds)
 
 
 SOL_MINT = "So11111111111111111111111111111111111111112"
@@ -354,6 +397,142 @@ def _assert_live_schedule(schedule: Mapping[str, Any]) -> None:
         raise PathRiskLiveError("PACE_BELOW_FLOOR")
 
 
+def sleep_clock(clock: object, seconds: float) -> None:
+    if seconds <= 0:
+        return
+    sleeper = getattr(clock, "sleep", None)
+    if not callable(sleeper):
+        raise PathRiskLiveError("CLOCK_SLEEP_UNSUPPORTED")
+    sleeper(seconds)
+
+
+def wait_until(clock: object, target: datetime) -> None:
+    remaining = (target.astimezone(UTC) - clock()).total_seconds()
+    if remaining > 0:
+        sleep_clock(clock, remaining)
+
+
+def prospective_band_derivable(schedule: Mapping[str, Any]) -> bool:
+    x_point = schedule["x_point"]
+    y_points = list(schedule["y_points"])
+    if not y_points:
+        return False
+    x_deadline = int(x_point["due_offset_seconds"]) + int(x_point["allowed_lateness_seconds"])
+    y_due = int(y_points[0]["due_offset_seconds"])
+    return 0 < x_deadline < y_due
+
+
+def prospective_time_admissible(
+    row: Mapping[str, Any],
+    *,
+    schedule: Mapping[str, Any],
+    as_of: datetime,
+) -> bool:
+    created = parse_anchor(row)
+    if created is None:
+        return False
+    x_point = schedule["x_point"]
+    y_point = schedule["y_points"][0]
+    x_deadline = created + timedelta(
+        seconds=int(x_point["due_offset_seconds"]) + int(x_point["allowed_lateness_seconds"])
+    )
+    y_due = created + timedelta(seconds=int(y_point["due_offset_seconds"]))
+    if as_of > x_deadline:
+        return False
+    if as_of >= y_due:
+        return False
+    return True
+
+
+def runtime_live_dir(data_root: Path) -> Path:
+    return Path(data_root) / "pathrisk_live" / ACTIVATION_ID
+
+
+def materialize_runtime_schedule(
+    root: Path,
+    data_root: Path,
+    now: datetime,
+) -> dict[str, Any]:
+    directory = runtime_live_dir(data_root)
+    directory.mkdir(parents=True, exist_ok=True)
+    yaml_path = directory / RUNTIME_SCHEDULE_NAME
+    binding_path = directory / RUNTIME_BINDING_NAME
+    if yaml_path.is_file():
+        loaded = yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
+        if not isinstance(loaded, Mapping):
+            raise PathRiskLiveError("RUNTIME_SCHEDULE_INVALID")
+        compiled = compile_schedule_document(dict(loaded), root=root)
+        if compiled.schedule is None:
+            raise PathRiskLiveError(str(compiled.terminal))
+        _assert_live_schedule(compiled.schedule)
+        binding = json.loads(binding_path.read_text(encoding="utf-8"))
+        if binding.get("schedule_sha256") != compiled.schedule["schedule_sha256"]:
+            raise PathRiskLiveError("RUNTIME_SCHEDULE_BINDING_MISMATCH")
+        return compiled.schedule
+    template = load_observation_schedule(root, LIVE_SCHEDULE_RELATIVE)
+    document = yaml.safe_load(yaml.safe_dump(template))
+    starts = now.astimezone(UTC)
+    document["activation"] = {
+        **dict(template.get("activation") or {}),
+        "starts_at": render_utc(starts),
+        "stops_admitting_at": render_utc(starts + timedelta(seconds=ADMISSION_SECONDS)),
+    }
+    compiled = compile_schedule_document(document, root=root)
+    if compiled.schedule is None:
+        raise PathRiskLiveError(str(compiled.terminal))
+    _assert_live_schedule(compiled.schedule)
+    if not prospective_band_derivable(compiled.schedule):
+        raise PathRiskLiveError("PROSPECTIVE_TIME_ADMISSIBILITY_REQUIRES_SCIENCE_REPLAN")
+    yaml_path.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+    binding_path.write_text(
+        json.dumps(
+            {
+                "schedule_sha256": compiled.schedule["schedule_sha256"],
+                "starts_at": document["activation"]["starts_at"],
+                "stops_admitting_at": document["activation"]["stops_admitting_at"],
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return compiled.schedule
+
+
+def load_process_credential(environ: Mapping[str, str] | None) -> str:
+    env = environ if environ is not None else os.environ
+    value = env.get(CREDENTIAL_ENV_NAME)
+    if not isinstance(value, str) or not value.strip():
+        raise PathRiskLiveError(TERMINAL_CREDENTIAL_MISSING)
+    return value
+
+
+def assert_rdp_ready(data_root: Path) -> None:
+    _, warnings = enumerate_rdp_datasets(Path(data_root))
+    if any(item.get("code") == "DATASET_PARTITION_CORRUPT" for item in warnings):
+        raise PathRiskLiveError("RDP_INTEGRITY_FAILED")
+    lock = Path(data_root) / "locks" / "writer.lock"
+    if lock.is_file() and not lock.is_symlink():
+        try:
+            payload = json.loads(lock.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise PathRiskLiveError("RDP_WRITER_STATE_INVALID") from exc
+        expiry_raw = payload.get("expiry") if isinstance(payload, Mapping) else None
+        if isinstance(expiry_raw, str):
+            try:
+                expiry = parse_utc(expiry_raw)
+            except Exception as exc:
+                raise PathRiskLiveError("RDP_WRITER_STATE_INVALID") from exc
+            if expiry > datetime.now(UTC):
+                raise PathRiskLiveError("RDP_WRITER_ACTIVE")
+
+
+def assert_no_completed_window(journal: Mapping[str, Any]) -> None:
+    if journal.get("stage") == "COMPLETE":
+        raise PathRiskLiveError("PRIOR_PATHRISK_WINDOW_COMPLETED")
+
+
 def compile_live_schedule(root: Path, *, relative: str | None = None) -> dict[str, Any]:
     document = load_observation_schedule(root, relative or LIVE_SCHEDULE_RELATIVE)
     compiled = compile_schedule_document(document, root=root)
@@ -450,9 +629,10 @@ def _oneshot(
     due_at: str,
     url: str,
     opener: object,
-    clock: FrozenClock,
+    clock: object,
     accounts: _Accounting,
     expected_entities: Sequence[str] | None = None,
+    pace_seconds: int = 3,
 ) -> dict[str, Any]:
     digest = str(schedule["schedule_sha256"])
     request_digest = request_sha256(
@@ -486,7 +666,7 @@ def _oneshot(
             now=clock(),
         )
         if blocked == "PACE_WAIT":
-            clock.advance(4)
+            sleep_clock(clock, max(pace_seconds, 3))
             continue
         if blocked:
             raise PathRiskLiveError(str(blocked))
@@ -544,7 +724,7 @@ def _oneshot(
         },
         clock=completion,
     )
-    clock.advance(4)
+    sleep_clock(clock, 4)
     return {
         "reused": False,
         "request_sha256": request_digest,
@@ -563,13 +743,29 @@ def _drain_quotes(
     schedule: Mapping[str, Any],
     opener: object,
     producer_git_sha: str,
-    clock: FrozenClock,
+    clock: object,
     discovery: Sequence[Mapping[str, Any]] | list[Any],
     steps: int,
+    wait_future: bool = False,
 ) -> dict[str, Any] | None:
     last: dict[str, Any] | None = None
     injected: Sequence[Mapping[str, Any]] | list[Any] = discovery
+    digest = str(schedule["schedule_sha256"])
     for _ in range(steps):
+        pending = [
+            row
+            for row in store.due_in_states(("PENDING", "DUE", "CLAIMED"))
+            if row["schedule_sha256"] == digest
+        ]
+        due_now = [row for row in pending if parse_utc(row["due_at"]) <= clock()]
+        future = [row for row in pending if parse_utc(row["due_at"]) > clock()]
+        if not injected and not due_now and future:
+            if not wait_future:
+                break
+            wait_until(clock, min(parse_utc(row["due_at"]) for row in future))
+            continue
+        if not injected and not due_now and not future:
+            break
         last = tick_once(
             root=root,
             data_root=data_root,
@@ -583,15 +779,7 @@ def _drain_quotes(
             clock=clock,
         )
         injected = []
-        pending = [
-            row
-            for row in store.due_in_states(("PENDING", "DUE", "CLAIMED"))
-            if row["schedule_sha256"] == schedule["schedule_sha256"]
-            and parse_utc(row["due_at"]) <= clock()
-        ]
-        if not pending:
-            break
-        clock.advance(4)
+        sleep_clock(clock, 4)
     return last
 
 
@@ -674,7 +862,7 @@ def run_live_window(
     *,
     root: Path,
     data_root: Path,
-    opener: object,
+    opener: object | None = None,
     producer_git_sha: str,
     owner_phrase: str,
     main_sha: str,
@@ -682,6 +870,9 @@ def run_live_window(
     stop_after: str | None = None,
     store_path: Path | None = None,
     policy: Mapping[str, Any] | None = None,
+    production: bool = False,
+    clock: object | None = None,
+    environ: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
     require_exact_main_sha(main_sha)
     loaded_policy = dict(policy or load_policy(root))
@@ -689,12 +880,70 @@ def run_live_window(
         raise PathRiskLiveError("ATOM_DRIFT")
     if int(loaded_policy["runtime_limits"]["max_calls"]) != CALL_CAP:
         raise PathRiskLiveError("CALL_CAP_26_NOT_ENFORCEABLE")
+    proposed_capture_packet(root=root, main_sha=main_sha, policy=loaded_policy)
     require_owner_phrase(loaded_policy, owner_phrase)
+    if production:
+        if now is not None:
+            raise PathRiskLiveError("NOW_OVERRIDE_FORBIDDEN_IN_PRODUCTION")
+        if stop_after is not None:
+            raise PathRiskLiveError("STOP_AFTER_FORBIDDEN_IN_PRODUCTION")
+        if isinstance(clock, FrozenClock):
+            raise PathRiskLiveError("FROZEN_CLOCK_FORBIDDEN_IN_PRODUCTION")
+        if opener is not None:
+            raise PathRiskLiveError("OPENER_INJECTION_FORBIDDEN_IN_PRODUCTION")
     data_root = Path(data_root)
     data_root.mkdir(parents=True, exist_ok=True)
-    schedule = compile_live_schedule(root)
-    origin = (now or parse_utc(str(schedule["activation"]["starts_at"]))).astimezone(UTC)
-    clock = FrozenClock(origin)
+    assert_rdp_ready(data_root)
+    if clock is None:
+        if production:
+            clock = SystemClock()
+        elif now is not None:
+            clock = ControllableClock(now)
+        else:
+            raise PathRiskLiveError("CLOCK_REQUIRED")
+    if production and type(clock) is FrozenClock:
+        raise PathRiskLiveError("FROZEN_CLOCK_FORBIDDEN_IN_PRODUCTION")
+    journal = load_journal(data_root, ACTIVATION_ID)
+    resume_stage = str(journal.get("stage") or "START")
+    assert_no_completed_window(journal)
+    exclusion = resolve_consumed_exclusions(
+        repo_root=root,
+        data_root=data_root,
+        policy=loaded_policy,
+        resolved_at=clock(),
+    )
+    schedule = materialize_runtime_schedule(root, data_root, clock())
+    if not prospective_band_derivable(schedule):
+        raise PathRiskLiveError("PROSPECTIVE_TIME_ADMISSIBILITY_REQUIRES_SCIENCE_REPLAN")
+    journal["exclusion"] = {
+        key: exclusion[key]
+        for key in (
+            "excluded_mint_count",
+            "excluded_mints_sha256",
+            "source_refs",
+            "source_hashes",
+            "resolved_at",
+            "exclusion_packet_sha256",
+        )
+    }
+    journal["schedule_sha256"] = schedule["schedule_sha256"]
+    save_journal(data_root, ACTIVATION_ID, journal)
+    if production:
+        try:
+            credential = load_process_credential(environ)
+        except PathRiskLiveError as exc:
+            if str(exc) == TERMINAL_CREDENTIAL_MISSING:
+                return {
+                    "terminal": TERMINAL_CREDENTIAL_MISSING,
+                    "provider_calls": 0,
+                    "quote_calls": 0,
+                    "credential_reads": 0,
+                    "git_mutated": False,
+                }
+            raise
+        opener = JupiterReadonlyOpener(credential)
+    if opener is None:
+        raise PathRiskLiveError("OPENER_REQUIRED")
     ops_path = store_path or (data_root / "observation_schedule_state.sqlite")
     store = ObservationScheduleStore(ops_path)
     try:
@@ -708,29 +957,11 @@ def run_live_window(
                 now=clock(),
                 producer_git_sha=producer_git_sha,
             )
-        journal = load_journal(data_root, ACTIVATION_ID)
         epoch_before = evidence_epoch_sha256(
             evidence_epoch_material(root, data_root)
         )
-        exclusion = resolve_consumed_exclusions(
-            repo_root=root,
-            data_root=data_root,
-            policy=loaded_policy,
-            resolved_at=clock(),
-        )
-        journal["exclusion"] = {
-            key: exclusion[key]
-            for key in (
-                "excluded_mint_count",
-                "excluded_mints_sha256",
-                "source_refs",
-                "source_hashes",
-                "resolved_at",
-                "exclusion_packet_sha256",
-            )
-        }
-        save_journal(data_root, ACTIVATION_ID, journal)
         accounts = _accounting(store, schedule, clock(), root)
+        pace_seconds = int(schedule["budgets"]["min_provider_pace_seconds"])
         capped = opener if isinstance(opener, HardCapOpener) else HardCapOpener(opener)
         recent = _oneshot(
             store=store,
@@ -742,6 +973,7 @@ def run_live_window(
             opener=capped,
             clock=clock,
             accounts=accounts,
+            pace_seconds=pace_seconds,
         )
         journal["stage"] = "RECENT_DONE"
         journal["recent_sha256"] = recent.get("response_sha256")
@@ -775,6 +1007,7 @@ def run_live_window(
             clock=clock,
             accounts=accounts,
             expected_entities=recent_ids,
+            pace_seconds=pace_seconds,
         )
         search_hash = search.get("response_sha256")
         if not isinstance(search_hash, str) or len(search_hash) != 64:
@@ -794,15 +1027,34 @@ def run_live_window(
                 "git_mutated": False,
             }
         rows = [row for row in (search.get("rows") or []) if isinstance(row, Mapping)]
-        sample = select_r0_sample(
-            rows,
-            policy=loaded_policy,
-            as_of=clock(),
-            excluded_mints=set(exclusion["mints"]),
-        )
-        journal["selected_mints"] = list(sample["mints"])
-        journal["eligible_count"] = sample["eligible_count"]
-        save_journal(data_root, ACTIVATION_ID, journal)
+        prior_stage = resume_stage
+        frozen_stages = {"SAMPLED", "T0_COMPLETE", "H900_PARTIAL"}
+        frozen_mints = [
+            str(item)
+            for item in list(journal.get("selected_mints") or [])
+            if item
+        ]
+        if prior_stage in frozen_stages and frozen_mints:
+            sample = {
+                "terminal": None,
+                "mints": frozen_mints,
+                "eligible_count": int(journal.get("eligible_count") or len(frozen_mints)),
+            }
+        else:
+            admissible_rows = [
+                row
+                for row in rows
+                if prospective_time_admissible(row, schedule=schedule, as_of=clock())
+            ]
+            sample = select_r0_sample(
+                admissible_rows,
+                policy=loaded_policy,
+                as_of=clock(),
+                excluded_mints=set(exclusion["mints"]),
+            )
+            journal["selected_mints"] = list(sample["mints"])
+            journal["eligible_count"] = sample["eligible_count"]
+            save_journal(data_root, ACTIVATION_ID, journal)
         quote_urls = lambda: [url for url in capped.urls if "/swap/v2/order" in url]
         if sample["terminal"] == TERMINAL_BELOW_FLOOR:
             journal["stage"] = "BELOW_FLOOR"
@@ -845,37 +1097,43 @@ def run_live_window(
             if not isinstance(row, Mapping):
                 raise PathRiskLiveError("R0_SINGLE_SNAPSHOT_BINDING_NOT_PROVEN")
             selected_rows.append(dict(row))
-        journal["stage"] = "SAMPLED"
-        save_journal(data_root, ACTIVATION_ID, journal)
+        if prior_stage not in {"T0_COMPLETE", "H900_PARTIAL"}:
+            journal["stage"] = "SAMPLED"
+            save_journal(data_root, ACTIVATION_ID, journal)
         t0_steps = 4 if stop_after == "during_t0" else 48
-        t0_result = _drain_quotes(
-            root=root,
-            data_root=data_root,
-            store=store,
-            schedule=schedule,
-            opener=capped,
-            producer_git_sha=producer_git_sha,
-            clock=clock,
-            discovery=selected_rows,
-            steps=t0_steps,
-        )
-        t0_readout = _panel_readout(
-            data_root=data_root,
-            schedule_sha256=str(schedule["schedule_sha256"]),
-            mints=list(sample["mints"]),
-            provider_calls=_lifetime_calls(store, schedule),
-        )
-        labeled = _write_live_labels(
-            data_root=data_root,
-            schedule_sha256=str(schedule["schedule_sha256"]),
-            readout=t0_readout,
-            exclusion=exclusion,
-            r0_search_sha256=str(search_hash),
-            selected_mints=list(sample["mints"]),
-        )
-        journal["stage"] = "T0_COMPLETE"
-        journal["t0_readout_sha256"] = t0_readout.get("readout_sha256")
-        save_journal(data_root, ACTIVATION_ID, journal)
+        t0_result: dict[str, Any] | None = None
+        labeled: list[str] = []
+        if prior_stage not in {"T0_COMPLETE", "H900_PARTIAL"}:
+            t0_result = _drain_quotes(
+                root=root,
+                data_root=data_root,
+                store=store,
+                schedule=schedule,
+                opener=capped,
+                producer_git_sha=producer_git_sha,
+                clock=clock,
+                discovery=selected_rows,
+                steps=t0_steps,
+                wait_future=False,
+            )
+            t0_readout = _panel_readout(
+                data_root=data_root,
+                schedule_sha256=str(schedule["schedule_sha256"]),
+                mints=list(sample["mints"]),
+                provider_calls=_lifetime_calls(store, schedule),
+            )
+            labeled = _write_live_labels(
+                data_root=data_root,
+                schedule_sha256=str(schedule["schedule_sha256"]),
+                readout=t0_readout,
+                exclusion=exclusion,
+                r0_search_sha256=str(search_hash),
+                selected_mints=list(sample["mints"]),
+            )
+            journal["t0_readout_sha256"] = t0_readout.get("readout_sha256")
+            if stop_after != "during_t0":
+                journal["stage"] = "T0_COMPLETE"
+            save_journal(data_root, ACTIVATION_ID, journal)
         if stop_after in {"after_t0", "during_t0"}:
             return {
                 "terminal": (
@@ -891,10 +1149,10 @@ def run_live_window(
                 "labeled_manifests": labeled,
                 "git_mutated": False,
             }
-        h900_at = origin + timedelta(seconds=600)
-        if clock() < h900_at:
-            clock.now = h900_at
         h900_steps = 4 if stop_after == "during_h900" else 48
+        if production:
+            sys.stderr.write("PATHRISK_LIVE_WAITING_H900\n")
+            sys.stderr.flush()
         h900_result = _drain_quotes(
             root=root,
             data_root=data_root,
@@ -905,6 +1163,7 @@ def run_live_window(
             clock=clock,
             discovery=[],
             steps=h900_steps,
+            wait_future=True,
         )
         if stop_after == "during_h900":
             h900_readout = _panel_readout(
@@ -1000,13 +1259,19 @@ def count_url_kinds(urls: Sequence[str]) -> dict[str, int]:
 
 __all__ = [
     "CALL_CAP",
+    "CREDENTIAL_ENV_NAME",
     "FORBIDDEN_SEARCH_BUNDLE",
+    "ControllableClock",
     "FixtureWindowOpener",
     "HardCapOpener",
     "LIVE_SCHEDULE_RELATIVE",
     "PathRiskLiveError",
+    "SystemClock",
+    "TERMINAL_CREDENTIAL_MISSING",
     "compile_live_schedule",
     "count_url_kinds",
+    "materialize_runtime_schedule",
+    "prospective_time_admissible",
     "resolve_consumed_exclusions",
     "run_live_window",
 ]
