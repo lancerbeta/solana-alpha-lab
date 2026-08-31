@@ -11,7 +11,20 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/PATHRISK_LIVE_RECENT_HTTP_CLASS_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "205cb429090c8292bdc1784644de6f774836f9d4c1482c90be694f6a6486e29f",
+    "catalog/assets/lifecycle.yaml": "ba1a8e65f2cc02f3ccab6f9f539132ea56eb331bc705459570cd9fb805b558e8",
+    "catalog/catalog_manifest.yaml": "1d8c514c370288cb474f02907071b2434d6277677447f528282d08bbf9bab839",
+    "catalog/generated/asset_edges.json": "4e81c6605408df8dde12f501f841275e03f0fd6d429073dde0d832c72b0abdfe",
+    "configs/early_quote_surface_pathrisk_calibration_v1.yaml": "96cdba8e9e1e218d77b0ec0f7ab34a09469e197304e788994063168e7553ac51",
+    "configs/observation_primitive_registry_v1.yaml": "63f487e22b7fae3ab1a9bbc38b4e5660713953911b0c36bdb374d8bdc73d4ad4",
+    "docs/PROJECT_MAP.md": "1304f04adcc5d88a2ef0607b99ac1b01051702adb9d380f12e3f1206f6e78903",
+    "docs/reports/pathrisk_live_recent_http_class/a1_owner_readout_v1.md": "a8df315ff4e4b81ff6106bd7b4030d89ae82b5464b9d796dad080da62204e7a9",
+    "docs/tasks/PATHRISK_LIVE_RECENT_HTTP_CLASS_V1.md": "c3a30fdb778d6dd75213b388455cfb1922e2ecfae5ef076c1ae0873d24a58302",
+    "scripts/early_quote_surface_pathrisk_calibration.py": "0663a4b8bf210c4cae55d5a98d35d4e66f7d9f340ae900a59db7dd5ac8d7fa97",
+    "src/solana_alpha_lab/factory/observation_primitives.py": "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82",
+    "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "7ae570ff207d3757f8623992aee7e6821dce988b76c6ba68d88419a05af847b7",
+    "src/solana_alpha_lab/factory/pathrisk_live.py": "17925bae067363ce5e01ab4421dffd7a6a61d3f7d4672ec9bf2fae1ee27e70b6",
+    "tests/test_pathrisk_recent_http_class.py": "b8b42340f5b4dfe135ed31c275f078bf8b9c4c743d289f757fbc793fbfbf6871"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/pathrisk_live_recent_http_class/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "cecdff13bfd6851041f79624404512e6f953c2073fa661338f0b7125ffd018a2",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PATHRISK_RECENT_HTTP_CLASS_SUITE",
     "independent_review": {
       "path": "docs/evidence/pathrisk_live_recent_http_class/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "5a4a46cdc91bba7c4d1569ce6ec8c64675543ce88ab6db916dcd0164c67fc548",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
