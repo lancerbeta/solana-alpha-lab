@@ -274,10 +274,7 @@ class PathRiskWallclockLiveTests(unittest.TestCase):
             return _Response()
 
         opener = JupiterReadonlyOpener("TEST_KEY_NOT_A_SECRET")
-        with patch(
-            "solana_alpha_lab.factory.observation_schedule_runtime.urllib.request.urlopen",
-            side_effect=_open,
-        ):
+        with patch.object(opener._http, "open", side_effect=_open):
             opener.open("https://api.jup.ag/swap/v2/order?inputMint=x")
         self.assertEqual(captured["method"], "GET")
         self.assertNotIn("TEST_KEY_NOT_A_SECRET", str(captured["url"]))

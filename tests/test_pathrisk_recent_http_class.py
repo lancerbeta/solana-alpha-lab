@@ -329,21 +329,17 @@ class PathRiskRecentHttpClassTests(unittest.TestCase):
 
     def test_opener_httperror_keeps_status_without_body(self) -> None:
         error = HTTPError(RECENT, 401, "unauthorized", hdrs={}, fp=None)
-        with patch(
-            "solana_alpha_lab.factory.observation_schedule_runtime.urllib.request.urlopen",
-            side_effect=error,
-        ):
-            result = JupiterReadonlyOpener("TEST_KEY_NOT_A_SECRET").open(RECENT)
+        opener = JupiterReadonlyOpener("TEST_KEY_NOT_A_SECRET")
+        with patch.object(opener._http, "open", side_effect=error):
+            result = opener.open(RECENT)
         self.assertEqual(result["http_status"], 401)
         self.assertIsNone(result["body"])
 
     def test_opener_urlerror_is_oserror(self) -> None:
-        with patch(
-            "solana_alpha_lab.factory.observation_schedule_runtime.urllib.request.urlopen",
-            side_effect=URLError("dns"),
-        ):
+        opener = JupiterReadonlyOpener("TEST_KEY_NOT_A_SECRET")
+        with patch.object(opener._http, "open", side_effect=URLError("dns")):
             with self.assertRaises(OSError):
-                JupiterReadonlyOpener("TEST_KEY_NOT_A_SECRET").open(RECENT)
+                opener.open(RECENT)
 
     def test_historical_payload_stays_unknown(self) -> None:
         payload = {
@@ -357,11 +353,13 @@ class PathRiskRecentHttpClassTests(unittest.TestCase):
         self.assertIsNone(r0_recent_operational_terminal(payload))
 
     def test_urlerror_timeout_is_timeout_class(self) -> None:
-        with patch(
-            "solana_alpha_lab.factory.observation_schedule_runtime.urllib.request.urlopen",
+        opener = JupiterReadonlyOpener("TEST_KEY_NOT_A_SECRET")
+        with patch.object(
+            opener._http,
+            "open",
             side_effect=URLError(TimeoutError("timed out")),
         ):
-            result = _primitive(JupiterReadonlyOpener("TEST_KEY_NOT_A_SECRET"))
+            result = _primitive(opener)
         self.assertEqual(result["http_class"], HTTP_CLASS_TIMEOUT)
         self.assertIsNone(result["http_status"])
 

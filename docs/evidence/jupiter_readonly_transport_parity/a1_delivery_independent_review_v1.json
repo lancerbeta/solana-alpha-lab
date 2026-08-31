@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "JUPITER-READONLY-TRANSPORT-PARITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-31",
+  "task_id": "JUPITER_READONLY_TRANSPORT_PARITY_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0",
+  "reviewed_inventory_sha256": "0",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_REQUEST_PROFILE_PARITY",
+        "CHECKED_NO_REDIRECT_OPENER",
+        "CHECKED_NO_QUALIFICATION_PRIVATE_IMPORT",
+        "CHECKED_PR226_HTTP_DIAGNOSTICS",
+        "CHECKED_COMPLETED_REUSE_UNTOUCHED",
+        "CHECKED_ZERO_PROVIDER_ZERO_CREDENTIAL",
+        "CHECKED_PERFORM_CREDENTIALED_GET_REQUEST_ORACLE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_PREVIOUS_FAIL_REQUEST_HEADER_PARITY_UNORACLED_VS_PERFORM_CREDENTIALED_GET",
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_EVIDENCE_BUDGET"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLOSED_TESTS_PASS_WHILE_PROFILE_DIVERGES",
+        "PROFILE_PARITY_LOCKED",
+        "NO_NEW_HTTP_FRAMEWORK",
+        "NO_QUALIFICATION_PRIVATE_IMPORT",
+        "HTTPERROR_BODY_STILL_DROPPED",
+        "NO_RETRY",
+        "NO_FALLBACK",
+        "PATHRISK_SCIENCE_UNTOUCHED",
+        "ACT_PATHRISK_LIVE_001_ABSENT"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_LIVE_CALIBRATION",
+    "NO_ALPHA",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "USER_AGENT_ALONE_NOT_PROVEN_CAUSAL"
+  ]
+}
