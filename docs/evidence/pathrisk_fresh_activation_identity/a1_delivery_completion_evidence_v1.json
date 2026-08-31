@@ -10,7 +10,21 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "77ada5e66aa075c8d50fce1e1d6eac798e9597a5c0d2020029b95fe5cd16a140",
+    "catalog/assets/lifecycle.yaml": "26380c4dd10814496b9feba7a40c4bb3f238b7aa0e3712a408b564a0c6dcccfd",
+    "catalog/catalog_manifest.yaml": "3a978cd2e843c3db5f5ac6532e5e056294dfa799e7eb844065a733bb8b24fc95",
+    "catalog/generated/asset_edges.json": "c414a45659ea643ede41bb424a234c6937b7eddfcba0bde0818be0c19c88232c",
+    "configs/early_quote_surface_pathrisk_calibration_v1.yaml": "61fdffb2f78b75c6937464f674bef91000e3da089303b70513e2515dcb51f6d2",
+    "docs/PROJECT_MAP.md": "54b06693350036e55a761ab6be984fc8cd7499d31cd0085084ab932c78061a30",
+    "docs/reports/pathrisk_fresh_activation_identity/a1_owner_readout_v1.md": "7d991d06b8addb701ace7f314b46968dd60f96e6a27f6de34cff9fb20cabeb29",
+    "docs/tasks/PATHRISK_FRESH_ACTIVATION_IDENTITY_V1.md": "c6f288fde0154a9c22844b315621c5bbda09ce9bf8936412151eda5a0ad1bf97",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "82486796404050e17cdf01a44b946f7bb886441b69dad982d0795750ab0ad1ca",
+    "src/solana_alpha_lab/factory/pathrisk_live.py": "5b9acc02932678fbd2a44386bcb150ff88715aaf42c8142e52c18bc2c644251e",
+    "tests/test_pathrisk_fresh_activation_identity.py": "d30567681e1a3fdb318ebcf0065290acb3a9e846ada5370e7d782d1fcfaf0269",
+    "tests/test_pathrisk_live_window.py": "051d04e220cdea529c1b9425506542227ad76afa1b408c7d23a51be2ea9dcd9a",
+    "tests/test_pathrisk_wallclock_live.py": "2ff3368bb3080ca6534703ef75da7609982334580495ebe35d01fbebe5bf143f"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/pathrisk_fresh_activation_identity/a1_delivery_factory_fit_v1.json",
-    "sha256": "pending",
+    "sha256": "6ffdf0306ba35f6868bebb1b6188fb3da647c0b6317ffbc3729e5808a3a39d41",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PATHRISK_FRESH_ACTIVATION_IDENTITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/pathrisk_fresh_activation_identity/a1_delivery_independent_review_v1.json",
-      "sha256": "pending",
+      "sha256": "40d9ad5bdd5a29531b2cef4f047b46ec0e3857aff94707f1787fa19b0a03374c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

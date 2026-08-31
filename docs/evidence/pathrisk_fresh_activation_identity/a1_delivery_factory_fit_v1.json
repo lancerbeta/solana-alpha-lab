@@ -6,8 +6,8 @@
   "task_id": "PATHRISK_FRESH_ACTIVATION_IDENTITY_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "pending",
-  "reviewed_inventory_sha256": "pending",
+  "reviewed_bindings_sha256": "4a879e26470e65b9cc889ad8d7fbf09f80de52e3d1ecfc3c38013a21404a1e95",
+  "reviewed_inventory_sha256": "1cada224bbdc0ae30d59489979910bdf00ebd3d76e9e87fb2ebefbd7530682b1",
   "capability_radar": {
     "now": "NONE",
     "watch": "PATHRISK_LIVE_AFTER_FRESH_ACTIVATION_IDENTITY"
