@@ -4,8 +4,8 @@
   "review_id": "CI-SHARD-REBALANCE-AND-ANTI-DRIFT-FACTORY-FIT-001",
   "as_of": "2026-09-01",
   "task_id": "CI_SHARD_REBALANCE_AND_ANTI_DRIFT_V1",
-  "reviewed_bindings_sha256": "10045c78a2f9187c59558c8f73eca1244236cc6b5a36e750c5c6f23be5f69531",
-  "reviewed_inventory_sha256": "f10790cc49e471ef47040c73a5013e1ce8bd0fae64c80ff3f3790d55132f79c9",
+  "reviewed_bindings_sha256": "0826d63b914a5dbd90d3902a8104397f65f5416dcfe7dfcd33335365df65c33e",
+  "reviewed_inventory_sha256": "bfbeef1816c9e1716ec4cf51d8119cab2bf4645c36d70c046cc12c116f695184",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
