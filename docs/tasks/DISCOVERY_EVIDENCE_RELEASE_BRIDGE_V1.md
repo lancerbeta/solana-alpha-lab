@@ -26,8 +26,12 @@ managed_write_set:
 - src/solana_alpha_lab/factory/hfic_preflight.py
 - configs/observation_primitive_registry_v1.yaml
 - scripts/discovery_evidence_release.py
+- scripts/owner_attention_gate.py
+- scripts/harness_sync.py
 - tests/test_tokens_v2_typed_projection.py
 - tests/test_discovery_evidence_release_bridge.py
+- tests/test_delivery_harness_merge_guard.py
+- tests/test_harness_sync_bindings.py
 - docs/evidence/discovery_evidence_release_bridge/a1_delivery_completion_evidence_v1.json
 - docs/evidence/discovery_evidence_release_bridge/a1_delivery_independent_review_v1.json
 - docs/evidence/discovery_evidence_release_bridge/a1_delivery_factory_fit_v1.json
@@ -38,6 +42,7 @@ managed_write_set:
 - catalog/generated/asset_edges.json
 - docs/PROJECT_MAP.md
 - docs/OPERATOR_NAVIGATION.md
+- .agents/skills/delivery-harness/SKILL.md
 external_caps:
   network: false
   credentials: false

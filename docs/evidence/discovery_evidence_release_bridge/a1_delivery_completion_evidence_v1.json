@@ -18,7 +18,7 @@
     "configs/observation_primitive_registry_v1.yaml": "1817b4fae2e4466d32de28821f62085f73f71a26e1b180c467a19a3e0e824b64",
     "docs/PROJECT_MAP.md": "9687e976126c3aa8cd58236e233c2836c28bcfde326790f6e4fb6fde00e69a3c",
     "docs/reports/discovery_evidence_release_bridge/a1_owner_readout_v1.md": "0f587f51199e84b3634f768608190f9f8e5b31e3a9b02eeaa9e689653709f32f",
-    "docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md": "03993e69834aa7e6a1de68d3a73b5bfd6eb3f39c033eb044ed9e31618e53f954",
+    "docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md": "16e57d4a1c77370c2a6b79a2e150708bfbf97a6082441078c5fcd679a8107d4c",
     "scripts/discovery_evidence_release.py": "701a063d525c004d7248fe1abe1eaae967bc7a0d5a570064adf2d9378209eafb",
     "src/solana_alpha_lab/factory/discovery_evidence_release.py": "c11128e4a1670631b70ce1ff5a07ee5d6edc1a17881050c047c295dcd14f5a04",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "d246362a1842a3e4d4ac074875f70dc1763c9e5ea503964b00e0a2d2ff2ee952",
@@ -28,11 +28,6 @@
     "tests/test_discovery_evidence_release_bridge.py": "75fab71cf4fc7120c01376372a80e135054db589ca3334e5882b212cf3339eda",
     "tests/test_tokens_v2_typed_projection.py": "6e5c5bb24194de57b5fab017e8249428a4eef280c3204317ebb75712d9ade692"
   },
-  "false_roadmap_assumptions": [
-    "Design-time main SHA 4cf01ec was superseded; freeze base is 2597104 after PR #230",
-    "Git DISCOVERY_SEARCH_R0 fixture is thin (no holderCount/organic/multi-window trader stats); VAL_R0 literal absent",
-    "Roadmap 'rich unused provider fields' does not hold for the Git-bound fixture; missing fields are MISSING_TYPED/EXCLUDED"
-  ],
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -43,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_factory_fit_v1.json",
-    "sha256": "baade619d128f9d11376122d1a52d3a4e09f4e0279b799bf10c2ea50ed31c7c3",
+    "sha256": "da7f9a8394794ccfd0f82122212f229e409583e5f3f36597140fcf88f3c23f94",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DISCOVERY_EVIDENCE_RELEASE_BRIDGE_AND_SCHEDULER_REGRESSION",
     "independent_review": {
       "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_independent_review_v1.json",
-      "sha256": "7fe7b9168a8ceef266d51db5c01740a238d99848b52dcc7611bba21eb3ba7f57",
+      "sha256": "a1e07b8237412cf4aadb124e23e45af673ac590b2ace2f296fa8c8c4f81d6f75",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

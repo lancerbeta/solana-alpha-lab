@@ -16308,7 +16308,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: 6263154180508da9d3777d594586405ea787b4577a42839db8e2cdcdbf1bb3e8}
+  integrity: {kind: sha256, sha256: e8d7d23150d52662b821773d75e54e307bf401444773e35c8af9ab3fedc726da}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19875,7 +19875,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: 28a457198c116acf92ae5295899f9446b9011bd4f1e51e1392a5c5c004296f36}
+  integrity: {kind: sha256, sha256: cbc5f269a566699469b6f36c475e29a3f3471e9a5fa7549527daac026a2b1d74}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -32783,7 +32783,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md', repository_path: docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md}
-  integrity: {kind: sha256, sha256: 03993e69834aa7e6a1de68d3a73b5bfd6eb3f39c033eb044ed9e31618e53f954}
+  integrity: {kind: sha256, sha256: 16e57d4a1c77370c2a6b79a2e150708bfbf97a6082441078c5fcd679a8107d4c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
