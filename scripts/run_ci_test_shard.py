@@ -21,8 +21,35 @@ import ci_test_partition as partition  # noqa: E402
 import profile_test_wall_clock as profiler  # noqa: E402
 
 
+STALE_UNPLANNED_COUNT = 8
+STALE_UNPLANNED_FRACTION = 0.05
+STALE_PROFILE_WARNING = "CI_SHARD_PROFILE_STALE_REBALANCE_RECOMMENDED"
+
+
 class ShardError(ValueError):
     """Fail-closed shard runner error."""
+
+
+def stale_profile_warning(
+    current_modules: list[str],
+    plan: dict,
+) -> str | None:
+    """Return an informational stale-plan hint, or None.
+
+    Never changes coverage, assignment, or process exit semantics.
+    """
+    planned = {
+        partition.posix(path)
+        for shard in plan.get("shards") or []
+        for path in shard
+    }
+    current = [partition.posix(path) for path in current_modules]
+    unplanned_count = sum(1 for path in current if path not in planned)
+    total = len(current)
+    fraction = (unplanned_count / total) if total else 0.0
+    if unplanned_count >= STALE_UNPLANNED_COUNT or fraction >= STALE_UNPLANNED_FRACTION:
+        return STALE_PROFILE_WARNING
+    return None
 
 
 def load_suite_for_paths(paths: list[str], *, root: Path = ROOT) -> unittest.TestSuite:
@@ -109,6 +136,10 @@ def run_shard(
             "SHARD_CASE_COUNT_MISMATCH:"
             f"loaded_union={loaded_union_count}:discover={canonical_count}"
         )
+    if index == 0:
+        warning = stale_profile_warning(current, plan)
+        if warning is not None:
+            print(warning)
     suite = load_suite_for_paths(selected, root=root)
     case_count = profiler.count_cases(suite)
     if case_count < 1:
