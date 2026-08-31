@@ -1048,6 +1048,7 @@ def rebuild_observation_panel_from_rdp(
             if not path.is_file():
                 continue
             rows = pq.read_table(path).to_pylist()
+            matching_rows = False
             if str(partition.get("partition_id") or "").endswith("-members"):
                 for row in rows:
                     if row.get("schedule_sha256") != schedule_sha256:
@@ -1060,6 +1061,7 @@ def rebuild_observation_panel_from_rdp(
                     current = rebuilt_members.get(key)
                     if current is None or candidate[:2] >= current[:2]:
                         rebuilt_members[key] = candidate
+                    matching_rows = True
             else:
                 for row in rows:
                     if row.get("schedule_sha256") != schedule_sha256:
@@ -1087,7 +1089,9 @@ def rebuild_observation_panel_from_rdp(
                     current = rebuilt_observations.get(key)
                     if current is None or candidate[:2] >= current[:2]:
                         rebuilt_observations[key] = candidate
-            found = True
+                    matching_rows = True
+            if matching_rows:
+                found = True
         if found:
             manifest_ids.append(manifest_id)
     return {

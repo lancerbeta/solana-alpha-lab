@@ -33263,7 +33263,7 @@ records:
   as_of: '2026-08-30'
   truth_owner: EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://configs/early_quote_surface_pathrisk_calibration_v1.yaml', repository_path: configs/early_quote_surface_pathrisk_calibration_v1.yaml}
-  integrity: {kind: sha256, sha256: 96cdba8e9e1e218d77b0ec0f7ab34a09469e197304e788994063168e7553ac51}
+  integrity: {kind: sha256, sha256: 61fdffb2f78b75c6937464f674bef91000e3da089303b70513e2515dcb51f6d2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001}
@@ -33401,18 +33401,19 @@ records:
 - asset_id: MODULE-PATHRISK-LIVE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Authority-gated PathRisk live orchestrator with SystemClock production path, R0 HTTP-class operational terminals, and one-GET transport probe.
+  purpose: Authority-gated PathRisk live orchestrator with contract-bound activation identity, SystemClock production path, R0 HTTP-class operational terminals, and one-GET transport probe.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-31'
   truth_owner: PATHRISK_LIVE_WINDOW_EXECUTION_GLUE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/pathrisk_live.py', repository_path: src/solana_alpha_lab/factory/pathrisk_live.py}
-  integrity: {kind: sha256, sha256: 17925bae067363ce5e01ab4421dffd7a6a61d3f7d4672ec9bf2fae1ee27e70b6}
+  integrity: {kind: sha256, sha256: 5b9acc02932678fbd2a44386bcb150ff88715aaf42c8142e52c18bc2c644251e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001}
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001}
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001}
   - {relation_type: depends_on, target_asset_id: MODULE-PATHRISK-CALIBRATION-001}
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULER-001}
   consumers: [FACTORY-001, SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001]
@@ -33428,7 +33429,7 @@ records:
   as_of: '2026-08-31'
   truth_owner: PATHRISK_LIVE_WINDOW_EXECUTION_GLUE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_pathrisk_live_window.py', repository_path: tests/test_pathrisk_live_window.py}
-  integrity: {kind: sha256, sha256: 674562692a5ffa59507a265259322b3c790993d610d644ed849220c5d89f7f85}
+  integrity: {kind: sha256, sha256: 051d04e220cdea529c1b9425506542227ad76afa1b408c7d23a51be2ea9dcd9a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001}
@@ -33485,7 +33486,7 @@ records:
   as_of: '2026-08-31'
   truth_owner: PATHRISK_REAL_WALLCLOCK_LIVE_EXECUTION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_pathrisk_wallclock_live.py', repository_path: tests/test_pathrisk_wallclock_live.py}
-  integrity: {kind: sha256, sha256: f1daf526e73b26df449ae3cadeaa1509320049abbde3da20d609b8e2a5e067fd}
+  integrity: {kind: sha256, sha256: 2ff3368bb3080ca6534703ef75da7609982334580495ebe35d01fbebe5bf143f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001}
@@ -33570,4 +33571,43 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [JUPITER, READONLY, TRANSPORT, PARITY, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for a fresh immutable PathRisk live identity after pre-evidence operational failure of ACT-PATHRISK-LIVE-001; zero provider calls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-31'
+  truth_owner: PATHRISK_FRESH_ACTIVATION_IDENTITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/PATHRISK_FRESH_ACTIVATION_IDENTITY_V1.md', repository_path: docs/tasks/PATHRISK_FRESH_ACTIVATION_IDENTITY_V1.md}
+  integrity: {kind: sha256, sha256: c6f288fde0154a9c22844b315621c5bbda09ce9bf8936412151eda5a0ad1bf97}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-JUPITER-READONLY-TRANSPORT-PARITY-001}
+  - {relation_type: contains, target_asset_id: MODULE-PATHRISK-LIVE-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-PATHRISK-FRESH-ACTIVATION-IDENTITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PATHRISK, ACTIVATION_ID, ACT-PATHRISK-LIVE-002, PRE_EVIDENCE_OPERATIONAL_FAILURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-PATHRISK-FRESH-ACTIVATION-IDENTITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network T1-T24 proofs that ACT-002 is isolated from ACT-001 and the consumed calibration phrase cannot authorize the replacement.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-31'
+  truth_owner: PATHRISK_FRESH_ACTIVATION_IDENTITY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_pathrisk_fresh_activation_identity.py', repository_path: tests/test_pathrisk_fresh_activation_identity.py}
+  integrity: {kind: sha256, sha256: d30567681e1a3fdb318ebcf0065290acb3a9e846ada5370e7d782d1fcfaf0269}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PATHRISK-LIVE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PATHRISK, ACTIVATION_IDENTITY, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

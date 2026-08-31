@@ -3268,6 +3268,31 @@
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
     {
+      "source_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PATHRISK-LIVE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-JUPITER-READONLY-TRANSPORT-PARITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PATHRISK-FRESH-ACTIVATION-IDENTITY-001"
+    },
+    {
       "source_asset_id": "CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001",
       "relation": "contains",
       "target_asset_id": "MODULE-PATHRISK-LIVE-001"
@@ -9705,6 +9730,11 @@
     {
       "source_asset_id": "MODULE-PATHRISK-LIVE-001",
       "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-PATHRISK-LIVE-001",
+      "relation": "governed_by",
       "target_asset_id": "CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001"
     },
     {
@@ -14091,6 +14121,16 @@
       "source_asset_id": "TEST-PATHRISK-CALIBRATION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "TEST-PATHRISK-FRESH-ACTIVATION-IDENTITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PATHRISK-LIVE-001"
+    },
+    {
+      "source_asset_id": "TEST-PATHRISK-FRESH-ACTIVATION-IDENTITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-FRESH-ACTIVATION-IDENTITY-001"
     },
     {
       "source_asset_id": "TEST-PATHRISK-LIVE-WINDOW-001",

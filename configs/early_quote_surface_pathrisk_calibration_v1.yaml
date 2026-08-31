@@ -11,7 +11,7 @@ external_authority:
   build: false
   taker: OMITTED_QUOTE_ONLY
   cash_cap_usd_cents: 0
-  future_owner_phrase: 'OK EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_LIVE_V1: one bounded Jupiter Free-key read-only PathRisk calibration using a local process-environment key only; exactly one Tokens V2 /recent and exactly one bulk /tokens/v2/search R0 snapshot plus quote-only /swap/v2/order; no recurring /recent; x-api-key header only; no .env read; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 26; ICP-EARLY-PUMPFUN-V1; first 4 fresh unconsumed eligible mints or CALIBRATION_ELIGIBLE_BELOW_FLOOR with quote calls 0; notionals 10000000 and 1000000 lamports; T0 BUY + T0 reverse + H900 dependent SELL of the same T0 BUY token amount; one window only; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, Strategy, Shadow, alpha and NetReturn forbidden.'
+  future_owner_phrase: 'OK PATHRISK_FRESH_ACTIVATION_IDENTITY_LIVE_V1: exactly one replacement prospective PathRisk window ACT-PATHRISK-LIVE-002; predecessor ACT-PATHRISK-LIVE-001 remains immutable; replacement_reason PRE_EVIDENCE_OPERATIONAL_FAILURE; not a resume of ACT-PATHRISK-LIVE-001; Jupiter Free-key; JUPITER_API_KEY process env only; exactly one /recent; exactly one bulk /tokens/v2/search; quote-only /swap/v2/order; no recurring /recent; x-api-key header only; no .env / secret leakage; no taker, /build, /execute, wallet, signer, transaction; no paid plan / second provider; no retry / fallback; cash cap $0; call cap 26; ICP-EARLY-PUMPFUN-V1; first 4 fresh unconsumed eligible mints or CALIBRATION_ELIGIBLE_BELOW_FLOOR with quote_calls=0; notionals 10000000 and 1000000 lamports; T0 BUY + T0 reverse + H900 dependent SELL of the same T0 BUY token amount; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, Strategy, Shadow, alpha and NetReturn forbidden inside the live window.'
 transport_probe:
   capture_authorized: false
   max_calls: 1
@@ -69,6 +69,10 @@ live_window:
   per_member_search: false
   one_bulk_search: true
   schedule_fixture: tests/fixtures/observation_schedule/pathrisk_live_window.yaml
+  identity:
+    activation_id: ACT-PATHRISK-LIVE-002
+    predecessor_activation_id: ACT-PATHRISK-LIVE-001
+    replacement_reason: PRE_EVIDENCE_OPERATIONAL_FAILURE
 informative_complete_dual_notional_floor: 3
 forbidden_actions:
   - taker
