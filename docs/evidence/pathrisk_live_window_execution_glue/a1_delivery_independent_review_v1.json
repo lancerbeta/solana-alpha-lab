@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-31",
+  "task_id": "PATHRISK_LIVE_WINDOW_EXECUTION_GLUE_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "8104b00c9e18b26cb5c101bd563fc16e1ef0935f7d5f938e3ec359c13c8f28d5",
+  "reviewed_inventory_sha256": "f29ceedc1271245adb2aeab89caa629cf72f0d076a09adc52aec0f6cc6b24436",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_ONE_RECENT_ONE_SEARCH_NO_X300_SEARCH",
+        "CHECKED_HARD_CAP_26_AND_NO_RETRY_FALLBACK",
+        "CHECKED_CALL_LEDGER_COMPLETED_NO_REPEAT",
+        "CHECKED_NO_SECRET_IN_URL",
+        "FIXED_PACE_WAIT_ON_RESUME_ONESHOT"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "FIXED_T16_LIVE_DEGENERATE_PARTIAL_INVALID_THROUGH_RUN_LIVE_WINDOW",
+        "FIXED_T7_FLOOR_AFTER_EXCLUSION",
+        "FIXED_T13_DURING_T0_RESTART",
+        "CHECKED_NON_CLAIMS_AND_ALPHA_CLAIM_FALSE",
+        "CHECKED_INFORMATIVE_IS_NOT_ALPHA"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLOSED_TWO_R0_SNAPSHOTS",
+        "CLOSED_CONSUMED_MINT_IN_FOUR",
+        "CLOSED_RECURRING_RECENT_OR_DUP_SEARCH",
+        "CLOSED_RESTART_DUPLICATE_REQUESTS",
+        "CLOSED_MINT_ORDER_NOT_ASC",
+        "CLOSED_BELOW_FLOOR_QUOTES",
+        "CLOSED_INFORMATIVE_AS_ALPHA",
+        "FIXED_Q8_LABELS_ON_ALL_PUBLISHED_PANELS_PLUS_READOUT_JSON",
+        "CHECKED_SMALLEST_GLUE_NOT_NEW_SCHEDULER",
+        "CHECKED_NO_NEW_PROVIDER_OR_ENDPOINT"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_LIVE_CALIBRATION",
+    "NO_ALPHA",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK"
+  ]
+}

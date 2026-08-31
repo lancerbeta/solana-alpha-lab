@@ -10,9 +10,14 @@ external_authority:
   build: false
   taker: OMITTED_QUOTE_ONLY
   cash_cap_usd_cents: 0
-  future_owner_phrase: 'OK EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_LIVE_V1: one bounded Jupiter Free-key read-only PathRisk calibration using a local process-environment key only; Tokens V2 /recent plus one bulk /tokens/v2/search R0 snapshot plus quote-only /swap/v2/order; x-api-key header only; no .env read; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; ICP-EARLY-PUMPFUN-V1; first 4 fresh eligible mints or CALIBRATION_ELIGIBLE_BELOW_FLOOR with quote calls 0; notionals 10000000 and 1000000 lamports; T0 BUY + T0 reverse + H900 dependent SELL of the same T0 BUY token amount; one window only; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, Strategy, Shadow, alpha and NetReturn forbidden.'
+  future_owner_phrase: 'OK EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_LIVE_V1: one bounded Jupiter Free-key read-only PathRisk calibration using a local process-environment key only; exactly one Tokens V2 /recent and exactly one bulk /tokens/v2/search R0 snapshot plus quote-only /swap/v2/order; no recurring /recent; x-api-key header only; no .env read; no key in URL/log/receipt/Git; no taker, /build, /execute, wallet, signer, transaction, paid plan, second provider, retry or fallback; cash cap $0; call cap 26; ICP-EARLY-PUMPFUN-V1; first 4 fresh unconsumed eligible mints or CALIBRATION_ELIGIBLE_BELOW_FLOOR with quote calls 0; notionals 10000000 and 1000000 lamports; T0 BUY + T0 reverse + H900 dependent SELL of the same T0 BUY token amount; one window only; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, Strategy, Shadow, alpha and NetReturn forbidden.'
 registry: configs/provider_route_capability_registry_v10.yaml
 routes:
+  recent:
+    route_id: JUPITER-SOLANA-TOKENS-V2-RECENT-FREE-API-KEY-001
+    endpoint: https://api.jup.ag/tokens/v2/recent
+    host: api.jup.ag
+    method: GET
   search:
     route_id: JUPITER-SOLANA-TOKENS-V2-SEARCH-FREE-API-KEY-001
     endpoint: https://api.jup.ag/tokens/v2/search
@@ -40,11 +45,13 @@ horizons:
   t0_offset_seconds: 300
   h900_offset_seconds: 900
 runtime_limits:
-  max_calls: 25
+  max_calls: 26
   min_interval_seconds: 3
   timeout_seconds: 20.0
   retry: false
   fallback: false
+consumed_mint_receipts:
+  - docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_runtime_receipt_v1.json
 raw_retention:
   zone: DATA_ROOT_ONLY
   class: RAW_BOUNDED
@@ -53,8 +60,10 @@ raw_retention:
 live_window:
   inject_r0_discovery: true
   enable_source_poll: false
+  one_recent: true
   per_member_search: false
   one_bulk_search: true
+  schedule_fixture: tests/fixtures/observation_schedule/pathrisk_live_window.yaml
 informative_complete_dual_notional_floor: 3
 forbidden_actions:
   - taker
@@ -74,4 +83,4 @@ forbidden_actions:
   - shadow
   - realized_vwap
   - netreturn
-schedule_fixture: tests/fixtures/observation_schedule/pathrisk_calibration.yaml
+schedule_fixture: tests/fixtures/observation_schedule/pathrisk_live_window.yaml

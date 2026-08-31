@@ -2485,6 +2485,11 @@
     {
       "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
       "relation": "contains",
+      "target_asset_id": "MODULE-PATHRISK-LIVE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "contains",
       "target_asset_id": "MODULE-QUOTE-SURFACE-PROJECTION-001"
     },
     {
@@ -2516,6 +2521,11 @@
       "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PATHRISK-LIVE-WINDOW-001"
     },
     {
       "source_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001",
@@ -3231,6 +3241,21 @@
       "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PATHRISK-LIVE-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-PATHRISK-LIVE-WINDOW-001"
     },
     {
       "source_asset_id": "CTRL-PMF-QUOTE-ATTEMPT-PREP-001",
@@ -8293,6 +8318,11 @@
       "target_asset_id": "CONFIG-OWNER-AUTHORITY-PACKET-001"
     },
     {
+      "source_asset_id": "FIXTURE-PATHRISK-LIVE-WINDOW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001"
+    },
+    {
       "source_asset_id": "FIXTURE-T04-PIT-001",
       "relation": "derived_from",
       "target_asset_id": "PROTOTYPE-T04-CORE-NATIVE-STACK-001"
@@ -9576,6 +9606,21 @@
       "source_asset_id": "MODULE-PATHRISK-CALIBRATION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-PATHRISK-LIVE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULER-001"
+    },
+    {
+      "source_asset_id": "MODULE-PATHRISK-LIVE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-PATHRISK-LIVE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001"
     },
     {
       "source_asset_id": "MODULE-PMF-QUOTE-ATTEMPT-PREP-001",
@@ -13931,6 +13976,16 @@
       "source_asset_id": "TEST-PATHRISK-CALIBRATION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "TEST-PATHRISK-LIVE-WINDOW-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PATHRISK-LIVE-001"
+    },
+    {
+      "source_asset_id": "TEST-PATHRISK-LIVE-WINDOW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001"
     },
     {
       "source_asset_id": "TEST-PMF-QUOTE-ATTEMPT-PREP-001",

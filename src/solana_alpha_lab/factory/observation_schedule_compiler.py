@@ -115,6 +115,9 @@ def _compute_budget(
         admission_days = (last_slot.date() - first_slot.date()).days + 1
     else:
         admission_days = 0
+    poll_enabled = bool(schedule.get("source_poll", {}).get("enabled", True))
+    if not poll_enabled:
+        discovery_slots = 0
     discovery_calls = discovery_slots * int(discovery["call_cost"]["calls_per_request"])
     max_slots_per_utc_day = min(
         discovery_slots,

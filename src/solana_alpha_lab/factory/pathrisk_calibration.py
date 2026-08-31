@@ -126,11 +126,15 @@ def select_r0_sample(
     *,
     policy: Mapping[str, Any],
     as_of: datetime | None = None,
+    excluded_mints: set[str] | None = None,
 ) -> dict[str, Any]:
+    excluded = excluded_mints or set()
     eligible = [
         str(row.get("id") or row.get("mint"))
         for row in rows
-        if isinstance(row, Mapping) and population_eligible(row, policy=policy, as_of=as_of)
+        if isinstance(row, Mapping)
+        and population_eligible(row, policy=policy, as_of=as_of)
+        and str(row.get("id") or row.get("mint") or "") not in excluded
     ]
     ordered = sorted({mint for mint in eligible if mint})
     floor = int(policy["sample"]["floor"])
