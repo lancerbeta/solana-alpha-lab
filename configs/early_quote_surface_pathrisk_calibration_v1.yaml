@@ -3,6 +3,7 @@ schema_version: '1.0'
 atom_id: EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1
 as_of: '2026-08-30'
 external_authority:
+  credential_name: JUPITER_API_KEY
   capture_authorized: false
   credential_reads: false
   dotenv_reads: false

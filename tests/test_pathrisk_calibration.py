@@ -638,6 +638,7 @@ class PathRiskCalibrationTests(unittest.TestCase):
         self.assertEqual(packet["notionals_lamports"], [NOTIONAL_1M, NOTIONAL_10M])
         self.assertIn("taker", packet["forbidden_actions"])
         self.assertEqual(packet["max_calls"], 26)
+        self.assertEqual(packet["credential_env_name"], "JUPITER_API_KEY")
         self.assertEqual(packet["live_window"]["one_recent"], True)
         self.assertEqual(packet["live_window"]["enable_source_poll"], False)
         with self.assertRaisesRegex(PathRiskCalibrationError, "MAIN_SHA_NOT_EXACT_40_HEX"):

@@ -32,6 +32,7 @@ from solana_alpha_lab.factory.pathrisk_calibration import (
 from solana_alpha_lab.factory.pathrisk_live import (
     CALL_CAP,
     FORBIDDEN_SEARCH_BUNDLE,
+    ControllableClock,
     FixtureWindowOpener,
     HardCapOpener,
     compile_live_schedule,
@@ -82,10 +83,11 @@ def _run(*, data_root: Path, opener, stop_after: str | None = None, policy=None)
         producer_git_sha=GIT_SHA,
         owner_phrase=_phrase(),
         main_sha=MAIN_SHA,
-        now=T0,
+        clock=ControllableClock(T0),
         stop_after=stop_after,
         store_path=data_root / "observation_schedule_state.sqlite",
         policy=policy,
+        production=False,
     )
 
 
@@ -390,6 +392,8 @@ class PathRiskLiveWindowTests(unittest.TestCase):
                     GIT_SHA,
                     "--fake-provider-fixture",
                     str(fixture_path),
+                    "--now",
+                    "2026-09-01T00:10:00Z",
                 ],
                 capture_output=True,
                 text=True,
