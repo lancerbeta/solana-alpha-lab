@@ -27,10 +27,22 @@ SAFE_CONFIG_PREFIXES = (
 )
 UNIT_RELATIVE = "configs/factory_remote_ops/factory-observation-schedule.service"
 ALLOWED_CREDENTIAL_ENV = frozenset({"JUPITER_FREE_API_KEY"})
+PROVEN_READONLY_USER_AGENT = (
+    "solana-alpha-lab/quote-native-evidence-qualification-v1"
+)
 
 
 class ObservationRuntimeError(ValueError):
     """Typed runtime-config failure."""
+
+
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(
+        self,
+        *_args: object,
+        **_kwargs: object,
+    ) -> urllib.request.Request | None:
+        return None
 
 
 def _safe_relative(root: Path, relative: str) -> Path:
@@ -164,15 +176,20 @@ class JupiterReadonlyOpener:
             raise ObservationRuntimeError("CREDENTIAL_ENV_MISSING")
         self._api_key = api_key
         self._timeout_seconds = timeout_seconds
+        self._http = urllib.request.build_opener(_NoRedirectHandler())
 
     def open(self, url: str) -> dict[str, Any]:
         request = urllib.request.Request(
             url,
             method="GET",
-            headers={"x-api-key": self._api_key, "Accept": "application/json"},
+            headers={
+                "Accept": "application/json",
+                "User-Agent": PROVEN_READONLY_USER_AGENT,
+                "x-api-key": self._api_key,
+            },
         )
         try:
-            with urllib.request.urlopen(request, timeout=self._timeout_seconds) as response:
+            with self._http.open(request, timeout=self._timeout_seconds) as response:
                 body_bytes = response.read()
                 body = json.loads(body_bytes.decode("utf-8"))
                 return {
@@ -242,6 +259,7 @@ __all__ = [
     "DEFAULT_RUNTIME_RELATIVE",
     "FakeProviderOpener",
     "JupiterReadonlyOpener",
+    "PROVEN_READONLY_USER_AGENT",
     "ObservationRuntimeError",
     "UNIT_RELATIVE",
     "build_opener",

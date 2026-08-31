@@ -201,11 +201,9 @@ class ObservationPrimitiveTests(unittest.TestCase):
         response.read.return_value = b'[{"id":"MintA"}]'
         response.__enter__.return_value = response
         response.__exit__.return_value = None
-        with patch(
-            "solana_alpha_lab.factory.observation_schedule_runtime.urllib.request.urlopen",
-            return_value=response,
-        ) as opener:
-            result = JupiterReadonlyOpener("secret-key-value").open(
+        transport = JupiterReadonlyOpener("secret-key-value")
+        with patch.object(transport._http, "open", return_value=response) as opener:
+            result = transport.open(
                 "https://api.jup.ag/tokens/v2/search?query=MintA"
             )
         request = opener.call_args.args[0]
