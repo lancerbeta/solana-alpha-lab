@@ -32783,7 +32783,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md', repository_path: docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md}
-  integrity: {kind: sha256, sha256: 16e57d4a1c77370c2a6b79a2e150708bfbf97a6082441078c5fcd679a8107d4c}
+  integrity: {kind: sha256, sha256: 0dad6888ca93ffa6e0f92a992a1be4556e41ef7a0ff2ada4f307f1f79784d679}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

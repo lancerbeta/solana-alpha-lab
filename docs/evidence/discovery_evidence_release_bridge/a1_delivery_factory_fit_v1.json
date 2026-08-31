@@ -4,7 +4,7 @@
   "review_id": "DISCOVERY-EVIDENCE-RELEASE-BRIDGE-FACTORY-FIT-001",
   "as_of": "2026-09-01",
   "task_id": "DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1",
-  "reviewed_bindings_sha256": "b039e801d1cf9558cdd38decf0379deaef82502d75c80057c534e682d93c3bad",
+  "reviewed_bindings_sha256": "45ed020b070bcb2c2b523983a53d8935cdb230590866c7b2a32ca8fb11099952",
   "reviewed_inventory_sha256": "c06aa992a10b0b6219ccf93840caa3217c2c997edbbf96c1816efda58cfdb531",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",

@@ -12,14 +12,14 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/delivery-harness/SKILL.md": "cbc5f269a566699469b6f36c475e29a3f3471e9a5fa7549527daac026a2b1d74",
-    "catalog/assets/core.yaml": "8b3aaed52a60aa8aefcd20f6fee3e90533dd9f68cc7928e0934a301af33e4fa9",
+    "catalog/assets/core.yaml": "5e1dbc17a92a32117463e7e86745492a6781cdd2c4e0531f84a6e1698553264f",
     "catalog/assets/lifecycle.yaml": "d169fa8fd77d4969148a702a92f8323cc952499d19665fafc5873ea0a037ffb0",
     "catalog/catalog_manifest.yaml": "0ad2e8e1e1e4760c512f5a4fb5a99c6f10fe5ad06af9430d25eb4f5bce205266",
     "catalog/generated/asset_edges.json": "9a330d1376edb1a7c00ea549c43b2ee3eb49d447125d3bdec624c595d7fe8458",
     "configs/observation_primitive_registry_v1.yaml": "1817b4fae2e4466d32de28821f62085f73f71a26e1b180c467a19a3e0e824b64",
     "docs/PROJECT_MAP.md": "9687e976126c3aa8cd58236e233c2836c28bcfde326790f6e4fb6fde00e69a3c",
     "docs/reports/discovery_evidence_release_bridge/a1_owner_readout_v1.md": "0f587f51199e84b3634f768608190f9f8e5b31e3a9b02eeaa9e689653709f32f",
-    "docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md": "16e57d4a1c77370c2a6b79a2e150708bfbf97a6082441078c5fcd679a8107d4c",
+    "docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md": "0dad6888ca93ffa6e0f92a992a1be4556e41ef7a0ff2ada4f307f1f79784d679",
     "scripts/discovery_evidence_release.py": "701a063d525c004d7248fe1abe1eaae967bc7a0d5a570064adf2d9378209eafb",
     "scripts/harness_sync.py": "7772dc526871752ff3e559b64c184ca65fe8f9c1784f5edc7414380c8e974fcd",
     "scripts/owner_attention_gate.py": "e8d7d23150d52662b821773d75e54e307bf401444773e35c8af9ab3fedc726da",
@@ -43,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_factory_fit_v1.json",
-    "sha256": "fc3ce257e4e9536c21e95b44429a108077c0fc816fed6faefafd93af2af95f3e",
+    "sha256": "ccb502168515115e69e85bb97281a78d24591e1b5ce0ff84077cb639a78e1689",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DISCOVERY_EVIDENCE_RELEASE_BRIDGE_AND_SCHEDULER_REGRESSION",
     "independent_review": {
       "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_independent_review_v1.json",
-      "sha256": "5b8f6d26dbdfee088eddd66c6353f5cfbc23ad81f35869f56a1cc7a99132875a",
+      "sha256": "8a73bef0de7298aaabf67069aa14d333ffbbfac2805e2600e2c9f9bae578c072",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
