@@ -4,8 +4,8 @@
   "review_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-FACTORY-FIT-001",
   "as_of": "2026-08-31",
   "task_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-V1",
-  "reviewed_bindings_sha256": "df978fe1e5b634db1bd570f7358edb0b9f9b06aae2f185ed1a99985058a3ea8f",
-  "reviewed_inventory_sha256": "07b2f234781d1db45245b1f4281734000774bff85a0bbdae7cf6c7262664ea95",
+  "reviewed_bindings_sha256": "cf6d5ea62c400cda67471acb088d4952e757a0ce869b72e1e5963ea1d7093004",
+  "reviewed_inventory_sha256": "612c3c61ff5885844f0e43108dd2da839940bbf9abec0537e4de665259e731cb",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
