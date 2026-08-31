@@ -10,7 +10,25 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "d03a9d61199239cf0f3af6fad7a4e57178f3aa1bb72da19091db5dfee521b115",
+    "catalog/assets/lifecycle.yaml": "90b2c6972cee69c649560288e9b0b553213236033ff77ef129c9e16891053bec",
+    "catalog/catalog_manifest.yaml": "131da949bba77caa3cbf1cb7f3f6aff7d6f9b641620c2608fc1d55a670d97ca2",
+    "catalog/generated/asset_edges.json": "bc3c02c404d2294805ad3c1752b8404664b4419f7c504c6f6f9130c7bf31e221",
+    "configs/early_quote_surface_pathrisk_calibration_v1.yaml": "6fd54b56b1cd8004c013b43ff7e0e74ac79985ae87ecace5a9f990208ed7750f",
+    "docs/PROJECT_MAP.md": "257ae06c43041abd0f1e8fe47e49be58a157489dbb2b51f98fa6a5cdb0803105",
+    "docs/reports/pathrisk_successor_window_identity/a1_owner_readout_v1.md": "a6f9beaf84b1500056bf3087498adc8635a6514069737fa87a5eda94a47f390d",
+    "docs/tasks/PATHRISK_SUCCESSOR_WINDOW_IDENTITY_V1.md": "74f79864634b4b5af1beb07da5297b77ffb2247102d81451a3311d6478116442",
+    "scripts/early_quote_surface_pathrisk_calibration.py": "d40305af7bf35c77879d1d11cc760da9ed8b25831be0c588bc8942dcf0adc672",
+    "src/solana_alpha_lab/factory/pathrisk_calibration.py": "1dcf227f8cfc4922d8284217dae658eb391d951e41722f04139fc72ab09c74a1",
+    "src/solana_alpha_lab/factory/pathrisk_live.py": "f3fa5fd33e07f4fbe11173aa21d85f422e1ef60527984a7b8afbda4a88e12115",
+    "tests/pathrisk_live_testkit.py": "5efc592d0b2ab84686207dfdb321c6a9fad72431462189782d7ece7238ccebd2",
+    "tests/test_pathrisk_fresh_activation_identity.py": "bb3564952d40d128cf57aea32cb14547bf367f981dee004529a8fece6782c97c",
+    "tests/test_pathrisk_live_window.py": "144d4e8d9a3daf90583899eabdbc69de24aa7aa0d9f4518e752c66d390939030",
+    "tests/test_pathrisk_recent_http_class.py": "e0e7891f4867a3e831d543993df81f15e93f751bce1ce1094754a168aa3e96b6",
+    "tests/test_pathrisk_successor_window_identity.py": "f5546d6c17d05ca14a7134c408002c639bd073a05b312b3bee39e82f4c7bca4a",
+    "tests/test_pathrisk_wallclock_live.py": "55f32bdb7e7a4c47e4d4de9277fc3bd3b4fa026a50b377af520a72438f14de26"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/pathrisk_successor_window_identity/a1_delivery_factory_fit_v1.json",
-    "sha256": "0",
+    "sha256": "be9919da9f96d48ce8b122e184f79b6bf20074139a09c9e3b8f4650bdd7021c1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PATHRISK_SUCCESSOR_WINDOW_IDENTITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/pathrisk_successor_window_identity/a1_delivery_independent_review_v1.json",
-      "sha256": "0",
+      "sha256": "eedeab1e267cc06c1a3f1249d9a309f2d8af886a6e4fbc722c8f0100a847bb5e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
