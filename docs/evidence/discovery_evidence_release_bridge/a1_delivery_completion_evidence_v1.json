@@ -18,6 +18,8 @@
     "catalog/generated/asset_edges.json": "9a330d1376edb1a7c00ea549c43b2ee3eb49d447125d3bdec624c595d7fe8458",
     "configs/observation_primitive_registry_v1.yaml": "1817b4fae2e4466d32de28821f62085f73f71a26e1b180c467a19a3e0e824b64",
     "docs/PROJECT_MAP.md": "9687e976126c3aa8cd58236e233c2836c28bcfde326790f6e4fb6fde00e69a3c",
+    "docs/evidence/control/a1_merge_readiness_before_owner_phrase_completion_v1.json": "dc19e80746f9414bfe6f06dc9fb36096275b9fb465308741aeadf217dc46e43d",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "3ed45fc6cc2706e71d63cff4a048b18e4eab66433957774b1b85c1134361430a",
     "docs/reports/discovery_evidence_release_bridge/a1_owner_readout_v1.md": "0f587f51199e84b3634f768608190f9f8e5b31e3a9b02eeaa9e689653709f32f",
     "docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md": "0dad6888ca93ffa6e0f92a992a1be4556e41ef7a0ff2ada4f307f1f79784d679",
     "scripts/discovery_evidence_release.py": "701a063d525c004d7248fe1abe1eaae967bc7a0d5a570064adf2d9378209eafb",
@@ -43,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_factory_fit_v1.json",
-    "sha256": "ccb502168515115e69e85bb97281a78d24591e1b5ce0ff84077cb639a78e1689",
+    "sha256": "56f4a69e32832b111e27890e0a286f6e75b06ac21f8f29142888c3c06d30d19b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DISCOVERY_EVIDENCE_RELEASE_BRIDGE_AND_SCHEDULER_REGRESSION",
     "independent_review": {
       "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_independent_review_v1.json",
-      "sha256": "8a73bef0de7298aaabf67069aa14d333ffbbfac2805e2600e2c9f9bae578c072",
+      "sha256": "858c292470134740703f8b6140cc0d6de20735639589195ab91112ecd7f6d2fd",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
