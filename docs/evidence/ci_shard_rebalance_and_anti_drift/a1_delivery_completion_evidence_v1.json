@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "CI-SHARD-REBALANCE-AND-ANTI-DRIFT-COMPLETION-001",
+  "as_of": "2026-09-01",
+  "task_id": "CI_SHARD_REBALANCE_AND_ANTI_DRIFT_V1",
+  "state_change": "CI_TEST_SHARDS_REBALANCED_AND_UNPLANNED_LOAD_AWARE",
+  "base_main": "4cf01ec95637d8b7fe4b359cf73ac7f9d269a990",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "configs/ci_test_shards_v1.json": "ff14b948fd73ab0eb5c15ab2a6b62e99cfe605c570a985fb62f45509422000a3",
+    "docs/tasks/CI_SHARD_REBALANCE_AND_ANTI_DRIFT_V1.md": "731886b56f9102471d6d767c62b171bb6d912fa9722e1d52b144542e328fbf07",
+    "scripts/ci_test_partition.py": "865c189549cfb220c201f98463146a1603ad51c2eae29d66934d19200de1ca97",
+    "scripts/run_ci_test_shard.py": "6b42894c73eabfa4b983f18d86f9d8e1934ca8e31e09667496c44cc28f3a8ecc",
+    "tests/test_ci_test_partition.py": "1ba8bd3764b8ae5c52d147171bba3f2e63a4ceb1e8718af2089791cdb0afad17",
+    "tests/test_run_ci_test_shard.py": "7d1057809e91973c99cf1f85a7ee07d992d42afef3d3b3c2590f1626634673ec"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/ci_shard_rebalance_and_anti_drift/a1_delivery_factory_fit_v1.json",
+    "sha256": "bc5eb8644b977074ca94222ae81fb6ddfe0cdbea1a43725af52bc0091ae9c290",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_CI_SHARD_PARTITION_AND_RUNNER_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/ci_shard_rebalance_and_anti_drift/a1_delivery_independent_review_v1.json",
+      "sha256": "71a0d3a09e63fd82a6257f91f631e81e370525b0aaa197b1e8ea9803927813a9",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CI_SHARD_PARTITION_AND_RUNNER_TESTS",
+      "PASS_INVENTORY_UNION_EXACT_ONCE",
+      "PASS_CASE_COUNT_EQUIVALENCE"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_BRANCH_PROTECTION_MUTATION",
+    "NO_ALPHA",
+    "NO_EXACT_HEAD_CI_MATERIALITY_YET"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

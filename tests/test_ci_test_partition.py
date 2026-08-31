@@ -134,6 +134,169 @@ class CiTestPartitionTests(unittest.TestCase):
         heavy = {f"tests/test_{i}.py": 200.0 for i in range(8)}
         self.assertEqual(partition.choose_shard_count(heavy), 4)
 
+    def _cover(
+        self, current: list[str], plan: dict
+    ) -> list[list[str]]:
+        count = plan["shard_count"]
+        return [
+            partition.select_modules_for_shard(
+                current, plan=plan, index=index, count=count
+            )
+            for index in range(count)
+        ]
+
+    def test_ad1_four_unknown_modules_do_not_all_land_on_one_shard(self) -> None:
+        plan = partition.plan_shards(
+            {f"tests/test_old_{index}.py": 50.0 for index in range(8)},
+            shard_count=4,
+            source_profile_sha256="x",
+        )
+        current = [f"tests/test_old_{index}.py" for index in range(8)] + [
+            "tests/test_new_a.py",
+            "tests/test_new_b.py",
+            "tests/test_new_c.py",
+            "tests/test_new_d.py",
+        ]
+        shards = self._cover(current, plan)
+        new_counts = [
+            sum(1 for path in shard if path.startswith("tests/test_new_"))
+            for shard in shards
+        ]
+        self.assertNotEqual(max(new_counts), 4)
+        self.assertEqual(sorted(new_counts), [1, 1, 1, 1])
+
+    def test_ad2_repeated_unplanned_assignment_is_identical(self) -> None:
+        plan = partition.plan_shards(
+            {"tests/test_old.py": 5.0},
+            shard_count=4,
+            source_profile_sha256="x",
+        )
+        current = [
+            "tests/test_old.py",
+            "tests/test_new_a.py",
+            "tests/test_new_b.py",
+        ]
+        first = partition.assign_unplanned_modules(current, plan, 4)
+        second = partition.assign_unplanned_modules(current, plan, 4)
+        self.assertEqual(first, second)
+
+    def test_ad3_planned_modules_stay_on_committed_shards(self) -> None:
+        plan = partition.plan_shards(
+            {
+                "tests/test_a.py": 40.0,
+                "tests/test_b.py": 10.0,
+                "tests/test_c.py": 10.0,
+                "tests/test_d.py": 10.0,
+            },
+            shard_count=4,
+            source_profile_sha256="x",
+        )
+        committed = {
+            path: index
+            for index, shard in enumerate(plan["shards"])
+            for path in shard
+        }
+        current = list(committed) + ["tests/test_new.py"]
+        shards = self._cover(current, plan)
+        for index, shard in enumerate(shards):
+            for path in shard:
+                if path in committed:
+                    self.assertEqual(committed[path], index)
+
+    def test_ad4_and_ad5_current_modules_selected_exactly_once(self) -> None:
+        plan = partition.plan_shards(
+            {f"tests/test_old_{index}.py": float(index + 1) for index in range(6)},
+            shard_count=4,
+            source_profile_sha256="x",
+        )
+        current = [f"tests/test_old_{index}.py" for index in range(6)] + [
+            "tests/test_new_a.py",
+            "tests/test_new_b.py",
+        ]
+        covered = [path for shard in self._cover(current, plan) for path in shard]
+        self.assertEqual(sorted(covered), sorted(current))
+        self.assertEqual(len(covered), len(set(covered)))
+
+    def test_ad6_first_unplanned_module_prefers_lightest_shard(self) -> None:
+        plan = {
+            "schema": "smial.ci-test-shards.v1",
+            "shard_count": 3,
+            "source_profile_sha256": "x",
+            "projected_seconds": [100.0, 10.0, 50.0],
+            "projected_max_seconds": 100.0,
+            "shards": [
+                ["tests/test_a.py"],
+                ["tests/test_b.py"],
+                ["tests/test_c.py"],
+            ],
+        }
+        current = [
+            "tests/test_a.py",
+            "tests/test_b.py",
+            "tests/test_c.py",
+            "tests/test_new.py",
+        ]
+        assignment = partition.assign_unplanned_modules(current, plan, 3)
+        self.assertEqual(assignment["tests/test_new.py"], 1)
+
+    def test_ad7_tie_breaks_by_lowest_shard_index(self) -> None:
+        plan = {
+            "schema": "smial.ci-test-shards.v1",
+            "shard_count": 3,
+            "source_profile_sha256": "x",
+            "projected_seconds": [10.0, 10.0, 10.0],
+            "projected_max_seconds": 10.0,
+            "shards": [
+                ["tests/test_a.py"],
+                ["tests/test_b.py"],
+                ["tests/test_c.py"],
+            ],
+        }
+        current = [
+            "tests/test_a.py",
+            "tests/test_b.py",
+            "tests/test_c.py",
+            "tests/test_new.py",
+        ]
+        assignment = partition.assign_unplanned_modules(current, plan, 3)
+        self.assertEqual(assignment["tests/test_new.py"], 0)
+
+    def test_ad8_estimated_load_updates_after_each_assignment(self) -> None:
+        plan = {
+            "schema": "smial.ci-test-shards.v1",
+            "shard_count": 3,
+            "source_profile_sha256": "x",
+            "projected_seconds": [5.0, 6.0, 100.0],
+            "projected_max_seconds": 100.0,
+            "shards": [
+                ["tests/test_a.py"],
+                ["tests/test_b.py"],
+                ["tests/test_c.py"],
+            ],
+        }
+        current = [
+            "tests/test_a.py",
+            "tests/test_b.py",
+            "tests/test_c.py",
+            "tests/test_z_a.py",
+            "tests/test_z_b.py",
+        ]
+        assignment = partition.assign_unplanned_modules(current, plan, 3)
+        self.assertEqual(assignment["tests/test_z_a.py"], 0)
+        self.assertEqual(assignment["tests/test_z_b.py"], 1)
+
+    def test_ad9_stale_removed_entry_cannot_drop_or_duplicate_current(self) -> None:
+        plan = partition.plan_shards(
+            {"tests/test_alive.py": 1.0, "tests/test_gone.py": 50.0},
+            shard_count=2,
+            source_profile_sha256="x",
+        )
+        current = ["tests/test_alive.py", "tests/test_brand_new.py"]
+        covered = [path for shard in self._cover(current, plan) for path in shard]
+        self.assertEqual(sorted(covered), sorted(current))
+        self.assertEqual(len(covered), len(set(covered)))
+        self.assertNotIn("tests/test_gone.py", covered)
+
 
 if __name__ == "__main__":
     unittest.main()

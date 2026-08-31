@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "CI-SHARD-REBALANCE-AND-ANTI-DRIFT-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "CI_SHARD_REBALANCE_AND_ANTI_DRIFT_V1",
+  "reviewed_bindings_sha256": "0826d63b914a5dbd90d3902a8104397f65f5416dcfe7dfcd33335365df65c33e",
+  "reviewed_inventory_sha256": "bfbeef1816c9e1716ec4cf51d8119cab2bf4645c36d70c046cc12c116f695184",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "UNPLANNED_MODULE_CANNOT_DISAPPEAR",
+        "NO_DUPLICATE_SHARD_EXECUTION",
+        "PLANNED_MODULES_STABLE",
+        "STALE_WARNING_NON_BLOCKING",
+        "NO_TEST_WEAKENING",
+        "LIVE_UNION_AND_CASE_COUNT_FAIL_CLOSED",
+        "SYS_PATH_ISOLATION_RESTORED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PROJECTED_IMBALANCE_1_000",
+        "CI_EQUIVALENT_MATERIALITY_40PCT",
+        "EXACT_HEAD_CI_STILL_BINDS",
+        "NO_TEST_WEAKENING"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "UNPLANNED_MODULE_CANNOT_DISAPPEAR",
+        "NO_DUPLICATE_SHARD_EXECUTION",
+        "PLANNED_MODULES_STABLE",
+        "STALE_WARNING_NON_BLOCKING",
+        "NO_TEST_WEAKENING",
+        "CI_PARTITION_ONLY_NO_RESEARCH_VALIDITY_BREAK",
+        "FAIL_CLOSED_UNION_AND_CASE_COUNT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_BRANCH_PROTECTION_MUTATION",
+    "NO_PRODUCT_OR_PROVIDER_CHANGE",
+    "NO_CANONICAL_DONE",
+    "NO_EXACT_HEAD_CI_MATERIALITY_YET"
+  ]
+}

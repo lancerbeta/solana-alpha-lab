@@ -63,9 +63,77 @@ def choose_shard_count(module_seconds: dict[str, float]) -> int:
     return 4
 
 
+SAFE_UNSEEN_FALLBACK_SECONDS = 1.0
+
+
 def module_fallback_index(path: str, shard_count: int) -> int:
     digest = hashlib.sha256(posix(path).encode("utf-8")).hexdigest()
     return int(digest, 16) % shard_count
+
+
+def _planned_union(plan: dict[str, Any]) -> set[str]:
+    union: set[str] = set()
+    for shard in plan.get("shards") or []:
+        for path in shard:
+            union.add(posix(path))
+    return union
+
+
+def _estimated_unseen_loads(
+    plan: dict[str, Any],
+    count: int,
+) -> tuple[list[float], float]:
+    """Initial shard loads plus equal estimated weight for one unseen module.
+
+    Fail closed to a simple positive fallback when the committed plan cannot
+    produce a usable estimate. Never profiles at runtime.
+    """
+    planned_n = sum(len(shard) for shard in (plan.get("shards") or []))
+    raw = plan.get("projected_seconds")
+    try:
+        loads = [float(value) for value in raw]
+    except (TypeError, ValueError):
+        return [0.0] * count, SAFE_UNSEEN_FALLBACK_SECONDS
+    if len(loads) != count:
+        return [0.0] * count, SAFE_UNSEEN_FALLBACK_SECONDS
+    if planned_n < 1:
+        return list(loads), SAFE_UNSEEN_FALLBACK_SECONDS
+    total = sum(loads)
+    if total <= 0.0:
+        return list(loads), SAFE_UNSEEN_FALLBACK_SECONDS
+    estimated = total / planned_n
+    if estimated <= 0.0:
+        return list(loads), SAFE_UNSEEN_FALLBACK_SECONDS
+    return list(loads), estimated
+
+
+def assign_unplanned_modules(
+    current_modules: list[str],
+    plan: dict[str, Any],
+    count: int,
+) -> dict[str, int]:
+    """Deterministic load-aware shard map for modules absent from the plan."""
+    if count != plan.get("shard_count"):
+        raise PartitionError("SHARD_COUNT_MISMATCH")
+    if count < 1:
+        raise PartitionError("SHARD_COUNT_OUT_OF_RANGE")
+    planned = _planned_union(plan)
+    unplanned = sorted(
+        {
+            posix(path)
+            for path in current_modules
+            if posix(path) not in planned
+        }
+    )
+    assignment: dict[str, int] = {}
+    if not unplanned:
+        return assignment
+    loads, estimated = _estimated_unseen_loads(plan, count)
+    for path in unplanned:
+        index = min(range(count), key=lambda i: (loads[i], i))
+        assignment[path] = index
+        loads[index] += estimated
+    return assignment
 
 
 def select_modules_for_shard(
@@ -80,6 +148,7 @@ def select_modules_for_shard(
     if index < 0 or index >= count:
         raise PartitionError("SHARD_INDEX_OUT_OF_RANGE")
     planned = {posix(path) for path in plan["shards"][index]}
+    unplanned_assignment = assign_unplanned_modules(current_modules, plan, count)
     selected: list[str] = []
     seen: set[str] = set()
     for raw in current_modules:
@@ -90,10 +159,8 @@ def select_modules_for_shard(
         if path in planned:
             selected.append(path)
             continue
-        # New module absent from plan: deterministic fallback.
-        if path not in {posix(p) for shard in plan["shards"] for p in shard}:
-            if module_fallback_index(path, count) == index:
-                selected.append(path)
+        if unplanned_assignment.get(path) == index:
+            selected.append(path)
     selected.sort()
     return selected
 

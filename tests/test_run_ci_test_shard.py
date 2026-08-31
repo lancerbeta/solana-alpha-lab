@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import contextlib
 import importlib.util
+import io
 import sys
 import tempfile
 import textwrap
@@ -162,10 +164,15 @@ class RunCiTestShardTests(unittest.TestCase):
             root = Path(tmp)
             other = str((root / "other").resolve())
             root_s = str(root.resolve())
-            sys.path[:] = [other, root_s, other]
-            runner.ensure_repo_import_path(root)
-            self.assertEqual(sys.path[0], root_s)
-            self.assertEqual(sys.path.count(root_s), 1)
+            saved_path = list(sys.path)
+            try:
+                sys.path[:] = [other, root_s, other]
+                runner.ensure_repo_import_path(root)
+                self.assertEqual(sys.path[0], root_s)
+                self.assertEqual(sys.path.count(root_s), 1)
+            finally:
+                # This test shares a process with later shard modules in CI.
+                sys.path[:] = saved_path
 
     def test_case_count_mismatch_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -244,6 +251,74 @@ class RunCiTestShardTests(unittest.TestCase):
                 root=root,
             )
             self.assertEqual(code, 1)
+
+
+    def test_stale_profile_warning_threshold_and_non_blocking(self) -> None:
+        plan = partition.plan_shards(
+            {f"tests/test_old_{index}.py": 1.0 for index in range(4)},
+            shard_count=4,
+            source_profile_sha256="x",
+        )
+        current_fresh = [f"tests/test_old_{index}.py" for index in range(4)]
+        self.assertIsNone(runner.stale_profile_warning(current_fresh, plan))
+        current_stale_fraction = current_fresh + ["tests/test_new.py"]
+        self.assertEqual(
+            runner.stale_profile_warning(current_stale_fraction, plan),
+            runner.STALE_PROFILE_WARNING,
+        )
+        current_stale_count = current_fresh + [
+            f"tests/test_new_{index}.py" for index in range(8)
+        ]
+        self.assertEqual(
+            runner.stale_profile_warning(current_stale_count, plan),
+            runner.STALE_PROFILE_WARNING,
+        )
+
+    def test_stale_warning_prints_once_from_shard_zero_and_does_not_fail(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tests = root / "tests"
+            tests.mkdir()
+            for name in ("test_stale_warn_ok.py", "test_stale_warn_extra.py"):
+                (tests / name).write_text(
+                    textwrap.dedent(
+                        """\
+                        import unittest
+                        class T(unittest.TestCase):
+                            def test_ok(self):
+                                self.assertTrue(True)
+                        """
+                    ),
+                    encoding="utf-8",
+                )
+            plan = partition.plan_shards(
+                {"tests/test_stale_warn_ok.py": 1.0},
+                shard_count=1,
+                source_profile_sha256="x",
+            )
+            plan_path = root / "plan.json"
+            partition.write_plan(plan_path, plan)
+            capture = io.StringIO()
+            tests_dir = str(tests.resolve())
+            try:
+                with contextlib.redirect_stdout(capture):
+                    code = runner.run_shard(
+                        index=0,
+                        count=1,
+                        plan_path=plan_path,
+                        root=root,
+                    )
+            finally:
+                while tests_dir in sys.path:
+                    sys.path.remove(tests_dir)
+                for name in ("test_stale_warn_ok", "test_stale_warn_extra"):
+                    sys.modules.pop(name, None)
+            self.assertEqual(code, 0)
+            self.assertIn(runner.STALE_PROFILE_WARNING, capture.getvalue())
+            self.assertEqual(
+                capture.getvalue().count(runner.STALE_PROFILE_WARNING),
+                1,
+            )
 
 
 if __name__ == "__main__":
