@@ -10,7 +10,25 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "84d68e4782049884c15df5faffe52d31a3d4b9086ed3f7eb66597b57926526b9",
+    "catalog/assets/lifecycle.yaml": "b4c9f4b42e2b671d405934af4016fd523df4b08481dbc05a81e525154a905fef",
+    "catalog/catalog_manifest.yaml": "ef5bd90f0442b10ae3e2c06d36d8a5da47c9acf02749c601480dac4cc6248289",
+    "catalog/generated/asset_edges.json": "bbc5a2c415da4eaa609bae11760aca73283c6643ed3437b2b76a384716d5f65b",
+    "catalog/schemas/observation_schedule_v1.schema.json": "d726a0a01de561e29ab2a6ce080f4071d839b99c5d92c6da4b0325d1c07cb178",
+    "configs/early_quote_surface_pathrisk_calibration_v1.yaml": "b4ac5b0dff338b9811bf158854d9ab9b58557ce75dc1c2085a8dc6d691bfd349",
+    "docs/PROJECT_MAP.md": "7ecb3f5369fee1ef1b7609242b977a19243ced175279622d8644673324dec769",
+    "docs/reports/pathrisk_live_window_execution_glue/a1_owner_readout_v1.md": "4e5c1327e774d3b945e38624d123c55640c5846b6a5da1b9dc7b74f2b7591a23",
+    "docs/tasks/PATHRISK_LIVE_WINDOW_EXECUTION_GLUE_V1.md": "50c6b88053736712a982a15d5b89fae47fc3aebbb231597de4c62066a9f1a22a",
+    "scripts/early_quote_surface_pathrisk_calibration.py": "0859091afe4d0cf9229b6fff5011531325e55fb02e87ab76cf261bdc9f4d57df",
+    "src/solana_alpha_lab/factory/observation_schedule_compiler.py": "3b0a1e241506c063ffc31aec0752efb99bc4de5fd5e8ad04ecec88cf9cf94826",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "f3f0399abd7103f382b0052ac1a32e600a14e312390589a846222a780390ec8f",
+    "src/solana_alpha_lab/factory/pathrisk_calibration.py": "0611bf67ce74b15c03cb1fe3daf67058a9d7b4b5cac625ed3b8cf1571c827ce0",
+    "src/solana_alpha_lab/factory/pathrisk_live.py": "75829937f79864f2057d6ac3eec23804ac71002436b8049cd511ed32efd9db7c",
+    "tests/fixtures/observation_schedule/pathrisk_live_window.yaml": "eee6f6a398709127e2f3cd6a5996d99db957eec56f7bcbbfa891b3c37545210a",
+    "tests/test_pathrisk_calibration.py": "daf8f6ff7b946557bd94d750e3c60adc4f69e101e3c38a9a9856ce25ac9fbb10",
+    "tests/test_pathrisk_live_window.py": "5f1e36fe0bae43b2f0a7521644d725103df008483a2ccf710d5a9f02acaddb9f"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/pathrisk_live_window_execution_glue/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "18e9b158a9d04a72d03e902ba579ee2cfdae223e048d356abe750a8cf2ee5d98",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PATHRISK_LIVE_WINDOW_SUITE",
     "independent_review": {
       "path": "docs/evidence/pathrisk_live_window_execution_glue/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "71041ede78f278c41af1851a3da9cae44fa394fa0d721fa05b90df819d33d480",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
