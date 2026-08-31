@@ -1114,8 +1114,10 @@ def tick_once(
             state == "ACTIVE"
             or (state == "DRAINING" and predecessor_before_cutover)
         )
+        poll_enabled = bool(schedule.get("source_poll", {}).get("enabled", True))
         if (
             discovery_rows is None
+            and poll_enabled
             and opener is not None
             and can_admit_before_cutover
             and not due_work_waiting

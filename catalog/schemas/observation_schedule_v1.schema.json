@@ -46,7 +46,8 @@
       "properties": {
         "primitive_id": {"$ref": "#/$defs/primitive_id"},
         "query_profile_id": {"$ref": "#/$defs/query_profile_id"},
-        "period_seconds": {"enum": [60, 300, 900, 3600, 86400]}
+        "period_seconds": {"enum": [60, 300, 900, 3600, 86400]},
+        "enabled": {"type": "boolean"}
       }
     },
     "population": {

@@ -637,7 +637,8 @@ class PathRiskCalibrationTests(unittest.TestCase):
         self.assertEqual(packet["sample_floor"], 4)
         self.assertEqual(packet["notionals_lamports"], [NOTIONAL_1M, NOTIONAL_10M])
         self.assertIn("taker", packet["forbidden_actions"])
-        self.assertEqual(packet["live_window"]["inject_r0_discovery"], True)
+        self.assertEqual(packet["max_calls"], 26)
+        self.assertEqual(packet["live_window"]["one_recent"], True)
         self.assertEqual(packet["live_window"]["enable_source_poll"], False)
         with self.assertRaisesRegex(PathRiskCalibrationError, "MAIN_SHA_NOT_EXACT_40_HEX"):
             proposed_capture_packet(root=ROOT, main_sha="<EXACT_MAIN_SHA>")
