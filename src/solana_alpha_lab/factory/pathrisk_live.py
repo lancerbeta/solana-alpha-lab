@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 import sys
 import time
 from collections.abc import Mapping, Sequence
@@ -77,6 +78,7 @@ from solana_alpha_lab.factory.pathrisk_calibration import (
     NOTIONAL_10M,
     NOTIONAL_1M,
     TERMINAL_BELOW_FLOOR,
+    TERMINAL_INFORMATIVE,
     build_readout,
     load_policy,
     proposed_capture_packet,
@@ -109,6 +111,10 @@ RUNTIME_BINDING_NAME = "runtime_binding.json"
 REPLACEMENT_REASON_PRE_EVIDENCE_OPERATIONAL_FAILURE = (
     "PRE_EVIDENCE_OPERATIONAL_FAILURE"
 )
+SUCCESSOR_REASON_MARKET_SUPPLY_RETRY = "MARKET_SUPPLY_RETRY_AFTER_BELOW_FLOOR"
+LIVE_IDENTITY_NAMESPACE = "ACT-PATHRISK-LIVE"
+LIVE_IDENTITY_RE = re.compile(r"^ACT-PATHRISK-LIVE-(\d{3})$")
+OWNER_PHRASE_PREFIX = "OK PATHRISK_SUCCESSOR_WINDOW_IDENTITY_LIVE_V1"
 CONSUMED_LIVE_OWNER_PHRASE = (
     "OK EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_LIVE_V1: one bounded Jupiter "
     "Free-key read-only PathRisk calibration using a local process-environment "
@@ -123,15 +129,51 @@ CONSUMED_LIVE_OWNER_PHRASE = (
     "only; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, "
     "Strategy, Shadow, alpha and NetReturn forbidden."
 )
+CONSUMED_ACT002_LIVE_OWNER_PHRASE = (
+    "OK PATHRISK_FRESH_ACTIVATION_IDENTITY_LIVE_V1: exactly one replacement "
+    "prospective PathRisk window ACT-PATHRISK-LIVE-002; predecessor "
+    "ACT-PATHRISK-LIVE-001 remains immutable; replacement_reason "
+    "PRE_EVIDENCE_OPERATIONAL_FAILURE; not a resume of ACT-PATHRISK-LIVE-001; "
+    "Jupiter Free-key; JUPITER_API_KEY process env only; exactly one /recent; "
+    "exactly one bulk /tokens/v2/search; quote-only /swap/v2/order; no recurring "
+    "/recent; x-api-key header only; no .env / secret leakage; no taker, /build, "
+    "/execute, wallet, signer, transaction; no paid plan / second provider; no "
+    "retry / fallback; cash cap $0; call cap 26; ICP-EARLY-PUMPFUN-V1; first 4 "
+    "fresh unconsumed eligible mints or CALIBRATION_ELIGIBLE_BELOW_FLOOR with "
+    "quote_calls=0; notionals 10000000 and 1000000 lamports; T0 BUY + T0 reverse "
+    "+ H900 dependent SELL of the same T0 BUY token amount; no third notional; "
+    "Factory runner unchanged; Hypothesis Forge, Paper, Strategy, Shadow, alpha "
+    "and NetReturn forbidden inside the live window."
+)
+CONSUMED_OWNER_PHRASES = frozenset(
+    {CONSUMED_LIVE_OWNER_PHRASE, CONSUMED_ACT002_LIVE_OWNER_PHRASE}
+)
 
 
 class PathRiskLiveError(ValueError):
     """Typed live-window glue failure."""
 
 
+INCOMPLETE_WINDOW_STAGES = frozenset(
+    {
+        "START",
+        "RECENT_DONE",
+        "R0_BOUND",
+        "SAMPLED",
+        "T0_COMPLETE",
+        "H900_PARTIAL",
+    }
+)
+GIT_PER_WINDOW_IDENTITY_KEYS = (
+    "activation_id",
+    "predecessor_activation_id",
+    "replacement_reason",
+)
+
+
 @dataclass(frozen=True, slots=True)
 class LiveWindowIdentity:
-    """Immutable PathRisk live identity resolved from the science contract."""
+    """Immutable PathRisk live identity bound at runtime, never stored as Git current-window ids."""
 
     activation_id: str
     predecessor_activation_id: str
@@ -145,25 +187,211 @@ class LiveWindowIdentity:
         }
 
 
-def resolve_live_window_identity(policy: Mapping[str, Any]) -> LiveWindowIdentity:
+def parse_live_activation_id(value: str) -> tuple[str, int]:
+    text = str(value or "").strip()
+    match = LIVE_IDENTITY_RE.fullmatch(text)
+    if match is None:
+        raise PathRiskLiveError("LIVE_IDENTITY_NAMESPACE_MISMATCH")
+    return text, int(match.group(1))
+
+
+def format_live_activation_id(sequence: int) -> str:
+    if sequence < 1 or sequence > 999:
+        raise PathRiskLiveError("LIVE_IDENTITY_SEQUENCE_OUT_OF_RANGE")
+    return f"ACT-PATHRISK-LIVE-{sequence:03d}"
+
+
+def load_successor_identity_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
     live = policy.get("live_window")
     if not isinstance(live, Mapping):
         raise PathRiskLiveError("LIVE_WINDOW_IDENTITY_MISSING")
     raw = live.get("identity")
     if not isinstance(raw, Mapping):
         raise PathRiskLiveError("LIVE_WINDOW_IDENTITY_MISSING")
-    activation_id = str(raw.get("activation_id") or "").strip()
-    predecessor = str(raw.get("predecessor_activation_id") or "").strip()
-    reason = str(raw.get("replacement_reason") or "").strip()
-    if not activation_id or not predecessor or not reason:
-        raise PathRiskLiveError("LIVE_WINDOW_IDENTITY_INVALID")
-    if activation_id == predecessor:
+    for key in GIT_PER_WINDOW_IDENTITY_KEYS:
+        if key in raw:
+            raise PathRiskLiveError("GIT_PER_WINDOW_IDENTITY_FORBIDDEN")
+    namespace = str(raw.get("namespace") or "").strip()
+    if namespace != LIVE_IDENTITY_NAMESPACE:
+        raise PathRiskLiveError("LIVE_IDENTITY_NAMESPACE_MISMATCH")
+    reason = str(raw.get("successor_reason") or "").strip()
+    if reason != SUCCESSOR_REASON_MARKET_SUPPLY_RETRY:
+        raise PathRiskLiveError("SUCCESSOR_REASON_UNSUPPORTED")
+    terminals = raw.get("successor_after_terminal")
+    if not isinstance(terminals, list) or [str(item) for item in terminals] != [
+        TERMINAL_BELOW_FLOOR
+    ]:
+        raise PathRiskLiveError("SUCCESSOR_AFTER_TERMINAL_UNSUPPORTED")
+    try:
+        step = int(raw.get("sequence_step"))
+    except (TypeError, ValueError) as exc:
+        raise PathRiskLiveError("SUCCESSOR_SEQUENCE_STEP_INVALID") from exc
+    if step != 1:
+        raise PathRiskLiveError("SUCCESSOR_SEQUENCE_STEP_INVALID")
+    if raw.get("predecessor_required") is not True:
+        raise PathRiskLiveError("PREDECESSOR_REQUIRED")
+    if raw.get("immutable_identity") is not True:
+        raise PathRiskLiveError("IMMUTABLE_IDENTITY_REQUIRED")
+    if raw.get("one_window_per_owner_phrase") is not True:
+        raise PathRiskLiveError("ONE_WINDOW_PER_OWNER_PHRASE_REQUIRED")
+    if raw.get("branching_forbidden") is not True:
+        raise PathRiskLiveError("BRANCHING_FORBIDDEN_REQUIRED")
+    return {
+        "namespace": namespace,
+        "successor_reason": reason,
+        "sequence_step": step,
+        "successor_after_terminal": [TERMINAL_BELOW_FLOOR],
+    }
+
+
+def resolve_live_window_identity(
+    policy: Mapping[str, Any],
+    activation_id: str,
+    predecessor_activation_id: str,
+) -> LiveWindowIdentity:
+    rules = load_successor_identity_policy(policy)
+    activation, act_seq = parse_live_activation_id(activation_id)
+    predecessor, pred_seq = parse_live_activation_id(predecessor_activation_id)
+    if activation == predecessor:
         raise PathRiskLiveError("PREDECESSOR_CANNOT_BE_CURRENT_ACTIVATION")
+    if act_seq != pred_seq + int(rules["sequence_step"]):
+        raise PathRiskLiveError("SUCCESSOR_SEQUENCE_MUST_BE_PLUS_ONE")
     return LiveWindowIdentity(
-        activation_id=activation_id,
+        activation_id=activation,
         predecessor_activation_id=predecessor,
-        replacement_reason=reason,
+        replacement_reason=str(rules["successor_reason"]),
     )
+
+
+def render_successor_owner_phrase(
+    policy: Mapping[str, Any],
+    identity: LiveWindowIdentity,
+) -> str:
+    rules = load_successor_identity_policy(policy)
+    if identity.replacement_reason != rules["successor_reason"]:
+        raise PathRiskLiveError("SUCCESSOR_REASON_UNSUPPORTED")
+    max_calls = int(policy["runtime_limits"]["max_calls"])
+    icp = str(policy["population"]["icp_id"])
+    return (
+        f"{OWNER_PHRASE_PREFIX}: exactly one successor prospective PathRisk window "
+        f"{identity.activation_id}; predecessor {identity.predecessor_activation_id} "
+        f"remains immutable; successor_reason {identity.replacement_reason}; not a resume of "
+        f"{identity.predecessor_activation_id}; Jupiter Free-key; JUPITER_API_KEY process env only; "
+        "exactly one /recent; exactly one bulk /tokens/v2/search; quote-only /swap/v2/order; "
+        "no recurring /recent; x-api-key header only; no .env / secret leakage; no taker, /build, "
+        "/execute, wallet, signer, transaction; no paid plan / second provider; no retry / fallback; "
+        f"cash cap $0; call cap {max_calls}; {icp}; first 4 fresh unconsumed eligible mints or "
+        "CALIBRATION_ELIGIBLE_BELOW_FLOOR with quote_calls=0; notionals "
+        f"{NOTIONAL_10M} and {NOTIONAL_1M} lamports; T0 BUY + T0 reverse + H900 dependent SELL of the "
+        "same T0 BUY token amount; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, "
+        "Strategy, Shadow, alpha and NetReturn forbidden inside the live window."
+    )
+
+
+def journal_scientific_terminal(journal: Mapping[str, Any]) -> str | None:
+    terminal = journal.get("terminal")
+    if isinstance(terminal, str) and terminal.strip():
+        return terminal.strip()
+    if journal.get("stage") == "BELOW_FLOOR":
+        return TERMINAL_BELOW_FLOOR
+    return None
+
+
+def list_local_activation_ids(data_root: Path) -> list[str]:
+    root = Path(data_root) / "pathrisk_live"
+    if not root.is_dir():
+        return []
+    found: list[str] = []
+    for child in sorted(root.iterdir()):
+        if not child.is_dir():
+            continue
+        if LIVE_IDENTITY_RE.fullmatch(child.name) is None:
+            continue
+        if (child / "journal.json").is_file():
+            found.append(child.name)
+    return found
+
+
+def assert_predecessor_eligible(
+    data_root: Path,
+    identity: LiveWindowIdentity,
+) -> str:
+    pred_id = identity.predecessor_activation_id
+    path = _journal_path(data_root, pred_id)
+    if not path.is_file():
+        raise PathRiskLiveError("PREDECESSOR_JOURNAL_MISSING")
+    predecessor = load_journal(data_root, pred_id)
+    recorded = predecessor.get("activation_id")
+    if recorded not in (None, pred_id):
+        raise PathRiskLiveError("PREDECESSOR_IDENTITY_MISMATCH")
+    binding_path = runtime_live_dir(data_root, pred_id) / RUNTIME_BINDING_NAME
+    if binding_path.is_file():
+        try:
+            binding = json.loads(binding_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise PathRiskLiveError("PREDECESSOR_IDENTITY_MISMATCH") from exc
+        if not isinstance(binding, Mapping):
+            raise PathRiskLiveError("PREDECESSOR_IDENTITY_MISMATCH")
+        if binding.get("activation_id") not in (None, pred_id):
+            raise PathRiskLiveError("PREDECESSOR_IDENTITY_MISMATCH")
+    stage = str(predecessor.get("stage") or "")
+    terminal = journal_scientific_terminal(predecessor)
+    if stage == "COMPLETE" or terminal in {TERMINAL_INFORMATIVE}:
+        raise PathRiskLiveError(
+            "PREDECESSOR_INFORMATIVE_OR_COMPLETE_FORBIDS_ORDINARY_SUCCESSOR"
+        )
+    if terminal != TERMINAL_BELOW_FLOOR:
+        raise PathRiskLiveError("PREDECESSOR_NOT_BELOW_FLOOR")
+    return terminal
+
+
+def successor_preflight(
+    *,
+    data_root: Path,
+    policy: Mapping[str, Any],
+) -> dict[str, Any]:
+    rules = load_successor_identity_policy(policy)
+    reason = str(rules["successor_reason"])
+    payload: dict[str, Any] = {
+        "predecessor_activation_id": None,
+        "predecessor_terminal": None,
+        "proposed_activation_id": None,
+        "successor_reason": reason,
+        "eligible_for_successor": False,
+        "exact_future_owner_phrase": None,
+        "credential_reads": False,
+        "provider_calls": 0,
+        "git_mutated": False,
+        "rdp_mutation": 0,
+    }
+    sequenced: list[tuple[int, str, dict[str, Any]]] = []
+    for activation_id in list_local_activation_ids(data_root):
+        _, seq = parse_live_activation_id(activation_id)
+        sequenced.append((seq, activation_id, load_journal(data_root, activation_id)))
+    if not sequenced:
+        return payload
+    _, pred_id, journal = max(sequenced, key=lambda item: item[0])
+    terminal = journal_scientific_terminal(journal)
+    payload["predecessor_activation_id"] = pred_id
+    payload["predecessor_terminal"] = terminal
+    stage = str(journal.get("stage") or "")
+    if stage in INCOMPLETE_WINDOW_STAGES:
+        return payload
+    if stage == "COMPLETE" or terminal == TERMINAL_INFORMATIVE:
+        return payload
+    if terminal != TERMINAL_BELOW_FLOOR:
+        return payload
+    _, pred_seq = parse_live_activation_id(pred_id)
+    proposed = format_live_activation_id(pred_seq + int(rules["sequence_step"]))
+    identity = resolve_live_window_identity(policy, proposed, pred_id)
+    try:
+        assert_predecessor_eligible(data_root, identity)
+    except PathRiskLiveError:
+        return payload
+    payload["proposed_activation_id"] = proposed
+    payload["eligible_for_successor"] = True
+    payload["exact_future_owner_phrase"] = render_successor_owner_phrase(policy, identity)
+    return payload
 
 
 class HardCapOpener:
@@ -323,19 +551,16 @@ def save_journal(data_root: Path, activation_id: str, payload: Mapping[str, Any]
     path.write_text(json.dumps(dict(payload), indent=2, sort_keys=True), encoding="utf-8")
 
 
-def require_owner_phrase(policy: Mapping[str, Any], phrase: str) -> None:
-    if phrase == CONSUMED_LIVE_OWNER_PHRASE:
+def require_owner_phrase(
+    policy: Mapping[str, Any],
+    phrase: str,
+    identity: LiveWindowIdentity,
+) -> None:
+    if phrase in CONSUMED_OWNER_PHRASES:
         raise PathRiskLiveError("OWNER_PHRASE_CONSUMED")
-    expected = str(policy["external_authority"]["future_owner_phrase"])
+    expected = render_successor_owner_phrase(policy, identity)
     if phrase != expected:
         raise PathRiskLiveError("OWNER_PHRASE_MISMATCH")
-    identity = resolve_live_window_identity(policy)
-    if identity.activation_id not in phrase:
-        raise PathRiskLiveError("OWNER_PHRASE_IDENTITY_MISMATCH")
-    if identity.predecessor_activation_id not in phrase:
-        raise PathRiskLiveError("OWNER_PHRASE_IDENTITY_MISMATCH")
-    if identity.replacement_reason not in phrase:
-        raise PathRiskLiveError("OWNER_PHRASE_IDENTITY_MISMATCH")
 
 
 def transport_probe_owner_phrase(policy: Mapping[str, Any]) -> str:
@@ -628,10 +853,9 @@ def materialize_runtime_schedule(
     root: Path,
     data_root: Path,
     now: datetime,
-    identity: LiveWindowIdentity | None = None,
+    identity: LiveWindowIdentity,
 ) -> dict[str, Any]:
-    resolved = identity or resolve_live_window_identity(load_policy(root))
-    directory = runtime_live_dir(data_root, resolved.activation_id)
+    directory = runtime_live_dir(data_root, identity.activation_id)
     directory.mkdir(parents=True, exist_ok=True)
     yaml_path = directory / RUNTIME_SCHEDULE_NAME
     binding_path = directory / RUNTIME_BINDING_NAME
@@ -646,7 +870,7 @@ def materialize_runtime_schedule(
         binding = json.loads(binding_path.read_text(encoding="utf-8"))
         if binding.get("schedule_sha256") != compiled.schedule["schedule_sha256"]:
             raise PathRiskLiveError("RUNTIME_SCHEDULE_BINDING_MISMATCH")
-        _assert_identity_fields(binding, resolved)
+        _assert_identity_fields(binding, identity)
         return compiled.schedule
     template = load_observation_schedule(root, LIVE_SCHEDULE_RELATIVE)
     document = yaml.safe_load(yaml.safe_dump(template))
@@ -666,7 +890,7 @@ def materialize_runtime_schedule(
     binding_path.write_text(
         json.dumps(
             {
-                **resolved.binding_fields(),
+                **identity.binding_fields(),
                 "resume_of_predecessor": False,
                 "schedule_sha256": compiled.schedule["schedule_sha256"],
                 "starts_at": document["activation"]["starts_at"],
@@ -710,8 +934,11 @@ def assert_rdp_ready(data_root: Path) -> None:
 
 
 def assert_no_completed_window(journal: Mapping[str, Any]) -> None:
-    if journal.get("stage") == "COMPLETE":
+    stage = journal.get("stage")
+    if stage == "COMPLETE":
         raise PathRiskLiveError("PRIOR_PATHRISK_WINDOW_COMPLETED")
+    if stage == "BELOW_FLOOR" or journal.get("terminal") == TERMINAL_BELOW_FLOOR:
+        raise PathRiskLiveError("PRIOR_PATHRISK_WINDOW_BELOW_FLOOR")
 
 
 def compile_live_schedule(root: Path, *, relative: str | None = None) -> dict[str, Any]:
@@ -1066,6 +1293,8 @@ def run_live_window(
     producer_git_sha: str,
     owner_phrase: str,
     main_sha: str,
+    activation_id: str,
+    predecessor_activation_id: str,
     now: datetime | None = None,
     stop_after: str | None = None,
     store_path: Path | None = None,
@@ -1081,8 +1310,12 @@ def run_live_window(
     if int(loaded_policy["runtime_limits"]["max_calls"]) != CALL_CAP:
         raise PathRiskLiveError("CALL_CAP_26_NOT_ENFORCEABLE")
     proposed_capture_packet(root=root, main_sha=main_sha, policy=loaded_policy)
-    require_owner_phrase(loaded_policy, owner_phrase)
-    identity = resolve_live_window_identity(loaded_policy)
+    identity = resolve_live_window_identity(
+        loaded_policy,
+        activation_id,
+        predecessor_activation_id,
+    )
+    require_owner_phrase(loaded_policy, owner_phrase, identity)
     activation_id = identity.activation_id
     if production:
         if now is not None:
@@ -1105,6 +1338,7 @@ def run_live_window(
             raise PathRiskLiveError("CLOCK_REQUIRED")
     if production and type(clock) is FrozenClock:
         raise PathRiskLiveError("FROZEN_CLOCK_FORBIDDEN_IN_PRODUCTION")
+    assert_predecessor_eligible(data_root, identity)
     journal = load_journal(data_root, activation_id)
     resume_stage = str(journal.get("stage") or "START")
     _assert_existing_journal_identity(data_root, identity, journal)
@@ -1278,6 +1512,7 @@ def run_live_window(
         quote_urls = lambda: [url for url in capped.urls if "/swap/v2/order" in url]
         if sample["terminal"] == TERMINAL_BELOW_FLOOR:
             journal["stage"] = "BELOW_FLOOR"
+            journal["terminal"] = TERMINAL_BELOW_FLOOR
             save_journal(data_root, activation_id, journal)
             epoch_after = evidence_epoch_sha256(
                 evidence_epoch_material(root, data_root)
@@ -1488,8 +1723,10 @@ def count_url_kinds(urls: Sequence[str]) -> dict[str, int]:
 __all__ = [
     "CALL_CAP",
     "CREDENTIAL_ENV_NAME",
+    "CONSUMED_ACT002_LIVE_OWNER_PHRASE",
     "CONSUMED_LIVE_OWNER_PHRASE",
     "FORBIDDEN_SEARCH_BUNDLE",
+    "SUCCESSOR_REASON_MARKET_SUPPLY_RETRY",
     "ControllableClock",
     "FixtureWindowOpener",
     "HardCapOpener",
@@ -1498,14 +1735,18 @@ __all__ = [
     "PathRiskLiveError",
     "SystemClock",
     "TERMINAL_CREDENTIAL_MISSING",
+    "assert_predecessor_eligible",
     "compile_live_schedule",
     "count_url_kinds",
+    "load_successor_identity_policy",
     "materialize_runtime_schedule",
     "prospective_time_admissible",
+    "render_successor_owner_phrase",
     "resolve_consumed_exclusions",
     "resolve_live_window_identity",
     "runtime_live_dir",
     "run_live_window",
     "run_transport_probe_recent",
+    "successor_preflight",
     "transport_probe_owner_phrase",
 ]

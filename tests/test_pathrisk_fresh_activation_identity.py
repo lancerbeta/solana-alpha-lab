@@ -15,7 +15,17 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+if str(ROOT / "tests") not in sys.path:
+    sys.path.insert(0, str(ROOT / "tests"))
 
+from pathrisk_live_testkit import (
+    ACT_002,
+    ACT_003,
+    ensure_act002_below_floor,
+    live_identity_kwargs,
+    successor_identity,
+    successor_phrase,
+)
 from solana_alpha_lab.factory.hfic_preflight import evidence_epoch_material
 from solana_alpha_lab.factory.hfic_session import evidence_epoch_sha256
 from solana_alpha_lab.factory.observation_schedule_runtime import (
@@ -44,7 +54,7 @@ MAIN_SHA = "b" * 40
 T0 = datetime(2026, 9, 1, 0, 10, tzinfo=UTC)
 ANCHOR = "2026-09-01T00:05:00Z"
 PREDECESSOR_ID = "ACT-PATHRISK-LIVE-001"
-REPLACEMENT_ID = "ACT-PATHRISK-LIVE-002"
+REPLACEMENT_ID = "ACT-PATHRISK-LIVE-003"
 MINTS = (
     "MintA111111111111111111111111111111111111111",
     "MintB111111111111111111111111111111111111111",
@@ -56,11 +66,11 @@ PRED_PROD = PROD_DATA / "pathrisk_live" / PREDECESSOR_ID
 
 
 def _identity():
-    return resolve_live_window_identity(load_policy(ROOT))
+    return successor_identity()
 
 
 def _phrase() -> str:
-    return str(load_policy(ROOT)["external_authority"]["future_owner_phrase"])
+    return successor_phrase()
 
 
 def _row(mint: str, *, liquidity: str = "2000") -> dict:
@@ -80,6 +90,7 @@ def _fixture(mints=MINTS) -> dict:
 
 
 def _run(*, data_root: Path, opener, stop_after: str | None = None, policy=None):
+    ensure_act002_below_floor(data_root)
     return run_live_window(
         root=ROOT,
         data_root=data_root,
@@ -92,6 +103,7 @@ def _run(*, data_root: Path, opener, stop_after: str | None = None, policy=None)
         store_path=data_root / "observation_schedule_state.sqlite",
         policy=policy,
         production=False,
+        **live_identity_kwargs(),
     )
 
 
@@ -148,40 +160,38 @@ def _seed_predecessor(data_root: Path) -> dict[str, str]:
 
 
 class PathRiskFreshActivationIdentityTests(unittest.TestCase):
-    def test_t6_t7_policy_binds_replacement_and_predecessor(self) -> None:
+    def test_t6_t7_policy_is_stable_successor_and_runtime_binds_act003(self) -> None:
         identity = _identity()
         self.assertEqual(identity.activation_id, REPLACEMENT_ID)
-        self.assertEqual(identity.predecessor_activation_id, PREDECESSOR_ID)
-        self.assertEqual(identity.replacement_reason, "PRE_EVIDENCE_OPERATIONAL_FAILURE")
+        self.assertEqual(identity.predecessor_activation_id, ACT_002)
+        self.assertEqual(identity.replacement_reason, "MARKET_SUPPLY_RETRY_AFTER_BELOW_FLOOR")
         self.assertNotEqual(identity.activation_id, identity.predecessor_activation_id)
+        self.assertNotIn("activation_id", load_policy(ROOT)["live_window"]["identity"])
 
     def test_t12_predecessor_cannot_be_current(self) -> None:
-        mutated = copy.deepcopy(load_policy(ROOT))
-        mutated["live_window"]["identity"]["activation_id"] = PREDECESSOR_ID
         with self.assertRaisesRegex(
             PathRiskLiveError, "PREDECESSOR_CANNOT_BE_CURRENT_ACTIVATION"
         ):
-            resolve_live_window_identity(mutated)
-        self.assertNotIn("activation_id", inspect.signature(run_live_window).parameters)
+            resolve_live_window_identity(load_policy(ROOT), PREDECESSOR_ID, PREDECESSOR_ID)
+        self.assertIn("activation_id", inspect.signature(run_live_window).parameters)
 
     def test_t13_old_calibration_phrase_rejected(self) -> None:
         policy = load_policy(ROOT)
+        identity = successor_identity()
         with self.assertRaisesRegex(PathRiskLiveError, "OWNER_PHRASE_CONSUMED"):
-            require_owner_phrase(policy, CONSUMED_LIVE_OWNER_PHRASE)
+            require_owner_phrase(policy, CONSUMED_LIVE_OWNER_PHRASE, identity)
         with self.assertRaisesRegex(PathRiskLiveError, "OWNER_PHRASE_MISMATCH"):
-            require_owner_phrase(policy, "not-the-replacement-phrase")
+            require_owner_phrase(policy, "not-the-replacement-phrase", identity)
 
-    def test_t14_new_phrase_accepted_only_for_act_002_contract(self) -> None:
+    def test_t14_new_phrase_accepted_only_for_act_003_contract(self) -> None:
         policy = load_policy(ROOT)
-        require_owner_phrase(policy, _phrase())
+        require_owner_phrase(policy, _phrase(), successor_identity())
         self.assertIn(REPLACEMENT_ID, _phrase())
-        self.assertIn(PREDECESSOR_ID, _phrase())
-        self.assertIn("PRE_EVIDENCE_OPERATIONAL_FAILURE", _phrase())
-        mutated = copy.deepcopy(policy)
-        mutated["live_window"]["identity"]["activation_id"] = "ACT-PATHRISK-LIVE-003"
-        mutated["live_window"]["identity"]["predecessor_activation_id"] = PREDECESSOR_ID
-        with self.assertRaisesRegex(PathRiskLiveError, "OWNER_PHRASE_IDENTITY_MISMATCH"):
-            require_owner_phrase(mutated, _phrase())
+        self.assertIn(ACT_002, _phrase())
+        self.assertIn("MARKET_SUPPLY_RETRY_AFTER_BELOW_FLOOR", _phrase())
+        other = successor_identity(activation_id="ACT-PATHRISK-LIVE-004", predecessor_activation_id=REPLACEMENT_ID)
+        with self.assertRaisesRegex(PathRiskLiveError, "OWNER_PHRASE_MISMATCH"):
+            require_owner_phrase(policy, _phrase(), other)
 
     def test_t1_t2_t3_t4_t5_isolation_from_predecessor(self) -> None:
         opener = FixtureWindowOpener(_fixture())
@@ -200,7 +210,7 @@ class PathRiskFreshActivationIdentityTests(unittest.TestCase):
             journal = json.loads((repl / "journal.json").read_text(encoding="utf-8"))
             binding = json.loads((repl / "runtime_binding.json").read_text(encoding="utf-8"))
             self.assertEqual(journal["activation_id"], REPLACEMENT_ID)
-            self.assertEqual(journal["predecessor_activation_id"], PREDECESSOR_ID)
+            self.assertEqual(journal["predecessor_activation_id"], ACT_002)
             self.assertIs(journal["resume_of_predecessor"], False)
             self.assertEqual(journal["stage"], "RECENT_DONE")
             pred_journal = json.loads((pred / "journal.json").read_text(encoding="utf-8"))
@@ -212,7 +222,7 @@ class PathRiskFreshActivationIdentityTests(unittest.TestCase):
             self.assertEqual(load_journal(data_root, PREDECESSOR_ID)["predecessor_canary"], "ACT-001-ONLY")
             self.assertNotIn("predecessor_canary", load_journal(data_root, REPLACEMENT_ID))
             self.assertEqual(binding["activation_id"], REPLACEMENT_ID)
-            self.assertEqual(binding["predecessor_activation_id"], PREDECESSOR_ID)
+            self.assertEqual(binding["predecessor_activation_id"], ACT_002)
             self.assertNotEqual(
                 binding["schedule_sha256"], pred_journal["schedule_sha256"]
             )
@@ -407,9 +417,11 @@ class PathRiskFreshActivationIdentityTests(unittest.TestCase):
         env["JUPITER_API_KEY"] = "fixture-not-a-real-key"
         opener = FixtureWindowOpener(_fixture())
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            data_root = Path(tmp) / "rdp"
+            ensure_act002_below_floor(data_root)
             result = run_live_window(
                 root=ROOT,
-                data_root=Path(tmp) / "rdp",
+                data_root=data_root,
                 opener=opener,
                 producer_git_sha=GIT_SHA,
                 owner_phrase=_phrase(),
@@ -419,6 +431,7 @@ class PathRiskFreshActivationIdentityTests(unittest.TestCase):
                 store_path=Path(tmp) / "rdp" / "observation_schedule_state.sqlite",
                 production=False,
                 environ=env,
+                **live_identity_kwargs(),
             )
         self.assertEqual(result["quote_calls"], 0)
         self.assertEqual(env.reads, 0)

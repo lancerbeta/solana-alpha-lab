@@ -28,6 +28,7 @@ from solana_alpha_lab.factory.pathrisk_live import (  # noqa: E402
     require_transport_probe_phrase,
     run_live_window,
     run_transport_probe_recent,
+    successor_preflight,
     transport_probe_owner_phrase,
 )
 
@@ -60,6 +61,8 @@ def main() -> int:
     live.add_argument("--owner-phrase", required=True)
     live.add_argument("--data-root", type=Path, required=True)
     live.add_argument("--producer-git-sha", required=True)
+    live.add_argument("--activation-id", required=True)
+    live.add_argument("--predecessor-activation-id", required=True)
     mode = live.add_mutually_exclusive_group(required=True)
     mode.add_argument(
         "--fake-provider-fixture",
@@ -77,6 +80,12 @@ def main() -> int:
         default=None,
         help="test-only crash injection; forbidden with --real-provider",
     )
+    successor = sub.add_parser(
+        "successor-preflight",
+        help="zero-network successor identity and exact owner phrase; no credential, no provider",
+    )
+    successor.add_argument("--root", type=Path, default=ROOT)
+    successor.add_argument("--data-root", type=Path, required=True)
     probe = sub.add_parser(
         "transport-probe-recent",
         help="one-GET /tokens/v2/recent diagnostic; not a PathRisk window",
@@ -156,6 +165,8 @@ def main() -> int:
                     producer_git_sha=args.producer_git_sha,
                     owner_phrase=args.owner_phrase,
                     main_sha=args.main_sha,
+                    activation_id=args.activation_id,
+                    predecessor_activation_id=args.predecessor_activation_id,
                     production=True,
                     clock=SystemClock(),
                     stop_after=args.stop_after,
@@ -175,6 +186,8 @@ def main() -> int:
                     producer_git_sha=args.producer_git_sha,
                     owner_phrase=args.owner_phrase,
                     main_sha=args.main_sha,
+                    activation_id=args.activation_id,
+                    predecessor_activation_id=args.predecessor_activation_id,
                     now=parse_utc(args.now),
                     stop_after=args.stop_after,
                     production=False,
@@ -190,6 +203,16 @@ def main() -> int:
         print(json.dumps(payload, indent=2, sort_keys=True, default=str))
         if result.get("terminal") == TERMINAL_CREDENTIAL_MISSING:
             return 1
+        return 0
+    if args.command == "successor-preflight":
+        policy = load_policy(args.root)
+        if policy.get("atom_id") != ATOM_ID:
+            raise SystemExit("ATOM_DRIFT")
+        try:
+            payload = successor_preflight(data_root=args.data_root, policy=policy)
+        except PathRiskLiveError as exc:
+            raise SystemExit(str(exc)) from exc
+        print(json.dumps(payload, indent=2, sort_keys=True))
         return 0
     if args.command == "transport-probe-recent":
         from solana_alpha_lab.factory.observation_schedule_runtime import (

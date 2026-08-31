@@ -15,7 +15,17 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+if str(ROOT / "tests") not in sys.path:
+    sys.path.insert(0, str(ROOT / "tests"))
 
+from pathrisk_live_testkit import (
+    ACT_002,
+    ACT_003,
+    ensure_act002_below_floor,
+    live_identity_kwargs,
+    successor_identity,
+    successor_phrase,
+)
 from solana_alpha_lab.factory.observation_schedule_runtime import JupiterReadonlyOpener
 from solana_alpha_lab.factory.pathrisk_live import (
     CREDENTIAL_ENV_NAME,
@@ -27,8 +37,7 @@ from solana_alpha_lab.factory.pathrisk_live import (
     TERMINAL_CREDENTIAL_MISSING,
     count_url_kinds,
     materialize_runtime_schedule,
-    resolve_live_window_identity,
-    run_live_window,
+    run_live_window as _run_live_window,
 )
 from solana_alpha_lab.factory.pathrisk_calibration import (
     TERMINAL_BELOW_FLOOR,
@@ -50,7 +59,15 @@ MINTS = (
 
 
 def _phrase() -> str:
-    return str(load_policy(ROOT)["external_authority"]["future_owner_phrase"])
+    return successor_phrase()
+
+
+def run_live_window(**kwargs):
+    kwargs.setdefault("activation_id", ACT_003)
+    kwargs.setdefault("predecessor_activation_id", ACT_002)
+    if kwargs.get("owner_phrase") != "wrong":
+        ensure_act002_below_floor(Path(kwargs["data_root"]))
+    return _run_live_window(**kwargs)
 
 
 def _row(mint: str, *, created: datetime, liquidity: str = "2000") -> dict:
@@ -143,8 +160,12 @@ class PathRiskWallclockLiveTests(unittest.TestCase):
                 _phrase(),
                 "--data-root",
                 str(ROOT / "local" / "tmp_unused_rdp"),
-                "--producer-git-sha",
+                    "--producer-git-sha",
                 GIT_SHA,
+                "--activation-id",
+                ACT_003,
+                "--predecessor-activation-id",
+                ACT_002,
                 "--real-provider",
                 "--fake-provider-fixture",
                 "tests/fixtures/observation_schedule/pathrisk_live_window.yaml",
@@ -168,8 +189,12 @@ class PathRiskWallclockLiveTests(unittest.TestCase):
                 _phrase(),
                 "--data-root",
                 str(ROOT / "local" / "tmp_unused_rdp"),
-                "--producer-git-sha",
+                    "--producer-git-sha",
                 GIT_SHA,
+                "--activation-id",
+                ACT_003,
+                "--predecessor-activation-id",
+                ACT_002,
                 "--real-provider",
                 "--now",
                 "2026-08-31T12:00:00Z",
@@ -194,8 +219,12 @@ class PathRiskWallclockLiveTests(unittest.TestCase):
                 _phrase(),
                 "--data-root",
                 str(ROOT / "local" / "tmp_unused_rdp"),
-                "--producer-git-sha",
+                    "--producer-git-sha",
                 GIT_SHA,
+                "--activation-id",
+                ACT_003,
+                "--predecessor-activation-id",
+                ACT_002,
                 "--real-provider",
                 "--stop-after",
                 "after_t0",
@@ -333,7 +362,7 @@ class PathRiskWallclockLiveTests(unittest.TestCase):
                 Path(tmp)
                 / "rdp"
                 / "pathrisk_live"
-                / resolve_live_window_identity(load_policy(ROOT)).activation_id
+                / ACT_003
                 / "runtime_schedule.yaml"
             ).read_text(encoding="utf-8")
             self.assertNotIn("2026-09-01T00:00:00Z", yaml_text)
@@ -423,8 +452,10 @@ class PathRiskWallclockLiveTests(unittest.TestCase):
     def test_t15_t16_runtime_schedule_uses_supplied_clock(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             data_root = Path(tmp) / "rdp"
-            first = materialize_runtime_schedule(ROOT, data_root, NOW)
-            second = materialize_runtime_schedule(ROOT, data_root, NOW + timedelta(hours=1))
+            first = materialize_runtime_schedule(ROOT, data_root, NOW, successor_identity())
+            second = materialize_runtime_schedule(
+                ROOT, data_root, NOW + timedelta(hours=1), successor_identity()
+            )
             self.assertEqual(first["schedule_sha256"], second["schedule_sha256"])
             self.assertEqual(first["activation"]["starts_at"], "2026-08-31T12:00:00Z")
             self.assertNotEqual(first["activation"]["starts_at"], "2026-09-01T00:00:00Z")

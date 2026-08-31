@@ -15,7 +15,14 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
+if str(ROOT / "tests") not in sys.path:
+    sys.path.insert(0, str(ROOT / "tests"))
 
+from pathrisk_live_testkit import (
+    ensure_act002_below_floor,
+    live_identity_kwargs,
+    successor_phrase,
+)
 from solana_alpha_lab.factory.observation_primitives import (
     HTTP_CLASS_401,
     HTTP_CLASS_403,
@@ -63,7 +70,7 @@ def _clock() -> datetime:
 
 
 def _phrase() -> str:
-    return str(load_policy(ROOT)["external_authority"]["future_owner_phrase"])
+    return successor_phrase()
 
 
 def _probe_phrase() -> str:
@@ -112,6 +119,7 @@ def _primitive(opener: object) -> dict:
 
 
 def _run_window(*, data_root: Path, opener: object) -> dict:
+    ensure_act002_below_floor(data_root)
     return run_live_window(
         root=ROOT,
         data_root=data_root,
@@ -122,6 +130,7 @@ def _run_window(*, data_root: Path, opener: object) -> dict:
         clock=ControllableClock(NOW),
         store_path=data_root / "observation_schedule_state.sqlite",
         production=False,
+        **live_identity_kwargs(),
     )
 
 

@@ -11,7 +11,7 @@ external_authority:
   build: false
   taker: OMITTED_QUOTE_ONLY
   cash_cap_usd_cents: 0
-  future_owner_phrase: 'OK PATHRISK_FRESH_ACTIVATION_IDENTITY_LIVE_V1: exactly one replacement prospective PathRisk window ACT-PATHRISK-LIVE-002; predecessor ACT-PATHRISK-LIVE-001 remains immutable; replacement_reason PRE_EVIDENCE_OPERATIONAL_FAILURE; not a resume of ACT-PATHRISK-LIVE-001; Jupiter Free-key; JUPITER_API_KEY process env only; exactly one /recent; exactly one bulk /tokens/v2/search; quote-only /swap/v2/order; no recurring /recent; x-api-key header only; no .env / secret leakage; no taker, /build, /execute, wallet, signer, transaction; no paid plan / second provider; no retry / fallback; cash cap $0; call cap 26; ICP-EARLY-PUMPFUN-V1; first 4 fresh unconsumed eligible mints or CALIBRATION_ELIGIBLE_BELOW_FLOOR with quote_calls=0; notionals 10000000 and 1000000 lamports; T0 BUY + T0 reverse + H900 dependent SELL of the same T0 BUY token amount; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, Strategy, Shadow, alpha and NetReturn forbidden inside the live window.'
+  owner_phrase_source: SUCCESSOR_DETERMINISTIC_RENDERER
 transport_probe:
   capture_authorized: false
   max_calls: 1
@@ -70,9 +70,15 @@ live_window:
   one_bulk_search: true
   schedule_fixture: tests/fixtures/observation_schedule/pathrisk_live_window.yaml
   identity:
-    activation_id: ACT-PATHRISK-LIVE-002
-    predecessor_activation_id: ACT-PATHRISK-LIVE-001
-    replacement_reason: PRE_EVIDENCE_OPERATIONAL_FAILURE
+    namespace: ACT-PATHRISK-LIVE
+    successor_after_terminal:
+      - CALIBRATION_ELIGIBLE_BELOW_FLOOR
+    successor_reason: MARKET_SUPPLY_RETRY_AFTER_BELOW_FLOOR
+    sequence_step: 1
+    predecessor_required: true
+    immutable_identity: true
+    one_window_per_owner_phrase: true
+    branching_forbidden: true
 informative_complete_dual_notional_floor: 3
 forbidden_actions:
   - taker
