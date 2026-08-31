@@ -1,0 +1,66 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "PATHRISK-FRESH-ACTIVATION-IDENTITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-31",
+  "task_id": "PATHRISK_FRESH_ACTIVATION_IDENTITY_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "pending",
+  "reviewed_inventory_sha256": "pending",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_IDENTITY_FROM_POLICY_NOT_SINGLETON",
+        "CHECKED_NO_ACTIVATION_ID_ARG",
+        "CHECKED_CRASH_RESUME_SAME_002",
+        "CHECKED_COMPLETE_HARD_FAIL",
+        "CHECKED_INCOMPATIBLE_BINDING",
+        "CHECKED_CONSUMED_PHRASE_REJECTED",
+        "CHECKED_CALL_OCCURRENCE_KEYED_BY_ACTIVATION_ID",
+        "CHECKED_ZERO_PROVIDER_ZERO_CREDENTIAL"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_CHEAPEST_FALSIFIER_ENCODED",
+        "CHECKED_PREDECESSOR_CANARY_NOT_LOADED_AS_002",
+        "CHECKED_COPIED_001_JOURNAL_HARD_FAIL",
+        "CHECKED_COMPLETE_CANNOT_RERUN",
+        "CHECKED_PREDECESSOR_CANNOT_BE_CURRENT",
+        "CHECKED_SCIENCE_FREEZE",
+        "CHECKED_PREVIOUS_FAIL_JOURNAL_LOAD_UNORACLED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NO_ACT002_INHERIT_OVERWRITE_RESUME_REINTERPRET_ACT001",
+        "CHECKED_RUNTIME_JOURNAL_BINDING_ISOLATION",
+        "CHECKED_REBUILD_REQUIRES_MATCHING_SCHEDULE_ROWS",
+        "CHECKED_LABELS_ACTIVATION_SCOPED",
+        "CHECKED_FOREIGN_LABEL_HARD_FAIL",
+        "CHECKED_PREDECESSOR_PANEL_LABELS_BYTE_IDENTICAL",
+        "CHECKED_NO_MULTI_WINDOW_FRAMEWORK",
+        "CHECKED_PREVIOUS_FAIL_SHARED_RDP_LABEL_OVERWRITE"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_LIVE_CALIBRATION",
+    "NO_ALPHA",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_ACT_001_REWRITE"
+  ]
+}

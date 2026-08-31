@@ -1,0 +1,40 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PATHRISK-FRESH-ACTIVATION-IDENTITY-FACTORY-FIT-001",
+  "as_of": "2026-08-31",
+  "task_id": "PATHRISK_FRESH_ACTIVATION_IDENTITY_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "pending",
+  "reviewed_inventory_sha256": "pending",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "PATHRISK_LIVE_AFTER_FRESH_ACTIVATION_IDENTITY"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_LIVE_CALIBRATION",
+    "NO_NETRETURN",
+    "NO_FILL",
+    "QUOTE_ONLY",
+    "PATHRISK_PROXY_NOT_PROFITABILITY",
+    "NO_REAL_CREDENTIAL_VALUE_READ",
+    "OLD_WINDOW_UNCHANGED"
+  ],
+  "recovery": "REVERT"
+}

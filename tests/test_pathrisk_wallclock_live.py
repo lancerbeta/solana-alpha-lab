@@ -27,6 +27,7 @@ from solana_alpha_lab.factory.pathrisk_live import (
     TERMINAL_CREDENTIAL_MISSING,
     count_url_kinds,
     materialize_runtime_schedule,
+    resolve_live_window_identity,
     run_live_window,
 )
 from solana_alpha_lab.factory.pathrisk_calibration import (
@@ -329,7 +330,11 @@ class PathRiskWallclockLiveTests(unittest.TestCase):
                 self.assertGreaterEqual(observed, due)
                 self.assertLessEqual(observed, due + timedelta(seconds=120))
             yaml_text = (
-                Path(tmp) / "rdp" / "pathrisk_live" / "ACT-PATHRISK-LIVE-001" / "runtime_schedule.yaml"
+                Path(tmp)
+                / "rdp"
+                / "pathrisk_live"
+                / resolve_live_window_identity(load_policy(ROOT)).activation_id
+                / "runtime_schedule.yaml"
             ).read_text(encoding="utf-8")
             self.assertNotIn("2026-09-01T00:00:00Z", yaml_text)
             self.assertIn("2026-08-31T12:00:00Z", yaml_text)

@@ -38,6 +38,7 @@ from solana_alpha_lab.factory.pathrisk_live import (
     compile_live_schedule,
     count_url_kinds,
     resolve_consumed_exclusions,
+    resolve_live_window_identity,
     run_live_window,
 )
 
@@ -191,7 +192,7 @@ class PathRiskLiveWindowTests(unittest.TestCase):
             self.assertIn("NO_ALPHA", result["non_claims"])
             self.assertIn("PATHRISK_PROXY_NOT_PROFITABILITY", result["non_claims"])
             self.assertTrue(result["all_published_panels_labeled"])
-            self.assertTrue((data_root / "pathrisk_live" / "ACT-PATHRISK-LIVE-001" / "readout.json").is_file())
+            self.assertTrue((data_root / "pathrisk_live" / resolve_live_window_identity(load_policy(ROOT)).activation_id / "readout.json").is_file())
             self.assertGreaterEqual(
                 len(result["readout"]["complete_dual_notional_mints"]), 3
             )

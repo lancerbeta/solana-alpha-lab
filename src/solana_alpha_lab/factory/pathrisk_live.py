@@ -8,6 +8,7 @@ import os
 import sys
 import time
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -98,7 +99,6 @@ R0_RECENT_HTTP_TERMINALS = {
     HTTP_CLASS_TRANSPORT: "R0_RECENT_TRANSPORT_ERROR",
     HTTP_CLASS_NO_RESPONSE: "R0_RECENT_NO_HTTP_RESPONSE",
 }
-ACTIVATION_ID = "ACT-PATHRISK-LIVE-001"
 LIVE_SCHEDULE_RELATIVE = "tests/fixtures/observation_schedule/pathrisk_live_window.yaml"
 FORBIDDEN_SEARCH_BUNDLE = "BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001"
 CREDENTIAL_ENV_NAME = "JUPITER_API_KEY"
@@ -106,10 +106,64 @@ TERMINAL_CREDENTIAL_MISSING = "CREDENTIAL_ENV_MISSING_BEFORE_PROVIDER"
 ADMISSION_SECONDS = 180
 RUNTIME_SCHEDULE_NAME = "runtime_schedule.yaml"
 RUNTIME_BINDING_NAME = "runtime_binding.json"
+REPLACEMENT_REASON_PRE_EVIDENCE_OPERATIONAL_FAILURE = (
+    "PRE_EVIDENCE_OPERATIONAL_FAILURE"
+)
+CONSUMED_LIVE_OWNER_PHRASE = (
+    "OK EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_LIVE_V1: one bounded Jupiter "
+    "Free-key read-only PathRisk calibration using a local process-environment "
+    "key only; exactly one Tokens V2 /recent and exactly one bulk "
+    "/tokens/v2/search R0 snapshot plus quote-only /swap/v2/order; no recurring "
+    "/recent; x-api-key header only; no .env read; no key in URL/log/receipt/Git; "
+    "no taker, /build, /execute, wallet, signer, transaction, paid plan, second "
+    "provider, retry or fallback; cash cap $0; call cap 26; ICP-EARLY-PUMPFUN-V1; "
+    "first 4 fresh unconsumed eligible mints or CALIBRATION_ELIGIBLE_BELOW_FLOOR "
+    "with quote calls 0; notionals 10000000 and 1000000 lamports; T0 BUY + T0 "
+    "reverse + H900 dependent SELL of the same T0 BUY token amount; one window "
+    "only; no third notional; Factory runner unchanged; Hypothesis Forge, Paper, "
+    "Strategy, Shadow, alpha and NetReturn forbidden."
+)
 
 
 class PathRiskLiveError(ValueError):
     """Typed live-window glue failure."""
+
+
+@dataclass(frozen=True, slots=True)
+class LiveWindowIdentity:
+    """Immutable PathRisk live identity resolved from the science contract."""
+
+    activation_id: str
+    predecessor_activation_id: str
+    replacement_reason: str
+
+    def binding_fields(self) -> dict[str, str]:
+        return {
+            "activation_id": self.activation_id,
+            "predecessor_activation_id": self.predecessor_activation_id,
+            "replacement_reason": self.replacement_reason,
+        }
+
+
+def resolve_live_window_identity(policy: Mapping[str, Any]) -> LiveWindowIdentity:
+    live = policy.get("live_window")
+    if not isinstance(live, Mapping):
+        raise PathRiskLiveError("LIVE_WINDOW_IDENTITY_MISSING")
+    raw = live.get("identity")
+    if not isinstance(raw, Mapping):
+        raise PathRiskLiveError("LIVE_WINDOW_IDENTITY_MISSING")
+    activation_id = str(raw.get("activation_id") or "").strip()
+    predecessor = str(raw.get("predecessor_activation_id") or "").strip()
+    reason = str(raw.get("replacement_reason") or "").strip()
+    if not activation_id or not predecessor or not reason:
+        raise PathRiskLiveError("LIVE_WINDOW_IDENTITY_INVALID")
+    if activation_id == predecessor:
+        raise PathRiskLiveError("PREDECESSOR_CANNOT_BE_CURRENT_ACTIVATION")
+    return LiveWindowIdentity(
+        activation_id=activation_id,
+        predecessor_activation_id=predecessor,
+        replacement_reason=reason,
+    )
 
 
 class HardCapOpener:
@@ -270,9 +324,18 @@ def save_journal(data_root: Path, activation_id: str, payload: Mapping[str, Any]
 
 
 def require_owner_phrase(policy: Mapping[str, Any], phrase: str) -> None:
+    if phrase == CONSUMED_LIVE_OWNER_PHRASE:
+        raise PathRiskLiveError("OWNER_PHRASE_CONSUMED")
     expected = str(policy["external_authority"]["future_owner_phrase"])
     if phrase != expected:
         raise PathRiskLiveError("OWNER_PHRASE_MISMATCH")
+    identity = resolve_live_window_identity(policy)
+    if identity.activation_id not in phrase:
+        raise PathRiskLiveError("OWNER_PHRASE_IDENTITY_MISMATCH")
+    if identity.predecessor_activation_id not in phrase:
+        raise PathRiskLiveError("OWNER_PHRASE_IDENTITY_MISMATCH")
+    if identity.replacement_reason not in phrase:
+        raise PathRiskLiveError("OWNER_PHRASE_IDENTITY_MISMATCH")
 
 
 def transport_probe_owner_phrase(policy: Mapping[str, Any]) -> str:
@@ -533,16 +596,42 @@ def prospective_time_admissible(
     return True
 
 
-def runtime_live_dir(data_root: Path) -> Path:
-    return Path(data_root) / "pathrisk_live" / ACTIVATION_ID
+def runtime_live_dir(data_root: Path, activation_id: str) -> Path:
+    return Path(data_root) / "pathrisk_live" / activation_id
+
+
+def _assert_identity_fields(payload: Mapping[str, Any], identity: LiveWindowIdentity) -> None:
+    for key, expected in identity.binding_fields().items():
+        if payload.get(key) != expected:
+            raise PathRiskLiveError("INCOMPATIBLE_ACTIVATION_BINDING")
+    if payload.get("resume_of_predecessor") is True:
+        raise PathRiskLiveError("INCOMPATIBLE_ACTIVATION_BINDING")
+
+
+def _stamp_identity(payload: dict[str, Any], identity: LiveWindowIdentity) -> None:
+    payload.update(identity.binding_fields())
+    payload["resume_of_predecessor"] = False
+
+
+def _assert_existing_journal_identity(
+    data_root: Path,
+    identity: LiveWindowIdentity,
+    journal: Mapping[str, Any],
+) -> None:
+    path = _journal_path(data_root, identity.activation_id)
+    if not path.is_file():
+        return
+    _assert_identity_fields(journal, identity)
 
 
 def materialize_runtime_schedule(
     root: Path,
     data_root: Path,
     now: datetime,
+    identity: LiveWindowIdentity | None = None,
 ) -> dict[str, Any]:
-    directory = runtime_live_dir(data_root)
+    resolved = identity or resolve_live_window_identity(load_policy(root))
+    directory = runtime_live_dir(data_root, resolved.activation_id)
     directory.mkdir(parents=True, exist_ok=True)
     yaml_path = directory / RUNTIME_SCHEDULE_NAME
     binding_path = directory / RUNTIME_BINDING_NAME
@@ -557,6 +646,7 @@ def materialize_runtime_schedule(
         binding = json.loads(binding_path.read_text(encoding="utf-8"))
         if binding.get("schedule_sha256") != compiled.schedule["schedule_sha256"]:
             raise PathRiskLiveError("RUNTIME_SCHEDULE_BINDING_MISMATCH")
+        _assert_identity_fields(binding, resolved)
         return compiled.schedule
     template = load_observation_schedule(root, LIVE_SCHEDULE_RELATIVE)
     document = yaml.safe_load(yaml.safe_dump(template))
@@ -576,6 +666,8 @@ def materialize_runtime_schedule(
     binding_path.write_text(
         json.dumps(
             {
+                **resolved.binding_fields(),
+                "resume_of_predecessor": False,
                 "schedule_sha256": compiled.schedule["schedule_sha256"],
                 "starts_at": document["activation"]["starts_at"],
                 "stops_admitting_at": document["activation"]["stops_admitting_at"],
@@ -639,6 +731,7 @@ def _activate(
     schedule: Mapping[str, Any],
     now: datetime,
     producer_git_sha: str,
+    activation_id: str,
 ) -> str:
     store.persist_registered_schedule(
         schedule_sha256=str(schedule["schedule_sha256"]),
@@ -674,7 +767,7 @@ def _activate(
     store.upsert_activation(
         {
             "schedule_sha256": schedule["schedule_sha256"],
-            "activation_id": ACTIVATION_ID,
+            "activation_id": activation_id,
             "schedule_key": schedule["schedule_key"],
             "state": "ACTIVE",
             "authority_receipt_sha256": authority["receipt_sha256"],
@@ -684,7 +777,7 @@ def _activate(
         },
         clock=now,
     )
-    return ACTIVATION_ID
+    return activation_id
 
 
 def _accounting(
@@ -692,6 +785,7 @@ def _accounting(
     schedule: Mapping[str, Any],
     now: datetime,
     root: Path,
+    activation_id: str,
 ) -> _Accounting:
     registry = load_observation_primitive_registry(root)
     credit_costs = {
@@ -703,7 +797,7 @@ def _accounting(
     return _Accounting(
         store,
         schedule,
-        ACTIVATION_ID,
+        activation_id,
         now,
         credit_costs=credit_costs,
     )
@@ -729,7 +823,7 @@ def _oneshot(
     )
     occurrence = call_occurrence_id(
         schedule_sha256=digest,
-        activation_id=ACTIVATION_ID,
+        activation_id=accounts.activation_id,
         primitive_id=primitive_id,
         point_id=point_id,
         due_at=due_at,
@@ -842,6 +936,7 @@ def _drain_quotes(
     discovery: Sequence[Mapping[str, Any]] | list[Any],
     steps: int,
     wait_future: bool = False,
+    activation_id: str,
 ) -> dict[str, Any] | None:
     last: dict[str, Any] | None = None
     injected: Sequence[Mapping[str, Any]] | list[Any] = discovery
@@ -866,7 +961,7 @@ def _drain_quotes(
             data_root=data_root,
             store=store,
             schedule=schedule,
-            activation_id=ACTIVATION_ID,
+            activation_id=activation_id,
             now=clock(),
             opener=opener,
             producer_git_sha=producer_git_sha,
@@ -886,20 +981,26 @@ def _write_live_labels(
     exclusion: Mapping[str, Any],
     r0_search_sha256: str,
     selected_mints: Sequence[str],
+    activation_id: str,
 ) -> list[str]:
     rebuilt = rebuild_observation_panel_from_rdp(
         data_root=data_root,
         schedule_sha256=schedule_sha256,
     )
-    manifest_ids = list(rebuilt.get("dataset_manifest_ids") or [])
-    if not manifest_ids:
-        manifests_dir = Path(data_root) / "datasets" / "manifests"
-        for marker in sorted(manifests_dir.glob("dataset-*.published")):
-            payload = json.loads(marker.read_text(encoding="utf-8"))
-            manifest_id = str(payload.get("dataset_manifest_id") or "")
-            if manifest_id:
-                manifest_ids.append(manifest_id)
+    manifest_ids: list[str] = []
+    for manifest_id in list(rebuilt.get("dataset_manifest_ids") or []):
+        path = Path(data_root) / "datasets" / "manifests" / f"{manifest_id}.labels.json"
+        if path.is_file():
+            try:
+                existing = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise PathRiskLiveError("INCOMPATIBLE_ACTIVATION_BINDING") from exc
+            prior = existing.get("activation_id")
+            if prior not in {None, activation_id}:
+                raise PathRiskLiveError("INCOMPATIBLE_ACTIVATION_BINDING")
+        manifest_ids.append(str(manifest_id))
     labels = {
+        "activation_id": activation_id,
         "evidence_role": "PATHRISK_CALIBRATION_PANEL",
         "pathrisk_terminal": readout.get("terminal"),
         "readout_sha256": readout.get("readout_sha256"),
@@ -918,7 +1019,7 @@ def _write_live_labels(
     for manifest_id in manifest_ids:
         path = Path(data_root) / "datasets" / "manifests" / f"{manifest_id}.labels.json"
         path.write_text(json.dumps(labels, indent=2, sort_keys=True), encoding="utf-8")
-    readout_path = _journal_path(data_root, ACTIVATION_ID).parent / "readout.json"
+    readout_path = _journal_path(data_root, activation_id).parent / "readout.json"
     readout_path.parent.mkdir(parents=True, exist_ok=True)
     readout_path.write_text(
         json.dumps(dict(readout), indent=2, sort_keys=True, default=str),
@@ -945,10 +1046,14 @@ def _panel_readout(
     )
 
 
-def _lifetime_calls(store: ObservationScheduleStore, schedule: Mapping[str, Any]) -> int:
+def _lifetime_calls(
+    store: ObservationScheduleStore,
+    schedule: Mapping[str, Any],
+    activation_id: str,
+) -> int:
     life = store.load_lifetime(
         schedule_sha256=str(schedule["schedule_sha256"]),
-        activation_id=ACTIVATION_ID,
+        activation_id=activation_id,
     )
     return int(life.get("provider_calls") or 0)
 
@@ -977,6 +1082,8 @@ def run_live_window(
         raise PathRiskLiveError("CALL_CAP_26_NOT_ENFORCEABLE")
     proposed_capture_packet(root=root, main_sha=main_sha, policy=loaded_policy)
     require_owner_phrase(loaded_policy, owner_phrase)
+    identity = resolve_live_window_identity(loaded_policy)
+    activation_id = identity.activation_id
     if production:
         if now is not None:
             raise PathRiskLiveError("NOW_OVERRIDE_FORBIDDEN_IN_PRODUCTION")
@@ -998,8 +1105,9 @@ def run_live_window(
             raise PathRiskLiveError("CLOCK_REQUIRED")
     if production and type(clock) is FrozenClock:
         raise PathRiskLiveError("FROZEN_CLOCK_FORBIDDEN_IN_PRODUCTION")
-    journal = load_journal(data_root, ACTIVATION_ID)
+    journal = load_journal(data_root, activation_id)
     resume_stage = str(journal.get("stage") or "START")
+    _assert_existing_journal_identity(data_root, identity, journal)
     assert_no_completed_window(journal)
     exclusion = resolve_consumed_exclusions(
         repo_root=root,
@@ -1007,9 +1115,10 @@ def run_live_window(
         policy=loaded_policy,
         resolved_at=clock(),
     )
-    schedule = materialize_runtime_schedule(root, data_root, clock())
+    schedule = materialize_runtime_schedule(root, data_root, clock(), identity)
     if not prospective_band_derivable(schedule):
         raise PathRiskLiveError("PROSPECTIVE_TIME_ADMISSIBILITY_REQUIRES_SCIENCE_REPLAN")
+    _stamp_identity(journal, identity)
     journal["exclusion"] = {
         key: exclusion[key]
         for key in (
@@ -1022,7 +1131,7 @@ def run_live_window(
         )
     }
     journal["schedule_sha256"] = schedule["schedule_sha256"]
-    save_journal(data_root, ACTIVATION_ID, journal)
+    save_journal(data_root, activation_id, journal)
     if production:
         try:
             credential = load_process_credential(environ)
@@ -1042,7 +1151,7 @@ def run_live_window(
     ops_path = store_path or (data_root / "observation_schedule_state.sqlite")
     store = ObservationScheduleStore(ops_path)
     try:
-        existing = store.get_activation(str(schedule["schedule_sha256"]), ACTIVATION_ID)
+        existing = store.get_activation(str(schedule["schedule_sha256"]), activation_id)
         if existing is None:
             _activate(
                 root=root,
@@ -1051,11 +1160,12 @@ def run_live_window(
                 schedule=schedule,
                 now=clock(),
                 producer_git_sha=producer_git_sha,
+                activation_id=activation_id,
             )
         epoch_before = evidence_epoch_sha256(
             evidence_epoch_material(root, data_root)
         )
-        accounts = _accounting(store, schedule, clock(), root)
+        accounts = _accounting(store, schedule, clock(), root, activation_id)
         pace_seconds = int(schedule["budgets"]["min_provider_pace_seconds"])
         capped = opener if isinstance(opener, HardCapOpener) else HardCapOpener(opener)
         recent = _oneshot(
@@ -1073,11 +1183,11 @@ def run_live_window(
         journal["stage"] = "RECENT_DONE"
         journal["recent_sha256"] = recent.get("response_sha256")
         journal["recent_reused"] = recent.get("reused")
-        save_journal(data_root, ACTIVATION_ID, journal)
+        save_journal(data_root, activation_id, journal)
         if stop_after == "after_recent":
             return {
                 "terminal": "STOPPED_AFTER_RECENT",
-                "provider_calls": _lifetime_calls(store, schedule),
+                "provider_calls": _lifetime_calls(store, schedule, activation_id),
                 "quote_calls": 0,
                 "urls": list(capped.urls),
                 "exclusion": exclusion,
@@ -1096,7 +1206,7 @@ def run_live_window(
                     "terminal": operational,
                     "http_status": _http_fields(recent)["http_status"],
                     "http_class": _http_fields(recent)["http_class"],
-                    "provider_calls": _lifetime_calls(store, schedule),
+                    "provider_calls": _lifetime_calls(store, schedule, activation_id),
                     "quote_calls": 0,
                     "urls": list(capped.urls),
                     "exclusion": exclusion,
@@ -1125,11 +1235,11 @@ def run_live_window(
         journal["stage"] = "R0_BOUND"
         journal["r0_search_sha256"] = search_hash
         journal["search_reused"] = search.get("reused")
-        save_journal(data_root, ACTIVATION_ID, journal)
+        save_journal(data_root, activation_id, journal)
         if stop_after == "after_search":
             return {
                 "terminal": "STOPPED_AFTER_SEARCH",
-                "provider_calls": _lifetime_calls(store, schedule),
+                "provider_calls": _lifetime_calls(store, schedule, activation_id),
                 "quote_calls": 0,
                 "urls": list(capped.urls),
                 "r0_search_sha256": search_hash,
@@ -1164,11 +1274,11 @@ def run_live_window(
             )
             journal["selected_mints"] = list(sample["mints"])
             journal["eligible_count"] = sample["eligible_count"]
-            save_journal(data_root, ACTIVATION_ID, journal)
+            save_journal(data_root, activation_id, journal)
         quote_urls = lambda: [url for url in capped.urls if "/swap/v2/order" in url]
         if sample["terminal"] == TERMINAL_BELOW_FLOOR:
             journal["stage"] = "BELOW_FLOOR"
-            save_journal(data_root, ACTIVATION_ID, journal)
+            save_journal(data_root, activation_id, journal)
             epoch_after = evidence_epoch_sha256(
                 evidence_epoch_material(root, data_root)
             )
@@ -1177,7 +1287,7 @@ def run_live_window(
                 "eligible_count": sample["eligible_count"],
                 "selected_mints": list(sample["mints"]),
                 "quote_calls": 0,
-                "provider_calls": _lifetime_calls(store, schedule),
+                "provider_calls": _lifetime_calls(store, schedule, activation_id),
                 "discovery_calls": len(
                     [
                         url
@@ -1209,7 +1319,7 @@ def run_live_window(
             selected_rows.append(dict(row))
         if prior_stage not in {"T0_COMPLETE", "H900_PARTIAL"}:
             journal["stage"] = "SAMPLED"
-            save_journal(data_root, ACTIVATION_ID, journal)
+            save_journal(data_root, activation_id, journal)
         t0_steps = 4 if stop_after == "during_t0" else 48
         t0_result: dict[str, Any] | None = None
         labeled: list[str] = []
@@ -1225,12 +1335,13 @@ def run_live_window(
                 discovery=selected_rows,
                 steps=t0_steps,
                 wait_future=False,
+                activation_id=activation_id,
             )
             t0_readout = _panel_readout(
                 data_root=data_root,
                 schedule_sha256=str(schedule["schedule_sha256"]),
                 mints=list(sample["mints"]),
-                provider_calls=_lifetime_calls(store, schedule),
+                provider_calls=_lifetime_calls(store, schedule, activation_id),
             )
             labeled = _write_live_labels(
                 data_root=data_root,
@@ -1239,17 +1350,18 @@ def run_live_window(
                 exclusion=exclusion,
                 r0_search_sha256=str(search_hash),
                 selected_mints=list(sample["mints"]),
+                activation_id=activation_id,
             )
             journal["t0_readout_sha256"] = t0_readout.get("readout_sha256")
             if stop_after != "during_t0":
                 journal["stage"] = "T0_COMPLETE"
-            save_journal(data_root, ACTIVATION_ID, journal)
+            save_journal(data_root, activation_id, journal)
         if stop_after in {"after_t0", "during_t0"}:
             return {
                 "terminal": (
                     "STOPPED_DURING_T0" if stop_after == "during_t0" else "STOPPED_AFTER_T0"
                 ),
-                "provider_calls": _lifetime_calls(store, schedule),
+                "provider_calls": _lifetime_calls(store, schedule, activation_id),
                 "quote_calls": len(quote_urls()),
                 "urls": list(capped.urls),
                 "selected_mints": list(sample["mints"]),
@@ -1274,13 +1386,14 @@ def run_live_window(
             discovery=[],
             steps=h900_steps,
             wait_future=True,
+            activation_id=activation_id,
         )
         if stop_after == "during_h900":
             h900_readout = _panel_readout(
                 data_root=data_root,
                 schedule_sha256=str(schedule["schedule_sha256"]),
                 mints=list(sample["mints"]),
-                provider_calls=_lifetime_calls(store, schedule),
+                provider_calls=_lifetime_calls(store, schedule, activation_id),
             )
             labeled = _write_live_labels(
                 data_root=data_root,
@@ -1289,12 +1402,13 @@ def run_live_window(
                 exclusion=exclusion,
                 r0_search_sha256=str(search_hash),
                 selected_mints=list(sample["mints"]),
+                activation_id=activation_id,
             )
             journal["stage"] = "H900_PARTIAL"
-            save_journal(data_root, ACTIVATION_ID, journal)
+            save_journal(data_root, activation_id, journal)
             return {
                 "terminal": "STOPPED_DURING_H900",
-                "provider_calls": _lifetime_calls(store, schedule),
+                "provider_calls": _lifetime_calls(store, schedule, activation_id),
                 "quote_calls": len(quote_urls()),
                 "urls": list(capped.urls),
                 "selected_mints": list(sample["mints"]),
@@ -1307,7 +1421,7 @@ def run_live_window(
             data_root=data_root,
             schedule_sha256=str(schedule["schedule_sha256"]),
             mints=list(sample["mints"]),
-            provider_calls=_lifetime_calls(store, schedule),
+            provider_calls=_lifetime_calls(store, schedule, activation_id),
         )
         labeled = _write_live_labels(
             data_root=data_root,
@@ -1316,12 +1430,13 @@ def run_live_window(
             exclusion=exclusion,
             r0_search_sha256=str(search_hash),
             selected_mints=list(sample["mints"]),
+            activation_id=activation_id,
         )
         journal["stage"] = "COMPLETE"
         journal["terminal"] = readout["terminal"]
         journal["readout_sha256"] = readout.get("readout_sha256")
         journal["dataset_manifest_ids"] = labeled
-        save_journal(data_root, ACTIVATION_ID, journal)
+        save_journal(data_root, activation_id, journal)
         epoch_after = evidence_epoch_sha256(evidence_epoch_material(root, data_root))
         published = list((data_root / "datasets" / "manifests").glob("dataset-*.published"))
         labeled_files = list((data_root / "datasets" / "manifests").glob("dataset-*.labels.json"))
@@ -1331,7 +1446,7 @@ def run_live_window(
             "non_claims": list(readout.get("non_claims") or []),
             "selected_mints": list(sample["mints"]),
             "quote_calls": len(quote_urls()),
-            "provider_calls": _lifetime_calls(store, schedule),
+            "provider_calls": _lifetime_calls(store, schedule, activation_id),
             "urls": list(capped.urls),
             "r0_search_sha256": search_hash,
             "recent_calls": sum(1 for url in capped.urls if "/tokens/v2/recent" in url),
@@ -1348,6 +1463,9 @@ def run_live_window(
             "git_mutated": False,
             "h900_tick": h900_result,
             "schedule_sha256": schedule["schedule_sha256"],
+            "activation_id": activation_id,
+            "predecessor_activation_id": identity.predecessor_activation_id,
+            "replacement_reason": identity.replacement_reason,
             "all_published_panels_labeled": bool(published)
             and len(labeled_files) >= len(published),
         }
@@ -1370,11 +1488,13 @@ def count_url_kinds(urls: Sequence[str]) -> dict[str, int]:
 __all__ = [
     "CALL_CAP",
     "CREDENTIAL_ENV_NAME",
+    "CONSUMED_LIVE_OWNER_PHRASE",
     "FORBIDDEN_SEARCH_BUNDLE",
     "ControllableClock",
     "FixtureWindowOpener",
     "HardCapOpener",
     "LIVE_SCHEDULE_RELATIVE",
+    "LiveWindowIdentity",
     "PathRiskLiveError",
     "SystemClock",
     "TERMINAL_CREDENTIAL_MISSING",
@@ -1383,6 +1503,8 @@ __all__ = [
     "materialize_runtime_schedule",
     "prospective_time_admissible",
     "resolve_consumed_exclusions",
+    "resolve_live_window_identity",
+    "runtime_live_dir",
     "run_live_window",
     "run_transport_probe_recent",
     "transport_probe_owner_phrase",
