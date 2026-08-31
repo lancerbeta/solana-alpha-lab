@@ -1,0 +1,15 @@
+{
+  "schema": "smial.delivery-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "DISCOVERY-EVIDENCE-RELEASE-BRIDGE-FACTORY-FIT-001",
+  "as_of": "2026-09-01",
+  "task_id": "DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1",
+  "verdict": "PASS",
+  "adopt_wrap_fork_build": "WRAP",
+  "second_data_platform": false,
+  "provider_calls": 0,
+  "notes": [
+    "Wrapped existing ObservationSchedule field extraction, ResearchStore/RDP publication pattern, and HFIC preflight packet.",
+    "Did not invent a second collector, second RDP, or second Forge context path."
+  ]
+}

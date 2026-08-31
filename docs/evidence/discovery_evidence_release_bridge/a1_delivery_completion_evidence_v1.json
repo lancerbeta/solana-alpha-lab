@@ -1,0 +1,74 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "DISCOVERY-EVIDENCE-RELEASE-BRIDGE-COMPLETION-001",
+  "as_of": "2026-09-01",
+  "task_id": "DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1",
+  "state_change": "DISCOVERY_EVIDENCE_RELEASE_BRIDGE_VERTICAL_PROOF_READY_FOR_MERGE_GATE",
+  "base_main": "2597104aed0fd372ac756af84a497ad7b2705235",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md": "03993e69834aa7e6a1de68d3a73b5bfd6eb3f39c033eb044ed9e31618e53f954",
+    "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "716ebf7a936e4dbf4604a03d38b236eee71420db300c1ce710882670f7207d91",
+    "src/solana_alpha_lab/factory/discovery_evidence_release.py": "c11128e4a1670631b70ce1ff5a07ee5d6edc1a17881050c047c295dcd14f5a04",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "55f7cf956cde0d3b5931b20db6c934fbb723e701839c09a08b2127a540438ad6",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "23e00ffaefccbb6e3813930fe8bf2d358be2cb038e38d8561c54f1f7608f6d4e",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "d246362a1842a3e4d4ac074875f70dc1763c9e5ea503964b00e0a2d2ff2ee952",
+    "configs/observation_primitive_registry_v1.yaml": "1817b4fae2e4466d32de28821f62085f73f71a26e1b180c467a19a3e0e824b64",
+    "scripts/discovery_evidence_release.py": "701a063d525c004d7248fe1abe1eaae967bc7a0d5a570064adf2d9378209eafb",
+    "tests/test_tokens_v2_typed_projection.py": "6e5c5bb24194de57b5fab017e8249428a4eef280c3204317ebb75712d9ade692",
+    "tests/test_discovery_evidence_release_bridge.py": "75fab71cf4fc7120c01376372a80e135054db589ca3334e5882b212cf3339eda"
+  },
+  "false_roadmap_assumptions": [
+    "Design-time main SHA 4cf01ec was superseded; freeze base is 2597104 after PR #230",
+    "Git DISCOVERY_SEARCH_R0 fixture is thin (no holderCount/organic/multi-window trader stats); VAL_R0 literal absent",
+    "Roadmap 'rich unused provider fields' does not hold for the Git-bound fixture; missing fields are MISSING_TYPED/EXCLUDED"
+  ],
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_factory_fit_v1.json",
+    "sha256": "a92a75d4dd1013f32c90b1c36374516085e5168b8b2dd08e41cd970e3ec1f382",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_DISCOVERY_EVIDENCE_RELEASE_BRIDGE_AND_SCHEDULER_REGRESSION",
+    "independent_review": {
+      "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_independent_review_v1.json",
+      "sha256": "be60ef31face3c65d4bd944de1b9f622ca4a1959d42b80518710ad7aa4d2ee19",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_VERTICAL_ZERO_NETWORK_PROOF",
+      "PASS_SHARED_TYPED_PROJECTION",
+      "PASS_HFIC_FEATURE_FAMILIES_AND_EPOCH_CHANGE",
+      "PASS_CAPABILITY_REGISTRY_V2_SUPERSET",
+      "PASS_CATALOG_VALIDATION"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_READS",
+    "NO_VPS_DEPLOY",
+    "NO_A2_COLLECTOR_READINESS",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

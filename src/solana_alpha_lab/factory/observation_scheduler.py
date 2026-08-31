@@ -41,6 +41,13 @@ from solana_alpha_lab.factory.quote_surface_projection import (
     hash_raw_response,
     project_quote_surface,
 )
+from solana_alpha_lab.factory.tokens_v2_typed_projection import (
+    STATE_OBSERVED,
+    TOKENS_V2_FIELD_KINDS,
+    project_tokens_v2_field,
+    project_tokens_v2_scalar,
+    sanitize_tokens_v2_source_row,
+)
 from solana_alpha_lab.factory.observation_schedule import (
     parse_utc,
     render_utc,
@@ -138,43 +145,15 @@ def _first_non_none(*values: object) -> object | None:
 
 
 def _row_field(row: Mapping[str, Any], field_id: str) -> object:
-    first_pool = row.get("firstPool") if isinstance(row.get("firstPool"), Mapping) else {}
-    stats5m = row.get("stats5m") if isinstance(row.get("stats5m"), Mapping) else {}
+    if field_id in TOKENS_V2_FIELD_KINDS:
+        return project_tokens_v2_scalar(row, field_id)
     mapping = {
-        "FIELD-TOKEN-MINT-001": _first_non_none(row.get("id"), row.get("mint")),
-        "FIELD-FIRST-POOL-CREATED-AT-001": first_pool.get("createdAt") if isinstance(first_pool, Mapping) else None,
-        "FIELD-FIRST-POOL-SOURCE-001": (
-            _first_non_none(first_pool.get("source"), row.get("source"))
-            if isinstance(first_pool, Mapping)
-            else row.get("source")
-        ),
-        "FIELD-LIQUIDITY-USD-001": _first_non_none(
-            row.get("liquidity"), row.get("liquidityUsd")
-        ),
-        "FIELD-STATS5M-TAKER-VOLUME-001": (
-            _first_non_none(
-                row.get("stats5m_taker_volume"),
-                row.get("takerVolume"),
-                stats5m.get("takerVolume"),
-                stats5m.get("taker_volume"),
-                stats5m.get("volume"),
-            )
-        ),
-        "FIELD-R0-TAKER-VOLUME-MIX-001": (
-            _first_non_none(
-                row.get("r0_taker_volume_mix"),
-                row.get("r0TakerVolumeMix"),
-                row.get("r0"),
-                stats5m.get("r0"),
-            )
-        ),
         "FIELD-QUOTE-BUY-OUT-AMOUNT-001": (
             _first_non_none(row.get("outAmount"), row.get("buy_out_amount"))
         ),
         "FIELD-QUOTE-SELL-OUT-AMOUNT-001": (
             _first_non_none(row.get("outAmount"), row.get("sell_out_amount"))
         ),
-        "FIELD-FIRST-SEEN-AT-001": row.get("first_seen_at"),
     }
     return mapping.get(field_id)
 
@@ -2204,64 +2183,43 @@ def _typed_member_values(
     )
     value_registry = _value_registry(registry)
     fields = _registered_output_fields(value_registry, DISCOVERY)
-    return [
-        {
-            "field_id": field_id,
-            "value_kind": value_kind,
-            "typed_value_or_null": str(value) if value is not None else None,
-            "state": "OBSERVED" if value is not None else "MISSING_TYPED",
-            "missing_reason": None if value is not None else "FIELD_ABSENT",
-            "primitive_id": DISCOVERY,
-            "point_id": "MEMBER",
-            "event_time": anchor,
-            "first_reliable_available_at": payload.get("discovery_available_at")
-            or render_utc(now),
-            "request_sha256": payload.get("discovery_request_sha256"),
-            "call_occurrence_id": payload.get("discovery_call_occurrence_id"),
-        }
-        for field_id, value_kind in fields
-        for value in (
-            anchor
-            if field_id == "FIELD-FIRST-POOL-CREATED-AT-001"
-            else (
-                payload.get("first_seen_at")
-                if field_id == "FIELD-FIRST-SEEN-AT-001"
-                else _row_field(source_row, field_id)
-            ),
+    result: list[dict[str, Any]] = []
+    for field_id, value_kind in fields:
+        if field_id == "FIELD-FIRST-POOL-CREATED-AT-001":
+            value = anchor
+            state = "OBSERVED" if value is not None else "MISSING_TYPED"
+            missing_reason = None if value is not None else "FIELD_ABSENT"
+        elif field_id == "FIELD-FIRST-SEEN-AT-001":
+            value = payload.get("first_seen_at")
+            state = "OBSERVED" if value is not None else "MISSING_TYPED"
+            missing_reason = None if value is not None else "FIELD_ABSENT"
+        elif field_id in TOKENS_V2_FIELD_KINDS:
+            value, state, missing_reason = project_tokens_v2_field(source_row, field_id)
+        else:
+            value = _row_field(source_row, field_id)
+            state = "OBSERVED" if value is not None else "MISSING_TYPED"
+            missing_reason = None if value is not None else "FIELD_ABSENT"
+        result.append(
+            {
+                "field_id": field_id,
+                "value_kind": value_kind,
+                "typed_value_or_null": str(value) if value is not None else None,
+                "state": state,
+                "missing_reason": missing_reason,
+                "primitive_id": DISCOVERY,
+                "point_id": "MEMBER",
+                "event_time": anchor,
+                "first_reliable_available_at": payload.get("discovery_available_at")
+                or render_utc(now),
+                "request_sha256": payload.get("discovery_request_sha256"),
+                "call_occurrence_id": payload.get("discovery_call_occurrence_id"),
+            }
         )
-    ]
+    return result
 
 
 def _sanitized_source_row(row: Mapping[str, Any]) -> dict[str, Any]:
-    first_pool = row.get("firstPool")
-    sanitized: dict[str, Any] = {
-        "id": row.get("id"),
-        "mint": row.get("mint"),
-        "first_seen_at": row.get("first_seen_at"),
-        "liquidity": row.get("liquidity"),
-        "liquidityUsd": row.get("liquidityUsd"),
-        "stats5m": (
-            dict(row["stats5m"])
-            if isinstance(row.get("stats5m"), Mapping)
-            else row.get("stats5m")
-        ),
-        "stats5m_taker_volume": row.get("stats5m_taker_volume"),
-        "takerVolume": row.get("takerVolume"),
-        "r0": row.get("r0"),
-        "r0TakerVolumeMix": row.get("r0TakerVolumeMix"),
-        "r0_taker_volume_mix": row.get("r0_taker_volume_mix"),
-        "source": row.get("source"),
-    }
-    if isinstance(first_pool, Mapping):
-        sanitized["firstPool"] = {
-            "createdAt": first_pool.get("createdAt"),
-            "source": first_pool.get("source"),
-        }
-    return {
-        key: value
-        for key, value in sanitized.items()
-        if value is not None
-    }
+    return sanitize_tokens_v2_source_row(row)
 
 
 def _due_copy(
@@ -2398,6 +2356,7 @@ def _typed_observation_values(
     for field_id, value_kind in fields:
         value: object | None
         missing_for_field = missing_reason
+        typed_state: str | None = None
         if field_id == "FIELD-QUOTE-BUY-OUT-AMOUNT-001":
             value = buy_out
         elif field_id == "FIELD-QUOTE-SELL-OUT-AMOUNT-001":
@@ -2414,22 +2373,39 @@ def _typed_observation_values(
             else:
                 value = None
                 missing_for_field = status or "FIELD_ABSENT"
+        elif (
+            field_id in TOKENS_V2_FIELD_KINDS
+            and isinstance(response_payload, Mapping)
+        ):
+            value, typed_state, typed_missing = project_tokens_v2_field(
+                response_payload, field_id
+            )
+            missing_for_field = typed_missing
         elif isinstance(response_payload, Mapping):
             value = _row_field(response_payload, field_id)
         else:
             value = None
-        present = value is not None and state == "OBSERVED"
+        if typed_state is not None:
+            present = typed_state == STATE_OBSERVED and state == "OBSERVED"
+            row_state = typed_state if state == "OBSERVED" else (
+                state if state != "OBSERVED" else typed_state
+            )
+            row_missing = None if present else (missing_for_field or "FIELD_ABSENT")
+        else:
+            present = value is not None and state == "OBSERVED"
+            row_state = "OBSERVED" if present else (
+                state if state != "OBSERVED" else "MISSING_TYPED"
+            )
+            row_missing = None if present else (
+                missing_for_field or "FIELD_ABSENT"
+            )
         result.append(
             {
                 "field_id": field_id,
                 "value_kind": value_kind,
                 "typed_value_or_null": str(value) if present else None,
-                "state": "OBSERVED" if present else (
-                    state if state != "OBSERVED" else "MISSING_TYPED"
-                ),
-                "missing_reason": None if present else (
-                    missing_for_field or "FIELD_ABSENT"
-                ),
+                "state": row_state,
+                "missing_reason": row_missing,
                 "primitive_id": primitive_id,
                 "point_id": claim["point_id"],
                 "event_time": claim.get("event_time"),

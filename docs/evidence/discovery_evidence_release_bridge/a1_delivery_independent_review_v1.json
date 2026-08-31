@@ -1,0 +1,44 @@
+{
+  "schema": "smial.delivery-independent-review",
+  "schema_version": "1.0",
+  "review_id": "DISCOVERY-EVIDENCE-RELEASE-BRIDGE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1",
+  "verdict": "PASS",
+  "reviews": {
+    "code": {
+      "agent": "code-reviewer",
+      "initial": "FAIL",
+      "final": "PASS",
+      "blocking_fixed": [
+        "ObservationSchedule SEARCH/MEMBER typed path now preserves EXCLUDED_AMBIGUOUS via project_tokens_v2_field",
+        "observation_panel_publisher accepts EXCLUDED_AMBIGUOUS durable state"
+      ]
+    },
+    "goal_dod": {
+      "agent": "goal-dod-critic",
+      "verdict": "PASS"
+    },
+    "architecture": {
+      "agent": "architecture-critic",
+      "initial": "FAIL",
+      "final": "PASS_WITH_BOUNDED_RESIDUAL",
+      "blocking_fixed": [
+        "mint-level yield_eligible and derived dataset_terminal",
+        "evidence_role and confirmatory_reuse_forbidden stamped on observation parquet rows",
+        "shared typed-state preserved on live durable path"
+      ],
+      "residual_non_blocking": [
+        "singleton dataset_manifest_id for A1 fixture path; multi-release coexistence is A3+",
+        "HFIC confirmatory_reuse_forbidden is labeled and verify-enforced; hard accept interlock remains process/Critic"
+      ]
+    }
+  },
+  "review_questions": {
+    "weekly_releases_without_git_code_later": "YES_FOR_RELEASE_PATH",
+    "two_parsers_historical_future": "NO",
+    "retrospective_confirmation": "NO_AUTHORIZED_CLAIM",
+    "partial_corrupt_forge_truth": "NO",
+    "second_data_platform": "NO"
+  }
+}
