@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "PATHRISK-LIVE-RECENT-HTTP-CLASS-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-08-31",
+  "task_id": "PATHRISK_LIVE_RECENT_HTTP_CLASS_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "b21283adb2c3879e57e6dff5b34686d1d0fc9371c5559fa249c9549a3ed2d763",
+  "reviewed_inventory_sha256": "f25474822165871a28f2a2434b8443f49d8249bf69c9526c3b3ddcfb1555b2c1",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_HTTP_FIELDS_UNKNOWN_NOT_RECORDED_AT_TIME",
+        "CHECKED_URLERROR_TIMEOUT_IS_TIMEOUT_CLASS",
+        "CHECKED_T1_T18_ZERO_NETWORK",
+        "CHECKED_COMPLETED_REUSE_NO_REOPEN",
+        "CHECKED_R0_401_NOT_GENERIC_BINDING",
+        "CHECKED_PROBE_ONE_GET_NO_WINDOW",
+        "REPAIRED_OWNER_READOUT_POWERSHELL_PHRASE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_CHEAPEST_FALSIFIER_401_TYPED_TERMINAL",
+        "CHECKED_COMPLETED_REUSE_OPENS_EQ_1",
+        "CHECKED_HTTP_200_EMPTY_STAYS_BINDING",
+        "CHECKED_HISTORICAL_UNLABELED_NOT_INFERRED",
+        "CHECKED_PROBE_PHRASE_NOT_CALIBRATION",
+        "CHECKED_SCIENCE_TERMINAL_UNCHANGED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLOSED_INFERRED_HISTORY_AS_NO_HTTP_RESPONSE",
+        "CLOSED_URLERROR_TIMEOUT_AS_TRANSPORT",
+        "CHECKED_STORE_WIDENING_JSON_KEYS_ONLY",
+        "CHECKED_NO_BREAKING_STORE_MIGRATION",
+        "CHECKED_PROBE_ISOLATED_FROM_PATHRISK_WINDOW",
+        "CHECKED_NO_NEW_HTTP_STACK_OR_PROVIDER",
+        "CHECKED_COMPLETED_IDEMPOTENCY_PRESERVED"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_LIVE_CALIBRATION",
+    "NO_ALPHA",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK"
+  ]
+}

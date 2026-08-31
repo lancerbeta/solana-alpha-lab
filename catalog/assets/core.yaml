@@ -32937,7 +32937,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/observation_primitive_registry_v1.yaml', repository_path: configs/observation_primitive_registry_v1.yaml}
-  integrity: {kind: sha256, sha256: 85674ba8d3f9e595d9cba8eef7629bfca742a84daf61edb0606baf9f20996932}
+  integrity: {kind: sha256, sha256: 63f487e22b7fae3ab1a9bbc38b4e5660713953911b0c36bdb374d8bdc73d4ad4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33005,7 +33005,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_runtime.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_runtime.py}
-  integrity: {kind: sha256, sha256: 84a792b0e82276d6d962420bf90943cb07d0400574786bb7d397e5bec4432c89}
+  integrity: {kind: sha256, sha256: 7ae570ff207d3757f8623992aee7e6821dce988b76c6ba68d88419a05af847b7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33050,16 +33050,17 @@ records:
 - asset_id: MODULE-OBSERVATION-PRIMITIVES-001
   record_version: '1.0'
   asset_type: script
-  purpose: Zero-network-injectable wrappers for registered Jupiter observation primitives.
+  purpose: Zero-network-injectable Jupiter observation primitives that persist exact HTTP status and canonical http_class.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_primitives.py', repository_path: src/solana_alpha_lab/factory/observation_primitives.py}
-  integrity: {kind: sha256, sha256: 8828e31f674aa8869215dbef1593680bff2eb2ce067b5ac3bcffcf97ce00d4e2}
+  integrity: {kind: sha256, sha256: cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [OBSERVATION_PRIMITIVE, JUPITER]
@@ -33262,7 +33263,7 @@ records:
   as_of: '2026-08-30'
   truth_owner: EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://configs/early_quote_surface_pathrisk_calibration_v1.yaml', repository_path: configs/early_quote_surface_pathrisk_calibration_v1.yaml}
-  integrity: {kind: sha256, sha256: f2e935332ba9c28f48c43e065efab197b18ba91a38135e49711738042c743c0c}
+  integrity: {kind: sha256, sha256: 96cdba8e9e1e218d77b0ec0f7ab34a09469e197304e788994063168e7553ac51}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001}
@@ -33325,17 +33326,18 @@ records:
 - asset_id: SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001
   record_version: '1.0'
   asset_type: script
-  purpose: Capture-packet, live-preflight and mutually exclusive live-run --real-provider versus --fake-provider-fixture; Git capture_authorized stays false.
+  purpose: Capture-packet, live-preflight, mutually exclusive live-run, and transport-probe-recent; Git capture_authorized stays false.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-30'
   truth_owner: EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/early_quote_surface_pathrisk_calibration.py', repository_path: scripts/early_quote_surface_pathrisk_calibration.py}
-  integrity: {kind: sha256, sha256: 6fd31330778a94066e8b6771bc914244c0b124f36e58451bfdf15f48280ad0c3}
+  integrity: {kind: sha256, sha256: 0663a4b8bf210c4cae55d5a98d35d4e66f7d9f340ae900a59db7dd5ac8d7fa97}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001}
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001}
   - {relation_type: derived_from, target_asset_id: MODULE-PATHRISK-CALIBRATION-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
@@ -33399,17 +33401,18 @@ records:
 - asset_id: MODULE-PATHRISK-LIVE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Authority-gated PathRisk live orchestrator with SystemClock production path, adopted Jupiter GET opener, runtime one-window activation, one-shot R0, exclusion, floor-before-quotes and live build_readout.
+  purpose: Authority-gated PathRisk live orchestrator with SystemClock production path, R0 HTTP-class operational terminals, and one-GET transport probe.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-31'
   truth_owner: PATHRISK_LIVE_WINDOW_EXECUTION_GLUE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/pathrisk_live.py', repository_path: src/solana_alpha_lab/factory/pathrisk_live.py}
-  integrity: {kind: sha256, sha256: 40f6d316cbd2a41c51b69b414665c29899051c0acd844e9cd89876cdc8052053}
+  integrity: {kind: sha256, sha256: 17925bae067363ce5e01ab4421dffd7a6a61d3f7d4672ec9bf2fae1ee27e70b6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001}
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001}
   - {relation_type: depends_on, target_asset_id: MODULE-PATHRISK-CALIBRATION-001}
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULER-001}
   consumers: [FACTORY-001, SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001]
@@ -33490,4 +33493,43 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [PATHRISK, WALLCLOCK, TESTS, SYSTEM_UTC]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract to persist Jupiter HTTP status/class through opener, primitive, store and PathRisk R0 terminals; zero provider calls.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-31'
+  truth_owner: PATHRISK_LIVE_RECENT_HTTP_CLASS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/PATHRISK_LIVE_RECENT_HTTP_CLASS_V1.md', repository_path: docs/tasks/PATHRISK_LIVE_RECENT_HTTP_CLASS_V1.md}
+  integrity: {kind: sha256, sha256: c3a30fdb778d6dd75213b388455cfb1922e2ecfae5ef076c1ae0873d24a58302}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-PRIMITIVES-001}
+  - {relation_type: contains, target_asset_id: MODULE-PATHRISK-LIVE-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-EARLY-QUOTE-SURFACE-PATHRISK-CALIBRATION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-PATHRISK-RECENT-HTTP-CLASS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PATHRISK, HTTP_CLASS, TRANSPORT_PROBE, HTTP_401]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-PATHRISK-RECENT-HTTP-CLASS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network T1-T18 proofs that HTTP status/class persist, R0 401 is not a generic binding miss, and transport-probe-recent stays one GET.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-08-31'
+  truth_owner: PATHRISK_LIVE_RECENT_HTTP_CLASS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_pathrisk_recent_http_class.py', repository_path: tests/test_pathrisk_recent_http_class.py}
+  integrity: {kind: sha256, sha256: b8b42340f5b4dfe135ed31c275f078bf8b9c4c743d289f757fbc793fbfbf6871}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-RECENT-HTTP-CLASS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PATHRISK-LIVE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PATHRISK, HTTP_CLASS, TESTS, TRANSPORT_PROBE]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
