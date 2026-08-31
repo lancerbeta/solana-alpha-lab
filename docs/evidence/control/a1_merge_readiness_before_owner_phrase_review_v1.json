@@ -4,8 +4,8 @@
   "review_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-REVIEW-001",
   "as_of": "2026-08-31",
   "task_id": "CTRL-MERGE-READINESS-BEFORE-OWNER-PHRASE-V1",
-  "reviewed_bindings_sha256": "64f31c65fad34f14285eddd4e85050a9c4760a68d0eda1f87910e40dd95fa8af",
-  "reviewed_inventory_sha256": "cc5f091303d8dc365119a232e5f8b88e6ba799cd0b04018960c46d80639fe669",
+  "reviewed_bindings_sha256": "fa3eb2b9a5f59992fdda9b28c1a27c5b479d1bce249f9aa922f3f31480c3e217",
+  "reviewed_inventory_sha256": "1309d8a3137004d2bb2a2648b29549ecfdf1fcbdc270e58f7f601621df3d0e9b",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
