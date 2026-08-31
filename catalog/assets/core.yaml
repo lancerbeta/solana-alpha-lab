@@ -33503,7 +33503,7 @@ records:
   as_of: '2026-08-31'
   truth_owner: PATHRISK_LIVE_RECENT_HTTP_CLASS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/PATHRISK_LIVE_RECENT_HTTP_CLASS_V1.md', repository_path: docs/tasks/PATHRISK_LIVE_RECENT_HTTP_CLASS_V1.md}
-  integrity: {kind: sha256, sha256: 1ccbd5b70540fd9ffd0845db0bdd2dc702d97c26407de519e80f538b39d00532}
+  integrity: {kind: sha256, sha256: c3a30fdb778d6dd75213b388455cfb1922e2ecfae5ef076c1ae0873d24a58302}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-REAL-WALLCLOCK-LIVE-EXECUTION-001}

@@ -72,7 +72,10 @@ context_requirements:
     - configs/provider_route_capability_registry_v10.yaml
     ARCHITECTURE_DECISIONS:
     - docs/decisions/ADR-007-declarative-observation-schedule-bridge.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/pathrisk_live_recent_http_class/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/pathrisk_live_recent_http_class/a1_delivery_independent_review_v1.json
+    - docs/evidence/pathrisk_live_recent_http_class/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
