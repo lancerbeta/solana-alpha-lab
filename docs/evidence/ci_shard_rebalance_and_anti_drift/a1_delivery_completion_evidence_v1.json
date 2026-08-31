@@ -16,7 +16,7 @@
     "scripts/ci_test_partition.py": "865c189549cfb220c201f98463146a1603ad51c2eae29d66934d19200de1ca97",
     "scripts/run_ci_test_shard.py": "6b42894c73eabfa4b983f18d86f9d8e1934ca8e31e09667496c44cc28f3a8ecc",
     "tests/test_ci_test_partition.py": "1ba8bd3764b8ae5c52d147171bba3f2e63a4ceb1e8718af2089791cdb0afad17",
-    "tests/test_run_ci_test_shard.py": "de25a32bd2b09e21097b341830b3e47c1dcbf4705f48b67c23281298e6ae418d"
+    "tests/test_run_ci_test_shard.py": "7d1057809e91973c99cf1f85a7ee07d992d42afef3d3b3c2590f1626634673ec"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/ci_shard_rebalance_and_anti_drift/a1_delivery_factory_fit_v1.json",
-    "sha256": "529ce5d39d129ef8095f8332464d393e70123310dbbf8ac31ba74788bb14dff6",
+    "sha256": "710014c1c82702d0ef953857ee42c1cdff8e553997e9ea15db9b42e6b868d425",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CI_SHARD_PARTITION_AND_RUNNER_TESTS",
     "independent_review": {
       "path": "docs/evidence/ci_shard_rebalance_and_anti_drift/a1_delivery_independent_review_v1.json",
-      "sha256": "a8f8fd34c4edbb9f7427264de854ed992efaec1ebc280361a30b9c59e91551f6",
+      "sha256": "f31c4d902f26e27090b4cbbaba6ff66f538b26337dc850008682db9e35304f67",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

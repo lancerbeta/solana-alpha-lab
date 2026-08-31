@@ -4,8 +4,8 @@
   "review_id": "CI-SHARD-REBALANCE-AND-ANTI-DRIFT-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-01",
   "task_id": "CI_SHARD_REBALANCE_AND_ANTI_DRIFT_V1",
-  "reviewed_bindings_sha256": "1cb49ebd393ef6748e643e3017ca95597815de6673a5441083467893e51d2ef2",
-  "reviewed_inventory_sha256": "3ebf3efe74642e93276c8522f8ecf99a94e3db5d5d9623356a429d25bdeba360",
+  "reviewed_bindings_sha256": "10045c78a2f9187c59558c8f73eca1244236cc6b5a36e750c5c6f23be5f69531",
+  "reviewed_inventory_sha256": "f10790cc49e471ef47040c73a5013e1ce8bd0fae64c80ff3f3790d55132f79c9",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC"
@@ -20,7 +20,8 @@
         "PLANNED_MODULES_STABLE",
         "STALE_WARNING_NON_BLOCKING",
         "NO_TEST_WEAKENING",
-        "LIVE_UNION_AND_CASE_COUNT_FAIL_CLOSED"
+        "LIVE_UNION_AND_CASE_COUNT_FAIL_CLOSED",
+        "SYS_PATH_ISOLATION_RESTORED"
       ]
     },
     {
