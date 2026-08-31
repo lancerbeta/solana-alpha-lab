@@ -60,10 +60,13 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
         self.assertIn("ready_for_owner_phrase", text)
         self.assertIn("IDENTITY_MODE_MISMATCH", text)
         self.assertIn("Do not widen those prefixes", text)
+        self.assertIn("CONTROL_RUNTIME_CHANGED", text)
+        self.assertIn("managed_write_set", text)
 
     def test_portable_skill_does_not_route_control_work_to_live_pr_head(self) -> None:
         text = PORTABLE_SKILL.read_text(encoding="utf-8")
         self.assertIn("Do not widen those prefixes", text)
+        self.assertIn("CONTROL_RUNTIME_CHANGED", text)
         self.assertIn("task contract still uses `--contract`", text)
         self.assertNotIn("instead of a product task contract", text)
 

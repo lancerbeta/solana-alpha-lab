@@ -190,7 +190,10 @@ independent review + factory fit for task receipts.
 
 Use task-contract context, not `--pr`. After exact-head CI, run
 `--merge-readiness` **before** asking the owner phrase. If readiness fails,
-do not interrupt the owner.
+do not interrupt the owner. `CONTROL_RUNTIME_CHANGED` on a task receipt is
+allowed only when every drifted `CONTROL_RUNTIME_PATHS` entry is listed in
+that task `managed_write_set`. Unlisted runtime drift stays fail-closed.
+`LIVE_PR_HEAD` is unchanged.
 
 ---
 

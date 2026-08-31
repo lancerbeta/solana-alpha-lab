@@ -275,7 +275,22 @@ class FakeRunner:
 
 
 def context_receipt(module: ModuleType, route: str = "DIRECT_CURSOR_DELIVERY") -> dict[str, object]:
-    task_path = ROOT / "docs/tasks/CTRL-DELIVERY-HARNESS-V1.md"
+    return task_context_receipt(
+        module,
+        task_id="CTRL-DELIVERY-HARNESS-V1",
+        task_path="docs/tasks/CTRL-DELIVERY-HARNESS-V1.md",
+        route=route,
+    )
+
+
+def task_context_receipt(
+    module: ModuleType,
+    *,
+    task_id: str,
+    task_path: str,
+    route: str = "DIRECT_CURSOR_DELIVERY",
+) -> dict[str, object]:
+    contract = ROOT / task_path
     evidence_path = ROOT / "docs/evidence/control/delivery_harness_acceptance_v1.json"
     receipt: dict[str, object] = {
         "schema": "smial.delivery-context-receipt",
@@ -284,7 +299,7 @@ def context_receipt(module: ModuleType, route: str = "DIRECT_CURSOR_DELIVERY") -
         "route": route,
         "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
         "repository": {"name": "lancerbeta/solana-alpha-lab", "head": HEAD, "tree": TREE, "branch": "candidate", "dirty": False},
-        "task": {"task_id": "CTRL-DELIVERY-HARNESS-V1", "path": "docs/tasks/CTRL-DELIVERY-HARNESS-V1.md", "sha256": hashlib.sha256(task_path.read_bytes()).hexdigest()},
+        "task": {"task_id": task_id, "path": task_path, "sha256": hashlib.sha256(contract.read_bytes()).hexdigest()},
         "selected": [{
             "semantic_role": "DELIVERY_EVIDENCE", "lane": "L2", "truth_owner": "EXACT_CANDIDATE_EVIDENCE",
             "path": "docs/evidence/control/delivery_harness_acceptance_v1.json", "stable_id": None,
@@ -376,9 +391,14 @@ def guarded_submission_receipt(
     return receipt
 
 
-def exact_context_builder(module: ModuleType):
+def exact_context_builder(module: ModuleType, receipt: dict[str, object] | None = None):
     def build(root: Path, *, task_id: str, task_contract: str, route: str) -> dict[str, object]:
-        self = context_receipt(module, route)
+        self = context_receipt(module, route) if receipt is None else dict(receipt)
+        if receipt is not None:
+            self["route"] = route
+            unsigned = dict(self)
+            unsigned.pop("receipt_sha256", None)
+            self["receipt_sha256"] = module.sha256_bytes(module.canonical_json_bytes(unsigned))
         assert self["task"]["task_id"] == task_id
         assert self["task"]["path"] == task_contract
         return self
@@ -1337,16 +1357,40 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         self.assertFalse(any(call[:3] == ("gh", "pr", "merge") for call in runner.calls))
 
     def test_candidate_control_runtime_change_is_denied(self) -> None:
+        receipt = task_context_receipt(
+            self.module,
+            task_id="EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1",
+            task_path="docs/tasks/EARLY_QUOTE_SURFACE_PATHRISK_CALIBRATION_V1.md",
+        )
+        product_base = "b5ae41ee7d0507035c8604d4ac8f6856767199d3"
         with self.assertRaisesRegex(ValueError, "CONTROL_RUNTIME_CHANGED"):
             self.module.build_grounded_merge_request(
                 ROOT, repository="lancerbeta/solana-alpha-lab", pr_number=PR,
                 route="DIRECT_CURSOR_DELIVERY", actor="CURSOR", approval_phrase=PHRASE,
-                context_receipt=context_receipt(self.module),
-                runner=FakeRunner(base_mismatch_path="scripts/owner_attention_gate.py"),
-                context_builder=exact_context_builder(self.module),
+                context_receipt=receipt,
+                runner=FakeRunner(
+                    upstream_oid=product_base,
+                    base_mismatch_path="scripts/owner_attention_gate.py",
+                ),
+                context_builder=exact_context_builder(self.module, receipt),
                 evidence_builder=grounded_evidence,
                 delivery_checks_builder=grounded_delivery_checks,
             )
+
+    def test_task_receipt_control_runtime_in_write_set_is_allowed(self) -> None:
+        result = self.module.build_grounded_merge_request(
+            ROOT, repository="lancerbeta/solana-alpha-lab", pr_number=PR,
+            route="DIRECT_CURSOR_DELIVERY", actor="CURSOR", approval_phrase=PHRASE,
+            context_receipt=context_receipt(self.module),
+            runner=FakeRunner(base_mismatch_path="scripts/owner_attention_gate.py"),
+            context_builder=exact_context_builder(self.module),
+            evidence_builder=grounded_evidence,
+            delivery_checks_builder=grounded_delivery_checks,
+        )
+        self.assertTrue(result["merge_checks"]["context_receipt_bound"])
+        self.assertEqual(
+            self.module.evaluate(result, POLICY)["decision"], "AUTONOMOUS"
+        )
 
     def test_live_pr_head_merge_submits_after_exact_phrase_and_ci(self) -> None:
         receipt = live_pr_head_receipt(self.module)

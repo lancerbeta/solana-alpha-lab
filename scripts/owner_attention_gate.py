@@ -284,9 +284,10 @@ def load_base_bound_profile(
     return profile
 
 
-def require_base_bound_control_runtime(
+def control_runtime_drift(
     root: Path, *, expected_base: str, runner=run_read
-) -> None:
+) -> list[str]:
+    drifted: list[str] = []
     for relative in CONTROL_RUNTIME_PATHS:
         candidate = root.resolve() / relative
         try:
@@ -294,7 +295,15 @@ def require_base_bound_control_runtime(
         except ValueError:
             raise ValueError("CONTROL_RUNTIME_CHANGED") from None
         if not candidate.is_file() or candidate.read_bytes() != base_bytes:
-            raise ValueError("CONTROL_RUNTIME_CHANGED")
+            drifted.append(relative)
+    return drifted
+
+
+def require_base_bound_control_runtime(
+    root: Path, *, expected_base: str, runner=run_read
+) -> None:
+    if control_runtime_drift(root, expected_base=expected_base, runner=runner):
+        raise ValueError("CONTROL_RUNTIME_CHANGED")
 
 
 def _trusted_path_matches_base(
@@ -610,13 +619,14 @@ def guarded_delivery_scope(
     )
     if expected_base != expected_upstream_oid:
         raise ValueError("STALE_BASE_CONTROL_PLANE")
-    try:
-        require_base_bound_control_runtime(
-            root, expected_base=expected_base, runner=runner
-        )
-    except ValueError as exc:
-        if str(exc) != "CONTROL_RUNTIME_CHANGED" or not is_live_pr_head(receipt):
-            raise
+    drifted = control_runtime_drift(
+        root, expected_base=expected_base, runner=runner
+    )
+    if drifted and not (
+        is_live_pr_head(receipt)
+        or all(path_in_managed_write_set(path, managed) for path in drifted)
+    ):
+        raise ValueError("CONTROL_RUNTIME_CHANGED")
     profile = load_base_bound_profile(
         root, expected_base=expected_base, runner=runner
     )

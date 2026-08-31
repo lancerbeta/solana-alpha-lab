@@ -88,7 +88,9 @@ The owner never clicks GitHub Merge. Product work uses
 `context --contract --task-id`. `context --pr` is `LIVE_PR_HEAD` only when every
 changed path is inside `harness_control_write_prefixes`; otherwise
 `IDENTITY_MODE_MISMATCH` (use `--contract`). Do not widen those prefixes to
-admit a product write set. Re-read every machine precondition, evaluate
+admit a product write set. Task-contract merge may land drifted
+`CONTROL_RUNTIME_PATHS` listed in that task `managed_write_set`; unlisted
+runtime drift stays `CONTROL_RUNTIME_CHANGED`. Re-read every machine precondition, evaluate
 `OWNER_ATTENTION_GATE_V2`, then perform at most one ordinary guarded merge and
 read back the profile's exact default branch/post-merge CI. Use
 `scripts/owner_attention_gate.py --guarded-merge` so the agent cannot supply

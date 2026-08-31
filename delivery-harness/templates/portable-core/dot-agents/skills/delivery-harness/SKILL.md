@@ -22,6 +22,8 @@ Stop for the exact PR/head phrase only after
 (`LIVE_PR_HEAD`) is refused with `IDENTITY_MODE_MISMATCH` when any changed path
 is outside `harness_control_write_prefixes`. Do not widen those prefixes.
 Control-shaped work with a task contract still uses `--contract`.
+Task-contract merge may land drifted `CONTROL_RUNTIME_PATHS` listed in that
+task `managed_write_set`; unlisted runtime drift stays `CONTROL_RUNTIME_CHANGED`.
 Last content commit then `bind-evidence` then `--merge-readiness` then phrase.
 After the exact PR/head owner
 phrase, use the repository-owned grounded merge
