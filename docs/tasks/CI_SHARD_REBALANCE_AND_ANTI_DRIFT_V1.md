@@ -54,7 +54,8 @@ stop_conditions:
 - WALLET_BUILD_EXECUTE_TRANSACTION
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: []
+  l2_roles:
+  - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
