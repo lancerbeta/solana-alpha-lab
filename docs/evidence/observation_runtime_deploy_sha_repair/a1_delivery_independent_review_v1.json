@@ -10,8 +10,8 @@
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC"
   ],
-  "reviewed_bindings_sha256": "05abeb3e59beac8b36cdd2f81f2c0bb59f75e789d1bd146fb83c544794dad7a7",
-  "reviewed_inventory_sha256": "9d021ed81fe6e76cbf4da3af159b21d9886bb563639dcd25581e7aa3cc24d203",
+  "reviewed_bindings_sha256": "1594b1fae52e2c64e3b77979d5acad9811ff70746e9a9ea7548ebefa72d8a73f",
+  "reviewed_inventory_sha256": "493ffb947194b818696f0266d0906429d2e95edaa51388c190b76092d4ee0812",
   "reviews": [
     {
       "role": "CODE_REVIEWER",
