@@ -74,6 +74,8 @@ units:
   paper_heartbeat_relative: configs/factory_remote_ops/factory-paper-heartbeat.service
   observation_schedule_service_relative: configs/factory_remote_ops/factory-observation-schedule.service
   observation_schedule_timer_relative: configs/factory_remote_ops/factory-observation-schedule.timer
+  collector_owner_pulse_service_relative: configs/factory_remote_ops/factory-collector-owner-pulse.service
+  collector_owner_pulse_timer_relative: configs/factory_remote_ops/factory-collector-owner-pulse.timer
 health:
   process_alive_alone_is_not_healthy: true
   healthy_verdict_forbidden: true

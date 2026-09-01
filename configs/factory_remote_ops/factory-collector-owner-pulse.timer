@@ -1,0 +1,12 @@
+[Unit]
+Description=Daily Factory collector owner pulse at 06:15 UTC
+# Template only — do NOT install/enable in COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1.
+# OnCalendar is deterministic; do not invent a scheduling subsystem.
+
+[Timer]
+OnCalendar=*-*-* 06:15:00
+Persistent=true
+Unit=factory-collector-owner-pulse.service
+
+[Install]
+WantedBy=timers.target

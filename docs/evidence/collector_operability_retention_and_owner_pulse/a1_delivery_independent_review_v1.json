@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-independent-review",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1",
+  "verdict": "PASS",
+  "route": "DIRECT_CURSOR_DELIVERY",
+  "critics": {
+    "CODE": {
+      "verdict": "PASS",
+      "agent": "e6d704bf-71f5-4852-b752-6d535de58160",
+      "notes": "After fix loop: backup degraded, exclusive retention lease, no updated_at bump, Telegram URLError unchained"
+    },
+    "GOAL_DOD": {
+      "verdict": "PASS",
+      "agent": "35d86b84-7cca-40a5-811f-eebce062666f",
+      "required_answers": {
+        "owner_health_without_ssh": "YES",
+        "incidents_and_daily_separated": "YES",
+        "pulse_requires_jupiter": "NO",
+        "sqlite_grows_forever_from_bodies": "NO",
+        "retention_deletes_science": "NO",
+        "inflight_compactable": "NO",
+        "claims_original_http_bytes": "NO",
+        "created_monitoring_platform": "NO"
+      }
+    },
+    "ARCHITECTURE": {
+      "verdict": "PASS",
+      "agent": "11c0aeea-5aa6-412c-aea5-75e3141d5990",
+      "notes": "Primary updated_at falsification FAIL closed; science plane untouched; RAW_RETENTION_REQUIRES_REPLAN not required"
+    }
+  },
+  "single_agent_review_fallback": false
+}

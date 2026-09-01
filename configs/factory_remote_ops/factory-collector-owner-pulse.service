@@ -1,0 +1,11 @@
+[Unit]
+Description=Factory daily collector owner pulse (Telegram summary)
+Documentation=docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
+# Template only — do NOT install/enable in COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solana-alpha-lab
+EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode emit --record-storage-history
+NoNewPrivileges=true

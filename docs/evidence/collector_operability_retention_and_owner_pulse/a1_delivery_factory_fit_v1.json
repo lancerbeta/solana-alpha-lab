@@ -1,0 +1,20 @@
+{
+  "schema": "smial.delivery-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-FACTORY-FIT-001",
+  "as_of": "2026-09-01",
+  "task_id": "COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1",
+  "verdict": "PASS",
+  "adopt_wrap_fork_build": "WRAP",
+  "second_monitoring_or_data_platform": false,
+  "provider_authority_widened": false,
+  "scientific_deletion_path": false,
+  "vps_deploy_in_atom": false,
+  "capability_radar_now": "NONE",
+  "product_horizon": "Final VPS deploy/enable of observation timer + daily pulse timer + optional retention apply remains a separate ops atom after this software baseline",
+  "notes": [
+    "ADOPT collector_read_model + remote_ops Telegram/disk/backup + live cohort readiness",
+    "BUILD only operational packet compose, daily pulse, and safe SQLite body compaction",
+    "raw_retention substrate is decoded canonical JSON not byte-identical HTTP"
+  ]
+}
