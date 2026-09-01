@@ -14,7 +14,18 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1.md": "e85ad456ddcc62d20ec2867bf6f0f169c91bc3996310ef10a5b262d5d36f4b60"
+    ".cursor/rules/50-factory-remote-host.mdc": "01e670208138bc59b4d89c1f97bcb5080ebc786d26744ed1e15e11fef9b8a85b",
+    "catalog/assets/core.yaml": "c2b33a05f5a7fa261869fb0a37c5d4806394173e5d8e5505c3bbdd54b9b4bb65",
+    "catalog/assets/lifecycle.yaml": "c81a7d00641dbc33cf1d06a8c5a4cd234cd2408e1525d224699a477e2abc331f",
+    "catalog/catalog_manifest.yaml": "efdc5cd2cac3911319e4551a401b73f30c0e100f72b523dfb3bbc292a7c84e29",
+    "catalog/generated/asset_edges.json": "dc7d4a3d315137fdc7697da25284e6faa3bd916766601e780db5e13836c7e780",
+    "docs/PROJECT_MAP.md": "7214b17dd8f74032ce2457dc939ca10bf43507e597027e650dbc6e809e183a57",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "98db6e413f6167581ea4be4ed0e0996382634395785b41cc6721953ccc1f5528",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "edcacde00a83b40936c67669a4b1ee6588c419a2860e4827cdc10e850cf05fd2",
+    "docs/reports/observation_runtime_deploy_sha_repair/a1_owner_readout_v1.md": "2c1994504a9260bed21268d387c027523a028e0be3a22af9d28b04fc2e6cdf6f",
+    "docs/tasks/OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1.md": "e85ad456ddcc62d20ec2867bf6f0f169c91bc3996310ef10a5b262d5d36f4b60",
+    "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "ab76357599f7d9ab1b817682b4fafd0943ead86672c0a0f40a5adc11ec42136d",
+    "tests/test_observation_runtime_deploy_sha_repair.py": "51a6055e421f7aa969409acf4dce0f416c5e0d6cdb0323d06e630dbaaa1b316b"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -26,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_runtime_deploy_sha_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "dd748123073ac315017e96590d022f97ec54ff5a3a5d55ed7e556aa67396369d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_runtime_deploy_sha_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "b8f495950f8eb6aa96e0306e5d02cc3d91225502c54b49be7bbc7d6776ce9b90",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

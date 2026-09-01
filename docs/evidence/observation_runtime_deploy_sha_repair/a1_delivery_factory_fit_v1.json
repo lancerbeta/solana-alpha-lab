@@ -6,8 +6,8 @@
   "task_id": "OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "05abeb3e59beac8b36cdd2f81f2c0bb59f75e789d1bd146fb83c544794dad7a7",
+  "reviewed_inventory_sha256": "9d021ed81fe6e76cbf4da3af159b21d9886bb563639dcd25581e7aa3cc24d203",
   "capability_radar": {
     "now": "NONE",
     "watch": "DAILY_COLLECTOR_OWNER_PULSE_AFTER_LIVE_COMMISSIONING"
