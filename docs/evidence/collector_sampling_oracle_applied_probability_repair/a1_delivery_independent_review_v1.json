@@ -1,0 +1,31 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-SAMPLING-ORACLE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "INCLUSION_FOLLOWS_APPLIED_MEMBER_CAP",
+        "CAPACITY_CEILING_UNCHANGED",
+        "COMMISSIONING_ENVELOPE_P_057_REGRESSION",
+        "SCHEDULE_IDENTITY_DIFFERS_FROM_INVALID_02152E"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY"
+  ]
+}
