@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-GDRIVE-OFFHOST-DURABILITY-COMPLETION-001",
+  "as_of": "2026-09-01",
+  "task_id": "FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1",
+  "state_change": "FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_READY_FOR_MERGE_GATE",
+  "base_main": "a8a9b9931c06646fc0164d1ad29bea5a0f7a0b47",
+  "owner_approvals": [
+    "OK FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_google_drive_offhost_durability_automation/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING_BIND_EVIDENCE",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_OFFHOST_BACKUP_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_google_drive_offhost_durability_automation/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING_BIND_EVIDENCE",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_COPY_IDEMPOTENT",
+      "PASS_HASH_MISMATCH_FAIL_CLOSED",
+      "PASS_REMOTE_IDENTITY_CONFLICT_NO_OVERWRITE",
+      "PASS_NO_DELETE_SYNC_CONSTRUCTIBLE",
+      "PASS_RECEIPT_NO_CREDENTIALS",
+      "PASS_LOCAL_VS_OFFHOST_FRESHNESS",
+      "PASS_ENABLED_UNREADY_RCLONE_FAILED"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_CAMPAIGN_ACTIVATE",
+    "NO_TELEGRAM_SUCCESS_SPAM",
+    "NO_FACTORY_BACKUP_SINK_CHANGE",
+    "NO_NONEMPTY_RDP_OFFHOST_RESTORE_CLAIM",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

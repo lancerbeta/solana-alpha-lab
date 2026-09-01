@@ -332,6 +332,35 @@ class FactoryOffhostBackupTests(unittest.TestCase):
             "NONEMPTY_RDP_OFFHOST_RESTORE_PROOF",
         )
 
+    def test_enabled_offhost_with_unready_rclone_is_failed_not_silent(self) -> None:
+        broken = OffhostConfig(
+            remote_name=self.config.remote_name,
+            destination_root=self.config.destination_root,
+            rclone_config_absolute=Path(self.tmp.name) / "missing-rclone.conf",
+            rclone_bin=self.config.rclone_bin,
+            receipt_relative=self.config.receipt_relative,
+            freshness_current_max_seconds=self.config.freshness_current_max_seconds,
+            freshness_degraded_max_seconds=self.config.freshness_degraded_max_seconds,
+        )
+        health = offhost_health_snapshot(self.root, config=broken)
+        self.assertTrue(health["configured"])
+        self.assertEqual(health["offhost_backup_state"], "FAILED")
+        classes = compose_health_classes(
+            {
+                "backup_domain": "PARENT_INDEPENDENT_GIT_SIDE",
+                "backup_age_seconds": 60,
+                "last_backup_at": "2026-09-01T00:00:00Z",
+                "restore_marker_unresolved": False,
+                "offhost_backup_state": "FAILED",
+            }
+        )
+        self.assertIn("OFFHOST_BACKUP_FAILED", classes)
+        labels = agent_durability_classification(
+            local_backup_state="OK", offhost_backup_state="FAILED"
+        )
+        self.assertTrue(labels["OFFHOST_BACKUP_STALE"])
+        self.assertFalse(labels["OFFHOST_NOT_CONFIGURED"])
+
     def test_agent_classification_fresh_agent_labels(self) -> None:
         self.assertEqual(
             agent_durability_classification(

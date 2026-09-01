@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-GDRIVE-OFFHOST-DURABILITY-FACTORY-FIT-001",
+  "as_of": "2026-09-01",
+  "task_id": "FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONEMPTY_RDP_OFFHOST_RESTORE_PROOF"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_NONEMPTY_RDP_OFFHOST_RESTORE_CLAIM",
+    "NO_FACTORY_BACKUP_SINK_CHANGE"
+  ],
+  "recovery": "REVERT"
+}

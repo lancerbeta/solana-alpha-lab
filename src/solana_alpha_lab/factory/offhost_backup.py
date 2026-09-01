@@ -312,7 +312,9 @@ def classify_offhost_state(
     if configured is False:
         return "UNCONFIGURED"
     if rclone_ready is False:
-        return "UNCONFIGURED"
+        # Git has offhost.enabled; missing/unready rclone must not look like
+        # "optional not configured" and silently skip campaign attention.
+        return "FAILED"
     if receipt is None:
         return "MISSING"
     terminal = str(receipt.get("terminal") or "")

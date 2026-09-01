@@ -29939,7 +29939,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 36b8b30d211b5ed427688b9929545d87ba6244340b16aaeb0ceca77f4a8e1b24}
+  integrity: {kind: sha256, sha256: c1613b2e04f87311585c251cb3a55c899e7f1e9ea5386da1239c25a033d6c96f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}

@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-GDRIVE-OFFHOST-DURABILITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "STAGE1_LOCAL_BACKUP_INDEPENDENT",
+        "COPYTO_ONLY_ALLOWLIST",
+        "CONTENT_ADDRESSED_IDEMPOTENT",
+        "NO_TOKEN_IN_RECEIPT",
+        "ZERO_SECRET_TESTS_A_H",
+        "ENABLED_OFFHOST_UNREADY_RCLONE_ESCALATES_FAILED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LOCAL_HOURLY_INDEPENDENT_OF_DRIVE",
+        "FRESHNESS_LOCAL_VS_OFFHOST_VISIBLE",
+        "FRESH_AGENT_OFFHOST_STATUS",
+        "STOP_AT_MERGE_GATE_NO_DEPLOY",
+        "EMPTY_RDP_NOT_CLAIMED_AS_LIVE_PROOF"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DRIVE_NOT_SCIENTIFIC_TRUTH",
+        "NOT_SECOND_BACKUP_FRAMEWORK",
+        "FACTORY_BACKUP_SINK_UNCHANGED",
+        "NONEMPTY_RDP_OFFHOST_RESTORE_STILL_UNPROVEN",
+        "UNREADY_RCLONE_NO_LONGER_SILENT_UNCONFIGURED"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_NONEMPTY_RDP_OFFHOST_RESTORE_CLAIM",
+    "NO_ALPHA"
+  ]
+}

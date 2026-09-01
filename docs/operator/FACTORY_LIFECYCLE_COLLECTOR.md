@@ -373,7 +373,7 @@ Use `agent_classification` booleans (exactly one primary off-host label applies)
 | `LOCAL_BACKUP_OK` | `local_backup_state` == `OK` (newest local bundle age ≤ 24h) |
 | `OFFHOST_BACKUP_OK` | `offhost.offhost_backup_state` == `CURRENT` (verified receipt age ≤ 2h) |
 | `OFFHOST_BACKUP_STALE` | off-host state in `DEGRADED` (>2h), `HARD_ATTENTION` (>6h), `MISSING`, or `FAILED` |
-| `OFFHOST_NOT_CONFIGURED` | `offhost.offhost_backup_state` == `UNCONFIGURED` (no enabled offhost config or rclone config not ready) |
+| `OFFHOST_NOT_CONFIGURED` | `offhost.offhost_backup_state` == `UNCONFIGURED` (offhost block absent/disabled in Git config) |
 
 Full doctor (local + off-host dimensions + verdict):
 
@@ -398,7 +398,7 @@ From `configs/factory_remote_operations_v1_1.yaml` → `backup.offhost`:
 | `CURRENT` | ≤ 2h | Off-host copy matches campaign RPO target |
 | `DEGRADED` | > 2h and ≤ 6h | Visible degradation; local backup may still be OK |
 | `HARD_ATTENTION` | > 6h | Telegram path may emit `DEGRADED_OFFHOST_BACKUP_STALE` via doctor |
-| `FAILED` | last receipt terminal is failure | Typed copy/config conflict |
+| `FAILED` | last receipt terminal is failure, **or** Git offhost enabled but rclone config metadata not ready | Typed copy/config conflict |
 | `MISSING` | configured but no successful receipt | Never copy-assume from local health alone |
 
 Receipt terminals (success): `COPIED_VERIFIED`, `ALREADY_PRESENT_VERIFIED`. Never contains OAuth tokens.
