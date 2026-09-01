@@ -8,8 +8,8 @@
   "required_roles": [
     "CODE_REVIEWER"
   ],
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "433984c97a787191c05532a64a102bd63ff530067105cba3ea3622d995a511fe",
+  "reviewed_inventory_sha256": "ee74a29f73e80ac2d988ed00cb30472ec8338bea6cedb7f2e43a782f96c4822a",
   "reviews": [
     {
       "role": "CODE_REVIEWER",

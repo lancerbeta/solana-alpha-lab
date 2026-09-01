@@ -21,6 +21,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/collector_schedulability_oracle.py
 - tests/test_collector_sampling_oracle_applied_probability_repair.py
 - docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md
+- catalog/assets/core.yaml
 - docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_completion_evidence_v1.json
 - docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_independent_review_v1.json
 - docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_factory_fit_v1.json

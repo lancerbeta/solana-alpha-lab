@@ -11,7 +11,13 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "597c1c1dfe2a86074105ad5ae6e9491e73b052a952129205f4e0e0189f7483e4",
+    "docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md": "bff92915370409ac8d0a1f821161b28ab9f6209c74afaf7104d594657f02157d",
+    "docs/tasks/COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1.md": "b5cf381772dc8bbc0799826fa8f61f33a75f51650a3e93494ef4f0bb30567777",
+    "src/solana_alpha_lab/factory/collector_schedulability_oracle.py": "fc4f975b8d69e84efc96351292d776609ec6ab3af775b1f10fd21ba9389f5d26",
+    "tests/test_collector_sampling_oracle_applied_probability_repair.py": "ae61371da5fd1260b75bdae14db35e7c73be2a86ac95dc56c25f8ab2d62ad7d0"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -22,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "5e332f436ccfd913f03258453deaeccacc79bb17e0df490ef099e1605ace34aa",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SAMPLING_ORACLE_APPLIED_PROBABILITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "f7091cba8f4d7e7df28e1d3c36ce08d6a57caa9ae81059898e71c35828e234d6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
