@@ -14,7 +14,18 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1.md": "64566664ae150eea582a8669f40dc19946cee2217fdac549ea0512fae60447a5"
+    "catalog/assets/core.yaml": "ecc5b2ff8d85c828b5b90d3d7098aba059ae3f554b213a4947e6282f2ee3179f",
+    "catalog/assets/lifecycle.yaml": "d136ab87168d41fc7efa34f05c91302139728e78509d155a9f12c98fe8685130",
+    "catalog/catalog_manifest.yaml": "fcd987bb65b84103440a9b68651f68f64269a67a9f81c77f6584f2bbb69f2611",
+    "catalog/generated/asset_edges.json": "a760bc9d73f36275cbffbe4c18fb0fa5ce108822d96d3ab9d1c5eebb4f267b9b",
+    "docs/PROJECT_MAP.md": "e4d831beda0a32945a304ec6bfc009fed1853505f4b7951511f39e86896aaa89",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "532e95314a2a6ddd9862719394931e7a6bf54559f2c970e6cc35093d71331b64",
+    "docs/reports/live_cohort_discovery_release_series/a1_owner_readout_v1.md": "061a31255c0fab8bc65e4f144db029fc979020048139b1dccbaddb71751a3ab8",
+    "docs/tasks/LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1.md": "64566664ae150eea582a8669f40dc19946cee2217fdac549ea0512fae60447a5",
+    "scripts/discovery_evidence_release.py": "25a9373999f89cc1f561c66726986f54f44906786a9e5a443400eb310dbd6e6c",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "dea8328134f23e15e0145c610a298079bbfacdccb416affc8373e505a0791446",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "dee0129147d262bd6be39f9fa38232a6733d4dca3d721af76491c3ede1b9f55f",
+    "tests/test_live_cohort_discovery_release_series.py": "e093b69a4db0cc5724f41ae68389da578d022b92e907bddd2bc3a91ebd727293"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -26,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_discovery_release_series/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "df51b5b6d814c279d075a2dad6c21e926711cc701f4811f6082b322a4cb670c6",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_DISCOVERY_RELEASE_SERIES_SUITE",
     "independent_review": {
       "path": "docs/evidence/live_cohort_discovery_release_series/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "a0e11d6a1b0b3d3689f2b3b62bd4017429c10e27faa81847a05256b170a5d72b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
