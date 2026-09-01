@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-OWNER-PULSE-CLI-GIT-SHA-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-01",
+  "task_id": "COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "19589dda52c247a300cc49df4ce51d04ce1181cb5cd3a6d6ba5ed172f7850f2c",
+  "reviewed_inventory_sha256": "a24a2124aa6af0b7b49c441909f19e42b43303d095e54dd601a085295d0c08fc",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FACTORY_LIVE_BASELINE_COMMISSIONING_PREFLIGHT_RERUN"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_SSH_CHANGE",
+    "NO_BACKUP_CHANGE"
+  ],
+  "recovery": "REVERT"
+}

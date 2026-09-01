@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COLLECTOR-OWNER-PULSE-CLI-GIT-SHA-REPAIR-COMPLETION-001",
+  "as_of": "2026-09-01",
+  "task_id": "COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_V1",
+  "state_change": "COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_READY_FOR_MERGE_GATE",
+  "base_main": "ebb0a351cce2ce6ef0becd8b7025d5a4dfc99faa",
+  "owner_approvals": [
+    "OK COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/reports/collector_owner_pulse_cli_git_sha_repair/a1_owner_readout_v1.md": "9e7c8c6de132a4b5bb8ee1583faa0ba38c6fcba624c3968f738fbc3868be256c",
+    "docs/tasks/COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_V1.md": "0aac0753d455dfdfb6c167398dd0bc7c065ae0d8ebbf2db542af405129e519f2",
+    "scripts/collector_owner_pulse.py": "0d0dc6e1275430a3b2c229ba464ca20de5160eb5ef9b39941f1d7efbe7b57870",
+    "tests/test_collector_owner_pulse_cli_git_sha_repair.py": "e532b9ab8ad093a78d15ad2577e9cdc2496a0eac3927d8c877d85ff6a11f6c50"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/collector_owner_pulse_cli_git_sha_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "71d0320cc84f12c0e177c6c986060a97dcc2257f05080bcd899e01e4fecec438",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/collector_owner_pulse_cli_git_sha_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "3b84f737c49edf312025888a456d017c0ef8e48f02dc284cc3680bde0743e326",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CLI_CHECKOUT_DRY_RUN",
+      "PASS_CLI_NO_GIT_DEPLOY_SHA",
+      "PASS_CLI_CONFIGURED_PRODUCER_SHA",
+      "PASS_CLI_FAIL_CLOSED_MISSING_DEPLOY_SHA",
+      "PASS_ZERO_NETWORK_ZERO_CREDENTIAL_DRY_RUN"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_CAMPAIGN_ACTIVATE",
+    "NO_SSH_CHANGE",
+    "NO_BACKUP_CHANGE",
+    "NO_TELEGRAM_EMIT",
+    "NO_GIT_SHA_API_CHANGE",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

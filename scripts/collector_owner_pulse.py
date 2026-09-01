@@ -55,13 +55,14 @@ def main(argv: list[str] | None = None) -> int:
     store = ObservationScheduleStore((ROOT / ops_rel).resolve())
     now = parse_utc(args.now) if args.now else datetime.now().astimezone()
     remote = load_config_v1_1(ROOT)
+    producer_git_sha = git_sha(ROOT, runtime.get("producer_git_sha"))
 
     result = run_daily_owner_pulse(
         root=ROOT,
         store=store,
         mode=args.mode,
         now=now,
-        deploy_git_sha=git_sha(ROOT),
+        deploy_git_sha=producer_git_sha,
         observation_rdp=ROOT / str(runtime["data_root"]),
         remote_config=remote,
         record_storage_history=bool(args.record_storage_history and args.mode == "emit"),
