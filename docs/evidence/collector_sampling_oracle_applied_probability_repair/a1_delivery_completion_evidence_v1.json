@@ -28,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "5e332f436ccfd913f03258453deaeccacc79bb17e0df490ef099e1605ace34aa",
+    "sha256": "789fccd338007343e7dab98bd31fb5265e2639397443ef825dc7f2c479e506b2",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SAMPLING_ORACLE_APPLIED_PROBABILITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "f7091cba8f4d7e7df28e1d3c36ce08d6a57caa9ae81059898e71c35828e234d6",
+      "sha256": "8f75f010b1a38f915395e61df1bac9833e6202af0583c891035fc875d6f35faa",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

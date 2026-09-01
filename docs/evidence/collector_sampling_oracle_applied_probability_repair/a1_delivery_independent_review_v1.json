@@ -6,10 +6,12 @@
   "task_id": "COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1",
   "verdict": "PASS",
   "required_roles": [
-    "CODE_REVIEWER"
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
   ],
   "reviewed_bindings_sha256": "433984c97a787191c05532a64a102bd63ff530067105cba3ea3622d995a511fe",
-  "reviewed_inventory_sha256": "ee74a29f73e80ac2d988ed00cb30472ec8338bea6cedb7f2e43a782f96c4822a",
+  "reviewed_inventory_sha256": "3ebb5e122bcda827df1f0dc2cd84734d8f502ce8240c9cece30ae6508574e60d",
   "reviews": [
     {
       "role": "CODE_REVIEWER",
@@ -17,8 +19,25 @@
       "findings": [
         "INCLUSION_FOLLOWS_APPLIED_MEMBER_CAP",
         "CAPACITY_CEILING_UNCHANGED",
-        "COMMISSIONING_ENVELOPE_P_057_REGRESSION",
-        "SCHEDULE_IDENTITY_DIFFERS_FROM_INVALID_02152E"
+        "COMMISSIONING_ENVELOPE_P_057_REGRESSION"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "INVALID_PROPOSAL_02152E_MUST_NOT_AUTHORIZE",
+        "ZERO_NETWORK_ZERO_VPS",
+        "FROZEN_REPLACEMENT_P_057_CONFIRMED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ORACLE_SEMANTICS_COHERENT",
+        "PROVIDER_ACCOUNTING_UNCHANGED",
+        "NO_LAUNCHPAD_REGRESSION"
       ]
     }
   ],
