@@ -9,6 +9,8 @@
 
 ObservationSchedule / lifecycle collector protocol:
 `docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md` (не дублировать сюда).
+Off-host Google Drive durability recovery: см. раздел **Durability recovery**
+в том же collector runbook (`factory_remote_doctor.py --offhost-status`).
 
 ## Где хост
 

@@ -46,7 +46,23 @@ backup:
   recursive_relative_paths:
     - local/factory_v1/observation_rdp
   same_parent_forbidden: true
-  google_drive_role: OPTIONAL_COLD_COPY_NOT_DOD
+  google_drive_role: PROVEN_OFFHOST_DURABILITY
+  google_drive_role_prior: OPTIONAL_COLD_COPY_NOT_DOD
+  google_drive_role_provenance:
+    prior_role: OPTIONAL_COLD_COPY_NOT_DOD
+    promoted_by:
+      - FACTORY_GOOGLE_DRIVE_OFFHOST_PROOF_V1
+      - FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1
+    unproven_follow_up: NONEMPTY_RDP_OFFHOST_RESTORE_PROOF
+  offhost:
+    enabled: true
+    remote_name: factory-gdrive
+    destination_root: solana-alpha-lab/factory-backups
+    rclone_config_absolute: /etc/solana-alpha-lab/rclone.conf
+    rclone_bin: /usr/bin/rclone
+    receipt_relative: local/factory_v1/offhost_backup_receipt.json
+    freshness_current_max_seconds: 7200
+    freshness_degraded_max_seconds: 21600
 monitoring:
   freshness_max_seconds: 900
   stall_max_seconds: 1800
@@ -71,6 +87,7 @@ units:
   health_relative: configs/factory_remote_ops/factory-remote-health.service
   backup_service_relative: configs/factory_remote_ops/factory-remote-backup.service
   backup_timer_relative: configs/factory_remote_ops/factory-remote-backup.timer
+  backup_gdrive_service_relative: configs/factory_remote_ops/factory-remote-backup-gdrive.service
   paper_heartbeat_relative: configs/factory_remote_ops/factory-paper-heartbeat.service
   observation_schedule_service_relative: configs/factory_remote_ops/factory-observation-schedule.service
   observation_schedule_timer_relative: configs/factory_remote_ops/factory-observation-schedule.timer

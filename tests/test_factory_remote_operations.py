@@ -45,6 +45,7 @@ COPY_RELATIVES = [
     "configs/factory_remote_ops/factory-remote-health.service",
     "configs/factory_remote_ops/factory-remote-backup.service",
     "configs/factory_remote_ops/factory-remote-backup.timer",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive.service",
     "configs/factory_remote_ops/factory-paper-heartbeat.service",
     "configs/factory_remote_ops/factory-paper-heartbeat.timer",
     "configs/factory_remote_ops/secrets.env.example",
@@ -99,6 +100,10 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
         self.assertEqual(config["workbench"]["access"], "SSH_TUNNEL_ONLY")
         self.assertTrue(config["health"]["process_alive_alone_is_not_healthy"])
         self.assertEqual(config["backup"]["google_drive_role"], "OPTIONAL_COLD_COPY_NOT_DOD")
+        from solana_alpha_lab.factory.remote_ops import load_config_v1_1
+
+        v1_1 = load_config_v1_1(ROOT)
+        self.assertEqual(v1_1["backup"]["google_drive_role"], "PROVEN_OFFHOST_DURABILITY")
         dumped = yaml.safe_dump(config)
         self.assertNotIn("FACTORY_V1_OPERATIONAL_READY", dumped)
         self.assertNotIn("CLOUD_VPS_1_GEN2", dumped.split("rejected_sku:")[0])

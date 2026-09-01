@@ -15,6 +15,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory.offhost_backup import offhost_recovery_readout  # noqa: E402
 from solana_alpha_lab.factory.remote_ops import (  # noqa: E402
     RemoteOpsError,
     doctor_packet,
@@ -62,6 +63,11 @@ def main() -> int:
     parser.add_argument("--json", action="store_true")
     parser.add_argument("--heartbeat", action="store_true")
     parser.add_argument("--backup", action="store_true")
+    parser.add_argument(
+        "--offhost-status",
+        action="store_true",
+        help="Read-only off-host durability recovery readout (no Drive writes)",
+    )
     parser.add_argument("--loop", action="store_true")
     parser.add_argument("--process-alive", action="store_true")
     parser.add_argument("--process-down", action="store_true")
@@ -85,6 +91,14 @@ def main() -> int:
         if args.backup:
             packed = package_backup(root, config=config)
             print(json.dumps(packed, indent=2, sort_keys=True))
+            return 0
+        if args.offhost_status:
+            readout = offhost_recovery_readout(root, deploy_git_sha=_git_sha(root))
+            dumped = json.dumps(readout)
+            for forbidden in ("access_token", "refresh_token", "client_secret", "BEGIN PRIVATE"):
+                if forbidden in dumped:
+                    raise RemoteOpsError("SECRET_LEAK_IN_OFFHOST_READOUT")
+            print(json.dumps(readout, indent=2, sort_keys=True))
             return 0
         if args.process_alive:
             process_alive = True

@@ -38,11 +38,21 @@ units:
   - factory-remote-health.service
   - factory-paper-heartbeat.timer
   - factory-remote-backup.timer
+  - factory-remote-backup-gdrive.service
 commands:
   doctor: cd /opt/solana-alpha-lab && sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py
   heartbeat: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/run_factory_unattended_shadow_tick.py
   backup: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --backup
+  offhost_status: cd /opt/solana-alpha-lab && sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --offhost-status
   units: systemctl is-active factory-v1-workbench.service factory-remote-health.service nftables fail2ban
+offhost:
+  rclone_bin: /usr/bin/rclone
+  rclone_config_absolute: /etc/solana-alpha-lab/rclone.conf
+  remote_name: factory-gdrive
+  destination_root: solana-alpha-lab/factory-backups
+  receipt_relative: local/factory_v1/offhost_backup_receipt.json
+  copy_semantics: COPYTO_ONLY
+  delete_remote: false
 authority:
   live_mutate: STANDING_WITHIN_FACTORY_REMOTE_OPERATIONS_V1
   owner_micro_approval: FORBIDDEN
