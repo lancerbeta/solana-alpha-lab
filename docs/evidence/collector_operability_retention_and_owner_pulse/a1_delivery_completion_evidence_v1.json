@@ -1,0 +1,83 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-COMPLETION-001",
+  "as_of": "2026-09-01",
+  "task_id": "COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1",
+  "state_change": "COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_READY_FOR_MERGE_GATE",
+  "base_main": "23bb5b8d4bb861a33c27d711479af4ccdfffe9b9",
+  "owner_approvals": [
+    "OK COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "ea49cd91b3cee21ff009d2bb2ba53f0cd63f345ee60313a787d3371911c5f41d",
+    "catalog/assets/lifecycle.yaml": "6109248b4028bba3638d53191be7070c66a407a5e0eb9bd8db91f37ba84848c5",
+    "catalog/catalog_manifest.yaml": "88c09cbe3713fbf6dd89c5d7cec46c9562913dcea13b66402f0df46656e1e76c",
+    "catalog/generated/asset_edges.json": "c81998d818ee54bfc3f07c85650be2110cdf505c59cd902bfa83ac42014b1900",
+    "catalog/schemas/factory_remote_operations_v1_1.schema.json": "11b154a2201575db2bdf10a361766891be0b570708137fb046fe3a843d563910",
+    "configs/factory_remote_operations_v1_1.yaml": "43e26a5b46ee5fa3aa97c152e753c686e552ab78cee36d1c3e2432320ebb9b0e",
+    "configs/factory_remote_ops/factory-collector-owner-pulse.service": "17cec4e7056bc2ecaecd615c8ed16dac07cce07bfd14580a555b909c3570e99e",
+    "configs/factory_remote_ops/factory-collector-owner-pulse.timer": "1cd4e1a0aab62d99e51b521dceb37f719c82be35de91294b31db4ce3516e73a0",
+    "docs/PROJECT_MAP.md": "59eba2b1fdfe864997b8f41c77e84aa2d9a414e6cdba28bb395a1c89d31f286f",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "868530e60e43f34f0743ba0ccce0178b200f7429c0c8b3bf4ba455bea0c151a1",
+    "docs/reports/collector_operability_retention_and_owner_pulse/a1_owner_readout_v1.md": "3b754f64096e790f5e96e930edcec82f11b6b859884f3fe5e3da6fccf10e78e4",
+    "docs/tasks/COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1.md": "3d06d0a2b55bbf58c8cf4a56d77b3b633276e34da2685b3ee89d281febb34146",
+    "scripts/collector_owner_pulse.py": "d4a3527d761308fa7efc6602dfb194de37074e5bd4bfdb149d8cc3c1fd15c150",
+    "scripts/observation_schedule_retention.py": "e6664d1de22f6aa98f5436f9c3669a9380369f96f9a57297d96cee8e09980483",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "d9e1593730898a3bfe09640519a787290b50aed0c0d85bf0177f260efb148c9f",
+    "src/solana_alpha_lab/factory/collector_owner_pulse.py": "e2fd5c78376c80f06ad62431689e1340b27231fd6a3fce12fb9aa1f35a27d658",
+    "src/solana_alpha_lab/factory/observation_schedule_retention.py": "78a94b12c99a8849804872d246ff227b5785a5fc2aaa7d72cf7a4c1b4b0d1329",
+    "tests/test_collector_operability_retention_and_owner_pulse.py": "1ef11c7236bb01adc1b7625eedd815efb1d7db5ff49680e3ae0b1cd7c5718bc8"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/collector_operability_retention_and_owner_pulse/a1_delivery_factory_fit_v1.json",
+    "sha256": "39bf351df3c453ce4055500d87c2eda10aac895c71b1192937b8c9d25399e275",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/collector_operability_retention_and_owner_pulse/a1_delivery_independent_review_v1.json",
+      "sha256": "587a36dcb6809efc8ca9aa26def4b121447626f8ba63793d54be3f9c14e50c7d",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_VERTICAL_PACKET_PULSE_RETENTION",
+      "PASS_ZERO_ELIGIBLE_NOT_PROVIDER_FAILURE",
+      "PASS_CATALOG_VALIDATION"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_TIMER_ENABLE",
+    "NO_RETENTION_APPLY_ON_HOST",
+    "NO_FORGE_RUN",
+    "NO_CAMPAIGN_ACTIVATE",
+    "NO_SCIENTIFIC_DELETION",
+    "NO_SECOND_MONITORING_PLATFORM",
+    "NO_BYTE_IDENTICAL_HTTP_RAW_CLAIM",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

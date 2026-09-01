@@ -14,6 +14,20 @@ collector; host locator не дублировать.
 | Research Evidence Plane | canonical local `local/factory_v1/data_plane` | Forge-visible sealed evidence |
 | Evidence boundary | Discovery Evidence Release seal → verify → import | only sealed import changes Forge `evidence_epoch` |
 
+**Operational vs scientific storage (do not conflate):**
+
+| Substrate | Path / artifact | Role | Retention |
+|---|---|---|---|
+| ObservationSchedule SQLite | `local/factory_v1/observation_schedule_state.sqlite` | operational scheduler / call ledger / poll cache / accounting — **not** scientific truth | `raw_retention_days` (campaign default **31**) may compact aged COMPLETED provider **decoded JSON bodies** to provenance metadata |
+| Observation RDP / Parquet | `local/factory_v1/observation_rdp` | immutable scientific panel publication | `canonical_panel_retention = IMMUTABLE` — **never** auto-deleted by retention |
+| Sealed live releases / LIVE CORPUS | sealed release dirs + corpus lineage | exploratory scientific publication | **never** auto-deleted by retention |
+
+**`raw_retention_days = 31` means:** after 31 UTC days, and only when related due work is scientifically closed, COMPLETED `call_ledger` rows may drop large decoded provider payload fields (`rows` / body) while keeping `call_occurrence_id`, `request_sha256`, `response_sha256`, HTTP class/timing, and identity. It does **not** mean byte-identical original HTTP response retention — the substrate is **decoded/canonical provider JSON** in SQLite.
+
+What may be safely compacted: aged COMPLETED operational provider bodies; aged `poll_slots` cache bodies when they cannot participate in current scheduling/recovery.
+
+What is never automatically deleted: Observation RDP/Parquet, sealed live releases/corpus, candidate/member denominator rows, authority receipts, activation identity, accounting identity, unfinished/STARTED/IN_FLIGHT calls, anything younger than `raw_retention_days`.
+
 - Forge **never** reads moving VPS truth directly.
 - Continuous observation alone does **not** change Forge evidence epoch.
 - Discovery-only history (`DISCOVERY_ONLY_SECOND_LOOK`) cannot confirm hypotheses
@@ -199,23 +213,92 @@ Machine-resolved; do not freeze ephemeral PASS/FAIL into this prose.
 5. Independent backup decision (`FACTORY_BACKUP_SINK` other volume vs accept same-volume)
 6. Live campaign authority (exact ObservationSchedule phrase)
 7. Live commissioning (timer enabled, ticks with authority)
-8. Daily owner pulse — **next named consumer, not this atom**
+8. Daily owner pulse — product ready; install/enable timer only at final VPS deploy
 9. Live cohort seal / sync / import into LIVE CORPUS (product ready; ops after collector commissioning)
 10. Forge
 
-## DAILY_COLLECTOR_OWNER_PULSE (named future consumer)
+## DAILY_COLLECTOR_OWNER_PULSE
 
-Do **not** implement here unless already supported by existing health/Telegram
-with config only. Desired future daily (non-spam) summary:
+One daily Telegram summary (not incident spam). Reuses
+`FACTORY_TELEGRAM_BOT_TOKEN` / `FACTORY_TELEGRAM_CHAT_ID` only — **never** Jupiter
+credentials. Immediate remote-ops incident alerts remain separate and deduplicated.
 
-- collector state
-- candidates / sampled / X-eligible 24h
-- 4h/24h closure
-- discovery coverage class / gaps
-- provider 401/403/429/5xx/timeout
-- oldest due / backlog
-- backup age / domain
-- disk
-- current cohort / release state
+Deterministic schedule bytes: `OnCalendar=*-*-* 06:15:00` UTC
+(`configs/factory_remote_ops/factory-collector-owner-pulse.timer`). Templates only —
+do **not** install/enable in the software baseline atom.
 
-Immediate incident alerts remain separate from this daily pulse.
+### Dry-run (zero network, zero credential VALUE reads)
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run
+```
+
+### Emit (Telegram only; reads only Telegram env values)
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode emit --record-storage-history
+```
+
+### Operational packet + health classes
+
+Composed from collector_read_model + remote-ops disk/backup + live-release fields.
+Health classes include: `PROCESS_OK`, `DATA_STALE`, `PROVIDER_AUTH_FAILED`,
+`PROVIDER_RATE_LIMITED`, `PROVIDER_FAILED`, `DISCOVERY_GAP`,
+`DISCOVERY_COVERAGE_UNKNOWN`, `BACKLOG_RISK`, `BUDGET_BLOCKED`,
+`RDP_PUBLICATION_STALE`, `BACKUP_DEGRADED`, `DISK_WARNING`, `DISK_CRITICAL`,
+`RELEASE_BLOCKED`. Zero eligible market supply is **not** provider failure.
+Unavailable metrics use `UNKNOWN` / `NOT_APPLICABLE` — never silent zero.
+
+Disk policy (measured % used; does not auto-resize or delete science):
+
+| Threshold | Class |
+|---|---|
+| <70% | NORMAL |
+| ≥70% | EARLY_WARNING (pulse text only; not a hard health class) |
+| ≥80% | DISK_WARNING |
+| ≥85% | DISK_CRITICAL (remote-ops hard safety reference unchanged) |
+
+### Retention status / dry-run / apply
+
+Default is dry-run. Apply requires exact `--i-understand-apply`. Never deletes
+scientific RDP/releases. Safe around scheduler lease (`WRITER_BUSY` if tick holds lease).
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule_retention.py status --raw-retention-days 31
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule_retention.py dry-run --raw-retention-days 31
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule_retention.py apply --raw-retention-days 31 --i-understand-apply
+```
+
+VPS retention auto-enable is out of scope until final deploy atom.
+
+### Future agent recovery (read-only first)
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule_retention.py status --raw-retention-days 31
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/discovery_evidence_release.py live-status --observation-rdp local/factory_v1/observation_rdp --cohort-id <UTC-YYYYMMDD-YYYYMMDD>
+```
+
+Current/live corpus: one stable `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` with
+versioned manifests; weekly sealed releases import into that corpus — they are not
+deleted by operational retention.

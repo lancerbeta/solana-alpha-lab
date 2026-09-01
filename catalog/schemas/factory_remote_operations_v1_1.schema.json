@@ -203,7 +203,9 @@
         "backup_timer_relative": {"type": "string", "minLength": 8},
         "paper_heartbeat_relative": {"type": "string", "minLength": 8},
         "observation_schedule_service_relative": {"type": "string", "minLength": 8},
-        "observation_schedule_timer_relative": {"type": "string", "minLength": 8}
+        "observation_schedule_timer_relative": {"type": "string", "minLength": 8},
+        "collector_owner_pulse_service_relative": {"type": "string", "minLength": 8},
+        "collector_owner_pulse_timer_relative": {"type": "string", "minLength": 8}
       }
     },
     "health": {

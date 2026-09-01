@@ -29937,9 +29937,9 @@ records:
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-01'
-  truth_owner: OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1
+  truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 532e95314a2a6ddd9862719394931e7a6bf54559f2c970e6cc35093d71331b64}
+  integrity: {kind: sha256, sha256: 868530e60e43f34f0743ba0ccce0178b200f7429c0c8b3bf4ba455bea0c151a1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -32955,7 +32955,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_remote_operations_v1_1.schema.json', repository_path: catalog/schemas/factory_remote_operations_v1_1.schema.json}
-  integrity: {kind: sha256, sha256: b2d6740715461d830efa3f65303529fd83afff22306fe28bd646fa13b477f88b}
+  integrity: {kind: sha256, sha256: 11b154a2201575db2bdf10a361766891be0b570708137fb046fe3a843d563910}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33023,7 +33023,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_remote_operations_v1_1.yaml', repository_path: configs/factory_remote_operations_v1_1.yaml}
-  integrity: {kind: sha256, sha256: da55c1c8164198c083ebbe3d53e28eb1edfdb2e1f62b7f275e210b774b32de33}
+  integrity: {kind: sha256, sha256: 43e26a5b46ee5fa3aa97c152e753c686e552ab78cee36d1c3e2432320ebb9b0e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33971,4 +33971,93 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [LIVE_COHORT, CORPUS, VERTICAL_PROOF, TWELVE_WEEK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Bounded collector operational packet, daily owner Telegram pulse, and safe SQLite raw-body retention before final VPS deploy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1.md', repository_path: docs/tasks/COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1.md}
+  integrity: {kind: sha256, sha256: 3d06d0a2b55bbf58c8cf4a56d77b3b633276e34da2685b3ee89d281febb34146}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-READ-MODEL-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [OWNER_PULSE, RETENTION, COLLECTOR_OPERABILITY, TELEGRAM]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-COLLECTOR-OPERATIONAL-PACKET-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Compose ObservationSchedule + remote-ops + live-release into one collector operational packet with explicit UNKNOWN semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
+  integrity: {kind: sha256, sha256: d9e1593730898a3bfe09640519a787290b50aed0c0d85bf0177f260efb148c9f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-READ-MODEL-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OPERATIONAL_PACKET, HEALTH_CLASSES, DISK_WARNING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-COLLECTOR-OWNER-PULSE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Daily Collector Owner Pulse dry-run/emit over existing Telegram transport without Jupiter credentials.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_owner_pulse.py', repository_path: src/solana_alpha_lab/factory/collector_owner_pulse.py}
+  integrity: {kind: sha256, sha256: e2fd5c78376c80f06ad62431689e1340b27231fd6a3fce12fb9aa1f35a27d658}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-OPERATIONAL-PACKET-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [DAILY_COLLECTOR_OWNER_PULSE, TELEGRAM, DRY_RUN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-OBSERVATION-SCHEDULE-RETENTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Age-gated compaction of COMPLETED operational provider payloads while preserving scientific RDP and provenance identity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_retention.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_retention.py}
+  integrity: {kind: sha256, sha256: 78a94b12c99a8849804872d246ff227b5785a5fc2aaa7d72cf7a4c1b4b0d1329}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [RAW_RETENTION, COMPACTION, CALL_LEDGER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network vertical proof for operational packet, daily pulse, and safe retention compaction.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_collector_operability_retention_and_owner_pulse.py', repository_path: tests/test_collector_operability_retention_and_owner_pulse.py}
+  integrity: {kind: sha256, sha256: 1ef11c7236bb01adc1b7625eedd815efb1d7db5ff49680e3ae0b1cd7c5718bc8}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-OPERATIONAL-PACKET-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [VERTICAL_PROOF, OWNER_PULSE, RETENTION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
