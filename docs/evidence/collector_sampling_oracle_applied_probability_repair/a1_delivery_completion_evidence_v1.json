@@ -12,11 +12,18 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "597c1c1dfe2a86074105ad5ae6e9491e73b052a952129205f4e0e0189f7483e4",
+    ".agents/skills/delivery-harness/SKILL.md": "b282a736f16ad559e7a58844ec0db202d5ca4d869005d2fb757d22837f859608",
+    "catalog/assets/core.yaml": "4714f8a7c6d13c04e0609470fad23ce763273f3fbd36ab5f8cad804988e35d30",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "bea5ca334a53621c9a4ad0f9bc2342c3ba01cedcba4c8b16f88a61517cf1c72a",
     "docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md": "bff92915370409ac8d0a1f821161b28ab9f6209c74afaf7104d594657f02157d",
-    "docs/tasks/COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1.md": "b5cf381772dc8bbc0799826fa8f61f33a75f51650a3e93494ef4f0bb30567777",
+    "docs/tasks/COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1.md": "7fe657b427f99ef0b532d1a8938232fe633ac417873e1909e04137c7eac275d3",
+    "scripts/ci_fail_closed_messages.py": "fa415b439a3c11da934c57bf978de1f830a25fa87ff56d67b0e6fd1d6395a160",
+    "scripts/harness_sync.py": "31c114a1631dc96b39e89d18018e7f52a97d3ec52059e4ed638bb8c5efd328e3",
+    "scripts/owner_attention_gate.py": "6206d57a580becd3063cd8692d3f816c4bbba80d7c4585604c3b66915718b9ef",
     "src/solana_alpha_lab/factory/collector_schedulability_oracle.py": "fc4f975b8d69e84efc96351292d776609ec6ab3af775b1f10fd21ba9389f5d26",
-    "tests/test_collector_sampling_oracle_applied_probability_repair.py": "ae61371da5fd1260b75bdae14db35e7c73be2a86ac95dc56c25f8ab2d62ad7d0"
+    "tests/test_ci_messages.py": "b466d646d7d2982f547ea746217ed2372f697893fdb1e8e015f8c0bd1e1d619c",
+    "tests/test_collector_sampling_oracle_applied_probability_repair.py": "ae61371da5fd1260b75bdae14db35e7c73be2a86ac95dc56c25f8ab2d62ad7d0",
+    "tests/test_harness_sync_bindings.py": "8121cc573347a9af6c148d2a04ff9c276875218a3ad466c8ec9e8cd2af3e3c5a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -28,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "789fccd338007343e7dab98bd31fb5265e2639397443ef825dc7f2c479e506b2",
+    "sha256": "8630cf92af383b0937f28061d338bdf0f915793a1b5ae53e1c3f85f8a35aa3e8",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SAMPLING_ORACLE_APPLIED_PROBABILITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "8f75f010b1a38f915395e61df1bac9833e6202af0583c891035fc875d6f35faa",
+      "sha256": "214fe833cd2b00ea9d2bf3361bf8cff8d5819b0b88a02bc0058e310ed2195108",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

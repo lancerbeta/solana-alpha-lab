@@ -25,6 +25,8 @@ managed_write_set:
 - scripts/owner_attention_gate.py
 - scripts/ci_fail_closed_messages.py
 - tests/test_ci_messages.py
+- .agents/skills/delivery-harness/SKILL.md
+- docs/agent/DELIVERY_HARNESS_PROTOCOL.md
 - docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md
 - catalog/assets/core.yaml
 - docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_completion_evidence_v1.json
