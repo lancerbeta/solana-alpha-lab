@@ -440,3 +440,28 @@ sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_offhost
 ```
 
 Exit 0 → receipt updated. Local `--backup` remains separate and must succeed even if this fails.
+
+## Launchpad population contract (2026-09-01 commissioning)
+
+**Broken live schedule (MUST NOT RESUME):**
+
+| Item | Value |
+|---|---|
+| `schedule_sha256` | `490c21b69a1f8f8f878eb9d909f3fce62e3ffa9891c73d2e85ade9790949f7d8` |
+| `activation_id` | `ACT-490C21B69A1F8F8F` |
+| Pause reason | `POPULATION_PREDICATE_SCHEMA_MISMATCH_CONFIRMED` |
+| Terminal state | `PAUSED_OPERATOR` |
+
+**Root cause:** Jupiter `/tokens/v2/recent` exposes pump.fun membership on top-level
+`launchpad`, not on `firstPool.source` or top-level `source`. The authorized schedule
+used `FIELD-FIRST-POOL-SOURCE-001 EQ pump.fun`, which projected `MISSING_TYPED` on
+every live row, so all candidates became `NOT_SELECTED_PREDICATE` before Bernoulli
+sampling.
+
+**Repair:** `FIELD-LAUNCHPAD-001` (explicit launchpad text from `row["launchpad"]`).
+`FIELD-FIRST-POOL-SOURCE-001` semantics are unchanged. Replacement campaign requires
+**new** `schedule_sha256`, register, owner authorize phrase, and activate — never
+resume the broken activation or mutate its registered document in place.
+
+Evidence: `docs/evidence/factory_launchpad_population_contract_repair/`
+Task: `docs/tasks/FACTORY_LAUNCHPAD_POPULATION_CONTRACT_REPAIR_V1.md`

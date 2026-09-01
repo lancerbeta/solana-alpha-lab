@@ -29939,7 +29939,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: c1613b2e04f87311585c251cb3a55c899e7f1e9ea5386da1239c25a033d6c96f}
+  integrity: {kind: sha256, sha256: c9bc32269f0bbad97cf7fbc8760b3f198dd0e4152b6b572d205b16d0a55ca245}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -32887,7 +32887,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/observation_primitive_registry_v1.schema.json', repository_path: catalog/schemas/observation_primitive_registry_v1.schema.json}
-  integrity: {kind: sha256, sha256: 7ee5fb72152b50ad0593d731f23ba0c8a49666f4301b03f48d0a8604b128816d}
+  integrity: {kind: sha256, sha256: 7c38ddb1f0a77cb6502c688631683699073aec2961eee21578ad28f60d723411}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -32972,7 +32972,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/observation_primitive_registry_v1.yaml', repository_path: configs/observation_primitive_registry_v1.yaml}
-  integrity: {kind: sha256, sha256: 1817b4fae2e4466d32de28821f62085f73f71a26e1b180c467a19a3e0e824b64}
+  integrity: {kind: sha256, sha256: d560b947beae6341e90e6e818078f57383f33327be9dab63da2d4ee7ec985f06}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33349,7 +33349,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/tokens_v2_typed_projection.py', repository_path: src/solana_alpha_lab/factory/tokens_v2_typed_projection.py}
-  integrity: {kind: sha256, sha256: 716ebf7a936e4dbf4604a03d38b236eee71420db300c1ce710882670f7207d91}
+  integrity: {kind: sha256, sha256: 351a253ccf5eec73094158d2e1895948ec96e7ede6e57369cda80eac1113ae7c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -33366,7 +33366,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/discovery_evidence_release.py', repository_path: src/solana_alpha_lab/factory/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: c11128e4a1670631b70ce1ff5a07ee5d6edc1a17881050c047c295dcd14f5a04}
+  integrity: {kind: sha256, sha256: 36c2825848df6adb593e1d047b54f2958f161faef47bc61cf9a9c5279c75358c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -33402,7 +33402,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_tokens_v2_typed_projection.py', repository_path: tests/test_tokens_v2_typed_projection.py}
-  integrity: {kind: sha256, sha256: 6e5c5bb24194de57b5fab017e8249428a4eef280c3204317ebb75712d9ade692}
+  integrity: {kind: sha256, sha256: b3a704c71497530517f1b0a31c33bd878d5911f768ae2062ec420068ebead843}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -33820,7 +33820,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_campaign_preflight.py', repository_path: src/solana_alpha_lab/factory/collector_campaign_preflight.py}
-  integrity: {kind: sha256, sha256: 959948fb712d5161d47bc18cf46f8aa419846343369649b9858fe97e84a940df}
+  integrity: {kind: sha256, sha256: 61c0dc400bd597c01cc0b5ff6e6a1aac9b437973344caf606f88f7541c6ffa3e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
