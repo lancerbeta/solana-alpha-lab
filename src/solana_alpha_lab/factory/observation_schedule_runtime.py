@@ -30,6 +30,8 @@ ALLOWED_CREDENTIAL_ENV = frozenset({"JUPITER_FREE_API_KEY"})
 # Compat alias only: read when sanctioned name is unset. Never allowlist as config.
 CREDENTIAL_COMPAT_ALIAS_ENV = "JUPITER_API_KEY"
 SANCTIONED_CREDENTIAL_ENV = "JUPITER_FREE_API_KEY"
+DEPLOY_SHA_NAME = ".factory_deploy_sha"
+_SHA40 = re.compile(r"^[0-9a-f]{40}$")
 PROVEN_READONLY_USER_AGENT = (
     "solana-alpha-lab/quote-native-evidence-qualification-v1"
 )
@@ -241,11 +243,20 @@ def build_opener(
     return FakeProviderOpener(loaded)
 
 
-def git_sha(root: Path, configured: str | None) -> str:
-    if configured:
-        return configured
+def _require_sha40(value: str) -> str:
+    text = value.strip()
+    if _SHA40.fullmatch(text) is None:
+        raise ObservationRuntimeError("PRODUCER_GIT_SHA_UNAVAILABLE")
+    return text
+
+
+def _git_worktree_head(root: Path) -> str | None:
     import subprocess
 
+    # Require a Git metadata entry at this root only — do not walk up to a
+    # parent repository (that would shadow .factory_deploy_sha on nested dry-runs).
+    if not (root / ".git").exists():
+        return None
     completed = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=str(root),
@@ -255,17 +266,56 @@ def git_sha(root: Path, configured: str | None) -> str:
         shell=False,
     )
     if completed.returncode != 0:
-        raise ObservationRuntimeError("PRODUCER_GIT_SHA_UNAVAILABLE")
-    value = completed.stdout.decode("ascii").strip()
-    if len(value) != 40:
-        raise ObservationRuntimeError("PRODUCER_GIT_SHA_UNAVAILABLE")
+        return None
+    try:
+        value = completed.stdout.decode("ascii").strip()
+    except UnicodeDecodeError:
+        return None
+    if _SHA40.fullmatch(value) is None:
+        return None
     return value
+
+
+def _factory_deploy_sha(root: Path) -> str | None:
+    """Read sanctioned exact-SHA pin. Identity only — never grants authority."""
+    marker = root / DEPLOY_SHA_NAME
+    try:
+        if marker.is_symlink() or marker.is_file() is False:
+            return None
+        # Refuse path escape / odd types: must be a regular file under root.
+        if marker.resolve().parent != root.resolve():
+            return None
+        raw = marker.read_text(encoding="ascii")
+    except (OSError, UnicodeDecodeError):
+        return None
+    text = raw.strip()
+    if _SHA40.fullmatch(text) is None:
+        return None
+    return text
+
+
+def git_sha(root: Path, configured: str | None) -> str:
+    """Resolve producer identity: config → Git HEAD → .factory_deploy_sha.
+
+    The deploy-pin fallback is for sanctioned no-.git exact-SHA roots only.
+    It does not authorize ObservationSchedule activation or provider calls.
+    """
+    if configured is not None:
+        return _require_sha40(str(configured))
+    head = _git_worktree_head(root)
+    if head is not None:
+        return head
+    deploy = _factory_deploy_sha(root)
+    if deploy is not None:
+        return deploy
+    raise ObservationRuntimeError("PRODUCER_GIT_SHA_UNAVAILABLE")
 
 
 __all__ = [
     "ALLOWED_CREDENTIAL_ENV",
     "CREDENTIAL_COMPAT_ALIAS_ENV",
     "DEFAULT_RUNTIME_RELATIVE",
+    "DEPLOY_SHA_NAME",
     "FakeProviderOpener",
     "JupiterReadonlyOpener",
     "PROVEN_READONLY_USER_AGENT",

@@ -7,6 +7,9 @@
 Это не `FACTORY_V1_OPERATIONAL_READY` и не alpha. Секреты в Git и в чат
 не попадают.
 
+ObservationSchedule / lifecycle collector protocol:
+`docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md` (не дублировать сюда).
+
 ## Где хост
 
 | Поле | Значение |

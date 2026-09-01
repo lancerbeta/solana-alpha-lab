@@ -1,0 +1,66 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PRECEDENCE_A_B_C_LOCKED",
+        "ROOT_LOCAL_GIT_NO_PARENT_WALK",
+        "DEPLOY_PIN_FAIL_CLOSED_FORMAT_SYMLINK_ESCAPE",
+        "B_BEATS_C_COMBO_TEST",
+        "VERTICAL_NO_GIT_TICK_BEYOND_SHA",
+        "ZERO_PROVIDER_ZERO_CREDENTIAL",
+        "NO_AUTHORITY_FROM_FALLBACK",
+        "CATALOG_INTEGRITY_ALIGNED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHEAPEST_FALSIFIER_MATCHES_VPS_LAYOUT",
+        "COLLECTOR_RUNBOOK_DISCOVERABLE_WITHOUT_CHAT",
+        "RUNTIME_STATE_MACHINE_RESOLVED",
+        "NO_SECOND_OPERATOR_TRUTH_PLANE",
+        "DAILY_PULSE_NAMED_FUTURE_ONLY",
+        "STOP_NO_VPS_IN_ATOM",
+        "DURABLE_EVIDENCE_AND_OWNER_READOUT"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "IDENTITY_NOT_AUTHORITY",
+        "LIVE_OBS_VS_RESEARCH_EVIDENCE_PLANES_HOLD",
+        "HOST_LOCATOR_VS_COLLECTOR_PROTOCOL_SPLIT",
+        "PIN_TREE_DESYNC_RESIDUAL_VISIBLE",
+        "NO_FORGE_DIRECT_VPS_READ",
+        "NO_SECOND_CATALOG_TRUTH"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_TREE_ATTESTATION_FROM_PIN",
+    "NO_ALPHA"
+  ]
+}

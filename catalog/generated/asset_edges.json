@@ -3173,6 +3173,16 @@
       "target_asset_id": "TEST-T06-CATALOG-001"
     },
     {
+      "source_asset_id": "CTRL-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULE-RUNTIME-001"
+    },
+    {
       "source_asset_id": "CTRL-ORDINARY-MARKET-PIT-LOCAL-RAW-ENVELOPE-BIND-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -4476,6 +4486,16 @@
       "source_asset_id": "DOC-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-REMOTE-HOST-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001"
     },
     {
       "source_asset_id": "DOC-FACTORY-REMOTE-HOST-001",
@@ -14151,6 +14171,16 @@
       "source_asset_id": "TEST-KCDN-ATOM-B-STABLE-CONTEXT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-KCDN-ATOM-B-001"
+    },
+    {
+      "source_asset_id": "TEST-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULE-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001"
     },
     {
       "source_asset_id": "TEST-OBSERVATION-SCHEDULE-COMMISSIONING-001",

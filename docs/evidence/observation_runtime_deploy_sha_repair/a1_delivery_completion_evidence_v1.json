@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-COMPLETION-001",
+  "as_of": "2026-09-01",
+  "task_id": "OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1",
+  "state_change": "OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_READY_FOR_MERGE_GATE",
+  "base_main": "96f32177e9f01b7865647923f5da9a36b3a5bfe1",
+  "owner_approvals": [
+    "OK OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1.md": "e85ad456ddcc62d20ec2867bf6f0f169c91bc3996310ef10a5b262d5d36f4b60"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/observation_runtime_deploy_sha_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/observation_runtime_deploy_sha_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PRODUCER_SHA_PRECEDENCE",
+      "PASS_VERTICAL_NO_GIT_DEPLOY_TICK",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_COLLECTOR_OPERATOR_RUNBOOK"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_CAMPAIGN_ACTIVATE",
+    "NO_DAILY_PULSE_IMPLEMENTATION",
+    "NO_TREE_ATTESTATION_FROM_PIN",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

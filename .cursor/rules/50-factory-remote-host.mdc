@@ -12,6 +12,14 @@ action, read and obey:
 - `docs/operator/FACTORY_REMOTE_HOST.md`
 - `docs/operator/factory_remote_host_v1.yaml`
 
+Before any ObservationSchedule / lifecycle collector / campaign preflight /
+collector evidence-sync / discovery-release-import action, also read:
+
+- `docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md`
+
+Keep `FACTORY_REMOTE_HOST.md` as the host locator only. Collector protocol
+lives in `FACTORY_LIFECYCLE_COLLECTOR.md`.
+
 Do not discover the host from chat recency, Issues, or branch names.
 Use the YAML IPv4, hostname `factory-remote-ops`, deploy root
 `/opt/solana-alpha-lab`, and SSH identity basename `id_ed25519_factory`.
