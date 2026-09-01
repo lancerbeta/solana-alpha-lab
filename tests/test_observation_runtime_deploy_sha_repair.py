@@ -29,6 +29,36 @@ DEPLOY_SHA = "96f32177e9f01b7865647923f5da9a36b3a5bfe1"
 EXPLICIT = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 
+def _init_git_repo_with_head(root: Path) -> str:
+    """Create a minimal Git worktree with one commit; return HEAD SHA."""
+    subprocess.run(["git", "init"], cwd=str(root), check=True, capture_output=True)
+    subprocess.run(
+        ["git", "config", "user.email", "ci@example.com"],
+        cwd=str(root),
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "ci"],
+        cwd=str(root),
+        check=True,
+        capture_output=True,
+    )
+    subprocess.run(
+        ["git", "commit", "--allow-empty", "-m", "seed"],
+        cwd=str(root),
+        check=True,
+        capture_output=True,
+    )
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=str(root),
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+
 class ProducerShaResolutionTests(unittest.TestCase):
     def test_explicit_valid_producer_sha_wins(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -110,20 +140,7 @@ class ProducerShaResolutionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / DEPLOY_SHA_NAME).write_text(DEPLOY_SHA + "\n", encoding="utf-8")
-            subprocess.run(["git", "init"], cwd=str(root), check=True, capture_output=True)
-            subprocess.run(
-                ["git", "commit", "--allow-empty", "-m", "seed"],
-                cwd=str(root),
-                check=True,
-                capture_output=True,
-            )
-            head = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=str(root),
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout.strip()
+            head = _init_git_repo_with_head(root)
             self.assertEqual(len(head), 40)
             self.assertNotEqual(head, DEPLOY_SHA)
             self.assertEqual(git_sha(root, None), head)
@@ -134,14 +151,8 @@ class ProducerShaResolutionTests(unittest.TestCase):
             nested = root / "deploy"
             nested.mkdir()
             (nested / DEPLOY_SHA_NAME).write_text(DEPLOY_SHA + "\n", encoding="utf-8")
-            # Create a parent git repo so walk-up would succeed without the root .git guard.
-            subprocess.run(["git", "init"], cwd=str(root), check=True, capture_output=True)
-            subprocess.run(
-                ["git", "commit", "--allow-empty", "-m", "seed"],
-                cwd=str(root),
-                check=True,
-                capture_output=True,
-            )
+            # Parent git would succeed on walk-up without the root .git guard.
+            _init_git_repo_with_head(root)
             self.assertFalse((nested / ".git").exists())
             self.assertEqual(git_sha(nested, None), DEPLOY_SHA)
 

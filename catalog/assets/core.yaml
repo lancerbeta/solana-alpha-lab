@@ -33909,7 +33909,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_runtime_deploy_sha_repair.py', repository_path: tests/test_observation_runtime_deploy_sha_repair.py}
-  integrity: {kind: sha256, sha256: 51a6055e421f7aa969409acf4dce0f416c5e0d6cdb0323d06e630dbaaa1b316b}
+  integrity: {kind: sha256, sha256: 675cf0baeceb505b49a39a0afd8001dda563ead92eb91678ad4e8ade5b84897c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001}
