@@ -1,36 +1,64 @@
 {
-  "schema": "smial.delivery-independent-review",
+  "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "review_id": "COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-01",
   "task_id": "COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1",
   "verdict": "PASS",
-  "route": "DIRECT_CURSOR_DELIVERY",
-  "critics": {
-    "CODE": {
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "5c8c29ead7f0ce6221c2e4ca09b462b6caee2030324e56d753c015453eaa44d1",
+  "reviewed_inventory_sha256": "2de35525c506d4ff73d0a3aacdd247ce283ae255e32d2eabf444d7ca6029ff13",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
       "verdict": "PASS",
-      "agent": "e6d704bf-71f5-4852-b752-6d535de58160",
-      "notes": "After fix loop: backup degraded, exclusive retention lease, no updated_at bump, Telegram URLError unchained"
+      "findings": [
+        "BACKUP_MISSING_IS_DEGRADED",
+        "RETENTION_EXCLUSIVE_LEASE",
+        "UPDATED_AT_PRESERVED",
+        "TELEGRAM_URLERROR_UNCHAINED",
+        "NO_SCIENTIFIC_DELETE",
+        "DRY_RUN_ZERO_CREDENTIALS"
+      ]
     },
-    "GOAL_DOD": {
+    {
+      "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
-      "agent": "35d86b84-7cca-40a5-811f-eebce062666f",
-      "required_answers": {
-        "owner_health_without_ssh": "YES",
-        "incidents_and_daily_separated": "YES",
-        "pulse_requires_jupiter": "NO",
-        "sqlite_grows_forever_from_bodies": "NO",
-        "retention_deletes_science": "NO",
-        "inflight_compactable": "NO",
-        "claims_original_http_bytes": "NO",
-        "created_monitoring_platform": "NO"
-      }
+      "findings": [
+        "OWNER_HEALTH_WITHOUT_SSH",
+        "INCIDENTS_AND_DAILY_SEPARATED",
+        "PULSE_NO_JUPITER",
+        "BODIES_COMPACTABLE_AFTER_WINDOW",
+        "SCIENCE_NEVER_DELETED",
+        "INFLIGHT_PROTECTED",
+        "NO_ORIGINAL_HTTP_CLAIM",
+        "NO_SECOND_MONITORING_PLATFORM"
+      ]
     },
-    "ARCHITECTURE": {
+    {
+      "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
-      "agent": "11c0aeea-5aa6-412c-aea5-75e3141d5990",
-      "notes": "Primary updated_at falsification FAIL closed; science plane untouched; RAW_RETENTION_REQUIRES_REPLAN not required"
+      "findings": [
+        "SQLITE_OPS_VS_RDP_SCIENCE",
+        "DECODED_JSON_SUBSTRATE_HONEST",
+        "RELEASE_CORPUS_IMMUTABLE",
+        "DISK_EARLY_WARNING_COEXISTS_85",
+        "PULSE_DEDUP_SEPARATE",
+        "RAW_RETENTION_NO_REPLAN"
+      ]
     }
-  },
-  "single_agent_review_fallback": false
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_TIMER_ENABLE",
+    "NO_FORGE_RUN",
+    "NO_ALPHA"
+  ]
 }

@@ -43,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_operability_retention_and_owner_pulse/a1_delivery_factory_fit_v1.json",
-    "sha256": "2385aeca67c1ed261a2a0c2bef1c886e41a42ac7e98be9ab99a4061e12f87cd9",
+    "sha256": "39bf351df3c453ce4055500d87c2eda10aac895c71b1192937b8c9d25399e275",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_SUITE",
     "independent_review": {
       "path": "docs/evidence/collector_operability_retention_and_owner_pulse/a1_delivery_independent_review_v1.json",
-      "sha256": "595da26f5d8d4d6e9297bdf09506537c51250b571fe7f8c9bc020bcbd44023c8",
+      "sha256": "587a36dcb6809efc8ca9aa26def4b121447626f8ba63793d54be3f9c14e50c7d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
