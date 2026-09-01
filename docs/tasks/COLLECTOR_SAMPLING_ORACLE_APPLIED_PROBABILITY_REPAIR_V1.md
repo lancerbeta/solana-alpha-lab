@@ -27,6 +27,9 @@ managed_write_set:
 - tests/test_ci_messages.py
 - .agents/skills/delivery-harness/SKILL.md
 - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
+- delivery-harness/templates/portable-bundle-manifest.json
+- delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md
+- docs/evidence/control/delivery_harness_acceptance_v1.json
 - docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md
 - catalog/assets/core.yaml
 - docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_completion_evidence_v1.json
