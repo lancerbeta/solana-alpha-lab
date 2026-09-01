@@ -4,8 +4,8 @@
   "review_id": "DISCOVERY-EVIDENCE-RELEASE-BRIDGE-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-01",
   "task_id": "DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1",
-  "reviewed_bindings_sha256": "056dbe60ed578908ec103843cfd9c79c4cd2c2cd661595aec7ea03057972c1e0",
-  "reviewed_inventory_sha256": "172eb6890d2352e1921a07034f1e57996fd3323030368f33bab0ef7aca8c8252",
+  "reviewed_bindings_sha256": "9e25c916822a3f76062a6023b7be8652b249229224d2f3a30544c83cfe8e3dea",
+  "reviewed_inventory_sha256": "e2debf6779dc20ad4848fe9d40550e9886d2d84e54abf441b9aa15342e2ed534",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
