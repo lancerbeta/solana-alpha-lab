@@ -560,6 +560,8 @@ def enumerate_rdp_datasets(
         entries.append(
             {
                 "dataset_manifest_id": manifest.dataset_manifest_id,
+                "dataset_id": manifest.dataset_id,
+                "dataset_version": manifest.dataset_version,
                 "dataset_fingerprint": manifest.dataset_fingerprint,
                 "evidence_role": evidence_role,
                 "labels": labels,
@@ -954,6 +956,8 @@ def build_forge_context_packet(
         datasets = [
             {
                 "dataset_manifest_id": COMMISSIONING_DATASET_MANIFEST_ID,
+                "dataset_id": "DATASET-COMMISSIONING",
+                "dataset_version": "1.0",
                 "dataset_fingerprint": commissioning_dataset_fingerprint(repo_root),
                 "evidence_role": "COMMISSIONING_FIXTURE",
                 "labels": None,
@@ -965,6 +969,12 @@ def build_forge_context_packet(
                 "feature_families": [],
             }
         ]
+    else:
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            select_current_datasets_for_forge,
+        )
+
+        datasets = select_current_datasets_for_forge(datasets)
     assert_capability_registry_v2_superset(repo_root)
     capabilities = enumerate_accepted_capabilities(repo_root)
     closed_family_ledger = enumerate_closed_park_terminals(repo_root, data_root)
@@ -1062,10 +1072,12 @@ def build_forge_context_packet(
         "max_feature_families": MAX_FEATURE_FAMILIES,
         "max_capabilities": MAX_CAPABILITIES,
         "max_packet_bytes": MAX_PACKET_BYTES,
+        "selection_policy": "current_version_per_dataset_id",
     }
     if len(datasets) > MAX_DATASETS:
         datasets = datasets[:MAX_DATASETS]
         truncation["truncated"] = True
+        truncation["selection_policy"] = "current_version_per_dataset_id_then_cap"
     if len(feature_hints) > MAX_FEATURE_HINTS:
         feature_hints = feature_hints[:MAX_FEATURE_HINTS]
         truncation["truncated"] = True

@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-COHORT-DISCOVERY-RELEASE-SERIES-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "THREE_7D_RELEASES_COEXIST",
+        "TWELVE_RELEASES_NO_OVERWRITE",
+        "HFIC_CURRENT_VERSION_PER_DATASET_ID",
+        "RDP_REBUILD_WITHOUT_SQLITE",
+        "CONFIRM_FENCE_EXPLORATORY_REUSE",
+        "A3_SINGLETON_UNTOUCHED",
+        "ZERO_PROVIDER_CLI"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "VERTICAL_RDP_TO_CORPUS_TO_HFIC",
+        "TWELVE_WEEK_PROOF",
+        "ADMISSION_FIELD_FROZEN",
+        "WEEKLY_OPS_ZERO_PRODUCT_CODE",
+        "RUNBOOK_UPDATED",
+        "NO_SECOND_PLATFORM"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "WRAP_DISCOVERY_RELEASE_RDP_HFIC",
+        "VERSIONED_CORPUS_NOT_DATASET_EXPLOSION",
+        "CONFIRM_FROM_SELF_FORBIDDEN",
+        "A3_BYTES_PRESERVED",
+        "PARTIAL_SEAL_INVISIBLE",
+        "IMPORT_TIME_AVAILABILITY"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_FORGE_RUN",
+    "NO_A3_MUTATION",
+    "NO_ALPHA"
+  ]
+}

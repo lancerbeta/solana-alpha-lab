@@ -155,8 +155,38 @@ Do **not** trust chat “current status”. Machine-resolve:
 | Campaign envelope | `collector_campaign_preflight.py` (zero-network) |
 | Coverage class | doctor / collector read model `discovery_coverage_class` |
 | Backup | doctor `backup` / `backup_domain`; timer `factory-remote-backup.timer` |
-| Latest discovery release | RDP `DATASET-MANIFEST-DISCOVERY-EVIDENCE-RELEASE-001*` under local data_plane |
+| Latest **historical** A3 discovery release | RDP singleton `DATASET-MANIFEST-DISCOVERY-EVIDENCE-RELEASE-001*` (unchanged) |
+| Latest **live** lifecycle corpus | RDP `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` current version via lineage `datasets/live_lifecycle_corpus/lineage.json` + HFIC current-version selection |
 | Forge evidence epoch | HFIC preflight / `evidence_epoch_sha256` over canonical local RDP |
+
+### Live cohort seal / import (zero-provider)
+
+Scientific path (not weekly A3 singleton):
+
+Observation RDP rebuild snapshot → cohort readiness → `seal-live-cohort` →
+`verify-live` → `import-live` → versioned LIVE CORPUS → evidence_epoch.
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py live-status --observation-rdp <OBS_RDP> --cohort-id UTC-YYYYMMDD-YYYYMMDD
+```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py seal-live-cohort --observation-rdp <OBS_RDP> --cohort-id UTC-YYYYMMDD-YYYYMMDD --release-root <RELEASE>
+```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py verify-live --release-root <RELEASE>
+```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root <RELEASE> --data-root <LOCAL_RDP>
+```
+
+Admission clock: `discovery_first_reliable_available_at` (7 UTC-day windows).
+Live role: `EXPLORATORY_REUSE` with `confirmatory_reuse_forbidden=true`.
+`/recent` is the observable provider discovery stream — not a proven complete
+pump.fun universe unless coverage class says otherwise.
+
 
 ## Commissioning checklist / open gates
 
@@ -170,7 +200,7 @@ Machine-resolved; do not freeze ephemeral PASS/FAIL into this prose.
 6. Live campaign authority (exact ObservationSchedule phrase)
 7. Live commissioning (timer enabled, ticks with authority)
 8. Daily owner pulse — **next named consumer, not this atom**
-9. Cohort seal / sync / import into Research Evidence Plane
+9. Live cohort seal / sync / import into LIVE CORPUS (product ready; ops after collector commissioning)
 10. Forge
 
 ## DAILY_COLLECTOR_OWNER_PULSE (named future consumer)
