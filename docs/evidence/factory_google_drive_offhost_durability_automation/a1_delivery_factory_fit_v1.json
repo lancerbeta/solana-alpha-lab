@@ -6,8 +6,8 @@
   "task_id": "FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "b6b942450cc289bcf4a9b6cf86ae428302aa336446dbbe18fd07e3e07670107c",
+  "reviewed_inventory_sha256": "c2b62e6b67e3491b430bb412f21244d84487ea214e3b7e8f0e38d6f726c47a65",
   "capability_radar": {
     "now": "NONE",
     "watch": "NONEMPTY_RDP_OFFHOST_RESTORE_PROOF"

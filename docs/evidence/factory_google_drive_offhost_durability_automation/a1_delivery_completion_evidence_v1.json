@@ -13,7 +13,27 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "8afecba8233bd16febecb535eabe51dae1f458cab58f1c83a5ccabaf749f42b6",
+    "catalog/schemas/factory_remote_operations_v1_1.schema.json": "d7f61a771a08cbf7efd6f83cb49bb95c3ec34d59f9572176a81c1bc930bd77dd",
+    "configs/factory_remote_operations_v1_1.yaml": "b03edec1a3bd1a5d80405d9d54ed2aa9e232a20da985dab52ad3321069ca4898",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive.service": "9caa3bb48b273e11a2374152d6f29b4a793f4be0e902bbe151f48fa35afe142a",
+    "configs/factory_remote_ops/factory-remote-backup.service": "9b7498793b4b8f27a523eee5c2dd21b3daf104bb5ac55b74b2d0124fce5387ae",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "c1613b2e04f87311585c251cb3a55c899e7f1e9ea5386da1239c25a033d6c96f",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "0e1d2ae43281161138f8782e384dca89a7d4389aa4bf2cd817cebd207fe13ff2",
+    "docs/operator/factory_remote_host_v1.yaml": "a6e4e4498683ca18c5f1dbf3a4139fee7c52ac28052556bce3483f24f2fbdbba",
+    "docs/reports/factory_google_drive_offhost_durability_automation/a1_owner_readout_v1.md": "aa600f67da04dfe4fe87edb9506e0f810d72d77f814e91db24283b4027fd153e",
+    "docs/tasks/FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1.md": "f06fd456efb754154771db5ceca0647e21aaff59615b83f90e6a2190c7522762",
+    "scripts/factory_offhost_backup_copy.py": "b6b8af2c6dad1a8bbabe77d683ae99c33d2288af086d0e768e7f85bece1ac004",
+    "scripts/factory_remote_doctor.py": "0a7ae73947920a6bae3a1355b4fbdfc59ccf3a0c0149c93e8001fe6dd5c72067",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "4fb6305310fdd2ab326597abc5444c3fee7ce4e6203fbfd902cb025fc8be31bb",
+    "src/solana_alpha_lab/factory/collector_owner_pulse.py": "a43c94b5d2092359d2040d83352982af2378908acf5a30c7bc917d72aa56707e",
+    "src/solana_alpha_lab/factory/live_ops_hardening.py": "6a6903dd718c2d8577f5c9cea94bfeaba0d953bb44d6b701534c39e20b205ca4",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "8f66d0047f3b748ab1c3a6017c3e641bfe2f738fce74548c9d6b9535f6cba160",
+    "src/solana_alpha_lab/factory/remote_ops.py": "66e491b80b93d772574006a438a90e4b82ea5ad2b2f1d6f10d64ff2df61c4497",
+    "tests/test_factory_offhost_backup.py": "5e6ee38a987764e9afe8809f933c5fabb85b330338e82abf66e09361adbe233e",
+    "tests/test_factory_remote_operations.py": "7a458d81427b6d6cbb5631b56cc58d907d8fa7a027a5910eb06afd174805c812"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -24,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_google_drive_offhost_durability_automation/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING_BIND_EVIDENCE",
+    "sha256": "6066706163ea936cd9b9405c245533db499dc2cd5e79eaf27dbc8f7ea8021914",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_OFFHOST_BACKUP_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_google_drive_offhost_durability_automation/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING_BIND_EVIDENCE",
+      "sha256": "79346a3bff6328142be774391d7508ab444076382502166d016b953561efd005",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
