@@ -29,6 +29,9 @@ managed_write_set:
 - tests/test_launchpad_population_contract_repair.py
 - tests/test_tokens_v2_typed_projection.py
 - docs/evidence/factory_launchpad_population_contract_repair/a1_commissioning_pause_evidence_v1.json
+- docs/evidence/factory_launchpad_population_contract_repair/a1_delivery_completion_evidence_v1.json
+- docs/evidence/factory_launchpad_population_contract_repair/a1_delivery_independent_review_v1.json
+- docs/evidence/factory_launchpad_population_contract_repair/a1_delivery_factory_fit_v1.json
 - docs/reports/factory_launchpad_population_contract_repair/a1_owner_readout_v1.md
 external_caps:
   network: false
@@ -61,8 +64,9 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
-    - docs/evidence/factory_launchpad_population_contract_repair/a1_commissioning_pause_evidence_v1.json
-    - docs/reports/factory_launchpad_population_contract_repair/a1_owner_readout_v1.md
+    - docs/evidence/factory_launchpad_population_contract_repair/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/factory_launchpad_population_contract_repair/a1_delivery_independent_review_v1.json
+    - docs/evidence/factory_launchpad_population_contract_repair/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

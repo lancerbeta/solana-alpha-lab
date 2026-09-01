@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-LAUNCHPAD-POPULATION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "FACTORY_LAUNCHPAD_POPULATION_CONTRACT_REPAIR_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "FIELD_LAUNCHPAD_001_EXPLICIT",
+        "FIRST_POOL_SOURCE_UNALIASED",
+        "SANITIZER_RETAINS_LAUNCHPAD",
+        "QUERY_PROFILE_LAUNCHPAD_EQ_HONEST",
+        "REGRESSION_TESTS_LIVE_SHAPE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "BROKEN_ACTIVATION_PAUSED_NOT_DELETED",
+        "PROVIDER_CALLS_STOPPED_PROVEN",
+        "REPLACEMENT_REQUIRES_NEW_SCHEDULE_IDENTITY",
+        "NO_LIVE_CAMPAIGN_IN_THIS_ATOM",
+        "MUST_NOT_RESUME_490C21B6"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "POPULATION_SEMANTICS_MATCH_PROVIDER",
+        "FROZEN_BROKEN_SCHEDULE_IMMUTABLE",
+        "NO_SILENT_PROJECTION_REMAP",
+        "BERNOULLI_REACHABLE_AFTER_PREDICATE",
+        "BUDGET_CAPS_UNCHANGED_BY_REPAIR"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_REPLACEMENT_ACTIVATION",
+    "NO_ALPHA"
+  ]
+}
