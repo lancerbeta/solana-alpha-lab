@@ -21,6 +21,13 @@ from solana_alpha_lab.factory.discovery_evidence_release import (
     seal_discovery_release,
     verify_discovery_release,
 )
+from solana_alpha_lab.factory.live_cohort_discovery_release import (
+    LiveCohortReleaseError,
+    import_live_cohort,
+    live_cohort_status,
+    seal_live_cohort,
+    verify_live_cohort,
+)
 
 
 def _parse_utc(value: str | None) -> datetime | None:
@@ -51,6 +58,30 @@ def main(argv: list[str] | None = None) -> int:
     imp.add_argument("--data-root", type=Path, required=True)
     imp.add_argument("--import-at", type=str, default=None)
 
+    live_status = sub.add_parser(
+        "live-status", help="Cohort readiness from immutable Observation RDP"
+    )
+    live_status.add_argument("--observation-rdp", type=Path, required=True)
+    live_status.add_argument("--cohort-id", required=True)
+    live_status.add_argument("--as-of", type=str, default=None)
+
+    seal_live = sub.add_parser("seal-live-cohort", help="Seal a ready live cohort")
+    seal_live.add_argument("--observation-rdp", type=Path, required=True)
+    seal_live.add_argument("--cohort-id", required=True)
+    seal_live.add_argument("--release-root", type=Path, required=True)
+    seal_live.add_argument("--sealed-at", type=str, default=None)
+    seal_live.add_argument("--as-of", type=str, default=None)
+
+    verify_live = sub.add_parser("verify-live", help="Verify a sealed live cohort")
+    verify_live.add_argument("--release-root", type=Path, required=True)
+
+    import_live = sub.add_parser(
+        "import-live", help="Import a verified live cohort into the LIVE CORPUS"
+    )
+    import_live.add_argument("--release-root", type=Path, required=True)
+    import_live.add_argument("--data-root", type=Path, required=True)
+    import_live.add_argument("--import-at", type=str, default=None)
+
     args = parser.parse_args(argv)
     try:
         if args.command == "seal":
@@ -66,13 +97,35 @@ def main(argv: list[str] | None = None) -> int:
             )
         elif args.command == "verify":
             result = verify_discovery_release(args.release_root)
-        else:
+        elif args.command == "import":
             result = import_discovery_release(
                 release_root=args.release_root,
                 data_root=args.data_root,
                 import_time=_parse_utc(args.import_at),
             )
-    except DiscoveryReleaseError as exc:
+        elif args.command == "live-status":
+            result = live_cohort_status(
+                observation_rdp_root=args.observation_rdp,
+                cohort_id=args.cohort_id,
+                as_of=_parse_utc(args.as_of),
+            )
+        elif args.command == "seal-live-cohort":
+            result = seal_live_cohort(
+                observation_rdp_root=args.observation_rdp,
+                cohort_id=args.cohort_id,
+                release_root=args.release_root,
+                sealed_at=_parse_utc(args.sealed_at),
+                as_of=_parse_utc(args.as_of),
+            )
+        elif args.command == "verify-live":
+            result = verify_live_cohort(args.release_root)
+        else:
+            result = import_live_cohort(
+                release_root=args.release_root,
+                data_root=args.data_root,
+                import_time=_parse_utc(args.import_at),
+            )
+    except (DiscoveryReleaseError, LiveCohortReleaseError) as exc:
         print(json.dumps({"status": "FAIL", "code": str(exc)}, sort_keys=True))
         return 2
     print(json.dumps({"status": "PASS", "result": result}, sort_keys=True, default=str))
