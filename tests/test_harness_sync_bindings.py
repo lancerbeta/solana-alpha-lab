@@ -190,6 +190,30 @@ class BindEvidenceIntegrationTests(unittest.TestCase):
         for relative, content in before.items():
             self.assertEqual((self.worktree / relative).read_bytes(), content)
 
+    def test_verify_rejects_unexpected_completion_keys(self) -> None:
+        problems = harness_sync._completion_evidence_key_problems(
+            {
+                "schema": "smial.delivery-completion-evidence",
+                "schema_version": "1.0",
+                "acceptance_id": "X",
+                "as_of": "2026-09-01",
+                "task_id": "T",
+                "state_change": "S",
+                "implementation_bindings": {},
+                "active_stop_conditions": [],
+                "owner_attention_triggers": {},
+                "factory_fit": {},
+                "validation": {},
+                "non_claims": [],
+                "side_effects": {},
+                "false_roadmap_assumptions": ["no"],
+            }
+        )
+        self.assertEqual(
+            problems,
+            ["completion_unexpected_keys:false_roadmap_assumptions"],
+        )
+
     def test_verify_all_delivered_reports_real_repo(self) -> None:
         original_root = harness_sync.ROOT
         harness_sync.ROOT = ROOT

@@ -2368,6 +2368,11 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "CTRL-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001"
@@ -9263,6 +9268,16 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
     },
     {
+      "source_asset_id": "MODULE-DISCOVERY-EVIDENCE-RELEASE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TOKENS-V2-TYPED-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-DISCOVERY-EVIDENCE-RELEASE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
@@ -9646,6 +9661,11 @@
       "source_asset_id": "MODULE-OBSERVATION-SCHEDULER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-SURFACE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-OBSERVATION-SCHEDULER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TOKENS-V2-TYPED-PROJECTION-001"
     },
     {
       "source_asset_id": "MODULE-OBSERVATION-SCHEDULER-001",
@@ -11086,6 +11106,11 @@
       "source_asset_id": "MODULE-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
+    },
+    {
+      "source_asset_id": "MODULE-TOKENS-V2-TYPED-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
     },
     {
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
@@ -12668,6 +12693,16 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "SCRIPT-DISCOVERY-EVIDENCE-RELEASE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-DISCOVERY-EVIDENCE-RELEASE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-DISCOVERY-EVIDENCE-RELEASE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-HOLDER-CONCENTRATION-H900-FALSIFIER-001"
@@ -13696,6 +13731,16 @@
       "source_asset_id": "TEST-DELIVERY-HARNESS-001",
       "relation": "depends_on",
       "target_asset_id": "POLICY-OWNER-ATTENTION-GATE-002"
+    },
+    {
+      "source_asset_id": "TEST-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-DISCOVERY-EVIDENCE-RELEASE-001"
+    },
+    {
+      "source_asset_id": "TEST-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
     },
     {
       "source_asset_id": "TEST-EARLY-HOLDER-CONCENTRATION-H900-CONFIRMATORY-OOS-001",
@@ -16331,6 +16376,16 @@
       "source_asset_id": "TEST-TASK-CLOSE-FAST-PATH-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-TASK-CLOSE-FAST-PATH-001"
+    },
+    {
+      "source_asset_id": "TEST-TOKENS-V2-TYPED-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TOKENS-V2-TYPED-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-TOKENS-V2-TYPED-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

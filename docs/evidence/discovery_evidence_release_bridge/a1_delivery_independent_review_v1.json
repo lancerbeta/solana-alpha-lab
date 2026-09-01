@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "DISCOVERY-EVIDENCE-RELEASE-BRIDGE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1",
+  "reviewed_bindings_sha256": "90869707b79d4c7d45297fdbe81797fcbbba92df84c1f75e9f8afb8a6ef0669b",
+  "reviewed_inventory_sha256": "e39884b0d41588ca840d9a7c8d6b6fa1360d17a7e12fade52b5b764a08d5b8c2",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "SHARED_TOKENS_V2_PROJECTION",
+        "EXCLUDED_AMBIGUOUS_PRESERVED_ON_SCHEDULE_PATH",
+        "SEAL_VERIFY_IMPORT_CONTENT_ADDRESSED",
+        "PARTIAL_RELEASE_INVISIBLE",
+        "NO_PROVIDER_OR_CREDENTIAL_PATH",
+        "COMPLETION_KEY_WHITELIST_FAIL_CLOSED_IN_BIND_EVIDENCE",
+        "TICK_EXECUTION_CLOCK_BOUND_TO_LOGICAL_NOW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "VERTICAL_RAW_TO_TYPED_TO_RELEASE_TO_RDP_TO_HFIC",
+        "EVIDENCE_EPOCH_CHANGES_ON_IMPORT",
+        "FEATURE_FAMILIES_VISIBLE",
+        "DISCOVERY_ONLY_NO_CONFIRMATION_CLAIM",
+        "SAME_PROJECTION_FOR_FUTURE_SCHEDULE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NO_SECOND_DATA_PLATFORM",
+        "IMPORT_TIME_NOT_BACKDATED",
+        "OBSERVATION_GRAIN_EVIDENCE_ROLE_STAMPED",
+        "MINT_LEVEL_YIELD_AND_TERMINAL",
+        "CAPABILITY_REGISTRY_V2_ACTIVE_SUPERSET",
+        "SINGLETON_RELEASE_MANIFEST_A1_BOUNDED"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_READS",
+    "NO_VPS_DEPLOY",
+    "NO_A2_COLLECTOR_READINESS",
+    "NO_ALPHA"
+  ]
+}

@@ -80,7 +80,11 @@ installation alone uses the predecessor route and one pre-PR tracked-only gate.
 Bind exact inventory, tests, head/tree, limitations and rollback. Push/open PR
 inside routine authority (draft CI overlap is allowed). Isolated critics run on
 the inventory that `bind-evidence` will hash; FAIL or later content change
-requires re-review and rebind before merge-readiness. After exact-head CI run
+requires re-review and rebind before merge-readiness. Completion evidence keys
+must be exactly the gate whitelist (`required ∪ optional`); extra narrative
+keys (e.g. roadmap notes) belong in the owner readout, not completion JSON.
+Run `scripts/harness_sync.py bind-evidence --verify` before merge-readiness —
+it fails closed on unexpected/missing completion keys. After exact-head CI run
 `scripts/owner_attention_gate.py --merge-readiness` (no phrase, no `gh pr merge`).
 STOP for one exact owner approval only when `ready_for_owner_phrase` is true.
 Order: `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.

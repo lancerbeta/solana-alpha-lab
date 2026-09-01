@@ -66,12 +66,16 @@ MAX_DISTINCT_FOCUSES_PER_EPOCH = 3
 MAX_RANKED_PRIORS = 8
 MAX_DATASETS = 8
 MAX_FEATURE_HINTS = 8
+MAX_FEATURE_FAMILIES = 8
 MAX_CLOSED_FAMILIES = 8
 MAX_CAPABILITIES = 16
 MAX_PACKET_BYTES = 16384
 FORGE_CONTEXT_ARTIFACT_DIR = "research/artifacts/forge_context"
 FORGE_CONTEXT_ARTIFACT_KIND = "FORGE_CONTEXT_PACKET"
-CAPABILITY_REGISTRY_RELATIVE = "configs/experiment_capability_registry_v1.yaml"
+CAPABILITY_REGISTRY_RELATIVE = "configs/experiment_capability_registry_v2.yaml"
+CAPABILITY_REGISTRY_V1_PREDECESSOR_RELATIVE = (
+    "configs/experiment_capability_registry_v1.yaml"
+)
 NEGATIVE_RESULTS_RELATIVE = "registries/decisions_negative_results.yaml"
 CLOSED_FAMILY_ACCEPTANCE_RELATIVE = (
     "docs/evidence/early_valuation_liquidity_divergence_confirmation/"
@@ -510,6 +514,13 @@ def enumerate_rdp_datasets(
                 evidence_role = role
         yield_eligible = int((labels or {}).get("yield_eligible") or 0)
         feature_usable = yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE
+        feature_families: list[str] = []
+        raw_families = (labels or {}).get("feature_families")
+        if isinstance(raw_families, list):
+            for item in raw_families:
+                if isinstance(item, str) and item and item not in feature_families:
+                    feature_families.append(item)
+            feature_families = feature_families[:MAX_FEATURE_FAMILIES]
         published_path = manifests_dir / f"{manifest.dataset_manifest_id}.published"
         if labels is not None:
             if not published_path.is_file() or _is_symlink_path(published_path):
@@ -557,6 +568,7 @@ def enumerate_rdp_datasets(
                 "feature_usable": feature_usable,
                 "dataset_terminal": dataset_terminal,
                 "feature_hint": (labels or {}).get("feature_hint"),
+                "feature_families": feature_families,
             }
         )
     unique: dict[str, dict[str, Any]] = {}
@@ -594,8 +606,53 @@ def enumerate_accepted_capabilities(repo_root: Path) -> list[dict[str, Any]]:
                 "max_provider_calls": int(row.get("max_provider_calls") or 0),
             }
         )
-    entries.sort(key=lambda item: item["capability_id"])
+    entries.sort(key=lambda item: str(item["capability_id"]))
     return entries
+
+
+def assert_capability_registry_v2_superset(repo_root: Path) -> dict[str, Any]:
+    """v2 is the active current truth; v1 remains an immutable predecessor."""
+    root = Path(repo_root)
+    v1_path = root / CAPABILITY_REGISTRY_V1_PREDECESSOR_RELATIVE
+    v2_path = root / CAPABILITY_REGISTRY_RELATIVE
+    if not v1_path.is_file() or _is_symlink_path(v1_path):
+        raise HficPreflightError("CAPABILITY_REGISTRY_V1_MISSING")
+    if not v2_path.is_file() or _is_symlink_path(v2_path):
+        raise HficPreflightError("CAPABILITY_REGISTRY_MISSING")
+    v1 = yaml.safe_load(v1_path.read_text(encoding="utf-8"))
+    v2 = yaml.safe_load(v2_path.read_text(encoding="utf-8"))
+    if not isinstance(v1, Mapping) or not isinstance(v2, Mapping):
+        raise HficPreflightError("CAPABILITY_REGISTRY_INVALID")
+    rows1 = v1.get("capabilities")
+    rows2 = v2.get("capabilities")
+    if not isinstance(rows1, list) or not isinstance(rows2, list):
+        raise HficPreflightError("CAPABILITY_REGISTRY_INVALID")
+
+    def _accepted(rows: list[Any]) -> set[str]:
+        out: set[str] = set()
+        for row in rows:
+            if not isinstance(row, Mapping):
+                continue
+            if row.get("status") != "ACCEPTED":
+                continue
+            cap_id = row.get("capability_id")
+            if isinstance(cap_id, str) and cap_id:
+                out.add(cap_id)
+        return out
+
+    accepted_v1 = _accepted(rows1)
+    accepted_v2 = _accepted(rows2)
+    missing = sorted(accepted_v1 - accepted_v2)
+    if missing:
+        raise HficPreflightError("CAPABILITY_REGISTRY_V2_NOT_SUPERSET")
+    intentional = sorted(accepted_v2 - accepted_v1)
+    return {
+        "active_registry": CAPABILITY_REGISTRY_RELATIVE,
+        "predecessor_registry": CAPABILITY_REGISTRY_V1_PREDECESSOR_RELATIVE,
+        "v1_accepted_count": len(accepted_v1),
+        "v2_accepted_count": len(accepted_v2),
+        "intentional_v2_additions": intentional,
+    }
 
 
 def _dedupe_closed_families(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -905,8 +962,10 @@ def build_forge_context_packet(
                 "feature_usable": False,
                 "dataset_terminal": None,
                 "feature_hint": None,
+                "feature_families": [],
             }
         ]
+    assert_capability_registry_v2_superset(repo_root)
     capabilities = enumerate_accepted_capabilities(repo_root)
     closed_family_ledger = enumerate_closed_park_terminals(repo_root, data_root)
     if not any(item["terminal"] == CLOSED_FAMILY for item in closed_family_ledger):
@@ -951,6 +1010,29 @@ def build_forge_context_packet(
     usable_hint_ids = [
         str(item["feature_id"]) for item in feature_hints if item.get("usable")
     ]
+    feature_families: list[dict[str, Any]] = []
+    seen_families: set[str] = set()
+    for item in datasets:
+        families = item.get("feature_families") or []
+        if not isinstance(families, list):
+            continue
+        for family in families:
+            if not isinstance(family, str) or not family or family in seen_families:
+                continue
+            seen_families.add(family)
+            feature_families.append(
+                {
+                    "feature_family": family,
+                    "evidence_role": item["evidence_role"],
+                    "dataset_manifest_id": item["dataset_manifest_id"],
+                    "confirmatory_reuse_forbidden": bool(
+                        (item.get("labels") or {}).get("confirmatory_reuse_forbidden")
+                    ),
+                }
+            )
+        if len(feature_families) >= MAX_FEATURE_FAMILIES:
+            break
+    feature_families = feature_families[:MAX_FEATURE_FAMILIES]
     ranked, dropped_priors = rank_prior_candidate_ids(
         store,
         owner_focus=owner_focus,
@@ -977,6 +1059,7 @@ def build_forge_context_packet(
         "max_datasets": MAX_DATASETS,
         "max_closed_families": MAX_CLOSED_FAMILIES,
         "max_feature_hints": MAX_FEATURE_HINTS,
+        "max_feature_families": MAX_FEATURE_FAMILIES,
         "max_capabilities": MAX_CAPABILITIES,
         "max_packet_bytes": MAX_PACKET_BYTES,
     }
@@ -985,6 +1068,9 @@ def build_forge_context_packet(
         truncation["truncated"] = True
     if len(feature_hints) > MAX_FEATURE_HINTS:
         feature_hints = feature_hints[:MAX_FEATURE_HINTS]
+        truncation["truncated"] = True
+    if len(feature_families) > MAX_FEATURE_FAMILIES:
+        feature_families = feature_families[:MAX_FEATURE_FAMILIES]
         truncation["truncated"] = True
     if len(capabilities) > MAX_CAPABILITIES:
         capabilities = capabilities[:MAX_CAPABILITIES]
@@ -1039,6 +1125,7 @@ def build_forge_context_packet(
         "capability_ids": [item["capability_id"] for item in capabilities],
         "capability_entries": capabilities,
         "feature_hints": feature_hints,
+        "feature_families": feature_families,
         "closed_family_ledger": closed_family_ledger,
         "context_warnings": warnings,
         "ranked_prior_candidate_ids": ranked,

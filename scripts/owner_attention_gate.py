@@ -25,6 +25,30 @@ REQUIRED_REVIEW_ROLES = {
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC",
 }
+REQUIRED_COMPLETION_EVIDENCE_KEYS = {
+    "schema",
+    "schema_version",
+    "acceptance_id",
+    "as_of",
+    "task_id",
+    "state_change",
+    "implementation_bindings",
+    "active_stop_conditions",
+    "owner_attention_triggers",
+    "factory_fit",
+    "validation",
+    "non_claims",
+    "side_effects",
+}
+OPTIONAL_COMPLETION_EVIDENCE_KEYS = {
+    "base_main",
+    "owner_approvals",
+    "cloud_bundle_mode",
+    "cloud_bundle_required_by_harness",
+    "cloud_bundle_smoke_required",
+    "project_sources_disposition",
+    "capability_radar_now",
+}
 SINGLE_AGENT_REVIEW_FALLBACK = "SINGLE_AGENT_REVIEW_FALLBACK"
 
 
@@ -991,17 +1015,8 @@ def bound_delivery_evidence(
             )
         except (OSError, ValueError):
             continue
-        required_evidence = {
-            "schema", "schema_version", "acceptance_id", "as_of", "task_id",
-            "state_change", "implementation_bindings", "active_stop_conditions",
-            "owner_attention_triggers", "factory_fit", "validation", "non_claims",
-            "side_effects",
-        }
-        optional_evidence = {
-            "base_main", "owner_approvals", "cloud_bundle_mode",
-            "cloud_bundle_required_by_harness", "cloud_bundle_smoke_required",
-            "project_sources_disposition", "capability_radar_now",
-        }
+        required_evidence = REQUIRED_COMPLETION_EVIDENCE_KEYS
+        optional_evidence = OPTIONAL_COMPLETION_EVIDENCE_KEYS
         if not (
             required_evidence <= set(evidence) <= required_evidence | optional_evidence
             and evidence.get("schema") == "smial.delivery-completion-evidence"
@@ -1018,7 +1033,21 @@ def bound_delivery_evidence(
             and all(isinstance(item, str) and bool(item) for item in evidence["non_claims"])
             and isinstance(evidence.get("side_effects"), dict)
         ):
-            continue
+            extra = sorted(
+                set(evidence) - (required_evidence | optional_evidence)
+            )
+            missing = sorted(required_evidence - set(evidence))
+            detail_parts: list[str] = []
+            if extra:
+                detail_parts.append("unexpected_keys=" + ",".join(extra))
+            if missing:
+                detail_parts.append("missing_keys=" + ",".join(missing))
+            if not detail_parts:
+                detail_parts.append("shape_or_cloud_bundle_fields_invalid")
+            return {
+                **denied,
+                "deny_detail": "COMPLETION_EVIDENCE_KEYS:" + ";".join(detail_parts),
+            }
         if (
             ("base_main" in evidence and not (
                 isinstance(evidence["base_main"], str)
@@ -1837,6 +1866,22 @@ def evaluate_merge_readiness(
         root, expected_base=expected_base, runner=runner
     )
     result = evaluate(request, policy)
+    reasons = list(result.get("reasons") or [])
+    merge_checks = request.get("merge_checks")
+    if (
+        isinstance(merge_checks, dict)
+        and merge_checks.get("factory_fit_pass") is not True
+    ):
+        evidence = evidence_builder(
+            root,
+            context_receipt,
+            expected_base=expected_base,
+            head=str(merge_checks.get("observed_head_sha") or ""),
+            runner=runner,
+        )
+        detail = evidence.get("deny_detail") if isinstance(evidence, dict) else None
+        if isinstance(detail, str) and detail:
+            reasons.append(f"FACTORY_FIT_DENY_DETAIL:{detail}")
     ready = (
         result.get("decision") == "OWNER_ATTENTION_REQUIRED"
         and result.get("reasons") == ["EXACT_MERGE_APPROVAL_REQUIRED"]
@@ -1849,7 +1894,7 @@ def evaluate_merge_readiness(
         "schema_version": "1.0",
         "ready_for_owner_phrase": ready,
         "decision": result.get("decision"),
-        "reasons": result.get("reasons"),
+        "reasons": reasons,
         "merge_checks": request.get("merge_checks"),
         "identity_mode": identity_mode,
         "merge_submitted": False,

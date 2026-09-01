@@ -806,6 +806,32 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
+            receipt = write_delivery_evidence_fixture(
+                self.module,
+                root,
+                mutate_acceptance=lambda value: value.__setitem__(
+                    "false_roadmap_assumptions", ["narrative-only"]
+                ),
+            )
+            result = self.module.bound_delivery_evidence(
+                root,
+                receipt,
+                expected_base=BASE,
+                head=HEAD,
+                inventory_builder=lambda *args, **kwargs: "1" * 64,
+            )
+            self.assertFalse(result["factory_fit_pass"])
+            self.assertEqual(
+                result["active_stop_conditions"],
+                ["DELIVERY_EVIDENCE_NOT_GROUNDED"],
+            )
+            self.assertEqual(
+                result.get("deny_detail"),
+                "COMPLETION_EVIDENCE_KEYS:unexpected_keys=false_roadmap_assumptions",
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
             receipt = write_delivery_evidence_fixture(self.module, root)
             fit_path = root / "docs/evidence/fit.json"
             fit_path.write_text(

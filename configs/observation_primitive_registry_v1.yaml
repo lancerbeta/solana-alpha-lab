@@ -19,11 +19,47 @@ fields:
     availability_class: DISCOVERY
     value_kind: TIMESTAMP
     parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-USD-PRICE-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
   - field_id: FIELD-LIQUIDITY-USD-001
     availability_class: X_TIME
     value_kind: DECIMAL
     parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-MARKET-CAP-USD-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-HOLDER-COUNT-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-STATS5M-BUY-VOLUME-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-STATS5M-SELL-VOLUME-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
   - field_id: FIELD-STATS5M-TAKER-VOLUME-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-STATS5M-NUM-BUYS-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-STATS5M-NUM-SELLS-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-STATS5M-NUM-TRADERS-001
+    availability_class: X_TIME
+    value_kind: DECIMAL
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-STATS5M-NUM-NET-BUYERS-001
     availability_class: X_TIME
     value_kind: DECIMAL
     parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
@@ -85,8 +121,17 @@ bundles:
     primitive_id: PRIM-JUPITER-TOKENS-V2-SEARCH-001
     field_ids:
       - FIELD-TOKEN-MINT-001
+      - FIELD-USD-PRICE-001
       - FIELD-LIQUIDITY-USD-001
+      - FIELD-MARKET-CAP-USD-001
+      - FIELD-HOLDER-COUNT-001
+      - FIELD-STATS5M-BUY-VOLUME-001
+      - FIELD-STATS5M-SELL-VOLUME-001
       - FIELD-STATS5M-TAKER-VOLUME-001
+      - FIELD-STATS5M-NUM-BUYS-001
+      - FIELD-STATS5M-NUM-SELLS-001
+      - FIELD-STATS5M-NUM-TRADERS-001
+      - FIELD-STATS5M-NUM-NET-BUYERS-001
       - FIELD-R0-TAKER-VOLUME-MIX-001
       - FIELD-FIRST-POOL-CREATED-AT-001
       - FIELD-FIRST-POOL-SOURCE-001
@@ -198,8 +243,17 @@ primitives:
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
       - FIELD-TOKEN-MINT-001
+      - FIELD-USD-PRICE-001
       - FIELD-LIQUIDITY-USD-001
+      - FIELD-MARKET-CAP-USD-001
+      - FIELD-HOLDER-COUNT-001
+      - FIELD-STATS5M-BUY-VOLUME-001
+      - FIELD-STATS5M-SELL-VOLUME-001
       - FIELD-STATS5M-TAKER-VOLUME-001
+      - FIELD-STATS5M-NUM-BUYS-001
+      - FIELD-STATS5M-NUM-SELLS-001
+      - FIELD-STATS5M-NUM-TRADERS-001
+      - FIELD-STATS5M-NUM-NET-BUYERS-001
       - FIELD-R0-TAKER-VOLUME-MIX-001
       - FIELD-FIRST-POOL-CREATED-AT-001
       - FIELD-FIRST-POOL-SOURCE-001
@@ -216,8 +270,8 @@ primitives:
       credits_per_request: 1
       status: ACCEPTED
     dependency_contract: null
-    terminal_classes: [OBSERVED, MISSING_TYPED]
-    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, FIELD_ABSENT, NON_FINITE]
+    terminal_classes: [OBSERVED, MISSING_TYPED, EXCLUDED_AMBIGUOUS]
+    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, FIELD_ABSENT, NON_FINITE, FDV_NOT_MARKET_CAP, AMBIGUOUS_PRICE_ALIAS, TAKER_VOLUME_NOT_INFERRED_FROM_BUY_SELL]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false

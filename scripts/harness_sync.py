@@ -1049,12 +1049,31 @@ def compute_evidence_chain(
     }
 
 
+def _completion_evidence_key_problems(completion: dict[str, Any]) -> list[str]:
+    from owner_attention_gate import (
+        OPTIONAL_COMPLETION_EVIDENCE_KEYS,
+        REQUIRED_COMPLETION_EVIDENCE_KEYS,
+    )
+
+    problems: list[str] = []
+    allowed = REQUIRED_COMPLETION_EVIDENCE_KEYS | OPTIONAL_COMPLETION_EVIDENCE_KEYS
+    observed = set(completion)
+    extra = sorted(observed - allowed)
+    missing = sorted(REQUIRED_COMPLETION_EVIDENCE_KEYS - observed)
+    if extra:
+        problems.append("completion_unexpected_keys:" + ",".join(extra))
+    if missing:
+        problems.append("completion_missing_keys:" + ",".join(missing))
+    return problems
+
+
 def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: str | None = None) -> list[str]:
     expected = compute_evidence_chain(task_id=task_id, contract=contract, head=head)
     problems: list[str] = []
     completion = _load_json(ROOT / expected["completion_path"])
     review = _load_json(ROOT / expected["review_path"])
     fit = _load_json(ROOT / expected["fit_path"])
+    problems.extend(_completion_evidence_key_problems(completion))
     if completion.get("implementation_bindings") != expected["implementation_bindings"]:
         problems.append("implementation_bindings_mismatch")
     if completion.get("base_main") != expected["expected_base"]:
@@ -1118,6 +1137,7 @@ def verify_evidence_chain_internal(completion_path: str) -> list[str]:
         problems.append("fit_bindings_sha_mismatch")
     if review.get("reviewed_inventory_sha256") != fit.get("reviewed_inventory_sha256"):
         problems.append("review_fit_inventory_sha_mismatch")
+    problems.extend(_completion_evidence_key_problems(completion))
     for path, expected_sha in bindings.items():
         if not isinstance(path, str) or not isinstance(expected_sha, str):
             problems.append("implementation_binding_invalid")

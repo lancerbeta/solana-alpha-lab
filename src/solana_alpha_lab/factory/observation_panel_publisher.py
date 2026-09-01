@@ -201,6 +201,7 @@ def _normalize_observation_row(
         if state not in {
             "OBSERVED",
             "MISSING_TYPED",
+            "EXCLUDED_AMBIGUOUS",
             "DISAPPEARED",
             "CENSORED",
             "CENSORED_LATE",
