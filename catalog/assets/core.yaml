@@ -33420,7 +33420,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_scheduler.py', repository_path: src/solana_alpha_lab/factory/observation_scheduler.py}
-  integrity: {kind: sha256, sha256: 55f7cf956cde0d3b5931b20db6c934fbb723e701839c09a08b2127a540438ad6}
+  integrity: {kind: sha256, sha256: b9650a9dd3dc46d9aaa531ccd438dbb3573b191281eb7d01e3cb6f982d96e235}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

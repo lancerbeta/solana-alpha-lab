@@ -1016,11 +1016,10 @@ def tick_once(
     source_poll_reused = False
     discovery_context: dict[str, Any] = {}
     def execution_clock() -> datetime:
-        current = datetime.now(UTC)
-        # A caller may supply a logical/frozen scheduler time for offline
-        # fixtures.  Never manufacture an availability time before that
-        # tick, while still using the wall clock for an unconfigured runtime.
-        return max(current, now)
+        # `now` is the sole logical clock for this tick unless the caller
+        # supplies an advancing `clock` callable. Mixing wall time here
+        # fences the write lease once calendar time passes a frozen fixture.
+        return now.astimezone(UTC)
 
     if clock is not None:
         execution_clock = clock
