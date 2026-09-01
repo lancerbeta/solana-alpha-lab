@@ -112,7 +112,10 @@
         "source_relative_paths",
         "recursive_relative_paths",
         "same_parent_forbidden",
-        "google_drive_role"
+        "google_drive_role",
+        "google_drive_role_prior",
+        "google_drive_role_provenance",
+        "offhost"
       ],
       "properties": {
         "kind": {"const": "CONTENT_ADDRESSED_BUNDLE"},
@@ -130,7 +133,47 @@
           "items": {"type": "string", "minLength": 8}
         },
         "same_parent_forbidden": {"const": true},
-        "google_drive_role": {"const": "OPTIONAL_COLD_COPY_NOT_DOD"}
+        "google_drive_role": {"const": "PROVEN_OFFHOST_DURABILITY"},
+        "google_drive_role_prior": {"const": "OPTIONAL_COLD_COPY_NOT_DOD"},
+        "google_drive_role_provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["prior_role", "promoted_by", "unproven_follow_up"],
+          "properties": {
+            "prior_role": {"const": "OPTIONAL_COLD_COPY_NOT_DOD"},
+            "promoted_by": {
+              "type": "array",
+              "minItems": 2,
+              "items": {"type": "string", "minLength": 8}
+            },
+            "unproven_follow_up": {"const": "NONEMPTY_RDP_OFFHOST_RESTORE_PROOF"}
+          }
+        },
+        "offhost": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "remote_name",
+            "destination_root",
+            "rclone_config_absolute",
+            "receipt_relative",
+            "freshness_current_max_seconds",
+            "freshness_degraded_max_seconds"
+          ],
+          "properties": {
+            "enabled": {"const": true},
+            "remote_name": {"const": "factory-gdrive"},
+            "destination_root": {"const": "solana-alpha-lab/factory-backups"},
+            "rclone_config_absolute": {"const": "/etc/solana-alpha-lab/rclone.conf"},
+            "rclone_bin": {"const": "/usr/bin/rclone"},
+            "receipt_relative": {
+              "const": "local/factory_v1/offhost_backup_receipt.json"
+            },
+            "freshness_current_max_seconds": {"const": 7200},
+            "freshness_degraded_max_seconds": {"const": 21600}
+          }
+        }
       }
     },
     "monitoring": {
@@ -201,6 +244,7 @@
         "health_relative": {"type": "string", "minLength": 8},
         "backup_service_relative": {"type": "string", "minLength": 8},
         "backup_timer_relative": {"type": "string", "minLength": 8},
+        "backup_gdrive_service_relative": {"type": "string", "minLength": 8},
         "paper_heartbeat_relative": {"type": "string", "minLength": 8},
         "observation_schedule_service_relative": {"type": "string", "minLength": 8},
         "observation_schedule_timer_relative": {"type": "string", "minLength": 8},

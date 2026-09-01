@@ -82,6 +82,24 @@ systemctl is-active factory-observation-schedule.timer factory-observation-sched
 ```
 
 ```
+systemctl is-active factory-remote-backup.service factory-remote-backup-gdrive.service
+```
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --offhost-status
+```
+
+```
+sudo stat -c 'mode=%a owner=%U:%G size=%s' /etc/solana-alpha-lab/rclone.conf
+```
+
+```
+sudo /usr/bin/rclone --config /etc/solana-alpha-lab/rclone.conf about factory-gdrive:
+```
+
+Never `cat` `/etc/solana-alpha-lab/rclone.conf` — metadata only.
+
+```
 systemctl status factory-observation-schedule.timer --no-pager -n 20
 ```
 
@@ -169,6 +187,7 @@ Do **not** trust chat “current status”. Machine-resolve:
 | Campaign envelope | `collector_campaign_preflight.py` (zero-network) |
 | Coverage class | doctor / collector read model `discovery_coverage_class` |
 | Backup | doctor `backup` / `backup_domain`; timer `factory-remote-backup.timer` |
+| Off-host Google Drive copy | doctor `--offhost-status`; receipt `local/factory_v1/offhost_backup_receipt.json`; timer chain below |
 | Latest **historical** A3 discovery release | RDP singleton `DATASET-MANIFEST-DISCOVERY-EVIDENCE-RELEASE-001*` (unchanged) |
 | Latest **live** lifecycle corpus | RDP `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` current version via lineage `datasets/live_lifecycle_corpus/lineage.json` + HFIC current-version selection |
 | Forge evidence epoch | HFIC preflight / `evidence_epoch_sha256` over canonical local RDP |
@@ -211,11 +230,13 @@ Machine-resolved; do not freeze ephemeral PASS/FAIL into this prose.
 3. Key-only SSH baseline (`PasswordAuthentication no`)
 4. Jupiter credential placement (`JUPITER_FREE_API_KEY`)
 5. Independent backup decision (`FACTORY_BACKUP_SINK` other volume vs accept same-volume)
-6. Live campaign authority (exact ObservationSchedule phrase)
-7. Live commissioning (timer enabled, ticks with authority)
-8. Daily owner pulse — product ready; install/enable timer only at final VPS deploy
-9. Live cohort seal / sync / import into LIVE CORPUS (product ready; ops after collector commissioning)
-10. Forge
+6. Off-host Google Drive durability automation (deploy + enable `factory-remote-backup-gdrive.service` chain)
+7. Live campaign authority (exact ObservationSchedule phrase)
+8. Live commissioning (timer enabled, ticks with authority)
+9. Daily owner pulse — product ready; install/enable timer only at final VPS deploy
+10. Live cohort seal / sync / import into LIVE CORPUS (product ready; ops after collector commissioning)
+11. **`NONEMPTY_RDP_OFFHOST_RESTORE_PROOF`** — after live observation_rdp is non-empty: prove Drive copy/readback + isolated restore with non-empty RDP inventory (pre-live empty-RDP proof is acceptable; do not claim live RDP restore is already proven)
+12. Forge
 
 ## DAILY_COLLECTOR_OWNER_PULSE
 
@@ -245,7 +266,8 @@ Composed from collector_read_model + remote-ops disk/backup + live-release field
 Health classes include: `PROCESS_OK`, `DATA_STALE`, `PROVIDER_AUTH_FAILED`,
 `PROVIDER_RATE_LIMITED`, `PROVIDER_FAILED`, `DISCOVERY_GAP`,
 `DISCOVERY_COVERAGE_UNKNOWN`, `BACKLOG_RISK`, `BUDGET_BLOCKED`,
-`RDP_PUBLICATION_STALE`, `BACKUP_DEGRADED`, `DISK_WARNING`, `DISK_CRITICAL`,
+`RDP_PUBLICATION_STALE`, `BACKUP_DEGRADED`, `OFFHOST_BACKUP_STALE`, `OFFHOST_BACKUP_FAILED`,
+`DISK_WARNING`, `DISK_CRITICAL`,
 `RELEASE_BLOCKED`. Zero eligible market supply is **not** provider failure.
 Unavailable metrics use `UNKNOWN` / `NOT_APPLICABLE` — never silent zero.
 
@@ -302,3 +324,119 @@ sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_
 Current/live corpus: one stable `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` with
 versioned manifests; weekly sealed releases import into that corpus — they are not
 deleted by operational retention.
+
+## Durability recovery (local + off-host Google Drive)
+
+Fresh agents with **zero chat history** recover durability from Git +
+machine readback only. Canonical Git:
+
+- `configs/factory_remote_operations_v1_1.yaml` — `backup.offhost`, `google_drive_role`
+- `configs/factory_remote_ops/factory-remote-backup*.service` — systemd chain
+- `scripts/factory_offhost_backup_copy.py` — stage-2 copy-only surface
+- `src/solana_alpha_lab/factory/offhost_backup.py` — receipt + health/readout
+
+### Two-stage architecture (do not conflate)
+
+| Stage | Mechanism | Output | Scientific truth? |
+|---|---|---|---|
+| **1 — local** | `factory-remote-backup.timer` → `factory-remote-backup.service` → `factory_remote_doctor.py --backup` | `local/factory_v1_backup_sink/BACKUP_<sha256>.zip` | **No** — operational durability only |
+| **2 — off-host** | `factory-remote-backup.service` **OnSuccess** → `factory-remote-backup-gdrive.service` → `factory_offhost_backup_copy.py` | `factory-gdrive:solana-alpha-lab/factory-backups/BACKUP_<sha256>.zip` | **No** — copy-only cold mirror |
+
+- **`FACTORY_BACKUP_SINK`** remains the optional **absolute other-volume** first-stage sink env name. Empty → git-side parent-independent sink under `local/factory_v1_backup_sink` (same volume, different parent). Google Drive is **never** `FACTORY_BACKUP_SINK`.
+- **Copy-only:** `rclone copyto` only. **No** delete, move, purge, sync-delete, or FUSE mount.
+- **Google Drive outage** must not invalidate a successful local backup artifact; stage 1 stays independently diagnosable.
+
+### Fixed off-host constants (VPS)
+
+| Item | Canonical value |
+|---|---|
+| rclone binary | `/usr/bin/rclone` |
+| rclone config (metadata only) | `/etc/solana-alpha-lab/rclone.conf` (`root:root`, mode `0600`, non-empty) |
+| logical remote name | `factory-gdrive` |
+| remote folder | `solana-alpha-lab/factory-backups` |
+| machine receipt | `local/factory_v1/offhost_backup_receipt.json` |
+| google_drive_role | `PROVEN_OFFHOST_DURABILITY` (prior: `OPTIONAL_COLD_COPY_NOT_DOD`) |
+| unproven after live data | `NONEMPTY_RDP_OFFHOST_RESTORE_PROOF` |
+
+### Fresh-agent classification (machine JSON)
+
+Read-only — **no Drive writes**, **no token/config body**:
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --offhost-status
+```
+
+Use `agent_classification` booleans (exactly one primary off-host label applies):
+
+| Label | When true |
+|---|---|
+| `LOCAL_BACKUP_OK` | `local_backup_state` == `OK` (newest local bundle age ≤ 24h) |
+| `OFFHOST_BACKUP_OK` | `offhost.offhost_backup_state` == `CURRENT` (verified receipt age ≤ 2h) |
+| `OFFHOST_BACKUP_STALE` | off-host state in `DEGRADED` (>2h), `HARD_ATTENTION` (>6h), `MISSING`, or `FAILED` |
+| `OFFHOST_NOT_CONFIGURED` | `offhost.offhost_backup_state` == `UNCONFIGURED` (offhost block absent/disabled in Git config) |
+
+Full doctor (local + off-host dimensions + verdict):
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py
+```
+
+Key JSON fields: `dimensions.backup_age`, `dimensions.offhost_backup`, `offhost_backup_state`, `offhost_last_verified_at`, `offhost_last_filename`, `offhost_last_sha256`, `durability_domain` (`OFF_HOST_INDEPENDENT` only when off-host `CURRENT`).
+
+Daily pulse dry-run (human Backup section: `local … / offhost … / GOOGLE_DRIVE / …`):
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/collector_owner_pulse.py --mode dry-run
+```
+
+### Off-host freshness / RPO (machine)
+
+From `configs/factory_remote_operations_v1_1.yaml` → `backup.offhost`:
+
+| Class | Age since `verified_at` | Meaning |
+|---|---|---|
+| `CURRENT` | ≤ 2h | Off-host copy matches campaign RPO target |
+| `DEGRADED` | > 2h and ≤ 6h | Visible degradation; local backup may still be OK |
+| `HARD_ATTENTION` | > 6h | Telegram path may emit `DEGRADED_OFFHOST_BACKUP_STALE` via doctor |
+| `FAILED` | last receipt terminal is failure, **or** Git offhost enabled but rclone config metadata not ready | Typed copy/config conflict |
+| `MISSING` | configured but no successful receipt | Never copy-assume from local health alone |
+
+Receipt terminals (success): `COPIED_VERIFIED`, `ALREADY_PRESENT_VERIFIED`. Never contains OAuth tokens.
+
+Last verified bundle fields in receipt / `--offhost-status`: `source_backup_filename`, `source_sha256`, `source_bytes`, `remote_logical_path`, `remote_bytes`, `verified_at`.
+
+### Read-only metadata checks (never print config body)
+
+```
+sudo stat -c 'mode=%a owner=%U:%G size=%s' /etc/solana-alpha-lab/rclone.conf
+```
+
+```
+sudo /usr/bin/rclone --config /etc/solana-alpha-lab/rclone.conf about factory-gdrive:
+```
+
+```
+systemctl is-active factory-remote-backup.timer factory-remote-backup.service factory-remote-backup-gdrive.service
+```
+
+### Isolated restore (sanctioned; never into live stores)
+
+After download to an **isolated temp path** outside `/opt/solana-alpha-lab/local/factory_v1`:
+
+```
+/usr/bin/uv run --locked --managed-python python -B -c "from pathlib import Path; from solana_alpha_lab.factory.remote_ops import restore_backup_isolated; print(restore_backup_isolated(bundle=Path('<ISOLATED>/BACKUP_<sha256>.zip'), dest_root=Path('<ISOLATED>/restore-staging')))"
+```
+
+Requirements: manifest integrity PASS, SQLite integrity PASS, restore markers respected, **no** replacement of live SQLite/RDP, deployed SHA unchanged.
+
+Pre-live commissioning may prove restore with `rdp_inventory.count = 0`. **`NONEMPTY_RDP_OFFHOST_RESTORE_PROOF`** remains mandatory once live observation data exists — do not claim non-empty live RDP off-host restore is already proven.
+
+### Manual stage-2 copy (commissioning / recovery only)
+
+Owner-authorized; not routine automation:
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py
+```
+
+Exit 0 → receipt updated. Local `--backup` remains separate and must succeed even if this fails.

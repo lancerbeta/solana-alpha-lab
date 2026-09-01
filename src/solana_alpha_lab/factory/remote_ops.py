@@ -376,6 +376,9 @@ def project_health(
         and env.get(str(loaded["alert"]["chat_id_env"]), "").strip()
     )
     domain = backup_domain_for(root, loaded, sink, env)
+    from solana_alpha_lab.factory.offhost_backup import offhost_health_snapshot
+
+    offhost = offhost_health_snapshot(root, now=clock)
     dimensions = {
         "process": "ALIVE" if process_alive else "DOWN",
         "security": "PASS",
@@ -403,6 +406,7 @@ def project_health(
             "OK" if disk <= int(loaded["monitoring"]["disk_used_percent_max"]) else "HIGH"
         ),
         "alert_sink": "CONFIGURED" if alert_configured else "UNCONFIGURED",
+        "offhost_backup": offhost.get("offhost_backup_state", "UNCONFIGURED"),
     }
     if process_alive is False:
         verdict = "UNHEALTHY_NOT_RUNNING"
@@ -413,6 +417,18 @@ def project_health(
     elif dimensions["backup_age"] != "OK":
         verdict = "DEGRADED_BACKUP_AGE"
         next_safe_action = "RUN_INDEPENDENT_BACKUP"
+    elif offhost.get("configured") and offhost.get("offhost_backup_state") in {
+        "FAILED",
+    }:
+        verdict = "DEGRADED_OFFHOST_BACKUP_FAILED"
+        next_safe_action = "RUN_OFFHOST_BACKUP_COPY"
+    elif offhost.get("configured") and offhost.get("offhost_backup_state") in {
+        "HARD_ATTENTION",
+        "MISSING",
+        "DEGRADED",
+    }:
+        verdict = "DEGRADED_OFFHOST_BACKUP_STALE"
+        next_safe_action = "RUN_OFFHOST_BACKUP_COPY"
     elif dimensions["data_freshness"] == "STALE":
         verdict = "DEGRADED_STALE_DATA"
         next_safe_action = "WRITE_PAPER_HEARTBEAT"
@@ -463,6 +479,14 @@ def project_health(
         "heartbeat_age_seconds": freshness_age,
         "stall_age_seconds": stall_age,
         "backup_domain": domain,
+        "offhost": offhost,
+        "offhost_backup_state": offhost.get("offhost_backup_state"),
+        "offhost_last_verified_at": offhost.get("offhost_last_verified_at"),
+        "offhost_backup_age_seconds": offhost.get("offhost_backup_age_seconds"),
+        "offhost_last_filename": offhost.get("offhost_last_filename"),
+        "offhost_last_sha256": offhost.get("offhost_last_sha256"),
+        "offhost_remote": offhost.get("offhost_remote"),
+        "durability_domain": offhost.get("durability_domain"),
         "alert_configured": alert_configured,
         "next_safe_action": next_safe_action,
         "rpo_max": loaded["deploy"]["rpo_max"],
@@ -863,6 +887,7 @@ ALERT_CODE_RU = {
     "START_REMOTE_PROCESSES": "Напишите агенту: процесс Factory упал. Сами не SSH и не Linux.",
     "INSPECT_UNRESOLVED_POSITIONS": "Напишите агенту: есть незакрытая paper-позиция. SQLite не трогайте.",
     "RUN_INDEPENDENT_BACKUP": "Напишите агенту: нужен независимый backup. Сами не копируйте файлы.",
+    "RUN_OFFHOST_BACKUP_COPY": "Напишите агенту: off-host Google Drive copy stale или failed. Local backup отдельно проверьте.",
     "WRITE_PAPER_HEARTBEAT": "Напишите агенту: heartbeat paper устарел. Сами ничего не запускайте.",
     "RESTART_PAPER_HEARTBEAT": "Напишите агенту: paper-бот не продвигается. Сами не systemctl.",
     "FREE_DISK_OR_SCALE_STORAGE": "Напишите агенту: диск тесен. Сами не заходите на хост.",

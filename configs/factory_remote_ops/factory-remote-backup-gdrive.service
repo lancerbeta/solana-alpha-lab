@@ -1,0 +1,10 @@
+[Unit]
+Description=Factory off-host Google Drive backup copy (stage 2)
+Documentation=docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md
+After=factory-remote-backup.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solana-alpha-lab
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py
+NoNewPrivileges=true

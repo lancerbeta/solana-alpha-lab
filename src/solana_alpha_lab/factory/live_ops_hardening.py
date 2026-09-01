@@ -900,6 +900,7 @@ def _copy_ops_fixture(src_root: Path, dst_root: Path) -> Path:
         "configs/factory_remote_ops/factory-remote-health.service",
         "configs/factory_remote_ops/factory-remote-backup.service",
         "configs/factory_remote_ops/factory-remote-backup.timer",
+        "configs/factory_remote_ops/factory-remote-backup-gdrive.service",
         "configs/factory_remote_ops/factory-paper-heartbeat.service",
         "configs/factory_remote_ops/factory-paper-heartbeat.timer",
         "configs/factory_remote_ops/secrets.env.example",

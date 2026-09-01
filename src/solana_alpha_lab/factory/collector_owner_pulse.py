@@ -50,6 +50,8 @@ def _owner_action(packet: Mapping[str, Any]) -> str:
         return "Free disk or scale storage before scientific evidence is at risk; do not auto-delete RDP."
     if "BACKUP_DEGRADED" in classes:
         return "Run independent backup (`factory_remote_doctor.py --backup`) and verify FACTORY_BACKUP_SINK domain."
+    if "OFFHOST_BACKUP_FAILED" in classes or "OFFHOST_BACKUP_STALE" in classes:
+        return "Off-host Google Drive copy stale or failed; local backup may still be OK. Agent should run offhost copy proof path."
     if "BUDGET_BLOCKED" in classes:
         return "Inspect ObservationSchedule budget counters; do not raise caps without owner OK."
     if "RELEASE_BLOCKED" in classes:
@@ -60,6 +62,29 @@ def _owner_action(packet: Mapping[str, Any]) -> str:
     if packet.get("collector_verdict") == "DEGRADED":
         return "Review health_classes in collector operational packet; no automatic mutate."
     return "NONE"
+
+
+def _backup_domain_pulse_label(domain: object) -> str:
+    text = str(domain or UNKNOWN)
+    if text == "ABSOLUTE_SINK_SAME_VOLUME":
+        return "SAME_VOLUME"
+    if text == "PARENT_INDEPENDENT_GIT_SIDE":
+        return "SAME_VOLUME"
+    if text in {UNKNOWN, "UNKNOWN"}:
+        return "UNKNOWN"
+    return text
+
+
+def _offhost_pulse_label(state: object) -> str:
+    mapping = {
+        "CURRENT": "OK",
+        "DEGRADED": "DEGRADED",
+        "HARD_ATTENTION": "STALE",
+        "FAILED": "FAILED",
+        "MISSING": "MISSING",
+        "UNCONFIGURED": "UNCONFIGURED",
+    }
+    return mapping.get(str(state or ""), _fmt(state))
 
 
 def render_daily_owner_pulse(packet: Mapping[str, Any]) -> str:
@@ -85,9 +110,25 @@ def render_daily_owner_pulse(packet: Mapping[str, Any]) -> str:
 
     backup_age = packet.get("backup_age_seconds")
     if isinstance(backup_age, int):
-        backup_age_txt = f"{backup_age // 3600}h"
+        if backup_age < 3600:
+            backup_age_txt = f"{backup_age // 60}m"
+        else:
+            backup_age_txt = f"{backup_age // 3600}h"
     else:
         backup_age_txt = _fmt(backup_age)
+
+    offhost_age = packet.get("offhost_backup_age_seconds")
+    if isinstance(offhost_age, int):
+        if offhost_age < 3600:
+            offhost_age_txt = f"{offhost_age // 60}m"
+        else:
+            offhost_age_txt = f"{offhost_age // 3600}h"
+    else:
+        offhost_age_txt = _fmt(offhost_age)
+
+    local_domain = _backup_domain_pulse_label(packet.get("backup_domain"))
+    offhost_remote = _fmt(packet.get("offhost_remote"))
+    offhost_state = _offhost_pulse_label(packet.get("offhost_backup_state"))
 
     oldest = packet.get("oldest_due_age")
     if isinstance(oldest, int):
@@ -132,8 +173,8 @@ def render_daily_owner_pulse(packet: Mapping[str, Any]) -> str:
         f"Projected 80% disk: {projected_txt}",
         "",
         "Backup:",
-        f"age {backup_age_txt}",
-        f"domain {_fmt(packet.get('backup_domain'))}",
+        f"local {backup_age_txt} / {local_domain}",
+        f"offhost {offhost_age_txt} / {offhost_remote} / {offhost_state}",
         "",
         "Release:",
         f"state={_fmt(packet.get('release_state'))} "

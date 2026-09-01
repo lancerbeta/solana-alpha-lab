@@ -1,6 +1,7 @@
 [Unit]
 Description=Factory remote-ops independent-domain backup
 Documentation=docs/tasks/FACTORY_REMOTE_OPERATIONS_V1.md
+OnSuccess=factory-remote-backup-gdrive.service
 
 [Service]
 Type=oneshot

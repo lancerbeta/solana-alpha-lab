@@ -19,6 +19,7 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
 )
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+from solana_alpha_lab.factory.offhost_backup import offhost_health_snapshot
 from solana_alpha_lab.factory.remote_ops import (
     _backup_newest,
     _disk_used_percent,
@@ -48,6 +49,8 @@ HEALTH_CLASSES = (
     "BUDGET_BLOCKED",
     "RDP_PUBLICATION_STALE",
     "BACKUP_DEGRADED",
+    "OFFHOST_BACKUP_STALE",
+    "OFFHOST_BACKUP_FAILED",
     "DISK_WARNING",
     "DISK_CRITICAL",
     "RELEASE_BLOCKED",
@@ -443,6 +446,12 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
     elif isinstance(backup_age, int) and backup_age > 24 * 3600:
         flags.append("BACKUP_DEGRADED")
 
+    offhost_state = str(packet.get("offhost_backup_state") or "")
+    if offhost_state == "FAILED":
+        flags.append("OFFHOST_BACKUP_FAILED")
+    elif offhost_state in {"DEGRADED", "HARD_ATTENTION", "MISSING"}:
+        flags.append("OFFHOST_BACKUP_STALE")
+
     disk = packet.get("filesystem_disk_used_pct")
     if isinstance(disk, int):
         if disk >= DISK_CRITICAL_PCT:
@@ -467,6 +476,8 @@ def collector_verdict(health_classes: list[str]) -> str:
         "PROVIDER_AUTH_FAILED",
         "DISK_CRITICAL",
         "BACKUP_DEGRADED",
+        "OFFHOST_BACKUP_FAILED",
+        "OFFHOST_BACKUP_STALE",
         "RELEASE_BLOCKED",
         "BUDGET_BLOCKED",
     }
@@ -593,6 +604,8 @@ def build_collector_operational_packet(
         except Exception:
             backup_domain = UNKNOWN
 
+    offhost = offhost_health_snapshot(root, now=clock)
+
     publish_at = _newest_publish_at(rdp)
     if publish_at is None:
         publish_at_value: Any = UNKNOWN
@@ -700,6 +713,13 @@ def build_collector_operational_packet(
         "last_backup_sha256": backup_sha,
         "backup_age_seconds": backup_age,
         "backup_domain": backup_domain,
+        "offhost_backup_state": offhost.get("offhost_backup_state"),
+        "offhost_last_verified_at": offhost.get("offhost_last_verified_at"),
+        "offhost_backup_age_seconds": offhost.get("offhost_backup_age_seconds"),
+        "offhost_last_filename": offhost.get("offhost_last_filename"),
+        "offhost_last_sha256": offhost.get("offhost_last_sha256"),
+        "offhost_remote": offhost.get("offhost_remote"),
+        "durability_domain": offhost.get("durability_domain"),
         "restore_marker_unresolved": bool(base.get("restore_marker_unresolved")),
         "raw_retention_substrate": (
             "DECODED_CANONICAL_PROVIDER_JSON_IN_CALL_LEDGER_NOT_BYTE_IDENTICAL_HTTP"
