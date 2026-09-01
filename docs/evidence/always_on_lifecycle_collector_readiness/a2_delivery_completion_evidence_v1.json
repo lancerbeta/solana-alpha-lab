@@ -18,7 +18,6 @@
     "catalog/generated/asset_edges.json": "80abb5a04bd38d656f887115698a1876957a7cd198615719e2e06848fc399d18",
     "catalog/schemas/observation_schedule_runtime_v1.schema.json": "94eb39db04d2c472f4886ec5e5056ded4c945ed9ef3bd21c96642bf71bff6021",
     "configs/factory_remote_ops/secrets.env.example": "069866e92c6c1ec02fe2ffe8f78207b5864a256c9c03ba7bdcf4393af1122112",
-    "configs/observation_schedule_runtime_v1.yaml": "b15e4cddf88adb4ed752daaf81ae9a506b6ca689ff73310658315fa736c83190",
     "docs/PROJECT_MAP.md": "95ce1ccd7bcadec88ae04671674c5eac39cbf3bf008152728811654dd64bdeb6",
     "docs/reports/always_on_lifecycle_collector_readiness/a2_owner_readout_v1.md": "472633544c2ed3d2eaede86b559b7afb1deb4ddbb42bf54ce3abc9ad47c9fed8",
     "docs/tasks/ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1.md": "c5cc9c513c3d029275edc2c4dd53eab4fac23acf47acd1da8aaa80c2228f4571",
@@ -43,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/always_on_lifecycle_collector_readiness/a2_delivery_factory_fit_v1.json",
-    "sha256": "768cab9fca8f9a3df430ffdd5912a08b2706bb27b43025a091f3691cf75f95a0",
+    "sha256": "a348d19aa99158dd5b76dc35c7513de091d249df1eb58a1d5dcdddf9147ba217",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COLLECTOR_READINESS_AND_SCHEDULE_REGRESSION",
     "independent_review": {
       "path": "docs/evidence/always_on_lifecycle_collector_readiness/a2_delivery_independent_review_v1.json",
-      "sha256": "7c91c9efb1e34da444c7aef0c56cb4ab78ecb0bc0c39ca2f1a79998752fe2642",
+      "sha256": "4a52954424879490106cd4c142680343b941ea3f258ac1f7e6d9685f32e5ef56",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

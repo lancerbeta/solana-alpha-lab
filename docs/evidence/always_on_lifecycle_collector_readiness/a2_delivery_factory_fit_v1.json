@@ -4,8 +4,8 @@
   "review_id": "ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-FACTORY-FIT-001",
   "as_of": "2026-09-01",
   "task_id": "ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1",
-  "reviewed_bindings_sha256": "9de6b2715cc0a7da1bf7edab5a79b922b1f845546eb13b0189a402cef1666a60",
-  "reviewed_inventory_sha256": "9de6b2715cc0a7da1bf7edab5a79b922b1f845546eb13b0189a402cef1666a60",
+  "reviewed_bindings_sha256": "0644e54e94d0ebebe0f3f1bbc17866a80af2e0f54b30c529b26222e2fb6e0477",
+  "reviewed_inventory_sha256": "f3ad9c37e6133f997569e3f725ab5e09cb3fcff2ec3b11c375ac30424cec56ce",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
