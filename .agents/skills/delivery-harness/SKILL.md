@@ -84,7 +84,16 @@ requires re-review and rebind before merge-readiness. Completion evidence keys
 must be exactly the gate whitelist (`required ∪ optional`); extra narrative
 keys (e.g. roadmap notes) belong in the owner readout, not completion JSON.
 Run `scripts/harness_sync.py bind-evidence --verify` before merge-readiness —
-it fails closed on unexpected/missing completion keys. After exact-head CI run
+it fails closed on unexpected/missing completion keys and merge-gate evidence
+shape (`factory_fit.mode`, independent-review roles). After cataloged script
+changes, repair derived hashes with incremental sync before commit:
+
+```text
+uv run --locked --managed-python python -B scripts/harness_sync.py --apply --base-ref <task expected_base>
+```
+
+Bare `--apply` is recovery/full oracle only; pre-commit and CI drift lines
+prefer `--base-ref` when the branch task contract is unambiguous. After exact-head CI run
 `scripts/owner_attention_gate.py --merge-readiness` (no phrase, no `gh pr merge`).
 STOP for one exact owner approval only when `ready_for_owner_phrase` is true.
 Order: `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.

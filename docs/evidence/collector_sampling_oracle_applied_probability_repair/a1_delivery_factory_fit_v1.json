@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-SAMPLING-ORACLE-FACTORY-FIT-001",
+  "as_of": "2026-09-02",
+  "task_id": "COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "2059028bf949dd78ddefe2f6f974e28300532ff972bba85e886e254d67a1e136",
+  "reviewed_inventory_sha256": "3036cea2c1f3946b7e19aff9e6de2603ee4bbb6d7ac9c618ae65a75908eb3906",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "REPLACEMENT_CAMPAIGN_REGISTER_WITH_REPAIRED_P_057"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS",
+    "INVALID_PROPOSAL_02152E3136AD_MUST_NOT_AUTHORIZE"
+  ],
+  "recovery": "REVERT"
+}

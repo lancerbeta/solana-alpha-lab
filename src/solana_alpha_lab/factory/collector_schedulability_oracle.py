@@ -1,4 +1,10 @@
-"""Deterministic ObservationSchedule capacity / schedulability oracle (zero-network)."""
+"""Deterministic ObservationSchedule capacity / schedulability oracle (zero-network).
+
+``recommended_inclusion_probability`` is derived from the **applied** member cap
+``min(requested_max_members_per_utc_day, max_supported_members_per_day)``, not from
+``max_supported_members_per_day`` alone. A prior bug used the capacity ceiling (e.g.
+456/2000 → 0.228) while the applied cap remained 114 (→ 0.057).
+"""
 
 from __future__ import annotations
 
@@ -45,6 +51,22 @@ class SchedulabilityResult:
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+def recommended_inclusion_probability(
+    *,
+    recommended_members: int,
+    candidate_launches_per_utc_day: int,
+) -> str:
+    """Bernoulli p for the applied member cap, not the capacity ceiling."""
+
+    if candidate_launches_per_utc_day <= 0:
+        return "0"
+    if recommended_members >= candidate_launches_per_utc_day:
+        return "1.0"
+    value = recommended_members / candidate_launches_per_utc_day
+    formatted = f"{value:.6f}".rstrip("0").rstrip(".")
+    return formatted or "0"
 
 
 def classify_discovery_coverage(
@@ -298,19 +320,17 @@ def evaluate_schedulability(
     if int(schedule["x_point"]["due_offset_seconds"]) != x_seconds:
         reasons.append("SCHEDULE_X_DIFFERS_FROM_ORACLE_SELECTION")
 
-    inclusion = "1.0"
-    if candidate_launches_per_utc_day > 0 and max_members < candidate_launches_per_utc_day:
-        inclusion = f"{max_members / candidate_launches_per_utc_day:.6f}".rstrip("0").rstrip(
-            "."
-        )
-        if inclusion == "":
-            inclusion = "0"
+    recommended_members = min(members, max_members)
+    inclusion = recommended_inclusion_probability(
+        recommended_members=recommended_members,
+        candidate_launches_per_utc_day=candidate_launches_per_utc_day,
+    )
 
     return SchedulabilityResult(
         terminal=terminal,
         max_supported_members_per_day=max_members,
         recommended_inclusion_probability=inclusion,
-        recommended_max_members_per_utc_day=min(members, max_members),
+        recommended_max_members_per_utc_day=recommended_members,
         predicted_provider_calls_per_day=predicted_day,
         predicted_provider_calls_lifetime_21d=predicted_life,
         pace_bound_calls_per_day=pace_bound,
@@ -349,5 +369,6 @@ __all__ = [
     "TIMER_CADENCE_SECONDS",
     "classify_discovery_coverage",
     "evaluate_schedulability",
+    "recommended_inclusion_probability",
     "select_x_point",
 ]

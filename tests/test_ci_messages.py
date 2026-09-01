@@ -47,6 +47,29 @@ class DerivedHashDriftMessageTests(unittest.TestCase):
         self.assertIn("DERIVED_HASH_DRIFT:", summary)
         self.assertIn("scripts/harness_sync.py --apply", summary)
 
+    def test_apply_command_with_explicit_base_ref(self) -> None:
+        cmd = messages.harness_sync_apply_command(
+            base_ref="5c0efd1619f048c61e6f056b83449571e0abfdae"
+        )
+        self.assertIn(
+            "--base-ref 5c0efd1619f048c61e6f056b83449571e0abfdae",
+            cmd,
+        )
+        self.assertNotIn("RECOVERY", cmd)
+
+    def test_apply_command_without_base_ref_marks_recovery(self) -> None:
+        cmd = messages.harness_sync_apply_command(
+            base_ref=None,
+            root=Path("/nonexistent-empty-root"),
+        )
+        self.assertIn("RECOVERY_FULL_ORACLE", cmd)
+
+    def test_branch_task_contract_resolves_incremental_base_ref(self) -> None:
+        base = messages.routine_harness_sync_base_ref(root=ROOT)
+        self.assertEqual(base, "5c0efd1619f048c61e6f056b83449571e0abfdae")
+        summary = messages.derived_hash_drift_summary(root=ROOT)
+        self.assertIn("--base-ref 5c0efd1619f048c61e6f056b83449571e0abfdae", summary)
+
     def test_emit_writes_to_stderr(self) -> None:
         buffer = io.StringIO()
         messages.emit_derived_hash_drift_summary(stream=buffer)

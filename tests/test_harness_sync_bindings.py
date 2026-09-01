@@ -223,6 +223,57 @@ class BindEvidenceIntegrationTests(unittest.TestCase):
         self.assertIn("passed", payload)
         self.assertIn("mismatched", payload)
 
+    def test_verify_rejects_invalid_factory_fit_mode(self) -> None:
+        original_root = harness_sync.ROOT
+        harness_sync.ROOT = self.worktree.resolve()
+        self.addCleanup(setattr, harness_sync, "ROOT", original_root)
+        apply = self._run_bind("--apply")
+        self.assertEqual(apply.returncode, 0, apply.stderr)
+        fit_path = (
+            self.worktree
+            / "docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_factory_fit_v1.json"
+        )
+        fit = json.loads(fit_path.read_text(encoding="utf-8"))
+        fit["mode"] = "PROPORTIONAL"
+        fit_path.write_text(json.dumps(fit, indent=2) + "\n", encoding="utf-8")
+        verify = self._run_bind("--verify")
+        self.assertEqual(verify.returncode, 1, verify.stderr)
+        self.assertIn("factory_fit_mode_invalid", verify.stderr)
+
+    def test_verify_rejects_incomplete_review_roles(self) -> None:
+        original_root = harness_sync.ROOT
+        harness_sync.ROOT = self.worktree.resolve()
+        self.addCleanup(setattr, harness_sync, "ROOT", original_root)
+        apply = self._run_bind("--apply")
+        self.assertEqual(apply.returncode, 0, apply.stderr)
+        review_path = (
+            self.worktree
+            / "docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_review_v1.json"
+        )
+        review = json.loads(review_path.read_text(encoding="utf-8"))
+        review["required_roles"] = ["CODE_REVIEWER"]
+        review["reviews"] = review["reviews"][:1]
+        review_path.write_text(json.dumps(review, indent=2) + "\n", encoding="utf-8")
+        verify = self._run_bind("--verify")
+        self.assertEqual(verify.returncode, 1, verify.stderr)
+        self.assertIn("review_required_roles_incomplete", verify.stderr)
+
+    def test_apply_rejects_invalid_shape_before_write(self) -> None:
+        fit_path = (
+            self.worktree
+            / "docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_factory_fit_v1.json"
+        )
+        fit = json.loads(fit_path.read_text(encoding="utf-8"))
+        original_bindings_sha = fit.get("reviewed_bindings_sha256")
+        fit["mode"] = "PROPORTIONAL"
+        fit_path.write_text(json.dumps(fit, indent=2) + "\n", encoding="utf-8")
+        apply = self._run_bind("--apply")
+        self.assertEqual(apply.returncode, 2, apply.stderr)
+        self.assertIn("BIND_EVIDENCE_MERGE_GATE_SHAPE", apply.stderr)
+        after = json.loads(fit_path.read_text(encoding="utf-8"))
+        self.assertEqual(after["mode"], "PROPORTIONAL")
+        self.assertEqual(after.get("reviewed_bindings_sha256"), original_bindings_sha)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COLLECTOR-SAMPLING-ORACLE-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1",
+  "state_change": "COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_READY_FOR_MERGE_GATE",
+  "base_main": "5c0efd1619f048c61e6f056b83449571e0abfdae",
+  "owner_approvals": [],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "b282a736f16ad559e7a58844ec0db202d5ca4d869005d2fb757d22837f859608",
+    "catalog/assets/core.yaml": "8927096d8692a1ea539d92746b3ec5e0228cb6e62aaae9f721d2fe7ace4c9df4",
+    "delivery-harness/templates/portable-bundle-manifest.json": "e57cc6fa2ad9ee6317d3ba0e0800e40af74632558be43b3e5f6092a71bb6ebf7",
+    "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md": "781b65017a2706933fdf8451823e07d51e4eee07e0f1ae26f00b41e188a46bb4",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "bea5ca334a53621c9a4ad0f9bc2342c3ba01cedcba4c8b16f88a61517cf1c72a",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "6f48c6ccc82f9db7c3fba6d0bdb9922c8fdbae55380d65ba32dd99a06c474630",
+    "docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md": "bff92915370409ac8d0a1f821161b28ab9f6209c74afaf7104d594657f02157d",
+    "docs/tasks/COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1.md": "f66b95abbf156132b8cf36b7a3063b4f389d33a30a83ab18b669e94bcc0dec62",
+    "scripts/ci_fail_closed_messages.py": "01eb0cc8a39b1f11c040e471604f58c76e1057b5c7867d13ae836c423386ef7d",
+    "scripts/harness_sync.py": "9d32fa5d810ef1fbfeea4f2a24ff45457ed5e1c5dac853fe29aba05a12003c8d",
+    "scripts/owner_attention_gate.py": "6206d57a580becd3063cd8692d3f816c4bbba80d7c4585604c3b66915718b9ef",
+    "src/solana_alpha_lab/factory/collector_schedulability_oracle.py": "fc4f975b8d69e84efc96351292d776609ec6ab3af775b1f10fd21ba9389f5d26",
+    "tests/test_ci_messages.py": "b466d646d7d2982f547ea746217ed2372f697893fdb1e8e015f8c0bd1e1d619c",
+    "tests/test_collector_sampling_oracle_applied_probability_repair.py": "ae61371da5fd1260b75bdae14db35e7c73be2a86ac95dc56c25f8ab2d62ad7d0",
+    "tests/test_harness_sync_bindings.py": "8121cc573347a9af6c148d2a04ff9c276875218a3ad466c8ec9e8cd2af3e3c5a"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "e91519ed7db08bc3fcfb4c739b0ed0a005f925942af6c40f82dde4cac4482243",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_SAMPLING_ORACLE_APPLIED_PROBABILITY_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "7f458bac2d1906cadb6740bafcea6d4a7f975a2c5a6a22fc340e2ae298f3137d",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_APPLIED_CAP_P_057",
+      "PASS_CAPACITY_CEILING_FORMULA_P_228",
+      "PASS_COMMISSIONING_PREFLIGHT_ENVELOPE",
+      "PASS_SCHEDULE_IDENTITY_NOT_02152E"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS",
+    "NO_AUTHORIZE_02152E3136AD",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

@@ -38,6 +38,111 @@ NAV_OUTPUTS = (
     "catalog/generated/asset_edges.json",
     "docs/OPERATOR_NAVIGATION.md",
 )
+TASK_CONTRACT_DIR = "docs/tasks"
+TASK_CONTRACT_FRONTMATTER = re.compile(r"^---\n(?P<frontmatter>.*?)\n---", re.DOTALL)
+HARNESS_SYNC_RECOVERY_SUFFIX = "  # RECOVERY_FULL_ORACLE"
+
+
+def _expected_base_from_task_contract(relative: str, *, root: Path) -> str | None:
+    if not relative.startswith(f"{TASK_CONTRACT_DIR}/") or not relative.endswith(".md"):
+        return None
+    path = root / relative
+    if not path.is_file():
+        return None
+    match = TASK_CONTRACT_FRONTMATTER.match(path.read_text(encoding="utf-8"))
+    if match is None:
+        return None
+    metadata = yaml.safe_load(match.group("frontmatter"))
+    if not isinstance(metadata, dict):
+        return None
+    binding = metadata.get("git_binding")
+    if not isinstance(binding, dict):
+        return None
+    expected_base = binding.get("expected_base")
+    if isinstance(expected_base, str) and re.fullmatch(r"[0-9a-f]{40}", expected_base):
+        return expected_base
+    return None
+
+
+def _git_task_contract_paths(args: list[str], *, root: Path) -> list[str]:
+    completed = subprocess.run(
+        args,
+        cwd=str(root),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if completed.returncode != 0:
+        return []
+    relatives: list[str] = []
+    for item in completed.stdout.split(b"\0"):
+        if not item:
+            continue
+        relative = item.decode("utf-8", errors="strict").replace("\\", "/")
+        if relative.startswith(f"{TASK_CONTRACT_DIR}/") and relative.endswith(".md"):
+            relatives.append(relative)
+    return relatives
+
+
+def _task_contract_relatives_for_repair(*, root: Path) -> set[str]:
+    relatives = set(_git_task_contract_paths(
+        ["git", "diff", "--cached", "--name-only", "--no-renames", "-z"],
+        root=root,
+    ))
+    relatives.update(_git_task_contract_paths(
+        ["git", "diff", "--name-only", "--no-renames", "-z", "HEAD"],
+        root=root,
+    ))
+    merge_base = subprocess.run(
+        ["git", "merge-base", "HEAD", "origin/main"],
+        cwd=str(root),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if merge_base.returncode == 0:
+        base = merge_base.stdout.decode("ascii", errors="strict").strip()
+        if re.fullmatch(r"[0-9a-f]{40}", base):
+            relatives.update(_git_task_contract_paths(
+                [
+                    "git",
+                    "diff",
+                    "--name-only",
+                    "--no-renames",
+                    "-z",
+                    base,
+                    "HEAD",
+                    "--",
+                    f"{TASK_CONTRACT_DIR}/",
+                ],
+                root=root,
+            ))
+    return relatives
+
+
+def routine_harness_sync_base_ref(*, root: Path | None = None) -> str | None:
+    """Single task expected_base when branch/staging context is unambiguous."""
+
+    target = root or ROOT
+    if not (target / ".git").is_dir():
+        return None
+    bases = {
+        base
+        for relative in _task_contract_relatives_for_repair(root=target)
+        if (base := _expected_base_from_task_contract(relative, root=target)) is not None
+    }
+    if len(bases) == 1:
+        return next(iter(bases))
+    return None
+
+
+def harness_sync_repair_suffix(*, root: Path | None = None) -> str:
+    resolved = routine_harness_sync_base_ref(root=root)
+    if resolved:
+        return f"; run harness_sync.py --apply --base-ref {resolved}"
+    return f"; run harness_sync.py --apply{HARNESS_SYNC_RECOVERY_SUFFIX}"
 
 
 class HarnessSyncError(RuntimeError):
@@ -283,6 +388,7 @@ def drift_scopes_for_paths(paths: set[str]) -> dict[str, bool]:
 
 
 def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
+    repair = harness_sync_repair_suffix(root=ROOT)
     scopes = (
         {"assets": True, "checkpoint": True, "navigation": True}
         if scoped_paths is None
@@ -307,7 +413,7 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
             current = _current_block_sha(registry_file.read_text(encoding="utf-8"), asset_id)
             if current != desired:
                 problems.append(
-                    f"sha256_mismatch:{asset_id}:{info['registry']}; run harness_sync.py --apply"
+                    f"sha256_mismatch:{asset_id}:{info['registry']}{repair}"
                 )
     if scopes["checkpoint"]:
         observed = observed_checkpoint()
@@ -316,7 +422,7 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
             problems.append(
                 "catalog_current_checkpoint_drift:"
                 f"registered={json.dumps(manifest.get('current_checkpoint'), sort_keys=True)}:"
-                f"observed={json.dumps(observed, sort_keys=True)}; run harness_sync.py --apply"
+                f"observed={json.dumps(observed, sort_keys=True)}{repair}"
             )
     if scopes["navigation"]:
         nav = subprocess.run(
@@ -329,7 +435,7 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
             problems.append(
                 "navigation_projection_stale"
                 + (f":{detail[0]}" if detail else "")
-                + "; run harness_sync.py --apply"
+                + repair
             )
     return problems
 
@@ -1067,6 +1173,62 @@ def _completion_evidence_key_problems(completion: dict[str, Any]) -> list[str]:
     return problems
 
 
+def _delivery_evidence_merge_shape_problems(
+    *,
+    completion: dict[str, Any],
+    review: dict[str, Any],
+    fit: dict[str, Any],
+    task_id: str | None = None,
+) -> list[str]:
+    from owner_attention_gate import (
+        delivery_factory_fit_shape_problems,
+        delivery_independent_review_shape_problems,
+    )
+
+    problems: list[str] = []
+    problems.extend(
+        delivery_independent_review_shape_problems(review, task_id=task_id)
+    )
+    problems.extend(delivery_factory_fit_shape_problems(fit, task_id=task_id))
+    validation = completion.get("validation")
+    if not isinstance(validation, dict) or set(validation) != {
+        "targeted",
+        "independent_review",
+        "full_gate",
+        "github_ci",
+        "project_checks",
+    }:
+        problems.append("completion_validation_shape_invalid")
+    else:
+        if not str(validation.get("targeted", "")).startswith("PASS_"):
+            problems.append("completion_validation_targeted_invalid")
+        if validation.get("full_gate") != "ENFORCED_BY_PROJECT_BOUND_VALIDATION":
+            problems.append("completion_validation_full_gate_invalid")
+        if validation.get("github_ci") != "ENFORCED_LIVE_AT_GUARDED_MERGE":
+            problems.append("completion_validation_github_ci_invalid")
+        project_checks = validation.get("project_checks")
+        if not isinstance(project_checks, list) or not all(
+            isinstance(item, str) and item.startswith("PASS_")
+            for item in project_checks
+        ):
+            problems.append("completion_validation_project_checks_invalid")
+        review_binding = validation.get("independent_review")
+        if not isinstance(review_binding, dict) or set(review_binding) != {
+            "path",
+            "sha256",
+            "verdict",
+        } or review_binding.get("verdict") != "PASS":
+            problems.append("completion_review_binding_invalid")
+    fit_binding = completion.get("factory_fit")
+    if not isinstance(fit_binding, dict) or set(fit_binding) != {
+        "path",
+        "sha256",
+        "verdict",
+    } or fit_binding.get("verdict") != "PASS":
+        problems.append("completion_factory_fit_binding_invalid")
+    return problems
+
+
 def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: str | None = None) -> list[str]:
     expected = compute_evidence_chain(task_id=task_id, contract=contract, head=head)
     problems: list[str] = []
@@ -1091,6 +1253,14 @@ def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: st
             completion=completion,
             review_path=expected["review_path"],
             fit_path=expected["fit_path"],
+        )
+    )
+    problems.extend(
+        _delivery_evidence_merge_shape_problems(
+            completion=completion,
+            review=review,
+            fit=fit,
+            task_id=task_id,
         )
     )
     return problems
@@ -1155,6 +1325,18 @@ def verify_evidence_chain_internal(completion_path: str) -> list[str]:
             fit_path=fit_path,
         )
     )
+    task_id = completion.get("task_id")
+    if isinstance(task_id, str) and task_id:
+        problems.extend(
+            _delivery_evidence_merge_shape_problems(
+                completion=completion,
+                review=review,
+                fit=fit,
+                task_id=task_id,
+            )
+        )
+    else:
+        problems.append("completion_task_id_missing")
     return problems
 
 
@@ -1167,6 +1349,16 @@ def apply_evidence_chain(*, task_id: str, contract: str | None = None, head: str
     review = _load_json(review_path)
     fit = _load_json(fit_path)
     completion = _load_json(completion_path)
+    shape_problems = _delivery_evidence_merge_shape_problems(
+        completion=completion,
+        review=review,
+        fit=fit,
+        task_id=task_id,
+    )
+    if shape_problems:
+        raise HarnessSyncError(
+            "BIND_EVIDENCE_MERGE_GATE_SHAPE:" + shape_problems[0]
+        )
     review["reviewed_bindings_sha256"] = expected["reviewed_bindings_sha256"]
     review["reviewed_inventory_sha256"] = expected["reviewed_inventory_sha256"]
     fit["reviewed_bindings_sha256"] = expected["reviewed_bindings_sha256"]
@@ -1298,6 +1490,18 @@ def sync_main(argv: list[str]) -> int:
         else:
             problems = check_drift()
         if problems:
+            resolved = routine_harness_sync_base_ref(root=ROOT)
+            if resolved:
+                repair_cmd = (
+                    "uv run --locked --managed-python python -B "
+                    f"scripts/harness_sync.py --apply --base-ref {resolved}"
+                )
+            else:
+                repair_cmd = (
+                    "uv run --locked --managed-python python -B "
+                    f"scripts/harness_sync.py --apply{HARNESS_SYNC_RECOVERY_SUFFIX}"
+                )
+            print(f"DERIVED_HASH_DRIFT: run {repair_cmd}", file=sys.stderr)
             for problem in problems:
                 print(f"DERIVED_HASH_DRIFT: {problem}", file=sys.stderr)
             return 1

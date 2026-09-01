@@ -1,0 +1,50 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-SAMPLING-ORACLE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "2059028bf949dd78ddefe2f6f974e28300532ff972bba85e886e254d67a1e136",
+  "reviewed_inventory_sha256": "3036cea2c1f3946b7e19aff9e6de2603ee4bbb6d7ac9c618ae65a75908eb3906",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "INCLUSION_FOLLOWS_APPLIED_MEMBER_CAP",
+        "CAPACITY_CEILING_UNCHANGED",
+        "COMMISSIONING_ENVELOPE_P_057_REGRESSION"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "INVALID_PROPOSAL_02152E_MUST_NOT_AUTHORIZE",
+        "ZERO_NETWORK_ZERO_VPS",
+        "FROZEN_REPLACEMENT_P_057_CONFIRMED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ORACLE_SEMANTICS_COHERENT",
+        "PROVIDER_ACCOUNTING_UNCHANGED",
+        "NO_LAUNCHPAD_REGRESSION"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY"
+  ]
+}

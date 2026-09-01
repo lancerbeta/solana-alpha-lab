@@ -90,8 +90,11 @@ When derived hashes drift, child validators still fail closed. Before their
 details, `validate_ci.py` and `validate_baton.py` print one actionable line:
 
 ```text
-DERIVED_HASH_DRIFT: run uv run --locked --managed-python python -B scripts/harness_sync.py --apply
+DERIVED_HASH_DRIFT: run uv run --locked --managed-python python -B scripts/harness_sync.py --apply --base-ref <exact expected_base>
 ```
+
+When no unambiguous task `expected_base` is available, the same line ends with
+`# RECOVERY_FULL_ORACLE` and bare `--apply` is correct.
 
 Pre-commit runs a scoped staging check only:
 
