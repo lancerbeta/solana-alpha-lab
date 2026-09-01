@@ -37,6 +37,7 @@ managed_write_set:
 - docs/evidence/discovery_evidence_release_bridge/a1_delivery_factory_fit_v1.json
 - docs/evidence/control/delivery_harness_acceptance_v1.json
 - docs/evidence/control/a1_merge_readiness_before_owner_phrase_completion_v1.json
+- delivery-harness/templates/portable-bundle-manifest.json
 - docs/reports/discovery_evidence_release_bridge/a1_owner_readout_v1.md
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml

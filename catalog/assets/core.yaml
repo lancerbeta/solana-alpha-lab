@@ -19802,7 +19802,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: 72e641f5b9cf8cf5d6890f501bb5de658d7b1fc90ff76c18c125dc0de604301e}
+  integrity: {kind: sha256, sha256: 5993e1021ec04d1e7703eb51ae753a4a9a3e31a327142e278e182ece7eb0f16e}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -32783,7 +32783,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md', repository_path: docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md}
-  integrity: {kind: sha256, sha256: 0dad6888ca93ffa6e0f92a992a1be4556e41ef7a0ff2ada4f307f1f79784d679}
+  integrity: {kind: sha256, sha256: 8fa1107f9d57f6823368ec13a6d0e059d76be7a843f9bee7872c32edeb8b70df}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
