@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1",
+  "reviewed_bindings_sha256": "9de6b2715cc0a7da1bf7edab5a79b922b1f845546eb13b0189a402cef1666a60",
+  "reviewed_inventory_sha256": "9de6b2715cc0a7da1bf7edab5a79b922b1f845546eb13b0189a402cef1666a60",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "SOURCE_POLL_FAIRNESS_GATE_REMOVED",
+        "HTTP_CLASS_LEDGER_AND_RECOVERY_HELPER",
+        "DOCTOR_UNKNOWN_COVERAGE_NOT_HARD_FAIL",
+        "STORE_LIST_CALLS_TIMESTAMPS_IN_WRITE_SET",
+        "SANCTIONED_CREDENTIAL_SCHEMA_CONST",
+        "PREFLIGHT_NO_AUTHORIZE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "VERTICAL_ZERO_NETWORK_PROOF_TESTS",
+        "FREE_TIER_ENVELOPE_WITH_HEADROOM",
+        "X300_RETAINED_WITHOUT_TIMING_EVIDENCE",
+        "CAMPAIGN_PACKET_PROPOSED_NOT_AUTHORITY",
+        "COLLECTOR_READ_MODEL_ON_STATUS_DOCTOR"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NO_SECOND_SCHEDULER_OR_PLATFORM",
+        "ADOPT_WRAP_OBSERVATION_SCHEDULE",
+        "LATENESS_CAPS_MEMBERS_FAIL_CLOSED",
+        "NO_PRIVATE_COMPILER_BUDGET_IMPORT",
+        "ZERO_NETWORK_ORACLE_AND_PREFLIGHT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_ALPHA"
+  ]
+}

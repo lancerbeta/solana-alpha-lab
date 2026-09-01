@@ -27,6 +27,9 @@ SAFE_CONFIG_PREFIXES = (
 )
 UNIT_RELATIVE = "configs/factory_remote_ops/factory-observation-schedule.service"
 ALLOWED_CREDENTIAL_ENV = frozenset({"JUPITER_FREE_API_KEY"})
+# Compat alias only: read when sanctioned name is unset. Never allowlist as config.
+CREDENTIAL_COMPAT_ALIAS_ENV = "JUPITER_API_KEY"
+SANCTIONED_CREDENTIAL_ENV = "JUPITER_FREE_API_KEY"
 PROVEN_READONLY_USER_AGENT = (
     "solana-alpha-lab/quote-native-evidence-qualification-v1"
 )
@@ -121,6 +124,11 @@ def load_credential_after_activation(config: Mapping[str, Any]) -> str:
     if name not in ALLOWED_CREDENTIAL_ENV:
         raise ObservationRuntimeError("CREDENTIAL_ENV_NOT_ALLOWLISTED")
     value = os.environ.get(name)
+    if not value and name == SANCTIONED_CREDENTIAL_ENV:
+        # Explicit single-operator contract: sanctioned name first; legacy alias
+        # only when sanctioned env is unset. Config must still declare
+        # JUPITER_FREE_API_KEY.
+        value = os.environ.get(CREDENTIAL_COMPAT_ALIAS_ENV)
     if not value:
         raise ObservationRuntimeError("CREDENTIAL_ENV_MISSING")
     return value
@@ -256,10 +264,12 @@ def git_sha(root: Path, configured: str | None) -> str:
 
 __all__ = [
     "ALLOWED_CREDENTIAL_ENV",
+    "CREDENTIAL_COMPAT_ALIAS_ENV",
     "DEFAULT_RUNTIME_RELATIVE",
     "FakeProviderOpener",
     "JupiterReadonlyOpener",
     "PROVEN_READONLY_USER_AGENT",
+    "SANCTIONED_CREDENTIAL_ENV",
     "ObservationRuntimeError",
     "UNIT_RELATIVE",
     "build_opener",
