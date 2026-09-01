@@ -269,6 +269,8 @@ def main(argv: list[str] | None = None) -> int:
                 store,
                 schedule_sha256=getattr(args, "schedule_sha256", None) or config.get("schedule_sha256"),
                 activation_id=getattr(args, "activation_id", None) or config.get("activation_id"),
+                now=now,
+                deploy_git_sha=producer,
             )
             return _emit(result, 0)
         if args.command == "snapshot":
@@ -287,9 +289,22 @@ def main(argv: list[str] | None = None) -> int:
             )
             return _emit(result, 0)
         if args.command == "doctor":
+            from solana_alpha_lab.factory.collector_read_model import (
+                build_collector_read_model,
+            )
+
             unresolved = store.restore_marker_unresolved()
             activations = store.list_activations()
             live = any(row["state"] == "ACTIVE" for row in activations)
+            collector = build_collector_read_model(
+                store,
+                now=now,
+                schedule_sha256=getattr(args, "schedule_sha256", None)
+                or config.get("schedule_sha256"),
+                activation_id=getattr(args, "activation_id", None)
+                or config.get("activation_id"),
+                deploy_git_sha=producer,
+            )
             if unresolved:
                 return _emit(
                     {
@@ -297,6 +312,7 @@ def main(argv: list[str] | None = None) -> int:
                         "live_activation": live,
                         "restore_marker_unresolved": True,
                         "activation_count": len(activations),
+                        "collector": collector,
                         "next_action": "RESOLVE_RESTORE_MARKER",
                     },
                     2,
@@ -309,6 +325,7 @@ def main(argv: list[str] | None = None) -> int:
                         "live_activation": False,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
+                        "collector": collector,
                         "next_action": "RESUME",
                     },
                     2,
@@ -320,19 +337,36 @@ def main(argv: list[str] | None = None) -> int:
                         "live_activation": False,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
+                        "collector": collector,
                         "next_action": "REGISTER_AUTHORIZE_ACTIVATE",
                     },
                     2,
                 )
+            health = list(collector.get("health_flags") or [])
+            terminal = "DOCTOR_OK"
+            next_action = "TICK_ONCE"
+            if "PROVIDER_FAILED" in health:
+                terminal = "DOCTOR_PROVIDER_FAILED"
+                next_action = "INSPECT_HTTP_CLASS"
+            elif "DISCOVERY_GAP" in health or "DATA_STALE" in health:
+                terminal = "DOCTOR_DISCOVERY_GAP"
+                next_action = "INSPECT_SOURCE_POLL"
+            elif "BACKLOG_RISK" in health:
+                terminal = "DOCTOR_BACKLOG_RISK"
+                next_action = "INSPECT_DUE_WORK"
+            # DISCOVERY_COVERAGE_UNKNOWN is machine-visible commissioning signal,
+            # not a hard doctor failure (unknown ≠ confirmed gap).
+            code = 0 if terminal == "DOCTOR_OK" else 2
             return _emit(
                 {
-                    "terminal": "DOCTOR_OK",
+                    "terminal": terminal,
                     "live_activation": True,
                     "restore_marker_unresolved": False,
                     "activation_count": len(activations),
-                    "next_action": "TICK_ONCE",
+                    "collector": collector,
+                    "next_action": next_action,
                 },
-                0,
+                code,
             )
         if args.command == "tick":
             if store.restore_marker_unresolved():

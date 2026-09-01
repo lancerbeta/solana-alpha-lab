@@ -33,7 +33,7 @@
     },
     "credential_env": {
       "type": "string",
-      "pattern": "^[A-Z][A-Z0-9_]{2,63}$"
+      "const": "JUPITER_FREE_API_KEY"
     },
     "producer_git_sha": {
       "type": "string",

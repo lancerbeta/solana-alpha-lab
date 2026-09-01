@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Mapping, Sequence
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -1392,6 +1392,8 @@ def status_schedule(
     *,
     schedule_sha256: str | None,
     activation_id: str | None,
+    now: datetime | None = None,
+    deploy_git_sha: str | None = None,
 ) -> dict[str, Any]:
     activations = store.list_activations()
     if schedule_sha256 and activation_id:
@@ -1399,6 +1401,16 @@ def status_schedule(
         if row is None:
             raise ObservationLifecycleError("ACTIVATION_MISSING")
         activations = [row]
+    from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
+
+    clock = now or datetime.now(UTC)
+    collector = build_collector_read_model(
+        store,
+        now=clock,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        deploy_git_sha=deploy_git_sha,
+    )
     return {
         "terminal": "STATUS",
         "activations": [
@@ -1411,6 +1423,7 @@ def status_schedule(
         ],
         "due_counts": store.due_counts(),
         "restore_marker_unresolved": store.restore_marker_unresolved(),
+        "collector": collector,
     }
 
 

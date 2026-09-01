@@ -2248,6 +2248,16 @@
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
+    },
+    {
       "source_asset_id": "CTRL-BATON-SETUP-001",
       "relation": "superseded_by",
       "target_asset_id": "CTRL-DELIVERY-HARNESS-001"
@@ -9263,6 +9273,26 @@
       "target_asset_id": "CTRL-KCDN-ATOM-A-001"
     },
     {
+      "source_asset_id": "MODULE-COLLECTOR-CAMPAIGN-PREFLIGHT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-SCHEDULABILITY-ORACLE-001"
+    },
+    {
+      "source_asset_id": "MODULE-COLLECTOR-CAMPAIGN-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001"
+    },
+    {
+      "source_asset_id": "MODULE-COLLECTOR-READ-MODEL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001"
+    },
+    {
+      "source_asset_id": "MODULE-COLLECTOR-SCHEDULABILITY-ORACLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001"
+    },
+    {
       "source_asset_id": "MODULE-DELIVERY-TRACKED-HASH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-CLOCK-QUALIFY-001"
@@ -12683,6 +12713,16 @@
       "target_asset_id": "MODULE-BUY-DT-QUOTE-MS-ASSOCIATION-001"
     },
     {
+      "source_asset_id": "SCRIPT-COLLECTOR-CAMPAIGN-PREFLIGHT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-CAMPAIGN-PREFLIGHT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-COLLECTOR-CAMPAIGN-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001"
+    },
+    {
       "source_asset_id": "SCRIPT-DELIVERY-HARNESS-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-DELIVERY-HARNESS-001"
@@ -13716,6 +13756,16 @@
       "source_asset_id": "TEST-CATALOG-SEARCH-001",
       "relation": "validated_by",
       "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "TEST-COLLECTOR-READINESS-BRIDGE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-SCHEDULABILITY-ORACLE-001"
+    },
+    {
+      "source_asset_id": "TEST-COLLECTOR-READINESS-BRIDGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001"
     },
     {
       "source_asset_id": "TEST-DELIVERY-HARNESS-001",

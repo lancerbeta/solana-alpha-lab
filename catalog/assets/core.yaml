@@ -32920,7 +32920,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/observation_schedule_runtime_v1.schema.json', repository_path: catalog/schemas/observation_schedule_runtime_v1.schema.json}
-  integrity: {kind: sha256, sha256: 084d8f926132c6adb4961e6c7b75b2eb15095ed799a8a44ebf4c7ee3740c849e}
+  integrity: {kind: sha256, sha256: 94eb39db04d2c472f4886ec5e5056ded4c945ed9ef3bd21c96642bf71bff6021}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33016,13 +33016,13 @@ records:
 - asset_id: MODULE-OBSERVATION-SCHEDULE-RUNTIME-001
   record_version: '1.0'
   asset_type: script
-  purpose: Credential-free runtime loader, fake provider opener and ExecStart parser.
+  purpose: Credential-free runtime loader with sanctioned JUPITER_FREE_API_KEY contract, fake provider opener and ExecStart parser.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_runtime.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_runtime.py}
-  integrity: {kind: sha256, sha256: 1692763d4cf3be5d2c51f3652a94b857728c78d5409866875296f09d2a260dff}
+  integrity: {kind: sha256, sha256: 2373da5ae30490f264e95102b5ac33bb90efeaa103e6a4294402ea6c78274fba}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33039,7 +33039,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: d86262aed0cea36521c24b1b8b04d7c9dd7e008d2cf01e94417997017c433cf3}
+  integrity: {kind: sha256, sha256: 8ef91a7f714d11bd0f11b02942f56f5ddb37ad35651f2649e3e8e2a77e5e293c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33091,7 +33091,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: 3173f4cda56cfd0e48afdbb80ece523e7011345ecc40e45f774d128c80e3edcb}
+  integrity: {kind: sha256, sha256: 84f1c960f345a370c837b4ddb86a440127d94fcfb6a54b45f5a7a000ed1f0626}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -33414,13 +33414,13 @@ records:
 - asset_id: MODULE-OBSERVATION-SCHEDULER-001
   record_version: '1.0'
   asset_type: script
-  purpose: Crash-safe ObservationSchedule tick including Tokens V2 typed projection and dual-notional quote-surface glue.
+  purpose: Crash-safe ObservationSchedule tick with source-poll fairness, HTTP-class ledger persistence, Tokens V2 typed projection and dual-notional quote-surface glue.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_scheduler.py', repository_path: src/solana_alpha_lab/factory/observation_scheduler.py}
-  integrity: {kind: sha256, sha256: b9650a9dd3dc46d9aaa531ccd438dbb3573b191281eb7d01e3cb6f982d96e235}
+  integrity: {kind: sha256, sha256: d177930ffa065e177bc591d343e9ec4411231627add6779461e5df9ac4aa96b1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33757,4 +33757,110 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [PATHRISK, SUCCESSOR, IDENTITY, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact A2 task contract for ObservationSchedule always-on collector readiness under Free-tier envelope.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1.md', repository_path: docs/tasks/ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1.md}
+  integrity: {kind: sha256, sha256: c5cc9c513c3d029275edc2c4dd53eab4fac23acf47acd1da8aaa80c2228f4571}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [COLLECTOR_READINESS, ALWAYS_ON, FAIRNESS, SCHEDULABILITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-COLLECTOR-SCHEDULABILITY-ORACLE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic zero-network Free-tier capacity and schedulability oracle for ObservationSchedule campaigns.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_schedulability_oracle.py', repository_path: src/solana_alpha_lab/factory/collector_schedulability_oracle.py}
+  integrity: {kind: sha256, sha256: ee099280d3579a0f9a3651e34857bb8d48abee47e919ecffc76aa6c26cd72c9f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
+  consumers: [FACTORY-001, MODULE-COLLECTOR-CAMPAIGN-PREFLIGHT-001]
+  evidence: []
+  search_terms: [SCHEDULABILITY, FREE_TIER, ORACLE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-COLLECTOR-CAMPAIGN-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network 21d campaign schedule proposal and PROPOSED_NOT_AUTHORITY packet builder.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_campaign_preflight.py', repository_path: src/solana_alpha_lab/factory/collector_campaign_preflight.py}
+  integrity: {kind: sha256, sha256: 959948fb712d5161d47bc18cf46f8aa419846343369649b9858fe97e84a940df}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-SCHEDULABILITY-ORACLE-001}
+  consumers: [FACTORY-001, SCRIPT-COLLECTOR-CAMPAIGN-PREFLIGHT-001]
+  evidence: []
+  search_terms: [CAMPAIGN_PREFLIGHT, AUTHORITY_PACKET]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-COLLECTOR-READ-MODEL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Collector health read model derived from ObservationSchedule store for doctor/status.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_read_model.py', repository_path: src/solana_alpha_lab/factory/collector_read_model.py}
+  integrity: {kind: sha256, sha256: e90ff0968c65f188e64ee4d4469abb98b8990ccc9a193b3d4014f3348ce499a0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
+  consumers: [FACTORY-001, MODULE-OBSERVATION-SCHEDULE-LIFECYCLE-001]
+  evidence: []
+  search_terms: [COLLECTOR, READ_MODEL, DOCTOR, HTTP_CLASS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-COLLECTOR-CAMPAIGN-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI for zero-network collector campaign preflight without authorize/activate.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/collector_campaign_preflight.py', repository_path: scripts/collector_campaign_preflight.py}
+  integrity: {kind: sha256, sha256: b2cb6da6004880c55c35d6931eb565ad99fd140a319c3102c29baca6a4f44c06}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-CAMPAIGN-PREFLIGHT-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [CAMPAIGN_PREFLIGHT, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-COLLECTOR-READINESS-BRIDGE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical zero-network proofs for fairness, HTTP-class persistence, oracle, credential contract and campaign preflight.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-01'
+  truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_collector_readiness_bridge.py', repository_path: tests/test_collector_readiness_bridge.py}
+  integrity: {kind: sha256, sha256: b178292b0b77782fa40dd4618fac1bc8bce86e67c7a3f330886f784c0e1fb5b1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-SCHEDULABILITY-ORACLE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [COLLECTOR_READINESS, VERTICAL_PROOF, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

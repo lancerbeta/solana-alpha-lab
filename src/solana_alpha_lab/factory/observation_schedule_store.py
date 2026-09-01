@@ -1801,7 +1801,7 @@ class ObservationScheduleStore:
             rows = self._conn.execute(
                 """
                 SELECT request_sha256, call_occurrence_id, attempt_id,
-                       state, primitive_id, payload_json
+                       state, primitive_id, payload_json, created_at, updated_at
                 FROM call_ledger
                 WHERE primitive_id = ?
                 ORDER BY updated_at ASC
@@ -1812,7 +1812,7 @@ class ObservationScheduleStore:
             rows = self._conn.execute(
                 """
                 SELECT request_sha256, call_occurrence_id, attempt_id,
-                       state, primitive_id, payload_json
+                       state, primitive_id, payload_json, created_at, updated_at
                 FROM call_ledger
                 ORDER BY updated_at ASC
                 """

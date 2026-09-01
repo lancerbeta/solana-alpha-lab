@@ -344,6 +344,40 @@ def _result_completion(result: Mapping[str, Any], fallback: datetime) -> datetim
     return fallback.astimezone(UTC)
 
 
+def _transport_ledger_fields(result: Mapping[str, Any]) -> dict[str, Any]:
+    """Persist provider transport classification for crash recovery / health."""
+
+    return {
+        "http_status": result.get("http_status"),
+        "http_class": result.get("http_class"),
+        "status": result.get("status"),
+        "missing_reason": result.get("missing_reason"),
+        "request_started_at": result.get("request_started_at"),
+        "response_received_at": result.get("response_received_at"),
+        "first_reliable_available_at": result.get("first_reliable_available_at"),
+        "response_sha256": result.get("response_sha256"),
+    }
+
+
+def _recovered_result_from_ledger(ledger_payload: Mapping[str, Any]) -> dict[str, Any]:
+    """Rebuild typed transport fields from a completed call ledger payload."""
+
+    return {
+        "status": ledger_payload.get("status"),
+        "missing_reason": ledger_payload.get("missing_reason"),
+        "entities": ledger_payload.get("entities") or {},
+        "response_sha256": ledger_payload.get("response_sha256"),
+        "http_status": ledger_payload.get("http_status"),
+        "http_class": ledger_payload.get("http_class"),
+        "request_started_at": ledger_payload.get("request_started_at"),
+        "response_received_at": ledger_payload.get("response_received_at"),
+        "first_reliable_available_at": ledger_payload.get(
+            "first_reliable_available_at"
+        ),
+        "buy_out_amount": ledger_payload.get("buy_out_amount"),
+    }
+
+
 def _entity_terminal(
     result: Mapping[str, Any],
     entity_id: str,
@@ -903,14 +937,9 @@ def _discover(
         call_occurrence_id=occurrence,
         attempt_id=attempt_id,
         payload={
-            "status": result.get("status"),
-            "missing_reason": result.get("missing_reason"),
-            "response_sha256": result.get("response_sha256"),
+            **_transport_ledger_fields(result),
             "rows": result.get("body") if isinstance(result.get("body"), list) else [],
             "call_occurrence_id": occurrence,
-            "request_started_at": result.get("request_started_at"),
-            "response_received_at": result.get("response_received_at"),
-            "first_reliable_available_at": result.get("first_reliable_available_at"),
         },
         clock=completion,
     )
@@ -928,6 +957,10 @@ def _discover(
             "first_reliable_available_at": result.get(
                 "first_reliable_available_at"
             ),
+            "http_status": result.get("http_status"),
+            "http_class": result.get("http_class"),
+            "status": result.get("status"),
+            "missing_reason": result.get("missing_reason"),
         },
         clock=completion,
     )
@@ -1051,14 +1084,6 @@ def tick_once(
             now,
             credit_costs=credit_costs,
         )
-        due_work_waiting = any(
-            str(item["schedule_sha256"]) == digest
-            and str(item["activation_id"]) == activation_id
-            for item in store.due_in_states(
-                ("PENDING", "DUE", "CLAIMED"),
-                due_at_max=now,
-            )
-        )
         successor_before_cutover = any(
             str(item["successor_schedule_sha256"]) == digest
             and str(item["successor_activation_id"]) == activation_id
@@ -1093,12 +1118,13 @@ def tick_once(
             or (state == "DRAINING" and predecessor_before_cutover)
         )
         poll_enabled = bool(schedule.get("source_poll", {}).get("enabled", True))
+        # Fairness: continuous due load must not suppress /recent indefinitely.
+        # Attempt the current poll slot first (reuse is free); then claim due work.
         if (
             discovery_rows is None
             and poll_enabled
             and opener is not None
             and can_admit_before_cutover
-            and not due_work_waiting
             and not successor_before_cutover
         ):
             (
@@ -1230,15 +1256,7 @@ def tick_once(
                     store.call_payload(occurrence)
                     or {}
                 )
-                recovered_result = {
-                    "status": ledger_payload.get("status"),
-                    "missing_reason": ledger_payload.get("missing_reason"),
-                    "entities": ledger_payload.get("entities") or {},
-                    "response_sha256": ledger_payload.get("response_sha256"),
-                    "first_reliable_available_at": ledger_payload.get(
-                        "first_reliable_available_at"
-                    ),
-                }
+                recovered_result = _recovered_result_from_ledger(ledger_payload)
                 for claim in live:
                     previously = store.has_prior_observation(
                         schedule_sha256=digest,
@@ -1422,14 +1440,8 @@ def tick_once(
                 call_occurrence_id=occurrence,
                 attempt_id=attempt_id,
                 payload={
-                    "response_sha256": result.get("response_sha256"),
-                    "status": result.get("status"),
+                    **_transport_ledger_fields(result),
                     "entities": entity_payload,
-                    "request_started_at": result.get("request_started_at"),
-                    "response_received_at": result.get("response_received_at"),
-                    "first_reliable_available_at": result.get(
-                        "first_reliable_available_at"
-                    ),
                     "buy_out_amount": None,
                 },
                 clock=completion,
@@ -1607,17 +1619,14 @@ def tick_once(
                 continue
             if prior == "COMPLETED":
                 ledger_payload = store.call_payload(occurrence) or {}
+                recovered_result = _recovered_result_from_ledger(ledger_payload)
                 previously = store.has_prior_observation(
                     schedule_sha256=digest,
                     activation_id=activation_id,
                     entity_id=str(claim["entity_id"]),
                 )
                 recovered_state, recovered_reason = _entity_terminal(
-                    {
-                        "status": ledger_payload.get("status"),
-                        "missing_reason": ledger_payload.get("missing_reason"),
-                        "entities": ledger_payload.get("entities") or {},
-                    },
+                    recovered_result,
                     str(claim["entity_id"]),
                     previously_observed=previously,
                 )
@@ -1807,15 +1816,9 @@ def tick_once(
                 call_occurrence_id=occurrence,
                 attempt_id=attempt_id,
                 payload={
-                    "response_sha256": result.get("response_sha256"),
-                    "status": result.get("status"),
+                    **_transport_ledger_fields(result),
                     "buy_out_amount": buy_out,
                     "entities": entity_map,
-                    "request_started_at": result.get("request_started_at"),
-                    "response_received_at": result.get("response_received_at"),
-                    "first_reliable_available_at": result.get(
-                        "first_reliable_available_at"
-                    ),
                 },
                 clock=completion,
             )
