@@ -12,14 +12,14 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/delivery-harness/SKILL.md": "cbc5f269a566699469b6f36c475e29a3f3471e9a5fa7549527daac026a2b1d74",
-    "catalog/assets/core.yaml": "71c4062275632ea93d6266401f42734ba250e824094e43ac3069cfffbc29292f",
+    "catalog/assets/core.yaml": "b207a7dc4d113638d0c41bc4d1074e3940b0539234b099106990a5a7909d39b3",
     "catalog/assets/lifecycle.yaml": "d169fa8fd77d4969148a702a92f8323cc952499d19665fafc5873ea0a037ffb0",
     "catalog/catalog_manifest.yaml": "0ad2e8e1e1e4760c512f5a4fb5a99c6f10fe5ad06af9430d25eb4f5bce205266",
     "catalog/generated/asset_edges.json": "9a330d1376edb1a7c00ea549c43b2ee3eb49d447125d3bdec624c595d7fe8458",
     "configs/observation_primitive_registry_v1.yaml": "1817b4fae2e4466d32de28821f62085f73f71a26e1b180c467a19a3e0e824b64",
     "delivery-harness/templates/portable-bundle-manifest.json": "5993e1021ec04d1e7703eb51ae753a4a9a3e31a327142e278e182ece7eb0f16e",
     "docs/PROJECT_MAP.md": "9687e976126c3aa8cd58236e233c2836c28bcfde326790f6e4fb6fde00e69a3c",
-    "docs/evidence/control/a1_merge_readiness_before_owner_phrase_completion_v1.json": "f155e8d38b77784954fc9c99155963fca862b1279fac5f33abdf4a8145497fb5",
+    "docs/evidence/control/a1_merge_readiness_before_owner_phrase_completion_v1.json": "892669e373fed85498f5fa0871ddc6cd29654b7a6578e9c59914218b3a7afb37",
     "docs/evidence/control/delivery_harness_acceptance_v1.json": "14ea5bd20d27e761328aad508f9b34e8d3172ff25904c4fee8782bb2b4c69acd",
     "docs/reports/discovery_evidence_release_bridge/a1_owner_readout_v1.md": "0f587f51199e84b3634f768608190f9f8e5b31e3a9b02eeaa9e689653709f32f",
     "docs/tasks/DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1.md": "8fa1107f9d57f6823368ec13a6d0e059d76be7a843f9bee7872c32edeb8b70df",
@@ -29,7 +29,7 @@
     "src/solana_alpha_lab/factory/discovery_evidence_release.py": "c11128e4a1670631b70ce1ff5a07ee5d6edc1a17881050c047c295dcd14f5a04",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "d246362a1842a3e4d4ac074875f70dc1763c9e5ea503964b00e0a2d2ff2ee952",
     "src/solana_alpha_lab/factory/observation_panel_publisher.py": "23e00ffaefccbb6e3813930fe8bf2d358be2cb038e38d8561c54f1f7608f6d4e",
-    "src/solana_alpha_lab/factory/observation_scheduler.py": "55f7cf956cde0d3b5931b20db6c934fbb723e701839c09a08b2127a540438ad6",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "b9650a9dd3dc46d9aaa531ccd438dbb3573b191281eb7d01e3cb6f982d96e235",
     "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py": "716ebf7a936e4dbf4604a03d38b236eee71420db300c1ce710882670f7207d91",
     "tests/test_delivery_harness_merge_guard.py": "14485bc331ca462de2fb3807d66f9a43f52ad68b3801d114345544a3d7063b0b",
     "tests/test_discovery_evidence_release_bridge.py": "75fab71cf4fc7120c01376372a80e135054db589ca3334e5882b212cf3339eda",
@@ -46,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_factory_fit_v1.json",
-    "sha256": "278fdb07f808c13e43f7eccc9fe929d1f8da4b9f9d98fd5b2e7d6f013941e473",
+    "sha256": "5287c0eddc7140bd9cb3e9111112fbf4c23962f2dc7db92f73ec9c78792958c3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DISCOVERY_EVIDENCE_RELEASE_BRIDGE_AND_SCHEDULER_REGRESSION",
     "independent_review": {
       "path": "docs/evidence/discovery_evidence_release_bridge/a1_delivery_independent_review_v1.json",
-      "sha256": "275bb31ca66653cb646e39c1cfe51a304f6590d0a05eb1e9cef9ce25a6855bed",
+      "sha256": "1c3f19aede7d3e067be7341357ee7a73bdb9bcbee973add1ba5f71501b2f3f5b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
