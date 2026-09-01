@@ -56,6 +56,7 @@ FIELD_TO_FAMILY: dict[str, str] = {
     "FIELD-HOLDER-COUNT-001": FEATURE_FAMILY_HOLDER_STATE,
     "FIELD-FIRST-POOL-CREATED-AT-001": FEATURE_FAMILY_LIFECYCLE_TIMING,
     "FIELD-FIRST-POOL-SOURCE-001": FEATURE_FAMILY_LIFECYCLE_TIMING,
+    "FIELD-LAUNCHPAD-001": FEATURE_FAMILY_LIFECYCLE_TIMING,
     "FIELD-TOKEN-MINT-001": FEATURE_FAMILY_LIFECYCLE_TIMING,
     "FIELD-FIRST-SEEN-AT-001": FEATURE_FAMILY_LIFECYCLE_TIMING,
 }
@@ -65,6 +66,7 @@ TOKENS_V2_FIELD_KINDS: dict[str, str] = {
     "FIELD-TOKEN-MINT-001": "TOKEN_MINT",
     "FIELD-FIRST-POOL-CREATED-AT-001": "TIMESTAMP",
     "FIELD-FIRST-POOL-SOURCE-001": "TEXT",
+    "FIELD-LAUNCHPAD-001": "TEXT",
     "FIELD-FIRST-SEEN-AT-001": "TIMESTAMP",
     "FIELD-USD-PRICE-001": "DECIMAL",
     "FIELD-LIQUIDITY-USD-001": "DECIMAL",
@@ -154,6 +156,8 @@ def project_tokens_v2_field(
         raw = first_pool.get("createdAt")
     elif field_id == "FIELD-FIRST-POOL-SOURCE-001":
         raw = _first_non_none(first_pool.get("source"), row.get("source"))
+    elif field_id == "FIELD-LAUNCHPAD-001":
+        raw = row.get("launchpad")
     elif field_id == "FIELD-FIRST-SEEN-AT-001":
         raw = row.get("first_seen_at")
     elif field_id == "FIELD-USD-PRICE-001":
@@ -288,6 +292,7 @@ def sanitize_tokens_v2_source_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "r0TakerVolumeMix": row.get("r0TakerVolumeMix"),
         "r0_taker_volume_mix": row.get("r0_taker_volume_mix"),
         "source": row.get("source"),
+        "launchpad": row.get("launchpad"),
     }
     if isinstance(first_pool, Mapping):
         sanitized["firstPool"] = {

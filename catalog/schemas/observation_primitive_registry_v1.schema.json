@@ -67,9 +67,9 @@
           "parameters": {
             "type": "object",
             "additionalProperties": false,
-            "required": ["source_eq"],
+            "required": ["launchpad_eq"],
             "properties": {
-              "source_eq": {"type": "string", "minLength": 1, "maxLength": 64}
+              "launchpad_eq": {"type": "string", "minLength": 1, "maxLength": 64}
             }
           }
         }

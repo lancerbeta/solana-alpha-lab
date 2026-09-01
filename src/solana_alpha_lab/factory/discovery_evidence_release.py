@@ -224,6 +224,7 @@ def _build_tables(
         "FIELD-TOKEN-MINT-001",
         "FIELD-FIRST-POOL-CREATED-AT-001",
         "FIELD-FIRST-POOL-SOURCE-001",
+        "FIELD-LAUNCHPAD-001",
         "FIELD-FIRST-SEEN-AT-001",
     }
     mints_with_signal: set[str] = set()

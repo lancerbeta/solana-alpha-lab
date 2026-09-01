@@ -1,0 +1,21 @@
+{
+  "schema": "smial.factory-launchpad-population-pause-evidence",
+  "schema_version": "1.0",
+  "observed_at": "2026-09-01T20:45:00Z",
+  "broken_schedule_sha256": "490c21b69a1f8f8f878eb9d909f3fce62e3ffa9891c73d2e85ade9790949f7d8",
+  "activation_id": "ACT-490C21B69A1F8F8F",
+  "pause_terminal": "PAUSED",
+  "activation_state_after_pause": "PAUSED_OPERATOR",
+  "ACTIVE_COUNT_after_pause": 0,
+  "provider_calls_lifetime_at_pause": 34,
+  "provider_calls_lifetime_after_3_timer_cycles": 34,
+  "recent_ledger_rows_after_3_timer_cycles": 34,
+  "timer_state": "enabled/active",
+  "durability": {
+    "offhost_backup_state": "CURRENT",
+    "durability_domain": "OFF_HOST_INDEPENDENT"
+  },
+  "root_cause": "POPULATION_PREDICATE_SCHEMA_MISMATCH_CONFIRMED",
+  "must_not_resume": true,
+  "replacement_requires_new_schedule_identity": true
+}

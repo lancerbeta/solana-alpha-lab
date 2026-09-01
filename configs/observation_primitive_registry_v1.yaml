@@ -15,6 +15,10 @@ fields:
     availability_class: SOURCE
     value_kind: TEXT
     parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
+  - field_id: FIELD-LAUNCHPAD-001
+    availability_class: SOURCE
+    value_kind: TEXT
+    parser_asset_id: MODULE-OBSERVATION-PRIMITIVES-001
   - field_id: FIELD-FIRST-SEEN-AT-001
     availability_class: DISCOVERY
     value_kind: TIMESTAMP
@@ -115,7 +119,7 @@ query_profiles:
   - query_profile_id: QUERY-JUPITER-PUMPFUN-RECENT-001
     primitive_id: PRIM-JUPITER-TOKENS-V2-RECENT-001
     parameters:
-      source_eq: pump.fun
+      launchpad_eq: pump.fun
 bundles:
   - bundle_id: BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001
     primitive_id: PRIM-JUPITER-TOKENS-V2-SEARCH-001
@@ -135,6 +139,7 @@ bundles:
       - FIELD-R0-TAKER-VOLUME-MIX-001
       - FIELD-FIRST-POOL-CREATED-AT-001
       - FIELD-FIRST-POOL-SOURCE-001
+      - FIELD-LAUNCHPAD-001
   - bundle_id: BUNDLE-JUPITER-QUOTE-BUY-001
     primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001
     field_ids:
@@ -206,6 +211,7 @@ primitives:
       - FIELD-FIRST-SEEN-AT-001
       - FIELD-FIRST-POOL-CREATED-AT-001
       - FIELD-FIRST-POOL-SOURCE-001
+      - FIELD-LAUNCHPAD-001
     pit_support: true
     authoritative_clock_field_ids:
       - FIELD-FIRST-POOL-CREATED-AT-001
@@ -257,6 +263,7 @@ primitives:
       - FIELD-R0-TAKER-VOLUME-MIX-001
       - FIELD-FIRST-POOL-CREATED-AT-001
       - FIELD-FIRST-POOL-SOURCE-001
+      - FIELD-LAUNCHPAD-001
     pit_support: true
     authoritative_clock_field_ids:
       - FIELD-FIRST-POOL-CREATED-AT-001

@@ -82,6 +82,19 @@ class TokensV2TypedProjectionTests(unittest.TestCase):
         self.assertEqual(state, STATE_EXCLUDED)
         self.assertEqual(reason, "TAKER_VOLUME_NOT_INFERRED_FROM_BUY_SELL")
 
+    def test_launchpad_field_observed_from_provider_row(self) -> None:
+        value, state, missing = project_tokens_v2_field(
+            {
+                "id": "MintE",
+                "launchpad": "pump.fun",
+                "firstPool": {"createdAt": "2026-08-24T00:00:00Z"},
+            },
+            "FIELD-LAUNCHPAD-001",
+        )
+        self.assertEqual(state, STATE_OBSERVED)
+        self.assertEqual(value, "pump.fun")
+        self.assertIsNone(missing)
+
     def test_feature_families_include_missingness(self) -> None:
         typed = project_tokens_v2_row(
             {

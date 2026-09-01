@@ -83,7 +83,7 @@ def build_campaign_schedule_document(
             "scheduling_fallback": "FIRST_SEEN_AT_ONLY",
             "source_predicates": [
                 {
-                    "field_id": "FIELD-FIRST-POOL-SOURCE-001",
+                    "field_id": "FIELD-LAUNCHPAD-001",
                     "operator": "EQ",
                     "value_text": "pump.fun",
                 }
