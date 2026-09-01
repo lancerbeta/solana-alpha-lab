@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-01",
+  "task_id": "OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "1594b1fae52e2c64e3b77979d5acad9811ff70746e9a9ea7548ebefa72d8a73f",
+  "reviewed_inventory_sha256": "493ffb947194b818696f0266d0906429d2e95edaa51388c190b76092d4ee0812",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "DAILY_COLLECTOR_OWNER_PULSE_AFTER_LIVE_COMMISSIONING"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_TREE_ATTESTATION_FROM_PIN",
+    "PIN_STALE_PROVENANCE_RESIDUAL",
+    "NO_DAILY_PULSE_IMPLEMENTATION"
+  ],
+  "recovery": "REVERT"
+}

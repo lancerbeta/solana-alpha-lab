@@ -1,0 +1,76 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-COMPLETION-001",
+  "as_of": "2026-09-01",
+  "task_id": "OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1",
+  "state_change": "OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_READY_FOR_MERGE_GATE",
+  "base_main": "96f32177e9f01b7865647923f5da9a36b3a5bfe1",
+  "owner_approvals": [
+    "OK OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".cursor/rules/50-factory-remote-host.mdc": "01e670208138bc59b4d89c1f97bcb5080ebc786d26744ed1e15e11fef9b8a85b",
+    "catalog/assets/core.yaml": "29a1c093b56020bbf745c8fbe10c3e25b44eb2db150e8b2cfbf9db9316761af6",
+    "catalog/assets/lifecycle.yaml": "c81a7d00641dbc33cf1d06a8c5a4cd234cd2408e1525d224699a477e2abc331f",
+    "catalog/catalog_manifest.yaml": "efdc5cd2cac3911319e4551a401b73f30c0e100f72b523dfb3bbc292a7c84e29",
+    "catalog/generated/asset_edges.json": "dc7d4a3d315137fdc7697da25284e6faa3bd916766601e780db5e13836c7e780",
+    "docs/PROJECT_MAP.md": "7214b17dd8f74032ce2457dc939ca10bf43507e597027e650dbc6e809e183a57",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "98db6e413f6167581ea4be4ed0e0996382634395785b41cc6721953ccc1f5528",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "edcacde00a83b40936c67669a4b1ee6588c419a2860e4827cdc10e850cf05fd2",
+    "docs/reports/observation_runtime_deploy_sha_repair/a1_owner_readout_v1.md": "2c1994504a9260bed21268d387c027523a028e0be3a22af9d28b04fc2e6cdf6f",
+    "docs/tasks/OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_V1.md": "e85ad456ddcc62d20ec2867bf6f0f169c91bc3996310ef10a5b262d5d36f4b60",
+    "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "ab76357599f7d9ab1b817682b4fafd0943ead86672c0a0f40a5adc11ec42136d",
+    "tests/test_observation_runtime_deploy_sha_repair.py": "675cf0baeceb505b49a39a0afd8001dda563ead92eb91678ad4e8ade5b84897c"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/observation_runtime_deploy_sha_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "e8556c5356d367aef4af26b95a24f251eeff84af150185ad4710d6a3802402de",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OBSERVATION_RUNTIME_DEPLOY_SHA_REPAIR_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/observation_runtime_deploy_sha_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "7c66f602f52735f987dac63112cfa8b552b5f84d4b2e80541216973791d0cc5a",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PRODUCER_SHA_PRECEDENCE",
+      "PASS_VERTICAL_NO_GIT_DEPLOY_TICK",
+      "PASS_CATALOG_VALIDATION",
+      "PASS_COLLECTOR_OPERATOR_RUNBOOK"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_CAMPAIGN_ACTIVATE",
+    "NO_DAILY_PULSE_IMPLEMENTATION",
+    "NO_TREE_ATTESTATION_FROM_PIN",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}
