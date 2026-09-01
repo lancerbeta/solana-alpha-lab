@@ -14,10 +14,10 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_V1.md": "0000000000000000000000000000000000000000000000000000000000000000",
-    "scripts/collector_owner_pulse.py": "0000000000000000000000000000000000000000000000000000000000000000",
-    "tests/test_collector_owner_pulse_cli_git_sha_repair.py": "0000000000000000000000000000000000000000000000000000000000000000",
-    "docs/reports/collector_owner_pulse_cli_git_sha_repair/a1_owner_readout_v1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "docs/reports/collector_owner_pulse_cli_git_sha_repair/a1_owner_readout_v1.md": "9e7c8c6de132a4b5bb8ee1583faa0ba38c6fcba624c3968f738fbc3868be256c",
+    "docs/tasks/COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_V1.md": "0aac0753d455dfdfb6c167398dd0bc7c065ae0d8ebbf2db542af405129e519f2",
+    "scripts/collector_owner_pulse.py": "0d0dc6e1275430a3b2c229ba464ca20de5160eb5ef9b39941f1d7efbe7b57870",
+    "tests/test_collector_owner_pulse_cli_git_sha_repair.py": "e532b9ab8ad093a78d15ad2577e9cdc2496a0eac3927d8c877d85ff6a11f6c50"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -29,14 +29,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_owner_pulse_cli_git_sha_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "71d0320cc84f12c0e177c6c986060a97dcc2257f05080bcd899e01e4fecec438",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/collector_owner_pulse_cli_git_sha_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "3b84f737c49edf312025888a456d017c0ef8e48f02dc284cc3680bde0743e326",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
