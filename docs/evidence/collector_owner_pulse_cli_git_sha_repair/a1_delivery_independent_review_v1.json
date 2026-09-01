@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-OWNER-PULSE-CLI-GIT-SHA-REPAIR-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-01",
+  "task_id": "COLLECTOR_OWNER_PULSE_CLI_GIT_SHA_REPAIR_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CLI_BINDS_GIT_SHA_ROOT_CONFIGURED",
+        "NO_GIT_SHA_API_CHANGE",
+        "NO_SECOND_PRODUCER_SHA_RESOLVER",
+        "SUBPROCESS_CLI_SURFACE_A_B_C",
+        "CONFIGURED_PRODUCER_SHA_FALSIFIER",
+        "ZERO_NETWORK_ZERO_CREDENTIAL_DRY_RUN"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ORIGINAL_TYPEERROR_FALSIFIER_CLEARED",
+        "DECISION_DELTA_CONFIGURED_LEG_COVERED",
+        "NO_DEPLOY_IN_ATOM",
+        "STOP_AT_MERGE_GATE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "IDENTITY_NOT_AUTHORITY",
+        "PRECEDENCE_UNCHANGED",
+        "DRY_RUN_CANNOT_EMIT_TELEGRAM",
+        "JUPITER_UNREAD_ON_DRY_RUN",
+        "NO_SCIENTIFIC_RUNTIME_SEMANTICS_CHANGE"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_AUTHORITY",
+    "NO_ALPHA"
+  ]
+}
