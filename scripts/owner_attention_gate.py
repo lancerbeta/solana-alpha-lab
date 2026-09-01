@@ -68,6 +68,193 @@ def review_records_single_agent_fallback(review: dict[str, Any]) -> bool:
             if isinstance(finding, str) and SINGLE_AGENT_REVIEW_FALLBACK in finding:
                 return True
     return False
+
+
+EXPECTED_FACTORY_FIT_KEYS = frozenset(
+    {
+        "schema",
+        "schema_version",
+        "review_id",
+        "as_of",
+        "task_id",
+        "reviewed_bindings_sha256",
+        "reviewed_inventory_sha256",
+        "mode",
+        "verdict",
+        "dimensions",
+        "capability_radar",
+        "recovery",
+        "limits",
+    }
+)
+EXPECTED_FACTORY_FIT_DIMENSIONS = frozenset(
+    {
+        "mission",
+        "flexibility_and_history",
+        "context_efficiency",
+        "research_truth",
+        "owner_operability",
+        "execution_to_cashflow",
+        "monitoring_and_recovery",
+        "build_vs_buy",
+        "security",
+        "red_team",
+    }
+)
+ALLOWED_FACTORY_FIT_MODES = frozenset({"FAST_PATH", "FULL_REVIEW"})
+INDEPENDENT_REVIEW_KEYS = frozenset(
+    {
+        "schema",
+        "schema_version",
+        "review_id",
+        "as_of",
+        "task_id",
+        "reviewed_bindings_sha256",
+        "reviewed_inventory_sha256",
+        "required_roles",
+        "reviews",
+        "verdict",
+        "non_claims",
+    }
+)
+
+
+def delivery_independent_review_shape_problems(
+    review: dict[str, Any],
+    *,
+    task_id: str | None = None,
+) -> list[str]:
+    """Structural checks shared by merge-readiness and bind-evidence."""
+
+    problems: list[str] = []
+    if set(review) != INDEPENDENT_REVIEW_KEYS:
+        extra = sorted(set(review) - INDEPENDENT_REVIEW_KEYS)
+        missing = sorted(INDEPENDENT_REVIEW_KEYS - set(review))
+        if extra:
+            problems.append("review_unexpected_keys:" + ",".join(extra))
+        if missing:
+            problems.append("review_missing_keys:" + ",".join(missing))
+        return problems
+    if review.get("schema") != "smial.delivery-independent-review-evidence":
+        problems.append("review_schema_invalid")
+    if review.get("schema_version") != "1.0":
+        problems.append("review_schema_version_invalid")
+    if task_id is not None and review.get("task_id") != task_id:
+        problems.append("review_task_id_mismatch")
+    if review.get("verdict") != "PASS":
+        problems.append("review_verdict_not_pass")
+    if not isinstance(review.get("review_id"), str) or not review["review_id"]:
+        problems.append("review_id_invalid")
+    if not isinstance(review.get("as_of"), str) or re.fullmatch(
+        r"20[0-9]{2}-[0-9]{2}-[0-9]{2}", review["as_of"]
+    ) is None:
+        problems.append("review_as_of_invalid")
+    required_roles = review.get("required_roles")
+    if not isinstance(required_roles, list) or not all(
+        isinstance(item, str) for item in required_roles
+    ):
+        problems.append("review_required_roles_invalid")
+    elif set(required_roles) != REQUIRED_REVIEW_ROLES or len(required_roles) != len(
+        REQUIRED_REVIEW_ROLES
+    ):
+        problems.append("review_required_roles_incomplete")
+    non_claims = review.get("non_claims")
+    if not isinstance(non_claims, list) or not all(
+        isinstance(item, str) and bool(item) for item in non_claims
+    ):
+        problems.append("review_non_claims_invalid")
+    elif len(set(non_claims)) != len(non_claims):
+        problems.append("review_non_claims_duplicate")
+    elif "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY" not in non_claims:
+        problems.append("review_non_claims_missing_identity")
+    reviews = review.get("reviews")
+    if not isinstance(reviews, list):
+        problems.append("review_entries_invalid")
+        return problems
+    reviews_by_role: dict[str, list[dict[str, Any]]] = {}
+    for item in reviews:
+        if not isinstance(item, dict) or set(item) != {"role", "verdict", "findings"}:
+            problems.append("review_entry_shape_invalid")
+            continue
+        if not (
+            isinstance(item.get("role"), str)
+            and item.get("verdict") in {"PASS", "NOT_READY"}
+            and isinstance(item.get("findings"), list)
+            and all(isinstance(finding, str) and bool(finding) for finding in item["findings"])
+        ):
+            problems.append("review_entry_fields_invalid")
+            continue
+        reviews_by_role.setdefault(item["role"], []).append(item)
+    if set(reviews_by_role) != REQUIRED_REVIEW_ROLES:
+        problems.append("review_roles_incomplete")
+    elif len(reviews) != len(REQUIRED_REVIEW_ROLES):
+        problems.append("review_role_count_invalid")
+    elif any(
+        len(reviews_by_role[role]) != 1 or reviews_by_role[role][0]["verdict"] != "PASS"
+        for role in REQUIRED_REVIEW_ROLES
+    ):
+        problems.append("review_role_verdict_not_pass")
+    if review_records_single_agent_fallback(review):
+        problems.append("review_single_agent_fallback")
+    return problems
+
+
+def delivery_factory_fit_shape_problems(
+    fit: dict[str, Any],
+    *,
+    task_id: str | None = None,
+) -> list[str]:
+    """Structural checks shared by merge-readiness and bind-evidence."""
+
+    problems: list[str] = []
+    if set(fit) != EXPECTED_FACTORY_FIT_KEYS:
+        extra = sorted(set(fit) - EXPECTED_FACTORY_FIT_KEYS)
+        missing = sorted(EXPECTED_FACTORY_FIT_KEYS - set(fit))
+        if extra:
+            problems.append("factory_fit_unexpected_keys:" + ",".join(extra))
+        if missing:
+            problems.append("factory_fit_missing_keys:" + ",".join(missing))
+        return problems
+    if fit.get("schema") != "smial.delivery-harness-factory-fit":
+        problems.append("factory_fit_schema_invalid")
+    if fit.get("schema_version") != "1.0":
+        problems.append("factory_fit_schema_version_invalid")
+    if task_id is not None and fit.get("task_id") != task_id:
+        problems.append("factory_fit_task_id_mismatch")
+    if fit.get("mode") not in ALLOWED_FACTORY_FIT_MODES:
+        problems.append("factory_fit_mode_invalid")
+    if fit.get("verdict") != "PASS":
+        problems.append("factory_fit_verdict_not_pass")
+    if not isinstance(fit.get("review_id"), str) or not fit["review_id"]:
+        problems.append("factory_fit_review_id_invalid")
+    if not isinstance(fit.get("as_of"), str) or re.fullmatch(
+        r"20[0-9]{2}-[0-9]{2}-[0-9]{2}", fit["as_of"]
+    ) is None:
+        problems.append("factory_fit_as_of_invalid")
+    dimensions = fit.get("dimensions")
+    if not isinstance(dimensions, dict) or set(dimensions) != EXPECTED_FACTORY_FIT_DIMENSIONS:
+        problems.append("factory_fit_dimensions_invalid")
+    elif not all(isinstance(value, str) and bool(value) for value in dimensions.values()):
+        problems.append("factory_fit_dimension_values_invalid")
+    capability_radar = fit.get("capability_radar")
+    if not isinstance(capability_radar, dict) or set(capability_radar) != {"now", "watch"}:
+        problems.append("factory_fit_capability_radar_invalid")
+    elif not all(
+        isinstance(value, str) and bool(value) for value in capability_radar.values()
+    ):
+        problems.append("factory_fit_capability_radar_values_invalid")
+    if not isinstance(fit.get("recovery"), str) or not fit["recovery"]:
+        problems.append("factory_fit_recovery_invalid")
+    limits = fit.get("limits")
+    if not isinstance(limits, list) or not all(
+        isinstance(item, str) and bool(item) for item in limits
+    ):
+        problems.append("factory_fit_limits_invalid")
+    elif len(set(limits)) != len(limits):
+        problems.append("factory_fit_limits_duplicate")
+    return problems
+
+
 CONTROL_RUNTIME_PATHS = (
     "scripts/owner_attention_gate.py",
     "scripts/delivery_harness.py",
@@ -1150,61 +1337,12 @@ def bound_delivery_evidence(
             )
         except ValueError:
             continue
-        if set(review) != {
-            "schema", "schema_version", "review_id", "as_of", "task_id",
-            "reviewed_bindings_sha256", "reviewed_inventory_sha256",
-            "required_roles", "reviews",
-            "verdict", "non_claims",
-        } or not (
-            review.get("schema") == "smial.delivery-independent-review-evidence"
-            and review.get("schema_version") == "1.0"
-            and review.get("task_id") == task.get("task_id")
-            and review.get("verdict") == "PASS"
-            and review.get("reviewed_bindings_sha256")
+        if delivery_independent_review_shape_problems(
+            review, task_id=task.get("task_id")
+        ) or not (
+            review.get("reviewed_bindings_sha256")
             == sha256_bytes(canonical_json_bytes(bindings))
             and review.get("reviewed_inventory_sha256") == inventory_sha
-            and isinstance(review.get("review_id"), str)
-            and bool(review["review_id"])
-            and isinstance(review.get("as_of"), str)
-            and re.fullmatch(r"20[0-9]{2}-[0-9]{2}-[0-9]{2}", review["as_of"])
-            and isinstance(review.get("required_roles"), list)
-            and all(isinstance(item, str) for item in review["required_roles"])
-            and set(review["required_roles"]) == REQUIRED_REVIEW_ROLES
-            and len(review["required_roles"]) == len(REQUIRED_REVIEW_ROLES)
-            and isinstance(review.get("reviews"), list)
-            and isinstance(review.get("non_claims"), list)
-            and all(isinstance(item, str) and bool(item) for item in review["non_claims"])
-            and len(set(review["non_claims"])) == len(review["non_claims"])
-            and "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY" in review["non_claims"]
-        ):
-            continue
-        reviews_by_role: dict[str, list[dict[str, Any]]] = {}
-        review_shape_valid = True
-        for item in review["reviews"]:
-            if not isinstance(item, dict) or set(item) != {
-                "role", "verdict", "findings"
-            } or not (
-                isinstance(item.get("role"), str)
-                and item.get("verdict") in {"PASS", "NOT_READY"}
-                and isinstance(item.get("findings"), list)
-                and all(
-                    isinstance(finding, str) and bool(finding)
-                    for finding in item["findings"]
-                )
-            ):
-                review_shape_valid = False
-                break
-            reviews_by_role.setdefault(item["role"], []).append(item)
-        if not (
-            review_shape_valid
-            and set(reviews_by_role) == REQUIRED_REVIEW_ROLES
-            and len(review["reviews"]) == len(REQUIRED_REVIEW_ROLES)
-            and all(
-                len(reviews_by_role[role]) == 1
-                and reviews_by_role[role][0]["verdict"] == "PASS"
-                for role in REQUIRED_REVIEW_ROLES
-            )
-            and not review_records_single_agent_fallback(review)
         ):
             continue
         fit_path = (root / fit_relative).resolve()
@@ -1219,78 +1357,49 @@ def bound_delivery_evidence(
             )
         except ValueError:
             continue
-        expected_fit_keys = {
-            "schema", "schema_version", "review_id", "as_of", "task_id",
-            "reviewed_bindings_sha256", "reviewed_inventory_sha256", "mode",
-            "verdict", "dimensions", "capability_radar", "recovery", "limits",
-        }
-        expected_dimensions = {
-            "mission", "flexibility_and_history", "context_efficiency",
-            "research_truth", "owner_operability", "execution_to_cashflow",
-            "monitoring_and_recovery", "build_vs_buy", "security", "red_team",
-        }
-        if (
-            isinstance(fit, dict)
-            and set(fit) == expected_fit_keys
-            and fit.get("schema") == "smial.delivery-harness-factory-fit"
-            and fit.get("schema_version") == "1.0"
-            and isinstance(fit.get("review_id"), str)
-            and bool(fit["review_id"])
-            and isinstance(fit.get("as_of"), str)
-            and re.fullmatch(r"20[0-9]{2}-[0-9]{2}-[0-9]{2}", fit["as_of"])
-            and fit.get("task_id") == task.get("task_id")
-            and fit.get("mode") in {"FAST_PATH", "FULL_REVIEW"}
-            and fit.get("verdict") == "PASS"
-            and fit.get("reviewed_bindings_sha256")
+        if delivery_factory_fit_shape_problems(
+            fit, task_id=task.get("task_id")
+        ) or not (
+            fit.get("reviewed_bindings_sha256")
             == sha256_bytes(canonical_json_bytes(bindings))
             and fit.get("reviewed_inventory_sha256") == inventory_sha
-            and isinstance(fit.get("dimensions"), dict)
-            and set(fit["dimensions"]) == expected_dimensions
-            and all(isinstance(value, str) and bool(value) for value in fit["dimensions"].values())
-            and isinstance(fit.get("capability_radar"), dict)
-            and set(fit["capability_radar"]) == {"now", "watch"}
-            and all(isinstance(value, str) and bool(value) for value in fit["capability_radar"].values())
-            and isinstance(fit.get("recovery"), str)
-            and bool(fit["recovery"])
-            and isinstance(fit.get("limits"), list)
-            and all(isinstance(item, str) and bool(item) for item in fit["limits"])
-            and len(set(fit["limits"])) == len(fit["limits"])
         ):
-            stops = evidence.get("active_stop_conditions")
-            triggers = evidence.get("owner_attention_triggers")
-            if not (
-                str(validation.get("targeted", "")).startswith("PASS_")
-                and validation.get("full_gate")
-                == "ENFORCED_BY_PROJECT_BOUND_VALIDATION"
-                and validation.get("github_ci")
-                == "ENFORCED_LIVE_AT_GUARDED_MERGE"
-                and isinstance(validation.get("project_checks"), list)
-                and all(
-                    isinstance(item, str) and item.startswith("PASS_")
-                    for item in validation["project_checks"]
-                )
-            ):
-                continue
-            expected_trigger_keys = {
-                "auth_or_access_recovery",
-                "material_owner_decision",
-                "user_only_activation",
-                "external_material_action",
-                "unresolved_safety_or_truth_conflict",
-            }
-            if not isinstance(stops, list) or any(
-                not isinstance(item, str) for item in stops
-            ):
-                continue
-            if not isinstance(triggers, dict) or set(triggers) != expected_trigger_keys:
-                continue
-            if any(type(value) is not bool for value in triggers.values()):
-                continue
-            return {
-                "factory_fit_pass": True,
-                "active_stop_conditions": stops,
-                "triggers": triggers,
-            }
+            continue
+        stops = evidence.get("active_stop_conditions")
+        triggers = evidence.get("owner_attention_triggers")
+        if not (
+            str(validation.get("targeted", "")).startswith("PASS_")
+            and validation.get("full_gate")
+            == "ENFORCED_BY_PROJECT_BOUND_VALIDATION"
+            and validation.get("github_ci")
+            == "ENFORCED_LIVE_AT_GUARDED_MERGE"
+            and isinstance(validation.get("project_checks"), list)
+            and all(
+                isinstance(item, str) and item.startswith("PASS_")
+                for item in validation["project_checks"]
+            )
+        ):
+            continue
+        expected_trigger_keys = {
+            "auth_or_access_recovery",
+            "material_owner_decision",
+            "user_only_activation",
+            "external_material_action",
+            "unresolved_safety_or_truth_conflict",
+        }
+        if not isinstance(stops, list) or any(
+            not isinstance(item, str) for item in stops
+        ):
+            continue
+        if not isinstance(triggers, dict) or set(triggers) != expected_trigger_keys:
+            continue
+        if any(type(value) is not bool for value in triggers.values()):
+            continue
+        return {
+            "factory_fit_pass": True,
+            "active_stop_conditions": stops,
+            "triggers": triggers,
+        }
     return denied
 
 

@@ -1067,6 +1067,62 @@ def _completion_evidence_key_problems(completion: dict[str, Any]) -> list[str]:
     return problems
 
 
+def _delivery_evidence_merge_shape_problems(
+    *,
+    completion: dict[str, Any],
+    review: dict[str, Any],
+    fit: dict[str, Any],
+    task_id: str | None = None,
+) -> list[str]:
+    from owner_attention_gate import (
+        delivery_factory_fit_shape_problems,
+        delivery_independent_review_shape_problems,
+    )
+
+    problems: list[str] = []
+    problems.extend(
+        delivery_independent_review_shape_problems(review, task_id=task_id)
+    )
+    problems.extend(delivery_factory_fit_shape_problems(fit, task_id=task_id))
+    validation = completion.get("validation")
+    if not isinstance(validation, dict) or set(validation) != {
+        "targeted",
+        "independent_review",
+        "full_gate",
+        "github_ci",
+        "project_checks",
+    }:
+        problems.append("completion_validation_shape_invalid")
+    else:
+        if not str(validation.get("targeted", "")).startswith("PASS_"):
+            problems.append("completion_validation_targeted_invalid")
+        if validation.get("full_gate") != "ENFORCED_BY_PROJECT_BOUND_VALIDATION":
+            problems.append("completion_validation_full_gate_invalid")
+        if validation.get("github_ci") != "ENFORCED_LIVE_AT_GUARDED_MERGE":
+            problems.append("completion_validation_github_ci_invalid")
+        project_checks = validation.get("project_checks")
+        if not isinstance(project_checks, list) or not all(
+            isinstance(item, str) and item.startswith("PASS_")
+            for item in project_checks
+        ):
+            problems.append("completion_validation_project_checks_invalid")
+        review_binding = validation.get("independent_review")
+        if not isinstance(review_binding, dict) or set(review_binding) != {
+            "path",
+            "sha256",
+            "verdict",
+        } or review_binding.get("verdict") != "PASS":
+            problems.append("completion_review_binding_invalid")
+    fit_binding = completion.get("factory_fit")
+    if not isinstance(fit_binding, dict) or set(fit_binding) != {
+        "path",
+        "sha256",
+        "verdict",
+    } or fit_binding.get("verdict") != "PASS":
+        problems.append("completion_factory_fit_binding_invalid")
+    return problems
+
+
 def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: str | None = None) -> list[str]:
     expected = compute_evidence_chain(task_id=task_id, contract=contract, head=head)
     problems: list[str] = []
@@ -1091,6 +1147,14 @@ def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: st
             completion=completion,
             review_path=expected["review_path"],
             fit_path=expected["fit_path"],
+        )
+    )
+    problems.extend(
+        _delivery_evidence_merge_shape_problems(
+            completion=completion,
+            review=review,
+            fit=fit,
+            task_id=task_id,
         )
     )
     return problems
@@ -1155,6 +1219,18 @@ def verify_evidence_chain_internal(completion_path: str) -> list[str]:
             fit_path=fit_path,
         )
     )
+    task_id = completion.get("task_id")
+    if isinstance(task_id, str) and task_id:
+        problems.extend(
+            _delivery_evidence_merge_shape_problems(
+                completion=completion,
+                review=review,
+                fit=fit,
+                task_id=task_id,
+            )
+        )
+    else:
+        problems.append("completion_task_id_missing")
     return problems
 
 
@@ -1167,6 +1243,16 @@ def apply_evidence_chain(*, task_id: str, contract: str | None = None, head: str
     review = _load_json(review_path)
     fit = _load_json(fit_path)
     completion = _load_json(completion_path)
+    shape_problems = _delivery_evidence_merge_shape_problems(
+        completion=completion,
+        review=review,
+        fit=fit,
+        task_id=task_id,
+    )
+    if shape_problems:
+        raise HarnessSyncError(
+            "BIND_EVIDENCE_MERGE_GATE_SHAPE:" + shape_problems[0]
+        )
     review["reviewed_bindings_sha256"] = expected["reviewed_bindings_sha256"]
     review["reviewed_inventory_sha256"] = expected["reviewed_inventory_sha256"]
     fit["reviewed_bindings_sha256"] = expected["reviewed_bindings_sha256"]

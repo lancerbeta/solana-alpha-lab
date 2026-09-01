@@ -20,6 +20,9 @@ managed_write_set:
 - docs/tasks/COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1.md
 - src/solana_alpha_lab/factory/collector_schedulability_oracle.py
 - tests/test_collector_sampling_oracle_applied_probability_repair.py
+- tests/test_harness_sync_bindings.py
+- scripts/harness_sync.py
+- scripts/owner_attention_gate.py
 - docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md
 - catalog/assets/core.yaml
 - docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_completion_evidence_v1.json
