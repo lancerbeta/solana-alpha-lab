@@ -283,6 +283,9 @@ def drift_scopes_for_paths(paths: set[str]) -> dict[str, bool]:
 
 
 def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
+    from ci_fail_closed_messages import harness_sync_repair_suffix
+
+    repair = harness_sync_repair_suffix(root=ROOT)
     scopes = (
         {"assets": True, "checkpoint": True, "navigation": True}
         if scoped_paths is None
@@ -307,7 +310,7 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
             current = _current_block_sha(registry_file.read_text(encoding="utf-8"), asset_id)
             if current != desired:
                 problems.append(
-                    f"sha256_mismatch:{asset_id}:{info['registry']}; run harness_sync.py --apply"
+                    f"sha256_mismatch:{asset_id}:{info['registry']}{repair}"
                 )
     if scopes["checkpoint"]:
         observed = observed_checkpoint()
@@ -316,7 +319,7 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
             problems.append(
                 "catalog_current_checkpoint_drift:"
                 f"registered={json.dumps(manifest.get('current_checkpoint'), sort_keys=True)}:"
-                f"observed={json.dumps(observed, sort_keys=True)}; run harness_sync.py --apply"
+                f"observed={json.dumps(observed, sort_keys=True)}{repair}"
             )
     if scopes["navigation"]:
         nav = subprocess.run(
@@ -329,7 +332,7 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
             problems.append(
                 "navigation_projection_stale"
                 + (f":{detail[0]}" if detail else "")
-                + "; run harness_sync.py --apply"
+                + repair
             )
     return problems
 
@@ -1384,6 +1387,9 @@ def sync_main(argv: list[str]) -> int:
         else:
             problems = check_drift()
         if problems:
+            from ci_fail_closed_messages import emit_derived_hash_drift_summary
+
+            emit_derived_hash_drift_summary()
             for problem in problems:
                 print(f"DERIVED_HASH_DRIFT: {problem}", file=sys.stderr)
             return 1

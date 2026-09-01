@@ -23,6 +23,8 @@ managed_write_set:
 - tests/test_harness_sync_bindings.py
 - scripts/harness_sync.py
 - scripts/owner_attention_gate.py
+- scripts/ci_fail_closed_messages.py
+- tests/test_ci_messages.py
 - docs/reports/collector_sampling_oracle_applied_probability_repair/a1_owner_readout_v1.md
 - catalog/assets/core.yaml
 - docs/evidence/collector_sampling_oracle_applied_probability_repair/a1_delivery_completion_evidence_v1.json
