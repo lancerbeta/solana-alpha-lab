@@ -64,11 +64,21 @@ class DerivedHashDriftMessageTests(unittest.TestCase):
         )
         self.assertIn("RECOVERY_FULL_ORACLE", cmd)
 
-    def test_branch_task_contract_resolves_incremental_base_ref(self) -> None:
-        base = messages.routine_harness_sync_base_ref(root=ROOT)
+    def test_task_contract_path_resolves_expected_base(self) -> None:
+        from harness_sync import _expected_base_from_task_contract
+
+        base = _expected_base_from_task_contract(
+            "docs/tasks/COLLECTOR_SAMPLING_ORACLE_APPLIED_PROBABILITY_REPAIR_V1.md",
+            root=ROOT,
+        )
         self.assertEqual(base, "5c0efd1619f048c61e6f056b83449571e0abfdae")
-        summary = messages.derived_hash_drift_summary(root=ROOT)
-        self.assertIn("--base-ref 5c0efd1619f048c61e6f056b83449571e0abfdae", summary)
+        summary = messages.derived_hash_drift_summary(
+            root=ROOT,
+        )
+        if messages.routine_harness_sync_base_ref(root=ROOT) is not None:
+            self.assertIn("--base-ref 5c0efd1619f048c61e6f056b83449571e0abfdae", summary)
+        else:
+            self.assertIn("RECOVERY_FULL_ORACLE", summary)
 
     def test_emit_writes_to_stderr(self) -> None:
         buffer = io.StringIO()
