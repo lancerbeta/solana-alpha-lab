@@ -19,6 +19,12 @@ by `freeze`, not by the model.
 `finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane
 commissioning.
 
+`FORGE_CONTEXT_PACKET` includes bounded `semantic_capability_entries` (Forge-visible
+semantic routes only, `authority_granted=false`, ≤3072 bytes). Before proposing a
+new capability/collector/provider/infrastructure path, compare against those
+entries and accepted `capability_entries`; reuse when sufficient, name the exact
+gap when missing, and do not invent infrastructure under uncertainty.
+
 **Canonical operator prefix:** `uv run --locked --managed-python python -B scripts/hypothesis_forge.py`.
 Required interpreter is CPython `3.13.14` from `.python-version` /
 `pyproject.toml` `exact_python_pin`. A non-matching interpreter must return

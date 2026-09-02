@@ -21,6 +21,13 @@ from solana_alpha_lab.catalog_discovery import (
     resolve_canonical_binding,
     search_catalog_assets,
 )
+from solana_alpha_lab.factory_semantic_operability import (
+    SemanticOperabilityError,
+    list_semantic_routes,
+    load_semantic_projection,
+    resolve_semantic_route,
+    search_semantic_routes,
+)
 
 
 def emit(value: object, as_json: bool) -> None:
@@ -71,6 +78,8 @@ ERROR_NEXT = {
     "BINDING_RELEVANT_BYTES_DIRTY": "Commit or restore catalog/catalog_manifest.yaml, Catalog asset shards, and the bound target path.",
     "LIMIT_OUT_OF_RANGE": "Pass --limit as an integer from 1 to 50.",
     "DEPTH_OUT_OF_RANGE": "Pass --depth as 1 or 2.",
+    "SEMANTIC_ROUTE_NOT_FOUND": "Use list-routes or search-routes; route ids look like SEM-PRODUCT-STATE.",
+    "SEMANTIC_PROJECTION_MISSING": "Expected configs/factory_semantic_operability_v1.yaml in the repository root.",
 }
 
 
@@ -135,6 +144,19 @@ def main() -> int:
     related.add_argument("--relation", action="append", dest="relations")
     related.add_argument("--limit", default="20")
     related.add_argument("--json", action="store_true")
+
+    search_routes = sub.add_parser("search-routes")
+    search_routes.add_argument("--text", required=True)
+    search_routes.add_argument("--limit", default="5")
+    search_routes.add_argument("--explain", action="store_true")
+    search_routes.add_argument("--json", action="store_true")
+
+    resolve_route = sub.add_parser("resolve-route")
+    resolve_route.add_argument("semantic_route_id")
+    resolve_route.add_argument("--json", action="store_true")
+
+    list_routes = sub.add_parser("list-routes")
+    list_routes.add_argument("--json", action="store_true")
 
     args = parser.parse_args()
     as_json = bool(getattr(args, "json", False))
@@ -218,6 +240,51 @@ def main() -> int:
         except CatalogDiscoveryError as exc:
             return _emit_error(str(exc), as_json, asset_id=args.asset_id)
         emit(payload, as_json)
+        return 0
+
+    if args.command in {"search-routes", "resolve-route", "list-routes"}:
+        try:
+            projection = load_semantic_projection(ROOT)
+        except SemanticOperabilityError as exc:
+            return _emit_error(str(exc), as_json)
+        bindings = snapshot.manifest.get("canonical_bindings") or {}
+        if args.command == "list-routes":
+            emit(
+                list_semantic_routes(
+                    projection, assets=snapshot.assets, bindings=bindings
+                ),
+                as_json,
+            )
+            return 0
+        if args.command == "resolve-route":
+            try:
+                payload = resolve_semantic_route(
+                    projection,
+                    args.semantic_route_id,
+                    assets=snapshot.assets,
+                    bindings=bindings,
+                )
+            except SemanticOperabilityError as exc:
+                return _emit_error(
+                    str(exc), as_json, semantic_route_id=args.semantic_route_id
+                )
+            emit(payload, as_json)
+            return 0
+        limit = _parse_bounded_int(args.limit, minimum=1, maximum=20)
+        if limit is None:
+            return _emit_error("LIMIT_OUT_OF_RANGE", as_json)
+        try:
+            matches = search_semantic_routes(
+                projection,
+                args.text,
+                assets=snapshot.assets,
+                bindings=bindings,
+                limit=limit,
+                explain=args.explain,
+            )
+        except SemanticOperabilityError as exc:
+            return _emit_error(str(exc), as_json)
+        emit(matches, as_json)
         return 0
 
     return _emit_error("COMMAND_NOT_IMPLEMENTED", as_json, command=args.command)

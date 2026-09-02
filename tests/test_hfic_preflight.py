@@ -633,3 +633,14 @@ class LegacyCommissioningCompatibilityTests(unittest.TestCase):
                 receipt["commissioning"]["compatibility_repair"]["status"],
                 "APPLIED",
             )
+
+class SemanticOperabilityEpochTests(unittest.TestCase):
+    def test_evidence_epoch_material_includes_semantic_digest_key(self) -> None:
+        from solana_alpha_lab.factory.hfic_preflight import evidence_epoch_material
+        from solana_alpha_lab.factory.hfic_session import _MATERIAL_EPOCH_KEYS
+
+        self.assertIn("semantic_capability_digest_sha256", _MATERIAL_EPOCH_KEYS)
+        material = evidence_epoch_material(ROOT)
+        digest = material.get("semantic_capability_digest_sha256")
+        self.assertIsInstance(digest, str)
+        self.assertEqual(len(digest), 64)

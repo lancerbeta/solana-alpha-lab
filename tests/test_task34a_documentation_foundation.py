@@ -305,7 +305,9 @@ class Task34aDocumentationFoundationTests(unittest.TestCase):
         self.assertIn(b"show_task34a_context.py", expected)
         self.assertIn(b"Active Git discovery", expected)
         self.assertIn(b"resolve-binding", expected)
-        self.assertIn(b"PARTIAL_COVERAGE", expected)
+        self.assertIn(b"search-routes", expected)
+        self.assertIn(b"QUERY-HFIC-EXACT-RELATED-PRIOR-001", expected)
+        self.assertNotIn(b"PARTIAL_COVERAGE", expected)
         self.assertNotIn(b"Generated from the active Project Sources release", expected)
         self.assertNotIn(b"provider_route_capability_registry_v3.yaml", expected)
 

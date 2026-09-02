@@ -19,6 +19,12 @@ a new contract and must not mutate or invent a task. Discriminate
 `ORIENTATION` versus `EXECUTE` with `.cursor/rules/10-input-routing.mdc`.
 Never search for the newest/latest/current task, handoff, Issue, branch or file.
 
+For ORIENTATION questions about what product capability exists or where its
+current truth lives, resolve a semantic route (`catalog_cli.py search-routes` /
+`resolve-route`, see `docs/FACTORY_SEMANTIC_MAP.md`) before repository-wide
+search. Semantic routing cannot select executable work, change task authority
+or replace exact task context.
+
 Build L0/L1 context with `scripts/delivery_harness.py context`. Load L2 only for
 a named capability gap and L3 only for a concrete evidence dispute. Missing
 truth is an explicit gap, never an invitation to guess or load the repository

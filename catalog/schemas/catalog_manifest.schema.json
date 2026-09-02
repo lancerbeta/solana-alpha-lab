@@ -161,6 +161,15 @@
             },
             "related_assets": {
               "$ref": "#/$defs/command"
+            },
+            "search_routes": {
+              "$ref": "#/$defs/command"
+            },
+            "resolve_route": {
+              "$ref": "#/$defs/command"
+            },
+            "list_routes": {
+              "$ref": "#/$defs/command"
             }
           }
         }
@@ -289,7 +298,10 @@
                   "check_generated_navigation",
                   "resolve_binding",
                   "search_assets",
-                  "related_assets"
+                  "related_assets",
+                  "search_routes",
+                  "resolve_route",
+                  "list_routes"
                 ]
               }
             }
