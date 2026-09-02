@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import sys
 import tempfile
 import unittest
@@ -24,9 +25,9 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E4
     COHORT_ADMISSION_FIELD,
     CORPUS_DATASET_ID,
     LIVE_EVIDENCE_ROLE,
-    LiveCohortReleaseError,
     classify_cohort_readiness,
     cohort_id_for_admission,
+    current_corpus_partition_rows,
     import_live_cohort,
     seal_live_cohort,
     select_current_datasets_for_forge,
@@ -42,6 +43,8 @@ from solana_alpha_lab.factory.tokens_v2_typed_projection import (  # noqa: E402
 SCHEDULE_SHA = "a" * 64
 PRODUCER = "b70cf48508d0de84bfc5b1df311b41c04ea1d6ea"
 ACTIVATION = "act-live-cohort-test-001"
+CAMPAIGN_STARTS = datetime(2026, 1, 5, 12, 0, 0, tzinfo=UTC)
+CAMPAIGN_STOPS = CAMPAIGN_STARTS + timedelta(days=84)
 
 
 def _member(
@@ -55,8 +58,8 @@ def _member(
         "mint": mint,
         COHORT_ADMISSION_FIELD: admission,
         "authoritative_anchor": admission,
-        "candidate_state": "CANDIDATE",
-        "membership_state": "INCLUDED",
+        "candidate_state": "ADMITTED" if selected == "SELECTED" else "NOT_SELECTED_HASH_SAMPLE",
+        "membership_state": "OBSERVED" if denom == "observed" else "ADMITTED",
         "denominator_state": denom,
         "sampling_policy": "HASH_SAMPLE",
         "sampling_seed": "seed-1",
@@ -95,9 +98,7 @@ def _snapshot_for_week(
     *,
     coverage: str = "EMPIRICAL_OVERLAP_ONLY",
 ) -> dict:
-    # Week 0 starts 2026-01-01 (Thursday) → cohort UTC-20251228-20260103 contains it?
-    # Use explicit admissions inside known 7-day buckets.
-    base = datetime(2026, 1, 5, 12, 0, 0, tzinfo=UTC) + timedelta(days=7 * week_index)
+    base = CAMPAIGN_STARTS + timedelta(days=7 * week_index)
     admission = base.strftime("%Y-%m-%dT%H:%M:%SZ")
     mints = [f"MintW{week_index}A", f"MintW{week_index}B", f"MintW{week_index}C"]
     members = [
@@ -124,6 +125,8 @@ def _snapshot_for_week(
         "schedule_sha256": SCHEDULE_SHA,
         "activation_id": ACTIVATION,
         "producer_git_sha": PRODUCER,
+        "starts_at": CAMPAIGN_STARTS.strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "stops_admitting_at": CAMPAIGN_STOPS.strftime("%Y-%m-%dT%H:%M:%SZ"),
         "discovery_coverage_class": coverage,
         "open_publication": False,
         "unresolved_due": False,
@@ -136,14 +139,26 @@ def _snapshot_for_week(
 
 
 class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
-    def test_cohort_id_non_overlapping_7_utc_days(self) -> None:
-        a = cohort_id_for_admission(datetime(2026, 1, 5, tzinfo=UTC))
-        b = cohort_id_for_admission(datetime(2026, 1, 7, tzinfo=UTC))
-        c = cohort_id_for_admission(datetime(2026, 1, 8, tzinfo=UTC))
+    def test_campaign_relative_7d_windows(self) -> None:
+        a = cohort_id_for_admission(
+            datetime(2026, 1, 5, 12, 0, 0, tzinfo=UTC),
+            starts_at=CAMPAIGN_STARTS,
+            stops_admitting_at=CAMPAIGN_STOPS,
+        )
+        b = cohort_id_for_admission(
+            datetime(2026, 1, 12, 11, 59, 59, tzinfo=UTC),
+            starts_at=CAMPAIGN_STARTS,
+            stops_admitting_at=CAMPAIGN_STOPS,
+        )
+        c = cohort_id_for_admission(
+            datetime(2026, 1, 12, 12, 0, 0, tzinfo=UTC),
+            starts_at=CAMPAIGN_STARTS,
+            stops_admitting_at=CAMPAIGN_STOPS,
+        )
         self.assertEqual(a, b)
         self.assertNotEqual(a, c)
-        self.assertEqual(a, "UTC-20260101-20260107")
-        self.assertEqual(c, "UTC-20260108-20260114")
+        self.assertEqual(a, "REL-20260105T120000Z-20260112T120000Z")
+        self.assertEqual(c, "REL-20260112T120000Z-20260119T120000Z")
 
     def test_blocked_states_not_sealable(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -156,7 +171,12 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
             )
 
             source = load_observation_rdp_source(root)
-            cohort = cohort_id_for_admission(datetime(2026, 1, 5, tzinfo=UTC))
+            cohort = cohort_id_for_admission(
+                datetime(2026, 1, 5, 12, tzinfo=UTC),
+                starts_at=CAMPAIGN_STARTS,
+                stops_admitting_at=CAMPAIGN_STOPS,
+            )
+            assert cohort is not None
             ready = classify_cohort_readiness(
                 source,
                 cohort_id=cohort,
@@ -176,7 +196,12 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
 
             snap = _snapshot_for_week(0, coverage="GAP_SUSPECTED")
             write_observation_rdp_source(obs_rdp, snap)
-            cohort = cohort_id_for_admission(datetime(2026, 1, 5, tzinfo=UTC))
+            cohort = cohort_id_for_admission(
+                datetime(2026, 1, 5, 12, tzinfo=UTC),
+                starts_at=CAMPAIGN_STARTS,
+                stops_admitting_at=CAMPAIGN_STOPS,
+            )
+            assert cohort is not None
             as_of = datetime(2026, 1, 20, tzinfo=UTC)
             from solana_alpha_lab.factory.live_cohort_discovery_release import (
                 load_observation_rdp_source,
@@ -265,13 +290,20 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
             store = ResearchStore(data_root)
             epochs: list[str] = []
             manifest_ids: list[str] = []
+            parquet_files_before = 0
+            week0_parquet_sha: dict[str, str] = {}
             for week in range(12):
                 obs_rdp = base / f"obs_{week}"
                 release = base / f"rel_{week}"
                 snap = _snapshot_for_week(week)
                 write_observation_rdp_source(obs_rdp, snap)
-                admission = datetime(2026, 1, 5, tzinfo=UTC) + timedelta(days=7 * week)
-                cohort = cohort_id_for_admission(admission)
+                admission = CAMPAIGN_STARTS + timedelta(days=7 * week)
+                cohort = cohort_id_for_admission(
+                    admission,
+                    starts_at=CAMPAIGN_STARTS,
+                    stops_admitting_at=CAMPAIGN_STOPS,
+                )
+                assert cohort is not None
                 as_of = admission + timedelta(days=10)
                 seal_live_cohort(
                     observation_rdp_root=obs_rdp,
@@ -292,8 +324,24 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
                 epochs.append(
                     evidence_epoch_sha256(evidence_epoch_material(ROOT, data_root))
                 )
+                parquet_count = len(list((data_root / "datasets" / "partitions").rglob("*.parquet")))
+                if week == 0:
+                    parquet_files_before = parquet_count
+                    for path in (data_root / "datasets" / "partitions").rglob("*.parquet"):
+                        rel = path.relative_to(data_root).as_posix()
+                        week0_parquet_sha[rel] = hashlib.sha256(path.read_bytes()).hexdigest()
+                else:
+                    # Exactly two new parquet files per cohort (census+obs), no historical rewrite.
+                    self.assertEqual(parquet_count, parquet_files_before + 2 * week)
+                    for rel, digest in week0_parquet_sha.items():
+                        live = data_root / rel
+                        self.assertTrue(live.is_file(), rel)
+                        self.assertEqual(
+                            hashlib.sha256(live.read_bytes()).hexdigest(),
+                            digest,
+                            msg=f"week0 parquet mutated after week {week}: {rel}",
+                        )
 
-            # All 12 corpus version manifests remain on disk / enumerable.
             enumerated, _ = enumerate_rdp_datasets(data_root)
             corpus_entries = [
                 e
@@ -304,7 +352,6 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
             self.assertEqual(len(corpus_entries), 12)
             self.assertEqual(len(set(manifest_ids)), 12)
 
-            # HFIC forge context sees one current corpus version, not 12.
             current = select_current_datasets_for_forge(enumerated)
             current_corpus = [
                 e
@@ -318,6 +365,15 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
             )
             lineage = (current_corpus[0].get("labels") or {}).get("cohort_lineage")
             self.assertEqual(len(lineage), 12)
+
+            census_rows = current_corpus_partition_rows(data_root, kind="census")
+            mints = {row.get("mint") for row in census_rows}
+            for week in range(12):
+                self.assertIn(f"MintW{week}A", mints)
+            self.assertEqual(
+                len(census_rows),
+                (current_corpus[0].get("labels") or {}).get("census_row_count_cumulative"),
+            )
 
             packet, _ = build_forge_context_packet(
                 ROOT,
@@ -338,13 +394,9 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
             self.assertEqual(len(corpus_in_packet), 1)
             self.assertLessEqual(len(packet["dataset_manifest_ids"]), 8)
 
-            # Epoch changes once per new cohort.
             self.assertEqual(len(set(epochs)), 12)
-
-            # Three non-overlapping 7-day cohorts coexist (weeks 0,1,2).
             self.assertEqual(len(set(manifest_ids[:3])), 3)
 
-            # Confirmatory fence holds on current corpus.
             self.assertTrue(
                 (current_corpus[0].get("labels") or {}).get(
                     "confirmatory_reuse_forbidden"
@@ -361,7 +413,12 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
             root = Path(tmp)
             write_observation_rdp_source(root, _snapshot_for_week(0))
             self.assertFalse((root / "observation_schedule_state.sqlite").exists())
-            cohort = cohort_id_for_admission(datetime(2026, 1, 5, tzinfo=UTC))
+            cohort = cohort_id_for_admission(
+                datetime(2026, 1, 5, 12, tzinfo=UTC),
+                starts_at=CAMPAIGN_STARTS,
+                stops_admitting_at=CAMPAIGN_STOPS,
+            )
+            assert cohort is not None
             from solana_alpha_lab.factory.live_cohort_discovery_release import (
                 load_observation_rdp_source,
             )

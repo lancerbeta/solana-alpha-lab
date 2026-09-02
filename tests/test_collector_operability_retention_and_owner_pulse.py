@@ -44,6 +44,8 @@ from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
 )
 from solana_alpha_lab.factory.remote_ops import load_config_v1_1  # noqa: E402
 from tests.test_live_cohort_discovery_release_series import (  # noqa: E402
+    CAMPAIGN_STARTS,
+    CAMPAIGN_STOPS,
     _snapshot_for_week,
 )
 from tests.test_observation_scheduler import GIT_SHA, NOW, _activate  # noqa: E402
@@ -172,7 +174,12 @@ class CollectorOperabilityRetentionPulseTests(unittest.TestCase):
             rdp_before = _sha_tree(rdp)
 
             release_root = root / "releases"
-            cohort = cohort_id_for_admission(datetime(2026, 1, 5, tzinfo=UTC))
+            cohort = cohort_id_for_admission(
+                datetime(2026, 1, 5, 12, tzinfo=UTC),
+                starts_at=CAMPAIGN_STARTS,
+                stops_admitting_at=CAMPAIGN_STOPS,
+            )
+            assert cohort is not None
             sealed = seal_live_cohort(
                 observation_rdp_root=rdp,
                 cohort_id=cohort,

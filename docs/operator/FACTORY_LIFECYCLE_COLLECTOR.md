@@ -196,15 +196,20 @@ Do **not** trust chat “current status”. Machine-resolve:
 
 Scientific path (not weekly A3 singleton):
 
-Observation RDP rebuild snapshot → cohort readiness → `seal-live-cohort` →
-`verify-live` → `import-live` → versioned LIVE CORPUS → evidence_epoch.
+Immutable Observation RDP → `build-live-source` → cohort readiness →
+`seal-live-cohort` → `verify-live` → `import-live` → **cumulative** LIVE CORPUS →
+evidence_epoch.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py live-status --observation-rdp <OBS_RDP> --cohort-id UTC-YYYYMMDD-YYYYMMDD
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --observation-rdp <OBS_RDP> --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py seal-live-cohort --observation-rdp <OBS_RDP> --cohort-id UTC-YYYYMMDD-YYYYMMDD --release-root <RELEASE>
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py live-status --observation-rdp <OBS_RDP> --cohort-id REL-YYYYMMDDTHHMMSSZ-YYYYMMDDTHHMMSSZ
+```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py seal-live-cohort --observation-rdp <OBS_RDP> --cohort-id REL-... --release-root <RELEASE>
 ```
 
 ```
@@ -215,8 +220,12 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root <RELEASE> --data-root <LOCAL_RDP>
 ```
 
-Admission clock: `discovery_first_reliable_available_at` (7 UTC-day windows).
-Live role: `EXPLORATORY_REUSE` with `confirmatory_reuse_forbidden=true`.
+Admission clock: `discovery_first_reliable_available_at` on campaign-relative
+half-open 7-day windows from schedule `activation.starts_at` /
+`stops_admitting_at` (not unix-epoch calendar buckets).
+Current corpus version rebinds all accepted cohort partitions without parquet
+byte duplication. Live role: `EXPLORATORY_REUSE` with
+`confirmatory_reuse_forbidden=true`.
 `/recent` is the observable provider discovery stream — not a proven complete
 pump.fun universe unless coverage class says otherwise.
 
@@ -318,7 +327,7 @@ sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_
 ```
 
 ```
-/usr/bin/uv run --locked --managed-python python -B scripts/discovery_evidence_release.py live-status --observation-rdp local/factory_v1/observation_rdp --cohort-id <UTC-YYYYMMDD-YYYYMMDD>
+/usr/bin/uv run --locked --managed-python python -B scripts/discovery_evidence_release.py live-status --observation-rdp local/factory_v1/observation_rdp --cohort-id <REL-...Z-...Z>
 ```
 
 Current/live corpus: one stable `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` with
