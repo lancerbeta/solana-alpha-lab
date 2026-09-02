@@ -1,0 +1,55 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COLLECTOR-ORACLE-P99-DEADLINE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "COLLECTOR_ORACLE_P99_SCIENTIFIC_DEADLINE_CLOSURE_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "db00e1ad5e678ad1df6ce570ec6cea0497e5531413b54f3c8803c4baf69d2699",
+  "reviewed_inventory_sha256": "0e84085be7729c8c10d1cf4368c6e41ebbf7bdfefd4af938b00639a7d960560d",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "P99_ADMISSION_REPLACES_P95_FIT",
+        "X_DEADLINE_HEADROOM_FIELD_EXPOSED",
+        "P99_CONSTRUCTION_PRESERVED",
+        "FAIL_CLOSED_P99_EXCEEDS_ALLOWED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LEGACY_102_GEOMETRY_REJECTED",
+        "BOUNDARY_85_ACCEPTED_86_CAPPED",
+        "PREFLIGHT_CAPS_RECOMPUTED",
+        "NO_HARDCODED_85_OR_P"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "GENERIC_OBSERVATION_SCHEDULE_INVARIANT",
+        "NO_SCHEDULER_OR_PACING_KNOB_CHANGE",
+        "NO_SECOND_ORACLE_TRUTH_PLANE",
+        "FORGE_ENVELOPES_CANNOT_MACHINE_APPROVE_P99_OUTSIDE_X"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS",
+    "NO_AUTHORIZE_FORBIDDEN_PROPOSAL",
+    "NO_ALPHA"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COLLECTOR-ORACLE-P99-DEADLINE-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "COLLECTOR_ORACLE_P99_SCIENTIFIC_DEADLINE_CLOSURE_V1",
+  "state_change": "COLLECTOR_ORACLE_P99_SCIENTIFIC_DEADLINE_CLOSURE_READY_FOR_MERGE",
+  "base_main": "78082974966c3b876403c7001d156cb5febc2ef6",
+  "owner_approvals": [],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "152b5edba7db12351c969749ba8d00cf26af61326789f0216ff8b92a952f94f2",
+    "docs/reports/collector_oracle_p99_scientific_deadline_closure_v1/a1_owner_readout_v1.md": "5162ba29a4b0856bee6a92c248b5d08e2cab537a5ec6a3ed912d2d6a62a94b32",
+    "docs/tasks/COLLECTOR_ORACLE_P99_SCIENTIFIC_DEADLINE_CLOSURE_V1.md": "4fe1c8266e33a51db1db391f9c717693399c80e8b07508556a830866f2b5f2fc",
+    "src/solana_alpha_lab/factory/collector_schedulability_oracle.py": "143ad134ca5c31a79bc7c061331f29ee0259475b8043225bc44ffe20141392de",
+    "tests/test_collector_oracle_p99_scientific_deadline_closure.py": "e09e13938b7b955a3c118a46fa8c3dc30b7161bf1c655391981811b239acde34",
+    "tests/test_collector_sampling_oracle_applied_probability_repair.py": "23685beeba9060822f8dffc6af9d9b203a9a42fb899ca5dfa6f83b94fc668389"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/collector_oracle_p99_scientific_deadline_closure_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "63d3372c39cf6e9c6f5700904fd5f5f94f58f152724b4f70a97f48a9b2aa1baf",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COLLECTOR_ORACLE_P99_DEADLINE_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/collector_oracle_p99_scientific_deadline_closure_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "b287347ab795fc297c9e13d55d00e6e5cf8823e53e3f6a2f537d5d5510db0a26",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_P99_FIT_INSIDE_X",
+      "PASS_LEGACY_102_REJECTED",
+      "PASS_BOUNDARY_85",
+      "PASS_PREFLIGHT_CAPS",
+      "PASS_PACING_REGRESSIONS_GREEN"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS",
+    "NO_AUTHORIZE_FORBIDDEN_PROPOSAL",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}
