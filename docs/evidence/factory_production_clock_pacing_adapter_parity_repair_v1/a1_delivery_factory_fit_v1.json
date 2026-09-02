@@ -6,8 +6,8 @@
   "task_id": "FACTORY_PRODUCTION_CLOCK_PACING_ADAPTER_PARITY_REPAIR_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "52d32a4ef19844aade747997f9c2875273333a0f752663266da4ab039acf7d06",
+  "reviewed_inventory_sha256": "98543dd0d867981d7b4188999b47c687acdd48ef21bfbd260d4d555c6f6f803b",
   "capability_radar": {
     "now": "NONE",
     "watch": "MEASURED_SEARCH_LATENCY_THEN_P99_ENVELOPE;MULTI_SCHEDULE_JUPITER_PACING;END_OF_TICK_PACE_WAIT_SYSTEMD_EXIT"
