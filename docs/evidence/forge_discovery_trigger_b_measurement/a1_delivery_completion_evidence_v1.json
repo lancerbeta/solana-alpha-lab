@@ -11,7 +11,9 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/FORGE_DISCOVERY_TRIGGER_B_MEASUREMENT_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "docs/evidence/forge_discovery_trigger_b_measurement/a1_trigger_b_measurement_v1.json": "2e0e042984a3a04e0a670aa524535d5aa43ba93e316f1079f6b58e44d4d40d8b",
+    "docs/reports/forge_discovery_trigger_b_measurement/a1_owner_readout_v1.md": "3443184bed42618158f5e2c37100a22d9e58ed69f306d5aa61876b946336683d",
+    "docs/tasks/FORGE_DISCOVERY_TRIGGER_B_MEASUREMENT_V1.md": "7a80668d94346c43570f5691124dc459a0dab91ca56320570e907989011fa1f2"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +25,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_discovery_trigger_b_measurement/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "4266be4b107901b20c3d5128f48f692db05c449900dbd5660792f5f4e90fd744",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TRIGGER_B_MEASUREMENT_SELF_CONSISTENT",
     "independent_review": {
       "path": "docs/evidence/forge_discovery_trigger_b_measurement/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "a86d9ce1247596fb4ca61ab3980ab58e2bddc3a46de8fab83c41acc69e900aa3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
