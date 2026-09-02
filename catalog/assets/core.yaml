@@ -34108,7 +34108,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1.md', repository_path: docs/tasks/FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: d0966c3f1b02b446b891da08db84013dbb42bf58c9e1fcd328be0389a94f6559}
+  integrity: {kind: sha256, sha256: 0c04f645cf5509b03784cd040b3132f3ba846562aa631c65994eb2645ea2ab96}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}

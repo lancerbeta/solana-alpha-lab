@@ -13,7 +13,7 @@
   "implementation_bindings": {
     ".agents/skills/delivery-harness/SKILL.md": "cbc5f269a566699469b6f36c475e29a3f3471e9a5fa7549527daac026a2b1d74",
     ".cursor/commands/delivery-finish.md": "5b5836571a47bb84f16c1d468292d6946aaef755fb9cf7329247e5aee8c50e5c",
-    "AGENTS.md": "6dbc2ba902c059f6a599f3f74897ef95d9e5be4df36be6d43b12e03f3c136571",
+    "AGENTS.md": "6d74f3fdeb273239762fa2f18af55191e17b7f6d91aa89215348ece360f26d22",
     "catalog/assets/core.yaml": "b207a7dc4d113638d0c41bc4d1074e3940b0539234b099106990a5a7909d39b3",
     "delivery-harness/templates/portable-bundle-manifest.json": "5993e1021ec04d1e7703eb51ae753a4a9a3e31a327142e278e182ece7eb0f16e",
     "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md": "374314c70e71ff2a1055c1bda0fa7730fab93963da5f0d46a175c2c54e267290",
