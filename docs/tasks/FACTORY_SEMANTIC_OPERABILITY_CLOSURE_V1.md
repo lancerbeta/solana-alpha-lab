@@ -48,6 +48,7 @@ managed_write_set:
 - tests/test_hfic_preflight.py
 - tests/test_hfic_operational_closure_v1.py
 - tests/test_task34a_documentation_foundation.py
+- docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 - docs/evidence/factory_semantic_operability_closure/a1_delivery_completion_evidence_v1.json
 - docs/evidence/factory_semantic_operability_closure/a1_delivery_independent_review_v1.json
 - docs/evidence/factory_semantic_operability_closure/a1_delivery_factory_fit_v1.json

@@ -1474,7 +1474,7 @@ records:
     repository_path: scripts/generate_navigation.py
   integrity:
     kind: sha256
-    sha256: f3415ec6c203eb997e019f688a31a9178c9c086a3c0c07e219f73ed53c5a38af
+    sha256: 2f92af046f3bbd4d6f519ef2e4826a2623ea0ab7141e96ee8a3ed34835f3e726
   access:
     mode: task_write
     method: command
@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: a8c2ab1b3d89c50ff5ca1b3208b50925b906344d0eee1a1b9460666b258a847f}
+  integrity: {kind: sha256, sha256: 7ef9e092a39831e8d35b7d2f68931cab6e331e6d5a9759c1ebf88701e424e7ff}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -34108,7 +34108,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1.md', repository_path: docs/tasks/FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: 495de63102a8a479939c282d3c1481e4bdf1a92dcc783ed9fb7ff29a3c48c4a2}
+  integrity: {kind: sha256, sha256: d0966c3f1b02b446b891da08db84013dbb42bf58c9e1fcd328be0389a94f6559}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}

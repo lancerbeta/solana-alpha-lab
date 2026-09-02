@@ -15,11 +15,6 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from solana_alpha_lab.factory_semantic_operability import (  # noqa: E402
-    PROJECTION_RELATIVE,
-    load_semantic_projection,
-    validate_semantic_projection,
-)
 from solana_alpha_lab.task34a_documentation_foundation import evaluate_context
 
 PROJECT_MAP_PATH = "docs/PROJECT_MAP.md"
@@ -251,14 +246,20 @@ def render_operator_navigation(root: Path, snapshot: Any) -> bytes:
 
 
 def render_factory_semantic_map(root: Path, snapshot: Any) -> bytes:
-    projection = load_semantic_projection(root)
-    manifest = snapshot.manifest if isinstance(getattr(snapshot, "manifest", None), dict) else {}
-    bindings = manifest.get("canonical_bindings") or {}
     if "CONFIG-FACTORY-SEMANTIC-OPERABILITY-001" not in getattr(snapshot, "assets", {}):
         return (
             "# Factory semantic map\n\n"
             "Synthetic Catalog snapshot without semantic projection roots.\n"
         ).encode("utf-8")
+    from solana_alpha_lab.factory_semantic_operability import (  # noqa: PLC0415
+        PROJECTION_RELATIVE,
+        load_semantic_projection,
+        validate_semantic_projection,
+    )
+
+    projection = load_semantic_projection(root)
+    manifest = snapshot.manifest if isinstance(getattr(snapshot, "manifest", None), dict) else {}
+    bindings = manifest.get("canonical_bindings") or {}
     violations = validate_semantic_projection(
         projection,
         assets=snapshot.assets,
