@@ -240,3 +240,11 @@ intent adds no new authority plane.
 No generator, ranker, queue, UI, DB, provider route, trial, holdout use, or
 roadmap insertion is authorized by registering this intent. v1.1 does not prove
 the ARCH-INTENT-006 activation trigger.
+
+Entry Gate `FORGE_DISCOVERY_RANKER_ENTRY_GATE_V1` (as_of `2026-09-02`, base
+`ebb4c726c322ea7da1534af2506a610f889a0014`) evaluated §8 triggers against
+current Git/Catalog readiness and research-memory evidence and returned
+`DISCOVERY_GENERATOR_TRIGGER_NOT_YET_PROVEN`. Activation mode remains
+`WATCH_ONLY_UNTIL_ENTRY_GATE`. Owner discovery reframe alone did not force
+activation. No generator, ranker, QD, or VOI work is authorized by that
+terminal.

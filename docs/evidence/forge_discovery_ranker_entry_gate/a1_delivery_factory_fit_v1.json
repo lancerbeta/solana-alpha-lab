@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-DISCOVERY-RANKER-ENTRY-GATE-FACTORY-FIT-001",
+  "as_of": "2026-09-02",
+  "task_id": "FORGE_DISCOVERY_RANKER_ENTRY_GATE_V1",
+  "reviewed_bindings_sha256": "1374ca753c3114ebe6725786c0ec0fd5ae6174d287c97e03063e2ef77c3546c8",
+  "reviewed_inventory_sha256": "7bde2aa2abb55ffc856d91a5979022995b17b8f57e37ceadc2b8432cdc632a19",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ENTRY_GATE_DECIDES_ACTIVATION_WITHOUT_BUILDING_GENERATOR",
+    "flexibility_and_history": "PASS_EXTENDS_ARCH_INTENT_006_WITHOUT_REPLACING_TRUTH_OWNERS",
+    "context_efficiency": "PASS_BOUNDED_GIT_CATALOG_EVIDENCE_ONLY",
+    "research_truth": "PASS_NOT_YET_PROVEN_BLOCKS_SPECULATIVE_INFRA",
+    "owner_operability": "PASS_ONE_TERMINAL_AND_EXPLICIT_NON_CLAIMS",
+    "execution_to_cashflow": "NOT_APPLICABLE_DECISION_ONLY_GATE",
+    "monitoring_and_recovery": "PASS_REVERT_INTENT_NOTE_AND_EVIDENCE_BYTES",
+    "build_vs_buy": "PASS_NO_NEW_PLATFORM_ON_NEGATIVE_TRIGGER",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_SIGNER",
+    "red_team": "PASS_OWNER_REFRAME_ALONE_CANNOT_FORCE_PROVEN"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "REOPEN_ENTRY_GATE_WHEN_SUPPLY_BOTTLENECK_OR_CANDIDATE_SPACE_IS_MEASURED"
+  },
+  "recovery": "REVERT ARCH-INTENT-006 ENTRY-GATE NOTE, CATALOG INTEGRITY, AND forge_discovery_ranker_entry_gate EVIDENCE; DO NOT START A1 FROM THIS MERGE.",
+  "limits": [
+    "NO_GENERATOR_OR_RANKER",
+    "NO_QD_OR_VOI",
+    "NO_PROVIDER_OR_NETWORK",
+    "NO_HOLDOUT_OR_TRIAL",
+    "NO_ALPHA_OR_CASHFLOW",
+    "NO_SUCCESSOR_A1",
+    "NO_CANONICAL_DONE"
+  ]
+}
