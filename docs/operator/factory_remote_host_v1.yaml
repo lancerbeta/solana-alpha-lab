@@ -2,10 +2,10 @@ schema: smial.factory-remote-host-locator
 schema_version: "1.0"
 contract_id: FACTORY-REMOTE-OPERATIONS-001
 atom_id: FACTORY_REMOTE_OPERATIONS_V1
-as_of: "2026-08-22"
+as_of: "2026-09-02"
 # Public operational locator only. No tokens, keys, or .env values.
 provider: CHERRY_SERVERS
-sku: CLOUD_VPS_4_GEN2
+sku: CLOUD_VPS_6_GEN2
 os: ubuntu-24.04
 region: LT
 cherry_portal: https://portal.cherryservers.com/

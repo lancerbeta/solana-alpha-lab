@@ -17,7 +17,7 @@ Off-host Google Drive durability recovery: см. раздел **Durability recov
 | Поле | Значение |
 |---|---|
 | Provider | Cherry Servers, EU / Lithuania |
-| SKU | `CLOUD_VPS_4_GEN2` (не VPS 1) |
+| SKU | `CLOUD_VPS_6_GEN2` (не VPS 1) |
 | Hostname | `factory-remote-ops` |
 | Instance | `973818` |
 | IPv4 | `5.199.174.153` |
@@ -26,6 +26,8 @@ Off-host Google Drive durability recovery: см. раздел **Durability recov
 | Portal | `https://portal.cherryservers.com/` |
 
 IPv4 меняется только сменой этого YAML + этой таблицы одним коммитом.
+Doctor JSON может ещё показывать purchase-floor `CLOUD_VPS_4_GEN2` до
+отдельного schema unfreeze; для размера хоста канон — SKU в таблице/YAML выше.
 
 ## Как зайти
 

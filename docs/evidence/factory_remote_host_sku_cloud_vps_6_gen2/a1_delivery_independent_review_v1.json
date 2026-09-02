@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-REMOTE-HOST-SKU-CLOUD-VPS-6-GEN2-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_REMOTE_HOST_SKU_CLOUD_VPS_6_GEN2_V1",
+  "reviewed_bindings_sha256": "b760ff67ed3644322658260808817c0c488f14cfe17e5a04401e161aba99b35d",
+  "reviewed_inventory_sha256": "4937a4c14810411444af4c66a4d5cafd17db017ec6f9b35f6b1aa572ad66a6af",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_LOCATOR_ONLY_NO_TRUTH_OWNER_FORK",
+        "PASS_PURCHASE_FLOOR_CONFIGS_REMAIN_SEPARATE",
+        "PASS_NO_COLLECTOR_OR_SSH_BOUNDARY_CHANGE",
+        "PASS_DOCTOR_FLOOR_SKU_RESIDUAL_EXPLICIT"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_WRITE_SET_LOCATOR_PLUS_DERIVED_HASHES_ONLY",
+        "CHECKED_PURCHASE_FLOOR_CONFIGS_UNTOUCHED",
+        "CHECKED_IPV4_HOSTNAME_SSH_INSTANCE_UNCHANGED",
+        "CHECKED_NO_SECRETS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_LOCATOR_SKU_FALSIFIABLE_ON_CONSUMER_SURFACES",
+        "CHECKED_DOCTOR_FLOOR_RESIDUAL_NOTED_ON_OPERATOR_MD",
+        "CHECKED_HASH_BOUND_RECEIPT_VIA_BIND_EVIDENCE",
+        "CHECKED_NO_PURCHASE_FLOOR_UNFREEZE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_PURCHASE_FLOOR_UNFREEZE",
+    "NO_ALPHA_OR_OPERATIONAL_READY_CLAIM"
+  ]
+}
