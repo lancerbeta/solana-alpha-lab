@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-SEMANTIC-OPERABILITY-CLOSURE-FACTORY-FIT-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_USES_SEMANTIC_ROUTES_BEFORE_NEW_CAPABILITY_ATOMS"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS",
+    "NO_RAG_VECTOR_GRAPH",
+    "NO_AUTHORITY_INFERENCE",
+    "NO_RUNTIME_CACHE_IN_GIT",
+    "NO_TASK_SELECTION"
+  ],
+  "recovery": "REVERT"
+}

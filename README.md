@@ -1,7 +1,25 @@
 # Solana Memecoin Intraday Alpha Lab
 
-A bounded, evidence-first research system for executable Solana memecoin alpha
-on a 15-minute to 4-hour horizon.
+Owner-operated bounded Solana memecoin Alpha Factory: Git-native delivery,
+Catalog discovery, Hypothesis Forge, live lifecycle evidence and remote
+operations for executable alpha research on a 15-minute to 4-hour horizon.
+
+## Product orientation
+
+For “what capability exists / where is its current truth”:
+
+```text
+uv run --locked --managed-python python -B scripts/catalog_cli.py search-routes --text "<NEED>" --limit 5 --explain --json
+```
+
+Then read generated `docs/FACTORY_SEMANTIC_MAP.md` and the command ladder in
+`docs/OPERATOR_NAVIGATION.md`. Semantic routing never grants authority and never
+caches live runtime status.
+
+For an exact delivery atom: `AGENTS.md` / Delivery Harness.
+
+For exhaustive asset archaeology: Catalog commands, with `docs/PROJECT_MAP.md`
+only as fallback.
 
 ## Repository status boundary
 

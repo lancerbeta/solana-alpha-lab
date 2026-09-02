@@ -39,6 +39,13 @@ receipt, next epistemic action and terminal; automatic isolated Critic handoff; 
 deterministic lane classification; finalize; replay/resume/`prove-runtime`;
 cleanup of process-owned temp files.
 
+Before proposing `PASS_CHANGE_LANE_REQUIRED`, `CAPABILITY_OPTION_READY`, a new
+collector, provider adapter or infrastructure, compare the need against
+`semantic_capability_entries` and `capability_entries` in
+`FORGE_CONTEXT_PACKET`. Reuse or compose an accepted capability when sufficient;
+state an exact named gap when missing; do not invent infrastructure under
+uncertainty. Semantic entries never grant provider/data authority.
+
 If isolated Critic context is unavailable, return typed `AUTO_HANDOFF_UNAVAILABLE`.
 Do not silently self-criticize in the Forge context.
 

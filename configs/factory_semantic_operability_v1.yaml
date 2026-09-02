@@ -1,0 +1,278 @@
+schema: smial.factory-semantic-operability
+schema_version: "1.0"
+projection_id: FACTORY_SEMANTIC_OPERABILITY_V1
+projection_kind: DERIVED_REFERENCE_ONLY
+truth_owner: CATALOG_REFERENCES
+authority_granted: false
+limits:
+  max_routes: 12
+  max_root_bindings_per_route: 2
+  max_root_assets_per_route: 3
+  max_query_recipes_per_route: 4
+  max_search_terms_per_route: 16
+  max_forge_routes: 6
+  max_forge_projection_bytes: 3072
+routes:
+  - semantic_route_id: SEM-PRODUCT-STATE
+    purpose: Current Factory v1 product readiness and operational meaning from the readiness contract, not historical closeout tasks.
+    owner_questions:
+      - What is this product / Factory v1?
+      - What is this system / Alpha Factory?
+      - What does operationally ready mean?
+      - Where is current product readiness truth?
+      - что это за продукт / factory readiness
+    search_terms:
+      - factory
+      - product
+      - readiness
+      - operational
+      - OPERATIONAL_READY
+      - factory v1
+      - system
+      - alpha lab
+      - alpha factory
+      - продукт
+      - готовность
+      - система
+    consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+    root_binding_ids: [ACTIVE-FACTORY-OPERATIONAL-READINESS]
+    root_asset_ids: []
+    query_recipe_ids: []
+    status_plane: CAPABILITY
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-AUTHORITY-BOUNDARIES, SEM-HYPOTHESIS-FORGE]
+
+  - semantic_route_id: SEM-HYPOTHESIS-FORGE
+    purpose: Current Hypothesis Forge / Independent Critic one-slash workflow and capability roots.
+    owner_questions:
+      - How do I generate or review a hypothesis?
+      - Where do hypotheses enter?
+      - How do I run Hypothesis Forge?
+      - What is the one-slash Forge workflow?
+      - как сгенерировать или проверить гипотезу
+    search_terms:
+      - hypothesis
+      - hypotheses
+      - forge
+      - HFIC
+      - critic
+      - /hypothesis-forge
+      - enter
+      - гипотеза
+      - кузница
+    consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+    root_binding_ids: [ACTIVE-HYPOTHESIS-FORGE]
+    root_asset_ids:
+      - DOC-HYPOTHESIS-FORGE-OPERATOR-001
+      - SKILL-HYPOTHESIS-FORGE-001
+    query_recipe_ids: []
+    status_plane: CAPABILITY
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-PRIOR-WORK, SEM-EXPERIMENT-CAPABILITIES]
+
+  - semantic_route_id: SEM-PRIOR-WORK
+    purpose: Current prior-work and negative-result discovery via HFIC/Fast Lane recipes and research memory roots.
+    owner_questions:
+      - Has this mechanism been tested?
+      - Find prior negative hypothesis work
+      - Is there an existing HFIC or Fast Lane session?
+      - найти прошлую негативную работу по гипотезам
+    search_terms:
+      - prior work
+      - negative results
+      - research memory
+      - HFIC session
+      - Fast Lane prior
+      - прошлые результаты
+      - негатив
+    consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CURSOR-DELIVERY]
+    root_binding_ids: []
+    root_asset_ids:
+      - MODULE-FACTORY-V1-RESEARCH-STORE-001
+      - REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
+    query_recipe_ids:
+      - QUERY-HFIC-EXACT-RELATED-PRIOR-001
+      - QUERY-HYPOTHESIS-FAST-LANE-SEARCH-PRIOR-WORK-001
+      - QUERY-HFIC-SESSION-BY-SEARCH-KEY-001
+      - QUERY-HFIC-PENDING-SESSION-001
+    status_plane: SCIENTIFIC
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: INCLUDE
+    related_route_ids: [SEM-EXPERIMENT-CAPABILITIES, SEM-LIVE-EVIDENCE-TO-FORGE]
+
+  - semantic_route_id: SEM-EXPERIMENT-CAPABILITIES
+    purpose: Accepted reusable Experiment Capability registry for compose-or-gap decisions.
+    owner_questions:
+      - Can I run this through an existing experiment capability?
+      - What capability IDs are accepted?
+      - Would this require product code?
+      - можно ли прогнать через существующую capability
+    search_terms:
+      - experiment capability
+      - capability registry
+      - CAP-
+      - Fast Lane capability
+      - reusable capability
+      - capability
+    consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
+    root_binding_ids: [ACTIVE-EXPERIMENT-CAPABILITY-REGISTRY]
+    root_asset_ids: []
+    query_recipe_ids: []
+    status_plane: CAPABILITY
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: INCLUDE
+    related_route_ids: [SEM-PROVIDER-ROUTES, SEM-MARKET-DATA-FEATURES]
+
+  - semantic_route_id: SEM-MARKET-DATA-FEATURES
+    purpose: Current Factory market feature surface and PIT versus forward-only availability classes.
+    owner_questions:
+      - What feature or data exists at decision time?
+      - Is it PIT_READY or FORWARD_ONLY?
+      - What market features already exist?
+      - какие признаки уже есть
+    search_terms:
+      - market feature
+      - feature surface
+      - PIT_READY
+      - FORWARD_ONLY
+      - HISTORICAL_RECONSTRUCTIBLE
+      - признаки
+      - market data
+    consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
+    root_binding_ids: [ACTIVE-FACTORY-MARKET-FEATURE-SURFACE]
+    root_asset_ids: []
+    query_recipe_ids: []
+    status_plane: MIXED
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: INCLUDE
+    related_route_ids: [SEM-PROVIDER-ROUTES, SEM-EXPERIMENT-CAPABILITIES]
+
+  - semantic_route_id: SEM-PROVIDER-ROUTES
+    purpose: Current provider-route capability registry. Route existence never implies call authority.
+    owner_questions:
+      - What provider route supports this field?
+      - Does a provider route already exist?
+      - Which provider route is registered?
+      - какой маршрут провайдера уже есть
+    search_terms:
+      - provider route
+      - provider registry
+      - ROUTE_EXISTS
+      - CALL_AUTHORIZED
+      - провайдер
+      - маршрут
+    consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
+    root_binding_ids: [ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY]
+    root_asset_ids: []
+    query_recipe_ids: []
+    status_plane: MIXED
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: INCLUDE
+    related_route_ids: [SEM-AUTHORITY-BOUNDARIES, SEM-EXPERIMENT-CAPABILITIES]
+
+  - semantic_route_id: SEM-LIVE-COLLECTION
+    purpose: Lifecycle collector operator entry and ObservationSchedule config root; runtime state requires gated readback.
+    owner_questions:
+      - Is lifecycle collection running / where do I inspect it?
+      - How is lifecycle data collected?
+      - Where is the collector runbook?
+      - где смотреть сбор lifecycle
+    search_terms:
+      - lifecycle collector
+      - ObservationSchedule
+      - live collection
+      - collector runbook
+      - C4
+      - сбор
+      - коллектор
+    consumers: [GOAL-OWNER, FACTORY-001]
+    root_binding_ids: [ACTIVE-LIFECYCLE-COLLECTOR]
+    root_asset_ids: [CONFIG-OBSERVATION-SCHEDULE-RUNTIME-V1-001]
+    query_recipe_ids: []
+    status_plane: MIXED
+    runtime_resolution:
+      mode: EXTERNAL_GATED_READBACK
+      operator_asset_ids: [DOC-FACTORY-LIFECYCLE-COLLECTOR-001]
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-LIVE-EVIDENCE-TO-FORGE, SEM-REMOTE-OPS-RECOVERY]
+
+  - semantic_route_id: SEM-LIVE-EVIDENCE-TO-FORGE
+    purpose: How Observation RDP becomes cumulative LIVE CORPUS scientific evidence for Forge consumers.
+    owner_questions:
+      - How does live RDP get into Forge?
+      - How does a cohort become LIVE CORPUS?
+      - Does Forge see one cumulative current dataset?
+      - как live evidence попадает в Forge
+    search_terms:
+      - live evidence
+      - LIVE CORPUS
+      - live cohort
+      - discovery release
+      - Observation RDP
+      - cumulative corpus
+      - live rdp
+    consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
+    root_binding_ids: [ACTIVE-LIVE-LIFECYCLE-EVIDENCE]
+    root_asset_ids: []
+    query_recipe_ids: []
+    status_plane: MIXED
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: INCLUDE
+    related_route_ids: [SEM-PRIOR-WORK, SEM-LIVE-COLLECTION]
+
+  - semantic_route_id: SEM-REMOTE-OPS-RECOVERY
+    purpose: Factory remote host locator and remote-operations config; health and backup freshness require gated readback.
+    owner_questions:
+      - Where is the Factory VPS?
+      - How do I backup / restore / recover remote Factory?
+      - How do I inspect remote health?
+      - бэкап / restore / remote Factory VPS
+    search_terms:
+      - remote ops
+      - VPS
+      - backup
+      - restore
+      - factory-remote-ops
+      - recovery
+      - удалённый
+      - бэкап
+    consumers: [GOAL-OWNER, FACTORY-001]
+    root_binding_ids: [ACTIVE-FACTORY-REMOTE-OPERATIONS]
+    root_asset_ids: [DOC-FACTORY-REMOTE-HOST-001]
+    query_recipe_ids: []
+    status_plane: RUNTIME
+    runtime_resolution:
+      mode: EXTERNAL_GATED_READBACK
+      operator_asset_ids: [DOC-FACTORY-REMOTE-HOST-001]
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-LIVE-COLLECTION, SEM-AUTHORITY-BOUNDARIES]
+
+  - semantic_route_id: SEM-AUTHORITY-BOUNDARIES
+    purpose: Explains where authority is resolved. Never grants provider, deploy, spend, merge or remote mutation.
+    owner_questions:
+      - Am I authorized to call, deploy or spend?
+      - May I merge?
+      - Where is authority decided?
+      - Where does authority come from?
+      - могу ли я вызвать провайдера / задеплоить / потратить
+    search_terms:
+      - authority
+      - owner attention
+      - merge readiness
+      - authorized
+      - permission
+      - gate
+      - полномочия
+      - авторизация
+    consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+    root_binding_ids: []
+    root_asset_ids:
+      - POLICY-OWNER-ATTENTION-GATE-002
+      - CONFIG-DELIVERY-PROJECT-PROFILE-001
+    query_recipe_ids: []
+    status_plane: AUTHORITY
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-PROVIDER-ROUTES, SEM-PRODUCT-STATE]

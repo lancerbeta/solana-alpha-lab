@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-SEMANTIC-OPERABILITY-CLOSURE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "AUTHORITY_GRANTED_CONST_FALSE",
+        "REFERENCE_ONLY_PROJECTION",
+        "INCLUDE_ROUTE_WORDING_DIGEST_STABLE",
+        "FORGE_FULL_PAYLOAD_BYTE_BUDGET",
+        "ARCH_INTENT_BANNED_AS_ROOT",
+        "GOLD_ROUTE_RANKING_DETERMINISTIC",
+        "NO_RUNTIME_STATE_CACHED",
+        "CLI_SEARCH_RESOLVE_LIST_ROUTES"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "TEN_SEMANTIC_ROUTES",
+        "CLEAN_CLONE_GOLD_QUESTIONS",
+        "PROJECT_MAP_NOT_ON_NORMAL_PATH",
+        "STALE_TASK_NOT_CURRENT_ROOT",
+        "PRIOR_WORK_HFIC_FACADE",
+        "FORGE_SEMANTIC_BUDGETS",
+        "DIGEST_IDENTITY_ONLY",
+        "NO_SECOND_CATALOG_OR_RAG"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Q1_STALE_TASK_NO",
+        "Q2_ARCH_INTENT_NO",
+        "Q3_AUTHORITY_GRANT_NO",
+        "Q4_RUNTIME_PROSE_NO",
+        "Q5_WORDING_BUDGET_NO",
+        "Q6_CONTEXT_DISCOVERABILITY",
+        "Q7_BINDING_MOVE_NO_RETRO",
+        "Q8_PROJECT_MAP_NOT_REQUIRED",
+        "Q9_NOT_SECOND_CATALOG",
+        "Q10_NO_FAKE_ROADMAP",
+        "Q11_PACKET_BUDGET_HELD",
+        "Q12_PROVIDER_PIN_PRESERVED"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_AUTHORITY_FROM_SEMANTIC_ROUTE",
+    "NO_RUNTIME_HEALTH_FROM_GIT",
+    "NO_TASK_SELECTION",
+    "NO_ALPHA"
+  ]
+}

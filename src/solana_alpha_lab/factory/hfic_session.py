@@ -68,6 +68,7 @@ _MATERIAL_EPOCH_KEYS = (
     "scientific_terminals",
     "capability_schema_hashes",
     "accepted_query_recipe_hashes",
+    "semantic_capability_digest_sha256",
 )
 _COMPONENT_FIELDS = (
     "primary_x_family",

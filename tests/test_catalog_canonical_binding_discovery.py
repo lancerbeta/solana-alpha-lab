@@ -87,7 +87,14 @@ class CanonicalBindingSchemaTests(unittest.TestCase):
         legacy["schema_version"] = "1.0"
         legacy.pop("canonical_bindings", None)
         commands = legacy["root_resolver"]["commands"]
-        for key in ("resolve_binding", "search_assets", "related_assets"):
+        for key in (
+            "resolve_binding",
+            "search_assets",
+            "related_assets",
+            "search_routes",
+            "resolve_route",
+            "list_routes",
+        ):
             commands.pop(key, None)
         self.validator.validate(legacy)
 
@@ -485,14 +492,11 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
         cls.snapshot = load_and_validate()
         cls.bindings = cls.snapshot.manifest["canonical_bindings"]
 
-    def test_live_bindings_are_exactly_the_two_atom_a_roots(self) -> None:
-        self.assertEqual(
-            set(self.bindings),
-            {
-                "ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY",
-                "ACTIVE-FACTORY-MARKET-FEATURE-SURFACE",
-            },
-        )
+    def test_live_bindings_include_atom_a_and_semantic_roots(self) -> None:
+        self.assertLessEqual(len(self.bindings), 10)
+        self.assertIn("ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY", self.bindings)
+        self.assertIn("ACTIVE-FACTORY-MARKET-FEATURE-SURFACE", self.bindings)
+        self.assertIn("ACTIVE-FACTORY-SEMANTIC-OPERABILITY", self.bindings)
         self.assertEqual(
             self.bindings["ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY"]["target_asset_id"],
             "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
@@ -500,6 +504,10 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
         self.assertEqual(
             self.bindings["ACTIVE-FACTORY-MARKET-FEATURE-SURFACE"]["target_asset_id"],
             "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001",
+        )
+        self.assertEqual(
+            self.bindings["ACTIVE-FACTORY-OPERATIONAL-READINESS"]["target_asset_id"],
+            "CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001",
         )
 
     def test_legacy_search_assets_wrapper_still_accepts_old_call(self) -> None:

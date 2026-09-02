@@ -58,7 +58,11 @@ from solana_alpha_lab.factory.research_store import (
 )
 from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
 from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
-
+from solana_alpha_lab.factory_semantic_operability import (
+    SemanticOperabilityError,
+    forge_semantic_slice_for_repo,
+    semantic_capability_digest_for_repo,
+)
 
 AUTO_FOCUS = "AUTO"
 AUTO_SESSIONS_PER_EPOCH = 1
@@ -171,6 +175,10 @@ def evidence_epoch_material(
         for item in enumerate_closed_park_terminals(root, data_root)
     )
     lifecycle_terminals = list(dict.fromkeys(lifecycle_terminals))
+    try:
+        semantic_digest = semantic_capability_digest_for_repo(root)
+    except SemanticOperabilityError:
+        semantic_digest = hashlib.sha256(b"SEMANTIC-DIGEST-UNAVAILABLE").hexdigest()
     return {
         "catalog_root_hashes": hashes,
         "dataset_manifest_ids": dataset_manifest_ids,
@@ -180,6 +188,7 @@ def evidence_epoch_material(
         "capability_schema_hashes": [hashes[-1]],
         "accepted_query_recipe_hashes": [hashes[1]],
         "prior_work_digest": prior_digest,
+        "semantic_capability_digest_sha256": semantic_digest,
     }
 
 
@@ -1110,6 +1119,19 @@ def build_forge_context_packet(
         truncation["truncated"] = True
     if warnings:
         truncation["context_warnings"] = len(warnings)
+    try:
+        semantic_slice = forge_semantic_slice_for_repo(Path(repo_root))
+    except SemanticOperabilityError:
+        semantic_slice = {
+            "semantic_capability_entries": [],
+            "semantic_capability_digest_sha256": hashlib.sha256(
+                b"SEMANTIC-DIGEST-UNAVAILABLE"
+            ).hexdigest(),
+            "kept_semantic_routes": [],
+            "dropped_semantic_routes": [],
+            "semantic_projection_truncated": True,
+            "authority_granted": False,
+        }
     packet = {
         "prompt_version": PROMPT_VERSION,
         "owner_focus": owner_focus,
@@ -1139,16 +1161,44 @@ def build_forge_context_packet(
         "feature_hints": feature_hints,
         "feature_families": feature_families,
         "closed_family_ledger": closed_family_ledger,
+        "semantic_capability_entries": semantic_slice.get("semantic_capability_entries")
+        or [],
+        "semantic_capability_digest_sha256": semantic_slice.get(
+            "semantic_capability_digest_sha256"
+        ),
         "context_warnings": warnings,
         "ranked_prior_candidate_ids": ranked,
-        "truncation_receipt": truncation,
+        "truncation_receipt": {
+            **truncation,
+            "kept_semantic_routes": semantic_slice.get("kept_semantic_routes") or [],
+            "dropped_semantic_routes": semantic_slice.get("dropped_semantic_routes")
+            or [],
+            "semantic_projection_truncated": bool(
+                semantic_slice.get("semantic_projection_truncated")
+            ),
+        },
     }
     encoded = canonical_json_bytes(packet)
+    if len(encoded) > MAX_PACKET_BYTES:
+        # Semantic navigation is lower priority than datasets / closed families / priors.
+        packet["semantic_capability_entries"] = []
+        packet["truncation_receipt"] = {
+            **packet["truncation_receipt"],
+            "truncated": True,
+            "kept_semantic_routes": [],
+            "dropped_semantic_routes": list(
+                semantic_slice.get("kept_semantic_routes") or []
+            )
+            + list(semantic_slice.get("dropped_semantic_routes") or []),
+            "semantic_projection_truncated": True,
+            "reason": "MAX_PACKET_BYTES_DROP_SEMANTIC",
+        }
+        encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
         packet["ranked_prior_candidate_ids"] = ranked[:3]
         packet["prior_work_receipts"] = prior_work_receipts[:5]
         packet["truncation_receipt"] = {
-            **truncation,
+            **packet["truncation_receipt"],
             "truncated": True,
             "kept_priors": min(3, len(ranked)),
             "reason": "MAX_PACKET_BYTES",

@@ -1,0 +1,146 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/factory_semantic_operability.schema.json",
+  "title": "SMIAL factory semantic operability projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "projection_id",
+    "projection_kind",
+    "truth_owner",
+    "authority_granted",
+    "limits",
+    "routes"
+  ],
+  "properties": {
+    "schema": {"const": "smial.factory-semantic-operability"},
+    "schema_version": {"const": "1.0"},
+    "projection_id": {"const": "FACTORY_SEMANTIC_OPERABILITY_V1"},
+    "projection_kind": {"const": "DERIVED_REFERENCE_ONLY"},
+    "truth_owner": {"const": "CATALOG_REFERENCES"},
+    "authority_granted": {"const": false},
+    "limits": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_routes",
+        "max_root_bindings_per_route",
+        "max_root_assets_per_route",
+        "max_query_recipes_per_route",
+        "max_search_terms_per_route",
+        "max_forge_routes",
+        "max_forge_projection_bytes"
+      ],
+      "properties": {
+        "max_routes": {"type": "integer", "minimum": 1, "maximum": 12},
+        "max_root_bindings_per_route": {"type": "integer", "minimum": 0, "maximum": 2},
+        "max_root_assets_per_route": {"type": "integer", "minimum": 0, "maximum": 3},
+        "max_query_recipes_per_route": {"type": "integer", "minimum": 0, "maximum": 4},
+        "max_search_terms_per_route": {"type": "integer", "minimum": 1, "maximum": 16},
+        "max_forge_routes": {"type": "integer", "minimum": 1, "maximum": 6},
+        "max_forge_projection_bytes": {"type": "integer", "minimum": 256, "maximum": 3072}
+      }
+    },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": {"$ref": "#/$defs/route"}
+    }
+  },
+  "$defs": {
+    "stableId": {
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+$"
+    },
+    "runtimeResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "operator_asset_ids"],
+      "properties": {
+        "mode": {
+          "enum": ["NONE", "LOCAL_READ_ONLY", "EXTERNAL_GATED_READBACK"]
+        },
+        "operator_asset_ids": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stableId"}
+        }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "semantic_route_id",
+        "purpose",
+        "owner_questions",
+        "search_terms",
+        "consumers",
+        "root_binding_ids",
+        "root_asset_ids",
+        "query_recipe_ids",
+        "status_plane",
+        "runtime_resolution",
+        "forge_visibility",
+        "related_route_ids"
+      ],
+      "properties": {
+        "semantic_route_id": {"$ref": "#/$defs/stableId"},
+        "purpose": {"type": "string", "minLength": 8, "maxLength": 400},
+        "owner_questions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {"type": "string", "minLength": 3, "maxLength": 200}
+        },
+        "search_terms": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 2, "maxLength": 64}
+        },
+        "consumers": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 2, "maxLength": 64}
+        },
+        "root_binding_ids": {
+          "type": "array",
+          "maxItems": 2,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stableId"}
+        },
+        "root_asset_ids": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stableId"}
+        },
+        "query_recipe_ids": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stableId"}
+        },
+        "status_plane": {
+          "enum": ["CAPABILITY", "RUNTIME", "SCIENTIFIC", "AUTHORITY", "MIXED"]
+        },
+        "runtime_resolution": {"$ref": "#/$defs/runtimeResolution"},
+        "forge_visibility": {"enum": ["INCLUDE", "EXCLUDE"]},
+        "related_route_ids": {
+          "type": "array",
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/stableId"}
+        }
+      }
+    }
+  }
+}

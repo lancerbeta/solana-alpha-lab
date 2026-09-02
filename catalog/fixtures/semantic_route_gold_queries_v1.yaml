@@ -1,0 +1,55 @@
+schema_version: '1.0'
+fixture_id: FIXTURE-SEMANTIC-ROUTE-GOLD-QUERIES-001
+as_of: '2026-09-02'
+queries:
+- query_id: SGQ-PRODUCT-STATE-EN
+  query: what is this product / factory readiness
+  required_top_route: SEM-PRODUCT-STATE
+- query_id: SGQ-PRODUCT-STATE-SYSTEM
+  query: what is this system
+  required_top_route: SEM-PRODUCT-STATE
+- query_id: SGQ-PRODUCT-STATE-RU
+  query: что это за продукт / factory readiness
+  required_top_route: SEM-PRODUCT-STATE
+- query_id: SGQ-HYPOTHESIS-FORGE-EN
+  query: generate or review a hypothesis
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-HYPOTHESIS-FORGE-ENTER
+  query: where do hypotheses enter
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-HYPOTHESIS-FORGE-RU
+  query: как сгенерировать или проверить гипотезу
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-PRIOR-WORK-EN
+  query: find prior negative hypothesis work
+  required_top_route: SEM-PRIOR-WORK
+- query_id: SGQ-PRIOR-WORK-RU
+  query: найти прошлую негативную работу по гипотезам
+  required_top_route: SEM-PRIOR-WORK
+- query_id: SGQ-EXPERIMENT-CAPABILITIES-EN
+  query: can I run this through an existing experiment capability
+  required_top_route: SEM-EXPERIMENT-CAPABILITIES
+- query_id: SGQ-MARKET-FEATURES-EN
+  query: what feature/data exists at decision time
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-PROVIDER-ROUTES-EN
+  query: what provider route supports this field
+  required_top_route: SEM-PROVIDER-ROUTES
+- query_id: SGQ-LIVE-COLLECTION-EN
+  query: is lifecycle collection running / where do I inspect it
+  required_top_route: SEM-LIVE-COLLECTION
+- query_id: SGQ-LIVE-EVIDENCE-EN
+  query: how live RDP gets into Forge
+  required_top_route: SEM-LIVE-EVIDENCE-TO-FORGE
+- query_id: SGQ-REMOTE-OPS-EN
+  query: backup / restore / remote Factory VPS
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-AUTHORITY-EN
+  query: am I authorized to call/deploy/spend
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-AUTHORITY-COME-FROM
+  query: where does authority come from
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-AUTHORITY-RU
+  query: могу ли я вызвать провайдера / задеплоить / потратить
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
