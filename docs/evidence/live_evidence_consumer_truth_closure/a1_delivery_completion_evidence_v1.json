@@ -11,7 +11,19 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "fb52f17800c21ee0d78e14449d07ee3b142068a908be8c4d925207964c340235",
+    "catalog/assets/lifecycle.yaml": "f063203c3e4bed8aabbbcde788337547e986e1762a3ec0ad87df61029bae96db",
+    "catalog/catalog_manifest.yaml": "2556af7cd6f914b853280a99d2de4361b43144a4ad37849c147f19ae7e23cb58",
+    "catalog/generated/asset_edges.json": "28210bd0a0fcba71167fac37188ad7f97cf46766e52b6493497e211a1fe5cf41",
+    "docs/PROJECT_MAP.md": "5257a7641aa1280e75ddebcafe43b9a9833efccb9e818fc74035556ba6e3905b",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "4c97d28f245e723aa7af739a11cea8edcfcee7c05141eba01d62f72f45a94cae",
+    "docs/reports/live_evidence_consumer_truth_closure/a1_owner_readout_v1.md": "36df5a3db5e6b0b570a6e8a8b63da5ce01b69e7b50f93ebd3929c6d3836c1ee5",
+    "docs/tasks/LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1.md": "745409b1508be0ed97f92f90b1dedf7be3d0b146c481d214b1c81e80cf8b9cea",
+    "scripts/discovery_evidence_release.py": "4f8778122b2d413b562abad255f9dd820f7946403f1a0b140f0a9fe1b60b258e",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "77bafb0ff71b0eb54e426a55090d3c15d34f3465ca64fb871c1456053d4ba0e9",
+    "tests/test_collector_operability_retention_and_owner_pulse.py": "e204adfa69bfc5703adb245daea767f68a32babfe553e47ed658e2d9bad62cbb",
+    "tests/test_live_cohort_discovery_release_series.py": "0c0e56e32872fe11dd325f585270009309d68e9db81bf07e2c4eafafec658a00",
+    "tests/test_live_evidence_consumer_truth_closure.py": "dd9c27adc5eabf929abb088466211eb0dc0d0620b9a9cc8ab1a8cd47bfa8f363"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_evidence_consumer_truth_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "2ba3333bd70bb654caa264e9d82264e950ce636e6e9bd3ffe1f06d207e2e3159",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/live_evidence_consumer_truth_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "1e275b3810f7bfb8126d67d7e4eb9f1219c421f738fed020c23fd8114bdc92c3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

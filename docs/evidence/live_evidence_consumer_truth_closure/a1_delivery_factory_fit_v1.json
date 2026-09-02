@@ -6,8 +6,8 @@
   "task_id": "LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "ed465d1eeee03daeea54729d2b5f06d13ce461596947de7bb8fd60bb2e74a43c",
+  "reviewed_inventory_sha256": "f40260d9839b87ad1fe7687b0a759baea9022fb7939753cb6cdcc3bbb190aa46",
   "capability_radar": {
     "now": "NONE",
     "watch": "C4_WEEKLY_LIVE_COHORT_SEAL_AFTER_MATURITY"
