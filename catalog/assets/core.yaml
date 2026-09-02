@@ -33109,7 +33109,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: 979943f10d958a4001387442a14f74268627094dcc75d57d6b82f39113597e06}
+  integrity: {kind: sha256, sha256: c9b6c88d214074f9337bd4694e2eda8699d3c587f3900a8f2aa04b1612999e7b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -33438,7 +33438,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_scheduler.py', repository_path: src/solana_alpha_lab/factory/observation_scheduler.py}
-  integrity: {kind: sha256, sha256: 9fc35af6362c8c4c738252afb561abaaa577193ee1b39b6b2ccc018581f0c24f}
+  integrity: {kind: sha256, sha256: fc3a08a8fa44f327d7213c38f5de6e952d3849a89c6ea6483b14a0116c2a011c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}

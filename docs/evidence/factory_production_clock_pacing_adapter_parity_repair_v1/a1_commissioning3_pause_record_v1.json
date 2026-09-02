@@ -1,0 +1,42 @@
+{
+  "schema": "smial.factory-commissioning-pause-record",
+  "schema_version": "1.0",
+  "record_id": "FACTORY-C3-PAUSE-PRODUCTION-CLOCK-PACING-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_PRODUCTION_CLOCK_PACING_ADAPTER_PARITY_REPAIR_V1",
+  "owner_authority": "OK FACTORY_PAUSE_COMMISSIONING_3_PRODUCTION_CLOCK_PACING_BUG_V1 schedule=1ac23901907ecc8a481ec8ce595f751b774c53221244407cbdee634cdadc5893 activation=ACT-1AC23901907ECC8A reason=SEARCH_STARVED_BY_PRODUCTION_CLOCK_PACING_ADAPTER",
+  "schedule_sha256": "1ac23901907ecc8a481ec8ce595f751b774c53221244407cbdee634cdadc5893",
+  "activation_id": "ACT-1AC23901907ECC8A",
+  "final_state": "PAUSED_OPERATOR",
+  "active_count_after_pause": 0,
+  "scientific_use": "COMMISSIONING_ONLY",
+  "must_not_resume": true,
+  "failure_reason": "SEARCH_STARVED_BY_PRODUCTION_CLOCK_PACING_ADAPTER",
+  "deploy_sha_at_pause": "f6dd1175a578103ed3df463219b8040c23fb535e",
+  "call_ledger": {
+    "pre_pause": 108,
+    "post_quiescence_baseline": 108,
+    "freeze_cycles": [108, 108, 108],
+    "freeze_proof": "PASS"
+  },
+  "timer": {
+    "enabled": true,
+    "active": true
+  },
+  "post_pause_tick_terminal": "TICK_REFUSED_NO_LIVE_DEFAULT",
+  "post_pause_provider_calls": 0,
+  "censored_late_immutable_at_pause_scope": true,
+  "prior_aborted_safety_preserved": [
+    "ACT-490C21B69A1F8F8F",
+    "ACT-7DB1C77A6F7AF4F3"
+  ],
+  "vps_abort_executed": false,
+  "repair_deployed": false,
+  "replacement_campaign_started": false,
+  "non_claims": [
+    "NO_ABORT_SAFETY_TRANSITION",
+    "NO_RESUME",
+    "NO_REPAIR_DEPLOY",
+    "NO_SECRET_VALUES"
+  ]
+}

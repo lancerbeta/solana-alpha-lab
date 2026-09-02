@@ -19,7 +19,9 @@ from solana_alpha_lab.factory.observation_panel_publisher import (
     repair_open_publication_jobs,
 )
 from solana_alpha_lab.factory.observation_provider_pacing import (
+    ClockSleepRequiredError,
     ProviderTickContext,
+    require_sleep_capable_clock,
 )
 from solana_alpha_lab.factory.observation_primitive_registry import (
     ObservationPrimitiveRegistry,
@@ -1060,9 +1062,12 @@ def tick_once(
     stop_reason: str | None = None
     source_poll_reused = False
     discovery_context: dict[str, Any] = {}
-    injectable_clock = clock
-    if clock is not None and not callable(getattr(clock, "sleep", None)):
-        injectable_clock = clock
+    # Production must supply a sleep-capable clock (WallClock). Bare callables
+    # without sleep previously no-op'd here and starved SEARCH via rapid PACE_WAIT.
+    try:
+        injectable_clock = require_sleep_capable_clock(clock)
+    except ClockSleepRequiredError as exc:
+        raise ObservationSchedulerError(str(exc)) from exc
     provider_ctx = ProviderTickContext(
         tick_start=now,
         pace_seconds=int(schedule["budgets"]["min_provider_pace_seconds"]),

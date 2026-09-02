@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-PROD-CLOCK-PACING-ADAPTER-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_PRODUCTION_CLOCK_PACING_ADAPTER_PARITY_REPAIR_V1",
+  "state_change": "FACTORY_PRODUCTION_CLOCK_PACING_ADAPTER_PARITY_REPAIR_READY_FOR_MERGE",
+  "base_main": "f6dd1175a578103ed3df463219b8040c23fb535e",
+  "owner_approvals": [],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "c70755f5bc0a19d77d2e52a77704b4c89dfd3d80270ca59e7d1214209432b3c2",
+    "docs/evidence/factory_production_clock_pacing_adapter_parity_repair_v1/a1_commissioning3_pause_record_v1.json": "f726a44d111185de57532e3ba2d7720b553441a1af195fc22c26636a405eda64",
+    "docs/reports/factory_production_clock_pacing_adapter_parity_repair_v1/a1_owner_readout_v1.md": "92c8c89c810dc086d70e35e6ae4287f0e0f90df5130eb7358ed1444a5a3e332d",
+    "docs/tasks/FACTORY_PRODUCTION_CLOCK_PACING_ADAPTER_PARITY_REPAIR_V1.md": "4e788783d4af75c6a4f771f9bc276d1b3a5a55f1de46483309a5eb4ff6cc7a7b",
+    "scripts/observation_schedule.py": "c9b6c88d214074f9337bd4694e2eda8699d3c587f3900a8f2aa04b1612999e7b",
+    "src/solana_alpha_lab/factory/observation_provider_pacing.py": "06ce75920b31d7714554b0c11b2c51a6130197ebad2421176219e7c26399856f",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "fc3a08a8fa44f327d7213c38f5de6e952d3849a89c6ea6483b14a0116c2a011c",
+    "tests/test_factory_production_clock_pacing_adapter_parity_repair.py": "9cff6a5f8237c027e804f90522021a3bd5c7e105e389e7c680e8e04f031acd8c"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_production_clock_pacing_adapter_parity_repair_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "2c157b8684721c4b33f5156ba852806e58bf58336d5c09e91197c552d0cfa7b7",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PRODUCTION_CLOCK_PACING_ADAPTER_PARITY_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_production_clock_pacing_adapter_parity_repair_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "4e31b22d9431677d75a53d7fd84f73bf7a1a94d49d9ac7d240d4bb9e46cc8c45",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PAUSE_LEDGER_FREEZE",
+      "PASS_LEGACY_BARE_CALLABLE_STARVATION_TRACE",
+      "PASS_WALLCLOCK_CLI",
+      "PASS_RECENT_SEARCH_SAME_TICK",
+      "PASS_FOUR_DUES_SPACING",
+      "PASS_ORACLE_GEOMETRY_UNCHANGED"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_REPAIR_VPS_DEPLOY",
+    "NO_RESUME",
+    "NO_ABORT_SAFETY_TRANSITION",
+    "NO_NEW_CAMPAIGN",
+    "NO_ORACLE_RETUNE",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

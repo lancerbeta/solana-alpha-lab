@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-PROD-CLOCK-PACING-ADAPTER-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_PRODUCTION_CLOCK_PACING_ADAPTER_PARITY_REPAIR_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "52d32a4ef19844aade747997f9c2875273333a0f752663266da4ab039acf7d06",
+  "reviewed_inventory_sha256": "98543dd0d867981d7b4188999b47c687acdd48ef21bfbd260d4d555c6f6f803b",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "WALLCLOCK_ADDED_WITH_REAL_SLEEP",
+        "BARE_CALLABLE_FAIL_CLOSED",
+        "CLI_NO_LONGER_SUPPLIES_LAMBDA_NOW",
+        "ADVANCING_CLOCK_TESTS_NO_REAL_SLEEP"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PAUSE_RECORD_SHAPE_OK",
+        "CLI_WALLCLOCK_OK",
+        "FAIL_CLOSED_OK",
+        "RECENT_SEARCH_PROOF_OK",
+        "FOUR_DUES_ALL_TERMINAL_ASSERTED",
+        "NON_CLAIMS_STATED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SINGLE_PACING_SURFACE",
+        "NO_SECOND_TIME_PLANE",
+        "FORGE_VPS_BOUNDARY_CLEAN",
+        "GENERIC_PACING_ADAPTER",
+        "ORACLE_SCIENCE_UNCHANGED"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_REPAIR_VPS_DEPLOY",
+    "NO_RESUME",
+    "NO_ABORT_SAFETY_TRANSITION",
+    "NO_ALPHA"
+  ]
+}
