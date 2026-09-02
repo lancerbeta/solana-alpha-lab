@@ -7,7 +7,6 @@ import argparse
 import json
 import os
 import sys
-from datetime import UTC, datetime
 from pathlib import Path, PurePosixPath, PureWindowsPath
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,6 +33,9 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     rollover_schedule,
     snapshot_schedule,
     status_schedule,
+)
+from solana_alpha_lab.factory.observation_provider_pacing import (  # noqa: E402
+    WallClock,
 )
 from solana_alpha_lab.factory.observation_schedule_runtime import (  # noqa: E402
     DEFAULT_RUNTIME_RELATIVE,
@@ -523,7 +525,7 @@ def main(argv: list[str] | None = None) -> int:
                     credential_loader=credential_loader,
                     producer_git_sha=producer,
                     clock=(
-                        (lambda: datetime.now(UTC))
+                        WallClock()
                         if not config.get("fake_provider_fixture")
                         else None
                     ),

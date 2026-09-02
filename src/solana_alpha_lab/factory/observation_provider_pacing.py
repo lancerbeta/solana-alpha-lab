@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import time
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Any, Protocol
@@ -10,6 +11,10 @@ TIMER_CADENCE_SECONDS = 60
 DEFAULT_TICK_WALL_BUDGET_SECONDS = 55
 MAX_INTRA_TICK_PACE_WAITS = 20
 FREE_TIER_MIN_PACE_SECONDS = 3
+
+
+class ClockSleepRequiredError(ValueError):
+    """Bare callable clocks without sleep are not valid production pacing clocks."""
 
 
 class _AccountingGate(Protocol):
@@ -34,6 +39,20 @@ class _AccountingGate(Protocol):
     ) -> None: ...
 
 
+class WallClock:
+    """Production UTC wall clock. now()/__call__ and real sleep for provider pacing."""
+
+    def __call__(self) -> datetime:
+        return datetime.now(UTC)
+
+    def now(self) -> datetime:
+        return self()
+
+    def sleep(self, seconds: float) -> None:
+        if seconds > 0:
+            time.sleep(seconds)
+
+
 class AdvancingClock:
     """Injectable clock with optional sleep for deterministic pacing tests."""
 
@@ -45,10 +64,76 @@ class AdvancingClock:
     def __call__(self) -> datetime:
         return self._current
 
+    def now(self) -> datetime:
+        return self()
+
     def sleep(self, seconds: float) -> None:
         if seconds <= 0:
             return
         self._current = self._current + timedelta(seconds=seconds)
+
+
+def clock_has_sleep(clock: Any) -> bool:
+    return callable(getattr(clock, "sleep", None))
+
+
+def require_sleep_capable_clock(
+    clock: Callable[[], datetime] | AdvancingClock | WallClock | None,
+) -> Callable[[], datetime] | AdvancingClock | WallClock | None:
+    """Reject bare callables that would silently skip real provider pacing waits."""
+
+    if clock is None:
+        return None
+    if clock_has_sleep(clock):
+        return clock
+    raise ClockSleepRequiredError("CLOCK_SLEEP_REQUIRED")
+
+
+def legacy_bare_callable_pace_starvation_terminal(
+    *,
+    pace_seconds: int = FREE_TIER_MIN_PACE_SECONDS,
+    max_waits: int = MAX_INTRA_TICK_PACE_WAITS,
+) -> dict[str, Any]:
+    """Deterministic trace of the pre-repair production defect.
+
+    Production supplied ``clock = lambda: datetime.now(UTC)`` (callable, no sleep).
+    ``ProviderTickContext.now()`` used the injectable wall callable, while
+    ``_advance_pace_wait`` only bumped ``_logical_offset`` (ignored when injectable
+    is set) and never slept. The pacing loop therefore burned
+    ``MAX_INTRA_TICK_PACE_WAITS`` instantly and returned ``PACE_WAIT`` without a
+    SEARCH provider call.
+    """
+
+    frozen = datetime(2026, 9, 2, 9, 20, tzinfo=UTC)
+    logical_offset = timedelta(0)
+    pace_waits = 0
+    # Gate stays PACE_WAIT while "now" never advances past last completion.
+    last_completion = frozen
+    trace: list[str] = [
+        "RECENT_COMPLETED",
+        "SEARCH_WAIT_FOR_PROVIDER_SLOT",
+        "GATE_PACE_WAIT",
+    ]
+    while True:
+        now = frozen  # injectable bare callable; logical_offset ignored
+        blocked = "PACE_WAIT" if now < last_completion + timedelta(seconds=pace_seconds) else None
+        if blocked != "PACE_WAIT":
+            return {"terminal": "UNEXPECTED_SLOT_OPEN", "pace_waits": pace_waits, "trace": trace}
+        if pace_waits >= max_waits:
+            trace.append("MAX_INTRA_TICK_PACE_WAITS")
+            trace.append("RETURN_PACE_WAIT")
+            trace.append("SEARCH_PROVIDER_CALL_NEVER")
+            return {
+                "terminal": "PACE_WAIT",
+                "pace_waits": pace_waits,
+                "logical_offset_seconds": logical_offset.total_seconds(),
+                "injectable_advanced": False,
+                "trace": trace,
+            }
+        pace_waits += 1
+        # Old _advance_pace_wait without sleep:
+        logical_offset += timedelta(seconds=pace_seconds)
+        trace.append(f"LOGICAL_OFFSET_BUMP_{pace_waits}")
 
 
 class ProviderTickContext:
@@ -59,7 +144,7 @@ class ProviderTickContext:
         *,
         tick_start: datetime,
         pace_seconds: int,
-        injectable_clock: Callable[[], datetime] | AdvancingClock | None = None,
+        injectable_clock: Callable[[], datetime] | AdvancingClock | WallClock | None = None,
         tick_wall_budget_seconds: int = DEFAULT_TICK_WALL_BUDGET_SECONDS,
     ) -> None:
         if tick_start.tzinfo is None:
@@ -67,7 +152,8 @@ class ProviderTickContext:
         self.tick_start = tick_start.astimezone(UTC)
         self.pace_seconds = max(FREE_TIER_MIN_PACE_SECONDS, int(pace_seconds))
         self.tick_wall_budget_seconds = int(tick_wall_budget_seconds)
-        self._injectable = injectable_clock
+        # Bare callables without sleep must not masquerade as pacing clocks.
+        self._injectable = require_sleep_capable_clock(injectable_clock)
         self._logical_offset = timedelta(0)
         self.pace_waits = 0
         self.provider_completions = 0
@@ -90,9 +176,10 @@ class ProviderTickContext:
         self.pace_waits += 1
         if self._injectable is not None:
             sleeper = getattr(self._injectable, "sleep", None)
-            if callable(sleeper):
-                sleeper(self.pace_seconds)
-                return
+            if not callable(sleeper):
+                raise ClockSleepRequiredError("CLOCK_SLEEP_REQUIRED")
+            sleeper(self.pace_seconds)
+            return
         self._logical_offset += timedelta(seconds=self.pace_seconds)
 
     def wait_for_provider_slot(
@@ -195,12 +282,17 @@ def usable_due_calls_per_tick(
 
 __all__ = [
     "AdvancingClock",
+    "ClockSleepRequiredError",
     "DEFAULT_TICK_WALL_BUDGET_SECONDS",
     "FREE_TIER_MIN_PACE_SECONDS",
     "MAX_INTRA_TICK_PACE_WAITS",
     "ProviderTickContext",
     "TIMER_CADENCE_SECONDS",
+    "WallClock",
+    "clock_has_sleep",
+    "legacy_bare_callable_pace_starvation_terminal",
     "max_provider_calls_per_tick",
+    "require_sleep_capable_clock",
     "reserved_source_poll_calls",
     "usable_due_calls_per_tick",
     "wait_for_provider_slot",
