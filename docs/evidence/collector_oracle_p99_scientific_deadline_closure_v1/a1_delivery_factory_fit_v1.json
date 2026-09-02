@@ -6,8 +6,8 @@
   "task_id": "COLLECTOR_ORACLE_P99_SCIENTIFIC_DEADLINE_CLOSURE_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "db00e1ad5e678ad1df6ce570ec6cea0497e5531413b54f3c8803c4baf69d2699",
+  "reviewed_inventory_sha256": "0e84085be7729c8c10d1cf4368c6e41ebbf7bdfefd4af938b00639a7d960560d",
   "capability_radar": {
     "now": "NONE",
     "watch": "FORGE_OBSERVATION_SCHEDULE_P99_DEADLINE_INVARIANT"
