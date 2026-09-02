@@ -64,14 +64,15 @@ def build_feature_grounding_projection(repo_root: Path | str) -> dict[str, Any]:
 
 
 def _value_status_for_availability(availability_class: str) -> str | None:
+    # Only emit value_status when the resolver can prove it (design §6.4).
+    # HISTORICAL/FORWARD stay typed on availability_class alone — do not collapse
+    # them into a secondary UNKNOWN channel.
     if availability_class == "MISSING_CAPABILITY":
         return "MISSING_CAPABILITY"
     if availability_class == "MISSING":
         return "NOT_AVAILABLE"
     if availability_class == "PIT_READY":
         return "PIT_READY"
-    if availability_class in {"HISTORICAL_RECONSTRUCTIBLE", "FORWARD_ONLY"}:
-        return "UNKNOWN"
     return None
 
 
@@ -137,17 +138,9 @@ def ground_candidate(
             }
         )
 
+    # Only unresolved_requirements force GROUNDED_WITH_GAPS (design §6.4).
+    # Typed availability (HISTORICAL/FORWARD/MISSING) stays on feature_bindings.
     terminal = "GROUNDED_WITH_GAPS" if unresolved else "GROUNDED"
-    gap_classes = {
-        str(item["availability_class"])
-        for item in feature_bindings
-        if item.get("availability_class")
-        in {"MISSING", "MISSING_CAPABILITY", "FORWARD_ONLY", "HISTORICAL_RECONSTRUCTIBLE"}
-    }
-    if gap_classes and terminal == "GROUNDED":
-        # Historical/forward/missing are typed availability, not invented IDs.
-        # Only unresolved_requirements force GROUNDED_WITH_GAPS per design.
-        pass
 
     return {
         "context_packet_sha256": context_packet_sha256.lower(),
@@ -315,9 +308,6 @@ def session_diagnostics_from_candidates(
         "unique_primary_x_family_count": _unique_count(x_families),
         "unique_horizon_notional_count": _unique_count(horizons),
         "candidate_with_known_prior_ref_count": with_prior,
-        "closed_or_suppressed_collision_count": int(
-            session_meta.get("closed_or_suppressed_collision_count") or 0
-        ),
         "critic_terminal": critic_terminal or None,
         "selected_candidate_present": selected_present,
         "no_worthy_hypothesis": bool(no_worthy),
@@ -332,6 +322,10 @@ def session_diagnostics_from_candidates(
         )
     if "resume_or_replay" in session_meta:
         diagnostics["resume_or_replay"] = bool(session_meta.get("resume_or_replay"))
+    if "closed_or_suppressed_collision_count" in session_meta:
+        diagnostics["closed_or_suppressed_collision_count"] = int(
+            session_meta.get("closed_or_suppressed_collision_count") or 0
+        )
     return diagnostics
 
 

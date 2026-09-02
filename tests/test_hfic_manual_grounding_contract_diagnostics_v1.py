@@ -108,7 +108,7 @@ class GroundCandidateTests(unittest.TestCase):
         binding = grounding["feature_bindings"][0]
         self.assertEqual(binding["availability_class"], "HISTORICAL_RECONSTRUCTIBLE")
         self.assertNotEqual(binding["availability_class"], "PIT_READY")
-        self.assertEqual(binding["value_status"], "UNKNOWN")
+        self.assertNotIn("value_status", binding)
 
     def test_forward_only_stays(self) -> None:
         card = _card_from_draft(3)

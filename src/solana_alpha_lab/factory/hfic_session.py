@@ -616,11 +616,16 @@ def freeze_draft(
     closed_family_ledger = ledger_from_receipt(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None
     )
+    closed_or_suppressed_collision_count: int | None = None
     if store is not None and closed_family_ledger:
+        closed_or_suppressed_collision_count = 0
         for card in candidates:
             hit = candidate_matches_hard_close(card, closed_family_ledger)
             if hit is not None:
+                closed_or_suppressed_collision_count += 1
                 raise HficSessionError("CLOSED_FAMILY_REOPEN")
+    elif store is not None:
+        closed_or_suppressed_collision_count = 0
     truth_roots = _nonempty_str_list(
         draft.get("truth_roots_used"),
         code="TRUTH_ROOTS_REQUIRED",
@@ -831,6 +836,10 @@ def freeze_draft(
     }
     if grounded_candidates is not None:
         result["grounded_candidates"] = grounded_candidates
+    if closed_or_suppressed_collision_count is not None:
+        result["closed_or_suppressed_collision_count"] = (
+            closed_or_suppressed_collision_count
+        )
     if store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
@@ -881,6 +890,22 @@ def _freeze_no_worthy(
         code="PRIOR_WORK_RECEIPTS_REQUIRED",
     )
     memory_as_of = _require_memory_timestamp(draft.get("research_memory_as_of"))
+    closed_family_ledger = ledger_from_receipt(
+        preflight_receipt if isinstance(preflight_receipt, Mapping) else None
+    )
+    closed_or_suppressed_collision_count: int | None = None
+    draft_candidates = draft.get("candidates")
+    if store is not None and closed_family_ledger and isinstance(draft_candidates, list):
+        closed_or_suppressed_collision_count = 0
+        for card in draft_candidates:
+            if not isinstance(card, Mapping):
+                continue
+            hit = candidate_matches_hard_close(card, closed_family_ledger)
+            if hit is not None:
+                closed_or_suppressed_collision_count += 1
+                raise HficSessionError("CLOSED_FAMILY_REOPEN")
+    elif store is not None:
+        closed_or_suppressed_collision_count = 0
     bound: dict[str, Any] | None = None
     if store is not None:
         if repo_root is None or not isinstance(preflight_receipt, Mapping):
@@ -998,6 +1023,10 @@ def _freeze_no_worthy(
     }
     if grounded_candidates is not None:
         result["grounded_candidates"] = list(grounded_candidates)
+    if closed_or_suppressed_collision_count is not None:
+        result["closed_or_suppressed_collision_count"] = (
+            closed_or_suppressed_collision_count
+        )
     if store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
@@ -1341,6 +1370,15 @@ def persist_no_worthy_session(
             "no_worthy_hypothesis": True,
             "lane_classifier_terminal": None,
             "next_action_type_if_any": action["action_type"],
+            **(
+                {
+                    "closed_or_suppressed_collision_count": frozen[
+                        "closed_or_suppressed_collision_count"
+                    ]
+                }
+                if "closed_or_suppressed_collision_count" in frozen
+                else {}
+            ),
         },
     )
     if diagnostics is not None:
@@ -1631,6 +1669,10 @@ def persist_frozen_session(
             }
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
+    if "closed_or_suppressed_collision_count" in frozen:
+        cycle_payload["closed_or_suppressed_collision_count"] = frozen[
+            "closed_or_suppressed_collision_count"
+        ]
     records = [
         event(
             record_id=f"HFIC-CYCLE-{session_id}-FROZEN",
@@ -2429,17 +2471,13 @@ def persist_intermediate_cycle(
     )
     critic_bytes = _canonical_bytes(critic_result)
     critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
-    records = [
-        event(
-            record_id=f"HFIC-CYCLE-{session_id}-{phase}",
-            kind=RecordKind.RESEARCH_CYCLE,
-            entity_id=session_id,
-            payload={
+    prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
+    intermediate_cycle = {
                 "research_cycle_id": f"{session_id}-{phase}",
                 "session_id": session_id,
                 "phase": phase,
-                "hfic_protocol": PROMPT_VERSION,
-                "prompt_version": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
+                "prompt_version": prompt_version,
                 "owner_focus": frozen.get("owner_focus") or "AUTO",
                 "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": frozen.get("focus_key_sha256") or "",
@@ -2456,7 +2494,20 @@ def persist_intermediate_cycle(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
-            },
+                "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
+            }
+    if isinstance(frozen.get("grounded_candidates"), list):
+        intermediate_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
+    if "closed_or_suppressed_collision_count" in frozen:
+        intermediate_cycle["closed_or_suppressed_collision_count"] = frozen[
+            "closed_or_suppressed_collision_count"
+        ]
+    records = [
+        event(
+            record_id=f"HFIC-CYCLE-{session_id}-{phase}",
+            kind=RecordKind.RESEARCH_CYCLE,
+            entity_id=session_id,
+            payload=intermediate_cycle,
             transaction_id=transaction_id,
         ),
         event(
@@ -2466,7 +2517,7 @@ def persist_intermediate_cycle(
             payload={
                 "research_artifact_id": f"HFIC-ART-CRITIC-RESULT-{session_id}-{hashlib.sha256(critic_bytes).hexdigest()[:12].upper()}",
                 "session_id": session_id,
-                "hfic_protocol": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
                 "artifact_kind": "CRITIC_RESULT",
                 "payload_canonical": critic_bytes.decode("utf-8"),
                 "payload_sha256": hashlib.sha256(critic_bytes).hexdigest(),
@@ -2486,7 +2537,7 @@ def persist_intermediate_cycle(
                 payload={
                     "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "artifact_kind": "CRITIC_INPUT_PACKET",
                     "payload_canonical": packet_bytes.decode("utf-8"),
                     "payload_sha256": digest,
@@ -2719,17 +2770,15 @@ def apply_revision(
         "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
         stage_time,
     )
-    records = [
-        event(
-            record_id=f"HFIC-CYCLE-{session_id}-REVISED",
-            kind=RecordKind.RESEARCH_CYCLE,
-            entity_id=session_id,
-            payload={
+    prompt_version = str(
+        existing.get("prompt_version") or frozen.get("prompt_version") or PROMPT_VERSION
+    )
+    revision_cycle = {
                 "research_cycle_id": f"{session_id}-REVISED",
                 "session_id": session_id,
                 "phase": "REVISED_AWAITING_CRITIC",
-                "hfic_protocol": PROMPT_VERSION,
-                "prompt_version": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
+                "prompt_version": prompt_version,
                 "owner_focus": existing.get("owner_focus") or "AUTO",
                 "evidence_epoch_sha256": existing.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": existing.get("focus_key_sha256") or "",
@@ -2744,7 +2793,38 @@ def apply_revision(
                 "git_composite_sha256": existing.get("git_composite_sha256"),
                 "research_memory_as_of": existing.get("research_memory_as_of"),
                 "revision_count": 1,
+                "forge_context_packet_sha256": existing.get("forge_context_packet_sha256")
+                or frozen.get("forge_context_packet_sha256"),
+            }
+    if prompt_version == PROMPT_VERSION and repo_root is not None:
+        grounded_candidates = _ground_v12_candidates(
+            revised_draft.get("candidates") or [],
+            draft_identities,
+            repo_root=repo_root,
+            preflight_receipt={
+                "forge_context_packet_sha256": revision_cycle.get(
+                    "forge_context_packet_sha256"
+                )
+                or ("0" * 64),
             },
+        )
+        revision_cycle["grounded_candidates"] = grounded_candidates
+    elif isinstance(existing.get("grounded_candidates"), list):
+        revision_cycle["grounded_candidates"] = list(existing["grounded_candidates"])
+    if "closed_or_suppressed_collision_count" in existing:
+        revision_cycle["closed_or_suppressed_collision_count"] = existing[
+            "closed_or_suppressed_collision_count"
+        ]
+    elif "closed_or_suppressed_collision_count" in frozen:
+        revision_cycle["closed_or_suppressed_collision_count"] = frozen[
+            "closed_or_suppressed_collision_count"
+        ]
+    records = [
+        event(
+            record_id=f"HFIC-CYCLE-{session_id}-REVISED",
+            kind=RecordKind.RESEARCH_CYCLE,
+            entity_id=session_id,
+            payload=revision_cycle,
             transaction_id=transaction_id,
         ),
         event(
@@ -2754,7 +2834,7 @@ def apply_revision(
             payload={
                 "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-REV1",
                 "session_id": session_id,
-                "hfic_protocol": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
                 "artifact_kind": "CRITIC_INPUT_PACKET",
                 "payload_canonical": _canonical_bytes(packet).decode("utf-8"),
                 "payload_sha256": packet_sha,
@@ -2772,7 +2852,7 @@ def apply_revision(
                 payload={
                     "hypothesis_version_id": selected_identity.candidate_id,
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "statement": selected_identity.definition["claim"],
                     "claim": selected_identity.definition["claim"],
                     "mechanism": selected_identity.definition["mechanism"],
@@ -2963,7 +3043,7 @@ def finalize_session(
                 payload={
                     "decision_event_id": decision_id,
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "decision_kind": kind,
                     "reason_code": code,
                     "hypothesis_version_id": candidate_id,
@@ -2981,7 +3061,7 @@ def finalize_session(
                 payload={
                     "capability_gap_id": f"HFIC-GAP-{session_id}",
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "capability_id": "CHANGE_LANE",
                     "reason_code": "PASS_CHANGE_LANE_REQUIRED",
                     "required_contract": "OWNER_CONTRACT_REQUIRED",
@@ -2999,7 +3079,7 @@ def finalize_session(
                 payload={
                     "research_artifact_id": f"HFIC-ART-CLASSIFIER-{session_id}",
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "artifact_kind": "CLASSIFIER_RECEIPT",
                     "payload_canonical": classifier_bytes.decode("utf-8"),
                     "payload_sha256": hashlib.sha256(classifier_bytes).hexdigest(),
@@ -3076,6 +3156,15 @@ def finalize_session(
             "no_worthy_hypothesis": False,
             "lane_classifier_terminal": receipt.get("lane_classifier_terminal"),
             "next_action_type_if_any": None,
+            **(
+                {
+                    "closed_or_suppressed_collision_count": frozen[
+                        "closed_or_suppressed_collision_count"
+                    ]
+                }
+                if "closed_or_suppressed_collision_count" in frozen
+                else {}
+            ),
         },
     )
     if diagnostics is not None:
@@ -3353,9 +3442,14 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "next_action": None,
         "next_action_status": "LEGACY_NOT_RECORDED",
         "grounded_candidates": cycle.get("grounded_candidates"),
+        "closed_or_suppressed_collision_count": cycle.get(
+            "closed_or_suppressed_collision_count"
+        ),
     }
     if not isinstance(bundle.get("grounded_candidates"), list):
         bundle.pop("grounded_candidates", None)
+    if "closed_or_suppressed_collision_count" not in cycle:
+        bundle.pop("closed_or_suppressed_collision_count", None)
     expected_action_sha = None
     if isinstance(session_receipt, Mapping):
         maybe_sha = session_receipt.get("next_action_artifact_sha256")
