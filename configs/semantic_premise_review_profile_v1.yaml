@@ -1,0 +1,70 @@
+schema: smial.semantic-premise-review-profile
+schema_version: "1.0"
+profile_id: SEMANTIC_PREMISE_REVIEW_PROFILE_V1
+architecture_owner: ARCHITECTURE_CRITIC
+new_permanent_review_role: false
+authority_granted: false
+profiles:
+  STANDARD: {}
+  SEMANTIC_PREMISE:
+    mandatory_questions:
+      - HOW_CAN_EXACT_IMPLEMENTATION_STILL_BE_SEMANTICALLY_WRONG
+      - WHICH_CLAIM_IS_STRONGER_THAN_EVIDENCE
+      - IS_LOCAL_OBSERVATION_WIDENED_TO_FAMILY_OR_GLOBAL
+      - IS_UNKNOWN_BEING_TREATED_AS_NEGATIVE_EVIDENCE
+      - DOES_LIFECYCLE_STATUS_GAIN_SCIENTIFIC_AUTHORITY
+      - DOES_SCHEMA_ENUM_CHANGE_ALTER_OLD_EVIDENCE_MEANING
+      - IS_IMPLEMENTATION_DETAIL_BECOMING_TRUTH_OWNER
+      - WHAT_EVIDENCE_WOULD_FALSIFY_THIS_PREMISE
+      - WOULD_FUTURE_AGENT_INFER_STRONGER_CLAIM
+      - WHAT_SMALLEST_CORRECTION_RESTORES_EXACT_SEMANTICS
+    verdict_map:
+      PASS: PASS
+      FAIL: NOT_READY
+      INCONCLUSIVE: NOT_READY
+risk_dimensions:
+  - SCIENTIFIC_ESTIMAND
+  - FALSIFIER_OR_ENDPOINT
+  - EVIDENCE_ADMISSIBILITY
+  - PIT_OR_AVAILABILITY_SEMANTICS
+  - RESEARCH_TRUTH_OWNERSHIP
+  - HYPOTHESIS_OR_FAMILY_CLOSURE
+  - PROMOTION_OR_SUPPRESSION_AUTHORITY
+  - UNKNOWN_VS_NEGATIVE_EVIDENCE
+  - EXECUTION_TRUTH_SEMANTICS
+  - DURABLE_SCIENCE_SCHEMA
+  - OWNER_AUTHORITY_SEMANTICS
+  - HARNESS_PREMISE_OR_MERGE_AUTHORITY
+# Deterministic path triggers (not NLP). Intersection with changed paths => HIGH_RISK.
+trigger_path_prefixes:
+  - configs/hypothesis_
+  - configs/experiment_
+  - configs/factory_v1_
+  - configs/provider_route_
+  - control/owner_attention_gate
+  - delivery-harness/policies/
+  - catalog/schemas/hypothesis_
+  - catalog/schemas/experiment_
+  - catalog/schemas/factory_
+  - catalog/schemas/delivery_harness_
+  - src/solana_alpha_lab/factory/
+  - docs/contracts/
+  - docs/operator/HYPOTHESIS_
+packet:
+  max_bytes: 16384
+  forbidden_keys:
+    - implementation_transcript
+    - chat_history
+    - parent_session
+    - owner_reassurance
+    - secrets
+    - absolute_machine_paths
+  exact_task_body_marker: "SEMANTIC_PREMISE_HIGH_RISK: true"
+independence:
+  claim_scope: PACKET_INFORMATION_PATH
+  context_isolated: true
+  implementation_transcript_seen: false
+  packet_bound: true
+  readonly: true
+  launch_isolation: PROCESS_OBLIGATION
+  model_diversity_default: UNPROVEN

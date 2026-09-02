@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/semantic_premise_review_packet.schema.json",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "task",
+    "candidate",
+    "review",
+    "semantic_claims",
+    "non_claims",
+    "evidence",
+    "questions",
+    "packet_fingerprint_sha256",
+    "independence"
+  ],
+  "properties": {
+    "schema": {"const": "smial.semantic-premise-review-packet"},
+    "schema_version": {"const": "1.0"},
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "task_contract_sha256"],
+      "properties": {
+        "task_id": {"type": "string", "minLength": 1},
+        "task_contract_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "head", "diff_sha256"],
+      "properties": {
+        "base": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "diff_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["profile", "risk_dimensions", "architecture_owner"],
+      "properties": {
+        "profile": {"const": "SEMANTIC_PREMISE"},
+        "risk_dimensions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "architecture_owner": {"const": "ARCHITECTURE_CRITIC"}
+      }
+    },
+    "semantic_claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claim_id", "claim", "scope"],
+        "properties": {
+          "claim_id": {"type": "string", "minLength": 1},
+          "claim": {"type": "string", "minLength": 1},
+          "scope": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "non_claims": {
+      "type": "array",
+      "items": {"type": "string", "minLength": 1}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["logical_ref", "sha256_or_fingerprint"],
+        "properties": {
+          "asset_id": {"type": ["string", "null"]},
+          "logical_ref": {"type": "string", "minLength": 1},
+          "sha256_or_fingerprint": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "questions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "packet_fingerprint_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "independence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "claim_scope",
+        "context_isolated",
+        "implementation_transcript_seen",
+        "packet_bound",
+        "readonly",
+        "launch_isolation",
+        "model_diversity",
+        "model_diversity_identity"
+      ],
+      "properties": {
+        "claim_scope": {
+          "const": "PACKET_INFORMATION_PATH",
+          "description": "Independence fields attest packet constraints only, not live parent-prompt isolation."
+        },
+        "context_isolated": {
+          "const": true,
+          "description": "Packet information path excludes implementation transcript; not a live-launch attestation."
+        },
+        "implementation_transcript_seen": {"const": false},
+        "packet_bound": {"const": true},
+        "readonly": {"const": true},
+        "launch_isolation": {
+          "const": "PROCESS_OBLIGATION",
+          "description": "Isolated critic launch is a delivery-review process obligation, not proven by packet build."
+        },
+        "model_diversity": {"enum": ["PROVEN", "UNPROVEN"]},
+        "model_diversity_identity": {
+          "type": ["string", "null"],
+          "description": "Required non-empty when model_diversity is PROVEN; otherwise null."
+        }
+      }
+    }
+  }
+}

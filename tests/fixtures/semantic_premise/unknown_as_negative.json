@@ -1,0 +1,26 @@
+{
+  "case_id": "UNKNOWN_AS_NEGATIVE",
+  "task_id": "FIXTURE-SEMANTIC-PREMISE-UNKNOWN-NEGATIVE",
+  "task_contract_text": "SEMANTIC_PREMISE_HIGH_RISK: true\n",
+  "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "head": "dddddddddddddddddddddddddddddddddddddddd",
+  "diff_text": "claim: missing unknown => negative evidence\n",
+  "risk_dimensions": ["UNKNOWN_VS_NEGATIVE_EVIDENCE"],
+  "semantic_claims": [
+    {
+      "claim_id": "CLAIM-UNKNOWN-NEG-001",
+      "claim": "MISSING_UNKNOWN observations count as negative scientific evidence",
+      "scope": "scientific estimand"
+    }
+  ],
+  "non_claims": [],
+  "evidence": [
+    {
+      "asset_id": null,
+      "logical_ref": "fixture://missing-unknown",
+      "sha256_or_fingerprint": "3333333333333333333333333333333333333333333333333333333333333333"
+    }
+  ],
+  "model_diversity": "UNPROVEN",
+  "expected_architecture_verdict": "NOT_READY"
+}

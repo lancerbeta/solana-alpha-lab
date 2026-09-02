@@ -1,12 +1,12 @@
 schema_version: '1.1'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.122.0
+catalog_version: 0.123.0
 as_of: '2026-09-02'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1631
+  assets: 1637
   asset_registries: 4
-  schemas: 81
+  schemas: 82
   queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -174,6 +174,7 @@ root_resolver:
   - catalog/schemas/hfic_provenance_time_correction_v1.schema.json
   - catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json
   - catalog/schemas/factory_semantic_operability.schema.json
+  - catalog/schemas/semantic_premise_review_packet.schema.json
   - catalog/schemas/hfic_scientific_discovery_prospects_v1.schema.json
   - catalog/schemas/hfic_next_epistemic_action_draft_v1.schema.json
   - catalog/schemas/hfic_next_epistemic_action_v1.schema.json
