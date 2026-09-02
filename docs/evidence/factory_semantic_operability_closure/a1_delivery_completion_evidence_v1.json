@@ -14,7 +14,7 @@
     ".agents/skills/hypothesis-forge/SKILL.md": "59245872d0aa6dcf32fa2a8e60091d992ef3f3b08143fe7590595743934222d1",
     "AGENTS.md": "6d74f3fdeb273239762fa2f18af55191e17b7f6d91aa89215348ece360f26d22",
     "README.md": "967dcf83f04a6f1c0d852b2faa78bfc0aac5e256c9512f2b8a7bd82692b50b43",
-    "catalog/assets/core.yaml": "f82eca24aab821f79d49a49fb98e92f2d3aab2d772182f2cdbd23754ec9d9f90",
+    "catalog/assets/core.yaml": "b8b053c8f6b9ebb8e451c3a8d1996ef8e8d963732f6574f022109a508b60d0d1",
     "catalog/assets/lifecycle.yaml": "4b10155834be6ae28742741dee9c8388940e1ce8822004778c33c52f06b4a561",
     "catalog/catalog_manifest.yaml": "0e381c063507277ab775b6dbbec6b6e37a48de931f87dcd366fbaf904981f1e6",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "dfee869485113bee5d3081efb1a8c3c01480faaade428063cc1b0877ec6e8692",
@@ -25,11 +25,12 @@
     "docs/FACTORY_SEMANTIC_MAP.md": "1c44acfc59abae99cab09b2cca5abcdc706542e8625640edb5b5686e24b34eb0",
     "docs/OPERATOR_NAVIGATION.md": "f30346976040f700a98f5b5d03fadcb3d408725bb787358a621babbcb2992ba5",
     "docs/PROJECT_MAP.md": "dd20e6036e905abd779d7286ee326505723c1c9871dcc1da6c32e49979a5e1e6",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "7ef9e092a39831e8d35b7d2f68931cab6e331e6d5a9759c1ebf88701e424e7ff",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "67f2a1bb1fc7c101bf9769889c249a500014f45a5f04ba79b669441db1e237af",
     "docs/reports/factory_semantic_operability_closure/a1_owner_readout_v1.md": "43685bbd56ff5fba1f43c70debce267b596bef1e150208677424217aa8335299",
-    "docs/tasks/FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1.md": "495de63102a8a479939c282d3c1481e4bdf1a92dcc783ed9fb7ff29a3c48c4a2",
+    "docs/tasks/FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1.md": "d0966c3f1b02b446b891da08db84013dbb42bf58c9e1fcd328be0389a94f6559",
     "scripts/catalog_cli.py": "a2906f109374983dc770f7183d3a527fdaabae50ae10241188cfabf5b05a3748",
-    "scripts/generate_navigation.py": "f3415ec6c203eb997e019f688a31a9178c9c086a3c0c07e219f73ed53c5a38af",
+    "scripts/generate_navigation.py": "2f92af046f3bbd4d6f519ef2e4826a2623ea0ab7141e96ee8a3ed34835f3e726",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "438d7fd9a1060570dcf957c965d64f64909436ad127e8982242d083b91928490",
     "src/solana_alpha_lab/factory/hfic_session.py": "6af01bf1e041753c4f0c6e986b67864008eebd05e24c0db7e6de506b14c5e2c4",
     "src/solana_alpha_lab/factory_semantic_operability.py": "4498624fa511e5b7f0c73e70e53f81020239b9db642f02d9febffa31708a3b4b",
@@ -48,14 +49,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_semantic_operability_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "6c6a8ba31860a84cac6fbedfef8a94f81e48de0dd62a91bdecff4f3b9bf51a2e",
+    "sha256": "b9130fb750076b5222ebdbba20573db38695735302e8e629badd9d6ae4dfafe9",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_SEMANTIC_OPERABILITY_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/factory_semantic_operability_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "1b07b1df77ec0bff4334d06098afeac35530660571c618f85a8e89bd658d49ff",
+      "sha256": "85c5ffd7ca12fd50119122a0311c5d7cbd53a8ca1ff2800fec67e3593e6c63ec",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
