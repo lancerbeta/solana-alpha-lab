@@ -1,10 +1,10 @@
 [Unit]
-Description=Factory off-host weekly full Google Drive coverage
+Description=Factory off-host daily incremental Google Drive checkpoint
 Documentation=docs/tasks/FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1.md
 
 [Service]
 Type=oneshot
 WorkingDirectory=/opt/solana-alpha-lab
 EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
-ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py --mode weekly
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py --mode daily
 NoNewPrivileges=true

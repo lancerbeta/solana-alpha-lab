@@ -1,8 +1,10 @@
 [Unit]
-Description=Hourly Factory remote-ops backup
+Description=Factory local full backup every 12 hours UTC
+Documentation=docs/tasks/FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1.md
 
 [Timer]
-OnCalendar=hourly
+OnCalendar=*-*-* 00:15:00 UTC
+OnCalendar=*-*-* 12:15:00 UTC
 Persistent=true
 Unit=factory-remote-backup.service
 

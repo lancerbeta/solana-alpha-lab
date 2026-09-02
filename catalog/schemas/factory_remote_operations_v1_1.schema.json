@@ -112,6 +112,8 @@
         "source_relative_paths",
         "recursive_relative_paths",
         "same_parent_forbidden",
+        "local_full_schedule",
+        "local_verified_bundle_retention",
         "google_drive_role",
         "google_drive_role_prior",
         "google_drive_role_provenance",
@@ -133,6 +135,8 @@
           "items": {"type": "string", "minLength": 8}
         },
         "same_parent_forbidden": {"const": true},
+        "local_full_schedule": {"const": "12h"},
+        "local_verified_bundle_retention": {"const": 1},
         "google_drive_role": {"const": "PROVEN_OFFHOST_DURABILITY"},
         "google_drive_role_prior": {"const": "OPTIONAL_COLD_COPY_NOT_DOD"},
         "google_drive_role_provenance": {
@@ -146,7 +150,7 @@
               "minItems": 2,
               "items": {"type": "string", "minLength": 8}
             },
-            "unproven_follow_up": {"const": "NONEMPTY_RDP_OFFHOST_RESTORE_PROOF"}
+            "unproven_follow_up": {"const": "LIVE_FACTORY_INCREMENTAL_RESTORE_COMMISSIONING"}
           }
         },
         "offhost": {
@@ -159,7 +163,12 @@
             "rclone_config_absolute",
             "receipt_relative",
             "freshness_current_max_seconds",
-            "freshness_degraded_max_seconds"
+            "freshness_degraded_max_seconds",
+            "daily_delta",
+            "weekly_full",
+            "weekly_weekday_utc",
+            "owner_traffic_target_30d_bytes",
+            "internal_payload_planning_budget_30d_bytes"
           ],
           "properties": {
             "enabled": {"const": true},
@@ -170,8 +179,13 @@
             "receipt_relative": {
               "const": "local/factory_v1/offhost_backup_receipt.json"
             },
-            "freshness_current_max_seconds": {"const": 7200},
-            "freshness_degraded_max_seconds": {"const": 21600}
+            "freshness_current_max_seconds": {"const": 86400},
+            "freshness_degraded_max_seconds": {"const": 172800},
+            "daily_delta": {"const": true},
+            "weekly_full": {"const": true},
+            "weekly_weekday_utc": {"const": 6},
+            "owner_traffic_target_30d_bytes": {"const": 300000000000},
+            "internal_payload_planning_budget_30d_bytes": {"const": 240000000000}
           }
         }
       }
@@ -245,6 +259,9 @@
         "backup_service_relative": {"type": "string", "minLength": 8},
         "backup_timer_relative": {"type": "string", "minLength": 8},
         "backup_gdrive_service_relative": {"type": "string", "minLength": 8},
+        "backup_gdrive_timer_relative": {"type": "string", "minLength": 8},
+        "backup_gdrive_delta_service_relative": {"type": "string", "minLength": 8},
+        "backup_gdrive_delta_timer_relative": {"type": "string", "minLength": 8},
         "paper_heartbeat_relative": {"type": "string", "minLength": 8},
         "observation_schedule_service_relative": {"type": "string", "minLength": 8},
         "observation_schedule_timer_relative": {"type": "string", "minLength": 8},

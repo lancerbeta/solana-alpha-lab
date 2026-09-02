@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-OFFHOST-TRAFFIC-BOUNDED-BACKUP-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1",
+  "state_change": "FACTORY_DAILY_DELTA_WEEKLY_FULL_OFFHOST_BACKUP_PASS",
+  "base_main": "a1dcf6b5b2b457f375a37ffd41b97b24fc951264",
+  "owner_approvals": [
+    "OK FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1.md": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_offhost_traffic_bounded_backup/a1_delivery_factory_fit_v1.json",
+    "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_offhost_traffic_bounded_backup/a1_delivery_independent_review_v1.json",
+      "sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_STREAMING_NO_BYTESIO",
+      "PASS_RETAIN1_STILL_DAILY_DELTA",
+      "PASS_WEEKLY_BEFORE_SAME_DAY_DELTA",
+      "PASS_CHECKPOINT_DISCOVERY_RESTORE",
+      "PASS_PLANNING_FIXTURE_UNDER_240GB",
+      "PASS_PAYLOAD_NOT_BILLING",
+      "PASS_NO_DELETE_SYNC_CONSTRUCTIBLE"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_CREDENTIAL_VALUES",
+    "NO_ALPHA",
+    "APPLICATION_PAYLOAD_IS_NOT_BILLING_TRUTH",
+    "NO_LIVE_RESTORE_OVER_FACTORY_STATE",
+    "NO_REMOTE_DELETE",
+    "NO_RCLONE_SYNC",
+    "GIT_PROOF_NOT_LIVE_TIMER_ENABLE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

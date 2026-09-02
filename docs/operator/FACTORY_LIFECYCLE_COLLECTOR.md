@@ -82,7 +82,11 @@ systemctl is-active factory-observation-schedule.timer factory-observation-sched
 ```
 
 ```
-systemctl is-active factory-remote-backup.service factory-remote-backup-gdrive.service
+systemctl is-active factory-remote-backup.timer factory-remote-backup-gdrive.timer factory-remote-backup-gdrive-delta.timer
+```
+
+```
+systemctl is-active factory-remote-backup.service factory-remote-backup-gdrive.service factory-remote-backup-gdrive-delta.service
 ```
 
 ```
@@ -244,7 +248,7 @@ Machine-resolved; do not freeze ephemeral PASS/FAIL into this prose.
 8. Live commissioning (timer enabled, ticks with authority)
 9. Daily owner pulse — product ready; install/enable timer only at final VPS deploy
 10. Live cohort seal / sync / import into LIVE CORPUS (product ready; ops after collector commissioning)
-11. **`NONEMPTY_RDP_OFFHOST_RESTORE_PROOF`** — after live observation_rdp is non-empty: prove Drive copy/readback + isolated restore with non-empty RDP inventory (pre-live empty-RDP proof is acceptable; do not claim live RDP restore is already proven)
+11. **`NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF`** — after live observation_rdp is non-empty: prove remote weekly full + daily delta(s) + immutable recovery checkpoint, then isolated restore with entry SHA, SQLite integrity and RDP inventory equality. Never restore over live Factory state. Required terminal: `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`.
 12. Forge
 
 ## DAILY_COLLECTOR_OWNER_PULSE
@@ -348,8 +352,8 @@ machine readback only. Canonical Git:
 
 | Stage | Mechanism | Output | Scientific truth? |
 |---|---|---|---|
-| **1 — local** | `factory-remote-backup.timer` → `factory-remote-backup.service` → `factory_remote_doctor.py --backup` | `local/factory_v1_backup_sink/BACKUP_<sha256>.zip` | **No** — operational durability only |
-| **2 — off-host** | `factory-remote-backup.service` **OnSuccess** → `factory-remote-backup-gdrive.service` → `factory_offhost_backup_copy.py` | `factory-gdrive:solana-alpha-lab/factory-backups/BACKUP_<sha256>.zip` | **No** — copy-only cold mirror |
+| **1 — local** | `factory-remote-backup.timer` (every 12h UTC) → `factory-remote-backup.service` → `factory_remote_doctor.py --backup` | `local/factory_v1_backup_sink/BACKUP_<sha256>.zip` (retain 1 verified) | **No** — operational durability only |
+| **2 — off-host** | independent timers: weekly `factory-remote-backup-gdrive.timer` + daily `factory-remote-backup-gdrive-delta.timer` → `factory_offhost_backup_copy.py --mode weekly|daily` | remote `BACKUP_*.zip` / `DELTA_*.zip` + immutable `RECOVERY_CHECKPOINT_<UTC>_<sha256>.json` | **No** — copy-only cold mirror |
 
 - **`FACTORY_BACKUP_SINK`** remains the optional **absolute other-volume** first-stage sink env name. Empty → git-side parent-independent sink under `local/factory_v1_backup_sink` (same volume, different parent). Google Drive is **never** `FACTORY_BACKUP_SINK`.
 - **Copy-only:** `rclone copyto` only. **No** delete, move, purge, sync-delete, or FUSE mount.
@@ -365,7 +369,7 @@ machine readback only. Canonical Git:
 | remote folder | `solana-alpha-lab/factory-backups` |
 | machine receipt | `local/factory_v1/offhost_backup_receipt.json` |
 | google_drive_role | `PROVEN_OFFHOST_DURABILITY` (prior: `OPTIONAL_COLD_COPY_NOT_DOD`) |
-| unproven after live data | `NONEMPTY_RDP_OFFHOST_RESTORE_PROOF` |
+| unproven after Git proof | `LIVE_FACTORY_INCREMENTAL_RESTORE_COMMISSIONING` (enable timers on live host; do not restore over live state) |
 
 ### Fresh-agent classification (machine JSON)
 
@@ -380,8 +384,8 @@ Use `agent_classification` booleans (exactly one primary off-host label applies)
 | Label | When true |
 |---|---|
 | `LOCAL_BACKUP_OK` | `local_backup_state` == `OK` (newest local bundle age ≤ 24h) |
-| `OFFHOST_BACKUP_OK` | `offhost.offhost_backup_state` == `CURRENT` (verified receipt age ≤ 2h) |
-| `OFFHOST_BACKUP_STALE` | off-host state in `DEGRADED` (>2h), `HARD_ATTENTION` (>6h), `MISSING`, or `FAILED` |
+| `OFFHOST_BACKUP_OK` | `offhost.offhost_backup_state` == `CURRENT` (verified receipt age ≤ 24h) |
+| `OFFHOST_BACKUP_STALE` | off-host state in `DEGRADED` (>24h), `HARD_ATTENTION` (>48h), `MISSING`, or `FAILED` |
 | `OFFHOST_NOT_CONFIGURED` | `offhost.offhost_backup_state` == `UNCONFIGURED` (offhost block absent/disabled in Git config) |
 
 Full doctor (local + off-host dimensions + verdict):
@@ -404,13 +408,13 @@ From `configs/factory_remote_operations_v1_1.yaml` → `backup.offhost`:
 
 | Class | Age since `verified_at` | Meaning |
 |---|---|---|
-| `CURRENT` | ≤ 2h | Off-host copy matches campaign RPO target |
-| `DEGRADED` | > 2h and ≤ 6h | Visible degradation; local backup may still be OK |
-| `HARD_ATTENTION` | > 6h | Telegram path may emit `DEGRADED_OFFHOST_BACKUP_STALE` via doctor |
+| `CURRENT` | ≤ 24h | Off-host checkpoint matches ~24h disaster RPO |
+| `DEGRADED` | > 24h and ≤ 48h | Visible degradation; local backup may still be OK |
+| `HARD_ATTENTION` | > 48h | Telegram path may emit `DEGRADED_OFFHOST_BACKUP_STALE` via doctor |
 | `FAILED` | last receipt terminal is failure, **or** Git offhost enabled but rclone config metadata not ready | Typed copy/config conflict |
 | `MISSING` | configured but no successful receipt | Never copy-assume from local health alone |
 
-Receipt terminals (success): `COPIED_VERIFIED`, `ALREADY_PRESENT_VERIFIED`. Never contains OAuth tokens.
+Receipt terminals (success): `DAILY_DELTA_VERIFIED`, `NO_CHANGES_VERIFIED`, `WEEKLY_FULL_VERIFIED`, `FULL_COVERAGE_RECONFIRMED_NO_CHANGE`, plus legacy `COPIED_VERIFIED` / `ALREADY_PRESENT_VERIFIED`. Payload counters `offhost_backup_payload_bytes_30d` / `projected_offhost_backup_payload_bytes_30d` are operational proxies, not Cherry billing. Never contains OAuth tokens.
 
 Last verified bundle fields in receipt / `--offhost-status`: `source_backup_filename`, `source_sha256`, `source_bytes`, `remote_logical_path`, `remote_bytes`, `verified_at`.
 
@@ -425,7 +429,7 @@ sudo /usr/bin/rclone --config /etc/solana-alpha-lab/rclone.conf about factory-gd
 ```
 
 ```
-systemctl is-active factory-remote-backup.timer factory-remote-backup.service factory-remote-backup-gdrive.service
+systemctl is-active factory-remote-backup.timer factory-remote-backup.service factory-remote-backup-gdrive.timer factory-remote-backup-gdrive-delta.timer
 ```
 
 ### Isolated restore (sanctioned; never into live stores)
@@ -433,19 +437,21 @@ systemctl is-active factory-remote-backup.timer factory-remote-backup.service fa
 After download to an **isolated temp path** outside `/opt/solana-alpha-lab/local/factory_v1`:
 
 ```
-/usr/bin/uv run --locked --managed-python python -B -c "from pathlib import Path; from solana_alpha_lab.factory.remote_ops import restore_backup_isolated; print(restore_backup_isolated(bundle=Path('<ISOLATED>/BACKUP_<sha256>.zip'), dest_root=Path('<ISOLATED>/restore-staging')))"
+/usr/bin/uv run --locked --managed-python python -B -c "from pathlib import Path; from solana_alpha_lab.factory.remote_ops import restore_incremental_chain_isolated; print(restore_incremental_chain_isolated(full_bundle=Path('<ISOLATED>/BACKUP_<sha256>.zip'), deltas=[Path('<ISOLATED>/DELTA_<sha256>.zip')], dest_root=Path('<ISOLATED>/restore-staging')))"
 ```
 
-Requirements: manifest integrity PASS, SQLite integrity PASS, restore markers respected, **no** replacement of live SQLite/RDP, deployed SHA unchanged.
+Requirements: manifest integrity PASS, SQLite integrity PASS, RDP inventory equality, restore markers respected, **no** replacement of live SQLite/RDP, deployed SHA unchanged.
 
-Pre-live commissioning may prove restore with `rdp_inventory.count = 0`. **`NONEMPTY_RDP_OFFHOST_RESTORE_PROOF`** remains mandatory once live observation data exists — do not claim non-empty live RDP off-host restore is already proven.
+Fresh-host recovery: newest valid `RECOVERY_CHECKPOINT_<UTC>_<sha256>.json` by **immutable filename timestamp**, then validate content hash, then follow referenced full/deltas. Do not use Drive listing order or object mtime.
+
+Pre-live commissioning may prove restore with empty RDP. Required live proof terminal: `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`.
 
 ### Manual stage-2 copy (commissioning / recovery only)
 
 Owner-authorized; not routine automation:
 
 ```
-sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_offhost_backup_copy.py --mode daily
 ```
 
 Exit 0 → receipt updated. Local `--backup` remains separate and must succeed even if this fails.

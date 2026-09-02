@@ -1,0 +1,11 @@
+[Unit]
+Description=Factory off-host weekly full coverage Sunday 00:30 UTC
+Documentation=docs/tasks/FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1.md
+
+[Timer]
+OnCalendar=Sun *-*-* 00:30:00 UTC
+Persistent=true
+Unit=factory-remote-backup-gdrive.service
+
+[Install]
+WantedBy=timers.target
