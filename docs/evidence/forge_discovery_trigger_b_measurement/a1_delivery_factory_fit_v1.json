@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-DISCOVERY-TRIGGER-B-MEASUREMENT-FACTORY-FIT-001",
+  "as_of": "2026-09-03",
+  "task_id": "FORGE_DISCOVERY_TRIGGER_B_MEASUREMENT_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_TRIGGER_B_MEASUREMENT_WITHOUT_BUILDING_GENERATOR",
+    "flexibility_and_history": "PASS_PRESERVES_A0_NOT_YET_AND_ARCH_INTENT_WATCH",
+    "context_efficiency": "PASS_GIT_CATALOG_ONLY_NO_NEW_STORE",
+    "research_truth": "PASS_NO_X_TIME_TO_PIT_NO_CARTESIAN_FAMILIES",
+    "owner_operability": "PASS_ONE_TERMINAL_AND_MISSING_EVIDENCE_LIST",
+    "execution_to_cashflow": "NOT_APPLICABLE_EVIDENCE_ONLY",
+    "monitoring_and_recovery": "PASS_REVERT_MEASUREMENT_EVIDENCE_BYTES",
+    "build_vs_buy": "PASS_NO_NEW_PLATFORM",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER",
+    "red_team": "PASS_ADVISORY_23_CANNOT_FORCE_PROVEN"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "REOPEN_TRIGGER_B_WHEN_GE_3_CURRENTLY_GROUNDED_FAMILIES"
+  },
+  "recovery": "REVERT forge_discovery_trigger_b_measurement EVIDENCE/TASK/REPORT; DO NOT ALTER A0 TERMINAL OR START A1.",
+  "limits": [
+    "NO_GENERATOR",
+    "NO_A1",
+    "NO_A0_MUTATION",
+    "NO_PROVIDER",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}

@@ -1,0 +1,146 @@
+{
+  "schema": "smial.forge-discovery-trigger-b-measurement",
+  "schema_version": "1.0",
+  "measurement_id": "FORGE-DISCOVERY-TRIGGER-B-MEASUREMENT-001",
+  "as_of": "2026-09-03",
+  "task_id": "FORGE_DISCOVERY_TRIGGER_B_MEASUREMENT_V1",
+  "base_main": "e3ccf6561c3d91720c0234c4255d3385b3f9f8d7",
+  "arch_intent_trigger": "ARCH-INTENT-006-SECTION-8-TRIGGER-2",
+  "trigger_prose": "the owner must choose the next hypothesis family from a materially large candidate space",
+  "materiality_rule_preregistered": {
+    "currently_grounded_min": 3,
+    "forward_only_does_not_satisfy_gate": true,
+    "pairwise_axis_divergence_min": 2,
+    "mechanism_classes_min": 3,
+    "forbid_single_dominant_next_family": true,
+    "owner_comparison_min_competing_grounded": 3,
+    "non_family_inventories_excluded": [
+      "HFIC_23_PROSPECTS",
+      "FEATURE_SURFACE_19",
+      "OBSERVATION_FIELDS_28",
+      "CAPABILITY_REGISTRY_V2"
+    ]
+  },
+  "source_opportunities_inspected": {
+    "feature_surface_items": 19,
+    "observation_fields": 28,
+    "experiment_capabilities_v2": 7,
+    "hfic_scientific_discovery_prospects": 23,
+    "scientific_close_valid_families": 6,
+    "market_mechanism_directions_scored": 16,
+    "note": "Inventories are role-distinct; do not sum into one family count."
+  },
+  "feature_availability_mix": {
+    "PIT_READY": 1,
+    "HISTORICAL_RECONSTRUCTIBLE": 10,
+    "FORWARD_ONLY": 3,
+    "MISSING": 4,
+    "MISSING_CAPABILITY": 1,
+    "source": "configs/factory_v1_common_market_feature_surface_v1.yaml"
+  },
+  "classification_counts": {
+    "CURRENTLY_GROUNDED": 0,
+    "GROUNDED_WITH_FORWARD_ONLY_EVIDENCE": 2,
+    "MISSING_CAPABILITY": 2,
+    "BLOCKED_BY_RESEARCH_TRUTH": 2,
+    "CLOSED_OR_DUPLICATIVE": 9,
+    "ADVISORY_ONLY_NOT_YET_GROUNDED": 24
+  },
+  "currently_grounded_distinct_families": [],
+  "grounded_with_forward_only_evidence": [
+    {
+      "id": "HOLDER_CONCENTRATION",
+      "axes": {
+        "actor_counterparty": "top_holders_vs_rest",
+        "mechanism": "concentration_to_worse_H900_recovery",
+        "primary_observable_X": "audit.topHoldersPercentage",
+        "horizon": "H900_quote_only",
+        "state_transition": null,
+        "payoff_asymmetry": null
+      },
+      "note": "Replicated relation; actionability veto not proven; family_hard_closed=false; NEXT is DESIGN_ONLY_REFRAME not third sample"
+    },
+    {
+      "id": "QUOTE_OBSERVABLES_AS_OPEN_FAMILY",
+      "axes": {
+        "actor_counterparty": null,
+        "mechanism": "quote_availability_friction_route",
+        "primary_observable_X": "quote_availability_friction_route_status",
+        "horizon": null,
+        "state_transition": null,
+        "payoff_asymmetry": null
+      },
+      "note": "Features FORWARD_ONLY; exact quote-friction/alpha families already closed or paused"
+    }
+  ],
+  "structural_signature_distribution": {
+    "CURRENTLY_GROUNDED_mechanism_classes": 0,
+    "FORWARD_ONLY_mechanism_classes": 2,
+    "closed_family_ledger_entries": 6,
+    "advisory_prospect_dispositions": {
+      "ADOPT_NOW": 1,
+      "WATCH_TRIGGERED_ONLY": 8,
+      "DEFERRED_CURRENT_HORIZON": 4,
+      "PREREQUISITE_BLOCKED": 9,
+      "REJECTED_CURRENT_HORIZON": 1
+    }
+  },
+  "excluded_blocked_by_reason": {
+    "CLOSED_OR_DUPLICATIVE": 9,
+    "ADVISORY_ONLY_NOT_YET_GROUNDED": 24,
+    "MISSING_CAPABILITY": 2,
+    "BLOCKED_BY_RESEARCH_TRUTH": 2
+  },
+  "closed_or_duplicate_pressure": {
+    "scientific_close_valid": [
+      "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY",
+      "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY",
+      "CLOSE_EXACT_FRICTION_VETO_FAMILY",
+      "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY",
+      "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY",
+      "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY"
+    ],
+    "source": "docs/evidence/hfic_legacy_science_rebase/a1_inventory_v1.json"
+  },
+  "single_dominant_next_family": {
+    "present": false,
+    "explanation": "No unique automatic next executable family. Holder is the only replicated non-hard-closed market mechanism, but owner NEXT is DESIGN_ONLY_REFRAME / new cheap mechanism search, not selection among a large grounded choice set."
+  },
+  "materiality_evaluation": {
+    "M1_cardinality_currently_grounded_ge_3": false,
+    "M2_structural_diversity": false,
+    "M3_no_single_dominant_next": true,
+    "M4_owner_comparison_effort_ge_3_grounded": false,
+    "all_pass": false
+  },
+  "terminal": "DISCOVERY_TRIGGER_B_NOT_YET_PROVEN",
+  "a0_terminal_unchanged": "DISCOVERY_GENERATOR_TRIGGER_NOT_YET_PROVEN",
+  "missing_evidence_for_later_reevaluation": [
+    "Git census of >=3 CURRENTLY_GROUNDED distinct market hypothesis families with pairwise >=2 Forge-axis divergence",
+    "Measured HFIC session census meeting configs/hypothesis_forge_independent_critic_v1.yaml search-budget thresholds (min_sessions=5 etc.) without treating advisory prospects as families",
+    "Strategy-available (not FORWARD_ONLY-only) observables for competing open families",
+    "Prior-work state showing multiple competing grounded NEXTs rather than DESIGN_ONLY_REFRAME after closed-family ledger"
+  ],
+  "evidence_refs": [
+    "docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md",
+    "docs/tasks/FORGE_DISCOVERY_RANKER_ENTRY_GATE_V1.md",
+    "configs/factory_v1_common_market_feature_surface_v1.yaml",
+    "configs/observation_primitive_registry_v1.yaml",
+    "configs/experiment_capability_registry_v2.yaml",
+    "configs/hypothesis_forge_independent_critic_v1.yaml",
+    "docs/architecture/prospects/hfic_scientific_discovery_prospects_v1.yaml",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md",
+    "docs/evidence/hfic_legacy_science_rebase/a1_inventory_v1.json",
+    "docs/FACTORY_SEMANTIC_MAP.md"
+  ],
+  "non_claims": [
+    "NO_A0_TERMINAL_CHANGE",
+    "NO_A1_START",
+    "NO_GENERATOR_OR_RANKER",
+    "NO_OPPORTUNITY_PROJECTION",
+    "NO_CARTESIAN_PRODUCT_COUNT",
+    "NO_X_TIME_TO_PIT_COERCION",
+    "NO_CAPABILITY_IMPLIES_AUTHORITY",
+    "NO_PROVIDER_OR_EXPERIMENT"
+  ]
+}

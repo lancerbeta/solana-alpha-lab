@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-DISCOVERY-TRIGGER-B-MEASUREMENT-COMPLETION-001",
+  "as_of": "2026-09-03",
+  "task_id": "FORGE_DISCOVERY_TRIGGER_B_MEASUREMENT_V1",
+  "state_change": "DISCOVERY_TRIGGER_B_NOT_YET_PROVEN",
+  "base_main": "e3ccf6561c3d91720c0234c4255d3385b3f9f8d7",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/FORGE_DISCOVERY_TRIGGER_B_MEASUREMENT_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_discovery_trigger_b_measurement/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TRIGGER_B_MEASUREMENT_SELF_CONSISTENT",
+    "independent_review": {
+      "path": "docs/evidence/forge_discovery_trigger_b_measurement/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TRIGGER_B_MATERIALITY_RULE_APPLIED"
+    ]
+  },
+  "non_claims": [
+    "NO_A0_TERMINAL_CHANGE",
+    "NO_A1_START",
+    "NO_GENERATOR_OR_RANKER",
+    "NO_OPPORTUNITY_PROJECTION",
+    "NO_CARTESIAN_PRODUCT_COUNT",
+    "NO_PROVIDER_OR_EXPERIMENT",
+    "NO_HOLDOUT",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "generator_code_added": 0,
+    "new_db": 0
+  }
+}
