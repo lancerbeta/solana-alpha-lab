@@ -72,11 +72,12 @@ class DerivedHashDriftMessageTests(unittest.TestCase):
             root=ROOT,
         )
         self.assertEqual(base, "5c0efd1619f048c61e6f056b83449571e0abfdae")
+        routine_base = messages.routine_harness_sync_base_ref(root=ROOT)
         summary = messages.derived_hash_drift_summary(
             root=ROOT,
         )
-        if messages.routine_harness_sync_base_ref(root=ROOT) is not None:
-            self.assertIn("--base-ref 5c0efd1619f048c61e6f056b83449571e0abfdae", summary)
+        if routine_base is not None:
+            self.assertIn(f"--base-ref {routine_base}", summary)
         else:
             self.assertIn("RECOVERY_FULL_ORACLE", summary)
 

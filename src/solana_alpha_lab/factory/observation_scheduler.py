@@ -296,6 +296,8 @@ class _Accounting:
                 elapsed = (reference_now - parse_utc(str(last))).total_seconds()
             except Exception:
                 elapsed = self.pace
+            if elapsed < 0:
+                elapsed = self.pace
             if elapsed < self.pace:
                 return "PACE_WAIT"
         return None
@@ -1023,6 +1025,7 @@ def tick_once(
             "terminal": "NOT_YET_ACTIVE",
             "provider_calls": 0,
             "credential_reads": 0,
+            "activation_state": state,
         }
     if state in {
         "PAUSED_OPERATOR",
@@ -1031,7 +1034,12 @@ def tick_once(
         "BLOCKED_BUDGET",
         "COMPLETE",
     }:
-        return {"terminal": state, "provider_calls": 0, "credential_reads": 0}
+        return {
+            "terminal": state,
+            "provider_calls": 0,
+            "credential_reads": 0,
+            "activation_state": state,
+        }
     try:
         _require_live_authority(
             store,
@@ -1088,6 +1096,19 @@ def tick_once(
             now,
             credit_costs=credit_costs,
         )
+        if injectable_clock is not None:
+            last_raw = accounts.day.get("last_provider_call_at")
+            if last_raw:
+                try:
+                    last_dt = parse_utc(str(last_raw))
+                    min_now = last_dt + timedelta(seconds=accounts.pace)
+                    current = provider_ctx.now()
+                    if current < min_now:
+                        sleeper = getattr(injectable_clock, "sleep", None)
+                        if callable(sleeper):
+                            sleeper((min_now - current).total_seconds())
+                except Exception:
+                    pass
         successor_before_cutover = any(
             str(item["successor_schedule_sha256"]) == digest
             and str(item["successor_activation_id"]) == activation_id
@@ -1105,6 +1126,7 @@ def tick_once(
             materialize_pending_observation_snapshots,
         )
 
+        prior_activation_state = str(activation["state"])
         drained = drain_expired_admission(
             data_root=data_root,
             store=store,
@@ -2032,14 +2054,23 @@ def tick_once(
             )
         draining_completion = None
         if state == "DRAINING":
-            draining_completion = complete_draining_schedule(
-                data_root=data_root,
-                store=store,
-                schedule_sha256=digest,
-                activation_id=activation_id,
-                now=now,
-                producer_git_sha=producer_git_sha,
+            admission_just_closed = (
+                prior_activation_state == "ACTIVE" and not admission_open
             )
+            if admission_just_closed:
+                draining_completion = {
+                    "state": "DRAINING",
+                    "terminal": "DRAINING_PENDING",
+                }
+            else:
+                draining_completion = complete_draining_schedule(
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=digest,
+                    activation_id=activation_id,
+                    now=now,
+                    producer_git_sha=producer_git_sha,
+                )
         materialize_pending_observation_snapshots(
             data_root=data_root,
             store=store,

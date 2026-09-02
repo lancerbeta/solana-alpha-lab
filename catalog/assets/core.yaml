@@ -33057,7 +33057,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 9c7907983f17c14a186748bdf9f20a179ae9ff6d2da5c1d9d8a8ed375b59a138}
+  integrity: {kind: sha256, sha256: 80fe61fae18de9a7965dedc3039596e53fd720f87a00e101874f72c80c70b1cf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33438,7 +33438,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_scheduler.py', repository_path: src/solana_alpha_lab/factory/observation_scheduler.py}
-  integrity: {kind: sha256, sha256: 129e83fbbe61ece967698ed38b231021ad03ee68baaf64e26288d92d30a83d18}
+  integrity: {kind: sha256, sha256: 9fc35af6362c8c4c738252afb561abaaa577193ee1b39b6b2ccc018581f0c24f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33555,7 +33555,7 @@ records:
   as_of: '2026-08-31'
   truth_owner: PATHRISK_LIVE_WINDOW_EXECUTION_GLUE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_pathrisk_live_window.py', repository_path: tests/test_pathrisk_live_window.py}
-  integrity: {kind: sha256, sha256: 144d4e8d9a3daf90583899eabdbc69de24aa7aa0d9f4518e752c66d390939030}
+  integrity: {kind: sha256, sha256: b3d0adce8b3f772facf29cf594c23c83371e85ff8f6616bc3b0d4fb27425bb64}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PATHRISK-LIVE-WINDOW-EXECUTION-GLUE-001}

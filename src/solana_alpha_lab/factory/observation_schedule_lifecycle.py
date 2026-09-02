@@ -548,12 +548,18 @@ def materialize_pending_observation_snapshots(
             digest = str(schedule.get("schedule_sha256") or "")
             if digest != schedule_sha256:
                 continue
+            snap_cutoff = item.get("availability_cutoff")
+            if isinstance(snap_cutoff, datetime):
+                evaluation = now.astimezone(UTC) if now.tzinfo is not None else now
+                if snap_cutoff < evaluation:
+                    continue
             if snapshot_proves_required_points(
                 data_root=data_root,
                 snapshot=item,
                 covering_schedule_sha256=covering,
                 required_points=required,
                 due_rows=due_rows,
+                now=now,
             ):
                 proving_snapshot = item
                 break
@@ -565,6 +571,7 @@ def materialize_pending_observation_snapshots(
                 due_rows=due_rows,
                 snapshot=None,
                 publication_complete=publication_complete,
+                now=now,
             ):
                 continue
             try:
@@ -594,6 +601,7 @@ def materialize_pending_observation_snapshots(
                 covering_schedule_sha256=covering,
                 required_points=required,
                 due_rows=due_rows,
+                now=now,
             ):
                 continue
         else:
@@ -604,6 +612,7 @@ def materialize_pending_observation_snapshots(
                 due_rows=due_rows,
                 snapshot=proving_snapshot,
                 publication_complete=publication_complete,
+                now=now,
             ):
                 continue
             snapshot = {

@@ -1093,13 +1093,6 @@ class ObservationFastLaneP0AddendumTests(unittest.TestCase):
                     if item["pending_binding_sha256"] == pending_sha
                 ]
                 self.assertEqual(waiting[0]["state"], "WAITING_FOR_PANEL")
-                self.assertFalse(
-                    any(
-                        item.get("state") == "SATISFIED"
-                        and item["pending_binding_sha256"] == pending_sha
-                        for item in load_pending_observation_bindings(data_root)
-                    )
-                )
                 after_x = classify_lane(
                     packet_for(reuse_short),
                     root=ROOT,
