@@ -11,7 +11,11 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/FACTORY_REMOTE_HOST_SKU_CLOUD_VPS_6_GEN2_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "2b90936bba91ea95cb4c8ab53882310f80a726581e44fa17ce5350047b6b0ef6",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "cc3997fcaf5bcf70afe7003d1b51d9818ec53576089c01b23b269fa30b1958fd",
+    "docs/operator/factory_remote_host_v1.yaml": "ae5d269f45f8441a25872a4397e409c7dfa098b978481f3bc756ecc457ff56e6",
+    "docs/reports/factory_remote_host_sku_cloud_vps_6_gen2/a1_owner_readout_v1.md": "f39f78027820223cb11f1868782d3b3f94e8b9b3d088b0208025f00b55378b4c",
+    "docs/tasks/FACTORY_REMOTE_HOST_SKU_CLOUD_VPS_6_GEN2_V1.md": "608ff90bc42189b6a2ab6c19f50da8990fabe71d9aa87c211248957c282ce52d"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +27,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_remote_host_sku_cloud_vps_6_gen2/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "dc4bd055004c9446c1f58b10c1a389ed6d36a0311155101adf32ab26fc9b84f3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LOCATOR_SKU_DIFF_BOUNDED",
     "independent_review": {
       "path": "docs/evidence/factory_remote_host_sku_cloud_vps_6_gen2/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "398b2b6db2f0a197389e197d1b69af279bb9ba7a1506c3f2ecac1d32401eaa53",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
