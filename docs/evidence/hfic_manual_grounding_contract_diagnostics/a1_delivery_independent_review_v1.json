@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-MANUAL-GROUNDING-CONTRACT-DIAGNOSTICS-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-03",
+  "task_id": "HFIC_MANUAL_GROUNDING_CONTRACT_DIAGNOSTICS_V1",
+  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=3c3d42e325dc150ce44065ff02191fdc5a66334fa8454bab5b3ead78f4599c93",
+        "FIXED_PIT_OMIT_UNPROVEN_VALUE_STATUS",
+        "FIXED_COLLISION_COUNT_OBSERVED_ONLY",
+        "DESIGN_ALIGNED_GROUNDED_TERMINAL",
+        "FIXED_CYCLE_CONTINUITY_GROUNDING",
+        "C2_C3_C4_HOLD_NO_TRIGGER_OR_ARCH006"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "FAIL_CLOSED_UNKNOWN_FEAT_CAP",
+        "IDENTITY_FIELDS_UNCHANGED",
+        "STRUCTURAL_SIG_NOT_IDENTITY",
+        "INTERMEDIATE_CARRIES_GROUNDED",
+        "REVISION_REGROUNDS_V12",
+        "FINALIZE_THREADS_PROMPT_VERSION",
+        "NO_GENERATOR_RANKER_NO_SECRETS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_P1_P4_FALSIFIABLE_OFFLINE",
+        "DOD_NO_LIVE_FORGE_REQUIRED",
+        "DOD_NO_TRIGGER_A_OR_B_CLAIM",
+        "DOD_NO_ARCH_INTENT_006_REOPEN",
+        "DOD_NO_GENERATOR_OR_RANKER"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_GENERATOR_OR_RANKER",
+    "NO_ARCH_INTENT_006_REOPEN",
+    "NO_TRIGGER_A_OR_B_PROOF"
+  ]
+}
