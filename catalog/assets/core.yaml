@@ -29923,7 +29923,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_REMOTE_HOST.md', repository_path: docs/operator/FACTORY_REMOTE_HOST.md}
-  integrity: {kind: sha256, sha256: 202630b94c18f25cbf5b8b7676d8bc539d7732cf57896a212f370d1760645909}
+  integrity: {kind: sha256, sha256: cc3997fcaf5bcf70afe7003d1b51d9818ec53576089c01b23b269fa30b1958fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]

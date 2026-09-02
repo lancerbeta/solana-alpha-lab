@@ -26,6 +26,8 @@ Off-host Google Drive durability recovery: см. раздел **Durability recov
 | Portal | `https://portal.cherryservers.com/` |
 
 IPv4 меняется только сменой этого YAML + этой таблицы одним коммитом.
+Doctor JSON может ещё показывать purchase-floor `CLOUD_VPS_4_GEN2` до
+отдельного schema unfreeze; для размера хоста канон — SKU в таблице/YAML выше.
 
 ## Как зайти
 

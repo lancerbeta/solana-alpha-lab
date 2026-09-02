@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-REMOTE-HOST-SKU-CLOUD-VPS-6-GEN2-FACTORY-FIT-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_REMOTE_HOST_SKU_CLOUD_VPS_6_GEN2_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_LOCATOR_SKU_MATCHES_LIVE_UPGRADE",
+    "flexibility_and_history": "PASS_LOCATOR_ONLY_NO_PURCHASE_FLOOR_FORK",
+    "context_efficiency": "PASS_TWO_OPERATOR_FILES_PLUS_DERIVED_HASHES",
+    "research_truth": "PASS_NO_ALPHA_OR_READY_CLAIM",
+    "owner_operability": "PASS_TABLE_AND_YAML_SKU_ALIGNED",
+    "execution_to_cashflow": "NOT_APPLICABLE_LOCATOR_ONLY",
+    "monitoring_and_recovery": "PASS_REVERT_TWO_LOCATOR_FILES_AND_CORE_HASHES",
+    "build_vs_buy": "PASS_NO_NEW_PLATFORM",
+    "security": "PASS_NO_SECRETS_NO_SSH_IDENTITY_CHANGE",
+    "red_team": "PASS_DOCTOR_FLOOR_SKU_STALE_UNTIL_SCHEMA_UNFREEZE_EXPLICIT"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OPTIONAL_LATER_SCHEMA_UNFREEZE_FOR_DOCTOR_JSON_SKU"
+  },
+  "recovery": "REVERT factory_remote_host_v1.yaml, FACTORY_REMOTE_HOST.md, AND core.yaml LOCATOR HASHES.",
+  "limits": [
+    "NO_PURCHASE_FLOOR_UNFREEZE",
+    "NO_COLLECTOR_PROTOCOL_CHANGE",
+    "NO_IPV4_HOSTNAME_SSH_CHANGE",
+    "NO_ALPHA_OR_OPERATIONAL_READY",
+    "NO_CANONICAL_DONE"
+  ]
+}

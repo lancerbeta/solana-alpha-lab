@@ -1,0 +1,52 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-REMOTE-HOST-SKU-CLOUD-VPS-6-GEN2-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_REMOTE_HOST_SKU_CLOUD_VPS_6_GEN2_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_WRITE_SET_LOCATOR_PLUS_DERIVED_HASHES_ONLY",
+        "CHECKED_PURCHASE_FLOOR_CONFIGS_UNTOUCHED",
+        "CHECKED_IPV4_HOSTNAME_SSH_INSTANCE_UNCHANGED",
+        "CHECKED_NO_SECRETS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_LOCATOR_SKU_FALSIFIABLE_ON_CONSUMER_SURFACES",
+        "CHECKED_DOCTOR_FLOOR_RESIDUAL_NOTED_ON_OPERATOR_MD",
+        "CHECKED_HASH_BOUND_RECEIPT_VIA_BIND_EVIDENCE",
+        "CHECKED_NO_PURCHASE_FLOOR_UNFREEZE"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_TABLE_YAML_SKU_COHERENT",
+        "CHECKED_CONNECT_COORDINATES_UNCHANGED",
+        "CHECKED_DOCTOR_FLOOR_RESIDUAL_VISIBLE_TO_OPERATOR"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_PURCHASE_FLOOR_UNFREEZE",
+    "NO_ALPHA_OR_OPERATIONAL_READY_CLAIM"
+  ]
+}

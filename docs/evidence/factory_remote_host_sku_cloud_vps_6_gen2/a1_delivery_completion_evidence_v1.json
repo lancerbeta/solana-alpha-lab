@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-REMOTE-HOST-SKU-CLOUD-VPS-6-GEN2-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_REMOTE_HOST_SKU_CLOUD_VPS_6_GEN2_V1",
+  "state_change": "FACTORY_REMOTE_HOST_SKU_LOCATOR_UPDATED",
+  "base_main": "077a1f9d508683a3f9341cc5de15f4411f2b6130",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_REMOTE_HOST_SKU_CLOUD_VPS_6_GEN2_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_remote_host_sku_cloud_vps_6_gen2/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LOCATOR_SKU_DIFF_BOUNDED",
+    "independent_review": {
+      "path": "docs/evidence/factory_remote_host_sku_cloud_vps_6_gen2/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_PURCHASE_FLOOR_UNFREEZE",
+    "NO_IPV4_HOSTNAME_SSH_CHANGE",
+    "NO_COLLECTOR_PROTOCOL_CHANGE",
+    "NO_INSTANCE_ID_CHANGE",
+    "NO_SECRETS",
+    "NO_WALLET_OR_CASH_SPEND",
+    "NO_DOCTOR_JSON_SKU_ENUM_CHANGE",
+    "NO_ALPHA_OR_OPERATIONAL_READY_CLAIM"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}
