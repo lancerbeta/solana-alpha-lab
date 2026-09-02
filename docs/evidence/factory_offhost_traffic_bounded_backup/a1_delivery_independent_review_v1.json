@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OFFHOST-TRAFFIC-BOUNDED-BACKUP-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "8e384197667763b62853be3e325d00e29f07aed56d003c51b411dc50c7ccd25a",
+  "reviewed_inventory_sha256": "8ed72342901800f15d6c08e38adcc2fe9c133aae8ece1d83c859d989b53628f6",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "STREAMING_ZIP_NO_BYTESIO",
+        "SHARED_LOCK_PID_AND_4H_STALE",
+        "COPYTO_ONLY_ALLOWLIST",
+        "TIP_ENTRIES_SURVIVE_RETAIN1",
+        "DELTA_PATH_SAFE_RELATIVE",
+        "GDRIVE_UNITS_ENVIRONMENTFILE",
+        "CHECKPOINT_FILENAME_CONTENT_HASH"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LOCAL_FULL_12H_RETAIN1",
+        "DAILY_DELTA_AFTER_RETAIN1",
+        "WEEKLY_BEFORE_SAME_DAY_DELTA",
+        "DISCOVERY_THEN_RESTORE",
+        "PLANNING_FIXTURE_202GB_LT_240GB",
+        "PAYLOAD_NOT_BILLING_TRUTH",
+        "MISSING_LEDGER_UNKNOWN",
+        "REQUIRED_ACCEPTANCE_TERMINAL_BOUND"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=1a327714131969f722c5a5c1435ad03aa16f0c14b2e4f75efd8a02aae69b5a29",
+        "BACKUP_NOT_SCIENTIFIC_TRUTH",
+        "C10_OCCUPANCY_NOT_PIT",
+        "LIVE_FOLLOW_UP_COMMISSIONING",
+        "CHECKPOINT_FILENAME_TIMESTAMP_THEN_HASH",
+        "UNKNOWN_LEDGER_NOT_ZERO"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_CREDENTIAL_VALUES",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "APPLICATION_PAYLOAD_IS_NOT_BILLING_TRUTH",
+    "NO_LIVE_RESTORE_OVER_FACTORY_STATE",
+    "NO_REMOTE_DELETE",
+    "NO_RCLONE_SYNC"
+  ]
+}

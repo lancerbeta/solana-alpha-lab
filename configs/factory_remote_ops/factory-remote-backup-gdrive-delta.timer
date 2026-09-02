@@ -1,0 +1,11 @@
+[Unit]
+Description=Factory off-host daily incremental checkpoint 00:45 UTC
+Documentation=docs/tasks/FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1.md
+
+[Timer]
+OnCalendar=*-*-* 00:45:00 UTC
+Persistent=true
+Unit=factory-remote-backup-gdrive-delta.service
+
+[Install]
+WantedBy=timers.target

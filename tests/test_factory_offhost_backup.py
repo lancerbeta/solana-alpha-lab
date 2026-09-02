@@ -26,24 +26,35 @@ from solana_alpha_lab.factory.collector_operational_packet import (  # noqa: E40
 )
 from solana_alpha_lab.factory.offhost_backup import (  # noqa: E402
     FORBIDDEN_RCLONE_SUBCOMMANDS,
+    INTERNAL_PAYLOAD_PLANNING_BUDGET_30D,
+    OWNER_BACKUP_TRAFFIC_TARGET_30D,
+    PLANNING_FIXTURE_PAYLOAD_30D,
     OffhostBackupError,
     OffhostConfig,
     agent_durability_classification,
     build_rclone_argv,
+    conservative_full_pressure_bytes,
     copy_offhost_backup,
     load_offhost_config,
+    newest_checkpoint_filename,
     offhost_health_snapshot,
     offhost_recovery_readout,
+    planning_fixture_payload_30d,
     read_offhost_receipt,
+    restore_from_recovery_checkpoint,
+    run_offhost_checkpoint,
     validate_rclone_argv,
+    validate_recovery_checkpoint,
     verify_backup_bundle,
     write_offhost_receipt,
 )
 from solana_alpha_lab.factory.remote_ops import (  # noqa: E402
+    backup_plane_lock,
     load_config_v1_1,
     package_backup,
     project_health,
     resolve_backup_sink,
+    RemoteOpsError,
 )
 
 from tests.test_factory_remote_operations import COPY_RELATIVES as REMOTE_OPS_COPY_RELATIVES
@@ -52,6 +63,9 @@ OFFHOST_RELATIVES = list(REMOTE_OPS_COPY_RELATIVES) + [
     "catalog/schemas/factory_remote_operations_v1_1.schema.json",
     "configs/factory_remote_operations_v1_1.yaml",
     "configs/factory_remote_ops/factory-remote-backup-gdrive.service",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive.timer",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive-delta.service",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive-delta.timer",
     "configs/factory_remote_ops/factory-observation-schedule.service",
     "configs/factory_remote_ops/factory-observation-schedule.timer",
 ]
@@ -97,8 +111,10 @@ def _seed_tree(dst: Path) -> Path:
 class FakeRcloneRunner:
     def __init__(self) -> None:
         self.objects: dict[str, int] = {}
+        self.payloads: dict[str, bytes] = {}
         self.calls: list[list[str]] = []
         self.fail_next_copy = False
+        self.fail_copy_count = 0
 
     @staticmethod
     def _subcommand(argv: list[str]) -> str:
@@ -118,11 +134,15 @@ class FakeRcloneRunner:
             payload = [{"Path": Path(remote).name, "Size": self.objects[remote]}]
             return type("R", (), {"returncode": 0, "stdout": json.dumps(payload), "stderr": ""})()
         if sub == "copyto":
-            if self.fail_next_copy:
+            if self.fail_next_copy or self.fail_copy_count > 0:
+                if self.fail_copy_count > 0:
+                    self.fail_copy_count -= 1
                 return type("R", (), {"returncode": 1, "stdout": "", "stderr": "copy failed"})()
             source = Path(argv[-2])
             remote = argv[-1]
-            self.objects[remote] = source.stat().st_size
+            data = source.read_bytes()
+            self.objects[remote] = len(data)
+            self.payloads[remote] = data
             return type("R", (), {"returncode": 0, "stdout": "", "stderr": ""})()
         raise AssertionError(f"unexpected subcommand {sub}")
 
@@ -238,8 +258,8 @@ class FactoryOffhostBackupTests(unittest.TestCase):
             self.root,
             self.config,
             {
-                "uploaded_at": (now - timedelta(hours=7)).isoformat().replace("+00:00", "Z"),
-                "verified_at": (now - timedelta(hours=7)).isoformat().replace("+00:00", "Z"),
+                "uploaded_at": (now - timedelta(hours=49)).isoformat().replace("+00:00", "Z"),
+                "verified_at": (now - timedelta(hours=49)).isoformat().replace("+00:00", "Z"),
                 "source_backup_filename": bundle.name,
                 "source_sha256": bundle.stem.removeprefix("BACKUP_"),
                 "source_bytes": bundle.stat().st_size,
@@ -329,7 +349,7 @@ class FactoryOffhostBackupTests(unittest.TestCase):
         self.assertEqual(cfg["backup"]["google_drive_role_prior"], "OPTIONAL_COLD_COPY_NOT_DOD")
         self.assertEqual(
             cfg["backup"]["google_drive_role_provenance"]["unproven_follow_up"],
-            "NONEMPTY_RDP_OFFHOST_RESTORE_PROOF",
+            "LIVE_FACTORY_INCREMENTAL_RESTORE_COMMISSIONING",
         )
 
     def test_enabled_offhost_with_unready_rclone_is_failed_not_silent(self) -> None:
@@ -407,7 +427,15 @@ class FactoryOffhostBackupTests(unittest.TestCase):
         self.assertIn("stage_2_offhost", readout["architecture"])
         self.assertEqual(
             readout["architecture"]["stage_2_offhost"]["unproven_follow_up"],
-            "NONEMPTY_RDP_OFFHOST_RESTORE_PROOF",
+            "LIVE_FACTORY_INCREMENTAL_RESTORE_COMMISSIONING",
+        )
+        self.assertEqual(
+            readout["architecture"]["stage_2_offhost"]["discovery"],
+            "RECOVERY_CHECKPOINT_FILENAME_TIMESTAMP_THEN_CONTENT_HASH",
+        )
+        self.assertEqual(
+            readout["required_acceptance_terminal"],
+            "FACTORY_DAILY_DELTA_WEEKLY_FULL_OFFHOST_BACKUP_PASS",
         )
         dumped = json.dumps(readout)
         self.assertNotIn("access_token", dumped)
@@ -419,6 +447,276 @@ class FactoryOffhostBackupTests(unittest.TestCase):
         link.symlink_to(bundle)
         with self.assertRaises(OffhostBackupError):
             verify_backup_bundle(link)
+
+    def test_streaming_package_is_not_memory_proportional(self) -> None:
+        import inspect
+
+        from solana_alpha_lab.factory import remote_ops as remote_ops_mod
+
+        source = inspect.getsource(remote_ops_mod.package_backup)
+        delta_source = inspect.getsource(remote_ops_mod.package_delta_backup)
+        self.assertNotIn("BytesIO", source)
+        self.assertNotIn("BytesIO", delta_source)
+        self.assertNotIn("read_bytes()", source)
+        self.assertIn("_stream_zip_entry", source)
+        self.assertIn("_stream_zip_entry", delta_source)
+        service = (ROOT / "configs/factory_remote_ops/factory-remote-backup.service").read_text(
+            encoding="utf-8"
+        )
+        timer = (ROOT / "configs/factory_remote_ops/factory-remote-backup.timer").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("OnSuccess=", service)
+        self.assertIn("00:15:00 UTC", timer)
+        self.assertIn("12:15:00 UTC", timer)
+        cfg = load_config_v1_1(ROOT)
+        self.assertEqual(cfg["backup"]["local_full_schedule"], "12h")
+        self.assertEqual(cfg["backup"]["local_verified_bundle_retention"], 1)
+
+    def test_retain_one_verified_local_full(self) -> None:
+        loaded = load_config_v1_1(self.root)
+        first = package_backup(self.root, config=loaded)
+        sink = resolve_backup_sink(self.root, loaded, {})
+        (self.root / "local/factory_v1/observation_rdp/a.bin").write_bytes(b"alpha")
+        second = package_backup(self.root, config=loaded)
+        names = sorted(path.name for path in sink.glob("BACKUP_*.zip"))
+        self.assertEqual(names, [second["bundle"]])
+        self.assertNotEqual(first["sha256"], second["sha256"])
+        self.assertEqual(second["pruned"], [first["bundle"]])
+
+    def test_planning_fixture_payload_under_internal_budget(self) -> None:
+        self.assertEqual(planning_fixture_payload_30d(), 202_000_000_000)
+        self.assertEqual(PLANNING_FIXTURE_PAYLOAD_30D, 202_000_000_000)
+        self.assertLess(planning_fixture_payload_30d(), INTERNAL_PAYLOAD_PLANNING_BUDGET_30D)
+        self.assertEqual(OWNER_BACKUP_TRAFFIC_TARGET_30D, 300_000_000_000)
+        pressure = conservative_full_pressure_bytes(
+            current_full_payload_size=40 * 1_000_000_000,
+            projected_non_full_delta_payload=52 * 1_000_000_000,
+        )
+        self.assertGreater(pressure, INTERNAL_PAYLOAD_PLANNING_BUDGET_30D)
+        health = offhost_health_snapshot(self.root, config=self.config)
+        self.assertFalse(health["application_payload_is_billing_truth"])
+        self.assertNotIn("offhost_backup_egress_bytes_30d", health)
+        self.assertIsNone(health["offhost_backup_payload_bytes_30d"])
+        self.assertEqual(health["budget_class"], "UNKNOWN")
+
+    def test_weekly_full_precedes_same_day_delta(self) -> None:
+        sunday = datetime(2026, 9, 6, 0, 30, tzinfo=UTC)
+        (self.root / "local/factory_v1/observation_rdp/seed.bin").write_bytes(b"rdp-one")
+        weekly = run_offhost_checkpoint(
+            self.root,
+            mode="weekly",
+            config=self.config,
+            runner=self.runner,
+            now=sunday,
+            deploy_git_sha="f" * 40,
+        )
+        self.assertEqual(weekly["terminal"], "WEEKLY_FULL_VERIFIED")
+        backup_copies = [
+            call[-1]
+            for call in self.runner.calls
+            if FakeRcloneRunner._subcommand(call) == "copyto" and "BACKUP_" in call[-1]
+        ]
+        self.assertEqual(len(backup_copies), 1)
+        daily = run_offhost_checkpoint(
+            self.root,
+            mode="daily",
+            config=self.config,
+            runner=self.runner,
+            now=sunday.replace(hour=0, minute=45),
+            deploy_git_sha="f" * 40,
+        )
+        self.assertEqual(daily["terminal"], "NO_CHANGES_VERIFIED")
+        backup_copies_after = [
+            call[-1]
+            for call in self.runner.calls
+            if FakeRcloneRunner._subcommand(call) == "copyto" and "BACKUP_" in call[-1]
+        ]
+        delta_copies = [
+            call[-1]
+            for call in self.runner.calls
+            if FakeRcloneRunner._subcommand(call) == "copyto" and "DELTA_" in call[-1]
+        ]
+        self.assertEqual(backup_copies_after, backup_copies)
+        self.assertEqual(delta_copies, [])
+        checkpoints = [
+            Path(call[-1]).name
+            for call in self.runner.calls
+            if FakeRcloneRunner._subcommand(call) == "copyto"
+            and "RECOVERY_CHECKPOINT_" in call[-1]
+        ]
+        self.assertEqual(len(checkpoints), 2)
+        newest = newest_checkpoint_filename(checkpoints)
+        self.assertEqual(newest, checkpoints[-1])
+        local_checkpoint = (
+            resolve_backup_sink(self.root, load_config_v1_1(self.root), {}) / newest
+        )
+        payload = validate_recovery_checkpoint(local_checkpoint)
+        self.assertEqual(payload["checkpoint_terminal"], "NO_CHANGES_VERIFIED")
+
+    def test_weekly_no_change_does_not_reupload_full(self) -> None:
+        sunday = datetime(2026, 9, 6, 0, 30, tzinfo=UTC)
+        run_offhost_checkpoint(
+            self.root,
+            mode="weekly",
+            config=self.config,
+            runner=self.runner,
+            now=sunday,
+        )
+        later = run_offhost_checkpoint(
+            self.root,
+            mode="weekly",
+            config=self.config,
+            runner=self.runner,
+            now=sunday.replace(minute=40),
+        )
+        self.assertEqual(later["terminal"], "FULL_COVERAGE_RECONFIRMED_NO_CHANGE")
+        backup_copies = [
+            call
+            for call in self.runner.calls
+            if FakeRcloneRunner._subcommand(call) == "copyto" and "BACKUP_" in call[-1]
+        ]
+        self.assertEqual(len(backup_copies), 1)
+
+    def test_failed_copy_counts_attempted_payload(self) -> None:
+        self.runner.fail_copy_count = 1
+        with self.assertRaises(OffhostBackupError):
+            run_offhost_checkpoint(
+                self.root,
+                mode="daily",
+                config=self.config,
+                runner=self.runner,
+                now=datetime(2026, 9, 2, 0, 45, tzinfo=UTC),
+            )
+        ledger_path = self.root / "local/factory_v1/offhost_traffic_ledger.json"
+        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        attempted = sum(int(event["attempted_payload_bytes"]) for event in ledger["events"])
+        self.assertGreater(attempted, 0)
+        self.assertEqual(ledger["offhost_backup_payload_bytes_30d"], attempted)
+
+    def test_weekly_fail_allows_daily_delta_from_previous_base(self) -> None:
+        wednesday = datetime(2026, 9, 2, 0, 45, tzinfo=UTC)
+        (self.root / "local/factory_v1/observation_rdp/seed.bin").write_bytes(b"before")
+        first = run_offhost_checkpoint(
+            self.root,
+            mode="daily",
+            config=self.config,
+            runner=self.runner,
+            now=wednesday,
+        )
+        self.assertEqual(first["terminal"], "WEEKLY_FULL_VERIFIED")
+        (self.root / "local/factory_v1/observation_rdp/seed.bin").write_bytes(b"after-change")
+        self.runner.fail_copy_count = 1
+        sunday = datetime(2026, 9, 6, 0, 45, tzinfo=UTC)
+        daily = run_offhost_checkpoint(
+            self.root,
+            mode="daily",
+            config=self.config,
+            runner=self.runner,
+            now=sunday,
+        )
+        self.assertEqual(daily["terminal"], "DAILY_DELTA_VERIFIED")
+        self.assertEqual(daily["weekly_full_state"], "DEGRADED")
+
+    def test_nonempty_rdp_incremental_restore_proof(self) -> None:
+        rdp = self.root / "local/factory_v1/observation_rdp/live.bin"
+        rdp.write_bytes(b"epoch-1")
+        wednesday = datetime(2026, 9, 2, 0, 45, tzinfo=UTC)
+        first = run_offhost_checkpoint(
+            self.root,
+            mode="daily",
+            config=self.config,
+            runner=self.runner,
+            now=wednesday,
+        )
+        rdp.write_bytes(b"epoch-2-nonempty")
+        thursday = datetime(2026, 9, 3, 0, 45, tzinfo=UTC)
+        second = run_offhost_checkpoint(
+            self.root,
+            mode="daily",
+            config=self.config,
+            runner=self.runner,
+            now=thursday,
+        )
+        self.assertEqual(second["terminal"], "DAILY_DELTA_VERIFIED")
+        isolated = Path(self.tmp.name) / "isolated-restore"
+        objects = isolated / "objects"
+        objects.mkdir(parents=True)
+        dest = isolated / "dest"
+        for remote, data in self.runner.payloads.items():
+            (objects / Path(remote).name).write_bytes(data)
+        decoy = objects / f"RECOVERY_CHECKPOINT_20200101T000000Z_{'a' * 64}.json"
+        # older timestamp must not win
+        decoy.write_text("{}", encoding="utf-8")
+        names = [path.name for path in objects.iterdir()]
+        newest = newest_checkpoint_filename(names)
+        self.assertIsNotNone(newest)
+        self.assertTrue(str(newest).startswith("RECOVERY_CHECKPOINT_20260903"))
+        checkpoint_path = objects / newest
+        restored = restore_from_recovery_checkpoint(
+            checkpoint_path=checkpoint_path,
+            objects_dir=objects,
+            dest_root=dest,
+        )
+        self.assertEqual(
+            restored["terminal"],
+            "NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS",
+        )
+        self.assertEqual(
+            restored["discovery"],
+            "RECOVERY_CHECKPOINT_FILENAME_TIMESTAMP_THEN_CONTENT_HASH",
+        )
+        self.assertEqual(
+            (dest / "local/factory_v1/observation_rdp/live.bin").read_bytes(),
+            b"epoch-2-nonempty",
+        )
+        self.assertTrue(restored["sqlite_integrity"])
+        checkpoint = validate_recovery_checkpoint(checkpoint_path)
+        self.assertTrue(str(checkpoint["base_full"]["filename"]).startswith("BACKUP_"))
+        self.assertEqual(len(checkpoint["ordered_deltas"]), 1)
+
+    def test_retain_one_local_full_still_emits_daily_delta(self) -> None:
+        sunday = datetime(2026, 9, 6, 0, 30, tzinfo=UTC)
+        (self.root / "local/factory_v1/observation_rdp/seed.bin").write_bytes(b"week-base")
+        weekly = run_offhost_checkpoint(
+            self.root,
+            mode="weekly",
+            config=self.config,
+            runner=self.runner,
+            now=sunday,
+        )
+        self.assertEqual(weekly["terminal"], "WEEKLY_FULL_VERIFIED")
+        loaded = load_config_v1_1(self.root)
+        package_backup(self.root, config=loaded)
+        (self.root / "local/factory_v1/observation_rdp/seed.bin").write_bytes(b"monday-growth")
+        package_backup(self.root, config=loaded)
+        monday = datetime(2026, 9, 7, 0, 45, tzinfo=UTC)
+        daily = run_offhost_checkpoint(
+            self.root,
+            mode="daily",
+            config=self.config,
+            runner=self.runner,
+            now=monday,
+        )
+        self.assertEqual(daily["terminal"], "DAILY_DELTA_VERIFIED")
+        delta_copies = [
+            call[-1]
+            for call in self.runner.calls
+            if FakeRcloneRunner._subcommand(call) == "copyto" and "DELTA_" in call[-1]
+        ]
+        self.assertEqual(len(delta_copies), 1)
+        backup_copies = [
+            call[-1]
+            for call in self.runner.calls
+            if FakeRcloneRunner._subcommand(call) == "copyto" and "BACKUP_" in call[-1]
+        ]
+        self.assertEqual(len(backup_copies), 1)
+
+    def test_shared_lock_rejects_concurrent_writer(self) -> None:
+        with backup_plane_lock(self.root):
+            with self.assertRaises(RemoteOpsError):
+                with backup_plane_lock(self.root, timeout_seconds=0.2):
+                    pass
 
 
 if __name__ == "__main__":

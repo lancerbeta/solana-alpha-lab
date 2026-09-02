@@ -46,6 +46,8 @@ backup:
   recursive_relative_paths:
     - local/factory_v1/observation_rdp
   same_parent_forbidden: true
+  local_full_schedule: 12h
+  local_verified_bundle_retention: 1
   google_drive_role: PROVEN_OFFHOST_DURABILITY
   google_drive_role_prior: OPTIONAL_COLD_COPY_NOT_DOD
   google_drive_role_provenance:
@@ -53,7 +55,7 @@ backup:
     promoted_by:
       - FACTORY_GOOGLE_DRIVE_OFFHOST_PROOF_V1
       - FACTORY_GOOGLE_DRIVE_OFFHOST_DURABILITY_AUTOMATION_V1
-    unproven_follow_up: NONEMPTY_RDP_OFFHOST_RESTORE_PROOF
+    unproven_follow_up: LIVE_FACTORY_INCREMENTAL_RESTORE_COMMISSIONING
   offhost:
     enabled: true
     remote_name: factory-gdrive
@@ -61,8 +63,13 @@ backup:
     rclone_config_absolute: /etc/solana-alpha-lab/rclone.conf
     rclone_bin: /usr/bin/rclone
     receipt_relative: local/factory_v1/offhost_backup_receipt.json
-    freshness_current_max_seconds: 7200
-    freshness_degraded_max_seconds: 21600
+    freshness_current_max_seconds: 86400
+    freshness_degraded_max_seconds: 172800
+    daily_delta: true
+    weekly_full: true
+    weekly_weekday_utc: 6
+    owner_traffic_target_30d_bytes: 300000000000
+    internal_payload_planning_budget_30d_bytes: 240000000000
 monitoring:
   freshness_max_seconds: 900
   stall_max_seconds: 1800
@@ -88,6 +95,9 @@ units:
   backup_service_relative: configs/factory_remote_ops/factory-remote-backup.service
   backup_timer_relative: configs/factory_remote_ops/factory-remote-backup.timer
   backup_gdrive_service_relative: configs/factory_remote_ops/factory-remote-backup-gdrive.service
+  backup_gdrive_timer_relative: configs/factory_remote_ops/factory-remote-backup-gdrive.timer
+  backup_gdrive_delta_service_relative: configs/factory_remote_ops/factory-remote-backup-gdrive-delta.service
+  backup_gdrive_delta_timer_relative: configs/factory_remote_ops/factory-remote-backup-gdrive-delta.timer
   paper_heartbeat_relative: configs/factory_remote_ops/factory-paper-heartbeat.service
   observation_schedule_service_relative: configs/factory_remote_ops/factory-observation-schedule.service
   observation_schedule_timer_relative: configs/factory_remote_ops/factory-observation-schedule.timer

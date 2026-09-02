@@ -38,7 +38,10 @@ units:
   - factory-remote-health.service
   - factory-paper-heartbeat.timer
   - factory-remote-backup.timer
+  - factory-remote-backup-gdrive.timer
+  - factory-remote-backup-gdrive-delta.timer
   - factory-remote-backup-gdrive.service
+  - factory-remote-backup-gdrive-delta.service
 commands:
   doctor: cd /opt/solana-alpha-lab && sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py
   heartbeat: cd /opt/solana-alpha-lab && /usr/bin/uv run --locked --managed-python python -B scripts/run_factory_unattended_shadow_tick.py

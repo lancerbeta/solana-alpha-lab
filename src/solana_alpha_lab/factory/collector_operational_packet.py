@@ -721,6 +721,13 @@ def build_collector_operational_packet(
         "offhost_last_sha256": offhost.get("offhost_last_sha256"),
         "offhost_remote": offhost.get("offhost_remote"),
         "durability_domain": offhost.get("durability_domain"),
+        "offhost_backup_payload_bytes_30d": offhost.get("offhost_backup_payload_bytes_30d"),
+        "projected_offhost_backup_payload_bytes_30d": offhost.get(
+            "projected_offhost_backup_payload_bytes_30d"
+        ),
+        "offhost_payload_budget_class": offhost.get("budget_class"),
+        "offhost_egress_policy_pressure": offhost.get("offhost_egress_policy_pressure"),
+        "application_payload_is_billing_truth": False,
         "restore_marker_unresolved": bool(base.get("restore_marker_unresolved")),
         "raw_retention_substrate": (
             "DECODED_CANONICAL_PROVIDER_JSON_IN_CALL_LEDGER_NOT_BYTE_IDENTICAL_HTTP"

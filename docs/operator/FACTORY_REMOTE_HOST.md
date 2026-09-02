@@ -57,6 +57,8 @@ ssh -i "$env:USERPROFILE\.ssh\id_ed25519_factory" -o IdentitiesOnly=yes -o Batch
 /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --backup
 ```
 
+Локальный full: каждые 12h UTC, retain 1 verified `BACKUP_*.zip`. Off-host: daily incremental checkpoint + weekly full, discovery via `RECOVERY_CHECKPOINT_<UTC>_<sha256>.json`. Подробности — collector runbook, раздел Durability recovery.
+
 ```
 systemctl is-active factory-v1-workbench.service factory-remote-health.service nftables fail2ban
 ```

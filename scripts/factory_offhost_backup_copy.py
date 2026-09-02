@@ -40,11 +40,23 @@ def _git_sha(root: Path) -> str | None:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", type=Path, default=ROOT)
+    parser.add_argument(
+        "--mode",
+        choices=("copy-newest", "daily", "weekly"),
+        default="daily",
+    )
     args = parser.parse_args()
     root = args.root.resolve()
     try:
-        receipt = copy_offhost_backup(root, deploy_git_sha=_git_sha(root))
-        print(json.dumps(receipt, indent=2, sort_keys=True))
+        if args.mode == "copy-newest":
+            receipt = copy_offhost_backup(root, deploy_git_sha=_git_sha(root))
+        else:
+            from solana_alpha_lab.factory.offhost_backup import run_offhost_checkpoint
+
+            receipt = run_offhost_checkpoint(
+                root, mode=args.mode, deploy_git_sha=_git_sha(root)
+            )
+        print(json.dumps(receipt, indent=2, sort_keys=True, default=str))
         return 0
     except (OffhostBackupError, RemoteOpsError) as exc:
         print(

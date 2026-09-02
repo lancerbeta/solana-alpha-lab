@@ -448,6 +448,24 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
             )
             self.assertEqual(skip["skipped"], "NO_INCIDENT")
 
+    def test_package_backup_streams_and_twelve_hour_timer(self) -> None:
+        import inspect
+
+        from solana_alpha_lab.factory.remote_ops import package_backup as pack_fn
+        from solana_alpha_lab.factory.remote_ops import package_delta_backup
+
+        self.assertNotIn("BytesIO", inspect.getsource(pack_fn))
+        self.assertNotIn("BytesIO", inspect.getsource(package_delta_backup))
+        timer = (ROOT / "configs/factory_remote_ops/factory-remote-backup.timer").read_text(
+            encoding="utf-8"
+        )
+        service = (ROOT / "configs/factory_remote_ops/factory-remote-backup.service").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("OnCalendar=*-*-* 00:15:00 UTC", timer)
+        self.assertIn("OnCalendar=*-*-* 12:15:00 UTC", timer)
+        self.assertNotIn("OnSuccess=", service)
+
     def test_doctor_cli_does_not_force_process_alive(self) -> None:
         source = (ROOT / "scripts/factory_remote_doctor.py").read_text(encoding="utf-8")
         self.assertNotIn("default=True", source)

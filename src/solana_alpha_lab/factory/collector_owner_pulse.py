@@ -175,6 +175,9 @@ def render_daily_owner_pulse(packet: Mapping[str, Any]) -> str:
         "Backup:",
         f"local {backup_age_txt} / {local_domain}",
         f"offhost {offhost_age_txt} / {offhost_remote} / {offhost_state}",
+        f"payload_30d={_fmt(packet.get('offhost_backup_payload_bytes_30d'))} "
+        f"projected={_fmt(packet.get('projected_offhost_backup_payload_bytes_30d'))} "
+        f"(not billing truth)",
         "",
         "Release:",
         f"state={_fmt(packet.get('release_state'))} "

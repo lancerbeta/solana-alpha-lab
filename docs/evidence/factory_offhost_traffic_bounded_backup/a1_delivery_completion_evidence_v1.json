@@ -1,0 +1,89 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-OFFHOST-TRAFFIC-BOUNDED-BACKUP-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1",
+  "state_change": "FACTORY_DAILY_DELTA_WEEKLY_FULL_OFFHOST_BACKUP_PASS",
+  "base_main": "a1dcf6b5b2b457f375a37ffd41b97b24fc951264",
+  "owner_approvals": [
+    "OK FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "23cc391f7bb97287629ca77663d43ee88cdfef056d27c49f5fcf125cb61e91ed",
+    "catalog/schemas/factory_remote_operations_v1_1.schema.json": "50ecccd414b51b1c117521ae15ee8d684748ccd432025ea693084a9cfe280e47",
+    "configs/factory_remote_operations_v1_1.yaml": "2869e7180bfd876da65bf7e03b80711bcde977e0c5b5c553360ce1ce66594118",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive-delta.service": "15bf1dfe43d991fd65f939391fa265a42c565c90271f1b462c2d807524de493d",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive-delta.timer": "32b7ca723c9b330e03c901bea03e896761a8a2d879a0cd0c5fecd4c45b2907cc",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive.service": "1eda185d959ad4ecbfab37db7bdca3e05766b59aacba12ec0c6cf4ed23155754",
+    "configs/factory_remote_ops/factory-remote-backup-gdrive.timer": "8cde7b1973db8569a26fe2f7400f2fe3c15e9c0ac270720af8bfdedeab2cf882",
+    "configs/factory_remote_ops/factory-remote-backup.service": "3307158955128695cc2a22b1e4e90f2566ef8d4279327b589f5490a93883e0e3",
+    "configs/factory_remote_ops/factory-remote-backup.timer": "0aebe918bbbdc00193e0b337785f3249259a74ca22ef06cd5ff1b9aa9975dc96",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "dd8774d13bce99b5484e90e8e1bd1eb1548c06c6ef1e857270ca510f132574b7",
+    "docs/operator/FACTORY_REMOTE_HOST.md": "c7d257b3790d8de3d8d13c43f15dff8aa382a1b2dce5dca02eeac20aea2d90c1",
+    "docs/operator/factory_remote_host_v1.yaml": "8ba04de3b9ff524e25788a5d66c14fa214c67b985c8e6d4f4fe095413048adad",
+    "docs/reports/factory_offhost_traffic_bounded_backup/a1_owner_readout_v1.md": "c0ef2595b33117f1423eff1f1b1fc67d9f6de5aeada4c084876647991eeed024",
+    "docs/tasks/FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1.md": "6381c3f4b14447f2104f6d7adaca244b214058e5929ea7f21d171df09bde4b74",
+    "scripts/factory_offhost_backup_copy.py": "9089065f16978a77e4208a52fbac768f3cf61c6838e6ae0e7c4385b6ae54ab81",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "66152523ba286960eda82825fbf847d33794365647554ad4fc5eca4ba7e0c762",
+    "src/solana_alpha_lab/factory/collector_owner_pulse.py": "0e6d6fd4587aebfe5ee373e1922a37d8732450237788a2f39ba425220041a41a",
+    "src/solana_alpha_lab/factory/live_ops_hardening.py": "12ae31173e61e0e9274b279b16494ebf7a5f6fb6ad747dae633418f95642a2a9",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "c33ce64a13f7e69a742d8e40657a8cd3c2fcdbbb59ce167871b433fdb649f462",
+    "src/solana_alpha_lab/factory/remote_ops.py": "8de905f2ef0d9ace4e12ddc38e122ad3b22565799684d003e4e3aa98fd1dc096",
+    "tests/test_factory_offhost_backup.py": "e9293c7d02143ba1008633fc7e135759ce64225407a83a8df7eb55d648aa6458",
+    "tests/test_factory_remote_operations.py": "91b7038a605df7ea8b8713836697c1075163e31185a12fd84f8e208c3b4f44e6",
+    "tests/test_factory_v1_live_ops_hardening.py": "f5900b2ad2eb5efa8436f97e914701050fcb5ea042503892ba70261af2aa81cb"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_offhost_traffic_bounded_backup/a1_delivery_factory_fit_v1.json",
+    "sha256": "fd2c7bf721809ea6c557f04979beb7ea2d1d6a71672d3c589ce54c2956809b3b",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_offhost_traffic_bounded_backup/a1_delivery_independent_review_v1.json",
+      "sha256": "9b231686bc4b4a581729e6bb203e8ac95a5e02f1f19857dbf69d210e39c24e96",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_STREAMING_NO_BYTESIO",
+      "PASS_RETAIN1_STILL_DAILY_DELTA",
+      "PASS_WEEKLY_BEFORE_SAME_DAY_DELTA",
+      "PASS_CHECKPOINT_DISCOVERY_RESTORE",
+      "PASS_PLANNING_FIXTURE_UNDER_240GB",
+      "PASS_PAYLOAD_NOT_BILLING",
+      "PASS_NO_DELETE_SYNC_CONSTRUCTIBLE"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_CREDENTIAL_VALUES",
+    "NO_ALPHA",
+    "APPLICATION_PAYLOAD_IS_NOT_BILLING_TRUTH",
+    "NO_LIVE_RESTORE_OVER_FACTORY_STATE",
+    "NO_REMOTE_DELETE",
+    "NO_RCLONE_SYNC",
+    "GIT_PROOF_NOT_LIVE_TIMER_ENABLE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}
