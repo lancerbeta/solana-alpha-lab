@@ -4,8 +4,8 @@
   "review_id": "HFIC-MANUAL-GROUNDING-CONTRACT-DIAGNOSTICS-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-03",
   "task_id": "HFIC_MANUAL_GROUNDING_CONTRACT_DIAGNOSTICS_V1",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "3672e9f0d38a1e48167a24c3a66c8f534a60f669f011a85710d23af8ae04a6ee",
+  "reviewed_inventory_sha256": "9b8661da78a23790fdd7cb7bb3f0ebcdde9ebfb4fcd550f3ca802f7003b4bcd5",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -16,7 +16,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=3c3d42e325dc150ce44065ff02191fdc5a66334fa8454bab5b3ead78f4599c93",
+        "packet_fingerprint_sha256=dba496e68f03494dffc8d59894dc0c2e2a055f315c35bc2f104d593ae16c1b58",
         "FIXED_PIT_OMIT_UNPROVEN_VALUE_STATUS",
         "FIXED_COLLISION_COUNT_OBSERVED_ONLY",
         "DESIGN_ALIGNED_GROUNDED_TERMINAL",

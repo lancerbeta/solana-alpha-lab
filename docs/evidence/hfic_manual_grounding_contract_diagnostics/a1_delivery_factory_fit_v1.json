@@ -4,8 +4,8 @@
   "review_id": "HFIC-MANUAL-GROUNDING-CONTRACT-DIAGNOSTICS-FACTORY-FIT-001",
   "as_of": "2026-09-03",
   "task_id": "HFIC_MANUAL_GROUNDING_CONTRACT_DIAGNOSTICS_V1",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "3672e9f0d38a1e48167a24c3a66c8f534a60f669f011a85710d23af8ae04a6ee",
+  "reviewed_inventory_sha256": "9b8661da78a23790fdd7cb7bb3f0ebcdde9ebfb4fcd550f3ca802f7003b4bcd5",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
