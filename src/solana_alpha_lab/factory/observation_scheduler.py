@@ -18,6 +18,9 @@ from solana_alpha_lab.factory.observation_panel_publisher import (
     publish_observation_batch,
     repair_open_publication_jobs,
 )
+from solana_alpha_lab.factory.observation_provider_pacing import (
+    ProviderTickContext,
+)
 from solana_alpha_lab.factory.observation_primitive_registry import (
     ObservationPrimitiveRegistry,
     PrimitiveRegistryError,
@@ -807,7 +810,7 @@ def _discover(
     credential_loader: Callable[[], str] | None,
     redact_with: str | None,
     accounts: _Accounting,
-    execution_clock: Callable[[], datetime],
+    provider_ctx: ProviderTickContext,
 ) -> tuple[list[Mapping[str, Any]], str | None, int, str | None, bool, dict[str, Any]]:
     slot = poll_slot_id(
         primitive_id=str(schedule["source_poll"]["primitive_id"]),
@@ -880,9 +883,9 @@ def _discover(
                     ),
                 },
             )
-    blocked = accounts.gate(
+    blocked = provider_ctx.wait_for_provider_slot(
+        accounts,
         extra_credits=_primitive_credit_cost(accounts, DISCOVERY),
-        now=execution_clock(),
     )
     if blocked:
         return (
@@ -922,12 +925,13 @@ def _discover(
         method="GET",
         url=RECENT_URL,
         opener=opener,
-        clock=execution_clock,
+        clock=provider_ctx.clock(),
         redact_with=holder,
         schema_required_keys=SCHEMA_REQUIRED_KEYS.get(DISCOVERY),
     )
-    completion = _result_completion(result, now)
-    accounts.note(
+    completion = _result_completion(result, provider_ctx.now())
+    provider_ctx.record_provider_completion(
+        accounts,
         raw_bytes=len(json.dumps(result.get("body"), default=str)),
         credits=_primitive_credit_cost(accounts, DISCOVERY),
         completed_at=completion,
@@ -1048,14 +1052,14 @@ def tick_once(
     stop_reason: str | None = None
     source_poll_reused = False
     discovery_context: dict[str, Any] = {}
-    def execution_clock() -> datetime:
-        # `now` is the sole logical clock for this tick unless the caller
-        # supplies an advancing `clock` callable. Mixing wall time here
-        # fences the write lease once calendar time passes a frozen fixture.
-        return now.astimezone(UTC)
-
-    if clock is not None:
-        execution_clock = clock
+    injectable_clock = clock
+    if clock is not None and not callable(getattr(clock, "sleep", None)):
+        injectable_clock = clock
+    provider_ctx = ProviderTickContext(
+        tick_start=now,
+        pace_seconds=int(schedule["budgets"]["min_provider_pace_seconds"]),
+        injectable_clock=injectable_clock,
+    )
     try:
         try:
             registry = load_observation_primitive_registry(root)
@@ -1118,6 +1122,14 @@ def tick_once(
             or (state == "DRAINING" and predecessor_before_cutover)
         )
         poll_enabled = bool(schedule.get("source_poll", {}).get("enabled", True))
+        matured_due_count = sum(
+            1
+            for item in store.due_in_states(("PENDING", "DUE", "CLAIMED"), due_at_max=now)
+            if str(item.get("schedule_sha256")) == digest
+            and str(item.get("activation_id")) == activation_id
+            and parse_utc(str(item["due_at"])) <= now
+            and parse_utc(str(item["deadline_at"])) > now
+        )
         # Fairness: continuous due load must not suppress /recent indefinitely.
         # Attempt the current poll slot first (reuse is free); then claim due work.
         if (
@@ -1127,24 +1139,39 @@ def tick_once(
             and can_admit_before_cutover
             and not successor_before_cutover
         ):
-            (
-                discovery_rows,
-                stop_reason,
-                credential_reads,
-                holder_disc,
-                source_poll_reused,
-                discovery_context,
-            ) = _discover(
-                    store=store,
-                    schedule=schedule,
-                    activation_id=activation_id,
-                    now=now,
-                    opener=opener,
-                    credential_loader=credential_loader,
-                    redact_with=redact_with,
-                    accounts=accounts,
-                    execution_clock=execution_clock,
+            slot_probe = poll_slot_id(
+                primitive_id=str(schedule["source_poll"]["primitive_id"]),
+                query_profile_id=str(schedule["source_poll"]["query_profile_id"]),
+                period_seconds=int(schedule["source_poll"]["period_seconds"]),
+                now=now,
+                schedule_sha256=digest,
+                activation_id=activation_id,
             )
+            poll_cached = store.load_poll_slot(slot_probe) is not None
+            defer_poll = provider_ctx.should_defer_fresh_source_poll(
+                accounts,
+                matured_due_count=matured_due_count,
+                poll_slot_cached=poll_cached,
+            )
+            if not defer_poll:
+                (
+                    discovery_rows,
+                    stop_reason,
+                    credential_reads,
+                    holder_disc,
+                    source_poll_reused,
+                    discovery_context,
+                ) = _discover(
+                        store=store,
+                        schedule=schedule,
+                        activation_id=activation_id,
+                        now=now,
+                        opener=opener,
+                        credential_loader=credential_loader,
+                        redact_with=redact_with,
+                        accounts=accounts,
+                        provider_ctx=provider_ctx,
+                )
             if holder_disc is not None:
                 redact_with = holder_disc
             if stop_reason in {"BLOCKED_BUDGET", "CHANGE_LANE_SAFETY_CONTRACT_GAP"}:
@@ -1364,9 +1391,9 @@ def tick_once(
                         )
                     )
                 continue
-            blocked = accounts.gate(
+            blocked = provider_ctx.wait_for_provider_slot(
+                accounts,
                 extra_credits=_primitive_credit_cost(accounts, SEARCH),
-                now=execution_clock(),
             )
             if blocked:
                 stop_reason = blocked
@@ -1420,15 +1447,16 @@ def tick_once(
                 method="GET",
                 url=url,
                 opener=opener,
-                clock=execution_clock,
+                clock=provider_ctx.clock(),
                 redact_with=holder,
                 expected_entities=[str(item["entity_id"]) for item in live],
                 schema_required_keys=SCHEMA_REQUIRED_KEYS.get(SEARCH),
             )
             if result.get("request_sha256") != request_digest:
                 raise ObservationSchedulerError("REQUEST_HASH_MISMATCH")
-            completion = _result_completion(result, now)
-            accounts.note(
+            completion = _result_completion(result, provider_ctx.now())
+            provider_ctx.record_provider_completion(
+                accounts,
                 raw_bytes=len(json.dumps(result.get("body"), default=str)),
                 credits=_primitive_credit_cost(accounts, SEARCH),
                 completed_at=completion,
@@ -1730,11 +1758,11 @@ def tick_once(
                     )
                 )
                 continue
-            blocked = accounts.gate(
+            blocked = provider_ctx.wait_for_provider_slot(
+                accounts,
                 extra_credits=_primitive_credit_cost(
                     accounts, str(claim["primitive_id"])
                 ),
-                now=execution_clock(),
             )
             if blocked:
                 stop_reason = blocked
@@ -1786,15 +1814,16 @@ def tick_once(
                 method="GET",
                 url=url,
                 opener=opener,
-                clock=execution_clock,
+                clock=provider_ctx.clock(),
                 redact_with=holder,
                 expected_entities=[str(claim["entity_id"])],
                 schema_required_keys=SCHEMA_REQUIRED_KEYS.get(str(claim["primitive_id"])),
             )
             if result.get("request_sha256") != request_digest:
                 raise ObservationSchedulerError("REQUEST_HASH_MISMATCH")
-            completion = _result_completion(result, now)
-            accounts.note(
+            completion = _result_completion(result, provider_ctx.now())
+            provider_ctx.record_provider_completion(
+                accounts,
                 raw_bytes=len(json.dumps(result.get("body"), default=str)),
                 credits=_primitive_credit_cost(accounts, str(claim["primitive_id"])),
                 completed_at=completion,

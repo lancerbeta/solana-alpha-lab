@@ -17,7 +17,13 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
     load_observation_primitive_registry,
 )
 
-TIMER_CADENCE_SECONDS = 60
+from solana_alpha_lab.factory.observation_provider_pacing import (
+    DEFAULT_TICK_WALL_BUDGET_SECONDS,
+    TIMER_CADENCE_SECONDS as PACING_TIMER_CADENCE_SECONDS,
+    usable_due_calls_per_tick,
+)
+
+TIMER_CADENCE_SECONDS = PACING_TIMER_CADENCE_SECONDS
 MATERIAL_HEADROOM_PCT = 25
 FREE_TIER_MIN_PACE_SECONDS = 3
 FREE_TIER_PACE_BOUND_CALLS_PER_DAY = 86400 // FREE_TIER_MIN_PACE_SECONDS
@@ -147,8 +153,9 @@ def _simulate_due_lateness(
     max_claims: int,
     poll_period_seconds: int,
     worst_case_unbatched: bool,
+    tick_wall_budget_seconds: int = DEFAULT_TICK_WALL_BUDGET_SECONDS,
 ) -> tuple[int, int, str]:
-    """Synthetic burst: all members become due for one point in the same minute."""
+    """Synthetic burst: members become due for one lifecycle point in the same minute."""
 
     del point_count
     if members <= 0:
@@ -157,9 +164,13 @@ def _simulate_due_lateness(
         remaining_calls = members
     else:
         remaining_calls = math.ceil(members / batch_size)
-    poll_calls_per_minute = max(1, timer_cadence_seconds // max(1, poll_period_seconds))
-    pace_calls_per_tick = max(1, timer_cadence_seconds // max(1, pace_seconds))
-    usable_per_tick = max(0, min(max_claims, pace_calls_per_tick) - poll_calls_per_minute)
+    usable_per_tick = usable_due_calls_per_tick(
+        pace_seconds=pace_seconds,
+        poll_period_seconds=poll_period_seconds,
+        timer_cadence_seconds=timer_cadence_seconds,
+        tick_wall_budget_seconds=tick_wall_budget_seconds,
+        max_claims_per_tick=max_claims,
+    )
     if usable_per_tick <= 0:
         return 86_400, 86_400, "HIGH"
     ticks_needed = math.ceil(remaining_calls / usable_per_tick)
@@ -267,10 +278,12 @@ def evaluate_schedulability(
             reason_codes=("FREE_TIER_PACE_BOUND_EXCEEDED",),
         )
 
+    capacity_ceiling_members = max_members
     headroom = int(100 * (1 - predicted_day / max(1, pace_bound)))
     reasons: list[str] = []
     terminal = "SCHEDULABLE_WITH_HEADROOM"
     allowed_x_lateness = int(schedule["x_point"]["allowed_lateness_seconds"])
+    recommended_members_cap = max_members
     if p95 > allowed_x_lateness:
         # Reduce recommended members until burst lateness fits the scientific window.
         fitted = max_members
@@ -291,13 +304,13 @@ def evaluate_schedulability(
         if fitted <= 0:
             terminal = STOP_FREE_TIER_CAPACITY_NOT_PROVEN
             reasons.append("BURST_LATENESS_EXCEEDS_ALLOWED_WINDOW")
-            max_members = 0
+            recommended_members_cap = 0
         else:
-            max_members = fitted
+            recommended_members_cap = fitted
             reasons.append("MEMBERS_CAPPED_FOR_ALLOWED_LATENESS")
             # Recompute predicted load for the fitted envelope.
             predicted_day = discovery_per_day + _calls_for_members(
-                members=min(members, max_members),
+                members=min(members, recommended_members_cap),
                 point_count=point_count,
                 batch_size=batch_size,
                 worst_case_unbatched=True,
@@ -305,7 +318,7 @@ def evaluate_schedulability(
             predicted_life = predicted_day * admission_days
             headroom = int(100 * (1 - predicted_day / max(1, pace_bound)))
             p95, p99, gap_risk = _simulate_due_lateness(
-                members=min(members, max_members),
+                members=min(members, recommended_members_cap),
                 point_count=point_count,
                 batch_size=batch_size,
                 pace_seconds=pace,
@@ -320,7 +333,7 @@ def evaluate_schedulability(
     if int(schedule["x_point"]["due_offset_seconds"]) != x_seconds:
         reasons.append("SCHEDULE_X_DIFFERS_FROM_ORACLE_SELECTION")
 
-    recommended_members = min(members, max_members)
+    recommended_members = min(members, recommended_members_cap)
     inclusion = recommended_inclusion_probability(
         recommended_members=recommended_members,
         candidate_launches_per_utc_day=candidate_launches_per_utc_day,
@@ -328,7 +341,7 @@ def evaluate_schedulability(
 
     return SchedulabilityResult(
         terminal=terminal,
-        max_supported_members_per_day=max_members,
+        max_supported_members_per_day=capacity_ceiling_members,
         recommended_inclusion_probability=inclusion,
         recommended_max_members_per_utc_day=recommended_members,
         predicted_provider_calls_per_day=predicted_day,

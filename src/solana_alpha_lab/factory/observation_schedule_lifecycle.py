@@ -1022,6 +1022,86 @@ def pause_schedule(
     }
 
 
+def _activation_must_not_resume(activation: Mapping[str, Any]) -> bool:
+    payload = dict(activation.get("payload") or {})
+    if payload.get("must_not_resume") is True:
+        return True
+    if str(payload.get("abort_reason") or "").strip():
+        return True
+    return False
+
+
+def abort_schedule(
+    *,
+    data_root: Path,
+    store: ObservationScheduleStore,
+    schedule_sha256: str,
+    activation_id: str,
+    reason: str,
+    now: datetime,
+    producer_git_sha: str,
+) -> dict[str, Any]:
+    existing = store.get_activation(schedule_sha256, activation_id)
+    if existing is None:
+        raise ObservationLifecycleError("ACTIVATION_MISSING")
+    if existing["state"] == "ABORTED_SAFETY":
+        return {
+            "terminal": "ABORT_REPLAY",
+            "activation_id": activation_id,
+            "schedule_sha256": schedule_sha256,
+            "state": "ABORTED_SAFETY",
+            "abort_reason": dict(existing.get("payload") or {}).get("abort_reason"),
+        }
+    if existing["state"] not in {"PAUSED_OPERATOR", "ACTIVE", "DRAINING"}:
+        raise ObservationLifecycleError("ABORT_NOT_ALLOWED")
+    reason_text = str(reason or "").strip()
+    if not reason_text:
+        raise ObservationLifecycleError("ABORT_REASON_REQUIRED")
+    transition = store.transition_activation(
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        new_state="ABORTED_SAFETY",
+        authority_receipt_sha256=existing.get("authority_receipt_sha256"),
+        effective_at=render_utc(now),
+        payload={
+            "abort_reason": reason_text,
+            "must_not_resume": True,
+            "aborted_from": existing["state"],
+        },
+        clock=now,
+    )
+    event = _research_event(
+        record_id=str(transition["event_id"]),
+        record_kind=RecordKind.OBSERVATION_SCHEDULE_STATE,
+        entity_id=schedule_sha256,
+        payload={
+            "state_event_id": transition["event_id"],
+            "activation_id": activation_id,
+            "state": "ABORTED_SAFETY",
+            "schedule_sha256": schedule_sha256,
+            "prior_state": transition["prior_state"],
+            "abort_reason": reason_text,
+            "must_not_resume": True,
+        },
+        now=now,
+        producer_git_sha=producer_git_sha,
+        run_id=activation_id,
+        transaction_id=f"RESEARCH-TXN-{transition['event_id'].upper()}",
+    )
+    _append_or_replay(data_root, event)
+    aborted = store.get_activation(schedule_sha256, activation_id)
+    if aborted is None or aborted["state"] != "ABORTED_SAFETY":
+        raise ObservationLifecycleError("ABORT_NOT_PERSISTED")
+    return {
+        "terminal": "ABORT_REPLAY" if transition.get("replayed") else "ABORTED",
+        "activation_id": activation_id,
+        "schedule_sha256": schedule_sha256,
+        "state": "ABORTED_SAFETY",
+        "abort_reason": reason_text,
+        "transition_event_id": transition["event_id"],
+    }
+
+
 def resume_schedule(
     *,
     data_root: Path,
@@ -1043,6 +1123,8 @@ def resume_schedule(
         }
     if existing["state"] != "PAUSED_OPERATOR":
         raise ObservationLifecycleError("RESUME_NOT_PAUSED")
+    if _activation_must_not_resume(existing):
+        raise ObservationLifecycleError("MUST_NOT_RESUME")
     registered = store.get_registered_schedule(schedule_sha256)
     if registered is None:
         raise ObservationLifecycleError("SCHEDULE_NOT_REGISTERED")
@@ -1503,6 +1585,7 @@ def snapshot_schedule(
 __all__ = [
     "ObservationLifecycleError",
     "activate_schedule",
+    "abort_schedule",
     "authorize_schedule",
     "build_authority_request",
     "drain_expired_admission",

@@ -870,12 +870,10 @@ class ObservationSchedulerTests(unittest.TestCase):
                         }
                     ],
                 )
-                self.assertEqual(result["terminal"], "PACE_WAIT")
+                self.assertEqual(result["terminal"], "TICK_COMPLETE")
                 self.assertGreater(result["provider_calls"], 0)
                 self.assertEqual(result["credential_reads"], 0)
-                self.assertTrue(opener.urls)
-                pending = store.due_in_states(("PENDING",))
-                self.assertTrue(any(row["primitive_id"].endswith("QUOTE-BUY-001") for row in pending))
+                self.assertTrue(any("/tokens/v2/search" in url for url in opener.urls))
             finally:
                 store.close()
 
@@ -2252,7 +2250,7 @@ class ObservationSchedulerTests(unittest.TestCase):
             self.assertTrue(any("/swap/v2/order" in url for url in opener.urls))
             store.close()
 
-    def test_second_call_at_same_timestamp_waits_for_pace(self) -> None:
+    def test_two_due_calls_same_tick_obey_pace_without_duplicate(self) -> None:
         schedule = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
         )
@@ -2294,8 +2292,8 @@ class ObservationSchedulerTests(unittest.TestCase):
                 producer_git_sha=GIT_SHA,
                 discovery_rows=[],
             )
-            self.assertEqual(first["terminal"], "PACE_WAIT")
-            self.assertEqual(sum(1 for url in opener.urls if "/swap/v2/order" in url), 1)
+            self.assertEqual(first["terminal"], "TICK_COMPLETE")
+            self.assertEqual(sum(1 for url in opener.urls if "/swap/v2/order" in url), 2)
             second = tick_once(
                 root=ROOT,
                 data_root=data_root,
@@ -2307,8 +2305,8 @@ class ObservationSchedulerTests(unittest.TestCase):
                 producer_git_sha=GIT_SHA,
                 discovery_rows=[],
             )
-            self.assertEqual(second["terminal"], "PACE_WAIT")
-            self.assertEqual(sum(1 for url in opener.urls if "/swap/v2/order" in url), 1)
+            self.assertEqual(second["terminal"], "TICK_COMPLETE")
+            self.assertEqual(sum(1 for url in opener.urls if "/swap/v2/order" in url), 2)
             third = tick_once(
                 root=ROOT,
                 data_root=data_root,
@@ -2320,7 +2318,7 @@ class ObservationSchedulerTests(unittest.TestCase):
                 producer_git_sha=GIT_SHA,
                 discovery_rows=[],
             )
-            self.assertNotEqual(third["terminal"], "PACE_WAIT")
+            self.assertEqual(third["terminal"], "TICK_COMPLETE")
             self.assertEqual(sum(1 for url in opener.urls if "/swap/v2/order" in url), 2)
             store.close()
 

@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
+from solana_alpha_lab.factory.due_pressure import backlog_risk_from_due_pressure
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
     CORPUS_DATASET_ID,
     load_observation_rdp_source,
@@ -415,9 +416,8 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
             if coverage in {"GAP_SUSPECTED", "UNKNOWN", ""}:
                 flags.append("DISCOVERY_COVERAGE_UNKNOWN")
 
-    pending = int(packet.get("pending_due") or 0)
-    oldest = packet.get("oldest_due_age")
-    if pending > 100 or (isinstance(oldest, int) and oldest > 600):
+    due_pressure = packet.get("due_pressure") or {}
+    if backlog_risk_from_due_pressure(due_pressure):
         flags.append("BACKLOG_RISK")
     if int(packet.get("blocked_budget") or 0) > 0:
         flags.append("BUDGET_BLOCKED")
@@ -675,6 +675,7 @@ def build_collector_operational_packet(
         "censored_late_24h": base.get("censored_late_24h"),
         "pending_due": base.get("pending_due_count"),
         "oldest_due_age": base.get("oldest_due_age_seconds"),
+        "due_pressure": base.get("due_pressure"),
         "in_flight_indeterminate": base.get("in_flight_indeterminate_count"),
         "blocked_budget": base.get("blocked_budget_count"),
         # PROVIDER

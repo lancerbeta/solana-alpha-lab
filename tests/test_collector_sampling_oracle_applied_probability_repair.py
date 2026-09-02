@@ -43,21 +43,21 @@ def _probe_schedule(*, max_members: int) -> dict:
 
 
 class CollectorSamplingOracleAppliedProbabilityRepairTests(unittest.TestCase):
-    def test_applied_cap_114_yields_p_057(self) -> None:
+    def test_applied_cap_clamped_to_executable_oracle_envelope(self) -> None:
         result = evaluate_schedulability(
             root=ROOT,
             schedule=_probe_schedule(max_members=114),
             candidate_launches_per_utc_day=2000,
         )
         self.assertEqual(result.max_supported_members_per_day, 456)
-        self.assertEqual(result.recommended_max_members_per_utc_day, 114)
-        self.assertEqual(result.recommended_inclusion_probability, "0.057")
+        self.assertEqual(result.recommended_max_members_per_utc_day, 102)
+        self.assertEqual(result.recommended_inclusion_probability, "0.051")
         self.assertEqual(
             recommended_inclusion_probability(
-                recommended_members=114,
+                recommended_members=102,
                 candidate_launches_per_utc_day=2000,
             ),
-            "0.057",
+            "0.051",
         )
 
     def test_capacity_ceiling_member_cap_yields_p_228(self) -> None:
@@ -93,17 +93,17 @@ class CollectorSamplingOracleAppliedProbabilityRepairTests(unittest.TestCase):
         schedule = preflight["schedule"]
         self.assertEqual(preflight["terminal"], "CAMPAIGN_PREFLIGHT_PROPOSED")
         self.assertEqual(oracle["terminal"], "SCHEDULABLE_WITH_HEADROOM")
-        self.assertEqual(oracle["recommended_max_members_per_utc_day"], 114)
-        self.assertEqual(oracle["recommended_inclusion_probability"], "0.057")
-        self.assertEqual(oracle["predicted_provider_calls_per_day"], 2352)
-        self.assertEqual(oracle["headroom_pct"], 91)
+        self.assertEqual(oracle["recommended_max_members_per_utc_day"], 102)
+        self.assertEqual(oracle["recommended_inclusion_probability"], "0.051")
+        self.assertEqual(oracle["predicted_provider_calls_per_day"], 2256)
+        self.assertEqual(oracle["headroom_pct"], 92)
         self.assertEqual(
             int(schedule["budgets"]["provider_calls_per_utc_day_max"]),
-            2940,
+            2820,
         )
         self.assertEqual(
             int(schedule["budgets"]["provider_calls_lifetime_max"]),
-            61740,
+            59220,
         )
         self.assertEqual(
             schedule["population"]["source_predicates"][0],
@@ -113,8 +113,8 @@ class CollectorSamplingOracleAppliedProbabilityRepairTests(unittest.TestCase):
                 "value_text": "pump.fun",
             },
         )
-        self.assertEqual(schedule["sampling"]["max_members_per_utc_day"], 114)
-        self.assertEqual(schedule["sampling"]["inclusion_probability"], "0.057")
+        self.assertEqual(schedule["sampling"]["max_members_per_utc_day"], 102)
+        self.assertEqual(schedule["sampling"]["inclusion_probability"], "0.051")
 
     def test_repaired_schedule_identity_differs_from_broken_and_invalid(self) -> None:
         preflight = run_campaign_preflight(
