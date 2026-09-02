@@ -14,15 +14,16 @@
     ".agents/skills/delivery-harness/SKILL.md": "86f0b17c08d5d839ee76fb32feb98989102df6c0269f0ef039758c9c9f62e7e6",
     ".cursor/agents/architecture-critic.md": "3b722ec66320f004a18f83eaf820b4ebeaa637fe40dd384943407ebc14c8a27e",
     ".cursor/commands/delivery-review.md": "f5ddbccf9f722fdde7c0daeb8e664fb146c2d8d184544abf331359940303b165",
-    "catalog/assets/core.yaml": "6220ff76988215434fde8d15cf18391bd4b01773d11744eab2bce3d4a79e8879",
+    "catalog/assets/core.yaml": "95468bbfbbad92c8a1a516a4077d1e2d85335f039fca0954397c7c01378ae4f3",
     "catalog/assets/lifecycle.yaml": "5affdfc4683bde4bd0008f9523ed981dfe120fdc9f12454b71c03cc5c5b190a0",
     "catalog/catalog_manifest.yaml": "298f7b235996b5b748b289b9877e40e9b72660c2904ccd2e3ccc4582789a0335",
     "catalog/generated/asset_edges.json": "12f668a7b0e2c5fba26dd5c1187eb132b0bb0792784fc78b56db287fde880d75",
     "catalog/schemas/semantic_premise_review_packet.schema.json": "81f75f6b6678bcd925f497704e92844be8f218ad58d56ac0be592eea02b6715d",
     "configs/semantic_premise_review_profile_v1.yaml": "2ed0c6658c5505e3cf3d966458512aa09f50ab0683b6398fa651f59a2a56ad9c",
     "docs/PROJECT_MAP.md": "56838b34d7cc67df386aa0f08d60f6f7b2334e37064d794252fc484896975745",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "714c00d69ba4743473ef4ca48b29f8162f49892796a7e001c9cdc5b6a3c3c07e",
     "docs/reports/semantic_premise_review_profile/a1_owner_readout_v1.md": "ab2fe4ab5650eaf02c0ff0f1d0c54acf26119fb9dabd4c2ad3847d7faabecc5f",
-    "docs/tasks/SEMANTIC_PREMISE_REVIEW_PROFILE_V1.md": "62b4c33adf78a5393ccce9021fd4c4ddf88a895f7c05089c93806a3d6f93bf3c",
+    "docs/tasks/SEMANTIC_PREMISE_REVIEW_PROFILE_V1.md": "a94ef7bea28f052921fb7bf521dd895cd40eaba6f86872b67f0183ec80120379",
     "scripts/semantic_premise_review_cli.py": "a93d32b8c9d765a2a59730f3960f3c33808e7d2a593d4a4acd0f54510fea4ff1",
     "src/solana_alpha_lab/semantic_premise_review.py": "fddfd7d13be45c624a919d4833344bccff906728faa3c4970ad4fd3e03ac3ea2",
     "tests/fixtures/semantic_premise/bounded_closure_pass.json": "f90aa985dedf353ab5803a24e746f58701d22343ab4fd0864a2d4f5767104820",
@@ -40,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/semantic_premise_review_profile/a1_delivery_factory_fit_v1.json",
-    "sha256": "a339e3f0eea7d260a46dd1a4dd13905399d2d191afe00e9b298110129365efb7",
+    "sha256": "0a2486ee9fdf952d84e0e850be707da609735432124c4fb14437e67b0e4b5ea3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SEMANTIC_PREMISE_REVIEW_PROFILE",
     "independent_review": {
       "path": "docs/evidence/semantic_premise_review_profile/a1_delivery_independent_review_v1.json",
-      "sha256": "42f54663cb2ec7661b111c3db9d818795f6dfd4ff0dfee9da99056152ed00a52",
+      "sha256": "37909f8a944330f73af21a14064f76d03a00dad8e1d872a257a5b4cec5e1a72d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
