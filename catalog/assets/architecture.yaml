@@ -218,10 +218,10 @@ records:
 - asset_id: ARCH-INTENT-006
   record_version: '1.1'
   asset_type: architecture_intent
-  purpose: Accepted product-horizon memory for a bounded hypothesis discovery and opportunity surface; v1.1 adds advisory prospect memory and a post-no-worthy router consumer without proving ranker activation.
+  purpose: Accepted product-horizon memory for a bounded hypothesis discovery and opportunity surface; v1.1 adds advisory prospect memory and a post-no-worthy router consumer without proving ranker activation. Entry Gate FORGE_DISCOVERY_RANKER_ENTRY_GATE_V1 returned DISCOVERY_GENERATOR_TRIGGER_NOT_YET_PROVEN and remains WATCH-only.
   status: ACCEPTED_DIRECTION_NOT_IMPLEMENTED
   origin: REPOSITORY
-  as_of: '2026-08-22'
+  as_of: '2026-09-02'
   truth_owner: USER_GOAL_OWNER
   location:
     kind: git_path
@@ -229,7 +229,7 @@ records:
     repository_path: docs/architecture/intents/ARCH-INTENT-006-hypothesis-discovery-and-opportunity-surface.md
   integrity:
     kind: sha256
-    sha256: b85d3d3138af34da6ca63d1460a9acdd4d1b22d1413837cc75b02e345a6942cf
+    sha256: 2e02611f1cbf14f0d965a6b42ab2907673ac5c6e60ae0a6473b43965295a1d39
   access:
     mode: read_only
     method: file
@@ -260,7 +260,7 @@ records:
     past_availability_claim: NO_PAST_AVAILABILITY_CLAIM
     retention: TRACKED_REFERENCE
     canonicality: CURRENT_INTENT
-    availability_note: Horizon memory only; does not authorize generator, provider, trial, holdout, roadmap insertion or TASK-28 unfreeze. v1.1 does not prove ARCH-INTENT-006 trigger.
+    availability_note: Horizon memory only; does not authorize generator, provider, trial, holdout, roadmap insertion or TASK-28 unfreeze. Entry Gate FORGE_DISCOVERY_RANKER_ENTRY_GATE_V1 terminal DISCOVERY_GENERATOR_TRIGGER_NOT_YET_PROVEN; activation remains unproven.
 - asset_id: DOC-HFIC-SCIENTIFIC-DISCOVERY-RESEARCH-001
   record_version: '1.0'
   asset_type: control_document
