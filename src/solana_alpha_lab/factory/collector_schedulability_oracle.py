@@ -47,6 +47,7 @@ class SchedulabilityResult:
     source_poll_gap_risk: str
     p95_due_lateness_seconds: int
     p99_due_lateness_seconds: int
+    x_deadline_headroom_seconds: int
     selected_x_due_offset_seconds: int
     x_selection_basis: str
     timer_cadence_seconds: int
@@ -260,6 +261,8 @@ def evaluate_schedulability(
             source_poll_gap_risk="HIGH",
             p95_due_lateness_seconds=p95,
             p99_due_lateness_seconds=p99,
+            x_deadline_headroom_seconds=int(schedule["x_point"]["allowed_lateness_seconds"])
+            - p99,
             selected_x_due_offset_seconds=x_seconds,
             x_selection_basis=x_basis,
             timer_cadence_seconds=timer_cadence_seconds,
@@ -284,11 +287,12 @@ def evaluate_schedulability(
     terminal = "SCHEDULABLE_WITH_HEADROOM"
     allowed_x_lateness = int(schedule["x_point"]["allowed_lateness_seconds"])
     recommended_members_cap = max_members
-    if p95 > allowed_x_lateness:
-        # Reduce recommended members until burst lateness fits the scientific window.
-        fitted = max_members
+    # Scientific acquisition fit: modeled p99 must remain inside allowed X lateness.
+    # p99 keeps one timer-cadence tail beyond p95; do not delete that margin to fit.
+    if p99 > allowed_x_lateness:
+        fitted = min(members, max_members)
         while fitted > 0:
-            trial_p95, _, _ = _simulate_due_lateness(
+            _, trial_p99, _ = _simulate_due_lateness(
                 members=fitted,
                 point_count=point_count,
                 batch_size=batch_size,
@@ -298,7 +302,7 @@ def evaluate_schedulability(
                 poll_period_seconds=period,
                 worst_case_unbatched=True,
             )
-            if trial_p95 <= allowed_x_lateness:
+            if trial_p99 <= allowed_x_lateness:
                 break
             fitted -= 1
         if fitted <= 0:
@@ -308,7 +312,6 @@ def evaluate_schedulability(
         else:
             recommended_members_cap = fitted
             reasons.append("MEMBERS_CAPPED_FOR_ALLOWED_LATENESS")
-            # Recompute predicted load for the fitted envelope.
             predicted_day = discovery_per_day + _calls_for_members(
                 members=min(members, recommended_members_cap),
                 point_count=point_count,
@@ -334,10 +337,14 @@ def evaluate_schedulability(
         reasons.append("SCHEDULE_X_DIFFERS_FROM_ORACLE_SELECTION")
 
     recommended_members = min(members, recommended_members_cap)
+    if terminal == "SCHEDULABLE_WITH_HEADROOM" and p99 > allowed_x_lateness:
+        terminal = STOP_FREE_TIER_CAPACITY_NOT_PROVEN
+        reasons.append("P99_EXCEEDS_ALLOWED_X_LATENESS")
     inclusion = recommended_inclusion_probability(
         recommended_members=recommended_members,
         candidate_launches_per_utc_day=candidate_launches_per_utc_day,
     )
+    x_deadline_headroom_seconds = allowed_x_lateness - p99
 
     return SchedulabilityResult(
         terminal=terminal,
@@ -351,6 +358,7 @@ def evaluate_schedulability(
         source_poll_gap_risk=gap_risk,
         p95_due_lateness_seconds=p95,
         p99_due_lateness_seconds=p99,
+        x_deadline_headroom_seconds=x_deadline_headroom_seconds,
         selected_x_due_offset_seconds=x_seconds,
         x_selection_basis=x_basis,
         timer_cadence_seconds=timer_cadence_seconds,
