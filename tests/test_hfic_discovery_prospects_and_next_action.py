@@ -215,7 +215,7 @@ class NextActionBindingTests(unittest.TestCase):
             self.assertEqual(action["action_type"], expected)
             self.assertEqual(action["generation_mode"], "MODEL_VALIDATED")
             self.assertTrue(action["action_id"].startswith("HFIC-NEXT-"))
-            self.assertEqual(action["hfic_protocol"], "HFIC-V1.1")
+            self.assertEqual(action["hfic_protocol"], "HFIC-V1.2")
             self.assertEqual(action["prompt_version"], "HFIC-NEXT-V1.0")
 
     def test_unknown_prospect_fails_closed(self) -> None:
@@ -673,7 +673,8 @@ class OperatorContractTests(unittest.TestCase):
         for text in (skill, operator, command, config):
             self.assertIn("HFIC-NEXT-V1.0", text)
             self.assertIn("ZERO_MID_CYCLE_OWNER_INTERVENTION", text)
-        self.assertIn("prompt_version: HFIC-V1.1", config)
+        self.assertIn("prompt_version: HFIC-V1.2", config)
+        self.assertIn("HFIC-V1.2", skill)
         self.assertIn("HFIC-V1.1", skill)
         self.assertIn("NO_WORTHY", skill)
         self.assertIn("--next-action", skill)

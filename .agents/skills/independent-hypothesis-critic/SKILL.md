@@ -35,9 +35,11 @@ Copy/bind exactly:
 - `selected_definition_sha256` ← canonical selected-candidate identity hash
   from packet fields via repo identity algorithm, as applicable
 
-A `packet_version=1.1` packet without `session_id` is incomplete. Do **not**
+A `packet_version=1.1` or `1.2` packet without `session_id` is incomplete. Do **not**
 emit `hypothesis_critic_result_v1` and do **not** infer the missing field.
 Return `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` and
+stop. Generator prompt versions `HFIC-V1.1` and `HFIC-V1.2` are both accepted;
+critic result identity remains `HFIC-V1.1`.
 `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_SESSION_ID`.
 
 If `finalize` later reports `CRITIC_SESSION_MISMATCH`, copy

@@ -1,8 +1,8 @@
 schema: smial.hypothesis-forge-independent-critic
 schema_version: '1.1'
 contract_id: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
-prompt_version: HFIC-V1.1
-as_of: '2026-08-26'
+prompt_version: HFIC-V1.2
+as_of: '2026-09-03'
 generator_mode: MANUAL_FALLBACK_UNTIL_GENERATOR
 runtime_mode: EXPLICIT_SLASH_ONLY
 forge_invocation:
@@ -55,9 +55,11 @@ schemas:
   critic_input: catalog/schemas/hypothesis_critic_input_v1.schema.json
   synthesis_handoff: catalog/schemas/hypothesis_forge_synthesis_handoff_v1.schema.json
   synthesis_handoff_v1_1: catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json
-  forge_draft: catalog/schemas/hypothesis_forge_draft_v1.schema.json
+  forge_draft: catalog/schemas/hypothesis_forge_draft_v1_2.schema.json
+  forge_draft_v1_1: catalog/schemas/hypothesis_forge_draft_v1.schema.json
   critic_result: catalog/schemas/hypothesis_critic_result_v1.schema.json
-  session_receipt: catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
+  session_receipt: catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
+  session_receipt_v1_1: catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
 synthesis_invariants:
   forge_complete_requires:
     - FORGE_REPORT

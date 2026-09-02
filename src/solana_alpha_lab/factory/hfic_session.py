@@ -34,7 +34,17 @@ from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 
 _SCHEMA_VALIDATORS: dict[str, Draft202012Validator] = {}
-PROMPT_VERSION = "HFIC-V1.1"
+PROMPT_VERSION = "HFIC-V1.2"
+PROMPT_VERSION_V1_1 = "HFIC-V1.1"
+SUPPORTED_PROMPT_VERSIONS = frozenset({PROMPT_VERSION_V1_1, PROMPT_VERSION})
+DRAFT_SCHEMA_BY_PACKET_VERSION = {
+    "1.1": "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
+    "1.2": "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json",
+}
+SESSION_RECEIPT_SCHEMA_BY_PROMPT = {
+    PROMPT_VERSION_V1_1: "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
+    PROMPT_VERSION: "catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json",
+}
 MIN_CANDIDATES = 4
 MAX_CANDIDATES = 6
 PHASE_RANK = {
@@ -412,6 +422,123 @@ def _resolve_ref(ref: object, identities: Sequence[Any]) -> int:
     return -1
 
 
+def _draft_packet_version(draft: Mapping[str, Any]) -> str:
+    version = str(draft.get("packet_version") or "1.1")
+    if version not in DRAFT_SCHEMA_BY_PACKET_VERSION:
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    return version
+
+
+def _draft_prompt_version(draft: Mapping[str, Any]) -> str:
+    packet_version = _draft_packet_version(draft)
+    declared = str(draft.get("generator_prompt_version") or "")
+    expected = PROMPT_VERSION if packet_version == "1.2" else PROMPT_VERSION_V1_1
+    if declared and declared != expected:
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    return expected
+
+
+def _draft_schema_path(repo_root: Any, draft: Mapping[str, Any]) -> Path:
+    return Path(repo_root) / DRAFT_SCHEMA_BY_PACKET_VERSION[_draft_packet_version(draft)]
+
+
+def _session_receipt_schema_path(repo_root: Any, prompt_version: str) -> Path:
+    relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT.get(prompt_version)
+    if relative is None:
+        relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT[PROMPT_VERSION_V1_1]
+    return Path(repo_root) / relative
+
+
+def _accepted_capability_ids_from_preflight(
+    preflight_receipt: Mapping[str, Any] | None,
+) -> list[str]:
+    if not isinstance(preflight_receipt, Mapping):
+        return []
+    packet = preflight_receipt.get("forge_context_packet")
+    if not isinstance(packet, Mapping):
+        return []
+    ids = packet.get("capability_ids") or []
+    if not isinstance(ids, list):
+        return []
+    return [str(item) for item in ids if isinstance(item, str) and item]
+
+
+def _context_packet_sha_from_preflight(
+    preflight_receipt: Mapping[str, Any] | None,
+) -> str:
+    if not isinstance(preflight_receipt, Mapping):
+        return "0" * 64
+    digest = preflight_receipt.get("forge_context_packet_sha256")
+    if isinstance(digest, str) and len(digest) == 64:
+        return digest.lower()
+    packet = preflight_receipt.get("forge_context_packet")
+    if isinstance(packet, Mapping):
+        return hashlib.sha256(_canonical_bytes(packet)).hexdigest()
+    return "0" * 64
+
+
+def _ground_v12_candidates(
+    candidates: Sequence[Mapping[str, Any]],
+    identities: Sequence[Any],
+    *,
+    repo_root: Any,
+    preflight_receipt: Mapping[str, Any] | None,
+) -> list[dict[str, Any]]:
+    from solana_alpha_lab.factory.hfic_grounding import (
+        HficGroundingError,
+        ground_candidate,
+        structural_signature_v1_sha256,
+    )
+
+    accepted = _accepted_capability_ids_from_preflight(preflight_receipt)
+    if not accepted and repo_root is not None:
+        from solana_alpha_lab.factory.hfic_preflight import (
+            enumerate_accepted_capabilities,
+        )
+
+        accepted = [
+            str(item["capability_id"])
+            for item in enumerate_accepted_capabilities(Path(repo_root))
+        ]
+    context_sha = _context_packet_sha_from_preflight(preflight_receipt)
+    enriched: list[dict[str, Any]] = []
+    for card, identity in zip(candidates, identities, strict=True):
+        try:
+            grounding = ground_candidate(
+                card,
+                repo_root=Path(repo_root),
+                context_packet_sha256=context_sha,
+                accepted_capability_ids=accepted,
+            )
+            signature = structural_signature_v1_sha256(card)
+        except HficGroundingError as exc:
+            raise HficSessionError(str(exc)) from exc
+        enriched_card = dict(card)
+        enriched_card["candidate_id"] = identity.candidate_id
+        enriched_card["grounding"] = grounding
+        enriched_card["structural_signature_v1_sha256"] = signature
+        enriched.append(enriched_card)
+    return enriched
+
+
+def _diagnostics_for_receipt(
+    *,
+    prompt_version: str,
+    grounded_candidates: Sequence[Mapping[str, Any]] | None,
+    session_meta: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    if prompt_version != PROMPT_VERSION:
+        return None
+    from solana_alpha_lab.factory.hfic_grounding import (
+        session_diagnostics_from_candidates,
+    )
+
+    return session_diagnostics_from_candidates(
+        list(grounded_candidates or []),
+        session_meta,
+    )
+
+
 def freeze_draft(
     draft: Mapping[str, Any],
     *,
@@ -422,11 +549,10 @@ def freeze_draft(
 ) -> dict[str, Any]:
     if not isinstance(draft, Mapping):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    packet_version = _draft_packet_version(draft)
+    prompt_version = _draft_prompt_version(draft)
     if repo_root is not None:
-        _validate_json_schema(
-            draft,
-            Path(repo_root) / "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
-        )
+        _validate_json_schema(draft, _draft_schema_path(repo_root, draft))
     candidates = draft.get("candidates")
     if not isinstance(candidates, list) or not (
         MIN_CANDIDATES <= len(candidates) <= MAX_CANDIDATES
@@ -437,6 +563,17 @@ def freeze_draft(
     except HficIdentityError as exc:
         raise HficSessionError(str(exc)) from exc
 
+    grounded_candidates: list[dict[str, Any]] | None = None
+    if packet_version == "1.2":
+        if repo_root is None:
+            raise HficSessionError("HFIC_PROTOCOL_INVALID")
+        grounded_candidates = _ground_v12_candidates(
+            candidates,
+            identities,
+            repo_root=repo_root,
+            preflight_receipt=preflight_receipt,
+        )
+
     selected_ref = draft.get("selected_candidate_ref")
     if selected_ref in (None, ""):
         return _freeze_no_worthy(
@@ -446,6 +583,9 @@ def freeze_draft(
             store=store,
             repo_root=repo_root,
             next_action_draft=next_action_draft,
+            grounded_candidates=grounded_candidates,
+            prompt_version=prompt_version,
+            packet_version=packet_version,
         )
 
     if next_action_draft is not None:
@@ -470,6 +610,9 @@ def freeze_draft(
     runner_up = identities[runner_up_index]
     rejected = identities[rejected_index]
     selected_card = candidates[selected_index]
+    selected_required_caps = selected_card.get("required_capability_ids") or []
+    if not isinstance(selected_required_caps, list):
+        selected_required_caps = []
     closed_family_ledger = ledger_from_receipt(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None
     )
@@ -515,10 +658,15 @@ def freeze_draft(
         maybe_head = preflight_receipt.get("live_git_head")
         if isinstance(maybe_head, str) and len(maybe_head) == 40:
             git_head = maybe_head.lower()
+    critic_packet_version = "1.2" if packet_version == "1.2" else "1.1"
+    decision_unlocked = str(selected_card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
+    disconfirming = str(
+        selected_card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT"
+    )
     packet = {
         "packet_schema": "smial.hypothesis-critic-input",
-        "packet_version": "1.1",
-        "generator_prompt_version": PROMPT_VERSION,
+        "packet_version": critic_packet_version,
+        "generator_prompt_version": prompt_version,
         "generated_at": memory_as_of,
         "live_git_head": git_head,
         "research_memory_as_of": memory_as_of,
@@ -531,7 +679,9 @@ def freeze_draft(
             "candidate_id": selected.candidate_id,
             "claim": str(selected_card.get("claim") or ""),
             "nearest_prior_and_difference": str(
-                selected_card.get("nearest_prior_and_difference") or "NOT_DECLARED_IN_DRAFT"
+                selected_card.get("nearest_prior_and_difference")
+                or selected_card.get("material_difference_from_prior")
+                or "NOT_DECLARED_IN_DRAFT"
             ),
             "actor_counterparty": str(selected_card.get("actor_counterparty") or ""),
             "mechanism": str(selected_card.get("mechanism") or ""),
@@ -541,9 +691,7 @@ def freeze_draft(
             "primary_x": str(selected_card.get("primary_x_family") or ""),
             "primary_y": str(selected_card.get("primary_y") or ""),
             "horizon_notional": str(selected_card.get("horizon_notional") or ""),
-            "disconfirming_prediction": str(
-                selected_card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT"
-            ),
+            "disconfirming_prediction": disconfirming,
             "negative_control": str(selected_card.get("negative_control") or ""),
             "alternative_world": str(selected_card.get("alternative_world") or "NOT_DECLARED_IN_DRAFT"),
             "confounders": selected_card.get("confounders") or ["NOT_DECLARED_IN_DRAFT"],
@@ -564,11 +712,11 @@ def freeze_draft(
             "pass_fail_inconclusive_semantics": str(
                 selected_card.get("pass_fail_inconclusive_semantics") or "NOT_DECLARED_IN_DRAFT"
             ),
-            "decision_unlocked": str(selected_card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT"),
+            "decision_unlocked": decision_unlocked,
         },
         "provisional_lane": {
             "value": "DATA_OPTION_CANDIDATE",
-            "required_capability_ids": [],
+            "required_capability_ids": [str(item) for item in selected_required_caps],
             "required_query_recipe_ids": [],
             "required_data_bindings": [],
             "exact_gap": "PROVISIONAL_LANE_NOT_YET_CLASSIFIED",
@@ -610,7 +758,7 @@ def freeze_draft(
     if not focus_key:
         focus_key = focus_key_sha256(owner_focus)
     if epoch and not search_key:
-        search_key = search_key_sha256(epoch, owner_focus, PROMPT_VERSION)
+        search_key = search_key_sha256(epoch, owner_focus, prompt_version)
     if search_key:
         session_id = "HFIC-SESS-" + search_key[:16].upper()
     else:
@@ -618,7 +766,7 @@ def freeze_draft(
             {
                 "candidate_ids": [item.candidate_id for item in identities],
                 "selected": selected.candidate_id,
-                "prompt_version": PROMPT_VERSION,
+                "prompt_version": prompt_version,
             }
         )[:16].upper()
     _bind_packet_session_id(packet, session_id)
@@ -637,7 +785,7 @@ def freeze_draft(
     result = {
         "session_id": session_id,
         "session_state": "FROZEN_AWAITING_CRITIC",
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": prompt_version,
         "owner_focus": owner_focus,
         "evidence_epoch_sha256": epoch,
         "focus_key_sha256": focus_key,
@@ -681,6 +829,8 @@ def freeze_draft(
             for item in identities
         ],
     }
+    if grounded_candidates is not None:
+        result["grounded_candidates"] = grounded_candidates
     if store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
@@ -709,6 +859,9 @@ def _freeze_no_worthy(
     store: Any,
     repo_root: Any,
     next_action_draft: Mapping[str, Any] | None = None,
+    grounded_candidates: Sequence[Mapping[str, Any]] | None = None,
+    prompt_version: str = PROMPT_VERSION_V1_1,
+    packet_version: str = "1.1",
 ) -> dict[str, Any]:
     runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
     if runner_up_index < 0:
@@ -783,7 +936,7 @@ def _freeze_no_worthy(
     if not focus_key:
         focus_key = focus_key_sha256(owner_focus)
     if epoch and not search_key:
-        search_key = search_key_sha256(epoch, owner_focus, PROMPT_VERSION)
+        search_key = search_key_sha256(epoch, owner_focus, prompt_version)
     if search_key:
         session_id = "HFIC-SESS-" + search_key[:16].upper()
     else:
@@ -791,7 +944,7 @@ def _freeze_no_worthy(
             {
                 "candidate_ids": [item.candidate_id for item in identities],
                 "selected": None,
-                "prompt_version": PROMPT_VERSION,
+                "prompt_version": prompt_version,
                 "terminal": "NO_WORTHY_HYPOTHESIS",
             }
         )[:16].upper()
@@ -808,7 +961,7 @@ def _freeze_no_worthy(
     result = {
         "session_id": session_id,
         "session_state": "SYNTHESIS_COMPLETE",
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": prompt_version,
         "owner_focus": owner_focus,
         "evidence_epoch_sha256": epoch,
         "focus_key_sha256": focus_key,
@@ -843,6 +996,8 @@ def _freeze_no_worthy(
         "truth_roots_used": truth_roots,
         "prior_work_receipts": prior_work,
     }
+    if grounded_candidates is not None:
+        result["grounded_candidates"] = list(grounded_candidates)
     if store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
@@ -1139,13 +1294,14 @@ def persist_no_worthy_session(
     )
     action_bytes = _canonical_bytes(action)
     action_sha = hashlib.sha256(action_bytes).hexdigest()
+    prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
     receipt = {
         "session_id": session_id,
         "session_state": "SYNTHESIS_COMPLETE",
         "evidence_epoch_sha256": str(frozen.get("evidence_epoch_sha256") or "0" * 64),
         "focus_key_sha256": str(frozen.get("focus_key_sha256") or "0" * 64),
         "search_key_sha256": str(frozen.get("search_key_sha256") or "0" * 64),
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": prompt_version,
         "live_git_head": str(frozen.get("live_git_head") or git.head_sha.lower()),
         "store_inventory_digest": frozen.get("store_inventory_digest") or ("0" * 64),
         "candidate_ids": list(frozen.get("candidate_ids") or []),
@@ -1174,11 +1330,25 @@ def persist_no_worthy_session(
         "created_at": created_at,
         "session_started_at": started_at,
     }
+    diagnostics = _diagnostics_for_receipt(
+        prompt_version=prompt_version,
+        grounded_candidates=frozen.get("grounded_candidates")
+        if isinstance(frozen.get("grounded_candidates"), list)
+        else None,
+        session_meta={
+            "critic_terminal": "NO_WORTHY_HYPOTHESIS",
+            "selected_candidate_id": None,
+            "no_worthy_hypothesis": True,
+            "lane_classifier_terminal": None,
+            "next_action_type_if_any": action["action_type"],
+        },
+    )
+    if diagnostics is not None:
+        receipt["diagnostics"] = diagnostics
     if repo_root is not None:
         _validate_json_schema(
             receipt,
-            Path(repo_root)
-            / "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
+            _session_receipt_schema_path(repo_root, prompt_version),
         )
     receipt_bytes = _canonical_bytes(receipt)
     receipt_sha = hashlib.sha256(receipt_bytes).hexdigest()
@@ -1191,8 +1361,8 @@ def persist_no_worthy_session(
                 "research_cycle_id": f"{session_id}-NO-WORTHY",
                 "session_id": session_id,
                 "phase": "SYNTHESIS_COMPLETE",
-                "hfic_protocol": PROMPT_VERSION,
-                "prompt_version": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
+                "prompt_version": prompt_version,
                 "owner_focus": frozen.get("owner_focus") or "AUTO",
                 "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": frozen.get("focus_key_sha256") or "",
@@ -1221,7 +1391,7 @@ def persist_no_worthy_session(
             payload={
                 "research_artifact_id": f"HFIC-ART-NEXT-ACTION-{session_id}-{action_sha[:12]}",
                 "session_id": session_id,
-                "hfic_protocol": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
                 "artifact_kind": "NEXT_EPISTEMIC_ACTION",
                 "payload_canonical": action_bytes.decode("utf-8"),
                 "payload_sha256": action_sha,
@@ -1234,7 +1404,7 @@ def persist_no_worthy_session(
             payload={
                 "research_artifact_id": f"HFIC-ART-SESSION-RECEIPT-{session_id}",
                 "session_id": session_id,
-                "hfic_protocol": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
                 "artifact_kind": "SESSION_RECEIPT",
                 "payload_canonical": receipt_bytes.decode("utf-8"),
                 "payload_sha256": receipt_sha,
@@ -1247,7 +1417,7 @@ def persist_no_worthy_session(
             payload={
                 "decision_event_id": f"HFIC-DEC-{session_id}-NO-WORTHY",
                 "session_id": session_id,
-                "hfic_protocol": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
                 "decision_kind": "REJECT",
                 "reason_code": "NO_WORTHY_HYPOTHESIS",
                 "hypothesis_version_id": None,
@@ -1264,7 +1434,7 @@ def persist_no_worthy_session(
                 payload={
                     "hypothesis_version_id": identity.candidate_id,
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "statement": identity.definition["claim"],
                     "claim": identity.definition["claim"],
                     "mechanism": identity.definition["mechanism"],
@@ -1298,7 +1468,7 @@ def persist_no_worthy_session(
                 payload={
                     "research_artifact_id": f"HFIC-ART-FORGE-DRAFT-{session_id}",
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "artifact_kind": "FORGE_DRAFT",
                     "payload_canonical": draft_bytes,
                     "payload_sha256": hashlib.sha256(
@@ -1436,17 +1606,13 @@ def persist_frozen_session(
             created_at=now,
         )
 
-    records = [
-        event(
-            record_id=f"HFIC-CYCLE-{session_id}-FROZEN",
-            kind=RecordKind.RESEARCH_CYCLE,
-            entity_id=session_id,
-            payload={
+    prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
+    cycle_payload = {
                 "research_cycle_id": session_id,
                 "session_id": session_id,
                 "phase": "FROZEN_AWAITING_CRITIC",
-                "hfic_protocol": PROMPT_VERSION,
-                "prompt_version": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
+                "prompt_version": prompt_version,
                 "owner_focus": frozen.get("owner_focus") or "AUTO",
                 "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": frozen.get("focus_key_sha256") or "",
@@ -1462,7 +1628,15 @@ def persist_frozen_session(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
-            },
+            }
+    if isinstance(frozen.get("grounded_candidates"), list):
+        cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
+    records = [
+        event(
+            record_id=f"HFIC-CYCLE-{session_id}-FROZEN",
+            kind=RecordKind.RESEARCH_CYCLE,
+            entity_id=session_id,
+            payload=cycle_payload,
         )
     ]
     for identity in identities:
@@ -1475,7 +1649,7 @@ def persist_frozen_session(
                 payload={
                     "hypothesis_version_id": identity.candidate_id,
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "statement": identity.definition["claim"],
                     "claim": identity.definition["claim"],
                     "mechanism": identity.definition["mechanism"],
@@ -1517,7 +1691,7 @@ def persist_frozen_session(
             payload={
                 "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}",
                 "session_id": session_id,
-                "hfic_protocol": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
                 "artifact_kind": "CRITIC_INPUT_PACKET",
                 "payload_canonical": packet_bytes,
                 "payload_sha256": hashlib.sha256(
@@ -1542,7 +1716,7 @@ def persist_frozen_session(
                 payload={
                     "research_artifact_id": f"HFIC-ART-FORGE-DRAFT-{session_id}",
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "artifact_kind": "FORGE_DRAFT",
                     "payload_canonical": draft_bytes,
                     "payload_sha256": hashlib.sha256(
@@ -2370,7 +2544,7 @@ def apply_revision(
     if repo_root is not None:
         _validate_json_schema(
             revised_draft,
-            Path(repo_root) / "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
+            _draft_schema_path(repo_root, revised_draft),
         )
     _validate_revision_context_lock(existing, revised_draft)
     candidates = revised_draft.get("candidates")
@@ -2755,6 +2929,7 @@ def finalize_session(
     )
     critic_bytes = _canonical_bytes(critic_result)
     critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
+    prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
     decision_ids: list[str] = []
     records = [
         event(
@@ -2764,7 +2939,7 @@ def finalize_session(
             payload={
                 "research_artifact_id": f"HFIC-ART-CRITIC-RESULT-{session_id}-{hashlib.sha256(critic_bytes).hexdigest()[:12].upper()}",
                 "session_id": session_id,
-                "hfic_protocol": PROMPT_VERSION,
+                "hfic_protocol": prompt_version,
                 "artifact_kind": "CRITIC_RESULT",
                 "payload_canonical": critic_bytes.decode("utf-8"),
                 "payload_sha256": critic_result_sha256,
@@ -2846,7 +3021,7 @@ def finalize_session(
         "evidence_epoch_sha256": str(frozen.get("evidence_epoch_sha256") or "0" * 64),
         "focus_key_sha256": str(frozen.get("focus_key_sha256") or "0" * 64),
         "search_key_sha256": str(frozen.get("search_key_sha256") or "0" * 64),
-        "prompt_version": PROMPT_VERSION,
+        "prompt_version": prompt_version,
         "live_git_head": git_after.head_sha.lower(),
         "store_inventory_digest": store.diagnostics().committed_inventory_sha256,
         "candidate_ids": list(frozen["candidate_ids"]),
@@ -2890,11 +3065,25 @@ def finalize_session(
     started = frozen.get("session_started_at")
     if isinstance(started, str) and started.strip():
         receipt["session_started_at"] = started
+    diagnostics = _diagnostics_for_receipt(
+        prompt_version=prompt_version,
+        grounded_candidates=frozen.get("grounded_candidates")
+        if isinstance(frozen.get("grounded_candidates"), list)
+        else None,
+        session_meta={
+            "critic_terminal": terminal,
+            "selected_candidate_id": selected_id,
+            "no_worthy_hypothesis": False,
+            "lane_classifier_terminal": receipt.get("lane_classifier_terminal"),
+            "next_action_type_if_any": None,
+        },
+    )
+    if diagnostics is not None:
+        receipt["diagnostics"] = diagnostics
     if repo_root is not None:
         _validate_json_schema(
             receipt,
-            Path(repo_root)
-            / "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
+            _session_receipt_schema_path(repo_root, prompt_version),
         )
     receipt_bytes = _canonical_bytes(receipt)
     records.extend(
@@ -2906,7 +3095,7 @@ def finalize_session(
                 payload={
                     "research_artifact_id": f"HFIC-ART-SESSION-RECEIPT-{session_id}",
                     "session_id": session_id,
-                    "hfic_protocol": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
                     "artifact_kind": "SESSION_RECEIPT",
                     "payload_canonical": receipt_bytes.decode("utf-8"),
                     "payload_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
@@ -2921,8 +3110,8 @@ def finalize_session(
                     "research_cycle_id": f"{session_id}-COMPLETE",
                     "session_id": session_id,
                     "phase": "SYNTHESIS_COMPLETE",
-                    "hfic_protocol": PROMPT_VERSION,
-                    "prompt_version": PROMPT_VERSION,
+                    "hfic_protocol": prompt_version,
+                    "prompt_version": prompt_version,
                     "owner_focus": frozen.get("owner_focus") or "AUTO",
                     "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                     "focus_key_sha256": frozen.get("focus_key_sha256") or "",
@@ -3163,7 +3352,10 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         ),
         "next_action": None,
         "next_action_status": "LEGACY_NOT_RECORDED",
+        "grounded_candidates": cycle.get("grounded_candidates"),
     }
+    if not isinstance(bundle.get("grounded_candidates"), list):
+        bundle.pop("grounded_candidates", None)
     expected_action_sha = None
     if isinstance(session_receipt, Mapping):
         maybe_sha = session_receipt.get("next_action_artifact_sha256")

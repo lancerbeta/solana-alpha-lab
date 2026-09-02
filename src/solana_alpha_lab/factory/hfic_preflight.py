@@ -1132,6 +1132,17 @@ def build_forge_context_packet(
             "semantic_projection_truncated": True,
             "authority_granted": False,
         }
+    from solana_alpha_lab.factory.hfic_grounding import (
+        build_feature_grounding_projection,
+    )
+
+    grounding_projection = build_feature_grounding_projection(Path(repo_root))
+    feature_grounding_entries = list(
+        grounding_projection.get("feature_grounding_entries") or []
+    )
+    feature_grounding_source_digest = str(
+        grounding_projection.get("feature_grounding_source_digest_sha256") or ""
+    )
     packet = {
         "prompt_version": PROMPT_VERSION,
         "owner_focus": owner_focus,
@@ -1160,6 +1171,8 @@ def build_forge_context_packet(
         "capability_entries": capabilities,
         "feature_hints": feature_hints,
         "feature_families": feature_families,
+        "feature_grounding_entries": feature_grounding_entries,
+        "feature_grounding_source_digest_sha256": feature_grounding_source_digest,
         "closed_family_ledger": closed_family_ledger,
         "semantic_capability_entries": semantic_slice.get("semantic_capability_entries")
         or [],
@@ -1170,6 +1183,8 @@ def build_forge_context_packet(
         "ranked_prior_candidate_ids": ranked,
         "truncation_receipt": {
             **truncation,
+            "feature_grounding_truncated": False,
+            "dropped_feature_count": 0,
             "kept_semantic_routes": semantic_slice.get("kept_semantic_routes") or [],
             "dropped_semantic_routes": semantic_slice.get("dropped_semantic_routes")
             or [],
@@ -1192,6 +1207,18 @@ def build_forge_context_packet(
             + list(semantic_slice.get("dropped_semantic_routes") or []),
             "semantic_projection_truncated": True,
             "reason": "MAX_PACKET_BYTES_DROP_SEMANTIC",
+        }
+        encoded = canonical_json_bytes(packet)
+    if len(encoded) > MAX_PACKET_BYTES:
+        # Drop feature grounding rows after semantic, keeping source digest.
+        dropped = len(feature_grounding_entries)
+        packet["feature_grounding_entries"] = []
+        packet["truncation_receipt"] = {
+            **packet["truncation_receipt"],
+            "truncated": True,
+            "feature_grounding_truncated": True,
+            "dropped_feature_count": dropped,
+            "reason": "MAX_PACKET_BYTES_DROP_FEATURE_GROUNDING",
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:

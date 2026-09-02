@@ -8,8 +8,13 @@
 
 **Режим:** discovery и design only. Генерация не запускает эксперимент, не меняет Git, не создаёт branch/PR, не вызывает market/provider API/RPC/WSS, не тратит деньги и не получает торговых полномочий.
 
-**Версия промпта:** `HFIC-V1.1` для Prompt A/B (исторические пакеты `HFIC-V1.0` остаются читаемыми).
-Prompt C identity: `HFIC-NEXT-V1.0`. Candidate-generation search identity stays `HFIC-V1.1`.
+**Версия промпта:** `HFIC-V1.2` для новых Prompt A/B сессий (исторические пакеты
+`HFIC-V1.1` / `HFIC-V1.0` остаются читаемыми). V1.2 добавляет compact
+`feature_grounding_entries` в `FORGE_CONTEXT_PACKET`, machine grounding на freeze,
+diagnostics-only structural signature (не меняет `HFIC-CAND-*` identity) и
+read-only `diagnostics --last N` (1..20) по session receipts.
+Prompt C identity: `HFIC-NEXT-V1.0`. Candidate-generation search identity for new
+sessions is `HFIC-V1.2`.
 Display ordinal (`C1`/`C2`/…) is display-only. Canonical `candidate_id` is assigned
 by `freeze`, not by the model.
 

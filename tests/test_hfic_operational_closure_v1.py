@@ -43,9 +43,9 @@ def schema_errors(document: dict[str, Any], schema_path: Path) -> list[str]:
 
 
 class HficOperationalClosureContractTests(unittest.TestCase):
-    def test_config_is_hfic_v1_1_without_breaking_manual_fallback(self) -> None:
+    def test_config_is_hfic_v1_2_without_breaking_manual_fallback(self) -> None:
         config = load_yaml(CONFIG_PATH)
-        self.assertEqual(config["prompt_version"], "HFIC-V1.1")
+        self.assertEqual(config["prompt_version"], "HFIC-V1.2")
         self.assertEqual(config["generator_mode"], "MANUAL_FALLBACK_UNTIL_GENERATOR")
         self.assertEqual(config["runtime_mode"], "EXPLICIT_SLASH_ONLY")
         self.assertTrue(config["commissioning_gate"]["auto_commission_offline_when_safe"])
@@ -57,6 +57,15 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertEqual(config["search_budget"]["distinct_focus_sessions_per_evidence_epoch"], 3)
         self.assertEqual(config["candidate_policy"]["min_candidates"], 4)
         self.assertEqual(config["candidate_policy"]["max_candidates"], 6)
+        schemas = config["schemas"]
+        self.assertTrue(str(schemas["forge_draft"]).endswith("hypothesis_forge_draft_v1_2.schema.json"))
+        self.assertTrue(str(schemas["forge_draft_v1_1"]).endswith("hypothesis_forge_draft_v1.schema.json"))
+        self.assertTrue(
+            str(schemas["session_receipt"]).endswith("hypothesis_forge_session_receipt_v1_2.schema.json")
+        )
+        self.assertTrue(
+            str(schemas["session_receipt_v1_1"]).endswith("hypothesis_forge_session_receipt_v1.schema.json")
+        )
 
     def test_v1_0_handoff_fixture_remains_readable(self) -> None:
         handoff = load_json(HANDOFF_COMPLETE_V10)
@@ -89,6 +98,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         allowed = version.get("enum") or [version.get("const")]
         self.assertIn("HFIC-V1.0", allowed)
         self.assertIn("HFIC-V1.1", allowed)
+        self.assertIn("HFIC-V1.2", allowed)
         self.assertIn("session_id", schema["properties"])
         self.assertEqual(
             schema["properties"]["session_id"]["pattern"],
@@ -127,6 +137,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("freeze", text)
         self.assertIn("finalize", text)
         self.assertIn("HFIC-V1.1", text)
+        self.assertIn("HFIC-V1.2", text)
         self.assertIn("RETURN_EXISTING_SESSION", text)
         self.assertIn("RESUME_CRITIC", text)
         self.assertIn("FORGE_DRAFT", text)
@@ -177,6 +188,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
     def test_operator_pack_mentions_v1_1_and_keeps_prompts(self) -> None:
         text = OPERATOR_PATH.read_text(encoding="utf-8")
         self.assertIn("HFIC-V1.1", text)
+        self.assertIn("HFIC-V1.2", text)
         self.assertIn("BEGIN PROMPT A", text)
         self.assertIn("END PROMPT A", text)
         self.assertIn("BEGIN PROMPT B", text)

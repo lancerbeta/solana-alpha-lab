@@ -35,7 +35,7 @@
     "packet_schema": {"const": "smial.hfic-next-epistemic-action"},
     "packet_version": {"const": "1.0"},
     "prompt_version": {"const": "HFIC-NEXT-V1.0"},
-    "hfic_protocol": {"const": "HFIC-V1.1"},
+    "hfic_protocol": {"enum": ["HFIC-V1.1", "HFIC-V1.2"]},
     "action_id": {"type": "string", "pattern": "^HFIC-NEXT-[0-9A-F]{16}$"},
     "session_id": {"type": "string", "minLength": 1, "maxLength": 120},
     "evidence_epoch_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
