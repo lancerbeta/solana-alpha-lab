@@ -6,8 +6,8 @@
   "task_id": "FACTORY_OFFHOST_TRAFFIC_BOUNDED_BACKUP_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviewed_bindings_sha256": "8e384197667763b62853be3e325d00e29f07aed56d003c51b411dc50c7ccd25a",
+  "reviewed_inventory_sha256": "8ed72342901800f15d6c08e38adcc2fe9c133aae8ece1d83c859d989b53628f6",
   "capability_radar": {
     "now": "NONE",
     "watch": "LIVE_FACTORY_INCREMENTAL_RESTORE_COMMISSIONING"
