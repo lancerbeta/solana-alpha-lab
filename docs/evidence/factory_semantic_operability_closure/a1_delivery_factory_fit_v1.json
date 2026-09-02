@@ -6,8 +6,8 @@
   "task_id": "FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "f5a8bdaf6e7145dd1bdd8da30c4c2463b0c2f8a9f2507a865e39d35611588d79",
-  "reviewed_inventory_sha256": "552634d889590b0ca27fa1f228b52f5af82f17b33a035626103df38381de610e",
+  "reviewed_bindings_sha256": "9566ba4d91486a5e7d76fd6b7720ff5d1920f99c678cb22a388132ae9e3d9073",
+  "reviewed_inventory_sha256": "c9557c89b1ff7ab4be78ad43d21814678479cf6aa5d3ca867feb400d16b22007",
   "capability_radar": {
     "now": "NONE",
     "watch": "OWNER_USES_SEMANTIC_ROUTES_BEFORE_NEW_CAPABILITY_ATOMS"
