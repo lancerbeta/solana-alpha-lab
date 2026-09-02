@@ -20,7 +20,7 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    ".agents/skills/delivery-harness/SKILL.md": "b282a736f16ad559e7a58844ec0db202d5ca4d869005d2fb757d22837f859608",
+    ".agents/skills/delivery-harness/SKILL.md": "86f0b17c08d5d839ee76fb32feb98989102df6c0269f0ef039758c9c9f62e7e6",
     ".cursor/commands/delivery-finish.md": "5b5836571a47bb84f16c1d468292d6946aaef755fb9cf7329247e5aee8c50e5c",
     ".github/ISSUE_TEMPLATE/control-atom.yml": "29cb96ec1b0058f38ea6e9669017bf01ef66552ab1288d68c17d39baa2f29fba",
     "AGENTS.md": "6d74f3fdeb273239762fa2f18af55191e17b7f6d91aa89215348ece360f26d22",

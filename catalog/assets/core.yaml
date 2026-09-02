@@ -34269,7 +34269,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: SEMANTIC_PREMISE_REVIEW_PROFILE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/SEMANTIC_PREMISE_REVIEW_PROFILE_V1.md', repository_path: docs/tasks/SEMANTIC_PREMISE_REVIEW_PROFILE_V1.md}
-  integrity: {kind: sha256, sha256: 62b4c33adf78a5393ccce9021fd4c4ddf88a895f7c05089c93806a3d6f93bf3c}
+  integrity: {kind: sha256, sha256: a94ef7bea28f052921fb7bf521dd895cd40eaba6f86872b67f0183ec80120379}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-SEMANTIC-PREMISE-REVIEW-PROFILE-001}

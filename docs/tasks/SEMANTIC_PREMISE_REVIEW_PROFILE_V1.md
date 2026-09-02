@@ -35,6 +35,7 @@ managed_write_set:
 - tests/fixtures/semantic_premise/bounded_closure_pass.json
 - tests/fixtures/semantic_premise/unknown_as_negative.json
 - docs/PROJECT_MAP.md
+- docs/evidence/control/delivery_harness_acceptance_v1.json
 - docs/evidence/semantic_premise_review_profile/a1_delivery_completion_evidence_v1.json
 - docs/evidence/semantic_premise_review_profile/a1_delivery_independent_review_v1.json
 - docs/evidence/semantic_premise_review_profile/a1_delivery_factory_fit_v1.json
