@@ -1,0 +1,26 @@
+{
+  "case_id": "FALSE_GLOBAL_CLOSURE",
+  "task_id": "FIXTURE-SEMANTIC-PREMISE-FALSE-CLOSURE",
+  "task_contract_text": "SEMANTIC_PREMISE_HIGH_RISK: true\nobjective: park implies global reopen_forbidden\n",
+  "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "head": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "diff_text": "claim: PARK => global family reopen_forbidden\n",
+  "risk_dimensions": ["HYPOTHESIS_OR_FAMILY_CLOSURE", "UNKNOWN_VS_NEGATIVE_EVIDENCE"],
+  "semantic_claims": [
+    {
+      "claim_id": "CLAIM-GLOBAL-CLOSE-001",
+      "claim": "PARK/CLOSE for observed scope establishes global family reopen_forbidden",
+      "scope": "global family"
+    }
+  ],
+  "non_claims": [],
+  "evidence": [
+    {
+      "asset_id": null,
+      "logical_ref": "fixture://bounded-observation",
+      "sha256_or_fingerprint": "1111111111111111111111111111111111111111111111111111111111111111"
+    }
+  ],
+  "model_diversity": "UNPROVEN",
+  "expected_architecture_verdict": "NOT_READY"
+}

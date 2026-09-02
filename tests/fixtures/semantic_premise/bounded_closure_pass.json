@@ -1,0 +1,29 @@
+{
+  "case_id": "BOUNDED_CLOSURE_PASS",
+  "task_id": "FIXTURE-SEMANTIC-PREMISE-BOUNDED-CLOSURE",
+  "task_contract_text": "SEMANTIC_PREMISE_HIGH_RISK: true\nobjective: bounded version disposition only\n",
+  "base": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "head": "cccccccccccccccccccccccccccccccccccccccc",
+  "diff_text": "claim: version-specific PARK only\n",
+  "risk_dimensions": ["HYPOTHESIS_OR_FAMILY_CLOSURE"],
+  "semantic_claims": [
+    {
+      "claim_id": "CLAIM-BOUNDED-CLOSE-001",
+      "claim": "PARK applies only to the exact observed hypothesis version",
+      "scope": "exact hypothesis version under observed evidence window"
+    }
+  ],
+  "non_claims": [
+    "broader family remains UNKNOWN/reopenable under new evidence",
+    "no global reopen_forbidden"
+  ],
+  "evidence": [
+    {
+      "asset_id": null,
+      "logical_ref": "fixture://bounded-observation",
+      "sha256_or_fingerprint": "2222222222222222222222222222222222222222222222222222222222222222"
+    }
+  ],
+  "model_diversity": "UNPROVEN",
+  "expected_architecture_verdict": "PASS"
+}

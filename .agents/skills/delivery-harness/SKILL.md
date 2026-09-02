@@ -61,8 +61,15 @@ Run code review for every delivery. Add goal/DoD review for a new/changed
 outcome, architecture review for boundaries/contracts/schemas/security or
 multiple components, owner-UX review when CLI/console/readouts/manual operator
 flows change, and refactor review only after correctness with measured cost.
-Launch critics in isolated context. `SINGLE_AGENT_REVIEW_FALLBACK` is
-`NOT_READY` for merge; deterministic checks remain mandatory.
+Launch critics in isolated context. Before architecture review, classify
+`scripts/semantic_premise_review_cli.py classify`. On `SEMANTIC_PREMISE`, build a
+frozen packet, run fail-closed `validate-launch`, launch the architecture critic
+with packet+diff only (no implementation transcript), and bind
+`packet_fingerprint_sha256=<hex>` in architecture findings. Packet independence
+attests `PACKET_INFORMATION_PATH` only; launch isolation remains
+`PROCESS_OBLIGATION`. Canonical independent-review evidence still uses role
+`ARCHITECTURE_CRITIC` only. `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for
+merge; deterministic checks remain mandatory.
 
 ## Finish and merge
 
