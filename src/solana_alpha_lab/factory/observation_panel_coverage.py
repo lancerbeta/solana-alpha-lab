@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from solana_alpha_lab.factory.observation_schedule import (
@@ -150,6 +150,7 @@ def due_rows_prove_required_points(
     *,
     covering_schedule_sha256: str,
     required_points: Sequence[str],
+    now: datetime | None = None,
 ) -> bool:
     """Fail closed unless every required point has only scientific terminal due rows."""
 
@@ -165,10 +166,19 @@ def due_rows_prove_required_points(
     by_point: dict[str, list[Mapping[str, Any]]] = {}
     for row in scoped:
         by_point.setdefault(str(row.get("point_id") or ""), []).append(row)
+    reference = now.astimezone(UTC) if now is not None and now.tzinfo is not None else now
     for point_id in required_points:
         rows = by_point.get(str(point_id)) or []
         if not rows:
             return False
+        if reference is not None:
+            for row in rows:
+                if str(row.get("state") or "") in SCIENTIFIC_CLOSED_DUE_STATES:
+                    try:
+                        if parse_utc(str(row["due_at"])) > reference:
+                            return False
+                    except Exception:
+                        return False
         if any(str(row.get("state") or "") in UNRESOLVED_REQUIRED_DUE_STATES for row in rows):
             return False
         if any(str(row.get("state") or "") == "BLOCKED_BUDGET" for row in rows):
@@ -187,6 +197,7 @@ def snapshot_proves_required_points(
     covering_schedule_sha256: str,
     required_points: Sequence[str],
     due_rows: Sequence[Mapping[str, Any]] | None = None,
+    now: datetime | None = None,
 ) -> bool:
     """An existing snapshot is reusable only if it independently proves this consumer."""
 
@@ -198,14 +209,17 @@ def snapshot_proves_required_points(
     if not required_points:
         return False
     parquet_points = snapshot_manifest_point_ids(data_root, snapshot)
-    if parquet_points:
-        return set(required_points).issubset(parquet_points)
+    if parquet_points and not set(required_points).issubset(parquet_points):
+        return False
     if due_rows is not None:
         return due_rows_prove_required_points(
             due_rows,
             covering_schedule_sha256=covering_schedule_sha256,
             required_points=required_points,
+            now=now,
         )
+    if parquet_points:
+        return set(required_points).issubset(parquet_points)
     return False
 
 
@@ -217,6 +231,7 @@ def pending_consumer_satisfiable(
     due_rows: Sequence[Mapping[str, Any]],
     snapshot: Mapping[str, Any] | None = None,
     publication_complete: bool,
+    now: datetime | None = None,
 ) -> bool:
     """Fail-closed WAITING_FOR_PANEL → SATISFIED gate from committed due/RDP truth."""
 
@@ -228,6 +243,7 @@ def pending_consumer_satisfiable(
         due_rows,
         covering_schedule_sha256=covering_schedule_sha256,
         required_points=required_points,
+        now=now,
     ):
         return False
     if snapshot is not None:
@@ -237,6 +253,7 @@ def pending_consumer_satisfiable(
             covering_schedule_sha256=covering_schedule_sha256,
             required_points=required_points,
             due_rows=due_rows,
+            now=now,
         )
     return True
 
@@ -529,15 +546,19 @@ class CoverageIndex:
                 for row in (due_rows or ())
                 if str(row.get("schedule_sha256") or "") == covering
             ]
-            if live_due:
-                if not snapshot_proves_required_points(
-                    data_root=data_root,
-                    snapshot=item,
-                    covering_schedule_sha256=covering,
-                    required_points=required,
-                    due_rows=live_due,
-                ):
-                    continue
+            proof_due_rows = live_due if live_due else None
+            proof_now = cutoff if live_due else None
+            if proof_due_rows is None:
+                return dict(item)
+            if not snapshot_proves_required_points(
+                data_root=data_root,
+                snapshot=item,
+                covering_schedule_sha256=covering,
+                required_points=required,
+                due_rows=proof_due_rows,
+                now=proof_now,
+            ):
+                continue
             return dict(item)
         return None
 

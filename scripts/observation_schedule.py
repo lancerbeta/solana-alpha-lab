@@ -26,6 +26,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     ObservationLifecycleError,
     _require_live_authority,
     activate_schedule,
+    abort_schedule,
     authorize_schedule,
     pause_schedule,
     register_schedule,
@@ -113,6 +114,7 @@ def main(argv: list[str] | None = None) -> int:
         "authorize",
         "activate",
         "pause",
+        "abort",
         "resume",
         "rollover",
         "status",
@@ -125,15 +127,17 @@ def main(argv: list[str] | None = None) -> int:
         cmd.add_argument("--data-root")
         if name == "authorize":
             cmd.add_argument("--phrase", required=True)
-        if name in {"activate", "pause", "resume", "snapshot"}:
+        if name in {"activate", "pause", "abort", "resume", "snapshot"}:
             cmd.add_argument("--activation-id", required=True)
+        if name == "abort":
+            cmd.add_argument("--reason", required=True)
         if name == "rollover":
             cmd.add_argument("--predecessor-schedule-sha256", required=True)
             cmd.add_argument("--predecessor-activation-id", required=True)
             cmd.add_argument("--successor-schedule-sha256", required=True)
             cmd.add_argument("--successor-activation-id", required=True)
             cmd.add_argument("--cutover-at", required=True)
-        if name in {"authorize", "activate", "pause", "resume", "snapshot", "status"}:
+        if name in {"authorize", "activate", "pause", "abort", "resume", "snapshot", "status"}:
             cmd.add_argument("--schedule-sha256")
         if name == "status":
             cmd.add_argument("--activation-id")
@@ -228,6 +232,22 @@ def main(argv: list[str] | None = None) -> int:
                 producer_git_sha=producer,
             )
             return _emit(result, 0)
+        if args.command == "abort":
+            digest = args.schedule_sha256 or config.get("schedule_sha256")
+            if not digest and args.schedule:
+                digest = load_observation_schedule(ROOT, args.schedule)["schedule_sha256"]
+            if not digest:
+                return _emit({"terminal": "SCHEDULE_SHA256_REQUIRED"}, 2)
+            result = abort_schedule(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=digest,
+                activation_id=args.activation_id,
+                reason=args.reason,
+                now=now,
+                producer_git_sha=producer,
+            )
+            return _emit(result, 0)
         if args.command == "resume":
             digest = args.schedule_sha256 or config.get("schedule_sha256")
             if not digest and args.schedule:
@@ -317,8 +337,27 @@ def main(argv: list[str] | None = None) -> int:
                     },
                     2,
                 )
+            aborted = any(row["state"] == "ABORTED_SAFETY" for row in activations)
+            if aborted and not live:
+                return _emit(
+                    {
+                        "terminal": "DOCTOR_ABORTED_SAFETY",
+                        "live_activation": False,
+                        "restore_marker_unresolved": False,
+                        "activation_count": len(activations),
+                        "collector": collector,
+                        "next_action": "MUST_NOT_RESUME",
+                    },
+                    2,
+                )
             paused = any(row["state"] == "PAUSED_OPERATOR" for row in activations)
             if paused and not live:
+                must_not_resume = any(
+                    dict(row.get("payload") or {}).get("must_not_resume") is True
+                    or str(dict(row.get("payload") or {}).get("abort_reason") or "").strip()
+                    for row in activations
+                    if row["state"] == "PAUSED_OPERATOR"
+                )
                 return _emit(
                     {
                         "terminal": "DOCTOR_PAUSED",
@@ -326,7 +365,7 @@ def main(argv: list[str] | None = None) -> int:
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
                         "collector": collector,
-                        "next_action": "RESUME",
+                        "next_action": "MUST_NOT_RESUME" if must_not_resume else "RESUME",
                     },
                     2,
                 )

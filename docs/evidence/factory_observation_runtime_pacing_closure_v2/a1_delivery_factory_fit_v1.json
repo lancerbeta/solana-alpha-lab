@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OBSERVATION-PACING-CLOSURE-FACTORY-FIT-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_OBSERVATION_RUNTIME_PACING_AND_OPERABILITY_CLOSURE_V2",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "8f439dd9f57d9a5fd74d7b5b980235d4be55c1e665a871d80d073884ed5718ac",
+  "reviewed_inventory_sha256": "648bd274a3e7ce1edf41f321f462abab172890e6c2bb31121337ed254976627b",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "GLOBAL_JUPITER_PACING_MULTI_SCHEDULE"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_VPS_ABORT",
+    "NO_CAMPAIGN_RESUME",
+    "NO_PROVIDER_CALLS_AFTER_PAUSE",
+    "RDP_PUBLICATION_STALE_SEMANTICS_FUTURE"
+  ],
+  "recovery": "REVERT"
+}

@@ -8,6 +8,10 @@ from typing import Any
 from solana_alpha_lab.factory.collector_schedulability_oracle import (
     classify_discovery_coverage,
 )
+from solana_alpha_lab.factory.due_pressure import (
+    backlog_risk_from_due_pressure,
+    build_due_pressure_projection,
+)
 from solana_alpha_lab.factory.observation_primitives import (
     HTTP_CLASS_401,
     HTTP_CLASS_403,
@@ -78,22 +82,17 @@ def build_collector_read_model(
     activation_state = str((selected or {}).get("state") or "NONE")
 
     due_counts = store.due_counts()
-    pending_due = int(due_counts.get("PENDING", 0)) + int(due_counts.get("DUE", 0))
-    in_flight = int(due_counts.get("IN_FLIGHT_CALL_INDETERMINATE", 0))
-    blocked_budget = int(due_counts.get("BLOCKED_BUDGET", 0))
+    due_pressure = build_due_pressure_projection(
+        store,
+        now=now,
+        schedule_sha256=digest or None,
+        activation_id=act_id or None,
+    )
+    pending_due = int(due_pressure["pending_due_count"])
+    in_flight = int(due_pressure["in_flight_count"])
+    blocked_budget = int(due_pressure["blocked_budget_count"])
 
-    oldest_due_age = 0
-    for row in store.due_in_states(("PENDING", "DUE", "CLAIMED"), due_at_max=now):
-        if digest and str(row.get("schedule_sha256")) != digest:
-            continue
-        if act_id and str(row.get("activation_id")) != act_id:
-            continue
-        due_at = _safe_parse(row.get("due_at"))
-        if due_at is None:
-            continue
-        age = int((now - due_at).total_seconds())
-        if age > oldest_due_age:
-            oldest_due_age = age
+    oldest_due_age = int(due_pressure["oldest_overdue_age_seconds"])
 
     http_counts = {
         "HTTP_401_24h": 0,
@@ -181,7 +180,7 @@ def build_collector_read_model(
         health_flags.append("DISCOVERY_GAP")
     elif coverage == "GAP_SUSPECTED":
         health_flags.append("DISCOVERY_COVERAGE_UNKNOWN")
-    if pending_due > 100 or oldest_due_age > 600:
+    if backlog_risk_from_due_pressure(due_pressure):
         health_flags.append("BACKLOG_RISK")
     if source_poll_age is not None and source_poll_age > period_seconds * 3:
         health_flags.append("DATA_STALE")
@@ -215,6 +214,7 @@ def build_collector_read_model(
         "last_search_success_at": last_search_success_at,
         "pending_due_count": pending_due,
         "oldest_due_age_seconds": oldest_due_age,
+        "due_pressure": due_pressure,
         "in_flight_indeterminate_count": in_flight,
         "blocked_budget_count": blocked_budget,
         "candidate_count_24h": candidates_24h,

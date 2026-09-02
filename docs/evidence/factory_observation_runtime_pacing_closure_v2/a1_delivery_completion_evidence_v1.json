@@ -1,0 +1,77 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-OBSERVATION-PACING-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_OBSERVATION_RUNTIME_PACING_AND_OPERABILITY_CLOSURE_V2",
+  "state_change": "FACTORY_OBSERVATION_RUNTIME_PACING_AND_OPERABILITY_CLOSURE_READY_FOR_MERGE",
+  "base_main": "2a54438deef22ee1a325cf1c43a16d002d66cae3",
+  "owner_approvals": [],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "bcdd3654187d230cadeda7848cd02a3b714406f2cede638f78396faa85a895d3",
+    "docs/reports/factory_observation_runtime_pacing_closure_v2/a1_owner_readout_v1.md": "590f9980f01f6a96022ac40990d57712b088945522355c877bca8b1e10ae13b8",
+    "docs/tasks/FACTORY_OBSERVATION_RUNTIME_PACING_AND_OPERABILITY_CLOSURE_V2.md": "bff8482d608a4f2288dab4e60eae7bee7e9fdfbf115655aca7dda21dd317a3b3",
+    "scripts/observation_schedule.py": "979943f10d958a4001387442a14f74268627094dcc75d57d6b82f39113597e06",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "d727758e6e197eca94797f58e18c4ea05fdefd073df1e7bd88bb2addade325d8",
+    "src/solana_alpha_lab/factory/collector_read_model.py": "6f9ed1e6f66d652fe29f8af9703d6b39a5a0fdef35ec0abe715b47ac1b438838",
+    "src/solana_alpha_lab/factory/collector_schedulability_oracle.py": "9c0b31e9553d72428c5a61d500641824bdff0bb2f5452506b0b668b8aec3a720",
+    "src/solana_alpha_lab/factory/due_pressure.py": "73c3656ea1854c836b68a4b9c8c0f02978bc8abacfe1cbb64f443a6e58daf746",
+    "src/solana_alpha_lab/factory/observation_panel_coverage.py": "35b2696caea7c7bdb4fdbd439cc619cf27ec41fba07d26b0b53881f645a24ca3",
+    "src/solana_alpha_lab/factory/observation_provider_pacing.py": "8253e8c7e67156751f3a68b736eac4638f89fcb0c21cdbe929108e6a5bd7f617",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "80fe61fae18de9a7965dedc3039596e53fd720f87a00e101874f72c80c70b1cf",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "9fc35af6362c8c4c738252afb561abaaa577193ee1b39b6b2ccc018581f0c24f",
+    "tests/test_ci_messages.py": "98fb591d00f7e6c69d90151fd71fc1505d706ff471abb0e0f4a7c3ad6c4678c8",
+    "tests/test_collector_sampling_oracle_applied_probability_repair.py": "abc73b726de5f7e27df65b721a4aa4a560c14a0600e3f44fe5973a16e0a5fa76",
+    "tests/test_observation_fast_lane_p0_addendum.py": "1efe8f0a7af8757eda40e5278e9b28f2b65f8195e7480455c50f143777a9e53b",
+    "tests/test_observation_runtime_pacing_closure_v2.py": "cb76d17cc3dfab135321cc412f54d5dfbb0d618ccde34d9e40e2ee0739ac9d50",
+    "tests/test_observation_schedule_commissioning.py": "566b399a30823e35ade10417cb1d2cb21478f23a89a39f7efc533e7eb7e7bdab",
+    "tests/test_observation_scheduler.py": "179155691a83451fa8bfe3fac099c0a42d50e63a7ca5039e41c71fd6650f080c",
+    "tests/test_pathrisk_live_window.py": "b3d0adce8b3f772facf29cf594c23c83371e85ff8f6616bc3b0d4fb27425bb64"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_factory_fit_v1.json",
+    "sha256": "7b1cf63e8342998c7970e5dec76a27751937cb5b02bb6e76d417a2b1e9d6ef4b",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OBSERVATION_RUNTIME_PACING_CLOSURE_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_independent_review_v1.json",
+      "sha256": "d11199030311e5ab6945dbe3fb9f1f8106d916eb653efea5adb37b02ebaac455",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PACING_CLOSURE_V2",
+      "PASS_FAST_LANE_P0_ADDENDUM",
+      "PASS_ORACLE_102_P_051",
+      "PASS_NO_RESUME_STARVED_CAMPAIGN"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_VPS_ABORT",
+    "NO_CAMPAIGN_RESUME",
+    "NO_PROVIDER_CALLS_AFTER_PAUSE",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

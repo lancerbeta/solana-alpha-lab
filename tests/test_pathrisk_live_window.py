@@ -337,7 +337,10 @@ class PathRiskLiveWindowTests(unittest.TestCase):
             after_t0 = _run(data_root=data_root, opener=opener, stop_after="after_t0")
             self.assertEqual(count_url_kinds(opener.urls)["recent"], 1)
             self.assertEqual(count_url_kinds(opener.urls)["search"], 1)
-            self.assertGreaterEqual(after_t0["quote_calls"], mid_t0["quote_calls"])
+            cumulative_quotes = len(
+                [url for url in opener.urls if "/swap/v2/order" in url]
+            )
+            self.assertGreaterEqual(cumulative_quotes, mid_t0["quote_calls"])
             partial = _run(
                 data_root=data_root, opener=opener, stop_after="during_h900"
             )

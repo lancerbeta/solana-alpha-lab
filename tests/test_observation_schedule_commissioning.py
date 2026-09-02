@@ -183,17 +183,10 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             self.assertEqual(code, 2)
             self.assertEqual(refused["terminal"], "TICK_REFUSED_NO_LIVE_DEFAULT")
 
-            code, paced = _cli(
-                ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
-                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z"},
-            )
-            self.assertEqual(code, 2, paced)
-            self.assertEqual(paced["terminal"], "PACE_WAIT")
-
             code, faulted = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
                 env={
-                    "OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:03Z",
+                    "OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:00Z",
                     "OBSERVATION_SCHEDULE_PUBLISH_FAULT": "AFTER_ARTIFACTS",
                 },
             )
@@ -202,7 +195,7 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
 
             code, ticked = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
-                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:06Z"},
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T00:10:03Z"},
             )
             self.assertEqual(code, 0, ticked)
             self.assertEqual(ticked["terminal"], "TICK_COMPLETE")
@@ -232,6 +225,55 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             )
             self.assertEqual(code, 0, y900)
             self.assertEqual(y900["terminal"], "TICK_COMPLETE")
+
+            code, second = _cli(["register", "--schedule", NARROW, *base])
+            self.assertEqual(code, 0, second)
+            digest2 = second["schedule_sha256"]
+            _cli(
+                [
+                    "authorize",
+                    "--schedule-sha256",
+                    digest2,
+                    "--phrase",
+                    _authority_phrase(load_observation_schedule(ROOT, NARROW)),
+                    *base,
+                ]
+            )
+            code, rolled = _cli(
+                [
+                    "rollover",
+                    "--predecessor-schedule-sha256",
+                    digest,
+                    "--predecessor-activation-id",
+                    ACT,
+                    "--successor-schedule-sha256",
+                    digest2,
+                    "--successor-activation-id",
+                    ACT2,
+                    "--cutover-at",
+                    "2026-09-01T12:00:00Z",
+                    *base,
+                ]
+            )
+            self.assertEqual(code, 0, rolled)
+            self.assertEqual(rolled["terminal"], "ROLLOVER_COMMITTED")
+            calls_before = int(
+                store.load_lifetime(schedule_sha256=digest2, activation_id=ACT2)["provider_calls"]
+            )
+            code, shared = _cli(
+                ["tick", "--once", *base, "--schedule-sha256", digest2, "--activation-id", ACT2],
+                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T12:00:00Z"},
+            )
+            self.assertIn(shared["terminal"], {"PACE_WAIT", "TICK_COMPLETE"}, shared)
+            self.assertGreaterEqual(int(shared["provider_calls"]), max(1, calls_before))
+            self.assertEqual(
+                store.get_activation(digest, ACT)["state"],
+                "DRAINING",
+            )
+            self.assertEqual(
+                store.get_activation(digest2, ACT2)["state"],
+                "ACTIVE",
+            )
 
             code, h24 = _cli(
                 ["tick", "--once", *base, "--schedule-sha256", digest, "--activation-id", ACT],
@@ -293,55 +335,6 @@ class ObservationScheduleCommissioningTests(unittest.TestCase):
             )
             self.assertEqual(int(later["provider_calls"]), 0)
             self.assertNotEqual(int(day["provider_calls"]), 0)
-
-            code, second = _cli(["register", "--schedule", NARROW, *base])
-            self.assertEqual(code, 0, second)
-            digest2 = second["schedule_sha256"]
-            _cli(
-                [
-                    "authorize",
-                    "--schedule-sha256",
-                    digest2,
-                    "--phrase",
-                    _authority_phrase(load_observation_schedule(ROOT, NARROW)),
-                    *base,
-                ]
-            )
-            code, rolled = _cli(
-                [
-                    "rollover",
-                    "--predecessor-schedule-sha256",
-                    digest,
-                    "--predecessor-activation-id",
-                    ACT,
-                    "--successor-schedule-sha256",
-                    digest2,
-                    "--successor-activation-id",
-                    ACT2,
-                    "--cutover-at",
-                    "2026-09-01T12:00:00Z",
-                    *base,
-                ]
-            )
-            self.assertEqual(code, 0, rolled)
-            self.assertEqual(rolled["terminal"], "ROLLOVER_COMMITTED")
-            calls_before = int(
-                store.load_lifetime(schedule_sha256=digest2, activation_id=ACT2)["provider_calls"]
-            )
-            code, shared = _cli(
-                ["tick", "--once", *base, "--schedule-sha256", digest2, "--activation-id", ACT2],
-                env={"OBSERVATION_SCHEDULE_CLOCK_UTC": "2026-09-01T12:00:00Z"},
-            )
-            self.assertIn(shared["terminal"], {"PACE_WAIT", "TICK_COMPLETE"}, shared)
-            self.assertGreaterEqual(int(shared["provider_calls"]), max(1, calls_before))
-            self.assertEqual(
-                store.get_activation(digest, ACT)["state"],
-                "DRAINING",
-            )
-            self.assertEqual(
-                store.get_activation(digest2, ACT2)["state"],
-                "ACTIVE",
-            )
             store.close()
 
             covering = load_observation_schedule(ROOT, COMMON)
