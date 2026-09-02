@@ -23,11 +23,19 @@ managed_write_set:
 - src/solana_alpha_lab/factory/collector_read_model.py
 - src/solana_alpha_lab/factory/collector_operational_packet.py
 - src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
+- src/solana_alpha_lab/factory/observation_panel_coverage.py
 - scripts/observation_schedule.py
 - tests/test_observation_runtime_pacing_closure_v2.py
 - tests/test_collector_sampling_oracle_applied_probability_repair.py
 - tests/test_observation_schedule_commissioning.py
 - tests/test_observation_scheduler.py
+- tests/test_ci_messages.py
+- tests/test_pathrisk_live_window.py
+- tests/test_observation_fast_lane_p0_addendum.py
+- docs/reports/factory_observation_runtime_pacing_closure_v2/a1_owner_readout_v1.md
+- docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_completion_evidence_v1.json
+- docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_independent_review_v1.json
+- docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_factory_fit_v1.json
 - catalog/assets/core.yaml
 external_caps:
   network: false
@@ -56,7 +64,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_independent_review_v1.json
+    - docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

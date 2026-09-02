@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-OBSERVATION-PACING-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-02",
+  "task_id": "FACTORY_OBSERVATION_RUNTIME_PACING_AND_OPERABILITY_CLOSURE_V2",
+  "state_change": "FACTORY_OBSERVATION_RUNTIME_PACING_AND_OPERABILITY_CLOSURE_READY_FOR_MERGE",
+  "base_main": "2a54438deef22ee1a325cf1c43a16d002d66cae3",
+  "owner_approvals": [],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OBSERVATION_RUNTIME_PACING_CLOSURE_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_observation_runtime_pacing_closure_v2/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PACING_CLOSURE_V2",
+      "PASS_FAST_LANE_P0_ADDENDUM",
+      "PASS_ORACLE_102_P_051",
+      "PASS_NO_RESUME_STARVED_CAMPAIGN"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_VPS_ABORT",
+    "NO_CAMPAIGN_RESUME",
+    "NO_PROVIDER_CALLS_AFTER_PAUSE",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}
