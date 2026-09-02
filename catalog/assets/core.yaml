@@ -29923,7 +29923,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_REMOTE_HOST.md', repository_path: docs/operator/FACTORY_REMOTE_HOST.md}
-  integrity: {kind: sha256, sha256: 0e1d2ae43281161138f8782e384dca89a7d4389aa4bf2cd817cebd207fe13ff2}
+  integrity: {kind: sha256, sha256: 202630b94c18f25cbf5b8b7676d8bc539d7732cf57896a212f370d1760645909}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29957,7 +29957,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/factory_remote_host_v1.yaml', repository_path: docs/operator/factory_remote_host_v1.yaml}
-  integrity: {kind: sha256, sha256: a6e4e4498683ca18c5f1dbf3a4139fee7c52ac28052556bce3483f24f2fbdbba}
+  integrity: {kind: sha256, sha256: ae5d269f45f8441a25872a4397e409c7dfa098b978481f3bc756ecc457ff56e6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
