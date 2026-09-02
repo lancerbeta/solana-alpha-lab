@@ -23,6 +23,7 @@ from solana_alpha_lab.factory.discovery_evidence_release import (
 )
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
     LiveCohortReleaseError,
+    build_live_observation_source_from_rdp,
     import_live_cohort,
     live_cohort_status,
     seal_live_cohort,
@@ -57,6 +58,14 @@ def main(argv: list[str] | None = None) -> int:
     imp.add_argument("--release-root", type=Path, required=True)
     imp.add_argument("--data-root", type=Path, required=True)
     imp.add_argument("--import-at", type=str, default=None)
+
+    build_live = sub.add_parser(
+        "build-live-source",
+        help="Rebuild deterministic live source snapshot from Observation RDP",
+    )
+    build_live.add_argument("--observation-rdp", type=Path, required=True)
+    build_live.add_argument("--schedule-sha256", required=True)
+    build_live.add_argument("--activation-id", required=True)
 
     live_status = sub.add_parser(
         "live-status", help="Cohort readiness from immutable Observation RDP"
@@ -102,6 +111,12 @@ def main(argv: list[str] | None = None) -> int:
                 release_root=args.release_root,
                 data_root=args.data_root,
                 import_time=_parse_utc(args.import_at),
+            )
+        elif args.command == "build-live-source":
+            result = build_live_observation_source_from_rdp(
+                observation_rdp_root=args.observation_rdp,
+                schedule_sha256=args.schedule_sha256,
+                activation_id=args.activation_id,
             )
         elif args.command == "live-status":
             result = live_cohort_status(

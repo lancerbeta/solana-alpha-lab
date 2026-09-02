@@ -3193,6 +3193,16 @@
       "target_asset_id": "MODULE-DISCOVERY-EVIDENCE-RELEASE-001"
     },
     {
+      "source_asset_id": "CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
       "source_asset_id": "CTRL-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
@@ -14246,6 +14256,16 @@
       "source_asset_id": "TEST-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001"
     },
     {
       "source_asset_id": "TEST-OBSERVATION-RUNTIME-DEPLOY-SHA-REPAIR-001",

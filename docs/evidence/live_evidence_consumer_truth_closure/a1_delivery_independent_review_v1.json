@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-02",
+  "task_id": "LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "ed465d1eeee03daeea54729d2b5f06d13ce461596947de7bb8fd60bb2e74a43c",
+  "reviewed_inventory_sha256": "f40260d9839b87ad1fe7687b0a759baea9022fb7939753cb6cdcc3bbb190aa46",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "REAL_RDP_PUBLISH_TO_LIVE_SOURCE",
+        "NO_SQLITE_IN_ADAPTER_PATH",
+        "ACTIVATION_SCOPED_PRODUCER_LINEAGE",
+        "CAMPAIGN_RELATIVE_COHORT_WINDOWS",
+        "CUMULATIVE_PARTITION_REBIND",
+        "FIELD_VALUES_EXPLODE_TYPED",
+        "IDEMPOTENT_REIMPORT",
+        "EPOCH_ON_CANONICAL_IMPORT_ONLY",
+        "WEEK0_PARQUET_BYTE_IMMUTABLE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DONE_PROOF_KEYS_COVERED_BY_DIRECT_TESTS",
+        "LATEST_ONLY_FALSE_POSITIVE_KILLED",
+        "TWELVE_COHORT_CURRENT_VIEW_ALL_PRESENT",
+        "FORGE_ONE_CURRENT_DATASET",
+        "HISTORICAL_PARQUET_SHA_FALSIFIER",
+        "C4_UNTOUCHED_ZERO_PROVIDER",
+        "NO_SECOND_SCIENTIFIC_PLATFORM"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CURRENT_VN_EXPOSES_CUMULATIVE_ROWS",
+        "DENOMINATOR_AND_SAMPLING_PRESERVED",
+        "NESTED_FIELD_FLATTEN_KEEPS_PIT",
+        "COHORT_FROM_SCHEDULE_CLOCK_NOT_UNIX_DAY",
+        "SOURCE_REBUILD_DOES_NOT_REWRITE_SEALED",
+        "NO_ON2_PARQUET_COPY",
+        "HFIC_SINGLE_CURRENT_CORPUS_DATASET",
+        "CONFIRM_FENCE_EXPLORATORY_REUSE"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_C4_COLLECTOR_MUTATION",
+    "NO_LIVE_SEAL_OR_FORGE",
+    "NO_A3_MUTATION",
+    "NO_ALPHA"
+  ]
+}

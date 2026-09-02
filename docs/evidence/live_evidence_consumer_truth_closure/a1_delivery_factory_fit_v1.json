@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-FACTORY-FIT-001",
+  "as_of": "2026-09-02",
+  "task_id": "LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "ed465d1eeee03daeea54729d2b5f06d13ce461596947de7bb8fd60bb2e74a43c",
+  "reviewed_inventory_sha256": "f40260d9839b87ad1fe7687b0a759baea9022fb7939753cb6cdcc3bbb190aa46",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "C4_WEEKLY_LIVE_COHORT_SEAL_AFTER_MATURITY"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS",
+    "NO_C4_MUTATION",
+    "NO_LIVE_SEAL_OR_FORGE",
+    "NO_A3_REWRITE",
+    "CONFIRMATORY_REUSE_FORBIDDEN"
+  ],
+  "recovery": "REVERT"
+}

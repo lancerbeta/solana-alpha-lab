@@ -29939,7 +29939,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: c9bc32269f0bbad97cf7fbc8760b3f198dd0e4152b6b572d205b16d0a55ca245}
+  integrity: {kind: sha256, sha256: 4c97d28f245e723aa7af739a11cea8edcfcee7c05141eba01d62f72f45a94cae}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33384,7 +33384,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/discovery_evidence_release.py', repository_path: scripts/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: 25a9373999f89cc1f561c66726986f54f44906786a9e5a443400eb310dbd6e6c}
+  integrity: {kind: sha256, sha256: 4f8778122b2d413b562abad255f9dd820f7946403f1a0b140f0a9fe1b60b258e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -33945,7 +33945,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: dee0129147d262bd6be39f9fa38232a6733d4dca3d721af76491c3ede1b9f55f}
+  integrity: {kind: sha256, sha256: 77bafb0ff71b0eb54e426a55090d3c15d34f3465ca64fb871c1456053d4ba0e9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -33963,7 +33963,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_discovery_release_series.py', repository_path: tests/test_live_cohort_discovery_release_series.py}
-  integrity: {kind: sha256, sha256: e093b69a4db0cc5724f41ae68389da578d022b92e907bddd2bc3a91ebd727293}
+  integrity: {kind: sha256, sha256: 0c0e56e32872fe11dd325f585270009309d68e9db81bf07e2c4eafafec658a00}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -33971,6 +33971,43 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [LIVE_COHORT, CORPUS, VERTICAL_PROOF, TWELVE_WEEK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Close real Observation RDP to cumulative LIVE CORPUS consumer path with campaign-relative cohorts.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-02'
+  truth_owner: LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1.md', repository_path: docs/tasks/LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1.md}
+  integrity: {kind: sha256, sha256: 745409b1508be0ed97f92f90b1dedf7be3d0b146c481d214b1c81e80cf8b9cea}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [LIVE_EVIDENCE, CONSUMER_TRUTH, CUMULATIVE_CORPUS, CAMPAIGN_COHORT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Real RDP adapter, C4 campaign windows, and cumulative corpus consumer proofs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-02'
+  truth_owner: LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_live_evidence_consumer_truth_closure.py', repository_path: tests/test_live_evidence_consumer_truth_closure.py}
+  integrity: {kind: sha256, sha256: dd9c27adc5eabf929abb088466211eb0dc0d0620b9a9cc8ab1a8cd47bfa8f363}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIVE_EVIDENCE, RDP_ADAPTER, CUMULATIVE, C4_COHORT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001
   record_version: '1.0'
@@ -34052,7 +34089,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_collector_operability_retention_and_owner_pulse.py', repository_path: tests/test_collector_operability_retention_and_owner_pulse.py}
-  integrity: {kind: sha256, sha256: 1ef11c7236bb01adc1b7625eedd815efb1d7db5ff49680e3ae0b1cd7c5718bc8}
+  integrity: {kind: sha256, sha256: e204adfa69bfc5703adb245daea767f68a32babfe553e47ed658e2d9bad62cbb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
