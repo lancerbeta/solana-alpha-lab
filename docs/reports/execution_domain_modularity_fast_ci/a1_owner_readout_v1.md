@@ -3,30 +3,30 @@
 ## Decision delta
 
 PAPER/SHADOW execution now has a machine-checked dependency boundary and an
-exactly-once fast CI lane (`validate-execution`), while the final merge gate
-remains one `validate` over core + execution + four general shards.
+exactly-once fast CI lane (alidate-execution), while the final merge gate
+remains one alidate over core + execution + four general shards.
 
 ## Local E2E
 
-- Boundary: `EXECUTION_DOMAIN_BOUNDARY: PASS`
-- Fast lane: `EXECUTION_DOMAIN_FAST_TESTS: PASS` (~15–18s / 76 cases)
+- Boundary: EXECUTION_DOMAIN_BOUNDARY: PASS
+- Fast lane: EXECUTION_DOMAIN_FAST_TESTS: PASS (~15–18s / 76 cases)
 - Coverage: 7 execution + 355 general = 362 modules; 76 + 4073 = 4149 cases;
   overlap 0
 - Ordinary projected max ~438s after one diagnosis calibration; balance ratio 1.00
-- Product runtime source diff: 0 files under `src/solana_alpha_lab/factory/`
+- Product runtime source diff: 0 files under src/solana_alpha_lab/factory/
 
-## Exact-head diagnosis
+## Exact-head CI
 
-First green exact-head run `33790086715` at `3a1b59f7…` had
-`critical_path_seconds=652` (>630) because the Windows profile under-weighted
-HFIC/pathrisk modules on ubuntu-24.04. One allowed repair: scale module weights
-by observed CI test elapsed per shard, then replan once. No second architecture
-and no test weakening.
+- Head: 23d82b33537783fdef25855d7ece904694e3c3cb
+- Run: 33797983306
+- alidate-execution job wall: 31s (hard <=180)
+- Ordinary shard test elapsed: 381 / 422 / 457 / 444
+- critical_path_seconds: 550 (hard <=630, target <=600)
+- Diagnosis: one CI-elapsed scale calibration after first green run at 652s
 
-## Terminal (after re-run exact-head CI)
+## Terminal
 
-Pending repaired exact-head GitHub CI for final
-`EXECUTION_DOMAIN_MODULARITY_FAST_CI_PASS`.
+EXECUTION_DOMAIN_MODULARITY_FAST_CI_PASS after guarded merge + post-merge read-back.
 
 ## Non-claims
 
@@ -34,5 +34,5 @@ No live authority, no second repository, no path-based suite skip, no alpha.
 
 ## Next
 
-`STOP_THIS_CHAIN` after merge read-back; wait for selected research or
+STOP_THIS_CHAIN after merge read-back; wait for selected research or
 market-evidence gate.
