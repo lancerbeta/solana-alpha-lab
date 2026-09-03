@@ -4,8 +4,8 @@
   "review_id": "PAPER-SHADOW-ACCOUNTING-CONTROL-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-03",
   "task_id": "PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "f0247d191992c66e6cd279875d305553e112c1762ce2610e537f87c282593248",
+  "reviewed_inventory_sha256": "271631bfc54d4e776994d1d23adc16eca22fda420ae09c69c0c7c62c2bad7d06",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
