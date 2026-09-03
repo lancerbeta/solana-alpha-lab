@@ -20,6 +20,7 @@
     "docs/reports/execution_domain_modularity_fast_ci/a1_owner_readout_v1.md": "7a78aa8e1d4788ddcbd90c4606e0868088f9dd9f332d5ca4aaee54d0ee78a20a",
     "docs/tasks/EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1.md": "37f0c55b55efae494e8c48e89f8bf1fbe12e451d883ad375509eba2fcf40d1a8",
     "scripts/ci_test_partition.py": "bde802e21d587aa315f09f8ca19caf46b3e31d3cd45ff8b93d627aafd45c1165",
+    "scripts/owner_attention_gate.py": "4372166adcbecd0ff098c66a9e8f8e7a71516bc61d036fa35313b873807d400b",
     "scripts/render_ci_workflow.py": "8e600a8d3024cb07e70b1dce3381f41fa1ba1b349eb84e34649efaa3a8ff22f8",
     "scripts/run_ci_execution_domain.py": "35b6c91538216c876a4c5c7a1a979af0b965871220486f9b8b6ded85b6f99408",
     "scripts/run_ci_test_shard.py": "a5c7d5b3f715d2efa06d0fe3821e20904b4779bc655a002240e4558972f2d6ab",
@@ -27,6 +28,7 @@
     "scripts/validate_execution_domain.py": "f647d0fc9d2de00e0378e1c95569dde75ef63c59fbf5e0cb6894491b3bb0e025",
     "tests/test_ci.py": "614893c33f9d22c0199f4a5f66cb3c979af493414cd7e40e7070c026d4d07df0",
     "tests/test_ci_test_partition.py": "2c363d568b9cf945ffef3363e5573e78b190bbf01fb712dab8d19ce686db9e5e",
+    "tests/test_delivery_harness_merge_guard.py": "7588baf0fdd87ad88e712e3c6dc9fb0245194e3fa0ce493f0f86311ce1379201",
     "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "6e49ec82a56c31eaa1de15bfb0c04d1e73ecdc2c0d4e8cb31e6298e745d07033",
     "tests/test_run_ci_test_shard.py": "53935d792a92e2ed65f9e67dc4b3699e53da0b429878e91eded6754e3f00d322"
   },
@@ -40,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_factory_fit_v1.json",
-    "sha256": "49c3ad726ca97790405bcdeef787bff9dced450ac2d97f1a53c2e163ecb43eb1",
+    "sha256": "9f179e84ba59a0f32a5350cff18bc5ca687762d337150ff640a6c6929f5ca27c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_EXECUTION_DOMAIN_AND_CI_SUITE",
     "independent_review": {
       "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_independent_review_v1.json",
-      "sha256": "ee924d8f96f747e41679422e4de86f23fd30dd2173b43f4ccd62b396c8b868a3",
+      "sha256": "22f6a8e5ba0ba76add4378c65b16f8b95cb5756f4e2c9a2c3222add0c1c894b0",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
