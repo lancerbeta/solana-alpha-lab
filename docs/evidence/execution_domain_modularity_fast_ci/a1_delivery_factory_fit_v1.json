@@ -4,7 +4,7 @@
   "review_id": "EXECUTION-DOMAIN-MODULARITY-FAST-CI-FACTORY-FIT-001",
   "as_of": "2026-09-03",
   "task_id": "EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1",
-  "reviewed_bindings_sha256": "78353ce83b69e8af2ebaf95674660bf571625816206af1ce60ff8d99f5177b8b",
+  "reviewed_bindings_sha256": "d10a80e0eb7df9ad0e190b075914fae3fb2e04398618a18173146c7b6f633e98",
   "reviewed_inventory_sha256": "a4819d30be4965d7db7aefeaa9a1800155ef7a40f2af537daa604d14fd2352a4",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",

@@ -13,11 +13,11 @@
   "implementation_bindings": {
     ".github/workflows/ci.yml": "21cc282d19346d03785cdb2c2f51b2f6e55ae73f1f3b943cffb31ed4bb5d57fd",
     "catalog/assets/core.yaml": "6dae7d14ea6c189d535f39c2025d33d35883d7ba53955d61b54cb2da5895c87d",
-    "configs/ci_test_shards_v1.json": "dfc89fb0d2935ff1c56d51f28ee24be42fd1e631d80a0bb27326358ed3a4db25",
+    "configs/ci_test_shards_v1.json": "37491cf659ab933b22c74269e65ca7f404c101c74958b00d2ea5c83983fe7008",
     "configs/execution_domain_v1.json": "d4141c574e632d7431949efe25aeac80f3de8889f1b1b71f3247e77b8557b4d0",
-    "docs/evidence/execution_domain_modularity_fast_ci/a1_coverage_timing_v1.json": "bf959b85caac34d211301899a6dc46dadcbaab4e030b3a7bdef683f6257e2650",
+    "docs/evidence/execution_domain_modularity_fast_ci/a1_coverage_timing_v1.json": "9981c6201ed8d3a9aab8f17677d0135a941976bf3a96b9d5487c77c9a3152d95",
     "docs/evidence/execution_domain_modularity_fast_ci/a1_entry_baseline_v1.json": "26426c5699641310b9e09b63049a5a94878d76b8df77c2ff706defe90e4ff160",
-    "docs/reports/execution_domain_modularity_fast_ci/a1_owner_readout_v1.md": "469274b4f4aa46b8cc08f03fca754e566c6a83b71f6f44144f9adc9801ce10cc",
+    "docs/reports/execution_domain_modularity_fast_ci/a1_owner_readout_v1.md": "9517f4275f09b12d0c09a7d49a6125399d25c6430d3a795be79c6fc1146b494b",
     "docs/tasks/EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1.md": "2c564f295e47261c567f54d9e4b499b6a72cdfe683ff070b77d40b25382e5721",
     "scripts/ci_test_partition.py": "bde802e21d587aa315f09f8ca19caf46b3e31d3cd45ff8b93d627aafd45c1165",
     "scripts/render_ci_workflow.py": "8e600a8d3024cb07e70b1dce3381f41fa1ba1b349eb84e34649efaa3a8ff22f8",
@@ -40,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_factory_fit_v1.json",
-    "sha256": "b6bcdb0ba13fcde81351f3237feda318af5499a9ddbb4688027a87bee6aa7289",
+    "sha256": "96b7b44d1a2e93244d446bf4c11ca9283709bfd9114098fd9039c0dccceaf1a0",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_EXECUTION_DOMAIN_AND_CI_SUITE",
     "independent_review": {
       "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_independent_review_v1.json",
-      "sha256": "034cae47600b4e5662313f7a1f0fbc6d4dc4e2f53e44ac0b5654e0ebba41947f",
+      "sha256": "4780e41bb42259306ef8d715f21a20c953eae01d8f2e440e02786ce4f5b07a44",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
