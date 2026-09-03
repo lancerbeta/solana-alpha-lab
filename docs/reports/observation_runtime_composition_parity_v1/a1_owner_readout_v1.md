@@ -16,9 +16,11 @@ are represented in one golden vertical + restart continuation.
 ## Capability
 
 - `P0_STATIC_IDENTITY`: PASS (systemd ExecStart → tick --once + production runtime config)
-- `P1_COMPOSITION_ASSEMBLY`: PASS (CLI tick delegates to seam; abandon-seam +
-  binding-consumption locks PASS)
-- `P2_DETERMINISTIC_VERTICAL`: PASS (RECENT+SEARCH, measured 3s spacing, restart, doctor)
+- `P1_COMPOSITION_ASSEMBLY`: PASS (CLI tick delegates to seam; SEAM_MUST_RUN on
+  override and production paths; binding-consumption locks with sentinel
+  override proof + production WallClock consumption)
+- `P2_DETERMINISTIC_VERTICAL`: PASS (RECENT+SEARCH under process-local overrides;
+  measured 3s spacing, restart, doctor — not live production assembly)
 
 ## Parity smoke
 

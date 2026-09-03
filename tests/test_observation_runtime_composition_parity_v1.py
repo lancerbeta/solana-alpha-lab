@@ -26,6 +26,7 @@ from solana_alpha_lab.factory.observation_provider_pacing import (  # noqa: E402
 )
 from solana_alpha_lab.factory.observation_schedule_composition import (  # noqa: E402
     CompositionParityError,
+    TickPhysicalBinding,
     TickPhysicalOverrides,
     materialize_tick_physical_dependencies,
     validate_tick_physical_overrides,
@@ -209,9 +210,17 @@ class CompositionSeamUnitTests(unittest.TestCase):
 
         captured: dict = {}
         real = seam.materialize_tick_physical_dependencies
+        # Distinct sentinels: prove CLI feeds binding returns, not raw overrides.
+        sentinel_opener = object()
+        sentinel_clock = object()
 
         def _wrap(**kwargs):  # type: ignore[no-untyped-def]
-            binding = real(**kwargs)
+            real(**kwargs)  # preserve fail-closed validation
+            binding = TickPhysicalBinding(
+                opener=sentinel_opener,
+                credential_loader=None,
+                pacing_clock=sentinel_clock,
+            )
             captured["binding"] = binding
             return binding
 
@@ -259,10 +268,53 @@ class CompositionSeamUnitTests(unittest.TestCase):
             self.assertEqual(code, 0)
             self.assertIn("binding", captured)
             kwargs = mocked_tick.call_args.kwargs
-            self.assertIs(kwargs["opener"], captured["binding"].opener)
-            self.assertIs(kwargs["clock"], captured["binding"].pacing_clock)
-            self.assertIs(kwargs["opener"], opener)
-            self.assertIs(kwargs["clock"], clock)
+            self.assertIs(kwargs["opener"], sentinel_opener)
+            self.assertIs(kwargs["clock"], sentinel_clock)
+            self.assertIsNot(kwargs["opener"], opener)
+            self.assertIsNot(kwargs["clock"], clock)
+
+    def test_production_path_also_requires_materialize(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            schedule = build_parity_schedule()
+            store = ObservationScheduleStore(
+                data_root / "observation_schedule_state.sqlite"
+            )
+            authorize_and_activate(
+                store=store, data_root=data_root, schedule=schedule, now=NOW
+            )
+            store.close()
+            with patch(
+                "scripts.observation_schedule.materialize_tick_physical_dependencies",
+                side_effect=CompositionParityError("SEAM_MUST_RUN"),
+            ), patch.dict(
+                "os.environ",
+                {
+                    "JUPITER_FREE_API_KEY": "x" * 16,
+                    "OBSERVATION_SCHEDULE_CLOCK_UTC": NOW.strftime(
+                        "%Y-%m-%dT%H:%M:%SZ"
+                    ),
+                },
+            ):
+                buf = StringIO()
+                from contextlib import redirect_stdout
+
+                with redirect_stdout(buf):
+                    code = cli_main(
+                        [
+                            "tick",
+                            "--once",
+                            "--runtime-config",
+                            DEFAULT_RUNTIME_RELATIVE,
+                            "--data-root",
+                            str(data_root),
+                        ],
+                        physical_overrides=None,
+                    )
+                payload = json.loads(buf.getvalue())
+            self.assertEqual(code, 2)
+            self.assertEqual(payload.get("terminal"), "SEAM_MUST_RUN")
 
     def test_tick_once_consumes_materialize_binding_production_path(self) -> None:
         from solana_alpha_lab.factory import observation_schedule_composition as seam
