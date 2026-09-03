@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_runtime_composition_parity_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "51330472339b525e1e585702f3f34c79e6d3fff15a50cf7bc9c106483bf465c1",
+    "sha256": "06feb68cd83ce2aee7d6d135281deff5463ac0adc0f790754c9ef31b19adf987",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_RUNTIME_COMPOSITION_PARITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_runtime_composition_parity_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "95a16dafa88bd09ec68f4f17977e2b120820af8947c2d4678ecef2746054610d",
+      "sha256": "97e998189cfd1c7d37eb9850fa46ea722e20a0e33afc12fb6489d58fae11c4a6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
