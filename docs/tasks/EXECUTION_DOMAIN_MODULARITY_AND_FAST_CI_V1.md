@@ -33,6 +33,7 @@ managed_write_set:
   - scripts/validate_ci.py
   - scripts/render_ci_workflow.py
   - scripts/owner_attention_gate.py
+  - delivery-harness/templates/portable-bundle-manifest.json
   - .github/workflows/ci.yml
   - tests/test_execution_domain_modularity_and_fast_ci_v1.py
   - tests/test_ci_test_partition.py
