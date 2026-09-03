@@ -151,10 +151,19 @@ class ProductionClockPacingAdapterParityTests(unittest.TestCase):
             ProviderTickContext(tick_start=NOW, pace_seconds=3, injectable_clock=bare)
 
     def test_production_cli_uses_wall_clock_not_bare_lambda(self) -> None:
-        src = (ROOT / "scripts" / "observation_schedule.py").read_text(encoding="utf-8")
-        self.assertIn("WallClock()", src)
-        self.assertNotIn("lambda: datetime.now(UTC)", src)
-        tree = ast.parse(src)
+        cli_src = (ROOT / "scripts" / "observation_schedule.py").read_text(encoding="utf-8")
+        seam_src = (
+            ROOT
+            / "src"
+            / "solana_alpha_lab"
+            / "factory"
+            / "observation_schedule_composition.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("materialize_tick_physical_dependencies", cli_src)
+        self.assertNotIn("lambda: datetime.now(UTC)", cli_src)
+        self.assertNotIn("lambda: datetime.now(UTC)", seam_src)
+        self.assertIn("WallClock()", seam_src)
+        tree = ast.parse(seam_src)
         found_wall = False
         for node in ast.walk(tree):
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
