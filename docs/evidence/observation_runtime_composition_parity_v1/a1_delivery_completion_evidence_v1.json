@@ -11,20 +11,20 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1.md": "1c3f935d2a2f23ca27f38daa717d5bb485735cbdeb9a8f75ee98d15b6ae13207",
-    "src/solana_alpha_lab/factory/observation_schedule_composition.py": "2fda340677f7b4e68d9a2b53e579fc78b8f888acceb4e1906297e70348712633",
-    "scripts/observation_schedule.py": "6bc2825432b55be539bb46403342d3fafb23c8c067ee1775587232f460afbe6c",
-    "scripts/observation_runtime_composition_parity.py": "aea30d0e3045b9f9a4328a5662241a102c62054a28777c05e03d4555961e5324",
-    "tests/test_observation_runtime_composition_parity_v1.py": "ff0d5a773a87e31f200a58f8f25ea73f67e8a2657098e6a917adc193d4fd476a",
-    "tests/test_factory_production_clock_pacing_adapter_parity_repair.py": "bfa6e1b0db1eae73276157ba79ab878b2d0343d329f8c4783fb306c4936fa0c5",
-    "tests/fixtures/observation_schedule/composition_parity_provider_v1.json": "cde97d84b80c4c54ac0a4a523ca37992d8a298bc749002c59148aa4df34a8dd0",
-    "configs/ci_test_shards_v1.json": "03c66115bbc92b2d8d61b4d60767b31beefd66b0e95ba040dc0db2fd1b08b6d5",
-    "catalog/assets/core.yaml": "86058f50955470f8415a63fdab1fce77f1e8a3a6509e4602427b9f755c6a0c8e",
+    "catalog/assets/core.yaml": "97b6f94046b99a1e7dc9510bdb022b622d001242b55ab5a4bcfb3683255bef69",
     "catalog/assets/lifecycle.yaml": "84259074fe89246a7afb6fcd34e7a3b54eb03ae0cbfc00e7d0b6d17b643deda9",
     "catalog/catalog_manifest.yaml": "da529e79c0b479aee4ec3b438e8e4af62e713dbc258c11318c28e383e125f9ad",
     "catalog/generated/asset_edges.json": "b06f7fd2de2894574f7c391a33feb19108a07f887a4fe5bbaaf4a05073940310",
+    "configs/ci_test_shards_v1.json": "03c66115bbc92b2d8d61b4d60767b31beefd66b0e95ba040dc0db2fd1b08b6d5",
     "docs/PROJECT_MAP.md": "e4138d398cb80cc23d06bcee39832e0e007ba3a806d587bb6b0b7e6565ee7ac5",
-    "docs/reports/observation_runtime_composition_parity_v1/a1_owner_readout_v1.md": "04f640a529b74a442ed11d284ad4addca41ff1a3d3b00550185725febcba06ef"
+    "docs/reports/observation_runtime_composition_parity_v1/a1_owner_readout_v1.md": "12111789862c4e5b226ca50a5e33eaceee92e51ea542d9938aff7ffccb5cfda1",
+    "docs/tasks/OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1.md": "1c3f935d2a2f23ca27f38daa717d5bb485735cbdeb9a8f75ee98d15b6ae13207",
+    "scripts/observation_runtime_composition_parity.py": "aea30d0e3045b9f9a4328a5662241a102c62054a28777c05e03d4555961e5324",
+    "scripts/observation_schedule.py": "6bc2825432b55be539bb46403342d3fafb23c8c067ee1775587232f460afbe6c",
+    "src/solana_alpha_lab/factory/observation_schedule_composition.py": "2fda340677f7b4e68d9a2b53e579fc78b8f888acceb4e1906297e70348712633",
+    "tests/fixtures/observation_schedule/composition_parity_provider_v1.json": "cde97d84b80c4c54ac0a4a523ca37992d8a298bc749002c59148aa4df34a8dd0",
+    "tests/test_factory_production_clock_pacing_adapter_parity_repair.py": "bfa6e1b0db1eae73276157ba79ab878b2d0343d329f8c4783fb306c4936fa0c5",
+    "tests/test_observation_runtime_composition_parity_v1.py": "e866aa92cdb11694f39739811e5ebd6747134cba233f35cbd5665c18d5a368d8"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_runtime_composition_parity_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "51330472339b525e1e585702f3f34c79e6d3fff15a50cf7bc9c106483bf465c1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_RUNTIME_COMPOSITION_PARITY_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_runtime_composition_parity_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "95a16dafa88bd09ec68f4f17977e2b120820af8947c2d4678ecef2746054610d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
