@@ -37,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_operations_cockpit/a1_delivery_factory_fit_v1.json",
-    "sha256": "f7204bade6d678d89b75ca6820d0ae11287fc1d2304de3e40e3795f89147054b",
+    "sha256": "db08c491700a7821fc5bf1ed9d9fb1994c81af9e42ceff0c2889d6e1ccfc1a93",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_OPERATIONS_COCKPIT_SUITE",
     "independent_review": {
       "path": "docs/evidence/owner_operations_cockpit/a1_delivery_independent_review_v1.json",
-      "sha256": "4e7a750eaaa4fb83b13f33eb954bdb9c10b3f6361f0ec8c94055317ae1eaec1b",
+      "sha256": "bf16fd6b8ec2cd68cafb2d685e1eacb463d71f39d68cb7897d007b8999b46606",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
