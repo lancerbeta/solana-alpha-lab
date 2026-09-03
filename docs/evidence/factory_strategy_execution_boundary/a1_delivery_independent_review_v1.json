@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-STRATEGY-EXECUTION-BOUNDARY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-03",
+  "task_id": "FACTORY_STRATEGY_EXECUTION_BOUNDARY_V1",
+  "reviewed_bindings_sha256": "a811ffd460591362084040534264f615e270c887a3a9e470c6b111c33faa6852",
+  "reviewed_inventory_sha256": "b8fb84946c81a0f66cf52651e5d06e85627fefa3035b187341e4028986e54afe",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=none",
+        "SCIENCE_ENDS_AT_SIGNAL_EXIT_DECISION",
+        "ONE_SQLITE_STORE_ADDITIVE_MIGRATION",
+        "V1_0_PRESERVED_V1_1_SEPARATE",
+        "MAX_AGE_MAX_OPEN_ENFORCED",
+        "NO_INVENTED_OPEN_ON_TERMINAL"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "ENTER_LINEAGE_BEFORE_START_BOT",
+        "CLOSED_ENTER_RETURNS_REAL_STATE",
+        "SHADOW_EXECUTABLE_ON_SHADOW",
+        "IDEMPOTENT_RESUME_PRE_OPEN",
+        "NO_ORPHAN_BOT_ON_EPOCH_REJECT"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_LEGACY_V1_COMPAT",
+        "DOD_TWO_PRODUCERS_SAME_INTERFACE",
+        "DOD_ACTIVATION_EPOCH_SEPARATE",
+        "DOD_FEATURE_NAME_AGNOSTIC_V1_1",
+        "DOD_UNKNOWN_FAIL_CLOSED",
+        "TERMINAL_STRATEGY_EXECUTION_BOUNDARY_PASS"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PROVIDER",
+    "NO_NETRETURN"
+  ]
+}

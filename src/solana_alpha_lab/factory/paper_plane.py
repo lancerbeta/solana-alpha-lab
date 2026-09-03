@@ -1,21 +1,42 @@
 """Generic research-to-paper plane: StrategyVersion configs in, bot and
 position lifecycle out. Owns no scientific truth and never produces
-REAL_FILL."""
+REAL_FILL.
+
+v1.0 commissioning path retains declarative signal_rule evaluation.
+v1.1 candidate path consumes already-frozen SignalDecision / ExitDecision
+and never inspects scientific feature names.
+"""
 
 from __future__ import annotations
 
-import hashlib
-import json
 import sqlite3
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Any, Mapping
 
-import jsonschema
-import yaml
+from solana_alpha_lab.factory.strategy_runtime import (
+    PaperPlaneError,
+    load_strategy_version,
+    normalize_strategy,
+    position_id_for_signal_decision,
+    validate_exit_decision,
+    validate_signal_decision,
+)
 
-SCHEMA_RELATIVE = "catalog/schemas/strategy_version.schema.json"
+# Re-export for legacy callers/tests.
+__all__ = [
+    "PaperPlaneError",
+    "PaperPlaneStore",
+    "accept_exit_decision",
+    "accept_signal_decision",
+    "load_strategy_version",
+    "observe_shadow",
+    "run_commissioning",
+    "run_shadow_tick",
+    "signal_kind_for",
+]
+
 SIGNAL_KINDS = frozenset(
     {
         "NO_SIGNAL",
@@ -56,40 +77,17 @@ TRANSITIONS: dict[str, set[str]] = {
     "RECONCILED": set(),
 }
 FORBIDDEN_SIGNAL_KINDS = frozenset({"REAL_FILL"})
-
-
-class PaperPlaneError(ValueError):
-    """Raised when a strategy version or paper-plane transition is invalid."""
+OPEN_RISK_STATES = frozenset(
+    {"WATCHED", "SIGNALLED", "INTENT_CREATED", "ATTEMPTING", "OPEN", "PARTIAL", "UNKNOWN"}
+)
 
 
 def _now() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def load_strategy_version(root: Path, relative: str) -> dict[str, Any]:
-    candidate = Path(relative)
-    if candidate.is_absolute() or ".." in candidate.parts:
-        raise PaperPlaneError("STRATEGY_PATH_UNSAFE")
-    path = root / candidate
-    try:
-        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except OSError as exc:
-        raise PaperPlaneError("STRATEGY_MISSING") from exc
-    if not isinstance(loaded, dict):
-        raise PaperPlaneError("STRATEGY_INVALID")
-    schema = json.loads((root / SCHEMA_RELATIVE).read_text(encoding="utf-8"))
-    try:
-        jsonschema.validate(loaded, schema)
-    except jsonschema.ValidationError as exc:
-        raise PaperPlaneError("STRATEGY_SCHEMA_INVALID") from exc
-    unsigned = dict(loaded)
-    claimed = str(unsigned.pop("spec_sha256"))
-    actual = hashlib.sha256(
-        (json.dumps(unsigned, ensure_ascii=False, sort_keys=True) + "\n").encode("utf-8")
-    ).hexdigest()
-    if claimed != actual:
-        raise PaperPlaneError("SPEC_SHA256_MISMATCH")
-    return loaded
+def _parse_utc(value: str) -> datetime:
+    return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
 
 
 def signal_kind_for(
@@ -98,10 +96,12 @@ def signal_kind_for(
 ) -> str:
     """Evaluate one decision-time row against one declarative signal rule.
 
-    Data-driven: the rule comes from config; missing feature data yields
-    UNKNOWN, never zero.
+    Legacy v1.0 compatibility path only. v1.1 must not call this.
+    Missing feature data yields UNKNOWN, never zero.
     """
 
+    if str(strategy.get("schema_version", "1.0")) == "1.1":
+        raise PaperPlaneError("SIGNAL_KIND_FOR_FORBIDDEN_ON_V1_1")
     rule = strategy["signal_rule"]
     value = row.get(str(rule["feature"]))
     if value is None:
@@ -115,6 +115,17 @@ def signal_kind_for(
     high = numeric >= threshold if op == ">=" else numeric > threshold
     entry_kinds = list(strategy["entry_rule"]["when_signal_kind_in"])
     return entry_kinds[0] if high else "NO_SIGNAL"
+
+
+def _table_columns(conn: sqlite3.Connection, table: str) -> set[str]:
+    rows = conn.execute(f"PRAGMA table_info({table})").fetchall()
+    return {str(row[1]) for row in rows}
+
+
+def _ensure_column(conn: sqlite3.Connection, table: str, column: str, ddl_type: str) -> None:
+    if column in _table_columns(conn, table):
+        return
+    conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl_type}")
 
 
 class PaperPlaneStore:
@@ -152,15 +163,58 @@ class PaperPlaneStore:
             )
             """
         )
+        self._migrate_v1_1_lineage()
         self._conn.commit()
+
+    def _migrate_v1_1_lineage(self) -> None:
+        """Idempotent additive columns for v1.1 lineage. Legacy rows may be NULL."""
+
+        _ensure_column(self._conn, "bot_instances", "activation_epoch_id", "TEXT")
+        _ensure_column(self._conn, "bot_instances", "runtime_schema_version", "TEXT")
+        _ensure_column(self._conn, "positions", "signal_decision_id", "TEXT")
+        _ensure_column(self._conn, "positions", "activation_epoch_id", "TEXT")
+        _ensure_column(self._conn, "positions", "strategy_id", "TEXT")
+        _ensure_column(self._conn, "positions", "strategy_version_label", "TEXT")
+        _ensure_column(self._conn, "positions", "exit_decision_id", "TEXT")
+        _ensure_column(self._conn, "positions", "reason_code", "TEXT")
+        self._conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_positions_signal_decision_id
+            ON positions(signal_decision_id)
+            """
+        )
+        self._conn.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_bot_activation_epoch_id
+            ON bot_instances(activation_epoch_id)
+            """
+        )
 
     def close(self) -> None:
         self._conn.close()
 
-    def start_bot(self, strategy: Mapping[str, Any], *, mode: str = "PAPER") -> dict[str, Any]:
+    def start_bot(
+        self,
+        strategy: Mapping[str, Any],
+        *,
+        mode: str = "PAPER",
+        activation_epoch_id: str | None = None,
+    ) -> dict[str, Any]:
         if mode not in {"PAPER", "SHADOW"}:
             raise PaperPlaneError("BOT_MODE_INVALID")
-        bot_instance_id = f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}-{mode}"
+        schema_version = str(strategy.get("schema_version", "1.0"))
+        if schema_version == "1.1":
+            if not activation_epoch_id:
+                raise PaperPlaneError("ACTIVATION_EPOCH_REQUIRED")
+            bot_instance_id = (
+                f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}"
+                f"-{mode}-{activation_epoch_id}"
+            )
+        else:
+            bot_instance_id = (
+                f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}-{mode}"
+            )
+            activation_epoch_id = None
         existing = self.get_bot(bot_instance_id)
         if existing is not None and existing["status"] == "RUNNING":
             return existing
@@ -172,20 +226,32 @@ class PaperPlaneStore:
             "status": "RUNNING",
             "started_at": _now(),
             "stopped_at": None,
+            "activation_epoch_id": activation_epoch_id,
+            "runtime_schema_version": schema_version,
         }
         self._conn.execute(
             """
             INSERT INTO bot_instances(
                 bot_instance_id, strategy_id, strategy_version, mode,
-                status, started_at, stopped_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                status, started_at, stopped_at, activation_epoch_id,
+                runtime_schema_version
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(bot_instance_id) DO UPDATE SET
-                status=excluded.status, stopped_at=excluded.stopped_at
+                status=excluded.status,
+                stopped_at=excluded.stopped_at,
+                activation_epoch_id=COALESCE(excluded.activation_epoch_id, bot_instances.activation_epoch_id),
+                runtime_schema_version=COALESCE(excluded.runtime_schema_version, bot_instances.runtime_schema_version)
             """,
             (
-                record["bot_instance_id"], record["strategy_id"],
-                record["strategy_version"], record["mode"],
-                record["status"], record["started_at"], None,
+                record["bot_instance_id"],
+                record["strategy_id"],
+                record["strategy_version"],
+                record["mode"],
+                record["status"],
+                record["started_at"],
+                None,
+                record["activation_epoch_id"],
+                record["runtime_schema_version"],
             ),
         )
         self._conn.commit()
@@ -216,6 +282,40 @@ class PaperPlaneStore:
             ON CONFLICT(position_id) DO NOTHING
             """,
             (position_id, bot_instance_id, mint, signal_kind, _now()),
+        )
+        self._conn.commit()
+        return position_id
+
+    def open_position_from_signal(
+        self,
+        *,
+        bot_instance_id: str,
+        signal_decision: Mapping[str, Any],
+        signal_kind: str = "SIMULATED_FILL",
+    ) -> str:
+        signal_decision_id = str(signal_decision["signal_decision_id"])
+        position_id = position_id_for_signal_decision(signal_decision_id)
+        self._conn.execute(
+            """
+            INSERT INTO positions(
+                position_id, bot_instance_id, mint, state, signal_kind,
+                opened_at, signal_decision_id, activation_epoch_id,
+                strategy_id, strategy_version_label, reason_code
+            ) VALUES (?, ?, ?, 'WATCHED', ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(position_id) DO NOTHING
+            """,
+            (
+                position_id,
+                bot_instance_id,
+                str(signal_decision["mint"]),
+                signal_kind,
+                _now(),
+                signal_decision_id,
+                str(signal_decision["activation_epoch_id"]),
+                str(signal_decision["strategy_id"]),
+                str(signal_decision["strategy_version"]),
+                str(signal_decision["reason_code"]),
+            ),
         )
         self._conn.commit()
         return position_id
@@ -252,6 +352,13 @@ class PaperPlaneStore:
         rows = self._conn.execute("SELECT * FROM positions ORDER BY opened_at").fetchall()
         return [dict(row) for row in rows]
 
+    def open_risk_count(self, bot_instance_id: str) -> int:
+        rows = self._conn.execute(
+            "SELECT state FROM positions WHERE bot_instance_id = ?",
+            (bot_instance_id,),
+        ).fetchall()
+        return sum(1 for row in rows if str(row["state"]) in OPEN_RISK_STATES)
+
     def fill_paper(self, *, bot_instance_id: str, mint: str, notional_usd: Decimal) -> tuple[str, str]:
         position_id = self.open_position(
             bot_instance_id=bot_instance_id,
@@ -269,6 +376,302 @@ class PaperPlaneStore:
         self._conn.commit()
         return position_id, "SIMULATED_FILL"
 
+    def fill_paper_from_signal(
+        self,
+        *,
+        bot_instance_id: str,
+        signal_decision: Mapping[str, Any],
+        notional_usd: Decimal,
+        signal_kind: str = "SIMULATED_FILL",
+    ) -> tuple[str, str]:
+        if signal_kind not in {"SIMULATED_FILL", "SHADOW_EXECUTABLE"}:
+            raise PaperPlaneError("SIGNAL_KIND_INVALID")
+        position_id = position_id_for_signal_decision(
+            str(signal_decision["signal_decision_id"])
+        )
+        existing = self.get_position(position_id)
+        if existing is None:
+            self.open_position_from_signal(
+                bot_instance_id=bot_instance_id,
+                signal_decision=signal_decision,
+                signal_kind=signal_kind,
+            )
+            existing = self.get_position(position_id)
+        assert existing is not None
+        if existing["state"] in {"OPEN", "PARTIAL", "EXIT_REQUIRED", "EXITING", "CLOSED", "RECONCILED", "UNRESOLVED"}:
+            return position_id, str(existing.get("signal_kind") or signal_kind)
+        # Resume incomplete lifecycle after crash/retry between commits.
+        state = str(existing["state"])
+        if state == "WATCHED":
+            self._conn.execute(
+                "UPDATE positions SET signal_kind=? WHERE position_id=?",
+                (signal_kind, position_id),
+            )
+            self._conn.commit()
+            self.transition(position_id, "SIGNALLED")
+            state = "SIGNALLED"
+        if state == "SIGNALLED":
+            self.transition(position_id, "INTENT_CREATED")
+            state = "INTENT_CREATED"
+        if state == "INTENT_CREATED":
+            self.transition(position_id, "ATTEMPTING")
+            state = "ATTEMPTING"
+        if state == "ATTEMPTING":
+            self.transition(position_id, "OPEN")
+        self._conn.execute(
+            "UPDATE positions SET entered_notional_usd=?, signal_kind=? WHERE position_id=?",
+            (float(notional_usd), signal_kind, position_id),
+        )
+        self._conn.commit()
+        return position_id, signal_kind
+
+    def apply_exit_decision(
+        self,
+        *,
+        exit_decision: Mapping[str, Any],
+    ) -> dict[str, Any]:
+        position_id = str(exit_decision["position_id"])
+        position = self.get_position(position_id)
+        if position is None:
+            raise PaperPlaneError("POSITION_NOT_FOUND")
+        action = str(exit_decision["action"])
+        if action != "EXIT":
+            return {
+                "position_id": position_id,
+                "applied": False,
+                "action": action,
+                "state": position["state"],
+            }
+        if position["state"] == "EXIT_REQUIRED":
+            self._conn.execute(
+                "UPDATE positions SET exit_decision_id=?, reason_code=? WHERE position_id=?",
+                (
+                    str(exit_decision["exit_decision_id"]),
+                    str(exit_decision["reason_code"]),
+                    position_id,
+                ),
+            )
+            self._conn.commit()
+            updated = self.get_position(position_id)
+            assert updated is not None
+            return {
+                "position_id": position_id,
+                "applied": True,
+                "action": action,
+                "state": updated["state"],
+                "fill_claimed": False,
+            }
+        if position["state"] not in {"OPEN", "PARTIAL", "UNKNOWN"}:
+            raise PaperPlaneError(f"EXIT_DECISION_STATE_INVALID:{position['state']}")
+        updated = self.transition(position_id, "EXIT_REQUIRED")
+        self._conn.execute(
+            "UPDATE positions SET exit_decision_id=?, reason_code=? WHERE position_id=?",
+            (
+                str(exit_decision["exit_decision_id"]),
+                str(exit_decision["reason_code"]),
+                position_id,
+            ),
+        )
+        self._conn.commit()
+        refreshed = self.get_position(position_id)
+        assert refreshed is not None
+        return {
+            "position_id": position_id,
+            "applied": True,
+            "action": action,
+            "state": refreshed["state"],
+            "fill_claimed": False,
+        }
+
+
+def resolve_activation_epoch(
+    activation_epoch_id: str,
+    *,
+    known_activation_epochs: Mapping[str, Any] | set[str] | frozenset[str],
+) -> None:
+    if isinstance(known_activation_epochs, Mapping):
+        ok = activation_epoch_id in known_activation_epochs
+    else:
+        ok = activation_epoch_id in known_activation_epochs
+    if not ok:
+        raise PaperPlaneError("ACTIVATION_EPOCH_UNRESOLVED")
+
+
+def accept_signal_decision(
+    root: Path,
+    store: PaperPlaneStore,
+    *,
+    strategy: Mapping[str, Any],
+    signal_decision: Mapping[str, Any],
+    known_activation_epochs: Mapping[str, Any] | set[str] | frozenset[str],
+    mode: str = "PAPER",
+    as_of: str | None = None,
+) -> dict[str, Any]:
+    """Consume a frozen SignalDecision on the v1.1 path. Feature-name agnostic."""
+
+    if mode not in {"PAPER", "SHADOW"}:
+        raise PaperPlaneError("BOT_MODE_INVALID")
+    normalized = normalize_strategy(strategy)
+    if normalized["runtime_path"] != "CANDIDATE_V1_1":
+        raise PaperPlaneError("SIGNAL_DECISION_REQUIRES_V1_1")
+    eligibility = strategy.get("mode_eligibility", {})
+    if mode == "PAPER" and eligibility.get("paper") is not True:
+        raise PaperPlaneError("PAPER_MODE_NOT_ELIGIBLE")
+    if mode == "SHADOW" and eligibility.get("shadow") is not True:
+        raise PaperPlaneError("SHADOW_MODE_NOT_ELIGIBLE")
+    if eligibility.get("micro_live") is not False:
+        raise PaperPlaneError("MICRO_LIVE_FORBIDDEN")
+    decision = validate_signal_decision(root, signal_decision)
+    if decision["strategy_id"] != strategy["strategy_id"]:
+        raise PaperPlaneError("SIGNAL_STRATEGY_ID_MISMATCH")
+    if decision["strategy_version"] != strategy["strategy_version"]:
+        raise PaperPlaneError("SIGNAL_STRATEGY_VERSION_MISMATCH")
+    resolve_activation_epoch(
+        str(decision["activation_epoch_id"]),
+        known_activation_epochs=known_activation_epochs,
+    )
+    if _parse_utc(decision["first_reliable_available_at"]) > _parse_utc(decision["decision_at"]):
+        if decision["action"] == "ENTER":
+            raise PaperPlaneError("SIGNAL_FUTURE_AVAILABLE_ENTER_FORBIDDEN")
+    action = str(decision["action"])
+    if action != "ENTER":
+        return {
+            "opened": False,
+            "action": action,
+            "reason_code": decision["reason_code"],
+            "signal_decision_id": decision["signal_decision_id"],
+            "position_id": None,
+        }
+    as_of_dt = _parse_utc(as_of) if as_of else _parse_utc(decision["decision_at"])
+    decision_at = _parse_utc(decision["decision_at"])
+    max_age = int(strategy["signal_input"]["max_age_seconds"])
+    age_seconds = (as_of_dt - decision_at).total_seconds()
+    if age_seconds > max_age:
+        raise PaperPlaneError("SIGNAL_DECISION_STALE")
+    position_id = position_id_for_signal_decision(str(decision["signal_decision_id"]))
+    existing = store.get_position(position_id)
+    if existing is not None:
+        if existing.get("activation_epoch_id") and str(existing["activation_epoch_id"]) != str(
+            decision["activation_epoch_id"]
+        ):
+            raise PaperPlaneError("SIGNAL_ACTIVATION_EPOCH_MISMATCH")
+        if existing.get("strategy_id") and str(existing["strategy_id"]) != str(
+            decision["strategy_id"]
+        ):
+            raise PaperPlaneError("SIGNAL_POSITION_STRATEGY_MISMATCH")
+        expected_bot_id = (
+            f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}"
+            f"-{mode}-{decision['activation_epoch_id']}"
+        )
+        if existing.get("bot_instance_id") and str(existing["bot_instance_id"]) != expected_bot_id:
+            raise PaperPlaneError("SIGNAL_BOT_INSTANCE_MISMATCH")
+    bot = store.start_bot(
+        strategy,
+        mode=mode,
+        activation_epoch_id=str(decision["activation_epoch_id"]),
+    )
+    if existing is not None:
+        state = str(existing["state"])
+        if state == "OPEN":
+            return {
+                "opened": True,
+                "action": action,
+                "reason_code": decision["reason_code"],
+                "signal_decision_id": decision["signal_decision_id"],
+                "position_id": position_id,
+                "idempotent": True,
+                "state": state,
+                "bot_instance_id": bot["bot_instance_id"],
+                "activation_epoch_id": decision["activation_epoch_id"],
+            }
+        if state in {
+            "PARTIAL",
+            "EXIT_REQUIRED",
+            "EXITING",
+            "CLOSED",
+            "RECONCILED",
+            "UNRESOLVED",
+            "UNKNOWN",
+        }:
+            return {
+                "opened": state in {"PARTIAL", "UNKNOWN"},
+                "action": action,
+                "reason_code": decision["reason_code"],
+                "signal_decision_id": decision["signal_decision_id"],
+                "position_id": position_id,
+                "idempotent": True,
+                "state": state,
+                "bot_instance_id": bot["bot_instance_id"],
+                "activation_epoch_id": decision["activation_epoch_id"],
+            }
+        # Incomplete pre-OPEN states fall through to resume.
+    open_count = store.open_risk_count(bot["bot_instance_id"])
+    max_open = int(strategy["risk_policy"]["max_open_positions"])
+    # Resume does not consume a new risk slot when the same signal already exists.
+    if existing is None and open_count >= max_open:
+        raise PaperPlaneError("BLOCK_MAX_OPEN_POSITIONS")
+    signal_kind = "SHADOW_EXECUTABLE" if mode == "SHADOW" else "SIMULATED_FILL"
+    notional = Decimal(str(strategy["notional_policy"]["notional_usd"]))
+    was_existing = existing is not None
+    opened_id, realized = store.fill_paper_from_signal(
+        bot_instance_id=bot["bot_instance_id"],
+        signal_decision=decision,
+        notional_usd=notional,
+        signal_kind=signal_kind,
+    )
+    refreshed = store.get_position(opened_id)
+    assert refreshed is not None
+    return {
+        "opened": refreshed["state"] == "OPEN",
+        "action": action,
+        "reason_code": decision["reason_code"],
+        "signal_decision_id": decision["signal_decision_id"],
+        "position_id": opened_id,
+        "idempotent": was_existing,
+        "state": refreshed["state"],
+        "realized_signal_kind": realized,
+        "bot_instance_id": bot["bot_instance_id"],
+        "activation_epoch_id": decision["activation_epoch_id"],
+    }
+
+
+def accept_exit_decision(
+    root: Path,
+    store: PaperPlaneStore,
+    *,
+    strategy: Mapping[str, Any],
+    exit_decision: Mapping[str, Any],
+    known_activation_epochs: Mapping[str, Any] | set[str] | frozenset[str],
+) -> dict[str, Any]:
+    normalized = normalize_strategy(strategy)
+    if normalized["runtime_path"] != "CANDIDATE_V1_1":
+        raise PaperPlaneError("EXIT_DECISION_REQUIRES_V1_1")
+    decision = validate_exit_decision(root, exit_decision)
+    if decision["strategy_id"] != strategy["strategy_id"]:
+        raise PaperPlaneError("EXIT_STRATEGY_ID_MISMATCH")
+    if decision["strategy_version"] != strategy["strategy_version"]:
+        raise PaperPlaneError("EXIT_STRATEGY_VERSION_MISMATCH")
+    resolve_activation_epoch(
+        str(decision["activation_epoch_id"]),
+        known_activation_epochs=known_activation_epochs,
+    )
+    if _parse_utc(decision["first_reliable_available_at"]) > _parse_utc(decision["decision_at"]):
+        if decision["action"] == "EXIT":
+            raise PaperPlaneError("EXIT_FUTURE_AVAILABLE_FORBIDDEN")
+    position = store.get_position(str(decision["position_id"]))
+    if position is None:
+        raise PaperPlaneError("POSITION_NOT_FOUND")
+    if position.get("activation_epoch_id") and str(position["activation_epoch_id"]) != str(
+        decision["activation_epoch_id"]
+    ):
+        raise PaperPlaneError("EXIT_ACTIVATION_EPOCH_MISMATCH")
+    if position.get("strategy_id") and str(position["strategy_id"]) != str(decision["strategy_id"]):
+        raise PaperPlaneError("EXIT_POSITION_STRATEGY_MISMATCH")
+    result = store.apply_exit_decision(exit_decision=decision)
+    result["exit_decision_id"] = decision["exit_decision_id"]
+    result["fill_claimed"] = False
+    return result
+
 
 def run_commissioning(
     root: Path,
@@ -284,6 +687,8 @@ def run_commissioning(
         per_strategy: list[dict[str, Any]] = []
         for relative in strategy_relatives:
             strategy = load_strategy_version(root, relative)
+            if str(strategy.get("schema_version", "1.0")) != "1.0":
+                raise PaperPlaneError("COMMISSIONING_REQUIRES_V1_0")
             bot = store.start_bot(strategy, mode="PAPER")
             filled = 0
             skipped = 0

@@ -1,0 +1,83 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-STRATEGY-EXECUTION-BOUNDARY-COMPLETION-001",
+  "as_of": "2026-09-03",
+  "task_id": "FACTORY_STRATEGY_EXECUTION_BOUNDARY_V1",
+  "state_change": "STRATEGY_EXECUTION_BOUNDARY_PASS",
+  "base_main": "df1fd8ae4a2f45bbe304a394caa1266872cbfd5f",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "bf396c3af950b6b1b2bfb5ec313f1fd0ce2be4450f27e9a7fc581a0ec76a7975",
+    "catalog/assets/lifecycle.yaml": "c3a784e2497bc61df3c834868c4e3d7dd1ac9c2afc0e64ea54f4d59b6f24f06f",
+    "catalog/catalog_manifest.yaml": "b63d19808478265233f42034ae37d005fd3425575ee719b2b9e952db769bd3c1",
+    "catalog/generated/asset_edges.json": "de20438e4c61746fa16d1dad313046c4d71b6b139c2a648884063ba430e9c953",
+    "catalog/schemas/exit_decision_v1.schema.json": "03946bcf1661afb94852efe8299ee02429e69ae3bffa199bb6a743c9f2cc5366",
+    "catalog/schemas/signal_decision_v1.schema.json": "e03caf41d09516f299f6422b916465267a6f8a37118c3be4a3c72bb601636c21",
+    "catalog/schemas/strategy_version_v1_1.schema.json": "c58f072c58650089ac54a0feac5879899f6a099c3e7b0c809cb67b0bf0a222ce",
+    "docs/PROJECT_MAP.md": "701817897e9f9a6189cd2c2494512d405c2d37395f6694419212fcdb30fdabbf",
+    "docs/reports/factory_strategy_execution_boundary/a1_owner_readout_v1.md": "6e0bd0834d94c5a254a7da9da53ab407a2897044e23f34a6b81eeddf02c6e51c",
+    "docs/tasks/FACTORY_STRATEGY_EXECUTION_BOUNDARY_V1.md": "534bee063fd9b0951e0b0ffd909fff77fe698d07afbe03b1598e63e56494c2c8",
+    "src/solana_alpha_lab/factory/paper_plane.py": "636a6dc0b8a19a86716662f627a32986091b0daa81d2012648a8a4ce235404b8",
+    "src/solana_alpha_lab/factory/strategy_runtime.py": "37f9c917048aa87124cb5336b6ebf6bf0d52c8cdc8b1de7eb6494400ece7ea9e",
+    "tests/fixtures/factory_strategy_execution_boundary/exit_decision_exit.json": "bfd5b6166f074a6abac2902c35b83e0075b523ba90e9a1bbdd15cd74b2be0a06",
+    "tests/fixtures/factory_strategy_execution_boundary/signal_decision_blocked.json": "8bf0055809bed23b36365af0584b5546a6d90df9bf8794199fc3f45d42e02fac",
+    "tests/fixtures/factory_strategy_execution_boundary/signal_decision_enter_a.json": "d2d7c2ec37d98a2921e6af98d9aec6030356d53bdce254f793e91e1a3dfec547",
+    "tests/fixtures/factory_strategy_execution_boundary/signal_decision_enter_b_same_mint.json": "9ddd683e3f66e38f9b925d70c6419a8b6f21518a152a11e859ad631b8b9bc0af",
+    "tests/fixtures/factory_strategy_execution_boundary/signal_decision_future_available.json": "b88174a02a2dec7f9e9b0b1f7588154b16035e2c12332a669b78e100ed693d32",
+    "tests/fixtures/factory_strategy_execution_boundary/signal_decision_no_enter.json": "f8f3179067ef955192505a0f2a74498db7903d0f8ab4d8bd5330b9647ff70c4c",
+    "tests/fixtures/factory_strategy_execution_boundary/signal_decision_unknown.json": "b58b9c37493e4ac93eca2fa4a91cf7f37c3c3fe1bc4733797e136ec08a38867b",
+    "tests/fixtures/factory_strategy_execution_boundary/strategy_v1_1_candidate_a.yaml": "8a29a92d8edb0bc44fbcc4b8661d80025e098ec5339b64ef00f04e388088c3a7",
+    "tests/fixtures/factory_strategy_execution_boundary/strategy_v1_1_candidate_b.yaml": "c821eb405b6422419c83301442f10f4a665caa8681bd1d7641d6d3bd40897e19",
+    "tests/test_factory_strategy_execution_boundary_v1.py": "88335d34904700d0dce3d7598d68c1fe4e932bceefc4daff9d33e677f3930d1f"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_strategy_execution_boundary/a1_delivery_factory_fit_v1.json",
+    "sha256": "c49e92c1301eecac91c6cec390bfdfdd895042c342f1d1b709f7e71d40ce9662",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_STRATEGY_EXECUTION_BOUNDARY_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_strategy_execution_boundary/a1_delivery_independent_review_v1.json",
+      "sha256": "6da7d4ee44fc33c856eaad9e15d5becbc1da67fd5540096a783b5c3a67f690b0",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_LEGACY_V1_0_SUITE",
+      "PASS_FOCUSED_BOUNDARY_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PROVIDER",
+    "NO_MICRO_LIVE",
+    "NO_PNL_DASHBOARD",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0,
+    "vps_mutations": 0
+  }
+}
