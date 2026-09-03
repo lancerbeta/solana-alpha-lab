@@ -4,6 +4,7 @@ import copy
 import contextlib
 import importlib.util
 import io
+import os
 import subprocess
 import sys
 import unittest
@@ -68,9 +69,10 @@ class CiWorkflowTests(unittest.TestCase):
         )
         self.assertEqual(
             set(document["jobs"]),
-            {"validate-core", "validate-tests", "validate"},
+            {"validate-core", "validate-execution", "validate-tests", "validate"},
         )
         core = document["jobs"]["validate-core"]
+        execution = document["jobs"]["validate-execution"]
         tests = document["jobs"]["validate-tests"]
         final = document["jobs"]["validate"]
         self.assertEqual(
@@ -95,8 +97,10 @@ class CiWorkflowTests(unittest.TestCase):
         self.assertEqual(final["if"], "${{ always() }}")
         self.assertEqual(
             final["needs"],
-            ["validate-core", "validate-tests"],
+            ["validate-core", "validate-execution", "validate-tests"],
         )
+        self.assertEqual(execution["needs"], ["validate-core"])
+        self.assertNotIn("needs", tests)
         self.assertEqual(
             core["steps"][0]["with"],
             {"persist-credentials": "false", "fetch-depth": "0"},
@@ -110,7 +114,9 @@ class CiWorkflowTests(unittest.TestCase):
             },
         )
         self.assertIn("--core-only", core["steps"][3]["run"])
+        self.assertIn("run_ci_execution_domain.py", execution["steps"][3]["run"])
         self.assertIn("run_ci_test_shard.py", tests["steps"][3]["run"])
+        self.assertIn("--reserved-manifest", tests["steps"][3]["run"])
         self.assertIn("AGGREGATOR_DENY", final["steps"][0]["run"])
 
     def test_tag_based_action_reference_fails(self) -> None:
@@ -172,13 +178,36 @@ class CiWorkflowTests(unittest.TestCase):
             with self.subTest():
                 self.assert_invalid(mutation)
 
+    def _aggregator_script_body(self) -> str:
+        return ci.AGGREGATOR_DENY_SCRIPT.split("python - <<'PY'\n", 1)[1].rsplit("\nPY", 1)[0]
+
     def test_aggregator_denies_non_success_dependency_results(self) -> None:
-        document = yaml.load(self.text, Loader=yaml.BaseLoader)
-        script = document["jobs"]["validate"]["steps"][0]["run"]
+        script = self._aggregator_script_body()
         self.assertIn('value != "success"', script)
         self.assertIn("AGGREGATOR_DENY", script)
         self.assertIn("validate-core", script)
+        self.assertIn("validate-execution", script)
         self.assertIn("validate-tests", script)
+
+    def test_aggregator_denies_failed_or_skipped_execution(self) -> None:
+        body = self._aggregator_script_body()
+        for execution_result in ("failure", "skipped", "cancelled"):
+            with self.subTest(execution_result=execution_result):
+                env = {
+                    **os.environ,
+                    "CORE_RESULT": "success",
+                    "EXECUTION_RESULT": execution_result,
+                    "TESTS_RESULT": "success",
+                }
+                completed = subprocess.run(
+                    [sys.executable, "-c", body],
+                    capture_output=True,
+                    text=True,
+                    env=env,
+                    check=False,
+                )
+                self.assertNotEqual(completed.returncode, 0)
+                self.assertIn("AGGREGATOR_DENY", completed.stdout)
 
 
 class CleanCloneDocumentationTests(unittest.TestCase):

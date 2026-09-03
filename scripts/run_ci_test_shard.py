@@ -81,11 +81,31 @@ def ensure_repo_import_path(root: Path = ROOT) -> None:
     sys.path.insert(0, root_s)
 
 
+def load_reserved_modules(manifest_path: Path, *, root: Path) -> set[str]:
+    import validate_execution_domain as execution_domain
+
+    manifest = execution_domain.load_execution_domain(manifest_path)
+    if manifest.get("schema") != execution_domain.MANIFEST_SCHEMA:
+        raise ShardError("RESERVED_MANIFEST_SCHEMA_INVALID")
+    if manifest.get("domain_id") != execution_domain.EXPECTED_DOMAIN_ID:
+        raise ShardError("RESERVED_MANIFEST_DOMAIN_INVALID")
+    reserved_list = [
+        partition.posix(path)
+        for path in (manifest.get("required_fast_test_modules") or [])
+    ]
+    if not reserved_list:
+        raise ShardError("RESERVED_MODULES_EMPTY")
+    if len(reserved_list) != len(set(reserved_list)):
+        raise ShardError("RESERVED_MODULES_DUPLICATE")
+    return set(reserved_list)
+
+
 def run_shard(
     *,
     index: int,
     count: int,
     plan_path: Path,
+    reserved_manifest_path: Path | None = None,
     root: Path = ROOT,
 ) -> int:
     ensure_repo_import_path(root)
@@ -98,27 +118,46 @@ def run_shard(
     canonical_count = profiler.count_cases(
         unittest.defaultTestLoader.discover(str(root / "tests"), pattern="test_*.py")
     )
+    reserved: set[str] = set()
+    if reserved_manifest_path is not None:
+        reserved = load_reserved_modules(reserved_manifest_path, root=root)
+        if len(reserved) != len(set(reserved)):
+            raise ShardError("RESERVED_MODULES_DUPLICATE")
+        overlap = sorted(reserved & set(current))
+        if len(overlap) != len(reserved):
+            missing_reserved = sorted(reserved - set(current))
+            raise ShardError(
+                "RESERVED_MODULE_NOT_IN_DISCOVERY:"
+                + ",".join(missing_reserved[:20])
+            )
+    current_general = [path for path in current if path not in reserved]
     selected = partition.select_modules_for_shard(
-        current,
+        current_general,
         plan=plan,
         index=index,
         count=count,
     )
     if not selected:
         raise ShardError("EMPTY_SHARD_REFUSED")
-    # Prove current inventory is fully covered exactly once across the plan.
-    covered: list[str] = []
+    # Prove current inventory is fully covered exactly once across lanes.
+    general_covered: list[str] = []
     for shard_index in range(count):
-        covered.extend(
+        general_covered.extend(
             partition.select_modules_for_shard(
-                current,
+                current_general,
                 plan=plan,
                 index=shard_index,
                 count=count,
             )
         )
-    if len(covered) != len(set(covered)):
-        raise ShardError("SHARD_UNION_HAS_DUPLICATES")
+    execution_covered = sorted(reserved)
+    if len(general_covered) != len(set(general_covered)):
+        raise ShardError("GENERAL_SHARD_UNION_HAS_DUPLICATES")
+    if execution_covered and len(execution_covered) != len(set(execution_covered)):
+        raise ShardError("EXECUTION_RESERVED_HAS_DUPLICATES")
+    if reserved and set(general_covered) & reserved:
+        raise ShardError("EXECUTION_GENERAL_OVERLAP")
+    covered = sorted(set(general_covered) | reserved)
     if set(covered) != set(current):
         missing = sorted(set(current) - set(covered))
         extra = sorted(set(covered) - set(current))
@@ -129,7 +168,7 @@ def run_shard(
     # Live equivalence: module-path union is not enough — the cases loaded from
     # those modules must match unittest discover on the same tests root.
     loaded_union_count = profiler.count_cases(
-        load_suite_for_paths(sorted(set(covered)), root=root)
+        load_suite_for_paths(covered, root=root)
     )
     if loaded_union_count != canonical_count:
         raise ShardError(
@@ -137,9 +176,12 @@ def run_shard(
             f"loaded_union={loaded_union_count}:discover={canonical_count}"
         )
     if index == 0:
-        warning = stale_profile_warning(current, plan)
+        warning = stale_profile_warning(current_general, plan)
         if warning is not None:
             print(warning)
+    if index == 0 and reserved_manifest_path is not None:
+        print(f"execution_reserved_modules={len(reserved)}")
+        print(f"general_modules={len(current_general)}")
     suite = load_suite_for_paths(selected, root=root)
     case_count = profiler.count_cases(suite)
     if case_count < 1:
@@ -176,13 +218,19 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--index", required=True, type=int)
     parser.add_argument("--count", required=True, type=int)
     parser.add_argument("--plan", required=True, type=Path)
+    parser.add_argument("--reserved-manifest", type=Path, default=None)
     return parser.parse_args(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
     try:
-        return run_shard(index=args.index, count=args.count, plan_path=args.plan)
+        return run_shard(
+            index=args.index,
+            count=args.count,
+            plan_path=args.plan,
+            reserved_manifest_path=args.reserved_manifest,
+        )
     except (ShardError, partition.PartitionError) as exc:
         print(f"SHARD_ERROR: {exc}", file=sys.stderr)
         return 2

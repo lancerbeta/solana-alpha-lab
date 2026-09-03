@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "EXECUTION-DOMAIN-MODULARITY-FAST-CI-DELIVERY-COMPLETION-001",
+  "as_of": "2026-09-03",
+  "task_id": "EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1",
+  "state_change": "EXECUTION_DOMAIN_MODULARITY_FAST_CI_LOCAL_PASS",
+  "base_main": "b442a763e62e8d4ed8dcfebbdf2c67514d4d1d82",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING_BIND",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_EXECUTION_DOMAIN_AND_CI_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING_BIND",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "EXECUTION_DOMAIN_BOUNDARY_PASS",
+      "EXECUTION_DOMAIN_FAST_TESTS_PASS",
+      "EXACTLY_ONCE_COVERAGE_EQUIVALENCE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA_OR_CASHFLOW_CLAIM",
+    "NO_PROVIDER_CREDENTIAL_WALLET_OR_CASH_AUTHORITY",
+    "NO_LIVE_FILL_OR_LIVE_CAPITAL",
+    "NO_PATH_BASED_FULL_SUITE_SKIP",
+    "NO_SECOND_REPOSITORY_OR_SERVICE"
+  ],
+  "side_effects": {
+    "provider_calls": 0,
+    "wallet_signer_transaction_actions": 0,
+    "cash_spend_usd": 0
+  }
+}

@@ -42,10 +42,17 @@ GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
 CI_TEST_SHARDS_PLAN = ROOT / "configs/ci_test_shards_v1.json"
+EXECUTION_DOMAIN_MANIFEST = ROOT / "configs/execution_domain_v1.json"
+EXECUTION_DOMAIN_COMMAND = (
+    "uv run --locked --managed-python python -B "
+    "scripts/run_ci_execution_domain.py "
+    "--manifest configs/execution_domain_v1.json"
+)
 SHARD_RUN_COMMAND_TEMPLATE = (
     "uv run --locked --managed-python python -B scripts/run_ci_test_shard.py "
     "--index ${{{{ matrix.shard }}}} --count {shard_count} "
-    "--plan configs/ci_test_shards_v1.json"
+    "--plan configs/ci_test_shards_v1.json "
+    "--reserved-manifest configs/execution_domain_v1.json"
 )
 CORE_ONLY_COMMAND = VALIDATION_COMMAND + " --core-only"
 AGGREGATOR_DENY_SCRIPT = """python - <<'PY'
@@ -54,6 +61,7 @@ import sys
 
 required = {
     "validate-core": os.environ.get("CORE_RESULT", ""),
+    "validate-execution": os.environ.get("EXECUTION_RESULT", ""),
     "validate-tests": os.environ.get("TESTS_RESULT", ""),
 }
 failed = {name: value for name, value in required.items() if value != "success"}
@@ -631,6 +639,20 @@ def load_shard_plan() -> dict[str, Any]:
         raise CiValidationError("ci_test_shards_plan_duplicate_modules")
     if not seen:
         raise CiValidationError("ci_test_shards_plan_empty")
+    if EXECUTION_DOMAIN_MANIFEST.is_file():
+        try:
+            manifest = json.loads(EXECUTION_DOMAIN_MANIFEST.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            raise CiValidationError("execution_domain_manifest_invalid_json") from exc
+        reserved = {
+            str(path).replace("\\", "/")
+            for path in (manifest.get("required_fast_test_modules") or [])
+        }
+        overlap = sorted(seen & reserved)
+        if overlap:
+            raise CiValidationError(
+                "ci_test_shards_plan_execution_overlap:" + ",".join(overlap[:20])
+            )
     return document
 
 
@@ -692,6 +714,16 @@ def expected_workflow() -> dict[str, Any]:
                 },
                 "steps": setup_steps(validate_command=CORE_ONLY_COMMAND),
             },
+            "validate-execution": {
+                "runs-on": "ubuntu-24.04",
+                "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
+                "needs": ["validate-core"],
+                "env": {
+                    "UV_NO_ENV_FILE": "1",
+                    "PYTHONDONTWRITEBYTECODE": "1",
+                },
+                "steps": setup_steps(validate_command=EXECUTION_DOMAIN_COMMAND),
+            },
             "validate-tests": {
                 "runs-on": "ubuntu-24.04",
                 "timeout-minutes": str(GITHUB_VALIDATE_TIMEOUT_MINUTES),
@@ -710,11 +742,12 @@ def expected_workflow() -> dict[str, Any]:
             },
             "validate": {
                 "if": "${{ always() }}",
-                "needs": ["validate-core", "validate-tests"],
+                "needs": ["validate-core", "validate-execution", "validate-tests"],
                 "runs-on": "ubuntu-24.04",
                 "timeout-minutes": str(GITHUB_AGGREGATOR_TIMEOUT_MINUTES),
                 "env": {
                     "CORE_RESULT": "${{ needs.validate-core.result }}",
+                    "EXECUTION_RESULT": "${{ needs.validate-execution.result }}",
                     "TESTS_RESULT": "${{ needs.validate-tests.result }}",
                 },
                 "steps": [
@@ -750,7 +783,14 @@ def validate_workflow_text(text: str) -> None:
         raise CiValidationError("workflow_exact_contract_mismatch")
 
     uses = re.findall(r"(?m)^\s*uses:\s*([^\s#]+)", text)
-    expected_uses = [CHECKOUT_PIN, SETUP_UV_PIN, CHECKOUT_PIN, SETUP_UV_PIN]
+    expected_uses = [
+        CHECKOUT_PIN,
+        SETUP_UV_PIN,
+        CHECKOUT_PIN,
+        SETUP_UV_PIN,
+        CHECKOUT_PIN,
+        SETUP_UV_PIN,
+    ]
     if uses != expected_uses:
         raise CiValidationError("workflow_action_set_mismatch")
     if any(not re.search(r"@[0-9a-f]{40}$", reference) for reference in uses):
@@ -792,6 +832,16 @@ def child_commands(*, policy_only_baseline: bool = False) -> list[tuple[str, lis
         (
             "PRE_GIT_IMPORT_VALIDATION",
             [python, "-B", "scripts/validate_pre_git_import.py"],
+        ),
+        (
+            "EXECUTION_DOMAIN_BOUNDARY",
+            [
+                python,
+                "-B",
+                "scripts/validate_execution_domain.py",
+                "--manifest",
+                "configs/execution_domain_v1.json",
+            ],
         ),
         ("TASK04_ARCHITECTURE", [python, "-B", "scripts/validate_task04.py"]),
         ("REPOSITORY_POLICY", baseline),
