@@ -31,6 +31,7 @@ managed_write_set:
   - catalog/schemas/factory_v1_owner_cockpit.schema.json
   - tests/test_owner_operations_cockpit_v1.py
   - tests/test_factory_v1_owner_cockpit.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
