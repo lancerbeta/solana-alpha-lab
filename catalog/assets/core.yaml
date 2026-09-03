@@ -25667,12 +25667,14 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 82a08b513f12ffcb0b95a3343f2004e2faea2e374ecd3a27b3c9fd4e87cf5173}
+  integrity: {kind: sha256, sha256: 4d91c030b3abbf4f6546ad1e043b98dbeb40c5edd8915709dc021cb781736dc8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-READ-MODEL-001}
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
   consumers: [FACTORY-001, FACTORY-V1-PRODUCT-KERNEL-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, APPLICATION, COMMANDS]
@@ -25723,7 +25725,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 18b16798a2b8d0303586e260a9fcb8272b27cb922e633d9d5e294d69a08ddd66}
+  integrity: {kind: sha256, sha256: 55b4a4f9845573196eb21ccdff641b7be4094bcb7b30e9e2f9a5bb372c44a73b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -26259,16 +26261,17 @@ records:
 - asset_id: CONFIG-FACTORY-V1-OWNER-COCKPIT-001
   record_version: '1.0'
   asset_type: configuration
-  purpose: Machine-readable Cockpit-lite nav, packet fields and no-UI-package authority.
+  purpose: Machine-readable Cockpit-lite nav with earned OPERATIONS/ECONOMICS, MARKET hidden, no-UI-package authority.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-19'
-  truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
+  as_of: '2026-09-03'
+  truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_owner_cockpit_v1.yaml', repository_path: configs/factory_v1_owner_cockpit_v1.yaml}
-  integrity: {kind: sha256, sha256: a3af2f4556d4603572632f96301dedbb31704345cfc0b1cc88fb95fd145a8b26}
+  integrity: {kind: sha256, sha256: 90e82a1a23f8b2412d93eb89c3b544782570065ee0a6353a709da4a16ecead38}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
   - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-V1-OWNER-COCKPIT-001}
   consumers: [FACTORY-001, FACTORY-V1-OWNER-COCKPIT-001, GOAL-OWNER]
   evidence: []
@@ -26284,7 +26287,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_owner_cockpit.schema.json', repository_path: catalog/schemas/factory_v1_owner_cockpit.schema.json}
-  integrity: {kind: sha256, sha256: f44c5b6e672c191bdf295aa3dac5d5bda0e41f2d9bace6ddd643302c7ea2af0f}
+  integrity: {kind: sha256, sha256: f38e880d8ac318f035da138ba63ff065fce7f3385e8b144cf238e5c327de6fe9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26302,7 +26305,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/cockpit.py', repository_path: src/solana_alpha_lab/factory/cockpit.py}
-  integrity: {kind: sha256, sha256: 9ae851eaf30b011d1fc67d999721454f6eddfd8305133453b76b252f6a5a77bf}
+  integrity: {kind: sha256, sha256: a3991c1dc6e106760f8d9ca96c645239755f7a0940d755684953c0f98f24133b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26320,7 +26323,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: b69589fc08190abd8c1008d3aa235f95cca773a1df75e89df98d31d9ebe59c2e}
+  integrity: {kind: sha256, sha256: 5e9e21eb3b059bdf4c60bf35e9c967614f2c7b167f447e78306631a654e720bc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -27657,7 +27660,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 650f7844580beada1821004abb99d7f2cccaef70b16610be859654285069e085}
+  integrity: {kind: sha256, sha256: c55fc5d7f329350ceb4f632354fb1869fa998496461eb1903e9b34f476069eea}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -34512,7 +34515,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_operations.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_operations.py}
-  integrity: {kind: sha256, sha256: 45aae9120649c1f7c610bc5a8910c459e2d305d5577adb4f3244f70ed2eed46e}
+  integrity: {kind: sha256, sha256: ef2154be4ccbde13f23d80ca66a0650b4ac78ed0c2942ce15657d981097bda23}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
@@ -34577,4 +34580,47 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [PAPER_SHADOW, ACCOUNTING, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for earned Workbench OPERATIONS/ECONOMICS over FactoryApplication without SQLite in UI.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-03'
+  truth_owner: OWNER_OPERATIONS_COCKPIT_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md', repository_path: docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md}
+  integrity: {kind: sha256, sha256: 4562550db5dbf1bff9e8738be304ef6582f085d7ca781ffdcbcd6e59ed693cbc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
+  - {relation_type: contains, target_asset_id: CONFIG-FACTORY-V1-OWNER-COCKPIT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-OWNER-OPERATIONS-COCKPIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [OWNER_OPERATIONS, COCKPIT, WORKBENCH, ECONOMICS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-OWNER-OPERATIONS-COCKPIT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Focused proofs for OPERATIONS/ECONOMICS surfaces, operator commands and no Workbench SQLite.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-03'
+  truth_owner: OWNER_OPERATIONS_COCKPIT_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_owner_operations_cockpit_v1.py', repository_path: tests/test_owner_operations_cockpit_v1.py}
+  integrity: {kind: sha256, sha256: 077d2b2e0744d44341f9c8e44cb70a906767e98221b480e9445bd508c8932535}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OWNER_OPERATIONS, COCKPIT, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

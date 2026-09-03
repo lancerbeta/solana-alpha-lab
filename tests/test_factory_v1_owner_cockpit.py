@@ -79,8 +79,8 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
         config = load_cockpit_config(ROOT)
         jsonschema.validate(config, json.loads(COCKPIT_SCHEMA.read_text(encoding="utf-8")))
         self.assertEqual(config["implementation"], "WORKBENCH_WRAP_NO_NEW_UI_PACKAGE")
-        self.assertEqual(config["visible_nav"], ["HOME", "RESEARCH", "SYSTEM"])
-        self.assertEqual(config["hidden_nav"], ["MARKET", "OPERATIONS", "ECONOMICS"])
+        self.assertEqual(config["visible_nav"], ["HOME", "RESEARCH", "OPERATIONS", "ECONOMICS", "SYSTEM"])
+        self.assertEqual(config["hidden_nav"], ["MARKET"])
         self.assertEqual(list(config["packet_fields"]), list(PACKET_FIELDS))
         self.assertTrue(config["health"]["empty_enterprise_screens_forbidden"])
         self.assertFalse(config["authority"]["ui_package_adoption"])
@@ -123,8 +123,14 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
         self.assertEqual(cockpit["packet"]["RESULT"], "DIRECTIONAL_HINT_NOT_CONFIRMATION")
         self.assertNotEqual(cockpit["packet"]["RESULT"], "FACTORY_COMMISSIONING_LIVE_CYCLE_PASS")
 
+    def _close_app(self, app: FactoryApplication, store: OperationalStore) -> None:
+        paper = getattr(app, "_paper_plane_store", None)
+        if paper is not None:
+            paper.close()
+        store.close()
+
     def test_packet_and_attention_are_visible_without_git_archaeology(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = isolated_factory_root(Path(tmp) / "src")
             store = OperationalStore((root / "ops.sqlite").resolve())
             app = FactoryApplication(root=root, store=store)
@@ -155,17 +161,25 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 self.assertIn("EXPLICIT_UNKNOWN", home)
                 self.assertIn("DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN", home)
                 self.assertNotIn(">MARKET<", home)
-                self.assertNotIn(">OPERATIONS<", home)
-                self.assertNotIn(">ECONOMICS<", home)
+                self.assertIn(">OPERATIONS<", home)
+                self.assertIn(">ECONOMICS<", home)
+                operations = _get(app, "/operations")
+                economics = _get(app, "/economics")
+                ops_model = app.read_model(surface="OPERATIONS")
+                self.assertEqual(ops_model["cockpit"]["terminal"], "OWNER_OPERATIONS_COCKPIT_PASS")
+                self.assertIn("Operator commands", operations)
+                self.assertIn("NO_REALIZED_LIVE_PNL", economics)
+                self.assertNotIn(">MARKET<", operations)
+                self.assertNotIn(">MARKET<", economics)
                 self.assertNotEqual(model["runtime"]["verdict"], "HEALTHY")
                 self.assertIn("COMMISSIONING_PACKET_SCIENTIFIC_HINT_NOT_ALPHA", research)
                 self.assertIn("QUESTION", research)
                 self.assertIn("factory-v1-runtime-v1.0", system)
             finally:
-                store.close()
+                self._close_app(app, store)
 
     def test_missing_acceptance_requires_git_archaeology(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = isolated_factory_root(Path(tmp) / "src")
             (root / ACCEPTANCE_RELATIVE).unlink()
             store = OperationalStore((root / "ops.sqlite").resolve())
@@ -181,10 +195,10 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 self.assertIn("git_archaeology_required=true", home)
                 self.assertNotEqual(model.get("runtime", {}).get("verdict"), "HEALTHY")
             finally:
-                store.close()
+                self._close_app(app, store)
 
     def test_missing_runtime_receipt_requires_git_archaeology(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = isolated_factory_root(Path(tmp) / "src")
             (root / RUNTIME_RECEIPT_RELATIVE).unlink()
             store = OperationalStore((root / "ops.sqlite").resolve())
@@ -195,10 +209,10 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 self.assertIn("RUNTIME_RECEIPT", model["cockpit"]["attention"][0]["EVIDENCE"])
                 self.assertEqual(model["cockpit"]["terminal"], "OWNER_COCKPIT_LITE_BLOCKED")
             finally:
-                store.close()
+                self._close_app(app, store)
 
     def test_missing_both_produced_receipts_requires_git_archaeology(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = isolated_factory_root(Path(tmp) / "src")
             (root / ACCEPTANCE_RELATIVE).unlink()
             (root / RUNTIME_RECEIPT_RELATIVE).unlink()
@@ -212,7 +226,7 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 self.assertIn("RUNTIME_RECEIPT", evidence)
                 self.assertEqual(model["cockpit"]["terminal"], "OWNER_COCKPIT_LITE_BLOCKED")
             finally:
-                store.close()
+                self._close_app(app, store)
 
     def test_kernel_authority_and_existing_copy_blocks_remain(self) -> None:
         kernel = yaml.safe_load(
@@ -220,16 +234,16 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
         )
         self.assertFalse(kernel["authority"]["provider_calls"])
         self.assertFalse(kernel["ui_gate"]["package_adoption"])
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             store = OperationalStore(Path(tmp) / "ops.sqlite")
+            app = FactoryApplication(root=ROOT, store=store)
             try:
-                app = FactoryApplication(root=ROOT, store=store)
                 home = _get(app, "/")
                 self.assertIn("copy-block", home)
                 self.assertIn("Копировать", home)
                 self.assertIn("QUOTE_SURFACE_RETENTION_CONFIRMATORY_V1", home)
             finally:
-                store.close()
+                self._close_app(app, store)
 
 
 if __name__ == "__main__":

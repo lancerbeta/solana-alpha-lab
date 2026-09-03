@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OWNER-OPERATIONS-COCKPIT-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-03",
+  "task_id": "OWNER_OPERATIONS_COCKPIT_V1",
+  "reviewed_bindings_sha256": "ee102e80c1eda581ff7ded5036843bcf44bb377b139dc1f8b685a87031491dbd",
+  "reviewed_inventory_sha256": "72db8e6a5d427d199a1237f1826126805f1c352e31096cc24919e1448c576c7b",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=none",
+        "WORKBENCH_NO_SQLITE",
+        "APPLICATION_OWNS_PAPER_PLANE",
+        "LAZY_ATTACH_RESEARCH_SYSTEM",
+        "OPS_TERMINAL_INDEPENDENT_OF_ARCHAEOLOGY"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "BOT_INSTANCE_ID_REQUIRED",
+        "MULTI_BOT_FAIL_CLOSED",
+        "CLOSE_ALL_CONFIRM_STALE",
+        "COMMAND_FIELD_REQUIRED",
+        "MARKET_HIDDEN_GUARD"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_OPERATIONS_ECONOMICS_NAV",
+        "DOD_ARCHAEOLOGY_FALSIFIER",
+        "DOD_HTTP_RESUME_STOP",
+        "DOD_NON_CLAIMS_ALL_FOUR",
+        "TERMINAL_OWNER_OPERATIONS_COCKPIT_PASS"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PROVIDER",
+    "NO_NETRETURN"
+  ]
+}

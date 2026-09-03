@@ -363,3 +363,43 @@ def build_operations_projection(
             1 for p in positions if str(p["state"]) in OPEN_RISK_STATES
         ),
     }
+
+
+def build_economics_projection(
+    store: PaperPlaneStore,
+    *,
+    operations: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Bounded PAPER/SHADOW model economics. Never claims live/FCF/NetReturn."""
+
+    ops = operations or build_operations_projection(store)
+    by_class: dict[str, Decimal] = {}
+    for row in ops.get("position_rows") or []:
+        if row.get("pnl_status") != "KNOWN" or row.get("net_pnl_usd") is None:
+            continue
+        evidence = str(row.get("pnl_evidence_class") or "UNKNOWN_CLASS")
+        by_class[evidence] = by_class.get(evidence, Decimal("0")) + Decimal(
+            str(row["net_pnl_usd"])
+        )
+    return {
+        "as_of": ops.get("as_of"),
+        "reconciled_net_pnl_usd": ops.get("reconciled_net_pnl_usd"),
+        "reconciled_net_pnl_status": ops.get("reconciled_net_pnl_status"),
+        "pnl_known_count": ops.get("pnl_known_count"),
+        "pnl_unknown_count": ops.get("pnl_unknown_count"),
+        "known_open_exposure_usd": ops.get("known_open_exposure_usd"),
+        "known_open_exposure_status": ops.get("known_open_exposure_status"),
+        "current_loss_streak_status": ops.get("current_loss_streak_status"),
+        "current_loss_streak_count": ops.get("current_loss_streak_count"),
+        "max_drawdown_usd": ops.get("max_drawdown_usd"),
+        "max_drawdown_status": ops.get("max_drawdown_status"),
+        "pnl_by_evidence_class": {
+            key: format(value, "f") for key, value in sorted(by_class.items())
+        },
+        "non_claims": [
+            "NO_REALIZED_LIVE_PNL",
+            "NO_OWNER_FCF",
+            "NO_LIVE_CAPITAL",
+            "NO_NETRETURN_CLAIM",
+        ],
+    }

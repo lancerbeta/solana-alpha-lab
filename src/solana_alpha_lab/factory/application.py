@@ -12,6 +12,12 @@ import yaml
 from solana_alpha_lab.factory.cockpit import pinned_produced_gaps, project_cockpit
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, requirement_map
 from solana_alpha_lab.factory.operational_store import OperationalStore
+from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
+from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command
+from solana_alpha_lab.factory.paper_shadow_operations import (
+    build_economics_projection,
+    build_operations_projection,
+)
 from solana_alpha_lab.factory.read_model import project_read_model
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
@@ -24,6 +30,7 @@ T0_FRICTION_SCREEN_CONFIG_RELATIVE = "configs/factory_v1_prior_git_t0_friction_s
 RETENTION_CONFIG_RELATIVE = "configs/factory_v1_quote_surface_retention_falsifier_v1.yaml"
 CONFIRMATORY_CONFIG_RELATIVE = "configs/factory_v1_quote_surface_retention_confirmatory_v1.yaml"
 RUNTIME_CONFIG_RELATIVE = "configs/factory_v1_production_lite_runtime_v1.yaml"
+PAPER_PLANE_STORE_RELATIVE = "local/factory_v1/paper_plane_state.sqlite"
 GOLDEN_SPEC_RELATIVE = (
     "configs/experiment_specs/quote_native_admissible_friction_audition_offline_v1.yaml"
 )
@@ -75,22 +82,69 @@ def ops_store_path(root: Path) -> Path:
     return (root / relative).resolve()
 
 
+def paper_plane_store_path(root: Path) -> Path:
+    relative = PAPER_PLANE_STORE_RELATIVE
+    if Path(relative).is_absolute() or ".." in Path(relative).parts:
+        raise ApplicationError("PAPER_PLANE_STORE_PATH_UNSAFE")
+    return (root / relative).resolve()
+
+
 class FactoryApplication:
     def __init__(
         self,
         *,
         root: Path,
         store: OperationalStore | None = None,
+        paper_plane_store: PaperPlaneStore | None = None,
         spec_relative: str | None = None,
         authority_phrase: str | None = None,
     ) -> None:
         self.root = root
         self.store = store or OperationalStore(ops_store_path(root))
+        self._paper_plane_store = paper_plane_store
         self.runner = ExperimentRunner(root=root, store=self.store)
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
 
-    def read_model(self) -> dict[str, Any]:
+    def existing_paper_plane(self) -> PaperPlaneStore | None:
+        if self._paper_plane_store is not None:
+            return self._paper_plane_store
+        path = paper_plane_store_path(self.root)
+        if not path.is_file():
+            return None
+        self._paper_plane_store = PaperPlaneStore(path)
+        return self._paper_plane_store
+
+    def paper_plane(self) -> PaperPlaneStore:
+        existing = self.existing_paper_plane()
+        if existing is not None:
+            return existing
+        path = paper_plane_store_path(self.root)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._paper_plane_store = PaperPlaneStore(path)
+        return self._paper_plane_store
+
+    def operations_projection(self) -> dict[str, Any]:
+        return build_operations_projection(self.paper_plane())
+
+    def economics_projection(self) -> dict[str, Any]:
+        return build_economics_projection(self.paper_plane())
+
+    def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:
+        try:
+            return apply_operator_command(self.paper_plane(), command)
+        except PaperPlaneError as exc:
+            raise ApplicationError(str(exc)) from exc
+        except KeyError as exc:
+            raise ApplicationError("COMMAND_FIELD_REQUIRED") from exc
+
+    def recent_execution_changes(
+        self, store: PaperPlaneStore, *, limit: int = 12
+    ) -> list[dict[str, Any]]:
+        events = store.execution_events()
+        return list(reversed(events[-limit:]))
+
+    def read_model(self, *, surface: str | None = None) -> dict[str, Any]:
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
         model = project_read_model(
             root=self.root,
@@ -126,6 +180,31 @@ class FactoryApplication:
             runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
             pinned_produced_gaps=gaps,
         )
+        surface_key = (surface or "").upper()
+        force_paper_plane = surface_key in {"OPERATIONS", "ECONOMICS"}
+        paper_store = self.paper_plane() if force_paper_plane else self.existing_paper_plane()
+        if paper_store is not None:
+            operations = build_operations_projection(paper_store)
+            model["operations"] = operations
+            model["economics"] = build_economics_projection(
+                paper_store, operations=operations
+            )
+            model["recent_changes"] = self.recent_execution_changes(paper_store)
+            operator_attention = []
+            for item in operations.get("attention") or []:
+                if not isinstance(item, dict):
+                    continue
+                operator_attention.append(
+                    {
+                        "id": str(item.get("code") or "OPERATOR"),
+                        "WHY_NOW": item.get("WHY_NOW"),
+                        "IMPACT": item.get("IMPACT"),
+                        "EVIDENCE": item.get("EVIDENCE"),
+                        "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
+                    }
+                )
+            cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
+            cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
         return model

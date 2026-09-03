@@ -828,6 +828,11 @@
       "target_asset_id": "CTRL-FACTORY-V1-OWNER-COCKPIT-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-V1-OWNER-COCKPIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-FACTORY-V1-PRIOR-GIT-T0-FRICTION-SCREEN-001"
@@ -3391,6 +3396,31 @@
       "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-V1-OWNER-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001"
     },
     {
       "source_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001",
@@ -9628,6 +9658,16 @@
       "target_asset_id": "MODULE-FACTORY-V1-RUNNER-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-COMMANDS-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -14636,6 +14676,31 @@
       "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-COMMANDS-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001"
     },
     {
       "source_asset_id": "TEST-PAPER-SHADOW-ACCOUNTING-CONTROL-001",
