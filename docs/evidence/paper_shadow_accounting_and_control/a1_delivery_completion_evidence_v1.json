@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PAPER-SHADOW-ACCOUNTING-CONTROL-COMPLETION-001",
+  "as_of": "2026-09-03",
+  "task_id": "PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1",
+  "state_change": "PAPER_SHADOW_ACCOUNTING_CONTROL_PASS",
+  "base_main": "2038abf80500b9a52e9f95657c998d0db9af8eab",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/paper_shadow_accounting_and_control/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING_BIND_EVIDENCE",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PAPER_SHADOW_ACCOUNTING_CONTROL_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/paper_shadow_accounting_and_control/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING_BIND_EVIDENCE",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_FOCUSED_ACCOUNTING_SUITE",
+      "PASS_OPERATOR_SMOKE",
+      "PASS_ATOM1_BOUNDARY_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PROVIDER",
+    "NO_MICRO_LIVE",
+    "NO_UI_COCKPIT",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

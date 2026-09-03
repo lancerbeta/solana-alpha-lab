@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "PAPER-SHADOW-ACCOUNTING-CONTROL-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-03",
+  "task_id": "PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1",
+  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=none",
+        "EXIT_FILL_ATOMIC_TXN",
+        "DRAIN_CLEARED_RECONCILED_ONLY",
+        "SQLITE_TRUTH_OPS_DERIVED",
+        "UNKNOWN_PRESERVED",
+        "NO_RECONCILED_MUTATION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "START_BOT_PRESERVE_DRAINING_STOPPED",
+        "BOT_STATUS_BEFORE_ENTRIES_PAUSED",
+        "CLOSED_TO_RECONCILED",
+        "RESUME_HAPPY_PATH",
+        "EXECUTION_EVENTS_ASSERTED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_LOSS_STREAK_2",
+        "DOD_MAX_DRAWDOWN_30_37",
+        "DOD_PAUSE_RESUME_CLOSE_ALL",
+        "DOD_UNKNOWN_PNL_PRESERVED",
+        "TERMINAL_PAPER_SHADOW_ACCOUNTING_CONTROL_PASS"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PROVIDER",
+    "NO_NETRETURN",
+    "NO_UI_COCKPIT"
+  ]
+}
