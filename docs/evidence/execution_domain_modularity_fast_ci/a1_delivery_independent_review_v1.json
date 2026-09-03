@@ -4,8 +4,8 @@
   "review_id": "EXECUTION-DOMAIN-MODULARITY-FAST-CI-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-03",
   "task_id": "EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "4f7d7794dbb444d3a71f7e6fdef119d07668899e0064e56007bff6c2e48184d3",
+  "reviewed_inventory_sha256": "98f90e9184183f671ac7d4bcc9000e0c2dd2681536bb77c38041b3343fa8e24d",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

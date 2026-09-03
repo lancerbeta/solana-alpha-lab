@@ -10,7 +10,26 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".github/workflows/ci.yml": "21cc282d19346d03785cdb2c2f51b2f6e55ae73f1f3b943cffb31ed4bb5d57fd",
+    "catalog/assets/core.yaml": "6dae7d14ea6c189d535f39c2025d33d35883d7ba53955d61b54cb2da5895c87d",
+    "configs/ci_test_shards_v1.json": "dfc89fb0d2935ff1c56d51f28ee24be42fd1e631d80a0bb27326358ed3a4db25",
+    "configs/execution_domain_v1.json": "d4141c574e632d7431949efe25aeac80f3de8889f1b1b71f3247e77b8557b4d0",
+    "docs/evidence/execution_domain_modularity_fast_ci/a1_coverage_timing_v1.json": "bf959b85caac34d211301899a6dc46dadcbaab4e030b3a7bdef683f6257e2650",
+    "docs/evidence/execution_domain_modularity_fast_ci/a1_entry_baseline_v1.json": "26426c5699641310b9e09b63049a5a94878d76b8df77c2ff706defe90e4ff160",
+    "docs/reports/execution_domain_modularity_fast_ci/a1_owner_readout_v1.md": "469274b4f4aa46b8cc08f03fca754e566c6a83b71f6f44144f9adc9801ce10cc",
+    "docs/tasks/EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1.md": "2c564f295e47261c567f54d9e4b499b6a72cdfe683ff070b77d40b25382e5721",
+    "scripts/ci_test_partition.py": "bde802e21d587aa315f09f8ca19caf46b3e31d3cd45ff8b93d627aafd45c1165",
+    "scripts/render_ci_workflow.py": "8e600a8d3024cb07e70b1dce3381f41fa1ba1b349eb84e34649efaa3a8ff22f8",
+    "scripts/run_ci_execution_domain.py": "35b6c91538216c876a4c5c7a1a979af0b965871220486f9b8b6ded85b6f99408",
+    "scripts/run_ci_test_shard.py": "f3b3853e91539843d3850bfbf0b200210359a57490775b2ee5fcef4578bf94bd",
+    "scripts/validate_ci.py": "9dd16a03a2da27aa89bb417d89241a00f0ffe8a043501820af522837ad0a7098",
+    "scripts/validate_execution_domain.py": "f647d0fc9d2de00e0378e1c95569dde75ef63c59fbf5e0cb6894491b3bb0e025",
+    "tests/test_ci.py": "30072ac28fbf70dba19170d2a9e42c6ab1de6864cb68af3f887f9725007292b9",
+    "tests/test_ci_test_partition.py": "2c363d568b9cf945ffef3363e5573e78b190bbf01fb712dab8d19ce686db9e5e",
+    "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "6e49ec82a56c31eaa1de15bfb0c04d1e73ecdc2c0d4e8cb31e6298e745d07033",
+    "tests/test_run_ci_test_shard.py": "53935d792a92e2ed65f9e67dc4b3699e53da0b429878e91eded6754e3f00d322"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,34 +40,38 @@
   },
   "factory_fit": {
     "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING_BIND",
+    "sha256": "87a3cec7a15ceec1632daebbd01eb7fec20c8c9345c5c33850a2fb37aa65acc3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_EXECUTION_DOMAIN_AND_CI_SUITE",
     "independent_review": {
       "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING_BIND",
+      "sha256": "88ec14102932bc9275733ad7925b86c2527c02f97488922f1a79fd05c24c25a9",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "EXECUTION_DOMAIN_BOUNDARY_PASS",
-      "EXECUTION_DOMAIN_FAST_TESTS_PASS",
-      "EXACTLY_ONCE_COVERAGE_EQUIVALENCE"
+      "PASS_EXECUTION_DOMAIN_BOUNDARY",
+      "PASS_EXECUTION_DOMAIN_FAST_TESTS",
+      "PASS_EXACTLY_ONCE_COVERAGE_EQUIVALENCE"
     ]
   },
   "non_claims": [
-    "NO_ALPHA_OR_CASHFLOW_CLAIM",
-    "NO_PROVIDER_CREDENTIAL_WALLET_OR_CASH_AUTHORITY",
-    "NO_LIVE_FILL_OR_LIVE_CAPITAL",
+    "NO_ALPHA",
+    "NO_LIVE_AUTHORITY",
     "NO_PATH_BASED_FULL_SUITE_SKIP",
-    "NO_SECOND_REPOSITORY_OR_SERVICE"
+    "NO_SECOND_REPOSITORY",
+    "NO_CANONICAL_DONE"
   ],
   "side_effects": {
-    "provider_calls": 0,
-    "wallet_signer_transaction_actions": 0,
-    "cash_spend_usd": 0
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
   }
 }
