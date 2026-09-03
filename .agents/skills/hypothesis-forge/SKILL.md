@@ -9,7 +9,11 @@ Use **only** when the owner explicitly invokes `/hypothesis-forge`. Do not run F
 from orientation, autonomous delivery, or implicit continuation phrases.
 
 Manual hypothesis synthesis contour for Solana Alpha Lab while
-`MANUAL_FALLBACK_UNTIL_GENERATOR` remains active. Prompt version `HFIC-V1.1`.
+`MANUAL_FALLBACK_UNTIL_GENERATOR` remains active. Prompt version `HFIC-V1.2`
+(new sessions). Historical `HFIC-V1.1` drafts/receipts remain readable.
+V1.2 adds deterministic feature grounding, typed unresolved requirements,
+diagnostics-only `structural_signature_v1_sha256` (not HFIC-CAND identity),
+and read-only `diagnostics --last N` (1..20).
 
 Canonical entrypoint: `scripts/hypothesis_forge.py`.
 Operator-executable prefix:

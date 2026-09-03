@@ -594,6 +594,35 @@ def cmd_backfill(
     return emit(result)
 
 
+def cmd_diagnostics(
+    repo_root: Path,
+    *,
+    last_n: int,
+    explicit_data_root: Path | None,
+) -> int:
+    from solana_alpha_lab.factory.hfic_grounding import (
+        HficGroundingError,
+        aggregate_diagnostics,
+        collect_session_receipts,
+    )
+
+    data_root = _store_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root)
+    try:
+        receipts = collect_session_receipts(store)
+        payload = aggregate_diagnostics(receipts, last_n)
+    except HficGroundingError as exc:
+        raise HficCliError(str(exc)) from exc
+    payload["action"] = "DIAGNOSTICS"
+    payload["authority"] = {
+        "git_mutation": 0,
+        "experiment_execution": 0,
+        "provider_api_rpc_wss_calls": 0,
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="hypothesis_forge")
     parser.add_argument("--root", type=Path, default=ROOT)
@@ -644,6 +673,10 @@ def build_parser() -> argparse.ArgumentParser:
     prior.add_argument("--candidate", default=None)
     prior.add_argument("--query", default=None)
     prior.add_argument("--format", choices=("json",), default="json")
+
+    diagnostics = subparsers.add_parser("diagnostics")
+    diagnostics.add_argument("--last", type=int, required=True)
+    diagnostics.add_argument("--format", choices=("json",), default="json")
 
     backfill = subparsers.add_parser("backfill-legacy")
     backfill.add_argument("--packet", type=Path, required=True)
@@ -756,6 +789,12 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root,
                 candidate_raw=args.candidate,
                 query=args.query,
+                explicit_data_root=args.data_root,
+            )
+        if args.command == "diagnostics":
+            return cmd_diagnostics(
+                repo_root,
+                last_n=int(args.last),
                 explicit_data_root=args.data_root,
             )
         if args.command == "prove-runtime":

@@ -6,7 +6,7 @@ implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
   assets: 1637
   asset_registries: 4
-  schemas: 82
+  schemas: 84
   queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -169,8 +169,10 @@ root_resolver:
   - catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
   - catalog/schemas/provider_route_capability_registry_v10.schema.json
   - catalog/schemas/hypothesis_forge_draft_v1.schema.json
+  - catalog/schemas/hypothesis_forge_draft_v1_2.schema.json
   - catalog/schemas/hypothesis_critic_result_v1.schema.json
   - catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
+  - catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
   - catalog/schemas/hfic_provenance_time_correction_v1.schema.json
   - catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json
   - catalog/schemas/factory_semantic_operability.schema.json

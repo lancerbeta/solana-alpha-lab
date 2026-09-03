@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-MANUAL-GROUNDING-CONTRACT-DIAGNOSTICS-FACTORY-FIT-001",
+  "as_of": "2026-09-03",
+  "task_id": "HFIC_MANUAL_GROUNDING_CONTRACT_DIAGNOSTICS_V1",
+  "reviewed_bindings_sha256": "3672e9f0d38a1e48167a24c3a66c8f534a60f669f011a85710d23af8ae04a6ee",
+  "reviewed_inventory_sha256": "9b8661da78a23790fdd7cb7bb3f0ebcdde9ebfb4fcd550f3ca802f7003b4bcd5",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_V1_2_GROUNDING_CONTRACT_DIAGNOSTICS_WITHOUT_GENERATOR",
+    "flexibility_and_history": "PASS_V1_1_READABLE_AND_HFIC_CAND_IDENTITY_PRESERVED",
+    "context_efficiency": "PASS_ADOPTS_EXISTING_SURFACE_AND_RESEARCH_STORE",
+    "research_truth": "PASS_AVAILABILITY_CLASS_TRUTH_VALUE_STATUS_ONLY_WHEN_PROVEN",
+    "owner_operability": "PASS_DIAGNOSTICS_LAST_N_AND_OWNER_READOUT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_FORGE_REQUIRED",
+    "monitoring_and_recovery": "PASS_REVERT_BRANCH_BYTES",
+    "build_vs_buy": "PASS_ADOPT_WRAP_NO_NEW_PLATFORM",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER",
+    "red_team": "PASS_NO_TRIGGER_PROOF_NO_ARCH_INTENT_006_REOPEN"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "MANUAL_HFIC_V1_2_WHEN_OWNER_INVOKES_FORGE"
+  },
+  "recovery": "REVERT hfic_manual_grounding_contract_diagnostics BRANCH; KEEP V1.1 ARTIFACTS READABLE.",
+  "limits": [
+    "NO_GENERATOR",
+    "NO_RANKER",
+    "NO_ARCH_INTENT_006_REOPEN",
+    "NO_TRIGGER_A_OR_B_PROOF",
+    "NO_PROVIDER",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}
