@@ -1,0 +1,74 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "PAPER-SHADOW-ACCOUNTING-CONTROL-COMPLETION-001",
+  "as_of": "2026-09-03",
+  "task_id": "PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1",
+  "state_change": "PAPER_SHADOW_ACCOUNTING_CONTROL_PASS",
+  "base_main": "2038abf80500b9a52e9f95657c998d0db9af8eab",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f29ee5e92e5676ec1482a9065ddc70c779b6bd475339a3276e4f7e6ccff7b451",
+    "catalog/assets/lifecycle.yaml": "a8f60f50a51aeef444c0be207e6f770e9c4d7acf4d6780626a5d5ac7fd4a3361",
+    "catalog/catalog_manifest.yaml": "4ac3350a41c4237985eb6a6bd6fe0abe2e71da004a25419b1328cf6d32e4f08e",
+    "catalog/generated/asset_edges.json": "5c33e70689e3428ed42b8a9362e1c36e76260f80e7a8b5936a7f39499bf579ea",
+    "docs/PROJECT_MAP.md": "35a996afe6bbbab0b6099c9b633f6acb64377c644c9ef6215d7b35387c49434d",
+    "docs/reports/paper_shadow_accounting_and_control/a1_owner_readout_v1.md": "9f90eb6cd9b7e237cb9674abd16338d0822b1e9790e2992746b7957fcb6d2209",
+    "docs/tasks/PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1.md": "6dd212e1bccfacbae1926ff8e974b4cc9a0c7e9b3f9db95d532825b5e90df76d",
+    "scripts/factory_paper_shadow_operator_smoke.py": "f4678f7ba8511f1ffe9ebf2f839528bb8932d6c810883dc3c73187a0940fbade",
+    "src/solana_alpha_lab/factory/paper_plane.py": "be29616ccf479eeab99e1d68a61e558aeb96adace4e2be86e271dc3a66664d22",
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": "ff59975a337074aee0269a229a6ee64064e762c63069b762f4d5e9f75e737f91",
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": "45aae9120649c1f7c610bc5a8910c459e2d305d5577adb4f3244f70ed2eed46e",
+    "tests/fixtures/paper_shadow_accounting_control/strategy_v1_1_accounting.yaml": "36f811ff4325cdb0b7ed0ff4986de9e6e8fef3a21002be05cb04631d6698f501",
+    "tests/test_paper_shadow_accounting_and_control_v1.py": "3123e9691b49aa441ae8dead2f88b5e839b8a8c156c8b8beb87f1b58755ffad1"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/paper_shadow_accounting_and_control/a1_delivery_factory_fit_v1.json",
+    "sha256": "d13de03ebc3a3a77cab8ca7b12b9a701b6284ab14099d9a30cc3902efda1cb1d",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PAPER_SHADOW_ACCOUNTING_CONTROL_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/paper_shadow_accounting_and_control/a1_delivery_independent_review_v1.json",
+      "sha256": "6eb1c2bbb4013a43f4ece6e212408efd7d6a14ac8cf35211d12b94dfbc87f82b",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_FOCUSED_ACCOUNTING_SUITE",
+      "PASS_OPERATOR_SMOKE",
+      "PASS_ATOM1_BOUNDARY_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PROVIDER",
+    "NO_MICRO_LIVE",
+    "NO_UI_COCKPIT",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

@@ -29599,7 +29599,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 636a6dc0b8a19a86716662f627a32986091b0daa81d2012648a8a4ce235404b8}
+  integrity: {kind: sha256, sha256: be29616ccf479eeab99e1d68a61e558aeb96adace4e2be86e271dc3a66664d22}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -34480,4 +34480,101 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [STRATEGY_EXECUTION_BOUNDARY, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for Decimal PAPER/SHADOW accounting, operator commands and derived operations projection on one SQLite store.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-03'
+  truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1.md', repository_path: docs/tasks/PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1.md}
+  integrity: {kind: sha256, sha256: 6dd212e1bccfacbae1926ff8e974b4cc9a0c7e9b3f9db95d532825b5e90df76d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  - {relation_type: contains, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-FACTORY-PAPER-SHADOW-OPERATOR-SMOKE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PAPER_SHADOW, ACCOUNTING, OPERATOR_COMMANDS, LOSS_STREAK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Derived PAPER/SHADOW operations projection; owns no runtime truth.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-03'
+  truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_operations.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_operations.py}
+  integrity: {kind: sha256, sha256: 45aae9120649c1f7c610bc5a8910c459e2d305d5577adb4f3244f70ed2eed46e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OPERATIONS_PROJECTION, DRAWDOWN, LOSS_STREAK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-PAPER-SHADOW-COMMANDS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Idempotent PAPER/SHADOW operator commands with stale close-all snapshot protection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-03'
+  truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_shadow_commands.py', repository_path: src/solana_alpha_lab/factory/paper_shadow_commands.py}
+  integrity: {kind: sha256, sha256: ff59975a337074aee0269a229a6ee64064e762c63069b762f4d5e9f75e737f91}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OPERATOR_COMMANDS, CLOSE_ALL, DRAINING, IDEMPOTENCY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-FACTORY-PAPER-SHADOW-OPERATOR-SMOKE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network smoke proving accounting fixture, pause/close-all and restart readback.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-03'
+  truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/factory_paper_shadow_operator_smoke.py', repository_path: scripts/factory_paper_shadow_operator_smoke.py}
+  integrity: {kind: sha256, sha256: f4678f7ba8511f1ffe9ebf2f839528bb8932d6c810883dc3c73187a0940fbade}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PAPER_SHADOW, SMOKE, ACCOUNTING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-PAPER-SHADOW-ACCOUNTING-CONTROL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Focused proofs for Decimal PnL, UNKNOWN preservation, commands and smoke terminal.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-03'
+  truth_owner: PAPER_SHADOW_ACCOUNTING_AND_CONTROL_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_accounting_and_control_v1.py', repository_path: tests/test_paper_shadow_accounting_and_control_v1.py}
+  integrity: {kind: sha256, sha256: 3123e9691b49aa441ae8dead2f88b5e839b8a8c156c8b8beb87f1b58755ffad1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PAPER_SHADOW, ACCOUNTING, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
