@@ -20,6 +20,9 @@ OPERATOR_COMMANDS = (
     "REQUEST_CLOSE_ALL",
     "STOP_BOT",
 )
+BOT_SCOPED_COMMANDS = frozenset(
+    {"PAUSE_NEW_ENTRIES", "RESUME_NEW_ENTRIES", "REQUEST_CLOSE_ALL", "STOP_BOT"}
+)
 NAV = (
     ("/", "HOME"),
     ("/research", "RESEARCH"),
@@ -199,7 +202,13 @@ def _operations_section(model: dict[str, Any]) -> str:
         if isinstance(bot, dict)
     ) or "<tr><td colspan=\"6\">NONE</td></tr>"
     snapshot = str(ops.get("open_position_set_sha256") or "")
-    bot_id = str(ops.get("bot") or (bots[0].get("bot_instance_id") if bots else "") or "")
+    bot_id = str(ops.get("bot") or "")
+    bot_warning = ""
+    if len(bots) != 1:
+        bot_id = ""
+        bot_warning = (
+            "<p class=\"error\">Operator commands require exactly one bot instance.</p>"
+        )
     return (
         "<h2>Bots</h2><table><tr><th>bot</th><th>strategy</th><th>mode</th>"
         "<th>status</th><th>entries_paused</th><th>activation_epoch</th></tr>"
@@ -225,6 +234,7 @@ def _operations_section(model: dict[str, Any]) -> str:
         + "<h2>Recent changes</h2>"
         + _recent_changes(list(model.get("recent_changes") or []))
         + "<h2>Operator commands</h2>"
+        + bot_warning
         + "<form method=\"post\" action=\"/operations\" class=\"ops-form\">"
         + f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{html.escape(bot_id)}\">"
         + f"<input type=\"hidden\" name=\"expected_open_position_set_sha256\" value=\"{html.escape(snapshot)}\">"
@@ -392,7 +402,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
 
         def _render(self, surface: str, error: str = "") -> None:
             body = _page(
-                app.read_model(),
+                app.read_model(surface=surface),
                 surface=surface,
                 copy_blocks=owner_copy_blocks(app) if surface == "HOME" else [],
                 error=error,
@@ -455,6 +465,8 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                         or f"WB-{uuid4().hex[:12].upper()}",
                     }
                     bot_id = (fields.get("bot_instance_id") or [""])[0]
+                    if command in BOT_SCOPED_COMMANDS and not bot_id:
+                        raise ApplicationError("BOT_INSTANCE_ID_REQUIRED")
                     if bot_id:
                         payload["bot_instance_id"] = bot_id
                     if command == "REQUEST_CLOSE_POSITION":

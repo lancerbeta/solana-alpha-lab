@@ -165,6 +165,8 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 self.assertIn(">ECONOMICS<", home)
                 operations = _get(app, "/operations")
                 economics = _get(app, "/economics")
+                ops_model = app.read_model(surface="OPERATIONS")
+                self.assertEqual(ops_model["cockpit"]["terminal"], "OWNER_OPERATIONS_COCKPIT_PASS")
                 self.assertIn("Operator commands", operations)
                 self.assertIn("NO_REALIZED_LIVE_PNL", economics)
                 self.assertNotIn(">MARKET<", operations)

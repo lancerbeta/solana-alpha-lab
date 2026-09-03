@@ -106,11 +106,22 @@ class FactoryApplication:
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
 
+    def existing_paper_plane(self) -> PaperPlaneStore | None:
+        if self._paper_plane_store is not None:
+            return self._paper_plane_store
+        path = paper_plane_store_path(self.root)
+        if not path.is_file():
+            return None
+        self._paper_plane_store = PaperPlaneStore(path)
+        return self._paper_plane_store
+
     def paper_plane(self) -> PaperPlaneStore:
-        if self._paper_plane_store is None:
-            path = paper_plane_store_path(self.root)
-            path.parent.mkdir(parents=True, exist_ok=True)
-            self._paper_plane_store = PaperPlaneStore(path)
+        existing = self.existing_paper_plane()
+        if existing is not None:
+            return existing
+        path = paper_plane_store_path(self.root)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._paper_plane_store = PaperPlaneStore(path)
         return self._paper_plane_store
 
     def operations_projection(self) -> dict[str, Any]:
@@ -124,12 +135,16 @@ class FactoryApplication:
             return apply_operator_command(self.paper_plane(), command)
         except PaperPlaneError as exc:
             raise ApplicationError(str(exc)) from exc
+        except KeyError as exc:
+            raise ApplicationError("COMMAND_FIELD_REQUIRED") from exc
 
-    def recent_execution_changes(self, *, limit: int = 12) -> list[dict[str, Any]]:
-        events = self.paper_plane().execution_events()
+    def recent_execution_changes(
+        self, store: PaperPlaneStore, *, limit: int = 12
+    ) -> list[dict[str, Any]]:
+        events = store.execution_events()
         return list(reversed(events[-limit:]))
 
-    def read_model(self) -> dict[str, Any]:
+    def read_model(self, *, surface: str | None = None) -> dict[str, Any]:
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
         model = project_read_model(
             root=self.root,
@@ -165,25 +180,31 @@ class FactoryApplication:
             runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
             pinned_produced_gaps=gaps,
         )
-        operations = self.operations_projection()
-        model["operations"] = operations
-        model["economics"] = build_economics_projection(self.paper_plane(), operations=operations)
-        model["recent_changes"] = self.recent_execution_changes()
-        # Promote operator attention onto HOME without duplicating scientific cards.
-        operator_attention = []
-        for item in operations.get("attention") or []:
-            if not isinstance(item, dict):
-                continue
-            operator_attention.append(
-                {
-                    "id": str(item.get("code") or "OPERATOR"),
-                    "WHY_NOW": item.get("WHY_NOW"),
-                    "IMPACT": item.get("IMPACT"),
-                    "EVIDENCE": item.get("EVIDENCE"),
-                    "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
-                }
+        surface_key = (surface or "").upper()
+        force_paper_plane = surface_key in {"OPERATIONS", "ECONOMICS"}
+        paper_store = self.paper_plane() if force_paper_plane else self.existing_paper_plane()
+        if paper_store is not None:
+            operations = build_operations_projection(paper_store)
+            model["operations"] = operations
+            model["economics"] = build_economics_projection(
+                paper_store, operations=operations
             )
-        cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
+            model["recent_changes"] = self.recent_execution_changes(paper_store)
+            operator_attention = []
+            for item in operations.get("attention") or []:
+                if not isinstance(item, dict):
+                    continue
+                operator_attention.append(
+                    {
+                        "id": str(item.get("code") or "OPERATOR"),
+                        "WHY_NOW": item.get("WHY_NOW"),
+                        "IMPACT": item.get("IMPACT"),
+                        "EVIDENCE": item.get("EVIDENCE"),
+                        "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
+                    }
+                )
+            cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
+            cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
         return model

@@ -25,6 +25,11 @@ from solana_alpha_lab.factory.strategy_runtime import load_strategy_version  # n
 from solana_alpha_lab.factory import workbench as workbench_mod  # noqa: E402
 from solana_alpha_lab.factory.workbench import serve  # noqa: E402
 
+ACCEPTANCE_RELATIVE = (
+    "docs/evidence/factory_v1_commissioning/a2_factory_v1_commissioning_acceptance_v1.json"
+)
+PAPER_STORE_RELATIVE = "local/factory_v1/paper_plane_state.sqlite"
+
 STRAT_REL = "tests/fixtures/paper_shadow_accounting_control/strategy_v1_1_accounting.yaml"
 EPOCH = "ACTIVATION-EPOCH-ACCOUNTING-PAPER-001"
 KNOWN_EPOCHS = {EPOCH: {"mode": "PAPER"}}
@@ -204,6 +209,9 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
                 self.assertIn("LOSS_STREAK", home)
                 self.assertIn("NO_REALIZED_LIVE_PNL", economics)
                 self.assertIn("NO_OWNER_FCF", economics)
+                self.assertIn("NO_LIVE_CAPITAL", economics)
+                self.assertIn("NO_NETRETURN_CLAIM", economics)
+                self.assertIn("Absent live metrics are not shown as $0", economics)
                 self.assertIn("30.37", economics)
                 self.assertIn("Confirm REQUEST_CLOSE_ALL", operations)
 
@@ -283,6 +291,39 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
                 )
                 self.assertTrue(dup.get("idempotent"))
 
+                resume = _post(
+                    app,
+                    "/operations",
+                    {
+                        "command": "RESUME_NEW_ENTRIES",
+                        "bot_instance_id": bot_id,
+                        "idempotency_key": "WB-RESUME-1",
+                    },
+                )
+                self.assertNotIn("ENTRIES_PAUSED", resume)
+                self.assertEqual(int(paper.get_bot(bot_id)["entries_paused"]), 0)
+
+                stop = _post(
+                    app,
+                    "/operations",
+                    {
+                        "command": "STOP_BOT",
+                        "bot_instance_id": bot_id,
+                        "idempotency_key": "WB-STOP-1",
+                    },
+                )
+                self.assertIn("DRAINING", stop)
+
+                missing_bot = _post(
+                    app,
+                    "/operations",
+                    {
+                        "command": "PAUSE_NEW_ENTRIES",
+                        "idempotency_key": "WB-PAUSE-NOBOT",
+                    },
+                )
+                self.assertIn("BOT_INSTANCE_ID_REQUIRED", missing_bot)
+
                 source = inspect.getsource(workbench_mod)
                 self.assertNotIn("sqlite3", source)
                 self.assertNotIn("PaperPlaneStore", source)
@@ -295,11 +336,35 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
             root = isolated_factory_root(Path(tmp) / "src")
             store = OperationalStore((root / "ops.sqlite").resolve())
             app = FactoryApplication(root=root, store=store)
+            paper_path = root / PAPER_STORE_RELATIVE
             try:
                 self.assertIn("QUESTION", _get(app, "/research"))
                 self.assertIn("Runtime", _get(app, "/system"))
+                self.assertFalse(paper_path.is_file())
             finally:
                 store.close()
+
+    def test_position_questions_without_git_archaeology(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            (root / ACCEPTANCE_RELATIVE).unlink()
+            ops = OperationalStore((root / "ops.sqlite").resolve())
+            paper = PaperPlaneStore((root / PAPER_STORE_RELATIVE).resolve())
+            ids = _seed_ops(paper)
+            app = FactoryApplication(root=root, store=ops, paper_plane_store=paper)
+            try:
+                self.assertTrue(app.read_model()["git_archaeology_required"])
+                operations = _get(app, "/operations")
+                economics = _get(app, "/economics")
+                self.assertIn(ids["p4"], operations)
+                self.assertIn(ids["p5"], operations)
+                self.assertIn("UNKNOWN", operations)
+                self.assertIn("NO_REALIZED_LIVE_PNL", economics)
+                ops_model = app.read_model(surface="OPERATIONS")
+                self.assertEqual(ops_model["cockpit"]["terminal"], "OWNER_OPERATIONS_COCKPIT_PASS")
+            finally:
+                paper.close()
+                ops.close()
 
 
 if __name__ == "__main__":
