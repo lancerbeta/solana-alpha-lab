@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-RUNTIME-COMPOSITION-PARITY-FACTORY-FIT-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_REDUCES_COMMISSIONING_LOOP_COST",
+    "flexibility_and_history": "PASS_INCIDENT_PROMOTION_AND_FIXTURE_POLICY",
+    "context_efficiency": "PASS_ONE_SEAM_ONE_SCENARIO_NO_PLATFORM",
+    "research_truth": "PASS_CONSUMES_CAMPAIGN_PREFLIGHT_LAUNCHPAD",
+    "owner_operability": "PASS_ZERO_NETWORK_SMOKE_COMMAND",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_RESTART_SQLITE_REOPEN_PROOF",
+    "build_vs_buy": "PASS_CAPABILITY_RADAR_NONE",
+    "security": "PASS_NO_PROVIDER_NO_SECRETS_NO_FAKE_MODE_SWITCH",
+    "red_team": "PASS_SEAM_BINDING_CONSUMPTION_LOCKED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SECOND_COMPOSITION_INCIDENT_OR_MICRO_LIVE_CONSUMER"
+  },
+  "recovery": "REVERT cursor/observation-runtime-composition-parity-v1; PRODUCTION CLI REGAINS INLINE ASSEMBLY ONLY IF SEAM COMMIT IS REVERTED.",
+  "limits": [
+    "NO_P3_LIVE_COMMISSIONING",
+    "NO_PROVIDER_FOREVER_COMPAT",
+    "NO_OS_SYSTEMD_SUPERVISION",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_MICRO_LIVE",
+    "NO_CANONICAL_DONE"
+  ]
+}

@@ -33116,10 +33116,11 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: c9b6c88d214074f9337bd4694e2eda8699d3c587f3900a8f2aa04b1612999e7b}
+  integrity: {kind: sha256, sha256: 6bc2825432b55be539bb46403342d3fafb23c8c067ee1775587232f460afbe6c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPOSITION-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [OBSERVATION_SCHEDULE, CLI]
@@ -34623,4 +34624,82 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [OWNER_OPERATIONS, COCKPIT, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-OBSERVATION-RUNTIME-COMPOSITION-PARITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for deterministic zero-network P0–P2 ObservationSchedule production-composition parity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-04'
+  truth_owner: OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1.md', repository_path: docs/tasks/OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1.md}
+  integrity: {kind: sha256, sha256: 1c3f935d2a2f23ca27f38daa717d5bb485735cbdeb9a8f75ee98d15b6ae13207}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPOSITION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-OBSERVATION-RUNTIME-COMPOSITION-PARITY-SMOKE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-OBSERVATION-RUNTIME-COMPOSITION-PARITY-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-OBSERVATION-SCHEDULE-CLI-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-RUNTIME-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [OBSERVATION_RUNTIME, COMPOSITION_PARITY, ADVANCING_CLOCK, ZERO_NETWORK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-OBSERVATION-SCHEDULE-COMPOSITION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Narrow tick physical-dependency composition seam; production defaults vs process-local overrides.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-04'
+  truth_owner: OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_composition.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_composition.py}
+  integrity: {kind: sha256, sha256: 2fda340677f7b4e68d9a2b53e579fc78b8f888acceb4e1906297e70348712633}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RUNTIME-COMPOSITION-PARITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-RUNTIME-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [TickPhysicalOverrides, COMPOSITION_SEAM, WallClock]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-OBSERVATION-RUNTIME-COMPOSITION-PARITY-SMOKE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network reusable deterministic composition parity smoke for ObservationSchedule tick.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-04'
+  truth_owner: OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/observation_runtime_composition_parity.py', repository_path: scripts/observation_runtime_composition_parity.py}
+  integrity: {kind: sha256, sha256: aea30d0e3045b9f9a4328a5662241a102c62054a28777c05e03d4555961e5324}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RUNTIME-COMPOSITION-PARITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPOSITION-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-OBSERVATION-SCHEDULE-CLI-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [COMPOSITION_PARITY, SMOKE, ZERO_NETWORK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-OBSERVATION-RUNTIME-COMPOSITION-PARITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Boundary and golden proofs for ObservationSchedule composition parity P0–P2.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-04'
+  truth_owner: OBSERVATION_RUNTIME_COMPOSITION_PARITY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_observation_runtime_composition_parity_v1.py', repository_path: tests/test_observation_runtime_composition_parity_v1.py}
+  integrity: {kind: sha256, sha256: ff0d5a773a87e31f200a58f8f25ea73f67e8a2657098e6a917adc193d4fd476a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RUNTIME-COMPOSITION-PARITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPOSITION-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-OBSERVATION-RUNTIME-COMPOSITION-PARITY-SMOKE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [COMPOSITION_PARITY, TESTS, LAUNCHPAD, PACING]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

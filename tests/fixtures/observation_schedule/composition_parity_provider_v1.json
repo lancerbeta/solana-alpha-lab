@@ -1,0 +1,31 @@
+{
+  "recent": [
+    {
+      "id": "MintParityPump111111111111111111111111111111",
+      "launchpad": "pump.fun",
+      "firstPool": {"createdAt": "2026-09-03T11:55:00Z"}
+    },
+    {
+      "id": "MintParityControl111111111111111111111111111",
+      "launchpad": "met-dbc",
+      "firstPool": {"createdAt": "2026-09-03T11:55:00Z"}
+    },
+    {
+      "id": "MintParityLegacyOnly11111111111111111111111",
+      "firstPool": {
+        "createdAt": "2026-09-03T11:55:00Z",
+        "source": "pump.fun"
+      }
+    }
+  ],
+  "search": [
+    {
+      "id": "MintParityPump111111111111111111111111111111",
+      "launchpad": "pump.fun",
+      "liquidity": "2500",
+      "firstPool": {"createdAt": "2026-09-03T11:55:00Z"}
+    }
+  ],
+  "quote": {"outAmount": "9900000"},
+  "omit": []
+}

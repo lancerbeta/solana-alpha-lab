@@ -34,13 +34,14 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     snapshot_schedule,
     status_schedule,
 )
-from solana_alpha_lab.factory.observation_provider_pacing import (  # noqa: E402
-    WallClock,
+from solana_alpha_lab.factory.observation_schedule_composition import (  # noqa: E402
+    CompositionParityError,
+    TickPhysicalOverrides,
+    materialize_tick_physical_dependencies,
 )
 from solana_alpha_lab.factory.observation_schedule_runtime import (  # noqa: E402
     DEFAULT_RUNTIME_RELATIVE,
     ObservationRuntimeError,
-    build_opener,
     git_sha,
     load_credential_after_activation,
     load_runtime_config,
@@ -106,7 +107,13 @@ def _bind_runtime(args: argparse.Namespace) -> tuple[dict, Path, ObservationSche
     return config, resolved, store
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(
+    argv: list[str] | None = None,
+    *,
+    physical_overrides: TickPhysicalOverrides | None = None,
+) -> int:
+    """Operator entrypoint. physical_overrides is process-local / keyword-only."""
+
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
     for name in (
@@ -170,7 +177,10 @@ def main(argv: list[str] | None = None) -> int:
                 0 if result.schedule_sha256 else 2,
             )
         config, data_root, store = _bind_runtime(args)
-        now = resolve_clock(config)
+        if physical_overrides is not None:
+            now = physical_overrides.now
+        else:
+            now = resolve_clock(config)
         producer = git_sha(ROOT, config.get("producer_git_sha"))
         if args.command == "register":
             if not args.schedule:
@@ -507,13 +517,13 @@ def main(argv: list[str] | None = None) -> int:
                         credential_holder["value"] = load_credential_after_activation(config)
                     return credential_holder["value"]
 
-                if config.get("fake_provider_fixture"):
-                    opener = build_opener(ROOT, config)
-                    credential_loader = _load
-                else:
-                    # The exact authority check above precedes the sole secret read.
-                    opener = build_opener(ROOT, config, credential=_load())
-                    credential_loader = None
+                # Authority precedes credential/transport materialization.
+                physical = materialize_tick_physical_dependencies(
+                    root=ROOT,
+                    config=config,
+                    load_credential=_load,
+                    physical_overrides=physical_overrides,
+                )
                 result = tick_once(
                     root=ROOT,
                     data_root=data_root,
@@ -521,14 +531,10 @@ def main(argv: list[str] | None = None) -> int:
                     schedule=registered["document"],
                     activation_id=activation_id,
                     now=now,
-                    opener=opener,
-                    credential_loader=credential_loader,
+                    opener=physical.opener,
+                    credential_loader=physical.credential_loader,
                     producer_git_sha=producer,
-                    clock=(
-                        WallClock()
-                        if not config.get("fake_provider_fixture")
-                        else None
-                    ),
+                    clock=physical.pacing_clock,
                     fault_after=os.environ.get("OBSERVATION_SCHEDULE_PUBLISH_FAULT")
                     or config.get("publish_fault_after"),
                 )
@@ -562,6 +568,7 @@ def main(argv: list[str] | None = None) -> int:
         ObservationPanelPublisherError,
         PublicationFault,
         PrimitiveRegistryError,
+        CompositionParityError,
     ) as exc:
         return _emit({"terminal": str(exc)}, 2)
     finally:
