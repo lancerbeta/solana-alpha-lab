@@ -4,8 +4,8 @@
   "review_id": "FACTORY-STRATEGY-EXECUTION-BOUNDARY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-03",
   "task_id": "FACTORY_STRATEGY_EXECUTION_BOUNDARY_V1",
-  "reviewed_bindings_sha256": "3be954a43b8432d4611000f1e533e7c2655d8a015dff865aa907d16c5351a3fc",
-  "reviewed_inventory_sha256": "3be954a43b8432d4611000f1e533e7c2655d8a015dff865aa907d16c5351a3fc",
+  "reviewed_bindings_sha256": "a811ffd460591362084040534264f615e270c887a3a9e470c6b111c33faa6852",
+  "reviewed_inventory_sha256": "b8fb84946c81a0f66cf52651e5d06e85627fefa3035b187341e4028986e54afe",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
