@@ -1939,6 +1939,65 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             any("--tracked-only-delivery" in call for call in runner.calls)
         )
 
+    def test_task_context_accepts_exact_head_ci_when_validators_nullified(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            write_validation_profile(
+                root,
+                primary={
+                    "argv": ["project-primary", "{expected_base}"],
+                    "result_owner": "FOCUSED_PLUS_EXACT_PR_CI",
+                    "trusted_paths": ["validator.txt"],
+                },
+                fallback={
+                    "argv": ["project-fallback", "{expected_base}"],
+                    "result_owner": "FULL_EXACT_HEAD",
+                    "trusted_paths": ["validator.txt"],
+                },
+                credential_scan={
+                    "argv": ["project-secret-scan"],
+                    "trusted_paths": ["scanner.txt"],
+                },
+            )
+            calls: list[tuple[str, ...]] = []
+
+            def runner(args: list[str], cwd: Path) -> bytes:
+                calls.append(tuple(args))
+                if args[:5] == ["git", "diff", "--name-only", "--no-renames", "-z"]:
+                    return b"delivery-harness/harness.yaml\0"
+                if args[:2] == ["git", "show"]:
+                    relative = args[2].split(":", 1)[1]
+                    if relative == "validator.txt":
+                        return b"base validator bytes\n"
+                    return (root / relative).read_bytes()
+                git_result = validation_git_read(args, root)
+                if git_result is not None:
+                    return git_result
+                if args[0] == "project-secret-scan":
+                    return b"PASS\n"
+                raise AssertionError(args)
+
+            receipt = context_receipt(self.module)
+            with mock.patch.object(
+                self.module,
+                "task_delivery_scope",
+                return_value=(MAIN, "origin/main", MAIN, ["delivery-harness/**"]),
+            ):
+                checks = self.module.build_delivery_checks(
+                    root,
+                    context_receipt=receipt,
+                    local_head=HEAD,
+                    local_tree=TREE,
+                    ci_pass=True,
+                    runner=runner,
+                )
+            self.assertTrue(checks["required_tests_pass"])
+            self.assertTrue(checks["full_gate_pass"])
+            self.assertTrue(checks["write_set_pass"])
+            self.assertTrue(checks["secret_scan_pass"])
+            self.assertFalse(any(call[0] == "project-primary" for call in calls))
+            self.assertFalse(any(call[0] == "project-fallback" for call in calls))
+
     def test_merge_readiness_reports_write_set_fail_without_phrase(self) -> None:
         def failing_write_set(
             root: Path,

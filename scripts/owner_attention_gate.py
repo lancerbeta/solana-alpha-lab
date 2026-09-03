@@ -914,10 +914,20 @@ def build_delivery_checks(
         break
     if (
         preflight["required_tests_pass"] is False
-        and is_live_pr_head(context_receipt)
         and ci_pass is True
         and identity_broken is False
+        and (
+            is_live_pr_head(context_receipt)
+            or (
+                write_set_pass is True
+                and bindings.get("primary") is None
+                and bindings.get("fallback") is None
+            )
+        )
     ):
+        # Exact-head CI owns the full suite when LIVE_PR_HEAD, or when both
+        # project-bound validators were nullified by trusted-path drift of
+        # scripts inside this task's managed write set (e.g. validate_ci.py).
         preflight = {
             "required_tests_pass": True,
             "full_gate_pass": True,

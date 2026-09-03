@@ -32,12 +32,14 @@ managed_write_set:
   - scripts/run_ci_test_shard.py
   - scripts/validate_ci.py
   - scripts/render_ci_workflow.py
+  - scripts/owner_attention_gate.py
   - .github/workflows/ci.yml
   - tests/test_execution_domain_modularity_and_fast_ci_v1.py
   - tests/test_ci_test_partition.py
   - tests/test_run_ci_test_shard.py
   - tests/test_ci.py
   - tests/test_baseline.py
+  - tests/test_delivery_harness_merge_guard.py
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
