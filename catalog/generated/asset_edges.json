@@ -2743,6 +2743,31 @@
       "target_asset_id": "TEST-FACTORY-SEMANTIC-OPERABILITY-001"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-STRATEGY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-EXIT-DECISION-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-SIGNAL-DECISION-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-V1-1-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001"
@@ -9950,7 +9975,27 @@
     {
       "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
       "relation": "depends_on",
+      "target_asset_id": "MODULE-STRATEGY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXIT-DECISION-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-SIGNAL-DECISION-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
+      "relation": "depends_on",
       "target_asset_id": "SCHEMA-STRATEGY-VERSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-V1-1-001"
     },
     {
       "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
@@ -10236,6 +10281,16 @@
       "source_asset_id": "MODULE-SEMANTIC-PREMISE-REVIEW-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-SEMANTIC-PREMISE-REVIEW-PROFILE-001"
+    },
+    {
+      "source_asset_id": "MODULE-STRATEGY-RUNTIME-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-V1-1-001"
+    },
+    {
+      "source_asset_id": "MODULE-STRATEGY-RUNTIME-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
     },
     {
       "source_asset_id": "MODULE-T06-STORAGE-API-001",
@@ -12123,6 +12178,11 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "SCHEMA-EXIT-DECISION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
+    },
+    {
       "source_asset_id": "SCHEMA-EXPERIMENT-CAPABILITY-DESCRIPTOR-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
@@ -12373,9 +12433,19 @@
       "target_asset_id": "CTRL-SEMANTIC-PREMISE-REVIEW-PROFILE-001"
     },
     {
+      "source_asset_id": "SCHEMA-SIGNAL-DECISION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
+    },
+    {
       "source_asset_id": "SCHEMA-STRATEGY-VERSION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EARLY-STATE-TO-PAPER-VERTICAL-SLICE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-STRATEGY-VERSION-V1-1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
     },
     {
       "source_asset_id": "SCHEMA-T05-CANONICAL-DDL-001",
@@ -14086,6 +14156,21 @@
       "source_asset_id": "TEST-FACTORY-SEMANTIC-OPERABILITY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-SEMANTIC-OPERABILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-STRATEGY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",

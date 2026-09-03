@@ -1,0 +1,16 @@
+{
+  "schema": "smial.exit-decision",
+  "schema_version": "1.0",
+  "exit_decision_id": "EXITDEC-BOUNDARY-EXIT-A",
+  "position_id": "POS-SIG-SIGDEC-BOUNDARY-ENTER-A",
+  "strategy_id": "STRAT-BOUNDARY-CANDIDATE-A",
+  "strategy_version": "V1",
+  "activation_epoch_id": "ACTIVATION-EPOCH-BOUNDARY-PAPER-001",
+  "decision_at": "2026-09-03T12:30:00Z",
+  "first_reliable_available_at": "2026-09-03T12:29:00Z",
+  "action": "EXIT",
+  "reason_code": "EXIT_RULE_FIRED",
+  "evidence_refs": [
+    "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+  ]
+}

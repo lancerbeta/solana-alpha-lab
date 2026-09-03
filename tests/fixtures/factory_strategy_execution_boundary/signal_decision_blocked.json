@@ -1,0 +1,19 @@
+{
+  "schema": "smial.signal-decision",
+  "schema_version": "1.0",
+  "signal_decision_id": "SIGDEC-BOUNDARY-BLOCKED",
+  "strategy_id": "STRAT-BOUNDARY-CANDIDATE-A",
+  "strategy_version": "V1",
+  "activation_epoch_id": "ACTIVATION-EPOCH-BOUNDARY-PAPER-001",
+  "source_hypothesis_refs": [
+    "HYP-BOUNDARY-SYNTH-A"
+  ],
+  "mint": "So11111111111111111111111111111111111111112",
+  "decision_at": "2026-09-03T12:10:00Z",
+  "first_reliable_available_at": "2026-09-03T12:09:00Z",
+  "action": "BLOCKED",
+  "reason_code": "RISK_GATE",
+  "evidence_refs": [
+    "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/strategy_version_v1_1.schema.json",
+  "title": "SMIAL StrategyVersion v1.1 candidate-ready execution contract",
+  "description": "Candidate-ready StrategyVersion without scientific feature enums or threshold syntax. Scientific logic ends at SignalDecision/ExitDecision.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "strategy_id",
+    "strategy_version",
+    "title",
+    "source_decision_asset_id",
+    "source_hypothesis_refs",
+    "population_ref",
+    "signal_input",
+    "exit_input",
+    "notional_policy",
+    "risk_policy",
+    "mode_eligibility",
+    "authority_class",
+    "created_at",
+    "spec_sha256"
+  ],
+  "properties": {
+    "schema": {"const": "smial.strategy-version"},
+    "schema_version": {"const": "1.1"},
+    "strategy_id": {
+      "type": "string",
+      "pattern": "^STRAT-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "strategy_version": {
+      "type": "string",
+      "pattern": "^V[0-9]+$"
+    },
+    "title": {"type": "string", "minLength": 4, "maxLength": 160},
+    "source_decision_asset_id": {
+      "type": "string",
+      "minLength": 6,
+      "maxLength": 120
+    },
+    "source_hypothesis_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 3, "maxLength": 120}
+    },
+    "population_ref": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 120
+    },
+    "signal_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "contract_version", "enter_actions", "max_age_seconds"],
+      "properties": {
+        "contract": {"const": "smial.signal-decision"},
+        "contract_version": {"const": "1.0"},
+        "enter_actions": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"const": "ENTER"}
+        },
+        "max_age_seconds": {"type": "integer", "minimum": 1}
+      }
+    },
+    "exit_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contract", "contract_version"],
+      "properties": {
+        "contract": {"const": "smial.exit-decision"},
+        "contract_version": {"const": "1.0"}
+      }
+    },
+    "notional_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["notional_usd", "fee_bps"],
+      "properties": {
+        "notional_usd": {"type": "number", "exclusiveMinimum": 0},
+        "fee_bps": {"type": "integer", "minimum": 0, "maximum": 10000}
+      }
+    },
+    "risk_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_open_positions"],
+      "properties": {
+        "max_open_positions": {"type": "integer", "minimum": 1}
+      }
+    },
+    "mode_eligibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paper", "shadow", "micro_live"],
+      "properties": {
+        "paper": {"const": true},
+        "shadow": {"type": "boolean"},
+        "micro_live": {"const": false}
+      }
+    },
+    "authority_class": {"const": "PAPER_SHADOW_ONLY"},
+    "created_at": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "spec_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

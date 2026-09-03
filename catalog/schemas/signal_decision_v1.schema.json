@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/signal_decision_v1.schema.json",
+  "title": "SMIAL SignalDecision v1 — frozen enter/no-enter decision for PAPER/SHADOW execution",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "signal_decision_id",
+    "strategy_id",
+    "strategy_version",
+    "activation_epoch_id",
+    "source_hypothesis_refs",
+    "mint",
+    "decision_at",
+    "first_reliable_available_at",
+    "action",
+    "reason_code",
+    "evidence_refs"
+  ],
+  "properties": {
+    "schema": {"const": "smial.signal-decision"},
+    "schema_version": {"const": "1.0"},
+    "signal_decision_id": {
+      "type": "string",
+      "pattern": "^SIGDEC-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "strategy_id": {
+      "type": "string",
+      "pattern": "^STRAT-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "strategy_version": {
+      "type": "string",
+      "pattern": "^V[0-9]+$"
+    },
+    "activation_epoch_id": {
+      "type": "string",
+      "pattern": "^ACTIVATION-EPOCH-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "source_hypothesis_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 3, "maxLength": 120}
+    },
+    "mint": {
+      "type": "string",
+      "minLength": 32,
+      "maxLength": 64,
+      "pattern": "^[1-9A-HJ-NP-Za-km-z]+$"
+    },
+    "decision_at": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "first_reliable_available_at": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "action": {
+      "enum": ["ENTER", "NO_ENTER", "UNKNOWN", "BLOCKED"]
+    },
+    "reason_code": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 80,
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 6, "maxLength": 240}
+    }
+  }
+}

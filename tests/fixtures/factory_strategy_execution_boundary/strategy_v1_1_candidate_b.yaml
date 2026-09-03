@@ -1,0 +1,30 @@
+schema: smial.strategy-version
+schema_version: '1.1'
+strategy_id: STRAT-BOUNDARY-CANDIDATE-B
+strategy_version: V1
+title: Boundary candidate B producer-different
+source_decision_asset_id: DECISION-SYNTHETIC-BOUNDARY-001
+source_hypothesis_refs:
+- HYP-BOUNDARY-SYNTH-B
+population_ref: ICP-SYNTHETIC-BOUNDARY
+signal_input:
+  contract: smial.signal-decision
+  contract_version: '1.0'
+  enter_actions:
+  - ENTER
+  max_age_seconds: 900
+exit_input:
+  contract: smial.exit-decision
+  contract_version: '1.0'
+notional_policy:
+  notional_usd: 100
+  fee_bps: 10
+risk_policy:
+  max_open_positions: 5
+mode_eligibility:
+  paper: true
+  shadow: true
+  micro_live: false
+authority_class: PAPER_SHADOW_ONLY
+created_at: '2026-09-03T12:00:00Z'
+spec_sha256: 194c65ca2b5bb7579c4e59da890183e1f93b417699e0852fae56e2f02b605f06
