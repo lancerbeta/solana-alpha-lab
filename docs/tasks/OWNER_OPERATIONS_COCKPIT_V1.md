@@ -66,7 +66,8 @@ stop_conditions:
 
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: []
+  l2_roles:
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
@@ -79,7 +80,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/owner_operations_cockpit/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/owner_operations_cockpit/a1_delivery_independent_review_v1.json
+      - docs/evidence/owner_operations_cockpit/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

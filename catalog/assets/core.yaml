@@ -34591,7 +34591,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md', repository_path: docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md}
-  integrity: {kind: sha256, sha256: 4aa93c784630fda49e435479132db58f0517a8aa780004472c022709bf3330fd}
+  integrity: {kind: sha256, sha256: 11b68bce82c85388dc914bcabdbfa32c3ab7eb6386dcdf18b5687374c045b097}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}

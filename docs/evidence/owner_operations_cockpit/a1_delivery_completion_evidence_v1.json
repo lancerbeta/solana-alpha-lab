@@ -11,14 +11,15 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "pending_bind",
-    "catalog/assets/lifecycle.yaml": "pending_bind",
-    "catalog/catalog_manifest.yaml": "pending_bind",
-    "catalog/generated/asset_edges.json": "pending_bind",
-    "configs/factory_v1_owner_cockpit_v1.yaml": "90e82a1a23f8b2412d93eb89c3b544782570065ee0a6353a709da4a16ecead38",
+    "catalog/assets/core.yaml": "e9c9e6dfa07468a757ce27e99e3b71a96d7590e0638000b1e3b1af59d6d9ce51",
+    "catalog/assets/lifecycle.yaml": "1d9e35f1ad38ec95ba4cfab7928abc501f0683f66ad9713a8da6c34d11b63ce1",
+    "catalog/catalog_manifest.yaml": "162f2b58adc78331aff29844c2aaa221fd2629bfd6a20e494012187d7925bc4c",
+    "catalog/generated/asset_edges.json": "a6901b16024dffd5cd4b1f75a181bb6eb2fb841466e4e7d2a7783fe119d3d371",
     "catalog/schemas/factory_v1_owner_cockpit.schema.json": "f38e880d8ac318f035da138ba63ff065fce7f3385e8b144cf238e5c327de6fe9",
-    "docs/PROJECT_MAP.md": "pending_bind",
-    "docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md": "4aa93c784630fda49e435479132db58f0517a8aa780004472c022709bf3330fd",
+    "configs/factory_v1_owner_cockpit_v1.yaml": "90e82a1a23f8b2412d93eb89c3b544782570065ee0a6353a709da4a16ecead38",
+    "docs/PROJECT_MAP.md": "fb3926741923ac9856221b49422d5015816d514c5b71321dd798dfc8091df46a",
+    "docs/reports/owner_operations_cockpit/a1_owner_readout_v1.md": "959c47f3c15dbeed7040f93c49bedc2e1f8f551c377be2db8bc1c622926be6cb",
+    "docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md": "11b68bce82c85388dc914bcabdbfa32c3ab7eb6386dcdf18b5687374c045b097",
     "src/solana_alpha_lab/factory/application.py": "4d91c030b3abbf4f6546ad1e043b98dbeb40c5edd8915709dc021cb781736dc8",
     "src/solana_alpha_lab/factory/cockpit.py": "a3991c1dc6e106760f8d9ca96c645239755f7a0940d755684953c0f98f24133b",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "ef2154be4ccbde13f23d80ca66a0650b4ac78ed0c2942ce15657d981097bda23",
@@ -36,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_operations_cockpit/a1_delivery_factory_fit_v1.json",
-    "sha256": "pending_bind",
+    "sha256": "f7204bade6d678d89b75ca6820d0ae11287fc1d2304de3e40e3795f89147054b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_OPERATIONS_COCKPIT_SUITE",
     "independent_review": {
       "path": "docs/evidence/owner_operations_cockpit/a1_delivery_independent_review_v1.json",
-      "sha256": "pending_bind",
+      "sha256": "4e7a750eaaa4fb83b13f33eb954bdb9c10b3f6361f0ec8c94055317ae1eaec1b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
