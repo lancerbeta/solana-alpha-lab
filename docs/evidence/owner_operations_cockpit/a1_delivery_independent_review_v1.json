@@ -4,8 +4,8 @@
   "review_id": "OWNER-OPERATIONS-COCKPIT-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-03",
   "task_id": "OWNER_OPERATIONS_COCKPIT_V1",
-  "reviewed_bindings_sha256": "2ca0787fd5b894b611567691c6676c132910bcb570f012dadaec0579fb7f33f9",
-  "reviewed_inventory_sha256": "e71719d9ab7a61bca35fa3e82f271a0e2eba2fd27db7ad2f71dd50a3afb0a721",
+  "reviewed_bindings_sha256": "ee102e80c1eda581ff7ded5036843bcf44bb377b139dc1f8b685a87031491dbd",
+  "reviewed_inventory_sha256": "72db8e6a5d427d199a1237f1826126805f1c352e31096cc24919e1448c576c7b",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

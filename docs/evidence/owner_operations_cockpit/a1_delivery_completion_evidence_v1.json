@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "e9c9e6dfa07468a757ce27e99e3b71a96d7590e0638000b1e3b1af59d6d9ce51",
+    "catalog/assets/core.yaml": "b258915c0474c4e994aa8d8ff8502a687644306cd2fe5dc78793339b3d0f9b9e",
     "catalog/assets/lifecycle.yaml": "1d9e35f1ad38ec95ba4cfab7928abc501f0683f66ad9713a8da6c34d11b63ce1",
     "catalog/catalog_manifest.yaml": "162f2b58adc78331aff29844c2aaa221fd2629bfd6a20e494012187d7925bc4c",
     "catalog/generated/asset_edges.json": "a6901b16024dffd5cd4b1f75a181bb6eb2fb841466e4e7d2a7783fe119d3d371",
@@ -19,11 +19,12 @@
     "configs/factory_v1_owner_cockpit_v1.yaml": "90e82a1a23f8b2412d93eb89c3b544782570065ee0a6353a709da4a16ecead38",
     "docs/PROJECT_MAP.md": "fb3926741923ac9856221b49422d5015816d514c5b71321dd798dfc8091df46a",
     "docs/reports/owner_operations_cockpit/a1_owner_readout_v1.md": "959c47f3c15dbeed7040f93c49bedc2e1f8f551c377be2db8bc1c622926be6cb",
-    "docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md": "11b68bce82c85388dc914bcabdbfa32c3ab7eb6386dcdf18b5687374c045b097",
+    "docs/tasks/OWNER_OPERATIONS_COCKPIT_V1.md": "4562550db5dbf1bff9e8738be304ef6582f085d7ca781ffdcbcd6e59ed693cbc",
     "src/solana_alpha_lab/factory/application.py": "4d91c030b3abbf4f6546ad1e043b98dbeb40c5edd8915709dc021cb781736dc8",
     "src/solana_alpha_lab/factory/cockpit.py": "a3991c1dc6e106760f8d9ca96c645239755f7a0940d755684953c0f98f24133b",
     "src/solana_alpha_lab/factory/paper_shadow_operations.py": "ef2154be4ccbde13f23d80ca66a0650b4ac78ed0c2942ce15657d981097bda23",
     "src/solana_alpha_lab/factory/workbench.py": "55b4a4f9845573196eb21ccdff641b7be4094bcb7b30e9e2f9a5bb372c44a73b",
+    "tests/test_factory_ordinary_market_hypothesis.py": "c55fc5d7f329350ceb4f632354fb1869fa998496461eb1903e9b34f476069eea",
     "tests/test_factory_v1_owner_cockpit.py": "5e9e21eb3b059bdf4c60bf35e9c967614f2c7b167f447e78306631a654e720bc",
     "tests/test_owner_operations_cockpit_v1.py": "077d2b2e0744d44341f9c8e44cb70a906767e98221b480e9445bd508c8932535"
   },
@@ -37,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_operations_cockpit/a1_delivery_factory_fit_v1.json",
-    "sha256": "db08c491700a7821fc5bf1ed9d9fb1994c81af9e42ceff0c2889d6e1ccfc1a93",
+    "sha256": "36b0e07e5daffba35a94b74d673d8edf3ba40c38c1e6493ecafc7cf08b77ef49",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_OPERATIONS_COCKPIT_SUITE",
     "independent_review": {
       "path": "docs/evidence/owner_operations_cockpit/a1_delivery_independent_review_v1.json",
-      "sha256": "bf16fd6b8ec2cd68cafb2d685e1eacb463d71f39d68cb7897d007b8999b46606",
+      "sha256": "a459d573c89a7b786a746b4734c304b0e22e27245cb350764661f0117d71c5dc",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
