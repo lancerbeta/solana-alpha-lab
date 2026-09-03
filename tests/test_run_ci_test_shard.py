@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import importlib.util
 import io
+import json
 import sys
 import tempfile
 import textwrap
@@ -319,6 +320,60 @@ class RunCiTestShardTests(unittest.TestCase):
                 capture.getvalue().count(runner.STALE_PROFILE_WARNING),
                 1,
             )
+
+    def test_reserved_manifest_excludes_execution_modules_from_general_union(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tests = root / "tests"
+            tests.mkdir()
+            for name in ("test_exec.py", "test_general_a.py", "test_general_b.py"):
+                (tests / name).write_text(
+                    textwrap.dedent(
+                        """\
+                        import unittest
+                        class T(unittest.TestCase):
+                            def test_ok(self):
+                                self.assertTrue(True)
+                        """
+                    ),
+                    encoding="utf-8",
+                )
+            manifest_path = root / "execution_domain.json"
+            manifest_path.write_text(
+                json.dumps(
+                    {
+                        "schema": "smial.execution-domain.v1",
+                        "domain_id": "FACTORY_PAPER_SHADOW_EXECUTION_V1",
+                        "contract_paths": [],
+                        "source_modules": [],
+                        "adapter_consumers": [],
+                        "required_fast_test_modules": ["tests/test_exec.py"],
+                        "test_inventory_policy": "EXACTLY_ONCE_ACROSS_EXECUTION_AND_GENERAL_SHARDS",
+                        "runtime_mode_scope": ["PAPER"],
+                        "live_authority": False,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            plan = partition.plan_shards(
+                {
+                    "tests/test_exec.py": 5.0,
+                    "tests/test_general_a.py": 1.0,
+                    "tests/test_general_b.py": 1.0,
+                },
+                shard_count=1,
+                source_profile_sha256="x",
+            )
+            plan_path = root / "plan.json"
+            partition.write_plan(plan_path, plan)
+            code = runner.run_shard(
+                index=0,
+                count=1,
+                plan_path=plan_path,
+                reserved_manifest_path=manifest_path,
+                root=root,
+            )
+            self.assertEqual(code, 0)
 
 
 if __name__ == "__main__":

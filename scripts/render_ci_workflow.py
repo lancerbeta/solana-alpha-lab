@@ -64,6 +64,32 @@ jobs:
       - name: Validate repository
         run: {ci.CORE_ONLY_COMMAND}
 
+  validate-execution:
+    runs-on: ubuntu-24.04
+    timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}
+    needs:
+      - validate-core
+    env:
+      UV_NO_ENV_FILE: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: {ci.CHECKOUT_PIN} # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install pinned uv and Python
+        uses: {ci.SETUP_UV_PIN} # v8.3.2
+        with:
+          version: "{ci.EXPECTED_UV}"
+          checksum: "{ci.LINUX_UV_CHECKSUM}"
+          python-version: "{".".join(map(str, ci.EXPECTED_PYTHON))}"
+          enable-cache: false
+      - name: Configure local hooks
+        run: git config --local core.hooksPath .githooks
+      - name: Validate repository
+        run: {ci.EXECUTION_DOMAIN_COMMAND}
+
   validate-tests:
     runs-on: ubuntu-24.04
     timeout-minutes: {ci.GITHUB_VALIDATE_TIMEOUT_MINUTES}
@@ -98,11 +124,13 @@ jobs:
     if: ${{{{ always() }}}}
     needs:
       - validate-core
+      - validate-execution
       - validate-tests
     runs-on: ubuntu-24.04
     timeout-minutes: {ci.GITHUB_AGGREGATOR_TIMEOUT_MINUTES}
     env:
       CORE_RESULT: ${{{{ needs.validate-core.result }}}}
+      EXECUTION_RESULT: ${{{{ needs.validate-execution.result }}}}
       TESTS_RESULT: ${{{{ needs.validate-tests.result }}}}
     steps:
       - name: Deny non-success core or shard results
@@ -114,7 +142,7 @@ jobs:
 def main() -> int:
     text = render_workflow()
     path = ROOT / ".github/workflows/ci.yml"
-    path.write_text(text, encoding="utf-8")
+    path.write_text(text, encoding="utf-8", newline="\n")
     ci.validate_workflow_text(text)
     print(f"wrote {path.relative_to(ROOT).as_posix()}")
     return 0

@@ -71,6 +71,28 @@ class CiTestPartitionTests(unittest.TestCase):
             with self.assertRaises(partition.PartitionError):
                 partition.load_plan(path)
 
+    def test_subtract_reserved_modules_removes_exact_declared_modules(self) -> None:
+        modules = {
+            "tests/test_a.py": 10.0,
+            "tests/test_b.py": 20.0,
+            "tests/test_c.py": 30.0,
+        }
+        result = partition.subtract_reserved_modules(
+            modules,
+            ["tests/test_b.py"],
+        )
+        self.assertEqual(
+            result,
+            {"tests/test_a.py": 10.0, "tests/test_c.py": 30.0},
+        )
+
+    def test_subtract_reserved_modules_fails_when_profile_missing_entry(self) -> None:
+        with self.assertRaises(partition.PartitionError):
+            partition.subtract_reserved_modules(
+                {"tests/test_a.py": 1.0},
+                ["tests/test_missing.py"],
+            )
+
     def test_committed_plan_covers_current_inventory_once(self) -> None:
         plan = partition.load_plan(ROOT / "configs/ci_test_shards_v1.json")
         current = sorted(
@@ -80,19 +102,28 @@ class CiTestPartitionTests(unittest.TestCase):
         )
         union, duplicates = partition.union_and_duplicates(plan)
         self.assertEqual(duplicates, set())
-        # Stale plan paths are allowed as warnings; current modules must all map.
+        # With execution reservation, ordinary plan may omit reserved modules.
+        # Current modules must still map exactly once across general selection.
+        reserved = set(
+            __import__("json").loads(
+                (ROOT / "configs/execution_domain_v1.json").read_text(encoding="utf-8")
+            )["required_fast_test_modules"]
+        )
+        current_general = [path for path in current if path not in reserved]
         covered: list[str] = []
         for index in range(plan["shard_count"]):
             covered.extend(
                 partition.select_modules_for_shard(
-                    current,
+                    current_general,
                     plan=plan,
                     index=index,
                     count=plan["shard_count"],
                 )
             )
-        self.assertEqual(sorted(covered), current)
+        self.assertEqual(sorted(covered), current_general)
         self.assertEqual(len(covered), len(set(covered)))
+        self.assertFalse(set(covered) & reserved)
+        self.assertEqual(set(covered) | reserved, set(current))
 
     def test_new_module_absent_from_plan_is_assigned(self) -> None:
         plan = partition.plan_shards(

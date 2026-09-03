@@ -1,0 +1,86 @@
+{
+  "as_of": "2026-09-03",
+  "canonical_case_count": 4149,
+  "canonical_module_count": 362,
+  "canonical_module_inventory_sha256": "BOUND_AT_EXACT_HEAD_CI",
+  "critical_path_seconds": 550,
+  "critical_path_seconds_pre_diagnosis": 652,
+  "diagnosis": {
+    "calibrated_projected_ratio": 1.0,
+    "calibrated_projected_seconds": [
+      438.090548,
+      438.090484,
+      438.090492,
+      438.090476
+    ],
+    "ci_run_id": "33790086715",
+    "critical_path_seconds_post_repair": 550,
+    "exact_head_post_repair": "23d82b33537783fdef25855d7ece904694e3c3cb",
+    "exact_head_pre_repair": "3a1b59f747935e14e37bc09d7705dd316633e48e",
+    "reason": "Windows profile under-weighted HFIC/pathrisk relative to ubuntu-24.04; projected-equal plan yielded CI test elapsed 221/434/471/627 and critical_path 652>630",
+    "repair": "ONE_SHOT_CI_ELAPSED_SCALE_CALIBRATION_THEN_REPLAN"
+  },
+  "duplicate_module_count": 0,
+  "exact_head_ci_run_id": "33797983306",
+  "execution_case_count": 76,
+  "execution_general_overlap_count": 0,
+  "execution_manifest_sha256": "d4141c574e632d7431949efe25aeac80f3de8889f1b1b71f3247e77b8557b4d0",
+  "execution_module_count": 7,
+  "external_authority": {
+    "cash_spend": false,
+    "credentials": false,
+    "deployment": false,
+    "network": false,
+    "wallet_signer_transaction": false
+  },
+  "extra_module_count": 0,
+  "final_validate_job_wall_seconds": 3,
+  "fresh_profile_sha256": "c8e4d5cdad20870d3e0c17c3367603870606f382816421ea4d8c56e2209b151e",
+  "general_loaded_case_count": 4073,
+  "general_module_count": 355,
+  "hard_limit_seconds": 630,
+  "head_sha": "23d82b33537783fdef25855d7ece904694e3c3cb",
+  "headroom_fraction": 0.388889,
+  "local_e2e_terminal": "EXECUTION_DOMAIN_MODULARITY_FAST_CI_LOCAL_PASS",
+  "missing_module_count": 0,
+  "new_test_skip_policy": "NONE",
+  "ordinary_shard_case_counts": "DETERMINED_AT_RUNTIME",
+  "ordinary_shard_count": 4,
+  "ordinary_shard_module_counts": [
+    87,
+    89,
+    89,
+    90
+  ],
+  "ordinary_shard_projected_seconds": [
+    438.090548,
+    438.090484,
+    438.090492,
+    438.090476
+  ],
+  "product_runtime_diff_files": 0,
+  "reference_budget_seconds": 900,
+  "schema": "smial.execution-domain-modularity.coverage-timing.v1",
+  "target_limit_seconds": 600,
+  "validate_core_job_wall_seconds": 61,
+  "validate_execution_job_wall_seconds": 31,
+  "validate_execution_test_elapsed_seconds": 15.523,
+  "validate_tests_elapsed_seconds_by_shard": [
+    381.488,
+    421.702,
+    457.153,
+    443.976
+  ],
+  "validate_tests_elapsed_seconds_by_shard_pre_diagnosis": [
+    220.774,
+    433.969,
+    470.948,
+    626.671
+  ],
+  "validate_tests_job_wall_seconds_by_shard": [
+    399,
+    542,
+    474,
+    461
+  ]
+}

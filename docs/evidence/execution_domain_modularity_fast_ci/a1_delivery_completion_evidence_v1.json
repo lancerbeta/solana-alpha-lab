@@ -1,0 +1,81 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "EXECUTION-DOMAIN-MODULARITY-FAST-CI-DELIVERY-COMPLETION-001",
+  "as_of": "2026-09-03",
+  "task_id": "EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1",
+  "state_change": "EXECUTION_DOMAIN_MODULARITY_FAST_CI_PASS",
+  "base_main": "b442a763e62e8d4ed8dcfebbdf2c67514d4d1d82",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".github/workflows/ci.yml": "21cc282d19346d03785cdb2c2f51b2f6e55ae73f1f3b943cffb31ed4bb5d57fd",
+    "catalog/assets/core.yaml": "20e2cfad012c94847be3df69337a36b1f373f2bb60c1cf330c9215cf4781c3c1",
+    "configs/ci_test_shards_v1.json": "37491cf659ab933b22c74269e65ca7f404c101c74958b00d2ea5c83983fe7008",
+    "configs/execution_domain_v1.json": "d4141c574e632d7431949efe25aeac80f3de8889f1b1b71f3247e77b8557b4d0",
+    "delivery-harness/templates/portable-bundle-manifest.json": "d50379c87ad89db8072a20db78efa3953ab3dc96ea3c2981afb238b4cea054ab",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "719dbda045d6f6091028963fcd956ee1aa609168a935a471f0bf2fc1ce50d8c3",
+    "docs/evidence/execution_domain_modularity_fast_ci/a1_coverage_timing_v1.json": "4044bdc424e93e08d95f5f0a591f8b0fcf617c0501338e4ef88f086002b37531",
+    "docs/evidence/execution_domain_modularity_fast_ci/a1_entry_baseline_v1.json": "26426c5699641310b9e09b63049a5a94878d76b8df77c2ff706defe90e4ff160",
+    "docs/reports/execution_domain_modularity_fast_ci/a1_owner_readout_v1.md": "7a78aa8e1d4788ddcbd90c4606e0868088f9dd9f332d5ca4aaee54d0ee78a20a",
+    "docs/tasks/EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1.md": "a72a52dc0150772c04885d4badb6d7c5864b1e952ae587a1acc5e1bd3c48bb1e",
+    "scripts/ci_test_partition.py": "bde802e21d587aa315f09f8ca19caf46b3e31d3cd45ff8b93d627aafd45c1165",
+    "scripts/owner_attention_gate.py": "4372166adcbecd0ff098c66a9e8f8e7a71516bc61d036fa35313b873807d400b",
+    "scripts/render_ci_workflow.py": "8e600a8d3024cb07e70b1dce3381f41fa1ba1b349eb84e34649efaa3a8ff22f8",
+    "scripts/run_ci_execution_domain.py": "35b6c91538216c876a4c5c7a1a979af0b965871220486f9b8b6ded85b6f99408",
+    "scripts/run_ci_test_shard.py": "a5c7d5b3f715d2efa06d0fe3821e20904b4779bc655a002240e4558972f2d6ab",
+    "scripts/validate_ci.py": "9dd16a03a2da27aa89bb417d89241a00f0ffe8a043501820af522837ad0a7098",
+    "scripts/validate_execution_domain.py": "f647d0fc9d2de00e0378e1c95569dde75ef63c59fbf5e0cb6894491b3bb0e025",
+    "tests/test_ci.py": "614893c33f9d22c0199f4a5f66cb3c979af493414cd7e40e7070c026d4d07df0",
+    "tests/test_ci_test_partition.py": "2c363d568b9cf945ffef3363e5573e78b190bbf01fb712dab8d19ce686db9e5e",
+    "tests/test_delivery_harness_merge_guard.py": "7588baf0fdd87ad88e712e3c6dc9fb0245194e3fa0ce493f0f86311ce1379201",
+    "tests/test_execution_domain_modularity_and_fast_ci_v1.py": "6e49ec82a56c31eaa1de15bfb0c04d1e73ecdc2c0d4e8cb31e6298e745d07033",
+    "tests/test_run_ci_test_shard.py": "53935d792a92e2ed65f9e67dc4b3699e53da0b429878e91eded6754e3f00d322"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_factory_fit_v1.json",
+    "sha256": "4247dd57b6b1676f3b280c56eee2e52916847e93ce5670fe3c261f9695482e97",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_EXECUTION_DOMAIN_AND_CI_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/execution_domain_modularity_fast_ci/a1_delivery_independent_review_v1.json",
+      "sha256": "6023023d570059f931884542c7334ae6ae07e6441219d2311a222a591936b8e5",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_EXECUTION_DOMAIN_BOUNDARY",
+      "PASS_EXECUTION_DOMAIN_FAST_TESTS",
+      "PASS_EXACTLY_ONCE_COVERAGE_EQUIVALENCE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE_AUTHORITY",
+    "NO_PATH_BASED_FULL_SUITE_SKIP",
+    "NO_SECOND_REPOSITORY",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

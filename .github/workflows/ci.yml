@@ -41,6 +41,32 @@ jobs:
       - name: Validate repository
         run: uv run --locked --managed-python python -B scripts/validate_ci.py --core-only
 
+  validate-execution:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    needs:
+      - validate-core
+    env:
+      UV_NO_ENV_FILE: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install pinned uv and Python
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.29"
+          checksum: "04f8b82f5d47f0512dcd32c67a4a6f16a0ea27c81537c338fd0ad6b23cebe829"
+          python-version: "3.13.14"
+          enable-cache: false
+      - name: Configure local hooks
+        run: git config --local core.hooksPath .githooks
+      - name: Validate repository
+        run: uv run --locked --managed-python python -B scripts/run_ci_execution_domain.py --manifest configs/execution_domain_v1.json
+
   validate-tests:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -72,17 +98,19 @@ jobs:
       - name: Configure local hooks
         run: git config --local core.hooksPath .githooks
       - name: Validate repository
-        run: uv run --locked --managed-python python -B scripts/run_ci_test_shard.py --index ${{ matrix.shard }} --count 4 --plan configs/ci_test_shards_v1.json
+        run: uv run --locked --managed-python python -B scripts/run_ci_test_shard.py --index ${{ matrix.shard }} --count 4 --plan configs/ci_test_shards_v1.json --reserved-manifest configs/execution_domain_v1.json
 
   validate:
     if: ${{ always() }}
     needs:
       - validate-core
+      - validate-execution
       - validate-tests
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     env:
       CORE_RESULT: ${{ needs.validate-core.result }}
+      EXECUTION_RESULT: ${{ needs.validate-execution.result }}
       TESTS_RESULT: ${{ needs.validate-tests.result }}
     steps:
       - name: Deny non-success core or shard results
@@ -93,6 +121,7 @@ jobs:
 
           required = {
               "validate-core": os.environ.get("CORE_RESULT", ""),
+              "validate-execution": os.environ.get("EXECUTION_RESULT", ""),
               "validate-tests": os.environ.get("TESTS_RESULT", ""),
           }
           failed = {name: value for name, value in required.items() if value != "success"}

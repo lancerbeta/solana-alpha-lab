@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "EXECUTION-DOMAIN-MODULARITY-FAST-CI-FACTORY-FIT-001",
+  "as_of": "2026-09-03",
+  "task_id": "EXECUTION_DOMAIN_MODULARITY_AND_FAST_CI_V1",
+  "reviewed_bindings_sha256": "adcbc03a8879dd35f8b681014b1d1c849ae5328cbe16ababea7f7ca803b5ad94",
+  "reviewed_inventory_sha256": "9a5b07c8a50a52ff8e099575f90702a1b605202638f5bc496433591b1f0bcf06",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "PATH_AWARE_CI_ROUTING_IF_RUNNER_MINUTES_MATERIAL; PHYSICAL_EXTRACTION_IF_DEPLOY_OR_TCB_REQUIRES"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_AUTHORITY",
+    "NO_PATH_BASED_FULL_SUITE_SKIP",
+    "NO_ALPHA",
+    "NO_SECOND_REPOSITORY"
+  ]
+}

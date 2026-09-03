@@ -1,0 +1,60 @@
+{
+  "schema": "smial.execution-domain-modularity.entry-baseline.v1",
+  "as_of": "2026-09-03",
+  "reviewed_pack_anchor": "b442a763e62e8d4ed8dcfebbdf2c67514d4d1d82",
+  "live_base_sha": "b442a763e62e8d4ed8dcfebbdf2c67514d4d1d82",
+  "active_time_gate_result": "NO_DUE_GATE",
+  "control_plane_freeze_result": "EXHAUSTED",
+  "control_plane_freeze_evidence": {
+    "incremental_harness_sync_merge": "11c9e81c20fe0e55a33c27a62ad83f88c03fa819",
+    "substantive_product_research_merges_after_sync": [
+      {"pr": 249, "title": "forge-discovery-trigger-b-measurement-v1"},
+      {"pr": 250, "title": "hfic-manual-grounding-contract-diagnostics-v1"},
+      {"pr": 251, "title": "factory-strategy-execution-boundary-v1"},
+      {"pr": 252, "title": "paper-shadow-accounting-and-control-v1"},
+      {"pr": 253, "title": "owner-operations-cockpit-v1"}
+    ],
+    "required_count": 5,
+    "observed_count": 5
+  },
+  "A1_terminal_binding": "FACTORY_STRATEGY_EXECUTION_BOUNDARY_PASS",
+  "A2_terminal_binding": "PAPER_SHADOW_ACCOUNTING_CONTROL_PASS",
+  "A3_terminal_binding": "OWNER_OPERATIONS_COCKPIT_PASS",
+  "workflow_sha256": "fdbf9cd5ac9a09c24caab2eb79fa6392d45ae9650db31fd6e08c838342467e7f",
+  "shard_plan_sha256": "ff14b948fd73ab0eb5c15ab2a6b62e99cfe605c570a985fb62f45509422000a3",
+  "anti_drift_capability_binding": "CI_SHARD_REBALANCE_AND_ANTI_DRIFT_V1",
+  "current_execution_import_edges": {
+    "src/solana_alpha_lab/factory/strategy_runtime.py": [],
+    "src/solana_alpha_lab/factory/paper_plane.py": [
+      "solana_alpha_lab.factory.strategy_runtime"
+    ],
+    "src/solana_alpha_lab/factory/paper_shadow_operations.py": [
+      "solana_alpha_lab.factory.paper_plane"
+    ],
+    "src/solana_alpha_lab/factory/paper_shadow_commands.py": [
+      "solana_alpha_lab.factory.paper_plane",
+      "solana_alpha_lab.factory.paper_shadow_operations"
+    ]
+  },
+  "current_fast_module_membership_in_general_plan": {
+    "tests/test_factory_strategy_execution_boundary_v1.py": false,
+    "tests/test_paper_shadow_accounting_and_control_v1.py": false,
+    "tests/test_owner_operations_cockpit_v1.py": false
+  },
+  "focused_execution_test_seconds": 15.7687431,
+  "baseline_exact_head_run_id": 33770183725,
+  "baseline_job_wall_seconds": {
+    "validate-core": 68,
+    "validate-tests_max_shard": 617,
+    "validate": 4
+  },
+  "baseline_critical_path_seconds": 565,
+  "external_authority": {
+    "network": false,
+    "credentials": false,
+    "deployment": false,
+    "wallet_signer_transaction": false,
+    "cash_spend": false
+  },
+  "entry_verdict": "START_AS_WRITTEN"
+}

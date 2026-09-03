@@ -6,6 +6,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from collections.abc import Collection, Mapping
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -204,6 +205,7 @@ def write_plan(path: Path, plan: dict[str, Any]) -> None:
     path.write_text(
         json.dumps(plan, indent=2, ensure_ascii=False, sort_keys=True) + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
 
@@ -216,3 +218,61 @@ def modules_from_profile(profile: dict[str, Any]) -> dict[str, float]:
         path = posix(row["path"])
         out[path] = float(row["seconds"])
     return out
+
+
+def subtract_reserved_modules(
+    module_seconds: Mapping[str, float],
+    reserved_modules: Collection[str],
+) -> dict[str, float]:
+    normalized = {posix(path): float(seconds) for path, seconds in module_seconds.items()}
+    reserved = {posix(path) for path in reserved_modules}
+    missing = sorted(reserved - set(normalized))
+    if missing:
+        raise PartitionError(
+            "RESERVED_MODULE_MISSING_FROM_PROFILE:" + ",".join(missing[:20])
+        )
+    return {
+        path: seconds
+        for path, seconds in normalized.items()
+        if path not in reserved
+    }
+
+
+def main(argv: list[str] | None = None) -> int:
+    import argparse
+    import hashlib
+    import json
+    import sys
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile", required=True, type=Path)
+    parser.add_argument("--reserved-manifest", required=True, type=Path)
+    parser.add_argument("--shard-count", required=True, type=int)
+    parser.add_argument("--output", required=True, type=Path)
+    args = parser.parse_args(argv)
+    try:
+        profile_bytes = args.profile.read_bytes()
+        profile = json.loads(profile_bytes.decode("utf-8"))
+        manifest = json.loads(args.reserved_manifest.read_text(encoding="utf-8"))
+        reserved = manifest.get("required_fast_test_modules") or []
+        general_modules = subtract_reserved_modules(
+            modules_from_profile(profile),
+            reserved,
+        )
+        if not general_modules:
+            raise PartitionError("GENERAL_MODULE_INVENTORY_EMPTY")
+        plan = plan_shards(
+            general_modules,
+            shard_count=args.shard_count,
+            source_profile_sha256=hashlib.sha256(profile_bytes).hexdigest(),
+        )
+        write_plan(args.output, plan)
+    except (PartitionError, json.JSONDecodeError) as exc:
+        print(f"PARTITION_ERROR: {exc}", file=sys.stderr)
+        return 2
+    print(f"wrote {args.output.as_posix()}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
