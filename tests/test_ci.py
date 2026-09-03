@@ -604,6 +604,7 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
                 "CATALOG_RESOLUTION",
                 "GENERATED_NAVIGATION",
                 "PRE_GIT_IMPORT_VALIDATION",
+                "EXECUTION_DOMAIN_BOUNDARY",
                 "TASK04_ARCHITECTURE",
                 "PRE_COMMIT_HOOK",
             },
@@ -613,6 +614,10 @@ class CiOwnedDeliveryPilotTests(unittest.TestCase):
         )
         self.assertNotIn("scripts/validate_baseline.py", flattened)
         self.assertIn("--focused", commands["BATON_VALIDATION"])
+        self.assertIn(
+            "scripts/validate_execution_domain.py",
+            commands["EXECUTION_DOMAIN_BOUNDARY"],
+        )
 
     def test_focused_child_execution_is_forced_offline(self) -> None:
         observed: dict[str, str] = {}

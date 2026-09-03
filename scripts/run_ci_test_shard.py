@@ -100,6 +100,46 @@ def load_reserved_modules(manifest_path: Path, *, root: Path) -> set[str]:
     return set(reserved_list)
 
 
+def discover_case_count(*, root: Path, current: list[str]) -> int:
+    """Canonical case count for root/tests.
+
+    Prefer unittest discover (CI equivalence). Fall back to loading the
+    current module inventory when TemporaryDirectory fixtures leave
+    ``tests`` unimportable or polluted in sys.modules.
+    """
+    tests_root = (root / "tests").resolve()
+    allowed_files = {(tests_root / Path(path).name).resolve() for path in current}
+    for name in list(sys.modules):
+        module = sys.modules.get(name)
+        file_name = getattr(module, "__file__", None) if module is not None else None
+        if name == "tests" or name.startswith("tests."):
+            if not file_name:
+                sys.modules.pop(name, None)
+                continue
+            try:
+                Path(file_name).resolve().relative_to(tests_root)
+            except (ValueError, OSError):
+                sys.modules.pop(name, None)
+            continue
+        if name.startswith("test_") and file_name:
+            try:
+                resolved = Path(file_name).resolve()
+            except OSError:
+                sys.modules.pop(name, None)
+                continue
+            if resolved not in allowed_files:
+                sys.modules.pop(name, None)
+    try:
+        return profiler.count_cases(
+            unittest.defaultTestLoader.discover(
+                str(root / "tests"),
+                pattern="test_*.py",
+            )
+        )
+    except ImportError:
+        return profiler.count_cases(load_suite_for_paths(current, root=root))
+
+
 def run_shard(
     *,
     index: int,
@@ -115,9 +155,7 @@ def run_shard(
         for path in profiler.discover_module_paths(root / "tests")
     ]
     full_hash = inventory_hash(current)
-    canonical_count = profiler.count_cases(
-        unittest.defaultTestLoader.discover(str(root / "tests"), pattern="test_*.py")
-    )
+    canonical_count = discover_case_count(root=root, current=current)
     reserved: set[str] = set()
     if reserved_manifest_path is not None:
         reserved = load_reserved_modules(reserved_manifest_path, root=root)
