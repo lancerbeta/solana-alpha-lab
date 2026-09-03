@@ -1,18 +1,18 @@
 schema: smial.factory-v1-owner-cockpit
 schema_version: '1.0'
 contract_id: FACTORY-V1-OWNER-COCKPIT-001
-atom_id: FACTORY_V1_OWNER_COCKPIT_LITE_V1
-as_of: '2026-08-19'
+atom_id: OWNER_OPERATIONS_COCKPIT_V1
+as_of: '2026-09-03'
 mode: DIRECT_CURSOR_DELIVERY
 implementation: WORKBENCH_WRAP_NO_NEW_UI_PACKAGE
 visible_nav:
   - HOME
   - RESEARCH
+  - OPERATIONS
+  - ECONOMICS
   - SYSTEM
 hidden_nav:
   - MARKET
-  - OPERATIONS
-  - ECONOMICS
 packet_fields:
   - QUESTION
   - ESTIMAND
