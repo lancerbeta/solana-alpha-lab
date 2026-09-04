@@ -11,7 +11,13 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "placeholder": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "82beec99976446909da68105e72fe54a445cb7f49f08757a69d62796c9d1952b",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "6ebeec941036dc575c2380065d7db1761deb42e2a80876306933c639178b8761",
+    "docs/reports/observation_raw_capture_publication_operability_closure_v1/a1_owner_readout_v1.md": "d43a40fe1b9d4ce9d94d48d4171eaa0b1bb8d80268d2b656b9216b53e521a73a",
+    "docs/tasks/OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1.md": "1989e9d3522ef43548bfedda393208e5b88dba33d4dcfa14e4cdc32ddc6296f6",
+    "scripts/observation_publication_jobs.py": "a59daccc960bf048e78cffcdb504102eb44718eb976bb2fcb005d1a8a9703297",
+    "src/solana_alpha_lab/factory/observation_publication_jobs.py": "06b8e0671399f7d6cf10c6167cb2cd44c4cb020d25f9d12d913884b531ffad07",
+    "tests/test_observation_publication_job_lifecycle_v1.py": "c6961417c67c8693f4d7f74cc85f059813cb81e8904ec5e58bf83afdac528e4b"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +29,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_raw_capture_publication_operability_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "e65d30aef6af144a8f44ea6ad5b85cf804b705e6307853a0f31eb3d53c669762",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PUBLICATION_JOB_LIFECYCLE_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_raw_capture_publication_operability_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "6c57610598ec32b5acd5eef93fa45c471addf5f49758cff74c111e8b6356588d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
