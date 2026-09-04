@@ -351,6 +351,22 @@ class ObservationPublicationJobLifecycleTests(unittest.TestCase):
                 code = module.main(["apply", "--data-root", str(data_root)])
             self.assertEqual(code, 2)
             self.assertEqual(json.loads(buf.getvalue())["terminal"], "APPLY_REQUIRES_FLAG")
+            buf = io.StringIO()
+            with patch.object(sys, "stdout", buf):
+                code = module.main(
+                    [
+                        "apply",
+                        "--data-root",
+                        str(data_root),
+                        "--ops-store",
+                        str(Path(tmp) / "missing.sqlite"),
+                        "--i-understand-apply",
+                    ]
+                )
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                json.loads(buf.getvalue())["terminal"], "COLLECTOR_STORE_MISSING"
+            )
             store_path = Path(tmp) / "ops.sqlite"
             store = ObservationScheduleStore(store_path)
             store.upsert_activation(

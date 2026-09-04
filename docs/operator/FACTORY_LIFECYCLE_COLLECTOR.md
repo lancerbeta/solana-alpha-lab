@@ -249,6 +249,8 @@ systemctl status factory-observation-schedule.timer --no-pager -n 20
 
 Require: exact deployed SHA; `PAUSED_OPERATOR`; timer/service not running a worker; lease clear/expired; SQLite `ok`; backup/offhost status recorded; disk/resource baseline from doctor/packet.
 
+`observation_schedule.py doctor` while `PAUSED_OPERATOR` is expected to print `DOCTOR_PAUSED` and exit 2. That is the READY signal for this gate, not a reason to resume.
+
 ### B. Migration (collector remains PAUSED)
 
 ```
@@ -259,13 +261,20 @@ Require: exact deployed SHA; `PAUSED_OPERATOR`; timer/service not running a work
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py dry-run --runtime-config configs/observation_schedule_runtime_v1.yaml
 ```
 
-Require `classified_ambiguous=0`. Then APPLY (same filesystem, no provider calls, no RDP rewrite, no STARTED cleanup, no `legacy_full` deletion):
+Require `classified_ambiguous=0`. If `classified_ambiguous>0`: stay `PAUSED_OPERATOR`, do not APPLY, keep evidence, open a new atom. Then APPLY (same filesystem, no provider calls, no RDP rewrite, no STARTED cleanup, no `legacy_full` deletion):
 
 ```
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py apply --runtime-config configs/observation_schedule_runtime_v1.yaml --i-understand-apply
 ```
 
-Prove: Parquet/manifests/RDP inventory unchanged; `legacy_full` bytes preserved; `publication_jobs_open_count` bounded to genuine incomplete jobs.
+Prove scientific Parquet/manifests/RDP inventory excluding the journal (compare before vs after APPLY):
+
+```
+/usr/bin/uv run --locked --managed-python python -B -c "from pathlib import Path, hashlib; root=Path('local/factory_v1/observation_rdp'); jobs=root/'datasets'/'publication_jobs'; parts=[];
+[parts.append(f'{p.relative_to(root).as_posix()}:{hashlib.sha256(p.read_bytes()).hexdigest()}') for p in sorted(root.rglob('*')) if p.is_file() and 'publication_jobs' not in p.parts]; print(hashlib.sha256('\n'.join(parts).encode()).hexdigest())"
+```
+
+Prove `legacy_full` bytes preserved and `publication_jobs_open_count` bounded to genuine incomplete jobs via `status`.
 
 ### C. One manual production tick
 

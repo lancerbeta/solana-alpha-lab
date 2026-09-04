@@ -21,6 +21,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E402
     AMBIGUOUS_BLOCKS_APPLY,
     COLLECTOR_NOT_PAUSED,
+    COLLECTOR_STORE_MISSING,
     PublicationJobError,
     apply_migration,
     collector_blocks_apply,
@@ -87,24 +88,32 @@ def main(argv: list[str] | None = None) -> int:
             },
             2,
         )
-    if store_path.is_file():
-        store = ObservationScheduleStore(store_path)
-        try:
-            activations = store.list_activations()
-        finally:
-            store.close()
-        if collector_blocks_apply(activations):
-            return _emit(
-                {
-                    "terminal": COLLECTOR_NOT_PAUSED,
-                    "provider_calls": 0,
-                    "scientific_writes": 0,
-                    "activation_states": [
-                        str(item.get("state") or "") for item in activations
-                    ],
-                },
-                2,
-            )
+    if not store_path.is_file():
+        return _emit(
+            {
+                "terminal": COLLECTOR_STORE_MISSING,
+                "provider_calls": 0,
+                "scientific_writes": 0,
+            },
+            2,
+        )
+    store = ObservationScheduleStore(store_path)
+    try:
+        activations = store.list_activations()
+    finally:
+        store.close()
+    if collector_blocks_apply(activations):
+        return _emit(
+            {
+                "terminal": COLLECTOR_NOT_PAUSED,
+                "provider_calls": 0,
+                "scientific_writes": 0,
+                "activation_states": [
+                    str(item.get("state") or "") for item in activations
+                ],
+            },
+            2,
+        )
     try:
         report = apply_migration(data_root)
     except PublicationJobError as exc:

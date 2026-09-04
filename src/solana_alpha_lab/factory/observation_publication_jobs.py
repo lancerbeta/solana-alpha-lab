@@ -28,6 +28,7 @@ CLASS_AMBIGUOUS = "AMBIGUOUS"
 HOT_PATH_FORBIDDEN = "PUBLICATION_HOT_PATH_READ_FORBIDDEN"
 AMBIGUOUS_BLOCKS_APPLY = "PUBLICATION_JOB_MIGRATION_AMBIGUOUS"
 COLLECTOR_NOT_PAUSED = "COLLECTOR_NOT_PAUSED"
+COLLECTOR_STORE_MISSING = "COLLECTOR_STORE_MISSING"
 APPLY_ACTIVE_STATES = frozenset({"ACTIVE", "DRAINING"})
 COMPACT_FORBIDDEN_KEYS = frozenset(
     {"observations", "normalized_observations", "members"}
@@ -406,12 +407,21 @@ def apply_migration(data_root: Path) -> dict[str, Any]:
         payload = json.loads(raw.decode("utf-8"))
         label = classify_legacy_payload(payload, data_root=data_root)
         content = str(payload["content_sha256"])
+        if label == CLASS_AMBIGUOUS:
+            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
         if label == CLASS_OPEN:
             destination = open_job_path(data_root, content)
             destination.parent.mkdir(parents=True, exist_ok=True)
-            os.replace(path, destination)
+            if destination.is_file():
+                if destination.read_bytes() != raw:
+                    raise PublicationJobError("OPEN_JOB_CONFLICT")
+                path.unlink()
+            else:
+                os.replace(path, destination)
             moved_open += 1
             continue
+        if label != CLASS_PROVEN_COMPLETED:
+            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
         receipt = compact_receipt_from_job(
             payload,
             completed_at=parse_utc(str(payload.get("created_at")))
@@ -494,6 +504,7 @@ __all__ = [
     "CLASS_OPEN",
     "CLASS_PROVEN_COMPLETED",
     "COLLECTOR_NOT_PAUSED",
+    "COLLECTOR_STORE_MISSING",
     "COMPACT_FORBIDDEN_KEYS",
     "HOT_PATH_FORBIDDEN",
     "PublicationJobError",
