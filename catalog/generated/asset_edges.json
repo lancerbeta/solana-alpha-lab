@@ -2688,6 +2688,26 @@
       "target_asset_id": "TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-FACTORY-97D-STORAGE-ARCHITECTURE-PRD-SSD-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-FACTORY-97D-LIVE-FORENSICS-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -4763,6 +4783,11 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
     },
     {
+      "source_asset_id": "DOC-FACTORY-97D-STORAGE-ARCHITECTURE-PRD-SSD-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
+    },
+    {
       "source_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-REMOTE-HOST-001"
@@ -5236,6 +5261,11 @@
       "source_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-97D-LIVE-FORENSICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
@@ -14401,6 +14431,16 @@
       "source_asset_id": "TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-97D-STORAGE-FORMAT-BENCHMARK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",

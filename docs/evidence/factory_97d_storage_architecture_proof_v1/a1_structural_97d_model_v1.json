@@ -1,0 +1,34 @@
+{
+  "schema": "smial.factory-97d-structural-model",
+  "schema_version": "1.0",
+  "as_of": "2026-09-04",
+  "hot_window_days": 90,
+  "archive_cadence_days": 7,
+  "capacity_horizon_days": 97,
+  "target_bytes": 42949672960,
+  "hard_bytes": 53687091200,
+  "formulas": {
+    "PRIMARY_HOT_97D": "97 * (S_day + R_day + M_day) * A_layout",
+    "SAME_VOLUME_BACKUP_97D": "PRIMARY_HOT_97D * (B_same_vol - 1)",
+    "STAGING_PEAK": "P_stage",
+    "TOTAL_97D": "PRIMARY_HOT_97D + SAME_VOLUME_BACKUP_97D + STAGING_PEAK"
+  },
+  "inputs": {
+    "S_day": {"status": "UNKNOWN", "blocker": "publication age span not measured in this atom"},
+    "R_day": {"status": "UNKNOWN", "note": "14:17Z protected sqlite payload 59198098 bytes is not a day-rate"},
+    "M_day": {"status": "UNKNOWN"},
+    "A_layout": {"status": "UNKNOWN_LIVE", "local_ci": "zstd_3_and_7_smaller_than_uncompressed_on_schema_faithful_corpus"},
+    "B_same_vol": {"current_topology": 2.0, "selected_architecture": 1.0, "note": "2.0 if ZIP_STORED full RDP remains on same volume"},
+    "P_stage": {"status": "UNKNOWN", "note": "closed daily unit plus zip; must be counted"}
+  },
+  "contractual_not_measured": {
+    "raw_bytes_per_utc_day_max": 1073741824,
+    "raw_97d_if_cap_saturated_bytes": 104152956928,
+    "note": "Do not call this a measured run-rate. It already exceeds HARD 50 GiB."
+  },
+  "typical_total_97d_bytes": null,
+  "conservative_measured_stress_97d_bytes": null,
+  "pass_target_40_gib": null,
+  "pass_hard_50_gib": null,
+  "terminal_gate": "STORAGE_ARCHITECTURE_BLOCKED"
+}

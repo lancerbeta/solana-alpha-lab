@@ -1,0 +1,44 @@
+{
+  "schema": "smial.factory-97d-live-forensics",
+  "schema_version": "1.0",
+  "as_of": "2026-09-04",
+  "atom_id": "FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1",
+  "read_only": true,
+  "retention_apply": false,
+  "drive_writes": 0,
+  "credential_values_read": false,
+  "this_atom_live_probe": {
+    "started_at": "2026-09-04T16:48:51Z",
+    "status": "HOST_UNREACHABLE",
+    "failure": "SSH banner timeout and ICMP 100% loss after read-only Path.rglob of /opt for BACKUP_*.zip",
+    "factory_data_mutated": false,
+    "secrets_read": false,
+    "drive_calls": 0,
+    "limitation": "publication age span, parquet distribution, sqlite duplicate sha256, and backup-sink st_dev were not re-measured"
+  },
+  "predecessor_successful_readback": {
+    "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_storage_baseline_v1.json",
+    "observed_at": "2026-09-04T14:17:55Z",
+    "deploy_sha": "af1ad23ac4a97d4f63108abd8446ad3dc6b1960c",
+    "filesystem_size_bytes": 103079215104,
+    "filesystem_used_bytes": 16192004096,
+    "filesystem_free_bytes": 86679314432,
+    "sqlite_observation_schedule_bytes": 167993344,
+    "scientific_rdp_bytes_excluding_publication_jobs": 612857483,
+    "publication_jobs_completed_count": 456,
+    "publication_jobs_completed_bytes": 479870,
+    "local_backup_sink_bytes": 11114155120,
+    "local_backup_sink_note": "pre-reclaim leftover; not steady-state",
+    "offhost_payload_bytes_rolling_30d": 22139072972,
+    "collector_storage_history": "HISTORY_ABSENT",
+    "protected_call_payload_bytes": 59198098,
+    "protected_calls": 2353,
+    "eligible_call_compactions": 0,
+    "backup_sink_other_volume_proven": false
+  },
+  "disk_policy": {
+    "early_warning_pct": 70,
+    "warning_pct": 80,
+    "critical_pct": 85
+  }
+}

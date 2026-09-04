@@ -1,0 +1,26 @@
+{
+  "schema": "smial.factory-97d-format-benchmark",
+  "schema_version": "1.0",
+  "as_of": "2026-09-04",
+  "live_corpus_benchmark": {
+    "status": "NOT_RUN",
+    "reason": "VPS unreachable after read-only /opt walk; no live parquet/raw sample copied"
+  },
+  "local_ci_corpus": {
+    "test": "tests/test_factory_97d_storage_format_benchmark_v1.py",
+    "semantic_equality_codecs": [
+      "current_unspecified",
+      "uncompressed",
+      "zstd_1",
+      "zstd_3",
+      "zstd_7",
+      "snappy"
+    ],
+    "zstd_3_smaller_than_uncompressed": true,
+    "zstd_7_smaller_than_uncompressed": true,
+    "batch_concat_preserves_first_reliable_available_at": true,
+    "canonical_raw_parquet_extract_equals_canonical_json_bytes": true,
+    "response_sha256_dedup_reconstructs_occurrence_bodies": true
+  },
+  "pyarrow_current_publisher_note": "observation_panel_publisher calls pq.write_table without explicit compression; pyarrow 25 default is snappy. research_store writes compression=NONE. Do not label live observation files uncompressed without footer readback."
+}
