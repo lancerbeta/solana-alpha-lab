@@ -134,6 +134,18 @@
           "uniqueItems": true,
           "items": {"type": "string", "minLength": 8}
         },
+        "mutable_only_source_relative_paths": {
+          "type": "array",
+          "minItems": 3,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 8}
+        },
+        "mutable_only_recursive_relative_paths": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 8}
+        },
         "same_parent_forbidden": {"const": true},
         "local_full_schedule": {"const": "12h"},
         "local_verified_bundle_retention": {"const": 1},

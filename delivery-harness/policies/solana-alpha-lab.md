@@ -89,6 +89,18 @@ changes estimand, falsifier, or execution truth → incremental bytes and cost �
 retention class. No named material consumer means no broader high-resolution
 capture.
 
+For any new material capture consumer, the planning chain is:
+
+incremental compressed bytes/day → incremental 97d resident bytes → total
+projected same-volume Factory footprint → retention class.
+
+Same-volume mutable backup and staging count. Current owner thresholds remain
+`TARGET <= 40 GiB` and `HARD <= 50 GiB`. Do not automatically reduce sampling
+to satisfy disk. If future projected footprint exceeds HARD: `ACTION_REQUIRED`
+and an explicit science-owner decision. Machine-readable runway lives in
+`src/solana_alpha_lab/factory/hot90_storage_admission.py`; Telegram alerting
+is a later atom.
+
 Estimand is `NetReturn` after PIT data, executable buy/sell route, latency,
 fees, retries, exit and notional. Separate `Touch | Fillable | RealizedVWAP |
 Net | PathRisk`. Trigger is not order, fill or profit.
