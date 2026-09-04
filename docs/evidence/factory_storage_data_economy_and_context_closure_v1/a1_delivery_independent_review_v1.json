@@ -5,7 +5,7 @@
   "as_of": "2026-09-04",
   "task_id": "FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1",
   "reviewed_bindings_sha256": "57544d59592840fdc0f53f70dc4754d24a18b988fa688d58fdba9f178b38b9e7",
-  "reviewed_inventory_sha256": "fa667b111e9999576a8329c50d86b717bba2630205e4fb517dc1dac0a0de43ca",
+  "reviewed_inventory_sha256": "47fe029a861ad0d73b747f9d949757664bbc097039ed4fd2509beed0b1f27121",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

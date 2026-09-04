@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "6429856c86c099340291a15e638c0db434d5c6aac7cf92f354ba48a3f52ca4f0",
+    "sha256": "98340f0a08455777bd1ed6ed5a598bf57833c7b940bc495b82dbd47f77e79ca8",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_STORAGE_DATA_ECONOMY_SEMANTIC_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "2426b606bc98c948f7f7fc8a2429093f85057837e9830b123ef3e1627e2b0be0",
+      "sha256": "112991243a38c994064eac801c2f7f56f27c8834d65d8790158d95ca1acee2d4",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
