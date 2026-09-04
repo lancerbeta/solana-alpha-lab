@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -27,8 +28,28 @@ CLASS_PROVEN_COMPLETED = "PROVEN_COMPLETED"
 CLASS_AMBIGUOUS = "AMBIGUOUS"
 HOT_PATH_FORBIDDEN = "PUBLICATION_HOT_PATH_READ_FORBIDDEN"
 AMBIGUOUS_BLOCKS_APPLY = "PUBLICATION_JOB_MIGRATION_AMBIGUOUS"
+OPEN_JOB_CONFLICT = "OPEN_JOB_CONFLICT"
+COMPLETED_RECEIPT_CONFLICT = "COMPLETED_RECEIPT_CONFLICT"
+LEGACY_FULL_BYTE_MISMATCH = "LEGACY_FULL_BYTE_MISMATCH"
+COMPACT_RECEIPT_UNCONSTRUCTABLE = "COMPACT_RECEIPT_UNCONSTRUCTABLE"
+CONTENT_SHA256_INVALID = "CONTENT_SHA256_INVALID"
 COLLECTOR_NOT_PAUSED = "COLLECTOR_NOT_PAUSED"
 COLLECTOR_STORE_MISSING = "COLLECTOR_STORE_MISSING"
+CONTENT_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+UNAVAILABLE_FILESYSTEM_TRUTH = "UNAVAILABLE_FILESYSTEM_TRUTH"
+UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET = "UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET"
+COMPACT_IDENTITY_KEYS = (
+    "content_sha256",
+    "schedule_sha256",
+    "activation_id",
+    "utc_day",
+    "dataset_version",
+    "dataset_manifest_id",
+    "parquet_rel",
+    "member_rel",
+    "file_sha256",
+    "member_sha256",
+)
 APPLY_ACTIVE_STATES = frozenset({"ACTIVE", "DRAINING"})
 COMPACT_FORBIDDEN_KEYS = frozenset(
     {"observations", "normalized_observations", "members"}
@@ -189,29 +210,70 @@ def compact_receipt_from_job(
     completed_at: datetime,
     dataset_fingerprint: str | None = None,
 ) -> dict[str, Any]:
-    receipt = {
-        "content_sha256": str(job["content_sha256"]),
-        "schedule_sha256": str(job["schedule_sha256"]),
-        "activation_id": str(job["activation_id"]),
-        "stage": STAGE_COMPLETE,
-        "utc_day": str(job["utc_day"]),
-        "dataset_version": str(job["dataset_version"]),
-        "dataset_manifest_id": str(job["dataset_manifest_id"]),
-        "created_at": str(job["created_at"]),
-        "completed_at": render_utc(completed_at.astimezone(UTC)),
-        "parquet_rel": str(job["parquet_rel"]),
-        "member_rel": str(job["member_rel"]),
-        "file_sha256": str(job["file_sha256"]),
-        "member_sha256": str(job["member_sha256"]),
-        "observation_count": int(job.get("observation_count") or 0),
-        "member_count": int(job.get("member_count") or 0),
-        "dataset_fingerprint": str(
-            dataset_fingerprint or job.get("dataset_fingerprint") or job["content_sha256"]
-        ),
-    }
+    try:
+        content = str(job["content_sha256"])
+        receipt = {
+            "content_sha256": content,
+            "schedule_sha256": str(job["schedule_sha256"]),
+            "activation_id": str(job["activation_id"]),
+            "stage": STAGE_COMPLETE,
+            "utc_day": str(job["utc_day"]),
+            "dataset_version": str(job["dataset_version"]),
+            "dataset_manifest_id": str(job["dataset_manifest_id"]),
+            "created_at": str(job["created_at"]),
+            "completed_at": render_utc(completed_at.astimezone(UTC)),
+            "parquet_rel": str(job["parquet_rel"]),
+            "member_rel": str(job["member_rel"]),
+            "file_sha256": str(job["file_sha256"]),
+            "member_sha256": str(job["member_sha256"]),
+            "observation_count": int(job.get("observation_count") or 0),
+            "member_count": int(job.get("member_count") or 0),
+            "dataset_fingerprint": str(
+                dataset_fingerprint or job.get("dataset_fingerprint") or content
+            ),
+        }
+    except (KeyError, TypeError, ValueError):
+        raise PublicationJobError(COMPACT_RECEIPT_UNCONSTRUCTABLE) from None
+    if any(not str(receipt.get(key) or "") for key in COMPACT_IDENTITY_KEYS):
+        raise PublicationJobError(COMPACT_RECEIPT_UNCONSTRUCTABLE)
     if any(key in receipt for key in COMPACT_FORBIDDEN_KEYS):
         raise PublicationJobError("COMPACT_RECEIPT_CONTAINS_PAYLOAD")
+    if not is_compact_receipt(receipt):
+        raise PublicationJobError(COMPACT_RECEIPT_UNCONSTRUCTABLE)
     return receipt
+
+
+def _same_publication_identity(left: Mapping[str, Any], right: Mapping[str, Any]) -> bool:
+    return all(str(left.get(key) or "") == str(right.get(key) or "") for key in COMPACT_IDENTITY_KEYS)
+
+
+def _planned_compact_receipt(payload: Mapping[str, Any], content: str) -> dict[str, Any]:
+    created = payload.get("created_at")
+    try:
+        completed_at = (
+            parse_utc(str(payload.get("completed_at") or created))
+            if (payload.get("completed_at") or created)
+            else datetime.now(UTC)
+        )
+    except (TypeError, ValueError):
+        raise PublicationJobError(COMPACT_RECEIPT_UNCONSTRUCTABLE) from None
+    receipt = compact_receipt_from_job(
+        payload,
+        completed_at=completed_at,
+        dataset_fingerprint=str(payload.get("dataset_fingerprint") or content),
+    )
+    if payload.get("completed_at"):
+        receipt["completed_at"] = str(payload["completed_at"])
+    if not is_compact_receipt(receipt):
+        raise PublicationJobError(COMPACT_RECEIPT_UNCONSTRUCTABLE)
+    return receipt
+
+
+def _content_sha256(payload: Mapping[str, Any]) -> str:
+    content = str(payload.get("content_sha256") or "")
+    if CONTENT_SHA256_RE.fullmatch(content) is None:
+        raise PublicationJobError(CONTENT_SHA256_INVALID)
+    return content
 
 
 def publication_artifacts_proven(
@@ -394,54 +456,106 @@ def dry_run_migration(data_root: Path) -> dict[str, Any]:
     return stats
 
 
-def apply_migration(data_root: Path) -> dict[str, Any]:
-    """Move unmigrated flat jobs. Fail closed on any AMBIGUOUS. No RDP rewrite."""
+def plan_migration(data_root: Path) -> list[dict[str, Any]]:
+    """Inspect every unmigrated source. Fail before the caller mutates anything."""
 
-    report = dry_run_migration(data_root)
-    if int(report["classified_ambiguous"]) > 0:
-        raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
-    moved_open = 0
-    moved_completed = 0
+    plan: list[dict[str, Any]] = []
     for path in _iter_unmigrated_paths(data_root):
-        raw = path.read_bytes()
-        payload = json.loads(raw.decode("utf-8"))
+        try:
+            raw = path.read_bytes()
+            payload = json.loads(raw.decode("utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
+        if not isinstance(payload, dict):
+            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
+        content = _content_sha256(payload)
         label = classify_legacy_payload(payload, data_root=data_root)
-        content = str(payload["content_sha256"])
         if label == CLASS_AMBIGUOUS:
             raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
         if label == CLASS_OPEN:
             destination = open_job_path(data_root, content)
+            if destination.is_file() and destination.read_bytes() != raw:
+                raise PublicationJobError(OPEN_JOB_CONFLICT)
+            plan.append(
+                {
+                    "source": path,
+                    "raw": raw,
+                    "content": content,
+                    "label": CLASS_OPEN,
+                    "receipt": None,
+                }
+            )
+            continue
+        if label != CLASS_PROVEN_COMPLETED:
+            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
+        receipt = _planned_compact_receipt(payload, content)
+        completed = completed_job_path(data_root, content)
+        if completed.is_file():
+            try:
+                existing = json.loads(completed.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+            if not isinstance(existing, dict) or not is_compact_receipt(existing):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+            if not _same_publication_identity(existing, receipt):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+        legacy = legacy_full_path(data_root, content)
+        if legacy.is_file() and legacy.read_bytes() != raw:
+            raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
+        plan.append(
+            {
+                "source": path,
+                "raw": raw,
+                "content": content,
+                "label": CLASS_PROVEN_COMPLETED,
+                "receipt": receipt,
+            }
+        )
+    return plan
+
+
+def apply_migration(data_root: Path) -> dict[str, Any]:
+    """Move unmigrated flat jobs after a complete preflight. No RDP rewrite."""
+
+    plan = plan_migration(data_root)
+    report = dry_run_migration(data_root)
+    moved_open = 0
+    moved_completed = 0
+    for item in plan:
+        path = item["source"]
+        raw = item["raw"]
+        content = item["content"]
+        if item["label"] == CLASS_OPEN:
+            destination = open_job_path(data_root, content)
             destination.parent.mkdir(parents=True, exist_ok=True)
             if destination.is_file():
                 if destination.read_bytes() != raw:
-                    raise PublicationJobError("OPEN_JOB_CONFLICT")
+                    raise PublicationJobError(OPEN_JOB_CONFLICT)
                 path.unlink()
             else:
                 os.replace(path, destination)
             moved_open += 1
             continue
-        if label != CLASS_PROVEN_COMPLETED:
-            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
-        receipt = compact_receipt_from_job(
-            payload,
-            completed_at=parse_utc(str(payload.get("created_at")))
-            if payload.get("created_at")
-            else datetime.now(UTC),
-            dataset_fingerprint=str(payload.get("dataset_fingerprint") or content),
-        )
-        if payload.get("completed_at"):
-            receipt["completed_at"] = str(payload["completed_at"])
-        _atomic_write_json(completed_job_path(data_root, content), receipt)
+        receipt = item["receipt"]
+        completed = completed_job_path(data_root, content)
+        if completed.is_file():
+            existing = json.loads(completed.read_text(encoding="utf-8"))
+            if not isinstance(existing, dict) or not is_compact_receipt(existing):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+            if not _same_publication_identity(existing, receipt):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+        else:
+            _atomic_write_json(completed, receipt)
         legacy = legacy_full_path(data_root, content)
         legacy.parent.mkdir(parents=True, exist_ok=True)
         if legacy.is_file():
             if legacy.read_bytes() != raw:
-                raise PublicationJobError("LEGACY_FULL_BYTE_MISMATCH")
-            path.unlink()
+                raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
+            path.unlink(missing_ok=True)
         else:
             os.replace(path, legacy)
             if legacy.read_bytes() != raw:
-                raise PublicationJobError("LEGACY_FULL_BYTE_MISMATCH")
+                raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
         moved_completed += 1
     report["moved_open"] = moved_open
     report["moved_completed"] = moved_completed
@@ -450,12 +564,20 @@ def apply_migration(data_root: Path) -> dict[str, Any]:
     return report
 
 
+def _measured_int(value: Any, *, allow_zero: bool) -> int | None:
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    if allow_zero:
+        return value if value >= 0 else None
+    return value if value > 0 else None
+
+
 def project_7d_disk_used(
     *,
-    disk_total_bytes: int,
-    disk_used_bytes: int,
-    sqlite_bytes: int,
-    rdp_science_bytes: int,
+    disk_total_bytes: int | None,
+    disk_used_bytes: int | None,
+    sqlite_bytes: int | None,
+    rdp_science_bytes: int | None,
     job_open_bytes: int,
     job_completed_bytes: int,
     job_legacy_bytes: int,
@@ -463,36 +585,59 @@ def project_7d_disk_used(
     declared_raw_bytes_per_day: int | None,
     history_data_growth_24h_bytes: int | None,
 ) -> dict[str, Any]:
-    """Conservative 7-day used-pct using declared budgets when history is thin."""
+    """Conservative 7-day used-pct. UNKNOWN inputs cannot manufacture a PASS."""
 
-    live = sqlite_bytes + rdp_science_bytes + job_open_bytes + job_completed_bytes
-    daily_declared = declared_raw_bytes_per_day
-    daily_history = history_data_growth_24h_bytes
-    if isinstance(daily_history, int) and daily_history > 0:
+    del elapsed_campaign_days
+    sqlite = _measured_int(sqlite_bytes, allow_zero=True)
+    science = _measured_int(rdp_science_bytes, allow_zero=True)
+    live = (
+        sqlite + science + int(job_open_bytes) + int(job_completed_bytes)
+        if sqlite is not None and science is not None
+        else None
+    )
+    total = _measured_int(disk_total_bytes, allow_zero=False)
+    used = _measured_int(disk_used_bytes, allow_zero=True)
+    daily_history = _measured_int(history_data_growth_24h_bytes, allow_zero=False)
+    daily_declared = _measured_int(declared_raw_bytes_per_day, allow_zero=False)
+    if daily_history is not None:
         daily = daily_history
         basis = "STORAGE_HISTORY_24H"
-    elif isinstance(daily_declared, int) and daily_declared > 0:
+    elif daily_declared is not None:
         daily = daily_declared
         basis = "DECLARED_RAW_BYTES_PER_DAY"
     else:
-        days = elapsed_campaign_days if elapsed_campaign_days and elapsed_campaign_days > 1 else 1.0
-        daily = int(live / days)
-        basis = "CURRENT_STOCK_OVER_ELAPSED_DAYS"
-    extra_7d = int(daily) * 7
-    extra_with_backup = extra_7d * 2
-    projected_used = disk_used_bytes + extra_with_backup
-    projected_pct = (100.0 * projected_used / disk_total_bytes) if disk_total_bytes else None
-    pass_70 = projected_pct is not None and projected_pct < DISK_WARNING_EARLY_PCT
+        return {
+            "projection_basis": UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET,
+            "live_bytes": live,
+            "legacy_full_bytes": job_legacy_bytes,
+            "projected_7d_additional_bytes": None,
+            "projected_7d_disk_used_bytes": None,
+            "projected_7d_disk_used_pct": None,
+            "projected_7d_disk_used_pass_70": False,
+            "early_warning_pct": DISK_WARNING_EARLY_PCT,
+        }
+    if total is None or used is None:
+        return {
+            "projection_basis": UNAVAILABLE_FILESYSTEM_TRUTH,
+            "live_bytes": live,
+            "legacy_full_bytes": job_legacy_bytes,
+            "projected_7d_additional_bytes": int(daily) * 7 * 2,
+            "projected_7d_disk_used_bytes": None,
+            "projected_7d_disk_used_pct": None,
+            "projected_7d_disk_used_pass_70": False,
+            "early_warning_pct": DISK_WARNING_EARLY_PCT,
+        }
+    extra_with_backup = int(daily) * 7 * 2
+    projected_used = used + extra_with_backup
+    projected_pct = 100.0 * projected_used / total
     return {
         "projection_basis": basis,
         "live_bytes": live,
         "legacy_full_bytes": job_legacy_bytes,
         "projected_7d_additional_bytes": extra_with_backup,
         "projected_7d_disk_used_bytes": projected_used,
-        "projected_7d_disk_used_pct": None
-        if projected_pct is None
-        else round(projected_pct, 4),
-        "projected_7d_disk_used_pass_70": pass_70,
+        "projected_7d_disk_used_pct": round(projected_pct, 4),
+        "projected_7d_disk_used_pass_70": projected_pct < DISK_WARNING_EARLY_PCT,
         "early_warning_pct": DISK_WARNING_EARLY_PCT,
     }
 
@@ -506,10 +651,17 @@ __all__ = [
     "COLLECTOR_NOT_PAUSED",
     "COLLECTOR_STORE_MISSING",
     "COMPACT_FORBIDDEN_KEYS",
+    "COMPACT_RECEIPT_UNCONSTRUCTABLE",
+    "COMPLETED_RECEIPT_CONFLICT",
+    "CONTENT_SHA256_INVALID",
     "HOT_PATH_FORBIDDEN",
+    "LEGACY_FULL_BYTE_MISMATCH",
+    "OPEN_JOB_CONFLICT",
     "PublicationJobError",
     "STAGE_COMPLETE",
     "STAGE_MARKER",
+    "UNAVAILABLE_FILESYSTEM_TRUTH",
+    "UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET",
     "apply_migration",
     "assert_routine_hot_path",
     "collector_blocks_apply",
@@ -523,6 +675,7 @@ __all__ = [
     "legacy_full_dir",
     "load_job_by_content",
     "open_dir",
+    "plan_migration",
     "project_7d_disk_used",
     "publication_artifacts_proven",
     "rdp_bytes_excluding_publication_jobs",

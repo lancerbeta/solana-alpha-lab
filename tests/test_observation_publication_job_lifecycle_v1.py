@@ -32,17 +32,25 @@ from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
 from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E402
     AMBIGUOUS_BLOCKS_APPLY,
     COLLECTOR_NOT_PAUSED,
+    COMPACT_RECEIPT_UNCONSTRUCTABLE,
+    COMPLETED_RECEIPT_CONFLICT,
     HOT_PATH_FORBIDDEN,
+    LEGACY_FULL_BYTE_MISMATCH,
     PublicationJobError,
+    UNAVAILABLE_FILESYSTEM_TRUTH,
+    UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET,
     apply_migration,
     collector_blocks_apply,
+    compact_receipt_from_job,
     completed_job_path,
     dry_run_migration,
     is_compact_receipt,
     journal_stats,
     jobs_root,
+    legacy_full_path,
     load_job_by_content,
     open_dir,
+    open_job_path,
     project_7d_disk_used,
 )
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
@@ -103,6 +111,33 @@ def _publish(data_root: Path, schedule: dict, entity: str, **kwargs):
         observations=_observations(schedule, entity),
         **kwargs,
     )
+
+
+def _flatten_jobs(data_root: Path) -> None:
+    root = jobs_root(data_root)
+    for path in list(open_dir(data_root).glob("*.json")):
+        os.replace(path, root / path.name)
+
+
+def _alien_receipt(content: str) -> dict:
+    return {
+        "content_sha256": content,
+        "schedule_sha256": "e" * 64,
+        "activation_id": "ACT-ALIEN",
+        "stage": "COMPLETE",
+        "utc_day": "2020-01-01",
+        "dataset_version": "v-alien",
+        "dataset_manifest_id": "dataset-alien",
+        "created_at": "2020-01-01T00:00:00Z",
+        "completed_at": "2020-01-01T00:00:00Z",
+        "parquet_rel": "datasets/parquet/alien.parquet",
+        "member_rel": "datasets/members/alien.json",
+        "file_sha256": "a" * 64,
+        "member_sha256": "b" * 64,
+        "observation_count": 0,
+        "member_count": 0,
+        "dataset_fingerprint": content,
+    }
 
 
 def _forbid_historical_job_reads():
@@ -431,6 +466,178 @@ class ObservationPublicationJobLifecycleTests(unittest.TestCase):
             self.assertEqual(applied["moved_open"], 1)
             self.assertFalse(applied["legacy_full_deleted"])
 
+    def test_preflight_malformed_proven_moves_nothing(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintOpen", fault_after="AFTER_ARTIFACTS")
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
+            _flatten_jobs(data_root)
+            root = jobs_root(data_root)
+            before = {path.name: path.read_bytes() for path in root.glob("*.json")}
+            for path in root.glob("*.json"):
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                if payload.get("stage") == "MARKER":
+                    payload.pop("utc_day", None)
+                    payload.pop("file_sha256", None)
+                    path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+            with self.assertRaises(PublicationJobError) as raised:
+                apply_migration(data_root)
+            self.assertEqual(str(raised.exception), COMPACT_RECEIPT_UNCONSTRUCTABLE)
+            after = {path.name: path.read_bytes() for path in root.glob("*.json")}
+            self.assertEqual(set(after), set(before))
+            self.assertEqual(list(open_dir(data_root).glob("*.json")), [])
+            self.assertEqual(journal_stats(data_root)["publication_jobs_legacy_full_count"], 0)
+
+    def test_preflight_incompatible_completed_moves_nothing(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
+            _flatten_jobs(data_root)
+            source = next(jobs_root(data_root).glob("*.json"))
+            payload = json.loads(source.read_text(encoding="utf-8"))
+            content = payload["content_sha256"]
+            dest = completed_job_path(data_root, content)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(json.dumps(_alien_receipt(content), sort_keys=True), encoding="utf-8")
+            source_bytes = source.read_bytes()
+            with self.assertRaises(PublicationJobError) as raised:
+                apply_migration(data_root)
+            self.assertEqual(str(raised.exception), COMPLETED_RECEIPT_CONFLICT)
+            self.assertTrue(source.is_file())
+            self.assertEqual(source.read_bytes(), source_bytes)
+            self.assertEqual(
+                json.loads(dest.read_text(encoding="utf-8"))["dataset_manifest_id"],
+                "dataset-alien",
+            )
+
+    def test_preflight_incompatible_legacy_full_moves_nothing(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
+            _flatten_jobs(data_root)
+            source = next(jobs_root(data_root).glob("*.json"))
+            payload = json.loads(source.read_text(encoding="utf-8"))
+            content = payload["content_sha256"]
+            source_bytes = source.read_bytes()
+            legacy = legacy_full_path(data_root, content)
+            legacy.parent.mkdir(parents=True, exist_ok=True)
+            legacy.write_bytes(b"NOT-THE-SOURCE")
+            with self.assertRaises(PublicationJobError) as raised:
+                apply_migration(data_root)
+            self.assertEqual(str(raised.exception), LEGACY_FULL_BYTE_MISMATCH)
+            self.assertTrue(source.is_file())
+            self.assertEqual(source.read_bytes(), source_bytes)
+            self.assertEqual(legacy.read_bytes(), b"NOT-THE-SOURCE")
+
+    def test_identical_preexisting_destinations_are_idempotent(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintOpen", fault_after="AFTER_ARTIFACTS")
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
+            _flatten_jobs(data_root)
+            root = jobs_root(data_root)
+            open_path = None
+            proven_path = None
+            for path in root.glob("*.json"):
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                if payload.get("stage") == "MARKER":
+                    proven_path = path
+                else:
+                    open_path = path
+            assert open_path is not None and proven_path is not None
+            open_raw = open_path.read_bytes()
+            proven_raw = proven_path.read_bytes()
+            open_payload = json.loads(open_raw.decode("utf-8"))
+            proven_payload = json.loads(proven_raw.decode("utf-8"))
+            dest_open = open_job_path(data_root, open_payload["content_sha256"])
+            dest_open.parent.mkdir(parents=True, exist_ok=True)
+            dest_open.write_bytes(open_raw)
+            receipt = compact_receipt_from_job(
+                proven_payload,
+                completed_at=NOW,
+                dataset_fingerprint=proven_payload["content_sha256"],
+            )
+            dest_completed = completed_job_path(data_root, proven_payload["content_sha256"])
+            dest_completed.parent.mkdir(parents=True, exist_ok=True)
+            dest_completed.write_text(json.dumps(receipt, sort_keys=True), encoding="utf-8")
+            dest_legacy = legacy_full_path(data_root, proven_payload["content_sha256"])
+            dest_legacy.parent.mkdir(parents=True, exist_ok=True)
+            dest_legacy.write_bytes(proven_raw)
+            first = apply_migration(data_root)
+            self.assertEqual(first["moved_open"], 1)
+            self.assertEqual(first["moved_completed"], 1)
+            self.assertFalse(open_path.is_file())
+            self.assertFalse(proven_path.is_file())
+            self.assertEqual(dest_open.read_bytes(), open_raw)
+            self.assertEqual(dest_legacy.read_bytes(), proven_raw)
+            self.assertTrue(is_compact_receipt(json.loads(dest_completed.read_text(encoding="utf-8"))))
+            second = apply_migration(data_root)
+            self.assertEqual(second["moved_open"], 0)
+            self.assertEqual(second["moved_completed"], 0)
+
+    def test_prefix_applied_state_converges_on_rerun(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintOpen", fault_after="AFTER_ARTIFACTS")
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
+            _flatten_jobs(data_root)
+            root = jobs_root(data_root)
+            open_path = None
+            proven_path = None
+            for path in root.glob("*.json"):
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                if payload.get("stage") == "MARKER":
+                    proven_path = path
+                else:
+                    open_path = path
+            assert open_path is not None and proven_path is not None
+            open_payload = json.loads(open_path.read_text(encoding="utf-8"))
+            os.replace(open_path, open_job_path(data_root, open_payload["content_sha256"]))
+            self.assertTrue(proven_path.is_file())
+            report = apply_migration(data_root)
+            self.assertEqual(report["moved_open"], 0)
+            self.assertEqual(report["moved_completed"], 1)
+            self.assertFalse(proven_path.is_file())
+            self.assertEqual(journal_stats(data_root)["publication_jobs_open_count"], 1)
+            self.assertEqual(journal_stats(data_root)["publication_jobs_completed_count"], 1)
+            self.assertEqual(journal_stats(data_root)["publication_jobs_legacy_full_count"], 1)
+            again = apply_migration(data_root)
+            self.assertEqual(again["moved_open"], 0)
+            self.assertEqual(again["moved_completed"], 0)
+
+    def test_compact_missing_keys_are_typed_not_keyerror(self) -> None:
+        with self.assertRaises(PublicationJobError) as raised:
+            compact_receipt_from_job({}, completed_at=NOW)
+        self.assertEqual(str(raised.exception), COMPACT_RECEIPT_UNCONSTRUCTABLE)
+
     def test_week_survival_uses_declared_budget_not_unknown_pass(self) -> None:
         passing = project_7d_disk_used(
             disk_total_bytes=1_000_000,
@@ -460,6 +667,54 @@ class ObservationPublicationJobLifecycleTests(unittest.TestCase):
         )
         self.assertFalse(failing["projected_7d_disk_used_pass_70"])
         self.assertIsInstance(failing["projected_7d_disk_used_pass_70"], bool)
+        missing_fs = project_7d_disk_used(
+            disk_total_bytes=None,
+            disk_used_bytes=None,
+            sqlite_bytes=None,
+            rdp_science_bytes=None,
+            job_open_bytes=0,
+            job_completed_bytes=0,
+            job_legacy_bytes=0,
+            elapsed_campaign_days=3.0,
+            declared_raw_bytes_per_day=1_000,
+            history_data_growth_24h_bytes=None,
+        )
+        self.assertEqual(missing_fs["projection_basis"], UNAVAILABLE_FILESYSTEM_TRUTH)
+        self.assertIsNone(missing_fs["projected_7d_disk_used_pct"])
+        self.assertFalse(missing_fs["projected_7d_disk_used_pass_70"])
+        missing_budget = project_7d_disk_used(
+            disk_total_bytes=1_000_000,
+            disk_used_bytes=100_000,
+            sqlite_bytes=None,
+            rdp_science_bytes=None,
+            job_open_bytes=0,
+            job_completed_bytes=0,
+            job_legacy_bytes=0,
+            elapsed_campaign_days=0.5,
+            declared_raw_bytes_per_day=None,
+            history_data_growth_24h_bytes=None,
+        )
+        self.assertEqual(
+            missing_budget["projection_basis"], UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET
+        )
+        self.assertIsNone(missing_budget["projected_7d_disk_used_pct"])
+        self.assertFalse(missing_budget["projected_7d_disk_used_pass_70"])
+        coerced_zero = project_7d_disk_used(
+            disk_total_bytes=1_000_000,
+            disk_used_bytes=0,
+            sqlite_bytes=0,
+            rdp_science_bytes=0,
+            job_open_bytes=0,
+            job_completed_bytes=0,
+            job_legacy_bytes=0,
+            elapsed_campaign_days=10.0,
+            declared_raw_bytes_per_day=None,
+            history_data_growth_24h_bytes=None,
+        )
+        self.assertFalse(coerced_zero["projected_7d_disk_used_pass_70"])
+        self.assertEqual(
+            coerced_zero["projection_basis"], UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET
+        )
 
 
 if __name__ == "__main__":

@@ -699,10 +699,10 @@ def build_collector_operational_packet(
     )
     history_growth = data_growth if isinstance(data_growth, int) else None
     week_proj = project_7d_disk_used(
-        disk_total_bytes=disk_total or 0,
-        disk_used_bytes=disk_used or 0,
-        sqlite_bytes=sqlite_bytes if isinstance(sqlite_bytes, int) else 0,
-        rdp_science_bytes=rdp_science_bytes if isinstance(rdp_science_bytes, int) else 0,
+        disk_total_bytes=disk_total,
+        disk_used_bytes=disk_used,
+        sqlite_bytes=sqlite_bytes if isinstance(sqlite_bytes, int) else None,
+        rdp_science_bytes=rdp_science_bytes if isinstance(rdp_science_bytes, int) else None,
         job_open_bytes=int(jobs["publication_jobs_open_bytes"]),
         job_completed_bytes=int(jobs["publication_jobs_completed_bytes"]),
         job_legacy_bytes=int(jobs["publication_jobs_legacy_full_bytes"]),

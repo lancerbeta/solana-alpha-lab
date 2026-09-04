@@ -22,6 +22,11 @@ from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E40
     AMBIGUOUS_BLOCKS_APPLY,
     COLLECTOR_NOT_PAUSED,
     COLLECTOR_STORE_MISSING,
+    COMPACT_RECEIPT_UNCONSTRUCTABLE,
+    COMPLETED_RECEIPT_CONFLICT,
+    CONTENT_SHA256_INVALID,
+    LEGACY_FULL_BYTE_MISMATCH,
+    OPEN_JOB_CONFLICT,
     PublicationJobError,
     apply_migration,
     collector_blocks_apply,
@@ -118,9 +123,15 @@ def main(argv: list[str] | None = None) -> int:
         report = apply_migration(data_root)
     except PublicationJobError as exc:
         text = str(exc)
-        terminal = (
-            AMBIGUOUS_BLOCKS_APPLY if text == AMBIGUOUS_BLOCKS_APPLY else "PUBLICATION_JOB_ERROR"
-        )
+        known = {
+            AMBIGUOUS_BLOCKS_APPLY,
+            OPEN_JOB_CONFLICT,
+            COMPLETED_RECEIPT_CONFLICT,
+            LEGACY_FULL_BYTE_MISMATCH,
+            COMPACT_RECEIPT_UNCONSTRUCTABLE,
+            CONTENT_SHA256_INVALID,
+        }
+        terminal = text if text in known else "PUBLICATION_JOB_ERROR"
         return _emit(
             {
                 "terminal": terminal,

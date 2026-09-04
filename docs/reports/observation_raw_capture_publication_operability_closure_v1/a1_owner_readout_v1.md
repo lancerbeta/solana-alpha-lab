@@ -10,9 +10,25 @@ jobs. Proven terminals become compact receipts in `completed/` (no
 
 Repository terminal: `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_SOFTWARE_PASS`.
 
+Predecessor merge: PR #258 / `e285e0b4157d088c90d7c8d4afd9bc5a70082a93`. This
+PATCH does **not** treat that merge as live APPLY/tick proof.
+
 Live deploy, migration APPLY, one manual tick, and three timer ticks remain a
 **separate exact owner gate**:
 `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_LIVE_PASS`.
+
+## PATCH after post-merge review
+
+- APPLY builds a complete in-memory plan of every unmigrated source and fails
+  before the first filesystem mutation on ambiguous JSON, unconstructable
+  compact receipts, OPEN dest byte mismatch, incompatible completed identity,
+  or incompatible `legacy_full` bytes. Compact construction raises typed
+  `PublicationJobError`, not `KeyError`.
+- `projected_7d_disk_used_pass_70` cannot become true from UNKNOWN coerced to
+  zero. Missing filesystem total/used, or missing history plus missing declared
+  budget, is an explicit non-PASS. Declared `raw_bytes_per_utc_day_max` remains
+  the conservative fallback when storage history is thin.
+- Hot path remains `O(open jobs)`. Forge/RDP history is unchanged.
 
 ## What changed
 
@@ -36,6 +52,11 @@ sentinel are not opened by routine repair; one genuine open job crash-repairs;
 terminal jobs compact; D+1 replay keeps identity; Forge rebuild matches after
 the job payload is gone; migration dry-run/apply is idempotent; `legacy_full`
 bytes are preserved; APPLY refuses a live collector and a missing store.
+Preflight: later unconstructable PROVEN_COMPLETED, incompatible completed
+receipt, and incompatible `legacy_full` fail with zero source moves; identical
+destinations stay idempotent; prefix-applied state converges on rerun. 7d:
+declared budget can PASS or FAIL ≥70%; missing filesystem or missing
+history+declared cannot PASS.
 
 ## Isolated review
 
