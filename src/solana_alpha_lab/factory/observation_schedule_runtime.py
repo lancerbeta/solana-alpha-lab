@@ -16,6 +16,10 @@ from urllib.parse import parse_qs, urlsplit
 import jsonschema
 import yaml
 
+from solana_alpha_lab.factory.observation_provider_bounded_response import (
+    parse_bounded_json,
+    read_bounded_http_body,
+)
 from solana_alpha_lab.factory.observation_schedule import parse_utc
 
 SCHEMA_RELATIVE = "catalog/schemas/observation_schedule_runtime_v1.schema.json"
@@ -200,8 +204,8 @@ class JupiterReadonlyOpener:
         )
         try:
             with self._http.open(request, timeout=self._timeout_seconds) as response:
-                body_bytes = response.read()
-                body = json.loads(body_bytes.decode("utf-8"))
+                body_bytes = read_bounded_http_body(response)
+                body = parse_bounded_json(body_bytes)
                 return {
                     "http_status": int(response.status),
                     "body": body,

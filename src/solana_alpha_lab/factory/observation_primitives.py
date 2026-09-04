@@ -8,6 +8,10 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import urlencode, urlsplit
 
+from solana_alpha_lab.factory.observation_provider_bounded_response import (
+    ResponseBodyTooLargeError,
+    ResponseJsonInvalidError,
+)
 from solana_alpha_lab.factory.observation_schedule import canonical_sha256, parse_utc, render_utc
 
 API_HOST = "api.jup.ag"
@@ -201,6 +205,18 @@ def execute_primitive(
         result = opener.open(url)  # type: ignore[union-attr]
     except TimeoutError:
         return typed_missing("TIMEOUT", render_utc(clock()), timeout=True)
+    except ResponseBodyTooLargeError:
+        return typed_missing(
+            "RESPONSE_BODY_TOO_LARGE",
+            render_utc(clock()),
+            transport_error=True,
+        )
+    except ResponseJsonInvalidError:
+        return typed_missing(
+            "RESPONSE_JSON_INVALID",
+            render_utc(clock()),
+            transport_error=True,
+        )
     except OSError:
         return typed_missing("HTTP_ERROR", render_utc(clock()), transport_error=True)
     response_received_at = render_utc(clock())

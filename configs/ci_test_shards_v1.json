@@ -303,6 +303,7 @@
       "tests/test_jupiter_readonly_transport_parity.py",
       "tests/test_live_cohort_discovery_release_series.py",
       "tests/test_observation_runtime_composition_parity_v1.py",
+      "tests/test_observation_provider_bounded_response_and_parse_safety_v1.py",
       "tests/test_observation_provider_wall_deadline_and_lease_safety_v1.py",
       "tests/test_observation_runtime_pacing_closure_v2.py",
       "tests/test_observation_schedule_artifact_pin.py",
