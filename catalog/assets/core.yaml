@@ -29946,7 +29946,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 4734632ff03ad11868b983732467e8a0019bff1ee8843ca04dc3eb7eaff426d5}
+  integrity: {kind: sha256, sha256: 6ebeec941036dc575c2380065d7db1761deb42e2a80876306933c639178b8761}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34830,7 +34830,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1.md', repository_path: docs/tasks/OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: dc7c9bb22835a680732586005ce059e5498b022f262de079ef7b2e1e58398348}
+  integrity: {kind: sha256, sha256: 1989e9d3522ef43548bfedda393208e5b88dba33d4dcfa14e4cdc32ddc6296f6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-OBSERVATION-PUBLICATION-JOBS-001}
@@ -34850,7 +34850,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_publication_jobs.py', repository_path: src/solana_alpha_lab/factory/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: 005bb7ba1d3d6839eb3dfaa80ed211c9641be4db3f15e874d27cb45b82843de9}
+  integrity: {kind: sha256, sha256: 06b8e0671399f7d6cf10c6167cb2cd44c4cb020d25f9d12d913884b531ffad07}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}
@@ -34867,7 +34867,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_publication_jobs.py', repository_path: scripts/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: 8883cee97f036b10f8c9044b9357074b4a59808ed6ab66b3a0cbc97925505193}
+  integrity: {kind: sha256, sha256: a59daccc960bf048e78cffcdb504102eb44718eb976bb2fcb005d1a8a9703297}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}
@@ -34885,7 +34885,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_publication_job_lifecycle_v1.py', repository_path: tests/test_observation_publication_job_lifecycle_v1.py}
-  integrity: {kind: sha256, sha256: 04d2848cf4ce2bec8d1332036e17e6a69d5e652395bea6b6df5eef6b0bb94f0c}
+  integrity: {kind: sha256, sha256: c6961417c67c8693f4d7f74cc85f059813cb81e8904ec5e58bf83afdac528e4b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}

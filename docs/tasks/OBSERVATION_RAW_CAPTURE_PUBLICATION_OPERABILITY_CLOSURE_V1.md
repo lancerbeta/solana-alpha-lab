@@ -9,10 +9,10 @@ allowed_routes:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: e285e0b4157d088c90d7c8d4afd9bc5a70082a93
+  expected_base: 891191881c7a4255d9fc4b1e13b0340f2f9e23c4
   expected_upstream: origin/main
-  expected_upstream_oid: e285e0b4157d088c90d7c8d4afd9bc5a70082a93
-  expected_branch: cursor/observation-raw-capture-publication-operability-preflight-7d-v1
+  expected_upstream_oid: 891191881c7a4255d9fc4b1e13b0340f2f9e23c4
+  expected_branch: cursor/observation-raw-capture-publication-operability-plan-memory-v1
   dirty_mode: ALLOW_REPORTED
 
 objective: >-
@@ -104,25 +104,26 @@ history or mixing irreversible `legacy_full` compaction into this atom?
 
 ## Binding
 
-- Base: `e285e0b4157d088c90d7c8d4afd9bc5a70082a93`
-- Predecessor software merge: PR #258
+- Base: `891191881c7a4255d9fc4b1e13b0340f2f9e23c4`
+- Predecessor software merge: PR #259
 - Route: `DIRECT_CURSOR_DELIVERY`
 - SPEC_ROUTE: `BOTH`
 - Live VPS deploy, migration APPLY, and live smoke remain a separate owner gate
 
 ## PATCH after post-merge review
 
-Close two residual correctness gaps without changing `open/` / `completed/` /
-`legacy_full` architecture:
+Close residual APPLY memory complexity without changing `open/` /
+`completed/` / `legacy_full` architecture:
 
-1. APPLY inspects every unmigrated source into an in-memory plan and fails
-   before the first filesystem mutation on any deterministically detectable
-   source/destination/content conflict. Compact construction uses typed
-   `PublicationJobError`, not `KeyError`.
-2. `projected_7d_disk_used_pass_70` cannot become true because unavailable
-   inputs were coerced to zero. Missing filesystem truth, or missing history
-   plus missing declared budget, is an explicit non-PASS.
+1. Migration plan peak payload memory is `O(max_job_bytes)`, not
+   `O(total unmigrated payload bytes)`. Plan items retain source
+   metadata and compact receipts, never raw bodies or scientific arrays.
+2. Duplicate `content_sha256` with identical bytes/identity is coalesced;
+   differing sources claiming the same identity fail before mutation.
+3. APPLY revalidates each source size/hash against the plan and fails
+   closed on TOCTOU. Destination equality uses streaming hashes.
 
+PR #259 preflight-before-mutation and 7d fail-closed semantics remain.
 This PATCH does not claim live APPLY, VPS, or tick proof.
 
 ## Owner decision
@@ -144,9 +145,11 @@ crash-repairs; D+1 replay keeps dataset identity; Forge/RDP consumer matches
 after compacting the job. Migration: a later unconstructable PROVEN_COMPLETED
 candidate, or incompatible completed/legacy_full destination, fails with
 zero earlier source moves; identical destinations stay idempotent; a
-prefix-applied state converges on rerun. 7d projection: declared-budget
-input can PASS or FAIL ≥70%; missing filesystem truth cannot PASS; missing
-history plus missing declared budget cannot PASS.
+prefix-applied state converges on rerun. Plan items contain no raw/full
+payload; duplicate content identity with different bytes fails before
+mutation; a source changed after preflight fails closed. 7d projection:
+declared-budget input can PASS or FAIL ≥70%; missing filesystem truth cannot
+PASS; missing history plus missing declared budget cannot PASS.
 
 ## Terminal (this repository atom)
 
