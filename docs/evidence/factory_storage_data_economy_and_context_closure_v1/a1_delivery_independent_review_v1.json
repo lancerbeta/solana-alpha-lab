@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-04",
+  "task_id": "FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PENDING",
+      "findings": ["REVIEW_NOT_YET_BOUND"]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PENDING",
+      "findings": ["REVIEW_NOT_YET_BOUND"]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PENDING",
+      "findings": ["REVIEW_NOT_YET_BOUND"]
+    }
+  ],
+  "verdict": "PENDING",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PRODUCTION_CODE_MUTATION",
+    "NO_TELEGRAM_ATOM"
+  ]
+}

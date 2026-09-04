@@ -70,6 +70,22 @@ Preserve event/observed/available/ingested time, lineage, revisions and source
 disagreement. No future labels. Holdout opening consumes that holdout; redesign
 requires a new forward holdout.
 
+`DATA_RESOLUTION_ECONOMY`: collect and store the minimum temporal and detail
+resolution sufficient for a named scientific estimand or execution consumer.
+Richer resolution, including tick, quote, or microstructure, requires a
+concrete non-reconstructable consumer or falsifier and material information
+value relative to incremental storage and cost. Do not coarsen when doing so
+destroys PIT availability, path order, fillability, transient liquidity,
+executable quote truth, or another estimand-relevant signal. This is a
+policy guardrail, not a new subsystem, and it does not impose a universal candle
+or tick granularity.
+
+A future proposal for richer capture is a named decision test, not a platform:
+named consumer → information the current resolution loses → why that loss
+changes estimand, falsifier, or execution truth → incremental bytes and cost →
+retention class. No named material consumer means no broader high-resolution
+capture.
+
 Estimand is `NetReturn` after PIT data, executable buy/sell route, latency,
 fees, retries, exit and notional. Separate `Touch | Fillable | RealizedVWAP |
 Net | PathRisk`. Trigger is not order, fill or profit.

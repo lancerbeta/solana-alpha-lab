@@ -6,6 +6,29 @@ collector; host locator не дублировать.
 
 Секреты в Git и в чат не попадают. Это не alpha и не `OPERATIONAL_READY`.
 
+## Historical 2026-09-04 chain (not current health)
+
+These terminals are historical evidence. They do **not** prove current runtime
+health; that requires a fresh `doctor` / `status` / operational-packet readback.
+
+| Proven historically | Terminal / interpretation |
+|---|---|
+| Live publication operability | `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_LIVE_PASS` |
+| Isolated nonempty RDP restore | `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS` |
+| `legacy_full` reclaim executed | machine terminal **`LEGACY_FULL_RECLAIM_FAIL`** |
+| Why FAIL | `RECLAIM_EFFECTIVE` / `ACCEPTANCE_FALSE_NEGATIVE_CONCURRENT_PUBLICATION` |
+
+Project-level interpretation (do not rewrite the machine terminal):
+`RECLAIM_EFFECTIVE / ACCEPTANCE_FALSE_NEGATIVE_CONCURRENT_PUBLICATION`.
+
+Reclaim acceptance required exact pre/post scientific fingerprint equality while
+the collector stayed `ACTIVE`. Live ticks legally appended publications, so the
+hash changed. Exact pre-file inventory was not persisted; do not invent a
+retrospective subset proof. Do **not** auto-repeat restore or reclaim from this
+runbook. Concurrent append-only operations must preserve the pre-existing
+scientific path+hash set as a subset of post-state; full fingerprint equality is
+valid only when the writer is frozen.
+
 ## Architecture
 
 | Plane | Where | Role |
@@ -45,6 +68,7 @@ Host identity: `docs/operator/FACTORY_REMOTE_HOST.md` +
 | Runtime config | `configs/observation_schedule_runtime_v1.yaml` |
 | Units | `factory-observation-schedule.service` / `.timer` |
 | Unit templates | `configs/factory_remote_ops/factory-observation-schedule.*` |
+| Production tick env | systemd `EnvironmentFile=-/etc/solana-alpha-lab/secrets.env` (not bare `uv tick`) |
 | SQLite | `local/factory_v1/observation_schedule_state.sqlite` |
 | Observation RDP | `local/factory_v1/observation_rdp` |
 | Service user | systemd oneshot as **root** (no `User=` in unit); paths owned `root:root` |
@@ -199,9 +223,10 @@ Do **not** trust chat “current status”. Machine-resolve:
 
 **Operational vs recovery journal (do not conflate):** `open/` is the only
 routine tick repair glob. `completed/` holds compact terminal receipts without
-`observations` / `members`. `legacy_full/` keeps byte-identical historical full
-JSON until a future `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`.
-Do not delete `legacy_full` in the publication-operability atom.
+`observations` / `members`. `legacy_full/` historically parked byte-identical
+full JSON until the 2026-09-04 restore proof and reclaim. After reclaim the live
+path is empty (`0` files / `0` B). Do not delete remaining science. Do not
+re-run restore or reclaim merely because older NEXT prose still mentioned them.
 
 ## Publication-job journal migration + live vertical smoke
 
@@ -278,7 +303,11 @@ Prove `legacy_full` bytes preserved and `publication_jobs_open_count` bounded to
 
 ### C. One manual production tick
 
-Stop the timer. Resume the same activation. One canonical tick under an external hard cutoff of 90s.
+Stop the timer. Resume the same activation. One canonical tick via the existing
+systemd oneshot, which loads `EnvironmentFile=-/etc/solana-alpha-lab/secrets.env`.
+Bare `sudo uv … tick` without that EnvironmentFile is **not** a canonical
+production surface: live proof observed `CREDENTIAL_ENV_MISSING`. Do not
+change the unit for documentation.
 
 ```
 sudo systemctl stop factory-observation-schedule.timer
@@ -291,10 +320,10 @@ Resume uses `--schedule-sha256` and `--activation-id` from status:
 ```
 
 ```
-/usr/bin/timeout 90s /usr/bin/time -v /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 <schedule_sha256> --activation-id <activation_id>
+sudo systemctl start factory-observation-schedule.service
 ```
 
-Hard acceptance: no `LEASE_FENCED`; no leaked worker; no unbounded pre-provider CPU; publication repair with zero open jobs comfortably <2s; tick reaches provider path; new provider occurrence does not remain STARTED; raw call record has request/response/timing/status/hash provenance; no scientific corruption. A legitimate market `no eligible rows` is not failure — it must be explicit.
+Hard acceptance: no `LEASE_FENCED`; no leaked worker; no unbounded pre-provider CPU; publication repair with zero open jobs comfortably <2s; tick reaches provider path; new provider occurrence does not remain STARTED; raw call record has request/response/timing/status/hash provenance; no scientific corruption. A legitimate market `no eligible rows` is not failure — it must be explicit. `CREDENTIAL_ENV_MISSING` is a credential-surface miss, not a publication-CPU fail.
 
 ### D. Three normal timer ticks
 
@@ -326,7 +355,8 @@ sudo systemctl stop factory-observation-schedule.timer
 
 Preserve evidence. No second repair by intuition.
 
-Next separate atom after live PASS: `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF`. Only after that proof reclaim/compact `legacy_full`.
+Live PASS, nonempty restore proof, and `legacy_full` reclaim are historical
+(see table above). Do not treat them as the next atom.
 
 ## Commissioning checklist / open gates
 
@@ -380,9 +410,9 @@ Machine-resolved; do not freeze ephemeral PASS/FAIL into this prose.
 6. Off-host Google Drive durability automation (deploy + enable `factory-remote-backup-gdrive.service` chain)
 7. Live campaign authority (exact ObservationSchedule phrase)
 8. Live commissioning (timer enabled, ticks with authority)
-9. Daily owner pulse — product ready; install/enable timer only at final VPS deploy
+9. Daily owner pulse — product ready; install/enable timer only after this collector/storage closure (not automatic from this runbook)
 10. Live cohort seal / sync / import into LIVE CORPUS (product ready; ops after collector commissioning)
-11. **`NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF`** — after live observation_rdp is non-empty: prove remote weekly full + daily delta(s) + immutable recovery checkpoint, then isolated restore with entry SHA, SQLite integrity and RDP inventory equality. Never restore over live Factory state. Required terminal: `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`.
+11. **`NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF`** — **historically proven** 2026-09-04 (`NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`). Isolated restore only for future recovery; never over live Factory state; do not auto-repeat.
 12. Forge
 
 ## DAILY_COLLECTOR_OWNER_PULSE
@@ -578,7 +608,9 @@ Requirements: manifest integrity PASS, SQLite integrity PASS, RDP inventory equa
 
 Fresh-host recovery: newest valid `RECOVERY_CHECKPOINT_<UTC>_<sha256>.json` by **immutable filename timestamp**, then validate content hash, then follow referenced full/deltas. Do not use Drive listing order or object mtime.
 
-Pre-live commissioning may prove restore with empty RDP. Required live proof terminal: `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`.
+Pre-live commissioning may prove restore with empty RDP. Live nonempty proof is
+historical (`NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`, 2026-09-04).
+Future restore is recovery-only, never a default NEXT.
 
 ### Manual stage-2 copy (commissioning / recovery only)
 

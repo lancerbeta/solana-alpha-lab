@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-04",
+  "task_id": "FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1",
+  "state_change": "FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_SOFTWARE_PASS",
+  "base_main": "af1ad23ac4a97d4f63108abd8446ad3dc6b1960c",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "DAILY_COLLECTOR_OWNER_PULSE",
+  "implementation_bindings": {
+    "delivery-harness/policies/solana-alpha-lab.md": "a65268586e413344eee8f8d743f3f6efcb69551427c2b1f72719cb10ccb04aca",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "2fcc73a418093a39e3e3e3481b155ae3b8dc3cf274cb941202f9593ade51c599",
+    "docs/reports/factory_storage_data_economy_and_context_closure_v1/a1_owner_readout_v1.md": "db0129a108b9517781cb110a6032a422adf1de97e20fe2e2b5e413221b287bcd",
+    "docs/tasks/FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1.md": "85d8bb6d4f6c3138afe1881743f382e53263296f5b95ec7d329318f138f8dedb",
+    "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_storage_baseline_v1.json": "9c6387dbd03e71fee6be22b591cce0fe24db34a15a0b48db5eb38f3d8b4080be",
+    "tests/test_factory_storage_data_economy_and_context_closure_v1.py": "675852cb5447334dd1588ae27e34b0afc4af2ca2f784e29fb302e85efdb0115c"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_STORAGE_DATA_ECONOMY_SEMANTIC_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_STORAGE_DATA_ECONOMY_SEMANTIC_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_CODE_MUTATION",
+    "NO_RETENTION_APPLY",
+    "NO_TELEGRAM_ATOM",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

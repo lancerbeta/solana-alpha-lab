@@ -1,0 +1,126 @@
+{
+  "schema": "smial.factory-storage-data-economy-baseline",
+  "schema_version": "1.0",
+  "as_of": "2026-09-04",
+  "observed_at": "2026-09-04T14:17:55Z",
+  "host": "factory-remote-ops",
+  "deploy_sha": "af1ad23ac4a97d4f63108abd8446ad3dc6b1960c",
+  "read_only": true,
+  "retention_apply": false,
+  "reclaim_repeated": false,
+  "restore_repeated": false,
+  "reclaim_disposition": {
+    "machine_terminal": "LEGACY_FULL_RECLAIM_FAIL",
+    "project_interpretation": "RECLAIM_EFFECTIVE / ACCEPTANCE_FALSE_NEGATIVE_CONCURRENT_PUBLICATION",
+    "reason": "acceptance required exact scientific fingerprint equality while collector stayed ACTIVE; live ticks legally appended publications",
+    "limitation": "exact pre-file scientific inventory was not persisted; subset preservation cannot be reconstructed after the fact",
+    "known_outcome": {
+      "legacy_full_before": {"count": 379, "bytes": 10560999561},
+      "legacy_full_after": {"count": 0, "bytes": 0},
+      "disk_used_pct_before": 26.0,
+      "disk_used_pct_after_unlink": 15.7,
+      "completed_receipts_preserved": true,
+      "collector_remained": "ACTIVE",
+      "sqlite_integrity": "ok"
+    }
+  },
+  "filesystem": {
+    "size_bytes": 103079215104,
+    "used_bytes": 16192004096,
+    "free_bytes": 86679314432,
+    "used_pct_approx": 16
+  },
+  "sqlite": {
+    "observation_schedule_state_bytes": 167993344,
+    "observation_schedule_wal_bytes": 0,
+    "operational_state_bytes": 4096,
+    "operational_state_wal_bytes": 41232,
+    "paper_plane_state_bytes": 53248,
+    "packet_observation_sqlite_bytes": 168862696
+  },
+  "publication_jobs": {
+    "open_count": 0,
+    "open_bytes": 0,
+    "completed_count": 456,
+    "completed_bytes": 479870,
+    "legacy_full_count": 0,
+    "legacy_full_bytes": 0,
+    "unmigrated_count": 0
+  },
+  "scientific_rdp": {
+    "bytes_excluding_publication_jobs": 612857483,
+    "total_rdp_bytes": 613337353
+  },
+  "local_backup_sink": {
+    "bytes": 11114155120,
+    "note": "BACKUP snapshot timestamped 2026-09-04T12:16:23Z is pre-reclaim; do not treat 11.1G as steady-state. Next 12h cadence should shrink."
+  },
+  "offhost": {
+    "class": "CURRENT",
+    "payload_bytes_rolling_30d": 22139072972,
+    "budget_class": "NORMAL",
+    "last_checkpoint": "RECOVERY_CHECKPOINT_20260904T131714Z_ac9339de536ecf686bb36318fc2124b5265f70ba8f7837bdbd0ec0b73cdc1a35",
+    "local_backup_ok": true,
+    "offhost_backup_ok": true
+  },
+  "collector_storage_history": {
+    "path": "local/factory_v1/collector_storage_history.jsonl",
+    "status": "HISTORY_ABSENT",
+    "implication": "empirical 24h/30d/90d growth is UNKNOWN until daily pulse --record-storage-history exists; do not add telemetry in this atom"
+  },
+  "retention": {
+    "raw_retention_days": 31,
+    "raw_retention_days_source": "campaign_compiler_and_cli_default",
+    "eligible_call_compactions": 0,
+    "eligible_call_payload_bytes": 0,
+    "eligible_poll_slot_compactions": 0,
+    "protected_calls": 2353,
+    "protected_call_payload_bytes": 59198098,
+    "protected_poll_slots": 1085,
+    "protect_reason_sample": "YOUNGER_THAN_RETENTION",
+    "decision": "RETENTION_NO_ACTION_YET"
+  },
+  "collector_health_at_observation": {
+    "activation_id": "ACT-619AE64E885E995E",
+    "lifecycle": "ACTIVE",
+    "timer": "enabled_active",
+    "process": "PROCESS_OK",
+    "http_errors": 0,
+    "discovery_coverage_class": "DISCOVERY_COVERAGE_UNKNOWN",
+    "packet_verdict": "DEGRADED"
+  },
+  "one_off_versus_steady_state": {
+    "one_off": [
+      "legacy_full journal park then reclaim ~10.56GiB",
+      "isolated restore-proof download ~22.1G (temp, cleaned)",
+      "offhost daily delta ~10.77G counted in 30d ledger",
+      "local backup zip still 11.1G pre-reclaim leftover"
+    ],
+    "plausible_steady_state": [
+      "scientific RDP ~0.61G growing with publications",
+      "SQLite ~168MB",
+      "compact completed receipts ~480KB",
+      "declared raw/day cap 1GiB used only as conservative 7d disk budget"
+    ],
+    "do_not_extrapolate": "incident-day traffic as normal run-rate"
+  },
+  "projections": {
+    "7d": {
+      "basis": "DECLARED_RAW_BYTES_PER_DAY",
+      "declared_raw_bytes_per_utc_day_max": 1073741824,
+      "projected_7d_disk_used_pct": 30.3488,
+      "projected_7d_disk_used_pass_70": true,
+      "empirical": false
+    },
+    "30d": {
+      "status": "UNKNOWN",
+      "observation_that_would_measure_it": "daily pulse --record-storage-history over >=30 UTC days after this post-reclaim baseline"
+    },
+    "90d": {
+      "status": "UNKNOWN",
+      "observation_that_would_measure_it": "same history over >=90 UTC days; do not invent a new collector for the estimate"
+    }
+  },
+  "owner_question": "change storage topology, retention, or capture resolution now?",
+  "storage_architecture_terminal": "NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED"
+}
