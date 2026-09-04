@@ -60,18 +60,14 @@ history+declared cannot PASS.
 
 ## Isolated review
 
-ARCHITECTURE_CRITIC, CODE_REVIEWER, and GOAL_DOD_CRITIC: PASS on HEAD
-`911461d6` (`packet_fingerprint_sha256=47ae18b14e5534f2ca95c691ab891abdc06c3c4eaae23ce0ba12415592a56a84`).
-Not canonical DONE. Not live PASS.
+ARCHITECTURE_CRITIC, CODE_REVIEWER, and GOAL_DOD_CRITIC re-review this PATCH
+on the new HEAD after evidence bind. Not canonical DONE. Not live PASS.
 
 Non-blocking residuals (not this write set):
 - `observation_schedule.py doctor` while paused still emits `next_action=RESUME`;
   the live playbook says do not resume/tick until APPLY. Follow the playbook.
 - Daily pulse text still reports total RDP including the journal; science-only
   bytes live on the operational packet, not Telegram copy.
-- 7d `pass_70` can still be True if disk total is known but science/sqlite
-  were coerced to 0 and no declared/history budget exists. Health classes ignore
-  this flag.
 
 ## Non-claims
 

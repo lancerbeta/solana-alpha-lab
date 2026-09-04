@@ -113,6 +113,20 @@ def _publish(data_root: Path, schedule: dict, entity: str, **kwargs):
     )
 
 
+def _early_open_source(data_root: Path, schedule: dict) -> Path:
+    content = "0" * 64
+    payload = {
+        "content_sha256": content,
+        "schedule_sha256": schedule["schedule_sha256"],
+        "activation_id": "ACT-OBS-001",
+        "stage": "OPEN",
+        "members": [{"schedule_sha256": schedule["schedule_sha256"], "entity_id": "Early"}],
+    }
+    path = jobs_root(data_root) / f"{content}.json"
+    path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+    return path
+
+
 def _flatten_jobs(data_root: Path) -> None:
     root = jobs_root(data_root)
     for path in list(open_dir(data_root).glob("*.json")):
@@ -478,19 +492,25 @@ class ObservationPublicationJobLifecycleTests(unittest.TestCase):
             with self.assertRaises(PublicationFault):
                 _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
             _flatten_jobs(data_root)
+            early = _early_open_source(data_root, schedule)
+            early_bytes = early.read_bytes()
             root = jobs_root(data_root)
-            before = {path.name: path.read_bytes() for path in root.glob("*.json")}
             for path in root.glob("*.json"):
                 payload = json.loads(path.read_text(encoding="utf-8"))
                 if payload.get("stage") == "MARKER":
                     payload.pop("utc_day", None)
                     payload.pop("file_sha256", None)
                     path.write_text(json.dumps(payload, sort_keys=True), encoding="utf-8")
+            before = {path.name: path.read_bytes() for path in root.glob("*.json")}
+            names = sorted(before)
+            self.assertEqual(names[0], early.name)
+            self.assertGreater(len(names), 1)
             with self.assertRaises(PublicationJobError) as raised:
                 apply_migration(data_root)
             self.assertEqual(str(raised.exception), COMPACT_RECEIPT_UNCONSTRUCTABLE)
             after = {path.name: path.read_bytes() for path in root.glob("*.json")}
             self.assertEqual(set(after), set(before))
+            self.assertEqual(after[early.name], early_bytes)
             self.assertEqual(list(open_dir(data_root).glob("*.json")), [])
             self.assertEqual(journal_stats(data_root)["publication_jobs_legacy_full_count"], 0)
 
@@ -504,16 +524,25 @@ class ObservationPublicationJobLifecycleTests(unittest.TestCase):
             with self.assertRaises(PublicationFault):
                 _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
             _flatten_jobs(data_root)
-            source = next(jobs_root(data_root).glob("*.json"))
+            early = _early_open_source(data_root, schedule)
+            early_bytes = early.read_bytes()
+            source = next(
+                path
+                for path in jobs_root(data_root).glob("*.json")
+                if path.name != early.name
+            )
             payload = json.loads(source.read_text(encoding="utf-8"))
             content = payload["content_sha256"]
             dest = completed_job_path(data_root, content)
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(json.dumps(_alien_receipt(content), sort_keys=True), encoding="utf-8")
             source_bytes = source.read_bytes()
+            self.assertLess(early.name, source.name)
             with self.assertRaises(PublicationJobError) as raised:
                 apply_migration(data_root)
             self.assertEqual(str(raised.exception), COMPLETED_RECEIPT_CONFLICT)
+            self.assertTrue(early.is_file())
+            self.assertEqual(early.read_bytes(), early_bytes)
             self.assertTrue(source.is_file())
             self.assertEqual(source.read_bytes(), source_bytes)
             self.assertEqual(
@@ -531,16 +560,25 @@ class ObservationPublicationJobLifecycleTests(unittest.TestCase):
             with self.assertRaises(PublicationFault):
                 _publish(data_root, schedule, "MintDone", fault_after="AFTER_MARKER")
             _flatten_jobs(data_root)
-            source = next(jobs_root(data_root).glob("*.json"))
+            early = _early_open_source(data_root, schedule)
+            early_bytes = early.read_bytes()
+            source = next(
+                path
+                for path in jobs_root(data_root).glob("*.json")
+                if path.name != early.name
+            )
             payload = json.loads(source.read_text(encoding="utf-8"))
             content = payload["content_sha256"]
             source_bytes = source.read_bytes()
             legacy = legacy_full_path(data_root, content)
             legacy.parent.mkdir(parents=True, exist_ok=True)
             legacy.write_bytes(b"NOT-THE-SOURCE")
+            self.assertLess(early.name, source.name)
             with self.assertRaises(PublicationJobError) as raised:
                 apply_migration(data_root)
             self.assertEqual(str(raised.exception), LEGACY_FULL_BYTE_MISMATCH)
+            self.assertTrue(early.is_file())
+            self.assertEqual(early.read_bytes(), early_bytes)
             self.assertTrue(source.is_file())
             self.assertEqual(source.read_bytes(), source_bytes)
             self.assertEqual(legacy.read_bytes(), b"NOT-THE-SOURCE")
