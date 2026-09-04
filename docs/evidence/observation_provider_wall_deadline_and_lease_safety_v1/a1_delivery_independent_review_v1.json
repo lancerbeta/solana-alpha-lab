@@ -4,8 +4,8 @@
   "review_id": "OBSERVATION-PROVIDER-WALL-DEADLINE-LEASE-SAFETY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-04",
   "task_id": "OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_V1",
-  "reviewed_bindings_sha256": "PENDING",
-  "reviewed_inventory_sha256": "PENDING",
+  "reviewed_bindings_sha256": "1f49a409084402f0ae09468af6de0d2afd022c43605c679aa8cf314980d6a7ea",
+  "reviewed_inventory_sha256": "ed87eba6adca9ddbc784a962b496ae050ce63ac2b0bccf977f94fb1fb29cf044",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -16,7 +16,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=8f49b4d11f306041977588bd30f8841b52c11a46540ff29637819e5d810ec4be",
+        "packet_fingerprint_sha256=5d0b07ee5b32a42d78eb94b4564a5b9d4f0f7d77280daca1bad5b47d2ae29994",
         "CLAIM_WALL_001_SUPPORTED_OPENER_WRAP_COVERS_LOGICAL_OPEN",
         "CLAIM_WALL_002_SUPPORTED_TIMEOUTERROR_TO_TYPED_TIMEOUT_NO_FABRICATE",
         "CLAIM_WALL_003_SUPPORTED_HEARTBEAT_BOUNDED_WALL_LT_LEASE",

@@ -4,8 +4,8 @@
   "review_id": "OBSERVATION-PROVIDER-WALL-DEADLINE-LEASE-SAFETY-FACTORY-FIT-001",
   "as_of": "2026-09-04",
   "task_id": "OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_V1",
-  "reviewed_bindings_sha256": "PENDING",
-  "reviewed_inventory_sha256": "PENDING",
+  "reviewed_bindings_sha256": "1f49a409084402f0ae09468af6de0d2afd022c43605c679aa8cf314980d6a7ea",
+  "reviewed_inventory_sha256": "ed87eba6adca9ddbc784a962b496ae050ce63ac2b0bccf977f94fb1fb29cf044",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

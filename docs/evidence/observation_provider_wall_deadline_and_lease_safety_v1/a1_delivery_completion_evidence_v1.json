@@ -10,7 +10,23 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "df2ac5fcafaff173a6421d2e4f3bf546d630ac4838d719d6d0daeffe7f96bfbc",
+    "catalog/assets/lifecycle.yaml": "9eda65a700f493947fdd585c5205bf9bd9eb43c42c29a9cedd0457c8eb8e5f7f",
+    "catalog/catalog_manifest.yaml": "3fc21c8f0aff0a8b424269ed9b744543520920bf47c87ad709dbe07a1b1967f1",
+    "catalog/generated/asset_edges.json": "fdcf89d2f2241a9c08510cf5a166eb1dcd5b3347b1301eea056a599530b19aad",
+    "catalog/schemas/observation_schedule_runtime_v1.schema.json": "9d1378a7d9e598e1f235964e795129bb9bf045a344589ef5c493244952a1b85f",
+    "configs/ci_test_shards_v1.json": "991a09db152c5372d1096da406fecfe4169068dd073891a8bdd010acc92be3e3",
+    "configs/observation_schedule_runtime_v1.yaml": "619313a607a8742a4880eabf206ae2600babdcc5b78e535dc58db48a0c1231dd",
+    "docs/PROJECT_MAP.md": "ed6c991c7b951cf5d007b3d7d89459be70eefc58d07c1aaedfd87f730e7082d1",
+    "docs/reports/observation_provider_wall_deadline_and_lease_safety_v1/a1_owner_readout_v1.md": "d46eed062ed7ab6981b34e8a11f79a65a630fa7a57f3f7f1fa8f523279ddf814",
+    "docs/tasks/OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_V1.md": "ffa6662d2424b80c77705f39504c37bcfcd65913df622024aaa50c6d94476f05",
+    "scripts/observation_schedule.py": "72b39451e0211eeaaaade171d9472593cb225c1da8108e8c644f3e30196e88d7",
+    "src/solana_alpha_lab/factory/observation_provider_wall_deadline.py": "177f41bf02f10229ff4d626e4eb8433aabafcb750272fc8f79eb8df8765ab7f4",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "d22784f458d371d3ae753c02b39d0c6d3678f222a09ea94702a6a1920dbf2b3a",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "1606b1ae47f7c631eb969f9bce1b8b1895aec6b1b93261b0676cc17fb1341246",
+    "tests/test_observation_provider_wall_deadline_and_lease_safety_v1.py": "1c3ed28b3fcc66a0a443ed5f2635de23e9e2f30b37355e41893f5e5bf31cf423"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_provider_wall_deadline_and_lease_safety_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING",
+    "sha256": "b9aa5244e5aa002f6ca89e4ff19a39ae9844dbd2c8360ac580280708cc289662",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_PROVIDER_WALL_DEADLINE_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_provider_wall_deadline_and_lease_safety_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING",
+      "sha256": "ae4fcc8f2ae0a25bd789c7bf1b87d19dadd3c2da22f47ea6043754912297b08c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
