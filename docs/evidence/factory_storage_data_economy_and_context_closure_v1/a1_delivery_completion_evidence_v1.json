@@ -11,17 +11,19 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "DAILY_COLLECTOR_OWNER_PULSE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "47cd6f4f7dee1db386cd9a70cfab050050c6e28e42e90bec95360ae247fa024f",
+    "catalog/assets/core.yaml": "bcab941e3f4ebd53c7c6ac14db8eff0a2c2b3f5bbbb064a3e99c6241cad4aa3c",
     "catalog/assets/lifecycle.yaml": "934c969a2d93eb55bb00a090656856ecc7eabbb48dc7844afb4e5ad9fe5d3501",
     "catalog/catalog_manifest.yaml": "36d7517ae818168eade436298dd31d7a553d9d20b81bc40b6a319369e0390d3c",
     "catalog/generated/asset_edges.json": "0559c196cb14941fcb9cabec3071adc912c9932048735a69b96a402fd9236dc2",
     "configs/ci_test_shards_v1.json": "a2879ae47500da6b0e25e9a1a4d5f9e384e37ecafb690d6f53ecb0e7129c63dc",
     "delivery-harness/policies/solana-alpha-lab.md": "a65268586e413344eee8f8d743f3f6efcb69551427c2b1f72719cb10ccb04aca",
     "docs/PROJECT_MAP.md": "89ea2a4ae06adcc86d91792305210205fcce348c69abfec973d96da7b20264ed",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "c05f18fcdddb22a03ff1a6a896ea2c23caf3ce9ff2efbf2893d5fefc75ae58f4",
     "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_storage_baseline_v1.json": "9c6387dbd03e71fee6be22b591cce0fe24db34a15a0b48db5eb38f3d8b4080be",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "c5bb165035ab554ab52427d6754e13e49655f6c0c4a40ba317d58c98bb8284df",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "60a2c22ae29bc8b4d27dd3fd3036dad05e5e357eddbf1fd7bb6e5a533ffde234",
     "docs/reports/factory_storage_data_economy_and_context_closure_v1/a1_owner_readout_v1.md": "db0129a108b9517781cb110a6032a422adf1de97e20fe2e2b5e413221b287bcd",
-    "docs/tasks/FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1.md": "9f8cd8a7527c23fcc4a639487ff1170bf7c7114c69f37d31fc3dc27f321bb6e5",
+    "docs/tasks/FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1.md": "4a7ccc97d303bdb6dda03fd7841b635cac5b51d4ea50ad65f7422312ce87be7d",
     "tests/test_factory_storage_data_economy_and_context_closure_v1.py": "675852cb5447334dd1588ae27e34b0afc4af2ca2f784e29fb302e85efdb0115c"
   },
   "active_stop_conditions": [],
@@ -34,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "2c91710d1745c98c65e98365c0f15b89d9d7d6553732b78b2b6cbf0285216750",
+    "sha256": "ccc069581cbd26112952520d1ccc6bc15c9c0fddaf52eb59f328cf11c20ca4cd",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_STORAGE_DATA_ECONOMY_SEMANTIC_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "7a38881c6b3baa44ed2e09905950266b24bdf4841b90c7a938040f9d0940e331",
+      "sha256": "fd6534b2d2f3140a89fc8a738c25c5cb20a29150542d5ba0072375df8e604324",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

@@ -4,8 +4,8 @@
   "review_id": "FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-FACTORY-FIT-001",
   "as_of": "2026-09-04",
   "task_id": "FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1",
-  "reviewed_bindings_sha256": "7bbcfa767871fafc7cc9b1eef2ccb65ded8424280042208d06c4ea84e49ad9ce",
-  "reviewed_inventory_sha256": "6875caaffe469f6ea00758721903195594876fb49f9178cced25c0c4e23f1392",
+  "reviewed_bindings_sha256": "dd244b591080bdd0540aeed0f741d08afd89984cef6aa4974721a24cbd9d7ce6",
+  "reviewed_inventory_sha256": "fa667b111e9999576a8329c50d86b717bba2630205e4fb517dc1dac0a0de43ca",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
