@@ -4,25 +4,25 @@
   "review_id": "FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-FACTORY-FIT-001",
   "as_of": "2026-09-04",
   "task_id": "FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1",
-  "reviewed_bindings_sha256": "b50c376ef7352505a151b20114069cfe8051c5e848ccd60eb8a044135dc9b874",
-  "reviewed_inventory_sha256": "dfbb4531183b042dda3d248b43d2acb57daf9b9817a640473b501e8fd9f7b757",
+  "reviewed_bindings_sha256": "1211d90b2dd8f500de5b2ff7ba4b3efe11e2784bf5e179222da06393d1fddfd3",
+  "reviewed_inventory_sha256": "bbdcd5ef770b65889125a3194ec118f5fd3b4867de8435b3226475f40a67084e",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "PASS_RECORDS_HOT90_DESIGN_WITH_TYPICAL_40_50",
+    "mission": "PASS_HONEST_HARD50_FAIL_ARCHITECTURE_FROZEN",
     "flexibility_and_history": "PASS_KEEPS_IMMUTABLE_CONST_AND_PREDECESSOR_TERMINAL",
     "context_efficiency": "PASS_PRD_SSD_AND_POST_REBOOT_FORENSICS",
-    "research_truth": "PASS_CONTENT_IMMUTABILITY_VS_RESIDENCY_SPLIT",
-    "owner_operability": "PASS_READY_HANDOFF_IMPL_AFTER_MERGE",
+    "research_truth": "PASS_ADDITIVE_BACKUP_AND_BOUNDED_PUB_RATE",
+    "owner_operability": "PASS_CAPTURE_POLICY_HANDOFF_NOT_IMPL",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
     "monitoring_and_recovery": "PASS_POST_REBOOT_COHERENT_HOST_UNREACHABLE_HISTORICAL",
     "build_vs_buy": "PASS_WRAP_PARQUET_DUCKDB_RCLONE_REJECT_NEW_PLATFORMS",
     "security": "PASS_NO_SECRETS_NO_RUNTIME_MUTATION",
-    "red_team": "PASS_STRESS_OVER_40_NOT_CONVERTED_TO_MARGIN"
+    "red_team": "PASS_COMBINED_STRESS_FAILS_HARD_NOT_MASSAGED"
   },
   "capability_radar": {
-    "now": "HOT90_IMPL_AFTER_RESEARCH_PR_MERGE",
-    "watch": "DESTRUCTIVE_EVICTION_LATER_GATE"
+    "now": "OWNER_CAPTURE_POLICY_OR_HARD_BUDGET_DECISION",
+    "watch": "HOT90_IMPL_ONLY_AFTER_HARD50_REPROOF"
   },
   "recovery": "REVERT cursor/factory-97d-storage-architecture-proof-v1",
   "limits": [
@@ -31,6 +31,7 @@
     "NO_DRIVE_WRITE",
     "NO_LOCAL_FACTORY_DATA_DELETE",
     "NO_WITH_TARGET_MARGIN",
+    "NO_STORAGE_97D_ARCHITECTURE_READY",
     "NO_ARCHITECTURE_IMPLEMENTATION",
     "NO_ALPHA",
     "NO_NETRETURN",

@@ -9,42 +9,42 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "capability_radar_now": "HOT90_IMPL_AFTER_RESEARCH_PR_MERGE",
+  "capability_radar_now": "OWNER_CAPTURE_POLICY_OR_HARD_BUDGET_DECISION",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "00fab1cc25bf3a8a46a87f0a0bbc46caad5ebe8d094513d89457b5721b9be15a",
-    "catalog/assets/lifecycle.yaml": "7f1e9a370661730b8ff46d2570f67b4e45db4109e048b4d0d7f3d4950df60577",
+    "catalog/assets/core.yaml": "d6a4764b6763be16e2865d4dcedf00d7b9dcf61cc0273fa50d752c24e3b622e4",
+    "catalog/assets/lifecycle.yaml": "00aefda6bd371281e6efadd3b58b683f4b14a505c400ab8b88233e946713426d",
     "catalog/catalog_manifest.yaml": "01f429791fe82e3572db3db101097987f0dc2b2624adbf96887f700f8c243104",
     "catalog/generated/asset_edges.json": "aca4a056e087ca3dab0f9293c66d9f4552792a730539b7e0e97daf363761e79a",
     "configs/ci_test_shards_v1.json": "a14ef93b346c7d706af82b1d0b195312a2eb65138fcd079166bfb2d478a40af5",
-    "docs/PROJECT_MAP.md": "34bb87fc4068668a08066159431be2036ab4d9787d3bf0fff8d752bf54aa7dac",
-    "docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md": "4185d4eee74629f90c1bb874dc0e7e453a5eb14bcea57e5480e03d25957e0e5f",
+    "docs/PROJECT_MAP.md": "bd72e8fe1bbaaa0bb528cc8b50b7a3531399205f6cdfde541cade233e6461554",
+    "docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md": "74e625ec9a1772f765950339d6fa155db752fc0c6f2df68d7642e6a9edb031c8",
     "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_adopt_wrap_decision_v1.json": "62d84ef3d60adef24c311da8882c50a9e931c956c73759e9c7452cd60e680a3e",
     "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_format_benchmark_v1.json": "314d4cd6b4a5c7784323ea19d14e903e6180f59bf9de27266695e1246da829c0",
-    "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_live_byte_forensics_v1.json": "a2c927b67d5a32bf98307f841f57a0361e125cffd3e6ed348154773b84150545",
-    "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_structural_97d_model_v1.json": "be8e30669ace233e4b65d4d50611e5a8d93e5c6cc991d30cd534faf2848d58d5",
-    "docs/reports/factory_97d_storage_architecture_proof_v1/a1_owner_readout_v1.md": "b9e30fd6b23cbc53c2306457564111140f7cdf83f75c8cc37dc3a93008525b23",
-    "docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md": "cb30e51af3f34b1b4ee73cc91333bd67b4bebe97965c459bb78bef59d6039890",
-    "tests/test_factory_97d_storage_architecture_proof_v1.py": "a1f3d3b75bdd2dc5d78e4465b68e0809156eea8bc4e76b3eab50259d16c070f1",
+    "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_live_byte_forensics_v1.json": "9c9c320cf4f0a6d33c3aa612f621585fa2a9bcd9f9c190ece4906c3d718154dd",
+    "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_structural_97d_model_v1.json": "97e6ab1618f79bfe34ec931e7db6ff723c5239615c0f823c888da7f7eb64dc5f",
+    "docs/reports/factory_97d_storage_architecture_proof_v1/a1_owner_readout_v1.md": "24f84a881281be925ecfe8cd37b7a96e565ecdb8214a15d4ca885b91405c104c",
+    "docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md": "c198dcfbcdf381a7f5411e88acd853c81cbf27407a970631a27c8b3e4060e242",
+    "tests/test_factory_97d_storage_architecture_proof_v1.py": "8e4771f77930b9365a6703ed76fd1bdcd779b6756dbd8a0b9ac9130111de77ba",
     "tests/test_factory_97d_storage_format_benchmark_v1.py": "88ae03a7579812dcfd4b7cdc37822ac7e96444a15e43121cbb6c977d7b381abc"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
-    "material_owner_decision": false,
+    "material_owner_decision": true,
     "user_only_activation": false,
     "external_material_action": false,
     "unresolved_safety_or_truth_conflict": false
   },
   "factory_fit": {
     "path": "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "423885ac1b69abe213e1ae3e7461885f70470ea943b76db518286e843b6f2b09",
+    "sha256": "6ca35d7984ee3b386287d776a3b8c39d0dd368f78c4f8c5beb9b1998194799c0",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_97D_STORAGE_ARCHITECTURE_SEMANTIC_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_97d_storage_architecture_proof_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "ee4e5c94ba78b7dcf242817abbcd9a91d86885bbb78fd7055a4779cb8abf6f6b",
+      "sha256": "514355829885b03143772aa1890f77e7dbbd0c279847549ca0fbfb9c99512a91",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -61,6 +61,7 @@
     "NO_RETENTION_APPLY",
     "NO_DRIVE_WRITE",
     "NO_WITH_TARGET_MARGIN",
+    "NO_STORAGE_97D_ARCHITECTURE_READY",
     "NO_CANONICAL_DONE"
   ],
   "side_effects": {
