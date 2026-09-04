@@ -2748,6 +2748,21 @@
       "target_asset_id": "TEST-FACTORY-SEMANTIC-OPERABILITY-001"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001",
+      "relation": "evidenced_by",
+      "target_asset_id": "EVIDENCE-FACTORY-STORAGE-BASELINE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
       "relation": "contains",
       "target_asset_id": "MODULE-STRATEGY-RUNTIME-001"
@@ -5251,6 +5266,11 @@
       "source_asset_id": "EVIDENCE-FACTORY-REMOTE-OPERATIONS-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-STORAGE-BASELINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-UNATTENDED-SHADOW-ACCEPTANCE-001",
@@ -14411,6 +14431,11 @@
       "source_asset_id": "TEST-FACTORY-SEMANTIC-OPERABILITY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-SEMANTIC-OPERABILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
