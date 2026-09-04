@@ -9,8 +9,11 @@ Live probe: `HOST_UNREACHABLE`
 VPS `factory-remote-ops` (`5.199.174.153`) не отвечал (SSH banner timeout,
 ICMP 100% loss) после read-only forensics-скрипта, который обошёл `/opt` в
 поисках `BACKUP_*.zip`. Причинность «скрипт уронил хост» не доказана, только
-временная последовательность. Factory-данные не мутировались, Drive не
-писался, секреты не читались. Live Phase A/C этого атома не закрыты. 40/50 GiB
+временная последовательность. Этот процесс не писал Drive и не печатал
+секреты в Git/чат (`credential_values_read: false`). Мутация Factory-данных
+на хосте после обрыва и чтение секретов на хосте —
+`NOT_OBSERVED_AFTER_HOST_UNREACHABLE`, не доказанный negative. Live Phase A/C
+этого атома не закрыты. 40/50 GiB
 PASS/FAIL не утверждается.
 
 Последний успешный machine readback: `2026-09-04T14:17:55Z`

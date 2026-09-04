@@ -55,6 +55,11 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
         forensics = json.loads(FORENSICS.read_text(encoding="utf-8"))
         self.assertEqual(forensics["this_atom_live_probe"]["status"], "HOST_UNREACHABLE")
         self.assertFalse(forensics["credential_values_read"])
+        self.assertEqual(
+            forensics["this_atom_live_probe"]["factory_data_mutated"],
+            "NOT_OBSERVED_AFTER_HOST_UNREACHABLE",
+        )
+        self.assertIn("NOT_OBSERVED_AFTER_HOST_UNREACHABLE", readout)
         model = json.loads(MODEL.read_text(encoding="utf-8"))
         self.assertIsNone(model["pass_target_40_gib"])
         self.assertIsNone(model["pass_hard_50_gib"])

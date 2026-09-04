@@ -157,8 +157,10 @@ a device-id readback proves otherwise, same-volume backup bytes stay inside the
 
 At ~2026-09-04T16:48:51Z a read-only forensics script walked `/opt` looking for
 `BACKUP_*.zip`. The VPS then became unreachable: SSH banner timeout and ICMP
-100% loss from the operator host. No Factory data was mutated, no Drive write,
-no secrets printed.
+100% loss from the operator host. This process issued no Drive write and
+printed no secrets to Git/chat (`credential_values_read: false`). Post-hang
+VPS mutation and whether secrets were read on the host are
+`NOT_OBSERVED_AFTER_HOST_UNREACHABLE` — not proven negatives.
 
 Required measurements **not** obtained in this atom:
 
@@ -334,7 +336,8 @@ For a closed unit, eligibility clock is the **maximum** of the unit's
 availability/closure clocks. Required members:
 
 - `first_reliable_available_at`
-- `max_available_to_strategy_at` when present on the partition/manifest
+- `max_available_to_strategy_at` — required; if missing on a closed unit, the
+  unit is **ineligible** for eviction (fail-closed), not skipped
 - partition/archive closure time
 
 Never use the **minimum** of those clocks. Never use filesystem mtime.
@@ -485,8 +488,10 @@ Write set (bounded; eviction still a later destructive gate after IMPL):
   `hot_local_residency_days`
 - `catalog/schemas/experiment_spec_v1_2.schema.json` if it still duplicates
   the panel retention block
-- `docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md` — replace “never auto-deleted”
-  with content-immutable + 90d HOT residency after COLD SHA256 verify
+- `docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md` — **Observation RDP / Parquet
+  row only**: replace “never auto-deleted by retention” with content-immutable
+  + 90d HOT residency after COLD SHA256 verify. Do not widen that replace to
+  sealed live releases, identity, or receipts.
 - `delivery-harness/policies/solana-alpha-lab.md` storage-admission extension
 - `src/solana_alpha_lab/factory/observation_panel_publisher.py` (explicit ZSTD;
   optional closed-day batching; do not change availability clocks)
