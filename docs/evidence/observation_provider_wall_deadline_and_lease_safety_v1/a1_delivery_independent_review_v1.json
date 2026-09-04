@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-PROVIDER-WALL-DEADLINE-LEASE-SAFETY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_V1",
+  "reviewed_bindings_sha256": "PENDING",
+  "reviewed_inventory_sha256": "PENDING",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=8f49b4d11f306041977588bd30f8841b52c11a46540ff29637819e5d810ec4be",
+        "CLAIM_WALL_001_SUPPORTED_OPENER_WRAP_COVERS_LOGICAL_OPEN",
+        "CLAIM_WALL_002_SUPPORTED_TIMEOUTERROR_TO_TYPED_TIMEOUT_NO_FABRICATE",
+        "CLAIM_WALL_003_SUPPORTED_HEARTBEAT_BOUNDED_WALL_LT_LEASE",
+        "CLAIM_WALL_004_SUPPORTED_STARTED_FAIL_CLOSED_EXISTING_IN_FLIGHT",
+        "NON_CLAIMS_RESPECTED_NO_VPS_NO_RETRY_WIDEN_NO_LEASE_TTL_SOLE_FIX",
+        "NO_SECOND_LIFECYCLE_INVENTED"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "HARD_WALL_DEFAULT_60_LT_LEASE_120",
+        "HEARTBEAT_RENEW_HELD_LEASE",
+        "TIMEOUTERROR_TO_TYPED_TIMEOUT",
+        "DAEMON_NO_JOIN_AFTER_WALL",
+        "STARTED_RESTART_FAIL_CLOSED",
+        "NO_RETRY_FALLBACK_WIDENING",
+        "NO_CREDENTIAL_IN_WALL_SURFACE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "WALLCLOCK_LEASE_FENCE_CONTROL_EARNED",
+        "STALL_OVER_SHORT_LEASE_NO_SELF_FENCE_EARNED",
+        "TIMEOUT_LEDGER_MISSINGNESS_ASSERTED",
+        "STARTED_RESTART_HONEST",
+        "COMPOSITION_PACING_PARITY_GREEN_LOCAL",
+        "NO_VPS_DEPLOY_NON_CLAIM"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_COMMISSIONING"
+  ]
+}

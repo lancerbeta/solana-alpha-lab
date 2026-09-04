@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OBSERVATION-PROVIDER-WALL-DEADLINE-LEASE-SAFETY-COMPLETION-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_V1",
+  "state_change": "OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_PASS",
+  "base_main": "6a3a8734a51c27be4a49cae6d81513c1720e83e6",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/observation_provider_wall_deadline_and_lease_safety_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OBSERVATION_PROVIDER_WALL_DEADLINE_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/observation_provider_wall_deadline_and_lease_safety_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_WALL_DEADLINE_SUITE",
+      "PASS_COMPOSITION_PARITY_SUITE",
+      "PASS_PACING_CLOSURE_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_COMMISSIONING",
+    "NO_PROVIDER_ROUTE_CHANGE",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}
