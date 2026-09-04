@@ -1,0 +1,191 @@
+{
+  "schema": "smial.factory-97d-structural-model",
+  "schema_version": "1.3",
+  "as_of": "2026-09-05",
+  "hot_window_days": 90,
+  "archive_cadence_days": 7,
+  "capacity_horizon_days": 97,
+  "target_bytes": 42949672960,
+  "hard_bytes": 53687091200,
+  "selected_members_layout": "SNAPSHOT_PLUS_DELTA",
+  "formulas": {
+    "PRIMARY_HOT_97D": "97 * (MEMBERS_SNAPSHOT_PLUS_DELTA_DAY + S_day_other + R_day_hot + M_day)",
+    "MUTABLE_LOCAL_BACKUP_PEAK": "ZIP_STORED retain-1 of 97d operational sqlite (bodies removed) + paper + operational_state + WAL",
+    "UNARCHIVED_TAIL_DURABILITY_BYTES": "24h RPO copy of not-yet-Drive-verified HOT parquet+raw (one selected day)",
+    "STAGING_PEAK": "P_stage = one selected-architecture day while packaging",
+    "TOTAL_97D": "PRIMARY_HOT_97D + MUTABLE_LOCAL_BACKUP_PEAK + UNARCHIVED_TAIL_DURABILITY_BYTES + STAGING_PEAK"
+  },
+  "measured_denominators": {
+    "scientific_span_days": 2.9636151684,
+    "scientific_span_source": "parquet first_reliable_available_at min/max on live observation_rdp",
+    "raw_span_days": 2.9701874618,
+    "raw_span_source": "call_ledger payload first_reliable_available_at min/max",
+    "limitation": "LIVE cohort is ~3 days, not 90. Linear 97d assumes mix stays similar. Do not use 14:17Z-to-19:23Z catch-up (+229 MiB RDP in ~5.1h) as typical. Do not use 2026-09-04 as a healthy UTC day (HOST_UNREACHABLE/reboot)."
+  },
+  "inputs": {
+    "S_day": {
+      "status": "MEASURED",
+      "bytes": 284178196,
+      "basis": "rdp_excluding_publication_jobs 842194811 / scientific_span_days",
+      "dominant": "members.parquet SNAPPY 824754961 bytes (530 files); selected HOT members layout replaces per-file members with SNAPSHOT_PLUS_DELTA"
+    },
+    "S_day_other": {
+      "status": "MEASURED",
+      "bytes": 5884654,
+      "basis": "S_day minus members SNAPPY/scientific_span_days (observations/other parquet/manifests)"
+    },
+    "R_day": {
+      "status": "MEASURED",
+      "bytes": 20503703,
+      "basis": "call_ledger $.rows json 60899842 / raw_span_days; unique response_sha extra bytes only 387031",
+      "poll_slots": "NOT added as extra unique raw; see poll_slots_overlap"
+    },
+    "M_day": {
+      "status": "MEASURED",
+      "bytes": 19717661,
+      "basis": "sqlite file minus call+poll payload_json = 58565148 / raw_span_days; research journals counted inside S_day"
+    },
+    "A_layout": {
+      "status": "SUPERSEDED_FOR_MEMBERS",
+      "selected_architecture": 0.725,
+      "note": "Per-file SNAPPY->ZSTD3 remains for non-member science/raw. Members HOT uses SNAPSHOT_PLUS_DELTA, not A_layout=0.725.",
+      "member_exact_file_sha_dups": 0,
+      "local_ci": "zstd_3_and_7_smaller_than_uncompressed_on_schema_faithful_corpus"
+    },
+    "same_volume": {
+      "st_dev": 64769,
+      "FACTORY_BACKUP_SINK_other_device": false,
+      "status": "MACHINE_PROVEN_SAME_ST_DEV",
+      "note": "Other-device sink may be excluded only after machine proof. Current git-side sink is same st_dev."
+    }
+  },
+  "members_layout": {
+    "selected": "SNAPSHOT_PLUS_DELTA",
+    "rejected": ["DAILY_BATCHED_MEMBER_PARQUET", "CONTENT_ADDRESSED_MEMBER_REUSE"],
+    "observed_at_complete": "2026-09-04T21:52:53Z",
+    "factory_data_mutated": false,
+    "drive_writes": 0,
+    "days": {
+      "2026-09-02": {
+        "publication_count": 258,
+        "live_snappy_bytes": 99373848,
+        "per_file_zstd3_bytes": 73368492,
+        "daily_batched_zstd3_bytes": 72851892,
+        "snapshot_plus_delta_zstd3_bytes": 4909476,
+        "content_addressed_zstd3_bytes": 8122490,
+        "unique_row_ratio": 0.02375132602545969,
+        "mean_consecutive_entity_jaccard": 0.9656060219069847,
+        "reconstruction_batched_ok": 258,
+        "reconstruction_delta_ok": 258,
+        "reconstruction_mismatch": 0
+      },
+      "2026-09-03": {
+        "publication_count": 121,
+        "live_snappy_bytes": 285306578,
+        "per_file_zstd3_bytes": 211517656,
+        "daily_batched_zstd3_bytes": 211299232,
+        "snapshot_plus_delta_zstd3_bytes": 7119972,
+        "content_addressed_zstd3_bytes": 35470652,
+        "unique_row_ratio": 0.00923618675301034,
+        "mean_consecutive_entity_jaccard": 0.9983566162276145,
+        "reconstruction_batched_ok": 121,
+        "reconstruction_delta_ok": 121,
+        "reconstruction_mismatch": 0
+      }
+    },
+    "typical_members_day_bytes": 6014724,
+    "typical_basis": "mean SNAPSHOT_PLUS_DELTA ZSTD3 of two healthy UTC days",
+    "stress_members_day_bytes": 7119972,
+    "stress_basis": "max SNAPSHOT_PLUS_DELTA ZSTD3 of two healthy UTC days (2026-09-03); not p95 per-file members; not publication-count scaled",
+    "daily_batch_rejected_reason": "batched ZSTD3 / per-file ZSTD3 = 0.993 and 0.999; one row-group per publication gives no material gain",
+    "cas_rejected_reason": "larger than SNAPSHOT_PLUS_DELTA (8.12 MiB and 33.8 MiB) and adds posting-list machinery",
+    "semantics_preserved": [
+      "per-publication exact reconstruction",
+      "dataset_manifest_id / publication identity",
+      "membership_state",
+      "entity/member identity",
+      "PIT / availability fields",
+      "missingness / survival"
+    ]
+  },
+  "poll_slots_overlap": {
+    "observed_at": "2026-09-04T20:05:33Z",
+    "call_completed_rows": 2148,
+    "poll_slot_rows": 1286,
+    "poll_exact_payload_sha256_in_call": 1286,
+    "poll_exact_payload_sha256_not_in_call": 0,
+    "poll_nonoverlap_payload_bytes": 0,
+    "poll_duplicate_payload_bytes": 67874291,
+    "poll_response_sha256_in_call": 1285,
+    "poll_response_sha256_not_in_call": 1,
+    "poll_nonoverlap_rows_json_bytes_via_sha": 2,
+    "decision": "DEDUPE_KEEP",
+    "note": "Every poll_slots payload_json has an exact sha256 match in call_ledger. Same JSON shape was insufficient; exact payload hash overlap is the proof. The one response_sha256 miss carries 2 rows-json bytes."
+  },
+  "publication_rate": {
+    "status": "BOUNDED",
+    "typical_publications_per_day": 178.83563481898935,
+    "typical_basis": "530 closed publications / scientific_span_days",
+    "completed_jobs_by_utc_day": {
+      "2026-09-02": 258,
+      "2026-09-03": 121,
+      "2026-09-04": 151
+    },
+    "healthy_full_utc_days_used": ["2026-09-02", "2026-09-03"],
+    "excluded_utc_days": {
+      "2026-09-04": "HOST_UNREACHABLE_AND_REBOOT_NOT_HEALTHY_THROUGHPUT"
+    },
+    "stress_publications_per_day": 258,
+    "stress_basis": "max completed-job count on a full UTC day excluding the outage/reboot day; applies to raw/meta/backup only. Members stress is max measured SNAPSHOT_PLUS_DELTA day, not 258 x p95.",
+    "frequency_multiplier_vs_typical": 1.4426654970701887,
+    "n_clean_full_utc_days": 2,
+    "variance_note": "121 vs 258 on consecutive full UTC days; dimension is BOUNDED not a 90d-stable rate"
+  },
+  "selected_daily_components_bytes": {
+    "members_snapshot_plus_delta": 6014724,
+    "S_day_other": 5884654,
+    "R_day_hot_raw_parquet_zstd": 3131359,
+    "M_day": 19717661,
+    "sum": 34748398
+  },
+  "typical_primary_hot_97d_bytes": 3370594606,
+  "typical_mutable_local_backup_peak_bytes": 1912711645,
+  "typical_unarchived_tail_durability_bytes": 15030737,
+  "typical_staging_peak_bytes": 34748398,
+  "typical_total_97d_bytes": 5333085386,
+  "TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D": 5333085386,
+  "mutable_backup_basis": {
+    "sqlite_operational_now_bytes": 58565148,
+    "scale": "97 / raw_span_days after removing call+poll payload_json from current sqlite file",
+    "plus_paper_operational_wal_bytes": 98576,
+    "compression": "ZIP_STORED",
+    "includes_full_rdp": false,
+    "same_volume": true
+  },
+  "conservative_measured_stress": {
+    "basis": "members = max SNAPSHOT_PLUS_DELTA day 7119972; raw/other-science/metadata/backup frequency-scaled by 258/typical pubs; plus 24h tail copy plus staging. Not members p95/mean. Not daily-batch.",
+    "frequency_multiplier": 1.4426654970701887,
+    "members_p95_over_mean_not_applied": 2.0092396025005543,
+    "members_snapshot_plus_delta_day_bytes": 7119972,
+    "primary_hot_97d_bytes": 4711586044,
+    "mutable_local_backup_peak_bytes": 2759403096,
+    "unarchived_tail_durability_bytes": 20127063,
+    "staging_peak_bytes": 48573052,
+    "total_97d_bytes": 7539689255,
+    "pass_target_40_gib": true,
+    "pass_hard_50_gib": true,
+    "margin_to_hard_50_bytes": 46147401945
+  },
+  "current_topology_contrast_not_selected": {
+    "note": "Recursive ZIP_STORED of full observation_rdp on same volume remains REJECT as HOT data plane. Mutable retain-1 snapshot is still same-volume and is now an explicit additive term, not B_same_vol=1.0 with zero backup bytes. Per-file members.parquet remains current live layout; SNAPSHOT_PLUS_DELTA is the selected HOT members representation for 97d proof."
+  },
+  "contractual_not_measured": {
+    "raw_bytes_per_utc_day_max": 1073741824,
+    "raw_97d_if_cap_saturated_bytes": 104152956928,
+    "note": "Do not call this a measured run-rate. It already exceeds HARD 50 GiB. Admission must not treat the cap as expected fill. Not used as publication rate."
+  },
+  "pass_target_40_gib": true,
+  "pass_hard_50_gib": true,
+  "pass_target_40_gib_conservative_stress": true,
+  "terminal_gate": "STORAGE_97D_ARCHITECTURE_READY"
+}

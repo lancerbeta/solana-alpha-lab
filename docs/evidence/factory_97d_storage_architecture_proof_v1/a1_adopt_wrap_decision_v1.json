@@ -1,0 +1,69 @@
+{
+  "schema": "smial.factory-97d-adopt-wrap-decision",
+  "schema_version": "1.0",
+  "as_of": "2026-09-04",
+  "reuse_trigger": "ADOPT_WRAP_FORK_BUILD",
+  "selected_architecture": "FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1",
+  "decisions": [
+    {
+      "candidate": "current_sqlite_plus_rdp_unchanged",
+      "decision": "REJECT",
+      "reason": "90d residency plus recursive ZIP_STORED full copy of immutable RDP doubles same-volume data; weekly off-host full retransmits immutable bytes; size-only verify cannot authorize eviction"
+    },
+    {
+      "candidate": "pyarrow_parquet_zstd_batching",
+      "decision": "WRAP",
+      "reason": "locked pyarrow==25.0.0; semantic equality proven on schema-faithful corpus"
+    },
+    {
+      "candidate": "duckdb_multi_file_parquet",
+      "decision": "WRAP",
+      "reason": "locked duckdb==1.5.5; no new service"
+    },
+    {
+      "candidate": "split_operational_db_from_bulk_raw",
+      "decision": "WRAP",
+      "reason": "SQLite stays operational ledger; bulk canonical raw becomes time-partitioned Parquet with response_sha256 identity"
+    },
+    {
+      "candidate": "upload_once_immutable_lifecycle",
+      "decision": "WRAP",
+      "reason": "standard object lifecycle on existing Google Drive"
+    },
+    {
+      "candidate": "current_repeated_full_backup_as_hot_data_plane",
+      "decision": "REJECT",
+      "reason": "retain mutable-only snapshots; do not full-copy HOT RDP locally or weekly"
+    },
+    {
+      "candidate": "zlib_cas_raw_objects",
+      "decision": "REJECT",
+      "reason": "Parquet already preserves exact canonical bytes plus occurrence metadata unless live measurement shows a correctness or operability disadvantage"
+    },
+    {
+      "candidate": "rclone_drive_sha256",
+      "decision": "ADOPT",
+      "reason": "existing /usr/bin/rclone; Drive sha256Checksum plus --download fallback; no new provider"
+    },
+    {
+      "candidate": "existing_zip_stored_manifest",
+      "decision": "WRAP",
+      "reason": "exact source bytes; inventory SHA256 already exists"
+    },
+    {
+      "candidate": "apache_iceberg_delta_hudi",
+      "decision": "REJECT",
+      "reason": "catalog service or new operational plane; tens of GiB not PB; file+manifest consumers; complexity larger than the problem"
+    },
+    {
+      "candidate": "minio_gcs_s3_new_cloud",
+      "decision": "REJECT",
+      "reason": "Drive exists; new provider/credential/cost"
+    },
+    {
+      "candidate": "postgresql_kafka_redis",
+      "decision": "REJECT",
+      "reason": "SQLite is not the bulk; no streaming bus requirement"
+    }
+  ]
+}

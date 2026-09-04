@@ -1,0 +1,243 @@
+{
+  "schema": "smial.factory-97d-live-forensics",
+  "schema_version": "1.1",
+  "as_of": "2026-09-04",
+  "atom_id": "FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1",
+  "read_only": true,
+  "retention_apply": false,
+  "drive_writes": 0,
+  "credential_values_read": false,
+  "walked": [
+    "/opt/solana-alpha-lab/local/factory_v1",
+    "/opt/solana-alpha-lab/local/factory_v1_backup_sink"
+  ],
+  "never_walked": ["/opt", "/"],
+  "historical_host_unreachable_probe": {
+    "started_at": "2026-09-04T16:48:51Z",
+    "status": "HOST_UNREACHABLE",
+    "failure": "SSH banner timeout and ICMP 100% loss after read-only Path.rglob of /opt for BACKUP_*.zip",
+    "factory_data_mutated": "NOT_OBSERVED_AFTER_HOST_UNREACHABLE",
+    "secrets_read": "NOT_OBSERVED_AFTER_HOST_UNREACHABLE",
+    "drive_calls": 0,
+    "root_cause": "NOT_PROVEN_WITHOUT_SPECULATIVE_REPAIR",
+    "note": "Temporal sequence only. Cherry power cycle of instance 973818 is not itself recovery proof."
+  },
+  "this_atom_live_probe": {
+    "status": "POST_REBOOT_COHERENT",
+    "observed_at": "2026-09-04T19:23:34Z",
+    "ssh": "SSH_OK",
+    "hostname": "factory-remote-ops",
+    "boot_id": "e3645da3-2e1b-4d22-bcaf-20b9648f22d4",
+    "boot_time_local": "2026-09-04 22:12:07",
+    "uptime_seconds_at_19_18_03z": 355.48,
+    "new_boot_proven": true,
+    "deploy_sha": "af1ad23ac4a97d4f63108abd8446ad3dc6b1960c",
+    "deploy_sha_unchanged_vs_14_17z": true,
+    "factory_data_mutated_by_this_atom": false,
+    "telegram_invoked": false,
+    "drive_writes": 0
+  },
+  "post_reboot_health": {
+    "filesystem": {
+      "size_bytes": 102888095744,
+      "used_bytes": 16461918208,
+      "avail_bytes": 86409400320,
+      "used_pct_approx": 17
+    },
+    "collector": {
+      "timer_enabled": true,
+      "timer_active": true,
+      "service_last_result": "success",
+      "latest_tick_terminal": "TICK_COMPLETE",
+      "activation_id": "ACT-619AE64E885E995E",
+      "activation_state": "ACTIVE",
+      "restore_marker_unresolved": false
+    },
+    "source_poll_progress_after_boot": {
+      "t0_success_at": "2026-09-04T19:18:41.288308Z",
+      "t1_success_at": "2026-09-04T19:19:41.374963Z",
+      "progress_resumed": true
+    },
+    "doctor_terminal": "DOCTOR_PROVIDER_FAILED",
+    "doctor_transport_error_24h": 1,
+    "doctor_transport_error_interpretation": "RESIDUE_IN_24H_WINDOW_NOT_CURRENT_POLL_FAILURE",
+    "backup_units": {
+      "factory-remote-backup.timer": "enabled_active_waiting",
+      "factory-remote-backup-gdrive.timer": "enabled_active_waiting",
+      "factory-remote-backup-gdrive-delta.timer": "enabled_active_waiting",
+      "unexpected_running_writer": false,
+      "backup_plane_lock_exists": false,
+      "offhost_backup_lock_exists": false
+    },
+    "offhost": {
+      "state": "CURRENT",
+      "last_terminal": "DAILY_DELTA_VERIFIED",
+      "last_verified_at": "2026-09-04T13:17:14Z",
+      "payload_bytes_30d": 22139072972
+    },
+    "sqlite_integrity_check": {
+      "observation_schedule_state.sqlite": "ok",
+      "operational_state.sqlite": "ok",
+      "paper_plane_state.sqlite": "ok"
+    },
+    "scientific_rdp_vs_14_17z": {
+      "predecessor_bytes_excluding_jobs": 612857483,
+      "now_bytes_excluding_jobs": 842194811,
+      "delta_bytes": 229337328,
+      "unexpected_loss_or_rollback": false
+    }
+  },
+  "predecessor_successful_readback": {
+    "path": "docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_storage_baseline_v1.json",
+    "observed_at": "2026-09-04T14:17:55Z",
+    "deploy_sha": "af1ad23ac4a97d4f63108abd8446ad3dc6b1960c",
+    "filesystem_size_bytes": 103079215104,
+    "filesystem_used_bytes": 16192004096,
+    "filesystem_free_bytes": 86679314432,
+    "sqlite_observation_schedule_bytes": 167993344,
+    "scientific_rdp_bytes_excluding_publication_jobs": 612857483,
+    "publication_jobs_completed_count": 456,
+    "publication_jobs_completed_bytes": 479870,
+    "local_backup_sink_bytes": 11114155120,
+    "local_backup_sink_note": "pre-reclaim leftover; not steady-state",
+    "offhost_payload_bytes_rolling_30d": 22139072972,
+    "collector_storage_history": "HISTORY_ABSENT",
+    "protected_call_payload_bytes": 59198098,
+    "protected_calls": 2353,
+    "eligible_call_compactions": 0,
+    "backup_sink_other_volume_proven": false
+  },
+  "byte_attribution": {
+    "observed_at": "2026-09-04T19:23:34Z",
+    "factory_v1_bytes": 1036638312,
+    "observation_rdp_bytes": 842752605,
+    "rdp_excluding_publication_jobs_bytes": 842194811,
+    "rdp_datasets_bytes": 832856226,
+    "rdp_research_journals_bytes": 9896379,
+    "data_plane_bytes": 0,
+    "research_duckdb": "ABSENT",
+    "sqlite": {
+      "observation_schedule_state_bytes": 192040960,
+      "observation_schedule_wal_bytes": 0,
+      "operational_state_bytes": 4096,
+      "operational_state_wal_bytes": 41232,
+      "paper_plane_state_bytes": 53248,
+      "call_ledger_completed_rows": 2106,
+      "call_ledger_completed_payload_json_bytes": 67669069,
+      "call_ledger_started_rows": 547,
+      "call_ledger_started_payload_json_bytes": 71110,
+      "call_ledger_rows_json_bytes": 60899842,
+      "call_ledger_body_json_bytes": 0,
+      "poll_slots_rows": 1244,
+      "poll_slots_payload_json_bytes": 65735633,
+      "poll_slots_same_shape_as_call_ledger": true,
+      "duplicate_sha_groups": 130,
+      "duplicate_extra_occurrences": 178,
+      "duplicate_extra_payload_json_bytes_approx": 387031,
+      "sqlite_index_and_overhead_bytes": 58565148
+    },
+    "poll_slots_overlap": {
+      "observed_at": "2026-09-04T20:05:33Z",
+      "call_completed_rows": 2148,
+      "poll_slot_rows": 1286,
+      "poll_exact_payload_sha256_in_call": 1286,
+      "poll_exact_payload_sha256_not_in_call": 0,
+      "poll_nonoverlap_payload_bytes": 0,
+      "poll_duplicate_payload_bytes": 67874291,
+      "poll_response_sha256_in_call": 1285,
+      "poll_response_sha256_not_in_call": 1,
+      "poll_nonoverlap_rows_json_bytes_via_sha": 2,
+      "decision": "DEDUPE_KEEP",
+      "note": "Exact canonical payload sha256 overlap, not merely same JSON shape."
+    },
+    "members_layout_probe": {
+      "selected": "SNAPSHOT_PLUS_DELTA",
+      "observed_at_complete": "2026-09-04T21:52:53Z",
+      "factory_data_mutated": false,
+      "drive_writes": 0,
+      "reconstruction": {
+        "2026-09-02": {"checked": 258, "exact_ok": 258, "mismatch": 0},
+        "2026-09-03": {"checked": 121, "exact_ok": 121, "mismatch": 0}
+      },
+      "snapshot_plus_delta_zstd3_bytes": {
+        "2026-09-02": 4909476,
+        "2026-09-03": 7119972
+      },
+      "per_file_zstd3_bytes": {
+        "2026-09-02": 73368492,
+        "2026-09-03": 211517656
+      },
+      "daily_batched_rejected": true,
+      "cas_rejected": true
+    },
+    "publication_jobs_completed_by_utc_day": {
+      "2026-09-02": 258,
+      "2026-09-03": 121,
+      "2026-09-04": 151
+    },
+    "publication_jobs": {
+      "open_count": 0,
+      "open_bytes": 0,
+      "completed_count": 530,
+      "completed_bytes": 557794,
+      "legacy_full_count": 0,
+      "legacy_full_bytes": 0,
+      "unmigrated_flat_count": 0,
+      "unmigrated_flat_bytes": 0
+    },
+    "parquet": {
+      "files_scanned": 2144,
+      "live_footer_compression": "SNAPPY",
+      "created_by": "parquet-cpp-arrow version 25.0.0",
+      "first_reliable_available_at_min": "2026-09-01 20:05:58.394261+00:00",
+      "first_reliable_available_at_max": "2026-09-04T19:13:34.744813Z",
+      "publication_span_days": 2.9636151684,
+      "observations": {
+        "count": 530,
+        "bytes": 6121537,
+        "rows": 1856,
+        "file_bytes_min": 9099,
+        "file_bytes_median": 11547.0,
+        "file_bytes_p95": 13849,
+        "file_bytes_max": 15687
+      },
+      "members": {
+        "count": 530,
+        "bytes": 824754961,
+        "rows": 7490653,
+        "file_bytes_min": 18986,
+        "file_bytes_median": 2164736.0,
+        "file_bytes_p95": 3126661,
+        "file_bytes_max": 3382587,
+        "exact_sha_duplicate_groups": 0,
+        "exact_sha_extra_bytes": 0
+      },
+      "other_parquet": {
+        "count": 1084,
+        "bytes": 8989287,
+        "rows": 1084
+      },
+      "manifests": {"count": 1590, "bytes": 1321234},
+      "published_markers": {"count": 530, "bytes": 100700}
+    },
+    "backup_sink": {
+      "path_kind": "GIT_SIDE_DEFAULT",
+      "st_dev": 64769,
+      "factory_st_dev": 64769,
+      "same_st_dev_as_factory": true,
+      "B_same_vol_current_topology": 2.0,
+      "dir_bytes": 11114155120,
+      "retain1_zip_bytes": 11114150260,
+      "retain1_zip_name": "BACKUP_a2a50f2756d5ac50c32935a0c314438c01b65a9afd1cfafe2a0a3fae45fe9451.zip",
+      "mtime": "2026-09-04T12:16:23Z",
+      "note": "pre-reclaim leftover full-RDP ZIP; not the selected mutable retain-1 term. Sink is same st_dev; mutable snapshot bytes stay in 40/50."
+    },
+    "current_data_related_local_footprint_bytes": 12150793432,
+    "current_data_related_excluding_leftover_backup_bytes": 1036638312
+  },
+  "disk_policy": {
+    "early_warning_pct": 70,
+    "warning_pct": 80,
+    "critical_pct": 85
+  }
+}
