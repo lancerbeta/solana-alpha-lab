@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-FACTORY-FIT-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0",
+  "reviewed_inventory_sha256": "0",
+  "mode": "FULL_REVIEW",
+  "verdict": "NOT_READY",
+  "dimensions": {
+    "mission": "PENDING",
+    "flexibility_and_history": "PENDING",
+    "context_efficiency": "PENDING",
+    "research_truth": "PENDING",
+    "owner_operability": "PENDING",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PENDING",
+    "build_vs_buy": "PASS_CAPABILITY_RADAR_NONE",
+    "security": "PENDING",
+    "red_team": "PENDING"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF"
+  },
+  "recovery": "REVERT cursor/observation-raw-capture-publication-operability-closure-v1",
+  "limits": [
+    "NO_VPS_DEPLOY",
+    "NO_LEGACY_FULL_DELETION",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0",
+  "reviewed_inventory_sha256": "0",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "NOT_READY",
+      "findings": [
+        "PENDING_ISOLATED_REVIEW"
+      ]
+    }
+  ],
+  "verdict": "NOT_READY",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_COMMISSIONING"
+  ]
+}

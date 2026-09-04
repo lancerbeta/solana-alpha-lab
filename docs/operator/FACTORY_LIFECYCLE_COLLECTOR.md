@@ -195,6 +195,131 @@ Do **not** trust chat “current status”. Machine-resolve:
 | Latest **historical** A3 discovery release | RDP singleton `DATASET-MANIFEST-DISCOVERY-EVIDENCE-RELEASE-001*` (unchanged) |
 | Latest **live** lifecycle corpus | RDP `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` current version via lineage `datasets/live_lifecycle_corpus/lineage.json` + HFIC current-version selection |
 | Forge evidence epoch | HFIC preflight / `evidence_epoch_sha256` over canonical local RDP |
+| Publication-job journal | `scripts/observation_publication_jobs.py status` / `dry-run` |
+
+**Operational vs recovery journal (do not conflate):** `open/` is the only
+routine tick repair glob. `completed/` holds compact terminal receipts without
+`observations` / `members`. `legacy_full/` keeps byte-identical historical full
+JSON until a future `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`.
+Do not delete `legacy_full` in the publication-operability atom.
+
+## Publication-job journal migration + live vertical smoke
+
+Repository software close is `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_SOFTWARE_PASS`.
+Live terminal `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_LIVE_PASS` is a
+**separate exact owner gate** after merge/deploy. Do not tick a new SHA until
+migration APPLY. Do not resume by intuition after a hard fail — immediately
+`PAUSED_OPERATOR` and keep evidence.
+
+Take `schedule_sha256` and `activation_id` from status. Do not invent them.
+
+### A. PAUSED preflight
+
+```
+cat /opt/solana-alpha-lab/.factory_deploy_sha
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py
+```
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py --offhost-status
+```
+
+```
+systemctl is-active factory-observation-schedule.timer factory-observation-schedule.service
+```
+
+```
+systemctl status factory-observation-schedule.timer --no-pager -n 20
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B -c "import sqlite3; from pathlib import Path; p=Path('local/factory_v1/observation_schedule_state.sqlite'); c=sqlite3.connect(f'file:{p.as_posix()}?mode=ro', uri=True); print(c.execute('PRAGMA integrity_check').fetchone()[0]); print('STARTED', c.execute(\"SELECT COUNT(*) FROM call_ledger WHERE state='STARTED'\").fetchone()[0])"
+```
+
+Require: exact deployed SHA; `PAUSED_OPERATOR`; timer/service not running a worker; lease clear/expired; SQLite `ok`; backup/offhost status recorded; disk/resource baseline from doctor/packet.
+
+### B. Migration (collector remains PAUSED)
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py dry-run --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Require `classified_ambiguous=0`. Then APPLY (same filesystem, no provider calls, no RDP rewrite, no STARTED cleanup, no `legacy_full` deletion):
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py apply --runtime-config configs/observation_schedule_runtime_v1.yaml --i-understand-apply
+```
+
+Prove: Parquet/manifests/RDP inventory unchanged; `legacy_full` bytes preserved; `publication_jobs_open_count` bounded to genuine incomplete jobs.
+
+### C. One manual production tick
+
+Stop the timer. Resume the same activation. One canonical tick under an external hard cutoff of 90s.
+
+```
+sudo systemctl stop factory-observation-schedule.timer
+```
+
+Resume uses `--schedule-sha256` and `--activation-id` from status:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py resume --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 <schedule_sha256> --activation-id <activation_id>
+```
+
+```
+/usr/bin/timeout 90s /usr/bin/time -v /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py tick --once --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 <schedule_sha256> --activation-id <activation_id>
+```
+
+Hard acceptance: no `LEASE_FENCED`; no leaked worker; no unbounded pre-provider CPU; publication repair with zero open jobs comfortably <2s; tick reaches provider path; new provider occurrence does not remain STARTED; raw call record has request/response/timing/status/hash provenance; no scientific corruption. A legitimate market `no eligible rows` is not failure — it must be explicit.
+
+### D. Three normal timer ticks
+
+If the manual tick PASS, run exactly three ordinary 60s timer cycles / max ~4 minutes.
+
+```
+sudo systemctl start factory-observation-schedule.timer
+```
+
+```
+systemctl is-active factory-observation-schedule.timer factory-observation-schedule.service
+```
+
+Require: 3 consecutive bounded completions; no `LEASE_FENCED`; no accumulating STARTED; source poll continues advancing; open publication jobs return to zero or a bounded genuine incomplete state; no CPU/RSS runaway; disk/job counters follow the new lifecycle. If publishable work exists, verify one new RDP publication end-to-end (member/observation → manifest → `.published`) with PIT clocks and identities.
+
+### E. Terminal
+
+If all PASS: `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_LIVE_PASS`. Leave the same activation `ACTIVE`, timer enabled+active.
+
+If ANY hard criterion fails:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py pause --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 <schedule_sha256> --activation-id <activation_id>
+```
+
+```
+sudo systemctl stop factory-observation-schedule.timer
+```
+
+Preserve evidence. No second repair by intuition.
+
+Next separate atom after live PASS: `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF`. Only after that proof reclaim/compact `legacy_full`.
+
+## Commissioning checklist / open gates
 
 ### Live cohort seal / import (zero-provider)
 

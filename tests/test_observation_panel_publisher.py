@@ -16,8 +16,14 @@ from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
     ObservationPanelPublisherError,
     PublicationFault,
     build_panel_snapshot,
+    has_open_publication_jobs,
     publish_observation_batch,
     repair_open_publication_jobs,
+)
+from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E402
+    is_compact_receipt,
+    journal_stats,
+    load_job_by_content,
 )
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     canonical_sha256,
@@ -82,6 +88,33 @@ class ObservationPanelPublisherTests(unittest.TestCase):
             )
             self.assertEqual(first["min_event_time"], "2026-09-01T00:05:00Z")
             self.assertEqual(first["first_reliable_available_at"], "2026-09-01T00:10:00Z")
+            members = [{"schedule_sha256": schedule["schedule_sha256"], "entity_id": "MintA"}]
+            observations = [
+                {
+                    "schedule_sha256": schedule["schedule_sha256"],
+                    "entity_id": "MintA",
+                    "point_id": "X300",
+                    "state": "OBSERVED",
+                    "event_time": "2026-09-01T00:05:00Z",
+                    "first_reliable_available_at": "2026-09-01T00:10:00Z",
+                }
+            ]
+            content = canonical_sha256({"members": members, "observations": observations})
+            receipt = load_job_by_content(data_root, content)
+            self.assertIsNotNone(receipt)
+            self.assertTrue(is_compact_receipt(receipt or {}))
+            self.assertNotIn("observations", receipt or {})
+            self.assertNotIn("members", receipt or {})
+            self.assertEqual(
+                journal_stats(data_root)["publication_jobs_open_count"], 0
+            )
+            self.assertFalse(
+                has_open_publication_jobs(
+                    data_root=data_root,
+                    schedule_sha256=schedule["schedule_sha256"],
+                    activation_id="ACT-OBS-001",
+                )
+            )
             second = publish_observation_batch(
                 data_root=data_root,
                 root=ROOT,
@@ -273,6 +306,7 @@ class ObservationPanelPublisherTests(unittest.TestCase):
             "AFTER_ONE_RDP_EVENT",
             "AFTER_MANIFEST",
             "AFTER_MARKER",
+            "AFTER_COMPLETE",
         ):
             with tempfile.TemporaryDirectory() as tmp:
                 data_root = Path(tmp) / "rdp"
@@ -326,6 +360,19 @@ class ObservationPanelPublisherTests(unittest.TestCase):
                 }
                 self.assertIn("OBSERVATION_BATCH", kinds)
                 self.assertIn("OBSERVATION_MEMBER_BATCH", kinds)
+                records = list(ResearchStore(data_root).iter_committed_records())
+                self.assertEqual(
+                    sum(1 for item in records if str(item.record_kind) == "OBSERVATION_BATCH"),
+                    1,
+                )
+                self.assertEqual(
+                    sum(
+                        1
+                        for item in records
+                        if str(item.record_kind) == "OBSERVATION_MEMBER_BATCH"
+                    ),
+                    1,
+                )
 
     def test_repair_preserves_original_publication_identity(self) -> None:
         schedule = load_observation_schedule(
