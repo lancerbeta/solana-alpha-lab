@@ -10,9 +10,25 @@ jobs. Proven terminals become compact receipts in `completed/` (no
 
 Repository terminal: `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_SOFTWARE_PASS`.
 
+Predecessor merge: PR #258 / `e285e0b4157d088c90d7c8d4afd9bc5a70082a93`. This
+PATCH does **not** treat that merge as live APPLY/tick proof.
+
 Live deploy, migration APPLY, one manual tick, and three timer ticks remain a
 **separate exact owner gate**:
 `OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_LIVE_PASS`.
+
+## PATCH after post-merge review
+
+- APPLY builds a complete in-memory plan of every unmigrated source and fails
+  before the first filesystem mutation on ambiguous JSON, unconstructable
+  compact receipts, OPEN dest byte mismatch, incompatible completed identity,
+  or incompatible `legacy_full` bytes. Compact construction raises typed
+  `PublicationJobError`, not `KeyError`.
+- `projected_7d_disk_used_pass_70` cannot become true from UNKNOWN coerced to
+  zero. Missing filesystem total/used, or missing history plus missing declared
+  budget, is an explicit non-PASS. Declared `raw_bytes_per_utc_day_max` remains
+  the conservative fallback when storage history is thin.
+- Hot path remains `O(open jobs)`. Forge/RDP history is unchanged.
 
 ## What changed
 
@@ -36,11 +52,16 @@ sentinel are not opened by routine repair; one genuine open job crash-repairs;
 terminal jobs compact; D+1 replay keeps identity; Forge rebuild matches after
 the job payload is gone; migration dry-run/apply is idempotent; `legacy_full`
 bytes are preserved; APPLY refuses a live collector and a missing store.
+Preflight: later unconstructable PROVEN_COMPLETED, incompatible completed
+receipt, and incompatible `legacy_full` fail with zero source moves; identical
+destinations stay idempotent; prefix-applied state converges on rerun. 7d:
+declared budget can PASS or FAIL ≥70%; missing filesystem or missing
+history+declared cannot PASS.
 
 ## Isolated review
 
 ARCHITECTURE_CRITIC, CODE_REVIEWER, and GOAL_DOD_CRITIC: PASS on HEAD
-`911461d6` (`packet_fingerprint_sha256=47ae18b14e5534f2ca95c691ab891abdc06c3c4eaae23ce0ba12415592a56a84`).
+`6a674547` (`packet_fingerprint_sha256=e982864775cfa817c7ae99db34267291d45cb7626a0702aacf864fcc6afa8dbf`).
 Not canonical DONE. Not live PASS.
 
 Non-blocking residuals (not this write set):
@@ -48,9 +69,9 @@ Non-blocking residuals (not this write set):
   the live playbook says do not resume/tick until APPLY. Follow the playbook.
 - Daily pulse text still reports total RDP including the journal; science-only
   bytes live on the operational packet, not Telegram copy.
-- 7d `pass_70` can still be True if disk total is known but science/sqlite
-  were coerced to 0 and no declared/history budget exists. Health classes ignore
-  this flag.
+- `pass_70=false` for UNAVAILABLE is fail-closed, not a measured ≥70% disk fail;
+  read `projection_basis`.
+- APPLY in-memory plan is O(unmigrated bodies); live APPLY remains a separate gate.
 
 ## Non-claims
 

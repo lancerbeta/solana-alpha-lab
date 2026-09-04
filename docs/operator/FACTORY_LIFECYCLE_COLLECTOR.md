@@ -261,7 +261,7 @@ Require: exact deployed SHA; `PAUSED_OPERATOR`; timer/service not running a work
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py dry-run --runtime-config configs/observation_schedule_runtime_v1.yaml
 ```
 
-Require `classified_ambiguous=0`. If `classified_ambiguous>0`: stay `PAUSED_OPERATOR`, do not APPLY, keep evidence, open a new atom. Then APPLY (same filesystem, no provider calls, no RDP rewrite, no STARTED cleanup, no `legacy_full` deletion):
+Require `classified_ambiguous=0`. APPLY builds a complete in-memory plan of every unmigrated source and fails **before the first filesystem mutation** on ambiguous payloads, unconstructable compact receipts, or destination identity/byte conflicts. If `classified_ambiguous>0`: stay `PAUSED_OPERATOR`, do not APPLY, keep evidence, open a new atom. Then APPLY (same filesystem, no provider calls, no RDP rewrite, no STARTED cleanup, no `legacy_full` deletion):
 
 ```
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py apply --runtime-config configs/observation_schedule_runtime_v1.yaml --i-understand-apply
