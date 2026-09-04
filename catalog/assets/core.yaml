@@ -34956,7 +34956,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md', repository_path: docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md}
-  integrity: {kind: sha256, sha256: 393d6aef7aaf114ed145b94504210638ac9e034a090660c00bbc52309ce71379}
+  integrity: {kind: sha256, sha256: 985488cc14bf5fff1dee5680a6dbe8e67cd2923d9e0d495c3c27e10f2695d44d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001}

@@ -92,7 +92,9 @@ context_requirements:
       - delivery-harness/policies/solana-alpha-lab.md
       - configs/factory_remote_operations_v1_1.yaml
     DELIVERY_EVIDENCE:
-      - docs/evidence/factory_storage_data_economy_and_context_closure_v1/a1_storage_baseline_v1.json
+      - docs/evidence/factory_97d_storage_architecture_proof_v1/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_97d_storage_architecture_proof_v1/a1_delivery_independent_review_v1.json
+      - docs/evidence/factory_97d_storage_architecture_proof_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
