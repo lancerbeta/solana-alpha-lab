@@ -1,15 +1,15 @@
 # FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1
 
-Status: `DESIGN_FROZEN_PENDING_LIVE_CAPACITY_PROOF`
+Status: `DESIGN_FROZEN_CAPACITY_PROVED`
 Contract: `FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1`
 Base: `52be82091af859171de2c062b1a08e05f5eb325e`
-Terminal of this atom: `STORAGE_ARCHITECTURE_BLOCKED`
+Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`
 As of: `2026-09-04`
 
 This document is the PRD+SSD for a **later** implementation atom. It does **not**
 implement the architecture. It does **not** authorize retention APPLY, Drive
 write, local Factory-data delete, deploy, or capture change. Implementation is
-not the next step after this PR.
+not started from this PR; merge of this research/design is the handoff.
 
 Predecessor `FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1` terminal
 `NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED` remains historically true under the
@@ -22,30 +22,25 @@ predecessor terminal.
 
 - `DECISION_DELTA`: which standard ADOPT/WRAP architecture keeps 90d of RAW +
   scientific evidence on the current ~100 GiB VPS without periodic disk upgrades.
-- `UNCERTAINTY_REMOVED`: current byte owners and backup amplification from Git
-  contracts + the 2026-09-04T14:17:55Z machine baseline; codec semantic equality
-  on a schema-faithful corpus. rclone/Drive SHA256 and isolated hydration are
-  **design-selected contracts**, not live measurements in this atom.
-- `CAPABILITY_OR_EVIDENCE`: this PRD+SSD. Live 97d capacity PASS/FAIL is **not**
-  closed: after this atom's second VPS forensics the host became unreachable
-  (SSH banner timeout, ICMP 100% loss). Causation is not proven beyond temporal
-  sequence.
-- `STOP`: no architecture implementation. No merge of this research as a claim
-  of 40/50 GiB PASS.
-- `NEXT` (three layers, not one arrow):
-  1. Owner: recover VPS via Cherry instance `973818` /
-     `docs/operator/FACTORY_REMOTE_HOST.md`.
-  2. Research: `FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1` (suggested; no whole-`/opt`
-     walk) fills §4 tables and returns a capacity terminal.
-  3. Implementation: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` only after
-     `STORAGE_97D_ARCHITECTURE_READY` or
-     `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`. Not this PR. Not the
-     step after BLOCKED.
+- `UNCERTAINTY_REMOVED`: live byte attribution after post-reboot coherence;
+  same-`st_dev` backup sink; ~2.96 d publication span; SNAPPY live footers;
+  ZSTD3 live ratios; 97d typical 21.47 GiB / conservative stress 42.84 GiB.
+  rclone/Drive SHA256 and isolated hydration remain **design-selected
+  contracts** (this atom made 0 Drive hash calls).
+- `CAPABILITY_OR_EVIDENCE`: this PRD+SSD plus filled §4 tables. Historical
+  `HOST_UNREACHABLE` after a `/opt` walk is recorded; it does not remain the
+  capacity terminal.
+- `STOP`: no architecture implementation, deploy, retention APPLY, Drive write,
+  local delete, capture change, or merge from this handoff.
+- `NEXT`: merge gate of this research PR, then
+  `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`. Destructive eviction stays a
+  later gate. `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` is **not**
+  the terminal (conservative stress exceeds 40 GiB).
 
 `SPEC_ROUTE`: `BOTH`
 `MODEL_EFFORT_RECOMMENDATION`: `SOL_XHIGH`
-`NEXT_MODEL_EFFORT`: `SOL_XHIGH` for the live-forensics retry (capacity truth);
-`LUNA_MAX` only after PASS for bounded implementation.
+`NEXT_MODEL_EFFORT`: `LUNA_MAX` for bounded implementation after merge;
+`SOL_XHIGH` if IMPL changes schema, availability clocks, or PIT.
 
 ## 1. Product requirement (frozen)
 
@@ -153,31 +148,43 @@ baseline (git-side `local/factory_v1_backup_sink` on the same disk class). Until
 a device-id readback proves otherwise, same-volume backup bytes stay inside the
 40/50 GiB budget.
 
-### 3.2 This atom's live probe — blocked
+### 3.2 Historical HOST_UNREACHABLE (not the capacity terminal)
 
 At ~2026-09-04T16:48:51Z a read-only forensics script walked `/opt` looking for
 `BACKUP_*.zip`. The VPS then became unreachable: SSH banner timeout and ICMP
 100% loss from the operator host. This process issued no Drive write and
 printed no secrets to Git/chat (`credential_values_read: false`). Post-hang
 VPS mutation and whether secrets were read on the host are
-`NOT_OBSERVED_AFTER_HOST_UNREACHABLE` — not proven negatives.
+`NOT_OBSERVED_AFTER_HOST_UNREACHABLE` — not proven negatives. Root cause is
+`NOT_PROVEN_WITHOUT_SPECULATIVE_REPAIR`.
 
-Required measurements **not** obtained in this atom:
+### 3.3 Post-reboot bounded forensics (2026-09-04T19:23:34Z)
 
-- current SQLite body vs metadata split, `response_sha256` duplicates, COMPLETED vs STARTED
-- parquet file-size distribution, rows/file, member exact-duplicate bytes
-- publication day-span / rows/day (this is the capacity-rate denominator)
-- whether `FACTORY_BACKUP_SINK` is a different `st_dev`
-- current retain-1 bundle bytes after the 14:17Z leftover note
-- ResearchStore `projections/research_memory.duckdb` bytes
+SSH recovered after Cherry power cycle of instance `973818`. New boot proven
+(`boot_id=e3645da3-2e1b-4d22-bcaf-20b9648f22d4`, `uptime -s` 2026-09-04 22:12:07
+EEST). Deploy SHA unchanged `af1ad23ac4a97d4f63108abd8446ad3dc6b1960c`.
+Walked only `local/factory_v1` and the git-side backup sink. Telegram not
+invoked. Drive writes 0.
+
+| Substrate | Bytes | Notes |
+|---|---:|---|
+| Filesystem size / used / avail | 102 888 095 744 / 16 461 918 208 / 86 409 400 320 | ~17% used |
+| ObservationSchedule SQLite | 192 040 960 | WAL 0; `integrity_check=ok` |
+| Scientific RDP excl. publication_jobs | 842 194 811 | grew from 612 857 483 at 14:17Z; no rollback |
+| publication_jobs completed | 557 794 | 530 files; open 0; `legacy_full` 0; unmigrated 0 |
+| members.parquet | 824 754 961 | 530 files; SNAPPY; exact SHA dups 0 |
+| observations.parquet | 6 121 537 | 530 files; 1856 rows |
+| call_ledger COMPLETED payload_json | 67 669 069 | 2106 rows; `$.rows` 60 899 842; `$.body` 0 |
+| poll_slots payload_json | 65 735 633 | same JSON shape as call_ledger; do not add as extra raw |
+| Local backup sink | 11 114 155 120 | same `st_dev=64769` as factory_v1; leftover ZIP |
+| Research DuckDB | 0 | ABSENT |
+| publication span | 2.9636 days | `first_reliable_available_at` min/max |
 
 `collector_storage_history.jsonl` remains `HISTORY_ABSENT`. Do not wait 90 days;
-do not invent a run-rate from the 1 GiB/day contractual cap.
+do not invent a run-rate from the 1 GiB/day contractual cap. Do not use the
+~5.1h post-outage RDP catch-up as typical.
 
-**Capacity PASS/FAIL is blocked until a bounded (no whole-`/opt` walk) live
-readback returns publication age span and parquet/raw distributions.**
-
-## 4. Phase B — structural 97d model (formulas; numbers gated)
+## 4. Phase B — structural 97d model (live numbers)
 
 Let:
 
@@ -202,24 +209,38 @@ Report separately, never as measured run-rate:
   bound. This already exceeds HARD 50 GiB. It is an admission cap, not empirical
   growth.
 
-From 14:17Z only (insufficient for PASS):
+From live forensics (19:23Z), selected architecture `B_same_vol=1.0`,
+`A_layout=0.725` (members SNAPPY→ZSTD3 + HOT raw JSON→ZSTD3 parquet):
 
-- SQLite bodies ~56.5 MiB across current protected window → raw is **not** the
-  bulk today.
-- Scientific RDP ~584 MiB + 456 completed jobs. **Age span unknown.** If those
-  456 jobs were produced in hours rather than days, 97d HOT scientific bytes
-  can exceed 50 GiB even after lossless compression. That is why live day-span
-  is the cheapest remaining falsifier.
+| Term | Bytes | GiB |
+|---|---:|---:|
+| `S_day` (live SNAPPY science) | 284 178 196 | 0.265 |
+| `R_day` (unique `$.rows` JSON) | 20 503 703 | 0.019 |
+| `M_day` (sqlite overhead) | 19 717 661 | 0.018 |
+| typical `PRIMARY_HOT_97D` | 22 813 412 187 | 21.25 |
+| typical `STAGING_PEAK` | 235 189 816 | 0.22 |
+| typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` | 23 048 602 003 | 21.47 |
+| conservative stress (members p95/mean) | 46 000 455 406 | 42.84 |
+| contractual 1 GiB/day × 97 (not measured) | 104 152 956 928 | 97 |
+
+Typical passes TARGET 40 and HARD 50. Conservative stress misses TARGET and
+passes HARD. Current topology with `B_same_vol=2.0` is still REJECT: it would
+put 97d over HARD.
 
 A design does **not** PASS if HOT is 40 GiB and a same-volume full backup makes
 80 GiB. Current topology (`recursive observation_rdp` in 12h ZIP_STORED retain-1
 **and** weekly off-host full of the same immutable bytes) is the amplification
-to remove.
+to remove. Same-volume identity is now machine-proven (`st_dev=64769`).
 
-## 5. Phase C — format benchmark (local schema-faithful corpus)
+## 5. Phase C — format benchmark (CI corpus + live tmp rewrite)
 
-Live corpus copy was not completed (host unreachable). CI corpus:
-`tests/test_factory_97d_storage_format_benchmark_v1.py`.
+Live corpus rewrite used `/tmp` only; no live Factory bytes committed.
+Footer on live observations/members: **SNAPPY**, `parquet-cpp-arrow version 25.0.0`.
+Median members file: SNAPPY 2 167 088 → ZSTD3 1 607 686 (0.74×). p95-ish members:
+SNAPPY 3 126 661 → ZSTD3 2 275 791 (0.73×). 80 COMPLETED raw JSON rows
+(3 909 820 B) → ZSTD3 parquet 597 114 B (0.15×). Exact member file-SHA
+duplicates = 0; WRAP content-addressed members remains optional, not required
+to meet HARD. Overlapping 7d member snapshots are already inside `S_day`.
 
 Proven on nested observation rows with `event_time`,
 `first_reliable_available_at`, typed values, missingness, `request_sha256`,
@@ -240,10 +261,10 @@ uncompressed. `research_store` explicitly writes `compression="NONE"`. Do not
 call current observation files "uncompressed" without reading footer metadata
 on the live corpus.
 
-Member/denominator: quantify exact file-SHA duplicates on live RDP before
-choosing content-addressed member snapshots vs larger batches. The publisher
-writes a new `members.parquet` per `dataset_manifest_id`. If live hashes collide
-materially, WRAP a content-addressed member object referenced by batches.
+Member/denominator: live exact file-SHA duplicates = 0. The publisher still
+writes a new `members.parquet` per `dataset_manifest_id`; overlapping cohort
+windows inflate `S_day` without identical files. Content-addressed member
+objects remain optional WRAP, not required for HARD 50.
 
 ## 6. Phase D — split retention
 
@@ -457,29 +478,33 @@ Name: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`
 6. **Hydration**: isolated temp `data_root`.
 7. **Admission**: extend `DATA_RESOLUTION_ECONOMY` with 97d footprint math.
 
-## 15. Capacity acceptance (gated)
+## 15. Capacity acceptance
 
 `hot_window_days=90`, `archive_cadence_days=7`, `capacity_horizon_days=97`.
 
-This atom **cannot** assert TARGET 40 GiB or HARD 50 GiB PASS/FAIL. Missing live
-publication age span and post-layout `A_layout` on the real corpus.
+Selected architecture typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D`
+= 23 048 602 003 bytes (21.47 GiB) ≤ TARGET 40 GiB and HARD 50 GiB.
+Conservative measured stress = 46 000 455 406 bytes (42.84 GiB) ≤ HARD and
+> TARGET. Terminal: `STORAGE_97D_ARCHITECTURE_READY`.
 
-Whole-host at 14:17Z: ~16% used, margin to 70/80/85 is large **today**, and is
-not a 97d proof.
+Limitation: denominator is a ~3-day LIVE cohort, linearly scaled. Mix shift
+toward p95 member files is the stress case. Contractual 1 GiB/day saturation
+remains a separate theoretical bound (97 GiB) and must not be treated as
+expected fill.
 
-The archive→verify→evict path must be executable and fail-closed before any
-age policy is called "runway".
+The archive→verify→evict path must still be executable and fail-closed before
+any age policy is called "runway". Whole-host at 19:18Z: ~17% used; leftover
+same-volume ZIP is current disk, not the selected 97d term.
 
 ## 16. Implementation atom (not this PR)
 
 Do **not** start automatically. Destructive eviction is a **later** gate.
 
 Suggested later task id: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`
-Do not start it from this BLOCKED atom. Immediate research successor is
-`FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1`. Precondition for IMPL: that forensics
-atom fills §4 tables and the capacity terminal is
-`STORAGE_97D_ARCHITECTURE_READY` or
-`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`.
+Precondition: this atom terminal `STORAGE_97D_ARCHITECTURE_READY` and merge of
+the research PR. Do not start IMPL from an unmerged working copy as production
+mutation. Destructive eviction remains a later gate after IMPL write-only
+commissioning.
 
 Write set (bounded; eviction still a later destructive gate after IMPL):
 

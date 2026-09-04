@@ -42,29 +42,51 @@ PUBLISHER = ROOT / "src" / "solana_alpha_lab" / "factory" / "observation_panel_p
 
 
 class Factory97dStorageArchitectureProofTests(unittest.TestCase):
-    def test_terminal_is_blocked_and_does_not_claim_capacity_pass(self) -> None:
+    def test_terminal_is_ready_after_post_reboot_forensics(self) -> None:
         prd = PRD.read_text(encoding="utf-8")
         readout = READOUT.read_text(encoding="utf-8")
-        self.assertIn("STORAGE_ARCHITECTURE_BLOCKED", prd)
-        self.assertIn("STORAGE_ARCHITECTURE_BLOCKED", readout)
+        self.assertIn("Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`", prd)
+        self.assertIn("`STORAGE_97D_ARCHITECTURE_READY`", readout)
+        self.assertNotIn("Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`", prd)
+        self.assertNotIn("Terminal of this atom: `STORAGE_ARCHITECTURE_BLOCKED`", prd)
         self.assertIn("canonical content = immutable forever", prd)
         self.assertIn("hot local residency = 90d", prd)
         self.assertIn("cold durability = indefinite", prd)
-        self.assertNotIn("pass 40 gib: yes", readout.lower())
         self.assertIn("HOST_UNREACHABLE", readout)
+        self.assertIn("NOT_OBSERVED_AFTER_HOST_UNREACHABLE", readout)
         forensics = json.loads(FORENSICS.read_text(encoding="utf-8"))
-        self.assertEqual(forensics["this_atom_live_probe"]["status"], "HOST_UNREACHABLE")
+        self.assertEqual(forensics["this_atom_live_probe"]["status"], "POST_REBOOT_COHERENT")
         self.assertFalse(forensics["credential_values_read"])
+        self.assertFalse(forensics["this_atom_live_probe"]["factory_data_mutated_by_this_atom"])
         self.assertEqual(
-            forensics["this_atom_live_probe"]["factory_data_mutated"],
+            forensics["historical_host_unreachable_probe"]["status"],
+            "HOST_UNREACHABLE",
+        )
+        self.assertEqual(
+            forensics["historical_host_unreachable_probe"]["factory_data_mutated"],
             "NOT_OBSERVED_AFTER_HOST_UNREACHABLE",
         )
-        self.assertIn("NOT_OBSERVED_AFTER_HOST_UNREACHABLE", readout)
+        self.assertTrue(forensics["byte_attribution"]["backup_sink"]["same_st_dev_as_factory"])
+        self.assertFalse(
+            forensics["post_reboot_health"]["scientific_rdp_vs_14_17z"][
+                "unexpected_loss_or_rollback"
+            ]
+        )
         model = json.loads(MODEL.read_text(encoding="utf-8"))
-        self.assertIsNone(model["pass_target_40_gib"])
-        self.assertIsNone(model["pass_hard_50_gib"])
+        self.assertTrue(model["pass_target_40_gib"])
+        self.assertTrue(model["pass_hard_50_gib"])
+        self.assertFalse(model["pass_target_40_gib_conservative_stress"])
         self.assertEqual(model["capacity_horizon_days"], 97)
-        self.assertEqual(model["terminal_gate"], "STORAGE_ARCHITECTURE_BLOCKED")
+        self.assertEqual(model["terminal_gate"], "STORAGE_97D_ARCHITECTURE_READY")
+        self.assertLessEqual(model["TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D"], model["target_bytes"])
+        self.assertLessEqual(
+            model["conservative_measured_stress"]["total_97d_bytes"],
+            model["hard_bytes"],
+        )
+        self.assertGreater(
+            model["conservative_measured_stress"]["total_97d_bytes"],
+            model["target_bytes"],
+        )
 
     def test_selected_architecture_rejects_new_platforms_and_size_only_verify(self) -> None:
         prd = PRD.read_text(encoding="utf-8")

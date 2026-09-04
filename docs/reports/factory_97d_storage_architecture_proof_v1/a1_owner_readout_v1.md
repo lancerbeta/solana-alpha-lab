@@ -2,151 +2,143 @@
 
 ## Terminal
 
-`STORAGE_ARCHITECTURE_BLOCKED`
+`STORAGE_97D_ARCHITECTURE_READY`
 
-Live probe: `HOST_UNREACHABLE`
+Typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` = 21.47 GiB ≤ TARGET 40.
+Conservative measured stress = 42.84 GiB: TARGET miss, HARD 50 pass.
+`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` не выбран (stress > 40).
+`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE` не выбран (lossless layout
+держит HARD). `STORAGE_ARCHITECTURE_BLOCKED` снят после post-reboot
+coherence + bounded live forensics.
 
-VPS `factory-remote-ops` (`5.199.174.153`) не отвечал (SSH banner timeout,
-ICMP 100% loss) после read-only forensics-скрипта, который обошёл `/opt` в
-поисках `BACKUP_*.zip`. Причинность «скрипт уронил хост» не доказана, только
-временная последовательность. Этот процесс не писал Drive и не печатал
-секреты в Git/чат (`credential_values_read: false`). Мутация Factory-данных
-на хосте после обрыва и чтение секретов на хосте —
-`NOT_OBSERVED_AFTER_HOST_UNREACHABLE`, не доказанный negative. Live Phase A/C
-этого атома не закрыты. 40/50 GiB
-PASS/FAIL не утверждается.
-
-Последний успешный machine readback: `2026-09-04T14:17:55Z`
-(`a1_storage_baseline_v1.json`).
+Historical incident remains recorded: first probe `HOST_UNREACHABLE`
+(`NOT_OBSERVED_AFTER_HOST_UNREACHABLE` for post-hang host mutation/secrets).
+Power cycle is not itself recovery proof; machine readback is.
 
 ## Entry / outcome
 
 - `DECISION_DELTA`: какая стандартная архитектура держит 90 дней RAW+science на
   текущем ~100 GiB VPS без апгрейда диска.
-- `UNCERTAINTY_REMOVED`: владельцы байт и backup-амплификация из Git-контрактов
-  и baseline 14:17Z; semantic equality кодеков на schema-faithful корпусе.
-  rclone/Drive SHA256 и isolated hydration — **выбранный контракт**, не live
-  измерение в этом атоме (Drive hash calls = 0).
+- `UNCERTAINTY_REMOVED`: live byte attribution, `st_dev` backup sink, publication
+  span ~2.96 d, SNAPPY footer, ZSTD3 live ratios, 97d typical/stress vs 40/50.
 - `CAPABILITY_OR_EVIDENCE`: PRD+SSD
   `docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md`.
-- `STOP`: нет implementation, deploy, retention APPLY, Drive write, delete.
-- `NEXT` — три разных слоя, не одна стрелка:
-
-  1. **Owner recovery (сейчас):** Cherry portal reboot instance `973818`.
-     Locator: `docs/operator/FACTORY_REMOTE_HOST.md`.
-  2. **Research (после живого SSH):** bounded live forensics, suggested id
-     `FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1`. Не этот PR. Не walk `/opt`.
-  3. **Implementation:** `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` только
-     после capacity terminal `STORAGE_97D_ARCHITECTURE_READY` или
-     `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`. Не следующий шаг.
+- `STOP`: нет implementation, deploy, retention APPLY, Drive write, delete,
+  merge. Этот PR — research/design handoff.
+- `NEXT`: merge gate этого PR после CI; затем
+  `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`. Destructive eviction —
+  отдельный поздний gate. Не менять capture/sampling.
 
 `MODEL_EFFORT_RECOMMENDATION`: `SOL_XHIGH`
-`NEXT_MODEL_EFFORT`: `SOL_XHIGH` на retry forensics / capacity; не
-implementation.
+`NEXT_MODEL_EFFORT`: `LUNA_MAX` на bounded implementation после merge; `SOL_XHIGH`
+если IMPL трогает schema/PIT/availability clocks.
 
-Predecessor `NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED` не переписывается: это
-было «менять topology/retention/resolution *сейчас*?» при 31d raw + immutable
-local RDP. Здесь новое требование владельца: 90d residency всех material RAW +
-science и бюджет 40/50 GiB.
+Predecessor `NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED` не переписывается.
+
+## Post-reboot health
+
+SSH `SSH_OK`. Hostname `factory-remote-ops`. New boot proven:
+`boot_id=e3645da3-2e1b-4d22-bcaf-20b9648f22d4`, `uptime -s` `2026-09-04 22:12:07`
+(EEST), uptime 355 s at 19:18:03Z. Deploy SHA still
+`af1ad23ac4a97d4f63108abd8446ad3dc6b1960c` (PR #262 not deployed).
+
+FS used 16.46 GiB / 17%. Collector timer enabled/active; ticks `TICK_COMPLETE`;
+activation `ACT-619AE64E885E995E` `ACTIVE`. Source-poll success
+`19:18:41.288308Z` → `19:19:41.374963Z` (progress after boot). SQLite
+`integrity_check=ok` on observation/operational/paper. publication_jobs:
+open 0 / completed 530 / `legacy_full` 0 / unmigrated 0. Backup timers
+enabled/waiting; no stuck writer; no backup locks. Off-host `CURRENT`
+(`DAILY_DELTA_VERIFIED` 13:17Z). RDP excl. jobs 612 857 483 → 842 194 811
+(рост, не rollback). `restore_marker_unresolved=false`.
+
+Doctor JSON `DOCTOR_PROVIDER_FAILED` из `TRANSPORT_ERROR_24h=1` —
+остаток 24h-окна, не текущий poll fail. Это не `STOP_WITH_REPLAN`.
+
+Root cause HOST_UNREACHABLE: не доказан без speculative repair. Только
+временная последовательность после `/opt` walk. Этот атом Drive не писал и
+секреты не читал (`credential_values_read: false`).
 
 ## 16 ответов
 
-1. **Что ест байты сейчас (14:17Z):** scientific RDP ~584 MiB; SQLite ~160 MiB;
-   completed publication receipts ~480 KiB; local backup zip ~10.3 GiB
-   (pre-reclaim leftover, не steady-state); FS used ~15.1 GiB / ~16%.
-2. **Что дублируется:** текущий 12h ZIP_STORED full копирует весь
-   `observation_rdp` на тот же диск; weekly off-host full снова шлёт те же
-   immutable байты. Size-only remote verify. Member `members.parquet` пишется
-   на каждую publication — live exact-dup ещё не измерен.
-3. **Operational vs raw vs scientific:** SQLite = operational ledger + decoded
-   JSON bodies (~56.5 MiB protected payloads, 2353 calls). RDP Parquet =
-   scientific. `legacy_full` = 0.
-4. **Backup amplify:** ZIP_STORED ⇒ ~1.0× сжатия, ~2× same-volume если sink на
-   том же FS. `FACTORY_BACKUP_SINK` other-device **не** machine-proven —
-   same-volume байты входят в 40/50.
-5. **Lossless savings:** CI корпус доказал semantic equality для unspecified /
-   none / zstd 1,3,7 / snappy и raw `canonical_json_bytes` roundtrip +
-   `response_sha256` dedup. Live ratio не измерен (хост упал).
-6. **Выбранная архитектура:** WRAP Parquet ZSTD + DuckDB + rclone Drive SHA256
-   + существующий ZIP/manifest; split operational SQLite vs HOT raw Parquet;
-   upload-once immutable; 90d residency / indefinite cold; mutable-only local
-   snapshot. Имя: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`.
-7. **REJECT:** current SQLite+RDP unchanged (2× backup + нельзя эвиктить);
-   Iceberg/Delta/Hudi (каталог/сервис, сложность > задачи); MinIO/S3/GCS (новый
-   провайдер); PostgreSQL/Kafka/Redis; 31→90 в SQLite как решение; CAS файлы
-   пока Parquet сохраняет exact canonical bytes.
-8. **97d footprint:** typical / conservative **UNKNOWN** без publication
-   day-span. Contractual 1 GiB/day × 97d = 97 GiB — отдельно, не measured
-   run-rate, и уже > HARD 50.
-9. **PASS 40 GiB?** Не утверждается.
-10. **PASS 50 GiB?** Не утверждается.
-11. **RAW 90d без SQLite bloat:** HOT raw Parquet (canonical JSON bytes +
-    occurrence metadata, dedup по `response_sha256`); COMPLETED body уходит из
-    SQLite только после materialize+hash+нет unresolved due/call.
-12. **Scientific identity после eviction:** content immutable; HOT tree
-    shrinks; COLD ZIP_STORED exact source bytes; hydrate в isolated
-    `data_root`; manifests/path/dataset id сохраняются; DuckDB projection
-    rebuild from remaining HOT, не partial delete из глобально связанного
-    индекса.
-13. **Drive verify:** `rclone hashsum sha256`; fallback `--download`. Size-only
-    недостаточно. Это атом Drive не вызывал.
-14. **DR:** ~24h RPO за счёт mutable snapshot + unclosed tail. Isolated restore
-    без записи в live `factory_v1`. Immutable не weekly full-reupload.
-15. **Старый >90d experiment:** скачать archive unit → isolated temp data_root
-    → существующие readers. Не поверх live.
-16. **Новый consumer через месяц:** storage admission в
-    `DATA_RESOLUTION_ECONOMY`: compressed bytes/day → 97d → total vs 40/50.
-    >40 `DEGRADED`; >50 `ACTION_REQUIRED`. Не silent downsample. Если lossless
-    не влезает в 50 — `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`.
+1. **Что ест байты сейчас (19:23Z):** scientific RDP excl. jobs 842.2 MiB
+   (members 786.2 MiB SNAPPY); SQLite 183.2 MiB; completed receipts 545 KiB;
+   leftover local ZIP 10.35 GiB (pre-reclaim, не 97d selected term); factory_v1
+   0.97 GiB; current data-related incl. leftover ZIP 11.32 GiB; FS ~17%.
+2. **Что дублируется:** `poll_slots` ≈ тот же JSON, что `call_ledger` (второй
+   сырой слой в SQLite). `response_sha256` extra occurrences 178 / ~387 KiB —
+   почти ничего. Exact `members.parquet` SHA dups = 0; доминирует повтор
+   overlapping 7d member snapshot на каждую publication. Same-volume
+   ZIP_STORED full RDP: `st_dev=64769` совпадает с `factory_v1` ⇒ `B_same_vol=2.0`
+   сейчас. Leftover sink 10.35 GiB (не selected 97d term).
+3. **Operational vs raw vs scientific:** SQLite = ledger + decoded JSON
+   (`$.rows` 58.1 MiB unique-ish; body field 0). RDP Parquet = scientific.
+   `legacy_full` = 0. DuckDB projection ABSENT.
+4. **Backup amplify:** git-side sink same `st_dev`. Selected architecture
+   `B_same_vol=1.0` (mutable-only snapshot). Текущий leftover ZIP 10.35 GiB,
+   не steady 97d.
+5. **Lossless savings:** live members SNAPPY→ZSTD3 ≈ 0.74×; 80 raw JSON rows →
+   ZSTD3 parquet ≈ 0.15×. CI semantic equality без изменений.
+6. **Выбранная архитектура:** `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`
+   (не пересобиралась; live numbers её подтверждают).
+7. **REJECT:** current SQLite+RDP unchanged (B=2 + нельзя эвиктить science);
+   Iceberg/Delta/Hudi; MinIO/S3/GCS; PG/Kafka/Redis; 31→90 в SQLite; CAS files.
+8. **97d footprint (selected, B=1, A=0.725):** typical
+   `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` = 23 048 602 003 bytes
+   (21.47 GiB). Conservative stress (members p95/mean) = 46 000 455 406
+   (42.84 GiB). Contractual 1 GiB/day × 97 = 97 GiB — отдельно, не run-rate.
+9. **PASS 40 GiB?** Typical **yes**. Conservative stress **no**.
+10. **PASS 50 GiB?** Typical **yes**. Conservative stress **yes**.
+11. **RAW 90d без SQLite bloat:** HOT raw Parquet canonical JSON + occurrence
+    metadata; `response_sha256` unique-body. COMPLETED body leaves SQLite only
+    after materialize+hash+no unresolved due/call.
+12. **Scientific identity после eviction:** content immutable; HOT shrinks;
+    COLD ZIP_STORED; hydrate isolated `data_root`. Пока нет поля
+    `hot_local_residency_days`:
+    `SCIENTIFIC_RDP_LOCAL_EVICTION_FORBIDDEN_UNDER_CURRENT_IMMUTABLE_CONST`.
+13. **Drive verify:** `rclone hashsum sha256`; fallback `--download`. Этот атом
+    Drive hash не вызывал.
+14. **DR:** ~24h RPO на mutable tail. Isolated restore. Immutable не weekly
+    full-reupload.
+15. **Старый >90d experiment:** archive unit → isolated temp data_root →
+    существующие readers.
+16. **Новый consumer:** `DATA_RESOLUTION_ECONOMY` admission: compressed
+    bytes/day → 97d → vs 40/50. >40 `DEGRADED`; >50 `ACTION_REQUIRED`. Не
+    silent downsample.
 
 ## Content immutability vs local residency
 
 Не переименовывать тихо `canonical_panel_retention=IMMUTABLE`.
 
-Пока схема и collector runbook говорят только IMMUTABLE / never auto-deleted,
-локальный eviction scientific RDP **запрещён**. 90d residency — новое поле
-`hot_local_residency_days`, не новое значение старого const.
-
 - canonical content = immutable forever
 - hot local residency = 90d
 - cold durability = indefinite
 
-## VPS / owner attention
+## Implementation atom (not this PR)
 
-Хост на момент этого readout не отвечает. Это не micro-approval и не
-implementation. Слой 1 — только владелец в Cherry. Locator:
-`docs/operator/FACTORY_REMOTE_HOST.md` и
-`docs/operator/factory_remote_host_v1.yaml`. Instance: `973818`. Hostname:
-`factory-remote-ops`. IPv4: `5.199.174.153`. User: `factory`.
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` after this research PR merges.
+Write set stays in PRD §16. Eviction remains a later destructive gate.
+Deployment sequence: write-only ZSTD + raw plane → archive without eviction →
+mutable-only backup cutover → isolated hydrate proof → STOP.
+
+## VPS locator (unchanged)
 
 ```
 https://portal.cherryservers.com/
 ```
 
-Хост снова жив, когда SSH banner не timeout **и** doctor JSON читается
-(вердикт `HEALTHY` у doctor запрещён; нужен parseable JSON, не ICMP-only).
-
-Проверка SSH с ПК оператора:
-
 ```
 ssh -i "$env:USERPROFILE\.ssh\id_ed25519_factory" -o IdentitiesOnly=yes -o BatchMode=yes factory@5.199.174.153
 ```
 
-Doctor после живого SSH:
+Default doctor emits health alerts. This atom used `doctor_packet` without
+Telegram. Locator one-liner remains:
 
 ```
 ssh -i "$env:USERPROFILE\.ssh\id_ed25519_factory" -o IdentitiesOnly=yes -o BatchMode=yes factory@5.199.174.153 "cd /opt/solana-alpha-lab && sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py"
 ```
 
-Слой 2 (агент, только после живого SSH): `du` только
-`/opt/solana-alpha-lab/local/factory_v1` и известный backup sink; SQLite
-`file:?mode=ro`; parquet metadata; не `rglob /opt`; не hashing всего дерева
-одним процессом без прогресса. Это не команды Cherry console.
-
-Collector на момент 14:17Z был `ACTIVE`. Текущее здоровье неизвестно, пока нет
-свежего doctor.
-
 ## Non-claims
 
-Не alpha. Не NetReturn. Не canonical DONE. Не 40/50 PASS. Не implementation.
-Не retention APPLY. Не Drive write. Не текущий runtime health.
+Не alpha. Не NetReturn. Не canonical DONE. Не merge. Не implementation.
+Не retention APPLY. Не Drive write. Не capture change. Не WITH_TARGET_MARGIN.
+Contractual 1 GiB/day saturation is not a measured run-rate.

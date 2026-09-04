@@ -152,25 +152,24 @@ PostgreSQL/Iceberg/Delta/Hudi/new cloud provider merely because they exist.
 
 Exactly one, this atom:
 
-`STORAGE_ARCHITECTURE_BLOCKED`
+`STORAGE_97D_ARCHITECTURE_READY`
 
-Live 97d capacity PASS/FAIL is not closed. Architecture is recorded in
-`docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md` but must not
-be implemented until bounded live forensics fills the capacity tables.
+Typical 97d selected footprint passes TARGET 40 GiB and HARD 50 GiB.
+Conservative measured stress passes HARD and misses TARGET, so
+`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` is not selected.
+`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE` is not selected.
+Historical `HOST_UNREACHABLE` remains in evidence and does not stay the
+capacity terminal.
 
-Other terminals remain defined for the successor atom:
+Defined but not this atom's terminal:
 
-- `STORAGE_97D_ARCHITECTURE_READY`
 - `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`
 - `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
+- `STORAGE_ARCHITECTURE_BLOCKED`
 
 ## STOP / NEXT
 
 STOP after the research/design PR and owner readout. No architecture
-implementation. NEXT is three layers: (1) owner recovers VPS via Cherry
-instance `973818` / `docs/operator/FACTORY_REMOTE_HOST.md`; (2) research
-`FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1` (no whole-`/opt` walk) returns a
-capacity terminal; (3) `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` only
-after `STORAGE_97D_ARCHITECTURE_READY` or
-`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`. Destructive eviction
-remains a later gate.
+implementation. No merge from this handoff until exact-head CI and owner
+phrase. NEXT is `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` after this
+research PR merges. Destructive eviction remains a later gate.

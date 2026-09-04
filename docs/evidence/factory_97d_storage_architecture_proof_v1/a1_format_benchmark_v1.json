@@ -1,10 +1,35 @@
 {
   "schema": "smial.factory-97d-format-benchmark",
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "as_of": "2026-09-04",
   "live_corpus_benchmark": {
-    "status": "NOT_RUN",
-    "reason": "VPS unreachable after read-only /opt walk; no live parquet/raw sample copied"
+    "status": "RUN_TMP_ONLY",
+    "observed_at": "2026-09-04T19:26:33Z",
+    "factory_data_mutated": false,
+    "live_bytes_copied_to_git": false,
+    "footer_compression_observations_and_members": "SNAPPY",
+    "created_by": "parquet-cpp-arrow version 25.0.0",
+    "member_rewrite_median_file": {
+      "source_snappy_bytes": 2167088,
+      "uncompressed_bytes": 2778880,
+      "zstd_1_bytes": 1602052,
+      "zstd_3_bytes": 1607686,
+      "zstd_7_bytes": 1557326,
+      "zstd_3_over_snappy": 0.74186
+    },
+    "member_rewrite_p95_file": {
+      "source_snappy_bytes": 3126661,
+      "uncompressed_bytes": 4182746,
+      "zstd_3_bytes": 2275791,
+      "zstd_3_over_snappy": 0.72787
+    },
+    "raw_completed_sample_80": {
+      "unique_sha": 80,
+      "sum_json_bytes": 3909820,
+      "zstd_3_occurrence_parquet_bytes": 597114,
+      "zstd_3_over_json": 0.15272,
+      "snappy_occurrence_parquet_bytes": 1097917
+    }
   },
   "local_ci_corpus": {
     "test": "tests/test_factory_97d_storage_format_benchmark_v1.py",
@@ -22,5 +47,5 @@
     "canonical_raw_parquet_extract_equals_canonical_json_bytes": true,
     "response_sha256_dedup_reconstructs_occurrence_bodies": true
   },
-  "pyarrow_current_publisher_note": "observation_panel_publisher calls pq.write_table without explicit compression; pyarrow 25 default is snappy. research_store writes compression=NONE. Do not label live observation files uncompressed without footer readback."
+  "pyarrow_current_publisher_note": "observation_panel_publisher calls pq.write_table without explicit compression; live footer confirms SNAPPY (pyarrow 25). research_store writes compression=NONE. Do not label live observation files uncompressed."
 }
