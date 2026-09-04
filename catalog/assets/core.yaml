@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 7ef9e092a39831e8d35b7d2f68931cab6e331e6d5a9759c1ebf88701e424e7ff}
+  integrity: {kind: sha256, sha256: c5bb165035ab554ab52427d6754e13e49655f6c0c4a40ba317d58c98bb8284df}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -34903,7 +34903,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1.md', repository_path: docs/tasks/FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: 9f8cd8a7527c23fcc4a639487ff1170bf7c7114c69f37d31fc3dc27f321bb6e5}
+  integrity: {kind: sha256, sha256: 4a7ccc97d303bdb6dda03fd7841b635cac5b51d4ea50ad65f7422312ce87be7d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
