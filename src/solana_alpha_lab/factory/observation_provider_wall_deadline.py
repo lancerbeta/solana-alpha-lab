@@ -1,8 +1,15 @@
-"""Hard wall-clock deadline for ObservationSchedule provider calls.
+"""Waiter-side wall-clock deadline for ObservationSchedule provider calls.
 
 Socket/urllib inactivity timeouts alone are not a sufficient end-to-end bound:
 a stalled logical provider operation must still terminate before the scheduler
 lease TTL so the tick cannot self-fence via LEASE_FENCED.
+
+This wrapper is a waiter timeout, not a GIL-preempting hard kill. A worker
+that holds the GIL (UTF-8 decode / ``json.loads`` of a huge body) can starve
+``Event.wait`` and complete after the nominal wall — the V1 ``time.sleep``
+stall did not represent that class. Bounded response + bounded parse in
+``observation_provider_bounded_response`` is the GIL-starvation control.
+The thread wrapper remains for I/O stalls that release the GIL.
 
 ADOPT: stdlib threading + join slices (no new package). Heartbeat renews the
 held lease while waiting; on wall expiry the waiter raises TimeoutError and
@@ -29,7 +36,7 @@ _HEARTBEAT_SLICE_SECONDS = 5.0
 
 
 class ProviderWallDeadlineError(TimeoutError):
-    """Hard end-to-end provider-call wall deadline exceeded."""
+    """Waiter-side provider-call wall deadline exceeded (not a GIL hard kill)."""
 
     def __init__(self) -> None:
         super().__init__(PROVIDER_CALL_WALL_DEADLINE)
@@ -58,11 +65,12 @@ def run_with_provider_wall_deadline(
     sleeper: Callable[[float], None] | None = None,
     monotonic: Callable[[], float] | None = None,
 ) -> T:
-    """Run fn under a hard wall-clock deadline.
+    """Run fn under a waiter-side wall-clock deadline.
 
     Heartbeat (if provided) runs on wait slices so a legitimate bounded wait
     renews the scheduler lease. On deadline, raises ProviderWallDeadlineError
-    without blocking on the worker thread.
+    without blocking on the worker thread. Does not preempt GIL-bound work;
+    pair with bounded body/parse so that class cannot reach LEASE_SECONDS.
     """
 
     if wall_seconds <= 0:
@@ -113,7 +121,7 @@ def run_with_provider_wall_deadline(
 
 
 class WallDeadlineOpener:
-    """Wrap any opener.open(url) with the hard provider-call wall deadline."""
+    """Wrap any opener.open(url) with the waiter-side provider-call wall deadline."""
 
     def __init__(
         self,

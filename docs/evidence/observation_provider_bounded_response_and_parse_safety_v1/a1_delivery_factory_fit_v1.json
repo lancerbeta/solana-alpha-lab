@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-FACTORY-FIT-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1",
+  "reviewed_bindings_sha256": "547a8cb7008a2cbf93f9fae279c68f6335b0718a001d95670162b97c7222eeb3",
+  "reviewed_inventory_sha256": "fc8ed00ea30d846a70f3342336f5a8a9f5d0546b89668c79d1e4cadbe547a9fe",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CLOSES_HUGE_BODY_GIL_LEASE_STARVATION",
+    "flexibility_and_history": "PASS_ADOPT_STDLIB_BOUNDED_READ_AND_JSON_HOOKS",
+    "context_efficiency": "PASS_ONE_BOUNDED_RESPONSE_MODULE",
+    "research_truth": "PASS_TYPED_MISSING_NO_FABRICATE_NO_RETRY",
+    "owner_operability": "PASS_NO_LEASE_TTL_INCREASE_NO_NEW_DAEMON",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_STARTED_EXITS_CRASH_FAIL_CLOSED",
+    "build_vs_buy": "PASS_CAPABILITY_RADAR_NONE",
+    "security": "PASS_NO_SECRET_IN_EXCEPTIONS_OR_LEDGER",
+    "red_team": "PASS_CHUNKED_OVERSIZE_AND_DIGIT_BOMB_PROOFS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "LIVE_HOST_2MIB_JSON_STILL_HOLDS_GIL_THROUGH_LEASE"
+  },
+  "recovery": "REVERT cursor/observation-provider-bounded-response-parse-safety-v1",
+  "limits": [
+    "NO_VPS_DEPLOY",
+    "NO_PROVIDER_FOREVER_COMPAT",
+    "NO_OFFICIAL_JUPITER_MAX_BODY",
+    "NO_GIL_HARD_KILL",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}

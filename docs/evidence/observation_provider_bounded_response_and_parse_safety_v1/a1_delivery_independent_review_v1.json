@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1",
+  "reviewed_bindings_sha256": "547a8cb7008a2cbf93f9fae279c68f6335b0718a001d95670162b97c7222eeb3",
+  "reviewed_inventory_sha256": "fc8ed00ea30d846a70f3342336f5a8a9f5d0546b89668c79d1e4cadbe547a9fe",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=e4df56ff069a4db282da1499b513389366596563a38f6b06d77f82fb4a796f4c",
+        "CLAIM_BOUND_001_SUPPORTED_BOUNDED_READ_AND_TYPED_MISS",
+        "CLAIM_BOUND_002_SIZE_AND_TOKEN_BOUND_NOT_GIL_HARD_KILL",
+        "CLAIM_BOUND_003_WALL_WAITER_SIDE_ONLY",
+        "CLAIM_BOUND_004_STARTED_FAIL_CLOSED_OVERSIZE_TICK",
+        "CLAIM_BOUND_005_MISSING_REASON_IS_SCIENTIFIC_TYPE",
+        "HTTP_CLASS_TRANSPORT_ALIASES_OVERSIZE_WITH_SOCKET_RESIDUAL",
+        "NON_CLAIMS_RESPECTED",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "PACKET_INFORMATION_PATH_ONLY"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "UNBOUNDED_READ_GONE",
+        "NO_SILENT_TRUNCATE_ON_URLLIB",
+        "TYPED_MISSINGNESS_OVERSIZE_INVALID_TIMEOUT",
+        "STARTED_EXITS_HANDLED_CRASH_FAIL_CLOSED",
+        "RETRY_FALLBACK_FALSE",
+        "LEASE_SECONDS_UNCHANGED",
+        "NUMBER_TOKEN_CAP_40",
+        "LOW_LYING_READ_N_SLICE_NOT_PRODUCTION_URLLIB",
+        "LOW_REGISTRY_PIN_STILL_PRIMITIVES_ONLY"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DECISION_DELTA_CLOSED_FOR_NAMED_CONSUMER",
+        "CHEAPEST_FALSIFIER_REPRESENTED_ZERO_NETWORK",
+        "REQUIRED_PROOF_SURFACES_PRESENT",
+        "LEASE_SECONDS_NOT_THE_REPAIR",
+        "NO_RETRY_FALLBACK_NO_NEW_SERVICE",
+        "GAPS_NONE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_COMMISSIONING"
+  ]
+}

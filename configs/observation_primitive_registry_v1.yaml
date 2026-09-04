@@ -203,7 +203,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
+      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -226,7 +226,7 @@ primitives:
       status: ACCEPTED
     dependency_contract: null
     terminal_classes: [OBSERVED, MISSING_TYPED]
-    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, INVALID_RESPONSE]
+    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, INVALID_RESPONSE, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false
@@ -244,7 +244,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
+      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -278,7 +278,7 @@ primitives:
       status: ACCEPTED
     dependency_contract: null
     terminal_classes: [OBSERVED, MISSING_TYPED, EXCLUDED_AMBIGUOUS]
-    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, FIELD_ABSENT, NON_FINITE, FDV_NOT_MARKET_CAP, AMBIGUOUS_PRICE_ALIAS, TAKER_VOLUME_NOT_INFERRED_FROM_BUY_SELL]
+    missing_classes: [ENTITY_ABSENT_FROM_RESPONSE, FIELD_ABSENT, NON_FINITE, FDV_NOT_MARKET_CAP, AMBIGUOUS_PRICE_ALIAS, TAKER_VOLUME_NOT_INFERRED_FROM_BUY_SELL, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false
@@ -296,7 +296,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
+      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -324,7 +324,7 @@ primitives:
       status: ACCEPTED
     dependency_contract: null
     terminal_classes: [OBSERVED, MISSING_TYPED]
-    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
+    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false
@@ -342,7 +342,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
+      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -370,7 +370,7 @@ primitives:
       status: ACCEPTED
     dependency_contract: null
     terminal_classes: [OBSERVED, MISSING_TYPED]
-    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
+    missing_classes: [NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false
@@ -388,7 +388,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
+      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -418,7 +418,7 @@ primitives:
       recipe_id: DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001
       requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-001
     terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
-    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
+    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false
@@ -436,7 +436,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82"
+      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -466,7 +466,7 @@ primitives:
       recipe_id: DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001
       requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-1M-001
     terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
-    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN]
+    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false

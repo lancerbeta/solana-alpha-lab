@@ -32979,7 +32979,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/observation_primitive_registry_v1.yaml', repository_path: configs/observation_primitive_registry_v1.yaml}
-  integrity: {kind: sha256, sha256: d560b947beae6341e90e6e818078f57383f33327be9dab63da2d4ee7ec985f06}
+  integrity: {kind: sha256, sha256: 04aee01ebfbe6a26bf8cdc54aff94a415715a63b9df02b7eab59c41a58a797aa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33047,7 +33047,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_runtime.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_runtime.py}
-  integrity: {kind: sha256, sha256: ab76357599f7d9ab1b817682b4fafd0943ead86672c0a0f40a5adc11ec42136d}
+  integrity: {kind: sha256, sha256: 0a7439d5c40bb9af8f7e79443b7e462901acb0650e517767471d209b57409f59}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33098,7 +33098,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_primitives.py', repository_path: src/solana_alpha_lab/factory/observation_primitives.py}
-  integrity: {kind: sha256, sha256: cd2747e3c0101287bba60059654e1b7313a6d469a3126d381ce361e98cefab82}
+  integrity: {kind: sha256, sha256: d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -34728,13 +34728,13 @@ records:
 - asset_id: MODULE-OBSERVATION-PROVIDER-WALL-DEADLINE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Hard end-to-end wall-clock deadline wrapper for ObservationSchedule provider opener calls with optional lease heartbeat.
+  purpose: Waiter-side wall-clock deadline wrapper for ObservationSchedule provider opener calls with optional lease heartbeat; not a GIL-preempting hard kill.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_provider_wall_deadline.py', repository_path: src/solana_alpha_lab/factory/observation_provider_wall_deadline.py}
-  integrity: {kind: sha256, sha256: 177f41bf02f10229ff4d626e4eb8433aabafcb750272fc8f79eb8df8765ab7f4}
+  integrity: {kind: sha256, sha256: e83aa3a5aaedef6e6d73c28bc3bb8cc4aeebb042e3d52981674c39dec69f670e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-PROVIDER-WALL-DEADLINE-AND-LEASE-SAFETY-001}
@@ -34760,4 +34760,62 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [PROVIDER_WALL_DEADLINE, LEASE_FENCED, IN_FLIGHT, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for memory-bounded Jupiter ObservationSchedule response body and parse safety that cannot starve the lease envelope.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-04'
+  truth_owner: OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1.md', repository_path: docs/tasks/OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1.md}
+  integrity: {kind: sha256, sha256: b5b3d7515cd5304f7ee91566fc7ee81f9ec8889f0971b1a8fd7ae685a10a496f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-RUNTIME-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-PRIMITIVES-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-PROVIDER-WALL-DEADLINE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BOUNDED_RESPONSE, RESPONSE_BODY_TOO_LARGE, GIL, LEASE_SAFETY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Explicit byte-budgeted Jupiter HTTP body read and bounded JSON parse with typed oversize/invalid outcomes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-04'
+  truth_owner: OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_provider_bounded_response.py', repository_path: src/solana_alpha_lab/factory/observation_provider_bounded_response.py}
+  integrity: {kind: sha256, sha256: ef57273a165b3c1fc085e1ad0bf45f41011b5aa4b17394ec4db50c0a36adf417}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [MAX_RESPONSE_BYTES, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network proofs for bounded body, bounded parse, typed missingness, STARTED exit, and lease non-self-fence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-04'
+  truth_owner: OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_observation_provider_bounded_response_and_parse_safety_v1.py', repository_path: tests/test_observation_provider_bounded_response_and_parse_safety_v1.py}
+  integrity: {kind: sha256, sha256: 44870fa76d00ae742c8d518b8c49e1fe4574a3790cbc5eea0d064941dd285ad6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-RUNTIME-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [BOUNDED_RESPONSE, LEASE_FENCED, RESPONSE_BODY_TOO_LARGE, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
