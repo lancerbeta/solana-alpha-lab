@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-PROVIDER-WALL-DEADLINE-LEASE-SAFETY-FACTORY-FIT-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_PROVIDER_WALL_DEADLINE_AND_LEASE_SAFETY_V1",
+  "reviewed_bindings_sha256": "1f49a409084402f0ae09468af6de0d2afd022c43605c679aa8cf314980d6a7ea",
+  "reviewed_inventory_sha256": "ed87eba6adca9ddbc784a962b496ae050ce63ac2b0bccf977f94fb1fb29cf044",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CLOSES_PROVIDER_STALL_SELF_FENCE",
+    "flexibility_and_history": "PASS_ADOPT_STDLIB_THREAD_WALL",
+    "context_efficiency": "PASS_ONE_WALL_MODULE_ONE_CONFIG_FIELD",
+    "research_truth": "PASS_TYPED_TIMEOUT_NO_FABRICATE_NO_RETRY",
+    "owner_operability": "PASS_CONFIG_WALL_BELOW_LEASE",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_STARTED_IN_FLIGHT_FAIL_CLOSED",
+    "build_vs_buy": "PASS_CAPABILITY_RADAR_NONE",
+    "security": "PASS_NO_CREDENTIAL_SURFACE_CHANGE",
+    "red_team": "PASS_WALLCLOCK_LEASE_FALSIFIER"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SECOND_PROVIDER_WALL_INCIDENT_OR_LONG_LIVED_TICK_DAEMON_ACCUMULATION"
+  },
+  "recovery": "REVERT cursor/observation-provider-wall-deadline-lease-safety-v1",
+  "limits": [
+    "NO_VPS_DEPLOY",
+    "NO_PROVIDER_FOREVER_COMPAT",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}

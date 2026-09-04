@@ -450,6 +450,17 @@ class ObservationScheduleStore:
             self._conn.rollback()
             return None
 
+    def renew_held_lease(self, *, clock: datetime | None = None) -> None:
+        """Renew expires_at while this process still owns the lease token.
+
+        Used as a bounded heartbeat during hard wall-clock provider waits so a
+        legitimate in-budget call cannot self-fence via LEASE_FENCED.
+        """
+
+        if self._lease_token is None:
+            raise ObservationScheduleStoreError("LEASE_NOT_HELD")
+        self._require_write_lease(clock)
+
     def release_lease(self, lease_token: str) -> None:
         cursor = self._conn.execute(
             "DELETE FROM scheduler_leases WHERE lease_id = ? AND lease_token = ?",

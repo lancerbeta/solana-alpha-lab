@@ -39,6 +39,9 @@ from solana_alpha_lab.factory.observation_schedule_composition import (  # noqa:
     TickPhysicalOverrides,
     materialize_tick_physical_dependencies,
 )
+from solana_alpha_lab.factory.observation_provider_wall_deadline import (  # noqa: E402
+    resolve_provider_call_wall_seconds,
+)
 from solana_alpha_lab.factory.observation_schedule_runtime import (  # noqa: E402
     DEFAULT_RUNTIME_RELATIVE,
     ObservationRuntimeError,
@@ -537,6 +540,7 @@ def main(
                     clock=physical.pacing_clock,
                     fault_after=os.environ.get("OBSERVATION_SCHEDULE_PUBLISH_FAULT")
                     or config.get("publish_fault_after"),
+                    provider_call_wall_seconds=resolve_provider_call_wall_seconds(config),
                 )
                 result["schedule_sha256"] = digest
                 result["activation_id"] = activation_id
