@@ -71,8 +71,24 @@ policy.
 Semantic transition (do not silently reinterpret `canonical_panel_retention=IMMUTABLE`):
 
 - `CONTENT_IMMUTABILITY` = canonical bytes never mutate; identity is content hash.
-- `LOCAL_RESIDENCY` = HOT local copy retained 90d.
+  The existing schema const `canonical_panel_retention: IMMUTABLE` **keeps this
+  meaning**. It does **not** become “delete after 90d”.
+- `LOCAL_RESIDENCY` requires a **new** versioned field, proposed name
+  `hot_local_residency_days` (value `90`). Add it in
+  `catalog/schemas/observation_schedule_v1.schema.json` (and the duplicate
+  `experiment_spec_v1_2` panel block if still required) **before** any HOT
+  scientific eviction. Companion operator sentence in
+  `docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md` must change from “never
+  auto-deleted by retention” to “content immutable; HOT local copy 90d after
+  COLD SHA256 verify”.
 - `COLD_DURABILITY` = indefinite on Drive after exact SHA256 verify.
+
+Until that schema + operator + domain-policy write exists:
+
+`SCIENTIFIC_RDP_LOCAL_EVICTION_FORBIDDEN_UNDER_CURRENT_IMMUTABLE_CONST`
+
+A successor must not evict Observation RDP while YAML/schema still only say
+`IMMUTABLE` and the collector runbook still says never auto-deleted.
 
 Versioned names:
 
@@ -97,7 +113,10 @@ Versioned names:
    hashed by `canonical_sha256(body)` — **not** byte-identical wire HTTP.
 5. Operational raw retention default `raw_retention_days=31`.
 6. Scientific RDP `canonical_panel_retention=IMMUTABLE` currently means never
-   auto-deleted. New design splits that into content immutability vs residency.
+   auto-deleted (`catalog/schemas/observation_schedule_v1.schema.json` const +
+   collector runbook). The new design does **not** reuse that const for 90d
+   residency. Residency is a new field `hot_local_residency_days`. Eviction
+   under the current const is forbidden.
 7. Local backup includes `observation_rdp` recursively in a 12h ZIP_STORED full,
    retain 1.
 8. Off-host: daily delta + weekly standalone full. Copy verification is
@@ -311,9 +330,17 @@ This atom performed **zero** Drive hash calls. Tests may mock the contract.
 
 Never use filesystem mtime as scientific retention truth.
 
-For a closed unit, eligibility clock is the scientifically meaningful maximum
-availability/closure clock, including `first_reliable_available_at` (and
-partition `max_available_to_strategy_at` where that is the closure bound).
+For a closed unit, eligibility clock is the **maximum** of the unit's
+availability/closure clocks. Required members:
+
+- `first_reliable_available_at`
+- `max_available_to_strategy_at` when present on the partition/manifest
+- partition/archive closure time
+
+Never use the **minimum** of those clocks. Never use filesystem mtime.
+Using only `first_reliable_available_at` when a later
+`max_available_to_strategy_at` exists can evict rows still inside the
+availability window.
 
 Eligibility:
 
@@ -451,8 +478,16 @@ atom fills §4 tables and the capacity terminal is
 `STORAGE_97D_ARCHITECTURE_READY` or
 `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`.
 
-Write set (bounded):
+Write set (bounded; eviction still a later destructive gate after IMPL):
 
+- `catalog/schemas/observation_schedule_v1.schema.json` — keep
+  `canonical_panel_retention` const `IMMUTABLE`; add
+  `hot_local_residency_days`
+- `catalog/schemas/experiment_spec_v1_2.schema.json` if it still duplicates
+  the panel retention block
+- `docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md` — replace “never auto-deleted”
+  with content-immutable + 90d HOT residency after COLD SHA256 verify
+- `delivery-harness/policies/solana-alpha-lab.md` storage-admission extension
 - `src/solana_alpha_lab/factory/observation_panel_publisher.py` (explicit ZSTD;
   optional closed-day batching; do not change availability clocks)
 - `src/solana_alpha_lab/factory/research_store.py` (explicit ZSTD on new events;
@@ -465,11 +500,12 @@ Write set (bounded):
 - `src/solana_alpha_lab/factory/offhost_backup.py` SHA256 verify; upload-once
   archive copyto
 - archive packager WRAP of existing `package_backup` ZIP_STORED+manifest
-- eviction planner (lock/plan/TOCTOU/exact paths)
-- `delivery-harness/policies/solana-alpha-lab.md` storage-admission extension
+- eviction planner (lock/plan/TOCTOU/exact paths) — must refuse if
+  `hot_local_residency_days` is absent
 - tests for compression equality, raw extract, verify-before-evict, hydration
-  isolation, no mtime age
-- Catalog/docs/operator runbook
+  isolation, max availability clock, no mtime age, no eviction under
+  IMMUTABLE-only schema
+- Catalog/docs
 
 Migrations / compatibility:
 

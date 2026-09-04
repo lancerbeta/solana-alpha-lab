@@ -100,6 +100,10 @@ science и бюджет 40/50 GiB.
 
 Не переименовывать тихо `canonical_panel_retention=IMMUTABLE`.
 
+Пока схема и collector runbook говорят только IMMUTABLE / never auto-deleted,
+локальный eviction scientific RDP **запрещён**. 90d residency — новое поле
+`hot_local_residency_days`, не новое значение старого const.
+
 - canonical content = immutable forever
 - hot local residency = 90d
 - cold durability = indefinite
