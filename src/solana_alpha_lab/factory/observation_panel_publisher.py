@@ -27,6 +27,14 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
     PrimitiveRegistryError,
     load_observation_primitive_registry,
 )
+from solana_alpha_lab.factory.observation_publication_jobs import (
+    PublicationJobError,
+    assert_routine_hot_path,
+    complete_publication_job,
+    iter_open_job_paths,
+    load_job_by_content,
+    save_open_job,
+)
 from solana_alpha_lab.storage.manifests import (
     build_dataset_manifest,
     build_partition_manifest,
@@ -568,26 +576,36 @@ def load_pending_observation_bindings(data_root: Path) -> list[dict[str, Any]]:
     return [latest[key] for key in sorted(latest)]
 
 
-def _job_path(data_root: Path, content: str) -> Path:
-    return data_root / "datasets" / "publication_jobs" / f"{content}.json"
-
-
 def _load_job(data_root: Path, content: str) -> dict[str, Any] | None:
-    path = _job_path(data_root, content)
-    if path.is_file() is False:
-        return None
-    loaded = json.loads(path.read_text(encoding="utf-8"))
-    if not isinstance(loaded, dict):
-        raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
-    return loaded
+    try:
+        return load_job_by_content(data_root, content)
+    except PublicationJobError as exc:
+        raise ObservationPanelPublisherError(str(exc)) from exc
 
 
 def _save_job(data_root: Path, content: str, payload: Mapping[str, Any]) -> None:
-    path = _job_path(data_root, content)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    tmp = path.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(dict(payload), sort_keys=True), encoding="utf-8")
-    tmp.replace(path)
+    try:
+        save_open_job(data_root, content, payload)
+    except PublicationJobError as exc:
+        raise ObservationPanelPublisherError(str(exc)) from exc
+
+
+def _complete_job(
+    data_root: Path,
+    job: Mapping[str, Any],
+    *,
+    completed_at: datetime,
+    dataset_fingerprint: str | None = None,
+) -> dict[str, Any]:
+    try:
+        return complete_publication_job(
+            data_root,
+            job,
+            completed_at=completed_at,
+            dataset_fingerprint=dataset_fingerprint,
+        )
+    except PublicationJobError as exc:
+        raise ObservationPanelPublisherError(str(exc)) from exc
 
 
 def _rdp_has(data_root: Path, record_id: str, payload_sha256: str | None = None) -> bool:
@@ -689,9 +707,29 @@ def publish_observation_batch(
         if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
             raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
         loaded = json.loads(published_path.read_text(encoding="utf-8"))
+        fingerprint = str(
+            loaded.get("dataset_fingerprint")
+            or (job or {}).get("dataset_fingerprint")
+            or content
+        )
+        if job is not None and job.get("parquet_rel"):
+            created = parse_utc(str(job["created_at"])) if job.get("created_at") else now
+            persist_observation_schedule(
+                data_root=data_root,
+                schedule=schedule,
+                now=created,
+                producer_git_sha=producer_git_sha,
+                activation_id=activation_id,
+            )
+            _complete_job(
+                data_root,
+                job,
+                completed_at=created,
+                dataset_fingerprint=fingerprint,
+            )
         return {
             "dataset_manifest_id": dataset_manifest_id,
-            "dataset_fingerprint": loaded.get("dataset_fingerprint"),
+            "dataset_fingerprint": fingerprint,
             "replay": True,
         }
 
@@ -881,6 +919,13 @@ def publish_observation_batch(
             activation_id=activation_id,
         )
         _maybe_fault(fault_after, "AFTER_MARKER")
+        _complete_job(
+            data_root,
+            job,
+            completed_at=created_at,
+            dataset_fingerprint=str(manifest.dataset_fingerprint),
+        )
+        _maybe_fault(fault_after, "AFTER_COMPLETE")
 
     return {
         "dataset_manifest_id": dataset_manifest_id,
@@ -904,13 +949,14 @@ def repair_open_publication_jobs(
     producer_git_sha: str,
     fault_after: str | None = None,
 ) -> list[dict[str, Any]]:
-    jobs_dir = data_root / "datasets" / "publication_jobs"
-    if jobs_dir.is_dir() is False:
-        return []
     digest = str(schedule["schedule_sha256"])
     repaired: list[dict[str, Any]] = []
-    for path in sorted(jobs_dir.glob("*.json")):
-        job = json.loads(path.read_text(encoding="utf-8"))
+    for path in iter_open_job_paths(data_root):
+        try:
+            assert_routine_hot_path(path)
+            job = json.loads(path.read_text(encoding="utf-8"))
+        except PublicationJobError as exc:
+            raise ObservationPanelPublisherError(str(exc)) from exc
         if not isinstance(job, dict):
             raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
         if job.get("schedule_sha256") != digest:
@@ -918,8 +964,6 @@ def repair_open_publication_jobs(
         if str(job.get("activation_id") or "") != str(activation_id):
             if job.get("activation_id") is None:
                 raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
-            continue
-        if job.get("stage") == STAGE_MARKER:
             continue
         observations = list(job.get("observations") or [])
         members = list(job.get("members") or [])
@@ -949,10 +993,12 @@ def has_open_publication_jobs(
     activation_id: str,
 ) -> bool:
     """Return whether this activation still has an unresolved publish job."""
-    jobs_dir = data_root / "datasets" / "publication_jobs"
-    if jobs_dir.is_dir() is False:
-        return False
-    for path in sorted(jobs_dir.glob("*.json")):
+
+    for path in iter_open_job_paths(data_root):
+        try:
+            assert_routine_hot_path(path)
+        except PublicationJobError as exc:
+            raise ObservationPanelPublisherError(str(exc)) from exc
         try:
             job = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
@@ -962,13 +1008,11 @@ def has_open_publication_jobs(
         if (
             str(job.get("schedule_sha256")) == schedule_sha256
             and str(job.get("activation_id")) == activation_id
-            and job.get("stage") != STAGE_MARKER
         ):
             return True
         if (
             str(job.get("schedule_sha256")) == schedule_sha256
             and job.get("activation_id") is None
-            and job.get("stage") != STAGE_MARKER
         ):
             return True
     return False

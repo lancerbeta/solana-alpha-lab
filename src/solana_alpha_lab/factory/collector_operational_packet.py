@@ -18,6 +18,11 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     CORPUS_DATASET_ID,
     load_observation_rdp_source,
 )
+from solana_alpha_lab.factory.observation_publication_jobs import (
+    journal_stats,
+    project_7d_disk_used,
+    rdp_bytes_excluding_publication_jobs,
+)
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.offhost_backup import offhost_health_snapshot
@@ -582,6 +587,62 @@ def build_collector_operational_packet(
     if measured is not None:
         rdp_bytes = measured
 
+    jobs = journal_stats(rdp)
+    rdp_science_bytes: Any = UNKNOWN
+    try:
+        rdp_science_bytes = rdp_bytes_excluding_publication_jobs(rdp)
+    except OSError:
+        rdp_science_bytes = UNKNOWN
+
+    declared_raw: Any = UNKNOWN
+    remaining_canonical: Any = UNKNOWN
+    elapsed_days: float | None = None
+    digest = str(base.get("schedule_sha256") or "")
+    act_id = str(base.get("activation_id") or "")
+    if digest:
+        try:
+            registered = store.get_registered_schedule(digest)
+        except Exception:
+            registered = None
+        document = (registered or {}).get("document") if registered else None
+        budgets = (document or {}).get("budgets") if isinstance(document, dict) else {}
+        if isinstance(budgets, dict) and "raw_bytes_per_utc_day_max" in budgets:
+            try:
+                declared_raw = int(budgets["raw_bytes_per_utc_day_max"])
+            except (TypeError, ValueError):
+                declared_raw = UNKNOWN
+        if isinstance(budgets, dict) and "canonical_bytes_lifetime_max" in budgets:
+            try:
+                life = store.load_lifetime(
+                    schedule_sha256=digest, activation_id=act_id
+                )
+                remaining_canonical = max(
+                    0,
+                    int(budgets["canonical_bytes_lifetime_max"])
+                    - int(life["canonical_bytes"]),
+                )
+            except Exception:
+                remaining_canonical = UNKNOWN
+        try:
+            activation = store.get_activation(digest, act_id) if act_id else None
+            starts = (activation or {}).get("starts_at")
+            if starts:
+                elapsed_days = max(
+                    (clock - parse_utc(str(starts))).total_seconds() / 86400.0, 0.0
+                )
+        except Exception:
+            elapsed_days = None
+
+    disk_total: int | None = None
+    disk_used: int | None = None
+    try:
+        usage = shutil.disk_usage(root)
+        disk_total = int(usage.total)
+        disk_used = int(usage.used)
+    except OSError:
+        disk_total = None
+        disk_used = None
+
     backup_at: Any = UNKNOWN
     backup_sha: Any = UNKNOWN
     backup_age: Any = UNKNOWN
@@ -635,6 +696,19 @@ def build_collector_operational_packet(
         history_with_now,
         now=clock,
         current_disk_pct=disk_pct if isinstance(disk_pct, int) else None,
+    )
+    history_growth = data_growth if isinstance(data_growth, int) else None
+    week_proj = project_7d_disk_used(
+        disk_total_bytes=disk_total or 0,
+        disk_used_bytes=disk_used or 0,
+        sqlite_bytes=sqlite_bytes if isinstance(sqlite_bytes, int) else 0,
+        rdp_science_bytes=rdp_science_bytes if isinstance(rdp_science_bytes, int) else 0,
+        job_open_bytes=int(jobs["publication_jobs_open_bytes"]),
+        job_completed_bytes=int(jobs["publication_jobs_completed_bytes"]),
+        job_legacy_bytes=int(jobs["publication_jobs_legacy_full_bytes"]),
+        elapsed_campaign_days=elapsed_days,
+        declared_raw_bytes_per_day=declared_raw if isinstance(declared_raw, int) else None,
+        history_data_growth_24h_bytes=history_growth,
     )
 
     release = _live_release_fields(
@@ -690,6 +764,24 @@ def build_collector_operational_packet(
         "filesystem_disk_free_bytes": disk_free,
         "observation_sqlite_bytes": sqlite_bytes,
         "observation_rdp_bytes": rdp_bytes,
+        "observation_rdp_bytes_excluding_publication_jobs": rdp_science_bytes,
+        "publication_jobs_open_count": jobs["publication_jobs_open_count"],
+        "publication_jobs_open_bytes": jobs["publication_jobs_open_bytes"],
+        "publication_jobs_completed_count": jobs["publication_jobs_completed_count"],
+        "publication_jobs_completed_bytes": jobs["publication_jobs_completed_bytes"],
+        "publication_jobs_legacy_full_count": jobs["publication_jobs_legacy_full_count"],
+        "publication_jobs_legacy_full_bytes": jobs["publication_jobs_legacy_full_bytes"],
+        "publication_jobs_unmigrated_flat_count": jobs[
+            "publication_jobs_unmigrated_flat_count"
+        ],
+        "publication_jobs_unmigrated_flat_bytes": jobs[
+            "publication_jobs_unmigrated_flat_bytes"
+        ],
+        "declared_raw_bytes_per_utc_day_max": declared_raw,
+        "canonical_bytes_lifetime_remaining": remaining_canonical,
+        "projected_7d_disk_used_pct": week_proj.get("projected_7d_disk_used_pct"),
+        "projected_7d_disk_used_pass_70": week_proj.get("projected_7d_disk_used_pass_70"),
+        "projected_7d_projection_basis": week_proj.get("projection_basis"),
         "backup_sink_bytes": backup_sink_bytes,
         "disk_growth_24h_pct_points": disk_growth,
         "data_growth_24h_bytes": data_growth,

@@ -1,0 +1,66 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1",
+  "reviewed_bindings_sha256": "ea81231fa0a51dbb956edc5be81d9e5fa75b8b9c2ed5251bd80947de43be9c0c",
+  "reviewed_inventory_sha256": "54fd11ca7800c8b94f3500571f5eb01aa07d032f92d7eaf7691f6462ad948f80",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=47ae18b14e5534f2ca95c691ab891abdc06c3c4eaae23ce0ba12415592a56a84",
+        "CLAIM_PUB_001_HELD_OPEN_ONLY_HOT_PATH",
+        "CLAIM_PUB_002_HELD_COMPACT_RECEIPT_NOT_SCIENCE",
+        "CLAIM_PUB_003_HELD_MARKER_COMPLETE_IDEMPOTENT",
+        "CLAIM_PUB_004_HELD_FORGE_FROM_RDP_PARQUET",
+        "CLAIM_PUB_005_HELD_AMBIGUOUS_FAIL_CLOSED_NO_DELETE",
+        "LIVE_FLAT_JOURNAL_INVISIBLE_UNTIL_APPLY",
+        "RECEIPT_DELETION_CAN_FORK_PUBLISH_IDENTITY",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "HOT_PATH_OPEN_ONLY_NO_HISTORICAL_BODY_SCAN",
+        "COMPACT_FORBIDS_SCIENTIFIC_ARRAYS",
+        "APPLY_FAIL_CLOSED_AMBIGUOUS_STORE_CONFLICT",
+        "NO_SECRETS_IN_RECEIPTS_OR_EXCEPTIONS",
+        "NO_VPS_OR_LIVE_APPLY_IN_THIS_ATOM",
+        "MEDIUM_7D_PASS_IF_UNKNOWN_COERCED_TO_ZERO",
+        "MEDIUM_APPLY_KEYERROR_AFTER_PARTIAL_MOVES",
+        "LOW_CLI_COLLAPSES_DEST_CONFLICT_TERMINAL"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DECISION_DELTA_CLOSED_FOR_NAMED_CONSUMER",
+        "CHEAPEST_FALSIFIER_MAPPED_TO_LIFECYCLE_SUITE",
+        "SOFTWARE_PASS_NOT_LIVE_PASS",
+        "NON_CLAIMS_RESPECTED",
+        "LEGACY_FULL_PARK_NOT_DELETE",
+        "GAPS_NONE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_COMMISSIONING"
+  ]
+}

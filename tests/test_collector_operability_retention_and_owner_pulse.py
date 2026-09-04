@@ -231,6 +231,13 @@ class CollectorOperabilityRetentionPulseTests(unittest.TestCase):
             self.assertEqual(packet["deploy_git_sha"], GIT_SHA)
             self.assertNotEqual(packet["filesystem_disk_used_pct"], None)
             self.assertIn("health_classes", packet)
+            self.assertIn("publication_jobs_open_count", packet)
+            self.assertIn("publication_jobs_completed_count", packet)
+            self.assertIn("publication_jobs_legacy_full_count", packet)
+            self.assertIn("observation_rdp_bytes_excluding_publication_jobs", packet)
+            self.assertIn("projected_7d_disk_used_pct", packet)
+            self.assertIn("projected_7d_disk_used_pass_70", packet)
+            self.assertEqual(packet["publication_jobs_open_count"], 0)
             self.assertEqual(
                 packet["raw_retention_substrate"],
                 "DECODED_CANONICAL_PROVIDER_JSON_IN_CALL_LEDGER_NOT_BYTE_IDENTICAL_HTTP",

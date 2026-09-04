@@ -1,0 +1,75 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-COMPLETION-001",
+  "as_of": "2026-09-04",
+  "task_id": "OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1",
+  "state_change": "OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_SOFTWARE_PASS",
+  "base_main": "55206cc414fb2499df54221f475a84fd4cb849de",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "b894c5ff3b43c4c3cdf3fc789df442701980363ff76b5ebae63e6f36a7d2f67e",
+    "catalog/assets/lifecycle.yaml": "af3f2d6013e957a4cba29b08acd7e2c22f41157d71e31ef1adf97a7bcb1ced01",
+    "catalog/catalog_manifest.yaml": "09ab4469bf344a4ffd8aed7d6c12063d0acfe1558fa9362b00c8d5ff4d443de9",
+    "catalog/generated/asset_edges.json": "48cfca4b7c81941c33efd078b30c2082fc7b9d091902d550e2703ea5cee4f389",
+    "configs/ci_test_shards_v1.json": "58143281fc4fa08522a1a5ef0ee78468b6464a70cf40d3b7dd98d182ac133fb0",
+    "docs/PROJECT_MAP.md": "aaf0e79726037f9d58769f4f5ed39296e7b695e1c1ad16087f78cc045519a3dc",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "ddda87235aeef9bbd6ec65b5f8462f2c7ab2c46f75548f823ee8ef0fad7540fc",
+    "docs/reports/observation_raw_capture_publication_operability_closure_v1/a1_owner_readout_v1.md": "e876eee8ffdf73f459174967f0ff1c183db21229243e832c5adea66fdbcda195",
+    "docs/tasks/OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1.md": "4f3f6d80bedb338a4578b3a38cdf8cd7eb61510201c18251948b83d96a2776f0",
+    "scripts/observation_publication_jobs.py": "9ca0e67c00f4e78bebffd89db38dc7cc2e08269423e1e58b98ec5be02f0707b6",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "bf03d1b3a22213432eea21d86cead3e16c3c700f0cc3a794f30e5498a0b37e5a",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "a5c2769bff052a79be5ca41497a64fa82da5d3c5c95e9a64db4187c2b5fc29cb",
+    "src/solana_alpha_lab/factory/observation_publication_jobs.py": "7a3382d86f21bf8fa7aa8d480e51d5b3f2f461b54553be77eb9b09a1c8464e6c",
+    "tests/test_collector_operability_retention_and_owner_pulse.py": "9977999732fb21d8e5c80c249bb8c075647b79dccddd7a427230a64e978774fc",
+    "tests/test_observation_panel_publisher.py": "397ca04b38a6a1d8f0beb7ede6a14388902a338d8cbb8e48e58b4d9254827570",
+    "tests/test_observation_publication_job_lifecycle_v1.py": "0cd79a3f3ecba162a0deeb7ae3756ce7b554e599a366d27e69477c27266deda9"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/observation_raw_capture_publication_operability_closure_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "172e977d2b6f78fdc32d6985d729ff9d4a1f1e37c88cfd39ff1451ed1ce2d13c",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PUBLICATION_JOB_LIFECYCLE_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/observation_raw_capture_publication_operability_closure_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "8f622422f4d156699b193043d4a6824e2de15bce3c796c33c2926fc6dbeb4d9c",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_PUBLICATION_JOB_LIFECYCLE_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_COMMISSIONING",
+    "NO_LEGACY_FULL_DELETION",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}
