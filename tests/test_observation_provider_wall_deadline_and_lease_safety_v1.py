@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import tempfile
 import threading
@@ -9,6 +10,7 @@ import time
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -20,6 +22,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.observation_primitives import (  # noqa: E402
     execute_primitive,
 )
+from solana_alpha_lab.factory.observation_provider_pacing import WallClock  # noqa: E402
 from solana_alpha_lab.factory.observation_provider_wall_deadline import (  # noqa: E402
     DEFAULT_PROVIDER_CALL_WALL_SECONDS,
     PROVIDER_CALL_WALL_DEADLINE,
@@ -33,10 +36,12 @@ from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     canonical_sha256,
     load_observation_schedule,
     render_utc,
+    schedule_sha256,
 )
 from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
     LEASE_SECONDS,
     ObservationScheduleStore,
+    ObservationScheduleStoreError,
 )
 from solana_alpha_lab.factory.observation_scheduler import tick_once  # noqa: E402
 
@@ -73,7 +78,27 @@ class _StallOpener:
         return {"http_status": 200, "body": [{"id": MINT}]}
 
 
-def _activate(store: ObservationScheduleStore, schedule: dict) -> str:
+def _live_schedule_around(clock_now: datetime) -> dict:
+    """Fixture schedule with admission window covering WallClock production now."""
+    schedule = load_observation_schedule(
+        ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+    )
+    schedule = dict(schedule)
+    activation = dict(schedule["activation"])
+    activation["starts_at"] = render_utc(clock_now - timedelta(hours=1))
+    activation["stops_admitting_at"] = render_utc(clock_now + timedelta(days=2))
+    schedule["activation"] = activation
+    schedule.pop("schedule_sha256", None)
+    schedule["schedule_sha256"] = schedule_sha256(schedule)
+    return schedule
+
+
+def _activate(
+    store: ObservationScheduleStore,
+    schedule: dict,
+    *,
+    clock: datetime = NOW,
+) -> str:
     from solana_alpha_lab.factory.observation_schedule_lifecycle import (
         _authority_policy,
         _minimum_expiry,
@@ -89,9 +114,11 @@ def _activate(store: ObservationScheduleStore, schedule: dict) -> str:
         schedule_sha256=schedule["schedule_sha256"],
         schedule_key=schedule["schedule_key"],
         document=schedule,
-        clock=NOW,
+        clock=clock,
     )
-    expires_at = render_utc(_minimum_expiry(schedule))
+    min_expiry = _minimum_expiry(schedule)
+    # Keep authority live under production WallClock ticks.
+    expires_at = render_utc(max(min_expiry, clock + timedelta(days=30)))
     _, routes = _used_provider_route_ids(ROOT, schedule)
     policy = _authority_policy(
         root=ROOT,
@@ -113,8 +140,9 @@ def _activate(store: ObservationScheduleStore, schedule: dict) -> str:
             expires_at=expires_at,
             policy_digest=canonical_sha256(policy),
         ),
-        now=NOW,
+        now=clock,
         producer_git_sha=GIT_SHA,
+        expires_at=expires_at,
     )
     store.upsert_activation(
         {
@@ -127,7 +155,7 @@ def _activate(store: ObservationScheduleStore, schedule: dict) -> str:
             "stops_admitting_at": schedule["activation"]["stops_admitting_at"],
             "payload": {},
         },
-        clock=NOW,
+        clock=clock,
     )
     return activation_id
 
@@ -204,49 +232,103 @@ class WallDeadlineUnitTests(unittest.TestCase):
 
 
 class WallDeadlineTickIntegrationTests(unittest.TestCase):
+    def test_without_renew_wall_clock_past_lease_self_fences(self) -> None:
+        """Control: production WallClock + expired lease → LEASE_FENCED on write."""
+        short_lease = 3
+        with patch(
+            "solana_alpha_lab.factory.observation_schedule_store.LEASE_SECONDS",
+            short_lease,
+        ):
+            with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+                store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+                try:
+                    clock = WallClock()
+                    token = store.acquire_lease("fence-control", clock=clock.now())
+                    self.assertIsNotNone(token)
+                    time.sleep(short_lease + 1.5)
+                    with self.assertRaises(ObservationScheduleStoreError) as ctx:
+                        store.record_event(
+                            "CONTROL",
+                            {"probe": True},
+                            clock=clock.now(),
+                        )
+                    self.assertEqual(str(ctx.exception), "LEASE_FENCED")
+                finally:
+                    store.close()
+
     def test_stall_over_lease_equivalent_does_not_lease_fence(self) -> None:
-        schedule = load_observation_schedule(
-            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        """Production-shaped clock: stall > short lease, wall cuts before self-fence."""
+        short_lease = 4
+        wall = 2
+        stall = _StallOpener(stall_seconds=short_lease + 6)
+        patches = (
+            patch(
+                "solana_alpha_lab.factory.observation_schedule_store.LEASE_SECONDS",
+                short_lease,
+            ),
+            patch(
+                "solana_alpha_lab.factory.observation_provider_wall_deadline.LEASE_SECONDS",
+                short_lease,
+            ),
+            patch(
+                "solana_alpha_lab.factory.observation_scheduler.LEASE_SECONDS",
+                short_lease,
+            ),
         )
-        stall = _StallOpener(stall_seconds=30)
-        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
-            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
-            try:
-                data_root = Path(tmp) / "rdp"
-                data_root.mkdir()
-                activation_id = _activate(store, schedule)
-                # Wall << LEASE_SECONDS; stall would outlive lease without the wall.
-                result = tick_once(
-                    root=ROOT,
-                    data_root=data_root,
-                    store=store,
-                    schedule=schedule,
-                    activation_id=activation_id,
-                    now=NOW + timedelta(minutes=15),
-                    opener=stall,
-                    producer_git_sha=GIT_SHA,
-                    provider_call_wall_seconds=2,
-                )
-                self.assertNotEqual(result.get("terminal"), "LEASE_FENCED")
-                self.assertIn(
-                    result.get("terminal"),
-                    {"TICK_COMPLETE", "PACE_WAIT", "TICK_PARTIAL"},
-                )
-                # Discovery call must not remain STARTED after wall timeout.
-                rows = store._conn.execute(
-                    "SELECT state FROM call_ledger WHERE primitive_id=?",
-                    ("PRIM-JUPITER-TOKENS-V2-RECENT-001",),
-                ).fetchall()
-                self.assertTrue(rows)
-                self.assertTrue(all(str(r[0]) != "STARTED" for r in rows))
-                # Lease released after tick.
-                held = store._conn.execute(
-                    "SELECT owner FROM scheduler_leases WHERE lease_id=?",
-                    ("observation-scheduler",),
-                ).fetchone()
-                self.assertIsNone(held)
-            finally:
-                store.close()
+        with patches[0], patches[1], patches[2]:
+            with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+                store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+                try:
+                    data_root = Path(tmp) / "rdp"
+                    data_root.mkdir()
+                    clock = WallClock()
+                    act_now = clock.now()
+                    schedule = _live_schedule_around(act_now)
+                    activation_id = _activate(store, schedule, clock=act_now)
+                    tick_now = clock.now()
+                    try:
+                        result = tick_once(
+                            root=ROOT,
+                            data_root=data_root,
+                            store=store,
+                            schedule=schedule,
+                            activation_id=activation_id,
+                            now=tick_now,
+                            clock=clock,
+                            opener=stall,
+                            producer_git_sha=GIT_SHA,
+                            provider_call_wall_seconds=wall,
+                        )
+                    except ObservationScheduleStoreError as exc:
+                        self.fail(f"unexpected store fence during wall-bounded stall: {exc}")
+                    self.assertNotEqual(result.get("terminal"), "LEASE_FENCED")
+                    self.assertGreaterEqual(int(result.get("provider_calls") or 0), 1)
+                    self.assertIn(
+                        result.get("terminal"),
+                        {"TICK_COMPLETE", "PACE_WAIT", "TICK_PARTIAL"},
+                    )
+                    rows = store._conn.execute(
+                        "SELECT state, payload_json FROM call_ledger WHERE primitive_id=?",
+                        ("PRIM-JUPITER-TOKENS-V2-RECENT-001",),
+                    ).fetchall()
+                    self.assertTrue(rows)
+                    self.assertTrue(all(str(r[0]) != "STARTED" for r in rows))
+                    payloads = [json.loads(str(r[1] or "{}")) for r in rows]
+                    self.assertTrue(
+                        any(
+                            p.get("missing_reason") == "TIMEOUT"
+                            or p.get("http_class") == "TIMEOUT"
+                            for p in payloads
+                        ),
+                        msg=f"expected TIMEOUT missingness in ledger payloads: {payloads}",
+                    )
+                    held = store._conn.execute(
+                        "SELECT owner FROM scheduler_leases WHERE lease_id=?",
+                        ("observation-scheduler",),
+                    ).fetchone()
+                    self.assertIsNone(held)
+                finally:
+                    store.close()
 
     def test_restart_after_started_is_in_flight_indeterminate(self) -> None:
         schedule = load_observation_schedule(

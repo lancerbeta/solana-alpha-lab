@@ -11,7 +11,9 @@ this atom adds an end-to-end wall around the logical provider operation.
 
 - `observation_provider_wall_deadline.py`: stdlib daemon-thread wall + optional lease heartbeat
 - `tick_once` wraps the opener with `provider_call_wall_seconds` (default **60**, must be `< LEASE_SECONDS=120`)
-- Heartbeat calls `renew_held_lease` during bounded waits; wall still terminates hung work
+- Heartbeat calls `renew_held_lease` during bounded waits; wall still forces the
+  waiter to return typed TIMEOUT so the tick can release the lease (daemon worker
+  is not joined; oneshot ticks exit with the process)
 - Hard deadline → existing `TimeoutError` → typed `TIMEOUT` missingness (no fabricate / no auto-retry)
 - Config/schema: `provider_call_wall_seconds`
 - Deterministic tests: stall > lease-equivalent cannot `LEASE_FENCED`; STARTED restart stays fail-closed
