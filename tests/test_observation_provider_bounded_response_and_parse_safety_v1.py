@@ -568,6 +568,31 @@ class BoundedHelperTests(unittest.TestCase):
         self.assertIn("16x", doc)
         self.assertIn("2_000_000", doc)
 
+    def test_zero_arg_read_small_body_accepted(self) -> None:
+        class _ZeroArg:
+            status = 200
+            headers: dict[str, str] = {}
+
+            def read(self) -> bytes:
+                return b'{"outAmount":"1"}'
+
+            def __enter__(self) -> _ZeroArg:
+                return self
+
+            def __exit__(self, *args: object) -> None:
+                return None
+
+        opener = JupiterReadonlyOpener(FIXTURE_KEY)
+        with _hook_open(opener, _ZeroArg()):
+            opened = opener.open(RECENT)
+        self.assertEqual(opened["body"], {"outAmount": "1"})
+
+    def test_lying_sized_read_over_want_is_too_large(self) -> None:
+        stream = _HttpLike(b"[" + (b"1," * 1000) + b"1]", ignore_limit=True)
+        with self.assertRaises(ResponseBodyTooLargeError):
+            read_bounded_http_body(stream, max_bytes=64)
+
+
     def test_wall_module_does_not_claim_gil_hard_kill(self) -> None:
         text = Path(
             ROOT,

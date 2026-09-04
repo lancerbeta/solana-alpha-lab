@@ -34792,7 +34792,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_provider_bounded_response.py', repository_path: src/solana_alpha_lab/factory/observation_provider_bounded_response.py}
-  integrity: {kind: sha256, sha256: 860fb170736aa0a470768f3c954d20a7256a6658fe57cc0e097c8f0cb4fb8139}
+  integrity: {kind: sha256, sha256: ef57273a165b3c1fc085e1ad0bf45f41011b5aa4b17394ec4db50c0a36adf417}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001}
@@ -34809,7 +34809,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_observation_provider_bounded_response_and_parse_safety_v1.py', repository_path: tests/test_observation_provider_bounded_response_and_parse_safety_v1.py}
-  integrity: {kind: sha256, sha256: edf77d59244d01555c68a38c4f975b7677f510bcd34636a650a6ef9cfee46fe4}
+  integrity: {kind: sha256, sha256: 44870fa76d00ae742c8d518b8c49e1fe4574a3790cbc5eea0d064941dd285ad6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001}

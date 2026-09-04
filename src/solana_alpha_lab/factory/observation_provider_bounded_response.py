@@ -24,6 +24,7 @@ and never attach the rejected body to exceptions or results.
 
 from __future__ import annotations
 
+import inspect
 import json
 from typing import Any
 
@@ -77,6 +78,33 @@ def _declared_content_length(stream: object) -> int | None:
     return value
 
 
+def _coerce_bytes(piece: object) -> bytes:
+    if piece is None:
+        return b""
+    if isinstance(piece, memoryview):
+        return piece.tobytes()
+    if isinstance(piece, bytearray):
+        return bytes(piece)
+    if not isinstance(piece, bytes):
+        raise ResponseJsonInvalidError()
+    return piece
+
+
+def _read_accepts_size(read_fn: object) -> bool:
+    try:
+        signature = inspect.signature(read_fn)
+    except (TypeError, ValueError):
+        return True
+    for param in signature.parameters.values():
+        if param.kind in (
+            inspect.Parameter.POSITIONAL_ONLY,
+            inspect.Parameter.POSITIONAL_OR_KEYWORD,
+            inspect.Parameter.VAR_POSITIONAL,
+        ):
+            return True
+    return False
+
+
 def read_bounded_http_body(
     stream: object,
     *,
@@ -92,6 +120,11 @@ def read_bounded_http_body(
     read_fn = getattr(stream, "read", None)
     if not callable(read_fn):
         raise ResponseJsonInvalidError()
+    if not _read_accepts_size(read_fn):
+        piece = _coerce_bytes(read_fn())
+        if len(piece) > max_bytes:
+            raise ResponseBodyTooLargeError()
+        return piece
     chunks: list[bytes] = []
     total = 0
     budget = max_bytes + READ_SENTINEL_BYTES
@@ -100,19 +133,18 @@ def read_bounded_http_body(
         if remaining <= 0:
             raise ResponseBodyTooLargeError()
         want = min(_READ_CHUNK_BYTES, remaining)
-        piece = read_fn(want)
-        if piece is None:
+        try:
+            piece = _coerce_bytes(read_fn(want))
+        except TypeError:
+            piece = _coerce_bytes(read_fn())
+            if total + len(piece) > max_bytes:
+                raise ResponseBodyTooLargeError()
+            chunks.append(piece)
             break
-        if isinstance(piece, memoryview):
-            piece = piece.tobytes()
-        elif isinstance(piece, bytearray):
-            piece = bytes(piece)
-        if not isinstance(piece, bytes):
-            raise ResponseJsonInvalidError()
         if not piece:
             break
         if len(piece) > want:
-            piece = piece[:want]
+            raise ResponseBodyTooLargeError()
         if total + len(piece) > max_bytes:
             raise ResponseBodyTooLargeError()
         total += len(piece)
