@@ -7,6 +7,7 @@ receipts in ``completed/``. Historical full JSON is moved byte-identical into
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import re
@@ -33,9 +34,17 @@ COMPLETED_RECEIPT_CONFLICT = "COMPLETED_RECEIPT_CONFLICT"
 LEGACY_FULL_BYTE_MISMATCH = "LEGACY_FULL_BYTE_MISMATCH"
 COMPACT_RECEIPT_UNCONSTRUCTABLE = "COMPACT_RECEIPT_UNCONSTRUCTABLE"
 CONTENT_SHA256_INVALID = "CONTENT_SHA256_INVALID"
+CONTENT_IDENTITY_COLLISION = "CONTENT_IDENTITY_COLLISION"
+SOURCE_CHANGED_AFTER_PLAN = "SOURCE_CHANGED_AFTER_PLAN"
 COLLECTOR_NOT_PAUSED = "COLLECTOR_NOT_PAUSED"
 COLLECTOR_STORE_MISSING = "COLLECTOR_STORE_MISSING"
 CONTENT_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+STREAM_HASH_CHUNK = 1024 * 1024
+PLAN_FORBIDDEN_PAYLOAD_KEYS = frozenset(
+    {"raw", "payload", "observations", "normalized_observations", "members"}
+)
+MIGRATION_PEAK_PAYLOAD_MEMORY = "O(max_job_bytes)"
+ROUTINE_TICK_PUBLICATION_REPAIR = "O(open_job_bytes)"
 UNAVAILABLE_FILESYSTEM_TRUTH = "UNAVAILABLE_FILESYSTEM_TRUTH"
 UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET = "UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET"
 COMPACT_IDENTITY_KEYS = (
@@ -276,6 +285,114 @@ def _content_sha256(payload: Mapping[str, Any]) -> str:
     return content
 
 
+def _sha256_file(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        while True:
+            chunk = handle.read(STREAM_HASH_CHUNK)
+            if not chunk:
+                break
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _source_fingerprint(path: Path) -> tuple[int, str]:
+    return int(path.stat().st_size), _sha256_file(path)
+
+
+def _revalidate_source(path: Path, size: int, digest: str) -> None:
+    try:
+        current = _source_fingerprint(path)
+    except OSError:
+        raise PublicationJobError(SOURCE_CHANGED_AFTER_PLAN) from None
+    if current != (size, digest):
+        raise PublicationJobError(SOURCE_CHANGED_AFTER_PLAN)
+
+
+def _load_json_object(path: Path) -> dict[str, Any]:
+    try:
+        with path.open(encoding="utf-8") as handle:
+            payload = json.load(handle)
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
+    if not isinstance(payload, dict):
+        raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
+    return payload
+
+
+def _dest_matches_hash(path: Path, digest: str) -> bool:
+    try:
+        return _sha256_file(path) == digest
+    except OSError:
+        return False
+
+
+def _inspect_unmigrated_source(data_root: Path, path: Path) -> dict[str, Any]:
+    try:
+        size, digest = _source_fingerprint(path)
+    except OSError:
+        raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY) from None
+    payload = _load_json_object(path)
+    content = _content_sha256(payload)
+    label = classify_legacy_payload(payload, data_root=data_root)
+    if label == CLASS_AMBIGUOUS:
+        raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
+    receipt = None
+    if label == CLASS_OPEN:
+        destination = open_job_path(data_root, content)
+        if destination.is_file() and not _dest_matches_hash(destination, digest):
+            raise PublicationJobError(OPEN_JOB_CONFLICT)
+    elif label == CLASS_PROVEN_COMPLETED:
+        receipt = _planned_compact_receipt(payload, content)
+        completed = completed_job_path(data_root, content)
+        if completed.is_file():
+            try:
+                existing = json.loads(completed.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+            if not isinstance(existing, dict) or not is_compact_receipt(existing):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+            if not _same_publication_identity(existing, receipt):
+                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+        legacy = legacy_full_path(data_root, content)
+        if legacy.is_file() and not _dest_matches_hash(legacy, digest):
+            raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
+    else:
+        raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
+    return {
+        "sources": [path],
+        "source_size": size,
+        "source_sha256": digest,
+        "content": content,
+        "label": label,
+        "receipt": receipt,
+    }
+
+
+def _coalesce_plan_item(
+    seen: dict[str, dict[str, Any]],
+    item: dict[str, Any],
+) -> None:
+    previous = seen[item["content"]]
+    same_identity = (
+        previous["source_sha256"] == item["source_sha256"]
+        and previous["source_size"] == item["source_size"]
+        and previous["label"] == item["label"]
+    )
+    if same_identity and previous["label"] == CLASS_OPEN:
+        previous["sources"].extend(item["sources"])
+        return
+    if (
+        same_identity
+        and previous["receipt"] is not None
+        and item["receipt"] is not None
+        and _same_publication_identity(previous["receipt"], item["receipt"])
+    ):
+        previous["sources"].extend(item["sources"])
+        return
+    raise PublicationJobError(CONTENT_IDENTITY_COLLISION)
+
+
 def publication_artifacts_proven(
     data_root: Path,
     job: Mapping[str, Any],
@@ -457,61 +574,25 @@ def dry_run_migration(data_root: Path) -> dict[str, Any]:
 
 
 def plan_migration(data_root: Path) -> list[dict[str, Any]]:
-    """Inspect every unmigrated source. Fail before the caller mutates anything."""
+    """Inspect every unmigrated source. Fail before the caller mutates anything.
 
-    plan: list[dict[str, Any]] = []
+    Peak payload memory is O(max job bytes): the plan retains source metadata
+    and compact receipts, never raw job bodies or scientific arrays.
+    """
+
+    seen: dict[str, dict[str, Any]] = {}
+    order: list[dict[str, Any]] = []
     for path in _iter_unmigrated_paths(data_root):
-        try:
-            raw = path.read_bytes()
-            payload = json.loads(raw.decode("utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        item = _inspect_unmigrated_source(data_root, path)
+        if any(key in item for key in PLAN_FORBIDDEN_PAYLOAD_KEYS):
             raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
-        if not isinstance(payload, dict):
-            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
-        content = _content_sha256(payload)
-        label = classify_legacy_payload(payload, data_root=data_root)
-        if label == CLASS_AMBIGUOUS:
-            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
-        if label == CLASS_OPEN:
-            destination = open_job_path(data_root, content)
-            if destination.is_file() and destination.read_bytes() != raw:
-                raise PublicationJobError(OPEN_JOB_CONFLICT)
-            plan.append(
-                {
-                    "source": path,
-                    "raw": raw,
-                    "content": content,
-                    "label": CLASS_OPEN,
-                    "receipt": None,
-                }
-            )
+        content = item["content"]
+        if content in seen:
+            _coalesce_plan_item(seen, item)
             continue
-        if label != CLASS_PROVEN_COMPLETED:
-            raise PublicationJobError(AMBIGUOUS_BLOCKS_APPLY)
-        receipt = _planned_compact_receipt(payload, content)
-        completed = completed_job_path(data_root, content)
-        if completed.is_file():
-            try:
-                existing = json.loads(completed.read_text(encoding="utf-8"))
-            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
-            if not isinstance(existing, dict) or not is_compact_receipt(existing):
-                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
-            if not _same_publication_identity(existing, receipt):
-                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
-        legacy = legacy_full_path(data_root, content)
-        if legacy.is_file() and legacy.read_bytes() != raw:
-            raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
-        plan.append(
-            {
-                "source": path,
-                "raw": raw,
-                "content": content,
-                "label": CLASS_PROVEN_COMPLETED,
-                "receipt": receipt,
-            }
-        )
-    return plan
+        seen[content] = item
+        order.append(item)
+    return order
 
 
 def apply_migration(data_root: Path) -> dict[str, Any]:
@@ -522,44 +603,50 @@ def apply_migration(data_root: Path) -> dict[str, Any]:
     moved_open = 0
     moved_completed = 0
     for item in plan:
-        path = item["source"]
-        raw = item["raw"]
         content = item["content"]
-        if item["label"] == CLASS_OPEN:
-            destination = open_job_path(data_root, content)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            if destination.is_file():
-                if destination.read_bytes() != raw:
-                    raise PublicationJobError(OPEN_JOB_CONFLICT)
-                path.unlink()
+        digest = item["source_sha256"]
+        size = item["source_size"]
+        for path in item["sources"]:
+            _revalidate_source(path, size, digest)
+            if item["label"] == CLASS_OPEN:
+                destination = open_job_path(data_root, content)
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                if destination.is_file():
+                    if not _dest_matches_hash(destination, digest):
+                        raise PublicationJobError(OPEN_JOB_CONFLICT)
+                    path.unlink()
+                else:
+                    os.replace(path, destination)
+                    if not _dest_matches_hash(destination, digest):
+                        raise PublicationJobError(OPEN_JOB_CONFLICT)
+                moved_open += 1
+                continue
+            receipt = item["receipt"]
+            completed = completed_job_path(data_root, content)
+            if completed.is_file():
+                existing = json.loads(completed.read_text(encoding="utf-8"))
+                if not isinstance(existing, dict) or not is_compact_receipt(existing):
+                    raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
+                if not _same_publication_identity(existing, receipt):
+                    raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
             else:
-                os.replace(path, destination)
-            moved_open += 1
-            continue
-        receipt = item["receipt"]
-        completed = completed_job_path(data_root, content)
-        if completed.is_file():
-            existing = json.loads(completed.read_text(encoding="utf-8"))
-            if not isinstance(existing, dict) or not is_compact_receipt(existing):
-                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
-            if not _same_publication_identity(existing, receipt):
-                raise PublicationJobError(COMPLETED_RECEIPT_CONFLICT)
-        else:
-            _atomic_write_json(completed, receipt)
-        legacy = legacy_full_path(data_root, content)
-        legacy.parent.mkdir(parents=True, exist_ok=True)
-        if legacy.is_file():
-            if legacy.read_bytes() != raw:
-                raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
-            path.unlink(missing_ok=True)
-        else:
-            os.replace(path, legacy)
-            if legacy.read_bytes() != raw:
-                raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
-        moved_completed += 1
+                _atomic_write_json(completed, receipt)
+            legacy = legacy_full_path(data_root, content)
+            legacy.parent.mkdir(parents=True, exist_ok=True)
+            if legacy.is_file():
+                if not _dest_matches_hash(legacy, digest):
+                    raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
+                path.unlink(missing_ok=True)
+            else:
+                os.replace(path, legacy)
+                if not _dest_matches_hash(legacy, digest):
+                    raise PublicationJobError(LEGACY_FULL_BYTE_MISMATCH)
+            moved_completed += 1
     report["moved_open"] = moved_open
     report["moved_completed"] = moved_completed
     report["legacy_full_deleted"] = False
+    report["migration_peak_payload_memory"] = MIGRATION_PEAK_PAYLOAD_MEMORY
+    report["routine_tick_publication_repair"] = ROUTINE_TICK_PUBLICATION_REPAIR
     report.update(journal_stats(data_root))
     return report
 
@@ -653,11 +740,16 @@ __all__ = [
     "COMPACT_FORBIDDEN_KEYS",
     "COMPACT_RECEIPT_UNCONSTRUCTABLE",
     "COMPLETED_RECEIPT_CONFLICT",
+    "CONTENT_IDENTITY_COLLISION",
     "CONTENT_SHA256_INVALID",
     "HOT_PATH_FORBIDDEN",
     "LEGACY_FULL_BYTE_MISMATCH",
+    "MIGRATION_PEAK_PAYLOAD_MEMORY",
     "OPEN_JOB_CONFLICT",
+    "PLAN_FORBIDDEN_PAYLOAD_KEYS",
     "PublicationJobError",
+    "ROUTINE_TICK_PUBLICATION_REPAIR",
+    "SOURCE_CHANGED_AFTER_PLAN",
     "STAGE_COMPLETE",
     "STAGE_MARKER",
     "UNAVAILABLE_FILESYSTEM_TRUTH",

@@ -24,9 +24,11 @@ from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E40
     COLLECTOR_STORE_MISSING,
     COMPACT_RECEIPT_UNCONSTRUCTABLE,
     COMPLETED_RECEIPT_CONFLICT,
+    CONTENT_IDENTITY_COLLISION,
     CONTENT_SHA256_INVALID,
     LEGACY_FULL_BYTE_MISMATCH,
     OPEN_JOB_CONFLICT,
+    SOURCE_CHANGED_AFTER_PLAN,
     PublicationJobError,
     apply_migration,
     collector_blocks_apply,
@@ -129,7 +131,9 @@ def main(argv: list[str] | None = None) -> int:
             COMPLETED_RECEIPT_CONFLICT,
             LEGACY_FULL_BYTE_MISMATCH,
             COMPACT_RECEIPT_UNCONSTRUCTABLE,
+            CONTENT_IDENTITY_COLLISION,
             CONTENT_SHA256_INVALID,
+            SOURCE_CHANGED_AFTER_PLAN,
         }
         terminal = text if text in known else "PUBLICATION_JOB_ERROR"
         return _emit(
