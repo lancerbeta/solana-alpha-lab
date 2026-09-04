@@ -42,12 +42,19 @@ PUBLISHER = ROOT / "src" / "solana_alpha_lab" / "factory" / "observation_panel_p
 
 
 class Factory97dStorageArchitectureProofTests(unittest.TestCase):
-    def test_terminal_is_ready_after_post_reboot_forensics(self) -> None:
+    def test_terminal_requires_capture_policy_after_capacity_corrections(self) -> None:
         prd = PRD.read_text(encoding="utf-8")
         readout = READOUT.read_text(encoding="utf-8")
-        self.assertIn("Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`", prd)
-        self.assertIn("`STORAGE_97D_ARCHITECTURE_READY`", readout)
-        self.assertNotIn("Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`", prd)
+        self.assertIn(
+            "Terminal of this atom: `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`",
+            prd,
+        )
+        self.assertIn("`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`", readout)
+        self.assertNotIn("Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`", prd)
+        self.assertNotIn(
+            "Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`",
+            prd,
+        )
         self.assertNotIn("Terminal of this atom: `STORAGE_ARCHITECTURE_BLOCKED`", prd)
         self.assertIn("canonical content = immutable forever", prd)
         self.assertIn("hot local residency = 90d", prd)
@@ -72,21 +79,43 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
                 "unexpected_loss_or_rollback"
             ]
         )
+        overlap = forensics["byte_attribution"]["poll_slots_overlap"]
+        self.assertEqual(overlap["poll_exact_payload_sha256_in_call"], 1286)
+        self.assertEqual(overlap["poll_exact_payload_sha256_not_in_call"], 0)
+        self.assertEqual(overlap["poll_nonoverlap_payload_bytes"], 0)
+        self.assertEqual(overlap["decision"], "DEDUPE_KEEP")
         model = json.loads(MODEL.read_text(encoding="utf-8"))
+        self.assertEqual(model["schema_version"], "1.2")
         self.assertTrue(model["pass_target_40_gib"])
-        self.assertTrue(model["pass_hard_50_gib"])
+        self.assertFalse(model["pass_hard_50_gib"])
         self.assertFalse(model["pass_target_40_gib_conservative_stress"])
         self.assertEqual(model["capacity_horizon_days"], 97)
-        self.assertEqual(model["terminal_gate"], "STORAGE_97D_ARCHITECTURE_READY")
-        self.assertLessEqual(model["TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D"], model["target_bytes"])
-        self.assertLessEqual(
-            model["conservative_measured_stress"]["total_97d_bytes"],
-            model["hard_bytes"],
+        self.assertEqual(
+            model["terminal_gate"],
+            "STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE",
         )
-        self.assertGreater(
-            model["conservative_measured_stress"]["total_97d_bytes"],
+        self.assertEqual(model["TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D"], 25176785867)
+        self.assertEqual(model["typical_mutable_local_backup_peak_bytes"], 1912711645)
+        self.assertGreater(model["typical_mutable_local_backup_peak_bytes"], 0)
+        self.assertLessEqual(
+            model["TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D"],
             model["target_bytes"],
         )
+        stress = model["conservative_measured_stress"]
+        self.assertEqual(stress["total_97d_bytes"], 66929230243)
+        self.assertEqual(stress["mutable_local_backup_peak_bytes"], 2759403096)
+        self.assertGreater(stress["total_97d_bytes"], model["hard_bytes"])
+        self.assertFalse(stress["pass_hard_50_gib"])
+        pub = model["publication_rate"]
+        self.assertEqual(pub["status"], "BOUNDED")
+        self.assertEqual(pub["stress_publications_per_day"], 258)
+        self.assertEqual(pub["n_clean_full_utc_days"], 2)
+        self.assertNotIn("2026-09-04", pub["healthy_full_utc_days_used"])
+        poll = model["poll_slots_overlap"]
+        self.assertEqual(poll["poll_exact_payload_sha256_in_call"], 1286)
+        self.assertEqual(poll["poll_nonoverlap_payload_bytes"], 0)
+        self.assertEqual(poll["decision"], "DEDUPE_KEEP")
+        self.assertIn("PRIMARY_HOT_97D + MUTABLE_LOCAL_BACKUP_PEAK", model["formulas"]["TOTAL_97D"])
 
     def test_selected_architecture_rejects_new_platforms_and_size_only_verify(self) -> None:
         prd = PRD.read_text(encoding="utf-8")

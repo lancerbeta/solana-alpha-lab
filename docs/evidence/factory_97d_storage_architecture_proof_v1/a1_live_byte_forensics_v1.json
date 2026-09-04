@@ -136,6 +136,25 @@
       "duplicate_extra_payload_json_bytes_approx": 387031,
       "sqlite_index_and_overhead_bytes": 58565148
     },
+    "poll_slots_overlap": {
+      "observed_at": "2026-09-04T20:05:33Z",
+      "call_completed_rows": 2148,
+      "poll_slot_rows": 1286,
+      "poll_exact_payload_sha256_in_call": 1286,
+      "poll_exact_payload_sha256_not_in_call": 0,
+      "poll_nonoverlap_payload_bytes": 0,
+      "poll_duplicate_payload_bytes": 67874291,
+      "poll_response_sha256_in_call": 1285,
+      "poll_response_sha256_not_in_call": 1,
+      "poll_nonoverlap_rows_json_bytes_via_sha": 2,
+      "decision": "DEDUPE_KEEP",
+      "note": "Exact canonical payload sha256 overlap, not merely same JSON shape."
+    },
+    "publication_jobs_completed_by_utc_day": {
+      "2026-09-02": 258,
+      "2026-09-03": 121,
+      "2026-09-04": 151
+    },
     "publication_jobs": {
       "open_count": 0,
       "open_bytes": 0,
@@ -191,7 +210,7 @@
       "retain1_zip_bytes": 11114150260,
       "retain1_zip_name": "BACKUP_a2a50f2756d5ac50c32935a0c314438c01b65a9afd1cfafe2a0a3fae45fe9451.zip",
       "mtime": "2026-09-04T12:16:23Z",
-      "note": "pre-reclaim leftover; not selected-architecture 97d term"
+      "note": "pre-reclaim leftover full-RDP ZIP; not the selected mutable retain-1 term. Sink is same st_dev; mutable snapshot bytes stay in 40/50."
     },
     "current_data_related_local_footprint_bytes": 12150793432,
     "current_data_related_excluding_leftover_backup_bytes": 1036638312

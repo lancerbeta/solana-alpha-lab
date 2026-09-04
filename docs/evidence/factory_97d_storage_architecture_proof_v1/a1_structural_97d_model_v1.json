@@ -1,6 +1,6 @@
 {
   "schema": "smial.factory-97d-structural-model",
-  "schema_version": "1.1",
+  "schema_version": "1.2",
   "as_of": "2026-09-04",
   "hot_window_days": 90,
   "archive_cadence_days": 7,
@@ -9,16 +9,17 @@
   "hard_bytes": 53687091200,
   "formulas": {
     "PRIMARY_HOT_97D": "97 * (S_day + R_day + M_day) * A_layout",
-    "SAME_VOLUME_BACKUP_97D": "PRIMARY_HOT_97D * (B_same_vol - 1)",
-    "STAGING_PEAK": "P_stage",
-    "TOTAL_97D": "PRIMARY_HOT_97D + SAME_VOLUME_BACKUP_97D + STAGING_PEAK"
+    "MUTABLE_LOCAL_BACKUP_PEAK": "ZIP_STORED retain-1 of 97d operational sqlite (bodies removed) + paper + operational_state + WAL",
+    "UNARCHIVED_TAIL_DURABILITY_BYTES": "24h RPO copy of not-yet-Drive-verified HOT parquet+raw (one selected day)",
+    "STAGING_PEAK": "P_stage = one selected-architecture day while packaging",
+    "TOTAL_97D": "PRIMARY_HOT_97D + MUTABLE_LOCAL_BACKUP_PEAK + UNARCHIVED_TAIL_DURABILITY_BYTES + STAGING_PEAK"
   },
   "measured_denominators": {
     "scientific_span_days": 2.9636151684,
     "scientific_span_source": "parquet first_reliable_available_at min/max on live observation_rdp",
     "raw_span_days": 2.9701874618,
     "raw_span_source": "call_ledger payload first_reliable_available_at min/max",
-    "limitation": "LIVE cohort is ~3 days, not 90. Linear 97d assumes mix stays similar. Do not use 14:17Z-to-19:23Z catch-up (+229 MiB RDP in ~5.1h) as typical."
+    "limitation": "LIVE cohort is ~3 days, not 90. Linear 97d assumes mix stays similar. Do not use 14:17Z-to-19:23Z catch-up (+229 MiB RDP in ~5.1h) as typical. Do not use 2026-09-04 as a healthy UTC day (HOST_UNREACHABLE/reboot)."
   },
   "inputs": {
     "S_day": {
@@ -31,7 +32,7 @@
       "status": "MEASURED",
       "bytes": 20503703,
       "basis": "call_ledger $.rows json 60899842 / raw_span_days; unique response_sha extra bytes only 387031",
-      "poll_slots_not_added": "poll_slots payload is the same JSON shape as call_ledger; adding both would double-count raw"
+      "poll_slots": "NOT added as extra unique raw; see poll_slots_overlap"
     },
     "M_day": {
       "status": "MEASURED",
@@ -45,50 +46,88 @@
       "member_exact_file_sha_dups": 0,
       "local_ci": "zstd_3_and_7_smaller_than_uncompressed_on_schema_faithful_corpus"
     },
-    "B_same_vol": {
-      "current_topology": 2.0,
-      "selected_architecture": 1.0,
-      "status": "MACHINE_PROVEN_SAME_ST_DEV",
+    "same_volume": {
       "st_dev": 64769,
-      "note": "FACTORY_BACKUP_SINK resolved to git-side local/factory_v1_backup_sink; same st_dev as factory_v1"
-    },
-    "P_stage": {
-      "status": "MEASURED_AS_ONE_SELECTED_DAY",
-      "bytes": 235189816,
-      "note": "closed daily HOT unit plus zip; fail-closed as one extra selected-architecture day"
+      "FACTORY_BACKUP_SINK_other_device": false,
+      "status": "MACHINE_PROVEN_SAME_ST_DEV",
+      "note": "Other-device sink may be excluded only after machine proof. Current git-side sink is same st_dev."
     }
+  },
+  "poll_slots_overlap": {
+    "observed_at": "2026-09-04T20:05:33Z",
+    "call_completed_rows": 2148,
+    "poll_slot_rows": 1286,
+    "poll_exact_payload_sha256_in_call": 1286,
+    "poll_exact_payload_sha256_not_in_call": 0,
+    "poll_nonoverlap_payload_bytes": 0,
+    "poll_duplicate_payload_bytes": 67874291,
+    "poll_response_sha256_in_call": 1285,
+    "poll_response_sha256_not_in_call": 1,
+    "poll_nonoverlap_rows_json_bytes_via_sha": 2,
+    "decision": "DEDUPE_KEEP",
+    "note": "Every poll_slots payload_json has an exact sha256 match in call_ledger. Same JSON shape was insufficient; exact payload hash overlap is the proof. The one response_sha256 miss carries 2 rows-json bytes."
+  },
+  "publication_rate": {
+    "status": "BOUNDED",
+    "typical_publications_per_day": 178.83563481898935,
+    "typical_basis": "530 closed publications / scientific_span_days",
+    "completed_jobs_by_utc_day": {
+      "2026-09-02": 258,
+      "2026-09-03": 121,
+      "2026-09-04": 151
+    },
+    "healthy_full_utc_days_used": ["2026-09-02", "2026-09-03"],
+    "excluded_utc_days": {
+      "2026-09-04": "HOST_UNREACHABLE_AND_REBOOT_NOT_HEALTHY_THROUGHPUT"
+    },
+    "stress_publications_per_day": 258,
+    "stress_basis": "max completed-job count on a full UTC day excluding the outage/reboot day",
+    "frequency_multiplier_vs_typical": 1.4426654970701887,
+    "n_clean_full_utc_days": 2,
+    "variance_note": "121 vs 258 on consecutive full UTC days; dimension is BOUNDED not a 90d-stable rate"
   },
   "selected_daily_components_bytes": {
     "S_day_zstd": 212340797,
     "R_day_hot_raw_parquet_zstd": 3131359,
     "M_day": 19717661,
-    "sum": 235189816
+    "sum": 235189817
   },
-  "typical_primary_hot_97d_bytes": 22813412187,
-  "typical_same_volume_backup_97d_bytes": 0,
-  "typical_staging_peak_bytes": 235189816,
-  "typical_total_97d_bytes": 23048602003,
-  "TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D": 23048602003,
+  "typical_primary_hot_97d_bytes": 22813412249,
+  "typical_mutable_local_backup_peak_bytes": 1912711645,
+  "typical_unarchived_tail_durability_bytes": 215472156,
+  "typical_staging_peak_bytes": 235189817,
+  "typical_total_97d_bytes": 25176785867,
+  "TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D": 25176785867,
+  "mutable_backup_basis": {
+    "sqlite_operational_now_bytes": 58565148,
+    "scale": "97 / raw_span_days after removing call+poll payload_json from current sqlite file",
+    "plus_paper_operational_wal_bytes": 98576,
+    "compression": "ZIP_STORED",
+    "includes_full_rdp": false,
+    "same_volume": true
+  },
   "conservative_measured_stress": {
-    "basis": "scale scientific+metadata day-rate by members p95/mean file bytes (3126661/1556141.4358490566); keep measured HOT raw; B_same_vol=1; P_stage=one stress day",
-    "scale": 2.0092396025005543,
-    "total_97d_bytes": 46000455406,
+    "basis": "stress_publications_per_day 258 times members p95/mean bytes/publication after ZSTD3, plus freq-scaled raw+metadata, plus freq-scaled mutable backup, plus 24h tail copy, plus staging",
+    "frequency_multiplier": 1.4426654970701887,
+    "members_p95_over_mean": 2.0092396025005543,
+    "primary_hot_97d_bytes": 62901338326,
+    "mutable_local_backup_peak_bytes": 2759403096,
+    "unarchived_tail_durability_bytes": 620021416,
+    "staging_peak_bytes": 648467405,
+    "total_97d_bytes": 66929230243,
     "pass_target_40_gib": false,
-    "pass_hard_50_gib": true
+    "pass_hard_50_gib": false
   },
   "current_topology_contrast_not_selected": {
-    "B_same_vol": 2.0,
-    "A_layout": 1.0,
-    "daily_live_snappy_plus_unique_raw_plus_meta_bytes": 324399560,
-    "note": "If ZIP_STORED full RDP remains on same volume, 97d exceeds HARD. That is why current topology is REJECT."
+    "note": "Recursive ZIP_STORED of full observation_rdp on same volume remains REJECT as HOT data plane. Mutable retain-1 snapshot is still same-volume and is now an explicit additive term, not B_same_vol=1.0 with zero backup bytes."
   },
   "contractual_not_measured": {
     "raw_bytes_per_utc_day_max": 1073741824,
     "raw_97d_if_cap_saturated_bytes": 104152956928,
-    "note": "Do not call this a measured run-rate. It already exceeds HARD 50 GiB. Admission must not treat the cap as expected fill."
+    "note": "Do not call this a measured run-rate. It already exceeds HARD 50 GiB. Admission must not treat the cap as expected fill. Not used as publication rate."
   },
   "pass_target_40_gib": true,
-  "pass_hard_50_gib": true,
+  "pass_hard_50_gib": false,
   "pass_target_40_gib_conservative_stress": false,
-  "terminal_gate": "STORAGE_97D_ARCHITECTURE_READY"
+  "terminal_gate": "STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE"
 }

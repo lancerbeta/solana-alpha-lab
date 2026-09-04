@@ -1,15 +1,16 @@
 # FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1
 
-Status: `DESIGN_FROZEN_CAPACITY_PROVED`
+Status: `DESIGN_FROZEN_CAPTURE_POLICY_GATE`
 Contract: `FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1`
 Base: `52be82091af859171de2c062b1a08e05f5eb325e`
-Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`
+Terminal of this atom: `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
 As of: `2026-09-04`
 
-This document is the PRD+SSD for a **later** implementation atom. It does **not**
-implement the architecture. It does **not** authorize retention APPLY, Drive
-write, local Factory-data delete, deploy, or capture change. Implementation is
-not started from this PR; merge of this research/design is the handoff.
+This document is the PRD+SSD that freezes architecture direction
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`. It does **not** implement the
+architecture. It does **not** authorize retention APPLY, Drive write, local
+Factory-data delete, deploy, or capture change. Combined conservative stress
+fails HARD 50 GiB; this atom is a capture/budget handoff, not an IMPL grant.
 
 Predecessor `FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1` terminal
 `NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED` remains historically true under the
@@ -24,7 +25,9 @@ predecessor terminal.
   scientific evidence on the current ~100 GiB VPS without periodic disk upgrades.
 - `UNCERTAINTY_REMOVED`: live byte attribution after post-reboot coherence;
   same-`st_dev` backup sink; ~2.96 d publication span; SNAPPY live footers;
-  ZSTD3 live ratios; 97d typical 21.47 GiB / conservative stress 42.84 GiB.
+  ZSTD3 live ratios; exact `poll_slots` payload-hash overlap; 97d typical
+  23.45 GiB including mutable backup+tail; combined pub-rate×p95 stress
+  62.33 GiB > HARD 50.
   rclone/Drive SHA256 and isolated hydration remain **design-selected
   contracts** (this atom made 0 Drive hash calls).
 - `CAPABILITY_OR_EVIDENCE`: this PRD+SSD plus filled §4 tables. Historical
@@ -32,15 +35,15 @@ predecessor terminal.
   capacity terminal.
 - `STOP`: no architecture implementation, deploy, retention APPLY, Drive write,
   local delete, capture change, or merge from this handoff.
-- `NEXT`: merge gate of this research PR, then
-  `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`. Destructive eviction stays a
-  later gate. `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` is **not**
-  the terminal (conservative stress exceeds 40 GiB).
+- `NEXT`: owner capture/sampling (or other HARD-budget) decision. Do **not**
+  start `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` as if 50 GiB were
+  proven. Destructive eviction stays a later gate.
 
 `SPEC_ROUTE`: `BOTH`
 `MODEL_EFFORT_RECOMMENDATION`: `SOL_XHIGH`
-`NEXT_MODEL_EFFORT`: `LUNA_MAX` for bounded implementation after merge;
-`SOL_XHIGH` if IMPL changes schema, availability clocks, or PIT.
+`NEXT_MODEL_EFFORT`: `SOL_XHIGH` for the owner capture/budget decision;
+`LUNA_MAX` only for bounded IMPL after HARD 50 is proveable again;
+`SOL_XHIGH` if that later IMPL changes schema, availability clocks, or PIT.
 
 ## 1. Product requirement (frozen)
 
@@ -175,7 +178,7 @@ invoked. Drive writes 0.
 | members.parquet | 824 754 961 | 530 files; SNAPPY; exact SHA dups 0 |
 | observations.parquet | 6 121 537 | 530 files; 1856 rows |
 | call_ledger COMPLETED payload_json | 67 669 069 | 2106 rows; `$.rows` 60 899 842; `$.body` 0 |
-| poll_slots payload_json | 65 735 633 | same JSON shape as call_ledger; do not add as extra raw |
+| poll_slots payload_json | 65 735 633 | 19:23Z size; 20:05Z exact payload sha256 overlap 1286/1286 vs call_ledger |
 | Local backup sink | 11 114 155 120 | same `st_dev=64769` as factory_v1; leftover ZIP |
 | Research DuckDB | 0 | ABSENT |
 | publication span | 2.9636 days | `first_reliable_available_at` min/max |
@@ -192,45 +195,57 @@ Let:
 - `R_day` = measured canonical raw body bytes/day (unique `response_sha256`)
 - `M_day` = operational metadata/SQLite/journals growth/day after split
 - `A_layout` = lossless layout factor (ZSTD + batching + member/raw dedup), measured
-- `B_same_vol` = same-volume recovery artifact factor (1.0 if mutable-only snapshot;
-  ~2.0 if current full RDP ZIP_STORED copy)
-- `P_stage` = archive/compaction staging peak (closed daily unit + zip)
+- `MUTABLE_LOCAL_BACKUP_PEAK` = same-volume 12h retain-1 ZIP_STORED of **mutable**
+  state at 97d (operational sqlite without bulk bodies, paper, WAL). Not zero.
+  Not a full RDP copy. Other-device `FACTORY_BACKUP_SINK` excluded only after
+  machine proof; current `st_dev=64769` is the same as `factory_v1`.
+- `UNARCHIVED_TAIL_DURABILITY_BYTES` = 24h RPO copy of HOT parquet+raw not yet
+  Drive-verified
+- `P_stage` = archive/compaction staging peak (one selected day)
 
 ```
 PRIMARY_HOT_97D = 97 * (S_day + R_day + M_day) * A_layout
-SAME_VOLUME_BACKUP_97D = PRIMARY_HOT_97D * (B_same_vol - 1)   # extra copy
-STAGING_PEAK = P_stage
-TOTAL_97D = PRIMARY_HOT_97D + SAME_VOLUME_BACKUP_97D + STAGING_PEAK
+TOTAL_97D = PRIMARY_HOT_97D
+  + MUTABLE_LOCAL_BACKUP_PEAK
+  + UNARCHIVED_TAIL_DURABILITY_BYTES
+  + STAGING_PEAK
 ```
+
+Do **not** use `B_same_vol selected = 1.0` to drop backup bytes. Coarse
+`PRIMARY * (B-1)` is retired for the selected architecture.
 
 Report separately, never as measured run-rate:
 
 - contractual `raw_bytes_per_utc_day_max = 1 GiB` → 97 GiB raw-only theoretical
   bound. This already exceeds HARD 50 GiB. It is an admission cap, not empirical
-  growth.
+  growth or publication rate.
 
-From live forensics (19:23Z), selected architecture `B_same_vol=1.0`,
-`A_layout=0.725` (members SNAPPY→ZSTD3 + HOT raw JSON→ZSTD3 parquet):
+From live forensics (19:23Z) plus overlap/rate probe (20:05Z), `A_layout=0.725`:
 
 | Term | Bytes | GiB |
 |---|---:|---:|
-| `S_day` (live SNAPPY science) | 284 178 196 | 0.265 |
-| `R_day` (unique `$.rows` JSON) | 20 503 703 | 0.019 |
-| `M_day` (sqlite overhead) | 19 717 661 | 0.018 |
-| typical `PRIMARY_HOT_97D` | 22 813 412 187 | 21.25 |
-| typical `STAGING_PEAK` | 235 189 816 | 0.22 |
-| typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` | 23 048 602 003 | 21.47 |
-| conservative stress (members p95/mean) | 46 000 455 406 | 42.84 |
-| contractual 1 GiB/day × 97 (not measured) | 104 152 956 928 | 97 |
+| typical `PRIMARY_HOT_97D` | 22 813 412 249 | 21.25 |
+| typical `MUTABLE_LOCAL_BACKUP_PEAK` | 1 912 711 645 | 1.78 |
+| typical `UNARCHIVED_TAIL_DURABILITY_BYTES` | 215 472 156 | 0.20 |
+| typical `STAGING_PEAK` | 235 189 817 | 0.22 |
+| typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` | 25 176 785 867 | 23.45 |
+| combined stress (258 pubs/day × p95 members after ZSTD3 + freq-scaled raw/meta/backup/tail/staging) | 66 929 230 243 | 62.33 |
 
-Typical passes TARGET 40 and HARD 50. Conservative stress misses TARGET and
-passes HARD. Current topology with `B_same_vol=2.0` is still REJECT: it would
-put 97d over HARD.
+Typical passes TARGET 40. Combined conservative stress **fails HARD 50**.
+Publication-frequency dimension uses max of two full UTC days (258 on
+2026-09-02, 121 on 2026-09-03); 2026-09-04 excluded as outage/reboot.
+`n=2` so the rate is `BOUNDED`, not a 90d-stable throughput. Do not treat the
+~3-day span mean as that proof.
+
+`poll_slots`: 1286/1286 exact `sha256(payload_json)` matches in `call_ledger`
+(`poll_nonoverlap_payload_bytes=0`). Dedup stands. Same JSON shape was not the
+evidence.
 
 A design does **not** PASS if HOT is 40 GiB and a same-volume full backup makes
 80 GiB. Current topology (`recursive observation_rdp` in 12h ZIP_STORED retain-1
 **and** weekly off-host full of the same immutable bytes) is the amplification
-to remove. Same-volume identity is now machine-proven (`st_dev=64769`).
+to remove. Mutable retain-1 still counts. Same-volume identity is machine-proven
+(`st_dev=64769`).
 
 ## 5. Phase C — format benchmark (CI corpus + live tmp rewrite)
 
@@ -482,29 +497,35 @@ Name: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`
 
 `hot_window_days=90`, `archive_cadence_days=7`, `capacity_horizon_days=97`.
 
-Selected architecture typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D`
-= 23 048 602 003 bytes (21.47 GiB) ≤ TARGET 40 GiB and HARD 50 GiB.
-Conservative measured stress = 46 000 455 406 bytes (42.84 GiB) ≤ HARD and
-> TARGET. Terminal: `STORAGE_97D_ARCHITECTURE_READY`.
+Typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` = 25 176 785 867 bytes
+(23.45 GiB) ≤ TARGET 40 GiB. Combined publication-frequency × p95-member
+conservative stress = 66 929 230 243 bytes (62.33 GiB) **exceeds HARD 50 GiB**.
+Terminal: `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`.
 
-Limitation: denominator is a ~3-day LIVE cohort, linearly scaled. Mix shift
-toward p95 member files is the stress case. Contractual 1 GiB/day saturation
-remains a separate theoretical bound (97 GiB) and must not be treated as
-expected fill.
+Lossless HOT90 layout is still the selected architecture. It does **not** by
+itself prove 50 GiB under the defensible combined stress. Do not start IMPL as
+a capacity PASS.
+
+Limitation: frequency uses n=2 full UTC days (258 vs 121). Combined stress
+multiplies that max by members p95/mean. Contractual 1 GiB/day saturation
+remains a separate theoretical bound.
 
 The archive→verify→evict path must still be executable and fail-closed before
 any age policy is called "runway". Whole-host at 19:18Z: ~17% used; leftover
-same-volume ZIP is current disk, not the selected 97d term.
+same-volume full-RDP ZIP is current disk, not the selected mutable 97d term.
 
 ## 16. Implementation atom (not this PR)
 
-Do **not** start automatically. Destructive eviction is a **later** gate.
+Do **not** start automatically. This atom's terminal is
+`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`, not a 40/50 PASS.
+Destructive eviction is a **later** gate.
 
 Suggested later task id: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`
-Precondition: this atom terminal `STORAGE_97D_ARCHITECTURE_READY` and merge of
-the research PR. Do not start IMPL from an unmerged working copy as production
-mutation. Destructive eviction remains a later gate after IMPL write-only
-commissioning.
+Precondition: owner capture/sampling (or other HARD-budget) decision **and**
+a later proof that defensible conservative 97d stays ≤ HARD 50. Architecture
+direction `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` stays selected. Do not
+start IMPL from this research PR as if 50 GiB were proven. Destructive
+eviction remains a later gate after IMPL write-only commissioning.
 
 Write set (bounded; eviction still a later destructive gate after IMPL):
 

@@ -106,7 +106,9 @@ Can the Factory keep 90 days of all material RAW + transformed scientific
 evidence locally on the current ~100 GiB VPS, with weekly eviction (97-day
 capacity horizon), TARGET <=40 GiB and HARD <=50 GiB inclusive of same-volume
 data footprint, without a capture-policy change — and which standard
-ADOPT/WRAP architecture should the next implementation atom build?
+ADOPT/WRAP architecture to freeze. Combined publication-rate × p95 stress
+now fails HARD 50, so the live consumer of this atom is the owner
+capture/budget decision, not a silent IMPL start.
 
 ## Binding
 
@@ -125,13 +127,19 @@ It does not silently rewrite that predecessor terminal.
 
 ## Named consumer
 
-Owner and the next implementation atom, deciding the storage architecture
-before any production mutation, retention APPLY, Drive write, or eviction.
+Owner capture/sampling (or other HARD-budget) decision. Architecture direction
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` is frozen. Do not treat this atom as
+an IMPL grant. No production mutation, retention APPLY, Drive write, or eviction.
 
 ## Cheapest falsifier
 
 - Live byte attribution cannot reconcile Factory data-related disk usage.
 - A design "passes" 40/50 GiB only by excluding same-volume backup/staging.
+- HARD 50 is claimed from members file-size p95/mean alone, without a
+  bounded publication-frequency stress, or by treating the ~3-day mixed
+  outage span as a 90d-stable rate.
+- `poll_slots` "same JSON shape" is treated as duplicate-content proof
+  without payload-hash overlap.
 - Lossless compression/batching/dedup is claimed without a real-corpus
   benchmark that preserves semantic equality.
 - Scientific identity/reproducibility after local eviction is unspecified.
@@ -152,24 +160,28 @@ PostgreSQL/Iceberg/Delta/Hudi/new cloud provider merely because they exist.
 
 Exactly one, this atom:
 
-`STORAGE_97D_ARCHITECTURE_READY`
+`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
 
-Typical 97d selected footprint passes TARGET 40 GiB and HARD 50 GiB.
-Conservative measured stress passes HARD and misses TARGET, so
+Typical 97d selected footprint including same-volume mutable backup+tail
+passes TARGET 40 GiB. Combined publication-frequency × p95-member conservative
+stress exceeds HARD 50 GiB. Architecture direction stays
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`. Do not start IMPL as a 50 GiB PASS.
+`STORAGE_97D_ARCHITECTURE_READY` is not selected.
 `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` is not selected.
-`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE` is not selected.
 Historical `HOST_UNREACHABLE` remains in evidence and does not stay the
 capacity terminal.
 
 Defined but not this atom's terminal:
 
+- `STORAGE_97D_ARCHITECTURE_READY`
 - `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`
-- `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
 - `STORAGE_ARCHITECTURE_BLOCKED`
 
 ## STOP / NEXT
 
 STOP after the research/design PR and owner readout. No architecture
-implementation. No merge from this handoff until exact-head CI and owner
-phrase. NEXT is `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` after this
-research PR merges. Destructive eviction remains a later gate.
+implementation. No capture-policy change in this atom. No merge from this
+handoff until exact-head CI and owner phrase. NEXT is an owner capture/sampling
+(or other HARD-budget) decision. Do not start
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` from this terminal.
+Destructive eviction remains a later gate.

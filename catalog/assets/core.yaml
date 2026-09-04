@@ -34950,13 +34950,13 @@ records:
 - asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001
   record_version: '1.0'
   asset_type: control_document
-  purpose: Research/design proof for 90d local residency and 40/50 GiB VPS data budget; typical 97d READY, stress misses TARGET.
+  purpose: Research/design proof for 90d local residency and 40/50 GiB VPS data budget; typical 97d passes TARGET; combined stress requires capture-policy gate.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md', repository_path: docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md}
-  integrity: {kind: sha256, sha256: cb30e51af3f34b1b4ee73cc91333bd67b4bebe97965c459bb78bef59d6039890}
+  integrity: {kind: sha256, sha256: c198dcfbcdf381a7f5411e88acd853c81cbf27407a970631a27c8b3e4060e242}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001}
@@ -34965,7 +34965,7 @@ records:
   - {relation_type: validated_by, target_asset_id: TEST-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [STORAGE_97D_ARCHITECTURE_READY, HOT90, CONTENT_IMMUTABILITY, LOCAL_RESIDENCY]
+  search_terms: [STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE, HOT90, CONTENT_IMMUTABILITY, LOCAL_RESIDENCY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: DOC-FACTORY-97D-STORAGE-ARCHITECTURE-PRD-SSD-001
   record_version: '1.0'
@@ -34976,7 +34976,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md', repository_path: docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md}
-  integrity: {kind: sha256, sha256: 4185d4eee74629f90c1bb874dc0e7e453a5eb14bcea57e5480e03d25957e0e5f}
+  integrity: {kind: sha256, sha256: 74e625ec9a1772f765950339d6fa155db752fc0c6f2df68d7642e6a9edb031c8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}
@@ -34987,19 +34987,19 @@ records:
 - asset_id: TEST-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001
   record_version: '1.0'
   asset_type: script
-  purpose: Semantic proofs that this atom is STORAGE_97D_ARCHITECTURE_READY after post-reboot forensics and records ADOPT/WRAP/REJECT.
+  purpose: Semantic proofs that this atom is STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE after capacity-model corrections and records ADOPT/WRAP/REJECT.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_97d_storage_architecture_proof_v1.py', repository_path: tests/test_factory_97d_storage_architecture_proof_v1.py}
-  integrity: {kind: sha256, sha256: a1f3d3b75bdd2dc5d78e4465b68e0809156eea8bc4e76b3eab50259d16c070f1}
+  integrity: {kind: sha256, sha256: 8e4771f77930b9365a6703ed76fd1bdcd779b6756dbd8a0b9ac9130111de77ba}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}
   consumers: [FACTORY-001]
   evidence: []
-  search_terms: [STORAGE_97D_ARCHITECTURE_READY, CONTENT_IMMUTABILITY, Iceberg]
+  search_terms: [STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE, CONTENT_IMMUTABILITY, Iceberg]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-FACTORY-97D-STORAGE-FORMAT-BENCHMARK-001
   record_version: '1.0'
@@ -35027,7 +35027,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_97d_storage_architecture_proof_v1/a1_live_byte_forensics_v1.json', repository_path: docs/evidence/factory_97d_storage_architecture_proof_v1/a1_live_byte_forensics_v1.json}
-  integrity: {kind: sha256, sha256: a2c927b67d5a32bf98307f841f57a0361e125cffd3e6ed348154773b84150545}
+  integrity: {kind: sha256, sha256: 9c9c320cf4f0a6d33c3aa612f621585fa2a9bcd9f9c190ece4906c3d718154dd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}
