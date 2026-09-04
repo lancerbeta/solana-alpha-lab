@@ -54,6 +54,12 @@
         "AFTER_MANIFEST",
         "AFTER_MARKER"
       ]
+    },
+    "provider_call_wall_seconds": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 119,
+      "description": "Hard wall-clock seconds for one logical provider call; must be < LEASE_SECONDS (120)."
     }
   }
 }

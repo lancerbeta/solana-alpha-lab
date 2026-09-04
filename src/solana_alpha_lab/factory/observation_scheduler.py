@@ -23,6 +23,10 @@ from solana_alpha_lab.factory.observation_provider_pacing import (
     ProviderTickContext,
     require_sleep_capable_clock,
 )
+from solana_alpha_lab.factory.observation_provider_wall_deadline import (
+    DEFAULT_PROVIDER_CALL_WALL_SECONDS,
+    wrap_opener_with_wall_deadline,
+)
 from solana_alpha_lab.factory.observation_primitive_registry import (
     ObservationPrimitiveRegistry,
     PrimitiveRegistryError,
@@ -63,7 +67,10 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     _require_live_authority,
     complete_draining_schedule,
 )
-from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+from solana_alpha_lab.factory.observation_schedule_store import (
+    LEASE_SECONDS,
+    ObservationScheduleStore,
+)
 
 OWNER = "tick-once"
 SEARCH = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
@@ -1007,6 +1014,7 @@ def tick_once(
     redact_with: str | None = None,
     fault_after: str | None = None,
     clock: Callable[[], datetime] | None = None,
+    provider_call_wall_seconds: int | None = None,
 ) -> dict[str, Any]:
     if now.tzinfo is None:
         raise ObservationSchedulerError("TIMESTAMP_INVALID")
@@ -1072,6 +1080,18 @@ def tick_once(
         tick_start=now,
         pace_seconds=int(schedule["budgets"]["min_provider_pace_seconds"]),
         injectable_clock=injectable_clock,
+    )
+    wall_seconds = (
+        DEFAULT_PROVIDER_CALL_WALL_SECONDS
+        if provider_call_wall_seconds is None
+        else int(provider_call_wall_seconds)
+    )
+    if wall_seconds <= 0 or wall_seconds >= LEASE_SECONDS:
+        raise ObservationSchedulerError("PROVIDER_CALL_WALL_SECONDS_MUST_BE_BELOW_LEASE")
+    opener = wrap_opener_with_wall_deadline(
+        opener,
+        wall_seconds=wall_seconds,
+        heartbeat=lambda: store.renew_held_lease(clock=provider_ctx.now()),
     )
     try:
         try:
