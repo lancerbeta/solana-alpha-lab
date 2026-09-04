@@ -1,16 +1,17 @@
 # FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1
 
-Status: `DESIGN_FROZEN_CAPTURE_POLICY_GATE`
+Status: `DESIGN_FROZEN_CAPACITY_PROVED`
 Contract: `FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1`
 Base: `52be82091af859171de2c062b1a08e05f5eb325e`
-Terminal of this atom: `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
-As of: `2026-09-04`
+Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`
+As of: `2026-09-05`
 
 This document is the PRD+SSD that freezes architecture direction
-`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`. It does **not** implement the
-architecture. It does **not** authorize retention APPLY, Drive write, local
-Factory-data delete, deploy, or capture change. Combined conservative stress
-fails HARD 50 GiB; this atom is a capture/budget handoff, not an IMPL grant.
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` with HOT members layout
+`SNAPSHOT_PLUS_DELTA`. It does **not** implement the architecture. It does
+**not** authorize retention APPLY, Drive write, local Factory-data delete,
+deploy, or capture change. Combined conservative stress passes HARD 50 GiB.
+Implementation is not started from this PR.
 
 Predecessor `FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1` terminal
 `NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED` remains historically true under the
@@ -25,9 +26,10 @@ predecessor terminal.
   scientific evidence on the current ~100 GiB VPS without periodic disk upgrades.
 - `UNCERTAINTY_REMOVED`: live byte attribution after post-reboot coherence;
   same-`st_dev` backup sink; ~2.96 d publication span; SNAPPY live footers;
-  ZSTD3 live ratios; exact `poll_slots` payload-hash overlap; 97d typical
-  23.45 GiB including mutable backup+tail; combined pub-rate×p95 stress
-  62.33 GiB > HARD 50.
+  ZSTD3 live ratios; exact `poll_slots` payload-hash overlap; SNAPSHOT_PLUS_DELTA
+  members reconstruction 258/258 and 121/121; 97d typical 4.97 GiB including
+  mutable backup+tail; combined conservative stress 7.02 GiB ≤ HARD 50
+  (margin 42.98 GiB).
   rclone/Drive SHA256 and isolated hydration remain **design-selected
   contracts** (this atom made 0 Drive hash calls).
 - `CAPABILITY_OR_EVIDENCE`: this PRD+SSD plus filled §4 tables. Historical
@@ -35,14 +37,13 @@ predecessor terminal.
   capacity terminal.
 - `STOP`: no architecture implementation, deploy, retention APPLY, Drive write,
   local delete, capture change, or merge from this handoff.
-- `NEXT`: owner capture/sampling (or other HARD-budget) decision. Do **not**
-  start `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` as if 50 GiB were
-  proven. Destructive eviction stays a later gate.
+- `NEXT`: merge gate of this research PR. Do **not** start
+  `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` from this handoff.
+  Destructive eviction stays a later gate.
 
 `SPEC_ROUTE`: `BOTH`
 `MODEL_EFFORT_RECOMMENDATION`: `SOL_XHIGH`
-`NEXT_MODEL_EFFORT`: `SOL_XHIGH` for the owner capture/budget decision;
-`LUNA_MAX` only for bounded IMPL after HARD 50 is proveable again;
+`NEXT_MODEL_EFFORT`: `LUNA_MAX` for bounded IMPL after this research PR merges;
 `SOL_XHIGH` if that later IMPL changes schema, availability clocks, or PIT.
 
 ## 1. Product requirement (frozen)
@@ -204,7 +205,7 @@ Let:
 - `P_stage` = archive/compaction staging peak (one selected day)
 
 ```
-PRIMARY_HOT_97D = 97 * (S_day + R_day + M_day) * A_layout
+PRIMARY_HOT_97D = 97 * (MEMBERS_SNAPSHOT_PLUS_DELTA_DAY + S_day_other + R_day_hot + M_day)
 TOTAL_97D = PRIMARY_HOT_97D
   + MUTABLE_LOCAL_BACKUP_PEAK
   + UNARCHIVED_TAIL_DURABILITY_BYTES
@@ -220,22 +221,29 @@ Report separately, never as measured run-rate:
   bound. This already exceeds HARD 50 GiB. It is an admission cap, not empirical
   growth or publication rate.
 
-From live forensics (19:23Z) plus overlap/rate probe (20:05Z), `A_layout=0.725`:
+From live forensics (19:23Z) plus overlap/rate probe (20:05Z) plus members
+layout probe (completed 21:52Z). Selected HOT members layout
+`SNAPSHOT_PLUS_DELTA` (one full snapshot anchor + exact add/remove/change
+deltas; reconstruction 258/258 and 121/121, mismatch 0). Daily batched Parquet
+rejected (0.993× / 0.999× vs per-file ZSTD3). CAS rejected (larger than delta).
+
+Do **not** apply members p95/mean on top of SNAPSHOT_PLUS_DELTA. Members stress
+is the max measured delta day. Publication-frequency multiplier still applies
+to raw, other science, metadata, and mutable backup.
 
 | Term | Bytes | GiB |
 |---|---:|---:|
-| typical `PRIMARY_HOT_97D` | 22 813 412 249 | 21.25 |
+| typical members `SNAPSHOT_PLUS_DELTA` /day | 6 014 724 | 0.006 |
+| typical `PRIMARY_HOT_97D` | 3 370 594 606 | 3.14 |
 | typical `MUTABLE_LOCAL_BACKUP_PEAK` | 1 912 711 645 | 1.78 |
-| typical `UNARCHIVED_TAIL_DURABILITY_BYTES` | 215 472 156 | 0.20 |
-| typical `STAGING_PEAK` | 235 189 817 | 0.22 |
-| typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` | 25 176 785 867 | 23.45 |
-| combined stress (258 pubs/day × p95 members after ZSTD3 + freq-scaled raw/meta/backup/tail/staging) | 66 929 230 243 | 62.33 |
+| typical `UNARCHIVED_TAIL_DURABILITY_BYTES` | 15 030 737 | 0.014 |
+| typical `STAGING_PEAK` | 34 748 398 | 0.032 |
+| typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` | 5 333 085 386 | 4.97 |
+| combined conservative stress | 7 539 689 255 | 7.02 |
 
-Typical passes TARGET 40. Combined conservative stress **fails HARD 50**.
-Publication-frequency dimension uses max of two full UTC days (258 on
-2026-09-02, 121 on 2026-09-03); 2026-09-04 excluded as outage/reboot.
-`n=2` so the rate is `BOUNDED`, not a 90d-stable throughput. Do not treat the
-~3-day span mean as that proof.
+Typical and combined conservative stress pass TARGET 40 and HARD 50.
+Margin to HARD 50 = 46 147 401 945 bytes (42.98 GiB).
+Publication-frequency dimension remains `BOUNDED` (n=2). 2026-09-04 excluded.
 
 `poll_slots`: 1286/1286 exact `sha256(payload_json)` matches in `call_ledger`
 (`poll_nonoverlap_payload_bytes=0`). Dedup stands. Same JSON shape was not the
@@ -254,8 +262,11 @@ Footer on live observations/members: **SNAPPY**, `parquet-cpp-arrow version 25.0
 Median members file: SNAPPY 2 167 088 → ZSTD3 1 607 686 (0.74×). p95-ish members:
 SNAPPY 3 126 661 → ZSTD3 2 275 791 (0.73×). 80 COMPLETED raw JSON rows
 (3 909 820 B) → ZSTD3 parquet 597 114 B (0.15×). Exact member file-SHA
-duplicates = 0; WRAP content-addressed members remains optional, not required
-to meet HARD. Overlapping 7d member snapshots are already inside `S_day`.
+duplicates = 0. Daily batched members Parquet does **not** beat per-file ZSTD3
+(0.993× / 0.999×). Selected HOT members representation is `SNAPSHOT_PLUS_DELTA`
+(2026-09-02: 4.7 MiB vs per-file ZSTD3 70.0 MiB, reconstruction 258/258;
+2026-09-03 stress: 6.8 MiB vs per-file ZSTD3 201.7 MiB, reconstruction 121/121).
+CAS is larger than delta and is not selected.
 
 Proven on nested observation rows with `event_time`,
 `first_reliable_available_at`, typed values, missingness, `request_sha256`,
@@ -278,8 +289,9 @@ on the live corpus.
 
 Member/denominator: live exact file-SHA duplicates = 0. The publisher still
 writes a new `members.parquet` per `dataset_manifest_id`; overlapping cohort
-windows inflate `S_day` without identical files. Content-addressed member
-objects remain optional WRAP, not required for HARD 50.
+windows inflate `S_day` without identical files. Member CAS is **REJECT** for
+HOT 97d (larger than `SNAPSHOT_PLUS_DELTA` plus posting-list complexity).
+`SNAPSHOT_PLUS_DELTA` is the selected HOT members representation.
 
 ## 6. Phase D — split retention
 
@@ -479,8 +491,10 @@ Expected bias honored: mature Parquet / DuckDB / rclone; no new table platform.
 Name: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`
 
 1. **HOT scientific**: keep immutable Parquet identity; write ZSTD (level 3
-   unless live encode-time forbids); close UTC-day partitions; optional member
-   content-address if live duplicates are material.
+   unless live encode-time forbids); close UTC-day partitions. HOT members use
+   `SNAPSHOT_PLUS_DELTA` (one proportionate full snapshot anchor plus exact
+   deltas). Per-file members, daily batched members, and member CAS are not
+   the selected 97d HOT representation.
 2. **HOT raw**: lossless time-partitioned Parquet of canonical JSON bytes +
    occurrence metadata; `response_sha256` unique-body table; SQLite drops
    COMPLETED bodies only after materialize+hash+no unresolved dependency.
@@ -497,18 +511,18 @@ Name: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`
 
 `hot_window_days=90`, `archive_cadence_days=7`, `capacity_horizon_days=97`.
 
-Typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` = 25 176 785 867 bytes
-(23.45 GiB) ≤ TARGET 40 GiB. Combined publication-frequency × p95-member
-conservative stress = 66 929 230 243 bytes (62.33 GiB) **exceeds HARD 50 GiB**.
-Terminal: `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`.
+Typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` = 5 333 085 386 bytes
+(4.97 GiB) ≤ TARGET 40 GiB. Combined conservative stress = 7 539 689 255 bytes
+(7.02 GiB) ≤ HARD 50 GiB (margin 42.98 GiB) and ≤ TARGET 40 GiB.
+Terminal: `STORAGE_97D_ARCHITECTURE_READY`.
 
-Lossless HOT90 layout is still the selected architecture. It does **not** by
-itself prove 50 GiB under the defensible combined stress. Do not start IMPL as
-a capacity PASS.
+Selected HOT members layout is `SNAPSHOT_PLUS_DELTA`. Per-file members and
+daily batched Parquet are not the 97d HOT representation. Capture/sampling
+unchanged. Do not start IMPL from this research PR.
 
-Limitation: frequency uses n=2 full UTC days (258 vs 121). Combined stress
-multiplies that max by members p95/mean. Contractual 1 GiB/day saturation
-remains a separate theoretical bound.
+Limitation: frequency uses n=2 full UTC days (258 vs 121). Members stress uses
+max measured SNAPSHOT_PLUS_DELTA day, not p95×258. Contractual 1 GiB/day
+saturation remains a separate theoretical bound.
 
 The archive→verify→evict path must still be executable and fail-closed before
 any age policy is called "runway". Whole-host at 19:18Z: ~17% used; leftover
@@ -516,15 +530,12 @@ same-volume full-RDP ZIP is current disk, not the selected mutable 97d term.
 
 ## 16. Implementation atom (not this PR)
 
-Do **not** start automatically. This atom's terminal is
-`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`, not a 40/50 PASS.
-Destructive eviction is a **later** gate.
+Do **not** start automatically. Destructive eviction is a **later** gate.
 
 Suggested later task id: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`
-Precondition: owner capture/sampling (or other HARD-budget) decision **and**
-a later proof that defensible conservative 97d stays ≤ HARD 50. Architecture
-direction `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` stays selected. Do not
-start IMPL from this research PR as if 50 GiB were proven. Destructive
+Precondition: this atom terminal `STORAGE_97D_ARCHITECTURE_READY` and merge of
+the research PR. HOT members layout in IMPL is `SNAPSHOT_PLUS_DELTA`. Do not
+start IMPL from an unmerged working copy as production mutation. Destructive
 eviction remains a later gate after IMPL write-only commissioning.
 
 Write set (bounded; eviction still a later destructive gate after IMPL):

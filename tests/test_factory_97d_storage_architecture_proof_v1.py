@@ -42,20 +42,21 @@ PUBLISHER = ROOT / "src" / "solana_alpha_lab" / "factory" / "observation_panel_p
 
 
 class Factory97dStorageArchitectureProofTests(unittest.TestCase):
-    def test_terminal_requires_capture_policy_after_capacity_corrections(self) -> None:
+    def test_terminal_is_ready_after_snapshot_plus_delta(self) -> None:
         prd = PRD.read_text(encoding="utf-8")
         readout = READOUT.read_text(encoding="utf-8")
-        self.assertIn(
+        self.assertIn("Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`", prd)
+        self.assertIn("`STORAGE_97D_ARCHITECTURE_READY`", readout)
+        self.assertNotIn(
             "Terminal of this atom: `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`",
             prd,
         )
-        self.assertIn("`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`", readout)
-        self.assertNotIn("Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY`", prd)
         self.assertNotIn(
             "Terminal of this atom: `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`",
             prd,
         )
         self.assertNotIn("Terminal of this atom: `STORAGE_ARCHITECTURE_BLOCKED`", prd)
+        self.assertIn("SNAPSHOT_PLUS_DELTA", prd)
         self.assertIn("canonical content = immutable forever", prd)
         self.assertIn("hot local residency = 90d", prd)
         self.assertIn("cold durability = indefinite", prd)
@@ -84,17 +85,21 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
         self.assertEqual(overlap["poll_exact_payload_sha256_not_in_call"], 0)
         self.assertEqual(overlap["poll_nonoverlap_payload_bytes"], 0)
         self.assertEqual(overlap["decision"], "DEDUPE_KEEP")
+        layout = forensics["byte_attribution"]["members_layout_probe"]
+        self.assertEqual(layout["selected"], "SNAPSHOT_PLUS_DELTA")
+        self.assertEqual(layout["reconstruction"]["2026-09-02"]["exact_ok"], 258)
+        self.assertEqual(layout["reconstruction"]["2026-09-03"]["exact_ok"], 121)
+        self.assertEqual(layout["snapshot_plus_delta_zstd3_bytes"]["2026-09-02"], 4909476)
+        self.assertEqual(layout["snapshot_plus_delta_zstd3_bytes"]["2026-09-03"], 7119972)
         model = json.loads(MODEL.read_text(encoding="utf-8"))
-        self.assertEqual(model["schema_version"], "1.2")
+        self.assertEqual(model["schema_version"], "1.3")
+        self.assertEqual(model["selected_members_layout"], "SNAPSHOT_PLUS_DELTA")
         self.assertTrue(model["pass_target_40_gib"])
-        self.assertFalse(model["pass_hard_50_gib"])
-        self.assertFalse(model["pass_target_40_gib_conservative_stress"])
+        self.assertTrue(model["pass_hard_50_gib"])
+        self.assertTrue(model["pass_target_40_gib_conservative_stress"])
         self.assertEqual(model["capacity_horizon_days"], 97)
-        self.assertEqual(
-            model["terminal_gate"],
-            "STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE",
-        )
-        self.assertEqual(model["TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D"], 25176785867)
+        self.assertEqual(model["terminal_gate"], "STORAGE_97D_ARCHITECTURE_READY")
+        self.assertEqual(model["TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D"], 5333085386)
         self.assertEqual(model["typical_mutable_local_backup_peak_bytes"], 1912711645)
         self.assertGreater(model["typical_mutable_local_backup_peak_bytes"], 0)
         self.assertLessEqual(
@@ -102,10 +107,13 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
             model["target_bytes"],
         )
         stress = model["conservative_measured_stress"]
-        self.assertEqual(stress["total_97d_bytes"], 66929230243)
+        self.assertEqual(stress["total_97d_bytes"], 7539689255)
+        self.assertEqual(stress["members_snapshot_plus_delta_day_bytes"], 7119972)
         self.assertEqual(stress["mutable_local_backup_peak_bytes"], 2759403096)
-        self.assertGreater(stress["total_97d_bytes"], model["hard_bytes"])
-        self.assertFalse(stress["pass_hard_50_gib"])
+        self.assertEqual(stress["unarchived_tail_durability_bytes"], 20127063)
+        self.assertLessEqual(stress["total_97d_bytes"], model["hard_bytes"])
+        self.assertEqual(stress["margin_to_hard_50_bytes"], 46147401945)
+        self.assertTrue(stress["pass_hard_50_gib"])
         pub = model["publication_rate"]
         self.assertEqual(pub["status"], "BOUNDED")
         self.assertEqual(pub["stress_publications_per_day"], 258)
@@ -116,6 +124,7 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
         self.assertEqual(poll["poll_nonoverlap_payload_bytes"], 0)
         self.assertEqual(poll["decision"], "DEDUPE_KEEP")
         self.assertIn("PRIMARY_HOT_97D + MUTABLE_LOCAL_BACKUP_PEAK", model["formulas"]["TOTAL_97D"])
+        self.assertEqual(model["members_layout"]["typical_members_day_bytes"], 6014724)
 
     def test_selected_architecture_rejects_new_platforms_and_size_only_verify(self) -> None:
         prd = PRD.read_text(encoding="utf-8")

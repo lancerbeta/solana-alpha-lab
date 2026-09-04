@@ -2,18 +2,16 @@
 
 ## Terminal
 
-`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
+`STORAGE_97D_ARCHITECTURE_READY`
 
-Typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` = 23.45 GiB ≤ TARGET 40.
-Combined conservative stress (publication-frequency × members p95 after
-lossless layout + mutable backup + unarchived tail + staging) = 62.33 GiB
-**> HARD 50**. Architecture direction `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`
-accepted and unchanged. This atom does **not** change capture/sampling.
+Typical `TOTAL_DATA_RELATED_LOCAL_FOOTPRINT_AT_97D` = 4.97 GiB ≤ TARGET 40.
+Combined conservative stress (SNAPSHOT_PLUS_DELTA members + freq-scaled
+raw/meta/backup + tail + staging) = 7.02 GiB ≤ HARD 50 (margin 42.98 GiB)
+and ≤ TARGET 40. Architecture `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` with
+HOT members `SNAPSHOT_PLUS_DELTA`. Capture/sampling unchanged.
 
-`STORAGE_97D_ARCHITECTURE_READY` не выбран (combined stress fails HARD).
-`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` не выбран.
-`STORAGE_ARCHITECTURE_BLOCKED` снят после post-reboot coherence + bounded
-live forensics.
+`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE` не выбран (HARD recovered
+losslessly). `STORAGE_ARCHITECTURE_BLOCKED` снят после post-reboot coherence.
 
 Historical incident remains recorded: first probe `HOST_UNREACHABLE`
 (`NOT_OBSERVED_AFTER_HOST_UNREACHABLE` for post-hang host mutation/secrets).
@@ -22,23 +20,22 @@ Power cycle is not itself recovery proof; machine readback is.
 ## Entry / outcome
 
 - `DECISION_DELTA`: какая стандартная архитектура держит 90 дней RAW+science на
-  текущем ~100 GiB VPS без апгрейда диска — и проходит ли она 40/50 после
-  additive same-volume mutable backup и publication-rate stress.
+  текущем ~100 GiB VPS без апгрейда диска — SNAPSHOT_PLUS_DELTA закрывает HARD 50
+  lossless.
 - `UNCERTAINTY_REMOVED`: live byte attribution, `st_dev` backup sink, exact
-  `poll_slots` payload-hash overlap, healthy UTC publication counts (n=2),
-  SNAPPY footer, ZSTD3 live ratios, 97d typical 23.45 GiB / combined stress
-  62.33 GiB vs 40/50.
+  `poll_slots` payload-hash overlap, members reconstruction 258/258 and 121/121,
+  97d typical 4.97 GiB / combined stress 7.02 GiB vs 40/50.
 - `CAPABILITY_OR_EVIDENCE`: PRD+SSD
   `docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md`.
 - `STOP`: нет implementation, deploy, retention APPLY, Drive write, delete,
   capture change, merge. Этот PR — research/design handoff.
-- `NEXT`: owner capture/sampling (или другой HARD-budget) decision. Не
-  стартовать `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` как будто 50 GiB
-  proven. Destructive eviction — отдельный поздний gate.
+- `NEXT`: merge gate этого PR. Не стартовать
+  `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` из этого хендоффа.
+  Destructive eviction — отдельный поздний gate.
 
 `MODEL_EFFORT_RECOMMENDATION`: `SOL_XHIGH`
-`NEXT_MODEL_EFFORT`: `SOL_XHIGH` на owner capture-policy / budget decision;
-`LUNA_MAX` только на bounded IMPL после того, как HARD 50 снова доказуем.
+`NEXT_MODEL_EFFORT`: `LUNA_MAX` на bounded IMPL после merge этого research PR;
+`SOL_XHIGH` если IMPL трогает schema/PIT/availability clocks.
 
 Predecessor `NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED` не переписывается.
 
@@ -87,20 +84,23 @@ Root cause HOST_UNREACHABLE: не доказан без speculative repair. То
    keeps 12h retain-1 **mutable** ZIP_STORED snapshot on the same volume.
    Typical `MUTABLE_LOCAL_BACKUP_PEAK` = 1 912 711 645 bytes (1.78 GiB) — не
    ноль. Не full RDP copy. Leftover ZIP 10.35 GiB — текущий диск, не 97d term.
-5. **Lossless savings:** live members SNAPPY→ZSTD3 ≈ 0.74×; 80 raw JSON rows →
-   ZSTD3 parquet ≈ 0.15×. CI semantic equality без изменений.
-6. **Выбранная архитектура:** `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`
-   (не пересобиралась; live numbers её подтверждают как направление).
+5. **Lossless savings:** live members SNAPPY→ZSTD3 ≈ 0.74× per file; daily
+   batched Parquet ≈ 0.993×/0.999× vs per-file ZSTD3 (**no material gain**).
+   SNAPSHOT_PLUS_DELTA: 70.0 MiB → 4.7 MiB (02) and 201.7 MiB → 6.8 MiB (03).
+   Reconstruction 258/258 and 121/121. CAS larger than delta — not selected.
+6. **Выбранная архитектура:** `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` + HOT
+   members `SNAPSHOT_PLUS_DELTA`.
 7. **REJECT:** current SQLite+RDP unchanged (full same-volume RDP ZIP + нельзя
    эвиктить science); Iceberg/Delta/Hudi; MinIO/S3/GCS; PG/Kafka/Redis; 31→90
-   в SQLite; CAS files.
-8. **97d footprint (additive, A=0.725):** typical PRIMARY 22 813 412 249 +
-   mutable backup 1 912 711 645 + unarchived tail 215 472 156 + staging
-   235 189 817 = `TOTAL` 25 176 785 867 (23.45 GiB). Combined stress TOTAL =
-   66 929 230 243 (62.33 GiB). Contractual 1 GiB/day × 97 = 97 GiB — отдельно,
+   в SQLite; daily batched members as HOT; CAS member reuse.
+8. **97d footprint (SNAPSHOT_PLUS_DELTA):** typical PRIMARY 3 370 594 606 +
+   mutable backup 1 912 711 645 + unarchived tail 15 030 737 + staging
+   34 748 398 = `TOTAL` 5 333 085 386 (4.97 GiB). Combined stress TOTAL =
+   7 539 689 255 (7.02 GiB). Contractual 1 GiB/day × 97 = 97 GiB — отдельно,
    не run-rate и не publication rate.
-9. **PASS 40 GiB?** Typical **yes**. Combined conservative stress **no**.
-10. **PASS 50 GiB?** Typical **yes**. Combined conservative stress **no**.
+9. **PASS 40 GiB?** Typical **yes**. Combined conservative stress **yes**.
+10. **PASS 50 GiB?** Typical **yes**. Combined conservative stress **yes**
+    (margin 42.98 GiB).
 11. **RAW 90d без SQLite bloat:** HOT raw Parquet canonical JSON + occurrence
     metadata; `response_sha256` unique-body. COMPLETED body leaves SQLite only
     after materialize+hash+no unresolved due/call.
@@ -116,8 +116,7 @@ Root cause HOST_UNREACHABLE: не доказан без speculative repair. То
     существующие readers.
 16. **Новый consumer:** `DATA_RESOLUTION_ECONOMY` admission: compressed
     bytes/day → 97d → vs 40/50. >40 `DEGRADED`; >50 `ACTION_REQUIRED`. Не
-    silent downsample. Этот атом capture не меняет; terminal требует owner
-    decision.
+    silent downsample. Этот атом capture не меняет.
 
 ## Publication-rate stress basis
 
@@ -129,10 +128,9 @@ Stress pubs/day = 258. Frequency multiplier vs typical = 1.4426654970701887.
 90d-stable. Do not use the 14:17Z–19:23Z catch-up window. Do not use the
 1 GiB/day provider cap as publication rate.
 
-Combined stress = 258 pubs/day × p95 members after ZSTD3 + freq-scaled raw +
-operational metadata + same-volume mutable backup + unarchived tail + staging.
-Size-only p95 or frequency-only without p95 is **not** the HARD-50 claim.
-Do not massage: combined 62.33 GiB exceeds HARD.
+Members HOT stress = max SNAPSHOT_PLUS_DELTA day (2026-09-03 = 7 119 972 bytes),
+not 258 × p95 per-file. Frequency multiplier 1.4427 still scales raw, other
+science, metadata, and mutable backup. Combined conservative = 7.02 GiB ≤ HARD.
 
 ## Content immutability vs local residency
 
@@ -144,11 +142,12 @@ Do not massage: combined 62.33 GiB exceeds HARD.
 
 ## Implementation atom (not this PR)
 
-`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` только после owner
-capture/budget decision и повторного доказательства HARD 50. Write set
-остаётся в PRD §16. Eviction remains a later destructive gate.
-Deployment sequence: write-only ZSTD + raw plane → archive without eviction →
-mutable-only backup cutover → isolated hydrate proof → STOP.
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` after this research PR merges.
+HOT members layout = `SNAPSHOT_PLUS_DELTA`. Write set остаётся в PRD §16.
+Eviction remains a later destructive gate.
+Deployment sequence: write-only ZSTD + raw plane + members snapshot+delta →
+archive without eviction → mutable-only backup cutover → isolated hydrate
+proof → STOP.
 
 ## VPS locator (unchanged)
 
@@ -170,6 +169,5 @@ ssh -i "$env:USERPROFILE\.ssh\id_ed25519_factory" -o IdentitiesOnly=yes -o Batch
 ## Non-claims
 
 Не alpha. Не NetReturn. Не canonical DONE. Не merge. Не implementation.
-Не retention APPLY. Не Drive write. Не capture change в этом атоме
-(terminal — owner gate на capture/budget). Не WITH_TARGET_MARGIN. Не READY.
+Не retention APPLY. Не Drive write. Не capture change в этом атоме.
 Contractual 1 GiB/day saturation is not a measured run-rate.

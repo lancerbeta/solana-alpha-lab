@@ -150,6 +150,26 @@
       "decision": "DEDUPE_KEEP",
       "note": "Exact canonical payload sha256 overlap, not merely same JSON shape."
     },
+    "members_layout_probe": {
+      "selected": "SNAPSHOT_PLUS_DELTA",
+      "observed_at_complete": "2026-09-04T21:52:53Z",
+      "factory_data_mutated": false,
+      "drive_writes": 0,
+      "reconstruction": {
+        "2026-09-02": {"checked": 258, "exact_ok": 258, "mismatch": 0},
+        "2026-09-03": {"checked": 121, "exact_ok": 121, "mismatch": 0}
+      },
+      "snapshot_plus_delta_zstd3_bytes": {
+        "2026-09-02": 4909476,
+        "2026-09-03": 7119972
+      },
+      "per_file_zstd3_bytes": {
+        "2026-09-02": 73368492,
+        "2026-09-03": 211517656
+      },
+      "daily_batched_rejected": true,
+      "cas_rejected": true
+    },
     "publication_jobs_completed_by_utc_day": {
       "2026-09-02": 258,
       "2026-09-03": 121,

@@ -106,9 +106,9 @@ Can the Factory keep 90 days of all material RAW + transformed scientific
 evidence locally on the current ~100 GiB VPS, with weekly eviction (97-day
 capacity horizon), TARGET <=40 GiB and HARD <=50 GiB inclusive of same-volume
 data footprint, without a capture-policy change — and which standard
-ADOPT/WRAP architecture to freeze. Combined publication-rate × p95 stress
-now fails HARD 50, so the live consumer of this atom is the owner
-capture/budget decision, not a silent IMPL start.
+ADOPT/WRAP architecture to freeze. SNAPSHOT_PLUS_DELTA recovers HARD 50
+losslessly; the live consumer of this atom is the research-PR merge gate,
+not a silent IMPL start.
 
 ## Binding
 
@@ -127,9 +127,10 @@ It does not silently rewrite that predecessor terminal.
 
 ## Named consumer
 
-Owner capture/sampling (or other HARD-budget) decision. Architecture direction
-`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` is frozen. Do not treat this atom as
-an IMPL grant. No production mutation, retention APPLY, Drive write, or eviction.
+Owner and the later implementation atom, after this research PR. Architecture
+direction `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1` with HOT members
+`SNAPSHOT_PLUS_DELTA`. Do not start IMPL from this handoff. No production
+mutation, retention APPLY, Drive write, or eviction.
 
 ## Cheapest falsifier
 
@@ -160,28 +161,28 @@ PostgreSQL/Iceberg/Delta/Hudi/new cloud provider merely because they exist.
 
 Exactly one, this atom:
 
-`STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
+`STORAGE_97D_ARCHITECTURE_READY`
 
 Typical 97d selected footprint including same-volume mutable backup+tail
-passes TARGET 40 GiB. Combined publication-frequency × p95-member conservative
-stress exceeds HARD 50 GiB. Architecture direction stays
-`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`. Do not start IMPL as a 50 GiB PASS.
-`STORAGE_97D_ARCHITECTURE_READY` is not selected.
-`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` is not selected.
+passes TARGET 40 GiB. Combined conservative stress with SNAPSHOT_PLUS_DELTA
+passes HARD 50 GiB (and TARGET 40). Architecture direction stays
+`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1`. Do not start IMPL from this PR.
+`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN` is not the atom heading
+(owner-named READY). `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE` is not
+selected.
 Historical `HOST_UNREACHABLE` remains in evidence and does not stay the
 capacity terminal.
 
 Defined but not this atom's terminal:
 
-- `STORAGE_97D_ARCHITECTURE_READY`
 - `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`
+- `STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE`
 - `STORAGE_ARCHITECTURE_BLOCKED`
 
 ## STOP / NEXT
 
 STOP after the research/design PR and owner readout. No architecture
 implementation. No capture-policy change in this atom. No merge from this
-handoff until exact-head CI and owner phrase. NEXT is an owner capture/sampling
-(or other HARD-budget) decision. Do not start
-`FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` from this terminal.
-Destructive eviction remains a later gate.
+handoff until exact-head CI and owner phrase. NEXT is the merge gate of this
+research PR, then `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` as a later
+atom. Destructive eviction remains a later gate.
