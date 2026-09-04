@@ -84,10 +84,13 @@ context_requirements:
       - src/solana_alpha_lab/factory/observation_provider_wall_deadline.py
       - src/solana_alpha_lab/factory/observation_schedule_runtime.py
     DELIVERY_EVIDENCE:
+      - docs/evidence/observation_provider_bounded_response_and_parse_safety_v1/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/observation_provider_bounded_response_and_parse_safety_v1/a1_delivery_independent_review_v1.json
+      - docs/evidence/observation_provider_bounded_response_and_parse_safety_v1/a1_delivery_factory_fit_v1.json
+    HISTORICAL_CONTEXT:
       - docs/evidence/observation_provider_wall_deadline_and_lease_safety_v1/a1_delivery_completion_evidence_v1.json
       - docs/evidence/observation_provider_wall_deadline_and_lease_safety_v1/a1_delivery_independent_review_v1.json
       - docs/evidence/observation_provider_wall_deadline_and_lease_safety_v1/a1_delivery_factory_fit_v1.json
-    HISTORICAL_CONTEXT: []
 ---
 
 # OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1

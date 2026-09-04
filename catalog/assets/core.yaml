@@ -34771,7 +34771,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1.md', repository_path: docs/tasks/OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1.md}
-  integrity: {kind: sha256, sha256: 382df2bad41cfbd4beb8c52780315daee4c6f3d3f356ea871c47fba1572555a0}
+  integrity: {kind: sha256, sha256: b5b3d7515cd5304f7ee91566fc7ee81f9ec8889f0971b1a8fd7ae685a10a496f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-001}
