@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-04",
+  "task_id": "FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=ebfb87905d22674b5556ef3a4f356ebfa93b3e8d733ec0a003d79b7290f16a5b",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "CLAIM_97D_001_BLOCKED_NO_40_50_PASS",
+        "CLAIM_97D_002_HOT_LOCAL_RESIDENCY_DAYS_NOT_SILENT_IMMUTABLE",
+        "SCIENTIFIC_RDP_LOCAL_EVICTION_FORBIDDEN_UNDER_CURRENT_IMMUTABLE_CONST",
+        "CLAIM_97D_008_GIT_CLEAN_HOST_NOT_OBSERVED_AFTER_HANG",
+        "MAX_AVAILABILITY_CLOCK_FAIL_CLOSED_IF_MAX_AVAILABLE_MISSING",
+        "NO_PRODUCTION_CODE_MUTATION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "NO_SRC_MUTATION",
+        "NO_SECRETS",
+        "TESTS_PIN_BLOCKED_HOST_UNREACHABLE_NOT_OBSERVED",
+        "TESTS_PIN_HOT_LOCAL_RESIDENCY_DAYS_AND_EVICTION_FORBID",
+        "CATALOG_HASHES_MATCH",
+        "NO_RETENTION_APPLY",
+        "NO_DRIVE_WRITE",
+        "STOP_CONDITIONS_HELD"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DECISION_DELTA_CAPACITY_HALF_UNCLOSED",
+        "TERMINAL_STORAGE_ARCHITECTURE_BLOCKED",
+        "THREE_LAYER_NEXT",
+        "EVICTION_FORBIDDEN_UNTIL_NEW_FIELD",
+        "NO_40_50_GIB_PASS",
+        "STOP_AT_RESEARCH_PR"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_ARCHITECTURE_IMPLEMENTATION",
+    "NO_40_50_GIB_PASS"
+  ]
+}

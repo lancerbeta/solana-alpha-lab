@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-FACTORY-FIT-001",
+  "as_of": "2026-09-04",
+  "task_id": "FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_RECORDS_HOT90_DESIGN_WITHOUT_CAPACITY_PASS",
+    "flexibility_and_history": "PASS_KEEPS_IMMUTABLE_CONST_AND_PREDECESSOR_TERMINAL",
+    "context_efficiency": "PASS_PRD_SSD_AND_BOUNDED_FORENSICS_NEXT",
+    "research_truth": "PASS_CONTENT_IMMUTABILITY_VS_RESIDENCY_SPLIT",
+    "owner_operability": "PASS_THREE_LAYER_NEXT_AND_CHERRY_RECOVERY",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_NOW_VPS_RECOVERY_THEN_BOUNDED_FORENSICS",
+    "build_vs_buy": "PASS_WRAP_PARQUET_DUCKDB_RCLONE_REJECT_NEW_PLATFORMS",
+    "security": "PASS_NO_SECRETS_NO_RUNTIME_MUTATION",
+    "red_team": "PASS_UNKNOWN_97D_NOT_CONVERTED_TO_PASS"
+  },
+  "capability_radar": {
+    "now": "BOUNDED_LIVE_FORENSICS_AFTER_VPS_RECOVERY",
+    "watch": "HOT90_IMPL_ONLY_AFTER_CAPACITY_READY"
+  },
+  "recovery": "REVERT cursor/factory-97d-storage-architecture-proof-v1",
+  "limits": [
+    "NO_PRODUCTION_CODE_MUTATION",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_LOCAL_FACTORY_DATA_DELETE",
+    "NO_40_50_GIB_PASS",
+    "NO_ARCHITECTURE_IMPLEMENTATION",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}
