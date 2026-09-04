@@ -75,7 +75,9 @@ Non-blocking residuals (not this write set):
   bytes live on the operational packet, not Telegram copy.
 - `pass_70=false` for UNAVAILABLE is fail-closed, not a measured ≥70% disk fail;
   read `projection_basis`.
-- APPLY in-memory plan is O(unmigrated bodies); live APPLY remains a separate gate.
+- Live APPLY remains a separate owner gate. APPLY still `json.load`s one
+  source at a time during inspect; it does not retain historical bodies across
+  plan items.
 
 ## Non-claims
 
