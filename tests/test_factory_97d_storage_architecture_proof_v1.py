@@ -50,7 +50,8 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
         self.assertIn("canonical content = immutable forever", prd)
         self.assertIn("hot local residency = 90d", prd)
         self.assertIn("cold durability = indefinite", prd)
-        self.assertNotIn("PASS 40 GiB: yes", readout.lower())
+        self.assertNotIn("pass 40 gib: yes", readout.lower())
+        self.assertIn("HOST_UNREACHABLE", readout)
         forensics = json.loads(FORENSICS.read_text(encoding="utf-8"))
         self.assertEqual(forensics["this_atom_live_probe"]["status"], "HOST_UNREACHABLE")
         self.assertFalse(forensics["credential_values_read"])
@@ -58,6 +59,7 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
         self.assertIsNone(model["pass_target_40_gib"])
         self.assertIsNone(model["pass_hard_50_gib"])
         self.assertEqual(model["capacity_horizon_days"], 97)
+        self.assertEqual(model["terminal_gate"], "STORAGE_ARCHITECTURE_BLOCKED")
 
     def test_selected_architecture_rejects_new_platforms_and_size_only_verify(self) -> None:
         prd = PRD.read_text(encoding="utf-8")

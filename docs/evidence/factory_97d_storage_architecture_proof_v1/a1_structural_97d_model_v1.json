@@ -18,7 +18,7 @@
     "R_day": {"status": "UNKNOWN", "note": "14:17Z protected sqlite payload 59198098 bytes is not a day-rate"},
     "M_day": {"status": "UNKNOWN"},
     "A_layout": {"status": "UNKNOWN_LIVE", "local_ci": "zstd_3_and_7_smaller_than_uncompressed_on_schema_faithful_corpus"},
-    "B_same_vol": {"current_topology": 2.0, "selected_architecture": 1.0, "note": "2.0 if ZIP_STORED full RDP remains on same volume"},
+    "B_same_vol": {"current_topology": 2.0, "selected_architecture": 1.0, "status": "UNKNOWN_LIVE_ST_DEV", "note": "2.0 is fail-closed if ZIP_STORED full RDP remains on same volume; other-device FACTORY_BACKUP_SINK was not machine-proven"},
     "P_stage": {"status": "UNKNOWN", "note": "closed daily unit plus zip; must be counted"}
   },
   "contractual_not_measured": {

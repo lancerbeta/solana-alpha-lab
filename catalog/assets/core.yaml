@@ -34956,7 +34956,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md', repository_path: docs/tasks/FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1.md}
-  integrity: {kind: sha256, sha256: 49bee964b75e0421db1295248a775b19bcab6b72a863b067d56cca35b9aaaa4e}
+  integrity: {kind: sha256, sha256: 393d6aef7aaf114ed145b94504210638ac9e034a090660c00bbc52309ce71379}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001}
@@ -34976,7 +34976,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md', repository_path: docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md}
-  integrity: {kind: sha256, sha256: 917ebddfd043d4453c640ea1f807670e34f60870830d6446cce8e1e3e405b925}
+  integrity: {kind: sha256, sha256: 8d25dc949231dbb5f57793de08ca53796476353cadfaa1f6c19652522ff35f8f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}
@@ -34993,7 +34993,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_97d_storage_architecture_proof_v1.py', repository_path: tests/test_factory_97d_storage_architecture_proof_v1.py}
-  integrity: {kind: sha256, sha256: 76d226a4da56a5f310fa1f912cb136b1df2fa28884bc89174029b787c0eb2181}
+  integrity: {kind: sha256, sha256: f2c3364e57b92e59a7552f8ecb2ca3b4ebab694cddf236d05f9ca56295716471}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}

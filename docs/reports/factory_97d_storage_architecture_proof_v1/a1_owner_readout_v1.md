@@ -4,11 +4,14 @@
 
 `STORAGE_ARCHITECTURE_BLOCKED`
 
-VPS `factory-remote-ops` (`5.199.174.153`) стал unreachable (SSH banner timeout,
+Live probe: `HOST_UNREACHABLE`
+
+VPS `factory-remote-ops` (`5.199.174.153`) не отвечал (SSH banner timeout,
 ICMP 100% loss) после read-only forensics-скрипта, который обошёл `/opt` в
-поисках `BACKUP_*.zip`. Factory-данные не мутировались, Drive не писался,
-секреты не читались. Live Phase A/C этого атома не закрыты. 40/50 GiB PASS/FAIL
-не утверждается.
+поисках `BACKUP_*.zip`. Причинность «скрипт уронил хост» не доказана, только
+временная последовательность. Factory-данные не мутировались, Drive не
+писался, секреты не читались. Live Phase A/C этого атома не закрыты. 40/50 GiB
+PASS/FAIL не утверждается.
 
 Последний успешный machine readback: `2026-09-04T14:17:55Z`
 (`a1_storage_baseline_v1.json`).
@@ -18,13 +21,21 @@ ICMP 100% loss) после read-only forensics-скрипта, который о
 - `DECISION_DELTA`: какая стандартная архитектура держит 90 дней RAW+science на
   текущем ~100 GiB VPS без апгрейда диска.
 - `UNCERTAINTY_REMOVED`: владельцы байт и backup-амплификация из Git-контрактов
-  и baseline 14:17Z; semantic equality кодеков на schema-faithful корпусе;
-  rclone/Drive SHA256; hydration без HOT/COLD в каждом reader.
+  и baseline 14:17Z; semantic equality кодеков на schema-faithful корпусе.
+  rclone/Drive SHA256 и isolated hydration — **выбранный контракт**, не live
+  измерение в этом атоме (Drive hash calls = 0).
 - `CAPABILITY_OR_EVIDENCE`: PRD+SSD
   `docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md`.
 - `STOP`: нет implementation, deploy, retention APPLY, Drive write, delete.
-- `NEXT`: bounded live forensics (без walk `/opt`) → заполнить 97d таблицу →
-  один implementation atom только если PASS.
+- `NEXT` — три разных слоя, не одна стрелка:
+
+  1. **Owner recovery (сейчас):** Cherry portal reboot instance `973818`.
+     Locator: `docs/operator/FACTORY_REMOTE_HOST.md`.
+  2. **Research (после живого SSH):** bounded live forensics, suggested id
+     `FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1`. Не этот PR. Не walk `/opt`.
+  3. **Implementation:** `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` только
+     после capacity terminal `STORAGE_97D_ARCHITECTURE_READY` или
+     `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`. Не следующий шаг.
 
 `MODEL_EFFORT_RECOMMENDATION`: `SOL_XHIGH`
 `NEXT_MODEL_EFFORT`: `SOL_XHIGH` на retry forensics / capacity; не
@@ -95,13 +106,35 @@ science и бюджет 40/50 GiB.
 
 ## VPS / owner attention
 
-Хост сейчас не отвечает. Это не micro-approval: нужен operator check
-(Cherry console / reboot), затем **bounded** forensics:
+Хост на момент этого readout не отвечает. Это не micro-approval и не
+implementation. Слой 1 — только владелец в Cherry. Locator:
+`docs/operator/FACTORY_REMOTE_HOST.md` и
+`docs/operator/factory_remote_host_v1.yaml`. Instance: `973818`. Hostname:
+`factory-remote-ops`. IPv4: `5.199.174.153`. User: `factory`.
 
-- `df` / `findmnt` / `du` только `local/factory_v1` и известный backup sink
-- SQLite read-only URI
-- parquet **metadata** (не `rglob /opt`)
-- не hashing всех файлов одним процессом без прогресса
+```
+https://portal.cherryservers.com/
+```
+
+Хост снова жив, когда SSH banner не timeout **и** doctor JSON читается
+(вердикт `HEALTHY` у doctor запрещён; нужен parseable JSON, не ICMP-only).
+
+Проверка SSH с ПК оператора:
+
+```
+ssh -i "$env:USERPROFILE\.ssh\id_ed25519_factory" -o IdentitiesOnly=yes -o BatchMode=yes factory@5.199.174.153
+```
+
+Doctor после живого SSH:
+
+```
+ssh -i "$env:USERPROFILE\.ssh\id_ed25519_factory" -o IdentitiesOnly=yes -o BatchMode=yes factory@5.199.174.153 "cd /opt/solana-alpha-lab && sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_remote_doctor.py"
+```
+
+Слой 2 (агент, только после живого SSH): `du` только
+`/opt/solana-alpha-lab/local/factory_v1` и известный backup sink; SQLite
+`file:?mode=ro`; parquet metadata; не `rglob /opt`; не hashing всего дерева
+одним процессом без прогресса. Это не команды Cherry console.
 
 Collector на момент 14:17Z был `ACTIVE`. Текущее здоровье неизвестно, пока нет
 свежего doctor.

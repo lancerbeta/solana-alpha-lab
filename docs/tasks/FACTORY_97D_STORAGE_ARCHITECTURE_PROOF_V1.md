@@ -165,5 +165,10 @@ Other terminals remain defined for the successor atom:
 ## STOP / NEXT
 
 STOP after the research/design PR and owner readout. No architecture
-implementation. NEXT: recover VPS, bounded live forensics (no whole-`/opt`
-walk), then capacity terminal. Destructive eviction remains a later gate.
+implementation. NEXT is three layers: (1) owner recovers VPS via Cherry
+instance `973818` / `docs/operator/FACTORY_REMOTE_HOST.md`; (2) research
+`FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1` (no whole-`/opt` walk) returns a
+capacity terminal; (3) `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` only
+after `STORAGE_97D_ARCHITECTURE_READY` or
+`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`. Destructive eviction
+remains a later gate.

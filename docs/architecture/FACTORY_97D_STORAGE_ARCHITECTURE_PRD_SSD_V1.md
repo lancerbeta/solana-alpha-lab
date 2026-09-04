@@ -6,9 +6,10 @@ Base: `52be82091af859171de2c062b1a08e05f5eb325e`
 Terminal of this atom: `STORAGE_ARCHITECTURE_BLOCKED`
 As of: `2026-09-04`
 
-This document is the PRD+SSD for the next implementation atom. It does **not**
+This document is the PRD+SSD for a **later** implementation atom. It does **not**
 implement the architecture. It does **not** authorize retention APPLY, Drive
-write, local Factory-data delete, deploy, or capture change.
+write, local Factory-data delete, deploy, or capture change. Implementation is
+not the next step after this PR.
 
 Predecessor `FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1` terminal
 `NO_STORAGE_ARCHITECTURE_CHANGE_REQUIRED` remains historically true under the
@@ -23,14 +24,23 @@ predecessor terminal.
   scientific evidence on the current ~100 GiB VPS without periodic disk upgrades.
 - `UNCERTAINTY_REMOVED`: current byte owners and backup amplification from Git
   contracts + the 2026-09-04T14:17:55Z machine baseline; codec semantic equality
-  on a schema-faithful corpus; rclone/Drive SHA256 verify contract; consumer
-  hydration boundary.
+  on a schema-faithful corpus. rclone/Drive SHA256 and isolated hydration are
+  **design-selected contracts**, not live measurements in this atom.
 - `CAPABILITY_OR_EVIDENCE`: this PRD+SSD. Live 97d capacity PASS/FAIL is **not**
-  closed: this atom's second VPS forensics made the host unreachable.
+  closed: after this atom's second VPS forensics the host became unreachable
+  (SSH banner timeout, ICMP 100% loss). Causation is not proven beyond temporal
+  sequence.
 - `STOP`: no architecture implementation. No merge of this research as a claim
   of 40/50 GiB PASS.
-- `NEXT`: bounded live forensics (no whole-`/opt` walk) → fill capacity tables →
-  one implementation atom if PASS, else owner capture-policy decision.
+- `NEXT` (three layers, not one arrow):
+  1. Owner: recover VPS via Cherry instance `973818` /
+     `docs/operator/FACTORY_REMOTE_HOST.md`.
+  2. Research: `FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1` (suggested; no whole-`/opt`
+     walk) fills §4 tables and returns a capacity terminal.
+  3. Implementation: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` only after
+     `STORAGE_97D_ARCHITECTURE_READY` or
+     `STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`. Not this PR. Not the
+     step after BLOCKED.
 
 `SPEC_ROUTE`: `BOTH`
 `MODEL_EFFORT_RECOMMENDATION`: `SOL_XHIGH`
@@ -434,9 +444,12 @@ age policy is called "runway".
 
 Do **not** start automatically. Destructive eviction is a **later** gate.
 
-Suggested task id: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`
-Precondition: bounded live forensics fills §4 tables and capacity terminal is
-`STORAGE_97D_ARCHITECTURE_READY` or `..._WITH_TARGET_MARGIN`.
+Suggested later task id: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1`
+Do not start it from this BLOCKED atom. Immediate research successor is
+`FACTORY_97D_BOUNDED_LIVE_FORENSICS_V1`. Precondition for IMPL: that forensics
+atom fills §4 tables and the capacity terminal is
+`STORAGE_97D_ARCHITECTURE_READY` or
+`STORAGE_97D_ARCHITECTURE_READY_WITH_TARGET_MARGIN`.
 
 Write set (bounded):
 
