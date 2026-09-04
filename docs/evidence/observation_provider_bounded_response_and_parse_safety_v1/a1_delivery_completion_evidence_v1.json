@@ -11,7 +11,20 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "58a90cd71f05cbcee18a750f04e5eaba8fb11dee4554c4414f59649250ec1e47",
+    "catalog/assets/lifecycle.yaml": "60985329f02fa993e6d7d89cd4f9ecaf7f8cd8b4bead300b01056bdaab1d6f2e",
+    "catalog/catalog_manifest.yaml": "45c65494a36d1299ca52beca25beac15961048cf7b67b5d815da22ae68758b3b",
+    "catalog/generated/asset_edges.json": "aca661b3b14e59cda0cd5cd6f1c6da14037995f12e46ac1bae3b73aeaae57907",
+    "configs/ci_test_shards_v1.json": "a44968632511bed7ca4e0c2ed19d618b1c1249ede3fd0695af06ba06099403ce",
+    "configs/observation_primitive_registry_v1.yaml": "04aee01ebfbe6a26bf8cdc54aff94a415715a63b9df02b7eab59c41a58a797aa",
+    "docs/PROJECT_MAP.md": "7eb53e8f74e6a4937516cd77509afbb8daef561007e0f917e69a32e422447413",
+    "docs/reports/observation_provider_bounded_response_and_parse_safety_v1/a1_owner_readout_v1.md": "74ba9ee15c6d3ad99cc79f38047feb7f7baa105d1d546432cfbcee20514e5e47",
+    "docs/tasks/OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1.md": "b5b3d7515cd5304f7ee91566fc7ee81f9ec8889f0971b1a8fd7ae685a10a496f",
+    "src/solana_alpha_lab/factory/observation_primitives.py": "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631",
+    "src/solana_alpha_lab/factory/observation_provider_bounded_response.py": "860fb170736aa0a470768f3c954d20a7256a6658fe57cc0e097c8f0cb4fb8139",
+    "src/solana_alpha_lab/factory/observation_provider_wall_deadline.py": "e83aa3a5aaedef6e6d73c28bc3bb8cc4aeebb042e3d52981674c39dec69f670e",
+    "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "0a7439d5c40bb9af8f7e79443b7e462901acb0650e517767471d209b57409f59",
+    "tests/test_observation_provider_bounded_response_and_parse_safety_v1.py": "edf77d59244d01555c68a38c4f975b7677f510bcd34636a650a6ef9cfee46fe4"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_provider_bounded_response_and_parse_safety_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "36bdb441d375dfe556a1bbf9c20177b1c0f597d73c73139c2191ca4531148230",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_PROVIDER_BOUNDED_RESPONSE_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_provider_bounded_response_and_parse_safety_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "688f86018384a3873aa91e8e020612742cdf7dbb73142d24006930bd30bf8110",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
