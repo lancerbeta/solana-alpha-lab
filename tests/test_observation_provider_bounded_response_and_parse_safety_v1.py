@@ -364,6 +364,22 @@ class BoundedTransportTests(unittest.TestCase):
         self.assertEqual(primitive["http_class"], HTTP_CLASS_TRANSPORT)
         self.assertIsNone(primitive.get("body"))
 
+    def test_huge_int_inside_container_is_typed_invalid_quickly(self) -> None:
+        opener = JupiterReadonlyOpener(FIXTURE_KEY)
+        payload = b'{"n":' + (b"1" * 500) + b"}"
+        stream = _HttpLike(payload)
+        started = time.perf_counter()
+        with _hook_open(opener, stream):
+            primitive = _primitive(opener)
+        elapsed = time.perf_counter() - started
+        self.assertLess(elapsed, 1.0)
+        self.assertEqual(primitive["missing_reason"], RESPONSE_JSON_INVALID)
+
+    def test_ordinary_json_numbers_still_parse(self) -> None:
+        parsed = parse_bounded_json(b'{"usdPrice":1.25,"holderCount":12}')
+        self.assertEqual(parsed["usdPrice"], 1.25)
+        self.assertEqual(parsed["holderCount"], 12)
+
     def test_non_container_json_rejected_without_huge_int_parse(self) -> None:
         opener = JupiterReadonlyOpener(FIXTURE_KEY)
         stream = _HttpLike(b"1" * 200_000)
@@ -559,6 +575,8 @@ class BoundedHelperTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("not a GIL-preempting hard kill", text)
         self.assertIn("Bounded response + bounded parse", text)
+        self.assertNotIn("Hard end-to-end provider-call wall deadline exceeded", text)
+        self.assertNotIn("with the hard provider-call wall deadline", text)
 
 
 if __name__ == "__main__":

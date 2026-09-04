@@ -30,6 +30,10 @@ from typing import Any
 # Same-family proven cap. See module docstring for the safety margin.
 MAX_RESPONSE_BYTES = 2_000_000
 READ_SENTINEL_BYTES = 1
+# Safety cap on JSON number token length. Official Jupiter token/quote fields
+# are ordinary JSON numbers; a million-digit int inside an otherwise-legal
+# 2 MiB object is not expected payload semantics and can hold the GIL.
+MAX_JSON_NUMBER_CHARS = 40
 _READ_CHUNK_BYTES = 65_536
 RESPONSE_BODY_TOO_LARGE = "RESPONSE_BODY_TOO_LARGE"
 RESPONSE_JSON_INVALID = "RESPONSE_JSON_INVALID"
@@ -126,6 +130,18 @@ def _json_container_prefix(body: bytes) -> bool:
     return index < length and body[index] in b"[{"
 
 
+def _bounded_json_int(token: str) -> int:
+    if len(token) > MAX_JSON_NUMBER_CHARS:
+        raise ResponseJsonInvalidError()
+    return int(token)
+
+
+def _bounded_json_float(token: str) -> float:
+    if len(token) > MAX_JSON_NUMBER_CHARS:
+        raise ResponseJsonInvalidError()
+    return float(token)
+
+
 def parse_bounded_json(
     body: bytes,
     *,
@@ -140,7 +156,13 @@ def parse_bounded_json(
     except UnicodeDecodeError:
         raise ResponseJsonInvalidError() from None
     try:
-        parsed = json.loads(text)
+        parsed = json.loads(
+            text,
+            parse_int=_bounded_json_int,
+            parse_float=_bounded_json_float,
+        )
+    except ResponseJsonInvalidError:
+        raise
     except (json.JSONDecodeError, RecursionError, ValueError):
         raise ResponseJsonInvalidError() from None
     if not isinstance(parsed, (dict, list)):
@@ -149,6 +171,7 @@ def parse_bounded_json(
 
 
 __all__ = [
+    "MAX_JSON_NUMBER_CHARS",
     "MAX_RESPONSE_BYTES",
     "READ_SENTINEL_BYTES",
     "RESPONSE_BODY_TOO_LARGE",

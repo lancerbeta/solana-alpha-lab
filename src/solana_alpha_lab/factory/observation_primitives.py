@@ -206,6 +206,8 @@ def execute_primitive(
     except TimeoutError:
         return typed_missing("TIMEOUT", render_utc(clock()), timeout=True)
     except ResponseBodyTooLargeError:
+        # missing_reason is the scientific type. http_class TRANSPORT is
+        # fail-closed availability, not "the network died".
         return typed_missing(
             "RESPONSE_BODY_TOO_LARGE",
             render_utc(clock()),

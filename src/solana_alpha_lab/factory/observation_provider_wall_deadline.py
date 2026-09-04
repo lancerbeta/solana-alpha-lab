@@ -36,7 +36,7 @@ _HEARTBEAT_SLICE_SECONDS = 5.0
 
 
 class ProviderWallDeadlineError(TimeoutError):
-    """Hard end-to-end provider-call wall deadline exceeded."""
+    """Waiter-side provider-call wall deadline exceeded (not a GIL hard kill)."""
 
     def __init__(self) -> None:
         super().__init__(PROVIDER_CALL_WALL_DEADLINE)
@@ -121,7 +121,7 @@ def run_with_provider_wall_deadline(
 
 
 class WallDeadlineOpener:
-    """Wrap any opener.open(url) with the hard provider-call wall deadline."""
+    """Wrap any opener.open(url) with the waiter-side provider-call wall deadline."""
 
     def __init__(
         self,
