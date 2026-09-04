@@ -22,6 +22,28 @@ class Hot90ArchiveError(ValueError):
     """Typed closed-day archive failure."""
 
 
+def confined_relative_file(
+    root: Path, relative: str, *, error: type[Exception], code: str
+) -> Path:
+    text = str(relative).replace("\\", "/")
+    if text.startswith("/") or text.startswith("\\") or "://" in text:
+        raise error(code)
+    segments = text.split("/")
+    if any(segment in {"", ".", ".."} for segment in segments):
+        raise error(code)
+    if any(token in text for token in ("*", "?", "[", "]")):
+        raise error(code)
+    if len(segments[0]) == 2 and segments[0][1] == ":":
+        raise error(code)
+    resolved_root = root.resolve()
+    candidate = (root / text).resolve()
+    try:
+        candidate.relative_to(resolved_root)
+    except ValueError as exc:
+        raise error(code) from exc
+    return candidate
+
+
 def package_closed_day_archive(
     source_root: Path,
     *,
@@ -34,6 +56,9 @@ def package_closed_day_archive(
     tmp = dest_dir / f".archive-{os.getpid()}.zip"
     with zipfile.ZipFile(tmp, mode="w", compression=zipfile.ZIP_STORED, allowZip64=True) as archive:
         for relative in relative_paths:
+            confined_relative_file(
+                source_root, relative, error=Hot90ArchiveError, code="ARCHIVE_PATH_UNSAFE"
+            )
             path = source_root / relative
             if path.is_file() is False:
                 raise Hot90ArchiveError(f"ARCHIVE_SOURCE_MISSING:{relative}")
@@ -94,6 +119,9 @@ def hydrate_closed_day_archive(
         observed_entries = []
         for item in manifest.get("entries") or []:
             rel = str(item["path"])
+            confined_relative_file(
+                isolated_data_root, rel, error=Hot90ArchiveError, code="HYDRATE_PATH_ESCAPE"
+            )
             payload = archive.read(rel)
             digest = hashlib.sha256(payload).hexdigest()
             if digest != str(item.get("sha256") or "") or len(payload) != int(item.get("bytes") or -1):

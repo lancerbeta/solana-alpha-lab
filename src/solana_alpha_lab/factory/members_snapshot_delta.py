@@ -40,6 +40,8 @@ def diff_member_snapshots(
     curr_by = {str(row.get("entity_id") or ""): dict(row) for row in current}
     if "" in prev_by or "" in curr_by:
         raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+    if len(prev_by) != len(previous) or len(curr_by) != len(current):
+        raise MembersDeltaError("DUPLICATE_ENTITY_ID")
     added: list[dict[str, Any]] = []
     changed: list[dict[str, Any]] = []
     unchanged: list[dict[str, str]] = []
@@ -112,6 +114,7 @@ def write_snapshot_unit(
     rows: Sequence[Mapping[str, Any]],
 ) -> dict[str, Any]:
     unit_dir = data_root / "datasets" / "members_snapshot_plus_delta" / utc_day
+    _require_unique_entity_ids(rows)
     rel = f"datasets/members_snapshot_plus_delta/{utc_day}/snapshot/{dataset_manifest_id}/members.parquet"
     path = data_root / rel
     file_sha256 = _write_snapshot_or_reuse(path, rows)
@@ -149,6 +152,7 @@ def append_delta_publication(
     unit_path = unit_dir / "unit.json"
     if unit_path.is_file() is False:
         raise MembersDeltaError("ANCHOR_MISSING")
+    _require_unique_entity_ids(rows)
     unit = json.loads(unit_path.read_text(encoding="utf-8"))
     if not isinstance(unit, dict) or unit.get("layout") != LAYOUT_KIND:
         raise MembersDeltaError("UNIT_LAYOUT_INVALID")
@@ -293,9 +297,22 @@ def _write_snapshot_or_reuse(path: Path, rows: Sequence[Mapping[str, Any]]) -> s
     return _write_parquet_zstd(path, rows)
 
 
+def _require_unique_entity_ids(rows: Sequence[Mapping[str, Any]]) -> None:
+    seen: set[str] = set()
+    for row in rows:
+        entity_id = str(row.get("entity_id") or "")
+        if not entity_id:
+            raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+        if entity_id in seen:
+            raise MembersDeltaError("DUPLICATE_ENTITY_ID")
+        seen.add(entity_id)
+
+
 def _write_unit(path: Path, unit: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(unit, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(unit, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    tmp.replace(path)
 
 
 def _write_layout_sidecar(artifact: Path, unit: Mapping[str, Any], dataset_manifest_id: str) -> None:

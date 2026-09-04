@@ -10,8 +10,8 @@ from typing import Any, Callable
 
 from solana_alpha_lab.factory.hot90_activation import (
     Hot90ActivationError,
-    assert_no_drive_writes,
     load_hot90_activation,
+    require_drive_writes_enabled,
 )
 from solana_alpha_lab.factory.offhost_backup import (
     OffhostBackupError,
@@ -37,7 +37,7 @@ def verify_remote_content_sha256(
     activation = load_hot90_activation(root)
     if allow_drive is not True:
         try:
-            assert_no_drive_writes(activation)
+            require_drive_writes_enabled(activation)
         except Hot90ActivationError as exc:
             raise OffhostBackupError("HOT90_DRIVE_WRITES_DISABLED") from exc
     native = _hashsum(config, remote_object, runner, download=False)

@@ -12,6 +12,7 @@ from solana_alpha_lab.factory.hot90_activation import (
     STAGE_RETENTION_ACTIVE,
     load_hot90_activation,
 )
+from solana_alpha_lab.factory.hot90_archive import confined_relative_file
 from solana_alpha_lab.factory.hot90_remote_verify import (
     REMOTE_CONTENT_SHA256_VERIFIED,
     size_or_mtime_never_authorizes_delete,
@@ -83,18 +84,20 @@ def plan_exact_eviction(
         raise Hot90EvictionError("REMOTE_CONTENT_SHA256_REQUIRED")
     exact: list[str] = []
     for relative in source_paths:
-        if any(token in relative for token in ("*", "?", "[", "]")):
-            raise Hot90EvictionError("WILDCARD_DELETE_FORBIDDEN")
         if relative.endswith("/") or relative.endswith("\\"):
             raise Hot90EvictionError("PARENT_RECURSIVE_DELETE_FORBIDDEN")
-        path = data_root / relative
+        path = confined_relative_file(
+            data_root, relative, error=Hot90EvictionError, code="EVICTION_PATH_UNSAFE"
+        )
         if path.is_file() is False:
             raise Hot90EvictionError("SOURCE_MISSING")
+        if path.is_dir():
+            raise Hot90EvictionError("PARENT_RECURSIVE_DELETE_FORBIDDEN")
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
         expected = plan_hashes.get(relative)
         if expected != digest:
             raise Hot90EvictionError("SOURCE_HASH_CHANGED_SINCE_PLAN")
-        exact.append(relative)
+        exact.append(str(relative).replace("\\", "/"))
     return {
         "eligible": True,
         "exact_paths": exact,
@@ -107,22 +110,31 @@ def execute_exact_delete(
     *,
     data_root: Path,
     exact_paths: Sequence[str],
+    plan_hashes: Mapping[str, str],
     fixture_destructive: bool,
 ) -> dict[str, Any]:
     if fixture_destructive is not True:
         raise Hot90EvictionError("PRODUCTION_EVICTION_DISABLED")
     deleted: list[str] = []
     for relative in exact_paths:
-        if any(token in relative for token in ("*", "?", "[", "]")):
-            raise Hot90EvictionError("WILDCARD_DELETE_FORBIDDEN")
-        path = data_root / relative
+        if relative.endswith("/") or relative.endswith("\\"):
+            raise Hot90EvictionError("PARENT_RECURSIVE_DELETE_FORBIDDEN")
+        path = confined_relative_file(
+            data_root, relative, error=Hot90EvictionError, code="EVICTION_PATH_UNSAFE"
+        )
         if path.is_file() is False:
             raise Hot90EvictionError("SOURCE_MISSING")
         if path.is_dir():
             raise Hot90EvictionError("PARENT_RECURSIVE_DELETE_FORBIDDEN")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if plan_hashes.get(relative) != digest:
+            raise Hot90EvictionError("SOURCE_HASH_CHANGED_SINCE_PLAN")
         path.unlink()
-        deleted.append(relative)
-    return {"deleted": deleted, "readback": all((data_root / item).exists() is False for item in deleted)}
+        deleted.append(str(relative).replace("\\", "/"))
+    return {
+        "deleted": deleted,
+        "readback": all((data_root / item).exists() is False for item in deleted),
+    }
 
 
 def _parse_utc(value: str) -> datetime:

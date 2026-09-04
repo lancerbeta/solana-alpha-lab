@@ -75,7 +75,7 @@ def load_hot90_activation(
     }
 
 
-def assert_no_drive_writes(activation: Mapping[str, Any]) -> None:
+def require_drive_writes_enabled(activation: Mapping[str, Any]) -> None:
     if activation.get("drive_writes_enabled") is True:
         return
     raise Hot90ActivationError("HOT90_DRIVE_WRITES_DISABLED")

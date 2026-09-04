@@ -29946,7 +29946,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 2dc39d2a68919eb6d63964bc28b1027564c7ebb722985043db024cd80aeba20b}
+  integrity: {kind: sha256, sha256: 798e754f300998cffee61beb1fddcc95296fb8c16ebdf6caa8da4c0cd45114cb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -35081,7 +35081,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_hot90_immutable_drive_archive_impl_v1.py', repository_path: tests/test_factory_hot90_immutable_drive_archive_impl_v1.py}
-  integrity: {kind: sha256, sha256: 191501ce7da0745a2ca5f7f53d6ee15e82ab3a4f67f44372c9267ed0015900e1}
+  integrity: {kind: sha256, sha256: 98e182d5e699cca4859b480762384b5fbda0b9c1a97c3b6e8c4ea037e98a4a09}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
@@ -35098,7 +35098,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md', repository_path: docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md}
-  integrity: {kind: sha256, sha256: 1bc8171ba00dfcf9a4959b4fba68d34af3c5866d6ac82f2390c4cf09d0d78dd2}
+  integrity: {kind: sha256, sha256: 58278732e5f23e00935b09b6f46c50a03255bac93a80a23dafa7706c2183f077}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
@@ -35115,7 +35115,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_CLEANUP_PRECONDITIONS_V1.md', repository_path: docs/operator/FACTORY_HOT90_CLEANUP_PRECONDITIONS_V1.md}
-  integrity: {kind: sha256, sha256: d427c3127698b9e55d54ac0064ac02c24bdeaedef2df786964b54b00b348bbe8}
+  integrity: {kind: sha256, sha256: 58a8959b89952f06b1fad2e5724d75cfea792b80394aa2b046b0efa3572139a4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}

@@ -7,6 +7,7 @@ import json
 import sys
 import tempfile
 import unittest
+import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
@@ -23,6 +24,7 @@ from solana_alpha_lab.factory.hot90_activation import (  # noqa: E402
     load_hot90_activation,
 )
 from solana_alpha_lab.factory.hot90_archive import (  # noqa: E402
+    Hot90ArchiveError,
     hydrate_closed_day_archive,
     package_closed_day_archive,
     reconstruct_members_from_hydrated,
@@ -523,14 +525,59 @@ class ArchiveHydrateVerifyEvictTests(unittest.TestCase):
                 fixture_destructive=True,
             )
             deleted = execute_exact_delete(
-                data_root=live, exact_paths=planned["exact_paths"], fixture_destructive=True
+                data_root=live,
+                exact_paths=planned["exact_paths"],
+                plan_hashes={rel: digest},
+                fixture_destructive=True,
             )
             self.assertEqual(deleted["deleted"], [rel])
             self.assertFalse((live / rel).exists())
             with self.assertRaises(Hot90EvictionError):
                 execute_exact_delete(
-                    data_root=live, exact_paths=[rel], fixture_destructive=False
+                    data_root=live,
+                    exact_paths=[rel],
+                    plan_hashes={rel: digest},
+                    fixture_destructive=False,
                 )
+            with self.assertRaises(Hot90EvictionError):
+                execute_exact_delete(
+                    data_root=live,
+                    exact_paths=["../escape.bin"],
+                    plan_hashes={"../escape.bin": "0" * 64},
+                    fixture_destructive=True,
+                )
+
+    def test_hydrate_rejects_parent_path_before_write(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            live = Path(tmp) / "live"
+            isolated = Path(tmp) / "isolated"
+            live.mkdir()
+            isolated.mkdir()
+            marker = live / "keep.bin"
+            marker.write_bytes(b"keep")
+            zip_path = Path(tmp) / "bad.zip"
+            entries = [{"path": "../escape.bin", "sha256": hashlib.sha256(b"x").hexdigest(), "bytes": 1}]
+            from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+
+            manifest = {
+                "kind": "FACTORY_HOT90_CLOSED_DAY_ARCHIVE",
+                "utc_day": "20260902",
+                "inventory_sha256": canonical_sha256(entries),
+                "entries": entries,
+            }
+            with zipfile.ZipFile(zip_path, "w") as archive:
+                archive.writestr(
+                    "ARCHIVE_MANIFEST.json",
+                    json.dumps(manifest, sort_keys=True, separators=(",", ":")),
+                )
+                archive.writestr("../escape.bin", b"x")
+            with self.assertRaises(Hot90ArchiveError) as raised:
+                hydrate_closed_day_archive(
+                    zip_path, isolated_data_root=isolated, live_data_root=live
+                )
+            self.assertEqual(str(raised.exception), "HYDRATE_PATH_ESCAPE")
+            self.assertFalse((Path(tmp) / "escape.bin").exists())
+            self.assertEqual(marker.read_bytes(), b"keep")
 
 
 class AdmissionBackupDocsTests(unittest.TestCase):

@@ -2,8 +2,10 @@
 
 Status: `PREPARED_NOT_EXECUTED`
 As of: `2026-09-05`
-This is not a delete grant. The existing same-volume `BACKUP_*.zip` (~11.1 GiB)
-must remain untouched until a later exact destructive owner gate.
+This is not a delete grant. Do **not** execute this document after IMPL merge.
+The existing same-volume `BACKUP_*.zip` (~11.1 GiB) must remain untouched until
+a later exact destructive owner gate identifies the exact path/hash/size on the
+VPS. This file does not name a host path.
 
 90d age eviction is a separate lifecycle behavior. It is not permission to
 mass-delete current data or to bundle historical deletion with this ZIP.

@@ -6,6 +6,15 @@ Predecessor: `FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1` merged to `main`
 This document is the next operational atom contract. It does **not** authorize
 deploy, Drive write, retention APPLY, SQLite compaction, or live deletion.
 
+Do **not** execute this runbook after IMPL merge. Execution requires a later
+exact commissioning task contract plus owner OK. `PREPARED_NOT_EXECUTED` means
+prepare-only: not a VPS command list to run now.
+
+`WRITE_ONLY_SHADOW` enables publisher ZSTD + SNAPSHOT_PLUS_DELTA. Canonical raw
+plane, closed-day archive, remote SHA256 verify, isolated hydrate, and runway
+are explicit primitives for that later commissioning atom. They do not auto-run
+from collector ticks.
+
 Activation default in Git is `CURRENT_SAFE`. Commissioning mutates Factory
 runtime only after a later exact owner atom.
 
