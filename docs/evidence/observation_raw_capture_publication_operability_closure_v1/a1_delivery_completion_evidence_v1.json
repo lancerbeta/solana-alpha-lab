@@ -38,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_raw_capture_publication_operability_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "027f909c17b39bf1af6a0c43fa7322245fbcb77a771a5c057885e740ca0a247d",
+    "sha256": "172e977d2b6f78fdc32d6985d729ff9d4a1f1e37c88cfd39ff1451ed1ce2d13c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_PUBLICATION_JOB_LIFECYCLE_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_raw_capture_publication_operability_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "8a9092ee29a11716fbc544a2c5a2501ead2761a2ab9a6d8993787e2629232cad",
+      "sha256": "8f622422f4d156699b193043d4a6824e2de15bce3c796c33c2926fc6dbeb4d9c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

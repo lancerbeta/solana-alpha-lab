@@ -5,7 +5,7 @@
   "as_of": "2026-09-04",
   "task_id": "OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1",
   "reviewed_bindings_sha256": "ea81231fa0a51dbb956edc5be81d9e5fa75b8b9c2ed5251bd80947de43be9c0c",
-  "reviewed_inventory_sha256": "4fe55567fd4fc67ec99b1d456ff079dd1e89f7182e72865557d4a827514b8af4",
+  "reviewed_inventory_sha256": "54fd11ca7800c8b94f3500571f5eb01aa07d032f92d7eaf7691f6462ad948f80",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
