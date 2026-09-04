@@ -60,14 +60,18 @@ history+declared cannot PASS.
 
 ## Isolated review
 
-ARCHITECTURE_CRITIC, CODE_REVIEWER, and GOAL_DOD_CRITIC re-review this PATCH
-on the new HEAD after evidence bind. Not canonical DONE. Not live PASS.
+ARCHITECTURE_CRITIC, CODE_REVIEWER, and GOAL_DOD_CRITIC: PASS on HEAD
+`6a674547` (`packet_fingerprint_sha256=e982864775cfa817c7ae99db34267291d45cb7626a0702aacf864fcc6afa8dbf`).
+Not canonical DONE. Not live PASS.
 
 Non-blocking residuals (not this write set):
 - `observation_schedule.py doctor` while paused still emits `next_action=RESUME`;
   the live playbook says do not resume/tick until APPLY. Follow the playbook.
 - Daily pulse text still reports total RDP including the journal; science-only
   bytes live on the operational packet, not Telegram copy.
+- `pass_70=false` for UNAVAILABLE is fail-closed, not a measured ≥70% disk fail;
+  read `projection_basis`.
+- APPLY in-memory plan is O(unmigrated bodies); live APPLY remains a separate gate.
 
 ## Non-claims
 
