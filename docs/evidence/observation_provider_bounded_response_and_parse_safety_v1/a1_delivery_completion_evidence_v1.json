@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "58a90cd71f05cbcee18a750f04e5eaba8fb11dee4554c4414f59649250ec1e47",
+    "catalog/assets/core.yaml": "3499536bedbbb6a7985d45271dc86b53e5a12863e0f1bb09a77cd894a1521bf0",
     "catalog/assets/lifecycle.yaml": "60985329f02fa993e6d7d89cd4f9ecaf7f8cd8b4bead300b01056bdaab1d6f2e",
     "catalog/catalog_manifest.yaml": "45c65494a36d1299ca52beca25beac15961048cf7b67b5d815da22ae68758b3b",
     "catalog/generated/asset_edges.json": "aca661b3b14e59cda0cd5cd6f1c6da14037995f12e46ac1bae3b73aeaae57907",
@@ -21,10 +21,10 @@
     "docs/reports/observation_provider_bounded_response_and_parse_safety_v1/a1_owner_readout_v1.md": "74ba9ee15c6d3ad99cc79f38047feb7f7baa105d1d546432cfbcee20514e5e47",
     "docs/tasks/OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1.md": "b5b3d7515cd5304f7ee91566fc7ee81f9ec8889f0971b1a8fd7ae685a10a496f",
     "src/solana_alpha_lab/factory/observation_primitives.py": "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631",
-    "src/solana_alpha_lab/factory/observation_provider_bounded_response.py": "860fb170736aa0a470768f3c954d20a7256a6658fe57cc0e097c8f0cb4fb8139",
+    "src/solana_alpha_lab/factory/observation_provider_bounded_response.py": "ef57273a165b3c1fc085e1ad0bf45f41011b5aa4b17394ec4db50c0a36adf417",
     "src/solana_alpha_lab/factory/observation_provider_wall_deadline.py": "e83aa3a5aaedef6e6d73c28bc3bb8cc4aeebb042e3d52981674c39dec69f670e",
     "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "0a7439d5c40bb9af8f7e79443b7e462901acb0650e517767471d209b57409f59",
-    "tests/test_observation_provider_bounded_response_and_parse_safety_v1.py": "edf77d59244d01555c68a38c4f975b7677f510bcd34636a650a6ef9cfee46fe4"
+    "tests/test_observation_provider_bounded_response_and_parse_safety_v1.py": "44870fa76d00ae742c8d518b8c49e1fe4574a3790cbc5eea0d064941dd285ad6"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/observation_provider_bounded_response_and_parse_safety_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "36bdb441d375dfe556a1bbf9c20177b1c0f597d73c73139c2191ca4531148230",
+    "sha256": "6169c6725ffad7920a10035963b5265cca1fce65ec7216d3b951972387a59593",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OBSERVATION_PROVIDER_BOUNDED_RESPONSE_SUITE",
     "independent_review": {
       "path": "docs/evidence/observation_provider_bounded_response_and_parse_safety_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "688f86018384a3873aa91e8e020612742cdf7dbb73142d24006930bd30bf8110",
+      "sha256": "e9afa7d7226fdf911c6eaf8b858cb381f1c351eb4dfdfc7184efa175f34680f4",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

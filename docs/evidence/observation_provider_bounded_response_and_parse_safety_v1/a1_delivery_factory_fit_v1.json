@@ -4,8 +4,8 @@
   "review_id": "OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-FACTORY-FIT-001",
   "as_of": "2026-09-04",
   "task_id": "OBSERVATION_PROVIDER_BOUNDED_RESPONSE_AND_PARSE_SAFETY_V1",
-  "reviewed_bindings_sha256": "b5d19012b84ffb409055d22788c0d7808132dced858f4fda27cf49501e511e64",
-  "reviewed_inventory_sha256": "376d57d63d6eff4bd608ce0ea3cd589ec136971c199a5c0fa0729a39ae32d589",
+  "reviewed_bindings_sha256": "547a8cb7008a2cbf93f9fae279c68f6335b0718a001d95670162b97c7222eeb3",
+  "reviewed_inventory_sha256": "fc8ed00ea30d846a70f3342336f5a8a9f5d0546b89668c79d1e4cadbe547a9fe",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
