@@ -4,25 +4,25 @@
   "review_id": "FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-FACTORY-FIT-001",
   "as_of": "2026-09-04",
   "task_id": "FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1",
-  "reviewed_bindings_sha256": "e7b7d447e6e728a57879a02394cf3148b73a3e3199547491ecbb56e359e29ed7",
-  "reviewed_inventory_sha256": "d4ec6855155b82170383684fc4b58fee610932522bbdb9ff7c537ad803f4fad1",
+  "reviewed_bindings_sha256": "b50c376ef7352505a151b20114069cfe8051c5e848ccd60eb8a044135dc9b874",
+  "reviewed_inventory_sha256": "dfbb4531183b042dda3d248b43d2acb57daf9b9817a640473b501e8fd9f7b757",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "PASS_RECORDS_HOT90_DESIGN_WITHOUT_CAPACITY_PASS",
+    "mission": "PASS_RECORDS_HOT90_DESIGN_WITH_TYPICAL_40_50",
     "flexibility_and_history": "PASS_KEEPS_IMMUTABLE_CONST_AND_PREDECESSOR_TERMINAL",
-    "context_efficiency": "PASS_PRD_SSD_AND_BOUNDED_FORENSICS_NEXT",
+    "context_efficiency": "PASS_PRD_SSD_AND_POST_REBOOT_FORENSICS",
     "research_truth": "PASS_CONTENT_IMMUTABILITY_VS_RESIDENCY_SPLIT",
-    "owner_operability": "PASS_THREE_LAYER_NEXT_AND_CHERRY_RECOVERY",
+    "owner_operability": "PASS_READY_HANDOFF_IMPL_AFTER_MERGE",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
-    "monitoring_and_recovery": "PASS_NOW_VPS_RECOVERY_THEN_BOUNDED_FORENSICS",
+    "monitoring_and_recovery": "PASS_POST_REBOOT_COHERENT_HOST_UNREACHABLE_HISTORICAL",
     "build_vs_buy": "PASS_WRAP_PARQUET_DUCKDB_RCLONE_REJECT_NEW_PLATFORMS",
     "security": "PASS_NO_SECRETS_NO_RUNTIME_MUTATION",
-    "red_team": "PASS_UNKNOWN_97D_NOT_CONVERTED_TO_PASS"
+    "red_team": "PASS_STRESS_OVER_40_NOT_CONVERTED_TO_MARGIN"
   },
   "capability_radar": {
-    "now": "BOUNDED_LIVE_FORENSICS_AFTER_VPS_RECOVERY",
-    "watch": "HOT90_IMPL_ONLY_AFTER_CAPACITY_READY"
+    "now": "HOT90_IMPL_AFTER_RESEARCH_PR_MERGE",
+    "watch": "DESTRUCTIVE_EVICTION_LATER_GATE"
   },
   "recovery": "REVERT cursor/factory-97d-storage-architecture-proof-v1",
   "limits": [
@@ -30,7 +30,7 @@
     "NO_RETENTION_APPLY",
     "NO_DRIVE_WRITE",
     "NO_LOCAL_FACTORY_DATA_DELETE",
-    "NO_40_50_GIB_PASS",
+    "NO_WITH_TARGET_MARGIN",
     "NO_ARCHITECTURE_IMPLEMENTATION",
     "NO_ALPHA",
     "NO_NETRETURN",
