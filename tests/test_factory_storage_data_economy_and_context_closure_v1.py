@@ -27,6 +27,16 @@ class FactoryStorageDataEconomyClosureTests(unittest.TestCase):
         self.assertIn("DATA_RESOLUTION_ECONOMY", policy)
         self.assertIn("minimum temporal and detail", policy)
         self.assertIn("tick, quote, or microstructure", policy)
+        self.assertIn("requires all of", policy)
+        self.assertIn("named non-reconstructable/material consumer", policy)
+        self.assertIn("concrete estimand/falsifier", policy)
+        self.assertIn("execution-truth question", policy)
+        self.assertIn("material information value relative to incremental", policy)
+        self.assertRegex(
+            " ".join(policy.split()),
+            r"No named material consumer means no broader high-resolution capture",
+        )
+        self.assertNotRegex(policy, r"consumer or falsifier")
         self.assertIn("PIT availability", policy)
         self.assertIn("executable quote truth", policy)
         self.assertNotIn("1m candles only", policy)
@@ -47,14 +57,31 @@ class FactoryStorageDataEconomyClosureTests(unittest.TestCase):
         self.assertIn("NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS", runbook)
         self.assertIn("EnvironmentFile=-/etc/solana-alpha-lab/secrets.env", runbook)
         self.assertIn("CREDENTIAL_ENV_MISSING", runbook)
-        self.assertIn("sudo systemctl start factory-observation-schedule.service", runbook)
-        self.assertNotIn(
-            "Next separate atom after live PASS: NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF",
+        self.assertIn(
+            "sudo /usr/bin/timeout 90s /usr/bin/systemctl start factory-observation-schedule.service",
             runbook,
         )
-        self.assertNotIn(
-            "Required live proof terminal: `NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`.",
+        self.assertIn(
+            'sudo /usr/bin/systemctl stop factory-observation-schedule.service',
             runbook,
+        )
+        compact = " ".join(runbook.split())
+        self.assertIn("TICK_HARD_CUTOFF_90S", runbook)
+        self.assertIn("TimeoutStartSec", runbook)
+        self.assertNotIn("TimeoutStartSec=", UNIT.read_text(encoding="utf-8"))
+        self.assertIn(
+            "At the 2026-09-04 reclaim post-readback the path was empty",
+            compact,
+        )
+        self.assertIn("Current state requires fresh status/readback", compact)
+        self.assertNotIn("After reclaim the live path is empty", runbook)
+        self.assertNotRegex(
+            runbook,
+            r"Next separate atom after live PASS:[\s`]*NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF",
+        )
+        self.assertNotRegex(
+            runbook,
+            r"Required live proof terminal:[\s`]*NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS",
         )
         self.assertIn("historically proven", runbook)
         self.assertIn("never a default NEXT", runbook)

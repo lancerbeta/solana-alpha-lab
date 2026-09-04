@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: c5bb165035ab554ab52427d6754e13e49655f6c0c4a40ba317d58c98bb8284df}
+  integrity: {kind: sha256, sha256: 47077d5325b70cbeba617cebf64dbabe259ca582960a07dc7dac98c79aa474f5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -29946,7 +29946,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 60a2c22ae29bc8b4d27dd3fd3036dad05e5e357eddbf1fd7bb6e5a533ffde234}
+  integrity: {kind: sha256, sha256: bd358d32bd88f4d48d015c1aefbd7eda2a8285b3da49c943ad826b6f34a032a3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34922,7 +34922,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: FACTORY_STORAGE_DATA_ECONOMY_AND_CONTEXT_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_storage_data_economy_and_context_closure_v1.py', repository_path: tests/test_factory_storage_data_economy_and_context_closure_v1.py}
-  integrity: {kind: sha256, sha256: 675852cb5447334dd1588ae27e34b0afc4af2ca2f784e29fb302e85efdb0115c}
+  integrity: {kind: sha256, sha256: c22867cb7bb7a7c0aedcbb1fd4cc63554c064894b18e2be12c33483f0c6c56b1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-STORAGE-DATA-ECONOMY-AND-CONTEXT-CLOSURE-001}

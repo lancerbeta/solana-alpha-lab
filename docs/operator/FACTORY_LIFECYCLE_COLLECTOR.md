@@ -224,8 +224,9 @@ Do **not** trust chat “current status”. Machine-resolve:
 **Operational vs recovery journal (do not conflate):** `open/` is the only
 routine tick repair glob. `completed/` holds compact terminal receipts without
 `observations` / `members`. `legacy_full/` historically parked byte-identical
-full JSON until the 2026-09-04 restore proof and reclaim. After reclaim the live
-path is empty (`0` files / `0` B). Do not delete remaining science. Do not
+full JSON until the 2026-09-04 restore proof and reclaim. At the 2026-09-04
+reclaim post-readback the path was empty (`0` files / `0` B). Current state
+requires fresh status/readback. Do not delete remaining science. Do not
 re-run restore or reclaim merely because older NEXT prose still mentioned them.
 
 ## Publication-job journal migration + live vertical smoke
@@ -305,7 +306,9 @@ Prove `legacy_full` bytes preserved and `publication_jobs_open_count` bounded to
 
 Stop the timer. Resume the same activation. One canonical tick via the existing
 systemd oneshot, which loads `EnvironmentFile=-/etc/solana-alpha-lab/secrets.env`.
-Bare `sudo uv … tick` without that EnvironmentFile is **not** a canonical
+The unit does **not** declare `TimeoutStartSec`; the 90s hard cutoff is this
+operator procedure (`timeout` of the `systemctl` client, then explicit service
+stop). Bare `sudo uv … tick` without that EnvironmentFile is **not** a canonical
 production surface: live proof observed `CREDENTIAL_ENV_MISSING`. Do not
 change the unit for documentation.
 
@@ -320,10 +323,17 @@ Resume uses `--schedule-sha256` and `--activation-id` from status:
 ```
 
 ```
-sudo systemctl start factory-observation-schedule.service
+sudo /usr/bin/timeout 90s /usr/bin/systemctl start factory-observation-schedule.service
+rc=$?
+if [ "$rc" -eq 124 ]; then
+  sudo /usr/bin/systemctl stop factory-observation-schedule.service
+  echo "TICK_HARD_CUTOFF_90S"
+  exit 124
+fi
+test "$rc" -eq 0
 ```
 
-Hard acceptance: no `LEASE_FENCED`; no leaked worker; no unbounded pre-provider CPU; publication repair with zero open jobs comfortably <2s; tick reaches provider path; new provider occurrence does not remain STARTED; raw call record has request/response/timing/status/hash provenance; no scientific corruption. A legitimate market `no eligible rows` is not failure — it must be explicit. `CREDENTIAL_ENV_MISSING` is a credential-surface miss, not a publication-CPU fail.
+Hard acceptance: no `TICK_HARD_CUTOFF_90S`; no `LEASE_FENCED`; no leaked worker; no unbounded pre-provider CPU; publication repair with zero open jobs comfortably <2s; tick reaches provider path; new provider occurrence does not remain STARTED; raw call record has request/response/timing/status/hash provenance; no scientific corruption. Ordinary service failure (`rc` not 0 and not 124) stays distinct from timeout. A legitimate market `no eligible rows` is not failure — it must be explicit. `CREDENTIAL_ENV_MISSING` is a credential-surface miss, not a publication-CPU fail.
 
 ### D. Three normal timer ticks
 

@@ -99,7 +99,11 @@ Scientific RDP stays immutable.
 Canonical owner `delivery-harness/policies/solana-alpha-lab.md` §
 `DATA_AND_RESEARCH_TRUTH` now states `DATA_RESOLUTION_ECONOMY` once.
 Historical/reusable cache first is unchanged. No universal “1m candles only”.
-Tick / quote / microstructure remain possible when a named consumer exists.
+Tick / quote / microstructure remain possible only when all of: a named
+non-reconstructable/material consumer; a concrete estimand/falsifier or
+execution-truth question; and material information value relative to
+incremental storage/cost. No named material consumer means no broader
+high-resolution capture.
 
 `BUY_DECISION_TIME_QUOTE_MICROSTRUCTURE_ASSOCIATION_V1` remains a legitimate
 decision-time quote consumer: coarsening that would destroy PIT, path order,
@@ -115,7 +119,9 @@ Future richer capture is a named decision test, not a new platform.
 - historical LIVE_PASS / restore PASS / reclaim FAIL-as-false-negative;
 - no auto-NEXT to restore or reclaim;
 - production tick is the existing systemd oneshot with
-  `EnvironmentFile=-/etc/solana-alpha-lab/secrets.env`;
+  `EnvironmentFile=-/etc/solana-alpha-lab/secrets.env` and an operator 90s
+  `timeout` plus explicit service stop (`TICK_HARD_CUTOFF_90S`); the unit is
+  unchanged;
 - current health still requires a fresh machine readback.
 
 No production/runtime mutation. No Telegram mutation. No new infra.

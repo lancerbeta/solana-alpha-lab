@@ -72,13 +72,16 @@ requires a new forward holdout.
 
 `DATA_RESOLUTION_ECONOMY`: collect and store the minimum temporal and detail
 resolution sufficient for a named scientific estimand or execution consumer.
-Richer resolution, including tick, quote, or microstructure, requires a
-concrete non-reconstructable consumer or falsifier and material information
-value relative to incremental storage and cost. Do not coarsen when doing so
-destroys PIT availability, path order, fillability, transient liquidity,
-executable quote truth, or another estimand-relevant signal. This is a
-policy guardrail, not a new subsystem, and it does not impose a universal candle
-or tick granularity.
+Richer resolution, including tick, quote, or microstructure, requires all of:
+
+- a named non-reconstructable/material consumer;
+- a concrete estimand/falsifier or execution-truth question;
+- material information value relative to incremental storage and cost.
+
+Do not coarsen when doing so destroys PIT availability, path order, fillability,
+transient liquidity, executable quote truth, or another estimand-relevant
+signal. This is a policy guardrail, not a new subsystem, and it does not
+impose a universal candle or tick granularity.
 
 A future proposal for richer capture is a named decision test, not a platform:
 named consumer → information the current resolution loses → why that loss
