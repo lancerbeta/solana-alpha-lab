@@ -6,8 +6,8 @@
   "task_id": "OWNER_LIFECYCLE_PROJECTION_SPINE_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "df66d319c5ea41df8e6205b16898333ffa7ed93d1ff73fd35f2c625ef99201e0",
+  "reviewed_inventory_sha256": "a795af022f3062c89859ebfd12b74b5b1ea4794d44266f18de0f8579812e2984",
   "capability_radar": {
     "now": "NONE",
     "watch": "RESEARCH_LIFECYCLE_WORKBENCH_V1"
