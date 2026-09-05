@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "OPERATE_WRITE_RUNTIME_THEN_EXACT_SHA_DEPLOY",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "e0b7a32e0a00d4ac2093c8c65f033d3ec13ebb1c074099d5c36980328be4bb39",
+    "catalog/assets/core.yaml": "436e4b48c0799f3db17dd57a9a97580a5c2b5c59e2dac83f5dcca5aa2c83122e",
     "catalog/assets/lifecycle.yaml": "803603c79780545a2b59fdcd6b491b5c3332f5a22d75eb71c6cbc475066c0b3e",
     "catalog/catalog_manifest.yaml": "9cca56a868d13e24faf475a62ef8670fa1efd160c6e07dd0712907e0e6b06638",
     "catalog/generated/asset_edges.json": "ff220fb1667cbaf75da79465e47a6c46f2e8b7bb7aa9158776e36b1afebca8d7",
@@ -20,7 +20,7 @@
     "docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md": "0843e579c55e7ad7482e118fdb2242eb024836ff5a9c147d9825dc1c17fac54a",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "35d3bc5488c31f567807f002a63d1edb2cbce9a0ebe1c4557155795d28fac2a5",
     "docs/reports/hot90_runtime_activation_boundary_repair_v1/a1_owner_readout_v1.md": "1cd8f012a4bb5cf35a28473ef10aef6af9748e5cbc7a03552699fc19f4224bb2",
-    "docs/tasks/HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1.md": "ccc5d713e142e1d055fdbe80310bd874fd49a6831c9dea71e0f33563842ba704",
+    "docs/tasks/HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1.md": "0930ec7f671021cb2015cb51be2577f4f30c799fda95d8faf5a0cc1140900617",
     "scripts/hot90_activation.py": "ed81f3e498aa260bb6d72bc8ba96e2caa7074f8752a80deb58f50738e297fac9",
     "src/solana_alpha_lab/factory/hot90_activation.py": "e3d47e9705aaeb17a2c90f4cf5358c39f7ad00a5402f02f25b7f2afbb80533d4",
     "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py": "64df1178a1f655d6aa215c4c749ba0e7623b8f65deb09c334d3ef37543e70a8a"
@@ -35,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hot90_runtime_activation_boundary_repair_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "b76ce4951cdc21d023adf54e97e1b1077a82a81721358d3e1ec28668e5a07efa",
+    "sha256": "dcd9bbb89f8aa174e2e6509d5a983d330ad4ffe13d17d098fdac5a096e98fa98",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/hot90_runtime_activation_boundary_repair_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "53d846852d7dc6624458df0c808d8e59cc51ce78824a894c7364ddb9e749a9b8",
+      "sha256": "9c98b7c7859062df8c4a8cdc4e0d7a56a7c3d3976e2a900845145a9cca025fe7",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
