@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SMIAL-VISUAL-OPERATING-SYSTEM-FACTORY-FIT-001",
+  "as_of": "2026-09-05",
+  "task_id": "SMIAL_VISUAL_OPERATING_SYSTEM_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "87eb6c48e5fa13e35543972002b8e36062d9a2eb9945c5a24f8389e9a8cc92ee",
+  "reviewed_inventory_sha256": "a9c651c1f19afe7d9a06330055c88cd2547a5ba4a5170e1dca0fee7335853701",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_LIFECYCLE_PROJECTION_SPINE_V1"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_WORKBENCH_REDESIGN",
+    "NO_UI_FRAMEWORK",
+    "NO_SECOND_TRUTH_OWNER",
+    "NO_RUNTIME_COUPLING"
+  ],
+  "recovery": "REVERT"
+}

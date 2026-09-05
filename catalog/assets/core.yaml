@@ -17787,7 +17787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: f30346976040f700a98f5b5d03fadcb3d408725bb787358a621babbcb2992ba5}
+  integrity: {kind: sha256, sha256: dcdfe73832fe1fdc7e1c02128547b8e8586219758be18ac4273d8c2a55570472}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
@@ -31616,7 +31616,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/discovery_gold_queries_v1.yaml', repository_path: catalog/fixtures/discovery_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: b0e25d38a0fed6ac3beb260da4943a7c31015f1b064ad288d117a45d9092a9d7}
+  integrity: {kind: sha256, sha256: cbd51bc9207b07ff68d32f056e150669d84352c8d1c980f6ba4c3919a66dd12a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-KCDN-ATOM-A-001}
@@ -31634,7 +31634,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_catalog_canonical_binding_discovery.py', repository_path: tests/test_catalog_canonical_binding_discovery.py}
-  integrity: {kind: sha256, sha256: e8d627a1102254456f07eab3fdf0364023a3c1895252dd41aad7f2ddc7838a0c}
+  integrity: {kind: sha256, sha256: 75c9ff44b91037aa5a5bfe1cdcc3324f8ea596e8e9ebd14b653cde05ab7cff3c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-CATALOG-DISCOVERY-001}
@@ -34137,7 +34137,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 4420d9358f0ad2529b400f4072546714d629dd164aa71034a233e86a3c316085}
+  integrity: {kind: sha256, sha256: d3f25f62b5638dfd3d422c3502602b47678dede4766a6c8eca5cd37bd2f7efe4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34226,7 +34226,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_semantic_operability.py', repository_path: tests/test_factory_semantic_operability.py}
-  integrity: {kind: sha256, sha256: ca216b4e2ffd5ae42f3f27fe7fbad7369d479097234a547f8c2330ff5c4cc272}
+  integrity: {kind: sha256, sha256: fb018c6ca729a6754ea8e3be690b04832a2de75bb3ea1e720fa5a6f9c203a07c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34244,7 +34244,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 1c44acfc59abae99cab09b2cca5abcdc706542e8625640edb5b5686e24b34eb0}
+  integrity: {kind: sha256, sha256: 7421f84854f5b0e1a2615804746a395c419252eb461874407dada4db4275ca6e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34262,7 +34262,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 1f06f961031233aec12a743efe8082484758a89e5137d04ee2a61a1b1d328512}
+  integrity: {kind: sha256, sha256: 47fea58ef0ed4eaa23d6cf099e3a6ba83f2e84b18cea5170ec065c8e2d2ef176}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -35236,4 +35236,95 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [NORMALIZED_TRAJECTORY, PREREGISTRATION, motif]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for the durable SMIAL Visual Operating System presentation semantics without UI implementation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: SMIAL_VISUAL_OPERATING_SYSTEM_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/SMIAL_VISUAL_OPERATING_SYSTEM_V1.md', repository_path: docs/tasks/SMIAL_VISUAL_OPERATING_SYSTEM_V1.md}
+  integrity: {kind: sha256, sha256: 27b015748064c160dd8e5c04c0260139a3d0ffc641f528f91f801d99841fd96a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  - {relation_type: contains, target_asset_id: SCHEMA-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  - {relation_type: contains, target_asset_id: DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  - {relation_type: validated_by, target_asset_id: TEST-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [VISUAL_OPERATING_SYSTEM, STEEL_SIGNAL, BRANDBOOK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable SMIAL Visual Operating System tokens, surface modes and presentation invariants.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: SMIAL_VISUAL_OPERATING_SYSTEM_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/smial_visual_operating_system_v1.yaml', repository_path: configs/smial_visual_operating_system_v1.yaml}
+  integrity: {kind: sha256, sha256: 816664d0ae66f02a5a6a0ab0cd490724df765327def9dc8180469d2577da7c92}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [VISUAL_OPERATING_SYSTEM, STEEL_SIGNAL, DARK_ONLY, DESIGN_TOKENS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for the SMIAL Visual Operating System machine contract with authority_granted false.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: SMIAL_VISUAL_OPERATING_SYSTEM_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/smial_visual_operating_system.schema.json', repository_path: catalog/schemas/smial_visual_operating_system.schema.json}
+  integrity: {kind: sha256, sha256: 28395a8e008a93612bc43a8637f121e3dd8622275f740be86ac6779d8bc45406}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [VISUAL_OPERATING_SYSTEM, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Human-readable SMIAL Visual Operating System companion for owner-facing presentation semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: SMIAL_VISUAL_OPERATING_SYSTEM_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/smial_visual_operating_system_v1.md', repository_path: docs/contracts/smial_visual_operating_system_v1.md}
+  integrity: {kind: sha256, sha256: 7245b92696f9441149f3688fb60557dd46b3bc4e55ea4e1374ad6e57347f6ee0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [VISUAL_OPERATING_SYSTEM, BRANDBOOK, UI, UX, брендбук, визуал, визуальный, стиль, интерфейс, SMIAL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Focused tests for visual-contract schema, Catalog binding, semantic route gold and non-hijack invariants.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: SMIAL_VISUAL_OPERATING_SYSTEM_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_smial_visual_operating_system_v1.py', repository_path: tests/test_smial_visual_operating_system_v1.py}
+  integrity: {kind: sha256, sha256: e61df8002792b6966f1f4398fbf6ccebaeaa7e8eaa58b307d99dcea6aaedcf94}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [VISUAL_OPERATING_SYSTEM, GOLD_QUERY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

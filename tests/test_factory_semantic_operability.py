@@ -325,7 +325,7 @@ class FactorySemanticOperabilityTests(unittest.TestCase):
 
     def test_machine_packet_and_generated_map_surface(self) -> None:
         routes = self.projection["routes"]
-        self.assertEqual(len(routes), 10)
+        self.assertEqual(len(routes), 11)
         self.assertIs(self.projection["authority_granted"], False)
         map_path = ROOT / "docs/FACTORY_SEMANTIC_MAP.md"
         self.assertTrue(map_path.is_file())

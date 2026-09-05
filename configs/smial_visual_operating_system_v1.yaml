@@ -1,0 +1,315 @@
+schema: smial.visual-operating-system
+schema_version: "1.0"
+system_id: SMIAL_VISUAL_OPERATING_SYSTEM_V1
+version: "1.0"
+appearance: DARK_ONLY
+authority_granted: false
+truth_owner_boundary: PRESENTATION_ONLY
+identity:
+  base: STEEL_SIGNAL
+  sublanguages:
+    - COMPUTATIONAL_FIELD
+    - EVIDENCE_EDITORIAL
+    - CONTROL_SURFACE
+  selectable_themes: false
+  light_theme: false
+palette:
+  surface:
+    void: "#080A0C"
+    base: "#0C0F12"
+    panel: "#11151A"
+    raised: "#171C22"
+  border:
+    hairline: "#27303A"
+  text:
+    primary: "#E7EBEF"
+    secondary: "#B8C0C8"
+    muted: "#89939E"
+  accent:
+    signal: "#66D4F2"
+    cobalt: "#3B82F6"
+  semantic:
+    positive: "#22C55E"
+    warning: "#F59E0B"
+    danger: "#EF4444"
+    unknown: "#6B7280"
+  data:
+    comparison_secondary: "#A855F7"
+semantic_color_roles:
+  accent.signal:
+    means:
+      - selected
+      - current
+      - focus
+      - active_informational_emphasis
+    must_not_mean:
+      - success
+      - healthy
+      - pass
+  accent.cobalt:
+    means:
+      - primary_analytical_series
+      - informational_emphasis
+      - evidence_data_focus
+    must_not_mean:
+      - success
+      - healthy
+  semantic.positive:
+    means:
+      - positive_result
+      - healthy
+      - pass
+      - within_limits
+    requires_domain_support: true
+  semantic.warning:
+    means:
+      - attention
+      - degraded
+      - stale_or_approaching_limit
+      - unresolved_non_terminal
+  semantic.danger:
+    means:
+      - failure
+      - blocked
+      - breach
+      - destructive_or_dangerous_command
+      - materially_negative
+    scarcity: RED_IS_SCARCE
+  semantic.unknown:
+    means:
+      - UNKNOWN
+      - unavailable
+      - unresolved
+    must_not_resemble:
+      - zero
+      - healthy
+      - success
+      - empty_decorative_space
+typography_roles:
+  ui_sans:
+    intent_class: neo-grotesk
+    preferred_examples:
+      - Inter
+      - Manrope
+    adoption_in_this_contract: false
+  mono:
+    intent_class: ui-monospace
+    preferred_examples:
+      - IBM Plex Mono
+    adoption_in_this_contract: false
+    use_only_for:
+      - ids
+      - hashes
+      - timestamps
+      - code
+      - exact_machine_values
+      - command_snippets
+  numerals:
+    tabular_for:
+      - pnl
+      - prices
+      - counts
+      - time
+      - percentages
+      - positions
+      - tables
+spacing_scale_px:
+  - 4
+  - 8
+  - 12
+  - 16
+  - 24
+  - 32
+geometry:
+  hairline_px: 1
+  radius_normal_px:
+    min: 2
+    max: 6
+  radius_exception_px: 8
+  pill_for_every_state: false
+  giant_bubbly_cards: false
+surface_modes:
+  STEEL_SIGNAL:
+    role: BASE_VISUAL_OPERATING_SYSTEM
+    use_for:
+      - global_shell
+      - navigation
+      - overview
+      - ordinary_tables
+      - default_cards
+      - base_charts
+  COMPUTATIONAL_FIELD:
+    role: LIFECYCLE_LINEAGE_TRANSITION
+    use_for:
+      - lifecycle
+      - lineage
+      - causal_path
+      - system_transition
+    primary_primitive: TRACE
+  EVIDENCE_EDITORIAL:
+    role: RESEARCH_EXPERIMENT_EVIDENCE
+    use_for:
+      - hypothesis_detail
+      - experiment_detail
+      - result_evidence
+      - strategy_version_provenance
+      - scientific_reports
+  CONTROL_SURFACE:
+    role: OPERATIONS_RISK_COMMAND
+    use_for:
+      - positions
+      - trading_operations
+      - risk
+      - incidents
+      - reconciliation
+      - bounded_commands
+    primary_primitive: STATUS_RAIL
+visual_primitives:
+  - SIGNAL_RAIL
+  - TRACE
+  - EVIDENCE_HEADER
+  - CONTROL_ZONE
+chart_invariants:
+  expose_scope_when_source_provides:
+    - as_of_or_observed_at
+    - population
+    - n
+    - units
+    - missingness
+    - evidence_class
+  missing_field_policy: UNKNOWN_OR_NOT_AVAILABLE
+  fabricate_precision: false
+  forbidden:
+    - rainbow_series
+    - default_gradient_filled_pnl
+    - three_d
+    - neon_glow
+    - chartjunk
+    - green_because_line_ended_positive
+state_invariants:
+  owns_domain_states: false
+  color_never_alone: true
+  brand_accent_is_not_success: true
+  evidence_class_never_color_only: true
+  unknown_is_not_zero: true
+  stale_is_not_healthy: true
+  process_up_is_not_system_healthy: true
+  paper_is_not_live: true
+  backtest_is_not_paper: true
+  evidence_class_labels_required:
+    - MODEL
+    - BACKTEST
+    - PAPER
+    - SHADOW
+    - LIVE
+motion_invariants:
+  allowed:
+    - state_transition
+    - causal_path_transition
+    - disclosure_open_close
+    - readback_confirmation
+    - short_focus_transition
+  forbidden:
+    - ambient_pulsing
+    - decorative_glowing
+    - moving_backgrounds
+    - fake_live_activity
+    - endless_network_traces
+    - premium_feel_only
+  typical_duration_ms:
+    min: 120
+    max: 220
+  reduced_motion_required: true
+  perpetual_animation: false
+accessibility_invariants:
+  text_contrast_target: WCAG_AA
+  focus_without_color_alone: true
+  semantic_states_without_color_alone: true
+  decision_critical_not_tiny_low_contrast: true
+  dense_ui_does_not_justify_illegibility: true
+  reduced_motion_supportable: true
+anti_patterns:
+  - generic_crypto_dashboard
+  - cyberpunk
+  - neon
+  - rgb_glow
+  - purple_ai_gradient
+  - glassmorphism
+  - holographic_hud
+  - terminal_cosplay
+  - fake_scanlines
+  - circuit_board_decoration
+  - hexagon_overload
+  - robot_brain_ai_sparkle
+  - giant_gradients
+  - three_d_chrome
+  - fake_stock_ticker
+  - bloomberg_imitation
+  - sci_fi_condensed_fonts
+  - every_status_as_pill
+  - every_box_as_rounded_card
+  - decorative_green_red
+  - emoji_heavy_operations
+  - gratuitous_animation
+  - generic_enterprise_empty_surfaces
+  - beauty_over_truth
+  - density_over_legibility
+  - minimalism_over_evidence
+  - brand_over_domain_semantics
+grammars:
+  research:
+    - QUESTION
+    - MECHANISM
+    - FALSIFIER
+    - EVIDENCE_SCOPE
+    - RESULT
+    - UNCERTAINTY
+    - ROBUSTNESS
+    - DECISION
+    - BLOCKER
+    - NEXT_SAFE_ACTION
+  operations:
+    - WHAT_EXISTS
+    - WHAT_STATE
+    - WHAT_CHANGED
+    - WHAT_RISK_IS_OPEN
+    - HOW_FRESH
+    - WHAT_NEEDS_ATTENTION
+    - NEXT_SAFE_ACTION
+  telegram:
+    - STATE_OR_SEVERITY
+    - WHAT
+    - WHY_NOW
+    - IMPACT
+    - CURRENT_SAFE_STATE
+    - NEXT_SAFE_ACTION
+    - OBSERVED_AT_OR_EVIDENCE_REF
+  attention:
+    - WHAT
+    - WHY_NOW
+    - IMPACT
+    - EVIDENCE
+    - CURRENT_SAFE_STATE
+    - NEXT_SAFE_ACTION
+    - AUTHORITY_REQUIRED
+  command:
+    - intent
+    - target
+    - expected_current_state
+    - preconditions
+    - authority
+    - command
+    - machine_result
+    - readback
+consumers:
+  - future_owner_workbench
+  - charts
+  - reports
+  - telegram_service_messages
+non_claims:
+  - NO_DOMAIN_STATE_OWNERSHIP
+  - NO_AUTHORITY
+  - NO_WORKBENCH_IMPLEMENTATION
+  - NO_UI_FRAMEWORK
+  - NO_FONT_ADOPTION
+  - NO_ALPHA

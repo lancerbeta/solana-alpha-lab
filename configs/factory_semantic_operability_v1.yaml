@@ -278,4 +278,41 @@ routes:
     status_plane: AUTHORITY
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: EXCLUDE
-    related_route_ids: [SEM-PROVIDER-ROUTES, SEM-PRODUCT-STATE]
+    related_route_ids: [SEM-PROVIDER-ROUTES, SEM-PRODUCT-STATE, SEM-VISUAL-OPERATING-SYSTEM]
+
+  - semantic_route_id: SEM-VISUAL-OPERATING-SYSTEM
+    purpose: Canonical SMIAL Visual Operating System for owner-facing presentation. Reference-only; never grants authority or owns domain state.
+    owner_questions:
+      - How should I design an SMIAL owner-facing surface?
+      - What visual system does SMIAL use?
+      - How should Workbench UI look?
+      - What colors mean warning, danger, or unknown?
+      - How should I style an experiment or evidence screen?
+      - How should operations or command surfaces look?
+      - How should Telegram service messages look?
+      - какой брендбук / визуальный стиль проекта?
+    search_terms:
+      - visual system
+      - brandbook
+      - UI
+      - UX
+      - STEEL SIGNAL
+      - workbench design
+      - dashboard style
+      - chart design
+      - telegram style
+      - брендбук
+      - визуал
+      - интерфейс
+      - visual
+      - оформлять
+      - evidence editorial
+      - control surface
+    consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+    root_binding_ids: [ACTIVE-SMIAL-VISUAL-OPERATING-SYSTEM]
+    root_asset_ids: [DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001]
+    query_recipe_ids: []
+    status_plane: CAPABILITY
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-PRODUCT-STATE, SEM-AUTHORITY-BOUNDARIES]

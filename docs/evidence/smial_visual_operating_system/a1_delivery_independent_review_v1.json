@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SMIAL-VISUAL-OPERATING-SYSTEM-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-05",
+  "task_id": "SMIAL_VISUAL_OPERATING_SYSTEM_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "87eb6c48e5fa13e35543972002b8e36062d9a2eb9945c5a24f8389e9a8cc92ee",
+  "reviewed_inventory_sha256": "a9c651c1f19afe7d9a06330055c88cd2547a5ba4a5170e1dca0fee7335853701",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PRIMITIVE_VOCABULARY_SPLIT: CONTROL_SURFACE.primary_primitive=STATUS_RAIL is schema-legal but absent from closed visual_primitives"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "FALSIFIABLE_AGENT_ROUTE",
+        "ONE_IDENTITY_NOT_THEMES",
+        "AUTHORITY_GRANTED_FALSE",
+        "DOMAIN_QUESTIONS_NOT_HIJACKED",
+        "NO_WORKBENCH_REDESIGN"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=9be92312f3857d1faf165f066d3b4c60c1e1b5d22b4b17ea676a78f9228b7877",
+        "PRESENTATION_ONLY owns_domain_states=false authority_granted=false",
+        "SUBLANGUAGES_NOT_THEMES selectable_themes=false",
+        "ROUTE_REFERENCE_ONLY SEM-VISUAL-OPERATING-SYSTEM forge_visibility=EXCLUDE",
+        "UNKNOWN_NOT_ZERO_OR_HEALTHY evidence_class_never_color_only",
+        "NO_UI_RUNTIME_MUTATION",
+        "RESIDUAL_STATUS_RAIL_VS_SIGNAL_RAIL_NON_BLOCKING"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_WORKBENCH_REDESIGN",
+    "NO_UI_FRAMEWORK",
+    "NO_DOMAIN_STATE_OWNERSHIP",
+    "NO_AUTHORITY_FROM_VISUAL_ROUTE"
+  ]
+}
