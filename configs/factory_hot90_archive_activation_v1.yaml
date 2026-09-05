@@ -1,8 +1,8 @@
 schema: smial.factory-hot90-archive-activation
 schema_version: '1.0'
 as_of: '2026-09-05'
-activation_stage: CURRENT_SAFE
+activation_stage: WRITE_ONLY_SHADOW
 production_compaction_enabled: false
 production_eviction_enabled: false
 drive_writes_enabled: false
-note: CURRENT_SAFE preserves live publisher SNAPPY + per-publication members and existing backup topology. Later commissioning may set WRITE_ONLY_SHADOW then DURABILITY_CUTOVER. RETENTION_ACTIVE is a separate destructive owner gate.
+note: WRITE_ONLY_SHADOW uses ZSTD new writes and SNAPSHOT_PLUS_DELTA members. Drive writes, SQLite compaction, eviction, and backup durability cutover stay disabled until later owner-gated stages. RETENTION_ACTIVE is a separate destructive owner gate.

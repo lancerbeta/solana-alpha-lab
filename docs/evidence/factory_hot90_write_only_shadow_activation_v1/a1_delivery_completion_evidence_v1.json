@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-HOT90-WRITE-ONLY-SHADOW-ACTIVATION-COMPLETION-001",
+  "as_of": "2026-09-05",
+  "task_id": "FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1",
+  "state_change": "FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_CONFIG_PASS",
+  "base_main": "fc69b4d5fa88d07ff177fda4c731c1792b1ae8cd",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "DEPLOY_EXACT_SHA_THEN_OBSERVE_WRITE_ONLY_SHADOW",
+  "implementation_bindings": {
+    "configs/factory_hot90_archive_activation_v1.yaml": "efb8fb0c6578e01adb5d7712b941e6164c33a93455ab14fa066f792ad1991f6b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_hot90_write_only_shadow_activation_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_hot90_write_only_shadow_activation_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_SQLITE_LIVE_COMPACTION",
+    "NO_PRODUCTION_EVICTION",
+    "NO_BACKUP_DURABILITY_CUTOVER",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}
