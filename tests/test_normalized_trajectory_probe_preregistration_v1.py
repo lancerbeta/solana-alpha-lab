@@ -13,6 +13,11 @@ SRC = ROOT / "src"
 sys.path.insert(0, str(SCRIPTS))
 sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory.collector_schedulability_oracle import (  # noqa: E402
+    ALLOWED_X_POINTS,
+    DEFAULT_LIFECYCLE_Y_SECONDS,
+    PREFERRED_X_SECONDS,
+)
 from solana_alpha_lab.factory.early_market_panel_importer import (  # noqa: E402
     MIN_USABLE_YIELD_ELIGIBLE,
 )
@@ -149,9 +154,49 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
             self.contract["control_terminals_permit_probe"],
             ["NO_WORTHY_HYPOTHESIS", "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED"],
         )
-        self.assertEqual(self.contract["time"]["decision_t"], "LATEST_DECLARED_X_POINT_DUE")
-        self.assertEqual(self.contract["time"]["y_role_points_in_x"], "forbidden")
+        self.assertEqual(
+            self.contract["time"]["decision_t_point_id"],
+            "Y1800",
+        )
+        self.assertEqual(self.contract["time"]["decision_t_due_offset_seconds"], 1800)
+        self.assertEqual(
+            self.contract["time"]["schedule_shape"],
+            "one_x_point_plus_declared_y_points",
+        )
+        self.assertIs(
+            self.contract["time"]["x_selection_menu_is_not_collected_prefix"],
+            True,
+        )
+        self.assertEqual(
+            self.contract["time"]["preferred_x_due_offset_seconds"],
+            PREFERRED_X_SECONDS,
+        )
+        self.assertEqual(
+            set(self.contract["time"]["x_selection_menu_seconds"]),
+            set(ALLOWED_X_POINTS),
+        )
+        self.assertEqual(
+            tuple(self.contract["time"]["declared_y_due_offset_seconds"]),
+            DEFAULT_LIFECYCLE_Y_SECONDS,
+        )
         self.assertEqual(self.contract["time"]["min_motif_steps"], 2)
+        self.assertEqual(self.contract["time"]["min_prefix_slots"], 3)
+        self.assertEqual(
+            self.contract["time"]["drop_slot_when_clock_missing"],
+            "forbidden",
+        )
+        self.assertEqual(
+            self.contract["challenger"]["packet_surgery"],
+            "REPLACE_WITHIN_EXISTING_TRUNCATION",
+        )
+        self.assertEqual(
+            self.contract["control_terminal_else"],
+            "INVALID_TRIGGER_NOT_MET",
+        )
+        self.assertEqual(
+            self.contract["case_e"]["code"],
+            "INVALID_GROUNDING_BOUNDARY",
+        )
         self.assertIs(self.contract["control_run_required_first"], True)
         self.assertIs(self.contract["one_registered_trial"], True)
         self.assertEqual(self.contract["after_pass_does_not_mean"], "alpha_exists")

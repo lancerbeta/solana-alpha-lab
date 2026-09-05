@@ -35168,7 +35168,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_representation_probe_v1.md', repository_path: docs/contracts/normalized_trajectory_representation_probe_v1.md}
-  integrity: {kind: sha256, sha256: f998a83c46cc84a9f50f4814bb604f5ea8918c795086f846b805afc5cd9c26e7}
+  integrity: {kind: sha256, sha256: eb1f6dbf4b77628c208467df1a902874170d87e7127d3a7b1c3541847e582e5c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
@@ -35188,7 +35188,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_normalized_trajectory_probe_preregistration_v1.py', repository_path: tests/test_normalized_trajectory_probe_preregistration_v1.py}
-  integrity: {kind: sha256, sha256: 49da59aa96f13c280901735bb7fd28b3d5719c00dacc0b36965e76fd372562fb}
+  integrity: {kind: sha256, sha256: 967d94ab057c3f591de15ec6e0211450c2ab40ace5d59d4557410f364600f1b0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}

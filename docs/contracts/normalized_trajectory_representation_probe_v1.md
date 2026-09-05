@@ -73,15 +73,21 @@ time:
   landmark_source: ObservationSchedule
   preferred_schedule_id: OBS-ALWAYS-ON-TOKENS-V2-LIFECYCLE-21D-001
   imported_schedule_identity: use_exact_schedule_bound_to_imported_corpus
-  x_due_offset_seconds_expected: [300, 600, 900]
-  if_imported_schedule_x_offsets_differ: use_imported_declared_x_offsets_do_not_invent_after_seeing_paths
-  decision_t: LATEST_DECLARED_X_POINT_DUE
+  schedule_shape: one_x_point_plus_declared_y_points
+  x_selection_menu_seconds: [300, 600, 900]
+  x_selection_menu_is_not_collected_prefix: true
+  preferred_x_due_offset_seconds: 300
+  declared_y_due_offset_seconds: [900, 1800, 3600, 7200, 14400, 43200, 86400]
+  decision_t_point_id: Y1800
+  decision_t_due_offset_seconds: 1800
   decision_t_is_not_forge_wall_clock: true
   delay_after_ready_to_lengthen_motif: forbidden
-  y_role_points_in_x: forbidden
-  prefix_landmarks: declared_x_points_with_due_offset_le_decision_t_and_pit_clock_le_T
+  prefix_slots: all_schedule_points_with_due_offset_le_1800
+  missing_or_late_clock_keeps_slot_emits: M
+  drop_slot_when_clock_missing: forbidden
+  y_points_after_decision_due_are_outcomes_not_x: true
   min_motif_steps: 2
-  min_x_landmarks_required: 3
+  min_prefix_slots: 3
   schematic_motif_example_length: not_a_requirement
   preserve_due_offset_seconds: true
   equal_spacing_fiction: forbidden
@@ -147,11 +153,18 @@ unknown_or_suspected_coverage_may_use: READY_VALID_WITH_COVERAGE_LIMITATION
 control:
   representation: unchanged_current_forge_packet
   same: [evidence_epoch, corpus, prior_work_memory, critic, search_budget, prompt_family, candidate_count_constraints]
+control_terminal_else: INVALID_TRIGGER_NOT_MET
 challenger:
   representation: NORMALIZED_TRAJECTORY_V1_compact_prefix_motif
+  packet_surgery: REPLACE_WITHIN_EXISTING_TRUNCATION
   packet_budget_owner: HFIC_MAX_PACKET_BYTES
   raw_trajectory_dump: forbidden
   variant_shopping: forbidden
+  add_versus_replace_shopping: forbidden
+case_e:
+  code: INVALID_GROUNDING_BOUNDARY
+  if: lifecycle_field_sequences_cannot_legally_ground_through_current_feat_contract
+  silently_widen_feature_grounding: forbidden
 novelty:
   wording_or_card_count_alone: not_material
   structural_signature_change_alone: not_sufficient
@@ -203,7 +216,7 @@ invalid_codes:
   - INVALID_CASE_C_OBSERVABILITY
 invalid_insufficient_prefix_if:
   - motif_steps_lt_min_motif_steps
-  - imported_schedule_declared_x_points_lt_min_x_landmarks_required
+  - prefix_slots_lt_min_prefix_slots
 after_kill: RETURN_TO_PROJECT_CHAT_NO_AUTO_TRAJECTORY_ENGINE
 after_pass_does_not_mean: alpha_exists
 ---
@@ -261,16 +274,17 @@ Holders, mcap, net buyers, missingness motifs, quotes and execution are not Prob
 ## Time, PIT, normalization, motif
 
 Bind landmarks to the imported corpus ObservationSchedule. Preferred campaign identity is
-`OBS-ALWAYS-ON-TOKENS-V2-LIFECYCLE-21D-001` with declared X due offsets 300, 600, 900
-seconds. If the imported schedule's declared X set differs, use that declared set. Do not
-invent extra landmarks after seeing paths.
+`OBS-ALWAYS-ON-TOKENS-V2-LIFECYCLE-21D-001`. Git shape is **one** `x_point` chosen from
+the menu {300, 600, 900} (preferred 300) plus Y due offsets 900, 1800, 3600, 7200, 14400,
+43200, 86400. That menu is not three collected X landmarks. Offset 600 is not a default Y.
 
-Probe 1 decision `T` is the **latest declared X-point due**, not Forge wall-clock and not a
-later Y. Do not wait after READY to lengthen motifs. Y-role points never enter X, even if
-already available. Prefix = declared X-points with `due_offset_seconds <= T` and
-`first_reliable_available_at <= T`.
+Probe 1 decision `T` is the **Y1800** due (1800 seconds), not Forge wall-clock and not a
+later Y. Do not wait after READY to lengthen motifs. Prefix **slots** are every schedule
+point with `due_offset_seconds <= 1800` (default: X300, Y900, Y1800). Points after 1800
+remain outcomes, not X. A missing/late PIT clock keeps the slot and emits `M`; do not drop
+the slot.
 
-Need ≥3 X landmarks and ≥2 adjacent motif steps. Otherwise `INVALID_INSUFFICIENT_PREFIX`.
+Need ≥3 prefix slots and ≥2 adjacent motif steps. Otherwise `INVALID_INSUFFICIENT_PREFIX`.
 The compact `PRICE: U-U-F-D` sketch is schema-only; it does not freeze motif length.
 
 Preserve `due_offset_seconds`. No equal-spacing fiction, interpolation, or intra-interval
