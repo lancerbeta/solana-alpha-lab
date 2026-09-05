@@ -9,9 +9,9 @@ allowed_routes:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: a946e866370464d7980212118f8535ae963fdb1c
+  expected_base: 012d6f053f20a50dfa22ddc67b7e4c13df36a7a0
   expected_upstream: origin/main
-  expected_upstream_oid: a946e866370464d7980212118f8535ae963fdb1c
+  expected_upstream_oid: 012d6f053f20a50dfa22ddc67b7e4c13df36a7a0
   expected_branch: cursor/hot90-runtime-activation-boundary-repair-v1
   dirty_mode: ALLOW_REPORTED
 
@@ -108,7 +108,7 @@ stage, Drive and destructive flags. This PR does not deploy or change VPS state.
 
 ## Binding
 
-- Base: `a946e866370464d7980212118f8535ae963fdb1c`
+- Base: `012d6f053f20a50dfa22ddc67b7e4c13df36a7a0` (origin/main after Probe 1; start SHA was `a946e866370464d7980212118f8535ae963fdb1c`)
 - Route: `DIRECT_CURSOR_DELIVERY`
 - `SPEC_ROUTE`: `NONE`
 - Entry: `START_AS_WRITTEN`

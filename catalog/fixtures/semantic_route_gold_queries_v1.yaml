@@ -20,6 +20,9 @@ queries:
 - query_id: SGQ-HYPOTHESIS-FORGE-RU
   query: как сгенерировать или проверить гипотезу
   required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-NORMALIZED-TRAJECTORY-PROBE
+  query: normalized trajectory
+  required_top_route: SEM-HYPOTHESIS-FORGE
 - query_id: SGQ-PRIOR-WORK-EN
   query: find prior negative hypothesis work
   required_top_route: SEM-PRIOR-WORK

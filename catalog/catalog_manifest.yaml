@@ -4,7 +4,7 @@ catalog_version: 0.124.0
 as_of: '2026-09-05'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1681
+  assets: 1683
   asset_registries: 4
   schemas: 87
   queries: 19
@@ -1035,5 +1035,7 @@ mandatory_asset_ids:
 - SCHEMA-EXIT-DECISION-V1-001
 - MODULE-STRATEGY-RUNTIME-001
 - TEST-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001
+- CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001
+- TEST-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001
 deferred_capabilities:
 - GRAPH_DATABASE
