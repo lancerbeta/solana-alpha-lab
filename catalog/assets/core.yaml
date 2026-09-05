@@ -17787,7 +17787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: dcdfe73832fe1fdc7e1c02128547b8e8586219758be18ac4273d8c2a55570472}
+  integrity: {kind: sha256, sha256: a2c0b028cba34258c131eaad2c11fa0e3a1ea53f8c37aa78fa711c0e1d7cf63a}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
@@ -24370,7 +24370,7 @@ records:
   as_of: '2026-08-18'
   truth_owner: FACTORY-V1-OPERATIONAL-READINESS-V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_operational_readiness_v1.yaml', repository_path: configs/factory_v1_operational_readiness_v1.yaml}
-  integrity: {kind: sha256, sha256: 0a887caafbbfc44ba240cd0a9bb86b648a8c9d4fbbb954ab13c0e5062831d1c4}
+  integrity: {kind: sha256, sha256: e697a16c37d4aac8268b460df4731f9d95b4f990bbf5879a9de9c358fac6220c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: ARCH-INTENT-005}
@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 4d91c030b3abbf4f6546ad1e043b98dbeb40c5edd8915709dc021cb781736dc8}
+  integrity: {kind: sha256, sha256: 97db61438d4980aacc07b1fd24aee4a848594742e02909fd17e4b7aeb57ab262}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25675,6 +25675,7 @@ records:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
   - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
   - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OWNER-LIFECYCLE-PROJECTION-001}
   consumers: [FACTORY-001, FACTORY-V1-PRODUCT-KERNEL-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, APPLICATION, COMMANDS]
@@ -31634,7 +31635,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_catalog_canonical_binding_discovery.py', repository_path: tests/test_catalog_canonical_binding_discovery.py}
-  integrity: {kind: sha256, sha256: 75c9ff44b91037aa5a5bfe1cdcc3324f8ea596e8e9ebd14b653cde05ab7cff3c}
+  integrity: {kind: sha256, sha256: 664974381d9bd7008b935fed47c70d3d27a392a9731f4f79e25d5797f82cb26c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-CATALOG-DISCOVERY-001}
@@ -34137,7 +34138,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: d3f25f62b5638dfd3d422c3502602b47678dede4766a6c8eca5cd37bd2f7efe4}
+  integrity: {kind: sha256, sha256: ccd0a85fb9b60f07c0383bf7f7f4643bf4351609e0f2511c0475048310ea92f0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34226,7 +34227,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_semantic_operability.py', repository_path: tests/test_factory_semantic_operability.py}
-  integrity: {kind: sha256, sha256: fb018c6ca729a6754ea8e3be690b04832a2de75bb3ea1e720fa5a6f9c203a07c}
+  integrity: {kind: sha256, sha256: 59b7055e4966690f1815d83eb4daf2289dc5ba397efd9420a52859a970044b31}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34244,7 +34245,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 7421f84854f5b0e1a2615804746a395c419252eb461874407dada4db4275ca6e}
+  integrity: {kind: sha256, sha256: 201d5b4b11ef479aa1301c2dbfccdf408257f53f70817bb4422e54e48dd5c118}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34262,7 +34263,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 47fea58ef0ed4eaa23d6cf099e3a6ba83f2e84b18cea5170ec065c8e2d2ef176}
+  integrity: {kind: sha256, sha256: 242dec78595fdf47783c42ad1ebd0c7a516ea1382f7fb3a5aba734af8ef8c88f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -35327,4 +35328,133 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [VISUAL_OPERATING_SYSTEM, GOLD_QUERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for the derived owner lifecycle projection spine without a second truth store.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md', repository_path: docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md}
+  integrity: {kind: sha256, sha256: 1de341ce1e8d5d011d3897a458ef8e5ea1f2ed1fb5e51273d69388e4747d71df}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: contains, target_asset_id: SCHEMA-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: contains, target_asset_id: DOC-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: contains, target_asset_id: MODULE-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-SHOW-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [LIFECYCLE_PROJECTION, OWNER_LIFECYCLE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Machine-readable owner lifecycle projection source adapters, bounded roots and relation policy.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/owner_lifecycle_projection_v1.yaml', repository_path: configs/owner_lifecycle_projection_v1.yaml}
+  integrity: {kind: sha256, sha256: 48d402a1c3c1f7381bed0193dd449d4e5f1e69601047da4164e1996a3f53d4de}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [LIFECYCLE_PROJECTION, DERIVED_INDEX, TARGET_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-OWNER-LIFECYCLE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for LifecycleProjectionV1 output and source-adapter contract with authority_granted false.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/owner_lifecycle_projection_v1.schema.json', repository_path: catalog/schemas/owner_lifecycle_projection_v1.schema.json}
+  integrity: {kind: sha256, sha256: 90750b71072d9da1eff3b50b7be7c6b6549bb83895803fdda7009ab21899ff3b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIFECYCLE_PROJECTION, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-OWNER-LIFECYCLE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Human companion for the derived owner lifecycle index, current source owners and explicit GAP semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/owner_lifecycle_projection_spine_v1.md', repository_path: docs/contracts/owner_lifecycle_projection_spine_v1.md}
+  integrity: {kind: sha256, sha256: 0b89afdb308e5672169ff9b4d1b4c70c403cdc23a2f118cf9564c3de4ffcbe85}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [LIFECYCLE_PROJECTION, lineage, lifecycle-объекты, карта lifecycle]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-OWNER-LIFECYCLE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Read-only adapters that rebuild LifecycleProjectionV1 from existing source owners.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
+  integrity: {kind: sha256, sha256: 8dc468b4329fcee7095120c6c2540136e5a9e3d7609aa41808e12d161d106b1d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIFECYCLE_PROJECTION, ADAPTER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-SHOW-OWNER-LIFECYCLE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Read-only inspection CLI for LifecycleProjectionV1 JSON. Not the owner UX.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/show_owner_lifecycle_projection.py', repository_path: scripts/show_owner_lifecycle_projection.py}
+  integrity: {kind: sha256, sha256: e5e36c49ad33086ce21a51996373edc78248085153d249ad9f25c371c15f9a64}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [LIFECYCLE_PROJECTION, INSPECTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-OWNER-LIFECYCLE-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Focused tests for lifecycle projection adapters, real-repo cases, gaps and semantic routing.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_owner_lifecycle_projection_spine_v1.py', repository_path: tests/test_owner_lifecycle_projection_spine_v1.py}
+  integrity: {kind: sha256, sha256: 932c5e0b6ac7a3fb0324dfc32648f23c72eae2a8959a77401d1bb534c9ad10fb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIFECYCLE_PROJECTION, GOLD_QUERY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

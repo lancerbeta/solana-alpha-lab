@@ -1,0 +1,60 @@
+schema: smial.owner-lifecycle-projection-contract
+schema_version: "1.0"
+contract_id: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
+projection_schema: smial.owner-lifecycle-projection
+projection_schema_version: "1.0"
+truth_owner_boundary: DERIVED_INDEX_ONLY
+authority_granted: false
+owns_source_truth: false
+persist_projection: false
+bounded_roots:
+  experiment_specs: configs/experiment_specs
+  strategy_versions: configs/strategies
+legacy_empty_registries:
+  - registries/hypotheses.yaml
+  - registries/research_cycles.yaml
+  - registries/strategies.yaml
+  - registries/bot_instances.yaml
+decision_negative_registry: registries/decisions_negative_results.yaml
+operational_store:
+  kernel_config: configs/factory_v1_product_kernel_v1.yaml
+  create_if_missing: false
+paper_plane_store:
+  relative_path: local/factory_v1/paper_plane_state.sqlite
+  create_if_missing: false
+research_store:
+  create_if_missing: false
+  projected_record_kinds:
+    - HYPOTHESIS_VERSION
+    - TRIAL
+    - DECISION_EVENT
+    - RUN_STARTED
+    - RUN_COMPLETED
+    - RUN_ABORTED
+    - RUN_INVALID
+    - ACTIVATION_EPOCH
+relation_derivation_methods:
+  - EXPLICIT_SOURCE_FIELD
+  - EXPLICIT_FOREIGN_KEY
+  - EXPLICIT_CATALOG_RELATION
+  - EXPLICIT_CONTRACT_KEY
+forbidden_derivation_methods:
+  - INFERRED_BY_NAME
+  - INFERRED_BY_TIME
+  - INFERRED_BY_TEXT_SIMILARITY
+identity_forbidden:
+  - filename_stem
+  - nearby_directory
+  - similar_title
+  - temporal_proximity
+  - mint_alone
+  - narrative_similarity
+  - summary_regex
+  - llm_semantic_match
+consumers:
+  - RESEARCH_LIFECYCLE_WORKBENCH_V1
+  - EXPERIMENT_EVIDENCE_DECISION_V1
+  - SCIENCE_TO_STRATEGY_HANDOFF_V1
+  - TRADING_OPERATIONS_WORKBENCH_V2
+  - OWNER_ATTENTION_AND_CHANGE_FEED_V1
+future_moves_must_not_rebuild_joins_from_empty_registries: true

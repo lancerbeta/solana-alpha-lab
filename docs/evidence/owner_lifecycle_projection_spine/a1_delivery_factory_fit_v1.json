@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OWNER-LIFECYCLE-PROJECTION-SPINE-FACTORY-FIT-001",
+  "as_of": "2026-09-05",
+  "task_id": "OWNER_LIFECYCLE_PROJECTION_SPINE_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "RESEARCH_LIFECYCLE_WORKBENCH_V1"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_SECOND_TRUTH_OWNER",
+    "NO_RUNTIME_GIT_WRITES",
+    "NO_LEGACY_REGISTRY_BACKFILL",
+    "NO_WORKBENCH_REDESIGN",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_OWNER_WORKBENCH_COMPLETE"
+  ],
+  "recovery": "REVERT"
+}

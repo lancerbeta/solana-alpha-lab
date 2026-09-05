@@ -1,12 +1,12 @@
 schema_version: '1.1'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.125.0
+catalog_version: 0.126.0
 as_of: '2026-09-05'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1688
+  assets: 1695
   asset_registries: 4
-  schemas: 88
+  schemas: 89
   queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -85,6 +85,14 @@ canonical_bindings:
     current_use_evidence_asset_ids:
     - DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001
     - TEST-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  ACTIVE-OWNER-LIFECYCLE-PROJECTION:
+    target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001
+    expected_asset_type: configuration
+    semantics: CURRENT_AT_COMMIT
+    rationale: Current derived owner lifecycle index over existing source owners
+    current_use_evidence_asset_ids:
+    - DOC-OWNER-LIFECYCLE-PROJECTION-001
+    - TEST-OWNER-LIFECYCLE-PROJECTION-001
 root_resolver:
   asset_registries:
   - catalog/assets/core.yaml
@@ -188,6 +196,7 @@ root_resolver:
   - catalog/schemas/hypothesis_forge_synthesis_handoff_v1_1.schema.json
   - catalog/schemas/factory_semantic_operability.schema.json
   - catalog/schemas/smial_visual_operating_system.schema.json
+  - catalog/schemas/owner_lifecycle_projection_v1.schema.json
   - catalog/schemas/semantic_premise_review_packet.schema.json
   - catalog/schemas/hfic_scientific_discovery_prospects_v1.schema.json
   - catalog/schemas/hfic_next_epistemic_action_draft_v1.schema.json
@@ -1051,5 +1060,12 @@ mandatory_asset_ids:
 - SCHEMA-SMIAL-VISUAL-OPERATING-SYSTEM-001
 - DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001
 - TEST-SMIAL-VISUAL-OPERATING-SYSTEM-001
+- CTRL-OWNER-LIFECYCLE-PROJECTION-001
+- CONFIG-OWNER-LIFECYCLE-PROJECTION-001
+- SCHEMA-OWNER-LIFECYCLE-PROJECTION-001
+- DOC-OWNER-LIFECYCLE-PROJECTION-001
+- MODULE-OWNER-LIFECYCLE-PROJECTION-001
+- SCRIPT-SHOW-OWNER-LIFECYCLE-PROJECTION-001
+- TEST-OWNER-LIFECYCLE-PROJECTION-001
 deferred_capabilities:
 - GRAPH_DATABASE

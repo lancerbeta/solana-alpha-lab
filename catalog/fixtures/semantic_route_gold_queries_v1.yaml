@@ -80,3 +80,48 @@ queries:
 - query_id: SGQ-VISUAL-INTERFACE-RU
   query: как оформлять интерфейс SMIAL
   required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-OWNER-LIFECYCLE-OBJECTS-EN
+  query: What lifecycle objects currently exist?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-CONNECTED-EN
+  query: How are hypothesis, experiment, strategy and position connected?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-TRUTH-EN
+  query: Where is lifecycle truth?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-LINEAGE-EN
+  query: Show the research-to-execution lineage.
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-STRATEGY-EN
+  query: What is linked to this StrategyVersion?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-PROJECTION-EN
+  query: What is the owner lifecycle projection?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-OBJECTS-RU
+  query: какие lifecycle-объекты сейчас существуют?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-CONNECTED-RU
+  query: как связаны гипотеза эксперимент стратегия и позиция?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-LINEAGE-RU
+  query: где смотреть research → execution lineage?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-LIFECYCLE-MAP-RU
+  query: где каноническая карта lifecycle?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-ANTI-VPS-HEALTH
+  query: Is the VPS healthy?
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-ANTI-PROVIDER-ROUTE-EXISTS
+  query: What provider route exists?
+  required_top_route: SEM-PROVIDER-ROUTES
+- query_id: SGQ-ANTI-DESIGN-UI
+  query: How do I design the UI?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-ANTI-GENERATE-HYPOTHESIS
+  query: How do I generate a hypothesis?
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-ANTI-AUTHORIZED-DEPLOY
+  query: Am I authorized to deploy?
+  required_top_route: SEM-AUTHORITY-BOUNDARIES

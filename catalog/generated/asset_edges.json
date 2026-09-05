@@ -993,6 +993,16 @@
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
     },
     {
+      "source_asset_id": "CONFIG-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CONFIG-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
       "source_asset_id": "CONFIG-PMF-QUOTE-ATTEMPT-PREP-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-PMF-QUOTE-ATTEMPT-PREP-001"
@@ -3623,6 +3633,36 @@
       "target_asset_id": "TEST-OWNER-ATTENTION-GATE-001"
     },
     {
+      "source_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-SHOW-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
       "source_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-FACTORY-V1-OWNER-COCKPIT-001"
@@ -4971,6 +5011,16 @@
       "source_asset_id": "DOC-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-T26C-A3-CATALOG-FACTORY-FIT-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
     },
     {
       "source_asset_id": "DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001",
@@ -9955,6 +10005,11 @@
     {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
+      "target_asset_id": "MODULE-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
+      "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-SHADOW-COMMANDS-001"
     },
     {
@@ -10361,6 +10416,16 @@
       "source_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001",
       "relation": "produces",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
     },
     {
       "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
@@ -12768,6 +12833,11 @@
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
     },
     {
+      "source_asset_id": "SCHEMA-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
@@ -13786,6 +13856,16 @@
       "source_asset_id": "SCRIPT-SEMANTIC-PREMISE-REVIEW-CLI-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-SEMANTIC-PREMISE-REVIEW-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-SHOW-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-SHOW-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
     },
     {
       "source_asset_id": "SCRIPT-T05-MIGRATION-LEDGER-001",
@@ -15126,6 +15206,16 @@
       "source_asset_id": "TEST-OWNER-AUTHORITY-PACKET-A2-001",
       "relation": "depends_on",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
     },
     {
       "source_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001",

@@ -1,0 +1,369 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/owner_lifecycle_projection_v1.schema.json",
+  "title": "Owner Lifecycle Projection V1",
+  "$defs": {
+    "sourceStatus": {
+      "type": "string",
+      "enum": ["AVAILABLE", "EMPTY", "NOT_PRESENT", "UNAVAILABLE", "INVALID", "UNKNOWN"]
+    },
+    "truthPlane": {
+      "type": "string",
+      "enum": ["GIT", "EVIDENCE", "RUNTIME"]
+    },
+    "projectionClass": {
+      "type": "string",
+      "enum": [
+        "RESEARCH",
+        "EXPERIMENT",
+        "EVIDENCE_DECISION",
+        "STRATEGY",
+        "EXECUTION",
+        "POSITION",
+        "ECONOMICS"
+      ]
+    },
+    "nativeKind": {
+      "type": "string",
+      "enum": [
+        "HYPOTHESIS_VERSION",
+        "TRIAL",
+        "DECISION_EVENT",
+        "DECISION",
+        "NEGATIVE_RESULT",
+        "EXPERIMENT_SPEC",
+        "EXPERIMENT_RUN",
+        "STRATEGY_VERSION",
+        "ACTIVATION_EPOCH",
+        "BOT_INSTANCE",
+        "SIGNAL_DECISION",
+        "EXIT_DECISION",
+        "EXECUTION_EVENT",
+        "POSITION",
+        "ECONOMIC_FACT"
+      ]
+    },
+    "stateDerivation": {
+      "type": "string",
+      "enum": ["SOURCE_NATIVE", "EXPLICIT_CONTRACT_MAPPING", "UNKNOWN"]
+    },
+    "derivationMethod": {
+      "type": "string",
+      "enum": [
+        "EXPLICIT_SOURCE_FIELD",
+        "EXPLICIT_FOREIGN_KEY",
+        "EXPLICIT_CATALOG_RELATION",
+        "EXPLICIT_CONTRACT_KEY"
+      ]
+    },
+    "relationResolution": {
+      "type": "string",
+      "enum": ["RESOLVED", "TARGET_GAP", "SOURCE_GAP", "CONFLICT"]
+    },
+    "completeness": {
+      "type": "string",
+      "enum": ["COMPLETE", "PARTIAL", "UNAVAILABLE"]
+    },
+    "authorityRequired": {
+      "type": "string",
+      "enum": ["NONE_FOR_READ", "SOURCE_DECLARED", "EXACT_OWNER_GATE", "UNKNOWN"]
+    },
+    "gapCode": {
+      "type": "string",
+      "enum": [
+        "SOURCE_NOT_PRESENT",
+        "SOURCE_UNAVAILABLE",
+        "SOURCE_INVALID",
+        "SOURCE_EMPTY",
+        "RELATION_TARGET_GAP",
+        "IDENTITY_CONFLICT",
+        "STATE_CONFLICT",
+        "MISSING_STABLE_ID",
+        "MISSING_EXPLICIT_RELATION",
+        "UNSUPPORTED_SOURCE_VERSION",
+        "FRESHNESS_UNKNOWN",
+        "EVIDENCE_CLASS_UNKNOWN",
+        "AUTHORITY_UNKNOWN"
+      ]
+    },
+    "sourceRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["git_path", "sqlite", "research_store", "injected"]
+        },
+        "value": {"type": "string", "minLength": 1, "maxLength": 512}
+      }
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "basis"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["CURRENT_AT_COMMIT", "SOURCE_TIMESTAMP", "READBACK", "UNKNOWN"]
+        },
+        "basis": {"type": "string", "minLength": 1, "maxLength": 256}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schema_version",
+        "contract_id",
+        "projection_schema",
+        "projection_schema_version",
+        "truth_owner_boundary",
+        "authority_granted",
+        "owns_source_truth",
+        "persist_projection",
+        "bounded_roots",
+        "legacy_empty_registries",
+        "decision_negative_registry",
+        "operational_store",
+        "paper_plane_store",
+        "research_store",
+        "relation_derivation_methods",
+        "forbidden_derivation_methods",
+        "identity_forbidden",
+        "consumers",
+        "future_moves_must_not_rebuild_joins_from_empty_registries"
+      ],
+      "properties": {
+        "schema": {"const": "smial.owner-lifecycle-projection-contract"},
+        "schema_version": {"const": "1.0"},
+        "contract_id": {"const": "OWNER_LIFECYCLE_PROJECTION_SPINE_V1"},
+        "projection_schema": {"const": "smial.owner-lifecycle-projection"},
+        "projection_schema_version": {"const": "1.0"},
+        "truth_owner_boundary": {"const": "DERIVED_INDEX_ONLY"},
+        "authority_granted": {"const": false},
+        "owns_source_truth": {"const": false},
+        "persist_projection": {"const": false},
+        "bounded_roots": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["experiment_specs", "strategy_versions"],
+          "properties": {
+            "experiment_specs": {"type": "string", "minLength": 1},
+            "strategy_versions": {"type": "string", "minLength": 1}
+          }
+        },
+        "legacy_empty_registries": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {"type": "string"}
+        },
+        "decision_negative_registry": {"type": "string"},
+        "operational_store": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kernel_config", "create_if_missing"],
+          "properties": {
+            "kernel_config": {"type": "string"},
+            "create_if_missing": {"const": false}
+          }
+        },
+        "paper_plane_store": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["relative_path", "create_if_missing"],
+          "properties": {
+            "relative_path": {"type": "string"},
+            "create_if_missing": {"const": false}
+          }
+        },
+        "research_store": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["create_if_missing", "projected_record_kinds"],
+          "properties": {
+            "create_if_missing": {"const": false},
+            "projected_record_kinds": {
+              "type": "array",
+              "minItems": 1,
+              "items": {"type": "string"}
+            }
+          }
+        },
+        "relation_derivation_methods": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/derivationMethod"}
+        },
+        "forbidden_derivation_methods": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "identity_forbidden": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "consumers": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "future_moves_must_not_rebuild_joins_from_empty_registries": {"const": true}
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schema_version",
+        "projection_id",
+        "projected_at",
+        "completeness",
+        "authority_granted",
+        "git_sha",
+        "sources",
+        "entities",
+        "relations",
+        "gaps"
+      ],
+      "properties": {
+        "schema": {"const": "smial.owner-lifecycle-projection"},
+        "schema_version": {"const": "1.0"},
+        "projection_id": {"type": "string", "minLength": 8, "maxLength": 128},
+        "projected_at": {"type": "string", "minLength": 8},
+        "completeness": {"$ref": "#/$defs/completeness"},
+        "authority_granted": {"const": false},
+        "git_sha": {"type": ["string", "null"]},
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_id",
+              "truth_plane",
+              "truth_owner",
+              "source_ref",
+              "status",
+              "observed_at",
+              "freshness_basis"
+            ],
+            "properties": {
+              "source_id": {"type": "string", "minLength": 1},
+              "truth_plane": {"$ref": "#/$defs/truthPlane"},
+              "truth_owner": {"type": "string", "minLength": 1},
+              "source_ref": {"$ref": "#/$defs/sourceRef"},
+              "status": {"$ref": "#/$defs/sourceStatus"},
+              "observed_at": {"type": ["string", "null"]},
+              "as_of": {"type": ["string", "null"]},
+              "freshness_basis": {"type": "string", "minLength": 1},
+              "error": {"type": ["string", "null"]},
+              "adapter_detail": {"type": ["string", "null"]}
+            }
+          }
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "entity_id",
+              "projection_class",
+              "native_kind",
+              "native_state",
+              "display_state",
+              "state_derivation",
+              "source_owner",
+              "source_ref",
+              "truth_plane",
+              "as_of",
+              "observed_at",
+              "evidence_class",
+              "freshness",
+              "blocker",
+              "next_safe_action",
+              "authority_required",
+              "summary",
+              "contributing_source_ids"
+            ],
+            "properties": {
+              "entity_id": {"type": "string", "minLength": 1, "maxLength": 256},
+              "projection_class": {"$ref": "#/$defs/projectionClass"},
+              "native_kind": {"$ref": "#/$defs/nativeKind"},
+              "native_state": {"type": ["string", "null"]},
+              "display_state": {"type": ["string", "null"]},
+              "state_derivation": {"$ref": "#/$defs/stateDerivation"},
+              "source_owner": {"type": "string", "minLength": 1},
+              "source_ref": {"$ref": "#/$defs/sourceRef"},
+              "truth_plane": {"$ref": "#/$defs/truthPlane"},
+              "as_of": {"type": ["string", "null"]},
+              "observed_at": {"type": ["string", "null"]},
+              "evidence_class": {"type": "string", "minLength": 1},
+              "freshness": {"$ref": "#/$defs/freshness"},
+              "blocker": {"type": ["string", "null"]},
+              "next_safe_action": {"type": ["string", "null"]},
+              "authority_required": {"$ref": "#/$defs/authorityRequired"},
+              "summary": {"type": ["string", "null"]},
+              "contributing_source_ids": {
+                "type": "array",
+                "minItems": 1,
+                "items": {"type": "string"}
+              }
+            }
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "relation_type",
+              "from_entity_id",
+              "to_entity_id",
+              "resolution",
+              "source_ref",
+              "derivation_method"
+            ],
+            "properties": {
+              "relation_type": {"type": "string", "minLength": 1, "maxLength": 64},
+              "from_entity_id": {"type": "string", "minLength": 1},
+              "to_entity_id": {"type": "string", "minLength": 1},
+              "resolution": {"$ref": "#/$defs/relationResolution"},
+              "source_ref": {"$ref": "#/$defs/sourceRef"},
+              "derivation_method": {"$ref": "#/$defs/derivationMethod"}
+            }
+          }
+        },
+        "gaps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "gap_code",
+              "reason",
+              "source_ref",
+              "impact",
+              "next_safe_action"
+            ],
+            "properties": {
+              "gap_code": {"$ref": "#/$defs/gapCode"},
+              "affected_entity_id": {"type": ["string", "null"]},
+              "source_id": {"type": ["string", "null"]},
+              "relation_type": {"type": ["string", "null"]},
+              "reason": {"type": "string", "minLength": 1},
+              "source_ref": {"$ref": "#/$defs/sourceRef"},
+              "impact": {"type": "string", "minLength": 1},
+              "next_safe_action": {"type": "string", "minLength": 1}
+            }
+          }
+        }
+      }
+    }
+  ]
+}
