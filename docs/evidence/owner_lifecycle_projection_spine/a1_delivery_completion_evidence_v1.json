@@ -11,12 +11,13 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "427eaf057d9b78507bacab93cecfe4390dd70a75eb437ec8769dafe74fa587f0",
+    "catalog/assets/core.yaml": "3ca1cbb8a5cef1c57c280401fe2ced27baa76a482b7bc21024fdff0dcf3ae8bd",
     "catalog/assets/lifecycle.yaml": "44ec2f7d8110568da928849063966dd4809beea0056d39462f1686299638c629",
     "catalog/catalog_manifest.yaml": "ac7ba143c79ef71a94917113cf65a005fcbfc5905de74041e6ec69ea167ef972",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "242dec78595fdf47783c42ad1ebd0c7a516ea1382f7fb3a5aba734af8ef8c88f",
     "catalog/generated/asset_edges.json": "01fcbdb533776787b1ea2ab2253bd3142a691de943deb7a91f5aa5a3cf673bda",
     "catalog/schemas/owner_lifecycle_projection_v1.schema.json": "90750b71072d9da1eff3b50b7be7c6b6549bb83895803fdda7009ab21899ff3b",
+    "configs/execution_domain_v1.json": "eeeda6a3a28b205ce2037995eb75a863eae2d9130b65fc3df331ea6ca9d2d1f3",
     "configs/factory_semantic_operability_v1.yaml": "ccd0a85fb9b60f07c0383bf7f7f4643bf4351609e0f2511c0475048310ea92f0",
     "configs/factory_v1_operational_readiness_v1.yaml": "e697a16c37d4aac8268b460df4731f9d95b4f990bbf5879a9de9c358fac6220c",
     "configs/owner_lifecycle_projection_v1.yaml": "48d402a1c3c1f7381bed0193dd449d4e5f1e69601047da4164e1996a3f53d4de",
@@ -25,7 +26,7 @@
     "docs/PROJECT_MAP.md": "59788235a7500b162482946eaef3904d158b514c40ddf642672704235ae4aa86",
     "docs/contracts/owner_lifecycle_projection_spine_v1.md": "0b89afdb308e5672169ff9b4d1b4c70c403cdc23a2f118cf9564c3de4ffcbe85",
     "docs/reports/owner_lifecycle_projection_spine/a1_owner_readout_v1.md": "bb4e6fcff2813e4e212f7914295b217c1ce808a6056bdb2f5053164e7c356c4c",
-    "docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md": "1de341ce1e8d5d011d3897a458ef8e5ea1f2ed1fb5e51273d69388e4747d71df",
+    "docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md": "5b983fa9dc98bda8309e59dd963b758ca818d4c684edfec28ad61e280e743f18",
     "scripts/show_owner_lifecycle_projection.py": "e5e36c49ad33086ce21a51996373edc78248085153d249ad9f25c371c15f9a64",
     "src/solana_alpha_lab/factory/application.py": "97db61438d4980aacc07b1fd24aee4a848594742e02909fd17e4b7aeb57ab262",
     "src/solana_alpha_lab/factory/lifecycle_projection.py": "8dc468b4329fcee7095120c6c2540136e5a9e3d7609aa41808e12d161d106b1d",
@@ -43,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_lifecycle_projection_spine/a1_delivery_factory_fit_v1.json",
-    "sha256": "c1bb5537d36bbafa601ac577c20ebb25493bd5b2b4788174c4f47d26bafb6ba2",
+    "sha256": "2c18e4c1730ddf5fdee1a2f2ddcba4a6c211e48b2b60db16bbf39c53f6ba66b4",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_LIFECYCLE_PROJECTION_SPINE_V1",
     "independent_review": {
       "path": "docs/evidence/owner_lifecycle_projection_spine/a1_delivery_independent_review_v1.json",
-      "sha256": "5491496056c38f92f49812061776251b9e688461f793b69f762b8a74e1590515",
+      "sha256": "495c953bebcdcafd40aaef0f9dc70042fd976c748dd265df153a52093cc4ba25",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
