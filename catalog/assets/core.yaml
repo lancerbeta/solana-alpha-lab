@@ -29946,7 +29946,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 798e754f300998cffee61beb1fddcc95296fb8c16ebdf6caa8da4c0cd45114cb}
+  integrity: {kind: sha256, sha256: 29cc0488a4ff745df06c4ec4edc8b42825330fa7ebde302c247beb65a4b90863}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -35098,7 +35098,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md', repository_path: docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md}
-  integrity: {kind: sha256, sha256: 58278732e5f23e00935b09b6f46c50a03255bac93a80a23dafa7706c2183f077}
+  integrity: {kind: sha256, sha256: 234d1811ee92f3e54dcd1a4a9b2f28f12f370e71f3e6e7249cd1419f6189461d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}

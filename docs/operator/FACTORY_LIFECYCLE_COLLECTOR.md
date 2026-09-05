@@ -472,7 +472,8 @@ Disk policy (measured % used; does not auto-resize or delete science):
 Default is dry-run. Apply requires exact `--i-understand-apply`. This APPLY
 only compacts operational SQLite bodies. It never deletes scientific
 RDP/releases and is **not** HOT90 90d eviction. HOT local residency is not live
-on the VPS until a later exact destructive owner gate.
+on the VPS until a later exact destructive owner gate. Safe around scheduler
+lease (`WRITER_BUSY` if tick holds lease).
 
 ```
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule_retention.py status --raw-retention-days 31

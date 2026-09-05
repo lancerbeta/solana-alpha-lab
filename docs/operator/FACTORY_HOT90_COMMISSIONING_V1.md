@@ -30,7 +30,7 @@ start Telegram. Do not delete `BACKUP_*.zip`.
 | Stage | Allowed | Forbidden |
 |---|---|---|
 | `CURRENT_SAFE` | live SNAPPY + per-publication members + full-RDP local backup | ZSTD HOT writes, SNAPSHOT_PLUS_DELTA, Drive, eviction, compaction |
-| `WRITE_ONLY_SHADOW` | new layout/raw/archive generation beside current truth | eviction, SQLite compaction, live delete |
+| `WRITE_ONLY_SHADOW` | publisher ZSTD + SNAPSHOT_PLUS_DELTA; raw/archive/verify/hydrate/runway remain explicit primitives (no collector auto-run) | eviction, SQLite compaction, live delete, Drive |
 | `DURABILITY_CUTOVER` | immutable archive + mutable-only backup | eviction, compaction |
 | `RETENTION_ACTIVE` | only after a separate destructive owner gate | size-only remote proof, mtime age, wildcard delete |
 
