@@ -36,6 +36,7 @@ managed_write_set:
   - tests/test_factory_v1_owner_cockpit.py
   - tests/test_owner_operations_cockpit_v1.py
   - tests/test_factory_ordinary_market_hypothesis.py
+  - tests/test_catalog_canonical_binding_discovery.py
   - tests/test_factory_semantic_operability.py
   - configs/factory_semantic_operability_v1.yaml
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml
