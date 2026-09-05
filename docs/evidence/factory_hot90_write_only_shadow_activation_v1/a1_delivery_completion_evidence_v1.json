@@ -11,15 +11,16 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "DEPLOY_EXACT_SHA_THEN_OBSERVE_WRITE_ONLY_SHADOW",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "e9c888b7dcf6553392085340d521eb1b5fdcc79115d1bc6f9f301e66284b8225",
+    "catalog/assets/core.yaml": "a72795e31bada255d40ea0178149101f88cf8bd075d83ed80923b890fe40cc7e",
     "catalog/assets/lifecycle.yaml": "c5d92573f4f8bbb52abe8c1cd63984415fa2e980ee5e661bfa130ca7e37e5f0f",
     "catalog/catalog_manifest.yaml": "e4b26c0b4e11f08b77f469f34738e8aaf12319f14471b8914c9672eb44de4523",
     "catalog/generated/asset_edges.json": "6a030ff7f5293e2f21700060065cab6a0d825bca73ac87d8fc2ae46378593cbd",
     "configs/factory_hot90_archive_activation_v1.yaml": "efb8fb0c6578e01adb5d7712b941e6164c33a93455ab14fa066f792ad1991f6b",
     "docs/PROJECT_MAP.md": "44c281bd17c1995eba293144b685f15f0d38e900598f666db92eab5154cca857",
     "docs/reports/factory_hot90_write_only_shadow_activation_v1/a1_owner_readout_v1.md": "de7266238a748189eda97889f877ed72361b7676b6c5ee82dae01c35c58a6963",
-    "docs/tasks/FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1.md": "3e22e870f8c665cbabbd7351148b4106c1dc31e0a737e1b0e2db7ca48cb1458e",
-    "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py": "4ee155efe1f06902a468990aedb0c23639a7d3af77d109ba45383ed545f7d295"
+    "docs/tasks/FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1.md": "bc8f63b99080bdf619d03db3be0b97998f7e4e877684a2988a58f62d49ad278b",
+    "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py": "4ee155efe1f06902a468990aedb0c23639a7d3af77d109ba45383ed545f7d295",
+    "tests/test_observation_scheduler.py": "891ab3e5f9fec2d83f46f5cab5303d0d9b3d7f379b2c9469a414e71d05e40641"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -31,14 +32,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_hot90_write_only_shadow_activation_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "916eedc1feeed6a576c259dda8708418b4321a58aad985606f0a54b96f552160",
+    "sha256": "e74868f1206eb4f31e2b6aa594de1ef56d68a80a4d733204db5e3765a09d356b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_hot90_write_only_shadow_activation_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "383d24a698c337002246b0c2a95766e57c9066fc668189d0e247c5f16b84c055",
+      "sha256": "b94975879d85bbc82c6b6dc353842129a35f2077c153331a0150cffee9731deb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

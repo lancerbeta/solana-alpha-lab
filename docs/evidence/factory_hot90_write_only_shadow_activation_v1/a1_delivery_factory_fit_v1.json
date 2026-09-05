@@ -4,8 +4,8 @@
   "review_id": "FACTORY-HOT90-WRITE-ONLY-SHADOW-ACTIVATION-FACTORY-FIT-001",
   "as_of": "2026-09-05",
   "task_id": "FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1",
-  "reviewed_bindings_sha256": "f2f5717faf63c1a4ff9d0b96d060c96c251d5d1b4be1a33428326a7d47d78d04",
-  "reviewed_inventory_sha256": "4646f6b461a285951e4861525586a8aeb4b09811f3c7231b3cd6beb230343c40",
+  "reviewed_bindings_sha256": "962bd4fcf836f7ee0032b529eec77374d2e960e5814dbbecd44f7cca79f87c8b",
+  "reviewed_inventory_sha256": "b6f3f52704f3f7ce4f93b752dc8399014072c287c28922a51c1083556e005813",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
