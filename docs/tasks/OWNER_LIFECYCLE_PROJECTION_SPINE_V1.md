@@ -25,6 +25,7 @@ managed_write_set:
 - src/solana_alpha_lab/factory/application.py
 - scripts/show_owner_lifecycle_projection.py
 - tests/test_owner_lifecycle_projection_spine_v1.py
+- configs/execution_domain_v1.json
 - configs/factory_semantic_operability_v1.yaml
 - configs/factory_v1_operational_readiness_v1.yaml
 - catalog/catalog_manifest.yaml

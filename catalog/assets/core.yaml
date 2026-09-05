@@ -35338,7 +35338,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md', repository_path: docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md}
-  integrity: {kind: sha256, sha256: 1de341ce1e8d5d011d3897a458ef8e5ea1f2ed1fb5e51273d69388e4747d71df}
+  integrity: {kind: sha256, sha256: 5b983fa9dc98bda8309e59dd963b758ca818d4c684edfec28ad61e280e743f18}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
