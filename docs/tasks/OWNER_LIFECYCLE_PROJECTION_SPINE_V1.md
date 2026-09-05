@@ -35,6 +35,7 @@ managed_write_set:
 - catalog/fixtures/semantic_route_gold_queries_v1.yaml
 - tests/test_factory_semantic_operability.py
 - tests/test_catalog_canonical_binding_discovery.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - docs/FACTORY_SEMANTIC_MAP.md
 - docs/OPERATOR_NAVIGATION.md
 - docs/PROJECT_MAP.md

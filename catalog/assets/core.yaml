@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: c55fc5d7f329350ceb4f632354fb1869fa998496461eb1903e9b34f476069eea}
+  integrity: {kind: sha256, sha256: c221595e67f4282c5aea86d487a993f3c77fb154f162911719afa3a7391b7a67}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -35338,7 +35338,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md', repository_path: docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md}
-  integrity: {kind: sha256, sha256: 5b983fa9dc98bda8309e59dd963b758ca818d4c684edfec28ad61e280e743f18}
+  integrity: {kind: sha256, sha256: d5b427ed2b36a39563183d58bb0eafbe2c582caaed7e0e2ba0f7688ef52fc17f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
