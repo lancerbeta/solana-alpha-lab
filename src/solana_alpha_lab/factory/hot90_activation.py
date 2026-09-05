@@ -117,7 +117,10 @@ def _validated(payload: Mapping[str, Any], *, source: str) -> dict[str, Any]:
         raise Hot90ActivationError(
             "HOT90_RUNTIME_INVALID" if source == SOURCE_RUNTIME else "HOT90_ACTIVATION_INVALID"
         )
-    stage = str(payload.get("activation_stage") or STAGE_CURRENT_SAFE)
+    raw_stage = payload.get("activation_stage")
+    if isinstance(raw_stage, str) is False or raw_stage == "":
+        raise Hot90ActivationError("HOT90_ACTIVATION_STAGE_INVALID")
+    stage = raw_stage
     if stage not in ALLOWED_STAGES:
         raise Hot90ActivationError("HOT90_ACTIVATION_STAGE_INVALID")
     compaction = payload.get("production_compaction_enabled") is True

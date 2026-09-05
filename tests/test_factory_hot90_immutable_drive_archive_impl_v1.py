@@ -386,6 +386,20 @@ class Hot90RuntimeBoundaryTests(unittest.TestCase):
                 load_hot90_activation(root)
         self.assertEqual(str(raised.exception), "HOT90_RUNTIME_INVALID")
 
+    def test_runtime_missing_stage_fails_closed_without_git_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(
+                tmp,
+                runtime={
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": False,
+                    "drive_writes_enabled": False,
+                },
+            )
+            with self.assertRaises(Hot90ActivationError) as raised:
+                load_hot90_activation(root)
+        self.assertEqual(str(raised.exception), "HOT90_RUNTIME_INVALID")
+
     def test_invalid_runtime_flag_combination_fails_closed_without_git_fallback(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = _isolated_root(

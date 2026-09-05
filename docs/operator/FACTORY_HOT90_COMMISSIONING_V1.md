@@ -78,7 +78,8 @@ uv run --locked --managed-python python -B scripts/hot90_activation.py --root /o
 
 ## Continuity migration (OPERATE, not this Git PR)
 
-Live host at repair merge is already `WRITE_ONLY_SHADOW`. Sequence:
+Owner-reported live host before this repair is `WRITE_ONLY_SHADOW`. This Git
+PR does not re-prove that host fact. Sequence:
 
 1. **Before** deploying the repair SHA, on the Factory host write validated
    runtime state with the current live semantics: `WRITE_ONLY_SHADOW`, Drive
@@ -124,4 +125,7 @@ Closed-day archive waits until the UTC day is actually closed.
 Filename, listing, mtime, size, or successful upload never authorize deletion.
 `canonical_panel_retention = IMMUTABLE` remains content immutability.
 `hot_local_residency_days = 90` is local residency, not a rewrite of IMMUTABLE.
-Tracked Git YAML is never current production stage.
+Tracked Git YAML is the safe default when no valid runtime file exists, not a
+log of the last operator SET. After this SHA, missing runtime means
+`CURRENT_SAFE` / SNAPPY, which is a live downgrade if the host was already
+`WRITE_ONLY_SHADOW`.
