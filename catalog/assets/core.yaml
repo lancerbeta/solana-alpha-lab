@@ -35360,7 +35360,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/owner_lifecycle_projection_v1.yaml', repository_path: configs/owner_lifecycle_projection_v1.yaml}
-  integrity: {kind: sha256, sha256: 48d402a1c3c1f7381bed0193dd449d4e5f1e69601047da4164e1996a3f53d4de}
+  integrity: {kind: sha256, sha256: 0c46bc14b91f2028c9e9416a8db697afc60f261974934415da2a43b6a6c82121}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35378,7 +35378,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/owner_lifecycle_projection_v1.schema.json', repository_path: catalog/schemas/owner_lifecycle_projection_v1.schema.json}
-  integrity: {kind: sha256, sha256: 90750b71072d9da1eff3b50b7be7c6b6549bb83895803fdda7009ab21899ff3b}
+  integrity: {kind: sha256, sha256: 294d2d196c05e87e082c88c8654ab0521983515f9b108d1a037d63391bc2f8d4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35395,7 +35395,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/owner_lifecycle_projection_spine_v1.md', repository_path: docs/contracts/owner_lifecycle_projection_spine_v1.md}
-  integrity: {kind: sha256, sha256: 0b89afdb308e5672169ff9b4d1b4c70c403cdc23a2f118cf9564c3de4ffcbe85}
+  integrity: {kind: sha256, sha256: 3308261e61e0ef84f5a562641045b607315c8d76848c595de2fbc3c6825b1769}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35413,7 +35413,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
-  integrity: {kind: sha256, sha256: 8dc468b4329fcee7095120c6c2540136e5a9e3d7609aa41808e12d161d106b1d}
+  integrity: {kind: sha256, sha256: 50db8e53f15a56f06fbbc2a6373c49a34e4ac4ed200378da1524b30d1678050c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35449,7 +35449,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_lifecycle_projection_spine_v1.py', repository_path: tests/test_owner_lifecycle_projection_spine_v1.py}
-  integrity: {kind: sha256, sha256: 932c5e0b6ac7a3fb0324dfc32648f23c72eae2a8959a77401d1bb534c9ad10fb}
+  integrity: {kind: sha256, sha256: e0341b5a1fb6e457f0d55fa7211966e8d85368ece9b2ce413b4787cbb1a408c8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}

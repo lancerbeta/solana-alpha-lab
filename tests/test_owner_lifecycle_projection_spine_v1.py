@@ -119,6 +119,7 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
         self.assertIs(self.contract["authority_granted"], False)
         self.assertFalse(self.contract["owns_source_truth"])
         self.assertFalse(self.contract["persist_projection"])
+        self.assertIs(self.contract["resolved_requires_unambiguous_endpoint_identity"], True)
         self.assertIn("INFERRED_BY_NAME", self.contract["forbidden_derivation_methods"])
         invalid = copy.deepcopy(self.projection)
         invalid["authority_granted"] = True
@@ -147,6 +148,7 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
         self.assertIn("LifecycleProjectionV1", text)
         self.assertIn("authority_granted = false", text)
         self.assertIn("TARGET_GAP", text)
+        self.assertIn("RESOLVED = endpoint identity unambiguous in current projection", text)
         self.assertIn("RESEARCH_LIFECYCLE_WORKBENCH_V1", text)
         self.assertIn("EMPTY envelope", text)
         self.assertIn("`INFERRED_BY_NAME`", text)
@@ -434,6 +436,75 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
         merged, gaps = _merge_entities([runtime, evidence])
         self.assertEqual(len(merged), 2)
         self.assertEqual({item["truth_plane"] for item in merged}, {"RUNTIME", "EVIDENCE"})
+        self.assertTrue(any(item["gap_code"] == "IDENTITY_CONFLICT" for item in gaps))
+
+    def test_ambiguous_cross_plane_endpoint_is_conflict_not_resolved(self) -> None:
+        from solana_alpha_lab.factory.lifecycle_projection import (
+            _entity,
+            _entity_id_planes,
+            _finalize_relations,
+            _merge_entities,
+            _relation,
+        )
+
+        runtime = _entity(
+            entity_id="JOB-SHARED-ID",
+            projection_class="EXPERIMENT",
+            native_kind="EXPERIMENT_RUN",
+            native_state="RUNNING",
+            source_owner="SRC-OPERATIONAL-STORE",
+            source_ref={"kind": "sqlite", "value": "ops"},
+            truth_plane="RUNTIME",
+            contributing_source_ids=["SRC-OPERATIONAL-STORE"],
+        )
+        evidence = _entity(
+            entity_id="JOB-SHARED-ID",
+            projection_class="EXPERIMENT",
+            native_kind="EXPERIMENT_RUN",
+            native_state="COMPLETED",
+            source_owner="SRC-RESEARCH-STORE",
+            source_ref={"kind": "research_store", "value": "injected"},
+            truth_plane="EVIDENCE",
+            contributing_source_ids=["SRC-RESEARCH-STORE"],
+            evidence_class="MODEL",
+        )
+        origin = _entity(
+            entity_id="EXP-UNAMBIGUOUS",
+            projection_class="EXPERIMENT",
+            native_kind="EXPERIMENT_SPEC",
+            native_state="READY",
+            source_owner="SRC-EXPERIMENT-SPEC",
+            source_ref={"kind": "git_path", "value": "configs/experiment_specs/unambiguous.yaml"},
+            truth_plane="GIT",
+            contributing_source_ids=["SRC-EXPERIMENT-SPEC"],
+        )
+        merged, gaps = _merge_entities([runtime, evidence, origin])
+        self.assertEqual(sum(1 for item in merged if item["entity_id"] == "JOB-SHARED-ID"), 2)
+        self.assertEqual(
+            {item["truth_plane"] for item in merged if item["entity_id"] == "JOB-SHARED-ID"},
+            {"RUNTIME", "EVIDENCE"},
+        )
+        self.assertTrue(any(item["gap_code"] == "IDENTITY_CONFLICT" for item in gaps))
+        preliminary = _relation(
+            relation_type="JOB_FOR_EXPERIMENT",
+            from_entity_id="EXP-UNAMBIGUOUS",
+            to_entity_id="JOB-SHARED-ID",
+            source_ref={"kind": "git_path", "value": "configs/experiment_specs/unambiguous.yaml"},
+            derivation_method="EXPLICIT_CONTRACT_KEY",
+            known_ids={"JOB-SHARED-ID", "EXP-UNAMBIGUOUS"},
+        )
+        self.assertEqual(preliminary["resolution"], "RESOLVED")
+        finalized, relation_gaps = _finalize_relations([preliminary], _entity_id_planes(merged))
+        self.assertEqual(len(finalized), 1)
+        self.assertNotEqual(finalized[0]["resolution"], "RESOLVED")
+        self.assertEqual(finalized[0]["resolution"], "CONFLICT")
+        self.assertTrue(
+            any(
+                item["gap_code"] == "IDENTITY_CONFLICT"
+                and item.get("relation_type") == "JOB_FOR_EXPERIMENT"
+                for item in relation_gaps
+            )
+        )
         self.assertTrue(any(item["gap_code"] == "IDENTITY_CONFLICT" for item in gaps))
 
     def test_execution_event_without_id_is_gap_not_synthetic(self) -> None:

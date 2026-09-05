@@ -58,3 +58,4 @@ consumers:
   - TRADING_OPERATIONS_WORKBENCH_V2
   - OWNER_ATTENTION_AND_CHANGE_FEED_V1
 future_moves_must_not_rebuild_joins_from_empty_registries: true
+resolved_requires_unambiguous_endpoint_identity: true

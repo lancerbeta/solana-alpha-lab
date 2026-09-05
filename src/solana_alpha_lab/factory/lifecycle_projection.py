@@ -1520,9 +1520,16 @@ def _merge_entities(entities: Iterable[dict[str, Any]]) -> tuple[list[dict[str, 
     return merged, gaps
 
 
+def _entity_id_planes(entities: Iterable[Mapping[str, Any]]) -> dict[str, set[str]]:
+    planes: dict[str, set[str]] = {}
+    for item in entities:
+        planes.setdefault(str(item["entity_id"]), set()).add(str(item["truth_plane"]))
+    return planes
+
+
 def _finalize_relations(
     relations: Iterable[dict[str, Any]],
-    known_ids: set[str],
+    id_planes: Mapping[str, set[str]],
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     finalized: list[dict[str, Any]] = []
     gaps: list[dict[str, Any]] = []
@@ -1543,15 +1550,17 @@ def _finalize_relations(
         if key in seen:
             continue
         seen.add(key)
-        if from_id not in known_ids and relation_type == "JOB_FOR_EXPERIMENT" and method == "EXPLICIT_CONTRACT_KEY":
-            # Spec-declared contract key is retained even when the job is absent.
-            resolution = "SOURCE_GAP" if to_id in known_ids else "SOURCE_GAP"
-        elif to_id in known_ids:
+        from_count = len(id_planes.get(from_id, ()))
+        to_count = len(id_planes.get(to_id, ()))
+        if from_count >= 2 or to_count >= 2:
+            # RESOLVED requires unambiguous endpoint identity; do not pick a plane.
+            resolution = "CONFLICT"
+        elif from_count == 0:
+            resolution = "SOURCE_GAP"
+        elif to_count == 1:
             resolution = "RESOLVED"
         else:
             resolution = "TARGET_GAP"
-        if from_id not in known_ids and relation_type != "JOB_FOR_EXPERIMENT":
-            resolution = "SOURCE_GAP"
         item = {
             "relation_type": relation_type,
             "from_entity_id": from_id,
@@ -1571,6 +1580,22 @@ def _finalize_relations(
                     source_ref=relation["source_ref"],
                     impact="explicit_edge_retained_without_synthetic_target",
                     next_safe_action="DO_NOT_SYNTHESIZE_TARGET",
+                )
+            )
+        elif resolution == "CONFLICT":
+            ambiguous = from_id if from_count >= 2 else to_id
+            gaps.append(
+                _gap(
+                    gap_code="IDENTITY_CONFLICT",
+                    affected_entity_id=ambiguous,
+                    relation_type=relation_type,
+                    reason=(
+                        "relation endpoint identity is ambiguous across truth planes; "
+                        "RESOLVED requires unambiguous identity in current projection"
+                    ),
+                    source_ref=relation["source_ref"],
+                    impact="IDENTITY_OR_STATE_CONFLICT",
+                    next_safe_action="DO_NOT_UNIFY_ACROSS_PLANES",
                 )
             )
     finalized.sort(
@@ -1660,8 +1685,9 @@ def build_lifecycle_projection(
 
     merged_entities, merge_gaps = _merge_entities(entities)
     gaps.extend(merge_gaps)
-    known_ids = {item["entity_id"] for item in merged_entities}
-    finalized_relations, relation_gaps = _finalize_relations(relations, known_ids)
+    id_planes = _entity_id_planes(merged_entities)
+    known_ids = set(id_planes)
+    finalized_relations, relation_gaps = _finalize_relations(relations, id_planes)
     gaps.extend(relation_gaps)
 
     # Drop spec-declared JOB_FOR_EXPERIMENT SOURCE_GAP when a runtime job already emitted the same edge.

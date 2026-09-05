@@ -135,7 +135,8 @@
         "forbidden_derivation_methods",
         "identity_forbidden",
         "consumers",
-        "future_moves_must_not_rebuild_joins_from_empty_registries"
+        "future_moves_must_not_rebuild_joins_from_empty_registries",
+        "resolved_requires_unambiguous_endpoint_identity"
       ],
       "properties": {
         "schema": {"const": "smial.owner-lifecycle-projection-contract"},
@@ -210,7 +211,8 @@
           "type": "array",
           "items": {"type": "string"}
         },
-        "future_moves_must_not_rebuild_joins_from_empty_registries": {"const": true}
+        "future_moves_must_not_rebuild_joins_from_empty_registries": {"const": true},
+        "resolved_requires_unambiguous_endpoint_identity": {"const": true}
       }
     },
     {

@@ -118,6 +118,15 @@ No `INFERRED_BY_NAME`, `INFERRED_BY_TIME`, or text similarity.
 
 `resolution`: `RESOLVED` | `TARGET_GAP` | `SOURCE_GAP` | `CONFLICT`
 
+```text
+RESOLVED = endpoint identity unambiguous in current projection
+```
+
+If `from_entity_id` or `to_entity_id` is materialized on more than one
+`truth_plane` without a proving identity contract, `resolution = CONFLICT`.
+Entities stay separate. Existing `IDENTITY_CONFLICT` remains visible.
+Do not pick a plane by timestamp, source order, or source priority.
+
 A relation to a stable ID whose target is not materialized remains visible
 with `TARGET_GAP`. Do not synthesize the target.
 

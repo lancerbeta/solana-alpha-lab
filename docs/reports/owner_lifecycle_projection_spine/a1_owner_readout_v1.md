@@ -94,7 +94,7 @@ Focused unittest green: lifecycle Cases A–E, schema, gaps, FactoryApplication 
 
 - Default CLI/API does not inject ResearchStore; research lineage is `NOT_PRESENT` until a caller passes an existing store.
 - `registries/global_trial_ledger.yaml` is not adapted (not a V1 source).
-- Relation `RESOLVED` matching is still by `entity_id` (plane-blind endpoints); cross-plane entity merge is not.
+- `RESOLVED` requires unambiguous endpoint identity in the current projection; a shared `entity_id` on multiple `truth_plane`s stays as separate entities plus `IDENTITY_CONFLICT` and `relation.resolution = CONFLICT`.
 - Move 1 consumption is a documented obligation, not a runtime lock.
 - Gold question «где каноническая карта lifecycle?» still routes here; the route purpose says derived index, not source truth.
 
