@@ -144,9 +144,19 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
         invalid = set(self.contract["invalid_codes"])
         self.assertIn("INVALID_GROUNDING_BOUNDARY", invalid)
         self.assertIn("INVALID_PACKET_BUDGET", invalid)
-        self.assertIn("INVALID_INSUFFICIENT_YIELD", invalid)
-        self.assertNotIn(self.contract["pass_code"], invalid)
-        self.assertNotIn(self.contract["kill_code"], invalid)
+        self.assertIn("INVALID_INSUFFICIENT_PREFIX", invalid)
+        self.assertEqual(
+            self.contract["control_terminals_permit_probe"],
+            ["NO_WORTHY_HYPOTHESIS", "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED"],
+        )
+        self.assertEqual(self.contract["time"]["decision_t"], "LATEST_DECLARED_X_POINT_DUE")
+        self.assertEqual(self.contract["time"]["y_role_points_in_x"], "forbidden")
+        self.assertEqual(self.contract["time"]["min_motif_steps"], 2)
+        self.assertIs(self.contract["control_run_required_first"], True)
+        self.assertIs(self.contract["one_registered_trial"], True)
+        self.assertEqual(self.contract["after_pass_does_not_mean"], "alpha_exists")
+        self.assertEqual(len(self.contract["pass_requires_all"]), 5)
+        self.assertGreaterEqual(len(self.contract["kill_if_any"]), 5)
 
     def test_no_projection_implementation_landed(self) -> None:
         src = ROOT / "src"
@@ -186,10 +196,11 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
             bindings=self.bindings,
         )
         root_ids = [item["asset_id"] for item in resolved["root_assets"]]
-        self.assertIn(
+        self.assertNotIn(
             "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",
             root_ids,
         )
+        self.assertEqual(resolved["forge_visibility"], "EXCLUDE")
         record = self.snapshot.assets[
             "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001"
         ]
@@ -197,7 +208,10 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
             record["location"]["repository_path"],
             "docs/contracts/normalized_trajectory_representation_probe_v1.md",
         )
-        self.assertEqual(resolved["forge_visibility"], "EXCLUDE")
+        self.assertEqual(
+            record["status"],
+            "ACCEPTED_DIRECTION_NOT_IMPLEMENTED",
+        )
 
 
 if __name__ == "__main__":

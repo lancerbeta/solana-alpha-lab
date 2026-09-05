@@ -1500,17 +1500,17 @@
     {
       "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
-      "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
-    },
-    {
-      "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",
-      "relation": "depends_on",
       "target_asset_id": "CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001"
     },
     {
       "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TOKENS-V2-TYPED-PROJECTION-001"
     },
     {
       "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",

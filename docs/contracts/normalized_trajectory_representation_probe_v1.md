@@ -71,6 +71,18 @@ forbidden_probe1_fields:
   - mcap
 time:
   landmark_source: ObservationSchedule
+  preferred_schedule_id: OBS-ALWAYS-ON-TOKENS-V2-LIFECYCLE-21D-001
+  imported_schedule_identity: use_exact_schedule_bound_to_imported_corpus
+  x_due_offset_seconds_expected: [300, 600, 900]
+  if_imported_schedule_x_offsets_differ: use_imported_declared_x_offsets_do_not_invent_after_seeing_paths
+  decision_t: LATEST_DECLARED_X_POINT_DUE
+  decision_t_is_not_forge_wall_clock: true
+  delay_after_ready_to_lengthen_motif: forbidden
+  y_role_points_in_x: forbidden
+  prefix_landmarks: declared_x_points_with_due_offset_le_decision_t_and_pit_clock_le_T
+  min_motif_steps: 2
+  min_x_landmarks_required: 3
+  schematic_motif_example_length: not_a_requirement
   preserve_due_offset_seconds: true
   equal_spacing_fiction: forbidden
   interpolation: forbidden
@@ -110,12 +122,28 @@ trigger_all_required:
   - readiness_in_READY_VALID_or_READY_VALID_WITH_COVERAGE_LIMITATION
   - yield_eligible_ge_min_usable_yield_eligible
   - one_control_forge_run_on_unchanged_current_representation_same_evidence_epoch
-  - control_terminal_is_no_worthy_or_banal_closed_duplicative_or_credible_representation_gap
+  - control_terminal_permits_probe
   - not_case_c_observability
-  - not_case_a_currently_grounded
+  - not_case_a
+control_terminals_permit_probe:
+  - NO_WORTHY_HYPOTHESIS
+  - KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED
 case_a:
   probe_trigger: false
   next: CHEAPEST_MARKET_FALSIFIER
+  if_control_critic_terminal_in:
+    - PASS_FAST_LANE_READY
+    - PASS_CHANGE_LANE_REQUIRED
+case_c:
+  code: INVALID_CASE_C_OBSERVABILITY
+  if_any:
+    - control_forge_context_or_preflight_cannot_be_built
+    - control_critic_terminal_in_KILL_UNBOUND_EVIDENCE_or_KILL_DATA_INFEASIBLE
+    - imported_corpus_absent_from_current_forge_packet
+invalid_coverage_broken_if:
+  - discovery_coverage_class_is_GAP_CONFIRMED
+  - readiness_not_in_READY_VALID_or_READY_VALID_WITH_COVERAGE_LIMITATION
+unknown_or_suspected_coverage_may_use: READY_VALID_WITH_COVERAGE_LIMITATION
 control:
   representation: unchanged_current_forge_packet
   same: [evidence_epoch, corpus, prior_work_memory, critic, search_budget, prompt_family, candidate_count_constraints]
@@ -147,9 +175,25 @@ secondary_only:
   - structural_signature_diversity
   - candidate_count
 pass_code: NORMALIZED_TRAJECTORY_REPRESENTATION_PROBE_PASS
+pass_requires_all:
+  - at_least_one_challenger_candidate_unavailable_to_control
+  - differs_from_closed_or_duplicate_families_on_ge_2_frozen_axes
+  - grounded_in_current_pit_evidence_without_new_provider_or_data_platform
+  - survives_independent_critic_without_duplicate_or_reformulation_kill
+  - has_concrete_cheap_falsifier
+pass_means: trajectory_representation_expanded_useful_hypothesis_search_space_this_epoch
 kill_code: NORMALIZED_TRAJECTORY_REPRESENTATION_PROBE_KILL
+kill_if_any:
+  - zero_materially_new_grounded_mechanisms
+  - only_wording_or_signature_variants
+  - only_restatements_of_closed_families
+  - useful_effect_requires_intra_interval_data_not_collected
+  - challenger_mainly_increases_unresolved_requirements
+  - useful_effect_depends_on_second_unregistered_representation_variant
+  - result_explained_by_different_budget_evidence_or_model
 invalid_codes:
   - INVALID_INSUFFICIENT_YIELD
+  - INVALID_INSUFFICIENT_PREFIX
   - INVALID_COVERAGE_BROKEN
   - INVALID_PACKET_BUDGET
   - INVALID_GROUNDING_BOUNDARY
@@ -157,6 +201,9 @@ invalid_codes:
   - INVALID_CONTROL_NOT_RUN
   - INVALID_TRIGGER_NOT_MET
   - INVALID_CASE_C_OBSERVABILITY
+invalid_insufficient_prefix_if:
+  - motif_steps_lt_min_motif_steps
+  - imported_schedule_declared_x_points_lt_min_x_landmarks_required
 after_kill: RETURN_TO_PROJECT_CHAT_NO_AUTO_TRAJECTORY_ENGINE
 after_pass_does_not_mean: alpha_exists
 ---
@@ -184,10 +231,20 @@ Not automatically after import. All trigger conjuncts in the front matter must b
 including one CONTROL `/hypothesis-forge` on the **unchanged current representation** for
 that exact evidence epoch.
 
-If CONTROL already yields a credible `CURRENTLY_GROUNDED` mechanism (CASE A):
+If CONTROL `critic_terminal` is `PASS_FAST_LANE_READY` or `PASS_CHANGE_LANE_REQUIRED` (CASE A):
 `PROBE_TRIGGER=FALSE`, `NEXT=CHEAPEST_MARKET_FALSIFIER`.
 
-CASE C (observability failure) is `INVALID_CASE_C_OBSERVABILITY`, not KILL.
+CONTROL permits the probe only when `critic_terminal` is `NO_WORTHY_HYPOTHESIS` or
+`KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. Do not invent a post-hoc "representation gap"
+terminal after seeing candidates.
+
+CASE C is `INVALID_CASE_C_OBSERVABILITY` when CONTROL cannot build FORGE_CONTEXT / preflight
+fails, the imported corpus is absent from the current packet, or CONTROL ends
+`KILL_UNBOUND_EVIDENCE` / `KILL_DATA_INFEASIBLE`. That is not KILL.
+
+`INVALID_COVERAGE_BROKEN` only if `discovery_coverage_class=GAP_CONFIRMED` or readiness is
+outside the two allowed READY states. `DISCOVERY_COVERAGE_UNKNOWN` / `GAP_SUSPECTED` may
+remain `READY_VALID_WITH_COVERAGE_LIMITATION` as already allowed by live-cohort seal.
 
 ## Fields and volume channel
 
@@ -203,10 +260,21 @@ Holders, mcap, net buyers, missingness motifs, quotes and execution are not Prob
 
 ## Time, PIT, normalization, motif
 
-Use ObservationSchedule landmarks with `first_reliable_available_at <= T`. Preserve
-`due_offset_seconds`. No equal-spacing fiction, interpolation, or intra-interval shape.
+Bind landmarks to the imported corpus ObservationSchedule. Preferred campaign identity is
+`OBS-ALWAYS-ON-TOKENS-V2-LIFECYCLE-21D-001` with declared X due offsets 300, 600, 900
+seconds. If the imported schedule's declared X set differs, use that declared set. Do not
+invent extra landmarks after seeing paths.
 
-If the PIT clock is missing, emit `M`. Do not substitute event/request time.
+Probe 1 decision `T` is the **latest declared X-point due**, not Forge wall-clock and not a
+later Y. Do not wait after READY to lengthen motifs. Y-role points never enter X, even if
+already available. Prefix = declared X-points with `due_offset_seconds <= T` and
+`first_reliable_available_at <= T`.
+
+Need ≥3 X landmarks and ≥2 adjacent motif steps. Otherwise `INVALID_INSUFFICIENT_PREFIX`.
+The compact `PRICE: U-U-F-D` sketch is schema-only; it does not freeze motif length.
+
+Preserve `due_offset_seconds`. No equal-spacing fiction, interpolation, or intra-interval
+shape. If the PIT clock is missing, emit `M`. Do not substitute event/request time.
 
 Own-history normalization is `log(value_t / value_first_observed)` only for strictly
 positive finite observed values. No future point in the denominator.
@@ -241,16 +309,11 @@ Material novelty requires difference from CONTROL **and** closed/duplicative fam
 ≥2 frozen Forge axes. A changed `structural_signature_v1_sha256` is not enough if the
 semantic delta is trivial. Reuse existing HFIC machinery; do not add a novelty scorer.
 
-`NORMALIZED_TRAJECTORY_REPRESENTATION_PROBE_PASS` only if at least one challenger candidate
-is unavailable to CONTROL, differs on ≥2 axes from closed families, is grounded in current
-PIT evidence without a new provider/data-platform capability, survives independent Critic
-without duplicate/reformulation kill, and has a concrete cheap falsifier. PASS means the
-search space expanded. It does not mean alpha exists.
+`NORMALIZED_TRAJECTORY_REPRESENTATION_PROBE_PASS` only if every `pass_requires_all` conjunct
+in the front matter holds. PASS means the search space expanded. It does not mean alpha
+exists (`after_pass_does_not_mean: alpha_exists`).
 
-`NORMALIZED_TRAJECTORY_REPRESENTATION_PROBE_KILL` if zero such mechanisms, only wording or
-signature variants, only closed-family restatements, the useful effect needs intra-interval
-data not collected, unresolved requirements mainly increase, a second unregistered variant
-is required, or the result is explained by budget/evidence/model mismatch.
+`NORMALIZED_TRAJECTORY_REPRESENTATION_PROBE_KILL` if any `kill_if_any` conjunct holds.
 
 INVALID is not KILL. Use the front-matter `invalid_codes`. After KILL, return to Project
 Chat; do not automatically build a more sophisticated trajectory engine.

@@ -69,12 +69,11 @@ routes:
     root_asset_ids:
       - DOC-HYPOTHESIS-FORGE-OPERATOR-001
       - SKILL-HYPOTHESIS-FORGE-001
-      - CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001
     query_recipe_ids: []
     status_plane: CAPABILITY
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: EXCLUDE
-    related_route_ids: [SEM-PRIOR-WORK, SEM-EXPERIMENT-CAPABILITIES, SEM-LIVE-EVIDENCE-TO-FORGE]
+    related_route_ids: [SEM-PRIOR-WORK, SEM-EXPERIMENT-CAPABILITIES]
 
   - semantic_route_id: SEM-PRIOR-WORK
     purpose: Current prior-work and negative-result discovery via HFIC/Fast Lane recipes and research memory roots.
@@ -224,7 +223,7 @@ routes:
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: INCLUDE
-    related_route_ids: [SEM-PRIOR-WORK, SEM-LIVE-COLLECTION, SEM-HYPOTHESIS-FORGE]
+    related_route_ids: [SEM-PRIOR-WORK, SEM-LIVE-COLLECTION]
 
   - semantic_route_id: SEM-REMOTE-OPS-RECOVERY
     purpose: Factory remote host locator and remote-operations config; health and backup freshness require gated readback.
