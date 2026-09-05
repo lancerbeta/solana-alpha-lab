@@ -82,8 +82,15 @@ RESEARCH_COPY = {
         "Запись решения на этой машине недоступна. Карточка остаётся "
         "только для чтения."
     ),
+    "write_off": "запись недоступна",
     "write_available": "запись доступна",
     "record_decision": "Зафиксировать решение",
+    "decision_recorded": "Решение записано и подтверждено readback.",
+    "stale_next": "Форма ниже уже со свежим снимком — повторите решение.",
+    "writer_busy_next": "Чтение карточки живо. Подождите и нажмите снова.",
+    "unverified_next": "Не нажимайте повторно, пока история не покажет событие.",
+    "current_object": "текущий объект",
+    "trace": "TRACE",
     "rationale": "Пояснение (по-русски)",
     "promote_confirm": (
         "Понимаю: PROMOTE — только научное решение. StrategyVersion, "
@@ -151,14 +158,16 @@ FIELD_LABELS = {
 
 OWNER_ERRORS = {
     "STALE_EVIDENCE_SNAPSHOT": (
-        "Снимок доказательств устарел. Решение не записано."
+        "Снимок доказательств устарел. Решение не записано. "
+        "Форма ниже уже со свежим снимком — повторите."
     ),
     "WRITER_BUSY": (
-        "ResearchStore сейчас занят другим писателем. Решение не записано."
+        "ResearchStore сейчас занят другим писателем. Решение не записано. "
+        "Чтение карточки живо. Подождите и нажмите снова."
     ),
     "DECISION_WRITE_UNVERIFIED": (
         "Запись могла пройти, но readback не подтвердил событие. "
-        "Повтор не выполняется."
+        "Повтор не выполняется. Смотрите историю, не нажимайте снова."
     ),
     "PROMOTE_BLOCKED": "Научный PROMOTE закрыт: не хватает обязательных доказательств.",
     "PROMOTE_BOUNDARY_CONFIRMATION_REQUIRED": (
@@ -167,6 +176,10 @@ OWNER_ERRORS = {
     ),
     "WRITE_UNAVAILABLE": "Запись решения на этой машине недоступна.",
     "DECISION_KIND_REJECTED": "Этот вид решения здесь не предлагается.",
+    "FILTER_REJECTED": "Фильтр отклонён. Сбросьте поиск или выберите значение из списка.",
+    "QUERY_TOO_LONG": "Слишком длинный поиск. Укоротите запрос.",
+    "LIMIT_REJECTED": "Недопустимый limit.",
+    "LOCATOR_AMBIGUOUS": "Локатор неоднозначен. Нужны entity_id, плоскость и native_kind.",
     "LOCATOR_INCOMPLETE": "Неполный локатор объекта.",
     "LOCATOR_REJECTED": "Локатор отклонён.",
     "LOCATOR_NOT_IN_PROJECTION": "Объект не найден в текущей проекции.",
@@ -197,6 +210,8 @@ FORBIDDEN_RESEARCH_FIXED_LABELS = (
     "<th>kind</th>",
     "<th>title</th>",
     "<p class=\"empty\">NONE</p>",
+    "CURRENT OBJECT",
+    "Git definitions",
 )
 
 

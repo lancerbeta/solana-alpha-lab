@@ -58,7 +58,8 @@ Normal GET `/research` must cause:
 0 network calls except the local HTTP response
 ```
 
-No mutation buttons on the universe/detail workflow.
+GET `/research` remains non-mutating. Experiment dossier may show
+bounded `RESEARCH_DECISION` controls on `CONTROL_SURFACE` only.
 
 ## 3. Overview semantics
 

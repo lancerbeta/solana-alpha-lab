@@ -209,16 +209,36 @@ def _obligation(
     }
 
 
-def _first_payload_value(cards: Sequence[Mapping[str, Any]], records: Sequence[Any], *keys: str) -> Any:
+ROBUSTNESS_UNKNOWN_SENTINELS = frozenset({"NOT_TESTED", "UNTESTED", "UNKNOWN"})
+
+
+def _collect_payload_values(
+    cards: Sequence[Mapping[str, Any]],
+    records: Sequence[Any],
+    *keys: str,
+    allow_empty_list: bool = False,
+) -> list[Any]:
     by_id = {getattr(record, "record_id", None): record for record in records}
+    found: list[Any] = []
     for card in cards:
         record = by_id.get(card.get("record_id"))
         payload = _payload(record) if record is not None else {}
         for key in keys:
-            value = payload.get(key)
-            if value not in (None, "", [], {}):
-                return value
-    return None
+            if key not in payload:
+                continue
+            value = payload[key]
+            if value is None or value == "":
+                continue
+            if value == {} or (value == [] and not allow_empty_list):
+                continue
+            found.append(value)
+            break
+    return found
+
+
+def _first_payload_value(cards: Sequence[Mapping[str, Any]], records: Sequence[Any], *keys: str) -> Any:
+    values = _collect_payload_values(cards, records, *keys)
+    return values[0] if values else None
 
 
 def _status_from_values(
@@ -226,7 +246,7 @@ def _status_from_values(
     source: str = "ResearchStore",
     present_note: str | None = None,
 ) -> tuple[str, str | None]:
-    found = [item for item in values if item not in (None, "", [], {})]
+    found = [item for item in values if item is not None and item != ""]
     if not found:
         return "MISSING", None
     texts = {canonical_dumps(item) for item in found}
@@ -240,7 +260,11 @@ def _holdout_status(
     direct: Sequence[Mapping[str, Any]],
     records: Sequence[Any],
 ) -> dict[str, Any]:
-    ids = _first_payload_value(direct, records, "holdout_consumption_ids")
+    id_lists = _collect_payload_values(
+        direct, records, "holdout_consumption_ids", allow_empty_list=True
+    )
+    ids_status, ids_note = _status_from_values(*id_lists)
+    ids = id_lists[0] if id_lists else None
     applicable = _first_payload_value(direct, records, "holdout_applicable")
     if applicable is False or str(applicable).upper() in {"FALSE", "NO", "NOT_APPLICABLE"}:
         return _obligation(
@@ -249,6 +273,14 @@ def _holdout_status(
             source="ResearchStore",
             note="явная семантика источника: holdout не открывался",
             values={"holdout_applicable": applicable, "holdout_consumption_ids": ids},
+        )
+    if ids_status == "CONFLICT":
+        return _obligation(
+            "HOLDOUT",
+            "CONFLICT",
+            source="ResearchStore",
+            note=ids_note,
+            values={"holdout_consumption_ids": id_lists},
         )
     if isinstance(ids, list) and ids:
         return _obligation(
@@ -299,34 +331,50 @@ def _build_obligations(
         ]
     store_records = records or ()
     falsifier = _text(spec.get("falsifier"))
-    pit_cutoff = _first_payload_value(
+    pit_cutoffs = _collect_payload_values(
         direct, store_records, "availability_cutoff", "data_cutoff", "effective_cutoff"
     )
-    pit_available = _first_payload_value(
+    pit_available_values = _collect_payload_values(
         direct, store_records, "first_reliable_available_at"
     )
     pit_prov = _first_payload_value(direct, store_records, "availability_provenance")
-    observed_n = _first_payload_value(direct, store_records, "observed_n", "n", "population_n")
-    missing_n = _first_payload_value(
+    n_values = _collect_payload_values(
+        direct, store_records, "observed_n", "n", "population_n"
+    )
+    missing_values = _collect_payload_values(
         direct, store_records, "missing_count", "excluded_count", "missing_n"
     )
-    survival = _first_payload_value(
+    survival_values = _collect_payload_values(
         direct, store_records, "survival_visible", "survival_n", "survival_visibility"
     )
-    entry = _first_payload_value(
+    entry_values = _collect_payload_values(
         direct, store_records, "entry_artifact_id", "entry_executability"
     )
-    exit_ = _first_payload_value(
+    exit_values = _collect_payload_values(
         direct, store_records, "exit_artifact_id", "exit_executability"
     )
-    cost = _first_payload_value(
+    cost_values = _collect_payload_values(
         direct, store_records, "cost_assumptions_artifact_id", "cost_evidence_id"
     )
-    result = _first_payload_value(
+    result_values = _collect_payload_values(
         direct, store_records, "outcome", "result", "scientific_terminal"
     )
-    uncertainty = _first_payload_value(direct, store_records, "uncertainty", "limitation_codes")
-    robustness = _first_payload_value(direct, store_records, "robustness")
+    uncertainty_values = _collect_payload_values(
+        direct, store_records, "uncertainty", "limitation_codes"
+    )
+    robustness_values = _collect_payload_values(direct, store_records, "robustness")
+    class_values = _collect_payload_values(direct, store_records, "evidence_class")
+    pit_cutoff = pit_cutoffs[0] if pit_cutoffs else None
+    pit_available = pit_available_values[0] if pit_available_values else None
+    observed_n = n_values[0] if n_values else None
+    missing_n = missing_values[0] if missing_values else None
+    survival = survival_values[0] if survival_values else None
+    entry = entry_values[0] if entry_values else None
+    exit_ = exit_values[0] if exit_values else None
+    cost = cost_values[0] if cost_values else None
+    result = result_values[0] if result_values else None
+    uncertainty = uncertainty_values[0] if uncertainty_values else None
+    robustness = robustness_values[0] if robustness_values else None
     evidence_class = entity.get("evidence_class")
     if evidence_class in (None, "", "NOT_APPLICABLE") and not direct:
         evidence_status, evidence_note = "MISSING", "нет прямых evidence-записей"
@@ -337,22 +385,38 @@ def _build_obligations(
             )
     else:
         evidence_status, evidence_note = _status_from_values(
-            _first_payload_value(direct, store_records, "evidence_class") or evidence_class
+            *(class_values or [evidence_class])
         )
-    pit_status = "PRESENT" if pit_cutoff and pit_available else (
-        "MISSING" if not direct else "UNKNOWN"
-    )
-    if pit_cutoff and not pit_available:
+    pit_status, pit_note = _status_from_values(*(pit_cutoffs + pit_available_values))
+    if pit_status == "PRESENT" and not (pit_cutoff and pit_available):
         pit_status = "UNKNOWN"
-    missing_status = "MISSING" if missing_n is None else "PRESENT"
-    if missing_n == 0 or missing_n == "0":
-        missing_status = "PRESENT"
+        pit_note = "cutoff или first_reliable_available_at неполны"
+    if pit_status == "MISSING" and direct:
+        pit_status = "UNKNOWN"
+    n_status, n_note = _status_from_values(*n_values)
+    if n_status == "MISSING" and not direct:
+        n_status = "MISSING"
+    elif n_status == "MISSING":
+        n_status = "UNKNOWN"
+    missing_status, missing_note = _status_from_values(*missing_values)
+    if missing_status == "MISSING" and not direct:
+        missing_status = "MISSING"
+    survival_status, survival_note = _status_from_values(*survival_values)
+    entry_status, entry_note = _status_from_values(*entry_values)
+    exit_status, exit_note = _status_from_values(*exit_values)
+    cost_status, cost_note = _status_from_values(*cost_values)
+    result_status, result_note = _status_from_values(*result_values)
+    uncertainty_status, uncertainty_note = _status_from_values(*uncertainty_values)
+    robustness_status, robustness_note = _status_from_values(*robustness_values)
+    if robustness_status == "PRESENT" and any(
+        str(item).upper() in ROBUSTNESS_UNKNOWN_SENTINELS for item in robustness_values
+    ):
+        robustness_status = "UNKNOWN"
+        robustness_note = "NOT_TESTED не равно выполненному robustness"
     population = _text(spec.get("population"))
-    if observed_n is None:
-        pop_status = "MISSING"
-        pop_note = "имя популяции не заменяет N" if population else None
-    else:
-        pop_status, pop_note = "PRESENT", None
+    pop_status, pop_note = n_status, n_note
+    if pop_status == "MISSING" and population:
+        pop_note = "имя популяции не заменяет N"
     holdout = _holdout_status(spec, direct, store_records)
     matrix = [
         _obligation(
@@ -365,7 +429,9 @@ def _build_obligations(
             "PIT_AVAILABILITY",
             pit_status,
             source="ResearchStore" if direct else "NONE",
-            note="успешный run не доказывает PIT" if pit_status != "PRESENT" else None,
+            note=pit_note or (
+                "успешный run не доказывает PIT" if pit_status != "PRESENT" else None
+            ),
             values={
                 "availability_cutoff": pit_cutoff,
                 "first_reliable_available_at": pit_available,
@@ -383,51 +449,57 @@ def _build_obligations(
             "MISSINGNESS",
             missing_status,
             source="ResearchStore",
-            note="отсутствие missingness не равно нулю",
+            note=missing_note or "отсутствие missingness не равно нулю",
             values={"missing_count": missing_n},
         ),
         _obligation(
             "SURVIVAL",
-            "PRESENT" if survival not in (None, "") else "MISSING",
+            survival_status,
             source="ResearchStore",
+            note=survival_note,
             values={"survival": survival},
         ),
         holdout,
         _obligation(
             "ENTRY_EXECUTABILITY",
-            "PRESENT" if entry not in (None, "") else "MISSING",
+            entry_status,
             source="ResearchStore",
+            note=entry_note,
             values={"entry": entry},
         ),
         _obligation(
             "EXIT_EXECUTABILITY",
-            "PRESENT" if exit_ not in (None, "") else "MISSING",
+            exit_status,
             source="ResearchStore",
+            note=exit_note,
             values={"exit": exit_},
         ),
         _obligation(
             "COST_EVIDENCE",
-            "PRESENT" if cost not in (None, "") else "MISSING",
+            cost_status,
             source="ResearchStore",
-            note="нарратив про fees не заменяет машинное доказательство",
+            note=cost_note or "нарратив про fees не заменяет машинное доказательство",
             values={"cost": cost},
         ),
         _obligation(
             "RESULT",
-            "PRESENT" if result not in (None, "") else "MISSING",
+            result_status,
             source="ResearchStore",
+            note=result_note,
             values={"result": result},
         ),
         _obligation(
             "UNCERTAINTY",
-            "PRESENT" if uncertainty not in (None, "") else "MISSING",
+            uncertainty_status,
             source="ResearchStore",
+            note=uncertainty_note,
             values={"uncertainty": uncertainty},
         ),
         _obligation(
             "ROBUSTNESS",
-            "PRESENT" if robustness not in (None, "") else "MISSING",
+            robustness_status,
             source="ResearchStore",
+            note=robustness_note,
             values={"robustness": robustness},
         ),
         _obligation(
@@ -435,7 +507,7 @@ def _build_obligations(
             evidence_status,
             source="LifecycleProjection/ResearchStore",
             note=evidence_note,
-            values={"evidence_class": _first_payload_value(direct, store_records, "evidence_class") or evidence_class},
+            values={"evidence_class": (class_values[0] if class_values else evidence_class)},
         ),
     ]
     return matrix
@@ -480,7 +552,7 @@ def _evidence_state(guard: Mapping[str, Any], obligations: Sequence[Mapping[str,
         return "CONFLICT"
     if not guard.get("allowed"):
         return "BLOCKED"
-    return "SATISFIED"
+    return "GUARD_OPEN"
 
 
 def _related_from_projection(
@@ -574,7 +646,7 @@ def compose_experiment_dossier(
             direct.append(card)
         else:
             related.append(card)
-        if _kind(record) == "DECISION_EVENT":
+        if _kind(record) == "DECISION_EVENT" and relation == "DIRECT":
             payload = _payload(record)
             history.append(
                 {
@@ -583,8 +655,8 @@ def compose_experiment_dossier(
                     "evidence_snapshot_sha256": payload.get("evidence_snapshot_sha256"),
                     "rationale": payload.get("rationale"),
                     "effective_at": str(getattr(record, "effective_at", "") or ""),
-                    "relation": relation,
-                    "creates_strategy_version": payload.get("creates_strategy_version", False),
+                    "relation": "DIRECT",
+                    "creates_strategy_version": payload.get("creates_strategy_version"),
                 }
             )
     related.extend(

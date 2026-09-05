@@ -531,6 +531,7 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
         + html.escape(decision_kind_label(str(item.get("decision_kind") or "")))
         + f" <span class=\"mono\">{html.escape(str(item.get('decision_kind') or ''))}</span> "
         + f"<span class=\"mono\">{html.escape(str(item.get('record_id') or ''))}</span> "
+        + f"<span class=\"mono\">{html.escape(str(item.get('relation') or 'DIRECT'))}</span> "
         + html.escape(str(item.get("rationale") or ""))
         + "</li>"
         for item in dossier.get("decision_history") or []
@@ -541,7 +542,27 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
     locator = dossier.get("locator") if isinstance(dossier.get("locator"), dict) else {}
     guard = dossier.get("science_guard") if isinstance(dossier.get("science_guard"), dict) else {}
     blocked = ", ".join(str(code) for code in guard.get("blocked_codes") or [])
-    controls = (
+    blocked_banner = (
+        f"<p class=\"semantic-warning\">{html.escape(research_copy('promote_blocked'))} "
+        f"<span class=\"mono\">{html.escape(blocked)}</span></p>"
+        if not guard.get("allowed")
+        else ""
+    )
+    write_status = (
+        f"<p>{html.escape(research_copy('read_available' if write.get('read') == 'AVAILABLE' else 'not_available'))} "
+        f"/ {html.escape(research_copy('write_available' if writable else 'write_off'))} "
+        f"<span class=\"mono\">{html.escape(str(write.get('read') or 'UNKNOWN'))}/"
+        f"{html.escape(str(write.get('write') or 'UNKNOWN'))}</span></p>"
+    )
+    buttons = []
+    for kind in dossier.get("owner_decision_kinds") or []:
+        disabled = " disabled" if kind == "PROMOTE" and not guard.get("allowed") else ""
+        buttons.append(
+            f'<button type="submit" name="decision_kind" value="{html.escape(kind)}"{disabled}>'
+            f"{html.escape(decision_kind_label(kind))} "
+            f"<span class=\"mono\">{html.escape(kind)}</span></button>"
+        )
+    controls = write_status + blocked_banner + (
         f"<p class=\"semantic-unknown\">{html.escape(research_copy('write_unavailable'))}</p>"
         if not writable
         else (
@@ -563,18 +584,7 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
             "<label><input type=\"checkbox\" name=\"promote_scientific_only\" value=\"1\"> "
             + html.escape(research_copy("promote_confirm"))
             + "</label></p>"
-            + (
-                f"<p class=\"semantic-warning\">{html.escape(research_copy('promote_blocked'))} "
-                f"<span class=\"mono\">{html.escape(blocked)}</span></p>"
-                if not guard.get("allowed")
-                else ""
-            )
-            + "".join(
-                f'<button type="submit" name="decision_kind" value="{html.escape(kind)}">'
-                f"{html.escape(decision_kind_label(kind))} "
-                f"<span class=\"mono\">{html.escape(kind)}</span></button>"
-                for kind in dossier.get("owner_decision_kinds") or []
-            )
+            + "".join(buttons)
             + "</form>"
         )
     )
@@ -696,7 +706,7 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
         + "<div class=\"computational-field\" data-mode=\"COMPUTATIONAL_FIELD\">"
         + "<p class=\"trace-label\">TRACE</p>"
         + _lineage_list(list(lineage.get("inbound") or []), research_copy("inbound"))
-        + "<p class=\"current\">CURRENT OBJECT</p>"
+        + f"<p class=\"current\">{html.escape(research_copy('current_object'))}</p>"
         + _lineage_list(list(lineage.get("outbound") or []), research_copy("outbound"))
         + "</div>"
         + f"<h3>{html.escape(research_copy('gaps_unknown'))}</h3><ul>"
@@ -753,6 +763,7 @@ def _page(
     surface: str,
     copy_blocks: list[dict[str, str]] | None = None,
     error: str = "",
+    notice: str = "",
     research_html: str | None = None,
     visual_css: str = "",
     visual_consumed: bool = False,
@@ -760,7 +771,9 @@ def _page(
     cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
     packet = cockpit.get("packet") if isinstance(cockpit.get("packet"), dict) else {}
     runtime = model.get("runtime") if isinstance(model.get("runtime"), dict) else {}
-    notice = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
+    notice_html = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
+    if notice:
+        notice_html += f"<p class=\"notice\">{html.escape(notice)}</p>"
     buttons = "".join(
         f'<button type="submit" name="command" value="{command}">{command}</button>'
         for command in COMMANDS
@@ -860,7 +873,7 @@ td, th {{ border-bottom: 1px solid var(--border-hairline, #333); padding: 0.35re
 <main>
 <h1>Factory v1 — локальный срез владельца</h1>
 <p>Проекция. UI не владеет научной истиной и не открывает SQLite. START без точной owner phrase не читает ключ и не вызывает Jupiter. git_archaeology_required={html.escape(archaeology)}. Operational-ready milestone is not claimed.</p>
-{notice}
+{notice_html}
 {_copy_sections(copy_blocks or []) if surface == "HOME" else ""}
 {sections.get(surface) or ""}
 {("<form method=\"post\" action=\"/\">" + buttons + "</form>") if surface == "HOME" else ""}
@@ -905,6 +918,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             self,
             surface: str,
             error: str = "",
+            notice: str = "",
             query: dict[str, list[str]] | None = None,
         ) -> None:
             if surface == "RESEARCH":
@@ -918,6 +932,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                 surface=surface,
                 copy_blocks=owner_copy_blocks(app) if surface == "HOME" else [],
                 error=error,
+                notice=notice,
                 research_html=research_html,
                 visual_css=visual_os_css(app.root),
                 visual_consumed=visual_os_consumed(app.root),
@@ -1020,7 +1035,11 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                             )[0],
                         }
                     )
-                    self._render("RESEARCH", query=query)
+                    self._render(
+                        "RESEARCH",
+                        query=query,
+                        notice=research_copy("decision_recorded"),
+                    )
                     return
                 raise ApplicationError("COMMAND_PATH_INVALID")
             except ApplicationError as exc:

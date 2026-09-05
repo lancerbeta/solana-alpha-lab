@@ -323,7 +323,7 @@ routes:
     related_route_ids: [SEM-PRODUCT-STATE, SEM-AUTHORITY-BOUNDARIES, SEM-OWNER-LIFECYCLE]
 
   - semantic_route_id: SEM-OWNER-LIFECYCLE
-    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN, plus the owner Research Workbench, experiment evidence dossier, missing evidence, and why a hypothesis was rejected. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
+    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN, plus the owner Research Workbench, experiment evidence dossier, missing evidence for this experiment, and why this experiment's scientific decision was recorded. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
     owner_questions:
       - What lifecycle objects currently exist?
       - How are hypothesis, experiment, strategy and position connected?
@@ -341,8 +341,6 @@ routes:
       - StrategyVersion
       - LifecycleProjectionV1
       - TARGET_GAP
-      - карта lifecycle
-      - lifecycle-объекты
       - SEM-OWNER-LIFECYCLE
       - где каноническая карта lifecycle
       - как связаны гипотеза эксперимент стратегия и позиция
@@ -350,6 +348,8 @@ routes:
       - чего не хватает для решения
       - experiment evidence
       - Research Workbench
+      - what evidence is missing
+      - why was this experiment rejected
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids:
       - ACTIVE-OWNER-LIFECYCLE-PROJECTION

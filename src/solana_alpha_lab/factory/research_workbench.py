@@ -282,11 +282,11 @@ def _filter_entities(
 
 def _source_panel(projection: Mapping[str, Any]) -> list[dict[str, Any]]:
     labels = {
-        "SRC-EXPERIMENT-SPECS": "Git definitions",
-        "SRC-GLOBAL-TRIAL-LEDGER": "Git trial ledger",
-        "SRC-DECISIONS-NEGATIVE-RESULTS": "Git decisions",
-        "SRC-RESEARCH-STORE": "Research evidence",
-        "SRC-OPERATIONAL-STORE": "Experiment runtime",
+        "SRC-EXPERIMENT-SPECS": "Git-определения",
+        "SRC-GLOBAL-TRIAL-LEDGER": "Git-реестр проверок",
+        "SRC-DECISIONS-NEGATIVE-RESULTS": "Git-решения",
+        "SRC-RESEARCH-STORE": "Доказательства ResearchStore",
+        "SRC-OPERATIONAL-STORE": "Выполнение эксперимента",
     }
     gap_by_source: dict[str, dict[str, Any]] = {}
     for gap in projection.get("gaps") or []:
@@ -736,7 +736,7 @@ def build_research_overview(
             },
             "degraded": True,
             "degraded_copy": (
-                "Lifecycle projection is unavailable to this Workbench. "
+                "Проекция жизненного цикла этой рабочей панели недоступна. "
                 f"({type(exc).__name__})"
             ),
             "needs_attention": [],

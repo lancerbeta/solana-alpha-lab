@@ -127,7 +127,7 @@ def _eligible_run() -> ResearchEvent:
             "cost_assumptions_artifact_id": "ART-COST-001",
             "outcome": "INCONCLUSIVE",
             "uncertainty": ["SMALL_SAMPLE"],
-            "robustness": "NOT_TESTED",
+            "robustness": "HOLD_SPLIT",
             "evidence_class": "DIAGNOSTIC",
         },
         transaction_id="RESEARCH-TXN-ELIGIBLE-001",
@@ -199,6 +199,88 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         self.assertIn("RUN-ELIGIBLE-001", direct_ids)
         self.assertIn("TRIAL-PRIOR-SAME-HYP-001", related_ids)
         self.assertNotIn("TRIAL-PRIOR-SAME-HYP-001", direct_ids)
+        related_decision = _event(
+            record_id="DECISION-EVENT-PRIOR-HYP-001",
+            record_kind="DECISION_EVENT",
+            entity_id="DECISION-EVENT-PRIOR-HYP-001",
+            hypothesis_version_id=HYPOTHESIS_ID,
+            payload={
+                "decision_kind": "PROMOTE",
+                "target_entity_id": "EXP-OTHER-001",
+                "target_native_kind": "EXPERIMENT_SPEC",
+            },
+            transaction_id="RESEARCH-TXN-PRIOR-DEC-001",
+        )
+        polluted = compose_experiment_dossier(
+            projection,
+            LOCATOR,
+            root=ROOT,
+            records=(run, prior, related_decision),
+            records_status="AVAILABLE",
+        )
+        self.assertEqual(polluted["planes"]["decision"], "NO_DECISION")
+        history_ids = {item.get("record_id") for item in polluted["decision_history"]}
+        self.assertNotIn("DECISION-EVENT-PRIOR-HYP-001", history_ids)
+        related_ids_after = {item["record_id"] for item in polluted["related_prior_memory"]}
+        self.assertIn("DECISION-EVENT-PRIOR-HYP-001", related_ids_after)
+
+    def test_conflict_and_holdout_empty_list_stay_distinct(self) -> None:
+        run_a = _eligible_run()
+        run_b = _event(
+            record_id="RUN-ELIGIBLE-002",
+            record_kind="RUN_COMPLETED",
+            entity_id="RUN-ELIGIBLE-002",
+            run_id="RUN-ELIGIBLE-002",
+            hypothesis_version_id=HYPOTHESIS_ID,
+            payload={
+                **json.loads(run_a.payload_json),
+                "experiment_id": EXPERIMENT_ID,
+                "run_id": "RUN-ELIGIBLE-002",
+                "observed_n": 7,
+            },
+            transaction_id="RESEARCH-TXN-ELIGIBLE-002",
+        )
+        projection = build_lifecycle_projection(ROOT, projected_at="2026-09-06T00:00:00Z")
+        dossier = compose_experiment_dossier(
+            projection,
+            LOCATOR,
+            root=ROOT,
+            records=(run_a, run_b),
+            records_status="AVAILABLE",
+        )
+        statuses = {item["code"]: item["status"] for item in dossier["obligations"]}
+        self.assertEqual(statuses["POPULATION_N"], "CONFLICT")
+        self.assertNotEqual(statuses["POPULATION_N"], statuses.get("MISSINGNESS"))
+        self.assertFalse(dossier["science_guard"]["allowed"])
+        self.assertIn("POPULATION_N", dossier["science_guard"]["blocked_codes"])
+        sentinel = _event(
+            record_id="RUN-SENTINEL-001",
+            record_kind="RUN_COMPLETED",
+            entity_id="RUN-SENTINEL-001",
+            run_id="RUN-SENTINEL-001",
+            hypothesis_version_id=HYPOTHESIS_ID,
+            payload={
+                **json.loads(run_a.payload_json),
+                "experiment_id": EXPERIMENT_ID,
+                "run_id": "RUN-SENTINEL-001",
+                "observed_n": 24,
+                "robustness": "NOT_TESTED",
+            },
+            transaction_id="RESEARCH-TXN-SENTINEL-001",
+        )
+        sentinel_dossier = compose_experiment_dossier(
+            projection,
+            LOCATOR,
+            root=ROOT,
+            records=(sentinel,),
+            records_status="AVAILABLE",
+        )
+        sentinel_status = {
+            item["code"]: item["status"] for item in sentinel_dossier["obligations"]
+        }
+        self.assertEqual(sentinel_status["ROBUSTNESS"], "UNKNOWN")
+        self.assertNotEqual(sentinel_status["ROBUSTNESS"], "MISSING")
+        self.assertFalse(sentinel_dossier["science_guard"]["allowed"])
 
     def test_degraded_source_keeps_definition_and_unknown_obligations(self) -> None:
         projection = build_lifecycle_projection(ROOT, projected_at="2026-09-06T00:00:00Z")
@@ -424,19 +506,59 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
             self.assertIn("REJECT", OWNER_DECISION_KINDS)
 
     def test_html_decision_and_promote_guard_copy(self) -> None:
-        app = FactoryApplication(
-            root=ROOT,
-            spec_relative="configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml",
-        )
-        href = (
-            f"/research?entity_id={EXPERIMENT_ID}"
-            "&truth_plane=GIT&native_kind=EXPERIMENT_SPEC"
-        )
-        _, body = _http(app, "GET", href)
-        self.assertIn("PROMOTE закрыт", body)
-        self.assertIn("StrategyVersion", body)
-        self.assertIn("CONTROL_SURFACE", body)
-        self.assertIn("Вопрос", body)
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            ResearchStore(data_root)
+            app = FactoryApplication(
+                root=ROOT,
+                spec_relative="configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml",
+                research_data_root=data_root,
+            )
+            href = (
+                f"/research?entity_id={EXPERIMENT_ID}"
+                "&truth_plane=GIT&native_kind=EXPERIMENT_SPEC"
+            )
+            _, body = _http(app, "GET", href)
+            self.assertIn("PROMOTE закрыт", body)
+            self.assertIn("StrategyVersion", body)
+            self.assertIn("CONTROL_SURFACE", body)
+            self.assertIn("Вопрос", body)
+            self.assertIn('disabled', body)
+
+    def test_http_records_reject_and_surfaces_done(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append([_eligible_run()], transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = FactoryApplication(
+                root=ROOT,
+                spec_relative="configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml",
+                research_data_root=data_root,
+            )
+            href = (
+                f"/research?entity_id={EXPERIMENT_ID}"
+                "&truth_plane=GIT&native_kind=EXPERIMENT_SPEC"
+            )
+            _, body = _http(app, "GET", href)
+            marker = 'name="expected_evidence_snapshot_sha256" value="'
+            start = body.index(marker) + len(marker)
+            snapshot = body[start : body.index('"', start)]
+            posted = urlencode(
+                {
+                    "command": "RESEARCH_DECISION",
+                    "entity_id": EXPERIMENT_ID,
+                    "truth_plane": "GIT",
+                    "native_kind": "EXPERIMENT_SPEC",
+                    "decision_kind": "REJECT",
+                    "expected_evidence_snapshot_sha256": snapshot,
+                    "rationale": "Отклоняю по текущему снимку.",
+                }
+            )
+            status, recorded = _http(app, "POST", "/research", posted)
+            self.assertEqual(status, 200)
+            self.assertIn("Решение записано", recorded)
+            self.assertIn("REJECT", recorded)
+            self.assertIn("DIRECT", recorded)
 
     def test_semantic_anti_hijack(self) -> None:
         projection = load_semantic_projection(ROOT)

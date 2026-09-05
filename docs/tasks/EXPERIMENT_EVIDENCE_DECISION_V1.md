@@ -37,7 +37,7 @@ managed_write_set:
   - tests/test_factory_semantic_operability.py
   - configs/factory_semantic_operability_v1.yaml
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml
-  - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
   - catalog/generated/asset_edges.json
   - docs/FACTORY_SEMANTIC_MAP.md
