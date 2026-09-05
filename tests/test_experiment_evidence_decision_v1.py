@@ -104,6 +104,29 @@ def _http(app: FactoryApplication, method: str, path: str, body: str | None = No
         server.server_close()
 
 
+def _scientific_payload(**overrides: object) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "experiment_id": EXPERIMENT_ID,
+        "availability_cutoff": "2026-09-01T00:00:00Z",
+        "first_reliable_available_at": "2026-09-01T00:00:00Z",
+        "availability_provenance": "GIT_CANONICAL_RECEIPT",
+        "observed_n": 24,
+        "missing_count": 3,
+        "survival_visible": 21,
+        "holdout_applicable": False,
+        "holdout_consumption_ids": [],
+        "entry_artifact_id": "ART-ENTRY-001",
+        "exit_artifact_id": "ART-EXIT-001",
+        "cost_assumptions_artifact_id": "ART-COST-001",
+        "outcome": "INCONCLUSIVE",
+        "uncertainty": ["SMALL_SAMPLE"],
+        "robustness": "HOLD_SPLIT",
+        "evidence_class": "DIAGNOSTIC",
+    }
+    payload.update(overrides)
+    return payload
+
+
 def _eligible_run() -> ResearchEvent:
     return _event(
         record_id="RUN-ELIGIBLE-001",
@@ -116,21 +139,30 @@ def _eligible_run() -> ResearchEvent:
             "run_id": "RUN-ELIGIBLE-001",
             "availability_cutoff": "2026-09-01T00:00:00Z",
             "first_reliable_available_at": "2026-09-01T00:00:00Z",
-            "availability_provenance": "GIT_CANONICAL_RECEIPT",
             "observed_n": 24,
-            "missing_count": 3,
-            "survival_visible": 21,
-            "holdout_applicable": False,
-            "holdout_consumption_ids": [],
-            "entry_artifact_id": "ART-ENTRY-001",
-            "exit_artifact_id": "ART-EXIT-001",
-            "cost_assumptions_artifact_id": "ART-COST-001",
-            "outcome": "INCONCLUSIVE",
-            "uncertainty": ["SMALL_SAMPLE"],
             "robustness": "HOLD_SPLIT",
-            "evidence_class": "DIAGNOSTIC",
+            "outcome": "INCONCLUSIVE",
         },
         transaction_id="RESEARCH-TXN-ELIGIBLE-001",
+    )
+
+
+def _eligible_binding(**overrides: object) -> ResearchEvent:
+    record_id = str(overrides.pop("record_id", "EVIDENCE-BINDING-ELIGIBLE-001"))
+    txn = str(overrides.pop("transaction_id", "RESEARCH-TXN-BINDING-001"))
+    return _event(
+        record_id=record_id,
+        record_kind="EVIDENCE_BINDING",
+        entity_id=record_id,
+        hypothesis_version_id=HYPOTHESIS_ID,
+        payload=_scientific_payload(**overrides),
+        transaction_id=txn,
+    )
+
+
+def _eligible_records() -> tuple[ResearchEvent, ResearchEvent]:
+    return _eligible_run(), _eligible_binding(
+        transaction_id="RESEARCH-TXN-ELIGIBLE-001"
     )
 
 
@@ -224,28 +256,35 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         related_ids_after = {item["record_id"] for item in polluted["related_prior_memory"]}
         self.assertIn("DECISION-EVENT-PRIOR-HYP-001", related_ids_after)
 
+    def test_run_completed_does_not_satisfy_pit(self) -> None:
+        projection = build_lifecycle_projection(ROOT, projected_at="2026-09-06T00:00:00Z")
+        dossier = compose_experiment_dossier(
+            projection,
+            LOCATOR,
+            root=ROOT,
+            records=(_eligible_run(),),
+            records_status="AVAILABLE",
+        )
+        statuses = {item["code"]: item["status"] for item in dossier["obligations"]}
+        self.assertEqual(dossier["planes"]["execution"], "COMPLETED")
+        self.assertIn(statuses["PIT_AVAILABILITY"], {"MISSING", "UNKNOWN"})
+        self.assertNotEqual(statuses["PIT_AVAILABILITY"], "PRESENT")
+        self.assertFalse(dossier["science_guard"]["allowed"])
+        self.assertIn("PIT_AVAILABILITY", dossier["science_guard"]["blocked_codes"])
+
     def test_conflict_and_holdout_empty_list_stay_distinct(self) -> None:
-        run_a = _eligible_run()
-        run_b = _event(
-            record_id="RUN-ELIGIBLE-002",
-            record_kind="RUN_COMPLETED",
-            entity_id="RUN-ELIGIBLE-002",
-            run_id="RUN-ELIGIBLE-002",
-            hypothesis_version_id=HYPOTHESIS_ID,
-            payload={
-                **json.loads(run_a.payload_json),
-                "experiment_id": EXPERIMENT_ID,
-                "run_id": "RUN-ELIGIBLE-002",
-                "observed_n": 7,
-            },
-            transaction_id="RESEARCH-TXN-ELIGIBLE-002",
+        binding_a = _eligible_binding()
+        binding_b = _eligible_binding(
+            record_id="EVIDENCE-BINDING-ELIGIBLE-002",
+            transaction_id="RESEARCH-TXN-BINDING-002",
+            observed_n=7,
         )
         projection = build_lifecycle_projection(ROOT, projected_at="2026-09-06T00:00:00Z")
         dossier = compose_experiment_dossier(
             projection,
             LOCATOR,
             root=ROOT,
-            records=(run_a, run_b),
+            records=(_eligible_run(), binding_a, binding_b),
             records_status="AVAILABLE",
         )
         statuses = {item["code"]: item["status"] for item in dossier["obligations"]}
@@ -253,20 +292,10 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         self.assertNotEqual(statuses["POPULATION_N"], statuses.get("MISSINGNESS"))
         self.assertFalse(dossier["science_guard"]["allowed"])
         self.assertIn("POPULATION_N", dossier["science_guard"]["blocked_codes"])
-        sentinel = _event(
-            record_id="RUN-SENTINEL-001",
-            record_kind="RUN_COMPLETED",
-            entity_id="RUN-SENTINEL-001",
-            run_id="RUN-SENTINEL-001",
-            hypothesis_version_id=HYPOTHESIS_ID,
-            payload={
-                **json.loads(run_a.payload_json),
-                "experiment_id": EXPERIMENT_ID,
-                "run_id": "RUN-SENTINEL-001",
-                "observed_n": 24,
-                "robustness": "NOT_TESTED",
-            },
+        sentinel = _eligible_binding(
+            record_id="EVIDENCE-BINDING-SENTINEL-001",
             transaction_id="RESEARCH-TXN-SENTINEL-001",
+            robustness="NOT_TESTED",
         )
         sentinel_dossier = compose_experiment_dossier(
             projection,
@@ -476,7 +505,10 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             store = ResearchStore(data_root)
-            store.append([_eligible_run()], transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            store.append(
+                list(_eligible_records()),
+                transaction_id="RESEARCH-TXN-ELIGIBLE-001",
+            )
             app = FactoryApplication(
                 root=ROOT,
                 spec_relative="configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml",

@@ -35565,7 +35565,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/experiment_evidence_decision_v1.md', repository_path: docs/contracts/experiment_evidence_decision_v1.md}
-  integrity: {kind: sha256, sha256: 6075703d688c83bb75144444af1f0ddb1255953a9e7d8d781b08fdc33dd8960c}
+  integrity: {kind: sha256, sha256: f52326d2557861a7815435ba95debf58ba317bf1c02a3763e8b5566aa8953891}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35584,7 +35584,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
-  integrity: {kind: sha256, sha256: 2dc25b6398a11a350c742b24a81c985b2c7c99a783114057a070f6b6ad27df08}
+  integrity: {kind: sha256, sha256: ff6fd32ea2e0e4755fa3943df65d0929f4c4c67fd2c8f75c4beb8f95b7fe46b8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35621,7 +35621,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_experiment_evidence_decision_v1.py', repository_path: tests/test_experiment_evidence_decision_v1.py}
-  integrity: {kind: sha256, sha256: 5345cee0ed9866a67e10eb4cb40ede5dc392dd005084ed4eceb3a89b278cd2ce}
+  integrity: {kind: sha256, sha256: f6065cccfcb20a9404c2b7f11cc844eb1532d23fa8efde95c625dc85a78cc153}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}

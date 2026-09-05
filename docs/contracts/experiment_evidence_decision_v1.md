@@ -46,11 +46,17 @@ Hard invariants:
 UI != truth owner
 GET /research != writer
 RUN_COMPLETED != scientific validity
+RUN_* payload keys != scientific obligation PRESENT
 scientific PROMOTE != StrategyVersion
 RELATED != DIRECT
 TRANSLATION != SCIENTIFIC MUTATION
 presentation translation owns zero scientific truth
 ```
+
+Scientific obligations are composed only from DIRECT `EXPERIMENT_METRIC`,
+`EVIDENCE_BINDING`, or `PROMOTION_CANDIDATE` records. A completed run
+still sets the execution plane; it does not satisfy PIT, N, result, or
+robustness.
 
 ## 3. Direct vs related
 

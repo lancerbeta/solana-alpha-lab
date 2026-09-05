@@ -30,17 +30,22 @@ OBLIGATIONS = (
     "EVIDENCE_CLASS",
 )
 SCIENCE_GUARD_OBLIGATIONS = OBLIGATIONS
-DIRECT_RECORD_KINDS = frozenset(
+EXECUTION_RECORD_KINDS = frozenset(
     {
         "RUN_STARTED",
         "RUN_COMPLETED",
         "RUN_ABORTED",
         "RUN_INVALID",
+    }
+)
+SCIENTIFIC_EVIDENCE_RECORD_KINDS = frozenset(
+    {
         "EXPERIMENT_METRIC",
         "EVIDENCE_BINDING",
         "PROMOTION_CANDIDATE",
     }
 )
+DIRECT_RECORD_KINDS = EXECUTION_RECORD_KINDS | SCIENTIFIC_EVIDENCE_RECORD_KINDS
 RELATED_RECORD_KINDS = frozenset({"TRIAL", "DECISION_EVENT", "HYPOTHESIS_VERSION"})
 EXPLICIT_EXPERIMENT_KEYS = (
     "experiment_id",
@@ -212,6 +217,14 @@ def _obligation(
 ROBUSTNESS_UNKNOWN_SENTINELS = frozenset({"NOT_TESTED", "UNTESTED", "UNKNOWN"})
 
 
+def _scientific_cards(direct: Sequence[Mapping[str, Any]]) -> list[Mapping[str, Any]]:
+    return [
+        card
+        for card in direct
+        if str(card.get("record_kind") or "") in SCIENTIFIC_EVIDENCE_RECORD_KINDS
+    ]
+
+
 def _collect_payload_values(
     cards: Sequence[Mapping[str, Any]],
     records: Sequence[Any],
@@ -330,40 +343,41 @@ def _build_obligations(
             for code in OBLIGATIONS
         ]
     store_records = records or ()
+    scientific = _scientific_cards(direct)
     falsifier = _text(spec.get("falsifier"))
     pit_cutoffs = _collect_payload_values(
-        direct, store_records, "availability_cutoff", "data_cutoff", "effective_cutoff"
+        scientific, store_records, "availability_cutoff", "data_cutoff", "effective_cutoff"
     )
     pit_available_values = _collect_payload_values(
-        direct, store_records, "first_reliable_available_at"
+        scientific, store_records, "first_reliable_available_at"
     )
-    pit_prov = _first_payload_value(direct, store_records, "availability_provenance")
+    pit_prov = _first_payload_value(scientific, store_records, "availability_provenance")
     n_values = _collect_payload_values(
-        direct, store_records, "observed_n", "n", "population_n"
+        scientific, store_records, "observed_n", "n", "population_n"
     )
     missing_values = _collect_payload_values(
-        direct, store_records, "missing_count", "excluded_count", "missing_n"
+        scientific, store_records, "missing_count", "excluded_count", "missing_n"
     )
     survival_values = _collect_payload_values(
-        direct, store_records, "survival_visible", "survival_n", "survival_visibility"
+        scientific, store_records, "survival_visible", "survival_n", "survival_visibility"
     )
     entry_values = _collect_payload_values(
-        direct, store_records, "entry_artifact_id", "entry_executability"
+        scientific, store_records, "entry_artifact_id", "entry_executability"
     )
     exit_values = _collect_payload_values(
-        direct, store_records, "exit_artifact_id", "exit_executability"
+        scientific, store_records, "exit_artifact_id", "exit_executability"
     )
     cost_values = _collect_payload_values(
-        direct, store_records, "cost_assumptions_artifact_id", "cost_evidence_id"
+        scientific, store_records, "cost_assumptions_artifact_id", "cost_evidence_id"
     )
     result_values = _collect_payload_values(
-        direct, store_records, "outcome", "result", "scientific_terminal"
+        scientific, store_records, "outcome", "result", "scientific_terminal"
     )
     uncertainty_values = _collect_payload_values(
-        direct, store_records, "uncertainty", "limitation_codes"
+        scientific, store_records, "uncertainty", "limitation_codes"
     )
-    robustness_values = _collect_payload_values(direct, store_records, "robustness")
-    class_values = _collect_payload_values(direct, store_records, "evidence_class")
+    robustness_values = _collect_payload_values(scientific, store_records, "robustness")
+    class_values = _collect_payload_values(scientific, store_records, "evidence_class")
     pit_cutoff = pit_cutoffs[0] if pit_cutoffs else None
     pit_available = pit_available_values[0] if pit_available_values else None
     observed_n = n_values[0] if n_values else None
@@ -417,7 +431,7 @@ def _build_obligations(
     pop_status, pop_note = n_status, n_note
     if pop_status == "MISSING" and population:
         pop_note = "имя популяции не заменяет N"
-    holdout = _holdout_status(spec, direct, store_records)
+    holdout = _holdout_status(spec, scientific, store_records)
     matrix = [
         _obligation(
             "FALSIFIER",
@@ -430,7 +444,7 @@ def _build_obligations(
             pit_status,
             source="ResearchStore" if direct else "NONE",
             note=pit_note or (
-                "успешный run не доказывает PIT" if pit_status != "PRESENT" else None
+                "RUN_COMPLETED не доказывает PIT" if pit_status != "PRESENT" else None
             ),
             values={
                 "availability_cutoff": pit_cutoff,
