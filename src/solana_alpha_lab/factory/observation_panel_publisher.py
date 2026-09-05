@@ -12,6 +12,13 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from solana_alpha_lab.factory.hot90_activation import load_hot90_activation
+from solana_alpha_lab.factory.members_snapshot_delta import (
+    MembersDeltaError,
+    append_delta_publication,
+    load_member_rows_for_location,
+    write_snapshot_unit,
+)
 from solana_alpha_lab.factory.observation_schedule import (
     canonical_sha256,
     parse_utc,
@@ -72,6 +79,25 @@ def _write_parquet(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
     table = pa.Table.from_pylist([dict(row) for row in rows])
     tmp = path.with_suffix(".parquet.tmp")
     pq.write_table(table, tmp)
+    payload = tmp.read_bytes()
+    digest = hashlib.sha256(payload).hexdigest()
+    if path.is_file():
+        try:
+            existing_digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        finally:
+            tmp.unlink(missing_ok=True)
+        if existing_digest != digest:
+            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+    else:
+        tmp.replace(path)
+    return digest
+
+
+def _write_selected_zstd_parquet(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    table = pa.Table.from_pylist([dict(row) for row in rows])
+    tmp = path.with_suffix(".parquet.tmp")
+    pq.write_table(table, tmp, compression="zstd", compression_level=3)
     payload = tmp.read_bytes()
     digest = hashlib.sha256(payload).hexdigest()
     if path.is_file():
@@ -750,8 +776,33 @@ def publish_observation_batch(
     member_path = data_root / member_rel
 
     if job.get("stage") is None:
-        file_sha256 = _write_parquet(parquet_path, rows)
-        member_sha256 = _write_parquet(member_path, member_rows)
+        activation = load_hot90_activation(root)
+        writer = _write_selected_zstd_parquet if activation["new_write_zstd"] else _write_parquet
+        file_sha256 = writer(parquet_path, rows)
+        if activation["members_layout"] == "SNAPSHOT_PLUS_DELTA":
+            unit_path = (
+                data_root / "datasets" / "members_snapshot_plus_delta" / utc_day / "unit.json"
+            )
+            if unit_path.is_file():
+                unit = append_delta_publication(
+                    data_root,
+                    utc_day=utc_day,
+                    dataset_manifest_id=dataset_manifest_id,
+                    rows=member_rows,
+                )
+            else:
+                unit = write_snapshot_unit(
+                    data_root,
+                    utc_day=utc_day,
+                    dataset_manifest_id=dataset_manifest_id,
+                    rows=member_rows,
+                )
+            last = unit["publications"][-1]
+            member_rel = str(last["rel"]).replace("\\", "/")
+            member_path = data_root / member_rel
+            member_sha256 = str(last["sha256"])
+        else:
+            member_sha256 = writer(member_path, member_rows)
         existing_obs = parquet_path.read_bytes() if parquet_path.is_file() else b""
         if hashlib.sha256(existing_obs).hexdigest() != file_sha256:
             raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
@@ -1090,9 +1141,19 @@ def rebuild_observation_panel_from_rdp(
         for partition in partitions:
             location = str(partition.get("logical_location") or "")
             path = data_root / location
-            if not path.is_file():
+            if not path.is_file() and not (path.with_name("members.layout.json")).is_file():
                 continue
-            rows = pq.read_table(path).to_pylist()
+            if str(partition.get("partition_id") or "").endswith("-members"):
+                try:
+                    rows = load_member_rows_for_location(data_root, location)
+                except MembersDeltaError:
+                    if path.is_file() is False:
+                        continue
+                    raise
+            else:
+                if not path.is_file():
+                    continue
+                rows = pq.read_table(path).to_pylist()
             matching_rows = False
             if str(partition.get("partition_id") or "").endswith("-members"):
                 for row in rows:

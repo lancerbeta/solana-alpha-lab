@@ -689,13 +689,23 @@ def write_heartbeat(
     return path
 
 
+def _effective_backup_lists(root: Path, loaded: Mapping[str, Any]) -> tuple[list[str], list[str]]:
+    from solana_alpha_lab.factory.hot90_activation import load_hot90_activation
+    from solana_alpha_lab.factory.hot90_mutable_backup import mutable_backup_sources
+
+    selected = mutable_backup_sources(
+        loaded["backup"],
+        activation_stage=str(load_hot90_activation(root)["activation_stage"]),
+    )
+    return list(selected["source_relative_paths"]), list(selected["recursive_relative_paths"])
+
+
 def _assert_independent_sink(root: Path, loaded: Mapping[str, Any], sink: Path) -> None:
     if loaded["backup"]["same_parent_forbidden"] is not True:
         raise RemoteOpsError("INDEPENDENT_FLAG_DRIFT")
     parents = []
-    relatives = list(loaded["backup"]["source_relative_paths"]) + list(
-        loaded["backup"].get("recursive_relative_paths") or []
-    )
+    sources, recursive = _effective_backup_lists(root, loaded)
+    relatives = list(sources) + list(recursive)
     for relative in relatives:
         source = _safe_relative(root, relative)
         parents.append(source.parent.resolve())
@@ -715,7 +725,8 @@ def _backup_source_paths(
 ) -> list[tuple[str, Path, bool]]:
     result: list[tuple[str, Path, bool]] = []
     seen: set[str] = set()
-    for relative in loaded["backup"]["source_relative_paths"]:
+    sources, recursive = _effective_backup_lists(root, loaded)
+    for relative in sources:
         normalized = str(relative).replace("\\", "/")
         source = _safe_relative(root, normalized)
         if source.is_file() is False:
@@ -723,7 +734,7 @@ def _backup_source_paths(
         if normalized not in seen:
             result.append((normalized, source, normalized.endswith(".sqlite")))
             seen.add(normalized)
-    for relative in loaded["backup"].get("recursive_relative_paths") or []:
+    for relative in recursive:
         normalized_root = str(relative).replace("\\", "/").rstrip("/")
         source_root = _safe_relative(root, normalized_root)
         if source_root.is_dir() is False:

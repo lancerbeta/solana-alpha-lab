@@ -1101,8 +1101,9 @@ def _completed_run_passport(
 class ResearchStore:
     """One-writer immutable research log rooted outside Git."""
 
-    def __init__(self, data_root: Path) -> None:
+    def __init__(self, data_root: Path, *, parquet_compression: str = "NONE") -> None:
         self._root = _validated_data_root(data_root)
+        self._parquet_compression = parquet_compression
 
     @contextmanager
     def writer_lease(self) -> Iterator[None]:
@@ -1190,7 +1191,7 @@ class ResearchStore:
             pq.write_table(
                 table,
                 temporary_path,
-                compression="NONE",
+                compression=self._parquet_compression,
                 use_dictionary=False,
                 write_statistics=True,
                 version="2.6",

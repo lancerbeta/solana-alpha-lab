@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 47077d5325b70cbeba617cebf64dbabe259ca582960a07dc7dac98c79aa474f5}
+  integrity: {kind: sha256, sha256: 56eb3a5622576e11fdcce56208e6667bfbd78a6de3ca0c32f7de13139678155b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -29815,7 +29815,7 @@ records:
   as_of: '2026-08-22'
   truth_owner: FACTORY_REMOTE_OPERATIONS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/remote_ops.py', repository_path: src/solana_alpha_lab/factory/remote_ops.py}
-  integrity: {kind: sha256, sha256: 8de905f2ef0d9ace4e12ddc38e122ad3b22565799684d003e4e3aa98fd1dc096}
+  integrity: {kind: sha256, sha256: a03b4c2813879ec21f89b011b50a45bfa99d5f6675908b705412b8803b41997d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations: [{relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}]
   consumers: [FACTORY-001, GOAL-OWNER]
@@ -29946,7 +29946,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: bd358d32bd88f4d48d015c1aefbd7eda2a8285b3da49c943ad826b6f34a032a3}
+  integrity: {kind: sha256, sha256: 29cc0488a4ff745df06c4ec4edc8b42825330fa7ebde302c247beb65a4b90863}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -32002,7 +32002,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_store.py', repository_path: src/solana_alpha_lab/factory/research_store.py}
-  integrity: {kind: sha256, sha256: aa14e66e9cd64ab51aa4596ef5d8d207487709cbf17a9d3813bd15eb05cc47d1}
+  integrity: {kind: sha256, sha256: bd7fbcbafe4140a6f5923d980ec5bc75ac85ee14d1156b5d03398d3bc1b0ea7c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32842,7 +32842,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec_v1_2.schema.json', repository_path: catalog/schemas/experiment_spec_v1_2.schema.json}
-  integrity: {kind: sha256, sha256: 2a16cf8624aa5fa58ab7642b139e78547706f37bbc35a4b0d90f3dfd6481847f}
+  integrity: {kind: sha256, sha256: 41de53d9dac8bd9a5331e21a0a0ab3950adfc9fc6715632977eca75cc1a19fd9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -32860,7 +32860,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/observation_schedule_v1.schema.json', repository_path: catalog/schemas/observation_schedule_v1.schema.json}
-  integrity: {kind: sha256, sha256: d726a0a01de561e29ab2a6ce080f4071d839b99c5d92c6da4b0325d1c07cb178}
+  integrity: {kind: sha256, sha256: b47a281876592f5ea4263180fdc1558aee233f2ab39fd2fd27294cb2f0c68def}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -32962,7 +32962,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_remote_operations_v1_1.schema.json', repository_path: catalog/schemas/factory_remote_operations_v1_1.schema.json}
-  integrity: {kind: sha256, sha256: 50ecccd414b51b1c117521ae15ee8d684748ccd432025ea693084a9cfe280e47}
+  integrity: {kind: sha256, sha256: 1e846291ea09049e8928c0595fdd6c023f36f09080d4c48fe1166fe94735f736}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33030,7 +33030,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_remote_operations_v1_1.yaml', repository_path: configs/factory_remote_operations_v1_1.yaml}
-  integrity: {kind: sha256, sha256: 2869e7180bfd876da65bf7e03b80711bcde977e0c5b5c553360ce1ce66594118}
+  integrity: {kind: sha256, sha256: 8c9a6ca037f36b939776c3c3187e57ca22f873bd4fe8389ba321d0a9dcd6c8ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -35034,4 +35034,109 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [POST_REBOOT_COHERENT, HOST_UNREACHABLE, 97D]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: IMPL of FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_V1 behind CURRENT_SAFE; no production mutation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1.md', repository_path: docs/tasks/FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1.md}
+  integrity: {kind: sha256, sha256: 8957d6a3bbdadc59c209d3d009e13d828929b757c361d50216b5be6993bf3256}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
+  - {relation_type: contains, target_asset_id: CONFIG-FACTORY-HOT90-ARCHIVE-ACTIVATION-001}
+  - {relation_type: contains, target_asset_id: DOC-FACTORY-HOT90-COMMISSIONING-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HOT90, SNAPSHOT_PLUS_DELTA, CURRENT_SAFE, CONTENT_IMMUTABILITY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-FACTORY-HOT90-ARCHIVE-ACTIVATION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Fail-closed HOT90 activation stages; default CURRENT_SAFE preserves live Factory semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/factory_hot90_archive_activation_v1.yaml', repository_path: configs/factory_hot90_archive_activation_v1.yaml}
+  integrity: {kind: sha256, sha256: d0319def3040c521a9451c4cd206dddf3706605aa6a1db19994f75ad4bbacfaa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [CURRENT_SAFE, WRITE_ONLY_SHADOW, DURABILITY_CUTOVER, RETENTION_ACTIVE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fixture proofs for SNAPSHOT_PLUS_DELTA, ZSTD, archive/hydrate, remote SHA256, eviction, admission.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_hot90_immutable_drive_archive_impl_v1.py', repository_path: tests/test_factory_hot90_immutable_drive_archive_impl_v1.py}
+  integrity: {kind: sha256, sha256: 98e182d5e699cca4859b480762384b5fbda0b9c1a97c3b6e8c4ea037e98a4a09}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SNAPSHOT_PLUS_DELTA, ZSTD, REMOTE_CONTENT_SHA256_VERIFIED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-FACTORY-HOT90-COMMISSIONING-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Prepared-not-executed VPS commissioning contract for HOT90 write-only then durability cutover.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md', repository_path: docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md}
+  integrity: {kind: sha256, sha256: 234d1811ee92f3e54dcd1a4a9b2f28f12f370e71f3e6e7249cd1419f6189461d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [PREPARED_NOT_EXECUTED, WRITE_ONLY_SHADOW, COMMISSIONING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-FACTORY-HOT90-CLEANUP-PRECONDITIONS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Prepared-not-executed preconditions before deleting the leftover full-RDP BACKUP ZIP.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_CLEANUP_PRECONDITIONS_V1.md', repository_path: docs/operator/FACTORY_HOT90_CLEANUP_PRECONDITIONS_V1.md}
+  integrity: {kind: sha256, sha256: 58a8959b89952f06b1fad2e5724d75cfea792b80394aa2b046b0efa3572139a4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [BACKUP_ZIP, PREPARED_NOT_EXECUTED, CLEANUP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-FACTORY-HOT90-IMPL-OWNER-READOUT-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner readout for HOT90 IMPL capability with CURRENT_SAFE default and zero production mutations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_hot90_immutable_drive_archive_impl_v1/a1_owner_readout_v1.md', repository_path: docs/reports/factory_hot90_immutable_drive_archive_impl_v1/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: a7a14b9fdf1441d16d7f5786283c91d955d56a32d55d1d342822b3fc358de17a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HOT90, CURRENT_SAFE, SNAPSHOT_PLUS_DELTA]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

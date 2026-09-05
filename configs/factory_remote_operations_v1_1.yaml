@@ -45,6 +45,12 @@ backup:
     - local/factory_v1/observation_schedule_state.sqlite
   recursive_relative_paths:
     - local/factory_v1/observation_rdp
+  mutable_only_source_relative_paths:
+    - local/factory_v1/operational_state.sqlite
+    - local/factory_v1/paper_plane_state.sqlite
+    - local/factory_v1/observation_schedule_state.sqlite
+  mutable_only_recursive_relative_paths:
+    - local/factory_v1/observation_rdp/datasets/publication_jobs
   same_parent_forbidden: true
   local_full_schedule: 12h
   local_verified_bundle_retention: 1

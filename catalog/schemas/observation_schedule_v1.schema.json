@@ -183,6 +183,7 @@
       "properties": {
         "raw_retention_days": {"type": "integer", "minimum": 8, "maximum": 365},
         "canonical_panel_retention": {"const": "IMMUTABLE"},
+        "hot_local_residency_days": {"type": "integer", "const": 90},
         "active_journal_backup": {"const": "REQUIRED"}
       }
     },

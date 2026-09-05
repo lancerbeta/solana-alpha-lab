@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-05",
+  "task_id": "FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1",
+  "reviewed_bindings_sha256": "23e6e7a9b5718c248b7150f29ba007f4a05faa222fcd427a048a7e10672329e4",
+  "reviewed_inventory_sha256": "0a13bb47c34aa841df8cddb9a65f182eddaa509cf26363567b9956f1e950f351",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=d9be2c22d5bce5fb6d4e5e4a1cf1eec3ced434e15995983e50f2d34e7104b10e",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "CONFINED_RELATIVE_FILE_HYDRATE_PACKAGE_EVICT",
+        "EXECUTE_EXACT_DELETE_TOCTOU_REHASH",
+        "DUPLICATE_ENTITY_ID_FAIL_CLOSED",
+        "CURRENT_SAFE_LIVE_FUSE",
+        "IMMUTABLE_CONST_CONTENT_NOT_LOCAL_FOREVER",
+        "HOT_LOCAL_RESIDENCY_OPTIONAL_90",
+        "AGE_MAX_AVAILABILITY_CLOCKS_NOT_MTIME",
+        "DUCKDB_ABSENT_NOT_TRUTH_OWNER",
+        "DISCLOSED_FIXTURE_DESTRUCTIVE_UNWIRED",
+        "DISCLOSED_REBUILD_LAST_WINS",
+        "DISCLOSED_NATIVE_HASHSUM_NOT_LIVE_CONTENT",
+        "DISCLOSED_97D_RUNWAY_CALLER_BYTES"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CONFINED_RELATIVE_FILE",
+        "TOCTOU_PLAN_HASHES",
+        "CURRENT_SAFE_DEFAULT",
+        "NO_SECRETS",
+        "STOP_CONDITIONS_HELD",
+        "ZIP_SLIP_HYDRATE_PATH_ESCAPE",
+        "NO_DRIVE_WRITE",
+        "NO_PRODUCTION_EVICTION",
+        "DELIVERY_TRIO_BOUND_AFTER_CRITICS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "REPOSITORY_CAPABILITY_BEHIND_CURRENT_SAFE",
+        "WRITE_ONLY_SHADOW_PUBLISHER_ONLY",
+        "EXPLICIT_PRIMITIVES_NOT_COLLECTOR_AUTO",
+        "NAMED_CONSUMER_LATER_COMMISSIONING",
+        "NO_VPS_ACTIVATION",
+        "STOP_AT_IMPL_PR_MERGE_GATE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_DRIVE_WRITE",
+    "NO_CANONICAL_DONE"
+  ]
+}

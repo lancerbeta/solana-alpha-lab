@@ -42,14 +42,14 @@ valid only when the writer is frozen.
 | Substrate | Path / artifact | Role | Retention |
 |---|---|---|---|
 | ObservationSchedule SQLite | `local/factory_v1/observation_schedule_state.sqlite` | operational scheduler / call ledger / poll cache / accounting — **not** scientific truth | `raw_retention_days` (campaign default **31**) may compact aged COMPLETED provider **decoded JSON bodies** to provenance metadata |
-| Observation RDP / Parquet | `local/factory_v1/observation_rdp` | immutable scientific panel publication | `canonical_panel_retention = IMMUTABLE` — **never** auto-deleted by retention |
+| Observation RDP / Parquet | `local/factory_v1/observation_rdp` | scientific panel publication | `canonical_panel_retention = IMMUTABLE` means **CONTENT IMMUTABLE FOREVER**, not local copy forever. HOT local residency is `hot_local_residency_days = 90` **after** a later commissioning + destructive owner gate. Git default `CURRENT_SAFE` does not evict. Scientific local eviction stays forbidden until schema + availability clocks + verified COLD SHA256 + that later gate are all satisfied |
 | Sealed live releases / LIVE CORPUS | sealed release dirs + corpus lineage | exploratory scientific publication | **never** auto-deleted by retention |
 
 **`raw_retention_days = 31` means:** after 31 UTC days, and only when related due work is scientifically closed, COMPLETED `call_ledger` rows may drop large decoded provider payload fields (`rows` / body) while keeping `call_occurrence_id`, `request_sha256`, `response_sha256`, HTTP class/timing, and identity. It does **not** mean byte-identical original HTTP response retention — the substrate is **decoded/canonical provider JSON** in SQLite.
 
 What may be safely compacted: aged COMPLETED operational provider bodies; aged `poll_slots` cache bodies when they cannot participate in current scheduling/recovery.
 
-What is never automatically deleted: Observation RDP/Parquet, sealed live releases/corpus, candidate/member denominator rows, authority receipts, activation identity, accounting identity, unfinished/STARTED/IN_FLIGHT calls, anything younger than `raw_retention_days`.
+What is never automatically deleted: sealed live releases/corpus, candidate/member denominator rows, authority receipts, activation identity, accounting identity, unfinished/STARTED/IN_FLIGHT calls, anything younger than `raw_retention_days`. Observation RDP/Parquet content remains immutable; a local HOT copy is not forever (`hot_local_residency_days = 90`) and is not auto-deleted by this collector path.
 
 - Forge **never** reads moving VPS truth directly.
 - Continuous observation alone does **not** change Forge evidence epoch.
@@ -469,8 +469,11 @@ Disk policy (measured % used; does not auto-resize or delete science):
 
 ### Retention status / dry-run / apply
 
-Default is dry-run. Apply requires exact `--i-understand-apply`. Never deletes
-scientific RDP/releases. Safe around scheduler lease (`WRITER_BUSY` if tick holds lease).
+Default is dry-run. Apply requires exact `--i-understand-apply`. This APPLY
+only compacts operational SQLite bodies. It never deletes scientific
+RDP/releases and is **not** HOT90 90d eviction. HOT local residency is not live
+on the VPS until a later exact destructive owner gate. Safe around scheduler
+lease (`WRITER_BUSY` if tick holds lease).
 
 ```
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule_retention.py status --raw-retention-days 31
