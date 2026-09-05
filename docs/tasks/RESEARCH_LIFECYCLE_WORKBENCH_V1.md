@@ -92,8 +92,9 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
-    - tests/test_research_lifecycle_workbench_v1.py
-    - docs/contracts/research_lifecycle_workbench_v1.md
+    - docs/evidence/research_lifecycle_workbench/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/research_lifecycle_workbench/a1_delivery_independent_review_v1.json
+    - docs/evidence/research_lifecycle_workbench/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

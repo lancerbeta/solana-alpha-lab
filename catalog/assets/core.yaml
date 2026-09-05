@@ -35467,7 +35467,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/RESEARCH_LIFECYCLE_WORKBENCH_V1.md', repository_path: docs/tasks/RESEARCH_LIFECYCLE_WORKBENCH_V1.md}
-  integrity: {kind: sha256, sha256: 4f4f0359123e73b19c79f431c92c0f5be457080a8f38d8c35873b13cec2c4646}
+  integrity: {kind: sha256, sha256: bacdc3acd097e82fc83cb23927d24c3aa887fa8c0f0d620f5ec498726368bb50}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}
