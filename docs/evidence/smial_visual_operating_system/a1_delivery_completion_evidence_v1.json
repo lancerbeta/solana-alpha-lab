@@ -40,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/smial_visual_operating_system/a1_delivery_factory_fit_v1.json",
-    "sha256": "3ad8c0dae826eb9cefccae6eebae22dda58b6276bd07741f24546f5589a42a63",
+    "sha256": "6e5c57ea5ef75bbe01363ab146cbce157a72d325fbd50fd44fde318b2a300c5b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SMIAL_VISUAL_OPERATING_SYSTEM_V1",
     "independent_review": {
       "path": "docs/evidence/smial_visual_operating_system/a1_delivery_independent_review_v1.json",
-      "sha256": "b4f225b94b5ed29ee9d4211681c6291b9838219c0a41a79ff9e36af8b25adf08",
+      "sha256": "b24b41339c3da2f2b4208916ccc22a65036ee3a2d368481932e47ee9cec6c80a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

@@ -7,7 +7,7 @@
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "reviewed_bindings_sha256": "d49b579baae34ab9ed8e3952ab5231c18083886174b0256fc2ba338854c60c55",
-  "reviewed_inventory_sha256": "979588e8fc8a70e215d02732e76e7c1f52700c5e713550f5d850a3ba328c9e29",
+  "reviewed_inventory_sha256": "fe7a1d10a7dd40ad5ad30902bb76c55ef76bb573915b746ea8fa5cbb712c361f",
   "capability_radar": {
     "now": "NONE",
     "watch": "OWNER_LIFECYCLE_PROJECTION_SPINE_V1"
