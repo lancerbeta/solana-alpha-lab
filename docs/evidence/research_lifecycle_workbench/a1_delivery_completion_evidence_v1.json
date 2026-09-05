@@ -1,0 +1,89 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RESEARCH-LIFECYCLE-WORKBENCH-COMPLETION-001",
+  "as_of": "2026-09-05",
+  "task_id": "RESEARCH_LIFECYCLE_WORKBENCH_V1",
+  "state_change": "RESEARCH_LIFECYCLE_WORKBENCH_V1_READY_FOR_MERGE",
+  "base_main": "97281cccca06365515b282868174cdfd0b023845",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "8d2aa1a072bf94215aeb1f6e62f1197fcb9f52fc526e1a30560fb3325aef6729",
+    "catalog/assets/lifecycle.yaml": "a2514992fe31771d459b8e4d9bdde1d75c69586539d514f7829c690720ead2f9",
+    "catalog/catalog_manifest.yaml": "e7734d7ab2423f86f4900753f1a92ea73276a5576a2ca7109e30b89989d1c3a8",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "9dfa59371988ed8efd7fe10f6f58e128fa7da0bfc8a766c38d1b69d59e988a6d",
+    "catalog/generated/asset_edges.json": "c57a5cf5c5fbb3108bd61fff81926bad2071984e77fe9fdc568656953e0247c3",
+    "catalog/schemas/owner_lifecycle_projection_v1.schema.json": "d4cadc225fc20c7a0217099ffceac8d57786a94750d20acfe767ae947189532f",
+    "configs/factory_semantic_operability_v1.yaml": "e165124407ad97d5bb065b90d426a8210164add682e4deb4024282c56a2ecded",
+    "configs/owner_lifecycle_projection_v1.yaml": "611115b374053e8a8cee073f43140d925cc52528488b023de7c9178273ac742a",
+    "docs/FACTORY_SEMANTIC_MAP.md": "89543cee5eaae103a37941bb34212f2a36f96225ad30f8eba65586e84ebac8d8",
+    "docs/OPERATOR_NAVIGATION.md": "17c15d2debc5252570f376af6e6caec9275c54b05f56a564f1e637edb431501c",
+    "docs/PROJECT_MAP.md": "788782d4626072702ad5519f75b3992b39bb23d6a74fec93630a8392826483e8",
+    "docs/contracts/owner_lifecycle_projection_spine_v1.md": "9af509d2ebac93d977d414c319b88daacc2b66955198dcec918b2c3f2d2adbf3",
+    "docs/contracts/research_lifecycle_workbench_v1.md": "87a4c68559608095cc4044b13f0761c07fd88d1ce45d92e4c6ef5d5bd40ad2d4",
+    "docs/reports/research_lifecycle_workbench/a1_owner_readout_v1.md": "8835432c3d0ea186d0531db21410961c9975f3ce91c0adc01092ea80e73fdce1",
+    "docs/tasks/RESEARCH_LIFECYCLE_WORKBENCH_V1.md": "389e8d534b591bba0addf6f369e27aa536c8c50ba05a9ee8a4926e18cb43cc29",
+    "scripts/run_factory_workbench.py": "fd4ca488bd3f0428ffa64b10792a79ef5861374735bdff2d49edcba6a6c79a23",
+    "src/solana_alpha_lab/factory/application.py": "ec8655a2831499cdb370d6551d09e9525261b1550eddb98c451fa33d0b3c0d03",
+    "src/solana_alpha_lab/factory/data_root.py": "aeed4cbe9785c01c77955856e9f2efa2e9cc7cb1d43d5098a95608d268f38b1d",
+    "src/solana_alpha_lab/factory/lifecycle_projection.py": "6bcf614b59354ff577cbfde0abdbb56dec754dd88b778773228f6d64e97c68c9",
+    "src/solana_alpha_lab/factory/research_store.py": "1bb7e184730bd52865b3dc32f8e1c5bb9c90da79de41fa0280776914cbd5b140",
+    "src/solana_alpha_lab/factory/research_workbench.py": "4d72ff580a3606d918227674a86596c78847c325124289e6107114cf4d9a0285",
+    "src/solana_alpha_lab/factory/visual_os.py": "4bada4fe21cd7a0347f0a805885541ec411b54bc959f21ec1e58c6f7dca22ba7",
+    "src/solana_alpha_lab/factory/workbench.py": "ce5ca80bf5e590d62e3d64a988e6a455a99662d5d137ba0e135a01f507d6e2e3",
+    "tests/test_catalog_canonical_binding_discovery.py": "c61cff8663e95133508587f7cabc572ba7d147bb363bc74cc7ba52d6626afc6b",
+    "tests/test_factory_ordinary_market_hypothesis.py": "79b0195ef1039d259376e947ba1ba346ae8aca2a47bcda14c5d6616bd7b488a2",
+    "tests/test_factory_semantic_operability.py": "f59b62680a683e1b6074631f12bc4e916a96e93bdb3c3ab6e85827679650f712",
+    "tests/test_factory_v1_owner_cockpit.py": "f46adf9ed4a0cad456241a56e1f936347d4844db9c90266018576a7277ccd9c4",
+    "tests/test_owner_lifecycle_projection_spine_v1.py": "faa2e71c2e2a94353269720586808c62dd18f5da9e21b83e355c5b47dde47c7a",
+    "tests/test_owner_operations_cockpit_v1.py": "e12254150ac5390d3c7bb380c459d300ee9b4078caaa739cac66e3454dcff538",
+    "tests/test_research_lifecycle_workbench_v1.py": "43855940bf1fe97ed636a2ba0346d70447c466bd36743742dc9e4569abdeb39b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/research_lifecycle_workbench/a1_delivery_factory_fit_v1.json",
+    "sha256": "6902a24627feab162a4da26cd6a7d5e085ee9211dced08d72661200adc6f692a",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_RESEARCH_LIFECYCLE_WORKBENCH_V1",
+    "independent_review": {
+      "path": "docs/evidence/research_lifecycle_workbench/a1_delivery_independent_review_v1.json",
+      "sha256": "93234bf7b615410565e058d89b0744b8fa840c64dc769db716fb7518247d3ffd",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_RESEARCH_MUTATION",
+    "NO_SECOND_TRUTH_STORE",
+    "NO_NEW_SEMANTIC_ROUTE",
+    "NO_FRONTEND_FRAMEWORK",
+    "NO_VPS_DEPLOY",
+    "NO_AUTHORITY_FROM_WORKBENCH",
+    "NO_INVENTED_LIFECYCLE_STATES"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "RESEARCH-LIFECYCLE-WORKBENCH-FACTORY-FIT-001",
+  "as_of": "2026-09-05",
+  "task_id": "RESEARCH_LIFECYCLE_WORKBENCH_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "969592c08ed85a0485719bfd0f5c0c512d0fdef3d5fca9693edef54e5e14c0b4",
+  "reviewed_inventory_sha256": "963269e5fa3460d89a561be94d5a133609ea115146671e8e8b6197682eb08d5a",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "EXPERIMENT_EVIDENCE_DECISION_V1"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_SECOND_TRUTH_STORE",
+    "NO_RESEARCH_MUTATION",
+    "NO_NEW_SEMANTIC_ROUTE",
+    "NO_FRONTEND_FRAMEWORK",
+    "NO_VPS_DEPLOY",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_INVENTED_LIFECYCLE_STATES"
+  ],
+  "recovery": "REVERT"
+}

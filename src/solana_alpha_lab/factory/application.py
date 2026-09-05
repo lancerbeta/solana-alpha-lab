@@ -98,11 +98,15 @@ class FactoryApplication:
         paper_plane_store: PaperPlaneStore | None = None,
         spec_relative: str | None = None,
         authority_phrase: str | None = None,
+        research_data_root: Path | None = None,
     ) -> None:
         self.root = root
         self._operational_store = store
         self._paper_plane_store = paper_plane_store
         self._runner: ExperimentRunner | None = None
+        self._research_data_root = research_data_root
+        self._research_reader = None
+        self._research_discovery = None
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
 
@@ -142,12 +146,79 @@ class FactoryApplication:
     def economics_projection(self) -> dict[str, Any]:
         return build_economics_projection(self.paper_plane())
 
+    def research_discovery(self) -> Any:
+        if self._research_discovery is None:
+            from solana_alpha_lab.factory.data_root import resolve_existing_data_root
+
+            self._research_discovery = resolve_existing_data_root(
+                self.root, explicit_data_root=self._research_data_root
+            )
+        return self._research_discovery
+
+    def existing_research_store(self) -> Any:
+        if self._research_reader is not None:
+            return self._research_reader
+        discovery = self.research_discovery()
+        if discovery.status != "PRESENT" or discovery.root is None:
+            return None
+        from solana_alpha_lab.factory.research_store import (
+            ExistingResearchStoreReader,
+            ResearchStoreError,
+        )
+
+        try:
+            self._research_reader = ExistingResearchStoreReader(discovery.root)
+        except ResearchStoreError:
+            return None
+        return self._research_reader
+
+    def research_projection_discovery(self) -> tuple[str | None, str | None]:
+        discovery = self.research_discovery()
+        store = self.existing_research_store()
+        if store is not None:
+            return None, None
+        if discovery.status == "PRESENT":
+            return "INVALID", discovery.error or "RESEARCH_STORE_OPEN_FAILED"
+        if discovery.status != "PRESENT":
+            return discovery.status, discovery.error
+        return None, discovery.error
+
     def lifecycle_projection(self) -> dict[str, Any]:
         from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection
 
+        status, error = self.research_projection_discovery()
         return build_lifecycle_projection(
             self.root,
             paper_plane_store=self._paper_plane_store,
+            research_store=self.existing_research_store(),
+            research_discovery_status=status,
+            research_discovery_error=error,
+        )
+
+    def research_overview(self, **filters: Any) -> dict[str, Any]:
+        from solana_alpha_lab.factory.research_workbench import build_research_overview
+
+        status, error = self.research_projection_discovery()
+        return build_research_overview(
+            self.root,
+            paper_plane_store=self._paper_plane_store,
+            research_store=self.existing_research_store(),
+            research_discovery_status=status,
+            research_discovery_error=error,
+            **filters,
+        )
+
+    def research_detail(self, locator: Any) -> dict[str, Any]:
+        from solana_alpha_lab.factory.research_workbench import build_research_detail
+
+        status, error = self.research_projection_discovery()
+        return build_research_detail(
+            self.root,
+            locator,
+            paper_plane_store=self._paper_plane_store,
+            research_store=self.existing_research_store(),
+            research_discovery_status=status,
+            research_discovery_error=error,
         )
 
     def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:

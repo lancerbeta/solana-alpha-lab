@@ -5,12 +5,17 @@ from __future__ import annotations
 import html
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from typing import Any
+from typing import Any, Mapping
 from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
 from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+from solana_alpha_lab.factory.research_workbench import (
+    ResearchWorkbenchError,
+    parse_locator,
+)
+from solana_alpha_lab.factory.visual_os import visual_os_css, visual_os_consumed
 
 COMMANDS = ("FREEZE", "START", "STOP", "PARK", "RECORD_DECISION")
 OPERATOR_COMMANDS = (
@@ -82,7 +87,11 @@ def _nav(active: str) -> str:
     for href, name in NAV:
         current = " aria-current=\"page\"" if name == active else ""
         links.append(f'<a href="{href}"{current}>{html.escape(name)}</a>')
-    return "<nav>" + " · ".join(links) + "</nav>"
+    return (
+        "<aside class=\"signal-rail\" data-mode=\"STEEL_SIGNAL\">"
+        "<p class=\"brand\">SMIAL</p>"
+        "<nav>" + "".join(links) + "</nav></aside>"
+    )
 
 
 def _rows(mapping: dict[str, Any]) -> str:
@@ -284,12 +293,276 @@ def _economics_section(model: dict[str, Any]) -> str:
     )
 
 
+def _href_detail(locator: Mapping[str, Any]) -> str:
+    return (
+        "/research?entity_id="
+        + html.escape(str(locator.get("entity_id") or ""), quote=True)
+        + "&amp;truth_plane="
+        + html.escape(str(locator.get("truth_plane") or ""), quote=True)
+        + "&amp;native_kind="
+        + html.escape(str(locator.get("native_kind") or ""), quote=True)
+    )
+
+
+def _research_rows(rows: list[dict[str, Any]]) -> str:
+    if not rows:
+        return "<p class=\"empty\">NONE</p>"
+    body = []
+    for row in rows:
+        locator = row.get("locator") if isinstance(row.get("locator"), dict) else {}
+        has_locator = bool(
+            locator.get("entity_id")
+            and locator.get("truth_plane")
+            and locator.get("native_kind")
+        )
+        href = _href_detail(locator) if has_locator else ""
+        kind_text = html.escape(str(row.get("kind") or ""))
+        title_text = html.escape(str(row.get("title") or ""))
+        kind_cell = f"<td><a href=\"{href}\">{kind_text}</a></td>" if href else f"<td>{kind_text}</td>"
+        title_cell = f"<td><a href=\"{href}\">{title_text}</a></td>" if href else f"<td>{title_text}</td>"
+        marker = []
+        if row.get("attention"):
+            marker.append("ATTENTION")
+        if row.get("blocker"):
+            marker.append(str(row.get("blocker")))
+        if not has_locator and row.get("next_safe_action"):
+            marker.append(str(row.get("next_safe_action")))
+        body.append(
+            "<tr class=\"research-row\">"
+            + kind_cell
+            + title_cell
+            + f"<td>{html.escape(str(row.get('native_state') or 'UNKNOWN'))}</td>"
+            f"<td>{html.escape(str(row.get('truth_plane') or ''))}</td>"
+            f"<td>{html.escape(str(row.get('evidence_class') or ''))}</td>"
+            f"<td class=\"mono\">{html.escape(str(row.get('as_of') or ''))}</td>"
+            f"<td>{html.escape(str(row.get('source') or ''))}</td>"
+            f"<td>{html.escape(' · '.join(marker) if marker else '')}</td>"
+            f"<td class=\"mono\">{html.escape(str(locator.get('entity_id') or ''))}</td>"
+            "</tr>"
+        )
+    return (
+        "<table class=\"research-table\"><tr>"
+        "<th>kind</th><th>title</th><th>state</th><th>plane</th>"
+        "<th>evidence</th><th>as_of</th><th>source</th><th>marker</th><th>id</th>"
+        "</tr>" + "".join(body) + "</table>"
+    )
+
+
+def _counter_cell(label: str, value: Any) -> str:
+    if value is None:
+        return (
+            f"<article class=\"counter\"><h3>{html.escape(label)}</h3>"
+            "<p class=\"semantic-unknown\">NOT AVAILABLE</p></article>"
+        )
+    return (
+        f"<article class=\"counter\"><h3>{html.escape(label)}</h3>"
+        f"<p>{html.escape(str(value))}</p></article>"
+    )
+
+
+def _lineage_list(edges: list[dict[str, Any]], direction: str) -> str:
+    if not edges:
+        return f"<p class=\"empty\">{html.escape(direction)} NONE</p>"
+    items = []
+    for edge in edges:
+        resolution = str(edge.get("resolution") or "")
+        css = "trace-resolved"
+        if resolution in {"TARGET_GAP", "SOURCE_GAP"}:
+            css = "trace-gap"
+        elif resolution == "CONFLICT":
+            css = "trace-conflict"
+        items.append(
+            f"<li class=\"{css}\">"
+            f"<span>{html.escape(str(edge.get('relation_type') or ''))}</span> "
+            f"<span class=\"mono\">{html.escape(str(edge.get('from_entity_id') or ''))}</span>"
+            " → "
+            f"<span class=\"mono\">{html.escape(str(edge.get('to_entity_id') or ''))}</span> "
+            f"<span>{html.escape(resolution)}</span> "
+            f"<span>{html.escape(str(edge.get('derivation_method') or ''))}</span>"
+            "</li>"
+        )
+    return f"<ul class=\"trace {html.escape(direction.casefold())}\">" + "".join(items) + "</ul>"
+
+
+def _research_overview_html(view: Mapping[str, Any]) -> str:
+    sources = "".join(
+        "<tr>"
+        f"<th>{html.escape(str(item.get('label') or ''))}</th>"
+        f"<td>{html.escape(str(item.get('status') or 'UNKNOWN'))}</td>"
+        f"<td>{html.escape(str(item.get('truth_plane') or ''))}</td>"
+        f"<td>{html.escape(str(item.get('error') or ''))}</td>"
+        f"<td>{html.escape(str(item.get('next_safe_action') or 'UNKNOWN'))}</td>"
+        "</tr>"
+        for item in view.get("sources") or []
+        if isinstance(item, dict)
+    ) or "<tr><td>UNKNOWN</td></tr>"
+    counters = view.get("counters") if isinstance(view.get("counters"), dict) else {}
+    degraded = ""
+    if view.get("degraded"):
+        degraded = (
+            "<p class=\"degraded semantic-unknown\">"
+            + html.escape(str(view.get("degraded_copy") or "PARTIAL"))
+            + "</p>"
+        )
+    filters = view.get("filters") if isinstance(view.get("filters"), dict) else {}
+    q = html.escape(str(filters.get("q") or ""))
+    kind = html.escape(str(filters.get("kind") or "all"))
+    return (
+        "<section class=\"research-overview\">"
+        "<h2>RESEARCH</h2>"
+        f"<p>projection {html.escape(str(view.get('completeness') or 'PARTIAL'))}</p>"
+        + degraded
+        + "<table class=\"source-panel\">"
+        + "<tr><th>source</th><th>status</th><th>plane</th><th>error</th><th>next</th></tr>"
+        + sources
+        + "</table>"
+        + "<div class=\"counters\">"
+        + "".join(_counter_cell(label, counters.get(label)) for label in (
+            "ACTIVE NOW", "TRIALS", "DECISIONS", "NEGATIVES", "ATTENTION", "GAPS"
+        ))
+        + "</div>"
+        + "<h3>Needs attention</h3>"
+        + _research_rows(list(view.get("needs_attention") or []))
+        + "<h3>Current activity</h3>"
+        + (
+            "<p class=\"empty semantic-unknown\">NOT AVAILABLE</p>"
+            if counters.get("ACTIVE NOW") is None
+            else _research_rows(list(view.get("current_activity") or []))
+        )
+        + "<h3>Research universe</h3>"
+        + "<p class=\"filters\">"
+        + "<a href=\"/research\">all</a> "
+        + "<a href=\"/research?kind=hypotheses\">hypotheses</a> "
+        + "<a href=\"/research?kind=experiments\">experiments</a> "
+        + "<a href=\"/research?kind=trials\">trials</a> "
+        + "<a href=\"/research?kind=decisions\">decisions</a> "
+        + "<a href=\"/research?kind=negative\">negative</a>"
+        + "</p>"
+        + "<form method=\"get\" action=\"/research\" class=\"search\">"
+        + f"<input name=\"q\" value=\"{q}\" maxlength=\"80\" aria-label=\"search\">"
+        + f"<input type=\"hidden\" name=\"kind\" value=\"{kind}\">"
+        + "<button type=\"submit\">search</button></form>"
+        + _research_rows(list(view.get("universe") or []))
+        + "</section>"
+    )
+
+
+def _research_detail_html(view: Mapping[str, Any]) -> str:
+    header = view.get("header") if isinstance(view.get("header"), dict) else {}
+    fields = view.get("fields") if isinstance(view.get("fields"), dict) else {}
+    lineage = view.get("lineage") if isinstance(view.get("lineage"), dict) else {}
+    gaps = "".join(
+        "<li>"
+        + html.escape(str(item.get("gap_code") or "UNKNOWN"))
+        + " — "
+        + html.escape(str(item.get("reason") or ""))
+        + "</li>"
+        for item in view.get("gaps") or []
+        if isinstance(item, dict)
+    ) or "<li class=\"semantic-unknown\">NONE</li>"
+    unknown = view.get("unknown") if isinstance(view.get("unknown"), list) else []
+    unknown_html = (
+        "<ul>" + "".join(f"<li class=\"semantic-unknown\">{html.escape(str(item))}</li>" for item in unknown) + "</ul>"
+        if unknown
+        else "<p class=\"semantic-unknown\">NONE</p>"
+    )
+    timeline = "".join(
+        "<li>"
+        + html.escape(str(item.get("clock") or ""))
+        + " "
+        + f"<span class=\"mono\">{html.escape(str(item.get('value') or ''))}</span>"
+        + "</li>"
+        for item in view.get("timeline") or []
+        if isinstance(item, dict)
+    )
+    technical = view.get("technical") if isinstance(view.get("technical"), dict) else {}
+    provenance = view.get("provenance") if isinstance(view.get("provenance"), dict) else {}
+    field_rows = _rows({str(key): value for key, value in fields.items()})
+    return (
+        "<article class=\"evidence-editorial\" data-mode=\"EVIDENCE_EDITORIAL\">"
+        "<p><a href=\"/research\">← RESEARCH</a></p>"
+        "<header class=\"evidence-header\">"
+        f"<p>{html.escape(str(header.get('native_kind') or ''))} "
+        f"<span class=\"mono\">{html.escape(str(header.get('entity_id') or ''))}</span></p>"
+        f"<h2>{html.escape(str(header.get('title') or ''))}</h2>"
+        "<table>"
+        + _rows(
+            {
+                "STATE": header.get("state") or "UNKNOWN",
+                "TRUTH PLANE": header.get("truth_plane"),
+                "EVIDENCE CLASS": header.get("evidence_class"),
+                "SOURCE": header.get("source"),
+                "AS OF": header.get("as_of"),
+                "OBSERVED AT": header.get("observed_at"),
+                "FRESHNESS": header.get("freshness"),
+                "NEXT SAFE ACTION": header.get("next_safe_action") or "UNKNOWN",
+            }
+        )
+        + "</table></header>"
+        + "<h3>DETAIL</h3><table>"
+        + (field_rows or "<tr><td class=\"semantic-unknown\">UNKNOWN</td></tr>")
+        + "</table>"
+        + "<h3>LINEAGE</h3>"
+        + "<div class=\"computational-field\" data-mode=\"COMPUTATIONAL_FIELD\">"
+        + "<p class=\"trace-label\">TRACE</p>"
+        + _lineage_list(list(lineage.get("inbound") or []), "INBOUND")
+        + "<p class=\"current\">CURRENT OBJECT</p>"
+        + _lineage_list(list(lineage.get("outbound") or []), "OUTBOUND")
+        + "</div>"
+        + "<h3>GAPS / UNKNOWN</h3><ul>"
+        + gaps
+        + "</ul>"
+        + unknown_html
+        + "<h3>SOURCE / PROVENANCE</h3><table>"
+        + _rows(provenance)
+        + "</table>"
+        + "<h3>TIMELINE</h3><ul>"
+        + timeline
+        + "</ul>"
+        + "<details class=\"technical\"><summary>TECHNICAL DETAILS</summary><table>"
+        + _rows(technical)
+        + "</table></details></article>"
+    )
+
+
+def _research_section(app: FactoryApplication, query: dict[str, list[str]]) -> str:
+    def first(name: str) -> str | None:
+        values = query.get(name) or []
+        return values[0] if values else None
+
+    try:
+        locator = parse_locator(
+            first("entity_id"),
+            first("truth_plane"),
+            first("native_kind"),
+        )
+        if locator is not None:
+            return _research_detail_html(app.research_detail(locator))
+        limit_raw = first("limit") or "80"
+        limit = int(limit_raw)
+        return _research_overview_html(
+            app.research_overview(
+                q=first("q"),
+                kind=first("kind"),
+                truth_plane=first("truth_plane") if not first("entity_id") else None,
+                state=first("state"),
+                evidence_class=first("evidence_class"),
+                limit=limit,
+            )
+        )
+    except (ResearchWorkbenchError, ApplicationError, ValueError) as exc:
+        return f"<p class=\"error\">{html.escape(str(exc))}</p><p><a href=\"/research\">← RESEARCH</a></p>"
+
+
 def _page(
     model: dict[str, Any],
     *,
     surface: str,
     copy_blocks: list[dict[str, str]] | None = None,
     error: str = "",
+    research_html: str | None = None,
+    visual_css: str = "",
+    visual_consumed: bool = False,
 ) -> bytes:
     cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
     packet = cockpit.get("packet") if isinstance(cockpit.get("packet"), dict) else {}
@@ -330,40 +603,63 @@ def _page(
             )
             + "</table>"
         ),
-        "RESEARCH": "<h2>Research packet</h2><table>" + _rows(packet) + "</table>",
+        "RESEARCH": research_html or "<h2>RESEARCH</h2><p class=\"semantic-unknown\">UNKNOWN</p>",
         "OPERATIONS": _operations_section(model),
         "ECONOMICS": _economics_section(model),
         "SYSTEM": "<h2>Runtime</h2><table>" + _rows(runtime) + "</table>",
     }
+    consumed = "true" if visual_consumed else "false"
     body = f"""<!doctype html>
-<html lang="ru"><head><meta charset="utf-8"><title>Factory v1 Workbench</title>
+<html lang="ru" data-appearance="DARK_ONLY" data-identity="STEEL_SIGNAL"><head><meta charset="utf-8"><title>Factory v1 Workbench</title>
 <style>
-body {{ font-family: sans-serif; margin: 2rem; max-width: 1100px; }}
+{visual_css}
+html,body {{ background: var(--surface-void, #111); color: var(--text-primary, #eee); font-family: sans-serif; margin: 0; }}
+.shell {{ display: grid; grid-template-columns: 12rem 1fr; min-height: 100vh; }}
+.signal-rail {{ background: var(--surface-base, #161616); border-right: 1px solid var(--border-hairline, #333); padding: 1.5rem 1rem; }}
+.signal-rail .brand {{ letter-spacing: 0.12em; margin: 0 0 1.5rem; }}
+.signal-rail nav {{ display: flex; flex-direction: column; gap: 0.75rem; }}
+.signal-rail a {{ color: var(--text-muted, #999); text-decoration: none; }}
+.signal-rail a[aria-current="page"] {{ color: var(--accent-signal, #888); font-weight: bold; }}
+main {{ background: var(--surface-base, #161616); padding: 2rem; max-width: 1100px; }}
 th {{ text-align: left; padding-right: 1rem; vertical-align: top; }}
-.error {{ color: #a40000; }}
-nav a[aria-current="page"] {{ font-weight: bold; }}
+.error, .danger {{ color: var(--semantic-danger, #a40000); }}
+.semantic-unknown {{ color: var(--semantic-unknown, #777); }}
+.semantic-warning {{ color: var(--semantic-warning, #b8860b); }}
+.degraded {{ border: 1px solid var(--border-hairline, #333); padding: 0.75rem 1rem; background: var(--surface-panel, #1c1c1c); }}
 form button {{ margin-right: 0.5rem; margin-bottom: 0.5rem; }}
-.copy-hint {{ color: #444; }}
-.copy-block {{ position: relative; margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid #ccc; background: #f7f7f7; }}
+.copy-hint {{ color: var(--text-muted, #999); }}
+.copy-block {{ position: relative; margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--border-hairline, #333); background: var(--surface-panel, #1c1c1c); }}
 .copy-head {{ display: flex; align-items: center; justify-content: space-between; gap: 1rem; }}
 .copy-head h2 {{ font-size: 1rem; margin: 0; }}
 .copy-btn {{ opacity: 0; pointer-events: none; }}
 .copy-block:hover .copy-btn, .copy-block:focus-within .copy-btn {{ opacity: 1; pointer-events: auto; }}
 .copy-text {{ white-space: pre-wrap; word-break: break-word; margin: 0.75rem 0 0; }}
-.attention {{ border: 1px solid #ccc; padding: 0.75rem 1rem; margin: 0.75rem 0; }}
+.attention {{ border: 1px solid var(--border-hairline, #333); padding: 0.75rem 1rem; margin: 0.75rem 0; }}
 .non-claims {{ font-weight: bold; }}
-.danger {{ border: 2px solid #a40000; padding: 0.75rem; margin-top: 1rem; }}
+.danger {{ border: 2px solid var(--semantic-danger, #a40000); padding: 0.75rem; margin-top: 1rem; }}
 .safe-actions {{ margin: 0.75rem 0; }}
+.mono {{ font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.85em; }}
+.counters {{ display: grid; grid-template-columns: repeat(6, minmax(6rem, 1fr)); gap: 0.75rem; margin: 1rem 0; }}
+.counter {{ background: var(--surface-panel, #1c1c1c); border: 1px solid var(--border-hairline, #333); padding: 0.5rem 0.75rem; }}
+.counter h3 {{ font-size: 0.75rem; margin: 0 0 0.35rem; color: var(--text-muted, #999); }}
+.research-table a {{ color: var(--text-primary, #eee); }}
+.trace-resolved {{ color: var(--text-primary, #eee); }}
+.trace-gap {{ color: var(--semantic-warning, #b8860b); }}
+.trace-conflict {{ color: var(--semantic-danger, #a40000); font-weight: bold; }}
+.evidence-editorial .evidence-header {{ border-bottom: 1px solid var(--border-hairline, #333); margin-bottom: 1rem; }}
 table {{ border-collapse: collapse; width: 100%; margin-bottom: 1rem; }}
-td, th {{ border-bottom: 1px solid #ddd; padding: 0.35rem 0.5rem; }}
-</style></head><body>
+td, th {{ border-bottom: 1px solid var(--border-hairline, #333); padding: 0.35rem 0.5rem; }}
+</style></head><body class="steel-signal" data-visual-os-consumed="{consumed}">
+<div class="shell">
+{_nav(surface)}
+<main>
 <h1>Factory v1 — локальный срез владельца</h1>
 <p>Проекция. UI не владеет научной истиной и не открывает SQLite. START без точной owner phrase не читает ключ и не вызывает Jupiter. git_archaeology_required={html.escape(archaeology)}. Operational-ready milestone is not claimed.</p>
-{_nav(surface)}
 {notice}
 {_copy_sections(copy_blocks or []) if surface == "HOME" else ""}
 {sections.get(surface) or ""}
 {("<form method=\"post\" action=\"/\">" + buttons + "</form>") if surface == "HOME" else ""}
+</main></div>
 <script>
 document.querySelectorAll(".copy-btn").forEach(function (button) {{
   button.addEventListener("click", function () {{
@@ -400,21 +696,37 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
         def log_message(self, format: str, *args: object) -> None:
             return
 
-        def _render(self, surface: str, error: str = "") -> None:
+        def _render(
+            self,
+            surface: str,
+            error: str = "",
+            query: dict[str, list[str]] | None = None,
+        ) -> None:
+            if surface == "RESEARCH":
+                model: dict[str, Any] = {"cockpit": {}, "runtime": {}}
+                research_html = _research_section(app, query or {})
+            else:
+                model = app.read_model(surface=surface)
+                research_html = None
             body = _page(
-                app.read_model(surface=surface),
+                model,
                 surface=surface,
                 copy_blocks=owner_copy_blocks(app) if surface == "HOME" else [],
                 error=error,
+                research_html=research_html,
+                visual_css=visual_os_css(app.root),
+                visual_consumed=visual_os_consumed(app.root),
             )
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
 
         def do_GET(self) -> None:  # noqa: N802
-            path = urlparse(self.path).path
+            parsed = urlparse(self.path)
+            path = parsed.path
             surfaces = {
                 "/": "HOME",
                 "/index.html": "HOME",
@@ -427,7 +739,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             if surface is None:
                 self.send_error(404)
                 return
-            self._render(surface)
+            self._render(surface, query=parse_qs(parsed.query))
 
         def do_POST(self) -> None:  # noqa: N802
             path = urlparse(self.path).path

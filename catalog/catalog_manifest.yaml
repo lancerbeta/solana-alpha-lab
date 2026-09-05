@@ -4,7 +4,7 @@ catalog_version: 0.126.0
 as_of: '2026-09-05'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1695
+  assets: 1699
   asset_registries: 4
   schemas: 89
   queries: 19
@@ -93,6 +93,14 @@ canonical_bindings:
     current_use_evidence_asset_ids:
     - DOC-OWNER-LIFECYCLE-PROJECTION-001
     - TEST-OWNER-LIFECYCLE-PROJECTION-001
+  ACTIVE-RESEARCH-LIFECYCLE-WORKBENCH:
+    target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001
+    expected_asset_type: control_document
+    semantics: CURRENT_AT_COMMIT
+    rationale: Owner Research Workbench read composition over the lifecycle projection
+    current_use_evidence_asset_ids:
+    - DOC-RESEARCH-LIFECYCLE-WORKBENCH-001
+    - TEST-RESEARCH-LIFECYCLE-WORKBENCH-001
 root_resolver:
   asset_registries:
   - catalog/assets/core.yaml

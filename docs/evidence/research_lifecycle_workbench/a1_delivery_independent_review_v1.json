@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "RESEARCH-LIFECYCLE-WORKBENCH-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-05",
+  "task_id": "RESEARCH_LIFECYCLE_WORKBENCH_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "969592c08ed85a0485719bfd0f5c0c512d0fdef3d5fca9693edef54e5e14c0b4",
+  "reviewed_inventory_sha256": "963269e5fa3460d89a561be94d5a133609ea115146671e8e8b6197682eb08d5a",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "SQLITE_READONLY_IMMUTABLE",
+        "FILTER_ENUMS_ALLOWLISTED",
+        "NO_PATH_TRAVERSAL_IN_LOCATOR",
+        "HTML_ESCAPED",
+        "NO_RESEARCHSTORE_RESCAN_ON_DETAIL",
+        "GET_RESEARCH_DOES_NOT_CREATE_ROOT"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "FOUR_OWNER_LOOPS_CLOSED",
+        "ACTIVE_NOW_NOT_FAKE_ZERO",
+        "BLOCKER_NONE_NOT_ATTENTION",
+        "NEGATIVE_NOT_KILLED",
+        "DEGRADED_PARTIAL_TRUTHFUL",
+        "REAL_TRIAL_EXPERIMENT_NEGATIVE_VISIBLE",
+        "SOURCE_ATTENTION_SHOWS_NEXT_SAFE_ACTION"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=95e57db948fc20849507335755b14d51f4569defcb8f61ad0d128c6ba162c3c4",
+        "WORKBENCH_NOT_TRUTH_OWNER",
+        "NO_SECOND_PROJECTION",
+        "RESEARCHSTORE_READ_NON_MUTATING",
+        "GLOBAL_TRIAL_VIA_LIFECYCLE_PROJECTION",
+        "NO_NEW_SEMANTIC_ROUTE",
+        "PLANE_CONFLICT_NOT_RESOLVED",
+        "NO_VPS_DEPLOY"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_RESEARCH_MUTATION",
+    "NO_SECOND_TRUTH_STORE",
+    "NO_NEW_SEMANTIC_ROUTE",
+    "NO_FRONTEND_FRAMEWORK",
+    "NO_VPS_DEPLOY",
+    "NO_AUTHORITY_FROM_WORKBENCH",
+    "NO_INVENTED_LIFECYCLE_STATES"
+  ]
+}
