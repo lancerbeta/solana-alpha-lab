@@ -18,6 +18,7 @@ Validation: `PASS`.
 | What is this product / Factory v1? | SEM-PRODUCT-STATE | ACTIVE-FACTORY-OPERATIONAL-READINESS→CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001 | CAPABILITY | resolve-route / Catalog dereference | false |
 | What provider route supports this field? | SEM-PROVIDER-ROUTES | ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY→CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010 | MIXED | resolve-route / Catalog dereference | false |
 | Where is the Factory VPS? | SEM-REMOTE-OPS-RECOVERY | ACTIVE-FACTORY-REMOTE-OPERATIONS→CONFIG-FACTORY-REMOTE-OPERATIONS-001; DOC-FACTORY-REMOTE-HOST-001 | RUNTIME | EXTERNAL_GATED_READBACK via DOC-FACTORY-REMOTE-HOST-001 | false |
+| How should I design an SMIAL owner-facing surface? | SEM-VISUAL-OPERATING-SYSTEM | ACTIVE-SMIAL-VISUAL-OPERATING-SYSTEM→CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001; DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001 | CAPABILITY | resolve-route / Catalog dereference | false |
 
 Planes: `CAPABILITY` = what Git currently knows how to do; `RUNTIME` = machine readback;
 `SCIENTIFIC` = evidence/results; `AUTHORITY` = gate/task resolver only; `MIXED` = explicit multi-plane.

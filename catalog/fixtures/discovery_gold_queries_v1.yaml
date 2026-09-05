@@ -158,3 +158,15 @@ queries:
   required_top_5:
   - CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010
   rationale: Consumer and relation filters apply before rank
+- query_id: GQ-VISUAL-OPERATING-SYSTEM-EN
+  command: search-assets
+  query: smial visual operating system
+  required_top_5:
+  - CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  rationale: Current visual operating system machine contract in English
+- query_id: GQ-VISUAL-BRANDBOOK-RU
+  command: search-assets
+  query: брендбук визуальный стиль smial
+  required_top_5:
+  - DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001
+  rationale: Current visual companion document from Russian brandbook query

@@ -497,6 +497,11 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
         self.assertIn("ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY", self.bindings)
         self.assertIn("ACTIVE-FACTORY-MARKET-FEATURE-SURFACE", self.bindings)
         self.assertIn("ACTIVE-FACTORY-SEMANTIC-OPERABILITY", self.bindings)
+        self.assertIn("ACTIVE-SMIAL-VISUAL-OPERATING-SYSTEM", self.bindings)
+        self.assertEqual(
+            self.bindings["ACTIVE-SMIAL-VISUAL-OPERATING-SYSTEM"]["target_asset_id"],
+            "CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001",
+        )
         self.assertEqual(
             self.bindings["ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY"]["target_asset_id"],
             "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
@@ -519,7 +524,7 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
     def test_gold_queries(self) -> None:
         fixture = yaml.safe_load(GOLD_PATH.read_text(encoding="utf-8"))
         queries = fixture["queries"]
-        self.assertEqual(len(queries), 24)
+        self.assertEqual(len(queries), 26)
         ids = [item["query_id"] for item in queries]
         self.assertEqual(len(ids), len(set(ids)))
         first = []

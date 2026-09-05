@@ -1,0 +1,413 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/smial_visual_operating_system.schema.json",
+  "title": "SMIAL Visual Operating System V1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "system_id",
+    "version",
+    "appearance",
+    "authority_granted",
+    "truth_owner_boundary",
+    "identity",
+    "palette",
+    "semantic_color_roles",
+    "typography_roles",
+    "spacing_scale_px",
+    "geometry",
+    "surface_modes",
+    "visual_primitives",
+    "chart_invariants",
+    "state_invariants",
+    "motion_invariants",
+    "accessibility_invariants",
+    "anti_patterns"
+  ],
+  "properties": {
+    "schema": {"const": "smial.visual-operating-system"},
+    "schema_version": {"const": "1.0"},
+    "system_id": {"const": "SMIAL_VISUAL_OPERATING_SYSTEM_V1"},
+    "version": {"const": "1.0"},
+    "appearance": {"const": "DARK_ONLY"},
+    "authority_granted": {"const": false},
+    "truth_owner_boundary": {"const": "PRESENTATION_ONLY"},
+    "identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["base", "sublanguages", "selectable_themes", "light_theme"],
+      "properties": {
+        "base": {"const": "STEEL_SIGNAL"},
+        "sublanguages": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "COMPUTATIONAL_FIELD",
+              "EVIDENCE_EDITORIAL",
+              "CONTROL_SURFACE"
+            ]
+          }
+        },
+        "selectable_themes": {"const": false},
+        "light_theme": {"const": false}
+      }
+    },
+    "palette": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["surface", "border", "text", "accent", "semantic", "data"],
+      "properties": {
+        "surface": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["void", "base", "panel", "raised"],
+          "properties": {
+            "void": {"$ref": "#/$defs/hexColor"},
+            "base": {"$ref": "#/$defs/hexColor"},
+            "panel": {"$ref": "#/$defs/hexColor"},
+            "raised": {"$ref": "#/$defs/hexColor"}
+          }
+        },
+        "border": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["hairline"],
+          "properties": {"hairline": {"$ref": "#/$defs/hexColor"}}
+        },
+        "text": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["primary", "secondary", "muted"],
+          "properties": {
+            "primary": {"$ref": "#/$defs/hexColor"},
+            "secondary": {"$ref": "#/$defs/hexColor"},
+            "muted": {"$ref": "#/$defs/hexColor"}
+          }
+        },
+        "accent": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["signal", "cobalt"],
+          "properties": {
+            "signal": {"$ref": "#/$defs/hexColor"},
+            "cobalt": {"$ref": "#/$defs/hexColor"}
+          }
+        },
+        "semantic": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["positive", "warning", "danger", "unknown"],
+          "properties": {
+            "positive": {"$ref": "#/$defs/hexColor"},
+            "warning": {"$ref": "#/$defs/hexColor"},
+            "danger": {"$ref": "#/$defs/hexColor"},
+            "unknown": {"$ref": "#/$defs/hexColor"}
+          }
+        },
+        "data": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["comparison_secondary"],
+          "properties": {
+            "comparison_secondary": {"$ref": "#/$defs/hexColor"}
+          }
+        }
+      }
+    },
+    "semantic_color_roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "accent.signal",
+        "accent.cobalt",
+        "semantic.positive",
+        "semantic.warning",
+        "semantic.danger",
+        "semantic.unknown"
+      ],
+      "properties": {
+        "accent.signal": {"$ref": "#/$defs/colorRole"},
+        "accent.cobalt": {"$ref": "#/$defs/colorRole"},
+        "semantic.positive": {"$ref": "#/$defs/colorRole"},
+        "semantic.warning": {"$ref": "#/$defs/colorRole"},
+        "semantic.danger": {"$ref": "#/$defs/colorRole"},
+        "semantic.unknown": {"$ref": "#/$defs/colorRole"}
+      }
+    },
+    "typography_roles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ui_sans", "mono", "numerals"],
+      "properties": {
+        "ui_sans": {"$ref": "#/$defs/typeRole"},
+        "mono": {"$ref": "#/$defs/typeRole"},
+        "numerals": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["tabular_for"],
+          "properties": {
+            "tabular_for": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"type": "string", "minLength": 2, "maxLength": 32}
+            }
+          }
+        }
+      }
+    },
+    "spacing_scale_px": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": {"type": "integer", "minimum": 1, "maximum": 64},
+      "const": [4, 8, 12, 16, 24, 32]
+    },
+    "geometry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "hairline_px",
+        "radius_normal_px",
+        "radius_exception_px",
+        "pill_for_every_state",
+        "giant_bubbly_cards"
+      ],
+      "properties": {
+        "hairline_px": {"const": 1},
+        "radius_normal_px": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": {
+            "min": {"type": "integer", "minimum": 1, "maximum": 8},
+            "max": {"type": "integer", "minimum": 1, "maximum": 8}
+          }
+        },
+        "radius_exception_px": {"type": "integer", "minimum": 4, "maximum": 12},
+        "pill_for_every_state": {"const": false},
+        "giant_bubbly_cards": {"const": false}
+      }
+    },
+    "surface_modes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "STEEL_SIGNAL",
+        "COMPUTATIONAL_FIELD",
+        "EVIDENCE_EDITORIAL",
+        "CONTROL_SURFACE"
+      ],
+      "properties": {
+        "STEEL_SIGNAL": {"$ref": "#/$defs/surfaceMode"},
+        "COMPUTATIONAL_FIELD": {"$ref": "#/$defs/surfaceMode"},
+        "EVIDENCE_EDITORIAL": {"$ref": "#/$defs/surfaceMode"},
+        "CONTROL_SURFACE": {"$ref": "#/$defs/surfaceMode"}
+      }
+    },
+    "visual_primitives": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {
+        "enum": ["SIGNAL_RAIL", "TRACE", "EVIDENCE_HEADER", "CONTROL_ZONE"]
+      }
+    },
+    "chart_invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "expose_scope_when_source_provides",
+        "missing_field_policy",
+        "fabricate_precision",
+        "forbidden"
+      ],
+      "properties": {
+        "expose_scope_when_source_provides": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1, "maxLength": 64}
+        },
+        "missing_field_policy": {"const": "UNKNOWN_OR_NOT_AVAILABLE"},
+        "fabricate_precision": {"const": false},
+        "forbidden": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 2, "maxLength": 64}
+        }
+      }
+    },
+    "state_invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owns_domain_states",
+        "color_never_alone",
+        "brand_accent_is_not_success",
+        "evidence_class_never_color_only",
+        "unknown_is_not_zero",
+        "stale_is_not_healthy",
+        "process_up_is_not_system_healthy",
+        "paper_is_not_live",
+        "backtest_is_not_paper",
+        "evidence_class_labels_required"
+      ],
+      "properties": {
+        "owns_domain_states": {"const": false},
+        "color_never_alone": {"const": true},
+        "brand_accent_is_not_success": {"const": true},
+        "evidence_class_never_color_only": {"const": true},
+        "unknown_is_not_zero": {"const": true},
+        "stale_is_not_healthy": {"const": true},
+        "process_up_is_not_system_healthy": {"const": true},
+        "paper_is_not_live": {"const": true},
+        "backtest_is_not_paper": {"const": true},
+        "evidence_class_labels_required": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["MODEL", "BACKTEST", "PAPER", "SHADOW", "LIVE"]
+          }
+        }
+      }
+    },
+    "motion_invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "allowed",
+        "forbidden",
+        "typical_duration_ms",
+        "reduced_motion_required",
+        "perpetual_animation"
+      ],
+      "properties": {
+        "allowed": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 2, "maxLength": 64}
+        },
+        "forbidden": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 2, "maxLength": 64}
+        },
+        "typical_duration_ms": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["min", "max"],
+          "properties": {
+            "min": {"type": "integer", "minimum": 50, "maximum": 400},
+            "max": {"type": "integer", "minimum": 50, "maximum": 400}
+          }
+        },
+        "reduced_motion_required": {"const": true},
+        "perpetual_animation": {"const": false}
+      }
+    },
+    "accessibility_invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text_contrast_target",
+        "focus_without_color_alone",
+        "semantic_states_without_color_alone",
+        "decision_critical_not_tiny_low_contrast",
+        "dense_ui_does_not_justify_illegibility",
+        "reduced_motion_supportable"
+      ],
+      "properties": {
+        "text_contrast_target": {"const": "WCAG_AA"},
+        "focus_without_color_alone": {"const": true},
+        "semantic_states_without_color_alone": {"const": true},
+        "decision_critical_not_tiny_low_contrast": {"const": true},
+        "dense_ui_does_not_justify_illegibility": {"const": true},
+        "reduced_motion_supportable": {"const": true}
+      }
+    },
+    "anti_patterns": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 3, "maxLength": 64}
+    },
+    "grammars": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["research", "operations", "telegram", "attention", "command"],
+      "properties": {
+        "research": {"$ref": "#/$defs/stringList"},
+        "operations": {"$ref": "#/$defs/stringList"},
+        "telegram": {"$ref": "#/$defs/stringList"},
+        "attention": {"$ref": "#/$defs/stringList"},
+        "command": {"$ref": "#/$defs/stringList"}
+      }
+    },
+    "consumers": {"$ref": "#/$defs/stringList"},
+    "non_claims": {"$ref": "#/$defs/stringList"}
+  },
+  "$defs": {
+    "hexColor": {
+      "type": "string",
+      "pattern": "^#[0-9A-Fa-f]{6}$"
+    },
+    "stringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 2, "maxLength": 64}
+    },
+    "colorRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["means"],
+      "properties": {
+        "means": {"$ref": "#/$defs/stringList"},
+        "must_not_mean": {"$ref": "#/$defs/stringList"},
+        "must_not_resemble": {"$ref": "#/$defs/stringList"},
+        "requires_domain_support": {"type": "boolean"},
+        "scarcity": {"enum": ["RED_IS_SCARCE"]}
+      }
+    },
+    "typeRole": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["intent_class", "preferred_examples", "adoption_in_this_contract"],
+      "properties": {
+        "intent_class": {"type": "string", "minLength": 2, "maxLength": 64},
+        "preferred_examples": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 2, "maxLength": 64}
+        },
+        "adoption_in_this_contract": {"const": false},
+        "use_only_for": {"$ref": "#/$defs/stringList"}
+      }
+    },
+    "surfaceMode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "use_for"],
+      "properties": {
+        "role": {"type": "string", "minLength": 4, "maxLength": 64},
+        "use_for": {"$ref": "#/$defs/stringList"},
+        "primary_primitive": {
+          "enum": ["SIGNAL_RAIL", "TRACE", "EVIDENCE_HEADER", "CONTROL_ZONE", "STATUS_RAIL"]
+        }
+      }
+    }
+  }
+}

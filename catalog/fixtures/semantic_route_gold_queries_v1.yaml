@@ -56,3 +56,27 @@ queries:
 - query_id: SGQ-AUTHORITY-RU
   query: могу ли я вызвать провайдера / задеплоить / потратить
   required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-VISUAL-DESIGN-EN
+  query: How should I design an SMIAL owner-facing surface?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-VISUAL-SYSTEM-EN
+  query: What visual system does SMIAL use?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-VISUAL-WORKBENCH-EN
+  query: How should Workbench UI look?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-VISUAL-EVIDENCE-EN
+  query: How should I style an experiment or evidence screen?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-VISUAL-OPERATIONS-EN
+  query: How should operations or command surfaces look?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-VISUAL-TELEGRAM-EN
+  query: How should Telegram service messages look?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-VISUAL-BRANDBOOK-RU
+  query: какой брендбук / визуальный стиль проекта
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-VISUAL-INTERFACE-RU
+  query: как оформлять интерфейс SMIAL
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
