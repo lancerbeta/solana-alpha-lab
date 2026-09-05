@@ -35205,7 +35205,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: SMIAL_VISUAL_OPERATING_SYSTEM_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/SMIAL_VISUAL_OPERATING_SYSTEM_V1.md', repository_path: docs/tasks/SMIAL_VISUAL_OPERATING_SYSTEM_V1.md}
-  integrity: {kind: sha256, sha256: c2c42d2685dafcccae3ba54babcfc8a2aeee62a8a3f4388b12b4bd0cec5132fc}
+  integrity: {kind: sha256, sha256: 3f8cd7696cf8ac443adc975a1d84d2ca5859d7271fb15512fa7a79546442189a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONFIG-SMIAL-VISUAL-OPERATING-SYSTEM-001}

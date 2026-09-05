@@ -10,7 +10,7 @@ expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: 012d6f053f20a50dfa22ddc67b7e4c13df36a7a0
   expected_upstream: origin/main
-  expected_upstream_oid: 012d6f053f20a50dfa22ddc67b7e4c13df36a7a0
+  expected_upstream_oid: 89c9778f120c5d9cc68df340aa4339c75ea45b96
   expected_branch: cursor/smial-visual-operating-system-v1
   dirty_mode: ALLOW_REPORTED
 objective: Canonize one durable SMIAL Visual Operating System so future owner-facing
