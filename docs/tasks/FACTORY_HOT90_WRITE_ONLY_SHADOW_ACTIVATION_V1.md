@@ -25,6 +25,7 @@ managed_write_set:
   - docs/tasks/FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1.md
   - configs/factory_hot90_archive_activation_v1.yaml
   - tests/test_factory_hot90_immutable_drive_archive_impl_v1.py
+  - tests/test_observation_scheduler.py
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
   - catalog/catalog_manifest.yaml
