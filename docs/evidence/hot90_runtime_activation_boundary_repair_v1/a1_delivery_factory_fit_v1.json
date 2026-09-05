@@ -4,8 +4,8 @@
   "review_id": "HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-FACTORY-FIT-001",
   "as_of": "2026-09-05",
   "task_id": "HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1",
-  "reviewed_bindings_sha256": "58d5cc29efcbbb3a67e699b5c88c2d619f944b85cf950a4636c976c7817e572d",
-  "reviewed_inventory_sha256": "8042bce6ab55acd2c96223ffae594043072687ecff0a2b1d13b842bf3c120fe3",
+  "reviewed_bindings_sha256": "4042cbc3a22aa844dd5042abd6921e16ae0eeda30a6a5990aa371f8234768ea2",
+  "reviewed_inventory_sha256": "16fc70350e20a283777373ec6a00b1504aaf6cfe84a5e5d29620628a8b334713",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
