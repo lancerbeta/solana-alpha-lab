@@ -1,0 +1,40 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-HOT90-WRITE-ONLY-SHADOW-ACTIVATION-FACTORY-FIT-001",
+  "as_of": "2026-09-05",
+  "task_id": "FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1",
+  "reviewed_bindings_sha256": "962bd4fcf836f7ee0032b529eec77374d2e960e5814dbbecd44f7cca79f87c8b",
+  "reviewed_inventory_sha256": "b6f3f52704f3f7ce4f93b752dc8399014072c287c28922a51c1083556e005813",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_GIT_OWNED_WRITE_ONLY_SHADOW_WITHOUT_DEPLOY",
+    "flexibility_and_history": "PASS_REVERT_YAML_RESTORES_CURRENT_SAFE",
+    "context_efficiency": "PASS_ONE_ACTIVATION_YAML_PLUS_GATED_TESTS",
+    "research_truth": "PASS_LEGACY_SNAPPY_AND_CURRENT_SAFE_FAIL_CLOSED_RETAINED",
+    "owner_operability": "PASS_NO_VPS_MUTATION_STOP_FOR_MERGE_PHRASE",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_DRIVE_COMPACTION_EVICTION_REMAIN_FALSE",
+    "build_vs_buy": "PASS_EXISTING_LOADER_NO_NEW_OVERRIDE",
+    "security": "PASS_NO_SECRETS_NO_DRIVE_WRITES",
+    "red_team": "PASS_WRITE_ONLY_SHADOW_CANNOT_EVICT_COMPACT_OR_WRITE_DRIVE"
+  },
+  "capability_radar": {
+    "now": "DEPLOY_EXACT_SHA_THEN_OBSERVE_WRITE_ONLY_SHADOW",
+    "watch": "DURABILITY_CUTOVER_AFTER_OBSERVED_PUBLICATIONS"
+  },
+  "recovery": "REVERT configs/factory_hot90_archive_activation_v1.yaml to CURRENT_SAFE",
+  "limits": [
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_LOCAL_FACTORY_DATA_DELETE",
+    "NO_SQLITE_LIVE_COMPACTION",
+    "NO_PRODUCTION_EVICTION",
+    "NO_BACKUP_DURABILITY_CUTOVER",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}

@@ -224,7 +224,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: 26c31de5a19e38c81219b93550ad7ed6697c6cd7a8e6c906f91b90600301093e
+    sha256: 44c281bd17c1995eba293144b685f15f0d38e900598f666db92eab5154cca857
   access:
     mode: read_only
     method: file
@@ -285,7 +285,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 95857620ebe3a9b119b7c94e7e226352f03291be823d379e177f8c0ba34de88f
+    sha256: 6a030ff7f5293e2f21700060065cab6a0d825bca73ac87d8fc2ae46378593cbd
   access:
     mode: read_only
     method: file

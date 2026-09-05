@@ -1554,7 +1554,7 @@ class ObservationSchedulerTests(unittest.TestCase):
                     },
                 ],
             )
-            members_path = next((data_root / "datasets" / "parquet").rglob("members.parquet"))
+            members_path = next((data_root / "datasets").rglob("members.parquet"))
             states = set(pq.read_table(members_path).column("membership_state").to_pylist())
             self.assertIn("PREDICATE_REJECTED", states)
             store.close()

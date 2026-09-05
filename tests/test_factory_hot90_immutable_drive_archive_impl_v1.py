@@ -22,6 +22,7 @@ from solana_alpha_lab.factory.hot90_activation import (  # noqa: E402
     STAGE_WRITE_ONLY_SHADOW,
     Hot90ActivationError,
     load_hot90_activation,
+    require_drive_writes_enabled,
 )
 from solana_alpha_lab.factory.hot90_archive import (  # noqa: E402
     Hot90ArchiveError,
@@ -106,12 +107,17 @@ class FakeRun:
 
 
 class Hot90ActivationTests(unittest.TestCase):
-    def test_default_current_safe_forbids_destructive_flags(self) -> None:
+    def test_git_default_write_only_shadow_keeps_destructive_flags_false(self) -> None:
         loaded = load_hot90_activation(ROOT)
-        self.assertEqual(loaded["activation_stage"], STAGE_CURRENT_SAFE)
-        self.assertEqual(loaded["members_layout"], "LEGACY_PER_PUBLICATION")
-        self.assertFalse(loaded["new_write_zstd"])
-        with self.assertRaises(Hot90ActivationError):
+        self.assertEqual(loaded["activation_stage"], STAGE_WRITE_ONLY_SHADOW)
+        self.assertEqual(loaded["members_layout"], "SNAPSHOT_PLUS_DELTA")
+        self.assertTrue(loaded["new_write_zstd"])
+        self.assertFalse(loaded["production_compaction_enabled"])
+        self.assertFalse(loaded["production_eviction_enabled"])
+        self.assertFalse(loaded["drive_writes_enabled"])
+
+    def test_current_safe_fail_closed_forbids_destructive_flags(self) -> None:
+        with self.assertRaises(Hot90ActivationError) as eviction:
             load_hot90_activation(
                 ROOT,
                 override={
@@ -121,6 +127,89 @@ class Hot90ActivationTests(unittest.TestCase):
                     "drive_writes_enabled": False,
                 },
             )
+        self.assertEqual(str(eviction.exception), "HOT90_CURRENT_SAFE_FORBIDS_DESTRUCTIVE_FLAGS")
+        with self.assertRaises(Hot90ActivationError) as compaction:
+            load_hot90_activation(
+                ROOT,
+                override={
+                    "activation_stage": STAGE_CURRENT_SAFE,
+                    "production_eviction_enabled": False,
+                    "production_compaction_enabled": True,
+                    "drive_writes_enabled": False,
+                },
+            )
+        self.assertEqual(
+            str(compaction.exception), "HOT90_CURRENT_SAFE_FORBIDS_DESTRUCTIVE_FLAGS"
+        )
+        with self.assertRaises(Hot90ActivationError) as drive:
+            load_hot90_activation(
+                ROOT,
+                override={
+                    "activation_stage": STAGE_CURRENT_SAFE,
+                    "production_eviction_enabled": False,
+                    "production_compaction_enabled": False,
+                    "drive_writes_enabled": True,
+                },
+            )
+        self.assertIn(
+            str(drive.exception),
+            {
+                "HOT90_CURRENT_SAFE_FORBIDS_DESTRUCTIVE_FLAGS",
+                "HOT90_CURRENT_SAFE_FORBIDS_DRIVE_WRITES",
+            },
+        )
+
+    def test_write_only_shadow_cannot_evict_compact_or_write_drive(self) -> None:
+        loaded = load_hot90_activation(ROOT)
+        self.assertEqual(loaded["activation_stage"], STAGE_WRITE_ONLY_SHADOW)
+        with self.assertRaises(Hot90ActivationError) as eviction:
+            load_hot90_activation(
+                ROOT,
+                override={
+                    "activation_stage": STAGE_WRITE_ONLY_SHADOW,
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": True,
+                    "drive_writes_enabled": False,
+                },
+            )
+        self.assertEqual(str(eviction.exception), "HOT90_EVICTION_REQUIRES_RETENTION_ACTIVE")
+        with self.assertRaises(Hot90ActivationError) as drive:
+            require_drive_writes_enabled(loaded)
+        self.assertEqual(str(drive.exception), "HOT90_DRIVE_WRITES_DISABLED")
+        gate = sqlite_body_compaction_eligible(
+            call_state="COMPLETED",
+            raw_materialized=True,
+            extracted_sha256="a" * 64,
+            expected_response_sha256="a" * 64,
+            unresolved_recovery=False,
+            publication_open=False,
+            production_compaction_enabled=loaded["production_compaction_enabled"],
+        )
+        self.assertFalse(gate["eligible"])
+        self.assertEqual(gate["reason"], "PRODUCTION_COMPACTION_DISABLED")
+        with self.assertRaises(Hot90EvictionError) as planned:
+            plan_exact_eviction(
+                root=ROOT,
+                retention={
+                    "canonical_panel_retention": "IMMUTABLE",
+                    "hot_local_residency_days": 90,
+                },
+                unit={
+                    "terminal": "CLOSED",
+                    "first_reliable_available_at": "2026-01-01T00:00:00Z",
+                    "max_available_to_strategy_at": "2026-01-01T00:00:00Z",
+                    "closed_at": "2026-01-01T00:00:00Z",
+                },
+                now=datetime(2026, 9, 5, tzinfo=UTC),
+                unresolved_call_or_due=False,
+                open_publication=False,
+                remote_verify_terminal=REMOTE_CONTENT_SHA256_VERIFIED,
+                source_paths=["datasets/x.parquet"],
+                data_root=ROOT,
+                plan_hashes={"datasets/x.parquet": "0" * 64},
+                fixture_destructive=False,
+            )
+        self.assertEqual(str(planned.exception), "PRODUCTION_EVICTION_DISABLED")
 
 
 class SnapshotPlusDeltaTests(unittest.TestCase):
@@ -241,10 +330,56 @@ class PublisherCompatibilityTests(unittest.TestCase):
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
         )
         digest = schedule["schedule_sha256"]
+        current_safe = {
+            "activation_stage": STAGE_CURRENT_SAFE,
+            "production_compaction_enabled": False,
+            "production_eviction_enabled": False,
+            "drive_writes_enabled": False,
+        }
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
-            published = publish_observation_batch(
+            with patch(
+                "solana_alpha_lab.factory.observation_panel_publisher.load_hot90_activation",
+                return_value=load_hot90_activation(ROOT, override=current_safe),
+            ):
+                published = publish_observation_batch(
+                    data_root=data_root,
+                    root=ROOT,
+                    schedule=schedule,
+                    activation_id="ACT-OBS-001",
+                    now=NOW,
+                    producer_git_sha=GIT_SHA,
+                    members=[{"schedule_sha256": digest, "entity_id": "MintA"}],
+                    observations=[
+                        {
+                            "schedule_sha256": digest,
+                            "entity_id": "MintA",
+                            "point_id": "X300",
+                            "state": "OBSERVED",
+                            "event_time": "2026-09-02T00:05:00Z",
+                            "first_reliable_available_at": "2026-09-02T00:10:00Z",
+                        }
+                    ],
+                )
+            member_path = next((data_root / "datasets" / "parquet").rglob("members.parquet"))
+            compression = pq.read_metadata(member_path).row_group(0).column(0).compression
+            self.assertEqual(compression, "SNAPPY")
+            rebuilt = rebuild_observation_panel_from_rdp(
+                data_root=data_root, schedule_sha256=digest
+            )
+            self.assertEqual(rebuilt["dataset_manifest_ids"], [published["dataset_manifest_id"]])
+            self.assertEqual(rebuilt["members"][0]["entity_id"], "MintA")
+
+    def test_git_default_publish_uses_zstd(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        digest = schedule["schedule_sha256"]
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            publish_observation_batch(
                 data_root=data_root,
                 root=ROOT,
                 schedule=schedule,
@@ -263,14 +398,11 @@ class PublisherCompatibilityTests(unittest.TestCase):
                     }
                 ],
             )
-            member_path = next((data_root / "datasets" / "parquet").rglob("members.parquet"))
-            compression = pq.read_metadata(member_path).row_group(0).column(0).compression
-            self.assertEqual(compression, "SNAPPY")
-            rebuilt = rebuild_observation_panel_from_rdp(
-                data_root=data_root, schedule_sha256=digest
-            )
-            self.assertEqual(rebuilt["dataset_manifest_ids"], [published["dataset_manifest_id"]])
-            self.assertEqual(rebuilt["members"][0]["entity_id"], "MintA")
+            obs = next((data_root / "datasets" / "parquet").rglob("observations.parquet"))
+            compression = pq.read_metadata(obs).row_group(0).column(0).compression
+            self.assertEqual(compression, "ZSTD")
+            layout = next((data_root / "datasets").rglob("members.layout.json"), None)
+            self.assertIsNotNone(layout)
 
     def test_write_only_snapshot_plus_delta_round_trip(self) -> None:
         schedule = load_observation_schedule(
@@ -607,6 +739,16 @@ class AdmissionBackupDocsTests(unittest.TestCase):
             activation_stage=STAGE_CURRENT_SAFE,
         )
         self.assertTrue(live["includes_full_observation_rdp"])
+        self.assertFalse(live["cutover"])
+        shadow = mutable_backup_sources(
+            {
+                "source_relative_paths": ["local/factory_v1/operational_state.sqlite"],
+                "recursive_relative_paths": ["local/factory_v1/observation_rdp"],
+            },
+            activation_stage=STAGE_WRITE_ONLY_SHADOW,
+        )
+        self.assertTrue(shadow["includes_full_observation_rdp"])
+        self.assertFalse(shadow["cutover"])
         cut = mutable_backup_sources(
             {
                 "source_relative_paths": ["local/factory_v1/operational_state.sqlite"],

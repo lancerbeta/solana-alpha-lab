@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-HOT90-WRITE-ONLY-SHADOW-ACTIVATION-COMPLETION-001",
+  "as_of": "2026-09-05",
+  "task_id": "FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1",
+  "state_change": "FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_CONFIG_PASS",
+  "base_main": "fc69b4d5fa88d07ff177fda4c731c1792b1ae8cd",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "DEPLOY_EXACT_SHA_THEN_OBSERVE_WRITE_ONLY_SHADOW",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "a72795e31bada255d40ea0178149101f88cf8bd075d83ed80923b890fe40cc7e",
+    "catalog/assets/lifecycle.yaml": "c5d92573f4f8bbb52abe8c1cd63984415fa2e980ee5e661bfa130ca7e37e5f0f",
+    "catalog/catalog_manifest.yaml": "e4b26c0b4e11f08b77f469f34738e8aaf12319f14471b8914c9672eb44de4523",
+    "catalog/generated/asset_edges.json": "6a030ff7f5293e2f21700060065cab6a0d825bca73ac87d8fc2ae46378593cbd",
+    "configs/factory_hot90_archive_activation_v1.yaml": "efb8fb0c6578e01adb5d7712b941e6164c33a93455ab14fa066f792ad1991f6b",
+    "docs/PROJECT_MAP.md": "44c281bd17c1995eba293144b685f15f0d38e900598f666db92eab5154cca857",
+    "docs/reports/factory_hot90_write_only_shadow_activation_v1/a1_owner_readout_v1.md": "de7266238a748189eda97889f877ed72361b7676b6c5ee82dae01c35c58a6963",
+    "docs/tasks/FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_V1.md": "bc8f63b99080bdf619d03db3be0b97998f7e4e877684a2988a58f62d49ad278b",
+    "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py": "4ee155efe1f06902a468990aedb0c23639a7d3af77d109ba45383ed545f7d295",
+    "tests/test_observation_scheduler.py": "891ab3e5f9fec2d83f46f5cab5303d0d9b3d7f379b2c9469a414e71d05e40641"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_hot90_write_only_shadow_activation_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "e74868f1206eb4f31e2b6aa594de1ef56d68a80a4d733204db5e3765a09d356b",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_hot90_write_only_shadow_activation_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "b94975879d85bbc82c6b6dc353842129a35f2077c153331a0150cffee9731deb",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_HOT90_WRITE_ONLY_SHADOW_ACTIVATION_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_SQLITE_LIVE_COMPACTION",
+    "NO_PRODUCTION_EVICTION",
+    "NO_BACKUP_DURABILITY_CUTOVER",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}
