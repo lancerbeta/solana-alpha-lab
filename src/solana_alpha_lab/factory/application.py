@@ -100,11 +100,23 @@ class FactoryApplication:
         authority_phrase: str | None = None,
     ) -> None:
         self.root = root
-        self.store = store or OperationalStore(ops_store_path(root))
+        self._operational_store = store
         self._paper_plane_store = paper_plane_store
-        self.runner = ExperimentRunner(root=root, store=self.store)
+        self._runner: ExperimentRunner | None = None
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
+
+    @property
+    def store(self) -> OperationalStore:
+        if self._operational_store is None:
+            self._operational_store = OperationalStore(ops_store_path(self.root))
+        return self._operational_store
+
+    @property
+    def runner(self) -> ExperimentRunner:
+        if self._runner is None:
+            self._runner = ExperimentRunner(root=self.root, store=self.store)
+        return self._runner
 
     def existing_paper_plane(self) -> PaperPlaneStore | None:
         if self._paper_plane_store is not None:
@@ -129,6 +141,14 @@ class FactoryApplication:
 
     def economics_projection(self) -> dict[str, Any]:
         return build_economics_projection(self.paper_plane())
+
+    def lifecycle_projection(self) -> dict[str, Any]:
+        from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection
+
+        return build_lifecycle_projection(
+            self.root,
+            paper_plane_store=self._paper_plane_store,
+        )
 
     def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:
         try:

@@ -165,7 +165,7 @@ foundation_freeze_after_readiness:
 truth_owners:
   git: immutable repository bytes and contracts
   catalog: discovery, location and relations
-  lifecycle_registries: hypotheses, trials, decisions, strategies and bots
+  lifecycle_registries: Git envelopes only; empty hypotheses/research_cycles/strategies/bot_instances are not complete current owners. Current research/strategy/runtime truth remains owned by ResearchStore, Git ExperimentSpec/StrategyVersion, OperationalStore and PaperPlaneStore. LifecycleProjectionV1 is a derived index over those owners, not a replacement truth owner.
   raw_parquet: immutable market/provider observations
   duckdb: reproducible analytical projections and queries
   owner_cockpit: NOTHING

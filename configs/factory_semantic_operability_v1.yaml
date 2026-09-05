@@ -315,4 +315,39 @@ routes:
     status_plane: CAPABILITY
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: EXCLUDE
-    related_route_ids: [SEM-PRODUCT-STATE, SEM-AUTHORITY-BOUNDARIES]
+    related_route_ids: [SEM-PRODUCT-STATE, SEM-AUTHORITY-BOUNDARIES, SEM-OWNER-LIFECYCLE]
+
+  - semantic_route_id: SEM-OWNER-LIFECYCLE
+    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
+    owner_questions:
+      - What lifecycle objects currently exist?
+      - How are hypothesis, experiment, strategy and position connected?
+      - Where is lifecycle truth?
+      - Show the research-to-execution lineage.
+      - What is linked to this StrategyVersion?
+      - What is the owner lifecycle projection?
+      - какие lifecycle-объекты сейчас существуют?
+      - как связаны гипотеза эксперимент стратегия и позиция?
+    search_terms:
+      - owner lifecycle
+      - lifecycle projection
+      - lifecycle objects
+      - research-to-execution
+      - lineage
+      - StrategyVersion
+      - LifecycleProjectionV1
+      - TARGET_GAP
+      - карта lifecycle
+      - lifecycle-объекты
+      - SEM-OWNER-LIFECYCLE
+      - research lineage
+      - execution lineage
+      - где каноническая карта lifecycle
+    consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+    root_binding_ids: [ACTIVE-OWNER-LIFECYCLE-PROJECTION]
+    root_asset_ids: [DOC-OWNER-LIFECYCLE-PROJECTION-001]
+    query_recipe_ids: []
+    status_plane: MIXED
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-PRIOR-WORK, SEM-EXPERIMENT-CAPABILITIES, SEM-PRODUCT-STATE]

@@ -5,7 +5,7 @@ records:
 - asset_id: REGISTRY-RESEARCH-CYCLES-001
   record_version: '1.0'
   asset_type: lifecycle_registry
-  purpose: Active registry for bounded research-cycle lifecycle records.
+  purpose: Git envelope for research cycles; currently EMPTY and not the complete current research-cycle owner.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -35,7 +35,7 @@ records:
 - asset_id: REGISTRY-HYPOTHESES-001
   record_version: '1.0'
   asset_type: lifecycle_registry
-  purpose: Active registry for evidence-bearing research hypotheses.
+  purpose: Git envelope for hypotheses; currently EMPTY and not the complete current research-truth owner.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -119,7 +119,7 @@ records:
 - asset_id: REGISTRY-STRATEGIES-001
   record_version: '1.0'
   asset_type: lifecycle_registry
-  purpose: Active registry for strategies linked to validated hypotheses.
+  purpose: Git envelope for strategies; currently EMPTY and not the complete current StrategyVersion owner.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -139,7 +139,7 @@ records:
 - asset_id: REGISTRY-BOT-INSTANCES-001
   record_version: '1.0'
   asset_type: lifecycle_registry
-  purpose: Active registry for strategy-bound bot instance lifecycle records.
+  purpose: Git envelope for bot instances; currently EMPTY and not the complete current PaperPlane bot owner.
   status: VALIDATED_ACTIVE
   origin: REPOSITORY
   as_of: '2026-07-22'
@@ -224,7 +224,7 @@ records:
     repository_path: docs/PROJECT_MAP.md
   integrity:
     kind: sha256
-    sha256: eedf69495540f3a3baa8318b3e7453fa135d5f68722f6e5aa791b5eff2d763c8
+    sha256: 59788235a7500b162482946eaef3904d158b514c40ddf642672704235ae4aa86
   access:
     mode: read_only
     method: file
@@ -285,7 +285,7 @@ records:
     repository_path: catalog/generated/asset_edges.json
   integrity:
     kind: sha256
-    sha256: 3cd0eefbe7c99b5e65afc88478347cb4cbfae77c5c756767db889a553d2dea3f
+    sha256: 01fcbdb533776787b1ea2ab2253bd3142a691de943deb7a91f5aa5a3cf673bda
   access:
     mode: read_only
     method: file
