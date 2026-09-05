@@ -12,17 +12,24 @@ from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
+import yaml
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.factory.hot90_activation import (  # noqa: E402
+    SOURCE_GIT_DEFAULT,
+    SOURCE_RUNTIME,
     STAGE_CURRENT_SAFE,
+    STAGE_DURABILITY_CUTOVER,
+    STAGE_RETENTION_ACTIVE,
     STAGE_WRITE_ONLY_SHADOW,
     Hot90ActivationError,
     load_hot90_activation,
     require_drive_writes_enabled,
+    write_hot90_runtime_state,
 )
 from solana_alpha_lab.factory.hot90_archive import (  # noqa: E402
     Hot90ArchiveError,
@@ -106,15 +113,57 @@ class FakeRun:
         self.stderr = ""
 
 
+def _isolated_root(tmp: str, *, runtime: dict[str, object] | None = None) -> Path:
+    root = Path(tmp)
+    cfg = root / "configs"
+    cfg.mkdir()
+    (cfg / "factory_hot90_archive_activation_v1.yaml").write_text(
+        (ROOT / "configs/factory_hot90_archive_activation_v1.yaml").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
+    if runtime is not None:
+        path = root / "local" / "factory_v1" / "hot90_activation_runtime.yaml"
+        path.parent.mkdir(parents=True)
+        import yaml
+
+        path.write_text(yaml.safe_dump(runtime, sort_keys=True), encoding="utf-8")
+    return root
+
+
 class Hot90ActivationTests(unittest.TestCase):
-    def test_git_default_write_only_shadow_keeps_destructive_flags_false(self) -> None:
-        loaded = load_hot90_activation(ROOT)
-        self.assertEqual(loaded["activation_stage"], STAGE_WRITE_ONLY_SHADOW)
-        self.assertEqual(loaded["members_layout"], "SNAPSHOT_PLUS_DELTA")
-        self.assertTrue(loaded["new_write_zstd"])
+    def test_git_default_without_runtime_is_current_safe(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            loaded = load_hot90_activation(_isolated_root(tmp))
+        self.assertEqual(loaded["activation_stage"], STAGE_CURRENT_SAFE)
+        self.assertEqual(loaded["activation_source"], SOURCE_GIT_DEFAULT)
+        self.assertEqual(loaded["members_layout"], "LEGACY_PER_PUBLICATION")
+        self.assertFalse(loaded["new_write_zstd"])
         self.assertFalse(loaded["production_compaction_enabled"])
         self.assertFalse(loaded["production_eviction_enabled"])
         self.assertFalse(loaded["drive_writes_enabled"])
+
+    def test_tracked_git_yaml_is_safe_default_not_live_shadow(self) -> None:
+        payload = yaml.safe_load(
+            (ROOT / "configs/factory_hot90_archive_activation_v1.yaml").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(payload["activation_stage"], STAGE_CURRENT_SAFE)
+        self.assertIs(payload["production_compaction_enabled"], False)
+        self.assertIs(payload["production_eviction_enabled"], False)
+        self.assertIs(payload["drive_writes_enabled"], False)
+
+    def test_production_code_reads_activation_only_through_canonical_loader(self) -> None:
+        offenders: list[str] = []
+        for path in (ROOT / "src").rglob("*.py"):
+            if path.name == "hot90_activation.py":
+                continue
+            text = path.read_text(encoding="utf-8")
+            if "factory_hot90_archive_activation_v1.yaml" in text:
+                offenders.append(path.as_posix())
+            if "hot90_activation_runtime.yaml" in text:
+                offenders.append(path.as_posix())
+        self.assertEqual(offenders, [])
 
     def test_current_safe_fail_closed_forbids_destructive_flags(self) -> None:
         with self.assertRaises(Hot90ActivationError) as eviction:
@@ -160,8 +209,22 @@ class Hot90ActivationTests(unittest.TestCase):
         )
 
     def test_write_only_shadow_cannot_evict_compact_or_write_drive(self) -> None:
-        loaded = load_hot90_activation(ROOT)
+        with tempfile.TemporaryDirectory() as tmp:
+            loaded = load_hot90_activation(
+                _isolated_root(
+                    tmp,
+                    runtime={
+                        "activation_stage": STAGE_WRITE_ONLY_SHADOW,
+                        "production_compaction_enabled": False,
+                        "production_eviction_enabled": False,
+                        "drive_writes_enabled": False,
+                    },
+                )
+            )
         self.assertEqual(loaded["activation_stage"], STAGE_WRITE_ONLY_SHADOW)
+        self.assertEqual(loaded["activation_source"], SOURCE_RUNTIME)
+        self.assertEqual(loaded["members_layout"], "SNAPSHOT_PLUS_DELTA")
+        self.assertTrue(loaded["new_write_zstd"])
         with self.assertRaises(Hot90ActivationError) as eviction:
             load_hot90_activation(
                 ROOT,
@@ -210,6 +273,187 @@ class Hot90ActivationTests(unittest.TestCase):
                 fixture_destructive=False,
             )
         self.assertEqual(str(planned.exception), "PRODUCTION_EVICTION_DISABLED")
+
+
+class Hot90RuntimeBoundaryTests(unittest.TestCase):
+    def test_runtime_durability_cutover_drive_true_excludes_full_rdp(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(
+                tmp,
+                runtime={
+                    "activation_stage": STAGE_DURABILITY_CUTOVER,
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": False,
+                    "drive_writes_enabled": True,
+                },
+            )
+            loaded = load_hot90_activation(root)
+            require_drive_writes_enabled(loaded)
+            selected = mutable_backup_sources(
+                {
+                    "source_relative_paths": ["local/factory_v1/operational_state.sqlite"],
+                    "recursive_relative_paths": ["local/factory_v1/observation_rdp"],
+                    "mutable_only_source_relative_paths": [
+                        "local/factory_v1/operational_state.sqlite"
+                    ],
+                    "mutable_only_recursive_relative_paths": [
+                        "local/factory_v1/observation_rdp/datasets/publication_jobs"
+                    ],
+                },
+                activation_stage=str(loaded["activation_stage"]),
+            )
+        self.assertEqual(loaded["activation_stage"], STAGE_DURABILITY_CUTOVER)
+        self.assertTrue(loaded["drive_writes_enabled"])
+        self.assertFalse(loaded["production_compaction_enabled"])
+        self.assertFalse(loaded["production_eviction_enabled"])
+        self.assertTrue(selected["cutover"])
+        self.assertFalse(selected["includes_full_observation_rdp"])
+
+    def test_retention_active_does_not_imply_eviction(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(
+                tmp,
+                runtime={
+                    "activation_stage": STAGE_RETENTION_ACTIVE,
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": False,
+                    "drive_writes_enabled": False,
+                },
+            )
+            loaded = load_hot90_activation(root)
+            self.assertEqual(loaded["activation_stage"], STAGE_RETENTION_ACTIVE)
+            self.assertFalse(loaded["production_eviction_enabled"])
+            with self.assertRaises(Hot90EvictionError) as planned:
+                plan_exact_eviction(
+                    root=root,
+                    retention={
+                        "canonical_panel_retention": "IMMUTABLE",
+                        "hot_local_residency_days": 90,
+                    },
+                    unit={
+                        "terminal": "CLOSED",
+                        "first_reliable_available_at": "2026-01-01T00:00:00Z",
+                        "max_available_to_strategy_at": "2026-01-01T00:00:00Z",
+                        "closed_at": "2026-01-01T00:00:00Z",
+                    },
+                    now=datetime(2026, 6, 1, tzinfo=UTC),
+                    unresolved_call_or_due=False,
+                    open_publication=False,
+                    remote_verify_terminal="REMOTE_CONTENT_SHA256_VERIFIED",
+                    source_paths=["datasets/x.parquet"],
+                    data_root=root,
+                    plan_hashes={"datasets/x.parquet": "a" * 64},
+                )
+        self.assertEqual(str(planned.exception), "PRODUCTION_EVICTION_DISABLED")
+
+    def test_malformed_runtime_yaml_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(tmp)
+            path = root / "local" / "factory_v1" / "hot90_activation_runtime.yaml"
+            path.parent.mkdir(parents=True)
+            path.write_text("{not yaml", encoding="utf-8")
+            with self.assertRaises(Hot90ActivationError) as raised:
+                load_hot90_activation(root)
+        self.assertEqual(str(raised.exception), "HOT90_RUNTIME_INVALID")
+
+    def test_symlink_runtime_path_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(tmp)
+            target = Path(tmp) / "other.yaml"
+            target.write_text("activation_stage: WRITE_ONLY_SHADOW\n", encoding="utf-8")
+            path = root / "local" / "factory_v1" / "hot90_activation_runtime.yaml"
+            path.parent.mkdir(parents=True)
+            try:
+                path.symlink_to(target)
+            except OSError:
+                self.skipTest("symlink unsupported")
+            with self.assertRaises(Hot90ActivationError) as raised:
+                load_hot90_activation(root)
+        self.assertEqual(str(raised.exception), "HOT90_RUNTIME_UNSAFE")
+
+    def test_invalid_runtime_stage_fails_closed_without_git_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(
+                tmp,
+                runtime={
+                    "activation_stage": "NOT_A_STAGE",
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": False,
+                    "drive_writes_enabled": False,
+                },
+            )
+            with self.assertRaises(Hot90ActivationError) as raised:
+                load_hot90_activation(root)
+        self.assertEqual(str(raised.exception), "HOT90_RUNTIME_INVALID")
+
+    def test_invalid_runtime_flag_combination_fails_closed_without_git_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(
+                tmp,
+                runtime={
+                    "activation_stage": STAGE_CURRENT_SAFE,
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": False,
+                    "drive_writes_enabled": True,
+                },
+            )
+            with self.assertRaises(Hot90ActivationError) as raised:
+                load_hot90_activation(root)
+            self.assertIn(
+                str(raised.exception),
+                {
+                    "HOT90_CURRENT_SAFE_FORBIDS_DESTRUCTIVE_FLAGS",
+                    "HOT90_CURRENT_SAFE_FORBIDS_DRIVE_WRITES",
+                },
+            )
+            (root / "local" / "factory_v1" / "hot90_activation_runtime.yaml").unlink()
+            loaded = load_hot90_activation(root)
+        self.assertEqual(loaded["activation_stage"], STAGE_CURRENT_SAFE)
+        self.assertEqual(loaded["activation_source"], SOURCE_GIT_DEFAULT)
+
+    def test_atomic_set_then_show_round_trip(self) -> None:
+        from importlib.machinery import SourceFileLoader
+        from io import StringIO
+        from unittest.mock import patch as mock_patch
+
+        cli = SourceFileLoader(
+            "hot90_activation_cli", str(ROOT / "scripts" / "hot90_activation.py")
+        ).load_module()
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _isolated_root(tmp)
+            buf = StringIO()
+            with mock_patch("sys.stdout", buf):
+                code = cli.main(
+                    [
+                        "--root",
+                        str(root),
+                        "set",
+                        "--stage",
+                        STAGE_WRITE_ONLY_SHADOW,
+                        "--drive-writes",
+                        "false",
+                        "--compaction",
+                        "false",
+                        "--eviction",
+                        "false",
+                    ]
+                )
+            self.assertEqual(code, 0)
+            payload = json.loads(buf.getvalue())
+            self.assertEqual(payload["activation_stage"], STAGE_WRITE_ONLY_SHADOW)
+            self.assertEqual(payload["activation_source"], SOURCE_RUNTIME)
+            loaded = load_hot90_activation(root)
+            self.assertEqual(loaded["activation_stage"], STAGE_WRITE_ONLY_SHADOW)
+            written = write_hot90_runtime_state(
+                root,
+                {
+                    "activation_stage": STAGE_WRITE_ONLY_SHADOW,
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": False,
+                    "drive_writes_enabled": False,
+                },
+            )
+            self.assertEqual(written["activation_source"], SOURCE_RUNTIME)
 
 
 class SnapshotPlusDeltaTests(unittest.TestCase):
@@ -371,33 +615,84 @@ class PublisherCompatibilityTests(unittest.TestCase):
             self.assertEqual(rebuilt["dataset_manifest_ids"], [published["dataset_manifest_id"]])
             self.assertEqual(rebuilt["members"][0]["entity_id"], "MintA")
 
-    def test_git_default_publish_uses_zstd(self) -> None:
+    def test_git_default_publish_uses_snappy_without_runtime(self) -> None:
         schedule = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
         )
         digest = schedule["schedule_sha256"]
         with tempfile.TemporaryDirectory() as tmp:
+            isolated = _isolated_root(tmp)
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
-            publish_observation_batch(
-                data_root=data_root,
-                root=ROOT,
-                schedule=schedule,
-                activation_id="ACT-OBS-001",
-                now=NOW,
-                producer_git_sha=GIT_SHA,
-                members=[{"schedule_sha256": digest, "entity_id": "MintA"}],
-                observations=[
-                    {
-                        "schedule_sha256": digest,
-                        "entity_id": "MintA",
-                        "point_id": "X300",
-                        "state": "OBSERVED",
-                        "event_time": "2026-09-02T00:05:00Z",
-                        "first_reliable_available_at": "2026-09-02T00:10:00Z",
-                    }
-                ],
+            with patch(
+                "solana_alpha_lab.factory.observation_panel_publisher.load_hot90_activation",
+                return_value=load_hot90_activation(isolated),
+            ):
+                publish_observation_batch(
+                    data_root=data_root,
+                    root=ROOT,
+                    schedule=schedule,
+                    activation_id="ACT-OBS-001",
+                    now=NOW,
+                    producer_git_sha=GIT_SHA,
+                    members=[{"schedule_sha256": digest, "entity_id": "MintA"}],
+                    observations=[
+                        {
+                            "schedule_sha256": digest,
+                            "entity_id": "MintA",
+                            "point_id": "X300",
+                            "state": "OBSERVED",
+                            "event_time": "2026-09-02T00:05:00Z",
+                            "first_reliable_available_at": "2026-09-02T00:10:00Z",
+                        }
+                    ],
+                )
+            obs = next((data_root / "datasets" / "parquet").rglob("observations.parquet"))
+            compression = pq.read_metadata(obs).row_group(0).column(0).compression
+            self.assertEqual(compression, "SNAPPY")
+            layout = next((data_root / "datasets").rglob("members.layout.json"), None)
+            self.assertIsNone(layout)
+
+    def test_runtime_shadow_publish_uses_zstd_via_loader(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        digest = schedule["schedule_sha256"]
+        with tempfile.TemporaryDirectory() as tmp:
+            isolated = _isolated_root(
+                tmp,
+                runtime={
+                    "activation_stage": STAGE_WRITE_ONLY_SHADOW,
+                    "production_compaction_enabled": False,
+                    "production_eviction_enabled": False,
+                    "drive_writes_enabled": False,
+                },
             )
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with patch(
+                "solana_alpha_lab.factory.observation_panel_publisher.load_hot90_activation",
+                return_value=load_hot90_activation(isolated),
+            ):
+                publish_observation_batch(
+                    data_root=data_root,
+                    root=ROOT,
+                    schedule=schedule,
+                    activation_id="ACT-OBS-001",
+                    now=NOW,
+                    producer_git_sha=GIT_SHA,
+                    members=[{"schedule_sha256": digest, "entity_id": "MintA"}],
+                    observations=[
+                        {
+                            "schedule_sha256": digest,
+                            "entity_id": "MintA",
+                            "point_id": "X300",
+                            "state": "OBSERVED",
+                            "event_time": "2026-09-02T00:05:00Z",
+                            "first_reliable_available_at": "2026-09-02T00:10:00Z",
+                        }
+                    ],
+                )
             obs = next((data_root / "datasets" / "parquet").rglob("observations.parquet"))
             compression = pq.read_metadata(obs).row_group(0).column(0).compression
             self.assertEqual(compression, "ZSTD")
@@ -780,6 +1075,8 @@ class AdmissionBackupDocsTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("PREPARED_NOT_EXECUTED", commissioning)
         self.assertIn("WRITE_ONLY_SHADOW", commissioning)
+        self.assertIn("local/factory_v1/hot90_activation_runtime.yaml", commissioning)
+        self.assertIn("SAFE DEFAULT WHEN NO VALID RUNTIME STATE EXISTS", commissioning)
         cleanup = (
             ROOT / "docs/operator/FACTORY_HOT90_CLEANUP_PRECONDITIONS_V1.md"
         ).read_text(encoding="utf-8")
