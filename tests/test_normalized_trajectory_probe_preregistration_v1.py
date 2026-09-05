@@ -186,8 +186,27 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
             "forbidden",
         )
         self.assertEqual(
-            self.contract["challenger"]["packet_surgery"],
-            "REPLACE_WITHIN_EXISTING_TRUNCATION",
+            self.contract["challenger"]["packet_shape"],
+            "COHORT_MOTIF_HISTOGRAM",
+        )
+        self.assertEqual(
+            self.contract["challenger"]["packet_key"],
+            "normalized_trajectory_v1",
+        )
+        self.assertEqual(self.contract["challenger"]["max_distinct_motif_tuples"], 8)
+        self.assertEqual(
+            self.contract["volume_unavailable_emission"],
+            "MOTIF_ALL_M_KEEP_LINE",
+        )
+        self.assertIs(
+            self.contract["time"]["lateness_window_does_not_extend_T"],
+            True,
+        )
+        self.assertIn("required_feature_ids", self.contract["novelty"]["axes"])
+        self.assertNotIn("required_observable_relation", self.contract["novelty"]["axes"])
+        self.assertEqual(
+            self.contract["if_imported_x_due_offset_ge_900"],
+            "INVALID_INSUFFICIENT_PREFIX",
         )
         self.assertEqual(
             self.contract["control_terminal_else"],

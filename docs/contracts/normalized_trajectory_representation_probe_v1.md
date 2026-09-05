@@ -94,6 +94,8 @@ time:
   interpolation: forbidden
   intra_interval_shape_reconstruction: forbidden
   pit_clock: first_reliable_available_at
+  t_is_member_anchor_plus_decision_due_offset: true
+  lateness_window_does_not_extend_T: true
   substitute_event_time_if_clock_missing: forbidden
   missing_clock_emits: M
 normalization:
@@ -157,14 +159,26 @@ control_terminal_else: INVALID_TRIGGER_NOT_MET
 challenger:
   representation: NORMALIZED_TRAJECTORY_V1_compact_prefix_motif
   packet_surgery: REPLACE_WITHIN_EXISTING_TRUNCATION
+  packet_key: normalized_trajectory_v1
+  packet_shape: COHORT_MOTIF_HISTOGRAM
+  max_distinct_motif_tuples: 8
+  histogram_includes_m_heavy_members: true
+  completeness_filter_on_m_rate: forbidden
+  mint_identities_in_packet: forbidden
+  truncation_order: drop_lowest_count_tuples_first
+  do_not_drop_dataset_identity_or_prior_work_to_fit: true
   packet_budget_owner: HFIC_MAX_PACKET_BYTES
   raw_trajectory_dump: forbidden
   variant_shopping: forbidden
   add_versus_replace_shopping: forbidden
+volume_unavailable_emission: MOTIF_ALL_M_KEEP_LINE
+if_imported_x_due_offset_ge_900: INVALID_INSUFFICIENT_PREFIX
 case_e:
   code: INVALID_GROUNDING_BOUNDARY
   if: lifecycle_field_sequences_cannot_legally_ground_through_current_feat_contract
+  presentation: CONTEXT_ONLY_NOT_FEAT_ALIASED
   silently_widen_feature_grounding: forbidden
+  invent_feat_ids_after_failure: forbidden
 novelty:
   wording_or_card_count_alone: not_material
   structural_signature_change_alone: not_sufficient
@@ -175,9 +189,10 @@ novelty:
     - population
     - decision_timestamp
     - state_transition
-    - required_observable_relation
-    - falsifier
+    - required_feature_ids
+    - required_capability_ids
     - primary_y
+    - cheapest_falsifier
 metrics_rank:
   - materially_new_grounded_mechanism_families
   - at_least_one_expressible_without_new_provider_or_data_capability
@@ -306,9 +321,11 @@ VOLUME: U-U-D-D
 TRADERS: U-F-D-D
 ```
 
-Do not dump raw trajectories. HFIC `MAX_PACKET_BYTES=16384` remains authoritative. If the
-challenger cannot fit after existing truncation, stop as `INVALID_PACKET_BUDGET`. Do not
-add a ninth feature family.
+Do not dump raw trajectories or mint identities. Present a cohort motif histogram of at most 8
+distinct tuples under packet key `normalized_trajectory_v1`, including M-heavy members.
+Replace/truncate within existing HFIC packet budget only; if it cannot fit without dropping
+dataset identity or prior-work, stop as `INVALID_PACKET_BUDGET`. Volume-unavailable still
+emits an all-`M` VOLUME line. If imported X due_offset >= 900, `INVALID_INSUFFICIENT_PREFIX`.
 
 Later Y points are outcomes, not X for an earlier T. Missing stays missing. No imputation.
 
