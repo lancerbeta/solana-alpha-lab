@@ -34137,7 +34137,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 56005b98eff44ceba5e11feefd1cb1c51d795434a4cebab1242289274715b8f9}
+  integrity: {kind: sha256, sha256: 6e001991e28f65311f518cfe701a88a1c79dc5076b2ee38cb774132fc395c45e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34244,7 +34244,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 1c44acfc59abae99cab09b2cca5abcdc706542e8625640edb5b5686e24b34eb0}
+  integrity: {kind: sha256, sha256: e72f81b188378d7ac43b476134fdc63bad00b60602084dd7c93d5fd895825404}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34262,7 +34262,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: dfee869485113bee5d3081efb1a8c3c01480faaade428063cc1b0877ec6e8692}
+  integrity: {kind: sha256, sha256: 1f06f961031233aec12a743efe8082484758a89e5137d04ee2a61a1b1d328512}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -35158,4 +35158,41 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [WRITE_ONLY_SHADOW, HOT90, CURRENT_SAFE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Frozen preregistration for the first Forge representation challenger NORMALIZED_TRAJECTORY_V1 before first-cohort scientific inspection.
+  status: VALIDATED_ACTIVE
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_representation_probe_v1.md', repository_path: docs/contracts/normalized_trajectory_representation_probe_v1.md}
+  integrity: {kind: sha256, sha256: 438b3d6988b888728e8161f9e33bc21b4306eec0781b08eada76fbda07195a5d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [NORMALIZED_TRAJECTORY, representation probe, motif, PREREGISTERED_NOT_EXECUTED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Contract parse, FIELD-ID binding, taker non-inference and semantic discoverability for NORMALIZED_TRAJECTORY_V1.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-05'
+  truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_normalized_trajectory_probe_preregistration_v1.py', repository_path: tests/test_normalized_trajectory_probe_preregistration_v1.py}
+  integrity: {kind: sha256, sha256: 50822847ee3f4fa00ab13e9b52aabf710e46988f2e0d2f8e85d497aa6d3d4bde}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [NORMALIZED_TRAJECTORY, PREREGISTRATION, motif]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "NORMALIZED-TRAJECTORY-PROBE-PREREGISTRATION-FACTORY-FIT-001",
+  "as_of": "2026-09-05",
+  "task_id": "NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_PREREGISTERS_CHALLENGER_WITHOUT_RUNNING_IT",
+    "flexibility_and_history": "PASS_ONE_REGISTERED_TRIAL_NO_VARIANT_SHOPPING",
+    "context_efficiency": "PASS_ONE_CONTRACT_PLUS_EXISTING_CATALOG_NAV",
+    "research_truth": "PASS_PIT_NO_IMPUTATION_NO_COHORT_SNOOP_EXACT_ZERO_FLAT",
+    "owner_operability": "PASS_DISCOVERABLE_VIA_SEM_HYPOTHESIS_FORGE",
+    "execution_to_cashflow": "NOT_APPLICABLE_CONTRACT_ONLY_NO_PNL",
+    "monitoring_and_recovery": "PASS_KILL_RETURNS_TO_PROJECT_CHAT",
+    "build_vs_buy": "PASS_NO_TRAJECTORY_ENGINE",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_COHORT_VALUES",
+    "red_team": "PASS_PASS_IS_NOT_ALPHA_INVALID_NOT_KILL"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "EXECUTE_PROBE_ONLY_AFTER_CONTROL_FORGE_ON_FIRST_COHORT"
+  },
+  "recovery": "REVERT preregistration contract/catalog/semantic route; do not implement trajectory projection or inspect the live cohort.",
+  "limits": [
+    "NO_PROJECTION_CODE",
+    "NO_HFIC_MUTATION",
+    "NO_FORGE_RUN",
+    "NO_COHORT_SCIENCE",
+    "NO_PROVIDER",
+    "NO_ALPHA",
+    "NO_GENERATOR"
+  ]
+}

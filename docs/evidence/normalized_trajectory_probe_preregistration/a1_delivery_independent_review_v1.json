@@ -1,0 +1,45 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "NORMALIZED-TRAJECTORY-PROBE-PREREGISTRATION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-05",
+  "task_id": "NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PENDING_PACKET_FINGERPRINT"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PENDING_CODE_REVIEW"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PENDING_GOAL_DOD"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_TRAJECTORY_PROJECTION_CODE",
+    "NO_CURRENT_COHORT_SCIENCE",
+    "NO_ALPHA"
+  ]
+}
