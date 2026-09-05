@@ -22,8 +22,18 @@ def main() -> int:
     parser.add_argument("--spec", default=None)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
+    parser.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="Existing ResearchStore root only. Never creates a directory.",
+    )
     args = parser.parse_args()
-    app = FactoryApplication(root=args.root.resolve(), spec_relative=args.spec)
+    app = FactoryApplication(
+        root=args.root.resolve(),
+        spec_relative=args.spec,
+        research_data_root=args.data_root.resolve() if args.data_root is not None else None,
+    )
     server = serve(app, host=args.host, port=args.port)
     print(f"FACTORY_WORKBENCH_LISTEN http://{args.host}:{args.port}/")
     try:

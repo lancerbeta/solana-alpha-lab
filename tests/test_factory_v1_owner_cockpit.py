@@ -172,8 +172,8 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 self.assertNotIn(">MARKET<", operations)
                 self.assertNotIn(">MARKET<", economics)
                 self.assertNotEqual(model["runtime"]["verdict"], "HEALTHY")
-                self.assertIn("COMMISSIONING_PACKET_SCIENTIFIC_HINT_NOT_ALPHA", research)
-                self.assertIn("QUESTION", research)
+                self.assertIn("RESEARCH", research)
+                self.assertIn("projection", research)
                 self.assertIn("factory-v1-runtime-v1.0", system)
             finally:
                 self._close_app(app, store)

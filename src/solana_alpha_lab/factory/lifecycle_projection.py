@@ -7,15 +7,18 @@ import sqlite3
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Iterable, Mapping
+from typing import Any, Iterable, Mapping, Protocol
 
 import yaml
 from jsonschema import Draft202012Validator
 
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 from solana_alpha_lab.factory.paper_plane import PaperPlaneStore
-from solana_alpha_lab.factory.research_store import ResearchStore
 from solana_alpha_lab.factory.strategy_runtime import load_strategy_version
+
+
+class ResearchRecordReader(Protocol):
+    def iter_committed_records(self) -> Iterable[Any]: ...
 
 CONTRACT_RELATIVE = "configs/owner_lifecycle_projection_v1.yaml"
 SCHEMA_RELATIVE = "catalog/schemas/owner_lifecycle_projection_v1.schema.json"
@@ -157,13 +160,14 @@ def _entity(
     next_safe_action: str | None = "UNKNOWN",
     authority_required: str = "NONE_FOR_READ",
     summary: str | None = None,
+    source_owned_fields: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     display = display_state if display_state is not None else native_state
     derivation = state_derivation
     if native_state is not None and derivation == "UNKNOWN":
         derivation = "SOURCE_NATIVE"
         display = native_state
-    return {
+    payload = {
         "entity_id": entity_id,
         "projection_class": projection_class,
         "native_kind": native_kind,
@@ -183,6 +187,9 @@ def _entity(
         "summary": summary,
         "contributing_source_ids": list(contributing_source_ids),
     }
+    if source_owned_fields:
+        payload["source_owned_fields"] = source_owned_fields
+    return payload
 
 
 def _relation(
@@ -266,7 +273,7 @@ def _load_registry(root: Path, relative: str) -> tuple[str, dict[str, Any] | Non
 
 
 def _sqlite_readonly(path: Path) -> sqlite3.Connection:
-    uri = path.resolve().as_uri() + "?mode=ro"
+    uri = path.resolve().as_uri() + "?mode=ro&immutable=1"
     conn = sqlite3.connect(uri, uri=True)
     conn.row_factory = sqlite3.Row
     return conn
@@ -432,6 +439,151 @@ def _adapt_negative_decisions(
                 next_safe_action="UNKNOWN",
             )
         )
+        for evidence_id in record.get("evidence_asset_ids") or []:
+            if not isinstance(evidence_id, str) or not evidence_id:
+                continue
+            relations.append(
+                {
+                    "relation_type": "REFERENCES_EVIDENCE_ASSET",
+                    "from_entity_id": record_id,
+                    "to_entity_id": evidence_id,
+                    "resolution": "TARGET_GAP",
+                    "source_ref": source_ref,
+                    "derivation_method": "EXPLICIT_SOURCE_FIELD",
+                }
+            )
+            gaps.append(
+                _gap(
+                    gap_code="RELATION_TARGET_GAP",
+                    affected_entity_id=record_id,
+                    source_id=source_id,
+                    relation_type="REFERENCES_EVIDENCE_ASSET",
+                    reason=f"evidence asset {evidence_id} is not a lifecycle entity",
+                    source_ref=source_ref,
+                    impact="lineage_to_catalog_evidence_not_materialized_here",
+                    next_safe_action="UNKNOWN",
+                )
+            )
+    return source, entities, relations, gaps
+
+
+def _adapt_global_trial_ledger(
+    root: Path,
+    contract: Mapping[str, Any],
+    observed_at: str,
+    git_sha: str | None,
+) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
+    relative = str(contract["global_trial_ledger"])
+    source_id = "SRC-GLOBAL-TRIAL-LEDGER"
+    source_ref = {"kind": "git_path", "value": relative}
+    status, doc, error = _load_registry(root, relative)
+    source = _source(
+        source_id=source_id,
+        truth_plane="GIT",
+        truth_owner="global_trial_ledger",
+        source_ref=source_ref,
+        status=status,
+        observed_at=observed_at,
+        as_of=str(doc.get("as_of") if doc else git_sha),
+        freshness_basis="CURRENT_AT_COMMIT",
+        error=error,
+    )
+    entities: list[dict[str, Any]] = []
+    relations: list[dict[str, Any]] = []
+    gaps: list[dict[str, Any]] = []
+    if status == "NOT_PRESENT":
+        gaps.append(
+            _gap(
+                gap_code="SOURCE_NOT_PRESENT",
+                source_id=source_id,
+                reason="global trial ledger is not present",
+                source_ref=source_ref,
+                impact="no_git_trial_memory",
+                next_safe_action="UNKNOWN",
+            )
+        )
+        return source, entities, relations, gaps
+    if status == "INVALID":
+        gaps.append(
+            _gap(
+                gap_code="SOURCE_INVALID",
+                source_id=source_id,
+                reason=error or "invalid registry",
+                source_ref=source_ref,
+                impact="trial_memory_unreadable",
+                next_safe_action="FAIL_CLOSED_FOR_SOURCE",
+            )
+        )
+        return source, entities, relations, gaps
+    if status == "EMPTY":
+        gaps.append(
+            _gap(
+                gap_code="SOURCE_EMPTY",
+                source_id=source_id,
+                reason="global trial ledger has no records",
+                source_ref=source_ref,
+                impact="no_recorded_trials",
+                next_safe_action="UNKNOWN",
+            )
+        )
+        return source, entities, relations, gaps
+    assert doc is not None
+    for record in doc.get("records") or []:
+        if not isinstance(record, Mapping):
+            continue
+        record_id = str(record.get("record_id") or "")
+        kind = str(record.get("record_kind") or "")
+        if not record_id:
+            gaps.append(
+                _gap(
+                    gap_code="MISSING_STABLE_ID",
+                    source_id=source_id,
+                    reason="trial record missing record_id",
+                    source_ref=source_ref,
+                    impact="record_dropped",
+                    next_safe_action="FAIL_CLOSED_FOR_RECORD",
+                )
+            )
+            continue
+        if kind and kind != "trial":
+            continue
+        outcome = str(record.get("outcome") or "") or None
+        hypothesis_id = str(record.get("hypothesis_id") or "")
+        summary_parts = []
+        if outcome:
+            summary_parts.append(f"outcome={outcome}")
+        if hypothesis_id:
+            summary_parts.append(f"hypothesis_id={hypothesis_id}")
+        entities.append(
+            _entity(
+                entity_id=record_id,
+                projection_class="RESEARCH",
+                native_kind="TRIAL",
+                native_state=str(record.get("status") or "") or None,
+                source_owner=source_id,
+                source_ref=source_ref,
+                truth_plane="GIT",
+                contributing_source_ids=[source_id],
+                as_of=str(record.get("created_at") or doc.get("as_of") or git_sha),
+                observed_at=observed_at,
+                evidence_class="RETAINED_OFFLINE_TRIAL",
+                freshness_status="CURRENT_AT_COMMIT",
+                freshness_basis="git_registry_record",
+                summary=" ".join(summary_parts) or None,
+                next_safe_action="UNKNOWN",
+            )
+        )
+        if hypothesis_id:
+            relations.append(
+                {
+                    "relation_type": "REFERENCES_HYPOTHESIS_VERSION",
+                    "from_entity_id": record_id,
+                    "to_entity_id": hypothesis_id,
+                    "resolution": "TARGET_GAP",
+                    "source_ref": source_ref,
+                    "derivation_method": "EXPLICIT_SOURCE_FIELD",
+                }
+            )
         for evidence_id in record.get("evidence_asset_ids") or []:
             if not isinstance(evidence_id, str) or not evidence_id:
                 continue
@@ -1220,6 +1372,27 @@ def _adapt_paper_plane(
     return source, entities, relations, gaps
 
 
+def _research_store_owned_fields(
+    record: Any,
+    payload: Mapping[str, Any],
+    *,
+    as_of: str,
+    available: str,
+) -> dict[str, Any]:
+    fields = {
+        "claim / statement": payload.get("claim") or payload.get("statement"),
+        "mechanism": payload.get("mechanism"),
+        "falsifier": payload.get("falsifier"),
+        "trial outcome": payload.get("outcome"),
+        "decision kind": payload.get("decision_kind") or payload.get("kind"),
+        "effective_at": as_of,
+        "first_reliable_available_at": available,
+        "evidence class": payload.get("evidence_class"),
+        "supersedes": getattr(record, "supersedes_record_id", None),
+    }
+    return {key: value for key, value in fields.items() if value not in (None, "")}
+
+
 def _research_entity_id(record: Any, payload: Mapping[str, Any]) -> str | None:
     kind = str(record.record_kind)
     if kind in _RUN_KINDS:
@@ -1240,12 +1413,40 @@ def _research_entity_id(record: Any, payload: Mapping[str, Any]) -> str | None:
 def _adapt_research_store(
     *,
     observed_at: str,
-    research_store: ResearchStore | None,
+    research_store: ResearchRecordReader | None,
     research_data_root: Path | None,
+    discovery_status: str | None = None,
+    discovery_error: str | None = None,
 ) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     source_id = "SRC-RESEARCH-STORE"
     store = research_store
     source_ref = {"kind": "research_store", "value": "NOT_PRESENT"}
+    if store is None and discovery_status == "UNAVAILABLE":
+        source = _source(
+            source_id=source_id,
+            truth_plane="EVIDENCE",
+            truth_owner="ResearchStore",
+            source_ref={"kind": "research_store", "value": "discovery"},
+            status="UNAVAILABLE",
+            observed_at=observed_at,
+            freshness_basis="evidence_clock",
+            error=discovery_error or "RESEARCH_STORE_UNAVAILABLE",
+        )
+        return (
+            source,
+            [],
+            [],
+            [
+                _gap(
+                    gap_code="SOURCE_UNAVAILABLE",
+                    source_id=source_id,
+                    reason=discovery_error or "research data root is ambiguous or unreadable",
+                    source_ref={"kind": "research_store", "value": "discovery"},
+                    impact="research_store_not_opened_by_projection",
+                    next_safe_action="RESOLVE_DATA_ROOT_AMBIGUITY",
+                )
+            ],
+        )
     if store is None and research_data_root is not None:
         source_ref = {"kind": "research_store", "value": "provided_data_root"}
         if not research_data_root.is_dir():
@@ -1375,6 +1576,9 @@ def _adapt_research_store(
                 freshness_basis="effective_at/first_reliable_available_at",
                 next_safe_action="UNKNOWN",
                 summary=str(payload.get("claim") or payload.get("summary") or "") or None,
+                source_owned_fields=_research_store_owned_fields(
+                    record, payload, as_of=as_of, available=available
+                ),
             )
         )
         projected += 1
@@ -1613,8 +1817,10 @@ def build_lifecycle_projection(
     root: Path,
     *,
     paper_plane_store: PaperPlaneStore | None = None,
-    research_store: ResearchStore | None = None,
+    research_store: ResearchRecordReader | None = None,
     research_data_root: Path | None = None,
+    research_discovery_status: str | None = None,
+    research_discovery_error: str | None = None,
     projected_at: str | None = None,
     git_sha: str | None = None,
 ) -> dict[str, Any]:
@@ -1637,6 +1843,14 @@ def build_lifecycle_projection(
     entities.extend(neg_entities)
     relations.extend(neg_relations)
     gaps.extend(neg_gaps)
+
+    trial_source, trial_entities, trial_relations, trial_gaps = _adapt_global_trial_ledger(
+        root, contract, observed_at, sha
+    )
+    sources.append(trial_source)
+    entities.extend(trial_entities)
+    relations.extend(trial_relations)
+    gaps.extend(trial_gaps)
 
     spec_source, spec_entities, spec_relations, spec_gaps = _adapt_experiment_specs(
         root, contract, observed_at, sha
@@ -1677,6 +1891,8 @@ def build_lifecycle_projection(
         observed_at=observed_at,
         research_store=research_store,
         research_data_root=research_data_root,
+        discovery_status=research_discovery_status,
+        discovery_error=research_discovery_error,
     )
     sources.append(research_source)
     entities.extend(research_entities)

@@ -66,6 +66,7 @@ failure.
 | `configs/experiment_specs/*.yaml` | GIT | ExperimentSpec identity and explicit `hypothesis_version` |
 | `configs/strategies/*.yaml` | GIT | StrategyVersion identity and explicit provenance |
 | `registries/decisions_negative_results.yaml` | GIT | Decision / negative-result records |
+| `registries/global_trial_ledger.yaml` | GIT | Historical trial records; native `outcome` preserved |
 | `registries/hypotheses.yaml` | GIT | EMPTY envelope; not complete current research truth |
 | `registries/research_cycles.yaml` | GIT | EMPTY envelope; not complete current research-cycle truth |
 | `registries/strategies.yaml` | GIT | EMPTY envelope; not complete current strategy truth |
@@ -156,9 +157,11 @@ acceptance, agent debugging, and recovery. Machine JSON is the inspection
 format, not a second truth owner. It is not the owner UX.
 Move 1 provides the Research Workbench.
 
-Workbench (`src/solana_alpha_lab/factory/workbench.py`) is unchanged.
-Visual presentation is owned by `SMIAL_VISUAL_OPERATING_SYSTEM_V1` /
-`SEM-VISUAL-OPERATING-SYSTEM`. This spine supplies semantics, not CSS.
+Workbench (`src/solana_alpha_lab/factory/workbench.py`) consumes this
+index for `/research` presentation. It does not own lifecycle joins or
+source truth. Visual presentation is owned by
+`SMIAL_VISUAL_OPERATING_SYSTEM_V1` / `SEM-VISUAL-OPERATING-SYSTEM`.
+This spine supplies semantics, not CSS.
 
 ## 8. Git vs operational state
 

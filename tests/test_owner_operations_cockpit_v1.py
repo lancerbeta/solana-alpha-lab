@@ -338,7 +338,7 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
             app = FactoryApplication(root=root, store=store)
             paper_path = root / PAPER_STORE_RELATIVE
             try:
-                self.assertIn("QUESTION", _get(app, "/research"))
+                self.assertIn("RESEARCH", _get(app, "/research"))
                 self.assertIn("Runtime", _get(app, "/system"))
                 self.assertFalse(paper_path.is_file())
             finally:

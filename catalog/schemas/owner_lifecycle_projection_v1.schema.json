@@ -128,6 +128,7 @@
         "bounded_roots",
         "legacy_empty_registries",
         "decision_negative_registry",
+        "global_trial_ledger",
         "operational_store",
         "paper_plane_store",
         "research_store",
@@ -164,6 +165,7 @@
           "items": {"type": "string"}
         },
         "decision_negative_registry": {"type": "string"},
+        "global_trial_ledger": {"type": "string"},
         "operational_store": {
           "type": "object",
           "additionalProperties": false,
@@ -310,6 +312,11 @@
               "next_safe_action": {"type": ["string", "null"]},
               "authority_required": {"$ref": "#/$defs/authorityRequired"},
               "summary": {"type": ["string", "null"]},
+              "source_owned_fields": {
+                "type": "object",
+                "additionalProperties": true,
+                "description": "Source-owned scalars copied in the same adapter pass. Not a second join."
+              },
               "contributing_source_ids": {
                 "type": "array",
                 "minItems": 1,

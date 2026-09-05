@@ -79,6 +79,7 @@ routes:
     purpose: Current prior-work and negative-result discovery via HFIC/Fast Lane recipes and research memory roots.
     owner_questions:
       - Has this mechanism been tested?
+      - Has mechanism X been tested before?
       - Find prior negative hypothesis work
       - Is there an existing HFIC or Fast Lane session?
       - найти прошлую негативную работу по гипотезам
@@ -90,11 +91,13 @@ routes:
       - Fast Lane prior
       - прошлые результаты
       - негатив
+      - prior trials
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CURSOR-DELIVERY]
     root_binding_ids: []
     root_asset_ids:
       - MODULE-FACTORY-V1-RESEARCH-STORE-001
       - REGISTRY-DECISIONS-NEGATIVE-RESULTS-001
+      - REGISTRY-GLOBAL-TRIAL-LEDGER-001
     query_recipe_ids:
       - QUERY-HFIC-EXACT-RELATED-PRIOR-001
       - QUERY-HYPOTHESIS-FAST-LANE-SEARCH-PRIOR-WORK-001
@@ -318,16 +321,16 @@ routes:
     related_route_ids: [SEM-PRODUCT-STATE, SEM-AUTHORITY-BOUNDARIES, SEM-OWNER-LIFECYCLE]
 
   - semantic_route_id: SEM-OWNER-LIFECYCLE
-    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
+    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN, plus the owner Research Workbench read surface. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
     owner_questions:
       - What lifecycle objects currently exist?
       - How are hypothesis, experiment, strategy and position connected?
-      - Where is lifecycle truth?
-      - Show the research-to-execution lineage.
-      - What is linked to this StrategyVersion?
-      - What is the owner lifecycle projection?
-      - какие lifecycle-объекты сейчас существуют?
-      - как связаны гипотеза эксперимент стратегия и позиция?
+      - What research objects exist?
+      - What have we tested?
+      - Where is the Research Workbench?
+      - What is blocked in research?
+      - что сейчас исследуется?
+      - что уже проверяли?
     search_terms:
       - owner lifecycle
       - lifecycle projection
@@ -341,11 +344,16 @@ routes:
       - lifecycle-объекты
       - SEM-OWNER-LIFECYCLE
       - research lineage
-      - execution lineage
+      - как связаны гипотеза эксперимент стратегия и позиция
       - где каноническая карта lifecycle
+      - Research Workbench
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
-    root_binding_ids: [ACTIVE-OWNER-LIFECYCLE-PROJECTION]
-    root_asset_ids: [DOC-OWNER-LIFECYCLE-PROJECTION-001]
+    root_binding_ids:
+      - ACTIVE-OWNER-LIFECYCLE-PROJECTION
+      - ACTIVE-RESEARCH-LIFECYCLE-WORKBENCH
+    root_asset_ids:
+      - DOC-OWNER-LIFECYCLE-PROJECTION-001
+      - DOC-RESEARCH-LIFECYCLE-WORKBENCH-001
     query_recipe_ids: []
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}

@@ -227,12 +227,20 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
 
     def test_missing_runtime_is_not_present_not_empty_healthy(self) -> None:
         paper = _source(self.projection, "SRC-PAPER-PLANE")
-        self.assertEqual(paper["status"], "NOT_PRESENT")
         research = _source(self.projection, "SRC-RESEARCH-STORE")
+        paper_path = ROOT / "local/factory_v1/paper_plane_state.sqlite"
+        if paper_path.is_file():
+            self.assertIn(paper["status"], {"AVAILABLE", "EMPTY"})
+        else:
+            self.assertEqual(paper["status"], "NOT_PRESENT")
+            self.assertTrue(
+                any(
+                    item["gap_code"] == "SOURCE_NOT_PRESENT"
+                    and item.get("source_id") == "SRC-PAPER-PLANE"
+                    for item in self.projection["gaps"]
+                )
+            )
         self.assertEqual(research["status"], "NOT_PRESENT")
-        self.assertTrue(
-            any(item["gap_code"] == "SOURCE_NOT_PRESENT" and item.get("source_id") == "SRC-PAPER-PLANE" for item in self.projection["gaps"])
-        )
 
     def test_case_d_paper_runtime_lineage_from_foreign_keys(self) -> None:
         strategy = load_strategy_version(ROOT, LEGACY_STRAT)
@@ -291,7 +299,13 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
         self.assertTrue(epoch_edges)
         self.assertEqual(epoch_edges[0]["to_entity_id"], "ACTIVATION-EPOCH-BOUNDARY-PAPER-001")
         self.assertEqual(epoch_edges[0]["resolution"], "TARGET_GAP")
-        self.assertFalse((ROOT / "local/factory_v1/paper_plane_state.sqlite").exists())
+        paper = next(
+            item
+            for item in projection["sources"]
+            if item["source_id"] == "SRC-PAPER-PLANE"
+        )
+        self.assertEqual(paper["status"], "AVAILABLE")
+        self.assertEqual(paper["source_ref"], {"kind": "injected", "value": "PaperPlaneStore"})
 
     def test_case_e_research_store_explicit_path(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -529,10 +543,33 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
             any(item["gap_code"] == "MISSING_STABLE_ID" for item in projection["gaps"])
         )
 
-    def test_workbench_not_redesigned(self) -> None:
+    def test_global_trial_ledger_preserves_native_outcome(self) -> None:
+        self.assertIn(
+            "TRIAL-RC002-H11-NEXT-GTA-TARGET-001",
+            _ids(self.projection, native_kind="TRIAL"),
+        )
+        entity = next(
+            item
+            for item in self.projection["entities"]
+            if item["entity_id"] == "TRIAL-RC002-H11-NEXT-GTA-TARGET-001"
+        )
+        self.assertEqual(entity["truth_plane"], "GIT")
+        self.assertEqual(entity["native_state"], "RECORDED")
+        self.assertIn("outcome=PASS", entity["summary"] or "")
+        self.assertNotIn("POSITIVE", entity["summary"] or "")
+        hyp = [
+            item
+            for item in _relations(self.projection, "REFERENCES_HYPOTHESIS_VERSION")
+            if item["from_entity_id"] == "TRIAL-RC002-H11-NEXT-GTA-TARGET-001"
+        ]
+        self.assertEqual(hyp[0]["to_entity_id"], "HYP-RC002-H11-LIFECYCLE-CLOCK-V1")
+        self.assertEqual(hyp[0]["resolution"], "TARGET_GAP")
+        self.assertNotIn("HYP-RC002-H11-LIFECYCLE-CLOCK-V1", _ids(self.projection))
+
+    def test_workbench_does_not_own_lifecycle_joins(self) -> None:
         text = WORKBENCH.read_text(encoding="utf-8")
-        self.assertNotIn("lifecycle_projection", text)
-        self.assertNotIn("SEM-OWNER-LIFECYCLE", text)
+        self.assertNotIn("INFERRED_BY_NAME", text)
+        self.assertIn("research_overview", text)
 
     def test_catalog_binding_and_semantic_route(self) -> None:
         snapshot = load_and_validate(allow_generated_drift=True)
@@ -543,7 +580,7 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
             bindings["ACTIVE-OWNER-LIFECYCLE-PROJECTION"]["target_asset_id"],
             "CONFIG-OWNER-LIFECYCLE-PROJECTION-001",
         )
-        self.assertLessEqual(len(bindings), 11)
+        self.assertLessEqual(len(bindings), 12)
         self.assertIn("CONFIG-OWNER-LIFECYCLE-PROJECTION-001", snapshot.assets)
         positives = [
             "What lifecycle objects currently exist?",

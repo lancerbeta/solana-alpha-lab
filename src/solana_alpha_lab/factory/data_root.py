@@ -69,6 +69,93 @@ def _env_mapping(env: Mapping[str, str] | None) -> Mapping[str, str]:
     return os.environ if env is None else env
 
 
+def inspect_existing_directory(candidate: Path) -> Path | None:
+    """Return a resolved existing directory, or None. Never mkdir."""
+
+    try:
+        path = Path(candidate)
+        if not path.is_absolute():
+            path = path.resolve()
+        if path.is_symlink() or not path.is_dir():
+            return None
+        resolved = path.resolve(strict=True)
+    except OSError:
+        return None
+    if resolved.is_symlink() or not resolved.is_dir():
+        return None
+    return resolved
+
+
+@dataclass(frozen=True, slots=True)
+class ExistingDataRootResolution:
+    status: str
+    root: Path | None
+    selection_reason: str
+    error: str | None
+
+    def redacted_receipt(self) -> dict[str, object]:
+        return {
+            "status": self.status,
+            "selection_reason": self.selection_reason,
+            "error": self.error,
+            "present": self.root is not None,
+        }
+
+
+def resolve_existing_data_root(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None = None,
+    env: Mapping[str, str] | None = None,
+) -> ExistingDataRootResolution:
+    """Non-creating discovery: explicit → SMIAL_DATA_ROOT → existing default.
+
+    Missing stays missing. Split-brain is UNAVAILABLE, not an arbitrary pick.
+    """
+
+    mapping = _env_mapping(env)
+    if explicit_data_root is not None:
+        existing = inspect_existing_directory(Path(explicit_data_root))
+        if existing is None:
+            return ExistingDataRootResolution(
+                "NOT_PRESENT", None, "EXPLICIT_MISSING", "RESEARCH_STORE_NOT_PRESENT"
+            )
+        return ExistingDataRootResolution("PRESENT", existing, "EXPLICIT", None)
+
+    env_raw = mapping.get("SMIAL_DATA_ROOT")
+    default_existing = inspect_existing_directory(
+        Path(repo_root) / DEFAULT_DATA_PLANE_RELATIVE
+    )
+    if env_raw:
+        env_existing = inspect_existing_directory(Path(env_raw))
+        if env_existing is None:
+            return ExistingDataRootResolution(
+                "NOT_PRESENT",
+                None,
+                "ENV_MISSING",
+                "RESEARCH_STORE_NOT_PRESENT",
+            )
+        if (
+            default_existing is not None
+            and env_existing != default_existing
+        ):
+            return ExistingDataRootResolution(
+                "UNAVAILABLE",
+                None,
+                "SPLIT_BRAIN",
+                "DATA_ROOT_SPLIT_BRAIN",
+            )
+        return ExistingDataRootResolution("PRESENT", env_existing, "ENV", None)
+
+    if default_existing is not None:
+        return ExistingDataRootResolution(
+            "PRESENT", default_existing, "DEFAULT_EXISTING", None
+        )
+    return ExistingDataRootResolution(
+        "NOT_PRESENT", None, "DEFAULT_MISSING", "RESEARCH_STORE_NOT_PRESENT"
+    )
+
+
 def resolve_data_root(
     repo_root: Path,
     *,

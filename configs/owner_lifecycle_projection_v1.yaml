@@ -16,6 +16,7 @@ legacy_empty_registries:
   - registries/strategies.yaml
   - registries/bot_instances.yaml
 decision_negative_registry: registries/decisions_negative_results.yaml
+global_trial_ledger: registries/global_trial_ledger.yaml
 operational_store:
   kernel_config: configs/factory_v1_product_kernel_v1.yaml
   create_if_missing: false

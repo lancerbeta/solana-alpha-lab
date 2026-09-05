@@ -110,6 +110,30 @@ queries:
 - query_id: SGQ-OWNER-LIFECYCLE-MAP-RU
   query: где каноническая карта lifecycle?
   required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RESEARCH-EXISTS-EN
+  query: What research objects exist?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RESEARCH-TESTED-EN
+  query: What have we tested?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RESEARCH-WORKBENCH-EN
+  query: Where is the Research Workbench?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RESEARCH-ACTIVE-RU
+  query: что сейчас исследуется?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RESEARCH-TESTED-RU
+  query: что уже проверяли?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-ANTI-MECHANISM-PRIOR
+  query: Has mechanism X been tested before?
+  required_top_route: SEM-PRIOR-WORK
+- query_id: SGQ-ANTI-WORKBENCH-COLORS
+  query: What colors should Workbench use?
+  required_top_route: SEM-VISUAL-OPERATING-SYSTEM
+- query_id: SGQ-ANTI-MAY-DEPLOY
+  query: May I deploy?
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
 - query_id: SGQ-ANTI-VPS-HEALTH
   query: Is the VPS healthy?
   required_top_route: SEM-REMOTE-OPS-RECOVERY

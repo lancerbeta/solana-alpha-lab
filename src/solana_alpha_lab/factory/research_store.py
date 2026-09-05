@@ -1062,13 +1062,25 @@ def _publish_immutable(path: Path, data: bytes) -> _PublishDisposition:
                 raise ResearchStoreError("TEMPORARY_CLEANUP_FAILED") from exc
 
 
-def _validated_data_root(data_root: Path) -> Path:
+def _validated_data_root(data_root: Path, *, create: bool = True) -> Path:
     if not isinstance(data_root, Path):
         raise ResearchStoreError("DATA_ROOT_MUST_BE_PATH")
     if not data_root.is_absolute():
         raise ResearchStoreError("DATA_ROOT_MUST_BE_ABSOLUTE")
     if data_root.is_symlink():
         raise ResearchStoreError("DATA_ROOT_SYMLINK_FORBIDDEN")
+    if not create:
+        if not data_root.exists():
+            raise ResearchStoreError("RESEARCH_STORE_NOT_PRESENT")
+        try:
+            resolved = data_root.resolve(strict=True)
+        except OSError as exc:
+            raise ResearchStoreError("DATA_ROOT_UNAVAILABLE") from exc
+        if resolved.is_symlink():
+            raise ResearchStoreError("DATA_ROOT_SYMLINK_FORBIDDEN")
+        if not resolved.is_dir():
+            raise ResearchStoreError("DATA_ROOT_MUST_BE_DIRECTORY")
+        return resolved
     try:
         data_root.mkdir(parents=True, exist_ok=True)
         resolved = data_root.resolve(strict=True)
@@ -1101,8 +1113,14 @@ def _completed_run_passport(
 class ResearchStore:
     """One-writer immutable research log rooted outside Git."""
 
-    def __init__(self, data_root: Path, *, parquet_compression: str = "NONE") -> None:
-        self._root = _validated_data_root(data_root)
+    def __init__(
+        self,
+        data_root: Path,
+        *,
+        parquet_compression: str = "NONE",
+        create_if_missing: bool = True,
+    ) -> None:
+        self._root = _validated_data_root(data_root, create=create_if_missing)
         self._parquet_compression = parquet_compression
 
     @contextmanager
@@ -1936,9 +1954,24 @@ class ResearchStore:
         return True
 
 
+class ExistingResearchStoreReader:
+    """Read-only view of an already-present ResearchStore. No write API."""
+
+    def __init__(self, data_root: Path) -> None:
+        self._store = ResearchStore(data_root, create_if_missing=False)
+
+    @property
+    def root(self) -> Path:
+        return self._store._root
+
+    def iter_committed_records(self) -> Iterator[ResearchEvent]:
+        return self._store.iter_committed_records()
+
+
 __all__ = [
     "CommitDisposition",
     "CommitReceipt",
+    "ExistingResearchStoreReader",
     "PidLiveness",
     "ProjectionReceipt",
     "RESEARCH_EVENT_ARROW_SCHEMA",
