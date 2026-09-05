@@ -4,7 +4,7 @@ catalog_version: 0.125.0
 as_of: '2026-09-05'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1686
+  assets: 1688
   asset_registries: 4
   schemas: 88
   queries: 19

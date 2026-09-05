@@ -1,8 +1,8 @@
 schema: smial.factory-hot90-archive-activation
 schema_version: '1.0'
 as_of: '2026-09-05'
-activation_stage: WRITE_ONLY_SHADOW
+activation_stage: CURRENT_SAFE
 production_compaction_enabled: false
 production_eviction_enabled: false
 drive_writes_enabled: false
-note: WRITE_ONLY_SHADOW uses ZSTD new writes and SNAPSHOT_PLUS_DELTA members. Drive writes, SQLite compaction, eviction, and backup durability cutover stay disabled until later owner-gated stages. RETENTION_ACTIVE is a separate destructive owner gate.
+note: SAFE DEFAULT WHEN NO VALID RUNTIME STATE EXISTS. Current host stage is local/factory_v1/hot90_activation_runtime.yaml. This Git file is policy/validation/safe default, not live Factory state.

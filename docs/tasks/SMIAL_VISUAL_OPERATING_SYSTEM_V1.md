@@ -8,7 +8,7 @@ allowed_routes:
 - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 012d6f053f20a50dfa22ddc67b7e4c13df36a7a0
+  expected_base: 89c9778f120c5d9cc68df340aa4339c75ea45b96
   expected_upstream: origin/main
   expected_upstream_oid: 89c9778f120c5d9cc68df340aa4339c75ea45b96
   expected_branch: cursor/smial-visual-operating-system-v1
@@ -121,11 +121,11 @@ deploy changes.
 
 `START_AS_WRITTEN`
 
-Rebind: observed Project Chat `main=a946e866...` moved to
-`origin/main=012d6f053f20a50dfa22ddc67b7e4c13df36a7a0` via PR #265
-(normalized-trajectory probe preregistration). No visual-system owner or
-conflicting presentation contract appeared. No current canonical visual
-owner exists.
+Rebind: observed Project Chat `main=a946e866...` moved through
+`012d6f053f20a50dfa22ddc67b7e4c13df36a7a0` (PR #265) to
+`origin/main=89c9778f120c5d9cc68df340aa4339c75ea45b96` via PR #266
+(HOT90 runtime activation boundary). Ordinary merge of that main keeps HOT90
+runtime truth and this atom's visual contract. No competing visual owner.
 
 ## FACTORY FIT / PRODUCT HORIZON
 

@@ -1,0 +1,40 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-05",
+  "task_id": "HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1",
+  "reviewed_bindings_sha256": "f99a9ff47e990c5dfe6ccc73f89cdad9381ed71d33e885741ea020320abd5f42",
+  "reviewed_inventory_sha256": "8d594f3d9da3e583a278d650d96d43624729474cac5fcc2071330426a7cc93c3",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_LAST_GIT_REPAIR_FOR_ORDINARY_HOT90_STAGE_TRANSITIONS",
+    "flexibility_and_history": "PASS_PRE_REPAIR_SHA_IGNORES_RUNTIME_FILE",
+    "context_efficiency": "PASS_ONE_LOADER_ONE_CLI_NO_CONFIG_SERVICE",
+    "research_truth": "PASS_LEGACY_SNAPPY_AND_FAIL_CLOSED_RUNTIME_RETAINED",
+    "owner_operability": "PASS_SHOW_SET_WITH_OWNER_GATE_STILL_REQUIRED",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_GIT_DEFAULT_AFTER_THIS_SHA_IS_CONTINUITY_FAIL",
+    "build_vs_buy": "PASS_PRESERVED_LOCAL_YAML_NO_NEW_SUBSYSTEM",
+    "security": "PASS_NO_SECRETS_SYMLINK_FAIL_CLOSED",
+    "red_team": "PASS_INVALID_RUNTIME_DOES_NOT_FALL_BACK_TO_GIT"
+  },
+  "capability_radar": {
+    "now": "OPERATE_WRITE_RUNTIME_THEN_EXACT_SHA_DEPLOY",
+    "watch": "DURABILITY_CUTOVER_AFTER_OWNER_GATE"
+  },
+  "recovery": "Rollback to a pre-repair SHA ignores the runtime file and uses that SHA tracked YAML. Repair-or-newer SHA treats valid runtime as authoritative. Deleting or corrupting runtime is not casual rollback.",
+  "limits": [
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_LOCAL_FACTORY_DATA_DELETE",
+    "NO_SQLITE_LIVE_COMPACTION",
+    "NO_PRODUCTION_EVICTION",
+    "NO_BACKUP_DURABILITY_CUTOVER",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}
