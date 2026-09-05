@@ -6,8 +6,8 @@
   "task_id": "SMIAL_VISUAL_OPERATING_SYSTEM_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "d49b579baae34ab9ed8e3952ab5231c18083886174b0256fc2ba338854c60c55",
-  "reviewed_inventory_sha256": "fe7a1d10a7dd40ad5ad30902bb76c55ef76bb573915b746ea8fa5cbb712c361f",
+  "reviewed_bindings_sha256": "87eb6c48e5fa13e35543972002b8e36062d9a2eb9945c5a24f8389e9a8cc92ee",
+  "reviewed_inventory_sha256": "a9c651c1f19afe7d9a06330055c88cd2547a5ba4a5170e1dca0fee7335853701",
   "capability_radar": {
     "now": "NONE",
     "watch": "OWNER_LIFECYCLE_PROJECTION_SPINE_V1"
