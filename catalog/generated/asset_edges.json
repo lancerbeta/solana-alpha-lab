@@ -728,6 +728,11 @@
       "target_asset_id": "CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-HOT90-ARCHIVE-ACTIVATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-REMOTE-HOST-LOCATOR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
@@ -2749,6 +2754,31 @@
     },
     {
       "source_asset_id": "CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-FACTORY-HOT90-ARCHIVE-ACTIVATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-FACTORY-HOT90-COMMISSIONING-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-HOT90-ACTIVATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FACTORY-HOT90-WRITE-ONLY-SHADOW-ACTIVATION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001"
     },
@@ -4856,6 +4886,11 @@
       "source_asset_id": "DOC-FACTORY-HOT90-COMMISSIONING-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-HOT90-COMMISSIONING-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001"
     },
     {
       "source_asset_id": "DOC-FACTORY-HOT90-IMPL-OWNER-READOUT-001",
@@ -13493,6 +13528,11 @@
       "target_asset_id": "CTRL-HFIC-NEXT-FORWARD-EVIDENCE-EXECUTION-001"
     },
     {
+      "source_asset_id": "SCRIPT-HOT90-ACTIVATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001"
+    },
+    {
       "source_asset_id": "SCRIPT-HYPOTHESIS-FAST-LANE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-LANE-CLASSIFIER-001"
@@ -14521,6 +14561,11 @@
       "source_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
