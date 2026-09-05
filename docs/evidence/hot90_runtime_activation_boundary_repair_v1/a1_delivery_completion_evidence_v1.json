@@ -11,7 +11,19 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "OPERATE_WRITE_RUNTIME_THEN_EXACT_SHA_DEPLOY",
   "implementation_bindings": {
-    "docs/tasks/HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1.md": "862e4368a92e20e5319c9bc10d5707be5779b96d492127526ae2c0ffbdffdc38"
+    "catalog/assets/core.yaml": "7007d6a3bbd4f359d7c6d2a1a9d777f2c29f5e1830b95e26684bd242074ac43d",
+    "catalog/assets/lifecycle.yaml": "6245ed08d3aa1cb2460f07e3bc39caf2c83110a8afaf8f75f68eb63ea2961bd2",
+    "catalog/catalog_manifest.yaml": "eb30ba318f4ab13b0a9d4a6fe0e605b1d2dca14a0752139e107eb4803cd38c2b",
+    "catalog/generated/asset_edges.json": "1168f06d33d0c6f11b13732a7caac8124248efb191f5f0abd1c8b56e64be80c4",
+    "configs/factory_hot90_archive_activation_v1.yaml": "9e0eec586d319e9a0935d3a89648649f1ba4669b272aa2ad0c5385c393dfe49f",
+    "docs/PROJECT_MAP.md": "4b649e5272ad0e02dc2b7c89aeba2daf56ba02520d31aae236f13d390382229f",
+    "docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md": "0843e579c55e7ad7482e118fdb2242eb024836ff5a9c147d9825dc1c17fac54a",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "35d3bc5488c31f567807f002a63d1edb2cbce9a0ebe1c4557155795d28fac2a5",
+    "docs/reports/hot90_runtime_activation_boundary_repair_v1/a1_owner_readout_v1.md": "1cd8f012a4bb5cf35a28473ef10aef6af9748e5cbc7a03552699fc19f4224bb2",
+    "docs/tasks/HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1.md": "8dbbb203b7182f111381236a05d1b5573b38cec21d3fcb3a89ffa40ab877cf2d",
+    "scripts/hot90_activation.py": "ed81f3e498aa260bb6d72bc8ba96e2caa7074f8752a80deb58f50738e297fac9",
+    "src/solana_alpha_lab/factory/hot90_activation.py": "e3d47e9705aaeb17a2c90f4cf5358c39f7ad00a5402f02f25b7f2afbb80533d4",
+    "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py": "64df1178a1f655d6aa215c4c749ba0e7623b8f65deb09c334d3ef37543e70a8a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +35,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hot90_runtime_activation_boundary_repair_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "31612a9b8b2aebed5219a79d019b55c8574c48caecfcc1ca8e704aa3473e391c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/hot90_runtime_activation_boundary_repair_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "b74069f2190e7ef7a476ae89e99b34eb95e8e4dc2f41314c8a8e8c0e2e4a86bf",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
