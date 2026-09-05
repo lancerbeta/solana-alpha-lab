@@ -81,11 +81,15 @@ or match foreign keys from other records. Lineage and object gaps are
 scoped to the selected locator plane and source, except `CONFLICT`
 edges which remain visible on every involved plane.
 
+Owner-facing copy is Russian-first (`OWNER_FACING_LANGUAGE = RU`).
+Canonical identifiers, enums, JSON keys and error codes stay English.
+Legacy scientific prose is not rewritten for localization.
+
 Preferred degraded copy when ResearchStore is absent:
 
 ```text
-Research evidence source is unavailable to this Workbench.
-Git-tracked experiments/trials/decisions below remain available.
+Источник ResearchStore этой рабочей панели недоступен.
+Git-эксперименты, проверки и решения ниже остаются видимы.
 ```
 
 Groups prefer source-native states. Do not invent `KILLED`,
@@ -136,9 +140,9 @@ Shared chrome is `STEEL_SIGNAL` / `DARK_ONLY`. Detail is
 Tokens are read from the canonical Visual OS contract. Cyan is not
 success. Red is scarce. `UNKNOWN` has text semantics. No second palette.
 
-## 8. Future extension
+## 8. Move 2 extension
 
-Move 2 (`EXPERIMENT_EVIDENCE_DECISION_V1`) may add typed evidence-quality
-detail for one real experiment. It must keep LifecycleProjection as the
+Experiment evidence/decision composition is `EXPERIMENT_EVIDENCE_DECISION_V1`.
+GET `/research` remains non-mutating. Decision writes go through
+FactoryApplication → ResearchStore only. LifecycleProjection stays the
 identity layer. Frontend technology may change without moving truth.
-Do not add a cache, theme service, router, or research mutation here.

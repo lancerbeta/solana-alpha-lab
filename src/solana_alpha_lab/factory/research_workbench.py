@@ -10,6 +10,7 @@ from typing import Any, Iterable, Mapping
 import yaml
 
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+from solana_alpha_lab.factory.owner_language import research_copy
 from solana_alpha_lab.factory.lifecycle_projection import (
     LifecycleProjectionError,
     build_lifecycle_projection,
@@ -407,12 +408,7 @@ def compose_research_overview(
         },
         "counter_scope": "materialized_projection_facts",
         "degraded": degraded,
-        "degraded_copy": (
-            "Research evidence source is unavailable to this Workbench. "
-            "Git-tracked experiments/trials/decisions below remain available."
-            if degraded
-            else None
-        ),
+        "degraded_copy": (research_copy("degraded_copy") if degraded else None),
         "needs_attention": attention_rows[:limit],
         "current_activity": [_row(item) for item in active[:limit]],
         "universe": [_row(item) for item in filtered],
@@ -617,6 +613,7 @@ def compose_research_detail(
     locator: LifecycleEntityLocatorV1,
     *,
     root: Path,
+    dossier: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     matches = [
         item
@@ -692,6 +689,7 @@ def compose_research_detail(
             "state_derivation": entity.get("state_derivation"),
             "authority_required": entity.get("authority_required"),
         },
+        "dossier": dict(dossier) if dossier else None,
     }
 
 
@@ -767,6 +765,7 @@ def build_research_detail(
     research_discovery_status: str | None = None,
     research_discovery_error: str | None = None,
     projected_at: str | None = None,
+    write_capability: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     projection = build_lifecycle_projection(
         root,
@@ -777,4 +776,28 @@ def build_research_detail(
         research_discovery_error=research_discovery_error,
         projected_at=projected_at,
     )
-    return compose_research_detail(projection, locator, root=root)
+    dossier = None
+    if locator.native_kind == "EXPERIMENT_SPEC":
+        from solana_alpha_lab.factory.experiment_evidence import compose_experiment_dossier
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+
+        records: tuple[Any, ...] | None = None
+        records_status = "NOT_PRESENT"
+        if research_store is not None:
+            try:
+                records = tuple(research_store.iter_committed_records())
+                records_status = "AVAILABLE"
+            except ResearchStoreError:
+                records = None
+                records_status = "UNAVAILABLE"
+        elif research_discovery_status in {"UNAVAILABLE", "INVALID"}:
+            records_status = "UNAVAILABLE"
+        dossier = compose_experiment_dossier(
+            projection,
+            locator,
+            root=root,
+            records=records,
+            records_status=records_status,
+            write_capability=write_capability,
+        )
+    return compose_research_detail(projection, locator, root=root, dossier=dossier)

@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 import yaml
 
@@ -38,6 +38,10 @@ GOLDEN_SPEC_RELATIVE = (
 
 class ApplicationError(ValueError):
     """Raised when a bounded owner command cannot execute fail-closed."""
+
+    def __init__(self, code: str) -> None:
+        self.code = str(code)
+        super().__init__(code)
 
 
 def _load_yaml(root: Path, relative: str) -> dict[str, Any]:
@@ -208,6 +212,22 @@ class FactoryApplication:
             **filters,
         )
 
+    def research_write_capability(self) -> dict[str, str | None]:
+        discovery = self.research_discovery()
+        if discovery.status != "PRESENT" or discovery.root is None:
+            return {
+                "read": "AVAILABLE",
+                "write": "UNAVAILABLE",
+                "reason": discovery.error or discovery.status,
+            }
+        if self.existing_research_store() is None:
+            return {
+                "read": "AVAILABLE",
+                "write": "UNAVAILABLE",
+                "reason": "RESEARCH_STORE_OPEN_FAILED",
+            }
+        return {"read": "AVAILABLE", "write": "AVAILABLE", "reason": None}
+
     def research_detail(self, locator: Any) -> dict[str, Any]:
         from solana_alpha_lab.factory.research_workbench import build_research_detail
 
@@ -219,7 +239,208 @@ class FactoryApplication:
             research_store=self.existing_research_store(),
             research_discovery_status=status,
             research_discovery_error=error,
+            write_capability=self.research_write_capability(),
         )
+
+    def _producer_git_sha(self) -> str:
+        import subprocess
+
+        try:
+            sha = subprocess.check_output(
+                ["git", "rev-parse", "HEAD"],
+                cwd=self.root,
+                text=True,
+                timeout=5,
+            ).strip()
+        except (OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired) as exc:
+            raise ApplicationError("PRODUCER_GIT_SHA_UNAVAILABLE") from exc
+        if len(sha) != 40:
+            raise ApplicationError("PRODUCER_GIT_SHA_UNAVAILABLE")
+        return sha
+
+    def _committed_decision_event(self, event_id: str) -> Any | None:
+        from solana_alpha_lab.factory.research_store import (
+            ExistingResearchStoreReader,
+            ResearchStoreError,
+        )
+
+        discovery = self.research_discovery()
+        if discovery.root is None:
+            return None
+        try:
+            for record in ExistingResearchStoreReader(discovery.root).iter_committed_records():
+                if record.record_id == event_id:
+                    return record
+        except ResearchStoreError:
+            return None
+        return None
+
+    def _decision_matches(
+        self,
+        record: Any,
+        *,
+        kind: str,
+        snapshot: str,
+        locator: Any,
+    ) -> bool:
+        try:
+            committed = json.loads(record.payload_json)
+        except (TypeError, ValueError, json.JSONDecodeError):
+            return False
+        return (
+            isinstance(committed, dict)
+            and committed.get("decision_kind") == kind
+            and committed.get("evidence_snapshot_sha256") == snapshot
+            and committed.get("target_entity_id") == locator.entity_id
+        )
+
+    def record_research_decision(self, command: Mapping[str, Any]) -> dict[str, Any]:
+        from datetime import UTC, datetime
+
+        from solana_alpha_lab.factory.experiment_evidence import (
+            OWNER_DECISION_KINDS,
+            decision_payload,
+            logical_decision_ids,
+        )
+        from solana_alpha_lab.factory.research_store import (
+            ExistingResearchStoreReader,
+            ResearchEvent,
+            ResearchStore,
+            ResearchStoreError,
+        )
+        from solana_alpha_lab.factory.research_workbench import (
+            ResearchWorkbenchError,
+            parse_locator,
+        )
+
+        try:
+            locator = parse_locator(
+                command.get("entity_id"),
+                command.get("truth_plane"),
+                command.get("native_kind"),
+            )
+        except ResearchWorkbenchError as exc:
+            raise ApplicationError(str(exc)) from exc
+        if locator is None or locator.native_kind != "EXPERIMENT_SPEC":
+            raise ApplicationError("LOCATOR_REJECTED")
+        capability = self.research_write_capability()
+        if capability.get("write") != "AVAILABLE":
+            raise ApplicationError("WRITE_UNAVAILABLE")
+        kind = str(command.get("decision_kind") or "")
+        if kind not in OWNER_DECISION_KINDS:
+            raise ApplicationError("DECISION_KIND_REJECTED")
+        expected = str(command.get("expected_evidence_snapshot_sha256") or "")
+        reread = self.research_detail(locator)
+        reread_dossier = reread.get("dossier") if isinstance(reread.get("dossier"), dict) else {}
+        live_snapshot = str(reread_dossier.get("evidence_snapshot_sha256") or "")
+        if not expected or expected != live_snapshot:
+            txn_id, event_id = logical_decision_ids(
+                locator=locator,
+                decision_kind=kind,
+                snapshot_sha256=expected,
+            )
+            existing = self._committed_decision_event(event_id)
+            if existing is not None and self._decision_matches(
+                existing, kind=kind, snapshot=expected, locator=locator
+            ):
+                self._research_reader = None
+                refreshed = self.research_detail(locator)
+                refreshed["decision_result"] = {
+                    "status": "DECISION_RECORDED",
+                    "disposition": "REPLAY_IDENTICAL",
+                    "decision_event_id": event_id,
+                    "transaction_id": txn_id,
+                    "creates_strategy_version": False,
+                }
+                return refreshed
+            raise ApplicationError("STALE_EVIDENCE_SNAPSHOT")
+        if kind == "PROMOTE":
+            guard = reread_dossier.get("science_guard") if isinstance(
+                reread_dossier.get("science_guard"), dict
+            ) else {}
+            if not guard.get("allowed"):
+                raise ApplicationError("PROMOTE_BLOCKED")
+            confirm = str(command.get("promote_scientific_only") or "")
+            if confirm != "1":
+                raise ApplicationError("PROMOTE_BOUNDARY_CONFIRMATION_REQUIRED")
+        txn_id, event_id = logical_decision_ids(
+            locator=locator,
+            decision_kind=kind,
+            snapshot_sha256=expected,
+        )
+        payload = decision_payload(
+            locator=locator,
+            decision_kind=kind,
+            snapshot_sha256=expected,
+            hypothesis_version_id=(reread_dossier.get("tested") or {}).get(
+                "hypothesis_version_id"
+            ),
+            rationale=command.get("rationale"),
+            decision_event_id=event_id,
+        )
+        payload_json = json.dumps(
+            payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
+        )
+        now = datetime.now(UTC)
+        event = ResearchEvent(
+            record_id=event_id,
+            record_kind="DECISION_EVENT",
+            entity_id=event_id,
+            hypothesis_version_id=payload.get("hypothesis_version_id"),
+            run_id=None,
+            transaction_id=txn_id,
+            effective_at=now,
+            first_reliable_available_at=now,
+            supersedes_record_id=None,
+            payload_json=payload_json,
+            payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+            schema_version="1.0",
+            producer_capability_id="FACTORY-APPLICATION-RESEARCH-DECISION-V1",
+            producer_git_sha=self._producer_git_sha(),
+            created_at=now,
+        )
+        discovery = self.research_discovery()
+        if discovery.root is None:
+            raise ApplicationError("WRITE_UNAVAILABLE")
+        try:
+            writer = ResearchStore(discovery.root, create_if_missing=False)
+            receipt = writer.append([event], transaction_id=txn_id)
+        except ResearchStoreError as exc:
+            code = getattr(exc, "code", None) or str(exc)
+            if code == "WRITER_BUSY":
+                raise ApplicationError("WRITER_BUSY") from exc
+            raise ApplicationError(code) from exc
+        found = None
+        try:
+            for record in ExistingResearchStoreReader(discovery.root).iter_committed_records():
+                if record.record_id == event_id:
+                    found = record
+                    break
+        except ResearchStoreError as exc:
+            raise ApplicationError("DECISION_WRITE_UNVERIFIED") from exc
+        if found is None:
+            raise ApplicationError("DECISION_WRITE_UNVERIFIED")
+        try:
+            committed = json.loads(found.payload_json)
+        except (TypeError, ValueError, json.JSONDecodeError) as exc:
+            raise ApplicationError("DECISION_WRITE_UNVERIFIED") from exc
+        if (
+            not isinstance(committed, dict)
+            or committed.get("decision_kind") != kind
+            or committed.get("evidence_snapshot_sha256") != expected
+            or committed.get("target_entity_id") != locator.entity_id
+        ):
+            raise ApplicationError("DECISION_WRITE_UNVERIFIED")
+        self._research_reader = None
+        refreshed = self.research_detail(locator)
+        refreshed["decision_result"] = {
+            "status": "DECISION_RECORDED",
+            "disposition": str(receipt.disposition),
+            "decision_event_id": event_id,
+            "transaction_id": txn_id,
+            "creates_strategy_version": False,
+        }
+        return refreshed
 
     def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:
         try:

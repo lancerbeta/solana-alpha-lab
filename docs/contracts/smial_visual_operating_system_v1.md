@@ -29,6 +29,10 @@ evidence class, and never fills missing data.
 
 Truth wins over beauty, density, brand consistency, and decorative minimalism.
 
+Owner-facing copy is Russian-first. Machine tokens, enums, identifiers and
+contracts stay canonical English. Presentation translation owns zero
+scientific truth and never rewrites immutable evidence.
+
 ## 2. One system, four behaviors
 
 These are not selectable themes. They are one identity whose expression

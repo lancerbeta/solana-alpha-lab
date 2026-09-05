@@ -197,7 +197,7 @@ class ResearchLifecycleWorkbenchTests(unittest.TestCase):
         status, detail, _ = _get(self.app, href)
         self.assertEqual(status, 200)
         self.assertIn("EVIDENCE_EDITORIAL", detail)
-        self.assertIn("QUESTION", detail)
+        self.assertIn("Вопрос", detail)
         self.assertIn("TRACE", detail.upper() + detail)
         self.assertIn("computational-field", detail)
         self.assertIn("semantic-unknown", detail)
@@ -311,7 +311,7 @@ class ResearchLifecycleWorkbenchTests(unittest.TestCase):
             overview = compose_research_overview(projection)
             self.assertEqual(overview["completeness"], "PARTIAL")
             self.assertTrue(overview["degraded"])
-            self.assertIn("unavailable to this Workbench", overview["degraded_copy"] or "")
+            self.assertIn("недоступен", overview["degraded_copy"] or "")
             research = next(
                 item
                 for item in overview["sources"]
@@ -431,7 +431,7 @@ class ResearchLifecycleWorkbenchTests(unittest.TestCase):
             )
             status, body, _ = _get(app, "/research")
             self.assertEqual(status, 200)
-            self.assertIn("RESEARCH", body)
+            self.assertIn("Исследования", body)
             self.assertFalse(missing.exists())
             self.assertIsNone(app._operational_store)
             self.assertIsNone(app._paper_plane_store)
@@ -561,7 +561,7 @@ class ResearchLifecycleWorkbenchTests(unittest.TestCase):
         self.assertEqual(overview["needs_attention"][0]["kind"], "SOURCE")
         self.assertEqual(overview["needs_attention"][0]["next_safe_action"], "FAIL_CLOSED_FOR_SOURCE")
         html = _research_overview_html(overview)
-        self.assertIn("NOT AVAILABLE", html)
+        self.assertIn("недоступно", html)
         self.assertNotIn("<h3>Current activity</h3><p class=\"empty\">NONE</p>", html)
         self.assertIn("FAIL_CLOSED_FOR_SOURCE", html)
 

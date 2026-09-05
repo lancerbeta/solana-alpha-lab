@@ -16,16 +16,18 @@ Factory Fit: `RESEARCH_LIFECYCLE_WORKBENCH_FACTORY_FIT_PASS`.
 
 ```text
 BASE = 97281cccca06365515b282868174cdfd0b023845
-HEAD = (bind after evidence commit)
-PR   = (opened after push)
+HEAD = 67038fdf796f327870d1d021f3a0f3f08a68e24e
+PR   = #269
+merge = 9ce5f80e775ce1e7bacf9383e3dd4412501f88d6
 ```
 
 ## ЧТО ТЕПЕРЬ ВИДНО НА /research
 
 Petr открывает `/research` и за 30–60 секунд видит: что есть, что
-сейчас выполняется (или `NOT AVAILABLE`), какие trials/decisions/negatives
+сейчас выполняется (или `недоступно`), какие trials/decisions/negatives
 уже материализованы, что требует внимания, какие gaps, откуда объект и
-с чем он явно связан. Без Git/SSH/SQLite археологии.
+с чем он явно связан. Без Git/SSH/SQLite археологии. Owner-facing copy
+на `/research` — русский; machine enums/IDs остаются английскими.
 
 ## 4 OWNER LOOPS
 
@@ -67,7 +69,7 @@ Optional `--data-root` never creates. Normal Workbench start path unchanged.
 - VPS deployed state is UNKNOWN unless separately read back
 - holdout / experiment evidence quality is Move 2
 - invented strategic groups (`KILLED`, `READY_TO_TEST`, …) stay absent
-- activity is `NOT AVAILABLE` when runtime/evidence sources are not observable
+- activity is `недоступно` when runtime/evidence sources are not observable
 
 ## ЧТО НЕ МЕНЯЛОСЬ
 

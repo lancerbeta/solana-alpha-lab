@@ -125,6 +125,27 @@ queries:
 - query_id: SGQ-OWNER-RESEARCH-TESTED-RU
   query: что уже проверяли?
   required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-EXPERIMENT-EVIDENCE-EN
+  query: show experiment evidence
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-EXPERIMENT-EVIDENCE-RU
+  query: покажи evidence эксперимента
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-EVIDENCE-MISSING-EN
+  query: what evidence is missing
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-EVIDENCE-MISSING-RU
+  query: чего не хватает для решения
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-WHY-REJECTED-EN
+  query: why was this rejected
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-ANTI-MECHANISM-TESTED-BEFORE
+  query: has this mechanism been tested before?
+  required_top_route: SEM-PRIOR-WORK
+- query_id: SGQ-ANTI-EXPERIMENT-CAN-RUN
+  query: can this experiment be run?
+  required_top_route: SEM-EXPERIMENT-CAPABILITIES
 - query_id: SGQ-ANTI-MECHANISM-PRIOR
   query: Has mechanism X been tested before?
   required_top_route: SEM-PRIOR-WORK

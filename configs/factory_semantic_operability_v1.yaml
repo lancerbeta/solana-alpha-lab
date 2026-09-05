@@ -115,6 +115,7 @@ routes:
       - What capability IDs are accepted?
       - Would this require product code?
       - можно ли прогнать через существующую capability
+      - Can this experiment be run?
     search_terms:
       - experiment capability
       - capability registry
@@ -122,6 +123,7 @@ routes:
       - Fast Lane capability
       - reusable capability
       - capability
+      - can this experiment be run
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
     root_binding_ids: [ACTIVE-EXPERIMENT-CAPABILITY-REGISTRY]
     root_asset_ids: []
@@ -321,20 +323,19 @@ routes:
     related_route_ids: [SEM-PRODUCT-STATE, SEM-AUTHORITY-BOUNDARIES, SEM-OWNER-LIFECYCLE]
 
   - semantic_route_id: SEM-OWNER-LIFECYCLE
-    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN, plus the owner Research Workbench read surface. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
+    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN, plus the owner Research Workbench, experiment evidence dossier, missing evidence, and why a hypothesis was rejected. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
     owner_questions:
       - What lifecycle objects currently exist?
       - How are hypothesis, experiment, strategy and position connected?
       - What research objects exist?
       - What have we tested?
       - Where is the Research Workbench?
-      - What is blocked in research?
+      - Show evidence for this experiment
       - что сейчас исследуется?
       - что уже проверяли?
     search_terms:
       - owner lifecycle
       - lifecycle projection
-      - lifecycle objects
       - research-to-execution
       - lineage
       - StrategyVersion
@@ -343,9 +344,11 @@ routes:
       - карта lifecycle
       - lifecycle-объекты
       - SEM-OWNER-LIFECYCLE
-      - research lineage
-      - как связаны гипотеза эксперимент стратегия и позиция
       - где каноническая карта lifecycle
+      - как связаны гипотеза эксперимент стратегия и позиция
+      - покажи evidence эксперимента
+      - чего не хватает для решения
+      - experiment evidence
       - Research Workbench
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids:
@@ -354,6 +357,7 @@ routes:
     root_asset_ids:
       - DOC-OWNER-LIFECYCLE-PROJECTION-001
       - DOC-RESEARCH-LIFECYCLE-WORKBENCH-001
+      - DOC-EXPERIMENT-EVIDENCE-DECISION-001
     query_recipe_ids: []
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
