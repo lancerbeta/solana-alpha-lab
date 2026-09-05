@@ -57,29 +57,38 @@ Loader: valid runtime → use it; runtime absent → Git safe default; runtime
 present but invalid, malformed, unsafe or symlink → fail closed, no silent
 fallback.
 
-Operator readback:
+Operator readback on the Factory host (deploy root `/opt/solana-alpha-lab`):
 
 ```
-uv run --locked --managed-python python -B scripts/hot90_activation.py show
+uv run --locked --managed-python python -B scripts/hot90_activation.py --root /opt/solana-alpha-lab show
 ```
 
-SET is an operational mutation and requires the exact owner gate first. Example continuity file (not a grant):
+After this SHA is live, `activation_source=GIT_DEFAULT` plus `CURRENT_SAFE` is
+continuity **FAIL**: missing runtime, new writes would drop to SNAPPY/legacy.
+Success is `activation_source=RUNTIME` plus `WRITE_ONLY_SHADOW`.
+
+SET is an operational mutation on the host named by `--root`. The CLI grants
+no authority. Continuity SET below preserves already-live `WRITE_ONLY_SHADOW`;
+it is still an OPERATE mutation and needs the exact owner gate first. It is
+not a stage move. Do not run it against a workstation checkout.
 
 ```
-uv run --locked --managed-python python -B scripts/hot90_activation.py set --stage WRITE_ONLY_SHADOW --drive-writes false --compaction false --eviction false
+uv run --locked --managed-python python -B scripts/hot90_activation.py --root /opt/solana-alpha-lab set --stage WRITE_ONLY_SHADOW --drive-writes false --compaction false --eviction false
 ```
 
 ## Continuity migration (OPERATE, not this Git PR)
 
 Live host at repair merge is already `WRITE_ONLY_SHADOW`. Sequence:
 
-1. **Before** deploying the repair SHA, write validated runtime state with the
-   current live semantics: `WRITE_ONLY_SHADOW`, Drive false, compaction false,
-   eviction false. The pre-repair SHA ignores this file (`local/` preserved).
+1. **Before** deploying the repair SHA, on the Factory host write validated
+   runtime state with the current live semantics: `WRITE_ONLY_SHADOW`, Drive
+   false, compaction false, eviction false. The pre-repair SHA ignores this
+   file (`local/` preserved).
 2. Deploy the exact merged repair SHA (`restart=False` exact-SHA, preserve `local/`).
 3. New loader reads the preserved runtime file.
-4. Readback must prove no behavior transition:
-   `WRITE_ONLY_SHADOW` before == `WRITE_ONLY_SHADOW` after.
+4. Host `show` must prove no behavior transition:
+   `WRITE_ONLY_SHADOW` + `activation_source=RUNTIME` before deploy equals
+   the same pair after deploy.
 
 Do **not** perform that VPS migration from the Git PR.
 

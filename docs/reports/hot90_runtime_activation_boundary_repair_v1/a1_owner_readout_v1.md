@@ -42,9 +42,13 @@ stage, Drive writes and destructive flags still need an exact owner gate.
 
 ## Continuity (after merge, not this PR)
 
+On the Factory host only (`--root /opt/solana-alpha-lab`), after the exact
+OPERATE gate:
+
 1. Before deploy: write runtime `WRITE_ONLY_SHADOW` with all flags false.
 2. Deploy exact merged SHA (`local/` preserved).
-3. `show` must read `WRITE_ONLY_SHADOW` from `activation_source=RUNTIME`.
+3. Host `show` must read `WRITE_ONLY_SHADOW` from `activation_source=RUNTIME`.
+   `GIT_DEFAULT` + `CURRENT_SAFE` after this SHA is a live downgrade, not success.
 
 ## Confirm
 

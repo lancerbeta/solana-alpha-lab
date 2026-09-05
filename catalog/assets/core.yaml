@@ -35100,7 +35100,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md', repository_path: docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md}
-  integrity: {kind: sha256, sha256: 07d29c55746c08d24589cc2def52c29405322bfe7523e8042ffbd95c825ccea4}
+  integrity: {kind: sha256, sha256: 156da884ab42e1da2cd57a79d873df0f78e43dc57e5ab29dcf4961c5031b3810}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
