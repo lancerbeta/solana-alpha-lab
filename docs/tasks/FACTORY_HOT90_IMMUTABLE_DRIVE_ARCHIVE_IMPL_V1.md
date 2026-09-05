@@ -48,6 +48,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hot90_mutable_backup.py
   - src/solana_alpha_lab/factory/observation_panel_publisher.py
   - src/solana_alpha_lab/factory/research_store.py
+  - src/solana_alpha_lab/factory/remote_ops.py
   - src/solana_alpha_lab/factory/offhost_backup.py
   - tests/test_factory_hot90_immutable_drive_archive_impl_v1.py
   - catalog/assets/core.yaml
@@ -106,7 +107,10 @@ context_requirements:
       - docs/architecture/FACTORY_97D_STORAGE_ARCHITECTURE_PRD_SSD_V1.md
       - delivery-harness/policies/solana-alpha-lab.md
       - configs/factory_remote_operations_v1_1.yaml
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_independent_review_v1.json
+      - docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

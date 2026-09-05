@@ -35044,7 +35044,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1.md', repository_path: docs/tasks/FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1.md}
-  integrity: {kind: sha256, sha256: 20d2e83c6da38d994f8f4f8bb7a48a15e4745edaeb1c14836eae37649c246c5b}
+  integrity: {kind: sha256, sha256: 8957d6a3bbdadc59c209d3d009e13d828929b757c361d50216b5be6993bf3256}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}

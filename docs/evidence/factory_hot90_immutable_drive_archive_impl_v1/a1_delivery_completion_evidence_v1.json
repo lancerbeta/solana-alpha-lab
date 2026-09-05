@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-COMPLETION-001",
+  "as_of": "2026-09-05",
+  "task_id": "FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1",
+  "state_change": "FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_SOFTWARE_PASS",
+  "base_main": "8149f0649a633a334cc1fab532027ba483e4f4da",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "COMMISSIONING_AFTER_MERGE",
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_SEMANTIC_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_CATALOG_VALIDATE",
+      "PASS_FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_SEMANTIC_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_LOCAL_FACTORY_DATA_DELETE",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

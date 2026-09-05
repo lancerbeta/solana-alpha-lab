@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-FACTORY-FIT-001",
+  "as_of": "2026-09-05",
+  "task_id": "FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_HOT90_CAPABILITY_BEHIND_CURRENT_SAFE",
+    "flexibility_and_history": "PASS_KEEPS_IMMUTABLE_CONST_AND_LEGACY_PARQUET",
+    "context_efficiency": "PASS_ACTIVATION_YAML_AND_COMMISSIONING_RUNBOOKS",
+    "research_truth": "PASS_SNAPSHOT_PLUS_DELTA_RECONSTRUCTS_LOGICAL_MEMBERS",
+    "owner_operability": "PASS_PREPARED_NOT_EXECUTED_AND_WRITER_BUSY",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_FAIL_CLOSED_STAGES_AND_REVERT_BRANCH",
+    "build_vs_buy": "PASS_WRAP_PARQUET_RCLONE_ZIP_STORED",
+    "security": "PASS_NO_SECRETS_ZIP_SLIP_AND_TOCTOU",
+    "red_team": "PASS_CURRENT_SAFE_DEFAULT_NOT_SILENT_CUTOVER"
+  },
+  "capability_radar": {
+    "now": "COMMISSIONING_AFTER_MERGE",
+    "watch": "DESTRUCTIVE_EVICTION_AND_OLD_ZIP_CLEANUP"
+  },
+  "recovery": "REVERT cursor/factory-hot90-immutable-drive-archive-impl-v1",
+  "limits": [
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_LOCAL_FACTORY_DATA_DELETE",
+    "NO_SQLITE_LIVE_COMPACTION",
+    "NO_EXISTING_BACKUP_ZIP_DELETE",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}
