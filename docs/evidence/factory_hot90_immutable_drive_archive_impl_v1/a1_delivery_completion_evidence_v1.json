@@ -11,7 +11,37 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "COMMISSIONING_AFTER_MERGE",
   "implementation_bindings": {
-    "docs/tasks/FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "9cdd66451b961dc0fff236d87b46cfcbc77a75d627dbb9158a1f4b95e704993d",
+    "catalog/assets/lifecycle.yaml": "6d60ac675b2e40401446519b17b917f0c6df69b3f700d4a2d6e2555a8f693079",
+    "catalog/catalog_manifest.yaml": "65e2c7d657a40df0e9ebbab8cf5ad3daa91e9966f1539052e24ae6586064da29",
+    "catalog/generated/asset_edges.json": "95857620ebe3a9b119b7c94e7e226352f03291be823d379e177f8c0ba34de88f",
+    "catalog/schemas/experiment_spec_v1_2.schema.json": "41de53d9dac8bd9a5331e21a0a0ab3950adfc9fc6715632977eca75cc1a19fd9",
+    "catalog/schemas/factory_remote_operations_v1_1.schema.json": "1e846291ea09049e8928c0595fdd6c023f36f09080d4c48fe1166fe94735f736",
+    "catalog/schemas/observation_schedule_v1.schema.json": "b47a281876592f5ea4263180fdc1558aee233f2ab39fd2fd27294cb2f0c68def",
+    "configs/ci_test_shards_v1.json": "14693df65e85a5204abe210064d710c543ed0c28587b4956e89a5f8d0f0f716f",
+    "configs/factory_hot90_archive_activation_v1.yaml": "d0319def3040c521a9451c4cd206dddf3706605aa6a1db19994f75ad4bbacfaa",
+    "configs/factory_remote_operations_v1_1.yaml": "8c9a6ca037f36b939776c3c3187e57ca22f873bd4fe8389ba321d0a9dcd6c8ec",
+    "delivery-harness/policies/solana-alpha-lab.md": "a4692be7cf58ee7ad1d5a20f6d96a8bc8902d133e28b2a0483655e15d09b2d23",
+    "docs/PROJECT_MAP.md": "26c31de5a19e38c81219b93550ad7ed6697c6cd7a8e6c906f91b90600301093e",
+    "docs/operator/FACTORY_HOT90_CLEANUP_PRECONDITIONS_V1.md": "58a8959b89952f06b1fad2e5724d75cfea792b80394aa2b046b0efa3572139a4",
+    "docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md": "234d1811ee92f3e54dcd1a4a9b2f28f12f370e71f3e6e7249cd1419f6189461d",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "29cc0488a4ff745df06c4ec4edc8b42825330fa7ebde302c247beb65a4b90863",
+    "docs/reports/factory_hot90_immutable_drive_archive_impl_v1/a1_owner_readout_v1.md": "a7a14b9fdf1441d16d7f5786283c91d955d56a32d55d1d342822b3fc358de17a",
+    "docs/tasks/FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1.md": "8957d6a3bbdadc59c209d3d009e13d828929b757c361d50216b5be6993bf3256",
+    "src/solana_alpha_lab/factory/hot90_activation.py": "d5d59c4ba60c38a96c01c26899f960e575ade1a34af5d44fd5f17dc52255d445",
+    "src/solana_alpha_lab/factory/hot90_archive.py": "176aabce1735fd6484916f4ecc2fccaddfce19b0de48480fd94e16b41f5224fa",
+    "src/solana_alpha_lab/factory/hot90_eviction.py": "2ad389f4cf675ba142471685317d7311d02d3d867432fc9566d16a21dbd13e3a",
+    "src/solana_alpha_lab/factory/hot90_mutable_backup.py": "0a546689568e7e03e4fee6d61451b3a6fec7a1c7d7f345fba63e5167e12221b7",
+    "src/solana_alpha_lab/factory/hot90_remote_verify.py": "a8304dbcf578851be659b69866fb6d340ad24ce7111a4d18d458e4fccbfcaed7",
+    "src/solana_alpha_lab/factory/hot90_sqlite_eligibility.py": "ff0c0272b8720793720760928023411ff2daea8c0c6115aa45926487b6578ec5",
+    "src/solana_alpha_lab/factory/hot90_storage_admission.py": "5d7469bed78625da672034df4722a29cc69ac05d1b443f068ae6edbc15db161c",
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "82a8d0dc671fd6031a4e226ceec244848c8156789226120d2b6f9fd00dd4ce47",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "4f9005eded1c0b328f555a8edc6b90c3abd08b5ab4a1d60d4af136430bb6fa5d",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "7c0c72ce9c657aaac4328c2f64b5298780bdec1cda6c4987eb08014aa880d751",
+    "src/solana_alpha_lab/factory/raw_evidence_plane.py": "e5076936e93d894420d9c9790b18198070fe7c11fb694469c80914bab42c4126",
+    "src/solana_alpha_lab/factory/remote_ops.py": "a03b4c2813879ec21f89b011b50a45bfa99d5f6675908b705412b8803b41997d",
+    "src/solana_alpha_lab/factory/research_store.py": "bd7fbcbafe4140a6f5923d980ec5bc75ac85ee14d1156b5d03398d3bc1b0ea7c",
+    "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py": "98e182d5e699cca4859b480762384b5fbda0b9c1a97c3b6e8c4ea037e98a4a09"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +53,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "f900bf9b296abb0aea6d7fca2690265d83664ecbab1b25d1451312344dea0768",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_SEMANTIC_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "dabad799db3a006d4f647176c1279890033d0af1fdc83f00e5c37b8f76b77355",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
