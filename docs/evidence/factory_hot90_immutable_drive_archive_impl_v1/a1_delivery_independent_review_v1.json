@@ -4,8 +4,8 @@
   "review_id": "FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-05",
   "task_id": "FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1",
-  "reviewed_bindings_sha256": "2b33963ffef50e383f4cd0615b0dc31eb78afbd7097717762ff19a8b2258600d",
-  "reviewed_inventory_sha256": "ae6b1ad24192c25e7bced8b9bf8857624043ee8415b5b193d81433b8d2a86db1",
+  "reviewed_bindings_sha256": "23e6e7a9b5718c248b7150f29ba007f4a05faa222fcd427a048a7e10672329e4",
+  "reviewed_inventory_sha256": "0a13bb47c34aa841df8cddb9a65f182eddaa509cf26363567b9956f1e950f351",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

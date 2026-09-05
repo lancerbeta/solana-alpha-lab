@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "COMMISSIONING_AFTER_MERGE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "9cdd66451b961dc0fff236d87b46cfcbc77a75d627dbb9158a1f4b95e704993d",
+    "catalog/assets/core.yaml": "071474ac6071dfa53a75639642ae7e23662f9dc3d52e41cc33d967003c6c9214",
     "catalog/assets/lifecycle.yaml": "6d60ac675b2e40401446519b17b917f0c6df69b3f700d4a2d6e2555a8f693079",
     "catalog/catalog_manifest.yaml": "65e2c7d657a40df0e9ebbab8cf5ad3daa91e9966f1539052e24ae6586064da29",
     "catalog/generated/asset_edges.json": "95857620ebe3a9b119b7c94e7e226352f03291be823d379e177f8c0ba34de88f",
@@ -23,6 +23,8 @@
     "configs/factory_remote_operations_v1_1.yaml": "8c9a6ca037f36b939776c3c3187e57ca22f873bd4fe8389ba321d0a9dcd6c8ec",
     "delivery-harness/policies/solana-alpha-lab.md": "a4692be7cf58ee7ad1d5a20f6d96a8bc8902d133e28b2a0483655e15d09b2d23",
     "docs/PROJECT_MAP.md": "26c31de5a19e38c81219b93550ad7ed6697c6cd7a8e6c906f91b90600301093e",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "4a452677811db6b0b02d9bf51ed8df35e375794dd50f5eb0e9aa5796e232d8c2",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "56eb3a5622576e11fdcce56208e6667bfbd78a6de3ca0c32f7de13139678155b",
     "docs/operator/FACTORY_HOT90_CLEANUP_PRECONDITIONS_V1.md": "58a8959b89952f06b1fad2e5724d75cfea792b80394aa2b046b0efa3572139a4",
     "docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md": "234d1811ee92f3e54dcd1a4a9b2f28f12f370e71f3e6e7249cd1419f6189461d",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "29cc0488a4ff745df06c4ec4edc8b42825330fa7ebde302c247beb65a4b90863",
@@ -53,14 +55,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "f900bf9b296abb0aea6d7fca2690265d83664ecbab1b25d1451312344dea0768",
+    "sha256": "3f1c8b90d5c7d1cec794211d82cfa6f23345c6a2da562ce7cf931986c4a2c398",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_SEMANTIC_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_hot90_immutable_drive_archive_impl_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "dabad799db3a006d4f647176c1279890033d0af1fdc83f00e5c37b8f76b77355",
+      "sha256": "825fafec94dca867a06381281f306805cf7d684e848cb63c20523c136e96bbfd",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
