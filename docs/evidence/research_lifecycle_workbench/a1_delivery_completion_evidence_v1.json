@@ -51,14 +51,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/research_lifecycle_workbench/a1_delivery_factory_fit_v1.json",
-    "sha256": "3a62890e71536596820f0b86218d024993dc64745e4910a6fc78730c62f8c762",
+    "sha256": "b95374c2b4a409b61c56e6ce11ee80984be8f7dcc46449f571bb67f34123391f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_RESEARCH_LIFECYCLE_WORKBENCH_V1",
     "independent_review": {
       "path": "docs/evidence/research_lifecycle_workbench/a1_delivery_independent_review_v1.json",
-      "sha256": "620df1883a14a7b637bee2083272ba72c0ca0cc64858c8b105f502eea632614f",
+      "sha256": "508d01f7260537058ee564019c7b79a02dfa2a8687daf4740a21d1feb3e99226",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
