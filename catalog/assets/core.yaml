@@ -35171,7 +35171,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1.md', repository_path: docs/tasks/HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1.md}
-  integrity: {kind: sha256, sha256: 862e4368a92e20e5319c9bc10d5707be5779b96d492127526ae2c0ffbdffdc38}
+  integrity: {kind: sha256, sha256: 8dbbb203b7182f111381236a05d1b5573b38cec21d3fcb3a89ffa40ab877cf2d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-FACTORY-HOT90-WRITE-ONLY-SHADOW-ACTIVATION-001}

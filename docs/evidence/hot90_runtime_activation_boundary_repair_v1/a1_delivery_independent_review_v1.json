@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-05",
+  "task_id": "HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=c2a2baa37d2f78f1c4897332a83b043d716f30975d1b4cdc134e896e602ca1db",
+        "PRESENT_RUNTIME_MISSING_STAGE_FAILS_CLOSED",
+        "ABSENT_RUNTIME_USES_GIT_CURRENT_SAFE_DEFAULT",
+        "DEPLOY_WITHOUT_RUNTIME_IS_LIVE_DOWNGRADE_OPERATE_NOT_THIS_PR",
+        "PACKET_INFORMATION_PATH_PROCESS_OBLIGATION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "LOADER_RUNTIME_THEN_GIT_DEFAULT_THEN_HARDCODED_SAFE",
+        "TRACKED_YAML_CURRENT_SAFE_FLAGS_FALSE",
+        "SRC_CONSUMERS_LOAD_HOT90_ACTIVATION_ONLY",
+        "CLI_SET_REQUIRES_ALL_FLAGS_ATOMIC_REPLACE",
+        "MISSING_RUNTIME_STAGE_REMAPPED_HOT90_RUNTIME_INVALID"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "GIT_POLICY_SAFE_DEFAULT_NOT_LIVE_STAGE_LOG",
+        "HOST_RUNTIME_OWNS_CURRENT_STAGE",
+        "ORDINARY_STAGE_SET_WITHOUT_GIT_PR",
+        "CLI_GRANTS_NO_AUTHORITY",
+        "NO_VPS_MIGRATION_IN_THIS_PR"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_DRIVE_WRITE",
+    "NO_STAGE_TRANSITION",
+    "NO_CANONICAL_DONE"
+  ]
+}

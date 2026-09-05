@@ -88,7 +88,10 @@ context_requirements:
     ARCHITECTURE_DECISIONS:
       - configs/factory_hot90_archive_activation_v1.yaml
       - src/solana_alpha_lab/factory/hot90_activation.py
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/hot90_runtime_activation_boundary_repair_v1/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/hot90_runtime_activation_boundary_repair_v1/a1_delivery_independent_review_v1.json
+      - docs/evidence/hot90_runtime_activation_boundary_repair_v1/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
