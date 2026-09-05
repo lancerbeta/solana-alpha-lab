@@ -11,29 +11,29 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "e9134bc0da6c0c947d7255e5fe8144267a1b7527e1603663caa5a14333eeb30a",
+    "catalog/assets/core.yaml": "dfaefc6a29492ea5f4199c40d957b787993f85ac6dce260881dd92fa5130a1ba",
     "catalog/assets/lifecycle.yaml": "44ec2f7d8110568da928849063966dd4809beea0056d39462f1686299638c629",
     "catalog/catalog_manifest.yaml": "ac7ba143c79ef71a94917113cf65a005fcbfc5905de74041e6ec69ea167ef972",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "242dec78595fdf47783c42ad1ebd0c7a516ea1382f7fb3a5aba734af8ef8c88f",
     "catalog/generated/asset_edges.json": "01fcbdb533776787b1ea2ab2253bd3142a691de943deb7a91f5aa5a3cf673bda",
-    "catalog/schemas/owner_lifecycle_projection_v1.schema.json": "90750b71072d9da1eff3b50b7be7c6b6549bb83895803fdda7009ab21899ff3b",
+    "catalog/schemas/owner_lifecycle_projection_v1.schema.json": "294d2d196c05e87e082c88c8654ab0521983515f9b108d1a037d63391bc2f8d4",
     "configs/execution_domain_v1.json": "eeeda6a3a28b205ce2037995eb75a863eae2d9130b65fc3df331ea6ca9d2d1f3",
     "configs/factory_semantic_operability_v1.yaml": "ccd0a85fb9b60f07c0383bf7f7f4643bf4351609e0f2511c0475048310ea92f0",
     "configs/factory_v1_operational_readiness_v1.yaml": "e697a16c37d4aac8268b460df4731f9d95b4f990bbf5879a9de9c358fac6220c",
-    "configs/owner_lifecycle_projection_v1.yaml": "48d402a1c3c1f7381bed0193dd449d4e5f1e69601047da4164e1996a3f53d4de",
+    "configs/owner_lifecycle_projection_v1.yaml": "0c46bc14b91f2028c9e9416a8db697afc60f261974934415da2a43b6a6c82121",
     "docs/FACTORY_SEMANTIC_MAP.md": "201d5b4b11ef479aa1301c2dbfccdf408257f53f70817bb4422e54e48dd5c118",
     "docs/OPERATOR_NAVIGATION.md": "a2c0b028cba34258c131eaad2c11fa0e3a1ea53f8c37aa78fa711c0e1d7cf63a",
     "docs/PROJECT_MAP.md": "59788235a7500b162482946eaef3904d158b514c40ddf642672704235ae4aa86",
-    "docs/contracts/owner_lifecycle_projection_spine_v1.md": "0b89afdb308e5672169ff9b4d1b4c70c403cdc23a2f118cf9564c3de4ffcbe85",
-    "docs/reports/owner_lifecycle_projection_spine/a1_owner_readout_v1.md": "bb4e6fcff2813e4e212f7914295b217c1ce808a6056bdb2f5053164e7c356c4c",
+    "docs/contracts/owner_lifecycle_projection_spine_v1.md": "3308261e61e0ef84f5a562641045b607315c8d76848c595de2fbc3c6825b1769",
+    "docs/reports/owner_lifecycle_projection_spine/a1_owner_readout_v1.md": "2580d9ebe12703491e1f51ba5e24f2c9b5810feedb897d2da41a68140cdfd893",
     "docs/tasks/OWNER_LIFECYCLE_PROJECTION_SPINE_V1.md": "d5b427ed2b36a39563183d58bb0eafbe2c582caaed7e0e2ba0f7688ef52fc17f",
     "scripts/show_owner_lifecycle_projection.py": "e5e36c49ad33086ce21a51996373edc78248085153d249ad9f25c371c15f9a64",
     "src/solana_alpha_lab/factory/application.py": "97db61438d4980aacc07b1fd24aee4a848594742e02909fd17e4b7aeb57ab262",
-    "src/solana_alpha_lab/factory/lifecycle_projection.py": "8dc468b4329fcee7095120c6c2540136e5a9e3d7609aa41808e12d161d106b1d",
+    "src/solana_alpha_lab/factory/lifecycle_projection.py": "50db8e53f15a56f06fbbc2a6373c49a34e4ac4ed200378da1524b30d1678050c",
     "tests/test_catalog_canonical_binding_discovery.py": "664974381d9bd7008b935fed47c70d3d27a392a9731f4f79e25d5797f82cb26c",
     "tests/test_factory_ordinary_market_hypothesis.py": "c221595e67f4282c5aea86d487a993f3c77fb154f162911719afa3a7391b7a67",
     "tests/test_factory_semantic_operability.py": "59b7055e4966690f1815d83eb4daf2289dc5ba397efd9420a52859a970044b31",
-    "tests/test_owner_lifecycle_projection_spine_v1.py": "932c5e0b6ac7a3fb0324dfc32648f23c72eae2a8959a77401d1bb534c9ad10fb"
+    "tests/test_owner_lifecycle_projection_spine_v1.py": "e0341b5a1fb6e457f0d55fa7211966e8d85368ece9b2ce413b4787cbb1a408c8"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -45,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_lifecycle_projection_spine/a1_delivery_factory_fit_v1.json",
-    "sha256": "d3776b59d3a32aff70743ea82b660aea082b3077bbdff039e8e5c9508b3a436e",
+    "sha256": "8a7a1bc4770c1065d6f94fcd6e2168440649d6585438d2a7389534314f410d06",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_LIFECYCLE_PROJECTION_SPINE_V1",
     "independent_review": {
       "path": "docs/evidence/owner_lifecycle_projection_spine/a1_delivery_independent_review_v1.json",
-      "sha256": "762a7d5a64c242a2bbc592c01705c6b567742d075a91d342c733c3b7af57aad2",
+      "sha256": "86059960f5518341bc27aa7b14ed36233a3045b381ddc6c78795295e72ab6ee3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
