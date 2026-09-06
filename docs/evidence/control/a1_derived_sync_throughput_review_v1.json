@@ -4,8 +4,8 @@
   "review_id": "DERIVED-SYNC-THROUGHPUT-REVIEW-001",
   "as_of": "2026-09-07",
   "task_id": "DELIVERY_HARNESS_DERIVED_SYNC_THROUGHPUT_V1",
-  "reviewed_bindings_sha256": "3b665c2298402c4480edd85c5d509cec0fd4e93ecb861e917643a2b5d1e8adce",
-  "reviewed_inventory_sha256": "4282380b85f8279afa47b9e3403f4d040ef6a1b63d533a4b6c43789a97c2b9fd",
+  "reviewed_bindings_sha256": "d9d69d5901de5850d4b4089e0d930cfc4c3a188a3a608bf6fbffde401ec1c840",
+  "reviewed_inventory_sha256": "680cba7370d3a2d0025d8b43eeac3d5106451d06be13bc4cf965c70784ad3c77",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
