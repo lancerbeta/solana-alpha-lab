@@ -265,7 +265,22 @@ minimalism > evidence
 brand consistency > domain semantics
 ```
 
-## 16. Future-consumer rules
+## 16. Owner-surface invariants
+
+Owner Workbench surfaces consume this Visual OS. They do not create a second
+visual system.
+
+- One shell: signal rail, page-specific H1, page question, then facts, then
+  action, then inspectable machine truth.
+- Russian-first labels. Canonical English tokens, command POST values, IDs,
+  hashes, PAPER/SHADOW/LIVE, UNKNOWN/MISSING/CONFLICT stay visible and
+  unchanged.
+- UNKNOWN is never $0 and never healthy. A live process is not a healthy
+  system.
+- Technical details recede into disclosure. They remain in the HTML.
+- No i18n runtime, SPA, or new CSS framework.
+
+## 17. Future-consumer rules
 
 1. Resolve `SEM-VISUAL-OPERATING-SYSTEM` before inventing colors or chrome.
 2. Read the machine contract; this document is the companion, not a second palette.
@@ -277,7 +292,7 @@ brand consistency > domain semantics
 7. Resolving this route grants no command, deploy, spend, merge, provider,
    wallet, signer, or transaction authority (`authority_granted = false`).
 
-## 17. Reference image
+## 18. Reference image
 
 If a `REFERENCE_ONLY` / `NON_CANONICAL` board is stored beside this contract,
 it is inspiration. Tokens and invariants win on conflict. Absence of the image

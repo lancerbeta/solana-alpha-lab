@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, Mapping
+
 PRESENTATION_LANGUAGE = "RU"
 MACHINE_LANGUAGE = "EN"
 
@@ -129,12 +131,194 @@ DECISION_KIND_LABELS = {
     "PROMOTE": "Научно продвинуть",
 }
 
+UNKNOWN_CANONICAL = frozenset(
+    {
+        "UNKNOWN",
+        "MISSING",
+        "EMPTY",
+        "EXPLICIT_UNKNOWN",
+        "UNAVAILABLE",
+        "NOT_PRESENT",
+    }
+)
+
+VERDICT_GLOSS = {
+    "UNHEALTHY_NOT_RUNNING": "процесс не запущен",
+    "UNHEALTHY_VERSION_MISSING": "версия не найдена",
+    "UNHEALTHY_EVIDENCE_MISSING": "нет Git-доказательств",
+    "DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN": "деградирован",
+    "RUNTIME_PROVED_BACKUP_UNKNOWN": "процесс доказан, бэкап неизвестен",
+    "UNAVAILABLE": "недоступен",
+    "UNKNOWN": "неизвестно",
+}
+
+BACKUP_GLOSS = {
+    "EXPLICIT_UNKNOWN": "не подтверждён",
+    "UNKNOWN": "неизвестно",
+}
+
+ROLLBACK_GLOSS = {
+    "PRESENT": "есть",
+    "MISSING": "отсутствует",
+    "UNKNOWN": "неизвестно",
+}
+
+NEXT_ACTION_GLOSS = {
+    "INSPECT_SYSTEM": "Откройте экран Система",
+    "RESOLVE_MISSING_EVIDENCE": "Восстановите недостающие Git-доказательства",
+    "RUN_RUNTIME_PROOFS": "Запустите runtime proofs",
+    "DO_NOT_PROMOTE": "Не продвигать в стратегию",
+}
+
 STATUS_GLOSS = {
     "PRESENT": "есть",
     "MISSING": "нет данных",
     "UNKNOWN": "неизвестно",
     "CONFLICT": "конфликт",
     "NOT_APPLICABLE": "не применимо",
+    "EMPTY": "пусто",
+    "KNOWN": "известно",
+    "AVAILABLE": "доступен",
+    "INVALID": "недействителен",
+    "NOT_PRESENT": "отсутствует",
+    "PARTIAL": "частично",
+}
+
+KIND_LABELS = {
+    "DECISION": "Решение",
+    "EXPERIMENT_SPEC": "Эксперимент",
+    "EXPERIMENT": "Эксперимент",
+    "TRIAL": "Проверка",
+    "NEGATIVE_RESULT": "Отрицательный результат",
+    "HYPOTHESIS": "Гипотеза",
+    "SOURCE": "Источник",
+}
+
+SHELL_COPY = {
+    "note": (
+        "Локальная проекция. UI не владеет научной истиной. "
+        "Команды на экране не подставляют owner phrase и не вызывают Jupiter."
+    ),
+    "copy": "Копировать",
+    "copied": "Скопировано",
+    "technical": "Технические детали",
+    "full_legacy": "Полный исходный текст",
+    "copy_hint": (
+        "Справа кнопка «Копировать». START на этой странице фразу не подставляет "
+        "и Jupiter не вызывает."
+    ),
+    "safe_state": "Сейчас безопасно: отдельных срочных действий нет.",
+    "generic_error": "Источник вернул ошибку. Точный текст сохранён в технических деталях.",
+}
+
+SURFACE_COPY = {
+    "HOME": {
+        "h1": "Главная",
+        "question": "Что сейчас действительно требует моего внимания?",
+        "attention": "Что требует внимания",
+        "known": "Что известно",
+        "next": "Следующее безопасное действие",
+        "phrase": "Точные команды владельца",
+        "cycle_commands": "Технические команды цикла",
+        "packet": "Пакет / признаки",
+        "features": "Требуемые признаки",
+        "health": "Вердикт runtime",
+        "recent": "Недавние изменения",
+        "no_attention": "Отдельных пунктов внимания нет.",
+        "no_recent": "Недавних событий исполнения нет.",
+        "phrase_not_urgent": (
+            "Фраза ниже — точный текст для чата, не срочная кнопка этого экрана."
+        ),
+    },
+    "RESEARCH": {
+        "h1": "Исследования",
+        "question": "Что мы проверяем / что знаем / что мне решать?",
+        "sources": "Источники проекции",
+    },
+    "OPERATIONS": {
+        "h1": "Операции",
+        "question": "Что работает, какой риск открыт и что я могу безопасно сделать?",
+        "summary": "Сводка",
+        "bots": "Боты",
+        "counts": "Счётчики",
+        "positions": "Позиции",
+        "attention": "Внимание",
+        "recent": "Недавние изменения",
+        "commands": "Команды оператора",
+        "no_bots": "Нет ботов.",
+        "no_positions": "Нет позиций.",
+        "no_attention": "Пунктов внимания нет.",
+        "no_recent": "Недавних событий исполнения нет.",
+        "need_one_bot": "Команды оператора требуют ровно один экземпляр бота.",
+        "bots_count": "Боты",
+        "open_positions": "Открытые позиции",
+        "entries_paused": "Новые входы",
+        "paused": "приостановлены",
+        "not_paused": "не приостановлены",
+        "exit_required": "Требуется выход",
+        "unresolved": "Неразрешённые",
+        "pause_entries": "Приостановить новые входы",
+        "resume_entries": "Возобновить новые входы",
+        "close_one": "Закрыть одну позицию",
+        "close_all": "Закрыть все позиции",
+        "stop_bot": "Остановить бота",
+        "confirm_close_all": "Подтверждаю REQUEST_CLOSE_ALL против показанного снимка открытых позиций",
+        "bulk": "Массовые / стоп (локальное подтверждение)",
+        "position_id": "position_id",
+        "idempotency": "idempotency_key",
+        "snapshot": "Снимок открытых позиций",
+    },
+    "ECONOMICS": {
+        "h1": "Экономика",
+        "question": "Есть ли уже экономический результат и насколько ему можно доверять?",
+        "pnl": "Подтверждённый PnL",
+        "evidence": "Класс доказательств",
+        "known_count": "Известных",
+        "unknown_count": "Неизвестных",
+        "exposure": "Открытая экспозиция",
+        "drawdown": "Просадка",
+        "streak": "Серия убытков",
+        "non_claims": "Явные non-claims",
+        "all_unknown": "Экономический результат сейчас неизвестен. Это не ноль.",
+        "not_zero": "Отсутствующие live-метрики не показываются как $0.",
+        "model": "Модель PAPER/SHADOW",
+    },
+    "SYSTEM": {
+        "h1": "Система",
+        "question": "Система сейчас в каком состоянии и что не доказано?",
+        "process": "Процесс",
+        "process_up": "запущен",
+        "process_down": "не запущен",
+        "backup": "Бэкап",
+        "backup_unproven": "не подтверждён",
+        "rollback": "Rollback snapshot",
+        "rollback_missing": "отсутствует",
+        "verdict": "Общий статус",
+        "next": "Следующее действие",
+        "not_healthy": "Запущенный процесс не означает, что система исправна.",
+        "deployed": "Развёрнутая версия",
+        "runtime": "Точные runtime-значения",
+    },
+}
+
+ATTENTION_LABELS = {
+    "WHY_NOW": "Почему сейчас",
+    "IMPACT": "Влияние",
+    "EVIDENCE": "Доказательства",
+    "NEXT_SAFE_ACTION": "Следующее безопасное действие",
+}
+
+COMMAND_LABELS = {
+    "PAUSE_NEW_ENTRIES": "Приостановить новые входы",
+    "RESUME_NEW_ENTRIES": "Возобновить новые входы",
+    "REQUEST_CLOSE_POSITION": "Закрыть одну позицию",
+    "REQUEST_CLOSE_ALL": "Закрыть все позиции",
+    "STOP_BOT": "Остановить бота",
+    "FREEZE": "Заморозить",
+    "START": "Старт",
+    "STOP": "Стоп",
+    "PARK": "Парковка",
+    "RECORD_DECISION": "Записать решение",
 }
 
 FIELD_LABELS = {
@@ -187,6 +371,11 @@ OWNER_ERRORS = {
     "LOCATOR_NOT_IN_PROJECTION": "Объект не найден в текущей проекции.",
     "COMMAND_NOT_ALLOWLISTED": "Команда не из списка разрешённых.",
     "COMMAND_PATH_INVALID": "Эта команда на этом экране недоступна.",
+    "CLOSE_ALL_CONFIRMATION_REQUIRED": (
+        "Нужно локальное подтверждение CLOSE_ALL. Команда не отправлена."
+    ),
+    "BOT_INSTANCE_ID_REQUIRED": "Нужен bot_instance_id. Команда не отправлена.",
+    "STALE_OPERATOR_SNAPSHOT": "Снимок оператора устарел. Команда не отправлена.",
     "RESEARCH_STORE_NOT_PRESENT": "ResearchStore на этой машине отсутствует.",
 }
 
@@ -255,3 +444,43 @@ def owner_error(code: str, details: str | None = None) -> str:
     if details and details != code:
         return f"{message}{suffix}: {details}"
     return f"{message}{suffix}"
+
+
+def surface_copy(surface: str, key: str) -> str:
+    block = SURFACE_COPY.get(surface) or {}
+    return str(block.get(key) or key)
+
+
+def shell_copy(key: str) -> str:
+    return SHELL_COPY.get(key, key)
+
+
+def kind_label(kind: str) -> str:
+    return KIND_LABELS.get(kind, kind)
+
+
+def attention_label(key: str) -> str:
+    return ATTENTION_LABELS.get(key, key)
+
+
+def command_label(value: str) -> str:
+    return COMMAND_LABELS.get(value, value)
+
+
+def status_gloss(status: str) -> str | None:
+    return STATUS_GLOSS.get(str(status or "UNKNOWN"))
+
+
+def token_gloss(
+    table: Mapping[str, str],
+    value: Any,
+    *,
+    empty: str = "UNKNOWN",
+) -> tuple[str, str, bool]:
+    if value is None or value == "":
+        canonical = empty
+    else:
+        canonical = str(value)
+    gloss = table.get(canonical) or ""
+    unknown = canonical in UNKNOWN_CANONICAL
+    return gloss, canonical, unknown
