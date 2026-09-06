@@ -35086,7 +35086,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_HOT90_IMMUTABLE_DRIVE_ARCHIVE_IMPL_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_hot90_immutable_drive_archive_impl_v1.py', repository_path: tests/test_factory_hot90_immutable_drive_archive_impl_v1.py}
-  integrity: {kind: sha256, sha256: 64df1178a1f655d6aa215c4c749ba0e7623b8f65deb09c334d3ef37543e70a8a}
+  integrity: {kind: sha256, sha256: 06892ee0b8426ac098dc22311837a7dc1cfd52bddf182e4ba1a70ccafff7ad07}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}

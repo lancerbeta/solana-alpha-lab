@@ -60,6 +60,7 @@ managed_write_set:
   - README.md
   - configs/ci_test_shards_v1.json
   - tests/test_factory_unattended_operability_closure_v1.py
+  - tests/test_factory_hot90_immutable_drive_archive_impl_v1.py
   - tests/test_collector_operability_retention_and_owner_pulse.py
   - tests/test_factory_semantic_operability.py
   - docs/reports/factory_unattended_operability_closure_v1/a1_owner_readout_v1.md
