@@ -1509,7 +1509,7 @@ records:
     repository_path: README.md
   integrity:
     kind: sha256
-    sha256: 967dcf83f04a6f1c0d852b2faa78bfc0aac5e256c9512f2b8a7bd82692b50b43
+    sha256: 625cd06e83b181bc6462ccf4d7fd03fad221d0516770b09774bc1c1e4f3343ee
   access:
     mode: read_only
     method: file
@@ -17787,7 +17787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: 17c15d2debc5252570f376af6e6caec9275c54b05f56a564f1e637edb431501c}
+  integrity: {kind: sha256, sha256: 4ab8a3c326f22b1c3a5b65e0e5019a7feb8fea0fe0f7318a413225e28700d81b}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
@@ -29787,6 +29787,7 @@ records:
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
   - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: superseded_by, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY, REMOTE_OPS, CONFIG, CHERRY]
@@ -29947,7 +29948,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 35d3bc5488c31f567807f002a63d1edb2cbce9a0ebe1c4557155795d28fac2a5}
+  integrity: {kind: sha256, sha256: ccb126e6ad8d1d0effa90c09a915097accd28420d012b574b145e28dfc81ff84}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -32963,7 +32964,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_remote_operations_v1_1.schema.json', repository_path: catalog/schemas/factory_remote_operations_v1_1.schema.json}
-  integrity: {kind: sha256, sha256: 1e846291ea09049e8928c0595fdd6c023f36f09080d4c48fe1166fe94735f736}
+  integrity: {kind: sha256, sha256: e859eed9cc2310ae645c4eb88872cd13f950352acfe93659a32fd15a55e42264}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33025,19 +33026,21 @@ records:
 - asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001
   record_version: '1.0'
   asset_type: configuration
-  purpose: Remote-ops v1.1 config adding observation sqlite, heartbeat and tick units.
+  purpose: Current remote-ops config for mutable backup vs immutable closed-day archive, operability watch, daily/incident alert and external-heartbeat env contract. Git capability only; not live host status.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-08-28'
-  truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
+  as_of: '2026-09-06'
+  truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_remote_operations_v1_1.yaml', repository_path: configs/factory_remote_operations_v1_1.yaml}
-  integrity: {kind: sha256, sha256: 8c9a6ca037f36b939776c3c3187e57ca22f873bd4fe8389ba321d0a9dcd6c8ec}
+  integrity: {kind: sha256, sha256: 106c842e700ecbf63962bda2090fae03a4e7985c231e95c15364199087bf49eb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
-  - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
-  consumers: [FACTORY-001]
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-FACTORY-REMOTE-OPERATIONS-V1-1-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FACTORY-UNATTENDED-OPERABILITY-CLOSURE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [REMOTE_OPS, V1_1]
+  search_terms: [REMOTE_OPS, V1_1, IMMUTABLE_RDP_ARCHIVE, MUTABLE_STATE_BACKUP, HEARTBEAT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-OBSERVATION-SCHEDULE-RUNTIME-001
   record_version: '1.0'
@@ -34046,7 +34049,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: c5b15321716642b70dbaa2ea964f14c04134404b3e62438dc96c12e93ccae130}
+  integrity: {kind: sha256, sha256: 597e3a8e8a6378d6e4c12d5ca0de37443baad69e9bf82a7508931b77947047ce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34065,7 +34068,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_owner_pulse.py', repository_path: src/solana_alpha_lab/factory/collector_owner_pulse.py}
-  integrity: {kind: sha256, sha256: 0e6d6fd4587aebfe5ee373e1922a37d8732450237788a2f39ba425220041a41a}
+  integrity: {kind: sha256, sha256: e5384bdde7cbfa18a06695f6ec51397bd9f00720fdd2c6dcb7ec5d524679c89c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34100,7 +34103,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_collector_operability_retention_and_owner_pulse.py', repository_path: tests/test_collector_operability_retention_and_owner_pulse.py}
-  integrity: {kind: sha256, sha256: 9977999732fb21d8e5c80c249bb8c075647b79dccddd7a427230a64e978774fc}
+  integrity: {kind: sha256, sha256: 880680d82e26661cc428aff45b03c0ccecdc417e4b0306eb9e0b06cd3f358652}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34138,7 +34141,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: cd6938654c4996c528d7df01dab67baaf8c7d0b8dddd6b6bedc239823630adc1}
+  integrity: {kind: sha256, sha256: f0b2bbc8ab2d52647b36bcd884df7162c5ee99083f5c22744edb465c4119feda}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34245,7 +34248,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 17c5c684959e39f9104de590b8c0dee981697abda281fdb0bf905b4df6ece378}
+  integrity: {kind: sha256, sha256: 71616504d9301b1129c33a380117535a9788b40bffe957e512ee9d7900d962b8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34263,7 +34266,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 0d8ee9205b99b9c48b573404d4c7850ebd31ea61777d85870f89d2573871a4b7}
+  integrity: {kind: sha256, sha256: 3d7be790e242c5651625b51b8e948c49bf681d3ef6ebef111fd75a5d7f3645d0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -35101,7 +35104,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md', repository_path: docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md}
-  integrity: {kind: sha256, sha256: 0843e579c55e7ad7482e118fdb2242eb024836ff5a9c147d9825dc1c17fac54a}
+  integrity: {kind: sha256, sha256: e591d44c9e5f47b9a4ae8276cab19efde93b1199950d8e8480c006cb41969654}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
@@ -35629,4 +35632,43 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [EXPERIMENT_EVIDENCE, GOLD_QUERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Canonical operator entrypoint for unattended Factory loops, Git vs runtime vs Drive vs external liveness, and recovery without live-status claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
+  integrity: {kind: sha256, sha256: f4156eeca0ab8827ff14801ef06cbd50a4541c9c6b37eb9ed215abf2371b42c3}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [UNATTENDED, OPERABILITY, ARCHIVE, INCIDENT, HEARTBEAT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-FACTORY-UNATTENDED-OPERABILITY-CLOSURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical proofs for closed-day durability, backlog catch-up, incidents, daily UTC pulse, heartbeat and semantic discovery.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
+  integrity: {kind: sha256, sha256: d6475a258d71c633ff27d52fa9a529d89c0af09bc87dfb81c1b1c2f78f2032cb}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [UNATTENDED, ARCHIVE, INCIDENT, HEARTBEAT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

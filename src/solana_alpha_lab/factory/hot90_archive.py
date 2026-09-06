@@ -44,6 +44,65 @@ def confined_relative_file(
     return candidate
 
 
+def list_closed_day_relative_paths(source_root: Path, utc_day: str) -> list[str]:
+    """Deterministic scientific inventory for one UTC day. Never uses mtime."""
+
+    if len(utc_day) != 8 or utc_day.isdigit() is False:
+        raise Hot90ArchiveError("UTC_DAY_INVALID")
+    relatives: set[str] = set()
+    members_root = source_root / "datasets" / "members_snapshot_plus_delta" / utc_day
+    if members_root.is_dir():
+        for path in members_root.rglob("*"):
+            if path.is_file() and path.is_symlink() is False:
+                relatives.add(path.relative_to(source_root).as_posix())
+    unit_path = members_root / "unit.json"
+    if unit_path.is_file():
+        unit = json.loads(unit_path.read_text(encoding="utf-8"))
+        for pub in unit.get("publications") or []:
+            mid = str(pub.get("dataset_manifest_id") or "")
+            rel = str(pub.get("rel") or "").replace("\\", "/")
+            for extra in (
+                rel,
+                str(Path(rel).with_name("members.layout.json").as_posix()) if rel else "",
+                f"datasets/parquet/{mid}/observations.parquet" if mid else "",
+                f"datasets/parquet/{mid}/members.parquet" if mid else "",
+                f"datasets/manifests/{mid}.json" if mid else "",
+                f"datasets/manifests/{mid}.published" if mid else "",
+            ):
+                if extra:
+                    candidate = source_root / extra
+                    if candidate.is_file() and candidate.is_symlink() is False:
+                        relatives.add(extra)
+    iso = f"{utc_day[:4]}-{utc_day[4:6]}-{utc_day[6:]}"
+    manifests_dir = source_root / "datasets" / "manifests"
+    if manifests_dir.is_dir():
+        for man in manifests_dir.glob("*.json"):
+            try:
+                payload = json.loads(man.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            pid = str(payload.get("partition_id") or "")
+            if pid not in {f"utc-day-{utc_day}", f"utc-day-{iso}"}:
+                continue
+            rel = f"datasets/manifests/{man.name}"
+            if (source_root / rel).is_file():
+                relatives.add(rel)
+            published = f"datasets/manifests/{man.stem}.published"
+            if (source_root / published).is_file():
+                relatives.add(published)
+            loc = payload.get("logical_location")
+            if isinstance(loc, str) and loc and (source_root / loc).is_file():
+                relatives.add(loc.replace("\\", "/"))
+    raw_root = source_root / "datasets" / "raw_evidence" / utc_day
+    if raw_root.is_dir():
+        for path in raw_root.rglob("*"):
+            if path.is_file() and path.is_symlink() is False:
+                relatives.add(path.relative_to(source_root).as_posix())
+    if not relatives:
+        raise Hot90ArchiveError("ARCHIVE_INVENTORY_EMPTY")
+    return sorted(relatives)
+
+
 def package_closed_day_archive(
     source_root: Path,
     *,

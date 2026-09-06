@@ -431,7 +431,7 @@ One daily Telegram summary (not incident spam). Reuses
 `FACTORY_TELEGRAM_BOT_TOKEN` / `FACTORY_TELEGRAM_CHAT_ID` only — **never** Jupiter
 credentials. Immediate remote-ops incident alerts remain separate and deduplicated.
 
-Deterministic schedule bytes: `OnCalendar=*-*-* 06:15:00` UTC
+Deterministic schedule bytes: `OnCalendar=*-*-* 06:15:00 UTC`
 (`configs/factory_remote_ops/factory-collector-owner-pulse.timer`). Templates only —
 do **not** install/enable in the software baseline atom.
 

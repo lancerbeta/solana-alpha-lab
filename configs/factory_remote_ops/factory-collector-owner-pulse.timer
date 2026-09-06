@@ -4,7 +4,7 @@ Description=Daily Factory collector owner pulse at 06:15 UTC
 # OnCalendar is deterministic; do not invent a scheduling subsystem.
 
 [Timer]
-OnCalendar=*-*-* 06:15:00
+OnCalendar=*-*-* 06:15:00 UTC
 Persistent=true
 Unit=factory-collector-owner-pulse.service
 

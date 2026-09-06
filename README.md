@@ -16,6 +16,12 @@ Then read generated `docs/FACTORY_SEMANTIC_MAP.md` and the command ladder in
 `docs/OPERATOR_NAVIGATION.md`. Semantic routing never grants authority and never
 caches live runtime status.
 
+For remote operations, durability, incidents and recovery, start at semantic
+route `SEM-REMOTE-OPS-RECOVERY`, then the operator entrypoint
+`docs/operator/FACTORY_UNATTENDED_OPERABILITY.md`. That document is capability
+and procedure only — not current disk, archive day, HOT90 stage, or Telegram
+state.
+
 For an exact delivery atom: `AGENTS.md` / Delivery Harness.
 
 For exhaustive asset archaeology: Catalog commands, with `docs/PROJECT_MAP.md`

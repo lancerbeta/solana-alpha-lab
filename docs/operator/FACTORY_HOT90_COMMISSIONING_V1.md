@@ -1,12 +1,19 @@
 # FACTORY HOT90 commissioning contract
 
-Status: `PREPARED_NOT_EXECUTED` for Drive archive / durability cutover / cleanup.
-As of: `2026-09-05`
+Status: `ACTIVE_BOUNDARY_CONTRACT`.
+Runtime truth: `RUNTIME_STATE_EXTERNAL_READBACK_REQUIRED`.
+As of: `2026-09-06`
 Predecessor: `HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1`
 
-This document is the operational commissioning contract. It does **not**
-authorize Drive write, retention APPLY, SQLite compaction, or live deletion
-by itself. Those still need an exact owner OPERATE gate.
+This document is the Git commissioning **boundary**, not live host status.
+It does **not** encode the current VPS activation stage, Drive liveness, or
+Telegram liveness. Those require a fresh machine readback.
+
+Retention APPLY, SQLite compaction, and live scientific deletion still need
+an exact owner OPERATE gate. Unattended closed-day archive / daily pulse /
+incident watch capability lives in
+`docs/operator/FACTORY_UNATTENDED_OPERABILITY.md` and is not auto-enabled by
+this Git change.
 
 Git YAML is **policy / safe default / validation**, not current host stage.
 Current activation on a Factory host is preserved local runtime state.
@@ -27,8 +34,12 @@ writes and destructive flags still need an exact owner gate before `SET`.
 
 ## STOP
 
-Do not start cleanup. Do not start Telegram. Do not delete `BACKUP_*.zip`.
-Do not treat tracked YAML as live Factory stage.
+Do not treat this Git file as current live stage, current Telegram health, or
+current Drive health. Do not start scientific cleanup or `BACKUP_*.zip`
+deletion from this document. Do not treat tracked YAML as live Factory stage.
+Telegram and closed-day archive **capability** exist in Git; install/enable
+and live send remain a later OPERATE gate. Historical commissioning sequence
+below is contextual, not a claim that the VPS is in any named stage now.
 
 ## Required activation boundary
 

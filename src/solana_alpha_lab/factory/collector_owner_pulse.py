@@ -16,8 +16,6 @@ from pathlib import Path
 from typing import Any, Callable, Mapping
 
 from solana_alpha_lab.factory.collector_operational_packet import (
-    DISK_WARNING_EARLY_PCT,
-    DISK_WARNING_PCT,
     UNKNOWN,
     append_storage_history,
     build_collector_operational_packet,
@@ -33,7 +31,7 @@ from solana_alpha_lab.factory.remote_ops import (
 TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
 PULSE_DEDUP_RELATIVE = "local/factory_v1/collector_owner_pulse_dedup.json"
 # Ordinary documented UTC time — deterministic schedule bytes.
-DAILY_PULSE_ON_CALENDAR = "*-*-* 06:15:00"
+DAILY_PULSE_ON_CALENDAR = "*-*-* 06:15:00 UTC"
 
 
 def _fmt(value: object) -> str:
@@ -42,150 +40,94 @@ def _fmt(value: object) -> str:
     return str(value)
 
 
-def _owner_action(packet: Mapping[str, Any]) -> str:
+def _owner_action_code(packet: Mapping[str, Any]) -> str:
     classes = set(packet.get("health_classes") or [])
+    if "IMMUTABLE_ARCHIVE_HASH_MISMATCH" in classes:
+        return "IMMUTABLE_ARCHIVE_HASH_MISMATCH"
+    if "DISK_RUNWAY_HARD50" in classes or "DISK_CRITICAL" in classes:
+        return "DISK_RUNWAY_HARD50"
     if "PROVIDER_AUTH_FAILED" in classes:
-        return "Inspect Jupiter credential placement (JUPITER_FREE_API_KEY); do not rotate blindly."
-    if "DISK_CRITICAL" in classes:
-        return "Free disk or scale storage before scientific evidence is at risk; do not auto-delete RDP."
+        return "SUSTAINED_PROVIDER_FAILURE"
+    if "IMMUTABLE_ARCHIVE_STALE" in classes:
+        return "IMMUTABLE_ARCHIVE_STALE"
     if "BACKUP_DEGRADED" in classes:
-        return "Run independent backup (`factory_remote_doctor.py --backup`) and verify FACTORY_BACKUP_SINK domain."
-    if "OFFHOST_BACKUP_FAILED" in classes or "OFFHOST_BACKUP_STALE" in classes:
-        return "Off-host Google Drive copy stale or failed; local backup may still be OK. Agent should run offhost copy proof path."
-    if "BUDGET_BLOCKED" in classes:
-        return "Inspect ObservationSchedule budget counters; do not raise caps without owner OK."
-    if "RELEASE_BLOCKED" in classes:
-        reasons = packet.get("release_blocked_reasons") or []
-        return f"Clear release blockers before seal: {', '.join(map(str, reasons)) or 'UNKNOWN'}."
+        return "MUTABLE_BACKUP_STALE"
     if "DATA_STALE" in classes:
-        return "Confirm observation timer is enabled and last tick advances."
-    if packet.get("collector_verdict") == "DEGRADED":
-        return "Review health_classes in collector operational packet; no automatic mutate."
+        return "SOURCE_DATA_STALE"
+    if "DISK_RUNWAY_TARGET40" in classes:
+        return "DISK_RUNWAY_TARGET40"
+    if packet.get("collector_verdict") == "ACTION_REQUIRED":
+        return "COLLECTOR_ACTION"
     return "NONE"
 
 
-def _backup_domain_pulse_label(domain: object) -> str:
-    text = str(domain or UNKNOWN)
-    if text == "ABSOLUTE_SINK_SAME_VOLUME":
-        return "SAME_VOLUME"
-    if text == "PARENT_INDEPENDENT_GIT_SIDE":
-        return "SAME_VOLUME"
-    if text in {UNKNOWN, "UNKNOWN"}:
-        return "UNKNOWN"
-    return text
-
-
-def _offhost_pulse_label(state: object) -> str:
+def _owner_action(packet: Mapping[str, Any]) -> str:
+    code = _owner_action_code(packet)
     mapping = {
-        "CURRENT": "OK",
-        "DEGRADED": "DEGRADED",
-        "HARD_ATTENTION": "STALE",
-        "FAILED": "FAILED",
-        "MISSING": "MISSING",
-        "UNCONFIGURED": "UNCONFIGURED",
+        "IMMUTABLE_ARCHIVE_HASH_MISMATCH": "Fail closed: do not overwrite remote archive; inspect Drive object vs local SHA.",
+        "DISK_RUNWAY_HARD50": "Free disk or scale storage before scientific evidence is at risk; do not auto-delete RDP.",
+        "SUSTAINED_PROVIDER_FAILURE": "Inspect Jupiter credential placement (JUPITER_FREE_API_KEY); do not rotate blindly.",
+        "IMMUTABLE_ARCHIVE_STALE": "Closed-day Drive archive is behind RPO; later timer catch-up should converge.",
+        "MUTABLE_BACKUP_STALE": "Mutable backup freshness degraded; do not treat generic offhost CURRENT as archive proof.",
+        "SOURCE_DATA_STALE": "Confirm observation timer is enabled and last source-poll advances.",
+        "DISK_RUNWAY_TARGET40": "Projected 97d footprint exceeds TARGET40; no scientific delete from this pulse.",
+        "COLLECTOR_ACTION": "Review collector operational packet; no automatic mutate.",
+        "NONE": "NONE",
     }
-    return mapping.get(str(state or ""), _fmt(state))
+    return mapping.get(code, code)
+
+
+def _pulse_state(packet: Mapping[str, Any]) -> str:
+    verdict = str(packet.get("collector_verdict") or "")
+    if _owner_action_code(packet) != "NONE" or verdict == "ACTION_REQUIRED":
+        return "ACTION"
+    if verdict == "DEGRADED":
+        return "DEGRADED"
+    return "OK"
 
 
 def render_daily_owner_pulse(packet: Mapping[str, Any]) -> str:
-    """Deterministic human-readable daily summary. No secrets."""
+    """Phone-short daily card. No secrets. Footer is parser-stable."""
 
     disk = packet.get("filesystem_disk_used_pct")
-    disk_note = _fmt(disk)
-    if isinstance(disk, int):
-        if disk >= 85:
-            disk_note = f"{disk}% CRITICAL"
-        elif disk >= DISK_WARNING_PCT:
-            disk_note = f"{disk}% WARNING"
-        elif disk >= DISK_WARNING_EARLY_PCT:
-            disk_note = f"{disk}% EARLY_WARNING"
-        else:
-            disk_note = f"{disk}% NORMAL"
-
-    projected = packet.get("projected_disk_80pct")
-    if isinstance(projected, dict):
-        projected_txt = f"{projected.get('estimated_days')}d to {projected.get('threshold_pct')}%"
-    else:
-        projected_txt = _fmt(projected)
-
+    disk_note = _fmt(disk) if not isinstance(disk, int) else f"{disk}%"
+    runway = str(packet.get("projected_97d_status") or "UNKNOWN")
     backup_age = packet.get("backup_age_seconds")
     if isinstance(backup_age, int):
-        if backup_age < 3600:
-            backup_age_txt = f"{backup_age // 60}m"
-        else:
-            backup_age_txt = f"{backup_age // 3600}h"
+        backup_age_txt = f"{backup_age // 3600}h" if backup_age >= 3600 else f"{backup_age // 60}m"
     else:
         backup_age_txt = _fmt(backup_age)
-
-    offhost_age = packet.get("offhost_backup_age_seconds")
-    if isinstance(offhost_age, int):
-        if offhost_age < 3600:
-            offhost_age_txt = f"{offhost_age // 60}m"
-        else:
-            offhost_age_txt = f"{offhost_age // 3600}h"
-    else:
-        offhost_age_txt = _fmt(offhost_age)
-
-    local_domain = _backup_domain_pulse_label(packet.get("backup_domain"))
-    offhost_remote = _fmt(packet.get("offhost_remote"))
-    offhost_state = _offhost_pulse_label(packet.get("offhost_backup_state"))
-
-    oldest = packet.get("oldest_due_age")
-    if isinstance(oldest, int):
-        oldest_txt = f"{oldest}s"
-    else:
-        oldest_txt = _fmt(oldest)
-
+    state = _pulse_state(packet)
+    action_code = _owner_action_code(packet)
+    lifecycle = _fmt(packet.get("cohort_readiness_state"))
     lines = [
-        "FACTORY / DAILY",
+        f"FACTORY / DAILY — {state}",
         "",
-        f"Collector: {_fmt(packet.get('collector_verdict'))}",
-        f"Cohort: {_fmt(packet.get('cohort_readiness_state'))}/{_fmt(packet.get('cohort_id'))}",
+        f"Collector: {_fmt(packet.get('activation_state'))} / {_fmt(packet.get('collector_verdict'))}",
+        f"Lifecycle: {lifecycle}",
         "",
-        f"Candidates 24h: {_fmt(packet.get('candidates_24h'))}",
-        f"Sampled: {_fmt(packet.get('sampled_members_24h'))}",
-        f"X eligible: {_fmt(packet.get('x_eligible_24h'))}",
+        "Durability:",
+        f"Mutable backup {backup_age_txt} full_rdp={_fmt(packet.get('mutable_backup_includes_full_observation_rdp'))}",
+        f"Immutable archive verified={_fmt(packet.get('immutable_archive_latest_verified_day'))} "
+        f"backlog={_fmt(packet.get('immutable_archive_backlog_days'))}",
         "",
-        f"4h/24h closure: observations={_fmt(packet.get('observations_24h'))} "
-        f"typed_missing={_fmt(packet.get('typed_missing_24h'))} "
-        f"censored_late={_fmt(packet.get('censored_late_24h'))}",
-        f"Coverage: {_fmt(packet.get('discovery_coverage_class'))}",
-        f"Gap incidents: {_fmt((packet.get('health_classes') or []).count('DISCOVERY_GAP') if isinstance(packet.get('health_classes'), list) else UNKNOWN)}",
+        f"Storage: {disk_note} projected97d={_fmt(packet.get('projected_97d_bytes'))} {runway}",
         "",
-        "Provider:",
-        f"401 {_fmt(packet.get('HTTP_401_24h'))} / "
-        f"403 {_fmt(packet.get('HTTP_403_24h'))} / "
-        f"429 {_fmt(packet.get('HTTP_429_24h'))} / "
-        f"5xx {_fmt(packet.get('HTTP_5XX_24h'))} / "
-        f"timeout {_fmt(packet.get('TIMEOUT_24h'))}",
-        "",
-        f"Backlog: pending={_fmt(packet.get('pending_due'))} "
-        f"in_flight={_fmt(packet.get('in_flight_indeterminate'))} "
-        f"budget_blocked={_fmt(packet.get('blocked_budget'))}",
-        f"Oldest due: {oldest_txt}",
-        "",
-        "Storage:",
-        f"Disk: {disk_note}",
-        f"Growth 24h: disk_pp={_fmt(packet.get('disk_growth_24h_pct_points'))} "
-        f"data_bytes={_fmt(packet.get('data_growth_24h_bytes'))}",
-        f"SQLite: {_fmt(packet.get('observation_sqlite_bytes'))}",
-        f"Observation RDP: {_fmt(packet.get('observation_rdp_bytes'))}",
-        f"Projected 80% disk: {projected_txt}",
-        "",
-        "Backup:",
-        f"local {backup_age_txt} / {local_domain}",
-        f"offhost {offhost_age_txt} / {offhost_remote} / {offhost_state}",
-        f"payload_30d={_fmt(packet.get('offhost_backup_payload_bytes_30d'))} "
-        f"projected={_fmt(packet.get('projected_offhost_backup_payload_bytes_30d'))} "
-        f"(not billing truth)",
-        "",
-        "Release:",
-        f"state={_fmt(packet.get('release_state'))} "
-        f"sealed={_fmt(packet.get('last_sealed_release_id'))} "
-        f"corpus_v={_fmt(packet.get('current_live_corpus_version'))}",
-        "",
-        "Owner action:",
+        "Owner:",
         _owner_action(packet),
+        "",
+        "```",
+        "MESSAGE_TYPE=DAILY",
+        f"STATE={state}",
+        f"INCIDENT={action_code if action_code != 'NONE' else 'NONE'}",
+        f"COLLECTOR_STATE={_fmt(packet.get('activation_state'))}",
+        f"LIFECYCLE_STATE={lifecycle}",
+        f"ARCHIVE_LAST_VERIFIED_DAY={_fmt(packet.get('immutable_archive_latest_verified_day'))}",
+        f"ARCHIVE_BACKLOG_DAYS={_fmt(packet.get('immutable_archive_backlog_days'))}",
+        f"MUTABLE_BACKUP_STATE={backup_age_txt}",
+        f"PROJECTED_97D_BYTES={_fmt(packet.get('projected_97d_bytes'))}",
+        f"OWNER_ACTION={action_code}",
+        "```",
     ]
     return "\n".join(lines) + "\n"
 
@@ -203,6 +145,7 @@ def emit_daily_owner_pulse(
     environ: Mapping[str, str] | None = None,
     transport: Callable[[str, str, str], None] | None = None,
     dedup_store: Path | None = None,
+    incident_key: str | None = None,
 ) -> dict[str, Any]:
     """Send one Telegram message. Reads only FACTORY_TELEGRAM_* values."""
 
@@ -222,7 +165,7 @@ def emit_daily_owner_pulse(
             pass
 
     day = _utc_day(clock)
-    incident_key = f"DAILY_COLLECTOR_OWNER_PULSE:{day}"
+    key = incident_key or f"DAILY_COLLECTOR_OWNER_PULSE:{day}"
     store = dedup_store or (root / PULSE_DEDUP_RELATIVE)
     store.parent.mkdir(parents=True, exist_ok=True)
     history: dict[str, Any] = {}
@@ -234,11 +177,11 @@ def emit_daily_owner_pulse(
         except (OSError, json.JSONDecodeError):
             history = {}
     sent = history.get("sent") if isinstance(history.get("sent"), dict) else {}
-    if incident_key in sent:
+    if key in sent:
         return {
             "delivered": False,
             "deduped": True,
-            "incident_key": incident_key,
+            "incident_key": key,
             "credentials_read": ["FACTORY_TELEGRAM_BOT_TOKEN", "FACTORY_TELEGRAM_CHAT_ID"],
             "jupiter_credentials_read": 0,
         }
@@ -265,13 +208,13 @@ def emit_daily_owner_pulse(
     else:
         transport(token, chat_id, text)
 
-    sent[incident_key] = {"at": render_utc(clock)}
+    sent[key] = {"at": render_utc(clock)}
     history["sent"] = sent
     store.write_text(json.dumps(history, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return {
         "delivered": True,
         "deduped": False,
-        "incident_key": incident_key,
+        "incident_key": key,
         "credentials_read": ["FACTORY_TELEGRAM_BOT_TOKEN", "FACTORY_TELEGRAM_CHAT_ID"],
         "jupiter_credentials_read": 0,
         "chars": len(text),

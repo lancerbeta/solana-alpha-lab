@@ -16,6 +16,7 @@
     "workbench",
     "stores",
     "backup",
+    "archive",
     "monitoring",
     "alert",
     "security",
@@ -199,7 +200,41 @@
             "owner_traffic_target_30d_bytes": {"const": 300000000000},
             "internal_payload_planning_budget_30d_bytes": {"const": 240000000000}
           }
+        },
+        "channels": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["mutable_state", "immutable_rdp_archive", "full_rdp_legacy"],
+          "properties": {
+            "mutable_state": {"const": "MUTABLE_STATE_BACKUP"},
+            "immutable_rdp_archive": {"const": "IMMUTABLE_RDP_ARCHIVE"},
+            "full_rdp_legacy": {"const": "FULL_RDP_BACKUP"}
+          }
         }
+      }
+    },
+    "archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "receipts_relative",
+        "staging_relative",
+        "max_days_per_run",
+        "max_runtime_seconds",
+        "local_verified_staging_retention",
+        "on_calendar_utc"
+      ],
+      "properties": {
+        "kind": {"const": "IMMUTABLE_CLOSED_DAY"},
+        "receipts_relative": {
+          "const": "local/factory_v1/hot90_archive_receipts"
+        },
+        "staging_relative": {"const": "local/factory_v1/hot90_archives"},
+        "max_days_per_run": {"const": 3},
+        "max_runtime_seconds": {"const": 900},
+        "local_verified_staging_retention": {"const": 1},
+        "on_calendar_utc": {"const": "*-*-* 01:15:00 UTC"}
       }
     },
     "monitoring": {
@@ -217,7 +252,8 @@
         "stall_max_seconds": {"type": "integer", "minimum": 60, "maximum": 86400},
         "disk_used_percent_max": {"type": "integer", "minimum": 50, "maximum": 95},
         "heartbeat_relative": {"type": "string", "minLength": 8},
-        "observation_heartbeat_relative": {"type": "string", "minLength": 8}
+        "observation_heartbeat_relative": {"type": "string", "minLength": 8},
+        "heartbeat_url_env": {"const": "FACTORY_EXTERNAL_HEARTBEAT_URL"}
       }
     },
     "alert": {
@@ -278,7 +314,13 @@
         "observation_schedule_service_relative": {"type": "string", "minLength": 8},
         "observation_schedule_timer_relative": {"type": "string", "minLength": 8},
         "collector_owner_pulse_service_relative": {"type": "string", "minLength": 8},
-        "collector_owner_pulse_timer_relative": {"type": "string", "minLength": 8}
+        "collector_owner_pulse_timer_relative": {"type": "string", "minLength": 8},
+        "closed_day_archive_service_relative": {"type": "string", "minLength": 8},
+        "closed_day_archive_timer_relative": {"type": "string", "minLength": 8},
+        "operability_watch_service_relative": {"type": "string", "minLength": 8},
+        "operability_watch_timer_relative": {"type": "string", "minLength": 8},
+        "external_heartbeat_service_relative": {"type": "string", "minLength": 8},
+        "external_heartbeat_timer_relative": {"type": "string", "minLength": 8}
       }
     },
     "health": {

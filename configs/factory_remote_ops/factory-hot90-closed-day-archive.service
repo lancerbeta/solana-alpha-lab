@@ -1,0 +1,12 @@
+[Unit]
+Description=HOT90 closed UTC-day archive to Google Drive with exact SHA verify
+Documentation=docs/operator/FACTORY_UNATTENDED_OPERABILITY.md
+After=network-online.target
+# Template only — install/enable only after owner-gated production commissioning.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solana-alpha-lab
+EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/hot90_closed_day_durability.py
+NoNewPrivileges=true
