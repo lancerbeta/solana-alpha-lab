@@ -8,9 +8,9 @@ allowed_routes:
   - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 7b7f96d191b12fb37a90565241b0ce0c447eaf30
+  expected_base: dc44aca566ab141c641700d5cf6e8e8ddcdc77b9
   expected_upstream: origin/main
-  expected_upstream_oid: 7b7f96d191b12fb37a90565241b0ce0c447eaf30
+  expected_upstream_oid: dc44aca566ab141c641700d5cf6e8e8ddcdc77b9
   expected_branch: cursor/science-to-strategy-handoff-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-

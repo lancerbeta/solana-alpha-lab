@@ -35642,7 +35642,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md', repository_path: docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md}
-  integrity: {kind: sha256, sha256: 6bfdd327d4730d474b0df4279b7d56fff848be31a9b0f28b32c46f67d9236497}
+  integrity: {kind: sha256, sha256: 9e9a1b2d4aa28be11d0705bcbe31780e0a28cf331ccb23b3c5da81d00958c60e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001}
