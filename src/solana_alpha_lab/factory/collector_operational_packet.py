@@ -161,6 +161,40 @@ def append_storage_history(
     return path
 
 
+def _normalized_24h_growth(
+    *,
+    prior: Mapping[str, Any],
+    latest: Mapping[str, Any],
+    span_h: float,
+    current_disk_pct: int | None,
+) -> tuple[Any, Any]:
+    """Scale sqlite+RDP and disk-pct deltas onto an exact 24h window."""
+
+    if span_h < 12:
+        return UNKNOWN, UNKNOWN
+    scale = 24.0 / span_h
+    old_pct = prior.get("disk_used_pct")
+    new_pct = current_disk_pct if isinstance(current_disk_pct, int) else latest.get("disk_used_pct")
+    if not isinstance(old_pct, int) or not isinstance(new_pct, int):
+        disk_growth: Any = UNKNOWN
+    else:
+        disk_growth = round((new_pct - old_pct) * scale, 3)
+    old_bytes = prior.get("sqlite_bytes")
+    new_bytes = latest.get("sqlite_bytes")
+    old_rdp = prior.get("rdp_bytes")
+    new_rdp = latest.get("rdp_bytes")
+    data_growth: Any = UNKNOWN
+    if (
+        isinstance(old_bytes, int)
+        and isinstance(new_bytes, int)
+        and isinstance(old_rdp, int)
+        and isinstance(new_rdp, int)
+    ):
+        delta = (new_bytes + new_rdp) - (old_bytes + old_rdp)
+        data_growth = int(round(delta * scale))
+    return disk_growth, data_growth
+
+
 def _growth_and_projection(
     history: list[dict[str, Any]],
     *,
@@ -183,9 +217,8 @@ def _growth_and_projection(
             # first observation after window still usable as nearest older peer
             break
     if prior is None:
-        # need at least two points spanning ~24h
         dated = [
-            ( _safe_parse(r.get("observed_at")), r)
+            (_safe_parse(r.get("observed_at")), r)
             for r in history
             if _safe_parse(r.get("observed_at")) is not None
         ]
@@ -195,51 +228,25 @@ def _growth_and_projection(
         dated.sort(key=lambda item: item[0])
         oldest_t, oldest = dated[0]
         newest_t, newest = dated[-1]
-        span_h = (newest_t - oldest_t).total_seconds() / 3600.0
-        if span_h < 12:
-            return UNKNOWN, UNKNOWN, UNKNOWN
-        prior = oldest
-        # scale growth to 24h
-        old_pct = prior.get("disk_used_pct")
-        new_pct = newest.get("disk_used_pct")
-        if not isinstance(old_pct, int) or not isinstance(new_pct, int):
-            disk_growth: Any = UNKNOWN
-        else:
-            disk_growth = round((new_pct - old_pct) * (24.0 / span_h), 3)
-        old_bytes = prior.get("sqlite_bytes")
-        new_bytes = newest.get("sqlite_bytes")
-        old_rdp = prior.get("rdp_bytes")
-        new_rdp = newest.get("rdp_bytes")
-        data_growth: Any = UNKNOWN
-        if (
-            isinstance(old_bytes, int)
-            and isinstance(new_bytes, int)
-            and isinstance(old_rdp, int)
-            and isinstance(new_rdp, int)
-        ):
-            delta = (new_bytes + new_rdp) - (old_bytes + old_rdp)
-            data_growth = int(round(delta * (24.0 / span_h)))
+        disk_growth, data_growth = _normalized_24h_growth(
+            prior=oldest,
+            latest=newest,
+            span_h=(newest_t - oldest_t).total_seconds() / 3600.0,
+            current_disk_pct=current_disk_pct,
+        )
     else:
-        old_pct = prior.get("disk_used_pct")
-        if not isinstance(old_pct, int):
-            disk_growth = UNKNOWN
-        else:
-            disk_growth = current_disk_pct - old_pct
-        old_bytes = prior.get("sqlite_bytes")
-        old_rdp = prior.get("rdp_bytes")
-        # current sizes passed via last history row if present
         latest = history[-1] if history else {}
-        new_bytes = latest.get("sqlite_bytes")
-        new_rdp = latest.get("rdp_bytes")
-        if (
-            isinstance(old_bytes, int)
-            and isinstance(new_bytes, int)
-            and isinstance(old_rdp, int)
-            and isinstance(new_rdp, int)
-        ):
-            data_growth = (new_bytes + new_rdp) - (old_bytes + old_rdp)
-        else:
-            data_growth = UNKNOWN
+        prior_at = _safe_parse(prior.get("observed_at"))
+        latest_at = _safe_parse(latest.get("observed_at")) or now
+        span_h = (
+            (latest_at - prior_at).total_seconds() / 3600.0 if prior_at is not None else 0.0
+        )
+        disk_growth, data_growth = _normalized_24h_growth(
+            prior=prior,
+            latest=latest,
+            span_h=span_h,
+            current_disk_pct=current_disk_pct,
+        )
 
     projected: Any = UNKNOWN
     if isinstance(disk_growth, (int, float)) and disk_growth > 0:

@@ -1,0 +1,42 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-SNAPSHOT-DELTA-ECONOMY-AND-SIGNAL-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-06",
+  "task_id": "FACTORY_SNAPSHOT_DELTA_ECONOMY_AND_SIGNAL_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_COMPACT_DELTA_AND_TRUTHFUL_STALE_SIGNAL",
+    "flexibility_and_history": "PASS_V1_FAT_READER_KEPT_NO_HISTORICAL_REWRITE",
+    "context_efficiency": "PASS_EXISTING_HOT90_AND_REMOTE_OPS_ROUTES",
+    "research_truth": "PASS_EXACT_RECONSTRUCT_NO_SCIENCE_SEMANTIC_CHANGE",
+    "owner_operability": "PASS_ONE_SOURCE_DATA_STALE_AND_WRITE_ONLY_COMMISSIONING",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_SPAN_NORMALIZED_GROWTH_WATCH_CADENCE_UNCHANGED",
+    "build_vs_buy": "PASS_EXISTING_PARQUET_ENVELOPE_NO_NEW_STORE",
+    "security": "PASS_FAIL_CLOSED_CORRUPT_DELTA_NO_SECRETS",
+    "red_team": "PASS_UNCHANGED_IGNORE_REQUIRES_TARGET_FINGERPRINT"
+  },
+  "capability_radar": {
+    "now": "COMPACT_DELTA_GIT_CAPABILITY",
+    "watch": "LIVE_TICK_WALLTIME_AFTER_COMMISSIONING"
+  },
+  "recovery": "Redeploy previous exact SHA; leave live fat deltas and archives untouched. New writes after rollback become fat v1 again.",
+  "limits": [
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_LIVE_TELEGRAM_SEND",
+    "NO_SCIENTIFIC_RDP_DELETE",
+    "NO_DRIVE_PRUNE",
+    "NO_HISTORICAL_REWRITE",
+    "NO_SQLITE_COMPACTION",
+    "NO_LEASE_TTL_INFLATION",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE"
+  ]
+}
