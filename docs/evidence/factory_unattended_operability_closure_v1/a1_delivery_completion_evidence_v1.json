@@ -33,6 +33,7 @@
     "docs/FACTORY_SEMANTIC_MAP.md": "71616504d9301b1129c33a380117535a9788b40bffe957e512ee9d7900d962b8",
     "docs/OPERATOR_NAVIGATION.md": "4ab8a3c326f22b1c3a5b65e0e5019a7feb8fea0fe0f7318a413225e28700d81b",
     "docs/PROJECT_MAP.md": "0f5c3bead3c00cb6567e6e9d4f7f2eb756d6356a10a15165591f3f0c0027ee34",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "e7ebcfa03d645da5651d3c354ce7a7faccd2138c53c310496e6e29ab8a42be48",
     "docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md": "e591d44c9e5f47b9a4ae8276cab19efde93b1199950d8e8480c006cb41969654",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "1c4d8378352f7a8a9fb24febcc7ccb083ad95fbb832ea6f42603a09a8aee9818",
     "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "b5a28ee70955bac6c003db3968bd00c6233d3f81912e4c2552afaf86e65da788",
@@ -49,6 +50,7 @@
     "src/solana_alpha_lab/factory/hot90_remote_verify.py": "cb9174ed356f4f391473470a656a7c34b1f832e1ddb633d1720b318a219cc4f7",
     "src/solana_alpha_lab/factory/operability_watch.py": "625e59c95c57244ba9590c6602f5a38c9bc131efb81e33d851ced026535f81cf",
     "tests/test_collector_operability_retention_and_owner_pulse.py": "880680d82e26661cc428aff45b03c0ccecdc417e4b0306eb9e0b06cd3f358652",
+    "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py": "06892ee0b8426ac098dc22311837a7dc1cfd52bddf182e4ba1a70ccafff7ad07",
     "tests/test_factory_unattended_operability_closure_v1.py": "dbbc6dd76532fed64f60333a19d3c789171591fa19ae9a4e6565b4d2f89b2fa9"
   },
   "active_stop_conditions": [],
@@ -61,14 +63,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_unattended_operability_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "077e7f118bb59d64e5ef7a31b4333c39d0b548478e99d2dab08767fc7ad35b50",
+    "sha256": "4b529a2e787c1e3195cf7130c0229cf11480226a42b2544b59512def603e6791",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_UNATTENDED_OPERABILITY_CLOSURE_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_unattended_operability_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "65bd21f33c4e78c0dd6211733e0edcad41533459e47b11641b2ca88f271b7d8c",
+      "sha256": "98c24907407009523b23feeec156825a329168fc25eb72d98c9b7b8fb5ce121b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
