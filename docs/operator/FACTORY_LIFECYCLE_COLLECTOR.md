@@ -455,6 +455,11 @@ ordinary collector tick.
 ### Operational packet + health classes
 
 Composed from collector_read_model + remote-ops disk/backup + live-release fields.
+Watch mapping: `DATA_STALE` is one actionable freshness incident
+(`SOURCE_DATA_STALE`). It is not also `COLLECTOR_STALLED`. Canonical watch
+cadence remains 15 minutes; source-poll cadence must stay compatible with
+that bound after SNAPSHOT_PLUS_DELTA compact-delta repair.
+
 Health classes include: `PROCESS_OK`, `DATA_STALE`, `PROVIDER_AUTH_FAILED`,
 `PROVIDER_RATE_LIMITED`, `PROVIDER_FAILED`, `DISCOVERY_GAP`,
 `DISCOVERY_COVERAGE_UNKNOWN`, `BACKLOG_RISK`, `BUDGET_BLOCKED`,

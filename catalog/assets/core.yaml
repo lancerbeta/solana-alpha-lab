@@ -29948,7 +29948,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 1c4d8378352f7a8a9fb24febcc7ccb083ad95fbb832ea6f42603a09a8aee9818}
+  integrity: {kind: sha256, sha256: a69a260c39d2449bfcad078bfb23b3f7b70514c0d8c30686dcc312404ebd6b9e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34049,7 +34049,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 0f39b43bbd4f2f92109ffb12af2b5e3fd7c329d17254e9a4bc40a8695980414c}
+  integrity: {kind: sha256, sha256: 6c325b076c6402ed64702dab6e63fe99038ecdf7eb42dd5332538c7852769ca4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34141,7 +34141,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: c98c7e96bcf175287caa3f07229096ca509a8bc046da6c51acb55986a4e530b0}
+  integrity: {kind: sha256, sha256: 74c4048546940c0ccc8922ecf026bb2d6a58b2f2497b83ee172ddb829ecb02ec}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34266,7 +34266,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: a296bdcfd1a330aeafd6e7cdb86c2f649ecd9baa1321057d9c75726bdb7cba71}
+  integrity: {kind: sha256, sha256: 501c0ef06b6d84640c7d1c1e2849745c524c2b97b0bf8aa31f3de1b80d9816ce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -35057,7 +35057,7 @@ records:
   - {relation_type: contains, target_asset_id: DOC-FACTORY-HOT90-COMMISSIONING-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [HOT90, SNAPSHOT_PLUS_DELTA, CURRENT_SAFE, CONTENT_IMMUTABILITY]
+  search_terms: [HOT90, SNAPSHOT_PLUS_DELTA, compact delta encoding, storage economy, reconstruction, CURRENT_SAFE, CONTENT_IMMUTABILITY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: CONFIG-FACTORY-HOT90-ARCHIVE-ACTIVATION-001
   record_version: '1.0'
@@ -35093,7 +35093,7 @@ records:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001}
   consumers: [FACTORY-001]
   evidence: []
-  search_terms: [SNAPSHOT_PLUS_DELTA, ZSTD, REMOTE_CONTENT_SHA256_VERIFIED]
+  search_terms: [SNAPSHOT_PLUS_DELTA, compact delta encoding, ZSTD, REMOTE_CONTENT_SHA256_VERIFIED]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: DOC-FACTORY-HOT90-COMMISSIONING-001
   record_version: '1.0'
@@ -35104,7 +35104,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: HOT90_RUNTIME_ACTIVATION_BOUNDARY_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md', repository_path: docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md}
-  integrity: {kind: sha256, sha256: e591d44c9e5f47b9a4ae8276cab19efde93b1199950d8e8480c006cb41969654}
+  integrity: {kind: sha256, sha256: 97eabbd6bfed3ee74779c63983ef6303e4871b933cbe53f5a8c24345bdec3aa7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001}
@@ -35736,7 +35736,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: b5a28ee70955bac6c003db3968bd00c6233d3f81912e4c2552afaf86e65da788}
+  integrity: {kind: sha256, sha256: e3581323f3041c720923491594ff5901efdf84265f843acd60002e42cb4c1d72}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -35745,7 +35745,7 @@ records:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [UNATTENDED, OPERABILITY, ARCHIVE, INCIDENT, HEARTBEAT]
+  search_terms: [UNATTENDED, OPERABILITY, ARCHIVE, INCIDENT, HEARTBEAT, SOURCE_DATA_STALE, collector stale monitoring]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-FACTORY-UNATTENDED-OPERABILITY-CLOSURE-001
   record_version: '1.0'

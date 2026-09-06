@@ -1,0 +1,77 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-SNAPSHOT-DELTA-ECONOMY-AND-SIGNAL-REPAIR-COMPLETION-001",
+  "as_of": "2026-09-06",
+  "task_id": "FACTORY_SNAPSHOT_DELTA_ECONOMY_AND_SIGNAL_REPAIR_V1",
+  "state_change": "FACTORY_SNAPSHOT_DELTA_ECONOMY_AND_SIGNAL_REPAIR_SOFTWARE_PASS",
+  "base_main": "7b7f96d191b12fb37a90565241b0ce0c447eaf30",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "COMMISSIONING_AFTER_MERGE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "6d8d193a84d62171798de8eba7af993e04dda5e9e0026cd4f36107420193b732",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "0097b7b5f9c0b34e59b5ceae2be67c52aee970743df1b5a39b7106983215b162",
+    "configs/ci_test_shards_v1.json": "31364ca59ee9f72f10baf5e542f4d9232ad8e01aa0c11c72e70ab51998ca54f2",
+    "configs/factory_semantic_operability_v1.yaml": "3f807d79802a0e043b43716643bcac41987b109e11fe902f5a34f2198e21258e",
+    "docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md": "97eabbd6bfed3ee74779c63983ef6303e4871b933cbe53f5a8c24345bdec3aa7",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "a69a260c39d2449bfcad078bfb23b3f7b70514c0d8c30686dcc312404ebd6b9e",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "e3581323f3041c720923491594ff5901efdf84265f843acd60002e42cb4c1d72",
+    "docs/reports/factory_snapshot_delta_economy_and_signal_repair_v1/a1_owner_readout_v1.md": "c42682b04b492ebf094c68e7b42041edcac01c82090a903d51c3154a54afb30b",
+    "docs/tasks/FACTORY_SNAPSHOT_DELTA_ECONOMY_AND_SIGNAL_REPAIR_V1.md": "4e85d97d4edfdc2e39bf95b9407af0990a2b4af05e74d575351806e5bf958fc7",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "6c325b076c6402ed64702dab6e63fe99038ecdf7eb42dd5332538c7852769ca4",
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "1e4914c64a31a24ece3833c09bdc69cb620a43cfc6c2f109e6c381b378b6dd08",
+    "src/solana_alpha_lab/factory/operability_watch.py": "0e79675f4561386310518a4a7ba709c7179b5f0c253b6de1c461f3e9b623f1fa",
+    "tests/test_factory_snapshot_delta_economy_and_signal_repair_v1.py": "9c083dbfb660b76e0f6b0f66cec4e90b99ca5de9ba6ba8f1e349c90e7137f0cc"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_snapshot_delta_economy_and_signal_repair_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "7318f841c32d1f6e6071ac8e524b5a25381703f1fbfa94ab1e70a98a305a170b",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_SNAPSHOT_DELTA_ECONOMY_AND_SIGNAL_REPAIR_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_snapshot_delta_economy_and_signal_repair_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "43f04974fc903cf7bbf26635c6757de0a4331b71d0e9574e5a9fb9440da17ca3",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_SNAPSHOT_DELTA_ECONOMY_AND_SIGNAL_REPAIR_SUITE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_RETENTION_APPLY",
+    "NO_DRIVE_WRITE",
+    "NO_LIVE_TELEGRAM_SEND",
+    "NO_SCIENTIFIC_RDP_DELETE",
+    "NO_DRIVE_PRUNE",
+    "NO_HISTORICAL_REWRITE",
+    "NO_SQLITE_COMPACTION",
+    "NO_LEASE_TTL_INFLATION",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

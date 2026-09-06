@@ -186,6 +186,7 @@ routes:
       - Is lifecycle collection running / where do I inspect it?
       - How is lifecycle data collected?
       - Where is the collector runbook?
+      - Where is collector stale monitoring / SOURCE_DATA_STALE?
       - где смотреть сбор lifecycle
     search_terms:
       - lifecycle collector
@@ -195,6 +196,9 @@ routes:
       - C4
       - сбор
       - коллектор
+      - collector stale monitoring
+      - SOURCE_DATA_STALE
+      - source poll
     consumers: [GOAL-OWNER, FACTORY-001]
     root_binding_ids: [ACTIVE-LIFECYCLE-COLLECTOR]
     root_asset_ids: [CONFIG-OBSERVATION-SCHEDULE-RUNTIME-V1-001]
@@ -231,14 +235,14 @@ routes:
     related_route_ids: [SEM-PRIOR-WORK, SEM-LIVE-COLLECTION]
 
   - semantic_route_id: SEM-REMOTE-OPS-RECOVERY
-    purpose: Factory remote operations, backup/durability channels, incidents, recovery and external-liveness entrypoint. Git is capability; live health needs gated readback.
+    purpose: Factory remote operations, backup/durability, SNAPSHOT_PLUS_DELTA compact delta encoding, storage economy, reconstruction, incidents and recovery. Git is capability; live health needs gated readback.
     owner_questions:
       - Where is the Factory VPS?
       - How do I backup / restore / recover remote Factory?
       - почему архив не загрузился / why Drive archive failed?
       - What will Telegram send (daily / incident / recovered)?
       - How do I know the VPS died / host unreachable?
-      - бэкап VPS / mutable backup / HOT90 runtime
+      - HOT90 runtime / SNAPSHOT_PLUS_DELTA compact delta encoding / reconstruction
       - куда уезжает immutable RDP archive?
       - как восстановить Factory?
     search_terms:
@@ -254,10 +258,10 @@ routes:
       - как восстановить Factory
       - HOT90 runtime
       - mutable backup
-      - архив
-      - heartbeat
-      - Drive
-      - recovery
+      - SNAPSHOT_PLUS_DELTA
+      - compact delta encoding
+      - storage economy
+      - reconstruction
     consumers: [GOAL-OWNER, FACTORY-001]
     root_binding_ids: [ACTIVE-FACTORY-REMOTE-OPERATIONS]
     root_asset_ids: [DOC-FACTORY-REMOTE-HOST-001, DOC-FACTORY-UNATTENDED-OPERABILITY-001]

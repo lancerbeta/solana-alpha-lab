@@ -206,6 +206,7 @@
       "tests/test_factory_97d_storage_architecture_proof_v1.py",
       "tests/test_factory_97d_storage_format_benchmark_v1.py",
       "tests/test_factory_hot90_immutable_drive_archive_impl_v1.py",
+      "tests/test_factory_snapshot_delta_economy_and_signal_repair_v1.py",
       "tests/test_factory_unattended_operability_closure_v1.py",
       "tests/test_factory_storage_data_economy_and_context_closure_v1.py",
       "tests/test_factory_v1_commissioning.py",

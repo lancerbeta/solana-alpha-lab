@@ -74,6 +74,21 @@ queries:
 - query_id: SGQ-REMOTE-OPS-MUTABLE-BACKUP
   query: mutable backup
   required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-COMPACT-DELTA
+  query: compact delta encoding
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-SNAPSHOT-PLUS-DELTA
+  query: SNAPSHOT_PLUS_DELTA reconstruction
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-STORAGE-ECONOMY
+  query: storage economy
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-LIVE-COLLECTOR-STALE
+  query: collector stale monitoring
+  required_top_route: SEM-LIVE-COLLECTION
+- query_id: SGQ-LIVE-SOURCE-DATA-STALE
+  query: SOURCE_DATA_STALE
+  required_top_route: SEM-LIVE-COLLECTION
 - query_id: SGQ-AUTHORITY-EN
   query: am I authorized to call/deploy/spend
   required_top_route: SEM-AUTHORITY-BOUNDARIES

@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-SNAPSHOT-DELTA-ECONOMY-AND-SIGNAL-REPAIR-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-06",
+  "task_id": "FACTORY_SNAPSHOT_DELTA_ECONOMY_AND_SIGNAL_REPAIR_V1",
+  "reviewed_bindings_sha256": "cd16ee1a5acc728f034a8171874245bde4f5344c417c66e7ffc0f2ff8974b55c",
+  "reviewed_inventory_sha256": "2bde811019ce126817c49ef3430aee517fed02bf1d4cbaa20832d4e0d8253e94",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=641396e5754fdf1ace611811e9b89c4facd65d36a6cf5bfc9c6da28fc74ad9d3",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "LAUNCH_ISOLATION_PROCESS_OBLIGATION",
+        "SCHEMA_2_0_NOT_SILENT_V1_DRIFT",
+        "TARGET_FINGERPRINT_KEEPS_UNCHANGED_MEMBERS",
+        "MIXED_V1_V2_AND_HYDRATE_COMPATIBLE",
+        "DATA_STALE_IS_SOURCE_DATA_STALE_ONLY",
+        "SPAN_NORMALIZED_24H_GROWTH",
+        "LEASE_SECONDS_UNCHANGED_120",
+        "NO_HISTORICAL_REWRITE_OR_SCIENTIFIC_DELETE",
+        "DISCLOSED_WRITE_PATH_STILL_FINGERPRINTS_UNIVERSE_PER_TICK",
+        "DISCLOSED_UNKNOWN_GROWTH_STILL_ZERO_INCREMENTAL_FOR_RUNWAY_PREEXISTING",
+        "LIVE_BYTE_AND_TICK_COLLAPSE_NEEDS_COMMISSIONING"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "V2_WRITER_OMITS_UNCHANGED",
+        "V1_READER_KEPT_FAIL_CLOSED",
+        "SEQ_ZERO_ANCHOR_CHECK_FIXED",
+        "MIXED_CHAIN_AND_CORRUPTION_TESTS",
+        "DATA_STALE_NOT_COLLECTOR_STALLED",
+        "GROWTH_SPAN_NORMALIZED",
+        "LEASE_SECONDS_UNCHANGED",
+        "NO_SECRETS_IN_RECEIPTS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SIX_FALSIFIERS_IN_FOCUSED_TESTS",
+        "PUBLISH_RECONSTRUCT_HYDRATE_WATCH_CONSUMERS_HIT",
+        "NON_GOALS_OUT_OF_WRITE_SET",
+        "LIVE_TICK_WALLTIME_LEFT_TO_WRITE_ONLY_COMMISSIONING",
+        "NO_FOLLOWUP_ENGINEERING_TASK"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_HISTORICAL_REWRITE",
+    "NO_CANONICAL_DONE"
+  ]
+}
