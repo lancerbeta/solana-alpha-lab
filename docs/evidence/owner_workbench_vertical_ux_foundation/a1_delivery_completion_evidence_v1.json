@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OWNER-WORKBENCH-VERTICAL-UX-FOUNDATION-COMPLETION-001",
+  "as_of": "2026-09-06",
+  "task_id": "OWNER_WORKBENCH_VERTICAL_UX_FOUNDATION_V1",
+  "state_change": "OWNER_WORKBENCH_VERTICAL_UX_FOUNDATION_PASS",
+  "base_main": "f08effba27125d6e23c0ee4de53c0d1ee2ae0cde",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/OWNER_WORKBENCH_VERTICAL_UX_FOUNDATION_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/owner_workbench_vertical_ux_foundation/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OWNER_WORKBENCH_VERTICAL_UX_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/owner_workbench_vertical_ux_foundation/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FOCUSED_WORKBENCH_SUITE",
+      "PASS_ORDINARY_HYPOTHESIS_CONSUMER",
+      "PASS_OPERATIONS_COCKPIT_CONSUMER"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PROVIDER",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

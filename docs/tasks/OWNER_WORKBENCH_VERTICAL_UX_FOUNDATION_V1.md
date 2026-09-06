@@ -87,7 +87,10 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
     - docs/contracts/smial_visual_operating_system_v1.md
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/owner_workbench_vertical_ux_foundation/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/owner_workbench_vertical_ux_foundation/a1_delivery_independent_review_v1.json
+    - docs/evidence/owner_workbench_vertical_ux_foundation/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
