@@ -11,7 +11,18 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/OWNER_WORKBENCH_VERTICAL_UX_FOUNDATION_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "c303d8c85fc6ad18c16538cce34d3c49f26102ef49813a39149dbd93da3bf357",
+    "docs/contracts/smial_visual_operating_system_v1.md": "db79d28a8f1df22eda61cde5e34a00f65541e7374f5ccceb60a374a7c0341c4a",
+    "docs/reports/owner_workbench_vertical_ux_foundation/a1_owner_readout_v1.md": "ae60cdc2913282425c5044a8feb126f3db7594dd7c48c6b4b0c1c13f0cd26004",
+    "docs/tasks/OWNER_WORKBENCH_VERTICAL_UX_FOUNDATION_V1.md": "f96831ce059ae3b32d6279a87ee4557e78321a67d85f5f5efd8c0d84a0e59f59",
+    "src/solana_alpha_lab/factory/owner_language.py": "ee89b555568cbf2e903f101cf55a87bd421afe48745d81c223d598135242060f",
+    "src/solana_alpha_lab/factory/owner_surface.py": "1fdb5112cd7e20212838881569274fab0633159233721842f750b4430a7b4e1b",
+    "src/solana_alpha_lab/factory/visual_os.py": "a8d997abfd0da6db8a1840f51d4fc4f1f6ef57aefe7ee89773aa72ecdebf8beb",
+    "src/solana_alpha_lab/factory/workbench.py": "b80cd6007dd32ddbe165b0ab4901da6d263f0634f02948f0a39466d3392fd947",
+    "tests/test_factory_ordinary_market_hypothesis.py": "085ee7023b0d3c8b6b1b5030d5c18bdaec4dc371abf391244a00ad5f55a20942",
+    "tests/test_factory_v1_owner_cockpit.py": "c1aef355e5ce24cd4bf0aaa0bc22cc49b047136a4f5073a89c334d67d885f1be",
+    "tests/test_owner_operations_cockpit_v1.py": "a035b3fce7316353fa89b74dd7f5e8b943bfa4205b3b35ad6a8025eb4c9b8282",
+    "tests/test_owner_workbench_vertical_ux_foundation_v1.py": "0fe2de1e626abd1a7440eb19c57a916f752e28a91f65e92150cfcc1441b201fa"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_workbench_vertical_ux_foundation/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "3b4436c75fa2e15c8d6598063e9bb5210297d9b81324e68d60c84430a6f0aeb7",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_WORKBENCH_VERTICAL_UX_SUITE",
     "independent_review": {
       "path": "docs/evidence/owner_workbench_vertical_ux_foundation/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "5a1871729b9fc6c81293d1fd59ae029e6a52c19f58e83da68fa953a4e08be7d6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
