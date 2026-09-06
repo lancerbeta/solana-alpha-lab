@@ -177,9 +177,9 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 self.assertIn("не означает, что система исправна", system)
                 self.assertNotIn("<h1>Система исправна</h1>", system)
                 self.assertIn("Required features", home)
-                home_note = re.search(r"git_archaeology_required=(true|false)", home)
+                home_note = re.search(r"git_archaeology_required=(true|false|UNKNOWN)", home)
                 research_note = re.search(
-                    r"git_archaeology_required=(true|false)", research
+                    r"git_archaeology_required=(true|false|UNKNOWN)", research
                 )
                 self.assertIsNotNone(home_note)
                 self.assertIsNotNone(research_note)
@@ -257,6 +257,8 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
         self.assertIn("HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1", home_html)
         self.assertIn("DO_NOT_PROMOTE", home_html)
         self.assertIn("Required features", home_html)
+        self.assertIn("Не продвигать в стратегию", home_html)
+        missing_ops = _operations_section({"operations": {}})
         missing_ops = _operations_section({"operations": {}})
         self.assertIn("UNKNOWN", missing_ops)
         self.assertNotIn("не приостановлены", missing_ops)

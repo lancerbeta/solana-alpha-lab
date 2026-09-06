@@ -193,6 +193,18 @@ def _rollback_html(rollback: Any) -> str:
     return token_dual(rollback, ROLLBACK_GLOSS, empty="UNKNOWN")
 
 
+def _optional_bool_html(mapping: Mapping[str, Any], key: str) -> str:
+    if key not in mapping:
+        return dual("неизвестно", "UNKNOWN", unknown=True)
+    return canon("true" if mapping.get(key) else "false")
+
+
+def _token_or_unknown(value: Any) -> str:
+    if value is None or value == "":
+        return dual("неизвестно", "UNKNOWN", unknown=True)
+    return canon(value)
+
+
 def _next_action_html(action: str) -> str:
     gloss, canonical, _unknown = token_gloss(NEXT_ACTION_GLOSS, action)
     body = dual(gloss, canonical) if gloss else canon(canonical)
@@ -322,6 +334,13 @@ def _operations_section(model: dict[str, Any]) -> str:
             (surface_copy("OPERATIONS", "entries_paused"), paused_html),
             (surface_copy("OPERATIONS", "exit_required"), cell_html(ops.get("exit_required"))),
             (surface_copy("OPERATIONS", "unresolved"), cell_html(ops.get("unresolved_positions"))),
+            ("unknown_positions", cell_html(ops.get("unknown_positions"))),
+            (
+                "mode",
+                canon(bots[0].get("mode"))
+                if len(bots) == 1
+                else dual("неизвестно", "UNKNOWN", unknown=True),
+            ),
         ]
     )
     commands = (
@@ -618,7 +637,7 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         [
             (
                 research_copy("projection"),
-                canon(view.get("completeness") or "PARTIAL"),
+                _token_or_unknown(view.get("completeness")),
             ),
             (
                 counter_label("ATTENTION"),
@@ -987,7 +1006,11 @@ def _home_section(
     next_html = (
         "<ul>" + "".join(f"<li>{_next_action_html(item)}</li>" for item in next_actions) + "</ul>"
         if next_actions
-        else f"<p>{esc(surface_copy('HOME', 'no_attention'))}</p>"
+        else (
+            f"<p>{_next_action_html(str(model.get('next_safe_action')))}</p>"
+            if model.get("next_safe_action")
+            else f"<p>{esc(shell_copy('safe_state'))}</p>"
+        )
     )
     buttons = "".join(command_button(command) for command in COMMANDS)
     return (
@@ -1002,7 +1025,7 @@ def _home_section(
                 ),
                 (
                     "git_archaeology_required",
-                    canon("true" if cockpit.get("git_archaeology_required") else "false"),
+                    _optional_bool_html(cockpit, "git_archaeology_required"),
                 ),
                 (
                     surface_copy("SYSTEM", "backup"),
@@ -1012,7 +1035,7 @@ def _home_section(
                 ),
                 (
                     surface_copy("SYSTEM", "deployed"),
-                    canon(runtime.get("deploy_version") or ""),
+                    _token_or_unknown(runtime.get("deploy_version")),
                 ),
             ]
         )
@@ -1068,7 +1091,6 @@ def _system_section(runtime: dict[str, Any]) -> str:
     backup_html = _backup_html(runtime.get("backup_status"))
     rollback_html = _rollback_html(runtime.get("local_rollback_snapshot"))
     verdict_html = _verdict_html(runtime.get("verdict"))
-    next_action = str(runtime.get("next_safe_action") or "")
     return (
         fact_strip(
             [
@@ -1078,9 +1100,11 @@ def _system_section(runtime: dict[str, Any]) -> str:
                 (surface_copy("SYSTEM", "verdict"), verdict_html),
                 (
                     surface_copy("SYSTEM", "next"),
-                    _next_action_html(next_action) if next_action else canon(""),
+                    _next_action_html(str(runtime.get("next_safe_action")))
+                    if runtime.get("next_safe_action")
+                    else _token_or_unknown(None),
                 ),
-                (surface_copy("SYSTEM", "deployed"), canon(runtime.get("deploy_version"))),
+                (surface_copy("SYSTEM", "deployed"), _token_or_unknown(runtime.get("deploy_version"))),
             ]
         )
         + f"<p class=\"semantic-warning\">{esc(surface_copy('SYSTEM', 'not_healthy'))}</p>"
@@ -1104,11 +1128,10 @@ def _page(
     notice_html = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
     if notice:
         notice_html += f"<p class=\"notice\">{html.escape(notice)}</p>"
-    archaeology = (
-        "true"
-        if cockpit.get("git_archaeology_required")
-        else "false"
-    )
+    if "git_archaeology_required" in cockpit:
+        archaeology = "true" if cockpit.get("git_archaeology_required") else "false"
+    else:
+        archaeology = "UNKNOWN"
     sections = {
         "HOME": _home_section(model, copy_blocks=copy_blocks or []),
         "RESEARCH": research_html
