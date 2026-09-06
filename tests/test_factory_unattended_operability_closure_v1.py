@@ -101,11 +101,12 @@ class FakeRun:
 
 
 class FakeDrive:
-    def __init__(self, *, fail_copy: bool = False, mismatch: bool = False) -> None:
+    def __init__(self, *, fail_copy: bool = False, mismatch: bool = False, fail_hashsum: bool = False) -> None:
         self.objects: dict[str, bytes] = {}
         self.copy_count = 0
         self.fail_copy = fail_copy
         self.mismatch = mismatch
+        self.fail_hashsum = fail_hashsum
 
     def runner(self, argv: list[str]) -> FakeRun:
         if "copyto" in argv:
@@ -126,6 +127,8 @@ class FakeDrive:
                 return FakeRun(0)
             return FakeRun(1)
         if "hashsum" in argv:
+            if self.fail_hashsum:
+                return FakeRun(1)
             remote = argv[-1]
             payload = self.objects.get(remote)
             if payload is None:
@@ -293,6 +296,30 @@ class ClosedDayDurabilityLoopTests(unittest.TestCase):
             self.assertTrue(result.get("overwrite_forbidden"))
             self.assertEqual(drive.copy_count, 0)
             self.assertEqual(drive.objects[remote], b"not-the-archive")
+
+    def test_unreadable_native_hashsum_still_does_not_overwrite(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _ops_root(tmp)
+            rdp = root / "local/factory_v1/observation_rdp"
+            _seed_day(rdp, "20260905", "MintQ")
+            from solana_alpha_lab.factory.offhost_backup import load_offhost_config
+
+            paths = list_closed_day_relative_paths(rdp, "20260905")
+            packed = package_closed_day_archive(
+                rdp, utc_day="20260905", relative_paths=paths, dest_dir=root / "tmp-q"
+            )
+            offhost = load_offhost_config(root)
+            assert offhost is not None
+            remote = offhost.remote_object(Path(packed["path"]).name)
+            hashed = FakeDrive(fail_hashsum=True)
+            hashed.objects[remote] = b"not-the-archive"
+            hashed_result = process_one_day(
+                root, "20260905", now=NOW, rclone_runner=hashed.runner, allow_drive=True
+            )
+            self.assertEqual(hashed_result["terminal"], "HASH_MISMATCH")
+            self.assertTrue(hashed_result.get("overwrite_forbidden"))
+            self.assertEqual(hashed.objects[remote], b"not-the-archive")
+            self.assertEqual(hashed.copy_count, 0)
 
     def test_seven_day_backlog_oldest_first_catch_up(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

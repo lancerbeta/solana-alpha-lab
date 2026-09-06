@@ -21,6 +21,7 @@ from solana_alpha_lab.factory.hot90_archive import (
 )
 from solana_alpha_lab.factory.hot90_remote_verify import (
     REMOTE_CONTENT_SHA256_VERIFIED,
+    probe_remote_sha256,
     verify_remote_content_sha256,
 )
 from solana_alpha_lab.factory.observation_publication_jobs import iter_open_job_paths
@@ -229,18 +230,6 @@ def _prune_verified_staging(root: Path, keep_sha256: str) -> list[str]:
     return removed
 
 
-def _native_remote_sha(offhost: Any, remote_object: str, runner: RcloneRunner) -> str | None:
-    completed = runner(build_rclone_argv(offhost, "hashsum", "sha256", remote_object))
-    if getattr(completed, "returncode", 1) != 0:
-        return None
-    stdout = getattr(completed, "stdout", "") or ""
-    for line in stdout.splitlines():
-        token = line.strip().split()
-        if token and len(token[0]) == 64 and all(ch in "0123456789abcdef" for ch in token[0]):
-            return token[0]
-    return None
-
-
 def process_one_day(
     root: Path,
     utc_day: str,
@@ -298,7 +287,7 @@ def process_one_day(
     runner = rclone_runner or default_rclone_runner
     archive_path = Path(packed["path"])
     remote_object = offhost.remote_object(archive_path.name)
-    native = _native_remote_sha(offhost, remote_object, runner)
+    native = probe_remote_sha256(config=offhost, remote_object=remote_object, runner=runner)
     if native == local_sha:
         receipt = {
             "kind": RECEIPT_KIND,

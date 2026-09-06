@@ -1,6 +1,7 @@
 [Unit]
 Description=Daily Factory collector owner pulse at 06:15 UTC
-# Template only — do NOT install/enable in COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1.
+# Template only — install/enable only after owner-gated
+# FACTORY_UNATTENDED_OPERABILITY commissioning (not COLLECTOR pulse atom).
 # OnCalendar is deterministic; do not invent a scheduling subsystem.
 
 [Timer]

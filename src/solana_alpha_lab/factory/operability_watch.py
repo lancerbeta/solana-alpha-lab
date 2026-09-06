@@ -23,6 +23,7 @@ WATCH_REQUIRED_TIMERS = (
     "factory-remote-backup.timer",
     "factory-collector-owner-pulse.timer",
     "factory-hot90-closed-day-archive.timer",
+    "factory-operability-watch.timer",
 )
 
 INCIDENT_GRACE_SECONDS = {
@@ -121,13 +122,16 @@ def render_incident_message(
     if isinstance(backup_age, int):
         backup_state = f"{backup_age // 3600}h" if backup_age >= 3600 else f"{backup_age // 60}m"
     else:
-        backup_state = str(packet.get("backup_domain") or "UNKNOWN")
+        backup_state = "UNKNOWN"
+    verified_day = packet.get("immutable_archive_latest_verified_day")
+    if verified_day is None or verified_day == "":
+        verified_day = "UNKNOWN"
     lines = [
         f"FACTORY / {kind} — {state}",
         "",
         f"{code}: {detail}",
         f"Collector: {packet.get('collector_verdict')}",
-        f"Archive: verified={packet.get('immutable_archive_latest_verified_day')} "
+        f"Archive: verified={verified_day} "
         f"backlog={packet.get('immutable_archive_backlog_days')}",
         "",
         "```",
@@ -136,7 +140,7 @@ def render_incident_message(
         f"INCIDENT={code}",
         f"COLLECTOR_STATE={packet.get('activation_state')}",
         f"LIFECYCLE_STATE={packet.get('cohort_readiness_state')}",
-        f"ARCHIVE_LAST_VERIFIED_DAY={packet.get('immutable_archive_latest_verified_day')}",
+        f"ARCHIVE_LAST_VERIFIED_DAY={verified_day}",
         f"ARCHIVE_BACKLOG_DAYS={packet.get('immutable_archive_backlog_days')}",
         f"MUTABLE_BACKUP_STATE={backup_state}",
         f"PROJECTED_97D_BYTES={packet.get('projected_97d_bytes')}",
@@ -261,6 +265,7 @@ def evaluate_operability(
         "present": sorted(present),
         "messages": messages,
         "pending_count": len(still_pending),
+        "preview_messages": [str(item.get("text") or "") for item in still_pending],
         "packet_verdict": packet.get("collector_verdict"),
         "on_calendar_utc": WATCH_ON_CALENDAR,
     }

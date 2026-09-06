@@ -91,8 +91,9 @@ Parser footer fields: `MESSAGE_TYPE`, `STATE`, `INCIDENT`, `COLLECTOR_STATE`,
 - `scripts/collector_owner_pulse.py --mode dry-run` — zero network, zero
   Telegram credential VALUE reads.
 - `scripts/factory_operability_watch.py --mode dry-run --skip-systemd` —
-  no Telegram send and no incident-state write. `--mode emit` persists
-  local incident JSON and may send Telegram.
+  no Telegram send and no incident-state write. Owner cards are in
+  JSON `preview_messages`. `--mode emit` persists local incident JSON
+  and may send Telegram.
 - `scripts/hot90_closed_day_durability.py` is an operator **action** when
   runtime is `DURABILITY_CUTOVER`/`RETENTION_ACTIVE` with Drive writes
   enabled; otherwise typed no-op. Do not use it as a read-only probe.
@@ -129,11 +130,26 @@ content hash.
 
 ## HOW DO I ROLLBACK THE NEW AUTOMATION?
 
-Disable only the new units (`factory-hot90-closed-day-archive`,
-`factory-operability-watch`, `factory-collector-owner-pulse`,
-`factory-external-heartbeat`). Keep receipts,
-source RDP, and HOT90 runtime activation. Restore a previous exact deploy
-SHA if required. Do not “rollback” by deleting runtime truth.
+Disable only the new **timers** (oneshot services have no `[Install]`):
+
+```
+sudo systemctl disable --now factory-hot90-closed-day-archive.timer
+```
+
+```
+sudo systemctl disable --now factory-operability-watch.timer
+```
+
+```
+sudo systemctl disable --now factory-collector-owner-pulse.timer
+```
+
+```
+sudo systemctl disable --now factory-external-heartbeat.timer
+```
+
+Keep receipts, source RDP, and HOT90 runtime activation. Restore a previous
+exact deploy SHA if required. Do not “rollback” by deleting runtime truth.
 
 ## Commissioning (future OPERATE, not this Git change)
 
@@ -141,12 +157,35 @@ SHA if required. Do not “rollback” by deleting runtime truth.
 2. Exact live SHA vs exact merged-target SHA review.
 3. Owner-gated exact-SHA deploy.
 4. Post-deploy HOT90 runtime continuity readback.
-5. Owner-gated install/enable of the new units together:
-   `factory-hot90-closed-day-archive`, `factory-operability-watch`,
-   `factory-collector-owner-pulse`, and optionally `factory-external-heartbeat`
-   (heartbeat stays `NOT_CONFIGURED` until separately authorized).
+5. Owner-gated install/enable of the new **timers** together (heartbeat
+   optional; stays `NOT_CONFIGURED` until separately authorized):
+
+```
+sudo systemctl enable --now factory-hot90-closed-day-archive.timer
+```
+
+```
+sudo systemctl enable --now factory-operability-watch.timer
+```
+
+```
+sudo systemctl enable --now factory-collector-owner-pulse.timer
+```
+
+```
+sudo systemctl enable --now factory-external-heartbeat.timer
+```
+
+That last timer is optional. Skip it unless a heartbeat URL is separately
+authorized.
+
 6. One real eligible closed-day archive → Drive → exact SHA → receipt.
 7. Next scheduled or one real DAILY delivery.
-8. Deterministic incident dry proof.
+8. Incident dry proof (no Telegram, no state write; cards are in
+   `preview_messages`):
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/factory_operability_watch.py --mode dry-run --skip-systemd
+```
 9. Collector/source progression and mutable backup unchanged.
 10. External heartbeat remains `NOT_CONFIGURED` until separately authorized.

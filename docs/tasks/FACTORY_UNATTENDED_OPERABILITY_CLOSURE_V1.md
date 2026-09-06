@@ -24,6 +24,7 @@ objective: >-
 managed_write_set:
   - docs/tasks/FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1.md
   - src/solana_alpha_lab/factory/hot90_archive.py
+  - src/solana_alpha_lab/factory/hot90_remote_verify.py
   - src/solana_alpha_lab/factory/hot90_closed_day_loop.py
   - src/solana_alpha_lab/factory/operability_watch.py
   - src/solana_alpha_lab/factory/external_heartbeat.py
@@ -36,6 +37,7 @@ managed_write_set:
   - configs/factory_remote_operations_v1_1.yaml
   - catalog/schemas/factory_remote_operations_v1_1.schema.json
   - configs/factory_remote_ops/factory-collector-owner-pulse.timer
+  - configs/factory_remote_ops/factory-collector-owner-pulse.service
   - configs/factory_remote_ops/factory-hot90-closed-day-archive.service
   - configs/factory_remote_ops/factory-hot90-closed-day-archive.timer
   - configs/factory_remote_ops/factory-operability-watch.service

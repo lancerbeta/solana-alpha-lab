@@ -23,6 +23,22 @@ RcloneRunner = Callable[[Sequence[str]], Any]
 REMOTE_CONTENT_SHA256_VERIFIED = "REMOTE_CONTENT_SHA256_VERIFIED"
 
 
+def probe_remote_sha256(
+    *,
+    config: OffhostConfig,
+    remote_object: str,
+    runner: RcloneRunner,
+) -> str | None:
+    """Read-only remote digest. None means the object was not readable."""
+    native = _hashsum(config, remote_object, runner, download=False)
+    if native:
+        return native
+    downloaded = _hashsum(config, remote_object, runner, download=True)
+    if downloaded:
+        return downloaded
+    return _copyto_hash(config, remote_object, runner)
+
+
 def verify_remote_content_sha256(
     *,
     config: OffhostConfig,
