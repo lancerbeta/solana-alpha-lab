@@ -6,8 +6,8 @@
   "task_id": "SCIENCE_TO_STRATEGY_HANDOFF_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "0c35a0c393697c155ea975e6423bb92dc49a753a916a2f9ff6d23d75b4fca24b",
+  "reviewed_inventory_sha256": "25635a70fd6b9d984915949fc5df5775df6324f0c508cf4ad52e829af9ba3c92",
   "capability_radar": {
     "now": "NONE",
     "watch": "TRADING_OPERATIONS_WORKBENCH_V2"

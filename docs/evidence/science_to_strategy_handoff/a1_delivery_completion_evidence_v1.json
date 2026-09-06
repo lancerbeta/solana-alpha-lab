@@ -10,7 +10,33 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "README.md": "ffd6ab2f6a2476be116fadf8a919ad33f47ee387c344e47120a8a4b573d75bd4",
+    "catalog/assets/core.yaml": "231125ed1c6bca5876d421704954a76476b36023df875958aff3334163996d10",
+    "catalog/assets/lifecycle.yaml": "79a901d0a10f47d0c46f01f88992ac84c438f92c106f6be7f6830ab97c51e235",
+    "catalog/catalog_manifest.yaml": "7089a9511e63c45830319ab58c38518f53f4c235461acd90a1feade1ef902cde",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "501c0ef06b6d84640c7d1c1e2849745c524c2b97b0bf8aa31f3de1b80d9816ce",
+    "catalog/generated/asset_edges.json": "7584ffb33de54b69214f63b99b73a21ab29d5a3b97aba921774cfb92fdbc29a7",
+    "catalog/schemas/factory_semantic_operability.schema.json": "2fe6fef9fe517c76896b5d529796afed06fa2589b9e76429cc4cfc8acd1142da",
+    "catalog/schemas/promotion_handoff_manifest_v1.schema.json": "b33b7a5c8728360d654ce41c260c3f4436a0da616aaf993d71575ee02d7407fd",
+    "configs/ci_test_shards_v1.json": "453deb51de55265e3cfdc575386516a1fd6af1b1a1465884a9a17510f00de9b7",
+    "configs/factory_semantic_operability_v1.yaml": "74c4048546940c0ccc8922ecf026bb2d6a58b2f2497b83ee172ddb829ecb02ec",
+    "docs/PROJECT_MAP.md": "cb3bfd63fef9f662902fd1cf023976aa7dc028b164a66357c6ac28108ff9453a",
+    "docs/contracts/experiment_evidence_decision_v1.md": "155cee013011939295e3b0a16396d95dc8663a6ab511133c7b109d3c54b9e861",
+    "docs/contracts/owner_lifecycle_projection_spine_v1.md": "e8ac3786b8caa1e3a8e8e585e0de86c4272c1d2611b4a8a96380080cd2d80387",
+    "docs/contracts/research_lifecycle_workbench_v1.md": "4bf166e78a607f90f18009d47f10db317ba7bba679d6140568103f05b590f988",
+    "docs/contracts/science_to_strategy_handoff_v1.md": "39bb7c961d7a59b5159cc62205ec49f1839154ff39bdee33102ba3a12388a438",
+    "docs/reports/science_to_strategy_handoff/a1_owner_readout_v1.md": "6c6e231aada9855109c6a21f3a556a6484fd6b7fdd0ba72ced0be188f87eacdf",
+    "docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md": "9e9a1b2d4aa28be11d0705bcbe31780e0a28cf331ccb23b3c5da81d00958c60e",
+    "src/solana_alpha_lab/factory/application.py": "5aabbeac71fd95d73ee191fc618f706f6443fa55b8be2ca7fec9f9d5edffc03c",
+    "src/solana_alpha_lab/factory/experiment_evidence.py": "314d80154e0201d71bedd70653bb3dcd4145c28c3ae6c4ac4e78a49a59a29371",
+    "src/solana_alpha_lab/factory/lifecycle_projection.py": "1ad24507f38abee632c10ebb3bea9cb54c6b6271545ae6e3b37137c94c928bc1",
+    "src/solana_alpha_lab/factory/owner_language.py": "f7bc857232e4933e944465e907c77f6e3deb3aa2fe778dfd65db1c96b04ca434",
+    "src/solana_alpha_lab/factory/promotion_handoff.py": "c910b2a406c77c6e514f9d57f74fe763405e8dc3c3b4837c7b348fd6752d33c1",
+    "src/solana_alpha_lab/factory/research_workbench.py": "29323bccc865ce8064b0207c10cc6fa1fff0a89322b85cc12d4c57d7df140b81",
+    "src/solana_alpha_lab/factory/workbench.py": "2dd0438963ba51268cebffc2148394013f5845d53893e88c7d3580469cd15938",
+    "tests/test_science_to_strategy_handoff_v1.py": "15e829d384bbb3ed7a180041e59560c151cdc35d22387d511d3e885d581c045e"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/science_to_strategy_handoff/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "6eee000131fcef401e905223d1b80bfacd6c6762702228c9a6320ff3a92ad918",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SCIENCE_TO_STRATEGY_HANDOFF_V1",
     "independent_review": {
       "path": "docs/evidence/science_to_strategy_handoff/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "692c80aac7be40cfaba4bd59fb80327a5b2729727008f8fe5d183245b86d3e2a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
