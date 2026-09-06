@@ -23,6 +23,7 @@ managed_write_set:
 - scripts/harness_sync.py
 - tests/test_harness_sync.py
 - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
+- docs/evidence/control/delivery_harness_acceptance_v1.json
 - catalog/catalog_manifest.yaml
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml
