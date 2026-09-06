@@ -118,7 +118,7 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                     self.assertNotIn(f"<h1>{GENERIC_H1}</h1>", body, path)
                     self.assertNotIn("i18next", body)
                     self.assertNotIn("gettext", body)
-                for path in ("/", "/operations", "/economics", "/system"):
+                for path in HEADINGS:
                     self.assertIn("details class=\"technical\"", pages[path], path)
                 home = pages["/"]
                 self.assertIn("WHY_NOW", home)
@@ -132,9 +132,19 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 self.assertIn("Активно сейчас", research)
                 self.assertIn(research_copy("source"), research)
                 self.assertIn(research_copy("universe"), research)
+                self.assertEqual(research.count("<h1>Исследования</h1>"), 1)
+                self.assertNotIn("<h2>Исследования</h2>", research)
                 operations = pages["/operations"]
                 self.assertIn("Команды оператора", operations)
                 self.assertNotIn(">Bots<", operations)
+                self.assertLess(
+                    operations.find("<h2>Внимание</h2>"),
+                    operations.find("<h2>Позиции</h2>"),
+                )
+                self.assertLess(
+                    operations.find("<h2>Позиции</h2>"),
+                    operations.find("<h2>Команды оператора</h2>"),
+                )
                 for command in OPERATOR_COMMANDS:
                     self.assertRegex(
                         operations,

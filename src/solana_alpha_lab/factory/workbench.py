@@ -305,23 +305,23 @@ def _operations_section(model: dict[str, Any]) -> str:
     )
     return (
         summary
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'bots'))}</h2>"
-        + "<table><tr><th>bot</th><th>strategy</th><th>mode</th>"
-        "<th>status</th><th>entries_paused</th><th>activation_epoch</th></tr>"
-        + bot_rows
-        + "</table>"
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'positions'))}</h2>"
-        + _position_table(list(ops.get("position_rows") or []))
         + f"<h2>{esc(surface_copy('OPERATIONS', 'attention'))}</h2>"
         + _attention(
             list(ops.get("attention") or []),
             empty=surface_copy("OPERATIONS", "no_attention"),
         )
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'positions'))}</h2>"
+        + _position_table(list(ops.get("position_rows") or []))
         + f"<h2>{esc(surface_copy('OPERATIONS', 'commands'))}</h2>"
         + bot_warning
         + commands
         + technical(
-            "<table>"
+            f"<h3>{esc(surface_copy('OPERATIONS', 'bots'))}</h3>"
+            + "<table><tr><th>bot</th><th>strategy</th><th>mode</th>"
+            "<th>status</th><th>entries_paused</th><th>activation_epoch</th></tr>"
+            + bot_rows
+            + "</table>"
+            + "<table>"
             + mapping_rows(
                 {
                     "open_positions": ops.get("open_positions"),
@@ -548,13 +548,8 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
     filters = view.get("filters") if isinstance(view.get("filters"), dict) else {}
     q = html.escape(str(filters.get("q") or ""))
     kind = html.escape(str(filters.get("kind") or "all"))
-    return (
-        "<section class=\"research-overview\">"
-        f"<h2>{html.escape(research_copy('title'))}</h2>"
-        f"<p>{html.escape(research_copy('projection'))} "
-        f"{html.escape(str(view.get('completeness') or 'PARTIAL'))}</p>"
-        + degraded
-        + "<table class=\"source-panel\">"
+    source_table = (
+        "<table class=\"source-panel\">"
         + "<tr><th>"
         + html.escape(research_copy("source"))
         + "</th><th>"
@@ -568,6 +563,37 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         + "</th></tr>"
         + sources
         + "</table>"
+    )
+    facts = fact_strip(
+        [
+            (
+                research_copy("projection"),
+                canon(view.get("completeness") or "PARTIAL"),
+            ),
+            (
+                counter_label("ATTENTION"),
+                esc(counters.get("ATTENTION"))
+                if counters.get("ATTENTION") is not None
+                else dual(research_copy("not_available"), "UNKNOWN", unknown=True),
+            ),
+            (
+                counter_label("GAPS"),
+                esc(counters.get("GAPS"))
+                if counters.get("GAPS") is not None
+                else dual(research_copy("not_available"), "UNKNOWN", unknown=True),
+            ),
+            (
+                counter_label("ACTIVE NOW"),
+                esc(counters.get("ACTIVE NOW"))
+                if counters.get("ACTIVE NOW") is not None
+                else dual(research_copy("not_available"), "UNKNOWN", unknown=True),
+            ),
+        ]
+    )
+    return (
+        "<section class=\"research-overview\">"
+        + facts
+        + degraded
         + "<div class=\"counters\">"
         + "".join(
             _counter_cell(counter_label(label), counters.get(label))
@@ -603,6 +629,7 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         + f"<input type=\"hidden\" name=\"kind\" value=\"{kind}\">"
         + f"<button type=\"submit\">{html.escape(research_copy('search'))}</button></form>"
         + _research_rows(list(view.get("universe") or []))
+        + technical(source_table, title=surface_copy("RESEARCH", "sources"))
         + "</section>"
     )
 
