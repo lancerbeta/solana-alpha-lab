@@ -562,6 +562,17 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             )
             self.assertEqual(typed["handoff_state"], "BLOCKED")
             self.assertIn("EXECUTION_INPUT_GAP", typed["blocker_codes"])
+            non_finite = dict(EXECUTION_INPUTS)
+            non_finite["notional_usd"] = float("nan")
+            naned = materialize_strategy_candidate(
+                root=ROOT,
+                manifest=manifest,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                execution_inputs=non_finite,
+            )
+            self.assertEqual(naned["handoff_state"], "BLOCKED")
+            self.assertIn("EXECUTION_INPUT_GAP", naned["blocker_codes"])
 
     def test_overview_ready_is_not_available(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -640,6 +651,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 manifest=manifest,
                 execution_inputs=EXECUTION_INPUTS,
                 decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
                 existing_blockers=["EVIDENCE_HASH_CONFLICT"],
             )
             self.assertEqual(check["handoff_state"], "MATERIALIZED")
@@ -710,6 +722,61 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                     decision_event_id=event_id,
                 )
             self.assertEqual(str(lineage.exception), "HANDOFF_MANIFEST_INVALID")
+            titled = dict(candidate)
+            titled["title"] = "OTHER-TITLE"
+            unsigned_title = {
+                key: value for key, value in titled.items() if key != "spec_sha256"
+            }
+            titled["spec_sha256"] = canonical_spec_sha256(unsigned_title)
+            with self.assertRaises(PromotionHandoffError) as science:
+                verify_strategy_version(
+                    ROOT,
+                    titled,
+                    manifest=manifest,
+                    decision_event_id=event_id,
+                )
+            self.assertEqual(str(science.exception), "HANDOFF_MANIFEST_INVALID")
+
+    def test_check_mismatch_does_not_report_materialized(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            recorded = _promote(app)
+            event_id = recorded["decision_result"]["decision_event_id"]
+            manifest = _stored_manifest(store, event_id)
+            schema_root = _schema_root(Path(tmp) / "git")
+            candidate = render_strategy_version(
+                root=ROOT,
+                manifest=manifest,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                execution_inputs=EXECUTION_INPUTS,
+            )
+            (schema_root / "configs" / "strategies" / "replay.yaml").write_text(
+                yaml.safe_dump(candidate, sort_keys=False, allow_unicode=True),
+                encoding="utf-8",
+            )
+            missing_clock = check_materialization(
+                root=schema_root,
+                manifest=manifest,
+                execution_inputs=EXECUTION_INPUTS,
+                decision_event_id=event_id,
+            )
+            self.assertEqual(missing_clock["handoff_state"], "BLOCKED")
+            self.assertIn("HANDOFF_MANIFEST_INVALID", missing_clock["blocker_codes"])
+            self.assertIsNone(missing_clock["strategy_identity"])
+            wrong_clock = check_materialization(
+                root=schema_root,
+                manifest=manifest,
+                execution_inputs=EXECUTION_INPUTS,
+                decision_event_id=event_id,
+                created_at="2020-01-01T00:00:00Z",
+            )
+            self.assertEqual(wrong_clock["handoff_state"], "BLOCKED")
+            self.assertIn("HANDOFF_MANIFEST_INVALID", wrong_clock["blocker_codes"])
+            self.assertIsNone(wrong_clock["strategy_identity"])
 
     def test_semantic_gold_query(self) -> None:
         projection = load_semantic_projection(ROOT)

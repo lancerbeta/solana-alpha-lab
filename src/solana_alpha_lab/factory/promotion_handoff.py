@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -303,6 +304,8 @@ def _parse_execution_inputs(inputs: Mapping[str, Any] | None) -> dict[str, Any] 
         return None
     if type(notional) not in (int, float) or type(notional) is bool:
         return None
+    if not math.isfinite(float(notional)):
+        return None
     if type(fee) is not int or fee < 0:
         return None
     if type(positions) is not int or positions < 1:
@@ -365,6 +368,27 @@ def _lookup_strategy(
     return None
 
 
+def _science_lineage_matches(existing: Mapping[str, Any], manifest: Mapping[str, Any]) -> bool:
+    refs = existing.get("source_hypothesis_refs")
+    if not isinstance(refs, list) or len(refs) != 1:
+        return False
+    try:
+        expected_id = strategy_id_from_experiment(str(manifest["experiment_id"]))
+    except PromotionHandoffError:
+        return False
+    return (
+        str(existing.get("strategy_id") or "") == expected_id
+        and str(existing.get("strategy_version") or "") == "V1"
+        and str(existing.get("title") or "") == str(manifest["experiment_id"])
+        and [str(item) for item in refs] == [str(manifest["hypothesis_version_id"])]
+        and str(existing.get("population_ref") or "") == str(manifest["population_ref"])
+        and str(existing.get("source_decision_asset_id") or "") == str(
+            manifest["decision_event_id"]
+        )
+        and str(existing.get("created_at") or "") == str(manifest["decision_effective_at"])
+    )
+
+
 def _strategy_relation(
     *,
     root: Path,
@@ -372,6 +396,7 @@ def _strategy_relation(
     strategy_version: str,
     decision_event_id: str | None,
     candidate: Mapping[str, Any] | None,
+    manifest: Mapping[str, Any] | None = None,
 ) -> tuple[str | None, str | None, list[str]]:
     identity = f"{strategy_id}@{strategy_version}"
     try:
@@ -398,6 +423,8 @@ def _strategy_relation(
         return identity, "CONFLICT", ["STRATEGY_CONTENT_CONFLICT"]
     source = str(existing.get("source_decision_asset_id") or "")
     if decision_event_id and source == decision_event_id:
+        if manifest is not None and not _science_lineage_matches(existing, manifest):
+            return identity, "CONFLICT", ["STRATEGY_CONTENT_CONFLICT"]
         return identity, "MATERIALIZED", []
     return identity, "CONFLICT", ["STRATEGY_IDENTITY_CONFLICT"]
 
@@ -422,12 +449,19 @@ def check_materialization(
             "strategy_version": None,
             "strategy_identity": None,
         }
-    if not _require_bound_decision(manifest, decision_event_id):
-        blockers.append("HANDOFF_MANIFEST_INVALID")
-    if created_at is not None and str(manifest.get("decision_effective_at") or "") != str(
-        created_at
+    if (
+        not decision_event_id
+        or created_at is None
+        or not _require_bound_decision(manifest, decision_event_id)
+        or str(manifest.get("decision_effective_at") or "") != str(created_at)
     ):
-        blockers.append("HANDOFF_MANIFEST_INVALID")
+        return {
+            "handoff_state": "BLOCKED",
+            "blocker_codes": sorted(set([*blockers, "HANDOFF_MANIFEST_INVALID"])),
+            "strategy_id": None,
+            "strategy_version": None,
+            "strategy_identity": None,
+        }
     strategy_id = strategy_id_from_experiment(str(manifest["experiment_id"]))
     identity, state, collision = _strategy_relation(
         root=root,
@@ -435,6 +469,7 @@ def check_materialization(
         strategy_version="V1",
         decision_event_id=decision_event_id,
         candidate=None,
+        manifest=manifest,
     )
     blockers.extend(collision)
     if state == "CONFLICT":
@@ -550,6 +585,8 @@ def verify_strategy_version(
     ):
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
     if str(validated.get("created_at") or "") != str(manifest["decision_effective_at"]):
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    if not _science_lineage_matches(validated, manifest):
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
     return validated
 
