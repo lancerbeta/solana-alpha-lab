@@ -135,6 +135,144 @@ STATUS_GLOSS = {
     "UNKNOWN": "неизвестно",
     "CONFLICT": "конфликт",
     "NOT_APPLICABLE": "не применимо",
+    "EMPTY": "пусто",
+    "KNOWN": "известно",
+    "AVAILABLE": "доступен",
+    "INVALID": "недействителен",
+    "NOT_PRESENT": "отсутствует",
+    "PARTIAL": "частично",
+}
+
+KIND_LABELS = {
+    "DECISION": "Решение",
+    "EXPERIMENT_SPEC": "Эксперимент",
+    "EXPERIMENT": "Эксперимент",
+    "TRIAL": "Проверка",
+    "NEGATIVE_RESULT": "Отрицательный результат",
+    "HYPOTHESIS": "Гипотеза",
+    "SOURCE": "Источник",
+}
+
+SHELL_COPY = {
+    "note": (
+        "Локальная проекция. UI не владеет научной истиной. "
+        "Команды на экране не подставляют owner phrase и не вызывают Jupiter."
+    ),
+    "copy": "Копировать",
+    "copied": "Скопировано",
+    "technical": "Технические детали",
+    "full_legacy": "Полный исходный текст (legacy EN)",
+    "safe_state": "Сейчас безопасно: отдельных срочных действий нет.",
+    "generic_error": "Источник вернул ошибку. Точный текст сохранён в технических деталях.",
+}
+
+SURFACE_COPY = {
+    "HOME": {
+        "h1": "Главная",
+        "question": "Что сейчас действительно требует моего внимания?",
+        "attention": "Что требует внимания",
+        "known": "Что известно",
+        "next": "Следующее безопасное действие",
+        "phrase": "Точные команды владельца",
+        "cycle_commands": "Технические команды цикла",
+        "packet": "Пакет / признаки",
+        "features": "Требуемые признаки",
+        "health": "Краткий статус системы",
+        "recent": "Недавние изменения",
+        "no_attention": "Отдельных пунктов внимания нет.",
+        "no_recent": "Недавних событий исполнения нет.",
+        "phrase_not_urgent": (
+            "Фраза ниже — точный текст для чата, не срочная кнопка этого экрана."
+        ),
+    },
+    "RESEARCH": {
+        "h1": "Исследования",
+        "question": "Что мы проверяем / что знаем / что мне решать?",
+    },
+    "OPERATIONS": {
+        "h1": "Операции",
+        "question": "Что работает, какой риск открыт и что я могу безопасно сделать?",
+        "summary": "Сводка",
+        "bots": "Боты",
+        "counts": "Счётчики",
+        "positions": "Позиции",
+        "attention": "Внимание",
+        "recent": "Недавние изменения",
+        "commands": "Команды оператора",
+        "no_bots": "Нет ботов.",
+        "no_positions": "Нет позиций.",
+        "no_attention": "Пунктов внимания нет.",
+        "no_recent": "Недавних событий исполнения нет.",
+        "need_one_bot": "Команды оператора требуют ровно один экземпляр бота.",
+        "bots_count": "Боты",
+        "open_positions": "Открытые позиции",
+        "entries_paused": "Новые входы",
+        "paused": "приостановлены",
+        "not_paused": "не приостановлены",
+        "exit_required": "Требуется выход",
+        "unresolved": "Неразрешённые",
+        "pause_entries": "Приостановить новые входы",
+        "resume_entries": "Возобновить новые входы",
+        "close_one": "Закрыть одну позицию",
+        "close_all": "Закрыть все позиции",
+        "stop_bot": "Остановить бота",
+        "confirm_close_all": "Подтверждаю REQUEST_CLOSE_ALL против показанного снимка открытых позиций",
+        "bulk": "Массовые / стоп (локальное подтверждение)",
+        "position_id": "position_id",
+        "idempotency": "idempotency_key",
+        "snapshot": "Снимок открытых позиций",
+    },
+    "ECONOMICS": {
+        "h1": "Экономика",
+        "question": "Есть ли уже экономический результат и насколько ему можно доверять?",
+        "pnl": "Подтверждённый PnL",
+        "evidence": "Класс доказательств",
+        "known_count": "Известных",
+        "unknown_count": "Неизвестных",
+        "exposure": "Открытая экспозиция",
+        "drawdown": "Просадка",
+        "streak": "Серия убытков",
+        "non_claims": "Явные non-claims",
+        "all_unknown": "Экономический результат сейчас неизвестен. Это не ноль.",
+        "not_zero": "Отсутствующие live-метрики не показываются как $0.",
+        "model": "Модель PAPER/SHADOW",
+    },
+    "SYSTEM": {
+        "h1": "Система",
+        "question": "Система сейчас в каком состоянии и что не доказано?",
+        "process": "Процесс",
+        "process_up": "запущен",
+        "process_down": "не подтверждён",
+        "backup": "Бэкап",
+        "backup_unproven": "не подтверждён",
+        "rollback": "Rollback snapshot",
+        "rollback_missing": "отсутствует",
+        "verdict": "Общий статус",
+        "next": "Следующее действие",
+        "not_healthy": "Запущенный процесс не означает, что система исправна.",
+        "deployed": "Развёрнутая версия",
+        "runtime": "Точные runtime-значения",
+    },
+}
+
+ATTENTION_LABELS = {
+    "WHY_NOW": "Почему сейчас",
+    "IMPACT": "Влияние",
+    "EVIDENCE": "Доказательства",
+    "NEXT_SAFE_ACTION": "Следующее безопасное действие",
+}
+
+COMMAND_LABELS = {
+    "PAUSE_NEW_ENTRIES": "Приостановить новые входы",
+    "RESUME_NEW_ENTRIES": "Возобновить новые входы",
+    "REQUEST_CLOSE_POSITION": "Закрыть одну позицию",
+    "REQUEST_CLOSE_ALL": "Закрыть все позиции",
+    "STOP_BOT": "Остановить бота",
+    "FREEZE": "Заморозить",
+    "START": "Старт",
+    "STOP": "Стоп",
+    "PARK": "Парковка",
+    "RECORD_DECISION": "Записать решение",
 }
 
 FIELD_LABELS = {
@@ -255,3 +393,28 @@ def owner_error(code: str, details: str | None = None) -> str:
     if details and details != code:
         return f"{message}{suffix}: {details}"
     return f"{message}{suffix}"
+
+
+def surface_copy(surface: str, key: str) -> str:
+    block = SURFACE_COPY.get(surface) or {}
+    return str(block.get(key) or key)
+
+
+def shell_copy(key: str) -> str:
+    return SHELL_COPY.get(key, key)
+
+
+def kind_label(kind: str) -> str:
+    return KIND_LABELS.get(kind, kind)
+
+
+def attention_label(key: str) -> str:
+    return ATTENTION_LABELS.get(key, key)
+
+
+def command_label(value: str) -> str:
+    return COMMAND_LABELS.get(value, value)
+
+
+def status_gloss(status: str) -> str | None:
+    return STATUS_GLOSS.get(str(status or "UNKNOWN"))

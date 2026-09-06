@@ -12,20 +12,40 @@ from uuid import uuid4
 from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 from solana_alpha_lab.factory.owner_language import (
+    attention_label,
     counter_label,
     decision_kind_label,
     field_label,
+    kind_label,
     nav_label,
     obligation_label,
     owner_error,
     research_copy,
+    shell_copy,
     status_display,
+    surface_copy,
+)
+from solana_alpha_lab.factory.owner_surface import (
+    canon,
+    command_button,
+    compact_title,
+    dual,
+    esc,
+    fact_strip,
+    mapping_rows,
+    page_head,
+    status_html,
+    technical,
 )
 from solana_alpha_lab.factory.research_workbench import (
     ResearchWorkbenchError,
     parse_locator,
 )
-from solana_alpha_lab.factory.visual_os import visual_os_css, visual_os_consumed
+from solana_alpha_lab.factory.visual_os import (
+    visual_os_css,
+    visual_os_consumed,
+    visual_os_layout_css,
+)
 
 COMMANDS = ("FREEZE", "START", "STOP", "PARK", "RECORD_DECISION")
 OPERATOR_COMMANDS = (
@@ -81,7 +101,7 @@ def _copy_sections(blocks: list[dict[str, str]]) -> str:
             "<section class=\"copy-block\">"
             f"<div class=\"copy-head\"><h2>{html.escape(block['title'])}</h2>"
             f"<button type=\"button\" class=\"copy-btn\" data-copy-target=\"{html.escape(block['id'])}\">"
-            "Копировать</button></div>"
+            f"{html.escape(shell_copy('copy'))}</button></div>"
             f"<pre id=\"{html.escape(block['id'])}\" class=\"copy-text\">{html.escape(block['text'])}</pre>"
             "</section>"
         )
@@ -101,7 +121,7 @@ def _nav(active: str) -> str:
         )
     return (
         "<aside class=\"signal-rail\" data-mode=\"STEEL_SIGNAL\">"
-        "<p class=\"brand\">SMIAL</p>"
+        "<p class=\"brand\">Factory v1</p>"
         "<nav>" + "".join(links) + "</nav></aside>"
     )
 
@@ -150,35 +170,41 @@ def _pnl_cell(row: dict[str, Any]) -> str:
     return str(row.get("net_pnl_usd"))
 
 
-def _attention(items: list[dict[str, Any]]) -> str:
+def _attention(items: list[dict[str, Any]], *, empty: str) -> str:
     if not items:
-        return "<p>Нет attention items.</p>"
+        return f"<p>{esc(empty)}</p>"
     cards = []
     for item in items:
+        code = str(item.get("id") or item.get("code") or "")
+        next_action = _cell(item.get("NEXT_SAFE_ACTION"))
         cards.append(
             "<article class=\"attention\">"
-            f"<h3>{html.escape(str(item.get('id') or item.get('code') or ''))}</h3>"
+            f"<h3>{canon(code)}</h3>"
             "<table>"
-            f"<tr><th>WHY_NOW</th><td>{html.escape(_cell(item.get('WHY_NOW')))}</td></tr>"
-            f"<tr><th>IMPACT</th><td>{html.escape(_cell(item.get('IMPACT')))}</td></tr>"
-            f"<tr><th>EVIDENCE</th><td>{html.escape(_cell(item.get('EVIDENCE')))}</td></tr>"
-            f"<tr><th>NEXT_SAFE_ACTION</th><td>{html.escape(_cell(item.get('NEXT_SAFE_ACTION')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
+            f"<td>{esc(_cell(item.get('WHY_NOW')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
+            f"<td>{esc(_cell(item.get('IMPACT')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
+            f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
+            f"<td>{esc(next_action)}</td></tr>"
             "</table></article>"
         )
     return "".join(cards)
 
 
-def _recent_changes(items: list[dict[str, Any]]) -> str:
+def _recent_changes(items: list[dict[str, Any]], *, empty: str) -> str:
     if not items:
-        return "<p>Нет недавних execution/command events.</p>"
+        return f"<p>{esc(empty)}</p>"
     rows = []
     for item in items:
         rows.append(
             "<tr>"
-            f"<td>{html.escape(str(item.get('created_at') or ''))}</td>"
-            f"<td>{html.escape(str(item.get('event_type') or ''))}</td>"
-            f"<td>{html.escape(str(item.get('position_id') or ''))}</td>"
-            f"<td>{html.escape(_cell(item.get('payload')))}</td>"
+            f"<td class=\"mono\">{esc(item.get('created_at') or '')}</td>"
+            f"<td class=\"mono\">{esc(item.get('event_type') or '')}</td>"
+            f"<td class=\"mono\">{esc(item.get('position_id') or '')}</td>"
+            f"<td class=\"mono\">{esc(_cell(item.get('payload')))}</td>"
             "</tr>"
         )
     return (
@@ -219,98 +245,176 @@ def _position_table(rows: list[dict[str, Any]]) -> str:
 def _operations_section(model: dict[str, Any]) -> str:
     ops = model.get("operations") if isinstance(model.get("operations"), dict) else {}
     bots = ops.get("bots") if isinstance(ops.get("bots"), list) else []
+    paused = bool(ops.get("entries_paused"))
     bot_rows = "".join(
         "<tr>"
-        f"<td>{html.escape(str(bot.get('bot_instance_id') or ''))}</td>"
-        f"<td>{html.escape(str(bot.get('strategy_id') or ''))}</td>"
-        f"<td>{html.escape(str(bot.get('mode') or ''))}</td>"
-        f"<td>{html.escape(str(bot.get('status') or ''))}</td>"
-        f"<td>{html.escape(str(bool(int(bot.get('entries_paused') or 0))))}</td>"
-        f"<td>{html.escape(str(bot.get('activation_epoch_id') or ''))}</td>"
+        f"<td class=\"mono\">{esc(bot.get('bot_instance_id') or '')}</td>"
+        f"<td class=\"mono\">{esc(bot.get('strategy_id') or '')}</td>"
+        f"<td>{canon(bot.get('mode'))}</td>"
+        f"<td>{canon(bot.get('status'))}</td>"
+        f"<td>{esc(bot.get('entries_paused'))}</td>"
+        f"<td class=\"mono\">{esc(bot.get('activation_epoch_id') or '')}</td>"
         "</tr>"
         for bot in bots
         if isinstance(bot, dict)
-    ) or "<tr><td colspan=\"6\">NONE</td></tr>"
+    ) or f"<tr><td colspan=\"6\">{esc(surface_copy('OPERATIONS', 'no_bots'))}</td></tr>"
     snapshot = str(ops.get("open_position_set_sha256") or "")
     bot_id = str(ops.get("bot") or "")
     bot_warning = ""
     if len(bots) != 1:
         bot_id = ""
         bot_warning = (
-            "<p class=\"error\">Operator commands require exactly one bot instance.</p>"
+            f"<p class=\"error\">{esc(surface_copy('OPERATIONS', 'need_one_bot'))}</p>"
         )
+    paused_html = dual(
+        surface_copy("OPERATIONS", "paused" if paused else "not_paused"),
+        "true" if paused else "false",
+        unknown=False,
+    )
+    summary = fact_strip(
+        [
+            (surface_copy("OPERATIONS", "bots_count"), esc(len(bots))),
+            (surface_copy("OPERATIONS", "open_positions"), esc(ops.get("open_positions"))),
+            (surface_copy("OPERATIONS", "entries_paused"), paused_html),
+            (surface_copy("OPERATIONS", "exit_required"), esc(ops.get("exit_required"))),
+            (surface_copy("OPERATIONS", "unresolved"), esc(ops.get("unresolved_positions"))),
+        ]
+    )
+    commands = (
+        "<form method=\"post\" action=\"/operations\" class=\"ops-form control-zone\" "
+        "data-mode=\"CONTROL_SURFACE\">"
+        + f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{esc(bot_id)}\">"
+        + f"<input type=\"hidden\" name=\"expected_open_position_set_sha256\" value=\"{esc(snapshot)}\">"
+        + f"<p><label>{esc(surface_copy('OPERATIONS', 'position_id'))} "
+        + "<input name=\"position_id\"></label></p>"
+        + f"<p><label>{esc(surface_copy('OPERATIONS', 'idempotency'))} "
+        + "<input name=\"idempotency_key\" "
+        + f"value=\"{esc('WB-' + uuid4().hex[:12].upper())}\"></label></p>"
+        + "<p class=\"safe-actions\">"
+        + command_button("PAUSE_NEW_ENTRIES")
+        + command_button("RESUME_NEW_ENTRIES")
+        + command_button("REQUEST_CLOSE_POSITION")
+        + "</p>"
+        + "<fieldset class=\"danger-zone danger\">"
+        + f"<legend>{esc(surface_copy('OPERATIONS', 'bulk'))}</legend>"
+        + "<p><label><input type=\"checkbox\" name=\"confirm_close_all\" value=\"1\"> "
+        + f"{esc(surface_copy('OPERATIONS', 'confirm_close_all'))}</label></p>"
+        + command_button("REQUEST_CLOSE_ALL")
+        + command_button("STOP_BOT")
+        + "</fieldset></form>"
+    )
     return (
-        "<h2>Bots</h2><table><tr><th>bot</th><th>strategy</th><th>mode</th>"
+        summary
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'bots'))}</h2>"
+        + "<table><tr><th>bot</th><th>strategy</th><th>mode</th>"
         "<th>status</th><th>entries_paused</th><th>activation_epoch</th></tr>"
         + bot_rows
         + "</table>"
-        + "<h2>Counts</h2><table>"
-        + _rows(
-            {
-                "open_positions": ops.get("open_positions"),
-                "partial_positions": ops.get("partial_positions"),
-                "unknown_positions": ops.get("unknown_positions"),
-                "exit_required": ops.get("exit_required"),
-                "unresolved_positions": ops.get("unresolved_positions"),
-                "entries_paused": ops.get("entries_paused"),
-                "open_position_set_sha256": snapshot,
-            }
-        )
-        + "</table>"
-        + "<h2>Positions</h2>"
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'positions'))}</h2>"
         + _position_table(list(ops.get("position_rows") or []))
-        + "<h2>Attention</h2>"
-        + _attention(list(ops.get("attention") or []))
-        + "<h2>Recent changes</h2>"
-        + _recent_changes(list(model.get("recent_changes") or []))
-        + "<h2>Operator commands</h2>"
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'attention'))}</h2>"
+        + _attention(
+            list(ops.get("attention") or []),
+            empty=surface_copy("OPERATIONS", "no_attention"),
+        )
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'commands'))}</h2>"
         + bot_warning
-        + "<form method=\"post\" action=\"/operations\" class=\"ops-form\">"
-        + f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{html.escape(bot_id)}\">"
-        + f"<input type=\"hidden\" name=\"expected_open_position_set_sha256\" value=\"{html.escape(snapshot)}\">"
-        + "<p><label>position_id <input name=\"position_id\"></label></p>"
-        + "<p><label>idempotency_key <input name=\"idempotency_key\" "
-        + f"value=\"{html.escape('WB-' + uuid4().hex[:12].upper())}\"></label></p>"
-        + "<p class=\"safe-actions\">"
-        + "<button type=\"submit\" name=\"command\" value=\"PAUSE_NEW_ENTRIES\">PAUSE_NEW_ENTRIES</button>"
-        + "<button type=\"submit\" name=\"command\" value=\"RESUME_NEW_ENTRIES\">RESUME_NEW_ENTRIES</button>"
-        + "<button type=\"submit\" name=\"command\" value=\"REQUEST_CLOSE_POSITION\">REQUEST_CLOSE_POSITION</button>"
-        + "</p>"
-        + "<fieldset class=\"danger\">"
-        + "<legend>Bulk / stop (local confirmation)</legend>"
-        + "<p><label><input type=\"checkbox\" name=\"confirm_close_all\" value=\"1\"> "
-        + "Confirm REQUEST_CLOSE_ALL against the rendered open-position snapshot</label></p>"
-        + "<button type=\"submit\" name=\"command\" value=\"REQUEST_CLOSE_ALL\">REQUEST_CLOSE_ALL</button>"
-        + "<button type=\"submit\" name=\"command\" value=\"STOP_BOT\">STOP_BOT</button>"
-        + "</fieldset></form>"
+        + commands
+        + technical(
+            "<table>"
+            + mapping_rows(
+                {
+                    "open_positions": ops.get("open_positions"),
+                    "partial_positions": ops.get("partial_positions"),
+                    "unknown_positions": ops.get("unknown_positions"),
+                    "exit_required": ops.get("exit_required"),
+                    "unresolved_positions": ops.get("unresolved_positions"),
+                    "entries_paused": ops.get("entries_paused"),
+                    "open_position_set_sha256": snapshot,
+                }
+            )
+            + "</table>"
+            + f"<h3>{esc(surface_copy('OPERATIONS', 'recent'))}</h3>"
+            + _recent_changes(
+                list(model.get("recent_changes") or []),
+                empty=surface_copy("OPERATIONS", "no_recent"),
+            ),
+            title=surface_copy("OPERATIONS", "snapshot"),
+        )
     )
 
 
 def _economics_section(model: dict[str, Any]) -> str:
     eco = model.get("economics") if isinstance(model.get("economics"), dict) else {}
     non_claims = eco.get("non_claims") if isinstance(eco.get("non_claims"), list) else []
+    pnl_status = str(eco.get("reconciled_net_pnl_status") or "UNKNOWN")
+    pnl_value = eco.get("reconciled_net_pnl_usd")
+    pnl_unknown = pnl_value is None or pnl_status in {"UNKNOWN", "EMPTY"}
+    pnl_html = (
+        dual("неизвестно", "UNKNOWN", unknown=True) if pnl_unknown else esc(pnl_value)
+    )
+    evidence = eco.get("pnl_by_evidence_class")
+    all_unknown = pnl_unknown and eco.get("known_open_exposure_usd") is None
+    banner = (
+        f"<p class=\"semantic-unknown\">{esc(surface_copy('ECONOMICS', 'all_unknown'))}</p>"
+        if all_unknown
+        else ""
+    )
     return (
-        "<h2>PAPER/SHADOW model economics</h2>"
-        + "<p class=\"non-claims\">"
-        + " · ".join(html.escape(str(item)) for item in non_claims)
-        + "</p><table>"
-        + _rows(
-            {
-                "reconciled_net_pnl_usd": eco.get("reconciled_net_pnl_usd"),
-                "reconciled_net_pnl_status": eco.get("reconciled_net_pnl_status"),
-                "pnl_known_count": eco.get("pnl_known_count"),
-                "pnl_unknown_count": eco.get("pnl_unknown_count"),
-                "known_open_exposure_usd": eco.get("known_open_exposure_usd"),
-                "known_open_exposure_status": eco.get("known_open_exposure_status"),
-                "current_loss_streak_status": eco.get("current_loss_streak_status"),
-                "current_loss_streak_count": eco.get("current_loss_streak_count"),
-                "max_drawdown_usd": eco.get("max_drawdown_usd"),
-                "max_drawdown_status": eco.get("max_drawdown_status"),
-                "pnl_by_evidence_class": eco.get("pnl_by_evidence_class"),
-            }
+        banner
+        + fact_strip(
+            [
+                (surface_copy("ECONOMICS", "pnl"), pnl_html),
+                (
+                    surface_copy("ECONOMICS", "evidence"),
+                    canon(evidence) if evidence else dual("неизвестно", "UNKNOWN", unknown=True),
+                ),
+                (surface_copy("ECONOMICS", "known_count"), esc(eco.get("pnl_known_count"))),
+                (
+                    surface_copy("ECONOMICS", "unknown_count"),
+                    dual(str(eco.get("pnl_unknown_count")), eco.get("pnl_unknown_count")),
+                ),
+                (
+                    surface_copy("ECONOMICS", "exposure"),
+                    dual("неизвестно", "UNKNOWN", unknown=True)
+                    if eco.get("known_open_exposure_usd") is None
+                    else esc(eco.get("known_open_exposure_usd")),
+                ),
+                (
+                    surface_copy("ECONOMICS", "streak"),
+                    f"{esc(eco.get('current_loss_streak_count'))} {canon(eco.get('current_loss_streak_status'))}",
+                ),
+                (
+                    surface_copy("ECONOMICS", "drawdown"),
+                    dual("неизвестно", "UNKNOWN", unknown=True)
+                    if eco.get("max_drawdown_usd") is None
+                    else esc(eco.get("max_drawdown_usd")),
+                ),
+            ]
         )
-        + "</table>"
-        + "<p>Absent live metrics are not shown as $0.</p>"
+        + f"<p class=\"non-claims\">{esc(surface_copy('ECONOMICS', 'non_claims'))}: "
+        + " · ".join(canon(item) for item in non_claims)
+        + "</p>"
+        + f"<p>{esc(surface_copy('ECONOMICS', 'not_zero'))}</p>"
+        + technical(
+            f"<p>{esc(surface_copy('ECONOMICS', 'model'))}</p><table>"
+            + mapping_rows(
+                {
+                    "reconciled_net_pnl_usd": eco.get("reconciled_net_pnl_usd"),
+                    "reconciled_net_pnl_status": eco.get("reconciled_net_pnl_status"),
+                    "pnl_known_count": eco.get("pnl_known_count"),
+                    "pnl_unknown_count": eco.get("pnl_unknown_count"),
+                    "known_open_exposure_usd": eco.get("known_open_exposure_usd"),
+                    "known_open_exposure_status": eco.get("known_open_exposure_status"),
+                    "current_loss_streak_status": eco.get("current_loss_streak_status"),
+                    "current_loss_streak_count": eco.get("current_loss_streak_count"),
+                    "max_drawdown_usd": eco.get("max_drawdown_usd"),
+                    "max_drawdown_status": eco.get("max_drawdown_status"),
+                    "pnl_by_evidence_class": eco.get("pnl_by_evidence_class"),
+                }
+            )
+            + "</table>"
+        )
     )
 
 
@@ -337,10 +441,20 @@ def _research_rows(rows: list[dict[str, Any]]) -> str:
             and locator.get("native_kind")
         )
         href = _href_detail(locator) if has_locator else ""
-        kind_text = html.escape(str(row.get("kind") or ""))
-        title_text = html.escape(str(row.get("title") or ""))
-        kind_cell = f"<td><a href=\"{href}\">{kind_text}</a></td>" if href else f"<td>{kind_text}</td>"
-        title_cell = f"<td><a href=\"{href}\">{title_text}</a></td>" if href else f"<td>{title_text}</td>"
+        kind_text = str(row.get("kind") or "")
+        title_text = str(row.get("title") or "")
+        short_title, truncated = compact_title(title_text)
+        kind_html = dual(kind_label(kind_text), kind_text)
+        scan = f'<span class="title-scan" title="{esc(title_text)}">{esc(short_title)}</span>'
+        linked = f'<a href="{href}">{scan}</a>' if href else scan
+        extra = ""
+        if truncated:
+            extra = (
+                f'<details class="technical"><summary>{esc(shell_copy("full_legacy"))}</summary>'
+                f"<p>{esc(title_text)}</p></details>"
+            )
+        kind_cell = f"<td><a href=\"{href}\">{kind_html}</a></td>" if href else f"<td>{kind_html}</td>"
+        title_cell = f"<td>{linked}{extra}</td>"
         marker = []
         if row.get("attention"):
             marker.append(counter_label("ATTENTION"))
@@ -353,13 +467,12 @@ def _research_rows(rows: list[dict[str, Any]]) -> str:
             "<tr class=\"research-row\">"
             + kind_cell
             + title_cell
-            + f"<td>{html.escape(status_display(native_state))}</td>"
-            f"<td>{html.escape(str(row.get('truth_plane') or ''))}</td>"
-            f"<td>{html.escape(str(row.get('evidence_class') or ''))}</td>"
-            f"<td class=\"mono\">{html.escape(str(row.get('as_of') or ''))}</td>"
-            f"<td>{html.escape(str(row.get('source') or ''))}</td>"
-            f"<td>{html.escape(' · '.join(marker) if marker else '')}</td>"
-            f"<td class=\"mono\">{html.escape(str(locator.get('entity_id') or ''))}</td>"
+            + f"<td>{status_html(native_state)}</td>"
+            f"<td>{canon(row.get('truth_plane') or '')}</td>"
+            f"<td>{canon(row.get('evidence_class') or '')}</td>"
+            f"<td class=\"mono\">{esc(row.get('as_of') or '')}</td>"
+            f"<td>{esc(' · '.join(marker) if marker else '')}</td>"
+            f"<td class=\"mono\">{esc(locator.get('entity_id') or '')}</td>"
             "</tr>"
         )
     return (
@@ -370,7 +483,6 @@ def _research_rows(rows: list[dict[str, Any]]) -> str:
         f"<th>{html.escape(research_copy('col_plane'))}</th>"
         f"<th>{html.escape(research_copy('col_evidence_class'))}</th>"
         f"<th>{html.escape(research_copy('col_as_of'))}</th>"
-        f"<th>{html.escape(research_copy('col_source'))}</th>"
         f"<th>{html.escape(research_copy('col_marker'))}</th>"
         f"<th>{html.escape(research_copy('col_id'))}</th>"
         "</tr>" + "".join(body) + "</table>"
@@ -778,6 +890,128 @@ def _research_section(app: FactoryApplication, query: dict[str, list[str]]) -> s
         )
 
 
+def _home_section(
+    model: dict[str, Any],
+    *,
+    copy_blocks: list[dict[str, str]],
+) -> str:
+    cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
+    packet = cockpit.get("packet") if isinstance(cockpit.get("packet"), dict) else {}
+    runtime = model.get("runtime") if isinstance(model.get("runtime"), dict) else {}
+    attention = list(cockpit.get("attention") or [])
+    next_actions = []
+    for item in attention:
+        action = _cell(item.get("NEXT_SAFE_ACTION"))
+        if action and action not in next_actions:
+            next_actions.append(action)
+    next_html = (
+        "<ul>" + "".join(f"<li>{canon(item)}</li>" for item in next_actions) + "</ul>"
+        if next_actions
+        else f"<p>{esc(surface_copy('HOME', 'no_attention'))}</p>"
+    )
+    buttons = "".join(command_button(command) for command in COMMANDS)
+    return (
+        f"<h2>{esc(surface_copy('HOME', 'attention'))}</h2>"
+        + _attention(attention, empty=surface_copy("HOME", "no_attention"))
+        + f"<h2>{esc(surface_copy('HOME', 'next'))}</h2>"
+        + next_html
+        + f"<h2>{esc(surface_copy('HOME', 'known'))}</h2>"
+        + fact_strip(
+            [
+                (
+                    surface_copy("HOME", "health"),
+                    dual(
+                        "деградирован"
+                        if "DEGRADED" in str(runtime.get("verdict") or "")
+                        else str(runtime.get("verdict") or "UNKNOWN"),
+                        runtime.get("verdict") or "UNAVAILABLE",
+                        unknown="UNKNOWN" in str(runtime.get("verdict") or "UNKNOWN"),
+                    ),
+                ),
+                (
+                    "git_archaeology_required",
+                    canon("true" if cockpit.get("git_archaeology_required") else "false"),
+                ),
+                (
+                    surface_copy("SYSTEM", "backup"),
+                    canon(
+                        runtime.get("backup_status")
+                        or cockpit.get("backup_status")
+                        or "EXPLICIT_UNKNOWN"
+                    ),
+                ),
+                (
+                    surface_copy("SYSTEM", "deployed"),
+                    canon(runtime.get("deploy_version") or ""),
+                ),
+            ]
+        )
+        + (
+            f"<h2>{esc(surface_copy('HOME', 'phrase'))}</h2>"
+            f"<p class=\"page-note\">{esc(surface_copy('HOME', 'phrase_not_urgent'))}</p>"
+            + _copy_sections(copy_blocks)
+            if copy_blocks
+            else ""
+        )
+        + technical(
+            f"<h3>{esc(surface_copy('HOME', 'packet'))}</h3><table>"
+            + _rows(packet)
+            + "</table>"
+            + "<h3>Runtime</h3><table>"
+            + mapping_rows(runtime)
+            + "</table>"
+            + f"<h3>{esc(surface_copy('HOME', 'features'))}</h3><table>"
+            + _feature_rows(list(model.get("required_features") or []))
+            + "</table>"
+            + f"<h3>{esc(surface_copy('HOME', 'cycle_commands'))}</h3>"
+            + f"<form method=\"post\" action=\"/\">{buttons}</form>"
+            + f"<h3>{esc(surface_copy('HOME', 'recent'))}</h3>"
+            + _recent_changes(
+                list(model.get("recent_changes") or [])[:6],
+                empty=surface_copy("HOME", "no_recent"),
+            ),
+            title=surface_copy("HOME", "packet"),
+        )
+    )
+
+
+def _system_section(runtime: dict[str, Any]) -> str:
+    process_alive = runtime.get("process_alive") is True
+    backup = str(runtime.get("backup_status") or "EXPLICIT_UNKNOWN")
+    rollback = str(runtime.get("local_rollback_snapshot") or "MISSING")
+    verdict = str(runtime.get("verdict") or "UNAVAILABLE")
+    process_html = dual(
+        surface_copy("SYSTEM", "process_up" if process_alive else "process_down"),
+        "true" if process_alive else "false",
+    )
+    backup_html = dual(surface_copy("SYSTEM", "backup_unproven"), backup, unknown=True)
+    rollback_html = dual(
+        surface_copy("SYSTEM", "rollback_missing"),
+        rollback,
+        unknown=rollback in {"MISSING", "UNKNOWN"},
+    )
+    degraded = "DEGRADED" in verdict or "UNKNOWN" in verdict
+    verdict_html = dual(
+        "деградирован" if degraded else verdict,
+        verdict,
+        unknown=True,
+    )
+    return (
+        fact_strip(
+            [
+                (surface_copy("SYSTEM", "process"), process_html),
+                (surface_copy("SYSTEM", "backup"), backup_html),
+                (surface_copy("SYSTEM", "rollback"), rollback_html),
+                (surface_copy("SYSTEM", "verdict"), verdict_html),
+                (surface_copy("SYSTEM", "next"), canon(runtime.get("next_safe_action"))),
+                (surface_copy("SYSTEM", "deployed"), canon(runtime.get("deploy_version"))),
+            ]
+        )
+        + f"<p class=\"semantic-warning\">{esc(surface_copy('SYSTEM', 'not_healthy'))}</p>"
+        + technical("<table>" + mapping_rows(runtime) + "</table>", title="Runtime")
+    )
+
+
 def _page(
     model: dict[str, Any],
     *,
@@ -790,46 +1024,13 @@ def _page(
     visual_consumed: bool = False,
 ) -> bytes:
     cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
-    packet = cockpit.get("packet") if isinstance(cockpit.get("packet"), dict) else {}
     runtime = model.get("runtime") if isinstance(model.get("runtime"), dict) else {}
     notice_html = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
     if notice:
         notice_html += f"<p class=\"notice\">{html.escape(notice)}</p>"
-    buttons = "".join(
-        f'<button type="submit" name="command" value="{command}">{command}</button>'
-        for command in COMMANDS
-    )
     archaeology = "true" if cockpit.get("git_archaeology_required") else "false"
     sections = {
-        "HOME": (
-            "<h2>Attention / Today</h2>"
-            + _attention(list(cockpit.get("attention") or []))
-            + "<h2>Recent changes</h2>"
-            + _recent_changes(list(model.get("recent_changes") or [])[:6])
-            + "<h2>Owner packet</h2><table>"
-            + _rows(packet)
-            + "</table><h2>Cycle state</h2><table>"
-            + _rows(
-                {
-                    "status": model.get("status") or "",
-                    "blocker": model.get("blocker") or "",
-                    "hypothesis": model.get("hypothesis") or "",
-                }
-            )
-            + "</table><h2>Required features</h2><table>"
-            + _feature_rows(list(model.get("required_features") or []))
-            + "</table><h2>System health</h2><table>"
-            + _rows(
-                {
-                    "verdict": runtime.get("verdict") or "UNAVAILABLE",
-                    "backup_status": runtime.get("backup_status")
-                    or cockpit.get("backup_status")
-                    or "EXPLICIT_UNKNOWN",
-                    "deploy_version": runtime.get("deploy_version") or "",
-                }
-            )
-            + "</table>"
-        ),
+        "HOME": _home_section(model, copy_blocks=copy_blocks or []),
         "RESEARCH": research_html
         or (
             f"<h2>{html.escape(research_copy('title'))}</h2>"
@@ -837,67 +1038,25 @@ def _page(
         ),
         "OPERATIONS": _operations_section(model),
         "ECONOMICS": _economics_section(model),
-        "SYSTEM": "<h2>Runtime</h2><table>" + _rows(runtime) + "</table>",
+        "SYSTEM": _system_section(runtime),
     }
     consumed = "true" if visual_consumed else "false"
+    layout_css = visual_os_layout_css()
+    note = (
+        f"{shell_copy('note')} git_archaeology_required={archaeology}."
+    )
     body = f"""<!doctype html>
-<html lang="ru" data-appearance="DARK_ONLY" data-identity="STEEL_SIGNAL"><head><meta charset="utf-8"><title>Factory v1 Workbench</title>
+<html lang="ru" data-appearance="DARK_ONLY" data-identity="STEEL_SIGNAL"><head><meta charset="utf-8"><title>{html.escape(surface_copy(surface, 'h1'))}</title>
 <style>
 {visual_css}
-html,body {{ background: var(--surface-void, #111); color: var(--text-primary, #eee); font-family: sans-serif; margin: 0; }}
-.shell {{ display: grid; grid-template-columns: 12rem 1fr; min-height: 100vh; }}
-.signal-rail {{ background: var(--surface-base, #161616); border-right: 1px solid var(--border-hairline, #333); padding: 1.5rem 1rem; }}
-.signal-rail .brand {{ letter-spacing: 0.12em; margin: 0 0 1.5rem; }}
-.signal-rail nav {{ display: flex; flex-direction: column; gap: 0.75rem; }}
-.signal-rail a {{ color: var(--text-muted, #999); text-decoration: none; }}
-.signal-rail a[aria-current="page"] {{ color: var(--accent-signal, #888); font-weight: bold; }}
-main {{ background: var(--surface-base, #161616); padding: 2rem; max-width: 1100px; }}
-th {{ text-align: left; padding-right: 1rem; vertical-align: top; }}
-.error, .danger {{ color: var(--semantic-danger, #a40000); }}
-.semantic-unknown {{ color: var(--semantic-unknown, #777); }}
-.semantic-warning {{ color: var(--semantic-warning, #b8860b); }}
-.degraded {{ border: 1px solid var(--border-hairline, #333); padding: 0.75rem 1rem; background: var(--surface-panel, #1c1c1c); }}
-form button {{ margin-right: 0.5rem; margin-bottom: 0.5rem; }}
-.copy-hint {{ color: var(--text-muted, #999); }}
-.copy-block {{ position: relative; margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--border-hairline, #333); background: var(--surface-panel, #1c1c1c); }}
-.copy-head {{ display: flex; align-items: center; justify-content: space-between; gap: 1rem; }}
-.copy-head h2 {{ font-size: 1rem; margin: 0; }}
-.copy-btn {{ opacity: 0; pointer-events: none; }}
-.copy-block:hover .copy-btn, .copy-block:focus-within .copy-btn {{ opacity: 1; pointer-events: auto; }}
-.copy-text {{ white-space: pre-wrap; word-break: break-word; margin: 0.75rem 0 0; }}
-.attention {{ border: 1px solid var(--border-hairline, #333); padding: 0.75rem 1rem; margin: 0.75rem 0; }}
-.non-claims {{ font-weight: bold; }}
-.danger {{ border: 2px solid var(--semantic-danger, #a40000); padding: 0.75rem; margin-top: 1rem; }}
-.safe-actions {{ margin: 0.75rem 0; }}
-.mono {{ font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.85em; }}
-.counters {{ display: grid; grid-template-columns: repeat(6, minmax(6rem, 1fr)); gap: 0.75rem; margin: 1rem 0; }}
-.counter {{ background: var(--surface-panel, #1c1c1c); border: 1px solid var(--border-hairline, #333); padding: 0.5rem 0.75rem; }}
-.counter h3 {{ font-size: 0.75rem; margin: 0 0 0.35rem; color: var(--text-muted, #999); }}
-.research-table a {{ color: var(--text-primary, #eee); }}
-.trace-resolved {{ color: var(--text-primary, #eee); }}
-.trace-gap {{ color: var(--semantic-warning, #b8860b); }}
-.trace-conflict {{ color: var(--semantic-danger, #a40000); font-weight: bold; }}
-.evidence-editorial .evidence-header {{ border-bottom: 1px solid var(--border-hairline, #333); margin-bottom: 1rem; }}
-.direct-evidence {{ border-left: 3px solid var(--accent-signal, #888); padding-left: 1rem; margin-bottom: 1rem; }}
-.related-memory {{ border-left: 3px solid var(--text-muted, #999); padding-left: 1rem; margin-bottom: 1rem; }}
-.related-memory .muted {{ color: var(--text-muted, #999); }}
-.control-zone {{ border: 1px solid var(--border-hairline, #333); padding: 1rem; background: var(--surface-panel, #1c1c1c); margin: 1rem 0; }}
-.control-zone textarea {{ width: 100%; background: var(--surface-base, #161616); color: var(--text-primary, #eee); border: 1px solid var(--border-hairline, #333); }}
-.obligation-MISSING, .obligation-UNKNOWN {{ color: var(--semantic-warning, #b8860b); }}
-.obligation-CONFLICT {{ color: var(--semantic-danger, #a40000); }}
-.legacy-note {{ color: var(--text-muted, #999); font-size: 0.9rem; }}
-table {{ border-collapse: collapse; width: 100%; margin-bottom: 1rem; }}
-td, th {{ border-bottom: 1px solid var(--border-hairline, #333); padding: 0.35rem 0.5rem; }}
+{layout_css}
 </style></head><body class="steel-signal" data-visual-os-consumed="{consumed}">
 <div class="shell">
 {_nav(surface)}
 <main>
-<h1>Factory v1 — локальный срез владельца</h1>
-<p>Проекция. UI не владеет научной истиной и не открывает SQLite. START без точной owner phrase не читает ключ и не вызывает Jupiter. git_archaeology_required={html.escape(archaeology)}. Operational-ready milestone is not claimed.</p>
+{page_head(surface, note=note)}
 {notice_html}
-{_copy_sections(copy_blocks or []) if surface == "HOME" else ""}
 {sections.get(surface) or ""}
-{("<form method=\"post\" action=\"/\">" + buttons + "</form>") if surface == "HOME" else ""}
 </main></div>
 <script>
 document.querySelectorAll(".copy-btn").forEach(function (button) {{
