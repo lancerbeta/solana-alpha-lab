@@ -4,8 +4,8 @@
   "review_id": "DERIVED-SYNC-THROUGHPUT-FACTORY-FIT-001",
   "as_of": "2026-09-07",
   "task_id": "DELIVERY_HARNESS_DERIVED_SYNC_THROUGHPUT_V1",
-  "reviewed_bindings_sha256": "3421762fa31b8e3929857930cc3e49ed297b3bc212b04e3b9e1ef64bbe41736a",
-  "reviewed_inventory_sha256": "2c8e6c60105473149918a27fdeee112dc7574820b9149b4e42066986c86fca69",
+  "reviewed_bindings_sha256": "3b665c2298402c4480edd85c5d509cec0fd4e93ecb861e917643a2b5d1e8adce",
+  "reviewed_inventory_sha256": "4282380b85f8279afa47b9e3403f4d040ef6a1b63d533a4b6c43789a97c2b9fd",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
