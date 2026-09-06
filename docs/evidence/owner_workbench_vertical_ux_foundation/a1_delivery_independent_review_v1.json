@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OWNER-WORKBENCH-VERTICAL-UX-FOUNDATION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-06",
+  "task_id": "OWNER_WORKBENCH_VERTICAL_UX_FOUNDATION_V1",
+  "reviewed_bindings_sha256": "b42ebf3e88dd9281e558ffff711ceb7eb9493183a536e9a68936c05fa4456e0a",
+  "reviewed_inventory_sha256": "7629b01a8020470246effef6fa0974d415d84eaa46539af55f2d7be12f762e38",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=24777a6f12c74e340964c91b7f38cfc992bbe03afaebbeb4bec8246ef8e2835f",
+        "RESEARCH_ARCHAEOLOGY_OMITTED_UNKNOWN",
+        "POST_COMMAND_VALUES_UNCHANGED",
+        "EXACT_TOKEN_GLOSS_PRESENT_AND_RUNTIME_PROVED",
+        "ONE_VISUAL_OS_SHELL_NO_NEW_SEM"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "POST_ALLOWLIST_UNCHANGED",
+        "RESEARCH_GET_NO_READ_MODEL",
+        "MISSING_BOOL_IS_UNKNOWN",
+        "HOME_CYCLE_AND_REQUIRED_FEATURES",
+        "WRITE_SET_ONLY"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_FIVE_ROUTES_ONE_SHELL",
+        "DOD_POST_UNCHANGED",
+        "DOD_UNKNOWN_NOT_ZERO_OR_HEALTHY",
+        "DOD_PAGE_QUESTION_PRESENT",
+        "OWNER_WAIVED_MERGE_SECOND"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PROVIDER",
+    "NO_NETRETURN"
+  ]
+}

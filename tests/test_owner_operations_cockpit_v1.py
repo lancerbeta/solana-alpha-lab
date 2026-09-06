@@ -213,9 +213,13 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
                 self.assertIn("NO_OWNER_FCF", economics)
                 self.assertIn("NO_LIVE_CAPITAL", economics)
                 self.assertIn("NO_NETRETURN_CLAIM", economics)
-                self.assertIn("Absent live metrics are not shown as $0", economics)
+                self.assertIn("Отсутствующие live-метрики не показываются как $0.", economics)
                 self.assertIn("30.37", economics)
-                self.assertIn("Confirm REQUEST_CLOSE_ALL", operations)
+                self.assertIn("REQUEST_CLOSE_ALL", operations)
+                self.assertIn(
+                    "Подтверждаю REQUEST_CLOSE_ALL против показанного снимка открытых позиций",
+                    operations,
+                )
 
                 bot_id = paper.bots()[0]["bot_instance_id"]
                 pause = _post(
