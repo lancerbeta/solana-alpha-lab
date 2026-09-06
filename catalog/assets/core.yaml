@@ -35662,7 +35662,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
-  integrity: {kind: sha256, sha256: de13dfbde7e8a9032b055b2e1fa44e564c76061ee77566e25f4b21608e669e5c}
+  integrity: {kind: sha256, sha256: dbbc6dd76532fed64f60333a19d3c789171591fa19ae9a4e6565b4d2f89b2fa9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}

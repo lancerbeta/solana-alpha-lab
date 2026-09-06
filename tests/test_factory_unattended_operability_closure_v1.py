@@ -63,6 +63,7 @@ from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
 from solana_alpha_lab.factory.operability_watch import (  # noqa: E402
     WATCH_ON_CALENDAR,
     evaluate_operability,
+    render_incident_message,
 )
 from solana_alpha_lab.factory.remote_ops import RemoteOpsError, load_config_v1_1  # noqa: E402
 from solana_alpha_lab.factory_semantic_operability import (  # noqa: E402
@@ -441,6 +442,46 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                 )
                 rec_codes = {(item["kind"], item["code"]) for item in recovered["messages"]}
                 self.assertIn(("RECOVERED", "REQUIRED_TIMER_FAILED"), rec_codes)
+            finally:
+                store.close()
+
+    def test_incident_footer_unknown_and_hash_mismatch_preview(self) -> None:
+        text = render_incident_message(
+            kind="INCIDENT",
+            code="IMMUTABLE_ARCHIVE_HASH_MISMATCH",
+            detail="Remote archive SHA != local archive SHA.",
+            packet={},
+            first_seen_at="2026-09-06T12:00:00Z",
+        )
+        self.assertIn("ARCHIVE_LAST_VERIFIED_DAY=UNKNOWN", text)
+        self.assertIn("MUTABLE_BACKUP_STATE=UNKNOWN", text)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _ops_root(tmp)
+            rdp = root / "local/factory_v1/observation_rdp"
+            _seed_day(rdp, "20260905", "MintPrev")
+            bad = FakeDrive(mismatch=True)
+            process_one_day(
+                root, "20260905", now=NOW, rclone_runner=bad.runner, allow_drive=True
+            )
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            try:
+                previewed = evaluate_operability(
+                    root=root,
+                    store=store,
+                    now=NOW,
+                    emit=False,
+                    persist=False,
+                    environ={},
+                    observation_rdp=rdp,
+                    unit_status={"factory-observation-schedule.timer": "active"},
+                )
+                self.assertFalse(
+                    (root / "local/factory_v1/operability_incident_state.json").exists()
+                )
+                self.assertGreater(len(previewed["preview_messages"]), 0)
+                card = previewed["preview_messages"][0]
+                self.assertIn("FACTORY / INCIDENT", card)
+                self.assertIn("IMMUTABLE_ARCHIVE_HASH_MISMATCH", card)
             finally:
                 store.close()
 
