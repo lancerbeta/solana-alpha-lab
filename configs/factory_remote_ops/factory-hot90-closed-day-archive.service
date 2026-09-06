@@ -10,3 +10,4 @@ WorkingDirectory=/opt/solana-alpha-lab
 EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
 ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/hot90_closed_day_durability.py
 NoNewPrivileges=true
+TimeoutStartSec=900

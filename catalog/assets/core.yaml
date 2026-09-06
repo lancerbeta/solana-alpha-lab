@@ -29948,7 +29948,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 81fbe609d7b14255905fcce5f80a8564873ce45048178505aa4aa28de6c5a6f6}
+  integrity: {kind: sha256, sha256: 1c4d8378352f7a8a9fb24febcc7ccb083ad95fbb832ea6f42603a09a8aee9818}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -34049,7 +34049,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 597e3a8e8a6378d6e4c12d5ca0de37443baad69e9bf82a7508931b77947047ce}
+  integrity: {kind: sha256, sha256: 0f39b43bbd4f2f92109ffb12af2b5e3fd7c329d17254e9a4bc40a8695980414c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -35642,7 +35642,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_UNATTENDED_OPERABILITY.md', repository_path: docs/operator/FACTORY_UNATTENDED_OPERABILITY.md}
-  integrity: {kind: sha256, sha256: a08346f9ddb8ce0bf72ea974bce70b14573848e6de67c0ef28fedb69bec594ee}
+  integrity: {kind: sha256, sha256: c280a67d82d37f3974077abcef07d84c001ce1de43a29163ff014ac20114f903}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-REMOTE-OPERATIONS-001}
@@ -35662,7 +35662,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
-  integrity: {kind: sha256, sha256: ed9cf7bbdec635fb1b88b5e5d70cffbc7f2391c7f782b67b39cf7e8530e9a864}
+  integrity: {kind: sha256, sha256: 57a70433ea47d0df32e974cc69e57a67ee06669d56350d1e0f1e211f9e62230b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}

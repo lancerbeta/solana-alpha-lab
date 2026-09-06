@@ -880,6 +880,7 @@ def build_collector_operational_packet(
             "latest_verified_day": UNKNOWN,
             "oldest_backlog_age_seconds": UNKNOWN,
             "eligible_unverified_days": [],
+            "stuck_hash_mismatch_days": [],
         }
     packet["immutable_archive_latest_verified_day"] = backlog.get("latest_verified_day")
     packet["immutable_archive_backlog_days"] = backlog.get("backlog_days")
@@ -889,7 +890,8 @@ def build_collector_operational_packet(
     last_terminal = None
     latest = backlog.get("latest_verified_day")
     unverified = backlog.get("eligible_unverified_days") or []
-    probe_day = unverified[0] if unverified else latest
+    stuck = backlog.get("stuck_hash_mismatch_days") or []
+    probe_day = stuck[0] if stuck else (unverified[0] if unverified else latest)
     if probe_day:
         receipt = read_receipt(root, str(probe_day))
         if receipt:

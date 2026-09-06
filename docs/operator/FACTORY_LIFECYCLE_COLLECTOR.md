@@ -420,7 +420,10 @@ Machine-resolved; do not freeze ephemeral PASS/FAIL into this prose.
 6. Off-host Google Drive durability automation (deploy + enable `factory-remote-backup-gdrive.service` chain)
 7. Live campaign authority (exact ObservationSchedule phrase)
 8. Live commissioning (timer enabled, ticks with authority)
-9. Daily owner pulse — product ready; install/enable timer only after this collector/storage closure (not automatic from this runbook)
+9. Daily owner pulse — product ready; install/enable
+   `factory-collector-owner-pulse.timer` only as part of later
+   `docs/operator/FACTORY_UNATTENDED_OPERABILITY.md` commissioning (same
+   enable set as archive/watch), not automatic from this collector runbook.
 10. Live cohort seal / sync / import into LIVE CORPUS (product ready; ops after collector commissioning)
 11. **`NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF`** — **historically proven** 2026-09-04 (`NONEMPTY_RDP_OFFHOST_INCREMENTAL_RESTORE_PROOF_PASS`). Isolated restore only for future recovery; never over live Factory state; do not auto-repeat.
 12. Forge

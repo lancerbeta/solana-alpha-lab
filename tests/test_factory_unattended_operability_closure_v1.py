@@ -249,6 +249,51 @@ class ClosedDayDurabilityLoopTests(unittest.TestCase):
             )
             self.assertEqual(recovered["terminal"], REMOTE_CONTENT_SHA256_VERIFIED)
 
+    def test_hash_mismatch_does_not_starve_younger_catch_up(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _ops_root(tmp)
+            rdp = root / "local/factory_v1/observation_rdp"
+            _seed_day(rdp, "20260904", "MintOld")
+            _seed_day(rdp, "20260905", "MintNew")
+            bad = FakeDrive(mismatch=True)
+            failed = process_one_day(
+                root, "20260904", now=NOW, rclone_runner=bad.runner, allow_drive=True
+            )
+            self.assertEqual(failed["terminal"], "HASH_MISMATCH")
+            good = FakeDrive()
+            result = run_closed_day_durability(
+                root, now=NOW, rclone_runner=good.runner, allow_drive=True, max_days=1
+            )
+            self.assertEqual(result["processed"][0]["utc_day"], "20260905")
+            self.assertEqual(result["processed"][0]["terminal"], REMOTE_CONTENT_SHA256_VERIFIED)
+            self.assertEqual(read_receipt(root, "20260904")["terminal"], "HASH_MISMATCH")
+            self.assertIn("20260904", archive_backlog(root, now=NOW)["stuck_hash_mismatch_days"])
+            self.assertNotIn("20260904", eligible_unverified_days(root, now=NOW))
+
+    def test_preexisting_remote_mismatch_does_not_copyto(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _ops_root(tmp)
+            rdp = root / "local/factory_v1/observation_rdp"
+            _seed_day(rdp, "20260905", "MintP")
+            from solana_alpha_lab.factory.offhost_backup import load_offhost_config
+
+            paths = list_closed_day_relative_paths(rdp, "20260905")
+            packed = package_closed_day_archive(
+                rdp, utc_day="20260905", relative_paths=paths, dest_dir=root / "tmp-p"
+            )
+            offhost = load_offhost_config(root)
+            assert offhost is not None
+            remote = offhost.remote_object(Path(packed["path"]).name)
+            drive = FakeDrive()
+            drive.objects[remote] = b"not-the-archive"
+            result = process_one_day(
+                root, "20260905", now=NOW, rclone_runner=drive.runner, allow_drive=True
+            )
+            self.assertEqual(result["terminal"], "HASH_MISMATCH")
+            self.assertTrue(result.get("overwrite_forbidden"))
+            self.assertEqual(drive.copy_count, 0)
+            self.assertEqual(drive.objects[remote], b"not-the-archive")
+
     def test_seven_day_backlog_oldest_first_catch_up(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = _ops_root(tmp)
@@ -492,6 +537,12 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
         for item in ARCHIVE_CATCH_UP_ON_CALENDAR:
             self.assertIn(item, archive_timer)
         self.assertEqual(ARCHIVE_ON_CALENDAR, "*-*-* 01:15:00 UTC")
+        self.assertIn(
+            "TimeoutStartSec=900",
+            (ROOT / "configs/factory_remote_ops/factory-hot90-closed-day-archive.service").read_text(
+                encoding="utf-8"
+            ),
+        )
         self.assertEqual(WATCH_ON_CALENDAR, "*-*-* *:0/15:00 UTC")
         self.assertEqual(HEARTBEAT_ON_CALENDAR, "*-*-* *:0/5:00 UTC")
 
@@ -585,6 +636,11 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
 
         found = classify_incidents(packet)
         self.assertNotIn("PUBLICATION_STUCK", found)
+        timers = classify_incidents(
+            packet,
+            unit_status={"factory-hot90-closed-day-archive.timer": "inactive"},
+        )
+        self.assertIn("REQUIRED_TIMER_FAILED", timers)
 
 
 class SemanticDiscoveryTests(unittest.TestCase):

@@ -18,6 +18,12 @@ from solana_alpha_lab.factory.remote_ops import RemoteOpsError
 
 STATE_RELATIVE = "local/factory_v1/operability_incident_state.json"
 WATCH_ON_CALENDAR = "*-*-* *:0/15:00 UTC"
+WATCH_REQUIRED_TIMERS = (
+    "factory-observation-schedule.timer",
+    "factory-remote-backup.timer",
+    "factory-collector-owner-pulse.timer",
+    "factory-hot90-closed-day-archive.timer",
+)
 
 INCIDENT_GRACE_SECONDS = {
     "COLLECTOR_STALLED": 1800,
@@ -77,8 +83,11 @@ def classify_incidents(
     if "DISCOVERY_GAP" in classes:
         found["MATERIAL_COVERAGE_DEGRADATION"] = "Discovery gap confirmed."
     units = unit_status or {}
-    if units.get("factory-observation-schedule.timer") not in {None, "", "active"}:
-        found["REQUIRED_TIMER_FAILED"] = "Observation schedule timer is not active."
+    for unit in WATCH_REQUIRED_TIMERS:
+        status = units.get(unit)
+        if status not in {None, "", "active"}:
+            found["REQUIRED_TIMER_FAILED"] = f"{unit} is not active."
+            break
     if "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED" in classes:
         found["MUTABLE_BACKUP_FAILED"] = "Mutable backup profile includes full Observation RDP."
     return found
@@ -108,6 +117,11 @@ def render_incident_message(
     recovered_at: str | None = None,
 ) -> str:
     state = "ACTION" if kind == "INCIDENT" else "OK"
+    backup_age = packet.get("backup_age_seconds")
+    if isinstance(backup_age, int):
+        backup_state = f"{backup_age // 3600}h" if backup_age >= 3600 else f"{backup_age // 60}m"
+    else:
+        backup_state = str(packet.get("backup_domain") or "UNKNOWN")
     lines = [
         f"FACTORY / {kind} — {state}",
         "",
@@ -124,7 +138,7 @@ def render_incident_message(
         f"LIFECYCLE_STATE={packet.get('cohort_readiness_state')}",
         f"ARCHIVE_LAST_VERIFIED_DAY={packet.get('immutable_archive_latest_verified_day')}",
         f"ARCHIVE_BACKLOG_DAYS={packet.get('immutable_archive_backlog_days')}",
-        f"MUTABLE_BACKUP_STATE={packet.get('backup_domain')}",
+        f"MUTABLE_BACKUP_STATE={backup_state}",
         f"PROJECTED_97D_BYTES={packet.get('projected_97d_bytes')}",
         f"OWNER_ACTION={code if kind == 'INCIDENT' else 'NONE'}",
         f"DEDUP_KEY={code}",

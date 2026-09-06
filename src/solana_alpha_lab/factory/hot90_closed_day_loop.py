@@ -31,6 +31,7 @@ from solana_alpha_lab.factory.offhost_backup import (
     default_rclone_runner,
     load_offhost_config,
 )
+from solana_alpha_lab.factory.remote_ops import RemoteOpsError, load_config_v1_1
 
 RECEIPT_KIND = "FACTORY_HOT90_CLOSED_DAY_ARCHIVE_RECEIPT"
 RECEIPTS_RELATIVE = "local/factory_v1/hot90_archive_receipts"
@@ -126,31 +127,43 @@ def discover_member_days(rdp: Path) -> list[str]:
     return days
 
 
-def eligible_unverified_days(root: Path, *, now: datetime) -> list[str]:
+def _split_unverified_days(root: Path, *, now: datetime) -> tuple[list[str], list[str]]:
     rdp = root / RDP_RELATIVE
     today = current_utc_day(now)
     blocked = open_publication_days(rdp)
-    eligible = []
+    processable: list[str] = []
+    stuck: list[str] = []
     for day in discover_member_days(rdp):
         if day >= today:
             continue
         if day in blocked:
             continue
-        if receipt_verified(read_receipt(root, day)):
+        receipt = read_receipt(root, day)
+        if receipt_verified(receipt):
+            continue
+        if str((receipt or {}).get("terminal") or "") == "HASH_MISMATCH":
+            stuck.append(day)
             continue
         try:
             list_closed_day_relative_paths(rdp, day)
         except (Hot90ArchiveError, json.JSONDecodeError, OSError):
             continue
-        eligible.append(day)
-    return eligible
+        processable.append(day)
+    return processable, stuck
+
+
+def eligible_unverified_days(root: Path, *, now: datetime) -> list[str]:
+    processable, _stuck = _split_unverified_days(root, now=now)
+    return processable
 
 
 def archive_backlog(root: Path, *, now: datetime) -> dict[str, Any]:
-    days = eligible_unverified_days(root, now=now)
+    processable, stuck = _split_unverified_days(root, now=now)
+    visible = processable + stuck
     oldest_age = None
-    if days:
-        oldest = datetime.strptime(days[0], "%Y%m%d").replace(tzinfo=UTC)
+    if visible:
+        oldest_day = min(visible)
+        oldest = datetime.strptime(oldest_day, "%Y%m%d").replace(tzinfo=UTC)
         clock = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
         oldest_age = int((clock.astimezone(UTC) - oldest).total_seconds())
     verified = []
@@ -161,8 +174,9 @@ def archive_backlog(root: Path, *, now: datetime) -> dict[str, Any]:
             if receipt_verified(payload):
                 verified.append(path.stem)
     return {
-        "eligible_unverified_days": days,
-        "backlog_days": len(days),
+        "eligible_unverified_days": processable,
+        "stuck_hash_mismatch_days": stuck,
+        "backlog_days": len(visible),
         "oldest_backlog_age_seconds": oldest_age,
         "latest_verified_day": verified[-1] if verified else None,
         "verified_days": verified,
@@ -181,7 +195,8 @@ def _write_failure_receipt(
         "verified_at": existing.get("verified_at"),
         "local_archive_sha256": extra.get("local_archive_sha256")
         or existing.get("local_archive_sha256"),
-        "remote_content_sha256": existing.get("remote_content_sha256"),
+        "remote_content_sha256": extra.get("remote_content_sha256")
+        or existing.get("remote_content_sha256"),
         "inventory_sha256": extra.get("inventory_sha256") or existing.get("inventory_sha256"),
         "remote_object": extra.get("remote_object") or existing.get("remote_object"),
     }
@@ -214,6 +229,18 @@ def _prune_verified_staging(root: Path, keep_sha256: str) -> list[str]:
     return removed
 
 
+def _native_remote_sha(offhost: Any, remote_object: str, runner: RcloneRunner) -> str | None:
+    completed = runner(build_rclone_argv(offhost, "hashsum", "sha256", remote_object))
+    if getattr(completed, "returncode", 1) != 0:
+        return None
+    stdout = getattr(completed, "stdout", "") or ""
+    for line in stdout.splitlines():
+        token = line.strip().split()
+        if token and len(token[0]) == 64 and all(ch in "0123456789abcdef" for ch in token[0]):
+            return token[0]
+    return None
+
+
 def process_one_day(
     root: Path,
     utc_day: str,
@@ -229,6 +256,11 @@ def process_one_day(
         require_drive_writes_enabled(activation)
     except Hot90ActivationError:
         return {"utc_day": utc_day, "terminal": "HOT90_DRIVE_WRITES_DISABLED", "uploaded": False}
+
+    if utc_day >= current_utc_day(now):
+        return {"utc_day": utc_day, "terminal": "OPEN_UTC_DAY", "uploaded": False}
+    if utc_day in open_publication_days(root / RDP_RELATIVE):
+        return {"utc_day": utc_day, "terminal": "OPEN_PUBLICATION_JOB", "uploaded": False}
 
     existing = read_receipt(root, utc_day)
     if str((existing or {}).get("terminal") or "") == "HASH_MISMATCH":
@@ -266,6 +298,47 @@ def process_one_day(
     runner = rclone_runner or default_rclone_runner
     archive_path = Path(packed["path"])
     remote_object = offhost.remote_object(archive_path.name)
+    native = _native_remote_sha(offhost, remote_object, runner)
+    if native == local_sha:
+        receipt = {
+            "kind": RECEIPT_KIND,
+            "utc_day": utc_day,
+            "inventory_sha256": packed["inventory_sha256"],
+            "local_archive_sha256": local_sha,
+            "local_archive_filename": archive_path.name,
+            "remote_object": remote_object,
+            "remote_content_sha256": native,
+            "terminal": REMOTE_CONTENT_SHA256_VERIFIED,
+            "verified_at": render_utc(now),
+            "last_failure": None,
+            "verify_method": "NATIVE_HASHSUM_PREEXISTING",
+        }
+        _atomic_write_json(receipt_path(root, utc_day), receipt)
+        return {
+            "utc_day": utc_day,
+            "terminal": REMOTE_CONTENT_SHA256_VERIFIED,
+            "uploaded": False,
+            "idempotent": True,
+            "local_archive_sha256": local_sha,
+        }
+    if native is not None:
+        payload = _write_failure_receipt(
+            root,
+            utc_day,
+            "HASH_MISMATCH",
+            {
+                "local_archive_sha256": local_sha,
+                "inventory_sha256": packed["inventory_sha256"],
+                "remote_object": remote_object,
+                "remote_content_sha256": native,
+            },
+        )
+        return {
+            "utc_day": utc_day,
+            "terminal": payload["terminal"],
+            "uploaded": False,
+            "overwrite_forbidden": True,
+        }
     copied = runner(build_rclone_argv(offhost, "copyto", str(archive_path), remote_object))
     uploaded = getattr(copied, "returncode", 1) == 0
     if uploaded is False:
@@ -358,10 +431,20 @@ def run_closed_day_durability(
     tick = monotonic or time.monotonic
     started = tick()
     max_runtime = DEFAULT_MAX_RUNTIME_SECONDS
+    try:
+        archive_cfg = dict(load_config_v1_1(root).get("archive") or {})
+        loaded_runtime = int(archive_cfg.get("max_runtime_seconds") or max_runtime)
+        if loaded_runtime >= 1:
+            max_runtime = loaded_runtime
+        if max_days is None:
+            loaded_max = int(archive_cfg.get("max_days_per_run") or loaded_max)
+    except (RemoteOpsError, TypeError, ValueError):
+        pass
+    wall = datetime.now(UTC)
     backlog = archive_backlog(root, now=clock)
     processed = []
     for day in backlog["eligible_unverified_days"][:loaded_max]:
-        if deadline is not None and clock > deadline:
+        if deadline is not None and wall > deadline:
             break
         if tick() - started > max_runtime:
             break
@@ -374,6 +457,7 @@ def run_closed_day_durability(
                 allow_drive=allow_drive,
             )
         )
+        wall = datetime.now(UTC)
     remaining = archive_backlog(root, now=clock)
     return {
         "processed": processed,

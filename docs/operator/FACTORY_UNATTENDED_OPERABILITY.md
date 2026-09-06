@@ -130,7 +130,8 @@ content hash.
 ## HOW DO I ROLLBACK THE NEW AUTOMATION?
 
 Disable only the new units (`factory-hot90-closed-day-archive`,
-`factory-operability-watch`, `factory-external-heartbeat`). Keep receipts,
+`factory-operability-watch`, `factory-collector-owner-pulse`,
+`factory-external-heartbeat`). Keep receipts,
 source RDP, and HOT90 runtime activation. Restore a previous exact deploy
 SHA if required. Do not “rollback” by deleting runtime truth.
 
@@ -140,7 +141,10 @@ SHA if required. Do not “rollback” by deleting runtime truth.
 2. Exact live SHA vs exact merged-target SHA review.
 3. Owner-gated exact-SHA deploy.
 4. Post-deploy HOT90 runtime continuity readback.
-5. Owner-gated install/enable of only the new units.
+5. Owner-gated install/enable of the new units together:
+   `factory-hot90-closed-day-archive`, `factory-operability-watch`,
+   `factory-collector-owner-pulse`, and optionally `factory-external-heartbeat`
+   (heartbeat stays `NOT_CONFIGURED` until separately authorized).
 6. One real eligible closed-day archive → Drive → exact SHA → receipt.
 7. Next scheduled or one real DAILY delivery.
 8. Deterministic incident dry proof.

@@ -34,6 +34,7 @@ def _unit_status() -> dict[str, str]:
         "factory-remote-backup.timer",
         "factory-collector-owner-pulse.timer",
         "factory-hot90-closed-day-archive.timer",
+        "factory-operability-watch.timer",
     )
     status: dict[str, str] = {}
     for unit in units:
