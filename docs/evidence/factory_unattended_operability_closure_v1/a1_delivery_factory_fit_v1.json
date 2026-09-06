@@ -5,7 +5,7 @@
   "as_of": "2026-09-06",
   "task_id": "FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1",
   "reviewed_bindings_sha256": "84b038e280f3210873a8194a3a71a0782d5ef81558377deb4918cde2a51c9e65",
-  "reviewed_inventory_sha256": "eb5c604b5467e73287bf939bb0967d50c810cb7910371f794114401cba82ae95",
+  "reviewed_inventory_sha256": "53649c1bf26bf6a9c1948a12bc8492c3d16ded9c5fb9458eeb19545abda0831b",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

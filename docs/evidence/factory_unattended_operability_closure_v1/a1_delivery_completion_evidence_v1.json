@@ -63,14 +63,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_unattended_operability_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "ac7069b484e41de768f920e2447118263eb67fbc342afc47ce0b2213eb679c6e",
+    "sha256": "22dce655e057ae59202af2b27966dfd44888c08c75f3f6ff7d3322030d0e4f2f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_UNATTENDED_OPERABILITY_CLOSURE_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_unattended_operability_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "c5e0c86453a696a8be501df9e08d6d4a0bfe9c272edc619561ae47c94e22fdf5",
+      "sha256": "8f563b6614d614721e6fe2aabb1151e73d33bc05ca0012a1640fa6fb9e097dc9",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
