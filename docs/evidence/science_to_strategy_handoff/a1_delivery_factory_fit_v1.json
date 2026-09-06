@@ -1,0 +1,42 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SCIENCE-TO-STRATEGY-HANDOFF-FACTORY-FIT-001",
+  "as_of": "2026-09-06",
+  "task_id": "SCIENCE_TO_STRATEGY_HANDOFF_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "5945ee0f00d633faf0ce4dc88798ee81cd87eae5694cf02ddbac770093542aa8",
+  "reviewed_inventory_sha256": "d7837e0fbe01c3c027d7c96e818d032047ad4e900644b03fde420e5b2b4df398",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "TRADING_OPERATIONS_WORKBENCH_V2"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_ACTIVATION",
+    "NO_PAPER_SHADOW_LIVE",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_SECOND_TRUTH_STORE",
+    "NO_WORKFLOW_ENGINE",
+    "NO_STRATEGY_VERSION_V1_2",
+    "NO_FAKE_PRODUCTION_STRATEGY",
+    "NO_NEW_SEMANTIC_ROUTE",
+    "NO_CANONICAL_DONE"
+  ],
+  "recovery": "REVERT"
+}
