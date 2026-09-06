@@ -131,6 +131,30 @@ Prove, in order, then STOP:
 
 Closed-day archive waits until the UTC day is actually closed.
 
+## Compact SNAPSHOT_PLUS_DELTA commissioning (later OPERATE, not this Git PR)
+
+Write-only procedure after the economy/signal repair SHA is merged. Do **not**
+execute it from the Git PR. Do not rewrite historical fat deltas, verified
+`20260905` archive, or live scientific members. Success is material collapse of
+tick wall-time and new-delta bytes versus the fat-`unchanged[]` regime, plus
+exact reconstruction. Do not require arbitrary exact performance numbers before
+a real live result. If the dominant cost remains, STOP and report it instead of
+tuning thresholds.
+
+1. Fresh live SHA / collector / HOT90 readback.
+2. Exact merged-SHA deploy (`restart=False` exact-SHA).
+3. Preserve local runtime/data (`local/` including HOT90 runtime and RDP).
+4. Observe several consecutive real ticks.
+5. Prove new delta representation appears (`schema_version=2.0`, no `unchanged[]`).
+6. Prove mixed old→new current-UTC-day reconstruction.
+7. Prove collector source poll continues.
+8. Measure tick wall-time.
+9. Verify lease does not expire during a normal tick (`LEASE_SECONDS` stays 120 unless a later evidence-backed renewal is required).
+10. Verify archive/backup unaffected (no historical rewrite).
+11. Verify watch stops generating false `DATA_STALE` / duplicate `COLLECTOR_STALLED`.
+12. Wait for automatic `RECOVERED` rather than clearing incident state manually.
+13. Record a new storage-growth baseline without deleting old data.
+
 ## Non-claims
 
 Filename, listing, mtime, size, or successful upload never authorize deletion.

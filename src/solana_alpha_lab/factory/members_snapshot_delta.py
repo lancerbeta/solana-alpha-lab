@@ -17,17 +17,35 @@ LAYOUT_KIND = "SNAPSHOT_PLUS_DELTA"
 LEGACY_KIND = "LEGACY_FULL"
 UNIT_SCHEMA = "smial.members-snapshot-plus-delta-unit"
 DELTA_SCHEMA = "smial.members-snapshot-delta"
+DELTA_SCHEMA_VERSION_V1 = "1.0"
+DELTA_SCHEMA_VERSION_V2 = "2.0"
+SUPPORTED_DELTA_SCHEMA_VERSIONS = frozenset(
+    {DELTA_SCHEMA_VERSION_V1, DELTA_SCHEMA_VERSION_V2}
+)
+
+_FINGERPRINT_WORK = {"snapshot_fingerprint": 0, "row_fingerprint": 0}
 
 
 class MembersDeltaError(ValueError):
     """Typed SNAPSHOT_PLUS_DELTA failure."""
 
 
+def reset_fingerprint_work() -> None:
+    _FINGERPRINT_WORK["snapshot_fingerprint"] = 0
+    _FINGERPRINT_WORK["row_fingerprint"] = 0
+
+
+def fingerprint_work() -> dict[str, int]:
+    return dict(_FINGERPRINT_WORK)
+
+
 def row_fingerprint(row: Mapping[str, Any]) -> str:
+    _FINGERPRINT_WORK["row_fingerprint"] += 1
     return canonical_sha256(dict(row))
 
 
 def snapshot_fingerprint(rows: Sequence[Mapping[str, Any]]) -> str:
+    _FINGERPRINT_WORK["snapshot_fingerprint"] += 1
     ordered = [dict(row) for row in sorted(rows, key=lambda item: str(item.get("entity_id") or ""))]
     return canonical_sha256(ordered)
 
@@ -35,6 +53,8 @@ def snapshot_fingerprint(rows: Sequence[Mapping[str, Any]]) -> str:
 def diff_member_snapshots(
     previous: Sequence[Mapping[str, Any]],
     current: Sequence[Mapping[str, Any]],
+    *,
+    include_unchanged: bool = False,
 ) -> dict[str, Any]:
     prev_by = {str(row.get("entity_id") or ""): dict(row) for row in previous}
     curr_by = {str(row.get("entity_id") or ""): dict(row) for row in current}
@@ -42,6 +62,7 @@ def diff_member_snapshots(
         raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
     if len(prev_by) != len(previous) or len(curr_by) != len(current):
         raise MembersDeltaError("DUPLICATE_ENTITY_ID")
+    prev_fp = {entity_id: row_fingerprint(row) for entity_id, row in prev_by.items()}
     added: list[dict[str, Any]] = []
     changed: list[dict[str, Any]] = []
     unchanged: list[dict[str, str]] = []
@@ -50,29 +71,39 @@ def diff_member_snapshots(
         if entity_id not in prev_by:
             added.append(row)
             continue
-        if row_fingerprint(prev_by[entity_id]) != digest:
+        if prev_fp[entity_id] != digest:
             changed.append(row)
-        else:
+        elif include_unchanged:
             unchanged.append({"entity_id": entity_id, "fingerprint": digest})
     removed: list[dict[str, str]] = []
     for entity_id, row in prev_by.items():
         if entity_id not in curr_by:
-            removed.append({"entity_id": entity_id, "fingerprint": row_fingerprint(row)})
-    return {
+            removed.append({"entity_id": entity_id, "fingerprint": prev_fp[entity_id]})
+    payload = {
         "added": added,
         "removed": removed,
         "changed": changed,
-        "unchanged": unchanged,
     }
+    if include_unchanged:
+        payload["unchanged"] = unchanged
+    return payload
 
 
 def apply_member_delta(
     base_rows: Sequence[Mapping[str, Any]],
     delta: Mapping[str, Any],
+    *,
+    previous_fingerprint: str | None = None,
+    verify_unchanged: bool = False,
+    verify_base_hash: bool = False,
 ) -> list[dict[str, Any]]:
     by_id = {str(row.get("entity_id") or ""): dict(row) for row in base_rows}
-    if snapshot_fingerprint(base_rows) != str(delta.get("previous_fingerprint") or ""):
+    expected_previous = str(delta.get("previous_fingerprint") or "")
+    if previous_fingerprint is not None and expected_previous != str(previous_fingerprint):
         raise MembersDeltaError("DELTA_HASH_MISMATCH")
+    if verify_base_hash:
+        if snapshot_fingerprint(base_rows) != expected_previous:
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
     for item in delta.get("removed") or []:
         entity_id = str(item.get("entity_id") or "")
         if entity_id not in by_id:
@@ -86,12 +117,13 @@ def apply_member_delta(
         if not entity_id:
             raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
         by_id[entity_id] = payload
-    for item in delta.get("unchanged") or []:
-        entity_id = str(item.get("entity_id") or "")
-        if entity_id not in by_id:
-            raise MembersDeltaError("DELTA_UNCHANGED_MISSING")
-        if row_fingerprint(by_id[entity_id]) != str(item.get("fingerprint") or ""):
-            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+    if verify_unchanged:
+        for item in delta.get("unchanged") or []:
+            entity_id = str(item.get("entity_id") or "")
+            if entity_id not in by_id:
+                raise MembersDeltaError("DELTA_UNCHANGED_MISSING")
+            if row_fingerprint(by_id[entity_id]) != str(item.get("fingerprint") or ""):
+                raise MembersDeltaError("DELTA_HASH_MISMATCH")
     return [by_id[key] for key in sorted(by_id)]
 
 
@@ -156,21 +188,28 @@ def append_delta_publication(
     unit = json.loads(unit_path.read_text(encoding="utf-8"))
     if not isinstance(unit, dict) or unit.get("layout") != LAYOUT_KIND:
         raise MembersDeltaError("UNIT_LAYOUT_INVALID")
-    reconstructed = reconstruct_publication(
-        data_root,
-        unit,
-        str(unit["publications"][-1]["dataset_manifest_id"]),
-    )
     previous_id = str(unit["publications"][-1]["dataset_manifest_id"])
-    previous_fp = snapshot_fingerprint(reconstructed)
-    delta = diff_member_snapshots(reconstructed, rows)
+    reconstructed = reconstruct_publication(data_root, unit, previous_id)
+    previous_fp = str(unit["publications"][-1]["snapshot_fingerprint"])
+    delta = diff_member_snapshots(reconstructed, rows, include_unchanged=False)
+    current_fp = snapshot_fingerprint(rows)
     delta_payload = {
         "schema": DELTA_SCHEMA,
-        "schema_version": "1.0",
+        "schema_version": DELTA_SCHEMA_VERSION_V2,
         "dataset_manifest_id": dataset_manifest_id,
         "previous_dataset_manifest_id": previous_id,
         "previous_fingerprint": previous_fp,
-        **delta,
+        "current_fingerprint": current_fp,
+        "added": delta["added"],
+        "changed": delta["changed"],
+        "removed": delta["removed"],
+        "counts": {
+            "added": len(delta["added"]),
+            "changed": len(delta["changed"]),
+            "removed": len(delta["removed"]),
+            "previous_row_count": len(reconstructed),
+            "current_row_count": len(rows),
+        },
     }
     seq = int(unit["publications"][-1]["seq"]) + 1
     rel = (
@@ -178,9 +217,15 @@ def append_delta_publication(
         f"{seq:04d}-{dataset_manifest_id}/members.parquet"
     )
     path = data_root / rel
-    digest = _write_delta_parquet(path, delta_payload)
-    applied = apply_member_delta(reconstructed, delta_payload)
-    if snapshot_fingerprint(applied) != snapshot_fingerprint(rows):
+    digest = persist_delta_payload(path, delta_payload)
+    applied = apply_member_delta(
+        reconstructed,
+        delta_payload,
+        previous_fingerprint=previous_fp,
+        verify_unchanged=False,
+        verify_base_hash=False,
+    )
+    if snapshot_fingerprint(applied) != current_fp:
         raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
     unit["publications"].append(
         {
@@ -190,7 +235,8 @@ def append_delta_publication(
             "rel": rel.replace("\\", "/"),
             "sha256": digest,
             "row_count": len(rows),
-            "snapshot_fingerprint": snapshot_fingerprint(rows),
+            "snapshot_fingerprint": current_fp,
+            "delta_schema_version": DELTA_SCHEMA_VERSION_V2,
         }
     )
     _write_unit(unit_path, unit)
@@ -207,7 +253,11 @@ def reconstruct_publication(
     if not publications:
         raise MembersDeltaError("ANCHOR_MISSING")
     anchor = publications[0]
-    if str(anchor.get("kind") or "") != "snapshot":
+    try:
+        anchor_seq = int(anchor.get("seq"))
+    except (TypeError, ValueError):
+        raise MembersDeltaError("ANCHOR_MISSING") from None
+    if str(anchor.get("kind") or "") != "snapshot" or anchor_seq != 0:
         raise MembersDeltaError("ANCHOR_MISSING")
     snapshot_path = data_root / str(anchor["rel"])
     if snapshot_path.is_file() is False:
@@ -216,9 +266,21 @@ def reconstruct_publication(
     if observed != str(anchor.get("sha256") or ""):
         raise MembersDeltaError("DELTA_HASH_MISMATCH")
     current = [dict(row) for row in pq.read_table(snapshot_path).to_pylist()]
-    if str(anchor.get("dataset_manifest_id") or "") == dataset_manifest_id:
+    running_fp = snapshot_fingerprint(current)
+    if running_fp != str(anchor.get("snapshot_fingerprint") or ""):
+        raise MembersDeltaError("DELTA_HASH_MISMATCH")
+    previous_id = str(anchor.get("dataset_manifest_id") or "")
+    if previous_id == dataset_manifest_id:
         return current
-    for item in publications[1:]:
+    for index, item in enumerate(publications[1:], start=1):
+        try:
+            item_seq = int(item.get("seq"))
+        except (TypeError, ValueError):
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID") from None
+        if item_seq != index:
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+        if str(item.get("kind") or "") != "delta":
+            raise MembersDeltaError("UNIT_LAYOUT_INVALID")
         rel = str(item.get("rel") or "")
         path = data_root / rel
         if path.is_file() is False:
@@ -227,9 +289,41 @@ def reconstruct_publication(
         if hashlib.sha256(payload).hexdigest() != str(item.get("sha256") or ""):
             raise MembersDeltaError("DELTA_HASH_MISMATCH")
         delta = _read_delta_payload(path, payload)
-        current = apply_member_delta(current, delta)
-        if str(item.get("dataset_manifest_id") or "") == dataset_manifest_id:
+        schema_version = str(delta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
+        if schema_version not in SUPPORTED_DELTA_SCHEMA_VERSIONS:
+            raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
+        if str(delta.get("previous_dataset_manifest_id") or "") != previous_id:
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+        if str(delta.get("dataset_manifest_id") or "") != str(item.get("dataset_manifest_id") or ""):
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+        if str(delta.get("previous_fingerprint") or "") != running_fp:
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        current = apply_member_delta(
+            current,
+            delta,
+            previous_fingerprint=running_fp,
+            verify_unchanged=False,
+            verify_base_hash=False,
+        )
+        unit_fp = str(item.get("snapshot_fingerprint") or "")
+        current_fp = str(delta.get("current_fingerprint") or "")
+        is_target = str(item.get("dataset_manifest_id") or "") == dataset_manifest_id
+        if schema_version == DELTA_SCHEMA_VERSION_V2:
+            if not current_fp:
+                raise MembersDeltaError("DELTA_CORRUPT")
+            if unit_fp and current_fp != unit_fp:
+                raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        if is_target:
+            observed_fp = snapshot_fingerprint(current)
+            if unit_fp and observed_fp != unit_fp:
+                raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+            if schema_version == DELTA_SCHEMA_VERSION_V2 and observed_fp != current_fp:
+                raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
             return current
+        running_fp = current_fp or unit_fp
+        if not running_fp:
+            raise MembersDeltaError("DELTA_CORRUPT")
+        previous_id = str(item.get("dataset_manifest_id") or "")
     raise MembersDeltaError("PUBLICATION_NOT_IN_UNIT")
 
 
@@ -262,7 +356,7 @@ def load_member_rows_for_location(data_root: Path, logical_location: str) -> lis
     return [dict(row) for row in table.to_pylist()]
 
 
-def _write_delta_parquet(path: Path, delta_payload: Mapping[str, Any]) -> str:
+def persist_delta_payload(path: Path, delta_payload: Mapping[str, Any]) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
     encoded = json.dumps(delta_payload, sort_keys=True, separators=(",", ":"))
     table = pa.table({"delta_json": [encoded]})
@@ -272,6 +366,10 @@ def _write_delta_parquet(path: Path, delta_payload: Mapping[str, Any]) -> str:
     digest = hashlib.sha256(payload).hexdigest()
     tmp.replace(path)
     return digest
+
+
+def _write_delta_parquet(path: Path, delta_payload: Mapping[str, Any]) -> str:
+    return persist_delta_payload(path, delta_payload)
 
 
 def _read_delta_payload(path: Path, payload: bytes) -> dict[str, Any]:

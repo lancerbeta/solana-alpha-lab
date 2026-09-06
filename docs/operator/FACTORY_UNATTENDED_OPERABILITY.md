@@ -31,6 +31,11 @@ After a later owner-gated commissioning (not this Git change):
 
 Archive, Telegram and heartbeat failures must not stop the collector.
 Collector death must still be visible to the local watch while the VPS is alive.
+One `DATA_STALE` health class emits one owner incident: `SOURCE_DATA_STALE`.
+It does not also emit `COLLECTOR_STALLED`. A true collector stoppage still
+surfaces through source freshness, required timers, or service failure.
+Watch cadence stays every 15 minutes UTC; do not treat a slower watch as
+the fix for a long oneshot tick.
 
 ## WHAT DOES GIT OWN?
 

@@ -62,7 +62,6 @@ def classify_incidents(
     found: dict[str, str] = {}
     if "DATA_STALE" in classes:
         found["SOURCE_DATA_STALE"] = "Collector source-poll older than 3 periods."
-        found["COLLECTOR_STALLED"] = "Process may be alive while collector progress is stale."
     if "RDP_PUBLICATION_STALE" in classes:
         found["PUBLICATION_STUCK"] = "Publication progress is stale beyond the freshness bound."
     if "BACKUP_DEGRADED" in classes:
