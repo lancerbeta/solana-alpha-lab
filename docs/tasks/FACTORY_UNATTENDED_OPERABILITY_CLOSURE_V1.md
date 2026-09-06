@@ -9,7 +9,7 @@ allowed_routes:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: f08effba27125d6e23c0ee4de53c0d1ee2ae0cde
+  expected_base: 2eae71b9fbc8d29fc98b7bc8f42975ea1ca63e0e
   expected_upstream: origin/main
   expected_upstream_oid: 2eae71b9fbc8d29fc98b7bc8f42975ea1ca63e0e
   expected_branch: cursor/factory-unattended-operability-closure-v1
