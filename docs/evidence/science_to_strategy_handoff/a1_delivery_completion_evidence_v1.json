@@ -11,8 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "README.md": "ffd6ab2f6a2476be116fadf8a919ad33f47ee387c344e47120a8a4b573d75bd4",
-    "catalog/assets/core.yaml": "231125ed1c6bca5876d421704954a76476b36023df875958aff3334163996d10",
+    "catalog/assets/core.yaml": "814a49ab3cd60f044c34781e22c23030b48f14643e954d9652af55ff9d321583",
     "catalog/assets/lifecycle.yaml": "79a901d0a10f47d0c46f01f88992ac84c438f92c106f6be7f6830ab97c51e235",
     "catalog/catalog_manifest.yaml": "7089a9511e63c45830319ab58c38518f53f4c235461acd90a1feade1ef902cde",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "501c0ef06b6d84640c7d1c1e2849745c524c2b97b0bf8aa31f3de1b80d9816ce",
@@ -27,7 +26,7 @@
     "docs/contracts/research_lifecycle_workbench_v1.md": "4bf166e78a607f90f18009d47f10db317ba7bba679d6140568103f05b590f988",
     "docs/contracts/science_to_strategy_handoff_v1.md": "39bb7c961d7a59b5159cc62205ec49f1839154ff39bdee33102ba3a12388a438",
     "docs/reports/science_to_strategy_handoff/a1_owner_readout_v1.md": "6c6e231aada9855109c6a21f3a556a6484fd6b7fdd0ba72ced0be188f87eacdf",
-    "docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md": "9e9a1b2d4aa28be11d0705bcbe31780e0a28cf331ccb23b3c5da81d00958c60e",
+    "docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md": "fac59437ba362ff7bd34114d2e86776fa8bfea74d1f5c9759a67f9a21b39859f",
     "src/solana_alpha_lab/factory/application.py": "5aabbeac71fd95d73ee191fc618f706f6443fa55b8be2ca7fec9f9d5edffc03c",
     "src/solana_alpha_lab/factory/experiment_evidence.py": "314d80154e0201d71bedd70653bb3dcd4145c28c3ae6c4ac4e78a49a59a29371",
     "src/solana_alpha_lab/factory/lifecycle_projection.py": "1ad24507f38abee632c10ebb3bea9cb54c6b6271545ae6e3b37137c94c928bc1",
@@ -35,7 +34,8 @@
     "src/solana_alpha_lab/factory/promotion_handoff.py": "c910b2a406c77c6e514f9d57f74fe763405e8dc3c3b4837c7b348fd6752d33c1",
     "src/solana_alpha_lab/factory/research_workbench.py": "29323bccc865ce8064b0207c10cc6fa1fff0a89322b85cc12d4c57d7df140b81",
     "src/solana_alpha_lab/factory/workbench.py": "2dd0438963ba51268cebffc2148394013f5845d53893e88c7d3580469cd15938",
-    "tests/test_science_to_strategy_handoff_v1.py": "15e829d384bbb3ed7a180041e59560c151cdc35d22387d511d3e885d581c045e"
+    "tests/test_factory_ordinary_market_hypothesis.py": "ce00edae429ef6c103b9762bd4b38b53301ee9da2a258e57db1daa16f4db139e",
+    "tests/test_science_to_strategy_handoff_v1.py": "32973ddc63b8c48e4a8c2e43445554c1eb31cd47f67c358200a865018a588682"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -47,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/science_to_strategy_handoff/a1_delivery_factory_fit_v1.json",
-    "sha256": "6eee000131fcef401e905223d1b80bfacd6c6762702228c9a6320ff3a92ad918",
+    "sha256": "1bc30178d21501420f2af3cfb0728dc130c10220822c5f7661c9a41e7b5a58d9",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SCIENCE_TO_STRATEGY_HANDOFF_V1",
     "independent_review": {
       "path": "docs/evidence/science_to_strategy_handoff/a1_delivery_independent_review_v1.json",
-      "sha256": "692c80aac7be40cfaba4bd59fb80327a5b2729727008f8fe5d183245b86d3e2a",
+      "sha256": "8e378e86d7dbd57708e178c3fcfadda1453a0f88f9d55a44732eccb781a2c603",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
