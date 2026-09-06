@@ -1087,7 +1087,8 @@ class AdmissionBackupDocsTests(unittest.TestCase):
         commissioning = (
             ROOT / "docs/operator/FACTORY_HOT90_COMMISSIONING_V1.md"
         ).read_text(encoding="utf-8")
-        self.assertIn("PREPARED_NOT_EXECUTED", commissioning)
+        self.assertIn("ACTIVE_BOUNDARY_CONTRACT", commissioning)
+        self.assertIn("FACTORY_UNATTENDED_OPERABILITY.md", commissioning)
         self.assertIn("WRITE_ONLY_SHADOW", commissioning)
         self.assertIn("local/factory_v1/hot90_activation_runtime.yaml", commissioning)
         self.assertIn("SAFE DEFAULT WHEN NO VALID RUNTIME STATE EXISTS", commissioning)

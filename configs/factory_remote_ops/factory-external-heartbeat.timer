@@ -1,0 +1,11 @@
+[Unit]
+Description=Factory external heartbeat every 5 minutes UTC
+# Template only — do NOT install/enable from this Git PR.
+
+[Timer]
+OnCalendar=*-*-* *:0/5:00 UTC
+Persistent=true
+Unit=factory-external-heartbeat.service
+
+[Install]
+WantedBy=timers.target

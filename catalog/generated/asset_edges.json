@@ -748,9 +748,24 @@
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-001",
+      "relation": "superseded_by",
+      "target_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-V1-1-001"
+    },
+    {
       "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001",
       "relation": "governed_by",
-      "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-UNATTENDED-OPERABILITY-CLOSURE-001"
     },
     {
       "source_asset_id": "CONFIG-FACTORY-SEMANTIC-OPERABILITY-001",
@@ -5029,6 +5044,26 @@
     },
     {
       "source_asset_id": "DOC-FACTORY-REMOTE-HOST-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-REMOTE-HOST-001"
+    },
+    {
+      "source_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
@@ -14871,6 +14906,21 @@
       "source_asset_id": "TEST-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-UNATTENDED-OPERABILITY-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-UNATTENDED-OPERABILITY-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-UNATTENDED-OPERABILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-UNATTENDED-OPERABILITY-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-UNATTENDED-SHADOW-VERTICAL-SLICE-001",

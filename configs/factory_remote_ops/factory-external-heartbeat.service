@@ -1,0 +1,13 @@
+[Unit]
+Description=Factory external liveness heartbeat (URL from secrets.env)
+Documentation=docs/operator/FACTORY_UNATTENDED_OPERABILITY.md
+After=network-online.target
+# Template only — install/enable only after owner-gated production commissioning.
+# Unconfigured FACTORY_EXTERNAL_HEARTBEAT_URL is a typed no-op.
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/solana-alpha-lab
+EnvironmentFile=-/etc/solana-alpha-lab/secrets.env
+ExecStart=/usr/bin/uv run --locked --managed-python python -B scripts/factory_external_heartbeat.py
+NoNewPrivileges=true

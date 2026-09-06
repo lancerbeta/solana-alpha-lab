@@ -248,11 +248,13 @@ class CollectorOperabilityRetentionPulseTests(unittest.TestCase):
             self.assertEqual(packet["collector_verdict"], "ACTION_REQUIRED")
 
             text = render_daily_owner_pulse(packet)
-            self.assertIn("FACTORY / DAILY", text)
+            self.assertIn("FACTORY / DAILY —", text)
             self.assertIn("Collector:", text)
             self.assertIn("Storage:", text)
-            self.assertIn("Owner action:", text)
-            self.assertNotIn("Owner action:\nNONE", text)
+            self.assertIn("Owner:", text)
+            self.assertIn("MESSAGE_TYPE=DAILY", text)
+            self.assertIn("OWNER_ACTION=", text)
+            self.assertNotIn("OWNER_ACTION=NONE", text)
 
             dry = run_daily_owner_pulse(
                 root=root,

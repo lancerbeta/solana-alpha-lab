@@ -76,12 +76,25 @@ backup:
     weekly_weekday_utc: 6
     owner_traffic_target_30d_bytes: 300000000000
     internal_payload_planning_budget_30d_bytes: 240000000000
+  channels:
+    mutable_state: MUTABLE_STATE_BACKUP
+    immutable_rdp_archive: IMMUTABLE_RDP_ARCHIVE
+    full_rdp_legacy: FULL_RDP_BACKUP
+archive:
+  kind: IMMUTABLE_CLOSED_DAY
+  receipts_relative: local/factory_v1/hot90_archive_receipts
+  staging_relative: local/factory_v1/hot90_archives
+  max_days_per_run: 3
+  max_runtime_seconds: 900
+  local_verified_staging_retention: 1
+  on_calendar_utc: "*-*-* 01:15:00 UTC"
 monitoring:
   freshness_max_seconds: 900
   stall_max_seconds: 1800
   disk_used_percent_max: 85
   heartbeat_relative: local/factory_v1/paper_heartbeat.json
   observation_heartbeat_relative: local/factory_v1/observation_schedule_heartbeat.json
+  heartbeat_url_env: FACTORY_EXTERNAL_HEARTBEAT_URL
 alert:
   sink: TELEGRAM_BOT_API
   token_env: FACTORY_TELEGRAM_BOT_TOKEN
@@ -109,6 +122,12 @@ units:
   observation_schedule_timer_relative: configs/factory_remote_ops/factory-observation-schedule.timer
   collector_owner_pulse_service_relative: configs/factory_remote_ops/factory-collector-owner-pulse.service
   collector_owner_pulse_timer_relative: configs/factory_remote_ops/factory-collector-owner-pulse.timer
+  closed_day_archive_service_relative: configs/factory_remote_ops/factory-hot90-closed-day-archive.service
+  closed_day_archive_timer_relative: configs/factory_remote_ops/factory-hot90-closed-day-archive.timer
+  operability_watch_service_relative: configs/factory_remote_ops/factory-operability-watch.service
+  operability_watch_timer_relative: configs/factory_remote_ops/factory-operability-watch.timer
+  external_heartbeat_service_relative: configs/factory_remote_ops/factory-external-heartbeat.service
+  external_heartbeat_timer_relative: configs/factory_remote_ops/factory-external-heartbeat.timer
 health:
   process_alive_alone_is_not_healthy: true
   healthy_verdict_forbidden: true

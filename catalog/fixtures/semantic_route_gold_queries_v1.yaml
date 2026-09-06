@@ -47,6 +47,33 @@ queries:
 - query_id: SGQ-REMOTE-OPS-EN
   query: backup / restore / remote Factory VPS
   required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-BACKUP-VPS-RU
+  query: бэкап VPS
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-IMMUTABLE-DRIVE
+  query: immutable archive Drive
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-ARCHIVE-FAILED-RU
+  query: почему архив не загрузился
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-TELEGRAM-ALERT
+  query: Telegram алерт
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-VPS-DOWN-RU
+  query: VPS недоступен
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-HOST-UNREACHABLE
+  query: host unreachable
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-RESTORE-RU
+  query: как восстановить Factory
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-HOT90-RUNTIME
+  query: HOT90 runtime
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-REMOTE-OPS-MUTABLE-BACKUP
+  query: mutable backup
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
 - query_id: SGQ-AUTHORITY-EN
   query: am I authorized to call/deploy/spend
   required_top_route: SEM-AUTHORITY-BOUNDARIES

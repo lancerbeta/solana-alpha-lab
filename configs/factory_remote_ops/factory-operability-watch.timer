@@ -1,0 +1,11 @@
+[Unit]
+Description=Factory operability watch every 15 minutes UTC
+# Template only — do NOT install/enable from this Git PR.
+
+[Timer]
+OnCalendar=*-*-* *:0/15:00 UTC
+Persistent=true
+Unit=factory-operability-watch.service
+
+[Install]
+WantedBy=timers.target

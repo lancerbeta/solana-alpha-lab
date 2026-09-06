@@ -14,6 +14,10 @@ from typing import Any, Mapping
 
 from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
 from solana_alpha_lab.factory.due_pressure import backlog_risk_from_due_pressure
+from solana_alpha_lab.factory.hot90_activation import load_hot90_activation
+from solana_alpha_lab.factory.hot90_closed_day_loop import archive_backlog, read_receipt
+from solana_alpha_lab.factory.hot90_mutable_backup import mutable_backup_sources
+from solana_alpha_lab.factory.hot90_storage_admission import project_storage_runway
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
     CORPUS_DATASET_ID,
     load_observation_rdp_source,
@@ -57,8 +61,13 @@ HEALTH_CLASSES = (
     "BACKUP_DEGRADED",
     "OFFHOST_BACKUP_STALE",
     "OFFHOST_BACKUP_FAILED",
+    "IMMUTABLE_ARCHIVE_STALE",
+    "IMMUTABLE_ARCHIVE_HASH_MISMATCH",
+    "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED",
     "DISK_WARNING",
     "DISK_CRITICAL",
+    "DISK_RUNWAY_TARGET40",
+    "DISK_RUNWAY_HARD50",
     "RELEASE_BLOCKED",
 )
 
@@ -457,6 +466,17 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
     elif offhost_state in {"DEGRADED", "HARD_ATTENTION", "MISSING"}:
         flags.append("OFFHOST_BACKUP_STALE")
 
+    if int(packet.get("immutable_archive_backlog_days") or 0) > 0:
+        age = packet.get("immutable_archive_oldest_backlog_age_seconds")
+        if isinstance(age, int) and age > 86400:
+            flags.append("IMMUTABLE_ARCHIVE_STALE")
+    if str(packet.get("immutable_archive_last_terminal") or "") == "HASH_MISMATCH":
+        flags.append("IMMUTABLE_ARCHIVE_HASH_MISMATCH")
+    if packet.get("mutable_backup_includes_full_observation_rdp") is True and str(
+        packet.get("hot90_activation_stage") or ""
+    ) in {"DURABILITY_CUTOVER", "RETENTION_ACTIVE"}:
+        flags.append("MUTABLE_BACKUP_FULL_RDP_UNEXPECTED")
+
     disk = packet.get("filesystem_disk_used_pct")
     if isinstance(disk, int):
         if disk >= DISK_CRITICAL_PCT:
@@ -464,6 +484,12 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
         elif disk >= DISK_WARNING_PCT:
             flags.append("DISK_WARNING")
         # >=70% early warning is pulse-text only; remote-ops hard boundary stays 85%.
+
+    runway = str(packet.get("projected_97d_status") or "")
+    if runway == "ACTION_REQUIRED":
+        flags.append("DISK_RUNWAY_HARD50")
+    elif runway == "DEGRADED":
+        flags.append("DISK_RUNWAY_TARGET40")
 
     if str(packet.get("release_state") or "").startswith("RELEASE_BLOCKED"):
         flags.append("RELEASE_BLOCKED")
@@ -483,6 +509,9 @@ def collector_verdict(health_classes: list[str]) -> str:
         "BACKUP_DEGRADED",
         "OFFHOST_BACKUP_FAILED",
         "OFFHOST_BACKUP_STALE",
+        "IMMUTABLE_ARCHIVE_HASH_MISMATCH",
+        "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED",
+        "DISK_RUNWAY_HARD50",
         "RELEASE_BLOCKED",
         "BUDGET_BLOCKED",
     }
@@ -491,10 +520,11 @@ def collector_verdict(health_classes: list[str]) -> str:
         "PROVIDER_RATE_LIMITED",
         "PROVIDER_FAILED",
         "DISCOVERY_GAP",
-        "DISCOVERY_COVERAGE_UNKNOWN",
         "BACKLOG_RISK",
         "RDP_PUBLICATION_STALE",
         "DISK_WARNING",
+        "IMMUTABLE_ARCHIVE_STALE",
+        "DISK_RUNWAY_TARGET40",
     }
     classes = set(health_classes)
     if classes & action:
@@ -826,6 +856,67 @@ def build_collector_operational_packet(
         ),
         "due_counts": base.get("due_counts") or {},
     }
+    try:
+        activation = load_hot90_activation(root)
+    except Exception:
+        activation = {}
+    packet["hot90_activation_stage"] = activation.get("activation_stage") or UNKNOWN
+    packet["hot90_activation_source"] = activation.get("activation_source") or UNKNOWN
+    try:
+        selected = mutable_backup_sources(
+            (loaded or {}).get("backup") or {},
+            activation_stage=str(activation.get("activation_stage") or "CURRENT_SAFE"),
+        )
+        packet["mutable_backup_includes_full_observation_rdp"] = selected.get(
+            "includes_full_observation_rdp"
+        )
+    except Exception:
+        packet["mutable_backup_includes_full_observation_rdp"] = UNKNOWN
+    try:
+        backlog = archive_backlog(root, now=clock)
+    except Exception:
+        backlog = {
+            "backlog_days": UNKNOWN,
+            "latest_verified_day": UNKNOWN,
+            "oldest_backlog_age_seconds": UNKNOWN,
+            "eligible_unverified_days": [],
+            "stuck_hash_mismatch_days": [],
+        }
+    packet["immutable_archive_latest_verified_day"] = backlog.get("latest_verified_day")
+    packet["immutable_archive_backlog_days"] = backlog.get("backlog_days")
+    packet["immutable_archive_oldest_backlog_age_seconds"] = backlog.get(
+        "oldest_backlog_age_seconds"
+    )
+    last_terminal = None
+    latest = backlog.get("latest_verified_day")
+    unverified = backlog.get("eligible_unverified_days") or []
+    stuck = backlog.get("stuck_hash_mismatch_days") or []
+    probe_day = stuck[0] if stuck else (unverified[0] if unverified else latest)
+    if probe_day:
+        receipt = read_receipt(root, str(probe_day))
+        if receipt:
+            last_terminal = receipt.get("terminal")
+    packet["immutable_archive_last_terminal"] = last_terminal
+    incremental = data_growth if isinstance(data_growth, int) and data_growth >= 0 else 0
+    current_bytes = 0
+    for item in (sqlite_bytes, rdp_bytes):
+        if isinstance(item, int):
+            current_bytes += item
+    try:
+        runway = project_storage_runway(
+            incremental_compressed_bytes_per_day=incremental,
+            current_same_volume_factory_bytes=current_bytes,
+            mutable_backup_peak_bytes=int(backup_sink_bytes)
+            if isinstance(backup_sink_bytes, int)
+            else 0,
+            staging_peak_bytes=0,
+            retention_class="HOT90_RESIDENT",
+        )
+        packet["projected_97d_bytes"] = runway["projected_total_same_volume_bytes"]
+        packet["projected_97d_status"] = runway["status"]
+    except Exception:
+        packet["projected_97d_bytes"] = UNKNOWN
+        packet["projected_97d_status"] = UNKNOWN
     health = compose_health_classes(packet)
     packet["health_classes"] = health
     packet["collector_verdict"] = collector_verdict(health)

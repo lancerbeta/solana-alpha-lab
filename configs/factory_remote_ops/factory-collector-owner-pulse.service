@@ -1,7 +1,8 @@
 [Unit]
 Description=Factory daily collector owner pulse (Telegram summary)
-Documentation=docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
-# Template only — do NOT install/enable in COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1.
+Documentation=docs/operator/FACTORY_UNATTENDED_OPERABILITY.md
+# Template only — install/enable only after owner-gated
+# FACTORY_UNATTENDED_OPERABILITY commissioning.
 
 [Service]
 Type=oneshot
