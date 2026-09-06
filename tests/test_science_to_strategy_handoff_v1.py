@@ -736,6 +736,23 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                     decision_event_id=event_id,
                 )
             self.assertEqual(str(science.exception), "HANDOFF_MANIFEST_INVALID")
+            poisoned = dict(candidate)
+            poisoned["notional_policy"] = {
+                "notional_usd": float("nan"),
+                "fee_bps": 100,
+            }
+            unsigned_poison = {
+                key: value for key, value in poisoned.items() if key != "spec_sha256"
+            }
+            poisoned["spec_sha256"] = canonical_spec_sha256(unsigned_poison)
+            with self.assertRaises(PromotionHandoffError) as non_finite:
+                verify_strategy_version(
+                    ROOT,
+                    poisoned,
+                    manifest=manifest,
+                    decision_event_id=event_id,
+                )
+            self.assertEqual(str(non_finite.exception), "EXECUTION_INPUT_GAP")
 
     def test_check_mismatch_does_not_report_materialized(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -777,6 +794,16 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             self.assertEqual(wrong_clock["handoff_state"], "BLOCKED")
             self.assertIn("HANDOFF_MANIFEST_INVALID", wrong_clock["blocker_codes"])
             self.assertIsNone(wrong_clock["strategy_identity"])
+            injected = check_materialization(
+                root=schema_root,
+                manifest=manifest,
+                execution_inputs=EXECUTION_INPUTS,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                existing_blockers=["HANDOFF_MANIFEST_INVALID"],
+            )
+            self.assertEqual(injected["handoff_state"], "MATERIALIZED")
+            self.assertNotIn("HANDOFF_MANIFEST_INVALID", injected["blocker_codes"])
 
     def test_semantic_gold_query(self) -> None:
         projection = load_semantic_projection(ROOT)

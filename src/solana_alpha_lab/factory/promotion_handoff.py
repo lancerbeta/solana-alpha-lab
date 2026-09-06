@@ -285,6 +285,8 @@ def load_existing_strategies(root: Path) -> list[dict[str, Any]]:
             from solana_alpha_lab.factory.strategy_runtime import load_strategy_version
 
             loaded.append(load_strategy_version(root, relative))
+            if not _finite_machine_numbers(loaded[-1]):
+                raise PromotionHandoffError("STRATEGY_CONTENT_CONFLICT")
         except Exception as exc:  # noqa: BLE001
             raise PromotionHandoffError("STRATEGY_CONTENT_CONFLICT") from exc
     return loaded
@@ -319,6 +321,16 @@ def _parse_execution_inputs(inputs: Mapping[str, Any] | None) -> dict[str, Any] 
         "max_open_positions": positions,
         "shadow": shadow,
     }
+
+
+def _finite_machine_numbers(value: Any) -> bool:
+    if type(value) is float:
+        return math.isfinite(value)
+    if isinstance(value, Mapping):
+        return all(_finite_machine_numbers(item) for item in value.values())
+    if isinstance(value, list):
+        return all(_finite_machine_numbers(item) for item in value)
+    return True
 
 
 def _execution_gaps(inputs: Mapping[str, Any] | None) -> list[str]:
@@ -438,7 +450,11 @@ def check_materialization(
     created_at: str | None = None,
     existing_blockers: Sequence[str] | None = None,
 ) -> dict[str, Any]:
-    blockers = list(existing_blockers or [])
+    blockers = [
+        code
+        for code in (existing_blockers or [])
+        if code in {"EVIDENCE_HASH_CONFLICT", "SOURCE_UNAVAILABLE"}
+    ]
     try:
         manifest = validate_promotion_handoff_manifest(manifest, root=root)
     except PromotionHandoffError:
@@ -579,6 +595,8 @@ def verify_strategy_version(
     validate_promotion_handoff_manifest(manifest, root=root)
     if not _require_bound_decision(manifest, decision_event_id):
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    if not _finite_machine_numbers(candidate):
+        raise PromotionHandoffError("EXECUTION_INPUT_GAP")
     validated = validate_and_hash_strategy(root, candidate)
     if str(validated.get("source_decision_asset_id") or "") != str(
         manifest["decision_event_id"]
