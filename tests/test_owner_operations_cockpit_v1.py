@@ -198,8 +198,10 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
                 home = _get(app, "/")
                 operations = _get(app, "/operations")
                 economics = _get(app, "/economics")
-                self.assertIn(">OPERATIONS<", home)
-                self.assertIn(">ECONOMICS<", home)
+                self.assertIn('href="/operations"', home)
+                self.assertIn(">Операции<", home)
+                self.assertIn('href="/economics"', home)
+                self.assertIn(">Экономика<", home)
                 self.assertNotIn(">MARKET<", home)
                 self.assertIn(ids["p4"], operations)
                 self.assertIn("UNKNOWN", operations)
@@ -338,7 +340,8 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
             app = FactoryApplication(root=root, store=store)
             paper_path = root / PAPER_STORE_RELATIVE
             try:
-                self.assertIn("RESEARCH", _get(app, "/research"))
+                self.assertIn('href="/research"', _get(app, "/research"))
+                self.assertIn(">Исследования<", _get(app, "/research"))
                 self.assertIn("Runtime", _get(app, "/system"))
                 self.assertFalse(paper_path.is_file())
             finally:

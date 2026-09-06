@@ -26324,7 +26324,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: f46adf9ed4a0cad456241a56e1f936347d4844db9c90266018576a7277ccd9c4}
+  integrity: {kind: sha256, sha256: 80be9181491cc13255b724136066ab0386996ec017865c439aaa8c2b1eb9d9fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -34616,7 +34616,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_operations_cockpit_v1.py', repository_path: tests/test_owner_operations_cockpit_v1.py}
-  integrity: {kind: sha256, sha256: e12254150ac5390d3c7bb380c459d300ee9b4078caaa739cac66e3454dcff538}
+  integrity: {kind: sha256, sha256: 82f409ed570e07111b4fd1bb9b882f67aff19d9e1599f4fa1b7e265ed0d7b7fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
@@ -35545,7 +35545,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/EXPERIMENT_EVIDENCE_DECISION_V1.md', repository_path: docs/tasks/EXPERIMENT_EVIDENCE_DECISION_V1.md}
-  integrity: {kind: sha256, sha256: 24c41e293a57486adc4923e1b52f876e30d8560d062c943c3311660c9a452c0a}
+  integrity: {kind: sha256, sha256: 2b56902d04dc1f0940c6d63eadd5792786a2298dad88847761b2bf8bc66d9d24}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001}
