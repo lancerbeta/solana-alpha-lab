@@ -17,7 +17,7 @@
     "docs/design/FACTORY_SPEC_PACKET_V1.md": "e4b7ea1ff70a8f07c73540ef7ab85b2ef8dafa978f078a8dd6ae26576b5fecab",
     "docs/evidence/control/delivery_harness_acceptance_v1.json": "0fa4550a97b93d6e72130cdb4c5d97b73ab1a09cd12cfd7241dd78db068451d3",
     "docs/reports/control/a1_derived_sync_throughput_owner_readout_v1.md": "f649f8f23d024cf77599c14f6758fc00e48a96344a4dfc9a85c3dd8952cab405",
-    "docs/tasks/DELIVERY_HARNESS_DERIVED_SYNC_THROUGHPUT_V1.md": "9ebea00e82aae122acdd10e10d6b03246386888c815fb1a2bc195dcf051b8427",
+    "docs/tasks/DELIVERY_HARNESS_DERIVED_SYNC_THROUGHPUT_V1.md": "5f53aa9b80f02fa59dfadb88c4c9a12427a46669c100cc2506e2285d0b39ae45",
     "scripts/harness_sync.py": "1daf582772acfef3f5930dfb8bc97b69e5153e982d658346fd8c9a000e39da37",
     "tests/test_harness_sync.py": "362faf8dda96a076b6fec395d52eeb1f62858cc7df49406d1cec6fac3ba884e7"
   },
@@ -31,14 +31,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_derived_sync_throughput_factory_fit_v1.json",
-    "sha256": "e2a2c1c76a547386a06cee1aa54b7c631ebea32fe11e39050d0456cc8186a1dd",
+    "sha256": "a6702590d348dd21017121ffab65dcf819613604857f0d34dedab950034d6b0f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HARNESS_SYNC_HASH_SCOPE_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_derived_sync_throughput_review_v1.json",
-      "sha256": "413c2a2c13d6e24fab04489845bda3d3be6313dc9794d0cd2dc7eecf454fa5ba",
+      "sha256": "31fde9181a7e7be84ee6df51d6e21dc4ec8fa41da92901db9b9f6eed7f8ea0ce",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
