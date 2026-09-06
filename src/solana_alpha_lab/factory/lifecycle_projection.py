@@ -1563,9 +1563,7 @@ def _adapt_research_store(
         projection_class, native_kind = _RESEARCH_CLASS[kind]
         as_of = record.effective_at.astimezone(UTC).isoformat().replace("+00:00", "Z")
         available = record.first_reliable_available_at.astimezone(UTC).isoformat().replace("+00:00", "Z")
-        native_state = str(
-            payload.get("decision_kind") or payload.get("status") or kind
-        )
+        native_state = str(payload.get("status") or kind)
         entities.append(
             _entity(
                 entity_id=entity_id,

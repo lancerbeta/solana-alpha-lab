@@ -373,10 +373,15 @@ class FactoryApplication:
             snapshot_sha256=expected,
         )
         manifest = None
+        now = datetime.now(UTC).replace(microsecond=0)
+        stamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")
         if kind == "PROMOTE":
             try:
                 manifest = freeze_promotion_handoff_manifest(
-                    reread_dossier, root=self.root
+                    reread_dossier,
+                    root=self.root,
+                    decision_event_id=event_id,
+                    decision_effective_at=stamp,
                 )
             except PromotionHandoffError as exc:
                 raise ApplicationError(str(exc) or "EXPERIMENT_SPEC_BINDING_GAP") from exc
@@ -398,7 +403,6 @@ class FactoryApplication:
         payload_json = json.dumps(
             payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
         )
-        now = datetime.now(UTC)
         event = ResearchEvent(
             record_id=event_id,
             record_kind="DECISION_EVENT",

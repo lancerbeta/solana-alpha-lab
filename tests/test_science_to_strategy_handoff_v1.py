@@ -21,8 +21,9 @@ from solana_alpha_lab.factory.application import FactoryApplication
 from solana_alpha_lab.factory.experiment_evidence import evidence_snapshot_sha256
 from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection
 from solana_alpha_lab.factory.promotion_handoff import (
+    PromotionHandoffError,
     compose_science_to_strategy_handoff,
-    freeze_promotion_handoff_manifest,
+    handoff_overview_counters,
     materialize_strategy_candidate,
     render_strategy_version,
 )
@@ -201,6 +202,13 @@ def _schema_root(tmp: Path) -> Path:
     return tmp
 
 
+def _stored_manifest(store: ResearchStore, event_id: str) -> dict:
+    for record in store.iter_committed_records():
+        if record.record_id == event_id:
+            return json.loads(record.payload_json)["promotion_handoff_manifest"]
+    raise AssertionError(event_id)
+
+
 class ScienceToStrategyHandoffTests(unittest.TestCase):
     def test_scenario_a_happy_path_vertical(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -226,11 +234,15 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             handoff = recorded["dossier"]["science_to_strategy_handoff"]
             self.assertEqual(handoff["state"]["handoff_state"], "BLOCKED")
             self.assertIn("EXECUTION_INPUT_GAP", handoff["state"]["blocker_codes"])
+            self.assertEqual(
+                manifest["decision_event_id"],
+                recorded["decision_result"]["decision_event_id"],
+            )
             rendered = materialize_strategy_candidate(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=recorded["decision_result"]["decision_event_id"],
-                created_at="2026-09-06T12:00:00Z",
+                created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
             )
             self.assertEqual(rendered["handoff_state"], "READY_TO_MATERIALIZE")
@@ -362,14 +374,12 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             app = _app(data_root)
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
-            manifest = freeze_promotion_handoff_manifest(
-                recorded["dossier"], root=ROOT
-            )
+            manifest = _stored_manifest(store, event_id)
             candidate = render_strategy_version(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=event_id,
-                created_at="2026-09-06T12:00:00Z",
+                created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
             )
             schema_root = _schema_root(Path(tmp) / "git")
@@ -382,7 +392,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 root=schema_root,
                 manifest=manifest,
                 decision_event_id=event_id,
-                created_at="2026-09-06T12:00:00Z",
+                created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
             )
             self.assertEqual(identical["handoff_state"], "MATERIALIZED")
@@ -401,7 +411,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 root=schema_root,
                 manifest=manifest,
                 decision_event_id=event_id,
-                created_at="2026-09-06T12:00:00Z",
+                created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
             )
             self.assertEqual(clash["handoff_state"], "CONFLICT")
@@ -463,28 +473,172 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             app = _app(data_root)
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
-            manifest = freeze_promotion_handoff_manifest(
-                recorded["dossier"], root=ROOT
-            )
+            manifest = _stored_manifest(store, event_id)
             first = render_strategy_version(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=event_id,
-                created_at="2026-09-06T12:00:00Z",
+                created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
             )
             second = render_strategy_version(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=event_id,
-                created_at="2026-09-06T12:00:00Z",
+                created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
             )
             self.assertEqual(first, second)
+            payload = None
+            for record in store.iter_committed_records():
+                if record.record_id == event_id:
+                    payload = json.loads(record.payload_json)
             self.assertEqual(
-                recorded["dossier"]["evidence_snapshot_sha256"],
+                payload["evidence_snapshot_sha256"],
                 manifest["evidence_snapshot_sha256"],
             )
+
+    def test_mismatched_decision_event_or_clock_is_invalid(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            recorded = _promote(app)
+            event_id = recorded["decision_result"]["decision_event_id"]
+            manifest = _stored_manifest(store, event_id)
+            with self.assertRaises(PromotionHandoffError) as mismatch:
+                render_strategy_version(
+                    root=ROOT,
+                    manifest=manifest,
+                    decision_event_id="DEC-OTHER-EVENT",
+                    created_at=manifest["decision_effective_at"],
+                    execution_inputs=EXECUTION_INPUTS,
+                )
+            self.assertEqual(str(mismatch.exception), "HANDOFF_MANIFEST_INVALID")
+            with self.assertRaises(PromotionHandoffError) as clock:
+                render_strategy_version(
+                    root=ROOT,
+                    manifest=manifest,
+                    decision_event_id=event_id,
+                    created_at="2020-01-01T00:00:00Z",
+                    execution_inputs=EXECUTION_INPUTS,
+                )
+            self.assertEqual(str(clock.exception), "HANDOFF_MANIFEST_INVALID")
+
+    def test_coerced_execution_inputs_are_gaps(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            recorded = _promote(app)
+            event_id = recorded["decision_result"]["decision_event_id"]
+            manifest = _stored_manifest(store, event_id)
+            coerced = dict(EXECUTION_INPUTS)
+            coerced["shadow"] = "false"
+            stringed = materialize_strategy_candidate(
+                root=ROOT,
+                manifest=manifest,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                execution_inputs=coerced,
+            )
+            self.assertEqual(stringed["handoff_state"], "BLOCKED")
+            self.assertIn("EXECUTION_INPUT_GAP", stringed["blocker_codes"])
+            bool_as_int = dict(EXECUTION_INPUTS)
+            bool_as_int["max_age_seconds"] = True
+            typed = materialize_strategy_candidate(
+                root=ROOT,
+                manifest=manifest,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                execution_inputs=bool_as_int,
+            )
+            self.assertEqual(typed["handoff_state"], "BLOCKED")
+            self.assertIn("EXECUTION_INPUT_GAP", typed["blocker_codes"])
+
+    def test_overview_ready_is_not_available(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            _promote(app)
+            projection = build_lifecycle_projection(
+                ROOT,
+                research_store=store,
+                projected_at="2026-09-06T12:00:00Z",
+            )
+            counters = handoff_overview_counters(
+                projection, research_status="AVAILABLE"
+            )
+            self.assertEqual(counters["SCIENTIFIC PROMOTE"], 1)
+            self.assertIsNone(counters["READY TO STRATEGY"])
+            self.assertEqual(counters["HANDOFF BLOCKED"], 1)
+            self.assertEqual(counters["STRATEGY MATERIALIZED"], 0)
+            status, body = _http(app, "GET", "/research")
+            self.assertEqual(status, 200)
+            self.assertIn("Готово к стратегии", body)
+            self.assertIn("недоступно", body)
+
+    def test_unreadable_strategy_file_is_conflict(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            recorded = _promote(app)
+            event_id = recorded["decision_result"]["decision_event_id"]
+            manifest = _stored_manifest(store, event_id)
+            schema_root = _schema_root(Path(tmp) / "git")
+            (schema_root / "configs" / "strategies" / "broken.yaml").write_text(
+                "not: [unterminated",
+                encoding="utf-8",
+            )
+            blocked = materialize_strategy_candidate(
+                root=schema_root,
+                manifest=manifest,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                execution_inputs=EXECUTION_INPUTS,
+            )
+            self.assertEqual(blocked["handoff_state"], "CONFLICT")
+            self.assertIn("STRATEGY_CONTENT_CONFLICT", blocked["blocker_codes"])
+            self.assertIsNone(blocked["candidate"])
+
+    def test_materialized_keeps_evidence_hash_conflict(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            recorded = _promote(app)
+            event_id = recorded["decision_result"]["decision_event_id"]
+            manifest = _stored_manifest(store, event_id)
+            schema_root = _schema_root(Path(tmp) / "git")
+            candidate = render_strategy_version(
+                root=ROOT,
+                manifest=manifest,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                execution_inputs=EXECUTION_INPUTS,
+            )
+            (schema_root / "configs" / "strategies" / "replay.yaml").write_text(
+                yaml.safe_dump(candidate, sort_keys=False, allow_unicode=True),
+                encoding="utf-8",
+            )
+            from solana_alpha_lab.factory.promotion_handoff import check_materialization
+
+            check = check_materialization(
+                root=schema_root,
+                manifest=manifest,
+                execution_inputs=EXECUTION_INPUTS,
+                decision_event_id=event_id,
+                existing_blockers=["EVIDENCE_HASH_CONFLICT"],
+            )
+            self.assertEqual(check["handoff_state"], "MATERIALIZED")
+            self.assertIn("EVIDENCE_HASH_CONFLICT", check["blocker_codes"])
 
     def test_semantic_gold_query(self) -> None:
         projection = load_semantic_projection(ROOT)

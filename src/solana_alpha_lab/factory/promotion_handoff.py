@@ -132,6 +132,8 @@ def freeze_promotion_handoff_manifest(
     dossier: Mapping[str, Any],
     *,
     root: Path,
+    decision_event_id: str,
+    decision_effective_at: str,
 ) -> dict[str, Any]:
     locator = dossier.get("locator") if isinstance(dossier.get("locator"), Mapping) else {}
     tested = dossier.get("tested") if isinstance(dossier.get("tested"), Mapping) else {}
@@ -179,9 +181,15 @@ def freeze_promotion_handoff_manifest(
     if not obligations:
         raise PromotionHandoffError("EVIDENCE_RELATION_GAP")
     packet = _text(dossier.get("promotion_packet_sha256"))
+    bound_event = _text(decision_event_id)
+    bound_at = _text(decision_effective_at)
+    if not bound_event or not bound_at:
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
     unsigned = {
         "schema": MANIFEST_SCHEMA,
         "schema_version": "1.0",
+        "decision_event_id": bound_event,
+        "decision_effective_at": bound_at,
         "experiment_id": experiment_id,
         "hypothesis_version_id": hypothesis_version_id,
         "experiment_spec_source_kind": "git_path",
@@ -276,16 +284,47 @@ def load_existing_strategies(root: Path) -> list[dict[str, Any]]:
             from solana_alpha_lab.factory.strategy_runtime import load_strategy_version
 
             loaded.append(load_strategy_version(root, relative))
-        except Exception:  # noqa: BLE001
-            continue
+        except Exception as exc:  # noqa: BLE001
+            raise PromotionHandoffError("STRATEGY_CONTENT_CONFLICT") from exc
     return loaded
 
 
-def _execution_gaps(inputs: Mapping[str, Any] | None) -> list[str]:
+def _parse_execution_inputs(inputs: Mapping[str, Any] | None) -> dict[str, Any] | None:
     if not isinstance(inputs, Mapping):
-        return ["EXECUTION_INPUT_GAP"]
-    missing = [key for key in REQUIRED_EXECUTION_INPUTS if key not in inputs or inputs.get(key) is None]
-    return ["EXECUTION_INPUT_GAP"] if missing else []
+        return None
+    if any(key not in inputs or inputs.get(key) is None for key in REQUIRED_EXECUTION_INPUTS):
+        return None
+    max_age = inputs["max_age_seconds"]
+    notional = inputs["notional_usd"]
+    fee = inputs["fee_bps"]
+    positions = inputs["max_open_positions"]
+    shadow = inputs["shadow"]
+    if type(max_age) is not int or max_age < 1:
+        return None
+    if type(notional) not in (int, float) or type(notional) is bool:
+        return None
+    if type(fee) is not int or fee < 0:
+        return None
+    if type(positions) is not int or positions < 1:
+        return None
+    if type(shadow) is not bool:
+        return None
+    return {
+        "max_age_seconds": max_age,
+        "notional_usd": float(notional),
+        "fee_bps": fee,
+        "max_open_positions": positions,
+        "shadow": shadow,
+    }
+
+
+def _execution_gaps(inputs: Mapping[str, Any] | None) -> list[str]:
+    return [] if _parse_execution_inputs(inputs) is not None else ["EXECUTION_INPUT_GAP"]
+
+
+def _require_bound_decision(manifest: Mapping[str, Any], decision_event_id: str | None) -> bool:
+    bound = str(manifest.get("decision_event_id") or "")
+    return bool(bound) and bound == str(decision_event_id or "")
 
 
 def _source_revalidation(
@@ -335,13 +374,26 @@ def _strategy_relation(
     candidate: Mapping[str, Any] | None,
 ) -> tuple[str | None, str | None, list[str]]:
     identity = f"{strategy_id}@{strategy_version}"
-    existing = _lookup_strategy(root, strategy_id, strategy_version)
+    try:
+        existing = _lookup_strategy(root, strategy_id, strategy_version)
+    except PromotionHandoffError:
+        return identity, "CONFLICT", ["STRATEGY_CONTENT_CONFLICT"]
     if existing is None:
         return None, None, []
     if candidate is not None:
-        unsigned_existing = {key: value for key, value in existing.items() if key != "spec_sha256"}
-        unsigned_candidate = {key: value for key, value in dict(candidate).items() if key != "spec_sha256"}
-        if canonical_dumps(unsigned_existing) == canonical_dumps(unsigned_candidate):
+        unsigned_existing = {
+            key: value for key, value in existing.items() if key != "spec_sha256"
+        }
+        unsigned_candidate = {
+            key: value for key, value in dict(candidate).items() if key != "spec_sha256"
+        }
+        existing_digest = str(existing.get("spec_sha256") or "") or canonical_spec_sha256(
+            unsigned_existing
+        )
+        candidate_digest = str(dict(candidate).get("spec_sha256") or "") or canonical_spec_sha256(
+            unsigned_candidate
+        )
+        if existing_digest == candidate_digest:
             return identity, "MATERIALIZED", []
         return identity, "CONFLICT", ["STRATEGY_CONTENT_CONFLICT"]
     source = str(existing.get("source_decision_asset_id") or "")
@@ -360,6 +412,8 @@ def check_materialization(
 ) -> dict[str, Any]:
     strategy_id = strategy_id_from_experiment(str(manifest["experiment_id"]))
     blockers = list(existing_blockers or [])
+    if not _require_bound_decision(manifest, decision_event_id):
+        blockers.append("HANDOFF_MANIFEST_INVALID")
     identity, state, collision = _strategy_relation(
         root=root,
         strategy_id=strategy_id,
@@ -379,7 +433,7 @@ def check_materialization(
     if state == "MATERIALIZED":
         return {
             "handoff_state": "MATERIALIZED",
-            "blocker_codes": [],
+            "blocker_codes": sorted(set(blockers)),
             "strategy_id": strategy_id,
             "strategy_version": "V1",
             "strategy_identity": identity,
@@ -410,10 +464,16 @@ def render_strategy_version(
     created_at: str,
     execution_inputs: Mapping[str, Any],
 ) -> dict[str, Any]:
-    gaps = _execution_gaps(execution_inputs)
-    if gaps:
+    parsed = _parse_execution_inputs(execution_inputs)
+    if parsed is None:
         raise PromotionHandoffError("EXECUTION_INPUT_GAP")
     validate_promotion_handoff_manifest(manifest, root=root)
+    if not _require_bound_decision(manifest, decision_event_id):
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    bound_at = str(manifest["decision_effective_at"])
+    if created_at != bound_at:
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    bound_event = str(manifest["decision_event_id"])
     strategy_id = strategy_id_from_experiment(str(manifest["experiment_id"]))
     unsigned = {
         "schema": "smial.strategy-version",
@@ -421,33 +481,33 @@ def render_strategy_version(
         "strategy_id": strategy_id,
         "strategy_version": "V1",
         "title": str(manifest["experiment_id"]),
-        "source_decision_asset_id": decision_event_id,
+        "source_decision_asset_id": bound_event,
         "source_hypothesis_refs": [str(manifest["hypothesis_version_id"])],
         "population_ref": str(manifest["population_ref"]),
         "signal_input": {
             "contract": FIXED_SIGNAL_CONTRACT,
             "contract_version": FIXED_SIGNAL_VERSION,
             "enter_actions": ["ENTER"],
-            "max_age_seconds": int(execution_inputs["max_age_seconds"]),
+            "max_age_seconds": parsed["max_age_seconds"],
         },
         "exit_input": {
             "contract": FIXED_EXIT_CONTRACT,
             "contract_version": FIXED_EXIT_VERSION,
         },
         "notional_policy": {
-            "notional_usd": float(execution_inputs["notional_usd"]),
-            "fee_bps": int(execution_inputs["fee_bps"]),
+            "notional_usd": parsed["notional_usd"],
+            "fee_bps": parsed["fee_bps"],
         },
         "risk_policy": {
-            "max_open_positions": int(execution_inputs["max_open_positions"]),
+            "max_open_positions": parsed["max_open_positions"],
         },
         "mode_eligibility": {
             "paper": True,
-            "shadow": bool(execution_inputs["shadow"]),
+            "shadow": parsed["shadow"],
             "micro_live": False,
         },
         "authority_class": FIXED_AUTHORITY_CLASS,
-        "created_at": created_at,
+        "created_at": bound_at,
     }
     candidate = dict(unsigned)
     candidate["spec_sha256"] = canonical_spec_sha256(unsigned)
@@ -633,6 +693,25 @@ def compose_science_to_strategy_handoff(
                 "next_safe_action": "FAIL_CLOSED_INVALID_MANIFEST",
             },
         }
+    if not _require_bound_decision(manifest, decision_event_id) or str(
+        manifest.get("decision_effective_at") or ""
+    ) != science["decision_effective_at"]:
+        return {
+            **empty,
+            "identity": identity,
+            "science": science,
+            "provenance": {
+                "manifest_status": "INVALID",
+                "source_revalidation": "UNKNOWN",
+                "direct_evidence": [],
+                "experiment_spec_binding": None,
+            },
+            "state": {
+                "handoff_state": "BLOCKED",
+                "blocker_codes": ["HANDOFF_MANIFEST_INVALID"],
+                "next_safe_action": "FAIL_CLOSED_INVALID_MANIFEST",
+            },
+        }
     science["handoff_manifest_sha256"] = manifest["manifest_sha256"]
     science["obligations"] = list(manifest.get("obligations") or [])
     revalidation, revalidation_codes = _source_revalidation(
@@ -718,8 +797,7 @@ def handoff_overview_counters(
             "HANDOFF BLOCKED": None,
             "STRATEGY MATERIALIZED": None,
         }
-    promotes = 0
-    with_manifest = 0
+    promote_ids: list[str] = []
     for entity in projection.get("entities") or []:
         if not isinstance(entity, Mapping):
             continue
@@ -728,26 +806,24 @@ def handoff_overview_counters(
         fields = entity.get("source_owned_fields") if isinstance(
             entity.get("source_owned_fields"), Mapping
         ) else {}
-        kind = str(fields.get("decision kind") or entity.get("native_state") or "")
+        kind = str(fields.get("decision kind") or "")
         if kind != "PROMOTE":
             continue
-        promotes += 1
-        if fields.get("promotion_handoff_manifest_sha256"):
-            with_manifest += 1
-    materialized = 0
+        promote_ids.append(str(entity.get("entity_id") or ""))
     known = {str(item.get("entity_id") or "") for item in projection.get("entities") or []}
-    for rel in projection.get("relations") or []:
-        if not isinstance(rel, Mapping):
-            continue
-        if rel.get("relation_type") != "REFERENCES_DECISION_ASSET":
-            continue
-        if rel.get("resolution") == "RESOLVED" and rel.get("to_entity_id") in known:
-            materialized += 1
-    blocked = max(promotes - materialized, 0)
-    ready = 0
+    materialized_decisions = {
+        str(rel.get("to_entity_id") or "")
+        for rel in projection.get("relations") or []
+        if isinstance(rel, Mapping)
+        and rel.get("relation_type") == "REFERENCES_DECISION_ASSET"
+        and rel.get("resolution") == "RESOLVED"
+        and str(rel.get("to_entity_id") or "") in known
+    }
+    materialized = sum(1 for item in promote_ids if item in materialized_decisions)
+    blocked = sum(1 for item in promote_ids if item not in materialized_decisions)
     return {
-        "SCIENTIFIC PROMOTE": promotes,
-        "READY TO STRATEGY": ready,
+        "SCIENTIFIC PROMOTE": len(promote_ids),
+        "READY TO STRATEGY": None,
         "HANDOFF BLOCKED": blocked,
         "STRATEGY MATERIALIZED": materialized,
     }

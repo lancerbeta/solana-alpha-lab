@@ -53,7 +53,14 @@ workflow-state database.
 ## 3. Manifest meaning
 
 New PROMOTE events freeze `promotion_handoff_manifest` schema_version `1.0`
-inside the scientific decision payload.
+inside the scientific decision payload. The signed manifest binds
+`decision_event_id` and `decision_effective_at`; CHECK/RENDER/VERIFY must
+refuse a mismatched caller identity or clock. Execution/risk inputs are
+accepted only as exact JSON types; strings and bool-as-int are not coerced.
+
+GET `/research` does not observe explicit execution inputs. Overview
+`READY TO STRATEGY` is therefore NOT AVAILABLE, not zero. Blocked vs
+materialized counts follow the same GET-side handoff projection.
 
 The manifest means:
 

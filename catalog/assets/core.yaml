@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: b5911f4f2e019ca70b34f53d8f305aa4efdccd448909eeafae515a9a63a459d6}
+  integrity: {kind: sha256, sha256: 5aabbeac71fd95d73ee191fc618f706f6443fa55b8be2ca7fec9f9d5edffc03c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -35416,7 +35416,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
-  integrity: {kind: sha256, sha256: a3931e2c4e1ea6093dac0d4b5f3fd231d809f32cb32726d2beed7408c78c6eb9}
+  integrity: {kind: sha256, sha256: 1ad24507f38abee632c10ebb3bea9cb54c6b6271545ae6e3b37137c94c928bc1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35662,7 +35662,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/science_to_strategy_handoff_v1.md', repository_path: docs/contracts/science_to_strategy_handoff_v1.md}
-  integrity: {kind: sha256, sha256: de9655268d8271f74058f4043726650e860a014554112bba0e31f426935ff4a6}
+  integrity: {kind: sha256, sha256: 62f9200fe9a3a666b02c1235a973882e88ccac00045b7f991badc525b0bd3c99}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35682,7 +35682,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/promotion_handoff_manifest_v1.schema.json', repository_path: catalog/schemas/promotion_handoff_manifest_v1.schema.json}
-  integrity: {kind: sha256, sha256: 5e8f7c6066f394b618051d4b9ed4361b05785e51fdfc4b8a000767fd7e8548d0}
+  integrity: {kind: sha256, sha256: b33b7a5c8728360d654ce41c260c3f4436a0da616aaf993d71575ee02d7407fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35699,7 +35699,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/promotion_handoff.py', repository_path: src/solana_alpha_lab/factory/promotion_handoff.py}
-  integrity: {kind: sha256, sha256: d17217b4a91e5f18fd105933928c212f9059ab6bd86655dee554ca9e4a7fddaa}
+  integrity: {kind: sha256, sha256: f6de2c3f40f5a1aa1b9ae2b39e6dcd7d551d07175a83d4dd5183439c7ca10770}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35718,7 +35718,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_science_to_strategy_handoff_v1.py', repository_path: tests/test_science_to_strategy_handoff_v1.py}
-  integrity: {kind: sha256, sha256: 91b97fce58912002c2b2a8a7fec85a051713a3f6e32670bfa319135f33527acc}
+  integrity: {kind: sha256, sha256: dcd471edcded2adc68c4193aac2aa25d4dc1fbe549b1835af859117258aa8ba3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
