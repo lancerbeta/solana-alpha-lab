@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SCIENCE-TO-STRATEGY-HANDOFF-COMPLETION-001",
+  "as_of": "2026-09-06",
+  "task_id": "SCIENCE_TO_STRATEGY_HANDOFF_V1",
+  "state_change": "SCIENCE_TO_STRATEGY_HANDOFF_V1_READY_FOR_MERGE",
+  "base_main": "dc44aca566ab141c641700d5cf6e8e8ddcdc77b9",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/science_to_strategy_handoff/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_SCIENCE_TO_STRATEGY_HANDOFF_V1",
+    "independent_review": {
+      "path": "docs/evidence/science_to_strategy_handoff/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_CANONICAL_DONE",
+    "NO_ACTIVATION",
+    "NO_PAPER_SHADOW_LIVE",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_SECOND_TRUTH_STORE",
+    "NO_WORKFLOW_ENGINE",
+    "NO_STRATEGY_VERSION_V1_2",
+    "NO_FAKE_PRODUCTION_STRATEGY",
+    "NO_NEW_SEMANTIC_ROUTE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}
