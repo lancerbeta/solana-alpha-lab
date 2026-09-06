@@ -4,8 +4,8 @@
   "review_id": "FACTORY-UNATTENDED-OPERABILITY-CLOSURE-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-06",
   "task_id": "FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1",
-  "reviewed_bindings_sha256": "84b038e280f3210873a8194a3a71a0782d5ef81558377deb4918cde2a51c9e65",
-  "reviewed_inventory_sha256": "53649c1bf26bf6a9c1948a12bc8492c3d16ded9c5fb9458eeb19545abda0831b",
+  "reviewed_bindings_sha256": "323d54caf2a8972b1b83192536bafd93d8e61e7837538a77b5dfb4155a30db77",
+  "reviewed_inventory_sha256": "016fd447c089a092743ff2c4f94dc67cf80fb18a0c5a6718d61624ed25163589",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

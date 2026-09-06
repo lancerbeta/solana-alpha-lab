@@ -5,14 +5,14 @@
   "as_of": "2026-09-06",
   "task_id": "FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1",
   "state_change": "FACTORY_UNATTENDED_OPERABILITY_CLOSURE_SOFTWARE_PASS",
-  "base_main": "f08effba27125d6e23c0ee4de53c0d1ee2ae0cde",
+  "base_main": "2eae71b9fbc8d29fc98b7bc8f42975ea1ca63e0e",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "COMMISSIONING_AFTER_MERGE",
   "implementation_bindings": {
     "README.md": "625cd06e83b181bc6462ccf4d7fd03fad221d0516770b09774bc1c1e4f3343ee",
-    "catalog/assets/core.yaml": "70295cc8839083e236ee154bf0b641d15c0bbfe7069edbff31b91ccd22afb153",
+    "catalog/assets/core.yaml": "a6cd17aa4015c77cedbc505d767a51b603d7f4af197826f779942885cbd167fa",
     "catalog/assets/lifecycle.yaml": "c557460836ff25e8a82a10d5921d0c095ce3ee514cdbb2a886b724d9cecfe7be",
     "catalog/catalog_manifest.yaml": "4e8877433f12a248a613be14244bc808dc67e24d58d62f0ce79f6900551beee3",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "3d7be790e242c5651625b51b8e948c49bf681d3ef6ebef111fd75a5d7f3645d0",
@@ -38,7 +38,7 @@
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "1c4d8378352f7a8a9fb24febcc7ccb083ad95fbb832ea6f42603a09a8aee9818",
     "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "b5a28ee70955bac6c003db3968bd00c6233d3f81912e4c2552afaf86e65da788",
     "docs/reports/factory_unattended_operability_closure_v1/a1_owner_readout_v1.md": "be346dd49e94f0deea366b8945cc4e91826bd6d5cf563143c1f42acd10fb7cd1",
-    "docs/tasks/FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1.md": "3baaa1748abfa3d482056154917ac21708728537b0ecb0126baa726dcf14fec2",
+    "docs/tasks/FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1.md": "a3d5101feada39128c21eb150697884086db0f8737673a1a0ef6e88a85d56cd9",
     "scripts/factory_external_heartbeat.py": "ff016056aa1be746a42b5a86da1a19d0d8fd205aadd3b4b0178f32f2be203042",
     "scripts/factory_operability_watch.py": "bf239a54b9b622bbc766a001fdad89c2d0555d799a1b5b7457816b93fbd0f433",
     "scripts/hot90_closed_day_durability.py": "b9c41b17f56675f5dcc79d77c4bf3ae2bdab2c822ac5aab8ce65fb4cfb3750f3",
@@ -63,14 +63,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_unattended_operability_closure_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "22dce655e057ae59202af2b27966dfd44888c08c75f3f6ff7d3322030d0e4f2f",
+    "sha256": "555ca568bb413f9107dff0fca63a4c08f2856a06a865530640c4556a32222e6e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_UNATTENDED_OPERABILITY_CLOSURE_SUITE",
     "independent_review": {
       "path": "docs/evidence/factory_unattended_operability_closure_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "8f563b6614d614721e6fe2aabb1151e73d33bc05ca0012a1640fa6fb9e097dc9",
+      "sha256": "5da18c6ca3a4ed8860bf022d0fac2cc74345e6995c0dde384693461cad19b1f8",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
