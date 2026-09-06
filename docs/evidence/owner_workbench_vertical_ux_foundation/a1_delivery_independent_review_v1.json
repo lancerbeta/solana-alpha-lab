@@ -4,8 +4,8 @@
   "review_id": "OWNER-WORKBENCH-VERTICAL-UX-FOUNDATION-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-06",
   "task_id": "OWNER_WORKBENCH_VERTICAL_UX_FOUNDATION_V1",
-  "reviewed_bindings_sha256": "5afa4c9eb9668917abb64c76c0554993f6df1527fb37d2d367f67891a47779b8",
-  "reviewed_inventory_sha256": "054fbef73a1931796a9ac203f88137924cffd0fc89192ff4fb5838a15af04a26",
+  "reviewed_bindings_sha256": "b42ebf3e88dd9281e558ffff711ceb7eb9493183a536e9a68936c05fa4456e0a",
+  "reviewed_inventory_sha256": "7629b01a8020470246effef6fa0974d415d84eaa46539af55f2d7be12f762e38",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
