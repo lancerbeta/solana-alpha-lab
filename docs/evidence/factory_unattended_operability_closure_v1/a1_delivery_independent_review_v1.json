@@ -4,8 +4,8 @@
   "review_id": "FACTORY-UNATTENDED-OPERABILITY-CLOSURE-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-06",
   "task_id": "FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1",
-  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_bindings_sha256": "7b4df6c7f5750096e282ed577a5ffe165b9d68ba49bfae3d28356ea9ab33fcf7",
+  "reviewed_inventory_sha256": "a38b5b91202dbb856ee6e7f7494a0011ee65e2d8f9f4080b116a9624d7034c9f",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -14,27 +14,48 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=pending"
+        "packet_fingerprint_sha256=689f44c2760aa944ae6a076f83b8c77ff99f7d93daf7cff42f168b6712a63de1",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "LAUNCH_ISOLATION_PROCESS_OBLIGATION",
+        "C1_REMOTE_DURABILITY_EXACT_SHA_NOT_COPYTO_MTIME_SIZE",
+        "C2_PROBE_NATIVE_DOWNLOAD_COPYTO_LOCAL_MISMATCH_NO_REMOTE_OVERWRITE",
+        "C3_OPEN_UTC_DAY_AND_OPEN_PUBLICATION_EXCLUDED",
+        "C4_GIT_PR_NO_DEPLOY_DRIVE_TELEGRAM_RETENTION_SCIENCE_DELETE",
+        "C5_UNCONFIGURED_HEARTBEAT_NETWORK_CALLS_0",
+        "C6_WATCH_CLI_DRY_RUN_PERSIST_FALSE_PREVIEW_MESSAGES_HOLD_CARDS",
+        "C7_SEM_REMOTE_OPS_RECOVERY_BINDS_ACTIVE_FACTORY_REMOTE_OPERATIONS_TO_CONFIG_V1_1_001",
+        "C8_HASH_MISMATCH_STUCK_VISIBLE_EXCLUDED_FROM_MAX_DAYS_SLOTS",
+        "DISCLOSED_DISCOVERY_COVERAGE_UNKNOWN_REMOVED_FROM_DEGRADED_SET_TASK_REQUIRED",
+        "DISCLOSED_PROBE_NONE_UNREADABLE_TREATED_AS_ABSENT_THEN_COPYTO",
+        "DISCLOSED_BUDGET_IN_FLIGHT_CURRENT_DAY_NOT_PREEMPTED"
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_REVIEW"
+        "NATIVE_HASHSUM_ABSENT_STILL_COPYTO_CLOSED",
+        "HASH_MISMATCH_STARVES_MAX_DAYS_CLOSED",
+        "WATCH_DRY_RUN_PERSIST_FALSE",
+        "DISCLOSED_PROBE_ALL_UNREADABLE_STILL_COPYTO",
+        "NO_SECRETS_IN_RECEIPTS"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "PENDING_ISOLATED_REVIEW"
+        "FOUR_VERTICAL_LOOPS_FALSIFIED",
+        "UNKNOWN_FOOTER_TOKENS_FALSIFIED",
+        "HASH_MISMATCH_DRY_RUN_OWNER_CARD_WITHOUT_STATE_WRITE",
+        "NO_LIVE_DEPLOY_DRIVE_TELEGRAM_RETENTION_DELETE"
       ]
     }
   ],
-  "verdict": "PENDING",
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "REVIEW_IS_NOT_SEMANTIC_DONE",
