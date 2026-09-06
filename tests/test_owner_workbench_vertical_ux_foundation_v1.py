@@ -26,7 +26,13 @@ from solana_alpha_lab.factory.owner_surface import (
 )
 from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime_config
 from solana_alpha_lab.factory.visual_os import visual_os_layout_css
-from solana_alpha_lab.factory.workbench import OPERATOR_COMMANDS, serve
+from solana_alpha_lab.factory.workbench import (
+    OPERATOR_COMMANDS,
+    _home_section,
+    _operations_section,
+    _system_section,
+    serve,
+)
 
 OWNER_LANGUAGE = ROOT / "src/solana_alpha_lab/factory/owner_language.py"
 HUMAN = ROOT / "docs/contracts/smial_visual_operating_system_v1.md"
@@ -99,6 +105,7 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
         css = visual_os_layout_css()
         self.assertIn(".page-head", css)
         self.assertIn("details.technical", css)
+        self.assertIn("copy-btn { opacity: 1;", css)
         self.assertIn("Owner-surface invariants", HUMAN.read_text(encoding="utf-8"))
 
     def test_five_routes_are_russian_first_with_page_questions(self) -> None:
@@ -169,6 +176,14 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 self.assertIn("process_alive", system)
                 self.assertIn("не означает, что система исправна", system)
                 self.assertNotIn("<h1>Система исправна</h1>", system)
+                self.assertIn("Required features", home)
+                home_note = re.search(r"git_archaeology_required=(true|false)", home)
+                research_note = re.search(
+                    r"git_archaeology_required=(true|false)", research
+                )
+                self.assertIsNotNone(home_note)
+                self.assertIsNotNone(research_note)
+                self.assertEqual(home_note.group(1), research_note.group(1))
             finally:
                 paper = getattr(app, "_paper_plane_store", None)
                 if paper is not None:
@@ -207,6 +222,49 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
         self.assertIn("visual system", human)
         self.assertIn("SEM-VISUAL-OPERATING-SYSTEM", human)
         self.assertNotIn("SEM-OWNER-WORKBENCH-VERTICAL-UX", human)
+
+    def test_exact_tokens_are_not_rewritten_as_missing_or_degraded(self) -> None:
+        proved = {
+            "process_alive": True,
+            "backup_status": "EXPLICIT_UNKNOWN",
+            "local_rollback_snapshot": "PRESENT",
+            "verdict": "RUNTIME_PROVED_BACKUP_UNKNOWN",
+            "next_safe_action": "INSPECT_SYSTEM",
+            "deploy_version": "test-deploy",
+        }
+        system_html = _system_section(proved)
+        home_html = _home_section(
+            {
+                "runtime": proved,
+                "cockpit": {},
+                "hypothesis": "HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1",
+                "status": "COMPLETE",
+                "blocker": None,
+                "next_safe_action": "DO_NOT_PROMOTE",
+                "required_features": [],
+            },
+            copy_blocks=[],
+        )
+        self.assertIn("есть", system_html)
+        self.assertIn("PRESENT", system_html)
+        self.assertNotIn("отсутствует", system_html)
+        proved_gloss = "процесс доказан, бэкап неизвестен"
+        self.assertIn(proved_gloss, system_html)
+        self.assertIn(proved_gloss, home_html)
+        self.assertNotIn("деградирован", system_html)
+        self.assertNotIn("деградирован", home_html)
+        self.assertEqual(system_html.count(proved_gloss), home_html.count(proved_gloss))
+        self.assertIn("HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1", home_html)
+        self.assertIn("DO_NOT_PROMOTE", home_html)
+        self.assertIn("Required features", home_html)
+        missing_ops = _operations_section({"operations": {}})
+        self.assertIn("UNKNOWN", missing_ops)
+        self.assertNotIn("не приостановлены", missing_ops)
+        paused = _operations_section({"operations": {"entries_paused": False}})
+        self.assertIn("не приостановлены", paused)
+        missing_process = _system_section({"verdict": "UNHEALTHY_NOT_RUNNING"})
+        self.assertIn("неизвестно", missing_process)
+        self.assertIn("UNKNOWN", missing_process)
 
 
 if __name__ == "__main__":

@@ -82,7 +82,7 @@ form button { margin-right: 0.5rem; margin-bottom: 0.5rem; }
 .copy-block { position: relative; margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--border-hairline, #333); background: var(--surface-panel, #1c1c1c); }
 .copy-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .copy-head h2 { font-size: 1rem; margin: 0; }
-.copy-btn { opacity: 0; pointer-events: none; }
+.copy-btn { opacity: 1; pointer-events: auto; }
 .copy-block:hover .copy-btn, .copy-block:focus-within .copy-btn { opacity: 1; pointer-events: auto; }
 .copy-text { white-space: pre-wrap; word-break: break-word; margin: 0.75rem 0 0; }
 .attention { border: 1px solid var(--border-hairline, #333); padding: 0.75rem 1rem; margin: 0.75rem 0; background: var(--surface-panel, #1c1c1c); }

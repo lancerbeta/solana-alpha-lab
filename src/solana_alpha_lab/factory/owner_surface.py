@@ -10,6 +10,7 @@ from solana_alpha_lab.factory.owner_language import (
     shell_copy,
     status_gloss,
     surface_copy,
+    token_gloss,
 )
 
 
@@ -17,10 +18,31 @@ def esc(value: Any) -> str:
     return html.escape(str(value if value is not None else ""))
 
 
+def machine_text(value: Any) -> str:
+    if value is None:
+        return "UNKNOWN"
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, str):
+        return value
+    import json
+
+    return json.dumps(value, ensure_ascii=False)
+
+
+def cell_html(value: Any) -> str:
+    return esc(machine_text(value))
+
+
 def canon(value: Any) -> str:
-    text = str(value if value is not None else "")
-    if not text:
+    if value is None:
         return ""
+    if isinstance(value, str):
+        if not value:
+            return ""
+        text = value
+    else:
+        text = machine_text(value)
     return f'<span class="canon">{esc(text)}</span>'
 
 
@@ -35,10 +57,30 @@ def dual(primary: str, machine: Any, *, unknown: bool = False) -> str:
     )
 
 
+def token_dual(
+    value: Any,
+    gloss_map: Mapping[str, str],
+    *,
+    empty: str = "UNKNOWN",
+) -> str:
+    gloss, canonical, unknown = token_gloss(gloss_map, value, empty=empty)
+    if gloss:
+        return dual(gloss, canonical, unknown=unknown)
+    if unknown:
+        return dual(canonical, canonical, unknown=True)
+    return canon(canonical)
+
+
 def status_html(status: Any) -> str:
     canonical = str(status or "UNKNOWN")
     gloss = status_gloss(canonical)
-    unknown = canonical in {"UNKNOWN", "MISSING", "EMPTY", "NOT_APPLICABLE", "NOT_PRESENT"}
+    unknown = canonical in {
+        "UNKNOWN",
+        "MISSING",
+        "EMPTY",
+        "NOT_APPLICABLE",
+        "NOT_PRESENT",
+    }
     if gloss:
         return dual(gloss, canonical, unknown=unknown)
     return canon(canonical)
@@ -92,16 +134,6 @@ def compact_title(text: str, *, limit: int = 88) -> tuple[str, bool]:
 def mapping_rows(mapping: Mapping[str, Any], *, empty_as: str | None = None) -> str:
     rows = []
     for key, value in mapping.items():
-        displayed = empty_as if value is None and empty_as is not None else _plain(value)
+        displayed = empty_as if value is None and empty_as is not None else machine_text(value)
         rows.append(f"<tr><th>{esc(key)}</th><td>{esc(displayed)}</td></tr>")
     return "".join(rows)
-
-
-def _plain(value: Any) -> str:
-    if value is None:
-        return "UNKNOWN"
-    if isinstance(value, str):
-        return value
-    import json
-
-    return json.dumps(value, ensure_ascii=False)

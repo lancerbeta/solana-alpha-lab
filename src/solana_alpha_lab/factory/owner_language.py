@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any, Mapping
+
 PRESENTATION_LANGUAGE = "RU"
 MACHINE_LANGUAGE = "EN"
 
@@ -129,6 +131,45 @@ DECISION_KIND_LABELS = {
     "PROMOTE": "Научно продвинуть",
 }
 
+UNKNOWN_CANONICAL = frozenset(
+    {
+        "UNKNOWN",
+        "MISSING",
+        "EMPTY",
+        "EXPLICIT_UNKNOWN",
+        "UNAVAILABLE",
+        "NOT_PRESENT",
+    }
+)
+
+VERDICT_GLOSS = {
+    "UNHEALTHY_NOT_RUNNING": "процесс не запущен",
+    "UNHEALTHY_VERSION_MISSING": "версия не найдена",
+    "UNHEALTHY_EVIDENCE_MISSING": "нет Git-доказательств",
+    "DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN": "деградирован",
+    "RUNTIME_PROVED_BACKUP_UNKNOWN": "процесс доказан, бэкап неизвестен",
+    "UNAVAILABLE": "недоступен",
+    "UNKNOWN": "неизвестно",
+}
+
+BACKUP_GLOSS = {
+    "EXPLICIT_UNKNOWN": "не подтверждён",
+    "UNKNOWN": "неизвестно",
+}
+
+ROLLBACK_GLOSS = {
+    "PRESENT": "есть",
+    "MISSING": "отсутствует",
+    "UNKNOWN": "неизвестно",
+}
+
+NEXT_ACTION_GLOSS = {
+    "INSPECT_SYSTEM": "Откройте экран Система",
+    "RESOLVE_MISSING_EVIDENCE": "Восстановите недостающие Git-доказательства",
+    "RUN_RUNTIME_PROOFS": "Запустите runtime proofs",
+    "DO_NOT_PROMOTE": "Не продвигать в стратегию",
+}
+
 STATUS_GLOSS = {
     "PRESENT": "есть",
     "MISSING": "нет данных",
@@ -161,7 +202,11 @@ SHELL_COPY = {
     "copy": "Копировать",
     "copied": "Скопировано",
     "technical": "Технические детали",
-    "full_legacy": "Полный исходный текст (legacy EN)",
+    "full_legacy": "Полный исходный текст",
+    "copy_hint": (
+        "Справа кнопка «Копировать». START на этой странице фразу не подставляет "
+        "и Jupiter не вызывает."
+    ),
     "safe_state": "Сейчас безопасно: отдельных срочных действий нет.",
     "generic_error": "Источник вернул ошибку. Точный текст сохранён в технических деталях.",
 }
@@ -177,7 +222,7 @@ SURFACE_COPY = {
         "cycle_commands": "Технические команды цикла",
         "packet": "Пакет / признаки",
         "features": "Требуемые признаки",
-        "health": "Краткий статус системы",
+        "health": "Вердикт runtime",
         "recent": "Недавние изменения",
         "no_attention": "Отдельных пунктов внимания нет.",
         "no_recent": "Недавних событий исполнения нет.",
@@ -243,7 +288,7 @@ SURFACE_COPY = {
         "question": "Система сейчас в каком состоянии и что не доказано?",
         "process": "Процесс",
         "process_up": "запущен",
-        "process_down": "не подтверждён",
+        "process_down": "не запущен",
         "backup": "Бэкап",
         "backup_unproven": "не подтверждён",
         "rollback": "Rollback snapshot",
@@ -326,6 +371,11 @@ OWNER_ERRORS = {
     "LOCATOR_NOT_IN_PROJECTION": "Объект не найден в текущей проекции.",
     "COMMAND_NOT_ALLOWLISTED": "Команда не из списка разрешённых.",
     "COMMAND_PATH_INVALID": "Эта команда на этом экране недоступна.",
+    "CLOSE_ALL_CONFIRMATION_REQUIRED": (
+        "Нужно локальное подтверждение CLOSE_ALL. Команда не отправлена."
+    ),
+    "BOT_INSTANCE_ID_REQUIRED": "Нужен bot_instance_id. Команда не отправлена.",
+    "STALE_OPERATOR_SNAPSHOT": "Снимок оператора устарел. Команда не отправлена.",
     "RESEARCH_STORE_NOT_PRESENT": "ResearchStore на этой машине отсутствует.",
 }
 
@@ -419,3 +469,18 @@ def command_label(value: str) -> str:
 
 def status_gloss(status: str) -> str | None:
     return STATUS_GLOSS.get(str(status or "UNKNOWN"))
+
+
+def token_gloss(
+    table: Mapping[str, str],
+    value: Any,
+    *,
+    empty: str = "UNKNOWN",
+) -> tuple[str, str, bool]:
+    if value is None or value == "":
+        canonical = empty
+    else:
+        canonical = str(value)
+    gloss = table.get(canonical) or ""
+    unknown = canonical in UNKNOWN_CANONICAL
+    return gloss, canonical, unknown

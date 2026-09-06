@@ -25726,7 +25726,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: e293ea3f543adc2f5649ceff7374df8796550c4e76c86c1e9a839e14e84beb15}
+  integrity: {kind: sha256, sha256: a64642404e3e9b24bfbce3d68d4461dae22a8447215a05121110a4a0245cb965}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 6e07a5f5b289cc0dbb20a521d94b6fb786c39dc26d5fe82dd92d73dcba530f63}
+  integrity: {kind: sha256, sha256: 4d3bdfbd5b6acb31ff6008344b8748aff513971ae89c93b7a75eb1aa17ff25a6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -35603,7 +35603,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: 9ef56c04c19aa96f1c6ff48eb1cce86effb6ea32802c6af382455bc3bb8fdcc6}
+  integrity: {kind: sha256, sha256: ee89b555568cbf2e903f101cf55a87bd421afe48745d81c223d598135242060f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
