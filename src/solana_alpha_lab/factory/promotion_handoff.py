@@ -408,12 +408,27 @@ def check_materialization(
     manifest: Mapping[str, Any],
     execution_inputs: Mapping[str, Any] | None,
     decision_event_id: str | None = None,
+    created_at: str | None = None,
     existing_blockers: Sequence[str] | None = None,
 ) -> dict[str, Any]:
-    strategy_id = strategy_id_from_experiment(str(manifest["experiment_id"]))
     blockers = list(existing_blockers or [])
+    try:
+        manifest = validate_promotion_handoff_manifest(manifest, root=root)
+    except PromotionHandoffError:
+        return {
+            "handoff_state": "BLOCKED",
+            "blocker_codes": sorted(set([*blockers, "HANDOFF_MANIFEST_INVALID"])),
+            "strategy_id": None,
+            "strategy_version": None,
+            "strategy_identity": None,
+        }
     if not _require_bound_decision(manifest, decision_event_id):
         blockers.append("HANDOFF_MANIFEST_INVALID")
+    if created_at is not None and str(manifest.get("decision_effective_at") or "") != str(
+        created_at
+    ):
+        blockers.append("HANDOFF_MANIFEST_INVALID")
+    strategy_id = strategy_id_from_experiment(str(manifest["experiment_id"]))
     identity, state, collision = _strategy_relation(
         root=root,
         strategy_id=strategy_id,
@@ -428,7 +443,7 @@ def check_materialization(
             "blocker_codes": sorted(set(blockers)),
             "strategy_id": strategy_id,
             "strategy_version": "V1",
-            "strategy_identity": f"{strategy_id}@V1",
+            "strategy_identity": identity or f"{strategy_id}@V1",
         }
     if state == "MATERIALIZED":
         return {
@@ -443,14 +458,14 @@ def check_materialization(
         return {
             "handoff_state": "BLOCKED",
             "blocker_codes": sorted(set(blockers)),
-            "strategy_id": strategy_id,
-            "strategy_version": "V1",
+            "strategy_id": None,
+            "strategy_version": None,
             "strategy_identity": None,
         }
     return {
         "handoff_state": "READY_TO_MATERIALIZE",
         "blocker_codes": [],
-        "strategy_id": strategy_id_from_experiment(str(manifest["experiment_id"])),
+        "strategy_id": strategy_id,
         "strategy_version": "V1",
         "strategy_identity": None,
     }
@@ -511,11 +526,32 @@ def render_strategy_version(
     }
     candidate = dict(unsigned)
     candidate["spec_sha256"] = canonical_spec_sha256(unsigned)
-    return verify_strategy_version(root, candidate)
+    return verify_strategy_version(
+        root,
+        candidate,
+        manifest=manifest,
+        decision_event_id=decision_event_id,
+    )
 
 
-def verify_strategy_version(root: Path, candidate: Mapping[str, Any]) -> dict[str, Any]:
-    return validate_and_hash_strategy(root, candidate)
+def verify_strategy_version(
+    root: Path,
+    candidate: Mapping[str, Any],
+    *,
+    manifest: Mapping[str, Any],
+    decision_event_id: str,
+) -> dict[str, Any]:
+    validate_promotion_handoff_manifest(manifest, root=root)
+    if not _require_bound_decision(manifest, decision_event_id):
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    validated = validate_and_hash_strategy(root, candidate)
+    if str(validated.get("source_decision_asset_id") or "") != str(
+        manifest["decision_event_id"]
+    ):
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    if str(validated.get("created_at") or "") != str(manifest["decision_effective_at"]):
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    return validated
 
 
 def materialize_strategy_candidate(
@@ -533,6 +569,7 @@ def materialize_strategy_candidate(
             manifest=manifest,
             execution_inputs=execution_inputs,
             decision_event_id=decision_event_id,
+            created_at=created_at,
         )
         return {**check, "candidate": None, "disposition": check["handoff_state"]}
     candidate = render_strategy_version(
@@ -723,6 +760,7 @@ def compose_science_to_strategy_handoff(
         manifest=manifest,
         execution_inputs=execution_inputs,
         decision_event_id=decision_event_id,
+        created_at=science["decision_effective_at"],
         existing_blockers=blockers,
     )
     next_action = {
@@ -810,20 +848,9 @@ def handoff_overview_counters(
         if kind != "PROMOTE":
             continue
         promote_ids.append(str(entity.get("entity_id") or ""))
-    known = {str(item.get("entity_id") or "") for item in projection.get("entities") or []}
-    materialized_decisions = {
-        str(rel.get("to_entity_id") or "")
-        for rel in projection.get("relations") or []
-        if isinstance(rel, Mapping)
-        and rel.get("relation_type") == "REFERENCES_DECISION_ASSET"
-        and rel.get("resolution") == "RESOLVED"
-        and str(rel.get("to_entity_id") or "") in known
-    }
-    materialized = sum(1 for item in promote_ids if item in materialized_decisions)
-    blocked = sum(1 for item in promote_ids if item not in materialized_decisions)
     return {
         "SCIENTIFIC PROMOTE": len(promote_ids),
         "READY TO STRATEGY": None,
-        "HANDOFF BLOCKED": blocked,
-        "STRATEGY MATERIALIZED": materialized,
+        "HANDOFF BLOCKED": None,
+        "STRATEGY MATERIALIZED": None,
     }

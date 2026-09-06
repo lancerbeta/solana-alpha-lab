@@ -22,11 +22,14 @@ from solana_alpha_lab.factory.experiment_evidence import evidence_snapshot_sha25
 from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection
 from solana_alpha_lab.factory.promotion_handoff import (
     PromotionHandoffError,
+    check_materialization,
     compose_science_to_strategy_handoff,
     handoff_overview_counters,
     materialize_strategy_candidate,
     render_strategy_version,
+    verify_strategy_version,
 )
+from solana_alpha_lab.factory.strategy_runtime import canonical_spec_sha256
 from solana_alpha_lab.factory.research_store import ResearchEvent, ResearchStore
 from solana_alpha_lab.factory.research_workbench import LifecycleEntityLocatorV1
 from solana_alpha_lab.factory.workbench import serve
@@ -274,6 +277,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             self.assertIn("Переход заблокирован", body)
             self.assertIn("EXECUTION_INPUT_GAP", body)
             self.assertIn("PAPER", body)
+            self.assertNotIn("STRAT-ORDINARY-PRICE-PATH-HYPOTHESIS-001", body)
             self.assertNotIn("Create strategy and commit", body)
             self.assertNotIn("Promote &amp; run", body)
 
@@ -365,6 +369,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             self.assertEqual(handoff["state"]["handoff_state"], "BLOCKED")
             self.assertIn("EXECUTION_INPUT_GAP", handoff["state"]["blocker_codes"])
             self.assertIsNone(handoff["materialization"]["strategy_identity"])
+            self.assertIsNone(handoff["materialization"]["strategy_id"])
 
     def test_scenario_e_and_f_collision_and_replay(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -575,8 +580,8 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             )
             self.assertEqual(counters["SCIENTIFIC PROMOTE"], 1)
             self.assertIsNone(counters["READY TO STRATEGY"])
-            self.assertEqual(counters["HANDOFF BLOCKED"], 1)
-            self.assertEqual(counters["STRATEGY MATERIALIZED"], 0)
+            self.assertIsNone(counters["HANDOFF BLOCKED"])
+            self.assertIsNone(counters["STRATEGY MATERIALIZED"])
             status, body = _http(app, "GET", "/research")
             self.assertEqual(status, 200)
             self.assertIn("Готово к стратегии", body)
@@ -639,6 +644,72 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             )
             self.assertEqual(check["handoff_state"], "MATERIALIZED")
             self.assertIn("EVIDENCE_HASH_CONFLICT", check["blocker_codes"])
+
+    def test_check_rejects_tampered_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            recorded = _promote(app)
+            event_id = recorded["decision_result"]["decision_event_id"]
+            manifest = dict(_stored_manifest(store, event_id))
+            manifest["manifest_sha256"] = "ab" * 32
+            check = check_materialization(
+                root=ROOT,
+                manifest=manifest,
+                execution_inputs=EXECUTION_INPUTS,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+            )
+            self.assertEqual(check["handoff_state"], "BLOCKED")
+            self.assertIn("HANDOFF_MANIFEST_INVALID", check["blocker_codes"])
+            self.assertIsNone(check["strategy_id"])
+            self.assertIsNone(check["strategy_identity"])
+
+    def test_verify_rejects_lineage_or_clock_mismatch(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            store.append(_eligible_records(), transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = _app(data_root)
+            recorded = _promote(app)
+            event_id = recorded["decision_result"]["decision_event_id"]
+            manifest = _stored_manifest(store, event_id)
+            candidate = render_strategy_version(
+                root=ROOT,
+                manifest=manifest,
+                decision_event_id=event_id,
+                created_at=manifest["decision_effective_at"],
+                execution_inputs=EXECUTION_INPUTS,
+            )
+            unsigned = {
+                key: value for key, value in candidate.items() if key != "spec_sha256"
+            }
+            unsigned["created_at"] = "2020-01-01T00:00:00Z"
+            unsigned["spec_sha256"] = canonical_spec_sha256(unsigned)
+            with self.assertRaises(PromotionHandoffError) as clock:
+                verify_strategy_version(
+                    ROOT,
+                    unsigned,
+                    manifest=manifest,
+                    decision_event_id=event_id,
+                )
+            self.assertEqual(str(clock.exception), "HANDOFF_MANIFEST_INVALID")
+            other = dict(candidate)
+            other["source_decision_asset_id"] = "DEC-OTHER-EVENT"
+            unsigned_other = {
+                key: value for key, value in other.items() if key != "spec_sha256"
+            }
+            other["spec_sha256"] = canonical_spec_sha256(unsigned_other)
+            with self.assertRaises(PromotionHandoffError) as lineage:
+                verify_strategy_version(
+                    ROOT,
+                    other,
+                    manifest=manifest,
+                    decision_event_id=event_id,
+                )
+            self.assertEqual(str(lineage.exception), "HANDOFF_MANIFEST_INVALID")
 
     def test_semantic_gold_query(self) -> None:
         projection = load_semantic_projection(ROOT)

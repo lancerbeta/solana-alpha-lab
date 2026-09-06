@@ -59,8 +59,9 @@ refuse a mismatched caller identity or clock. Execution/risk inputs are
 accepted only as exact JSON types; strings and bool-as-int are not coerced.
 
 GET `/research` does not observe explicit execution inputs. Overview
-`READY TO STRATEGY` is therefore NOT AVAILABLE, not zero. Blocked vs
-materialized counts follow the same GET-side handoff projection.
+`READY TO STRATEGY`, `HANDOFF BLOCKED`, and `STRATEGY MATERIALIZED`
+are therefore NOT AVAILABLE, not zero. Exact blocked vs materialized
+state lives on the GET detail handoff projection for one experiment.
 
 The manifest means:
 

@@ -766,7 +766,12 @@ def _handoff_html(handoff: Any) -> str:
         if blockers
         else f"<p>{html.escape(research_copy('none'))}</p>"
     )
-    strategy_id = material.get("strategy_identity") or material.get("strategy_id") or research_copy("none")
+    created_identity = (
+        str(material.get("strategy_identity") or "")
+        if state == "MATERIALIZED"
+        else ""
+    )
+    strategy_id = created_identity or research_copy("none")
     frozen = (
         research_copy("handoff_frozen_present")
         if science.get("handoff_manifest_sha256")
@@ -778,9 +783,7 @@ def _handoff_html(handoff: Any) -> str:
         else research_copy("none")
     )
     if science.get("handoff_manifest_sha256"):
-        carries = str(
-            material.get("strategy_identity") or material.get("strategy_id") or ""
-        ) or research_copy("handoff_carries_science")
+        carries = created_identity or research_copy("handoff_carries_science")
     else:
         carries = research_copy("none")
     next_gloss, next_canonical, _unknown = token_gloss(NEXT_ACTION_GLOSS, next_action)
@@ -796,8 +799,12 @@ def _handoff_html(handoff: Any) -> str:
                 "decision_event_id": identity.get("decision_event_id"),
                 "manifest_sha256": science.get("handoff_manifest_sha256"),
                 "evidence_snapshot_sha256": science.get("evidence_snapshot_sha256"),
-                "strategy_id": material.get("strategy_id"),
-                "strategy_version": material.get("strategy_version"),
+                "strategy_id": (
+                    material.get("strategy_id") if state == "MATERIALIZED" else None
+                ),
+                "strategy_version": (
+                    material.get("strategy_version") if state == "MATERIALIZED" else None
+                ),
                 "blocker_codes": ", ".join(blockers) or None,
                 "source_revalidation": provenance.get("source_revalidation"),
             }
