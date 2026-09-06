@@ -181,6 +181,8 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         self.assertTrue(dossier["tested"]["question"])
         statuses = {item["code"]: item["status"] for item in dossier["obligations"]}
         self.assertEqual(statuses["FALSIFIER"], "PRESENT")
+        self.assertEqual(statuses["EVIDENCE_CLASS"], "MISSING")
+        self.assertEqual(statuses["PIT_AVAILABILITY"], "MISSING")
         self.assertIn(statuses["RESULT"], {"MISSING", "UNKNOWN"})
         self.assertNotEqual(statuses["MISSINGNESS"], "NOT_APPLICABLE")
         self.assertFalse(dossier["science_guard"]["allowed"])
@@ -267,8 +269,11 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         )
         statuses = {item["code"]: item["status"] for item in dossier["obligations"]}
         self.assertEqual(dossier["planes"]["execution"], "COMPLETED")
-        self.assertIn(statuses["PIT_AVAILABILITY"], {"MISSING", "UNKNOWN"})
+        self.assertEqual(statuses["PIT_AVAILABILITY"], "MISSING")
+        self.assertEqual(statuses["EVIDENCE_CLASS"], "MISSING")
         self.assertNotEqual(statuses["PIT_AVAILABILITY"], "PRESENT")
+        self.assertNotEqual(statuses["EVIDENCE_CLASS"], "PRESENT")
+        self.assertNotEqual(statuses["EVIDENCE_CLASS"], "NOT_APPLICABLE")
         self.assertFalse(dossier["science_guard"]["allowed"])
         self.assertIn("PIT_AVAILABILITY", dossier["science_guard"]["blocked_codes"])
 
@@ -289,6 +294,7 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         )
         statuses = {item["code"]: item["status"] for item in dossier["obligations"]}
         self.assertEqual(statuses["POPULATION_N"], "CONFLICT")
+        self.assertEqual(statuses["HOLDOUT"], "NOT_APPLICABLE")
         self.assertNotEqual(statuses["POPULATION_N"], statuses.get("MISSINGNESS"))
         self.assertFalse(dossier["science_guard"]["allowed"])
         self.assertIn("POPULATION_N", dossier["science_guard"]["blocked_codes"])
@@ -392,10 +398,18 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
                 "decision_kind": "REJECT",
                 "expected_evidence_snapshot_sha256": snapshot,
                 "rationale": "Отклоняю: доказательств недостаточно.",
+                "next_condition": "Вернуться после holdout.",
             }
             recorded = app.record_research_decision(command)
             self.assertEqual(recorded["decision_result"]["status"], "DECISION_RECORDED")
             self.assertEqual(recorded["dossier"]["planes"]["decision"], "REJECT")
+            stored = [
+                item
+                for item in recorded["dossier"]["decision_history"]
+                if item.get("decision_kind") == "REJECT"
+            ]
+            self.assertEqual(stored[0].get("rationale"), command["rationale"])
+            self.assertEqual(stored[0].get("next_condition"), command["next_condition"])
             replay = app.record_research_decision(command)
             self.assertEqual(replay["decision_result"]["status"], "DECISION_RECORDED")
             self.assertEqual(replay["decision_result"]["disposition"], "REPLAY_IDENTICAL")

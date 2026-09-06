@@ -77,10 +77,12 @@ Counters describe materialized projection facts, not all reality.
 Missing runtime/evidence is not shown as zero. `completeness = PARTIAL`
 when any accepted source is `NOT_PRESENT` / `UNAVAILABLE` / `INVALID`.
 Evidence detail uses `source_owned_fields` copied in the same
-LifecycleProjection adapter pass. Detail does not rescan ResearchStore
-or match foreign keys from other records. Lineage and object gaps are
-scoped to the selected locator plane and source, except `CONFLICT`
-edges which remain visible on every involved plane.
+LifecycleProjection adapter pass. Identity and lineage stay projection-
+owned. Experiment-spec detail may attach a bounded dossier by reading
+already-committed ResearchStore records for that locator; it does not
+invent relations from filenames or LLM similarity. Lineage and object
+gaps are scoped to the selected locator plane and source, except
+`CONFLICT` edges which remain visible on every involved plane.
 
 Owner-facing copy is Russian-first (`OWNER_FACING_LANGUAGE = RU`).
 Canonical identifiers, enums, JSON keys and error codes stay English.

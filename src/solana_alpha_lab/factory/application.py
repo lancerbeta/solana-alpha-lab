@@ -376,6 +376,7 @@ class FactoryApplication:
                 "hypothesis_version_id"
             ),
             rationale=command.get("rationale"),
+            next_condition=command.get("next_condition"),
             decision_event_id=event_id,
         )
         payload_json = json.dumps(

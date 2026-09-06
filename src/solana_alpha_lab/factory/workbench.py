@@ -106,12 +106,20 @@ def _nav(active: str) -> str:
     )
 
 
-def _rows(mapping: dict[str, Any], *, translate_keys: bool = False) -> str:
-    return "".join(
-        f"<tr><th>{html.escape(field_label(str(key)) if translate_keys else str(key))}</th>"
-        f"<td>{html.escape(_cell(value))}</td></tr>"
-        for key, value in mapping.items()
-    )
+def _rows(
+    mapping: dict[str, Any],
+    *,
+    translate_keys: bool = False,
+    empty_as: str | None = None,
+) -> str:
+    rows = []
+    for key, value in mapping.items():
+        displayed = empty_as if value is None and empty_as is not None else _cell(value)
+        rows.append(
+            f"<tr><th>{html.escape(field_label(str(key)) if translate_keys else str(key))}</th>"
+            f"<td>{html.escape(displayed)}</td></tr>"
+        )
+    return "".join(rows)
 
 
 def _feature_rows(features: list[dict[str, Any]]) -> str:
@@ -533,6 +541,11 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
         + f"<span class=\"mono\">{html.escape(str(item.get('record_id') or ''))}</span> "
         + f"<span class=\"mono\">{html.escape(str(item.get('relation') or 'DIRECT'))}</span> "
         + html.escape(str(item.get("rationale") or ""))
+        + (
+            " — " + html.escape(str(item.get("next_condition")))
+            if item.get("next_condition")
+            else ""
+        )
         + "</li>"
         for item in dossier.get("decision_history") or []
         if isinstance(item, dict)
@@ -580,6 +593,9 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
             "<label>"
             + html.escape(research_copy("rationale"))
             + "<br><textarea name=\"rationale\" rows=\"3\" maxlength=\"2000\"></textarea></label>"
+            "<label>"
+            + html.escape(research_copy("next_condition"))
+            + "<br><textarea name=\"next_condition\" rows=\"2\" maxlength=\"2000\"></textarea></label>"
             "<p class=\"promote-boundary\">"
             "<label><input type=\"checkbox\" name=\"promote_scientific_only\" value=\"1\"> "
             + html.escape(research_copy("promote_confirm"))
@@ -621,6 +637,7 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
         + _rows(
             dossier.get("result") if isinstance(dossier.get("result"), dict) else {},
             translate_keys=True,
+            empty_as="MISSING",
         )
         + "</table>"
         + f"<h3>{html.escape(research_copy('direct_evidence'))}</h3>"
@@ -1030,6 +1047,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                                 fields.get("expected_evidence_snapshot_sha256") or [""]
                             )[0],
                             "rationale": (fields.get("rationale") or [""])[0],
+                            "next_condition": (fields.get("next_condition") or [""])[0],
                             "promote_scientific_only": (
                                 fields.get("promote_scientific_only") or [""]
                             )[0],

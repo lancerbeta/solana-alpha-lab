@@ -120,8 +120,9 @@ def _explicit_experiment_id(payload: Mapping[str, Any], record: Any) -> str | No
             }:
                 continue
             return value
-    binding_target = payload.get("bound_entity_id") or payload.get("target_id")
-    return _text(binding_target)
+    if _kind(record) == "EVIDENCE_BINDING":
+        return _text(payload.get("bound_entity_id"))
+    return None
 
 
 def _collect_direct_ids(experiment_id: str, records: Sequence[Any]) -> tuple[set[str], set[str]]:
@@ -389,28 +390,21 @@ def _build_obligations(
     result = result_values[0] if result_values else None
     uncertainty = uncertainty_values[0] if uncertainty_values else None
     robustness = robustness_values[0] if robustness_values else None
-    evidence_class = entity.get("evidence_class")
-    if evidence_class in (None, "", "NOT_APPLICABLE") and not direct:
-        evidence_status, evidence_note = "MISSING", "нет прямых evidence-записей"
-        if entity.get("evidence_class") == "NOT_APPLICABLE":
-            evidence_status, evidence_note = (
-                "NOT_APPLICABLE",
-                "Git ExperimentSpec не является scientific evidence class",
-            )
+    if class_values:
+        evidence_status, evidence_note = _status_from_values(*class_values)
     else:
-        evidence_status, evidence_note = _status_from_values(
-            *(class_values or [evidence_class])
+        evidence_status, evidence_note = (
+            "MISSING",
+            "Git evidence_class не является scientific evidence",
         )
     pit_status, pit_note = _status_from_values(*(pit_cutoffs + pit_available_values))
     if pit_status == "PRESENT" and not (pit_cutoff and pit_available):
         pit_status = "UNKNOWN"
         pit_note = "cutoff или first_reliable_available_at неполны"
-    if pit_status == "MISSING" and direct:
+    if pit_status == "MISSING" and scientific:
         pit_status = "UNKNOWN"
     n_status, n_note = _status_from_values(*n_values)
-    if n_status == "MISSING" and not direct:
-        n_status = "MISSING"
-    elif n_status == "MISSING":
+    if n_status == "MISSING" and scientific:
         n_status = "UNKNOWN"
     missing_status, missing_note = _status_from_values(*missing_values)
     if missing_status == "MISSING" and not direct:
@@ -521,7 +515,7 @@ def _build_obligations(
             evidence_status,
             source="LifecycleProjection/ResearchStore",
             note=evidence_note,
-            values={"evidence_class": (class_values[0] if class_values else evidence_class)},
+            values={"evidence_class": (class_values[0] if class_values else None)},
         ),
     ]
     return matrix
@@ -668,6 +662,7 @@ def compose_experiment_dossier(
                     "decision_kind": payload.get("decision_kind"),
                     "evidence_snapshot_sha256": payload.get("evidence_snapshot_sha256"),
                     "rationale": payload.get("rationale"),
+                    "next_condition": payload.get("next_condition"),
                     "effective_at": str(getattr(record, "effective_at", "") or ""),
                     "relation": "DIRECT",
                     "creates_strategy_version": payload.get("creates_strategy_version"),
@@ -690,7 +685,7 @@ def compose_experiment_dossier(
         records_status=records_status,
     )
     guard = science_guard(obligations)
-    packet = _first_payload_value(direct, store_records, "packet_sha256")
+    packet = _first_payload_value(_scientific_cards(direct), store_records, "packet_sha256")
     snapshot = evidence_snapshot_sha256(
         {
             "experiment_id": locator.entity_id,
@@ -758,6 +753,7 @@ def decision_payload(
     hypothesis_version_id: str | None,
     rationale: str | None,
     decision_event_id: str,
+    next_condition: str | None = None,
 ) -> dict[str, Any]:
     kind = str(decision_kind or "")
     if kind not in OWNER_DECISION_KINDS:
@@ -774,6 +770,6 @@ def decision_payload(
         "scientific_promotion_only": kind == "PROMOTE",
         "creates_strategy_version": False,
         "rationale": text,
-        "next_condition": None,
+        "next_condition": _text(next_condition),
         "decision_owner": "owner",
     }

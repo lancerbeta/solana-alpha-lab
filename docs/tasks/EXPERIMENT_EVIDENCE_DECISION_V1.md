@@ -38,6 +38,7 @@ managed_write_set:
   - configs/factory_semantic_operability_v1.yaml
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml
   - catalog/assets/lifecycle.yaml
+  - catalog/assets/core.yaml
   - catalog/catalog_manifest.yaml
   - catalog/generated/asset_edges.json
   - docs/FACTORY_SEMANTIC_MAP.md
@@ -155,6 +156,14 @@ readback; PROMOTE fails closed when required evidence is missing;
 GET `/research` remains non-mutating.
 
 ## DONE
+
+Slices:
+
+```text
+A = experiment dossier over existing projection/store
+B = FactoryApplication DECISION_EVENT command + Workbench POST/readback
+C = Catalog/semantic closure, isolated critics, Factory Fit, CI evidence
+```
 
 `EXPERIMENT_EVIDENCE_DECISION_V1_PASS` when slices A/B/C, language
 policy `OWNER_LANGUAGE_RU_PASS`, isolated critics, Factory Fit, and

@@ -92,6 +92,7 @@ RESEARCH_COPY = {
     "current_object": "текущий объект",
     "trace": "TRACE",
     "rationale": "Пояснение (по-русски)",
+    "next_condition": "Следующее условие (по-русски)",
     "promote_confirm": (
         "Понимаю: PROMOTE — только научное решение. StrategyVersion, "
         "PAPER/SHADOW/LIVE и деплой не создаются."
@@ -143,6 +144,7 @@ FIELD_LABELS = {
     "FALSIFIER": "Фальсификатор",
     "METHOD": "Метод",
     "HOLDOUT POLICY": "Политика holdout",
+    "result": "Результат",
     "TERMINAL OUTCOMES": "Терминальные исходы",
     "DATA REQUIREMENTS": "Требования к данным",
     "CAPABILITIES": "Capabilities",
