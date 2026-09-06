@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import json
 import os
-from datetime import UTC, datetime, timedelta
+import time
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Callable, Mapping
 
@@ -139,7 +140,7 @@ def eligible_unverified_days(root: Path, *, now: datetime) -> list[str]:
             continue
         try:
             list_closed_day_relative_paths(rdp, day)
-        except Hot90ArchiveError:
+        except (Hot90ArchiveError, json.JSONDecodeError, OSError):
             continue
         eligible.append(day)
     return eligible
@@ -230,6 +231,13 @@ def process_one_day(
         return {"utc_day": utc_day, "terminal": "HOT90_DRIVE_WRITES_DISABLED", "uploaded": False}
 
     existing = read_receipt(root, utc_day)
+    if str((existing or {}).get("terminal") or "") == "HASH_MISMATCH":
+        return {
+            "utc_day": utc_day,
+            "terminal": "HASH_MISMATCH",
+            "uploaded": False,
+            "overwrite_forbidden": True,
+        }
     rdp = root / RDP_RELATIVE
     relatives = list_closed_day_relative_paths(rdp, utc_day)
     packed = package_closed_day_archive(
@@ -339,6 +347,7 @@ def run_closed_day_durability(
     rclone_runner: RcloneRunner | None = None,
     allow_drive: bool = False,
     deadline: datetime | None = None,
+    monotonic: Callable[[], float] | None = None,
 ) -> dict[str, Any]:
     clock = now or datetime.now(UTC)
     if clock.tzinfo is None:
@@ -346,11 +355,15 @@ def run_closed_day_durability(
     loaded_max = DEFAULT_MAX_DAYS_PER_RUN if max_days is None else int(max_days)
     if loaded_max < 1:
         raise ClosedDayLoopError("MAX_DAYS_INVALID")
-    cutoff = deadline or (clock + timedelta(seconds=DEFAULT_MAX_RUNTIME_SECONDS))
+    tick = monotonic or time.monotonic
+    started = tick()
+    max_runtime = DEFAULT_MAX_RUNTIME_SECONDS
     backlog = archive_backlog(root, now=clock)
     processed = []
     for day in backlog["eligible_unverified_days"][:loaded_max]:
-        if clock > cutoff:
+        if deadline is not None and clock > deadline:
+            break
+        if tick() - started > max_runtime:
             break
         processed.append(
             process_one_day(

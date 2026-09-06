@@ -432,8 +432,10 @@ One daily Telegram summary (not incident spam). Reuses
 credentials. Immediate remote-ops incident alerts remain separate and deduplicated.
 
 Deterministic schedule bytes: `OnCalendar=*-*-* 06:15:00 UTC`
-(`configs/factory_remote_ops/factory-collector-owner-pulse.timer`). Templates only —
-do **not** install/enable in the software baseline atom.
+(`configs/factory_remote_ops/factory-collector-owner-pulse.timer`). Templates only.
+Install/enable of this timer is part of later
+`docs/operator/FACTORY_UNATTENDED_OPERABILITY.md` commissioning, not an
+ordinary collector tick.
 
 ### Dry-run (zero network, zero credential VALUE reads)
 

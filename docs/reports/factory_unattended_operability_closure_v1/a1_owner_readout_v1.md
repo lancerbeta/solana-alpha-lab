@@ -15,7 +15,10 @@ Telegram.
   operability watch; explicit UTC `06:15 UTC` daily pulse; provider-neutral
   heartbeat URL env.
 - `UNCERTAINTY_REMOVED`: upload/mtime/size cannot look durable; a 7-day
-  outage can catch up oldest-first without a Git PR; incidents fire once.
+  outage can catch up oldest-first without a Git PR; incidents fire once;
+  HASH_MISMATCH does not overwrite the same remote object; archive catch-up
+  uses a wall/monotonic 900s budget; watch `--mode dry-run` does not persist
+  incident JSON.
 - `CAPABILITY_OR_EVIDENCE`: four vertical loops + semantic route
   `SEM-REMOTE-OPS-RECOVERY` rebound to
   `CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001` +

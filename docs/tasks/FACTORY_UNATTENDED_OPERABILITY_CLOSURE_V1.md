@@ -45,6 +45,7 @@ managed_write_set:
   - configs/factory_remote_ops/secrets.env.example
   - configs/factory_semantic_operability_v1.yaml
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/assets/core.yaml
   - catalog/catalog_manifest.yaml
   - catalog/generated/asset_edges.json

@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from datetime import datetime
@@ -68,6 +69,8 @@ def main(argv: list[str] | None = None) -> int:
         remote_config=load_config_v1_1(ROOT),
         unit_status=None if args.skip_systemd else _unit_status(),
         emit=args.mode == "emit",
+        persist=args.mode == "emit",
+        environ=os.environ,
     )
     print(json.dumps(result, indent=2, sort_keys=True, default=str))
     store.close()

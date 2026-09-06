@@ -229,6 +229,13 @@ class ClosedDayDurabilityLoopTests(unittest.TestCase):
             self.assertEqual(failed["terminal"], "HASH_MISMATCH")
             self.assertTrue((rdp / "datasets/members_snapshot_plus_delta/20260905/unit.json").is_file())
             self.assertEqual(len(bad.objects), 1)
+            copies = bad.copy_count
+            again = process_one_day(
+                root, "20260905", now=NOW, rclone_runner=bad.runner, allow_drive=True
+            )
+            self.assertEqual(again["terminal"], "HASH_MISMATCH")
+            self.assertTrue(again.get("overwrite_forbidden"))
+            self.assertEqual(bad.copy_count, copies)
             _seed_day(rdp, "20260904", "MintC")
             down = FakeDrive(fail_copy=True)
             still_down = process_one_day(
@@ -263,6 +270,57 @@ class ClosedDayDurabilityLoopTests(unittest.TestCase):
             zips = list((root / STAGING_RELATIVE).glob("ARCHIVE_*.zip"))
             self.assertEqual(len(zips), 1)
 
+    def test_corrupt_member_unit_does_not_abort_eligibility(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _ops_root(tmp)
+            rdp = root / "local/factory_v1/observation_rdp"
+            _seed_day(rdp, "20260903", "MintGood")
+            _seed_day(rdp, "20260904", "MintBad")
+            unit = rdp / "datasets/members_snapshot_plus_delta/20260904/unit.json"
+            unit.write_text("{not-json", encoding="utf-8")
+            days = eligible_unverified_days(root, now=NOW)
+            self.assertIn("20260903", days)
+            self.assertNotIn("20260904", days)
+
+    def test_monotonic_budget_stops_before_second_day(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = _ops_root(tmp)
+            rdp = root / "local/factory_v1/observation_rdp"
+            _seed_day(rdp, "20260904", "MintD")
+            _seed_day(rdp, "20260905", "MintE")
+            ticks = iter((0.0, 0.0, 901.0))
+            drive = FakeDrive()
+            result = run_closed_day_durability(
+                root,
+                now=NOW,
+                rclone_runner=drive.runner,
+                allow_drive=True,
+                max_days=3,
+                monotonic=lambda: next(ticks),
+            )
+            self.assertEqual(len(result["processed"]), 1)
+            self.assertEqual(result["processed"][0]["utc_day"], "20260904")
+            self.assertEqual(result["backlog_after"], 1)
+
+    def test_watch_persist_false_does_not_write_state(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            state_path = root / "local/factory_v1/operability_incident_state.json"
+            try:
+                evaluate_operability(
+                    root=root,
+                    store=store,
+                    now=NOW,
+                    unit_status={"factory-observation-schedule.timer": "inactive"},
+                    emit=False,
+                    persist=False,
+                    environ={},
+                )
+                self.assertFalse(state_path.exists())
+            finally:
+                store.close()
+
 
 class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
     def test_incident_once_recovered_once_telegram_pending(self) -> None:
@@ -278,6 +336,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                 now=t0,
                 unit_status=units_bad,
                 emit=False,
+                environ={},
             )
             try:
                 self.assertEqual(first["messages"], [])
@@ -287,6 +346,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                     now=t0 + timedelta(seconds=901),
                     unit_status=units_bad,
                     emit=False,
+                    environ={},
                 )
                 codes = {(item["kind"], item["code"]) for item in later["messages"]}
                 self.assertIn(("INCIDENT", "REQUIRED_TIMER_FAILED"), codes)
@@ -296,6 +356,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                     now=t0 + timedelta(seconds=1800),
                     unit_status=units_bad,
                     emit=False,
+                    environ={},
                 )
                 self.assertEqual(again["messages"], [])
                 recovered = evaluate_operability(
@@ -304,6 +365,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                     now=t0 + timedelta(seconds=2000),
                     unit_status=units_ok,
                     emit=False,
+                    environ={},
                 )
                 rec_codes = {(item["kind"], item["code"]) for item in recovered["messages"]}
                 self.assertIn(("RECOVERED", "REQUIRED_TIMER_FAILED"), rec_codes)
@@ -342,6 +404,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                     now=t0,
                     unit_status=units_bad,
                     emit=False,
+                    environ={},
                 )
                 evaluate_operability(
                     root=root,
@@ -349,6 +412,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                     now=t0 + timedelta(seconds=901),
                     unit_status=units_bad,
                     emit=False,
+                    environ={},
                 )
                 failed = evaluate_operability(
                     root=root,
@@ -491,6 +555,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
                         emit=False,
                         observation_rdp=rdp,
                         remote_config=remote,
+                        environ={"FACTORY_BACKUP_SINK": str(sink)},
                     )
                     messages += len(result["messages"])
                 self.assertEqual(messages, 0)

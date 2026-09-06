@@ -147,11 +147,13 @@ def evaluate_operability(
     environ: Mapping[str, str] | None = None,
     unit_status: Mapping[str, str] | None = None,
     emit: bool = False,
+    persist: bool | None = None,
     transport: Callable[[str, str, str], None] | None = None,
 ) -> dict[str, Any]:
     clock = now or datetime.now(UTC)
     if clock.tzinfo is None:
         clock = clock.replace(tzinfo=UTC)
+    write_state = True if persist is None else persist
     packet = build_collector_operational_packet(
         root=root,
         store=store,
@@ -159,7 +161,7 @@ def evaluate_operability(
         deploy_git_sha=deploy_git_sha,
         observation_rdp=observation_rdp,
         remote_config=remote_config,
-        environ=environ if environ is not None else {},
+        environ=environ if environ is not None else os.environ,
     )
     present = classify_incidents(packet, unit_status=unit_status)
     state_path = root / STATE_RELATIVE
@@ -239,7 +241,8 @@ def evaluate_operability(
         still_pending = pending
 
     next_state = {"active": active, "pending": still_pending}
-    _atomic_write_json(state_path, next_state)
+    if write_state:
+        _atomic_write_json(state_path, next_state)
     return {
         "present": sorted(present),
         "messages": messages,

@@ -87,15 +87,19 @@ Parser footer fields: `MESSAGE_TYPE`, `STATE`, `INCIDENT`, `COLLECTOR_STATE`,
 
 ## WHAT IS SAFE TO READ?
 
-- `scripts/hot90_activation.py show`
-- `scripts/collector_owner_pulse.py --mode dry-run`
-- `scripts/factory_operability_watch.py --mode dry-run --skip-systemd`
-- `scripts/hot90_closed_day_durability.py` (no-op unless runtime is
-  `DURABILITY_CUTOVER`/`RETENTION_ACTIVE` with Drive writes enabled)
-- `scripts/factory_external_heartbeat.py` (no-op unless URL is configured)
+- `scripts/hot90_activation.py show` — no mutation.
+- `scripts/collector_owner_pulse.py --mode dry-run` — zero network, zero
+  Telegram credential VALUE reads.
+- `scripts/factory_operability_watch.py --mode dry-run --skip-systemd` —
+  no Telegram send and no incident-state write. `--mode emit` persists
+  local incident JSON and may send Telegram.
+- `scripts/hot90_closed_day_durability.py` is an operator **action** when
+  runtime is `DURABILITY_CUTOVER`/`RETENTION_ACTIVE` with Drive writes
+  enabled; otherwise typed no-op. Do not use it as a read-only probe.
+- `scripts/factory_external_heartbeat.py` — no-op unless URL is configured.
 - `scripts/factory_remote_doctor.py` status/offhost-status surfaces from the
   collector runbook (do not pass `--backup` unless that exact OPERATE atom
-  is named)
+  is named).
 
 ## WHAT REQUIRES OWNER AUTHORITY?
 
