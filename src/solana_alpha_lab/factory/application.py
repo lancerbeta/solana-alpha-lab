@@ -302,6 +302,10 @@ class FactoryApplication:
             decision_payload,
             logical_decision_ids,
         )
+        from solana_alpha_lab.factory.promotion_handoff import (
+            PromotionHandoffError,
+            freeze_promotion_handoff_manifest,
+        )
         from solana_alpha_lab.factory.research_store import (
             ExistingResearchStoreReader,
             ResearchEvent,
@@ -368,17 +372,29 @@ class FactoryApplication:
             decision_kind=kind,
             snapshot_sha256=expected,
         )
-        payload = decision_payload(
-            locator=locator,
-            decision_kind=kind,
-            snapshot_sha256=expected,
-            hypothesis_version_id=(reread_dossier.get("tested") or {}).get(
-                "hypothesis_version_id"
-            ),
-            rationale=command.get("rationale"),
-            next_condition=command.get("next_condition"),
-            decision_event_id=event_id,
-        )
+        manifest = None
+        if kind == "PROMOTE":
+            try:
+                manifest = freeze_promotion_handoff_manifest(
+                    reread_dossier, root=self.root
+                )
+            except PromotionHandoffError as exc:
+                raise ApplicationError(str(exc) or "EXPERIMENT_SPEC_BINDING_GAP") from exc
+        try:
+            payload = decision_payload(
+                locator=locator,
+                decision_kind=kind,
+                snapshot_sha256=expected,
+                hypothesis_version_id=(reread_dossier.get("tested") or {}).get(
+                    "hypothesis_version_id"
+                ),
+                rationale=command.get("rationale"),
+                next_condition=command.get("next_condition"),
+                decision_event_id=event_id,
+                promotion_handoff_manifest=manifest,
+            )
+        except ResearchWorkbenchError as exc:
+            raise ApplicationError(str(exc)) from exc
         payload_json = json.dumps(
             payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False
         )

@@ -17,9 +17,11 @@ from solana_alpha_lab.factory.owner_language import (
     ROLLBACK_GLOSS,
     VERDICT_GLOSS,
     attention_label,
+    blocker_label,
     counter_label,
     decision_kind_label,
     field_label,
+    handoff_state_label,
     kind_label,
     nav_label,
     obligation_label,
@@ -665,6 +667,10 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
                 "TRIALS",
                 "DECISIONS",
                 "NEGATIVES",
+                "SCIENTIFIC PROMOTE",
+                "READY TO STRATEGY",
+                "HANDOFF BLOCKED",
+                "STRATEGY MATERIALIZED",
                 "ATTENTION",
                 "GAPS",
             )
@@ -717,6 +723,115 @@ def _evidence_cards(cards: list[Any], empty_copy: str) -> str:
             + "</li>"
         )
     return "<ul>" + "".join(items) + "</ul>"
+
+
+def _handoff_html(handoff: Any) -> str:
+    if not isinstance(handoff, Mapping):
+        return ""
+    state = str((handoff.get("state") or {}).get("handoff_state") or "UNKNOWN")
+    science = handoff.get("science") if isinstance(handoff.get("science"), Mapping) else {}
+    material = (
+        handoff.get("materialization")
+        if isinstance(handoff.get("materialization"), Mapping)
+        else {}
+    )
+    identity = handoff.get("identity") if isinstance(handoff.get("identity"), Mapping) else {}
+    provenance = (
+        handoff.get("provenance") if isinstance(handoff.get("provenance"), Mapping) else {}
+    )
+    blockers = list((handoff.get("state") or {}).get("blocker_codes") or [])
+    next_action = str((handoff.get("state") or {}).get("next_safe_action") or "UNKNOWN")
+    status_copy = {
+        "NOT_PROMOTED": research_copy("handoff_none"),
+        "BLOCKED": (
+            research_copy("handoff_legacy")
+            if "LEGACY_PROVENANCE_GAP" in blockers
+            else research_copy("handoff_execution_gap")
+            if "EXECUTION_INPUT_GAP" in blockers
+            else research_copy("handoff_blocked_why")
+        ),
+        "READY_TO_MATERIALIZE": research_copy("handoff_ready_copy"),
+        "MATERIALIZED": research_copy("handoff_materialized"),
+        "CONFLICT": research_copy("handoff_conflict"),
+    }.get(state, research_copy("handoff_none"))
+    blocker_html = (
+        "<ul>"
+        + "".join(
+            "<li>"
+            + html.escape(blocker_label(code))
+            + f" <span class=\"mono\">{html.escape(code)}</span></li>"
+            for code in blockers
+        )
+        + "</ul>"
+        if blockers
+        else f"<p>{html.escape(research_copy('none'))}</p>"
+    )
+    strategy_id = material.get("strategy_identity") or material.get("strategy_id") or research_copy("none")
+    frozen = (
+        research_copy("handoff_frozen_present")
+        if science.get("handoff_manifest_sha256")
+        else research_copy("handoff_frozen_absent")
+    )
+    required = (
+        "; ".join(blocker_label(code) for code in blockers)
+        if blockers
+        else research_copy("none")
+    )
+    if science.get("handoff_manifest_sha256"):
+        carries = str(
+            material.get("strategy_identity") or material.get("strategy_id") or ""
+        ) or research_copy("handoff_carries_science")
+    else:
+        carries = research_copy("none")
+    next_gloss, next_canonical, _unknown = token_gloss(NEXT_ACTION_GLOSS, next_action)
+    next_display = (
+        f"{next_gloss} ({next_canonical})" if next_gloss else next_canonical
+    )
+    machine = (
+        "<p>"
+        + html.escape(research_copy("handoff_machine"))
+        + "</p><table>"
+        + _rows(
+            {
+                "decision_event_id": identity.get("decision_event_id"),
+                "manifest_sha256": science.get("handoff_manifest_sha256"),
+                "evidence_snapshot_sha256": science.get("evidence_snapshot_sha256"),
+                "strategy_id": material.get("strategy_id"),
+                "strategy_version": material.get("strategy_version"),
+                "blocker_codes": ", ".join(blockers) or None,
+                "source_revalidation": provenance.get("source_revalidation"),
+            }
+        )
+        + "</table>"
+    )
+    return (
+        f"<h3>{html.escape(research_copy('handoff_title'))}</h3>"
+        + "<table>"
+        + _rows(
+            {
+                research_copy("handoff_status"): (
+                    handoff_state_label(state) + f" ({state})"
+                ),
+                research_copy("handoff_decision"): (
+                    decision_kind_label(str(science.get("decision_kind") or ""))
+                    or "NONE"
+                ),
+                research_copy("handoff_frozen"): frozen,
+                research_copy("handoff_carries"): carries,
+                research_copy("handoff_required"): required,
+                research_copy("handoff_strategy"): strategy_id,
+                research_copy("handoff_next"): next_display,
+            }
+        )
+        + "</table>"
+        + f"<h4>{html.escape(research_copy('handoff_blocked_why'))}</h4>"
+        + blocker_html
+        + f"<p>{html.escape(status_copy)}</p>"
+        + f"<p>{html.escape(research_copy('handoff_not_started'))}: "
+        + html.escape(research_copy("handoff_not_started_body"))
+        + "</p>"
+        + technical(machine, title=research_copy("handoff_machine"))
+    )
 
 
 def _dossier_html(dossier: Mapping[str, Any]) -> str:
@@ -856,6 +971,7 @@ def _dossier_html(dossier: Mapping[str, Any]) -> str:
         + "</div>"
         + f"<h3>{html.escape(research_copy('decision_history'))}</h3>"
         + (f"<ul>{history}</ul>" if history.startswith("<li>") else history)
+        + _handoff_html(dossier.get("science_to_strategy_handoff"))
         + f"<h3>{html.escape(research_copy('owner_decision'))}</h3>"
         + controls
         + "</section>"

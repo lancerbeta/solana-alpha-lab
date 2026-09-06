@@ -6,7 +6,7 @@ import hashlib
 import json
 from typing import Any, Mapping, Sequence
 
-from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, spec_sha256
 from solana_alpha_lab.factory.owner_language import DEFAULT_RATIONALE
 from solana_alpha_lab.factory.research_workbench import (
     LifecycleEntityLocatorV1,
@@ -644,6 +644,7 @@ def compose_experiment_dossier(
     source_ref = entity.get("source_ref") if isinstance(entity.get("source_ref"), dict) else {}
     relative = str(source_ref.get("value") or "")
     spec = load_experiment_spec(root, relative) if relative else {}
+    spec_digest = spec_sha256(root, relative) if relative else None
     hypothesis_version_id = _text(spec.get("hypothesis_version"))
     store_records = tuple(records or ())
     direct_run_ids, direct_trial_ids = _collect_direct_ids(locator.entity_id, store_records)
@@ -677,6 +678,13 @@ def compose_experiment_dossier(
                     "effective_at": str(getattr(record, "effective_at", "") or ""),
                     "relation": "DIRECT",
                     "creates_strategy_version": payload.get("creates_strategy_version"),
+                    "promotion_handoff_manifest_sha256": (
+                        (payload.get("promotion_handoff_manifest") or {}).get(
+                            "manifest_sha256"
+                        )
+                        if isinstance(payload.get("promotion_handoff_manifest"), Mapping)
+                        else None
+                    ),
                 }
             )
     related.extend(
@@ -749,6 +757,12 @@ def compose_experiment_dossier(
         "decision_history": history,
         "science_guard": guard,
         "evidence_snapshot_sha256": snapshot,
+        "promotion_packet_sha256": packet,
+        "experiment_spec_binding": {
+            "source_kind": source_ref.get("kind"),
+            "source_value": relative or None,
+            "spec_sha256": spec_digest,
+        },
         "write_capability": dict(write_capability or {"read": "AVAILABLE", "write": "UNKNOWN"}),
         "owner_decision_kinds": list(OWNER_DECISION_KINDS),
         "promote_creates_strategy_version": False,
@@ -765,12 +779,13 @@ def decision_payload(
     rationale: str | None,
     decision_event_id: str,
     next_condition: str | None = None,
+    promotion_handoff_manifest: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     kind = str(decision_kind or "")
     if kind not in OWNER_DECISION_KINDS:
         raise ResearchWorkbenchError("DECISION_KIND_REJECTED")
     text = _text(rationale) or DEFAULT_RATIONALE[kind]
-    return {
+    payload = {
         "decision_event_id": decision_event_id,
         "decision_kind": kind,
         "target_entity_id": locator.entity_id,
@@ -784,3 +799,8 @@ def decision_payload(
         "next_condition": _text(next_condition),
         "decision_owner": "owner",
     }
+    if kind == "PROMOTE":
+        if not isinstance(promotion_handoff_manifest, Mapping):
+            raise ResearchWorkbenchError("EXPERIMENT_SPEC_BINDING_GAP")
+        payload["promotion_handoff_manifest"] = dict(promotion_handoff_manifest)
+    return payload

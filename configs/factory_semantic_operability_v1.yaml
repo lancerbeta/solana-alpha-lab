@@ -345,6 +345,8 @@ routes:
       - Show evidence for this experiment
       - что сейчас исследуется?
       - что уже проверяли?
+      - How does an accepted scientific experiment become a StrategyVersion?
+      - Почему эта стратегия вообще существует и каким evidence она разрешена?
     search_terms:
       - owner lifecycle
       - lifecycle projection

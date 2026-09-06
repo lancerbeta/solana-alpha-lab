@@ -1509,7 +1509,7 @@ records:
     repository_path: README.md
   integrity:
     kind: sha256
-    sha256: 625cd06e83b181bc6462ccf4d7fd03fad221d0516770b09774bc1c1e4f3343ee
+    sha256: ffd6ab2f6a2476be116fadf8a919ad33f47ee387c344e47120a8a4b573d75bd4
   access:
     mode: read_only
     method: file
@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: bfa2eec4e68b73c76dd87cba5325228e7a443156e17b531ca2f82b93f6e32b7f}
+  integrity: {kind: sha256, sha256: b5911f4f2e019ca70b34f53d8f305aa4efdccd448909eeafae515a9a63a459d6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25726,7 +25726,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: b80cd6007dd32ddbe165b0ab4901da6d263f0634f02948f0a39466d3392fd947}
+  integrity: {kind: sha256, sha256: 4ab1d794b007724e8ed37fac12aac7af2cf1bcad5261cf1278a1064812f5ce13}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -34141,7 +34141,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: f0b2bbc8ab2d52647b36bcd884df7162c5ee99083f5c22744edb465c4119feda}
+  integrity: {kind: sha256, sha256: c98c7e96bcf175287caa3f07229096ca509a8bc046da6c51acb55986a4e530b0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34159,7 +34159,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_semantic_operability.schema.json', repository_path: catalog/schemas/factory_semantic_operability.schema.json}
-  integrity: {kind: sha256, sha256: b33db0059075eed4db0cd5be3b5bfe1977b9acd238022e8184a9dbbfcaea3845}
+  integrity: {kind: sha256, sha256: 2fe6fef9fe517c76896b5d529796afed06fa2589b9e76429cc4cfc8acd1142da}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34266,7 +34266,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 3d7be790e242c5651625b51b8e948c49bf681d3ef6ebef111fd75a5d7f3645d0}
+  integrity: {kind: sha256, sha256: a296bdcfd1a330aeafd6e7cdb86c2f649ecd9baa1321057d9c75726bdb7cba71}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -35398,7 +35398,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/owner_lifecycle_projection_spine_v1.md', repository_path: docs/contracts/owner_lifecycle_projection_spine_v1.md}
-  integrity: {kind: sha256, sha256: 9af509d2ebac93d977d414c319b88daacc2b66955198dcec918b2c3f2d2adbf3}
+  integrity: {kind: sha256, sha256: e8ac3786b8caa1e3a8e8e585e0de86c4272c1d2611b4a8a96380080cd2d80387}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35416,7 +35416,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lifecycle_projection.py', repository_path: src/solana_alpha_lab/factory/lifecycle_projection.py}
-  integrity: {kind: sha256, sha256: 6bcf614b59354ff577cbfde0abdbb56dec754dd88b778773228f6d64e97c68c9}
+  integrity: {kind: sha256, sha256: a3931e2c4e1ea6093dac0d4b5f3fd231d809f32cb32726d2beed7408c78c6eb9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35489,7 +35489,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/research_lifecycle_workbench_v1.md', repository_path: docs/contracts/research_lifecycle_workbench_v1.md}
-  integrity: {kind: sha256, sha256: 335bb2d215dcb81e7e7c29ebb8044ff6d8fb5e687963c5c6f4e568c9312dcf0e}
+  integrity: {kind: sha256, sha256: 4bf166e78a607f90f18009d47f10db317ba7bba679d6140568103f05b590f988}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -35508,7 +35508,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_workbench.py', repository_path: src/solana_alpha_lab/factory/research_workbench.py}
-  integrity: {kind: sha256, sha256: 5515dde1d2f2f445b5fb75d48fdb758941b51e4ba6f31e781b4a25e8af5c83a1}
+  integrity: {kind: sha256, sha256: 29323bccc865ce8064b0207c10cc6fa1fff0a89322b85cc12d4c57d7df140b81}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -35568,7 +35568,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/experiment_evidence_decision_v1.md', repository_path: docs/contracts/experiment_evidence_decision_v1.md}
-  integrity: {kind: sha256, sha256: f52326d2557861a7815435ba95debf58ba317bf1c02a3763e8b5566aa8953891}
+  integrity: {kind: sha256, sha256: 155cee013011939295e3b0a16396d95dc8663a6ab511133c7b109d3c54b9e861}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35587,7 +35587,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
-  integrity: {kind: sha256, sha256: f4fa9a7e0a30a71e3cbaf443899e710f57cac2a8f9693f24d15f5468c74ff252}
+  integrity: {kind: sha256, sha256: 314d80154e0201d71bedd70653bb3dcd4145c28c3ae6c4ac4e78a49a59a29371}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35606,7 +35606,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: ee89b555568cbf2e903f101cf55a87bd421afe48745d81c223d598135242060f}
+  integrity: {kind: sha256, sha256: f7bc857232e4933e944465e907c77f6e3deb3aa2fe778dfd65db1c96b04ca434}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35632,6 +35632,100 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [EXPERIMENT_EVIDENCE, GOLD_QUERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for frozen scientific PROMOTE handoff and StrategyVersion v1.1 materialization without activation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md', repository_path: docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md}
+  integrity: {kind: sha256, sha256: 6bfdd327d4730d474b0df4279b7d56fff848be31a9b0f28b32c46f67d9236497}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  - {relation_type: contains, target_asset_id: SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-001}
+  - {relation_type: contains, target_asset_id: MODULE-PROMOTION-HANDOFF-001}
+  - {relation_type: validated_by, target_asset_id: TEST-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [SCIENCE_TO_STRATEGY, PROMOTION_HANDOFF]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Human contract for PROMOTE handoff manifest, handoff state, field provenance and no-activation materialization.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/science_to_strategy_handoff_v1.md', repository_path: docs/contracts/science_to_strategy_handoff_v1.md}
+  integrity: {kind: sha256, sha256: de9655268d8271f74058f4043726650e860a014554112bba0e31f426935ff4a6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  - {relation_type: depends_on, target_asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-STRATEGY-VERSION-V1-1-001}
+  - {relation_type: depends_on, target_asset_id: DOC-OWNER-LIFECYCLE-PROJECTION-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [promotion handoff, StrategyVersion, science to strategy]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Machine schema for decision-time promotion_handoff_manifest frozen inside new PROMOTE events.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/promotion_handoff_manifest_v1.schema.json', repository_path: catalog/schemas/promotion_handoff_manifest_v1.schema.json}
+  integrity: {kind: sha256, sha256: 5e8f7c6066f394b618051d4b9ed4361b05785e51fdfc4b8a000767fd7e8548d0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [promotion_handoff_manifest, MANIFEST_SHA256]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-PROMOTION-HANDOFF-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Derived ScienceToStrategyHandoffV1 projection and deterministic StrategyVersion v1.1 materialization seam.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/promotion_handoff.py', repository_path: src/solana_alpha_lab/factory/promotion_handoff.py}
+  integrity: {kind: sha256, sha256: d17217b4a91e5f18fd105933928c212f9059ab6bd86655dee554ca9e4a7fddaa}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-EXPERIMENT-EVIDENCE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-STRATEGY-RUNTIME-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [ScienceToStrategyHandoffV1, READY_TO_MATERIALIZE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-SCIENCE-TO-STRATEGY-HANDOFF-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical acceptance for frozen PROMOTE handoff, materialization seam, lifecycle relation and owner research rendering.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_science_to_strategy_handoff_v1.py', repository_path: tests/test_science_to_strategy_handoff_v1.py}
+  integrity: {kind: sha256, sha256: 91b97fce58912002c2b2a8a7fec85a051713a3f6e32670bfa319135f33527acc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  - {relation_type: depends_on, target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HANDOFF_VERTICAL, LEGACY_PROVENANCE_GAP]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001
   record_version: '1.0'

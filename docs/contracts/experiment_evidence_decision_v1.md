@@ -131,6 +131,11 @@ Unverified append is `DECISION_WRITE_UNVERIFIED` (no auto-retry).
 `UNKNOWN` or `CONFLICT`. It does not create StrategyVersion, start
 PAPER/SHADOW/LIVE, call providers, deploy, or touch a wallet.
 
+New PROMOTE events freeze an additive `promotion_handoff_manifest`
+inside the decision payload. `evidence_snapshot_sha256` keeps its
+existing meaning. Science-to-strategy materialization is owned by
+`SCIENCE_TO_STRATEGY_HANDOFF_V1`.
+
 New owner-authored human fields on this command (`rationale`,
 `next_condition`) are Russian-first. Machine keys stay English.
 

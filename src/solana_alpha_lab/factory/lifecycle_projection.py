@@ -1385,6 +1385,11 @@ def _research_store_owned_fields(
         "falsifier": payload.get("falsifier"),
         "trial outcome": payload.get("outcome"),
         "decision kind": payload.get("decision_kind") or payload.get("kind"),
+        "promotion_handoff_manifest_sha256": (
+            (payload.get("promotion_handoff_manifest") or {}).get("manifest_sha256")
+            if isinstance(payload.get("promotion_handoff_manifest"), Mapping)
+            else None
+        ),
         "effective_at": as_of,
         "first_reliable_available_at": available,
         "evidence class": payload.get("evidence_class"),
@@ -1558,7 +1563,9 @@ def _adapt_research_store(
         projection_class, native_kind = _RESEARCH_CLASS[kind]
         as_of = record.effective_at.astimezone(UTC).isoformat().replace("+00:00", "Z")
         available = record.first_reliable_available_at.astimezone(UTC).isoformat().replace("+00:00", "Z")
-        native_state = str(payload.get("status") or kind)
+        native_state = str(
+            payload.get("decision_kind") or payload.get("status") or kind
+        )
         entities.append(
             _entity(
                 entity_id=entity_id,
@@ -1613,6 +1620,25 @@ def _adapt_research_store(
                     "relation_type": "RESEARCH_TRIAL_LINK",
                     "from_entity_id": entity_id,
                     "to_entity_id": trial_id,
+                    "resolution": "TARGET_GAP",
+                    "source_ref": source_ref,
+                    "derivation_method": "EXPLICIT_SOURCE_FIELD",
+                }
+            )
+        target_id = payload.get("target_entity_id")
+        target_kind = payload.get("target_native_kind")
+        if (
+            kind == "DECISION_EVENT"
+            and isinstance(target_id, str)
+            and target_id
+            and target_id != entity_id
+            and target_kind in {None, "EXPERIMENT_SPEC"}
+        ):
+            relations.append(
+                {
+                    "relation_type": "DECISION_FOR_EXPERIMENT",
+                    "from_entity_id": entity_id,
+                    "to_entity_id": target_id,
                     "resolution": "TARGET_GAP",
                     "source_ref": source_ref,
                     "derivation_method": "EXPLICIT_SOURCE_FIELD",

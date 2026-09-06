@@ -15,6 +15,10 @@ from solana_alpha_lab.factory.lifecycle_projection import (
     LifecycleProjectionError,
     build_lifecycle_projection,
 )
+from solana_alpha_lab.factory.promotion_handoff import (
+    compose_science_to_strategy_handoff,
+    handoff_overview_counters,
+)
 
 RESEARCH_CLASSES = frozenset({"RESEARCH", "EXPERIMENT", "EVIDENCE_DECISION"})
 RESEARCH_KINDS = frozenset(
@@ -405,6 +409,7 @@ def compose_research_overview(
             "NEGATIVES": len(negatives),
             "ATTENTION": len(attention) + len(source_attention),
             "GAPS": len(structural_gaps),
+            **handoff_overview_counters(projection, research_status=research_status),
         },
         "counter_scope": "materialized_projection_facts",
         "degraded": degraded,
@@ -733,6 +738,10 @@ def build_research_overview(
                 "NEGATIVES": None,
                 "ATTENTION": None,
                 "GAPS": None,
+                "SCIENTIFIC PROMOTE": None,
+                "READY TO STRATEGY": None,
+                "HANDOFF BLOCKED": None,
+                "STRATEGY MATERIALIZED": None,
             },
             "degraded": True,
             "degraded_copy": (
@@ -800,4 +809,12 @@ def build_research_detail(
             records_status=records_status,
             write_capability=write_capability,
         )
+        handoff = compose_science_to_strategy_handoff(
+            root=root,
+            experiment_id=locator.entity_id,
+            records=records,
+            records_status=records_status,
+        )
+        dossier = dict(dossier)
+        dossier["science_to_strategy_handoff"] = handoff
     return compose_research_detail(projection, locator, root=root, dossier=dossier)
