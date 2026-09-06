@@ -302,6 +302,7 @@
       "tests/test_early_market_panel_importer.py",
       "tests/test_factory_production_clock_pacing_adapter_parity_repair.py",
       "tests/test_factory_semantic_operability.py",
+      "tests/test_science_to_strategy_handoff_v1.py",
       "tests/test_fast_lane_cli.py",
       "tests/test_hfic_forge_context_and_no_worthy.py",
       "tests/test_hfic_identity.py",

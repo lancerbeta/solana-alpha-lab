@@ -95,6 +95,9 @@ Preferred degraded copy when ResearchStore is absent:
 Git-эксперименты, проверки и решения ниже остаются видимы.
 ```
 
+Experiment detail may show a derived science→strategy handoff summary.
+That summary is not source truth and never writes Git or ResearchStore.
+
 Groups prefer source-native states. Do not invent `KILLED`,
 `READY_TO_TEST`, `DECISION_READY`, or `PROMOTION_CANDIDATE` from UI
 heuristics. A negative result is not a killed hypothesis. A completed

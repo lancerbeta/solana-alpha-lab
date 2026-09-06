@@ -4263,6 +4263,26 @@
       "target_asset_id": "TEST-RESEARCH-LIFECYCLE-WORKBENCH-001"
     },
     {
+      "source_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-PROMOTION-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
       "source_asset_id": "CTRL-SEMANTIC-PREMISE-REVIEW-PROFILE-001",
       "relation": "contains",
       "target_asset_id": "CONFIG-SEMANTIC-PREMISE-REVIEW-PROFILE-001"
@@ -5121,6 +5141,26 @@
       "source_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001"
+    },
+    {
+      "source_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-STRATEGY-VERSION-V1-1-001"
+    },
+    {
+      "source_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
     },
     {
       "source_asset_id": "DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001",
@@ -10683,6 +10723,21 @@
       "target_asset_id": "CONFIG-PMF-QUOTE-STAY-OVERLAY-001"
     },
     {
+      "source_asset_id": "MODULE-PROMOTION-HANDOFF-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-EXPERIMENT-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-PROMOTION-HANDOFF-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-STRATEGY-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "MODULE-PROMOTION-HANDOFF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
       "source_asset_id": "MODULE-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
       "relation": "governed_by",
       "target_asset_id": "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001"
@@ -12991,6 +13046,11 @@
       "source_asset_id": "SCHEMA-OWNER-LIFECYCLE-PROJECTION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
     },
     {
       "source_asset_id": "SCHEMA-PROVIDER-ROUTE-CAPABILITY-REGISTRY-001",
@@ -15811,6 +15871,16 @@
       "source_asset_id": "TEST-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "TEST-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "TEST-SCIENCE-TO-STRATEGY-HANDOFF-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
     },
     {
       "source_asset_id": "TEST-SEMANTIC-PREMISE-REVIEW-001",

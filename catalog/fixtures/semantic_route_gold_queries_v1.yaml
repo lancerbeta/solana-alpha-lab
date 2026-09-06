@@ -182,6 +182,12 @@ queries:
 - query_id: SGQ-OWNER-WHY-REJECTED-EN
   query: why was this rejected
   required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-SCIENCE-TO-STRATEGY-EN
+  query: How does an accepted scientific experiment become a StrategyVersion?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-SCIENCE-TO-STRATEGY-RU
+  query: Почему эта стратегия вообще существует и каким evidence она разрешена?
+  required_top_route: SEM-OWNER-LIFECYCLE
 - query_id: SGQ-ANTI-MECHANISM-TESTED-BEFORE
   query: has this mechanism been tested before?
   required_top_route: SEM-PRIOR-WORK

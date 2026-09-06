@@ -182,7 +182,7 @@ projection. There is no `lifecycle_projection.sqlite`.
 | --- | --- |
 | 1 `RESEARCH_LIFECYCLE_WORKBENCH_V1` | Consume this index; do not rebuild joins from empty registries |
 | 2 `EXPERIMENT_EVIDENCE_DECISION_V1` | Index = identity/link/status; science stays ExperimentSpec/Runner |
-| 3 `SCIENCE_TO_STRATEGY_HANDOFF_V1` | Explicit decision → StrategyVersion only |
+| 3 `SCIENCE_TO_STRATEGY_HANDOFF_V1` | Explicit `DECISION_FOR_EXPERIMENT` and `REFERENCES_DECISION_ASSET` only |
 | 4 `TRADING_OPERATIONS_WORKBENCH_V2` | Git StrategyVersion + PaperPlane via projections; commands via FactoryApplication |
 | 5 `OWNER_ATTENTION_AND_CHANGE_FEED_V1` | Attention derived from sources; no attention database |
 | 6 `SYSTEM_OPERABILITY_SURFACE_V2` | Runtime health from machine readback, never Git capability |

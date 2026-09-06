@@ -22,6 +22,10 @@ COUNTER_LABELS = {
     "NEGATIVES": "Отрицательные результаты",
     "ATTENTION": "Требует внимания",
     "GAPS": "Пробелы",
+    "SCIENTIFIC PROMOTE": "Научно продвинуто",
+    "READY TO STRATEGY": "Готово к стратегии",
+    "HANDOFF BLOCKED": "Переход заблокирован",
+    "STRATEGY MATERIALIZED": "StrategyVersion создана",
 }
 
 RESEARCH_COPY = {
@@ -106,6 +110,43 @@ RESEARCH_COPY = {
     "no_decisions": "Решений ещё нет",
     "original_source": "оригинал источника",
     "legacy_en": "legacy EN",
+    "handoff_title": "Переход в стратегию",
+    "handoff_status": "Статус",
+    "handoff_decision": "Научное решение",
+    "handoff_frozen": "Что было зафиксировано в момент решения",
+    "handoff_carries": "Что переносится в стратегию",
+    "handoff_required": "Что ещё требуется",
+    "handoff_blocked_why": "Почему переход заблокирован",
+    "handoff_strategy": "Созданная StrategyVersion",
+    "handoff_next": "Следующее безопасное действие",
+    "handoff_not_started": "Что НЕ было запущено",
+    "handoff_not_started_body": (
+        "StrategyVersion не запускает PAPER, SHADOW, LIVE, бота, провайдера "
+        "или кошелёк. Это только определение."
+    ),
+    "handoff_ready_copy": (
+        "Научный переход готов. Для создания StrategyVersion нужен bounded Git "
+        "materialization step."
+    ),
+    "handoff_frozen_present": (
+        "Научные входы на момент решения заморожены в handoff-манифесте."
+    ),
+    "handoff_frozen_absent": "Замороженного handoff-манифеста нет.",
+    "handoff_carries_science": (
+        "population_ref, hypothesis и source_decision_asset_id из научного решения"
+    ),
+    "handoff_none": "Научного продвижения ещё нет.",
+    "handoff_legacy": (
+        "Старый PROMOTE без замороженного handoff. Текущие доказательства "
+        "нельзя подставить вместо решения того момента."
+    ),
+    "handoff_execution_gap": (
+        "Научное решение есть. Не хватает явных параметров исполнения/риска. "
+        "Значения по умолчанию не подставляются."
+    ),
+    "handoff_materialized": "StrategyVersion уже есть. Ничего не запущено.",
+    "handoff_conflict": "Конфликт содержимого. Существующую StrategyVersion нельзя перезаписать.",
+    "handoff_machine": "Машинные идентификаторы",
 }
 
 OBLIGATION_LABELS = {
@@ -129,6 +170,26 @@ DECISION_KIND_LABELS = {
     "REVISE": "Доработать",
     "PAUSE": "Пауза",
     "PROMOTE": "Научно продвинуть",
+}
+
+HANDOFF_STATE_LABELS = {
+    "NOT_PROMOTED": "Нет научного продвижения",
+    "BLOCKED": "Переход заблокирован",
+    "READY_TO_MATERIALIZE": "Готово к StrategyVersion",
+    "MATERIALIZED": "StrategyVersion создана",
+    "CONFLICT": "Конфликт",
+}
+
+BLOCKER_LABELS = {
+    "LEGACY_PROVENANCE_GAP": "Нет замороженного решения того момента",
+    "HANDOFF_MANIFEST_INVALID": "Handoff-манифест недействителен",
+    "EXPERIMENT_SPEC_BINDING_GAP": "Нет привязки ExperimentSpec на момент решения",
+    "EVIDENCE_RELATION_GAP": "Нет явной связи с доказательствами",
+    "EVIDENCE_HASH_CONFLICT": "Хеш доказательств не совпадает с решением",
+    "EXECUTION_INPUT_GAP": "Нет явных параметров исполнения/риска",
+    "STRATEGY_IDENTITY_CONFLICT": "Конфликт идентификатора стратегии",
+    "STRATEGY_CONTENT_CONFLICT": "Конфликт содержимого StrategyVersion",
+    "SOURCE_UNAVAILABLE": "Исходный ResearchStore сейчас недоступен",
 }
 
 UNKNOWN_CANONICAL = frozenset(
@@ -168,6 +229,27 @@ NEXT_ACTION_GLOSS = {
     "RESOLVE_MISSING_EVIDENCE": "Восстановите недостающие Git-доказательства",
     "RUN_RUNTIME_PROOFS": "Запустите runtime proofs",
     "DO_NOT_PROMOTE": "Не продвигать в стратегию",
+    "NO_SCIENTIFIC_PROMOTE": "Научного продвижения ещё нет — ничего не делать",
+    "SUPPLY_EXPLICIT_EXECUTION_INPUTS": (
+        "Нужен bounded шаг с явными параметрами исполнения/риска"
+    ),
+    "DO_NOT_RECONSTRUCT_DECISION_TIME_EVIDENCE": (
+        "Не восстанавливать доказательства того момента из текущих записей"
+    ),
+    "FAIL_CLOSED_INVALID_MANIFEST": "Handoff-манифест недействителен — не материализовать",
+    "FAIL_CLOSED_EVIDENCE_HASH_CONFLICT": "Конфликт хеша доказательств — не материализовать",
+    "RESOLVE_RESEARCH_STORE": "Восстановить доступ к ResearchStore",
+    "INSPECT_HANDOFF_BLOCKER": "Разобрать указанный blocker перехода",
+    "BOUNDED_GIT_MATERIALIZATION_STEP": (
+        "Научный переход готов. Для создания StrategyVersion нужен bounded Git "
+        "materialization step."
+    ),
+    "INSPECT_STRATEGY_VERSION_NO_ACTIVATION": (
+        "StrategyVersion уже есть. Не запускать PAPER/SHADOW/LIVE."
+    ),
+    "DO_NOT_OVERWRITE_STRATEGY_VERSION": (
+        "Конфликт содержимого. Существующую StrategyVersion нельзя перезаписать."
+    ),
 }
 
 STATUS_GLOSS = {
@@ -424,6 +506,14 @@ def obligation_label(code: str) -> str:
 
 def decision_kind_label(kind: str) -> str:
     return DECISION_KIND_LABELS.get(kind, kind)
+
+
+def handoff_state_label(state: str) -> str:
+    return HANDOFF_STATE_LABELS.get(state, state)
+
+
+def blocker_label(code: str) -> str:
+    return BLOCKER_LABELS.get(code, code)
 
 
 def field_label(key: str) -> str:
