@@ -183,7 +183,7 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 )
                 self.assertIsNotNone(home_note)
                 self.assertIsNotNone(research_note)
-                self.assertEqual(home_note.group(1), research_note.group(1))
+                self.assertEqual(research_note.group(1), "UNKNOWN")
             finally:
                 paper = getattr(app, "_paper_plane_store", None)
                 if paper is not None:

@@ -10,7 +10,6 @@ from urllib.parse import parse_qs, urlparse
 from uuid import uuid4
 
 from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication
-from solana_alpha_lab.factory.cockpit import pinned_produced_gaps
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
 from solana_alpha_lab.factory.owner_language import (
     BACKUP_GLOSS,
@@ -74,11 +73,6 @@ NAV = (
     ("/system", "SYSTEM"),
 )
 HIDDEN_NAV = ("MARKET",)
-
-
-def _git_archaeology_required(app: FactoryApplication) -> bool:
-    spec = load_experiment_spec(app.root, app.spec_relative)
-    return bool(pinned_produced_gaps(spec, app.root))
 
 
 def owner_copy_blocks(app: FactoryApplication) -> list[dict[str, str]]:
@@ -194,7 +188,7 @@ def _rollback_html(rollback: Any) -> str:
 
 
 def _optional_bool_html(mapping: Mapping[str, Any], key: str) -> str:
-    if key not in mapping:
+    if key not in mapping or mapping.get(key) is None:
         return dual("неизвестно", "UNKNOWN", unknown=True)
     return canon("true" if mapping.get(key) else "false")
 
@@ -1009,7 +1003,7 @@ def _home_section(
         else (
             f"<p>{_next_action_html(str(model.get('next_safe_action')))}</p>"
             if model.get("next_safe_action")
-            else f"<p>{esc(shell_copy('safe_state'))}</p>"
+            else f"<p>{_token_or_unknown(None)}</p>"
         )
     )
     buttons = "".join(command_button(command) for command in COMMANDS)
@@ -1207,12 +1201,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             query: dict[str, list[str]] | None = None,
         ) -> None:
             if surface == "RESEARCH":
-                model = {
-                    "cockpit": {
-                        "git_archaeology_required": _git_archaeology_required(app),
-                    },
-                    "runtime": {},
-                }
+                model = {"cockpit": {}, "runtime": {}}
                 research_html = _research_section(app, query or {})
             else:
                 model = app.read_model(surface=surface)
