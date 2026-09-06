@@ -22,6 +22,7 @@ from solana_alpha_lab.factory.experiment_evidence import evidence_snapshot_sha25
 from solana_alpha_lab.factory.lifecycle_projection import build_lifecycle_projection
 from solana_alpha_lab.factory.promotion_handoff import (
     PromotionHandoffError,
+    canonical_spec_sha256,
     check_materialization,
     compose_science_to_strategy_handoff,
     handoff_overview_counters,
@@ -29,7 +30,6 @@ from solana_alpha_lab.factory.promotion_handoff import (
     render_strategy_version,
     verify_strategy_version,
 )
-from solana_alpha_lab.factory.strategy_runtime import canonical_spec_sha256
 from solana_alpha_lab.factory.research_store import ResearchEvent, ResearchStore
 from solana_alpha_lab.factory.research_workbench import LifecycleEntityLocatorV1
 from solana_alpha_lab.factory.workbench import serve
@@ -405,8 +405,6 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             conflicted = dict(replay)
             conflicted["notional_policy"] = {"notional_usd": 99.0, "fee_bps": 100}
             unsigned = {key: value for key, value in conflicted.items() if key != "spec_sha256"}
-            from solana_alpha_lab.factory.strategy_runtime import canonical_spec_sha256
-
             conflicted["spec_sha256"] = canonical_spec_sha256(unsigned)
             (schema_root / "configs" / "strategies" / "replay.yaml").write_text(
                 yaml.safe_dump(conflicted, sort_keys=False, allow_unicode=True),

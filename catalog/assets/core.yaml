@@ -1509,7 +1509,7 @@ records:
     repository_path: README.md
   integrity:
     kind: sha256
-    sha256: ffd6ab2f6a2476be116fadf8a919ad33f47ee387c344e47120a8a4b573d75bd4
+    sha256: 625cd06e83b181bc6462ccf4d7fd03fad221d0516770b09774bc1c1e4f3343ee
   access:
     mode: read_only
     method: file
@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 085ee7023b0d3c8b6b1b5030d5c18bdaec4dc371abf391244a00ad5f55a20942}
+  integrity: {kind: sha256, sha256: ce00edae429ef6c103b9762bd4b38b53301ee9da2a258e57db1daa16f4db139e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -35642,7 +35642,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md', repository_path: docs/tasks/SCIENCE_TO_STRATEGY_HANDOFF_V1.md}
-  integrity: {kind: sha256, sha256: 9e9a1b2d4aa28be11d0705bcbe31780e0a28cf331ccb23b3c5da81d00958c60e}
+  integrity: {kind: sha256, sha256: fac59437ba362ff7bd34114d2e86776fa8bfea74d1f5c9759a67f9a21b39859f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35718,7 +35718,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_science_to_strategy_handoff_v1.py', repository_path: tests/test_science_to_strategy_handoff_v1.py}
-  integrity: {kind: sha256, sha256: 15e829d384bbb3ed7a180041e59560c151cdc35d22387d511d3e885d581c045e}
+  integrity: {kind: sha256, sha256: 32973ddc63b8c48e4a8c2e43445554c1eb31cd47f67c358200a865018a588682}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}

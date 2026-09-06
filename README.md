@@ -14,9 +14,7 @@ uv run --locked --managed-python python -B scripts/catalog_cli.py search-routes 
 
 Then read generated `docs/FACTORY_SEMANTIC_MAP.md` and the command ladder in
 `docs/OPERATOR_NAVIGATION.md`. Semantic routing never grants authority and never
-caches live runtime status. An accepted scientific PROMOTE becomes a
-StrategyVersion only through `SEM-OWNER-LIFECYCLE` / science-to-strategy
-handoff; that path is definition, not activation.
+caches live runtime status.
 
 For remote operations, durability, incidents and recovery, start at semantic
 route `SEM-REMOTE-OPS-RECOVERY`, then the operator entrypoint

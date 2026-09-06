@@ -33,6 +33,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/workbench.py
   - src/solana_alpha_lab/factory/owner_language.py
   - tests/test_science_to_strategy_handoff_v1.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - tests/test_experiment_evidence_decision_v1.py
   - tests/test_factory_semantic_operability.py
   - configs/factory_semantic_operability_v1.yaml
