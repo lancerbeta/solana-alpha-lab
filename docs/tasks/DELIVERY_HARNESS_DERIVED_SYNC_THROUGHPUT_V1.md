@@ -8,9 +8,9 @@ allowed_routes:
 - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: dc44aca566ab141c641700d5cf6e8e8ddcdc77b9
+  expected_base: 6a8522aaaadbaf647351a4cb46740e35ad7eab77
   expected_upstream: origin/main
-  expected_upstream_oid: dc44aca566ab141c641700d5cf6e8e8ddcdc77b9
+  expected_upstream_oid: 6a8522aaaadbaf647351a4cb46740e35ad7eab77
   expected_branch: cursor/delivery-harness-derived-sync-throughput-v1
   dirty_mode: ALLOW_REPORTED
 objective: Make Catalog derived-sync HASH_SCOPE follow proof obligation, not registry
