@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "EXPERIMENT-EVIDENCE-DECISION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-06",
+  "task_id": "EXPERIMENT_EVIDENCE_DECISION_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "db5d5a10b64c75a8b971f7e4af42014b065b1e35f774c2c7246ee83dd7a0ed27",
+  "reviewed_inventory_sha256": "ac9c4096f4c8e900d60148f8ef397b9b9e35381f614e90b5fffcbe1c9e294017",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "SCIENTIFIC_OBLIGATIONS_FROM_SCIENTIFIC_KINDS",
+        "PIT_CLOCKS_SCORED_SEPARATELY",
+        "HOLDOUT_CONFLICT_BEFORE_NA",
+        "RUN_ID_HARVEST_RUN_ONLY",
+        "RELATED_DECISION_NOT_ON_PLANE",
+        "PROMOTE_DECISION_EVENT_ONLY",
+        "GET_RESEARCH_NON_MUTATING",
+        "OWNER_LANGUAGE_RU"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SLICES_ABC_DEFINED",
+        "REAL_INCOMPLETE_TRUTHFUL",
+        "GIT_NA_NOT_SCIENTIFIC_CLASS",
+        "HTTP_REJECT_READBACK",
+        "PROMOTE_FAIL_CLOSED",
+        "GET_NON_MUTATING",
+        "OWNER_LANGUAGE_RU_PASS"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=7610d11b23c4376d12593f0526b8fa63b72bfdb89cdc7707f9327f035e18c7e4",
+        "CLAIM_PROMOTE_SCIENCE_ONLY",
+        "CLAIM_DIRECT_RELATED",
+        "CLAIM_STATUS_SEMANTICS",
+        "CLAIM_LEGACY_IMMUTABLE",
+        "PACKET_INFORMATION_PATH",
+        "NO_NEW_SEMANTIC_ROUTE",
+        "NO_STRATEGY_VERSION"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_STRATEGY_VERSION",
+    "NO_PAPER_SHADOW_LIVE",
+    "NO_RUNTIME_LLM_TRANSLATION",
+    "NO_GENERIC_I18N_FRAMEWORK",
+    "NO_LEGACY_SCIENTIFIC_REWRITE",
+    "NO_NEW_SEMANTIC_ROUTE",
+    "NO_VPS_DEPLOY",
+    "NO_SECOND_TRUTH_STORE"
+  ]
+}

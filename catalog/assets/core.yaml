@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: ec8655a2831499cdb370d6551d09e9525261b1550eddb98c451fa33d0b3c0d03}
+  integrity: {kind: sha256, sha256: bfa2eec4e68b73c76dd87cba5325228e7a443156e17b531ca2f82b93f6e32b7f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25726,7 +25726,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: ce5ca80bf5e590d62e3d64a988e6a455a99662d5d137ba0e135a01f507d6e2e3}
+  integrity: {kind: sha256, sha256: 30b97ba54bbec3bfb442dbdcdf1b4075b13c5ffa8f774789246fedaa02453bf4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -26324,7 +26324,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: f46adf9ed4a0cad456241a56e1f936347d4844db9c90266018576a7277ccd9c4}
+  integrity: {kind: sha256, sha256: 80be9181491cc13255b724136066ab0386996ec017865c439aaa8c2b1eb9d9fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 79b0195ef1039d259376e947ba1ba346ae8aca2a47bcda14c5d6616bd7b488a2}
+  integrity: {kind: sha256, sha256: c8fd812350b075b40e12273f297360afcd41dbe994059df44052d08ca34fa269}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -34138,7 +34138,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: e165124407ad97d5bb065b90d426a8210164add682e4deb4024282c56a2ecded}
+  integrity: {kind: sha256, sha256: cd6938654c4996c528d7df01dab67baaf8c7d0b8dddd6b6bedc239823630adc1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34245,7 +34245,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 89543cee5eaae103a37941bb34212f2a36f96225ad30f8eba65586e84ebac8d8}
+  integrity: {kind: sha256, sha256: 17c5c684959e39f9104de590b8c0dee981697abda281fdb0bf905b4df6ece378}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34263,7 +34263,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 9dfa59371988ed8efd7fe10f6f58e128fa7da0bfc8a766c38d1b69d59e988a6d}
+  integrity: {kind: sha256, sha256: 0d8ee9205b99b9c48b573404d4c7850ebd31ea61777d85870f89d2573871a4b7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34616,7 +34616,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_operations_cockpit_v1.py', repository_path: tests/test_owner_operations_cockpit_v1.py}
-  integrity: {kind: sha256, sha256: e12254150ac5390d3c7bb380c459d300ee9b4078caaa739cac66e3454dcff538}
+  integrity: {kind: sha256, sha256: 82f409ed570e07111b4fd1bb9b882f67aff19d9e1599f4fa1b7e265ed0d7b7fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
@@ -35302,7 +35302,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: SMIAL_VISUAL_OPERATING_SYSTEM_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/smial_visual_operating_system_v1.md', repository_path: docs/contracts/smial_visual_operating_system_v1.md}
-  integrity: {kind: sha256, sha256: 7245b92696f9441149f3688fb60557dd46b3bc4e55ea4e1374ad6e57347f6ee0}
+  integrity: {kind: sha256, sha256: 18d20e02f83c237f6c027ae9da7311291db3206985c1774d9c63a392cef0b949}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001}
@@ -35467,7 +35467,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/RESEARCH_LIFECYCLE_WORKBENCH_V1.md', repository_path: docs/tasks/RESEARCH_LIFECYCLE_WORKBENCH_V1.md}
-  integrity: {kind: sha256, sha256: 389e8d534b591bba0addf6f369e27aa536c8c50ba05a9ee8a4926e18cb43cc29}
+  integrity: {kind: sha256, sha256: fc8e34bb291366da651624456f8e789748b32f64ffe7651fc9422997f0ba5517}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -35486,7 +35486,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/research_lifecycle_workbench_v1.md', repository_path: docs/contracts/research_lifecycle_workbench_v1.md}
-  integrity: {kind: sha256, sha256: 87a4c68559608095cc4044b13f0761c07fd88d1ce45d92e4c6ef5d5bd40ad2d4}
+  integrity: {kind: sha256, sha256: 335bb2d215dcb81e7e7c29ebb8044ff6d8fb5e687963c5c6f4e568c9312dcf0e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -35505,7 +35505,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/research_workbench.py', repository_path: src/solana_alpha_lab/factory/research_workbench.py}
-  integrity: {kind: sha256, sha256: 4d72ff580a3606d918227674a86596c78847c325124289e6107114cf4d9a0285}
+  integrity: {kind: sha256, sha256: 5515dde1d2f2f445b5fb75d48fdb758941b51e4ba6f31e781b4a25e8af5c83a1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -35527,7 +35527,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: RESEARCH_LIFECYCLE_WORKBENCH_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_research_lifecycle_workbench_v1.py', repository_path: tests/test_research_lifecycle_workbench_v1.py}
-  integrity: {kind: sha256, sha256: 43855940bf1fe97ed636a2ba0346d70447c466bd36743742dc9e4569abdeb39b}
+  integrity: {kind: sha256, sha256: 879547be64dbc57ce57e7a58b55e049047652dbabd2072082ecc8df304b83f80}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001}
@@ -35535,4 +35535,98 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [RESEARCH_WORKBENCH, GOLD_QUERY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for experiment evidence dossier and scientific research decision loop.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/EXPERIMENT_EVIDENCE_DECISION_V1.md', repository_path: docs/tasks/EXPERIMENT_EVIDENCE_DECISION_V1.md}
+  integrity: {kind: sha256, sha256: 2b56902d04dc1f0940c6d63eadd5792786a2298dad88847761b2bf8bc66d9d24}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001}
+  - {relation_type: contains, target_asset_id: MODULE-EXPERIMENT-EVIDENCE-001}
+  - {relation_type: contains, target_asset_id: MODULE-OWNER-LANGUAGE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-EXPERIMENT-EVIDENCE-DECISION-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [EXPERIMENT_EVIDENCE, RESEARCH_DECISION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Human contract for experiment evidence dossier, DIRECT vs RELATED, and scientific DECISION_EVENT.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/experiment_evidence_decision_v1.md', repository_path: docs/contracts/experiment_evidence_decision_v1.md}
+  integrity: {kind: sha256, sha256: f52326d2557861a7815435ba95debf58ba317bf1c02a3763e8b5566aa8953891}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
+  - {relation_type: depends_on, target_asset_id: DOC-RESEARCH-LIFECYCLE-WORKBENCH-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [experiment evidence, DECISION_EVENT, PROMOTE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-EXPERIMENT-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Typed experiment evidence composition over LifecycleProjection and ResearchStore records.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
+  integrity: {kind: sha256, sha256: f4fa9a7e0a30a71e3cbaf443899e710f57cac2a8f9693f24d15f5468c74ff252}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-RESEARCH-LIFECYCLE-WORKBENCH-001}
+  - {relation_type: consumes, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [EXPERIMENT_DOSSIER, DIRECT_EVIDENCE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-OWNER-LANGUAGE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Russian-first owner presentation labels. Owns zero scientific truth.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
+  integrity: {kind: sha256, sha256: 3775419da430b9b1cbc5f47250f97d6f8cddf29deeaccffa7069bc22806fa424}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
+  - {relation_type: governed_by, target_asset_id: CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OWNER_LANGUAGE, RU]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-EXPERIMENT-EVIDENCE-DECISION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Acceptance tests for experiment dossier, research decisions, language policy and semantic anti-hijack.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-06'
+  truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_experiment_evidence_decision_v1.py', repository_path: tests/test_experiment_evidence_decision_v1.py}
+  integrity: {kind: sha256, sha256: d0c19305ef4ac63e5ef9555c6611de88f8470abf7fda519c58d641e42845cb0b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
+  - {relation_type: depends_on, target_asset_id: DOC-EXPERIMENT-EVIDENCE-DECISION-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [EXPERIMENT_EVIDENCE, GOLD_QUERY]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

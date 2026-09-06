@@ -11,6 +11,16 @@ from uuid import uuid4
 
 from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec
+from solana_alpha_lab.factory.owner_language import (
+    counter_label,
+    decision_kind_label,
+    field_label,
+    nav_label,
+    obligation_label,
+    owner_error,
+    research_copy,
+    status_display,
+)
 from solana_alpha_lab.factory.research_workbench import (
     ResearchWorkbenchError,
     parse_locator,
@@ -86,7 +96,9 @@ def _nav(active: str) -> str:
     links = []
     for href, name in NAV:
         current = " aria-current=\"page\"" if name == active else ""
-        links.append(f'<a href="{href}"{current}>{html.escape(name)}</a>')
+        links.append(
+            f'<a href="{href}"{current}>{html.escape(nav_label(name))}</a>'
+        )
     return (
         "<aside class=\"signal-rail\" data-mode=\"STEEL_SIGNAL\">"
         "<p class=\"brand\">SMIAL</p>"
@@ -94,11 +106,20 @@ def _nav(active: str) -> str:
     )
 
 
-def _rows(mapping: dict[str, Any]) -> str:
-    return "".join(
-        f"<tr><th>{html.escape(str(key))}</th><td>{html.escape(_cell(value))}</td></tr>"
-        for key, value in mapping.items()
-    )
+def _rows(
+    mapping: dict[str, Any],
+    *,
+    translate_keys: bool = False,
+    empty_as: str | None = None,
+) -> str:
+    rows = []
+    for key, value in mapping.items():
+        displayed = empty_as if value is None and empty_as is not None else _cell(value)
+        rows.append(
+            f"<tr><th>{html.escape(field_label(str(key)) if translate_keys else str(key))}</th>"
+            f"<td>{html.escape(displayed)}</td></tr>"
+        )
+    return "".join(rows)
 
 
 def _feature_rows(features: list[dict[str, Any]]) -> str:
@@ -306,7 +327,7 @@ def _href_detail(locator: Mapping[str, Any]) -> str:
 
 def _research_rows(rows: list[dict[str, Any]]) -> str:
     if not rows:
-        return "<p class=\"empty\">NONE</p>"
+        return f"<p class=\"empty\">{html.escape(research_copy('none'))}</p>"
     body = []
     for row in rows:
         locator = row.get("locator") if isinstance(row.get("locator"), dict) else {}
@@ -322,16 +343,17 @@ def _research_rows(rows: list[dict[str, Any]]) -> str:
         title_cell = f"<td><a href=\"{href}\">{title_text}</a></td>" if href else f"<td>{title_text}</td>"
         marker = []
         if row.get("attention"):
-            marker.append("ATTENTION")
+            marker.append(counter_label("ATTENTION"))
         if row.get("blocker"):
             marker.append(str(row.get("blocker")))
         if not has_locator and row.get("next_safe_action"):
             marker.append(str(row.get("next_safe_action")))
+        native_state = str(row.get("native_state") or "UNKNOWN")
         body.append(
             "<tr class=\"research-row\">"
             + kind_cell
             + title_cell
-            + f"<td>{html.escape(str(row.get('native_state') or 'UNKNOWN'))}</td>"
+            + f"<td>{html.escape(status_display(native_state))}</td>"
             f"<td>{html.escape(str(row.get('truth_plane') or ''))}</td>"
             f"<td>{html.escape(str(row.get('evidence_class') or ''))}</td>"
             f"<td class=\"mono\">{html.escape(str(row.get('as_of') or ''))}</td>"
@@ -342,8 +364,15 @@ def _research_rows(rows: list[dict[str, Any]]) -> str:
         )
     return (
         "<table class=\"research-table\"><tr>"
-        "<th>kind</th><th>title</th><th>state</th><th>plane</th>"
-        "<th>evidence</th><th>as_of</th><th>source</th><th>marker</th><th>id</th>"
+        f"<th>{html.escape(research_copy('col_kind'))}</th>"
+        f"<th>{html.escape(research_copy('col_title'))}</th>"
+        f"<th>{html.escape(research_copy('col_state'))}</th>"
+        f"<th>{html.escape(research_copy('col_plane'))}</th>"
+        f"<th>{html.escape(research_copy('col_evidence_class'))}</th>"
+        f"<th>{html.escape(research_copy('col_as_of'))}</th>"
+        f"<th>{html.escape(research_copy('col_source'))}</th>"
+        f"<th>{html.escape(research_copy('col_marker'))}</th>"
+        f"<th>{html.escape(research_copy('col_id'))}</th>"
         "</tr>" + "".join(body) + "</table>"
     )
 
@@ -352,7 +381,7 @@ def _counter_cell(label: str, value: Any) -> str:
     if value is None:
         return (
             f"<article class=\"counter\"><h3>{html.escape(label)}</h3>"
-            "<p class=\"semantic-unknown\">NOT AVAILABLE</p></article>"
+            f"<p class=\"semantic-unknown\">{html.escape(research_copy('not_available'))}</p></article>"
         )
     return (
         f"<article class=\"counter\"><h3>{html.escape(label)}</h3>"
@@ -362,7 +391,7 @@ def _counter_cell(label: str, value: Any) -> str:
 
 def _lineage_list(edges: list[dict[str, Any]], direction: str) -> str:
     if not edges:
-        return f"<p class=\"empty\">{html.escape(direction)} NONE</p>"
+        return f"<p class=\"empty\">{html.escape(direction)} {html.escape(research_copy('none'))}</p>"
     items = []
     for edge in edges:
         resolution = str(edge.get("resolution") or "")
@@ -409,40 +438,224 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
     kind = html.escape(str(filters.get("kind") or "all"))
     return (
         "<section class=\"research-overview\">"
-        "<h2>RESEARCH</h2>"
-        f"<p>projection {html.escape(str(view.get('completeness') or 'PARTIAL'))}</p>"
+        f"<h2>{html.escape(research_copy('title'))}</h2>"
+        f"<p>{html.escape(research_copy('projection'))} "
+        f"{html.escape(str(view.get('completeness') or 'PARTIAL'))}</p>"
         + degraded
         + "<table class=\"source-panel\">"
-        + "<tr><th>source</th><th>status</th><th>plane</th><th>error</th><th>next</th></tr>"
+        + "<tr><th>"
+        + html.escape(research_copy("source"))
+        + "</th><th>"
+        + html.escape(research_copy("status"))
+        + "</th><th>"
+        + html.escape(research_copy("plane"))
+        + "</th><th>"
+        + html.escape(research_copy("error"))
+        + "</th><th>"
+        + html.escape(research_copy("next"))
+        + "</th></tr>"
         + sources
         + "</table>"
         + "<div class=\"counters\">"
-        + "".join(_counter_cell(label, counters.get(label)) for label in (
-            "ACTIVE NOW", "TRIALS", "DECISIONS", "NEGATIVES", "ATTENTION", "GAPS"
-        ))
+        + "".join(
+            _counter_cell(counter_label(label), counters.get(label))
+            for label in (
+                "ACTIVE NOW",
+                "TRIALS",
+                "DECISIONS",
+                "NEGATIVES",
+                "ATTENTION",
+                "GAPS",
+            )
+        )
         + "</div>"
-        + "<h3>Needs attention</h3>"
+        + f"<h3>{html.escape(research_copy('needs_attention'))}</h3>"
         + _research_rows(list(view.get("needs_attention") or []))
-        + "<h3>Current activity</h3>"
+        + f"<h3>{html.escape(research_copy('current_activity'))}</h3>"
         + (
-            "<p class=\"empty semantic-unknown\">NOT AVAILABLE</p>"
+            f"<p class=\"empty semantic-unknown\">{html.escape(research_copy('not_available'))}</p>"
             if counters.get("ACTIVE NOW") is None
             else _research_rows(list(view.get("current_activity") or []))
         )
-        + "<h3>Research universe</h3>"
+        + f"<h3>{html.escape(research_copy('universe'))}</h3>"
         + "<p class=\"filters\">"
-        + "<a href=\"/research\">all</a> "
-        + "<a href=\"/research?kind=hypotheses\">hypotheses</a> "
-        + "<a href=\"/research?kind=experiments\">experiments</a> "
-        + "<a href=\"/research?kind=trials\">trials</a> "
-        + "<a href=\"/research?kind=decisions\">decisions</a> "
-        + "<a href=\"/research?kind=negative\">negative</a>"
+        + f"<a href=\"/research\">{html.escape(research_copy('all'))}</a> "
+        + f"<a href=\"/research?kind=hypotheses\">{html.escape(research_copy('hypotheses'))}</a> "
+        + f"<a href=\"/research?kind=experiments\">{html.escape(research_copy('experiments'))}</a> "
+        + f"<a href=\"/research?kind=trials\">{html.escape(research_copy('trials'))}</a> "
+        + f"<a href=\"/research?kind=decisions\">{html.escape(research_copy('decisions'))}</a> "
+        + f"<a href=\"/research?kind=negative\">{html.escape(research_copy('negative'))}</a>"
         + "</p>"
         + "<form method=\"get\" action=\"/research\" class=\"search\">"
-        + f"<input name=\"q\" value=\"{q}\" maxlength=\"80\" aria-label=\"search\">"
+        + f"<input name=\"q\" value=\"{q}\" maxlength=\"80\" aria-label=\"{html.escape(research_copy('search_aria'))}\">"
         + f"<input type=\"hidden\" name=\"kind\" value=\"{kind}\">"
-        + "<button type=\"submit\">search</button></form>"
+        + f"<button type=\"submit\">{html.escape(research_copy('search'))}</button></form>"
         + _research_rows(list(view.get("universe") or []))
+        + "</section>"
+    )
+
+
+def _evidence_cards(cards: list[Any], empty_copy: str) -> str:
+    if not cards:
+        return f"<p class=\"semantic-unknown\">{html.escape(empty_copy)}</p>"
+    items = []
+    for card in cards:
+        if not isinstance(card, dict):
+            continue
+        summary = card.get("summary_fields") if isinstance(card.get("summary_fields"), dict) else {}
+        items.append(
+            "<li>"
+            f"<span class=\"mono\">{html.escape(str(card.get('record_kind') or ''))}</span> "
+            f"<span class=\"mono\">{html.escape(str(card.get('record_id') or card.get('entity_id') or ''))}</span>"
+            + "".join(
+                f" <span>{html.escape(str(key))}="
+                f"<span class=\"mono\">{html.escape(str(value))}</span></span>"
+                for key, value in summary.items()
+            )
+            + "</li>"
+        )
+    return "<ul>" + "".join(items) + "</ul>"
+
+
+def _dossier_html(dossier: Mapping[str, Any]) -> str:
+    tested = dossier.get("tested") if isinstance(dossier.get("tested"), dict) else {}
+    planes = dossier.get("planes") if isinstance(dossier.get("planes"), dict) else {}
+    obligations = "".join(
+        "<tr class=\"obligation-"
+        + html.escape(str(item.get("status") or "UNKNOWN"))
+        + "\"><th>"
+        + html.escape(obligation_label(str(item.get("code") or "")))
+        + f" <span class=\"mono\">{html.escape(str(item.get('code') or ''))}</span>"
+        + "</th><td>"
+        + html.escape(status_display(str(item.get("status") or "UNKNOWN")))
+        + "</td><td>"
+        + html.escape(str(item.get("note") or item.get("source") or ""))
+        + "</td></tr>"
+        for item in dossier.get("obligations") or []
+        if isinstance(item, dict)
+    )
+    history = "".join(
+        "<li>"
+        + html.escape(decision_kind_label(str(item.get("decision_kind") or "")))
+        + f" <span class=\"mono\">{html.escape(str(item.get('decision_kind') or ''))}</span> "
+        + f"<span class=\"mono\">{html.escape(str(item.get('record_id') or ''))}</span> "
+        + f"<span class=\"mono\">{html.escape(str(item.get('relation') or 'DIRECT'))}</span> "
+        + html.escape(str(item.get("rationale") or ""))
+        + (
+            " — " + html.escape(str(item.get("next_condition")))
+            if item.get("next_condition")
+            else ""
+        )
+        + "</li>"
+        for item in dossier.get("decision_history") or []
+        if isinstance(item, dict)
+    ) or f"<p class=\"semantic-unknown\">{html.escape(research_copy('no_decisions'))}</p>"
+    write = dossier.get("write_capability") if isinstance(dossier.get("write_capability"), dict) else {}
+    writable = write.get("write") == "AVAILABLE"
+    locator = dossier.get("locator") if isinstance(dossier.get("locator"), dict) else {}
+    guard = dossier.get("science_guard") if isinstance(dossier.get("science_guard"), dict) else {}
+    blocked = ", ".join(str(code) for code in guard.get("blocked_codes") or [])
+    blocked_banner = (
+        f"<p class=\"semantic-warning\">{html.escape(research_copy('promote_blocked'))} "
+        f"<span class=\"mono\">{html.escape(blocked)}</span></p>"
+        if not guard.get("allowed")
+        else ""
+    )
+    write_status = (
+        f"<p>{html.escape(research_copy('read_available' if write.get('read') == 'AVAILABLE' else 'not_available'))} "
+        f"/ {html.escape(research_copy('write_available' if writable else 'write_off'))} "
+        f"<span class=\"mono\">{html.escape(str(write.get('read') or 'UNKNOWN'))}/"
+        f"{html.escape(str(write.get('write') or 'UNKNOWN'))}</span></p>"
+    )
+    buttons = []
+    for kind in dossier.get("owner_decision_kinds") or []:
+        disabled = " disabled" if kind == "PROMOTE" and not guard.get("allowed") else ""
+        buttons.append(
+            f'<button type="submit" name="decision_kind" value="{html.escape(kind)}"{disabled}>'
+            f"{html.escape(decision_kind_label(kind))} "
+            f"<span class=\"mono\">{html.escape(kind)}</span></button>"
+        )
+    controls = write_status + blocked_banner + (
+        f"<p class=\"semantic-unknown\">{html.escape(research_copy('write_unavailable'))}</p>"
+        if not writable
+        else (
+            "<form method=\"post\" action=\"/research\" class=\"control-zone\" data-mode=\"CONTROL_SURFACE\">"
+            "<input type=\"hidden\" name=\"command\" value=\"RESEARCH_DECISION\">"
+            f"<input type=\"hidden\" name=\"entity_id\" value=\"{html.escape(str(locator.get('entity_id') or ''))}\">"
+            f"<input type=\"hidden\" name=\"truth_plane\" value=\"{html.escape(str(locator.get('truth_plane') or ''))}\">"
+            f"<input type=\"hidden\" name=\"native_kind\" value=\"{html.escape(str(locator.get('native_kind') or ''))}\">"
+            "<input type=\"hidden\" name=\"expected_evidence_snapshot_sha256\" value=\""
+            + html.escape(str(dossier.get("evidence_snapshot_sha256") or ""))
+            + "\">"
+            "<p>"
+            + html.escape(research_copy("snapshot"))
+            + f" <span class=\"mono\">{html.escape(str(dossier.get('evidence_snapshot_sha256') or ''))}</span></p>"
+            "<label>"
+            + html.escape(research_copy("rationale"))
+            + "<br><textarea name=\"rationale\" rows=\"3\" maxlength=\"2000\"></textarea></label>"
+            "<label>"
+            + html.escape(research_copy("next_condition"))
+            + "<br><textarea name=\"next_condition\" rows=\"2\" maxlength=\"2000\"></textarea></label>"
+            "<p class=\"promote-boundary\">"
+            "<label><input type=\"checkbox\" name=\"promote_scientific_only\" value=\"1\"> "
+            + html.escape(research_copy("promote_confirm"))
+            + "</label></p>"
+            + "".join(buttons)
+            + "</form>"
+        )
+    )
+    return (
+        "<section class=\"experiment-dossier\">"
+        + "<table class=\"planes\">"
+        + _rows(
+            {
+                research_copy("execution"): planes.get("execution") or "NO_RUN",
+                research_copy("evidence"): planes.get("evidence") or "UNKNOWN",
+                research_copy("decision"): planes.get("decision") or "NO_DECISION",
+            }
+        )
+        + "</table>"
+        + f"<h3>{html.escape(research_copy('what_was_tested'))}</h3>"
+        + f"<p class=\"legacy-note\">{html.escape(research_copy('original_source'))} "
+        + f"<span class=\"mono\">{html.escape(research_copy('legacy_en'))}</span></p>"
+        + "<table>"
+        + _rows(
+            {
+                "QUESTION": tested.get("question"),
+                "ESTIMAND": tested.get("estimand"),
+                "POPULATION": tested.get("population"),
+                "FALSIFIER": tested.get("falsifier"),
+                "HOLDOUT POLICY": tested.get("holdout_policy"),
+            },
+            translate_keys=True,
+        )
+        + "</table>"
+        + f"<h3>{html.escape(research_copy('evidence'))}</h3><table>"
+        + obligations
+        + "</table>"
+        + f"<h3>{html.escape(research_copy('result'))}</h3><table>"
+        + _rows(
+            dossier.get("result") if isinstance(dossier.get("result"), dict) else {},
+            translate_keys=True,
+            empty_as="MISSING",
+        )
+        + "</table>"
+        + f"<h3>{html.escape(research_copy('direct_evidence'))}</h3>"
+        + "<div class=\"direct-evidence\">"
+        + _evidence_cards(list(dossier.get("direct_evidence") or []), research_copy("no_direct"))
+        + "</div>"
+        + f"<h3>{html.escape(research_copy('related_prior_memory'))}</h3>"
+        + "<div class=\"related-memory\">"
+        + f"<p class=\"muted\">{html.escape(research_copy('related_not_direct'))}</p>"
+        + _evidence_cards(
+            list(dossier.get("related_prior_memory") or []),
+            research_copy("no_related"),
+        )
+        + "</div>"
+        + f"<h3>{html.escape(research_copy('decision_history'))}</h3>"
+        + (f"<ul>{history}</ul>" if history.startswith("<li>") else history)
+        + f"<h3>{html.escape(research_copy('owner_decision'))}</h3>"
+        + controls
         + "</section>"
     )
 
@@ -451,6 +664,7 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
     header = view.get("header") if isinstance(view.get("header"), dict) else {}
     fields = view.get("fields") if isinstance(view.get("fields"), dict) else {}
     lineage = view.get("lineage") if isinstance(view.get("lineage"), dict) else {}
+    dossier = view.get("dossier") if isinstance(view.get("dossier"), dict) else None
     gaps = "".join(
         "<li>"
         + html.escape(str(item.get("gap_code") or "UNKNOWN"))
@@ -459,12 +673,12 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
         + "</li>"
         for item in view.get("gaps") or []
         if isinstance(item, dict)
-    ) or "<li class=\"semantic-unknown\">NONE</li>"
+    ) or f"<li class=\"semantic-unknown\">{html.escape(research_copy('none'))}</li>"
     unknown = view.get("unknown") if isinstance(view.get("unknown"), list) else []
     unknown_html = (
         "<ul>" + "".join(f"<li class=\"semantic-unknown\">{html.escape(str(item))}</li>" for item in unknown) + "</ul>"
         if unknown
-        else "<p class=\"semantic-unknown\">NONE</p>"
+        else f"<p class=\"semantic-unknown\">{html.escape(research_copy('none'))}</p>"
     )
     timeline = "".join(
         "<li>"
@@ -477,10 +691,11 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
     )
     technical = view.get("technical") if isinstance(view.get("technical"), dict) else {}
     provenance = view.get("provenance") if isinstance(view.get("provenance"), dict) else {}
-    field_rows = _rows({str(key): value for key, value in fields.items()})
+    field_rows = _rows({str(key): value for key, value in fields.items()}, translate_keys=True)
+    dossier_html = _dossier_html(dossier) if dossier else ""
     return (
         "<article class=\"evidence-editorial\" data-mode=\"EVIDENCE_EDITORIAL\">"
-        "<p><a href=\"/research\">← RESEARCH</a></p>"
+        f"<p><a href=\"/research\">{html.escape(research_copy('back'))}</a></p>"
         "<header class=\"evidence-header\">"
         f"<p>{html.escape(str(header.get('native_kind') or ''))} "
         f"<span class=\"mono\">{html.escape(str(header.get('entity_id') or ''))}</span></p>"
@@ -490,36 +705,42 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
             {
                 "STATE": header.get("state") or "UNKNOWN",
                 "TRUTH PLANE": header.get("truth_plane"),
-                "EVIDENCE CLASS": header.get("evidence_class"),
+                **(
+                    {}
+                    if dossier and header.get("evidence_class") == "NOT_APPLICABLE"
+                    else {"EVIDENCE CLASS": header.get("evidence_class")}
+                ),
                 "SOURCE": header.get("source"),
                 "AS OF": header.get("as_of"),
                 "OBSERVED AT": header.get("observed_at"),
                 "FRESHNESS": header.get("freshness"),
                 "NEXT SAFE ACTION": header.get("next_safe_action") or "UNKNOWN",
-            }
+            },
+            translate_keys=True,
         )
         + "</table></header>"
-        + "<h3>DETAIL</h3><table>"
+        + dossier_html
+        + f"<h3>{html.escape(research_copy('detail'))}</h3><table>"
         + (field_rows or "<tr><td class=\"semantic-unknown\">UNKNOWN</td></tr>")
         + "</table>"
-        + "<h3>LINEAGE</h3>"
+        + f"<h3>{html.escape(research_copy('lineage'))}</h3>"
         + "<div class=\"computational-field\" data-mode=\"COMPUTATIONAL_FIELD\">"
         + "<p class=\"trace-label\">TRACE</p>"
-        + _lineage_list(list(lineage.get("inbound") or []), "INBOUND")
-        + "<p class=\"current\">CURRENT OBJECT</p>"
-        + _lineage_list(list(lineage.get("outbound") or []), "OUTBOUND")
+        + _lineage_list(list(lineage.get("inbound") or []), research_copy("inbound"))
+        + f"<p class=\"current\">{html.escape(research_copy('current_object'))}</p>"
+        + _lineage_list(list(lineage.get("outbound") or []), research_copy("outbound"))
         + "</div>"
-        + "<h3>GAPS / UNKNOWN</h3><ul>"
+        + f"<h3>{html.escape(research_copy('gaps_unknown'))}</h3><ul>"
         + gaps
         + "</ul>"
         + unknown_html
-        + "<h3>SOURCE / PROVENANCE</h3><table>"
+        + f"<h3>{html.escape(research_copy('source_provenance'))}</h3><table>"
         + _rows(provenance)
         + "</table>"
-        + "<h3>TIMELINE</h3><ul>"
+        + f"<h3>{html.escape(research_copy('timeline'))}</h3><ul>"
         + timeline
         + "</ul>"
-        + "<details class=\"technical\"><summary>TECHNICAL DETAILS</summary><table>"
+        + f"<details class=\"technical\"><summary>{html.escape(research_copy('technical'))}</summary><table>"
         + _rows(technical)
         + "</table></details></article>"
     )
@@ -551,7 +772,10 @@ def _research_section(app: FactoryApplication, query: dict[str, list[str]]) -> s
             )
         )
     except (ResearchWorkbenchError, ApplicationError, ValueError) as exc:
-        return f"<p class=\"error\">{html.escape(str(exc))}</p><p><a href=\"/research\">← RESEARCH</a></p>"
+        return (
+            f"<p class=\"error\">{html.escape(owner_error(getattr(exc, 'code', str(exc))))}</p>"
+            f"<p><a href=\"/research\">{html.escape(research_copy('back'))}</a></p>"
+        )
 
 
 def _page(
@@ -560,6 +784,7 @@ def _page(
     surface: str,
     copy_blocks: list[dict[str, str]] | None = None,
     error: str = "",
+    notice: str = "",
     research_html: str | None = None,
     visual_css: str = "",
     visual_consumed: bool = False,
@@ -567,7 +792,9 @@ def _page(
     cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
     packet = cockpit.get("packet") if isinstance(cockpit.get("packet"), dict) else {}
     runtime = model.get("runtime") if isinstance(model.get("runtime"), dict) else {}
-    notice = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
+    notice_html = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
+    if notice:
+        notice_html += f"<p class=\"notice\">{html.escape(notice)}</p>"
     buttons = "".join(
         f'<button type="submit" name="command" value="{command}">{command}</button>'
         for command in COMMANDS
@@ -603,7 +830,11 @@ def _page(
             )
             + "</table>"
         ),
-        "RESEARCH": research_html or "<h2>RESEARCH</h2><p class=\"semantic-unknown\">UNKNOWN</p>",
+        "RESEARCH": research_html
+        or (
+            f"<h2>{html.escape(research_copy('title'))}</h2>"
+            "<p class=\"semantic-unknown\">UNKNOWN</p>"
+        ),
         "OPERATIONS": _operations_section(model),
         "ECONOMICS": _economics_section(model),
         "SYSTEM": "<h2>Runtime</h2><table>" + _rows(runtime) + "</table>",
@@ -647,6 +878,14 @@ form button {{ margin-right: 0.5rem; margin-bottom: 0.5rem; }}
 .trace-gap {{ color: var(--semantic-warning, #b8860b); }}
 .trace-conflict {{ color: var(--semantic-danger, #a40000); font-weight: bold; }}
 .evidence-editorial .evidence-header {{ border-bottom: 1px solid var(--border-hairline, #333); margin-bottom: 1rem; }}
+.direct-evidence {{ border-left: 3px solid var(--accent-signal, #888); padding-left: 1rem; margin-bottom: 1rem; }}
+.related-memory {{ border-left: 3px solid var(--text-muted, #999); padding-left: 1rem; margin-bottom: 1rem; }}
+.related-memory .muted {{ color: var(--text-muted, #999); }}
+.control-zone {{ border: 1px solid var(--border-hairline, #333); padding: 1rem; background: var(--surface-panel, #1c1c1c); margin: 1rem 0; }}
+.control-zone textarea {{ width: 100%; background: var(--surface-base, #161616); color: var(--text-primary, #eee); border: 1px solid var(--border-hairline, #333); }}
+.obligation-MISSING, .obligation-UNKNOWN {{ color: var(--semantic-warning, #b8860b); }}
+.obligation-CONFLICT {{ color: var(--semantic-danger, #a40000); }}
+.legacy-note {{ color: var(--text-muted, #999); font-size: 0.9rem; }}
 table {{ border-collapse: collapse; width: 100%; margin-bottom: 1rem; }}
 td, th {{ border-bottom: 1px solid var(--border-hairline, #333); padding: 0.35rem 0.5rem; }}
 </style></head><body class="steel-signal" data-visual-os-consumed="{consumed}">
@@ -655,7 +894,7 @@ td, th {{ border-bottom: 1px solid var(--border-hairline, #333); padding: 0.35re
 <main>
 <h1>Factory v1 — локальный срез владельца</h1>
 <p>Проекция. UI не владеет научной истиной и не открывает SQLite. START без точной owner phrase не читает ключ и не вызывает Jupiter. git_archaeology_required={html.escape(archaeology)}. Operational-ready milestone is not claimed.</p>
-{notice}
+{notice_html}
 {_copy_sections(copy_blocks or []) if surface == "HOME" else ""}
 {sections.get(surface) or ""}
 {("<form method=\"post\" action=\"/\">" + buttons + "</form>") if surface == "HOME" else ""}
@@ -700,6 +939,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             self,
             surface: str,
             error: str = "",
+            notice: str = "",
             query: dict[str, list[str]] | None = None,
         ) -> None:
             if surface == "RESEARCH":
@@ -713,6 +953,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                 surface=surface,
                 copy_blocks=owner_copy_blocks(app) if surface == "HOME" else [],
                 error=error,
+                notice=notice,
                 research_html=research_html,
                 visual_css=visual_os_css(app.root),
                 visual_consumed=visual_os_consumed(app.root),
@@ -792,9 +1033,50 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                         error = "STALE_OPERATOR_SNAPSHOT"
                     self._render("OPERATIONS", error=error)
                     return
+                if path == "/research":
+                    if command != "RESEARCH_DECISION":
+                        raise ApplicationError("COMMAND_NOT_ALLOWLISTED")
+                    query = {
+                        "entity_id": fields.get("entity_id") or [],
+                        "truth_plane": fields.get("truth_plane") or [],
+                        "native_kind": fields.get("native_kind") or [],
+                    }
+                    app.record_research_decision(
+                        {
+                            "entity_id": (fields.get("entity_id") or [""])[0],
+                            "truth_plane": (fields.get("truth_plane") or [""])[0],
+                            "native_kind": (fields.get("native_kind") or [""])[0],
+                            "decision_kind": (fields.get("decision_kind") or [""])[0],
+                            "expected_evidence_snapshot_sha256": (
+                                fields.get("expected_evidence_snapshot_sha256") or [""]
+                            )[0],
+                            "rationale": (fields.get("rationale") or [""])[0],
+                            "next_condition": (fields.get("next_condition") or [""])[0],
+                            "promote_scientific_only": (
+                                fields.get("promote_scientific_only") or [""]
+                            )[0],
+                        }
+                    )
+                    self._render(
+                        "RESEARCH",
+                        query=query,
+                        notice=research_copy("decision_recorded"),
+                    )
+                    return
                 raise ApplicationError("COMMAND_PATH_INVALID")
             except ApplicationError as exc:
-                error = str(exc)
+                error = owner_error(getattr(exc, "code", str(exc)))
+                if path == "/research":
+                    self._render(
+                        "RESEARCH",
+                        error=error,
+                        query={
+                            "entity_id": fields.get("entity_id") or [],
+                            "truth_plane": fields.get("truth_plane") or [],
+                            "native_kind": fields.get("native_kind") or [],
+                        },
+                    )
+                    return
                 surface = "OPERATIONS" if path == "/operations" else "HOME"
                 self._render(surface, error=error)
 

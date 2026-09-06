@@ -2738,6 +2738,26 @@
       "target_asset_id": "TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
     },
     {
+      "source_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-EXPERIMENT-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-OWNER-LANGUAGE-001"
+    },
+    {
+      "source_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001",
       "relation": "contains",
       "target_asset_id": "DOC-FACTORY-97D-STORAGE-ARCHITECTURE-PRD-SSD-001"
@@ -4956,6 +4976,21 @@
       "source_asset_id": "DOC-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A2-001"
+    },
+    {
+      "source_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001"
     },
     {
       "source_asset_id": "DOC-FACTORY-97D-STORAGE-ARCHITECTURE-PRD-SSD-001",
@@ -10003,6 +10038,21 @@
       "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
     },
     {
+      "source_asset_id": "MODULE-EXPERIMENT-EVIDENCE-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-EXPERIMENT-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "MODULE-EXPERIMENT-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-REMOTE-OPS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
@@ -10446,6 +10496,16 @@
       "source_asset_id": "MODULE-OWNER-AUTHORITY-PACKET-001",
       "relation": "produces",
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-LANGUAGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-LANGUAGE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001"
     },
     {
       "source_asset_id": "MODULE-OWNER-LIFECYCLE-PROJECTION-001",
@@ -14731,6 +14791,16 @@
       "source_asset_id": "TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "TEST-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "TEST-EXPERIMENT-EVIDENCE-DECISION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001",

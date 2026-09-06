@@ -4,7 +4,7 @@ catalog_version: 0.126.0
 as_of: '2026-09-05'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1699
+  assets: 1704
   asset_registries: 4
   schemas: 89
   queries: 19
@@ -101,6 +101,7 @@ canonical_bindings:
     current_use_evidence_asset_ids:
     - DOC-RESEARCH-LIFECYCLE-WORKBENCH-001
     - TEST-RESEARCH-LIFECYCLE-WORKBENCH-001
+    - DOC-EXPERIMENT-EVIDENCE-DECISION-001
 root_resolver:
   asset_registries:
   - catalog/assets/core.yaml

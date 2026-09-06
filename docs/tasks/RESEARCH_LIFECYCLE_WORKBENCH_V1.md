@@ -1,7 +1,7 @@
 ---
 task_id: RESEARCH_LIFECYCLE_WORKBENCH_V1
 task_version: "1.0"
-status: IN_PROGRESS
+status: VALIDATED
 as_of: "2026-09-05"
 owner: GOAL_OWNER
 allowed_routes:

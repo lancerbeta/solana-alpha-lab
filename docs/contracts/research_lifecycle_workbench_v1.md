@@ -58,7 +58,8 @@ Normal GET `/research` must cause:
 0 network calls except the local HTTP response
 ```
 
-No mutation buttons on the universe/detail workflow.
+GET `/research` remains non-mutating. Experiment dossier may show
+bounded `RESEARCH_DECISION` controls on `CONTROL_SURFACE` only.
 
 ## 3. Overview semantics
 
@@ -76,16 +77,22 @@ Counters describe materialized projection facts, not all reality.
 Missing runtime/evidence is not shown as zero. `completeness = PARTIAL`
 when any accepted source is `NOT_PRESENT` / `UNAVAILABLE` / `INVALID`.
 Evidence detail uses `source_owned_fields` copied in the same
-LifecycleProjection adapter pass. Detail does not rescan ResearchStore
-or match foreign keys from other records. Lineage and object gaps are
-scoped to the selected locator plane and source, except `CONFLICT`
-edges which remain visible on every involved plane.
+LifecycleProjection adapter pass. Identity and lineage stay projection-
+owned. Experiment-spec detail may attach a bounded dossier by reading
+already-committed ResearchStore records for that locator; it does not
+invent relations from filenames or LLM similarity. Lineage and object
+gaps are scoped to the selected locator plane and source, except
+`CONFLICT` edges which remain visible on every involved plane.
+
+Owner-facing copy is Russian-first (`OWNER_FACING_LANGUAGE = RU`).
+Canonical identifiers, enums, JSON keys and error codes stay English.
+Legacy scientific prose is not rewritten for localization.
 
 Preferred degraded copy when ResearchStore is absent:
 
 ```text
-Research evidence source is unavailable to this Workbench.
-Git-tracked experiments/trials/decisions below remain available.
+Источник ResearchStore этой рабочей панели недоступен.
+Git-эксперименты, проверки и решения ниже остаются видимы.
 ```
 
 Groups prefer source-native states. Do not invent `KILLED`,
@@ -136,9 +143,9 @@ Shared chrome is `STEEL_SIGNAL` / `DARK_ONLY`. Detail is
 Tokens are read from the canonical Visual OS contract. Cyan is not
 success. Red is scarce. `UNKNOWN` has text semantics. No second palette.
 
-## 8. Future extension
+## 8. Move 2 extension
 
-Move 2 (`EXPERIMENT_EVIDENCE_DECISION_V1`) may add typed evidence-quality
-detail for one real experiment. It must keep LifecycleProjection as the
+Experiment evidence/decision composition is `EXPERIMENT_EVIDENCE_DECISION_V1`.
+GET `/research` remains non-mutating. Decision writes go through
+FactoryApplication → ResearchStore only. LifecycleProjection stays the
 identity layer. Frontend technology may change without moving truth.
-Do not add a cache, theme service, router, or research mutation here.
