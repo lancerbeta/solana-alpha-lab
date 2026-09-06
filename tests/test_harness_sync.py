@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import shutil
 import subprocess
 import sys
@@ -798,12 +799,377 @@ class IncrementalSyncTests(unittest.TestCase):
         self.assertEqual(checked.returncode, 1)
         self.assertIn("DERIVED_HASH_DRIFT", checked.stderr)
 
+    def test_check_rejects_apply_flags(self) -> None:
+        checked = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--check",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(checked.returncode, 2)
+        self.assertIn("CHECK_MODE_REJECTS_APPLY_FLAGS", checked.stderr)
+
     def test_t17_primary_source_not_overwritten(self) -> None:
         target = self.worktree / "docs/generated_target.txt"
         payload_bytes = b"alpha\nbeta\nkeep-primary\n"
         target.write_bytes(payload_bytes)
         self._apply_incremental()
         self.assertEqual(payload_bytes, target.read_bytes())
+
+
+def _append_sha_record(worktree: Path, asset_id: str, relative: str, digest: str) -> None:
+    core = worktree / "catalog/assets/core.yaml"
+    core.write_text(
+        core.read_text(encoding="utf-8")
+        + (
+            f"- asset_id: {asset_id}\n"
+            "  record_version: '1.0'\n"
+            "  asset_type: evidence\n"
+            "  purpose: hash-scope fixture member\n"
+            "  status: IMPLEMENTED_UNVERIFIED\n"
+            "  origin: REPOSITORY\n"
+            "  as_of: '2026-09-06'\n"
+            "  truth_owner: TASK-99\n"
+            "  location:\n"
+            "    kind: git_path\n"
+            f"    logical_uri: repo://{relative}\n"
+            f"    repository_path: {relative}\n"
+            "  integrity:\n"
+            "    kind: sha256\n"
+            f"    sha256: {digest}\n"
+            "  access:\n"
+            "    mode: read_only\n"
+            "    method: file\n"
+            "    network_required: false\n"
+            "    secrets_required: false\n"
+            "  relations: []\n"
+            "  consumers: [TASK-99]\n"
+            "  evidence: []\n"
+            "  classification:\n"
+            "    contains_secrets: false\n"
+            "    contains_raw_data: false\n"
+            "    sensitivity: INTERNAL_NON_SECRET\n"
+        ),
+        encoding="utf-8",
+    )
+
+
+NAV_OUTPUTS = (
+    "docs/PROJECT_MAP.md",
+    "catalog/generated/asset_edges.json",
+    "docs/OPERATOR_NAVIGATION.md",
+)
+
+
+def _run_with_spy(
+    args: list[str], *, cwd: Path, spy: Path
+) -> subprocess.CompletedProcess:
+    env = {
+        **os.environ,
+        "HARNESS_SYNC_SHA256_SPY": str(spy),
+        "PYTHONDONTWRITEBYTECODE": "1",
+    }
+    return subprocess.run(args, cwd=str(cwd), capture_output=True, text=True, env=env)
+
+
+def _cataloged_nav_paths(worktree: Path) -> set[str]:
+    found: set[str] = set()
+    for relative in (
+        "catalog/assets/core.yaml",
+        "catalog/assets/lifecycle.yaml",
+        "catalog/assets/architecture.yaml",
+        "catalog/assets/pre_git.yaml",
+    ):
+        path = worktree / relative
+        if not path.is_file():
+            continue
+        document = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(document, dict):
+            continue
+        for record in document.get("records") or []:
+            if not isinstance(record, dict):
+                continue
+            location = record.get("location") or {}
+            repo_path = location.get("repository_path")
+            if isinstance(repo_path, str) and repo_path.replace("\\", "/") in NAV_OUTPUTS:
+                found.add(repo_path.replace("\\", "/"))
+    return found
+
+
+def _unique_spy_paths(spy: Path) -> set[str]:
+    if not spy.is_file():
+        return set()
+    return {
+        line.strip().replace("\\", "/")
+        for line in spy.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    }
+
+
+class HashScopeThroughputTests(unittest.TestCase):
+    MEMBER_COUNT = 200
+
+    def setUp(self) -> None:
+        self._tmp = tempfile.TemporaryDirectory()
+        self.worktree = Path(self._tmp.name) / "repo"
+        self.addCleanup(self._tmp.cleanup)
+        SyncGoldenTests._build_fixture(self)
+        first = _run(
+            [sys.executable, "-B", "scripts/harness_sync.py", "--apply"],
+            cwd=self.worktree,
+        )
+        self.assertEqual(first.returncode, 0, first.stderr or first.stdout)
+        _commit_all(self.worktree, "synced fixture")
+        seed = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+        for index in range(self.MEMBER_COUNT):
+            relative = f"docs/hash_scope_{index:03d}.txt"
+            path = self.worktree / relative
+            path.write_bytes(f"member-{index}\n".encode("utf-8"))
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            _append_sha_record(self.worktree, f"HASH-SCOPE-{index:03d}", relative, digest)
+        filler = _run(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                seed,
+            ],
+            cwd=self.worktree,
+        )
+        self.assertEqual(filler.returncode, 0, filler.stderr or filler.stdout)
+        _commit_all(self.worktree, "hash-scope baseline")
+        self.base = _run(["git", "rev-parse", "HEAD"], cwd=self.worktree).stdout.strip()
+
+    def _assert_hash_scope(
+        self,
+        spy: Path,
+        *,
+        affected: set[str],
+        nav: bool,
+        stderr: str,
+        impact_class: str,
+    ) -> None:
+        expected = set(affected)
+        if nav:
+            expected.update(_cataloged_nav_paths(self.worktree))
+        unique = _unique_spy_paths(spy)
+        self.assertEqual(unique, expected)
+        self.assertLessEqual(len(unique), 8)
+        self.assertNotIn("docs/hash_scope_001.txt", unique)
+        plan_line = next(
+            (line for line in stderr.splitlines() if line.startswith("HARNESS_SYNC_PLAN:")),
+            "",
+        )
+        self.assertTrue(plan_line, stderr)
+        self.assertIn(f"class={impact_class}", plan_line)
+        self.assertIn(f"hashed={len(expected)}", plan_line)
+
+    def test_record_add_new_file_does_not_hash_neighbors(self) -> None:
+        relative = "docs/hash_scope_new.txt"
+        path = self.worktree / relative
+        path.write_bytes(b"brand-new\n")
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        stale = "ab" * 32
+        _append_sha_record(self.worktree, "HASH-SCOPE-NEW", relative, stale)
+        spy = self.worktree / "sha256.spy"
+        result = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        self.assertNotIn("HARNESS_SYNC_PLAN_REQUIRED_BEFORE_HASH", result.stderr)
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["mode"], "incremental")
+        self.assertFalse(payload["full_fallback"])
+        self._assert_hash_scope(
+            spy,
+            affected={relative},
+            nav=True,
+            stderr=result.stderr,
+            impact_class="RECORD_ADD_OR_MOVE",
+        )
+        self.assertEqual(payload["hashed_unique_paths"], len(_unique_spy_paths(spy)))
+        core = (self.worktree / "catalog/assets/core.yaml").read_text(encoding="utf-8")
+        self.assertIn(digest, core)
+        self.assertNotIn(stale, core)
+        plan_ids = payload["impact_plan"]["direct_sha_assets"]
+        self.assertIn("HASH-SCOPE-NEW", plan_ids)
+        self.assertNotIn("HASH-SCOPE-000", plan_ids)
+
+    def test_record_add_existing_path_does_not_hash_neighbors(self) -> None:
+        relative = "docs/hash_scope_000.txt"
+        digest = hashlib.sha256((self.worktree / relative).read_bytes()).hexdigest()
+        stale = "ef" * 32
+        _append_sha_record(self.worktree, "HASH-SCOPE-DUP", relative, stale)
+        spy = self.worktree / "sha256.spy"
+        result = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        payload = json.loads(result.stdout)
+        self._assert_hash_scope(
+            spy,
+            affected={relative},
+            nav=True,
+            stderr=result.stderr,
+            impact_class="RECORD_ADD_OR_MOVE",
+        )
+        core = (self.worktree / "catalog/assets/core.yaml").read_text(encoding="utf-8")
+        self.assertEqual(core.count(digest), 2)
+        self.assertNotIn(stale, core)
+        self.assertIn("HASH-SCOPE-DUP", payload["impact_plan"]["direct_sha_assets"])
+        self.assertNotIn("HASH-SCOPE-001", payload["impact_plan"]["direct_sha_assets"])
+
+    def test_staged_registry_check_does_not_hash_neighbors(self) -> None:
+        relative = "docs/hash_scope_staged.txt"
+        path = self.worktree / relative
+        path.write_bytes(b"staged-new\n")
+        stale = "cd" * 32
+        _append_sha_record(self.worktree, "HASH-SCOPE-STAGED", relative, stale)
+        _run(["git", "add", "catalog/assets/core.yaml"], cwd=self.worktree)
+        spy = self.worktree / "sha256.spy"
+        checked = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--check",
+                "--paths-from-staging",
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(checked.returncode, 1, checked.stderr)
+        self.assertIn("class=RECORD_ADD_OR_MOVE", checked.stderr)
+        self.assertIn("sha256_mismatch:HASH-SCOPE-STAGED", checked.stderr)
+        self.assertNotIn("sha256_mismatch:HASH-SCOPE-000", checked.stderr)
+        self._assert_hash_scope(
+            spy,
+            affected={relative},
+            nav=True,
+            stderr=checked.stderr,
+            impact_class="RECORD_ADD_OR_MOVE",
+        )
+
+    def test_staged_registry_check_classifies_index_not_worktree(self) -> None:
+        relative = "docs/hash_scope_index.txt"
+        path = self.worktree / relative
+        path.write_bytes(b"index-only\n")
+        stale = "a1" * 32
+        _append_sha_record(self.worktree, "HASH-SCOPE-INDEX", relative, stale)
+        _run(["git", "add", "catalog/assets/core.yaml"], cwd=self.worktree)
+        head_core = subprocess.run(
+            ["git", "show", "HEAD:catalog/assets/core.yaml"],
+            cwd=str(self.worktree),
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(head_core.returncode, 0, head_core.stderr)
+        (self.worktree / "catalog/assets/core.yaml").write_bytes(head_core.stdout)
+        index_core = subprocess.run(
+            ["git", "ls-files", "-s", "--", "catalog/assets/core.yaml"],
+            cwd=str(self.worktree),
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(index_core.returncode, 0, index_core.stderr)
+        index_oid = index_core.stdout.decode("ascii", errors="replace").split()[1]
+        index_blob = subprocess.run(
+            ["git", "cat-file", "blob", index_oid],
+            cwd=str(self.worktree),
+            capture_output=True,
+            check=False,
+        )
+        self.assertIn(b"HASH-SCOPE-INDEX", index_blob.stdout)
+        worktree_core = (self.worktree / "catalog/assets/core.yaml").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("HASH-SCOPE-INDEX", worktree_core)
+        spy = self.worktree / "sha256.spy"
+        checked = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--check",
+                "--paths-from-staging",
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(checked.returncode, 1, checked.stderr)
+        self.assertIn("sha256_mismatch:HASH-SCOPE-INDEX", checked.stderr)
+        self.assertIn(
+            "class=RECORD_ADD_OR_MOVE",
+            checked.stderr,
+            checked.stderr,
+        )
+        self._assert_hash_scope(
+            spy,
+            affected={relative},
+            nav=True,
+            stderr=checked.stderr,
+            impact_class="RECORD_ADD_OR_MOVE",
+        )
+
+    def test_purpose_only_does_not_hash_registry(self) -> None:
+        core = self.worktree / "catalog/assets/core.yaml"
+        text = core.read_text(encoding="utf-8")
+        core.write_text(
+            text.replace(
+                "purpose: hash-scope fixture member",
+                "purpose: hash-scope fixture member retitled",
+                1,
+            ),
+            encoding="utf-8",
+        )
+        spy = self.worktree / "sha256.spy"
+        result = _run_with_spy(
+            [
+                sys.executable,
+                "-B",
+                "scripts/harness_sync.py",
+                "--apply",
+                "--base-ref",
+                self.base,
+            ],
+            cwd=self.worktree,
+            spy=spy,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr or result.stdout)
+        payload = json.loads(result.stdout)
+        self._assert_hash_scope(
+            spy,
+            affected=set(),
+            nav=True,
+            stderr=result.stderr,
+            impact_class="SEMANTIC_NAV",
+        )
+        self.assertNotIn("HASH-SCOPE-000", payload["impact_plan"]["direct_sha_assets"])
 
 
 if __name__ == "__main__":

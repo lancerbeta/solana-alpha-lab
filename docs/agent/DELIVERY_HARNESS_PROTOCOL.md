@@ -87,11 +87,18 @@ verdicts, findings and non-claims remain agent-owned.
 ### CI fail-closed presentation
 
 When derived hashes drift, child validators still fail closed. Before their
-details, `validate_ci.py` and `validate_baton.py` print one actionable line:
+details, `validate_ci.py` and `validate_baton.py` print one actionable line.
+A scoped `--check --paths-from-staging` failure also prints the actual impact
+class and planned unique HASH_SCOPE bound (example):
 
 ```text
-DERIVED_HASH_DRIFT: run uv run --locked --managed-python python -B scripts/harness_sync.py --apply --base-ref <exact expected_base>
+DERIVED_HASH_DRIFT: class=RECORD_ADD_OR_MOVE hashed≤4; run uv run --locked --managed-python python -B scripts/harness_sync.py --apply --base-ref <exact expected_base>
 ```
+
+`--apply` and `--check` print `HARNESS_SYNC_PLAN` on stderr before the first
+hash. Scoped `--check --paths-from-staging` uses the same HASH_SCOPE classifier
+as `--apply` (index vs HEAD, including NAV_OUTPUTS when nav is required).
+Unscoped `--check` remains the whole-catalog fail-closed backstop.
 
 When no unambiguous task `expected_base` is available, the same line ends with
 `# RECOVERY_FULL_ORACLE` and bare `--apply` is correct.

@@ -19929,7 +19929,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://docs/agent/DELIVERY_HARNESS_PROTOCOL.md', repository_path: docs/agent/DELIVERY_HARNESS_PROTOCOL.md}
-  integrity: {kind: sha256, sha256: bea5ca334a53621c9a4ad0f9bc2342c3ba01cedcba4c8b16f88a61517cf1c72a}
+  integrity: {kind: sha256, sha256: 82c7d2bd0ccdd505e0d581a78fb10d71ceb0fb1371e1bf0e840c92019c0b51fe}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: ADR-DIRECT-DELIVERY-HARNESS-005}
