@@ -11,7 +11,29 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/EXPERIMENT_EVIDENCE_DECISION_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "c0b3d36df2cede2f64570d50d65d16df28d11bfbe9fa5db797d6de1feaec8803",
+    "catalog/assets/lifecycle.yaml": "ab29aee2c6233056844f1bf240a40e1225c8d98f6da1e30eba836f53d10e63f7",
+    "catalog/catalog_manifest.yaml": "66c96f1acc33d9bdbbac2424d8efb43e5eaaf8157d1a6c7510cea7d2256a64cd",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "0d8ee9205b99b9c48b573404d4c7850ebd31ea61777d85870f89d2573871a4b7",
+    "catalog/generated/asset_edges.json": "d3a51cca126b062e9132e5dcfe4377878f664d16ec5f902d5172d3b8ab3a761d",
+    "configs/factory_semantic_operability_v1.yaml": "cd6938654c4996c528d7df01dab67baaf8c7d0b8dddd6b6bedc239823630adc1",
+    "docs/FACTORY_SEMANTIC_MAP.md": "17c5c684959e39f9104de590b8c0dee981697abda281fdb0bf905b4df6ece378",
+    "docs/PROJECT_MAP.md": "c5630e7234fed838c107fd4639ef786cae61a528de754f5cdedfbf13e6123c89",
+    "docs/contracts/experiment_evidence_decision_v1.md": "f52326d2557861a7815435ba95debf58ba317bf1c02a3763e8b5566aa8953891",
+    "docs/contracts/research_lifecycle_workbench_v1.md": "335bb2d215dcb81e7e7c29ebb8044ff6d8fb5e687963c5c6f4e568c9312dcf0e",
+    "docs/contracts/smial_visual_operating_system_v1.md": "18d20e02f83c237f6c027ae9da7311291db3206985c1774d9c63a392cef0b949",
+    "docs/reports/experiment_evidence_decision/a1_owner_readout_v1.md": "6f51194e4ca43908a6ea50d6f60bb9f59233f8e9f8d43200cf5496ddd0316096",
+    "docs/reports/research_lifecycle_workbench/a1_owner_readout_v1.md": "ffed2fe85e6f281af75a1e7af162b5f92f0482e20df3fa099e9ae426df21e192",
+    "docs/tasks/EXPERIMENT_EVIDENCE_DECISION_V1.md": "24c41e293a57486adc4923e1b52f876e30d8560d062c943c3311660c9a452c0a",
+    "docs/tasks/RESEARCH_LIFECYCLE_WORKBENCH_V1.md": "fc8e34bb291366da651624456f8e789748b32f64ffe7651fc9422997f0ba5517",
+    "src/solana_alpha_lab/factory/application.py": "bfa2eec4e68b73c76dd87cba5325228e7a443156e17b531ca2f82b93f6e32b7f",
+    "src/solana_alpha_lab/factory/experiment_evidence.py": "f4fa9a7e0a30a71e3cbaf443899e710f57cac2a8f9693f24d15f5468c74ff252",
+    "src/solana_alpha_lab/factory/owner_language.py": "3775419da430b9b1cbc5f47250f97d6f8cddf29deeaccffa7069bc22806fa424",
+    "src/solana_alpha_lab/factory/research_workbench.py": "5515dde1d2f2f445b5fb75d48fdb758941b51e4ba6f31e781b4a25e8af5c83a1",
+    "src/solana_alpha_lab/factory/workbench.py": "30b97ba54bbec3bfb442dbdcdf1b4075b13c5ffa8f774789246fedaa02453bf4",
+    "tests/test_experiment_evidence_decision_v1.py": "d0c19305ef4ac63e5ef9555c6611de88f8470abf7fda519c58d641e42845cb0b",
+    "tests/test_factory_ordinary_market_hypothesis.py": "c8fd812350b075b40e12273f297360afcd41dbe994059df44052d08ca34fa269",
+    "tests/test_research_lifecycle_workbench_v1.py": "879547be64dbc57ce57e7a58b55e049047652dbabd2072082ecc8df304b83f80"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/experiment_evidence_decision/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "b7092f421b46f169444668124be7b56203f4adf61ed0a01016fb2467d0ce629f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_EXPERIMENT_EVIDENCE_DECISION_V1",
     "independent_review": {
       "path": "docs/evidence/experiment_evidence_decision/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "9a816317a1ab14b05e66ef1392728c0e88e52d6af3c621134a863393509eec31",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

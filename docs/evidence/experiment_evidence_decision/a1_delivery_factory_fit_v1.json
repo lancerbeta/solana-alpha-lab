@@ -6,8 +6,8 @@
   "task_id": "EXPERIMENT_EVIDENCE_DECISION_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "9b4be6cdcb0fc35904a0591db4706a00887f579f59587042c3e46c69a09e0add",
+  "reviewed_inventory_sha256": "566cd5ab237d1fbf203407339346d08840a9e59ebb536a0714086ecdac6a9201",
   "capability_radar": {
     "now": "NONE",
     "watch": "SCIENCE_TO_STRATEGY_HANDOFF_V1"
