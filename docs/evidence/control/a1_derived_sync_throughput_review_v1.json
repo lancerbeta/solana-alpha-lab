@@ -1,0 +1,41 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "DERIVED-SYNC-THROUGHPUT-REVIEW-001",
+  "as_of": "2026-09-07",
+  "task_id": "DELIVERY_HARNESS_DERIVED_SYNC_THROUGHPUT_V1",
+  "reviewed_bindings_sha256": "ddc773e9c87bce3366c73daa8734aa8ae16135480b4dc095a2b0c0e5f7cf26bd",
+  "reviewed_inventory_sha256": "2a7acc21dcd5fe8db13bfb2f99e014f7d68fd084603540dfb1a2bc16c870a352",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECK uses build_impact_plan index vs HEAD; HARNESS_SYNC_SHA256_SPY unique paths; B.5.4 present; CHECK_MODE_REJECTS_APPLY_FLAGS held."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "A.4 spy equals HASH_SCOPE; staged check fail-closed; SEMANTIC_NAV sibling cheap; L2 SHALLs not rewritten."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "No second hash store. Scoped check pins from index blobs. Unscoped --check remains the fail-closed backstop. Residual: nav/checkpoint still read worktree."
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

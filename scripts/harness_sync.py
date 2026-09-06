@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -41,6 +42,7 @@ NAV_OUTPUTS = (
 TASK_CONTRACT_DIR = "docs/tasks"
 TASK_CONTRACT_FRONTMATTER = re.compile(r"^---\n(?P<frontmatter>.*?)\n---", re.DOTALL)
 HARNESS_SYNC_RECOVERY_SUFFIX = "  # RECOVERY_FULL_ORACLE"
+_PLAN_EMITTED = False
 
 
 def _expected_base_from_task_contract(relative: str, *, root: Path) -> str | None:
@@ -185,15 +187,36 @@ def _current_block_sha(text: str, asset_id: str) -> str | None:
     return matches[0].group(1) or matches[0].group(2)
 
 
-def collect_asset_records() -> dict[str, dict[str, Any]]:
+def _reset_plan_gate() -> None:
+    global _PLAN_EMITTED
+    _PLAN_EMITTED = False
+
+
+def _registry_payload(
+    relative: str, *, live_source: str, root: Path
+) -> bytes | None:
+    if live_source == "index":
+        return _index_bytes(relative, root)
+    return _worktree_bytes(relative, root)
+
+
+def collect_asset_records(
+    *, live_source: str = "worktree"
+) -> dict[str, dict[str, Any]]:
     """Map asset_id -> {registry, repository_path} for sha256 git_path assets."""
     out: dict[str, dict[str, Any]] = {}
     for registry_relative in ASSET_REGISTRIES:
-        registry_file = ROOT / registry_relative
-        if not registry_file.is_file():
+        payload = _registry_payload(
+            registry_relative, live_source=live_source, root=ROOT
+        )
+        if payload is None:
             continue
-        document = yaml.safe_load(registry_file.read_text(encoding="utf-8"))
-        for record in document.get("records", []):
+        document = yaml.safe_load(payload.decode("utf-8"))
+        if not isinstance(document, dict):
+            continue
+        for record in document.get("records", []) or []:
+            if not isinstance(record, dict):
+                continue
             integrity = record.get("integrity") or {}
             location = record.get("location") or {}
             if integrity.get("kind") != "sha256":
@@ -208,13 +231,24 @@ def collect_asset_records() -> dict[str, dict[str, Any]]:
             )
             out[asset_id] = {
                 "registry": registry_relative,
-                "repository_path": relative,
+                "repository_path": relative.replace("\\", "/"),
             }
     return out
 
 
+def _note_sha256_path(repository_path: str) -> None:
+    if not _PLAN_EMITTED:
+        raise HarnessSyncError("HARNESS_SYNC_PLAN_REQUIRED_BEFORE_HASH")
+    spy = os.environ.get("HARNESS_SYNC_SHA256_SPY")
+    if not spy:
+        return
+    with Path(spy).open("a", encoding="utf-8") as handle:
+        handle.write(repository_path.replace("\\", "/") + "\n")
+
+
 def desired_sha256(repository_path: str) -> str:
     """Hash exactly the bytes the integrity guard reads for this path."""
+    _note_sha256_path(repository_path)
     try:
         resolved = canonical_repository_content(
             repository_path,
@@ -252,6 +286,9 @@ def apply_asset_hashes(
             info["repository_path"]
         )
         hashed += 1
+        if stats is not None:
+            paths = stats.setdefault("hashed_path_set", set())
+            paths.add(info["repository_path"])
     if stats is not None:
         stats["hashed_assets"] = stats.get("hashed_assets", 0) + hashed
         stats["desired_sha_calls"] = stats.get("desired_sha_calls", 0) + hashed
@@ -370,7 +407,7 @@ def read_staged_paths() -> set[str]:
         text=True,
     )
     _require(completed.returncode == 0, "STAGED_PATHS_UNAVAILABLE")
-    return {line.strip() for line in completed.stdout.splitlines() if line.strip()}
+    return {_posix_relative(line.strip()) for line in completed.stdout.splitlines() if line.strip()}
 
 
 def drift_scopes_for_paths(paths: set[str]) -> dict[str, bool]:
@@ -387,7 +424,37 @@ def drift_scopes_for_paths(paths: set[str]) -> dict[str, bool]:
     }
 
 
-def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
+def _hash_scope_asset_ids(
+    plan: dict[str, Any], *, records: dict[str, dict[str, Any]]
+) -> set[str]:
+    selected = set(plan.get("direct_sha_assets") or [])
+    if plan.get("navigation_required"):
+        selected.update(
+            asset_id
+            for asset_id, info in records.items()
+            if info["repository_path"] in NAV_OUTPUTS
+        )
+    return selected
+
+
+def _registry_text_for_check(relative: str, *, scoped: bool) -> str | None:
+    if scoped:
+        blob = _index_bytes(relative, ROOT)
+        if blob is not None:
+            return blob.decode("utf-8")
+        return None
+    target = ROOT / relative
+    if not target.is_file():
+        return None
+    return target.read_text(encoding="utf-8")
+
+
+def check_drift(
+    *,
+    scoped_paths: set[str] | None = None,
+    plan_out: dict[str, Any] | None = None,
+) -> list[str]:
+    _reset_plan_gate()
     repair = harness_sync_repair_suffix(root=ROOT)
     scopes = (
         {"assets": True, "checkpoint": True, "navigation": True}
@@ -398,19 +465,72 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
         return []
 
     problems: list[str] = []
-    records = collect_asset_records()
+    live_source = "index" if scoped_paths is not None else "worktree"
+    records = collect_asset_records(live_source=live_source)
+    check_plan: dict[str, Any]
+    selected_ids: set[str] | None
+    if scoped_paths is None:
+        selected_ids = None
+        check_plan = {
+            "mode": "FULL_FALLBACK",
+            "impact_class": "FULL_RECOVERY",
+            "navigation_required": True,
+            "fallback_reason": "UNSCOPED_CHECK",
+            "direct_sha_assets": sorted(records),
+            "checkpoint_required": True,
+        }
+        planned = len(records)
+    else:
+        try:
+            head = _head_oid(ROOT)
+            check_plan = build_impact_plan(
+                head,
+                live_source="index",
+                candidate_paths_override=scoped_paths,
+            )
+        except HarnessSyncError:
+            check_plan = {
+                "mode": "FULL_FALLBACK",
+                "impact_class": "FULL_RECOVERY",
+                "navigation_required": True,
+                "fallback_reason": "INCREMENTAL_SCOPE_UNPROVEN",
+                "direct_sha_assets": sorted(records),
+                "checkpoint_required": True,
+            }
+        selected_ids = _hash_scope_asset_ids(check_plan, records=records)
+        if check_plan.get("mode") != "INCREMENTAL":
+            selected_ids = set(records)
+        planned = (
+            len(records)
+            if check_plan.get("mode") != "INCREMENTAL"
+            else len(planned_hash_paths(check_plan, records=records))
+        )
+    check_plan["hashed_assets_planned"] = planned
+    if plan_out is not None:
+        plan_out.update(check_plan)
     if scopes["assets"]:
+        emit_harness_sync_plan(
+            check_plan,
+            base_ref="HEAD" if scoped_paths is not None else None,
+            hashed_assets_planned=planned,
+        )
         for asset_id, info in sorted(records.items()):
-            if scoped_paths is not None:
-                if info["registry"] not in scoped_paths and info["repository_path"] not in scoped_paths:
-                    continue
+            if selected_ids is not None and asset_id not in selected_ids:
+                continue
             try:
                 desired = desired_sha256(info["repository_path"])
             except HarnessSyncError as exc:
                 problems.append(str(exc))
                 continue
-            registry_file = ROOT / info["registry"]
-            current = _current_block_sha(registry_file.read_text(encoding="utf-8"), asset_id)
+            registry_text = _registry_text_for_check(
+                info["registry"], scoped=scoped_paths is not None
+            )
+            if registry_text is None:
+                problems.append(
+                    f"sha256_mismatch:{asset_id}:{info['registry']}{repair}"
+                )
+                continue
+            current = _current_block_sha(registry_text, asset_id)
             if current != desired:
                 problems.append(
                     f"sha256_mismatch:{asset_id}:{info['registry']}{repair}"
@@ -428,7 +548,7 @@ def check_drift(*, scoped_paths: set[str] | None = None) -> list[str]:
         nav = subprocess.run(
             [sys.executable, "-B", str(ROOT / "scripts" / "generate_navigation.py"), "--check"],
             capture_output=True,
-            env={**__import__("os").environ, "PYTHONDONTWRITEBYTECODE": "1"},
+            env={**os.environ, "PYTHONDONTWRITEBYTECODE": "1"},
         )
         if nav.returncode != 0:
             detail = nav.stdout.decode("utf-8", errors="replace").strip().splitlines()[-1:]
@@ -464,17 +584,65 @@ def _git_nul_paths(args: list[str], root: Path) -> set[str]:
 
 
 def _git_blob_or_none(root: Path, oid: str, relative: str) -> bytes | None:
-    completed = subprocess.run(
-        ["git", "show", f"{oid}:{relative}"],
+    parsed = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", f"{oid}:{relative}"],
         cwd=str(root),
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         check=False,
         shell=False,
     )
-    if completed.returncode != 0:
+    if parsed.returncode != 0:
         return None
-    return completed.stdout
+    blob_oid = parsed.stdout.decode("ascii", errors="replace").strip()
+    if re.fullmatch(r"[0-9a-f]{40,64}", blob_oid) is None:
+        return None
+    blob = subprocess.run(
+        ["git", "cat-file", "blob", blob_oid],
+        cwd=str(root),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if blob.returncode != 0:
+        return None
+    return blob.stdout
+
+
+def _index_bytes(relative: str, root: Path) -> bytes | None:
+    listing = subprocess.run(
+        ["git", "ls-files", "-s", "-z", "--", relative],
+        cwd=str(root),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if listing.returncode != 0 or not listing.stdout:
+        return None
+    entry = listing.stdout.split(b"\0", 1)[0]
+    if not entry or b"\t" not in entry:
+        return None
+    meta, _path = entry.split(b"\t", 1)
+    parts = meta.split()
+    if len(parts) < 2:
+        return None
+    try:
+        oid = parts[1].decode("ascii")
+    except UnicodeDecodeError:
+        return None
+    blob = subprocess.run(
+        ["git", "cat-file", "blob", oid],
+        cwd=str(root),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if blob.returncode != 0:
+        return None
+    return blob.stdout
 
 
 def candidate_paths(base_ref: str, *, root: Path | None = None) -> set[str]:
@@ -573,11 +741,55 @@ def _registry_sha256_pins(payload: bytes) -> dict[str, str]:
     return pins
 
 
-def registry_integrity_delta_asset_ids(
-    relative: str, base_ref: str, *, root: Path
+def _registry_path_index(payload: bytes) -> dict[str, str]:
+    document = yaml.safe_load(payload.decode("utf-8"))
+    if not isinstance(document, dict):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    index: dict[str, str] = {}
+    for record in document.get("records") or []:
+        if not isinstance(record, dict):
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        integrity = record.get("integrity")
+        if not isinstance(integrity, dict) or integrity.get("kind") != "sha256":
+            continue
+        asset_id = record.get("asset_id")
+        location = record.get("location")
+        path = location.get("repository_path") if isinstance(location, dict) else None
+        if not isinstance(asset_id, str) or not isinstance(path, str):
+            raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+        index[asset_id] = path.replace("\\", "/")
+    return index
+
+
+def registry_identity_delta_asset_ids(
+    relative: str, base_ref: str, *, root: Path, live_source: str = "worktree"
 ) -> list[str]:
-    """Asset ids whose sha256 pin differs between worktree and base (or is new/removed)."""
-    live = _worktree_bytes(relative, root)
+    """Live sha256 ids that are new, removed, or whose repository_path moved versus base."""
+    live = _registry_payload(relative, live_source=live_source, root=root)
+    base = _git_blob_or_none(root, base_ref, relative)
+    if live is None and base is None:
+        return []
+    if live is None or base is None:
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN")
+    try:
+        live_idx = _registry_path_index(live)
+        base_idx = _registry_path_index(base)
+    except (UnicodeDecodeError, yaml.YAMLError, HarnessSyncError):
+        raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from None
+    changed = {
+        asset_id
+        for asset_id, path in live_idx.items()
+        if base_idx.get(asset_id) != path
+    }
+    changed.update(asset_id for asset_id in base_idx if asset_id not in live_idx)
+    return sorted(changed)
+
+
+def registry_integrity_delta_asset_ids(
+    relative: str, base_ref: str, *, root: Path, live_source: str = "worktree"
+) -> list[str]:
+    """Asset ids whose sha256 pin differs between live bytes and base (or is new/removed)."""
+    live = _registry_payload(relative, live_source=live_source, root=root)
     base = _git_blob_or_none(root, base_ref, relative)
     if live is None and base is None:
         return []
@@ -596,8 +808,10 @@ def registry_integrity_delta_asset_ids(
     return sorted(changed)
 
 
-def registry_semantic_changed(relative: str, base_ref: str, *, root: Path) -> bool:
-    live = _worktree_bytes(relative, root)
+def registry_semantic_changed(
+    relative: str, base_ref: str, *, root: Path, live_source: str = "worktree"
+) -> bool:
+    live = _registry_payload(relative, live_source=live_source, root=root)
     base = _git_blob_or_none(root, base_ref, relative)
     if live is None and base is None:
         return False
@@ -609,9 +823,11 @@ def registry_semantic_changed(relative: str, base_ref: str, *, root: Path) -> bo
         raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from None
 
 
-def manifest_semantic_changed(base_ref: str, *, root: Path) -> bool:
+def manifest_semantic_changed(
+    base_ref: str, *, root: Path, live_source: str = "worktree"
+) -> bool:
     relative = MANIFEST_RELATIVE
-    live = _worktree_bytes(relative, root)
+    live = _registry_payload(relative, live_source=live_source, root=root)
     base = _git_blob_or_none(root, base_ref, relative)
     if live is None and base is None:
         return False
@@ -623,24 +839,95 @@ def manifest_semantic_changed(base_ref: str, *, root: Path) -> bool:
         raise HarnessSyncError("INCREMENTAL_SCOPE_UNPROVEN") from None
 
 
-def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, Any]:
+def _impact_class(
+    *,
+    mode: str,
+    nav_reasons: list[str],
+    identity_ids: list[str],
+    pin_ids: list[str],
+    source_ids: list[str],
+) -> str:
+    if mode != "INCREMENTAL":
+        return "FULL_RECOVERY"
+    semantic = any(reason.startswith("REGISTRY_SEMANTIC:") for reason in nav_reasons)
+    if semantic and identity_ids:
+        return "RECORD_ADD_OR_MOVE"
+    if semantic:
+        return "SEMANTIC_NAV"
+    if any(reason.startswith("NAV_INPUT:") for reason in nav_reasons):
+        return "NAV_INPUT"
+    if source_ids:
+        return "SOURCE_REHASH"
+    if pin_ids:
+        return "PIN_DELTA"
+    if nav_reasons:
+        return "SEMANTIC_NAV"
+    return "NOOP"
+
+
+def planned_hash_paths(plan: dict[str, Any], *, records: dict[str, dict[str, str]] | None = None) -> set[str]:
+    catalog = records if records is not None else collect_asset_records()
+    ids = set(plan.get("direct_sha_assets") or [])
+    if plan.get("navigation_required"):
+        for asset_id, info in catalog.items():
+            if info["repository_path"] in NAV_OUTPUTS:
+                ids.add(asset_id)
+    return {
+        catalog[asset_id]["repository_path"]
+        for asset_id in ids
+        if asset_id in catalog
+    }
+
+
+def emit_harness_sync_plan(
+    plan: dict[str, Any], *, base_ref: str | None, hashed_assets_planned: int
+) -> None:
+    global _PLAN_EMITTED
+    fallback = plan.get("fallback_reason") or "none"
+    print(
+        "HARNESS_SYNC_PLAN: "
+        f"class={plan.get('impact_class') or 'UNKNOWN'} "
+        f"hashed={hashed_assets_planned} "
+        f"nav={1 if plan.get('navigation_required') else 0} "
+        f"fallback={fallback} "
+        f"base_ref={base_ref or 'none'}",
+        file=sys.stderr,
+    )
+    _PLAN_EMITTED = True
+
+
+def _head_oid(root: Path) -> str:
+    return _run_git(["git", "rev-parse", "HEAD"], root).decode("ascii").strip()
+
+
+def build_impact_plan(
+    base_ref: str,
+    *,
+    root: Path | None = None,
+    live_source: str = "worktree",
+    candidate_paths_override: set[str] | None = None,
+) -> dict[str, Any]:
     target = root or ROOT
-    try:
-        paths = candidate_paths(base_ref, root=target)
-    except HarnessSyncError as exc:
-        if str(exc) == "INCREMENTAL_SCOPE_UNPROVEN":
-            return {
-                "mode": "FULL_FALLBACK",
-                "candidate_paths": [],
-                "direct_sha_assets": [],
-                "registries_to_rewrite": [],
-                "checkpoint_required": True,
-                "navigation_required": True,
-                "navigation_reason": ["INCREMENTAL_SCOPE_UNPROVEN"],
-                "fallback_reason": "INCREMENTAL_SCOPE_UNPROVEN",
-            }
-        raise
-    records = collect_asset_records()
+    if candidate_paths_override is not None:
+        paths = {_posix_relative(path) for path in candidate_paths_override}
+    else:
+        try:
+            paths = candidate_paths(base_ref, root=target)
+        except HarnessSyncError as exc:
+            if str(exc) == "INCREMENTAL_SCOPE_UNPROVEN":
+                return {
+                    "mode": "FULL_FALLBACK",
+                    "candidate_paths": [],
+                    "direct_sha_assets": [],
+                    "registries_to_rewrite": [],
+                    "checkpoint_required": True,
+                    "navigation_required": True,
+                    "navigation_reason": ["INCREMENTAL_SCOPE_UNPROVEN"],
+                    "fallback_reason": "INCREMENTAL_SCOPE_UNPROVEN",
+                    "impact_class": "FULL_RECOVERY",
+                }
+            raise
+    records = collect_asset_records(live_source=live_source)
     by_path: dict[str, list[str]] = {}
     for asset_id, info in records.items():
         by_path.setdefault(info["repository_path"], []).append(asset_id)
@@ -653,6 +940,9 @@ def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, A
         and path not in nav_output_set
     }
     direct: list[str] = []
+    identity_ids: list[str] = []
+    pin_ids: list[str] = []
+    source_ids: list[str] = []
     for relative in sorted(source_paths):
         matched = by_path.get(relative)
         if matched is None:
@@ -667,7 +957,9 @@ def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, A
                 "navigation_required": True,
                 "navigation_reason": ["AMBIGUOUS_ASSET_PATH"],
                 "fallback_reason": "AMBIGUOUS_ASSET_PATH",
+                "impact_class": "AMBIGUOUS",
             }
+        source_ids.extend(sorted(matched))
         direct.extend(sorted(matched))
     nav_reasons: list[str] = []
     checkpoint_required = False
@@ -675,29 +967,29 @@ def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, A
         for relative in ASSET_REGISTRIES:
             if relative not in paths:
                 continue
-            if registry_semantic_changed(relative, base_ref, root=target):
+            if registry_semantic_changed(
+                relative, base_ref, root=target, live_source=live_source
+            ):
                 nav_reasons.append(f"REGISTRY_SEMANTIC:{relative}")
                 checkpoint_required = True
-                # Semantic add/move/edit: hash every sha256 member so a new
-                # record pointing at an unchanged path cannot keep a stale pin.
-                direct.extend(
-                    sorted(
-                        asset_id
-                        for asset_id, info in records.items()
-                        if info["registry"] == relative
-                    )
+                id_chunk = registry_identity_delta_asset_ids(
+                    relative, base_ref, root=target, live_source=live_source
                 )
+                identity_ids.extend(id_chunk)
+                pin_chunk = registry_integrity_delta_asset_ids(
+                    relative, base_ref, root=target, live_source=live_source
+                )
+                pin_ids.extend(pin_chunk)
+                direct.extend(id_chunk)
+                direct.extend(pin_chunk)
             else:
-                # Integrity-only churn: rehash pins that differ from base so
-                # hand-edits repair even alongside unrelated candidates, without
-                # rehashing the entire registry after routine prior syncs.
-                direct.extend(
-                    registry_integrity_delta_asset_ids(
-                        relative, base_ref, root=target
-                    )
+                pin_chunk = registry_integrity_delta_asset_ids(
+                    relative, base_ref, root=target, live_source=live_source
                 )
+                pin_ids.extend(pin_chunk)
+                direct.extend(pin_chunk)
         if MANIFEST_RELATIVE in paths and manifest_semantic_changed(
-            base_ref, root=target
+            base_ref, root=target, live_source=live_source
         ):
             nav_reasons.append("MANIFEST_SEMANTIC")
             checkpoint_required = True
@@ -711,12 +1003,20 @@ def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, A
             "navigation_required": True,
             "navigation_reason": ["INCREMENTAL_SCOPE_UNPROVEN"],
             "fallback_reason": "INCREMENTAL_SCOPE_UNPROVEN",
+            "impact_class": "FULL_RECOVERY",
         }
     for relative in sorted(paths & NAV_RENDERED_INPUTS):
         nav_reasons.append(f"NAV_INPUT:{relative}")
     if paths & nav_output_set:
         nav_reasons.append("NAV_OUTPUT_DRIFT")
     registries = sorted(path for path in paths if path in REGISTRY_RELATIVES)
+    impact_class = _impact_class(
+        mode="INCREMENTAL",
+        nav_reasons=nav_reasons,
+        identity_ids=identity_ids,
+        pin_ids=pin_ids,
+        source_ids=source_ids,
+    )
     return {
         "mode": "INCREMENTAL",
         "candidate_paths": sorted(paths),
@@ -726,6 +1026,7 @@ def build_impact_plan(base_ref: str, *, root: Path | None = None) -> dict[str, A
         "navigation_required": bool(nav_reasons),
         "navigation_reason": nav_reasons,
         "fallback_reason": None,
+        "impact_class": impact_class,
     }
 
 
@@ -740,13 +1041,16 @@ def _sync_result(
     plan: dict[str, Any] | None = None,
     full_fallback: bool = False,
 ) -> dict[str, Any]:
+    unique_paths = stats.get("hashed_path_set") or set()
+    unique = len(unique_paths)
     payload = {
         "mode": mode,
         "updates": updates,
         "changed_files": sorted(changed_files),
         "idempotency": idempotency,
         "registered_sha_assets_total": len(collect_asset_records()),
-        "hashed_assets": stats.get("hashed_assets", 0),
+        "hashed_assets": unique if unique_paths else stats.get("hashed_assets", 0),
+        "hashed_unique_paths": unique,
         "desired_sha_calls": stats.get("desired_sha_calls", 0),
         "registries_rewritten": stats.get("registries_rewritten", 0),
         "checkpoint_updated": bool(stats.get("checkpoint_updated")),
@@ -760,6 +1064,7 @@ def _sync_result(
         payload["fallback_reason"] = plan.get("fallback_reason")
         payload["impact_plan"] = {
             "mode": plan.get("mode"),
+            "impact_class": plan.get("impact_class"),
             "checkpoint_required": plan.get("checkpoint_required"),
             "navigation_required": plan.get("navigation_required"),
             "navigation_reason": plan.get("navigation_reason"),
@@ -771,6 +1076,16 @@ def _sync_result(
 
 def apply_sync_full() -> dict[str, Any]:
     started = time.perf_counter()
+    _reset_plan_gate()
+    emit_harness_sync_plan(
+        {
+            "impact_class": "FULL_RECOVERY",
+            "navigation_required": True,
+            "fallback_reason": "FULL",
+        },
+        base_ref=None,
+        hashed_assets_planned=len(collect_asset_records()),
+    )
     changed_files: set[str] = set()
     updates: list[str] = []
     stats: dict[str, int] = {}
@@ -816,7 +1131,12 @@ def apply_sync_full() -> dict[str, Any]:
 
 def apply_sync_incremental(base_ref: str) -> dict[str, Any]:
     started = time.perf_counter()
+    _reset_plan_gate()
     plan = build_impact_plan(base_ref)
+    planned_paths = planned_hash_paths(plan)
+    emit_harness_sync_plan(
+        plan, base_ref=base_ref, hashed_assets_planned=len(planned_paths)
+    )
     if plan["mode"] != "INCREMENTAL":
         result = apply_sync_full()
         result["full_fallback"] = True
@@ -837,9 +1157,13 @@ def apply_sync_incremental(base_ref: str) -> dict[str, Any]:
     updates: list[str] = []
     stats: dict[str, Any] = {"base": base_ref, "hashed_assets": 0, "desired_sha_calls": 0}
     only = set(plan["direct_sha_assets"])
+    nav_ids = {
+        asset_id
+        for asset_id, info in collect_asset_records().items()
+        if info["repository_path"] in NAV_OUTPUTS
+    }
+    hash_ids = only | (nav_ids if plan["navigation_required"] else set())
     updates += apply_asset_hashes(changed_files, only_asset_ids=only, stats=stats)
-    first_hashed = stats.get("hashed_assets", 0)
-    first_sha_calls = stats.get("desired_sha_calls", 0)
     stats["registries_rewritten"] = sum(
         1 for relative in ASSET_REGISTRIES if relative in changed_files
     )
@@ -854,12 +1178,8 @@ def apply_sync_incremental(base_ref: str) -> dict[str, Any]:
         stats["navigation_runs"] = 1
         updates += apply_asset_hashes(
             changed_files,
-            only_asset_ids=only
-            | {
-                asset_id
-                for asset_id, info in collect_asset_records().items()
-                if info["repository_path"] in NAV_OUTPUTS
-            },
+            only_asset_ids=hash_ids,
+            stats=stats,
         )
         if plan["checkpoint_required"]:
             checkpoint = update_manifest_checkpoint(changed_files)
@@ -881,7 +1201,7 @@ def apply_sync_incremental(base_ref: str) -> dict[str, Any]:
         if (ROOT / relative).is_file()
     }
     second_updates = apply_asset_hashes(
-        second_changed, only_asset_ids=only
+        second_changed, only_asset_ids=hash_ids, stats=stats
     )
     if plan["checkpoint_required"]:
         second_updates += update_manifest_checkpoint(second_changed)
@@ -1486,9 +1806,13 @@ def sync_main(argv: list[str]) -> int:
             print("HARNESS_SYNC_ERROR: CHECK_MODE_REJECTS_APPLY_FLAGS", file=sys.stderr)
             return 2
         if args.paths_from_staging:
-            problems = check_drift(scoped_paths=read_staged_paths())
+            plan_out: dict[str, Any] = {}
+            problems = check_drift(
+                scoped_paths=read_staged_paths(), plan_out=plan_out
+            )
         else:
-            problems = check_drift()
+            plan_out = {}
+            problems = check_drift(plan_out=plan_out)
         if problems:
             resolved = routine_harness_sync_base_ref(root=ROOT)
             if resolved:
@@ -1501,6 +1825,15 @@ def sync_main(argv: list[str]) -> int:
                     "uv run --locked --managed-python python -B "
                     f"scripts/harness_sync.py --apply{HARNESS_SYNC_RECOVERY_SUFFIX}"
                 )
+            cls = plan_out.get("impact_class") or (
+                "FULL_RECOVERY" if not args.paths_from_staging else "UNKNOWN"
+            )
+            planned = plan_out.get("hashed_assets_planned")
+            bound = planned if planned is not None else "N"
+            print(
+                f"DERIVED_HASH_DRIFT: class={cls} hashed≤{bound}; run {repair_cmd}",
+                file=sys.stderr,
+            )
             print(f"DERIVED_HASH_DRIFT: run {repair_cmd}", file=sys.stderr)
             for problem in problems:
                 print(f"DERIVED_HASH_DRIFT: {problem}", file=sys.stderr)
