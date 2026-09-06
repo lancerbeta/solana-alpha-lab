@@ -108,7 +108,7 @@ def _scientific_payload(**overrides: object) -> dict[str, object]:
     payload: dict[str, object] = {
         "experiment_id": EXPERIMENT_ID,
         "availability_cutoff": "2026-09-01T00:00:00Z",
-        "first_reliable_available_at": "2026-09-01T00:00:00Z",
+        "first_reliable_available_at": "2026-09-01T01:00:00Z",
         "availability_provenance": "GIT_CANONICAL_RECEIPT",
         "observed_n": 24,
         "missing_count": 3,
@@ -295,6 +295,72 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
         statuses = {item["code"]: item["status"] for item in dossier["obligations"]}
         self.assertEqual(statuses["POPULATION_N"], "CONFLICT")
         self.assertEqual(statuses["HOLDOUT"], "NOT_APPLICABLE")
+        complementary = _eligible_binding(
+            record_id="EVIDENCE-BINDING-PIT-CLOCKS-001",
+            transaction_id="RESEARCH-TXN-PIT-CLOCKS-001",
+        )
+        clocks = compose_experiment_dossier(
+            projection,
+            LOCATOR,
+            root=ROOT,
+            records=(_eligible_run(), complementary),
+            records_status="AVAILABLE",
+        )
+        clock_status = {item["code"]: item["status"] for item in clocks["obligations"]}
+        self.assertEqual(clock_status["PIT_AVAILABILITY"], "PRESENT")
+        pit_values = next(
+            item["values"] for item in clocks["obligations"] if item["code"] == "PIT_AVAILABILITY"
+        )
+        self.assertNotEqual(
+            pit_values.get("availability_cutoff"),
+            pit_values.get("first_reliable_available_at"),
+        )
+        na = _eligible_binding(
+            record_id="EVIDENCE-BINDING-HOLDOUT-NA-001",
+            transaction_id="RESEARCH-TXN-HOLDOUT-NA-001",
+            holdout_applicable=False,
+            holdout_consumption_ids=[],
+        )
+        consumed = _eligible_binding(
+            record_id="EVIDENCE-BINDING-HOLDOUT-USED-001",
+            transaction_id="RESEARCH-TXN-HOLDOUT-USED-001",
+            holdout_applicable=True,
+            holdout_consumption_ids=["HOLDOUT-001"],
+        )
+        holdout_conflict = compose_experiment_dossier(
+            projection,
+            LOCATOR,
+            root=ROOT,
+            records=(na, consumed),
+            records_status="AVAILABLE",
+        )
+        holdout_status = {
+            item["code"]: item["status"] for item in holdout_conflict["obligations"]
+        }
+        self.assertEqual(holdout_status["HOLDOUT"], "CONFLICT")
+        foreign_metric = _event(
+            record_id="METRIC-FOREIGN-RUN-001",
+            record_kind="EXPERIMENT_METRIC",
+            entity_id="METRIC-FOREIGN-RUN-001",
+            run_id="RUN-FOREIGN-001",
+            hypothesis_version_id=HYPOTHESIS_ID,
+            payload={"run_id": "RUN-FOREIGN-001", "observed_n": 99, "evidence_class": "DIAGNOSTIC"},
+            transaction_id="RESEARCH-TXN-FOREIGN-METRIC-001",
+        )
+        binding_with_foreign_run = _eligible_binding(
+            record_id="EVIDENCE-BINDING-FOREIGN-RUN-001",
+            transaction_id="RESEARCH-TXN-FOREIGN-RUN-001",
+            run_id="RUN-FOREIGN-001",
+        )
+        harvested = compose_experiment_dossier(
+            projection,
+            LOCATOR,
+            root=ROOT,
+            records=(binding_with_foreign_run, foreign_metric),
+            records_status="AVAILABLE",
+        )
+        harvested_ids = {item.get("record_id") for item in harvested["direct_evidence"]}
+        self.assertNotIn("METRIC-FOREIGN-RUN-001", harvested_ids)
         self.assertNotEqual(statuses["POPULATION_N"], statuses.get("MISSINGNESS"))
         self.assertFalse(dossier["science_guard"]["allowed"])
         self.assertIn("POPULATION_N", dossier["science_guard"]["blocked_codes"])
@@ -376,6 +442,7 @@ class ExperimentEvidenceDecisionTests(unittest.TestCase):
             self.assertNotIn(label, detail)
         self.assertIn(EXPERIMENT_ID, detail)
         self.assertIn("UNKNOWN", detail)
+        self.assertNotIn("NOT_APPLICABLE", detail)
         self.assertNotIn("gettext", detail)
         self.assertNotIn("i18next", detail)
 

@@ -132,11 +132,12 @@ def _collect_direct_ids(experiment_id: str, records: Sequence[Any]) -> tuple[set
         payload = _payload(record)
         if _explicit_experiment_id(payload, record) != experiment_id:
             continue
+        kind = _kind(record)
         run_id = _text(getattr(record, "run_id", None) or payload.get("run_id"))
         trial_id = _text(payload.get("trial_id"))
-        if run_id:
+        if run_id and kind in EXECUTION_RECORD_KINDS:
             run_ids.add(run_id)
-        if trial_id:
+        if trial_id and kind == "TRIAL":
             trial_ids.add(trial_id)
     return run_ids, trial_ids
 
@@ -279,7 +280,20 @@ def _holdout_status(
     )
     ids_status, ids_note = _status_from_values(*id_lists)
     ids = id_lists[0] if id_lists else None
-    applicable = _first_payload_value(direct, records, "holdout_applicable")
+    applicable_values = _collect_payload_values(direct, records, "holdout_applicable")
+    applicable_status, applicable_note = _status_from_values(*applicable_values)
+    if applicable_status == "CONFLICT" or ids_status == "CONFLICT":
+        return _obligation(
+            "HOLDOUT",
+            "CONFLICT",
+            source="ResearchStore",
+            note=applicable_note or ids_note,
+            values={
+                "holdout_applicable": applicable_values,
+                "holdout_consumption_ids": id_lists,
+            },
+        )
+    applicable = applicable_values[0] if applicable_values else None
     if applicable is False or str(applicable).upper() in {"FALSE", "NO", "NOT_APPLICABLE"}:
         return _obligation(
             "HOLDOUT",
@@ -287,14 +301,6 @@ def _holdout_status(
             source="ResearchStore",
             note="явная семантика источника: holdout не открывался",
             values={"holdout_applicable": applicable, "holdout_consumption_ids": ids},
-        )
-    if ids_status == "CONFLICT":
-        return _obligation(
-            "HOLDOUT",
-            "CONFLICT",
-            source="ResearchStore",
-            note=ids_note,
-            values={"holdout_consumption_ids": id_lists},
         )
     if isinstance(ids, list) and ids:
         return _obligation(
@@ -397,12 +403,17 @@ def _build_obligations(
             "MISSING",
             "Git evidence_class не является scientific evidence",
         )
-    pit_status, pit_note = _status_from_values(*(pit_cutoffs + pit_available_values))
-    if pit_status == "PRESENT" and not (pit_cutoff and pit_available):
+    cutoff_status, cutoff_note = _status_from_values(*pit_cutoffs)
+    available_status, available_note = _status_from_values(*pit_available_values)
+    if cutoff_status == "CONFLICT" or available_status == "CONFLICT":
+        pit_status, pit_note = "CONFLICT", cutoff_note or available_note
+    elif cutoff_status == "PRESENT" and available_status == "PRESENT":
+        pit_status, pit_note = "PRESENT", None
+    elif scientific:
         pit_status = "UNKNOWN"
         pit_note = "cutoff или first_reliable_available_at неполны"
-    if pit_status == "MISSING" and scientific:
-        pit_status = "UNKNOWN"
+    else:
+        pit_status, pit_note = "MISSING", None
     n_status, n_note = _status_from_values(*n_values)
     if n_status == "MISSING" and scientific:
         n_status = "UNKNOWN"
@@ -436,7 +447,7 @@ def _build_obligations(
         _obligation(
             "PIT_AVAILABILITY",
             pit_status,
-            source="ResearchStore" if direct else "NONE",
+            source="ResearchStore" if scientific else "NONE",
             note=pit_note or (
                 "RUN_COMPLETED не доказывает PIT" if pit_status != "PRESENT" else None
             ),
@@ -513,7 +524,7 @@ def _build_obligations(
         _obligation(
             "EVIDENCE_CLASS",
             evidence_status,
-            source="LifecycleProjection/ResearchStore",
+            source="ResearchStore",
             note=evidence_note,
             values={"evidence_class": (class_values[0] if class_values else None)},
         ),

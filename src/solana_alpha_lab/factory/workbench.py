@@ -705,7 +705,11 @@ def _research_detail_html(view: Mapping[str, Any]) -> str:
             {
                 "STATE": header.get("state") or "UNKNOWN",
                 "TRUTH PLANE": header.get("truth_plane"),
-                "EVIDENCE CLASS": header.get("evidence_class"),
+                **(
+                    {}
+                    if dossier and header.get("evidence_class") == "NOT_APPLICABLE"
+                    else {"EVIDENCE CLASS": header.get("evidence_class")}
+                ),
                 "SOURCE": header.get("source"),
                 "AS OF": header.get("as_of"),
                 "OBSERVED AT": header.get("observed_at"),
