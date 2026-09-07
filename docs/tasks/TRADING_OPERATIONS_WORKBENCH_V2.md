@@ -27,6 +27,8 @@ managed_write_set:
   - src/solana_alpha_lab/factory/owner_language.py
   - src/solana_alpha_lab/factory/paper_plane.py
   - src/solana_alpha_lab/factory/paper_shadow_operations.py
+  - src/solana_alpha_lab/factory/paper_shadow_commands.py
+  - src/solana_alpha_lab/factory/operational_store.py
   - tests/test_trading_operations_workbench_v2.py
   - tests/test_owner_operations_cockpit_v1.py
   - tests/test_factory_ordinary_market_hypothesis.py
@@ -148,3 +150,12 @@ platform; no owner FCF.
 
 `SOL_XHIGH` for contracts/boundaries; `LUNA_MAX` for bounded UI/projection
 work.
+
+## DoD
+
+PASS only against the owner EXECUTE packet section 26 and
+`docs/contracts/trading_operations_workbench_v2.md`.
+
+Honest remaining product gaps: `ACTIVATION_PATH_GAP`, `WATCHLIST_SOURCE_GAP`.
+Missing `mark_as_of` is UNKNOWN. Timestamped MARK is not auto-expired;
+this atom does not invent a mark TTL policy.

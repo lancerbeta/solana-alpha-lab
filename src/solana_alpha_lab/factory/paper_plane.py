@@ -560,7 +560,11 @@ class PaperPlaneStore:
         out: list[dict[str, Any]] = []
         for row in rows:
             item = dict(row)
-            item["payload"] = json.loads(item.pop("payload_json"))
+            raw = item.pop("payload_json")
+            try:
+                item["payload"] = json.loads(raw)
+            except (TypeError, ValueError, json.JSONDecodeError):
+                item["payload"] = {}
             out.append(item)
         return out
 

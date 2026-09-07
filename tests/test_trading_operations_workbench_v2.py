@@ -330,6 +330,8 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
                 held = by_signal["SIGDEC-OPS-V2-E-HOLD"]
                 self.assertEqual(held["stages"]["SIGNAL_DECISION"], "PROVEN")
                 self.assertEqual(held["stages"]["POSITION"], "GAP")
+                self.assertEqual(held.get("action"), "NO_ENTER")
+                self.assertEqual(held.get("reason_code"), "OPS_V2_FIXTURE")
                 self.assertTrue(
                     all(row.get("signal_decision_id") != "SIGDEC-OPS-V2-E-HOLD" for row in paper.positions())
                 )
@@ -375,6 +377,22 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
                 g_trace = next(row for row in traces if row.get("signal_decision_id") == "SIGDEC-OPS-V2-G")
                 self.assertEqual(g_trace["stages"]["EXIT"], "PROVEN")
                 self.assertEqual(g_trace["stages"]["RECONCILIATION"], "PROVEN")
+                unresolved_id = _enter(paper, "SIGDEC-OPS-V2-G2", decision_at="2026-09-03T12:12:00Z")
+                paper.transition(unresolved_id, "EXIT_REQUIRED")
+                paper.apply_paper_exit_fill(
+                    position_id=unresolved_id,
+                    exit_unit_price_usd=None,
+                    mode="PAPER",
+                    unresolved=True,
+                )
+                u_trace = next(
+                    row
+                    for row in app.read_model()["trading_operations"]["traces"]
+                    if row.get("signal_decision_id") == "SIGDEC-OPS-V2-G2"
+                )
+                self.assertEqual(u_trace["stages"]["EXIT"], "GAP")
+                self.assertEqual(u_trace["stages"]["RECONCILIATION"], "GAP")
+                self.assertEqual(u_trace["blocker"], "UNRESOLVED_POSITION")
             finally:
                 paper.close()
 
@@ -476,6 +494,17 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
             body = _get(app, "/operations")
             self.assertIn("RUNTIME_SOURCE_UNAVAILABLE", body)
             self.assertNotIn('name="command" value="PAUSE_NEW_ENTRIES"', body)
+            before = path.read_bytes()
+            with self.assertRaises(ApplicationError) as raised:
+                app.apply_paper_operator_command(
+                    {
+                        "command_type": "PAUSE_NEW_ENTRIES",
+                        "bot_instance_id": "BOT-ABSENT",
+                        "idempotency_key": "WB-BAD-SCHEMA",
+                    }
+                )
+            self.assertEqual(raised.exception.code, "RUNTIME_SOURCE_UNAVAILABLE")
+            self.assertEqual(path.read_bytes(), before)
 
     def test_j_same_mint_does_not_merge_contexts(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -552,6 +581,72 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
             try:
                 traces = app.read_model()["trading_operations"]["traces"]
                 self.assertTrue(any(row.get("join") == "LEGACY_TRACE_GAP" for row in traces))
+            finally:
+                paper.close()
+
+    def test_multi_bot_close_all_uses_selected_hash(self) -> None:
+        epoch_b = "ACTIVATION-EPOCH-ACCOUNTING-PAPER-002"
+        known = {EPOCH: {"mode": "PAPER"}, epoch_b: {"mode": "PAPER"}}
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            paper = PaperPlaneStore((root / "local/factory_v1/paper_plane_state.sqlite").resolve())
+            strategy = load_strategy_version(ROOT, STRAT_REL)
+            first = _enter(paper, "SIGDEC-OPS-V2-M1", decision_at="2026-09-03T12:10:00Z")
+            second_signal = _signal("SIGDEC-OPS-V2-M2", decision_at="2026-09-03T12:11:00Z")
+            second_signal["activation_epoch_id"] = epoch_b
+            accepted = accept_signal_decision(
+                ROOT,
+                paper,
+                strategy=strategy,
+                signal_decision=second_signal,
+                known_activation_epochs=known,
+                mode="PAPER",
+                as_of="2026-09-03T12:11:00Z",
+            )
+            second = str(accepted["position_id"])
+            paper.apply_paper_entry_fill(
+                position_id=second,
+                entry_unit_price_usd="1.00",
+                entry_gross_notional_usd="100",
+                fee_bps=10,
+                mode="PAPER",
+            )
+            app = FactoryApplication(root=root, paper_plane_store=paper)
+            try:
+                ops = app.read_model()["operations"]
+                bots = [str(row["bot_instance_id"]) for row in ops["bots"]]
+                self.assertEqual(len(bots), 2)
+                hashes = ops["open_position_set_sha256_by_bot"]
+                self.assertNotEqual(hashes[bots[0]], hashes[bots[1]])
+                self.assertNotEqual(hashes[bots[0]], ops["open_position_set_sha256"])
+                body = _get(app, "/operations")
+                self.assertIn(f"open_set.{bots[0]}", body)
+                self.assertIn(f"open_set.{bots[1]}", body)
+                bot_a = str(paper.get_position(first)["bot_instance_id"])
+                stale = app.apply_paper_operator_command(
+                    {
+                        "command_type": "REQUEST_CLOSE_ALL",
+                        "bot_instance_id": bot_a,
+                        "expected_open_position_set_sha256": hashes[
+                            str(paper.get_position(second)["bot_instance_id"])
+                        ],
+                        "idempotency_key": "WB-OPS-V2-MULTI-STALE",
+                    }
+                )
+                self.assertEqual(stale["status"], "STALE_OPERATOR_SNAPSHOT")
+                self.assertEqual(stale.get("side_effects"), 0)
+                self.assertEqual(paper.get_position(first)["state"], "OPEN")
+                live = app.apply_paper_operator_command(
+                    {
+                        "command_type": "REQUEST_CLOSE_ALL",
+                        "bot_instance_id": bot_a,
+                        "expected_open_position_set_sha256": hashes[bot_a],
+                        "idempotency_key": "WB-OPS-V2-MULTI-LIVE",
+                    }
+                )
+                self.assertEqual(live["status"], "APPLIED")
+                self.assertEqual(paper.get_position(first)["state"], "EXIT_REQUIRED")
+                self.assertEqual(paper.get_position(second)["state"], "OPEN")
             finally:
                 paper.close()
 

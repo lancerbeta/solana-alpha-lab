@@ -318,6 +318,8 @@ def _trace_table(traces: list[dict[str, Any]]) -> str:
             f"<td class=\"mono\">{esc(trace.get('signal_decision_id') or trace.get('join') or '')}</td>"
             f"<td class=\"mono\">{esc(trace.get('strategy_id') or '')}</td>"
             f"<td class=\"mono\">{esc(trace.get('mint') or '')}</td>"
+            f"<td>{canon(trace.get('action') or 'UNKNOWN')}</td>"
+            f"<td class=\"mono\">{esc(trace.get('reason_code') or '')}</td>"
             + stage_cells
             + f"<td>{canon(trace.get('stop_stage'))}</td>"
             f"<td>{canon(trace.get('blocker') or 'NONE')}</td>"
@@ -326,6 +328,7 @@ def _trace_table(traces: list[dict[str, Any]]) -> str:
     return (
         "<table><tr>"
         "<th>signal_decision_id</th><th>strategy</th><th>mint</th>"
+        "<th>action</th><th>reason</th>"
         "<th>SIGNAL</th><th>RISK</th><th>INTENT</th><th>OBS</th>"
         "<th>POSITION</th><th>EXIT</th><th>RECONCILE</th>"
         "<th>stop</th><th>blocker</th></tr>"
@@ -349,9 +352,13 @@ def _context_table(contexts: list[dict[str, Any]]) -> str:
             f"<td class=\"mono\">{esc(row.get('bot_instance_id') or '')}</td>"
             f"<td>{canon(status)}</td>"
             f"<td>{canon(row.get('relation'))}</td>"
+            f"<td>{cell_html(row.get('entries_paused'))}</td>"
+            f"<td class=\"mono\">{esc(row.get('started_at') or '')}</td>"
+            f"<td class=\"mono\">{esc(row.get('stopped_at') or '')}</td>"
             f"<td>{canon(row.get('current_blocker') or 'NONE')}</td>"
             f"<td>{cell_html(row.get('open_risk_count'))}</td>"
             f"<td>{cell_html(row.get('unknown_positions'))}</td>"
+            f"<td>{cell_html(row.get('exit_required'))}</td>"
             f"<td>{cell_html(row.get('unresolved_positions'))}</td>"
             f"<td>{_next_action_html(str(row.get('next_safe_action') or 'OBSERVE'))}</td>"
             "</tr>"
@@ -359,9 +366,12 @@ def _context_table(contexts: list[dict[str, Any]]) -> str:
     return (
         "<table><tr>"
         "<th>strategy_id</th><th>version</th><th>mode</th><th>epoch</th>"
-        "<th>bot</th><th>status</th><th>relation</th><th>blocker</th>"
+        "<th>bot</th><th>status</th><th>relation</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'entries_paused'))}</th>"
+        "<th>started_at</th><th>stopped_at</th><th>blocker</th>"
         f"<th>{esc(surface_copy('OPERATIONS', 'open_risk'))}</th>"
         f"<th>{esc(surface_copy('OPERATIONS', 'unknown_positions'))}</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'exit_required'))}</th>"
         f"<th>{esc(surface_copy('OPERATIONS', 'unresolved'))}</th>"
         "<th>next</th></tr>"
         + "".join(body)
@@ -494,6 +504,9 @@ def _operations_section(model: dict[str, Any]) -> str:
         for bid, digest in by_bot_hashes.items()
         if bid
     )
+    resume_ok = not (
+        present and len(bots) == 1 and str(bots[0].get("status") or "") == "DRAINING"
+    )
     commands = ""
     if present and bots:
         commands = (
@@ -512,7 +525,7 @@ def _operations_section(model: dict[str, Any]) -> str:
             + f"value=\"{esc('WB-' + uuid4().hex[:12].upper())}\"></label></p>"
             + "<p class=\"safe-actions\">"
             + command_button("PAUSE_NEW_ENTRIES")
-            + command_button("RESUME_NEW_ENTRIES")
+            + (command_button("RESUME_NEW_ENTRIES") if resume_ok else "")
             + command_button("REQUEST_CLOSE_POSITION")
             + "</p>"
             + "<fieldset class=\"danger-zone danger\">"

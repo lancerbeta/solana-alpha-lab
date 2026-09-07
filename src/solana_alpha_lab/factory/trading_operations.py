@@ -239,11 +239,25 @@ def _build_traces(store: Any) -> list[dict[str, Any]]:
             ("mint", payload.get("mint") or (position or {}).get("mint")),
             ("decision_at", payload.get("decision_at")),
             ("created_at", event.get("created_at")),
+            ("action", payload.get("action")),
+            ("reason_code", payload.get("reason_code") or payload.get("reason")),
         ):
             if not bucket.get(field) and value not in {None, ""}:
                 bucket[field] = value
         event_type = str(event.get("event_type") or "")
         stage = EVENT_STAGE.get(event_type)
+        if event_type == "RECONCILIATION" and payload.get("result") == "UNRESOLVED":
+            bucket["blocker"] = "UNRESOLVED_POSITION"
+            stage = None
+        position_backed = {
+            "EXECUTION_INTENT",
+            "EXECUTION_OBSERVATION",
+            "POSITION",
+            "EXIT",
+            "RECONCILIATION",
+        }
+        if stage in position_backed and not _text(event.get("position_id")):
+            stage = None
         if stage:
             decision = payload.get("decision")
             if stage == "PRE_TRADE_RISK" and decision not in {None, "ALLOW"}:
@@ -509,7 +523,7 @@ def compose_trading_operations(
         contexts, activation_attention = _contexts(git_strategies, operations)
         traces = _build_traces(store)
         recent = list(reversed(store.execution_events()[-12:]))
-    except (PaperPlaneError, sqlite3.Error, OSError, IndexError):
+    except (PaperPlaneError, sqlite3.Error, OSError, IndexError, json.JSONDecodeError):
         contexts, activation_attention = _contexts(git_strategies, None)
         attention = [
             _attention(

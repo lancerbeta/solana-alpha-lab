@@ -159,13 +159,12 @@ class FactoryApplication:
         if self._paper_plane_store is not None:
             self._paper_plane_source_status = "PRESENT"
             return self._paper_plane_store
-        if self._paper_plane_readonly is not None:
-            self._paper_plane_source_status = "PRESENT"
-            return self._paper_plane_readonly
         path = paper_plane_store_path(self.root)
         if not path.is_file():
+            self._close_paper_plane_readonly()
             self._paper_plane_source_status = "NOT_PRESENT"
             return None
+        self._close_paper_plane_readonly()
         try:
             self._paper_plane_readonly = PaperPlaneStore(path, readonly=True)
         except (PaperPlaneError, sqlite3.Error, OSError):
@@ -539,6 +538,15 @@ class FactoryApplication:
                 path = paper_plane_store_path(self.root)
                 if not path.is_file():
                     raise ApplicationError("SOURCE_NOT_PRESENT")
+                probe: PaperPlaneStore | None = None
+                try:
+                    probe = PaperPlaneStore(path, readonly=True)
+                    probe.bots()
+                except (PaperPlaneError, sqlite3.Error, OSError) as exc:
+                    raise ApplicationError("RUNTIME_SOURCE_UNAVAILABLE") from exc
+                finally:
+                    if probe is not None:
+                        probe.close()
                 try:
                     store = PaperPlaneStore(path)
                     owned = True
