@@ -34,7 +34,7 @@
         "max_forge_projection_bytes"
       ],
       "properties": {
-        "max_routes": {"type": "integer", "minimum": 1, "maximum": 12},
+        "max_routes": {"type": "integer", "minimum": 1, "maximum": 13},
         "max_root_bindings_per_route": {"type": "integer", "minimum": 0, "maximum": 2},
         "max_root_assets_per_route": {"type": "integer", "minimum": 0, "maximum": 3},
         "max_query_recipes_per_route": {"type": "integer", "minimum": 0, "maximum": 4},
@@ -46,7 +46,7 @@
     "routes": {
       "type": "array",
       "minItems": 1,
-      "maxItems": 12,
+      "maxItems": 13,
       "items": {"$ref": "#/$defs/route"}
     }
   },
@@ -94,7 +94,7 @@
         "owner_questions": {
           "type": "array",
           "minItems": 1,
-          "maxItems": 10,
+          "maxItems": 11,
           "items": {"type": "string", "minLength": 3, "maxLength": 200}
         },
         "search_terms": {

@@ -493,13 +493,18 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
         cls.bindings = cls.snapshot.manifest["canonical_bindings"]
 
     def test_live_bindings_include_atom_a_and_semantic_roots(self) -> None:
-        self.assertLessEqual(len(self.bindings), 12)
+        self.assertLessEqual(len(self.bindings), 13)
         self.assertIn("ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY", self.bindings)
         self.assertIn("ACTIVE-FACTORY-MARKET-FEATURE-SURFACE", self.bindings)
         self.assertIn("ACTIVE-FACTORY-SEMANTIC-OPERABILITY", self.bindings)
         self.assertIn("ACTIVE-SMIAL-VISUAL-OPERATING-SYSTEM", self.bindings)
         self.assertIn("ACTIVE-OWNER-LIFECYCLE-PROJECTION", self.bindings)
         self.assertIn("ACTIVE-RESEARCH-LIFECYCLE-WORKBENCH", self.bindings)
+        self.assertIn("ACTIVE-OWNER-DAILY-ATTENTION", self.bindings)
+        self.assertEqual(
+            self.bindings["ACTIVE-OWNER-DAILY-ATTENTION"]["target_asset_id"],
+            "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+        )
         self.assertEqual(
             self.bindings["ACTIVE-OWNER-LIFECYCLE-PROJECTION"]["target_asset_id"],
             "CONFIG-OWNER-LIFECYCLE-PROJECTION-001",

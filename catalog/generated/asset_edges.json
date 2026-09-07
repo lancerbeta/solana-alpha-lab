@@ -3643,6 +3643,46 @@
       "target_asset_id": "TEST-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
     },
     {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-FACTORY-V1-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-OWNER-DAILY-ATTENTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001"
+    },
+    {
+      "source_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-OWNER-ATTENTION-AND-CHANGE-FEED-001"
+    },
+    {
       "source_asset_id": "CTRL-OWNER-ATTENTION-GATE-001",
       "relation": "contains",
       "target_asset_id": "ADR-OWNER-ATTENTION-GATE-004"
@@ -5141,6 +5181,36 @@
       "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-FACTORY-V1-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-SMIAL-VISUAL-OPERATING-SYSTEM-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001"
     },
     {
       "source_asset_id": "DOC-OWNER-AUTHORITY-PACKET-001",
@@ -10618,6 +10688,21 @@
       "target_asset_id": "EVIDENCE-OWNER-AUTHORITY-PACKET-A1-001"
     },
     {
+      "source_asset_id": "MODULE-OWNER-DAILY-ATTENTION-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-TRADING-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-DAILY-ATTENTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "MODULE-OWNER-DAILY-ATTENTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001"
+    },
+    {
       "source_asset_id": "MODULE-OWNER-LANGUAGE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001"
@@ -15461,6 +15546,16 @@
       "source_asset_id": "TEST-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-ORDINARY-RECENT-ORGANIC-PRESSURE-H900-AUDITION-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-ATTENTION-AND-CHANGE-FEED-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001"
     },
     {
       "source_asset_id": "TEST-OWNER-ATTENTION-GATE-001",

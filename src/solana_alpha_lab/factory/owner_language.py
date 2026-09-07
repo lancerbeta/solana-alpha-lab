@@ -267,6 +267,10 @@ NEXT_ACTION_GLOSS = {
     "USE_EXPLICIT_IDENTITY": "Использовать события с явной identity",
     "DO_NOT_INVENT_WATCHLIST": "Не изобретать watchlist storage",
     "REVIEW_PAUSE_CLOSE_POLICY": "Просмотреть политику pause/close",
+    "OPEN_OPERATIONS": "Открыть Операции",
+    "OPEN_RESEARCH": "Открыть Исследования",
+    "OPEN_SYSTEM": "Открыть Систему",
+    "MARK_HOME_REVIEWED": "Отметить просмотр Главной",
 }
 
 STATUS_GLOSS = {
@@ -313,17 +317,26 @@ SHELL_COPY = {
 SURFACE_COPY = {
     "HOME": {
         "h1": "Главная",
-        "question": "Что сейчас действительно требует моего внимания?",
-        "attention": "Что требует внимания",
-        "known": "Что известно",
+        "question": "Что требует меня сейчас, и что стало новым с просмотра?",
+        "attention": "Требует внимания",
+        "changed": "Изменилось с просмотра",
+        "info_changes": "Изменения без действия",
+        "coverage": "Полнота источников",
+        "known": "Сводка Factory",
         "next": "Следующее безопасное действие",
         "phrase": "Точные команды владельца",
         "cycle_commands": "Технические команды цикла",
         "packet": "Пакет / признаки",
         "features": "Требуемые признаки",
-        "health": "Вердикт runtime",
+        "health": "Покрытие источников, не вердикт healthy",
         "recent": "Недавние изменения",
-        "no_attention": "Отдельных пунктов внимания нет.",
+        "no_attention": "Сейчас нет пункта, который требует Петра.",
+        "no_changed": "Новых событий с просмотра не показано.",
+        "no_info": "Нет изменений без действия.",
+        "mark_reviewed": "Отметить просмотр",
+        "do_nothing": "Ничего делать не нужно.",
+        "new_since_review": "НОВОЕ С ПРОСМОТРА",
+        "open_source": "Открыть источник",
         "no_recent": "Недавних событий исполнения нет.",
         "phrase_not_urgent": (
             "Фраза ниже — точный текст для чата, не срочная кнопка этого экрана."
@@ -514,6 +527,7 @@ OWNER_ERRORS = {
     ),
     "BOT_INSTANCE_ID_REQUIRED": "Нужен bot_instance_id. Команда не отправлена.",
     "STALE_OPERATOR_SNAPSHOT": "Снимок оператора устарел. Команда не отправлена.",
+    "STALE_REVIEW_SNAPSHOT": "Снимок просмотра устарел. Курсор не записан.",
     "SOURCE_NOT_PRESENT": (
         "PaperPlane отсутствует. Команда не выполнена и runtime не создан."
     ),

@@ -203,6 +203,24 @@ queries:
 - query_id: SGQ-AUTHORITY-ACTIVATE-DEPLOY-SPEND
   query: May I activate/deploy/spend?
   required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-AUTHORITY-PR-MERGE
+  query: May this PR merge?
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-AUTHORITY-GATE-V2
+  query: What is OWNER_ATTENTION_GATE_V2?
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-OWNER-DAILY-ATTENTION-EN
+  query: What needs my attention today?
+  required_top_route: SEM-OWNER-DAILY-ATTENTION
+- query_id: SGQ-OWNER-DAILY-CHANGED-EN
+  query: What changed since I reviewed Factory?
+  required_top_route: SEM-OWNER-DAILY-ATTENTION
+- query_id: SGQ-OWNER-DAILY-ATTENTION-RU
+  query: Что мне нужно посмотреть сегодня?
+  required_top_route: SEM-OWNER-DAILY-ATTENTION
+- query_id: SGQ-OWNER-DAILY-PETR
+  query: What needs Petr today?
+  required_top_route: SEM-OWNER-DAILY-ATTENTION
 - query_id: SGQ-ANTI-MECHANISM-TESTED-BEFORE
   query: has this mechanism been tested before?
   required_top_route: SEM-PRIOR-WORK

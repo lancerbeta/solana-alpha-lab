@@ -41,7 +41,7 @@ OWNER_SURFACE = ROOT / "src/solana_alpha_lab/factory/owner_surface.py"
 VISUAL_OS = ROOT / "configs/smial_visual_operating_system_v1.yaml"
 
 HEADINGS = {
-    "/": ("Главная", "Что сейчас действительно требует моего внимания?"),
+    "/": ("Главная", "Что требует меня сейчас, и что стало новым с просмотра?"),
     "/research": ("Исследования", "Что мы проверяем / что знаем / что мне решать?"),
     "/operations": (
         "Операции",
@@ -131,7 +131,10 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 self.assertIn("WHY_NOW", home)
                 self.assertIn("NEXT_SAFE_ACTION", home)
                 self.assertIn("COMMISSIONING_PACKET_SCIENTIFIC_HINT_NOT_ALPHA", home)
-                self.assertIn("git_archaeology_required=", home)
+                self.assertIn("git_archaeology_required", home)
+                self.assertIn("MARK_REVIEWED", home)
+                self.assertIn("Требует внимания", home)
+                self.assertIn("Полнота источников", home)
                 self.assertIn("Factory v1", home)
                 self.assertIn("Почему сейчас", home)
                 research = pages["/research"]

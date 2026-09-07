@@ -5,7 +5,7 @@ projection_kind: DERIVED_REFERENCE_ONLY
 truth_owner: CATALOG_REFERENCES
 authority_granted: false
 limits:
-  max_routes: 12
+  max_routes: 13
   max_root_bindings_per_route: 2
   max_root_assets_per_route: 3
   max_query_recipes_per_route: 4
@@ -278,10 +278,12 @@ routes:
     owner_questions:
       - Am I authorized to call, deploy or spend?
       - May I merge?
+      - May this PR merge?
       - Where is authority decided?
       - Where does authority come from?
       - могу ли я вызвать провайдера / задеплоить / потратить
       - May I activate/deploy/spend?
+      - What is OWNER_ATTENTION_GATE_V2?
     search_terms:
       - authority
       - owner attention
@@ -294,6 +296,8 @@ routes:
       - activate
       - deploy
       - spend
+      - OWNER_ATTENTION_GATE_V2
+      - PR merge
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids: []
     root_asset_ids:
@@ -303,7 +307,7 @@ routes:
     status_plane: AUTHORITY
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: EXCLUDE
-    related_route_ids: [SEM-PROVIDER-ROUTES, SEM-PRODUCT-STATE, SEM-VISUAL-OPERATING-SYSTEM]
+    related_route_ids: [SEM-PROVIDER-ROUTES, SEM-PRODUCT-STATE, SEM-VISUAL-OPERATING-SYSTEM, SEM-OWNER-DAILY-ATTENTION]
 
   - semantic_route_id: SEM-VISUAL-OPERATING-SYSTEM
     purpose: Canonical SMIAL Visual Operating System for owner-facing presentation. Reference-only; never grants authority or owns domain state.
@@ -359,6 +363,7 @@ routes:
       - Почему эта стратегия вообще существует и каким evidence она разрешена?
       - что сейчас исследуется?
       - что уже проверяли?
+      - What have we tested?
     search_terms:
       - owner lifecycle
       - lifecycle projection
@@ -388,4 +393,43 @@ routes:
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: EXCLUDE
-    related_route_ids: [SEM-PRIOR-WORK, SEM-EXPERIMENT-CAPABILITIES, SEM-PRODUCT-STATE]
+    related_route_ids: [SEM-PRIOR-WORK, SEM-EXPERIMENT-CAPABILITIES, SEM-PRODUCT-STATE, SEM-OWNER-DAILY-ATTENTION]
+
+  - semantic_route_id: SEM-OWNER-DAILY-ATTENTION
+    purpose: >-
+      What needs Petr now, what changed since the last HOME review, and
+      whether he can do nothing. Composes Research, Operations and System
+      source-local attention. Not OWNER_ATTENTION_GATE_V2 merge authority.
+    owner_questions:
+      - What needs my attention today?
+      - What changed since I reviewed Factory?
+      - Что мне нужно посмотреть сегодня?
+      - What needs Petr today?
+      - Что реально требует внимания сейчас?
+    search_terms:
+      - daily attention
+      - change feed
+      - needs my attention today
+      - changed since I reviewed
+      - review checkpoint
+      - OWNER_ATTENTION_AND_CHANGE_FEED
+      - SEM-OWNER-DAILY-ATTENTION
+      - посмотреть сегодня
+      - требует меня сейчас
+      - NEW SINCE REVIEW
+      - MARK_REVIEWED
+      - HOME attention
+      - What needs Petr today
+      - ежедневное внимание
+      - owner review cursor
+      - since I reviewed Factory
+    consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+    root_binding_ids: [ACTIVE-OWNER-DAILY-ATTENTION]
+    root_asset_ids:
+      - DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001
+      - MODULE-OWNER-DAILY-ATTENTION-001
+    query_recipe_ids: []
+    status_plane: MIXED
+    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    forge_visibility: EXCLUDE
+    related_route_ids: [SEM-OWNER-LIFECYCLE, SEM-AUTHORITY-BOUNDARIES, SEM-VISUAL-OPERATING-SYSTEM]
