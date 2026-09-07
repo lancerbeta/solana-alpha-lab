@@ -272,3 +272,18 @@ queries:
 - query_id: SGQ-ANTI-RESTART-OR-DEPLOY
   query: May I restart or deploy?
   required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-OWNER-ECON-PAPER-RESULT
+  query: What is the PAPER economic result for this StrategyVersion?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-ECON-NETRETURN
+  query: Это NetReturn?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-ECON-FCF
+  query: Это owner FCF?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-ECON-PAPER-SHADOW-SUM
+  query: Можно ли складывать PAPER и SHADOW?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-ECON-MAX-OPEN
+  query: Достигнут ли max_open_positions?
+  required_top_route: SEM-OWNER-LIFECYCLE

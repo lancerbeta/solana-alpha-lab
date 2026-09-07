@@ -11,9 +11,9 @@ import yaml
 
 from solana_alpha_lab.factory.paper_plane import PaperPlaneError
 from solana_alpha_lab.factory.paper_shadow_operations import (
-    build_economics_projection,
     build_operations_projection,
 )
+from solana_alpha_lab.factory.risk_economics import compose_risk_economics
 
 SCHEMA = "smial.trading-operations-workbench"
 STRATEGY_ROOT = "configs/strategies"
@@ -530,7 +530,9 @@ def compose_trading_operations(
         )
     try:
         operations = build_operations_projection(store)
-        economics = build_economics_projection(store, operations=operations)
+        economics = compose_risk_economics(
+            root, store, source_status="PRESENT", operations=operations
+        )
         contexts, activation_attention = _contexts(git_strategies, operations)
         traces = _build_traces(store)
         recent = list(reversed(store.execution_events()[-12:]))

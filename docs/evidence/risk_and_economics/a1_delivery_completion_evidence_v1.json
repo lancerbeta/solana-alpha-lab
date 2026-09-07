@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "RISK-AND-ECONOMICS-COMPLETION-001",
+  "as_of": "2026-09-07",
+  "task_id": "RISK_AND_ECONOMICS_V1",
+  "state_change": "RISK_AND_ECONOMICS_V1_READY_FOR_MERGE",
+  "base_main": "b403c4df836615a68c79453e4c7ba785e5f2e33b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/risk_and_economics/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_RISK_AND_ECONOMICS_V1",
+    "independent_review": {
+      "path": "docs/evidence/risk_and_economics/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_LIVE_PNL",
+    "NO_OWNER_FCF",
+    "NO_LIVE_CAPITAL",
+    "NO_CAPACITY_CLAIM",
+    "NO_PROMOTION",
+    "NO_REAL_MONEY",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

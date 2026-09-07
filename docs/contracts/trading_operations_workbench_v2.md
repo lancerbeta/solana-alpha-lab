@@ -2,7 +2,8 @@
 
 Owner-facing composition of existing PAPER/SHADOW operations. Does not own
 StrategyVersion meaning, PaperPlane state machine, science handoff, Visual
-OS, System runbooks, or future Risk/Economics contracts.
+OS, System runbooks, or owner economics interpretation
+(`RISK_AND_ECONOMICS_V1` owns `/economics`).
 
 Catalog document: `DOC-TRADING-OPERATIONS-WORKBENCH-001`
 Semantic route: `SEM-OWNER-LIFECYCLE` (existing; no new route)

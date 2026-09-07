@@ -689,56 +689,195 @@ def _operations_section(model: dict[str, Any]) -> str:
     )
 
 
-def _economics_section(model: dict[str, Any]) -> str:
-    eco = model.get("economics") if isinstance(model.get("economics"), dict) else {}
-    non_claims = eco.get("non_claims") if isinstance(eco.get("non_claims"), list) else []
-    pnl_status = str(eco.get("reconciled_net_pnl_status") or "UNKNOWN")
-    pnl_value = eco.get("reconciled_net_pnl_usd")
-    pnl_unknown = pnl_value is None or pnl_status in {"UNKNOWN", "EMPTY"}
-    pnl_html = (
-        dual("неизвестно", "UNKNOWN", unknown=True) if pnl_unknown else esc(pnl_value)
+def _eco_money(value: Any) -> str:
+    if value is None or value == "":
+        return dual("неизвестно", "UNKNOWN", unknown=True)
+    return esc(value)
+
+
+def _scope_card(scope: Mapping[str, Any], *, mark: bool = False) -> str:
+    evidence = scope.get("mark_evidence_class" if mark else "pnl_evidence_class")
+    net_key = (
+        "unrealized_net_after_modeled_fees_usd"
+        if mark
+        else "realized_net_after_modeled_fees_usd"
     )
-    evidence = eco.get("pnl_by_evidence_class")
-    all_unknown = pnl_unknown and eco.get("known_open_exposure_usd") is None
-    banner = (
-        f"<p class=\"semantic-unknown\">{esc(surface_copy('ECONOMICS', 'all_unknown'))}</p>"
-        if all_unknown
-        else ""
+    identity = (
+        f"{esc(scope.get('strategy_id'))}@{esc(scope.get('strategy_version'))} "
+        f"{canon(scope.get('mode'))}"
     )
-    return (
-        banner
+    known_key = "open_mark_known_count" if mark else "reconciled_count_known"
+    unknown_key = (
+        "open_mark_unknown_count" if mark else "reconciled_count_unknown_or_conflict"
+    )
+    body = (
+        f"<h3>{identity}</h3>"
         + fact_strip(
             [
-                (surface_copy("ECONOMICS", "pnl"), pnl_html),
+                (surface_copy("ECONOMICS", "evidence"), canon(evidence)),
+                (surface_copy("ECONOMICS", "status"), canon(scope.get("status"))),
                 (
-                    surface_copy("ECONOMICS", "evidence"),
-                    dual("неизвестно", "UNKNOWN", unknown=True)
-                    if not evidence
-                    else canon(evidence),
+                    surface_copy("ECONOMICS", "marked_net" if mark else "net"),
+                    _eco_money(scope.get(net_key)),
                 ),
-                (surface_copy("ECONOMICS", "known_count"), cell_html(eco.get("pnl_known_count"))),
+                (surface_copy("ECONOMICS", "known_count"), cell_html(scope.get(known_key))),
                 (
                     surface_copy("ECONOMICS", "unknown_count"),
-                    cell_html(eco.get("pnl_unknown_count")),
-                ),
-                (
-                    surface_copy("ECONOMICS", "exposure"),
-                    dual("неизвестно", "UNKNOWN", unknown=True)
-                    if eco.get("known_open_exposure_usd") is None
-                    else esc(eco.get("known_open_exposure_usd")),
-                ),
-                (
-                    surface_copy("ECONOMICS", "streak"),
-                    f"{cell_html(eco.get('current_loss_streak_count'))} {canon(eco.get('current_loss_streak_status'))}",
-                ),
-                (
-                    surface_copy("ECONOMICS", "drawdown"),
-                    dual("неизвестно", "UNKNOWN", unknown=True)
-                    if eco.get("max_drawdown_usd") is None
-                    else esc(eco.get("max_drawdown_usd")),
+                    cell_html(scope.get(unknown_key)),
                 ),
             ]
         )
+    )
+    if mark:
+        sample = (scope.get("rows") or [{}])[0]
+        body += fact_strip(
+            [
+                (surface_copy("ECONOMICS", "mark_as_of"), cell_html(sample.get("mark_as_of"))),
+                (
+                    surface_copy("ECONOMICS", "mark_age"),
+                    cell_html(sample.get("mark_age_seconds")),
+                ),
+                (
+                    surface_copy("ECONOMICS", "freshness"),
+                    canon(scope.get("mark_freshness_policy") or "NOT_DEFINED"),
+                ),
+                (surface_copy("ECONOMICS", "settled"), canon("NOT_SETTLED")),
+            ]
+        )
+        return body
+    drawdown = scope.get("drawdown") if isinstance(scope.get("drawdown"), dict) else {}
+    streak = scope.get("loss_streak") if isinstance(scope.get("loss_streak"), dict) else {}
+    body += fact_strip(
+        [
+            (
+                surface_copy("ECONOMICS", "fee_coverage"),
+                canon(scope.get("modeled_fee_coverage")),
+            ),
+            (
+                surface_copy("ECONOMICS", "drawdown"),
+                _eco_money(drawdown.get("usd")) + " " + canon(drawdown.get("status")),
+            ),
+            (
+                surface_copy("ECONOMICS", "streak"),
+                f"{cell_html(streak.get('count'))} " + canon(streak.get("status")),
+            ),
+        ]
+    )
+    return body
+
+
+def _economics_section(model: dict[str, Any]) -> str:
+    eco = model.get("economics") if isinstance(model.get("economics"), dict) else {}
+    non_claims = eco.get("non_claims") if isinstance(eco.get("non_claims"), list) else []
+    source = str(eco.get("source_status") or "UNKNOWN")
+    mixed = bool(eco.get("mixed_evidence"))
+    reconciled = list(eco.get("reconciled_scopes") or [])
+    marks = list(eco.get("open_mark_scopes") or [])
+    risk = list(eco.get("declared_risk_scopes") or [])
+    coverage = eco.get("coverage") if isinstance(eco.get("coverage"), dict) else {}
+    next_action = str(eco.get("next_safe_action") or "")
+    next_gloss, next_canon, _unknown = token_gloss(NEXT_ACTION_GLOSS, next_action)
+    all_unknown = source in {"SOURCE_NOT_PRESENT", "SOURCE_UNAVAILABLE", "NOT_PRESENT"}
+    banner = ""
+    if all_unknown:
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('ECONOMICS', 'all_unknown'))}</p>"
+        )
+    elif mixed:
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('ECONOMICS', 'mixed'))} "
+            f"{canon('MIXED_EVIDENCE_NOT_AGGREGATED')}</p>"
+        )
+    risk_html = ""
+    for scope in risk:
+        risk_html += fact_strip(
+            [
+                (
+                    surface_copy("ECONOMICS", "entry_limit"),
+                    f"{cell_html(scope.get('entry_admission_risk_count'))} / "
+                    f"{cell_html(scope.get('max_open_positions'))} "
+                    + canon(scope.get("entry_admission_status")),
+                ),
+                (
+                    surface_copy("ECONOMICS", "headroom"),
+                    cell_html(scope.get("remaining_entry_slots")),
+                ),
+            ]
+        )
+        if scope.get("unresolved_or_exit_inventory"):
+            risk_html += (
+                f"<p>{esc(surface_copy('ECONOMICS', 'inventory_ops'))} "
+                f'<a href="/operations">{esc(surface_copy("ECONOMICS", "open_operations"))}</a></p>'
+            )
+    other_limits = ""
+    if risk:
+        other_limits = fact_strip(
+            [
+                (surface_copy("ECONOMICS", "daily_loss"), canon("NOT_DEFINED")),
+                (surface_copy("ECONOMICS", "capital_limit"), canon("NOT_DEFINED")),
+                (surface_copy("ECONOMICS", "dd_limit"), canon("NOT_DEFINED")),
+                (surface_copy("ECONOMICS", "capacity"), canon("NOT_DEFINED")),
+            ]
+        )
+    recon_html = (
+        "".join(_scope_card(scope) for scope in reconciled)
+        if reconciled
+        else f"<p class=\"empty\">{esc(surface_copy('ECONOMICS', 'no_reconciled'))}</p>"
+    )
+    mark_html = (
+        "".join(_scope_card(scope, mark=True) for scope in marks)
+        if marks
+        else f"<p class=\"empty\">{esc(surface_copy('ECONOMICS', 'no_marks'))}</p>"
+    )
+    headline = (
+        canon("MIXED_EVIDENCE_NOT_AGGREGATED")
+        if mixed
+        else _eco_money(eco.get("reconciled_net_pnl_usd"))
+    )
+    return (
+        banner
+        + f"<h2>{esc(surface_copy('ECONOMICS', 'proven'))}</h2>"
+        + fact_strip(
+            [
+                (surface_copy("ECONOMICS", "state"), canon(eco.get("evidence_state"))),
+                (surface_copy("ECONOMICS", "pnl"), headline),
+                (
+                    surface_copy("ECONOMICS", "known_count"),
+                    cell_html(coverage.get("reconciled_count_known")),
+                ),
+                (
+                    surface_copy("ECONOMICS", "unknown_count"),
+                    cell_html(coverage.get("reconciled_count_unknown_or_conflict")),
+                ),
+                (surface_copy("ECONOMICS", "fcf"), canon(eco.get("owner_fcf_status"))),
+                (surface_copy("ECONOMICS", "netreturn"), canon(eco.get("netreturn_status"))),
+            ]
+        )
+        + f"<h2>{esc(surface_copy('ECONOMICS', 'reconciled'))}</h2>"
+        + recon_html
+        + f"<h2>{esc(surface_copy('ECONOMICS', 'open_mark'))}</h2>"
+        + f"<p>{esc(surface_copy('ECONOMICS', 'mark_subordinate'))}</p>"
+        + mark_html
+        + f"<h2>{esc(surface_copy('ECONOMICS', 'declared_risk'))}</h2>"
+        + (risk_html or f"<p class=\"empty\">{esc(surface_copy('ECONOMICS', 'no_risk'))}</p>")
+        + other_limits
+        + f"<h2>{esc(surface_copy('ECONOMICS', 'coverage_h'))}</h2>"
+        + fact_strip(
+            [
+                (
+                    surface_copy("ECONOMICS", "real_cost"),
+                    canon(eco.get("total_real_trading_cost")),
+                ),
+                (
+                    surface_copy("ECONOMICS", "freshness"),
+                    canon(eco.get("mark_freshness_policy")),
+                ),
+            ]
+        )
+        + f"<h2>{esc(surface_copy('ECONOMICS', 'not_included'))}</h2>"
+        + f"<p>{esc(surface_copy('ECONOMICS', 'not_included_body'))}</p>"
+        + f"<h2>{esc(surface_copy('ECONOMICS', 'next'))}</h2>"
+        + f"<p>{esc(next_gloss)} {canon(next_canon or next_action)}</p>"
         + f"<p class=\"non-claims\">{esc(surface_copy('ECONOMICS', 'non_claims'))}: "
         + " · ".join(canon(item) for item in non_claims)
         + "</p>"
@@ -747,20 +886,22 @@ def _economics_section(model: dict[str, Any]) -> str:
             f"<p>{esc(surface_copy('ECONOMICS', 'model'))}</p><table>"
             + mapping_rows(
                 {
+                    "schema": eco.get("schema"),
+                    "evidence_state": eco.get("evidence_state"),
+                    "source_status": eco.get("source_status"),
                     "reconciled_net_pnl_usd": eco.get("reconciled_net_pnl_usd"),
                     "reconciled_net_pnl_status": eco.get("reconciled_net_pnl_status"),
-                    "pnl_known_count": eco.get("pnl_known_count"),
-                    "pnl_unknown_count": eco.get("pnl_unknown_count"),
-                    "known_open_exposure_usd": eco.get("known_open_exposure_usd"),
-                    "known_open_exposure_status": eco.get("known_open_exposure_status"),
-                    "current_loss_streak_status": eco.get("current_loss_streak_status"),
-                    "current_loss_streak_count": eco.get("current_loss_streak_count"),
-                    "max_drawdown_usd": eco.get("max_drawdown_usd"),
-                    "max_drawdown_status": eco.get("max_drawdown_status"),
-                    "pnl_by_evidence_class": eco.get("pnl_by_evidence_class"),
+                    "mixed_evidence": eco.get("mixed_evidence"),
+                    "netreturn_status": eco.get("netreturn_status"),
+                    "owner_fcf_status": eco.get("owner_fcf_status"),
+                    "total_real_trading_cost": eco.get("total_real_trading_cost"),
+                    "mark_freshness_policy": eco.get("mark_freshness_policy"),
+                    "next_safe_action": eco.get("next_safe_action"),
+                    "coverage": coverage,
                 }
             )
-            + "</table>"
+            + "</table>",
+            title=surface_copy("ECONOMICS", "machine"),
         )
     )
 

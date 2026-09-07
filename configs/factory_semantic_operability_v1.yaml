@@ -355,8 +355,9 @@ routes:
     purpose: >-
       Derived LifecycleProjectionV1 index plus Research Workbench, experiment
       evidence, StrategyVersion-to-bot lineage, SignalDecision traces, unresolved
-      positions and pause PAPER entries. Distinguishes Git definition from runtime
-      readback. Not source truth, not live health, grants no authority.
+      positions, pause PAPER entries, and PAPER/SHADOW economic interpretation.
+      Distinguishes Git definition from runtime readback. Not source truth, not
+      NetReturn or owner FCF, not live health, grants no authority.
     owner_questions:
       - What lifecycle objects currently exist?
       - How are hypothesis, experiment, strategy and position connected?
@@ -377,12 +378,12 @@ routes:
       - StrategyVersion
       - SignalDecision
       - unresolved positions
-      - tested
+      - PAPER economics
+      - max_open_positions
       - где каноническая карта lifecycle
       - как связаны гипотеза эксперимент стратегия и позиция
       - покажи evidence эксперимента
       - чего не хватает для решения
-      - experiment evidence
       - Research Workbench
       - what evidence is missing
       - why was this experiment rejected
