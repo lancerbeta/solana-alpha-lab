@@ -256,8 +256,19 @@ def _build_traces(store: Any) -> list[dict[str, Any]]:
             "EXIT",
             "RECONCILIATION",
         }
-        if stage in position_backed and not _text(event.get("position_id")):
-            stage = None
+        if stage in position_backed:
+            pid = _text(event.get("position_id"))
+            event_sig = _text(payload.get("signal_decision_id"))
+            pos_sig = _text(position.get("signal_decision_id")) if position else ""
+            bucket_sig = _text(bucket.get("signal_decision_id"))
+            if not pid or position is None:
+                stage = None
+            elif event_sig and pos_sig and event_sig != pos_sig:
+                bucket["blocker"] = bucket.get("blocker") or "SIGNAL_TRACE_GAP"
+                stage = None
+            elif bucket_sig and pos_sig and bucket_sig != pos_sig:
+                bucket["blocker"] = bucket.get("blocker") or "SIGNAL_TRACE_GAP"
+                stage = None
         if stage:
             decision = payload.get("decision")
             if stage == "PRE_TRADE_RISK" and decision not in {None, "ALLOW"}:

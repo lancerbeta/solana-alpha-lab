@@ -614,14 +614,19 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
             app = FactoryApplication(root=root, paper_plane_store=paper)
             try:
                 ops = app.read_model()["operations"]
+                trading = app.read_model()["trading_operations"]
                 bots = [str(row["bot_instance_id"]) for row in ops["bots"]]
                 self.assertEqual(len(bots), 2)
+                self.assertIsNone(ops.get("entries_paused"))
                 hashes = ops["open_position_set_sha256_by_bot"]
                 self.assertNotEqual(hashes[bots[0]], hashes[bots[1]])
                 self.assertNotEqual(hashes[bots[0]], ops["open_position_set_sha256"])
                 body = _get(app, "/operations")
                 self.assertIn(f"open_set.{bots[0]}", body)
                 self.assertIn(f"open_set.{bots[1]}", body)
+                ctx = next(row for row in trading["contexts"] if row.get("bot_instance_id"))
+                self.assertIn("open_positions", ctx)
+                self.assertIn("partial_positions", ctx)
                 bot_a = str(paper.get_position(first)["bot_instance_id"])
                 stale = app.apply_paper_operator_command(
                     {

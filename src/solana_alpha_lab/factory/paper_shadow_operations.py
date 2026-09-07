@@ -358,7 +358,7 @@ def build_operations_projection(
         "bot": bot.get("bot_instance_id") if bot else None,
         "mode": bot.get("mode") if bot else None,
         "status": bot.get("status") if bot else None,
-        "entries_paused": bool(int(bot.get("entries_paused") or 0)) if bot else False,
+        "entries_paused": bool(int(bot.get("entries_paused") or 0)) if bot else None,
         "bots": bots,
         "open_positions": sum(1 for p in positions if str(p["state"]) in OPEN_LIKE),
         "partial_positions": sum(1 for p in positions if str(p["state"]) == "PARTIAL"),
