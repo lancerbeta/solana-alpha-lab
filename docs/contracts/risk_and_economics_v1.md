@@ -129,8 +129,11 @@ Do not classify FRESH / STALE / EXPIRED. Missing `mark_as_of` →
 
 Drawdown is `RECONCILED_MODEL_PNL_DRAWDOWN_USD` over cumulative
 chronological reconciled model PnL from zero — not account/equity/cash
-drawdown. Any UNKNOWN/conflict that can affect the path → numeric null,
-status UNKNOWN. No skip-and-calculate subset.
+drawdown. Event time is an aware UTC instant (`Z` or `+00:00`). Naive ISO,
+non-UTC offsets, empty or unparseable `closed_at`, or any
+UNKNOWN/conflict that can affect the path → numeric null, status UNKNOWN.
+The path is walked in UTC-instant order, not string order. No
+skip-and-calculate subset.
 
 Loss streak: exact or UNKNOWN. Trailing known losses that hit UNKNOWN
 before a known non-loss or fully-known start → count null.

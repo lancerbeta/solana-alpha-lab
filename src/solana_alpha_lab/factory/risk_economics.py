@@ -68,10 +68,19 @@ def _money(value: Decimal | None) -> str | None:
 
 
 def _parse_utc(value: str) -> datetime | None:
+    raw = str(value or "").strip()
+    if not raw:
+        return None
     try:
-        return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+        parsed = datetime.fromisoformat(raw.replace("Z", "+00:00"))
     except (TypeError, ValueError):
         return None
+    if parsed.tzinfo is None:
+        return None
+    offset = parsed.utcoffset()
+    if offset is None or offset.total_seconds() != 0:
+        return None
+    return parsed.astimezone(UTC)
 
 
 def strategy_version_label_from_bot(bot: Mapping[str, Any]) -> str | None:
@@ -270,19 +279,27 @@ def _fee_coverage(rows: list[dict[str, Any]]) -> str:
     return "COMPLETE" if complete else "PARTIAL"
 
 
-def _chronology_known(rows: list[dict[str, Any]]) -> bool:
-    return all(_parse_utc(str(row.get("closed_at") or "")) is not None for row in rows)
+def _path_ordered(rows: list[dict[str, Any]]) -> list[dict[str, Any]] | None:
+    keyed: list[tuple[datetime, str, dict[str, Any]]] = []
+    for row in rows:
+        instant = _parse_utc(str(row.get("closed_at") or ""))
+        if instant is None:
+            return None
+        keyed.append((instant, str(row.get("position_id") or ""), row))
+    keyed.sort(key=lambda item: (item[0], item[1]))
+    return [item[2] for item in keyed]
 
 
 def _drawdown(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if not rows:
         return {"usd": None, "status": "EMPTY", "basis": "RECONCILED_MODEL_PNL_DRAWDOWN_USD"}
-    if any(not row.get("trusted") for row in rows) or not _chronology_known(rows):
+    ordered = _path_ordered(rows)
+    if any(not row.get("trusted") for row in rows) or ordered is None:
         return {"usd": None, "status": "UNKNOWN", "basis": "RECONCILED_MODEL_PNL_DRAWDOWN_USD"}
     equity = Decimal("0")
     peak = Decimal("0")
     max_dd = Decimal("0")
-    for row in rows:
+    for row in ordered:
         pnl = _dec(row["realized_net_after_modeled_fees_usd"])
         assert pnl is not None
         equity += pnl
@@ -301,10 +318,11 @@ def _drawdown(rows: list[dict[str, Any]]) -> dict[str, Any]:
 def _loss_streak(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if not rows:
         return {"status": "KNOWN", "count": 0}
-    if not _chronology_known(rows):
+    ordered = _path_ordered(rows)
+    if ordered is None:
         return {"status": "UNKNOWN", "count": None}
     streak = 0
-    for row in reversed(rows):
+    for row in reversed(ordered):
         if not row.get("trusted"):
             return {"status": "UNKNOWN", "count": None}
         pnl = _dec(row["realized_net_after_modeled_fees_usd"])
@@ -598,8 +616,9 @@ def compose_risk_economics(
     ]
     reconciled_rows.sort(
         key=lambda row: (
-            str(row.get("closed_at") or ""),
-            str(row.get("opened_at") or ""),
+            _parse_utc(str(row.get("closed_at") or "")) is None,
+            _parse_utc(str(row.get("closed_at") or ""))
+            or datetime.min.replace(tzinfo=UTC),
             str(row.get("position_id") or ""),
         )
     )

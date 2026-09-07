@@ -36058,7 +36058,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/risk_and_economics_v1.md', repository_path: docs/contracts/risk_and_economics_v1.md}
-  integrity: {kind: sha256, sha256: f3502133eeb8d826be6cddfc29bb46234b3112c5ddcbdf45689b72eee33bb79a}
+  integrity: {kind: sha256, sha256: de7262892fb3de1d948d97e8e6691f2a0eac875d0d2b499743e4adaf9e634677}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
@@ -36078,7 +36078,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/risk_economics.py', repository_path: src/solana_alpha_lab/factory/risk_economics.py}
-  integrity: {kind: sha256, sha256: 14dfbb388197577dea7aef47932fa8ee7c9d1c84598d76939e5e830f630954c9}
+  integrity: {kind: sha256, sha256: 8df490102a10d07960a128f2ec8a7bac568211e94c54c48f1f6fd7a10dd79411}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
@@ -36097,7 +36097,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_risk_and_economics_v1.py', repository_path: tests/test_risk_and_economics_v1.py}
-  integrity: {kind: sha256, sha256: 015d4e79ab48b7175bb585329e15d11e7f26d526ba9210391e2838286385a1dc}
+  integrity: {kind: sha256, sha256: a1cbf2db3d4d9320aaeb063db660c6dd1bcb347e1829370e3be767d19435bb46}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}

@@ -478,10 +478,40 @@ class RiskAndEconomicsV1Tests(unittest.TestCase):
                 streak = projection["reconciled_scopes"][0]["loss_streak"]
                 self.assertEqual(streak["status"], "UNKNOWN")
                 self.assertIsNone(streak["count"])
+                store._conn.execute(
+                    "UPDATE positions SET closed_at = '2026-09-07T10:00:00+05:00' "
+                    "WHERE position_id = ?",
+                    (p1,),
+                )
+                store._conn.execute(
+                    "UPDATE positions SET closed_at = '2026-09-07T10:00:00Z' "
+                    "WHERE position_id = ?",
+                    (p2,),
+                )
+                store._conn.commit()
+                projection = compose_risk_economics(
+                    Path(tmp), store, source_status="PRESENT", as_of=AS_OF
+                )
+                drawdown = projection["reconciled_scopes"][0]["drawdown"]
+                self.assertIsNone(drawdown["usd"])
+                self.assertEqual(drawdown["status"], "UNKNOWN")
+                streak = projection["reconciled_scopes"][0]["loss_streak"]
+                self.assertEqual(streak["status"], "UNKNOWN")
+                self.assertIsNone(streak["count"])
+                store._conn.execute(
+                    "UPDATE positions SET closed_at = '2026-09-07T10:00:00' "
+                    "WHERE position_id = ?",
+                    (p1,),
+                )
+                store._conn.commit()
+                projection = compose_risk_economics(
+                    Path(tmp), store, source_status="PRESENT", as_of=AS_OF
+                )
+                drawdown = projection["reconciled_scopes"][0]["drawdown"]
+                self.assertEqual(drawdown["status"], "UNKNOWN")
+                self.assertIsNone(drawdown["usd"])
             finally:
                 store.close()
-
-    def test_p3_no_reconciled_empty(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
             try:

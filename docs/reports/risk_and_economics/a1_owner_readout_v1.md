@@ -8,7 +8,7 @@ entry-admission limit доказуем, и чего из цифр нельзя �
 
 ```text
 START_WITH_PATCH
-RISK_AND_ECONOMICS_V1_READY_FOR_MERGE
+PRODUCT_FREEZE_PENDING_ARCHITECTURE
 ```
 
 Канонический `DONE` только после exact-head CI, bind-evidence и merge-readiness.
@@ -69,10 +69,11 @@ fees. `MARK_FRESHNESS_POLICY = NOT_DEFINED`. Нет TTL. Legacy rows не
 
 ## PATH METRICS
 
-Drawdown = `RECONCILED_MODEL_PNL_DRAWDOWN_USD` (не equity). Любой
-untrusted/conflict **или** неразборчивый `closed_at` → numeric null /
+Drawdown = `RECONCILED_MODEL_PNL_DRAWDOWN_USD` (не equity). Path требует
+aware UTC instant (`Z` / `+00:00`) и идёт по этому instant, не по строке.
+Пустой, naive или non-UTC `closed_at`, untrusted/conflict → numeric null /
 UNKNOWN. Нет skip-and-calculate. Loss streak exact только при полной
-хронологии; иначе UNKNOWN.
+UTC-хронологии; иначе UNKNOWN.
 
 ## DECLARED RISK
 
