@@ -247,6 +247,66 @@ def _attention(items: list[dict[str, Any]], *, empty: str) -> str:
     return "".join(cards)
 
 
+def _daily_attention(items: list[dict[str, Any]], *, empty: str) -> str:
+    if not items:
+        return f"<p>{esc(empty)}</p>"
+    cards = []
+    for item in items:
+        code = str(item.get("attention_code") or item.get("code") or item.get("id") or "")
+        priority = str(item.get("priority") or "")
+        new_mark = (
+            f"<p class=\"page-note\">{esc(surface_copy('HOME', 'new_since_review'))}</p>"
+            if item.get("new_since_review")
+            else ""
+        )
+        target = str(item.get("drilldown_target") or "")
+        drill = (
+            f"<p><a href=\"{esc(target)}\">{esc(surface_copy('HOME', 'open_source'))}</a></p>"
+            if target
+            else ""
+        )
+        next_action = _next_action_html(_cell(item.get("NEXT_SAFE_ACTION")))
+        cards.append(
+            "<article class=\"attention\">"
+            f"<h3>{esc(priority + ' ' if priority else '')}{canon(code)}</h3>"
+            + new_mark
+            + "<table>"
+            f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
+            f"<td>{esc(_cell(item.get('WHY_NOW')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
+            f"<td>{esc(_cell(item.get('IMPACT')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
+            f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
+            f"<td>{next_action}</td></tr>"
+            "</table>"
+            + drill
+            + "</article>"
+        )
+    return "".join(cards)
+
+
+def _coverage_table(rows: list[dict[str, Any]]) -> str:
+    if not rows:
+        return f"<p>{_token_or_unknown(None)}</p>"
+    body = "".join(
+        "<tr>"
+        f"<td>{esc(str(row.get('source_domain') or ''))}</td>"
+        f"<td>{_token_or_unknown(row.get('CURRENT_STATE'))}</td>"
+        f"<td>{_token_or_unknown(row.get('CHANGE_HISTORY'))}</td>"
+        f"<td><a href=\"{esc(str(row.get('drilldown_target') or ''))}\">"
+        f"{esc(surface_copy('HOME', 'open_source'))}</a></td>"
+        "</tr>"
+        for row in rows
+    )
+    return (
+        "<table><thead><tr><th>source</th><th>CURRENT_STATE</th>"
+        "<th>CHANGE_HISTORY</th><th></th></tr></thead><tbody>"
+        + body
+        + "</tbody></table>"
+    )
+
+
 def _recent_changes(items: list[dict[str, Any]], *, empty: str) -> str:
     if not items:
         return f"<p>{esc(empty)}</p>"
@@ -1333,52 +1393,65 @@ def _home_section(
     cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
     packet = cockpit.get("packet") if isinstance(cockpit.get("packet"), dict) else {}
     runtime = model.get("runtime") if isinstance(model.get("runtime"), dict) else {}
-    attention = list(cockpit.get("attention") or [])
+    daily = model.get("owner_attention") if isinstance(model.get("owner_attention"), dict) else {}
+    current = list(daily.get("current_attention") or [])
+    changed = list(daily.get("changes") or [])
+    info = list(daily.get("info_items") or [])
+    coverage = list(daily.get("coverage") or [])
+    review = daily.get("review") if isinstance(daily.get("review"), dict) else {}
+    snapshot = str(daily.get("review_snapshot_sha256") or "")
     next_actions = []
-    for item in attention:
+    for item in current:
         action = _cell(item.get("NEXT_SAFE_ACTION"))
         if action and action not in next_actions:
             next_actions.append(action)
-    next_html = (
-        "<ul>" + "".join(f"<li>{_next_action_html(item)}</li>" for item in next_actions) + "</ul>"
-        if next_actions
-        else (
-            f"<p>{_next_action_html(str(model.get('next_safe_action')))}</p>"
-            if model.get("next_safe_action")
-            else f"<p>{_token_or_unknown(None)}</p>"
+    if next_actions:
+        next_html = (
+            "<ul>"
+            + "".join(f"<li>{_next_action_html(item)}</li>" for item in next_actions)
+            + "</ul>"
         )
+    elif daily.get("all_clear"):
+        next_html = f"<p>{esc(surface_copy('HOME', 'do_nothing'))}</p>"
+    elif model.get("next_safe_action"):
+        next_html = f"<p>{_next_action_html(str(model.get('next_safe_action')))}</p>"
+    else:
+        next_html = f"<p>{_token_or_unknown(None)}</p>"
+    review_note = ""
+    if review.get("code"):
+        review_note = f"<p class=\"page-note\">{canon(str(review.get('code')))}</p>"
+    mark_form = (
+        "<form method=\"post\" action=\"/\" class=\"control-zone\">"
+        "<input type=\"hidden\" name=\"command\" value=\"MARK_REVIEWED\" />"
+        f"<input type=\"hidden\" name=\"expected_review_snapshot_sha256\" value=\"{esc(snapshot)}\" />"
+        f"<button type=\"submit\">{esc(surface_copy('HOME', 'mark_reviewed'))}</button>"
+        "</form>"
+        if snapshot
+        else ""
     )
-    buttons = "".join(command_button(command) for command in COMMANDS)
+    legend = (
+        "<p class=\"canon\">"
+        f"{canon('WHY_NOW')} {canon('IMPACT')} {canon('EVIDENCE')} "
+        f"{canon('NEXT_SAFE_ACTION')}</p>"
+        f"<p>{esc(attention_label('WHY_NOW'))} · "
+        f"{esc(attention_label('IMPACT'))} · "
+        f"{esc(attention_label('EVIDENCE'))} · "
+        f"{esc(attention_label('NEXT_SAFE_ACTION'))}</p>"
+    )
     return (
         f"<h2>{esc(surface_copy('HOME', 'attention'))}</h2>"
-        + _attention(attention, empty=surface_copy("HOME", "no_attention"))
-        + f"<h2>{esc(surface_copy('HOME', 'known'))}</h2>"
-        + fact_strip(
-            [
-                (
-                    surface_copy("HOME", "health"),
-                    _verdict_html(runtime.get("verdict")),
-                ),
-                (
-                    "git_archaeology_required",
-                    _optional_bool_html(cockpit, "git_archaeology_required"),
-                ),
-                (
-                    surface_copy("SYSTEM", "backup"),
-                    _backup_html(
-                        runtime.get("backup_status") or cockpit.get("backup_status")
-                    ),
-                ),
-                (
-                    surface_copy("SYSTEM", "deployed"),
-                    _token_or_unknown(runtime.get("deploy_version")),
-                ),
-            ]
-        )
+        + legend
+        + _daily_attention(current, empty=surface_copy("HOME", "no_attention"))
+        + f"<h2>{esc(surface_copy('HOME', 'changed'))}</h2>"
+        + review_note
+        + _daily_attention(changed, empty=surface_copy("HOME", "no_changed"))
+        + f"<h2>{esc(surface_copy('HOME', 'info_changes'))}</h2>"
+        + _daily_attention(info, empty=surface_copy("HOME", "no_info"))
+        + f"<h2>{esc(surface_copy('HOME', 'coverage'))}</h2>"
+        + _coverage_table(coverage)
         + f"<h2>{esc(surface_copy('HOME', 'next'))}</h2>"
         + next_html
-        + f"<h2>{esc(surface_copy('HOME', 'cycle_commands'))}</h2>"
-        + f"<form method=\"post\" action=\"/\" class=\"control-zone\">{buttons}</form>"
+        + mark_form
         + (
             f"<h2>{esc(surface_copy('HOME', 'phrase'))}</h2>"
             f"<p class=\"page-note\">{esc(surface_copy('HOME', 'phrase_not_urgent'))}</p>"
@@ -1390,7 +1463,9 @@ def _home_section(
             f"<h3>{esc(surface_copy('HOME', 'packet'))}</h3><table>"
             + _rows(packet)
             + "</table>"
-            + "<h3>Runtime</h3><table>"
+            + "<h3>Runtime</h3>"
+            + f"<p>{_verdict_html(runtime.get('verdict'))}</p>"
+            + "<table>"
             + mapping_rows(runtime)
             + "</table>"
             + "<h3>Cycle</h3><table>"
@@ -1401,6 +1476,7 @@ def _home_section(
                     "blocker": model.get("blocker"),
                     "next_safe_action": model.get("next_safe_action"),
                     "terminal_result": model.get("terminal_result"),
+                    "git_archaeology_required": cockpit.get("git_archaeology_required"),
                 }
             )
             + "</table>"
@@ -1592,18 +1668,12 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             error = ""
             try:
                 if path in {"/", "/index.html"}:
-                    if command == "FREEZE":
-                        app.freeze_hypothesis()
-                    elif command == "START":
-                        app.start()
-                    elif command == "STOP":
-                        app.stop()
-                    elif command == "PARK":
-                        app.park()
-                    elif command == "RECORD_DECISION":
-                        app.record_decision("OWNER_RECORDED_FROM_WORKBENCH")
-                    else:
+                    if command != "MARK_REVIEWED":
                         raise ApplicationError("COMMAND_NOT_ALLOWLISTED")
+                    expected = (fields.get("expected_review_snapshot_sha256") or [""])[0]
+                    result = app.mark_home_reviewed(expected)
+                    if result.get("status") == "STALE_REVIEW_SNAPSHOT":
+                        error = owner_error("STALE_REVIEW_SNAPSHOT")
                     self._render("HOME", error=error)
                     return
                 if path == "/operations":

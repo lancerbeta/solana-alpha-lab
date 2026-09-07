@@ -580,7 +580,7 @@ class OwnerLifecycleProjectionSpineTests(unittest.TestCase):
             bindings["ACTIVE-OWNER-LIFECYCLE-PROJECTION"]["target_asset_id"],
             "CONFIG-OWNER-LIFECYCLE-PROJECTION-001",
         )
-        self.assertLessEqual(len(bindings), 12)
+        self.assertLessEqual(len(bindings), 13)
         self.assertIn("CONFIG-OWNER-LIFECYCLE-PROJECTION-001", snapshot.assets)
         positives = [
             "What lifecycle objects currently exist?",

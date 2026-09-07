@@ -20,6 +20,15 @@ from solana_alpha_lab.factory.paper_shadow_operations import (
     build_operations_projection,
 )
 from solana_alpha_lab.factory.read_model import project_read_model
+from solana_alpha_lab.factory.owner_daily_attention import (
+    compose_owner_attention,
+    persistable_watermarks,
+)
+from solana_alpha_lab.factory.owner_review_cursor import (
+    load_cursor,
+    persist_cursor,
+    server_now,
+)
 from solana_alpha_lab.factory.trading_operations import compose_trading_operations
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
@@ -668,7 +677,97 @@ class FactoryApplication:
             model["recent_changes"] = []
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
+        if surface in (None, "HOME"):
+            model["owner_attention"] = self._owner_attention(model, trading)
         return model
+
+    def _research_change_records(self) -> tuple[list[dict[str, Any]], str]:
+        store = self.existing_research_store()
+        if store is None:
+            status, _error = self.research_projection_discovery()
+            if status in {"UNAVAILABLE", "INVALID"}:
+                return [], status
+            return [], "NOT_PRESENT"
+        from datetime import timezone
+
+        from solana_alpha_lab.factory.research_store import ResearchStoreError
+
+        rows: list[dict[str, Any]] = []
+        try:
+            for record in store.iter_committed_records():
+                available = record.first_reliable_available_at
+                effective = record.effective_at
+                rows.append(
+                    {
+                        "record_id": record.record_id,
+                        "record_kind": str(record.record_kind),
+                        "first_reliable_available_at": available.astimezone(timezone.utc)
+                        .isoformat()
+                        .replace("+00:00", "Z")
+                        if hasattr(available, "astimezone")
+                        else str(available),
+                        "effective_at": effective.astimezone(timezone.utc)
+                        .isoformat()
+                        .replace("+00:00", "Z")
+                        if hasattr(effective, "astimezone")
+                        else str(effective),
+                    }
+                )
+        except ResearchStoreError:
+            return [], "UNAVAILABLE"
+        return rows, "AVAILABLE"
+
+    def _owner_attention(
+        self, model: Mapping[str, Any], trading: Mapping[str, Any]
+    ) -> dict[str, Any]:
+        cursor_state = load_cursor(self.root)
+        discovery, _error = self.research_projection_discovery()
+        try:
+            research_view = self.research_overview()
+        except Exception:
+            research_view = {
+                "completeness": "UNAVAILABLE",
+                "sources": [],
+                "needs_attention": [],
+            }
+        records, records_status = self._research_change_records()
+        return compose_owner_attention(
+            research=research_view,
+            trading=trading,
+            runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
+            cockpit=model.get("cockpit") if isinstance(model.get("cockpit"), dict) else None,
+            research_records=records,
+            research_records_status=records_status if records_status in {"UNAVAILABLE", "INVALID"} else None,
+            research_discovery=discovery,
+            cursor=cursor_state.get("cursor"),
+            cursor_status=str(cursor_state.get("status") or "MISSING"),
+        )
+
+    def mark_home_reviewed(self, expected_snapshot_sha256: str) -> dict[str, Any]:
+        expected = str(expected_snapshot_sha256 or "")
+        model = self.read_model(surface="HOME")
+        attention = model.get("owner_attention")
+        if not isinstance(attention, dict):
+            raise ApplicationError("REVIEW_SNAPSHOT_UNAVAILABLE")
+        live = str(attention.get("review_snapshot_sha256") or "")
+        if live != expected or len(expected) != 64:
+            return {"status": "STALE_REVIEW_SNAPSHOT", "side_effects": 0}
+        loaded = load_cursor(self.root)
+        previous = loaded.get("cursor") if loaded.get("status") == "VALID" else None
+        sources = persistable_watermarks(
+            attention.get("review_snapshot") or {},
+            previous=previous if isinstance(previous, dict) else None,
+            coverage=list(attention.get("coverage") or []),
+        )
+        persist_cursor(
+            self.root,
+            {
+                "reviewed_at": server_now(),
+                "sources": sources,
+                "review_snapshot_sha256": live,
+            },
+        )
+        return {"status": "MARKED", "side_effects": 1}
 
     def freeze_hypothesis(self) -> dict[str, Any]:
         spec = load_experiment_spec(self.root, self.spec_relative)

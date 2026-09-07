@@ -58,8 +58,8 @@ class FactorySemanticOperabilityTests(unittest.TestCase):
         ]
         self.assertEqual(len(route_ids), len(set(route_ids)))
         self.assertGreaterEqual(len(route_ids), 10)
-        self.assertLessEqual(len(route_ids), 12)
-        self.assertLessEqual(len(self.bindings), 12)
+        self.assertLessEqual(len(route_ids), 13)
+        self.assertLessEqual(len(self.bindings), 13)
 
     def test_current_roots_avoid_stale_planes(self) -> None:
         for route in self.projection["routes"]:
@@ -325,7 +325,7 @@ class FactorySemanticOperabilityTests(unittest.TestCase):
 
     def test_machine_packet_and_generated_map_surface(self) -> None:
         routes = self.projection["routes"]
-        self.assertEqual(len(routes), 12)
+        self.assertEqual(len(routes), 13)
         self.assertIs(self.projection["authority_granted"], False)
         map_path = ROOT / "docs/FACTORY_SEMANTIC_MAP.md"
         self.assertTrue(map_path.is_file())
