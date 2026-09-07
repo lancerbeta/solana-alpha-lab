@@ -127,6 +127,24 @@ def _packet(**overrides: object) -> dict[str, object]:
     return base
 
 
+def _match_root(tmp: Path) -> Path:
+    root = tmp / "match"
+    root.mkdir()
+    marker = _init_git_head(root)
+    (root / ".factory_deploy_sha").write_text(marker + "\n", encoding="ascii")
+    return root
+
+
+def _compose_match(root: Path, **packet_overrides: object) -> dict[str, object]:
+    return compose_system_operability(
+        root=root,
+        now=NOW,
+        unit_status=UNITS_OK,
+        collector_packet=_packet(**packet_overrides),
+        environ={},
+    )
+
+
 class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
     def test_a1_fake_process_proof(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -218,24 +236,19 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
 
     def test_a6_deploy_identity_match(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
-            root = Path(tmp) / "match"
-            root.mkdir()
-            marker = _init_git_head(root)
-            (root / ".factory_deploy_sha").write_text(marker + "\n", encoding="ascii")
-            projection = compose_system_operability(
-                root=root,
-                now=NOW,
-                unit_status=UNITS_OK,
-                collector_packet=_packet(),
-                environ={},
-            )
+            root = _match_root(Path(tmp))
+            projection = _compose_match(root)
             self.assertEqual(projection["identity"]["deploy_relation"], "MATCH")
-            self.assertEqual(projection["identity"]["deployed_sha"], marker)
+            self.assertEqual(
+                projection["identity"]["deployed_sha"],
+                (root / ".factory_deploy_sha").read_text(encoding="ascii").strip(),
+            )
             self.assertNotIn(
                 "DEPLOY_IDENTITY_MISMATCH",
                 {item["attention_code"] for item in projection["attention"]},
             )
             self.assertEqual(projection["coverage"]["STORAGE"]["status"], "AVAILABLE")
+            self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "AVAILABLE")
             self.assertEqual(projection["state"], "OK_OBSERVED")
 
     def test_a7_deploy_identity_mismatch(self) -> None:
@@ -574,38 +587,51 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
         self.assertNotEqual(projection["state"], "OK_OBSERVED")
 
     def test_offhost_unknown_blocks_ok_observed(self) -> None:
-        projection = compose_system_operability(
-            root=ROOT,
-            now=NOW,
-            unit_status=UNITS_OK,
-            collector_packet=_packet(offhost_backup_state="UNKNOWN"),
-            environ={},
-        )
-        self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "UNKNOWN")
-        self.assertNotEqual(projection["state"], "OK_OBSERVED")
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            projection = _compose_match(
+                _match_root(Path(tmp)), offhost_backup_state="UNKNOWN"
+            )
+            self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "UNKNOWN")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_archive_unknown_blocks_ok_observed(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            projection = _compose_match(
+                _match_root(Path(tmp)),
+                immutable_archive_latest_verified_day="UNKNOWN",
+            )
+            self.assertEqual(projection["coverage"]["IMMUTABLE_ARCHIVE"]["status"], "UNKNOWN")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_offhost_unconfigured_blocks_ok_observed(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            projection = _compose_match(
+                _match_root(Path(tmp)),
+                health_classes=["PROCESS_OK"],
+                offhost_backup_state="UNCONFIGURED",
+            )
+            self.assertEqual(
+                projection["coverage"]["OFFHOST_BACKUP"]["status"], "NOT_CONFIGURED"
+            )
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_offhost_stale_without_class_is_not_ok_observed(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            projection = _compose_match(
+                _match_root(Path(tmp)),
+                health_classes=["PROCESS_OK"],
+                offhost_backup_state="STALE",
+            )
+            self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "DEGRADED")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
 
     def test_mixed_storage_sentinel_is_not_available(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
-            root = Path(tmp) / "mixed"
-            root.mkdir()
-            marker = _init_git_head(root)
-            (root / ".factory_deploy_sha").write_text(marker + "\n", encoding="ascii")
-            disk_only = compose_system_operability(
-                root=root,
-                now=NOW,
-                unit_status=UNITS_OK,
-                collector_packet=_packet(projected_97d_status="UNKNOWN"),
-                environ={},
-            )
+            root = _match_root(Path(tmp))
+            disk_only = _compose_match(root, projected_97d_status="UNKNOWN")
             self.assertEqual(disk_only["coverage"]["STORAGE"]["status"], "UNKNOWN")
             self.assertNotEqual(disk_only["state"], "OK_OBSERVED")
-            runway_only = compose_system_operability(
-                root=root,
-                now=NOW,
-                unit_status=UNITS_OK,
-                collector_packet=_packet(filesystem_disk_used_pct="UNKNOWN"),
-                environ={},
-            )
+            runway_only = _compose_match(root, filesystem_disk_used_pct="UNKNOWN")
             self.assertEqual(runway_only["coverage"]["STORAGE"]["status"], "UNKNOWN")
             self.assertNotEqual(runway_only["state"], "OK_OBSERVED")
 

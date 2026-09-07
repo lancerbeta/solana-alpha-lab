@@ -426,15 +426,6 @@ def _rollup_state(
     }
     if codes & action_codes or collector_verdict == "ACTION_REQUIRED":
         return "ACTION_REQUIRED"
-    if codes or collector_verdict == "DEGRADED":
-        return "DEGRADED"
-    blocked = {
-        "UNAVAILABLE",
-        "NOT_PRESENT",
-        "INVALID",
-        "PARTIAL",
-        "UNKNOWN",
-    }
     material = (
         "SYSTEMD",
         "COLLECTOR",
@@ -445,7 +436,24 @@ def _rollup_state(
         "IMMUTABLE_ARCHIVE",
         "DEPLOY_IDENTITY",
     )
-    if any(str(coverage.get(name, {}).get("status")) in blocked for name in material):
+    statuses = [str(coverage.get(name, {}).get("status") or "") for name in material]
+    if any(status == "ACTION_REQUIRED" for status in statuses):
+        return "ACTION_REQUIRED"
+    if (
+        codes
+        or collector_verdict == "DEGRADED"
+        or any(status == "DEGRADED" for status in statuses)
+    ):
+        return "DEGRADED"
+    blocked = {
+        "UNAVAILABLE",
+        "NOT_PRESENT",
+        "INVALID",
+        "PARTIAL",
+        "UNKNOWN",
+        "NOT_CONFIGURED",
+    }
+    if any(status in blocked for status in statuses):
         return "UNKNOWN"
     return "OK_OBSERVED"
 
