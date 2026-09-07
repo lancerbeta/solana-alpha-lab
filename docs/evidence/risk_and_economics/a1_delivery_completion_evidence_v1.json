@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "9a1195f1f949b00eb228044e4f2629d96ad5b3f18d04055212a570bc60c8d9fa",
+    "catalog/assets/core.yaml": "8ad346118293b1036e01f09c302fbe8a45b01363b188776872e00bb9130c179f",
     "catalog/assets/lifecycle.yaml": "dd7bfe36806bbd24dcf2a211da5c40b5e8d50959b4bf1e314f33f3b8ba006aae",
     "catalog/catalog_manifest.yaml": "48cff0d98eb71492e1abc1ed59047276c8222fd67fedf9da08bce0e964b937b3",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "e6b0712107ca9a5a907efad5e4080b5f94c54d3c6de63bdbb62a0626123e0257",
@@ -22,7 +22,7 @@
     "docs/contracts/risk_and_economics_v1.md": "de7262892fb3de1d948d97e8e6691f2a0eac875d0d2b499743e4adaf9e634677",
     "docs/contracts/trading_operations_workbench_v2.md": "788517fe53c05f36c495789355f05418488c15632b8574ccf600a552ecfb0289",
     "docs/reports/risk_and_economics/a1_owner_readout_v1.md": "90568079e845ddca9c9847e2d65f1ed69a8a8596b6bd20e7953e1cc800f9bb25",
-    "docs/tasks/RISK_AND_ECONOMICS_V1.md": "9a97b985624c80e66c2db40405c1e04d9adaf0cfce9e3745287ebcc66be35cb6",
+    "docs/tasks/RISK_AND_ECONOMICS_V1.md": "1585883db390056f1ca75f1b22472835cb5872f6fe7a39b6e57054b4551d6d44",
     "src/solana_alpha_lab/factory/application.py": "7b444be99fd25bed29d1a2e8b33d87ae428fa4fd447ad74a1553d752bced6c8f",
     "src/solana_alpha_lab/factory/owner_language.py": "98a552b458e26ae9d308a7d0ff835c46deb2b133cd419226d85c819e13badd4c",
     "src/solana_alpha_lab/factory/paper_plane.py": "c5d115a99f9dc4406c637740ed21aa71144bb4c2f83947c800dd740aea8a14e8",
@@ -44,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/risk_and_economics/a1_delivery_factory_fit_v1.json",
-    "sha256": "3272c0a1587710c46a88bb9eee61a239d3a222d7b905856bd369701ae79906a5",
+    "sha256": "e9fb9af7cfbf61acbd7cb5d52d86bc6547a0305192f16770dbb54f7677311679",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_RISK_AND_ECONOMICS_V1",
     "independent_review": {
       "path": "docs/evidence/risk_and_economics/a1_delivery_independent_review_v1.json",
-      "sha256": "ecbcaf79879db2d82ef637be7b3205b8f3752964a2a05c7a794aa19b0ca32e8c",
+      "sha256": "b0e83656183c231828f0657095321c2639e3aadcee07f79e6ae0ca50de5fa8e8",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

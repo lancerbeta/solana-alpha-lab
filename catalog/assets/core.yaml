@@ -27662,7 +27662,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: e20dc9ced28bdcbdc4eee2595914a0504a25019a3178a7d7f5e737059207a780}
+  integrity: {kind: sha256, sha256: 918afd055d8f3ec9f5fdb91c7c3b0a5adf6ad1bcdb20c0f9c9242967a073bb0c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -36036,7 +36036,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: RISK_AND_ECONOMICS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/RISK_AND_ECONOMICS_V1.md', repository_path: docs/tasks/RISK_AND_ECONOMICS_V1.md}
-  integrity: {kind: sha256, sha256: 9a97b985624c80e66c2db40405c1e04d9adaf0cfce9e3745287ebcc66be35cb6}
+  integrity: {kind: sha256, sha256: 1585883db390056f1ca75f1b22472835cb5872f6fe7a39b6e57054b4551d6d44}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-RISK-AND-ECONOMICS-001}
