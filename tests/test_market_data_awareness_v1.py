@@ -737,6 +737,50 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertIn("Что это не означает", html)
         self.assertIn("Ликвидность", html)
 
+    def test_get_market_shows_observed_relative_state(self) -> None:
+        from solana_alpha_lab.factory.market_context import git_data_capability
+
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        for hours in range(2, 14):
+            rows.append(
+                _obs(
+                    f"hist{hours}",
+                    "Y1800",
+                    AS_OF - timedelta(hours=hours),
+                    {"FIELD-LIQUIDITY-USD-001": 100},
+                )
+            )
+        projection = project_market_context(
+            self.definition, _bundle(self.definition, rows), as_of=AS_OF
+        )
+        self.assertEqual(
+            _cell(projection, "Y1800", "LIQUIDITY_LEVEL")["relative_state"],
+            "HIGH_RELATIVE",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = isolated_factory_root(Path(tmp))
+            projection["data_capability"] = git_data_capability(root)
+            app = FactoryApplication(root=root)
+
+            def _projection(*, as_of=None):
+                return projection
+
+            app.market_projection = _projection  # type: ignore[method-assign]
+            market = _get(app, "/market")
+            self.assertIn("HIGH_RELATIVE", market)
+            self.assertIn("Контекст сейчас", market)
+            self.assertIn("Покрытие и пропуски", market)
+            self.assertIn(str(_cell(projection, "Y1800", "LIQUIDITY_LEVEL")["n_observed"]), market)
+
     def test_get_market_zero_writes_and_visible_nav(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = isolated_factory_root(Path(tmp))

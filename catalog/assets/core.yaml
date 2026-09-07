@@ -26271,7 +26271,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_owner_cockpit_v1.yaml', repository_path: configs/factory_v1_owner_cockpit_v1.yaml}
-  integrity: {kind: sha256, sha256: ef03b8cc68b87e3a648ffaa186c6874b35e1ebc497e9e33bc437816ee6fb7faa}
+  integrity: {kind: sha256, sha256: b28bb923f4889b3bb1cd92c1e977e10423c3dd46aec7d0383c5bf356c5f6fa5e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26291,7 +26291,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_owner_cockpit.schema.json', repository_path: catalog/schemas/factory_v1_owner_cockpit.schema.json}
-  integrity: {kind: sha256, sha256: e25f736b2ec7ad26f8a9428f694cf659ac24185b9898f658705f62a1b5e4248b}
+  integrity: {kind: sha256, sha256: 33a52bddec9695b60f3aaacf9a7c4e7cbe955ffac0330230bfea912eba24ae10}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -36199,7 +36199,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/market_evidence.py', repository_path: src/solana_alpha_lab/factory/market_evidence.py}
-  integrity: {kind: sha256, sha256: 8db315f32e14ccd3f5d309a3a59b1697c5b0cb5321c50ab0e0e4150661945790}
+  integrity: {kind: sha256, sha256: d281d72df42fdcc395ae1dad91de238777f43136928d28e78aa4f69d10d7dfde}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
@@ -36258,7 +36258,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_market_data_awareness_v1.py', repository_path: tests/test_market_data_awareness_v1.py}
-  integrity: {kind: sha256, sha256: 6d9714de8a142fbc5da7963b85c15133d9e94159bc1a7472f82a4ec5a0284636}
+  integrity: {kind: sha256, sha256: 0aa72726b1d32480c00d9974772e507ca3c60669edb8a1f73ad9d61731fbfad9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}
