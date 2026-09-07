@@ -235,6 +235,8 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
                 "DEPLOY_IDENTITY_MISMATCH",
                 {item["attention_code"] for item in projection["attention"]},
             )
+            self.assertEqual(projection["coverage"]["STORAGE"]["status"], "AVAILABLE")
+            self.assertEqual(projection["state"], "OK_OBSERVED")
 
     def test_a7_deploy_identity_mismatch(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -494,21 +496,24 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
     def test_get_system_shows_visible_diagnosis(self) -> None:
         units = dict(UNITS_OK)
         units["factory-v1-workbench.service"] = "inactive"
-        projection = compose_system_operability(
-            root=ROOT,
-            now=NOW,
-            http_self=HTTP_SERVING,
-            unit_status=units,
-            collector_packet=_packet(),
-            environ={},
-        )
-        html = _system_section(projection)
-        self.assertIn("WORKBENCH_SERVICE_DOWN", html)
-        self.assertIn("Почему сейчас", html)
-        self.assertIn("FACTORY_UNATTENDED_OPERABILITY.md", html)
-        self.assertIn("не SSH", html)
-        self.assertIn("Workbench unit не active", html)
-        self.assertNotIn("git-only-capability", html.split("technical")[0])
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            before = _walk(root)
+            app = FactoryApplication(
+                root=root,
+                unit_status=units,
+                collector_packet=_packet(),
+            )
+            body = _get(app, "/system")
+            self.assertEqual(before, _walk(root))
+            self.assertIn("технически", body)
+            self.assertIn("WORKBENCH_SERVICE_DOWN", body)
+            self.assertIn("Почему сейчас", body)
+            self.assertIn("FACTORY_UNATTENDED_OPERABILITY.md", body)
+            self.assertIn("не SSH", body)
+            self.assertIn("Workbench unit не active", body)
+            self.assertNotIn("HEALTHY", body.split("non_claims")[0] if "non_claims" in body else body)
+            self.assertNotIn('name="command" value="START"', body)
 
     def test_deploy_strip_ignores_git_capability(self) -> None:
         html = _system_section(
@@ -567,6 +572,42 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
         self.assertEqual(coverage["IMMUTABLE_ARCHIVE"]["status"], "UNKNOWN")
         self.assertEqual(coverage["DATA_FRESHNESS"]["status"], "UNKNOWN")
         self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_offhost_unknown_blocks_ok_observed(self) -> None:
+        projection = compose_system_operability(
+            root=ROOT,
+            now=NOW,
+            unit_status=UNITS_OK,
+            collector_packet=_packet(offhost_backup_state="UNKNOWN"),
+            environ={},
+        )
+        self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "UNKNOWN")
+        self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_mixed_storage_sentinel_is_not_available(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "mixed"
+            root.mkdir()
+            marker = _init_git_head(root)
+            (root / ".factory_deploy_sha").write_text(marker + "\n", encoding="ascii")
+            disk_only = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                collector_packet=_packet(projected_97d_status="UNKNOWN"),
+                environ={},
+            )
+            self.assertEqual(disk_only["coverage"]["STORAGE"]["status"], "UNKNOWN")
+            self.assertNotEqual(disk_only["state"], "OK_OBSERVED")
+            runway_only = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                collector_packet=_packet(filesystem_disk_used_pct="UNKNOWN"),
+                environ={},
+            )
+            self.assertEqual(runway_only["coverage"]["STORAGE"]["status"], "UNKNOWN")
+            self.assertNotEqual(runway_only["state"], "OK_OBSERVED")
 
     def test_empty_unit_status_is_not_all_active(self) -> None:
         projection = compose_system_operability(

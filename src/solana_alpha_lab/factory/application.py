@@ -30,7 +30,10 @@ from solana_alpha_lab.factory.owner_review_cursor import (
     server_now,
 )
 from solana_alpha_lab.factory.trading_operations import compose_trading_operations
-from solana_alpha_lab.factory.system_operability import compose_system_operability
+from solana_alpha_lab.factory.system_operability import (
+    UnitReader,
+    compose_system_operability,
+)
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
 HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
@@ -115,6 +118,9 @@ class FactoryApplication:
         spec_relative: str | None = None,
         authority_phrase: str | None = None,
         research_data_root: Path | None = None,
+        unit_status: Mapping[str, str] | None = None,
+        unit_reader: UnitReader | None = None,
+        collector_packet: Mapping[str, Any] | None = None,
     ) -> None:
         self.root = root
         self._operational_store = store
@@ -128,6 +134,9 @@ class FactoryApplication:
         self._research_discovery = None
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
+        self._unit_status = unit_status
+        self._unit_reader = unit_reader
+        self._collector_packet = collector_packet
 
     def existing_operational_store(self) -> OperationalStore | None:
         if self._operational_store is not None:
@@ -613,6 +622,9 @@ class FactoryApplication:
         model["system_operability"] = compose_system_operability(
             root=self.root,
             http_self=http_self or "NOT_APPLICABLE",
+            unit_status=self._unit_status,
+            unit_reader=self._unit_reader,
+            collector_packet=self._collector_packet,
         )
         spec = load_experiment_spec(self.root, self.spec_relative)
         gaps = pinned_produced_gaps(spec, self.root)

@@ -378,7 +378,7 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
         action=bool(classes & {"DISK_RUNWAY_HARD50", "DISK_CRITICAL"}),
         degraded=bool(classes & {"DISK_RUNWAY_TARGET40", "DISK_WARNING"}),
         present=_observed(packet.get("filesystem_disk_used_pct"))
-        or _observed(packet.get("projected_97d_status")),
+        and _observed(packet.get("projected_97d_status")),
     )
     mutable = _evidence_status(
         degraded=bool(classes & {"BACKUP_DEGRADED", "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED"}),
@@ -441,6 +441,8 @@ def _rollup_state(
         "DATA_FRESHNESS",
         "STORAGE",
         "MUTABLE_BACKUP",
+        "OFFHOST_BACKUP",
+        "IMMUTABLE_ARCHIVE",
         "DEPLOY_IDENTITY",
     )
     if any(str(coverage.get(name, {}).get("status")) in blocked for name in material):
