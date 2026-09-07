@@ -11,8 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "README.md": "49f1c0b13ce444a5fdb814270d41df2ab328eb0390d6e1df937af63908ed51ba",
-    "catalog/assets/core.yaml": "6112915616541d46043da2e03432ddd5c03c242dc1c1bdecc173db56eaed7438",
+    "catalog/assets/core.yaml": "57df2ddde78ec7f5ed480218f5d2fb702748d23492ad174b00e7c599c1ab9061",
     "catalog/assets/lifecycle.yaml": "e9176dc91db381d453f1f9250706f1e7166b2489e5df3bbdf923c08a471e328b",
     "catalog/catalog_manifest.yaml": "579a213d318269cdf96a86236bffb0d16299dc38f1fe2da7383a112a9e401d6e",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "1d938e82a8a86569f0cf4763d054ee48792e5d9cd22238e2d56c67b1f4a9590a",
@@ -47,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_attention_and_change_feed/a1_delivery_factory_fit_v1.json",
-    "sha256": "b3e47b6924b204c61dc3e20000fc70ee384ab1d49f29066033e2d743b9dad213",
+    "sha256": "dc7795be219b992ee106433b7855991f6ec249cb4cba8a543d9ac8b39cc6a38e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_ATTENTION_AND_CHANGE_FEED_V1",
     "independent_review": {
       "path": "docs/evidence/owner_attention_and_change_feed/a1_delivery_independent_review_v1.json",
-      "sha256": "dde465001f8432b88753e9aa59ff2db2eb62f1443af40ca3d62adec69ae4f653",
+      "sha256": "67f638742aa8b658aef1681d7534010c8e7efcf32b926d654c3935e5e3d3f11d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
