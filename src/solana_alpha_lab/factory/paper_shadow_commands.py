@@ -184,7 +184,11 @@ def apply_operator_command(
             "expected_open_position_set_sha256": str(expected),
             "live_open_position_set_sha256": live_sha,
             "fanout": fanout,
-            "side_effects": sum(1 for item in fanout if not item.get("already")),
+            "side_effects": sum(
+                1
+                for item in fanout
+                if not item.get("already") and not item.get("skipped")
+            ),
             "fill_claimed": False,
         }
     elif command_type == "STOP_BOT":

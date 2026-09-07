@@ -59,6 +59,12 @@ def position_pnl_view(position: dict[str, Any]) -> dict[str, Any]:
                 "pnl_status": "UNKNOWN",
                 "pnl_evidence_class": mark_class or evidence,
             }
+        if position.get("mark_as_of") in {None, ""}:
+            return {
+                "net_pnl_usd": None,
+                "pnl_status": "UNKNOWN",
+                "pnl_evidence_class": mark_class or evidence,
+            }
         unreal = position.get("unrealized_net_pnl_usd_dec")
         return {
             "net_pnl_usd": None if unreal is None else format(Decimal(str(unreal)), "f"),
@@ -146,6 +152,15 @@ def build_operations_projection(
         for p in positions
         if str(p["state"]) not in TERMINAL_SETTLED
     ]
+    open_ids_by_bot: dict[str, list[str]] = {}
+    for bot in bots:
+        open_ids_by_bot[str(bot["bot_instance_id"])] = []
+    for p in positions:
+        if str(p["state"]) in TERMINAL_SETTLED:
+            continue
+        open_ids_by_bot.setdefault(str(p["bot_instance_id"]), []).append(
+            str(p["position_id"])
+        )
 
     reconciled_raw = [p for p in positions if str(p["state"]) == "RECONCILED"]
     reconciled_raw.sort(
@@ -228,7 +243,7 @@ def build_operations_projection(
                 "WHY_NOW": "At least one position is in UNKNOWN state",
                 "IMPACT": "PnL/exposure may be incomplete",
                 "EVIDENCE": "positions.state=UNKNOWN",
-                "NEXT_SAFE_ACTION": "Inspect marks and exit readiness",
+                "NEXT_SAFE_ACTION": "INSPECT_MARK",
             }
         )
     if any(str(p["state"]) in EXIT_REQUIRED_LIKE for p in positions):
@@ -238,7 +253,7 @@ def build_operations_projection(
                 "WHY_NOW": "Exit requested but not settled",
                 "IMPACT": "Inventory still open/unresolved",
                 "EVIDENCE": "positions.state in EXIT_REQUIRED|EXITING",
-                "NEXT_SAFE_ACTION": "Provide exit observation or wait for route",
+                "NEXT_SAFE_ACTION": "REQUEST_CLOSE_OR_WAIT_EXIT",
             }
         )
     if any(str(p["state"]) in UNRESOLVED_LIKE for p in positions):
@@ -248,17 +263,31 @@ def build_operations_projection(
                 "WHY_NOW": "Unresolved inventory remains",
                 "IMPACT": "Cannot treat bot as stopped",
                 "EVIDENCE": "positions.state=UNRESOLVED",
-                "NEXT_SAFE_ACTION": "Reconcile or keep draining",
+                "NEXT_SAFE_ACTION": "KEEP_DRAINING",
             }
         )
-    if any(row.get("pnl_status") == "UNKNOWN" for row in reconciled):
+    decision_states = {
+        "OPEN",
+        "PARTIAL",
+        "UNKNOWN",
+        "EXIT_REQUIRED",
+        "EXITING",
+        "UNRESOLVED",
+        "CLOSED",
+        "RECONCILED",
+    }
+    if any(
+        position_pnl_view(p)["pnl_status"] == "UNKNOWN"
+        and str(p["state"]) in decision_states
+        for p in positions
+    ):
         attention.append(
             {
                 "code": "PNL_UNKNOWN_OR_STALE",
-                "WHY_NOW": "Reconciled row lacks known PnL",
-                "IMPACT": "Loss streak may be UNKNOWN",
+                "WHY_NOW": "Known inventory lacks a known mark or reconciled PnL",
+                "IMPACT": "Exposure/PnL cannot be treated as zero",
                 "EVIDENCE": "pnl_status=UNKNOWN",
-                "NEXT_SAFE_ACTION": "Supply mark/exit observation",
+                "NEXT_SAFE_ACTION": "INSPECT_MARK",
             }
         )
     if streak.get("current_loss_streak_status") == "KNOWN" and int(
@@ -270,7 +299,7 @@ def build_operations_projection(
                 "WHY_NOW": f"Trailing loss streak={streak['current_loss_streak_count']}",
                 "IMPACT": "Operator risk attention",
                 "EVIDENCE": "reconciled net_pnl sequence",
-                "NEXT_SAFE_ACTION": "Review pause/close policy",
+                "NEXT_SAFE_ACTION": "REVIEW_PAUSE_CLOSE_POLICY",
             }
         )
 
@@ -283,7 +312,7 @@ def build_operations_projection(
                     "WHY_NOW": "Bot stop requested with remaining inventory",
                     "IMPACT": "Entries blocked; exits continue",
                     "EVIDENCE": f"bot.status=DRAINING:{b['bot_instance_id']}",
-                    "NEXT_SAFE_ACTION": "Wait until inventory cleared",
+                    "NEXT_SAFE_ACTION": "WAIT_DRAIN",
                 }
             )
         if int(b.get("entries_paused") or 0) == 1:
@@ -293,7 +322,7 @@ def build_operations_projection(
                     "WHY_NOW": "New entries paused",
                     "IMPACT": "ENTER blocked; exits continue",
                     "EVIDENCE": f"entries_paused=1:{b['bot_instance_id']}",
-                    "NEXT_SAFE_ACTION": "RESUME_NEW_ENTRIES when safe",
+                    "NEXT_SAFE_ACTION": "RESUME_WHEN_NOT_DRAINING",
                 }
             )
 
@@ -329,7 +358,7 @@ def build_operations_projection(
         "bot": bot.get("bot_instance_id") if bot else None,
         "mode": bot.get("mode") if bot else None,
         "status": bot.get("status") if bot else None,
-        "entries_paused": bool(int(bot.get("entries_paused") or 0)) if bot else False,
+        "entries_paused": bool(int(bot.get("entries_paused") or 0)) if bot else None,
         "bots": bots,
         "open_positions": sum(1 for p in positions if str(p["state"]) in OPEN_LIKE),
         "partial_positions": sum(1 for p in positions if str(p["state"]) == "PARTIAL"),
@@ -359,6 +388,10 @@ def build_operations_projection(
         "attention": attention,
         "open_position_set_sha256": open_position_set_sha256(open_ids),
         "open_position_ids": sorted(open_ids),
+        "open_position_set_sha256_by_bot": {
+            bot_id: open_position_set_sha256(ids)
+            for bot_id, ids in sorted(open_ids_by_bot.items())
+        },
         "open_risk_count": sum(
             1 for p in positions if str(p["state"]) in OPEN_RISK_STATES
         ),

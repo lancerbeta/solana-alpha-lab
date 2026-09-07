@@ -31,12 +31,12 @@ def _load_json(root: Path, relative: str) -> dict[str, Any] | None:
 def project_read_model(
     *,
     root: Path,
-    store: OperationalStore,
+    store: OperationalStore | None,
     spec_relative: str,
     hypothesis_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     spec = load_experiment_spec(root, spec_relative)
-    job = store.get_job(f"JOB-{spec['experiment_id']}")
+    job = store.get_job(f"JOB-{spec['experiment_id']}") if store is not None else None
     requirements = requirement_map(spec)
     acceptance_item = requirements.get("ACCEPTANCE")
     acceptance = None

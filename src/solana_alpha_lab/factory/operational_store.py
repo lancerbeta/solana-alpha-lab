@@ -19,11 +19,22 @@ def _now() -> str:
 
 
 class OperationalStore:
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, readonly: bool = False) -> None:
         if path.is_absolute() is False:
             raise OperationalStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
-        path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
+        self.readonly = readonly
+        if readonly:
+            if not path.is_file():
+                raise OperationalStoreError("SOURCE_NOT_PRESENT")
+            self._conn = sqlite3.connect(
+                path.resolve().as_uri() + "?mode=ro&immutable=1",
+                uri=True,
+                check_same_thread=False,
+            )
+            self._conn.row_factory = sqlite3.Row
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
         self._connect()
 
     def _connect(self) -> None:
@@ -79,6 +90,8 @@ class OperationalStore:
         self._conn.commit()
 
     def close(self) -> None:
+        if not getattr(self, "readonly", False):
+            self._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         self._conn.close()
 
     def record_command(self, *, job_id: str, kind: str, payload: Mapping[str, Any]) -> None:

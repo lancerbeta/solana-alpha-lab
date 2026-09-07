@@ -208,7 +208,7 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
                 self.assertIn(ids["p5"], operations)
                 self.assertIn("UNRESOLVED", operations)
                 self.assertIn("PAPER_RECONCILED_MODEL", operations)
-                self.assertIn("LOSS_STREAK", home)
+                self.assertIn("LOSS_STREAK", operations)
                 self.assertIn("NO_REALIZED_LIVE_PNL", economics)
                 self.assertIn("NO_OWNER_FCF", economics)
                 self.assertIn("NO_LIVE_CAPITAL", economics)

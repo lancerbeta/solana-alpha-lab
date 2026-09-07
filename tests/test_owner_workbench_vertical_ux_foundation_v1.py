@@ -45,7 +45,7 @@ HEADINGS = {
     "/research": ("Исследования", "Что мы проверяем / что знаем / что мне решать?"),
     "/operations": (
         "Операции",
-        "Что работает, какой риск открыт и что я могу безопасно сделать?",
+        "Что исполняется, где остановился путь и что безопасно сделать?",
     ),
     "/economics": (
         "Экономика",
@@ -142,18 +142,20 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 self.assertEqual(research.count("<h1>Исследования</h1>"), 1)
                 self.assertNotIn("<h2>Исследования</h2>", research)
                 operations = pages["/operations"]
-                self.assertIn("Команды оператора", operations)
+                self.assertIn("Допустимые действия", operations)
+                self.assertIn("NOT_PRESENT", operations)
+                self.assertIn("SOURCE_NOT_PRESENT", operations)
                 self.assertNotIn(">Bots<", operations)
                 self.assertLess(
-                    operations.find("<h2>Внимание</h2>"),
+                    operations.find("<h2>Требует внимания</h2>"),
                     operations.find("<h2>Позиции</h2>"),
                 )
                 self.assertLess(
                     operations.find("<h2>Позиции</h2>"),
-                    operations.find("<h2>Команды оператора</h2>"),
+                    operations.find("<h2>Допустимые действия</h2>"),
                 )
                 for command in OPERATOR_COMMANDS:
-                    self.assertRegex(
+                    self.assertNotRegex(
                         operations,
                         rf'name="command" value="{command}"',
                     )

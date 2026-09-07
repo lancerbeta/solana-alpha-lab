@@ -17,6 +17,7 @@
     "tests/test_factory_strategy_execution_boundary_v1.py",
     "tests/test_paper_shadow_accounting_and_control_v1.py",
     "tests/test_owner_operations_cockpit_v1.py",
+    "tests/test_trading_operations_workbench_v2.py",
     "tests/test_owner_lifecycle_projection_spine_v1.py",
     "tests/test_early_state_to_paper_vertical_slice.py",
     "tests/test_factory_unattended_shadow_vertical_slice.py",
