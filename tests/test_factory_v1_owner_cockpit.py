@@ -172,7 +172,7 @@ class FactoryV1OwnerCockpitLiteTests(unittest.TestCase):
                 self.assertNotEqual(ops_model["cockpit"]["terminal"], "OWNER_OPERATIONS_COCKPIT_PASS")
                 self.assertIn("Допустимые действия", operations)
                 self.assertIn("NOT_PRESENT", operations)
-                self.assertIn("NO_REALIZED_LIVE_PNL", economics)
+                self.assertIn("NO LIVE PNL", economics)
                 self.assertNotIn(">MARKET<", operations)
                 self.assertNotIn(">MARKET<", economics)
                 self.assertNotEqual((model.get("runtime") or {}).get("verdict"), "HEALTHY")

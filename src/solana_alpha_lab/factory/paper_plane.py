@@ -33,6 +33,7 @@ __all__ = [
     "accept_exit_decision",
     "accept_signal_decision",
     "load_strategy_version",
+    "modeled_unrealized_mark",
     "observe_shadow",
     "run_commissioning",
     "run_shadow_tick",
@@ -110,6 +111,38 @@ def _now() -> str:
 
 def _parse_utc(value: str) -> datetime:
     return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
+
+
+def modeled_unrealized_mark(
+    *,
+    mark_price: Decimal,
+    qty: Decimal,
+    entered_notional: Decimal,
+    entry_fee: Decimal,
+    fee_bps: int,
+) -> dict[str, Decimal]:
+    """Canonical open-mark economics after modeled entry+exit fees.
+
+    Does not persist. Forward `record_position_mark` and owner projection
+    must use this helper so Workbench cannot keep a second formula.
+    """
+
+    mark_value = (mark_price * qty).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    unrealized_gross = (mark_value - entered_notional).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    modeled_exit_fee = (mark_value * Decimal(fee_bps) / Decimal("10000")).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    unrealized_net = (unrealized_gross - entry_fee - modeled_exit_fee).quantize(
+        Decimal("0.01"), rounding=ROUND_HALF_UP
+    )
+    return {
+        "mark_value": mark_value,
+        "unrealized_gross": unrealized_gross,
+        "modeled_exit_fee_at_mark": modeled_exit_fee,
+        "unrealized_net": unrealized_net,
+    }
 
 
 def signal_kind_for(
@@ -637,12 +670,27 @@ class PaperPlaneStore:
             qty = Decimal(str(position["qty_dec"]))
             mark = Decimal(str(mark_price_dec))
             entry_notional = Decimal(str(position["entered_notional_usd_dec"]))
-            mark_value = (mark * qty).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-            gross = (mark_value - entry_notional).quantize(
-                Decimal("0.01"), rounding=ROUND_HALF_UP
-            )
-            unrealized = format(gross, "f")
-            unrealized_net = format(gross, "f")
+            entry_fee_raw = position.get("entry_fee_usd_dec")
+            fee_bps_raw = position.get("fee_bps")
+            if entry_fee_raw not in {None, ""} and fee_bps_raw is not None:
+                derived = modeled_unrealized_mark(
+                    mark_price=mark,
+                    qty=qty,
+                    entered_notional=entry_notional,
+                    entry_fee=Decimal(str(entry_fee_raw)),
+                    fee_bps=int(fee_bps_raw),
+                )
+                unrealized = format(derived["unrealized_gross"], "f")
+                unrealized_net = format(derived["unrealized_net"], "f")
+            else:
+                mark_value = (mark * qty).quantize(
+                    Decimal("0.01"), rounding=ROUND_HALF_UP
+                )
+                gross = (mark_value - entry_notional).quantize(
+                    Decimal("0.01"), rounding=ROUND_HALF_UP
+                )
+                unrealized = format(gross, "f")
+                unrealized_net = None
         self._conn.execute(
             """
             UPDATE positions

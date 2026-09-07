@@ -49,7 +49,7 @@ HEADINGS = {
     ),
     "/economics": (
         "Экономика",
-        "Есть ли уже экономический результат и насколько ему можно доверять?",
+        "Что доказано экономически, где UNKNOWN, и чего из цифр нельзя заключать?",
     ),
     "/system": ("Система", "Можно ли сейчас оставить Factory технически работать без меня?"),
 }
@@ -163,7 +163,9 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                         rf'name="command" value="{command}"',
                     )
                 economics = pages["/economics"]
-                self.assertIn("NO_REALIZED_LIVE_PNL", economics)
+                self.assertIn("NO LIVE PNL", economics)
+                self.assertIn("NO OWNER FCF", economics)
+                self.assertIn("NOT_ESTABLISHED", economics)
                 self.assertIn("UNKNOWN", economics)
                 self.assertIn("неизвестно", economics)
                 self.assertIn("не показываются как $0", economics)

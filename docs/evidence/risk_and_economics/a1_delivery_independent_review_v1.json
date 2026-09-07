@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "RISK-AND-ECONOMICS-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-07",
+  "task_id": "RISK_AND_ECONOMICS_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "5698f6094f3b6207b98572c69b22fea55b51221144a1ec9ffc3de685bed199b0",
+  "reviewed_inventory_sha256": "27d7573f60f9931cb7934b73ca5731fbe9b83a94714e187f1a057cf4593e55c1",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "GET_ECONOMICS_NON_MUTATING",
+        "NO_ECONOMICS_COMMANDS",
+        "NO_SECOND_PNL_FORMULA_IN_WORKBENCH",
+        "UTC_INSTANT_PATH_WALK",
+        "SCOPE_NET_ONLY_WHEN_KNOWN",
+        "NO_SKIP_SUM_ON_GET_ECONOMICS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "UTC_INSTANT_REQUIRED_FOR_KNOWN_PATH",
+        "NAIVE_NON_UTC_CLOSED_AT_UNKNOWN",
+        "SCOPE_NET_NULL_UNLESS_KNOWN",
+        "DECLARED_RISK_SHOWS_STRATEGY_IDENTITY",
+        "COMPAT_HEADLINE_HAS_CLASS_AND_MODE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=45d8e25b9c8c2bb0c32b05b2f682d90751bc6430f1c0eec55b9d937e30bb3a00",
+        "UTC_INSTANT_FAIL_CLOSED",
+        "PATH_WALKED_BY_UTC_INSTANT",
+        "KNOWN_DRAWDOWN_ON_NON_UTC_CHRONOLOGY_CLOSED",
+        "OWNER_READOUT_NOT_READY_FOR_MERGE",
+        "RESIDUAL_OPS_SKIP_AND_SUM_NOT_ON_GET_ECONOMICS",
+        "COMPAT_HEADLINE_HAS_CLASS_AND_MODE",
+        "SCOPE_NET_NULL_UNLESS_KNOWN"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_LIVE_PNL",
+    "NO_OWNER_FCF",
+    "NO_LIVE_CAPITAL",
+    "NO_CAPACITY_CLAIM",
+    "NO_PROMOTION",
+    "NO_REAL_MONEY",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_CANONICAL_DONE"
+  ]
+}

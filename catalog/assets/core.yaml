@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: df9293db1ab41e544ce4f0066e935f3b2363a9877a2f8f21e42db60fba767ec3}
+  integrity: {kind: sha256, sha256: 7b444be99fd25bed29d1a2e8b33d87ae428fa4fd447ad74a1553d752bced6c8f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25676,6 +25676,7 @@ records:
   - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
   - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
   - {relation_type: depends_on, target_asset_id: MODULE-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-RISK-AND-ECONOMICS-001}
   consumers: [FACTORY-001, FACTORY-V1-PRODUCT-KERNEL-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, APPLICATION, COMMANDS]
@@ -25726,7 +25727,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 96f8fdf983540dd321f276b0199a86d4acbec7b80eb0fe13d7a45ef312243eb9}
+  integrity: {kind: sha256, sha256: c751dd5ff3aae7557ec22de65315dd5c5c2ec7362e8b23a6ad4d0ac467ac6579}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -26324,7 +26325,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: 9fd7f9d90c8ad778c1b8b7d3275695a8cbff693d46cf072feee53edc6d471327}
+  integrity: {kind: sha256, sha256: d170fc97be6da6f7c348906dc383e46f8a41a73160162a6f8cd7cc2fa469e85a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -27661,7 +27662,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: e20dc9ced28bdcbdc4eee2595914a0504a25019a3178a7d7f5e737059207a780}
+  integrity: {kind: sha256, sha256: 918afd055d8f3ec9f5fdb91c7c3b0a5adf6ad1bcdb20c0f9c9242967a073bb0c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -29603,7 +29604,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: 823a541bda5f868ea3ef84f765a4503fc6db83d4d978ac57e1f4c03ef3a235dc}
+  integrity: {kind: sha256, sha256: c5d115a99f9dc4406c637740ed21aa71144bb4c2f83947c800dd740aea8a14e8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -34141,7 +34142,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: a64089ae4f5e0575597d251ff458854adb53cf7081d7cc9425a51de3376d2a0a}
+  integrity: {kind: sha256, sha256: c8b5b987bc852e6239eddfc4640ac4ae53574da9144044989185e936560e8b03}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34266,7 +34267,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 4b8d5c1f09af075f33265d93d7ff658a12f9c275d040b6b9b05427bc3f292a8a}
+  integrity: {kind: sha256, sha256: e6b0712107ca9a5a907efad5e4080b5f94c54d3c6de63bdbb62a0626123e0257}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34619,7 +34620,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_operations_cockpit_v1.py', repository_path: tests/test_owner_operations_cockpit_v1.py}
-  integrity: {kind: sha256, sha256: a818928a7ff344f200ab567392d5ec7839c157347d18f58b5b84f39ea872ddf1}
+  integrity: {kind: sha256, sha256: 101e4e4b0645ca500cedb6ce63abf142af4496012c140aadcc4002bf51921c08}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
@@ -35363,7 +35364,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/owner_lifecycle_projection_v1.yaml', repository_path: configs/owner_lifecycle_projection_v1.yaml}
-  integrity: {kind: sha256, sha256: 611115b374053e8a8cee073f43140d925cc52528488b023de7c9178273ac742a}
+  integrity: {kind: sha256, sha256: 52f9bb6dbbaf6c5ec8c92beea4d7a0f14df56944e42600f16cfb0135a205f58c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35403,6 +35404,7 @@ records:
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
   - {relation_type: depends_on, target_asset_id: CONFIG-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: consumes, target_asset_id: DOC-RISK-AND-ECONOMICS-001}
   consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
   evidence: []
   search_terms: [LIFECYCLE_PROJECTION, lineage, lifecycle-объекты, карта lifecycle]
@@ -35606,7 +35608,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: 591fa825645b9ed333393dae189d27bf53e7881273e006d59593fca004f56e27}
+  integrity: {kind: sha256, sha256: 98a552b458e26ae9d308a7d0ff835c46deb2b133cd419226d85c819e13badd4c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35798,7 +35800,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_operations_workbench_v2.md', repository_path: docs/contracts/trading_operations_workbench_v2.md}
-  integrity: {kind: sha256, sha256: d3381de2187f84fdd73c4eac039fe4feb5a038ada7c526f891e186422dd1844d}
+  integrity: {kind: sha256, sha256: 788517fe53c05f36c495789355f05418488c15632b8574ccf600a552ecfb0289}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
@@ -35817,11 +35819,12 @@ records:
   as_of: '2026-09-07'
   truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/trading_operations.py', repository_path: src/solana_alpha_lab/factory/trading_operations.py}
-  integrity: {kind: sha256, sha256: ec9d7450a9f1ade016a4759f0d0f1648839a8deb171a4654b75cffaa8025538d}
+  integrity: {kind: sha256, sha256: f01721650b9538d9a7734b62eacc0fbc15bade57bc71ad02f65dedfd2a299c9f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
   - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-RISK-AND-ECONOMICS-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [TradingOperationsProjectionV2, SOURCE_NOT_PRESENT]
@@ -36023,4 +36026,83 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [show_system_operability, JSON_READBACK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-RISK-AND-ECONOMICS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for owner PAPER/SHADOW economic interpretation over existing PaperPlane accounting without a second PnL store.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: RISK_AND_ECONOMICS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/RISK_AND_ECONOMICS_V1.md', repository_path: docs/tasks/RISK_AND_ECONOMICS_V1.md}
+  integrity: {kind: sha256, sha256: 1585883db390056f1ca75f1b22472835cb5872f6fe7a39b6e57054b4551d6d44}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-RISK-AND-ECONOMICS-001}
+  - {relation_type: contains, target_asset_id: MODULE-RISK-AND-ECONOMICS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-RISK-AND-ECONOMICS-001}
+  - {relation_type: consumes, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  - {relation_type: consumes, target_asset_id: DOC-TRADING-OPERATIONS-WORKBENCH-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [RISK_AND_ECONOMICS, MIXED_EVIDENCE_NOT_AGGREGATED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-RISK-AND-ECONOMICS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Human contract for derived RiskEconomicsProjectionV1, evidence-scoped PAPER/SHADOW economics, declared entry-admission risk and non-claims.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: RISK_AND_ECONOMICS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/risk_and_economics_v1.md', repository_path: docs/contracts/risk_and_economics_v1.md}
+  integrity: {kind: sha256, sha256: de7262892fb3de1d948d97e8e6691f2a0eac875d0d2b499743e4adaf9e634677}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
+  - {relation_type: depends_on, target_asset_id: DOC-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: consumes, target_asset_id: DOC-TRADING-OPERATIONS-WORKBENCH-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [RiskEconomicsProjectionV1, PAPER_RECONCILED_MODEL, NOT_ESTABLISHED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-RISK-AND-ECONOMICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Derived RiskEconomicsProjectionV1 composer over PaperPlane accounting. Persists nowhere and issues no commands.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: RISK_AND_ECONOMICS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/risk_economics.py', repository_path: src/solana_alpha_lab/factory/risk_economics.py}
+  integrity: {kind: sha256, sha256: 8df490102a10d07960a128f2ec8a7bac568211e94c54c48f1f6fd7a10dd79411}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-PLANE-ENGINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [compose_risk_economics, SOURCE_NOT_PRESENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-RISK-AND-ECONOMICS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical acceptance for evidence-scoped economics, open-mark fees, path UNKNOWN, declared entry risk and GET purity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: RISK_AND_ECONOMICS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_risk_and_economics_v1.py', repository_path: tests/test_risk_and_economics_v1.py}
+  integrity: {kind: sha256, sha256: a1cbf2db3d4d9320aaeb063db660c6dd1bcb347e1829370e3be767d19435bb46}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-RISK-AND-ECONOMICS-001}
+  - {relation_type: depends_on, target_asset_id: DOC-RISK-AND-ECONOMICS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [ECONOMICS_VERTICAL, GET_NON_MUTATION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

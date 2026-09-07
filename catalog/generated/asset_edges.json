@@ -4303,6 +4303,36 @@
       "target_asset_id": "TEST-RESEARCH-LIFECYCLE-WORKBENCH-001"
     },
     {
+      "source_asset_id": "CTRL-RISK-AND-ECONOMICS-001",
+      "relation": "consumes",
+      "target_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001"
+    },
+    {
+      "source_asset_id": "CTRL-RISK-AND-ECONOMICS-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-RISK-AND-ECONOMICS-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-RISK-AND-ECONOMICS-001"
+    },
+    {
+      "source_asset_id": "CTRL-RISK-AND-ECONOMICS-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-RISK-AND-ECONOMICS-001"
+    },
+    {
+      "source_asset_id": "CTRL-RISK-AND-ECONOMICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-RISK-AND-ECONOMICS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-RISK-AND-ECONOMICS-001"
+    },
+    {
       "source_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001",
       "relation": "contains",
       "target_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001"
@@ -5249,6 +5279,11 @@
     },
     {
       "source_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-RISK-AND-ECONOMICS-001"
+    },
+    {
+      "source_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-OWNER-LIFECYCLE-PROJECTION-001"
     },
@@ -5271,6 +5306,26 @@
       "source_asset_id": "DOC-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-SMIAL-VISUAL-OPERATING-SYSTEM-001"
+    },
+    {
+      "source_asset_id": "DOC-RISK-AND-ECONOMICS-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "DOC-RISK-AND-ECONOMICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001"
+    },
+    {
+      "source_asset_id": "DOC-RISK-AND-ECONOMICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "DOC-RISK-AND-ECONOMICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-RISK-AND-ECONOMICS-001"
     },
     {
       "source_asset_id": "DOC-SCIENCE-TO-STRATEGY-HANDOFF-001",
@@ -10338,6 +10393,11 @@
       "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RISK-AND-ECONOMICS-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-CAPABILITY-FREE-KEY-CAPTURE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-QUOTE-NATIVE-ADMISSIBLE-FRICTION-AUDITION-001"
@@ -11141,6 +11201,21 @@
       "source_asset_id": "MODULE-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "MODULE-RISK-AND-ECONOMICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "MODULE-RISK-AND-ECONOMICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "MODULE-RISK-AND-ECONOMICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-RISK-AND-ECONOMICS-001"
     },
     {
       "source_asset_id": "MODULE-SEMANTIC-PREMISE-REVIEW-001",
@@ -12266,6 +12341,11 @@
       "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-RISK-AND-ECONOMICS-001"
     },
     {
       "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
@@ -16096,6 +16176,16 @@
       "source_asset_id": "TEST-RESEARCH-LIFECYCLE-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-RESEARCH-LIFECYCLE-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "TEST-RISK-AND-ECONOMICS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-RISK-AND-ECONOMICS-001"
+    },
+    {
+      "source_asset_id": "TEST-RISK-AND-ECONOMICS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-RISK-AND-ECONOMICS-001"
     },
     {
       "source_asset_id": "TEST-SCIENCE-TO-STRATEGY-HANDOFF-001",

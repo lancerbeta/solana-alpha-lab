@@ -16,9 +16,9 @@ from solana_alpha_lab.factory.operational_store import OperationalStore, Operati
 from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command
 from solana_alpha_lab.factory.paper_shadow_operations import (
-    build_economics_projection,
     build_operations_projection,
 )
+from solana_alpha_lab.factory.risk_economics import compose_risk_economics
 from solana_alpha_lab.factory.read_model import project_read_model
 from solana_alpha_lab.factory.owner_daily_attention import (
     compose_owner_attention,
@@ -217,8 +217,9 @@ class FactoryApplication:
     def economics_projection(self) -> dict[str, Any]:
         store = self.existing_paper_plane()
         if store is None:
-            raise self._missing_runtime_error()
-        return build_economics_projection(store)
+            status = self._paper_plane_source_status or "NOT_PRESENT"
+            return compose_risk_economics(self.root, None, source_status=status)
+        return compose_risk_economics(self.root, store, source_status="PRESENT")
 
     def trading_operations_projection(
         self, *, last_command: Mapping[str, Any] | None = None
@@ -674,10 +675,9 @@ class FactoryApplication:
             if not isinstance(operations, dict):
                 operations = build_operations_projection(paper_store)
             model["operations"] = operations
-            economics = trading.get("economics")
-            if not isinstance(economics, dict):
-                economics = build_economics_projection(paper_store, operations=operations)
-            model["economics"] = economics
+            model["economics"] = compose_risk_economics(
+                self.root, paper_store, source_status="PRESENT", operations=operations
+            )
             model["recent_changes"] = trading.get("recent_changes") or []
             cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
         else:
@@ -687,21 +687,9 @@ class FactoryApplication:
                 "bots": None,
                 "attention": trading.get("attention") or [],
             }
-            model["economics"] = {
-                "source_status": status,
-                "reconciled_net_pnl_usd": None,
-                "reconciled_net_pnl_status": status,
-                "pnl_known_count": None,
-                "pnl_unknown_count": None,
-                "known_open_exposure_usd": None,
-                "known_open_exposure_status": status,
-                "non_claims": [
-                    "NO_REALIZED_LIVE_PNL",
-                    "NO_OWNER_FCF",
-                    "NO_LIVE_CAPITAL",
-                    "NO_NETRETURN_CLAIM",
-                ],
-            }
+            model["economics"] = compose_risk_economics(
+                self.root, None, source_status=status
+            )
             model["recent_changes"] = []
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
