@@ -25728,7 +25728,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: cb179130f18ce3695fb5076d19a1a9a96e2e59c96961ee1fb61547d948f07fd1}
+  integrity: {kind: sha256, sha256: 17694d0e14efc54bb6b310f40abb7cba584f9de752866dc86b339a2eeb7b60e8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -35610,7 +35610,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: fe0eb7f82201462ebeffffd33b2832064cf1631e5ee5e690d596c2c1aeb06435}
+  integrity: {kind: sha256, sha256: da6bdfa76517950d9860dc0fc7808850c2867d70d8f212e805da0685e99e3512}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -36199,7 +36199,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/market_evidence.py', repository_path: src/solana_alpha_lab/factory/market_evidence.py}
-  integrity: {kind: sha256, sha256: 9c33e0f59cc121c793b7296e45c16229da5ca6d541ca5b40c29e4d64841677bc}
+  integrity: {kind: sha256, sha256: 8db315f32e14ccd3f5d309a3a59b1697c5b0cb5321c50ab0e0e4150661945790}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
@@ -36218,7 +36218,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/market_context.py', repository_path: src/solana_alpha_lab/factory/market_context.py}
-  integrity: {kind: sha256, sha256: 353919bfc5ec93a6fd912b07606c1455d4a4e87139812621b8b86c5f7ef5e3f8}
+  integrity: {kind: sha256, sha256: 3106ac6a9b3665e27c2f67a8821d417458fff24bfcba10046a6c8a6e05413d0e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
@@ -36258,7 +36258,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_market_data_awareness_v1.py', repository_path: tests/test_market_data_awareness_v1.py}
-  integrity: {kind: sha256, sha256: 30f0d1e3f056aebc41cda60d1f1783ec3bcc042e942907d469a120a5c5223cfd}
+  integrity: {kind: sha256, sha256: 6d9714de8a142fbc5da7963b85c15133d9e94159bc1a7472f82a4ec5a0284636}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}

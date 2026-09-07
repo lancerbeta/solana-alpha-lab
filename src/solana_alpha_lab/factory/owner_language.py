@@ -320,6 +320,7 @@ STATUS_GLOSS = {
     "MEMBER_EVIDENCE_INCOMPLETE": "неполный список выборки",
     "SOURCE_NOT_PRESENT": "отсутствует",
     "GIT_CAPABILITY": "Git-доступность, не live market",
+    "PIT_CLOCK_MISSING": "нет PIT-часов",
 }
 
 KIND_LABELS = {
@@ -589,6 +590,9 @@ SURFACE_COPY = {
         "n_obs": "N observed",
         "n_scope": "N in scope",
         "missing": "missing / censored / excluded",
+        "coverage_point": "Возраст",
+        "coverage_axis": "Ось",
+        "coverage_classes": "Классы покрытия",
         "reference": "Статус сопоставления",
         "source": "Статус источника",
         "freshness": "Возраст evidence — это не здоровье collector.",

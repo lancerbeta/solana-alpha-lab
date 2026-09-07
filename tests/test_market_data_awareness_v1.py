@@ -247,9 +247,10 @@ class MarketDataAwarenessTests(unittest.TestCase):
         )
         cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
         self.assertEqual(cell["raw_value"], "40")
-        self.assertEqual(cell["coverage_classes"]["typed_missing"], 1)
-        self.assertGreaterEqual(cell["n_in_scope"], 2)
         self.assertEqual(cell["n_observed"], 1)
+        self.assertEqual(cell["n_in_scope"], 1)
+        self.assertEqual(cell["coverage_classes"]["typed_missing"], 0)
+        self.assertIn("PIT_CLOCK_MISSING", projection["gaps"])
 
     def test_stale_members_do_not_enter_current_denominator(self) -> None:
         rows = [
@@ -259,12 +260,19 @@ class MarketDataAwarenessTests(unittest.TestCase):
         bundle["members"] = [
             {
                 "entity_id": "old",
+                "point_id": "Y1800",
                 "_partition_day": "2026-08-31",
                 "first_reliable_available_at": render_utc(AS_OF - timedelta(days=7)),
             },
             {
                 "entity_id": "today",
+                "point_id": "Y1800",
                 "_partition_day": "2026-09-07",
+                "first_reliable_available_at": render_utc(AS_OF - timedelta(minutes=5)),
+            },
+            {
+                "entity_id": "wrong_landmark",
+                "point_id": "Y900",
                 "first_reliable_available_at": render_utc(AS_OF - timedelta(minutes=5)),
             },
         ]
@@ -375,7 +383,10 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertEqual(cell["relative_reason"], "MEMBER_EVIDENCE_INCOMPLETE")
 
     def test_unrelated_partition_is_not_observation_panel(self) -> None:
-        from solana_alpha_lab.factory.market_evidence import _is_observation_panel_partition
+        from solana_alpha_lab.factory.market_evidence import (
+            _is_observation_panel_partition,
+            _partition_day,
+        )
 
         self.assertFalse(
             _is_observation_panel_partition({"dataset_id": "other-dataset", "partition_id": "utc-day-2026-09-07"})
@@ -386,6 +397,10 @@ class MarketDataAwarenessTests(unittest.TestCase):
             )
         )
         self.assertFalse(_is_observation_panel_partition({"partition_id": "utc-day-2026-09-07"}))
+        self.assertEqual(_partition_day("utc-day-20260907"), "2026-09-07")
+        self.assertEqual(_partition_day("utc-day-20260907-members"), "2026-09-07")
+        self.assertEqual(_partition_day("utc-day-2026-09-07"), "2026-09-07")
+        self.assertEqual(_partition_day("utc-day-2026-09-07-members"), "2026-09-07")
 
     def test_floor_quantile_is_not_interpolated(self) -> None:
         from decimal import Decimal
@@ -687,6 +702,40 @@ class MarketDataAwarenessTests(unittest.TestCase):
         first = project_market_context(self.definition, bundle, as_of=AS_OF)
         second = project_market_context(self.definition, bundle, as_of=AS_OF)
         self.assertEqual(first["context_snapshot_sha256"], second["context_snapshot_sha256"])
+
+    def test_market_section_renders_observed_relative_state(self) -> None:
+        from solana_alpha_lab.factory.workbench import _market_section
+
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        for hours in range(2, 14):
+            rows.append(
+                _obs(
+                    f"hist{hours}",
+                    "Y1800",
+                    AS_OF - timedelta(hours=hours),
+                    {"FIELD-LIQUIDITY-USD-001": 100},
+                )
+            )
+        projection = project_market_context(
+            self.definition, _bundle(self.definition, rows), as_of=AS_OF
+        )
+        html = _market_section({"market": projection})
+        self.assertIn("HIGH_RELATIVE", html)
+        self.assertIn("Контекст сейчас", html)
+        self.assertIn("Покрытие и пропуски", html)
+        self.assertIn("Scope, источник и as-of", html)
+        self.assertIn("Что это означает как context", html)
+        self.assertIn("Что это не означает", html)
+        self.assertIn("Ликвидность", html)
 
     def test_get_market_zero_writes_and_visible_nav(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -1809,11 +1809,29 @@ def _system_section(system: dict[str, Any]) -> str:
     )
 
 
+def _coverage_class_text(classes: Mapping[str, Any]) -> str:
+    parts = []
+    for key in (
+        "observed",
+        "typed_missing",
+        "disappeared",
+        "censored",
+        "capacity_excluded",
+        "sampling_excluded",
+        "x_ineligible",
+        "unknown",
+    ):
+        count = classes.get(key)
+        if count:
+            parts.append(f"{key}={count}")
+    return "; ".join(parts) if parts else "empty"
+
+
 def _relative_cell(cell: Mapping[str, Any]) -> str:
     state = str(cell.get("relative_state") or "UNKNOWN")
     reason = str(cell.get("relative_reason") or "")
     raw = cell.get("raw_value")
-    why = f" {canon(reason)}" if reason else ""
+    why = f" {status_html(reason)}" if reason else ""
     return (
         f"<div class=\"market-cell\" data-relative=\"{esc(state)}\">"
         f"{status_html(state)}{why}"
@@ -1887,13 +1905,13 @@ def _market_section(model: dict[str, Any]) -> str:
             classes = cell.get("coverage_classes") if isinstance(cell.get("coverage_classes"), dict) else {}
             coverage_rows += (
                 "<tr>"
-                f"<td>{esc(landmark.get('point_id'))}</td>"
-                f"<td>{esc(cell.get('axis_id'))}</td>"
+                f"<td>{esc(landmark.get('owner_label') or landmark.get('point_id'))}</td>"
+                f"<td>{esc(axis_label(str(cell.get('axis_id'))))}</td>"
                 f"<td>{cell_html(cell.get('n_in_scope'))}</td>"
                 f"<td>{cell_html(cell.get('n_observed'))}</td>"
                 f"<td>{cell_html(cell.get('n_missing'))}</td>"
                 f"<td>{cell_html(cell.get('observed_fraction'))}</td>"
-                f"<td>{esc(classes)}</td>"
+                f"<td>{esc(_coverage_class_text(classes))}</td>"
                 "</tr>"
             )
     capability = market.get("data_capability") if isinstance(market.get("data_capability"), dict) else {}
@@ -1938,8 +1956,13 @@ def _market_section(model: dict[str, Any]) -> str:
         + f"<h2>{esc(surface_copy('MARKET', 'default_detail'))}</h2>"
         + default_html
         + f"<h2>{esc(surface_copy('MARKET', 'coverage'))}</h2>"
-        + "<table><thead><tr><th>point</th><th>axis</th><th>n_in_scope</th><th>n_observed</th>"
-        f"<th>n_missing</th><th>fraction</th><th>{esc(surface_copy('MARKET', 'missing'))}</th>"
+        + "<table><thead><tr>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_point'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_axis'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'n_scope'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'n_obs'))}</th>"
+        f"<th>n_missing</th><th>fraction</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_classes'))}</th>"
         "</tr></thead><tbody>"
         + coverage_rows
         + "</tbody></table>"

@@ -322,7 +322,7 @@ def _row_coverage_class(axis: Mapping[str, Any], row: Mapping[str, Any]) -> str:
 
 def _coverage_counts(
     rows: Sequence[Mapping[str, Any]],
-    member_ids: set[str],
+    member_ids: Mapping[str, str],
     axis: Mapping[str, Any],
 ) -> dict[str, int]:
     classes: dict[str, int] = {
@@ -342,11 +342,11 @@ def _coverage_counts(
             continue
         seen.add(entity_id)
         classes[_row_coverage_class(axis, row)] += 1
-    for entity_id in member_ids:
+    for entity_id, member_class in member_ids.items():
         if entity_id in seen:
             continue
         seen.add(entity_id)
-        classes["unknown"] += 1
+        classes[member_class if member_class in classes else "unknown"] += 1
     n_in_scope = sum(classes.values())
     return {
         **classes,
@@ -529,18 +529,30 @@ def _history_comparable(
     return True, None
 
 
-def _member_ids_for_current(
+def _member_ids_for_landmark(
     members: Sequence[Mapping[str, Any]],
     *,
+    point_id: str,
     current_start: datetime,
     as_of: datetime,
-) -> set[str]:
-    current_days = _utc_days(current_start, as_of)
-    ids: set[str] = set()
+    definition: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+    fingerprint: str | None,
+) -> dict[str, str]:
+    """Return entity_id -> coverage class for members in the current landmark window."""
+
+    ids: dict[str, str] = {}
     for row in members:
         entity_id = str(row.get("entity_id") or "")
         if not entity_id:
             continue
+        member_point = str(row.get("point_id") or "")
+        if member_point != point_id:
+            continue
+        if fingerprint is not None:
+            member_fp = _row_compatibility(definition, row, schedules)
+            if member_fp is not None and member_fp != fingerprint:
+                continue
         available = _parse_available(row)
         if available is None:
             raw = row.get("_partition_available_at")
@@ -549,26 +561,11 @@ def _member_ids_for_current(
                     available = parse_utc(str(raw))
                 except Exception:
                     available = None
-        if available is not None and available > as_of:
+        if available is None or available > as_of or not _in_window(available, current_start, as_of):
             continue
-        day = str(row.get("_partition_day") or "")
-        if day:
-            if day in current_days:
-                ids.add(entity_id)
-            continue
-        if available is not None and current_start < available <= as_of:
-            ids.add(entity_id)
+        state = row.get("membership_state") or row.get("state")
+        ids[entity_id] = coverage_class_for(state)
     return ids
-
-
-def _utc_days(start: datetime, end: datetime) -> set[str]:
-    days: set[str] = set()
-    cursor = start.astimezone(UTC).date()
-    last = end.astimezone(UTC).date()
-    while cursor <= last:
-        days.add(cursor.isoformat())
-        cursor = cursor + timedelta(days=1)
-    return days
 
 
 def _compatible_rows(
@@ -685,9 +682,7 @@ def project_market_context(
         if comparable_history and current_fingerprint
         else observations
     )
-    current_member_ids = _member_ids_for_current(
-        members, current_start=current_start, as_of=clock
-    )
+    missing_pit = any(_parse_available(row) is None for row in observations)
 
     slices: list[dict[str, Any]] = []
     for landmark in landmarks:
@@ -697,12 +692,14 @@ def project_market_context(
         current_at_point = _select_rows(
             current_obs, start=current_start, end=clock, point_id=point_id
         )
-        coverage_rows = _select_rows(
-            observations,
-            start=current_start,
-            end=clock,
+        member_ids = _member_ids_for_landmark(
+            members,
             point_id=point_id,
-            include_missing_pit=True,
+            current_start=current_start,
+            as_of=clock,
+            definition=definition,
+            schedules=schedules,
+            fingerprint=current_fingerprint,
         )
         previous_at_point = _select_rows(
             comparable_obs,
@@ -710,21 +707,13 @@ def project_market_context(
             end=clock,
             point_id=previous_id,
         )
-        landmark_status = (
-            "PRESENT"
-            if current_at_point or any(
-                str(row.get("point_id") or "") == point_id
-                and _parse_available(row) is None
-                for row in coverage_rows
-            )
-            else "LANDMARK_NOT_IN_EVIDENCE"
-        )
+        landmark_status = "PRESENT" if current_at_point else "LANDMARK_NOT_IN_EVIDENCE"
         axis_cells: list[dict[str, Any]] = []
         for axis in axes:
             current_value, details = _axis_value(
                 axis, current_at_point, previous_at_point
             )
-            coverage = _coverage_counts(coverage_rows, current_member_ids, axis)
+            coverage = _coverage_counts(current_at_point, member_ids, axis)
             reference_values = (
                 _reference_bucket_values(
                     axis,
@@ -816,6 +805,8 @@ def project_market_context(
         gaps.append("REFERENCE_INSUFFICIENT")
     if not current_obs and source_status == "PRESENT":
         gaps.append("NO_CURRENT_OBSERVATIONS")
+    if missing_pit and source_status == "PRESENT":
+        gaps.append("PIT_CLOCK_MISSING")
 
     snapshot_identity = {
         "definition_id": definition["definition_id"],

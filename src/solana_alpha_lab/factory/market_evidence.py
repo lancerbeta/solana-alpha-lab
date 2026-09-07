@@ -181,12 +181,14 @@ def _partition_available(payload: Mapping[str, Any]) -> datetime | None:
 
 def _partition_day(partition_id: str) -> str | None:
     text = str(partition_id or "")
-    if text.startswith("utc-day-"):
-        rest = text[len("utc-day-") :]
-        if rest.endswith("-members"):
-            rest = rest[: -len("-members")]
-        if len(rest) >= 10:
-            return rest[:10]
+    if not text.startswith("utc-day-"):
+        return None
+    rest = text[len("utc-day-") :]
+    if rest.endswith("-members"):
+        rest = rest[: -len("-members")]
+    compact = rest.replace("-", "")
+    if len(compact) == 8 and compact.isdigit():
+        return f"{compact[:4]}-{compact[4:6]}-{compact[6:8]}"
     return None
 
 
