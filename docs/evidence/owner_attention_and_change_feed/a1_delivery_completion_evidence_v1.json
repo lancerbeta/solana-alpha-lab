@@ -11,7 +11,31 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/reports/owner_attention_and_change_feed/a1_owner_readout_v1.md": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "README.md": "49f1c0b13ce444a5fdb814270d41df2ab328eb0390d6e1df937af63908ed51ba",
+    "catalog/assets/core.yaml": "6112915616541d46043da2e03432ddd5c03c242dc1c1bdecc173db56eaed7438",
+    "catalog/assets/lifecycle.yaml": "e9176dc91db381d453f1f9250706f1e7166b2489e5df3bbdf923c08a471e328b",
+    "catalog/catalog_manifest.yaml": "579a213d318269cdf96a86236bffb0d16299dc38f1fe2da7383a112a9e401d6e",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "1d938e82a8a86569f0cf4763d054ee48792e5d9cd22238e2d56c67b1f4a9590a",
+    "catalog/generated/asset_edges.json": "0799e98dc247d3575294ac2fd80a3d42e3c1484306db040bbb040fa7731fa743",
+    "catalog/schemas/factory_semantic_operability.schema.json": "5a4feae9260e569ed60ee623584c172f46ac5fda0711b95a02e68676dd6bbb57",
+    "configs/factory_semantic_operability_v1.yaml": "7a1596c1809011b2fb99f54391d79e7e347551892db5fab2ce92f8a7022ec1a8",
+    "docs/FACTORY_SEMANTIC_MAP.md": "81b18b0d46fcfdf78d6bb78ea0bef414b621ef1f67a62fb02ab6777f70446e49",
+    "docs/OPERATOR_NAVIGATION.md": "7fb02a22d6110976970e3e96b35afbfe59c9a4931b13df6d76148f2b2cc319e5",
+    "docs/PROJECT_MAP.md": "76a6be16cbefbf0c5b916afbefa8b9146aeb029299477e64f1327cdbe06aaa00",
+    "docs/contracts/owner_attention_and_change_feed_v1.md": "9055087b8adcf73a729cc4c56144ca9774f1678b0a49ce39652262729a27fee7",
+    "docs/reports/owner_attention_and_change_feed/a1_owner_readout_v1.md": "8631a4d8d6e09e1adef562ee316e927ef4afed54bc5d76ee1c6d857c3c55861d",
+    "docs/tasks/OWNER_ATTENTION_AND_CHANGE_FEED_V1.md": "a8a7f0b5a302c372d29c8ea006c62a3d4c0d344048d3fcb4b7979fd459d7003e",
+    "src/solana_alpha_lab/factory/application.py": "c084f0cf216521db9376c78f1da49fce12bacef808274e32f224330b90410304",
+    "src/solana_alpha_lab/factory/owner_daily_attention.py": "7e76a9aa483527c30a5ec10c766ad686e246b51fda3ab51c7c886e12949b9099",
+    "src/solana_alpha_lab/factory/owner_language.py": "61d2a60d8bcb9912178cd9c79ac7ace22d02565f5a010542bd62acb213530f7b",
+    "src/solana_alpha_lab/factory/owner_review_cursor.py": "2c88e95f06aaf4d2a6dbb1a27c7b6cc602800317bf28fd91a6b0a13f8cdec948",
+    "src/solana_alpha_lab/factory/workbench.py": "3b03b31c4dfb10acbe1d89bac269a26bd35dd7d70d858d50520334b409e703dd",
+    "tests/test_catalog_canonical_binding_discovery.py": "b553f6a37e5e8f2a042887d6c71909c432c42aa7f63e91ac80737adfb1802e89",
+    "tests/test_factory_ordinary_market_hypothesis.py": "96134901b838dbc392c1bc47284be50b3cfb387b3261871b3dbc0a57f65b6c9d",
+    "tests/test_factory_semantic_operability.py": "b189327167fe75c5a0324f6c79c19b125abb7abcdce2f4f67fe4da6af4a857be",
+    "tests/test_owner_attention_and_change_feed_v1.py": "4999d38f9918f243cd9239677dfc0867aa5230fb1dbee0c9f5132a0e6f7fc8d1",
+    "tests/test_owner_lifecycle_projection_spine_v1.py": "ec3c3db872e3b5174f4037f67f50221871344f479838773cde94f989dc3acdeb",
+    "tests/test_owner_workbench_vertical_ux_foundation_v1.py": "8947de20f802b49e53f90cf0c2a0e574e0b9cb378ce8d1e7a67a4fb7f69ea3b0"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +47,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_attention_and_change_feed/a1_delivery_factory_fit_v1.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sha256": "b3e47b6924b204c61dc3e20000fc70ee384ab1d49f29066033e2d743b9dad213",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_ATTENTION_AND_CHANGE_FEED_V1",
     "independent_review": {
       "path": "docs/evidence/owner_attention_and_change_feed/a1_delivery_independent_review_v1.json",
-      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sha256": "dde465001f8432b88753e9aa59ff2db2eb62f1443af40ca3d62adec69ae4f653",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

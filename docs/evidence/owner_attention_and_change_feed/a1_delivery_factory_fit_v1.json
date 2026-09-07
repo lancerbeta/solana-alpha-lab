@@ -6,8 +6,8 @@
   "task_id": "OWNER_ATTENTION_AND_CHANGE_FEED_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviewed_bindings_sha256": "1683ab111796a5a95fabae5b9968ce3cc5f536026d2520aa236cbb84c3656b41",
+  "reviewed_inventory_sha256": "bf883db546ccfaa2e5e8fde103888be6ed32f7c6c002e0806440ec697102dd78",
   "capability_radar": {
     "now": "NONE",
     "watch": "SYSTEM_OPERABILITY_SURFACE_V2"
