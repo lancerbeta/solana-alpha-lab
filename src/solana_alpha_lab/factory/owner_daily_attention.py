@@ -62,6 +62,7 @@ CHANGE_FEED_LIMIT = 12
 RESEARCH_STORE_SOURCE_ID = "SRC-RESEARCH-STORE"
 BLOCKING_STATE = frozenset({"UNAVAILABLE", "INVALID"})
 HISTORY_COMPLETE = "AVAILABLE"
+_WATERMARK_EPOCH = datetime(1, 1, 1, tzinfo=timezone.utc)
 
 
 def _text(value: Any) -> str:
@@ -71,19 +72,28 @@ def _text(value: Any) -> str:
 
 
 def _utc_iso(value: Any) -> str | None:
+    parsed = _utc_dt(value)
+    if parsed is None:
+        text = _text(value)
+        return text or None
+    spec = "microseconds" if parsed.microsecond else "seconds"
+    return parsed.isoformat(timespec=spec).replace("+00:00", "Z")
+
+
+def _utc_dt(value: Any) -> datetime | None:
     if value is None or value == "":
         return None
     if hasattr(value, "astimezone"):
-        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+        return value.astimezone(timezone.utc)
     text = _text(value)
     normalized = text.replace("Z", "+00:00") if text.endswith("Z") else text
     try:
         parsed = datetime.fromisoformat(normalized)
     except ValueError:
-        return text
+        return None
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    return parsed.astimezone(timezone.utc)
 
 
 def _priority_for(code: str, *, source_domain: str) -> str:
@@ -408,8 +418,8 @@ def _research_changes(records: Any) -> list[dict[str, Any]]:
     return out
 
 
-def _watermark_tuple(available: str | None, identity: str | None) -> tuple[str, str]:
-    return (available or "", identity or "")
+def _watermark_tuple(available: str | None, identity: str | None) -> tuple[datetime, str]:
+    return (_utc_dt(available) or _WATERMARK_EPOCH, identity or "")
 
 
 def _after_cursor(
@@ -423,7 +433,7 @@ def _after_cursor(
 
 def _source_watermark(changes: list[Mapping[str, Any]]) -> dict[str, str | None]:
     best = empty_watermark()
-    best_tuple = ("", "")
+    best_tuple: tuple[datetime, str] = (_WATERMARK_EPOCH, "")
     for change in changes:
         current = _watermark_tuple(change.get("change_available_at"), change.get("native_identity"))
         if current > best_tuple:
@@ -462,7 +472,7 @@ def _window_hole(
     if not established or not isinstance(mark, Mapping):
         return False
     mark_tuple = _watermark_tuple(mark.get("change_available_at"), mark.get("native_identity"))
-    if mark_tuple == ("", ""):
+    if not _text(mark.get("change_available_at")) and not _text(mark.get("native_identity")):
         return False
     if len(domain_changes) < CHANGE_FEED_LIMIT:
         return False
@@ -471,7 +481,7 @@ def _window_hole(
             _watermark_tuple(item.get("change_available_at"), item.get("native_identity"))
             for item in domain_changes
         ),
-        default=("", ""),
+        default=(_WATERMARK_EPOCH, ""),
     )
     return oldest > mark_tuple
 

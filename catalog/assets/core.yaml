@@ -35899,7 +35899,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: OWNER_ATTENTION_AND_CHANGE_FEED_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_daily_attention.py', repository_path: src/solana_alpha_lab/factory/owner_daily_attention.py}
-  integrity: {kind: sha256, sha256: d01143c007b4ca0c50ffe2832842ce3eab9e42c4633dcfce25053ba7ff46f304}
+  integrity: {kind: sha256, sha256: 7e76a9aa483527c30a5ec10c766ad686e246b51fda3ab51c7c886e12949b9099}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001}
@@ -35918,7 +35918,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: OWNER_ATTENTION_AND_CHANGE_FEED_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_attention_and_change_feed_v1.py', repository_path: tests/test_owner_attention_and_change_feed_v1.py}
-  integrity: {kind: sha256, sha256: 4aa7da3512f7b80322bafae0ef4e5e7871de1c633ff2730dd7817a772563946b}
+  integrity: {kind: sha256, sha256: 4999d38f9918f243cd9239677dfc0867aa5230fb1dbee0c9f5132a0e6f7fc8d1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001}

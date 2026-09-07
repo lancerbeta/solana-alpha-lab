@@ -719,6 +719,30 @@ class OwnerAttentionAndChangeFeedV1Tests(unittest.TestCase):
         )
         self.assertEqual(len(projection["changes"]), 0)
 
+    def test_fractional_availability_is_newer_than_whole_second_watermark(self) -> None:
+        cursor = {
+            "sources": {
+                "RESEARCH": {
+                    "change_available_at": "2026-09-07T12:00:00Z",
+                    "native_identity": "REC-OLD",
+                }
+            }
+        }
+        projection = compose_owner_attention(
+            research={"sources": [{"source_id": "SRC-RESEARCH-STORE", "status": "AVAILABLE"}]},
+            research_records=[
+                {
+                    "record_id": "REC-NEW",
+                    "record_kind": "RESEARCH_EVENT",
+                    "first_reliable_available_at": "2026-09-07T12:00:00.000001Z",
+                }
+            ],
+            cursor=cursor,
+            cursor_status="VALID",
+        )
+        self.assertEqual(len(projection["changes"]), 1)
+        self.assertEqual(projection["changes"][0]["source_native_identity"], "REC-NEW")
+
     def test_semantic_daily_attention_not_delivery_gate(self) -> None:
         projection = load_semantic_projection(ROOT)
         assets, bindings, _queries = load_semantic_catalog_views(ROOT)
