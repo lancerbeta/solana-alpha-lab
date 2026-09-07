@@ -624,10 +624,14 @@ def compose_risk_economics(
             for row in rows
             if row.get("trusted")
         ]
-        net_sum = sum((item for item in trusted_net if item is not None), Decimal("0"))
         status_value = _reconciled_status(rows)
         drawdown = _drawdown(rows)
         streak = _loss_streak(rows)
+        trusted_headline = (
+            format(sum((item for item in trusted_net if item is not None), Decimal("0")), "f")
+            if status_value == "KNOWN" and trusted_net
+            else None
+        )
         reconciled_scopes.append(
             {
                 "strategy_id": key[0],
@@ -640,11 +644,7 @@ def compose_risk_economics(
                 "reconciled_count_unknown_or_conflict": sum(
                     1 for row in rows if not row.get("trusted")
                 ),
-                "realized_net_after_modeled_fees_usd": None
-                if status_value in {"EMPTY", "UNKNOWN", "ACCOUNTING_CONFLICT"}
-                else format(net_sum, "f")
-                if trusted_net
-                else None,
+                "realized_net_after_modeled_fees_usd": trusted_headline,
                 "modeled_fee_coverage": _fee_coverage(rows),
                 "drawdown": drawdown,
                 "loss_streak": streak,
@@ -665,21 +665,26 @@ def compose_risk_economics(
     for key, rows in mark_groups.items():
         known = [row for row in rows if row.get("status") == "KNOWN"]
         nets = [_dec(row["unrealized_net_after_modeled_fees_usd"]) for row in known]
+        mark_status = (
+            "KNOWN"
+            if known and len(known) == len(rows)
+            else ("PARTIAL_UNKNOWN" if known else "UNKNOWN")
+        )
         open_mark_scopes.append(
             {
                 "strategy_id": key[0],
                 "strategy_version": key[1],
                 "mode": key[2],
                 "mark_evidence_class": key[3],
-                "status": "KNOWN"
-                if known and len(known) == len(rows)
-                else ("PARTIAL_UNKNOWN" if known else "UNKNOWN"),
+                "status": mark_status,
                 "open_mark_count": len(rows),
                 "open_mark_known_count": len(known),
                 "open_mark_unknown_count": len(rows) - len(known),
-                "unrealized_net_after_modeled_fees_usd": None
-                if not known
-                else format(sum((item for item in nets if item is not None), Decimal("0")), "f"),
+                "unrealized_net_after_modeled_fees_usd": (
+                    format(sum((item for item in nets if item is not None), Decimal("0")), "f")
+                    if mark_status == "KNOWN"
+                    else None
+                ),
                 "mark_freshness_policy": "NOT_DEFINED",
                 "settlement": "NOT_SETTLED",
                 "rows": rows,

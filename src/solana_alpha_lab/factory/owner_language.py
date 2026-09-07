@@ -464,6 +464,7 @@ SURFACE_COPY = {
         "open_mark": "Open mark economics",
         "mark_subordinate": "Open mark — as-of estimate, не settled cash. Не складывается с reconciled.",
         "declared_risk": "Declared entry-admission risk",
+        "strategy_binding": "StrategyVersion",
         "entry_limit": "max_open_positions",
         "headroom": "Оставшиеся entry slots",
         "daily_loss": "Daily loss limit",

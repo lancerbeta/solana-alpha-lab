@@ -458,6 +458,11 @@ class RiskAndEconomicsV1Tests(unittest.TestCase):
                 streak = projection["reconciled_scopes"][0]["loss_streak"]
                 self.assertEqual(streak["status"], "UNKNOWN")
                 self.assertIsNone(streak["count"])
+                scope = projection["reconciled_scopes"][0]
+                self.assertEqual(scope["status"], "PARTIAL_UNKNOWN")
+                self.assertIsNone(scope["realized_net_after_modeled_fees_usd"])
+                self.assertIsNone(projection["reconciled_net_pnl_usd"])
+                self.assertEqual(projection["reconciled_net_pnl_status"], "PARTIAL_UNKNOWN")
             finally:
                 store.close()
 
@@ -574,6 +579,7 @@ class RiskAndEconomicsV1Tests(unittest.TestCase):
             for path in GET_PATHS:
                 _get(app, path)
             self.assertIn("PAPER_RECONCILED_MODEL", economics)
+            self.assertIn("STRAT-ACCOUNTING-CONTROL-A@V1", economics)
             self.assertIn("NO ALPHA", economics)
             self.assertIn("NOT_ESTABLISHED", economics)
             self.assertIn("NOT_AVAILABLE", economics)

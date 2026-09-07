@@ -702,6 +702,10 @@ def _scope_card(scope: Mapping[str, Any], *, mark: bool = False) -> str:
         if mark
         else "realized_net_after_modeled_fees_usd"
     )
+    status_value = str(scope.get("status") or "")
+    net_value = scope.get(net_key)
+    if status_value in {"PARTIAL_UNKNOWN", "UNKNOWN", "ACCOUNTING_CONFLICT", "EMPTY"}:
+        net_value = None
     identity = (
         f"{esc(scope.get('strategy_id'))}@{esc(scope.get('strategy_version'))} "
         f"{canon(scope.get('mode'))}"
@@ -718,7 +722,7 @@ def _scope_card(scope: Mapping[str, Any], *, mark: bool = False) -> str:
                 (surface_copy("ECONOMICS", "status"), canon(scope.get("status"))),
                 (
                     surface_copy("ECONOMICS", "marked_net" if mark else "net"),
-                    _eco_money(scope.get(net_key)),
+                    _eco_money(net_value),
                 ),
                 (surface_copy("ECONOMICS", "known_count"), cell_html(scope.get(known_key))),
                 (
@@ -792,6 +796,11 @@ def _economics_section(model: dict[str, Any]) -> str:
     for scope in risk:
         risk_html += fact_strip(
             [
+                (
+                    surface_copy("ECONOMICS", "strategy_binding"),
+                    f"{esc(scope.get('strategy_id'))}@{esc(scope.get('strategy_version'))} "
+                    + canon(scope.get("mode")),
+                ),
                 (
                     surface_copy("ECONOMICS", "entry_limit"),
                     f"{cell_html(scope.get('entry_admission_risk_count'))} / "
