@@ -40,6 +40,8 @@ managed_write_set:
   - tests/test_catalog_canonical_binding_discovery.py
   - tests/test_owner_attention_and_change_feed_v1.py
   - tests/test_factory_unattended_operability_closure_v1.py
+  - tests/test_owner_operations_cockpit_v1.py
+  - tests/test_factory_v1_production_lite_runtime.py
   - catalog/schemas/factory_semantic_operability.schema.json
   - configs/factory_semantic_operability_v1.yaml
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml

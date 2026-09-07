@@ -26192,7 +26192,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_production_lite_runtime.py', repository_path: tests/test_factory_v1_production_lite_runtime.py}
-  integrity: {kind: sha256, sha256: 5187fbbd6b9c711a0cb5a9ceedc78a5af87fa4bd4f097f74cf18849b5afa65ab}
+  integrity: {kind: sha256, sha256: e10dcd5cab9016548c62976230cb58db8296274caaffcafd97a6c0eaed42e3b6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNTIME-001}
@@ -34619,7 +34619,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_operations_cockpit_v1.py', repository_path: tests/test_owner_operations_cockpit_v1.py}
-  integrity: {kind: sha256, sha256: a6303bf97a96f2136f187da38b6bd189283db0ce76795485b3c542a53d5a20b0}
+  integrity: {kind: sha256, sha256: a818928a7ff344f200ab567392d5ec7839c157347d18f58b5b84f39ea872ddf1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
@@ -35936,7 +35936,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md', repository_path: docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md}
-  integrity: {kind: sha256, sha256: cba4f001ada44b8e4a3b34ac3190af7813393495f512fee5cb8c97a534ef771d}
+  integrity: {kind: sha256, sha256: c5fb36b26c30cab6fc375f1a9dd4ed5e85409354048fbfb2c2f5e82916c446f6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-SYSTEM-OPERABILITY-SURFACE-001}
