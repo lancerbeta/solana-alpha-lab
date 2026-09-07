@@ -376,21 +376,17 @@ def read_market_evidence(
         else:
             observation_rows.extend(tagged)
 
-    current_days = _utc_day_set(
-        clock - timedelta(seconds=int(definition["current_window_seconds"])),
-        clock,
-    )
-    obs_current = False
-    member_current = False
+    obs_days = set()
+    member_days = set()
     for payload in selected:
         day = _partition_day(str(payload.get("partition_id") or ""))
-        if day not in current_days:
+        if day is None:
             continue
         if str(payload.get("partition_id") or "").endswith("-members"):
-            member_current = True
+            member_days.add(day)
         else:
-            obs_current = True
-    if obs_current and not member_current:
+            obs_days.add(day)
+    if obs_days - member_days:
         members_incomplete = True
 
     needed = {

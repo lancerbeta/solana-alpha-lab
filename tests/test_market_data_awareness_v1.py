@@ -174,13 +174,30 @@ def _history(
     return rows
 
 
+def _members_from(observations: list[dict]) -> list[dict]:
+    members: list[dict] = []
+    for row in observations:
+        if not row.get("first_reliable_available_at"):
+            continue
+        members.append(
+            {
+                "entity_id": row["entity_id"],
+                "point_id": row["point_id"],
+                "first_reliable_available_at": row["first_reliable_available_at"],
+                "schedule_sha256": row["schedule_sha256"],
+                "membership_state": row.get("state") or "OBSERVED",
+            }
+        )
+    return members
+
+
 def _bundle(definition, observations, *, sha: str = SHA_A, policy: str = "DETERMINISTIC_HASH_BERNOULLI"):
     semantics = schedule_semantics_from_document(_document(policy=policy))
     return {
         "source_status": "PRESENT",
         "source_error": None,
         "observations": observations,
-        "members": [],
+        "members": _members_from(observations),
         "schedules": {sha: semantics},
         "partitions_read": 1,
         "provider_calls": 0,
@@ -326,7 +343,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
         bundle = {
             "source_status": "PRESENT",
             "observations": rows,
-            "members": [],
+            "members": _members_from(rows),
             "schedules": {"0" * 64: unused_sem, SHA_A: current_sem},
         }
         projection = project_market_context(self.definition, bundle, as_of=AS_OF)
@@ -413,6 +430,45 @@ class MarketDataAwarenessTests(unittest.TestCase):
                     ),
                     encoding="utf-8",
                 )
+            bundle = read_market_evidence(
+                ROOT,
+                as_of=AS_OF,
+                definition=self.definition,
+                data_root=data_root,
+            )
+            self.assertTrue(bundle["members_incomplete"])
+
+    def test_historical_obs_day_without_members_marks_incomplete(self) -> None:
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            partitions = data_root / "datasets" / "manifests" / "partitions"
+            partitions.mkdir(parents=True)
+            (data_root / "datasets/observation-panel").mkdir(parents=True)
+            available = render_utc(AS_OF - timedelta(minutes=10))
+
+            def _write(pid: str) -> None:
+                rel = f"datasets/observation-panel/{pid}.parquet"
+                pq.write_table(pa.table({"entity_id": ["mint1"]}), data_root / rel)
+                (partitions / f"{pid}.json").write_text(
+                    json.dumps(
+                        {
+                            "dataset_id": "observation-panel-test",
+                            "partition_id": pid,
+                            "logical_location": rel,
+                            "first_reliable_available_at": available,
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+
+            current = AS_OF.strftime("%Y%m%d")
+            hist = (AS_OF - timedelta(days=2)).strftime("%Y%m%d")
+            _write(f"utc-day-{current}")
+            _write(f"utc-day-{current}-members")
+            _write(f"utc-day-{hist}")
             bundle = read_market_evidence(
                 ROOT,
                 as_of=AS_OF,
@@ -539,6 +595,27 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertEqual(cell["relative_reason"], "REFERENCE_INSUFFICIENT")
         self.assertEqual(cell["reference_bucket_count"], 0)
 
+    def test_history_without_member_evidence_is_not_reference(self) -> None:
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        current = list(rows)
+        rows.extend(_history({"FIELD-LIQUIDITY-USD-001": 100}))
+        bundle = _bundle(self.definition, rows)
+        bundle["members"] = _members_from(current)
+        projection = project_market_context(self.definition, bundle, as_of=AS_OF)
+        cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
+        self.assertEqual(cell["raw_value"], "1000")
+        self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertEqual(cell["relative_reason"], "REFERENCE_INSUFFICIENT")
+
     def test_insufficient_history_keeps_raw_unknown_relative(self) -> None:
         rows = [
             _obs("now1", "Y1800", AS_OF - timedelta(minutes=10), {"FIELD-LIQUIDITY-USD-001": 80}),
@@ -580,7 +657,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
         bundle = {
             "source_status": "PRESENT",
             "observations": rows,
-            "members": [],
+            "members": _members_from(rows),
             "schedules": {SHA_A: semantics, SHA_B: right_semantics},
         }
         projection = project_market_context(self.definition, bundle, as_of=AS_OF)

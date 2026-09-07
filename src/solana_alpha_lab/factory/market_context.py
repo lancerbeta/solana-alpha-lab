@@ -507,7 +507,18 @@ def _reference_bucket_values(
             schedules=schedules,
             fingerprint=fingerprint,
         )
-        coverage = _coverage_counts(current_rows, member_ids, axis)
+        if not member_ids:
+            cursor = bucket_end
+            continue
+        bucket_days = {
+            (cursor + timedelta(days=offset)).date().isoformat()
+            for offset in range((bucket_end.date() - cursor.date()).days + 1)
+        }
+        coverage_rows = [
+            *current_rows,
+            *_unclocked_rows(observations, point_id=point_id, current_days=bucket_days),
+        ]
+        coverage = _coverage_counts(coverage_rows, member_ids, axis)
         metric, _details = _axis_value(axis, current_rows, previous_rows)
         if metric is not None and _coverage_meets_minimum(coverage, definition):
             values.append(metric)
