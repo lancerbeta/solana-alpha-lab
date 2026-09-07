@@ -10,7 +10,30 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "9a1195f1f949b00eb228044e4f2629d96ad5b3f18d04055212a570bc60c8d9fa",
+    "catalog/assets/lifecycle.yaml": "dd7bfe36806bbd24dcf2a211da5c40b5e8d50959b4bf1e314f33f3b8ba006aae",
+    "catalog/catalog_manifest.yaml": "48cff0d98eb71492e1abc1ed59047276c8222fd67fedf9da08bce0e964b937b3",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "e6b0712107ca9a5a907efad5e4080b5f94c54d3c6de63bdbb62a0626123e0257",
+    "catalog/generated/asset_edges.json": "78f69799c7d9ca445940252df9bff29195b2039b6e9bc7594e9abcdbb42337dd",
+    "configs/factory_semantic_operability_v1.yaml": "c8b5b987bc852e6239eddfc4640ac4ae53574da9144044989185e936560e8b03",
+    "configs/owner_lifecycle_projection_v1.yaml": "52f9bb6dbbaf6c5ec8c92beea4d7a0f14df56944e42600f16cfb0135a205f58c",
+    "docs/PROJECT_MAP.md": "65f6732f0185c209bd9d9abc15700324e1e401efdb9a85ea1eb29032c621673d",
+    "docs/contracts/risk_and_economics_v1.md": "de7262892fb3de1d948d97e8e6691f2a0eac875d0d2b499743e4adaf9e634677",
+    "docs/contracts/trading_operations_workbench_v2.md": "788517fe53c05f36c495789355f05418488c15632b8574ccf600a552ecfb0289",
+    "docs/reports/risk_and_economics/a1_owner_readout_v1.md": "90568079e845ddca9c9847e2d65f1ed69a8a8596b6bd20e7953e1cc800f9bb25",
+    "docs/tasks/RISK_AND_ECONOMICS_V1.md": "9a97b985624c80e66c2db40405c1e04d9adaf0cfce9e3745287ebcc66be35cb6",
+    "src/solana_alpha_lab/factory/application.py": "7b444be99fd25bed29d1a2e8b33d87ae428fa4fd447ad74a1553d752bced6c8f",
+    "src/solana_alpha_lab/factory/owner_language.py": "98a552b458e26ae9d308a7d0ff835c46deb2b133cd419226d85c819e13badd4c",
+    "src/solana_alpha_lab/factory/paper_plane.py": "c5d115a99f9dc4406c637740ed21aa71144bb4c2f83947c800dd740aea8a14e8",
+    "src/solana_alpha_lab/factory/risk_economics.py": "8df490102a10d07960a128f2ec8a7bac568211e94c54c48f1f6fd7a10dd79411",
+    "src/solana_alpha_lab/factory/trading_operations.py": "f01721650b9538d9a7734b62eacc0fbc15bade57bc71ad02f65dedfd2a299c9f",
+    "src/solana_alpha_lab/factory/workbench.py": "c751dd5ff3aae7557ec22de65315dd5c5c2ec7362e8b23a6ad4d0ac467ac6579",
+    "tests/test_factory_v1_owner_cockpit.py": "d170fc97be6da6f7c348906dc383e46f8a41a73160162a6f8cd7cc2fa469e85a",
+    "tests/test_owner_operations_cockpit_v1.py": "101e4e4b0645ca500cedb6ce63abf142af4496012c140aadcc4002bf51921c08",
+    "tests/test_owner_workbench_vertical_ux_foundation_v1.py": "00af979a72002e20a1410062c207b24d33a69000b4617b50c211eada258541c9",
+    "tests/test_risk_and_economics_v1.py": "a1cbf2db3d4d9320aaeb063db660c6dd1bcb347e1829370e3be767d19435bb46"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/risk_and_economics/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "3272c0a1587710c46a88bb9eee61a239d3a222d7b905856bd369701ae79906a5",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_RISK_AND_ECONOMICS_V1",
     "independent_review": {
       "path": "docs/evidence/risk_and_economics/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "ecbcaf79879db2d82ef637be7b3205b8f3752964a2a05c7a794aa19b0ca32e8c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
