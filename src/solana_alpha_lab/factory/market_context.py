@@ -6,7 +6,7 @@ import hashlib
 import json
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
-from decimal import Decimal, ROUND_HALF_EVEN
+from decimal import ROUND_FLOOR, Decimal
 from pathlib import Path
 from typing import Any
 
@@ -113,6 +113,27 @@ def load_market_context_definition(root: Path) -> dict[str, Any]:
     return loaded
 
 
+def _definition_compat_payload(definition: Mapping[str, Any]) -> dict[str, Any]:
+    tokens = definition.get("tokens_projection") if isinstance(definition.get("tokens_projection"), Mapping) else {}
+    return {
+        "definition_id": definition["definition_id"],
+        "definition_version": definition["definition_version"],
+        "current_window_seconds": definition["current_window_seconds"],
+        "reference_lookback_seconds": definition["reference_lookback_seconds"],
+        "reference_bucket_seconds": definition["reference_bucket_seconds"],
+        "reference_low_quantile": definition["reference_low_quantile"],
+        "reference_high_quantile": definition["reference_high_quantile"],
+        "minimum_current_coverage": definition["minimum_current_coverage"],
+        "minimum_current_n": definition["minimum_current_n"],
+        "minimum_historical_buckets": definition["minimum_historical_buckets"],
+        "owner_default_landmark_id": definition["owner_default_landmark_id"],
+        "lifecycle_landmarks": list(definition["lifecycle_landmarks"]),
+        "axes": list(definition["axes"]),
+        "tokens_projection_id": str(tokens.get("projection_id") or PROJECTION_ID),
+        "tokens_projection_version": str(tokens.get("projection_version") or PROJECTION_VERSION),
+    }
+
+
 def context_compatibility_sha256(
     definition: Mapping[str, Any],
     schedule_semantics: Mapping[str, Any] | None,
@@ -120,15 +141,7 @@ def context_compatibility_sha256(
     if not isinstance(schedule_semantics, Mapping) or not schedule_semantics:
         return None
     payload = {
-        "definition_id": definition["definition_id"],
-        "definition_version": definition["definition_version"],
-        "tokens_projection_id": str(
-            (definition.get("tokens_projection") or {}).get("projection_id") or PROJECTION_ID
-        ),
-        "tokens_projection_version": str(
-            (definition.get("tokens_projection") or {}).get("projection_version")
-            or PROJECTION_VERSION
-        ),
+        **_definition_compat_payload(definition),
         "semantics": json.loads(_canonical_bytes(dict(schedule_semantics)).decode("utf-8")),
     }
     return _canonical_sha256(payload)
@@ -153,11 +166,9 @@ def _quantile(values: Sequence[Decimal], q: Decimal) -> Decimal | None:
     if n == 1:
         return ordered[0]
     position = q * Decimal(n - 1)
-    lower = int(position.to_integral_value(rounding=ROUND_HALF_EVEN))
-    lower = min(max(lower, 0), n - 1)
-    upper = min(lower + 1, n - 1)
-    fraction = position - Decimal(lower)
-    return ordered[lower] + (ordered[upper] - ordered[lower]) * fraction
+    index = int(position.to_integral_value(rounding=ROUND_FLOOR))
+    index = min(max(index, 0), n - 1)
+    return ordered[index]
 
 
 def _direction(previous: Decimal, current: Decimal) -> str:
@@ -288,6 +299,27 @@ def _entity_metric(
     raise MarketContextError("UNKNOWN_AGGREGATION")
 
 
+def _row_coverage_class(axis: Mapping[str, Any], row: Mapping[str, Any]) -> str:
+    fields = _field_map(row)
+    if _parse_available(row) is None:
+        return "typed_missing"
+    if str(axis["aggregation"]) == "MEDIAN_BUY_SELL_BALANCE":
+        states = []
+        for field_id in axis["field_ids"]:
+            field = fields.get(str(field_id))
+            states.append(str((field or {}).get("state") or row.get("state") or ""))
+        if states and all(item == "OBSERVED" for item in states):
+            return "observed"
+        for item in states:
+            if item != "OBSERVED":
+                return coverage_class_for(item)
+        return "unknown"
+    field_id = str(axis["field_ids"][0])
+    field = fields.get(field_id)
+    state = (field or {}).get("state") or row.get("state")
+    return coverage_class_for(state)
+
+
 def _coverage_counts(
     rows: Sequence[Mapping[str, Any]],
     member_ids: set[str],
@@ -304,16 +336,12 @@ def _coverage_counts(
         "unknown": 0,
     }
     seen: set[str] = set()
-    field_id = str(axis["field_ids"][0])
     for row in rows:
         entity_id = str(row.get("entity_id") or "")
         if not entity_id or entity_id in seen:
             continue
         seen.add(entity_id)
-        fields = _field_map(row)
-        field = fields.get(field_id)
-        state = (field or {}).get("state") or row.get("state")
-        classes[coverage_class_for(state)] += 1
+        classes[_row_coverage_class(axis, row)] += 1
     for entity_id in member_ids:
         if entity_id in seen:
             continue
@@ -340,13 +368,18 @@ def _select_rows(
     start: datetime,
     end: datetime,
     point_id: str | None = None,
+    include_missing_pit: bool = False,
 ) -> list[dict[str, Any]]:
     selected: list[dict[str, Any]] = []
     for row in rows:
         available = _parse_available(row)
-        if not _in_window(available, start, end):
-            continue
         if point_id is not None and str(row.get("point_id") or "") != point_id:
+            continue
+        if available is None:
+            if include_missing_pit:
+                selected.append(dict(row))
+            continue
+        if not _in_window(available, start, end):
             continue
         selected.append(dict(row))
     return selected
@@ -432,6 +465,142 @@ def _reference_bucket_values(
     return values
 
 
+def _row_compatibility(
+    definition: Mapping[str, Any],
+    row: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+) -> str | None:
+    semantics = row.get("schedule_semantics")
+    if not isinstance(semantics, Mapping):
+        digest = str(row.get("schedule_sha256") or "")
+        found = schedules.get(digest) if digest else None
+        semantics = found if isinstance(found, Mapping) else None
+    return context_compatibility_sha256(
+        definition, semantics if isinstance(semantics, Mapping) else None
+    )
+
+
+def _current_compatibility(
+    definition: Mapping[str, Any],
+    current_obs: Sequence[Mapping[str, Any]],
+    schedules: Mapping[str, Any],
+) -> tuple[str | None, str | None]:
+    fingerprints: set[str] = set()
+    missing = False
+    for row in current_obs:
+        fingerprint = _row_compatibility(definition, row, schedules)
+        if fingerprint is None:
+            missing = True
+            continue
+        fingerprints.add(fingerprint)
+    if missing and not fingerprints:
+        return None, "SCHEDULE_SEMANTICS_MISSING"
+    if missing:
+        return None, "SCHEDULE_SEMANTICS_MISSING"
+    if not fingerprints:
+        return None, "SCHEDULE_SEMANTICS_MISSING"
+    if len(fingerprints) > 1:
+        return None, "REFERENCE_SCOPE_MISMATCH"
+    return next(iter(fingerprints)), None
+
+
+def _history_comparable(
+    definition: Mapping[str, Any],
+    history_obs: Sequence[Mapping[str, Any]],
+    schedules: Mapping[str, Any],
+    current_fingerprint: str,
+) -> tuple[bool, str | None]:
+    if not history_obs:
+        return True, None
+    fingerprints: set[str] = set()
+    missing = False
+    for row in history_obs:
+        fingerprint = _row_compatibility(definition, row, schedules)
+        if fingerprint is None:
+            missing = True
+            continue
+        fingerprints.add(fingerprint)
+    if missing and not fingerprints:
+        return False, "SCHEDULE_SEMANTICS_MISSING"
+    if fingerprints and fingerprints != {current_fingerprint}:
+        return False, "REFERENCE_SCOPE_MISMATCH"
+    if missing:
+        return False, "SCHEDULE_SEMANTICS_MISSING"
+    return True, None
+
+
+def _member_ids_for_current(
+    members: Sequence[Mapping[str, Any]],
+    *,
+    current_start: datetime,
+    as_of: datetime,
+) -> set[str]:
+    current_days = _utc_days(current_start, as_of)
+    ids: set[str] = set()
+    for row in members:
+        entity_id = str(row.get("entity_id") or "")
+        if not entity_id:
+            continue
+        available = _parse_available(row)
+        if available is None:
+            raw = row.get("_partition_available_at")
+            if raw:
+                try:
+                    available = parse_utc(str(raw))
+                except Exception:
+                    available = None
+        if available is not None and available > as_of:
+            continue
+        day = str(row.get("_partition_day") or "")
+        if day:
+            if day in current_days:
+                ids.add(entity_id)
+            continue
+        if available is not None and current_start < available <= as_of:
+            ids.add(entity_id)
+    return ids
+
+
+def _utc_days(start: datetime, end: datetime) -> set[str]:
+    days: set[str] = set()
+    cursor = start.astimezone(UTC).date()
+    last = end.astimezone(UTC).date()
+    while cursor <= last:
+        days.add(cursor.isoformat())
+        cursor = cursor + timedelta(days=1)
+    return days
+
+
+def _compatible_rows(
+    rows: Sequence[Mapping[str, Any]],
+    definition: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+    fingerprint: str,
+) -> list[dict[str, Any]]:
+    return [
+        dict(row)
+        for row in rows
+        if _row_compatibility(definition, row, schedules) == fingerprint
+    ]
+
+
+def _sampling_policy(
+    current_obs: Sequence[Mapping[str, Any]],
+    schedules: Mapping[str, Any],
+) -> object:
+    for row in current_obs:
+        digest = str(row.get("schedule_sha256") or "")
+        semantics = row.get("schedule_semantics")
+        if not isinstance(semantics, Mapping):
+            found = schedules.get(digest) if digest else None
+            semantics = found if isinstance(found, Mapping) else None
+        if isinstance(semantics, Mapping):
+            sampling = semantics.get("sampling")
+            if isinstance(sampling, Mapping):
+                return sampling.get("policy")
+    return None
+
+
 def _schedule_sha_set(rows: Sequence[Mapping[str, Any]]) -> list[str]:
     return sorted(
         {
@@ -484,104 +653,85 @@ def project_market_context(
     source_status = str(evidence.get("source_status") or "NOT_PRESENT")
     landmarks = list(definition["lifecycle_landmarks"])
     axes = list(definition["axes"])
-    present_points = {
-        str(row.get("point_id") or "")
-        for row in observations
-        if str(row.get("point_id") or "")
-    }
-    for item in landmarks:
-        present_points.add(str(item["previous_point_id"]))
-
+    members_incomplete = bool(evidence.get("members_incomplete"))
     current_obs = _select_rows(observations, start=current_start, end=clock)
-    fingerprints: set[str] = set()
-    fingerprint_by_sha: dict[str, str | None] = {}
-    for digest, semantics in schedules.items():
-        fingerprint = context_compatibility_sha256(definition, semantics)
-        fingerprint_by_sha[str(digest)] = fingerprint
-        if fingerprint:
-            fingerprints.add(fingerprint)
-    if not fingerprints:
-        for row in current_obs:
-            digest = str(row.get("schedule_sha256") or "")
-            semantics = schedules.get(digest) if digest else None
-            if isinstance(row.get("schedule_semantics"), Mapping):
-                semantics = row.get("schedule_semantics")
-            fingerprint = context_compatibility_sha256(
-                definition, semantics if isinstance(semantics, Mapping) else None
-            )
-            if digest:
-                fingerprint_by_sha[digest] = fingerprint
-            if fingerprint:
-                fingerprints.add(fingerprint)
-
-    current_fingerprint = next(iter(sorted(fingerprints)), None)
+    history_obs = _select_rows(observations, start=reference_start, end=current_start)
+    current_fingerprint, fingerprint_fault = _current_compatibility(
+        definition, current_obs, schedules
+    )
     comparable_history = True
     incomparable_reason = "REFERENCE_SCOPE_MISMATCH"
-    history_obs = _select_rows(observations, start=reference_start, end=current_start)
     if source_status != "PRESENT":
         comparable_history = False
         incomparable_reason = "SOURCE_NOT_PRESENT"
+    elif members_incomplete:
+        comparable_history = False
+        incomparable_reason = "MEMBER_EVIDENCE_INCOMPLETE"
+    elif fingerprint_fault:
+        comparable_history = False
+        incomparable_reason = fingerprint_fault
+        current_fingerprint = None
     elif current_fingerprint is None:
         comparable_history = False
         incomparable_reason = "SCHEDULE_SEMANTICS_MISSING"
     else:
-        history_prints = set()
-        for row in history_obs:
-            digest = str(row.get("schedule_sha256") or "")
-            semantics = row.get("schedule_semantics")
-            if not isinstance(semantics, Mapping):
-                semantics = schedules.get(digest)
-            fingerprint = context_compatibility_sha256(
-                definition, semantics if isinstance(semantics, Mapping) else None
-            )
-            if fingerprint:
-                history_prints.add(fingerprint)
-        if history_obs and history_prints and history_prints != {current_fingerprint}:
-            comparable_history = False
-            incomparable_reason = "REFERENCE_SCOPE_MISMATCH"
-        elif history_obs and not history_prints:
-            comparable_history = False
-            incomparable_reason = "REFERENCE_SCOPE_MISMATCH"
+        comparable_history, history_fault = _history_comparable(
+            definition, history_obs, schedules, current_fingerprint
+        )
+        if history_fault:
+            incomparable_reason = history_fault
+    comparable_obs = (
+        _compatible_rows(observations, definition, schedules, current_fingerprint)
+        if comparable_history and current_fingerprint
+        else observations
+    )
+    current_member_ids = _member_ids_for_current(
+        members, current_start=current_start, as_of=clock
+    )
 
     slices: list[dict[str, Any]] = []
     for landmark in landmarks:
         point_id = str(landmark["point_id"])
         previous_id = str(landmark["previous_point_id"])
-        landmark_present = point_id in {
-            str(row.get("point_id") or "") for row in observations
-        } or point_id in {
-            str(row.get("point_id") or "") for row in current_obs
-        }
-        if not landmark_present and point_id not in {
-            str(row.get("point_id") or "") for row in observations
-        }:
-            landmark_status = "LANDMARK_NOT_IN_EVIDENCE"
-        else:
-            landmark_status = "PRESENT"
+        lookback = _previous_lookback_seconds(landmark, landmarks)
         current_at_point = _select_rows(
             current_obs, start=current_start, end=clock, point_id=point_id
         )
-        previous_at_point = _select_rows(
-            observations, start=reference_start, end=clock, point_id=previous_id
+        coverage_rows = _select_rows(
+            observations,
+            start=current_start,
+            end=clock,
+            point_id=point_id,
+            include_missing_pit=True,
         )
-        member_ids = {
-            str(row.get("entity_id") or "")
-            for row in members
-            if str(row.get("entity_id") or "")
-        }
+        previous_at_point = _select_rows(
+            comparable_obs,
+            start=current_start - timedelta(seconds=lookback),
+            end=clock,
+            point_id=previous_id,
+        )
+        landmark_status = (
+            "PRESENT"
+            if current_at_point or any(
+                str(row.get("point_id") or "") == point_id
+                and _parse_available(row) is None
+                for row in coverage_rows
+            )
+            else "LANDMARK_NOT_IN_EVIDENCE"
+        )
         axis_cells: list[dict[str, Any]] = []
         for axis in axes:
             current_value, details = _axis_value(
                 axis, current_at_point, previous_at_point
             )
-            coverage = _coverage_counts(current_at_point, member_ids, axis)
+            coverage = _coverage_counts(coverage_rows, current_member_ids, axis)
             reference_values = (
                 _reference_bucket_values(
                     axis,
-                    observations,
+                    comparable_obs,
                     point_id=point_id,
                     previous_point_id=previous_id,
-                    previous_lookback_seconds=_previous_lookback_seconds(landmark, landmarks),
+                    previous_lookback_seconds=lookback,
                     ref_start=reference_start,
                     ref_end=current_start,
                     bucket_seconds=bucket_seconds,
@@ -652,13 +802,16 @@ def project_market_context(
     if source_status != "PRESENT":
         gaps.append("SOURCE_NOT_PRESENT" if source_status == "NOT_PRESENT" else source_status)
     if current_fingerprint is None and source_status == "PRESENT":
-        gaps.append("SCHEDULE_SEMANTICS_MISSING")
+        gaps.append(fingerprint_fault or "SCHEDULE_SEMANTICS_MISSING")
+    if members_incomplete and source_status == "PRESENT":
+        gaps.append("MEMBER_EVIDENCE_INCOMPLETE")
     if (
         not comparable_history
         and source_status == "PRESENT"
-        and incomparable_reason == "REFERENCE_SCOPE_MISMATCH"
+        and incomparable_reason in {"REFERENCE_SCOPE_MISMATCH", "SCHEDULE_SEMANTICS_MISSING"}
     ):
-        gaps.append("REFERENCE_SCOPE_MISMATCH")
+        if incomparable_reason not in gaps:
+            gaps.append(incomparable_reason)
     elif source_status == "PRESENT" and comparable_history and not history_obs:
         gaps.append("REFERENCE_INSUFFICIENT")
     if not current_obs and source_status == "PRESENT":
@@ -719,11 +872,7 @@ def project_market_context(
         "scope": {
             "population_description": population["description"],
             "market_wide_claim": False,
-            "sampling_policy": (
-                next(iter(schedules.values()), {}).get("sampling", {}).get("policy")
-                if schedules
-                else None
-            ),
+            "sampling_policy": _sampling_policy(current_obs, schedules),
             "tokens_projection_id": str(
                 (definition.get("tokens_projection") or {}).get("projection_id") or PROJECTION_ID
             ),
@@ -742,17 +891,19 @@ def project_market_context(
         "context_compatibility_sha256": current_fingerprint,
         "context_snapshot_sha256": _canonical_sha256(snapshot_identity),
         "reference_status": (
-            "COMPARABLE"
+            "NOT_APPLICABLE"
+            if source_status != "PRESENT"
+            else "COMPARABLE"
             if comparable_history and current_fingerprint
-            else "REFERENCE_SCOPE_MISMATCH"
-            if source_status == "PRESENT"
-            else "NOT_APPLICABLE"
+            else incomparable_reason
         ),
         "lifecycle_slices": slices,
         "gaps": gaps,
         "nonclaims": list(definition["non_claims"]),
         "interpretation": interpretation,
-        "latest_evidence_available_at": _latest_clock(observations),
+        "latest_evidence_available_at": _latest_clock(
+            [row for row in observations if (_parse_available(row) or clock) <= clock]
+        ),
         "purity": dict(PURITY),
         "authority": {
             "pause_bot": False,

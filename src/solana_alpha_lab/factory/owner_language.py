@@ -309,6 +309,17 @@ STATUS_GLOSS = {
     "SERVING_NOW": "этот HTTP сейчас отвечает",
     "MATCH": "совпадает",
     "MISMATCH": "не совпадает",
+    "COMPARABLE": "сопоставима",
+    "HIGH_RELATIVE": "выше недавней истории",
+    "LOW_RELATIVE": "ниже недавней истории",
+    "MID_RELATIVE": "в середине недавней истории",
+    "REFERENCE_SCOPE_MISMATCH": "история несопоставима",
+    "COVERAGE_INSUFFICIENT": "покрытие недостаточно",
+    "REFERENCE_INSUFFICIENT": "мало сопоставимой истории",
+    "SCHEDULE_SEMANTICS_MISSING": "нет семантики расписания",
+    "MEMBER_EVIDENCE_INCOMPLETE": "неполный список выборки",
+    "SOURCE_NOT_PRESENT": "отсутствует",
+    "GIT_CAPABILITY": "Git-доступность, не live market",
 }
 
 KIND_LABELS = {
@@ -539,18 +550,18 @@ SURFACE_COPY = {
             "насколько этот вывод покрыт данными, и что из этого нельзя заключать?"
         ),
         "now": "Контекст сейчас",
-        "matrix": "Lifecycle matrix",
-        "default_detail": "30m default",
-        "coverage": "Coverage и missingness",
-        "scope": "Scope / source / as-of",
-        "capability": "Factory data capability",
+        "matrix": "Матрица возраста",
+        "default_detail": "Деталь 30м",
+        "coverage": "Покрытие и пропуски",
+        "scope": "Scope, источник и as-of",
+        "capability": "Какие данные Factory может использовать",
         "capability_note": (
             "Это Git-доступность признаков, не текущие рыночные значения."
         ),
-        "non_claims": "Явные non-claims",
+        "non_claims": "Что это не означает",
         "machine": "Точные machine-значения",
         "unknown_why": "Почему UNKNOWN",
-        "relative": "Относительно недавней comparable history",
+        "relative": "Относительно недавней сопоставимой истории",
         "raw": "Сырое значение",
         "as_of": "as_of",
         "latest": "Последняя доступность evidence",
@@ -561,19 +572,27 @@ SURFACE_COPY = {
         "operations_link": "Операции",
         "economics_link": "Экономика",
         "no_source": "Источник immutable market evidence сейчас отсутствует. LOW не выдуман.",
+        "mismatch": (
+            "История несопоставима с текущим контекстом. Сырые значения видны, "
+            "относительная полоса закрыта. HIGH/LOW читать нельзя."
+        ),
         "interpretation": "Что это означает как context",
         "vector": "Вектор осей, не один regime score.",
-        "high_means": "HIGH значит только: выше недавней comparable history. Не return и не trade.",
-        "tested": "Tested strategy-context binding",
-        "sampling": "Sampling policy",
+        "high_means": (
+            "HIGH_RELATIVE значит только: выше недавней сопоставимой истории. "
+            "Не return и не trade."
+        ),
+        "tested": "Проверенная привязка стратегии к context",
+        "sampling": "Политика выборки",
         "compat": "context_compatibility_sha256",
         "snapshot": "context_snapshot_sha256",
         "n_obs": "N observed",
         "n_scope": "N in scope",
         "missing": "missing / censored / excluded",
-        "reference": "Reference status",
-        "source": "Source status",
-        "freshness": "CURRENT_EVIDENCE_AGE — не COLLECTOR_HEALTHY",
+        "reference": "Статус сопоставления",
+        "source": "Статус источника",
+        "freshness": "Возраст evidence — это не здоровье collector.",
+        "leave": "Необычный context сам по себе не требует действия.",
     },
 }
 
@@ -595,6 +614,14 @@ COMMAND_LABELS = {
     "STOP": "Стоп",
     "PARK": "Парковка",
     "RECORD_DECISION": "Записать решение",
+}
+
+AXIS_LABELS = {
+    "LIQUIDITY_LEVEL": "Ликвидность",
+    "LIQUIDITY_BREADTH": "Ширина ликвидности",
+    "PARTICIPATION": "Участие трейдеров",
+    "BUY_SELL_ACTIVITY_BALANCE": "Баланс покупок/продаж",
+    "PRICE_BREADTH": "Ширина цены",
 }
 
 FIELD_LABELS = {
@@ -716,6 +743,10 @@ def handoff_state_label(state: str) -> str:
 
 def blocker_label(code: str) -> str:
     return BLOCKER_LABELS.get(code, code)
+
+
+def axis_label(axis_id: str) -> str:
+    return AXIS_LABELS.get(str(axis_id or ""), str(axis_id or ""))
 
 
 def field_label(key: str) -> str:

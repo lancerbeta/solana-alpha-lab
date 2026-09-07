@@ -59,6 +59,7 @@ def empty_evidence_bundle(*, source_status: str, source_error: str | None = None
         "partitions_read": 0,
         "provider_calls": 0,
         "writes": 0,
+        "members_incomplete": False,
     }
 
 
@@ -159,6 +160,23 @@ def _utc_day_set(start: datetime, end: datetime) -> set[str]:
         days.add(cursor.isoformat())
         cursor = cursor + timedelta(days=1)
     return days
+
+
+def _is_observation_panel_partition(payload: Mapping[str, Any]) -> bool:
+    dataset_id = str(payload.get("dataset_id") or "")
+    if dataset_id:
+        return dataset_id.startswith("observation-panel-")
+    return False
+
+
+def _partition_available(payload: Mapping[str, Any]) -> datetime | None:
+    raw = payload.get("first_reliable_available_at")
+    if not raw:
+        return None
+    try:
+        return parse_utc(str(raw))
+    except Exception:
+        return None
 
 
 def _partition_day(partition_id: str) -> str | None:
@@ -321,6 +339,7 @@ def read_market_evidence(
             "partitions_read": 0,
             "provider_calls": 0,
             "writes": 0,
+            "members_incomplete": False,
         }
 
     discovery = resolve_existing_data_root(root, explicit_data_root=data_root)
@@ -336,6 +355,11 @@ def read_market_evidence(
     days = _utc_day_set(start, clock)
     selected: list[dict[str, Any]] = []
     for payload in _list_partition_payloads(discovery.root):
+        if _is_observation_panel_partition(payload) is False:
+            continue
+        partition_available = _partition_available(payload)
+        if partition_available is None or partition_available > clock:
+            continue
         partition_id = str(payload.get("partition_id") or "")
         day = _partition_day(partition_id)
         if day is None or day not in days:
@@ -344,15 +368,30 @@ def read_market_evidence(
 
     observation_rows: list[dict[str, Any]] = []
     member_rows: list[dict[str, Any]] = []
+    members_incomplete = False
     for payload in selected:
         location = str(payload.get("logical_location") or "")
         partition_id = str(payload.get("partition_id") or "")
         is_members = partition_id.endswith("-members")
         rows = _load_rows(discovery.root, location, members=is_members)
+        if is_members and not rows:
+            path = discovery.root / location
+            if not location or path.is_file() is False:
+                members_incomplete = True
+        tagged = []
+        day = _partition_day(partition_id)
+        available = payload.get("first_reliable_available_at")
+        for row in rows:
+            item = dict(row)
+            if day:
+                item["_partition_day"] = day
+            if available:
+                item["_partition_available_at"] = available
+            tagged.append(item)
         if is_members:
-            member_rows.extend(rows)
+            member_rows.extend(tagged)
         else:
-            observation_rows.extend(rows)
+            observation_rows.extend(tagged)
 
     needed = {
         str(row.get("schedule_sha256") or "")
@@ -381,6 +420,7 @@ def read_market_evidence(
         "partitions_read": len(selected),
         "provider_calls": 0,
         "writes": 0,
+        "members_incomplete": members_incomplete,
         "horizon_start": render_utc(start),
         "as_of": render_utc(clock),
     }

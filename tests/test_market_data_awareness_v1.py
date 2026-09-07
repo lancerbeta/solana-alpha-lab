@@ -124,6 +124,7 @@ def _obs(
     *,
     schedule_sha: str = SHA_A,
     state: str = "OBSERVED",
+    omit_pit: bool = False,
 ) -> dict:
     values = []
     for field_id, value in fields.items():
@@ -138,7 +139,7 @@ def _obs(
     return {
         "entity_id": entity,
         "point_id": point,
-        "first_reliable_available_at": render_utc(available),
+        "first_reliable_available_at": "" if omit_pit else render_utc(available),
         "event_time": render_utc(available - timedelta(minutes=1)),
         "schedule_sha256": schedule_sha,
         "activation_id": "ACT-MARKET-001",
@@ -224,6 +225,176 @@ class MarketDataAwarenessTests(unittest.TestCase):
         cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
         self.assertEqual(cell["raw_value"], "40")
         self.assertEqual(cell["n_observed"], 1)
+
+    def test_missing_pit_clock_is_typed_missing_not_numeric(self) -> None:
+        missing = _obs(
+            "mint_missing",
+            "Y1800",
+            AS_OF - timedelta(minutes=10),
+            {"FIELD-LIQUIDITY-USD-001": 9000},
+            omit_pit=True,
+        )
+        current = _obs(
+            "mint2",
+            "Y1800",
+            AS_OF - timedelta(minutes=10),
+            {"FIELD-LIQUIDITY-USD-001": 40},
+        )
+        projection = project_market_context(
+            self.definition,
+            _bundle(self.definition, [missing, current]),
+            as_of=AS_OF,
+        )
+        cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
+        self.assertEqual(cell["raw_value"], "40")
+        self.assertEqual(cell["coverage_classes"]["typed_missing"], 1)
+        self.assertGreaterEqual(cell["n_in_scope"], 2)
+        self.assertEqual(cell["n_observed"], 1)
+
+    def test_stale_members_do_not_enter_current_denominator(self) -> None:
+        rows = [
+            _obs("mint1", "Y1800", AS_OF - timedelta(minutes=10), {"FIELD-LIQUIDITY-USD-001": 40}),
+        ]
+        bundle = _bundle(self.definition, rows)
+        bundle["members"] = [
+            {
+                "entity_id": "old",
+                "_partition_day": "2026-08-31",
+                "first_reliable_available_at": render_utc(AS_OF - timedelta(days=7)),
+            },
+            {
+                "entity_id": "today",
+                "_partition_day": "2026-09-07",
+                "first_reliable_available_at": render_utc(AS_OF - timedelta(minutes=5)),
+            },
+        ]
+        projection = project_market_context(self.definition, bundle, as_of=AS_OF)
+        cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
+        self.assertEqual(cell["n_in_scope"], 2)
+        self.assertEqual(cell["coverage_classes"]["unknown"], 1)
+        self.assertEqual(cell["n_observed"], 1)
+
+    def test_unused_incompatible_schedule_does_not_break_current(self) -> None:
+        current_sem = schedule_semantics_from_document(_document(), definition=self.definition)
+        unused_sem = schedule_semantics_from_document(
+            _document(policy="ALL_UNDER_CAP"), definition=self.definition
+        )
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        for hours in range(2, 14):
+            rows.append(
+                _obs(
+                    f"hist{hours}",
+                    "Y1800",
+                    AS_OF - timedelta(hours=hours),
+                    {"FIELD-LIQUIDITY-USD-001": 100},
+                )
+            )
+        bundle = {
+            "source_status": "PRESENT",
+            "observations": rows,
+            "members": [],
+            "schedules": {"0" * 64: unused_sem, SHA_A: current_sem},
+        }
+        projection = project_market_context(self.definition, bundle, as_of=AS_OF)
+        self.assertEqual(
+            _cell(projection, "Y1800", "LIQUIDITY_LEVEL")["relative_state"],
+            "HIGH_RELATIVE",
+        )
+
+    def test_incompatible_history_does_not_depend_on_sha_order(self) -> None:
+        current_sem = schedule_semantics_from_document(
+            _document(policy="ALL_UNDER_CAP"), definition=self.definition
+        )
+        hist_sem = schedule_semantics_from_document(_document(), definition=self.definition)
+        rows = [
+            _obs(
+                "now1",
+                "Y1800",
+                AS_OF - timedelta(minutes=10),
+                {"FIELD-LIQUIDITY-USD-001": 1000},
+                schedule_sha=SHA_B,
+            ),
+        ]
+        for hours in range(2, 14):
+            rows.append(
+                _obs(
+                    f"hist{hours}",
+                    "Y1800",
+                    AS_OF - timedelta(hours=hours),
+                    {"FIELD-LIQUIDITY-USD-001": 100},
+                    schedule_sha=SHA_A,
+                )
+            )
+        bundle = {
+            "source_status": "PRESENT",
+            "observations": rows,
+            "members": [],
+            "schedules": {SHA_A: hist_sem, SHA_B: current_sem},
+        }
+        projection = project_market_context(self.definition, bundle, as_of=AS_OF)
+        cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
+        self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertEqual(cell["relative_reason"], "REFERENCE_SCOPE_MISMATCH")
+        self.assertEqual(projection["reference_status"], "REFERENCE_SCOPE_MISMATCH")
+
+    def test_members_incomplete_suppresses_relative_band(self) -> None:
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        for hours in range(2, 14):
+            rows.append(
+                _obs(
+                    f"hist{hours}",
+                    "Y1800",
+                    AS_OF - timedelta(hours=hours),
+                    {"FIELD-LIQUIDITY-USD-001": 100},
+                )
+            )
+        bundle = _bundle(self.definition, rows)
+        bundle["members_incomplete"] = True
+        projection = project_market_context(self.definition, bundle, as_of=AS_OF)
+        cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
+        self.assertEqual(cell["raw_value"], "1000")
+        self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertEqual(cell["relative_reason"], "MEMBER_EVIDENCE_INCOMPLETE")
+
+    def test_unrelated_partition_is_not_observation_panel(self) -> None:
+        from solana_alpha_lab.factory.market_evidence import _is_observation_panel_partition
+
+        self.assertFalse(
+            _is_observation_panel_partition({"dataset_id": "other-dataset", "partition_id": "utc-day-2026-09-07"})
+        )
+        self.assertTrue(
+            _is_observation_panel_partition(
+                {"dataset_id": "observation-panel-abc", "partition_id": "utc-day-2026-09-07"}
+            )
+        )
+        self.assertFalse(_is_observation_panel_partition({"partition_id": "utc-day-2026-09-07"}))
+
+    def test_floor_quantile_is_not_interpolated(self) -> None:
+        from decimal import Decimal
+
+        from solana_alpha_lab.factory.market_context import _quantile
+
+        values = [Decimal(str(item)) for item in range(1, 11)]
+        self.assertEqual(_quantile(values, Decimal("0.20")), Decimal("2"))
+        self.assertEqual(_quantile(values, Decimal("0.80")), Decimal("8"))
 
     def test_lifecycle_landmarks_not_pooled(self) -> None:
         rows = [
@@ -528,6 +699,8 @@ class MarketDataAwarenessTests(unittest.TestCase):
             self.assertEqual(before, after)
             self.assertIn('href="/market"', home)
             self.assertIn("Рынок", market)
+            self.assertIn("Матрица возраста", market)
+            self.assertIn("HIGH_RELATIVE значит только", market)
             self.assertIn("NO_MARKET_WIDE_CLAIM", market)
             self.assertIn("GIT_CAPABILITY", market)
             self.assertIn("/system", market)

@@ -17,6 +17,7 @@ from solana_alpha_lab.factory.owner_language import (
     ROLLBACK_GLOSS,
     VERDICT_GLOSS,
     attention_label,
+    axis_label,
     blocker_label,
     counter_label,
     decision_kind_label,
@@ -1839,6 +1840,11 @@ def _market_section(model: dict[str, Any]) -> str:
             f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'no_source'))} "
             f"{canon(source)}</p>"
         )
+    elif str(market.get("reference_status") or "") == "REFERENCE_SCOPE_MISMATCH":
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'mismatch'))} "
+            f"{canon('REFERENCE_SCOPE_MISMATCH')}</p>"
+        )
     axis_ids: list[str] = []
     if slices:
         axis_ids = [str(cell.get("axis_id")) for cell in (slices[0].get("axes") or [])]
@@ -1858,15 +1864,15 @@ def _market_section(model: dict[str, Any]) -> str:
                 {},
             )
             cells += f"<td>{_relative_cell(cell)}</td>"
-        rows_html += f"<tr><th>{esc(axis_id)}</th>{cells}</tr>"
+        rows_html += f"<tr><th>{esc(axis_label(axis_id))}</th>{cells}</tr>"
     default_html = ""
     if isinstance(default_slice, dict):
         facts = []
         for cell in default_slice.get("axes") or []:
-            facts.append((str(cell.get("axis_id")), _relative_cell(cell)))
+            facts.append((axis_label(str(cell.get("axis_id"))), _relative_cell(cell)))
         default_html = fact_strip(facts)
         unknown_bits = [
-            f"{cell.get('axis_id')}: {cell.get('relative_reason') or cell.get('relative_state')}"
+                f"{axis_label(str(cell.get('axis_id')))}: {status_display(cell.get('relative_reason') or cell.get('relative_state'))}"
             for cell in (default_slice.get("axes") or [])
             if cell.get("relative_state") == "UNKNOWN"
         ]
@@ -1921,7 +1927,8 @@ def _market_section(model: dict[str, Any]) -> str:
                 ),
             ]
         )
-        + f"<p>{esc(surface_copy('MARKET', 'vector'))} {esc(surface_copy('MARKET', 'high_means'))}</p>"
+        + f"<p>{esc(surface_copy('MARKET', 'vector'))} {esc(surface_copy('MARKET', 'high_means'))} "
+        f"{esc(surface_copy('MARKET', 'leave'))}</p>"
         + f"<h2>{esc(surface_copy('MARKET', 'matrix'))}</h2>"
         + "<table><thead><tr><th></th>"
         + header
