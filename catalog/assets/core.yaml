@@ -17787,7 +17787,7 @@ records:
   as_of: '2026-08-09'
   truth_owner: TASK-34A
   location: {kind: git_path, logical_uri: 'repo://docs/OPERATOR_NAVIGATION.md', repository_path: docs/OPERATOR_NAVIGATION.md}
-  integrity: {kind: sha256, sha256: 7fb02a22d6110976970e3e96b35afbfe59c9a4931b13df6d76148f2b2cc319e5}
+  integrity: {kind: sha256, sha256: a896bed012b0d9b98531215292e4e69ee4dea9351fbecaa526c2472c06278a26}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: SCRIPT-T34A-CONTEXT-001}
@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 7b444be99fd25bed29d1a2e8b33d87ae428fa4fd447ad74a1553d752bced6c8f}
+  integrity: {kind: sha256, sha256: 78e15a17594621da178a3d78685cf584cdf517897e2c07dcecf68cb3f96288b2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25677,6 +25677,7 @@ records:
   - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-COMMANDS-001}
   - {relation_type: depends_on, target_asset_id: MODULE-OWNER-LIFECYCLE-PROJECTION-001}
   - {relation_type: depends_on, target_asset_id: MODULE-RISK-AND-ECONOMICS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-MARKET-CONTEXT-001}
   consumers: [FACTORY-001, FACTORY-V1-PRODUCT-KERNEL-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, APPLICATION, COMMANDS]
@@ -25727,10 +25728,11 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: c751dd5ff3aae7557ec22de65315dd5c5c2ec7362e8b23a6ad4d0ac467ac6579}
+  integrity: {kind: sha256, sha256: c14f9af70d829f588e6524b2de633a7aa1f19fed8d665c0c0f36ad23476ecc97}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
+  - {relation_type: consumes, target_asset_id: MODULE-MARKET-CONTEXT-001}
   consumers: [FACTORY-001, FACTORY-V1-PRODUCT-KERNEL-001, GOAL-OWNER]
   evidence: []
   search_terms: [FACTORY_V1, WORKBENCH, STDLIB]
@@ -26100,7 +26102,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCTION_LITE_LINUX_RUNTIME_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_production_lite_runtime_v1.yaml', repository_path: configs/factory_v1_production_lite_runtime_v1.yaml}
-  integrity: {kind: sha256, sha256: ea33463cbac2c912cc8d97356e0d05433c4055e05b4c422ecc892f7f09738f60}
+  integrity: {kind: sha256, sha256: 231ca72b82922fd9d7d8c3397269be95c52aec6a9aa7f0db503ce817259a3e37}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001}
@@ -26269,7 +26271,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_v1_owner_cockpit_v1.yaml', repository_path: configs/factory_v1_owner_cockpit_v1.yaml}
-  integrity: {kind: sha256, sha256: 90e82a1a23f8b2412d93eb89c3b544782570065ee0a6353a709da4a16ecead38}
+  integrity: {kind: sha256, sha256: ef03b8cc68b87e3a648ffaa186c6874b35e1ebc497e9e33bc437816ee6fb7faa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26289,7 +26291,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/schemas/factory_v1_owner_cockpit.schema.json', repository_path: catalog/schemas/factory_v1_owner_cockpit.schema.json}
-  integrity: {kind: sha256, sha256: f38e880d8ac318f035da138ba63ff065fce7f3385e8b144cf238e5c327de6fe9}
+  integrity: {kind: sha256, sha256: e25f736b2ec7ad26f8a9428f694cf659ac24185b9898f658705f62a1b5e4248b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26307,7 +26309,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/cockpit.py', repository_path: src/solana_alpha_lab/factory/cockpit.py}
-  integrity: {kind: sha256, sha256: a3991c1dc6e106760f8d9ca96c645239755f7a0940d755684953c0f98f24133b}
+  integrity: {kind: sha256, sha256: a597d0c6eb27c05c707e56826eb1eaf4d8393a74d3b70474e228e447dfba6166}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-OWNER-COCKPIT-001}
@@ -26325,7 +26327,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: d170fc97be6da6f7c348906dc383e46f8a41a73160162a6f8cd7cc2fa469e85a}
+  integrity: {kind: sha256, sha256: af9e832d6b9744c952f33bffe7a119ec3b54978cf6b7a5e0762f8c9e0b620844}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -31619,7 +31621,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/discovery_gold_queries_v1.yaml', repository_path: catalog/fixtures/discovery_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: cbd51bc9207b07ff68d32f056e150669d84352c8d1c980f6ba4c3919a66dd12a}
+  integrity: {kind: sha256, sha256: ccde522a4d8613f19781cbce4ff7ec5922a9cc901ae455f2b1ba1b80543fd37b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-KCDN-ATOM-A-001}
@@ -31637,7 +31639,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: KCDN_ATOM_A_CANONICAL_BINDINGS_AND_DETERMINISTIC_NAVIGATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_catalog_canonical_binding_discovery.py', repository_path: tests/test_catalog_canonical_binding_discovery.py}
-  integrity: {kind: sha256, sha256: b553f6a37e5e8f2a042887d6c71909c432c42aa7f63e91ac80737adfb1802e89}
+  integrity: {kind: sha256, sha256: c67a8bb3b34d2b65cc02dbdd6619630fd992f85e57ca2d99112d366e55dd3380}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-CATALOG-DISCOVERY-001}
@@ -34142,7 +34144,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: c8b5b987bc852e6239eddfc4640ac4ae53574da9144044989185e936560e8b03}
+  integrity: {kind: sha256, sha256: 066ae4f9d5d4a7014724c7f8a67cd0f81ec9d535662cba17f4d022847c312566}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34231,7 +34233,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_semantic_operability.py', repository_path: tests/test_factory_semantic_operability.py}
-  integrity: {kind: sha256, sha256: b189327167fe75c5a0324f6c79c19b125abb7abcdce2f4f67fe4da6af4a857be}
+  integrity: {kind: sha256, sha256: b8f24838669a39877fac49990c27b27a2e4bc246e2fe7df811d0c5e318f504fb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34249,7 +34251,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: f2c5b33ef7d9a22378c8a49607921903c944e9cc774df37727028ea15ab40f1f}
+  integrity: {kind: sha256, sha256: 3f4d26eb92ee45d0cfea117fe7cc1b0b8588375b727feba23d74056f6682a3bc}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34267,7 +34269,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: e6b0712107ca9a5a907efad5e4080b5f94c54d3c6de63bdbb62a0626123e0257}
+  integrity: {kind: sha256, sha256: 8e59a55191e31b3bafd96c6d581d33a884ad5f8230a78b0545c344b8688766d0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34620,7 +34622,7 @@ records:
   as_of: '2026-09-03'
   truth_owner: OWNER_OPERATIONS_COCKPIT_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_operations_cockpit_v1.py', repository_path: tests/test_owner_operations_cockpit_v1.py}
-  integrity: {kind: sha256, sha256: 101e4e4b0645ca500cedb6ce63abf142af4496012c140aadcc4002bf51921c08}
+  integrity: {kind: sha256, sha256: 6167f8f05afabe0aef7ccd1a69d296cfcfb9d05835653784da5587e33147b82d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
@@ -35454,7 +35456,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: OWNER_LIFECYCLE_PROJECTION_SPINE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_lifecycle_projection_spine_v1.py', repository_path: tests/test_owner_lifecycle_projection_spine_v1.py}
-  integrity: {kind: sha256, sha256: ec3c3db872e3b5174f4037f67f50221871344f479838773cde94f989dc3acdeb}
+  integrity: {kind: sha256, sha256: 72b92e16c8e2f54d764b073635cd5accc7f1ba120fea368bb6b9bf4b6b17b169}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-LIFECYCLE-PROJECTION-001}
@@ -35608,7 +35610,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: 98a552b458e26ae9d308a7d0ff835c46deb2b133cd419226d85c819e13badd4c}
+  integrity: {kind: sha256, sha256: 0c549fd72347a97f776c0586c7d237a1fbc8e8fadc7a41c265989a71e2c3d154}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -36105,4 +36107,163 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [ECONOMICS_VERTICAL, GET_NON_MUTATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-MARKET-DATA-AWARENESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for owner-facing Market Data Awareness over immutable observation evidence without a market platform or regime predictor.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/MARKET_DATA_AWARENESS_V1.md', repository_path: docs/tasks/MARKET_DATA_AWARENESS_V1.md}
+  integrity: {kind: sha256, sha256: dabfdc946e6b218404401acf3b4a8201c33cf600c32308ab1e0c8bd9a0b5ba40}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
+  - {relation_type: contains, target_asset_id: CONFIG-MARKET-CONTEXT-DEFINITION-001}
+  - {relation_type: contains, target_asset_id: MODULE-MARKET-CONTEXT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-MARKET-DATA-AWARENESS-001}
+  - {relation_type: consumes, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  - {relation_type: consumes, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [MARKET_DATA_AWARENESS, MARKET_CONTEXT, MOVE_8]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: DOC-MARKET-DATA-AWARENESS-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Durable Market Data Awareness contract for PIT-safe comparable lifecycle context.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/market_data_awareness_v1.md', repository_path: docs/contracts/market_data_awareness_v1.md}
+  integrity: {kind: sha256, sha256: 02d128b53b35b80a69976aba4eb49f23185824a0a082f11819bbc3cafdc5eb8f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [MARKET_CONTEXT_CONTRACT, NONCLAIMS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-MARKET-CONTEXT-DEFINITION-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for Git-owned MarketContextDefinitionV1.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/market_context_definition_v1.schema.json', repository_path: catalog/schemas/market_context_definition_v1.schema.json}
+  integrity: {kind: sha256, sha256: 61919bf810720a0725e13d326e39d09e94b1f632c711ffffd7e010cee8ac1f3e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [MARKET_CONTEXT_DEFINITION, SCHEMA]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-MARKET-CONTEXT-DEFINITION-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Current Market Context definition owner for windows, landmarks, axes, field IDs and comparability semantics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/market_context_definition_v1.yaml', repository_path: configs/market_context_definition_v1.yaml}
+  integrity: {kind: sha256, sha256: 4634841ca976f5e78cffc8e5f1f4890cf0f38f61550d3e6cb79c5a45dd154be6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-MARKET-CONTEXT-DEFINITION-001}
+  - {relation_type: consumes, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  - {relation_type: consumes, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [current market awareness, current market context definition, актуальный market context, MARKET_CONTEXT_DEFINITION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-MARKET-EVIDENCE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Bounded read-only immutable Observation RDP adapter that normalizes current and historical rows to one evidence shape.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/market_evidence.py', repository_path: src/solana_alpha_lab/factory/market_evidence.py}
+  integrity: {kind: sha256, sha256: eac296f403545a707681b724b5063551f31d4db7c1da9d226717ae5107f06c67}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-MARKET-CONTEXT-DEFINITION-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [MarketEvidenceReader, OBSERVATION_RDP, READONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-MARKET-CONTEXT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure MarketContextProjector composing MarketContextProjectionV1 from definition plus immutable evidence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/market_context.py', repository_path: src/solana_alpha_lab/factory/market_context.py}
+  integrity: {kind: sha256, sha256: d3260df21ca6c9a58e23803facbdf47eefdaa67ceacb296e34a08b5d6266f3d6}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-MARKET-CONTEXT-DEFINITION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-MARKET-EVIDENCE-001}
+  - {relation_type: consumes, target_asset_id: CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [MarketContextProjector, MarketContextProjectionV1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCRIPT-SHOW-MARKET-CONTEXT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI JSON readback of MarketContextProjectionV1 using the same composer as Workbench /market.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/show_market_context.py', repository_path: scripts/show_market_context.py}
+  integrity: {kind: sha256, sha256: fdf1daf97802daaca9c754fe134008ed1d7b59e2248032744f5ea6cbd1b62611}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-MARKET-CONTEXT-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [show_market_context, JSON_READBACK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-MARKET-DATA-AWARENESS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical acceptance for observe/compare/interpret loops, GET purity and semantic Market Awareness routing.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: MARKET_DATA_AWARENESS_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_market_data_awareness_v1.py', repository_path: tests/test_market_data_awareness_v1.py}
+  integrity: {kind: sha256, sha256: ca5b93dcecdcb0d808a68fa4dc5854547c1b4085a7cb10c82d243ec2cdbb3f9e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}
+  - {relation_type: depends_on, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [MARKET_VERTICAL, GET_NON_MUTATION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -59,7 +59,7 @@ class FactorySemanticOperabilityTests(unittest.TestCase):
         self.assertEqual(len(route_ids), len(set(route_ids)))
         self.assertGreaterEqual(len(route_ids), 10)
         self.assertLessEqual(len(route_ids), 13)
-        self.assertLessEqual(len(self.bindings), 13)
+        self.assertLessEqual(len(self.bindings), 14)
 
     def test_current_roots_avoid_stale_planes(self) -> None:
         for route in self.projection["routes"]:

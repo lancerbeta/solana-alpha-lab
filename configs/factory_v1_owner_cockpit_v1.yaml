@@ -8,11 +8,11 @@ implementation: WORKBENCH_WRAP_NO_NEW_UI_PACKAGE
 visible_nav:
   - HOME
   - RESEARCH
+  - MARKET
   - OPERATIONS
   - ECONOMICS
   - SYSTEM
-hidden_nav:
-  - MARKET
+hidden_nav: []
 packet_fields:
   - QUESTION
   - ESTIMAND

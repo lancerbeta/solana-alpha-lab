@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.system_operability import (
     UnitReader,
     compose_system_operability,
 )
+from solana_alpha_lab.factory.market_context import compose_market_context
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
 HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
@@ -220,6 +221,13 @@ class FactoryApplication:
             status = self._paper_plane_source_status or "NOT_PRESENT"
             return compose_risk_economics(self.root, None, source_status=status)
         return compose_risk_economics(self.root, store, source_status="PRESENT")
+
+    def market_projection(self, *, as_of=None) -> dict[str, Any]:
+        return compose_market_context(
+            self.root,
+            as_of=as_of,
+            data_root=self._research_data_root,
+        )
 
     def trading_operations_projection(
         self, *, last_command: Mapping[str, Any] | None = None
@@ -693,6 +701,8 @@ class FactoryApplication:
             model["recent_changes"] = []
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
+        if surface == "MARKET":
+            model["market"] = self.market_projection()
         if surface in (None, "HOME"):
             model["owner_attention"] = self._owner_attention(model, trading)
         return model

@@ -134,12 +134,16 @@ routes:
     related_route_ids: [SEM-PROVIDER-ROUTES, SEM-MARKET-DATA-FEATURES]
 
   - semantic_route_id: SEM-MARKET-DATA-FEATURES
-    purpose: Current Factory market feature surface and PIT versus forward-only availability classes.
+    purpose: Current Factory market feature surface, PIT versus forward-only availability, and observed Market Data Awareness context.
     owner_questions:
       - What feature or data exists at decision time?
       - Is it PIT_READY or FORWARD_ONLY?
       - What market features already exist?
       - какие признаки уже есть
+      - What market context is observed now?
+      - какой market context наблюдается
+      - What does this market context cover?
+      - какая ликвидность относительно недели
     search_terms:
       - market feature
       - feature surface
@@ -148,8 +152,16 @@ routes:
       - HISTORICAL_RECONSTRUCTIBLE
       - признаки
       - market data
+      - market context
+      - market awareness
+      - ликвидность
+      - трейдеров
+      - происходит с рынком
+      - observed now
+      - context cover
+      - PIT-ready
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
-    root_binding_ids: [ACTIVE-FACTORY-MARKET-FEATURE-SURFACE]
+    root_binding_ids: [ACTIVE-FACTORY-MARKET-FEATURE-SURFACE, ACTIVE-MARKET-DATA-AWARENESS]
     root_asset_ids: []
     query_recipe_ids: []
     status_plane: MIXED

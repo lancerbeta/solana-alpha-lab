@@ -10,6 +10,7 @@ MACHINE_LANGUAGE = "EN"
 NAV_LABELS = {
     "HOME": "Главная",
     "RESEARCH": "Исследования",
+    "MARKET": "Рынок",
     "OPERATIONS": "Операции",
     "ECONOMICS": "Экономика",
     "SYSTEM": "Система",
@@ -530,6 +531,50 @@ SURFACE_COPY = {
         "leave": "Можно оставить без вмешательства — при текущем покрытии.",
         "residual": "Workbench не может сам увидеть смерть своего VPS.",
     },
+    "MARKET": {
+        "h1": "Рынок",
+        "question": (
+            "Какой контекст сейчас наблюдается в моей торгуемой части рынка, "
+            "насколько он отличается от недавней сопоставимой истории, "
+            "насколько этот вывод покрыт данными, и что из этого нельзя заключать?"
+        ),
+        "now": "Контекст сейчас",
+        "matrix": "Lifecycle matrix",
+        "default_detail": "30m default",
+        "coverage": "Coverage и missingness",
+        "scope": "Scope / source / as-of",
+        "capability": "Factory data capability",
+        "capability_note": (
+            "Это Git-доступность признаков, не текущие рыночные значения."
+        ),
+        "non_claims": "Явные non-claims",
+        "machine": "Точные machine-значения",
+        "unknown_why": "Почему UNKNOWN",
+        "relative": "Относительно недавней comparable history",
+        "raw": "Сырое значение",
+        "as_of": "as_of",
+        "latest": "Последняя доступность evidence",
+        "population": "Популяция",
+        "not_all_market": "Это не весь рынок Solana / memecoin / pump.fun.",
+        "system_link": "Свежесть runtime → Система",
+        "research_link": "Исследования",
+        "operations_link": "Операции",
+        "economics_link": "Экономика",
+        "no_source": "Источник immutable market evidence сейчас отсутствует. LOW не выдуман.",
+        "interpretation": "Что это означает как context",
+        "vector": "Вектор осей, не один regime score.",
+        "high_means": "HIGH значит только: выше недавней comparable history. Не return и не trade.",
+        "tested": "Tested strategy-context binding",
+        "sampling": "Sampling policy",
+        "compat": "context_compatibility_sha256",
+        "snapshot": "context_snapshot_sha256",
+        "n_obs": "N observed",
+        "n_scope": "N in scope",
+        "missing": "missing / censored / excluded",
+        "reference": "Reference status",
+        "source": "Source status",
+        "freshness": "CURRENT_EVIDENCE_AGE — не COLLECTOR_HEALTHY",
+    },
 }
 
 ATTENTION_LABELS = {
@@ -601,6 +646,7 @@ OWNER_ERRORS = {
     "LOCATOR_REJECTED": "Локатор отклонён.",
     "LOCATOR_NOT_IN_PROJECTION": "Объект не найден в текущей проекции.",
     "COMMAND_NOT_ALLOWLISTED": "Команда не из списка разрешённых.",
+    "MARKET_HAS_NO_COMMANDS": "Экран Рынок не отдаёт команд боту и не меняет runtime.",
     "COMMAND_PATH_INVALID": "Эта команда на этом экране недоступна.",
     "CLOSE_ALL_CONFIRMATION_REQUIRED": (
         "Нужно локальное подтверждение CLOSE_ALL. Команда не отправлена."

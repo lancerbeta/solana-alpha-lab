@@ -32,6 +32,10 @@ rehost_relative_paths:
   - configs/factory_v1_commissioning_v1.yaml
   - configs/factory_v1_production_lite_runtime_v1.yaml
   - configs/factory_v1_linux_runtime/factory-v1-workbench.service
+  - configs/market_context_definition_v1.yaml
+  - catalog/schemas/market_context_definition_v1.schema.json
+  - configs/factory_v1_common_market_feature_surface_v1.yaml
+  - catalog/schemas/factory_v1_common_market_feature_surface.schema.json
   - configs/experiment_specs/factory_v1_commissioning_quote_native_free_key_v1.yaml
   - configs/quote_native_factory_commissioning_audition_v1.yaml
   - configs/provider_route_capability_registry_v6.yaml

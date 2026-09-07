@@ -493,7 +493,7 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
         cls.bindings = cls.snapshot.manifest["canonical_bindings"]
 
     def test_live_bindings_include_atom_a_and_semantic_roots(self) -> None:
-        self.assertLessEqual(len(self.bindings), 13)
+        self.assertLessEqual(len(self.bindings), 14)
         self.assertIn("ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY", self.bindings)
         self.assertIn("ACTIVE-FACTORY-MARKET-FEATURE-SURFACE", self.bindings)
         self.assertIn("ACTIVE-FACTORY-SEMANTIC-OPERABILITY", self.bindings)
@@ -521,9 +521,10 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
             self.bindings["ACTIVE-PROVIDER-ROUTE-CAPABILITY-REGISTRY"]["target_asset_id"],
             "CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-010",
         )
+        self.assertIn("ACTIVE-MARKET-DATA-AWARENESS", self.bindings)
         self.assertEqual(
-            self.bindings["ACTIVE-FACTORY-MARKET-FEATURE-SURFACE"]["target_asset_id"],
-            "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001",
+            self.bindings["ACTIVE-MARKET-DATA-AWARENESS"]["target_asset_id"],
+            "CONFIG-MARKET-CONTEXT-DEFINITION-001",
         )
         self.assertEqual(
             self.bindings["ACTIVE-FACTORY-OPERATIONAL-READINESS"]["target_asset_id"],
@@ -539,7 +540,7 @@ class LiveCatalogDiscoveryTests(unittest.TestCase):
     def test_gold_queries(self) -> None:
         fixture = yaml.safe_load(GOLD_PATH.read_text(encoding="utf-8"))
         queries = fixture["queries"]
-        self.assertEqual(len(queries), 26)
+        self.assertEqual(len(queries), 28)
         ids = [item["query_id"] for item in queries]
         self.assertEqual(len(ids), len(set(ids)))
         first = []

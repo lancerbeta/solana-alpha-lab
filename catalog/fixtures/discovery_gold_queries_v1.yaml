@@ -42,6 +42,18 @@ queries:
   required_top_5:
   - CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001
   rationale: Current Factory market feature surface in Russian
+- query_id: GQ-CURRENT-MARKET-AWARENESS-EN
+  command: search-assets
+  query: current market awareness
+  required_top_5:
+  - CONFIG-MARKET-CONTEXT-DEFINITION-001
+  rationale: Current Market Data Awareness definition in English
+- query_id: GQ-CURRENT-MARKET-AWARENESS-RU
+  command: search-assets
+  query: актуальный market context
+  required_top_5:
+  - CONFIG-MARKET-CONTEXT-DEFINITION-001
+  rationale: Current Market Data Awareness definition in Russian
 - query_id: GQ-DELIVERY-HARNESS
   command: search-assets
   query: delivery harness

@@ -28,17 +28,19 @@
     "implementation": {"const": "WORKBENCH_WRAP_NO_NEW_UI_PACKAGE"},
     "visible_nav": {
       "type": "array",
-      "minItems": 5,
-      "maxItems": 5,
+      "minItems": 6,
+      "maxItems": 6,
       "uniqueItems": true,
-      "items": {"enum": ["HOME", "RESEARCH", "OPERATIONS", "ECONOMICS", "SYSTEM"]}
+      "items": {
+        "enum": ["HOME", "RESEARCH", "MARKET", "OPERATIONS", "ECONOMICS", "SYSTEM"]
+      }
     },
     "hidden_nav": {
       "type": "array",
-      "minItems": 1,
-      "maxItems": 1,
+      "minItems": 0,
+      "maxItems": 0,
       "uniqueItems": true,
-      "items": {"enum": ["MARKET"]}
+      "items": {"type": "string"}
     },
     "packet_fields": {
       "type": "array",
