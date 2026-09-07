@@ -214,12 +214,22 @@ def _field_map(row: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
     return mapped
 
 
+def _metric_support_n(axis: Mapping[str, Any], details: Sequence[str]) -> int:
+    aggregation = str(axis["aggregation"])
+    if aggregation == "UP_SHARE_VS_PREVIOUS":
+        return sum(1 for item in details if item in {"UP", "FLAT", "DOWN"})
+    if aggregation == "MEDIAN_BUY_SELL_BALANCE":
+        return sum(1 for item in details if item == "OBSERVED")
+    return sum(1 for item in details if item == "OBSERVED")
+
+
 def _relative_state(
     current: Decimal | None,
     reference_values: Sequence[Decimal],
     *,
     n_in_scope: int,
     n_observed: int,
+    n_metric: int,
     definition: Mapping[str, Any],
     comparable: bool,
     incomparable_reason: str = "REFERENCE_SCOPE_MISMATCH",
@@ -232,7 +242,7 @@ def _relative_state(
     observed_fraction = (
         (Decimal(n_observed) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
     )
-    if current is None or n_observed < min_n or observed_fraction < min_cov:
+    if current is None or n_metric < min_n or observed_fraction < min_cov:
         return "UNKNOWN", "COVERAGE_INSUFFICIENT", len(reference_values)
     if len(reference_values) < min_buckets:
         return "UNKNOWN", "REFERENCE_INSUFFICIENT", len(reference_values)
@@ -394,11 +404,19 @@ def _bucket_start(available: datetime, origin: datetime, bucket_seconds: int) ->
     return origin + timedelta(seconds=index * bucket_seconds)
 
 
+def _event_clock(row: Mapping[str, Any]) -> datetime | None:
+    event = parse_market_clock(row.get("event_time"))
+    if event is not None:
+        return event
+    return parse_market_clock(row.get("authoritative_anchor"))
+
+
 def _select_rows(
     rows: Sequence[Mapping[str, Any]],
     *,
     start: datetime,
     end: datetime,
+    as_of: datetime,
     point_id: str | None = None,
     include_missing_pit: bool = False,
 ) -> list[dict[str, Any]]:
@@ -411,7 +429,14 @@ def _select_rows(
             if include_missing_pit:
                 selected.append(dict(row))
             continue
-        if not _in_window(available, start, end):
+        if available > as_of:
+            continue
+        event = _event_clock(row)
+        if event is None:
+            if include_missing_pit:
+                selected.append(dict(row))
+            continue
+        if not _in_window(event, start, end):
             continue
         selected.append(dict(row))
     return selected
@@ -480,18 +505,24 @@ def _reference_bucket_values(
     definition: Mapping[str, Any],
     schedules: Mapping[str, Any],
     fingerprint: str | None,
+    as_of: datetime,
 ) -> list[Decimal]:
     values: list[Decimal] = []
     cursor = ref_start
     while cursor < ref_end:
         bucket_end = min(cursor + timedelta(seconds=bucket_seconds), ref_end)
         current_rows = _select_rows(
-            observations, start=cursor, end=bucket_end, point_id=point_id
+            observations,
+            start=cursor,
+            end=bucket_end,
+            as_of=as_of,
+            point_id=point_id,
         )
         previous_rows = _select_rows(
             observations,
             start=cursor - timedelta(seconds=previous_lookback_seconds),
             end=bucket_end,
+            as_of=as_of,
             point_id=previous_point_id,
         )
         member_ids = _member_ids_for_landmark(
@@ -525,8 +556,13 @@ def _reference_bucket_values(
             *_unclocked_rows(observations, point_id=point_id, current_days=bucket_days),
         ]
         coverage = _coverage_counts(coverage_rows, member_ids, axis)
-        metric, _details = _axis_value(axis, current_rows, previous_rows)
-        if metric is not None and _coverage_meets_minimum(coverage, definition):
+        metric, details = _axis_value(axis, current_rows, previous_rows)
+        n_metric = _metric_support_n(axis, details)
+        if (
+            metric is not None
+            and n_metric >= int(definition["minimum_current_n"])
+            and _coverage_meets_minimum(coverage, definition)
+        ):
             values.append(metric)
         cursor = bucket_end
     return values
@@ -622,18 +658,15 @@ def _member_ids_for_landmark(
         member_point = str(row.get("point_id") or "")
         if member_point.startswith("Y") and member_point != point_id:
             continue
-        if fingerprint is not None:
-            member_fp = _row_compatibility(definition, row, schedules)
-            if member_fp is not None and member_fp != fingerprint:
-                continue
         available = _parse_available(row)
         if available is None:
             available = parse_market_clock(row.get("_partition_available_at"))
         if available is None or available > as_of:
             continue
-        anchor = parse_market_clock(row.get("authoritative_anchor") or row.get("event_time"))
+        event = _event_clock(row)
+        anchor = parse_market_clock(row.get("authoritative_anchor"))
         if member_point.startswith("Y"):
-            if not _in_window(available, current_start, as_of):
+            if event is None or not _in_window(event, current_start, as_of):
                 continue
         elif anchor is not None and due_offset_seconds:
             due = anchor + timedelta(seconds=due_offset_seconds)
@@ -641,6 +674,11 @@ def _member_ids_for_landmark(
                 continue
         else:
             continue
+        if fingerprint is not None:
+            member_fp = _row_compatibility(definition, row, schedules)
+            if member_fp != fingerprint:
+                ids[entity_id] = "unknown"
+                continue
         state = row.get("membership_state") or row.get("state")
         ids[entity_id] = coverage_class_for_member(state)
     return ids
@@ -729,19 +767,29 @@ def project_market_context(
     landmarks = list(definition["lifecycle_landmarks"])
     axes = list(definition["axes"])
     members_incomplete = bool(evidence.get("members_incomplete"))
-    current_obs = _select_rows(observations, start=current_start, end=clock)
-    history_obs = _select_rows(observations, start=reference_start, end=current_start)
+    current_obs = _select_rows(
+        observations, start=current_start, end=clock, as_of=clock
+    )
+    history_obs = _select_rows(
+        observations, start=reference_start, end=current_start, as_of=clock
+    )
     current_fingerprint, fingerprint_fault = _current_compatibility(
         definition, current_obs, schedules
     )
     comparable_history = True
     incomparable_reason = "REFERENCE_SCOPE_MISMATCH"
+    current_mixed = False
     if source_status != "PRESENT":
         comparable_history = False
         incomparable_reason = "SOURCE_NOT_PRESENT"
     elif members_incomplete:
         comparable_history = False
         incomparable_reason = "MEMBER_EVIDENCE_INCOMPLETE"
+    elif fingerprint_fault == "REFERENCE_SCOPE_MISMATCH":
+        comparable_history = False
+        incomparable_reason = fingerprint_fault
+        current_fingerprint = None
+        current_mixed = True
     elif fingerprint_fault:
         comparable_history = False
         incomparable_reason = fingerprint_fault
@@ -760,6 +808,7 @@ def project_market_context(
         if comparable_history and current_fingerprint
         else observations
     )
+    metric_obs = [] if current_mixed else current_obs
     missing_pit = any(_parse_available(row) is None for row in observations)
 
     current_days = {
@@ -771,11 +820,22 @@ def project_market_context(
         point_id = str(landmark["point_id"])
         previous_id = str(landmark["previous_point_id"])
         lookback = _previous_lookback_seconds(landmark, landmarks)
+        coverage_at_point = _select_rows(
+            current_obs,
+            start=current_start,
+            end=clock,
+            as_of=clock,
+            point_id=point_id,
+        )
         current_at_point = _select_rows(
-            current_obs, start=current_start, end=clock, point_id=point_id
+            metric_obs,
+            start=current_start,
+            end=clock,
+            as_of=clock,
+            point_id=point_id,
         )
         coverage_rows = [
-            *current_at_point,
+            *coverage_at_point,
             *_unclocked_rows(observations, point_id=point_id, current_days=current_days),
         ]
         member_ids = _member_ids_for_landmark(
@@ -792,6 +852,7 @@ def project_market_context(
             comparable_obs,
             start=current_start - timedelta(seconds=lookback),
             end=clock,
+            as_of=clock,
             point_id=previous_id,
         )
         landmark_status = "PRESENT" if current_at_point else "LANDMARK_NOT_IN_EVIDENCE"
@@ -815,15 +876,18 @@ def project_market_context(
                     definition=definition,
                     schedules=schedules,
                     fingerprint=current_fingerprint,
+                    as_of=clock,
                 )
                 if comparable_history
                 else []
             )
+            n_metric = _metric_support_n(axis, details)
             relative, reason, bucket_count = _relative_state(
                 current_value,
                 reference_values,
                 n_in_scope=int(coverage["n_in_scope"]),
                 n_observed=int(coverage["n_observed"]),
+                n_metric=n_metric,
                 definition=definition,
                 comparable=comparable_history,
                 incomparable_reason=incomparable_reason,
@@ -847,6 +911,7 @@ def project_market_context(
                     "relative_reason": reason,
                     "n_in_scope": coverage["n_in_scope"],
                     "n_observed": coverage["n_observed"],
+                    "n_metric_supported": n_metric,
                     "n_missing": coverage["n_missing"],
                     "observed_fraction": observed_fraction,
                     "coverage_classes": {
@@ -881,8 +946,8 @@ def project_market_context(
     gaps: list[str] = []
     if source_status != "PRESENT":
         gaps.append("SOURCE_NOT_PRESENT" if source_status == "NOT_PRESENT" else source_status)
-    if current_fingerprint is None and source_status == "PRESENT":
-        gaps.append(fingerprint_fault or "SCHEDULE_SEMANTICS_MISSING")
+    if current_mixed and source_status == "PRESENT":
+        gaps.append("CURRENT_SCOPE_MIXED")
     if members_incomplete and source_status == "PRESENT":
         gaps.append("MEMBER_EVIDENCE_INCOMPLETE")
     if (

@@ -106,11 +106,11 @@ def _document(*, policy: str = "DETERMINISTIC_HASH_BERNOULLI") -> dict:
         },
         "x_point": {"point_id": "X300", "due_offset_seconds": 300},
         "y_points": [
-            {"point_id": "Y900", "due_offset_seconds": 900},
-            {"point_id": "Y1800", "due_offset_seconds": 1800},
-            {"point_id": "Y3600", "due_offset_seconds": 3600},
-            {"point_id": "Y7200", "due_offset_seconds": 7200},
-            {"point_id": "Y14400", "due_offset_seconds": 14400},
+            {"point_id": "Y900", "due_offset_seconds": 900, "allowed_lateness_seconds": 0},
+            {"point_id": "Y1800", "due_offset_seconds": 1800, "allowed_lateness_seconds": 0},
+            {"point_id": "Y3600", "due_offset_seconds": 3600, "allowed_lateness_seconds": 0},
+            {"point_id": "Y7200", "due_offset_seconds": 7200, "allowed_lateness_seconds": 0},
+            {"point_id": "Y14400", "due_offset_seconds": 14400, "allowed_lateness_seconds": 0},
         ],
         "activation": {"starts_at": "2026-09-01T00:00:00Z"},
         "budgets": {"provider_calls_per_utc_day_max": 3200},
@@ -183,12 +183,33 @@ def _members_from(observations: list[dict]) -> list[dict]:
             {
                 "entity_id": row["entity_id"],
                 "point_id": row["point_id"],
+                "event_time": row.get("event_time"),
                 "first_reliable_available_at": row["first_reliable_available_at"],
                 "schedule_sha256": row["schedule_sha256"],
                 "membership_state": row.get("state") or "OBSERVED",
             }
         )
     return members
+
+
+def _publish_panel(
+    data_root: Path,
+    dataset_manifest_id: str,
+    *,
+    dataset_id: str = "observation-panel-test",
+) -> None:
+    manifests = data_root / "datasets" / "manifests"
+    manifests.mkdir(parents=True, exist_ok=True)
+    (manifests / f"{dataset_manifest_id}.json").write_text(
+        json.dumps(
+            {"dataset_id": dataset_id, "dataset_manifest_id": dataset_manifest_id}
+        ),
+        encoding="utf-8",
+    )
+    (manifests / f"{dataset_manifest_id}.published").write_text(
+        json.dumps({"dataset_manifest_id": dataset_manifest_id}),
+        encoding="utf-8",
+    )
 
 
 def _bundle(definition, observations, *, sha: str = SHA_A, policy: str = "DETERMINISTIC_HASH_BERNOULLI"):
@@ -312,6 +333,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
                 "entity_id": "today",
                 "point_id": "Y1800",
                 "_partition_day": "2026-09-07",
+                "event_time": render_utc(AS_OF - timedelta(minutes=5)),
                 "first_reliable_available_at": render_utc(AS_OF - timedelta(minutes=5)),
             },
             {
@@ -406,6 +428,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
             compact = AS_OF.strftime("%Y%m%d")
             partitions = data_root / "datasets" / "manifests" / "partitions"
             partitions.mkdir(parents=True)
+            _publish_panel(data_root, "ds-manifest-empty-members")
             obs_rel = f"datasets/observation-panel/utc-day-{compact}.parquet"
             mem_rel = f"datasets/observation-panel/utc-day-{compact}-members.parquet"
             (data_root / obs_rel).parent.mkdir(parents=True)
@@ -423,6 +446,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
                     json.dumps(
                         {
                             "dataset_id": "observation-panel-test",
+                            "dataset_manifest_id": "ds-manifest-empty-members",
                             "partition_id": pid,
                             "logical_location": rel,
                             "first_reliable_available_at": available,
@@ -446,6 +470,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
             data_root = Path(tmp)
             partitions = data_root / "datasets" / "manifests" / "partitions"
             partitions.mkdir(parents=True)
+            _publish_panel(data_root, "ds-manifest-hist-members")
             (data_root / "datasets/observation-panel").mkdir(parents=True)
             available = render_utc(AS_OF - timedelta(minutes=10))
 
@@ -456,6 +481,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
                     json.dumps(
                         {
                             "dataset_id": "observation-panel-test",
+                            "dataset_manifest_id": "ds-manifest-hist-members",
                             "partition_id": pid,
                             "logical_location": rel,
                             "first_reliable_available_at": available,
@@ -527,6 +553,10 @@ class MarketDataAwarenessTests(unittest.TestCase):
                         "dataset_manifest_id": dataset_manifest_id,
                     }
                 ),
+                encoding="utf-8",
+            )
+            (manifests / f"{dataset_manifest_id}.published").write_text(
+                json.dumps({"dataset_manifest_id": dataset_manifest_id}),
                 encoding="utf-8",
             )
             for rel, pid in (
@@ -757,6 +787,88 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertEqual(cell["relative_state"], "HIGH_RELATIVE")
         self.assertGreaterEqual(cell["n_in_scope"], 5)
 
+    def test_delayed_availability_does_not_enter_current_window(self) -> None:
+        rows = []
+        for index in range(5):
+            row = _obs(
+                f"late{index}",
+                "Y1800",
+                AS_OF - timedelta(minutes=10),
+                {"FIELD-LIQUIDITY-USD-001": 1000},
+            )
+            row["event_time"] = render_utc(AS_OF - timedelta(days=2))
+            rows.append(row)
+        rows.extend(_history({"FIELD-LIQUIDITY-USD-001": 100}))
+        cell = _cell(
+            project_market_context(self.definition, _bundle(self.definition, rows), as_of=AS_OF),
+            "Y1800",
+            "LIQUIDITY_LEVEL",
+        )
+        self.assertNotEqual(cell["relative_state"], "HIGH_RELATIVE")
+        self.assertIsNone(cell["raw_value"])
+
+    def test_breadth_relative_requires_metric_support_n(self) -> None:
+        rows = [
+            _obs("now1", "Y1800", AS_OF - timedelta(minutes=10), {"FIELD-LIQUIDITY-USD-001": 1000}),
+            _obs("now2", "Y1800", AS_OF - timedelta(minutes=9), {"FIELD-LIQUIDITY-USD-001": 1000}),
+            _obs("now3", "Y1800", AS_OF - timedelta(minutes=8), {"FIELD-LIQUIDITY-USD-001": 1000}),
+            _obs("now4", "Y1800", AS_OF - timedelta(minutes=7), {"FIELD-LIQUIDITY-USD-001": 1000}),
+            _obs("now5", "Y1800", AS_OF - timedelta(minutes=6), {"FIELD-LIQUIDITY-USD-001": 1000}),
+            _obs("now1", "Y900", AS_OF - timedelta(minutes=40), {"FIELD-LIQUIDITY-USD-001": 100}),
+        ]
+        rows.extend(_history({"FIELD-LIQUIDITY-USD-001": 100}, point="Y1800"))
+        rows.extend(_history({"FIELD-LIQUIDITY-USD-001": 50}, point="Y900"))
+        cell = _cell(
+            project_market_context(self.definition, _bundle(self.definition, rows), as_of=AS_OF),
+            "Y1800",
+            "LIQUIDITY_BREADTH",
+        )
+        self.assertEqual(cell["n_metric_supported"], 1)
+        self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertEqual(cell["relative_reason"], "COVERAGE_INSUFFICIENT")
+        self.assertEqual(cell["raw_value"], "1")
+
+    def test_mixed_current_schedules_do_not_blend_raw(self) -> None:
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"a{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 100},
+                    schedule_sha=SHA_A,
+                )
+            )
+            rows.append(
+                _obs(
+                    f"b{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 10000},
+                    schedule_sha=SHA_B,
+                )
+            )
+        bundle = _bundle(self.definition, rows, sha=SHA_A)
+        bundle["schedules"][SHA_B] = schedule_semantics_from_document(
+            _document(policy="UNIFORM_RANDOM")
+        )
+        projection = project_market_context(self.definition, bundle, as_of=AS_OF)
+        cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
+        self.assertIsNone(cell["raw_value"])
+        self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertIn("CURRENT_SCOPE_MIXED", projection["gaps"])
+
+    def test_allowed_lateness_changes_compatibility(self) -> None:
+        left = schedule_semantics_from_document(_document())
+        other = _document()
+        other["y_points"][1]["allowed_lateness_seconds"] = 3600
+        right = schedule_semantics_from_document(other)
+        self.assertNotEqual(
+            context_compatibility_sha256(self.definition, left),
+            context_compatibility_sha256(self.definition, right),
+        )
+
     def test_insufficient_history_keeps_raw_unknown_relative(self) -> None:
         rows = [
             _obs("now1", "Y1800", AS_OF - timedelta(minutes=10), {"FIELD-LIQUIDITY-USD-001": 80}),
@@ -812,6 +924,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
             obs_table = {
                 "entity_id": [row["entity_id"] for row in rows],
                 "point_id": [row["point_id"] for row in rows],
+                "event_time": [row["event_time"] for row in rows],
                 "first_reliable_available_at": [
                     row["first_reliable_available_at"] for row in rows
                 ],
@@ -865,6 +978,10 @@ class MarketDataAwarenessTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            (manifests / f"{dataset_manifest_id}.published").write_text(
+                json.dumps({"dataset_manifest_id": dataset_manifest_id}),
+                encoding="utf-8",
+            )
             available = (clock - timedelta(minutes=10)).isoformat()
             for rel, pid in (
                 (obs_rel, f"utc-day-{compact}"),
@@ -890,13 +1007,15 @@ class MarketDataAwarenessTests(unittest.TestCase):
             try:
                 connection.execute(
                     "CREATE TABLE _research_events "
-                    "(entity_id VARCHAR, record_kind VARCHAR, payload_json VARCHAR)"
+                    "(entity_id VARCHAR, record_kind VARCHAR, payload_json VARCHAR, "
+                    "first_reliable_available_at TIMESTAMP)"
                 )
                 connection.execute(
-                    "INSERT INTO _research_events VALUES (?, 'OBSERVATION_SCHEDULE', ?)",
+                    "INSERT INTO _research_events VALUES (?, 'OBSERVATION_SCHEDULE', ?, ?)",
                     [
                         SHA_A,
                         json.dumps({"schedule": _document(), "schedule_sha256": SHA_A}),
+                        render_utc(clock),
                     ],
                 )
             finally:

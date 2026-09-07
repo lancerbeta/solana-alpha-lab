@@ -18,13 +18,16 @@ from solana_alpha_lab.factory.owner_language import (
     VERDICT_GLOSS,
     attention_label,
     axis_label,
+    axis_unit_label,
     blocker_label,
+    coverage_class_label,
     counter_label,
     decision_kind_label,
     field_label,
     handoff_state_label,
     kind_label,
     nav_label,
+    nonclaim_label,
     obligation_label,
     owner_error,
     research_copy,
@@ -1823,7 +1826,7 @@ def _coverage_class_text(classes: Mapping[str, Any]) -> str:
     ):
         count = classes.get(key)
         if count:
-            parts.append(f"{key}={count}")
+            parts.append(f"{coverage_class_label(key)}={count}")
     return "; ".join(parts) if parts else "empty"
 
 
@@ -1831,11 +1834,15 @@ def _relative_cell(cell: Mapping[str, Any]) -> str:
     state = str(cell.get("relative_state") or "UNKNOWN")
     reason = str(cell.get("relative_reason") or "")
     raw = cell.get("raw_value")
+    unit = axis_unit_label(str(cell.get("unit") or ""))
+    raw_text = cell_html(raw)
+    if raw not in {None, ""} and unit:
+        raw_text = f"{raw_text} {esc(unit)}"
     why = f" {status_html(reason)}" if reason else ""
     return (
         f"<div class=\"market-cell\" data-relative=\"{esc(state)}\">"
         f"{status_html(state)}{why}"
-        f"<div>{esc(surface_copy('MARKET', 'raw'))}: {cell_html(raw)}</div>"
+        f"<div>{esc(surface_copy('MARKET', 'raw'))}: {raw_text}</div>"
         f"<div>{esc(surface_copy('MARKET', 'n_obs'))}: {cell_html(cell.get('n_observed'))}"
         f" / {esc(surface_copy('MARKET', 'n_scope'))}: {cell_html(cell.get('n_in_scope'))}</div>"
         "</div>"
@@ -1945,6 +1952,7 @@ def _market_section(model: dict[str, Any]) -> str:
                 ),
             ]
         )
+        + f"<p>{esc(surface_copy('MARKET', 'not_all_market'))} {canon('NO_MARKET_WIDE_CLAIM')}</p>"
         + f"<p>{esc(surface_copy('MARKET', 'vector'))} {esc(surface_copy('MARKET', 'high_means'))} "
         f"{esc(surface_copy('MARKET', 'leave'))}</p>"
         + f"<h2>{esc(surface_copy('MARKET', 'matrix'))}</h2>"
@@ -1961,7 +1969,8 @@ def _market_section(model: dict[str, Any]) -> str:
         f"<th>{esc(surface_copy('MARKET', 'coverage_axis'))}</th>"
         f"<th>{esc(surface_copy('MARKET', 'n_scope'))}</th>"
         f"<th>{esc(surface_copy('MARKET', 'n_obs'))}</th>"
-        f"<th>n_missing</th><th>fraction</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_missing'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_fraction'))}</th>"
         f"<th>{esc(surface_copy('MARKET', 'coverage_classes'))}</th>"
         "</tr></thead><tbody>"
         + coverage_rows
@@ -2003,7 +2012,7 @@ def _market_section(model: dict[str, Any]) -> str:
             ]
         )
         + f"<h2>{esc(surface_copy('MARKET', 'non_claims'))}</h2>"
-        + f"<p class=\"non-claims\">{esc('; '.join(str(item) for item in non_claims))}</p>"
+        + f"<p class=\"non-claims\">{esc('; '.join(nonclaim_label(str(item)) for item in non_claims))}</p>"
         + technical(
             "<table>" + mapping_rows(market) + "</table>",
             title=surface_copy("MARKET", "machine"),

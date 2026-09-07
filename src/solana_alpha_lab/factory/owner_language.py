@@ -588,11 +588,15 @@ SURFACE_COPY = {
         "compat": "context_compatibility_sha256",
         "snapshot": "context_snapshot_sha256",
         "n_obs": "N observed",
+        "n_metric": "N metric",
         "n_scope": "N in scope",
         "missing": "missing / censored / excluded",
         "coverage_point": "Возраст",
         "coverage_axis": "Ось",
         "coverage_classes": "Классы покрытия",
+        "coverage_missing": "Пропуски",
+        "coverage_fraction": "Доля observed",
+        "unit": "Единица",
         "reference": "Статус сопоставления",
         "source": "Статус источника",
         "freshness": "Возраст evidence — это не здоровье collector.",
@@ -618,6 +622,39 @@ COMMAND_LABELS = {
     "STOP": "Стоп",
     "PARK": "Парковка",
     "RECORD_DECISION": "Записать решение",
+}
+
+AXIS_UNITS = {
+    "USD": "USD",
+    "TRADERS": "трейдеры",
+    "UP_SHARE": "доля UP",
+    "BALANCE": "баланс",
+}
+
+COVERAGE_CLASS_LABELS = {
+    "observed": "наблюдено",
+    "typed_missing": "typed missing",
+    "disappeared": "исчезло",
+    "censored": "цензура",
+    "capacity_excluded": "capacity excluded",
+    "sampling_excluded": "sampling excluded",
+    "x_ineligible": "X-ineligible",
+    "unknown": "unknown",
+}
+
+NONCLAIM_LABELS = {
+    "NO_MARKET_WIDE_CLAIM": "Это не весь рынок",
+    "NO_EXPECTED_RETURN": "Не ожидаемая доходность",
+    "NO_TRADE_OR_NO_TRADE": "Не сигнал trade / no-trade",
+    "NO_BULL_BEAR_OR_COMPOSITE_REGIME": "Не BULL/BEAR и не composite regime",
+    "NO_TESTED_STRATEGY_CONTEXT_BINDING": "Нет проверенной привязки стратегии",
+    "NO_BOT_AUTHORITY": "Нет команд боту",
+    "NO_COLLECTOR_HEALTH_INFERENCE": "Не здоровье collector",
+    "NO_ORCH_001": "Не ORCH-001",
+    "NO_DISCOVERY_RANKER": "Не discovery ranker",
+    "NO_PROVIDER": "Не вызов провайдера",
+    "NO_DEPLOY": "Не deploy",
+    "NO_LIVE_OR_WALLET": "Не LIVE и не wallet",
 }
 
 AXIS_LABELS = {
@@ -751,6 +788,26 @@ def blocker_label(code: str) -> str:
 
 def axis_label(axis_id: str) -> str:
     return AXIS_LABELS.get(str(axis_id or ""), str(axis_id or ""))
+
+
+def axis_unit_label(unit: str) -> str:
+    return AXIS_UNITS.get(str(unit or ""), str(unit or ""))
+
+
+def coverage_class_label(key: str) -> str:
+    canonical = str(key or "")
+    gloss = COVERAGE_CLASS_LABELS.get(canonical)
+    if gloss and gloss != canonical:
+        return f"{gloss} ({canonical})"
+    return canonical
+
+
+def nonclaim_label(code: str) -> str:
+    canonical = str(code or "")
+    gloss = NONCLAIM_LABELS.get(canonical)
+    if gloss:
+        return f"{gloss} ({canonical})"
+    return canonical
 
 
 def field_label(key: str) -> str:

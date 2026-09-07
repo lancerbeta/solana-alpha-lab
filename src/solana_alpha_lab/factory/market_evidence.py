@@ -110,6 +110,7 @@ def schedule_semantics_from_document(document: Mapping[str, Any]) -> dict[str, A
         {
             "point_id": str(item.get("point_id") or ""),
             "due_offset_seconds": int(item.get("due_offset_seconds") or 0),
+            "allowed_lateness_seconds": int(item.get("allowed_lateness_seconds") or 0),
         }
         for item in (document.get("y_points") or [])
         if isinstance(item, Mapping)
@@ -126,6 +127,7 @@ def schedule_semantics_from_document(document: Mapping[str, Any]) -> dict[str, A
             "x_point": {
                 "point_id": x_point.get("point_id"),
                 "due_offset_seconds": x_point.get("due_offset_seconds"),
+                "allowed_lateness_seconds": x_point.get("allowed_lateness_seconds"),
             },
             "y_points": y_points,
         },
@@ -235,18 +237,55 @@ def _partition_day(partition_id: str) -> str | None:
     return None
 
 
-def _list_partition_payloads(data_root: Path) -> list[dict[str, Any]]:
+def _published_manifest_ids(manifests_dir: Path) -> set[str]:
+    ids: set[str] = set()
+    if manifests_dir.is_dir() is False:
+        return ids
+    for path in manifests_dir.glob("*.published"):
+        stem = path.name[: -len(".published")]
+        if stem.startswith("dataset-"):
+            ids.add(stem[len("dataset-") :])
+        else:
+            ids.add(stem)
+        try:
+            loaded = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if isinstance(loaded, Mapping):
+            manifest_id = str(loaded.get("dataset_manifest_id") or "")
+            if manifest_id:
+                ids.add(manifest_id)
+    return ids
+
+
+def _partition_paths_for_days(partitions_dir: Path, days: set[str]) -> list[Path]:
+    paths: list[Path] = []
+    for day in sorted(days):
+        compact = day.replace("-", "")
+        paths.extend(partitions_dir.glob(f"utc-day-{compact}.json"))
+        paths.extend(partitions_dir.glob(f"utc-day-{compact}-members.json"))
+    return sorted(set(paths))
+
+
+def _list_partition_payloads(data_root: Path, *, days: set[str]) -> list[dict[str, Any]]:
     payloads: list[dict[str, Any]] = []
     manifests_dir = data_root / "datasets" / "manifests"
     partitions_dir = manifests_dir / "partitions"
+    published = _published_manifest_ids(manifests_dir)
     if partitions_dir.is_dir():
-        for path in sorted(partitions_dir.glob("*.json")):
+        if not published:
+            return payloads
+        for path in _partition_paths_for_days(partitions_dir, days):
             try:
                 loaded = json.loads(path.read_text(encoding="utf-8"))
             except (OSError, json.JSONDecodeError):
                 continue
-            if isinstance(loaded, dict):
-                payloads.append(_enrich_partition(loaded, manifests_dir))
+            if not isinstance(loaded, dict):
+                continue
+            manifest_id = str(loaded.get("dataset_manifest_id") or "")
+            if manifest_id not in published:
+                continue
+            payloads.append(_enrich_partition(loaded, manifests_dir))
         return payloads
     manifests_dir = data_root / "datasets" / "manifests"
     if not manifests_dir.is_dir():
@@ -290,15 +329,24 @@ def _load_rows(data_root: Path, location: str, *, members: bool) -> list[dict[st
             except MembersDeltaError:
                 if path.is_file() is False:
                     return []
-                rows = pq.read_table(path).to_pylist()
+                try:
+                    rows = pq.read_table(path).to_pylist()
+                except Exception:
+                    return []
         except Exception:
             if path.is_file() is False:
                 return []
-            rows = pq.read_table(path).to_pylist()
+            try:
+                rows = pq.read_table(path).to_pylist()
+            except Exception:
+                return []
     else:
         if path.is_file() is False:
             return []
-        rows = pq.read_table(path).to_pylist()
+        try:
+            rows = pq.read_table(path).to_pylist()
+        except Exception:
+            return []
     return [_decode_loaded_row(row) for row in rows if isinstance(row, Mapping)]
 
 
@@ -319,7 +367,7 @@ def _load_schedules_from_projection(
     data_root: Path,
     needed: set[str],
     *,
-    definition: Mapping[str, Any],
+    as_of: datetime,
 ) -> dict[str, dict[str, Any]]:
     found: dict[str, dict[str, Any]] = {}
     projection = data_root / "projections" / "research_memory.duckdb"
@@ -344,7 +392,7 @@ def _load_schedules_from_projection(
         placeholders = ",".join(["?"] * len(needed))
         rows = connection.execute(
             f"""
-            SELECT entity_id, payload_json
+            SELECT entity_id, payload_json, first_reliable_available_at
             FROM _research_events
             WHERE record_kind = 'OBSERVATION_SCHEDULE'
               AND entity_id IN ({placeholders})
@@ -356,7 +404,17 @@ def _load_schedules_from_projection(
     finally:
         if connection is not None:
             connection.close()
-    for entity_id, payload_json in rows:
+    for entity_id, payload_json, available_raw in rows:
+        if isinstance(available_raw, datetime):
+            available = (
+                available_raw.replace(tzinfo=UTC)
+                if available_raw.tzinfo is None
+                else available_raw.astimezone(UTC)
+            )
+        else:
+            available = parse_market_clock(available_raw)
+        if available is None or available > as_of:
+            continue
         try:
             payload = json.loads(payload_json) if isinstance(payload_json, str) else payload_json
         except json.JSONDecodeError:
@@ -413,7 +471,7 @@ def read_market_evidence(
     start = horizon_start(clock, definition)
     days = _utc_day_set(start, clock)
     selected: list[dict[str, Any]] = []
-    for payload in _list_partition_payloads(discovery.root):
+    for payload in _list_partition_payloads(discovery.root, days=days):
         if _is_observation_panel_partition(payload) is False:
             continue
         partition_available = _partition_available(payload)
@@ -477,7 +535,7 @@ def read_market_evidence(
     if missing:
         found_schedules.update(
             _load_schedules_from_projection(
-                discovery.root, missing, definition=definition
+                discovery.root, missing, as_of=clock
             )
         )
 
