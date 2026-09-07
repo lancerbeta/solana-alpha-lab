@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "TRADING-OPERATIONS-WORKBENCH-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-07",
+  "task_id": "TRADING_OPERATIONS_WORKBENCH_V2",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "GET_READONLY_IMMUTABLE_REOPEN",
+        "COMMAND_PROBES_SCHEMA_FAIL_CLOSED",
+        "TRACE_REQUIRES_POSITION_AND_SIGNAL_IDENTITY",
+        "MULTI_BOT_PAUSE_UNKNOWN",
+        "PER_BOT_CLOSE_ALL_HASH",
+        "NO_MARK_TTL_INVENTED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OBSERVE_DIAGNOSE_ACT_VERIFY_VERTICAL",
+        "GIT_NOT_RUNTIME",
+        "ACTIVATION_PATH_GAP_HONEST",
+        "UNKNOWN_NOT_ZERO",
+        "CLOSE_COMMAND_NOT_EXIT_FILL",
+        "WATCHLIST_SOURCE_GAP_HONEST"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=574708e5c475f61cff177a11813cea2718ca7e7ffeff06c9f7f7619078954a48",
+        "GET_CANNOT_CREATE_RUNTIME",
+        "GIT_STRATEGYVERSION_NOT_BOT",
+        "SIGNAL_NOT_FILL",
+        "UNKNOWN_NOT_ZERO_OR_HEALTHY",
+        "NO_MINT_ONLY_JOIN",
+        "STOPPED_DOES_NOT_HIDE_INVENTORY",
+        "NO_UI_ACTIVATION",
+        "NO_RUNTIME_IN_GIT"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_REAL_MONEY",
+    "NO_OWNER_FCF",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_ACTIVATION_WORKFLOW",
+    "NO_ATTENTION_FEED",
+    "NO_NEW_DB",
+    "NO_NEW_SERVICE"
+  ]
+}
