@@ -418,6 +418,44 @@ class OwnerAttentionAndChangeFeedV1Tests(unittest.TestCase):
         self.assertEqual(research["CURRENT_STATE"], "PARTIAL")
         self.assertEqual(research["CHANGE_HISTORY"], "NOT_PRESENT")
         self.assertNotEqual(research["CHANGE_HISTORY"], "AVAILABLE")
+        self.assertTrue(projection["all_clear"])
+        previous = {
+            "sources": {
+                "RESEARCH": {
+                    "change_available_at": "2026-09-01T00:00:00Z",
+                    "native_identity": "REC-KEEP",
+                }
+            }
+        }
+        out = persistable_watermarks(
+            projection["review_snapshot"],
+            previous=previous,
+            coverage=projection["coverage"],
+        )
+        self.assertEqual(out["RESEARCH"]["native_identity"], "REC-KEEP")
+
+    def test_present_unopenable_research_store_is_p1_not_absence(self) -> None:
+        projection = compose_owner_attention(
+            research={
+                "sources": [
+                    {"source_id": "SRC-EXPERIMENT-SPECS", "status": "AVAILABLE"},
+                    {"source_id": "SRC-RESEARCH-STORE", "status": "NOT_PRESENT"},
+                ],
+                "needs_attention": [],
+            },
+            research_discovery="INVALID",
+        )
+        research = projection["coverage"][0]
+        self.assertEqual(research["CURRENT_STATE"], "INVALID")
+        self.assertEqual(research["CHANGE_HISTORY"], "UNAVAILABLE")
+        self.assertEqual(projection["current_attention"][0]["priority"], "P1")
+        self.assertEqual(projection["current_attention"][0]["attention_code"], "SOURCE_INVALID")
+        self.assertFalse(projection["all_clear"])
+        body = _page(
+            {"owner_attention": projection, "cockpit": {}, "runtime": {}},
+            surface="HOME",
+        ).decode("utf-8")
+        self.assertNotIn(SURFACE_COPY["HOME"]["do_nothing"], body)
         previous = {
             "sources": {
                 "RESEARCH": {

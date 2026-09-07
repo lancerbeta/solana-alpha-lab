@@ -684,6 +684,9 @@ class FactoryApplication:
     def _research_change_records(self) -> tuple[list[dict[str, Any]], str]:
         store = self.existing_research_store()
         if store is None:
+            status, _error = self.research_projection_discovery()
+            if status in {"UNAVAILABLE", "INVALID"}:
+                return [], status
             return [], "NOT_PRESENT"
         from datetime import timezone
 

@@ -282,6 +282,8 @@ def _research_coverage(
     if records_status in BLOCKING_STATE:
         current = records_status if records_status in BLOCKING_STATE else "UNAVAILABLE"
         return _coverage_row("RESEARCH", current=current, history="UNAVAILABLE")
+    if discovery in BLOCKING_STATE:
+        return _coverage_row("RESEARCH", current=str(discovery), history="UNAVAILABLE")
     if research is None:
         status = discovery or "NOT_PRESENT"
         history = _history_for_store(status)

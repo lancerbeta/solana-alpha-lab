@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: ab314ccffbaba88723dfe8e855e3ab72ac6432dc3d07ca8e24a569a9678d8325}
+  integrity: {kind: sha256, sha256: c084f0cf216521db9376c78f1da49fce12bacef808274e32f224330b90410304}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 6964dc0bb33b66770a130a0965e9f48dacb6ed8fa693d1e771da64858d8dbcb3}
+  integrity: {kind: sha256, sha256: 96134901b838dbc392c1bc47284be50b3cfb387b3261871b3dbc0a57f65b6c9d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -35899,7 +35899,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: OWNER_ATTENTION_AND_CHANGE_FEED_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_daily_attention.py', repository_path: src/solana_alpha_lab/factory/owner_daily_attention.py}
-  integrity: {kind: sha256, sha256: 747f8f77b2c272547f201f6d1ca6ebbf7ae760c84e30162b61118c6be5c2182a}
+  integrity: {kind: sha256, sha256: d01143c007b4ca0c50ffe2832842ce3eab9e42c4633dcfce25053ba7ff46f304}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001}
@@ -35918,7 +35918,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: OWNER_ATTENTION_AND_CHANGE_FEED_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_attention_and_change_feed_v1.py', repository_path: tests/test_owner_attention_and_change_feed_v1.py}
-  integrity: {kind: sha256, sha256: 5e4c9d52b5c495362e696aae25d87f3c4c830bce055e6597e447435574c592b5}
+  integrity: {kind: sha256, sha256: 4aa7da3512f7b80322bafae0ef4e5e7871de1c633ff2730dd7817a772563946b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001}
