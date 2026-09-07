@@ -418,6 +418,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertEqual(cell["raw_value"], "1000")
         self.assertEqual(cell["relative_state"], "UNKNOWN")
         self.assertEqual(cell["relative_reason"], "MEMBER_EVIDENCE_INCOMPLETE")
+        self.assertEqual(cell["n_in_scope"], 0)
 
     def test_empty_members_partition_marks_incomplete(self) -> None:
         import pyarrow as pa
@@ -1162,6 +1163,38 @@ class MarketDataAwarenessTests(unittest.TestCase):
         projection = project_market_context(self.definition, bundle, as_of=AS_OF)
         cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
         self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertEqual(cell["relative_reason"], "REFERENCE_SCOPE_MISMATCH")
+
+    def test_incomparable_history_does_not_blend_breadth_previous(self) -> None:
+        current_sem = schedule_semantics_from_document(_document())
+        hist_sem = schedule_semantics_from_document(_document(policy="ALL_UNDER_CAP"))
+        rows = [
+            _obs(
+                "mint1",
+                "Y1800",
+                AS_OF - timedelta(minutes=10),
+                {"FIELD-LIQUIDITY-USD-001": 1000},
+            ),
+            _obs(
+                "mint1",
+                "Y900",
+                AS_OF - timedelta(minutes=70),
+                {"FIELD-LIQUIDITY-USD-001": 100},
+                schedule_sha=SHA_B,
+            ),
+        ]
+        bundle = {
+            "source_status": "PRESENT",
+            "observations": rows,
+            "members": [],
+            "schedules": {SHA_A: current_sem, SHA_B: hist_sem},
+        }
+        cell = _cell(
+            project_market_context(self.definition, bundle, as_of=AS_OF),
+            "Y1800",
+            "LIQUIDITY_BREADTH",
+        )
+        self.assertIsNone(cell["raw_value"])
         self.assertEqual(cell["relative_reason"], "REFERENCE_SCOPE_MISMATCH")
 
     def test_current_window_excluded_from_reference(self) -> None:

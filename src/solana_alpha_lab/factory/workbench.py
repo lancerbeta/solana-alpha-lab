@@ -1991,8 +1991,15 @@ def _market_section(model: dict[str, Any]) -> str:
                 ),
             ]
         )
-        + f"<p>{esc(surface_copy('MARKET', 'vector'))} {esc(surface_copy('MARKET', 'high_means'))} "
-        f"{esc(surface_copy('MARKET', 'leave'))}</p>"
+        + f"<p>{esc(surface_copy('MARKET', 'vector'))} {esc(surface_copy('MARKET', 'high_means'))}</p>"
+        + (
+            f"<p>{esc(surface_copy('MARKET', 'leave'))}</p>"
+            if source == "PRESENT"
+            and "CURRENT_SCOPE_MIXED" not in market_gaps
+            and "MEMBER_EVIDENCE_INCOMPLETE" not in market_gaps
+            else ""
+        )
+        + f"<h3>{esc(surface_copy('MARKET', 'default_detail'))}</h3>"
         + default_html
         + f"<h2>{esc(surface_copy('MARKET', 'interpretation'))}</h2>"
         + fact_strip(

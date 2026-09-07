@@ -380,9 +380,9 @@ def _coverage_counts(
         "unknown": 0,
     }
     seen: set[str] = set()
-    for row in rows:
+    for row in _latest_by_entity(rows).values():
         entity_id = str(row.get("entity_id") or "")
-        if not entity_id or entity_id in seen:
+        if not entity_id:
             continue
         seen.add(entity_id)
         classes[_row_coverage_class(axis, row)] += 1
@@ -807,10 +807,11 @@ def project_market_context(
             incomparable_reason = history_fault
     comparable_obs = (
         _compatible_rows(observations, definition, schedules, current_fingerprint)
-        if comparable_history and current_fingerprint
-        else observations
+        if current_fingerprint
+        else []
     )
     metric_obs = [] if current_mixed else current_obs
+    withhold_coverage = current_mixed or members_incomplete
     missing_pit = any(_parse_available(row) is None for row in observations)
 
     current_days = {
@@ -824,7 +825,7 @@ def project_market_context(
         lookback = _previous_lookback_seconds(landmark, landmarks)
         coverage_at_point = (
             []
-            if current_mixed
+            if withhold_coverage
             else _select_rows(
                 current_obs,
                 start=current_start,
@@ -842,7 +843,7 @@ def project_market_context(
         )
         coverage_rows = (
             []
-            if current_mixed
+            if withhold_coverage
             else [
                 *coverage_at_point,
                 *_unclocked_rows(
@@ -852,7 +853,7 @@ def project_market_context(
         )
         member_ids = (
             {}
-            if current_mixed
+            if withhold_coverage
             else _member_ids_for_landmark(
                 members,
                 point_id=point_id,
