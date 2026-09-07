@@ -721,6 +721,41 @@ class MarketDataAwarenessTests(unittest.TestCase):
         cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
         self.assertEqual(cell["relative_state"], "HIGH_RELATIVE")
 
+    def test_discovery_clock_members_enter_y1800_by_anchor(self) -> None:
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        rows.extend(_history({"FIELD-LIQUIDITY-USD-001": 100}))
+        bundle = _bundle(self.definition, rows)
+        members = []
+        for row in rows:
+            available = datetime.fromisoformat(
+                str(row["first_reliable_available_at"]).replace("Z", "+00:00")
+            )
+            members.append(
+                {
+                    "entity_id": row["entity_id"],
+                    "authoritative_anchor": render_utc(available - timedelta(seconds=1800)),
+                    "first_reliable_available_at": render_utc(
+                        available - timedelta(minutes=90)
+                    ),
+                    "schedule_sha256": row["schedule_sha256"],
+                    "membership_state": "SAMPLED_MEMBER",
+                }
+            )
+        bundle["members"] = members
+        projection = project_market_context(self.definition, bundle, as_of=AS_OF)
+        cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
+        self.assertEqual(cell["relative_state"], "HIGH_RELATIVE")
+        self.assertGreaterEqual(cell["n_in_scope"], 5)
+
     def test_insufficient_history_keeps_raw_unknown_relative(self) -> None:
         rows = [
             _obs("now1", "Y1800", AS_OF - timedelta(minutes=10), {"FIELD-LIQUIDITY-USD-001": 80}),
@@ -736,6 +771,122 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertEqual(cell["raw_value"], "100")
         self.assertEqual(cell["relative_state"], "UNKNOWN")
         self.assertEqual(cell["relative_reason"], "REFERENCE_INSUFFICIENT")
+
+    def test_get_market_from_partitions_shows_high_relative(self) -> None:
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        clock = datetime.now(UTC).replace(microsecond=0)
+        semantics = schedule_semantics_from_document(_document())
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    clock - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        for hours in range(2, 14):
+            for index in range(5):
+                rows.append(
+                    _obs(
+                        f"hist{hours}_{index}",
+                        "Y1800",
+                        clock - timedelta(hours=hours),
+                        {"FIELD-LIQUIDITY-USD-001": 100},
+                    )
+                )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            factory = isolated_factory_root(data_root / "factory")
+            manifests = data_root / "datasets" / "manifests"
+            partitions = manifests / "partitions"
+            partitions.mkdir(parents=True)
+            (data_root / "datasets/observation-panel").mkdir(parents=True)
+            compact = clock.strftime("%Y%m%d")
+            dataset_manifest_id = "ds-manifest-get-market-001"
+            obs_rel = f"datasets/observation-panel/utc-day-{compact}.parquet"
+            mem_rel = f"datasets/observation-panel/utc-day-{compact}-members.parquet"
+            obs_table = {
+                "entity_id": [row["entity_id"] for row in rows],
+                "point_id": [row["point_id"] for row in rows],
+                "first_reliable_available_at": [
+                    row["first_reliable_available_at"] for row in rows
+                ],
+                "schedule_sha256": [row["schedule_sha256"] for row in rows],
+                "field_values": [json.dumps(row["field_values"]) for row in rows],
+                "schedule_semantics": [json.dumps(semantics) for _ in rows],
+                "state": [row["state"] for row in rows],
+            }
+            members = []
+            for row in rows:
+                available = datetime.fromisoformat(
+                    str(row["first_reliable_available_at"]).replace("Z", "+00:00")
+                )
+                members.append(
+                    {
+                        "entity_id": row["entity_id"],
+                        "authoritative_anchor": render_utc(
+                            available - timedelta(seconds=1800)
+                        ),
+                        "first_reliable_available_at": render_utc(
+                            available - timedelta(minutes=90)
+                        ),
+                        "schedule_sha256": row["schedule_sha256"],
+                        "membership_state": "SAMPLED_MEMBER",
+                    }
+                )
+            pq.write_table(pa.table(obs_table), data_root / obs_rel)
+            pq.write_table(
+                pa.table(
+                    {
+                        "entity_id": [item["entity_id"] for item in members],
+                        "authoritative_anchor": [
+                            item["authoritative_anchor"] for item in members
+                        ],
+                        "first_reliable_available_at": [
+                            item["first_reliable_available_at"] for item in members
+                        ],
+                        "schedule_sha256": [item["schedule_sha256"] for item in members],
+                        "membership_state": [
+                            item["membership_state"] for item in members
+                        ],
+                    }
+                ),
+                data_root / mem_rel,
+            )
+            (manifests / f"{dataset_manifest_id}.json").write_text(
+                json.dumps(
+                    {
+                        "dataset_id": "observation-panel-getmarket",
+                        "dataset_manifest_id": dataset_manifest_id,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            available = (clock - timedelta(minutes=10)).isoformat()
+            for rel, pid in (
+                (obs_rel, f"utc-day-{compact}"),
+                (mem_rel, f"utc-day-{compact}-members"),
+            ):
+                (partitions / f"{pid}.json").write_text(
+                    json.dumps(
+                        {
+                            "partition_manifest_id": pid,
+                            "dataset_manifest_id": dataset_manifest_id,
+                            "partition_id": pid,
+                            "logical_location": rel,
+                            "first_reliable_available_at": available,
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+            app = FactoryApplication(root=factory, research_data_root=data_root)
+            market = _get(app, "/market")
+            self.assertNotIn("SOURCE_NOT_PRESENT", market)
+            self.assertIn('data-relative="HIGH_RELATIVE"', market)
 
     def test_schedule_sha_rollover_still_comparable(self) -> None:
         semantics = schedule_semantics_from_document(_document())

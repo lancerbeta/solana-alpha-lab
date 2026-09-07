@@ -299,7 +299,20 @@ def _load_rows(data_root: Path, location: str, *, members: bool) -> list[dict[st
         if path.is_file() is False:
             return []
         rows = pq.read_table(path).to_pylist()
-    return [dict(row) for row in rows if isinstance(row, Mapping)]
+    return [_decode_loaded_row(row) for row in rows if isinstance(row, Mapping)]
+
+
+def _decode_loaded_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    item = dict(row)
+    for key in ("field_values", "schedule_semantics"):
+        raw = item.get(key)
+        if isinstance(raw, str):
+            try:
+                loaded = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+            item[key] = loaded
+    return item
 
 
 def _load_schedules_from_projection(

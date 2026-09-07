@@ -497,6 +497,16 @@ def _reference_bucket_values(
         member_ids = _member_ids_for_landmark(
             members,
             point_id=point_id,
+            due_offset_seconds=int(
+                next(
+                    (
+                        item["due_offset_seconds"]
+                        for item in definition["lifecycle_landmarks"]
+                        if str(item["point_id"]) == point_id
+                    ),
+                    0,
+                )
+            ),
             current_start=cursor,
             as_of=bucket_end,
             definition=definition,
@@ -590,13 +600,19 @@ def _member_ids_for_landmark(
     members: Sequence[Mapping[str, Any]],
     *,
     point_id: str,
+    due_offset_seconds: int,
     current_start: datetime,
     as_of: datetime,
     definition: Mapping[str, Any],
     schedules: Mapping[str, Any],
     fingerprint: str | None,
 ) -> dict[str, str]:
-    """Return entity_id -> coverage class for members in the current landmark window."""
+    """Return entity_id -> coverage class for members in the landmark window.
+
+    Production members are an entity/day cohort. Landmark eligibility uses
+    authoritative_anchor + due_offset. first_reliable_available_at is only
+    the PIT known-by clock.
+    """
 
     ids: dict[str, str] = {}
     for row in members:
@@ -613,7 +629,17 @@ def _member_ids_for_landmark(
         available = _parse_available(row)
         if available is None:
             available = parse_market_clock(row.get("_partition_available_at"))
-        if available is None or available > as_of or not _in_window(available, current_start, as_of):
+        if available is None or available > as_of:
+            continue
+        anchor = parse_market_clock(row.get("authoritative_anchor") or row.get("event_time"))
+        if member_point.startswith("Y"):
+            if not _in_window(available, current_start, as_of):
+                continue
+        elif anchor is not None and due_offset_seconds:
+            due = anchor + timedelta(seconds=due_offset_seconds)
+            if not (current_start < due <= as_of):
+                continue
+        elif not _in_window(available, current_start, as_of):
             continue
         state = row.get("membership_state") or row.get("state")
         ids[entity_id] = coverage_class_for_member(state)
@@ -755,6 +781,7 @@ def project_market_context(
         member_ids = _member_ids_for_landmark(
             members,
             point_id=point_id,
+            due_offset_seconds=int(landmark["due_offset_seconds"]),
             current_start=current_start,
             as_of=clock,
             definition=definition,
