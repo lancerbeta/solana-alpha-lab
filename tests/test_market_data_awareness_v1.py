@@ -503,6 +503,41 @@ class MarketDataAwarenessTests(unittest.TestCase):
             )
             self.assertTrue(bundle["members_incomplete"])
 
+    def test_unreadable_observation_parquet_is_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            partitions = data_root / "datasets" / "manifests" / "partitions"
+            partitions.mkdir(parents=True)
+            _publish_panel(data_root, "ds-manifest-bad-parquet")
+            rel = "datasets/observation-panel/utc-day-20260907.parquet"
+            path = data_root / rel
+            path.parent.mkdir(parents=True)
+            path.write_bytes(b"not-a-parquet")
+            compact = AS_OF.strftime("%Y%m%d")
+            (partitions / f"utc-day-{compact}.json").write_text(
+                json.dumps(
+                    {
+                        "dataset_id": "observation-panel-test",
+                        "dataset_manifest_id": "ds-manifest-bad-parquet",
+                        "partition_id": f"utc-day-{compact}",
+                        "logical_location": rel,
+                        "first_reliable_available_at": render_utc(
+                            AS_OF - timedelta(minutes=10)
+                        ),
+                    }
+                ),
+                encoding="utf-8",
+            )
+            bundle = read_market_evidence(
+                ROOT,
+                as_of=AS_OF,
+                definition=self.definition,
+                data_root=data_root,
+            )
+            self.assertEqual(bundle["source_status"], "UNAVAILABLE")
+            self.assertEqual(bundle["source_error"], "OBSERVATION_PARTITION_UNREADABLE")
+            self.assertEqual(bundle["observations"], [])
+
     def test_production_partition_json_and_offset_clock_are_admitted(self) -> None:
         import pyarrow as pa
         import pyarrow.parquet as pq
@@ -828,6 +863,46 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertEqual(cell["relative_reason"], "COVERAGE_INSUFFICIENT")
         self.assertEqual(cell["raw_value"], "1")
 
+    def test_relative_band_uses_metric_fraction_not_field_observed(self) -> None:
+        rows = []
+        for index in range(5):
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=10),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+            rows.append(
+                _obs(
+                    f"now{index}",
+                    "Y900",
+                    AS_OF - timedelta(minutes=40),
+                    {"FIELD-LIQUIDITY-USD-001": 100},
+                )
+            )
+        for index in range(21):
+            rows.append(
+                _obs(
+                    f"thin{index}",
+                    "Y1800",
+                    AS_OF - timedelta(minutes=8),
+                    {"FIELD-LIQUIDITY-USD-001": 1000},
+                )
+            )
+        rows.extend(_history({"FIELD-LIQUIDITY-USD-001": 100}, point="Y1800"))
+        rows.extend(_history({"FIELD-LIQUIDITY-USD-001": 50}, point="Y900"))
+        cell = _cell(
+            project_market_context(self.definition, _bundle(self.definition, rows), as_of=AS_OF),
+            "Y1800",
+            "LIQUIDITY_BREADTH",
+        )
+        self.assertEqual(cell["n_metric_supported"], 5)
+        self.assertGreater(cell["n_observed"], cell["n_metric_supported"])
+        self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertEqual(cell["relative_reason"], "COVERAGE_INSUFFICIENT")
+
     def test_mixed_current_schedules_do_not_blend_raw(self) -> None:
         rows = []
         for index in range(5):
@@ -858,6 +933,14 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertIsNone(cell["raw_value"])
         self.assertEqual(cell["relative_state"], "UNKNOWN")
         self.assertIn("CURRENT_SCOPE_MIXED", projection["gaps"])
+        self.assertEqual(cell["n_in_scope"], 0)
+        self.assertIsNone(projection["scope"]["sampling_policy"])
+        from solana_alpha_lab.factory.workbench import _market_section
+
+        html = _market_section({"market": projection})
+        self.assertIn("CURRENT_SCOPE_MIXED", html)
+        self.assertIn("Смешаны разные текущие scope", html)
+        self.assertNotIn("Сырые значения видны", html)
 
     def test_allowed_lateness_changes_compatibility(self) -> None:
         left = schedule_semantics_from_document(_document())

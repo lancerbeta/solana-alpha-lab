@@ -313,12 +313,16 @@ STATUS_GLOSS = {
     "HIGH_RELATIVE": "выше недавней истории",
     "LOW_RELATIVE": "ниже недавней истории",
     "MID_RELATIVE": "в середине недавней истории",
+    "CURRENT_SCOPE_MIXED": "смешаны разные текущие scope",
     "REFERENCE_SCOPE_MISMATCH": "история несопоставима",
     "COVERAGE_INSUFFICIENT": "покрытие недостаточно",
     "REFERENCE_INSUFFICIENT": "мало сопоставимой истории",
     "SCHEDULE_SEMANTICS_MISSING": "нет семантики расписания",
     "MEMBER_EVIDENCE_INCOMPLETE": "неполный список выборки",
     "SOURCE_NOT_PRESENT": "отсутствует",
+    "NO_CURRENT_OBSERVATIONS": "нет текущих наблюдений",
+    "OBSERVATION_PARTITION_MISSING": "нет файла observation partition",
+    "OBSERVATION_PARTITION_UNREADABLE": "не читается observation partition",
     "GIT_CAPABILITY": "Git-доступность, не live market",
     "PIT_CLOCK_MISSING": "нет PIT-часов",
 }
@@ -564,7 +568,7 @@ SURFACE_COPY = {
         "unknown_why": "Почему UNKNOWN",
         "relative": "Относительно недавней сопоставимой истории",
         "raw": "Сырое значение",
-        "as_of": "as_of",
+        "as_of": "На момент",
         "latest": "Последняя доступность evidence",
         "population": "Популяция",
         "not_all_market": "Это не весь рынок Solana / memecoin / pump.fun.",
@@ -577,6 +581,17 @@ SURFACE_COPY = {
             "История несопоставима с текущим контекстом. Сырые значения видны, "
             "относительная полоса закрыта. HIGH/LOW читать нельзя."
         ),
+        "mixed": (
+            "Смешаны разные текущие scope. Сырые значения и покрытие не смешиваются. "
+            "HIGH/LOW читать нельзя."
+        ),
+        "incomplete_members": (
+            "Список выборки за исторические дни неполный. HIGH/LOW читать нельзя."
+        ),
+        "no_current": (
+            "В текущем окне нет допущенных наблюдений. LOW не выдуман."
+        ),
+        "gaps": "Пробелы",
         "interpretation": "Что это означает как context",
         "vector": "Вектор осей, не один regime score.",
         "high_means": (

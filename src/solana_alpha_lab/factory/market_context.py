@@ -239,10 +239,10 @@ def _relative_state(
     min_n = int(definition["minimum_current_n"])
     min_cov = Decimal(str(definition["minimum_current_coverage"]))
     min_buckets = int(definition["minimum_historical_buckets"])
-    observed_fraction = (
-        (Decimal(n_observed) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
+    metric_fraction = (
+        (Decimal(n_metric) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
     )
-    if current is None or n_metric < min_n or observed_fraction < min_cov:
+    if current is None or n_metric < min_n or metric_fraction < min_cov:
         return "UNKNOWN", "COVERAGE_INSUFFICIENT", len(reference_values)
     if len(reference_values) < min_buckets:
         return "UNKNOWN", "REFERENCE_INSUFFICIENT", len(reference_values)
@@ -331,16 +331,18 @@ def _row_coverage_class(axis: Mapping[str, Any], row: Mapping[str, Any]) -> str:
 
 
 def _coverage_meets_minimum(
-    coverage: Mapping[str, int], definition: Mapping[str, Any]
+    coverage: Mapping[str, int],
+    definition: Mapping[str, Any],
+    *,
+    n_metric: int,
 ) -> bool:
     min_n = int(definition["minimum_current_n"])
     min_cov = Decimal(str(definition["minimum_current_coverage"]))
     n_in_scope = int(coverage["n_in_scope"])
-    n_observed = int(coverage["n_observed"])
-    observed_fraction = (
-        (Decimal(n_observed) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
+    metric_fraction = (
+        (Decimal(n_metric) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
     )
-    return n_observed >= min_n and observed_fraction >= min_cov
+    return n_metric >= min_n and metric_fraction >= min_cov
 
 
 def _unclocked_rows(
@@ -561,7 +563,7 @@ def _reference_bucket_values(
         if (
             metric is not None
             and n_metric >= int(definition["minimum_current_n"])
-            and _coverage_meets_minimum(coverage, definition)
+            and _coverage_meets_minimum(coverage, definition, n_metric=n_metric)
         ):
             values.append(metric)
         cursor = bucket_end
@@ -596,9 +598,9 @@ def _current_compatibility(
             missing = True
             continue
         fingerprints.add(fingerprint)
+    if missing and fingerprints:
+        return None, "REFERENCE_SCOPE_MISMATCH"
     if missing and not fingerprints:
-        return None, "SCHEDULE_SEMANTICS_MISSING"
-    if missing:
         return None, "SCHEDULE_SEMANTICS_MISSING"
     if not fingerprints:
         return None, "SCHEDULE_SEMANTICS_MISSING"
@@ -820,12 +822,16 @@ def project_market_context(
         point_id = str(landmark["point_id"])
         previous_id = str(landmark["previous_point_id"])
         lookback = _previous_lookback_seconds(landmark, landmarks)
-        coverage_at_point = _select_rows(
-            current_obs,
-            start=current_start,
-            end=clock,
-            as_of=clock,
-            point_id=point_id,
+        coverage_at_point = (
+            []
+            if current_mixed
+            else _select_rows(
+                current_obs,
+                start=current_start,
+                end=clock,
+                as_of=clock,
+                point_id=point_id,
+            )
         )
         current_at_point = _select_rows(
             metric_obs,
@@ -834,19 +840,29 @@ def project_market_context(
             as_of=clock,
             point_id=point_id,
         )
-        coverage_rows = [
-            *coverage_at_point,
-            *_unclocked_rows(observations, point_id=point_id, current_days=current_days),
-        ]
-        member_ids = _member_ids_for_landmark(
-            members,
-            point_id=point_id,
-            due_offset_seconds=int(landmark["due_offset_seconds"]),
-            current_start=current_start,
-            as_of=clock,
-            definition=definition,
-            schedules=schedules,
-            fingerprint=current_fingerprint,
+        coverage_rows = (
+            []
+            if current_mixed
+            else [
+                *coverage_at_point,
+                *_unclocked_rows(
+                    observations, point_id=point_id, current_days=current_days
+                ),
+            ]
+        )
+        member_ids = (
+            {}
+            if current_mixed
+            else _member_ids_for_landmark(
+                members,
+                point_id=point_id,
+                due_offset_seconds=int(landmark["due_offset_seconds"]),
+                current_start=current_start,
+                as_of=clock,
+                definition=definition,
+                schedules=schedules,
+                fingerprint=current_fingerprint,
+            )
         )
         previous_at_point = _select_rows(
             comparable_obs,
@@ -1019,7 +1035,9 @@ def project_market_context(
         "scope": {
             "population_description": population["description"],
             "market_wide_claim": False,
-            "sampling_policy": _sampling_policy(current_obs, schedules),
+            "sampling_policy": (
+                None if current_mixed else _sampling_policy(current_obs, schedules)
+            ),
             "tokens_projection_id": str(
                 (definition.get("tokens_projection") or {}).get("projection_id") or PROJECTION_ID
             ),

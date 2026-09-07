@@ -342,11 +342,11 @@ def _load_rows(data_root: Path, location: str, *, members: bool) -> list[dict[st
                 return []
     else:
         if path.is_file() is False:
-            return []
+            raise MarketEvidenceError("OBSERVATION_PARTITION_MISSING")
         try:
             rows = pq.read_table(path).to_pylist()
-        except Exception:
-            return []
+        except Exception as exc:
+            raise MarketEvidenceError("OBSERVATION_PARTITION_UNREADABLE") from exc
     return [_decode_loaded_row(row) for row in rows if isinstance(row, Mapping)]
 
 
@@ -486,27 +486,33 @@ def read_market_evidence(
     observation_rows: list[dict[str, Any]] = []
     member_rows: list[dict[str, Any]] = []
     members_incomplete = False
-    for payload in selected:
-        location = str(payload.get("logical_location") or "")
-        partition_id = str(payload.get("partition_id") or "")
-        is_members = partition_id.endswith("-members")
-        rows = _load_rows(discovery.root, location, members=is_members)
-        if is_members and not rows:
-            members_incomplete = True
-        tagged = []
-        day = _partition_day(partition_id)
-        available = payload.get("first_reliable_available_at")
-        for row in rows:
-            item = dict(row)
-            if day:
-                item["_partition_day"] = day
-            if available:
-                item["_partition_available_at"] = available
-            tagged.append(item)
-        if is_members:
-            member_rows.extend(tagged)
-        else:
-            observation_rows.extend(tagged)
+    try:
+        for payload in selected:
+            location = str(payload.get("logical_location") or "")
+            partition_id = str(payload.get("partition_id") or "")
+            is_members = partition_id.endswith("-members")
+            rows = _load_rows(discovery.root, location, members=is_members)
+            if is_members and not rows:
+                members_incomplete = True
+            tagged = []
+            day = _partition_day(partition_id)
+            available = payload.get("first_reliable_available_at")
+            for row in rows:
+                item = dict(row)
+                if day:
+                    item["_partition_day"] = day
+                if available:
+                    item["_partition_available_at"] = available
+                tagged.append(item)
+            if is_members:
+                member_rows.extend(tagged)
+            else:
+                observation_rows.extend(tagged)
+    except MarketEvidenceError as exc:
+        return empty_evidence_bundle(
+            source_status="UNAVAILABLE",
+            source_error=exc.code,
+        )
 
     obs_keys: set[tuple[str, str]] = set()
     member_keys: set[tuple[str, str]] = set()
