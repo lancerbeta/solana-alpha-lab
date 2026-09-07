@@ -39,6 +39,26 @@ __all__ = [
     "signal_kind_for",
 ]
 
+
+def _identity_fields(source: Mapping[str, Any]) -> dict[str, Any]:
+    version = source.get("strategy_version") or source.get("strategy_version_label")
+    payload: dict[str, Any] = {}
+    for key in (
+        "signal_decision_id",
+        "strategy_id",
+        "activation_epoch_id",
+        "mint",
+        "action",
+        "reason_code",
+        "decision_at",
+    ):
+        value = source.get(key)
+        if value not in {None, ""}:
+            payload[key] = value
+    if version not in {None, ""}:
+        payload["strategy_version"] = version
+    return payload
+
 SIGNAL_KINDS = frozenset(
     {
         "NO_SIGNAL",
@@ -690,6 +710,7 @@ class PaperPlaneStore:
             bot_instance_id=str(position["bot_instance_id"]),
             position_id=position_id,
             payload={
+                **_identity_fields(position),
                 "side": "ENTRY",
                 "entry_price_dec": format(price, "f"),
                 "qty_dec": format(quantity, "f"),
@@ -763,7 +784,12 @@ class PaperPlaneStore:
                 event_type="RECONCILIATION",
                 bot_instance_id=str(position["bot_instance_id"]),
                 position_id=position_id,
-                payload={"result": "UNRESOLVED", "mode": mode, "pnl_status": "UNKNOWN"},
+                payload={
+                    **_identity_fields(position),
+                    "result": "UNRESOLVED",
+                    "mode": mode,
+                    "pnl_status": "UNKNOWN",
+                },
             )
             updated = self.get_position(position_id)
             assert updated is not None
@@ -840,6 +866,7 @@ class PaperPlaneStore:
             bot_instance_id=str(position["bot_instance_id"]),
             position_id=position_id,
             payload={
+                **_identity_fields(position),
                 "side": "EXIT",
                 "exit_price_dec": format(price, "f"),
                 "exit_fee_usd_dec": format(exit_fee, "f"),
@@ -852,6 +879,7 @@ class PaperPlaneStore:
             bot_instance_id=str(position["bot_instance_id"]),
             position_id=position_id,
             payload={
+                **_identity_fields(position),
                 "result": "RECONCILED",
                 "pnl_status": "KNOWN",
                 "net_pnl_usd_dec": format(net, "f"),
@@ -1067,6 +1095,17 @@ def accept_signal_decision(
             raise PaperPlaneError("SIGNAL_FUTURE_AVAILABLE_ENTER_FORBIDDEN")
     action = str(decision["action"])
     if action != "ENTER":
+        store.append_execution_event(
+            event_type="SIGNAL_DECISION_ACCEPTED",
+            bot_instance_id=None,
+            position_id=None,
+            payload={
+                **_identity_fields(decision),
+                "strategy_id": strategy["strategy_id"],
+                "strategy_version": strategy["strategy_version"],
+                "opened": False,
+            },
+        )
         return {
             "opened": False,
             "action": action,
@@ -1152,8 +1191,9 @@ def accept_signal_decision(
         position_id=position_id if existing else None,
         payload={
             **risk,
-            "signal_decision_id": decision["signal_decision_id"],
-            "activation_epoch_id": decision["activation_epoch_id"],
+            **_identity_fields(decision),
+            "strategy_id": strategy["strategy_id"],
+            "strategy_version": strategy["strategy_version"],
         },
     )
     # Resume does not consume a new risk slot when the same signal already exists.
@@ -1164,12 +1204,9 @@ def accept_signal_decision(
         bot_instance_id=bot["bot_instance_id"],
         position_id=None,
         payload={
-            "signal_decision_id": decision["signal_decision_id"],
+            **_identity_fields(decision),
             "strategy_id": strategy["strategy_id"],
             "strategy_version": strategy["strategy_version"],
-            "activation_epoch_id": decision["activation_epoch_id"],
-            "action": action,
-            "mint": decision["mint"],
         },
     )
     signal_kind = "SHADOW_EXECUTABLE" if mode == "SHADOW" else "SIMULATED_FILL"
@@ -1186,7 +1223,9 @@ def accept_signal_decision(
         bot_instance_id=bot["bot_instance_id"],
         position_id=opened_id,
         payload={
-            "signal_decision_id": decision["signal_decision_id"],
+            **_identity_fields(decision),
+            "strategy_id": strategy["strategy_id"],
+            "strategy_version": strategy["strategy_version"],
             "signal_kind": realized,
             "mode": mode,
         },
@@ -1195,7 +1234,13 @@ def accept_signal_decision(
         event_type="POSITION_TRANSITION",
         bot_instance_id=bot["bot_instance_id"],
         position_id=opened_id,
-        payload={"to_state": "OPEN", "signal_kind": realized},
+        payload={
+            **_identity_fields(decision),
+            "strategy_id": strategy["strategy_id"],
+            "strategy_version": strategy["strategy_version"],
+            "to_state": "OPEN",
+            "signal_kind": realized,
+        },
     )
     refreshed = store.get_position(opened_id)
     assert refreshed is not None

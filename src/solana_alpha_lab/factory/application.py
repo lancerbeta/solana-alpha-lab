@@ -19,6 +19,7 @@ from solana_alpha_lab.factory.paper_shadow_operations import (
     build_operations_projection,
 )
 from solana_alpha_lab.factory.read_model import project_read_model
+from solana_alpha_lab.factory.trading_operations import compose_trading_operations
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
 HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
@@ -114,10 +115,22 @@ class FactoryApplication:
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
 
+    def existing_operational_store(self) -> OperationalStore | None:
+        if self._operational_store is not None:
+            return self._operational_store
+        path = ops_store_path(self.root)
+        if not path.is_file():
+            return None
+        self._operational_store = OperationalStore(path)
+        return self._operational_store
+
     @property
     def store(self) -> OperationalStore:
-        if self._operational_store is None:
-            self._operational_store = OperationalStore(ops_store_path(self.root))
+        existing = self.existing_operational_store()
+        if existing is not None:
+            return existing
+        path = ops_store_path(self.root)
+        self._operational_store = OperationalStore(path)
         return self._operational_store
 
     @property
@@ -145,10 +158,25 @@ class FactoryApplication:
         return self._paper_plane_store
 
     def operations_projection(self) -> dict[str, Any]:
-        return build_operations_projection(self.paper_plane())
+        store = self.existing_paper_plane()
+        if store is None:
+            raise ApplicationError("SOURCE_NOT_PRESENT")
+        return build_operations_projection(store)
 
     def economics_projection(self) -> dict[str, Any]:
-        return build_economics_projection(self.paper_plane())
+        store = self.existing_paper_plane()
+        if store is None:
+            raise ApplicationError("SOURCE_NOT_PRESENT")
+        return build_economics_projection(store)
+
+    def trading_operations_projection(
+        self, *, last_command: Mapping[str, Any] | None = None
+    ) -> dict[str, Any]:
+        return compose_trading_operations(
+            self.root,
+            self.existing_paper_plane(),
+            last_command=last_command,
+        )
 
     def research_discovery(self) -> Any:
         if self._research_discovery is None:
@@ -464,8 +492,11 @@ class FactoryApplication:
         return refreshed
 
     def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:
+        store = self.existing_paper_plane()
+        if store is None:
+            raise ApplicationError("SOURCE_NOT_PRESENT")
         try:
-            return apply_operator_command(self.paper_plane(), command)
+            return apply_operator_command(store, command)
         except PaperPlaneError as exc:
             raise ApplicationError(str(exc)) from exc
         except KeyError as exc:
@@ -477,20 +508,23 @@ class FactoryApplication:
         events = store.execution_events()
         return list(reversed(events[-limit:]))
 
-    def read_model(self, *, surface: str | None = None) -> dict[str, Any]:
+    def read_model(
+        self, *, surface: str | None = None, last_command: Mapping[str, Any] | None = None
+    ) -> dict[str, Any]:
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
+        ops_store = self.existing_operational_store()
         model = project_read_model(
             root=self.root,
-            store=self.store,
+            store=ops_store,
             spec_relative=self.spec_relative,
             hypothesis_registry=hypotheses,
         )
-        if (self.root / RUNTIME_CONFIG_RELATIVE).is_file():
+        if (self.root / RUNTIME_CONFIG_RELATIVE).is_file() and ops_store is not None:
             from solana_alpha_lab.factory.runtime import project_runtime_health
 
             model["runtime"] = project_runtime_health(
                 root=self.root,
-                store=self.store,
+                store=ops_store,
                 process_alive=True,
             )
         spec = load_experiment_spec(self.root, self.spec_relative)
@@ -513,31 +547,56 @@ class FactoryApplication:
             runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
             pinned_produced_gaps=gaps,
         )
-        surface_key = (surface or "").upper()
-        force_paper_plane = surface_key in {"OPERATIONS", "ECONOMICS"}
-        paper_store = self.paper_plane() if force_paper_plane else self.existing_paper_plane()
+        paper_store = self.existing_paper_plane()
+        trading = compose_trading_operations(
+            self.root, paper_store, last_command=last_command
+        )
+        model["trading_operations"] = trading
+        operator_attention = []
+        for item in trading.get("attention") or []:
+            if not isinstance(item, dict):
+                continue
+            operator_attention.append(
+                {
+                    "id": str(item.get("code") or "OPERATOR"),
+                    "WHY_NOW": item.get("WHY_NOW"),
+                    "IMPACT": item.get("IMPACT"),
+                    "EVIDENCE": item.get("EVIDENCE"),
+                    "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
+                }
+            )
+        cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
         if paper_store is not None:
-            operations = build_operations_projection(paper_store)
+            operations = trading.get("operations") or build_operations_projection(paper_store)
             model["operations"] = operations
-            model["economics"] = build_economics_projection(
+            model["economics"] = trading.get("economics") or build_economics_projection(
                 paper_store, operations=operations
             )
-            model["recent_changes"] = self.recent_execution_changes(paper_store)
-            operator_attention = []
-            for item in operations.get("attention") or []:
-                if not isinstance(item, dict):
-                    continue
-                operator_attention.append(
-                    {
-                        "id": str(item.get("code") or "OPERATOR"),
-                        "WHY_NOW": item.get("WHY_NOW"),
-                        "IMPACT": item.get("IMPACT"),
-                        "EVIDENCE": item.get("EVIDENCE"),
-                        "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
-                    }
-                )
-            cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
+            model["recent_changes"] = trading.get("recent_changes") or []
             cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
+        else:
+            model["operations"] = {
+                "source_status": "NOT_PRESENT",
+                "bots": None,
+                "attention": trading.get("attention") or [],
+            }
+            model["economics"] = {
+                "source_status": "NOT_PRESENT",
+                "reconciled_net_pnl_usd": None,
+                "reconciled_net_pnl_status": "NOT_PRESENT",
+                "pnl_known_count": None,
+                "pnl_unknown_count": None,
+                "known_open_exposure_usd": None,
+                "known_open_exposure_status": "NOT_PRESENT",
+                "non_claims": [
+                    "NO_REALIZED_LIVE_PNL",
+                    "NO_OWNER_FCF",
+                    "NO_LIVE_CAPITAL",
+                    "NO_NETRETURN_CLAIM",
+                ],
+            }
+            model["recent_changes"] = []
+        _ = surface
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
         return model

@@ -4568,6 +4568,36 @@
       "target_asset_id": "EVIDENCE-T39-RC002-H11-NAMED-MINT-GTA-001"
     },
     {
+      "source_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "consumes",
+      "target_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-TRADING-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
       "source_asset_id": "CTRL-UVLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-PYPROJECT-001"
@@ -5206,6 +5236,21 @@
       "source_asset_id": "DOC-T34A-RUNBOOKS-001",
       "relation": "depends_on",
       "target_asset_id": "SCRIPT-T34A-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "consumes",
+      "target_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001"
     },
     {
       "source_asset_id": "ENV-WORKSTATION-001",
@@ -12068,6 +12113,16 @@
       "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
     },
     {
+      "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-SHADOW-OPERATIONS-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
       "relation": "contains",
       "target_asset_id": "SCRIPT-OWNER-ATTENTION-GATE-001"
@@ -17741,6 +17796,16 @@
       "source_asset_id": "TEST-TOKENS-V2-TYPED-PROJECTION-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

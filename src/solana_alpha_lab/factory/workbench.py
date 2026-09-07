@@ -295,11 +295,96 @@ def _position_table(rows: list[dict[str, Any]]) -> str:
     )
 
 
+def _trace_table(traces: list[dict[str, Any]]) -> str:
+    if not traces:
+        return f"<p>{esc(surface_copy('OPERATIONS', 'no_traces'))}</p>"
+    body = []
+    for trace in traces:
+        stages = trace.get("stages") if isinstance(trace.get("stages"), dict) else {}
+        stage_cells = "".join(
+            f"<td>{canon(stages.get(name) or 'GAP')}</td>"
+            for name in (
+                "SIGNAL_DECISION",
+                "PRE_TRADE_RISK",
+                "EXECUTION_INTENT",
+                "EXECUTION_OBSERVATION",
+                "POSITION",
+                "EXIT",
+                "RECONCILIATION",
+            )
+        )
+        body.append(
+            "<tr>"
+            f"<td class=\"mono\">{esc(trace.get('signal_decision_id') or trace.get('join') or '')}</td>"
+            f"<td class=\"mono\">{esc(trace.get('strategy_id') or '')}</td>"
+            f"<td class=\"mono\">{esc(trace.get('mint') or '')}</td>"
+            + stage_cells
+            + f"<td>{canon(trace.get('stop_stage'))}</td>"
+            f"<td>{canon(trace.get('blocker') or 'NONE')}</td>"
+            "</tr>"
+        )
+    return (
+        "<table><tr>"
+        "<th>signal_decision_id</th><th>strategy</th><th>mint</th>"
+        "<th>SIGNAL</th><th>RISK</th><th>INTENT</th><th>OBS</th>"
+        "<th>POSITION</th><th>EXIT</th><th>RECONCILE</th>"
+        "<th>stop</th><th>blocker</th></tr>"
+        + "".join(body)
+        + "</table>"
+    )
+
+
+def _context_table(contexts: list[dict[str, Any]]) -> str:
+    if not contexts:
+        return f"<p>{esc(surface_copy('OPERATIONS', 'no_bots'))}</p>"
+    body = []
+    for row in contexts:
+        status = row.get("bot_status") or "NOT_ACTIVATED"
+        body.append(
+            "<tr>"
+            f"<td class=\"mono\">{esc(row.get('strategy_id') or '')}</td>"
+            f"<td class=\"mono\">{esc(row.get('strategy_version') or '')}</td>"
+            f"<td>{canon(row.get('mode'))}</td>"
+            f"<td class=\"mono\">{esc(row.get('activation_epoch_id') or '')}</td>"
+            f"<td class=\"mono\">{esc(row.get('bot_instance_id') or '')}</td>"
+            f"<td>{canon(status)}</td>"
+            f"<td>{canon(row.get('relation'))}</td>"
+            f"<td>{canon(row.get('current_blocker') or 'NONE')}</td>"
+            f"<td>{esc(row.get('next_safe_action') or '')}</td>"
+            "</tr>"
+        )
+    return (
+        "<table><tr>"
+        "<th>strategy_id</th><th>version</th><th>mode</th><th>epoch</th>"
+        "<th>bot</th><th>status</th><th>relation</th><th>blocker</th>"
+        "<th>next</th></tr>"
+        + "".join(body)
+        + "</table>"
+    )
+
+
 def _operations_section(model: dict[str, Any]) -> str:
+    trading = (
+        model.get("trading_operations")
+        if isinstance(model.get("trading_operations"), dict)
+        else {}
+    )
     ops = model.get("operations") if isinstance(model.get("operations"), dict) else {}
+    if trading.get("source_status"):
+        source_status = str(trading.get("source_status"))
+    elif ops.get("source_status"):
+        source_status = str(ops.get("source_status"))
+    elif ops:
+        source_status = "PRESENT"
+    else:
+        source_status = "UNKNOWN"
     bots = ops.get("bots") if isinstance(ops.get("bots"), list) else []
+    contexts = trading.get("contexts") if isinstance(trading.get("contexts"), list) else []
+    traces = trading.get("traces") if isinstance(trading.get("traces"), list) else []
+    attention_items = trading.get("attention") if isinstance(trading.get("attention"), list) else list(ops.get("attention") or [])
+    present = source_status == "PRESENT"
     paused_html = _flag_html(
-        ops.get("entries_paused") if "entries_paused" in ops else None,
+        ops.get("entries_paused") if present and "entries_paused" in ops else None,
         true_gloss=surface_copy("OPERATIONS", "paused"),
         false_gloss=surface_copy("OPERATIONS", "not_paused"),
     )
@@ -318,61 +403,136 @@ def _operations_section(model: dict[str, Any]) -> str:
     snapshot = str(ops.get("open_position_set_sha256") or "")
     bot_id = str(ops.get("bot") or "")
     bot_warning = ""
-    if len(bots) != 1:
+    if present and len(bots) != 1:
         bot_id = ""
         bot_warning = (
             f"<p class=\"error\">{esc(surface_copy('OPERATIONS', 'need_one_bot'))}</p>"
         )
+    now_mode = (
+        canon(bots[0].get("mode"))
+        if present and len(bots) == 1
+        else dual("неизвестно", "UNKNOWN", unknown=True)
+    )
+    if not present:
+        now_mode = dual("нет runtime", "NOT_PRESENT", unknown=True)
     summary = fact_strip(
         [
-            (surface_copy("OPERATIONS", "bots_count"), cell_html(len(bots))),
-            (surface_copy("OPERATIONS", "open_positions"), cell_html(ops.get("open_positions"))),
+            (surface_copy("OPERATIONS", "now"), canon(source_status)),
+            (surface_copy("OPERATIONS", "bots_count"), cell_html(len(bots) if present else None)),
+            (surface_copy("OPERATIONS", "open_positions"), cell_html(ops.get("open_positions") if present else None)),
             (surface_copy("OPERATIONS", "entries_paused"), paused_html),
-            (surface_copy("OPERATIONS", "exit_required"), cell_html(ops.get("exit_required"))),
-            (surface_copy("OPERATIONS", "unresolved"), cell_html(ops.get("unresolved_positions"))),
-            ("unknown_positions", cell_html(ops.get("unknown_positions"))),
-            (
-                "mode",
-                canon(bots[0].get("mode"))
-                if len(bots) == 1
-                else dual("неизвестно", "UNKNOWN", unknown=True),
-            ),
+            (surface_copy("OPERATIONS", "exit_required"), cell_html(ops.get("exit_required") if present else None)),
+            (surface_copy("OPERATIONS", "unresolved"), cell_html(ops.get("unresolved_positions") if present else None)),
+            ("unknown_positions", cell_html(ops.get("unknown_positions") if present else None)),
+            ("mode", now_mode),
         ]
     )
-    commands = (
-        "<form method=\"post\" action=\"/operations\" class=\"ops-form control-zone\" "
-        "data-mode=\"CONTROL_SURFACE\">"
-        + f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{esc(bot_id)}\">"
-        + f"<input type=\"hidden\" name=\"expected_open_position_set_sha256\" value=\"{esc(snapshot)}\">"
-        + f"<p><label>{esc(surface_copy('OPERATIONS', 'position_id'))} "
-        + "<input name=\"position_id\"></label></p>"
-        + f"<p><label>{esc(surface_copy('OPERATIONS', 'idempotency'))} "
-        + "<input name=\"idempotency_key\" "
-        + f"value=\"{esc('WB-' + uuid4().hex[:12].upper())}\"></label></p>"
-        + "<p class=\"safe-actions\">"
-        + command_button("PAUSE_NEW_ENTRIES")
-        + command_button("RESUME_NEW_ENTRIES")
-        + command_button("REQUEST_CLOSE_POSITION")
-        + "</p>"
-        + "<fieldset class=\"danger-zone danger\">"
-        + f"<legend>{esc(surface_copy('OPERATIONS', 'bulk'))}</legend>"
-        + "<p><label><input type=\"checkbox\" name=\"confirm_close_all\" value=\"1\"> "
-        + f"{esc(surface_copy('OPERATIONS', 'confirm_close_all'))}</label></p>"
-        + command_button("REQUEST_CLOSE_ALL")
-        + command_button("STOP_BOT")
-        + "</fieldset></form>"
+    source_banner = ""
+    if not present:
+        source_banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('OPERATIONS', 'source_absent'))} "
+            f"{esc(surface_copy('OPERATIONS', 'not_present'))}</p>"
+        )
+    last = trading.get("last_command") if isinstance(trading.get("last_command"), dict) else None
+    last_html = ""
+    if last:
+        last_html = (
+            f"<h2>{esc(surface_copy('OPERATIONS', 'last_command'))}</h2>"
+            f"<p>{esc(surface_copy('OPERATIONS', 'readback'))}</p>"
+            + "<table>"
+            + mapping_rows(
+                {
+                    "command_type": last.get("command_type"),
+                    "status": last.get("status"),
+                    "bot_instance_id": last.get("bot_instance_id"),
+                    "position_id": last.get("position_id"),
+                    "state": last.get("state"),
+                    "side_effects": last.get("side_effects"),
+                    "bot_status": last.get("bot_status"),
+                    "entries_paused": last.get("entries_paused"),
+                }
+            )
+            + "</table>"
+        )
+    commands = ""
+    if present:
+        commands = (
+            "<form method=\"post\" action=\"/operations\" class=\"ops-form control-zone\" "
+            "data-mode=\"CONTROL_SURFACE\">"
+            + f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{esc(bot_id)}\">"
+            + f"<input type=\"hidden\" name=\"expected_open_position_set_sha256\" value=\"{esc(snapshot)}\">"
+            + f"<p><label>{esc(surface_copy('OPERATIONS', 'position_id'))} "
+            + "<input name=\"position_id\"></label></p>"
+            + f"<p><label>{esc(surface_copy('OPERATIONS', 'idempotency'))} "
+            + "<input name=\"idempotency_key\" "
+            + f"value=\"{esc('WB-' + uuid4().hex[:12].upper())}\"></label></p>"
+            + "<p class=\"safe-actions\">"
+            + command_button("PAUSE_NEW_ENTRIES")
+            + command_button("RESUME_NEW_ENTRIES")
+            + command_button("REQUEST_CLOSE_POSITION")
+            + "</p>"
+            + "<fieldset class=\"danger-zone danger\">"
+            + f"<legend>{esc(surface_copy('OPERATIONS', 'bulk'))}</legend>"
+            + "<p><label><input type=\"checkbox\" name=\"confirm_close_all\" value=\"1\"> "
+            + f"{esc(surface_copy('OPERATIONS', 'confirm_close_all'))}</label></p>"
+            + command_button("REQUEST_CLOSE_ALL")
+            + command_button("STOP_BOT")
+            + "</fieldset></form>"
+        )
+    else:
+        commands = f"<p class=\"semantic-unknown\">{esc(surface_copy('OPERATIONS', 'source_absent'))}</p>"
+    cards = trading.get("commands") if isinstance(trading.get("commands"), list) else []
+    spec_rows = []
+    for card in cards:
+        if not isinstance(card, dict):
+            continue
+        spec_rows.append(
+            "<tr>"
+            f"<td>{canon(card.get('command_type'))}</td>"
+            f"<td>{esc(card.get('target') or '')}</td>"
+            f"<td>{esc(card.get('current_precondition') or '')}</td>"
+            f"<td>{esc(card.get('expected_effect') or '')}</td>"
+            f"<td>{esc(card.get('fail_closed') or '')}</td>"
+            "</tr>"
+        )
+    spec_table = (
+        "<table><tr>"
+        f"<th>command</th><th>{esc(surface_copy('OPERATIONS', 'target'))}</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'precondition'))}</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'expected'))}</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'fail_closed'))}</th>"
+        "</tr>"
+        + "".join(spec_rows)
+        + "</table>"
+        if spec_rows
+        else ""
     )
     return (
-        summary
+        source_banner
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'now'))}</h2>"
+        + summary
+        + last_html
         + f"<h2>{esc(surface_copy('OPERATIONS', 'attention'))}</h2>"
         + _attention(
-            list(ops.get("attention") or []),
+            list(attention_items),
             empty=surface_copy("OPERATIONS", "no_attention"),
         )
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'strategies_bots'))}</h2>"
+        + _context_table(list(contexts))
+        + f"<p>{esc(surface_copy('OPERATIONS', 'activation_path'))} "
+        + f"{esc(surface_copy('OPERATIONS', 'no_start'))}</p>"
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'trace'))}</h2>"
+        + _trace_table(list(traces))
         + f"<h2>{esc(surface_copy('OPERATIONS', 'positions'))}</h2>"
         + _position_table(list(ops.get("position_rows") or []))
+        + f"<h2>{esc(surface_copy('OPERATIONS', 'recent'))}</h2>"
+        + _recent_changes(
+            list(model.get("recent_changes") or []),
+            empty=surface_copy("OPERATIONS", "no_recent"),
+        )
         + f"<h2>{esc(surface_copy('OPERATIONS', 'commands'))}</h2>"
         + bot_warning
+        + spec_table
         + commands
         + technical(
             f"<h3>{esc(surface_copy('OPERATIONS', 'bots'))}</h3>"
@@ -383,22 +543,20 @@ def _operations_section(model: dict[str, Any]) -> str:
             + "<table>"
             + mapping_rows(
                 {
+                    "source_status": source_status,
                     "open_positions": ops.get("open_positions"),
                     "partial_positions": ops.get("partial_positions"),
                     "unknown_positions": ops.get("unknown_positions"),
                     "exit_required": ops.get("exit_required"),
                     "unresolved_positions": ops.get("unresolved_positions"),
-                    "entries_paused": ops.get("entries_paused"),
-                    "open_position_set_sha256": snapshot,
+                    "entries_paused": ops.get("entries_paused") if present else None,
+                    "open_position_set_sha256": snapshot or None,
+                    "watchlist_status": trading.get("watchlist_status"),
+                    "activation_path": trading.get("activation_path"),
                 }
             )
-            + "</table>"
-            + f"<h3>{esc(surface_copy('OPERATIONS', 'recent'))}</h3>"
-            + _recent_changes(
-                list(model.get("recent_changes") or []),
-                empty=surface_copy("OPERATIONS", "no_recent"),
-            ),
-            title=surface_copy("OPERATIONS", "snapshot"),
+            + "</table>",
+            title=surface_copy("OPERATIONS", "machine"),
         )
     )
 
@@ -1322,12 +1480,13 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             error: str = "",
             notice: str = "",
             query: dict[str, list[str]] | None = None,
+            last_command: dict[str, Any] | None = None,
         ) -> None:
             if surface == "RESEARCH":
                 model = {"cockpit": {}, "runtime": {}}
                 research_html = _research_section(app, query or {})
             else:
-                model = app.read_model(surface=surface)
+                model = app.read_model(surface=surface, last_command=last_command)
                 research_html = None
             body = _page(
                 model,
@@ -1412,7 +1571,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                     result = app.apply_paper_operator_command(payload)
                     if result.get("status") == "STALE_OPERATOR_SNAPSHOT":
                         error = owner_error("STALE_OPERATOR_SNAPSHOT")
-                    self._render("OPERATIONS", error=error)
+                    self._render("OPERATIONS", error=error, last_command=result)
                     return
                 if path == "/research":
                     if command != "RESEARCH_DECISION":

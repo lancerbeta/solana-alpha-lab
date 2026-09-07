@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 5aabbeac71fd95d73ee191fc618f706f6443fa55b8be2ca7fec9f9d5edffc03c}
+  integrity: {kind: sha256, sha256: b53ce0e17adfb30b15bf6bcf57245051ce8bdb9f91e8a107b80c49d08c68caa4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25690,7 +25690,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/read_model.py', repository_path: src/solana_alpha_lab/factory/read_model.py}
-  integrity: {kind: sha256, sha256: 1bdc9b61e5a4bb579d93f66d99eac9db7f6aaed44c9d79dcb781f89725d7fef1}
+  integrity: {kind: sha256, sha256: 4568d227853aa6a0da1568e0fcce9fdaf89e9fd4913ec6a57237d28c355c794e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPS-STORE-001}
@@ -25726,7 +25726,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 2dd0438963ba51268cebffc2148394013f5845d53893e88c7d3580469cd15938}
+  integrity: {kind: sha256, sha256: 8a9b5019e9864b66e770b49b27f16af045fe6b4314d41fa21e44ffd54e61ba90}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -26324,7 +26324,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: c1aef355e5ce24cd4bf0aaa0bc22cc49b047136a4f5073a89c334d67d885f1be}
+  integrity: {kind: sha256, sha256: fd1ff3ab557f0caf43a242b0a67e70952edfb286edca99e21e83d2ccaba1629b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: ce00edae429ef6c103b9762bd4b38b53301ee9da2a258e57db1daa16f4db139e}
+  integrity: {kind: sha256, sha256: f34d61ccf2a25d22a0cf6a95469e032c7546eba261da77c182fb42c283580254}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -29603,7 +29603,7 @@ records:
   as_of: '2026-08-21'
   truth_owner: EARLY_STATE_TO_PAPER_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/paper_plane.py', repository_path: src/solana_alpha_lab/factory/paper_plane.py}
-  integrity: {kind: sha256, sha256: be29616ccf479eeab99e1d68a61e558aeb96adace4e2be86e271dc3a66664d22}
+  integrity: {kind: sha256, sha256: 52ad97fbc3e0d81ed8be30a8d757a552ee8f39ef0f65f0b7accf7a24859a8df3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: SCHEMA-STRATEGY-VERSION-001}
@@ -34141,7 +34141,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 74c4048546940c0ccc8922ecf026bb2d6a58b2f2497b83ee172ddb829ecb02ec}
+  integrity: {kind: sha256, sha256: 8598520f3911775deb129a417961be934e4a11af1172760b752f14c73676bd1c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34266,7 +34266,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 501c0ef06b6d84640c7d1c1e2849745c524c2b97b0bf8aa31f3de1b80d9816ce}
+  integrity: {kind: sha256, sha256: ebb606ae8acbc17f627b2472cfc8d4687b331c0e54c4fbdab887c39813dcad3f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34592,7 +34592,7 @@ records:
 - asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001
   record_version: '1.0'
   asset_type: control_document
-  purpose: Exact contract for earned Workbench OPERATIONS/ECONOMICS over FactoryApplication without SQLite in UI.
+  purpose: Lower-level OPERATIONS/ECONOMICS capability consumed by TRADING_OPERATIONS_WORKBENCH_V2. Exact contract for earned Workbench OPERATIONS/ECONOMICS over FactoryApplication without SQLite in UI.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-03'
@@ -35606,7 +35606,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: f7bc857232e4933e944465e907c77f6e3deb3aa2fe778dfd65db1c96b04ca434}
+  integrity: {kind: sha256, sha256: c89280ee025413728c405141ab214b1119ff8b9d2f8e5581dcd59415d4bcfa09}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35765,4 +35765,82 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [UNATTENDED, ARCHIVE, INCIDENT, HEARTBEAT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for owner trading-operations OBSERVE/DIAGNOSE/ACT&VERIFY over existing PaperPlane without a parallel V2 runtime.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/TRADING_OPERATIONS_WORKBENCH_V2.md', repository_path: docs/tasks/TRADING_OPERATIONS_WORKBENCH_V2.md}
+  integrity: {kind: sha256, sha256: 4270e8ad384459f605828c61e0df716dd8c3f1f1fd447123b0243a558da8337f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-TRADING-OPERATIONS-WORKBENCH-001}
+  - {relation_type: contains, target_asset_id: MODULE-TRADING-OPERATIONS-001}
+  - {relation_type: validated_by, target_asset_id: TEST-TRADING-OPERATIONS-WORKBENCH-001}
+  - {relation_type: consumes, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [TRADING_OPERATIONS, OBSERVE, DIAGNOSE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-TRADING-OPERATIONS-WORKBENCH-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Human contract for GET non-mutation, StrategyVersion vs runtime bot, SignalDecision traces and bounded operator commands.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_operations_workbench_v2.md', repository_path: docs/contracts/trading_operations_workbench_v2.md}
+  integrity: {kind: sha256, sha256: d3381de2187f84fdd73c4eac039fe4feb5a038ada7c526f891e186422dd1844d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
+  - {relation_type: depends_on, target_asset_id: DOC-OWNER-LIFECYCLE-PROJECTION-001}
+  - {relation_type: consumes, target_asset_id: CTRL-OWNER-OPERATIONS-COCKPIT-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [NOT_PRESENT, ACTIVATION_GAP, LEGACY_TRACE_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-TRADING-OPERATIONS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Derived TradingOperationsProjectionV2 rebuilt from Git StrategyVersion and PaperPlane. Persists nowhere.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/trading_operations.py', repository_path: src/solana_alpha_lab/factory/trading_operations.py}
+  integrity: {kind: sha256, sha256: 4240f141800813b984c04dddfda211d1494a496ef4bf120aaf7024d151db8b37}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-PAPER-SHADOW-OPERATIONS-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [TradingOperationsProjectionV2, SOURCE_NOT_PRESENT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-TRADING-OPERATIONS-WORKBENCH-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical acceptance for GET non-mutation, Strategy/Bot lineage, traces, commands and Git/runtime separation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: TRADING_OPERATIONS_WORKBENCH_V2
+  location: {kind: git_path, logical_uri: 'repo://tests/test_trading_operations_workbench_v2.py', repository_path: tests/test_trading_operations_workbench_v2.py}
+  integrity: {kind: sha256, sha256: 24f9836f0620a98a711b1bdb9b5d7261f8768c48e83c78d42bb69f5852c01e65}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-TRADING-OPERATIONS-WORKBENCH-001}
+  - {relation_type: depends_on, target_asset_id: DOC-TRADING-OPERATIONS-WORKBENCH-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [OPS_VERTICAL, GET_NON_MUTATION]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
