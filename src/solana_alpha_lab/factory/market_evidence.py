@@ -25,11 +25,16 @@ COVERAGE_FROM_STATE = {
     "CENSORED_LATE": "censored",
     "X_POPULATION_INELIGIBLE": "x_ineligible",
     "NOT_SELECTED_CAPACITY": "capacity_excluded",
+    "CAPACITY_EXCLUDED": "capacity_excluded",
     "BLOCKED_BUDGET": "capacity_excluded",
     "NOT_SELECTED_SAMPLING": "sampling_excluded",
+    "PREDICATE_REJECTED": "x_ineligible",
     "DEPENDENCY_MISSING": "typed_missing",
     "EXCLUDED_AMBIGUOUS": "unknown",
     "IN_FLIGHT_CALL_INDETERMINATE": "unknown",
+    "ADMITTED": "unknown",
+    "SAMPLED_MEMBER": "unknown",
+    "SCHEDULED": "unknown",
 }
 
 
@@ -43,6 +48,30 @@ class MarketEvidenceError(ValueError):
 
 def coverage_class_for(state: object) -> str:
     return COVERAGE_FROM_STATE.get(str(state or ""), "unknown")
+
+
+def coverage_class_for_member(state: object) -> str:
+    mapped = coverage_class_for(state)
+    if mapped == "observed":
+        return "unknown"
+    return mapped
+
+
+def parse_market_clock(value: object) -> datetime | None:
+    if not value:
+        return None
+    text = str(value)
+    try:
+        return parse_utc(text)
+    except Exception:
+        pass
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except Exception:
+        return None
+    if parsed.tzinfo is None:
+        return None
+    return parsed.astimezone(UTC)
 
 
 def empty_evidence_bundle(*, source_status: str, source_error: str | None = None) -> dict[str, Any]:
@@ -153,13 +182,44 @@ def _is_observation_panel_partition(payload: Mapping[str, Any]) -> bool:
 
 
 def _partition_available(payload: Mapping[str, Any]) -> datetime | None:
-    raw = payload.get("first_reliable_available_at")
-    if not raw:
+    return parse_market_clock(payload.get("first_reliable_available_at"))
+
+
+def _publication_key(payload: Mapping[str, Any]) -> tuple[str, str] | None:
+    day = _partition_day(str(payload.get("partition_id") or ""))
+    if day is None:
         return None
+    publication = str(
+        payload.get("dataset_manifest_id") or payload.get("dataset_id") or ""
+    )
+    return day, publication
+
+
+def _dataset_id_for_manifest(manifests_dir: Path, dataset_manifest_id: str) -> str:
+    if not dataset_manifest_id:
+        return ""
+    path = manifests_dir / f"{dataset_manifest_id}.json"
+    if path.is_file() is False:
+        return ""
     try:
-        return parse_utc(str(raw))
-    except Exception:
-        return None
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    if not isinstance(loaded, Mapping):
+        return ""
+    return str(loaded.get("dataset_id") or "")
+
+
+def _enrich_partition(payload: Mapping[str, Any], manifests_dir: Path) -> dict[str, Any]:
+    item = dict(payload)
+    if item.get("dataset_id"):
+        return item
+    dataset_id = _dataset_id_for_manifest(
+        manifests_dir, str(item.get("dataset_manifest_id") or "")
+    )
+    if dataset_id:
+        item["dataset_id"] = dataset_id
+    return item
 
 
 def _partition_day(partition_id: str) -> str | None:
@@ -177,7 +237,8 @@ def _partition_day(partition_id: str) -> str | None:
 
 def _list_partition_payloads(data_root: Path) -> list[dict[str, Any]]:
     payloads: list[dict[str, Any]] = []
-    partitions_dir = data_root / "datasets" / "manifests" / "partitions"
+    manifests_dir = data_root / "datasets" / "manifests"
+    partitions_dir = manifests_dir / "partitions"
     if partitions_dir.is_dir():
         for path in sorted(partitions_dir.glob("*.json")):
             try:
@@ -185,7 +246,7 @@ def _list_partition_payloads(data_root: Path) -> list[dict[str, Any]]:
             except (OSError, json.JSONDecodeError):
                 continue
             if isinstance(loaded, dict):
-                payloads.append(loaded)
+                payloads.append(_enrich_partition(loaded, manifests_dir))
         return payloads
     manifests_dir = data_root / "datasets" / "manifests"
     if not manifests_dir.is_dir():
@@ -376,17 +437,17 @@ def read_market_evidence(
         else:
             observation_rows.extend(tagged)
 
-    obs_days = set()
-    member_days = set()
+    obs_keys: set[tuple[str, str]] = set()
+    member_keys: set[tuple[str, str]] = set()
     for payload in selected:
-        day = _partition_day(str(payload.get("partition_id") or ""))
-        if day is None:
+        key = _publication_key(payload)
+        if key is None:
             continue
         if str(payload.get("partition_id") or "").endswith("-members"):
-            member_days.add(day)
+            member_keys.add(key)
         else:
-            obs_days.add(day)
-    if obs_days - member_days:
+            obs_keys.add(key)
+    if obs_keys - member_keys:
         members_incomplete = True
 
     needed = {

@@ -15,11 +15,13 @@ import yaml
 
 from solana_alpha_lab.factory.market_evidence import (
     coverage_class_for,
+    coverage_class_for_member,
     empty_evidence_bundle,
+    parse_market_clock,
     read_market_evidence,
 )
 from solana_alpha_lab.factory.market_feature_surface import load_surface_config
-from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
+from solana_alpha_lab.factory.observation_schedule import render_utc
 from solana_alpha_lab.factory.tokens_v2_typed_projection import (
     PROJECTION_ID,
     PROJECTION_VERSION,
@@ -189,13 +191,7 @@ def _in_window(available: datetime | None, start: datetime, end: datetime) -> bo
 
 
 def _parse_available(row: Mapping[str, Any]) -> datetime | None:
-    raw = row.get("first_reliable_available_at")
-    if not raw:
-        return None
-    try:
-        return parse_utc(str(raw))
-    except Exception:
-        return None
+    return parse_market_clock(row.get("first_reliable_available_at"))
 
 
 def _field_map(row: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
@@ -608,7 +604,7 @@ def _member_ids_for_landmark(
         if not entity_id:
             continue
         member_point = str(row.get("point_id") or "")
-        if member_point != point_id:
+        if member_point.startswith("Y") and member_point != point_id:
             continue
         if fingerprint is not None:
             member_fp = _row_compatibility(definition, row, schedules)
@@ -616,16 +612,11 @@ def _member_ids_for_landmark(
                 continue
         available = _parse_available(row)
         if available is None:
-            raw = row.get("_partition_available_at")
-            if raw:
-                try:
-                    available = parse_utc(str(raw))
-                except Exception:
-                    available = None
+            available = parse_market_clock(row.get("_partition_available_at"))
         if available is None or available > as_of or not _in_window(available, current_start, as_of):
             continue
         state = row.get("membership_state") or row.get("state")
-        ids[entity_id] = coverage_class_for(state)
+        ids[entity_id] = coverage_class_for_member(state)
     return ids
 
 
