@@ -345,7 +345,7 @@ def _load_schedules_from_projection(
         rows = connection.execute(
             f"""
             SELECT entity_id, payload_json
-            FROM research_events
+            FROM _research_events
             WHERE record_kind = 'OBSERVATION_SCHEDULE'
               AND entity_id IN ({placeholders})
             """,

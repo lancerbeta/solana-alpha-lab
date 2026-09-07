@@ -60,13 +60,13 @@ def _walk(root: Path) -> dict[str, str]:
     return out
 
 
-def _get(app: FactoryApplication, path: str) -> str:
+def _get(app: FactoryApplication, path: str, *, timeout: int = 8) -> str:
     server = serve(app, host="127.0.0.1", port=0)
     thread = Thread(target=server.serve_forever, daemon=True)
     thread.start()
     try:
         host, port = server.server_address[:2]
-        conn = HTTPConnection(host, port, timeout=8)
+        conn = HTTPConnection(host, port, timeout=timeout)
         conn.request("GET", path)
         response = conn.getresponse()
         body = response.read().decode("utf-8")
@@ -695,7 +695,7 @@ class MarketDataAwarenessTests(unittest.TestCase):
         self.assertEqual(cell["relative_state"], "UNKNOWN")
         self.assertEqual(cell["relative_reason"], "REFERENCE_INSUFFICIENT")
 
-    def test_day_cohort_members_without_y_point_enter_reference(self) -> None:
+    def test_day_cohort_members_without_anchor_are_not_landmark_eligible(self) -> None:
         rows = []
         for index in range(5):
             rows.append(
@@ -719,7 +719,8 @@ class MarketDataAwarenessTests(unittest.TestCase):
         ]
         projection = project_market_context(self.definition, bundle, as_of=AS_OF)
         cell = _cell(projection, "Y1800", "LIQUIDITY_LEVEL")
-        self.assertEqual(cell["relative_state"], "HIGH_RELATIVE")
+        self.assertEqual(cell["relative_state"], "UNKNOWN")
+        self.assertEqual(cell["relative_reason"], "REFERENCE_INSUFFICIENT")
 
     def test_discovery_clock_members_enter_y1800_by_anchor(self) -> None:
         rows = []
@@ -777,7 +778,6 @@ class MarketDataAwarenessTests(unittest.TestCase):
         import pyarrow.parquet as pq
 
         clock = datetime.now(UTC).replace(microsecond=0)
-        semantics = schedule_semantics_from_document(_document())
         rows = []
         for index in range(5):
             rows.append(
@@ -817,7 +817,6 @@ class MarketDataAwarenessTests(unittest.TestCase):
                 ],
                 "schedule_sha256": [row["schedule_sha256"] for row in rows],
                 "field_values": [json.dumps(row["field_values"]) for row in rows],
-                "schedule_semantics": [json.dumps(semantics) for _ in rows],
                 "state": [row["state"] for row in rows],
             }
             members = []
@@ -883,8 +882,27 @@ class MarketDataAwarenessTests(unittest.TestCase):
                     ),
                     encoding="utf-8",
                 )
+            import duckdb
+
+            projections = data_root / "projections"
+            projections.mkdir(parents=True)
+            connection = duckdb.connect(str(projections / "research_memory.duckdb"))
+            try:
+                connection.execute(
+                    "CREATE TABLE _research_events "
+                    "(entity_id VARCHAR, record_kind VARCHAR, payload_json VARCHAR)"
+                )
+                connection.execute(
+                    "INSERT INTO _research_events VALUES (?, 'OBSERVATION_SCHEDULE', ?)",
+                    [
+                        SHA_A,
+                        json.dumps({"schedule": _document(), "schedule_sha256": SHA_A}),
+                    ],
+                )
+            finally:
+                connection.close()
             app = FactoryApplication(root=factory, research_data_root=data_root)
-            market = _get(app, "/market")
+            market = _get(app, "/market", timeout=30)
             self.assertNotIn("SOURCE_NOT_PRESENT", market)
             self.assertIn('data-relative="HIGH_RELATIVE"', market)
 

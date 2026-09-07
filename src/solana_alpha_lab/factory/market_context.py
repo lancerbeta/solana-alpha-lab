@@ -639,7 +639,7 @@ def _member_ids_for_landmark(
             due = anchor + timedelta(seconds=due_offset_seconds)
             if not (current_start < due <= as_of):
                 continue
-        elif not _in_window(available, current_start, as_of):
+        else:
             continue
         state = row.get("membership_state") or row.get("state")
         ids[entity_id] = coverage_class_for_member(state)
