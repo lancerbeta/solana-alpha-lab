@@ -80,6 +80,11 @@ def status_html(status: Any) -> str:
         "EMPTY",
         "NOT_APPLICABLE",
         "NOT_PRESENT",
+        "UNAVAILABLE",
+        "NOT_CONFIGURED",
+        "PARTIAL",
+        "DEGRADED",
+        "ACTION_REQUIRED",
     }
     if gloss:
         return dual(gloss, canonical, unknown=unknown)

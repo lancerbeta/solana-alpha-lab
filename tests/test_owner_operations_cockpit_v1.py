@@ -346,7 +346,9 @@ class OwnerOperationsCockpitTests(unittest.TestCase):
             try:
                 self.assertIn('href="/research"', _get(app, "/research"))
                 self.assertIn(">Исследования<", _get(app, "/research"))
-                self.assertIn("Runtime", _get(app, "/system"))
+                system = _get(app, "/system")
+                self.assertIn("SYSTEM_OPERABILITY", system)
+                self.assertIn("технически", system)
                 self.assertFalse(paper_path.is_file())
             finally:
                 store.close()

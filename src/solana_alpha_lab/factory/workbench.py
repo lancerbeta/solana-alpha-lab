@@ -204,9 +204,16 @@ def _token_or_unknown(value: Any) -> str:
 def _next_action_html(action: str) -> str:
     gloss, canonical, _unknown = token_gloss(NEXT_ACTION_GLOSS, action)
     body = dual(gloss, canonical) if gloss else canon(canonical)
-    if canonical == "INSPECT_SYSTEM":
+    if canonical == "OPEN_SYSTEM":
         return f'<a href="/system">{body}</a>'
     return body
+
+
+def _authority_html(flag: Any) -> str:
+    required = flag is True or str(flag).lower() in {"true", "1"}
+    if required:
+        return dual(surface_copy("SYSTEM", "authority_yes"), "AUTHORITY_REQUIRED")
+    return dual(surface_copy("SYSTEM", "authority_no"), "NO_OWNER_MUTATION")
 
 
 def _cell(value: Any) -> str:
@@ -1494,33 +1501,133 @@ def _home_section(
     )
 
 
-def _system_section(runtime: dict[str, Any]) -> str:
-    process_html = _flag_html(
-        runtime.get("process_alive") if "process_alive" in runtime else None,
-        true_gloss=surface_copy("SYSTEM", "process_up"),
-        false_gloss=surface_copy("SYSTEM", "process_down"),
+def _system_section(system: dict[str, Any]) -> str:
+    state = str(system.get("state") or "UNKNOWN")
+    identity = system.get("identity") if isinstance(system.get("identity"), dict) else {}
+    processes = system.get("processes") if isinstance(system.get("processes"), dict) else {}
+    collection = system.get("collection") if isinstance(system.get("collection"), dict) else {}
+    storage = system.get("storage") if isinstance(system.get("storage"), dict) else {}
+    durability = system.get("durability") if isinstance(system.get("durability"), dict) else {}
+    alerting = system.get("alerting") if isinstance(system.get("alerting"), dict) else {}
+    coverage = system.get("coverage") if isinstance(system.get("coverage"), dict) else {}
+    attention = list(system.get("attention") or [])
+    residual = system.get("out_of_band_host_reachability")
+    if isinstance(residual, dict):
+        residual_status = residual.get("status") or residual.get("detail")
+    else:
+        residual_status = residual
+    cards = []
+    for item in attention:
+        if not isinstance(item, dict):
+            continue
+        code = str(item.get("attention_code") or item.get("WHAT") or "")
+        cards.append(
+            "<article class=\"attention\">"
+            f"<h3>{canon(code)}</h3><table>"
+            f"<tr><th>WHAT</th><td>{canon(str(item.get('WHAT') or code))}</td></tr>"
+            f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
+            f"<td>{esc(_cell(item.get('WHY_NOW')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
+            f"<td>{status_html(item.get('IMPACT'))}</td></tr>"
+            f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
+            f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
+            f"<tr><th>CURRENT_SAFE_STATE</th><td>{status_html(item.get('CURRENT_SAFE_STATE'))}</td></tr>"
+            f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
+            f"<td>{_next_action_html(_cell(item.get('NEXT_SAFE_ACTION')))}</td></tr>"
+            f"<tr><th>RECOVERY_ROUTE</th><td class=\"mono\">{esc(_cell(item.get('RECOVERY_ROUTE')))}</td></tr>"
+            f"<tr><th>AUTHORITY_REQUIRED</th><td>{_authority_html(item.get('AUTHORITY_REQUIRED'))}</td></tr>"
+            "</table></article>"
+        )
+    if cards:
+        attention_html = "".join(cards)
+    elif state == "OK_OBSERVED":
+        attention_html = f"<p>{esc(surface_copy('SYSTEM', 'no_attention'))}</p>"
+    else:
+        attention_html = f"<p>{esc(surface_copy('SYSTEM', 'unknown_attention'))}</p>"
+    next_action = str(system.get("next_safe_action") or "")
+    leave_ok = state == "OK_OBSERVED" and next_action in {"", "LEAVE_UNATTENDED"}
+    if leave_ok:
+        next_html = f"<p>{esc(surface_copy('SYSTEM', 'leave'))}</p>"
+        next_strip = esc(surface_copy("SYSTEM", "leave"))
+    else:
+        shown = next_action or "INSPECT_COVERAGE_GAPS"
+        next_html = f"<p>{_next_action_html(shown)}</p>"
+        next_strip = _next_action_html(shown)
+    coverage_rows = []
+    for name, row in coverage.items():
+        payload = row if isinstance(row, dict) else {"status": row}
+        coverage_rows.append(
+            f"<tr><th>{canon(name)}</th><td>{status_html(payload.get('status'))}"
+            f" <span class=\"mono\">{esc(payload.get('detail') or '')}</span></td></tr>"
+        )
+    timers = processes.get("required_timers") if isinstance(processes.get("required_timers"), dict) else {}
+    timer_rows = "".join(
+        f"<tr><th>{canon(name)}</th><td>{status_html(value)}</td></tr>"
+        for name, value in timers.items()
     )
-    backup_html = _backup_html(runtime.get("backup_status"))
-    rollback_html = _rollback_html(runtime.get("local_rollback_snapshot"))
-    verdict_html = _verdict_html(runtime.get("verdict"))
     return (
         fact_strip(
             [
-                (surface_copy("SYSTEM", "process"), process_html),
-                (surface_copy("SYSTEM", "backup"), backup_html),
-                (surface_copy("SYSTEM", "rollback"), rollback_html),
-                (surface_copy("SYSTEM", "verdict"), verdict_html),
+                (surface_copy("SYSTEM", "now"), status_html(state)),
+                (surface_copy("SYSTEM", "http_self"), status_html(processes.get("http_self"))),
+                (
+                    surface_copy("SYSTEM", "managed_unit"),
+                    status_html(processes.get("managed_workbench_unit")),
+                ),
                 (
                     surface_copy("SYSTEM", "next"),
-                    _next_action_html(str(runtime.get("next_safe_action")))
-                    if runtime.get("next_safe_action")
-                    else _token_or_unknown(None),
+                    next_strip,
                 ),
-                (surface_copy("SYSTEM", "deployed"), _token_or_unknown(runtime.get("deploy_version"))),
+                (
+                    surface_copy("SYSTEM", "deployed"),
+                    _token_or_unknown(identity.get("deployed_sha")),
+                ),
             ]
         )
         + f"<p class=\"semantic-warning\">{esc(surface_copy('SYSTEM', 'not_healthy'))}</p>"
-        + technical("<table>" + mapping_rows(runtime) + "</table>", title="Runtime")
+        + f"<h2>{esc(surface_copy('SYSTEM', 'attention'))}</h2>"
+        + attention_html
+        + f"<h2>{esc(surface_copy('SYSTEM', 'collection'))}</h2>"
+        + "<table>"
+        + mapping_rows(collection)
+        + "</table>"
+        + f"<h2>{esc(surface_copy('SYSTEM', 'processes'))}</h2>"
+        + "<table>"
+        + f"<tr><th>HTTP_SELF</th><td>{status_html(processes.get('http_self'))}</td></tr>"
+        + f"<tr><th>MANAGED_WORKBENCH_UNIT</th><td>{status_html(processes.get('managed_workbench_unit'))}</td></tr>"
+        + timer_rows
+        + "</table>"
+        + f"<h2>{esc(surface_copy('SYSTEM', 'storage'))}</h2>"
+        + "<table>"
+        + mapping_rows(storage)
+        + "</table>"
+        + f"<h2>{esc(surface_copy('SYSTEM', 'durability'))}</h2>"
+        + "<table>"
+        + mapping_rows(durability)
+        + "</table>"
+        + f"<h2>{esc(surface_copy('SYSTEM', 'deploy'))}</h2>"
+        + "<table>"
+        + mapping_rows(
+            {
+                "deployed_sha": identity.get("deployed_sha"),
+                "git_head": identity.get("git_head"),
+                "deploy_relation": identity.get("deploy_relation"),
+            }
+        )
+        + "</table>"
+        + f"<h2>{esc(surface_copy('SYSTEM', 'alerting'))}</h2>"
+        + "<table>"
+        + mapping_rows(alerting)
+        + f"<tr><th>OUT_OF_BAND_HOST_REACHABILITY</th><td>{status_html(residual_status)}</td></tr>"
+        + "</table>"
+        + f"<p class=\"semantic-unknown\">{esc(surface_copy('SYSTEM', 'residual'))}</p>"
+        + f"<h2>{esc(surface_copy('SYSTEM', 'coverage'))}</h2>"
+        + "<table>"
+        + "".join(coverage_rows)
+        + "</table>"
+        + f"<h2>{esc(surface_copy('SYSTEM', 'next'))}</h2>"
+        + next_html
+        + technical("<table>" + mapping_rows(system) + "</table>", title=surface_copy("SYSTEM", "machine"))
     )
 
 
@@ -1536,7 +1643,11 @@ def _page(
     visual_consumed: bool = False,
 ) -> bytes:
     cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
-    runtime = model.get("runtime") if isinstance(model.get("runtime"), dict) else {}
+    system = (
+        model.get("system_operability")
+        if isinstance(model.get("system_operability"), dict)
+        else {}
+    )
     notice_html = f"<p class=\"error\">{html.escape(error)}</p>" if error else ""
     if notice:
         notice_html += f"<p class=\"notice\">{html.escape(notice)}</p>"
@@ -1553,7 +1664,7 @@ def _page(
         ),
         "OPERATIONS": _operations_section(model),
         "ECONOMICS": _economics_section(model),
-        "SYSTEM": _system_section(runtime),
+        "SYSTEM": _system_section(system),
     }
     consumed = "true" if visual_consumed else "false"
     layout_css = visual_os_layout_css()
@@ -1623,7 +1734,9 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                 model = {"cockpit": {}, "runtime": {}}
                 research_html = _research_section(app, query or {})
             else:
-                model = app.read_model(surface=surface, last_command=last_command)
+                model = app.read_model(
+                    surface=surface, last_command=last_command, http_self="SERVING_NOW"
+                )
                 research_html = None
             body = _page(
                 model,

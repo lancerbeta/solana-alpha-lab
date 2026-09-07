@@ -244,9 +244,12 @@ class FactoryV1ProductionLiteRuntimeTests(unittest.TestCase):
                 body = response.read().decode("utf-8")
                 conn.close()
                 self.assertEqual(response.status, 200)
-                self.assertIn("DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN", body)
+                self.assertIn("CAPABILITY_INVENTORY_NOT_CURRENT_READBACK", body)
+                self.assertIn("SYSTEM_OPERABILITY_SURFACE_V2", body)
                 self.assertIn("EXPLICIT_UNKNOWN", body)
                 self.assertIn("factory-v1-runtime-v1.0", body)
+                self.assertNotIn("DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN", body)
+                self.assertNotIn("HEALTHY", body.split("non_claims")[0] if "non_claims" in body else body)
             finally:
                 if server is not None:
                     server.shutdown()

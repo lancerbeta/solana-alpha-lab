@@ -29,13 +29,12 @@ from solana_alpha_lab.factory.remote_ops import load_config_v1_1  # noqa: E402
 
 
 def _unit_status() -> dict[str, str]:
-    units = (
-        "factory-observation-schedule.timer",
-        "factory-remote-backup.timer",
-        "factory-collector-owner-pulse.timer",
-        "factory-hot90-closed-day-archive.timer",
-        "factory-operability-watch.timer",
+    from solana_alpha_lab.factory.operability_watch import (
+        WATCH_REQUIRED_TIMERS,
+        WATCH_WORKBENCH_UNIT,
     )
+
+    units = (*WATCH_REQUIRED_TIMERS, WATCH_WORKBENCH_UNIT)
     status: dict[str, str] = {}
     for unit in units:
         completed = subprocess.run(

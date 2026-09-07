@@ -548,6 +548,29 @@ class ObservationScheduleStoreTests(unittest.TestCase):
             self.assertTrue(store.restore_marker_unresolved())
             store.close()
 
+    def test_readonly_missing_store_does_not_create(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "missing" / "observation_schedule_state.sqlite"
+            with self.assertRaisesRegex(ObservationScheduleStoreError, "SOURCE_NOT_PRESENT"):
+                ObservationScheduleStore(path, readonly=True)
+            self.assertFalse(path.exists())
+            self.assertFalse(path.parent.exists())
+
+    def test_readonly_does_not_mutate_and_rejects_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            writable = self._store(tmp)
+            writable.record_event("TICK", {"n": 1}, clock=NOW)
+            path = writable.path
+            writable.close()
+            before = path.read_bytes()
+            reader = ObservationScheduleStore(path, readonly=True)
+            self.addCleanup(reader.close)
+            self.assertTrue(reader.readonly)
+            with self.assertRaisesRegex(ObservationScheduleStoreError, "SOURCE_READONLY"):
+                reader.record_event("TICK", {"n": 2}, clock=NOW)
+            reader.close()
+            self.assertEqual(path.read_bytes(), before)
+
 
 if __name__ == "__main__":
     unittest.main()

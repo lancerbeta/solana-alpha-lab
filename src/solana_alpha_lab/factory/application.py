@@ -30,6 +30,10 @@ from solana_alpha_lab.factory.owner_review_cursor import (
     server_now,
 )
 from solana_alpha_lab.factory.trading_operations import compose_trading_operations
+from solana_alpha_lab.factory.system_operability import (
+    UnitReader,
+    compose_system_operability,
+)
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
 HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
@@ -114,6 +118,9 @@ class FactoryApplication:
         spec_relative: str | None = None,
         authority_phrase: str | None = None,
         research_data_root: Path | None = None,
+        unit_status: Mapping[str, str] | None = None,
+        unit_reader: UnitReader | None = None,
+        collector_packet: Mapping[str, Any] | None = None,
     ) -> None:
         self.root = root
         self._operational_store = store
@@ -127,6 +134,9 @@ class FactoryApplication:
         self._research_discovery = None
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
+        self._unit_status = unit_status
+        self._unit_reader = unit_reader
+        self._collector_packet = collector_packet
 
     def existing_operational_store(self) -> OperationalStore | None:
         if self._operational_store is not None:
@@ -580,7 +590,11 @@ class FactoryApplication:
         return list(reversed(events[-limit:]))
 
     def read_model(
-        self, *, surface: str | None = None, last_command: Mapping[str, Any] | None = None
+        self,
+        *,
+        surface: str | None = None,
+        last_command: Mapping[str, Any] | None = None,
+        http_self: str | None = None,
     ) -> dict[str, Any]:
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
         ops_store = self.existing_operational_store()
@@ -590,14 +604,28 @@ class FactoryApplication:
             spec_relative=self.spec_relative,
             hypothesis_registry=hypotheses,
         )
-        if (self.root / RUNTIME_CONFIG_RELATIVE).is_file() and ops_store is not None:
-            from solana_alpha_lab.factory.runtime import project_runtime_health
+        if (self.root / RUNTIME_CONFIG_RELATIVE).is_file():
+            from solana_alpha_lab.factory.runtime import load_runtime_config
 
-            model["runtime"] = project_runtime_health(
-                root=self.root,
-                store=ops_store,
-                process_alive=True,
-            )
+            try:
+                runtime_cfg = load_runtime_config(self.root)
+            except Exception:
+                runtime_cfg = {}
+            model["runtime"] = {
+                "deploy_version": runtime_cfg.get("deploy_version")
+                if isinstance(runtime_cfg, dict)
+                else None,
+                "backup_status": "EXPLICIT_UNKNOWN",
+                "current_health_owner": "SYSTEM_OPERABILITY_SURFACE_V2",
+                "health_plane": "CAPABILITY_INVENTORY_NOT_CURRENT_READBACK",
+            }
+        model["system_operability"] = compose_system_operability(
+            root=self.root,
+            http_self=http_self or "NOT_APPLICABLE",
+            unit_status=self._unit_status,
+            unit_reader=self._unit_reader,
+            collector_packet=self._collector_packet,
+        )
         spec = load_experiment_spec(self.root, self.spec_relative)
         gaps = pinned_produced_gaps(spec, self.root)
         acceptance_item = requirement_map(spec).get("ACCEPTANCE")
@@ -735,6 +763,9 @@ class FactoryApplication:
             research=research_view,
             trading=trading,
             runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
+            system=model.get("system_operability")
+            if isinstance(model.get("system_operability"), dict)
+            else None,
             cockpit=model.get("cockpit") if isinstance(model.get("cockpit"), dict) else None,
             research_records=records,
             research_records_status=records_status if records_status in {"UNAVAILABLE", "INVALID"} else None,
