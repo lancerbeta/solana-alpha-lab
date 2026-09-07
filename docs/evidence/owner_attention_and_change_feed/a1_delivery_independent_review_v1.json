@@ -1,0 +1,66 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OWNER-ATTENTION-AND-CHANGE-FEED-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-07",
+  "task_id": "OWNER_ATTENTION_AND_CHANGE_FEED_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Q3_UTC_INSTANT_NEWNESS",
+        "FRACTIONAL_AVAILABILITY_NOT_OLD",
+        "RESEARCH_OPEN_FAIL_IS_INVALID",
+        "GET_HOME_ZERO_WRITES",
+        "REVIEWED_NE_RESOLVED",
+        "WATERMARK_HELD_ON_GAP"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SUCCESS_NO_MATERIAL_COVERAGE_DO_NOTHING",
+        "TRUE_NOT_PRESENT_IS_GAP",
+        "FRACTIONAL_FALSIFIER_COVERS_Q3",
+        "GET_HOME_READONLY",
+        "REVIEWED_NE_RESOLVED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=1a682a506137287edf4374a35b5bd3c7ea271bf7729c57cc507724c38ed50534",
+        "Q3_PARSED_UTC_INSTANTS",
+        "Q2_HASH_BOUND_IDENTITIES",
+        "Q4_MISSING_HISTORY_NOT_ALL_CLEAR",
+        "Q7_DOMAIN_CODE_IDENTITY_KEY",
+        "SEM_OWNER_DAILY_NE_MERGE_GATE",
+        "GET_HOME_NON_MUTATING",
+        "SYSTEM_STATE_ONLY"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_OWNER_FCF",
+    "NO_SYSTEM_HEALTH_CLAIM",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_WALLET",
+    "NO_ATTENTION_DATABASE",
+    "NO_CANONICAL_DONE"
+  ]
+}

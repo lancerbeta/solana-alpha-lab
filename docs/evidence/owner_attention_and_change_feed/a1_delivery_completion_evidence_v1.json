@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OWNER-ATTENTION-AND-CHANGE-FEED-COMPLETION-001",
+  "as_of": "2026-09-07",
+  "task_id": "OWNER_ATTENTION_AND_CHANGE_FEED_V1",
+  "state_change": "OWNER_ATTENTION_AND_CHANGE_FEED_V1_READY_FOR_MERGE",
+  "base_main": "ac5c91c3baab36c055ab0e48dbd0ae4d37de2ac4",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/reports/owner_attention_and_change_feed/a1_owner_readout_v1.md": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/owner_attention_and_change_feed/a1_delivery_factory_fit_v1.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OWNER_ATTENTION_AND_CHANGE_FEED_V1",
+    "independent_review": {
+      "path": "docs/evidence/owner_attention_and_change_feed/a1_delivery_independent_review_v1.json",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_OWNER_FCF",
+    "NO_SYSTEM_HEALTH_CLAIM",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_WALLET",
+    "NO_ATTENTION_DATABASE",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}
