@@ -298,6 +298,35 @@ def _next_action_for(code: str) -> str:
     return "INSPECT_SYSTEM"
 
 
+_UNOBSERVED = frozenset(
+    {
+        "",
+        "UNKNOWN",
+        "UNCONFIGURED",
+        "NOT_CONFIGURED",
+        "NOT_PRESENT",
+        "NOT_APPLICABLE",
+        "EXPLICIT_UNKNOWN",
+        "N/A",
+        "NONE",
+        "NULL",
+    }
+)
+
+
+def _observed(value: Any) -> bool:
+    if value is None:
+        return False
+    if isinstance(value, bool):
+        return True
+    if isinstance(value, (int, float)):
+        return True
+    text = _text(value)
+    if not text:
+        return False
+    return text.upper() not in _UNOBSERVED
+
+
 def _evidence_status(
     *,
     action: bool = False,
@@ -332,7 +361,7 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
     offhost_state = _text(packet.get("offhost_backup_state")).upper()
     freshness = _evidence_status(
         degraded="DATA_STALE" in classes,
-        present=bool(_text(packet.get("collector_verdict"))),
+        present=_observed(packet.get("collector_verdict")),
     )
     provider = _evidence_status(
         degraded=bool(
@@ -343,17 +372,17 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
                 "PROVIDER_RATE_LIMITED",
             }
         ),
-        present=packet.get("provider_observations") is not None,
+        present=_observed(packet.get("provider_observations")),
     )
     storage = _evidence_status(
         action=bool(classes & {"DISK_RUNWAY_HARD50", "DISK_CRITICAL"}),
         degraded=bool(classes & {"DISK_RUNWAY_TARGET40", "DISK_WARNING"}),
-        present=packet.get("filesystem_disk_used_pct") is not None
-        or bool(_text(packet.get("projected_97d_status"))),
+        present=_observed(packet.get("filesystem_disk_used_pct"))
+        or _observed(packet.get("projected_97d_status")),
     )
     mutable = _evidence_status(
         degraded=bool(classes & {"BACKUP_DEGRADED", "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED"}),
-        present=packet.get("backup_age_seconds") is not None,
+        present=_observed(packet.get("backup_age_seconds")),
     )
     offhost = _evidence_status(
         degraded=bool(classes & {"OFFHOST_BACKUP_STALE", "OFFHOST_BACKUP_FAILED"})
@@ -364,7 +393,7 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
     archive = _evidence_status(
         action="IMMUTABLE_ARCHIVE_HASH_MISMATCH" in classes,
         degraded="IMMUTABLE_ARCHIVE_STALE" in classes,
-        present=bool(_text(packet.get("immutable_archive_latest_verified_day"))),
+        present=_observed(packet.get("immutable_archive_latest_verified_day")),
     )
     return {
         "COLLECTOR": _coverage("AVAILABLE"),

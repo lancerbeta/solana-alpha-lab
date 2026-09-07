@@ -544,6 +544,30 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
         )
         self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "UNKNOWN")
 
+    def test_unknown_sentinels_are_not_available(self) -> None:
+        projection = compose_system_operability(
+            root=ROOT,
+            now=NOW,
+            unit_status=UNITS_OK,
+            collector_packet=_packet(
+                health_classes=["PROCESS_OK"],
+                filesystem_disk_used_pct="UNKNOWN",
+                projected_97d_status="UNKNOWN",
+                backup_age_seconds="UNKNOWN",
+                offhost_backup_state="UNKNOWN",
+                immutable_archive_latest_verified_day="UNKNOWN",
+                collector_verdict="UNKNOWN",
+            ),
+            environ={},
+        )
+        coverage = projection["coverage"]
+        self.assertEqual(coverage["STORAGE"]["status"], "UNKNOWN")
+        self.assertEqual(coverage["MUTABLE_BACKUP"]["status"], "UNKNOWN")
+        self.assertEqual(coverage["OFFHOST_BACKUP"]["status"], "UNKNOWN")
+        self.assertEqual(coverage["IMMUTABLE_ARCHIVE"]["status"], "UNKNOWN")
+        self.assertEqual(coverage["DATA_FRESHNESS"]["status"], "UNKNOWN")
+        self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
     def test_empty_unit_status_is_not_all_active(self) -> None:
         projection = compose_system_operability(
             root=ROOT,
