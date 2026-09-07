@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Any, Mapping
 
 from solana_alpha_lab.factory.owner_review_cursor import (
@@ -57,12 +58,32 @@ DRILLDOWN = {
     "OPERATIONS": "/operations",
     "SYSTEM": "/system",
 }
+CHANGE_FEED_LIMIT = 12
+RESEARCH_STORE_SOURCE_ID = "SRC-RESEARCH-STORE"
+BLOCKING_STATE = frozenset({"UNAVAILABLE", "INVALID"})
+HISTORY_COMPLETE = "AVAILABLE"
 
 
 def _text(value: Any) -> str:
     if value is None:
         return ""
     return str(value)
+
+
+def _utc_iso(value: Any) -> str | None:
+    if value is None or value == "":
+        return None
+    if hasattr(value, "astimezone"):
+        return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    text = _text(value)
+    normalized = text.replace("Z", "+00:00") if text.endswith("Z") else text
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return text
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def _priority_for(code: str, *, source_domain: str) -> str:
@@ -128,6 +149,57 @@ def _item(
     }
 
 
+def _locator_entity(row: Mapping[str, Any]) -> str:
+    locator = row.get("locator")
+    if isinstance(locator, Mapping):
+        return _text(locator.get("entity_id"))
+    return ""
+
+
+def _attention_code(row: Mapping[str, Any]) -> str:
+    code = _text(
+        row.get("code")
+        or row.get("id")
+        or row.get("blocker")
+        or row.get("gap_code")
+    )
+    if code:
+        return code
+    if _text(row.get("display_state")) == "CONFLICT":
+        native = _text(row.get("native_state"))
+        if native in {"IDENTITY_CONFLICT", "STATE_CONFLICT"}:
+            return native
+        return "IDENTITY_CONFLICT"
+    native = _text(row.get("native_state"))
+    if native in P0_CODES | P1_OPERATION_CODES | P2_CODES | INFO_CODES:
+        return native
+    return ""
+
+
+def _native_identity(row: Mapping[str, Any], code: str) -> str:
+    identity = _text(
+        row.get("source_native_identity")
+        or row.get("entity_id")
+        or row.get("position_id")
+        or row.get("bot_instance_id")
+        or _locator_entity(row)
+        or row.get("source_id")
+    )
+    if identity:
+        return identity
+    source = row.get("source")
+    if isinstance(source, str) and source:
+        return source
+    if isinstance(source, Mapping):
+        nested = _text(source.get("source_id") or source.get("value") or source.get("kind"))
+        if nested:
+            return nested
+    evidence = _text(row.get("EVIDENCE") or row.get("evidence"))
+    if evidence and evidence != code:
+        return evidence
+    return ""
+
+
 def _from_local_attention(
     rows: Any, *, source_domain: str, source_status: str
 ) -> list[dict[str, Any]]:
@@ -137,24 +209,21 @@ def _from_local_attention(
     for row in rows:
         if not isinstance(row, dict):
             continue
-        code = _text(row.get("code") or row.get("id") or row.get("blocker"))
+        code = _attention_code(row)
         if not code:
+            continue
+        identity = _native_identity(row, code)
+        if not identity:
             continue
         item = _item(
             source_domain=source_domain,
             code=code,
-            native_identity=_text(
-                row.get("source_native_identity")
-                or row.get("entity_id")
-                or row.get("position_id")
-                or row.get("bot_instance_id")
-                or code
-            ),
+            native_identity=identity,
             why=_text(row.get("WHY_NOW") or row.get("title")),
             impact=_text(row.get("IMPACT")),
-            evidence=_text(row.get("EVIDENCE") or row.get("native_state")),
+            evidence=_text(row.get("EVIDENCE") or row.get("native_state") or identity),
             nxt=_text(row.get("NEXT_SAFE_ACTION") or row.get("next_safe_action")),
-            available_at=_text(row.get("observed_at") or row.get("as_of")) or None,
+            available_at=_utc_iso(row.get("observed_at") or row.get("as_of")),
             source_status=source_status,
         )
         if item:
@@ -178,31 +247,77 @@ def _coverage_row(
     }
 
 
-def _research_coverage(research: Mapping[str, Any] | None, discovery: str | None) -> dict[str, Any]:
+def _store_source(sources: list[Any]) -> dict[str, Any] | None:
+    labeled: list[dict[str, Any]] = []
+    unlabeled: list[dict[str, Any]] = []
+    for item in sources:
+        if not isinstance(item, dict):
+            continue
+        source_id = _text(item.get("source_id"))
+        if source_id == RESEARCH_STORE_SOURCE_ID or _text(item.get("truth_plane")) == "EVIDENCE":
+            return item
+        if source_id:
+            labeled.append(item)
+        else:
+            unlabeled.append(item)
+    if not labeled and len(unlabeled) == 1:
+        return unlabeled[0]
+    return None
+
+
+def _history_for_store(status: str) -> str:
+    if status in {"AVAILABLE", "EMPTY"}:
+        return "AVAILABLE"
+    if status == "NOT_PRESENT":
+        return "NOT_PRESENT"
+    return "UNAVAILABLE"
+
+
+def _research_coverage(
+    research: Mapping[str, Any] | None,
+    discovery: str | None,
+    *,
+    records_status: str | None = None,
+) -> dict[str, Any]:
+    if records_status in BLOCKING_STATE:
+        current = records_status if records_status in BLOCKING_STATE else "UNAVAILABLE"
+        return _coverage_row("RESEARCH", current=current, history="UNAVAILABLE")
     if research is None:
         status = discovery or "NOT_PRESENT"
-        history = "NOT_PRESENT" if status == "NOT_PRESENT" else "UNAVAILABLE"
-        if status == "INVALID":
-            history = "UNAVAILABLE"
+        history = _history_for_store(status)
         return _coverage_row("RESEARCH", current=status, history=history)
+    completeness = _text(research.get("completeness"))
     sources = research.get("sources") if isinstance(research.get("sources"), list) else []
-    statuses = [
+    store = _store_source(sources)
+    if not sources:
+        if completeness in BLOCKING_STATE:
+            current = completeness
+        elif discovery:
+            current = discovery
+        else:
+            current = "UNAVAILABLE"
+        return _coverage_row(
+            "RESEARCH",
+            current=current,
+            history=_history_for_store(current),
+        )
+    store_status = _text(store.get("status")) if store is not None else ""
+    other_statuses = [
         _text(item.get("status"))
         for item in sources
-        if isinstance(item, dict) and _text(item.get("status"))
+        if isinstance(item, dict) and item is not store and _text(item.get("status"))
     ]
-    if any(item in {"UNAVAILABLE", "INVALID"} for item in statuses):
-        current = "INVALID" if "INVALID" in statuses else "UNAVAILABLE"
-        return _coverage_row("RESEARCH", current=current, history="UNAVAILABLE")
-    if any(item == "NOT_PRESENT" for item in statuses) and not any(
-        item in {"AVAILABLE", "EMPTY"} for item in statuses
-    ):
-        return _coverage_row("RESEARCH", current="NOT_PRESENT", history="NOT_PRESENT")
-    if statuses and all(item in {"AVAILABLE", "EMPTY"} for item in statuses):
-        return _coverage_row("RESEARCH", current="AVAILABLE", history="AVAILABLE")
-    if statuses:
-        return _coverage_row("RESEARCH", current="PARTIAL", history="AVAILABLE")
-    return _coverage_row("RESEARCH", current="AVAILABLE", history="AVAILABLE")
+    if store is None:
+        return _coverage_row("RESEARCH", current="PARTIAL", history="NOT_PRESENT")
+    if store_status in BLOCKING_STATE:
+        return _coverage_row("RESEARCH", current=store_status, history="UNAVAILABLE")
+    history = _history_for_store(store_status)
+    if store_status == "NOT_PRESENT":
+        current = "PARTIAL" if any(item in {"AVAILABLE", "EMPTY"} for item in other_statuses) else "NOT_PRESENT"
+        return _coverage_row("RESEARCH", current=current, history="NOT_PRESENT")
+    if other_statuses and any(item not in {"AVAILABLE", "EMPTY"} for item in other_statuses):
+        return _coverage_row("RESEARCH", current="PARTIAL", history=history)
+    return _coverage_row("RESEARCH", current=store_status or "AVAILABLE", history=history)
 
 
 def _operations_coverage(trading: Mapping[str, Any] | None) -> dict[str, Any]:
@@ -241,7 +356,7 @@ def _operations_changes(trading: Mapping[str, Any] | None) -> list[dict[str, Any
         if not isinstance(event, dict):
             continue
         event_id = _text(event.get("event_id"))
-        available = _text(event.get("created_at")) or None
+        available = _utc_iso(event.get("created_at"))
         if not event_id:
             continue
         out.append(
@@ -249,7 +364,7 @@ def _operations_changes(trading: Mapping[str, Any] | None) -> list[dict[str, Any
                 "source_domain": "OPERATIONS",
                 "native_identity": event_id,
                 "change_available_at": available,
-                "effective_at": _text(event.get("effective_at")) or available,
+                "effective_at": _utc_iso(event.get("effective_at")) or available,
                 "change_kind": _text(event.get("event_type") or "EXECUTION_EVENT"),
                 "attention_code": _text(event.get("event_type") or "EXECUTION_EVENT"),
                 "drilldown_target": "/operations",
@@ -270,7 +385,7 @@ def _research_changes(records: Any) -> list[dict[str, Any]]:
         if not isinstance(record, dict):
             continue
         identity = _text(record.get("record_id"))
-        available = _text(record.get("first_reliable_available_at")) or None
+        available = _utc_iso(record.get("first_reliable_available_at"))
         if not identity:
             continue
         out.append(
@@ -278,7 +393,7 @@ def _research_changes(records: Any) -> list[dict[str, Any]]:
                 "source_domain": "RESEARCH",
                 "native_identity": identity,
                 "change_available_at": available,
-                "effective_at": _text(record.get("effective_at")) or None,
+                "effective_at": _utc_iso(record.get("effective_at")),
                 "change_kind": _text(record.get("record_kind") or "RESEARCH_EVENT"),
                 "attention_code": _text(record.get("record_kind") or "RESEARCH_EVENT"),
                 "drilldown_target": "/research",
@@ -332,6 +447,135 @@ def _dedup(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return [seen[key] for key in order]
 
 
+def _domain_changes(changes: list[Mapping[str, Any]], domain: str) -> list[Mapping[str, Any]]:
+    return [item for item in changes if item.get("source_domain") == domain]
+
+
+def _window_hole(
+    domain_changes: list[Mapping[str, Any]],
+    mark: Mapping[str, Any] | None,
+    *,
+    established: bool,
+) -> bool:
+    if not established or not isinstance(mark, Mapping):
+        return False
+    mark_tuple = _watermark_tuple(mark.get("change_available_at"), mark.get("native_identity"))
+    if mark_tuple == ("", ""):
+        return False
+    if len(domain_changes) < CHANGE_FEED_LIMIT:
+        return False
+    oldest = min(
+        (
+            _watermark_tuple(item.get("change_available_at"), item.get("native_identity"))
+            for item in domain_changes
+        ),
+        default=("", ""),
+    )
+    return oldest > mark_tuple
+
+
+def _coverage_blocker_item(domain: str, state: str) -> dict[str, Any]:
+    if domain == "OPERATIONS":
+        code = "SOURCE_INVALID" if state == "INVALID" else "RUNTIME_SOURCE_UNAVAILABLE"
+        nxt = "OPEN_OPERATIONS"
+        identity = "PAPER_PLANE"
+    else:
+        code = "SOURCE_INVALID" if state == "INVALID" else "SOURCE_UNAVAILABLE"
+        nxt = "RESOLVE_RESEARCH_STORE"
+        identity = RESEARCH_STORE_SOURCE_ID
+    return _item(
+        source_domain=domain,
+        code=code,
+        native_identity=identity,
+        why=code,
+        impact="named consumer blocked",
+        evidence=state,
+        nxt=nxt,
+        source_status=state,
+    )
+
+
+def _ensure_coverage_blockers(
+    current: list[dict[str, Any]], coverage: Mapping[str, Mapping[str, Any]]
+) -> list[dict[str, Any]]:
+    existing = {
+        (item.get("source_domain"), item.get("attention_code"))
+        for item in current
+    }
+    out = list(current)
+    for domain in ("RESEARCH", "OPERATIONS"):
+        state = _text(coverage[domain].get("CURRENT_STATE"))
+        if state not in BLOCKING_STATE:
+            continue
+        codes = (
+            {"RUNTIME_SOURCE_UNAVAILABLE", "SOURCE_UNAVAILABLE", "SOURCE_INVALID"}
+            if domain == "OPERATIONS"
+            else {"SOURCE_UNAVAILABLE", "SOURCE_INVALID"}
+        )
+        if any((domain, code) in existing for code in codes):
+            continue
+        item = _coverage_blocker_item(domain, state)
+        if item:
+            out.append(item)
+    return out
+
+
+def _change_item(change: Mapping[str, Any], *, source_status: str) -> dict[str, Any]:
+    domain = str(change["source_domain"])
+    item = _item(
+        source_domain=domain,
+        code=change.get("attention_code") or "CHANGE",
+        native_identity=str(change["native_identity"]),
+        why=change.get("WHY_NOW") or "",
+        impact="INFO",
+        evidence=change.get("EVIDENCE") or "",
+        nxt=change.get("NEXT_SAFE_ACTION") or "",
+        available_at=change.get("change_available_at"),
+        effective_at=change.get("effective_at"),
+        source_status=source_status,
+        change_kind=change.get("change_kind"),
+    )
+    if item:
+        item["new_since_review"] = True
+        item["priority"] = "INFO"
+        return item
+    return {
+        "attention_key": f"{domain}:CHANGE:{change['native_identity']}",
+        "source_domain": domain,
+        "source_owner": "TRADING_OPERATIONS_WORKBENCH_V2"
+        if domain == "OPERATIONS"
+        else "RESEARCH_LIFECYCLE_WORKBENCH_V1",
+        "source_native_identity": change["native_identity"],
+        "entity_locator": change["native_identity"],
+        "attention_code": change.get("attention_code") or "CHANGE",
+        "priority": "INFO",
+        "WHAT": change.get("change_kind") or "CHANGE",
+        "WHY_NOW": change.get("WHY_NOW") or "UNKNOWN",
+        "IMPACT": "INFO",
+        "EVIDENCE": change.get("EVIDENCE") or "UNKNOWN",
+        "CURRENT_SAFE_STATE": "UNKNOWN",
+        "NEXT_SAFE_ACTION": change.get("NEXT_SAFE_ACTION") or "UNKNOWN",
+        "AUTHORITY_REQUIRED": False,
+        "observed_at": change.get("change_available_at"),
+        "available_at": change.get("change_available_at"),
+        "effective_at": change.get("effective_at"),
+        "source_status": source_status,
+        "drilldown_target": change.get("drilldown_target"),
+        "change_kind": change.get("change_kind"),
+        "new_since_review": True,
+    }
+
+
+def _identity_token(item: Mapping[str, Any]) -> str:
+    return "|".join(
+        [
+            _text(item.get("source_domain")),
+            _text(item.get("native_identity") or item.get("source_native_identity")),
+            _text(item.get("change_available_at") or item.get("available_at")),
+        ]
+    )
+
+
 def compose_owner_attention(
     *,
     research: Mapping[str, Any] | None = None,
@@ -339,12 +583,15 @@ def compose_owner_attention(
     runtime: Mapping[str, Any] | None = None,
     cockpit: Mapping[str, Any] | None = None,
     research_records: list[dict[str, Any]] | None = None,
+    research_records_status: str | None = None,
     research_discovery: str | None = None,
     cursor: Mapping[str, Any] | None = None,
     cursor_status: str = "MISSING",
 ) -> dict[str, Any]:
     coverage = {
-        "RESEARCH": _research_coverage(research, research_discovery),
+        "RESEARCH": _research_coverage(
+            research, research_discovery, records_status=research_records_status
+        ),
         "OPERATIONS": _operations_coverage(trading),
         "SYSTEM": _system_coverage(runtime),
     }
@@ -392,13 +639,44 @@ def compose_owner_attention(
         )
     )
     current = [item for item in current if item.get("attention_code") not in NOISE_CODES]
+    current = _ensure_coverage_blockers(current, coverage)
     current = _dedup(current)
 
+    feed_ok = {
+        domain: coverage[domain]["CHANGE_HISTORY"] == HISTORY_COMPLETE
+        for domain in ("RESEARCH", "OPERATIONS")
+    }
     changes: list[dict[str, Any]] = []
-    if coverage["RESEARCH"]["CHANGE_HISTORY"] == "AVAILABLE":
+    if feed_ok["RESEARCH"]:
         changes.extend(_research_changes(research_records))
-    if coverage["OPERATIONS"]["CHANGE_HISTORY"] == "AVAILABLE":
+    if feed_ok["OPERATIONS"]:
         changes.extend(_operations_changes(trading))
+
+    cursor_sources = (cursor or {}).get("sources") if isinstance(cursor, Mapping) else {}
+    established = cursor_status == "VALID" and isinstance(cursor_sources, dict)
+    history_gap = False
+    gapped_domains: set[str] = set()
+    for domain in ("RESEARCH", "OPERATIONS"):
+        if not feed_ok[domain]:
+            continue
+        domain_rows = _domain_changes(changes, domain)
+        mark = cursor_sources.get(domain) if established else None
+        if _window_hole(domain_rows, mark if isinstance(mark, dict) else None, established=established):
+            history_gap = True
+            gapped_domains.add(domain)
+        elif (
+            established
+            and isinstance(mark, dict)
+            and (mark.get("change_available_at") or "")
+            and domain_rows
+            and all(
+                _watermark_tuple(item.get("change_available_at"), item.get("native_identity"))
+                < _watermark_tuple(mark.get("change_available_at"), mark.get("native_identity"))
+                for item in domain_rows
+            )
+        ):
+            history_gap = True
+            gapped_domains.add(domain)
 
     watermarks = {
         "RESEARCH": _source_watermark(
@@ -409,101 +687,47 @@ def compose_owner_attention(
         ),
         "SYSTEM": empty_watermark(),
     }
-    snapshot = {
-        "schema": "smial.owner-review-snapshot",
-        "schema_version": "1.0",
-        "sources": {
-            domain: {
-                "CURRENT_STATE": coverage[domain]["CURRENT_STATE"],
-                "CHANGE_HISTORY": coverage[domain]["CHANGE_HISTORY"],
-                **watermarks[domain],
-            }
-            for domain in SOURCE_DOMAINS
-        },
-    }
-    digest = snapshot_sha256(snapshot)
 
-    cursor_sources = (cursor or {}).get("sources") if isinstance(cursor, Mapping) else {}
-    established = cursor_status == "VALID" and isinstance(cursor_sources, dict)
-    history_gap = False
     new_changes: list[dict[str, Any]] = []
-    if coverage["RESEARCH"]["CHANGE_HISTORY"] != "AVAILABLE" and coverage["OPERATIONS"]["CHANGE_HISTORY"] != "AVAILABLE":
-        pass
     for change in changes:
         domain = change["source_domain"]
-        if coverage[domain]["CHANGE_HISTORY"] != "AVAILABLE":
+        if not feed_ok[domain]:
             continue
         mark = cursor_sources.get(domain) if established else None
-        if established and mark and (
-            (mark.get("change_available_at") or "")
-            and all(
-                _watermark_tuple(item.get("change_available_at"), item.get("native_identity"))
-                < _watermark_tuple(mark.get("change_available_at"), mark.get("native_identity"))
-                for item in changes
-                if item["source_domain"] == domain
-            )
-        ):
-            history_gap = True
         is_new = (not established) or _after_cursor(change, mark if isinstance(mark, dict) else None)
         if not is_new:
             continue
-        item = _item(
-            source_domain=domain,
-            code=change.get("attention_code") or "CHANGE",
-            native_identity=change["native_identity"],
-            why=change.get("WHY_NOW") or "",
-            impact="INFO",
-            evidence=change.get("EVIDENCE") or "",
-            nxt=change.get("NEXT_SAFE_ACTION") or "",
-            available_at=change.get("change_available_at"),
-            effective_at=change.get("effective_at"),
-            source_status=coverage[domain]["CURRENT_STATE"],
-            change_kind=change.get("change_kind"),
+        new_changes.append(
+            _change_item(change, source_status=coverage[domain]["CURRENT_STATE"])
         )
-        if not item:
-            item = {
-                "attention_key": f"{domain}:CHANGE:{change['native_identity']}",
-                "source_domain": domain,
-                "source_owner": "TRADING_OPERATIONS_WORKBENCH_V2"
-                if domain == "OPERATIONS"
-                else "RESEARCH_LIFECYCLE_WORKBENCH_V1",
-                "source_native_identity": change["native_identity"],
-                "entity_locator": change["native_identity"],
-                "attention_code": change.get("attention_code") or "CHANGE",
-                "priority": "INFO",
-                "WHAT": change.get("change_kind") or "CHANGE",
-                "WHY_NOW": change.get("WHY_NOW") or "UNKNOWN",
-                "IMPACT": "INFO",
-                "EVIDENCE": change.get("EVIDENCE") or "UNKNOWN",
-                "CURRENT_SAFE_STATE": "UNKNOWN",
-                "NEXT_SAFE_ACTION": change.get("NEXT_SAFE_ACTION") or "UNKNOWN",
-                "AUTHORITY_REQUIRED": False,
-                "observed_at": change.get("change_available_at"),
-                "available_at": change.get("change_available_at"),
-                "effective_at": change.get("effective_at"),
-                "source_status": coverage[domain]["CURRENT_STATE"],
-                "drilldown_target": change.get("drilldown_target"),
-                "change_kind": change.get("change_kind"),
-                "new_since_review": True,
-            }
-        else:
-            item["new_since_review"] = True
-            item["priority"] = "INFO"
-        new_changes.append(item)
 
-    by_native: dict[tuple[str, str], dict[str, Any]] = {}
-    for item in current:
-        by_native[(item["source_domain"], item["source_native_identity"])] = item
+    overflow = False
+    if len(new_changes) > CHANGE_FEED_LIMIT:
+        overflow = True
+        history_gap = True
+        for item in new_changes:
+            gapped_domains.add(str(item.get("source_domain")))
+        new_changes.sort(
+            key=lambda item: _watermark_tuple(item.get("available_at"), item.get("source_native_identity")),
+            reverse=True,
+        )
+        new_changes = list(reversed(new_changes[:CHANGE_FEED_LIMIT]))
+
+    for domain in gapped_domains:
+        coverage[domain]["CHANGE_HISTORY"] = "UNAVAILABLE"
+        coverage[domain]["reason"] = "CHANGE_HISTORY_GAP"
+
     for change in new_changes:
-        key = (change["source_domain"], change["source_native_identity"])
-        if key in by_native:
-            by_native[key]["new_since_review"] = True
-            change["merged_into_current"] = True
+        for item in current:
+            if (
+                item["source_domain"] == change["source_domain"]
+                and item["source_native_identity"] == change["source_native_identity"]
+            ):
+                item["new_since_review"] = True
+                change["merged_into_current"] = True
 
-    current = _dedup(list(by_native.values()) if by_native else current)
-    visible_changes = [
-        item for item in new_changes if not item.get("merged_into_current")
-    ]
+    current = _dedup(current)
+    visible_changes = [item for item in new_changes if not item.get("merged_into_current")]
 
     def _sort_key(item: Mapping[str, Any]) -> tuple[int, str, str]:
         return (
@@ -515,8 +739,7 @@ def compose_owner_attention(
     current.sort(key=_sort_key)
     visible_changes.sort(key=_sort_key)
     material = [item for item in current if item.get("priority") in {"P0", "P1", "P2", "UNKNOWN"}]
-    info = [item for item in current if item.get("priority") == "INFO"] + visible_changes
-    info = _dedup(info)
+    info = _dedup([item for item in current if item.get("priority") == "INFO"])
 
     review_code = None
     if cursor_status == "MISSING":
@@ -526,7 +749,26 @@ def compose_owner_attention(
     elif history_gap:
         review_code = "CHANGE_HISTORY_GAP"
 
-    all_clear = not material
+    blocking = any(
+        coverage[domain]["CURRENT_STATE"] in BLOCKING_STATE for domain in ("RESEARCH", "OPERATIONS")
+    )
+    history_complete = not history_gap and not overflow
+    snapshot = {
+        "schema": "smial.owner-review-snapshot",
+        "schema_version": "1.0",
+        "history_complete": history_complete,
+        "reviewed_identities": sorted(_identity_token(item) for item in changes),
+        "sources": {
+            domain: {
+                "CURRENT_STATE": coverage[domain]["CURRENT_STATE"],
+                "CHANGE_HISTORY": coverage[domain]["CHANGE_HISTORY"],
+                **watermarks[domain],
+            }
+            for domain in SOURCE_DOMAINS
+        },
+    }
+    digest = snapshot_sha256(snapshot)
+    all_clear = (not material) and (not blocking) and history_complete
     return {
         "schema": SCHEMA,
         "schema_version": "1.0",
@@ -561,21 +803,26 @@ def persistable_watermarks(
         if isinstance(row, Mapping)
     }
     sources = snapshot.get("sources") if isinstance(snapshot.get("sources"), Mapping) else {}
+    history_complete = snapshot.get("history_complete", True)
     out: dict[str, dict[str, str | None]] = {}
     for domain in SOURCE_DOMAINS:
         row = by_domain.get(domain) or {}
         history = _text(row.get("CHANGE_HISTORY"))
         current_state = _text(row.get("CURRENT_STATE"))
         live = sources.get(domain) if isinstance(sources.get(domain), Mapping) else {}
-        can_advance = history == "AVAILABLE" and current_state not in {
-            "UNAVAILABLE",
-            "INVALID",
-            "NOT_PRESENT",
-        }
+        live_at = live.get("change_available_at")
+        live_id = live.get("native_identity")
+        can_advance = (
+            bool(history_complete)
+            and history == HISTORY_COMPLETE
+            and _text(row.get("reason")) != "CHANGE_HISTORY_GAP"
+            and current_state not in {"UNAVAILABLE", "INVALID", "NOT_PRESENT"}
+            and bool(live_at or live_id)
+        )
         if can_advance:
             out[domain] = {
-                "change_available_at": live.get("change_available_at"),
-                "native_identity": live.get("native_identity"),
+                "change_available_at": live_at,
+                "native_identity": live_id,
             }
             continue
         kept = previous_sources.get(domain) if isinstance(previous_sources, Mapping) else None

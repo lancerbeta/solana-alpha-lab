@@ -681,10 +681,12 @@ class FactoryApplication:
             model["owner_attention"] = self._owner_attention(model, trading)
         return model
 
-    def _research_change_records(self) -> list[dict[str, Any]]:
+    def _research_change_records(self) -> tuple[list[dict[str, Any]], str]:
         store = self.existing_research_store()
         if store is None:
-            return []
+            return [], "NOT_PRESENT"
+        from datetime import timezone
+
         from solana_alpha_lab.factory.research_store import ResearchStoreError
 
         rows: list[dict[str, Any]] = []
@@ -696,34 +698,43 @@ class FactoryApplication:
                     {
                         "record_id": record.record_id,
                         "record_kind": str(record.record_kind),
-                        "first_reliable_available_at": available.astimezone().isoformat().replace("+00:00", "Z")
+                        "first_reliable_available_at": available.astimezone(timezone.utc)
+                        .isoformat()
+                        .replace("+00:00", "Z")
                         if hasattr(available, "astimezone")
                         else str(available),
-                        "effective_at": effective.astimezone().isoformat().replace("+00:00", "Z")
+                        "effective_at": effective.astimezone(timezone.utc)
+                        .isoformat()
+                        .replace("+00:00", "Z")
                         if hasattr(effective, "astimezone")
                         else str(effective),
                     }
                 )
         except ResearchStoreError:
-            return []
-        return rows
+            return [], "UNAVAILABLE"
+        return rows, "AVAILABLE"
 
     def _owner_attention(
         self, model: Mapping[str, Any], trading: Mapping[str, Any]
     ) -> dict[str, Any]:
         cursor_state = load_cursor(self.root)
-        research_view = None
         discovery, _error = self.research_projection_discovery()
         try:
             research_view = self.research_overview()
         except Exception:
-            research_view = None
+            research_view = {
+                "completeness": "UNAVAILABLE",
+                "sources": [],
+                "needs_attention": [],
+            }
+        records, records_status = self._research_change_records()
         return compose_owner_attention(
             research=research_view,
             trading=trading,
             runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
             cockpit=model.get("cockpit") if isinstance(model.get("cockpit"), dict) else None,
-            research_records=self._research_change_records(),
+            research_records=records,
+            research_records_status=records_status if records_status in {"UNAVAILABLE", "INVALID"} else None,
             research_discovery=discovery,
             cursor=cursor_state.get("cursor"),
             cursor_status=str(cursor_state.get("status") or "MISSING"),

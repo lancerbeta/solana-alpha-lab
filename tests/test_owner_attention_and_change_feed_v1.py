@@ -19,14 +19,19 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication  # noqa: E402
 from solana_alpha_lab.factory.operational_store import OperationalStore  # noqa: E402
-from solana_alpha_lab.factory.owner_daily_attention import compose_owner_attention  # noqa: E402
+from solana_alpha_lab.factory.owner_daily_attention import (  # noqa: E402
+    CHANGE_FEED_LIMIT,
+    compose_owner_attention,
+    persistable_watermarks,
+)
+from solana_alpha_lab.factory.owner_language import SURFACE_COPY  # noqa: E402
 from solana_alpha_lab.factory.owner_review_cursor import (  # noqa: E402
     cursor_path,
     load_cursor,
     persist_cursor,
 )
 from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime_config  # noqa: E402
-from solana_alpha_lab.factory.workbench import COMMANDS, serve  # noqa: E402
+from solana_alpha_lab.factory.workbench import COMMANDS, _page, serve  # noqa: E402
 from solana_alpha_lab.factory_semantic_operability import (  # noqa: E402
     load_semantic_catalog_views,
     load_semantic_projection,
@@ -384,6 +389,297 @@ class OwnerAttentionAndChangeFeedV1Tests(unittest.TestCase):
                 },
             )
             self.assertIn("STALE_REVIEW_SNAPSHOT", body)
+
+    def test_research_fail_is_p1_not_all_clear(self) -> None:
+        projection = compose_owner_attention(
+            research={"completeness": "UNAVAILABLE", "sources": [], "needs_attention": []}
+        )
+        self.assertEqual(projection["coverage"][0]["CURRENT_STATE"], "UNAVAILABLE")
+        self.assertEqual(projection["coverage"][0]["CHANGE_HISTORY"], "UNAVAILABLE")
+        self.assertEqual(projection["current_attention"][0]["priority"], "P1")
+        self.assertEqual(projection["current_attention"][0]["attention_code"], "SOURCE_UNAVAILABLE")
+        self.assertFalse(projection["all_clear"])
+        body = _page(
+            {"owner_attention": projection, "cockpit": {}, "runtime": {}},
+            surface="HOME",
+        ).decode("utf-8")
+        self.assertNotIn(SURFACE_COPY["HOME"]["do_nothing"], body)
+
+    def test_git_panel_does_not_mark_research_change_history(self) -> None:
+        projection = compose_owner_attention(
+            research={
+                "sources": [
+                    {"source_id": "SRC-EXPERIMENT-SPECS", "status": "AVAILABLE"},
+                    {"source_id": "SRC-RESEARCH-STORE", "status": "NOT_PRESENT"},
+                ]
+            }
+        )
+        research = projection["coverage"][0]
+        self.assertEqual(research["CURRENT_STATE"], "PARTIAL")
+        self.assertEqual(research["CHANGE_HISTORY"], "NOT_PRESENT")
+        self.assertNotEqual(research["CHANGE_HISTORY"], "AVAILABLE")
+        previous = {
+            "sources": {
+                "RESEARCH": {
+                    "change_available_at": "2026-09-01T00:00:00Z",
+                    "native_identity": "REC-KEEP",
+                }
+            }
+        }
+        out = persistable_watermarks(
+            projection["review_snapshot"],
+            previous=previous,
+            coverage=projection["coverage"],
+        )
+        self.assertEqual(out["RESEARCH"]["native_identity"], "REC-KEEP")
+
+    def test_success_state_is_do_nothing_with_visible_coverage(self) -> None:
+        projection = compose_owner_attention(
+            research={
+                "sources": [{"source_id": "SRC-RESEARCH-STORE", "status": "AVAILABLE"}],
+                "needs_attention": [],
+            },
+            trading={"source_status": "PRESENT", "attention": [], "recent_changes": []},
+            runtime={"verdict": "RUNTIME_PROVED_BACKUP_UNKNOWN"},
+            cursor_status="VALID",
+            cursor={"sources": {}},
+        )
+        self.assertEqual(projection["current_attention"], [])
+        self.assertTrue(projection["all_clear"])
+        self.assertFalse(projection["healthy_claim"])
+        self.assertEqual(projection["coverage"][0]["CHANGE_HISTORY"], "AVAILABLE")
+        self.assertEqual(projection["coverage"][2]["CHANGE_HISTORY"], "STATE_ONLY")
+        body = _page(
+            {"owner_attention": projection, "cockpit": {}, "runtime": {}},
+            surface="HOME",
+        ).decode("utf-8")
+        self.assertIn(SURFACE_COPY["HOME"]["do_nothing"], body)
+        self.assertIn(SURFACE_COPY["HOME"]["coverage"], body)
+
+    def test_research_change_feed_is_bounded_and_incomplete(self) -> None:
+        records = [
+            {
+                "record_id": f"REC-{index:02d}",
+                "record_kind": "RESEARCH_EVENT",
+                "first_reliable_available_at": f"2026-09-07T{index:02d}:00:00Z",
+                "effective_at": f"2026-09-01T{index:02d}:00:00Z",
+            }
+            for index in range(1, 16)
+        ]
+        projection = compose_owner_attention(
+            research={"sources": [{"source_id": "SRC-RESEARCH-STORE", "status": "AVAILABLE"}]},
+            research_records=records,
+            cursor_status="VALID",
+            cursor={
+                "sources": {
+                    "RESEARCH": {
+                        "change_available_at": "2026-09-01T00:00:00Z",
+                        "native_identity": "REC-OLD",
+                    }
+                }
+            },
+        )
+        self.assertLessEqual(len(projection["changes"]), CHANGE_FEED_LIMIT)
+        self.assertEqual(projection["review"]["code"], "CHANGE_HISTORY_GAP")
+        self.assertFalse(projection["all_clear"])
+        self.assertFalse(projection["review_snapshot"]["history_complete"])
+
+    def test_research_conflicts_keep_locator_identity(self) -> None:
+        projection = compose_owner_attention(
+            research={
+                "sources": [{"source_id": "SRC-RESEARCH-STORE", "status": "AVAILABLE"}],
+                "needs_attention": [
+                    {
+                        "locator": {"entity_id": "ENT-A"},
+                        "display_state": "CONFLICT",
+                        "title": "conflict a",
+                        "next_safe_action": "OPEN_RESEARCH",
+                    },
+                    {
+                        "locator": {"entity_id": "ENT-B"},
+                        "display_state": "CONFLICT",
+                        "title": "conflict b",
+                        "next_safe_action": "OPEN_RESEARCH",
+                    },
+                    {
+                        "blocker": "SOURCE_INVALID",
+                        "source_id": "SRC-A",
+                        "title": "invalid a",
+                        "next_safe_action": "OPEN_RESEARCH",
+                    },
+                    {
+                        "blocker": "SOURCE_INVALID",
+                        "source_id": "SRC-B",
+                        "title": "invalid b",
+                        "next_safe_action": "OPEN_RESEARCH",
+                    },
+                ],
+            }
+        )
+        keys = {item["source_native_identity"] for item in projection["current_attention"]}
+        self.assertEqual(keys, {"ENT-A", "ENT-B", "SRC-A", "SRC-B"})
+        self.assertTrue(all(item["priority"] == "P1" for item in projection["current_attention"]))
+
+    def test_same_native_keeps_distinct_codes(self) -> None:
+        projection = compose_owner_attention(
+            trading={
+                "source_status": "PRESENT",
+                "attention": [
+                    _ops_attention("UNRESOLVED_POSITION", "POS-1"),
+                    _ops_attention("EXIT_REQUIRED", "POS-1"),
+                    {
+                        "code": "BOT_DRAINING",
+                        "EVIDENCE": "bot.status=DRAINING:BOT-A",
+                        "WHY_NOW": "drain a",
+                        "IMPACT": "risk",
+                        "NEXT_SAFE_ACTION": "WAIT_DRAIN",
+                    },
+                    {
+                        "code": "BOT_DRAINING",
+                        "EVIDENCE": "bot.status=DRAINING:BOT-B",
+                        "WHY_NOW": "drain b",
+                        "IMPACT": "risk",
+                        "NEXT_SAFE_ACTION": "WAIT_DRAIN",
+                    },
+                ],
+            }
+        )
+        codes = {(item["attention_code"], item["source_native_identity"]) for item in projection["current_attention"]}
+        self.assertEqual(
+            codes,
+            {
+                ("UNRESOLVED_POSITION", "POS-1"),
+                ("EXIT_REQUIRED", "POS-1"),
+                ("BOT_DRAINING", "bot.status=DRAINING:BOT-A"),
+                ("BOT_DRAINING", "bot.status=DRAINING:BOT-B"),
+            },
+        )
+
+    def test_ops_window_hole_does_not_advance_watermark(self) -> None:
+        events = [
+            {
+                "event_id": f"EVT-{index:02d}",
+                "event_type": "POSITION_TRANSITION",
+                "created_at": f"2026-09-07T{index:02d}:00:00Z",
+            }
+            for index in range(10, 22)
+        ]
+        cursor = {
+            "sources": {
+                "OPERATIONS": {
+                    "change_available_at": "2026-09-01T00:00:00Z",
+                    "native_identity": "EVT-OLD",
+                }
+            }
+        }
+        projection = compose_owner_attention(
+            trading={"source_status": "PRESENT", "attention": [], "recent_changes": events},
+            cursor=cursor,
+            cursor_status="VALID",
+        )
+        self.assertEqual(projection["review"]["code"], "CHANGE_HISTORY_GAP")
+        self.assertEqual(projection["coverage"][1]["CHANGE_HISTORY"], "UNAVAILABLE")
+        out = persistable_watermarks(
+            projection["review_snapshot"],
+            previous=cursor,
+            coverage=projection["coverage"],
+        )
+        self.assertEqual(out["OPERATIONS"]["native_identity"], "EVT-OLD")
+
+    def test_empty_live_watermark_keeps_previous(self) -> None:
+        previous = {
+            "sources": {
+                "RESEARCH": {
+                    "change_available_at": "2026-09-01T00:00:00Z",
+                    "native_identity": "REC-KEEP",
+                }
+            }
+        }
+        snapshot = {
+            "history_complete": True,
+            "sources": {
+                "RESEARCH": {
+                    "change_available_at": None,
+                    "native_identity": None,
+                },
+                "OPERATIONS": {},
+                "SYSTEM": {},
+            },
+        }
+        coverage = [
+            {"source_domain": "RESEARCH", "CURRENT_STATE": "AVAILABLE", "CHANGE_HISTORY": "AVAILABLE"},
+            {"source_domain": "OPERATIONS", "CURRENT_STATE": "NOT_PRESENT", "CHANGE_HISTORY": "NOT_PRESENT"},
+            {"source_domain": "SYSTEM", "CURRENT_STATE": "PARTIAL", "CHANGE_HISTORY": "STATE_ONLY"},
+        ]
+        out = persistable_watermarks(snapshot, previous=previous, coverage=coverage)
+        self.assertEqual(out["RESEARCH"]["native_identity"], "REC-KEEP")
+
+    def test_snapshot_hash_includes_change_identities(self) -> None:
+        research = {"sources": [{"source_id": "SRC-RESEARCH-STORE", "status": "AVAILABLE"}]}
+        first = compose_owner_attention(
+            research=research,
+            research_records=[
+                {
+                    "record_id": "REC-A",
+                    "record_kind": "RESEARCH_EVENT",
+                    "first_reliable_available_at": "2026-09-07T10:00:00Z",
+                },
+                {
+                    "record_id": "REC-C",
+                    "record_kind": "RESEARCH_EVENT",
+                    "first_reliable_available_at": "2026-09-07T12:00:00Z",
+                },
+            ],
+            cursor_status="VALID",
+            cursor={"sources": {}},
+        )
+        second = compose_owner_attention(
+            research=research,
+            research_records=[
+                {
+                    "record_id": "REC-A",
+                    "record_kind": "RESEARCH_EVENT",
+                    "first_reliable_available_at": "2026-09-07T10:00:00Z",
+                },
+                {
+                    "record_id": "REC-B",
+                    "record_kind": "RESEARCH_EVENT",
+                    "first_reliable_available_at": "2026-09-07T11:00:00Z",
+                },
+                {
+                    "record_id": "REC-C",
+                    "record_kind": "RESEARCH_EVENT",
+                    "first_reliable_available_at": "2026-09-07T12:00:00Z",
+                },
+            ],
+            cursor_status="VALID",
+            cursor={"sources": {}},
+        )
+        self.assertNotEqual(first["review_snapshot_sha256"], second["review_snapshot_sha256"])
+
+    def test_newness_normalizes_timezone_offsets(self) -> None:
+        cursor = {
+            "sources": {
+                "RESEARCH": {
+                    "change_available_at": "2026-09-07T08:00:00Z",
+                    "native_identity": "REC-OLD",
+                }
+            }
+        }
+        projection = compose_owner_attention(
+            research={"sources": [{"source_id": "SRC-RESEARCH-STORE", "status": "AVAILABLE"}]},
+            research_records=[
+                {
+                    "record_id": "REC-NEW",
+                    "record_kind": "RESEARCH_EVENT",
+                    "first_reliable_available_at": "2026-09-07T10:00:00+03:00",
+                    "effective_at": "2026-09-06T08:00:00+03:00",
+                }
+            ],
+            cursor=cursor,
+            cursor_status="VALID",
+        )
+        self.assertEqual(len(projection["changes"]), 0)
 
     def test_semantic_daily_attention_not_delivery_gate(self) -> None:
         projection = load_semantic_projection(ROOT)
