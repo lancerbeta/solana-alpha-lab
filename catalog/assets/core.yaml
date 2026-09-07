@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: c084f0cf216521db9376c78f1da49fce12bacef808274e32f224330b90410304}
+  integrity: {kind: sha256, sha256: 452ca0dfc3b5d1122bea023cd42e9a06b9da7ad13ac508553cead96487a847d4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25726,7 +25726,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: 3b03b31c4dfb10acbe1d89bac269a26bd35dd7d70d858d50520334b409e703dd}
+  integrity: {kind: sha256, sha256: d5afd1b0c02c435900b50a15c1cc7e58c012434946517bab18a96748d7e7e2fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -26324,7 +26324,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_OWNER_COCKPIT_LITE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_v1_owner_cockpit.py', repository_path: tests/test_factory_v1_owner_cockpit.py}
-  integrity: {kind: sha256, sha256: fd1ff3ab557f0caf43a242b0a67e70952edfb286edca99e21e83d2ccaba1629b}
+  integrity: {kind: sha256, sha256: 9fd7f9d90c8ad778c1b8b7d3275695a8cbff693d46cf072feee53edc6d471327}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-COCKPIT-001}
@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 96134901b838dbc392c1bc47284be50b3cfb387b3261871b3dbc0a57f65b6c9d}
+  integrity: {kind: sha256, sha256: 8e07884322b0ee7651b74fc78a09fc3a0ccefe87df9f75fd43fd74850078bcf3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -34141,7 +34141,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 7a1596c1809011b2fb99f54391d79e7e347551892db5fab2ce92f8a7022ec1a8}
+  integrity: {kind: sha256, sha256: a64089ae4f5e0575597d251ff458854adb53cf7081d7cc9425a51de3376d2a0a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34248,7 +34248,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 81b18b0d46fcfdf78d6bb78ea0bef414b621ef1f67a62fb02ab6777f70446e49}
+  integrity: {kind: sha256, sha256: f2c5b33ef7d9a22378c8a49607921903c944e9cc774df37727028ea15ab40f1f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34266,7 +34266,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 1d938e82a8a86569f0cf4763d054ee48792e5d9cd22238e2d56c67b1f4a9590a}
+  integrity: {kind: sha256, sha256: 4b8d5c1f09af075f33265d93d7ff658a12f9c275d040b6b9b05427bc3f292a8a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -35606,7 +35606,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: 61d2a60d8bcb9912178cd9c79ac7ace22d02565f5a010542bd62acb213530f7b}
+  integrity: {kind: sha256, sha256: 0f3a062b59e4dfef123b5cb9b926f721ec215d9935c60397887f3ba6bbd1cea0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35899,7 +35899,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: OWNER_ATTENTION_AND_CHANGE_FEED_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_daily_attention.py', repository_path: src/solana_alpha_lab/factory/owner_daily_attention.py}
-  integrity: {kind: sha256, sha256: 7e76a9aa483527c30a5ec10c766ad686e246b51fda3ab51c7c886e12949b9099}
+  integrity: {kind: sha256, sha256: 5a3d82a7d63e8130c4338ed49b532fac0e61118ec27e1cd1e370fc66bccc38a6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001}
@@ -35926,4 +35926,101 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [ATTENTION_VERTICAL, STALE_REVIEW_SNAPSHOT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for /system current-health composition over existing collector, systemd and durability sources.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md', repository_path: docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md}
+  integrity: {kind: sha256, sha256: c79f6a11b04683d888153bacf2e9dce1a52799a6a0ab1c8603e7c26cb8ca2e46}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: DOC-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: contains, target_asset_id: MODULE-SYSTEM-OPERABILITY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: consumes, target_asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001}
+  - {relation_type: consumes, target_asset_id: DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [SYSTEM_OPERABILITY, SERVING_NOW]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: DOC-SYSTEM-OPERABILITY-SURFACE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Human contract for derived SystemOperabilityProjectionV2, GET purity and recovery routing without a monitoring platform.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
+  location: {kind: git_path, logical_uri: 'repo://docs/contracts/system_operability_surface_v2.md', repository_path: docs/contracts/system_operability_surface_v2.md}
+  integrity: {kind: sha256, sha256: 48c8e5f0359733a55409792efffd5ad12fb4fc9dd301c783dd926c78ef8eed39}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
+  - {relation_type: consumes, target_asset_id: DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
+  evidence: []
+  search_terms: [SEM-REMOTE-OPS-RECOVERY, OK_OBSERVED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-SYSTEM-OPERABILITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Derived SystemOperabilityProjectionV2 composer over existing collector packet and systemd readback.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/system_operability.py', repository_path: src/solana_alpha_lab/factory/system_operability.py}
+  integrity: {kind: sha256, sha256: c6e55f47dde7ea5abf385d7929f24836740713e27ab610d2f86ede58c75ed2ed}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-COLLECTOR-OPERATIONAL-PACKET-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-WORKBENCH-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SystemOperabilityProjectionV2, SOURCE_READONLY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-SYSTEM-OPERABILITY-SURFACE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical acceptance for observe/diagnose/route loops, GET purity and fake process-alive removal.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
+  location: {kind: git_path, logical_uri: 'repo://tests/test_system_operability_surface_v2.py', repository_path: tests/test_system_operability_surface_v2.py}
+  integrity: {kind: sha256, sha256: 1594c02ecff39448e16dbc2c198dab252e355c9b083380c80db6f6f54f78d669}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-SYSTEM-OPERABILITY-SURFACE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SYSTEM_VERTICAL, GET_NON_MUTATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-SHOW-SYSTEM-OPERABILITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI JSON readback of SystemOperabilityProjectionV2 using the same composer as Workbench /system.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-07'
+  truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
+  location: {kind: git_path, logical_uri: 'repo://scripts/show_system_operability.py', repository_path: scripts/show_system_operability.py}
+  integrity: {kind: sha256, sha256: 3544939617155b962a6e87470e26e65b14ac15e03915ac16f16a7b2abde3f65d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-SYSTEM-OPERABILITY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [show_system_operability, JSON_READBACK]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

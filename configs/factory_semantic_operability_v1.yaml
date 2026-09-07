@@ -235,16 +235,19 @@ routes:
     related_route_ids: [SEM-PRIOR-WORK, SEM-LIVE-COLLECTION]
 
   - semantic_route_id: SEM-REMOTE-OPS-RECOVERY
-    purpose: Factory remote operations, backup/durability, SNAPSHOT_PLUS_DELTA compact delta encoding, storage economy, reconstruction, incidents and recovery. Git is capability; live health needs gated readback.
+    purpose: Factory remote operations, unattended recovery, /system current-health composition, backup/durability, incidents and recovery. Git is capability; live health needs gated readback.
     owner_questions:
       - Where is the Factory VPS?
       - How do I backup / restore / recover remote Factory?
       - почему архив не загрузился / why Drive archive failed?
       - What will Telegram send (daily / incident / recovered)?
       - How do I know the VPS died / host unreachable?
-      - HOT90 runtime / SNAPSHOT_PLUS_DELTA compact delta encoding / reconstruction
+      - HOT90 runtime / SNAPSHOT_PLUS_DELTA compact delta encoding / mutable backup / storage economy / reconstruction
       - куда уезжает immutable RDP archive?
       - как восстановить Factory?
+      - Is Factory system okay right now?
+      - Can I leave Factory unattended?
+      - Почему /system показывает DEGRADED?
     search_terms:
       - remote ops
       - VPS
@@ -256,22 +259,22 @@ routes:
       - VPS недоступен
       - host unreachable
       - как восстановить Factory
-      - HOT90 runtime
-      - mutable backup
-      - SNAPSHOT_PLUS_DELTA
-      - compact delta encoding
-      - storage economy
-      - reconstruction
+      - Is Factory system okay right now?
+      - Can I leave Factory unattended?
+      - Что сейчас с VPS и сбором?
+      - Какой SHA сейчас реально запущен?
+      - How do I recover a failed Factory timer?
+      - Почему /system показывает DEGRADED?
     consumers: [GOAL-OWNER, FACTORY-001]
     root_binding_ids: [ACTIVE-FACTORY-REMOTE-OPERATIONS]
-    root_asset_ids: [DOC-FACTORY-REMOTE-HOST-001, DOC-FACTORY-UNATTENDED-OPERABILITY-001]
+    root_asset_ids: [DOC-FACTORY-REMOTE-HOST-001, DOC-FACTORY-UNATTENDED-OPERABILITY-001, DOC-SYSTEM-OPERABILITY-SURFACE-001]
     query_recipe_ids: []
     status_plane: MIXED
     runtime_resolution:
       mode: EXTERNAL_GATED_READBACK
       operator_asset_ids: [DOC-FACTORY-REMOTE-HOST-001, DOC-FACTORY-UNATTENDED-OPERABILITY-001]
     forge_visibility: EXCLUDE
-    related_route_ids: [SEM-LIVE-COLLECTION, SEM-AUTHORITY-BOUNDARIES]
+    related_route_ids: [SEM-LIVE-COLLECTION, SEM-AUTHORITY-BOUNDARIES, SEM-OWNER-DAILY-ATTENTION]
 
   - semantic_route_id: SEM-AUTHORITY-BOUNDARIES
     purpose: Explains where authority is resolved. Never grants provider, deploy, spend, merge or remote mutation.
@@ -284,6 +287,7 @@ routes:
       - могу ли я вызвать провайдера / задеплоить / потратить
       - May I activate/deploy/spend?
       - What is OWNER_ATTENTION_GATE_V2?
+      - May I restart or deploy?
     search_terms:
       - authority
       - owner attention
@@ -298,6 +302,7 @@ routes:
       - spend
       - OWNER_ATTENTION_GATE_V2
       - PR merge
+      - restart
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids: []
     root_asset_ids:

@@ -55,12 +55,28 @@ def _now(clock: datetime | None = None) -> str:
 
 
 class ObservationScheduleStore:
-    def __init__(self, path: Path) -> None:
+    def __init__(self, path: Path, *, readonly: bool = False) -> None:
         if path.is_absolute() is False:
             raise ObservationScheduleStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
-        path.parent.mkdir(parents=True, exist_ok=True)
         self.path = path
+        self.readonly = readonly
         self._lease_token: str | None = None
+        if readonly:
+            if path.exists() and path.is_file() is False:
+                raise ObservationScheduleStoreError("SOURCE_INVALID")
+            if path.is_file() is False:
+                raise ObservationScheduleStoreError("SOURCE_NOT_PRESENT")
+            try:
+                self._conn = sqlite3.connect(
+                    path.resolve().as_uri() + "?mode=ro&immutable=1",
+                    uri=True,
+                    check_same_thread=False,
+                )
+                self._conn.row_factory = sqlite3.Row
+            except sqlite3.Error as exc:
+                raise ObservationScheduleStoreError("SOURCE_UNAVAILABLE") from exc
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
         try:
             self._connect()
         except Exception:
@@ -362,12 +378,17 @@ class ObservationScheduleStore:
     def close(self) -> None:
         self._conn.close()
 
+    def _require_writable(self) -> None:
+        if getattr(self, "readonly", False):
+            raise ObservationScheduleStoreError("SOURCE_READONLY")
+
     def _require_write_lease(self, clock: datetime | None = None) -> None:
         """Fence mutations after another process replaces or expires our lease.
 
         While this process holds the token, every write renews expires_at so a
         long tick cannot lose the fence mid-mutation against the 60s timer.
         """
+        self._require_writable()
         now_text = _now(clock)
         if self._lease_token is None:
             active = self._conn.execute(
@@ -417,6 +438,7 @@ class ObservationScheduleStore:
         self._conn.commit()
 
     def acquire_lease(self, owner: str, *, clock: datetime | None = None) -> str | None:
+        self._require_writable()
         now = clock.astimezone(UTC) if clock is not None else datetime.now(UTC)
         now_text = render_utc(now)
         expires = render_utc(now + timedelta(seconds=LEASE_SECONDS))
@@ -2082,6 +2104,7 @@ class ObservationScheduleStore:
         self._conn.commit()
 
     def backup_to(self, dest: Path) -> None:
+        self._require_writable()
         if dest.is_absolute() is False:
             raise ObservationScheduleStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
         dest.parent.mkdir(parents=True, exist_ok=True)

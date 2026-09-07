@@ -51,7 +51,7 @@ HEADINGS = {
         "Экономика",
         "Есть ли уже экономический результат и насколько ему можно доверять?",
     ),
-    "/system": ("Система", "Система сейчас в каком состоянии и что не доказано?"),
+    "/system": ("Система", "Можно ли сейчас оставить Factory работать без меня?"),
 }
 
 GENERIC_H1 = "Factory v1 — локальный срез владельца"
@@ -176,11 +176,14 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                     economics,
                 )
                 system = pages["/system"]
-                self.assertIn("Runtime", system)
-                self.assertIn("DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN", system)
-                self.assertIn("process_alive", system)
+                self.assertIn("SYSTEM_OPERABILITY_SURFACE_V2", system)
                 self.assertIn("не означает, что система исправна", system)
                 self.assertNotIn("<h1>Система исправна</h1>", system)
+                self.assertNotIn("DEGRADED_PROCESS_ALIVE_BACKUP_UNKNOWN", system)
+                self.assertNotIn('name="command" value="START"', system)
+                self.assertNotIn('name="command" value="STOP"', system)
+                self.assertIn("HTTP_SELF", system)
+                self.assertIn("MANAGED_WORKBENCH_UNIT", system)
                 self.assertIn("Required features", home)
                 home_note = re.search(r"git_archaeology_required=(true|false|UNKNOWN)", home)
                 research_note = re.search(
@@ -230,14 +233,32 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
 
     def test_exact_tokens_are_not_rewritten_as_missing_or_degraded(self) -> None:
         proved = {
-            "process_alive": True,
-            "backup_status": "EXPLICIT_UNKNOWN",
-            "local_rollback_snapshot": "PRESENT",
-            "verdict": "RUNTIME_PROVED_BACKUP_UNKNOWN",
-            "next_safe_action": "INSPECT_SYSTEM",
             "deploy_version": "test-deploy",
+            "current_health_owner": "SYSTEM_OPERABILITY_SURFACE_V2",
         }
-        system_html = _system_section(proved)
+        system = {
+            "state": "OK_OBSERVED",
+            "identity": {
+                "deployed_sha": "a" * 40,
+                "git_head": "a" * 40,
+                "deploy_relation": "MATCH",
+                "capability_deploy_version": "test-deploy",
+            },
+            "processes": {
+                "http_self": "SERVING_NOW",
+                "managed_workbench_unit": "active",
+                "required_timers": {"factory-observation-schedule.timer": "active"},
+            },
+            "collection": {"source_status": "PRESENT", "collector_verdict": "OK"},
+            "storage": {},
+            "durability": {},
+            "alerting": {"status": "NOT_CONFIGURED"},
+            "coverage": {"HTTP_SELF": {"status": "SERVING"}},
+            "attention": [],
+            "next_safe_action": "LEAVE_UNATTENDED",
+            "out_of_band_host_reachability": {"status": "NOT_CONFIGURED"},
+        }
+        system_html = _system_section(system)
         home_html = _home_section(
             {
                 "runtime": proved,
@@ -250,26 +271,22 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
             },
             copy_blocks=[],
         )
-        self.assertIn("есть", system_html)
+        self.assertIn("MATCH", system_html)
+        self.assertIn("SERVING_NOW", system_html)
         self.assertIn("PRESENT", system_html)
-        self.assertNotIn("отсутствует", system_html)
-        proved_gloss = "процесс доказан, бэкап неизвестен"
-        self.assertIn(proved_gloss, system_html)
-        self.assertIn(proved_gloss, home_html)
+        self.assertIn("test-deploy", home_html)
         self.assertNotIn("деградирован", system_html)
         self.assertNotIn("деградирован", home_html)
-        self.assertEqual(system_html.count(proved_gloss), home_html.count(proved_gloss))
         self.assertIn("HYP-ORDINARY-PRICE-PATH-BUY-PRESSURE-V1", home_html)
         self.assertIn("DO_NOT_PROMOTE", home_html)
         self.assertIn("Required features", home_html)
         self.assertIn("Не продвигать в стратегию", home_html)
         missing_ops = _operations_section({"operations": {}})
-        missing_ops = _operations_section({"operations": {}})
         self.assertIn("UNKNOWN", missing_ops)
         self.assertNotIn("не приостановлены", missing_ops)
         paused = _operations_section({"operations": {"entries_paused": False}})
         self.assertIn("не приостановлены", paused)
-        missing_process = _system_section({"verdict": "UNHEALTHY_NOT_RUNNING"})
+        missing_process = _system_section({})
         self.assertIn("неизвестно", missing_process)
         self.assertIn("UNKNOWN", missing_process)
 

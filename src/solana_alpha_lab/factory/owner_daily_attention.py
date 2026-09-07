@@ -108,7 +108,7 @@ def _priority_for(code: str, *, source_domain: str) -> str:
     if code in INFO_CODES:
         return "INFO"
     if source_domain == "SYSTEM":
-        return ""
+        return "P1"
     return "UNKNOWN"
 
 
@@ -136,7 +136,7 @@ def _item(
         "source_owner": {
             "RESEARCH": "RESEARCH_LIFECYCLE_WORKBENCH_V1",
             "OPERATIONS": "TRADING_OPERATIONS_WORKBENCH_V2",
-            "SYSTEM": "FACTORY_V1_RUNTIME_PROJECTION",
+            "SYSTEM": "SYSTEM_OPERABILITY_SURFACE_V2",
         }[source_domain],
         "source_native_identity": native_identity or code,
         "entity_locator": native_identity or None,
@@ -168,7 +168,8 @@ def _locator_entity(row: Mapping[str, Any]) -> str:
 
 def _attention_code(row: Mapping[str, Any]) -> str:
     code = _text(
-        row.get("code")
+        row.get("attention_code")
+        or row.get("code")
         or row.get("id")
         or row.get("blocker")
         or row.get("gap_code")
@@ -188,7 +189,8 @@ def _attention_code(row: Mapping[str, Any]) -> str:
 
 def _native_identity(row: Mapping[str, Any], code: str) -> str:
     identity = _text(
-        row.get("source_native_identity")
+        row.get("native_identity")
+        or row.get("source_native_identity")
         or row.get("entity_id")
         or row.get("position_id")
         or row.get("bot_instance_id")
@@ -343,7 +345,26 @@ def _operations_coverage(trading: Mapping[str, Any] | None) -> dict[str, Any]:
     return _coverage_row("OPERATIONS", current="INVALID", history="UNAVAILABLE")
 
 
-def _system_coverage(runtime: Mapping[str, Any] | None) -> dict[str, Any]:
+def _system_coverage(
+    runtime: Mapping[str, Any] | None,
+    system: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    if isinstance(system, dict) and system:
+        groups = system.get("coverage") if isinstance(system.get("coverage"), dict) else {}
+        collector = _text((groups.get("COLLECTOR") or {}).get("status"))
+        systemd = _text((groups.get("SYSTEMD") or {}).get("status"))
+        if collector in {"UNAVAILABLE", "INVALID"}:
+            current = collector
+        elif systemd == "UNAVAILABLE" or collector in {"NOT_PRESENT", "PARTIAL", ""}:
+            current = "PARTIAL"
+        else:
+            current = "AVAILABLE"
+        return _coverage_row(
+            "SYSTEM",
+            current=current,
+            history="STATE_ONLY",
+            reason="CHANGE_HISTORY_UNAVAILABLE",
+        )
     if not isinstance(runtime, dict) or not runtime:
         return _coverage_row(
             "SYSTEM",
@@ -593,6 +614,7 @@ def compose_owner_attention(
     research: Mapping[str, Any] | None = None,
     trading: Mapping[str, Any] | None = None,
     runtime: Mapping[str, Any] | None = None,
+    system: Mapping[str, Any] | None = None,
     cockpit: Mapping[str, Any] | None = None,
     research_records: list[dict[str, Any]] | None = None,
     research_records_status: str | None = None,
@@ -605,7 +627,7 @@ def compose_owner_attention(
             research, research_discovery, records_status=research_records_status
         ),
         "OPERATIONS": _operations_coverage(trading),
-        "SYSTEM": _system_coverage(runtime),
+        "SYSTEM": _system_coverage(runtime, system),
     }
     research_status = coverage["RESEARCH"]["CURRENT_STATE"]
     ops_status = coverage["OPERATIONS"]["CURRENT_STATE"]
@@ -646,6 +668,13 @@ def compose_owner_attention(
     current.extend(
         _from_local_attention(
             cockpit_system,
+            source_domain="SYSTEM",
+            source_status=coverage["SYSTEM"]["CURRENT_STATE"],
+        )
+    )
+    current.extend(
+        _from_local_attention(
+            (system or {}).get("attention"),
             source_domain="SYSTEM",
             source_status=coverage["SYSTEM"]["CURRENT_STATE"],
         )

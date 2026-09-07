@@ -25,6 +25,9 @@ WATCH_REQUIRED_TIMERS = (
     "factory-hot90-closed-day-archive.timer",
     "factory-operability-watch.timer",
 )
+WATCH_WORKBENCH_UNIT = "factory-v1-workbench.service"
+SYSTEMD_READBACK_UNAVAILABLE = "SYSTEMD_READBACK_UNAVAILABLE"
+_UNIT_OK = frozenset({None, "", "active", SYSTEMD_READBACK_UNAVAILABLE})
 
 INCIDENT_GRACE_SECONDS = {
     "COLLECTOR_STALLED": 1800,
@@ -42,6 +45,7 @@ INCIDENT_GRACE_SECONDS = {
     "SUSTAINED_PROVIDER_FAILURE": 1800,
     "MATERIAL_COVERAGE_DEGRADATION": 1800,
     "REQUIRED_TIMER_FAILED": 900,
+    "WORKBENCH_SERVICE_DOWN": 0,
     "ALERTING_UNAVAILABLE": 0,
 }
 
@@ -85,9 +89,12 @@ def classify_incidents(
     units = unit_status or {}
     for unit in WATCH_REQUIRED_TIMERS:
         status = units.get(unit)
-        if status not in {None, "", "active"}:
+        if status not in _UNIT_OK:
             found["REQUIRED_TIMER_FAILED"] = f"{unit} is not active."
             break
+    workbench = units.get(WATCH_WORKBENCH_UNIT)
+    if workbench not in _UNIT_OK:
+        found["WORKBENCH_SERVICE_DOWN"] = f"{WATCH_WORKBENCH_UNIT} is not active."
     if "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED" in classes:
         found["MUTABLE_BACKUP_FAILED"] = "Mutable backup profile includes full Observation RDP."
     return found

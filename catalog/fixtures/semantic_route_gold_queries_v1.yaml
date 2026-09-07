@@ -251,3 +251,24 @@ queries:
 - query_id: SGQ-ANTI-AUTHORIZED-DEPLOY
   query: Am I authorized to deploy?
   required_top_route: SEM-AUTHORITY-BOUNDARIES
+- query_id: SGQ-SYSTEM-OKAY-NOW
+  query: Is Factory system okay right now?
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-SYSTEM-UNATTENDED
+  query: Can I leave Factory unattended?
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-SYSTEM-VPS-COLLECTION-RU
+  query: Что сейчас с VPS и сбором?
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-SYSTEM-DEGRADED
+  query: Почему /system показывает DEGRADED?
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-SYSTEM-DEPLOY-SHA
+  query: Какой SHA сейчас реально запущен?
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-SYSTEM-TIMER-RECOVER
+  query: How do I recover a failed Factory timer?
+  required_top_route: SEM-REMOTE-OPS-RECOVERY
+- query_id: SGQ-ANTI-RESTART-OR-DEPLOY
+  query: May I restart or deploy?
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
