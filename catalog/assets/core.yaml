@@ -35936,7 +35936,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md', repository_path: docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md}
-  integrity: {kind: sha256, sha256: c79f6a11b04683d888153bacf2e9dce1a52799a6a0ab1c8603e7c26cb8ca2e46}
+  integrity: {kind: sha256, sha256: 46db6793d387da182f856531cd3105549f40e2a22d4a2f2553150005cd44d6c1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-SYSTEM-OPERABILITY-SURFACE-001}
