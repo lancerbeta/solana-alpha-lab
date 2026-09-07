@@ -3,11 +3,13 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any, Mapping
 
 import yaml
 
+from solana_alpha_lab.factory.paper_plane import PaperPlaneError
 from solana_alpha_lab.factory.paper_shadow_operations import (
     build_economics_projection,
     build_operations_projection,
@@ -38,7 +40,6 @@ EVENT_STAGE = {
     "EXIT_UNRESOLVED": "EXIT",
     "RECONCILIATION": "RECONCILIATION",
 }
-CLOSE_COMMANDS = frozenset({"REQUEST_CLOSE_POSITION", "REQUEST_CLOSE_ALL"})
 COMMAND_SPECS = (
     (
         "PAUSE_NEW_ENTRIES",
@@ -243,8 +244,6 @@ def _build_traces(store: Any) -> list[dict[str, Any]]:
                 bucket[field] = value
         event_type = str(event.get("event_type") or "")
         stage = EVENT_STAGE.get(event_type)
-        if event_type == "OPERATOR_COMMAND_APPLIED" and payload.get("command_type") in CLOSE_COMMANDS:
-            stage = "EXIT"
         if stage:
             decision = payload.get("decision")
             if stage == "PRE_TRADE_RISK" and decision not in {None, "ALLOW"}:
@@ -346,7 +345,7 @@ def _contexts(
         if bot_id in seen_runtime:
             continue
         row = _bot_context(bot, operations, relation="RUNTIME_ONLY")
-        row["current_blocker"] = row.get("current_blocker") or "STRATEGY_VERSION_GAP"
+        row["current_blocker"] = "STRATEGY_VERSION_GAP"
         row["next_safe_action"] = "INSPECT_VERSION_GAP"
         contexts.append(row)
         attention.append(
@@ -380,6 +379,13 @@ def _bot_context(
     unresolved = _count_states(rows, {"UNRESOLVED"})
     open_positions = _count_states(rows, {"OPEN"})
     partial = _count_states(rows, {"PARTIAL"})
+    pnl_unknown = sum(
+        1
+        for row in rows
+        if row.get("pnl_status") == "UNKNOWN"
+        and str(row.get("state") or "")
+        in {"OPEN", "PARTIAL", "UNKNOWN", "EXIT_REQUIRED", "EXITING", "UNRESOLVED"}
+    )
     status = _text(bot.get("status"))
     paused = bool(int(bot.get("entries_paused") or 0))
     blocker = None
@@ -392,6 +398,9 @@ def _bot_context(
         nxt = "RESUME_WHEN_NOT_DRAINING"
     elif unknown:
         blocker = "POSITION_UNKNOWN"
+        nxt = "INSPECT_MARK"
+    elif pnl_unknown:
+        blocker = "PNL_UNKNOWN_OR_STALE"
         nxt = "INSPECT_MARK"
     elif exit_required:
         blocker = "EXIT_REQUIRED"
@@ -413,11 +422,46 @@ def _bot_context(
         "open_positions": open_positions,
         "partial_positions": partial,
         "unknown_positions": unknown,
+        "pnl_unknown_count": pnl_unknown,
         "exit_required": exit_required,
         "unresolved_positions": unresolved,
         "relation": relation,
         "current_blocker": blocker,
         "next_safe_action": nxt,
+    }
+
+
+def _idle_projection(
+    *,
+    git_strategies: list[dict[str, Any]],
+    contexts: list[dict[str, Any]],
+    attention: list[dict[str, str]],
+    status: str,
+    last_command: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    return {
+        "schema": SCHEMA,
+        "source_status": status,
+        "git_strategies": git_strategies,
+        "contexts": contexts,
+        "operations": None,
+        "economics": None,
+        "traces": [],
+        "attention": attention,
+        "commands": _command_cards(None),
+        "recent_changes": [],
+        "watchlist_status": WATCHLIST_STATUS,
+        "activation_path": ACTIVATION_PATH,
+        "last_command": dict(last_command) if last_command else None,
+        "non_claims": [
+            "NO_ALPHA",
+            "NO_LIVE",
+            "NO_REAL_MONEY",
+            "NO_OWNER_FCF",
+            "NO_DEPLOY",
+            "NO_PROVIDER",
+            "NO_WALLET",
+        ],
     }
 
 
@@ -452,34 +496,37 @@ def compose_trading_operations(
                     nxt="DO_NOT_BOOTSTRAP",
                 )
             ] + activation_attention
-        return {
-            "schema": SCHEMA,
-            "source_status": status,
-            "git_strategies": git_strategies,
-            "contexts": contexts,
-            "operations": None,
-            "economics": None,
-            "traces": [],
-            "attention": attention,
-            "commands": _command_cards(None),
-            "recent_changes": [],
-            "watchlist_status": WATCHLIST_STATUS,
-            "activation_path": ACTIVATION_PATH,
-            "last_command": dict(last_command) if last_command else None,
-            "non_claims": [
-                "NO_ALPHA",
-                "NO_LIVE",
-                "NO_REAL_MONEY",
-                "NO_OWNER_FCF",
-                "NO_DEPLOY",
-                "NO_PROVIDER",
-                "NO_WALLET",
-            ],
-        }
-    operations = build_operations_projection(store)
-    economics = build_economics_projection(store, operations=operations)
-    contexts, activation_attention = _contexts(git_strategies, operations)
-    traces = _build_traces(store)
+        return _idle_projection(
+            git_strategies=git_strategies,
+            contexts=contexts,
+            attention=attention,
+            status=status,
+            last_command=last_command,
+        )
+    try:
+        operations = build_operations_projection(store)
+        economics = build_economics_projection(store, operations=operations)
+        contexts, activation_attention = _contexts(git_strategies, operations)
+        traces = _build_traces(store)
+        recent = list(reversed(store.execution_events()[-12:]))
+    except (PaperPlaneError, sqlite3.Error, OSError, IndexError):
+        contexts, activation_attention = _contexts(git_strategies, None)
+        attention = [
+            _attention(
+                "RUNTIME_SOURCE_UNAVAILABLE",
+                why="Файл runtime есть, но схема или чтение несовместимы.",
+                impact="Нельзя считать ботов, позиции или команды.",
+                evidence="paper_plane_state.sqlite unreadable",
+                nxt="DO_NOT_BOOTSTRAP",
+            )
+        ] + activation_attention
+        return _idle_projection(
+            git_strategies=git_strategies,
+            contexts=contexts,
+            attention=attention,
+            status="UNAVAILABLE",
+            last_command=last_command,
+        )
     attention = list(operations.get("attention") or []) + activation_attention
     if any(row.get("blocker") == "RISK_BLOCK" for row in traces):
         attention.append(
@@ -520,7 +567,7 @@ def compose_trading_operations(
         "traces": traces,
         "attention": attention,
         "commands": _command_cards(operations),
-        "recent_changes": list(reversed(store.execution_events()[-12:])),
+        "recent_changes": recent,
         "watchlist_status": WATCHLIST_STATUS,
         "activation_path": ACTIVATION_PATH,
         "last_command": dict(last_command) if last_command else None,

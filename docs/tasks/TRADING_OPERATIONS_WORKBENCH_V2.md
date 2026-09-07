@@ -26,7 +26,9 @@ managed_write_set:
   - src/solana_alpha_lab/factory/workbench.py
   - src/solana_alpha_lab/factory/owner_language.py
   - src/solana_alpha_lab/factory/paper_plane.py
+  - src/solana_alpha_lab/factory/paper_shadow_operations.py
   - tests/test_trading_operations_workbench_v2.py
+  - tests/test_owner_operations_cockpit_v1.py
   - tests/test_factory_ordinary_market_hypothesis.py
   - tests/test_factory_semantic_operability.py
   - tests/test_owner_workbench_vertical_ux_foundation_v1.py

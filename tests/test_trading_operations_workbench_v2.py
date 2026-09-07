@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import sqlite3
 import sys
 import tempfile
 import unittest
@@ -359,6 +360,12 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
                 self.assertEqual(unknown["state"], "OPEN")
                 self.assertEqual(unknown["pnl_status"], "UNKNOWN")
                 self.assertIsNone(unknown["net_pnl_usd"])
+                self.assertGreater(ops["pnl_unknown_count"], 0)
+                codes = {
+                    item["code"]
+                    for item in app.read_model()["trading_operations"]["attention"]
+                }
+                self.assertIn("PNL_UNKNOWN_OR_STALE", codes)
                 reconciled = by_id[exit_id]
                 self.assertEqual(reconciled["state"], "RECONCILED")
                 body = _get(app, "/operations")
@@ -415,8 +422,60 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
                 )
                 self.assertEqual(applied["status"], "APPLIED")
                 self.assertEqual(paper.get_position(pid)["state"], "EXIT_REQUIRED")
+                traces = app.read_model()["trading_operations"]["traces"]
+                h_trace = next(
+                    row for row in traces if row.get("signal_decision_id") == "SIGDEC-OPS-V2-H"
+                )
+                self.assertEqual(h_trace["stages"]["POSITION"], "PROVEN")
+                self.assertEqual(h_trace["stages"]["EXIT"], "GAP")
             finally:
                 paper.close()
+
+    def test_h_get_then_command_sees_fresh_runtime(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            path = (root / "local/factory_v1/paper_plane_state.sqlite").resolve()
+            paper = PaperPlaneStore(path)
+            _enter(paper, "SIGDEC-OPS-V2-H2", decision_at="2026-09-03T12:10:00Z")
+            bot_id = paper.bots()[0]["bot_instance_id"]
+            paper.close()
+            app = FactoryApplication(root=root)
+            before = _get(app, "/operations")
+            self.assertNotIn("ENTRIES_PAUSED", before)
+            after = _post(
+                app,
+                "/operations",
+                {
+                    "command": "PAUSE_NEW_ENTRIES",
+                    "bot_instance_id": bot_id,
+                    "idempotency_key": "WB-OPS-V2-H2-PAUSE",
+                },
+            )
+            self.assertIn("PAUSE_NEW_ENTRIES", after)
+            self.assertIn("ENTRIES_PAUSED", after)
+            self.assertIn(f"open_set.{bot_id}", after)
+            reread = _get(app, "/operations")
+            self.assertIn("ENTRIES_PAUSED", reread)
+
+    def test_incompatible_schema_is_unavailable(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            path = (root / "local/factory_v1/paper_plane_state.sqlite").resolve()
+            path.parent.mkdir(parents=True, exist_ok=True)
+            conn = sqlite3.connect(path)
+            conn.execute("CREATE TABLE dummy (id INTEGER)")
+            conn.commit()
+            conn.close()
+            app = FactoryApplication(root=root)
+            trading = app.read_model(surface="OPERATIONS")["trading_operations"]
+            self.assertEqual(trading["source_status"], "UNAVAILABLE")
+            self.assertIn(
+                "RUNTIME_SOURCE_UNAVAILABLE",
+                {item["code"] for item in trading["attention"]},
+            )
+            body = _get(app, "/operations")
+            self.assertIn("RUNTIME_SOURCE_UNAVAILABLE", body)
+            self.assertNotIn('name="command" value="PAUSE_NEW_ENTRIES"', body)
 
     def test_j_same_mint_does_not_merge_contexts(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

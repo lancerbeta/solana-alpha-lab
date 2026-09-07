@@ -407,11 +407,17 @@ def _operations_section(model: dict[str, Any]) -> str:
         if isinstance(bot, dict)
     ) or f"<tr><td colspan=\"6\">{esc(surface_copy('OPERATIONS', 'no_bots'))}</td></tr>"
     snapshot = str(ops.get("open_position_set_sha256") or "")
+    by_bot_hashes = (
+        ops.get("open_position_set_sha256_by_bot")
+        if isinstance(ops.get("open_position_set_sha256_by_bot"), dict)
+        else {}
+    )
     bot_id = str(ops.get("bot") or "")
     bot_warning = ""
     bot_picker = ""
     if present and len(bots) == 1:
         bot_id = str(bots[0].get("bot_instance_id") or bot_id)
+        snapshot = str(by_bot_hashes.get(bot_id) or snapshot)
     elif present and len(bots) > 1:
         bot_id = ""
         options = "".join(
@@ -446,6 +452,7 @@ def _operations_section(model: dict[str, Any]) -> str:
             (surface_copy("OPERATIONS", "exit_required"), cell_html(ops.get("exit_required") if present else None)),
             (surface_copy("OPERATIONS", "unresolved"), cell_html(ops.get("unresolved_positions") if present else None)),
             ("unknown_positions", cell_html(ops.get("unknown_positions") if present else None)),
+            ("pnl_unknown", cell_html(ops.get("pnl_unknown_count") if present else None)),
             ("mode", now_mode),
         ]
     )
@@ -481,6 +488,12 @@ def _operations_section(model: dict[str, Any]) -> str:
             )
             + "</table>"
         )
+    hash_inputs = "".join(
+        f"<input type=\"hidden\" name=\"open_set.{esc(str(bid))}\" "
+        f"value=\"{esc(str(digest))}\">"
+        for bid, digest in by_bot_hashes.items()
+        if bid
+    )
     commands = ""
     if present and bots:
         commands = (
@@ -491,6 +504,7 @@ def _operations_section(model: dict[str, Any]) -> str:
                 or f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{esc(bot_id)}\">"
             )
             + f"<input type=\"hidden\" name=\"expected_open_position_set_sha256\" value=\"{esc(snapshot)}\">"
+            + hash_inputs
             + f"<p><label>{esc(surface_copy('OPERATIONS', 'position_id'))} "
             + "<input name=\"position_id\"></label></p>"
             + f"<p><label>{esc(surface_copy('OPERATIONS', 'idempotency'))} "
@@ -1595,7 +1609,10 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                     if command == "REQUEST_CLOSE_POSITION":
                         payload["position_id"] = (fields.get("position_id") or [""])[0]
                     if command == "REQUEST_CLOSE_ALL":
-                        payload["expected_open_position_set_sha256"] = (
+                        scoped = (
+                            (fields.get(f"open_set.{bot_id}") or [""])[0] if bot_id else ""
+                        )
+                        payload["expected_open_position_set_sha256"] = scoped or (
                             fields.get("expected_open_position_set_sha256") or [""]
                         )[0]
                     result = app.apply_paper_operator_command(payload)

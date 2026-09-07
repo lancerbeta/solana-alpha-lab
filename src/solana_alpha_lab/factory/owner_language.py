@@ -266,6 +266,7 @@ NEXT_ACTION_GLOSS = {
     "INSPECT_REASON_CODE": "Смотреть reason_code; не выводить fill",
     "USE_EXPLICIT_IDENTITY": "Использовать события с явной identity",
     "DO_NOT_INVENT_WATCHLIST": "Не изобретать watchlist storage",
+    "REVIEW_PAUSE_CLOSE_POLICY": "Просмотреть политику pause/close",
 }
 
 STATUS_GLOSS = {
@@ -391,6 +392,7 @@ SURFACE_COPY = {
         "source_unavailable": "Runtime файл есть, но прочитать его нельзя (RUNTIME_SOURCE_UNAVAILABLE).",
         "open_risk": "Открытый риск",
         "unknown_positions": "UNKNOWN",
+        "pnl_unknown": "PnL UNKNOWN",
         "next_observe": "Наблюдать",
         "next_inspect_activation": "Не считать бота запущенным; активация здесь не создаётся",
         "next_wait_drain": "Ждать, пока инвентарь не будет drain-cleared",

@@ -149,6 +149,12 @@ class FactoryApplication:
             self._runner = ExperimentRunner(root=self.root, store=self.store)
         return self._runner
 
+    def _close_paper_plane_readonly(self) -> None:
+        cached = self._paper_plane_readonly
+        self._paper_plane_readonly = None
+        if cached is not None:
+            cached.close()
+
     def existing_paper_plane(self) -> PaperPlaneStore | None:
         if self._paper_plane_store is not None:
             self._paper_plane_source_status = "PRESENT"
@@ -521,24 +527,34 @@ class FactoryApplication:
         return refreshed
 
     def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:
-        if self._paper_plane_store is not None and not getattr(
+        injected = self._paper_plane_store is not None and not getattr(
             self._paper_plane_store, "readonly", False
-        ):
-            store = self._paper_plane_store
-        else:
-            path = paper_plane_store_path(self.root)
-            if not path.is_file():
-                raise ApplicationError("SOURCE_NOT_PRESENT")
-            try:
-                store = PaperPlaneStore(path)
-            except (PaperPlaneError, sqlite3.Error, OSError) as exc:
-                raise ApplicationError("RUNTIME_SOURCE_UNAVAILABLE") from exc
+        )
+        owned = False
+        store: PaperPlaneStore | None = None
         try:
-            return apply_operator_command(store, command)
-        except PaperPlaneError as exc:
-            raise ApplicationError(str(exc)) from exc
-        except KeyError as exc:
-            raise ApplicationError("COMMAND_FIELD_REQUIRED") from exc
+            if injected:
+                store = self._paper_plane_store
+            else:
+                path = paper_plane_store_path(self.root)
+                if not path.is_file():
+                    raise ApplicationError("SOURCE_NOT_PRESENT")
+                try:
+                    store = PaperPlaneStore(path)
+                    owned = True
+                except (PaperPlaneError, sqlite3.Error, OSError) as exc:
+                    raise ApplicationError("RUNTIME_SOURCE_UNAVAILABLE") from exc
+            try:
+                assert store is not None
+                return apply_operator_command(store, command)
+            except PaperPlaneError as exc:
+                raise ApplicationError(str(exc)) from exc
+            except KeyError as exc:
+                raise ApplicationError("COMMAND_FIELD_REQUIRED") from exc
+        finally:
+            if owned and store is not None:
+                store.close()
+            self._close_paper_plane_readonly()
 
     def recent_execution_changes(
         self, store: PaperPlaneStore, *, limit: int = 12
@@ -608,12 +624,15 @@ class FactoryApplication:
             )
         if surface == "OPERATIONS":
             cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
-        if paper_store is not None:
-            operations = trading.get("operations") or build_operations_projection(paper_store)
+        if paper_store is not None and str(trading.get("source_status")) == "PRESENT":
+            operations = trading.get("operations")
+            if not isinstance(operations, dict):
+                operations = build_operations_projection(paper_store)
             model["operations"] = operations
-            model["economics"] = trading.get("economics") or build_economics_projection(
-                paper_store, operations=operations
-            )
+            economics = trading.get("economics")
+            if not isinstance(economics, dict):
+                economics = build_economics_projection(paper_store, operations=operations)
+            model["economics"] = economics
             model["recent_changes"] = trading.get("recent_changes") or []
             cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
         else:
