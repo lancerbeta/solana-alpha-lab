@@ -16,10 +16,6 @@ import pyarrow.parquet as pq
 
 from solana_alpha_lab.factory.data_root import resolve_existing_data_root
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
-from solana_alpha_lab.factory.tokens_v2_typed_projection import (
-    PROJECTION_ID,
-    PROJECTION_VERSION,
-)
 
 COVERAGE_FROM_STATE = {
     "OBSERVED": "observed",
@@ -69,12 +65,13 @@ def _as_utc(value: datetime) -> datetime:
     return value.astimezone(UTC)
 
 
-def schedule_semantics_from_document(
-    document: Mapping[str, Any],
-    *,
-    definition: Mapping[str, Any],
-) -> dict[str, Any]:
-    """Scientific subset for comparability. Excludes activation dates and budgets."""
+def schedule_semantics_from_document(document: Mapping[str, Any]) -> dict[str, Any]:
+    """Scientific subset for comparability. Excludes activation dates and budgets.
+
+    Tokens projection identity and Market axis field IDs live on the Git
+    definition fingerprint, not as retroactive stamps on historical schedules.
+    Schedule-owned source identity is primitive_id / query_profile_id.
+    """
 
     population = document.get("population") if isinstance(document.get("population"), Mapping) else {}
     sampling = document.get("sampling") if isinstance(document.get("sampling"), Mapping) else {}
@@ -88,20 +85,7 @@ def schedule_semantics_from_document(
         for item in (document.get("y_points") or [])
         if isinstance(item, Mapping)
     ]
-    field_ids: list[str] = []
-    for axis in definition.get("axes") or []:
-        if not isinstance(axis, Mapping):
-            continue
-        for field_id in axis.get("field_ids") or []:
-            text = str(field_id)
-            if text not in field_ids:
-                field_ids.append(text)
-    tokens = definition.get("tokens_projection") if isinstance(definition.get("tokens_projection"), Mapping) else {}
     return {
-        "definition_id": str(definition.get("definition_id") or ""),
-        "definition_version": str(definition.get("definition_version") or ""),
-        "tokens_projection_id": str(tokens.get("projection_id") or PROJECTION_ID),
-        "tokens_projection_version": str(tokens.get("projection_version") or PROJECTION_VERSION),
         "population": {
             "entity_type": population.get("entity_type"),
             "entity_key_field_id": population.get("entity_key_field_id"),
@@ -129,7 +113,6 @@ def schedule_semantics_from_document(
             "query_profile_id": source_poll.get("query_profile_id"),
             "period_seconds": source_poll.get("period_seconds"),
         },
-        "field_ids": field_ids,
     }
 
 
@@ -311,7 +294,7 @@ def _load_schedules_from_projection(
             continue
         digest = str(entity_id or payload.get("schedule_sha256") or "")
         if digest in needed:
-            found[digest] = schedule_semantics_from_document(document, definition=definition)
+            found[digest] = schedule_semantics_from_document(document)
     return found
 
 
@@ -377,9 +360,7 @@ def read_market_evidence(
         is_members = partition_id.endswith("-members")
         rows = _load_rows(discovery.root, location, members=is_members)
         if is_members and not rows:
-            path = discovery.root / location
-            if not location or path.is_file() is False:
-                members_incomplete = True
+            members_incomplete = True
         tagged = []
         day = _partition_day(partition_id)
         available = payload.get("first_reliable_available_at")

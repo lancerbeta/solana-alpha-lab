@@ -123,6 +123,7 @@ def _definition_compat_payload(definition: Mapping[str, Any]) -> dict[str, Any]:
         "reference_bucket_seconds": definition["reference_bucket_seconds"],
         "reference_low_quantile": definition["reference_low_quantile"],
         "reference_high_quantile": definition["reference_high_quantile"],
+        "quantile_method": definition["quantile_method"],
         "minimum_current_coverage": definition["minimum_current_coverage"],
         "minimum_current_n": definition["minimum_current_n"],
         "minimum_historical_buckets": definition["minimum_historical_buckets"],
@@ -158,7 +159,9 @@ def _median(values: Sequence[Decimal]) -> Decimal | None:
     return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
 
 
-def _quantile(values: Sequence[Decimal], q: Decimal) -> Decimal | None:
+def _quantile(values: Sequence[Decimal], q: Decimal, *, method: str) -> Decimal | None:
+    if method != "ROUND_FLOOR":
+        raise MarketContextError("UNKNOWN_QUANTILE_METHOD")
     if not values:
         return None
     ordered = sorted(values)
@@ -239,8 +242,9 @@ def _relative_state(
         return "UNKNOWN", "REFERENCE_INSUFFICIENT", len(reference_values)
     low_q = Decimal(str(definition["reference_low_quantile"]))
     high_q = Decimal(str(definition["reference_high_quantile"]))
-    low = _quantile(reference_values, low_q)
-    high = _quantile(reference_values, high_q)
+    method = str(definition["quantile_method"])
+    low = _quantile(reference_values, low_q, method=method)
+    high = _quantile(reference_values, high_q, method=method)
     if low is None or high is None:
         return "UNKNOWN", "REFERENCE_INSUFFICIENT", len(reference_values)
     if current < low:
@@ -318,6 +322,38 @@ def _row_coverage_class(axis: Mapping[str, Any], row: Mapping[str, Any]) -> str:
     field = fields.get(field_id)
     state = (field or {}).get("state") or row.get("state")
     return coverage_class_for(state)
+
+
+def _coverage_meets_minimum(
+    coverage: Mapping[str, int], definition: Mapping[str, Any]
+) -> bool:
+    min_n = int(definition["minimum_current_n"])
+    min_cov = Decimal(str(definition["minimum_current_coverage"]))
+    n_in_scope = int(coverage["n_in_scope"])
+    n_observed = int(coverage["n_observed"])
+    observed_fraction = (
+        (Decimal(n_observed) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
+    )
+    return n_observed >= min_n and observed_fraction >= min_cov
+
+
+def _unclocked_rows(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    point_id: str,
+    current_days: set[str] | None,
+) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
+    for row in rows:
+        if str(row.get("point_id") or "") != point_id:
+            continue
+        if _parse_available(row) is not None:
+            continue
+        day = str(row.get("_partition_day") or "")
+        if current_days is not None and day and day not in current_days:
+            continue
+        selected.append(dict(row))
+    return selected
 
 
 def _coverage_counts(
@@ -438,12 +474,16 @@ def _reference_bucket_values(
     axis: Mapping[str, Any],
     observations: Sequence[Mapping[str, Any]],
     *,
+    members: Sequence[Mapping[str, Any]],
     point_id: str,
     previous_point_id: str,
     previous_lookback_seconds: int,
     ref_start: datetime,
     ref_end: datetime,
     bucket_seconds: int,
+    definition: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+    fingerprint: str | None,
 ) -> list[Decimal]:
     values: list[Decimal] = []
     cursor = ref_start
@@ -458,8 +498,18 @@ def _reference_bucket_values(
             end=bucket_end,
             point_id=previous_point_id,
         )
+        member_ids = _member_ids_for_landmark(
+            members,
+            point_id=point_id,
+            current_start=cursor,
+            as_of=bucket_end,
+            definition=definition,
+            schedules=schedules,
+            fingerprint=fingerprint,
+        )
+        coverage = _coverage_counts(current_rows, member_ids, axis)
         metric, _details = _axis_value(axis, current_rows, previous_rows)
-        if metric is not None:
+        if metric is not None and _coverage_meets_minimum(coverage, definition):
             values.append(metric)
         cursor = bucket_end
     return values
@@ -684,6 +734,10 @@ def project_market_context(
     )
     missing_pit = any(_parse_available(row) is None for row in observations)
 
+    current_days = {
+        (current_start + timedelta(days=offset)).date().isoformat()
+        for offset in range((clock.date() - current_start.date()).days + 1)
+    }
     slices: list[dict[str, Any]] = []
     for landmark in landmarks:
         point_id = str(landmark["point_id"])
@@ -692,6 +746,10 @@ def project_market_context(
         current_at_point = _select_rows(
             current_obs, start=current_start, end=clock, point_id=point_id
         )
+        coverage_rows = [
+            *current_at_point,
+            *_unclocked_rows(observations, point_id=point_id, current_days=current_days),
+        ]
         member_ids = _member_ids_for_landmark(
             members,
             point_id=point_id,
@@ -713,17 +771,21 @@ def project_market_context(
             current_value, details = _axis_value(
                 axis, current_at_point, previous_at_point
             )
-            coverage = _coverage_counts(current_at_point, member_ids, axis)
+            coverage = _coverage_counts(coverage_rows, member_ids, axis)
             reference_values = (
                 _reference_bucket_values(
                     axis,
                     comparable_obs,
+                    members=members,
                     point_id=point_id,
                     previous_point_id=previous_id,
                     previous_lookback_seconds=lookback,
                     ref_start=reference_start,
                     ref_end=current_start,
                     bucket_seconds=bucket_seconds,
+                    definition=definition,
+                    schedules=schedules,
+                    fingerprint=current_fingerprint,
                 )
                 if comparable_history
                 else []

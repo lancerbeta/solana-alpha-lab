@@ -41,8 +41,10 @@ provenance. Different fingerprint → `REFERENCE_SCOPE_MISMATCH`.
 ## PIT
 
 For `as_of`, use only observations with
-`first_reliable_available_at <= as_of`. Missing PIT clock is typed missing.
+`first_reliable_available_at <= as_of`. Missing PIT clock is typed missing
+in the coverage denominator and excluded from numeric calculation.
 No backdating from event_time, mtime, Git, or request start.
+Quantile method is Git-owned (`ROUND_FLOOR`); it is not a projector default.
 
 ## Population
 

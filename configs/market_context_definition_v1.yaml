@@ -8,6 +8,7 @@ reference_lookback_seconds: 604800
 reference_bucket_seconds: 3600
 reference_low_quantile: "0.20"
 reference_high_quantile: "0.80"
+quantile_method: ROUND_FLOOR
 minimum_current_coverage: "0.20"
 minimum_current_n: 5
 minimum_historical_buckets: 12
