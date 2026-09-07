@@ -6,8 +6,8 @@
   "task_id": "SYSTEM_OPERABILITY_SURFACE_V2",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "b14c0350a927cf5a161ad39bef9f252ada9ca8df91cd69203a32edc5e386930a",
+  "reviewed_inventory_sha256": "ea286ba5da94d9cb6dfb6f23016871e8cde99a72a5060feb815fc07bafbb8ee9",
   "capability_radar": {
     "now": "NONE",
     "watch": "RISK_AND_ECONOMICS_V1"

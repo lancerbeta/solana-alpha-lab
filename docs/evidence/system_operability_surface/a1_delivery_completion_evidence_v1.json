@@ -5,13 +5,38 @@
   "as_of": "2026-09-07",
   "task_id": "SYSTEM_OPERABILITY_SURFACE_V2",
   "state_change": "SYSTEM_OPERABILITY_SURFACE_V2_READY_FOR_MERGE",
-  "base_main": "0000000000000000000000000000000000000000",
+  "base_main": "2df9fbcfb657d69d4f29d4dbef515552708b384c",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/contracts/system_operability_surface_v2.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "1d4a66c25182a58dd1957fdad630e49b6a571b4c06946ad7ca293594c0ea4878",
+    "catalog/assets/lifecycle.yaml": "c55cafe199c3dee0b5ebba6e0203051c9670bc4a2fff3190dd18f667201c5832",
+    "catalog/catalog_manifest.yaml": "1ee469d03e313e7f273306797563e58e882c9afb13e167ca2cf1a98d5bdde7c1",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "4b8d5c1f09af075f33265d93d7ff658a12f9c275d040b6b9b05427bc3f292a8a",
+    "catalog/generated/asset_edges.json": "c9e2da1d5d257b6c9f55feec645f10aecb598436e73725db7d53908a9f78bb4a",
+    "configs/factory_semantic_operability_v1.yaml": "a64089ae4f5e0575597d251ff458854adb53cf7081d7cc9425a51de3376d2a0a",
+    "docs/FACTORY_SEMANTIC_MAP.md": "f2c5b33ef7d9a22378c8a49607921903c944e9cc774df37727028ea15ab40f1f",
+    "docs/PROJECT_MAP.md": "bf0f983c8367dd12d4411184043a6937a26b0e3501e2132d4afc3a3cd3e6520e",
+    "docs/contracts/system_operability_surface_v2.md": "48c8e5f0359733a55409792efffd5ad12fb4fc9dd301c783dd926c78ef8eed39",
+    "docs/reports/system_operability_surface/a1_owner_readout_v1.md": "62b731500b509986d68651354e285408da0690130c00e0d7722d342d719cbc0a",
+    "docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md": "cba4f001ada44b8e4a3b34ac3190af7813393495f512fee5cb8c97a534ef771d",
+    "scripts/factory_operability_watch.py": "89d1cda436429b5bcfa9351a62b0a8b1ad6fc2dcf9943df40da494304df0d018",
+    "scripts/show_system_operability.py": "3544939617155b962a6e87470e26e65b14ac15e03915ac16f16a7b2abde3f65d",
+    "src/solana_alpha_lab/factory/application.py": "df9293db1ab41e544ce4f0066e935f3b2363a9877a2f8f21e42db60fba767ec3",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "d2c52667d5f0682205c982c43f51aa3378ac5488a3c130fe85ebbce89ce72f12",
+    "src/solana_alpha_lab/factory/operability_watch.py": "f91af2d23786e8637645ca2d1bfcd26171b427532b0a8c8ec6bf055b5c2ea98b",
+    "src/solana_alpha_lab/factory/owner_daily_attention.py": "d92e86313612a709f00908584485c80949fe8e551af3b084b5da89ae63e669ed",
+    "src/solana_alpha_lab/factory/owner_language.py": "591fa825645b9ed333393dae189d27bf53e7881273e006d59593fca004f56e27",
+    "src/solana_alpha_lab/factory/owner_surface.py": "fb651369054c0e4141cd33fd7aa0c434264761fee061a07bf63ecaa7060fbad7",
+    "src/solana_alpha_lab/factory/system_operability.py": "27833c5a086c897f6322cc56d3694d783d6ecd0bf07635f4a3945539cd1d3172",
+    "src/solana_alpha_lab/factory/workbench.py": "96f8fdf983540dd321f276b0199a86d4acbec7b80eb0fe13d7a45ef312243eb9",
+    "tests/test_factory_ordinary_market_hypothesis.py": "e20dc9ced28bdcbdc4eee2595914a0504a25019a3178a7d7f5e737059207a780",
+    "tests/test_factory_v1_owner_cockpit.py": "9fd7f9d90c8ad778c1b8b7d3275695a8cbff693d46cf072feee53edc6d471327",
+    "tests/test_observation_schedule_store.py": "06221d41067f32ee208938447d5a13c161369af0646b8fcc25569b608fc2c19c",
+    "tests/test_owner_workbench_vertical_ux_foundation_v1.py": "4b1b2f1e717e58230606d60bd04e3b0c42aee6b3afcda39f63d4d1d7d25f8a3b",
+    "tests/test_system_operability_surface_v2.py": "1b301c4be9041e89f92a95b414a3bfd3714c9a5825e77a6b64f1bbfd6246763a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +48,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/system_operability_surface/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "2cab84811ecabb53ed0d788397e1e510999a1f09c5ed94eaf2a424634e07d3c0",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_SYSTEM_OPERABILITY_SURFACE_V2",
     "independent_review": {
       "path": "docs/evidence/system_operability_surface/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "2f8cf86202144a4ba2f56a271889c73f4bf1723e724d1af57ae685b513f13784",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
