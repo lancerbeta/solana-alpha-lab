@@ -270,10 +270,14 @@ def _fee_coverage(rows: list[dict[str, Any]]) -> str:
     return "COMPLETE" if complete else "PARTIAL"
 
 
+def _chronology_known(rows: list[dict[str, Any]]) -> bool:
+    return all(_parse_utc(str(row.get("closed_at") or "")) is not None for row in rows)
+
+
 def _drawdown(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if not rows:
         return {"usd": None, "status": "EMPTY", "basis": "RECONCILED_MODEL_PNL_DRAWDOWN_USD"}
-    if any(not row.get("trusted") for row in rows):
+    if any(not row.get("trusted") for row in rows) or not _chronology_known(rows):
         return {"usd": None, "status": "UNKNOWN", "basis": "RECONCILED_MODEL_PNL_DRAWDOWN_USD"}
     equity = Decimal("0")
     peak = Decimal("0")
@@ -297,6 +301,8 @@ def _drawdown(rows: list[dict[str, Any]]) -> dict[str, Any]:
 def _loss_streak(rows: list[dict[str, Any]]) -> dict[str, Any]:
     if not rows:
         return {"status": "KNOWN", "count": 0}
+    if not _chronology_known(rows):
+        return {"status": "UNKNOWN", "count": None}
     streak = 0
     for row in reversed(rows):
         if not row.get("trusted"):
@@ -570,6 +576,8 @@ def compose_risk_economics(
         "reconciled_net_pnl_status": "SOURCE_NOT_PRESENT"
         if status in {"NOT_PRESENT", "SOURCE_NOT_PRESENT"}
         else "SOURCE_UNAVAILABLE",
+        "reconciled_net_pnl_evidence_class": None,
+        "reconciled_net_pnl_mode": None,
         "mixed_evidence": False,
         "netreturn_status": "NOT_ESTABLISHED",
         "owner_fcf_status": "NOT_AVAILABLE",
@@ -701,12 +709,16 @@ def compose_risk_economics(
         for scope in reconciled_scopes
         if scope["status"] == "KNOWN" and scope["realized_net_after_modeled_fees_usd"] is not None
     ]
+    legacy_class = None
+    legacy_mode = None
     if mixed:
         legacy_net = None
         legacy_status = "MIXED_EVIDENCE_NOT_AGGREGATED"
     elif len(trusted_single) == 1:
         legacy_net = trusted_single[0]["realized_net_after_modeled_fees_usd"]
         legacy_status = "KNOWN"
+        legacy_class = trusted_single[0]["pnl_evidence_class"]
+        legacy_mode = trusted_single[0]["mode"]
     elif not reconciled_scopes:
         legacy_net = None
         legacy_status = "EMPTY"
@@ -811,6 +823,8 @@ def compose_risk_economics(
         "next_safe_action": next_action,
         "reconciled_net_pnl_usd": legacy_net,
         "reconciled_net_pnl_status": legacy_status,
+        "reconciled_net_pnl_evidence_class": legacy_class,
+        "reconciled_net_pnl_mode": legacy_mode,
         "mixed_evidence": mixed,
         "netreturn_status": "NOT_ESTABLISHED",
         "owner_fcf_status": "NOT_AVAILABLE",

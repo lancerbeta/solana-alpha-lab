@@ -26,13 +26,16 @@ HEAD в этом файле — product freeze до bind-evidence. После ev
 
 ## OWNER SENTENCE
 
-Move 7 убрал возможность прочитать `/economics` как total profit, LIVE cash,
-NetReturn, owner FCF или portfolio risk.
+GET `/economics` больше не публикует один суммарный PAPER+SHADOW net и не
+называет цифру LIVE cash, NetReturn, owner FCF или portfolio risk. Один
+совместимый KNOWN scope может показать scoped model net вместе с
+`pnl_evidence_class` и `mode`; это не total profit.
 
 ## VERTICAL LOOPS
 
 - ECONOMIC EVIDENCE: PASS — PAPER и SHADOW разделены; reconciled и open mark
-  не суммируются; evidence class обязателен; conflict исключает строку.
+  не суммируются; evidence class обязателен; conflict исключает строку;
+  PARTIAL_UNKNOWN не публикует subset net.
 - DECLARED RISK: PASS — `max_open_positions` = entry-admission readback
   тех же `OPEN_RISK_STATES`, что execution; прочие лимиты `NOT_DEFINED`.
 - OWNER INTERPRETATION: PASS — non-claims на экране; команды остаются на
@@ -66,8 +69,10 @@ fees. `MARK_FRESHNESS_POLICY = NOT_DEFINED`. Нет TTL. Legacy rows не
 
 ## PATH METRICS
 
-Drawdown = `RECONCILED_MODEL_PNL_DRAWDOWN_USD` (не equity). Любой UNKNOWN
-в path → numeric null. Loss streak exact или UNKNOWN.
+Drawdown = `RECONCILED_MODEL_PNL_DRAWDOWN_USD` (не equity). Любой
+untrusted/conflict **или** неразборчивый `closed_at` → numeric null /
+UNKNOWN. Нет skip-and-calculate. Loss streak exact только при полной
+хронологии; иначе UNKNOWN.
 
 ## DECLARED RISK
 

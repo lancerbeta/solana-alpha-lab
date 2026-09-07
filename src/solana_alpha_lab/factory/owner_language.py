@@ -451,6 +451,7 @@ SURFACE_COPY = {
         "net": "Модельный net после комиссий",
         "marked_net": "Open-mark net после комиссий",
         "evidence": "Класс доказательств",
+        "mode": "Mode",
         "status": "Статус scope",
         "known_count": "Известных",
         "unknown_count": "Неизвестных / конфликт",

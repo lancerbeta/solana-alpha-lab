@@ -463,6 +463,21 @@ class RiskAndEconomicsV1Tests(unittest.TestCase):
                 self.assertIsNone(scope["realized_net_after_modeled_fees_usd"])
                 self.assertIsNone(projection["reconciled_net_pnl_usd"])
                 self.assertEqual(projection["reconciled_net_pnl_status"], "PARTIAL_UNKNOWN")
+                store._conn.execute(
+                    "UPDATE positions SET realized_net_pnl_usd_dec = '9.79', "
+                    "closed_at = '' WHERE position_id = ?",
+                    (p1,),
+                )
+                store._conn.commit()
+                projection = compose_risk_economics(
+                    Path(tmp), store, source_status="PRESENT", as_of=AS_OF
+                )
+                drawdown = projection["reconciled_scopes"][0]["drawdown"]
+                self.assertIsNone(drawdown["usd"])
+                self.assertEqual(drawdown["status"], "UNKNOWN")
+                streak = projection["reconciled_scopes"][0]["loss_streak"]
+                self.assertEqual(streak["status"], "UNKNOWN")
+                self.assertIsNone(streak["count"])
             finally:
                 store.close()
 
@@ -580,6 +595,10 @@ class RiskAndEconomicsV1Tests(unittest.TestCase):
                 _get(app, path)
             self.assertIn("PAPER_RECONCILED_MODEL", economics)
             self.assertIn("STRAT-ACCOUNTING-CONTROL-A@V1", economics)
+            self.assertIn("Reconciled net (один совместимый scope)", economics)
+            model = app.economics_projection()
+            self.assertEqual(model["reconciled_net_pnl_evidence_class"], "PAPER_RECONCILED_MODEL")
+            self.assertEqual(model["reconciled_net_pnl_mode"], "PAPER")
             self.assertIn("NO ALPHA", economics)
             self.assertIn("NOT_ESTABLISHED", economics)
             self.assertIn("NOT_AVAILABLE", economics)

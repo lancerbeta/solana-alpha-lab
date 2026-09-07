@@ -843,25 +843,47 @@ def _economics_section(model: dict[str, Any]) -> str:
         if mixed
         else _eco_money(eco.get("reconciled_net_pnl_usd"))
     )
+    if (
+        not mixed
+        and eco.get("reconciled_net_pnl_usd") not in {None, ""}
+        and not eco.get("reconciled_net_pnl_evidence_class")
+    ):
+        headline = _eco_money(None)
+    proven = [
+        (surface_copy("ECONOMICS", "state"), canon(eco.get("evidence_state"))),
+        (surface_copy("ECONOMICS", "pnl"), headline),
+    ]
+    if eco.get("reconciled_net_pnl_evidence_class"):
+        proven.extend(
+            [
+                (
+                    surface_copy("ECONOMICS", "evidence"),
+                    canon(eco.get("reconciled_net_pnl_evidence_class")),
+                ),
+                (
+                    surface_copy("ECONOMICS", "mode"),
+                    canon(eco.get("reconciled_net_pnl_mode")),
+                ),
+            ]
+        )
+    proven.extend(
+        [
+            (
+                surface_copy("ECONOMICS", "known_count"),
+                cell_html(coverage.get("reconciled_count_known")),
+            ),
+            (
+                surface_copy("ECONOMICS", "unknown_count"),
+                cell_html(coverage.get("reconciled_count_unknown_or_conflict")),
+            ),
+            (surface_copy("ECONOMICS", "fcf"), canon(eco.get("owner_fcf_status"))),
+            (surface_copy("ECONOMICS", "netreturn"), canon(eco.get("netreturn_status"))),
+        ]
+    )
     return (
         banner
         + f"<h2>{esc(surface_copy('ECONOMICS', 'proven'))}</h2>"
-        + fact_strip(
-            [
-                (surface_copy("ECONOMICS", "state"), canon(eco.get("evidence_state"))),
-                (surface_copy("ECONOMICS", "pnl"), headline),
-                (
-                    surface_copy("ECONOMICS", "known_count"),
-                    cell_html(coverage.get("reconciled_count_known")),
-                ),
-                (
-                    surface_copy("ECONOMICS", "unknown_count"),
-                    cell_html(coverage.get("reconciled_count_unknown_or_conflict")),
-                ),
-                (surface_copy("ECONOMICS", "fcf"), canon(eco.get("owner_fcf_status"))),
-                (surface_copy("ECONOMICS", "netreturn"), canon(eco.get("netreturn_status"))),
-            ]
-        )
+        + fact_strip(proven)
         + f"<h2>{esc(surface_copy('ECONOMICS', 'reconciled'))}</h2>"
         + recon_html
         + f"<h2>{esc(surface_copy('ECONOMICS', 'open_mark'))}</h2>"
@@ -900,6 +922,10 @@ def _economics_section(model: dict[str, Any]) -> str:
                     "source_status": eco.get("source_status"),
                     "reconciled_net_pnl_usd": eco.get("reconciled_net_pnl_usd"),
                     "reconciled_net_pnl_status": eco.get("reconciled_net_pnl_status"),
+                    "reconciled_net_pnl_evidence_class": eco.get(
+                        "reconciled_net_pnl_evidence_class"
+                    ),
+                    "reconciled_net_pnl_mode": eco.get("reconciled_net_pnl_mode"),
                     "mixed_evidence": eco.get("mixed_evidence"),
                     "netreturn_status": eco.get("netreturn_status"),
                     "owner_fcf_status": eco.get("owner_fcf_status"),
