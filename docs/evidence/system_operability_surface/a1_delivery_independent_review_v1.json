@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SYSTEM-OPERABILITY-SURFACE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-07",
+  "task_id": "SYSTEM_OPERABILITY_SURFACE_V2",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "GET_READONLY_SQLITE",
+        "UNKNOWN_SENTINEL_NOT_AVAILABLE",
+        "OFFHOST_NOT_CONFIGURED_BLOCKS_OK_OBSERVED",
+        "MATCH_STALE_WITHOUT_CLASS_IS_DEGRADED",
+        "NO_PROCESS_ALIVE_FROM_GIT",
+        "NO_SYSTEM_MUTATION_BUTTONS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OWNER_QUESTION_TECHNICHESKI",
+        "GET_HTTP_DIAGNOSIS",
+        "MATCH_DURABILITY_FALSIFIERS",
+        "MIXED_STORAGE_AND",
+        "CLI_JSON_EXECUTED",
+        "A6_OK_OBSERVED_CONTROL"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=8b77c12ec86141b3c5c201b8a63be966a84c14ce624a5ef073c567d557bb3dd8",
+        "Q3_NO_CAPABILITY_DEPLOY_AS_STRIP",
+        "Q6_OFFHOST_NOT_AVAILABLE",
+        "Q8_UNKNOWN_AND_NOT_CONFIGURED_BLOCK_OK_OBSERVED",
+        "NO_SEM_SYSTEM",
+        "GET_NON_MUTATING"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_OWNER_FCF",
+    "NO_SYSTEM_HEALTH_FROM_GIT",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_WALLET",
+    "NO_MONITORING_PLATFORM",
+    "NO_CANONICAL_DONE"
+  ]
+}
