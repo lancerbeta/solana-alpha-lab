@@ -39,10 +39,10 @@ PRODUCT_TERMINAL = "ORDINARY_HYPOTHESIS_COMPOSED_NOT_PROMOTABLE"
 FACTORY_CORE = {
     "src/solana_alpha_lab/factory/runner.py": "d8d22bcb51fb6992d40f09e58274c52e0f9942c12d043cc57b96ffca524e918f",
     "src/solana_alpha_lab/factory/capabilities.py": "906509c3176fa8aa92543f9252703387b96c501ac85154b0a3fd81e683d3935c",
-    "src/solana_alpha_lab/factory/read_model.py": "1bdc9b61e5a4bb579d93f66d99eac9db7f6aaed44c9d79dcb781f89725d7fef1",
-    "src/solana_alpha_lab/factory/workbench.py": "2dd0438963ba51268cebffc2148394013f5845d53893e88c7d3580469cd15938",
+    "src/solana_alpha_lab/factory/read_model.py": "4568d227853aa6a0da1568e0fcce9fdaf89e9fd4913ec6a57237d28c355c794e",
+    "src/solana_alpha_lab/factory/workbench.py": "16120db37d2de009563c13089d409ca2a2ffffc5c0afd8b16bf41ceefbc26569",
     "src/solana_alpha_lab/factory/market_feature_surface.py": "e6bbb655629da5582eaf30571a07ca37dac28aefdb93a4b808cf57ae45958e2b",
-    "src/solana_alpha_lab/factory/application.py": "5aabbeac71fd95d73ee191fc618f706f6443fa55b8be2ca7fec9f9d5edffc03c",
+    "src/solana_alpha_lab/factory/application.py": "a7def6f1a8945941d1205137e3eb59cc1709575082c5dc775fde0ad5e45f264e",
 }
 
 

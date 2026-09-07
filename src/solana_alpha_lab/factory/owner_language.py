@@ -250,6 +250,23 @@ NEXT_ACTION_GLOSS = {
     "DO_NOT_OVERWRITE_STRATEGY_VERSION": (
         "Конфликт содержимого. Существующую StrategyVersion нельзя перезаписать."
     ),
+    "OBSERVE": "Наблюдать",
+    "INSPECT_ACTIVATION_PATH_GAP": (
+        "Не считать бота запущенным; активация здесь не создаётся"
+    ),
+    "WAIT_DRAIN": "Ждать, пока инвентарь не будет drain-cleared",
+    "RESUME_WHEN_NOT_DRAINING": "RESUME_NEW_ENTRIES, если статус не DRAINING",
+    "INSPECT_MARK": "Смотреть evidence марки; UNKNOWN — не ноль",
+    "REQUEST_CLOSE_OR_WAIT_EXIT": (
+        "REQUEST_CLOSE_POSITION или ждать observation выхода"
+    ),
+    "KEEP_DRAINING": "Оставить DRAINING; STOPPED при неразрешённом инвентаре запрещён",
+    "DO_NOT_BOOTSTRAP": "Не создавать runtime чтением; команда закрывается fail-closed",
+    "INSPECT_VERSION_GAP": "Не сливать Git-версию с этим BotInstance",
+    "INSPECT_REASON_CODE": "Смотреть reason_code; не выводить fill",
+    "USE_EXPLICIT_IDENTITY": "Использовать события с явной identity",
+    "DO_NOT_INVENT_WATCHLIST": "Не изобретать watchlist storage",
+    "REVIEW_PAUSE_CLOSE_POLICY": "Просмотреть политику pause/close",
 }
 
 STATUS_GLOSS = {
@@ -319,19 +336,35 @@ SURFACE_COPY = {
     },
     "OPERATIONS": {
         "h1": "Операции",
-        "question": "Что работает, какой риск открыт и что я могу безопасно сделать?",
+        "question": "Что исполняется, где остановился путь и что безопасно сделать?",
+        "now": "Сейчас",
         "summary": "Сводка",
         "bots": "Боты",
+        "strategies_bots": "Стратегии / боты",
+        "trace": "Signal → Risk → Execution",
         "counts": "Счётчики",
         "positions": "Позиции",
-        "attention": "Внимание",
+        "positions_exit": "Позиции / Exit / Reconciliation",
+        "attention": "Требует внимания",
         "recent": "Недавние изменения",
-        "commands": "Команды оператора",
-        "no_bots": "Нет ботов.",
+        "commands": "Допустимые действия",
+        "no_bots": "Нет runtime-ботов.",
         "no_positions": "Нет позиций.",
         "no_attention": "Пунктов внимания нет.",
         "no_recent": "Недавних событий исполнения нет.",
+        "no_traces": "Нет доказанного пути Signal → Risk → Execution.",
         "need_one_bot": "Команды оператора требуют ровно один экземпляр бота.",
+        "source_absent": "Источник runtime отсутствует. Это не пустая здоровая система.",
+        "not_present": "PaperPlane отсутствует (NOT_PRESENT).",
+        "activation_gap": "StrategyVersion есть в Git, активации/бота нет.",
+        "not_activated": "не активировано",
+        "git_definition": "Git-определение",
+        "runtime_bot": "Runtime-бот",
+        "activation_path": "Активация здесь не создаётся (ACTIVATION_PATH_GAP).",
+        "watchlist": "Watchlist",
+        "last_command": "Результат команды",
+        "readback": "Ниже — свежая проекция runtime, не HTTP 200.",
+        "no_start": "Команд активации PAPER/SHADOW на этом экране нет.",
         "bots_count": "Боты",
         "open_positions": "Открытые позиции",
         "entries_paused": "Новые входы",
@@ -349,6 +382,29 @@ SURFACE_COPY = {
         "position_id": "position_id",
         "idempotency": "idempotency_key",
         "snapshot": "Снимок открытых позиций",
+        "machine": "Machine detail",
+        "target": "Цель",
+        "precondition": "Предусловие",
+        "expected": "Ожидаемый эффект",
+        "fail_closed": "Fail-closed",
+        "stop_stage": "Где путь остановился",
+        "select_bot": "Выберите BotInstance",
+        "source_unavailable": "Runtime файл есть, но прочитать его нельзя (RUNTIME_SOURCE_UNAVAILABLE).",
+        "open_risk": "Открытый риск",
+        "unknown_positions": "UNKNOWN",
+        "pnl_unknown": "PnL UNKNOWN",
+        "next_observe": "Наблюдать",
+        "next_inspect_activation": "Не считать бота запущенным; активация здесь не создаётся",
+        "next_wait_drain": "Ждать, пока инвентарь не будет drain-cleared",
+        "next_resume": "RESUME_NEW_ENTRIES, если статус не DRAINING",
+        "next_inspect_mark": "Смотреть evidence марки; UNKNOWN — не ноль",
+        "next_close_or_wait": "REQUEST_CLOSE_POSITION или ждать observation выхода",
+        "next_keep_draining": "Оставить DRAINING; STOPPED при неразрешённом инвентаре запрещён",
+        "next_do_not_bootstrap": "Не создавать runtime чтением; команда закрывается fail-closed",
+        "next_inspect_version": "Не сливать Git-версию с этим BotInstance",
+        "next_inspect_reason": "Смотреть reason_code; не выводить fill",
+        "next_use_identity": "Использовать события с явной identity",
+        "next_no_watchlist": "Не изобретать watchlist storage",
     },
     "ECONOMICS": {
         "h1": "Экономика",
@@ -458,6 +514,12 @@ OWNER_ERRORS = {
     ),
     "BOT_INSTANCE_ID_REQUIRED": "Нужен bot_instance_id. Команда не отправлена.",
     "STALE_OPERATOR_SNAPSHOT": "Снимок оператора устарел. Команда не отправлена.",
+    "SOURCE_NOT_PRESENT": (
+        "PaperPlane отсутствует. Команда не выполнена и runtime не создан."
+    ),
+    "RUNTIME_SOURCE_UNAVAILABLE": (
+        "Runtime файл есть, но прочитать его нельзя. Команда не выполнена."
+    ),
     "RESEARCH_STORE_NOT_PRESENT": "ResearchStore на этой машине отсутствует.",
 }
 

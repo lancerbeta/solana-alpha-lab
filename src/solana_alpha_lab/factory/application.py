@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -11,7 +12,7 @@ import yaml
 
 from solana_alpha_lab.factory.cockpit import pinned_produced_gaps, project_cockpit
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, requirement_map
-from solana_alpha_lab.factory.operational_store import OperationalStore
+from solana_alpha_lab.factory.operational_store import OperationalStore, OperationalStoreError
 from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command
 from solana_alpha_lab.factory.paper_shadow_operations import (
@@ -19,6 +20,7 @@ from solana_alpha_lab.factory.paper_shadow_operations import (
     build_operations_projection,
 )
 from solana_alpha_lab.factory.read_model import project_read_model
+from solana_alpha_lab.factory.trading_operations import compose_trading_operations
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
 HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
@@ -106,7 +108,10 @@ class FactoryApplication:
     ) -> None:
         self.root = root
         self._operational_store = store
+        self._operational_readonly = None
         self._paper_plane_store = paper_plane_store
+        self._paper_plane_readonly = None
+        self._paper_plane_source_status = "NOT_PRESENT"
         self._runner: ExperimentRunner | None = None
         self._research_data_root = research_data_root
         self._research_reader = None
@@ -114,10 +119,28 @@ class FactoryApplication:
         self.spec_relative = spec_relative or commissioning_spec_relative(root)
         self.authority_phrase = authority_phrase
 
+    def existing_operational_store(self) -> OperationalStore | None:
+        if self._operational_store is not None:
+            return self._operational_store
+        if self._operational_readonly is not None:
+            return self._operational_readonly
+        path = ops_store_path(self.root)
+        if not path.is_file():
+            return None
+        try:
+            self._operational_readonly = OperationalStore(path, readonly=True)
+        except (OperationalStoreError, sqlite3.Error, OSError):
+            return None
+        return self._operational_readonly
+
     @property
     def store(self) -> OperationalStore:
-        if self._operational_store is None:
-            self._operational_store = OperationalStore(ops_store_path(self.root))
+        if self._operational_store is not None and not getattr(
+            self._operational_store, "readonly", False
+        ):
+            return self._operational_store
+        path = ops_store_path(self.root)
+        self._operational_store = OperationalStore(path)
         return self._operational_store
 
     @property
@@ -126,29 +149,68 @@ class FactoryApplication:
             self._runner = ExperimentRunner(root=self.root, store=self.store)
         return self._runner
 
+    def _close_paper_plane_readonly(self) -> None:
+        cached = self._paper_plane_readonly
+        self._paper_plane_readonly = None
+        if cached is not None:
+            cached.close()
+
     def existing_paper_plane(self) -> PaperPlaneStore | None:
         if self._paper_plane_store is not None:
+            self._paper_plane_source_status = "PRESENT"
             return self._paper_plane_store
         path = paper_plane_store_path(self.root)
         if not path.is_file():
+            self._close_paper_plane_readonly()
+            self._paper_plane_source_status = "NOT_PRESENT"
             return None
-        self._paper_plane_store = PaperPlaneStore(path)
-        return self._paper_plane_store
+        self._close_paper_plane_readonly()
+        try:
+            self._paper_plane_readonly = PaperPlaneStore(path, readonly=True)
+        except (PaperPlaneError, sqlite3.Error, OSError):
+            self._paper_plane_source_status = "UNAVAILABLE"
+            return None
+        self._paper_plane_source_status = "PRESENT"
+        return self._paper_plane_readonly
 
     def paper_plane(self) -> PaperPlaneStore:
-        existing = self.existing_paper_plane()
-        if existing is not None:
-            return existing
+        if self._paper_plane_store is not None and not getattr(
+            self._paper_plane_store, "readonly", False
+        ):
+            return self._paper_plane_store
         path = paper_plane_store_path(self.root)
         path.parent.mkdir(parents=True, exist_ok=True)
         self._paper_plane_store = PaperPlaneStore(path)
+        self._paper_plane_source_status = "PRESENT"
         return self._paper_plane_store
 
+    def _missing_runtime_error(self) -> ApplicationError:
+        if self._paper_plane_source_status == "UNAVAILABLE":
+            return ApplicationError("RUNTIME_SOURCE_UNAVAILABLE")
+        return ApplicationError("SOURCE_NOT_PRESENT")
+
     def operations_projection(self) -> dict[str, Any]:
-        return build_operations_projection(self.paper_plane())
+        store = self.existing_paper_plane()
+        if store is None:
+            raise self._missing_runtime_error()
+        return build_operations_projection(store)
 
     def economics_projection(self) -> dict[str, Any]:
-        return build_economics_projection(self.paper_plane())
+        store = self.existing_paper_plane()
+        if store is None:
+            raise self._missing_runtime_error()
+        return build_economics_projection(store)
+
+    def trading_operations_projection(
+        self, *, last_command: Mapping[str, Any] | None = None
+    ) -> dict[str, Any]:
+        store = self.existing_paper_plane()
+        return compose_trading_operations(
+            self.root,
+            store,
+            last_command=last_command,
+            source_status=self._paper_plane_source_status,
+        )
 
     def research_discovery(self) -> Any:
         if self._research_discovery is None:
@@ -464,12 +526,43 @@ class FactoryApplication:
         return refreshed
 
     def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:
+        injected = self._paper_plane_store is not None and not getattr(
+            self._paper_plane_store, "readonly", False
+        )
+        owned = False
+        store: PaperPlaneStore | None = None
         try:
-            return apply_operator_command(self.paper_plane(), command)
-        except PaperPlaneError as exc:
-            raise ApplicationError(str(exc)) from exc
-        except KeyError as exc:
-            raise ApplicationError("COMMAND_FIELD_REQUIRED") from exc
+            if injected:
+                store = self._paper_plane_store
+            else:
+                path = paper_plane_store_path(self.root)
+                if not path.is_file():
+                    raise ApplicationError("SOURCE_NOT_PRESENT")
+                probe: PaperPlaneStore | None = None
+                try:
+                    probe = PaperPlaneStore(path, readonly=True)
+                    probe.bots()
+                except (PaperPlaneError, sqlite3.Error, OSError) as exc:
+                    raise ApplicationError("RUNTIME_SOURCE_UNAVAILABLE") from exc
+                finally:
+                    if probe is not None:
+                        probe.close()
+                try:
+                    store = PaperPlaneStore(path)
+                    owned = True
+                except (PaperPlaneError, sqlite3.Error, OSError) as exc:
+                    raise ApplicationError("RUNTIME_SOURCE_UNAVAILABLE") from exc
+            try:
+                assert store is not None
+                return apply_operator_command(store, command)
+            except PaperPlaneError as exc:
+                raise ApplicationError(str(exc)) from exc
+            except KeyError as exc:
+                raise ApplicationError("COMMAND_FIELD_REQUIRED") from exc
+        finally:
+            if owned and store is not None:
+                store.close()
+            self._close_paper_plane_readonly()
 
     def recent_execution_changes(
         self, store: PaperPlaneStore, *, limit: int = 12
@@ -477,20 +570,23 @@ class FactoryApplication:
         events = store.execution_events()
         return list(reversed(events[-limit:]))
 
-    def read_model(self, *, surface: str | None = None) -> dict[str, Any]:
+    def read_model(
+        self, *, surface: str | None = None, last_command: Mapping[str, Any] | None = None
+    ) -> dict[str, Any]:
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
+        ops_store = self.existing_operational_store()
         model = project_read_model(
             root=self.root,
-            store=self.store,
+            store=ops_store,
             spec_relative=self.spec_relative,
             hypothesis_registry=hypotheses,
         )
-        if (self.root / RUNTIME_CONFIG_RELATIVE).is_file():
+        if (self.root / RUNTIME_CONFIG_RELATIVE).is_file() and ops_store is not None:
             from solana_alpha_lab.factory.runtime import project_runtime_health
 
             model["runtime"] = project_runtime_health(
                 root=self.root,
-                store=self.store,
+                store=ops_store,
                 process_alive=True,
             )
         spec = load_experiment_spec(self.root, self.spec_relative)
@@ -513,31 +609,63 @@ class FactoryApplication:
             runtime=model.get("runtime") if isinstance(model.get("runtime"), dict) else None,
             pinned_produced_gaps=gaps,
         )
-        surface_key = (surface or "").upper()
-        force_paper_plane = surface_key in {"OPERATIONS", "ECONOMICS"}
-        paper_store = self.paper_plane() if force_paper_plane else self.existing_paper_plane()
-        if paper_store is not None:
-            operations = build_operations_projection(paper_store)
-            model["operations"] = operations
-            model["economics"] = build_economics_projection(
-                paper_store, operations=operations
+        paper_store = self.existing_paper_plane()
+        trading = compose_trading_operations(
+            self.root,
+            paper_store,
+            last_command=last_command,
+            source_status=self._paper_plane_source_status,
+        )
+        model["trading_operations"] = trading
+        operator_attention = []
+        for item in trading.get("attention") or []:
+            if not isinstance(item, dict):
+                continue
+            operator_attention.append(
+                {
+                    "id": str(item.get("code") or "OPERATOR"),
+                    "WHY_NOW": item.get("WHY_NOW"),
+                    "IMPACT": item.get("IMPACT"),
+                    "EVIDENCE": item.get("EVIDENCE"),
+                    "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
+                }
             )
-            model["recent_changes"] = self.recent_execution_changes(paper_store)
-            operator_attention = []
-            for item in operations.get("attention") or []:
-                if not isinstance(item, dict):
-                    continue
-                operator_attention.append(
-                    {
-                        "id": str(item.get("code") or "OPERATOR"),
-                        "WHY_NOW": item.get("WHY_NOW"),
-                        "IMPACT": item.get("IMPACT"),
-                        "EVIDENCE": item.get("EVIDENCE"),
-                        "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
-                    }
-                )
+        if surface == "OPERATIONS":
             cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
+        if paper_store is not None and str(trading.get("source_status")) == "PRESENT":
+            operations = trading.get("operations")
+            if not isinstance(operations, dict):
+                operations = build_operations_projection(paper_store)
+            model["operations"] = operations
+            economics = trading.get("economics")
+            if not isinstance(economics, dict):
+                economics = build_economics_projection(paper_store, operations=operations)
+            model["economics"] = economics
+            model["recent_changes"] = trading.get("recent_changes") or []
             cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
+        else:
+            status = str(trading.get("source_status") or self._paper_plane_source_status)
+            model["operations"] = {
+                "source_status": status,
+                "bots": None,
+                "attention": trading.get("attention") or [],
+            }
+            model["economics"] = {
+                "source_status": status,
+                "reconciled_net_pnl_usd": None,
+                "reconciled_net_pnl_status": status,
+                "pnl_known_count": None,
+                "pnl_unknown_count": None,
+                "known_open_exposure_usd": None,
+                "known_open_exposure_status": status,
+                "non_claims": [
+                    "NO_REALIZED_LIVE_PNL",
+                    "NO_OWNER_FCF",
+                    "NO_LIVE_CAPITAL",
+                    "NO_NETRETURN_CLAIM",
+                ],
+            }
+            model["recent_changes"] = []
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
         return model

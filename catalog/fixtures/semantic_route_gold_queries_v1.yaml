@@ -188,6 +188,21 @@ queries:
 - query_id: SGQ-OWNER-SCIENCE-TO-STRATEGY-RU
   query: Почему эта стратегия вообще существует и каким evidence она разрешена?
   required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-OPS-BOT-STRATEGY
+  query: What bot is executing this StrategyVersion?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-OPS-SIGNAL-TRACE
+  query: What happened after this SignalDecision?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-OPS-UNRESOLVED
+  query: Which positions are unresolved?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-OPS-PAUSE-PAPER
+  query: How do I pause PAPER entries safely?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-AUTHORITY-ACTIVATE-DEPLOY-SPEND
+  query: May I activate/deploy/spend?
+  required_top_route: SEM-AUTHORITY-BOUNDARIES
 - query_id: SGQ-ANTI-MECHANISM-TESTED-BEFORE
   query: has this mechanism been tested before?
   required_top_route: SEM-PRIOR-WORK

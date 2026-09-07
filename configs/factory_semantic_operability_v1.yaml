@@ -281,6 +281,7 @@ routes:
       - Where is authority decided?
       - Where does authority come from?
       - могу ли я вызвать провайдера / задеплоить / потратить
+      - May I activate/deploy/spend?
     search_terms:
       - authority
       - owner attention
@@ -290,6 +291,9 @@ routes:
       - gate
       - полномочия
       - авторизация
+      - activate
+      - deploy
+      - spend
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids: []
     root_asset_ids:
@@ -339,27 +343,31 @@ routes:
     related_route_ids: [SEM-PRODUCT-STATE, SEM-AUTHORITY-BOUNDARIES, SEM-OWNER-LIFECYCLE]
 
   - semantic_route_id: SEM-OWNER-LIFECYCLE
-    purpose: Derived LifecycleProjectionV1 index of known objects, explicit links and GAP/UNKNOWN, plus the owner Research Workbench, experiment evidence dossier, missing evidence for this experiment, and why this experiment's scientific decision was recorded. Distinguishes Git definition from runtime readback. Not source truth, not live health, grants no authority.
+    purpose: >-
+      Derived LifecycleProjectionV1 index plus Research Workbench, experiment
+      evidence, StrategyVersion-to-bot lineage, SignalDecision traces, unresolved
+      positions and pause PAPER entries. Distinguishes Git definition from runtime
+      readback. Not source truth, not live health, grants no authority.
     owner_questions:
       - What lifecycle objects currently exist?
       - How are hypothesis, experiment, strategy and position connected?
-      - What research objects exist?
-      - What have we tested?
-      - Where is the Research Workbench?
-      - Show evidence for this experiment
-      - что сейчас исследуется?
-      - что уже проверяли?
+      - What bot is executing this StrategyVersion?
+      - What happened after this SignalDecision?
+      - Which positions are unresolved?
+      - How do I pause PAPER entries safely?
       - How does an accepted scientific experiment become a StrategyVersion?
       - Почему эта стратегия вообще существует и каким evidence она разрешена?
+      - что сейчас исследуется?
+      - что уже проверяли?
     search_terms:
       - owner lifecycle
       - lifecycle projection
       - research-to-execution
       - lineage
       - StrategyVersion
-      - LifecycleProjectionV1
-      - TARGET_GAP
-      - SEM-OWNER-LIFECYCLE
+      - SignalDecision
+      - unresolved positions
+      - tested
       - где каноническая карта lifecycle
       - как связаны гипотеза эксперимент стратегия и позиция
       - покажи evidence эксперимента
