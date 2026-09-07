@@ -16,10 +16,6 @@ Then read generated `docs/FACTORY_SEMANTIC_MAP.md` and the command ladder in
 `docs/OPERATOR_NAVIGATION.md`. Semantic routing never grants authority and never
 caches live runtime status.
 
-Daily owner attention — “what needs Petr now / what changed since HOME
-review” — is semantic route `SEM-OWNER-DAILY-ATTENTION`. It is not
-delivery merge authority (`OWNER_ATTENTION_GATE_V2`).
-
 For remote operations, durability, incidents and recovery, start at semantic
 route `SEM-REMOTE-OPS-RECOVERY`, then the operator entrypoint
 `docs/operator/FACTORY_UNATTENDED_OPERABILITY.md`. That document is capability

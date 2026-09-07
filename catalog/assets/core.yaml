@@ -1509,7 +1509,7 @@ records:
     repository_path: README.md
   integrity:
     kind: sha256
-    sha256: 49f1c0b13ce444a5fdb814270d41df2ab328eb0390d6e1df937af63908ed51ba
+    sha256: 625cd06e83b181bc6462ccf4d7fd03fad221d0516770b09774bc1c1e4f3343ee
   access:
     mode: read_only
     method: file
