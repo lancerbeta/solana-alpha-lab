@@ -250,6 +250,22 @@ NEXT_ACTION_GLOSS = {
     "DO_NOT_OVERWRITE_STRATEGY_VERSION": (
         "Конфликт содержимого. Существующую StrategyVersion нельзя перезаписать."
     ),
+    "OBSERVE": "Наблюдать",
+    "INSPECT_ACTIVATION_PATH_GAP": (
+        "Не считать бота запущенным; активация здесь не создаётся"
+    ),
+    "WAIT_DRAIN": "Ждать, пока инвентарь не будет drain-cleared",
+    "RESUME_WHEN_NOT_DRAINING": "RESUME_NEW_ENTRIES, если статус не DRAINING",
+    "INSPECT_MARK": "Смотреть evidence марки; UNKNOWN — не ноль",
+    "REQUEST_CLOSE_OR_WAIT_EXIT": (
+        "REQUEST_CLOSE_POSITION или ждать observation выхода"
+    ),
+    "KEEP_DRAINING": "Оставить DRAINING; STOPPED при неразрешённом инвентаре запрещён",
+    "DO_NOT_BOOTSTRAP": "Не создавать runtime чтением; команда закрывается fail-closed",
+    "INSPECT_VERSION_GAP": "Не сливать Git-версию с этим BotInstance",
+    "INSPECT_REASON_CODE": "Смотреть reason_code; не выводить fill",
+    "USE_EXPLICIT_IDENTITY": "Использовать события с явной identity",
+    "DO_NOT_INVENT_WATCHLIST": "Не изобретать watchlist storage",
 }
 
 STATUS_GLOSS = {
@@ -371,6 +387,22 @@ SURFACE_COPY = {
         "expected": "Ожидаемый эффект",
         "fail_closed": "Fail-closed",
         "stop_stage": "Где путь остановился",
+        "select_bot": "Выберите BotInstance",
+        "source_unavailable": "Runtime файл есть, но прочитать его нельзя (RUNTIME_SOURCE_UNAVAILABLE).",
+        "open_risk": "Открытый риск",
+        "unknown_positions": "UNKNOWN",
+        "next_observe": "Наблюдать",
+        "next_inspect_activation": "Не считать бота запущенным; активация здесь не создаётся",
+        "next_wait_drain": "Ждать, пока инвентарь не будет drain-cleared",
+        "next_resume": "RESUME_NEW_ENTRIES, если статус не DRAINING",
+        "next_inspect_mark": "Смотреть evidence марки; UNKNOWN — не ноль",
+        "next_close_or_wait": "REQUEST_CLOSE_POSITION или ждать observation выхода",
+        "next_keep_draining": "Оставить DRAINING; STOPPED при неразрешённом инвентаре запрещён",
+        "next_do_not_bootstrap": "Не создавать runtime чтением; команда закрывается fail-closed",
+        "next_inspect_version": "Не сливать Git-версию с этим BotInstance",
+        "next_inspect_reason": "Смотреть reason_code; не выводить fill",
+        "next_use_identity": "Использовать события с явной identity",
+        "next_no_watchlist": "Не изобретать watchlist storage",
     },
     "ECONOMICS": {
         "h1": "Экономика",
@@ -482,6 +514,9 @@ OWNER_ERRORS = {
     "STALE_OPERATOR_SNAPSHOT": "Снимок оператора устарел. Команда не отправлена.",
     "SOURCE_NOT_PRESENT": (
         "PaperPlane отсутствует. Команда не выполнена и runtime не создан."
+    ),
+    "RUNTIME_SOURCE_UNAVAILABLE": (
+        "Runtime файл есть, но прочитать его нельзя. Команда не выполнена."
     ),
     "RESEARCH_STORE_NOT_PRESENT": "ResearchStore на этой машине отсутствует.",
 }

@@ -190,6 +190,20 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
             self.assertEqual(raised.exception.code, "SOURCE_NOT_PRESENT")
             self.assertEqual(before, _walk_relatives(root))
 
+    def test_a_existing_store_get_is_read_only(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            paper_path = (root / "local/factory_v1/paper_plane_state.sqlite").resolve()
+            paper = PaperPlaneStore(paper_path)
+            _enter(paper, "SIGDEC-OPS-V2-A2", decision_at="2026-09-03T12:10:00Z")
+            paper.close()
+            before = _walk_relatives(root)
+            app = FactoryApplication(root=root)
+            for path in GET_PATHS:
+                _get(app, path)
+            self.assertEqual(before, _walk_relatives(root))
+            self.assertEqual(app._paper_plane_source_status, "PRESENT")
+
     def test_b_c_strategy_bot_lineage_and_activation_gap(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = isolated_factory_root(Path(tmp) / "src")
@@ -223,6 +237,33 @@ class TradingOperationsWorkbenchV2Tests(unittest.TestCase):
                 self.assertIn("ACTIVATION_GAP", body)
                 self.assertIn("ACTIVATION_PATH_GAP", body)
                 self.assertNotIn('name="command" value="START_PAPER"', body)
+                copied = root / "configs" / "strategies" / Path(STRAT_REL).name
+                copied.write_text(
+                    copied.read_text(encoding="utf-8").replace(
+                        "strategy_version: V1",
+                        "strategy_version: V9",
+                        1,
+                    ),
+                    encoding="utf-8",
+                )
+                mismatched = app.read_model(surface="OPERATIONS")["trading_operations"]
+                git_row = next(
+                    row
+                    for row in mismatched["contexts"]
+                    if row["strategy_id"] == "STRAT-ACCOUNTING-CONTROL-A"
+                    and row["relation"] == "ACTIVATION_GAP"
+                )
+                self.assertEqual(git_row["strategy_version"], "V9")
+                runtime_row = next(
+                    row
+                    for row in mismatched["contexts"]
+                    if row["relation"] == "RUNTIME_ONLY"
+                )
+                self.assertEqual(runtime_row["current_blocker"], "STRATEGY_VERSION_GAP")
+                self.assertIn(
+                    "STRATEGY_VERSION_GAP",
+                    {item["code"] for item in mismatched["attention"]},
+                )
             finally:
                 paper.close()
 

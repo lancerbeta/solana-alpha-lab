@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -11,7 +12,7 @@ import yaml
 
 from solana_alpha_lab.factory.cockpit import pinned_produced_gaps, project_cockpit
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, requirement_map
-from solana_alpha_lab.factory.operational_store import OperationalStore
+from solana_alpha_lab.factory.operational_store import OperationalStore, OperationalStoreError
 from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command
 from solana_alpha_lab.factory.paper_shadow_operations import (
@@ -107,7 +108,10 @@ class FactoryApplication:
     ) -> None:
         self.root = root
         self._operational_store = store
+        self._operational_readonly = None
         self._paper_plane_store = paper_plane_store
+        self._paper_plane_readonly = None
+        self._paper_plane_source_status = "NOT_PRESENT"
         self._runner: ExperimentRunner | None = None
         self._research_data_root = research_data_root
         self._research_reader = None
@@ -118,17 +122,23 @@ class FactoryApplication:
     def existing_operational_store(self) -> OperationalStore | None:
         if self._operational_store is not None:
             return self._operational_store
+        if self._operational_readonly is not None:
+            return self._operational_readonly
         path = ops_store_path(self.root)
         if not path.is_file():
             return None
-        self._operational_store = OperationalStore(path)
-        return self._operational_store
+        try:
+            self._operational_readonly = OperationalStore(path, readonly=True)
+        except (OperationalStoreError, sqlite3.Error, OSError):
+            return None
+        return self._operational_readonly
 
     @property
     def store(self) -> OperationalStore:
-        existing = self.existing_operational_store()
-        if existing is not None:
-            return existing
+        if self._operational_store is not None and not getattr(
+            self._operational_store, "readonly", False
+        ):
+            return self._operational_store
         path = ops_store_path(self.root)
         self._operational_store = OperationalStore(path)
         return self._operational_store
@@ -141,41 +151,60 @@ class FactoryApplication:
 
     def existing_paper_plane(self) -> PaperPlaneStore | None:
         if self._paper_plane_store is not None:
+            self._paper_plane_source_status = "PRESENT"
             return self._paper_plane_store
+        if self._paper_plane_readonly is not None:
+            self._paper_plane_source_status = "PRESENT"
+            return self._paper_plane_readonly
         path = paper_plane_store_path(self.root)
         if not path.is_file():
+            self._paper_plane_source_status = "NOT_PRESENT"
             return None
-        self._paper_plane_store = PaperPlaneStore(path)
-        return self._paper_plane_store
+        try:
+            self._paper_plane_readonly = PaperPlaneStore(path, readonly=True)
+        except (PaperPlaneError, sqlite3.Error, OSError):
+            self._paper_plane_source_status = "UNAVAILABLE"
+            return None
+        self._paper_plane_source_status = "PRESENT"
+        return self._paper_plane_readonly
 
     def paper_plane(self) -> PaperPlaneStore:
-        existing = self.existing_paper_plane()
-        if existing is not None:
-            return existing
+        if self._paper_plane_store is not None and not getattr(
+            self._paper_plane_store, "readonly", False
+        ):
+            return self._paper_plane_store
         path = paper_plane_store_path(self.root)
         path.parent.mkdir(parents=True, exist_ok=True)
         self._paper_plane_store = PaperPlaneStore(path)
+        self._paper_plane_source_status = "PRESENT"
         return self._paper_plane_store
+
+    def _missing_runtime_error(self) -> ApplicationError:
+        if self._paper_plane_source_status == "UNAVAILABLE":
+            return ApplicationError("RUNTIME_SOURCE_UNAVAILABLE")
+        return ApplicationError("SOURCE_NOT_PRESENT")
 
     def operations_projection(self) -> dict[str, Any]:
         store = self.existing_paper_plane()
         if store is None:
-            raise ApplicationError("SOURCE_NOT_PRESENT")
+            raise self._missing_runtime_error()
         return build_operations_projection(store)
 
     def economics_projection(self) -> dict[str, Any]:
         store = self.existing_paper_plane()
         if store is None:
-            raise ApplicationError("SOURCE_NOT_PRESENT")
+            raise self._missing_runtime_error()
         return build_economics_projection(store)
 
     def trading_operations_projection(
         self, *, last_command: Mapping[str, Any] | None = None
     ) -> dict[str, Any]:
+        store = self.existing_paper_plane()
         return compose_trading_operations(
             self.root,
-            self.existing_paper_plane(),
+            store,
             last_command=last_command,
+            source_status=self._paper_plane_source_status,
         )
 
     def research_discovery(self) -> Any:
@@ -492,9 +521,18 @@ class FactoryApplication:
         return refreshed
 
     def apply_paper_operator_command(self, command: dict[str, Any]) -> dict[str, Any]:
-        store = self.existing_paper_plane()
-        if store is None:
-            raise ApplicationError("SOURCE_NOT_PRESENT")
+        if self._paper_plane_store is not None and not getattr(
+            self._paper_plane_store, "readonly", False
+        ):
+            store = self._paper_plane_store
+        else:
+            path = paper_plane_store_path(self.root)
+            if not path.is_file():
+                raise ApplicationError("SOURCE_NOT_PRESENT")
+            try:
+                store = PaperPlaneStore(path)
+            except (PaperPlaneError, sqlite3.Error, OSError) as exc:
+                raise ApplicationError("RUNTIME_SOURCE_UNAVAILABLE") from exc
         try:
             return apply_operator_command(store, command)
         except PaperPlaneError as exc:
@@ -549,7 +587,10 @@ class FactoryApplication:
         )
         paper_store = self.existing_paper_plane()
         trading = compose_trading_operations(
-            self.root, paper_store, last_command=last_command
+            self.root,
+            paper_store,
+            last_command=last_command,
+            source_status=self._paper_plane_source_status,
         )
         model["trading_operations"] = trading
         operator_attention = []
@@ -565,7 +606,8 @@ class FactoryApplication:
                     "NEXT_SAFE_ACTION": item.get("NEXT_SAFE_ACTION"),
                 }
             )
-        cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
+        if surface == "OPERATIONS":
+            cockpit["attention"] = list(cockpit.get("attention") or []) + operator_attention
         if paper_store is not None:
             operations = trading.get("operations") or build_operations_projection(paper_store)
             model["operations"] = operations
@@ -575,19 +617,20 @@ class FactoryApplication:
             model["recent_changes"] = trading.get("recent_changes") or []
             cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
         else:
+            status = str(trading.get("source_status") or self._paper_plane_source_status)
             model["operations"] = {
-                "source_status": "NOT_PRESENT",
+                "source_status": status,
                 "bots": None,
                 "attention": trading.get("attention") or [],
             }
             model["economics"] = {
-                "source_status": "NOT_PRESENT",
+                "source_status": status,
                 "reconciled_net_pnl_usd": None,
-                "reconciled_net_pnl_status": "NOT_PRESENT",
+                "reconciled_net_pnl_status": status,
                 "pnl_known_count": None,
                 "pnl_unknown_count": None,
                 "known_open_exposure_usd": None,
-                "known_open_exposure_status": "NOT_PRESENT",
+                "known_open_exposure_status": status,
                 "non_claims": [
                     "NO_REALIZED_LIVE_PNL",
                     "NO_OWNER_FCF",
@@ -596,7 +639,6 @@ class FactoryApplication:
                 ],
             }
             model["recent_changes"] = []
-        _ = surface
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
         return model

@@ -59,6 +59,12 @@ def position_pnl_view(position: dict[str, Any]) -> dict[str, Any]:
                 "pnl_status": "UNKNOWN",
                 "pnl_evidence_class": mark_class or evidence,
             }
+        if position.get("mark_as_of") in {None, ""}:
+            return {
+                "net_pnl_usd": None,
+                "pnl_status": "UNKNOWN",
+                "pnl_evidence_class": mark_class or evidence,
+            }
         unreal = position.get("unrealized_net_pnl_usd_dec")
         return {
             "net_pnl_usd": None if unreal is None else format(Decimal(str(unreal)), "f"),

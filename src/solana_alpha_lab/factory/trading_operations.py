@@ -82,6 +82,14 @@ def _text(value: Any) -> str:
     return "" if value is None else str(value)
 
 
+def _runtime_version_matches(strategy_id: str, git_version: str, bot_version: str) -> bool:
+    if not git_version or not bot_version:
+        return False
+    if bot_version == git_version:
+        return True
+    return bot_version == f"{strategy_id}-{git_version}"
+
+
 def _payload(event: Mapping[str, Any]) -> dict[str, Any]:
     raw = event.get("payload")
     if isinstance(raw, dict):
@@ -228,6 +236,8 @@ def _build_traces(store: Any) -> list[dict[str, Any]]:
                 payload.get("activation_epoch_id") or (position or {}).get("activation_epoch_id"),
             ),
             ("mint", payload.get("mint") or (position or {}).get("mint")),
+            ("decision_at", payload.get("decision_at")),
+            ("created_at", event.get("created_at")),
         ):
             if not bucket.get(field) and value not in {None, ""}:
                 bucket[field] = value
@@ -262,7 +272,13 @@ def _build_traces(store: Any) -> list[dict[str, Any]]:
         elif bucket["blocker"] is None and not proven:
             bucket["blocker"] = "SIGNAL_TRACE_GAP"
         traces.append(bucket)
-    traces.sort(key=lambda row: _text(row.get("signal_decision_id") or row.get("join")))
+    traces.sort(
+        key=lambda row: (
+            _text(row.get("decision_at") or row.get("created_at")),
+            _text(row.get("signal_decision_id") or row.get("join")),
+        ),
+        reverse=True,
+    )
     return traces
 
 
@@ -280,12 +296,19 @@ def _contexts(
     seen_runtime: set[str] = set()
     for spec in git_strategies:
         strategy_id = spec["strategy_id"]
-        matches = by_strategy.get(strategy_id) or []
+        git_version = spec["strategy_version"]
+        matches = [
+            bot
+            for bot in by_strategy.get(strategy_id) or []
+            if _runtime_version_matches(
+                strategy_id, git_version, _text(bot.get("strategy_version"))
+            )
+        ]
         if not matches:
             contexts.append(
                 {
                     "strategy_id": strategy_id,
-                    "strategy_version": spec["strategy_version"],
+                    "strategy_version": git_version,
                     "mode": None,
                     "activation_epoch_id": None,
                     "bot_instance_id": None,
@@ -293,7 +316,9 @@ def _contexts(
                     "entries_paused": None,
                     "started_at": None,
                     "stopped_at": None,
-                    "open_risk_count": 0,
+                    "open_risk_count": None,
+                    "unknown_positions": None,
+                    "unresolved_positions": None,
                     "relation": "ACTIVATION_GAP",
                     "current_blocker": "ACTIVATION_GAP",
                     "next_safe_action": "INSPECT_ACTIVATION_PATH_GAP",
@@ -302,23 +327,37 @@ def _contexts(
             attention.append(
                 _attention(
                     "ACTIVATION_GAP",
-                    why=f"Git StrategyVersion {strategy_id} has no runtime bot",
-                    impact="Definition exists; nothing is executing",
+                    why="Git StrategyVersion есть, runtime-бота этой версии нет.",
+                    impact="Определение не доказывает исполнение.",
                     evidence=spec["path"],
-                    nxt="Do not infer a running bot; activation is not created here",
+                    nxt="INSPECT_ACTIVATION_PATH_GAP",
                 )
             )
             continue
         for bot in matches:
             seen_runtime.add(_text(bot.get("bot_instance_id")))
-            contexts.append(_bot_context(bot, operations, relation="EXPLICIT"))
+            row = _bot_context(bot, operations, relation="EXPLICIT")
+            row["strategy_version"] = git_version
+            contexts.append(row)
     for bot in bots:
         if not isinstance(bot, dict):
             continue
         bot_id = _text(bot.get("bot_instance_id"))
         if bot_id in seen_runtime:
             continue
-        contexts.append(_bot_context(bot, operations, relation="RUNTIME_ONLY"))
+        row = _bot_context(bot, operations, relation="RUNTIME_ONLY")
+        row["current_blocker"] = row.get("current_blocker") or "STRATEGY_VERSION_GAP"
+        row["next_safe_action"] = "INSPECT_VERSION_GAP"
+        contexts.append(row)
+        attention.append(
+            _attention(
+                "STRATEGY_VERSION_GAP",
+                why="Runtime-бот не совпадает с Git StrategyVersion (id+version).",
+                impact="Нельзя принять Git-версию за этот BotInstance.",
+                evidence=bot_id,
+                nxt="INSPECT_VERSION_GAP",
+            )
+        )
     return contexts, attention
 
 
@@ -347,19 +386,19 @@ def _bot_context(
     nxt = "OBSERVE"
     if status == "DRAINING":
         blocker = "BOT_DRAINING"
-        nxt = "Wait until inventory is drain-cleared"
+        nxt = "WAIT_DRAIN"
     elif paused:
         blocker = "ENTRIES_PAUSED"
-        nxt = "RESUME_NEW_ENTRIES when DRAINING is false"
+        nxt = "RESUME_WHEN_NOT_DRAINING"
     elif unknown:
         blocker = "POSITION_UNKNOWN"
-        nxt = "Inspect mark evidence; UNKNOWN is not zero"
+        nxt = "INSPECT_MARK"
     elif exit_required:
         blocker = "EXIT_REQUIRED"
-        nxt = "REQUEST_CLOSE_POSITION / wait for exit observation"
+        nxt = "REQUEST_CLOSE_OR_WAIT_EXIT"
     elif unresolved:
         blocker = "UNRESOLVED_POSITION"
-        nxt = "Keep DRAINING; STOPPED is forbidden"
+        nxt = "KEEP_DRAINING"
     return {
         "strategy_id": bot.get("strategy_id"),
         "strategy_version": bot.get("strategy_version"),
@@ -387,22 +426,35 @@ def compose_trading_operations(
     store: Any | None,
     *,
     last_command: Mapping[str, Any] | None = None,
+    source_status: str | None = None,
 ) -> dict[str, Any]:
     git_strategies = list_git_strategies(root)
     if store is None:
+        status = source_status or "NOT_PRESENT"
         contexts, activation_attention = _contexts(git_strategies, None)
-        attention = [
-            _attention(
-                "SOURCE_NOT_PRESENT",
-                why="PaperPlane runtime store is absent",
-                impact="No bot, position or command truth is available",
-                evidence="local/factory_v1/paper_plane_state.sqlite missing",
-                nxt="Do not bootstrap runtime from GET; command fail-closes",
-            )
-        ] + activation_attention
+        if status == "UNAVAILABLE":
+            attention = [
+                _attention(
+                    "RUNTIME_SOURCE_UNAVAILABLE",
+                    why="Файл runtime есть, но прочитать его нельзя.",
+                    impact="Нельзя считать ботов, позиции или команды.",
+                    evidence="paper_plane_state.sqlite unreadable",
+                    nxt="DO_NOT_BOOTSTRAP",
+                )
+            ] + activation_attention
+        else:
+            attention = [
+                _attention(
+                    "SOURCE_NOT_PRESENT",
+                    why="PaperPlane runtime отсутствует.",
+                    impact="Нет истины по боту, позиции или команде.",
+                    evidence="local/factory_v1/paper_plane_state.sqlite missing",
+                    nxt="DO_NOT_BOOTSTRAP",
+                )
+            ] + activation_attention
         return {
             "schema": SCHEMA,
-            "source_status": "NOT_PRESENT",
+            "source_status": status,
             "git_strategies": git_strategies,
             "contexts": contexts,
             "operations": None,
@@ -433,29 +485,29 @@ def compose_trading_operations(
         attention.append(
             _attention(
                 "RISK_BLOCK",
-                why="Pre-trade risk did not ALLOW",
-                impact="No position is fabricated from a blocked signal",
+                why="Pre-trade risk не ALLOW.",
+                impact="Позиция из заблокированного сигнала не создаётся.",
                 evidence="PRE_TRADE_RISK_SNAPSHOT.decision!=ALLOW",
-                nxt="Inspect reason_code; do not infer a fill",
+                nxt="INSPECT_REASON_CODE",
             )
         )
     if any(row.get("join") == "LEGACY_TRACE_GAP" for row in traces):
         attention.append(
             _attention(
                 "SIGNAL_TRACE_GAP",
-                why="An execution event cannot join by signal_decision_id",
-                impact="Stage is GAP, not an inferred transition",
+                why="Событие нельзя связать по signal_decision_id.",
+                impact="Стадия остаётся GAP, не выведенный переход.",
                 evidence="LEGACY_TRACE_GAP",
-                nxt="Use forward-going events with explicit identity",
+                nxt="USE_EXPLICIT_IDENTITY",
             )
         )
     attention.append(
         _attention(
             WATCHLIST_STATUS,
-            why="No canonical pre-signal watch source is bound",
-            impact="Watchlist is not mocked",
+            why="Канонического pre-signal watch источника нет.",
+            impact="Watchlist не имитируется.",
             evidence=WATCHLIST_STATUS,
-            nxt="Do not invent watchlist storage in this atom",
+            nxt="DO_NOT_INVENT_WATCHLIST",
         )
     )
     return {

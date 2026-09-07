@@ -150,12 +150,30 @@ def _ensure_column(conn: sqlite3.Connection, table: str, column: str, ddl_type: 
     conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl_type}")
 
 
+def _connect_sqlite(path: Path, *, readonly: bool) -> sqlite3.Connection:
+    if readonly:
+        conn = sqlite3.connect(
+            path.resolve().as_uri() + "?mode=ro&immutable=1",
+            uri=True,
+            check_same_thread=False,
+        )
+    else:
+        conn = sqlite3.connect(path, check_same_thread=False)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
 class PaperPlaneStore:
-    def __init__(self, path: Path) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
+    def __init__(self, path: Path, *, readonly: bool = False) -> None:
         self.path = path
-        self._conn = sqlite3.connect(path, check_same_thread=False)
-        self._conn.row_factory = sqlite3.Row
+        self.readonly = readonly
+        if readonly:
+            if not path.is_file():
+                raise PaperPlaneError("SOURCE_NOT_PRESENT")
+            self._conn = _connect_sqlite(path, readonly=True)
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
+        self._conn = _connect_sqlite(path, readonly=False)
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute(
             """
@@ -273,6 +291,8 @@ class PaperPlaneStore:
         )
 
     def close(self) -> None:
+        if not self.readonly:
+            self._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
         self._conn.close()
 
     def start_bot(

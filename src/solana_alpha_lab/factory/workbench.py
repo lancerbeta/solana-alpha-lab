@@ -229,7 +229,7 @@ def _attention(items: list[dict[str, Any]], *, empty: str) -> str:
     cards = []
     for item in items:
         code = str(item.get("id") or item.get("code") or "")
-        next_action = _cell(item.get("NEXT_SAFE_ACTION"))
+        next_action = _next_action_html(_cell(item.get("NEXT_SAFE_ACTION")))
         cards.append(
             "<article class=\"attention\">"
             f"<h3>{canon(code)}</h3>"
@@ -241,7 +241,7 @@ def _attention(items: list[dict[str, Any]], *, empty: str) -> str:
             f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
             f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
             f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
-            f"<td>{esc(next_action)}</td></tr>"
+            f"<td>{next_action}</td></tr>"
             "</table></article>"
         )
     return "".join(cards)
@@ -350,13 +350,19 @@ def _context_table(contexts: list[dict[str, Any]]) -> str:
             f"<td>{canon(status)}</td>"
             f"<td>{canon(row.get('relation'))}</td>"
             f"<td>{canon(row.get('current_blocker') or 'NONE')}</td>"
-            f"<td>{esc(row.get('next_safe_action') or '')}</td>"
+            f"<td>{cell_html(row.get('open_risk_count'))}</td>"
+            f"<td>{cell_html(row.get('unknown_positions'))}</td>"
+            f"<td>{cell_html(row.get('unresolved_positions'))}</td>"
+            f"<td>{_next_action_html(str(row.get('next_safe_action') or 'OBSERVE'))}</td>"
             "</tr>"
         )
     return (
         "<table><tr>"
         "<th>strategy_id</th><th>version</th><th>mode</th><th>epoch</th>"
         "<th>bot</th><th>status</th><th>relation</th><th>blocker</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'open_risk'))}</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'unknown_positions'))}</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'unresolved'))}</th>"
         "<th>next</th></tr>"
         + "".join(body)
         + "</table>"
@@ -403,8 +409,24 @@ def _operations_section(model: dict[str, Any]) -> str:
     snapshot = str(ops.get("open_position_set_sha256") or "")
     bot_id = str(ops.get("bot") or "")
     bot_warning = ""
-    if present and len(bots) != 1:
+    bot_picker = ""
+    if present and len(bots) == 1:
+        bot_id = str(bots[0].get("bot_instance_id") or bot_id)
+    elif present and len(bots) > 1:
         bot_id = ""
+        options = "".join(
+            "<option value=\""
+            f"{esc(bot.get('bot_instance_id') or '')}\">"
+            f"{esc(bot.get('bot_instance_id') or '')} "
+            f"{esc(bot.get('strategy_id') or '')} "
+            f"{esc(bot.get('mode') or '')}</option>"
+            for bot in bots
+            if isinstance(bot, dict)
+        )
+        bot_picker = (
+            f"<p><label>{esc(surface_copy('OPERATIONS', 'select_bot'))} "
+            f"<select name=\"bot_instance_id\" required>{options}</select></label></p>"
+        )
         bot_warning = (
             f"<p class=\"error\">{esc(surface_copy('OPERATIONS', 'need_one_bot'))}</p>"
         )
@@ -428,10 +450,15 @@ def _operations_section(model: dict[str, Any]) -> str:
         ]
     )
     source_banner = ""
-    if not present:
+    if source_status == "NOT_PRESENT":
         source_banner = (
             f"<p class=\"semantic-unknown\">{esc(surface_copy('OPERATIONS', 'source_absent'))} "
             f"{esc(surface_copy('OPERATIONS', 'not_present'))}</p>"
+        )
+    elif source_status == "UNAVAILABLE":
+        source_banner = (
+            f"<p class=\"semantic-unknown\">"
+            f"{esc(surface_copy('OPERATIONS', 'source_unavailable'))}</p>"
         )
     last = trading.get("last_command") if isinstance(trading.get("last_command"), dict) else None
     last_html = ""
@@ -455,11 +482,14 @@ def _operations_section(model: dict[str, Any]) -> str:
             + "</table>"
         )
     commands = ""
-    if present:
+    if present and bots:
         commands = (
             "<form method=\"post\" action=\"/operations\" class=\"ops-form control-zone\" "
             "data-mode=\"CONTROL_SURFACE\">"
-            + f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{esc(bot_id)}\">"
+            + (
+                bot_picker
+                or f"<input type=\"hidden\" name=\"bot_instance_id\" value=\"{esc(bot_id)}\">"
+            )
             + f"<input type=\"hidden\" name=\"expected_open_position_set_sha256\" value=\"{esc(snapshot)}\">"
             + f"<p><label>{esc(surface_copy('OPERATIONS', 'position_id'))} "
             + "<input name=\"position_id\"></label></p>"
