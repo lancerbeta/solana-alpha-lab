@@ -25726,7 +25726,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: d5afd1b0c02c435900b50a15c1cc7e58c012434946517bab18a96748d7e7e2fd}
+  integrity: {kind: sha256, sha256: 96f8fdf983540dd321f276b0199a86d4acbec7b80eb0fe13d7a45ef312243eb9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -27661,7 +27661,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 8e07884322b0ee7651b74fc78a09fc3a0ccefe87df9f75fd43fd74850078bcf3}
+  integrity: {kind: sha256, sha256: 97cfa57df7902100c0e28515b82537976c3cfb125e876396790b08d3149064d8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -35606,7 +35606,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: 0f3a062b59e4dfef123b5cb9b926f721ec215d9935c60397887f3ba6bbd1cea0}
+  integrity: {kind: sha256, sha256: 591fa825645b9ed333393dae189d27bf53e7881273e006d59593fca004f56e27}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35899,7 +35899,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: OWNER_ATTENTION_AND_CHANGE_FEED_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_daily_attention.py', repository_path: src/solana_alpha_lab/factory/owner_daily_attention.py}
-  integrity: {kind: sha256, sha256: 5a3d82a7d63e8130c4338ed49b532fac0e61118ec27e1cd1e370fc66bccc38a6}
+  integrity: {kind: sha256, sha256: d92e86313612a709f00908584485c80949fe8e551af3b084b5da89ae63e669ed}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OWNER-ATTENTION-AND-CHANGE-FEED-001}
@@ -35936,7 +35936,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md', repository_path: docs/tasks/SYSTEM_OPERABILITY_SURFACE_V2.md}
-  integrity: {kind: sha256, sha256: 46db6793d387da182f856531cd3105549f40e2a22d4a2f2553150005cd44d6c1}
+  integrity: {kind: sha256, sha256: cba4f001ada44b8e4a3b34ac3190af7813393495f512fee5cb8c97a534ef771d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-SYSTEM-OPERABILITY-SURFACE-001}
@@ -35978,7 +35978,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/system_operability.py', repository_path: src/solana_alpha_lab/factory/system_operability.py}
-  integrity: {kind: sha256, sha256: c6e55f47dde7ea5abf385d7929f24836740713e27ab610d2f86ede58c75ed2ed}
+  integrity: {kind: sha256, sha256: afa532d011822ba9e4e3f40e3a22253f7a5c7226139a7a3767234c4fa599e4f3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
@@ -35997,7 +35997,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://tests/test_system_operability_surface_v2.py', repository_path: tests/test_system_operability_surface_v2.py}
-  integrity: {kind: sha256, sha256: 1594c02ecff39448e16dbc2c198dab252e355c9b083380c80db6f6f54f78d669}
+  integrity: {kind: sha256, sha256: f196891f232d50a05e9dd592104c6470828d1604152c71a4a1c1b4bb24129143}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}

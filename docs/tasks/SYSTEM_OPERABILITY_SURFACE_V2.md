@@ -27,6 +27,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/application.py
   - src/solana_alpha_lab/factory/workbench.py
   - src/solana_alpha_lab/factory/owner_language.py
+  - src/solana_alpha_lab/factory/owner_surface.py
   - src/solana_alpha_lab/factory/owner_daily_attention.py
   - scripts/show_system_operability.py
   - scripts/factory_operability_watch.py

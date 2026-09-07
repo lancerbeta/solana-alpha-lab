@@ -210,13 +210,14 @@ def read_required_units(
     unit_status: Mapping[str, str] | None = None,
     unit_reader: UnitReader | None = None,
 ) -> dict[str, str]:
+    required = (*WATCH_REQUIRED_TIMERS, WATCH_WORKBENCH_UNIT)
     if unit_status is not None:
-        return {str(name): str(value) for name, value in unit_status.items()}
+        units = {str(name): str(value) for name, value in unit_status.items()}
+        for name in required:
+            units.setdefault(name, SYSTEMD_UNAVAILABLE)
+        return units
     reader = unit_reader or default_unit_reader
-    units = {}
-    for name in (*WATCH_REQUIRED_TIMERS, WATCH_WORKBENCH_UNIT):
-        units[name] = reader(name)
-    return units
+    return {name: reader(name) for name in required}
 
 
 def _systemd_coverage(units: Mapping[str, str]) -> dict[str, Any]:
@@ -297,6 +298,24 @@ def _next_action_for(code: str) -> str:
     return "INSPECT_SYSTEM"
 
 
+def _evidence_status(
+    *,
+    action: bool = False,
+    degraded: bool = False,
+    not_configured: bool = False,
+    present: bool = False,
+) -> str:
+    if action:
+        return "ACTION_REQUIRED"
+    if not_configured:
+        return "NOT_CONFIGURED"
+    if degraded:
+        return "DEGRADED"
+    if present:
+        return "AVAILABLE"
+    return "UNKNOWN"
+
+
 def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str) -> dict[str, Any]:
     if packet is None:
         missing = "NOT_PRESENT" if source_status == "NOT_PRESENT" else source_status
@@ -310,19 +329,42 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
             "IMMUTABLE_ARCHIVE": _coverage(missing),
         }
     classes = {str(item) for item in (packet.get("health_classes") or [])}
-    freshness = "DEGRADED" if "DATA_STALE" in classes else "AVAILABLE"
-    provider = "DEGRADED" if classes & {
-        "PROVIDER_FAILED",
-        "PROVIDER_AUTH_FAILED",
-        "PROVIDER_RATE_LIMITED",
-    } else "AVAILABLE"
-    storage = "ACTION_REQUIRED" if classes & {"DISK_RUNWAY_HARD50", "DISK_CRITICAL"} else (
-        "DEGRADED" if classes & {"DISK_RUNWAY_TARGET40", "DISK_WARNING"} else "AVAILABLE"
+    offhost_state = _text(packet.get("offhost_backup_state")).upper()
+    freshness = _evidence_status(
+        degraded="DATA_STALE" in classes,
+        present=bool(_text(packet.get("collector_verdict"))),
     )
-    mutable = "DEGRADED" if classes & {"BACKUP_DEGRADED", "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED"} else "AVAILABLE"
-    offhost = "DEGRADED" if classes & {"OFFHOST_BACKUP_STALE", "OFFHOST_BACKUP_FAILED"} else "AVAILABLE"
-    archive = "ACTION_REQUIRED" if "IMMUTABLE_ARCHIVE_HASH_MISMATCH" in classes else (
-        "DEGRADED" if "IMMUTABLE_ARCHIVE_STALE" in classes else "AVAILABLE"
+    provider = _evidence_status(
+        degraded=bool(
+            classes
+            & {
+                "PROVIDER_FAILED",
+                "PROVIDER_AUTH_FAILED",
+                "PROVIDER_RATE_LIMITED",
+            }
+        ),
+        present=packet.get("provider_observations") is not None,
+    )
+    storage = _evidence_status(
+        action=bool(classes & {"DISK_RUNWAY_HARD50", "DISK_CRITICAL"}),
+        degraded=bool(classes & {"DISK_RUNWAY_TARGET40", "DISK_WARNING"}),
+        present=packet.get("filesystem_disk_used_pct") is not None
+        or bool(_text(packet.get("projected_97d_status"))),
+    )
+    mutable = _evidence_status(
+        degraded=bool(classes & {"BACKUP_DEGRADED", "MUTABLE_BACKUP_FULL_RDP_UNEXPECTED"}),
+        present=packet.get("backup_age_seconds") is not None,
+    )
+    offhost = _evidence_status(
+        degraded=bool(classes & {"OFFHOST_BACKUP_STALE", "OFFHOST_BACKUP_FAILED"})
+        or offhost_state in {"STALE", "FAILED"},
+        not_configured=offhost_state in {"UNCONFIGURED", "NOT_CONFIGURED", "LOCAL_ONLY"},
+        present=offhost_state in {"CURRENT", "OK", "AVAILABLE"},
+    )
+    archive = _evidence_status(
+        action="IMMUTABLE_ARCHIVE_HASH_MISMATCH" in classes,
+        degraded="IMMUTABLE_ARCHIVE_STALE" in classes,
+        present=bool(_text(packet.get("immutable_archive_latest_verified_day"))),
     )
     return {
         "COLLECTOR": _coverage("AVAILABLE"),
@@ -497,11 +539,12 @@ def compose_system_operability(
             },
         }
         next_item = attention[0] if attention else None
-        next_safe = (
-            str(next_item.get("NEXT_SAFE_ACTION"))
-            if next_item
-            else ("LEAVE_UNATTENDED" if state == "OK_OBSERVED" else "INSPECT_SYSTEM")
-        )
+        if next_item:
+            next_safe = str(next_item.get("NEXT_SAFE_ACTION") or "INSPECT_COVERAGE_GAPS")
+        elif state == "OK_OBSERVED":
+            next_safe = ""
+        else:
+            next_safe = "INSPECT_COVERAGE_GAPS"
         return {
             "schema": SCHEMA,
             "schema_version": SCHEMA_VERSION,

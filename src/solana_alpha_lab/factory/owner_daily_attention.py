@@ -239,6 +239,12 @@ def _from_local_attention(
             source_status=source_status,
         )
         if item:
+            if source_domain == "SYSTEM":
+                item["CURRENT_SAFE_STATE"] = _text(row.get("CURRENT_SAFE_STATE")) or "UNKNOWN"
+                item["AUTHORITY_REQUIRED"] = bool(row.get("AUTHORITY_REQUIRED"))
+                route = _text(row.get("RECOVERY_ROUTE"))
+                if route:
+                    item["RECOVERY_ROUTE"] = route
             out.append(item)
     return out
 
@@ -355,6 +361,8 @@ def _system_coverage(
         systemd = _text((groups.get("SYSTEMD") or {}).get("status"))
         if collector in {"UNAVAILABLE", "INVALID"}:
             current = collector
+        elif _text(system.get("state")) in {"UNKNOWN", "DEGRADED", "ACTION_REQUIRED"}:
+            current = "PARTIAL"
         elif systemd == "UNAVAILABLE" or collector in {"NOT_PRESENT", "PARTIAL", ""}:
             current = "PARTIAL"
         else:

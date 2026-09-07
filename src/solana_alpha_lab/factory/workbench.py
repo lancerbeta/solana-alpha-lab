@@ -204,9 +204,16 @@ def _token_or_unknown(value: Any) -> str:
 def _next_action_html(action: str) -> str:
     gloss, canonical, _unknown = token_gloss(NEXT_ACTION_GLOSS, action)
     body = dual(gloss, canonical) if gloss else canon(canonical)
-    if canonical == "INSPECT_SYSTEM":
+    if canonical == "OPEN_SYSTEM":
         return f'<a href="/system">{body}</a>'
     return body
+
+
+def _authority_html(flag: Any) -> str:
+    required = flag is True or str(flag).lower() in {"true", "1"}
+    if required:
+        return dual(surface_copy("SYSTEM", "authority_yes"), "AUTHORITY_REQUIRED")
+    return dual(surface_copy("SYSTEM", "authority_no"), "NO_OWNER_MUTATION")
 
 
 def _cell(value: Any) -> str:
@@ -1518,18 +1525,34 @@ def _system_section(system: dict[str, Any]) -> str:
             "<article class=\"attention\">"
             f"<h3>{canon(code)}</h3><table>"
             f"<tr><th>WHAT</th><td>{canon(str(item.get('WHAT') or code))}</td></tr>"
+            f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
+            f"<td>{esc(_cell(item.get('WHY_NOW')))}</td></tr>"
+            f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
+            f"<td>{status_html(item.get('IMPACT'))}</td></tr>"
             f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
             f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
             f"<tr><th>CURRENT_SAFE_STATE</th><td>{status_html(item.get('CURRENT_SAFE_STATE'))}</td></tr>"
             f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
             f"<td>{_next_action_html(_cell(item.get('NEXT_SAFE_ACTION')))}</td></tr>"
             f"<tr><th>RECOVERY_ROUTE</th><td class=\"mono\">{esc(_cell(item.get('RECOVERY_ROUTE')))}</td></tr>"
-            f"<tr><th>AUTHORITY_REQUIRED</th><td>{canon(item.get('AUTHORITY_REQUIRED'))}</td></tr>"
+            f"<tr><th>AUTHORITY_REQUIRED</th><td>{_authority_html(item.get('AUTHORITY_REQUIRED'))}</td></tr>"
             "</table></article>"
         )
-    attention_html = (
-        "".join(cards) if cards else f"<p>{esc(surface_copy('SYSTEM', 'no_attention'))}</p>"
-    )
+    if cards:
+        attention_html = "".join(cards)
+    elif state == "OK_OBSERVED":
+        attention_html = f"<p>{esc(surface_copy('SYSTEM', 'no_attention'))}</p>"
+    else:
+        attention_html = f"<p>{esc(surface_copy('SYSTEM', 'unknown_attention'))}</p>"
+    next_action = str(system.get("next_safe_action") or "")
+    leave_ok = state == "OK_OBSERVED" and next_action in {"", "LEAVE_UNATTENDED"}
+    if leave_ok:
+        next_html = f"<p>{esc(surface_copy('SYSTEM', 'leave'))}</p>"
+        next_strip = esc(surface_copy("SYSTEM", "leave"))
+    else:
+        shown = next_action or "INSPECT_COVERAGE_GAPS"
+        next_html = f"<p>{_next_action_html(shown)}</p>"
+        next_strip = _next_action_html(shown)
     coverage_rows = []
     for name, row in coverage.items():
         payload = row if isinstance(row, dict) else {"status": row}
@@ -1553,13 +1576,11 @@ def _system_section(system: dict[str, Any]) -> str:
                 ),
                 (
                     surface_copy("SYSTEM", "next"),
-                    _next_action_html(str(system.get("next_safe_action")))
-                    if system.get("next_safe_action")
-                    else _token_or_unknown(None),
+                    next_strip,
                 ),
                 (
                     surface_copy("SYSTEM", "deployed"),
-                    _token_or_unknown(identity.get("deployed_sha") or identity.get("capability_deploy_version")),
+                    _token_or_unknown(identity.get("deployed_sha")),
                 ),
             ]
         )
@@ -1586,7 +1607,13 @@ def _system_section(system: dict[str, Any]) -> str:
         + "</table>"
         + f"<h2>{esc(surface_copy('SYSTEM', 'deploy'))}</h2>"
         + "<table>"
-        + mapping_rows(identity)
+        + mapping_rows(
+            {
+                "deployed_sha": identity.get("deployed_sha"),
+                "git_head": identity.get("git_head"),
+                "deploy_relation": identity.get("deploy_relation"),
+            }
+        )
         + "</table>"
         + f"<h2>{esc(surface_copy('SYSTEM', 'alerting'))}</h2>"
         + "<table>"
@@ -1599,11 +1626,7 @@ def _system_section(system: dict[str, Any]) -> str:
         + "".join(coverage_rows)
         + "</table>"
         + f"<h2>{esc(surface_copy('SYSTEM', 'next'))}</h2>"
-        + (
-            f"<p>{_next_action_html(str(system.get('next_safe_action')))}</p>"
-            if system.get("next_safe_action")
-            else f"<p>{esc(surface_copy('SYSTEM', 'leave'))}</p>"
-        )
+        + next_html
         + technical("<table>" + mapping_rows(system) + "</table>", title=surface_copy("SYSTEM", "machine"))
     )
 

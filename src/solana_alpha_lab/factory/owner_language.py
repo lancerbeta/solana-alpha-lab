@@ -271,6 +271,14 @@ NEXT_ACTION_GLOSS = {
     "OPEN_RESEARCH": "Открыть Исследования",
     "OPEN_SYSTEM": "Открыть Систему",
     "MARK_HOME_REVIEWED": "Отметить просмотр Главной",
+    "LEAVE_UNATTENDED": "Можно оставить без вмешательства — при текущем покрытии",
+    "FOLLOW_UNATTENDED_TIMER_RECOVERY": "Таймер не active — смотрите unattended runbook, не SSH сами",
+    "FOLLOW_UNATTENDED_WORKBENCH_RECOVERY": "Workbench unit не active — смотрите unattended runbook",
+    "FOLLOW_DEPLOY_BOUNDARY": "Deploy SHA не совпадает с Git HEAD — смотрите remote-host runbook",
+    "FOLLOW_STORAGE_RUNWAY_RECOVERY": "Диск/runway — смотрите storage в unattended runbook",
+    "FOLLOW_DURABILITY_RUNBOOK": "Backup/off-host/archive — смотрите durability в unattended runbook",
+    "INSPECT_COLLECTOR_FRESHNESS": "Сбор устарел или застрял — смотрите collector freshness",
+    "INSPECT_COVERAGE_GAPS": "Покрытие неполное. UNKNOWN/NOT_PRESENT — это не «всё чисто»",
 }
 
 STATUS_GLOSS = {
@@ -285,6 +293,16 @@ STATUS_GLOSS = {
     "INVALID": "недействителен",
     "NOT_PRESENT": "отсутствует",
     "PARTIAL": "частично",
+    "UNAVAILABLE": "недоступен",
+    "NOT_CONFIGURED": "не настроено",
+    "CONFIGURED": "настроено, доставка не доказана",
+    "DEGRADED": "деградировано",
+    "ACTION_REQUIRED": "нужно действие",
+    "OK_OBSERVED": "наблюдается как работающее",
+    "SERVING": "этот HTTP сейчас отвечает",
+    "SERVING_NOW": "этот HTTP сейчас отвечает",
+    "MATCH": "совпадает",
+    "MISMATCH": "не совпадает",
 }
 
 KIND_LABELS = {
@@ -436,7 +454,7 @@ SURFACE_COPY = {
     },
     "SYSTEM": {
         "h1": "Система",
-        "question": "Можно ли сейчас оставить Factory работать без меня?",
+        "question": "Можно ли сейчас оставить Factory технически работать без меня?",
         "now": "Сейчас",
         "attention": "Требует внимания",
         "collection": "Сбор и свежесть",
@@ -462,6 +480,9 @@ SURFACE_COPY = {
         "http_self": "HTTP сейчас",
         "managed_unit": "Управляемый unit",
         "no_attention": "Сейчас нет системных пунктов, которые требуют Петра.",
+        "unknown_attention": "Пунктов внимания нет, но покрытие неполное — это не «можно оставить».",
+        "authority_yes": "Нужен агент / не SSH и не systemctl сами.",
+        "authority_no": "Маршрут описательный, кнопок мутации здесь нет.",
         "leave": "Можно оставить без вмешательства — при текущем покрытии.",
         "residual": "Workbench не может сам увидеть смерть своего VPS.",
     },

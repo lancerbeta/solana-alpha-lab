@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -30,7 +32,7 @@ from solana_alpha_lab.factory.system_operability import (  # noqa: E402
     compose_system_operability,
     observation_sqlite_path,
 )
-from solana_alpha_lab.factory.workbench import serve  # noqa: E402
+from solana_alpha_lab.factory.workbench import _system_section, serve  # noqa: E402
 from solana_alpha_lab.factory_semantic_operability import (  # noqa: E402
     load_semantic_catalog_views,
     load_semantic_projection,
@@ -48,6 +50,29 @@ UNITS_OK = {
     "factory-operability-watch.timer": "active",
     "factory-v1-workbench.service": "active",
 }
+
+
+def _init_git_head(root: Path) -> str:
+    subprocess.run(["git", "init"], cwd=root, check=True, capture_output=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.email=lab@example",
+            "-c",
+            "user.name=lab",
+            "commit",
+            "--allow-empty",
+            "-m",
+            "t",
+        ],
+        cwd=root,
+        check=True,
+        capture_output=True,
+    )
+    return subprocess.check_output(
+        ["git", "-C", str(root), "rev-parse", "HEAD"], text=True
+    ).strip()
 
 
 def isolated_factory_root(tmp: Path) -> Path:
@@ -195,7 +220,7 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = Path(tmp) / "match"
             root.mkdir()
-            marker = "b" * 40
+            marker = _init_git_head(root)
             (root / ".factory_deploy_sha").write_text(marker + "\n", encoding="ascii")
             projection = compose_system_operability(
                 root=root,
@@ -204,26 +229,31 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
                 collector_packet=_packet(),
                 environ={},
             )
-            # No .git → PARTIAL, not MATCH. Inject equal SHAs via files only:
-            self.assertIn(projection["identity"]["deploy_relation"], {"PARTIAL", "MATCH", "UNKNOWN"})
+            self.assertEqual(projection["identity"]["deploy_relation"], "MATCH")
             self.assertEqual(projection["identity"]["deployed_sha"], marker)
+            self.assertNotIn(
+                "DEPLOY_IDENTITY_MISMATCH",
+                {item["attention_code"] for item in projection["attention"]},
+            )
 
     def test_a7_deploy_identity_mismatch(self) -> None:
-        projection = compose_system_operability(
-            root=ROOT,
-            now=NOW,
-            unit_status=UNITS_OK,
-            collector_packet=_packet(),
-            environ={},
-        )
-        deployed = projection["identity"]["deployed_sha"]
-        head = projection["identity"]["git_head"]
-        if deployed and head and deployed != head:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "mismatch"
+            root.mkdir()
+            _init_git_head(root)
+            marker = "c" * 40
+            (root / ".factory_deploy_sha").write_text(marker + "\n", encoding="ascii")
+            projection = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                collector_packet=_packet(),
+                environ={},
+            )
             self.assertEqual(projection["identity"]["deploy_relation"], "MISMATCH")
+            self.assertEqual(projection["identity"]["deployed_sha"], marker)
             codes = {item["attention_code"] for item in projection["attention"]}
             self.assertIn("DEPLOY_IDENTITY_MISMATCH", codes)
-        else:
-            self.assertIn(projection["identity"]["deploy_relation"], {"MATCH", "PARTIAL", "UNKNOWN"})
 
     def test_b1_stale_collection(self) -> None:
         projection = compose_system_operability(
@@ -371,6 +401,17 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
                 for item in daily["current_attention"]
             )
         )
+        unknown = compose_system_operability(
+            root=ROOT,
+            now=NOW,
+            unit_status={name: SYSTEMD_UNAVAILABLE for name in UNITS_OK},
+            collector_packet=_packet(),
+            environ={},
+        )
+        self.assertEqual(unknown["state"], "UNKNOWN")
+        home = compose_owner_attention(system=unknown)
+        system_cov = next(item for item in home["coverage"] if item["source_domain"] == "SYSTEM")
+        self.assertNotEqual(system_cov["CURRENT_STATE"], "AVAILABLE")
 
     def test_c1_timer_card_has_recovery_fields(self) -> None:
         units = dict(UNITS_OK)
@@ -445,9 +486,74 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
             after = _walk(root)
             self.assertEqual(before, after)
             self.assertIn("SYSTEM_OPERABILITY", body)
+            self.assertIn("технически", body)
             self.assertNotIn("HEALTHY", body.split("non_claims")[0] if "non_claims" in body else body)
             self.assertNotIn('name="command" value="START"', body)
             self.assertNotIn("HEALTHY", json.dumps(app.read_model(surface="SYSTEM")["system_operability"]["state"]))
+
+    def test_get_system_shows_visible_diagnosis(self) -> None:
+        units = dict(UNITS_OK)
+        units["factory-v1-workbench.service"] = "inactive"
+        projection = compose_system_operability(
+            root=ROOT,
+            now=NOW,
+            http_self=HTTP_SERVING,
+            unit_status=units,
+            collector_packet=_packet(),
+            environ={},
+        )
+        html = _system_section(projection)
+        self.assertIn("WORKBENCH_SERVICE_DOWN", html)
+        self.assertIn("Почему сейчас", html)
+        self.assertIn("FACTORY_UNATTENDED_OPERABILITY.md", html)
+        self.assertIn("не SSH", html)
+        self.assertIn("Workbench unit не active", html)
+        self.assertNotIn("git-only-capability", html.split("technical")[0])
+
+    def test_deploy_strip_ignores_git_capability(self) -> None:
+        html = _system_section(
+            {
+                "state": "UNKNOWN",
+                "identity": {
+                    "deployed_sha": None,
+                    "capability_deploy_version": "git-only-capability",
+                },
+                "processes": {},
+                "collection": {},
+                "storage": {},
+                "durability": {},
+                "alerting": {},
+                "coverage": {},
+                "attention": [],
+            }
+        )
+        visible = html.split("technical")[0]
+        self.assertNotIn("git-only-capability", visible)
+        self.assertIn("UNKNOWN", visible)
+
+    def test_offhost_absence_is_not_available(self) -> None:
+        packet = _packet()
+        packet.pop("offhost_backup_state")
+        packet["health_classes"] = ["PROCESS_OK"]
+        projection = compose_system_operability(
+            root=ROOT,
+            now=NOW,
+            unit_status=UNITS_OK,
+            collector_packet=packet,
+            environ={},
+        )
+        self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "UNKNOWN")
+
+    def test_empty_unit_status_is_not_all_active(self) -> None:
+        projection = compose_system_operability(
+            root=ROOT,
+            now=NOW,
+            unit_status={},
+            collector_packet=_packet(),
+            environ={},
+        )
+        self.assertEqual(projection["coverage"]["SYSTEMD"]["status"], "UNAVAILABLE")
+        self.assertNotEqual(projection["state"], "OK_OBSERVED")
 
     def test_d2_existing_observation_db_unmodified(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -515,6 +621,21 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
         cli = (ROOT / "scripts/show_system_operability.py").read_text(encoding="utf-8")
         self.assertIn("compose_system_operability", cli)
         self.assertIn("--json", cli)
+        env = {**os.environ, "PYTHONPATH": str(SRC)}
+        raw = subprocess.check_output(
+            [
+                sys.executable,
+                "-B",
+                str(ROOT / "scripts/show_system_operability.py"),
+                "--json",
+            ],
+            cwd=str(ROOT),
+            env=env,
+        )
+        payload = json.loads(raw.decode("utf-8"))
+        self.assertEqual(payload["schema"], "smial.system-operability-projection")
+        dumped = json.dumps(payload)
+        self.assertNotIn("HEALTHY", dumped)
 
     def test_gold_queries_land_on_remote_ops(self) -> None:
         assets, bindings, _queries = load_semantic_catalog_views(ROOT)
