@@ -1,0 +1,44 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "MARKET-DATA-AWARENESS-FACTORY-FIT-001",
+  "as_of": "2026-09-08",
+  "task_id": "MARKET_DATA_AWARENESS_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "73f87b803b4fde8ef32fc1b688f86b3c0548d9debe5aa71161e50d438696e3a2",
+  "reviewed_inventory_sha256": "d28d358fc121a31b273c88c10aabf037741a5799fc6cc0170457bc3cee9f4c92",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "OWNER_WORKBENCH_VPS_DEPLOY_AND_SMOKE_V1"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXPECTED_RETURN",
+    "NO_TRADE_OR_NO_TRADE",
+    "NO_MARKET_WIDE_CLAIM",
+    "NO_REGIME_PREDICTOR",
+    "NO_LIVE_PNL",
+    "NO_OWNER_FCF",
+    "NO_PROMOTION",
+    "NO_REAL_MONEY",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_CANONICAL_DONE"
+  ],
+  "recovery": "REVERT"
+}

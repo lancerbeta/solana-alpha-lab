@@ -1,0 +1,82 @@
+schema: smial.market-context-definition
+schema_version: "1.0"
+definition_id: MARKET-CONTEXT-DEFINITION-V1
+definition_version: "1.0"
+as_of: "2026-09-07"
+current_window_seconds: 3600
+reference_lookback_seconds: 604800
+reference_bucket_seconds: 3600
+reference_low_quantile: "0.20"
+reference_high_quantile: "0.80"
+quantile_method: ROUND_FLOOR
+minimum_current_coverage: "0.20"
+minimum_current_n: 5
+minimum_historical_buckets: 12
+owner_default_landmark_id: Y1800
+lifecycle_landmarks:
+  - point_id: Y900
+    due_offset_seconds: 900
+    previous_point_id: X300
+    owner_label: 15m
+  - point_id: Y1800
+    due_offset_seconds: 1800
+    previous_point_id: Y900
+    owner_label: 30m
+  - point_id: Y3600
+    due_offset_seconds: 3600
+    previous_point_id: Y1800
+    owner_label: 1h
+  - point_id: Y7200
+    due_offset_seconds: 7200
+    previous_point_id: Y3600
+    owner_label: 2h
+  - point_id: Y14400
+    due_offset_seconds: 14400
+    previous_point_id: Y7200
+    owner_label: 4h
+axes:
+  - axis_id: LIQUIDITY_LEVEL
+    field_ids: [FIELD-LIQUIDITY-USD-001]
+    aggregation: MEDIAN_OBSERVED
+    unit: USD
+  - axis_id: LIQUIDITY_BREADTH
+    field_ids: [FIELD-LIQUIDITY-USD-001]
+    aggregation: UP_SHARE_VS_PREVIOUS
+    unit: UP_SHARE
+  - axis_id: PARTICIPATION
+    field_ids: [FIELD-STATS5M-NUM-TRADERS-001]
+    aggregation: MEDIAN_OBSERVED
+    unit: TRADERS
+  - axis_id: BUY_SELL_ACTIVITY_BALANCE
+    field_ids:
+      - FIELD-STATS5M-NUM-BUYS-001
+      - FIELD-STATS5M-NUM-SELLS-001
+    aggregation: MEDIAN_BUY_SELL_BALANCE
+    unit: BALANCE
+  - axis_id: PRICE_BREADTH
+    field_ids: [FIELD-USD-PRICE-001]
+    aggregation: UP_SHARE_VS_PREVIOUS
+    unit: UP_SHARE
+tokens_projection:
+  projection_id: TOKENS_V2_TYPED_PROJECTION_V1
+  projection_version: "1.0"
+population:
+  description: >-
+    Tracked / sampled early pump.fun lifecycle population under the current
+    accepted collection contract. Not all Solana, not all memecoins, not all
+    pump.fun.
+  market_wide_claim: false
+tested_context_binding: NOT_AVAILABLE
+non_claims:
+  - NO_MARKET_WIDE_CLAIM
+  - NO_EXPECTED_RETURN
+  - NO_TRADE_OR_NO_TRADE
+  - NO_BULL_BEAR_OR_COMPOSITE_REGIME
+  - NO_TESTED_STRATEGY_CONTEXT_BINDING
+  - NO_BOT_AUTHORITY
+  - NO_COLLECTOR_HEALTH_INFERENCE
+  - NO_ORCH_001
+  - NO_DISCOVERY_RANKER
+  - NO_PROVIDER
+  - NO_DEPLOY
+  - NO_LIVE_OR_WALLET

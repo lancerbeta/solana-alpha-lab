@@ -1,12 +1,12 @@
 schema_version: '1.1'
 catalog_id: SMIAL-PROJECT-ASSET-CATALOG
-catalog_version: 0.129.0
+catalog_version: 0.130.0
 as_of: '2026-09-07'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1728
+  assets: 1736
   asset_registries: 4
-  schemas: 90
+  schemas: 91
   queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -27,6 +27,14 @@ canonical_bindings:
     current_use_evidence_asset_ids:
     - MODULE-FACTORY-V1-MARKET-FEATURE-SURFACE-001
     - CONFIG-EXPERIMENT-SPEC-MARKET-FEATURE-PRICE-PATH-001
+  ACTIVE-MARKET-DATA-AWARENESS:
+    target_asset_id: CONFIG-MARKET-CONTEXT-DEFINITION-001
+    expected_asset_type: configuration
+    semantics: CURRENT_AT_COMMIT
+    rationale: Current Market Data Awareness definition and observable context capability
+    current_use_evidence_asset_ids:
+    - MODULE-MARKET-CONTEXT-001
+    - TEST-MARKET-DATA-AWARENESS-001
   ACTIVE-FACTORY-OPERATIONAL-READINESS:
     target_asset_id: CONFIG-FACTORY-V1-OPERATIONAL-READINESS-001
     expected_asset_type: configuration
@@ -202,6 +210,7 @@ root_resolver:
   - catalog/schemas/factory_v1_quote_surface_retention_falsifier.schema.json
   - catalog/schemas/factory_v1_quote_surface_retention_confirmatory.schema.json
   - catalog/schemas/factory_v1_common_market_feature_surface.schema.json
+  - catalog/schemas/market_context_definition_v1.schema.json
   - catalog/schemas/factory_v1_pit_data_truth_canonicalization.schema.json
   - catalog/schemas/provider_route_capability_registry_v10.schema.json
   - catalog/schemas/hypothesis_forge_draft_v1.schema.json

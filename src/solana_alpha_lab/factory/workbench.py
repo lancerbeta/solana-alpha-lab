@@ -17,13 +17,17 @@ from solana_alpha_lab.factory.owner_language import (
     ROLLBACK_GLOSS,
     VERDICT_GLOSS,
     attention_label,
+    axis_label,
+    axis_unit_label,
     blocker_label,
+    coverage_class_label,
     counter_label,
     decision_kind_label,
     field_label,
     handoff_state_label,
     kind_label,
     nav_label,
+    nonclaim_label,
     obligation_label,
     owner_error,
     research_copy,
@@ -70,11 +74,12 @@ BOT_SCOPED_COMMANDS = frozenset(
 NAV = (
     ("/", "HOME"),
     ("/research", "RESEARCH"),
+    ("/market", "MARKET"),
     ("/operations", "OPERATIONS"),
     ("/economics", "ECONOMICS"),
     ("/system", "SYSTEM"),
 )
-HIDDEN_NAV = ("MARKET",)
+HIDDEN_NAV: tuple[str, ...] = ()
 
 
 def owner_copy_blocks(app: FactoryApplication) -> list[dict[str, str]]:
@@ -1807,6 +1812,243 @@ def _system_section(system: dict[str, Any]) -> str:
     )
 
 
+def _coverage_class_text(classes: Mapping[str, Any]) -> str:
+    parts = []
+    for key in (
+        "observed",
+        "typed_missing",
+        "disappeared",
+        "censored",
+        "capacity_excluded",
+        "sampling_excluded",
+        "x_ineligible",
+        "unknown",
+    ):
+        count = classes.get(key)
+        if count:
+            parts.append(f"{coverage_class_label(key)}={count}")
+    return "; ".join(parts) if parts else "empty"
+
+
+def _relative_cell(cell: Mapping[str, Any]) -> str:
+    state = str(cell.get("relative_state") or "UNKNOWN")
+    reason = str(cell.get("relative_reason") or "")
+    raw = cell.get("raw_value")
+    unit = axis_unit_label(str(cell.get("unit") or ""))
+    raw_text = cell_html(raw)
+    if raw not in {None, ""} and unit:
+        raw_text = f"{raw_text} {esc(unit)}"
+    why = f" {status_html(reason)}" if reason else ""
+    return (
+        f"<div class=\"market-cell\" data-relative=\"{esc(state)}\">"
+        f"{status_html(state)}{why}"
+        f"<div>{esc(surface_copy('MARKET', 'raw'))}: {raw_text}</div>"
+        f"<div>{esc(surface_copy('MARKET', 'n_obs'))}: {cell_html(cell.get('n_observed'))}"
+        f" / {esc(surface_copy('MARKET', 'n_metric'))}: {cell_html(cell.get('n_metric_supported'))}"
+        f" / {esc(surface_copy('MARKET', 'n_scope'))}: {cell_html(cell.get('n_in_scope'))}</div>"
+        "</div>"
+    )
+
+
+def _market_section(model: dict[str, Any]) -> str:
+    market = model.get("market") if isinstance(model.get("market"), dict) else {}
+    scope = market.get("scope") if isinstance(market.get("scope"), dict) else {}
+    slices = list(market.get("lifecycle_slices") or [])
+    interpretation = (
+        market.get("interpretation") if isinstance(market.get("interpretation"), dict) else {}
+    )
+    default_id = str(interpretation.get("default_landmark_id") or "Y1800")
+    default_slice = next((item for item in slices if item.get("point_id") == default_id), None)
+    source = str(market.get("source_status") or "NOT_PRESENT")
+    market_gaps = [str(item) for item in (market.get("gaps") or [])]
+    banner = ""
+    if source != "PRESENT":
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'no_source'))} "
+            f"{status_html(source)}</p>"
+        )
+        error = str(market.get("source_error") or "")
+        if error:
+            banner += f"<p class=\"semantic-unknown\">{status_html(error)}</p>"
+    elif "CURRENT_SCOPE_MIXED" in market_gaps:
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'mixed'))} "
+            f"{status_html('CURRENT_SCOPE_MIXED')}</p>"
+        )
+    elif "MEMBER_EVIDENCE_INCOMPLETE" in market_gaps:
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'incomplete_members'))} "
+            f"{status_html('MEMBER_EVIDENCE_INCOMPLETE')}</p>"
+        )
+    elif "NO_CURRENT_OBSERVATIONS" in market_gaps:
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'no_current'))} "
+            f"{status_html('NO_CURRENT_OBSERVATIONS')}</p>"
+        )
+    elif str(market.get("reference_status") or "") == "REFERENCE_SCOPE_MISMATCH":
+        banner = (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'mismatch'))} "
+            f"{status_html('REFERENCE_SCOPE_MISMATCH')}</p>"
+        )
+    gaps_html = ""
+    if market_gaps:
+        gaps_html = (
+            f"<p>{esc(surface_copy('MARKET', 'gaps'))}: "
+            + "; ".join(status_html(item) for item in market_gaps)
+            + "</p>"
+        )
+    axis_ids: list[str] = []
+    if slices:
+        axis_ids = [str(cell.get("axis_id")) for cell in (slices[0].get("axes") or [])]
+    header = "".join(
+        f"<th>{esc(item.get('owner_label') or item.get('point_id'))}</th>" for item in slices
+    )
+    rows_html = ""
+    for axis_id in axis_ids:
+        cells = ""
+        for landmark in slices:
+            cell = next(
+                (
+                    item
+                    for item in (landmark.get("axes") or [])
+                    if item.get("axis_id") == axis_id
+                ),
+                {},
+            )
+            cells += f"<td>{_relative_cell(cell)}</td>"
+        rows_html += f"<tr><th>{esc(axis_label(axis_id))}</th>{cells}</tr>"
+    default_html = ""
+    if isinstance(default_slice, dict):
+        facts = []
+        for cell in default_slice.get("axes") or []:
+            facts.append((axis_label(str(cell.get("axis_id"))), _relative_cell(cell)))
+        default_html = fact_strip(facts)
+        unknown_bits = [
+                f"{axis_label(str(cell.get('axis_id')))}: {status_display(cell.get('relative_reason') or cell.get('relative_state'))}"
+            for cell in (default_slice.get("axes") or [])
+            if cell.get("relative_state") == "UNKNOWN"
+        ]
+        if unknown_bits:
+            default_html += (
+                f"<p>{esc(surface_copy('MARKET', 'unknown_why'))}: "
+                f"{esc('; '.join(unknown_bits))}</p>"
+            )
+    coverage_rows = ""
+    for landmark in slices:
+        for cell in landmark.get("axes") or []:
+            classes = cell.get("coverage_classes") if isinstance(cell.get("coverage_classes"), dict) else {}
+            coverage_rows += (
+                "<tr>"
+                f"<td>{esc(landmark.get('owner_label') or landmark.get('point_id'))}</td>"
+                f"<td>{esc(axis_label(str(cell.get('axis_id'))))}</td>"
+                f"<td>{cell_html(cell.get('n_in_scope'))}</td>"
+                f"<td>{cell_html(cell.get('n_observed'))}</td>"
+                f"<td>{cell_html(cell.get('n_metric_supported'))}</td>"
+                f"<td>{cell_html(cell.get('n_missing'))}</td>"
+                f"<td>{cell_html(cell.get('observed_fraction'))}</td>"
+                f"<td>{esc(_coverage_class_text(classes))}</td>"
+                "</tr>"
+            )
+    capability = market.get("data_capability") if isinstance(market.get("data_capability"), dict) else {}
+    cap_rows = ""
+    for item in capability.get("features") or []:
+        if not isinstance(item, dict):
+            continue
+        cap_rows += (
+            "<tr>"
+            f"<td>{esc(item.get('feature_id'))}</td>"
+            f"<td>{canon(item.get('availability'))}</td>"
+            "</tr>"
+        )
+    non_claims = market.get("nonclaims") if isinstance(market.get("nonclaims"), list) else []
+    return (
+        banner
+        + gaps_html
+        + f"<h2>{esc(surface_copy('MARKET', 'scope'))}</h2>"
+        + fact_strip(
+            [
+                (
+                    surface_copy("MARKET", "population"),
+                    esc(scope.get("population_description")),
+                ),
+                (surface_copy("MARKET", "as_of"), canon(market.get("as_of"))),
+                (surface_copy("MARKET", "source"), status_html(source)),
+                (surface_copy("MARKET", "sampling"), canon(scope.get("sampling_policy"))),
+            ]
+        )
+        + f"<p>{esc(surface_copy('MARKET', 'not_all_market'))} {canon('NO_MARKET_WIDE_CLAIM')}</p>"
+        + f"<h2>{esc(surface_copy('MARKET', 'now'))}</h2>"
+        + fact_strip(
+            [
+                (
+                    surface_copy("MARKET", "latest"),
+                    canon(market.get("latest_evidence_available_at")),
+                ),
+                (surface_copy("MARKET", "reference"), status_html(market.get("reference_status"))),
+                (
+                    surface_copy("MARKET", "compat"),
+                    canon(market.get("context_compatibility_sha256")),
+                ),
+            ]
+        )
+        + f"<p>{esc(surface_copy('MARKET', 'vector'))} {esc(surface_copy('MARKET', 'high_means'))}</p>"
+        + (
+            f"<p>{esc(surface_copy('MARKET', 'leave'))}</p>"
+            if source == "PRESENT"
+            and "CURRENT_SCOPE_MIXED" not in market_gaps
+            and "MEMBER_EVIDENCE_INCOMPLETE" not in market_gaps
+            else ""
+        )
+        + f"<h3>{esc(surface_copy('MARKET', 'default_detail'))}</h3>"
+        + default_html
+        + f"<h2>{esc(surface_copy('MARKET', 'interpretation'))}</h2>"
+        + fact_strip(
+            [
+                (
+                    surface_copy("MARKET", "tested"),
+                    canon(interpretation.get("tested_context_binding")),
+                ),
+            ]
+        )
+        + f"<h2>{esc(surface_copy('MARKET', 'non_claims'))}</h2>"
+        + f"<p class=\"non-claims\">{esc('; '.join(nonclaim_label(str(item)) for item in non_claims))}</p>"
+        + f"<h2>{esc(surface_copy('MARKET', 'matrix'))}</h2>"
+        + "<table><thead><tr><th></th>"
+        + header
+        + "</tr></thead><tbody>"
+        + rows_html
+        + "</tbody></table>"
+        + f"<h2>{esc(surface_copy('MARKET', 'coverage'))}</h2>"
+        + "<table><thead><tr>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_point'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_axis'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'n_scope'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'n_obs'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'n_metric'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_missing'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_fraction'))}</th>"
+        f"<th>{esc(surface_copy('MARKET', 'coverage_classes'))}</th>"
+        "</tr></thead><tbody>"
+        + coverage_rows
+        + "</tbody></table>"
+        + f"<p>{esc(surface_copy('MARKET', 'freshness'))} "
+        f'<a href="/system">{esc(surface_copy("MARKET", "system_link"))}</a></p>'
+        + f"<p><a href=\"/research\">{esc(surface_copy('MARKET', 'research_link'))}</a> · "
+        f"<a href=\"/operations\">{esc(surface_copy('MARKET', 'operations_link'))}</a> · "
+        f"<a href=\"/economics\">{esc(surface_copy('MARKET', 'economics_link'))}</a></p>"
+        + technical(
+            f"<p>{esc(surface_copy('MARKET', 'capability_note'))} {canon('GIT_CAPABILITY')}</p>"
+            + "<table>"
+            + cap_rows
+            + "</table>"
+            + "<table>"
+            + mapping_rows(market)
+            + "</table>",
+            title=surface_copy("MARKET", "machine"),
+        )
+    )
+
+
 def _page(
     model: dict[str, Any],
     *,
@@ -1840,6 +2082,7 @@ def _page(
         ),
         "OPERATIONS": _operations_section(model),
         "ECONOMICS": _economics_section(model),
+        "MARKET": _market_section(model),
         "SYSTEM": _system_section(system),
     }
     consumed = "true" if visual_consumed else "false"
@@ -1938,6 +2181,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                 "/": "HOME",
                 "/index.html": "HOME",
                 "/research": "RESEARCH",
+                "/market": "MARKET",
                 "/operations": "OPERATIONS",
                 "/economics": "ECONOMICS",
                 "/system": "SYSTEM",
@@ -1956,6 +2200,8 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
             command = (fields.get("command") or [""])[0]
             error = ""
             try:
+                if path == "/market":
+                    raise ApplicationError("MARKET_HAS_NO_COMMANDS")
                 if path in {"/", "/index.html"}:
                     if command != "MARK_REVIEWED":
                         raise ApplicationError("COMMAND_NOT_ALLOWLISTED")
@@ -2039,6 +2285,9 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                             "native_kind": fields.get("native_kind") or [],
                         },
                     )
+                    return
+                if path == "/market":
+                    self._render("MARKET", error=error)
                     return
                 surface = "OPERATIONS" if path == "/operations" else "HOME"
                 self._render(surface, error=error)

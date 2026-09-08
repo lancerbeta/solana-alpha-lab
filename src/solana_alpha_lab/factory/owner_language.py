@@ -10,6 +10,7 @@ MACHINE_LANGUAGE = "EN"
 NAV_LABELS = {
     "HOME": "Главная",
     "RESEARCH": "Исследования",
+    "MARKET": "Рынок",
     "OPERATIONS": "Операции",
     "ECONOMICS": "Экономика",
     "SYSTEM": "Система",
@@ -308,6 +309,22 @@ STATUS_GLOSS = {
     "SERVING_NOW": "этот HTTP сейчас отвечает",
     "MATCH": "совпадает",
     "MISMATCH": "не совпадает",
+    "COMPARABLE": "сопоставима",
+    "HIGH_RELATIVE": "выше недавней истории",
+    "LOW_RELATIVE": "ниже недавней истории",
+    "MID_RELATIVE": "в середине недавней истории",
+    "CURRENT_SCOPE_MIXED": "смешаны разные текущие scope",
+    "REFERENCE_SCOPE_MISMATCH": "история несопоставима",
+    "COVERAGE_INSUFFICIENT": "покрытие недостаточно",
+    "REFERENCE_INSUFFICIENT": "мало сопоставимой истории",
+    "SCHEDULE_SEMANTICS_MISSING": "нет семантики расписания",
+    "MEMBER_EVIDENCE_INCOMPLETE": "неполный список выборки",
+    "SOURCE_NOT_PRESENT": "отсутствует",
+    "NO_CURRENT_OBSERVATIONS": "нет текущих наблюдений",
+    "OBSERVATION_PARTITION_MISSING": "нет файла observation partition",
+    "OBSERVATION_PARTITION_UNREADABLE": "не читается observation partition",
+    "GIT_CAPABILITY": "Git-доступность, не live market",
+    "PIT_CLOCK_MISSING": "нет PIT-часов",
 }
 
 KIND_LABELS = {
@@ -530,6 +547,76 @@ SURFACE_COPY = {
         "leave": "Можно оставить без вмешательства — при текущем покрытии.",
         "residual": "Workbench не может сам увидеть смерть своего VPS.",
     },
+    "MARKET": {
+        "h1": "Рынок",
+        "question": (
+            "Какой контекст сейчас наблюдается в моей торгуемой части рынка, "
+            "насколько он отличается от недавней сопоставимой истории, "
+            "насколько этот вывод покрыт данными, и что из этого нельзя заключать?"
+        ),
+        "now": "Контекст сейчас",
+        "matrix": "Матрица возраста",
+        "default_detail": "Деталь 30м",
+        "coverage": "Покрытие и пропуски",
+        "scope": "Scope, источник и as-of",
+        "capability": "Какие данные Factory может использовать",
+        "capability_note": (
+            "Это Git-доступность признаков, не текущие рыночные значения."
+        ),
+        "non_claims": "Что это не означает",
+        "machine": "Точные machine-значения",
+        "unknown_why": "Почему UNKNOWN",
+        "relative": "Относительно недавней сопоставимой истории",
+        "raw": "Сырое значение",
+        "as_of": "На момент",
+        "latest": "Последняя доступность evidence",
+        "population": "Популяция",
+        "not_all_market": "Это не весь рынок Solana / memecoin / pump.fun.",
+        "system_link": "Свежесть runtime → Система",
+        "research_link": "Исследования",
+        "operations_link": "Операции",
+        "economics_link": "Экономика",
+        "no_source": "Источник immutable market evidence сейчас отсутствует. LOW не выдуман.",
+        "mismatch": (
+            "История несопоставима с текущим контекстом. Сырые значения видны, "
+            "относительная полоса закрыта. HIGH/LOW читать нельзя."
+        ),
+        "mixed": (
+            "Смешаны разные текущие scope. Сырые значения и покрытие не смешиваются. "
+            "HIGH/LOW читать нельзя."
+        ),
+        "incomplete_members": (
+            "Список выборки за исторические дни неполный. HIGH/LOW читать нельзя."
+        ),
+        "no_current": (
+            "В текущем окне нет допущенных наблюдений. LOW не выдуман."
+        ),
+        "gaps": "Пробелы",
+        "interpretation": "Что это означает как context",
+        "vector": "Вектор осей, не один regime score.",
+        "high_means": (
+            "HIGH_RELATIVE значит только: выше недавней сопоставимой истории. "
+            "Не return и не trade."
+        ),
+        "tested": "Проверенная привязка стратегии к context",
+        "sampling": "Политика выборки",
+        "compat": "context_compatibility_sha256",
+        "snapshot": "context_snapshot_sha256",
+        "n_obs": "N observed",
+        "n_metric": "N metric",
+        "n_scope": "N in scope",
+        "missing": "missing / censored / excluded",
+        "coverage_point": "Возраст",
+        "coverage_axis": "Ось",
+        "coverage_classes": "Классы покрытия",
+        "coverage_missing": "Пропуски",
+        "coverage_fraction": "Доля observed",
+        "unit": "Единица",
+        "reference": "Статус сопоставления",
+        "source": "Статус источника",
+        "freshness": "Возраст evidence — это не здоровье collector.",
+        "leave": "Необычный context сам по себе не требует действия.",
+    },
 }
 
 ATTENTION_LABELS = {
@@ -550,6 +637,47 @@ COMMAND_LABELS = {
     "STOP": "Стоп",
     "PARK": "Парковка",
     "RECORD_DECISION": "Записать решение",
+}
+
+AXIS_UNITS = {
+    "USD": "USD",
+    "TRADERS": "трейдеры",
+    "UP_SHARE": "доля UP",
+    "BALANCE": "баланс",
+}
+
+COVERAGE_CLASS_LABELS = {
+    "observed": "наблюдено",
+    "typed_missing": "typed missing",
+    "disappeared": "исчезло",
+    "censored": "цензура",
+    "capacity_excluded": "capacity excluded",
+    "sampling_excluded": "sampling excluded",
+    "x_ineligible": "X-ineligible",
+    "unknown": "unknown",
+}
+
+NONCLAIM_LABELS = {
+    "NO_MARKET_WIDE_CLAIM": "Это не весь рынок",
+    "NO_EXPECTED_RETURN": "Не ожидаемая доходность",
+    "NO_TRADE_OR_NO_TRADE": "Не сигнал trade / no-trade",
+    "NO_BULL_BEAR_OR_COMPOSITE_REGIME": "Не BULL/BEAR и не composite regime",
+    "NO_TESTED_STRATEGY_CONTEXT_BINDING": "Нет проверенной привязки стратегии",
+    "NO_BOT_AUTHORITY": "Нет команд боту",
+    "NO_COLLECTOR_HEALTH_INFERENCE": "Не здоровье collector",
+    "NO_ORCH_001": "Не ORCH-001",
+    "NO_DISCOVERY_RANKER": "Не discovery ranker",
+    "NO_PROVIDER": "Не вызов провайдера",
+    "NO_DEPLOY": "Не deploy",
+    "NO_LIVE_OR_WALLET": "Не LIVE и не wallet",
+}
+
+AXIS_LABELS = {
+    "LIQUIDITY_LEVEL": "Ликвидность",
+    "LIQUIDITY_BREADTH": "Ширина ликвидности",
+    "PARTICIPATION": "Участие трейдеров",
+    "BUY_SELL_ACTIVITY_BALANCE": "Баланс покупок/продаж",
+    "PRICE_BREADTH": "Ширина цены",
 }
 
 FIELD_LABELS = {
@@ -601,6 +729,7 @@ OWNER_ERRORS = {
     "LOCATOR_REJECTED": "Локатор отклонён.",
     "LOCATOR_NOT_IN_PROJECTION": "Объект не найден в текущей проекции.",
     "COMMAND_NOT_ALLOWLISTED": "Команда не из списка разрешённых.",
+    "MARKET_HAS_NO_COMMANDS": "Экран Рынок не отдаёт команд боту и не меняет runtime.",
     "COMMAND_PATH_INVALID": "Эта команда на этом экране недоступна.",
     "CLOSE_ALL_CONFIRMATION_REQUIRED": (
         "Нужно локальное подтверждение CLOSE_ALL. Команда не отправлена."
@@ -670,6 +799,30 @@ def handoff_state_label(state: str) -> str:
 
 def blocker_label(code: str) -> str:
     return BLOCKER_LABELS.get(code, code)
+
+
+def axis_label(axis_id: str) -> str:
+    return AXIS_LABELS.get(str(axis_id or ""), str(axis_id or ""))
+
+
+def axis_unit_label(unit: str) -> str:
+    return AXIS_UNITS.get(str(unit or ""), str(unit or ""))
+
+
+def coverage_class_label(key: str) -> str:
+    canonical = str(key or "")
+    gloss = COVERAGE_CLASS_LABELS.get(canonical)
+    if gloss and gloss != canonical:
+        return f"{gloss} ({canonical})"
+    return canonical
+
+
+def nonclaim_label(code: str) -> str:
+    canonical = str(code or "")
+    gloss = NONCLAIM_LABELS.get(canonical)
+    if gloss:
+        return f"{gloss} ({canonical})"
+    return canonical
 
 
 def field_label(key: str) -> str:

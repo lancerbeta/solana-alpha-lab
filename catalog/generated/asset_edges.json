@@ -948,6 +948,26 @@
       "target_asset_id": "CTRL-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
     },
     {
+      "source_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001",
+      "relation": "consumes",
+      "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-MARKET-CONTEXT-DEFINITION-001"
+    },
+    {
+      "source_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-MARKET-DATA-AWARENESS-001"
+    },
+    {
       "source_asset_id": "CONFIG-OBSERVATION-PRIMITIVE-REGISTRY-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
@@ -3458,6 +3478,41 @@
       "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
     },
     {
+      "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
+      "relation": "consumes",
+      "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
+    },
+    {
+      "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001"
+    },
+    {
+      "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-MARKET-DATA-AWARENESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-MARKET-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-MARKET-DATA-AWARENESS-001"
+    },
+    {
       "source_asset_id": "CTRL-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001",
       "relation": "contains",
       "target_asset_id": "MODULE-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-001"
@@ -5241,6 +5296,11 @@
       "source_asset_id": "DOC-HYPOTHESIS-FORGE-OPERATOR-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "DOC-MARKET-DATA-AWARENESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-MARKET-DATA-AWARENESS-001"
     },
     {
       "source_asset_id": "DOC-OWNER-ATTENTION-AND-CHANGE-FEED-001",
@@ -10380,6 +10440,11 @@
     {
       "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
       "relation": "depends_on",
+      "target_asset_id": "MODULE-MARKET-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-APPLICATION-001",
+      "relation": "depends_on",
       "target_asset_id": "MODULE-OWNER-LIFECYCLE-PROJECTION-001"
     },
     {
@@ -10599,6 +10664,11 @@
     },
     {
       "source_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-MARKET-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
     },
@@ -10646,6 +10716,36 @@
       "source_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001"
+    },
+    {
+      "source_asset_id": "MODULE-MARKET-CONTEXT-001",
+      "relation": "consumes",
+      "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
+    },
+    {
+      "source_asset_id": "MODULE-MARKET-CONTEXT-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001"
+    },
+    {
+      "source_asset_id": "MODULE-MARKET-CONTEXT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-MARKET-EVIDENCE-001"
+    },
+    {
+      "source_asset_id": "MODULE-MARKET-CONTEXT-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-MARKET-DATA-AWARENESS-001"
+    },
+    {
+      "source_asset_id": "MODULE-MARKET-EVIDENCE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-MARKET-CONTEXT-DEFINITION-001"
+    },
+    {
+      "source_asset_id": "MODULE-MARKET-EVIDENCE-001",
+      "relation": "governed_by",
+      "target_asset_id": "DOC-MARKET-DATA-AWARENESS-001"
     },
     {
       "source_asset_id": "MODULE-OBSERVATION-PRIMITIVES-001",
@@ -13293,6 +13393,11 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
     },
     {
+      "source_asset_id": "SCHEMA-MARKET-CONTEXT-DEFINITION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-MARKET-DATA-AWARENESS-001"
+    },
+    {
       "source_asset_id": "SCHEMA-OBSERVATION-PANEL-SNAPSHOT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
@@ -14356,6 +14461,16 @@
       "source_asset_id": "SCRIPT-SEMANTIC-PREMISE-REVIEW-CLI-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-SEMANTIC-PREMISE-REVIEW-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-SHOW-MARKET-CONTEXT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-MARKET-CONTEXT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-SHOW-MARKET-CONTEXT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-MARKET-DATA-AWARENESS-001"
     },
     {
       "source_asset_id": "SCRIPT-SHOW-OWNER-LIFECYCLE-PROJECTION-001",
@@ -15586,6 +15701,16 @@
       "source_asset_id": "TEST-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "TEST-MARKET-DATA-AWARENESS-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-MARKET-DATA-AWARENESS-001"
+    },
+    {
+      "source_asset_id": "TEST-MARKET-DATA-AWARENESS-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-MARKET-DATA-AWARENESS-001"
     },
     {
       "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",

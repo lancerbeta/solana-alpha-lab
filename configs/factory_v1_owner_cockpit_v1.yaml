@@ -1,5 +1,5 @@
 schema: smial.factory-v1-owner-cockpit
-schema_version: '1.0'
+schema_version: '1.1'
 contract_id: FACTORY-V1-OWNER-COCKPIT-001
 atom_id: OWNER_OPERATIONS_COCKPIT_V1
 as_of: '2026-09-03'
@@ -8,11 +8,11 @@ implementation: WORKBENCH_WRAP_NO_NEW_UI_PACKAGE
 visible_nav:
   - HOME
   - RESEARCH
+  - MARKET
   - OPERATIONS
   - ECONOMICS
   - SYSTEM
-hidden_nav:
-  - MARKET
+hidden_nav: []
 packet_fields:
   - QUESTION
   - ESTIMAND

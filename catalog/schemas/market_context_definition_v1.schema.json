@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/market_context_definition_v1.schema.json",
+  "title": "SMIAL MarketContextDefinitionV1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "definition_id",
+    "definition_version",
+    "as_of",
+    "current_window_seconds",
+    "reference_lookback_seconds",
+    "reference_bucket_seconds",
+    "reference_low_quantile",
+    "reference_high_quantile",
+    "quantile_method",
+    "minimum_current_coverage",
+    "minimum_current_n",
+    "minimum_historical_buckets",
+    "owner_default_landmark_id",
+    "lifecycle_landmarks",
+    "axes",
+    "tokens_projection",
+    "population",
+    "tested_context_binding",
+    "non_claims"
+  ],
+  "properties": {
+    "schema": {"const": "smial.market-context-definition"},
+    "schema_version": {"const": "1.0"},
+    "definition_id": {"const": "MARKET-CONTEXT-DEFINITION-V1"},
+    "definition_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+$"},
+    "as_of": {"type": "string", "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}$"},
+    "current_window_seconds": {"type": "integer", "minimum": 1},
+    "reference_lookback_seconds": {"type": "integer", "minimum": 1},
+    "reference_bucket_seconds": {"type": "integer", "minimum": 1},
+    "reference_low_quantile": {"type": "string", "pattern": "^0\\.[0-9]+$"},
+    "reference_high_quantile": {"type": "string", "pattern": "^0\\.[0-9]+$"},
+    "quantile_method": {"const": "ROUND_FLOOR"},
+    "minimum_current_coverage": {"type": "string", "pattern": "^0\\.[0-9]+$"},
+    "minimum_current_n": {"type": "integer", "minimum": 1},
+    "minimum_historical_buckets": {"type": "integer", "minimum": 1},
+    "owner_default_landmark_id": {"type": "string", "pattern": "^Y[0-9]+$"},
+    "lifecycle_landmarks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["point_id", "due_offset_seconds", "previous_point_id", "owner_label"],
+        "properties": {
+          "point_id": {"type": "string", "pattern": "^Y[0-9]+$"},
+          "due_offset_seconds": {"type": "integer", "minimum": 1},
+          "previous_point_id": {"type": "string", "pattern": "^[XY][0-9]+$"},
+          "owner_label": {"type": "string", "minLength": 2, "maxLength": 16}
+        }
+      }
+    },
+    "axes": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["axis_id", "field_ids", "aggregation", "unit"],
+        "properties": {
+          "axis_id": {
+            "enum": [
+              "LIQUIDITY_LEVEL",
+              "LIQUIDITY_BREADTH",
+              "PARTICIPATION",
+              "BUY_SELL_ACTIVITY_BALANCE",
+              "PRICE_BREADTH"
+            ]
+          },
+          "field_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 4,
+            "items": {"type": "string", "pattern": "^FIELD-[A-Z0-9-]+$"}
+          },
+          "aggregation": {
+            "enum": [
+              "MEDIAN_OBSERVED",
+              "UP_SHARE_VS_PREVIOUS",
+              "MEDIAN_BUY_SELL_BALANCE"
+            ]
+          },
+          "unit": {"type": "string", "minLength": 1, "maxLength": 32}
+        }
+      }
+    },
+    "tokens_projection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["projection_id", "projection_version"],
+      "properties": {
+        "projection_id": {"const": "TOKENS_V2_TYPED_PROJECTION_V1"},
+        "projection_version": {"type": "string", "minLength": 1}
+      }
+    },
+    "population": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "market_wide_claim"],
+      "properties": {
+        "description": {"type": "string", "minLength": 16, "maxLength": 400},
+        "market_wide_claim": {"const": false}
+      }
+    },
+    "tested_context_binding": {"const": "NOT_AVAILABLE"},
+    "non_claims": {
+      "type": "array",
+      "minItems": 6,
+      "items": {"type": "string", "minLength": 4, "maxLength": 80}
+    }
+  }
+}

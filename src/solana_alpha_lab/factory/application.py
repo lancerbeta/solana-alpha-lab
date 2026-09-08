@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.system_operability import (
     UnitReader,
     compose_system_operability,
 )
+from solana_alpha_lab.factory.market_context import compose_market_context
 from solana_alpha_lab.factory.runner import ExperimentRunner, ExperimentRunnerError
 
 HYPOTHESES_RELATIVE = "registries/hypotheses.yaml"
@@ -220,6 +221,13 @@ class FactoryApplication:
             status = self._paper_plane_source_status or "NOT_PRESENT"
             return compose_risk_economics(self.root, None, source_status=status)
         return compose_risk_economics(self.root, store, source_status="PRESENT")
+
+    def market_projection(self, *, as_of=None) -> dict[str, Any]:
+        return compose_market_context(
+            self.root,
+            as_of=as_of,
+            data_root=self._research_data_root,
+        )
 
     def trading_operations_projection(
         self, *, last_command: Mapping[str, Any] | None = None
@@ -597,6 +605,26 @@ class FactoryApplication:
         last_command: Mapping[str, Any] | None = None,
         http_self: str | None = None,
     ) -> dict[str, Any]:
+        if surface == "MARKET":
+            hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
+            model = project_read_model(
+                root=self.root,
+                store=None,
+                spec_relative=self.spec_relative,
+                hypothesis_registry=hypotheses,
+            )
+            spec = load_experiment_spec(self.root, self.spec_relative)
+            gaps = pinned_produced_gaps(spec, self.root)
+            cockpit = project_cockpit(
+                model,
+                acceptance=None,
+                runtime=None,
+                pinned_produced_gaps=gaps,
+            )
+            model["cockpit"] = cockpit
+            model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])
+            model["market"] = self.market_projection()
+            return model
         hypotheses = _load_yaml(self.root, HYPOTHESES_RELATIVE)
         ops_store = self.existing_operational_store()
         model = project_read_model(

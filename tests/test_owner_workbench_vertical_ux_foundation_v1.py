@@ -43,6 +43,10 @@ VISUAL_OS = ROOT / "configs/smial_visual_operating_system_v1.yaml"
 HEADINGS = {
     "/": ("Главная", "Что требует меня сейчас, и что стало новым с просмотра?"),
     "/research": ("Исследования", "Что мы проверяем / что знаем / что мне решать?"),
+    "/market": (
+        "Рынок",
+        "Какой контекст сейчас наблюдается в моей торгуемой части рынка, насколько он отличается от недавней сопоставимой истории, насколько этот вывод покрыт данными, и что из этого нельзя заключать?",
+    ),
     "/operations": (
         "Операции",
         "Что исполняется, где остановился путь и что безопасно сделать?",
@@ -108,7 +112,7 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
         self.assertIn("copy-btn { opacity: 1;", css)
         self.assertIn("Owner-surface invariants", HUMAN.read_text(encoding="utf-8"))
 
-    def test_five_routes_are_russian_first_with_page_questions(self) -> None:
+    def test_six_routes_are_russian_first_with_page_questions(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = isolated_factory_root(Path(tmp) / "src")
             store = OperationalStore((root / "ops.sqlite").resolve())
@@ -186,6 +190,13 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 self.assertNotIn('name="command" value="STOP"', system)
                 self.assertIn("HTTP_SELF", system)
                 self.assertIn("MANAGED_WORKBENCH_UNIT", system)
+                market = pages["/market"]
+                self.assertIn("NO_MARKET_WIDE_CLAIM", market)
+                self.assertIn("GIT_CAPABILITY", market)
+                self.assertIn("не весь рынок", market)
+                self.assertNotIn(">BULL<", market)
+                self.assertIn("NO_BULL_BEAR_OR_COMPOSITE_REGIME", market)
+                self.assertNotIn('name="command" value="PAUSE_NEW_ENTRIES"', market)
                 self.assertIn("Required features", home)
                 home_note = re.search(r"git_archaeology_required=(true|false|UNKNOWN)", home)
                 research_note = re.search(

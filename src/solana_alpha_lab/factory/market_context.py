@@ -1,0 +1,1130 @@
+"""Pure MarketContextProjector. Derived read model. Persists nowhere."""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime, timedelta
+from decimal import ROUND_FLOOR, Decimal
+from pathlib import Path
+from typing import Any
+
+import jsonschema
+import yaml
+
+from solana_alpha_lab.factory.market_evidence import (
+    coverage_class_for,
+    coverage_class_for_member,
+    empty_evidence_bundle,
+    parse_market_clock,
+    read_market_evidence,
+)
+from solana_alpha_lab.factory.market_feature_surface import load_surface_config
+from solana_alpha_lab.factory.observation_schedule import render_utc
+from solana_alpha_lab.factory.tokens_v2_typed_projection import (
+    PROJECTION_ID,
+    PROJECTION_VERSION,
+)
+
+SCHEMA = "smial.market-context-projection"
+SCHEMA_VERSION = "1.0"
+DEFINITION_RELATIVE = "configs/market_context_definition_v1.yaml"
+DEFINITION_SCHEMA_RELATIVE = "catalog/schemas/market_context_definition_v1.schema.json"
+
+REGIME_TOKENS = frozenset(
+    {
+        "BULL",
+        "BEAR",
+        "RISK_ON",
+        "RISK_OFF",
+        "GOOD_REGIME",
+        "BAD_REGIME",
+    }
+)
+PURITY = {
+    "provider_calls": 0,
+    "research_rdp_writes": 0,
+    "observation_schedule_writes": 0,
+    "paper_plane_writes": 0,
+    "operational_store_writes": 0,
+    "git_writes": 0,
+    "store_create": 0,
+    "migration": 0,
+    "manifest_publication": 0,
+    "lineage_mutation": 0,
+}
+
+
+class MarketContextError(ValueError):
+    """Typed Market Context fault."""
+
+    def __init__(self, code: str) -> None:
+        self.code = code
+        super().__init__(code)
+
+
+def _canonical_bytes(value: object) -> bytes:
+    return json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+
+
+def _canonical_sha256(value: object) -> str:
+    return hashlib.sha256(_canonical_bytes(value)).hexdigest()
+
+
+def _dec(value: object) -> Decimal | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, bool):
+        return None
+    try:
+        number = Decimal(str(value))
+    except Exception:
+        return None
+    if not number.is_finite():
+        return None
+    return number
+
+
+def _as_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        raise MarketContextError("AS_OF_NOT_UTC")
+    return value.astimezone(UTC)
+
+
+def load_market_context_definition(root: Path) -> dict[str, Any]:
+    path = root / DEFINITION_RELATIVE
+    schema_path = root / DEFINITION_SCHEMA_RELATIVE
+    try:
+        loaded = yaml.safe_load(path.read_text(encoding="utf-8"))
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise MarketContextError("DEFINITION_MISSING") from exc
+    if not isinstance(loaded, dict) or not isinstance(schema, dict):
+        raise MarketContextError("DEFINITION_INVALID")
+    try:
+        jsonschema.validate(loaded, schema)
+    except jsonschema.ValidationError as exc:
+        raise MarketContextError("DEFINITION_SCHEMA_INVALID") from exc
+    return loaded
+
+
+def _definition_compat_payload(definition: Mapping[str, Any]) -> dict[str, Any]:
+    tokens = definition.get("tokens_projection") if isinstance(definition.get("tokens_projection"), Mapping) else {}
+    return {
+        "definition_id": definition["definition_id"],
+        "definition_version": definition["definition_version"],
+        "current_window_seconds": definition["current_window_seconds"],
+        "reference_lookback_seconds": definition["reference_lookback_seconds"],
+        "reference_bucket_seconds": definition["reference_bucket_seconds"],
+        "reference_low_quantile": definition["reference_low_quantile"],
+        "reference_high_quantile": definition["reference_high_quantile"],
+        "quantile_method": definition["quantile_method"],
+        "minimum_current_coverage": definition["minimum_current_coverage"],
+        "minimum_current_n": definition["minimum_current_n"],
+        "minimum_historical_buckets": definition["minimum_historical_buckets"],
+        "owner_default_landmark_id": definition["owner_default_landmark_id"],
+        "lifecycle_landmarks": list(definition["lifecycle_landmarks"]),
+        "axes": list(definition["axes"]),
+        "tokens_projection_id": str(tokens.get("projection_id") or PROJECTION_ID),
+        "tokens_projection_version": str(tokens.get("projection_version") or PROJECTION_VERSION),
+    }
+
+
+def context_compatibility_sha256(
+    definition: Mapping[str, Any],
+    schedule_semantics: Mapping[str, Any] | None,
+) -> str | None:
+    if not isinstance(schedule_semantics, Mapping) or not schedule_semantics:
+        return None
+    payload = {
+        **_definition_compat_payload(definition),
+        "semantics": json.loads(_canonical_bytes(dict(schedule_semantics)).decode("utf-8")),
+    }
+    return _canonical_sha256(payload)
+
+
+def _median(values: Sequence[Decimal]) -> Decimal | None:
+    if not values:
+        return None
+    ordered = sorted(values)
+    n = len(ordered)
+    mid = n // 2
+    if n % 2:
+        return ordered[mid]
+    return (ordered[mid - 1] + ordered[mid]) / Decimal(2)
+
+
+def _quantile(values: Sequence[Decimal], q: Decimal, *, method: str) -> Decimal | None:
+    if method != "ROUND_FLOOR":
+        raise MarketContextError("UNKNOWN_QUANTILE_METHOD")
+    if not values:
+        return None
+    ordered = sorted(values)
+    n = len(ordered)
+    if n == 1:
+        return ordered[0]
+    position = q * Decimal(n - 1)
+    index = int(position.to_integral_value(rounding=ROUND_FLOOR))
+    index = min(max(index, 0), n - 1)
+    return ordered[index]
+
+
+def _direction(previous: Decimal, current: Decimal) -> str:
+    if current > previous:
+        return "UP"
+    if current < previous:
+        return "DOWN"
+    return "FLAT"
+
+
+def _in_window(available: datetime | None, start: datetime, end: datetime) -> bool:
+    if available is None:
+        return False
+    return start < available <= end
+
+
+def _parse_available(row: Mapping[str, Any]) -> datetime | None:
+    return parse_market_clock(row.get("first_reliable_available_at"))
+
+
+def _field_map(row: Mapping[str, Any]) -> dict[str, dict[str, Any]]:
+    values = row.get("field_values")
+    mapped: dict[str, dict[str, Any]] = {}
+    if isinstance(values, list):
+        for item in values:
+            if not isinstance(item, Mapping):
+                continue
+            field_id = str(item.get("field_id") or "")
+            if field_id:
+                mapped[field_id] = dict(item)
+    field_id = str(row.get("field_id") or "")
+    if field_id and field_id not in mapped:
+        mapped[field_id] = {
+            "field_id": field_id,
+            "typed_value_or_null": row.get("typed_value_or_null"),
+            "state": row.get("state"),
+        }
+    return mapped
+
+
+def _metric_support_n(axis: Mapping[str, Any], details: Sequence[str]) -> int:
+    aggregation = str(axis["aggregation"])
+    if aggregation == "UP_SHARE_VS_PREVIOUS":
+        return sum(1 for item in details if item in {"UP", "FLAT", "DOWN"})
+    if aggregation == "MEDIAN_BUY_SELL_BALANCE":
+        return sum(1 for item in details if item == "OBSERVED")
+    return sum(1 for item in details if item == "OBSERVED")
+
+
+def _relative_state(
+    current: Decimal | None,
+    reference_values: Sequence[Decimal],
+    *,
+    n_in_scope: int,
+    n_observed: int,
+    n_metric: int,
+    definition: Mapping[str, Any],
+    comparable: bool,
+    incomparable_reason: str = "REFERENCE_SCOPE_MISMATCH",
+) -> tuple[str, str | None, int]:
+    if not comparable:
+        return "UNKNOWN", incomparable_reason, 0
+    min_n = int(definition["minimum_current_n"])
+    min_cov = Decimal(str(definition["minimum_current_coverage"]))
+    min_buckets = int(definition["minimum_historical_buckets"])
+    metric_fraction = (
+        (Decimal(n_metric) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
+    )
+    if current is None or n_metric < min_n or metric_fraction < min_cov:
+        return "UNKNOWN", "COVERAGE_INSUFFICIENT", len(reference_values)
+    if len(reference_values) < min_buckets:
+        return "UNKNOWN", "REFERENCE_INSUFFICIENT", len(reference_values)
+    low_q = Decimal(str(definition["reference_low_quantile"]))
+    high_q = Decimal(str(definition["reference_high_quantile"]))
+    method = str(definition["quantile_method"])
+    low = _quantile(reference_values, low_q, method=method)
+    high = _quantile(reference_values, high_q, method=method)
+    if low is None or high is None:
+        return "UNKNOWN", "REFERENCE_INSUFFICIENT", len(reference_values)
+    if current < low:
+        return "LOW_RELATIVE", None, len(reference_values)
+    if current > high:
+        return "HIGH_RELATIVE", None, len(reference_values)
+    return "MID_RELATIVE", None, len(reference_values)
+
+
+def _format_decimal(value: Decimal | None) -> str | None:
+    if value is None:
+        return None
+    text = format(value.normalize(), "f")
+    if "." in text:
+        text = text.rstrip("0").rstrip(".")
+    return text or "0"
+
+
+def _observed_number(field: Mapping[str, Any] | None) -> Decimal | None:
+    if not isinstance(field, Mapping):
+        return None
+    if str(field.get("state") or "") != "OBSERVED":
+        return None
+    return _dec(field.get("typed_value_or_null"))
+
+
+def _entity_metric(
+    axis: Mapping[str, Any],
+    current_row: Mapping[str, Any] | None,
+    previous_row: Mapping[str, Any] | None,
+) -> tuple[Decimal | None, str]:
+    aggregation = str(axis["aggregation"])
+    current_fields = _field_map(current_row) if current_row else {}
+    if aggregation == "MEDIAN_OBSERVED":
+        field_id = str(axis["field_ids"][0])
+        number = _observed_number(current_fields.get(field_id))
+        return number, "OBSERVED" if number is not None else "MISSING"
+    if aggregation == "UP_SHARE_VS_PREVIOUS":
+        field_id = str(axis["field_ids"][0])
+        current = _observed_number(current_fields.get(field_id))
+        previous_fields = _field_map(previous_row) if previous_row else {}
+        previous = _observed_number(previous_fields.get(field_id))
+        if current is None or previous is None:
+            return None, "MISSING"
+        direction = _direction(previous, current)
+        return Decimal(1) if direction == "UP" else Decimal(0), direction
+    if aggregation == "MEDIAN_BUY_SELL_BALANCE":
+        buys = _observed_number(current_fields.get(str(axis["field_ids"][0])))
+        sells = _observed_number(current_fields.get(str(axis["field_ids"][1])))
+        if buys is None or sells is None:
+            return None, "UNKNOWN"
+        denom = buys + sells
+        if denom <= 0:
+            return None, "NO_ACTIVITY"
+        return (buys - sells) / denom, "OBSERVED"
+    raise MarketContextError("UNKNOWN_AGGREGATION")
+
+
+def _row_coverage_class(axis: Mapping[str, Any], row: Mapping[str, Any]) -> str:
+    fields = _field_map(row)
+    if _parse_available(row) is None:
+        return "typed_missing"
+    if str(axis["aggregation"]) == "MEDIAN_BUY_SELL_BALANCE":
+        states = []
+        for field_id in axis["field_ids"]:
+            field = fields.get(str(field_id))
+            states.append(str((field or {}).get("state") or row.get("state") or ""))
+        if states and all(item == "OBSERVED" for item in states):
+            return "observed"
+        for item in states:
+            if item != "OBSERVED":
+                return coverage_class_for(item)
+        return "unknown"
+    field_id = str(axis["field_ids"][0])
+    field = fields.get(field_id)
+    state = (field or {}).get("state") or row.get("state")
+    return coverage_class_for(state)
+
+
+def _coverage_meets_minimum(
+    coverage: Mapping[str, int],
+    definition: Mapping[str, Any],
+    *,
+    n_metric: int,
+) -> bool:
+    min_n = int(definition["minimum_current_n"])
+    min_cov = Decimal(str(definition["minimum_current_coverage"]))
+    n_in_scope = int(coverage["n_in_scope"])
+    metric_fraction = (
+        (Decimal(n_metric) / Decimal(n_in_scope)) if n_in_scope else Decimal(0)
+    )
+    return n_metric >= min_n and metric_fraction >= min_cov
+
+
+def _unclocked_rows(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    point_id: str,
+    current_days: set[str] | None,
+) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
+    for row in rows:
+        if str(row.get("point_id") or "") != point_id:
+            continue
+        if _parse_available(row) is not None:
+            continue
+        day = str(row.get("_partition_day") or "")
+        if current_days is not None and day and day not in current_days:
+            continue
+        selected.append(dict(row))
+    return selected
+
+
+def _coverage_counts(
+    rows: Sequence[Mapping[str, Any]],
+    member_ids: Mapping[str, str],
+    axis: Mapping[str, Any],
+) -> dict[str, int]:
+    classes: dict[str, int] = {
+        "observed": 0,
+        "typed_missing": 0,
+        "disappeared": 0,
+        "censored": 0,
+        "capacity_excluded": 0,
+        "sampling_excluded": 0,
+        "x_ineligible": 0,
+        "unknown": 0,
+    }
+    seen: set[str] = set()
+    for row in _latest_by_entity(rows).values():
+        entity_id = str(row.get("entity_id") or "")
+        if not entity_id:
+            continue
+        seen.add(entity_id)
+        classes[_row_coverage_class(axis, row)] += 1
+    for entity_id, member_class in member_ids.items():
+        if entity_id in seen:
+            continue
+        seen.add(entity_id)
+        classes[member_class if member_class in classes else "unknown"] += 1
+    n_in_scope = sum(classes.values())
+    return {
+        **classes,
+        "n_in_scope": n_in_scope,
+        "n_observed": classes["observed"],
+        "n_missing": n_in_scope - classes["observed"],
+    }
+
+
+def _bucket_start(available: datetime, origin: datetime, bucket_seconds: int) -> datetime:
+    elapsed = int((available - origin).total_seconds())
+    index = elapsed // bucket_seconds
+    return origin + timedelta(seconds=index * bucket_seconds)
+
+
+def _event_clock(row: Mapping[str, Any]) -> datetime | None:
+    event = parse_market_clock(row.get("event_time"))
+    if event is not None:
+        return event
+    return parse_market_clock(row.get("authoritative_anchor"))
+
+
+def _select_rows(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    start: datetime,
+    end: datetime,
+    as_of: datetime,
+    point_id: str | None = None,
+    include_missing_pit: bool = False,
+) -> list[dict[str, Any]]:
+    selected: list[dict[str, Any]] = []
+    for row in rows:
+        available = _parse_available(row)
+        if point_id is not None and str(row.get("point_id") or "") != point_id:
+            continue
+        if available is None:
+            if include_missing_pit:
+                selected.append(dict(row))
+            continue
+        if available > as_of:
+            continue
+        event = _event_clock(row)
+        if event is None:
+            if include_missing_pit:
+                selected.append(dict(row))
+            continue
+        if not _in_window(event, start, end):
+            continue
+        selected.append(dict(row))
+    return selected
+
+
+def _latest_by_entity(rows: Sequence[Mapping[str, Any]]) -> dict[str, dict[str, Any]]:
+    latest: dict[str, dict[str, Any]] = {}
+    for row in rows:
+        entity_id = str(row.get("entity_id") or "")
+        if not entity_id:
+            continue
+        current = latest.get(entity_id)
+        if current is None:
+            latest[entity_id] = dict(row)
+            continue
+        left = _parse_available(row)
+        right = _parse_available(current)
+        if left is not None and (right is None or left >= right):
+            latest[entity_id] = dict(row)
+    return latest
+
+
+def _axis_value(
+    axis: Mapping[str, Any],
+    current_rows: Sequence[Mapping[str, Any]],
+    previous_rows: Sequence[Mapping[str, Any]],
+) -> tuple[Decimal | None, list[str]]:
+    current_by = _latest_by_entity(current_rows)
+    previous_by = _latest_by_entity(previous_rows)
+    values: list[Decimal] = []
+    details: list[str] = []
+    for entity_id, row in sorted(current_by.items()):
+        number, detail = _entity_metric(axis, row, previous_by.get(entity_id))
+        details.append(detail)
+        if number is not None:
+            values.append(number)
+    if str(axis["aggregation"]) == "UP_SHARE_VS_PREVIOUS":
+        valid = [item for item in details if item in {"UP", "FLAT", "DOWN"}]
+        if not valid:
+            return None, details
+        up = sum(1 for item in valid if item == "UP")
+        return Decimal(up) / Decimal(len(valid)), details
+    return _median(values), details
+
+
+def _previous_lookback_seconds(landmark: Mapping[str, Any], landmarks: Sequence[Mapping[str, Any]]) -> int:
+    previous_id = str(landmark["previous_point_id"])
+    current_offset = int(landmark["due_offset_seconds"])
+    for item in landmarks:
+        if str(item["point_id"]) == previous_id:
+            return max(current_offset - int(item["due_offset_seconds"]), 1)
+    return current_offset
+
+
+def _reference_bucket_values(
+    axis: Mapping[str, Any],
+    observations: Sequence[Mapping[str, Any]],
+    *,
+    members: Sequence[Mapping[str, Any]],
+    point_id: str,
+    previous_point_id: str,
+    previous_lookback_seconds: int,
+    ref_start: datetime,
+    ref_end: datetime,
+    bucket_seconds: int,
+    definition: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+    fingerprint: str | None,
+    as_of: datetime,
+) -> list[Decimal]:
+    values: list[Decimal] = []
+    cursor = ref_start
+    while cursor < ref_end:
+        bucket_end = min(cursor + timedelta(seconds=bucket_seconds), ref_end)
+        current_rows = _select_rows(
+            observations,
+            start=cursor,
+            end=bucket_end,
+            as_of=as_of,
+            point_id=point_id,
+        )
+        previous_rows = _select_rows(
+            observations,
+            start=cursor - timedelta(seconds=previous_lookback_seconds),
+            end=bucket_end,
+            as_of=as_of,
+            point_id=previous_point_id,
+        )
+        member_ids = _member_ids_for_landmark(
+            members,
+            point_id=point_id,
+            due_offset_seconds=int(
+                next(
+                    (
+                        item["due_offset_seconds"]
+                        for item in definition["lifecycle_landmarks"]
+                        if str(item["point_id"]) == point_id
+                    ),
+                    0,
+                )
+            ),
+            current_start=cursor,
+            as_of=bucket_end,
+            definition=definition,
+            schedules=schedules,
+            fingerprint=fingerprint,
+        )
+        if not member_ids:
+            cursor = bucket_end
+            continue
+        bucket_days = {
+            (cursor + timedelta(days=offset)).date().isoformat()
+            for offset in range((bucket_end.date() - cursor.date()).days + 1)
+        }
+        coverage_rows = [
+            *current_rows,
+            *_unclocked_rows(observations, point_id=point_id, current_days=bucket_days),
+        ]
+        coverage = _coverage_counts(coverage_rows, member_ids, axis)
+        metric, details = _axis_value(axis, current_rows, previous_rows)
+        n_metric = _metric_support_n(axis, details)
+        if (
+            metric is not None
+            and n_metric >= int(definition["minimum_current_n"])
+            and _coverage_meets_minimum(coverage, definition, n_metric=n_metric)
+        ):
+            values.append(metric)
+        cursor = bucket_end
+    return values
+
+
+def _row_compatibility(
+    definition: Mapping[str, Any],
+    row: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+) -> str | None:
+    semantics = row.get("schedule_semantics")
+    if not isinstance(semantics, Mapping):
+        digest = str(row.get("schedule_sha256") or "")
+        found = schedules.get(digest) if digest else None
+        semantics = found if isinstance(found, Mapping) else None
+    return context_compatibility_sha256(
+        definition, semantics if isinstance(semantics, Mapping) else None
+    )
+
+
+def _current_compatibility(
+    definition: Mapping[str, Any],
+    current_obs: Sequence[Mapping[str, Any]],
+    schedules: Mapping[str, Any],
+) -> tuple[str | None, str | None]:
+    fingerprints: set[str] = set()
+    missing = False
+    for row in current_obs:
+        fingerprint = _row_compatibility(definition, row, schedules)
+        if fingerprint is None:
+            missing = True
+            continue
+        fingerprints.add(fingerprint)
+    if missing and fingerprints:
+        return None, "REFERENCE_SCOPE_MISMATCH"
+    if missing and not fingerprints:
+        return None, "SCHEDULE_SEMANTICS_MISSING"
+    if not fingerprints:
+        return None, "SCHEDULE_SEMANTICS_MISSING"
+    if len(fingerprints) > 1:
+        return None, "REFERENCE_SCOPE_MISMATCH"
+    return next(iter(fingerprints)), None
+
+
+def _history_comparable(
+    definition: Mapping[str, Any],
+    history_obs: Sequence[Mapping[str, Any]],
+    schedules: Mapping[str, Any],
+    current_fingerprint: str,
+) -> tuple[bool, str | None]:
+    if not history_obs:
+        return True, None
+    fingerprints: set[str] = set()
+    missing = False
+    for row in history_obs:
+        fingerprint = _row_compatibility(definition, row, schedules)
+        if fingerprint is None:
+            missing = True
+            continue
+        fingerprints.add(fingerprint)
+    if missing and not fingerprints:
+        return False, "SCHEDULE_SEMANTICS_MISSING"
+    if fingerprints and fingerprints != {current_fingerprint}:
+        return False, "REFERENCE_SCOPE_MISMATCH"
+    if missing:
+        return False, "SCHEDULE_SEMANTICS_MISSING"
+    return True, None
+
+
+def _member_ids_for_landmark(
+    members: Sequence[Mapping[str, Any]],
+    *,
+    point_id: str,
+    due_offset_seconds: int,
+    current_start: datetime,
+    as_of: datetime,
+    definition: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+    fingerprint: str | None,
+) -> dict[str, str]:
+    """Return entity_id -> coverage class for members in the landmark window.
+
+    Production members are an entity/day cohort. Landmark eligibility uses
+    authoritative_anchor + due_offset. first_reliable_available_at is only
+    the PIT known-by clock.
+    """
+
+    ids: dict[str, str] = {}
+    for row in members:
+        entity_id = str(row.get("entity_id") or "")
+        if not entity_id:
+            continue
+        member_point = str(row.get("point_id") or "")
+        if member_point.startswith("Y") and member_point != point_id:
+            continue
+        available = _parse_available(row)
+        if available is None:
+            available = parse_market_clock(row.get("_partition_available_at"))
+        if available is None or available > as_of:
+            continue
+        event = _event_clock(row)
+        anchor = parse_market_clock(row.get("authoritative_anchor"))
+        if member_point.startswith("Y"):
+            if event is None or not _in_window(event, current_start, as_of):
+                continue
+        elif anchor is not None and due_offset_seconds:
+            due = anchor + timedelta(seconds=due_offset_seconds)
+            if not (current_start < due <= as_of):
+                continue
+        else:
+            continue
+        if fingerprint is not None:
+            member_fp = _row_compatibility(definition, row, schedules)
+            if member_fp != fingerprint:
+                ids[entity_id] = "unknown"
+                continue
+        state = row.get("membership_state") or row.get("state")
+        ids[entity_id] = coverage_class_for_member(state)
+    return ids
+
+
+def _compatible_rows(
+    rows: Sequence[Mapping[str, Any]],
+    definition: Mapping[str, Any],
+    schedules: Mapping[str, Any],
+    fingerprint: str,
+) -> list[dict[str, Any]]:
+    return [
+        dict(row)
+        for row in rows
+        if _row_compatibility(definition, row, schedules) == fingerprint
+    ]
+
+
+def _sampling_policy(
+    current_obs: Sequence[Mapping[str, Any]],
+    schedules: Mapping[str, Any],
+) -> object:
+    for row in current_obs:
+        digest = str(row.get("schedule_sha256") or "")
+        semantics = row.get("schedule_semantics")
+        if not isinstance(semantics, Mapping):
+            found = schedules.get(digest) if digest else None
+            semantics = found if isinstance(found, Mapping) else None
+        if isinstance(semantics, Mapping):
+            sampling = semantics.get("sampling")
+            if isinstance(sampling, Mapping):
+                return sampling.get("policy")
+    return None
+
+
+def _schedule_sha_set(rows: Sequence[Mapping[str, Any]]) -> list[str]:
+    return sorted(
+        {
+            str(row.get("schedule_sha256") or "")
+            for row in rows
+            if str(row.get("schedule_sha256") or "")
+        }
+    )
+
+
+def _activation_set(rows: Sequence[Mapping[str, Any]]) -> list[str]:
+    return sorted(
+        {
+            str(row.get("activation_id") or "")
+            for row in rows
+            if str(row.get("activation_id") or "")
+        }
+    )
+
+
+def _latest_clock(rows: Sequence[Mapping[str, Any]]) -> str | None:
+    clocks = [item for item in (_parse_available(row) for row in rows) if item is not None]
+    if not clocks:
+        return None
+    return render_utc(max(clocks))
+
+
+def project_market_context(
+    definition: Mapping[str, Any],
+    evidence: Mapping[str, Any],
+    *,
+    as_of: datetime,
+) -> dict[str, Any]:
+    clock = _as_utc(as_of)
+    as_of_text = render_utc(clock)
+    current_seconds = int(definition["current_window_seconds"])
+    lookback_seconds = int(definition["reference_lookback_seconds"])
+    bucket_seconds = int(definition["reference_bucket_seconds"])
+    current_start = clock - timedelta(seconds=current_seconds)
+    reference_start = current_start - timedelta(seconds=lookback_seconds)
+    observations = [
+        dict(row)
+        for row in (evidence.get("observations") or [])
+        if isinstance(row, Mapping)
+    ]
+    members = [
+        dict(row) for row in (evidence.get("members") or []) if isinstance(row, Mapping)
+    ]
+    schedules = evidence.get("schedules") if isinstance(evidence.get("schedules"), Mapping) else {}
+    source_status = str(evidence.get("source_status") or "NOT_PRESENT")
+    landmarks = list(definition["lifecycle_landmarks"])
+    axes = list(definition["axes"])
+    members_incomplete = bool(evidence.get("members_incomplete"))
+    current_obs = _select_rows(
+        observations, start=current_start, end=clock, as_of=clock
+    )
+    history_obs = _select_rows(
+        observations, start=reference_start, end=current_start, as_of=clock
+    )
+    current_fingerprint, fingerprint_fault = _current_compatibility(
+        definition, current_obs, schedules
+    )
+    comparable_history = True
+    incomparable_reason = "REFERENCE_SCOPE_MISMATCH"
+    current_mixed = False
+    if source_status != "PRESENT":
+        comparable_history = False
+        incomparable_reason = "SOURCE_NOT_PRESENT"
+    elif members_incomplete:
+        comparable_history = False
+        incomparable_reason = "MEMBER_EVIDENCE_INCOMPLETE"
+    elif fingerprint_fault == "REFERENCE_SCOPE_MISMATCH":
+        comparable_history = False
+        incomparable_reason = fingerprint_fault
+        current_fingerprint = None
+        current_mixed = True
+    elif fingerprint_fault:
+        comparable_history = False
+        incomparable_reason = fingerprint_fault
+        current_fingerprint = None
+    elif current_fingerprint is None:
+        comparable_history = False
+        incomparable_reason = "SCHEDULE_SEMANTICS_MISSING"
+    else:
+        comparable_history, history_fault = _history_comparable(
+            definition, history_obs, schedules, current_fingerprint
+        )
+        if history_fault:
+            incomparable_reason = history_fault
+    comparable_obs = (
+        _compatible_rows(observations, definition, schedules, current_fingerprint)
+        if current_fingerprint
+        else []
+    )
+    metric_obs = [] if current_mixed else current_obs
+    withhold_coverage = current_mixed or members_incomplete
+    missing_pit = any(_parse_available(row) is None for row in observations)
+
+    current_days = {
+        (current_start + timedelta(days=offset)).date().isoformat()
+        for offset in range((clock.date() - current_start.date()).days + 1)
+    }
+    slices: list[dict[str, Any]] = []
+    for landmark in landmarks:
+        point_id = str(landmark["point_id"])
+        previous_id = str(landmark["previous_point_id"])
+        lookback = _previous_lookback_seconds(landmark, landmarks)
+        coverage_at_point = (
+            []
+            if withhold_coverage
+            else _select_rows(
+                current_obs,
+                start=current_start,
+                end=clock,
+                as_of=clock,
+                point_id=point_id,
+            )
+        )
+        current_at_point = _select_rows(
+            metric_obs,
+            start=current_start,
+            end=clock,
+            as_of=clock,
+            point_id=point_id,
+        )
+        coverage_rows = (
+            []
+            if withhold_coverage
+            else [
+                *coverage_at_point,
+                *_unclocked_rows(
+                    observations, point_id=point_id, current_days=current_days
+                ),
+            ]
+        )
+        member_ids = (
+            {}
+            if withhold_coverage
+            else _member_ids_for_landmark(
+                members,
+                point_id=point_id,
+                due_offset_seconds=int(landmark["due_offset_seconds"]),
+                current_start=current_start,
+                as_of=clock,
+                definition=definition,
+                schedules=schedules,
+                fingerprint=current_fingerprint,
+            )
+        )
+        previous_at_point = _select_rows(
+            comparable_obs,
+            start=current_start - timedelta(seconds=lookback),
+            end=clock,
+            as_of=clock,
+            point_id=previous_id,
+        )
+        landmark_status = "PRESENT" if current_at_point else "LANDMARK_NOT_IN_EVIDENCE"
+        axis_cells: list[dict[str, Any]] = []
+        for axis in axes:
+            current_value, details = _axis_value(
+                axis, current_at_point, previous_at_point
+            )
+            coverage = _coverage_counts(coverage_rows, member_ids, axis)
+            reference_values = (
+                _reference_bucket_values(
+                    axis,
+                    comparable_obs,
+                    members=members,
+                    point_id=point_id,
+                    previous_point_id=previous_id,
+                    previous_lookback_seconds=lookback,
+                    ref_start=reference_start,
+                    ref_end=current_start,
+                    bucket_seconds=bucket_seconds,
+                    definition=definition,
+                    schedules=schedules,
+                    fingerprint=current_fingerprint,
+                    as_of=clock,
+                )
+                if comparable_history
+                else []
+            )
+            n_metric = _metric_support_n(axis, details)
+            relative, reason, bucket_count = _relative_state(
+                current_value,
+                reference_values,
+                n_in_scope=int(coverage["n_in_scope"]),
+                n_observed=int(coverage["n_observed"]),
+                n_metric=n_metric,
+                definition=definition,
+                comparable=comparable_history,
+                incomparable_reason=incomparable_reason,
+            )
+            observed_fraction = (
+                str(
+                    (Decimal(coverage["n_observed"]) / Decimal(coverage["n_in_scope"]))
+                    .quantize(Decimal("0.0001"))
+                )
+                if coverage["n_in_scope"]
+                else "0"
+            )
+            axis_cells.append(
+                {
+                    "axis_id": axis["axis_id"],
+                    "unit": axis["unit"],
+                    "aggregation": axis["aggregation"],
+                    "field_ids": list(axis["field_ids"]),
+                    "raw_value": _format_decimal(current_value),
+                    "relative_state": relative,
+                    "relative_reason": reason,
+                    "n_in_scope": coverage["n_in_scope"],
+                    "n_observed": coverage["n_observed"],
+                    "n_metric_supported": n_metric,
+                    "n_missing": coverage["n_missing"],
+                    "observed_fraction": observed_fraction,
+                    "coverage_classes": {
+                        key: coverage[key]
+                        for key in (
+                            "observed",
+                            "typed_missing",
+                            "disappeared",
+                            "censored",
+                            "capacity_excluded",
+                            "sampling_excluded",
+                            "x_ineligible",
+                            "unknown",
+                        )
+                    },
+                    "reference_bucket_count": bucket_count,
+                    "latest_available_at": _latest_clock(current_at_point),
+                    "detail_states": sorted(set(details)),
+                }
+            )
+        slices.append(
+            {
+                "point_id": point_id,
+                "due_offset_seconds": landmark["due_offset_seconds"],
+                "previous_point_id": previous_id,
+                "owner_label": landmark["owner_label"],
+                "landmark_status": landmark_status,
+                "axes": axis_cells,
+            }
+        )
+
+    gaps: list[str] = []
+    if source_status != "PRESENT":
+        gaps.append("SOURCE_NOT_PRESENT" if source_status == "NOT_PRESENT" else source_status)
+    if current_mixed and source_status == "PRESENT":
+        gaps.append("CURRENT_SCOPE_MIXED")
+    if members_incomplete and source_status == "PRESENT":
+        gaps.append("MEMBER_EVIDENCE_INCOMPLETE")
+    if (
+        not comparable_history
+        and source_status == "PRESENT"
+        and incomparable_reason in {"REFERENCE_SCOPE_MISMATCH", "SCHEDULE_SEMANTICS_MISSING"}
+    ):
+        if incomparable_reason not in gaps:
+            gaps.append(incomparable_reason)
+    elif source_status == "PRESENT" and comparable_history and not history_obs:
+        gaps.append("REFERENCE_INSUFFICIENT")
+    if not current_obs and source_status == "PRESENT":
+        gaps.append("NO_CURRENT_OBSERVATIONS")
+    if missing_pit and source_status == "PRESENT":
+        gaps.append("PIT_CLOCK_MISSING")
+
+    snapshot_identity = {
+        "definition_id": definition["definition_id"],
+        "definition_version": definition["definition_version"],
+        "as_of": as_of_text,
+        "context_compatibility_sha256": current_fingerprint,
+        "source_status": source_status,
+        "slices": [
+            {
+                "point_id": item["point_id"],
+                "axes": [
+                    {
+                        "axis_id": cell["axis_id"],
+                        "raw_value": cell["raw_value"],
+                        "relative_state": cell["relative_state"],
+                        "n_observed": cell["n_observed"],
+                        "n_in_scope": cell["n_in_scope"],
+                    }
+                    for cell in item["axes"]
+                ],
+            }
+            for item in slices
+        ],
+    }
+    population = definition["population"]
+    interpretation = {
+        "kind": "CONTEXT_VECTOR",
+        "composite_regime": False,
+        "market_wide_claim": bool(population["market_wide_claim"]),
+        "tested_context_binding": definition["tested_context_binding"],
+        "default_landmark_id": definition["owner_default_landmark_id"],
+    }
+    for token in REGIME_TOKENS:
+        if token in json.dumps(interpretation):
+            raise MarketContextError("REGIME_TOKEN_FORBIDDEN")
+
+    return {
+        "schema": SCHEMA,
+        "schema_version": SCHEMA_VERSION,
+        "definition_id": definition["definition_id"],
+        "definition_version": definition["definition_version"],
+        "as_of": as_of_text,
+        "current_window": {
+            "start": render_utc(current_start),
+            "end": as_of_text,
+            "seconds": current_seconds,
+        },
+        "reference_window": {
+            "start": render_utc(reference_start),
+            "end": render_utc(current_start),
+            "seconds": lookback_seconds,
+            "bucket_seconds": bucket_seconds,
+        },
+        "scope": {
+            "population_description": population["description"],
+            "market_wide_claim": False,
+            "sampling_policy": (
+                None if current_mixed else _sampling_policy(current_obs, schedules)
+            ),
+            "tokens_projection_id": str(
+                (definition.get("tokens_projection") or {}).get("projection_id") or PROJECTION_ID
+            ),
+            "tokens_projection_version": str(
+                (definition.get("tokens_projection") or {}).get("projection_version")
+                or PROJECTION_VERSION
+            ),
+        },
+        "source_status": source_status,
+        "source_error": evidence.get("source_error"),
+        "source_provenance": {
+            "schedule_sha256": _schedule_sha_set(current_obs or observations),
+            "activation_id": _activation_set(current_obs or observations),
+            "partitions_read": evidence.get("partitions_read") or 0,
+        },
+        "context_compatibility_sha256": current_fingerprint,
+        "context_snapshot_sha256": _canonical_sha256(snapshot_identity),
+        "reference_status": (
+            "NOT_APPLICABLE"
+            if source_status != "PRESENT"
+            else "COMPARABLE"
+            if comparable_history and current_fingerprint
+            else incomparable_reason
+        ),
+        "lifecycle_slices": slices,
+        "gaps": gaps,
+        "nonclaims": list(definition["non_claims"]),
+        "interpretation": interpretation,
+        "latest_evidence_available_at": _latest_clock(
+            [row for row in observations if (_parse_available(row) or clock) <= clock]
+        ),
+        "purity": dict(PURITY),
+        "authority": {
+            "pause_bot": False,
+            "activate_bot": False,
+            "modify_bot": False,
+            "provider_calls": False,
+            "deploy": False,
+        },
+    }
+
+
+def git_data_capability(root: Path) -> dict[str, Any]:
+    """Git market-feature availability. Never live market values."""
+
+    try:
+        config = load_surface_config(root)
+    except Exception as exc:
+        return {
+            "status": "UNAVAILABLE",
+            "error": str(getattr(exc, "args", [type(exc).__name__])[0]),
+            "features": [],
+        }
+    features = []
+    for item in config.get("features") or []:
+        if not isinstance(item, Mapping):
+            continue
+        features.append(
+            {
+                "feature_id": item.get("feature_id"),
+                "availability": item.get("availability_class") or item.get("availability"),
+                "family": item.get("family"),
+            }
+        )
+    return {
+        "status": "GIT_CAPABILITY",
+        "contract_id": config.get("contract_id"),
+        "features": features,
+        "not_live_market_values": True,
+    }
+
+
+def compose_market_context(
+    root: Path,
+    *,
+    as_of: datetime | None = None,
+    evidence: Mapping[str, Any] | None = None,
+    data_root: Path | None = None,
+) -> dict[str, Any]:
+    definition = load_market_context_definition(root)
+    clock = as_of or datetime.now(UTC)
+    bundle = evidence or read_market_evidence(
+        root, as_of=clock, definition=definition, data_root=data_root
+    )
+    if not isinstance(bundle, Mapping):
+        bundle = empty_evidence_bundle(source_status="NOT_PRESENT")
+    projection = project_market_context(definition, bundle, as_of=clock)
+    projection["data_capability"] = git_data_capability(root)
+    return projection

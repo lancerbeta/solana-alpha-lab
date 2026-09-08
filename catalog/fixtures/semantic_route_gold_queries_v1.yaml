@@ -35,6 +35,27 @@ queries:
 - query_id: SGQ-MARKET-FEATURES-EN
   query: what feature/data exists at decision time
   required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-MARKET-CONTEXT-RU
+  query: какой market context сейчас наблюдается
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-MARKET-CONTEXT-EN
+  query: what market context is observed now
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-MARKET-NOW-RU
+  query: что сейчас происходит с рынком
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-MARKET-LIQUIDITY-WEEK-RU
+  query: какая сейчас ликвидность относительно недели
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-MARKET-TRADERS-RU
+  query: какая активность трейдеров сейчас
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-MARKET-PIT-READY-EN
+  query: what market data is PIT-ready
+  required_top_route: SEM-MARKET-DATA-FEATURES
+- query_id: SGQ-MARKET-COVER-EN
+  query: what does this market context cover
+  required_top_route: SEM-MARKET-DATA-FEATURES
 - query_id: SGQ-PROVIDER-ROUTES-EN
   query: what provider route supports this field
   required_top_route: SEM-PROVIDER-ROUTES
