@@ -4,8 +4,8 @@
   "review_id": "HFIC-ONE-FROZEN-RUNNER-UP-FAILOVER-REVIEW-001",
   "as_of": "2026-09-08",
   "task_id": "HFIC_ONE_FROZEN_RUNNER_UP_FAILOVER_V1",
-  "reviewed_bindings_sha256": "0",
-  "reviewed_inventory_sha256": "0",
+  "reviewed_bindings_sha256": "1853342a31d816167a5c6001a71b22e8e0d330f6e378be285861c6287c396182",
+  "reviewed_inventory_sha256": "e33d0d26ec4af4223df7cca5671ef7ea5b9a2cf7b0eccae8701338383fa34037",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

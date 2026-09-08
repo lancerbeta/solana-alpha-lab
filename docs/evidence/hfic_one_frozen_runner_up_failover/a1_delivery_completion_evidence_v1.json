@@ -10,7 +10,29 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "d662e9492a68c20e62f905552288041c76fb3258a9357759cf531730a90ce0af",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "5299b3ff3e360e50177ffc1c1a3e7ff1f4d91790d9a7d58e29a34796cc36efd5",
+    ".cursor/commands/hypothesis-forge.md": "f1c45f1e12074592f203957d34e99285e204f5d152131a7a2fde9168331adf17",
+    ".cursor/commands/independent-hypothesis-critic.md": "b5fe805ee85cabba1ba5b56fe3645681a1004a7b65e83f17a6f825605d431a04",
+    "catalog/assets/core.yaml": "62fe9534a5974abe5f7d1f5245f5a535300934fab82c2a4ff08fdb8fd9ecf5c6",
+    "catalog/catalog_manifest.yaml": "0d68b3c867c093d069a5cb41d2a4956f9618cc37ea1d7999b79db3cebd5efc8c",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json": "6b6f78d06a814c980878b3ffa3ca98e4aff4b59ccb0c327f78bd517d3e652477",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "322b94c1a37a5c3edbaa6ac473d9c200f28217df6b559f56728a64f968755817",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "db125d42ad5258aa33dc0a5bce024e5da4df328f1af2ba61e4d57bc919b6257b",
+    "docs/reports/hfic_one_frozen_runner_up_failover/a1_owner_readout_v1.md": "eca78f25515066d07ab20a45aadf081ca3059232611c9d3366b202ee05263c43",
+    "docs/tasks/HFIC_ONE_FROZEN_RUNNER_UP_FAILOVER_V1.md": "97a3a54f1c50dea4c454ff773dc3828ecd4e8848eac590aa566a2e64ccdbc18e",
+    "schemas/research_memory_projection_v1.sql": "3132d0ae51f2c3e225577abb50787c757998a958727455b3475547f895d0a0d8",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "f3974b78539d4b502c9f152613b05713a89f4b873f151bf6d1b6dea30f060234",
+    "src/solana_alpha_lab/factory/hfic_session.py": "414930171228c7be3c9e19ea3d58958149ecb5a03cfac7b1624e71bec2fae20c",
+    "tests/test_hfic_cli.py": "7bc4a5784efd6af1432441a302ed6645f36f11995865367416c2ce24f517e1f7",
+    "tests/test_hfic_epistemic_memory_semantics.py": "11bc6929fd9c6982235312eeba0b5fbc26cdc6843be4baacd28b6dd9a9969c5f",
+    "tests/test_hfic_manual_grounding_contract_diagnostics_v1.py": "18a5fe2cd0980be95e26c378526bac96ad4ffb59b78659e490e79bca08908a70",
+    "tests/test_hfic_one_frozen_runner_up_failover_v1.py": "7f1c16273107e1ba90bf887ed9f692647899a9215d00ac534d1fb4d28242d7bf",
+    "tests/test_hfic_operational_closure_v1.py": "74b0efcec23c18d805e0fb35285eb36d9c64db7fa4c9380a4c65bf89bbcebd31",
+    "tests/test_hfic_provenance_clock.py": "1c49931b12a28062904719a67e9136f8d1a15ee8295a80e5cc132696a12facb2",
+    "tests/test_hfic_session.py": "79e81826a1504ab5cb67b8076c2f9a8e2a96e4c839aa69a23a64f9d324449bd6"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_one_frozen_runner_up_failover/a1_delivery_factory_fit_v1.json",
-    "sha256": "0",
+    "sha256": "a8014ef999ed2d256a62d5bfe4bf2d1d95c684dfaf2fefb7187827971846cce2",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_ONE_FROZEN_RUNNER_UP_FAILOVER",
     "independent_review": {
       "path": "docs/evidence/hfic_one_frozen_runner_up_failover/a1_delivery_independent_review_v1.json",
-      "sha256": "0",
+      "sha256": "523cc8628eb77e5e3222d5349e1b776b68906b35f631e762f8f5f94d1886317b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
