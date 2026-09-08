@@ -71,7 +71,10 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertTrue(str(schemas["forge_draft"]).endswith("hypothesis_forge_draft_v1_2.schema.json"))
         self.assertTrue(str(schemas["forge_draft_v1_1"]).endswith("hypothesis_forge_draft_v1.schema.json"))
         self.assertTrue(
-            str(schemas["session_receipt"]).endswith("hypothesis_forge_session_receipt_v1_2.schema.json")
+            str(schemas["session_receipt"]).endswith("hypothesis_forge_session_receipt_v1_3.schema.json")
+        )
+        self.assertTrue(
+            str(schemas["session_receipt_v1_2"]).endswith("hypothesis_forge_session_receipt_v1_2.schema.json")
         )
         self.assertTrue(
             str(schemas["session_receipt_v1_1"]).endswith("hypothesis_forge_session_receipt_v1.schema.json")
@@ -208,6 +211,14 @@ class HficOperationalClosureContractTests(unittest.TestCase):
             self.assertIn("PASS_TO_CLASSIFICATION", text)
             self.assertIn("REVISE_ONCE", text)
             self.assertIn("AUTO_HANDOFF_UNAVAILABLE", text)
+        operator = OPERATOR_PATH.read_text(encoding="utf-8")
+        self.assertIn("RUNNER_UP_AWAITING_CRITIC", operator)
+        self.assertIn("RUNNER_UP_REVISION_REQUIRED", operator)
+        config = load_yaml(CONFIG_PATH)
+        self.assertEqual(
+            config["slash_session_authority"].get("auto_continue_revise_once_scope"),
+            "PRIMARY_SELECTED_ONLY",
+        )
 
     def test_operator_pack_mentions_v1_1_and_keeps_prompts(self) -> None:
         text = OPERATOR_PATH.read_text(encoding="utf-8")

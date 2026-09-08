@@ -381,7 +381,39 @@ class VerticalE2ETests(unittest.TestCase):
                 data_root=data_root,
             )
             self.assertEqual(finalize.returncode, 0, finalize.stderr + finalize.stdout)
-            session_receipt = json.loads(finalize.stdout)
+            pending = json.loads(finalize.stdout)
+            self.assertEqual(pending["session_state"], "RUNNER_UP_AWAITING_CRITIC")
+            resume = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(resume.returncode, 0, resume.stderr)
+            resume_payload = json.loads(resume.stdout)
+            c2 = critic_result_from_packet_only(
+                resume_payload["critic_input_packet"],
+                "KILL_MECHANISM",
+            )
+            c2_path = Path(tmp) / "critic_c2.json"
+            c2_path.write_text(
+                json.dumps(c2, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            finalize_c2 = run_cli(
+                "finalize",
+                "--session-id",
+                frozen["session_id"],
+                "--critic-result",
+                str(c2_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(finalize_c2.returncode, 0, finalize_c2.stderr + finalize_c2.stdout)
+            session_receipt = json.loads(finalize_c2.stdout)
             self.assertEqual(session_receipt["prompt_version"], "HFIC-V1.2")
             diagnostics = session_receipt["diagnostics"]
             self.assertEqual(diagnostics["candidate_count"], 4)

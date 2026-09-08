@@ -106,6 +106,47 @@ def critic_result_from_packet_only(
     }
 
 
+def finalize_kill_complete(
+    frozen: dict[str, object],
+    critic: dict[str, object],
+    store: object,
+    *,
+    repo_root: Path = ROOT,
+    **kwargs,
+):
+    from solana_alpha_lab.factory.hfic_session import finalize_session, load_session_bundle
+
+    first = finalize_session(frozen, critic, store=store, repo_root=repo_root, **kwargs)
+    if first.get("session_state") != "RUNNER_UP_AWAITING_CRITIC":
+        return first
+    bundle = load_session_bundle(store, str(frozen["session_id"])) or first
+    packet = bundle.get("critic_input_packet") or bundle.get("runner_up_critic_input_packet")
+    assert isinstance(packet, dict)
+    second = critic_result_from_packet_only(packet, str(critic.get("critic_terminal") or "KILL_MECHANISM"))
+    return finalize_session(bundle, second, store=store, repo_root=repo_root, **kwargs)
+
+
+def complete_if_runner_up_parked(store, frozen, done, *, repo_root=ROOT, **kwargs):
+    from solana_alpha_lab.factory.hfic_session import (
+        RUNNER_UP_AWAITING_CRITIC,
+        finalize_session,
+        load_session_bundle,
+    )
+
+    if done.get("session_state") != RUNNER_UP_AWAITING_CRITIC:
+        return done
+    parked = load_session_bundle(store, str(frozen["session_id"])) or done
+    packet = parked.get("critic_input_packet") or parked.get("runner_up_critic_input_packet")
+    assert isinstance(packet, dict)
+    return finalize_session(
+        parked,
+        critic_result_from_packet_only(packet, "KILL_MECHANISM"),
+        store=store,
+        repo_root=repo_root,
+        **kwargs,
+    )
+
+
 C3_C4_FIXTURE = ROOT / "tests/fixtures/hypothesis_forge/draft_c3_c4_mismatch_v1.json"
 
 
@@ -240,10 +281,10 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             critic = critic_result_from_packet_only(packet, "KILL_MECHANISM")
             self.assertEqual(critic["session_id"], packet["session_id"])
             self.assertNotIn("frozen", critic)
-            receipt = finalize_session(
+            receipt = finalize_kill_complete(
                 frozen,
                 critic,
-                store=store,
+                store,
                 repo_root=ROOT,
             )
             self.assertEqual(receipt["session_state"], "SYNTHESIS_COMPLETE")
@@ -389,10 +430,10 @@ class HficFreezeFinalizeTests(unittest.TestCase):
                 valid_draft(),
                 preflight_receipt=_preflight_receipt(),
             )
-            receipt = finalize_session(
+            receipt = finalize_kill_complete(
                 frozen,
                 _critic_result(frozen),
-                store=store,
+                store,
                 repo_root=ROOT,
             )
             self.assertEqual(receipt["session_state"], "SYNTHESIS_COMPLETE")
@@ -546,17 +587,21 @@ class HficFreezeFinalizeTests(unittest.TestCase):
                 repo_root=ROOT,
                 data_root=Path(tmp),
             )
+            done = complete_if_runner_up_parked(store, frozen, done)
             self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
-            self.assertIn(
-                done["critic_terminal"],
-                {
-                    "PASS_FAST_LANE_READY",
-                    "PASS_CHANGE_LANE_REQUIRED",
-                    "PASS_DATA_OPTION_REQUIRED",
-                    "OWNER_DECISION_REQUIRED",
-                    "KILL_UNBOUND_EVIDENCE",
-                },
-            )
+            if done.get("runner_up_failover_used"):
+                self.assertEqual(done.get("primary_critic_terminal"), "KILL_UNBOUND_EVIDENCE")
+            else:
+                self.assertIn(
+                    done["critic_terminal"],
+                    {
+                        "PASS_FAST_LANE_READY",
+                        "PASS_CHANGE_LANE_REQUIRED",
+                        "PASS_DATA_OPTION_REQUIRED",
+                        "OWNER_DECISION_REQUIRED",
+                        "KILL_UNBOUND_EVIDENCE",
+                    },
+                )
             self.assertNotEqual(done["critic_terminal"], "PASS_TO_CLASSIFICATION")
             fence = done.get("no_git_fence_receipt") or (
                 done.get("session_receipt") or {}
@@ -699,7 +744,7 @@ class HficFreezeFinalizeTests(unittest.TestCase):
             self.assertEqual(revised["session_state"], "REVISED_AWAITING_CRITIC")
             self.assertEqual(revised["revision_count"], 1)
             kill = _critic_result(revised, "KILL_PREPARATORY_LOOP")
-            done = finalize_session(revised, kill, store=store, repo_root=ROOT)
+            done = finalize_kill_complete(revised, kill, store, repo_root=ROOT)
             self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
             self.assertEqual(done["critic_terminal"], "KILL_PREPARATORY_LOOP")
 
@@ -735,7 +780,7 @@ class HficFreezeFinalizeTests(unittest.TestCase):
                 frozen.get("selected_display_ordinal"),
             )
             kill = _critic_result(revised, "KILL_PREPARATORY_LOOP")
-            done = finalize_session(revised, kill, store=store, repo_root=ROOT)
+            done = finalize_kill_complete(revised, kill, store, repo_root=ROOT)
             self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
 
     def test_revise_once_rejects_mechanism_change(self) -> None:
@@ -833,6 +878,9 @@ class HficHashBoundAndRevisionClosureTests(unittest.TestCase):
                 data_root=Path(tmp),
             )
             reloaded = load_session_bundle(store, str(frozen["session_id"]))
+            if reloaded.get("session_state") == "RUNNER_UP_AWAITING_CRITIC":
+                complete_if_runner_up_parked(store, frozen, reloaded)
+                reloaded = load_session_bundle(store, str(frozen["session_id"]))
             self.assertEqual(reloaded["session_state"], "SYNTHESIS_COMPLETE")
             first = prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
             second = prove_runtime(store, str(frozen["session_id"]), repo_root=ROOT)
@@ -863,10 +911,10 @@ class HficHashBoundAndRevisionClosureTests(unittest.TestCase):
                 store=store,
                 repo_root=ROOT,
             )
-            done = finalize_session(
+            done = finalize_kill_complete(
                 revised,
                 _critic_result(revised, "KILL_PREPARATORY_LOOP"),
-                store=store,
+                store,
                 repo_root=ROOT,
             )
             self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
@@ -901,10 +949,10 @@ class HficHashBoundAndRevisionClosureTests(unittest.TestCase):
                 store=store,
                 repo_root=ROOT,
             )
-            finalize_session(
+            finalize_kill_complete(
                 revised,
                 _critic_result(revised, "KILL_PREPARATORY_LOOP"),
-                store=store,
+                store,
                 repo_root=ROOT,
             )
             bundle = load_session_bundle(store, str(frozen["session_id"]))

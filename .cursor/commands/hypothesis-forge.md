@@ -7,8 +7,12 @@ through executable `preflight` → FORGE_DRAFT (PROMPT A) → optional Prompt C 
 
 One `/hypothesis-forge` is `ONE_SLASH_ONE_SESSION` authority that expires at the
 final terminal or STOP. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
-`PASS_TO_CLASSIFICATION` and exactly one bounded `REVISE_ONCE` continue
-automatically under the same slash. After `NO_WORTHY_HYPOTHESIS`, the same slash
+`PASS_TO_CLASSIFICATION` and exactly one bounded **primary** `REVISE_ONCE`
+continue automatically under the same slash. A final primary `KILL_*` continues
+once for the already-frozen runner-up (`RUNNER_UP_AWAITING_CRITIC` → isolated
+Critic #2 on the pre-frozen C2 packet only). C2 `REVISE_ONCE` does **not**
+auto-continue: persist `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`, no C2 wording
+repair, no C3, no new AUTO search. After `NO_WORTHY_HYPOTHESIS`, the same slash
 runs Prompt C (`HFIC-NEXT-V1.0`) and freeze `--next-action` with
 `ZERO_MID_CYCLE_OWNER_INTERVENTION`. Do not ask the owner to press Run or approve
 an RDP write between preflight, freeze, Critic, revision/classification and
@@ -31,10 +35,10 @@ Optional owner focus (default `AUTO`):
 OWNER_FOCUS=AUTO
 ```
 
-Return one terminal + one NEXT after `SYNTHESIS_COMPLETE`. After `NO_WORTHY`,
-NEXT is `WAIT_FOR_NEW_EVIDENCE`, `FORWARD_DATA_OPTION_READY` or
-`CAPABILITY_OPTION_READY` (or deterministic wait fallback). Forge is incomplete until critic returns one terminal and one NEXT and finalize
-persists the cycle, except `NO_WORTHY` (skips Critic; complete at freeze) and
+Return one terminal + one NEXT after `SYNTHESIS_COMPLETE`. Primary `KILL_*` is
+**not** evening-complete while `session_state=RUNNER_UP_AWAITING_CRITIC`. After
+`NO_WORTHY`, NEXT is `WAIT_FOR_NEW_EVIDENCE`, `FORWARD_DATA_OPTION_READY` or
+`CAPABILITY_OPTION_READY` (or deterministic wait fallback). Forge is incomplete until `finalize` persists `SYNTHESIS_COMPLETE`, except `NO_WORTHY` (skips Critic; complete at freeze) and
 `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` / `PRIOR_MEMORY_RECORD_UNIDENTIFIED`
 (BLOCKED; session not written; do not
 launch Critic; `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`).

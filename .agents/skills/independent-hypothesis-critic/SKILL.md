@@ -13,9 +13,11 @@ not continue Forge reasoning.
 Read `configs/hypothesis_forge_independent_critic_v1.yaml` and **PROMPT B** in
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
-Input must be a structured **CRITIC_INPUT_PACKET** only. Reject free-form Forge
+Input must be a structured **CRITIC_INPUT_PACKET** only. The packet may be the
+Forge-selected candidate or the pre-frozen runner-up; both use the same schema
+with `selected_candidate` set to that candidate. Reject free-form Forge
 narrative, pleas to «improve the idea», or requests to generate a new portfolio.
-Do not accept the outer frozen envelope, Forge scratchpad, or hidden session
+Do not accept C1 Critic reasoning when screening C2. Do not accept the outer frozen envelope, Forge scratchpad, or hidden session
 context alongside the packet. Do **not** walk ResearchStore or active RDP for
 prior recall: the packet is the sole research-memory input. Return
 `hypothesis_critic_result_v1`. The critic does not persist; `finalize` owns
@@ -110,7 +112,10 @@ classification is `PASS_TO_CLASSIFICATION`. Do not emit `PASS_FAST_LANE_READY`,
 B4 terminals (choose one):
 
 - `PASS_TO_CLASSIFICATION` — then run B5 classifier mapping
-- `REVISE_ONCE` — bounded repair once; no mechanism change
+- `REVISE_ONCE` — bounded **primary** repair once; no mechanism change.
+  If this packet is the pre-frozen runner-up, still emit `REVISE_ONCE` when
+  that is the honest terminal; Forge maps it to `PAUSE` /
+  `RUNNER_UP_REVISION_REQUIRED` and will not run `revise`.
 - `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`, `KILL_MECHANISM`, `KILL_PIT_OR_LEAKAGE`,
   `KILL_EXECUTION_OR_ECONOMICS`, `KILL_DATA_INFEASIBLE`,
   `KILL_STATISTICALLY_UNIDENTIFIABLE`, `KILL_LOW_INFORMATION_VALUE`,

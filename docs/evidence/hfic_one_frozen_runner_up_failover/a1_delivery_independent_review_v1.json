@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-ONE-FROZEN-RUNNER-UP-FAILOVER-REVIEW-001",
+  "as_of": "2026-09-08",
+  "task_id": "HFIC_ONE_FROZEN_RUNNER_UP_FAILOVER_V1",
+  "reviewed_bindings_sha256": "0",
+  "reviewed_inventory_sha256": "0",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=6ebf5e555098c9c006a6688e7778ac306347a4cf59264ecb12750cb6164a68a6",
+        "C1_C2_PREFREEZE_SAME_PRIOR_MEMORY",
+        "FAILOVER_ONLY_AFTER_FINAL_PRIMARY_KILL",
+        "LEGACY_CRITIC_FIELDS_C1_BOUND_C2_ADDITIVE_V13",
+        "C2_REVISE_ONCE_TYPED_PAUSE_ARTIFACT_UNCHANGED",
+        "LOAD_PROVE_FAIL_CLOSED_MISSING_C2_ARTIFACTS",
+        "FRESH_V12_CANNOT_STRIP_C2_SHA_STORED_HISTORICAL_ONE_SHOT",
+        "FAILOVER_REPLAY_C2_IDEMPOTENT_C1_SESSION_CONFLICT",
+        "LANE_NULL_ON_C1_BOUND_RECEIPT_AND_SHOW_SESSION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_C2_REVISE_REPLAY_CANONICALIZES_NEXT_STOP",
+        "CHECKED_C1_REPLAY_AFTER_FAILOVER_SESSION_CONFLICT",
+        "CHECKED_C2_RESULT_IDENTITY_BIND",
+        "CHECKED_DECLARED_SHA_FAIL_CLOSED_KILL_AND_NON_KILL",
+        "CHECKED_HISTORICAL_STORED_WITHOUT_SHA_ONE_SHOT",
+        "CHECKED_FAILOVER_LANE_NULL",
+        "CHECKED_NO_SECRETS_NO_PROVIDER_NO_RDP"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_PRE_FROZEN_C2_NOT_DISCARDED_ON_PRIMARY_KILL",
+        "DOD_T6_V12_NO_FAILOVER_RECEIPT_IDENTITY",
+        "DOD_T8_C2_REVISE_TYPED_PAUSE_SHOW_SESSION_SPLIT",
+        "DOD_V11_HANDOFF_DOES_NOT_CARRY_V13_FIELDS",
+        "DOD_NO_ALPHA_NO_C3_NO_SECOND_AUTO",
+        "STOP_CALIBRATION_MEMORY_REBASE_RESIDUAL"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_CALIBRATION_MEMORY_REBASE",
+    "NO_N_CANDIDATE_TOURNAMENT",
+    "NO_HFIC_V13_PACKET_SEMANTICS_MUTATION"
+  ]
+}

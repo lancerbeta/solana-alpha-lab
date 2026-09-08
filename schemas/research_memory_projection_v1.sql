@@ -313,6 +313,10 @@ scored AS (
         cycle.effective_at,
         cycle.first_reliable_available_at,
         cycle.record_id,
+        COALESCE(
+            TRY_CAST(json_extract(cycle.payload_json, '$.hfic_cycle_seq') AS INTEGER),
+            0
+        ) AS hfic_cycle_seq,
         CASE
             WHEN json_extract_string(cycle.payload_json, '$.phase')
                  = 'SYNTHESIS_COMPLETE'
@@ -322,23 +326,25 @@ scored AS (
             WHEN json_extract_string(cycle.payload_json, '$.phase')
                  = 'AWAITING_CLASSIFICATION' THEN 1
             WHEN json_extract_string(cycle.payload_json, '$.phase')
-                 = 'REVISED_AWAITING_CRITIC' THEN 1
+                 = 'RUNNER_UP_AWAITING_CRITIC' THEN 1
             WHEN json_extract_string(cycle.payload_json, '$.phase')
-                 = 'REVISION_REQUIRED' THEN 2
+                 = 'REVISED_AWAITING_CRITIC' THEN 3
+            WHEN json_extract_string(cycle.payload_json, '$.phase')
+                 = 'REVISION_REQUIRED' THEN 4
             WHEN json_extract_string(cycle.payload_json, '$.phase')
                  = 'SYNTHESIS_COMPLETE'
-                 AND art.session_id IS NOT NULL THEN 3
+                 AND art.session_id IS NOT NULL THEN 5
             WHEN json_extract_string(cycle.payload_json, '$.phase')
-                 = 'CRITIC_RESULT_READY' THEN 3
+                 = 'CRITIC_RESULT_READY' THEN 5
             WHEN json_extract_string(cycle.payload_json, '$.phase')
-                 = 'SYNTHESIS_COMPLETE' THEN 4
+                 = 'SYNTHESIS_COMPLETE' THEN 6
             WHEN json_extract_string(cycle.payload_json, '$.phase')
-                 = 'FROZEN_AWAITING_CRITIC' THEN 4
+                 = 'FROZEN_AWAITING_CRITIC' THEN 6
             WHEN json_extract_string(cycle.payload_json, '$.phase')
-                 = 'DRAFT_VALIDATED' THEN 5
+                 = 'DRAFT_VALIDATED' THEN 7
             WHEN json_extract_string(cycle.payload_json, '$.phase')
-                 = 'PREFLIGHT_PROVEN' THEN 6
-            ELSE 6
+                 = 'PREFLIGHT_PROVEN' THEN 8
+            ELSE 8
         END AS phase_rank
     FROM _research_events AS cycle
     LEFT JOIN receipt_sessions AS rec
@@ -355,7 +361,7 @@ ranked AS (
         scored.*,
         row_number() OVER (
             PARTITION BY session_id
-            ORDER BY phase_rank ASC, effective_at DESC, record_id ASC
+            ORDER BY phase_rank ASC, hfic_cycle_seq DESC, effective_at DESC, record_id ASC
         ) AS cycle_rank
     FROM scored
 )
@@ -469,6 +475,7 @@ WHERE session_state IN (
     'DRAFT_VALIDATED',
     'FROZEN_AWAITING_CRITIC',
     'REVISED_AWAITING_CRITIC',
+    'RUNNER_UP_AWAITING_CRITIC',
     'REVISION_REQUIRED',
     'AWAITING_CLASSIFICATION',
     'CRITIC_RESULT_READY'

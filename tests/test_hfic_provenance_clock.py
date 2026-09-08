@@ -49,7 +49,7 @@ from solana_alpha_lab.factory.hfic_session import (
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from tests.test_hfic_cli import bind_draft
-from tests.test_hfic_session import _critic_result, valid_draft
+from tests.test_hfic_session import _critic_result, finalize_kill_complete, valid_draft
 
 HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 NO_WORTHY = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
@@ -344,10 +344,10 @@ class HficPersistBoundTimeTests(unittest.TestCase):
                 identities=assign_portfolio_ids(draft["candidates"]),
                 draft=draft,
             )
-            finalize_session(
+            finalize_kill_complete(
                 frozen,
                 _critic_result(frozen, "KILL_PREPARATORY_LOOP"),
-                store=store,
+                store,
                 repo_root=ROOT,
                 clock=FrozenClock(STAGE),
             )
@@ -426,10 +426,10 @@ class HficReplayAndReceiptSchemaTests(unittest.TestCase):
             )
             from solana_alpha_lab.factory.hfic_session import finalize_session
 
-            finalize_session(
+            finalize_kill_complete(
                 frozen,
                 _critic_result(frozen, "KILL_PREPARATORY_LOOP"),
-                store=ResearchStore(data_root),
+                ResearchStore(data_root),
                 repo_root=ROOT,
                 clock=FrozenClock(STAGE),
             )
@@ -784,10 +784,10 @@ class HficProvenanceCorrectionTests(unittest.TestCase):
                 identities=assign_portfolio_ids(draft["candidates"]),
                 draft=draft,
             )
-            finalize_session(
+            finalize_kill_complete(
                 frozen,
                 _critic_result(frozen, "KILL_PREPARATORY_LOOP"),
-                store=store,
+                store,
                 repo_root=ROOT,
                 clock=FrozenClock(STAGE),
             )

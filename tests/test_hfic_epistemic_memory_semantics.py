@@ -213,6 +213,25 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
                 data_root=data_root,
             )
             self.assertEqual(finalized.returncode, 0, finalized.stderr)
+            pending = json.loads(finalized.stdout)
+            if pending.get("session_state") == "RUNNER_UP_AWAITING_CRITIC":
+                runner_packet = pending["critic_input_packet"]
+                c2_path = Path(tmp) / "critic_c2.json"
+                c2_path.write_text(
+                    json.dumps(critic_result_from_packet_only(runner_packet, "KILL_DATA_INFEASIBLE")),
+                    encoding="utf-8",
+                )
+                c2 = run_cli(
+                    "finalize",
+                    "--session-id",
+                    frozen["session_id"],
+                    "--critic-result",
+                    str(c2_path),
+                    "--format",
+                    "json",
+                    data_root=data_root,
+                )
+                self.assertEqual(c2.returncode, 0, c2.stderr)
             after_epoch = evidence_epoch_sha256(evidence_epoch_material(ROOT, data_root))
             self.assertEqual(after_epoch, epoch)
             replay = run_cli(
