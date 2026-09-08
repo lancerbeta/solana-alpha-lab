@@ -30,7 +30,7 @@ from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, R
 from solana_alpha_lab.storage.manifests import canonical_manifest_bytes  # noqa: E402
 from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli  # noqa: E402
 
-HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 TAKER_FAMILY = "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY"
 LATE_FAMILY = "CLOSE_ZZZ_LATE_ALPHABET_FAMILY"
 TAKER_MANIFEST_ID = "DATASET-MANIFEST-TAKER-MIX-CLOSURE-FIXTURE-001"

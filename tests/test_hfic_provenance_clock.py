@@ -51,7 +51,7 @@ from solana_alpha_lab.factory.run_passport import canonical_sha256
 from tests.test_hfic_cli import bind_draft
 from tests.test_hfic_session import _critic_result, valid_draft
 
-HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 NO_WORTHY = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
 STARTED = datetime(2026, 8, 27, 12, 0, 0, tzinfo=UTC)
 STAGE = datetime(2026, 8, 27, 13, 15, 0, tzinfo=UTC)

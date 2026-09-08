@@ -38,7 +38,7 @@ from tests.test_early_market_panel_importer import write_temp_capture
 from solana_alpha_lab.factory.early_market_panel_importer import import_early_market_panel
 
 CLI = ROOT / "scripts/hypothesis_forge.py"
-NO_WORTHY = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
+NO_WORTHY = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json"
 HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
 WAIT = ROOT / "tests/fixtures/hypothesis_forge/next_action_wait_valid_v1.json"
 FORWARD = ROOT / "tests/fixtures/hypothesis_forge/next_action_forward_valid_v1.json"

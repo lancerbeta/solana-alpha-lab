@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FRESH-SESSION-VERSION-LOCK-REVIEW-001",
+  "as_of": "2026-09-08",
+  "task_id": "HFIC_FRESH_SESSION_VERSION_LOCK_V1",
+  "reviewed_bindings_sha256": "00aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "00bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=36cadbb20a386f52e4a0873f547158d4d014116782823b3a6c0f79745752edaf",
+        "C1_REJECT_BEFORE_PERSIST",
+        "C2_NO_MACHINE_AUTO_UPGRADE",
+        "C3_HISTORICAL_V11_READABLE_CRITIC_V11_UNCHANGED",
+        "C4_PRIOR_RUNNER_UP_CLASSIFIER_UNCHANGED",
+        "UNKNOWN_DENIAL_DOES_NOT_BURN_AUTO_SLOT"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_GUARD_ON_FREEZE_AND_BIND",
+        "CHECKED_NO_AUTO_UPGRADE",
+        "CHECKED_HISTORICAL_STUB_FREEZE_V11",
+        "CHECKED_T1_T6_FALSIFY",
+        "CHECKED_T5_ISOLATES_START_NEW_SESSION",
+        "CHECKED_T2_STORE_UNCHANGED",
+        "CHECKED_NO_SECRETS_NO_PROVIDER_NO_RDP_NO_SCOPE_CREEP",
+        "OWNER_UX_START_NEW_SESSION_EMITS_V12",
+        "OWNER_UX_TYPED_DENIAL_BEFORE_PERSIST"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_FRESH_V12_REJECTS_V11_BEFORE_PERSIST",
+        "DOD_AUTO_SLOT_REMAINS_START_NEW_SESSION",
+        "DOD_V12_GROUNDING_PRESENT_ON_HAPPY_PATH",
+        "DOD_HISTORICAL_V11_READABLE",
+        "T1_T6_COVER_CURRENT_AND_HISTORICAL",
+        "STOP_NO_RDP_REWRITE_NO_CRITIC_V11_REDESIGN"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_AUTO_UPGRADE",
+    "NO_HISTORICAL_RDP_REWRITE",
+    "NO_CRITIC_V11_REDESIGN"
+  ]
+}

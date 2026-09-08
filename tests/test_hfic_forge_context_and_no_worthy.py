@@ -38,8 +38,8 @@ from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, R
 
 CLI = ROOT / "scripts/hypothesis_forge.py"
 FIXTURE = ROOT / "tests/fixtures/early_market_panel/temp_capture_v1"
-NO_WORTHY = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
-HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+NO_WORTHY = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json"
+HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 SECOND_DATASET_MANIFEST_ID = "DATASET-MANIFEST-SYNTHETIC-CONTEXT-002"
 SECOND_CAPABILITY_ID = "CAP-FIXTURE-GIT-RECEIPT-WRITER-001"
 

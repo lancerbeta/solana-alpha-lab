@@ -342,6 +342,7 @@ def bind_preflight_receipt(
         raise HficSessionError("PREFLIGHT_ACTION_INVALID")
     if receipt.get("prompt_version") != PROMPT_VERSION:
         raise HficSessionError("PREFLIGHT_PROMPT_VERSION_INVALID")
+    _reject_stale_fresh_session_draft(draft, receipt)
     observed_hash = receipt.get("preflight_receipt_sha256")
     expected_hash = canonical_preflight_receipt_sha256(receipt)
     if observed_hash != expected_hash:
@@ -420,6 +421,28 @@ def _resolve_ref(ref: object, identities: Sequence[Any]) -> int:
         if identity.candidate_id == token:
             return index
     return -1
+
+
+def _reject_stale_fresh_session_draft(
+    draft: Mapping[str, Any],
+    receipt: Mapping[str, Any] | None,
+) -> None:
+    """Fresh START_NEW_SESSION on the current prompt must not persist a legacy draft.
+
+    Historical V1.1 freeze without a current START_NEW_SESSION preflight stays
+    readable. Do not coerce packet_version labels: V1.2 grounding is absent in V1.1.
+    """
+    if not isinstance(receipt, Mapping):
+        return
+    if receipt.get("action") != "START_NEW_SESSION":
+        return
+    if receipt.get("prompt_version") != PROMPT_VERSION:
+        return
+    packet_version = str(draft.get("packet_version") or "")
+    declared = str(draft.get("generator_prompt_version") or "")
+    if packet_version == "1.2" and declared == PROMPT_VERSION:
+        return
+    raise HficSessionError("FRESH_SESSION_DRAFT_VERSION_MISMATCH")
 
 
 def _draft_packet_version(draft: Mapping[str, Any]) -> str:
@@ -549,6 +572,7 @@ def freeze_draft(
 ) -> dict[str, Any]:
     if not isinstance(draft, Mapping):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    _reject_stale_fresh_session_draft(draft, preflight_receipt)
     packet_version = _draft_packet_version(draft)
     prompt_version = _draft_prompt_version(draft)
     if repo_root is not None:
