@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-PUBLICATION-STUCK-EXPECTATION-AWARE-COMPLETION-001",
+  "as_of": "2026-09-08",
+  "task_id": "FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1",
+  "state_change": "FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1_READY_FOR_MERGE",
+  "base_main": "ed2bb1be2252581e4d363e89de21da1f8146f341",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_publication_stuck_expectation_aware_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PUBLICATION_EXPECTATION_AWARE_MATRIX",
+    "independent_review": {
+      "path": "docs/evidence/factory_publication_stuck_expectation_aware_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS",
+    "NO_THRESHOLD_INFLATION",
+    "NO_TIMESTAMP_SOURCE_CHANGE",
+    "NO_OPERABILITY_WATCH_REDESIGN",
+    "NO_COLLECTOR_SCHEDULER_PUBLISHER_CHANGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

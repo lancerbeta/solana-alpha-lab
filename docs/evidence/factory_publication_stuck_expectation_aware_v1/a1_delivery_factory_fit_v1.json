@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-PUBLICATION-STUCK-EXPECTATION-AWARE-FACTORY-FIT-001",
+  "as_of": "2026-09-08",
+  "task_id": "FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SEPARATE_OPERATE_DEPLOY_AFTER_EXACT_LIVE_TO_TARGET_DIFF"
+  },
+  "dimensions": {
+    "mission": "PASS: Telegram ACTION for PUBLICATION_STUCK only when a current publication obligation exists or expectation evidence is missing.",
+    "flexibility_and_history": "PASS: existing packet due_pressure and open-job counts express the invariant without a new store, timer, or incident type.",
+    "context_efficiency": "PASS: one health-class predicate plus existing operability tests; no second monitoring plane.",
+    "research_truth": "PASS: no scientific publication, estimand, or PIT change; operability signal only.",
+    "owner_operability": "PASS: proven idle no longer pages the owner; real stalls remain detectable after existing 30m grace.",
+    "execution_to_cashflow": "PASS: no execution, wallet, or cashflow path; this atom does not claim alpha.",
+    "monitoring_and_recovery": "PASS: watch grace, dedupe, and RECOVERED stay in operability_watch; stale clears naturally when idle is proven.",
+    "build_vs_buy": "PASS: reuse existing packet truth; no new oracle or vendor.",
+    "red_team": "PASS: UNKNOWN expectation fails closed; missing counts cannot look like healthy idle.",
+    "security": "PASS: no credentials, VPS mutation, or live incident clear."
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_THRESHOLD_INFLATION",
+    "NO_TIMESTAMP_SOURCE_CHANGE",
+    "FAIL_CLOSED_IS_PACKET_FIELD_ABSENCE_NOT_SQLITE_UNOBSERVABILITY",
+    "MALFORMED_BOOL_FALSE_NOT_IN_MATRIX"
+  ],
+  "recovery": "REVERT"
+}
