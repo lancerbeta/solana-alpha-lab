@@ -126,8 +126,8 @@ MARKET_PROVIDER_CALLS=0
 GIT_MUTATION=0
 EXPERIMENT_EXECUTION=0
 
-Используй PROMPT A из приложенного HFIC-V1.1.
-Верни полный FORGE_REPORT и machine-valid FORGE_DRAFT (hypothesis_forge_draft_v1).
+Используй PROMPT A из приложенного HFIC-V1.2.
+Верни полный FORGE_REPORT и machine-valid FORGE_DRAFT (hypothesis_forge_draft_v1_2).
 Не генерируй CRITIC_INPUT_PACKET: его создаёт только freeze.
 ```
 
@@ -587,7 +587,10 @@ decision after collection
 11. `PROVISIONAL_EXECUTION_UNIT` — одна единица либо `NONE`.
 12. `NON_CLAIMS_AND_HOLDOUT_RECEIPT`.
 13. `FORGE_DRAFT` — единственный machine handshake. JSON object по
-    `catalog/schemas/hypothesis_forge_draft_v1.schema.json`. Не выдавай
+    `catalog/schemas/hypothesis_forge_draft_v1_2.schema.json` с
+    `packet_version=1.2` и `generator_prompt_version=HFIC-V1.2`.
+    Не выдавай `packet_version=1.1` / `HFIC-V1.1` на fresh `START_NEW_SESSION`:
+    freeze вернёт `FRESH_SESSION_DRAFT_VERSION_MISMATCH`. Не выдавай
     `CRITIC_INPUT_PACKET`: его строит только `freeze`.
 
 Не добавляй roadmap из множества задач. Runners-up остаются watchlist, а не backlog tasks.
@@ -602,8 +605,8 @@ decision after collection
 ```json
 {
   "packet_schema": "smial.hypothesis-forge-draft",
-  "packet_version": "1.1",
-  "generator_prompt_version": "HFIC-V1.1",
+  "packet_version": "1.2",
+  "generator_prompt_version": "HFIC-V1.2",
   "owner_focus": "AUTO",
   "preflight_receipt_id": "<from preflight.receipt_id>",
   "preflight_receipt_sha256": "<from preflight.preflight_receipt_sha256>",
@@ -956,7 +959,7 @@ Proposed owner phrases have status `PROPOSED_NOT_AUTHORITY` and must not be exec
 ## BEGIN PROMPT C
 
 You are the post-no-worthy router for Solana Alpha Lab. Prompt identity `HFIC-NEXT-V1.0`.
-Candidate generation already finished with `NO_WORTHY_HYPOTHESIS`. Do not invent a new hypothesis. Do not change `HFIC-V1.1` search identity. Choose exactly one typed next action using only the supplied context, no-worthy portfolio and at most three prospect summaries. Authority remains all zeros. Output only a valid next-action draft.
+Candidate generation already finished with `NO_WORTHY_HYPOTHESIS`. Do not invent a new hypothesis. Do not change the current session search identity. Choose exactly one typed next action using only the supplied context, no-worthy portfolio and at most three prospect summaries. Authority remains all zeros. Output only a valid next-action draft.
 
 ## END PROMPT C
 
@@ -1046,7 +1049,7 @@ Catalog/prior resolution
 При каждом использовании сохраняйте в research packet:
 
 ```text
-generator_prompt_version = HFIC-V1.1
+generator_prompt_version = HFIC-V1.2 (new sessions; historical HFIC-V1.1 receipts remain readable)
 generator_model_and_effort
 critic_model_and_effort
 live_git_head

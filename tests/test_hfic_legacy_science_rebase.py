@@ -43,7 +43,7 @@ from tests.test_hfic_epistemic_memory_semantics import (  # noqa: E402
     _publish_labeled_dataset,
 )
 
-HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 H900_RULE = "HOLDER_CONCENTRATION_TOP_QUARTILE_VETO_V1"
 H900_TERMINAL = "REPLICATED_RELATION_NOT_ACTIONABLE_AS_TOP_QUARTILE_VETO"
 
@@ -241,7 +241,7 @@ class LegacyScienceRebaseTests(unittest.TestCase):
             prior_before = run_cli(
                 "prior",
                 "--query",
-                "ROUTE_FRAGMENTATION",
+                "LIQUIDITY_TO_MCAP_RATIO",
                 "--format",
                 "json",
                 data_root=data_root,
@@ -260,7 +260,7 @@ class LegacyScienceRebaseTests(unittest.TestCase):
             prior_after = run_cli(
                 "prior",
                 "--query",
-                "ROUTE_FRAGMENTATION",
+                "LIQUIDITY_TO_MCAP_RATIO",
                 "--format",
                 "json",
                 data_root=data_root,

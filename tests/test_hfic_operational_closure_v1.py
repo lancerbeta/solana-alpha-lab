@@ -203,6 +203,46 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertEqual(schema_errors(draft, DRAFT_SCHEMA), [])
         self.assertEqual(draft["generator_prompt_version"], "HFIC-V1.1")
 
+    def test_t5_canonical_start_new_session_instructions_emit_v12_draft(self) -> None:
+        skill = FORGE_SKILL_PATH.read_text(encoding="utf-8")
+        step3_start = skill.index("3. Only for `START_NEW_SESSION`")
+        step4_start = skill.index("\n4. ", step3_start)
+        step3 = skill[step3_start:step4_start]
+        self.assertRegex(step3, r"using\s+`HFIC-V1\.2`")
+        self.assertIn("packet_version=1.2", step3)
+        self.assertIn("generator_prompt_version=HFIC-V1.2", step3)
+        self.assertIn("catalog/schemas/hypothesis_forge_draft_v1_2.schema.json", step3)
+        self.assertNotRegex(step3, r"using\s+`HFIC-V1\.1`")
+        self.assertNotIn("hypothesis_forge_draft_v1.schema.json", step3)
+
+        operator = OPERATOR_PATH.read_text(encoding="utf-8")
+        step1_start = operator.index("### Шаг 1 — Forge")
+        step2_start = operator.index("### Шаг 2 — независимый Critic")
+        step1 = operator[step1_start:step2_start]
+        self.assertIn("HFIC-V1.2", step1)
+        self.assertIn("hypothesis_forge_draft_v1_2", step1)
+        self.assertNotIn("HFIC-V1.1", step1)
+        self.assertNotIn("hypothesis_forge_draft_v1)", step1)
+        self.assertNotIn("hypothesis_forge_draft_v1.", step1)
+
+        a13_start = operator.index("13. `FORGE_DRAFT`")
+        a14_end = operator.index("Не добавляй roadmap", a13_start)
+        a13 = operator[a13_start:a14_end]
+        self.assertIn("catalog/schemas/hypothesis_forge_draft_v1_2.schema.json", a13)
+        self.assertIn("packet_version=1.2", a13)
+        self.assertIn("generator_prompt_version=HFIC-V1.2", a13)
+        self.assertIn("FRESH_SESSION_DRAFT_VERSION_MISMATCH", a13)
+        self.assertNotIn("hypothesis_forge_draft_v1.schema.json", a13)
+
+        a14_start = operator.index("## A14. Формат FORGE_DRAFT")
+        a14_json_start = operator.index("```json", a14_start)
+        a14_json_end = operator.index("```", a14_json_start + 7)
+        a14_example = operator[a14_json_start:a14_json_end]
+        self.assertIn('"packet_version": "1.2"', a14_example)
+        self.assertIn('"generator_prompt_version": "HFIC-V1.2"', a14_example)
+        self.assertNotIn('"packet_version": "1.1"', a14_example)
+        self.assertNotIn('"generator_prompt_version": "HFIC-V1.1"', a14_example)
+
     def test_hfic_python_tests_do_not_nest_uv(self) -> None:
         for path in (
             ROOT / "tests/test_hfic_cli.py",
@@ -211,6 +251,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
             ROOT / "tests/test_hfic_provenance_clock.py",
             ROOT / "tests/test_hfic_forge_context_and_no_worthy.py",
             ROOT / "tests/test_hfic_discovery_prospects_and_next_action.py",
+            ROOT / "tests/test_hfic_fresh_session_version_lock_v1.py",
         ):
             text = path.read_text(encoding="utf-8")
             self.assertNotIn("uv run", text)

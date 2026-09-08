@@ -447,8 +447,7 @@ class HficTempRootE2ETests(unittest.TestCase):
         from solana_alpha_lab.factory.research_store import ResearchStore
 
         git_before = repository_git_snapshot(ROOT)
-        happy = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
-        mismatch = ROOT / "tests/fixtures/hypothesis_forge/draft_c3_c4_mismatch_v1.json"
+        happy = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
@@ -474,11 +473,10 @@ class HficTempRootE2ETests(unittest.TestCase):
                 json.dumps(bind_draft(json.loads(happy.read_text(encoding="utf-8")), preflight_payload)),
                 encoding="utf-8",
             )
+            mismatch_draft = bind_draft(json.loads(happy.read_text(encoding="utf-8")), preflight_payload)
+            mismatch_draft["runner_up_candidate_ref"] = "NOT-A-CANDIDATE"
             mismatch_bound = Path(tmp) / "draft_mismatch.json"
-            mismatch_bound.write_text(
-                json.dumps(bind_draft(json.loads(mismatch.read_text(encoding="utf-8")), preflight_payload)),
-                encoding="utf-8",
-            )
+            mismatch_bound.write_text(json.dumps(mismatch_draft), encoding="utf-8")
 
             blocked = run_cli(
                 "freeze",
@@ -651,7 +649,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             prior = run_cli(
                 "prior",
                 "--query",
-                "ROUTE_FRAGMENTATION",
+                "LIQUIDITY_TO_MCAP_RATIO",
                 "--format",
                 "json",
                 data_root=data_root,
@@ -713,7 +711,7 @@ class HficTempRootE2ETests(unittest.TestCase):
         from solana_alpha_lab.factory.document_runner import repository_git_snapshot
 
         git_before = repository_git_snapshot(ROOT)
-        happy = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
+        happy = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
@@ -750,7 +748,9 @@ class HficTempRootE2ETests(unittest.TestCase):
             self.assertEqual(frozen["session_state"], "FROZEN_AWAITING_CRITIC")
             packet = json.loads(json.dumps(frozen["critic_input_packet"]))
             outer_session = frozen["session_id"]
-            self.assertEqual(packet["packet_version"], "1.1")
+            self.assertEqual(packet["packet_version"], "1.2")
+            self.assertEqual(packet["generator_prompt_version"], "HFIC-V1.2")
+            self.assertGreaterEqual(len(frozen.get("grounded_candidates") or []), 4)
             self.assertEqual(packet["session_id"], outer_session)
             del frozen
             critic = critic_result_from_packet_only(packet, "KILL_MECHANISM")

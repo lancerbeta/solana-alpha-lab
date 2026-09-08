@@ -101,9 +101,13 @@ Happy path — no owner copy/paste between the slash command and the final termi
    - `STOP` → report the named terminal; stop.
    - `START_NEW_SESSION` → continue.
 3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
-   `HFIC-V1.1` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
+   `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
    resolved evidence. Display ordinals are display-only; do not invent canonical IDs.
-   Output a machine-valid `FORGE_DRAFT` (`hypothesis_forge_draft_v1.schema.json`).
+   Output a machine-valid `FORGE_DRAFT` with `packet_version=1.2`,
+   `generator_prompt_version=HFIC-V1.2`, schema
+   `catalog/schemas/hypothesis_forge_draft_v1_2.schema.json`.
+   Do not emit `packet_version=1.1` or `HFIC-V1.1` on this fresh binding; freeze
+   will fail closed with `FRESH_SESSION_DRAFT_VERSION_MISMATCH`.
    Copy `truth_roots_used`, `prior_work_receipts` and `research_memory_as_of` from
    preflight. Do **not** emit `CRITIC_INPUT_PACKET`; freeze is the only packet builder.
    Do **not** query prospects or include prospect IDs/research text in Prompt A.

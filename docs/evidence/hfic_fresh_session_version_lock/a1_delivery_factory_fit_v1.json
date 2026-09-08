@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FRESH-SESSION-VERSION-LOCK-FACTORY-FIT-001",
+  "as_of": "2026-09-08",
+  "task_id": "HFIC_FRESH_SESSION_VERSION_LOCK_V1",
+  "reviewed_bindings_sha256": "204e27511d17035a4665de3004495a83bb25f2b483890176d9539225da359179",
+  "reviewed_inventory_sha256": "e21d6919e03330c16019a5ae157c9eacef4862d8dd24bc22418147005dd28e6a",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_FRESH_SESSION_PROTOCOL_IDENTITY_LOCK",
+    "flexibility_and_history": "PASS_HISTORICAL_V11_READABLE_NO_REWRITE",
+    "context_efficiency": "PASS_ADOPTS_EXISTING_FREEZE_BOUNDARY",
+    "research_truth": "PASS_NO_LABEL_ONLY_UPGRADE_NO_FABRICATED_GROUNDING",
+    "owner_operability": "PASS_SKILL_AND_OPERATOR_START_NEW_SESSION_EMIT_V12",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_FORGE_REQUIRED",
+    "monitoring_and_recovery": "PASS_REVERT_BRANCH_BYTES",
+    "build_vs_buy": "PASS_ADOPT_EXISTING_SESSION_VALIDATION",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER",
+    "red_team": "PASS_FAIL_CLOSED_BEFORE_PERSIST"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "MANUAL_HFIC_V1_2_WHEN_OWNER_INVOKES_FORGE"
+  },
+  "recovery": "REVERT hfic-fresh-session-version-lock BRANCH; KEEP V1.1 ARTIFACTS READABLE.",
+  "limits": [
+    "NO_GENERATOR",
+    "NO_PRIOR_RECALL_CHANGE",
+    "NO_RUNNER_UP_LIFECYCLE_CHANGE",
+    "NO_PROVIDER",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_FORGE_REQUIRED"
+  ]
+}
