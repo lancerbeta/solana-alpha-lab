@@ -11,7 +11,22 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    ".agents/skills/hypothesis-forge/SKILL.md": "75989ef3ed1aade5dccded774a0dba5d52c953323ed5bf85151ea2747ab3b844",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "65c87f22aa2d3bf5478bd75c3ac8451ba709ceb722b9a255664b5771c4d43d25",
+    ".cursor/commands/hypothesis-forge.md": "917df9fca6e2cf44f6bdbfe6d62b73a2ea1768596c4e9c18e6a2214aac664825",
+    ".cursor/commands/independent-hypothesis-critic.md": "7efec7be567ace9e8fea6169584f2652c61619d77a7939bf68b280ef03226174",
+    "catalog/assets/core.yaml": "d258bc3715db137dc4a806b1574d12c53f5d26d2c6d8d845ec1cc45710feed4a",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "52ada38d7e341ffe001d1330ec4be58d9d26e717161e1b26247e4c3def143032",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "26b616d31c8d41a7f228806df96034bde4fae6e9dc2a3360cbf05a58b8e26028",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "fef7830bd96b7deffbb9521871da73d09242cb515d5a381f8fe2896cbcbcd0e0",
+    "docs/reports/hfic_critic_prior_memory_closure/a1_owner_readout_v1.md": "e033b4552d9e3dfec899458b69be38a7dcbc21b67f8dcdb794d4872c26ccc2ae",
+    "docs/tasks/HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_V1.md": "4468a5095790528a8aa555656dba94297d6e5c528c4de14b7c6456de765fa2b5",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "72d0c16bfd06dda79a72bb94b3715d6f5b2d5f1f41e2994542510663cfb86f1e",
+    "src/solana_alpha_lab/factory/hfic_session.py": "490e060a2f9785c6c427cd4a068013b7d3dfedf6105ea92ccec832439cbadc4f",
+    "tests/test_hfic_critic_prior_memory_closure_v1.py": "4552acd4f71b0328e0aba29d65bc8825dc1830bfe8c76700910b8f9783f327ba",
+    "tests/test_hfic_operational_closure_v1.py": "1296653ae7964a47401c9ec175629837c7325284b55e2ddfedb2a5036a5469a7",
+    "tests/test_hfic_session.py": "eb2149bd7230c732cc64f960e2de00f8d6f9b6923f6935d861918a65806d622a",
+    "tests/test_hypothesis_forge_independent_critic_v1.py": "87e541ea3a7cfd330665fe483e0b4f07622df33e184479971130193a90412c34"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_critic_prior_memory_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "a0cfe0220da45d1c4098dada2bae33c1abe0cb10bc7bad6797faf2e626c6da7a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_CRITIC_PRIOR_MEMORY_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/hfic_critic_prior_memory_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "7e0e167eb088daa369da4d9f70be9982e5b5fffd9863ad187d25d162ae56085c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
