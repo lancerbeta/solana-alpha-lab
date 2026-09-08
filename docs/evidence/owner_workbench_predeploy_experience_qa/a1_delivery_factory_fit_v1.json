@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OWNER-WORKBENCH-PREDEPLOY-EXPERIENCE-QA-FACTORY-FIT-001",
+  "as_of": "2026-09-08",
+  "task_id": "OWNER_WORKBENCH_PREDEPLOY_EXPERIENCE_QA_V1",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "dimensions": {
+    "mission": "PASS_SCAN_FIRST_SIX_SURFACES_NO_FRONTEND_REWRITE",
+    "flexibility_and_history": "PASS_EXISTING_VISUAL_OS_AND_OWNER_LANGUAGE_IN_PLACE",
+    "context_efficiency": "PASS_NO_SPA_NO_NEW_SEM_ROUTE",
+    "research_truth": "PASS_PRESENTATION_ONLY_UNKNOWN_PRESERVED",
+    "owner_operability": "PASS_PAGE_QUESTION_THEN_SCANNABLE_ATTENTION",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OR_NETRETURN",
+    "monitoring_and_recovery": "PASS_PROCESS_UP_IS_NOT_HEALTHY_NO_VPS_MUTATION",
+    "build_vs_buy": "PASS_CAPABILITY_RADAR_NONE",
+    "red_team": "PASS_UNKNOWN_NOT_ZERO_OR_HEALTHY_POST_UNCHANGED",
+    "security": "PASS_NO_PROVIDER_NO_SECRETS_NO_WALLET_NO_DEPLOY"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_CANONICAL_DONE",
+    "NAME_IS_HISTORICAL_ATOM_ID_NOT_PREDEPLOY_GATE",
+    "LIVE_FACTORY_REMAINS_ON_REVIEW_BASELINE_UNTIL_NAMED_DEPLOY"
+  ],
+  "recovery": "REVERT cursor/owner-workbench-predeploy-experience-qa-v1. No runtime reconciliation."
+}

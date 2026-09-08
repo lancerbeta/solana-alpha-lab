@@ -53,17 +53,18 @@ def visual_os_css(root: Path) -> str:
 def visual_os_layout_css() -> str:
     """Reusable workstation layout. Tokens come from the Visual OS contract."""
     return """
-html,body { background: var(--surface-void, #111); color: var(--text-primary, #eee); font-family: system-ui, sans-serif; margin: 0; }
+html,body { background: var(--surface-void, #111); color: var(--text-primary, #eee); font-family: system-ui, sans-serif; margin: 0; color-scheme: dark; scrollbar-color: #555 #1c1c1c; }
 .shell { display: grid; grid-template-columns: 12rem minmax(0, 1fr); min-height: 100vh; }
 .signal-rail { background: var(--surface-base, #161616); border-right: 1px solid var(--border-hairline, #333); padding: 1.5rem 1rem; }
 .signal-rail .brand { letter-spacing: 0.12em; margin: 0 0 1.5rem; color: var(--text-secondary, #bbb); }
 .signal-rail nav { display: flex; flex-direction: column; gap: 0.75rem; }
 .signal-rail a { color: var(--text-muted, #999); text-decoration: none; }
 .signal-rail a[aria-current="page"] { color: var(--accent-signal, #888); font-weight: 600; }
-main { background: var(--surface-base, #161616); padding: 1.5rem 2rem 3rem; max-width: 72rem; min-width: 0; }
+main { background: var(--surface-base, #161616); padding: 1.5rem 2rem 3rem; max-width: 72rem; min-width: 0; overflow-x: auto; }
 .page-head h1 { font-size: 1.35rem; font-weight: 650; margin: 0 0 0.35rem; }
 .page-question { color: var(--text-secondary, #bbb); margin: 0 0 0.75rem; font-size: 1rem; }
 .page-note { color: var(--text-muted, #999); margin: 0 0 1.25rem; font-size: 0.9rem; }
+.page-machine { color: var(--text-muted, #999); font-size: 0.75rem; margin: 1.25rem 0 0; }
 .fact-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; margin: 0 0 1.25rem; }
 .fact { background: var(--surface-panel, #1c1c1c); border: 1px solid var(--border-hairline, #333); padding: 0.65rem 0.75rem; }
 .fact .label { display: block; color: var(--text-muted, #999); font-size: 0.75rem; margin: 0 0 0.25rem; }
@@ -87,6 +88,10 @@ form button { margin-right: 0.5rem; margin-bottom: 0.5rem; }
 .copy-text { white-space: pre-wrap; word-break: break-word; margin: 0.75rem 0 0; }
 .attention { border: 1px solid var(--border-hairline, #333); padding: 0.75rem 1rem; margin: 0.75rem 0; background: var(--surface-panel, #1c1c1c); }
 .attention h3 { margin: 0 0 0.4rem; color: var(--text-primary, #eee); }
+.attention-p0 { border-color: var(--semantic-danger, #a40000); }
+.attention-p1 { border-color: var(--semantic-warning, #b8860b); }
+details.attention-scan > summary { cursor: pointer; font-weight: 600; color: var(--text-primary, #eee); }
+details.attention-scan[open] > summary { margin-bottom: 0.5rem; }
 .non-claims { font-weight: 600; color: var(--text-secondary, #bbb); }
 .danger-zone { border: 2px solid var(--semantic-danger, #a40000); padding: 0.75rem; margin-top: 1rem; }
 .safe-actions { margin: 0.75rem 0; }
