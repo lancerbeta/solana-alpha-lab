@@ -129,9 +129,11 @@ Happy path — no owner copy/paste between the slash command and the final termi
 6. Otherwise run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
    Do not pass `--next-action` on a selected-candidate path.
-   Fresh HFIC-V1.2 freeze binds a complete bounded `prior_memory` snapshot of
-   eligible historical `HYPOTHESIS_VERSION` records from the preflight-bound
-   store **before** current session persist. If freeze returns
+   Fresh HFIC-V1.2 freeze emits critic `packet_version=1.3` with
+   `generator_prompt_version=HFIC-V1.2` and a complete bounded `prior_memory`
+   snapshot of eligible historical `HYPOTHESIS_VERSION` records from the
+   preflight-bound store **before** current session persist. Do not emit
+   HFIC-V1.3 Prompt A. If freeze returns
    `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`: BLOCKED, not a crash; session was
    not written; do not launch Critic; do not paste a packet; do not retry the
    same slash expecting success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.

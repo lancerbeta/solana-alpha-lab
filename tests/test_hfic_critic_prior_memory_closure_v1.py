@@ -365,7 +365,7 @@ class PriorMemoryUnitTests(unittest.TestCase):
                 )
             self.assertEqual(raised.exception.code, "PRIOR_MEMORY_RECORD_UNIDENTIFIED")
 
-    def test_t7_historical_v11_packets_remain_readable(self) -> None:
+    def test_t7_historical_packets_remain_readable(self) -> None:
         schema = json.loads(CRITIC_SCHEMA.read_text(encoding="utf-8"))
         validator = Draft202012Validator(schema)
         v10 = json.loads(CRITIC_PACKET_FIXTURE.read_text(encoding="utf-8"))
@@ -376,6 +376,11 @@ class PriorMemoryUnitTests(unittest.TestCase):
         v11["session_id"] = "HFIC-SESS-HISTORICAL001"
         self.assertNotIn("prior_memory", v11)
         self.assertEqual(list(validator.iter_errors(v11)), [])
+        v12 = dict(v11)
+        v12["packet_version"] = "1.2"
+        v12["generator_prompt_version"] = "HFIC-V1.2"
+        self.assertNotIn("prior_memory", v12)
+        self.assertEqual(list(validator.iter_errors(v12)), [])
         frozen = freeze_draft(
             valid_draft(),
             preflight_receipt={"receipt_id": "HFIC-PREFLIGHT-FIXTURE-001"},
@@ -385,6 +390,17 @@ class PriorMemoryUnitTests(unittest.TestCase):
         self.assertEqual(packet["packet_version"], "1.1")
         self.assertNotIn("prior_memory", packet)
         self.assertEqual(list(validator.iter_errors(packet)), [])
+
+    def test_historical_v12_without_prior_memory_readable(self) -> None:
+        schema = json.loads(CRITIC_SCHEMA.read_text(encoding="utf-8"))
+        validator = Draft202012Validator(schema)
+        v10 = json.loads(CRITIC_PACKET_FIXTURE.read_text(encoding="utf-8"))
+        historical = dict(v10)
+        historical["packet_version"] = "1.2"
+        historical["generator_prompt_version"] = "HFIC-V1.2"
+        historical["session_id"] = "HFIC-SESS-HISTORICALV12"
+        self.assertNotIn("prior_memory", historical)
+        self.assertEqual(list(validator.iter_errors(historical)), [])
 
 
 class PriorMemoryFreezeE2ETests(unittest.TestCase):
@@ -545,7 +561,8 @@ class PriorMemoryFreezeE2ETests(unittest.TestCase):
                 memory["store_inventory_digest"],
                 fresh_receipt["store_inventory_digest"],
             )
-            self.assertEqual(packet["packet_version"], "1.2")
+            self.assertEqual(packet["packet_version"], "1.3")
+            self.assertEqual(packet["generator_prompt_version"], "HFIC-V1.2")
             self.assertTrue(memory["snapshot_sha256"])
             self.assertGreater(memory["bytes"], 0)
 

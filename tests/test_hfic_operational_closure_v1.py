@@ -66,6 +66,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
             "PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED",
         )
         self.assertFalse(prior_memory["include_ranked_shortlist_only"])
+        self.assertEqual(prior_memory["packet_versions"], ["1.3"])
         schemas = config["schemas"]
         self.assertTrue(str(schemas["forge_draft"]).endswith("hypothesis_forge_draft_v1_2.schema.json"))
         self.assertTrue(str(schemas["forge_draft_v1_1"]).endswith("hypothesis_forge_draft_v1.schema.json"))
@@ -114,6 +115,8 @@ class HficOperationalClosureContractTests(unittest.TestCase):
             "^HFIC-SESS-[A-Z0-9]+$",
         )
         self.assertIn("prior_memory", schema["properties"])
+        packet_versions = schema["properties"]["packet_version"]["enum"]
+        self.assertEqual(packet_versions, ["1.0", "1.1", "1.2", "1.3"])
         self.assertFalse(schema.get("additionalProperties", True))
 
     def test_projection_declares_hfic_views(self) -> None:
@@ -166,6 +169,8 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("copied/bound", text.casefold())
         self.assertIn("prior_memory", text)
         self.assertIn("sole research-memory", text.casefold())
+        self.assertIn("packet_version=1.3", text)
+        self.assertIn("Do not reconstruct or fabricate `prior_memory` for historical", text)
         operator = OPERATOR_PATH.read_text(encoding="utf-8")
         self.assertIn("copied/bound", operator)
         self.assertIn("HFIC-UNBOUND", operator)
@@ -174,6 +179,8 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED", operator)
         self.assertIn("RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY", operator)
         self.assertIn("STOP_DO_NOT_LAUNCH_CRITIC", operator)
+        self.assertIn("packet_version=1.3", operator)
+        self.assertIn("Historical `packet_version=1.0` / `1.1` / `1.2`", operator)
 
     def test_slash_command_happy_path_is_single_owner_action(self) -> None:
         text = FORGE_COMMAND_PATH.read_text(encoding="utf-8")

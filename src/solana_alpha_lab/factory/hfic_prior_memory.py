@@ -1,4 +1,4 @@
-"""Bounded historical prior-memory snapshot for HFIC-V1.2 Critic packets."""
+"""Bounded historical prior-memory snapshot for current Critic packet 1.3."""
 
 from __future__ import annotations
 

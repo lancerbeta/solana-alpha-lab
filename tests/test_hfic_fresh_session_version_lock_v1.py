@@ -176,7 +176,7 @@ class FreshSessionVersionLockTests(unittest.TestCase):
             self.assertEqual(frozen["session_state"], "FROZEN_AWAITING_CRITIC")
             self.assertEqual(frozen["prompt_version"], "HFIC-V1.2")
             packet = frozen["critic_input_packet"]
-            self.assertEqual(packet["packet_version"], "1.2")
+            self.assertEqual(packet["packet_version"], "1.3")
             self.assertEqual(packet["generator_prompt_version"], "HFIC-V1.2")
             grounded = frozen.get("grounded_candidates")
             self.assertIsInstance(grounded, list)

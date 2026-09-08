@@ -24,7 +24,7 @@
   ],
   "properties": {
     "packet_schema": {"const": "smial.hypothesis-critic-input"},
-    "packet_version": {"enum": ["1.0", "1.1", "1.2"]},
+    "packet_version": {"enum": ["1.0", "1.1", "1.2", "1.3"]},
     "generator_prompt_version": {"enum": ["HFIC-V1.0", "HFIC-V1.1", "HFIC-V1.2"]},
     "generated_at": {"type": "string", "minLength": 1},
     "live_git_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
@@ -213,7 +213,7 @@
     {
       "if": {
         "properties": {
-          "packet_version": {"enum": ["1.1", "1.2"]}
+          "packet_version": {"enum": ["1.1", "1.2", "1.3"]}
         },
         "required": ["packet_version"]
       },
@@ -224,7 +224,7 @@
     {
       "if": {
         "properties": {
-          "packet_version": {"const": "1.2"}
+          "packet_version": {"const": "1.3"}
         },
         "required": ["packet_version"]
       },

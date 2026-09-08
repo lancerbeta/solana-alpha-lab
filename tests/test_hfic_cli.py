@@ -748,7 +748,7 @@ class HficTempRootE2ETests(unittest.TestCase):
             self.assertEqual(frozen["session_state"], "FROZEN_AWAITING_CRITIC")
             packet = json.loads(json.dumps(frozen["critic_input_packet"]))
             outer_session = frozen["session_id"]
-            self.assertEqual(packet["packet_version"], "1.2")
+            self.assertEqual(packet["packet_version"], "1.3")
             self.assertEqual(packet["generator_prompt_version"], "HFIC-V1.2")
             self.assertGreaterEqual(len(frozen.get("grounded_candidates") or []), 4)
             self.assertEqual(packet["session_id"], outer_session)
