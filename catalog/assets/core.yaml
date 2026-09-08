@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: a8636a5b3e8bd0bf03dbd9f1844861777b4c2fb36b35fc016482055a709974ed}
+  integrity: {kind: sha256, sha256: 48838a37bb5ff3fdec9a19498b38c3c14f3e2ec61f8d35ecf7f83224a7b8b8aa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -25692,7 +25692,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/read_model.py', repository_path: src/solana_alpha_lab/factory/read_model.py}
-  integrity: {kind: sha256, sha256: 4568d227853aa6a0da1568e0fcce9fdaf89e9fd4913ec6a57237d28c355c794e}
+  integrity: {kind: sha256, sha256: 107e91ef8e9aef8e09e2733fd93407c873f80ddf8feeeaab07bf5d4a3684ed9a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-OPS-STORE-001}
@@ -25710,7 +25710,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/operational_store.py', repository_path: src/solana_alpha_lab/factory/operational_store.py}
-  integrity: {kind: sha256, sha256: 60a80031b274e0decee55e81be65ebd53334894f124263f64b48b34e6c834168}
+  integrity: {kind: sha256, sha256: 509477535d82e1d3471014d0da59f25e48e4dd3a594f2e011c0ed4ab727500b1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: c722785001ff56c1ff6dd30e5712bc24ab054c8f8c812aafb0604e190037036c}
+  integrity: {kind: sha256, sha256: e8489e43d92fb678789655b5f62bc71afbe30200e94cc7debfce08c5cb70b477}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}

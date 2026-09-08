@@ -14,8 +14,48 @@ class OperationalStoreError(ValueError):
     """Raised when operational state cannot be read or written safely."""
 
 
+SCHEMA_SOURCE_NOT_PRESENT = "SOURCE_NOT_PRESENT"
+SCHEMA_LEGACY_UNINITIALIZED = "LEGACY_UNINITIALIZED"
+SCHEMA_READY = "READY"
+SCHEMA_INCOMPATIBLE = "INCOMPATIBLE"
+SCHEMA_UNAVAILABLE = "UNAVAILABLE"
+
+JOBS_REQUIRED_COLUMNS = (
+    "job_id",
+    "experiment_id",
+    "spec_relative",
+    "spec_sha256",
+    "status",
+    "blocker",
+    "terminal",
+    "evidence_json",
+    "created_at",
+    "updated_at",
+)
+
+
 def _now() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _jobs_schema_status(conn: sqlite3.Connection) -> str:
+    try:
+        row = conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'jobs'"
+        ).fetchone()
+    except sqlite3.Error:
+        return SCHEMA_INCOMPATIBLE
+    if row is None:
+        return SCHEMA_LEGACY_UNINITIALIZED
+    try:
+        columns = {
+            str(item[1]) for item in conn.execute("PRAGMA table_info(jobs)").fetchall()
+        }
+    except sqlite3.Error:
+        return SCHEMA_INCOMPATIBLE
+    if not columns or any(name not in columns for name in JOBS_REQUIRED_COLUMNS):
+        return SCHEMA_INCOMPATIBLE
+    return SCHEMA_READY
 
 
 class OperationalStore:
@@ -24,15 +64,20 @@ class OperationalStore:
             raise OperationalStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
         self.path = path
         self.readonly = readonly
+        self.schema_status = SCHEMA_SOURCE_NOT_PRESENT
         if readonly:
             if not path.is_file():
                 raise OperationalStoreError("SOURCE_NOT_PRESENT")
-            self._conn = sqlite3.connect(
-                path.resolve().as_uri() + "?mode=ro&immutable=1",
-                uri=True,
-                check_same_thread=False,
-            )
+            try:
+                self._conn = sqlite3.connect(
+                    path.resolve().as_uri() + "?mode=ro&immutable=1",
+                    uri=True,
+                    check_same_thread=False,
+                )
+            except sqlite3.Error as exc:
+                raise OperationalStoreError("OPS_STORE_UNAVAILABLE") from exc
             self._conn.row_factory = sqlite3.Row
+            self.schema_status = _jobs_schema_status(self._conn)
             return
         path.parent.mkdir(parents=True, exist_ok=True)
         self._connect()
@@ -40,6 +85,10 @@ class OperationalStore:
     def _connect(self) -> None:
         self._conn = sqlite3.connect(self.path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
+        status = _jobs_schema_status(self._conn)
+        if status == SCHEMA_INCOMPATIBLE:
+            self._conn.close()
+            raise OperationalStoreError("OPS_STORE_INCOMPATIBLE")
         self._conn.execute("PRAGMA journal_mode=WAL")
         self._conn.execute(
             """
@@ -88,6 +137,7 @@ class OperationalStore:
             """
         )
         self._conn.commit()
+        self.schema_status = SCHEMA_READY
 
     def close(self) -> None:
         if not getattr(self, "readonly", False):
@@ -137,10 +187,17 @@ class OperationalStore:
         self._conn.commit()
 
     def get_job(self, job_id: str) -> dict[str, Any] | None:
-        row = self._conn.execute(
-            "SELECT * FROM jobs WHERE job_id = ?",
-            (job_id,),
-        ).fetchone()
+        if self.schema_status == SCHEMA_LEGACY_UNINITIALIZED:
+            return None
+        if self.schema_status == SCHEMA_INCOMPATIBLE:
+            raise OperationalStoreError("OPS_STORE_INCOMPATIBLE")
+        try:
+            row = self._conn.execute(
+                "SELECT * FROM jobs WHERE job_id = ?",
+                (job_id,),
+            ).fetchone()
+        except sqlite3.Error as exc:
+            raise OperationalStoreError("OPS_STORE_INCOMPATIBLE") from exc
         if row is None:
             return None
         payload = dict(row)
@@ -148,9 +205,16 @@ class OperationalStore:
         return payload
 
     def latest_job(self) -> dict[str, Any] | None:
-        row = self._conn.execute(
-            "SELECT * FROM jobs ORDER BY updated_at DESC, job_id DESC LIMIT 1"
-        ).fetchone()
+        if self.schema_status == SCHEMA_LEGACY_UNINITIALIZED:
+            return None
+        if self.schema_status == SCHEMA_INCOMPATIBLE:
+            raise OperationalStoreError("OPS_STORE_INCOMPATIBLE")
+        try:
+            row = self._conn.execute(
+                "SELECT * FROM jobs ORDER BY updated_at DESC, job_id DESC LIMIT 1"
+            ).fetchone()
+        except sqlite3.Error as exc:
+            raise OperationalStoreError("OPS_STORE_INCOMPATIBLE") from exc
         if row is None:
             return None
         payload = dict(row)
@@ -172,9 +236,16 @@ class OperationalStore:
         self._conn.commit()
 
     def runtime_events(self) -> list[dict[str, Any]]:
-        rows = self._conn.execute(
-            "SELECT event_id, kind, created_at, payload_json FROM runtime_events ORDER BY event_id ASC"
-        ).fetchall()
+        if self.schema_status in {SCHEMA_LEGACY_UNINITIALIZED, SCHEMA_INCOMPATIBLE}:
+            if self.schema_status == SCHEMA_INCOMPATIBLE:
+                raise OperationalStoreError("OPS_STORE_INCOMPATIBLE")
+            return []
+        try:
+            rows = self._conn.execute(
+                "SELECT event_id, kind, created_at, payload_json FROM runtime_events ORDER BY event_id ASC"
+            ).fetchall()
+        except sqlite3.Error as exc:
+            raise OperationalStoreError("OPS_STORE_INCOMPATIBLE") from exc
         events = []
         for row in rows:
             payload = dict(row)

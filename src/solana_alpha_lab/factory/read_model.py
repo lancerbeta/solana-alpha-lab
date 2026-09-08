@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sqlite3
 from pathlib import Path
 from typing import Any, Mapping
 
@@ -17,7 +18,14 @@ from solana_alpha_lab.factory.market_feature_surface import (
     FeatureSurfaceError,
     resolve_feature_snapshot,
 )
-from solana_alpha_lab.factory.operational_store import OperationalStore
+from solana_alpha_lab.factory.operational_store import (
+    SCHEMA_INCOMPATIBLE,
+    SCHEMA_LEGACY_UNINITIALIZED,
+    SCHEMA_SOURCE_NOT_PRESENT,
+    SCHEMA_UNAVAILABLE,
+    OperationalStore,
+    OperationalStoreError,
+)
 
 
 def _load_json(root: Path, relative: str) -> dict[str, Any] | None:
@@ -34,9 +42,27 @@ def project_read_model(
     store: OperationalStore | None,
     spec_relative: str,
     hypothesis_registry: Mapping[str, Any] | None = None,
+    operational_source_status: str | None = None,
 ) -> dict[str, Any]:
     spec = load_experiment_spec(root, spec_relative)
-    job = store.get_job(f"JOB-{spec['experiment_id']}") if store is not None else None
+    if store is not None:
+        source_status = str(getattr(store, "schema_status", SCHEMA_UNAVAILABLE) or SCHEMA_UNAVAILABLE)
+    elif operational_source_status:
+        source_status = str(operational_source_status)
+    else:
+        source_status = SCHEMA_SOURCE_NOT_PRESENT
+    job = None
+    job_unreadable = source_status in {SCHEMA_INCOMPATIBLE, SCHEMA_UNAVAILABLE}
+    if store is not None and source_status not in {
+        SCHEMA_LEGACY_UNINITIALIZED,
+        SCHEMA_INCOMPATIBLE,
+        SCHEMA_UNAVAILABLE,
+    }:
+        try:
+            job = store.get_job(f"JOB-{spec['experiment_id']}")
+        except (OperationalStoreError, sqlite3.Error):
+            job_unreadable = True
+            source_status = SCHEMA_INCOMPATIBLE
     requirements = requirement_map(spec)
     acceptance_item = requirements.get("ACCEPTANCE")
     acceptance = None
@@ -55,49 +81,61 @@ def project_read_model(
     available = list(coverage["available"])
     missing = list(coverage["missing"])
     produced_missing = list(coverage.get("produced_missing") or [])
-    operational_status = str(job["status"]) if job else "NOT_STARTED"
     evidence: dict[str, Any] = {"coverage": coverage}
     terminal = None
     capabilities = list(spec.get("capabilities") or [])
     live_capture = CAP_JUPITER_FREE_KEY_QUOTE_NATIVE_BOUNDED_CAPTURE in capabilities
-    stored_statuses = {"COMPLETE", "FAILED", "BLOCKED_AUTHORITY", "BLOCKED_DATA", "STOPPED", "PARKED"}
-    if operational_status in {"STOPPED", "PARKED"}:
-        status = operational_status
-        blocker = str(job["blocker"]) if job else "OWNER_STOP"
-        terminal = job.get("terminal") if job else None
-        evidence = dict(job.get("evidence") or evidence)
-    elif job and operational_status in stored_statuses:
-        status = operational_status
-        blocker = str(job.get("blocker") or "NONE")
-        terminal = job.get("terminal")
-        evidence = dict(job.get("evidence") or evidence)
-    elif missing:
-        status = "BLOCKED_DATA" if operational_status != "NOT_STARTED" else "NOT_STARTED"
-        blocker = "MISSING_OR_MISMATCHED_EVIDENCE"
-    elif operational_status == "NOT_STARTED":
-        status = "NOT_STARTED"
-        blocker = "NONE"
+    if job_unreadable:
+        status = "UNAVAILABLE"
+        blocker = "OPS_STORE_INCOMPATIBLE"
+        next_action = "INSPECT_READ_MODEL"
     else:
-        derived = execute_capability(spec, root=root)
-        evidence = derived
-        status = str(derived["status"])
-        blocker = str(derived.get("blocker") or "NONE")
-        terminal = derived.get("terminal")
-    next_action = str(spec.get("parameters", {}).get("next_safe_action") or "INSPECT_READ_MODEL")
-    if status == "NOT_STARTED" and missing:
-        next_action = "RESOLVE_MISSING_EVIDENCE"
-    elif status == "NOT_STARTED" and live_capture:
-        next_action = "WAIT_EXACT_OWNER_PHRASE"
-    elif status == "NOT_STARTED":
-        next_action = "START_EXPERIMENT"
-    elif status == "BLOCKED_DATA":
-        next_action = "RESOLVE_MISSING_EVIDENCE"
-    elif status == "BLOCKED_AUTHORITY":
-        next_action = "WAIT_EXACT_OWNER_PHRASE"
-    elif status == "COMPLETE" and terminal:
-        next_action = str(spec["parameters"]["next_safe_action"])
-        if live_capture:
-            next_action = "RECORD_DECISION_OR_PARK"
+        operational_status = str(job["status"]) if job else "NOT_STARTED"
+        stored_statuses = {
+            "COMPLETE",
+            "FAILED",
+            "BLOCKED_AUTHORITY",
+            "BLOCKED_DATA",
+            "STOPPED",
+            "PARKED",
+        }
+        if operational_status in {"STOPPED", "PARKED"}:
+            status = operational_status
+            blocker = str(job["blocker"]) if job else "OWNER_STOP"
+            terminal = job.get("terminal") if job else None
+            evidence = dict(job.get("evidence") or evidence)
+        elif job and operational_status in stored_statuses:
+            status = operational_status
+            blocker = str(job.get("blocker") or "NONE")
+            terminal = job.get("terminal")
+            evidence = dict(job.get("evidence") or evidence)
+        elif missing:
+            status = "BLOCKED_DATA" if operational_status != "NOT_STARTED" else "NOT_STARTED"
+            blocker = "MISSING_OR_MISMATCHED_EVIDENCE"
+        elif operational_status == "NOT_STARTED":
+            status = "NOT_STARTED"
+            blocker = "NONE"
+        else:
+            derived = execute_capability(spec, root=root)
+            evidence = derived
+            status = str(derived["status"])
+            blocker = str(derived.get("blocker") or "NONE")
+            terminal = derived.get("terminal")
+        next_action = str(spec.get("parameters", {}).get("next_safe_action") or "INSPECT_READ_MODEL")
+        if status == "NOT_STARTED" and missing:
+            next_action = "RESOLVE_MISSING_EVIDENCE"
+        elif status == "NOT_STARTED" and live_capture:
+            next_action = "WAIT_EXACT_OWNER_PHRASE"
+        elif status == "NOT_STARTED":
+            next_action = "START_EXPERIMENT"
+        elif status == "BLOCKED_DATA":
+            next_action = "RESOLVE_MISSING_EVIDENCE"
+        elif status == "BLOCKED_AUTHORITY":
+            next_action = "WAIT_EXACT_OWNER_PHRASE"
+        elif status == "COMPLETE" and terminal:
+            next_action = str(spec["parameters"]["next_safe_action"])
+            if live_capture:
+                next_action = "RECORD_DECISION_OR_PARK"
     recommendation = "NO_ALPHA_CLAIM"
     if terminal:
         recommendation = str(terminal)
@@ -151,4 +189,5 @@ def project_read_model(
         "next": next_action,
         "git_archaeology_required": bool(missing),
         "required_features": required_features,
+        "operational_source_status": source_status,
     }
