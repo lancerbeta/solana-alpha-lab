@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "MARKET-DATA-AWARENESS-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-08",
+  "task_id": "MARKET_DATA_AWARENESS_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "GET_MARKET_STORE_NONE",
+        "PIT_AVAILABLE_LE_AS_OF",
+        "WINDOW_EVENT_OR_ANCHOR",
+        "COMPAT_NOT_WHOLE_SCHEDULE_SHA",
+        "METRIC_N_GATES_RELATIVE",
+        "MIXED_CURRENT_WITHHOLDS_RAW_AND_N",
+        "INCOMPLETE_MEMBERS_N_ZERO",
+        "PREVIOUS_DEPENDENT_RAW_FINGERPRINT_FILTERED",
+        "UNREADABLE_PARQUET_UNAVAILABLE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "GET_MARKET_DIGEST_SECTIONS_PRESENT",
+        "SCOPE_BEFORE_MATRIX",
+        "CURRENT_SCOPE_MIXED_ON_HTML",
+        "NO_FALSE_RAW_VISIBLE_BANNER",
+        "NO_REGIME_PREDICTOR",
+        "NO_MARKET_PLATFORM"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=863fb35772e6891ad70d77feb8812fc192f30eb751dd3c99d8531d08996ea9d5",
+        "COMPARABLE_OBS_FINGERPRINT_OR_EMPTY",
+        "NO_UNFILTERED_PREVIOUS_BAG",
+        "LIKE_WITH_LIKE_CURRENT_NUMBER",
+        "DUCKDB_SCHEDULE_FAIL_CLOSED",
+        "NO_COMPOSITE_BULL_BEAR"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_EXPECTED_RETURN",
+    "NO_TRADE_OR_NO_TRADE",
+    "NO_MARKET_WIDE_CLAIM",
+    "NO_REGIME_PREDICTOR",
+    "NO_LIVE_PNL",
+    "NO_OWNER_FCF",
+    "NO_PROMOTION",
+    "NO_REAL_MONEY",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_CANONICAL_DONE"
+  ]
+}
