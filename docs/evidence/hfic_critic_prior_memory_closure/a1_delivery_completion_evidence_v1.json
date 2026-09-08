@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-CRITIC-PRIOR-MEMORY-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-08",
+  "task_id": "HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_V1",
+  "state_change": "HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_CANDIDATE",
+  "base_main": "19ad057614f0fd4aa4313b409606d205ff9cb290",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_critic_prior_memory_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_CRITIC_PRIOR_MEMORY_CLOSURE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_critic_prior_memory_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH",
+      "PASS_T1_T7_PRIOR_MEMORY",
+      "PASS_PACKET_ONLY_CRITIC_SMOKE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_CRITIC_REASONING_COMPLETENESS",
+    "NO_CALIBRATION_MEMORY_TRUST",
+    "NO_RANKER_CHANGE",
+    "NO_RUNNER_UP_LIFECYCLE_CHANGE",
+    "NO_EMBEDDINGS_RAG_OR_VECTOR_DB",
+    "NO_PROVIDER_OR_EXPERIMENT"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}
