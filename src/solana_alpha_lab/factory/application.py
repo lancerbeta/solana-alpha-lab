@@ -12,7 +12,13 @@ import yaml
 
 from solana_alpha_lab.factory.cockpit import pinned_produced_gaps, project_cockpit
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, requirement_map
-from solana_alpha_lab.factory.operational_store import OperationalStore, OperationalStoreError
+from solana_alpha_lab.factory.operational_store import (
+    SCHEMA_INCOMPATIBLE,
+    SCHEMA_SOURCE_NOT_PRESENT,
+    SCHEMA_UNAVAILABLE,
+    OperationalStore,
+    OperationalStoreError,
+)
 from solana_alpha_lab.factory.paper_plane import PaperPlaneError, PaperPlaneStore
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command
 from solana_alpha_lab.factory.paper_shadow_operations import (
@@ -126,6 +132,11 @@ class FactoryApplication:
         self.root = root
         self._operational_store = store
         self._operational_readonly = None
+        self._operational_source_status = (
+            str(getattr(store, "schema_status", SCHEMA_UNAVAILABLE))
+            if store is not None
+            else SCHEMA_SOURCE_NOT_PRESENT
+        )
         self._paper_plane_store = paper_plane_store
         self._paper_plane_readonly = None
         self._paper_plane_source_status = "NOT_PRESENT"
@@ -141,17 +152,40 @@ class FactoryApplication:
 
     def existing_operational_store(self) -> OperationalStore | None:
         if self._operational_store is not None:
+            self._operational_source_status = str(
+                getattr(self._operational_store, "schema_status", SCHEMA_UNAVAILABLE)
+            )
             return self._operational_store
         if self._operational_readonly is not None:
             return self._operational_readonly
         path = ops_store_path(self.root)
         if not path.is_file():
+            self._operational_source_status = SCHEMA_SOURCE_NOT_PRESENT
             return None
         try:
             self._operational_readonly = OperationalStore(path, readonly=True)
-        except (OperationalStoreError, sqlite3.Error, OSError):
+        except OperationalStoreError as exc:
+            code = str(exc)
+            if code == "SOURCE_NOT_PRESENT":
+                self._operational_source_status = SCHEMA_SOURCE_NOT_PRESENT
+            elif code == "OPS_STORE_INCOMPATIBLE":
+                self._operational_source_status = SCHEMA_INCOMPATIBLE
+            else:
+                self._operational_source_status = SCHEMA_UNAVAILABLE
             return None
+        except (sqlite3.Error, OSError):
+            self._operational_source_status = SCHEMA_UNAVAILABLE
+            return None
+        self._operational_source_status = str(
+            getattr(self._operational_readonly, "schema_status", SCHEMA_UNAVAILABLE)
+        )
         return self._operational_readonly
+
+    def _close_operational_readonly(self) -> None:
+        cached = self._operational_readonly
+        self._operational_readonly = None
+        if cached is not None:
+            cached.close()
 
     @property
     def store(self) -> OperationalStore:
@@ -632,6 +666,7 @@ class FactoryApplication:
             store=ops_store,
             spec_relative=self.spec_relative,
             hypothesis_registry=hypotheses,
+            operational_source_status=self._operational_source_status,
         )
         if (self.root / RUNTIME_CONFIG_RELATIVE).is_file():
             from solana_alpha_lab.factory.runtime import load_runtime_config
