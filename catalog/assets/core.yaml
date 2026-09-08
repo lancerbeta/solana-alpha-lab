@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 918afd055d8f3ec9f5fdb91c7c3b0a5adf6ad1bcdb20c0f9c9242967a073bb0c}
+  integrity: {kind: sha256, sha256: c722785001ff56c1ff6dd30e5712bc24ab054c8f8c812aafb0604e190037036c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -36118,7 +36118,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/MARKET_DATA_AWARENESS_V1.md', repository_path: docs/tasks/MARKET_DATA_AWARENESS_V1.md}
-  integrity: {kind: sha256, sha256: dabfdc946e6b218404401acf3b4a8201c33cf600c32308ab1e0c8bd9a0b5ba40}
+  integrity: {kind: sha256, sha256: 9f08cb231ea35397bf1f2f5a748ad4617d14f286c6efc848d7e9cb1d8e587d58}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-MARKET-DATA-AWARENESS-001}

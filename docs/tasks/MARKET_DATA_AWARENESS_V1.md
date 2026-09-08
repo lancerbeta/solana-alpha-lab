@@ -35,6 +35,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/owner_language.py
   - scripts/show_market_context.py
   - tests/test_market_data_awareness_v1.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - tests/test_factory_v1_owner_cockpit.py
   - tests/test_owner_workbench_vertical_ux_foundation_v1.py
   - tests/test_owner_operations_cockpit_v1.py
