@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OWNER-WORKBENCH-PREDEPLOY-EXPERIENCE-QA-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-08",
+  "task_id": "OWNER_WORKBENCH_PREDEPLOY_EXPERIENCE_QA_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=68d015049a8993b46cdca6fc869cf146d293f589152219e1686e8a24133e28c0",
+        "PRESENTATION_ONLY_NO_ESTIMAND_PIT_PROMOTION_OR_POST_CHANGE",
+        "UNKNOWN_NOT_ZERO_OR_HEALTHY_ARCHAEOLOGY_IS_PAGE_MACHINE",
+        "SCAN_PRIORITY_EXACT_P0_P1_P2_ONLY",
+        "NO_NEW_VISUAL_OS_OR_SEM_ROUTE"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "POST_COMMAND_VALUES_UNCHANGED",
+        "UNKNOWN_NOT_SHOWN_AS_ZERO_OR_HEALTHY",
+        "SCAN_PRIORITY_EXACT_TOKEN_ONLY",
+        "PAGE_QUESTION_ELEMENT_AND_RUSSIAN_TEXT_LOCKED",
+        "GET_DOES_NOT_MUTATE_OPS_SQLITE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DECISION_YES_IS_LOCAL_AFTER_NOT_LIVE_TTFB",
+        "D1_HOME_LATENCY_NOT_CLAIMED",
+        "PAGE_QUESTION_ELEMENT_LOCKED",
+        "UNKNOWN_NOT_ZERO_OR_HEALTHY",
+        "NO_DEPLOY_NO_NEW_FRAMEWORK"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_PROVIDER",
+    "NO_NETRETURN",
+    "NO_DEPLOY"
+  ]
+}
