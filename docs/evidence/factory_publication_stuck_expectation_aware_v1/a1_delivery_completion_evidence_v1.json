@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-PUBLICATION-STUCK-EXPECTATION-AWARE-COMPLETION-001",
+  "as_of": "2026-09-08",
+  "task_id": "FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1",
+  "state_change": "FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1_READY_FOR_MERGE",
+  "base_main": "ed2bb1be2252581e4d363e89de21da1f8146f341",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f8cc3d7115029f05cd9074e60c8b2e7f9b702ad60da51f26478742557f5d9785",
+    "docs/reports/factory_publication_stuck_expectation_aware_v1/a1_owner_readout_v1.md": "60e59a36873b0a30e4802176dc105a9dfd583cbb03c1588f5d2050e2c33ba077",
+    "docs/tasks/FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1.md": "30a439f6006f4f0e95450f114f05667e75ccb31b801381e56c38000ae58d8e6d",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "763d07fa43ccfe77b89226d6c1ca68b4d056346a88a92096821fa7f05263f57c",
+    "tests/test_factory_unattended_operability_closure_v1.py": "72cb74de7e0cab471ff0e68126e6912145d470d3528e135a8b7117d88d3b1c06"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_publication_stuck_expectation_aware_v1/a1_delivery_factory_fit_v1.json",
+    "sha256": "e5ee4578302366f8554ab2fcf2b01bd2eba9fa43a905a9f5ef2ff42e2cb71b14",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_PUBLICATION_EXPECTATION_AWARE_MATRIX",
+    "independent_review": {
+      "path": "docs/evidence/factory_publication_stuck_expectation_aware_v1/a1_delivery_independent_review_v1.json",
+      "sha256": "beab461b10c3a5f8a2afdc5559ee73f7c062b43836687d805f13294f62b220fa",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS",
+    "NO_THRESHOLD_INFLATION",
+    "NO_TIMESTAMP_SOURCE_CHANGE",
+    "NO_OPERABILITY_WATCH_REDESIGN",
+    "NO_COLLECTOR_SCHEDULER_PUBLISHER_CHANGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

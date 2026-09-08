@@ -11,6 +11,7 @@ import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -21,6 +22,11 @@ if str(SCRIPTS) not in sys.path:
     sys.path.insert(0, str(SCRIPTS))
 
 from solana_alpha_lab.factory.collector_operational_packet import (  # noqa: E402
+    PUBLICATION_EXPECTED,
+    PUBLICATION_EXPECTATION_UNKNOWN,
+    PUBLICATION_NOT_EXPECTED,
+    UNKNOWN,
+    classify_publication_expectation,
     compose_health_classes,
 )
 from solana_alpha_lab.factory.collector_owner_pulse import (  # noqa: E402
@@ -62,6 +68,7 @@ from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
 )
 from solana_alpha_lab.factory.operability_watch import (  # noqa: E402
     WATCH_ON_CALENDAR,
+    classify_incidents,
     evaluate_operability,
     render_incident_message,
 )
@@ -754,6 +761,227 @@ class SemanticDiscoveryTests(unittest.TestCase):
             bindings.get("ACTIVE-FACTORY-REMOTE-OPERATIONS", {}).get("target_asset_id"),
             "CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001",
         )
+
+
+def _idle_due_pressure(**overrides: object) -> dict[str, object]:
+    payload: dict[str, object] = {
+        "due_now_count": 0,
+        "claimed_count": 0,
+        "actually_overdue_count": 0,
+        "in_flight_count": 0,
+        "future_not_due_count": 72,
+        "blocked_budget_count": 0,
+    }
+    payload.update(overrides)
+    return payload
+
+
+def _operability_packet(**overrides: object) -> dict[str, object]:
+    packet: dict[str, object] = {
+        "activation_state": "ACTIVE",
+        "discovery_coverage_class": "COVERED",
+        "backup_domain": "PARENT_INDEPENDENT_GIT_SIDE",
+        "backup_age_seconds": 60,
+        "last_backup_at": "2026-09-07T14:08:52Z",
+        "offhost_backup_state": "CURRENT",
+        "immutable_archive_backlog_days": 0,
+        "due_pressure": _idle_due_pressure(),
+        "publication_jobs_open_count": 0,
+        "blocked_budget": 0,
+        "observation_rdp_last_publish_at": "2026-09-07T14:08:52.605003Z",
+        "observed_at": "2026-09-07T21:01:27Z",
+        "period_seconds": 60,
+        "source_poll_age": 1,
+    }
+    packet.update(overrides)
+    return packet
+
+
+class PublicationExpectationAwareTests(unittest.TestCase):
+    """Decision-complete matrix for FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1."""
+
+    def test_a_live_false_positive_idle_over_6h(self) -> None:
+        packet = _operability_packet()
+        self.assertEqual(
+            classify_publication_expectation(packet), PUBLICATION_NOT_EXPECTED
+        )
+        classes = compose_health_classes(packet)
+        self.assertNotIn("RDP_PUBLICATION_STALE", classes)
+        self.assertNotIn("PUBLICATION_STUCK", classify_incidents({"health_classes": classes}))
+
+    def test_b_very_long_legitimate_idle_over_24h(self) -> None:
+        packet = _operability_packet(observed_at="2026-09-08T15:08:52Z")
+        classes = compose_health_classes(packet)
+        self.assertNotIn("RDP_PUBLICATION_STALE", classes)
+        self.assertNotIn("PUBLICATION_STUCK", classify_incidents({"health_classes": classes}))
+
+    def test_c_due_work_keeps_stale_detectable(self) -> None:
+        packet = _operability_packet(due_pressure=_idle_due_pressure(due_now_count=1))
+        self.assertEqual(classify_publication_expectation(packet), PUBLICATION_EXPECTED)
+        classes = compose_health_classes(packet)
+        self.assertIn("RDP_PUBLICATION_STALE", classes)
+        self.assertIn("PUBLICATION_STUCK", classify_incidents({"health_classes": classes}))
+
+    def test_c_overdue_work_keeps_stale_detectable(self) -> None:
+        packet = _operability_packet(
+            due_pressure=_idle_due_pressure(actually_overdue_count=3)
+        )
+        classes = compose_health_classes(packet)
+        self.assertIn("RDP_PUBLICATION_STALE", classes)
+        self.assertIn("PUBLICATION_STUCK", classify_incidents({"health_classes": classes}))
+
+    def test_d_claimed_work_is_not_healthy_idle(self) -> None:
+        packet = _operability_packet(due_pressure=_idle_due_pressure(claimed_count=1))
+        self.assertEqual(classify_publication_expectation(packet), PUBLICATION_EXPECTED)
+        classes = compose_health_classes(packet)
+        self.assertIn("RDP_PUBLICATION_STALE", classes)
+
+    def test_d_in_flight_work_is_not_healthy_idle(self) -> None:
+        packet = _operability_packet(due_pressure=_idle_due_pressure(in_flight_count=2))
+        classes = compose_health_classes(packet)
+        self.assertIn("RDP_PUBLICATION_STALE", classes)
+        self.assertIn("PUBLICATION_STUCK", classify_incidents({"health_classes": classes}))
+
+    def test_e_open_publication_job_is_not_healthy_idle(self) -> None:
+        packet = _operability_packet(publication_jobs_open_count=1)
+        self.assertEqual(classify_publication_expectation(packet), PUBLICATION_EXPECTED)
+        classes = compose_health_classes(packet)
+        self.assertIn("RDP_PUBLICATION_STALE", classes)
+        self.assertIn("PUBLICATION_STUCK", classify_incidents({"health_classes": classes}))
+
+    def test_f_no_publication_marker_proven_idle(self) -> None:
+        packet = _operability_packet(observation_rdp_last_publish_at=UNKNOWN)
+        classes = compose_health_classes(packet)
+        self.assertNotIn("RDP_PUBLICATION_STALE", classes)
+        absent = _operability_packet()
+        absent["observation_rdp_last_publish_at"] = None
+        self.assertNotIn("RDP_PUBLICATION_STALE", compose_health_classes(absent))
+
+    def test_g_no_publication_marker_with_expected_work(self) -> None:
+        packet = _operability_packet(
+            observation_rdp_last_publish_at=UNKNOWN,
+            due_pressure=_idle_due_pressure(due_now_count=1),
+        )
+        classes = compose_health_classes(packet)
+        self.assertIn("RDP_PUBLICATION_STALE", classes)
+
+    def test_h_missing_due_pressure_fails_closed(self) -> None:
+        packet = _operability_packet()
+        del packet["due_pressure"]
+        self.assertEqual(
+            classify_publication_expectation(packet), PUBLICATION_EXPECTATION_UNKNOWN
+        )
+        self.assertIn("RDP_PUBLICATION_STALE", compose_health_classes(packet))
+
+    def test_h_missing_due_pressure_field_fails_closed(self) -> None:
+        pressure = _idle_due_pressure()
+        del pressure["in_flight_count"]
+        packet = _operability_packet(due_pressure=pressure)
+        self.assertEqual(
+            classify_publication_expectation(packet), PUBLICATION_EXPECTATION_UNKNOWN
+        )
+        self.assertIn("RDP_PUBLICATION_STALE", compose_health_classes(packet))
+
+    def test_h_missing_open_jobs_fails_closed(self) -> None:
+        packet = _operability_packet()
+        del packet["publication_jobs_open_count"]
+        self.assertEqual(
+            classify_publication_expectation(packet), PUBLICATION_EXPECTATION_UNKNOWN
+        )
+        self.assertIn("RDP_PUBLICATION_STALE", compose_health_classes(packet))
+
+    def test_h_malformed_counts_are_not_silent_zero(self) -> None:
+        for bad in (None, "0", 0.0, True, -1, {}):
+            packet = _operability_packet(publication_jobs_open_count=bad)
+            self.assertEqual(
+                classify_publication_expectation(packet),
+                PUBLICATION_EXPECTATION_UNKNOWN,
+                msg=repr(bad),
+            )
+            self.assertIn("RDP_PUBLICATION_STALE", compose_health_classes(packet), msg=repr(bad))
+
+    def test_i_budget_blocked_does_not_duplicate_publication_stuck(self) -> None:
+        packet = _operability_packet(blocked_budget=4)
+        classes = compose_health_classes(packet)
+        self.assertIn("BUDGET_BLOCKED", classes)
+        self.assertNotIn("RDP_PUBLICATION_STALE", classes)
+        self.assertNotIn("PUBLICATION_STUCK", classify_incidents({"health_classes": classes}))
+
+    def test_j_source_stale_stays_independent(self) -> None:
+        packet = _operability_packet(source_poll_age=240, period_seconds=60)
+        classes = compose_health_classes(packet)
+        self.assertIn("DATA_STALE", classes)
+        self.assertNotIn("RDP_PUBLICATION_STALE", classes)
+        found = classify_incidents({"health_classes": classes})
+        self.assertIn("SOURCE_DATA_STALE", found)
+        self.assertNotIn("PUBLICATION_STUCK", found)
+
+    def test_k_pr273_data_stale_does_not_fan_out_collector_stalled(self) -> None:
+        found = classify_incidents({"health_classes": ["PROCESS_OK", "DATA_STALE"]})
+        self.assertIn("SOURCE_DATA_STALE", found)
+        self.assertNotIn("COLLECTOR_STALLED", found)
+
+    def test_l_watch_recovers_publication_stuck_when_stale_clears(self) -> None:
+        stale_classes = compose_health_classes(
+            _operability_packet(due_pressure=_idle_due_pressure(due_now_count=1))
+        )
+        idle_classes = compose_health_classes(_operability_packet())
+        self.assertIn("RDP_PUBLICATION_STALE", stale_classes)
+        self.assertNotIn("RDP_PUBLICATION_STALE", idle_classes)
+        t0 = datetime(2026, 9, 7, 20, 15, 7, tzinfo=UTC)
+
+        def _watch_packet(classes: list[str]) -> dict[str, object]:
+            return {
+                "activation_state": "ACTIVE",
+                "health_classes": classes,
+                "collector_verdict": "DEGRADED",
+                "cohort_readiness_state": "UNKNOWN",
+                "backup_age_seconds": 60,
+                "immutable_archive_latest_verified_day": "20260905",
+                "immutable_archive_backlog_days": 1,
+                "projected_97d_bytes": 1,
+            }
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            try:
+                with patch(
+                    "solana_alpha_lab.factory.operability_watch.build_collector_operational_packet",
+                    return_value=_watch_packet(stale_classes),
+                ):
+                    first = evaluate_operability(
+                        root=root,
+                        store=store,
+                        now=t0,
+                        emit=False,
+                        environ={},
+                    )
+                    self.assertEqual(first["messages"], [])
+                    notified = evaluate_operability(
+                        root=root,
+                        store=store,
+                        now=t0 + timedelta(seconds=1800),
+                        emit=False,
+                        environ={},
+                    )
+                codes = {(item["kind"], item["code"]) for item in notified["messages"]}
+                self.assertIn(("INCIDENT", "PUBLICATION_STUCK"), codes)
+                with patch(
+                    "solana_alpha_lab.factory.operability_watch.build_collector_operational_packet",
+                    return_value=_watch_packet(idle_classes),
+                ):
+                    recovered = evaluate_operability(
+                        root=root,
+                        store=store,
+                        now=t0 + timedelta(seconds=1860),
+                        emit=False,
+                        environ={},
+                    )
+                rec_codes = {(item["kind"], item["code"]) for item in recovered["messages"]}
+                self.assertIn(("RECOVERED", "PUBLICATION_STUCK"), rec_codes)
+            finally:
+                store.close()
 
 
 if __name__ == "__main__":

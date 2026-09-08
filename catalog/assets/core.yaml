@@ -34052,7 +34052,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 6c325b076c6402ed64702dab6e63fe99038ecdf7eb42dd5332538c7852769ca4}
+  integrity: {kind: sha256, sha256: 763d07fa43ccfe77b89226d6c1ca68b4d056346a88a92096821fa7f05263f57c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -35760,7 +35760,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
-  integrity: {kind: sha256, sha256: dbbc6dd76532fed64f60333a19d3c789171591fa19ae9a4e6565b4d2f89b2fa9}
+  integrity: {kind: sha256, sha256: 72cb74de7e0cab471ff0e68126e6912145d470d3528e135a8b7117d88d3b1c06}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}

@@ -1,0 +1,72 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-PUBLICATION-STUCK-EXPECTATION-AWARE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-08",
+  "task_id": "FACTORY_PUBLICATION_STUCK_EXPECTATION_AWARE_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "20ed20e6f9f1528f367c73f15f178d0b67b8af5534e6111ec5347cdc2cd9c7e6",
+  "reviewed_inventory_sha256": "da921ea04b7ada5372c88bd2c3ea9ea2351ee454f1077979cde33627b308e9fc",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "HARD_EXCLUSIONS_UNTOUCHED",
+        "FAIL_CLOSED_NO_INT_OR_ZERO",
+        "BOOL_REJECTED_NOT_OBLIGATION",
+        "THRESHOLD_6H_UNCHANGED",
+        "TIMESTAMP_SOURCE_UNCHANGED",
+        "OPERABILITY_WATCH_UNTOUCHED",
+        "NO_SECOND_TRUTH_PLANE",
+        "RESIDUAL_MALFORMED_MATRIX_USES_TRUE_NOT_FALSE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LIVE_IDLE_FALSIFIER_ENCODED_A_AND_B",
+        "FUTURE_NOT_DUE_NOT_OBLIGATION",
+        "DUE_CLAIMED_IN_FLIGHT_OPEN_JOB_STILL_DETECTABLE",
+        "UNKNOWN_FAILS_CLOSED",
+        "WATCH_GRACE_UNCHANGED_1800S",
+        "PR273_NO_DUPLICATE_COLLECTOR_STALLED",
+        "IDLE_NO_LONGER_PAGES_OWNER",
+        "OPERATOR_DOCS_NOT_FACTUALLY_FALSE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=e1c3827996c088f204174e88d788228b3b942a992b4437187b14ec651e9e08fd",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "LAUNCH_ISOLATION_PROCESS_OBLIGATION",
+        "Q1_MISSING_INPUT_NOT_SILENT_ZERO",
+        "Q2_OPEN_JOB_NOT_HEALTHY_IDLE",
+        "Q3_CLAIMED_IN_FLIGHT_NOT_HEALTHY_IDLE",
+        "Q4_FUTURE_NOT_DUE_ALONE_NOT_STUCK",
+        "Q5_NO_COLLECTOR_PUBLISHER_SCHEDULER_CHANGE",
+        "Q6_NO_THRESHOLD_GRACE_TIMESTAMP_DEDUPE_RECOVERY_CHANGE",
+        "Q7_NO_SECOND_TRUTH_PLANE",
+        "RESIDUAL_FAIL_CLOSED_IS_PACKET_FIELD_ABSENCE_NOT_STORE_UNOBSERVABILITY"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_THRESHOLD_INFLATION",
+    "NO_OPERABILITY_WATCH_REDESIGN"
+  ]
+}
