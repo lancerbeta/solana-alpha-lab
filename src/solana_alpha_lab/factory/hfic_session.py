@@ -25,6 +25,10 @@ from solana_alpha_lab.factory.hfic_identity import (
     canonical_candidate_definition,
     normalize_text,
 )
+from solana_alpha_lab.factory.hfic_prior_memory import (
+    PriorMemoryCapacityError,
+    build_prior_memory_snapshot,
+)
 from solana_alpha_lab.factory.hfic_suppression_semantics import (
     candidate_matches_hard_close,
     family_hard_close_terminals,
@@ -799,6 +803,16 @@ def freeze_draft(
             }
         )[:16].upper()
     _bind_packet_session_id(packet, session_id)
+    if critic_packet_version == "1.2":
+        snapshot_digest = store_digest if isinstance(store_digest, str) else "0" * 64
+        try:
+            packet["prior_memory"] = build_prior_memory_snapshot(
+                store,
+                store_inventory_digest=snapshot_digest,
+                repo_root=repo_root,
+            )
+        except PriorMemoryCapacityError as exc:
+            raise HficSessionError(exc.code) from exc
     if repo_root is not None:
         _validate_json_schema(
             packet,

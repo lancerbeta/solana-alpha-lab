@@ -213,6 +213,7 @@ class HficFreezeFinalizeTests(unittest.TestCase):
         packet = frozen["critic_input_packet"]
         self.assertEqual(packet["packet_version"], "1.1")
         self.assertIn("session_id", packet)
+        self.assertNotIn("prior_memory", packet)
         self.assertTrue(str(packet["session_id"]).startswith("HFIC-SESS-"))
         self.assertEqual(packet["session_id"], frozen["session_id"])
         bound_hash = _canonical_json_hash(packet)

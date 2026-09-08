@@ -109,7 +109,9 @@ Happy path — no owner copy/paste between the slash command and the final termi
    Do not emit `packet_version=1.1` or `HFIC-V1.1` on this fresh binding; freeze
    will fail closed with `FRESH_SESSION_DRAFT_VERSION_MISMATCH`.
    Copy `truth_roots_used`, `prior_work_receipts` and `research_memory_as_of` from
-   preflight. Do **not** emit `CRITIC_INPUT_PACKET`; freeze is the only packet builder.
+   preflight.    Do **not** emit `CRITIC_INPUT_PACKET`; freeze is the only packet builder.
+   Prompt A search still uses only the bounded `ranked_prior_candidate_ids`
+   shortlist; do not change candidate-generation strategy to recover omitted priors.
    Do **not** query prospects or include prospect IDs/research text in Prompt A.
 4. Write machine `FORGE_DRAFT` to an OS temp file.
 5. If Prompt A returned `NO_WORTHY_HYPOTHESIS` (empty `selected_candidate_ref`):
@@ -127,6 +129,13 @@ Happy path — no owner copy/paste between the slash command and the final termi
 6. Otherwise run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
    Do not pass `--next-action` on a selected-candidate path.
+   Fresh HFIC-V1.2 freeze binds a complete bounded `prior_memory` snapshot of
+   eligible historical `HYPOTHESIS_VERSION` records from the preflight-bound
+   store **before** current session persist. If freeze returns
+   `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`: BLOCKED, not a crash; session was
+   not written; do not launch Critic; do not paste a packet; do not retry the
+   same slash expecting success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
+   Do not silently truncate or fall back to lexical top-N.
 7. **Mandatory auto-handoff (selected path only):** launch Independent Critic in a new isolated context
    with only the frozen packet. Do not persist from Critic.
 8. After critic returns `hypothesis_critic_result_v1`:
@@ -157,7 +166,8 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET` (selected path only):
    readers remain valid for historical fixtures).
 2. **Launch Independent Critic in a new isolated context** using `Task`
    subagent, `.agents/skills/independent-hypothesis-critic/SKILL.md`, and
-   **only** the packet (no Forge narrative, no intermediate reasoning).
+   **only** the packet (no Forge narrative, no intermediate reasoning, no
+   ResearchStore walk). The V1.2 packet already carries complete prior memory.
    If isolated context cannot launch, return typed `AUTO_HANDOFF_UNAVAILABLE`
    and STOP. Do not instruct the owner to open a new chat, paste the packet,
    or press Run. Do not silently self-criticize in the Forge context.

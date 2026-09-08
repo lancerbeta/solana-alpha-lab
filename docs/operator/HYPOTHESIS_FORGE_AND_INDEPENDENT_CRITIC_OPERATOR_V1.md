@@ -100,9 +100,18 @@ presents 1970 as an operational date. Uncovered placeholder HFIC records make
    и повтор Critic; при `PASS_TO_CLASSIFICATION`
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify`;
    затем `finalize`.
+   Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`: это BLOCKED, не
+   crash. Session не записан. Critic не запускать, packet не вставлять, тот же
+   slash не ретраить в ожидании success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
+   Bound: `prior_memory.max_records=64`, `max_bytes=65536` в
+   `configs/hypothesis_forge_independent_critic_v1.yaml`.
 3. Вечерний цикл **не завершён**, пока Critic не вернул финальный terminal
    (`KILL_*` / `NO_WORTHY_HYPOTHESIS` или post-classifier `PASS_*`) и `finalize`
-   не записал `SESSION_RECEIPT`. `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` —
+   не записал `SESSION_RECEIPT`, **кроме**:
+   - `NO_WORTHY_HYPOTHESIS` (Critic пропускается; complete на freeze + next action);
+   - `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` (BLOCKED; session не записан;
+     Critic не запускать; цикл останавливается на typed STOP, не на Critic).
+   `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` —
    intermediate states, не complete. Команды `revise` и `classify` — тот же CLI,
    не prose-only переход.
 4. Recovery: **`/independent-hypothesis-critic`** с вставленным packet только если auto-handoff
@@ -141,14 +150,19 @@ OWNER_FOCUS=execution-aware entry/exit asymmetry at small notional
 
 ### Шаг 2 — независимый Critic (manual fallback; при slash auto-handoff этот шаг не нужен)
 
-Откройте **новый чат**. Желательно использовать другую сильную модель; если модель та же — новый контекст обязателен. Передайте ей этот файл и только `CRITIC_INPUT_PACKET` из первого прогона:
+Сначала выполните `hypothesis_forge.py freeze` на `FORGE_DRAFT`. Если freeze вернул
+`PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`, не открывайте Critic:
+`OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`. Packet создаёт только freeze.
+
+Откройте **новый чат**. Желательно использовать другую сильную модель; если модель та же — новый контекст обязателен. Передайте ей этот файл и только `CRITIC_INPUT_PACKET` из freeze:
 
 ```text
 RUN INDEPENDENT_HYPOTHESIS_CRITIC_V1
 
-Используй PROMPT B из приложенного HFIC-V1.1.
+Используй PROMPT B из этого operator pack.
 Не доверяй выводам Forge без независимой проверки.
 Эксперимент не запускать.
+Не открывай ResearchStore / active RDP ради prior recall.
 Верни один terminal и ровно один NEXT.
 
 <вставить CRITIC_INPUT_PACKET>
@@ -683,21 +697,31 @@ decision after collection
   `selected_definition_sha256` ← canonical identity hash выбранного кандидата
   из полей packet (read-only repo truth), as applicable.
   Не изобретай `HFIC-UNBOUND-*` и не восстанавливай `session_id` из
-  `candidate_id`. Если `packet_version=1.1` и `session_id` отсутствует —
+  `candidate_id`. Если `packet_version=1.1` или `1.2` и `session_id` отсутствует —
   не эмитируй `hypothesis_critic_result_v1`. Верни
   `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` и
   `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_SESSION_ID`.
+  Если `packet_version=1.2` и нет `prior_memory` — не эмитируй result, не
+  восстанавливай память из ResearchStore. Верни
+  `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` и
+  `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY`.
+  Historical `packet_version=1.0` / `1.1` остаются читаемыми без `prior_memory`.
   Если позже `finalize` вернул `CRITIC_SESSION_MISMATCH` — скопируй
   `session_id` из packet и повтори один раз; не изобретай id.
 
 ## B1. Независимо разреши контекст
 
 1. Проверь live Git head и актуальные front-door/context/Catalog roots.
-2. Разреши referenced prior hypotheses, negative terminals, data manifests, query recipes, capabilities и schemas.
+2. Разреши referenced data manifests, query recipes, capabilities и schemas из
+   packet + read-only repository truth. Не открывай ResearchStore / active RDP
+   ради prior recall.
 3. Проверь, что Forge не использовал stale export как текущую authority.
 4. Проверь, что названные data доступны на заявленном PIT cutoff и fingerprint-bound.
 5. Проверь, что untouched/forward outcomes не открывались.
-6. Проверь ближайший prior work повторно по mechanism, actor, state, target и failure mode.
+6. Ближайший prior work: для `packet_version=1.2` сравни selected candidate с
+   `prior_memory.capsules` (см. B3 Novelty / memory). Historical `1.0` / `1.1`
+   packets не содержат `prior_memory`; novelty тогда ограничен полями packet и
+   cited receipts, без store walk.
 
 Если packet нельзя связать с проверяемой реальностью, terminal = `KILL_UNBOUND_EVIDENCE` или `REVISE_ONCE` только для исправления ссылки без изменения механизма.
 
@@ -726,10 +750,19 @@ decision after collection
 
 ### 1. Novelty / memory
 
+- Для `packet_version=1.2` единственный research-memory вход — `prior_memory.capsules`
+  внутри `CRITIC_INPUT_PACKET`. Не открывай ResearchStore / active RDP и не
+  используй Forge scratchpad ради prior recall.
+- Сравни selected candidate с каждой capsule по mechanism/state, actor/counterparty,
+  population, decision timestamp, X/Y/horizon и falsifier/control/economic distinction.
+- Лексическое равенство identity-полей **не** требуется для duplicate suspicion.
+- `memory_status` (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`, `AMBIGUOUS`,
+  `HISTORICAL`) остаётся различимым; видимость prior ≠ automatic hard-close.
 - Найди ближайший prior mechanism и terminal.
 - Проверь equivalence under renaming и threshold changes.
 - Определи, наследует ли кандидат prior null/negative evidence.
 - Требование PASS: material difference создаёт новое disconfirming prediction.
+- Historical `packet_version=1.0` / `1.1` остаются читаемыми без `prior_memory`.
 
 ### 2. Mechanism / counterparty
 

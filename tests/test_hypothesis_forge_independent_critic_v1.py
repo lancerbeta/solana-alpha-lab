@@ -80,6 +80,16 @@ class HypothesisForgeIndependentCriticV1Tests(unittest.TestCase):
         packet["session_id"] = "HFIC-UNBOUND-548FED55D34C"
         self.assertNotEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
 
+    def test_v12_packet_requires_prior_memory_v11_does_not(self) -> None:
+        packet = load_json(CRITIC_PACKET_FIXTURE)
+        packet["packet_version"] = "1.2"
+        packet["generator_prompt_version"] = "HFIC-V1.2"
+        packet["session_id"] = "HFIC-SESS-TESTBIND0001"
+        self.assertNotEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+        packet["packet_version"] = "1.1"
+        packet["generator_prompt_version"] = "HFIC-V1.1"
+        self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+
     def test_critic_packet_rejects_wrong_prompt_version(self) -> None:
         invalid = load_json(CRITIC_PACKET_FIXTURE)
         invalid["generator_prompt_version"] = "HFIC-V0.9"
