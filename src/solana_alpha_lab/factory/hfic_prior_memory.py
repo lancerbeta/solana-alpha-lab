@@ -66,6 +66,14 @@ class PriorMemoryCapacityError(ValueError):
         super().__init__(self.code)
 
 
+class PriorMemoryUnidentifiedError(ValueError):
+    """A committed HYPOTHESIS_VERSION cannot be projected without identity."""
+
+    def __init__(self) -> None:
+        self.code = "PRIOR_MEMORY_RECORD_UNIDENTIFIED"
+        super().__init__(self.code)
+
+
 def prior_memory_bounds(
     repo_root: Path | str | None = None,
     *,
@@ -158,7 +166,7 @@ def build_prior_memory_snapshot(
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "HYPOTHESIS_VERSION":
             continue
-        payload = _payload_mapping(record)
+        payload = _require_hypothesis_payload(record)
         hyp_id = str(
             payload.get("hypothesis_version_id")
             or getattr(record, "hypothesis_version_id", None)
@@ -166,7 +174,7 @@ def build_prior_memory_snapshot(
             or ""
         )
         if not hyp_id:
-            continue
+            raise PriorMemoryUnidentifiedError()
         record_id = str(getattr(record, "record_id", "") or "")
         effective = str(getattr(record, "effective_at", "") or "")
         key = (effective, record_id)
@@ -202,6 +210,19 @@ def build_prior_memory_snapshot(
             max_bytes=bytes_bound,
         )
     return snapshot
+
+
+def _require_hypothesis_payload(record: Any) -> dict[str, Any]:
+    raw = getattr(record, "payload_json", "") or ""
+    if isinstance(raw, bytes):
+        raw = raw.decode("utf-8")
+    try:
+        payload = json.loads(raw)
+    except (TypeError, ValueError) as exc:
+        raise PriorMemoryUnidentifiedError() from exc
+    if not isinstance(payload, dict):
+        raise PriorMemoryUnidentifiedError()
+    return payload
 
 
 def _payload_mapping(record: Any) -> dict[str, Any]:

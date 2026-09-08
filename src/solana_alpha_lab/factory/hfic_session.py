@@ -27,6 +27,7 @@ from solana_alpha_lab.factory.hfic_identity import (
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (
     PriorMemoryCapacityError,
+    PriorMemoryUnidentifiedError,
     build_prior_memory_snapshot,
 )
 from solana_alpha_lab.factory.hfic_suppression_semantics import (
@@ -811,7 +812,7 @@ def freeze_draft(
                 store_inventory_digest=snapshot_digest,
                 repo_root=repo_root,
             )
-        except PriorMemoryCapacityError as exc:
+        except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
             raise HficSessionError(exc.code) from exc
     if repo_root is not None:
         _validate_json_schema(

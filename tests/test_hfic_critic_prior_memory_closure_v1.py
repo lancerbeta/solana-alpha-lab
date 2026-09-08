@@ -24,6 +24,7 @@ from solana_alpha_lab.factory.hfic_prior_memory import (
     MEMORY_NOT_SELECTED,
     MEMORY_PARK,
     PriorMemoryCapacityError,
+    PriorMemoryUnidentifiedError,
     build_prior_memory_snapshot,
 )
 from solana_alpha_lab.factory.hfic_session import HficSessionError, freeze_draft, lookup_prior
@@ -330,6 +331,40 @@ class PriorMemoryUnitTests(unittest.TestCase):
             self.assertEqual(by_id[HISTORICAL_ID], MEMORY_HISTORICAL)
             self.assertEqual(len(set(by_id.values())), 5)
 
+    def test_unidentified_hypothesis_version_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            now = datetime(2026, 9, 8, 12, 0, tzinfo=UTC)
+            payload_json = "[]"
+            store.append(
+                [
+                    ResearchEvent(
+                        record_id="REC-UNIDENTIFIED",
+                        record_kind=RecordKind.HYPOTHESIS_VERSION,
+                        entity_id="HYP-BROKEN-JSON-001",
+                        hypothesis_version_id="HYP-BROKEN-JSON-001",
+                        run_id=None,
+                        transaction_id="RESEARCH-TXN-PRIOR-MEM-001",
+                        effective_at=now,
+                        first_reliable_available_at=now,
+                        supersedes_record_id=None,
+                        payload_json=payload_json,
+                        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+                        producer_git_sha="0" * 40,
+                        created_at=now,
+                    )
+                ],
+                transaction_id="RESEARCH-TXN-PRIOR-MEM-001",
+            )
+            with self.assertRaises(PriorMemoryUnidentifiedError) as raised:
+                build_prior_memory_snapshot(
+                    store,
+                    store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+                )
+            self.assertEqual(raised.exception.code, "PRIOR_MEMORY_RECORD_UNIDENTIFIED")
+
     def test_t7_historical_v11_packets_remain_readable(self) -> None:
         schema = json.loads(CRITIC_SCHEMA.read_text(encoding="utf-8"))
         validator = Draft202012Validator(schema)
@@ -472,6 +507,18 @@ class PriorMemoryFreezeE2ETests(unittest.TestCase):
                 [],
             )
 
+            store_before = ResearchStore(data_root)
+            unique_before = {
+                str(
+                    json.loads(record.payload_json).get("hypothesis_version_id")
+                    or getattr(record, "hypothesis_version_id", "")
+                    or record.entity_id
+                )
+                for record in store_before.iter_committed_records()
+                if str(getattr(record.record_kind, "value", record.record_kind))
+                == RecordKind.HYPOTHESIS_VERSION.value
+            }
+
             frozen_run = run_cli(
                 "freeze",
                 "--draft",
@@ -492,6 +539,8 @@ class PriorMemoryFreezeE2ETests(unittest.TestCase):
             ids = [item["hypothesis_version_id"] for item in memory["capsules"]]
             self.assertIn(P_TRUE_ID, ids)
             self.assertNotIn(frozen["selected_candidate_id"], ids)
+            self.assertEqual(memory["eligible_count"], len(unique_before))
+            self.assertEqual(set(ids), unique_before)
             self.assertEqual(
                 memory["store_inventory_digest"],
                 fresh_receipt["store_inventory_digest"],

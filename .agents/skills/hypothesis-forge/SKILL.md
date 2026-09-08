@@ -135,7 +135,8 @@ Happy path — no owner copy/paste between the slash command and the final termi
    `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`: BLOCKED, not a crash; session was
    not written; do not launch Critic; do not paste a packet; do not retry the
    same slash expecting success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
-   Do not silently truncate or fall back to lexical top-N.
+   If freeze returns `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: BLOCKED; session was
+   not written; do not launch Critic. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
 7. **Mandatory auto-handoff (selected path only):** launch Independent Critic in a new isolated context
    with only the frozen packet. Do not persist from Critic.
 8. After critic returns `hypothesis_critic_result_v1`:
