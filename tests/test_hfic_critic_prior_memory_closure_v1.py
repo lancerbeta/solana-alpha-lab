@@ -401,6 +401,13 @@ class PriorMemoryUnitTests(unittest.TestCase):
         historical["session_id"] = "HFIC-SESS-HISTORICALV12"
         self.assertNotIn("prior_memory", historical)
         self.assertEqual(list(validator.iter_errors(historical)), [])
+        from solana_alpha_lab.factory.hfic_prior_memory import empty_prior_memory_snapshot
+
+        with_memory = dict(historical)
+        with_memory["prior_memory"] = empty_prior_memory_snapshot(
+            store_inventory_digest="0" * 64
+        )
+        self.assertEqual(list(validator.iter_errors(with_memory)), [])
 
 
 class PriorMemoryFreezeE2ETests(unittest.TestCase):

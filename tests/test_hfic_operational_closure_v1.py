@@ -177,6 +177,7 @@ class HficOperationalClosureContractTests(unittest.TestCase):
         self.assertIn("INCOMPLETE_CRITIC_INPUT_PACKET", operator)
         self.assertIn("CRITIC_SESSION_MISMATCH", operator)
         self.assertIn("PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED", operator)
+        self.assertIn("PRIOR_MEMORY_RECORD_UNIDENTIFIED", operator)
         self.assertIn("RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY", operator)
         self.assertIn("STOP_DO_NOT_LAUNCH_CRITIC", operator)
         self.assertIn("packet_version=1.3", operator)

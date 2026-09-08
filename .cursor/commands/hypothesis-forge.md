@@ -35,7 +35,8 @@ Return one terminal + one NEXT after `SYNTHESIS_COMPLETE`. After `NO_WORTHY`,
 NEXT is `WAIT_FOR_NEW_EVIDENCE`, `FORWARD_DATA_OPTION_READY` or
 `CAPABILITY_OPTION_READY` (or deterministic wait fallback). Forge is incomplete until critic returns one terminal and one NEXT and finalize
 persists the cycle, except `NO_WORTHY` (skips Critic; complete at freeze) and
-`PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` (BLOCKED; session not written; do not
+`PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` / `PRIOR_MEMORY_RECORD_UNIDENTIFIED`
+(BLOCKED; session not written; do not
 launch Critic; `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`).
 **Auto-launch** Independent Critic in new isolated context; no owner copy/paste.
 

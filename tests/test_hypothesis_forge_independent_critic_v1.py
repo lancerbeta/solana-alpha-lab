@@ -88,6 +88,32 @@ class HypothesisForgeIndependentCriticV1Tests(unittest.TestCase):
         self.assertNotIn("prior_memory", packet)
         self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
 
+    def test_historical_v12_with_prior_memory_still_readable(self) -> None:
+        from solana_alpha_lab.factory.hfic_prior_memory import empty_prior_memory_snapshot
+
+        packet = load_json(CRITIC_PACKET_FIXTURE)
+        packet["packet_version"] = "1.2"
+        packet["generator_prompt_version"] = "HFIC-V1.2"
+        packet["session_id"] = "HFIC-SESS-TESTBIND0001"
+        packet["prior_memory"] = empty_prior_memory_snapshot(
+            store_inventory_digest="0" * 64
+        )
+        self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+
+    def test_v10_v11_packets_reject_prior_memory(self) -> None:
+        from solana_alpha_lab.factory.hfic_prior_memory import empty_prior_memory_snapshot
+
+        snapshot = empty_prior_memory_snapshot(store_inventory_digest="0" * 64)
+        v10 = load_json(CRITIC_PACKET_FIXTURE)
+        v10["prior_memory"] = snapshot
+        self.assertNotEqual(schema_errors(v10, CRITIC_SCHEMA_PATH), [])
+        v11 = load_json(CRITIC_PACKET_FIXTURE)
+        v11["packet_version"] = "1.1"
+        v11["generator_prompt_version"] = "HFIC-V1.1"
+        v11["session_id"] = "HFIC-SESS-TESTBIND0001"
+        v11["prior_memory"] = snapshot
+        self.assertNotEqual(schema_errors(v11, CRITIC_SCHEMA_PATH), [])
+
     def test_v13_packet_requires_prior_memory(self) -> None:
         from solana_alpha_lab.factory.hfic_prior_memory import empty_prior_memory_snapshot
 

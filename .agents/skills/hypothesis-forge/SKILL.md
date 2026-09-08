@@ -170,7 +170,8 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET` (selected path only):
 2. **Launch Independent Critic in a new isolated context** using `Task`
    subagent, `.agents/skills/independent-hypothesis-critic/SKILL.md`, and
    **only** the packet (no Forge narrative, no intermediate reasoning, no
-   ResearchStore walk). The V1.2 packet already carries complete prior memory.
+   ResearchStore walk). Fresh critic `packet_version=1.3` already carries
+   complete prior memory. Do not reconstruct `prior_memory` for historical `1.2`.
    If isolated context cannot launch, return typed `AUTO_HANDOFF_UNAVAILABLE`
    and STOP. Do not instruct the owner to open a new chat, paste the packet,
    or press Run. Do not silently self-criticize in the Forge context.

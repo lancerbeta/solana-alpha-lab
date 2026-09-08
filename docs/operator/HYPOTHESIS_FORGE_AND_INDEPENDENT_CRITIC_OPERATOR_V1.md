@@ -105,17 +105,19 @@ presents 1970 as an operational date. Uncovered placeholder HFIC records make
    и повтор Critic; при `PASS_TO_CLASSIFICATION`
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify`;
    затем `finalize`.
-   Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`: это BLOCKED, не
-   crash. Session не записан. Critic не запускать, packet не вставлять, тот же
-   slash не ретраить в ожидании success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
+   Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` или
+   `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: это BLOCKED, не crash. Session не
+   записан. Critic не запускать, packet не вставлять, тот же slash не ретраить
+   в ожидании success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
    Bound: `prior_memory.max_records=64`, `max_bytes=65536` в
    `configs/hypothesis_forge_independent_critic_v1.yaml`.
 3. Вечерний цикл **не завершён**, пока Critic не вернул финальный terminal
    (`KILL_*` / `NO_WORTHY_HYPOTHESIS` или post-classifier `PASS_*`) и `finalize`
    не записал `SESSION_RECEIPT`, **кроме**:
    - `NO_WORTHY_HYPOTHESIS` (Critic пропускается; complete на freeze + next action);
-   - `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` (BLOCKED; session не записан;
-     Critic не запускать; цикл останавливается на typed STOP, не на Critic).
+   - `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` / `PRIOR_MEMORY_RECORD_UNIDENTIFIED`
+     (BLOCKED; session не записан; Critic не запускать; цикл останавливается на
+     typed STOP, не на Critic).
    `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` —
    intermediate states, не complete. Команды `revise` и `classify` — тот же CLI,
    не prose-only переход.

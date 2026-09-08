@@ -231,6 +231,17 @@
       "then": {
         "required": ["prior_memory"]
       }
+    },
+    {
+      "if": {
+        "properties": {
+          "packet_version": {"enum": ["1.0", "1.1"]}
+        },
+        "required": ["packet_version"]
+      },
+      "then": {
+        "properties": {"prior_memory": false}
+      }
     }
   ]
 }

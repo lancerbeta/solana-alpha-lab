@@ -113,7 +113,8 @@ because lexical top-N omitted it.
 
 ## CAPABILITY_OR_EVIDENCE
 
-Snapshot builder + v1.2 packet field + T1–T7 + packet-only Critic smoke.
+Snapshot builder + critic packet 1.3 field + T1–T7 +
+`HISTORICAL_V12_WITHOUT_PRIOR_MEMORY_READABLE` + packet-only Critic smoke.
 
 ## STOP
 
