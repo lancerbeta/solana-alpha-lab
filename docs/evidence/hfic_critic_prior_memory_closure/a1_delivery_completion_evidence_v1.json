@@ -1,0 +1,79 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-CRITIC-PRIOR-MEMORY-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-08",
+  "task_id": "HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_V1",
+  "state_change": "HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_CANDIDATE",
+  "base_main": "19ad057614f0fd4aa4313b409606d205ff9cb290",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "bcc7ed23731baf8f8408c90b52cbd3d02e1bd1c036ab7b5ab90581a0240df7a4",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "55a0a2825e6a1de32c00e84ffbfe7473eecb263b732ed480e85b4a651dc9b4c9",
+    ".cursor/commands/hypothesis-forge.md": "ad6854d91be7e1db845ac3176f9c8f1a92f142796900673c5584fe636e290b9c",
+    ".cursor/commands/independent-hypothesis-critic.md": "6802527e7b0484dd9986fd9917ce1942e7b739874cc64388217d0b410a104d6c",
+    "catalog/assets/core.yaml": "bbdb0a568268c3aef60a0ce35783bcada281e528f1179d11efc751ea482ea387",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "859bb2838b03589709f601d2cab2edcd921126d98a80af1acc74d2545b85ea93",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "ff4b5904c14fd6af02e4f071d5b8e4102434ec75bb10b2f141fc8557e803f2c3",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "070fd741252ea3b99c8e7647cd8abc48bd191f30c746014b78b5008e685c0453",
+    "docs/reports/hfic_critic_prior_memory_closure/a1_owner_readout_v1.md": "d6a5cc164c17a4b907ad949345867e4e9188c285b6f5e728ba85c4796e09e20c",
+    "docs/tasks/HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_V1.md": "ccd6a9954b0bbc731723eb2f835bff8857d7b7d78c39ed2a1c122d491457c52e",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "f073397a7abb85b9064cfc51a473f22ad53ff56bf78c5153260680a9fc722fca",
+    "src/solana_alpha_lab/factory/hfic_session.py": "300e412c3f740519cc6b2e3c4b4dc9d7a45d30e33d7e16df5610bfd0604b1f16",
+    "tests/test_hfic_cli.py": "9881330912c39ad047d7bb7cc650ca91593de8e5ca49006c1ca077cc426d9c89",
+    "tests/test_hfic_critic_prior_memory_closure_v1.py": "fb051d9e7add87f59646aa2fefe006ad4e36d41b8accd81139adb814a5d12f33",
+    "tests/test_hfic_fresh_session_version_lock_v1.py": "bfe99d45545c3e91719962c740559ba7eb296b525f89e037f7513d5e534fbdde",
+    "tests/test_hfic_manual_grounding_contract_diagnostics_v1.py": "b8dbcf74a7539b99007413987b8353c98aaa2d6967d563b060e80db737ea2186",
+    "tests/test_hfic_operational_closure_v1.py": "6cf6eef0d8afa14fcda0e336fff559dfe228d1e44da0aee1251f835516e88f4e",
+    "tests/test_hfic_session.py": "eb2149bd7230c732cc64f960e2de00f8d6f9b6923f6935d861918a65806d622a",
+    "tests/test_hypothesis_forge_independent_critic_v1.py": "2049df792ab58b9b0c465025b6fd6edd79916a46e0c560679917d990c6cb4a70"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_critic_prior_memory_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "71bcdb760ef9c6d9ddf7537895c35c7423ebda56c874b9ce87b1ca54baad2d5a",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_CRITIC_PRIOR_MEMORY_CLOSURE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_critic_prior_memory_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "8eaad6e4c8e72405cb8abcc8c522c60a1ace16745f642754e933ccb0be9a76ce",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH",
+      "PASS_T1_T7_PRIOR_MEMORY",
+      "PASS_PACKET_ONLY_CRITIC_SMOKE"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_CRITIC_REASONING_COMPLETENESS",
+    "NO_CALIBRATION_MEMORY_TRUST",
+    "NO_RANKER_CHANGE",
+    "NO_RUNNER_UP_LIFECYCLE_CHANGE",
+    "NO_EMBEDDINGS_RAG_OR_VECTOR_DB",
+    "NO_PROVIDER_OR_EXPERIMENT",
+    "NO_HFIC_V1_3_PROMPT_A"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

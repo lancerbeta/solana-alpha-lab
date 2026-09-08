@@ -266,7 +266,7 @@ class CompatibilityAndSchemaTests(unittest.TestCase):
             "GROUNDED_WITH_GAPS",
         )
         packet = frozen["critic_input_packet"]
-        self.assertEqual(packet["packet_version"], "1.2")
+        self.assertEqual(packet["packet_version"], "1.3")
         self.assertEqual(
             packet["provisional_lane"]["required_capability_ids"],
             ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],

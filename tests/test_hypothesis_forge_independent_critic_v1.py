@@ -36,6 +36,20 @@ POST_CLASSIFICATION_TERMINALS = {
 
 BARE_LANE_NAMES = {"FAST_LANE", "CHANGE_LANE", "DATA_OPTION", "PROMOTION_LANE"}
 
+MIN_PRIOR_MEMORY = {
+    "schema": "smial.hfic-prior-memory-snapshot",
+    "schema_version": "1.0",
+    "complete": True,
+    "eligible_count": 0,
+    "emitted_count": 0,
+    "bytes": 0,
+    "snapshot_sha256": "0" * 64,
+    "store_inventory_digest": "0" * 64,
+    "max_records": 64,
+    "max_bytes": 65536,
+    "capsules": [],
+}
+
 
 def load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -79,6 +93,42 @@ class HypothesisForgeIndependentCriticV1Tests(unittest.TestCase):
         self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
         packet["session_id"] = "HFIC-UNBOUND-548FED55D34C"
         self.assertNotEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+
+    def test_historical_v12_without_prior_memory_readable(self) -> None:
+        packet = load_json(CRITIC_PACKET_FIXTURE)
+        packet["packet_version"] = "1.2"
+        packet["generator_prompt_version"] = "HFIC-V1.2"
+        packet["session_id"] = "HFIC-SESS-TESTBIND0001"
+        self.assertNotIn("prior_memory", packet)
+        self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+
+    def test_historical_v12_with_prior_memory_still_readable(self) -> None:
+        packet = load_json(CRITIC_PACKET_FIXTURE)
+        packet["packet_version"] = "1.2"
+        packet["generator_prompt_version"] = "HFIC-V1.2"
+        packet["session_id"] = "HFIC-SESS-TESTBIND0001"
+        packet["prior_memory"] = dict(MIN_PRIOR_MEMORY)
+        self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+
+    def test_v10_v11_packets_reject_prior_memory(self) -> None:
+        v10 = load_json(CRITIC_PACKET_FIXTURE)
+        v10["prior_memory"] = dict(MIN_PRIOR_MEMORY)
+        self.assertNotEqual(schema_errors(v10, CRITIC_SCHEMA_PATH), [])
+        v11 = load_json(CRITIC_PACKET_FIXTURE)
+        v11["packet_version"] = "1.1"
+        v11["generator_prompt_version"] = "HFIC-V1.1"
+        v11["session_id"] = "HFIC-SESS-TESTBIND0001"
+        v11["prior_memory"] = dict(MIN_PRIOR_MEMORY)
+        self.assertNotEqual(schema_errors(v11, CRITIC_SCHEMA_PATH), [])
+
+    def test_v13_packet_requires_prior_memory(self) -> None:
+        packet = load_json(CRITIC_PACKET_FIXTURE)
+        packet["packet_version"] = "1.3"
+        packet["generator_prompt_version"] = "HFIC-V1.2"
+        packet["session_id"] = "HFIC-SESS-TESTBIND0001"
+        self.assertNotEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+        packet["prior_memory"] = dict(MIN_PRIOR_MEMORY)
+        self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
 
     def test_critic_packet_rejects_wrong_prompt_version(self) -> None:
         invalid = load_json(CRITIC_PACKET_FIXTURE)

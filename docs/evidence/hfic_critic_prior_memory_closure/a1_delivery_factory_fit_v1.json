@@ -1,0 +1,40 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-CRITIC-PRIOR-MEMORY-CLOSURE-FACTORY-FIT-001",
+  "as_of": "2026-09-08",
+  "task_id": "HFIC_CRITIC_PRIOR_MEMORY_CLOSURE_V1",
+  "reviewed_bindings_sha256": "8dfbea76d8cce29a48764f3f708d805fa29ec61ae97feb22c61e072fba046b3d",
+  "reviewed_inventory_sha256": "ef51d6483d58985676ffcdce459edf530475815d0b90d17a0a8ddde963c10870",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_PACKET_PRIOR_MEMORY_CLOSES_F2_LEXICAL_BLIND_SPOT",
+    "flexibility_and_history": "PASS_HISTORICAL_V10_V11_V12_READABLE_V12_OPTIONAL_PRIOR_MEMORY",
+    "context_efficiency": "PASS_BOUNDED_SNAPSHOT_NO_STORE_ARCHAEOLOGY",
+    "research_truth": "PASS_VISIBILITY_IS_NOT_HARD_CLOSE_EXISTING_SUPPRESSION_SEMANTICS",
+    "owner_operability": "PASS_CAPACITY_AND_INCOMPLETE_PACKET_TYPED_STOP",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_FORGE_REQUIRED",
+    "monitoring_and_recovery": "PASS_REVERT_BRANCH_BYTES",
+    "build_vs_buy": "PASS_ADOPT_EXISTING_HV_FIELDS_NO_RAG",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER",
+    "red_team": "PASS_CAPACITY_AND_DIGEST_FAIL_CLOSED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "F3_RUNNER_UP_LIFECYCLE_AND_CALIBRATION_MEMORY_REBASE"
+  },
+  "recovery": "REVERT cursor/hfic-critic-prior-memory-closure-v1 BRANCH; KEEP V1.0/V1.1/V1.2 PACKETS READABLE.",
+  "limits": [
+    "NO_GENERATOR",
+    "NO_RANKER_CHANGE",
+    "NO_EMBEDDINGS_RAG_OR_VECTOR_DB",
+    "NO_RUNNER_UP_LIFECYCLE_CHANGE",
+    "NO_CALIBRATION_MEMORY_REBASE",
+    "NO_PROVIDER",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_HFIC_V1_3_PROMPT_A",
+    "NO_LIVE_FORGE_REQUIRED"
+  ]
+}

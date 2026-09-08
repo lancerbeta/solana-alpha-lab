@@ -16,8 +16,10 @@ Read `configs/hypothesis_forge_independent_critic_v1.yaml` and **PROMPT B** in
 Input must be a structured **CRITIC_INPUT_PACKET** only. Reject free-form Forge
 narrative, pleas to «improve the idea», or requests to generate a new portfolio.
 Do not accept the outer frozen envelope, Forge scratchpad, or hidden session
-context alongside the packet. Return `hypothesis_critic_result_v1`. The critic
-does not persist; `finalize` owns Research Data Plane writes.
+context alongside the packet. Do **not** walk ResearchStore or active RDP for
+prior recall: the packet is the sole research-memory input. Return
+`hypothesis_critic_result_v1`. The critic does not persist; `finalize` owns
+Research Data Plane writes.
 
 ## Copied identity — never generated
 
@@ -35,11 +37,20 @@ Copy/bind exactly:
 - `selected_definition_sha256` ← canonical selected-candidate identity hash
   from packet fields via repo identity algorithm, as applicable
 
-A `packet_version=1.1` or `1.2` packet without `session_id` is incomplete. Do **not**
-emit `hypothesis_critic_result_v1` and do **not** infer the missing field.
-Return `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` and
-stop. Generator prompt versions `HFIC-V1.1` and `HFIC-V1.2` are both accepted;
-critic result identity remains `HFIC-V1.1`.
+A `packet_version=1.1`, `1.2`, or `1.3` packet without `session_id` is
+incomplete. A current `packet_version=1.3` packet without `prior_memory` is
+incomplete. Do **not** emit `hypothesis_critic_result_v1` and do **not** infer
+the missing field. Return `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` and stop.
+Generator prompt versions `HFIC-V1.1` and `HFIC-V1.2` are both accepted;
+critic result identity remains `HFIC-V1.1`. Do **not** create HFIC-V1.3 Prompt A.
+Historical `packet_version=1.0` / `1.1` / `1.2` packets remain readable without
+`prior_memory`. Do not reconstruct or fabricate `prior_memory` for historical
+`1.2`. If a historical `1.2` packet already contains `prior_memory`, compare
+against those capsules; that is packet content, not reconstruction. A current
+`packet_version=1.3` packet without `prior_memory`:
+`OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY`.
+Do not invent capsules from ResearchStore.
+Missing `session_id` on `packet_version=1.1`, `1.2`, or `1.3`:
 `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_SESSION_ID`.
 
 If `finalize` later reports `CRITIC_SESSION_MISMATCH`, copy
@@ -58,6 +69,18 @@ Hard boundaries — same as Forge:
 1. Validate the packet against `catalog/schemas/hypothesis_critic_input_v1.schema.json`.
 2. Independently re-resolve live Git head, Catalog bindings and prior work cited in
    the packet. Do not trust Forge conclusions without verification.
+   For `packet_version=1.3`, and for any historical `1.2` packet that already
+   contains `prior_memory`, compare `selected_candidate` semantically against
+   every `prior_memory.capsules` entry on mechanism/state, actor/counterparty,
+   population, decision timestamp, X/Y/horizon, and falsifier/control/economic
+   distinction. Lexical equality of identity fields is **not** required for
+   duplicate suspicion. Capsule `memory_status` stays distinguishable
+   (`HARD_CLOSE`, `PARK`, `NOT_SELECTED_IN_SESSION`, `AMBIGUOUS`, `HISTORICAL`);
+   visibility in prior memory is not automatic hard-close. Do not compensate a
+   missing capsule with ResearchStore archaeology, RAG, embeddings, or a hidden
+   synonym query. Historical `1.0` / `1.1` / `1.2` packets without
+   `prior_memory` stay on existing compatibility: novelty is limited to packet
+   fields and cited receipts; do not reconstruct capsules.
 3. Execute **PROMPT B** attack matrix and terminal policy.
 4. Return critic sections B7 in order: one terminal, one NEXT, at most one execution
    unit.
@@ -71,6 +94,8 @@ This skill expects **new context** relative to Forge:
 - No access to Forge scratchpad or persuasive narrative
 - Packet + operator pack + read-only repository truth only
 - No outer frozen envelope, Forge narrative, or hidden session_id channel
+- No ResearchStore / active RDP archaeology for prior recall
+- For `packet_version=1.3`, packet `prior_memory` is the sole research-memory input
 
 When invoked from Forge auto-handoff via subagent, treat the subagent session as
 the required isolated context.

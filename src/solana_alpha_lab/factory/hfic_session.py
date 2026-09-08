@@ -25,6 +25,11 @@ from solana_alpha_lab.factory.hfic_identity import (
     canonical_candidate_definition,
     normalize_text,
 )
+from solana_alpha_lab.factory.hfic_prior_memory import (
+    PriorMemoryCapacityError,
+    PriorMemoryUnidentifiedError,
+    build_prior_memory_snapshot,
+)
 from solana_alpha_lab.factory.hfic_suppression_semantics import (
     candidate_matches_hard_close,
     family_hard_close_terminals,
@@ -37,6 +42,8 @@ _SCHEMA_VALIDATORS: dict[str, Draft202012Validator] = {}
 PROMPT_VERSION = "HFIC-V1.2"
 PROMPT_VERSION_V1_1 = "HFIC-V1.1"
 SUPPORTED_PROMPT_VERSIONS = frozenset({PROMPT_VERSION_V1_1, PROMPT_VERSION})
+CRITIC_PACKET_VERSION_V11 = "1.1"
+CRITIC_PACKET_VERSION_CURRENT = "1.3"
 DRAFT_SCHEMA_BY_PACKET_VERSION = {
     "1.1": "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
     "1.2": "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json",
@@ -461,6 +468,17 @@ def _draft_prompt_version(draft: Mapping[str, Any]) -> str:
     return expected
 
 
+def _critic_packet_version(draft_packet_version: str) -> str:
+    """Map Forge draft version to Critic transport version.
+
+    Fresh HFIC-V1.2 freeze emits critic packet 1.3. Historical draft 1.1 stays
+    critic 1.1. Do not mint an HFIC-V1.3 Prompt A.
+    """
+    if draft_packet_version == "1.2":
+        return CRITIC_PACKET_VERSION_CURRENT
+    return CRITIC_PACKET_VERSION_V11
+
+
 def _draft_schema_path(repo_root: Any, draft: Mapping[str, Any]) -> Path:
     return Path(repo_root) / DRAFT_SCHEMA_BY_PACKET_VERSION[_draft_packet_version(draft)]
 
@@ -687,7 +705,7 @@ def freeze_draft(
         maybe_head = preflight_receipt.get("live_git_head")
         if isinstance(maybe_head, str) and len(maybe_head) == 40:
             git_head = maybe_head.lower()
-    critic_packet_version = "1.2" if packet_version == "1.2" else "1.1"
+    critic_packet_version = _critic_packet_version(packet_version)
     decision_unlocked = str(selected_card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
     disconfirming = str(
         selected_card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT"
@@ -799,6 +817,16 @@ def freeze_draft(
             }
         )[:16].upper()
     _bind_packet_session_id(packet, session_id)
+    if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+        snapshot_digest = store_digest if isinstance(store_digest, str) else "0" * 64
+        try:
+            packet["prior_memory"] = build_prior_memory_snapshot(
+                store,
+                store_inventory_digest=snapshot_digest,
+                repo_root=repo_root,
+            )
+        except (PriorMemoryCapacityError, PriorMemoryUnidentifiedError) as exc:
+            raise HficSessionError(exc.code) from exc
     if repo_root is not None:
         _validate_json_schema(
             packet,

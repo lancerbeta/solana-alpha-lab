@@ -143,3 +143,23 @@ next_epistemic_action:
     - CAPABILITY_OPTION_READY
   proposed_phrase_status: PROPOSED_NOT_AUTHORITY
   execute_proposed_phrase: false
+prior_memory:
+  snapshot_schema: smial.hfic-prior-memory-snapshot
+  snapshot_schema_version: '1.0'
+  bound_to: CRITIC_INPUT_PACKET
+  packet_versions: ['1.3']
+  historical_v1_1_required: false
+  source: HYPOTHESIS_VERSION
+  include_ranked_shortlist_only: false
+  max_records: 64
+  max_bytes: 65536
+  silent_truncation: false
+  capacity_exceeded: PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED
+  memory_status:
+    - HARD_CLOSE
+    - PARK
+    - NOT_SELECTED_IN_SESSION
+    - AMBIGUOUS
+    - HISTORICAL
+  visibility_is_not_hard_close: true
+  critic_store_archaeology: false

@@ -24,7 +24,7 @@
   ],
   "properties": {
     "packet_schema": {"const": "smial.hypothesis-critic-input"},
-    "packet_version": {"enum": ["1.0", "1.1", "1.2"]},
+    "packet_version": {"enum": ["1.0", "1.1", "1.2", "1.3"]},
     "generator_prompt_version": {"enum": ["HFIC-V1.0", "HFIC-V1.1", "HFIC-V1.2"]},
     "generated_at": {"type": "string", "minLength": 1},
     "live_git_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
@@ -130,18 +130,117 @@
     "session_id": {
       "type": "string",
       "pattern": "^HFIC-SESS-[A-Z0-9]+$"
+    },
+    "prior_memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "schema_version",
+        "complete",
+        "eligible_count",
+        "emitted_count",
+        "bytes",
+        "snapshot_sha256",
+        "store_inventory_digest",
+        "max_records",
+        "max_bytes",
+        "capsules"
+      ],
+      "properties": {
+        "schema": {"const": "smial.hfic-prior-memory-snapshot"},
+        "schema_version": {"const": "1.0"},
+        "complete": {"const": true},
+        "eligible_count": {"type": "integer", "minimum": 0},
+        "emitted_count": {"type": "integer", "minimum": 0},
+        "bytes": {"type": "integer", "minimum": 0},
+        "snapshot_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "store_inventory_digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "max_records": {"type": "integer", "minimum": 1},
+        "max_bytes": {"type": "integer", "minimum": 1},
+        "capsules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "hypothesis_version_id",
+              "memory_status",
+              "claim",
+              "mechanism",
+              "actor_counterparty",
+              "population",
+              "decision_timestamp",
+              "primary_x_family",
+              "primary_y",
+              "horizon_notional",
+              "negative_control",
+              "cheapest_falsifier"
+            ],
+            "properties": {
+              "hypothesis_version_id": {"type": "string", "minLength": 1},
+              "session_id": {"type": ["string", "null"]},
+              "hfic_protocol": {"type": ["string", "null"]},
+              "definition_sha256": {"type": ["string", "null"]},
+              "memory_status": {
+                "enum": [
+                  "HARD_CLOSE",
+                  "PARK",
+                  "NOT_SELECTED_IN_SESSION",
+                  "AMBIGUOUS",
+                  "HISTORICAL"
+                ]
+              },
+              "decision_kind": {"type": ["string", "null"]},
+              "reason_code": {"type": ["string", "null"]},
+              "claim": {"type": ["string", "null"]},
+              "mechanism": {"type": ["string", "null"]},
+              "actor_counterparty": {"type": ["string", "null"]},
+              "population": {"type": ["string", "null"]},
+              "decision_timestamp": {"type": ["string", "null"]},
+              "primary_x_family": {"type": ["string", "null"]},
+              "primary_y": {"type": ["string", "null"]},
+              "horizon_notional": {"type": ["string", "null"]},
+              "negative_control": {"type": ["string", "null"]},
+              "cheapest_falsifier": {"type": ["string", "null"]}
+            }
+          }
+        }
+      }
     }
   },
   "allOf": [
     {
       "if": {
         "properties": {
-          "packet_version": {"enum": ["1.1", "1.2"]}
+          "packet_version": {"enum": ["1.1", "1.2", "1.3"]}
         },
         "required": ["packet_version"]
       },
       "then": {
         "required": ["session_id"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "packet_version": {"const": "1.3"}
+        },
+        "required": ["packet_version"]
+      },
+      "then": {
+        "required": ["prior_memory"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "packet_version": {"enum": ["1.0", "1.1"]}
+        },
+        "required": ["packet_version"]
+      },
+      "then": {
+        "properties": {"prior_memory": false}
       }
     }
   ]
