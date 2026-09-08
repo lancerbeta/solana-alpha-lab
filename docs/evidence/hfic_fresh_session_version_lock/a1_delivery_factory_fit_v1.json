@@ -4,8 +4,8 @@
   "review_id": "HFIC-FRESH-SESSION-VERSION-LOCK-FACTORY-FIT-001",
   "as_of": "2026-09-08",
   "task_id": "HFIC_FRESH_SESSION_VERSION_LOCK_V1",
-  "reviewed_bindings_sha256": "00aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "00bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviewed_bindings_sha256": "204e27511d17035a4665de3004495a83bb25f2b483890176d9539225da359179",
+  "reviewed_inventory_sha256": "e21d6919e03330c16019a5ae157c9eacef4862d8dd24bc22418147005dd28e6a",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
