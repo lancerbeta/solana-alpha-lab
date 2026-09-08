@@ -6,8 +6,8 @@
   "task_id": "MARKET_DATA_AWARENESS_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "ae2ba295a375187b27c869ab57475e0365834afaf2db147e897d323e243e118a",
-  "reviewed_inventory_sha256": "1edef6d2026142e6fbda60ba8801e4e400b628bdc5a2619046848573f50c2ad3",
+  "reviewed_bindings_sha256": "73f87b803b4fde8ef32fc1b688f86b3c0548d9debe5aa71161e50d438696e3a2",
+  "reviewed_inventory_sha256": "d28d358fc121a31b273c88c10aabf037741a5799fc6cc0170457bc3cee9f4c92",
   "capability_radar": {
     "now": "NONE",
     "watch": "OWNER_WORKBENCH_VPS_DEPLOY_AND_SMOKE_V1"

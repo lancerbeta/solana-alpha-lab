@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "d9f0ff7ccc879669bb15d45ce8852d4f4cd2d3229b771d6faae2f6259cb9b08b",
+    "catalog/assets/core.yaml": "6eb503a92abaeeabddaa3e487dbac5f2db5bfcb7ec19de49d95800948a195e9a",
     "catalog/assets/lifecycle.yaml": "924b2ce7c21de3809d8cd6623ef54373b9560f80b6c682d96a3e75cfaa6bc88d",
     "catalog/catalog_manifest.yaml": "fb9c39d04031fcf41ccdac7814e4d8866c3c9b9df387da3d5872a953629ebadc",
     "catalog/fixtures/discovery_gold_queries_v1.yaml": "ccde522a4d8613f19781cbce4ff7ec5922a9cc901ae455f2b1ba1b80543fd37b",
@@ -28,7 +28,7 @@
     "docs/PROJECT_MAP.md": "3a4137280bb1f811e15691ea4cd480d03c349c6a09191e34dc25cae211ea4ade",
     "docs/contracts/market_data_awareness_v1.md": "380860501e7d696b316d25cb99376307cd820abbe6512edf22ee684c2c40f932",
     "docs/reports/market_data_awareness/a1_owner_readout_v1.md": "17ebb6314f61dcd81086a44bdd1f5a2d0969c9e8b505d3734fa68f92266b9556",
-    "docs/tasks/MARKET_DATA_AWARENESS_V1.md": "dabfdc946e6b218404401acf3b4a8201c33cf600c32308ab1e0c8bd9a0b5ba40",
+    "docs/tasks/MARKET_DATA_AWARENESS_V1.md": "9f08cb231ea35397bf1f2f5a748ad4617d14f286c6efc848d7e9cb1d8e587d58",
     "scripts/show_market_context.py": "fdf1daf97802daaca9c754fe134008ed1d7b59e2248032744f5ea6cbd1b62611",
     "src/solana_alpha_lab/factory/application.py": "a8636a5b3e8bd0bf03dbd9f1844861777b4c2fb36b35fc016482055a709974ed",
     "src/solana_alpha_lab/factory/cockpit.py": "a597d0c6eb27c05c707e56826eb1eaf4d8393a74d3b70474e228e447dfba6166",
@@ -37,6 +37,7 @@
     "src/solana_alpha_lab/factory/owner_language.py": "20c049e75bb1bbe2f3945b1f66df64de84e48c92c5f021136ccf1ed84d19505d",
     "src/solana_alpha_lab/factory/workbench.py": "5c2ca083630ccbb97e3d2cc84b7f047a4544b44dd04333b7d428e689f78443ab",
     "tests/test_catalog_canonical_binding_discovery.py": "c67a8bb3b34d2b65cc02dbdd6619630fd992f85e57ca2d99112d366e55dd3380",
+    "tests/test_factory_ordinary_market_hypothesis.py": "c722785001ff56c1ff6dd30e5712bc24ab054c8f8c812aafb0604e190037036c",
     "tests/test_factory_semantic_operability.py": "b8f24838669a39877fac49990c27b27a2e4bc246e2fe7df811d0c5e318f504fb",
     "tests/test_factory_v1_owner_cockpit.py": "af9e832d6b9744c952f33bffe7a119ec3b54978cf6b7a5e0762f8c9e0b620844",
     "tests/test_market_data_awareness_v1.py": "0f883c62fe47cf46d40161bdbceef99ff64b43ef0f9369c9a10363816cd31460",
@@ -54,14 +55,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/market_data_awareness/a1_delivery_factory_fit_v1.json",
-    "sha256": "33d7a75e7c4c03a3562bd9ada2e86657a1ceee999b5cc4f02803abbcdc14ecb6",
+    "sha256": "df223acec70b27f5eb940dbe229f75f9fb4672534ef26c62d954f0e8c490fbf8",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MARKET_DATA_AWARENESS_V1",
     "independent_review": {
       "path": "docs/evidence/market_data_awareness/a1_delivery_independent_review_v1.json",
-      "sha256": "f17373ca8aa04d11008472a8148012e034b88d13a30efb261862a5a22c736498",
+      "sha256": "498a76e91b3d2c4c6f3fa95c21a6baeb273d540fe7c7e6c71179faa2183ac4c3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
