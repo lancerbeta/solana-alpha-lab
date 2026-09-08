@@ -11,7 +11,13 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/FACTORY_OPERATIONAL_STORE_READONLY_SCHEMA_COMPATIBILITY_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "56f56f62ab3c89d204d528dac4056d64acc8502bf934ff92676c5158c956357d",
+    "docs/reports/factory_operational_store_readonly_schema_compat_v1/a1_owner_readout_v1.md": "a4669188d12d348a5769df168d11765df6e241c110c0c0e8d7bae8769f429af5",
+    "docs/tasks/FACTORY_OPERATIONAL_STORE_READONLY_SCHEMA_COMPATIBILITY_V1.md": "132dc0e74dfce8a2b49af0fee7059f31466bd5156c23087fbb19943a891de859",
+    "src/solana_alpha_lab/factory/application.py": "48838a37bb5ff3fdec9a19498b38c3c14f3e2ec61f8d35ecf7f83224a7b8b8aa",
+    "src/solana_alpha_lab/factory/operational_store.py": "509477535d82e1d3471014d0da59f25e48e4dd3a594f2e011c0ed4ab727500b1",
+    "src/solana_alpha_lab/factory/read_model.py": "107e91ef8e9aef8e09e2733fd93407c873f80ddf8feeeaab07bf5d4a3684ed9a",
+    "tests/test_factory_operational_store_readonly_schema_compat_v1.py": "1ba13e8a77e182751c3d4926ae69d2d7ff047f4ca0dd606a4d6508753ea2703a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +29,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_operational_store_readonly_schema_compat_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "0ab97543729eeaf17480bc79cae218316025747d7a0d9f404cb874f508d92066",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_OPERATIONAL_STORE_READONLY_SCHEMA_COMPAT_V1",
     "independent_review": {
       "path": "docs/evidence/factory_operational_store_readonly_schema_compat_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "be0a190b5ed8d473ae78025394557b295efacae63c04b326ac9c8799e045fd2d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
