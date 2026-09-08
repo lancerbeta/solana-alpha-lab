@@ -23,6 +23,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/application.py
   - src/solana_alpha_lab/factory/read_model.py
   - tests/test_factory_operational_store_readonly_schema_compat_v1.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - catalog/assets/core.yaml
   - catalog/generated/asset_edges.json
   - docs/reports/factory_operational_store_readonly_schema_compat_v1/a1_owner_readout_v1.md
