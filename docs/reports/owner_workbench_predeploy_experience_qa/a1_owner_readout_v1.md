@@ -2,13 +2,19 @@
 
 ## Decision unlocked
 
-Can Petr scan the six already-deployed Workbench surfaces in ~10s without
+Can Petr scan the six Workbench surfaces **on this Git branch** without
 UNKNOWN becoming $0/«исправна», without command POST values changing, and
 without a frontend rewrite?
 
-**Answer: YES** on current `main`/live SHA `52808d613d02f8e96a85aea2668e98d80aec0d51`
-as the review baseline. The atom id still says `predeploy`; that is a historical
-name, not a predeploy gate. This PR does not deploy.
+**Answer: YES on local AFTER** (`scripts/run_factory_workbench.py` port 18765,
+HEAD of this PR). That is patched-branch HTML, not live Factory TTFB.
+
+Live Factory stays on review-baseline SHA `52808d613d02f8e96a85aea2668e98d80aec0d51`
+until a later named deploy. This atom does **not** claim a ~10s HOME scan on
+live: backlog D1 (HOME GET TTFB ~13–25s) is out of the presentation batch.
+
+The atom id still says `predeploy`; that is a historical name, not a
+predeploy gate. This PR does not deploy.
 
 ## What landed
 

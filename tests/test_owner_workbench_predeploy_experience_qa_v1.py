@@ -20,7 +20,7 @@ from solana_alpha_lab.factory.operational_store import OperationalStore
 from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime_config
 from solana_alpha_lab.factory.visual_os import visual_os_layout_css
 from solana_alpha_lab.factory.owner_language import research_copy, surface_copy
-from solana_alpha_lab.factory.owner_surface import command_button
+from solana_alpha_lab.factory.owner_surface import command_button, esc
 from solana_alpha_lab.factory.workbench import (
     OPERATOR_COMMANDS,
     _attention,
@@ -34,6 +34,14 @@ from solana_alpha_lab.factory.workbench import (
 
 VISUAL_OS = ROOT / "configs/smial_visual_operating_system_v1.yaml"
 PATHS = ("/", "/research", "/market", "/operations", "/economics", "/system")
+PATH_SURFACES = {
+    "/": "HOME",
+    "/research": "RESEARCH",
+    "/market": "MARKET",
+    "/operations": "OPERATIONS",
+    "/economics": "ECONOMICS",
+    "/system": "SYSTEM",
+}
 
 
 def isolated_factory_root(tmp: Path) -> Path:
@@ -200,7 +208,8 @@ class OwnerWorkbenchPredeployExperienceQaTests(unittest.TestCase):
                     self.assertNotIn("git_archaeology_required", note.group(1), path)
                     self.assertIn("git_archaeology_required=", body, path)
                     self.assertIn("page-machine", body, path)
-                    self.assertIn("page-question", body, path)
+                    question = esc(surface_copy(PATH_SURFACES[path], "question"))
+                    self.assertIn(f'<p class="page-question">{question}</p>', body, path)
                     self.assertIn('name="viewport"', body, path)
                     self.assertNotIn('name="command" value="START"', body)
                 hypotheses = _get(app, "/research?kind=hypotheses")
@@ -208,7 +217,8 @@ class OwnerWorkbenchPredeployExperienceQaTests(unittest.TestCase):
                 for body in (hypotheses, experiments):
                     note = re.search(r'class="page-note">([^<]+)', body)
                     self.assertIsNotNone(note)
-                    self.assertIn("page-question", body)
+                    research_q = esc(surface_copy("RESEARCH", "question"))
+                    self.assertIn(f'<p class="page-question">{research_q}</p>', body)
                     self.assertNotIn("git_archaeology_required", note.group(1))
                 self.assertIn("гипотезы", hypotheses)
                 self.assertIn("эксперименты", experiments)
