@@ -214,6 +214,61 @@ def _next_action_html(action: str) -> str:
     return body
 
 
+def _attention_css(priority: str) -> str:
+    if priority == "P0":
+        return "attention attention-p0 attention-scan"
+    if priority == "P1":
+        return "attention attention-p1 attention-scan"
+    return "attention attention-scan"
+
+
+def _scan_priority(item: Mapping[str, Any]) -> str:
+    for key in ("priority", "IMPACT"):
+        value = str(item.get(key) or "")
+        if value in {"P0", "P1", "P2"}:
+            return value
+    return ""
+
+
+def _attention_scan_card(
+    *,
+    code: str,
+    priority: str,
+    why: Any,
+    impact_html: str,
+    evidence: Any,
+    next_html: str,
+    drill_html: str = "",
+    extra_rows: str = "",
+    summary_badge: str = "",
+    next_scan: str = "",
+) -> str:
+    why_text = esc(_cell(why))
+    heading = f"{esc(priority + ' ' if priority else '')}{canon(code)}"
+    if summary_badge:
+        heading = f"{esc(summary_badge)} {heading}"
+    summary = f"{heading}: {why_text}"
+    if next_scan:
+        summary += f" → {esc(next_scan)}"
+    return (
+        f'<details class="{_attention_css(priority)}">'
+        f"<summary>{summary}</summary>"
+        "<table>"
+        f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
+        f"<td>{why_text}</td></tr>"
+        f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
+        f"<td>{impact_html}</td></tr>"
+        f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
+        f"<td class=\"mono\">{esc(_cell(evidence))}</td></tr>"
+        f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
+        f"<td>{next_html}</td></tr>"
+        + extra_rows
+        + "</table>"
+        + drill_html
+        + "</details>"
+    )
+
+
 def _authority_html(flag: Any) -> str:
     required = flag is True or str(flag).lower() in {"true", "1"}
     if required:
@@ -241,20 +296,16 @@ def _attention(items: list[dict[str, Any]], *, empty: str) -> str:
     cards = []
     for item in items:
         code = str(item.get("id") or item.get("code") or "")
-        next_action = _next_action_html(_cell(item.get("NEXT_SAFE_ACTION")))
         cards.append(
-            "<article class=\"attention\">"
-            f"<h3>{canon(code)}</h3>"
-            "<table>"
-            f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
-            f"<td>{esc(_cell(item.get('WHY_NOW')))}</td></tr>"
-            f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
-            f"<td>{esc(_cell(item.get('IMPACT')))}</td></tr>"
-            f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
-            f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
-            f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
-            f"<td>{next_action}</td></tr>"
-            "</table></article>"
+            _attention_scan_card(
+                code=code,
+                priority=_scan_priority(item),
+                why=item.get("WHY_NOW"),
+                impact_html=esc(_cell(item.get("IMPACT"))),
+                evidence=item.get("EVIDENCE"),
+                next_html=_next_action_html(_cell(item.get("NEXT_SAFE_ACTION"))),
+                next_scan=_cell(item.get("NEXT_SAFE_ACTION")),
+            )
         )
     return "".join(cards)
 
@@ -265,35 +316,28 @@ def _daily_attention(items: list[dict[str, Any]], *, empty: str) -> str:
     cards = []
     for item in items:
         code = str(item.get("attention_code") or item.get("code") or item.get("id") or "")
-        priority = str(item.get("priority") or "")
+        new_badge = surface_copy("HOME", "new_since_review") if item.get("new_since_review") else ""
         new_mark = (
-            f"<p class=\"page-note\">{esc(surface_copy('HOME', 'new_since_review'))}</p>"
-            if item.get("new_since_review")
-            else ""
+            f"<p class=\"page-note\">{esc(new_badge)}</p>" if new_badge else ""
         )
         target = str(item.get("drilldown_target") or "")
         drill = (
-            f"<p><a href=\"{esc(target)}\">{esc(surface_copy('HOME', 'open_source'))}</a></p>"
+            f"<p><a href=\"{esc(target)}\">{esc(surface_copy('HOME', 'open_source'))} "
+            f"{canon(code)}</a></p>"
             if target
             else ""
         )
-        next_action = _next_action_html(_cell(item.get("NEXT_SAFE_ACTION")))
         cards.append(
-            "<article class=\"attention\">"
-            f"<h3>{esc(priority + ' ' if priority else '')}{canon(code)}</h3>"
-            + new_mark
-            + "<table>"
-            f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
-            f"<td>{esc(_cell(item.get('WHY_NOW')))}</td></tr>"
-            f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
-            f"<td>{esc(_cell(item.get('IMPACT')))}</td></tr>"
-            f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
-            f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
-            f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
-            f"<td>{next_action}</td></tr>"
-            "</table>"
-            + drill
-            + "</article>"
+            _attention_scan_card(
+                code=code,
+                priority=_scan_priority(item),
+                why=item.get("WHY_NOW"),
+                impact_html=esc(_cell(item.get("IMPACT"))),
+                evidence=item.get("EVIDENCE"),
+                next_html=_next_action_html(_cell(item.get("NEXT_SAFE_ACTION"))),
+                drill_html=new_mark + drill,
+                summary_badge=new_badge,
+            )
         )
     return "".join(cards)
 
@@ -307,13 +351,17 @@ def _coverage_table(rows: list[dict[str, Any]]) -> str:
         f"<td>{_token_or_unknown(row.get('CURRENT_STATE'))}</td>"
         f"<td>{_token_or_unknown(row.get('CHANGE_HISTORY'))}</td>"
         f"<td><a href=\"{esc(str(row.get('drilldown_target') or ''))}\">"
-        f"{esc(surface_copy('HOME', 'open_source'))}</a></td>"
+        f"{esc(surface_copy('HOME', 'open_source'))} "
+        f"{canon(row.get('source_domain'))}</a></td>"
         "</tr>"
         for row in rows
     )
     return (
-        "<table><thead><tr><th>source</th><th>CURRENT_STATE</th>"
-        "<th>CHANGE_HISTORY</th><th></th></tr></thead><tbody>"
+        "<table><thead><tr>"
+        f"<th>{esc(surface_copy('HOME', 'coverage_source'))}</th>"
+        f"<th>{esc(surface_copy('HOME', 'coverage_state'))}</th>"
+        f"<th>{esc(surface_copy('HOME', 'coverage_history'))}</th>"
+        "<th></th></tr></thead><tbody>"
         + body
         + "</tbody></table>"
     )
@@ -537,9 +585,9 @@ def _operations_section(model: dict[str, Any]) -> str:
             (surface_copy("OPERATIONS", "entries_paused"), paused_html),
             (surface_copy("OPERATIONS", "exit_required"), cell_html(ops.get("exit_required") if present else None)),
             (surface_copy("OPERATIONS", "unresolved"), cell_html(ops.get("unresolved_positions") if present else None)),
-            ("unknown_positions", cell_html(ops.get("unknown_positions") if present else None)),
-            ("pnl_unknown", cell_html(ops.get("pnl_unknown_count") if present else None)),
-            ("mode", now_mode),
+            (surface_copy("OPERATIONS", "unknown_positions"), cell_html(ops.get("unknown_positions") if present else None)),
+            (surface_copy("OPERATIONS", "pnl_unknown"), cell_html(ops.get("pnl_unknown_count") if present else None)),
+            (surface_copy("OPERATIONS", "mode"), now_mode),
         ]
     )
     source_banner = ""
@@ -700,6 +748,23 @@ def _eco_money(value: Any) -> str:
     return esc(value)
 
 
+def _eco_money_and_status(usd: Any, status: Any) -> str:
+    if usd is None or usd == "":
+        return status_html(status or "UNKNOWN")
+    shown = esc(usd)
+    if status:
+        shown += " " + canon(status)
+    return shown
+
+
+def _count_and_status(count: Any, status: Any) -> str:
+    if count is None:
+        return status_html(status or "UNKNOWN")
+    if status:
+        return f"{cell_html(count)} {canon(status)}"
+    return cell_html(count)
+
+
 def _scope_card(scope: Mapping[str, Any], *, mark: bool = False) -> str:
     evidence = scope.get("mark_evidence_class" if mark else "pnl_evidence_class")
     net_key = (
@@ -764,11 +829,11 @@ def _scope_card(scope: Mapping[str, Any], *, mark: bool = False) -> str:
             ),
             (
                 surface_copy("ECONOMICS", "drawdown"),
-                _eco_money(drawdown.get("usd")) + " " + canon(drawdown.get("status")),
+                _eco_money_and_status(drawdown.get("usd"), drawdown.get("status")),
             ),
             (
                 surface_copy("ECONOMICS", "streak"),
-                f"{cell_html(streak.get('count'))} " + canon(streak.get("status")),
+                _count_and_status(streak.get("count"), streak.get("status")),
             ),
         ]
     )
@@ -1130,7 +1195,6 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         + "".join(
             _counter_cell(counter_label(label), counters.get(label))
             for label in (
-                "ACTIVE NOW",
                 "TRIALS",
                 "DECISIONS",
                 "NEGATIVES",
@@ -1138,8 +1202,6 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
                 "READY TO STRATEGY",
                 "HANDOFF BLOCKED",
                 "STRATEGY MATERIALIZED",
-                "ATTENTION",
-                "GAPS",
             )
         )
         + "</div>"
@@ -1618,9 +1680,6 @@ def _home_section(
         else ""
     )
     legend = (
-        "<p class=\"canon\">"
-        f"{canon('WHY_NOW')} {canon('IMPACT')} {canon('EVIDENCE')} "
-        f"{canon('NEXT_SAFE_ACTION')}</p>"
         f"<p>{esc(attention_label('WHY_NOW'))} · "
         f"{esc(attention_label('IMPACT'))} · "
         f"{esc(attention_label('EVIDENCE'))} · "
@@ -1703,21 +1762,21 @@ def _system_section(system: dict[str, Any]) -> str:
             continue
         code = str(item.get("attention_code") or item.get("WHAT") or "")
         cards.append(
-            "<article class=\"attention\">"
-            f"<h3>{canon(code)}</h3><table>"
-            f"<tr><th>WHAT</th><td>{canon(str(item.get('WHAT') or code))}</td></tr>"
-            f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
-            f"<td>{esc(_cell(item.get('WHY_NOW')))}</td></tr>"
-            f"<tr><th>{esc(attention_label('IMPACT'))} {canon('IMPACT')}</th>"
-            f"<td>{status_html(item.get('IMPACT'))}</td></tr>"
-            f"<tr><th>{esc(attention_label('EVIDENCE'))} {canon('EVIDENCE')}</th>"
-            f"<td class=\"mono\">{esc(_cell(item.get('EVIDENCE')))}</td></tr>"
-            f"<tr><th>CURRENT_SAFE_STATE</th><td>{status_html(item.get('CURRENT_SAFE_STATE'))}</td></tr>"
-            f"<tr><th>{esc(attention_label('NEXT_SAFE_ACTION'))} {canon('NEXT_SAFE_ACTION')}</th>"
-            f"<td>{_next_action_html(_cell(item.get('NEXT_SAFE_ACTION')))}</td></tr>"
-            f"<tr><th>RECOVERY_ROUTE</th><td class=\"mono\">{esc(_cell(item.get('RECOVERY_ROUTE')))}</td></tr>"
-            f"<tr><th>AUTHORITY_REQUIRED</th><td>{_authority_html(item.get('AUTHORITY_REQUIRED'))}</td></tr>"
-            "</table></article>"
+            _attention_scan_card(
+                code=code,
+                priority=_scan_priority(item),
+                why=item.get("WHY_NOW"),
+                impact_html=status_html(item.get("IMPACT")),
+                evidence=item.get("EVIDENCE"),
+                next_html=_next_action_html(_cell(item.get("NEXT_SAFE_ACTION"))),
+                next_scan=_cell(item.get("NEXT_SAFE_ACTION")),
+                extra_rows=(
+                    f"<tr><th>WHAT</th><td>{canon(str(item.get('WHAT') or code))}</td></tr>"
+                    f"<tr><th>CURRENT_SAFE_STATE</th><td>{status_html(item.get('CURRENT_SAFE_STATE'))}</td></tr>"
+                    f"<tr><th>RECOVERY_ROUTE</th><td class=\"mono\">{esc(_cell(item.get('RECOVERY_ROUTE')))}</td></tr>"
+                    f"<tr><th>AUTHORITY_REQUIRED</th><td>{_authority_html(item.get('AUTHORITY_REQUIRED'))}</td></tr>"
+                ),
+            )
         )
     if cards:
         attention_html = "".join(cards)
@@ -1999,8 +2058,33 @@ def _market_section(model: dict[str, Any]) -> str:
             and "MEMBER_EVIDENCE_INCOMPLETE" not in market_gaps
             else ""
         )
-        + f"<h3>{esc(surface_copy('MARKET', 'default_detail'))}</h3>"
-        + default_html
+        + (
+            f"<p class=\"semantic-unknown\">{esc(surface_copy('MARKET', 'no_current_detail'))}</p>"
+            if source != "PRESENT"
+            else (
+                f"<h3>{esc(surface_copy('MARKET', 'default_detail'))}</h3>"
+                + default_html
+                + f"<h2>{esc(surface_copy('MARKET', 'matrix'))}</h2>"
+                + "<table><thead><tr><th></th>"
+                + header
+                + "</tr></thead><tbody>"
+                + rows_html
+                + "</tbody></table>"
+                + f"<h2>{esc(surface_copy('MARKET', 'coverage'))}</h2>"
+                + "<table><thead><tr>"
+                f"<th>{esc(surface_copy('MARKET', 'coverage_point'))}</th>"
+                f"<th>{esc(surface_copy('MARKET', 'coverage_axis'))}</th>"
+                f"<th>{esc(surface_copy('MARKET', 'n_scope'))}</th>"
+                f"<th>{esc(surface_copy('MARKET', 'n_obs'))}</th>"
+                f"<th>{esc(surface_copy('MARKET', 'n_metric'))}</th>"
+                f"<th>{esc(surface_copy('MARKET', 'coverage_missing'))}</th>"
+                f"<th>{esc(surface_copy('MARKET', 'coverage_fraction'))}</th>"
+                f"<th>{esc(surface_copy('MARKET', 'coverage_classes'))}</th>"
+                "</tr></thead><tbody>"
+                + coverage_rows
+                + "</tbody></table>"
+            )
+        )
         + f"<h2>{esc(surface_copy('MARKET', 'interpretation'))}</h2>"
         + fact_strip(
             [
@@ -2012,25 +2096,6 @@ def _market_section(model: dict[str, Any]) -> str:
         )
         + f"<h2>{esc(surface_copy('MARKET', 'non_claims'))}</h2>"
         + f"<p class=\"non-claims\">{esc('; '.join(nonclaim_label(str(item)) for item in non_claims))}</p>"
-        + f"<h2>{esc(surface_copy('MARKET', 'matrix'))}</h2>"
-        + "<table><thead><tr><th></th>"
-        + header
-        + "</tr></thead><tbody>"
-        + rows_html
-        + "</tbody></table>"
-        + f"<h2>{esc(surface_copy('MARKET', 'coverage'))}</h2>"
-        + "<table><thead><tr>"
-        f"<th>{esc(surface_copy('MARKET', 'coverage_point'))}</th>"
-        f"<th>{esc(surface_copy('MARKET', 'coverage_axis'))}</th>"
-        f"<th>{esc(surface_copy('MARKET', 'n_scope'))}</th>"
-        f"<th>{esc(surface_copy('MARKET', 'n_obs'))}</th>"
-        f"<th>{esc(surface_copy('MARKET', 'n_metric'))}</th>"
-        f"<th>{esc(surface_copy('MARKET', 'coverage_missing'))}</th>"
-        f"<th>{esc(surface_copy('MARKET', 'coverage_fraction'))}</th>"
-        f"<th>{esc(surface_copy('MARKET', 'coverage_classes'))}</th>"
-        "</tr></thead><tbody>"
-        + coverage_rows
-        + "</tbody></table>"
         + f"<p>{esc(surface_copy('MARKET', 'freshness'))} "
         f'<a href="/system">{esc(surface_copy("MARKET", "system_link"))}</a></p>'
         + f"<p><a href=\"/research\">{esc(surface_copy('MARKET', 'research_link'))}</a> · "
@@ -2087,11 +2152,12 @@ def _page(
     }
     consumed = "true" if visual_consumed else "false"
     layout_css = visual_os_layout_css()
-    note = (
-        f"{shell_copy('note')} git_archaeology_required={archaeology}."
+    note = shell_copy("note")
+    machine = (
+        f'<p class="page-machine canon">git_archaeology_required={archaeology}</p>'
     )
     body = f"""<!doctype html>
-<html lang="ru" data-appearance="DARK_ONLY" data-identity="STEEL_SIGNAL"><head><meta charset="utf-8"><title>{html.escape(surface_copy(surface, 'h1'))}</title>
+<html lang="ru" data-appearance="DARK_ONLY" data-identity="STEEL_SIGNAL"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{html.escape(surface_copy(surface, 'h1'))}</title>
 <style>
 {visual_css}
 {layout_css}
@@ -2102,6 +2168,7 @@ def _page(
 {page_head(surface, note=note)}
 {notice_html}
 {sections.get(surface) or ""}
+{machine}
 </main></div>
 <script>
 document.querySelectorAll(".copy-btn").forEach(function (button) {{

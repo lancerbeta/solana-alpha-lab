@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "OWNER-WORKBENCH-PREDEPLOY-EXPERIENCE-QA-COMPLETION-001",
+  "as_of": "2026-09-08",
+  "task_id": "OWNER_WORKBENCH_PREDEPLOY_EXPERIENCE_QA_V1",
+  "state_change": "OWNER_WORKBENCH_PREDEPLOY_EXPERIENCE_QA_PASS",
+  "base_main": "52808d613d02f8e96a85aea2668e98d80aec0d51",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "517e44ed41e555efb67756c5dd25513ddba5980d92c89fc3089ef910f61d3a1b",
+    "docs/evidence/owner_workbench_predeploy_experience_qa/a1_before_after_inventory_v1.json": "d1ab2aef32a0f47b37b2781a6425dbf86e6de6c72be1bddafb8ce80e3c9d51ed",
+    "docs/evidence/owner_workbench_predeploy_experience_qa/a1_severity_ranked_backlog_v1.json": "1efb152bc571ca925d1b1bbf812b61d82b2a5cf33a9327dc68c4c9e2072850b4",
+    "docs/reports/owner_workbench_predeploy_experience_qa/a1_owner_readout_v1.md": "bb24b15e6a56fa07c7057987e73d6abb37a2824a870f295bf14031c9674d3bba",
+    "docs/tasks/OWNER_WORKBENCH_PREDEPLOY_EXPERIENCE_QA_V1.md": "61ebcf61361858cfd441cc8ac8609c5f402352554aaf1ab75bf993a617f04d5c",
+    "src/solana_alpha_lab/factory/owner_language.py": "839c27a37a2eb34375327732044bb06a90ee3283fb1f849dfef80e208005644b",
+    "src/solana_alpha_lab/factory/visual_os.py": "6920d81da98c13a51a440f6352ba35e979759ce9d75cbd7cf95b5a578ec62993",
+    "src/solana_alpha_lab/factory/workbench.py": "23394a0644661e5d28e3d999b160e478d61f90eca8646e3542d23cb394d8c92d",
+    "tests/test_factory_ordinary_market_hypothesis.py": "518d820be3c5b4015483198e6b36a3477f5436deec9105cd537861eca30c547d",
+    "tests/test_market_data_awareness_v1.py": "cd9be24b2d77fed857420e8e103e61fd1c3dc00e56d740b9ff73d8bf03a606e1",
+    "tests/test_owner_workbench_predeploy_experience_qa_v1.py": "f49948e25caf0258c2fcb0e1fd73f249f3dbbfab4e601026d46e4595e28a1dd9"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/owner_workbench_predeploy_experience_qa/a1_delivery_factory_fit_v1.json",
+    "sha256": "48fc85a344d4e0d3b3396f4594d4a2872ce4da5e0148db5c57a1b105031897ff",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_OWNER_WORKBENCH_PREDEPLOY_EXPERIENCE_QA_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/owner_workbench_predeploy_experience_qa/a1_delivery_independent_review_v1.json",
+      "sha256": "261200972fee7d934c6eea3b49cdaa98ecfa60502ae23f256d685a64f2ff82e0",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FOCUSED_QA_SUITE",
+      "PASS_VERTICAL_UX_FOUNDATION",
+      "PASS_ORDINARY_HYPOTHESIS_CONSUMER"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_NETRETURN",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "new_db": 0
+  }
+}

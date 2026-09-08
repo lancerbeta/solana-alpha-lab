@@ -1,0 +1,159 @@
+{
+  "schema": "smial.owner-workbench-predeploy-experience-qa-backlog",
+  "schema_version": "1.0",
+  "backlog_id": "OWNER-WORKBENCH-PREDEPLOY-EXPERIENCE-QA-BACKLOG-001",
+  "as_of": "2026-09-08",
+  "task_id": "OWNER_WORKBENCH_PREDEPLOY_EXPERIENCE_QA_V1",
+  "review_baseline_sha": "52808d613d02f8e96a85aea2668e98d80aec0d51",
+  "name_semantics": "HISTORICAL_ATOM_ID_NOT_PREDEPLOY_GATE",
+  "write_set": "PRESENTATION_ONLY",
+  "batch": "ONE_COORDINATED_REPAIR",
+  "items": [
+    {
+      "id": "H1",
+      "severity": "HIGH",
+      "surfaces": ["HOME", "OPERATIONS", "SYSTEM"],
+      "finding": "Attention cards were full tables; owner could not scan what needs them in ~10s.",
+      "repair": "details.attention-scan with summary = priority + code + WHY_NOW; P0/P1 border classes.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "H5",
+      "severity": "HIGH",
+      "surfaces": ["HOME"],
+      "finding": "new_since_review lived only inside closed details, so scan could miss НОВОЕ С ПРОСМОТРА.",
+      "repair": "summary_badge on the closed summary line; expanded card still repeats the note.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "H6",
+      "severity": "HIGH",
+      "surfaces": ["SYSTEM"],
+      "finding": "SYSTEM cards hardcoded priority empty; domain stores P0/P1 in IMPACT, not priority.",
+      "repair": "_scan_priority uses priority or IMPACT when the value is exactly P0|P1|P2. Prose IMPACT is not invented as a rank.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "H2",
+      "severity": "HIGH",
+      "surfaces": ["HOME", "RESEARCH", "MARKET", "OPERATIONS", "ECONOMICS", "SYSTEM"],
+      "finding": "git_archaeology_required leaked into the page-note under the page question.",
+      "repair": "page-note is shell_copy only; machine token lives in p.page-machine.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "H3",
+      "severity": "HIGH",
+      "surfaces": ["ECONOMICS"],
+      "finding": "Drawdown/streak rendered UNKNOWN UNKNOWN via dual plus extra canon(status).",
+      "repair": "_eco_money_and_status / _count_and_status emit one UNKNOWN.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "H4",
+      "severity": "HIGH",
+      "surfaces": ["RESEARCH"],
+      "finding": "ATTENTION / GAPS / ACTIVE NOW duplicated in fact-strip and counter grid.",
+      "repair": "Counter grid keeps remaining seven cells; the three stay in the fact-strip.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M1",
+      "severity": "MEDIUM",
+      "surfaces": ["HOME"],
+      "finding": "Coverage table headers were English source / CURRENT_STATE / CHANGE_HISTORY.",
+      "repair": "Russian headers; canonical cell values unchanged.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M2",
+      "severity": "MEDIUM",
+      "surfaces": ["RESEARCH"],
+      "finding": "Table columns evidence_class and as_of were English labels.",
+      "repair": "research_copy col_evidence_class / col_as_of.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M3",
+      "severity": "MEDIUM",
+      "surfaces": ["OPERATIONS"],
+      "finding": "Summary used raw keys unknown_positions, pnl_unknown, mode.",
+      "repair": "Russian surface_copy labels; values still canonical.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M4",
+      "severity": "MEDIUM",
+      "surfaces": ["ECONOMICS"],
+      "finding": "Section H2s were English (Reconciled economics and peers).",
+      "repair": "Russian H2s via surface_copy.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M5",
+      "severity": "MEDIUM",
+      "surfaces": ["HOME"],
+      "finding": "Identical Открыть источник links with no attention/source code.",
+      "repair": "Drill links include canon(code) or source_domain.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M6",
+      "severity": "MEDIUM",
+      "surfaces": ["MARKET"],
+      "finding": "SOURCE_NOT_PRESENT still showed a 5-axis UNKNOWN wall plus empty matrix/coverage.",
+      "repair": "Absent source shows no_current_detail (LOW не выдуман); skip detail/matrix/coverage.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M7",
+      "severity": "MEDIUM",
+      "surfaces": ["HOME", "OPERATIONS", "SYSTEM"],
+      "finding": "P0/P1 had no semantic border color; SYSTEM/ops cards did not pass scan priority.",
+      "repair": ".attention-p0 / .attention-p1 via _scan_priority; OPERATIONS next_scan on summary.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "M8",
+      "severity": "MEDIUM",
+      "surfaces": ["HOME", "RESEARCH", "MARKET", "OPERATIONS", "ECONOMICS", "SYSTEM"],
+      "finding": "Wide tables overflowed; light scrollbar on dark UI.",
+      "repair": "main overflow-x auto; color-scheme dark; scrollbar-color.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "D1",
+      "severity": "HIGH",
+      "surfaces": ["HOME"],
+      "finding": "HOME GET TTFB ~13-25s on live.",
+      "repair": null,
+      "status": "OUT_OF_BATCH",
+      "reason": "Latency is application/runtime, not the presentation write set."
+    },
+    {
+      "id": "D2",
+      "severity": "MEDIUM",
+      "surfaces": ["SYSTEM"],
+      "finding": "Collector residuals and heartbeat disabled remain visible as machine truth.",
+      "repair": null,
+      "status": "OUT_OF_BATCH",
+      "reason": "Domain/runtime, not presentation. No VPS mutation in this atom."
+    },
+    {
+      "id": "D3",
+      "severity": "LOW",
+      "surfaces": ["OPERATIONS", "ECONOMICS", "HOME"],
+      "finding": "Some technical/machine table headers remain English (position_id, command, Mode).",
+      "repair": null,
+      "status": "DEFERRED",
+      "reason": "Machine identity headers; not needed to scan the page question in ~10s."
+    }
+  ],
+  "non_goals_respected": [
+    "NO_COMMAND_POST_VALUE_CHANGE",
+    "UNKNOWN_NOT_SHOWN_AS_ZERO_OR_HEALTHY",
+    "NO_NEW_FRONTEND_FRAMEWORK",
+    "NO_VPS_OR_DEPLOY_MUTATION",
+    "NO_DOMAIN_OR_AUTHORITY_CHANGE"
+  ]
+}
