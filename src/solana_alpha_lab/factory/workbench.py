@@ -222,6 +222,14 @@ def _attention_css(priority: str) -> str:
     return "attention attention-scan"
 
 
+def _scan_priority(item: Mapping[str, Any]) -> str:
+    for key in ("priority", "IMPACT"):
+        value = str(item.get(key) or "")
+        if value in {"P0", "P1", "P2"}:
+            return value
+    return ""
+
+
 def _attention_scan_card(
     *,
     code: str,
@@ -232,12 +240,19 @@ def _attention_scan_card(
     next_html: str,
     drill_html: str = "",
     extra_rows: str = "",
+    summary_badge: str = "",
+    next_scan: str = "",
 ) -> str:
     why_text = esc(_cell(why))
     heading = f"{esc(priority + ' ' if priority else '')}{canon(code)}"
+    if summary_badge:
+        heading = f"{esc(summary_badge)} {heading}"
+    summary = f"{heading}: {why_text}"
+    if next_scan:
+        summary += f" → {esc(next_scan)}"
     return (
         f'<details class="{_attention_css(priority)}">'
-        f"<summary>{heading}: {why_text}</summary>"
+        f"<summary>{summary}</summary>"
         "<table>"
         f"<tr><th>{esc(attention_label('WHY_NOW'))} {canon('WHY_NOW')}</th>"
         f"<td>{why_text}</td></tr>"
@@ -284,11 +299,12 @@ def _attention(items: list[dict[str, Any]], *, empty: str) -> str:
         cards.append(
             _attention_scan_card(
                 code=code,
-                priority=str(item.get("priority") or ""),
+                priority=_scan_priority(item),
                 why=item.get("WHY_NOW"),
                 impact_html=esc(_cell(item.get("IMPACT"))),
                 evidence=item.get("EVIDENCE"),
                 next_html=_next_action_html(_cell(item.get("NEXT_SAFE_ACTION"))),
+                next_scan=_cell(item.get("NEXT_SAFE_ACTION")),
             )
         )
     return "".join(cards)
@@ -300,11 +316,9 @@ def _daily_attention(items: list[dict[str, Any]], *, empty: str) -> str:
     cards = []
     for item in items:
         code = str(item.get("attention_code") or item.get("code") or item.get("id") or "")
-        priority = str(item.get("priority") or "")
+        new_badge = surface_copy("HOME", "new_since_review") if item.get("new_since_review") else ""
         new_mark = (
-            f"<p class=\"page-note\">{esc(surface_copy('HOME', 'new_since_review'))}</p>"
-            if item.get("new_since_review")
-            else ""
+            f"<p class=\"page-note\">{esc(new_badge)}</p>" if new_badge else ""
         )
         target = str(item.get("drilldown_target") or "")
         drill = (
@@ -316,12 +330,13 @@ def _daily_attention(items: list[dict[str, Any]], *, empty: str) -> str:
         cards.append(
             _attention_scan_card(
                 code=code,
-                priority=priority,
+                priority=_scan_priority(item),
                 why=item.get("WHY_NOW"),
                 impact_html=esc(_cell(item.get("IMPACT"))),
                 evidence=item.get("EVIDENCE"),
                 next_html=_next_action_html(_cell(item.get("NEXT_SAFE_ACTION"))),
                 drill_html=new_mark + drill,
+                summary_badge=new_badge,
             )
         )
     return "".join(cards)
@@ -1749,11 +1764,12 @@ def _system_section(system: dict[str, Any]) -> str:
         cards.append(
             _attention_scan_card(
                 code=code,
-                priority="",
+                priority=_scan_priority(item),
                 why=item.get("WHY_NOW"),
                 impact_html=status_html(item.get("IMPACT")),
                 evidence=item.get("EVIDENCE"),
                 next_html=_next_action_html(_cell(item.get("NEXT_SAFE_ACTION"))),
+                next_scan=_cell(item.get("NEXT_SAFE_ACTION")),
                 extra_rows=(
                     f"<tr><th>WHAT</th><td>{canon(str(item.get('WHAT') or code))}</td></tr>"
                     f"<tr><th>CURRENT_SAFE_STATE</th><td>{status_html(item.get('CURRENT_SAFE_STATE'))}</td></tr>"

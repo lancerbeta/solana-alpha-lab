@@ -18,6 +18,22 @@
       "status": "REPAIRED"
     },
     {
+      "id": "H5",
+      "severity": "HIGH",
+      "surfaces": ["HOME"],
+      "finding": "new_since_review lived only inside closed details, so scan could miss НОВОЕ С ПРОСМОТРА.",
+      "repair": "summary_badge on the closed summary line; expanded card still repeats the note.",
+      "status": "REPAIRED"
+    },
+    {
+      "id": "H6",
+      "severity": "HIGH",
+      "surfaces": ["SYSTEM"],
+      "finding": "SYSTEM cards hardcoded priority empty; domain stores P0/P1 in IMPACT, not priority.",
+      "repair": "_scan_priority uses priority or IMPACT when the value is exactly P0|P1|P2. Prose IMPACT is not invented as a rank.",
+      "status": "REPAIRED"
+    },
+    {
       "id": "H2",
       "severity": "HIGH",
       "surfaces": ["HOME", "RESEARCH", "MARKET", "OPERATIONS", "ECONOMICS", "SYSTEM"],
@@ -86,15 +102,15 @@
       "severity": "MEDIUM",
       "surfaces": ["MARKET"],
       "finding": "SOURCE_NOT_PRESENT still showed a 5-axis UNKNOWN wall plus empty matrix/coverage.",
-      "repair": "Absent source shows no_current_detail; skip detail/matrix/coverage.",
+      "repair": "Absent source shows no_current_detail (LOW не выдуман); skip detail/matrix/coverage.",
       "status": "REPAIRED"
     },
     {
       "id": "M7",
       "severity": "MEDIUM",
-      "surfaces": ["HOME", "OPERATIONS"],
-      "finding": "P0/P1 had no semantic border color.",
-      "repair": ".attention-p0 / .attention-p1.",
+      "surfaces": ["HOME", "OPERATIONS", "SYSTEM"],
+      "finding": "P0/P1 had no semantic border color; SYSTEM/ops cards did not pass scan priority.",
+      "repair": ".attention-p0 / .attention-p1 via _scan_priority; OPERATIONS next_scan on summary.",
       "status": "REPAIRED"
     },
     {

@@ -15,6 +15,8 @@ name, not a predeploy gate. This PR does not deploy.
 One presentation-only repair batch after a browser-first review:
 
 - attention is scan-first: `details.attention-scan` with P0/P1 borders
+- `НОВОЕ С ПРОСМОТРА` is on the closed summary line, not only inside the card
+- SYSTEM P0/P1 chrome comes from exact `IMPACT` tokens `P0|P1|P2`; prose IMPACT is not invented as a rank
 - `git_archaeology_required=` left the page-note and sits in `.page-machine`
 - ECONOMICS drawdown/streak no longer render `UNKNOWN UNKNOWN`
 - RESEARCH no longer repeats ATTENTION / GAPS / ACTIVE NOW in the counter grid
