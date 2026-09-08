@@ -47,6 +47,16 @@ DISK_CRITICAL_PCT = 85  # hard safety reference; matches remote-ops max
 
 STORAGE_HISTORY_RELATIVE = "local/factory_v1/collector_storage_history.jsonl"
 
+PUBLICATION_EXPECTED = "PUBLICATION_EXPECTED"
+PUBLICATION_NOT_EXPECTED = "PUBLICATION_NOT_EXPECTED"
+PUBLICATION_EXPECTATION_UNKNOWN = "PUBLICATION_EXPECTATION_UNKNOWN"
+_PUBLICATION_EXPECTATION_COUNT_FIELDS = (
+    "due_now_count",
+    "claimed_count",
+    "actually_overdue_count",
+    "in_flight_count",
+)
+
 HEALTH_CLASSES = (
     "PROCESS_OK",
     "DATA_STALE",
@@ -79,6 +89,49 @@ def _safe_parse(raw: object) -> datetime | None:
         return parse_utc(raw)
     except Exception:
         return None
+
+
+def _non_negative_int(value: object) -> int | None:
+    """Canonical count evidence. Absence/bool/negative/non-int is not zero."""
+
+    if isinstance(value, bool) or not isinstance(value, int):
+        return None
+    if value < 0:
+        return None
+    return value
+
+
+def classify_publication_expectation(packet: Mapping[str, Any]) -> str:
+    """Tri-state current publication obligation from existing packet truth."""
+
+    due_pressure = packet.get("due_pressure")
+    if not isinstance(due_pressure, Mapping):
+        return PUBLICATION_EXPECTATION_UNKNOWN
+    obligation = 0
+    for field in _PUBLICATION_EXPECTATION_COUNT_FIELDS:
+        if field not in due_pressure:
+            return PUBLICATION_EXPECTATION_UNKNOWN
+        parsed = _non_negative_int(due_pressure[field])
+        if parsed is None:
+            return PUBLICATION_EXPECTATION_UNKNOWN
+        obligation += parsed
+    jobs = _non_negative_int(packet.get("publication_jobs_open_count"))
+    if jobs is None:
+        return PUBLICATION_EXPECTATION_UNKNOWN
+    if obligation > 0 or jobs > 0:
+        return PUBLICATION_EXPECTED
+    return PUBLICATION_NOT_EXPECTED
+
+
+def _publication_freshness_stale(packet: Mapping[str, Any], *, activation_state: str) -> bool:
+    """Existing 6h / missing-marker freshness bound. Timestamp source unchanged."""
+
+    publish_at = packet.get("observation_rdp_last_publish_at")
+    if publish_at in (None, UNKNOWN):
+        return activation_state == "ACTIVE"
+    pub = _safe_parse(publish_at)
+    now = _safe_parse(str(packet.get("observed_at") or "")) or datetime.now(UTC)
+    return pub is not None and (now - pub).total_seconds() > 6 * 3600
 
 
 def _tree_bytes(path: Path) -> int | None:
@@ -443,15 +496,12 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
     if int(packet.get("blocked_budget") or 0) > 0:
         flags.append("BUDGET_BLOCKED")
 
-    publish_at = packet.get("observation_rdp_last_publish_at")
-    if publish_at in (None, UNKNOWN):
-        if activation_state == "ACTIVE":
-            flags.append("RDP_PUBLICATION_STALE")
-    else:
-        pub = _safe_parse(publish_at)
-        now = _safe_parse(str(packet.get("observed_at") or "")) or datetime.now(UTC)
-        if pub is not None and (now - pub).total_seconds() > 6 * 3600:
-            flags.append("RDP_PUBLICATION_STALE")
+    expectation = classify_publication_expectation(packet)
+    freshness_stale = _publication_freshness_stale(
+        packet, activation_state=activation_state
+    )
+    if freshness_stale and expectation != PUBLICATION_NOT_EXPECTED:
+        flags.append("RDP_PUBLICATION_STALE")
 
     backup_domain = packet.get("backup_domain")
     backup_age = packet.get("backup_age_seconds")
@@ -938,8 +988,12 @@ __all__ = [
     "NOT_APPLICABLE",
     "STORAGE_HISTORY_RELATIVE",
     "UNKNOWN",
+    "PUBLICATION_EXPECTED",
+    "PUBLICATION_EXPECTATION_UNKNOWN",
+    "PUBLICATION_NOT_EXPECTED",
     "append_storage_history",
     "build_collector_operational_packet",
+    "classify_publication_expectation",
     "collector_verdict",
     "compose_health_classes",
 ]
