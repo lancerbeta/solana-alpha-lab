@@ -36258,7 +36258,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_market_data_awareness_v1.py', repository_path: tests/test_market_data_awareness_v1.py}
-  integrity: {kind: sha256, sha256: 0f883c62fe47cf46d40161bdbceef99ff64b43ef0f9369c9a10363816cd31460}
+  integrity: {kind: sha256, sha256: cd9be24b2d77fed857420e8e103e61fd1c3dc00e56d740b9ff73d8bf03a606e1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}

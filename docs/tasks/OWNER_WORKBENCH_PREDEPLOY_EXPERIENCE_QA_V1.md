@@ -28,6 +28,7 @@ managed_write_set:
   - tests/test_owner_workbench_predeploy_experience_qa_v1.py
   - tests/test_owner_workbench_vertical_ux_foundation_v1.py
   - tests/test_factory_ordinary_market_hypothesis.py
+  - tests/test_market_data_awareness_v1.py
   - tests/test_factory_semantic_operability.py
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml
   - configs/factory_semantic_operability_v1.yaml
