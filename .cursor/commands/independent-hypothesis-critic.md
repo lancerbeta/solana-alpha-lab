@@ -28,9 +28,11 @@ return a critic result and do not walk ResearchStore. Output
 `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY`.
 Historical `1.0` / `1.1` / `1.2` packets remain readable without `prior_memory`.
 Do not reconstruct or fabricate `prior_memory` for historical `1.2`.
+If a historical `1.2` packet already contains `prior_memory`, use those capsules;
+that is packet content, not reconstruction.
 
-For `packet_version=1.3`, packet `prior_memory` is the sole research-memory
-input. Do not open ResearchStore or active RDP for prior recall.
+When `prior_memory` is present, it is the sole research-memory input. Do not
+open ResearchStore or active RDP for prior recall.
 
 If `finalize` reports `CRITIC_SESSION_MISMATCH`: copy packet `session_id` into
 the result and retry once. Do not invent a session id.

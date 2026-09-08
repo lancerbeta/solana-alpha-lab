@@ -715,7 +715,8 @@ decision after collection
   `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY`.
   Historical `packet_version=1.0` / `1.1` / `1.2` остаются читаемыми без
   `prior_memory`. Не реконструируй и не фабрикуй `prior_memory` для
-  historical `1.2`.
+  historical `1.2`. Если historical `1.2` уже содержит `prior_memory`, сравни
+  с этими capsules: это содержимое packet, не реконструкция.
   Если позже `finalize` вернул `CRITIC_SESSION_MISMATCH` — скопируй
   `session_id` из packet и повтори один раз; не изобретай id.
 
@@ -728,7 +729,8 @@ decision after collection
 3. Проверь, что Forge не использовал stale export как текущую authority.
 4. Проверь, что названные data доступны на заявленном PIT cutoff и fingerprint-bound.
 5. Проверь, что untouched/forward outcomes не открывались.
-6. Ближайший prior work: для `packet_version=1.3` сравни selected candidate с
+6. Ближайший prior work: для `packet_version=1.3`, и для historical `1.2` если
+   `prior_memory` уже есть в packet, сравни selected candidate с
    `prior_memory.capsules` (см. B3 Novelty / memory). Historical `1.0` / `1.1` /
    `1.2` packets без `prior_memory` остаются на существующей compatibility:
    novelty ограничен полями packet и cited receipts, без store walk и без
@@ -761,7 +763,8 @@ decision after collection
 
 ### 1. Novelty / memory
 
-- Для `packet_version=1.3` единственный research-memory вход — `prior_memory.capsules`
+- Для `packet_version=1.3`, и для historical `1.2` если `prior_memory` уже
+  присутствует, единственный research-memory вход — `prior_memory.capsules`
   внутри `CRITIC_INPUT_PACKET`. Не открывай ResearchStore / active RDP и не
   используй Forge scratchpad ради prior recall.
 - Сравни selected candidate с каждой capsule по mechanism/state, actor/counterparty,
