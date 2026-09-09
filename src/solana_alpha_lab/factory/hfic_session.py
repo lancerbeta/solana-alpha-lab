@@ -2854,8 +2854,11 @@ def persist_intermediate_cycle(
         return existing
     git = repository_git_snapshot(Path(repo_root))
     stage_time = _stage_datetime(clock)
+    cycle_seq = _next_cycle_seq(existing)
     phase_token = "REV" if phase == "REVISION_REQUIRED" else "CLS"
-    transaction_id = f"RESEARCH-TXN-HFICINT-{phase_token}-{session_id[-12:]}"
+    transaction_id = (
+        f"RESEARCH-TXN-HFICINT-{phase_token}-{session_id[-12:]}-{cycle_seq:04d}"
+    )
     event = _make_event_factory(
         repo_root,
         git,
@@ -2867,7 +2870,7 @@ def persist_intermediate_cycle(
     critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
     prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
     intermediate_cycle = {
-                "research_cycle_id": f"{session_id}-{phase}",
+                "research_cycle_id": f"{session_id}-{phase}-{cycle_seq}",
                 "session_id": session_id,
                 "phase": phase,
                 "hfic_protocol": prompt_version,
@@ -2889,7 +2892,7 @@ def persist_intermediate_cycle(
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
                 "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
-                "hfic_cycle_seq": _next_cycle_seq(existing),
+                "hfic_cycle_seq": cycle_seq,
             }
     source = existing if existing is not None else frozen
     _attach_runner_up_fields(intermediate_cycle, source)
@@ -2902,7 +2905,7 @@ def persist_intermediate_cycle(
         ]
     records = [
         event(
-            record_id=f"HFIC-CYCLE-{session_id}-{phase}",
+            record_id=f"HFIC-CYCLE-{session_id}-{phase}-{cycle_seq}",
             kind=RecordKind.RESEARCH_CYCLE,
             entity_id=session_id,
             payload=intermediate_cycle,
@@ -2923,26 +2926,35 @@ def persist_intermediate_cycle(
             transaction_id=transaction_id,
         ),
     ]
+    known_input_shas = {
+        str((existing or {}).get(key) or "")
+        for key in (
+            "critic_input_packet_sha256",
+            "primary_critic_input_packet_sha256",
+            "runner_up_critic_input_packet_sha256",
+        )
+    }
     packet = frozen.get("critic_input_packet")
     if isinstance(packet, Mapping):
         packet_bytes = _canonical_bytes(packet)
         digest = hashlib.sha256(packet_bytes).hexdigest()
-        records.append(
-            event(
-                record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
-                kind=RecordKind.RESEARCH_ARTIFACT,
-                entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
-                payload={
-                    "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
-                    "session_id": session_id,
-                    "hfic_protocol": prompt_version,
-                    "artifact_kind": "CRITIC_INPUT_PACKET",
-                    "payload_canonical": packet_bytes.decode("utf-8"),
-                    "payload_sha256": digest,
-                },
-                transaction_id=transaction_id,
+        if digest not in known_input_shas:
+            records.append(
+                event(
+                    record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                    kind=RecordKind.RESEARCH_ARTIFACT,
+                    entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                    payload={
+                        "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                        "session_id": session_id,
+                        "hfic_protocol": prompt_version,
+                        "artifact_kind": "CRITIC_INPUT_PACKET",
+                        "payload_canonical": packet_bytes.decode("utf-8"),
+                        "payload_sha256": digest,
+                    },
+                    transaction_id=transaction_id,
+                )
             )
-        )
     runner_up_packet = frozen.get("runner_up_critic_input_packet")
     if isinstance(runner_up_packet, Mapping) and not (
         existing and existing.get("runner_up_critic_input_packet")

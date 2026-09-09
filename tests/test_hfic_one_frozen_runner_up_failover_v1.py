@@ -269,10 +269,71 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
 
         spec = v1_2_spec(as_of="2026-09-01T12:00:00Z")
         with tempfile.TemporaryDirectory() as tmp:
-            forged = forge_classify(packet_for(spec), Path(tmp), AS_OF_START)
+            data_root = Path(tmp)
+            forged = forge_classify(packet_for(spec), data_root, AS_OF_START)
             self.assertEqual(forged["session_state"], RUNNER_UP_AWAITING_CRITIC)
             self.assertEqual(forged["classifier_terminal"], "DENY_INVALID_SPEC")
             self.assertEqual(forged["hfic_terminal"], "KILL_UNBOUND_EVIDENCE")
+
+    def test_classifier_mapped_c1_kill_then_c2_classify(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import apply_classification
+        from tests.test_fast_lane_classifier import submission
+        from tests.test_observation_fast_lane_routing_closure import packet_for, v1_2_spec
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            draft = json.loads(HAPPY.read_text(encoding="utf-8"))
+            frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt(), repo_root=ROOT)
+            pending = finalize_session(
+                frozen,
+                critic_result_from_packet_only(
+                    frozen["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                ),
+                store=store,
+                repo_root=ROOT,
+            )
+            future = packet_for(v1_2_spec(as_of="2026-09-01T12:00:00Z"))
+            future["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            future["classifier_evaluated_at"] = "2026-09-01T00:00:00Z"
+            parked = apply_classification(
+                pending,
+                future,
+                store=store,
+                repo_root=ROOT,
+                data_root=Path(tmp),
+            )
+            self.assertEqual(parked["session_state"], RUNNER_UP_AWAITING_CRITIC)
+            parked_receipt = parked.get("classifier_receipt") or {}
+            self.assertEqual(parked_receipt.get("lane_classifier_terminal"), "DENY_INVALID_SPEC")
+            waiting = finalize_session(
+                parked,
+                critic_result_from_packet_only(
+                    parked["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                ),
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertEqual(waiting["session_state"], "AWAITING_CLASSIFICATION")
+            packet = submission()
+            packet["hypothesis_definition_sha256"] = frozen["runner_up_definition_sha256"]
+            done = apply_classification(
+                waiting,
+                packet,
+                store=store,
+                repo_root=ROOT,
+                data_root=Path(tmp),
+            )
+            self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+            self.assertTrue(done["runner_up_failover_used"])
+            bundle = load_session_bundle(store, frozen["session_id"])
+            assert bundle is not None
+            classifier = bundle.get("classifier_receipt") or {}
+            self.assertEqual(
+                classifier.get("selected_candidate_id"),
+                frozen["runner_up_candidate_id"],
+            )
+            self.assertIsNone(bundle.get("lane_classifier_terminal"))
+            self.assertIsNone((bundle.get("session_receipt") or {}).get("lane_classifier_terminal"))
 
     def test_t4_classifier_acts_on_c2_spec(self) -> None:
         from solana_alpha_lab.factory.hfic_session import apply_classification
