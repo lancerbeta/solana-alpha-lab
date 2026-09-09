@@ -44,7 +44,8 @@ two missed cycles (1800s) cannot stay collector-derived OK_OBSERVED
 ```
 
 STALE сохраняет исходный `observed_at` для диагностики, но
-collector-derived coverage не `AVAILABLE` и overall не `OK_OBSERVED`.
+collector-derived coverage не `AVAILABLE`, overall не `OK_OBSERVED`,
+и stale packet не классифицирует текущие incidents / ACTION_REQUIRED.
 
 ## FIRST DEPLOY (design only)
 

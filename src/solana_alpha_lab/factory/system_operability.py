@@ -409,8 +409,7 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
     }
     if source_status == "STALE":
         for row in mapped.values():
-            if row.get("status") == "AVAILABLE":
-                row["status"] = "STALE"
+            row["status"] = "STALE"
     return mapped
 
 
@@ -535,8 +534,16 @@ def compose_system_operability(
         }
     else:
         classified_units = systemd_units
-    incidents = classify_incidents(packet or {}, unit_status=classified_units)
-    classes = {str(item) for item in ((packet or {}).get("health_classes") or [])}
+    if collector_status == "STALE":
+        incidents = classify_incidents({}, unit_status=classified_units)
+        classes: set[str] = set()
+    else:
+        incidents = classify_incidents(packet or {}, unit_status=classified_units)
+        classes = {
+            str(item)
+            for item in ((packet or {}).get("health_classes") or [])
+            if isinstance(item, str)
+        }
     if "OFFHOST_BACKUP_STALE" in classes:
         incidents.setdefault(
             "OFFHOST_BACKUP_STALE", "Off-host backup freshness degraded."
@@ -615,7 +622,9 @@ def compose_system_operability(
         "OUT_OF_BAND_HOST_REACHABILITY": heartbeat,
         "CHANGE_HISTORY": _coverage("STATE_ONLY"),
     }
-    collector_verdict = None if packet is None else _text(packet.get("collector_verdict"))
+    collector_verdict = None
+    if packet is not None and collector_status not in {"STALE", "INVALID", "NOT_PRESENT"}:
+        collector_verdict = _text(packet.get("collector_verdict"))
     state = _rollup_state(
         attention=attention,
         coverage=coverage,

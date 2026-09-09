@@ -973,6 +973,54 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
             self.assertEqual(projection["coverage"]["COLLECTOR"]["status"], "STALE")
             self.assertNotEqual(projection["state"], "OK_OBSERVED")
 
+    def test_nested_health_classes_are_invalid_not_crash(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "nested"
+            root.mkdir()
+            snapshot = build_collector_snapshot(
+                _packet(), observed_at="2026-09-07T12:00:00Z"
+            )
+            snapshot["packet"]["health_classes"] = [{}]
+            path = root / COLLECTOR_SNAPSHOT_RELATIVE
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(snapshot), encoding="utf-8")
+            projection = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                environ={},
+            )
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "INVALID")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_stale_packet_incidents_are_not_current_authority(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = _match_root(Path(tmp))
+            stale_at = NOW - timedelta(seconds=COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS + 1)
+            _plant_snapshot(
+                root,
+                _packet(
+                    health_classes=["DATA_STALE", "DISK_RUNWAY_HARD50"],
+                    collector_verdict="ACTION_REQUIRED",
+                ),
+                observed_at=stale_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            )
+            projection = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                environ={},
+            )
+            codes = {item["attention_code"] for item in projection["attention"]}
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "STALE")
+            self.assertIn("COLLECTOR_SNAPSHOT_STALE", codes)
+            self.assertNotIn("SOURCE_DATA_STALE", codes)
+            self.assertNotIn("DISK_RUNWAY_HARD50", codes)
+            self.assertEqual(projection["state"], "UNKNOWN")
+            self.assertNotEqual(projection["state"], "ACTION_REQUIRED")
+            self.assertEqual(projection["coverage"]["STORAGE"]["status"], "STALE")
+            self.assertEqual(projection["coverage"]["DATA_FRESHNESS"]["status"], "STALE")
+
     def test_invalid_snapshot_does_not_crash_or_rewrite(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = Path(tmp) / "bad"

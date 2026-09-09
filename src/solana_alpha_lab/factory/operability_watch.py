@@ -115,7 +115,7 @@ def validate_collector_snapshot(raw: Any) -> dict[str, Any] | None:
     if raw.get("schema") != COLLECTOR_SNAPSHOT_SCHEMA:
         return None
     version = str(raw.get("schema_version") or "")
-    if not version.startswith("1."):
+    if version != COLLECTOR_SNAPSHOT_SCHEMA_VERSION:
         return None
     observed_at = str(raw.get("observed_at") or "").strip()
     if _parse_snapshot_observed_at(observed_at) is None:
@@ -123,8 +123,12 @@ def validate_collector_snapshot(raw: Any) -> dict[str, Any] | None:
     packet = raw.get("packet")
     if not isinstance(packet, dict):
         return None
-    if "health_classes" in packet and not isinstance(packet.get("health_classes"), list):
-        return None
+    if "health_classes" in packet:
+        health_classes = packet.get("health_classes")
+        if not isinstance(health_classes, list) or any(
+            not isinstance(item, str) for item in health_classes
+        ):
+            return None
     allowlisted = {
         key: packet[key] for key in COLLECTOR_SNAPSHOT_PACKET_FIELDS if key in packet
     }
@@ -185,7 +189,10 @@ def classify_incidents(
     *,
     unit_status: Mapping[str, str] | None = None,
 ) -> dict[str, str]:
-    classes = set(packet.get("health_classes") or [])
+    raw_classes = packet.get("health_classes") or []
+    if not isinstance(raw_classes, list):
+        raw_classes = []
+    classes = {item for item in raw_classes if isinstance(item, str)}
     found: dict[str, str] = {}
     if "DATA_STALE" in classes:
         found["SOURCE_DATA_STALE"] = "Collector source-poll older than 3 periods."

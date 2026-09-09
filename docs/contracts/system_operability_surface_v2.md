@@ -116,6 +116,10 @@ evidence time. Watch MUST persist packet source `observed_at` only;
 missing/unparseable source time is INVALID, never replaced by watch
 clock.
 
+STALE packet fields remain diagnostic coverage only. They MUST NOT
+classify current incidents or drive current `ACTION_REQUIRED` /
+`DEGRADED` from collector_verdict. Live systemd/deploy signals stay live.
+
 First future deploy with no `collector_snapshot` yet is MISSING:
 honest UNKNOWN, no GET-side warm-up. `evaluate_operability --mode emit`
 is not a cache initializer.
