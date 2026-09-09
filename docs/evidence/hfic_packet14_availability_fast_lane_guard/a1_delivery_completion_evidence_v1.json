@@ -11,15 +11,16 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "bd22eda1ca0a0e01fda80a76de4db77197f00142f2ab162d0033df7a97fb8489",
+    "catalog/assets/core.yaml": "3c5d19d4def43c5f2b3cc6512c62d4cfe393f766e35992bdc96076b6c5672e80",
     "catalog/assets/lifecycle.yaml": "8a225b97dec03b4d803ccd46ca687fab158d303e15dfc45cc9697b3febd53d1e",
     "catalog/catalog_manifest.yaml": "c1c6a6aac84255de7cfd113e229b6eee9e82b8ad642d2a80f9696180505eb3a4",
     "catalog/generated/asset_edges.json": "f9f04c80890346aeab57ca290205ccb4e061a42539ebe331b50211a1b92653be",
     "docs/PROJECT_MAP.md": "3d95130677ae7fe60d2a4ff08ac85e09331a13e11a09579d7e21621ec30e7be7",
     "docs/reports/hfic_packet14_availability_fast_lane_guard/a1_owner_readout_v1.md": "ebdb1eb6c160b158b88cf5fd4bb9d76da1fb7660334bf86f7222efc8416273fc",
-    "docs/tasks/HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1.md": "d70f2448672783a083a48f488e309b99e8bf91be2e0a9dfdccbbf99881808e7a",
+    "docs/tasks/HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1.md": "5da337440ed399b7ebca5868bcf2f0ff21e53db8a2e5462ae841b4640db8c3fb",
     "src/solana_alpha_lab/factory/hfic_control_integrity.py": "30cc794351459c00774e8aba06bf6823bfd82b0ae5f1ca4145db85291ff8d671",
     "src/solana_alpha_lab/factory/hfic_session.py": "626f7d9b1658073f0568512da3751435e8cae6c2789d420deba53d46ebc68f50",
+    "tests/test_hfic_one_frozen_runner_up_failover_v1.py": "5578fa2793d027da0a45efb5a9c33bd6d6dc8069eab12787eb3fbccaeb373b3c",
     "tests/test_hfic_packet14_availability_fast_lane_guard_v1.py": "5e3d5726898e41a1b0fbe4ea2de3c3d4d42519ba4ad40a6003f87d0fa213e2ee"
   },
   "active_stop_conditions": [],
@@ -32,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_packet14_availability_fast_lane_guard/a1_delivery_factory_fit_v1.json",
-    "sha256": "32c9a261f08ab737b8da832a2549b66d0a807749d48de02d6d82fe128c518fad",
+    "sha256": "064174b996dd5f21ba3afb89d4f4560fb24bec93df53fa1fab816094777c9720",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD",
     "independent_review": {
       "path": "docs/evidence/hfic_packet14_availability_fast_lane_guard/a1_delivery_independent_review_v1.json",
-      "sha256": "5c0c31d0734ea8a661aba9af45ba040025b179d5268fa7f327349e654cd20dec",
+      "sha256": "9f785a1f1d65ed40b5721892252c9c235357559d393fff96c7b57a957640a2c5",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
