@@ -36362,7 +36362,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md', repository_path: docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md}
-  integrity: {kind: sha256, sha256: afd130f8bea80b4125b37f2a4acb6185207513c327b0df66a8f05b03cf86db27}
+  integrity: {kind: sha256, sha256: c2e36747a35e7404b6c8702f9b4b2cb4dbe896f437646a7418720a95f40b7c28}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-TRADING-RUNTIME-POLICY-001}
