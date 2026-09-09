@@ -11,7 +11,7 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "e370a8089a04c7910e1e0f0aa597181afdd31ca5d81ab090bb4bb3ddfabaca7a",
+    "catalog/assets/core.yaml": "6e65a261d8ed005f9f2998721f839922a3a18090bc04a92fefa25df072f77f06",
     "catalog/assets/lifecycle.yaml": "57ce9e1523696dbaa53942f506b994c67cd3569bd312bd27b3b40e111024aff7",
     "catalog/catalog_manifest.yaml": "ac0506ba989c86bd26221a25e0aa7fc1d290e5cc7d03a3708a2fc67f3e15e22e",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "3be08a8b153a196957ba52d579b2ccc874277ef1379ff71d5dca79a05d73b990",
@@ -28,7 +28,7 @@
     "docs/contracts/trading_operations_workbench_v2.md": "1e067f76995debadd2889432db1a465375d97738838f9e89f21d091710c676e2",
     "docs/contracts/trading_runtime_policy_v1.md": "c29b84c7219bc7f01618e6589482be78299369b716764abfac80ed58d8af9c69",
     "docs/reports/owner_trading_operability_foundation/a1_owner_readout_v1.md": "4516ad816132319e61b5bd8198480e6c9af3ad0f3554b4301187587b74bd9eb6",
-    "docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md": "afd130f8bea80b4125b37f2a4acb6185207513c327b0df66a8f05b03cf86db27",
+    "docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md": "c2e36747a35e7404b6c8702f9b4b2cb4dbe896f437646a7418720a95f40b7c28",
     "scripts/trading_runtime_policy.py": "4d67009bd128eb0bcf909a1063cf4eac30267e4e699a364cf4bd09de1dee871b",
     "src/solana_alpha_lab/factory/application.py": "3c66455bba496f0efca0a411545d44b04a53baa100388f3651a35a89e283d196",
     "src/solana_alpha_lab/factory/owner_language.py": "c638009fa417c99dfbe7121198097d6797a47b925052f21cafe6552ece051ca2",
@@ -58,14 +58,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_trading_operability_foundation/a1_delivery_factory_fit_v1.json",
-    "sha256": "e9ea3d6efea301ac1317b45c69316cf327eb6f87f7d8cc6980fd81a34aac8084",
+    "sha256": "3ce150c8c3fd4945ecbdd9898a0a1b6c7a9c927d836766947248e58c40fed30c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_TRADING_OPERABILITY_FOUNDATION",
     "independent_review": {
       "path": "docs/evidence/owner_trading_operability_foundation/a1_delivery_independent_review_v1.json",
-      "sha256": "30f07744059d79e4c1cfb1100c8eb815d0a8ebf715851c4f55c852ae4b62fceb",
+      "sha256": "03c61784e9db3d75a5c483edeeeac9e9894373ae546f9f2fd078978c9ad6de2e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

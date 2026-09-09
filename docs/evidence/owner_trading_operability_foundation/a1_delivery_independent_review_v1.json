@@ -4,8 +4,8 @@
   "review_id": "OWNER-TRADING-OPERABILITY-FOUNDATION-REVIEW-001",
   "as_of": "2026-09-09",
   "task_id": "OWNER_TRADING_OPERABILITY_FOUNDATION_V1",
-  "reviewed_bindings_sha256": "3aac4549f1d49dba3aa4640a0482a5bf4f46c64192ffcfb81b9ae787162a6c02",
-  "reviewed_inventory_sha256": "19661b6a323c62a1d3c2ee3b9bc8b73196108ebb902198d8982be119be60e2f6",
+  "reviewed_bindings_sha256": "5ef668b65683296692382cb5efd92337992af6cf8cc5d7d6046968f9c6fb3bbc",
+  "reviewed_inventory_sha256": "19c66648629172c253c7d3a30323e3f4bac82740d9cfb93813440884e8bc66c8",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -16,7 +16,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=c7f38f11d421f7e4c8e0ee98113f80ff2e405e0534fadd90785eb99d14377232",
+        "packet_fingerprint_sha256=aa4f63341b27c944a24e72ea51f513a00224528ba72db1223c142df1ef86ca31",
         "C2_ENTER_APPLY_SERIALIZED_IMMEDIATE_WRITE",
         "C4_BOUNDED_REQUESTED_VS_ADMITTED",
         "NO_MATERIAL_YES_ON_BLOCKER_QUESTIONS",
