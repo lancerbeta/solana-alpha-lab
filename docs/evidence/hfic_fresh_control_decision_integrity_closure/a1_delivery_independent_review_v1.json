@@ -4,8 +4,8 @@
   "review_id": "HFIC-FRESH-CONTROL-DECISION-INTEGRITY-CLOSURE-REVIEW-001",
   "as_of": "2026-09-09",
   "task_id": "HFIC_FRESH_CONTROL_DECISION_INTEGRITY_CLOSURE_V1",
-  "reviewed_bindings_sha256": "00cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
-  "reviewed_inventory_sha256": "00dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "reviewed_bindings_sha256": "16438ddbb6d85c6376fc6e9f5de71201d2c5d3c02b8e38bf80deddcc4d0ab3f3",
+  "reviewed_inventory_sha256": "a4aefbc7e18a1bffcb684db02c9cc29d99bb2cf405a9c7117485612de9026f34",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

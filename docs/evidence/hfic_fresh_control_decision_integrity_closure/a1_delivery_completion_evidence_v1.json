@@ -10,7 +10,32 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "e1a990431abf25b96840a5f45d4eec4980e20042074ce1bbb1ee3c6cf821ca57",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "560f1f4040be5948817d520923c792f6df0c3f273079d5ffa022027001b49549",
+    "catalog/assets/core.yaml": "775a9331751b4eb9ea1a8fa6cebee04d3d6fc86fc7e2702f2ac036c323664ffc",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "1db44e57e878724ac72c683d15a9101bf6023abcd581496d4c88b0a29f7c95bd",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json": "778f4880e26c09d9f63821bb6263cf298dffd2942aecb4b083c9819409218d93",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "192d59e6921167d12d41e2c49772abd6e5fde54659400d412a713b50616a106f",
+    "docs/contracts/normalized_trajectory_representation_probe_v1.md": "617879817f2f7b0810bb66c657ba94f22b02acb54dd7b42f5b3b8df3a6908357",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "686e8c825b41c827233e0dd3442b40916eef7a0cbade9d7737c2ffdb5b359be8",
+    "docs/reports/hfic_fresh_control_decision_integrity_closure/a1_owner_readout_v1.md": "74c56e3e9de21449b819f56b425673a93b3e2711e7a414e42b596dabe40bfa99",
+    "docs/tasks/HFIC_FRESH_CONTROL_DECISION_INTEGRITY_CLOSURE_V1.md": "13ef0eb78b2361fa69705c9f790cc6899a434a34ba196b6059cc0a8446489e2d",
+    "scripts/hypothesis_forge.py": "fec8f0aa120e5b7214038ba435ba3cd689cc40642bfffa1f0c40963dacf806ad",
+    "src/solana_alpha_lab/factory/hfic_control_integrity.py": "5c588b4cbe8746d59dcea64a8647e4e196389a991210908ab9abef3b3cf72d1c",
+    "src/solana_alpha_lab/factory/hfic_memory_policy.py": "42308a25de5f725fc086ffbec0c7a1ccd63bc2b18d9de0f91405d625cfb964b3",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "688e05956a904fa6ae56ca5c390036b7e226188e84d95d2c75d1a9d21c47ce48",
+    "src/solana_alpha_lab/factory/hfic_session.py": "6209e0402bf82dadda3dfd74d26e8628e5c839b97c8da321f91cb8cf0d3aa31a",
+    "tests/test_hfic_cli.py": "44b7dddb0bcfea9ee57c8e398a3d421b3e41108166a0de850bd6aad512a1350a",
+    "tests/test_hfic_critic_prior_memory_closure_v1.py": "559278e2ae36587a61270dce582d79eb424f1c3af1dbd2640aa69927f81f4c37",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "d442d040ae33f41151da9b5e422edcdcfe9f23c279fadffbb01b6fcd4a785e56",
+    "tests/test_hfic_fresh_session_version_lock_v1.py": "28baef78fc53ed52443d94b0a970a23e46c8cecf226f1516a85ce741dff624e3",
+    "tests/test_hfic_manual_grounding_contract_diagnostics_v1.py": "ed063c3a7d3d73f6b05f149991f68cde59cce42ff28db188434e26dff76e2346",
+    "tests/test_hfic_one_frozen_runner_up_failover_v1.py": "c51b5c4856358ab0f362c146dc1d5755f524691e195b52b24f4330fa4afc5b8d",
+    "tests/test_hfic_operational_closure_v1.py": "435aa1cebc03ce76542a676d9e64a94403275813c97aaab913c5875a04ada2d1",
+    "tests/test_hypothesis_forge_independent_critic_v1.py": "7679da6e577d11dcd11de6e8ad7691280f09326f9f11f1302da94df2a3ef9222",
+    "tests/test_normalized_trajectory_probe_preregistration_v1.py": "0821342483931c4aa2d85b44536766627547b27dfcb7d28b0c91a8256fb592c6"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_fresh_control_decision_integrity_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "00aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sha256": "f5670d4db6aab47ba853f216168d0de7e8b08748cad033908697bac6da77b63b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_FRESH_CONTROL_DECISION_INTEGRITY",
     "independent_review": {
       "path": "docs/evidence/hfic_fresh_control_decision_integrity_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "00bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "sha256": "131a14f360a45e9e931684ae9ced0306e27e3fd3f6f94f783428191afa413198",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
