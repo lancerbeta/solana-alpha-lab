@@ -11,9 +11,9 @@ allowed_routes:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: 94c3397acf68516d69808e224fb61c4f99142a55
+  expected_base: 2265e9eb475a2e9ed4a64b424923a4460f9253d2
   expected_upstream: origin/main
-  expected_upstream_oid: 94c3397acf68516d69808e224fb61c4f99142a55
+  expected_upstream_oid: 2265e9eb475a2e9ed4a64b424923a4460f9253d2
   expected_branch: cursor/hfic-operational-memory-quarantine-v1
   dirty_mode: ALLOW_REPORTED
 
