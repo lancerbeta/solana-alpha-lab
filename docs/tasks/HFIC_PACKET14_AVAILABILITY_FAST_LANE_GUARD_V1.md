@@ -28,6 +28,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_control_integrity.py
   - src/solana_alpha_lab/factory/hfic_session.py
   - tests/test_hfic_packet14_availability_fast_lane_guard_v1.py
+  - tests/test_hfic_one_frozen_runner_up_failover_v1.py
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml

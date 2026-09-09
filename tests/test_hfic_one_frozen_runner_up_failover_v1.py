@@ -48,6 +48,17 @@ def _with_selected_feats(spec_packet: dict, critic_packet: dict) -> dict:
     return packet
 
 
+def _happy_with_pit_runner_up() -> dict:
+    """F3 classify still needs a strategy-usable C2. Keep C1 kill, make C2 PIT."""
+    draft = json.loads(HAPPY.read_text(encoding="utf-8"))
+    runner_ref = str(draft["runner_up_candidate_ref"])
+    for card in draft["candidates"]:
+        if card["label"] == runner_ref:
+            card["required_feature_ids"] = ["FEAT-TOKEN-LIQUIDITY-USD-TO-MCAP-RATIO"]
+            card["unresolved_requirements"] = []
+    return draft
+
+
 class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
     def setUp(self) -> None:
         from tests import test_hfic_session as session_tests
@@ -298,7 +309,7 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp))
-            draft = json.loads(HAPPY.read_text(encoding="utf-8"))
+            draft = _happy_with_pit_runner_up()
             frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt(), repo_root=ROOT)
             pending = finalize_session(
                 frozen,
@@ -380,7 +391,7 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             store = ResearchStore(Path(tmp))
-            draft = json.loads(HAPPY.read_text(encoding="utf-8"))
+            draft = _happy_with_pit_runner_up()
             frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt(), repo_root=ROOT)
             pending = finalize_session(
                 frozen,
