@@ -11,7 +11,25 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1.md": "4ed49d447a9392da000036229f94e36ab35002d50c6279c99a9ac19c8389efcd"
+    ".agents/skills/hypothesis-forge/SKILL.md": "8dea8e94461f1a23cba204a5da021c6d105e25c86a4ef6f0ac9a37df2abaea22",
+    "catalog/assets/core.yaml": "507439e8c44c686a4409dc2836a14f6ff554c6eb7a253e5542a91dfe6c775374",
+    "catalog/assets/lifecycle.yaml": "20fbed52fc09f94f98a4c8734decaf1ff76de619041e30e408160fba34e5b723",
+    "catalog/catalog_manifest.yaml": "963182c8376267cd33b44dd65c54e5d237308f1de3548c431367c757fd4c9706",
+    "catalog/generated/asset_edges.json": "cac60f4192018a6dbd4936cf98b5eabb8011513806176ee5cd17e109496fe7d5",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "b8a58a35503aeacd96944e914362b95eb6b90613cbe63483f6945ee58fcd8938",
+    "docs/PROJECT_MAP.md": "5ae8bddbe4175f31542a3d7b1c88b311c589691d108c76b5bef7f91be6923316",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "75580af63b92d02fb639648a5837fb809556d8877e991e1aaa2dfd98eb3791fa",
+    "docs/reports/hfic_operational_memory_quarantine/a1_owner_readout_v1.md": "2b75e16914d8095226b62e2ed2b94483c5d86c49214f5d96456cb4c05e4f795b",
+    "docs/tasks/HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1.md": "4216d512530b2efe5b96c36b096829fc2bbc0d5e2a39d4074ba706fe447d9bc0",
+    "schemas/research_memory_projection_v1.sql": "c39ee0d8fc725c73e4b91896bb16b95b8f85fc2ffb38d3fd91bcf51a1ffbc866",
+    "scripts/hypothesis_forge.py": "d7b935e29b20e9faeb18b1f5fab3c887a26a7ec5cb02c23ba48c12665e0b701c",
+    "src/solana_alpha_lab/factory/hfic_memory_policy.py": "12b3c51a9ee7b7f0d06f997163f0fd016bc66ccb9f5ef28d30e604e7967cf2da",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "627bb878e66691dcacc5ee025397d9146074c1f31021beea29ea3818484d5c0e",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "1d7391499e99f00d54f2cb73a8759df5c85498e6aa5254393e2ab7bc45dcb37d",
+    "src/solana_alpha_lab/factory/hfic_provenance.py": "f90d1c2011148675c70768447892fcaabfa03130ef13124ce8b2760296634eb6",
+    "src/solana_alpha_lab/factory/hfic_session.py": "206f7fc7e2f9603175f5fe71462c4065f5b28d440e3ff012ec51436f706ec185",
+    "tests/test_hfic_cli.py": "d4e61900915092c45054414c7559694e306f64b9d4aaab8c11145d54f6ac1c00",
+    "tests/test_hfic_operational_memory_quarantine_v1.py": "a6dc33f82e5153a2c1e2582a9c666562234ee17070679b142f9a497518e80d43"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_operational_memory_quarantine/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "7466f60c70ae9641f098e908c0ba4fbd82c7728a3d51d3f96798130eeb6e259e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_OPERATIONAL_MEMORY_QUARANTINE",
     "independent_review": {
       "path": "docs/evidence/hfic_operational_memory_quarantine/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "293245cfab48d521bf27293b2e119d0e1b408702cb75ad004f2e856d8dd6f11d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
