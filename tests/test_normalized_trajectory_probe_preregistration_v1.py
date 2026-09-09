@@ -155,6 +155,14 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
             ["NO_WORTHY_HYPOTHESIS", "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED"],
         )
         self.assertEqual(
+            self.contract["control_branching_field"],
+            "effective_control_terminal",
+        )
+        self.assertEqual(
+            self.contract["effective_control_terminal"],
+            "final_session_terminal_else_critic_terminal",
+        )
+        self.assertEqual(
             self.contract["time"]["decision_t_point_id"],
             "Y1800",
         )

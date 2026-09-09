@@ -568,7 +568,7 @@ class PriorMemoryFreezeE2ETests(unittest.TestCase):
                 memory["store_inventory_digest"],
                 fresh_receipt["store_inventory_digest"],
             )
-            self.assertEqual(packet["packet_version"], "1.3")
+            self.assertEqual(packet["packet_version"], "1.4")
             self.assertEqual(packet["generator_prompt_version"], "HFIC-V1.2")
             self.assertTrue(memory["snapshot_sha256"])
             self.assertGreater(memory["bytes"], 0)
