@@ -71,6 +71,8 @@ from solana_alpha_lab.factory.operability_watch import (  # noqa: E402
     classify_incidents,
     evaluate_operability,
     render_incident_message,
+    build_collector_snapshot,
+    COLLECTOR_SNAPSHOT_PACKET_FIELDS,
 )
 from solana_alpha_lab.factory.remote_ops import RemoteOpsError, load_config_v1_1  # noqa: E402
 from solana_alpha_lab.factory_semantic_operability import (  # noqa: E402
@@ -398,6 +400,54 @@ class ClosedDayDurabilityLoopTests(unittest.TestCase):
                     environ={},
                 )
                 self.assertFalse(state_path.exists())
+            finally:
+                store.close()
+
+    def test_watch_persist_writes_allowlisted_snapshot_only(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            state_path = root / "local/factory_v1/operability_incident_state.json"
+            packet = {
+                "observed_at": "2026-09-06T12:00:00Z",
+                "collector_verdict": "OK",
+                "health_classes": ["PROCESS_OK"],
+                "activation_state": "ACTIVE",
+                "filesystem_disk_used_pct": 10,
+                "projected_97d_status": "OK",
+                "backup_age_seconds": 60,
+                "offhost_backup_state": "CURRENT",
+                "immutable_archive_latest_verified_day": "20260905",
+                "password": "pw",
+                "brand_new_metric": 99,
+            }
+            try:
+                with patch(
+                    "solana_alpha_lab.factory.operability_watch.build_collector_operational_packet",
+                    return_value=packet,
+                ) as producer:
+                    evaluate_operability(
+                        root=root,
+                        store=store,
+                        now=NOW,
+                        unit_status={"factory-observation-schedule.timer": "active"},
+                        emit=False,
+                        persist=True,
+                        environ={},
+                    )
+                self.assertEqual(producer.call_count, 1)
+                payload = json.loads(state_path.read_text(encoding="utf-8"))
+                snapshot = payload["collector_snapshot"]
+                dumped = json.dumps(snapshot)
+                self.assertNotIn('"password"', dumped)
+                self.assertNotIn("brand_new_metric", dumped)
+                self.assertTrue(
+                    set(snapshot["packet"]).issubset(set(COLLECTOR_SNAPSHOT_PACKET_FIELDS))
+                )
+                rebuilt = build_collector_snapshot(
+                    packet, observed_at="2026-09-06T12:00:00Z"
+                )
+                self.assertEqual(snapshot["packet"], rebuilt["packet"])
             finally:
                 store.close()
 

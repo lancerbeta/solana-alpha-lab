@@ -9,9 +9,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import timedelta
 from http.client import HTTPConnection
 from pathlib import Path
 from threading import Thread
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -26,6 +28,13 @@ from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
 from solana_alpha_lab.factory.operational_store import OperationalStore  # noqa: E402
 from solana_alpha_lab.factory.owner_daily_attention import compose_owner_attention  # noqa: E402
 from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime_config  # noqa: E402
+from solana_alpha_lab.factory.operability_watch import (  # noqa: E402
+    COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS,
+    COLLECTOR_SNAPSHOT_PACKET_FIELDS,
+    STATE_RELATIVE as INCIDENT_STATE_RELATIVE,
+    build_collector_snapshot,
+    evaluate_operability,
+)
 from solana_alpha_lab.factory.system_operability import (  # noqa: E402
     HTTP_SERVING,
     SYSTEMD_UNAVAILABLE,
@@ -110,6 +119,45 @@ def _get(app: FactoryApplication, path: str) -> str:
     finally:
         server.shutdown()
         server.server_close()
+
+
+def _plant_snapshot(
+    root: Path,
+    packet: dict[str, object] | None = None,
+    *,
+    observed_at: str = "2026-09-07T12:00:00Z",
+    extra_packet: dict[str, object] | None = None,
+) -> Path:
+    body = dict(packet or _packet())
+    if extra_packet:
+        body.update(extra_packet)
+    path = root / INCIDENT_STATE_RELATIVE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "active": {},
+        "pending": [],
+        "collector_snapshot": build_collector_snapshot(body, observed_at=observed_at),
+    }
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    return path
+
+
+def _heavy_call_guard():
+    counts = {"packet": 0, "read_model": 0, "tree": 0}
+
+    def boom_packet(*_a, **_k):
+        counts["packet"] += 1
+        raise AssertionError("HEAVY_PACKET")
+
+    def boom_read(*_a, **_k):
+        counts["read_model"] += 1
+        raise AssertionError("HEAVY_READ_MODEL")
+
+    def boom_tree(*_a, **_k):
+        counts["tree"] += 1
+        raise AssertionError("HEAVY_TREE")
+
+    return counts, boom_packet, boom_read, boom_tree
 
 
 def _packet(**overrides: object) -> dict[str, object]:
@@ -224,13 +272,26 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
             writable.close()
             before = path.read_bytes()
             inventory = _walk(root)
-            projection = compose_system_operability(
-                root=root,
-                now=NOW,
-                unit_status=UNITS_OK,
-                environ={},
-            )
-            self.assertEqual(projection["collection"]["source_status"], "PRESENT")
+            counts, boom_packet, boom_read, boom_tree = _heavy_call_guard()
+            with patch(
+                "solana_alpha_lab.factory.collector_operational_packet.build_collector_operational_packet",
+                boom_packet,
+            ), patch(
+                "solana_alpha_lab.factory.collector_read_model.build_collector_read_model",
+                boom_read,
+            ), patch(
+                "solana_alpha_lab.factory.collector_operational_packet._tree_bytes",
+                boom_tree,
+            ):
+                projection = compose_system_operability(
+                    root=root,
+                    now=NOW,
+                    unit_status=UNITS_OK,
+                    environ={},
+                )
+            self.assertEqual(counts, {"packet": 0, "read_model": 0, "tree": 0})
+            self.assertEqual(projection["collection"]["source_status"], "NOT_PRESENT")
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "MISSING")
             self.assertEqual(path.read_bytes(), before)
             self.assertEqual(_walk(root), inventory)
 
@@ -764,6 +825,266 @@ class SystemOperabilitySurfaceV2Tests(unittest.TestCase):
             path = Path(tmp) / "nope.sqlite"
             with self.assertRaisesRegex(ObservationScheduleStoreError, "SOURCE_NOT_PRESENT"):
                 ObservationScheduleStore(path, readonly=True)
+
+
+class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
+    def test_composer_source_does_not_import_heavy_packet(self) -> None:
+        text = (SRC / "solana_alpha_lab/factory/system_operability.py").read_text(
+            encoding="utf-8"
+        )
+        self.assertNotIn("build_collector_operational_packet", text)
+        self.assertNotIn("build_collector_read_model", text)
+        self.assertNotIn("_tree_bytes", text)
+
+    def test_fresh_snapshot_preserves_collector_semantics(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = _match_root(Path(tmp))
+            _plant_snapshot(root, _packet())
+            later = NOW + timedelta(seconds=30)
+            counts, boom_packet, boom_read, boom_tree = _heavy_call_guard()
+            with patch(
+                "solana_alpha_lab.factory.collector_operational_packet.build_collector_operational_packet",
+                boom_packet,
+            ), patch(
+                "solana_alpha_lab.factory.collector_read_model.build_collector_read_model",
+                boom_read,
+            ), patch(
+                "solana_alpha_lab.factory.collector_operational_packet._tree_bytes",
+                boom_tree,
+            ):
+                projection = compose_system_operability(
+                    root=root,
+                    now=later,
+                    unit_status=UNITS_OK,
+                    environ={},
+                )
+            self.assertEqual(counts, {"packet": 0, "read_model": 0, "tree": 0})
+            self.assertEqual(projection["state"], "OK_OBSERVED")
+            self.assertEqual(projection["collection"]["source_status"], "PRESENT")
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "FRESH")
+            self.assertEqual(
+                projection["collector_snapshot"]["observed_at"], "2026-09-07T12:00:00Z"
+            )
+            self.assertEqual(projection["observed_at"], "2026-09-07T12:00:30Z")
+            self.assertEqual(projection["coverage"]["COLLECTOR"]["status"], "AVAILABLE")
+            self.assertEqual(projection["coverage"]["STORAGE"]["status"], "AVAILABLE")
+            self.assertEqual(projection["coverage"]["MUTABLE_BACKUP"]["status"], "AVAILABLE")
+            self.assertEqual(projection["coverage"]["OFFHOST_BACKUP"]["status"], "AVAILABLE")
+            self.assertEqual(projection["coverage"]["IMMUTABLE_ARCHIVE"]["status"], "AVAILABLE")
+
+    def test_interactive_get_home_and_system_skip_heavy_work(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            _plant_snapshot(root, _packet())
+            app = FactoryApplication(root=root, unit_status=UNITS_OK)
+            counts, boom_packet, boom_read, boom_tree = _heavy_call_guard()
+            with patch(
+                "solana_alpha_lab.factory.collector_operational_packet.build_collector_operational_packet",
+                boom_packet,
+            ), patch(
+                "solana_alpha_lab.factory.collector_read_model.build_collector_read_model",
+                boom_read,
+            ), patch(
+                "solana_alpha_lab.factory.collector_operational_packet._tree_bytes",
+                boom_tree,
+            ):
+                home = _get(app, "/")
+                system = _get(app, "/system")
+            self.assertEqual(counts, {"packet": 0, "read_model": 0, "tree": 0})
+            self.assertIn("SYSTEM_OPERABILITY", system)
+            self.assertIn("технически", system)
+            self.assertTrue(home)
+            self.assertNotIn("HEALTHY", system.split("non_claims")[0])
+
+    def test_missing_snapshot_does_not_rebuild(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "obs"
+            root.mkdir()
+            path = observation_sqlite_path(root)
+            writable = ObservationScheduleStore(path)
+            writable.record_event("TICK", {"n": 1}, clock=NOW)
+            writable.close()
+            counts, boom_packet, boom_read, boom_tree = _heavy_call_guard()
+            with patch(
+                "solana_alpha_lab.factory.collector_operational_packet.build_collector_operational_packet",
+                boom_packet,
+            ), patch(
+                "solana_alpha_lab.factory.collector_read_model.build_collector_read_model",
+                boom_read,
+            ), patch(
+                "solana_alpha_lab.factory.collector_operational_packet._tree_bytes",
+                boom_tree,
+            ):
+                projection = compose_system_operability(
+                    root=root,
+                    now=NOW,
+                    unit_status=UNITS_OK,
+                    environ={},
+                )
+            self.assertEqual(counts, {"packet": 0, "read_model": 0, "tree": 0})
+            self.assertEqual(projection["collection"]["source_status"], "NOT_PRESENT")
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "MISSING")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+            self.assertEqual(projection["coverage"]["COLLECTOR"]["status"], "NOT_PRESENT")
+
+    def test_stale_snapshot_is_visible_and_not_ok_observed(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = _match_root(Path(tmp))
+            stale_at = (NOW - timedelta(seconds=COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS + 1))
+            _plant_snapshot(root, _packet(), observed_at=stale_at.strftime("%Y-%m-%dT%H:%M:%SZ"))
+            counts, boom_packet, boom_read, boom_tree = _heavy_call_guard()
+            with patch(
+                "solana_alpha_lab.factory.collector_operational_packet.build_collector_operational_packet",
+                boom_packet,
+            ):
+                projection = compose_system_operability(
+                    root=root,
+                    now=NOW,
+                    unit_status=UNITS_OK,
+                    environ={},
+                )
+            self.assertEqual(counts["packet"], 0)
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "STALE")
+            self.assertEqual(
+                projection["collector_snapshot"]["observed_at"],
+                stale_at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+            )
+            self.assertEqual(projection["collection"]["source_status"], "STALE")
+            self.assertEqual(projection["coverage"]["COLLECTOR"]["status"], "STALE")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_invalid_snapshot_does_not_crash_or_rewrite(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "bad"
+            root.mkdir()
+            path = root / INCIDENT_STATE_RELATIVE
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text("{not-json", encoding="utf-8")
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            projection = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                environ={},
+            )
+            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), digest)
+            self.assertEqual(projection["collection"]["source_status"], "INVALID")
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "INVALID")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+            self.assertNotEqual(projection["state"], "HEALTHY")
+
+    def test_wrong_schema_snapshot_is_invalid(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "schema"
+            root.mkdir()
+            path = root / INCIDENT_STATE_RELATIVE
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                json.dumps(
+                    {
+                        "active": {},
+                        "pending": [],
+                        "collector_snapshot": {
+                            "schema": "smial.not-this",
+                            "schema_version": "1.0",
+                            "observed_at": "2026-09-07T12:00:00Z",
+                            "packet": _packet(),
+                        },
+                    }
+                ),
+                encoding="utf-8",
+            )
+            projection = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                environ={},
+            )
+            self.assertEqual(projection["collection"]["source_status"], "INVALID")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
+
+    def test_injected_packet_still_composes(self) -> None:
+        projection = compose_system_operability(
+            root=ROOT,
+            now=NOW,
+            unit_status=UNITS_OK,
+            collector_packet=_packet(health_classes=["DATA_STALE"], collector_verdict="DEGRADED"),
+            environ={},
+        )
+        self.assertEqual(projection["collector_snapshot"]["freshness"], "INJECTED")
+        self.assertIn(
+            "SOURCE_DATA_STALE",
+            {item["attention_code"] for item in projection["attention"]},
+        )
+        self.assertEqual(projection["state"], "DEGRADED")
+
+    def test_snapshot_allowlist_drops_undeclared_and_secret_fields(self) -> None:
+        packet = _packet(
+            password="pw",
+            token="tok",
+            secret_url="https://example.invalid/x",
+            private_endpoint="https://example.invalid/y",
+            wallet_key="wk",
+            brand_new_metric=123,
+        )
+        snapshot = build_collector_snapshot(packet, observed_at="2026-09-07T12:00:00Z")
+        dumped = json.dumps(snapshot)
+        self.assertNotIn('"password"', dumped)
+        self.assertNotIn('"token"', dumped)
+        self.assertNotIn("secret_url", dumped)
+        self.assertNotIn("private_endpoint", dumped)
+        self.assertNotIn("wallet_key", dumped)
+        self.assertNotIn("brand_new_metric", dumped)
+        self.assertEqual(set(snapshot["packet"]), set(packet) & set(COLLECTOR_SNAPSHOT_PACKET_FIELDS))
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "secrets"
+            root.mkdir()
+            _plant_snapshot(root, packet)
+            persisted = json.loads((root / INCIDENT_STATE_RELATIVE).read_text(encoding="utf-8"))
+            stored = json.dumps(persisted)
+            self.assertNotIn('"password"', stored)
+            self.assertNotIn('"token"', stored)
+            self.assertNotIn("brand_new_metric", stored)
+
+    def test_watch_producer_persists_bounded_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp)
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            fake_packet = _packet(observed_at="2026-09-07T12:00:00Z", password="nope")
+            try:
+                with patch(
+                    "solana_alpha_lab.factory.operability_watch.build_collector_operational_packet",
+                    return_value=fake_packet,
+                ) as producer:
+                    result = evaluate_operability(
+                        root=root,
+                        store=store,
+                        now=NOW,
+                        unit_status=UNITS_OK,
+                        emit=False,
+                        persist=True,
+                        environ={},
+                    )
+                self.assertEqual(producer.call_count, 1)
+                self.assertEqual(result["packet_verdict"], "OK")
+                state_path = root / INCIDENT_STATE_RELATIVE
+                payload = json.loads(state_path.read_text(encoding="utf-8"))
+                snapshot = payload["collector_snapshot"]
+                self.assertEqual(snapshot["schema"], "smial.collector-derived-operability-snapshot")
+                self.assertEqual(snapshot["observed_at"], "2026-09-07T12:00:00Z")
+                self.assertNotIn("password", snapshot["packet"])
+                self.assertIn("active", payload)
+                self.assertIn("pending", payload)
+                projection = compose_system_operability(
+                    root=root,
+                    now=NOW,
+                    unit_status=UNITS_OK,
+                    environ={},
+                )
+                self.assertEqual(projection["collection"]["source_status"], "PRESENT")
+                self.assertEqual(projection["collector_snapshot"]["freshness"], "FRESH")
+            finally:
+                store.close()
 
 
 if __name__ == "__main__":

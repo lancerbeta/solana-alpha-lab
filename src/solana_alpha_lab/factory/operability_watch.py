@@ -18,6 +18,26 @@ from solana_alpha_lab.factory.remote_ops import RemoteOpsError
 
 STATE_RELATIVE = "local/factory_v1/operability_incident_state.json"
 WATCH_ON_CALENDAR = "*-*-* *:0/15:00 UTC"
+WATCH_CADENCE_SECONDS = 15 * 60
+COLLECTOR_SNAPSHOT_SCHEMA = "smial.collector-derived-operability-snapshot"
+COLLECTOR_SNAPSHOT_SCHEMA_VERSION = "1.0"
+COLLECTOR_SNAPSHOT_FRESHNESS_GRACE_SECONDS = 180
+COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS = (
+    WATCH_CADENCE_SECONDS + COLLECTOR_SNAPSHOT_FRESHNESS_GRACE_SECONDS
+)
+COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
+    "activation_state",
+    "backup_age_seconds",
+    "collector_verdict",
+    "filesystem_disk_used_pct",
+    "health_classes",
+    "immutable_archive_last_terminal",
+    "immutable_archive_latest_verified_day",
+    "offhost_backup_state",
+    "projected_97d_status",
+    "provider_observations",
+    "restore_marker_unresolved",
+)
 WATCH_REQUIRED_TIMERS = (
     "factory-observation-schedule.timer",
     "factory-remote-backup.timer",
@@ -55,6 +75,101 @@ def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
     tmp = path.with_suffix(path.suffix + ".tmp")
     tmp.write_text(json.dumps(dict(payload), indent=2, sort_keys=True) + "\n", encoding="utf-8")
     os.replace(tmp, path)
+
+
+def build_collector_snapshot(
+    packet: Mapping[str, Any],
+    *,
+    observed_at: str,
+) -> dict[str, Any]:
+    body: dict[str, Any] = {}
+    for key in COLLECTOR_SNAPSHOT_PACKET_FIELDS:
+        if key in packet:
+            body[key] = packet[key]
+    return {
+        "schema": COLLECTOR_SNAPSHOT_SCHEMA,
+        "schema_version": COLLECTOR_SNAPSHOT_SCHEMA_VERSION,
+        "observed_at": observed_at,
+        "packet": body,
+    }
+
+
+def _parse_snapshot_observed_at(value: str) -> datetime | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    try:
+        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
+
+
+def validate_collector_snapshot(raw: Any) -> dict[str, Any] | None:
+    if not isinstance(raw, dict):
+        return None
+    if raw.get("schema") != COLLECTOR_SNAPSHOT_SCHEMA:
+        return None
+    version = str(raw.get("schema_version") or "")
+    if not version.startswith("1."):
+        return None
+    observed_at = str(raw.get("observed_at") or "").strip()
+    if _parse_snapshot_observed_at(observed_at) is None:
+        return None
+    packet = raw.get("packet")
+    if not isinstance(packet, dict):
+        return None
+    if "health_classes" in packet and not isinstance(packet.get("health_classes"), list):
+        return None
+    allowlisted = {
+        key: packet[key] for key in COLLECTOR_SNAPSHOT_PACKET_FIELDS if key in packet
+    }
+    return {
+        "schema": COLLECTOR_SNAPSHOT_SCHEMA,
+        "schema_version": COLLECTOR_SNAPSHOT_SCHEMA_VERSION,
+        "observed_at": observed_at,
+        "packet": allowlisted,
+    }
+
+
+def evaluate_collector_snapshot_freshness(
+    observed_at: str,
+    *,
+    now: datetime,
+) -> tuple[str, int | None]:
+    parsed = _parse_snapshot_observed_at(observed_at)
+    if parsed is None:
+        return "INVALID", None
+    clock = now if now.tzinfo else now.replace(tzinfo=UTC)
+    clock = clock.astimezone(UTC)
+    age = (clock - parsed).total_seconds()
+    if age < -COLLECTOR_SNAPSHOT_FRESHNESS_GRACE_SECONDS:
+        return "INVALID", int(age)
+    if age < 0:
+        age = 0.0
+    age_seconds = int(age)
+    if age <= COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS:
+        return "FRESH", age_seconds
+    return "STALE", age_seconds
+
+
+def load_collector_snapshot_file(path: Path) -> tuple[str, dict[str, Any] | None]:
+    if path.is_file() is False:
+        return "MISSING", None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return "INVALID", None
+    if not isinstance(payload, dict):
+        return "INVALID", None
+    if "collector_snapshot" not in payload:
+        return "MISSING", None
+    parsed = validate_collector_snapshot(payload.get("collector_snapshot"))
+    if parsed is None:
+        return "INVALID", None
+    return "PRESENT", parsed
 
 
 def classify_incidents(
@@ -264,7 +379,14 @@ def evaluate_operability(
     else:
         still_pending = pending
 
-    next_state = {"active": active, "pending": still_pending}
+    next_state = {
+        "active": active,
+        "pending": still_pending,
+        "collector_snapshot": build_collector_snapshot(
+            packet,
+            observed_at=str(packet.get("observed_at") or render_utc(clock)),
+        ),
+    }
     if write_state:
         _atomic_write_json(state_path, next_state)
     return {

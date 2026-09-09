@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SYSTEM-OPERABILITY-BOUNDED-READ-PATH-FACTORY-FIT-001",
+  "as_of": "2026-09-09",
+  "task_id": "SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "reviewed_inventory_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "LEAST_PRIVILEGE_SMIAL_OPERATOR_VPS_OBSERVER"
+  },
+  "dimensions": {
+    "mission": "PENDING",
+    "flexibility_and_history": "PENDING",
+    "context_efficiency": "PENDING",
+    "research_truth": "PASS",
+    "owner_operability": "PENDING",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_REQUIRED",
+    "monitoring_and_recovery": "PENDING",
+    "build_vs_buy": "PENDING",
+    "red_team": "PENDING",
+    "security": "PENDING"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_OWNER_FCF",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_MONITORING_PLATFORM",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_LATENCY_REPAIR"
+  ],
+  "recovery": "REVERT cursor/system-operability-bounded-read-path-v1 BRANCH. Extra collector_snapshot key is ignored by predecessor."
+}

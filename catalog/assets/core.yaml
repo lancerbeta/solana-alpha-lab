@@ -35760,7 +35760,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: FACTORY_UNATTENDED_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_unattended_operability_closure_v1.py', repository_path: tests/test_factory_unattended_operability_closure_v1.py}
-  integrity: {kind: sha256, sha256: 72cb74de7e0cab471ff0e68126e6912145d470d3528e135a8b7117d88d3b1c06}
+  integrity: {kind: sha256, sha256: 65f1e7eda35caefb5dc3e367b9fc9ec5511717dd05f2b5d0d02ba9634c7431a6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-FACTORY-REMOTE-OPERATIONS-V1-1-001}
@@ -35963,7 +35963,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/system_operability_surface_v2.md', repository_path: docs/contracts/system_operability_surface_v2.md}
-  integrity: {kind: sha256, sha256: 48c8e5f0359733a55409792efffd5ad12fb4fc9dd301c783dd926c78ef8eed39}
+  integrity: {kind: sha256, sha256: aae80a3d0a735ad5c07432ad577411be11d23dd5f17e628add3dcfa62a3b8914}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
@@ -35977,13 +35977,13 @@ records:
 - asset_id: MODULE-SYSTEM-OPERABILITY-001
   record_version: '1.0'
   asset_type: script
-  purpose: Derived SystemOperabilityProjectionV2 composer over existing collector packet and systemd readback.
+  purpose: Derived SystemOperabilityProjectionV2 composer over scheduled collector snapshot plus bounded live systemd/deploy signals.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/system_operability.py', repository_path: src/solana_alpha_lab/factory/system_operability.py}
-  integrity: {kind: sha256, sha256: 27833c5a086c897f6322cc56d3694d783d6ecd0bf07635f4a3945539cd1d3172}
+  integrity: {kind: sha256, sha256: 6afacad8be21576d50c5f2599532bd5287e2ca6d4d7eb0fb38d2454844cdbd55}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
@@ -35996,13 +35996,13 @@ records:
 - asset_id: TEST-SYSTEM-OPERABILITY-SURFACE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Vertical acceptance for observe/diagnose/route loops, GET purity and fake process-alive removal.
+  purpose: Vertical acceptance for observe/diagnose/route loops, GET purity, fake process-alive removal and interactive bounded collector snapshot reads.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-07'
   truth_owner: SYSTEM_OPERABILITY_SURFACE_V2
   location: {kind: git_path, logical_uri: 'repo://tests/test_system_operability_surface_v2.py', repository_path: tests/test_system_operability_surface_v2.py}
-  integrity: {kind: sha256, sha256: 1b301c4be9041e89f92a95b414a3bfd3714c9a5825e77a6b64f1bbfd6246763a}
+  integrity: {kind: sha256, sha256: f6bd82dcbb42b86b10b522a9630cfbbefa57958f25dfbb545d377ac57d88d65a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
@@ -36028,6 +36028,26 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [show_system_operability, JSON_READBACK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-SYSTEM-OPERABILITY-BOUNDED-READ-PATH-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact repair contract so owner HOME and /system read a scheduled collector snapshot instead of recomputing growing RDP/backup/history telemetry.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-09'
+  truth_owner: SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1.md', repository_path: docs/tasks/SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1.md}
+  integrity: {kind: sha256, sha256: 55d1eded279e15893ee4a93a48cc19ea61c8d74c798df3219e4418fc46525920}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: DOC-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-SYSTEM-OPERABILITY-SURFACE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-SYSTEM-OPERABILITY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-SYSTEM-OPERABILITY-SURFACE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [INTERACTIVE_BOUNDED_READ, COLLECTOR_SNAPSHOT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: CTRL-RISK-AND-ECONOMICS-001
   record_version: '1.0'
