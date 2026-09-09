@@ -5,7 +5,7 @@
   "as_of": "2026-09-09",
   "task_id": "HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1",
   "reviewed_bindings_sha256": "cdd265766621b1f801bc64aedc902fb17783869e00ad3c7b136e1f1fc56f030c",
-  "reviewed_inventory_sha256": "376ef1c381318167b70de8a59e5744df6829e0635c86109e30eb958a269b1b28",
+  "reviewed_inventory_sha256": "5d814c4a24bb678e85d1afc8bb068729766d11734387b5a4ba62ca81b6f56faa",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
