@@ -33,6 +33,7 @@ FAST_LANE_CLASSIFIER_TERMINALS = frozenset(
         "REPLAY_AVAILABLE",
     }
 )
+PIT_READY_AVAILABILITY_CLASS = "PIT_READY"
 CASE_C_KILL_TERMINALS = frozenset(
     {
         "KILL_UNBOUND_EVIDENCE",
@@ -160,6 +161,59 @@ def deny_unresolved_fast_lane(
             unresolved = text_list(grounding.get("unresolved_requirements"))
     if unresolved and classifier_terminal in FAST_LANE_CLASSIFIER_TERMINALS:
         raise ValueError(KILL_UNBOUND_EVIDENCE)
+
+
+def deny_non_pit_fast_lane(
+    selected: Mapping[str, Any],
+    classifier_terminal: str,
+) -> None:
+    """Refuse Fast Lane unless every required freeze-owned binding is PIT_READY.
+
+    Packet 1.4 HFIC classify path only. Does not read
+    available_to_strategy_semantics as the machine switch. Does not re-resolve
+    Catalog or RDP. Extra unrelated bindings cannot substitute for a required
+    feature.
+    """
+    if classifier_terminal not in FAST_LANE_CLASSIFIER_TERMINALS:
+        return
+    raw_required = selected.get("required_feature_ids")
+    if raw_required is None:
+        return
+    if not isinstance(raw_required, list):
+        raise ValueError(KILL_UNBOUND_EVIDENCE)
+    required_ids: list[str] = []
+    seen: set[str] = set()
+    for item in raw_required:
+        if not isinstance(item, str) or not item:
+            raise ValueError(KILL_UNBOUND_EVIDENCE)
+        if item in seen:
+            continue
+        seen.add(item)
+        required_ids.append(item)
+    if not required_ids:
+        return
+    grounding = selected.get("grounding")
+    if not isinstance(grounding, Mapping):
+        raise ValueError(KILL_UNBOUND_EVIDENCE)
+    bindings = grounding.get("feature_bindings")
+    if not isinstance(bindings, list):
+        raise ValueError(KILL_UNBOUND_EVIDENCE)
+    by_id: dict[str, list[str]] = {}
+    for item in bindings:
+        if not isinstance(item, Mapping):
+            raise ValueError(KILL_UNBOUND_EVIDENCE)
+        feat = item.get("feature_id")
+        if not isinstance(feat, str) or not feat:
+            raise ValueError(KILL_UNBOUND_EVIDENCE)
+        availability = item.get("availability_class")
+        class_name = availability if isinstance(availability, str) else ""
+        by_id.setdefault(feat, []).append(class_name)
+    for feat in required_ids:
+        observed = by_id.get(feat)
+        if observed is None or len(observed) != 1:
+            raise ValueError(KILL_UNBOUND_EVIDENCE)
+        if observed[0] != PIT_READY_AVAILABILITY_CLASS:
+            raise ValueError(KILL_UNBOUND_EVIDENCE)
 
 
 def resolve_control_corpus_yield(

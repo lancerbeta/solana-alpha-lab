@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-REVIEW-001",
+  "as_of": "2026-09-09",
+  "task_id": "HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=a8af4d64ad26e11afdeaaa4e1ed3e8107ac4e1918cd9d2f675ebdc505c67ff5e",
+        "Q1_NON_PIT_REQUIRED_CANNOT_KEEP_FAST_LANE",
+        "Q2_AVAIL_SEMANTICS_DOES_NOT_OVERRIDE_CLASS",
+        "Q3_EXTRA_BINDINGS_CANNOT_SALVAGE_REQUIRED",
+        "Q4_PARTIAL_AND_UNKNOWN_NOT_ALLOWLISTED",
+        "Q5_NO_GENERIC_CLASSIFIER_SPEC_SCHEMA_YIELD_REWRITE",
+        "C1_PACKET14_POSTFILTER_REQUIRES_EXACT_ONE_PIT_READY_BINDING",
+        "C2_FAIL_CLOSED_KILL_UNBOUND_EVIDENCE",
+        "C3_OVERLAY_ONLY_ON_HFIC_CLASSIFY_PATH"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_PIT_READY_ALLOWLIST",
+        "CHECKED_FORWARD_HISTORICAL_MISSING_DENIED",
+        "CHECKED_PARTIAL_UNKNOWN_FAIL_CLOSED",
+        "CHECKED_MISSING_AND_DUPLICATE_BINDING",
+        "CHECKED_EXTRA_BINDING_CANNOT_SALVAGE",
+        "CHECKED_REPLAY_AVAILABLE_DENIED",
+        "CHECKED_PACKET_1_3_SKIP",
+        "CHECKED_UNRESOLVED_ONLY_UNCHANGED",
+        "CHECKED_NON_FAST_LANES_UNCHANGED",
+        "CHECKED_NO_SECRETS_NO_PROVIDER_NO_LIVE_RDP"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_PACKET14_FAST_LANE_REQUIRES_PIT_READY",
+        "DOD_T1_T16_VERTICAL_FREEZE_TO_CLASSIFIER",
+        "DOD_NAMED_CONSUMER_FIRST_FRESH_CONTROL",
+        "DOD_NON_CLAIMS_PRESERVED",
+        "DOD_NO_ALPHA_NO_EXPERIMENT_READY_NO_FCF"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_GENERIC_PIT_FRAMEWORK",
+    "NO_LIVE_CONTROL",
+    "NO_ACTIVE_RDP_WRITE",
+    "NO_CANONICAL_DONE"
+  ]
+}
