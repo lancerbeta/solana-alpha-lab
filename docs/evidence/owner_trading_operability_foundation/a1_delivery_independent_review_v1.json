@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "OWNER-TRADING-OPERABILITY-FOUNDATION-REVIEW-001",
+  "as_of": "2026-09-09",
+  "task_id": "OWNER_TRADING_OPERABILITY_FOUNDATION_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=638a51f7dc80d8ff026e66b47e39e60742e4681430bb4575c83e04c6dce6587e",
+        "C2_ENTER_APPLY_SERIALIZED_IMMEDIATE_WRITE",
+        "C4_BOUNDED_REQUESTED_VS_ADMITTED",
+        "NO_MATERIAL_YES_ON_BLOCKER_QUESTIONS",
+        "UNKNOWN_NOT_ZERO",
+        "HTTP_GET_99_25_12_5",
+        "PACKET_INFORMATION_PATH",
+        "PROCESS_OBLIGATION",
+        "model_diversity=UNPROVEN"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "HTTP_GET_99_25_12_5",
+        "INVALID_VALID_UNFROZEN_RESUME_FAIL_CLOSED",
+        "SHARED_STORE_1_ALLOW_1_BLOCK",
+        "GET_READONLY",
+        "LIVE_DENIED",
+        "PAPER_SHADOW_ISOLATION",
+        "FROZEN_NOT_RESIZED",
+        "UNKNOWN_EXPOSURE_FAIL_CLOSED",
+        "NEW_ENTRIES_STOP",
+        "SCHEMA_NE_ENABLEMENT",
+        "LOW_INVALID_UNFROZEN_RESUME_UNTESTED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_HTTP_GET_99_25_12_5",
+        "DOD_INVALID_POLICY_FAIL_CLOSED_EXIT_CONTINUES",
+        "DOD_SHARED_STORE_ONE_SLOT",
+        "DOD_GET_READONLY_NO_POLICY_CREATE",
+        "DOD_NO_LIVE_NO_VPS_APPLY"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_REAL_MONEY",
+    "NO_OWNER_FCF",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_VPS_POLICY_APPLY",
+    "NO_WORKBENCH_POLICY_EDITOR",
+    "NO_CANONICAL_DONE"
+  ]
+}
