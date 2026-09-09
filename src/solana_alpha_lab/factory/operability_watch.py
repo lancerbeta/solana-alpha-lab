@@ -39,6 +39,7 @@ COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
     "provider_observations",
     "restore_marker_unresolved",
 )
+COLLECTOR_SNAPSHOT_FILE_MAX_BYTES = 65536
 WATCH_REQUIRED_TIMERS = (
     "factory-observation-schedule.timer",
     "factory-remote-backup.timer",
@@ -160,18 +161,20 @@ def load_collector_snapshot_file(path: Path) -> tuple[str, dict[str, Any] | None
     if path.is_file() is False:
         return "MISSING", None
     try:
+        size = path.stat().st_size
+    except OSError:
+        return "INVALID", None
+    if size > COLLECTOR_SNAPSHOT_FILE_MAX_BYTES:
+        return "INVALID", None
+    try:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError, UnicodeDecodeError):
         return "INVALID", None
     if not isinstance(payload, dict):
         return "INVALID", None
-    if payload.get("schema") == COLLECTOR_SNAPSHOT_SCHEMA:
-        raw = payload
-    elif "collector_snapshot" in payload:
-        raw = payload.get("collector_snapshot")
-    else:
+    if payload.get("schema") != COLLECTOR_SNAPSHOT_SCHEMA:
         return "INVALID", None
-    parsed = validate_collector_snapshot(raw)
+    parsed = validate_collector_snapshot(payload)
     if parsed is None:
         return "INVALID", None
     return "PRESENT", parsed
@@ -389,7 +392,7 @@ def evaluate_operability(
         "pending": still_pending,
         "collector_snapshot": build_collector_snapshot(
             packet,
-            observed_at=str(packet.get("observed_at") or render_utc(clock)),
+            observed_at=str(packet.get("observed_at") or ""),
         ),
     }
     if write_state:

@@ -49,6 +49,7 @@ NON_CLAIMS = (
     "NO SYSTEM HEALTH FROM GIT",
     "NO MONITORING PLATFORM",
     "NO CANONICAL DONE",
+    "NO SYNCHRONOUS_COLLECTOR_RECOMPUTE_ON_GET",
 )
 
 RECOVERY_ROUTE = {
@@ -70,7 +71,9 @@ RECOVERY_ROUTE = {
     "MATERIAL_COVERAGE_DEGRADATION": UNATTENDED_RUNBOOK,
     "ALERTING_UNAVAILABLE": UNATTENDED_RUNBOOK,
     "DEPLOY_IDENTITY_MISMATCH": REMOTE_HOST_RUNBOOK,
-    "SQLITE_INTEGRITY_FAILED": UNATTENDED_RUNBOOK,
+    "COLLECTOR_SNAPSHOT_MISSING": UNATTENDED_RUNBOOK,
+    "COLLECTOR_SNAPSHOT_STALE": UNATTENDED_RUNBOOK,
+    "COLLECTOR_SNAPSHOT_INVALID": UNATTENDED_RUNBOOK,
 }
 
 AUTHORITY_CODES = frozenset(
@@ -291,6 +294,10 @@ def _next_action_for(code: str) -> str:
         return "FOLLOW_DURABILITY_RUNBOOK"
     if code in {"SOURCE_DATA_STALE", "PUBLICATION_STUCK", "PUBLICATION_FAILED"}:
         return "INSPECT_COLLECTOR_FRESHNESS"
+    if code == "COLLECTOR_SNAPSHOT_MISSING":
+        return "WAIT_ONE_WATCH_CYCLE"
+    if code in {"COLLECTOR_SNAPSHOT_STALE", "COLLECTOR_SNAPSHOT_INVALID"}:
+        return "INSPECT_COLLECTOR_FRESHNESS"
     return "INSPECT_SYSTEM"
 
 
@@ -441,7 +448,7 @@ def _rollup_state(
     if any(status == "ACTION_REQUIRED" for status in statuses):
         return "ACTION_REQUIRED"
     if (
-        codes
+        (codes - {"COLLECTOR_SNAPSHOT_MISSING", "COLLECTOR_SNAPSHOT_STALE", "COLLECTOR_SNAPSHOT_INVALID"})
         or collector_verdict == "DEGRADED"
         or any(status == "DEGRADED" for status in statuses)
     ):
@@ -561,6 +568,35 @@ def compose_system_operability(
                 evidence=f"deployed={deployed} git_head={git_head}",
                 current_safe_state="DEGRADED",
                 next_safe_action=_next_action_for("DEPLOY_IDENTITY_MISMATCH"),
+                observed_at=observed_at,
+            )
+        )
+    freshness = str(snapshot_meta.get("freshness") or "")
+    snapshot_attention = {
+        "MISSING": (
+            "COLLECTOR_SNAPSHOT_MISSING",
+            "Dedicated collector snapshot is absent; wait one operability-watch cycle.",
+            "UNKNOWN",
+        ),
+        "STALE": (
+            "COLLECTOR_SNAPSHOT_STALE",
+            "Dedicated collector snapshot exceeded 1080s freshness; no GET rebuild.",
+            "UNKNOWN",
+        ),
+        "INVALID": (
+            "COLLECTOR_SNAPSHOT_INVALID",
+            "Dedicated collector snapshot failed schema or source observed_at.",
+            "UNKNOWN",
+        ),
+    }
+    if freshness in snapshot_attention:
+        code, evidence, safe = snapshot_attention[freshness]
+        attention.append(
+            _attention_card(
+                code,
+                evidence=evidence,
+                current_safe_state=safe,
+                next_safe_action=_next_action_for(code),
                 observed_at=observed_at,
             )
         )

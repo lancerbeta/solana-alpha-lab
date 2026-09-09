@@ -21,8 +21,10 @@ Deploy в этом атоме запрещён.
 ## OWNER SENTENCE
 
 Интерактивный GET читает свежий derived snapshot плюс живые O(1) сигналы.
-Нет snapshot / битый JSON / старше 1080s → честный UNKNOWN, без
-синхронного rebuild.
+Нет snapshot / битый JSON / старше 1080s / нет source `observed_at` →
+честный UNKNOWN, без синхронного rebuild и без подмены времени часами watch.
+HOME/`/system` получают attention `COLLECTOR_SNAPSHOT_*` (MISSING →
+подождать один watch cycle), а не «всё чисто».
 
 ## DECISION_DELTA
 

@@ -941,6 +941,11 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
             self.assertEqual(projection["collector_snapshot"]["freshness"], "MISSING")
             self.assertNotEqual(projection["state"], "OK_OBSERVED")
             self.assertEqual(projection["coverage"]["COLLECTOR"]["status"], "NOT_PRESENT")
+            self.assertIn(
+                "COLLECTOR_SNAPSHOT_MISSING",
+                {item["attention_code"] for item in projection["attention"]},
+            )
+            self.assertEqual(projection["next_safe_action"], "WAIT_ONE_WATCH_CYCLE")
 
     def test_stale_snapshot_is_visible_and_not_ok_observed(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -1131,6 +1136,56 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
             self.assertEqual(hashlib.sha256(incident.read_bytes()).hexdigest(), incident_digest)
             self.assertFalse(any(path.endswith(INCIDENT_STATE_RELATIVE) for path in reads))
             self.assertTrue(any(path.endswith(COLLECTOR_SNAPSHOT_RELATIVE) for path in reads))
+
+    def test_watch_missing_source_time_is_invalid_not_fresh(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp)
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            fake_packet = _packet(password="nope")
+            try:
+                with patch(
+                    "solana_alpha_lab.factory.operability_watch.build_collector_operational_packet",
+                    return_value=fake_packet,
+                ):
+                    evaluate_operability(
+                        root=root,
+                        store=store,
+                        now=NOW,
+                        unit_status=UNITS_OK,
+                        emit=False,
+                        persist=True,
+                        environ={},
+                    )
+                projection = compose_system_operability(
+                    root=root,
+                    now=NOW,
+                    unit_status=UNITS_OK,
+                    environ={},
+                )
+                self.assertEqual(projection["collector_snapshot"]["freshness"], "INVALID")
+                self.assertNotEqual(projection["state"], "OK_OBSERVED")
+                self.assertIn(
+                    "COLLECTOR_SNAPSHOT_INVALID",
+                    {item["attention_code"] for item in projection["attention"]},
+                )
+            finally:
+                store.close()
+
+    def test_oversized_snapshot_file_is_invalid(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp) / "big"
+            root.mkdir()
+            path = root / COLLECTOR_SNAPSHOT_RELATIVE
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(b"{%s}" % (b"x" * 70000))
+            projection = compose_system_operability(
+                root=root,
+                now=NOW,
+                unit_status=UNITS_OK,
+                environ={},
+            )
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "INVALID")
+            self.assertNotEqual(projection["state"], "OK_OBSERVED")
 
 
 if __name__ == "__main__":

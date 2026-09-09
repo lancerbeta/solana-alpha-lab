@@ -112,7 +112,9 @@ operability-watch snapshot only. Snapshot evidence MUST carry:
 
 STALE / MISSING / INVALID snapshot MUST NOT trigger optimistic
 synchronous fallback or rebuild. Projection render time is not source
-evidence time.
+evidence time. Watch MUST persist packet source `observed_at` only;
+missing/unparseable source time is INVALID, never replaced by watch
+clock.
 
 First future deploy with no `collector_snapshot` yet is MISSING:
 honest UNKNOWN, no GET-side warm-up. `evaluate_operability --mode emit`
