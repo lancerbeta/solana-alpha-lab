@@ -1501,11 +1501,15 @@ def accept_signal_decision(
                 admitted_notional = Decimal(str(frozen))
             else:
                 from solana_alpha_lab.factory.trading_runtime_policy import (
+                    STATUS_INVALID,
                     STATUS_VALID,
                     resolve_current_policy,
                 )
 
-                if str(resolve_current_policy(store, mode)["status"]) == STATUS_VALID:
+                if str(resolve_current_policy(store, mode)["status"]) in {
+                    STATUS_VALID,
+                    STATUS_INVALID,
+                }:
                     raise PaperPlaneError("ADMISSION_BINDING_MISSING")
             resume_only = True
         if not resume_only:

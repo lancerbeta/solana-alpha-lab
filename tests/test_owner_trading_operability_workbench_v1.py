@@ -194,7 +194,7 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
                         "strategy_id: STRAT-HTTP-UI",
                         "strategy_version: V1",
                         "notional_policy:",
-                        "  notional_usd: 111",
+                        "  notional_usd: 99.25",
                         "risk_policy:",
                         "  max_open_positions: 5",
                     ]
@@ -229,8 +229,9 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
             self.assertIn("Запрос стратегии", html)
             self.assertIn("Runtime cap", html)
             self.assertIn("Эффективно", html)
-            self.assertIn("111", html)
+            self.assertIn("99.25", html)
             self.assertIn("12.5", html)
+            self.assertNotIn("#99.25", html)
             self.assertNotIn("PaperPlane отсутствует", html)
             self.assertEqual(paper_path.stat().st_mtime_ns, mtime_before)
 
