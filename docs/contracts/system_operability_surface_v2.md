@@ -10,8 +10,12 @@ Canonical binding remains `ACTIVE-FACTORY-REMOTE-OPERATIONS`
 `NO_CHANGE_REQUIRED`).
 
 ```text
-collector packet + ObservationSchedule (readonly)
-+ systemd readback + deploy marker + incident JSON + env class
+scheduled operability watch
+        → full collector packet (background)
+        → bounded derived collector_snapshot (dedicated snapshot file;
+          extra key also on incident state, unused by GET)
+interactive GET `/` and `/system`
+        → bounded snapshot read + live O(1) system signals
         → SYSTEM_OPERABILITY_SURFACE_V2
         → /system + scripts/show_system_operability.py
         → System-local attention → OWNER_ATTENTION_AND_CHANGE_FEED_V1
@@ -26,6 +30,8 @@ HEALTHY is forbidden
 process_alive=True is never inferred from Git config + OperationalStore
 REVIEWED != RESOLVED
 current health is never Git truth
+INTERACTIVE_BOUNDED_READ
+snapshot is derived operational evidence, not scientific truth
 ```
 
 ## 1. Owner questions
@@ -74,10 +80,56 @@ Git config `deploy_version` is capability inventory, not current deployed proof.
 `/system` performs zero SQLite create/migrate/WAL, zero incident write,
 zero Telegram/Drive/provider/Git mutation, and never prints secret values.
 
-Allowed: filesystem stat, readonly SQLite, readonly JSON/YAML,
-`systemctl is-active` without sudo, local Git HEAD, deploy marker file.
+Allowed: filesystem stat, readonly JSON/YAML,
+`systemctl is-active` without sudo, local Git HEAD, deploy marker file,
+readonly presence checks.
 
-Absent ObservationSchedule → `SOURCE_NOT_PRESENT` without mkdir.
+Absent ObservationSchedule or absent collector snapshot → honest
+`NOT_PRESENT` / `UNKNOWN` without mkdir and without synchronous packet
+rebuild.
+
+## 4.1 INTERACTIVE_BOUNDED_READ
+
+Owner-facing GET `/` and `/system` MUST NOT synchronously execute recursive
+or data-volume-proportional Observation RDP, backup-sink, or full
+operational-history traversal.
+
+They MUST NOT call `build_collector_operational_packet` or a full
+`build_collector_read_model` fallback.
+
+They MUST NOT parse `operability_incident_state.json` (`active` /
+`pending` Telegram retry history). Interactive GET reads only the
+dedicated watch artifact `operability_collector_snapshot.json`.
+That file is a derived snapshot of the same watch cycle, not a second
+monitoring store, cache service, timer or daemon.
+
+Heavy derived collector evidence may come from the scheduled
+operability-watch snapshot only. Snapshot evidence MUST carry:
+
+- source `observed_at`
+- freshness evaluation (`FRESH` | `STALE` | `MISSING` | `INVALID`)
+- fail-closed stale/missing/invalid semantics
+
+STALE / MISSING / INVALID snapshot MUST NOT trigger optimistic
+synchronous fallback or rebuild. Projection render time is not source
+evidence time. Watch MUST persist packet source `observed_at` only;
+missing/unparseable source time is INVALID, never replaced by watch
+clock.
+
+STALE packet fields remain diagnostic coverage only. They MUST NOT
+classify current incidents or drive current `ACTION_REQUIRED` /
+`DEGRADED` from collector_verdict. Live systemd/deploy signals stay live.
+STALE packet values MUST NOT occupy current-shaped `storage` /
+`durability` / `collection.health_classes` fields; they may appear only
+under timestamped `collector_snapshot.diagnostics`. GET MUST read at
+most the snapshot size cap from a single open.
+
+First future deploy with no `collector_snapshot` yet is MISSING:
+honest UNKNOWN, no GET-side warm-up. `evaluate_operability --mode emit`
+is not a cache initializer.
+
+Allowed live bounded reads may remain live: HTTP_SELF, systemd unit
+state, deploy marker, bounded Git HEAD, safe environment presence classes.
 
 ## 5. Non-claims
 
@@ -94,4 +146,5 @@ NO WALLET
 NO SYSTEM HEALTH FROM GIT
 NO MONITORING PLATFORM
 NO CANONICAL DONE
+NO SYNCHRONOUS_COLLECTOR_RECOMPUTE_ON_GET
 ```

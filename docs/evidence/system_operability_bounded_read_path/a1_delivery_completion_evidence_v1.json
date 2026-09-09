@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SYSTEM-OPERABILITY-BOUNDED-READ-PATH-COMPLETION-001",
+  "as_of": "2026-09-09",
+  "task_id": "SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1",
+  "state_change": "SYSTEM_OPERABILITY_BOUNDED_READ_PATH_CANDIDATE",
+  "base_main": "94c3397acf68516d69808e224fb61c4f99142a55",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "83616d8f7f4b5d45df3d94d8a473e9860d1ef39792654a48a5c4d1b8c6f367e7",
+    "catalog/assets/lifecycle.yaml": "4e927c5772a801dea78afbedeb0135f5f87c9575ab5add93191412151776d1c3",
+    "catalog/catalog_manifest.yaml": "d7f2d746893cfeafd8a0d0a5d249b0fdb177b410989b0860cc701fda153a8a39",
+    "catalog/generated/asset_edges.json": "445c4f807e93a26430b6c8ea04d9cc40f9eafaa7742ca95bd6965c42b15cc492",
+    "docs/PROJECT_MAP.md": "48509d419d842a4cbe3fd73bd1ddb261ef6fef199ceec0084e138f9223b26c82",
+    "docs/contracts/system_operability_surface_v2.md": "0ba1436b05c8ed6cee8fa4f7106eac2c6023b0d293120a81ca1fffd01bab1be9",
+    "docs/reports/system_operability_bounded_read_path/a1_owner_readout_v1.md": "22eb8d6b4f123fa0a262e873745e78c467989126b20f6e44d3d2da445ab2be62",
+    "docs/tasks/SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1.md": "8583c1158e4156730e89c3a36ca437e632fe6cdaaf005a847d001a8fdb437b17",
+    "src/solana_alpha_lab/factory/operability_watch.py": "acfee1b82c8832b963d837ebafa177787c68b5c07d0a2ee4eed1b23cdfa41d2c",
+    "src/solana_alpha_lab/factory/system_operability.py": "9067a99b3cadd1af218a65aab41097fd4d2f8d6b2cab17bb8c40292b606d59e9",
+    "tests/test_factory_unattended_operability_closure_v1.py": "f747163e9238d85ea1b47d07da15eae6d6b6de19c38bcf52cb0591e6efb048c7",
+    "tests/test_system_operability_surface_v2.py": "d6cf08521491452b65b512a7fba173a3ad93d80549ef8f727c749f7af76ee399"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/system_operability_bounded_read_path/a1_delivery_factory_fit_v1.json",
+    "sha256": "9ab47db330e21fe903a8f0cd3d1472d391b4bb18ca5fdfd45bb8d8add2297a99",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1",
+    "independent_review": {
+      "path": "docs/evidence/system_operability_bounded_read_path/a1_delivery_independent_review_v1.json",
+      "sha256": "bcc70abbb58b7b1558f77b13a9b086db8adcfce6724e2c23da8374ac61dc9cb7",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_OWNER_FCF",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_MONITORING_PLATFORM",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_LATENCY_REPAIR"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

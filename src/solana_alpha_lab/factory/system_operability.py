@@ -11,21 +11,17 @@ from typing import Any, Callable, Mapping
 
 import yaml
 
-from solana_alpha_lab.factory.collector_operational_packet import (
-    build_collector_operational_packet,
-)
 from solana_alpha_lab.factory.external_heartbeat import HEARTBEAT_ENV, UNCONFIGURED
 from solana_alpha_lab.factory.observation_schedule import render_utc
 from solana_alpha_lab.factory.observation_schedule_runtime import DEPLOY_SHA_NAME
-from solana_alpha_lab.factory.observation_schedule_store import (
-    ObservationScheduleStore,
-    ObservationScheduleStoreError,
-)
 from solana_alpha_lab.factory.operability_watch import (
+    SNAPSHOT_RELATIVE as COLLECTOR_SNAPSHOT_RELATIVE,
     STATE_RELATIVE as INCIDENT_STATE_RELATIVE,
     WATCH_REQUIRED_TIMERS,
     WATCH_WORKBENCH_UNIT,
     classify_incidents,
+    evaluate_collector_snapshot_freshness,
+    load_collector_snapshot_file,
 )
 
 SCHEMA = "smial.system-operability-projection"
@@ -53,6 +49,7 @@ NON_CLAIMS = (
     "NO SYSTEM HEALTH FROM GIT",
     "NO MONITORING PLATFORM",
     "NO CANONICAL DONE",
+    "NO SYNCHRONOUS_COLLECTOR_RECOMPUTE_ON_GET",
 )
 
 RECOVERY_ROUTE = {
@@ -74,7 +71,9 @@ RECOVERY_ROUTE = {
     "MATERIAL_COVERAGE_DEGRADATION": UNATTENDED_RUNBOOK,
     "ALERTING_UNAVAILABLE": UNATTENDED_RUNBOOK,
     "DEPLOY_IDENTITY_MISMATCH": REMOTE_HOST_RUNBOOK,
-    "SQLITE_INTEGRITY_FAILED": UNATTENDED_RUNBOOK,
+    "COLLECTOR_SNAPSHOT_MISSING": UNATTENDED_RUNBOOK,
+    "COLLECTOR_SNAPSHOT_STALE": UNATTENDED_RUNBOOK,
+    "COLLECTOR_SNAPSHOT_INVALID": UNATTENDED_RUNBOOK,
 }
 
 AUTHORITY_CODES = frozenset(
@@ -295,6 +294,10 @@ def _next_action_for(code: str) -> str:
         return "FOLLOW_DURABILITY_RUNBOOK"
     if code in {"SOURCE_DATA_STALE", "PUBLICATION_STUCK", "PUBLICATION_FAILED"}:
         return "INSPECT_COLLECTOR_FRESHNESS"
+    if code == "COLLECTOR_SNAPSHOT_MISSING":
+        return "WAIT_ONE_WATCH_CYCLE"
+    if code in {"COLLECTOR_SNAPSHOT_STALE", "COLLECTOR_SNAPSHOT_INVALID"}:
+        return "INSPECT_COLLECTOR_FRESHNESS"
     return "INSPECT_SYSTEM"
 
 
@@ -395,7 +398,7 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
         degraded="IMMUTABLE_ARCHIVE_STALE" in classes,
         present=_observed(packet.get("immutable_archive_latest_verified_day")),
     )
-    return {
+    mapped = {
         "COLLECTOR": _coverage("AVAILABLE"),
         "DATA_FRESHNESS": _coverage(freshness),
         "PROVIDER_OBSERVATIONS": _coverage(provider),
@@ -404,6 +407,10 @@ def _map_packet_coverage(packet: Mapping[str, Any] | None, *, source_status: str
         "OFFHOST_BACKUP": _coverage(offhost),
         "IMMUTABLE_ARCHIVE": _coverage(archive),
     }
+    if source_status == "STALE":
+        for row in mapped.values():
+            row["status"] = "STALE"
+    return mapped
 
 
 def _rollup_state(
@@ -440,7 +447,7 @@ def _rollup_state(
     if any(status == "ACTION_REQUIRED" for status in statuses):
         return "ACTION_REQUIRED"
     if (
-        codes
+        (codes - {"COLLECTOR_SNAPSHOT_MISSING", "COLLECTOR_SNAPSHOT_STALE", "COLLECTOR_SNAPSHOT_INVALID"})
         or collector_verdict == "DEGRADED"
         or any(status == "DEGRADED" for status in statuses)
     ):
@@ -452,10 +459,25 @@ def _rollup_state(
         "PARTIAL",
         "UNKNOWN",
         "NOT_CONFIGURED",
+        "STALE",
+        "MISSING",
     }
     if any(status in blocked for status in statuses):
         return "UNKNOWN"
     return "OK_OBSERVED"
+
+
+def _snapshot_meta(
+    *,
+    freshness: str,
+    observed_at: str | None = None,
+    age_seconds: int | None = None,
+) -> dict[str, Any]:
+    return {
+        "freshness": freshness,
+        "observed_at": observed_at,
+        "age_seconds": age_seconds,
+    }
 
 
 def _open_collector(
@@ -463,28 +485,29 @@ def _open_collector(
     *,
     now: datetime,
     injected: Mapping[str, Any] | None,
-) -> tuple[Mapping[str, Any] | None, str, ObservationScheduleStore | None]:
+) -> tuple[Mapping[str, Any] | None, str, dict[str, Any]]:
     if injected is not None:
-        return injected, "PRESENT", None
-    path = observation_sqlite_path(root)
-    if path.is_file() is False:
-        return None, "NOT_PRESENT", None
-    store: ObservationScheduleStore | None = None
-    try:
-        store = ObservationScheduleStore(path, readonly=True)
-        packet = build_collector_operational_packet(root=root, store=store, now=now)
-        return packet, "PRESENT", store
-    except ObservationScheduleStoreError as exc:
-        code = str(exc)
-        if store is not None:
-            store.close()
-        if code in {"SOURCE_NOT_PRESENT", "SOURCE_UNAVAILABLE", "SOURCE_INVALID"}:
-            return None, code.removeprefix("SOURCE_"), None
-        return None, "UNAVAILABLE", None
-    except (OSError, Exception):
-        if store is not None:
-            store.close()
-        return None, "UNAVAILABLE", None
+        return injected, "PRESENT", _snapshot_meta(freshness="INJECTED")
+    shape, snapshot = load_collector_snapshot_file(root / COLLECTOR_SNAPSHOT_RELATIVE)
+    if shape == "MISSING":
+        return None, "NOT_PRESENT", _snapshot_meta(freshness="MISSING")
+    if shape == "INVALID" or snapshot is None:
+        return None, "INVALID", _snapshot_meta(freshness="INVALID")
+    source_observed = str(snapshot.get("observed_at") or "")
+    freshness, age = evaluate_collector_snapshot_freshness(observed_at=source_observed, now=now)
+    meta = _snapshot_meta(
+        freshness=freshness,
+        observed_at=source_observed,
+        age_seconds=age,
+    )
+    if freshness == "INVALID":
+        return None, "INVALID", meta
+    packet = snapshot.get("packet")
+    if not isinstance(packet, dict):
+        return None, "INVALID", _snapshot_meta(freshness="INVALID", observed_at=source_observed)
+    if freshness == "STALE":
+        return packet, "STALE", meta
+    return packet, "PRESENT", meta
 
 
 def compose_system_operability(
@@ -501,128 +524,180 @@ def compose_system_operability(
     observed_at = render_utc(clock)
     env = {str(key): str(value) for key, value in (environ if environ is not None else os.environ).items()}
     units = read_required_units(unit_status=unit_status, unit_reader=unit_reader)
-    packet, collector_status, store = _open_collector(
+    packet, collector_status, snapshot_meta = _open_collector(
         root, now=clock, injected=collector_packet
     )
-    try:
-        systemd_units = dict(units)
-        if _systemd_coverage(units)["status"] == "UNAVAILABLE":
-            classified_units = {
-                name: SYSTEMD_UNAVAILABLE for name in (*WATCH_REQUIRED_TIMERS, WATCH_WORKBENCH_UNIT)
-            }
-        else:
-            classified_units = systemd_units
+    systemd_units = dict(units)
+    if _systemd_coverage(units)["status"] == "UNAVAILABLE":
+        classified_units = {
+            name: SYSTEMD_UNAVAILABLE for name in (*WATCH_REQUIRED_TIMERS, WATCH_WORKBENCH_UNIT)
+        }
+    else:
+        classified_units = systemd_units
+    if collector_status == "STALE":
+        incidents = classify_incidents({}, unit_status=classified_units)
+        classes: set[str] = set()
+    else:
         incidents = classify_incidents(packet or {}, unit_status=classified_units)
-        classes = {str(item) for item in ((packet or {}).get("health_classes") or [])}
-        if "OFFHOST_BACKUP_STALE" in classes:
-            incidents.setdefault(
-                "OFFHOST_BACKUP_STALE", "Off-host backup freshness degraded."
+        classes = {
+            str(item)
+            for item in ((packet or {}).get("health_classes") or [])
+            if isinstance(item, str)
+        }
+    if "OFFHOST_BACKUP_STALE" in classes:
+        incidents.setdefault(
+            "OFFHOST_BACKUP_STALE", "Off-host backup freshness degraded."
+        )
+    if "OFFHOST_BACKUP_FAILED" in classes:
+        incidents.setdefault("OFFHOST_BACKUP_FAILED", "Off-host backup failed.")
+    attention = [
+        _attention_card(
+            code,
+            evidence=detail,
+            current_safe_state="DEGRADED",
+            next_safe_action=_next_action_for(code),
+            observed_at=observed_at,
+        )
+        for code, detail in incidents.items()
+    ]
+    deployed = read_deploy_marker(root)
+    git_head = read_git_head(root)
+    if deployed and git_head:
+        deploy_relation = "MATCH" if deployed == git_head else "MISMATCH"
+    elif deployed or git_head:
+        deploy_relation = "PARTIAL"
+    else:
+        deploy_relation = "UNKNOWN"
+    if deploy_relation == "MISMATCH":
+        attention.append(
+            _attention_card(
+                "DEPLOY_IDENTITY_MISMATCH",
+                evidence=f"deployed={deployed} git_head={git_head}",
+                current_safe_state="DEGRADED",
+                next_safe_action=_next_action_for("DEPLOY_IDENTITY_MISMATCH"),
+                observed_at=observed_at,
             )
-        if "OFFHOST_BACKUP_FAILED" in classes:
-            incidents.setdefault("OFFHOST_BACKUP_FAILED", "Off-host backup failed.")
-        attention = [
+        )
+    freshness = str(snapshot_meta.get("freshness") or "")
+    snapshot_attention = {
+        "MISSING": (
+            "COLLECTOR_SNAPSHOT_MISSING",
+            "Dedicated collector snapshot is absent; wait one operability-watch cycle.",
+            "UNKNOWN",
+        ),
+        "STALE": (
+            "COLLECTOR_SNAPSHOT_STALE",
+            "Dedicated collector snapshot exceeded 1080s freshness; no GET rebuild.",
+            "UNKNOWN",
+        ),
+        "INVALID": (
+            "COLLECTOR_SNAPSHOT_INVALID",
+            "Dedicated collector snapshot failed schema or source observed_at.",
+            "UNKNOWN",
+        ),
+    }
+    if freshness in snapshot_attention:
+        code, evidence, safe = snapshot_attention[freshness]
+        attention.append(
             _attention_card(
                 code,
-                evidence=detail,
-                current_safe_state="DEGRADED",
+                evidence=evidence,
+                current_safe_state=safe,
                 next_safe_action=_next_action_for(code),
                 observed_at=observed_at,
             )
-            for code, detail in incidents.items()
-        ]
-        deployed = read_deploy_marker(root)
-        git_head = read_git_head(root)
-        if deployed and git_head:
-            deploy_relation = "MATCH" if deployed == git_head else "MISMATCH"
-        elif deployed or git_head:
-            deploy_relation = "PARTIAL"
-        else:
-            deploy_relation = "UNKNOWN"
-        if deploy_relation == "MISMATCH":
-            attention.append(
-                _attention_card(
-                    "DEPLOY_IDENTITY_MISMATCH",
-                    evidence=f"deployed={deployed} git_head={git_head}",
-                    current_safe_state="DEGRADED",
-                    next_safe_action=_next_action_for("DEPLOY_IDENTITY_MISMATCH"),
-                    observed_at=observed_at,
-                )
-            )
-        telegram = _telegram_class(env)
-        heartbeat = _heartbeat_class(env)
-        coverage = {
-            "HTTP_SELF": _coverage(
-                "SERVING" if http_self == HTTP_SERVING else http_self
-            ),
-            "SYSTEMD": _systemd_coverage(units),
-            **_map_packet_coverage(packet, source_status=collector_status),
-            "DEPLOY_IDENTITY": _coverage(
-                "AVAILABLE" if deploy_relation in {"MATCH", "MISMATCH"} else deploy_relation
-            ),
-            "ALERTING": _coverage(str(telegram["status"])),
-            "OUT_OF_BAND_HOST_REACHABILITY": heartbeat,
-            "CHANGE_HISTORY": _coverage("STATE_ONLY"),
-        }
-        collector_verdict = None if packet is None else _text(packet.get("collector_verdict"))
-        state = _rollup_state(
-            attention=attention,
-            coverage=coverage,
-            collector_verdict=collector_verdict or None,
         )
-        workbench_unit = units.get(WATCH_WORKBENCH_UNIT, SYSTEMD_UNAVAILABLE)
-        processes = {
-            "http_self": http_self,
-            "managed_workbench_unit": workbench_unit,
-            "required_timers": {
-                name: units.get(name, SYSTEMD_UNAVAILABLE) for name in WATCH_REQUIRED_TIMERS
-            },
+    telegram = _telegram_class(env)
+    heartbeat = _heartbeat_class(env)
+    coverage = {
+        "HTTP_SELF": _coverage(
+            "SERVING" if http_self == HTTP_SERVING else http_self
+        ),
+        "SYSTEMD": _systemd_coverage(units),
+        **_map_packet_coverage(packet, source_status=collector_status),
+        "DEPLOY_IDENTITY": _coverage(
+            "AVAILABLE" if deploy_relation in {"MATCH", "MISMATCH"} else deploy_relation
+        ),
+        "ALERTING": _coverage(str(telegram["status"])),
+        "OUT_OF_BAND_HOST_REACHABILITY": heartbeat,
+        "CHANGE_HISTORY": _coverage("STATE_ONLY"),
+    }
+    collector_verdict = None
+    if packet is not None and collector_status not in {"STALE", "INVALID", "NOT_PRESENT"}:
+        collector_verdict = _text(packet.get("collector_verdict"))
+    state = _rollup_state(
+        attention=attention,
+        coverage=coverage,
+        collector_verdict=collector_verdict or None,
+    )
+    workbench_unit = units.get(WATCH_WORKBENCH_UNIT, SYSTEMD_UNAVAILABLE)
+    processes = {
+        "http_self": http_self,
+        "managed_workbench_unit": workbench_unit,
+        "required_timers": {
+            name: units.get(name, SYSTEMD_UNAVAILABLE) for name in WATCH_REQUIRED_TIMERS
+        },
+    }
+    next_item = attention[0] if attention else None
+    if next_item:
+        next_safe = str(next_item.get("NEXT_SAFE_ACTION") or "INSPECT_COVERAGE_GAPS")
+    elif state == "OK_OBSERVED":
+        next_safe = ""
+    else:
+        next_safe = "INSPECT_COVERAGE_GAPS"
+    current_packet = None if collector_status == "STALE" else packet
+    if collector_status == "STALE" and packet is not None:
+        snapshot_meta = dict(snapshot_meta)
+        snapshot_meta["diagnostics"] = {
+            "health_classes": list(packet.get("health_classes") or []),
+            "activation_state": packet.get("activation_state"),
+            "filesystem_disk_used_pct": packet.get("filesystem_disk_used_pct"),
+            "projected_97d_status": packet.get("projected_97d_status"),
+            "backup_age_seconds": packet.get("backup_age_seconds"),
+            "offhost_backup_state": packet.get("offhost_backup_state"),
+            "immutable_archive_latest_verified_day": packet.get(
+                "immutable_archive_latest_verified_day"
+            ),
         }
-        next_item = attention[0] if attention else None
-        if next_item:
-            next_safe = str(next_item.get("NEXT_SAFE_ACTION") or "INSPECT_COVERAGE_GAPS")
-        elif state == "OK_OBSERVED":
-            next_safe = ""
-        else:
-            next_safe = "INSPECT_COVERAGE_GAPS"
-        return {
-            "schema": SCHEMA,
-            "schema_version": SCHEMA_VERSION,
-            "observed_at": observed_at,
-            "state": state,
-            "coverage": coverage,
-            "identity": {
-                "deployed_sha": deployed,
-                "git_head": git_head,
-                "deploy_relation": deploy_relation,
-                "capability_deploy_version": read_capability_deploy_version(root),
-                "capability_health_owner": "SYSTEM_OPERABILITY_SURFACE_V2",
-            },
-            "processes": processes,
-            "collection": {
-                "source_status": collector_status,
-                "collector_verdict": collector_verdict or collector_status,
-                "health_classes": list(packet.get("health_classes") or []) if packet else [],
-                "activation_state": packet.get("activation_state") if packet else None,
-            },
-            "storage": {
-                "filesystem_disk_used_pct": None if packet is None else packet.get("filesystem_disk_used_pct"),
-                "projected_97d_status": None if packet is None else packet.get("projected_97d_status"),
-            },
-            "durability": {
-                "mutable_backup": None if packet is None else packet.get("backup_age_seconds"),
-                "offhost_backup_state": None if packet is None else packet.get("offhost_backup_state"),
-                "immutable_archive_latest_verified_day": (
-                    None if packet is None else packet.get("immutable_archive_latest_verified_day")
-                ),
-            },
-            "alerting": telegram,
-            "out_of_band_host_reachability": heartbeat,
-            "attention": attention,
-            "next_safe_action": next_safe,
-            "authority_required": bool(next_item and next_item.get("AUTHORITY_REQUIRED")),
-            "non_claims": list(NON_CLAIMS),
-            "incident_state_relative": INCIDENT_STATE_RELATIVE,
-        }
-    finally:
-        if store is not None:
-            store.close()
+    return {
+        "schema": SCHEMA,
+        "schema_version": SCHEMA_VERSION,
+        "observed_at": observed_at,
+        "state": state,
+        "coverage": coverage,
+        "identity": {
+            "deployed_sha": deployed,
+            "git_head": git_head,
+            "deploy_relation": deploy_relation,
+            "capability_deploy_version": read_capability_deploy_version(root),
+            "capability_health_owner": "SYSTEM_OPERABILITY_SURFACE_V2",
+        },
+        "processes": processes,
+        "collection": {
+            "source_status": collector_status,
+            "collector_verdict": collector_verdict or collector_status,
+            "health_classes": list(current_packet.get("health_classes") or []) if current_packet else [],
+            "activation_state": current_packet.get("activation_state") if current_packet else None,
+            "snapshot": snapshot_meta,
+        },
+        "collector_snapshot": snapshot_meta,
+        "storage": {
+            "filesystem_disk_used_pct": None if current_packet is None else current_packet.get("filesystem_disk_used_pct"),
+            "projected_97d_status": None if current_packet is None else current_packet.get("projected_97d_status"),
+        },
+        "durability": {
+            "mutable_backup": None if current_packet is None else current_packet.get("backup_age_seconds"),
+            "offhost_backup_state": None if current_packet is None else current_packet.get("offhost_backup_state"),
+            "immutable_archive_latest_verified_day": (
+                None if current_packet is None else current_packet.get("immutable_archive_latest_verified_day")
+            ),
+        },
+        "alerting": telegram,
+        "out_of_band_host_reachability": heartbeat,
+        "attention": attention,
+        "next_safe_action": next_safe,
+        "authority_required": bool(next_item and next_item.get("AUTHORITY_REQUIRED")),
+        "non_claims": list(NON_CLAIMS),
+        "incident_state_relative": INCIDENT_STATE_RELATIVE,
+        "collector_snapshot_relative": COLLECTOR_SNAPSHOT_RELATIVE,
+    }
