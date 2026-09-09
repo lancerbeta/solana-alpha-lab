@@ -58,14 +58,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_trading_operability_foundation/a1_delivery_factory_fit_v1.json",
-    "sha256": "8e4231af5768a615386421f011e43f8d0f3e0f8db6f015e2caeec84f1253efc2",
+    "sha256": "b0c4ba82073b97e6db5e9b6b8feffea8cce085d13912b7600aac3ff4207f79c0",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_TRADING_OPERABILITY_FOUNDATION",
     "independent_review": {
       "path": "docs/evidence/owner_trading_operability_foundation/a1_delivery_independent_review_v1.json",
-      "sha256": "3948d4bfd63a1452b0bc4b9ed89a3a655dab34249f59ad863a6c26d0f0eb7084",
+      "sha256": "dc2835b86561420d53cf773cc1c56d7e61d90ba5007720e725262c83b19da1dd",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
