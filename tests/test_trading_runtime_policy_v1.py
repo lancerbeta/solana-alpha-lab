@@ -345,6 +345,42 @@ class TradingRuntimePolicyTests(unittest.TestCase):
             finally:
                 store.close()
 
+    def test_missing_strategy_id_fail_closes_family_notional_cap(self) -> None:
+        strategy = load_strategy_version(ROOT, STRAT_REL)
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
+            try:
+                _apply(
+                    store,
+                    "PAPER",
+                    _candidate(
+                        global_entry_notional_cap_usd=None,
+                        max_total_open_positions=None,
+                        max_total_open_notional_usd=None,
+                        default_strategy_max_open_positions=None,
+                        default_strategy_max_open_notional_usd="500",
+                        max_open_positions_per_mint=None,
+                        max_open_notional_per_mint_usd=None,
+                    ),
+                    key="IDEM-SID-1",
+                )
+                opened = _enter2(store, strategy, "SIGDEC-SID-1")
+                store._conn.execute(
+                    "UPDATE positions SET strategy_id = NULL WHERE position_id = ?",
+                    (opened["position_id"],),
+                )
+                with self.assertRaises(PaperPlaneError) as exc:
+                    _enter2(
+                        store,
+                        strategy,
+                        "SIGDEC-SID-2",
+                        mint=MINT_B,
+                        decision_at="2026-09-03T12:11:00Z",
+                    )
+                self.assertIn("RUNTIME_EXPOSURE_UNKNOWN", str(exc.exception))
+            finally:
+                store.close()
+
     def test_entry_stop_and_revision_semantics(self) -> None:
         strategy = load_strategy_version(ROOT, STRAT_REL)
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

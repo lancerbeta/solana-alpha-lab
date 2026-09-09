@@ -103,7 +103,8 @@ and notional caps are keyed by `strategy_id` across the mode so a new
 StrategyVersion cannot double the family budget. Absent policy
 (`NOT_CONFIGURED_STRATEGY_ONLY`) therefore does not change overlapping
 activation-epoch admission. Missing `strategy_id` on a relevant OPEN_RISK
-row fail-closes family runtime caps (`RUNTIME_EXPOSURE_UNKNOWN`).
+row fail-closes family runtime caps (`RUNTIME_EXPOSURE_UNKNOWN`),
+including strategy-family notional caps, not only position-count caps.
 
 Admission freezes `admitted_entry_notional_usd_dec` and policy
 mode/revision/sha256. Later policy revisions do not resize existing

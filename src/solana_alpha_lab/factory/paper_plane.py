@@ -844,6 +844,7 @@ class PaperPlaneStore:
             sid = str(item.get("strategy_id") or "")
             if not sid:
                 strategy_identity_unknown = True
+                strategy_unknown = True
             elif sid == strategy_id:
                 strategy_count += 1
                 if unknown:

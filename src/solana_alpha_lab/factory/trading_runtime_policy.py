@@ -656,7 +656,7 @@ def evaluate_admission(
             strategy_notional_limit = policy.get("default_strategy_max_open_notional_usd")
         blocked = _notional_block(
             inventory.get("strategy_notional"),
-            bool(inventory.get("strategy_unknown")),
+            bool(inventory.get("strategy_unknown") or inventory.get("strategy_identity_unknown")),
             strategy_notional_limit,
             "BLOCK_STRATEGY_OPEN_NOTIONAL",
         )
