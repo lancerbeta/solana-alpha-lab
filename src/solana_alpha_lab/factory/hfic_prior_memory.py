@@ -160,31 +160,20 @@ def build_prior_memory_snapshot(
             max_records=records_bound,
             max_bytes=bytes_bound,
         )
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        iter_search_memory_hypothesis_payloads,
+    )
+
     decisions = _latest_decisions(store)
-    capsules_by_id: dict[str, tuple[tuple[str, str], dict[str, Any]]] = {}
-    for record in store.iter_committed_records():
-        kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind != "HYPOTHESIS_VERSION":
-            continue
-        payload = _require_hypothesis_payload(record)
-        hyp_id = str(
-            payload.get("hypothesis_version_id")
-            or getattr(record, "hypothesis_version_id", None)
-            or record.entity_id
-            or ""
-        )
+    capsules_by_id: dict[str, dict[str, Any]] = {}
+    for payload in iter_search_memory_hypothesis_payloads(store):
+        hyp_id = str(payload.get("hypothesis_version_id") or "")
         if not hyp_id:
             raise PriorMemoryUnidentifiedError()
-        record_id = str(getattr(record, "record_id", "") or "")
-        effective = str(getattr(record, "effective_at", "") or "")
-        key = (effective, record_id)
-        previous = capsules_by_id.get(hyp_id)
-        if previous is None or key >= previous[0]:
-            capsules_by_id[hyp_id] = (
-                key,
-                _capsule_from_payload(hyp_id, payload, decisions.get(hyp_id)),
-            )
-    capsules = [capsules_by_id[item][1] for item in sorted(capsules_by_id)]
+        capsules_by_id[hyp_id] = _capsule_from_payload(
+            hyp_id, payload, decisions.get(hyp_id)
+        )
+    capsules = [capsules_by_id[item] for item in sorted(capsules_by_id)]
     eligible = len(capsules)
     if eligible > records_bound:
         raise PriorMemoryCapacityError(

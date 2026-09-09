@@ -55,8 +55,8 @@ preflight, freeze, Critic, revision/classification и finalize.
 
 Slash **не** даёт Git mutation, experiment execution, provider/API/RPC/WSS,
 деньги, holdout, wallet/signer/tx, deployment/promotion, destructive RDP,
-новый capability atom, reopen completed search или
-`apply-provenance-correction`. `PASS_FAST_LANE_READY` —
+новый capability atom, reopen completed search,
+`apply-provenance-correction` или `memory-policy-apply`. `PASS_FAST_LANE_READY` —
 стоп до experiment. `PASS_CHANGE_LANE_REQUIRED` — один PRD+SSD, без PR.
 `PASS_DATA_OPTION_REQUIRED` — data option, без collection.
 
@@ -70,6 +70,47 @@ slash-cycle step. `show-session` reports session-local
 `provenance_time_status` = `VALID` or `CORRECTED_ORIGINAL_UNKNOWN` and never
 presents 1970 as an operational date. Uncovered placeholder HFIC records make
 `prove-runtime` fail closed with `PROVENANCE_TIME_UNCOVERED`.
+
+**Search-memory policy (не часть `/hypothesis-forge`).** Completed HFIC sessions
+can be excluded from *future HFIC search memory* by an append-only ResearchStore
+policy. Historical records stay immutable. Quarantine is not scientific
+rejection, deletion, supersession, CLOSE/PARK change, or a raise of
+`prior_memory.max_records=64`. Non-HFIC hypothesis versions stay eligible.
+The policy does not change `evidence_epoch_sha256`. After this capability is
+merged once, later quarantine/restore must not require Git mutation.
+
+Status:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py memory-policy-status
+```
+
+Preview writes JSON to stdout. Save the nested `proposal` object as
+`proposal.json` in the current directory. `--quarantine-all-current-hfic`
+freezes an exact session list inside that object; apply never reinterprets
+“all”.
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py memory-policy-preview --quarantine-all-current-hfic --reason OWNER_CALIBRATION_RESET
+```
+
+Apply the saved proposal only after the slash has ended:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py memory-policy-apply --proposal proposal.json --confirm-append-only
+```
+
+Without `--confirm-append-only` the CLI exits `HFIC_MEMORY_POLICY_CONFIRM_REQUIRED`.
+If any HFIC session is still pending (FROZEN/CRITIC/CLASSIFICATION/runner-up),
+preview/apply exit `HFIC_MEMORY_POLICY_PENDING_SESSION`. Finish or STOP that
+session, then preview again. If the store changed after preview, apply exits
+`HFIC_MEMORY_POLICY_PREVIEW_STALE`. Re-run preview and save a new `proposal.json`.
+
+Restore eligibility for named completed sessions from `quarantined_session_ids`
+in status JSON. Use `memory-policy-preview` with one `--restore-session`
+per id and `--reason OWNER_MEMORY_RESTORE`, save the nested `proposal`
+object as `proposal.json`, then apply. A→B→A restore recovers the original A
+search identity.
 
 ---
 
@@ -117,7 +158,9 @@ presents 1970 as an operational date. Uncovered placeholder HFIC records make
    Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` или
    `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: это BLOCKED, не crash. Session не
    записан. Critic не запускать, packet не вставлять, тот же slash не ретраить
-   в ожидании success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
+   в ожидании success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`. After the
+   slash ends, use the Search-memory policy CLI above for a calibration reset.
+   Do not run `memory-policy-apply` inside the slash.
    Bound: `prior_memory.max_records=64`, `max_bytes=65536` в
    `configs/hypothesis_forge_independent_critic_v1.yaml`.
 3. Вечерний цикл **не завершён**, пока `finalize` не записал `SESSION_RECEIPT` со

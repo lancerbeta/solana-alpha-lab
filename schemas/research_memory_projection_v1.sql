@@ -305,6 +305,8 @@ scored AS (
             AS focus_key_sha256,
         json_extract_string(cycle.payload_json, '$.search_key_sha256')
             AS search_key_sha256,
+        json_extract_string(cycle.payload_json, '$.memory_eligibility_sha256')
+            AS memory_eligibility_sha256,
         json_extract_string(cycle.payload_json, '$.prompt_version')
             AS prompt_version,
         json_extract_string(cycle.payload_json, '$.owner_focus') AS owner_focus,
@@ -371,6 +373,7 @@ SELECT
     evidence_epoch_sha256,
     focus_key_sha256,
     search_key_sha256,
+    memory_eligibility_sha256,
     prompt_version,
     owner_focus,
     live_git_head,

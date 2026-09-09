@@ -187,9 +187,20 @@ def focus_key_sha256(owner_focus: str) -> str:
     return hashlib.sha256(normalize_text(owner_focus).encode("utf-8")).hexdigest()
 
 
-def search_key_sha256(epoch: str, owner_focus: str, prompt_version: str) -> str:
-    payload = f"{epoch}{focus_key_sha256(owner_focus)}{prompt_version}"
-    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+def search_key_sha256(
+    epoch: str,
+    owner_focus: str,
+    prompt_version: str,
+    memory_eligibility_sha256: str | None = None,
+) -> str:
+    from solana_alpha_lab.factory.hfic_memory_policy import search_identity_sha256
+
+    return search_identity_sha256(
+        epoch,
+        owner_focus,
+        prompt_version,
+        memory_eligibility_sha256,
+    )
 
 
 def closed_family_terminals_from_receipt(receipt: Mapping[str, Any] | None) -> list[str]:
@@ -422,6 +433,15 @@ def bind_preflight_receipt(
     )
     if require_current_store_digest and receipt_digest != digest:
         raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        effective_policy,
+        session_memory_eligibility,
+    )
+
+    current_memory = str(effective_policy(store)["memory_eligibility_sha256"])
+    receipt_memory = session_memory_eligibility(receipt)
+    if receipt.get("memory_eligibility_sha256") and receipt_memory != current_memory:
+        raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
     git = repository_git_snapshot(Path(repo_root))
     receipt_head = str(receipt.get("live_git_head") or "")
     if receipt_head != git.head_sha.lower():
@@ -443,6 +463,7 @@ def bind_preflight_receipt(
         "live_git_head": git.head_sha.lower(),
         "git_composite_sha256": git.composite_sha256,
         "store_inventory_digest": digest,
+        "memory_eligibility_sha256": current_memory,
         "research_memory_as_of": _require_memory_timestamp(
             receipt.get("research_memory_as_of")
         ),
@@ -958,7 +979,13 @@ def freeze_draft(
         focus_hint = str(preflight_receipt.get("focus_key_sha256") or "")
         if epoch_hint and focus_hint:
             existing_before_bind = find_session_by_epoch_focus(
-                store, epoch_hint, focus_hint
+                store,
+                epoch_hint,
+                focus_hint,
+                memory_eligibility_sha256=str(
+                    preflight_receipt.get("memory_eligibility_sha256") or ""
+                )
+                or None,
             )
         bound = bind_preflight_receipt(
             preflight_receipt,
@@ -1031,7 +1058,21 @@ def freeze_draft(
     if not focus_key:
         focus_key = focus_key_sha256(owner_focus)
     if epoch and not search_key:
-        search_key = search_key_sha256(epoch, owner_focus, prompt_version)
+        search_key = search_key_sha256(
+            epoch,
+            owner_focus,
+            prompt_version,
+            (
+                str(bound.get("memory_eligibility_sha256") or "")
+                if bound is not None
+                else (
+                    str(preflight_receipt.get("memory_eligibility_sha256") or "")
+                    if isinstance(preflight_receipt, Mapping)
+                    else None
+                )
+            )
+            or None,
+        )
     if search_key:
         session_id = "HFIC-SESS-" + search_key[:16].upper()
     else:
@@ -1091,6 +1132,16 @@ def freeze_draft(
         "evidence_epoch_sha256": epoch,
         "focus_key_sha256": focus_key,
         "search_key_sha256": search_key,
+        "memory_eligibility_sha256": (
+            str(bound.get("memory_eligibility_sha256") or "")
+            if bound is not None
+            else (
+                str(preflight_receipt.get("memory_eligibility_sha256") or "")
+                if isinstance(preflight_receipt, Mapping)
+                else ""
+            )
+        )
+        or None,
         "selected_candidate_id": selected.candidate_id,
         "runner_up_candidate_id": runner_up.candidate_id,
         "rejected_alternative_id": rejected.candidate_id,
@@ -1148,7 +1199,21 @@ def freeze_draft(
     if store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
-        existing = find_session_by_epoch_focus(store, epoch, focus_key)
+        existing = find_session_by_epoch_focus(
+            store,
+            epoch,
+            focus_key,
+            memory_eligibility_sha256=(
+                str(bound.get("memory_eligibility_sha256") or "")
+                if bound is not None
+                else (
+                    str(preflight_receipt.get("memory_eligibility_sha256") or "")
+                    if isinstance(preflight_receipt, Mapping)
+                    else ""
+                )
+            )
+            or None,
+        )
         if existing is not None:
             return existing
         persist_frozen_session(
@@ -1220,7 +1285,13 @@ def _freeze_no_worthy(
         focus_hint = str(preflight_receipt.get("focus_key_sha256") or "")
         if epoch_hint and focus_hint:
             existing_before_bind = find_session_by_epoch_focus(
-                store, epoch_hint, focus_hint
+                store,
+                epoch_hint,
+                focus_hint,
+                memory_eligibility_sha256=str(
+                    preflight_receipt.get("memory_eligibility_sha256") or ""
+                )
+                or None,
             )
         bound = bind_preflight_receipt(
             preflight_receipt,
@@ -1266,7 +1337,21 @@ def _freeze_no_worthy(
     if not focus_key:
         focus_key = focus_key_sha256(owner_focus)
     if epoch and not search_key:
-        search_key = search_key_sha256(epoch, owner_focus, prompt_version)
+        search_key = search_key_sha256(
+            epoch,
+            owner_focus,
+            prompt_version,
+            (
+                str(bound.get("memory_eligibility_sha256") or "")
+                if bound is not None
+                else (
+                    str(preflight_receipt.get("memory_eligibility_sha256") or "")
+                    if isinstance(preflight_receipt, Mapping)
+                    else None
+                )
+            )
+            or None,
+        )
     if search_key:
         session_id = "HFIC-SESS-" + search_key[:16].upper()
     else:
@@ -1296,6 +1381,16 @@ def _freeze_no_worthy(
         "evidence_epoch_sha256": epoch,
         "focus_key_sha256": focus_key,
         "search_key_sha256": search_key,
+        "memory_eligibility_sha256": (
+            str(bound.get("memory_eligibility_sha256") or "")
+            if bound is not None
+            else (
+                str(preflight_receipt.get("memory_eligibility_sha256") or "")
+                if isinstance(preflight_receipt, Mapping)
+                else ""
+            )
+        )
+        or None,
         "selected_candidate_id": None,
         "runner_up_candidate_id": identities[runner_up_index].candidate_id,
         "rejected_alternative_id": identities[rejected_index].candidate_id,
@@ -1712,6 +1807,7 @@ def persist_no_worthy_session(
                 "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": frozen.get("focus_key_sha256") or "",
                 "search_key_sha256": frozen.get("search_key_sha256") or "",
+                "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
                 "selected_candidate_id": None,
                 "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
                 "rejected_alternative_id": frozen.get("rejected_alternative_id"),
@@ -1962,6 +2058,7 @@ def persist_frozen_session(
                 "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": frozen.get("focus_key_sha256") or "",
                 "search_key_sha256": frozen.get("search_key_sha256") or "",
+                "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
                 "selected_candidate_id": frozen["selected_candidate_id"],
                 "runner_up_candidate_id": frozen["runner_up_candidate_id"],
                 "rejected_alternative_id": frozen.get("rejected_alternative_id"),
@@ -2248,6 +2345,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "evidence_epoch_sha256": payload.get("evidence_epoch_sha256"),
                 "focus_key_sha256": payload.get("focus_key_sha256"),
                 "search_key_sha256": payload.get("search_key_sha256"),
+                "memory_eligibility_sha256": payload.get("memory_eligibility_sha256"),
                 "prompt_version": payload.get("prompt_version"),
                 "owner_focus": payload.get("owner_focus"),
                 "effective_at": getattr(record, "effective_at", ""),
@@ -2274,12 +2372,17 @@ def find_session_by_epoch_focus(
     store: Any,
     epoch: str,
     focus_key: str,
+    memory_eligibility_sha256: str | None = None,
 ) -> dict[str, Any] | None:
+    from solana_alpha_lab.factory.hfic_memory_policy import session_memory_eligibility
+
     matched = [
         item
         for item in list_hfic_sessions(store)
         if item.get("evidence_epoch_sha256") == epoch
         and item.get("focus_key_sha256") == focus_key
+        and session_memory_eligibility(item)
+        == session_memory_eligibility({"memory_eligibility_sha256": memory_eligibility_sha256})
     ]
     if not matched:
         return None
@@ -2879,6 +2982,7 @@ def persist_intermediate_cycle(
                 "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": frozen.get("focus_key_sha256") or "",
                 "search_key_sha256": frozen.get("search_key_sha256") or "",
+                "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
                 "selected_candidate_id": frozen.get("selected_candidate_id"),
                 "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
                 "candidate_ids": list(frozen.get("candidate_ids") or []),
@@ -4006,6 +4110,7 @@ def finalize_session(
                     "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                     "focus_key_sha256": frozen.get("focus_key_sha256") or "",
                     "search_key_sha256": frozen.get("search_key_sha256") or "",
+                "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
                     "selected_candidate_id": forge_selected_id,
                     "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
                     "candidate_ids": list(frozen.get("candidate_ids") or []),
@@ -4291,6 +4396,7 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "evidence_epoch_sha256": cycle.get("evidence_epoch_sha256") or "",
         "focus_key_sha256": cycle.get("focus_key_sha256") or "",
         "search_key_sha256": cycle.get("search_key_sha256") or "",
+        "memory_eligibility_sha256": cycle.get("memory_eligibility_sha256"),
         "selected_candidate_id": cycle.get("selected_candidate_id"),
         "runner_up_candidate_id": cycle.get("runner_up_candidate_id"),
         "rejected_alternative_id": cycle.get("rejected_alternative_id"),
@@ -4469,12 +4575,16 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         live_git_head = snap.head_sha.lower()
         composite = snap.composite_sha256
     provenance_status = _session_provenance_status(store, session_id)
+    from solana_alpha_lab.factory.hfic_memory_policy import quarantined_session_ids
+
     payload = {
         "session_id": bundle["session_id"],
         "session_state": bundle["session_state"],
         "evidence_epoch_sha256": bundle.get("evidence_epoch_sha256") or "0" * 64,
         "focus_key_sha256": bundle.get("focus_key_sha256") or "0" * 64,
         "search_key_sha256": bundle.get("search_key_sha256") or "0" * 64,
+        "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256"),
+        "search_memory_quarantined": session_id in set(quarantined_session_ids(store)),
         "prompt_version": bundle.get("prompt_version") or PROMPT_VERSION,
         "live_git_head": live_git_head,
         "store_inventory_digest": digest,
@@ -4550,12 +4660,12 @@ def lookup_prior(
     candidate: Mapping[str, Any] | None = None,
     query: str | None = None,
 ) -> dict[str, Any]:
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        iter_search_memory_hypothesis_payloads,
+    )
+
     cards: list[dict[str, Any]] = []
-    for record in store.iter_committed_records():
-        kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind != "HYPOTHESIS_VERSION":
-            continue
-        payload = json.loads(record.payload_json)
+    for payload in iter_search_memory_hypothesis_payloads(store):
         if payload.get("hfic_protocol") is None:
             continue
         cards.append(payload)
