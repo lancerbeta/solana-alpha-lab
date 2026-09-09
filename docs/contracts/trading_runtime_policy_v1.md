@@ -97,6 +97,14 @@ StrategyVersion + current policy + current inventory together.
 OPEN_RISK_STATES semantics are unchanged. Same SignalDecision retries
 resume one Position identity and do not consume a second slot.
 
+StrategyVersion `max_open_positions` remains bot-local, matching the
+pre-overlay PAPER/SHADOW admission counter. Runtime strategy position
+and notional caps are keyed by `strategy_id` across the mode so a new
+StrategyVersion cannot double the family budget. Absent policy
+(`NOT_CONFIGURED_STRATEGY_ONLY`) therefore does not change overlapping
+activation-epoch admission. Missing `strategy_id` on a relevant OPEN_RISK
+row fail-closes family runtime caps (`RUNTIME_EXPOSURE_UNKNOWN`).
+
 Admission freezes `admitted_entry_notional_usd_dec` and policy
 mode/revision/sha256. Later policy revisions do not resize existing
 admissions. Actual entered notional remains a separate fill field.

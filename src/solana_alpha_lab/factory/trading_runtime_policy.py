@@ -613,8 +613,14 @@ def evaluate_admission(
     global_count = int(inventory["global_count"])
     strategy_count = int(inventory["strategy_count"])
     mint_count = int(inventory["mint_count"])
-    if strategy_count >= effective_strategy_max:
+    bot_count = int(inventory.get("bot_count") or 0)
+    if bot_count >= strategy_max_open:
         return _block("BLOCK_MAX_OPEN_POSITIONS")
+    if runtime_strategy_max is not None:
+        if inventory.get("strategy_identity_unknown"):
+            return _block("RUNTIME_EXPOSURE_UNKNOWN")
+        if strategy_count >= int(runtime_strategy_max):
+            return _block("BLOCK_RUNTIME_STRATEGY_MAX_OPEN")
     if policy_status == STATUS_VALID and policy is not None:
         global_max = policy.get("max_total_open_positions")
         if global_max is not None and global_count >= int(global_max):
@@ -714,6 +720,7 @@ def _snapshot(
         "current_global_position_count": inventory.get("global_count"),
         "current_strategy_position_count": inventory.get("strategy_count"),
         "current_mint_position_count": inventory.get("mint_count"),
+        "current_bot_position_count": inventory.get("bot_count"),
         "current_global_open_risk_notional_usd": (
             None if inventory.get("global_notional") is None else format(inventory["global_notional"], "f")
         ),

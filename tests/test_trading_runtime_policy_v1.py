@@ -171,6 +171,50 @@ class TradingRuntimePolicyTests(unittest.TestCase):
             finally:
                 store.close()
 
+    def test_absent_policy_keeps_bot_local_strategy_version_max_open(self) -> None:
+        strategy = dict(load_strategy_version(ROOT, STRAT_REL))
+        strategy["risk_policy"] = {"max_open_positions": 1}
+        epoch2 = "ACTIVATION-EPOCH-ACCOUNTING-PAPER-002"
+        known = {**KNOWN, epoch2: {"mode": "PAPER"}}
+
+        def _enter_epoch(store: PaperPlaneStore, signal_id: str, epoch: str) -> dict:
+            return accept_signal_decision(
+                ROOT,
+                store,
+                strategy=strategy,
+                signal_decision=_signal(signal_id, epoch=epoch),
+                known_activation_epochs=known,
+                mode="PAPER",
+                as_of="2026-09-03T12:10:00Z",
+            )
+
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
+            try:
+                first = _enter_epoch(store, "SIGDEC-BOT-LOCAL-1", EPOCH)
+                second = _enter_epoch(store, "SIGDEC-BOT-LOCAL-2", epoch2)
+                self.assertNotEqual(first["bot_instance_id"], second["bot_instance_id"])
+                self.assertTrue(first["opened"])
+                self.assertTrue(second["opened"])
+            finally:
+                store.close()
+
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
+            try:
+                _apply(
+                    store,
+                    "PAPER",
+                    _candidate(default_strategy_max_open_positions=1),
+                    key="IDEM-FAMILY-1",
+                )
+                _enter_epoch(store, "SIGDEC-FAMILY-1", EPOCH)
+                with self.assertRaises(PaperPlaneError) as exc:
+                    _enter_epoch(store, "SIGDEC-FAMILY-2", epoch2)
+                self.assertIn("BLOCK_RUNTIME_STRATEGY_MAX_OPEN", str(exc.exception))
+            finally:
+                store.close()
+
     def test_sizing_min_and_no_headroom_shrink(self) -> None:
         self.assertEqual(
             effective_entry_notional(
@@ -248,6 +292,7 @@ class TradingRuntimePolicyTests(unittest.TestCase):
                         for token in (
                             "BLOCK_GLOBAL_MAX_OPEN_POSITIONS",
                             "BLOCK_MAX_OPEN_POSITIONS",
+                            "BLOCK_RUNTIME_STRATEGY_MAX_OPEN",
                         )
                     )
                 )

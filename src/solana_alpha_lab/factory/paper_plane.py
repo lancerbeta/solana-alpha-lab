@@ -799,6 +799,7 @@ class PaperPlaneStore:
         mode: str,
         strategy_id: str,
         mint: str,
+        bot_instance_id: str = "",
     ) -> dict[str, Any]:
         rows = self._conn.execute(
             """
@@ -811,6 +812,8 @@ class PaperPlaneStore:
         global_count = 0
         strategy_count = 0
         mint_count = 0
+        bot_count = 0
+        strategy_identity_unknown = False
         global_notional = Decimal("0")
         strategy_notional = Decimal("0")
         mint_notional = Decimal("0")
@@ -836,8 +839,12 @@ class PaperPlaneStore:
                 global_unknown = True
             elif notional is not None:
                 global_notional += notional
+            if bot_instance_id and str(item.get("bot_instance_id") or "") == bot_instance_id:
+                bot_count += 1
             sid = str(item.get("strategy_id") or "")
-            if sid == strategy_id:
+            if not sid:
+                strategy_identity_unknown = True
+            elif sid == strategy_id:
                 strategy_count += 1
                 if unknown:
                     strategy_unknown = True
@@ -853,6 +860,8 @@ class PaperPlaneStore:
             "global_count": global_count,
             "strategy_count": strategy_count,
             "mint_count": mint_count,
+            "bot_count": bot_count,
+            "strategy_identity_unknown": strategy_identity_unknown,
             "global_notional": None if global_unknown else global_notional,
             "strategy_notional": None if strategy_unknown else strategy_notional,
             "mint_notional": None if mint_unknown else mint_notional,
@@ -1501,6 +1510,7 @@ def accept_signal_decision(
                 mode=mode,
                 strategy_id=str(strategy["strategy_id"]),
                 mint=str(decision["mint"]),
+                bot_instance_id=str(bot["bot_instance_id"]),
             )
             risk = evaluate_admission(
                 mode=mode,
