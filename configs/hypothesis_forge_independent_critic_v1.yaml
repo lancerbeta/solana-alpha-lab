@@ -156,7 +156,7 @@ prior_memory:
   snapshot_schema: smial.hfic-prior-memory-snapshot
   snapshot_schema_version: '1.0'
   bound_to: CRITIC_INPUT_PACKET
-  packet_versions: ['1.3']
+  packet_versions: ['1.3', '1.4']
   historical_v1_1_required: false
   source: HYPOTHESIS_VERSION
   include_ranked_shortlist_only: false

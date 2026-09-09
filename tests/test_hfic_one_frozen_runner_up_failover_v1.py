@@ -37,7 +37,23 @@ RECEIPT_V13 = ROOT / "catalog/schemas/hypothesis_forge_session_receipt_v1_3.sche
 HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 
 
+def _with_selected_feats(spec_packet: dict, critic_packet: dict) -> dict:
+    packet = dict(spec_packet)
+    spec = dict(packet.get("experiment_spec") or {})
+    selected = (critic_packet or {}).get("selected_candidate") or {}
+    feats = list(selected.get("required_feature_ids") or [])
+    if feats:
+        spec["required_feature_ids"] = feats
+        packet["experiment_spec"] = spec
+    return packet
+
+
 class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
+    def setUp(self) -> None:
+        from tests import test_hfic_session as session_tests
+
+        session_tests._CACHED_GIT = None
+
     def test_t1_pre_frozen_c2_packet_before_critic(self) -> None:
         frozen = freeze_draft(valid_draft(), preflight_receipt=_preflight_receipt(), repo_root=ROOT)
         primary = frozen["critic_input_packet"]
@@ -68,7 +84,7 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
         frozen = freeze_draft(draft, preflight_receipt=_preflight_receipt(), repo_root=ROOT)
         primary = frozen["critic_input_packet"]
         runner = frozen["runner_up_critic_input_packet"]
-        self.assertEqual(primary["packet_version"], "1.3")
+        self.assertEqual(primary["packet_version"], "1.4")
         self.assertEqual(
             primary["prior_memory"]["snapshot_sha256"],
             runner["prior_memory"]["snapshot_sha256"],
@@ -292,7 +308,10 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
                 store=store,
                 repo_root=ROOT,
             )
-            future = packet_for(v1_2_spec(as_of="2026-09-01T12:00:00Z"))
+            future = _with_selected_feats(
+                packet_for(v1_2_spec(as_of="2026-09-01T12:00:00Z")),
+                frozen["critic_input_packet"],
+            )
             future["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
             future["classifier_evaluated_at"] = "2026-09-01T00:00:00Z"
             parked = apply_classification(
@@ -314,7 +333,10 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
                 repo_root=ROOT,
             )
             self.assertEqual(waiting["session_state"], "AWAITING_CLASSIFICATION")
-            packet = submission()
+            packet = _with_selected_feats(
+                submission(),
+                frozen["runner_up_critic_input_packet"],
+            )
             packet["hypothesis_definition_sha256"] = frozen["runner_up_definition_sha256"]
             done = apply_classification(
                 waiting,
@@ -334,6 +356,23 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
             )
             self.assertIsNone(bundle.get("lane_classifier_terminal"))
             self.assertIsNone((bundle.get("session_receipt") or {}).get("lane_classifier_terminal"))
+            from solana_alpha_lab.factory.hfic_control_integrity import (
+                effective_control_terminal,
+            )
+
+            self.assertEqual(bundle.get("critic_terminal"), "KILL_UNBOUND_EVIDENCE")
+            self.assertEqual(
+                bundle.get("effective_control_terminal"),
+                effective_control_terminal(bundle),
+            )
+            self.assertEqual(
+                bundle.get("effective_control_terminal"),
+                bundle.get("final_session_terminal"),
+            )
+            self.assertNotEqual(
+                bundle.get("critic_terminal"),
+                bundle.get("effective_control_terminal"),
+            )
 
     def test_t4_classifier_acts_on_c2_spec(self) -> None:
         from solana_alpha_lab.factory.hfic_session import apply_classification
@@ -358,7 +397,10 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
             self.assertEqual(waiting["session_state"], "AWAITING_CLASSIFICATION")
             c2 = pending["critic_input_packet"]["selected_candidate"]
             self.assertEqual(c2["candidate_id"], frozen["runner_up_candidate_id"])
-            packet = submission()
+            packet = _with_selected_feats(
+                submission(),
+                frozen["runner_up_critic_input_packet"],
+            )
             packet["hypothesis_definition_sha256"] = frozen["runner_up_definition_sha256"]
             done = apply_classification(
                 waiting,

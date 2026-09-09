@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FRESH-CONTROL-DECISION-INTEGRITY-CLOSURE-FACTORY-FIT-001",
+  "as_of": "2026-09-09",
+  "task_id": "HFIC_FRESH_CONTROL_DECISION_INTEGRITY_CLOSURE_V1",
+  "reviewed_bindings_sha256": "00cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "reviewed_inventory_sha256": "00dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_FIRST_FRESH_CONTROL_WITHOUT_KNOWN_P1",
+    "flexibility_and_history": "PASS_PACKET_1_3_READABLE_UNCHANGED",
+    "context_efficiency": "PASS_FREEZE_OWNED_GROUNDING_TRANSPORT",
+    "research_truth": "PASS_EFFECTIVE_TERMINAL_AND_SPEC_BIND",
+    "owner_operability": "PASS_CONTROL_PREFLIGHT_FLAG",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_CONTROL",
+    "monitoring_and_recovery": "PASS_YIELD_GATE_BEFORE_SEARCH_CONSUME",
+    "build_vs_buy": "PASS_ADOPT_EXISTING_HFIC_PATH",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_LIVE_RDP",
+    "red_team": "PASS_Q1_Q8_NO_AND_CONTROL_SEARCH_NOT_SHOPPING"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FIRST_FRESH_CONTROL_AFTER_MERGE"
+  },
+  "recovery": "REVERT cursor/hfic-fresh-control-decision-integrity-closure-v1 BRANCH. HISTORICAL PACKET 1.3 AND F3 RECEIPT SPLIT UNCHANGED.",
+  "limits": [
+    "NO_GENERATOR",
+    "NO_LIVE_CONTROL",
+    "NO_ACTIVE_RDP_WRITE",
+    "NO_REPRESENTATION_CHALLENGER",
+    "NO_GENERIC_EXPERIMENT_SPEC_REQUIRED",
+    "NO_PROVIDER",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}

@@ -15,11 +15,17 @@ diagnostics-only structural signature (не меняет `HFIC-CAND-*` identity)
 read-only `diagnostics --last N` (1..20) по session receipts.
 Prompt C identity: `HFIC-NEXT-V1.0`. Candidate-generation search identity for new
 sessions is `HFIC-V1.2`. Fresh freeze of an HFIC-V1.2 draft emits
-`CRITIC_INPUT_PACKET` `packet_version=1.3` with required `prior_memory` and
+`CRITIC_INPUT_PACKET` `packet_version=1.4` with freeze-owned `selected_candidate`
+grounding (`required_feature_ids`, `required_capability_ids`,
+`unresolved_requirements`, `grounding`), required `prior_memory`, and
 `generator_prompt_version=HFIC-V1.2`. This is a Critic transport bump only:
-do not create HFIC-V1.3 Prompt A. Historical critic packets `1.0` / `1.1` /
-`1.2` remain readable; `1.2` does not require `prior_memory` and must not be
-reconstructed.
+do not create HFIC-V1.3 or HFIC-V1.4 Prompt A. Historical critic packets `1.0` /
+`1.1` / `1.2` / `1.3` remain readable; `1.2` does not require `prior_memory` and
+must not be reconstructed. Packet `1.3` remains readable without being upgraded
+to `1.4`. For packet `1.4`, `selected_candidate.grounding` is authoritative
+machine grounding; empty `available_data_bindings` / `missing_or_forward_only_data`
+must never mean `MACHINE_PROVED_NO_FORWARD_OR_MISSING_DEPENDENCY` when grounding
+says otherwise.
 Display ordinal (`C1`/`C2`/…) is display-only. Canonical `candidate_id` is assigned
 by `freeze`, not by the model.
 
@@ -298,6 +304,38 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 - точечный публичный research, только если изменяемый факт или научный метод способен поменять выбор кандидата;
 - подготовка design packet, Experiment Card, draft ExperimentSpec и bounded PRD+SSD;
 - append-only запись session/hypothesis draft в Research Data Plane только если для этого уже существует accepted no-Git capability. Если её нет — выведи packet, но не создавай Git gap автоматически.
+
+`CURRENT_REPRESENTATION_CONTROL_V1` (preflight `--control-current-representation`)
+is the preregistered unchanged-representation CONTROL mode. It does not change
+default/general Forge. In CONTROL mode Prompt A may use only:
+
+- exact `FORGE_CONTEXT_PACKET`;
+- coarse dataset identities/fingerprints/labels;
+- `feature_hints` / `feature_families`;
+- `feature_grounding` projection;
+- closed-family ledger;
+- eligible prior memory under existing F2 rules;
+- ordinary Git/Catalog/operator truth required to interpret those IDs/contracts.
+
+Forbidden for Prompt A CONTROL synthesis: raw live lifecycle observation rows,
+parquet observation bodies, per-mint raw trajectories, ordered raw lifecycle
+sequences, future `normalized_trajectory_v1` motifs, or any reconstructed
+equivalent of the challenger representation. The phrase "explicitly resolved
+evidence" does not authorize those bodies in CONTROL mode. Ordinary Git/Catalog
+validation remains allowed. Do not build a filesystem sandbox.
+
+CONTROL preflight enforces `MIN_USABLE_YIELD_ELIGIBLE` from
+`early_market_panel_importer.py` using corpus metadata/labels only. Below-min
+or unresolvable current lifecycle corpus is `CONTROL_YIELD_BELOW_MIN` /
+`CONTROL_CORPUS_UNRESOLVABLE` and must not consume the CONTROL search slot.
+`OWNER NEXT` is `WAIT_FOR_IMPORT_OR_STOP` or `STOP_CORPUS_UNRESOLVABLE`.
+Do not recover by dropping `--control-current-representation` and running
+general Forge. Report `control_yield_eligible` vs `min_usable_yield_eligible`
+when present.
+
+For a completed CONTROL/general session, operator readout of the CONTROL probe
+branch uses `effective_control_terminal` (`final_session_terminal` when present,
+else `critic_terminal`). F3 still preserves primary `critic_terminal` as C1.
 
 External public research не даёт market/provider authority. Приоритет источников: исполнимая собственная реальность → официальные спецификации → воспроизводимые papers/code/data → прозрачная аналитика → агрегаторы → social/KOL только как источник идеи.
 
@@ -673,8 +711,9 @@ decision after collection
     `packet_version=1.2` и `generator_prompt_version=HFIC-V1.2`.
     Не выдавай `packet_version=1.1` / `HFIC-V1.1` на fresh `START_NEW_SESSION`:
     freeze вернёт `FRESH_SESSION_DRAFT_VERSION_MISMATCH`. Не выдавай
-    `CRITIC_INPUT_PACKET`: его строит только `freeze` как `packet_version=1.3`
-    с `generator_prompt_version=HFIC-V1.2` и полным `prior_memory`.
+    `CRITIC_INPUT_PACKET`: его строит только `freeze` как `packet_version=1.4`
+    с freeze-owned grounding, `generator_prompt_version=HFIC-V1.2` и полным
+    `prior_memory`. Не создавай HFIC-V1.3 / HFIC-V1.4 Prompt A.
 
 Не добавляй roadmap из множества задач. Runners-up остаются watchlist, а не backlog tasks.
 
@@ -766,16 +805,23 @@ decision after collection
   `selected_definition_sha256` ← canonical identity hash выбранного кандидата
   из полей packet (read-only repo truth), as applicable.
   Не изобретай `HFIC-UNBOUND-*` и не восстанавливай `session_id` из
-  `candidate_id`. Если `packet_version=1.1`, `1.2` или `1.3` и `session_id` отсутствует —
+  `candidate_id`. Если `packet_version=1.1`, `1.2`, `1.3` или `1.4` и `session_id` отсутствует —
   не эмитируй `hypothesis_critic_result_v1`. Верни
   `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` и
   `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_SESSION_ID`.
-  Если `packet_version=1.3` и нет `prior_memory` — не эмитируй result, не
+  Если `packet_version=1.3` или `1.4` и нет `prior_memory` — не эмитируй result, не
   восстанавливай память из ResearchStore. Верни
   `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET` и
   `OWNER NEXT=RE_RUN_FREEZE_AND_PASTE_PACKET_WITH_PRIOR_MEMORY`.
-  Historical `packet_version=1.0` / `1.1` / `1.2` остаются читаемыми без
-  `prior_memory`. Не реконструируй и не фабрикуй `prior_memory` для
+  Если `packet_version=1.4` и нет freeze-owned `selected_candidate.grounding` —
+  не эмитируй result и не реконструируй grounding через Catalog/RDP. Верни
+  `STATUS=INCOMPLETE_CRITIC_INPUT_PACKET`.
+  Packet `1.4` grounding — authoritative machine input над prose/default arrays.
+  Не повышай `HISTORICAL_RECONSTRUCTIBLE` до `PIT_READY` и не повышай
+  `FORWARD_ONLY` до strategy-available. Preserve `MISSING` / `MISSING_CAPABILITY`
+  и unresolved requirements.
+  Historical `packet_version=1.0` / `1.1` / `1.2` / `1.3` остаются читаемыми без
+  upgrade до `1.4`. Не реконструируй и не фабрикуй `prior_memory` для
   historical `1.2`. Если historical `1.2` уже содержит `prior_memory`, сравни
   с этими capsules: это содержимое packet, не реконструкция.
   Если позже `finalize` вернул `CRITIC_SESSION_MISMATCH` — скопируй
@@ -790,7 +836,7 @@ decision after collection
 3. Проверь, что Forge не использовал stale export как текущую authority.
 4. Проверь, что названные data доступны на заявленном PIT cutoff и fingerprint-bound.
 5. Проверь, что untouched/forward outcomes не открывались.
-6. Ближайший prior work: для `packet_version=1.3`, и для historical `1.2` если
+6. Ближайший prior work: для `packet_version=1.3` / `1.4`, и для historical `1.2` если
    `prior_memory` уже есть в packet, сравни selected candidate с
    `prior_memory.capsules` (см. B3 Novelty / memory). Historical `1.0` / `1.1` /
    `1.2` packets без `prior_memory` остаются на существующей compatibility:
@@ -824,10 +870,12 @@ decision after collection
 
 ### 1. Novelty / memory
 
-- Для `packet_version=1.3`, и для historical `1.2` если `prior_memory` уже
+- Для `packet_version=1.3` / `1.4`, и для historical `1.2` если `prior_memory` уже
   присутствует, единственный research-memory вход — `prior_memory.capsules`
   внутри `CRITIC_INPUT_PACKET`. Не открывай ResearchStore / active RDP и не
-  используй Forge scratchpad ради prior recall.
+  используй Forge scratchpad ради prior recall. Для `packet_version=1.4`
+  grounding из packet — bound machine input; Git/Catalog verification не может
+  его overwrite.
 - Сравни selected candidate с каждой capsule по mechanism/state, actor/counterparty,
   population, decision timestamp, X/Y/horizon и falsifier/control/economic distinction.
 - Лексическое равенство identity-полей **не** требуется для duplicate suspicion.

@@ -302,11 +302,20 @@ def decide_preflight_action(
     focus_key: str,
     owner_focus: str,
     memory_eligibility_sha256: str | None = None,
+    evidence_surface_mode: str | None = None,
 ) -> tuple[str, str | None]:
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        session_evidence_surface_mode,
+    )
     from solana_alpha_lab.factory.hfic_memory_policy import session_memory_eligibility
 
     expected_memory = session_memory_eligibility(
         {"memory_eligibility_sha256": memory_eligibility_sha256}
+    )
+    expected_mode = session_evidence_surface_mode(
+        {"evidence_surface_mode": evidence_surface_mode}
+        if evidence_surface_mode
+        else None
     )
     same_focus = [
         item
@@ -314,6 +323,7 @@ def decide_preflight_action(
         if item.get("evidence_epoch_sha256") == evidence_epoch
         and item.get("focus_key_sha256") == focus_key
         and session_memory_eligibility(item) == expected_memory
+        and session_evidence_surface_mode(item) == expected_mode
     ]
     if same_focus:
         chosen = pick_session(same_focus)
@@ -969,6 +979,7 @@ def build_forge_context_packet(
     store: ResearchStore,
     stage_time: datetime | None = None,
     clock: Clock | None = None,
+    evidence_surface_mode: str | None = None,
 ) -> tuple[dict[str, Any], str]:
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
     if not datasets:
@@ -1203,6 +1214,18 @@ def build_forge_context_packet(
             ),
         },
     }
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            control_packet_has_raw_sequences,
+        )
+
+        packet["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+        if control_packet_has_raw_sequences(packet):
+            raise HficPreflightError("CONTROL_RAW_SEQUENCE_FORBIDDEN")
     encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
         # Semantic navigation is lower priority than datasets / closed families / priors.
@@ -1264,6 +1287,7 @@ def run_preflight(
     commission_fn: Callable[[Path, Path], Mapping[str, Any]] | None = None,
     git_snapshot: Mapping[str, Any] | None = None,
     clock: Clock | None = None,
+    evidence_surface_mode: str | None = None,
 ) -> dict[str, Any]:
     compatibility_repair: dict[str, Any] = {"status": "NONE", "appended": 0}
     try:
@@ -1317,16 +1341,61 @@ def run_preflight(
     except HficClockError as exc:
         raise HficPreflightError(str(exc)) from exc
 
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+        resolve_control_corpus_yield,
+    )
     from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        CORPUS_DATASET_ID,
+        select_current_datasets_for_forge,
+    )
 
     epoch = evidence_epoch_sha256(evidence_epoch_material(repo_root, data_root))
     focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
     focus_key = focus_key_sha256(focus)
     policy_head = effective_policy(store)
     memory_eligibility = str(policy_head["memory_eligibility_sha256"])
-    search_key = search_key_sha256(
-        epoch, focus, PROMPT_VERSION, memory_eligibility
+    control_mode = (
+        CURRENT_REPRESENTATION_CONTROL_V1
+        if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
+        else None
     )
+    search_key = search_key_sha256(
+        epoch, focus, PROMPT_VERSION, memory_eligibility, control_mode
+    )
+    if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
+        if datasets:
+            datasets = select_current_datasets_for_forge(datasets)
+        gate, yield_eligible = resolve_control_corpus_yield(
+            datasets,
+            corpus_dataset_id=CORPUS_DATASET_ID,
+            min_usable_yield_eligible=MIN_USABLE_YIELD_ELIGIBLE,
+        )
+        if gate != "OK":
+            return {
+                "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+                "action": "STOP",
+                "terminal": gate,
+                "owner_focus": focus,
+                "prompt_version": PROMPT_VERSION,
+                "evidence_epoch_sha256": epoch,
+                "focus_key_sha256": focus_key,
+                "search_key_sha256": search_key,
+                "memory_policy_head_sha256": policy_head["policy_sha256"],
+                "memory_eligibility_sha256": memory_eligibility,
+                "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+                "control_yield_eligible": yield_eligible,
+                "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
+                "session_id": None,
+                "forge_context_packet": {},
+                "authority": {
+                    "git_mutation": 0,
+                    "experiment_execution": 0,
+                    "provider_api_rpc_wss_calls": 0,
+                },
+            }
     sessions = _query_hfic_sessions(data_root)
     action, bound_session = decide_preflight_action(
         sessions,
@@ -1335,6 +1404,7 @@ def run_preflight(
         focus_key=focus_key,
         owner_focus=focus,
         memory_eligibility_sha256=memory_eligibility,
+        evidence_surface_mode=control_mode,
     )
     live_git_head = "0" * 40
     git_composite = None
@@ -1391,6 +1461,8 @@ def run_preflight(
             "provider_api_rpc_wss_calls": 0,
         },
     }
+    if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        receipt_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
     if action == "STOP" and bound_session == "SEARCH_BUDGET_EXHAUSTED":
         receipt_body["terminal"] = "SEARCH_BUDGET_EXHAUSTED"
         receipt_body["session_id"] = None
@@ -1406,6 +1478,7 @@ def run_preflight(
         ),
         store=store,
         stage_time=session_started,
+        evidence_surface_mode=control_mode,
     )
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest
@@ -1454,8 +1527,18 @@ def run_preflight(
             ):
                 receipt_body["critic_result"] = bundle["critic_result"]
             if action == "RETURN_EXISTING_SESSION":
+                from solana_alpha_lab.factory.hfic_control_integrity import (
+                    effective_control_terminal,
+                )
+
                 receipt_body["session_state"] = bundle.get("session_state")
                 receipt_body["critic_terminal"] = bundle.get("critic_terminal")
+                receipt_body["final_session_terminal"] = bundle.get(
+                    "final_session_terminal"
+                )
+                receipt_body["effective_control_terminal"] = (
+                    effective_control_terminal(bundle)
+                )
                 receipt_body["next"] = bundle.get("next")
     receipt_body["preflight_receipt_sha256"] = canonical_sha256(receipt_body)
     return receipt_body

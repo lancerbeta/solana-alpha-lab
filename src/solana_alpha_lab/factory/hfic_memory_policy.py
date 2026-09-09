@@ -101,6 +101,7 @@ def search_identity_sha256(
     owner_focus: str,
     prompt_version: str,
     memory_eligibility: str | None = None,
+    evidence_surface_mode: str | None = None,
 ) -> str:
     eligibility = memory_eligibility or GENESIS_MEMORY_ELIGIBILITY_SHA256
     focus = hashlib.sha256(normalize_text(owner_focus).encode("utf-8")).hexdigest()
@@ -108,6 +109,8 @@ def search_identity_sha256(
         payload = f"{epoch}{focus}{prompt_version}"
     else:
         payload = f"{epoch}{focus}{prompt_version}{eligibility}"
+    if evidence_surface_mode:
+        payload = f"{payload}{evidence_surface_mode}"
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 

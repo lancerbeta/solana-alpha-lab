@@ -36,14 +36,19 @@ C2 packet. C2 `REVISE_ONCE` does not auto-continue (`RUNNER_UP_REVISION_REQUIRED
 After Prompt A `NO_WORTHY_HYPOTHESIS`, the same slash automatically runs
 Prompt C (`HFIC-NEXT-V1.0`) and freeze `--next-action` without owner intervention.
 
-Authorized without additional owner questions: read-only Git/Catalog/active RDP
-navigation; preflight and safe offline commissioning on the same canonical data
-root if genuinely required; process-owned OS temp files; append-only RDP writes
-for context artifact, session/cycle, all candidate versions, frozen Critic
-packet, Critic result, revision receipt, classifier receipt, decisions, session
-receipt, next epistemic action and terminal; automatic isolated Critic handoff; network-free
+Authorized without additional owner questions: read-only Git/Catalog navigation;
+in general Forge, read-only active RDP navigation; preflight and safe offline
+commissioning on the same canonical data root if genuinely required;
+process-owned OS temp files; append-only RDP writes for context artifact,
+session/cycle, all candidate versions, frozen Critic packet, Critic result,
+revision receipt, classifier receipt, decisions, session receipt, next
+epistemic action and terminal; automatic isolated Critic handoff; network-free
 deterministic lane classification; finalize; replay/resume/`prove-runtime`;
 cleanup of process-owned temp files.
+
+In `CURRENT_REPRESENTATION_CONTROL_V1`, Prompt A RDP access is limited to the
+coarse `FORGE_CONTEXT_PACKET` and labels/fingerprints already in that packet —
+not raw current lifecycle observation rows, parquet bodies, or trajectories.
 
 Before proposing `PASS_CHANGE_LANE_REQUIRED`, `CAPABILITY_OPTION_READY`, a new
 collector, provider adapter or infrastructure, compare the need against
@@ -92,8 +97,17 @@ commissioning when Fast Lane proof is absent and safe, design packets.
 Happy path — no owner copy/paste between the slash command and the final terminal:
 
 1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
+   For the preregistered unchanged-representation CONTROL only, add
+   `--control-current-representation` so the receipt carries
+   `evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1`. Do not use this
+   flag for ordinary Forge. CONTROL preflight stops with
+   `CONTROL_YIELD_BELOW_MIN` or `CONTROL_CORPUS_UNRESOLVABLE` before creating a
+   session when the imported live corpus yield is below
+   `MIN_USABLE_YIELD_ELIGIBLE` or the corpus cannot be resolved from metadata.
 2. Branch on `action`:
-   - `RETURN_EXISTING_SESSION` → report the stored terminal/NEXT; stop.
+   - `RETURN_EXISTING_SESSION` → report `effective_control_terminal` when
+     present, else `critic_terminal`, plus NEXT; stop. Do not treat primary C1
+     `critic_terminal` as the CONTROL probe branch after F3 failover.
    - `RESUME_CRITIC` → use `critic_input_packet` from the preflight JSON
      (canonical frozen bytes); do not generate.
    - `RESUME_FINALIZE` → run finalize only.
@@ -103,10 +117,26 @@ Happy path — no owner copy/paste between the slash command and the final termi
      schema-valid ExperimentSpec (network-free `classify_lane()`), then finalize.
      `PASS_TO_CLASSIFICATION` is not complete.
    - `STOP` → report the named terminal; stop.
+     For `CONTROL_YIELD_BELOW_MIN`: show `control_yield_eligible` vs
+     `min_usable_yield_eligible`; `OWNER NEXT=WAIT_FOR_IMPORT_OR_STOP`. Do not
+     drop `--control-current-representation`. Do not recover by running general
+     Forge. Do not freeze or launch Critic.
+     For `CONTROL_CORPUS_UNRESOLVABLE`: `OWNER NEXT=STOP_CORPUS_UNRESOLVABLE`.
+     Same recovery fence.
    - `START_NEW_SESSION` → continue.
 3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
    `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
-   resolved evidence. Display ordinals are display-only; do not invent canonical IDs.
+   resolved evidence. In `CURRENT_REPRESENTATION_CONTROL_V1`, "explicitly
+   resolved evidence" does **not** authorize reading raw current lifecycle
+   observation rows, parquet observation bodies, per-mint raw trajectories,
+   ordered raw lifecycle sequences, future `normalized_trajectory_v1` motifs,
+   or any manually reconstructed equivalent of the challenger representation.
+   CONTROL Prompt A may use the exact `FORGE_CONTEXT_PACKET`, its coarse
+   dataset identities/fingerprints/labels, `feature_hints` / `feature_families`,
+   `feature_grounding` projection, closed-family ledger, eligible prior memory
+   under existing F2 rules, and ordinary Git/Catalog/operator truth required to
+   interpret those IDs/contracts. General Forge read-only active-RDP navigation
+   remains unchanged when the CONTROL flag is absent.
    Output a machine-valid `FORGE_DRAFT` with `packet_version=1.2`,
    `generator_prompt_version=HFIC-V1.2`, schema
    `catalog/schemas/hypothesis_forge_draft_v1_2.schema.json`.
@@ -133,8 +163,9 @@ Happy path — no owner copy/paste between the slash command and the final termi
 6. Otherwise run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
    Do not pass `--next-action` on a selected-candidate path.
-   Fresh HFIC-V1.2 freeze emits critic `packet_version=1.3` with
-   `generator_prompt_version=HFIC-V1.2` and a complete bounded `prior_memory`
+   Fresh HFIC-V1.2 freeze emits critic `packet_version=1.4` with
+   `generator_prompt_version=HFIC-V1.2`, freeze-owned selected-candidate
+   grounding, and a complete bounded `prior_memory`
    snapshot of eligible historical `HYPOTHESIS_VERSION` records from the
    preflight-bound store **before** current session persist. Do not emit
    HFIC-V1.3 Prompt A. If freeze returns
@@ -179,8 +210,10 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET` (selected path only):
 2. **Launch Independent Critic in a new isolated context** using `Task`
    subagent, `.agents/skills/independent-hypothesis-critic/SKILL.md`, and
    **only** the packet (no Forge narrative, no intermediate reasoning, no
-   ResearchStore walk). Fresh critic `packet_version=1.3` already carries
-   complete prior memory. Do not reconstruct `prior_memory` for historical `1.2`.
+   ResearchStore walk). Fresh critic `packet_version=1.4` already carries
+   complete prior memory and freeze-owned grounding. Do not reconstruct
+   `prior_memory` for historical `1.2`. Do not reconstruct packet 1.4 grounding
+   from Catalog/RDP. Historical `packet_version=1.3` remains readable.
    If isolated context cannot launch, return typed `AUTO_HANDOFF_UNAVAILABLE`
    and STOP. Do not instruct the owner to open a new chat, paste the packet,
    or press Run. Do not silently self-criticize in the Forge context.

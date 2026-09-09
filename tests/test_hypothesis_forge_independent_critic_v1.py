@@ -130,6 +130,14 @@ class HypothesisForgeIndependentCriticV1Tests(unittest.TestCase):
         packet["prior_memory"] = dict(MIN_PRIOR_MEMORY)
         self.assertEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
 
+    def test_v14_packet_requires_grounding(self) -> None:
+        packet = load_json(CRITIC_PACKET_FIXTURE)
+        packet["packet_version"] = "1.4"
+        packet["generator_prompt_version"] = "HFIC-V1.2"
+        packet["session_id"] = "HFIC-SESS-TESTBIND0001"
+        packet["prior_memory"] = dict(MIN_PRIOR_MEMORY)
+        self.assertNotEqual(schema_errors(packet, CRITIC_SCHEMA_PATH), [])
+
     def test_critic_packet_rejects_wrong_prompt_version(self) -> None:
         invalid = load_json(CRITIC_PACKET_FIXTURE)
         invalid["generator_prompt_version"] = "HFIC-V0.9"
