@@ -4,8 +4,8 @@
   "review_id": "OWNER-TRADING-OPERABILITY-FOUNDATION-REVIEW-001",
   "as_of": "2026-09-09",
   "task_id": "OWNER_TRADING_OPERABILITY_FOUNDATION_V1",
-  "reviewed_bindings_sha256": "568288e61e48132ec65005879f0dd44bf2db39be0451d061ada710ee9010bbc6",
-  "reviewed_inventory_sha256": "8d3975dc80d43984863d6a82acccdd622dac4c633217eddebf94d4247c9ddb91",
+  "reviewed_bindings_sha256": "3aac4549f1d49dba3aa4640a0482a5bf4f46c64192ffcfb81b9ae787162a6c02",
+  "reviewed_inventory_sha256": "19661b6a323c62a1d3c2ee3b9bc8b73196108ebb902198d8982be119be60e2f6",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -16,12 +16,13 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=638a51f7dc80d8ff026e66b47e39e60742e4681430bb4575c83e04c6dce6587e",
+        "packet_fingerprint_sha256=c7f38f11d421f7e4c8e0ee98113f80ff2e405e0534fadd90785eb99d14377232",
         "C2_ENTER_APPLY_SERIALIZED_IMMEDIATE_WRITE",
         "C4_BOUNDED_REQUESTED_VS_ADMITTED",
         "NO_MATERIAL_YES_ON_BLOCKER_QUESTIONS",
         "UNKNOWN_NOT_ZERO",
         "HTTP_GET_99_25_12_5",
+        "PAPERPLANE_IMPORT_DECLARED_EXECUTION_DOMAIN",
         "PACKET_INFORMATION_PATH",
         "PROCESS_OBLIGATION",
         "model_diversity=UNPROVEN"
@@ -41,6 +42,8 @@
         "UNKNOWN_EXPOSURE_FAIL_CLOSED",
         "NEW_ENTRIES_STOP",
         "SCHEMA_NE_ENABLEMENT",
+        "EXECUTION_DOMAIN_LAZY_IMPORT_DECLARED",
+        "FACTORY_CORE_PINS_MATCH",
         "LOW_INVALID_UNFROZEN_RESUME_UNTESTED"
       ]
     },
@@ -52,7 +55,8 @@
         "DOD_INVALID_POLICY_FAIL_CLOSED_EXIT_CONTINUES",
         "DOD_SHARED_STORE_ONE_SLOT",
         "DOD_GET_READONLY_NO_POLICY_CREATE",
-        "DOD_NO_LIVE_NO_VPS_APPLY"
+        "DOD_NO_LIVE_NO_VPS_APPLY",
+        "DOD_BOUNDED_ENTER_ACCEPT_SIGNAL_DECISION"
       ]
     }
   ],

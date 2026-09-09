@@ -11,13 +11,14 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "92d669ba92fd7f533d0b20b7b5c7158ac0cc03446eafda430477a1a8f4c08bfd",
+    "catalog/assets/core.yaml": "e370a8089a04c7910e1e0f0aa597181afdd31ca5d81ab090bb4bb3ddfabaca7a",
     "catalog/assets/lifecycle.yaml": "57ce9e1523696dbaa53942f506b994c67cd3569bd312bd27b3b40e111024aff7",
     "catalog/catalog_manifest.yaml": "ac0506ba989c86bd26221a25e0aa7fc1d290e5cc7d03a3708a2fc67f3e15e22e",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "3be08a8b153a196957ba52d579b2ccc874277ef1379ff71d5dca79a05d73b990",
     "catalog/generated/asset_edges.json": "4470c9933331d24c372e04761b4d5ab11947d7ea420c8c5adcaf3d0985837c63",
     "catalog/schemas/strategy_version_v1_1.schema.json": "77a510286994c973b6363286f03a401183b5a5f07159861d66041a6be2845015",
     "catalog/schemas/trading_runtime_policy_v1.schema.json": "2a16069f8c620c71a166c038111e9917999dc02c32abc91ac951fdb7907d1d66",
+    "configs/execution_domain_v1.json": "b03cc92af7126ebdf4ba5be9aeb3a6de5fd4b382d202efd1d60cfda4e211c9e7",
     "configs/factory_semantic_operability_v1.yaml": "6af704ca7ab2f9c6568ed562331af939ad993178ca29c201df3a64b90c753698",
     "configs/trading_runtime_policy_v1.yaml": "234b78ec63075ef790da94b9376c485b28448ab6f27a54b45d46bc42ed98d2dd",
     "docs/PROJECT_MAP.md": "fa40c6b8a04301cdfb6bad1641eec695324e45b6e9ee8360e2c36744488e595c",
@@ -27,7 +28,7 @@
     "docs/contracts/trading_operations_workbench_v2.md": "1e067f76995debadd2889432db1a465375d97738838f9e89f21d091710c676e2",
     "docs/contracts/trading_runtime_policy_v1.md": "c29b84c7219bc7f01618e6589482be78299369b716764abfac80ed58d8af9c69",
     "docs/reports/owner_trading_operability_foundation/a1_owner_readout_v1.md": "4516ad816132319e61b5bd8198480e6c9af3ad0f3554b4301187587b74bd9eb6",
-    "docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md": "3168c52a5ef7fd3e93f17cb12849d5db21189935fc8ea7bf4cc213b89900cae0",
+    "docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md": "afd130f8bea80b4125b37f2a4acb6185207513c327b0df66a8f05b03cf86db27",
     "scripts/trading_runtime_policy.py": "4d67009bd128eb0bcf909a1063cf4eac30267e4e699a364cf4bd09de1dee871b",
     "src/solana_alpha_lab/factory/application.py": "3c66455bba496f0efca0a411545d44b04a53baa100388f3651a35a89e283d196",
     "src/solana_alpha_lab/factory/owner_language.py": "c638009fa417c99dfbe7121198097d6797a47b925052f21cafe6552ece051ca2",
@@ -39,6 +40,7 @@
     "src/solana_alpha_lab/factory/trading_runtime_policy.py": "d1c8347fc717348f25a90460494cdc8ddcdfc88a8cf42733a017bf3c9d9927b4",
     "src/solana_alpha_lab/factory/visual_os.py": "31deb0ca63a29a9961bc5ae75bd51f3cb666ae74523befdc88bd8c1d0473da7c",
     "src/solana_alpha_lab/factory/workbench.py": "0880be62a5765ee00f4ae0857b8bd97113fedcc8b178ffa6eb11675d4742d93c",
+    "tests/test_factory_ordinary_market_hypothesis.py": "c1928be3150eff94a791e3b4844178cd667236d3c67da4a80920518ced2ca03f",
     "tests/test_owner_trading_operability_workbench_v1.py": "e04a2726b8d4f571e34ea00e5f32cb8ea597901b2974846df48a799e3d2d602d",
     "tests/test_owner_workbench_vertical_ux_foundation_v1.py": "f2c0d59a298f00c1cc123df9b5f7187e262ecf696ff056aaa157353de4a15645",
     "tests/test_research_lifecycle_workbench_v1.py": "06b07516b50ebe4c6477203a2787ffd09a7b201bb2d481baf99ee5e775a0c992",
@@ -56,14 +58,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/owner_trading_operability_foundation/a1_delivery_factory_fit_v1.json",
-    "sha256": "a3fbd3f841f399eda82406df7f62c417b017c26a1e68466bfa37fd9b409045ed",
+    "sha256": "e9ea3d6efea301ac1317b45c69316cf327eb6f87f7d8cc6980fd81a34aac8084",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_OWNER_TRADING_OPERABILITY_FOUNDATION",
     "independent_review": {
       "path": "docs/evidence/owner_trading_operability_foundation/a1_delivery_independent_review_v1.json",
-      "sha256": "eb1397fde28d4b5691a0731bf9ed707752ab82b963a3b0d4035bc9e13c732096",
+      "sha256": "30f07744059d79e4c1cfb1100c8eb815d0a8ebf715851c4f55c852ae4b62fceb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
