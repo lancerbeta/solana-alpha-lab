@@ -28,6 +28,7 @@ managed_write_set:
   - catalog/schemas/trading_runtime_policy_v1.schema.json
   - catalog/schemas/strategy_version_v1_1.schema.json
   - configs/trading_runtime_policy_v1.yaml
+  - configs/execution_domain_v1.json
   - src/solana_alpha_lab/factory/trading_runtime_policy.py
   - src/solana_alpha_lab/factory/paper_plane.py
   - src/solana_alpha_lab/factory/paper_shadow_operations.py
