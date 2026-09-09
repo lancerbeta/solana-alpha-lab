@@ -106,6 +106,10 @@ activation-epoch admission. Missing `strategy_id` on a relevant OPEN_RISK
 row fail-closes family runtime caps (`RUNTIME_EXPOSURE_UNKNOWN`),
 including strategy-family notional caps, not only position-count caps.
 
+Owner projection must not mix those scopes into one scalar: family
+inventory is shown against the runtime family cap (`NOT_SET` when
+absent); StrategyVersion max is labeled bot-local.
+
 Admission freezes `admitted_entry_notional_usd_dec` and policy
 mode/revision/sha256. Later policy revisions do not resize existing
 admissions. Actual entered notional remains a separate fill field.

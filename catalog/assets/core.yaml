@@ -25728,7 +25728,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/workbench.py', repository_path: src/solana_alpha_lab/factory/workbench.py}
-  integrity: {kind: sha256, sha256: f72b974a77863d89a786ef4513b3a61e0155997319b3a13e1edb3c9c743463a2}
+  integrity: {kind: sha256, sha256: 0880be62a5765ee00f4ae0857b8bd97113fedcc8b178ffa6eb11675d4742d93c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-APPLICATION-001}
@@ -35612,7 +35612,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: e30a40de478e945188439a76c44dbce81f43a4b1dc0a86b0874e0a99fcbc1499}
+  integrity: {kind: sha256, sha256: c638009fa417c99dfbe7121198097d6797a47b925052f21cafe6552ece051ca2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -36383,7 +36383,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/trading_runtime_policy_v1.md', repository_path: docs/contracts/trading_runtime_policy_v1.md}
-  integrity: {kind: sha256, sha256: 6bdca7807ee042de61d096cb81cfb9ed1e63ac81a6ce6be6e4a8f2223bdfe88f}
+  integrity: {kind: sha256, sha256: 47bb2502da10b32afbc64211780bc298fd4980f13e5f3020912cd33d1cbcc563}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -36435,7 +36435,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/trading_runtime_policy.py', repository_path: src/solana_alpha_lab/factory/trading_runtime_policy.py}
-  integrity: {kind: sha256, sha256: 074a41d8b44ddabe457c39768a63c77d1954e5ff1dc347c48c2c0e1a9e699ecc}
+  integrity: {kind: sha256, sha256: 0a14dc32dd48397b4bade0321af18305b32f75961a696b1e0786e6919864e441}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -36525,7 +36525,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_trading_operability_workbench_v1.py', repository_path: tests/test_owner_trading_operability_workbench_v1.py}
-  integrity: {kind: sha256, sha256: fbe8ab3e15c667b208865a354bc515336e872ef83f08d11a717b191a9e20352c}
+  integrity: {kind: sha256, sha256: 501edf3e94e100544c065ce60038e2e59a363668497c92cb813c0362af5afbe3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}

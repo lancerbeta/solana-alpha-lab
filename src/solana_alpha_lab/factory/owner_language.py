@@ -423,6 +423,7 @@ SURFACE_COPY = {
         "policy_status_invalid": "Политика повреждена — новые входы закрыты. EXIT живёт.",
         "policy_status_valid": "Действует runtime overlay.",
         "by_strategy": "По стратегиям",
+        "declared_bot_max": "StrategyVersion max (на бот)",
         "no_strategies": "Нет StrategyVersion в Git-проекции.",
         "search_ops": "поиск по strategy / bot / position / mint",
         "positions_exit": "Позиции / Exit / Reconciliation",

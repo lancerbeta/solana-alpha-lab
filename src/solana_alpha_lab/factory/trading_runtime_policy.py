@@ -789,11 +789,8 @@ def compose_runtime_envelope(store: PaperPlaneStore, git_strategies: list[Mappin
                 runtime_max = override.get("max_open_positions")
                 if runtime_max is None:
                     runtime_max = policy.get("default_strategy_max_open_positions")
-            effective_max = declared_max
-            if declared_max is not None and runtime_max is not None:
-                effective_max = min(int(declared_max), int(runtime_max))
-            elif runtime_max is not None:
-                effective_max = int(runtime_max)
+            if runtime_max is not None:
+                runtime_max = int(runtime_max)
             by_strategy.append(
                 {
                     "mode": mode,
@@ -803,7 +800,9 @@ def compose_runtime_envelope(store: PaperPlaneStore, git_strategies: list[Mappin
                     "runtime_entry_cap_usd": None if cap is None else format(cap, "f"),
                     "effective_next_entry_notional_usd": None if effective is None else format(effective, "f"),
                     "active_positions": inventory["strategy_count"],
-                    "effective_max_open_positions": effective_max,
+                    "declared_max_open_positions": declared_max,
+                    "runtime_max_open_positions": runtime_max,
+                    "effective_max_open_positions": runtime_max,
                     "open_risk_notional_usd": (
                         None
                         if inventory["strategy_unknown"]

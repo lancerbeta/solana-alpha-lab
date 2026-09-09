@@ -171,6 +171,16 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
         self.assertIn("Runtime cap (global)", html)
         self.assertNotIn("Эффективный следующий вход", html)
         self.assertIn("NOT_SET", html)
+        self.assertIn("StrategyVersion max (на бот)", html)
+        paper_rows = [
+            row
+            for row in envelope["by_strategy"]
+            if row["mode"] == "PAPER" and row["strategy_id"] == "STRAT-UI"
+        ]
+        self.assertEqual(len(paper_rows), 1)
+        self.assertEqual(paper_rows[0]["declared_max_open_positions"], 5)
+        self.assertIsNone(paper_rows[0]["runtime_max_open_positions"])
+        self.assertIsNone(paper_rows[0]["effective_max_open_positions"])
         self.assertIn("entity-id-copy", compact_id_html("POS-UI"))
 
     def test_six_surfaces_render_and_get_does_not_write(self) -> None:
