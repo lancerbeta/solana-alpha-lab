@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SYSTEM-OPERABILITY-BOUNDED-READ-PATH-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-09",
+  "task_id": "SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "9ebf6aa3b15a9f74c9c1a101744d4f3ed74dcc78167fe2f72d06003fc4e3e80f",
+  "reviewed_inventory_sha256": "a28e8ebf66007e82fa7ada8f008d600821847ce247e61e3cec43a3dd0b70f0af",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_GET_BOUNDED",
+        "CHECKED_SINGLE_OPEN_SIZE_CAP",
+        "CHECKED_STALE_DIAGNOSTICS_ISOLATION",
+        "CHECKED_SPIES_HEAVY_CALLS",
+        "CHECKED_SPIES_INCIDENT_PENDING",
+        "CHECKED_FAIL_CLOSED_NO_REBUILD",
+        "CHECKED_NO_LIVE_TTFB"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_DECISION_DELTA",
+        "CHECKED_CHEAPEST_FALSIFIER",
+        "CHECKED_INTERACTIVE_BOUNDED_READ",
+        "CHECKED_SINGLE_OPEN_CAP",
+        "CHECKED_STALE_DIAGNOSTICS_NOT_CURRENT_SHAPED",
+        "CHECKED_USER_VISIBLE",
+        "CHECKED_NON_CLAIMS",
+        "CHECKED_EVIDENCE_BUDGET"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=81841aab41f1deca557a672afc1293c5c8897622e5c3ed3176f3b367c93a446c",
+        "CHECKED_SINGLE_OPEN_MAX_PLUS_ONE",
+        "CHECKED_STALE_NOT_CURRENT_AUTHORITY",
+        "CHECKED_SNAPSHOT_DERIVED_NOT_SCIENTIFIC",
+        "CHECKED_NO_FAMILY_WIDENING",
+        "CHECKED_UNKNOWN_NOT_NEGATIVE",
+        "CHECKED_ROLLBACK_ADDITIVE_EXTRA_KEY"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_OWNER_FCF",
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_WALLET",
+    "NO_MONITORING_PLATFORM",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_LATENCY_REPAIR"
+  ]
+}
