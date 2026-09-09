@@ -47,6 +47,7 @@ managed_write_set:
   - tests/test_trading_runtime_policy_backup_restore_v1.py
   - tests/test_research_lifecycle_workbench_v1.py
   - tests/test_owner_workbench_vertical_ux_foundation_v1.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - tests/test_factory_semantic_operability.py
   - configs/factory_semantic_operability_v1.yaml
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml

@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 518d820be3c5b4015483198e6b36a3477f5436deec9105cd537861eca30c547d}
+  integrity: {kind: sha256, sha256: c1928be3150eff94a791e3b4844178cd667236d3c67da4a80920518ced2ca03f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -36362,7 +36362,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md', repository_path: docs/tasks/OWNER_TRADING_OPERABILITY_FOUNDATION_V1.md}
-  integrity: {kind: sha256, sha256: 5a12c4c299c701c2e7e79fe9a96c449b573bef0d467eebe9f44aa6e4b373eaca}
+  integrity: {kind: sha256, sha256: afd130f8bea80b4125b37f2a4acb6185207513c327b0df66a8f05b03cf86db27}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: DOC-TRADING-RUNTIME-POLICY-001}
