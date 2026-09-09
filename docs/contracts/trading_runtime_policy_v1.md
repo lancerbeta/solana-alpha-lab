@@ -113,6 +113,9 @@ absent); StrategyVersion max is labeled bot-local.
 Admission freezes `admitted_entry_notional_usd_dec` and policy
 mode/revision/sha256. Later policy revisions do not resize existing
 admissions. Actual entered notional remains a separate fill field.
+PRE_TRADE_RISK_SNAPSHOT records StrategyVersion bot-local max and
+runtime family max as separate fields; it does not emit a mixed-scope
+minimum as canonical capacity.
 
 Relevant OPEN_RISK unknown required notional → `RUNTIME_EXPOSURE_UNKNOWN`
 → BLOCK. Historical CLOSED/RECONCILED missing notional does not block.

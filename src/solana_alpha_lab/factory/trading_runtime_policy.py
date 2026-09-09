@@ -606,9 +606,6 @@ def evaluate_admission(
     runtime_strategy_max = override.get("max_open_positions")
     if runtime_strategy_max is None and policy_status == STATUS_VALID and policy is not None:
         runtime_strategy_max = policy.get("default_strategy_max_open_positions")
-    effective_strategy_max = strategy_max_open
-    if runtime_strategy_max is not None:
-        effective_strategy_max = min(strategy_max_open, int(runtime_strategy_max))
 
     global_count = int(inventory["global_count"])
     strategy_count = int(inventory["strategy_count"])
@@ -686,7 +683,6 @@ def evaluate_admission(
     )
     snapshot["effective_entry_notional_usd_dec"] = format(effective, "f")
     snapshot["strategy_requested_notional_usd_dec"] = format(strategy_requested, "f")
-    snapshot["effective_strategy_max_open_positions"] = effective_strategy_max
     return snapshot
 
 
@@ -704,6 +700,14 @@ def _snapshot(
     effective: Decimal,
     inventory: Mapping[str, Any],
 ) -> dict[str, Any]:
+    runtime_strategy_max = None
+    if policy_status == STATUS_VALID and policy is not None:
+        override = _override_for(policy, str(strategy["strategy_id"]))
+        runtime_strategy_max = override.get("max_open_positions")
+        if runtime_strategy_max is None:
+            runtime_strategy_max = policy.get("default_strategy_max_open_positions")
+        if runtime_strategy_max is not None:
+            runtime_strategy_max = int(runtime_strategy_max)
     return {
         "decision": decision if decision.startswith("ALLOW") or decision.startswith("BLOCK") else decision,
         "reason_codes": list(reason_codes),
@@ -732,6 +736,8 @@ def _snapshot(
         "current_mint_open_risk_notional_usd": (
             None if inventory.get("mint_notional") is None else format(inventory["mint_notional"], "f")
         ),
+        "strategy_declared_max_open_positions": int(strategy["risk_policy"]["max_open_positions"]),
+        "runtime_strategy_max_open_positions": runtime_strategy_max,
         "open_risk_states": sorted(OPEN_RISK_STATES),
     }
 
