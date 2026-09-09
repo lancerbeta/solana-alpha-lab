@@ -8,7 +8,7 @@ allowed_routes:
   - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 9044db6b1b65614f55c074c481fb0dfd323ca2e1
+  expected_base: 62527018dca6f8a98a5722b71ce09c21f6aedd74
   expected_upstream: origin/main
   expected_upstream_oid: 62527018dca6f8a98a5722b71ce09c21f6aedd74
   expected_branch: cursor/owner-trading-operability-foundation-v1

@@ -4,8 +4,8 @@
   "review_id": "OWNER-TRADING-OPERABILITY-FOUNDATION-FACTORY-FIT-001",
   "as_of": "2026-09-09",
   "task_id": "OWNER_TRADING_OPERABILITY_FOUNDATION_V1",
-  "reviewed_bindings_sha256": "5ef668b65683296692382cb5efd92337992af6cf8cc5d7d6046968f9c6fb3bbc",
-  "reviewed_inventory_sha256": "19c66648629172c253c7d3a30323e3f4bac82740d9cfb93813440884e8bc66c8",
+  "reviewed_bindings_sha256": "65c4f4d47e33bcb81eb4a7581dd000c80b5cf81f187915fc10bbf6c1d41bd0e3",
+  "reviewed_inventory_sha256": "61afa24fab5dc8554544798d2621d360e7404aba01206ec611e925f8ce83b368",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
