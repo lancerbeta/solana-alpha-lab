@@ -36472,7 +36472,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_trading_runtime_policy_v1.py', repository_path: tests/test_trading_runtime_policy_v1.py}
-  integrity: {kind: sha256, sha256: 7dae9eaf7a2454dc72f2b332727848e923b6782d879a85193a5e0082fdadfdd9}
+  integrity: {kind: sha256, sha256: 20457b32d642d0624fce1d4f8fc8e7b30161477a956f82d7f24d5be886e24f85}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}
@@ -36525,7 +36525,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: OWNER_TRADING_OPERABILITY_FOUNDATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_owner_trading_operability_workbench_v1.py', repository_path: tests/test_owner_trading_operability_workbench_v1.py}
-  integrity: {kind: sha256, sha256: 501edf3e94e100544c065ce60038e2e59a363668497c92cb813c0362af5afbe3}
+  integrity: {kind: sha256, sha256: 96512a6cefc0fed5a725e80f3f02a1c50234e50ae4e0b1e7606f16497f633380}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-TRADING-RUNTIME-POLICY-001}

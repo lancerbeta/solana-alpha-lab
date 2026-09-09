@@ -465,6 +465,43 @@ class TradingRuntimePolicyTests(unittest.TestCase):
             finally:
                 store.close()
 
+    def test_invalid_policy_blocks_new_entry_exit_continues(self) -> None:
+        strategy = load_strategy_version(ROOT, STRAT_REL)
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
+            try:
+                _apply(store, "PAPER", _candidate(), key="IDEM-INV-1")
+                opened = _enter2(store, strategy, "SIGDEC-INV-1")
+                store._conn.execute(
+                    """
+                    UPDATE trading_runtime_policy_revisions
+                    SET policy_sha256 = ?
+                    WHERE mode = 'PAPER' AND revision = (
+                        SELECT MAX(revision) FROM trading_runtime_policy_revisions
+                        WHERE mode = 'PAPER'
+                    )
+                    """,
+                    ("0" * 64,),
+                )
+                shown = show_policy(store, "PAPER")
+                self.assertEqual(shown["status"], "RUNTIME_POLICY_INVALID")
+                with self.assertRaises(PaperPlaneError) as exc:
+                    _enter2(
+                        store,
+                        strategy,
+                        "SIGDEC-INV-2",
+                        mint=MINT_B,
+                        decision_at="2026-09-03T12:11:00Z",
+                    )
+                self.assertIn("RUNTIME_POLICY_INVALID", str(exc.exception))
+                store.transition(opened["position_id"], "EXIT_REQUIRED")
+                self.assertEqual(
+                    store.get_position(opened["position_id"])["state"],
+                    "EXIT_REQUIRED",
+                )
+            finally:
+                store.close()
+
     def test_paper_shadow_isolation_and_live_denied(self) -> None:
         strategy = load_strategy_version(ROOT, STRAT_REL)
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

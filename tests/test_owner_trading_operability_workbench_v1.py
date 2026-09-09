@@ -183,6 +183,57 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
         self.assertIsNone(paper_rows[0]["effective_max_open_positions"])
         self.assertIn("entity-id-copy", compact_id_html("POS-UI"))
 
+    def test_operations_http_get_present_store_shows_runtime_envelope(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = isolated_factory_root(Path(tmp) / "src")
+            strat_dir = root / "configs" / "strategies"
+            strat_dir.mkdir(parents=True, exist_ok=True)
+            (strat_dir / "STRAT-HTTP-UI.yaml").write_text(
+                "\n".join(
+                    [
+                        "strategy_id: STRAT-HTTP-UI",
+                        "strategy_version: V1",
+                        "notional_policy:",
+                        "  notional_usd: 100",
+                        "risk_policy:",
+                        "  max_open_positions: 5",
+                    ]
+                )
+                + "\n",
+                encoding="utf-8",
+            )
+            paper_path = root / "local" / "factory_v1" / "paper_plane_state.sqlite"
+            paper_path.parent.mkdir(parents=True, exist_ok=True)
+            paper = PaperPlaneStore(paper_path)
+            try:
+                apply_policy(
+                    ROOT,
+                    paper,
+                    mode="PAPER",
+                    candidate_raw={
+                        "new_entries_enabled": True,
+                        "global_entry_notional_cap_usd": "10",
+                    },
+                    expected_current_sha256="0" * 64,
+                    idempotency_key="IDEM-HTTP-1",
+                    owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+                    reason="UI",
+                )
+            finally:
+                paper.close()
+            mtime_before = paper_path.stat().st_mtime_ns
+            store = OperationalStore((root / "ops.sqlite").resolve())
+            app = FactoryApplication(root=root, store=store)
+            html = _get(app, "/operations")
+            self.assertIn("STRAT-HTTP-UI", html)
+            self.assertIn("Запрос стратегии", html)
+            self.assertIn("Runtime cap", html)
+            self.assertIn("Эффективно", html)
+            self.assertIn("100", html)
+            self.assertIn("10", html)
+            self.assertNotIn("PaperPlane отсутствует", html)
+            self.assertEqual(paper_path.stat().st_mtime_ns, mtime_before)
+
     def test_six_surfaces_render_and_get_does_not_write(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = isolated_factory_root(Path(tmp) / "src")
