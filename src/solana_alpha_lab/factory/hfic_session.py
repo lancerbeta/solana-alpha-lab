@@ -4210,6 +4210,17 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             packet_sha=str(cycle.get("runner_up_critic_input_packet_sha256") or ""),
             definition_sha=str(cycle.get("runner_up_definition_sha256") or ""),
         )
+    primary_result_sha = str(cycle.get("primary_critic_result_sha256") or "")
+    primary_critic_result = None
+    if len(primary_result_sha) == 64:
+        if critic_result is not None and primary_result_sha == (critic_result_sha or ""):
+            primary_critic_result = critic_result
+        else:
+            _wrapper, primary_critic_result, _primary_loaded = _load_artifact_by_sha(
+                artifacts,
+                artifact_kind="CRITIC_RESULT",
+                expected_sha=primary_result_sha,
+            )
     if expected_receipt_sha:
         _wrapper, session_receipt, receipt_sha = _load_artifact_by_sha(
             artifacts,
@@ -4245,10 +4256,14 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             if isinstance(raw, str):
                 classifier_receipt = json.loads(raw)
             break
-    elif isinstance(critic_result, Mapping):
-        embedded = critic_result.get("classifier_receipt")
-        if isinstance(embedded, Mapping):
-            classifier_receipt = dict(embedded)
+    else:
+        for source in (critic_result, primary_critic_result):
+            if not isinstance(source, Mapping):
+                continue
+            embedded = source.get("classifier_receipt")
+            if isinstance(embedded, Mapping):
+                classifier_receipt = dict(embedded)
+                break
     state = str(cycle.get("phase") or "FROZEN_AWAITING_CRITIC")
     if state == "SYNTHESIS_COMPLETE" and not isinstance(session_receipt, Mapping):
         if cycle.get("critic_terminal") == "NO_WORTHY_HYPOTHESIS" and not cycle.get(

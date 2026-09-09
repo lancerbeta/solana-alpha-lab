@@ -259,6 +259,21 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
             self.assertTrue(done["runner_up_failover_used"])
             self.assertEqual(done["critic_screen_count"], 2)
 
+    def test_classifier_mapped_c1_kill_keeps_c1_classifier_receipt_while_parked(self) -> None:
+        from tests.test_observation_fast_lane_routing_closure import (
+            AS_OF_START,
+            forge_classify,
+            packet_for,
+            v1_2_spec,
+        )
+
+        spec = v1_2_spec(as_of="2026-09-01T12:00:00Z")
+        with tempfile.TemporaryDirectory() as tmp:
+            forged = forge_classify(packet_for(spec), Path(tmp), AS_OF_START)
+            self.assertEqual(forged["session_state"], RUNNER_UP_AWAITING_CRITIC)
+            self.assertEqual(forged["classifier_terminal"], "DENY_INVALID_SPEC")
+            self.assertEqual(forged["hfic_terminal"], "KILL_UNBOUND_EVIDENCE")
+
     def test_t4_classifier_acts_on_c2_spec(self) -> None:
         from solana_alpha_lab.factory.hfic_session import apply_classification
         from tests.test_fast_lane_classifier import submission
