@@ -55,9 +55,11 @@ uncertainty. Semantic entries never grant provider/data authority.
 If isolated Critic context is unavailable, return typed `AUTO_HANDOFF_UNAVAILABLE`.
 Do not silently self-criticize in the Forge context.
 
-Slash does **not** authorize `apply-provenance-correction`. Read-only
-`inventory-placeholder-times` is also outside the slash cycle and runs only
-after the exact owner merge phrase.
+Slash does **not** authorize `apply-provenance-correction` or
+`memory-policy-apply`. Read-only `inventory-placeholder-times` and
+`memory-policy-status` / `memory-policy-preview` are also outside the slash
+cycle. Memory-policy apply runs only after the slash ends, with
+`--confirm-append-only`.
 
 If the host platform mechanically requires command approval, request at most one
 narrowly scoped batch at cycle start for

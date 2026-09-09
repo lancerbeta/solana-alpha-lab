@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-OPERATIONAL-MEMORY-QUARANTINE-COMPLETION-001",
+  "as_of": "2026-09-09",
+  "task_id": "HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1",
+  "state_change": "HFIC_OPERATIONAL_MEMORY_QUARANTINE_CANDIDATE",
+  "base_main": "94c3397acf68516d69808e224fb61c4f99142a55",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1.md": "4ed49d447a9392da000036229f94e36ab35002d50c6279c99a9ac19c8389efcd"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_operational_memory_quarantine/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_OPERATIONAL_MEMORY_QUARANTINE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_operational_memory_quarantine/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_T1_T14_MEMORY_QUARANTINE",
+      "PASS_ISOLATED_ARCHITECTURE_CODE_GOAL_DOD",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_RDP_APPLY",
+    "NO_HISTORICAL_REWRITE",
+    "NO_NON_HFIC_MEMORY_HIDE",
+    "NO_PRIOR_MEMORY_BOUND_RAISE",
+    "NO_CLOSE_PARK_CHANGE",
+    "NO_F1_F2_F3_CHANGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

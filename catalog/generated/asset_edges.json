@@ -3253,6 +3253,26 @@
       "target_asset_id": "TEST-FORWARD-H900-QUOTE-CAPTURE-001"
     },
     {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001"
+    },
+    {
       "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
       "relation": "depends_on",
       "target_asset_id": "ADR-MVP-STACK-002"
@@ -10503,6 +10523,16 @@
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
     },
     {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-RESEARCH-STORE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001"
+    },
+    {
       "source_asset_id": "MODULE-FACTORY-V1-HFIC-PROSPECTS-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-HFIC-SCIENTIFIC-DISCOVERY-PROSPECTS-001"
@@ -14275,6 +14305,11 @@
     {
       "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001",
       "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001",
+      "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
     },
     {
@@ -15571,6 +15606,21 @@
       "source_asset_id": "TEST-HFIC-OPERATIONAL-CLOSURE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001"
     },
     {
       "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",

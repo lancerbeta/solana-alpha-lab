@@ -119,6 +119,9 @@ class HficCliContractTests(unittest.TestCase):
             "apply-provenance-correction",
             "prospects",
             "rebase-science-memory",
+            "memory-policy-status",
+            "memory-policy-preview",
+            "memory-policy-apply",
         ):
             self.assertIn(command, completed.stdout)
 

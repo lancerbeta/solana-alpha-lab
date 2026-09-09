@@ -172,3 +172,23 @@ prior_memory:
     - HISTORICAL
   visibility_is_not_hard_close: true
   critic_store_archaeology: false
+  search_memory_policy:
+    artifact_kind: HFIC_SEARCH_MEMORY_POLICY
+    protocol: HFIC-MEMORY-POLICY-V1
+    schema: smial.hfic-search-memory-policy
+    schema_version: '1.0'
+    eligibility_axis: HFIC_SEARCH_MEMORY_ELIGIBILITY
+    not_scientific_rejection: true
+    not_deletion: true
+    not_supersession: true
+    evidence_epoch_binding: UNCHANGED_BY_HFIC_MEMORY_POLICY
+    future_reset_requires_git: false
+    restore_requires_git: false
+    slash_cycle: false
+    apply_requires_confirm_append_only: true
+    pending_sessions_denied: true
+    genesis_search_key_compatible: true
+    reasons:
+      - OWNER_CALIBRATION_RESET
+      - OWNER_MEMORY_RESTORE
+      - PRE_CAPABILITY_BASELINE_CALIBRATION_RESET

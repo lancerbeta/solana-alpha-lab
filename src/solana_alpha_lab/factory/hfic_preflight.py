@@ -256,7 +256,8 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                     focus_key_sha256,
                     search_key_sha256,
                     prompt_version,
-                    owner_focus
+                    owner_focus,
+                    memory_eligibility_sha256
                 FROM hfic_sessions
                 """
             ).fetchall()
@@ -275,6 +276,7 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                 "search_key_sha256": row[4],
                 "prompt_version": row[5],
                 "owner_focus": row[6],
+                "memory_eligibility_sha256": row[7],
             }
         )
     return sessions
@@ -299,12 +301,19 @@ def decide_preflight_action(
     evidence_epoch: str,
     focus_key: str,
     owner_focus: str,
+    memory_eligibility_sha256: str | None = None,
 ) -> tuple[str, str | None]:
+    from solana_alpha_lab.factory.hfic_memory_policy import session_memory_eligibility
+
+    expected_memory = session_memory_eligibility(
+        {"memory_eligibility_sha256": memory_eligibility_sha256}
+    )
     same_focus = [
         item
         for item in sessions
         if item.get("evidence_epoch_sha256") == evidence_epoch
         and item.get("focus_key_sha256") == focus_key
+        and session_memory_eligibility(item) == expected_memory
     ]
     if same_focus:
         chosen = pick_session(same_focus)
@@ -331,6 +340,7 @@ def decide_preflight_action(
         item
         for item in sessions
         if item.get("evidence_epoch_sha256") == evidence_epoch
+        and session_memory_eligibility(item) == expected_memory
     ]
     if _is_auto_focus(owner_focus):
         auto_count = sum(
@@ -363,6 +373,10 @@ def rank_prior_candidate_ids(
     feature_hints: list[str],
     limit: int = MAX_RANKED_PRIORS,
 ) -> tuple[list[str], int]:
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        iter_search_memory_hypothesis_payloads,
+    )
+
     focus_terms = _term_set(owner_focus)
     feature_terms = set()
     for hint in feature_hints:
@@ -373,11 +387,7 @@ def rank_prior_candidate_ids(
         )
     scored: list[tuple[int, str]] = []
     seen: set[str] = set()
-    for record in store.iter_committed_records():
-        kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind != RecordKind.HYPOTHESIS_VERSION.value:
-            continue
-        payload = json.loads(record.payload_json)
+    for payload in iter_search_memory_hypothesis_payloads(store):
         hyp_id = payload.get("hypothesis_version_id")
         if not isinstance(hyp_id, str) or hyp_id in seen:
             continue
@@ -1307,10 +1317,16 @@ def run_preflight(
     except HficClockError as exc:
         raise HficPreflightError(str(exc)) from exc
 
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+
     epoch = evidence_epoch_sha256(evidence_epoch_material(repo_root, data_root))
     focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
     focus_key = focus_key_sha256(focus)
-    search_key = search_key_sha256(epoch, focus, PROMPT_VERSION)
+    policy_head = effective_policy(store)
+    memory_eligibility = str(policy_head["memory_eligibility_sha256"])
+    search_key = search_key_sha256(
+        epoch, focus, PROMPT_VERSION, memory_eligibility
+    )
     sessions = _query_hfic_sessions(data_root)
     action, bound_session = decide_preflight_action(
         sessions,
@@ -1318,6 +1334,7 @@ def run_preflight(
         evidence_epoch=epoch,
         focus_key=focus_key,
         owner_focus=focus,
+        memory_eligibility_sha256=memory_eligibility,
     )
     live_git_head = "0" * 40
     git_composite = None
@@ -1344,6 +1361,12 @@ def run_preflight(
         "evidence_epoch_sha256": epoch,
         "focus_key_sha256": focus_key,
         "search_key_sha256": search_key,
+        "memory_policy_head_sha256": policy_head["policy_sha256"],
+        "memory_eligibility_sha256": memory_eligibility,
+        "quarantined_session_count": len(
+            list(policy_head.get("quarantined_session_ids") or [])
+        ),
+        "evidence_epoch_policy_binding": "UNCHANGED_BY_HFIC_MEMORY_POLICY",
         "live_git_head": live_git_head,
         "git_composite_sha256": git_composite,
         "store_inventory_digest": digest,

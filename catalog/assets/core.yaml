@@ -31917,7 +31917,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://schemas/research_memory_projection_v1.sql', repository_path: schemas/research_memory_projection_v1.sql}
-  integrity: {kind: sha256, sha256: 3132d0ae51f2c3e225577abb50787c757998a958727455b3475547f895d0a0d8}
+  integrity: {kind: sha256, sha256: c39ee0d8fc725c73e4b91896bb16b95b8f85fc2ffb38d3fd91bcf51a1ffbc866}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32280,18 +32280,19 @@ records:
 - asset_id: SCRIPT-HYPOTHESIS-FORGE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Thin network-free CLI for HFIC preflight, freeze, finalize, prior lookup, runtime proof, placeholder-time inventory and append-only provenance correction.
+  purpose: Thin network-free CLI for HFIC preflight, freeze, finalize, prior lookup, runtime proof, placeholder-time inventory, append-only provenance correction, and append-only search-memory policy.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: c8fa870b889bb2eaca3ccf77d0cd86cfaa4503efdab87f96e573aa81b8f08517}
+  integrity: {kind: sha256, sha256: d7b935e29b20e9faeb18b1f5fab3c887a26a7ec5cb02c23ba48c12665e0b701c}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SESSION-001}
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SUPPRESSION-SEMANTICS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001}
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
@@ -32306,7 +32307,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 0667a994f56e7ae0f1efe7f98e1fa395492a3303ce277343a358656074d5cb85}
+  integrity: {kind: sha256, sha256: 206f7fc7e2f9603175f5fe71462c4065f5b28d440e3ff012ec51436f706ec185}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34179,7 +34180,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/hypothesis_forge_independent_critic_v1.yaml', repository_path: configs/hypothesis_forge_independent_critic_v1.yaml}
-  integrity: {kind: sha256, sha256: 322b94c1a37a5c3edbaa6ac473d9c200f28217df6b559f56728a64f968755817}
+  integrity: {kind: sha256, sha256: b8a58a35503aeacd96944e914362b95eb6b90613cbe63483f6945ee58fcd8938}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34197,7 +34198,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: db125d42ad5258aa33dc0a5bce024e5da4df328f1af2ba61e4d57bc919b6257b}
+  integrity: {kind: sha256, sha256: 75580af63b92d02fb639648a5837fb809556d8877e991e1aaa2dfd98eb3791fa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34215,7 +34216,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: d662e9492a68c20e62f905552288041c76fb3258a9357759cf531730a90ce0af}
+  integrity: {kind: sha256, sha256: 8dea8e94461f1a23cba204a5da021c6d105e25c86a4ef6f0ac9a37df2abaea22}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -36266,4 +36267,64 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [MARKET_VERTICAL, GET_NON_MUTATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for append-only HFIC search-memory quarantine without Git mutation after first merge.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-09'
+  truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1.md', repository_path: docs/tasks/HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1.md}
+  integrity: {kind: sha256, sha256: 2cb33b6af822746feb0bec54f43063b3154bdfc6ee97f56f287b304f5458c020}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SEARCH_MEMORY, QUARANTINE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Append-only HFIC search-memory eligibility policy. Quarantine excludes completed HFIC sessions from future search memory without rewriting historical bytes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-09'
+  truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_memory_policy.py', repository_path: src/solana_alpha_lab/factory/hfic_memory_policy.py}
+  integrity: {kind: sha256, sha256: 12b3c51a9ee7b7f0d06f997163f0fd016bc66ccb9f5ef28d30e604e7967cf2da}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  consumers: [FACTORY-001, SCRIPT-HYPOTHESIS-FORGE-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SEARCH_MEMORY, POLICY]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network T1-T13 proofs that HFIC search-memory quarantine is append-only, does not hide non-HFIC memory, and does not change evidence epoch.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-09'
+  truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_operational_memory_quarantine_v1.py', repository_path: tests/test_hfic_operational_memory_quarantine_v1.py}
+  integrity: {kind: sha256, sha256: a6dc33f82e5153a2c1e2582a9c666562234ee17070679b142f9a497518e80d43}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SEARCH_MEMORY, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

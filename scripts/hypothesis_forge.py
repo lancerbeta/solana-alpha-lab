@@ -45,6 +45,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.data_root import (  # noqa: E402
     DataRootError,
     resolve_active_data_root,
+    resolve_existing_data_root,
 )
 from solana_alpha_lab.factory.document_runner import (  # noqa: E402
     repository_git_snapshot,
@@ -80,6 +81,15 @@ from solana_alpha_lab.factory.hfic_provenance import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_suppression_semantics import (  # noqa: E402
     HficSuppressionError,
     run_science_memory_rebase,
+)
+from solana_alpha_lab.factory.hfic_memory_policy import (  # noqa: E402
+    HficMemoryPolicyError,
+    REASON_OWNER_CALIBRATION_RESET,
+    REASON_OWNER_MEMORY_RESTORE,
+    REASON_PRE_CAPABILITY_BASELINE,
+    apply_memory_policy,
+    memory_policy_status,
+    preview_memory_policy,
 )
 from solana_alpha_lab.factory.research_store import (  # noqa: E402
     ResearchStore,
@@ -253,6 +263,69 @@ def cmd_preflight(
 
 def _store_root(repo_root: Path, explicit_data_root: Path | None) -> Path:
     return _active_root(repo_root, explicit_data_root).root
+
+
+def _existing_data_root(repo_root: Path, explicit_data_root: Path | None) -> Path:
+    resolved = resolve_existing_data_root(repo_root, explicit_data_root=explicit_data_root)
+    if resolved.status != "PRESENT" or resolved.root is None:
+        raise HficCliError(resolved.error or "RESEARCH_STORE_NOT_PRESENT")
+    return resolved.root
+
+
+def cmd_memory_policy_status(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+) -> int:
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    payload = memory_policy_status(store, repo_root=repo_root)
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_memory_policy_preview(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    quarantine_session_ids: list[str],
+    restore_session_ids: list[str],
+    quarantine_all_current_hfic: bool,
+    reason_code: str,
+) -> int:
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    payload = preview_memory_policy(
+        store,
+        repo_root=repo_root,
+        quarantine_session_ids=quarantine_session_ids,
+        restore_session_ids=restore_session_ids,
+        quarantine_all_current_hfic=quarantine_all_current_hfic,
+        reason_code=reason_code,
+    )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_memory_policy_apply(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    proposal_path: Path,
+    confirm_append_only: bool,
+) -> int:
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    proposal = _load_json_file(proposal_path)
+    nested = proposal.get("proposal")
+    body = nested if isinstance(nested, dict) else proposal
+    payload = apply_memory_policy(
+        store,
+        repo_root=repo_root,
+        proposal=body,
+        confirm_append_only=confirm_append_only,
+    )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
 
 
 def cmd_freeze(
@@ -714,6 +787,41 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="required; appends DECISION_EVENT only; never rewrites historical RDP bytes",
     )
+    status_cmd = subparsers.add_parser(
+        "memory-policy-status",
+        help="read-only HFIC search-memory policy and prior-memory capacity",
+    )
+    status_cmd.add_argument("--format", choices=("json",), default="json")
+    preview_cmd = subparsers.add_parser(
+        "memory-policy-preview",
+        help="read-only preview of an append-only HFIC search-memory policy",
+    )
+    preview_cmd.add_argument("--quarantine-session", action="append", default=[])
+    preview_cmd.add_argument("--restore-session", action="append", default=[])
+    preview_cmd.add_argument("--quarantine-all-current-hfic", action="store_true")
+    preview_cmd.add_argument(
+        "--reason",
+        default=REASON_OWNER_CALIBRATION_RESET,
+        choices=sorted(
+            {
+                REASON_OWNER_CALIBRATION_RESET,
+                REASON_OWNER_MEMORY_RESTORE,
+                REASON_PRE_CAPABILITY_BASELINE,
+            }
+        ),
+    )
+    preview_cmd.add_argument("--format", choices=("json",), default="json")
+    apply_cmd = subparsers.add_parser(
+        "memory-policy-apply",
+        help="append-only HFIC search-memory policy; requires --confirm-append-only",
+    )
+    apply_cmd.add_argument("--proposal", type=Path, required=True)
+    apply_cmd.add_argument(
+        "--confirm-append-only",
+        action="store_true",
+        help="required; appends policy only; never rewrites historical RDP bytes",
+    )
+    apply_cmd.add_argument("--format", choices=("json",), default="json")
     return parser
 
 
@@ -813,8 +921,26 @@ def main(argv: list[str] | None = None) -> int:
                 explicit_data_root=args.data_root,
                 confirm_append_only=bool(args.confirm_append_only),
             )
+        if args.command == "memory-policy-status":
+            return cmd_memory_policy_status(repo_root, args.data_root)
+        if args.command == "memory-policy-preview":
+            return cmd_memory_policy_preview(
+                repo_root,
+                explicit_data_root=args.data_root,
+                quarantine_session_ids=list(args.quarantine_session or []),
+                restore_session_ids=list(args.restore_session or []),
+                quarantine_all_current_hfic=bool(args.quarantine_all_current_hfic),
+                reason_code=str(args.reason),
+            )
+        if args.command == "memory-policy-apply":
+            return cmd_memory_policy_apply(
+                repo_root,
+                explicit_data_root=args.data_root,
+                proposal_path=args.proposal,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
-    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, HficSuppressionError, DataRootError, ResearchStoreError) as exc:
+    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, HficSuppressionError, HficMemoryPolicyError, DataRootError, ResearchStoreError) as exc:
         return emit_error(str(exc))
     except (OSError, ValueError, json.JSONDecodeError):
         return emit_error("HFIC_PROTOCOL_INVALID")
