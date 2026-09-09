@@ -49,6 +49,7 @@ RESEARCH_COPY = {
     "search": "найти",
     "search_aria": "поиск по исследованиям",
     "col_kind": "вид",
+    "col_num": "№",
     "col_title": "название",
     "col_state": "состояние",
     "col_plane": "плоскость",
@@ -384,6 +385,7 @@ SURFACE_COPY = {
         "phrase_not_urgent": (
             "Фраза ниже — точный текст для чата, не срочная кнопка этого экрана."
         ),
+        "phrase_technical": "Точная фраза эксперимента (не текущее действие HOME)",
     },
     "RESEARCH": {
         "h1": "Исследования",
@@ -392,7 +394,7 @@ SURFACE_COPY = {
     },
     "OPERATIONS": {
         "h1": "Операции",
-        "question": "Что исполняется, где остановился путь и что безопасно сделать?",
+        "question": "Что сейчас действительно активно, какой риск открыт, что блокирует новые входы и что я могу безопасно сделать?",
         "now": "Сейчас",
         "summary": "Сводка",
         "bots": "Боты",
@@ -400,6 +402,23 @@ SURFACE_COPY = {
         "trace": "Signal → Risk → Execution",
         "counts": "Счётчики",
         "positions": "Позиции",
+        "active_positions": "Активные позиции",
+        "history_positions": "История",
+        "trading_limits": "Торговые ограничения",
+        "open_risk_capital": "Лимит открытого риска / капитала",
+        "open_notional": "Открытый notional",
+        "new_entries_global": "Новые входы (режим)",
+        "entries_enabled": "включены",
+        "entries_disabled": "выключены",
+        "policy_status": "Статус политики",
+        "policy_revision": "Ревизия",
+        "changed_at": "Изменено",
+        "requested": "Запрос стратегии",
+        "runtime_cap": "Runtime cap",
+        "effective": "Эффективно",
+        "effective_next_entry": "Эффективный следующий вход",
+        "by_strategy": "По стратегиям",
+        "search_ops": "поиск по strategy / bot / position / mint",
         "positions_exit": "Позиции / Exit / Reconciliation",
         "attention": "Требует внимания",
         "recent": "Недавние изменения",
@@ -486,6 +505,11 @@ SURFACE_COPY = {
         "open_mark": "Open-mark экономика",
         "mark_subordinate": "Open mark — as-of оценка, не settled cash. Не складывается со сведённой.",
         "declared_risk": "Объявленный риск входа",
+        "runtime_envelope": "Текущий runtime-конверт (не баланс)",
+        "runtime_not_wallet": (
+            "Это лимит открытого риска / капитала и открытый notional, "
+            "не баланс и не доступные деньги."
+        ),
         "strategy_binding": "StrategyVersion",
         "entry_limit": "max_open_positions",
         "headroom": "Оставшиеся entry slots",

@@ -385,20 +385,20 @@ routes:
     search_terms:
       - owner lifecycle
       - lifecycle projection
-      - research-to-execution
-      - lineage
       - StrategyVersion
       - SignalDecision
       - unresolved positions
       - PAPER economics
-      - max_open_positions
+      - TradingRuntimePolicy
+      - why was this experiment rejected
+      - what evidence is missing
       - где каноническая карта lifecycle
       - как связаны гипотеза эксперимент стратегия и позиция
       - покажи evidence эксперимента
       - чего не хватает для решения
       - Research Workbench
-      - what evidence is missing
-      - why was this experiment rejected
+      - research-to-execution
+      - лимит открытого риска
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids:
       - ACTIVE-OWNER-LIFECYCLE-PROJECTION

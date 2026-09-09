@@ -14,6 +14,7 @@ from solana_alpha_lab.factory.paper_shadow_operations import (
     build_operations_projection,
 )
 from solana_alpha_lab.factory.risk_economics import compose_risk_economics
+from solana_alpha_lab.factory.trading_runtime_policy import compose_runtime_envelope
 
 SCHEMA = "smial.trading-operations-workbench"
 STRATEGY_ROOT = "configs/strategies"
@@ -116,6 +117,8 @@ def list_git_strategies(root: Path) -> list[dict[str, Any]]:
         strategy_id = _text(loaded.get("strategy_id"))
         if not strategy_id:
             continue
+        notional = loaded.get("notional_policy") if isinstance(loaded.get("notional_policy"), dict) else {}
+        risk = loaded.get("risk_policy") if isinstance(loaded.get("risk_policy"), dict) else {}
         rows.append(
             {
                 "strategy_id": strategy_id,
@@ -124,6 +127,10 @@ def list_git_strategies(root: Path) -> list[dict[str, Any]]:
                 "title": _text(loaded.get("title")),
                 "path": path.relative_to(root).as_posix(),
                 "runtime_status": "DEFINITION_ONLY",
+                "notional_policy": notional,
+                "risk_policy": risk,
+                "notional_usd": notional.get("notional_usd"),
+                "max_open_positions": risk.get("max_open_positions"),
             }
         )
     return rows
@@ -478,6 +485,11 @@ def _idle_projection(
         "watchlist_status": WATCHLIST_STATUS,
         "activation_path": ACTIVATION_PATH,
         "last_command": dict(last_command) if last_command else None,
+        "runtime_envelope": {
+            "modes": {},
+            "by_strategy": [],
+            "source_status": status,
+        },
         "non_claims": [
             "NO_ALPHA",
             "NO_LIVE",
@@ -598,6 +610,7 @@ def compose_trading_operations(
         "watchlist_status": WATCHLIST_STATUS,
         "activation_path": ACTIVATION_PATH,
         "last_command": dict(last_command) if last_command else None,
+        "runtime_envelope": compose_runtime_envelope(store, git_strategies),
         "non_claims": [
             "NO_ALPHA",
             "NO_LIVE",

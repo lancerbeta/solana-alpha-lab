@@ -308,3 +308,12 @@ queries:
 - query_id: SGQ-OWNER-ECON-MAX-OPEN
   query: Достигнут ли max_open_positions?
   required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RUNTIME-POLICY-EN
+  query: What is the current PAPER SHADOW trading runtime policy?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RUNTIME-STOP-ENTRIES-RU
+  query: Как остановить новые входы без Git?
+  required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-OWNER-RUNTIME-CAPITAL-RU
+  query: Где текущий лимит открытого риска капитала?
+  required_top_route: SEM-OWNER-LIFECYCLE

@@ -37,6 +37,7 @@ current PnL/risk never enters Git or Catalog
 ```text
 SCIENTIFIC MEANING              → Experiment / Research
 STRATEGY + DECLARED POLICY      → Git StrategyVersion
+CURRENT RUNTIME ENVELOPE        → TradingRuntimePolicyV1 in PaperPlane (read-only)
 BOT / POSITION / MARK / EXIT    → PaperPlane
 TRADING COMMAND / INVENTORY     → TRADING_OPERATIONS_WORKBENCH_V2
 SYSTEM HEALTH                   → SYSTEM_OPERABILITY_SURFACE_V2
@@ -99,6 +100,12 @@ TOTAL_REAL_TRADING_COST = NOT_ESTABLISHED
 NETRETURN_STATUS = NOT_ESTABLISHED
 OWNER_FCF_STATUS = NOT_AVAILABLE
 ```
+
+`/economics` may read TradingRuntimePolicyV1 as current operating envelope
+context. It does not own or edit policy. Visually separate economic
+evidence, StrategyVersion requested/declared values, and runtime limits.
+Open-risk notional is not wallet cash, available balance, portfolio
+equity, or Owner FCF.
 
 ## 6. Open marks
 

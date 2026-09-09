@@ -178,7 +178,7 @@ class ResearchLifecycleWorkbenchTests(unittest.TestCase):
         )
 
     def test_http_overview_and_click_detail(self) -> None:
-        status, body, headers = _get(self.app, "/research")
+        status, body, headers = _get(self.app, "/research?limit=80")
         self.assertEqual(status, 200)
         self.assertEqual(headers.get("cache-control"), "no-store")
         self.assertIn(TRIAL_ID, body)

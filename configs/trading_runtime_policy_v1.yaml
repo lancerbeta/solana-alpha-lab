@@ -1,0 +1,13 @@
+schema: smial.trading-runtime-policy
+schema_version: "1.0"
+policy_capability_id: TRADING_RUNTIME_POLICY_V1
+authority_granted: false
+live_supported: false
+owner_authorization_phrase: AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY
+supported_modes:
+  - PAPER
+  - SHADOW
+storage_owner: PAPER_PLANE_STORE
+notes:
+  - Current runtime policy values are never stored in this file.
+  - This file only binds the capability identity and APPLY authorization phrase.

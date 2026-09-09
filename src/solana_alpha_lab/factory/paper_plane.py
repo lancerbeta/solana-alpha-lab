@@ -11,10 +11,11 @@ from __future__ import annotations
 
 import json
 import sqlite3
+from contextlib import contextmanager
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, Iterator, Mapping
 from uuid import uuid4
 
 from solana_alpha_lab.factory.strategy_runtime import (
@@ -192,6 +193,8 @@ def _connect_sqlite(path: Path, *, readonly: bool) -> sqlite3.Connection:
         )
     else:
         conn = sqlite3.connect(path, check_same_thread=False)
+        conn.isolation_level = None
+        conn.execute("PRAGMA busy_timeout=5000")
     conn.row_factory = sqlite3.Row
     return conn
 
@@ -200,6 +203,7 @@ class PaperPlaneStore:
     def __init__(self, path: Path, *, readonly: bool = False) -> None:
         self.path = path
         self.readonly = readonly
+        self._txn_depth = 0
         if readonly:
             if not path.is_file():
                 raise PaperPlaneError("SOURCE_NOT_PRESENT")
@@ -238,7 +242,8 @@ class PaperPlaneStore:
         )
         self._migrate_v1_1_lineage()
         self._migrate_accounting_control_v1()
-        self._conn.commit()
+        self._migrate_trading_runtime_policy_v1()
+        self._commit()
 
     def _migrate_v1_1_lineage(self) -> None:
         """Idempotent additive columns for v1.1 lineage. Legacy rows may be NULL."""
@@ -323,6 +328,61 @@ class PaperPlaneStore:
             """
         )
 
+    def _migrate_trading_runtime_policy_v1(self) -> None:
+        """Append-only runtime policy revisions plus frozen admission lineage."""
+
+        self._conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS trading_runtime_policy_revisions (
+                mode TEXT NOT NULL CHECK (mode IN ('PAPER','SHADOW')),
+                revision INTEGER NOT NULL,
+                created_at TEXT NOT NULL,
+                reason TEXT NOT NULL,
+                policy_json TEXT NOT NULL,
+                policy_sha256 TEXT NOT NULL,
+                previous_policy_sha256 TEXT NOT NULL,
+                PRIMARY KEY (mode, revision)
+            )
+            """
+        )
+        self._conn.execute(
+            """
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_trp_mode_sha256
+            ON trading_runtime_policy_revisions(mode, policy_sha256)
+            """
+        )
+        for col, typ in (
+            ("admitted_entry_notional_usd_dec", "TEXT"),
+            ("strategy_requested_notional_usd_dec", "TEXT"),
+            ("runtime_policy_mode", "TEXT"),
+            ("runtime_policy_revision", "INTEGER"),
+            ("runtime_policy_sha256", "TEXT"),
+        ):
+            _ensure_column(self._conn, "positions", col, typ)
+
+    def _commit(self) -> None:
+        # Writable connections use isolation_level=None. Statements persist
+        # immediately unless immediate_write() opened BEGIN IMMEDIATE.
+        return
+
+    @contextmanager
+    def immediate_write(self) -> Iterator[None]:
+        if self.readonly:
+            raise PaperPlaneError("READONLY_STORE")
+        if self._txn_depth:
+            yield
+            return
+        self._conn.execute("BEGIN IMMEDIATE")
+        self._txn_depth += 1
+        try:
+            yield
+            self._conn.execute("COMMIT")
+        except Exception:
+            self._conn.execute("ROLLBACK")
+            raise
+        finally:
+            self._txn_depth = 0
+
     def close(self) -> None:
         if not self.readonly:
             self._conn.execute("PRAGMA wal_checkpoint(TRUNCATE)")
@@ -402,7 +462,7 @@ class PaperPlaneStore:
                 record["runtime_schema_version"],
             ),
         )
-        self._conn.commit()
+        self._commit()
         refreshed = self.get_bot(bot_instance_id)
         assert refreshed is not None
         return refreshed
@@ -433,7 +493,7 @@ class PaperPlaneStore:
             """,
             (position_id, bot_instance_id, mint, signal_kind, _now()),
         )
-        self._conn.commit()
+        self._commit()
         return position_id
 
     def open_position_from_signal(
@@ -467,7 +527,7 @@ class PaperPlaneStore:
                 str(signal_decision["reason_code"]),
             ),
         )
-        self._conn.commit()
+        self._commit()
         return position_id
 
     def transition(
@@ -487,7 +547,7 @@ class PaperPlaneStore:
             (to_state, closed_at, position_id),
         )
         if commit:
-            self._conn.commit()
+            self._commit()
         updated = self.get_position(position_id)
         assert updated is not None
         return updated
@@ -535,7 +595,7 @@ class PaperPlaneStore:
             "UPDATE bot_instances SET entries_paused = ? WHERE bot_instance_id = ?",
             (1 if paused else 0, bot_instance_id),
         )
-        self._conn.commit()
+        self._commit()
 
     def set_bot_status(
         self,
@@ -555,7 +615,7 @@ class PaperPlaneStore:
             """,
             (status, stopped_at, bot_instance_id),
         )
-        self._conn.commit()
+        self._commit()
 
     def append_execution_event(
         self,
@@ -583,7 +643,7 @@ class PaperPlaneStore:
                 json.dumps(dict(payload), sort_keys=True),
             ),
         )
-        self._conn.commit()
+        self._commit()
         return eid
 
     def execution_events(self) -> list[dict[str, Any]]:
@@ -630,7 +690,176 @@ class PaperPlaneStore:
                 json.dumps(dict(result), sort_keys=True),
             ),
         )
-        self._conn.commit()
+        self._commit()
+
+    def latest_runtime_policy_row(self, mode: str) -> dict[str, Any] | None:
+        if self.readonly:
+            tables = {
+                str(row[0])
+                for row in self._conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+            if "trading_runtime_policy_revisions" not in tables:
+                return None
+        row = self._conn.execute(
+            """
+            SELECT * FROM trading_runtime_policy_revisions
+            WHERE mode = ?
+            ORDER BY revision DESC
+            LIMIT 1
+            """,
+            (mode,),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def runtime_policy_history(self, mode: str) -> list[dict[str, Any]]:
+        if self.readonly:
+            tables = {
+                str(row[0])
+                for row in self._conn.execute(
+                    "SELECT name FROM sqlite_master WHERE type='table'"
+                ).fetchall()
+            }
+            if "trading_runtime_policy_revisions" not in tables:
+                return []
+        rows = self._conn.execute(
+            """
+            SELECT mode, revision, created_at, reason, policy_sha256, previous_policy_sha256
+            FROM trading_runtime_policy_revisions
+            WHERE mode = ?
+            ORDER BY revision DESC
+            """,
+            (mode,),
+        ).fetchall()
+        return [dict(row) for row in rows]
+
+    def runtime_policy_by_sha256(self, mode: str, policy_sha256: str) -> dict[str, Any] | None:
+        row = self._conn.execute(
+            """
+            SELECT * FROM trading_runtime_policy_revisions
+            WHERE mode = ? AND policy_sha256 = ?
+            """,
+            (mode, policy_sha256),
+        ).fetchone()
+        return dict(row) if row else None
+
+    def append_runtime_policy_revision(self, policy: Mapping[str, Any]) -> None:
+        self._conn.execute(
+            """
+            INSERT INTO trading_runtime_policy_revisions(
+                mode, revision, created_at, reason, policy_json,
+                policy_sha256, previous_policy_sha256
+            ) VALUES (?, ?, ?, ?, ?, ?, ?)
+            """,
+            (
+                str(policy["mode"]),
+                int(policy["revision"]),
+                str(policy["created_at"]),
+                str(policy["reason"]),
+                json.dumps(dict(policy), sort_keys=True),
+                str(policy["policy_sha256"]),
+                str(policy["previous_policy_sha256"]),
+            ),
+        )
+
+    def freeze_admission_binding(
+        self,
+        position_id: str,
+        *,
+        admitted_entry_notional_usd_dec: str,
+        strategy_requested_notional_usd_dec: str,
+        runtime_policy_mode: str | None,
+        runtime_policy_revision: int | None,
+        runtime_policy_sha256: str | None,
+    ) -> None:
+        self._conn.execute(
+            """
+            UPDATE positions
+            SET admitted_entry_notional_usd_dec = COALESCE(admitted_entry_notional_usd_dec, ?),
+                strategy_requested_notional_usd_dec = COALESCE(strategy_requested_notional_usd_dec, ?),
+                runtime_policy_mode = COALESCE(runtime_policy_mode, ?),
+                runtime_policy_revision = COALESCE(runtime_policy_revision, ?),
+                runtime_policy_sha256 = COALESCE(runtime_policy_sha256, ?)
+            WHERE position_id = ?
+            """,
+            (
+                admitted_entry_notional_usd_dec,
+                strategy_requested_notional_usd_dec,
+                runtime_policy_mode,
+                runtime_policy_revision,
+                runtime_policy_sha256,
+                position_id,
+            ),
+        )
+
+    def open_risk_inventory(
+        self,
+        *,
+        mode: str,
+        strategy_id: str,
+        mint: str,
+    ) -> dict[str, Any]:
+        rows = self._conn.execute(
+            """
+            SELECT p.* FROM positions p
+            JOIN bot_instances b ON b.bot_instance_id = p.bot_instance_id
+            WHERE b.mode = ?
+            """,
+            (mode,),
+        ).fetchall()
+        global_count = 0
+        strategy_count = 0
+        mint_count = 0
+        global_notional = Decimal("0")
+        strategy_notional = Decimal("0")
+        mint_notional = Decimal("0")
+        global_unknown = False
+        strategy_unknown = False
+        mint_unknown = False
+
+        def _exposure(item: Mapping[str, Any]) -> tuple[Decimal | None, bool]:
+            entered = item.get("entered_notional_usd_dec")
+            if entered not in {None, ""}:
+                return Decimal(str(entered)), False
+            admitted = item.get("admitted_entry_notional_usd_dec")
+            if admitted not in {None, ""}:
+                return Decimal(str(admitted)), False
+            return None, True
+        for row in rows:
+            item = dict(row)
+            if str(item["state"]) not in OPEN_RISK_STATES:
+                continue
+            global_count += 1
+            notional, unknown = _exposure(item)
+            if unknown:
+                global_unknown = True
+            elif notional is not None:
+                global_notional += notional
+            sid = str(item.get("strategy_id") or "")
+            if sid == strategy_id:
+                strategy_count += 1
+                if unknown:
+                    strategy_unknown = True
+                elif notional is not None:
+                    strategy_notional += notional
+            if str(item.get("mint") or "") == mint:
+                mint_count += 1
+                if unknown:
+                    mint_unknown = True
+                elif notional is not None:
+                    mint_notional += notional
+        return {
+            "global_count": global_count,
+            "strategy_count": strategy_count,
+            "mint_count": mint_count,
+            "global_notional": None if global_unknown else global_notional,
+            "strategy_notional": None if strategy_unknown else strategy_notional,
+            "mint_notional": None if mint_unknown else mint_notional,
+            "global_unknown": global_unknown,
+            "strategy_unknown": strategy_unknown,
+            "mint_unknown": mint_unknown,
+        }
 
     def record_position_mark(
         self,
@@ -710,7 +939,7 @@ class PaperPlaneStore:
                 position_id,
             ),
         )
-        self._conn.commit()
+        self._commit()
         return mark_id
 
     def apply_paper_entry_fill(
@@ -832,7 +1061,7 @@ class PaperPlaneStore:
                 "UNRESOLVED",
             }:
                 raise PaperPlaneError(f"EXIT_FILL_STATE_INVALID:{state0}")
-            try:
+            with self.immediate_write():
                 position = _advance_to_exiting(position)
                 if str(position["state"]) == "EXITING":
                     position = self.transition(position_id, "UNRESOLVED", commit=False)
@@ -848,10 +1077,6 @@ class PaperPlaneStore:
                     """,
                     (position_id,),
                 )
-                self._conn.commit()
-            except Exception:
-                self._conn.rollback()
-                raise
             self.append_execution_event(
                 event_type="RECONCILIATION",
                 bot_instance_id=str(position["bot_instance_id"]),
@@ -888,7 +1113,7 @@ class PaperPlaneStore:
         evidence = (
             "PAPER_RECONCILED_MODEL" if mode == "PAPER" else "SHADOW_RECONCILED_QUOTE_MODEL"
         )
-        try:
+        with self.immediate_write():
             if state0 == "UNRESOLVED":
                 self.transition(position_id, "RECONCILED", commit=False)
             elif state0 == "CLOSED":
@@ -928,10 +1153,6 @@ class PaperPlaneStore:
                     position_id,
                 ),
             )
-            self._conn.commit()
-        except Exception:
-            self._conn.rollback()
-            raise
         exit_event = "PAPER_EXIT_OBSERVED" if mode == "PAPER" else "SHADOW_EXIT_EXECUTABLE_OBSERVED"
         self.append_execution_event(
             event_type=exit_event,
@@ -1005,7 +1226,7 @@ class PaperPlaneStore:
             "UPDATE positions SET entered_notional_usd=? WHERE position_id=?",
             (float(notional_usd), position_id),
         )
-        self._conn.commit()
+        self._commit()
         return position_id, "SIMULATED_FILL"
 
     def fill_paper_from_signal(
@@ -1021,40 +1242,46 @@ class PaperPlaneStore:
         position_id = position_id_for_signal_decision(
             str(signal_decision["signal_decision_id"])
         )
-        existing = self.get_position(position_id)
-        if existing is None:
-            self.open_position_from_signal(
-                bot_instance_id=bot_instance_id,
-                signal_decision=signal_decision,
-                signal_kind=signal_kind,
-            )
+        with self.immediate_write():
             existing = self.get_position(position_id)
-        assert existing is not None
-        if existing["state"] in {"OPEN", "PARTIAL", "EXIT_REQUIRED", "EXITING", "CLOSED", "RECONCILED", "UNRESOLVED"}:
-            return position_id, str(existing.get("signal_kind") or signal_kind)
-        # Resume incomplete lifecycle after crash/retry between commits.
-        state = str(existing["state"])
-        if state == "WATCHED":
+            if existing is None:
+                self.open_position_from_signal(
+                    bot_instance_id=bot_instance_id,
+                    signal_decision=signal_decision,
+                    signal_kind=signal_kind,
+                )
+                existing = self.get_position(position_id)
+            assert existing is not None
+            if existing["state"] in {
+                "OPEN",
+                "PARTIAL",
+                "EXIT_REQUIRED",
+                "EXITING",
+                "CLOSED",
+                "RECONCILED",
+                "UNRESOLVED",
+            }:
+                return position_id, str(existing.get("signal_kind") or signal_kind)
+            state = str(existing["state"])
+            if state == "WATCHED":
+                self._conn.execute(
+                    "UPDATE positions SET signal_kind=? WHERE position_id=?",
+                    (signal_kind, position_id),
+                )
+                self.transition(position_id, "SIGNALLED", commit=False)
+                state = "SIGNALLED"
+            if state == "SIGNALLED":
+                self.transition(position_id, "INTENT_CREATED", commit=False)
+                state = "INTENT_CREATED"
+            if state == "INTENT_CREATED":
+                self.transition(position_id, "ATTEMPTING", commit=False)
+                state = "ATTEMPTING"
+            if state == "ATTEMPTING":
+                self.transition(position_id, "OPEN", commit=False)
             self._conn.execute(
-                "UPDATE positions SET signal_kind=? WHERE position_id=?",
-                (signal_kind, position_id),
+                "UPDATE positions SET entered_notional_usd=?, signal_kind=? WHERE position_id=?",
+                (float(notional_usd), signal_kind, position_id),
             )
-            self._conn.commit()
-            self.transition(position_id, "SIGNALLED")
-            state = "SIGNALLED"
-        if state == "SIGNALLED":
-            self.transition(position_id, "INTENT_CREATED")
-            state = "INTENT_CREATED"
-        if state == "INTENT_CREATED":
-            self.transition(position_id, "ATTEMPTING")
-            state = "ATTEMPTING"
-        if state == "ATTEMPTING":
-            self.transition(position_id, "OPEN")
-        self._conn.execute(
-            "UPDATE positions SET entered_notional_usd=?, signal_kind=? WHERE position_id=?",
-            (float(notional_usd), signal_kind, position_id),
-        )
-        self._conn.commit()
         return position_id, signal_kind
 
     def apply_exit_decision(
@@ -1083,7 +1310,7 @@ class PaperPlaneStore:
                     position_id,
                 ),
             )
-            self._conn.commit()
+            self._commit()
             updated = self.get_position(position_id)
             assert updated is not None
             return {
@@ -1104,7 +1331,7 @@ class PaperPlaneStore:
                 position_id,
             ),
         )
-        self._conn.commit()
+        self._commit()
         refreshed = self.get_position(position_id)
         assert refreshed is not None
         return {
@@ -1138,6 +1365,7 @@ def accept_signal_decision(
     known_activation_epochs: Mapping[str, Any] | set[str] | frozenset[str],
     mode: str = "PAPER",
     as_of: str | None = None,
+    skip_fill: bool = False,
 ) -> dict[str, Any]:
     """Consume a frozen SignalDecision on the v1.1 path. Feature-name agnostic."""
 
@@ -1192,107 +1420,181 @@ def accept_signal_decision(
     if age_seconds > max_age:
         raise PaperPlaneError("SIGNAL_DECISION_STALE")
     position_id = position_id_for_signal_decision(str(decision["signal_decision_id"]))
-    existing = store.get_position(position_id)
-    if existing is not None:
-        if existing.get("activation_epoch_id") and str(existing["activation_epoch_id"]) != str(
-            decision["activation_epoch_id"]
-        ):
-            raise PaperPlaneError("SIGNAL_ACTIVATION_EPOCH_MISMATCH")
-        if existing.get("strategy_id") and str(existing["strategy_id"]) != str(
-            decision["strategy_id"]
-        ):
-            raise PaperPlaneError("SIGNAL_POSITION_STRATEGY_MISMATCH")
-        expected_bot_id = (
-            f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}"
-            f"-{mode}-{decision['activation_epoch_id']}"
+    admitted_notional = Decimal(str(strategy["notional_policy"]["notional_usd"]))
+    was_existing = False
+    resume_only = False
+    block_code: str | None = None
+    bot_instance_id = ""
+    with store.immediate_write():
+        existing = store.get_position(position_id)
+        if existing is not None:
+            if existing.get("activation_epoch_id") and str(existing["activation_epoch_id"]) != str(
+                decision["activation_epoch_id"]
+            ):
+                raise PaperPlaneError("SIGNAL_ACTIVATION_EPOCH_MISMATCH")
+            if existing.get("strategy_id") and str(existing["strategy_id"]) != str(
+                decision["strategy_id"]
+            ):
+                raise PaperPlaneError("SIGNAL_POSITION_STRATEGY_MISMATCH")
+            expected_bot_id = (
+                f"BOT-{strategy['strategy_id']}-{strategy['strategy_version']}"
+                f"-{mode}-{decision['activation_epoch_id']}"
+            )
+            if existing.get("bot_instance_id") and str(existing["bot_instance_id"]) != expected_bot_id:
+                raise PaperPlaneError("SIGNAL_BOT_INSTANCE_MISMATCH")
+        bot = store.start_bot(
+            strategy,
+            mode=mode,
+            activation_epoch_id=str(decision["activation_epoch_id"]),
         )
-        if existing.get("bot_instance_id") and str(existing["bot_instance_id"]) != expected_bot_id:
-            raise PaperPlaneError("SIGNAL_BOT_INSTANCE_MISMATCH")
-    bot = store.start_bot(
-        strategy,
-        mode=mode,
-        activation_epoch_id=str(decision["activation_epoch_id"]),
-    )
-    if str(bot.get("status")) in {"DRAINING", "STOPPED"} and existing is None:
-        raise PaperPlaneError(f"BOT_STATUS_BLOCKS_ENTRY:{bot['status']}")
-    if int(bot.get("entries_paused") or 0) == 1 and existing is None:
-        raise PaperPlaneError("ENTRIES_PAUSED")
-    if existing is not None:
-        state = str(existing["state"])
-        if state == "OPEN":
-            return {
-                "opened": True,
-                "action": action,
-                "reason_code": decision["reason_code"],
-                "signal_decision_id": decision["signal_decision_id"],
-                "position_id": position_id,
-                "idempotent": True,
-                "state": state,
-                "bot_instance_id": bot["bot_instance_id"],
-                "activation_epoch_id": decision["activation_epoch_id"],
-            }
-        if state in {
-            "PARTIAL",
-            "EXIT_REQUIRED",
-            "EXITING",
-            "CLOSED",
-            "RECONCILED",
-            "UNRESOLVED",
-            "UNKNOWN",
-        }:
-            return {
-                "opened": state in {"PARTIAL", "UNKNOWN"},
-                "action": action,
-                "reason_code": decision["reason_code"],
-                "signal_decision_id": decision["signal_decision_id"],
-                "position_id": position_id,
-                "idempotent": True,
-                "state": state,
-                "bot_instance_id": bot["bot_instance_id"],
-                "activation_epoch_id": decision["activation_epoch_id"],
-            }
-        # Incomplete pre-OPEN states fall through to resume.
-    max_open = int(strategy["risk_policy"]["max_open_positions"])
-    risk = store.pre_trade_risk_snapshot(
-        bot_instance_id=bot["bot_instance_id"],
-        max_open_positions=max_open,
-    )
-    store.append_execution_event(
-        event_type="PRE_TRADE_RISK_SNAPSHOT",
-        bot_instance_id=bot["bot_instance_id"],
-        position_id=position_id if existing else None,
-        payload={
-            **risk,
-            **_identity_fields(decision),
-            "strategy_id": strategy["strategy_id"],
-            "strategy_version": strategy["strategy_version"],
-        },
-    )
-    # Resume does not consume a new risk slot when the same signal already exists.
-    if existing is None and risk["decision"] != "ALLOW":
-        raise PaperPlaneError(str(risk["decision"]))
-    store.append_execution_event(
-        event_type="SIGNAL_DECISION_ACCEPTED",
-        bot_instance_id=bot["bot_instance_id"],
-        position_id=None,
-        payload={
-            **_identity_fields(decision),
-            "strategy_id": strategy["strategy_id"],
-            "strategy_version": strategy["strategy_version"],
-        },
-    )
+        if existing is not None:
+            was_existing = True
+            state = str(existing["state"])
+            if state == "OPEN":
+                return {
+                    "opened": True,
+                    "action": action,
+                    "reason_code": decision["reason_code"],
+                    "signal_decision_id": decision["signal_decision_id"],
+                    "position_id": position_id,
+                    "idempotent": True,
+                    "state": state,
+                    "bot_instance_id": bot["bot_instance_id"],
+                    "activation_epoch_id": decision["activation_epoch_id"],
+                }
+            if state in {
+                "PARTIAL",
+                "EXIT_REQUIRED",
+                "EXITING",
+                "CLOSED",
+                "RECONCILED",
+                "UNRESOLVED",
+                "UNKNOWN",
+            }:
+                return {
+                    "opened": state in {"PARTIAL", "UNKNOWN"},
+                    "action": action,
+                    "reason_code": decision["reason_code"],
+                    "signal_decision_id": decision["signal_decision_id"],
+                    "position_id": position_id,
+                    "idempotent": True,
+                    "state": state,
+                    "bot_instance_id": bot["bot_instance_id"],
+                    "activation_epoch_id": decision["activation_epoch_id"],
+                }
+            frozen = existing.get("admitted_entry_notional_usd_dec")
+            if frozen not in {None, ""}:
+                admitted_notional = Decimal(str(frozen))
+            resume_only = True
+        if not resume_only:
+            if str(bot.get("status")) in {"DRAINING", "STOPPED"}:
+                raise PaperPlaneError(f"BOT_STATUS_BLOCKS_ENTRY:{bot['status']}")
+            if int(bot.get("entries_paused") or 0) == 1:
+                raise PaperPlaneError("ENTRIES_PAUSED")
+            from solana_alpha_lab.factory.trading_runtime_policy import (
+                evaluate_admission,
+                resolve_current_policy,
+            )
+
+            current_policy = resolve_current_policy(store, mode)
+            inventory = store.open_risk_inventory(
+                mode=mode,
+                strategy_id=str(strategy["strategy_id"]),
+                mint=str(decision["mint"]),
+            )
+            risk = evaluate_admission(
+                mode=mode,
+                strategy=strategy,
+                bot=bot,
+                mint=str(decision["mint"]),
+                policy_status=str(current_policy["status"]),
+                policy=current_policy.get("policy"),
+                inventory=inventory,
+            )
+            risk["signal_decision_id"] = decision["signal_decision_id"]
+            store.append_execution_event(
+                event_type="PRE_TRADE_RISK_SNAPSHOT",
+                bot_instance_id=bot["bot_instance_id"],
+                position_id=position_id if existing else None,
+                payload={
+                    **risk,
+                    **_identity_fields(decision),
+                    "strategy_id": strategy["strategy_id"],
+                    "strategy_version": strategy["strategy_version"],
+                },
+            )
+            if str(risk["decision"]) != "ALLOW":
+                block_code = str(risk["decision"])
+            else:
+                if existing is None:
+                    store.open_position_from_signal(
+                        bot_instance_id=bot["bot_instance_id"],
+                        signal_decision=decision,
+                        signal_kind="SHADOW_EXECUTABLE" if mode == "SHADOW" else "SIMULATED_FILL",
+                    )
+                admitted_notional = Decimal(str(risk["effective_entry_notional_usd_dec"]))
+                store.freeze_admission_binding(
+                    position_id,
+                    admitted_entry_notional_usd_dec=format(admitted_notional, "f"),
+                    strategy_requested_notional_usd_dec=str(risk["strategy_requested_notional_usd_dec"]),
+                    runtime_policy_mode=mode if current_policy.get("policy") else None,
+                    runtime_policy_revision=(
+                        None
+                        if current_policy.get("policy") is None
+                        else current_policy["policy"].get("revision")
+                    ),
+                    runtime_policy_sha256=(
+                        None
+                        if current_policy.get("policy") is None
+                        else current_policy["policy"].get("policy_sha256")
+                    ),
+                )
+                store.append_execution_event(
+                    event_type="SIGNAL_DECISION_ACCEPTED",
+                    bot_instance_id=bot["bot_instance_id"],
+                    position_id=position_id,
+                    payload={
+                        **_identity_fields(decision),
+                        "strategy_id": strategy["strategy_id"],
+                        "strategy_version": strategy["strategy_version"],
+                        "admitted_entry_notional_usd_dec": format(admitted_notional, "f"),
+                        "runtime_policy_revision": None
+                        if current_policy.get("policy") is None
+                        else current_policy["policy"].get("revision"),
+                        "runtime_policy_sha256": None
+                        if current_policy.get("policy") is None
+                        else current_policy["policy"].get("policy_sha256"),
+                    },
+                )
+        bot_instance_id = bot["bot_instance_id"]
+    if block_code:
+        raise PaperPlaneError(block_code)
+    if skip_fill:
+        reserved = store.get_position(position_id)
+        assert reserved is not None
+        return {
+            "opened": reserved["state"] == "OPEN",
+            "action": action,
+            "reason_code": decision["reason_code"],
+            "signal_decision_id": decision["signal_decision_id"],
+            "position_id": position_id,
+            "idempotent": was_existing,
+            "state": reserved["state"],
+            "bot_instance_id": bot_instance_id,
+            "activation_epoch_id": decision["activation_epoch_id"],
+            "admitted_entry_notional_usd_dec": reserved.get("admitted_entry_notional_usd_dec"),
+            "fill_deferred": True,
+        }
     signal_kind = "SHADOW_EXECUTABLE" if mode == "SHADOW" else "SIMULATED_FILL"
-    notional = Decimal(str(strategy["notional_policy"]["notional_usd"]))
-    was_existing = existing is not None
     opened_id, realized = store.fill_paper_from_signal(
-        bot_instance_id=bot["bot_instance_id"],
+        bot_instance_id=bot_instance_id,
         signal_decision=decision,
-        notional_usd=notional,
+        notional_usd=admitted_notional,
         signal_kind=signal_kind,
     )
     store.append_execution_event(
         event_type="EXECUTION_INTENT_CREATED",
-        bot_instance_id=bot["bot_instance_id"],
+        bot_instance_id=bot_instance_id,
         position_id=opened_id,
         payload={
             **_identity_fields(decision),
@@ -1304,7 +1606,7 @@ def accept_signal_decision(
     )
     store.append_execution_event(
         event_type="POSITION_TRANSITION",
-        bot_instance_id=bot["bot_instance_id"],
+        bot_instance_id=bot_instance_id,
         position_id=opened_id,
         payload={
             **_identity_fields(decision),
@@ -1325,8 +1627,9 @@ def accept_signal_decision(
         "idempotent": was_existing,
         "state": refreshed["state"],
         "realized_signal_kind": realized,
-        "bot_instance_id": bot["bot_instance_id"],
+        "bot_instance_id": bot_instance_id,
         "activation_epoch_id": decision["activation_epoch_id"],
+        "admitted_entry_notional_usd_dec": refreshed.get("admitted_entry_notional_usd_dec"),
     }
 
 
