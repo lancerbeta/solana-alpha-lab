@@ -502,6 +502,34 @@ class TradingRuntimePolicyTests(unittest.TestCase):
             finally:
                 store.close()
 
+    def test_valid_policy_resume_without_frozen_binding_fails_closed(self) -> None:
+        strategy = load_strategy_version(ROOT, STRAT_REL)
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
+            try:
+                _apply(store, "PAPER", _candidate(), key="IDEM-BIND-1")
+                bot = store.start_bot(
+                    strategy, mode="PAPER", activation_epoch_id=EPOCH
+                )
+                pid = store.open_position_from_signal(
+                    bot_instance_id=bot["bot_instance_id"],
+                    signal_decision=_signal("SIGDEC-BIND-1"),
+                )
+                self.assertIsNone(store.get_position(pid)["admitted_entry_notional_usd_dec"])
+                with self.assertRaises(PaperPlaneError) as exc:
+                    accept_signal_decision(
+                        ROOT,
+                        store,
+                        strategy=strategy,
+                        signal_decision=_signal("SIGDEC-BIND-1"),
+                        known_activation_epochs=KNOWN,
+                        mode="PAPER",
+                        as_of="2026-09-03T12:10:00Z",
+                    )
+                self.assertIn("ADMISSION_BINDING_MISSING", str(exc.exception))
+            finally:
+                store.close()
+
     def test_paper_shadow_isolation_and_live_denied(self) -> None:
         strategy = load_strategy_version(ROOT, STRAT_REL)
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

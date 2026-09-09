@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import sqlite3
+import threading
 from contextlib import contextmanager
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
@@ -203,7 +204,8 @@ class PaperPlaneStore:
     def __init__(self, path: Path, *, readonly: bool = False) -> None:
         self.path = path
         self.readonly = readonly
-        self._txn_depth = 0
+        self._txn_depth = threading.local()
+        self._write_lock = threading.Lock()
         if readonly:
             if not path.is_file():
                 raise PaperPlaneError("SOURCE_NOT_PRESENT")
@@ -369,19 +371,21 @@ class PaperPlaneStore:
     def immediate_write(self) -> Iterator[None]:
         if self.readonly:
             raise PaperPlaneError("READONLY_STORE")
-        if self._txn_depth:
+        depth = int(getattr(self._txn_depth, "value", 0))
+        if depth:
             yield
             return
-        self._conn.execute("BEGIN IMMEDIATE")
-        self._txn_depth += 1
-        try:
-            yield
-            self._conn.execute("COMMIT")
-        except Exception:
-            self._conn.execute("ROLLBACK")
-            raise
-        finally:
-            self._txn_depth = 0
+        with self._write_lock:
+            self._conn.execute("BEGIN IMMEDIATE")
+            self._txn_depth.value = 1
+            try:
+                yield
+                self._conn.execute("COMMIT")
+            except Exception:
+                self._conn.execute("ROLLBACK")
+                raise
+            finally:
+                self._txn_depth.value = 0
 
     def close(self) -> None:
         if not self.readonly:
@@ -1495,6 +1499,14 @@ def accept_signal_decision(
             frozen = existing.get("admitted_entry_notional_usd_dec")
             if frozen not in {None, ""}:
                 admitted_notional = Decimal(str(frozen))
+            else:
+                from solana_alpha_lab.factory.trading_runtime_policy import (
+                    STATUS_VALID,
+                    resolve_current_policy,
+                )
+
+                if str(resolve_current_policy(store, mode)["status"]) == STATUS_VALID:
+                    raise PaperPlaneError("ADMISSION_BINDING_MISSING")
             resume_only = True
         if not resume_only:
             if str(bot.get("status")) in {"DRAINING", "STOPPED"}:

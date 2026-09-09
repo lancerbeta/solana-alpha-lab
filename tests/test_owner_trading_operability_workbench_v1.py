@@ -194,7 +194,7 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
                         "strategy_id: STRAT-HTTP-UI",
                         "strategy_version: V1",
                         "notional_policy:",
-                        "  notional_usd: 100",
+                        "  notional_usd: 111",
                         "risk_policy:",
                         "  max_open_positions: 5",
                     ]
@@ -212,7 +212,7 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
                     mode="PAPER",
                     candidate_raw={
                         "new_entries_enabled": True,
-                        "global_entry_notional_cap_usd": "10",
+                        "global_entry_notional_cap_usd": "12.5",
                     },
                     expected_current_sha256="0" * 64,
                     idempotency_key="IDEM-HTTP-1",
@@ -229,8 +229,8 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
             self.assertIn("Запрос стратегии", html)
             self.assertIn("Runtime cap", html)
             self.assertIn("Эффективно", html)
-            self.assertIn("100", html)
-            self.assertIn("10", html)
+            self.assertIn("111", html)
+            self.assertIn("12.5", html)
             self.assertNotIn("PaperPlane отсутствует", html)
             self.assertEqual(paper_path.stat().st_mtime_ns, mtime_before)
 

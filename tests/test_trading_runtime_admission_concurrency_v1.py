@@ -98,6 +98,63 @@ class TradingRuntimeAdmissionConcurrencyTests(unittest.TestCase):
             finally:
                 verify.close()
 
+    def test_shared_store_two_threads_one_remaining_slot(self) -> None:
+        strategy = load_strategy_version(ROOT, STRAT_REL)
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
+            try:
+                apply_policy(
+                    ROOT,
+                    store,
+                    mode="PAPER",
+                    candidate_raw=_candidate(max_total_open_positions=1),
+                    expected_current_sha256=str(show_policy(store, "PAPER")["policy_sha256"]),
+                    idempotency_key="IDEM-SHARED-BOOT",
+                    owner_authorization_phrase=PHRASE,
+                    reason="CONC",
+                )
+                results: list[str] = []
+                lock = threading.Lock()
+
+                def _worker(signal_id: str, mint: str) -> None:
+                    try:
+                        accept_signal_decision(
+                            ROOT,
+                            store,
+                            strategy=strategy,
+                            signal_decision=_signal(signal_id, mint=mint),
+                            known_activation_epochs=KNOWN,
+                            mode="PAPER",
+                            as_of="2026-09-03T12:10:00Z",
+                        )
+                        with lock:
+                            results.append("ALLOW")
+                    except Exception as exc:
+                        with lock:
+                            results.append(str(exc))
+
+                threads = [
+                    threading.Thread(target=_worker, args=("SIGDEC-SHARED-A", MINT)),
+                    threading.Thread(target=_worker, args=("SIGDEC-SHARED-B", MINT_B)),
+                ]
+                for thread in threads:
+                    thread.start()
+                for thread in threads:
+                    thread.join()
+                allows = [item for item in results if item == "ALLOW"]
+                blocks = [item for item in results if item != "ALLOW"]
+                self.assertEqual(len(allows), 1, results)
+                self.assertEqual(len(blocks), 1, results)
+                self.assertTrue(any("BLOCK" in item for item in blocks), results)
+                open_risk = [
+                    row
+                    for row in store.positions()
+                    if str(row["state"]) in OPEN_RISK_STATES
+                ]
+                self.assertEqual(len(open_risk), 1)
+            finally:
+                store.close()
+
     def test_same_signal_retry_one_position(self) -> None:
         strategy = load_strategy_version(ROOT, STRAT_REL)
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
