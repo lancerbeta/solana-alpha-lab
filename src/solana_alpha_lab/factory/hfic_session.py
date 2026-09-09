@@ -3128,11 +3128,13 @@ def run_live_classifier(
     )
     if selected is not None:
         from solana_alpha_lab.factory.hfic_control_integrity import (
+            deny_non_pit_fast_lane,
             deny_unresolved_fast_lane,
         )
 
         try:
             deny_unresolved_fast_lane(selected, str(decision.terminal))
+            deny_non_pit_fast_lane(selected, str(decision.terminal))
         except ValueError as exc:
             raise HficSessionError(str(exc)) from exc
     return build_classifier_receipt(

@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-FACTORY-FIT-001",
+  "as_of": "2026-09-09",
+  "task_id": "HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1",
+  "reviewed_bindings_sha256": "cdd265766621b1f801bc64aedc902fb17783869e00ad3c7b136e1f1fc56f030c",
+  "reviewed_inventory_sha256": "5d814c4a24bb678e85d1afc8bb068729766d11734387b5a4ba62ca81b6f56faa",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_PACKET14_FAST_LANE_REQUIRES_PIT_READY",
+    "flexibility_and_history": "PASS_PACKET_1_3_UNCHANGED",
+    "context_efficiency": "PASS_HFIC_CLASSIFY_PATH_ONLY",
+    "research_truth": "PASS_POSITIVE_ALLOWLIST_PIT_READY",
+    "owner_operability": "PASS_NO_OPERATOR_SURFACE_CHANGE",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_CONTROL",
+    "monitoring_and_recovery": "PASS_KILL_UNBOUND_EVIDENCE_FAIL_CLOSED",
+    "build_vs_buy": "PASS_ADOPT_EXISTING_HFIC_HELPER",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_LIVE_RDP",
+    "red_team": "PASS_T1_T16_VERTICAL_AND_HELPER"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FIRST_FRESH_CONTROL_AFTER_MERGE"
+  },
+  "recovery": "REVERT cursor/hfic-packet14-availability-fast-lane-guard-v1 BRANCH. GENERIC LANE CLASSIFIER AND EXPERIMENT SPEC SCHEMAS UNCHANGED.",
+  "limits": [
+    "NO_GENERIC_PIT_FRAMEWORK",
+    "NO_LIVE_CONTROL",
+    "NO_ACTIVE_RDP_WRITE",
+    "NO_NEW_AVAILABILITY_ONTOLOGY",
+    "NO_PROVIDER",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}
