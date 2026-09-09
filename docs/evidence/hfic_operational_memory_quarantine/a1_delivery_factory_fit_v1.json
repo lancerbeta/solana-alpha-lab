@@ -4,8 +4,8 @@
   "review_id": "HFIC-OPERATIONAL-MEMORY-QUARANTINE-FACTORY-FIT-001",
   "as_of": "2026-09-09",
   "task_id": "HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1",
-  "reviewed_bindings_sha256": "60d4a0e2d7a649aff39e4c8aeddea5bb4464786dc8d1424e7e1d6e84e499a379",
-  "reviewed_inventory_sha256": "8d35d0be8fc821f0fc9bcbfd2c4a4d69893bd9fe1a0d20969d1a0268c651e213",
+  "reviewed_bindings_sha256": "f334c0648966c5fbb003f711cfb5660d469a0bd705de2635606b8089087421a2",
+  "reviewed_inventory_sha256": "9add3704b2fc0b5977397ca1a981e001be77138209bc1c31eb4c84408071d178",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
