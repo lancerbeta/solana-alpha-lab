@@ -31,6 +31,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_preflight.py
   - src/solana_alpha_lab/factory/hfic_prior_memory.py
   - src/solana_alpha_lab/factory/hfic_provenance.py
+  - scripts/hypothesis_forge.py
   - schemas/research_memory_projection_v1.sql
   - .agents/skills/hypothesis-forge/SKILL.md
   - tests/test_hfic_operational_memory_quarantine_v1.py
