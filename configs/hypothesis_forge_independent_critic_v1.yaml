@@ -58,8 +58,14 @@ schemas:
   forge_draft: catalog/schemas/hypothesis_forge_draft_v1_2.schema.json
   forge_draft_v1_1: catalog/schemas/hypothesis_forge_draft_v1.schema.json
   critic_result: catalog/schemas/hypothesis_critic_result_v1.schema.json
-  session_receipt: catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
+  session_receipt: catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json
+  session_receipt_v1_2: catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json
   session_receipt_v1_1: catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json
+runner_up_failover:
+  pending_state: RUNNER_UP_AWAITING_CRITIC
+  revision_pause: RUNNER_UP_REVISION_REQUIRED
+  max_critic_screens: 2
+  regenerate_after_primary_kill: false
 synthesis_invariants:
   forge_complete_requires:
     - FORGE_REPORT
@@ -87,6 +93,8 @@ slash_session_authority:
   auto_continue:
     - PASS_TO_CLASSIFICATION
     - REVISE_ONCE
+  auto_continue_revise_once_scope: PRIMARY_SELECTED_ONLY
+  runner_up_revise_once: RUNNER_UP_REVISION_REQUIRED
   isolated_critic_unavailable: AUTO_HANDOFF_UNAVAILABLE
   silent_self_critic_forbidden: true
   batch_approval_at_cycle_start_only: true
@@ -97,6 +105,7 @@ slash_session_authority:
     - process_owned_os_temp_files
     - append_only_rdp_context_session_candidates_critic_revision_classifier_finalize
     - automatic_isolated_critic_handoff
+    - runner_up_failover_isolated_critic
     - exactly_one_bounded_revise_once
     - network_free_deterministic_lane_classification
     - replay_resume_prove_runtime

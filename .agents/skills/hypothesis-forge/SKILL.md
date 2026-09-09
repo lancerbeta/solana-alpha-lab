@@ -29,8 +29,10 @@ One explicit `/hypothesis-forge` is scoped authorization for exactly one HFIC
 session (`ONE_SLASH_ONE_SESSION`), expiring at final terminal/STOP.
 `ZERO_MID_CYCLE_OWNER_INTERVENTION`: do not ask the owner to press Run or
 approve an RDP write between preflight, freeze, Critic, revision/classification
-and finalize. `PASS_TO_CLASSIFICATION` and exactly one bounded `REVISE_ONCE`
+and finalize. `PASS_TO_CLASSIFICATION` and exactly one bounded **primary** `REVISE_ONCE`
 remain inside the original slash authority and continue automatically.
+A final primary `KILL_*` continues once as isolated Critic #2 on the pre-frozen
+C2 packet. C2 `REVISE_ONCE` does not auto-continue (`RUNNER_UP_REVISION_REQUIRED`).
 After Prompt A `NO_WORTHY_HYPOTHESIS`, the same slash automatically runs
 Prompt C (`HFIC-NEXT-V1.0`) and freeze `--next-action` without owner intervention.
 
@@ -141,16 +143,21 @@ Happy path — no owner copy/paste between the slash command and the final termi
    not written; do not launch Critic. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
 7. **Mandatory auto-handoff (selected path only):** launch Independent Critic in a new isolated context
    with only the frozen packet. Do not persist from Critic.
-8. After critic returns `hypothesis_critic_result_v1`:
-   - `REVISE_ONCE` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py finalize` persists
-     `REVISION_REQUIRED`; then `uv run --locked --managed-python python -B scripts/hypothesis_forge.py revise`
-     (one claim-wording repair); then isolated Critic again; second terminal
-     must be PASS/KILL, never a second `REVISE_ONCE`.
-   - `PASS_TO_CLASSIFICATION` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py finalize`
-     persists `AWAITING_CLASSIFICATION`; then
-     `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify`; then finalize. This is
-     not a completed terminal.
-   - `KILL_*` → `uv run --locked --managed-python python -B scripts/hypothesis_forge.py finalize`.
+8. After critic returns `hypothesis_critic_result_v1`, branch on **which
+   candidate this packet screened** and on `finalize` `session_state`:
+   - Primary/C1 `REVISE_ONCE` only → `finalize` persists `REVISION_REQUIRED`;
+     then `revise` (one claim-wording repair); then isolated Critic again;
+     second terminal must be PASS/KILL, never a second `REVISE_ONCE`.
+   - `PASS_TO_CLASSIFICATION` → `finalize` persists `AWAITING_CLASSIFICATION`;
+     then `classify`; then finalize. This is not a completed terminal.
+   - Primary/C1 `KILL_*` → `finalize`. If `session_state=RUNNER_UP_AWAITING_CRITIC`,
+     do **not** emit `SYNTHESIS_COMPLETE` and do **not** mark the evening done.
+     Same slash: launch Critic #2 in a **new** isolated context with **only**
+     the pre-frozen C2 packet (`RESUME_CRITIC` `critic_input_packet` or freeze
+     `runner_up_critic_input_packet`). Then `finalize` the C2 result.
+   - C2 `REVISE_ONCE` → `finalize` persists `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`.
+     Do **not** run `revise`. No C3. No new search.
+   - PASS/OWNER/DATA/CHANGE on C1 never launches runner-up Critic.
    Fake/nonempty classifier objects are invalid. Final `PASS_*` requires a live
    network-free classifier receipt bound to session/selected/spec hash.
 9. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0
@@ -176,14 +183,26 @@ Immediately after a valid frozen `CRITIC_INPUT_PACKET` (selected path only):
    and STOP. Do not instruct the owner to open a new chat, paste the packet,
    or press Run. Do not silently self-criticize in the Forge context.
 3. Do not mark the evening cycle done, do not propose execution tasks, and do not
-   treat synthesis as finished until the critic returns one terminal and one NEXT
-   and `finalize` has persisted them.
-4. After critic returns, emit handoff with `synthesis_status: SYNTHESIS_COMPLETE`,
+   treat synthesis as finished until `finalize` has persisted `SYNTHESIS_COMPLETE`.
+   Primary `KILL_*` that returns `RUNNER_UP_AWAITING_CRITIC` is **not** complete:
+   launch Critic #2 first. C2 `REVISE_ONCE` completes as `PAUSE` /
+   `RUNNER_UP_REVISION_REQUIRED` with `OWNER NEXT=STOP` — no `revise`, no C3,
+   no new AUTO search, no candidate shopping.
+4. After `finalize` returns `session_state=SYNTHESIS_COMPLETE`, emit handoff with
+   `synthesis_status: SYNTHESIS_COMPLETE`,
    `critic_terminal`, `critic_report_present: true`, and when the final terminal is
    post-classification (`PASS_FAST_LANE_READY`, `PASS_CHANGE_LANE_REQUIRED`,
    `PASS_DATA_OPTION_REQUIRED`): `classifier_receipt_present: true` plus
    `lane_classifier_terminal` from offline `classify_lane()`. `PASS_*` is readiness
    / `PAUSE`, never promotion or alpha.
+
+   The v1.1 synthesis handoff schema is `additionalProperties: false` and cannot
+   carry v1.3 `final_session_terminal` / `runner_up_critic_terminal`. On runner-up
+   failover, read those fields from the session receipt / `show_session`, not from
+   the v1.1 handoff. Legacy handoff `critic_terminal` stays the C1 primary KILL for
+   v1.2 identity and is **not** the evening scientific result. Do not claim C1
+   KILL as C2's outcome. Do not put C2's classifier lane on C1-bound
+   `lane_classifier_terminal`.
 
 If packet validation fails, return `STATUS=NOT_READY`, keep
 `synthesis_status: FORGE_NOT_READY`, and one repair action. Do not launch critic
@@ -195,7 +214,9 @@ Speak to the owner in Russian. Keep schemas, enums, packet fields and paths
 canonical in English.
 
 Never end with a conditional backlog. One execution unit maximum per cycle.
-KILL/STOP is a complete useful result.
+KILL/STOP is a complete useful result. Primary `KILL_*` plus pending C2 screen
+is not evening-complete. C2 `RUNNER_UP_REVISION_REQUIRED` is a typed PAUSE STOP,
+not a prompt to shop another candidate or start a second AUTO search.
 
 ## Model effort
 

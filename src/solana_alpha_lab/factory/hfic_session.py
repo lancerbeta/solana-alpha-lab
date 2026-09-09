@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import copy
 import hashlib
 import json
 import re
 from collections.abc import Mapping, Sequence
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -52,18 +53,24 @@ SESSION_RECEIPT_SCHEMA_BY_PROMPT = {
     PROMPT_VERSION_V1_1: "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
     PROMPT_VERSION: "catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json",
 }
+SESSION_RECEIPT_SCHEMA_V1_3 = (
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json"
+)
+RUNNER_UP_AWAITING_CRITIC = "RUNNER_UP_AWAITING_CRITIC"
+RUNNER_UP_REVISION_REQUIRED = "RUNNER_UP_REVISION_REQUIRED"
 MIN_CANDIDATES = 4
 MAX_CANDIDATES = 6
 PHASE_RANK = {
     "SYNTHESIS_COMPLETE": 0,
     "LEGACY_PARTIAL": 0,
     "AWAITING_CLASSIFICATION": 1,
-    "REVISED_AWAITING_CRITIC": 1,
-    "REVISION_REQUIRED": 2,
-    "CRITIC_RESULT_READY": 3,
-    "FROZEN_AWAITING_CRITIC": 4,
-    "DRAFT_VALIDATED": 5,
-    "PREFLIGHT_PROVEN": 6,
+    RUNNER_UP_AWAITING_CRITIC: 1,
+    "REVISED_AWAITING_CRITIC": 3,
+    "REVISION_REQUIRED": 4,
+    "CRITIC_RESULT_READY": 5,
+    "FROZEN_AWAITING_CRITIC": 6,
+    "DRAFT_VALIDATED": 7,
+    "PREFLIGHT_PROVEN": 8,
 }
 PENDING_STATES = frozenset(
     {
@@ -71,6 +78,7 @@ PENDING_STATES = frozenset(
         "DRAFT_VALIDATED",
         "FROZEN_AWAITING_CRITIC",
         "REVISED_AWAITING_CRITIC",
+        RUNNER_UP_AWAITING_CRITIC,
         "REVISION_REQUIRED",
         "AWAITING_CLASSIFICATION",
         "CRITIC_RESULT_READY",
@@ -233,6 +241,36 @@ def critic_known_unknowns_with_closed_families(terminals: Sequence[str]) -> list
 
 def phase_rank(state: object) -> int:
     return PHASE_RANK.get(str(state or ""), 9)
+
+
+def _effective_at_key(value: object) -> str:
+    if isinstance(value, datetime):
+        instant = value.astimezone(UTC) if value.tzinfo is not None else value.replace(tzinfo=UTC)
+        return instant.isoformat()
+    return str(value or "")
+
+
+def _cycle_better(candidate: Mapping[str, Any], current: Mapping[str, Any]) -> bool:
+    """Match projection: phase_rank ASC, hfic_cycle_seq DESC, effective_at DESC, record_id ASC."""
+    cand_rank = phase_rank(candidate.get("phase") or candidate.get("session_state"))
+    cur_rank = phase_rank(current.get("phase") or current.get("session_state"))
+    if cand_rank != cur_rank:
+        return cand_rank < cur_rank
+    cand_seq = int(candidate.get("hfic_cycle_seq") or 0)
+    cur_seq = int(current.get("hfic_cycle_seq") or 0)
+    if cand_seq != cur_seq:
+        return cand_seq > cur_seq
+    cand_at = _effective_at_key(candidate.get("effective_at"))
+    cur_at = _effective_at_key(current.get("effective_at"))
+    if cand_at != cur_at:
+        return cand_at > cur_at
+    return str(candidate.get("record_id") or "") < str(current.get("record_id") or "")
+
+
+def _next_cycle_seq(existing: Mapping[str, Any] | None) -> int:
+    if existing is None:
+        return 1
+    return int(existing.get("hfic_cycle_seq") or 0) + 1
 
 
 def pick_session(sessions: Sequence[Mapping[str, Any]]) -> Mapping[str, Any]:
@@ -483,11 +521,247 @@ def _draft_schema_path(repo_root: Any, draft: Mapping[str, Any]) -> Path:
     return Path(repo_root) / DRAFT_SCHEMA_BY_PACKET_VERSION[_draft_packet_version(draft)]
 
 
-def _session_receipt_schema_path(repo_root: Any, prompt_version: str) -> Path:
+def _session_receipt_schema_path(
+    repo_root: Any,
+    prompt_version: str,
+    *,
+    selected_path: bool = True,
+) -> Path:
+    if selected_path and prompt_version == PROMPT_VERSION:
+        return Path(repo_root) / SESSION_RECEIPT_SCHEMA_V1_3
     relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT.get(prompt_version)
     if relative is None:
         relative = SESSION_RECEIPT_SCHEMA_BY_PROMPT[PROMPT_VERSION_V1_1]
     return Path(repo_root) / relative
+
+
+def _selected_candidate_block(identity: Any, card: Mapping[str, Any]) -> dict[str, Any]:
+    required_caps = card.get("required_capability_ids") or []
+    if not isinstance(required_caps, list):
+        required_caps = []
+    decision_unlocked = str(card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
+    disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
+    return {
+        "candidate_id": identity.candidate_id,
+        "claim": str(card.get("claim") or ""),
+        "nearest_prior_and_difference": str(
+            card.get("nearest_prior_and_difference")
+            or card.get("material_difference_from_prior")
+            or "NOT_DECLARED_IN_DRAFT"
+        ),
+        "actor_counterparty": str(card.get("actor_counterparty") or ""),
+        "mechanism": str(card.get("mechanism") or ""),
+        "why_not_arbitraged": str(card.get("why_not_arbitraged") or "NOT_DECLARED_IN_DRAFT"),
+        "population": str(card.get("population") or ""),
+        "decision_timestamp": str(card.get("decision_timestamp") or ""),
+        "primary_x": str(card.get("primary_x_family") or ""),
+        "primary_y": str(card.get("primary_y") or ""),
+        "horizon_notional": str(card.get("horizon_notional") or ""),
+        "disconfirming_prediction": disconfirming,
+        "negative_control": str(card.get("negative_control") or ""),
+        "alternative_world": str(card.get("alternative_world") or "NOT_DECLARED_IN_DRAFT"),
+        "confounders": card.get("confounders") or ["NOT_DECLARED_IN_DRAFT"],
+        "pit_leakage_survivorship_risks": card.get("pit_leakage_survivorship_risks")
+        or ["NOT_DECLARED_IN_DRAFT"],
+        "execution_capacity_risks": card.get("execution_capacity_risks")
+        or ["NOT_DECLARED_IN_DRAFT"],
+        "available_data_bindings": card.get("available_data_bindings") or [],
+        "missing_or_forward_only_data": card.get("missing_or_forward_only_data") or [],
+        "proposed_method": str(card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
+        "cheapest_falsifier": str(card.get("cheapest_falsifier") or ""),
+        "pass_fail_inconclusive_semantics": str(
+            card.get("pass_fail_inconclusive_semantics") or "NOT_DECLARED_IN_DRAFT"
+        ),
+        "decision_unlocked": decision_unlocked,
+        "_required_capability_ids": [str(item) for item in required_caps],
+    }
+
+
+def _provisional_lane(required_caps: Sequence[str]) -> dict[str, Any]:
+    return {
+        "value": "DATA_OPTION_CANDIDATE",
+        "required_capability_ids": [str(item) for item in required_caps],
+        "required_query_recipe_ids": [],
+        "required_data_bindings": [],
+        "exact_gap": "PROVISIONAL_LANE_NOT_YET_CLASSIFIED",
+    }
+
+
+def _build_runner_up_critic_packet(
+    primary_packet: Mapping[str, Any],
+    *,
+    runner_up: Any,
+    runner_up_card: Mapping[str, Any],
+) -> dict[str, Any]:
+    packet = copy.deepcopy(dict(primary_packet))
+    if "prior_memory" in primary_packet:
+        packet["prior_memory"] = primary_packet["prior_memory"]
+    selected = _selected_candidate_block(runner_up, runner_up_card)
+    required_caps = selected.pop("_required_capability_ids")
+    packet["selected_candidate"] = selected
+    packet["provisional_lane"] = _provisional_lane(required_caps)
+    return packet
+
+
+def _blank_optional(value: object) -> bool:
+    return value is None or value == "" or value == []
+
+
+def _attach_runner_up_fields(
+    payload: dict[str, Any],
+    source: Mapping[str, Any],
+) -> None:
+    for key in (
+        "runner_up_critic_input_packet_sha256",
+        "runner_up_definition_sha256",
+        "runner_up_display_ordinal",
+        "primary_critic_input_packet_sha256",
+        "primary_critic_result_sha256",
+        "primary_critic_terminal",
+        "runner_up_failover_used",
+        "critic_screen_count",
+    ):
+        if key in source and source[key] is not None:
+            payload[key] = source[key]
+
+
+def _session_state_of(
+    existing: Mapping[str, Any] | None,
+    frozen: Mapping[str, Any],
+) -> str:
+    if existing is not None:
+        return str(existing.get("session_state") or "")
+    return str(frozen.get("session_state") or "")
+
+
+def _screening_identity(
+    frozen: Mapping[str, Any],
+    existing: Mapping[str, Any] | None,
+) -> tuple[str, str, str]:
+    """Return (candidate_id, packet_sha, definition_sha) for the active Critic bind."""
+    source = existing if existing is not None else frozen
+    state = _session_state_of(existing, frozen)
+    failover_started = state == RUNNER_UP_AWAITING_CRITIC
+    if not failover_started and state == "AWAITING_CLASSIFICATION":
+        pending = source.get("critic_result")
+        runner_up_id = str(source.get("runner_up_candidate_id") or "")
+        if (
+            isinstance(pending, Mapping)
+            and runner_up_id
+            and pending.get("selected_candidate_id") == runner_up_id
+        ):
+            failover_started = True
+    if failover_started:
+        candidate_id = str(source.get("runner_up_candidate_id") or "")
+        packet_sha = str(source.get("runner_up_critic_input_packet_sha256") or "")
+        definition_sha = str(source.get("runner_up_definition_sha256") or "")
+        if not candidate_id or len(packet_sha) != 64 or len(definition_sha) != 64:
+            raise HficSessionError("RUNNER_UP_PACKET_MISSING")
+        return candidate_id, packet_sha, definition_sha
+    candidate_id = str(source.get("selected_candidate_id") or "")
+    packet_sha = str(source.get("critic_input_packet_sha256") or "")
+    definition_sha = str(source.get("selected_definition_sha256") or "")
+    return candidate_id, packet_sha, definition_sha
+
+
+def _require_declared_runner_up_packet(*sources: Mapping[str, Any] | None) -> None:
+    prompt_version = ""
+    declared_sha: str | None = None
+    packet: Mapping[str, Any] | None = None
+    for source in sources:
+        if source is None:
+            continue
+        prompt_version = str(source.get("prompt_version") or prompt_version or "")
+        observed_sha = source.get("runner_up_critic_input_packet_sha256")
+        if isinstance(observed_sha, str) and len(observed_sha) == 64:
+            declared_sha = observed_sha
+        observed_packet = source.get("runner_up_critic_input_packet")
+        if isinstance(observed_packet, Mapping):
+            packet = observed_packet
+    if (
+        prompt_version == PROMPT_VERSION
+        and declared_sha is not None
+        and packet is None
+    ):
+        raise HficSessionError("RUNNER_UP_PACKET_MISSING")
+
+
+def _require_fresh_v12_runner_up_declaration(
+    existing: Mapping[str, Any] | None,
+    frozen: Mapping[str, Any],
+) -> None:
+    if existing is not None:
+        return
+    if str(frozen.get("prompt_version") or "") != PROMPT_VERSION:
+        return
+    if not frozen.get("selected_candidate_id"):
+        return
+    declared_sha = frozen.get("runner_up_critic_input_packet_sha256")
+    if not (isinstance(declared_sha, str) and len(declared_sha) == 64):
+        raise HficSessionError("RUNNER_UP_PACKET_MISSING")
+
+
+def _runner_up_failover_eligible(
+    frozen: Mapping[str, Any],
+    existing: Mapping[str, Any] | None,
+    terminal: str,
+) -> bool:
+    if terminal not in _KILL_TERMINALS:
+        return False
+    state = _session_state_of(existing, frozen)
+    if state == RUNNER_UP_AWAITING_CRITIC:
+        return False
+    source = existing if existing is not None else frozen
+    if state == "AWAITING_CLASSIFICATION":
+        pending = source.get("critic_result")
+        runner_up_id = source.get("runner_up_candidate_id")
+        if (
+            isinstance(pending, Mapping)
+            and isinstance(runner_up_id, str)
+            and pending.get("selected_candidate_id") == runner_up_id
+        ):
+            return False
+    elif state not in {
+        "",
+        "FROZEN_AWAITING_CRITIC",
+        "REVISED_AWAITING_CRITIC",
+        "CRITIC_RESULT_READY",
+    }:
+        return False
+    runner_up_id = source.get("runner_up_candidate_id")
+    packet_sha = source.get("runner_up_critic_input_packet_sha256")
+    packet = source.get("runner_up_critic_input_packet")
+    definition_sha = source.get("runner_up_definition_sha256")
+    if not isinstance(runner_up_id, str) or not runner_up_id:
+        return False
+    if not isinstance(packet_sha, str) or len(packet_sha) != 64:
+        return False
+    if not isinstance(definition_sha, str) or len(definition_sha) != 64:
+        return False
+    if not isinstance(packet, Mapping):
+        return False
+    return True
+
+
+def _classifier_frozen_view(
+    frozen: Mapping[str, Any],
+    critic_result: Mapping[str, Any],
+) -> dict[str, Any]:
+    view = dict(frozen)
+    runner_up_id = frozen.get("runner_up_candidate_id")
+    if (
+        runner_up_id
+        and critic_result.get("selected_candidate_id") == runner_up_id
+    ):
+        view["selected_candidate_id"] = runner_up_id
+        view["selected_definition_sha256"] = frozen.get("runner_up_definition_sha256")
+        view["critic_input_packet_sha256"] = frozen.get(
+            "runner_up_critic_input_packet_sha256"
+        )
+        packet = frozen.get("runner_up_critic_input_packet")
+        if isinstance(packet, Mapping):
+            view["critic_input_packet"] = packet
+    return view
 
 
 def _accepted_capability_ids_from_preflight(
@@ -652,9 +926,7 @@ def freeze_draft(
     runner_up = identities[runner_up_index]
     rejected = identities[rejected_index]
     selected_card = candidates[selected_index]
-    selected_required_caps = selected_card.get("required_capability_ids") or []
-    if not isinstance(selected_required_caps, list):
-        selected_required_caps = []
+    runner_up_card = candidates[runner_up_index]
     closed_family_ledger = ledger_from_receipt(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None
     )
@@ -706,10 +978,8 @@ def freeze_draft(
         if isinstance(maybe_head, str) and len(maybe_head) == 40:
             git_head = maybe_head.lower()
     critic_packet_version = _critic_packet_version(packet_version)
-    decision_unlocked = str(selected_card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
-    disconfirming = str(
-        selected_card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT"
-    )
+    selected_block = _selected_candidate_block(selected, selected_card)
+    selected_required_caps = selected_block.pop("_required_capability_ids")
     packet = {
         "packet_schema": "smial.hypothesis-critic-input",
         "packet_version": critic_packet_version,
@@ -722,52 +992,8 @@ def freeze_draft(
         "holdouts_not_touched": list(draft.get("holdouts_not_touched") or []),
         "truth_roots_used": truth_roots,
         "prior_work_queries": prior_work,
-        "selected_candidate": {
-            "candidate_id": selected.candidate_id,
-            "claim": str(selected_card.get("claim") or ""),
-            "nearest_prior_and_difference": str(
-                selected_card.get("nearest_prior_and_difference")
-                or selected_card.get("material_difference_from_prior")
-                or "NOT_DECLARED_IN_DRAFT"
-            ),
-            "actor_counterparty": str(selected_card.get("actor_counterparty") or ""),
-            "mechanism": str(selected_card.get("mechanism") or ""),
-            "why_not_arbitraged": str(selected_card.get("why_not_arbitraged") or "NOT_DECLARED_IN_DRAFT"),
-            "population": str(selected_card.get("population") or ""),
-            "decision_timestamp": str(selected_card.get("decision_timestamp") or ""),
-            "primary_x": str(selected_card.get("primary_x_family") or ""),
-            "primary_y": str(selected_card.get("primary_y") or ""),
-            "horizon_notional": str(selected_card.get("horizon_notional") or ""),
-            "disconfirming_prediction": disconfirming,
-            "negative_control": str(selected_card.get("negative_control") or ""),
-            "alternative_world": str(selected_card.get("alternative_world") or "NOT_DECLARED_IN_DRAFT"),
-            "confounders": selected_card.get("confounders") or ["NOT_DECLARED_IN_DRAFT"],
-            "pit_leakage_survivorship_risks": selected_card.get(
-                "pit_leakage_survivorship_risks"
-            )
-            or ["NOT_DECLARED_IN_DRAFT"],
-            "execution_capacity_risks": selected_card.get("execution_capacity_risks")
-            or ["NOT_DECLARED_IN_DRAFT"],
-            "available_data_bindings": selected_card.get("available_data_bindings")
-            or [],
-            "missing_or_forward_only_data": selected_card.get(
-                "missing_or_forward_only_data"
-            )
-            or [],
-            "proposed_method": str(selected_card.get("proposed_method") or "NOT_DECLARED_IN_DRAFT"),
-            "cheapest_falsifier": str(selected_card.get("cheapest_falsifier") or ""),
-            "pass_fail_inconclusive_semantics": str(
-                selected_card.get("pass_fail_inconclusive_semantics") or "NOT_DECLARED_IN_DRAFT"
-            ),
-            "decision_unlocked": decision_unlocked,
-        },
-        "provisional_lane": {
-            "value": "DATA_OPTION_CANDIDATE",
-            "required_capability_ids": [str(item) for item in selected_required_caps],
-            "required_query_recipe_ids": [],
-            "required_data_bindings": [],
-            "exact_gap": "PROVISIONAL_LANE_NOT_YET_CLASSIFIED",
-        },
+        "selected_candidate": selected_block,
+        "provisional_lane": _provisional_lane(selected_required_caps),
         "provisional_execution_unit": "NONE",
         "strongest_rejected_alternative": rejected.candidate_id,
         "known_unknowns": critic_known_unknowns_with_closed_families(
@@ -832,8 +1058,26 @@ def freeze_draft(
             packet,
             Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
         )
+    runner_up_packet = _build_runner_up_critic_packet(
+        packet,
+        runner_up=runner_up,
+        runner_up_card=runner_up_card,
+    )
+    _bind_packet_session_id(runner_up_packet, session_id)
+    if repo_root is not None:
+        _validate_json_schema(
+            runner_up_packet,
+            Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
+        )
     packet_bytes = json.dumps(
         packet,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    )
+    runner_up_packet_bytes = json.dumps(
+        runner_up_packet,
         ensure_ascii=False,
         sort_keys=True,
         separators=(",", ":"),
@@ -852,10 +1096,19 @@ def freeze_draft(
         "rejected_alternative_id": rejected.candidate_id,
         "selected_definition_sha256": selected.full_sha256,
         "selected_display_ordinal": selected.display_ordinal,
+        "runner_up_definition_sha256": runner_up.full_sha256,
+        "runner_up_display_ordinal": runner_up.display_ordinal,
         "candidate_ids": [item.candidate_id for item in identities],
         "critic_input_packet": packet,
         "critic_input_packet_sha256": hashlib.sha256(
             packet_bytes.encode("utf-8")
+        ).hexdigest(),
+        "primary_critic_input_packet_sha256": hashlib.sha256(
+            packet_bytes.encode("utf-8")
+        ).hexdigest(),
+        "runner_up_critic_input_packet": runner_up_packet,
+        "runner_up_critic_input_packet_sha256": hashlib.sha256(
+            runner_up_packet_bytes.encode("utf-8")
         ).hexdigest(),
         "store_inventory_digest": store_digest,
         "git_composite_sha256": git_composite,
@@ -1438,7 +1691,9 @@ def persist_no_worthy_session(
     if repo_root is not None:
         _validate_json_schema(
             receipt,
-            _session_receipt_schema_path(repo_root, prompt_version),
+            _session_receipt_schema_path(
+                repo_root, prompt_version, selected_path=False
+            ),
         )
     receipt_bytes = _canonical_bytes(receipt)
     receipt_sha = hashlib.sha256(receipt_bytes).hexdigest()
@@ -1712,12 +1967,22 @@ def persist_frozen_session(
                 "rejected_alternative_id": frozen.get("rejected_alternative_id"),
                 "candidate_ids": list(frozen.get("candidate_ids") or []),
                 "critic_input_packet_sha256": frozen.get("critic_input_packet_sha256"),
+                "primary_critic_input_packet_sha256": frozen.get(
+                    "primary_critic_input_packet_sha256"
+                )
+                or frozen.get("critic_input_packet_sha256"),
+                "runner_up_critic_input_packet_sha256": frozen.get(
+                    "runner_up_critic_input_packet_sha256"
+                ),
+                "runner_up_definition_sha256": frozen.get("runner_up_definition_sha256"),
+                "runner_up_display_ordinal": frozen.get("runner_up_display_ordinal"),
                 "selected_definition_sha256": frozen.get("selected_definition_sha256"),
                 "selected_display_ordinal": frozen.get("selected_display_ordinal"),
                 "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
+                "hfic_cycle_seq": 1,
             }
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
@@ -1794,6 +2059,32 @@ def persist_frozen_session(
             },
         )
     )
+    runner_up_packet = frozen.get("runner_up_critic_input_packet")
+    if isinstance(runner_up_packet, Mapping):
+        runner_up_bytes = json.dumps(
+            runner_up_packet,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        records.append(
+            event(
+                record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP",
+                kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP",
+                payload={
+                    "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP",
+                    "session_id": session_id,
+                    "hfic_protocol": prompt_version,
+                    "artifact_kind": "CRITIC_INPUT_PACKET",
+                    "payload_canonical": runner_up_bytes,
+                    "payload_sha256": hashlib.sha256(
+                        runner_up_bytes.encode("utf-8")
+                    ).hexdigest(),
+                },
+            )
+        )
     if draft is not None:
         draft_bytes = json.dumps(
             draft,
@@ -1953,11 +2244,15 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
             {
                 "session_id": session_id,
                 "session_state": payload.get("phase"),
+                "phase": payload.get("phase"),
                 "evidence_epoch_sha256": payload.get("evidence_epoch_sha256"),
                 "focus_key_sha256": payload.get("focus_key_sha256"),
                 "search_key_sha256": payload.get("search_key_sha256"),
                 "prompt_version": payload.get("prompt_version"),
                 "owner_focus": payload.get("owner_focus"),
+                "effective_at": getattr(record, "effective_at", ""),
+                "record_id": str(getattr(record, "record_id", "") or ""),
+                "hfic_cycle_seq": int(payload.get("hfic_cycle_seq") or 0),
             }
         )
     latest: dict[str, dict[str, Any]] = {}
@@ -1968,11 +2263,9 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
             has_receipt=session_id in receipt_ids,
             has_critic=session_id in critic_ids,
         )
-        candidate = {**candidate, "session_state": phase}
+        candidate = {**candidate, "session_state": phase, "phase": phase}
         current = latest.get(session_id)
-        if current is None or phase_rank(candidate["session_state"]) <= phase_rank(
-            current["session_state"]
-        ):
+        if current is None or _cycle_better(candidate, current):
             latest[session_id] = candidate
     return list(latest.values())
 
@@ -2009,13 +2302,14 @@ def find_session_by_search_key(store: Any, search_key: str) -> dict[str, Any] | 
 def _require_critic_identity(
     frozen: Mapping[str, Any],
     critic_result: Mapping[str, Any],
+    *,
+    existing: Mapping[str, Any] | None = None,
 ) -> str:
-    selected_id = str(frozen["selected_candidate_id"])
+    selected_id, expected_packet, expected_def = _screening_identity(frozen, existing)
     if critic_result.get("selected_candidate_id") != selected_id:
         raise HficSessionError("CRITIC_SELECTED_MISMATCH")
     if critic_result.get("session_id") != frozen.get("session_id"):
         raise HficSessionError("CRITIC_SESSION_MISMATCH")
-    expected_packet = frozen.get("critic_input_packet_sha256")
     observed_packet = critic_result.get("critic_input_packet_sha256")
     if (
         not isinstance(expected_packet, str)
@@ -2023,7 +2317,6 @@ def _require_critic_identity(
         or expected_packet != observed_packet
     ):
         raise HficSessionError("CRITIC_PACKET_HASH_MISMATCH")
-    expected_def = frozen.get("selected_definition_sha256")
     observed_def = critic_result.get("selected_definition_sha256")
     if (
         not isinstance(expected_def, str)
@@ -2282,6 +2575,55 @@ def _verify_complete_hash_chain(
         right = str(session_receipt.get(key) or "")
         if left and right and left != right:
             raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+    if session_receipt.get("runner_up_failover_used"):
+        ru_result = str(session_receipt.get("runner_up_critic_result_sha256") or "")
+        cycle_ru = str(cycle.get("runner_up_critic_result_sha256") or "")
+        ru_input = str(session_receipt.get("runner_up_critic_input_packet_sha256") or "")
+        cycle_ru_input = str(cycle.get("runner_up_critic_input_packet_sha256") or "")
+        if len(ru_result) != 64 or ru_result != cycle_ru:
+            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+        if len(ru_input) != 64 or ru_input != cycle_ru_input:
+            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+        if ru_result == receipt_result:
+            raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+
+
+def _verify_failover_receipt_identity(receipt: Mapping[str, Any]) -> None:
+    if not receipt.get("runner_up_failover_used"):
+        return
+    if receipt.get("selected_candidate_id") != receipt.get("primary_selected_candidate_id"):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    if receipt.get("critic_terminal") != receipt.get("primary_critic_terminal"):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    if receipt.get("critic_result_sha256") != receipt.get("primary_critic_result_sha256"):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    if receipt.get("critic_input_packet_sha256") != receipt.get(
+        "primary_critic_input_packet_sha256"
+    ):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    ru_result = receipt.get("runner_up_critic_result_sha256")
+    if not isinstance(ru_result, str) or len(ru_result) != 64:
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    if ru_result == receipt.get("critic_result_sha256"):
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+
+
+def _verify_runner_up_result_bind(
+    result: Mapping[str, Any],
+    *,
+    session_id: str,
+    runner_up_id: str,
+    packet_sha: str,
+    definition_sha: str,
+) -> None:
+    if str(result.get("session_id") or "") != session_id:
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    if str(result.get("selected_candidate_id") or "") != runner_up_id:
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
+    if str(result.get("critic_input_packet_sha256") or "") != packet_sha:
+        raise HficSessionError("CRITIC_INPUT_HASH_MISMATCH")
+    if definition_sha and str(result.get("selected_definition_sha256") or "") != definition_sha:
+        raise HficSessionError("HFIC_PROTOCOL_INVALID")
 
 
 def _verify_store_reference_resolution(
@@ -2512,8 +2854,11 @@ def persist_intermediate_cycle(
         return existing
     git = repository_git_snapshot(Path(repo_root))
     stage_time = _stage_datetime(clock)
+    cycle_seq = _next_cycle_seq(existing)
     phase_token = "REV" if phase == "REVISION_REQUIRED" else "CLS"
-    transaction_id = f"RESEARCH-TXN-HFICINT-{phase_token}-{session_id[-12:]}"
+    transaction_id = (
+        f"RESEARCH-TXN-HFICINT-{phase_token}-{session_id[-12:]}-{cycle_seq:04d}"
+    )
     event = _make_event_factory(
         repo_root,
         git,
@@ -2525,7 +2870,7 @@ def persist_intermediate_cycle(
     critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
     prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
     intermediate_cycle = {
-                "research_cycle_id": f"{session_id}-{phase}",
+                "research_cycle_id": f"{session_id}-{phase}-{cycle_seq}",
                 "session_id": session_id,
                 "phase": phase,
                 "hfic_protocol": prompt_version,
@@ -2547,7 +2892,11 @@ def persist_intermediate_cycle(
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
                 "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
+                "hfic_cycle_seq": cycle_seq,
             }
+    source = existing if existing is not None else frozen
+    _attach_runner_up_fields(intermediate_cycle, source)
+    _attach_runner_up_fields(intermediate_cycle, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         intermediate_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -2556,7 +2905,7 @@ def persist_intermediate_cycle(
         ]
     records = [
         event(
-            record_id=f"HFIC-CYCLE-{session_id}-{phase}",
+            record_id=f"HFIC-CYCLE-{session_id}-{phase}-{cycle_seq}",
             kind=RecordKind.RESEARCH_CYCLE,
             entity_id=session_id,
             payload=intermediate_cycle,
@@ -2577,22 +2926,53 @@ def persist_intermediate_cycle(
             transaction_id=transaction_id,
         ),
     ]
+    known_input_shas = {
+        str((existing or {}).get(key) or "")
+        for key in (
+            "critic_input_packet_sha256",
+            "primary_critic_input_packet_sha256",
+            "runner_up_critic_input_packet_sha256",
+        )
+    }
     packet = frozen.get("critic_input_packet")
     if isinstance(packet, Mapping):
         packet_bytes = _canonical_bytes(packet)
         digest = hashlib.sha256(packet_bytes).hexdigest()
+        if digest not in known_input_shas:
+            records.append(
+                event(
+                    record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                    kind=RecordKind.RESEARCH_ARTIFACT,
+                    entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                    payload={
+                        "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                        "session_id": session_id,
+                        "hfic_protocol": prompt_version,
+                        "artifact_kind": "CRITIC_INPUT_PACKET",
+                        "payload_canonical": packet_bytes.decode("utf-8"),
+                        "payload_sha256": digest,
+                    },
+                    transaction_id=transaction_id,
+                )
+            )
+    runner_up_packet = frozen.get("runner_up_critic_input_packet")
+    if isinstance(runner_up_packet, Mapping) and not (
+        existing and existing.get("runner_up_critic_input_packet")
+    ):
+        runner_bytes = _canonical_bytes(runner_up_packet)
+        runner_digest = hashlib.sha256(runner_bytes).hexdigest()
         records.append(
             event(
-                record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP-{runner_digest[:12].upper()}",
                 kind=RecordKind.RESEARCH_ARTIFACT,
-                entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP-{runner_digest[:12].upper()}",
                 payload={
-                    "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                    "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP-{runner_digest[:12].upper()}",
                     "session_id": session_id,
                     "hfic_protocol": prompt_version,
                     "artifact_kind": "CRITIC_INPUT_PACKET",
-                    "payload_canonical": packet_bytes.decode("utf-8"),
-                    "payload_sha256": digest,
+                    "payload_canonical": runner_bytes.decode("utf-8"),
+                    "payload_sha256": runner_digest,
                 },
                 transaction_id=transaction_id,
             )
@@ -2847,7 +3227,10 @@ def apply_revision(
                 "revision_count": 1,
                 "forge_context_packet_sha256": existing.get("forge_context_packet_sha256")
                 or frozen.get("forge_context_packet_sha256"),
+                "hfic_cycle_seq": _next_cycle_seq(existing),
             }
+    _attach_runner_up_fields(revision_cycle, existing)
+    _attach_runner_up_fields(revision_cycle, frozen)
     if prompt_version == PROMPT_VERSION and repo_root is not None:
         grounded_candidates = _ground_v12_candidates(
             revised_draft.get("candidates") or [],
@@ -2950,9 +3333,10 @@ def apply_classification(
         raise HficSessionError("CLASSIFICATION_NOT_PENDING")
     critic_result = dict(existing.get("critic_result") or {})
     critic_result["experiment_spec_packet"] = dict(experiment_spec_packet)
+    view = _classifier_frozen_view(existing, critic_result)
     receipt = validate_live_classifier_receipt(
         critic_result,
-        frozen,
+        view,
         repo_root=repo_root,
         data_root=data_root,
     )
@@ -2961,13 +3345,209 @@ def apply_classification(
     critic_result["critic_terminal"] = terminal
     critic_result["next"] = "PAUSE" if terminal in _PAUSE_TERMINALS else "STOP"
     return finalize_session(
-        frozen,
+        existing,
         critic_result,
         store=store,
         repo_root=repo_root,
         data_root=data_root,
         clock=clock,
     )
+
+
+def persist_primary_kill_awaiting_runner_up(
+    store: Any,
+    frozen: Mapping[str, Any],
+    critic_result: Mapping[str, Any],
+    *,
+    repo_root: Any,
+    clock: Clock | None = None,
+) -> dict[str, Any]:
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from solana_alpha_lab.factory.research_store import RecordKind
+
+    session_id = str(frozen["session_id"])
+    existing = load_session_bundle(store, session_id)
+    if existing is not None and existing.get("session_state") == RUNNER_UP_AWAITING_CRITIC:
+        return existing
+    if existing is not None:
+        merged = dict(frozen)
+        for key in (
+            "runner_up_candidate_id",
+            "runner_up_critic_input_packet",
+            "runner_up_critic_input_packet_sha256",
+            "runner_up_definition_sha256",
+            "runner_up_display_ordinal",
+            "primary_critic_input_packet_sha256",
+            "git_composite_sha256",
+            "selected_candidate_id",
+            "selected_definition_sha256",
+            "candidate_ids",
+            "prompt_version",
+            "evidence_epoch_sha256",
+            "focus_key_sha256",
+            "search_key_sha256",
+            "research_memory_as_of",
+            "forge_context_packet_sha256",
+            "owner_focus",
+            "grounded_candidates",
+            "closed_or_suppressed_collision_count",
+            "revision_count",
+            "rejected_alternative_id",
+            "selected_display_ordinal",
+        ):
+            stored = existing.get(key)
+            if stored is not None and stored != "":
+                merged[key] = stored
+        frozen = merged
+    git = repository_git_snapshot(Path(repo_root))
+    preflight_composite = frozen.get("git_composite_sha256")
+    if not isinstance(preflight_composite, str) or len(preflight_composite) != 64:
+        raise HficSessionError("GIT_COMPOSITE_CHANGED")
+    if preflight_composite != git.composite_sha256:
+        raise HficSessionError("GIT_COMPOSITE_CHANGED")
+    stage_time = _stage_datetime(clock)
+    transaction_id = f"RESEARCH-TXN-HFICRU-{session_id[-12:]}"
+    event = _make_event_factory(
+        repo_root,
+        git,
+        session_id,
+        "CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+        stage_time,
+    )
+    critic_bytes = _canonical_bytes(critic_result)
+    critic_result_sha256 = hashlib.sha256(critic_bytes).hexdigest()
+    prompt_version = str(frozen.get("prompt_version") or PROMPT_VERSION)
+    primary_id = str(frozen["selected_candidate_id"])
+    terminal = str(critic_result.get("critic_terminal") or "")
+    primary_packet_sha = str(
+        critic_result.get("critic_input_packet_sha256")
+        or frozen.get("critic_input_packet_sha256")
+        or ""
+    )
+    runner_up_packet_sha = str(frozen.get("runner_up_critic_input_packet_sha256") or "")
+    pending_cycle = {
+        "research_cycle_id": f"{session_id}-RUNNER-UP-AWAITING",
+        "session_id": session_id,
+        "phase": RUNNER_UP_AWAITING_CRITIC,
+        "hfic_protocol": prompt_version,
+        "prompt_version": prompt_version,
+        "owner_focus": frozen.get("owner_focus") or "AUTO",
+        "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
+        "focus_key_sha256": frozen.get("focus_key_sha256") or "",
+        "search_key_sha256": frozen.get("search_key_sha256") or "",
+        "selected_candidate_id": primary_id,
+        "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
+        "rejected_alternative_id": frozen.get("rejected_alternative_id"),
+        "candidate_ids": list(frozen.get("candidate_ids") or []),
+        "critic_terminal": terminal,
+        "next": "RESUME_CRITIC",
+        "critic_input_packet_sha256": runner_up_packet_sha,
+        "primary_critic_input_packet_sha256": primary_packet_sha,
+        "primary_critic_result_sha256": critic_result_sha256,
+        "primary_critic_terminal": terminal,
+        "runner_up_critic_input_packet_sha256": runner_up_packet_sha,
+        "runner_up_definition_sha256": frozen.get("runner_up_definition_sha256"),
+        "runner_up_display_ordinal": frozen.get("runner_up_display_ordinal"),
+        "selected_definition_sha256": frozen.get("selected_definition_sha256"),
+        "selected_display_ordinal": frozen.get("selected_display_ordinal"),
+        "git_composite_sha256": frozen.get("git_composite_sha256"),
+        "research_memory_as_of": frozen.get("research_memory_as_of"),
+        "revision_count": int(frozen.get("revision_count") or 0),
+        "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
+        "runner_up_failover_used": True,
+        "critic_screen_count": 1,
+        "hfic_cycle_seq": _next_cycle_seq(existing),
+    }
+    if isinstance(frozen.get("grounded_candidates"), list):
+        pending_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
+    if "closed_or_suppressed_collision_count" in frozen:
+        pending_cycle["closed_or_suppressed_collision_count"] = frozen[
+            "closed_or_suppressed_collision_count"
+        ]
+    records = [
+        event(
+            record_id=f"HFIC-CYCLE-{session_id}-RUNNER-UP-AWAITING",
+            kind=RecordKind.RESEARCH_CYCLE,
+            entity_id=session_id,
+            payload=pending_cycle,
+            transaction_id=transaction_id,
+        ),
+        event(
+            record_id=f"HFIC-ART-CRITIC-RESULT-{session_id}-{hashlib.sha256(critic_bytes).hexdigest()[:12].upper()}",
+            kind=RecordKind.RESEARCH_ARTIFACT,
+            entity_id=f"HFIC-ART-CRITIC-RESULT-{session_id}-{hashlib.sha256(critic_bytes).hexdigest()[:12].upper()}",
+            payload={
+                "research_artifact_id": f"HFIC-ART-CRITIC-RESULT-{session_id}-{hashlib.sha256(critic_bytes).hexdigest()[:12].upper()}",
+                "session_id": session_id,
+                "hfic_protocol": prompt_version,
+                "artifact_kind": "CRITIC_RESULT",
+                "payload_canonical": critic_bytes.decode("utf-8"),
+                "payload_sha256": critic_result_sha256,
+            },
+            transaction_id=transaction_id,
+        ),
+        event(
+            record_id=f"HFIC-DEC-{primary_id}",
+            kind=RecordKind.DECISION_EVENT,
+            entity_id=f"HFIC-DEC-{primary_id}",
+            hypothesis_version_id=primary_id,
+            payload={
+                "decision_event_id": f"HFIC-DEC-{primary_id}",
+                "session_id": session_id,
+                "hfic_protocol": prompt_version,
+                "decision_kind": "REJECT",
+                "reason_code": terminal,
+                "hypothesis_version_id": primary_id,
+            },
+            transaction_id=transaction_id,
+        ),
+    ]
+    runner_up_packet = frozen.get("runner_up_critic_input_packet")
+    existing_runner = existing.get("runner_up_critic_input_packet") if existing else None
+    if isinstance(runner_up_packet, Mapping) and not isinstance(existing_runner, Mapping):
+        runner_bytes = _canonical_bytes(runner_up_packet)
+        runner_digest = hashlib.sha256(runner_bytes).hexdigest()
+        records.append(
+            event(
+                record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP-{runner_digest[:12].upper()}",
+                kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP-{runner_digest[:12].upper()}",
+                payload={
+                    "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-RUNNER-UP-{runner_digest[:12].upper()}",
+                    "session_id": session_id,
+                    "hfic_protocol": prompt_version,
+                    "artifact_kind": "CRITIC_INPUT_PACKET",
+                    "payload_canonical": runner_bytes.decode("utf-8"),
+                    "payload_sha256": runner_digest,
+                },
+                transaction_id=transaction_id,
+            )
+        )
+        primary_packet = frozen.get("critic_input_packet")
+        if isinstance(primary_packet, Mapping) and existing is None:
+            primary_bytes = _canonical_bytes(primary_packet)
+            records.append(
+                event(
+                    record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}",
+                    kind=RecordKind.RESEARCH_ARTIFACT,
+                    entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}",
+                    payload={
+                        "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}",
+                        "session_id": session_id,
+                        "hfic_protocol": prompt_version,
+                        "artifact_kind": "CRITIC_INPUT_PACKET",
+                        "payload_canonical": primary_bytes.decode("utf-8"),
+                        "payload_sha256": hashlib.sha256(primary_bytes).hexdigest(),
+                    },
+                    transaction_id=transaction_id,
+                )
+            )
+    store.append(records, transaction_id=transaction_id)
+    store.rebuild_projection()
+    loaded = load_session_bundle(store, session_id)
+    if loaded is None:
+        raise HficSessionError("SESSION_NOT_FOUND")
+    return loaded
 
 
 def finalize_session(
@@ -2982,21 +3562,77 @@ def finalize_session(
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind
 
-    selected_id = _require_critic_identity(frozen, critic_result)
+    existing = load_session_bundle(store, str(frozen["session_id"]))
+    if existing is not None and existing.get("session_state") == "SYNTHESIS_COMPLETE":
+        retry_payload = dict(critic_result)
+        if (
+            existing.get("runner_up_failover_used")
+            and str(retry_payload.get("critic_terminal") or "") == "REVISE_ONCE"
+        ):
+            retry_payload["next"] = "STOP"
+        retry_hash = hashlib.sha256(_canonical_bytes(retry_payload)).hexdigest()
+        if existing.get("runner_up_failover_used"):
+            completing = str(existing.get("runner_up_critic_result_sha256") or "")
+            if completing and retry_hash == completing:
+                return existing
+            raise HficSessionError("SESSION_CONFLICT")
+        existing_hash = existing.get("critic_result_sha256")
+        if existing_hash not in {None, retry_hash}:
+            raise HficSessionError("SESSION_CONFLICT")
+        return existing
+    _require_fresh_v12_runner_up_declaration(existing, frozen)
+    selected_id = _require_critic_identity(frozen, critic_result, existing=existing)
     if repo_root is not None:
         _validate_json_schema(
             critic_result,
             Path(repo_root) / "catalog/schemas/hypothesis_critic_result_v1.schema.json",
         )
-    existing = load_session_bundle(store, str(frozen["session_id"]))
-    if existing is not None and existing.get("session_state") == "SYNTHESIS_COMPLETE":
-        existing_hash = existing.get("critic_result_sha256")
-        retry_hash = hashlib.sha256(_canonical_bytes(critic_result)).hexdigest()
-        if existing_hash not in {None, retry_hash}:
-            raise HficSessionError("SESSION_CONFLICT")
-        return existing
-    terminal = str(critic_result.get("critic_terminal") or "")
-    if terminal == "REVISE_ONCE":
+    if existing is not None and existing.get("session_state") == RUNNER_UP_AWAITING_CRITIC:
+        frozen = {**dict(frozen), **{
+            key: existing[key]
+            for key in (
+                "runner_up_candidate_id",
+                "runner_up_critic_input_packet",
+                "runner_up_critic_input_packet_sha256",
+                "runner_up_definition_sha256",
+                "runner_up_display_ordinal",
+                "primary_critic_input_packet_sha256",
+                "primary_critic_result_sha256",
+                "primary_critic_terminal",
+                "selected_candidate_id",
+                "selected_definition_sha256",
+                "critic_input_packet",
+                "critic_input_packet_sha256",
+                "candidate_ids",
+                "session_id",
+                "prompt_version",
+                "evidence_epoch_sha256",
+                "focus_key_sha256",
+                "search_key_sha256",
+                "git_composite_sha256",
+                "research_memory_as_of",
+                "forge_context_packet_sha256",
+                "owner_focus",
+                "session_started_at",
+                "grounded_candidates",
+                "closed_or_suppressed_collision_count",
+                "revision_count",
+            )
+            if key in existing and existing.get(key) is not None
+        }}
+    _require_declared_runner_up_packet(existing, frozen)
+    observed_terminal = str(critic_result.get("critic_terminal") or "")
+    screening_is_runner_up = selected_id == str(frozen.get("runner_up_candidate_id") or "")
+    runner_up_revision_pause = (
+        observed_terminal == "REVISE_ONCE" and screening_is_runner_up
+    )
+    if runner_up_revision_pause:
+        critic_result = dict(critic_result)
+        critic_result["next"] = "STOP"
+    terminal = (
+        RUNNER_UP_REVISION_REQUIRED if runner_up_revision_pause else observed_terminal
+    )
+    if observed_terminal == "REVISE_ONCE" and not screening_is_runner_up:
         revision_count = int(frozen.get("revision_count") or 0)
         if existing is not None:
             revision_count = max(revision_count, int(existing.get("revision_count") or 0))
@@ -3028,12 +3664,21 @@ def finalize_session(
             phase="AWAITING_CLASSIFICATION",
             clock=clock,
         )
+    if _runner_up_failover_eligible(frozen, existing, terminal):
+        return persist_primary_kill_awaiting_runner_up(
+            store,
+            frozen,
+            critic_result,
+            repo_root=repo_root,
+            clock=clock,
+        )
     classifier_receipt = None
+    classifier_view = _classifier_frozen_view(frozen, critic_result)
     if terminal in _FINAL_PASS_TERMINALS:
         root_for_data = data_root if data_root is not None else getattr(store, "_root")
         classifier_receipt = validate_live_classifier_receipt(
             critic_result,
-            frozen,
+            classifier_view,
             repo_root=repo_root,
             data_root=root_for_data,
         )
@@ -3046,7 +3691,10 @@ def finalize_session(
         observed = critic_result.get("classifier_receipt")
         if isinstance(observed, Mapping) and observed.get("schema") == _CLASSIFIER_RECEIPT_SCHEMA:
             classifier_receipt = dict(observed)
-    decision_kind, reason = map_critic_terminal_to_decision(terminal)
+    if terminal == RUNNER_UP_REVISION_REQUIRED:
+        decision_kind, reason = "PAUSE", RUNNER_UP_REVISION_REQUIRED
+    else:
+        decision_kind, reason = map_critic_terminal_to_decision(terminal)
     git_before = repository_git_snapshot(Path(repo_root))
     session_id = str(frozen["session_id"])
     stage_time = _stage_datetime(clock)
@@ -3079,7 +3727,46 @@ def finalize_session(
             transaction_id=transaction_id,
         )
     ]
+    packets_to_store = []
+    primary_packet = frozen.get("critic_input_packet") or frozen.get(
+        "primary_critic_input_packet"
+    )
+    existing_primary = existing.get("critic_input_packet") if existing else None
+    existing_primary_alt = (
+        existing.get("primary_critic_input_packet") if existing else None
+    )
+    if isinstance(primary_packet, Mapping) and not isinstance(
+        existing_primary, Mapping
+    ) and not isinstance(existing_primary_alt, Mapping):
+        packets_to_store.append(primary_packet)
+    runner_packet = frozen.get("runner_up_critic_input_packet")
+    existing_runner = existing.get("runner_up_critic_input_packet") if existing else None
+    if isinstance(runner_packet, Mapping) and not isinstance(existing_runner, Mapping):
+        packets_to_store.append(runner_packet)
+    for packet in packets_to_store:
+        packet_bytes = _canonical_bytes(packet)
+        digest = hashlib.sha256(packet_bytes).hexdigest()
+        records.append(
+            event(
+                record_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id=f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                payload={
+                    "research_artifact_id": f"HFIC-ART-CRITIC-INPUT-{session_id}-{digest[:12].upper()}",
+                    "session_id": session_id,
+                    "hfic_protocol": prompt_version,
+                    "artifact_kind": "CRITIC_INPUT_PACKET",
+                    "payload_canonical": packet_bytes.decode("utf-8"),
+                    "payload_sha256": digest,
+                },
+                transaction_id=transaction_id,
+            )
+        )
     for candidate_id in frozen["candidate_ids"]:
+        prior = ((existing or {}).get("decisions") or {}).get(str(candidate_id))
+        if isinstance(prior, Mapping) and prior.get("decision_kind") == "REJECT":
+            decision_ids.append(f"HFIC-DEC-{candidate_id}")
+            continue
         if candidate_id == selected_id:
             kind, code = decision_kind, reason
         else:
@@ -3147,6 +3834,38 @@ def finalize_session(
         raise HficSessionError("GIT_COMPOSITE_CHANGED")
     if preflight_composite != git_after.composite_sha256:
         raise HficSessionError("GIT_COMPOSITE_CHANGED")
+    forge_selected_id = str(frozen.get("selected_candidate_id") or selected_id)
+    failover_used = bool(frozen.get("runner_up_failover_used")) or (
+        existing is not None
+        and existing.get("session_state") == RUNNER_UP_AWAITING_CRITIC
+    )
+    c2_packet_sha = frozen.get("runner_up_critic_input_packet_sha256")
+    live_packet_sha = critic_result.get("critic_input_packet_sha256") or frozen.get(
+        "critic_input_packet_sha256"
+    )
+    if failover_used:
+        live_packet_sha = c2_packet_sha or live_packet_sha
+        _verify_runner_up_result_bind(
+            critic_result,
+            session_id=session_id,
+            runner_up_id=str(frozen.get("runner_up_candidate_id") or ""),
+            packet_sha=str(c2_packet_sha or ""),
+            definition_sha=str(frozen.get("runner_up_definition_sha256") or ""),
+        )
+    primary_packet_sha = frozen.get("primary_critic_input_packet_sha256") or (
+        frozen.get("critic_input_packet_sha256") if not failover_used else None
+    )
+    if failover_used:
+        receipt_packet_sha = primary_packet_sha or live_packet_sha
+        receipt_result_sha = frozen.get("primary_critic_result_sha256") or critic_result_sha256
+        receipt_terminal = frozen.get("primary_critic_terminal") or observed_terminal
+    else:
+        receipt_packet_sha = live_packet_sha
+        receipt_result_sha = critic_result_sha256
+        receipt_terminal = observed_terminal
+    survivor_id = None
+    if decision_kind == "PAUSE" and reason != RUNNER_UP_REVISION_REQUIRED:
+        survivor_id = selected_id
     receipt = {
         "session_id": session_id,
         "session_state": "SYNTHESIS_COMPLETE",
@@ -3157,15 +3876,19 @@ def finalize_session(
         "live_git_head": git_after.head_sha.lower(),
         "store_inventory_digest": store.diagnostics().committed_inventory_sha256,
         "candidate_ids": list(frozen["candidate_ids"]),
-        "selected_candidate_id": selected_id,
+        "selected_candidate_id": forge_selected_id,
         "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
-        "critic_input_packet_sha256": frozen.get("critic_input_packet_sha256"),
-        "critic_result_sha256": critic_result_sha256,
-        "critic_terminal": terminal,
+        "critic_input_packet_sha256": receipt_packet_sha,
+        "critic_result_sha256": receipt_result_sha,
+        "critic_terminal": receipt_terminal,
         "lane_classifier_terminal": (
-            classifier_receipt.get("lane_classifier_terminal")
-            if classifier_receipt is not None
-            else None
+            None
+            if failover_used
+            else (
+                classifier_receipt.get("lane_classifier_terminal")
+                if classifier_receipt is not None
+                else None
+            )
         ),
         "decision_event_ids": decision_ids,
         "next": str(critic_result.get("next") or "STOP"),
@@ -3194,6 +3917,31 @@ def finalize_session(
         },
         "created_at": created_at,
     }
+    if prompt_version == PROMPT_VERSION:
+        receipt["receipt_schema_version"] = "1.3"
+        receipt["primary_selected_candidate_id"] = forge_selected_id
+        receipt["primary_critic_terminal"] = (
+            frozen.get("primary_critic_terminal") if failover_used else observed_terminal
+        )
+        receipt["primary_critic_result_sha256"] = (
+            frozen.get("primary_critic_result_sha256")
+            if failover_used
+            else critic_result_sha256
+        )
+        receipt["primary_critic_input_packet_sha256"] = primary_packet_sha
+        receipt["runner_up_failover_used"] = failover_used
+        receipt["runner_up_critic_input_packet_sha256"] = frozen.get(
+            "runner_up_critic_input_packet_sha256"
+        )
+        receipt["runner_up_critic_terminal"] = (
+            observed_terminal if failover_used else None
+        )
+        receipt["runner_up_critic_result_sha256"] = (
+            critic_result_sha256 if failover_used else None
+        )
+        receipt["final_survivor_candidate_id"] = survivor_id
+        receipt["final_session_terminal"] = terminal
+        receipt["critic_screen_count"] = 2 if failover_used else 1
     started = frozen.get("session_started_at")
     if isinstance(started, str) and started.strip():
         receipt["session_started_at"] = started
@@ -3203,8 +3951,8 @@ def finalize_session(
         if isinstance(frozen.get("grounded_candidates"), list)
         else None,
         session_meta={
-            "critic_terminal": terminal,
-            "selected_candidate_id": selected_id,
+            "critic_terminal": receipt_terminal,
+            "selected_candidate_id": forge_selected_id,
             "no_worthy_hypothesis": False,
             "lane_classifier_terminal": receipt.get("lane_classifier_terminal"),
             "next_action_type_if_any": None,
@@ -3222,6 +3970,7 @@ def finalize_session(
     if diagnostics is not None:
         receipt["diagnostics"] = diagnostics
     if repo_root is not None:
+        _verify_failover_receipt_identity(receipt)
         _validate_json_schema(
             receipt,
             _session_receipt_schema_path(repo_root, prompt_version),
@@ -3257,18 +4006,44 @@ def finalize_session(
                     "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
                     "focus_key_sha256": frozen.get("focus_key_sha256") or "",
                     "search_key_sha256": frozen.get("search_key_sha256") or "",
-                    "selected_candidate_id": selected_id,
+                    "selected_candidate_id": forge_selected_id,
                     "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
                     "candidate_ids": list(frozen.get("candidate_ids") or []),
-                    "critic_terminal": terminal,
+                    "critic_terminal": receipt_terminal,
+                    "final_session_terminal": terminal,
                     "next": str(critic_result.get("next") or "STOP"),
-                    "critic_input_packet_sha256": frozen.get("critic_input_packet_sha256"),
-                    "critic_result_sha256": critic_result_sha256,
+                    "critic_input_packet_sha256": receipt_packet_sha,
+                    "critic_result_sha256": receipt_result_sha,
                     "session_receipt_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
                     "selected_definition_sha256": frozen.get("selected_definition_sha256"),
                     "git_composite_sha256": git_after.composite_sha256,
                     "research_memory_as_of": frozen.get("research_memory_as_of"),
                     "revision_count": int(frozen.get("revision_count") or 0),
+                    "primary_critic_input_packet_sha256": receipt.get(
+                        "primary_critic_input_packet_sha256"
+                    )
+                    or frozen.get("primary_critic_input_packet_sha256"),
+                    "primary_critic_result_sha256": receipt.get(
+                        "primary_critic_result_sha256"
+                    )
+                    or frozen.get("primary_critic_result_sha256"),
+                    "primary_critic_terminal": receipt.get("primary_critic_terminal")
+                    or frozen.get("primary_critic_terminal"),
+                    "runner_up_critic_input_packet_sha256": frozen.get(
+                        "runner_up_critic_input_packet_sha256"
+                    ),
+                    "runner_up_critic_result_sha256": (
+                        critic_result_sha256 if failover_used else None
+                    ),
+                    "runner_up_critic_terminal": (
+                        observed_terminal if failover_used else None
+                    ),
+                    "runner_up_definition_sha256": frozen.get(
+                        "runner_up_definition_sha256"
+                    ),
+                    "runner_up_failover_used": failover_used,
+                    "critic_screen_count": 2 if failover_used else 1,
+                    "hfic_cycle_seq": _next_cycle_seq(existing),
                 },
                 transaction_id=transaction_id,
             ),
@@ -3277,17 +4052,26 @@ def finalize_session(
     store.append(records, transaction_id=transaction_id)
     store.rebuild_projection()
     receipt["store_inventory_digest"] = store.diagnostics().committed_inventory_sha256
-    receipt["decisions"] = {
-        selected_id: {"decision_kind": decision_kind, "reason_code": reason},
-        **{
-            candidate_id: {
+    decisions: dict[str, dict[str, str]] = {}
+    prior_decisions = dict((existing or {}).get("decisions") or {})
+    for candidate_id in frozen["candidate_ids"]:
+        prior = prior_decisions.get(str(candidate_id))
+        if isinstance(prior, Mapping) and prior.get("decision_kind") == "REJECT":
+            decisions[str(candidate_id)] = {
+                "decision_kind": "REJECT",
+                "reason_code": str(prior.get("reason_code") or ""),
+            }
+        elif candidate_id == selected_id:
+            decisions[str(candidate_id)] = {
+                "decision_kind": decision_kind,
+                "reason_code": reason,
+            }
+        else:
+            decisions[str(candidate_id)] = {
                 "decision_kind": "PAUSE",
                 "reason_code": "NOT_SELECTED_IN_SESSION",
             }
-            for candidate_id in frozen["candidate_ids"]
-            if candidate_id != selected_id
-        },
-    }
+    receipt["decisions"] = decisions
     return receipt
 
 
@@ -3314,7 +4098,13 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         if payload.get("session_id") != session_id:
             continue
         if kind == "RESEARCH_CYCLE":
-            cycles.append(payload)
+            cycles.append(
+                {
+                    **payload,
+                    "effective_at": getattr(record, "effective_at", ""),
+                    "record_id": str(getattr(record, "record_id", "") or ""),
+                }
+            )
             continue
         if kind == "HYPOTHESIS_VERSION":
             candidate_cards.append(payload)
@@ -3357,10 +4147,13 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             has_receipt=has_receipt,
             has_critic=has_critic,
         )
-        ranked = {**payload, "phase": effective}
-        if cycle is None or phase_rank(ranked.get("phase")) <= phase_rank(
-            cycle.get("phase")
-        ):
+        ranked = {
+            **payload,
+            "phase": effective,
+            "effective_at": payload.get("effective_at"),
+            "record_id": payload.get("record_id"),
+        }
+        if cycle is None or _cycle_better(ranked, cycle):
             cycle = ranked
     if cycle is None:
         return None
@@ -3383,11 +4176,32 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
     critic_result_sha = None
     session_receipt = None
     classifier_receipt = None
+    runner_up_result = None
+    runner_up_result_sha = str(cycle.get("runner_up_critic_result_sha256") or "")
     if expected_input_sha:
         _wrapper, critic_input, critic_input_sha = _load_artifact_by_sha(
             artifacts,
             artifact_kind="CRITIC_INPUT_PACKET",
             expected_sha=expected_input_sha,
+        )
+    runner_up_packet = None
+    runner_up_packet_sha = str(cycle.get("runner_up_critic_input_packet_sha256") or "")
+    if runner_up_packet_sha:
+        _wrapper, runner_up_packet, runner_up_packet_sha = _load_artifact_by_sha(
+            artifacts,
+            artifact_kind="CRITIC_INPUT_PACKET",
+            expected_sha=runner_up_packet_sha,
+        )
+    primary_packet = None
+    primary_packet_sha = str(cycle.get("primary_critic_input_packet_sha256") or "")
+    if primary_packet_sha and primary_packet_sha == (expected_input_sha or ""):
+        primary_packet = critic_input
+        primary_packet_sha = critic_input_sha or primary_packet_sha
+    elif primary_packet_sha:
+        _wrapper, primary_packet, primary_packet_sha = _load_artifact_by_sha(
+            artifacts,
+            artifact_kind="CRITIC_INPUT_PACKET",
+            expected_sha=primary_packet_sha,
         )
     if expected_result_sha:
         _wrapper, critic_result, critic_result_sha = _load_artifact_by_sha(
@@ -3395,6 +4209,30 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             artifact_kind="CRITIC_RESULT",
             expected_sha=expected_result_sha,
         )
+    if runner_up_result_sha:
+        _wrapper, runner_up_result, runner_up_result_sha = _load_artifact_by_sha(
+            artifacts,
+            artifact_kind="CRITIC_RESULT",
+            expected_sha=runner_up_result_sha,
+        )
+        _verify_runner_up_result_bind(
+            runner_up_result,
+            session_id=session_id,
+            runner_up_id=str(cycle.get("runner_up_candidate_id") or ""),
+            packet_sha=str(cycle.get("runner_up_critic_input_packet_sha256") or ""),
+            definition_sha=str(cycle.get("runner_up_definition_sha256") or ""),
+        )
+    primary_result_sha = str(cycle.get("primary_critic_result_sha256") or "")
+    primary_critic_result = None
+    if len(primary_result_sha) == 64:
+        if critic_result is not None and primary_result_sha == (critic_result_sha or ""):
+            primary_critic_result = critic_result
+        else:
+            _wrapper, primary_critic_result, _primary_loaded = _load_artifact_by_sha(
+                artifacts,
+                artifact_kind="CRITIC_RESULT",
+                expected_sha=primary_result_sha,
+            )
     if expected_receipt_sha:
         _wrapper, session_receipt, receipt_sha = _load_artifact_by_sha(
             artifacts,
@@ -3422,6 +4260,7 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
                 critic_result_sha=critic_result_sha,
                 receipt_sha=receipt_sha,
             )
+            _verify_failover_receipt_identity(session_receipt)
     if isinstance(session_receipt, Mapping):
         for wrapper, raw in artifacts:
             if wrapper.get("artifact_kind") != "CLASSIFIER_RECEIPT":
@@ -3429,10 +4268,14 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             if isinstance(raw, str):
                 classifier_receipt = json.loads(raw)
             break
-    elif isinstance(critic_result, Mapping):
-        embedded = critic_result.get("classifier_receipt")
-        if isinstance(embedded, Mapping):
-            classifier_receipt = dict(embedded)
+    else:
+        for source in (critic_result, primary_critic_result):
+            if not isinstance(source, Mapping):
+                continue
+            embedded = source.get("classifier_receipt")
+            if isinstance(embedded, Mapping):
+                classifier_receipt = dict(embedded)
+                break
     state = str(cycle.get("phase") or "FROZEN_AWAITING_CRITIC")
     if state == "SYNTHESIS_COMPLETE" and not isinstance(session_receipt, Mapping):
         if cycle.get("critic_terminal") == "NO_WORTHY_HYPOTHESIS" and not cycle.get(
@@ -3456,8 +4299,31 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "candidate_ids": cycle.get("candidate_ids") or unique_ids,
         "critic_input_packet": critic_input,
         "critic_input_packet_sha256": expected_input_sha or critic_input_sha,
+        "primary_critic_input_packet": primary_packet,
+        "primary_critic_input_packet_sha256": primary_packet_sha or cycle.get(
+            "primary_critic_input_packet_sha256"
+        ),
+        "primary_critic_result_sha256": cycle.get("primary_critic_result_sha256"),
+        "primary_critic_terminal": cycle.get("primary_critic_terminal"),
+        "runner_up_critic_input_packet": runner_up_packet,
+        "runner_up_critic_input_packet_sha256": runner_up_packet_sha or cycle.get(
+            "runner_up_critic_input_packet_sha256"
+        ),
+        "runner_up_definition_sha256": cycle.get("runner_up_definition_sha256"),
+        "runner_up_display_ordinal": cycle.get("runner_up_display_ordinal"),
+        "runner_up_failover_used": bool(cycle.get("runner_up_failover_used")),
+        "critic_screen_count": cycle.get("critic_screen_count"),
+        "final_session_terminal": cycle.get("final_session_terminal")
+        or (session_receipt or {}).get("final_session_terminal"),
+        "runner_up_critic_terminal": cycle.get("runner_up_critic_terminal")
+        or (session_receipt or {}).get("runner_up_critic_terminal"),
+        "hfic_cycle_seq": int(cycle.get("hfic_cycle_seq") or 0),
         "critic_result": critic_result,
         "critic_result_sha256": critic_result_sha,
+        "runner_up_critic_result": runner_up_result,
+        "runner_up_critic_result_sha256": runner_up_result_sha or cycle.get(
+            "runner_up_critic_result_sha256"
+        ),
         "session_receipt": session_receipt,
         "session_receipt_sha256": expected_receipt_sha or None,
         "classifier_receipt": classifier_receipt,
@@ -3476,10 +4342,14 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             for item in decisions
         },
         "candidates": candidate_cards,
-        "lane_classifier_terminal": (classifier_receipt or {}).get(
-            "lane_classifier_terminal"
-        )
-        or (session_receipt or {}).get("lane_classifier_terminal"),
+        "lane_classifier_terminal": (
+            None
+            if bool(cycle.get("runner_up_failover_used"))
+            else (
+                (classifier_receipt or {}).get("lane_classifier_terminal")
+                or (session_receipt or {}).get("lane_classifier_terminal")
+            )
+        ),
         "authority": {
             "git_mutation": 0,
             "experiment_execution": 0,
@@ -3615,6 +4485,11 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
         "critic_input_packet_sha256": bundle.get("critic_input_packet_sha256"),
         "critic_result_sha256": bundle.get("critic_result_sha256"),
         "critic_terminal": bundle.get("critic_terminal"),
+        "primary_critic_terminal": bundle.get("primary_critic_terminal"),
+        "final_session_terminal": bundle.get("final_session_terminal"),
+        "runner_up_critic_terminal": bundle.get("runner_up_critic_terminal"),
+        "runner_up_failover_used": bool(bundle.get("runner_up_failover_used")),
+        "critic_screen_count": bundle.get("critic_screen_count"),
         "lane_classifier_terminal": bundle.get("lane_classifier_terminal"),
         "decision_event_ids": bundle.get("decision_event_ids") or [],
         "next": bundle.get("next") or "STOP",
@@ -3652,6 +4527,10 @@ def show_session(store: Any, session_id: str, *, repo_root: Any = None) -> dict[
                     or (
                         bool(bundle.get("critic_result"))
                         and isinstance(bundle.get("session_receipt"), Mapping)
+                        and (
+                            not bundle.get("runner_up_failover_used")
+                            or bool(bundle.get("runner_up_critic_result"))
+                        )
                     )
                 )
             )
@@ -3756,6 +4635,22 @@ def prove_runtime(
             raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
         if not receipt_result or receipt_result != bundle_result:
             raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+        if receipt.get("runner_up_failover_used"):
+            _verify_failover_receipt_identity(receipt)
+            ru_result = str(receipt.get("runner_up_critic_result_sha256") or "")
+            if (
+                len(ru_result) != 64
+                or bundle.get("runner_up_critic_result") is None
+                or str(bundle.get("runner_up_critic_result_sha256") or "") != ru_result
+            ):
+                raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
+            ru_input = str(receipt.get("runner_up_critic_input_packet_sha256") or "")
+            if (
+                len(ru_input) != 64
+                or bundle.get("runner_up_critic_input_packet") is None
+                or str(bundle.get("runner_up_critic_input_packet_sha256") or "") != ru_input
+            ):
+                raise HficSessionError("SESSION_RECEIPT_HASH_MISMATCH")
     shown = show_session(store, session_id, repo_root=repo_root)
     after = repository_git_snapshot(Path(repo_root))
     if not before.unchanged(after):

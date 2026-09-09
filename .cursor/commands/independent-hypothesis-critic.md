@@ -6,7 +6,9 @@ Recovery or explicit critic invoke. Use when Forge already produced a
 Read and follow `.agents/skills/independent-hypothesis-critic/SKILL.md`.
 
 Paste **only** the YAML packet below this line — not Forge narrative, not the
-outer frozen envelope:
+outer frozen envelope. If recovery is after primary `KILL_*` and
+`session_state=RUNNER_UP_AWAITING_CRITIC`, paste the `RESUME_CRITIC`
+`critic_input_packet` (frozen C2), not the original freeze C1 packet.
 
 ```
 CRITIC_INPUT_PACKET:

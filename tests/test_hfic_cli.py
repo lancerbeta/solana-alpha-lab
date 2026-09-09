@@ -621,7 +621,37 @@ class HficTempRootE2ETests(unittest.TestCase):
                 data_root=data_root,
             )
             self.assertEqual(finalized.returncode, 0, finalized.stderr)
-            receipt = json.loads(finalized.stdout)
+            pending_kill = json.loads(finalized.stdout)
+            self.assertEqual(pending_kill["session_state"], "RUNNER_UP_AWAITING_CRITIC")
+            resume_runner = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(resume_runner.returncode, 0, resume_runner.stderr)
+            resume_runner_payload = json.loads(resume_runner.stdout)
+            self.assertEqual(resume_runner_payload["action"], "RESUME_CRITIC")
+            c2 = critic_result_from_packet_only(
+                resume_runner_payload["critic_input_packet"],
+                "KILL_PREPARATORY_LOOP",
+            )
+            c2_path = Path(tmp) / "critic_c2.json"
+            c2_path.write_text(json.dumps(c2), encoding="utf-8")
+            finalized_c2 = run_cli(
+                "finalize",
+                "--session-id",
+                session_id,
+                "--critic-result",
+                str(c2_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(finalized_c2.returncode, 0, finalized_c2.stderr)
+            receipt = json.loads(finalized_c2.stdout)
             self.assertEqual(receipt["session_state"], "SYNTHESIS_COMPLETE")
             self.assertEqual(receipt["critic_terminal"], "KILL_PREPARATORY_LOOP")
             selected = receipt["selected_candidate_id"]
@@ -629,8 +659,10 @@ class HficTempRootE2ETests(unittest.TestCase):
                 receipt["decisions"][selected]["decision_kind"],
                 "REJECT",
             )
+            runner_up = receipt["runner_up_candidate_id"]
+            self.assertEqual(receipt["decisions"][runner_up]["decision_kind"], "REJECT")
             for candidate_id, decision in receipt["decisions"].items():
-                if candidate_id != selected:
+                if candidate_id not in {selected, runner_up}:
                     self.assertEqual(decision["decision_kind"], "PAUSE")
 
             shown = run_cli(
@@ -768,7 +800,40 @@ class HficTempRootE2ETests(unittest.TestCase):
                 data_root=data_root,
             )
             self.assertEqual(finalized.returncode, 0, finalized.stderr)
-            receipt = json.loads(finalized.stdout)
+            pending = json.loads(finalized.stdout)
+            self.assertEqual(pending["session_state"], "RUNNER_UP_AWAITING_CRITIC")
+            resume = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(resume.returncode, 0, resume.stderr)
+            resume_payload = json.loads(resume.stdout)
+            c2_path = Path(tmp) / "critic_c2_packet_only.json"
+            c2_path.write_text(
+                json.dumps(
+                    critic_result_from_packet_only(
+                        resume_payload["critic_input_packet"],
+                        "KILL_MECHANISM",
+                    )
+                ),
+                encoding="utf-8",
+            )
+            finalized_c2 = run_cli(
+                "finalize",
+                "--session-id",
+                str(packet["session_id"]),
+                "--critic-result",
+                str(c2_path),
+                "--format",
+                "json",
+                data_root=data_root,
+            )
+            self.assertEqual(finalized_c2.returncode, 0, finalized_c2.stderr)
+            receipt = json.loads(finalized_c2.stdout)
             self.assertEqual(receipt["session_state"], "SYNTHESIS_COMPLETE")
             self.assertEqual(receipt["critic_terminal"], "KILL_MECHANISM")
             self.assertEqual(receipt["session_id"], outer_session)

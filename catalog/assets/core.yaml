@@ -31917,7 +31917,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://schemas/research_memory_projection_v1.sql', repository_path: schemas/research_memory_projection_v1.sql}
-  integrity: {kind: sha256, sha256: c95c04766095df5c4183daa2fe09a76676d2fcda1be8220f9f55c028dd8b45ff}
+  integrity: {kind: sha256, sha256: 3132d0ae51f2c3e225577abb50787c757998a958727455b3475547f895d0a0d8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32306,7 +32306,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 300e412c3f740519cc6b2e3c4b4dc9d7a45d30e33d7e16df5610bfd0604b1f16}
+  integrity: {kind: sha256, sha256: 0667a994f56e7ae0f1efe7f98e1fa395492a3303ce277343a358656074d5cb85}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32409,7 +32409,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_operational_closure_v1.py', repository_path: tests/test_hfic_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: 6cf6eef0d8afa14fcda0e336fff559dfe228d1e44da0aee1251f835516e88f4e}
+  integrity: {kind: sha256, sha256: 74b0efcec23c18d805e0fb35285eb36d9c64db7fa4c9380a4c65bf89bbcebd31}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -33211,7 +33211,7 @@ records:
   as_of: '2026-08-30'
   truth_owner: HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_epistemic_memory_semantics.py', repository_path: tests/test_hfic_epistemic_memory_semantics.py}
-  integrity: {kind: sha256, sha256: 900dcf890f5d08be7cbb37798e430bd2b6395cf42bd2741780d05226b8dc0e05}
+  integrity: {kind: sha256, sha256: 11bc6929fd9c6982235312eeba0b5fbc26cdc6843be4baacd28b6dd9a9969c5f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001}
@@ -34179,7 +34179,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/hypothesis_forge_independent_critic_v1.yaml', repository_path: configs/hypothesis_forge_independent_critic_v1.yaml}
-  integrity: {kind: sha256, sha256: ff4b5904c14fd6af02e4f071d5b8e4102434ec75bb10b2f141fc8557e803f2c3}
+  integrity: {kind: sha256, sha256: 322b94c1a37a5c3edbaa6ac473d9c200f28217df6b559f56728a64f968755817}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34197,7 +34197,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 070fd741252ea3b99c8e7647cd8abc48bd191f30c746014b78b5008e685c0453}
+  integrity: {kind: sha256, sha256: db125d42ad5258aa33dc0a5bce024e5da4df328f1af2ba61e4d57bc919b6257b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34215,7 +34215,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: bcc7ed23731baf8f8408c90b52cbd3d02e1bd1c036ab7b5ab90581a0240df7a4}
+  integrity: {kind: sha256, sha256: d662e9492a68c20e62f905552288041c76fb3258a9357759cf531730a90ce0af}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

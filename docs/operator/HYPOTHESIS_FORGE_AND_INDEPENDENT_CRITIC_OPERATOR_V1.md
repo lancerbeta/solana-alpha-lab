@@ -25,8 +25,10 @@ by `freeze`, not by the model.
 
 **Целевая эксплуатационная точка:** `/hypothesis-forge` →
 `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight`
-→ bounded draft → `freeze` → isolated Critic → optional `revise` / `classify` →
-`finalize`. До commissioning preflight сам выполняет безопасный offline Fast Lane
+→ bounded draft → `freeze` (C1 + pre-frozen C2 packets) → isolated Critic #1
+→ optional primary `revise` / `classify` → on final primary `KILL_*`, isolated
+Critic #2 on the pre-frozen C2 packet → `finalize`. C2 `REVISE_ONCE` is typed
+PAUSE, not a second wording repair. До commissioning preflight сам выполняет безопасный offline Fast Lane
 commissioning.
 
 `FORGE_CONTEXT_PACKET` includes bounded `semantic_capability_entries` (Forge-visible
@@ -45,8 +47,10 @@ write or Git mutation. Do not invoke a bare workstation `python`.
 Один явный `/hypothesis-forge` авторизует ровно одну HFIC-сессию до финального
 terminal/STOP. Не спрашивать owner про Run или append-only RDP write между
 preflight, freeze, Critic, revision/classification и finalize.
-`PASS_TO_CLASSIFICATION` и ровно один bounded `REVISE_ONCE` продолжаются
-автоматически внутри той же slash-authority. Если isolated Critic context
+`PASS_TO_CLASSIFICATION` и ровно один bounded **primary** `REVISE_ONCE` продолжаются
+автоматически внутри той же slash-authority. Финальный primary `KILL_*` даёт
+ровно один экран уже замороженному runner-up. C2 `REVISE_ONCE` **не**
+продолжается как `revise`. Если isolated Critic context
 недоступен — typed `AUTO_HANDOFF_UNAVAILABLE`, без silent self-critic.
 
 Slash **не** даёт Git mutation, experiment execution, provider/API/RPC/WSS,
@@ -89,6 +93,9 @@ presents 1970 as an operational date. Uncovered placeholder HFIC records make
 - **Детерминированный lane classifier** отвечает за маршрут выполнения. Ни Forge, ни Critic не могут назначить маршрут по впечатлению.
 
 Один вечерний цикл создаёт максимум **одну** исполнимую единицу. Пять красивых идей — это не пять задач.
+Если Forge уже заморозил distinct runner-up, финальный `KILL_*` selected candidate
+не завершает вечер сам по себе: тот же slash даёт C2 ровно один независимый экран.
+Это не tournament и не право выбрать «следующего» кандидата.
 
 ---
 
@@ -100,29 +107,34 @@ presents 1970 as an operational date. Uncovered placeholder HFIC records make
 2. Агент следует `.agents/skills/hypothesis-forge/SKILL.md`: executable
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight`
    → PROMPT A выдаёт machine-valid `FORGE_DRAFT` → `freeze` создаёт
-   `CRITIC_INPUT_PACKET` → isolated Critic → при `REVISE_ONCE` ровно один
+   `CRITIC_INPUT_PACKET` (и отдельно замороженный C2 packet) → isolated Critic #1
+   → при **primary** `REVISE_ONCE` ровно один
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py revise`
    и повтор Critic; при `PASS_TO_CLASSIFICATION`
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify`;
-   затем `finalize`.
+   при финальном primary `KILL_*` — isolated Critic #2 **только** на pre-frozen
+   C2 packet, затем `finalize`. C2 `REVISE_ONCE` не вызывает `revise`.
    Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` или
    `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: это BLOCKED, не crash. Session не
    записан. Critic не запускать, packet не вставлять, тот же slash не ретраить
    в ожидании success. `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`.
    Bound: `prior_memory.max_records=64`, `max_bytes=65536` в
    `configs/hypothesis_forge_independent_critic_v1.yaml`.
-3. Вечерний цикл **не завершён**, пока Critic не вернул финальный terminal
-   (`KILL_*` / `NO_WORTHY_HYPOTHESIS` или post-classifier `PASS_*`) и `finalize`
-   не записал `SESSION_RECEIPT`, **кроме**:
+3. Вечерний цикл **не завершён**, пока `finalize` не записал `SESSION_RECEIPT` со
+   `session_state=SYNTHESIS_COMPLETE`, **кроме**:
    - `NO_WORTHY_HYPOTHESIS` (Critic пропускается; complete на freeze + next action);
    - `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` / `PRIOR_MEMORY_RECORD_UNIDENTIFIED`
      (BLOCKED; session не записан; Critic не запускать; цикл останавливается на
      typed STOP, не на Critic).
-   `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` —
+   Primary `KILL_*` с `session_state=RUNNER_UP_AWAITING_CRITIC` — **не** complete:
+   сначала Critic #2. `REVISE_ONCE` (только C1) и `PASS_TO_CLASSIFICATION` —
    intermediate states, не complete. Команды `revise` и `classify` — тот же CLI,
-   не prose-only переход.
+   не prose-only переход. C2 `REVISE_ONCE` → `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`,
+   `OWNER NEXT=STOP`. Не `revise`, не C3, не новый AUTO search, не candidate shopping.
 4. Recovery: **`/independent-hypothesis-critic`** с вставленным packet только если auto-handoff
-   прервался.
+   прервался. Если session = `RUNNER_UP_AWAITING_CRITIC`, вставляйте packet из
+   same-AUTO `RESUME_CRITIC` (`critic_input_packet` = frozen C2), не C1 packet
+   из исходного freeze.
 
 Опциональный фокус передаётся в slash-чате, например `OWNER_FOCUS=execution-aware entry/exit asymmetry at small notional`.
 
@@ -161,7 +173,11 @@ OWNER_FOCUS=execution-aware entry/exit asymmetry at small notional
 `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED`, не открывайте Critic:
 `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`. Packet создаёт только freeze.
 
-Откройте **новый чат**. Желательно использовать другую сильную модель; если модель та же — новый контекст обязателен. Передайте ей этот файл и только `CRITIC_INPUT_PACKET` из freeze:
+Откройте **новый чат**. Желательно использовать другую сильную модель; если модель та же — новый контекст обязателен. Передайте ей этот файл и только `CRITIC_INPUT_PACKET`:
+для Critic #1 — packet из freeze (`selected_candidate` = C1);
+для Critic #2 / recovery при `RUNNER_UP_AWAITING_CRITIC` — packet из same-AUTO
+`RESUME_CRITIC` (`selected_candidate` = frozen C2). Не вставляйте C1 packet
+после primary KILL.
 
 ```text
 RUN INDEPENDENT_HYPOTHESIS_CRITIC_V1
@@ -179,8 +195,9 @@ RUN INDEPENDENT_HYPOTHESIS_CRITIC_V1
 
 ### Шаг 3 — действие после Critic (manual fallback only)
 
-На каноническом slash-пути `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` продолжаются
-агентом автоматически. Эта таблица — только для manual fallback или после
+На каноническом slash-пути **primary** `REVISE_ONCE` и `PASS_TO_CLASSIFICATION` продолжаются
+агентом автоматически. C2 `REVISE_ONCE` на slash-пути **не** продолжает `revise`.
+Эта таблица — только для manual fallback или после
 typed `AUTO_HANDOFF_UNAVAILABLE`.
 
 | Terminal | Что делать владельцу |
@@ -188,8 +205,9 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 | `PASS_FAST_LANE_READY` | Передать сюда итог Critic. После проверки отдельно разрешить no-Git run. |
 | `PASS_CHANGE_LANE_REQUIRED` | Передать сюда PRD+SSD capability-атома. После проверки отдельно разрешить один PR. |
 | `PASS_DATA_OPTION_REQUIRED` | Сначала решить, оправдан ли forward collection по цене и option value. |
-| `REVISE_ONCE` | Fallback only: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. |
-| `KILL_*` | Ничего не выполнять. Можно отправить Critic уже оценённого runner-up; новую генерацию на тех же evidence в этот вечер не запускать. |
+| `REVISE_ONCE` | Только primary/C1. Fallback: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. Если это Critic #2 / C2: **не** revise. `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`. `OWNER NEXT=STOP`. |
+| `KILL_*` | Если это ещё primary/C1: same slash auto-screens the already-frozen runner-up once (`RUNNER_UP_AWAITING_CRITIC`). Do not regenerate, do not pick another portfolio candidate, do not start a new AUTO search. Если это уже C2: session complete, no survivor unless a PASS terminal. |
+| `RUNNER_UP_REVISION_REQUIRED` | Typed PAUSE after C2 `REVISE_ONCE`. Evening STOP. Preserve C2 in memory. Do not claim scientific fail or pass. No C3. |
 | `NO_WORTHY_HYPOTHESIS` | Нормальный полезный результат. Same slash runs Prompt C and persists one typed next action. Do not invent a task. |
 | `OWNER_DECISION_REQUIRED` | Принять только названное материальное решение; не выдавать общее разрешение. |
 
@@ -821,7 +839,8 @@ decision after collection
 - Какое решение изменит PASS, FAIL и INCONCLUSIVE?
 - Можно ли закрыть тот же вопрос дешевле?
 - Не потребует ли ход двух preparatory atoms до market answer?
-- Не лучше ли Stop/Wait/runner-up?
+- Не лучше ли Stop/Wait, чем строить ещё инфраструктуру?
+- Не предлагай owner выбрать другого кандидата из портфеля и не предлагай новый AUTO search. Runner-up failover — только already-frozen C2 after primary KILL, и это делает Forge/session, не Critic.
 
 ### 8. Capability/data delta
 
@@ -852,9 +871,10 @@ OWNER_DECISION_REQUIRED
 Правила:
 
 - `REVISE_ONCE` разрешён только для исправления definition, binding, estimand, negative control или scope без смены механизма и без просмотра новых outcomes.
+- Если этот packet — runner-up / Critic #2, всё равно верни обычный B4 terminal. Forge **не** выполнит C2 revision: `REVISE_ONCE` станет `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`.
 - Если требуется добавить features, изменить population после результата, заменить mechanism или построить широкую инфраструктуру — `KILL`, не revision.
-- После одной revision второй `REVISE_ONCE` запрещён: выбери PASS или KILL.
-- Critic не обязан выбирать runner-up. Это отдельный прогон уже существующего packet, а не новая генерация.
+- После одной **primary** revision второй `REVISE_ONCE` запрещён: выбери PASS или KILL.
+- Critic #2, if launched, evaluates the pre-frozen runner-up packet independently. It must not see C1 reasoning. This is not a new generation and not a portfolio tournament.
 
 ## B5. Если terminal = PASS_TO_CLASSIFICATION
 
@@ -943,6 +963,9 @@ Never generate those fields.
 9. `FINAL EXECUTION UNIT` — максимум одна либо `NONE`.
 10. `NON_CLAIMS`.
 11. `OWNER NEXT` — ровно одно действие либо `STOP`.
+    Запрещено: «выберите runner-up», «попробуйте следующего кандидата»,
+    «запустите новый AUTO search». Primary KILL failover делает session/Forge,
+    не этот Critic report.
 
 Не заканчивай фразой «можно дополнительно». Не создавай условный backlog.
 
@@ -1105,6 +1128,8 @@ research_memory_as_of
 candidate_count
 selected_candidate_or_none
 critic_terminal
+final_session_terminal_or_legacy_same
+runner_up_critic_terminal_or_none
 lane_classifier_terminal_or_none
 ```
 

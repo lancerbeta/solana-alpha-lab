@@ -1417,6 +1417,15 @@ def run_preflight(
                 receipt_body["critic_input_packet_sha256"] = bundle.get(
                     "critic_input_packet_sha256"
                 )
+            if bundle.get("runner_up_critic_input_packet_sha256"):
+                receipt_body["runner_up_critic_input_packet_sha256"] = bundle.get(
+                    "runner_up_critic_input_packet_sha256"
+                )
+                receipt_body["runner_up_definition_sha256"] = bundle.get(
+                    "runner_up_definition_sha256"
+                )
+            if str(bundle.get("session_state") or "") == "RUNNER_UP_AWAITING_CRITIC":
+                receipt_body["session_state"] = "RUNNER_UP_AWAITING_CRITIC"
             if action in {"RESUME_FINALIZE", "RESUME_CLASSIFY"} and bundle.get(
                 "critic_result"
             ):
