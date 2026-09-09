@@ -21,6 +21,8 @@ cohort_normalization_activation: NEW_PREREGISTRATION_REQUIRED
 current_live_cohort_scientific_content_accessed: false
 control_run_required_first: true
 one_registered_trial: true
+control_branching_field: effective_control_terminal
+effective_control_terminal: final_session_terminal_else_critic_terminal
 scores_pnl: false
 new_novelty_scorer: forbidden
 projection_code_implemented: false
@@ -139,14 +141,14 @@ control_terminals_permit_probe:
 case_a:
   probe_trigger: false
   next: CHEAPEST_MARKET_FALSIFIER
-  if_control_critic_terminal_in:
+  if_effective_control_terminal_in:
     - PASS_FAST_LANE_READY
     - PASS_CHANGE_LANE_REQUIRED
 case_c:
   code: INVALID_CASE_C_OBSERVABILITY
   if_any:
     - control_forge_context_or_preflight_cannot_be_built
-    - control_critic_terminal_in_KILL_UNBOUND_EVIDENCE_or_KILL_DATA_INFEASIBLE
+    - effective_control_terminal_in_KILL_UNBOUND_EVIDENCE_or_KILL_DATA_INFEASIBLE
     - imported_corpus_absent_from_current_forge_packet
 invalid_coverage_broken_if:
   - discovery_coverage_class_is_GAP_CONFIRMED
@@ -259,16 +261,23 @@ Not automatically after import. All trigger conjuncts in the front matter must b
 including one CONTROL `/hypothesis-forge` on the **unchanged current representation** for
 that exact evidence epoch.
 
-If CONTROL `critic_terminal` is `PASS_FAST_LANE_READY` or `PASS_CHANGE_LANE_REQUIRED` (CASE A):
+If CONTROL `effective_control_terminal` is `PASS_FAST_LANE_READY` or
+`PASS_CHANGE_LANE_REQUIRED` (CASE A):
 `PROBE_TRIGGER=FALSE`, `NEXT=CHEAPEST_MARKET_FALSIFIER`.
 
-CONTROL permits the probe only when `critic_terminal` is `NO_WORTHY_HYPOTHESIS` or
-`KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. Do not invent a post-hoc "representation gap"
-terminal after seeing candidates.
+`effective_control_terminal` is `final_session_terminal` when the current receipt
+provides a non-empty value; otherwise it falls back to `critic_terminal`. Do not
+rewrite historical receipts. Do not treat the primary C1 kill as the probe branch
+after C2 produced another final outcome.
+
+CONTROL permits the probe only when `effective_control_terminal` is
+`NO_WORTHY_HYPOTHESIS` or `KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED`. Final
+`RUNNER_UP_REVISION_REQUIRED` is PAUSE: probe is not triggered. Do not invent a
+post-hoc "representation gap" terminal after seeing candidates.
 
 CASE C is `INVALID_CASE_C_OBSERVABILITY` when CONTROL cannot build FORGE_CONTEXT / preflight
-fails, the imported corpus is absent from the current packet, or CONTROL ends
-`KILL_UNBOUND_EVIDENCE` / `KILL_DATA_INFEASIBLE`. That is not KILL.
+fails, the imported corpus is absent from the current packet, or CONTROL
+`effective_control_terminal` is `KILL_UNBOUND_EVIDENCE` / `KILL_DATA_INFEASIBLE`. That is not KILL.
 
 `INVALID_COVERAGE_BROKEN` only if `discovery_coverage_class=GAP_CONFIRMED` or readiness is
 outside the two allowed READY states. `DISCOVERY_COVERAGE_UNKNOWN` / `GAP_SUSPECTED` may

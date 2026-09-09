@@ -103,6 +103,10 @@
       "pattern": "^HFIC-CAND-[0-9A-F]{12,64}$"
     },
     "final_session_terminal": {"type": "string", "minLength": 1},
+    "effective_control_terminal": {"type": "string", "minLength": 1},
+    "evidence_surface_mode": {
+      "enum": ["CURRENT_REPRESENTATION_CONTROL_V1"]
+    },
     "critic_screen_count": {"type": "integer", "minimum": 1, "maximum": 2},
     "critic_terminal": {"type": "string", "minLength": 1},
     "lane_classifier_terminal": {"type": ["string", "null"]},

@@ -44,7 +44,8 @@ PROMPT_VERSION = "HFIC-V1.2"
 PROMPT_VERSION_V1_1 = "HFIC-V1.1"
 SUPPORTED_PROMPT_VERSIONS = frozenset({PROMPT_VERSION_V1_1, PROMPT_VERSION})
 CRITIC_PACKET_VERSION_V11 = "1.1"
-CRITIC_PACKET_VERSION_CURRENT = "1.3"
+CRITIC_PACKET_VERSION_V13_HISTORICAL = "1.3"
+CRITIC_PACKET_VERSION_CURRENT = "1.4"
 DRAFT_SCHEMA_BY_PACKET_VERSION = {
     "1.1": "catalog/schemas/hypothesis_forge_draft_v1.schema.json",
     "1.2": "catalog/schemas/hypothesis_forge_draft_v1_2.schema.json",
@@ -192,6 +193,7 @@ def search_key_sha256(
     owner_focus: str,
     prompt_version: str,
     memory_eligibility_sha256: str | None = None,
+    evidence_surface_mode: str | None = None,
 ) -> str:
     from solana_alpha_lab.factory.hfic_memory_policy import search_identity_sha256
 
@@ -200,6 +202,7 @@ def search_key_sha256(
         owner_focus,
         prompt_version,
         memory_eligibility_sha256,
+        evidence_surface_mode,
     )
 
 
@@ -530,8 +533,8 @@ def _draft_prompt_version(draft: Mapping[str, Any]) -> str:
 def _critic_packet_version(draft_packet_version: str) -> str:
     """Map Forge draft version to Critic transport version.
 
-    Fresh HFIC-V1.2 freeze emits critic packet 1.3. Historical draft 1.1 stays
-    critic 1.1. Do not mint an HFIC-V1.3 Prompt A.
+    Fresh HFIC-V1.2 freeze emits critic packet 1.4. Historical draft 1.1 stays
+    critic 1.1. Do not mint an HFIC-V1.3 or HFIC-V1.4 Prompt A.
     """
     if draft_packet_version == "1.2":
         return CRITIC_PACKET_VERSION_CURRENT
@@ -556,13 +559,105 @@ def _session_receipt_schema_path(
     return Path(repo_root) / relative
 
 
-def _selected_candidate_block(identity: Any, card: Mapping[str, Any]) -> dict[str, Any]:
+def _copy_feature_bindings(raw: object) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    if not isinstance(raw, list):
+        return out
+    for item in raw:
+        if not isinstance(item, Mapping):
+            continue
+        binding: dict[str, Any] = {
+            "feature_id": str(item.get("feature_id") or ""),
+            "availability_class": str(item.get("availability_class") or ""),
+            "available_to_strategy_semantics": str(
+                item.get("available_to_strategy_semantics") or ""
+            ),
+        }
+        value_status = item.get("value_status")
+        if isinstance(value_status, str) and value_status:
+            binding["value_status"] = value_status
+        out.append(binding)
+    return out
+
+
+def _copy_capability_bindings(raw: object) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    if not isinstance(raw, list):
+        return out
+    for item in raw:
+        if not isinstance(item, Mapping):
+            continue
+        out.append(
+            {
+                "capability_id": str(item.get("capability_id") or ""),
+                "accepted": bool(item.get("accepted")),
+                "authority_granted": bool(item.get("authority_granted")),
+            }
+        )
+    return out
+
+
+def _freeze_owned_grounding_fields(card: Mapping[str, Any]) -> dict[str, Any]:
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CRITIC_PACKET_GROUNDING_MISMATCH,
+        text_list,
+    )
+
+    grounding = card.get("grounding")
+    if not isinstance(grounding, Mapping):
+        raise HficSessionError(CRITIC_PACKET_GROUNDING_MISMATCH)
+    copied = {
+        "context_packet_sha256": str(grounding.get("context_packet_sha256") or ""),
+        "feature_bindings": _copy_feature_bindings(grounding.get("feature_bindings")),
+        "capability_bindings": _copy_capability_bindings(
+            grounding.get("capability_bindings")
+        ),
+        "unresolved_requirements": text_list(grounding.get("unresolved_requirements")),
+        "terminal": str(grounding.get("terminal") or ""),
+    }
+    state = card.get("state_transition")
+    if state is not None and not isinstance(state, str):
+        state = str(state)
+    return {
+        "estimand": str(card.get("estimand") or ""),
+        "state_transition": state,
+        "required_feature_ids": [
+            str(item) for item in (card.get("required_feature_ids") or []) if item
+        ],
+        "required_capability_ids": [
+            str(item) for item in (card.get("required_capability_ids") or []) if item
+        ],
+        "unresolved_requirements": text_list(card.get("unresolved_requirements")),
+        "grounding": copied,
+    }
+
+
+def _copy_evidence_surface_mode(
+    target: dict[str, Any],
+    source: Mapping[str, Any] | None,
+) -> None:
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+        session_evidence_surface_mode,
+    )
+
+    mode = session_evidence_surface_mode(source)
+    if mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        target["evidence_surface_mode"] = mode
+
+
+def _selected_candidate_block(
+    identity: Any,
+    card: Mapping[str, Any],
+    *,
+    packet_version: str | None = None,
+) -> dict[str, Any]:
     required_caps = card.get("required_capability_ids") or []
     if not isinstance(required_caps, list):
         required_caps = []
     decision_unlocked = str(card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT")
     disconfirming = str(card.get("disconfirming_prediction") or "NOT_DECLARED_IN_DRAFT")
-    return {
+    block: dict[str, Any] = {
         "candidate_id": identity.candidate_id,
         "claim": str(card.get("claim") or ""),
         "nearest_prior_and_difference": str(
@@ -596,6 +691,9 @@ def _selected_candidate_block(identity: Any, card: Mapping[str, Any]) -> dict[st
         "decision_unlocked": decision_unlocked,
         "_required_capability_ids": [str(item) for item in required_caps],
     }
+    if packet_version == CRITIC_PACKET_VERSION_CURRENT:
+        block.update(_freeze_owned_grounding_fields(card))
+    return block
 
 
 def _provisional_lane(required_caps: Sequence[str]) -> dict[str, Any]:
@@ -613,11 +711,16 @@ def _build_runner_up_critic_packet(
     *,
     runner_up: Any,
     runner_up_card: Mapping[str, Any],
+    packet_version: str,
 ) -> dict[str, Any]:
     packet = copy.deepcopy(dict(primary_packet))
     if "prior_memory" in primary_packet:
         packet["prior_memory"] = primary_packet["prior_memory"]
-    selected = _selected_candidate_block(runner_up, runner_up_card)
+    selected = _selected_candidate_block(
+        runner_up,
+        runner_up_card,
+        packet_version=packet_version,
+    )
     required_caps = selected.pop("_required_capability_ids")
     packet["selected_candidate"] = selected
     packet["provisional_lane"] = _provisional_lane(required_caps)
@@ -986,6 +1089,10 @@ def freeze_draft(
                     preflight_receipt.get("memory_eligibility_sha256") or ""
                 )
                 or None,
+                evidence_surface_mode=str(
+                    preflight_receipt.get("evidence_surface_mode") or ""
+                )
+                or None,
             )
         bound = bind_preflight_receipt(
             preflight_receipt,
@@ -1005,7 +1112,35 @@ def freeze_draft(
         if isinstance(maybe_head, str) and len(maybe_head) == 40:
             git_head = maybe_head.lower()
     critic_packet_version = _critic_packet_version(packet_version)
-    selected_block = _selected_candidate_block(selected, selected_card)
+    selected_transport = (
+        grounded_candidates[selected_index]
+        if grounded_candidates is not None
+        else selected_card
+    )
+    selected_block = _selected_candidate_block(
+        selected,
+        selected_transport,
+        packet_version=critic_packet_version,
+    )
+    if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            CRITIC_PACKET_GROUNDING_MISMATCH,
+            assert_packet_grounding_consistent,
+        )
+
+        context_sha = _context_packet_sha_from_preflight(preflight_receipt)
+        grounding = selected_transport.get("grounding")
+        if not isinstance(grounding, Mapping):
+            raise HficSessionError(CRITIC_PACKET_GROUNDING_MISMATCH)
+        try:
+            assert_packet_grounding_consistent(
+                selected_block,
+                selected_card,
+                grounding,
+                context_sha,
+            )
+        except ValueError as exc:
+            raise HficSessionError(str(exc)) from exc
     selected_required_caps = selected_block.pop("_required_capability_ids")
     packet = {
         "packet_schema": "smial.hypothesis-critic-input",
@@ -1072,6 +1207,12 @@ def freeze_draft(
                 )
             )
             or None,
+            (
+                str(preflight_receipt.get("evidence_surface_mode") or "")
+                if isinstance(preflight_receipt, Mapping)
+                else None
+            )
+            or None,
         )
     if search_key:
         session_id = "HFIC-SESS-" + search_key[:16].upper()
@@ -1099,11 +1240,42 @@ def freeze_draft(
             packet,
             Path(repo_root) / "catalog/schemas/hypothesis_critic_input_v1.schema.json",
         )
-    runner_up_packet = _build_runner_up_critic_packet(
-        packet,
-        runner_up=runner_up,
-        runner_up_card=runner_up_card,
+    runner_up_transport = (
+        grounded_candidates[runner_up_index]
+        if grounded_candidates is not None
+        else runner_up_card
     )
+    if critic_packet_version == CRITIC_PACKET_VERSION_CURRENT:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            CRITIC_PACKET_GROUNDING_MISMATCH,
+            assert_packet_grounding_consistent,
+        )
+
+        runner_grounding = runner_up_transport.get("grounding")
+        if not isinstance(runner_grounding, Mapping):
+            raise HficSessionError(CRITIC_PACKET_GROUNDING_MISMATCH)
+        runner_up_packet = _build_runner_up_critic_packet(
+            packet,
+            runner_up=runner_up,
+            runner_up_card=runner_up_transport,
+            packet_version=critic_packet_version,
+        )
+        try:
+            assert_packet_grounding_consistent(
+                runner_up_packet["selected_candidate"],
+                runner_up_card,
+                runner_grounding,
+                _context_packet_sha_from_preflight(preflight_receipt),
+            )
+        except ValueError as exc:
+            raise HficSessionError(str(exc)) from exc
+    else:
+        runner_up_packet = _build_runner_up_critic_packet(
+            packet,
+            runner_up=runner_up,
+            runner_up_card=runner_up_card,
+            packet_version=critic_packet_version,
+        )
     _bind_packet_session_id(runner_up_packet, session_id)
     if repo_root is not None:
         _validate_json_schema(
@@ -1192,6 +1364,10 @@ def freeze_draft(
     }
     if grounded_candidates is not None:
         result["grounded_candidates"] = grounded_candidates
+    _copy_evidence_surface_mode(
+        result,
+        preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
+    )
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -1211,6 +1387,12 @@ def freeze_draft(
                     if isinstance(preflight_receipt, Mapping)
                     else ""
                 )
+            )
+            or None,
+            evidence_surface_mode=(
+                str(preflight_receipt.get("evidence_surface_mode") or "")
+                if isinstance(preflight_receipt, Mapping)
+                else None
             )
             or None,
         )
@@ -1292,6 +1474,10 @@ def _freeze_no_worthy(
                     preflight_receipt.get("memory_eligibility_sha256") or ""
                 )
                 or None,
+                evidence_surface_mode=str(
+                    preflight_receipt.get("evidence_surface_mode") or ""
+                )
+                or None,
             )
         bound = bind_preflight_receipt(
             preflight_receipt,
@@ -1349,6 +1535,12 @@ def _freeze_no_worthy(
                     if isinstance(preflight_receipt, Mapping)
                     else None
                 )
+            )
+            or None,
+            (
+                str(preflight_receipt.get("evidence_surface_mode") or "")
+                if isinstance(preflight_receipt, Mapping)
+                else None
             )
             or None,
         )
@@ -1423,6 +1615,10 @@ def _freeze_no_worthy(
     }
     if grounded_candidates is not None:
         result["grounded_candidates"] = list(grounded_candidates)
+    _copy_evidence_surface_mode(
+        result,
+        preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
+    )
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -1823,6 +2019,11 @@ def persist_no_worthy_session(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": 0,
+                **(
+                    {"evidence_surface_mode": frozen["evidence_surface_mode"]}
+                    if frozen.get("evidence_surface_mode")
+                    else {}
+                ),
             },
         ),
         event(
@@ -2081,6 +2282,7 @@ def persist_frozen_session(
                 "revision_count": int(frozen.get("revision_count") or 0),
                 "hfic_cycle_seq": 1,
             }
+    _copy_evidence_surface_mode(cycle_payload, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -2351,6 +2553,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "effective_at": getattr(record, "effective_at", ""),
                 "record_id": str(getattr(record, "record_id", "") or ""),
                 "hfic_cycle_seq": int(payload.get("hfic_cycle_seq") or 0),
+                "evidence_surface_mode": payload.get("evidence_surface_mode"),
             }
         )
     latest: dict[str, dict[str, Any]] = {}
@@ -2373,16 +2576,28 @@ def find_session_by_epoch_focus(
     epoch: str,
     focus_key: str,
     memory_eligibility_sha256: str | None = None,
+    evidence_surface_mode: str | None = None,
 ) -> dict[str, Any] | None:
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        session_evidence_surface_mode,
+    )
     from solana_alpha_lab.factory.hfic_memory_policy import session_memory_eligibility
 
+    expected_mode = session_evidence_surface_mode(
+        {"evidence_surface_mode": evidence_surface_mode}
+        if evidence_surface_mode
+        else None
+    )
     matched = [
         item
         for item in list_hfic_sessions(store)
         if item.get("evidence_epoch_sha256") == epoch
         and item.get("focus_key_sha256") == focus_key
         and session_memory_eligibility(item)
-        == session_memory_eligibility({"memory_eligibility_sha256": memory_eligibility_sha256})
+        == session_memory_eligibility(
+            {"memory_eligibility_sha256": memory_eligibility_sha256}
+        )
+        and session_evidence_surface_mode(item) == expected_mode
     ]
     if not matched:
         return None
@@ -2873,6 +3088,24 @@ def run_live_classifier(
     except ExperimentSpecError as exc:
         raise HficSessionError("EXPERIMENT_SPEC_INVALID") from exc
     spec_sha = experiment_spec_sha256(validated)
+    packet_in = frozen.get("critic_input_packet")
+    if (
+        isinstance(packet_in, Mapping)
+        and packet_in.get("packet_version") == CRITIC_PACKET_VERSION_CURRENT
+    ):
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            assert_experiment_spec_grounding,
+        )
+
+        selected = packet_in.get("selected_candidate")
+        if not isinstance(selected, Mapping):
+            raise HficSessionError("EXPERIMENT_SPEC_GROUNDING_MISMATCH")
+        try:
+            assert_experiment_spec_grounding(validated, selected)
+        except ValueError as exc:
+            raise HficSessionError(str(exc)) from exc
+    else:
+        selected = None
     as_of_raw = ""
     for candidate in (
         submission.get("classifier_evaluated_at") if isinstance(submission, Mapping) else None,
@@ -2893,6 +3126,15 @@ def run_live_classifier(
         data_root=Path(data_root),
         as_of=as_of,
     )
+    if selected is not None:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            deny_unresolved_fast_lane,
+        )
+
+        try:
+            deny_unresolved_fast_lane(selected, str(decision.terminal))
+        except ValueError as exc:
+            raise HficSessionError(str(exc)) from exc
     return build_classifier_receipt(
         frozen=frozen,
         decision=decision,
@@ -3001,6 +3243,8 @@ def persist_intermediate_cycle(
     source = existing if existing is not None else frozen
     _attach_runner_up_fields(intermediate_cycle, source)
     _attach_runner_up_fields(intermediate_cycle, frozen)
+    _copy_evidence_surface_mode(intermediate_cycle, source)
+    _copy_evidence_surface_mode(intermediate_cycle, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         intermediate_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -3239,6 +3483,20 @@ def apply_revision(
             selected_card.get("decision_unlocked") or "NOT_DECLARED_IN_DRAFT"
         ),
     }
+    if (
+        isinstance(packet_in, Mapping)
+        and packet_in.get("packet_version") == CRITIC_PACKET_VERSION_CURRENT
+    ):
+        for key in (
+            "estimand",
+            "state_transition",
+            "required_feature_ids",
+            "required_capability_ids",
+            "unresolved_requirements",
+            "grounding",
+        ):
+            if key in original_selected:
+                rebuilt_selected[key] = copy.deepcopy(original_selected[key])
     if not isinstance(packet_in, Mapping):
         raise HficSessionError("CRITIC_INPUT_ARTIFACT_MISSING")
     for field in (
@@ -3335,6 +3593,8 @@ def apply_revision(
             }
     _attach_runner_up_fields(revision_cycle, existing)
     _attach_runner_up_fields(revision_cycle, frozen)
+    _copy_evidence_surface_mode(revision_cycle, existing)
+    _copy_evidence_surface_mode(revision_cycle, frozen)
     if prompt_version == PROMPT_VERSION and repo_root is not None:
         grounded_candidates = _ground_v12_candidates(
             revised_draft.get("candidates") or [],
@@ -3562,6 +3822,8 @@ def persist_primary_kill_awaiting_runner_up(
         "critic_screen_count": 1,
         "hfic_cycle_seq": _next_cycle_seq(existing),
     }
+    _copy_evidence_surface_mode(pending_cycle, existing)
+    _copy_evidence_surface_mode(pending_cycle, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         pending_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -4046,9 +4308,15 @@ def finalize_session(
         receipt["final_survivor_candidate_id"] = survivor_id
         receipt["final_session_terminal"] = terminal
         receipt["critic_screen_count"] = 2 if failover_used else 1
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            effective_control_terminal,
+        )
+
+        receipt["effective_control_terminal"] = effective_control_terminal(receipt)
     started = frozen.get("session_started_at")
     if isinstance(started, str) and started.strip():
         receipt["session_started_at"] = started
+    _copy_evidence_surface_mode(receipt, frozen)
     diagnostics = _diagnostics_for_receipt(
         prompt_version=prompt_version,
         grounded_candidates=frozen.get("grounded_candidates")
@@ -4116,6 +4384,7 @@ def finalize_session(
                     "candidate_ids": list(frozen.get("candidate_ids") or []),
                     "critic_terminal": receipt_terminal,
                     "final_session_terminal": terminal,
+                    "effective_control_terminal": terminal,
                     "next": str(critic_result.get("next") or "STOP"),
                     "critic_input_packet_sha256": receipt_packet_sha,
                     "critic_result_sha256": receipt_result_sha,
@@ -4149,6 +4418,13 @@ def finalize_session(
                     "runner_up_failover_used": failover_used,
                     "critic_screen_count": 2 if failover_used else 1,
                     "hfic_cycle_seq": _next_cycle_seq(existing),
+                    **(
+                        {
+                            "evidence_surface_mode": frozen["evidence_surface_mode"]
+                        }
+                        if frozen.get("evidence_surface_mode")
+                        else {}
+                    ),
                 },
                 transaction_id=transaction_id,
             ),
@@ -4474,6 +4750,11 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             "closed_or_suppressed_collision_count"
         ),
     }
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        effective_control_terminal,
+    )
+
+    bundle["effective_control_terminal"] = effective_control_terminal(bundle)
     if not isinstance(bundle.get("grounded_candidates"), list):
         bundle.pop("grounded_candidates", None)
     if "closed_or_suppressed_collision_count" not in cycle:

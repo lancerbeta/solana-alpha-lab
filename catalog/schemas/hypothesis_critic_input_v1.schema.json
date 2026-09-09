@@ -24,7 +24,7 @@
   ],
   "properties": {
     "packet_schema": {"const": "smial.hypothesis-critic-input"},
-    "packet_version": {"enum": ["1.0", "1.1", "1.2", "1.3"]},
+    "packet_version": {"enum": ["1.0", "1.1", "1.2", "1.3", "1.4"]},
     "generator_prompt_version": {"enum": ["HFIC-V1.0", "HFIC-V1.1", "HFIC-V1.2"]},
     "generated_at": {"type": "string", "minLength": 1},
     "live_git_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
@@ -94,7 +94,83 @@
         "proposed_method": {"type": "string", "minLength": 1},
         "cheapest_falsifier": {"type": "string", "minLength": 1},
         "pass_fail_inconclusive_semantics": {"type": "string", "minLength": 1},
-        "decision_unlocked": {"type": "string", "minLength": 1}
+        "decision_unlocked": {"type": "string", "minLength": 1},
+        "estimand": {"type": "string"},
+        "state_transition": {"type": ["string", "null"]},
+        "required_feature_ids": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "required_capability_ids": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "unresolved_requirements": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "grounding": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "context_packet_sha256",
+            "feature_bindings",
+            "capability_bindings",
+            "unresolved_requirements",
+            "terminal"
+          ],
+          "properties": {
+            "context_packet_sha256": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "feature_bindings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "feature_id",
+                  "availability_class",
+                  "available_to_strategy_semantics"
+                ],
+                "properties": {
+                  "feature_id": {"type": "string", "minLength": 1},
+                  "availability_class": {"type": "string", "minLength": 1},
+                  "available_to_strategy_semantics": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "value_status": {"type": "string", "minLength": 1}
+                }
+              }
+            },
+            "capability_bindings": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "capability_id",
+                  "accepted",
+                  "authority_granted"
+                ],
+                "properties": {
+                  "capability_id": {"type": "string", "minLength": 1},
+                  "accepted": {"type": "boolean"},
+                  "authority_granted": {"type": "boolean"}
+                }
+              }
+            },
+            "unresolved_requirements": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "terminal": {
+              "enum": ["GROUNDED", "GROUNDED_WITH_GAPS"]
+            }
+          }
+        }
       }
     },
     "provisional_lane": {
@@ -213,7 +289,7 @@
     {
       "if": {
         "properties": {
-          "packet_version": {"enum": ["1.1", "1.2", "1.3"]}
+          "packet_version": {"enum": ["1.1", "1.2", "1.3", "1.4"]}
         },
         "required": ["packet_version"]
       },
@@ -224,12 +300,57 @@
     {
       "if": {
         "properties": {
-          "packet_version": {"const": "1.3"}
+          "packet_version": {"enum": ["1.3", "1.4"]}
         },
         "required": ["packet_version"]
       },
       "then": {
         "required": ["prior_memory"]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "packet_version": {"const": "1.4"}
+        },
+        "required": ["packet_version"]
+      },
+      "then": {
+        "properties": {
+          "selected_candidate": {
+            "required": [
+              "candidate_id",
+              "claim",
+              "nearest_prior_and_difference",
+              "actor_counterparty",
+              "mechanism",
+              "why_not_arbitraged",
+              "population",
+              "decision_timestamp",
+              "primary_x",
+              "primary_y",
+              "horizon_notional",
+              "disconfirming_prediction",
+              "negative_control",
+              "alternative_world",
+              "confounders",
+              "pit_leakage_survivorship_risks",
+              "execution_capacity_risks",
+              "available_data_bindings",
+              "missing_or_forward_only_data",
+              "proposed_method",
+              "cheapest_falsifier",
+              "pass_fail_inconclusive_semantics",
+              "decision_unlocked",
+              "estimand",
+              "state_transition",
+              "required_feature_ids",
+              "required_capability_ids",
+              "unresolved_requirements",
+              "grounding"
+            ]
+          }
+        }
       }
     },
     {

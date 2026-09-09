@@ -215,6 +215,7 @@ def cmd_preflight(
     owner_focus: str,
     auto_commission: bool,
     explicit_data_root: Path | None,
+    control_current_representation: bool = False,
 ) -> int:
     _assert_no_path_leak({"owner_focus": owner_focus}, str(repo_root))
     try:
@@ -231,6 +232,10 @@ def cmd_preflight(
         return emit(payload, exit_code=2)
     snap = repository_git_snapshot(repo_root)
     try:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            CURRENT_REPRESENTATION_CONTROL_V1,
+        )
+
         receipt = run_preflight(
             repo_root,
             data_root,
@@ -241,6 +246,11 @@ def cmd_preflight(
                 "head_sha": snap.head_sha,
                 "composite_sha256": snap.composite_sha256,
             },
+            evidence_surface_mode=(
+                CURRENT_REPRESENTATION_CONTROL_V1
+                if control_current_representation
+                else None
+            ),
         )
     except HficPreflightError as exc:
         payload = {
@@ -706,6 +716,11 @@ def build_parser() -> argparse.ArgumentParser:
     preflight.add_argument("--owner-focus", default="AUTO")
     preflight.add_argument("--format", choices=("json",), default="json")
     preflight.add_argument("--no-auto-commission", action="store_true")
+    preflight.add_argument(
+        "--control-current-representation",
+        action="store_true",
+        help="CURRENT_REPRESENTATION_CONTROL_V1 evidence-surface mode",
+    )
 
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--draft", type=Path, required=True)
@@ -836,6 +851,9 @@ def main(argv: list[str] | None = None) -> int:
                 owner_focus=args.owner_focus,
                 auto_commission=not args.no_auto_commission,
                 explicit_data_root=args.data_root,
+                control_current_representation=bool(
+                    getattr(args, "control_current_representation", False)
+                ),
             )
         if args.command == "freeze":
             return cmd_freeze(
