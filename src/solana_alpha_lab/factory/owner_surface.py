@@ -5,6 +5,8 @@ from __future__ import annotations
 import html
 from typing import Any, Iterable, Mapping
 
+from urllib.parse import urlencode
+
 from solana_alpha_lab.factory.owner_language import (
     command_label,
     shell_copy,
@@ -142,3 +144,114 @@ def mapping_rows(mapping: Mapping[str, Any], *, empty_as: str | None = None) -> 
         displayed = empty_as if value is None and empty_as is not None else machine_text(value)
         rows.append(f"<tr><th>{esc(key)}</th><td>{esc(displayed)}</td></tr>")
     return "".join(rows)
+
+
+DEFAULT_PAGE_SIZE = 25
+ACTIVE_POSITION_STATES = frozenset(
+    {
+        "WATCHED",
+        "SIGNALLED",
+        "INTENT_CREATED",
+        "ATTEMPTING",
+        "OPEN",
+        "PARTIAL",
+        "UNKNOWN",
+        "EXIT_REQUIRED",
+        "EXITING",
+        "UNRESOLVED",
+    }
+)
+HISTORY_POSITION_STATES = frozenset({"CLOSED", "RECONCILED"})
+
+
+def parse_page(query: Mapping[str, list[str]] | None, name: str = "page") -> int:
+    if not query:
+        return 1
+    raw = (query.get(name) or ["1"])[0]
+    try:
+        page = int(raw)
+    except (TypeError, ValueError):
+        return 1
+    return page if page > 0 else 1
+
+
+def paginate(
+    rows: list[Any],
+    *,
+    page: int = 1,
+    page_size: int = DEFAULT_PAGE_SIZE,
+) -> dict[str, Any]:
+    total = len(rows)
+    page = max(1, int(page))
+    start = (page - 1) * page_size
+    if start >= total and total:
+        page = max(1, (total - 1) // page_size + 1)
+        start = (page - 1) * page_size
+    sliced = rows[start : start + page_size]
+    end = start + len(sliced)
+    return {
+        "rows": sliced,
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "start_ordinal": start + 1 if sliced else 0,
+        "end_ordinal": end,
+        "has_prev": page > 1 and total > page_size,
+        "has_next": end < total,
+        "show_controls": total > page_size,
+    }
+
+
+def pager_html(
+    info: Mapping[str, Any],
+    *,
+    base_path: str,
+    params: Mapping[str, str] | None = None,
+    page_param: str = "page",
+) -> str:
+    total = int(info.get("total") or 0)
+    start = int(info.get("start_ordinal") or 0)
+    end = int(info.get("end_ordinal") or 0)
+    page = int(info.get("page") or 1)
+    summary = f"Всего {total}"
+    if info.get("show_controls"):
+        summary += f" · {start}–{end} из {total}"
+    if not info.get("show_controls"):
+        return f'<p class="pager">{esc(summary)}</p>'
+    query = dict(params or {})
+
+    def _href(target: int) -> str:
+        items = {**query, page_param: str(target)}
+        encoded = urlencode({key: value for key, value in items.items() if value})
+        href = f"{base_path}?{encoded}" if encoded else base_path
+        return esc(href)
+
+    prev = (
+        f'<a href="{_href(page - 1)}">Назад</a>'
+        if info.get("has_prev")
+        else "<span>Назад</span>"
+    )
+    nxt = (
+        f'<a href="{_href(page + 1)}">Вперёд</a>'
+        if info.get("has_next")
+        else "<span>Вперёд</span>"
+    )
+    return (
+        f'<p class="pager">{esc(summary)} · {prev} · {esc(str(page))} · {nxt}</p>'
+    )
+
+
+def compact_id_html(value: Any) -> str:
+    text = "" if value is None else str(value)
+    if not text:
+        return canon("UNKNOWN")
+    return (
+        f'<span class="entity-id">'
+        f'<input class="canon entity-id-copy" readonly value="{esc(text)}" '
+        f'aria-label="canonical id" title="{esc(text)}">'
+        f"</span>"
+    )
+
+
+def zone(title: str, inner: str) -> str:
+    return f'<section class="zone"><h2>{esc(title)}</h2>{inner}</section>'

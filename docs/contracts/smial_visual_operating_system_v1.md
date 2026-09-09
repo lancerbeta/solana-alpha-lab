@@ -297,3 +297,16 @@ visual system.
 If a `REFERENCE_ONLY` / `NON_CANONICAL` board is stored beside this contract,
 it is inspiration. Tokens and invariants win on conflict. Absence of the image
 does not weaken this contract.
+
+## 19. Workstation layout
+
+Owner Workbench is a workstation. Compact signal rail; main workspace uses
+desktop width (`max-width: none` on `main`). Prose, help, and copy blocks
+keep a bounded line length (`max-width: 42rem`).
+
+Meaningful sections use one shared `section.zone` treatment: raised surface,
+accent edge from existing unused tokens (`surface.raised`, `accent.cobalt`),
+not a second palette and not card-in-card soup.
+
+Entity collections show display ordinal `№` first. Canonical IDs stay
+secondary, compact, and copyable. Mass lists paginate at 25.

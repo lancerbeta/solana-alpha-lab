@@ -31,6 +31,7 @@ Git StrategyVersion = definition, not runtime
 ```text
 PRODUCT / STRATEGY MEANING     → Git StrategyVersion
 SCIENCE                        → Git + ResearchStore
+CURRENT RUNTIME ENVELOPE       → TradingRuntimePolicyV1 in PaperPlane
 CURRENT BOT / POSITION / CMD   → PaperPlane + operator_commands
 HOST / DEPLOY HEALTH           → outside this surface
 OWNER PRESENTATION             → derived Workbench projection
@@ -121,6 +122,16 @@ No global attention database. No VPS diagnosis from `/operations`.
 Retain source-owned operational metrics only. No owner FCF, LIVE
 NetReturn, or capital allocation. `/operations` may say
 `RUNTIME_SOURCE_UNAVAILABLE`; it must not say the VPS is unhealthy.
+
+`/operations` reads TradingRuntimePolicyV1 as current PAPER/SHADOW
+operating envelope. StrategyVersion notional/max_open_positions remain
+Git requested/declared values. Effective next-entry size is
+`min(requested, runtime cap)` when a valid policy exists. Absent policy:
+`NOT_CONFIGURED_STRATEGY_ONLY`. GET does not create or apply policy.
+
+ACTIVE / RISK inventory is presentation-split from HISTORY
+(`CLOSED` / `RECONCILED`). This does not change the PaperPlane state
+machine.
 
 ## 9. Watchlist
 

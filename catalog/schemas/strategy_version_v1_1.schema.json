@@ -81,7 +81,11 @@
       "additionalProperties": false,
       "required": ["notional_usd", "fee_bps"],
       "properties": {
-        "notional_usd": {"type": "number", "exclusiveMinimum": 0},
+        "notional_usd": {
+          "type": "number",
+          "exclusiveMinimum": 0,
+          "description": "Strategy-requested entry notional. Runtime policy may tighten effective size; it never increases this request."
+        },
         "fee_bps": {"type": "integer", "minimum": 0, "maximum": 10000}
       }
     },
@@ -90,7 +94,11 @@
       "additionalProperties": false,
       "required": ["max_open_positions"],
       "properties": {
-        "max_open_positions": {"type": "integer", "minimum": 1}
+        "max_open_positions": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Strategy-declared maximum concurrent positions. TradingRuntimePolicyV1 may apply a tighter effective cap."
+        }
       }
     },
     "mode_eligibility": {

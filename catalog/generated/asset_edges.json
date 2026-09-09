@@ -1553,6 +1553,11 @@
       "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
     },
     {
+      "source_asset_id": "CONFIG-TRADING-RUNTIME-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
+    },
+    {
       "source_asset_id": "CONTRACT-CANARY-SPECIFICATION-ONLY-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001"
@@ -4793,6 +4798,31 @@
       "target_asset_id": "TEST-TRADING-OPERATIONS-WORKBENCH-001"
     },
     {
+      "source_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001",
+      "relation": "contains",
+      "target_asset_id": "DOC-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-TRADING-RUNTIME-POLICY-001"
+    },
+    {
       "source_asset_id": "CTRL-UVLOCK-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-PYPROJECT-001"
@@ -5414,6 +5444,11 @@
     },
     {
       "source_asset_id": "DOC-RISK-AND-ECONOMICS-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "DOC-RISK-AND-ECONOMICS-001",
       "relation": "depends_on",
       "target_asset_id": "CTRL-PAPER-SHADOW-ACCOUNTING-CONTROL-001"
     },
@@ -5519,6 +5554,11 @@
     },
     {
       "source_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001",
+      "relation": "consumes",
+      "target_asset_id": "DOC-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-OWNER-LIFECYCLE-PROJECTION-001"
     },
@@ -5526,6 +5566,16 @@
       "source_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-RUNTIME-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "DOC-TRADING-RUNTIME-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
     },
     {
       "source_asset_id": "ENV-WORKSTATION-001",
@@ -10984,6 +11034,11 @@
     },
     {
       "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
+      "relation": "consumes",
+      "target_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "MODULE-PAPER-PLANE-ENGINE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-STRATEGY-RUNTIME-001"
     },
@@ -12499,8 +12554,28 @@
     },
     {
       "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-OPERATIONS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
     },
     {
       "source_asset_id": "POLICY-OWNER-ATTENTION-GATE-001",
@@ -14083,6 +14158,11 @@
       "target_asset_id": "CONTRACT-T40-RC002-H11-BONDING-CURVE-PDA-GTA-001"
     },
     {
+      "source_asset_id": "SCHEMA-TRADING-RUNTIME-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
+    },
+    {
       "source_asset_id": "SCM-BASELINE-COMMIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TASK-03-001"
@@ -15123,6 +15203,16 @@
       "target_asset_id": "POLICY-TASK-CLOSE-FAST-PATH-001"
     },
     {
+      "source_asset_id": "SCRIPT-TRADING-RUNTIME-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-TRADING-RUNTIME-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
+    },
+    {
       "source_asset_id": "SKILL-DELIVERY-HARNESS-001",
       "relation": "depends_on",
       "target_asset_id": "PROTOCOL-DELIVERY-HARNESS-001"
@@ -15981,6 +16071,16 @@
       "source_asset_id": "TEST-OWNER-OPERATIONS-COCKPIT-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-OWNER-OPERATIONS-COCKPIT-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-TRADING-OPERABILITY-WORKBENCH-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "TEST-OWNER-TRADING-OPERABILITY-WORKBENCH-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
     },
     {
       "source_asset_id": "TEST-PAPER-SHADOW-ACCOUNTING-CONTROL-001",
@@ -18271,6 +18371,31 @@
       "source_asset_id": "TEST-TRADING-OPERATIONS-WORKBENCH-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-TRADING-OPERATIONS-WORKBENCH-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-RUNTIME-ADMISSION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-PAPER-PLANE-ENGINE-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-RUNTIME-ADMISSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-RUNTIME-POLICY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-RUNTIME-POLICY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
+    },
+    {
+      "source_asset_id": "TEST-TRADING-RUNTIME-POLICY-BACKUP-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-TRADING-RUNTIME-POLICY-001"
     },
     {
       "source_asset_id": "VALIDATOR-REPOSITORY-STATE-001",

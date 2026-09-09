@@ -33,18 +33,23 @@ def visual_os_css(root: Path) -> str:
     text = palette.get("text") if isinstance(palette.get("text"), dict) else {}
     accent = palette.get("accent") if isinstance(palette.get("accent"), dict) else {}
     semantic = palette.get("semantic") if isinstance(palette.get("semantic"), dict) else {}
+    data = palette.get("data") if isinstance(palette.get("data"), dict) else {}
     tokens = {
         "--surface-void": surface.get("void"),
         "--surface-base": surface.get("base"),
         "--surface-panel": surface.get("panel"),
+        "--surface-raised": surface.get("raised"),
         "--border-hairline": border.get("hairline"),
         "--text-primary": text.get("primary"),
         "--text-secondary": text.get("secondary"),
         "--text-muted": text.get("muted"),
         "--accent-signal": accent.get("signal"),
+        "--accent-cobalt": accent.get("cobalt"),
+        "--semantic-positive": semantic.get("positive"),
         "--semantic-warning": semantic.get("warning"),
         "--semantic-danger": semantic.get("danger"),
         "--semantic-unknown": semantic.get("unknown"),
+        "--data-comparison-secondary": data.get("comparison_secondary"),
     }
     pairs = [f"{name}:{value}" for name, value in tokens.items() if isinstance(value, str)]
     return ":root{" + ";".join(pairs) + ";}"
@@ -53,34 +58,38 @@ def visual_os_css(root: Path) -> str:
 def visual_os_layout_css() -> str:
     """Reusable workstation layout. Tokens come from the Visual OS contract."""
     return """
-html,body { background: var(--surface-void, #111); color: var(--text-primary, #eee); font-family: system-ui, sans-serif; margin: 0; color-scheme: dark; scrollbar-color: #555 #1c1c1c; }
+html,body { background: var(--surface-void, #111); color: var(--text-primary, #eee); font-family: system-ui, sans-serif; margin: 0; color-scheme: dark; scrollbar-color: #555 #1c1c1c; font-size: 0.94rem; }
 .shell { display: grid; grid-template-columns: 12rem minmax(0, 1fr); min-height: 100vh; }
 .signal-rail { background: var(--surface-base, #161616); border-right: 1px solid var(--border-hairline, #333); padding: 1.5rem 1rem; }
 .signal-rail .brand { letter-spacing: 0.12em; margin: 0 0 1.5rem; color: var(--text-secondary, #bbb); }
 .signal-rail nav { display: flex; flex-direction: column; gap: 0.75rem; }
 .signal-rail a { color: var(--text-muted, #999); text-decoration: none; }
 .signal-rail a[aria-current="page"] { color: var(--accent-signal, #888); font-weight: 600; }
-main { background: var(--surface-base, #161616); padding: 1.5rem 2rem 3rem; max-width: 72rem; min-width: 0; overflow-x: auto; }
-.page-head h1 { font-size: 1.35rem; font-weight: 650; margin: 0 0 0.35rem; }
-.page-question { color: var(--text-secondary, #bbb); margin: 0 0 0.75rem; font-size: 1rem; }
+main { background: var(--surface-base, #161616); padding: 1.25rem 1.5rem 3rem; max-width: none; width: 100%; min-width: 0; overflow-x: auto; }
+.prose, .page-question, .page-note, .copy-text, .help { max-width: 42rem; }
+.page-head h1 { font-size: 1.5rem; font-weight: 700; margin: 0 0 0.35rem; letter-spacing: -0.02em; }
+.page-question { color: var(--text-secondary, #bbb); margin: 0 0 0.75rem; font-size: 1.02rem; }
 .page-note { color: var(--text-muted, #999); margin: 0 0 1.25rem; font-size: 0.9rem; }
 .page-machine { color: var(--text-muted, #999); font-size: 0.75rem; margin: 1.25rem 0 0; }
 .fact-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.75rem; margin: 0 0 1.25rem; }
 .fact { background: var(--surface-panel, #1c1c1c); border: 1px solid var(--border-hairline, #333); padding: 0.65rem 0.75rem; }
 .fact .label { display: block; color: var(--text-muted, #999); font-size: 0.75rem; margin: 0 0 0.25rem; }
 .fact .value { margin: 0; overflow-wrap: anywhere; word-break: break-word; }
-.canon, .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.82em; color: var(--text-muted, #999); overflow-wrap: anywhere; }
+.canon, .mono { font-family: ui-monospace, "Cascadia Mono", Consolas, monospace; font-size: 0.78em; color: var(--text-muted, #999); overflow-wrap: anywhere; }
 .dual { display: flex; flex-direction: column; gap: 0.15rem; align-items: flex-start; }
+section.zone { background: var(--surface-raised, #171C22); border: 1px solid var(--border-hairline, #333); border-left: 3px solid var(--accent-cobalt, #3B82F6); box-shadow: 0 1px 0 rgba(0,0,0,0.28); padding: 0.9rem 1rem 1rem; margin: 1.35rem 0; }
+section.zone > h2:first-child { margin-top: 0; }
 section { margin: 1.25rem 0; }
-h2 { font-size: 1.05rem; margin: 0 0 0.6rem; }
-h3 { font-size: 0.9rem; margin: 0.9rem 0 0.4rem; color: var(--text-secondary, #bbb); }
+h2 { font-size: 1.12rem; font-weight: 650; margin: 0 0 0.6rem; }
+h3 { font-size: 0.92rem; font-weight: 600; margin: 0.9rem 0 0.4rem; color: var(--text-secondary, #bbb); }
 .error, .danger { color: var(--semantic-danger, #a40000); }
 .semantic-unknown { color: var(--semantic-unknown, #777); }
 .semantic-warning { color: var(--semantic-warning, #b8860b); }
+.semantic-positive { color: var(--semantic-positive, #22C55E); }
 .degraded { border: 1px solid var(--border-hairline, #333); padding: 0.75rem 1rem; background: var(--surface-panel, #1c1c1c); }
 form button { margin-right: 0.5rem; margin-bottom: 0.5rem; }
 .copy-hint { color: var(--text-muted, #999); }
-.copy-block { position: relative; margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--border-hairline, #333); background: var(--surface-panel, #1c1c1c); }
+.copy-block { position: relative; margin: 1rem 0; padding: 0.75rem 1rem; border: 1px solid var(--border-hairline, #333); background: var(--surface-panel, #1c1c1c); max-width: 42rem; }
 .copy-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .copy-head h2 { font-size: 1rem; margin: 0; }
 .copy-btn { opacity: 1; pointer-events: auto; }
@@ -99,7 +108,7 @@ details.attention-scan[open] > summary { margin-bottom: 0.5rem; }
 .counter { background: var(--surface-panel, #1c1c1c); border: 1px solid var(--border-hairline, #333); padding: 0.5rem 0.75rem; }
 .counter h3 { font-size: 0.75rem; margin: 0 0 0.35rem; color: var(--text-muted, #999); }
 .research-table { table-layout: fixed; width: 100%; }
-.research-table th:nth-child(2), .research-table td:nth-child(2) { width: 28%; }
+.research-table th:nth-child(3), .research-table td:nth-child(3) { width: 28%; }
 .title-scan { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word; }
 .research-table a { color: var(--text-primary, #eee); }
 .trace-resolved { color: var(--text-primary, #eee); }
@@ -117,9 +126,17 @@ details.attention-scan[open] > summary { margin-bottom: 0.5rem; }
 details.technical { margin: 1rem 0; color: var(--text-muted, #999); }
 details.technical > summary { cursor: pointer; color: var(--text-secondary, #bbb); margin-bottom: 0.5rem; }
 .cmd-btn .canon { display: block; }
-table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+.entity-id { display: inline-flex; align-items: center; gap: 0.35rem; max-width: 14rem; }
+.entity-id .canon, .entity-id-copy { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 12rem; }
+.entity-id-copy { width: 12rem; border: 0; background: transparent; color: inherit; font: inherit; padding: 0; }
+.pager { display: flex; gap: 0.75rem; align-items: center; margin: 0.5rem 0 0.85rem; font-variant-numeric: tabular-nums; }
+.requested { color: var(--text-muted, #999); }
+.runtime-cap { color: var(--accent-cobalt, #3B82F6); }
+.effective { color: var(--text-primary, #eee); font-weight: 600; }
+table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; font-variant-numeric: tabular-nums; font-size: 0.86rem; }
 th { text-align: left; padding-right: 1rem; vertical-align: top; color: var(--text-muted, #999); font-weight: 600; }
-td, th { border-bottom: 1px solid var(--border-hairline, #333); padding: 0.35rem 0.5rem; word-break: break-word; }
+td, th { border-bottom: 1px solid var(--border-hairline, #333); padding: 0.22rem 0.45rem; word-break: break-word; }
+td.num { width: 2.5rem; color: var(--text-muted, #999); }
 """
 
 

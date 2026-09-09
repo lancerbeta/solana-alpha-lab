@@ -186,7 +186,13 @@ scientific PROMOTE ≠ StrategyVersion
 StrategyVersion ≠ activation
 Git capability ≠ live health
 GET /research ≠ writer
+StrategyVersion requested notional ≠ necessarily effective runtime size
 ```
+
+`notional_policy.notional_usd` and `risk_policy.max_open_positions` remain
+Git-declared strategy request/limit. TradingRuntimePolicyV1 may tighten
+effective PAPER/SHADOW execution without rewriting StrategyVersion.
+Do not invent StrategyVersion v1.2 for this overlay.
 
 Zero activation epoch, BotInstance, PAPER start, SHADOW start, LIVE,
 provider, wallet, signer, or spend from this capability.
