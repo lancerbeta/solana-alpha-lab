@@ -127,7 +127,8 @@ details.technical { margin: 1rem 0; color: var(--text-muted, #999); }
 details.technical > summary { cursor: pointer; color: var(--text-secondary, #bbb); margin-bottom: 0.5rem; }
 .cmd-btn .canon { display: block; }
 .entity-id { display: inline-flex; align-items: center; gap: 0.35rem; max-width: 14rem; }
-.entity-id .canon { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 12rem; }
+.entity-id .canon, .entity-id-copy { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 12rem; }
+.entity-id-copy { width: 12rem; border: 0; background: transparent; color: inherit; font: inherit; padding: 0; }
 .pager { display: flex; gap: 0.75rem; align-items: center; margin: 0.5rem 0 0.85rem; font-variant-numeric: tabular-nums; }
 .requested { color: var(--text-muted, #999); }
 .runtime-cap { color: var(--accent-cobalt, #3B82F6); }

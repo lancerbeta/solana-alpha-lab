@@ -69,10 +69,21 @@ def main(argv: list[str] | None = None) -> int:
         try:
             if args.command in {"SHOW", "HISTORY"}:
                 result = show_policy(store, args.mode)
+                result["operation"] = args.command
             else:
                 result = check_policy(
                     store, mode=args.mode, candidate_raw=_load_json_arg(args.candidate_json)
                 )
+        except (TradingRuntimePolicyError, PaperPlaneError) as exc:
+            code = getattr(exc, "code", str(exc))
+            print(
+                json.dumps(
+                    {"status": "DENIED", "error": code, "operation": args.command},
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
+            return 2
         finally:
             store.close()
         print(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True, default=str))

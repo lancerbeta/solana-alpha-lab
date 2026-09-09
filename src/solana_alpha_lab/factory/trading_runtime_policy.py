@@ -333,11 +333,13 @@ def check_policy(
     candidate_raw: Mapping[str, Any],
 ) -> dict[str, Any]:
     current = resolve_current_policy(store, mode)
-    if current["status"] == STATUS_INVALID:
-        raise TradingRuntimePolicyError("RUNTIME_POLICY_INVALID")
     candidate_body = normalize_policy_body(candidate_raw, mode=mode)
     current_policy = current.get("policy") if current["status"] == STATUS_VALID else None
-    classification = classify_diff(current_policy, candidate_body)
+    classification = (
+        "BLOCKED_INVALID"
+        if current["status"] == STATUS_INVALID
+        else classify_diff(current_policy, candidate_body)
+    )
     return {
         "schema": SCHEMA,
         "operation": "CHECK",
@@ -365,6 +367,76 @@ def check_policy(
     }
 
 
+def _request_fingerprint(request: Mapping[str, Any]) -> str:
+    return json.dumps(dict(request), sort_keys=True, separators=(",", ":"))
+
+
+def _replay_or_conflict(
+    store: PaperPlaneStore,
+    *,
+    idempotency_key: str,
+    command_type: str,
+    request: Mapping[str, Any],
+) -> dict[str, Any] | None:
+    existing = store.get_operator_command(idempotency_key)
+    if existing is None:
+        return None
+    stored_request = json.loads(existing["request_json"])
+    if str(existing.get("command_type")) != command_type or _request_fingerprint(
+        stored_request
+    ) != _request_fingerprint(request):
+        raise TradingRuntimePolicyError("POLICY_IDEMPOTENCY_REQUEST_MISMATCH")
+    payload = json.loads(existing["result_json"])
+    payload["idempotent"] = True
+    payload["idempotency_key"] = idempotency_key
+    return payload
+
+
+def _persist_policy_revision(
+    store: PaperPlaneStore,
+    *,
+    mode: str,
+    body: dict[str, Any],
+    expected_current_sha256: str,
+    reason: str,
+    command_type: str,
+    idempotency_key: str,
+    request: Mapping[str, Any],
+) -> dict[str, Any]:
+    current = resolve_current_policy(store, mode)
+    if current["status"] == STATUS_INVALID:
+        raise TradingRuntimePolicyError("RUNTIME_POLICY_INVALID")
+    if str(expected_current_sha256) != str(current.get("policy_sha256")):
+        raise TradingRuntimePolicyError("POLICY_STALE_WRITE_DENIED")
+    revision = 1 if current["revision"] is None else int(current["revision"]) + 1
+    policy = attach_revision_identity(
+        body,
+        revision=revision,
+        created_at=_now(),
+        reason=reason,
+        previous_policy_sha256=str(current.get("policy_sha256") or GENESIS_POLICY_SHA256),
+    )
+    store.append_runtime_policy_revision(policy)
+    result = {
+        "command_type": command_type,
+        "status": "APPLIED" if command_type == COMMAND_APPLY else "ROLLED_BACK",
+        "mode": mode,
+        "revision": policy["revision"],
+        "policy_sha256": policy["policy_sha256"],
+        "previous_policy_sha256": policy["previous_policy_sha256"],
+        "readback": resolve_current_policy(store, mode),
+    }
+    store.record_operator_command(
+        idempotency_key=idempotency_key,
+        command_type=command_type,
+        request=request,
+        result=result,
+    )
+    result["idempotent"] = False
+    result["idempotency_key"] = idempotency_key
+    return result
+
+
 def apply_policy(
     root: Path,
     store: PaperPlaneStore,
@@ -379,52 +451,32 @@ def apply_policy(
     require_owner_authorization(root, owner_authorization_phrase)
     if not idempotency_key:
         raise TradingRuntimePolicyError("COMMAND_IDEMPOTENCY_KEY_REQUIRED")
-    existing = store.get_operator_command(idempotency_key)
-    if existing is not None:
-        payload = json.loads(existing["result_json"])
-        payload["idempotent"] = True
-        payload["idempotency_key"] = idempotency_key
-        return payload
+    body = normalize_policy_body(candidate_raw, mode=mode)
+    request = {
+        "mode": mode,
+        "expected_current_sha256": expected_current_sha256,
+        "candidate": body,
+        "reason": reason,
+    }
     with store.immediate_write():
-        current = resolve_current_policy(store, mode)
-        if current["status"] == STATUS_INVALID:
-            raise TradingRuntimePolicyError("RUNTIME_POLICY_INVALID")
-        if str(expected_current_sha256) != str(current.get("policy_sha256")):
-            raise TradingRuntimePolicyError("POLICY_STALE_WRITE_DENIED")
-        body = normalize_policy_body(candidate_raw, mode=mode)
-        revision = 1 if current["revision"] is None else int(current["revision"]) + 1
-        created_at = _now()
-        policy = attach_revision_identity(
-            body,
-            revision=revision,
-            created_at=created_at,
-            reason=reason,
-            previous_policy_sha256=str(current.get("policy_sha256") or GENESIS_POLICY_SHA256),
-        )
-        store.append_runtime_policy_revision(policy)
-        result = {
-            "command_type": COMMAND_APPLY,
-            "status": "APPLIED",
-            "mode": mode,
-            "revision": policy["revision"],
-            "policy_sha256": policy["policy_sha256"],
-            "previous_policy_sha256": policy["previous_policy_sha256"],
-            "readback": resolve_current_policy(store, mode),
-        }
-        store.record_operator_command(
+        replayed = _replay_or_conflict(
+            store,
             idempotency_key=idempotency_key,
             command_type=COMMAND_APPLY,
-            request={
-                "mode": mode,
-                "expected_current_sha256": expected_current_sha256,
-                "candidate": body,
-                "reason": reason,
-            },
-            result=result,
+            request=request,
         )
-    result["idempotent"] = False
-    result["idempotency_key"] = idempotency_key
-    return result
+        if replayed is not None:
+            return replayed
+        return _persist_policy_revision(
+            store,
+            mode=mode,
+            body=body,
+            expected_current_sha256=expected_current_sha256,
+            reason=reason,
+            command_type=COMMAND_APPLY,
+            idempotency_key=idempotency_key,
+            request=request,
+        )
 
 
 def rollback_policy(
@@ -437,13 +489,22 @@ def rollback_policy(
     owner_authorization_phrase: str,
 ) -> dict[str, Any]:
     require_owner_authorization(root, owner_authorization_phrase)
-    existing = store.get_operator_command(idempotency_key)
-    if existing is not None:
-        payload = json.loads(existing["result_json"])
-        payload["idempotent"] = True
-        payload["idempotency_key"] = idempotency_key
-        return payload
+    if not idempotency_key:
+        raise TradingRuntimePolicyError("COMMAND_IDEMPOTENCY_KEY_REQUIRED")
+    request = {
+        "mode": mode,
+        "expected_current_sha256": expected_current_sha256,
+        "reason": "ROLLBACK",
+    }
     with store.immediate_write():
+        replayed = _replay_or_conflict(
+            store,
+            idempotency_key=idempotency_key,
+            command_type=COMMAND_ROLLBACK,
+            request=request,
+        )
+        if replayed is not None:
+            return replayed
         current = resolve_current_policy(store, mode)
         if current["status"] != STATUS_VALID or current["policy"] is None:
             raise TradingRuntimePolicyError("POLICY_ROLLBACK_NO_CURRENT")
@@ -456,15 +517,15 @@ def rollback_policy(
         if previous is None:
             raise TradingRuntimePolicyError("POLICY_ROLLBACK_PREVIOUS_MISSING")
         previous_body = normalize_policy_body(json.loads(previous["policy_json"]), mode=mode)
-        return apply_policy(
-            root,
+        return _persist_policy_revision(
             store,
             mode=mode,
-            candidate_raw=previous_body,
+            body=previous_body,
             expected_current_sha256=expected_current_sha256,
-            idempotency_key=idempotency_key,
-            owner_authorization_phrase=owner_authorization_phrase,
             reason="ROLLBACK",
+            command_type=COMMAND_ROLLBACK,
+            idempotency_key=idempotency_key,
+            request=request,
         )
 
 

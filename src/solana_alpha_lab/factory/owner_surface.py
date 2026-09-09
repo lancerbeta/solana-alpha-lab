@@ -246,7 +246,10 @@ def compact_id_html(value: Any) -> str:
     if not text:
         return canon("UNKNOWN")
     return (
-        f'<span class="entity-id"><span class="canon" title="{esc(text)}">{esc(text)}</span></span>'
+        f'<span class="entity-id">'
+        f'<input class="canon entity-id-copy" readonly value="{esc(text)}" '
+        f'aria-label="canonical id" title="{esc(text)}">'
+        f"</span>"
     )
 
 

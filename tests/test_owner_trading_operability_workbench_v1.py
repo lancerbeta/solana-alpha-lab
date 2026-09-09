@@ -16,8 +16,10 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory.application import FactoryApplication
 from solana_alpha_lab.factory.operational_store import OperationalStore
-from solana_alpha_lab.factory.owner_surface import paginate
+from solana_alpha_lab.factory.owner_surface import compact_id_html, paginate
+from solana_alpha_lab.factory.paper_plane import PaperPlaneStore
 from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime_config
+from solana_alpha_lab.factory.trading_runtime_policy import apply_policy, compose_runtime_envelope
 from solana_alpha_lab.factory.visual_os import visual_os_layout_css
 from solana_alpha_lab.factory.workbench import _operations_section, serve
 
@@ -118,6 +120,58 @@ class OwnerTradingOperabilityWorkbenchTests(unittest.TestCase):
         self.assertIn("entity-id", html)
         self.assertNotIn("Баланс", html)
         self.assertNotIn("Доступные деньги", html)
+
+    def test_operations_shows_requested_runtime_effective(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            store = PaperPlaneStore(Path(tmp) / "paper.sqlite")
+            try:
+                apply_policy(
+                    ROOT,
+                    store,
+                    mode="PAPER",
+                    candidate_raw={
+                        "new_entries_enabled": True,
+                        "global_entry_notional_cap_usd": "10",
+                    },
+                    expected_current_sha256="0" * 64,
+                    idempotency_key="IDEM-UI-1",
+                    owner_authorization_phrase="AUTHORIZE PAPER SHADOW TRADING RUNTIME POLICY APPLY",
+                    reason="UI",
+                )
+                envelope = compose_runtime_envelope(
+                    store,
+                    [
+                        {
+                            "strategy_id": "STRAT-UI",
+                            "strategy_version": "V1",
+                            "notional_usd": "100",
+                            "max_open_positions": 5,
+                        }
+                    ],
+                )
+            finally:
+                store.close()
+        html = _operations_section(
+            {
+                "operations": {"source_status": "PRESENT", "position_rows": [], "bots": []},
+                "trading_operations": {
+                    "source_status": "PRESENT",
+                    "runtime_envelope": envelope,
+                    "contexts": [],
+                    "traces": [],
+                    "attention": [],
+                },
+            }
+        )
+        self.assertIn("Запрос стратегии", html)
+        self.assertIn("Runtime cap", html)
+        self.assertIn("Эффективно", html)
+        self.assertIn("100", html)
+        self.assertIn("10", html)
+        self.assertIn("Runtime cap (global)", html)
+        self.assertNotIn("Эффективный следующий вход", html)
+        self.assertIn("NOT_SET", html)
+        self.assertIn("entity-id-copy", compact_id_html("POS-UI"))
 
     def test_six_surfaces_render_and_get_does_not_write(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

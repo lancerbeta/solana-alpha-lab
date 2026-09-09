@@ -581,12 +581,26 @@ def _entries_state_html(enabled: Any, status: Any) -> str:
     return dual("не настроено", status or "NOT_CONFIGURED_STRATEGY_ONLY", unknown=True)
 
 
-def _runtime_policy_zone(envelope: Mapping[str, Any]) -> str:
+def _overlay_limit_html(value: Any) -> str:
+    if value is None:
+        return dual(surface_copy("OPERATIONS", "limit_unset"), "NOT_SET")
+    return cell_html(value)
+
+
+def _policy_status_gloss(status: str) -> str:
+    if status == "RUNTIME_POLICY_INVALID":
+        return surface_copy("OPERATIONS", "policy_status_invalid")
+    if status == "VALID":
+        return surface_copy("OPERATIONS", "policy_status_valid")
+    return surface_copy("OPERATIONS", "policy_status_not_configured")
+
+
+def _runtime_policy_zone(envelope: Mapping[str, Any], *, title: str | None = None) -> str:
     modes = envelope.get("modes") if isinstance(envelope.get("modes"), dict) else {}
     blocks = []
     for mode in ("PAPER", "SHADOW"):
         item = modes.get(mode) if isinstance(modes.get(mode), dict) else {}
-        status = item.get("status") or "NOT_CONFIGURED_STRATEGY_ONLY"
+        status = str(item.get("status") or "NOT_CONFIGURED_STRATEGY_ONLY")
         enabled = item.get("new_entries_enabled")
         positions_max = item.get("max_total_open_positions")
         notional_max = item.get("max_total_open_notional_usd")
@@ -598,30 +612,25 @@ def _runtime_policy_zone(envelope: Mapping[str, Any]) -> str:
             open_n_html = cell_html(open_n)
         cap = item.get("global_entry_notional_cap_usd")
         blocks.append(
-            fact_strip(
-                [
-                    ("mode", canon(mode)),
-                    (surface_copy("OPERATIONS", "policy_status"), canon(status)),
-                    (surface_copy("OPERATIONS", "policy_revision"), cell_html(item.get("revision"))),
-                    (surface_copy("OPERATIONS", "changed_at"), cell_html(item.get("changed_at"))),
-                    (
-                        surface_copy("OPERATIONS", "new_entries_global"),
-                        _entries_state_html(enabled, status),
-                    ),
-                    (
-                        surface_copy("OPERATIONS", "open_risk_capital"),
-                        f"{cell_html(active)} / {cell_html(positions_max)}",
-                    ),
-                    (
-                        surface_copy("OPERATIONS", "open_notional"),
-                        f"{open_n_html} / {cell_html(notional_max)}",
-                    ),
-                    (
-                        surface_copy("OPERATIONS", "effective_next_entry"),
-                        cell_html(cap),
-                    ),
-                ]
-            )
+            "<table class=\"mode-envelope\"><tr>"
+            "<th>mode</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'policy_status'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'policy_revision'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'changed_at'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'new_entries_global'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'open_risk_capital'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'open_notional'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'runtime_cap_global'))}</th>"
+            "</tr><tr>"
+            f"<td>{canon(mode)}</td>"
+            f"<td>{canon(status)}<br><span class=\"page-note\">{esc(_policy_status_gloss(status))}</span></td>"
+            f"<td>{_overlay_limit_html(item.get('revision'))}</td>"
+            f"<td>{_overlay_limit_html(item.get('changed_at'))}</td>"
+            f"<td>{_entries_state_html(enabled, status)}</td>"
+            f"<td>{cell_html(active)} / {_overlay_limit_html(positions_max)}</td>"
+            f"<td>{open_n_html} / {_overlay_limit_html(notional_max)}</td>"
+            f"<td>{_overlay_limit_html(cap)}</td>"
+            "</tr></table>"
         )
     by_rows = []
     for index, row in enumerate(list(envelope.get("by_strategy") or []), start=1):
@@ -633,12 +642,12 @@ def _runtime_policy_zone(envelope: Mapping[str, Any]) -> str:
             f"<td>{esc(row.get('mode'))}</td>"
             f"<td>{esc(row.get('strategy_id') or '')} {canon(row.get('strategy_version'))}</td>"
             f"<td>{cell_html(row.get('active_positions'))} / "
-            f"{cell_html(row.get('effective_max_open_positions'))}</td>"
+            f"{_overlay_limit_html(row.get('effective_max_open_positions'))}</td>"
             f"<td>{cell_html(row.get('open_risk_notional_usd'))}</td>"
             f"<td><span class=\"requested\">{esc(surface_copy('OPERATIONS', 'requested'))} "
             f"{cell_html(row.get('requested_notional_usd'))}</span><br>"
             f"<span class=\"runtime-cap\">{esc(surface_copy('OPERATIONS', 'runtime_cap'))} "
-            f"{cell_html(row.get('runtime_entry_cap_usd'))}</span><br>"
+            f"{_overlay_limit_html(row.get('runtime_entry_cap_usd'))}</span><br>"
             f"<span class=\"effective\">{esc(surface_copy('OPERATIONS', 'effective'))} "
             f"{cell_html(row.get('effective_next_entry_notional_usd'))}</span></td>"
             f"<td>{canon(row.get('blocker'))}</td>"
@@ -653,10 +662,11 @@ def _runtime_policy_zone(envelope: Mapping[str, Any]) -> str:
         + "".join(by_rows)
         + "</table>"
         if by_rows
-        else f"<p>{esc(surface_copy('OPERATIONS', 'no_bots'))}</p>"
+        else f"<p>{esc(surface_copy('OPERATIONS', 'no_strategies'))}</p>"
     )
+    heading = title or surface_copy("OPERATIONS", "trading_limits")
     return zone(
-        surface_copy("OPERATIONS", "trading_limits"),
+        heading,
         "".join(blocks) + f"<h3>{esc(surface_copy('OPERATIONS', 'by_strategy'))}</h3>" + strategy_table,
     )
 
@@ -1075,11 +1085,15 @@ def _economics_section(model: dict[str, Any]) -> str:
     next_action = str(eco.get("next_safe_action") or "")
     next_gloss, next_canon, _unknown = token_gloss(NEXT_ACTION_GLOSS, next_action)
     envelope = eco.get("runtime_envelope") if isinstance(eco.get("runtime_envelope"), dict) else {}
-    envelope_html = _runtime_policy_zone(envelope) if envelope.get("modes") else (
+    envelope_html = (
+        _runtime_policy_zone(envelope, title=surface_copy("ECONOMICS", "runtime_envelope"))
+        if envelope.get("modes")
+        else (
         zone(
             surface_copy("ECONOMICS", "runtime_envelope"),
             f"<p>{esc(surface_copy('ECONOMICS', 'runtime_not_wallet'))}</p>"
             + f"<p class=\"semantic-unknown\">{canon('NOT_CONFIGURED_STRATEGY_ONLY')}</p>",
+        )
         )
     )
     all_unknown = source in {"SOURCE_NOT_PRESENT", "SOURCE_UNAVAILABLE", "NOT_PRESENT"}

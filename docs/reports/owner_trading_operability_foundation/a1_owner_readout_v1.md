@@ -62,7 +62,8 @@ Restart/deploy persistence: policy живёт в том же sqlite, котор�
 Широкий workstation canvas (`main` без max-width, prose 42rem).
 Секции `section.zone` на существующих Visual OS tokens.
 № + compact copyable ID + pagination 25 (страница 2 = 26–50).
-Operations: Торговые ограничения; requested / runtime / effective;
+Operations: Торговые ограничения; requested / runtime / effective
+в таблице стратегий; global cap не подписывается как effective.
 ACTIVE vs HISTORY. Research — индекс, не стена source text.
 HOME не поднимает historical ExperimentSpec phrase как текущую команду.
 

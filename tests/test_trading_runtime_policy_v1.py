@@ -24,8 +24,10 @@ from solana_alpha_lab.factory.strategy_runtime import load_strategy_version  # n
 from solana_alpha_lab.factory.trading_runtime_policy import (  # noqa: E402
     GENESIS_POLICY_SHA256,
     STATUS_NOT_CONFIGURED,
+    TradingRuntimePolicyError,
     apply_policy,
     check_policy,
+    compose_runtime_envelope,
     effective_entry_notional,
     load_capability_config,
     rollback_policy,
@@ -346,13 +348,27 @@ class TradingRuntimePolicyTests(unittest.TestCase):
                     ROOT,
                     store,
                     mode="PAPER",
-                    candidate_raw=_candidate(new_entries_enabled=False),
-                    expected_current_sha256=str(stale["policy_sha256"]),
+                    candidate_raw=_candidate(
+                        new_entries_enabled=False, global_entry_notional_cap_usd="1"
+                    ),
+                    expected_current_sha256=str(first["policy_sha256"]),
                     idempotency_key="IDEM-STOP-2",
                     owner_authorization_phrase=PHRASE,
-                    reason="DUP",
+                    reason="TEST",
                 )
                 self.assertTrue(again["idempotent"])
+                with self.assertRaises(TradingRuntimePolicyError) as mismatch:
+                    apply_policy(
+                        ROOT,
+                        store,
+                        mode="PAPER",
+                        candidate_raw=_candidate(),
+                        expected_current_sha256=str(stale["policy_sha256"]),
+                        idempotency_key="IDEM-STOP-2",
+                        owner_authorization_phrase=PHRASE,
+                        reason="OTHER",
+                    )
+                self.assertIn("POLICY_IDEMPOTENCY_REQUEST_MISMATCH", str(mismatch.exception))
                 rolled = rollback_policy(
                     ROOT,
                     store,
@@ -361,6 +377,8 @@ class TradingRuntimePolicyTests(unittest.TestCase):
                     idempotency_key="IDEM-ROLL-1",
                     owner_authorization_phrase=PHRASE,
                 )
+                self.assertEqual(rolled["command_type"], "TRADING_RUNTIME_POLICY_ROLLBACK")
+                self.assertEqual(rolled["status"], "ROLLED_BACK")
                 self.assertEqual(rolled["readback"]["revision"], 3)
                 self.assertEqual(len(show_policy(store, "PAPER")["history"]), 3)
             finally:
