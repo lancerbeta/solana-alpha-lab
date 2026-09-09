@@ -17,6 +17,7 @@ from solana_alpha_lab.factory.observation_schedule_store import ObservationSched
 from solana_alpha_lab.factory.remote_ops import RemoteOpsError
 
 STATE_RELATIVE = "local/factory_v1/operability_incident_state.json"
+SNAPSHOT_RELATIVE = "local/factory_v1/operability_collector_snapshot.json"
 WATCH_ON_CALENDAR = "*-*-* *:0/15:00 UTC"
 WATCH_CADENCE_SECONDS = 15 * 60
 COLLECTOR_SNAPSHOT_SCHEMA = "smial.collector-derived-operability-snapshot"
@@ -164,9 +165,13 @@ def load_collector_snapshot_file(path: Path) -> tuple[str, dict[str, Any] | None
         return "INVALID", None
     if not isinstance(payload, dict):
         return "INVALID", None
-    if "collector_snapshot" not in payload:
-        return "MISSING", None
-    parsed = validate_collector_snapshot(payload.get("collector_snapshot"))
+    if payload.get("schema") == COLLECTOR_SNAPSHOT_SCHEMA:
+        raw = payload
+    elif "collector_snapshot" in payload:
+        raw = payload.get("collector_snapshot")
+    else:
+        return "INVALID", None
+    parsed = validate_collector_snapshot(raw)
     if parsed is None:
         return "INVALID", None
     return "PRESENT", parsed
@@ -389,6 +394,7 @@ def evaluate_operability(
     }
     if write_state:
         _atomic_write_json(state_path, next_state)
+        _atomic_write_json(root / SNAPSHOT_RELATIVE, next_state["collector_snapshot"])
     return {
         "present": sorted(present),
         "messages": messages,

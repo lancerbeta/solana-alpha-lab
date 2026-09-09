@@ -12,7 +12,8 @@ Canonical binding remains `ACTIVE-FACTORY-REMOTE-OPERATIONS`
 ```text
 scheduled operability watch
         → full collector packet (background)
-        → bounded derived collector_snapshot (atomic state file)
+        → bounded derived collector_snapshot (dedicated snapshot file;
+          extra key also on incident state, unused by GET)
 interactive GET `/` and `/system`
         → bounded snapshot read + live O(1) system signals
         → SYSTEM_OPERABILITY_SURFACE_V2
@@ -95,6 +96,12 @@ operational-history traversal.
 
 They MUST NOT call `build_collector_operational_packet` or a full
 `build_collector_read_model` fallback.
+
+They MUST NOT parse `operability_incident_state.json` (`active` /
+`pending` Telegram retry history). Interactive GET reads only the
+dedicated watch artifact `operability_collector_snapshot.json`.
+That file is a derived snapshot of the same watch cycle, not a second
+monitoring store, cache service, timer or daemon.
 
 Heavy derived collector evidence may come from the scheduled
 operability-watch snapshot only. Snapshot evidence MUST carry:

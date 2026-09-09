@@ -4,7 +4,8 @@ Petr открывает HOME и `/system` как текущее техничес
 пересчитывая Observation RDP / backup tree / operational history на каждый
 GET. Тяжёлый collector packet считает существующий
 `factory-operability-watch` раз в 15 минут и кладёт bounded snapshot в
-тот же `operability_incident_state.json`.
+`operability_collector_snapshot.json` (и extra key в incident-state,
+который GET не читает).
 
 ## VERDICT
 

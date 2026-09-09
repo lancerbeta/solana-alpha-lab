@@ -73,6 +73,7 @@ from solana_alpha_lab.factory.operability_watch import (  # noqa: E402
     render_incident_message,
     build_collector_snapshot,
     COLLECTOR_SNAPSHOT_PACKET_FIELDS,
+    SNAPSHOT_RELATIVE,
 )
 from solana_alpha_lab.factory.remote_ops import RemoteOpsError, load_config_v1_1  # noqa: E402
 from solana_alpha_lab.factory_semantic_operability import (  # noqa: E402
@@ -448,6 +449,8 @@ class ClosedDayDurabilityLoopTests(unittest.TestCase):
                     packet, observed_at="2026-09-06T12:00:00Z"
                 )
                 self.assertEqual(snapshot["packet"], rebuilt["packet"])
+                dedicated = json.loads((root / SNAPSHOT_RELATIVE).read_text(encoding="utf-8"))
+                self.assertEqual(dedicated, snapshot)
             finally:
                 store.close()
 

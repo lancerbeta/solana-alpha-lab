@@ -15,6 +15,7 @@ from solana_alpha_lab.factory.external_heartbeat import HEARTBEAT_ENV, UNCONFIGU
 from solana_alpha_lab.factory.observation_schedule import render_utc
 from solana_alpha_lab.factory.observation_schedule_runtime import DEPLOY_SHA_NAME
 from solana_alpha_lab.factory.operability_watch import (
+    SNAPSHOT_RELATIVE as COLLECTOR_SNAPSHOT_RELATIVE,
     STATE_RELATIVE as INCIDENT_STATE_RELATIVE,
     WATCH_REQUIRED_TIMERS,
     WATCH_WORKBENCH_UNIT,
@@ -481,7 +482,7 @@ def _open_collector(
 ) -> tuple[Mapping[str, Any] | None, str, dict[str, Any]]:
     if injected is not None:
         return injected, "PRESENT", _snapshot_meta(freshness="INJECTED")
-    shape, snapshot = load_collector_snapshot_file(root / INCIDENT_STATE_RELATIVE)
+    shape, snapshot = load_collector_snapshot_file(root / COLLECTOR_SNAPSHOT_RELATIVE)
     if shape == "MISSING":
         return None, "NOT_PRESENT", _snapshot_meta(freshness="MISSING")
     if shape == "INVALID" or snapshot is None:
@@ -639,4 +640,5 @@ def compose_system_operability(
         "authority_required": bool(next_item and next_item.get("AUTHORITY_REQUIRED")),
         "non_claims": list(NON_CLAIMS),
         "incident_state_relative": INCIDENT_STATE_RELATIVE,
+        "collector_snapshot_relative": COLLECTOR_SNAPSHOT_RELATIVE,
     }

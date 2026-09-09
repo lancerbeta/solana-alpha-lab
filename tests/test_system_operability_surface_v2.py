@@ -31,6 +31,7 @@ from solana_alpha_lab.factory.runtime import copy_rehost_allowlist, load_runtime
 from solana_alpha_lab.factory.operability_watch import (  # noqa: E402
     COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS,
     COLLECTOR_SNAPSHOT_PACKET_FIELDS,
+    SNAPSHOT_RELATIVE as COLLECTOR_SNAPSHOT_RELATIVE,
     STATE_RELATIVE as INCIDENT_STATE_RELATIVE,
     build_collector_snapshot,
     evaluate_operability,
@@ -127,19 +128,33 @@ def _plant_snapshot(
     *,
     observed_at: str = "2026-09-07T12:00:00Z",
     extra_packet: dict[str, object] | None = None,
+    pending: list[dict[str, object]] | None = None,
 ) -> Path:
     body = dict(packet or _packet())
     if extra_packet:
         body.update(extra_packet)
-    path = root / INCIDENT_STATE_RELATIVE
-    path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
-        "active": {},
-        "pending": [],
-        "collector_snapshot": build_collector_snapshot(body, observed_at=observed_at),
-    }
-    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    return path
+    snapshot = build_collector_snapshot(body, observed_at=observed_at)
+    snapshot_path = root / COLLECTOR_SNAPSHOT_RELATIVE
+    snapshot_path.parent.mkdir(parents=True, exist_ok=True)
+    snapshot_path.write_text(
+        json.dumps(snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
+    incident_path = root / INCIDENT_STATE_RELATIVE
+    incident_path.parent.mkdir(parents=True, exist_ok=True)
+    incident_path.write_text(
+        json.dumps(
+            {
+                "active": {},
+                "pending": list(pending or []),
+                "collector_snapshot": snapshot,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return snapshot_path
 
 
 def _heavy_call_guard():
@@ -957,7 +972,7 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = Path(tmp) / "bad"
             root.mkdir()
-            path = root / INCIDENT_STATE_RELATIVE
+            path = root / COLLECTOR_SNAPSHOT_RELATIVE
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text("{not-json", encoding="utf-8")
             digest = hashlib.sha256(path.read_bytes()).hexdigest()
@@ -977,19 +992,15 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
             root = Path(tmp) / "schema"
             root.mkdir()
-            path = root / INCIDENT_STATE_RELATIVE
+            path = root / COLLECTOR_SNAPSHOT_RELATIVE
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(
                 json.dumps(
                     {
-                        "active": {},
-                        "pending": [],
-                        "collector_snapshot": {
-                            "schema": "smial.not-this",
-                            "schema_version": "1.0",
-                            "observed_at": "2026-09-07T12:00:00Z",
-                            "packet": _packet(),
-                        },
+                        "schema": "smial.not-this",
+                        "schema_version": "1.0",
+                        "observed_at": "2026-09-07T12:00:00Z",
+                        "packet": _packet(),
                     }
                 ),
                 encoding="utf-8",
@@ -1040,7 +1051,7 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
             root = Path(tmp) / "secrets"
             root.mkdir()
             _plant_snapshot(root, packet)
-            persisted = json.loads((root / INCIDENT_STATE_RELATIVE).read_text(encoding="utf-8"))
+            persisted = json.loads((root / COLLECTOR_SNAPSHOT_RELATIVE).read_text(encoding="utf-8"))
             stored = json.dumps(persisted)
             self.assertNotIn('"password"', stored)
             self.assertNotIn('"token"', stored)
@@ -1075,6 +1086,8 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
                 self.assertNotIn("password", snapshot["packet"])
                 self.assertIn("active", payload)
                 self.assertIn("pending", payload)
+                dedicated = json.loads((root / COLLECTOR_SNAPSHOT_RELATIVE).read_text(encoding="utf-8"))
+                self.assertEqual(dedicated, snapshot)
                 projection = compose_system_operability(
                     root=root,
                     now=NOW,
@@ -1083,8 +1096,41 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
                 )
                 self.assertEqual(projection["collection"]["source_status"], "PRESENT")
                 self.assertEqual(projection["collector_snapshot"]["freshness"], "FRESH")
+                self.assertEqual(
+                    projection["collector_snapshot_relative"], COLLECTOR_SNAPSHOT_RELATIVE
+                )
             finally:
                 store.close()
+
+    def test_get_does_not_parse_growing_incident_pending(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = _match_root(Path(tmp))
+            huge_pending = [
+                {"kind": "INCIDENT", "code": f"CODE_{idx}", "text": "x" * 2048}
+                for idx in range(400)
+            ]
+            _plant_snapshot(root, _packet(), pending=huge_pending)
+            incident = root / INCIDENT_STATE_RELATIVE
+            incident_digest = hashlib.sha256(incident.read_bytes()).hexdigest()
+            reads: list[str] = []
+            original = Path.read_text
+
+            def spy(self: Path, *args: object, **kwargs: object) -> str:
+                reads.append(self.as_posix().replace("\\", "/"))
+                return original(self, *args, **kwargs)
+
+            with patch.object(Path, "read_text", spy):
+                projection = compose_system_operability(
+                    root=root,
+                    now=NOW,
+                    unit_status=UNITS_OK,
+                    environ={},
+                )
+            self.assertEqual(projection["collector_snapshot"]["freshness"], "FRESH")
+            self.assertEqual(projection["collection"]["source_status"], "PRESENT")
+            self.assertEqual(hashlib.sha256(incident.read_bytes()).hexdigest(), incident_digest)
+            self.assertFalse(any(path.endswith(INCIDENT_STATE_RELATIVE) for path in reads))
+            self.assertTrue(any(path.endswith(COLLECTOR_SNAPSHOT_RELATIVE) for path in reads))
 
 
 if __name__ == "__main__":

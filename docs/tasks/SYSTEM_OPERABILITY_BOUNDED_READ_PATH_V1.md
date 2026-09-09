@@ -111,8 +111,9 @@ Fresh Git:
 PATCH versus a naive cache/TTL:
 
 1. ADOPT/WRAP existing operability watch as the heavy-compute producer.
-   Do not add Redis, a second SQLite, daemon, queue, timer or cache
-   framework.
+   Persist a dedicated bounded snapshot file plus the extra incident-state
+   key. Do not add Redis, a second SQLite, daemon, queue, timer or cache
+   framework. GET never parses incident `pending` history.
 2. Interactive GET is fail-closed on missing/invalid/stale snapshot.
    Stale never rebuilds synchronously.
 3. Snapshot is an explicit allowlist of derived operational fields, not
@@ -129,7 +130,8 @@ PATCH versus a naive cache/TTL:
   Letta observer (read-only live operability); `scripts/show_system_operability.py`.
 - **Cheapest falsifier:** spies/call-counts prove interactive GET invokes
   zero `build_collector_operational_packet`, zero full
-  `build_collector_read_model` fallback, zero recursive RDP/backup walk.
+  `build_collector_read_model` fallback, zero recursive RDP/backup walk,
+  and does not parse `operability_incident_state.json` pending history.
 - **User-visible result:** HOME/`/system` stay honest current-health
   projections; heavy derived evidence is timestamped and freshness-aware.
 - **Non-goals:** VPS deploy, systemd User/Group, Redis, new daemon,
@@ -141,8 +143,10 @@ BEFORE: owner GET → live collector packet recomputation → latency scales
 with data/I/O/history.
 
 AFTER: scheduled watch computes the packet once per cycle, persists a
-bounded snapshot atomically in `operability_incident_state.json`;
-interactive GET reads the snapshot plus bounded live system signals.
+bounded snapshot atomically as `operability_collector_snapshot.json`
+and as an extra key in `operability_incident_state.json`; interactive
+GET reads only the dedicated snapshot file plus bounded live system
+signals. GET never parses `pending` / `active` incident history.
 
 ## UNCERTAINTY_REMOVED
 
@@ -177,7 +181,8 @@ collector-derived `OK_OBSERVED`.
 
 ## First-deploy transition (design only, do not deploy)
 
-Missing `collector_snapshot` after first future deploy → honest
-UNKNOWN / NOT_PRESENT, no synchronous rebuild. Judge normal `/system`
-semantics only after one scheduled watch cycle writes a post-deploy
-snapshot.
+Missing dedicated `operability_collector_snapshot.json` after first
+future deploy → honest UNKNOWN / NOT_PRESENT, no synchronous rebuild.
+Judge normal `/system` semantics only after one scheduled watch cycle
+writes a post-deploy snapshot file. Predecessor incident-state extra
+key is not a GET fallback.
