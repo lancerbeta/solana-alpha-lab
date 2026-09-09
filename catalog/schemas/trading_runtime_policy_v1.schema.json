@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/trading_runtime_policy_v1.schema.json",
+  "title": "SMIAL TradingRuntimePolicy v1 PAPER/SHADOW operating envelope",
+  "description": "Append-only runtime capitalization/risk overlay. Current values live in PaperPlane, never in Git.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "policy_id",
+    "mode",
+    "revision",
+    "created_at",
+    "reason",
+    "new_entries_enabled",
+    "policy_sha256",
+    "previous_policy_sha256"
+  ],
+  "properties": {
+    "schema": {"const": "smial.trading-runtime-policy"},
+    "schema_version": {"const": "1.0"},
+    "policy_id": {
+      "type": "string",
+      "pattern": "^TRP-[A-Z0-9]+(?:-[A-Z0-9]+)*$"
+    },
+    "mode": {"enum": ["PAPER", "SHADOW"]},
+    "revision": {"type": "integer", "minimum": 1},
+    "created_at": {
+      "type": "string",
+      "pattern": "^20[0-9]{2}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "reason": {"type": "string", "minLength": 1, "maxLength": 240},
+    "new_entries_enabled": {"type": "boolean"},
+    "global_entry_notional_cap_usd": {"type": ["string", "null"], "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+    "max_total_open_positions": {"type": ["integer", "null"], "minimum": 1},
+    "max_total_open_notional_usd": {"type": ["string", "null"], "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+    "default_strategy_max_open_positions": {"type": ["integer", "null"], "minimum": 1},
+    "default_strategy_max_open_notional_usd": {"type": ["string", "null"], "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+    "max_open_positions_per_mint": {"type": ["integer", "null"], "minimum": 1},
+    "max_open_notional_per_mint_usd": {"type": ["string", "null"], "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+    "strategy_overrides": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "entry_notional_cap_usd": {"type": ["string", "null"], "pattern": "^[0-9]+(?:\\.[0-9]+)?$"},
+          "max_open_positions": {"type": ["integer", "null"], "minimum": 1},
+          "max_open_notional_usd": {"type": ["string", "null"], "pattern": "^[0-9]+(?:\\.[0-9]+)?$"}
+        }
+      }
+    },
+    "policy_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "previous_policy_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

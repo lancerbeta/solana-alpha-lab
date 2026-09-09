@@ -11,9 +11,9 @@ allowed_routes:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: 62527018dca6f8a98a5722b71ce09c21f6aedd74
+  expected_base: eabf4afb5366c15d44efc266ee14fb75bc12d33e
   expected_upstream: origin/main
-  expected_upstream_oid: 62527018dca6f8a98a5722b71ce09c21f6aedd74
+  expected_upstream_oid: eabf4afb5366c15d44efc266ee14fb75bc12d33e
   expected_branch: cursor/hfic-packet14-availability-fast-lane-guard-v1
   dirty_mode: ALLOW_REPORTED
 

@@ -4,8 +4,8 @@
   "review_id": "HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-FACTORY-FIT-001",
   "as_of": "2026-09-09",
   "task_id": "HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1",
-  "reviewed_bindings_sha256": "06c53dfbc6c82b5d77eed3d510652ef788246dc58b9d1cd2969097856e9189de",
-  "reviewed_inventory_sha256": "296e066c8d8d3324ae2e191f008a4bacac6cd4d398e78542306ee8ea9722a8c6",
+  "reviewed_bindings_sha256": "cdd265766621b1f801bc64aedc902fb17783869e00ad3c7b136e1f1fc56f030c",
+  "reviewed_inventory_sha256": "376ef1c381318167b70de8a59e5744df6829e0635c86109e30eb958a269b1b28",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

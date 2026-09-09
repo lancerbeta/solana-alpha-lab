@@ -343,6 +343,14 @@ def build_operations_projection(
                 "entered_notional_usd": None
                 if p.get("entered_notional_usd_dec") is None
                 else format(Decimal(str(p["entered_notional_usd_dec"])), "f"),
+                "admitted_entry_notional_usd": None
+                if p.get("admitted_entry_notional_usd_dec") is None
+                else format(Decimal(str(p["admitted_entry_notional_usd_dec"])), "f"),
+                "strategy_requested_notional_usd": None
+                if p.get("strategy_requested_notional_usd_dec") is None
+                else format(Decimal(str(p["strategy_requested_notional_usd_dec"])), "f"),
+                "runtime_policy_revision": p.get("runtime_policy_revision"),
+                "runtime_policy_sha256": p.get("runtime_policy_sha256"),
                 "net_pnl_usd": view["net_pnl_usd"],
                 "pnl_status": view["pnl_status"],
                 "pnl_evidence_class": view["pnl_evidence_class"],

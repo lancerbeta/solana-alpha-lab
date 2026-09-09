@@ -37,18 +37,25 @@ from solana_alpha_lab.factory.owner_language import (
     token_gloss,
 )
 from solana_alpha_lab.factory.owner_surface import (
+    ACTIVE_POSITION_STATES,
+    HISTORY_POSITION_STATES,
     canon,
     cell_html,
     command_button,
+    compact_id_html,
     compact_title,
     dual,
     esc,
     fact_strip,
     mapping_rows,
     page_head,
+    pager_html,
+    paginate,
+    parse_page,
     status_html,
     technical,
     token_dual,
+    zone,
 )
 from solana_alpha_lab.factory.research_workbench import (
     ResearchWorkbenchError,
@@ -387,29 +394,85 @@ def _recent_changes(items: list[dict[str, Any]], *, empty: str) -> str:
     )
 
 
-def _position_table(rows: list[dict[str, Any]]) -> str:
+ACTIVE_STATE_PRIORITY = {
+    "EXIT_REQUIRED": 0,
+    "EXITING": 1,
+    "UNRESOLVED": 2,
+    "UNKNOWN": 3,
+    "ATTEMPTING": 4,
+    "PARTIAL": 5,
+    "OPEN": 6,
+    "INTENT_CREATED": 7,
+    "SIGNALLED": 8,
+    "WATCHED": 9,
+}
+
+
+def _position_sort_key(row: Mapping[str, Any], *, history: bool) -> tuple:
+    if history:
+        return (
+            str(row.get("closed_at") or row.get("opened_at") or ""),
+            str(row.get("position_id") or ""),
+        )
+    return (
+        ACTIVE_STATE_PRIORITY.get(str(row.get("state") or ""), 99),
+        str(row.get("opened_at") or ""),
+        str(row.get("position_id") or ""),
+    )
+
+
+def _ops_matches(row: Mapping[str, Any], needle: str) -> bool:
+    if not needle:
+        return True
+    blob = " ".join(
+        str(row.get(key) or "")
+        for key in (
+            "position_id",
+            "bot_instance_id",
+            "strategy_id",
+            "strategy_version",
+            "mint",
+            "state",
+        )
+    )
+    return needle.casefold() in blob.casefold()
+
+
+def _position_table(
+    rows: list[dict[str, Any]],
+    *,
+    start_ordinal: int = 1,
+    history: bool = False,
+) -> str:
     if not rows:
-        return "<p>Нет позиций.</p>"
+        copy_key = "no_positions" if not history else "no_positions"
+        return f"<p>{esc(surface_copy('OPERATIONS', copy_key))}</p>"
     body = []
-    for row in rows:
+    for offset, row in enumerate(rows):
+        n = start_ordinal + offset
         body.append(
             "<tr>"
-            f"<td>{html.escape(str(row.get('position_id') or ''))}</td>"
-            f"<td>{html.escape(str(row.get('strategy_id') or ''))}/{html.escape(str(row.get('strategy_version') or ''))}</td>"
-            f"<td>{html.escape(str(row.get('activation_epoch_id') or ''))}</td>"
-            f"<td>{html.escape(str(row.get('mint') or ''))}</td>"
-            f"<td>{html.escape(str(row.get('state') or ''))}</td>"
-            f"<td>{html.escape(str(row.get('opened_at') or ''))}</td>"
-            f"<td>{html.escape(_cell(row.get('entered_notional_usd')))}</td>"
+            f"<td class=\"num\">{n}</td>"
+            f"<td class=\"mono\">{esc(row.get('mint') or '')}</td>"
+            f"<td>{esc(row.get('strategy_id') or '')} "
+            f"{canon(row.get('strategy_version'))}</td>"
+            f"<td>{canon(row.get('state'))}</td>"
+            f"<td class=\"mono\">{esc(row.get('opened_at') or '')}</td>"
+            f"<td><span class=\"requested\">{esc(_cell(row.get('strategy_requested_notional_usd')))}</span> "
+            f"<span class=\"effective\">{esc(_cell(row.get('admitted_entry_notional_usd') or row.get('entered_notional_usd')))}</span></td>"
             f"<td>{html.escape(_pnl_cell(row))}</td>"
-            f"<td>{html.escape(_cell(row.get('pnl_evidence_class')))}</td>"
+            f"<td>{canon(row.get('pnl_evidence_class'))}</td>"
+            f"<td>{compact_id_html(row.get('position_id'))}</td>"
             "</tr>"
         )
     return (
         "<table><tr>"
-        "<th>position_id</th><th>strategy</th><th>activation_epoch</th><th>mint</th>"
-        "<th>state</th><th>opened_at</th><th>entry_notional</th><th>pnl</th>"
-        "<th>pnl_evidence_class</th></tr>"
+        f"<th>{esc(research_copy('col_num'))}</th>"
+        "<th>mint</th><th>strategy</th>"
+        "<th>state</th><th>opened</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'effective'))} / entered</th>"
+        "<th>pnl</th><th>evidence</th>"
+        "<th>Position ID</th></tr>"
         + "".join(body)
         + "</table>"
     )
@@ -461,49 +524,159 @@ def _context_table(contexts: list[dict[str, Any]]) -> str:
     if not contexts:
         return f"<p>{esc(surface_copy('OPERATIONS', 'no_bots'))}</p>"
     body = []
-    for row in contexts:
+    for index, row in enumerate(contexts, start=1):
         status = row.get("bot_status") or "NOT_ACTIVATED"
+        identity = (
+            f"{esc(row.get('strategy_id') or '')} {canon(row.get('strategy_version'))}"
+            f"<br>{compact_id_html(row.get('bot_instance_id'))}"
+        )
+        inventory = (
+            f"{cell_html(row.get('open_risk_count'))} / "
+            f"{cell_html(row.get('open_positions'))}"
+        )
         body.append(
             "<tr>"
-            f"<td class=\"mono\">{esc(row.get('strategy_id') or '')}</td>"
-            f"<td class=\"mono\">{esc(row.get('strategy_version') or '')}</td>"
-            f"<td>{canon(row.get('mode'))}</td>"
-            f"<td class=\"mono\">{esc(row.get('activation_epoch_id') or '')}</td>"
-            f"<td class=\"mono\">{esc(row.get('bot_instance_id') or '')}</td>"
-            f"<td>{canon(status)}</td>"
-            f"<td>{canon(row.get('relation'))}</td>"
-            f"<td>{cell_html(row.get('entries_paused'))}</td>"
-            f"<td class=\"mono\">{esc(row.get('started_at') or '')}</td>"
-            f"<td class=\"mono\">{esc(row.get('stopped_at') or '')}</td>"
+            f"<td class=\"num\">{index}</td>"
+            f"<td>{identity}</td>"
+            f"<td>{canon(status)} {canon(row.get('mode'))}</td>"
             f"<td>{canon(row.get('current_blocker') or 'NONE')}</td>"
-            f"<td>{cell_html(row.get('open_risk_count'))}</td>"
-            f"<td>{cell_html(row.get('open_positions'))}</td>"
-            f"<td>{cell_html(row.get('partial_positions'))}</td>"
-            f"<td>{cell_html(row.get('unknown_positions'))}</td>"
-            f"<td>{cell_html(row.get('exit_required'))}</td>"
-            f"<td>{cell_html(row.get('unresolved_positions'))}</td>"
+            f"<td>{inventory}</td>"
             f"<td>{_next_action_html(str(row.get('next_safe_action') or 'OBSERVE'))}</td>"
             "</tr>"
         )
     return (
         "<table><tr>"
-        "<th>strategy_id</th><th>version</th><th>mode</th><th>epoch</th>"
-        "<th>bot</th><th>status</th><th>relation</th>"
-        f"<th>{esc(surface_copy('OPERATIONS', 'entries_paused'))}</th>"
-        "<th>started_at</th><th>stopped_at</th><th>blocker</th>"
+        f"<th>{esc(research_copy('col_num'))}</th>"
+        "<th>strategy / bot</th><th>state</th><th>blocker</th>"
         f"<th>{esc(surface_copy('OPERATIONS', 'open_risk'))}</th>"
-        f"<th>{esc(surface_copy('OPERATIONS', 'open_positions'))}</th>"
-        "<th>PARTIAL</th>"
-        f"<th>{esc(surface_copy('OPERATIONS', 'unknown_positions'))}</th>"
-        f"<th>{esc(surface_copy('OPERATIONS', 'exit_required'))}</th>"
-        f"<th>{esc(surface_copy('OPERATIONS', 'unresolved'))}</th>"
         "<th>next</th></tr>"
         + "".join(body)
         + "</table>"
+        + technical(
+            "<table><tr><th>bot</th><th>epoch</th><th>started</th><th>stopped</th>"
+            "<th>relation</th><th>PARTIAL</th><th>UNKNOWN</th></tr>"
+            + "".join(
+                "<tr>"
+                f"<td>{compact_id_html(row.get('bot_instance_id'))}</td>"
+                f"<td class=\"mono\">{esc(row.get('activation_epoch_id') or '')}</td>"
+                f"<td class=\"mono\">{esc(row.get('started_at') or '')}</td>"
+                f"<td class=\"mono\">{esc(row.get('stopped_at') or '')}</td>"
+                f"<td>{canon(row.get('relation'))}</td>"
+                f"<td>{cell_html(row.get('partial_positions'))}</td>"
+                f"<td>{cell_html(row.get('unknown_positions'))}</td>"
+                "</tr>"
+                for row in contexts
+            )
+            + "</table>",
+            title=surface_copy("OPERATIONS", "machine"),
+        )
     )
 
 
-def _operations_section(model: dict[str, Any]) -> str:
+def _entries_state_html(enabled: Any, status: Any) -> str:
+    if enabled is True:
+        return dual(surface_copy("OPERATIONS", "entries_enabled"), "ENABLED")
+    if enabled is False:
+        return dual(surface_copy("OPERATIONS", "entries_disabled"), "DISABLED")
+    return dual("не настроено", status or "NOT_CONFIGURED_STRATEGY_ONLY", unknown=True)
+
+
+def _overlay_limit_html(value: Any) -> str:
+    if value is None:
+        return dual(surface_copy("OPERATIONS", "limit_unset"), "NOT_SET")
+    return cell_html(value)
+
+
+def _policy_status_gloss(status: str) -> str:
+    if status == "RUNTIME_POLICY_INVALID":
+        return surface_copy("OPERATIONS", "policy_status_invalid")
+    if status == "VALID":
+        return surface_copy("OPERATIONS", "policy_status_valid")
+    return surface_copy("OPERATIONS", "policy_status_not_configured")
+
+
+def _runtime_policy_zone(envelope: Mapping[str, Any], *, title: str | None = None) -> str:
+    modes = envelope.get("modes") if isinstance(envelope.get("modes"), dict) else {}
+    blocks = []
+    for mode in ("PAPER", "SHADOW"):
+        item = modes.get(mode) if isinstance(modes.get(mode), dict) else {}
+        status = str(item.get("status") or "NOT_CONFIGURED_STRATEGY_ONLY")
+        enabled = item.get("new_entries_enabled")
+        positions_max = item.get("max_total_open_positions")
+        notional_max = item.get("max_total_open_notional_usd")
+        active = item.get("active_risk_positions")
+        open_n = item.get("open_risk_notional_usd")
+        if item.get("open_risk_notional_unknown"):
+            open_n_html = dual("неизвестно", "UNKNOWN", unknown=True)
+        else:
+            open_n_html = cell_html(open_n)
+        cap = item.get("global_entry_notional_cap_usd")
+        blocks.append(
+            "<table class=\"mode-envelope\"><tr>"
+            "<th>mode</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'policy_status'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'policy_revision'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'changed_at'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'new_entries_global'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'open_risk_capital'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'open_notional'))}</th>"
+            f"<th>{esc(surface_copy('OPERATIONS', 'runtime_cap_global'))}</th>"
+            "</tr><tr>"
+            f"<td>{canon(mode)}</td>"
+            f"<td>{canon(status)}<br><span class=\"page-note\">{esc(_policy_status_gloss(status))}</span></td>"
+            f"<td>{_overlay_limit_html(item.get('revision'))}</td>"
+            f"<td>{_overlay_limit_html(item.get('changed_at'))}</td>"
+            f"<td>{_entries_state_html(enabled, status)}</td>"
+            f"<td>{cell_html(active)} / {_overlay_limit_html(positions_max)}</td>"
+            f"<td>{open_n_html} / {_overlay_limit_html(notional_max)}</td>"
+            f"<td>{_overlay_limit_html(cap)}</td>"
+            "</tr></table>"
+        )
+    by_rows = []
+    for index, row in enumerate(list(envelope.get("by_strategy") or []), start=1):
+        if not isinstance(row, dict):
+            continue
+        by_rows.append(
+            "<tr>"
+            f"<td class=\"num\">{index}</td>"
+            f"<td>{esc(row.get('mode'))}</td>"
+            f"<td>{esc(row.get('strategy_id') or '')} {canon(row.get('strategy_version'))}</td>"
+            f"<td>{cell_html(row.get('active_positions'))} / "
+            f"{_overlay_limit_html(row.get('runtime_max_open_positions'))}<br>"
+            f"<span class=\"page-note\">{esc(surface_copy('OPERATIONS', 'declared_bot_max'))} "
+            f"{cell_html(row.get('declared_max_open_positions'))}</span></td>"
+            f"<td>{cell_html(row.get('open_risk_notional_usd'))}</td>"
+            f"<td><span class=\"requested\">{esc(surface_copy('OPERATIONS', 'requested'))} "
+            f"{cell_html(row.get('requested_notional_usd'))}</span><br>"
+            f"<span class=\"runtime-cap\">{esc(surface_copy('OPERATIONS', 'runtime_cap'))} "
+            f"{_overlay_limit_html(row.get('runtime_entry_cap_usd'))}</span><br>"
+            f"<span class=\"effective\">{esc(surface_copy('OPERATIONS', 'effective'))} "
+            f"{cell_html(row.get('effective_next_entry_notional_usd'))}</span></td>"
+            f"<td>{canon(row.get('blocker'))}</td>"
+            "</tr>"
+        )
+    strategy_table = (
+        "<table><tr>"
+        f"<th>{esc(research_copy('col_num'))}</th><th>mode</th><th>strategy</th>"
+        "<th>positions</th>"
+        f"<th>{esc(surface_copy('OPERATIONS', 'open_notional'))}</th>"
+        "<th>requested / runtime / effective</th><th>blocker</th></tr>"
+        + "".join(by_rows)
+        + "</table>"
+        if by_rows
+        else f"<p>{esc(surface_copy('OPERATIONS', 'no_strategies'))}</p>"
+    )
+    heading = title or surface_copy("OPERATIONS", "trading_limits")
+    return zone(
+        heading,
+        "".join(blocks) + f"<h3>{esc(surface_copy('OPERATIONS', 'by_strategy'))}</h3>" + strategy_table,
+    )
+
+
+def _operations_section(
+    model: dict[str, Any],
+    query: dict[str, list[str]] | None = None,
+) -> str:
     trading = (
         model.get("trading_operations")
         if isinstance(model.get("trading_operations"), dict)
@@ -688,33 +861,95 @@ def _operations_section(model: dict[str, Any]) -> str:
         if spec_rows
         else ""
     )
+    envelope = (
+        trading.get("runtime_envelope")
+        if isinstance(trading.get("runtime_envelope"), dict)
+        else {}
+    )
+    needle = ((query or {}).get("q") or [""])[0].strip()
+    raw_positions = [
+        row
+        for row in list(ops.get("position_rows") or [])
+        if isinstance(row, dict) and _ops_matches(row, needle)
+    ]
+    active_rows = [
+        row
+        for row in raw_positions
+        if str(row.get("state") or "") in ACTIVE_POSITION_STATES
+    ]
+    history_rows = [
+        row
+        for row in raw_positions
+        if str(row.get("state") or "") in HISTORY_POSITION_STATES
+    ]
+    active_rows.sort(key=lambda row: _position_sort_key(row, history=False))
+    history_rows.sort(key=lambda row: _position_sort_key(row, history=True), reverse=True)
+    active_page = paginate(active_rows, page=parse_page(query, "page"))
+    history_page = paginate(history_rows, page=parse_page(query, "hist_page"))
+    pager_params = {"q": needle}
+    search_form = (
+        "<form method=\"get\" action=\"/operations\" class=\"search\">"
+        f"<input name=\"q\" value=\"{esc(needle)}\" maxlength=\"80\" "
+        f"aria-label=\"{esc(surface_copy('OPERATIONS', 'search_ops'))}\">"
+        f"<button type=\"submit\">{esc(research_copy('search'))}</button></form>"
+    )
+    active_html = (
+        f"<p>ACTIVE POSITIONS = {active_page['total']}</p>"
+        + pager_html(active_page, base_path="/operations", params=pager_params)
+        + _position_table(
+            list(active_page["rows"]),
+            start_ordinal=int(active_page["start_ordinal"] or 1),
+        )
+    )
+    history_html = (
+        pager_html(
+            history_page,
+            base_path="/operations",
+            params=pager_params,
+            page_param="hist_page",
+        )
+        + _position_table(
+            list(history_page["rows"]),
+            start_ordinal=int(history_page["start_ordinal"] or 1),
+            history=True,
+        )
+    )
     return (
         source_banner
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'now'))}</h2>"
-        + summary
-        + last_html
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'attention'))}</h2>"
-        + _attention(
-            list(attention_items),
-            empty=surface_copy("OPERATIONS", "no_attention"),
+        + _runtime_policy_zone(envelope)
+        + zone(surface_copy("OPERATIONS", "now"), summary + last_html)
+        + zone(
+            surface_copy("OPERATIONS", "attention"),
+            _attention(
+                list(attention_items),
+                empty=surface_copy("OPERATIONS", "no_attention"),
+            ),
         )
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'strategies_bots'))}</h2>"
-        + _context_table(list(contexts))
-        + f"<p>{esc(surface_copy('OPERATIONS', 'activation_path'))} "
-        + f"{esc(surface_copy('OPERATIONS', 'no_start'))}</p>"
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'trace'))}</h2>"
-        + _trace_table(list(traces))
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'positions'))}</h2>"
-        + _position_table(list(ops.get("position_rows") or []))
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'recent'))}</h2>"
-        + _recent_changes(
-            list(model.get("recent_changes") or []),
-            empty=surface_copy("OPERATIONS", "no_recent"),
+        + zone(
+            surface_copy("OPERATIONS", "strategies_bots"),
+            _context_table(list(contexts))
+            + f"<p>{esc(surface_copy('OPERATIONS', 'activation_path'))} "
+            + f"{esc(surface_copy('OPERATIONS', 'no_start'))}</p>",
         )
-        + f"<h2>{esc(surface_copy('OPERATIONS', 'commands'))}</h2>"
-        + bot_warning
-        + spec_table
-        + commands
+        + technical(
+            f"<h3>{esc(surface_copy('OPERATIONS', 'trace'))}</h3>"
+            + _trace_table(list(traces)),
+            title=surface_copy("OPERATIONS", "trace"),
+        )
+        + search_form
+        + zone(surface_copy("OPERATIONS", "active_positions"), active_html)
+        + zone(surface_copy("OPERATIONS", "history_positions"), history_html)
+        + zone(
+            surface_copy("OPERATIONS", "recent"),
+            _recent_changes(
+                list(model.get("recent_changes") or []),
+                empty=surface_copy("OPERATIONS", "no_recent"),
+            ),
+        )
+        + zone(
+            surface_copy("OPERATIONS", "commands"),
+            bot_warning + spec_table + commands,
+        )
         + technical(
             f"<h3>{esc(surface_copy('OPERATIONS', 'bots'))}</h3>"
             + "<table><tr><th>bot</th><th>strategy</th><th>mode</th>"
@@ -851,6 +1086,18 @@ def _economics_section(model: dict[str, Any]) -> str:
     coverage = eco.get("coverage") if isinstance(eco.get("coverage"), dict) else {}
     next_action = str(eco.get("next_safe_action") or "")
     next_gloss, next_canon, _unknown = token_gloss(NEXT_ACTION_GLOSS, next_action)
+    envelope = eco.get("runtime_envelope") if isinstance(eco.get("runtime_envelope"), dict) else {}
+    envelope_html = (
+        _runtime_policy_zone(envelope, title=surface_copy("ECONOMICS", "runtime_envelope"))
+        if envelope.get("modes")
+        else (
+        zone(
+            surface_copy("ECONOMICS", "runtime_envelope"),
+            f"<p>{esc(surface_copy('ECONOMICS', 'runtime_not_wallet'))}</p>"
+            + f"<p class=\"semantic-unknown\">{canon('NOT_CONFIGURED_STRATEGY_ONLY')}</p>",
+        )
+        )
+    )
     all_unknown = source in {"SOURCE_NOT_PRESENT", "SOURCE_UNAVAILABLE", "NOT_PRESENT"}
     banner = ""
     if all_unknown:
@@ -952,6 +1199,8 @@ def _economics_section(model: dict[str, Any]) -> str:
     )
     return (
         banner
+        + envelope_html
+        + f"<p>{esc(surface_copy('ECONOMICS', 'runtime_not_wallet'))}</p>"
         + f"<h2>{esc(surface_copy('ECONOMICS', 'proven'))}</h2>"
         + fact_strip(proven)
         + f"<h2>{esc(surface_copy('ECONOMICS', 'reconciled'))}</h2>"
@@ -960,6 +1209,7 @@ def _economics_section(model: dict[str, Any]) -> str:
         + f"<p>{esc(surface_copy('ECONOMICS', 'mark_subordinate'))}</p>"
         + mark_html
         + f"<h2>{esc(surface_copy('ECONOMICS', 'declared_risk'))}</h2>"
+        + f"<p>{esc(surface_copy('ECONOMICS', 'runtime_not_wallet'))}</p>"
         + (risk_html or f"<p class=\"empty\">{esc(surface_copy('ECONOMICS', 'no_risk'))}</p>")
         + other_limits
         + f"<h2>{esc(surface_copy('ECONOMICS', 'coverage_h'))}</h2>"
@@ -1022,11 +1272,11 @@ def _href_detail(locator: Mapping[str, Any]) -> str:
     )
 
 
-def _research_rows(rows: list[dict[str, Any]]) -> str:
+def _research_rows(rows: list[dict[str, Any]], *, start_ordinal: int = 1) -> str:
     if not rows:
         return f"<p class=\"empty\">{html.escape(research_copy('none'))}</p>"
     body = []
-    for row in rows:
+    for offset, row in enumerate(rows):
         locator = row.get("locator") if isinstance(row.get("locator"), dict) else {}
         has_locator = bool(
             locator.get("entity_id")
@@ -1060,28 +1310,31 @@ def _research_rows(rows: list[dict[str, Any]]) -> str:
         if not has_locator and row.get("next_safe_action"):
             marker.append(str(row.get("next_safe_action")))
         native_state = str(row.get("native_state") or "UNKNOWN")
+        entity_id = locator.get("entity_id") or ""
         body.append(
             "<tr class=\"research-row\">"
+            f"<td class=\"num\">{start_ordinal + offset}</td>"
             + kind_cell
             + title_cell
+            + f"<td>{compact_id_html(entity_id)}</td>"
             + f"<td>{status_html(native_state)}</td>"
             f"<td>{canon(row.get('truth_plane') or '')}</td>"
             f"<td>{canon(row.get('evidence_class') or '')}</td>"
             f"<td class=\"mono\">{esc(row.get('as_of') or '')}</td>"
             f"<td>{esc(' · '.join(marker) if marker else '')}</td>"
-            f"<td class=\"mono\">{esc(locator.get('entity_id') or '')}</td>"
             "</tr>"
         )
     return (
         "<table class=\"research-table\"><tr>"
+        f"<th>{html.escape(research_copy('col_num'))}</th>"
         f"<th>{html.escape(research_copy('col_kind'))}</th>"
         f"<th>{html.escape(research_copy('col_title'))}</th>"
+        f"<th>{html.escape(research_copy('col_id'))}</th>"
         f"<th>{html.escape(research_copy('col_state'))}</th>"
         f"<th>{html.escape(research_copy('col_plane'))}</th>"
         f"<th>{html.escape(research_copy('col_evidence_class'))}</th>"
         f"<th>{html.escape(research_copy('col_as_of'))}</th>"
         f"<th>{html.escape(research_copy('col_marker'))}</th>"
-        f"<th>{html.escape(research_copy('col_id'))}</th>"
         "</tr>" + "".join(body) + "</table>"
     )
 
@@ -1145,6 +1398,32 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
     filters = view.get("filters") if isinstance(view.get("filters"), dict) else {}
     q = html.escape(str(filters.get("q") or ""))
     kind = html.escape(str(filters.get("kind") or "all"))
+    state = html.escape(str(filters.get("state") or ""))
+    truth_plane = html.escape(str(filters.get("truth_plane") or ""))
+    evidence_class = html.escape(str(filters.get("evidence_class") or ""))
+    universe = list(view.get("universe") or [])
+    total = int(view.get("universe_total") or len(universe))
+    page = int(filters.get("page") or 1)
+    limit = int(filters.get("limit") or 25)
+    start = ((page - 1) * limit) + 1 if universe else 0
+    pager_info = {
+        "total": total,
+        "page": page,
+        "page_size": limit,
+        "start_ordinal": start,
+        "end_ordinal": start + len(universe) - 1 if universe else 0,
+        "has_prev": page > 1 and total > limit,
+        "has_next": page * limit < total,
+        "show_controls": total > limit,
+    }
+    pager_params = {
+        "q": str(filters.get("q") or ""),
+        "kind": str(filters.get("kind") or ""),
+        "state": str(filters.get("state") or ""),
+        "truth_plane": str(filters.get("truth_plane") or ""),
+        "evidence_class": str(filters.get("evidence_class") or ""),
+        "limit": str(limit),
+    }
     source_table = (
         "<table class=\"source-panel\">"
         + "<tr><th>"
@@ -1225,8 +1504,12 @@ def _research_overview_html(view: Mapping[str, Any]) -> str:
         + "<form method=\"get\" action=\"/research\" class=\"search\">"
         + f"<input name=\"q\" value=\"{q}\" maxlength=\"80\" aria-label=\"{html.escape(research_copy('search_aria'))}\">"
         + f"<input type=\"hidden\" name=\"kind\" value=\"{kind}\">"
+        + f"<input type=\"hidden\" name=\"state\" value=\"{state}\">"
+        + f"<input type=\"hidden\" name=\"truth_plane\" value=\"{truth_plane}\">"
+        + f"<input type=\"hidden\" name=\"evidence_class\" value=\"{evidence_class}\">"
         + f"<button type=\"submit\">{html.escape(research_copy('search'))}</button></form>"
-        + _research_rows(list(view.get("universe") or []))
+        + pager_html(pager_info, base_path="/research", params=pager_params)
+        + _research_rows(universe, start_ordinal=start or 1)
         + technical(source_table, title=surface_copy("RESEARCH", "sources"))
         + "</section>"
     )
@@ -1613,11 +1896,16 @@ def _research_section(app: FactoryApplication, query: dict[str, list[str]]) -> s
         )
         if locator is not None:
             return _research_detail_html(app.research_detail(locator))
-        limit_raw = first("limit") or "80"
+        limit_raw = first("limit") or "25"
         try:
             limit = int(limit_raw)
         except ValueError as exc:
             raise ApplicationError("LIMIT_REJECTED") from exc
+        page_raw = first("page") or "1"
+        try:
+            page = int(page_raw)
+        except ValueError:
+            page = 1
         return _research_overview_html(
             app.research_overview(
                 q=first("q"),
@@ -1626,6 +1914,7 @@ def _research_section(app: FactoryApplication, query: dict[str, list[str]]) -> s
                 state=first("state"),
                 evidence_class=first("evidence_class"),
                 limit=limit,
+                page=page,
             )
         )
     except (ResearchWorkbenchError, ApplicationError, ValueError) as exc:
@@ -1633,6 +1922,34 @@ def _research_section(app: FactoryApplication, query: dict[str, list[str]]) -> s
             f"<p class=\"error\">{html.escape(owner_error(getattr(exc, 'code', str(exc))))}</p>"
             f"<p><a href=\"/research\">{html.escape(research_copy('back'))}</a></p>"
         )
+
+
+def _home_needs_exact_phrase(
+    current: list[Any],
+    copy_blocks: list[dict[str, str]],
+) -> bool:
+    phrase = ""
+    for block in copy_blocks:
+        if block.get("id") == "exact-owner-phrase":
+            phrase = str(block.get("text") or "")
+            break
+    if not phrase:
+        return False
+    for item in current:
+        if not isinstance(item, dict):
+            continue
+        blob = " ".join(
+            str(item.get(key) or "")
+            for key in ("NEXT_SAFE_ACTION", "WHY_NOW", "EVIDENCE", "id", "code")
+        )
+        if phrase in blob:
+            return True
+        upper = blob.upper()
+        if "AUTHORITY" in upper and "PHRASE" in upper:
+            return True
+        if "REQUIRED_OWNER_PHRASE" in upper:
+            return True
+    return False
 
 
 def _home_section(
@@ -1685,6 +2002,20 @@ def _home_section(
         f"{esc(attention_label('EVIDENCE'))} · "
         f"{esc(attention_label('NEXT_SAFE_ACTION'))}</p>"
     )
+    phrase_needed = _home_needs_exact_phrase(current, copy_blocks)
+    primary_phrase = ""
+    technical_phrase = ""
+    if copy_blocks and phrase_needed:
+        primary_phrase = (
+            f"<h2>{esc(surface_copy('HOME', 'phrase'))}</h2>"
+            + _copy_sections(copy_blocks)
+        )
+    elif copy_blocks:
+        technical_phrase = (
+            f"<h3>{esc(surface_copy('HOME', 'phrase_technical'))}</h3>"
+            f"<p class=\"page-note\">{esc(surface_copy('HOME', 'phrase_not_urgent'))}</p>"
+            + _copy_sections(copy_blocks)
+        )
     return (
         f"<h2>{esc(surface_copy('HOME', 'attention'))}</h2>"
         + legend
@@ -1699,17 +2030,12 @@ def _home_section(
         + f"<h2>{esc(surface_copy('HOME', 'next'))}</h2>"
         + next_html
         + mark_form
-        + (
-            f"<h2>{esc(surface_copy('HOME', 'phrase'))}</h2>"
-            f"<p class=\"page-note\">{esc(surface_copy('HOME', 'phrase_not_urgent'))}</p>"
-            + _copy_sections(copy_blocks)
-            if copy_blocks
-            else ""
-        )
+        + primary_phrase
         + technical(
             f"<h3>{esc(surface_copy('HOME', 'packet'))}</h3><table>"
             + _rows(packet)
             + "</table>"
+            + technical_phrase
             + "<h3>Runtime</h3>"
             + f"<p>{_verdict_html(runtime.get('verdict'))}</p>"
             + "<table>"
@@ -2124,6 +2450,7 @@ def _page(
     research_html: str | None = None,
     visual_css: str = "",
     visual_consumed: bool = False,
+    query: dict[str, list[str]] | None = None,
 ) -> bytes:
     cockpit = model.get("cockpit") if isinstance(model.get("cockpit"), dict) else {}
     system = (
@@ -2145,7 +2472,7 @@ def _page(
             f"<h2>{html.escape(research_copy('title'))}</h2>"
             "<p class=\"semantic-unknown\">UNKNOWN</p>"
         ),
-        "OPERATIONS": _operations_section(model),
+        "OPERATIONS": _operations_section(model, query),
         "ECONOMICS": _economics_section(model),
         "MARKET": _market_section(model),
         "SYSTEM": _system_section(system),
@@ -2233,6 +2560,7 @@ def make_handler(app: FactoryApplication) -> type[BaseHTTPRequestHandler]:
                 research_html=research_html,
                 visual_css=visual_os_css(app.root),
                 visual_consumed=visual_os_consumed(app.root),
+                query=query,
             )
             self.send_response(200)
             self.send_header("Content-Type", "text/html; charset=utf-8")

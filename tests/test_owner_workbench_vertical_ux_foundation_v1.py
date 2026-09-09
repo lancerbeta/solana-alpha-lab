@@ -49,7 +49,7 @@ HEADINGS = {
     ),
     "/operations": (
         "Операции",
-        "Что исполняется, где остановился путь и что безопасно сделать?",
+        "Что сейчас действительно активно, какой риск открыт, что блокирует новые входы и что я могу безопасно сделать?",
     ),
     "/economics": (
         "Экономика",
@@ -155,12 +155,14 @@ class OwnerWorkbenchVerticalUxFoundationTests(unittest.TestCase):
                 self.assertNotIn(">Bots<", operations)
                 self.assertLess(
                     operations.find("<h2>Требует внимания</h2>"),
-                    operations.find("<h2>Позиции</h2>"),
+                    operations.find("<h2>Активные позиции</h2>"),
                 )
                 self.assertLess(
-                    operations.find("<h2>Позиции</h2>"),
+                    operations.find("<h2>Активные позиции</h2>"),
                     operations.find("<h2>Допустимые действия</h2>"),
                 )
+                self.assertIn("Торговые ограничения", operations)
+                self.assertIn("История", operations)
                 for command in OPERATOR_COMMANDS:
                     self.assertNotRegex(
                         operations,

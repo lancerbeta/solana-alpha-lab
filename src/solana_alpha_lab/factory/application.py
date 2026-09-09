@@ -253,8 +253,19 @@ class FactoryApplication:
         store = self.existing_paper_plane()
         if store is None:
             status = self._paper_plane_source_status or "NOT_PRESENT"
-            return compose_risk_economics(self.root, None, source_status=status)
-        return compose_risk_economics(self.root, store, source_status="PRESENT")
+            eco = compose_risk_economics(self.root, None, source_status=status)
+            eco["runtime_envelope"] = {
+                "modes": {},
+                "by_strategy": [],
+                "source_status": status,
+            }
+            return eco
+        eco = compose_risk_economics(self.root, store, source_status="PRESENT")
+        from solana_alpha_lab.factory.trading_operations import list_git_strategies
+        from solana_alpha_lab.factory.trading_runtime_policy import compose_runtime_envelope
+
+        eco["runtime_envelope"] = compose_runtime_envelope(store, list_git_strategies(self.root))
+        return eco
 
     def market_projection(self, *, as_of=None) -> dict[str, Any]:
         return compose_market_context(
@@ -741,6 +752,7 @@ class FactoryApplication:
             model["economics"] = compose_risk_economics(
                 self.root, paper_store, source_status="PRESENT", operations=operations
             )
+            model["economics"]["runtime_envelope"] = trading.get("runtime_envelope") or {}
             model["recent_changes"] = trading.get("recent_changes") or []
             cockpit["terminal"] = "OWNER_OPERATIONS_COCKPIT_PASS"
         else:
@@ -753,6 +765,7 @@ class FactoryApplication:
             model["economics"] = compose_risk_economics(
                 self.root, None, source_status=status
             )
+            model["economics"]["runtime_envelope"] = trading.get("runtime_envelope") or {}
             model["recent_changes"] = []
         model["cockpit"] = cockpit
         model["git_archaeology_required"] = bool(cockpit["git_archaeology_required"])

@@ -5,19 +5,19 @@
   "as_of": "2026-09-09",
   "task_id": "HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1",
   "state_change": "HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_CANDIDATE",
-  "base_main": "62527018dca6f8a98a5722b71ce09c21f6aedd74",
+  "base_main": "eabf4afb5366c15d44efc266ee14fb75bc12d33e",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "3c5d19d4def43c5f2b3cc6512c62d4cfe393f766e35992bdc96076b6c5672e80",
-    "catalog/assets/lifecycle.yaml": "8a225b97dec03b4d803ccd46ca687fab158d303e15dfc45cc9697b3febd53d1e",
-    "catalog/catalog_manifest.yaml": "c1c6a6aac84255de7cfd113e229b6eee9e82b8ad642d2a80f9696180505eb3a4",
-    "catalog/generated/asset_edges.json": "f9f04c80890346aeab57ca290205ccb4e061a42539ebe331b50211a1b92653be",
-    "docs/PROJECT_MAP.md": "3d95130677ae7fe60d2a4ff08ac85e09331a13e11a09579d7e21621ec30e7be7",
+    "catalog/assets/core.yaml": "91c034d6cc6bb091ebb2ec493629ccb8903c09d75f4212a4bcde75dacc31423d",
+    "catalog/assets/lifecycle.yaml": "244ffbbf2eed4b68db1fe2a5ced8b4f634cf0fbebcd1f88ee8cce81db06b77a1",
+    "catalog/catalog_manifest.yaml": "c27c0b7fc27c9ed6551b18aa75ecf59279d9a0ca7d4868044c4e40a6792e15d8",
+    "catalog/generated/asset_edges.json": "fb85af91d3de928a5c25f7827608eb30c2d56f593901d18e4bbda753c160a765",
+    "docs/PROJECT_MAP.md": "431b7cbd358004040ab81f9e5aff1a43a37ddec71466da71f57caf37575e1460",
     "docs/reports/hfic_packet14_availability_fast_lane_guard/a1_owner_readout_v1.md": "ebdb1eb6c160b158b88cf5fd4bb9d76da1fb7660334bf86f7222efc8416273fc",
-    "docs/tasks/HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1.md": "5da337440ed399b7ebca5868bcf2f0ff21e53db8a2e5462ae841b4640db8c3fb",
+    "docs/tasks/HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1.md": "77b221d99e9f82964a371f18de751a8dc0db9680d49d7d7980da39352245177c",
     "src/solana_alpha_lab/factory/hfic_control_integrity.py": "30cc794351459c00774e8aba06bf6823bfd82b0ae5f1ca4145db85291ff8d671",
     "src/solana_alpha_lab/factory/hfic_session.py": "626f7d9b1658073f0568512da3751435e8cae6c2789d420deba53d46ebc68f50",
     "tests/test_hfic_one_frozen_runner_up_failover_v1.py": "5578fa2793d027da0a45efb5a9c33bd6d6dc8069eab12787eb3fbccaeb373b3c",
@@ -33,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_packet14_availability_fast_lane_guard/a1_delivery_factory_fit_v1.json",
-    "sha256": "064174b996dd5f21ba3afb89d4f4560fb24bec93df53fa1fab816094777c9720",
+    "sha256": "67cb5502d6c79352a171b2826e0102f39dcc2a6cb92afa8ac6db45f7e911149c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD",
     "independent_review": {
       "path": "docs/evidence/hfic_packet14_availability_fast_lane_guard/a1_delivery_independent_review_v1.json",
-      "sha256": "9f785a1f1d65ed40b5721892252c9c235357559d393fff96c7b57a957640a2c5",
+      "sha256": "875f2ef35a653b12151bfce153ff8f10dd1886f755c9eff2660000dc0a769d34",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

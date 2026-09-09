@@ -279,8 +279,6 @@ def _filter_entities(
         if needle and needle not in _text_blob(entity):
             continue
         selected.append(entity)
-        if len(selected) >= limit:
-            break
     return selected
 
 
@@ -353,6 +351,11 @@ def _row(entity: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
+def _entity_sort_key(entity: Mapping[str, Any]) -> tuple:
+    as_of = str(entity.get("as_of") or entity.get("observed_at") or "")
+    return (as_of, str(entity.get("entity_id") or ""), str(entity.get("truth_plane") or ""))
+
+
 def compose_research_overview(
     projection: Mapping[str, Any],
     *,
@@ -362,10 +365,13 @@ def compose_research_overview(
     state: str | None = None,
     evidence_class: str | None = None,
     limit: int = 80,
+    page: int = 1,
 ) -> dict[str, Any]:
     if limit < 1 or limit > LIMIT_MAX:
         raise ResearchWorkbenchError("LIMIT_REJECTED")
+    page = 1 if page < 1 else page
     entities = _research_entities(projection)
+    entities.sort(key=_entity_sort_key, reverse=True)
     attention = _attention_entities(projection, entities)
     source_attention = _source_attention_rows(projection)
     attention_rows = [_row(item) for item in attention[:limit]] + source_attention[:limit]
@@ -391,6 +397,8 @@ def compose_research_overview(
         evidence_class=evidence_class,
         limit=limit,
     )
+    start = (page - 1) * limit
+    page_rows = filtered[start : start + limit]
     sources = _source_panel(projection)
     research_source = _source_by_id(projection, "SRC-RESEARCH-STORE") or {}
     research_status = str(research_source.get("status") or "NOT_PRESENT")
@@ -416,7 +424,8 @@ def compose_research_overview(
         "degraded_copy": (research_copy("degraded_copy") if degraded else None),
         "needs_attention": attention_rows[:limit],
         "current_activity": [_row(item) for item in active[:limit]],
-        "universe": [_row(item) for item in filtered],
+        "universe": [_row(item) for item in page_rows],
+        "universe_total": len(filtered),
         "filters": {
             "q": q or "",
             "kind": kind or "all",
@@ -424,6 +433,7 @@ def compose_research_overview(
             "state": state or "",
             "evidence_class": evidence_class or "",
             "limit": limit,
+            "page": page,
         },
     }
 
@@ -712,6 +722,7 @@ def build_research_overview(
     state: str | None = None,
     evidence_class: str | None = None,
     limit: int = 80,
+    page: int = 1,
     projected_at: str | None = None,
 ) -> dict[str, Any]:
     try:
@@ -751,7 +762,8 @@ def build_research_overview(
             "needs_attention": [],
             "current_activity": [],
             "universe": [],
-            "filters": {"q": q or "", "kind": kind or "all", "limit": limit},
+            "universe_total": 0,
+            "filters": {"q": q or "", "kind": kind or "all", "limit": limit, "page": page},
         }
     return compose_research_overview(
         projection,
@@ -761,6 +773,7 @@ def build_research_overview(
         state=state,
         evidence_class=evidence_class,
         limit=limit,
+        page=page,
     )
 
 

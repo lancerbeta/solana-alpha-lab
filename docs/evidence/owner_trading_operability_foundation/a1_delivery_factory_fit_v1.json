@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "OWNER-TRADING-OPERABILITY-FOUNDATION-FACTORY-FIT-001",
+  "as_of": "2026-09-09",
+  "task_id": "OWNER_TRADING_OPERABILITY_FOUNDATION_V1",
+  "reviewed_bindings_sha256": "65c4f4d47e33bcb81eb4a7581dd000c80b5cf81f187915fc10bbf6c1d41bd0e3",
+  "reviewed_inventory_sha256": "8b0998649e42388d98c4686bea159067f54af734e6f7451869dd01c5a2df5f12",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_GITLESS_PAPER_SHADOW_OPERATING_ENVELOPE",
+    "flexibility_and_history": "PASS_APPEND_ONLY_POLICY_REVISIONS",
+    "context_efficiency": "PASS_SEM_OWNER_LIFECYCLE_REUSE",
+    "research_truth": "PASS_REQUESTED_VS_ADMITTED_DISTINCT",
+    "owner_operability": "PASS_SHOW_CHECK_APPLY_NO_GIT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_REQUIRED",
+    "monitoring_and_recovery": "PASS_BACKUP_RESTORE_AND_CRASH_RETRY",
+    "build_vs_buy": "PASS_ADOPT_PAPERPLANE_STORE",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_LIVE",
+    "red_team": "PASS_STALE_WRITE_UNKNOWN_EXPOSURE_GET_PURITY"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "EDITABLE_WORKBENCH_POLICY_FORM_AFTER_REAL_USE"
+  },
+  "recovery": "REVERT cursor/owner-trading-operability-foundation-v1 BRANCH; NO VPS POLICY APPLY.",
+  "limits": [
+    "NO_LIVE",
+    "NO_REAL_MONEY",
+    "NO_OWNER_FCF",
+    "NO_PROVIDER",
+    "NO_DEPLOY",
+    "NO_VPS_POLICY_APPLY",
+    "NO_WORKBENCH_POLICY_EDITOR",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}
