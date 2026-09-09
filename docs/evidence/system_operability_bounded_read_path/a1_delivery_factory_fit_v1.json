@@ -6,23 +6,23 @@
   "task_id": "SYSTEM_OPERABILITY_BOUNDED_READ_PATH_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
-  "reviewed_inventory_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+  "reviewed_bindings_sha256": "9ebf6aa3b15a9f74c9c1a101744d4f3ed74dcc78167fe2f72d06003fc4e3e80f",
+  "reviewed_inventory_sha256": "a28e8ebf66007e82fa7ada8f008d600821847ce247e61e3cec43a3dd0b70f0af",
   "capability_radar": {
     "now": "NONE",
     "watch": "LEAST_PRIVILEGE_SMIAL_OPERATOR_VPS_OBSERVER"
   },
   "dimensions": {
-    "mission": "PENDING",
-    "flexibility_and_history": "PENDING",
-    "context_efficiency": "PENDING",
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
     "research_truth": "PASS",
-    "owner_operability": "PENDING",
+    "owner_operability": "PASS",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_REQUIRED",
-    "monitoring_and_recovery": "PENDING",
-    "build_vs_buy": "PENDING",
-    "red_team": "PENDING",
-    "security": "PENDING"
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
   },
   "limits": [
     "NO_ALPHA",
@@ -35,5 +35,5 @@
     "NO_CANONICAL_DONE",
     "NO_LIVE_VPS_LATENCY_REPAIR"
   ],
-  "recovery": "REVERT cursor/system-operability-bounded-read-path-v1 BRANCH. Extra collector_snapshot key is ignored by predecessor."
+  "recovery": "REVERT the PR merge. Extra collector_snapshot key and dedicated snapshot file are ignored by predecessor GET. No DB migration. No host mutation."
 }
