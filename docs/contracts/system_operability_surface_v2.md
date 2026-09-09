@@ -119,6 +119,10 @@ clock.
 STALE packet fields remain diagnostic coverage only. They MUST NOT
 classify current incidents or drive current `ACTION_REQUIRED` /
 `DEGRADED` from collector_verdict. Live systemd/deploy signals stay live.
+STALE packet values MUST NOT occupy current-shaped `storage` /
+`durability` / `collection.health_classes` fields; they may appear only
+under timestamped `collector_snapshot.diagnostics`. GET MUST read at
+most the snapshot size cap from a single open.
 
 First future deploy with no `collector_snapshot` yet is MISSING:
 honest UNKNOWN, no GET-side warm-up. `evaluate_operability --mode emit`

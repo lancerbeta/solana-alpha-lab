@@ -165,14 +165,15 @@ def load_collector_snapshot_file(path: Path) -> tuple[str, dict[str, Any] | None
     if path.is_file() is False:
         return "MISSING", None
     try:
-        size = path.stat().st_size
+        with path.open("rb") as handle:
+            blob = handle.read(COLLECTOR_SNAPSHOT_FILE_MAX_BYTES + 1)
     except OSError:
         return "INVALID", None
-    if size > COLLECTOR_SNAPSHOT_FILE_MAX_BYTES:
+    if len(blob) > COLLECTOR_SNAPSHOT_FILE_MAX_BYTES:
         return "INVALID", None
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        payload = json.loads(blob.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError):
         return "INVALID", None
     if not isinstance(payload, dict):
         return "INVALID", None

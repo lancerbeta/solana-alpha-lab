@@ -1020,6 +1020,14 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
             self.assertNotEqual(projection["state"], "ACTION_REQUIRED")
             self.assertEqual(projection["coverage"]["STORAGE"]["status"], "STALE")
             self.assertEqual(projection["coverage"]["DATA_FRESHNESS"]["status"], "STALE")
+            self.assertIsNone(projection["storage"]["filesystem_disk_used_pct"])
+            self.assertIsNone(projection["durability"]["offhost_backup_state"])
+            self.assertEqual(projection["collection"]["health_classes"], [])
+            self.assertIn("diagnostics", projection["collector_snapshot"])
+            self.assertEqual(
+                projection["collector_snapshot"]["diagnostics"]["offhost_backup_state"],
+                "CURRENT",
+            )
 
     def test_invalid_snapshot_does_not_crash_or_rewrite(self) -> None:
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
@@ -1166,13 +1174,13 @@ class SystemOperabilityBoundedReadPathTests(unittest.TestCase):
             incident = root / INCIDENT_STATE_RELATIVE
             incident_digest = hashlib.sha256(incident.read_bytes()).hexdigest()
             reads: list[str] = []
-            original = Path.read_text
+            original = Path.open
 
-            def spy(self: Path, *args: object, **kwargs: object) -> str:
+            def spy(self: Path, *args: object, **kwargs: object):
                 reads.append(self.as_posix().replace("\\", "/"))
                 return original(self, *args, **kwargs)
 
-            with patch.object(Path, "read_text", spy):
+            with patch.object(Path, "open", spy):
                 projection = compose_system_operability(
                     root=root,
                     now=NOW,

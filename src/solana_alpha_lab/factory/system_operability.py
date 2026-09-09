@@ -645,6 +645,20 @@ def compose_system_operability(
         next_safe = ""
     else:
         next_safe = "INSPECT_COVERAGE_GAPS"
+    current_packet = None if collector_status == "STALE" else packet
+    if collector_status == "STALE" and packet is not None:
+        snapshot_meta = dict(snapshot_meta)
+        snapshot_meta["diagnostics"] = {
+            "health_classes": list(packet.get("health_classes") or []),
+            "activation_state": packet.get("activation_state"),
+            "filesystem_disk_used_pct": packet.get("filesystem_disk_used_pct"),
+            "projected_97d_status": packet.get("projected_97d_status"),
+            "backup_age_seconds": packet.get("backup_age_seconds"),
+            "offhost_backup_state": packet.get("offhost_backup_state"),
+            "immutable_archive_latest_verified_day": packet.get(
+                "immutable_archive_latest_verified_day"
+            ),
+        }
     return {
         "schema": SCHEMA,
         "schema_version": SCHEMA_VERSION,
@@ -662,20 +676,20 @@ def compose_system_operability(
         "collection": {
             "source_status": collector_status,
             "collector_verdict": collector_verdict or collector_status,
-            "health_classes": list(packet.get("health_classes") or []) if packet else [],
-            "activation_state": packet.get("activation_state") if packet else None,
+            "health_classes": list(current_packet.get("health_classes") or []) if current_packet else [],
+            "activation_state": current_packet.get("activation_state") if current_packet else None,
             "snapshot": snapshot_meta,
         },
         "collector_snapshot": snapshot_meta,
         "storage": {
-            "filesystem_disk_used_pct": None if packet is None else packet.get("filesystem_disk_used_pct"),
-            "projected_97d_status": None if packet is None else packet.get("projected_97d_status"),
+            "filesystem_disk_used_pct": None if current_packet is None else current_packet.get("filesystem_disk_used_pct"),
+            "projected_97d_status": None if current_packet is None else current_packet.get("projected_97d_status"),
         },
         "durability": {
-            "mutable_backup": None if packet is None else packet.get("backup_age_seconds"),
-            "offhost_backup_state": None if packet is None else packet.get("offhost_backup_state"),
+            "mutable_backup": None if current_packet is None else current_packet.get("backup_age_seconds"),
+            "offhost_backup_state": None if current_packet is None else current_packet.get("offhost_backup_state"),
             "immutable_archive_latest_verified_day": (
-                None if packet is None else packet.get("immutable_archive_latest_verified_day")
+                None if current_packet is None else current_packet.get("immutable_archive_latest_verified_day")
             ),
         },
         "alerting": telegram,
