@@ -34255,7 +34255,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: 0a458b95253243b1ebbcfae656fc87ad68d73968fd2c2e36ea9c5a993be8c205}
+  integrity: {kind: sha256, sha256: 39c6523af7ebeea3451d7c09c123022cbc32ce87875bfcad94693e73b432e2a0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34362,7 +34362,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: e924902f7f1151ceef29fb29460237ec9050f060b93cacb49bd9a8b885ff93bb}
+  integrity: {kind: sha256, sha256: 7f5d93b5276055690766b186e65dfe9c6e4a23de3a3613a95c26dac050edc5c9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
