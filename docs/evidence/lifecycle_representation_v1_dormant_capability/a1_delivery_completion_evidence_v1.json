@@ -7,6 +7,9 @@
   "state_change": "IMPLEMENTED_DORMANT_NOT_EXECUTED",
   "base_main": "9bb972b56da3f24fc796262f09669ac5895ad1ef",
   "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "152736209297acff0296728cc60cdbd11b77a3aa8fb330daa43f8076b6385833",
     ".cursor/commands/hypothesis-forge.md": "aa94261255226573ec54258d62df378faa8051c7bc7f8ab2398f3337bc0e5e7f",
