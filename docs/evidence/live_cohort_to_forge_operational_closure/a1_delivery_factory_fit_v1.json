@@ -6,8 +6,8 @@
   "task_id": "LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "9befcf32d1c63009ee3b96c1565046ec49ad041eaaeabd18b7be434c37aae27a",
-  "reviewed_inventory_sha256": "fccde20c0ed4a9d8b2434c5d2cd7f81e13c564056d36fa9f8d9571e7e8b40c6d",
+  "reviewed_bindings_sha256": "42443ae3220ddefd2c2539390f3438c1d64d5df58c5334acaf6a774338643ca2",
+  "reviewed_inventory_sha256": "5f401e72ae04cbe35cde21926ab6afe0f3e75fe4966afb79baa50f8b3a83a1ab",
   "capability_radar": {
     "now": "NONE",
     "watch": "POST_MERGE_COHORT1_PUBLISH_TO_FORGE"
