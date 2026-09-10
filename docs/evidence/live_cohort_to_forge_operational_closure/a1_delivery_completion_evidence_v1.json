@@ -11,7 +11,23 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "a77a10af76d8f97fade94493a3bfcd72ec9d531f34c37968e5a0f8c26f5ccc11",
+    "catalog/assets/lifecycle.yaml": "735a341526542b1a0dab1ae2f91be873af337299cb7a4f4e398a5e9d4fb12b36",
+    "catalog/catalog_manifest.yaml": "9dde364c5d5db0a8e21645c22d381524968fe030c6a359efcf36db87f35af5b8",
+    "catalog/generated/asset_edges.json": "7f7dac605ee6d896c54f0973d23e0561cfc38ccb6666bc635f712f172b2f1cf5",
+    "configs/factory_semantic_operability_v1.yaml": "0a458b95253243b1ebbcfae656fc87ad68d73968fd2c2e36ea9c5a993be8c205",
+    "docs/FACTORY_SEMANTIC_MAP.md": "e924902f7f1151ceef29fb29460237ec9050f060b93cacb49bd9a8b885ff93bb",
+    "docs/PROJECT_MAP.md": "41e4bbb1d3b4ba2805b16b9bf10a38d0c2649b8921856b6db096a94680627fba",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "3fdc16d558261f9dabfcab14032ff9c54bacc8cf03694a9294a65dcb3d47a290",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "354017bb9e75ab496d22e5deaf12bda2d19d9dc0a16f73bc3ea8eec88e176b50",
+    "docs/reports/live_cohort_to_forge_operational_closure/a1_owner_readout_v1.md": "bc887ee6f84695c667fea2db16fb57ade7597436d6270186d5e3011da21013d8",
+    "docs/tasks/LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1.md": "0c82d918af0216b8af61dc3b03fdaa43ce8c7026df76712501d955e54755395d",
+    "scripts/discovery_evidence_release.py": "35d58c3317f4a5a2ac3740ce6e2d070bb1d47e7e331bc10abbe337945352f117",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "5c412b98a7ebcb39ec2a914c61859519aac7a4b9aac6729aea6f036f5572e25c",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "6e0c21c47e928f545c330937cbfb971496008196ed9b45b82de5d44cbe9736d7",
+    "tests/test_live_cohort_discovery_release_series.py": "131e75b2748b5f694b465687e46202915116b1bb64685a3cdbb91be734b889e2",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "1f588972d000a2135d7f49d120cd1e8a4f5e76e4a7b85b87cf9de23aa1a73f6e",
+    "tests/test_live_evidence_consumer_truth_closure.py": "392db2fc2222377f9fcb83ae6dcc968118987cc4852c38cdd8f0d158641aa859"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_to_forge_operational_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "3666765a483b3244c0661a31948c9c1cdd6133df3e4d946e3502eb3c4e59d1ea",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE",
     "independent_review": {
       "path": "docs/evidence/live_cohort_to_forge_operational_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "86fe2f2152ea21524cf142cbc9e0b4ea3ef7484008c783884951f68ae0533966",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
