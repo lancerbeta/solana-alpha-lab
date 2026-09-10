@@ -31,7 +31,11 @@ prefix history, and emits only an anonymous cohort motif histogram. The frozen
 channels are `PRICE`, `LIQUIDITY`, activity volume, and `TRADERS`.
 Every projection carries a deterministic `schedule_sha256` binding; the
 challenger accepts only the closed representation payload produced by this
-projection, never an arbitrary raw mapping.
+projection, never an arbitrary raw mapping. For imported data that digest is
+the canonical full `ObservationSchedule` hash, not a hash of the four compact
+projection offsets. Every typed row also carries the exact schedule and
+activation binding, and the anonymous payload carries release, cohort, source,
+census, and observation-byte hashes without mint identities.
 
 Taker volume is used only when observed. If taker volume is unavailable and
 both buy and sell volume are observed, two fallback channels are emitted. Buy
@@ -66,8 +70,13 @@ existing fixture. The bridge revalidates the closed envelope, nested packet,
 schedule binding, payload hash, search identity, and one-run probe identity
 before transport. The representation payload hash is part of both the search
 identity and the one-run probe identity, so two payloads cannot share a
-CONTROL/epoch identity. Recorded CONTROL packet and memory-baseline hashes are
-mandatory; missing or mismatched anchors fail closed.
+CONTROL/epoch identity. Recorded CONTROL packet and memory anchors are verified
+fail closed; when the current CONTROL producer has not emitted a separate
+`memory_baseline_sha256`, the adapter derives it deterministically from the
+exact packet plus the existing memory eligibility/policy anchors. Caller-
+declared prior state is accepted only with a separate, hash-bound
+`REPRESENTATION_PROBE_REGISTRY_READBACK_V1` registration receipt keyed by the
+CONTROL/epoch slot; a raw boolean or challenger packet is not registration.
 
 The envelope binds the same evidence epoch, prompt (`HFIC-V1.2`), prior-memory
 baseline, packet hash, and one-run representation identity. It does not rebuild
@@ -89,11 +98,12 @@ cohort-release readback plane. Raw caller fields such as `cohort_ready`,
 `readiness`, or `yield_eligible` are not trusted; a missing, malformed, or
 drifted receipt returns `OBSERVABILITY_BLOCKED`. The receipt must carry the
 complete `smial.live-cohort-discovery-release` manifest, its canonical
-manifest hash, the release-id recomputed by the existing release owner, and
-the frozen V1 schedule hash. This keeps eligibility anchored to a verified
-release readback instead of a caller-supplied readiness summary. The status
-surface does not open the cohort, read scientific values, or verify a release
-at runtime.
+manifest hash, the release identity supplied by that readback, and the exact
+representation schedule hash. The representation payload's release/source
+byte binding must match the same verified manifest before fixture transport.
+This keeps eligibility anchored to a verified release readback instead of a
+caller-supplied readiness summary. The status surface does not open the cohort,
+read scientific values, or verify a release at runtime.
 
 `REPRESENTATION_PROBE_COMPLETE` is reserved for a separate runtime readback
 receipt. That receipt must bind the execution result hash, CONTROL/epoch

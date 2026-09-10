@@ -12,7 +12,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from solana_alpha_lab.factory.normalized_trajectory_v1 import (  # noqa: E402
+from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DEFAULT_SCHEDULE,
     FIELD_IDS,
     LifecycleSchedule,
@@ -21,7 +21,6 @@ from solana_alpha_lab.factory.normalized_trajectory_v1 import (  # noqa: E402
     TypedLifecycleObservation,
     project_normalized_trajectory,
 )
-
 
 ANCHOR = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -34,6 +33,8 @@ def _row(
     *,
     observed: bool = True,
     available_at: datetime | None = None,
+    schedule_sha256: str | None = None,
+    activation_id: str | None = None,
 ) -> TypedLifecycleObservation:
     return TypedLifecycleObservation(
         member_id=member,
@@ -47,6 +48,14 @@ def _row(
             else available_at
         ),
         observed=observed,
+        schedule_sha256=(
+            DEFAULT_SCHEDULE.schedule_sha256
+            if schedule_sha256 is None
+            else schedule_sha256
+        ),
+        activation_id=(
+            DEFAULT_SCHEDULE.activation_id if activation_id is None else activation_id
+        ),
     )
 
 
@@ -199,7 +208,24 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
     def test_schedule_hash_must_match_canonical_schedule_contents(self) -> None:
         with self.assertRaises(NormalizedTrajectoryError) as raised:
             LifecycleSchedule(schedule_sha256="00" * 32)
-        self.assertEqual(str(raised.exception), "SCHEDULE_SHA256_MISMATCH")
+        self.assertEqual(str(raised.exception), "SCHEDULE_DOCUMENT_REQUIRED")
+
+    def test_observations_must_share_imported_schedule_and_activation(self) -> None:
+        rows = _series("synthetic-a", "PRICE", (1.0, 2.0, 3.0))
+        rows.append(
+            _row(
+                "synthetic-a",
+                300,
+                "LIQUIDITY",
+                1.0,
+                activation_id="OTHER-ACTIVATION",
+            )
+        )
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            project_normalized_trajectory(rows)
+        self.assertEqual(
+            str(raised.exception), "OBSERVATION_ACTIVATION_BINDING_MISMATCH"
+        )
 
     def test_future_only_member_cannot_enter_pre_t_denominator(self) -> None:
         rows = []

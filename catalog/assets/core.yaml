@@ -36657,7 +36657,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY.md', repository_path: docs/tasks/LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY.md}
-  integrity: {kind: sha256, sha256: 613aacaba36efad76a05f61beb38123a98ff563ed11abe159edaa4171d00abcc}
+  integrity: {kind: sha256, sha256: c714aa02ec3b082a240651c027e51ec51a32d24bd97ea231be85d7b9a9f8404c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001}
@@ -36679,7 +36679,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_v1_capability_contract.md', repository_path: docs/contracts/normalized_trajectory_v1_capability_contract.md}
-  integrity: {kind: sha256, sha256: b5fd2893e37099f9f11317560585b05023129c1132db48f66e1c719f0c666763}
+  integrity: {kind: sha256, sha256: 68d9da5ed1048bc2f7f43aceb5c38afed411f88b97efaf722701770187a60705}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001}
@@ -36700,7 +36700,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/normalized_trajectory_v1.py', repository_path: src/solana_alpha_lab/factory/normalized_trajectory_v1.py}
-  integrity: {kind: sha256, sha256: 0a027e5e7ecb646ff56944e0c721fdf13c68abf3689385cb92cbc19099ecfa2b}
+  integrity: {kind: sha256, sha256: 3807e40025180f41bf8fee962088b9c357ba769899766dd514924ef632df47b6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001}
@@ -36720,7 +36720,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_probe.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_probe.py}
-  integrity: {kind: sha256, sha256: 0459863e5ac018a99b8e42d20b7f8ba1951499f383c1aa9c5677902ff6b453d8}
+  integrity: {kind: sha256, sha256: f908e4a12227d7adb51844930ed1bf055376ea7168067436762ec7786f912375}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-NORMALIZED-TRAJECTORY-V1-001}
@@ -36762,7 +36762,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_normalized_trajectory_v1.py', repository_path: tests/test_normalized_trajectory_v1.py}
-  integrity: {kind: sha256, sha256: 0a9c3ec684fef2fdf3dfea6a5a81267399037ec8d73fdec60a9c59ca2067e462}
+  integrity: {kind: sha256, sha256: a7ff08871982a43fccf97dcb8df5e73f0acd09d44fddf83047485c96ad0c7c7b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-NORMALIZED-TRAJECTORY-V1-001}
@@ -36781,7 +36781,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_representation_probe.py', repository_path: tests/test_hfic_representation_probe.py}
-  integrity: {kind: sha256, sha256: d33865e25b5533dad3d659c76f35a79ca4eda0b9c802e02bb687b68c364b31f8}
+  integrity: {kind: sha256, sha256: 26abad828187e701c5b83361b2bce8e429bda7234174af0bb8af60cbf641f2a1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-REPRESENTATION-PROBE-001}

@@ -1,6 +1,6 @@
 ---
 task_id: LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY
-task_version: '1.0'
+task_version: '1.1'
 status: READY
 as_of: '2026-09-10'
 owner: GOAL_OWNER
@@ -11,9 +11,9 @@ allowed_routes:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: 18a1111e07b9edcf19c090fa61b119f80983c894
+  expected_base: 9bb972b56da3f24fc796262f09669ac5895ad1ef
   expected_upstream: origin/main
-  expected_upstream_oid: 18a1111e07b9edcf19c090fa61b119f80983c894
+  expected_upstream_oid: 9bb972b56da3f24fc796262f09669ac5895ad1ef
   expected_branch: codex/lifecycle-representation-v1-dormant-capability
   dirty_mode: ALLOW_REPORTED
 
