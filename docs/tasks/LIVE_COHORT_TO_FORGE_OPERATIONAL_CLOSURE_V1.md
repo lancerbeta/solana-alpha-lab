@@ -8,9 +8,9 @@ allowed_routes:
 - DIRECT_CURSOR_DELIVERY
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: 9bb972b56da3f24fc796262f09669ac5895ad1ef
+  expected_base: 7ce0b87c9518914af7636a9860d068b6517b0943
   expected_upstream: origin/main
-  expected_upstream_oid: 9bb972b56da3f24fc796262f09669ac5895ad1ef
+  expected_upstream_oid: 7ce0b87c9518914af7636a9860d068b6517b0943
   expected_branch: cursor/live-cohort-to-forge-operational-closure-v1
   dirty_mode: ALLOW_REPORTED
 objective: Operationalize the recurring mature-cohort publication path from

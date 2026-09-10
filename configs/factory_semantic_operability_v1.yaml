@@ -64,11 +64,16 @@ routes:
       - normalized trajectory
       - NORMALIZED_TRAJECTORY
       - representation probe
+      - lifecycle representation
+      - Forge representation
+      - другое представление lifecycle
+      - траектория токена
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids: [ACTIVE-HYPOTHESIS-FORGE]
     root_asset_ids:
       - DOC-HYPOTHESIS-FORGE-OPERATOR-001
       - SKILL-HYPOTHESIS-FORGE-001
+      - CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001
     query_recipe_ids: []
     status_plane: CAPABILITY
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
@@ -223,7 +228,7 @@ routes:
     related_route_ids: [SEM-LIVE-EVIDENCE-TO-FORGE, SEM-REMOTE-OPS-RECOVERY]
 
   - semantic_route_id: SEM-LIVE-EVIDENCE-TO-FORGE
-    purpose: How Observation RDP becomes cumulative LIVE CORPUS scientific evidence for Forge consumers.
+    purpose: RDP to LIVE CORPUS for Forge.
     owner_questions:
       - How does live RDP get into Forge?
       - How does a cohort become LIVE CORPUS?
@@ -235,7 +240,6 @@ routes:
       - live cohort
       - discovery release
       - Observation RDP
-      - cumulative corpus
       - publish-live-cohort
       - forge-control-ready
       - live rdp
@@ -246,7 +250,7 @@ routes:
     status_plane: MIXED
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
     forge_visibility: INCLUDE
-    related_route_ids: [SEM-PRIOR-WORK, SEM-LIVE-COLLECTION]
+    related_route_ids: [SEM-LIVE-COLLECTION]
 
   - semantic_route_id: SEM-REMOTE-OPS-RECOVERY
     purpose: Factory remote operations, unattended recovery, /system current-health composition, backup/durability, incidents and recovery. Git is capability; live health needs gated readback.
