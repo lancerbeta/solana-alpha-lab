@@ -1165,6 +1165,8 @@ def existing_hfic_packet(
     """Return the unchanged critic packet for an existing HFIC lifecycle fixture."""
 
     validated, representation = _validate_challenger_packet(challenger_packet)
+    if validated["probe_state"] != "DORMANT_PACKET_ONLY":
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
     readiness = _validate_cohort_readiness_receipt(
         cohort_readiness_receipt,
         expected_schedule_sha256=representation["schedule"]["schedule_sha256"],

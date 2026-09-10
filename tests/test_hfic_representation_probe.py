@@ -315,6 +315,25 @@ class HficRepresentationProbeTests(unittest.TestCase):
             ),
             baseline.packet,
         )
+        registered_without_readback = json.loads(json.dumps(challenger))
+        registered_without_readback["probe_state"] = "REGISTERED"
+        for _ in range(3):
+            registered_without_readback["packet_bytes"] = len(
+                canonical_json_bytes(registered_without_readback)
+            )
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_packet(
+                registered_without_readback,
+                cohort_readiness_receipt=readiness,
+            )
+        self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_lifecycle_fixture_input(
+                registered_without_readback,
+                control_receipt=receipt,
+                cohort_readiness_receipt=readiness,
+            )
+        self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
         self.assertNotEqual(
             challenger["representation_search_key_sha256"],
             receipt["search_key_sha256"],

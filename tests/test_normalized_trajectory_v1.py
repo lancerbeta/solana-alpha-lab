@@ -124,6 +124,30 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         self.assertEqual(motif["VOLUME_SELL"], "F-U")
         self.assertNotIn("VOLUME", motif)
 
+    def test_mixed_taker_availability_keeps_missing_members_missing(self) -> None:
+        rows = []
+        rows.extend(_series("with-taker", "PRICE", (1.0, 2.0, 3.0)))
+        rows.extend(_series("with-taker", "LIQUIDITY", (1.0, 1.0, 1.0)))
+        rows.extend(_series("with-taker", "VOLUME", (1.0, 2.0, 3.0)))
+        rows.extend(_series("with-taker", "TRADERS", (1.0, 1.0, 1.0)))
+        rows.extend(_series("fallback-only", "PRICE", (1.0, 2.0, 3.0)))
+        rows.extend(_series("fallback-only", "LIQUIDITY", (1.0, 1.0, 1.0)))
+        rows.extend(_series("fallback-only", "VOLUME_BUY", (5.0, 6.0, 7.0)))
+        rows.extend(_series("fallback-only", "VOLUME_SELL", (4.0, 4.0, 5.0)))
+        rows.extend(_series("fallback-only", "TRADERS", (1.0, 1.0, 1.0)))
+
+        projected = project_normalized_trajectory(rows)
+
+        self.assertEqual(projected.payload["volume_mode"], "TAKER_OBSERVED")
+        fallback_motifs = [
+            item["motif"]
+            for item in projected.payload["histogram"]
+            if item["motif"]["VOLUME"] == "M-M"
+        ]
+        self.assertEqual(len(fallback_motifs), 1)
+        self.assertNotIn("VOLUME_BUY", fallback_motifs[0])
+        self.assertNotIn("VOLUME_SELL", fallback_motifs[0])
+
     def test_invalid_and_late_values_emit_m_without_dropping_slots(self) -> None:
         rows = []
         rows.extend(_series("synthetic-a", "PRICE", (0.0, 2.0, 3.0)))

@@ -80,6 +80,9 @@ exact packet plus the existing memory eligibility/policy anchors. Caller-
 declared prior state is accepted only with a separate, hash-bound
 `REPRESENTATION_PROBE_REGISTRY_READBACK_V1` registration receipt keyed by the
 CONTROL/epoch slot; a raw boolean or challenger packet is not registration.
+The existing HFIC fixture transport accepts only the dormant packet state;
+`REGISTERED` is a readback/status state and cannot enter that seam without the
+receipt.
 
 The challenger builder and fixture transport also reject a verified readiness
 receipt with `GAP_CONFIRMED` coverage or fewer than the preregistered minimum
