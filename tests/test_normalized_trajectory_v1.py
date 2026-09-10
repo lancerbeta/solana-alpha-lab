@@ -153,6 +153,11 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
             LifecycleSchedule(x_due_offset_seconds=900)
         self.assertEqual(str(raised.exception), "INVALID_INSUFFICIENT_PREFIX")
 
+    def test_default_schedule_emits_canonical_schedule_binding(self) -> None:
+        projected = project_normalized_trajectory([])
+        schedule = projected.payload["schedule"]
+        self.assertRegex(schedule["schedule_sha256"], r"^[0-9a-f]{64}$")
+
     def test_histogram_is_bounded_and_m_heavy_tuples_are_allowed(self) -> None:
         rows: list[TypedLifecycleObservation] = []
         patterns = (

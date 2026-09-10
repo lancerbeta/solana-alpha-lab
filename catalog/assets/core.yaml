@@ -36679,7 +36679,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_v1_capability_contract.md', repository_path: docs/contracts/normalized_trajectory_v1_capability_contract.md}
-  integrity: {kind: sha256, sha256: 5fd8b6f8e6a7476d8ceef3f171f3985e4b55b796bff930cfc7dceb6bfc0b5244}
+  integrity: {kind: sha256, sha256: 7a5de5be713e12386a6bfe20a1d644e9fa1f1fb841a395c307479b0a51a96417}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001}
@@ -36700,7 +36700,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/normalized_trajectory_v1.py', repository_path: src/solana_alpha_lab/factory/normalized_trajectory_v1.py}
-  integrity: {kind: sha256, sha256: 7ab2afc89d228cd937b3d6bfc6fe69ef1c578dcfa0c0b47f1e4fd45f0f96e18f}
+  integrity: {kind: sha256, sha256: 87c75163916ef3d1e401923cc408bb047d9fe621250b8d15aa28617ab8cf1dba}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001}
@@ -36720,7 +36720,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_probe.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_probe.py}
-  integrity: {kind: sha256, sha256: 77b7f2bfbe637eb974611a1c870b2427a5409a82cdcb4b26f49ac6598bbfd4c1}
+  integrity: {kind: sha256, sha256: 7cde85a671e7212db53196d99f0d5be0974cd76575b080c3f933bd12a78c2dd2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-NORMALIZED-TRAJECTORY-V1-001}
@@ -36761,7 +36761,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_normalized_trajectory_v1.py', repository_path: tests/test_normalized_trajectory_v1.py}
-  integrity: {kind: sha256, sha256: 832cec817cf704eeb52c8a201813f1cba3b3925addee4bc49c921e8737ffa6a1}
+  integrity: {kind: sha256, sha256: 41a2bb4ce7336e24ccd1dd1584f81cd7e1a7eeaae9c0723e2d7033dca056b203}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-NORMALIZED-TRAJECTORY-V1-001}
@@ -36780,7 +36780,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_representation_probe.py', repository_path: tests/test_hfic_representation_probe.py}
-  integrity: {kind: sha256, sha256: c000131762f0204d51dde618caa7c4beb70979ad7804e25c65a707791cd6237d}
+  integrity: {kind: sha256, sha256: 6f6910708f2d709c69d5bed686a7bbe9eaa2b491ceda29c957749d837fc1950e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-REPRESENTATION-PROBE-001}

@@ -162,6 +162,19 @@ class LifecycleSchedule:
             or _HASH64_RE.fullmatch(self.schedule_sha256) is None
         ):
             raise NormalizedTrajectoryError("SCHEDULE_SHA256_INVALID")
+        if self.schedule_sha256 is None:
+            object.__setattr__(
+                self,
+                "schedule_sha256",
+                canonical_sha256(
+                    {
+                        "schedule_id": self.schedule_id,
+                        "x_due_offset_seconds": x_point,
+                        "y_due_offset_seconds": list(y_points),
+                        "decision_t_due_offset_seconds": decision_t,
+                    }
+                ),
+            )
 
     @property
     def prefix_due_offsets(self) -> tuple[int, ...]:
@@ -522,8 +535,7 @@ def project_normalized_trajectory(
         },
         "anonymous": True,
     }
-    if bound_schedule.schedule_sha256 is not None:
-        base_payload["schedule"]["schedule_sha256"] = bound_schedule.schedule_sha256
+    base_payload["schedule"]["schedule_sha256"] = bound_schedule.schedule_sha256
     if _contains_forbidden_output_key(base_payload):
         raise NormalizedTrajectoryError("IDENTITY_LEAK_IN_REPRESENTATION")
     return NormalizedTrajectoryRepresentation(base_payload)

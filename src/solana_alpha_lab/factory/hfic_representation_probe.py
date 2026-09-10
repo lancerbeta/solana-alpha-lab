@@ -12,7 +12,7 @@ from __future__ import annotations
 import re
 from collections.abc import Mapping
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from solana_alpha_lab.factory.hfic_control_integrity import (
@@ -30,8 +30,14 @@ from solana_alpha_lab.factory.early_market_panel_importer import (
 from solana_alpha_lab.factory.hfic_preflight import MAX_PACKET_BYTES
 from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
+    ALLOWED_X_POINTS,
+    DECISION_T_DUE_OFFSET_SECONDS,
+    DECLARED_Y_POINTS,
+    FIELD_IDS,
     PACKET_KEY,
+    PREFERRED_SCHEDULE_ID,
     REPRESENTATION_ID,
+    REPRESENTATION_VERSION,
     NormalizedTrajectoryRepresentation,
 )
 from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
@@ -65,6 +71,7 @@ INVALID_PROBE_IDENTITY = "INVALID_PROBE_IDENTITY"
 INVALID_TRIGGER_NOT_MET = "INVALID_TRIGGER_NOT_MET"
 INVALID_CASE_C_OBSERVABILITY = "INVALID_CASE_C_OBSERVABILITY"
 REPRESENTATION_PROBE_ALREADY_EXISTS = "REPRESENTATION_PROBE_ALREADY_EXISTS"
+INVALID_REPRESENTATION_SCHEMA = "INVALID_REPRESENTATION_SCHEMA"
 
 _HASH64_RE = re.compile(r"^[0-9a-f]{64}$")
 _FORBIDDEN_CONTROL_KEYS = {
@@ -82,6 +89,24 @@ _FORBIDDEN_IDENTITY_KEYS = {
     "mint_address",
     "wallet",
     "token_address",
+}
+_VERIFIED_BASELINE_TOKEN = object()
+_REPRESENTATION_PAYLOAD_KEYS = {
+    "anonymous",
+    "eligible_member_count",
+    "field_ids",
+    "histogram",
+    "histogram_member_count",
+    "histogram_truncation",
+    "motif",
+    "normalization",
+    "packet_schema",
+    "payload_sha256",
+    "pit",
+    "representation_id",
+    "representation_version",
+    "schedule",
+    "volume_mode",
 }
 
 
@@ -121,6 +146,145 @@ def _contains_scalar(value: object, needle: str) -> bool:
     if isinstance(value, (list, tuple)):
         return any(_contains_scalar(child, needle) for child in value)
     return value == needle
+
+
+def _require_exact_keys(value: object, expected: set[str]) -> Mapping[str, Any]:
+    if not isinstance(value, Mapping) or set(value) != expected:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    return value
+
+
+def _require_nonnegative_int(value: object) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    return value
+
+
+def _validate_serialized_representation_payload(
+    value: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Validate the closed, anonymous representation packet schema."""
+
+    payload = deepcopy(dict(value))
+    _require_exact_keys(payload, _REPRESENTATION_PAYLOAD_KEYS)
+    if payload["packet_schema"] != "smial.normalized-trajectory-v1":
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if payload["representation_id"] != REPRESENTATION_ID:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_ID)
+    if payload["representation_version"] != REPRESENTATION_VERSION:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if payload["anonymous"] is not True or _contains_key(
+        payload, _FORBIDDEN_IDENTITY_KEYS
+    ):
+        raise RepresentationProbeError(INVALID_MINT_IDENTITY)
+
+    schedule = _require_exact_keys(
+        payload["schedule"],
+        {
+            "schedule_id",
+            "x_due_offset_seconds",
+            "declared_y_due_offset_seconds",
+            "prefix_due_offset_seconds",
+            "decision_t_due_offset_seconds",
+            "schedule_sha256",
+        },
+    )
+    if schedule["schedule_id"] != PREFERRED_SCHEDULE_ID:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if schedule["x_due_offset_seconds"] not in ALLOWED_X_POINTS:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if schedule["declared_y_due_offset_seconds"] != list(DECLARED_Y_POINTS):
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    expected_prefix = sorted(
+        [schedule["x_due_offset_seconds"]]
+        + [
+            point
+            for point in DECLARED_Y_POINTS
+            if point <= DECISION_T_DUE_OFFSET_SECONDS
+        ]
+    )
+    if schedule["prefix_due_offset_seconds"] != expected_prefix:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if schedule["decision_t_due_offset_seconds"] != DECISION_T_DUE_OFFSET_SECONDS:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    _hash64("schedule_sha256", schedule["schedule_sha256"])
+
+    if payload["pit"] != {
+        "cutoff": "member_anchor_plus_Y1800",
+        "first_reliable_available_at_le_cutoff": True,
+        "future_points_in_denominator": False,
+        "lateness_window_does_not_extend_T": True,
+    }:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if payload["normalization"] != {
+        "kind": "OWN_HISTORY_LOG_RATIO",
+        "first_value": "first_admissible_prefix_point_with_strictly_positive_finite_observed_value",
+        "invalid_or_nonpositive": "M",
+        "interpolation": False,
+        "imputation": False,
+    }:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+
+    volume_mode = payload["volume_mode"]
+    if volume_mode == "TAKER_OBSERVED":
+        channels = ["PRICE", "LIQUIDITY", "VOLUME", "TRADERS"]
+    elif volume_mode == "ACTIVITY_VOLUME_OBSERVED_BUY_PLUS_SELL":
+        channels = ["PRICE", "LIQUIDITY", "VOLUME_BUY", "VOLUME_SELL", "TRADERS"]
+    elif volume_mode == "UNAVAILABLE":
+        channels = ["PRICE", "LIQUIDITY", "VOLUME", "TRADERS"]
+    else:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    motif = _require_exact_keys(
+        payload["motif"],
+        {"channels", "alphabet", "min_steps", "flat_rule", "missing_stays_missing"},
+    )
+    if motif != {
+        "channels": channels,
+        "alphabet": ["U", "F", "D", "M"],
+        "min_steps": 2,
+        "flat_rule": "EXACT_ZERO_CHANGE_ONLY",
+        "missing_stays_missing": True,
+    }:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if payload["field_ids"] != {channel: FIELD_IDS[channel] for channel in channels}:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+
+    _require_nonnegative_int(payload["eligible_member_count"])
+    histogram_member_count = _require_nonnegative_int(payload["histogram_member_count"])
+    histogram = payload["histogram"]
+    if not isinstance(histogram, list) or len(histogram) > 8:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    total_histogram_count = 0
+    for item in histogram:
+        item_mapping = _require_exact_keys(item, {"motif", "count"})
+        item_motif = _require_exact_keys(item_mapping["motif"], set(channels))
+        if any(symbol not in {"U", "F", "D", "M"} for symbol in item_motif.values()):
+            raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+        total_histogram_count += _require_nonnegative_int(item_mapping["count"])
+    if histogram_member_count != total_histogram_count:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    truncation = _require_exact_keys(
+        payload["histogram_truncation"],
+        {
+            "max_distinct_motif_tuples",
+            "retained_order",
+            "dropped_lowest_count_tuples",
+            "m_heavy_members_retained",
+        },
+    )
+    if (
+        truncation["max_distinct_motif_tuples"] != 8
+        or truncation["retained_order"] != "count_desc_then_canonical_motif"
+        or not isinstance(truncation["m_heavy_members_retained"], bool)
+    ):
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    _require_nonnegative_int(truncation["dropped_lowest_count_tuples"])
+
+    declared_hash = _hash64("payload_sha256", payload["payload_sha256"])
+    base = {key: item for key, item in payload.items() if key != "payload_sha256"}
+    if declared_hash != canonical_sha256(base):
+        raise RepresentationProbeError(INVALID_REPRESENTATION_HASH)
+    return payload
 
 
 def _packet_from_receipt(receipt: Mapping[str, Any]) -> Mapping[str, Any] | None:
@@ -178,16 +342,27 @@ class ControlBaseline:
     packet: Mapping[str, Any]
     packet_sha256: str
     memory_baseline_sha256: str
+    memory_eligibility_sha256: str | None = None
     focus_key_sha256: str | None = None
     search_key_sha256: str | None = None
     receipt_verified: bool = False
+    _verification_token: object | None = field(
+        default=None, repr=False, compare=False
+    )
 
     def __post_init__(self) -> None:
+        if (
+            not self.receipt_verified
+            or self._verification_token is not _VERIFIED_BASELINE_TOKEN
+        ):
+            raise RepresentationProbeError(INVALID_CONTROL_NOT_RUN)
         _nonempty_text("session_id", self.session_id)
         _nonempty_text("terminal", self.terminal)
         _hash64("evidence_epoch_sha256", self.evidence_epoch_sha256)
         _hash64("packet_sha256", self.packet_sha256)
         _hash64("memory_baseline_sha256", self.memory_baseline_sha256)
+        if self.memory_eligibility_sha256 is not None:
+            _hash64("memory_eligibility_sha256", self.memory_eligibility_sha256)
         if self.focus_key_sha256 is not None:
             _hash64("focus_key_sha256", self.focus_key_sha256)
         if self.search_key_sha256 is not None:
@@ -262,9 +437,13 @@ def control_baseline_from_receipt(receipt: Mapping[str, Any]) -> ControlBaseline
         packet=packet,
         packet_sha256=computed_packet_sha256,
         memory_baseline_sha256=computed_memory_sha256,
+        memory_eligibility_sha256=receipt.get(
+            "memory_eligibility_sha256", packet.get("memory_eligibility_sha256")
+        ),
         focus_key_sha256=receipt.get("focus_key_sha256", packet.get("focus_key_sha256")),
         search_key_sha256=receipt.get("search_key_sha256", packet.get("search_key_sha256")),
         receipt_verified=True,
+        _verification_token=_VERIFIED_BASELINE_TOKEN,
     )
 
 
@@ -330,31 +509,16 @@ def representation_probe_identity_sha256(
 
 
 def _representation_payload(
-    representation: NormalizedTrajectoryRepresentation | Mapping[str, Any],
+    representation: NormalizedTrajectoryRepresentation,
 ) -> dict[str, Any]:
-    if isinstance(representation, NormalizedTrajectoryRepresentation):
-        payload = representation.payload
-    elif isinstance(representation, Mapping):
-        payload = deepcopy(dict(representation.get("payload", representation)))
-    else:
+    if not isinstance(representation, NormalizedTrajectoryRepresentation):
         raise RepresentationProbeError("REPRESENTATION_INVALID")
-    if payload.get("representation_id") != REPRESENTATION_ID:
-        raise RepresentationProbeError(INVALID_REPRESENTATION_ID)
-    if _contains_key(payload, _FORBIDDEN_IDENTITY_KEYS):
-        raise RepresentationProbeError(INVALID_MINT_IDENTITY)
-    declared_hash = payload.get("payload_sha256")
-    if declared_hash is not None:
-        base = {key: value for key, value in payload.items() if key != "payload_sha256"}
-        if declared_hash != canonical_sha256(base):
-            raise RepresentationProbeError(INVALID_REPRESENTATION_HASH)
-    else:
-        payload["payload_sha256"] = canonical_sha256(payload)
-    return payload
+    return _validate_serialized_representation_payload(representation.payload)
 
 
 def build_challenger_packet(
     control: ControlBaseline | Mapping[str, Any],
-    representation: NormalizedTrajectoryRepresentation | Mapping[str, Any],
+    representation: NormalizedTrajectoryRepresentation,
     *,
     owner_focus: str | None = None,
     registered_probe_identity_sha256: str | None = None,
@@ -371,7 +535,10 @@ def build_challenger_packet(
         if isinstance(control, ControlBaseline)
         else control_baseline_from_receipt(control)
     )
-    if isinstance(control, ControlBaseline) and not baseline.receipt_verified:
+    if isinstance(control, ControlBaseline) and (
+        not baseline.receipt_verified
+        or baseline._verification_token is not _VERIFIED_BASELINE_TOKEN
+    ):
         raise RepresentationProbeError(INVALID_CONTROL_NOT_RUN)
     if not control_probe_permitted(baseline.terminal):
         raise RepresentationProbeError(INVALID_TRIGGER_NOT_MET)
@@ -387,9 +554,6 @@ def build_challenger_packet(
     payload = _representation_payload(representation)
     payload_sha256 = payload.get("payload_sha256")
     _hash64("representation_payload_sha256", payload_sha256)
-    if registered_probe_identity_sha256 is not None:
-        _hash64("registered_probe_identity_sha256", registered_probe_identity_sha256)
-        raise RepresentationProbeError(REPRESENTATION_PROBE_ALREADY_EXISTS)
     bound_focus = str(
         baseline.packet.get("owner_focus", baseline.focus_key_sha256 or "CONTROL")
     )
@@ -412,6 +576,11 @@ def build_challenger_packet(
         representation_search_key=search_key,
         representation_payload_sha256=payload_sha256,
     )
+    if registered_probe_identity_sha256 is not None:
+        _hash64("registered_probe_identity_sha256", registered_probe_identity_sha256)
+        if registered_probe_identity_sha256 != probe_identity:
+            raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+        raise RepresentationProbeError(REPRESENTATION_PROBE_ALREADY_EXISTS)
     challenger: dict[str, Any] = {
         "packet_schema": REPRESENTATION_PROBE_SCHEMA,
         "packet_version": REPRESENTATION_PROBE_VERSION,
@@ -423,6 +592,8 @@ def build_challenger_packet(
         "evidence_epoch_sha256": baseline.evidence_epoch_sha256,
         "control_packet_sha256": baseline.packet_sha256,
         "memory_baseline_sha256": baseline.memory_baseline_sha256,
+        "memory_eligibility_sha256": baseline.memory_eligibility_sha256,
+        "owner_focus": bound_focus,
         "representation_payload_sha256": payload_sha256,
         "prompt_version": baseline.prompt_version,
         "representation_search_key_sha256": search_key,
@@ -431,7 +602,7 @@ def build_challenger_packet(
         "max_challenger_runs_per_representation_control_epoch": MAX_CHALLENGER_RUNS_PER_CONTROL_EPOCH,
         "max_packet_bytes": MAX_PACKET_BYTES,
         "critic_input_packet": deepcopy(dict(baseline.packet)),
-        "representation": payload,
+        PACKET_KEY: payload,
         "non_claims": [
             "NO_PROBE_EXECUTION",
             "NO_ALPHA",
@@ -453,15 +624,112 @@ def build_challenger_packet(
     return challenger
 
 
+def _validate_challenger_packet(
+    challenger_packet: Mapping[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Revalidate every identity-bearing field before fixture transport."""
+
+    expected_keys = {
+        "packet_schema",
+        "packet_version",
+        "probe_kind",
+        "probe_state",
+        "representation_id",
+        "representation_packet_key",
+        "control_session_id",
+        "evidence_epoch_sha256",
+        "control_packet_sha256",
+        "memory_baseline_sha256",
+        "memory_eligibility_sha256",
+        "owner_focus",
+        "representation_payload_sha256",
+        "prompt_version",
+        "representation_search_key_sha256",
+        "probe_identity_sha256",
+        "ordinary_search_budget_unchanged",
+        "max_challenger_runs_per_representation_control_epoch",
+        "max_packet_bytes",
+        "critic_input_packet",
+        PACKET_KEY,
+        "non_claims",
+        "packet_bytes",
+    }
+    packet = dict(_require_exact_keys(challenger_packet, expected_keys))
+    if (
+        packet["packet_schema"] != REPRESENTATION_PROBE_SCHEMA
+        or packet["packet_version"] != REPRESENTATION_PROBE_VERSION
+        or packet["probe_kind"] != REPRESENTATION_PROBE_KIND
+        or packet["probe_state"] != "DORMANT_PACKET_ONLY"
+        or packet["representation_id"] != REPRESENTATION_ID
+        or packet["representation_packet_key"] != PACKET_KEY
+        or packet["prompt_version"] != PROMPT_VERSION
+        or packet["ordinary_search_budget_unchanged"] is not True
+        or packet["max_challenger_runs_per_representation_control_epoch"]
+        != MAX_CHALLENGER_RUNS_PER_CONTROL_EPOCH
+        or packet["max_packet_bytes"] != MAX_PACKET_BYTES
+        or packet["non_claims"]
+        != ["NO_PROBE_EXECUTION", "NO_ALPHA", "NO_CURRENT_COHORT_SCIENTIFIC_READ"]
+    ):
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    _nonempty_text("control_session_id", packet["control_session_id"])
+    _hash64("evidence_epoch_sha256", packet["evidence_epoch_sha256"])
+    _hash64("control_packet_sha256", packet["control_packet_sha256"])
+    _hash64("memory_baseline_sha256", packet["memory_baseline_sha256"])
+    _nonempty_text("owner_focus", packet["owner_focus"])
+
+    control_packet = packet["critic_input_packet"]
+    if not isinstance(control_packet, Mapping):
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    if control_packet_has_raw_sequences(control_packet) or _contains_key(
+        control_packet, _FORBIDDEN_CONTROL_KEYS
+    ):
+        raise RepresentationProbeError(INVALID_CONTROL_TRAJECTORY)
+    if canonical_sha256(control_packet) != packet["control_packet_sha256"]:
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    eligibility = packet["memory_eligibility_sha256"]
+    if eligibility is not None:
+        _hash64("memory_eligibility_sha256", eligibility)
+    if _memory_baseline_sha256(
+        control_packet, {"memory_eligibility_sha256": eligibility}
+    ) != packet["memory_baseline_sha256"]:
+        raise RepresentationProbeError(INVALID_MEMORY_BASELINE_DRIFT)
+
+    representation = _validate_serialized_representation_payload(packet[PACKET_KEY])
+    if representation["payload_sha256"] != packet["representation_payload_sha256"]:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_HASH)
+    _hash64("representation_payload_sha256", packet["representation_payload_sha256"])
+    expected_search_key = representation_search_key_sha256(
+        evidence_epoch_sha256=packet["evidence_epoch_sha256"],
+        owner_focus=packet["owner_focus"],
+        prompt_version=packet["prompt_version"],
+        memory_baseline_sha256=packet["memory_baseline_sha256"],
+        representation_id=packet["representation_id"],
+        representation_payload_sha256=packet["representation_payload_sha256"],
+        control_packet_sha256=packet["control_packet_sha256"],
+    )
+    if expected_search_key != packet["representation_search_key_sha256"]:
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    expected_identity = representation_probe_identity_sha256(
+        control_session_id=packet["control_session_id"],
+        evidence_epoch_sha256=packet["evidence_epoch_sha256"],
+        representation_id=packet["representation_id"],
+        representation_search_key=packet["representation_search_key_sha256"],
+        representation_payload_sha256=packet["representation_payload_sha256"],
+    )
+    if expected_identity != packet["probe_identity_sha256"]:
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    if packet["packet_bytes"] != len(canonical_json_bytes(packet)):
+        raise RepresentationProbeError(INVALID_PACKET_BUDGET)
+    if packet["packet_bytes"] > MAX_PACKET_BYTES:
+        raise RepresentationProbeError(INVALID_PACKET_BUDGET)
+    return packet, representation
+
+
 def existing_hfic_packet(challenger_packet: Mapping[str, Any]) -> dict[str, Any]:
     """Return the unchanged critic packet for an existing HFIC lifecycle fixture."""
 
-    if not isinstance(challenger_packet, Mapping):
-        raise RepresentationProbeError("CHALLENGER_PACKET_INVALID")
-    packet = challenger_packet.get("critic_input_packet")
-    if not isinstance(packet, Mapping):
-        raise RepresentationProbeError("CHALLENGER_PACKET_INVALID")
-    return deepcopy(dict(packet))
+    validated, _representation = _validate_challenger_packet(challenger_packet)
+    return deepcopy(dict(validated["critic_input_packet"]))
 
 
 def existing_hfic_lifecycle_fixture_input(
@@ -474,26 +742,17 @@ def existing_hfic_lifecycle_fixture_input(
     schema validation and lifecycle code remain untouched.
     """
 
-    if not isinstance(challenger_packet, Mapping):
-        raise RepresentationProbeError("CHALLENGER_PACKET_INVALID")
-    packet = existing_hfic_packet(challenger_packet)
-    representation = _representation_payload(challenger_packet.get("representation", {}))
-    if canonical_sha256(packet) != challenger_packet.get("control_packet_sha256"):
-        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
-    if representation.get("payload_sha256") != challenger_packet.get("representation_payload_sha256"):
-        raise RepresentationProbeError(INVALID_REPRESENTATION_HASH)
-    _hash64("probe_identity_sha256", challenger_packet.get("probe_identity_sha256"))
+    validated, representation = _validate_challenger_packet(challenger_packet)
+    packet = existing_hfic_packet(validated)
     return {
         "lifecycle_mode": REPRESENTATION_PROBE_KIND,
-        "probe_state": challenger_packet.get("probe_state"),
-        "representation_id": challenger_packet.get("representation_id"),
+        "probe_state": validated["probe_state"],
+        "representation_id": validated["representation_id"],
         "representation": representation,
-        "probe_identity_sha256": challenger_packet.get("probe_identity_sha256"),
-        "control_session_id": challenger_packet.get("control_session_id"),
-        "evidence_epoch_sha256": challenger_packet.get("evidence_epoch_sha256"),
-        "ordinary_search_budget_unchanged": challenger_packet.get(
-            "ordinary_search_budget_unchanged"
-        ),
+        "probe_identity_sha256": validated["probe_identity_sha256"],
+        "control_session_id": validated["control_session_id"],
+        "evidence_epoch_sha256": validated["evidence_epoch_sha256"],
+        "ordinary_search_budget_unchanged": validated["ordinary_search_budget_unchanged"],
         "critic_input_packet": packet,
     }
 
@@ -533,12 +792,65 @@ def _status_binding_reason(
     }
     for key, value in expected.items():
         supplied = snapshot.get(key)
-        if supplied is not None and supplied != value:
+        if key not in snapshot or supplied != value:
             if key == "memory_baseline_sha256":
                 return INVALID_MEMORY_BASELINE_DRIFT
             if key == "evidence_epoch_sha256":
                 return INVALID_EVIDENCE_EPOCH_MISMATCH
             return INVALID_CONTROL_PACKET_HASH
+    declared_terminal = _value_or(
+        snapshot, "effective_control_terminal", "control_terminal"
+    )
+    if declared_terminal is not None and declared_terminal != baseline.terminal:
+        return INVALID_CONTROL_PACKET_HASH
+    return None
+
+
+def _status_probe_identity_reason(
+    snapshot: Mapping[str, Any],
+    baseline: ControlBaseline,
+) -> str | None:
+    """Require a complete, baseline-bound receipt for declared prior state."""
+
+    receipt = snapshot.get("representation_probe_receipt")
+    if not isinstance(receipt, Mapping) or receipt.get("receipt_verified") is not True:
+        return INVALID_PROBE_IDENTITY
+    try:
+        representation = _validate_serialized_representation_payload(
+            receipt[PACKET_KEY]
+        )
+        payload_sha256 = representation["payload_sha256"]
+        expected_search_key = representation_search_key_sha256(
+            evidence_epoch_sha256=baseline.evidence_epoch_sha256,
+            owner_focus=str(
+                baseline.packet.get("owner_focus", baseline.focus_key_sha256 or "CONTROL")
+            ),
+            prompt_version=baseline.prompt_version,
+            memory_baseline_sha256=baseline.memory_baseline_sha256,
+            representation_id=REPRESENTATION_ID,
+            representation_payload_sha256=payload_sha256,
+            control_packet_sha256=baseline.packet_sha256,
+        )
+        expected_identity = representation_probe_identity_sha256(
+            control_session_id=baseline.session_id,
+            evidence_epoch_sha256=baseline.evidence_epoch_sha256,
+            representation_id=REPRESENTATION_ID,
+            representation_search_key=expected_search_key,
+            representation_payload_sha256=payload_sha256,
+        )
+    except (KeyError, RepresentationProbeError):
+        return INVALID_PROBE_IDENTITY
+    for key, expected in {
+        "control_session_id": baseline.session_id,
+        "evidence_epoch_sha256": baseline.evidence_epoch_sha256,
+        "control_packet_sha256": baseline.packet_sha256,
+        "memory_baseline_sha256": baseline.memory_baseline_sha256,
+        "representation_payload_sha256": payload_sha256,
+        "representation_search_key_sha256": expected_search_key,
+        "probe_identity_sha256": expected_identity,
+    }.items():
+        if receipt.get(key) != expected:
+            return INVALID_PROBE_IDENTITY
     return None
 
 
@@ -547,21 +859,71 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
 
     if not isinstance(snapshot, Mapping):
         raise RepresentationProbeError("STATUS_INPUT_INVALID")
+    receipt = snapshot.get("control_receipt")
+    receipt_mapping = receipt if isinstance(receipt, Mapping) else None
+    control_present = _value_or(
+        snapshot,
+        "control_present",
+        "control_packet_present",
+        default=(receipt_mapping is not None),
+    )
+    if control_present is not True or receipt_mapping is None:
+        status = STATUS_CONTROL_REQUIRED
+        reason = INVALID_CONTROL_NOT_RUN
+        return {
+            "representation_id": REPRESENTATION_ID,
+            "status": status,
+            "reason_code": reason,
+            "read_only": True,
+            "probe_executed": False,
+            "ordinary_hypothesis_forge_unchanged": True,
+            "alpha_claim": False,
+            "message_ru": "Сначала нужен текущий CONTROL Forge на том же evidence epoch.",
+        }
+    try:
+        baseline = control_baseline_from_receipt(receipt_mapping)
+    except RepresentationProbeError as exc:
+        status = STATUS_OBSERVABILITY_BLOCKED
+        reason = str(exc)
+        return {
+            "representation_id": REPRESENTATION_ID,
+            "status": status,
+            "reason_code": reason,
+            "read_only": True,
+            "probe_executed": False,
+            "ordinary_hypothesis_forge_unchanged": True,
+            "alpha_claim": False,
+            "message_ru": "Representation probe заблокирован проблемой наблюдаемости или целостности.",
+        }
+    binding_reason = _status_binding_reason(snapshot, receipt_mapping)
+    if binding_reason is not None:
+        status = (
+            STATUS_CONTROL_REQUIRED
+            if binding_reason == INVALID_CONTROL_NOT_RUN
+            else STATUS_OBSERVABILITY_BLOCKED
+        )
+        return {
+            "representation_id": REPRESENTATION_ID,
+            "status": status,
+            "reason_code": binding_reason,
+            "read_only": True,
+            "probe_executed": False,
+            "ordinary_hypothesis_forge_unchanged": True,
+            "alpha_claim": False,
+            "message_ru": "Representation probe заблокирован проблемой наблюдаемости или целостности.",
+        }
+
     existing_state = _value_or(
         snapshot,
         "representation_probe_state",
         "probe_state",
         "existing_probe_state",
     )
-    existing_identity = _value_or(
-        snapshot,
-        "existing_probe_identity_sha256",
-        "probe_identity_sha256",
-    )
     if existing_state in {"COMPLETE", STATUS_COMPLETE, "PASS", "PROBE_EXECUTED"}:
-        if not isinstance(existing_identity, str) or _HASH64_RE.fullmatch(existing_identity) is None:
+        identity_reason = _status_probe_identity_reason(snapshot, baseline)
+        if identity_reason is not None:
             status = STATUS_OBSERVABILITY_BLOCKED
-            reason = INVALID_PROBE_IDENTITY
+            reason = identity_reason
         else:
             status = STATUS_COMPLETE
             reason = "REPRESENTATION_PROBE_ALREADY_COMPLETED"
@@ -569,40 +931,16 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
         existing_state in {"EXISTS", STATUS_ALREADY_EXISTS, "RUNNING", "REGISTERED"}
         or bool(_value_or(snapshot, "representation_probe_exists", "probe_exists", default=False))
     ):
-        if not isinstance(existing_identity, str) or _HASH64_RE.fullmatch(existing_identity) is None:
+        identity_reason = _status_probe_identity_reason(snapshot, baseline)
+        if identity_reason is not None:
             status = STATUS_OBSERVABILITY_BLOCKED
-            reason = INVALID_PROBE_IDENTITY
+            reason = identity_reason
         else:
             status = STATUS_ALREADY_EXISTS
             reason = REPRESENTATION_PROBE_ALREADY_EXISTS
     else:
-        receipt = snapshot.get("control_receipt")
-        receipt_mapping = receipt if isinstance(receipt, Mapping) else None
-        terminal = (
-            effective_control_terminal(receipt_mapping)
-            if receipt_mapping is not None
-            else str(
-                _value_or(
-                    snapshot,
-                    "effective_control_terminal",
-                    "control_terminal",
-                    default="",
-                )
-                or ""
-            )
-        )
-        control_present = bool(
-            _value_or(
-                snapshot,
-                "control_present",
-                "control_packet_present",
-                default=(receipt_mapping is not None),
-            )
-        )
-        if not control_present or not terminal:
-            status = STATUS_CONTROL_REQUIRED
-            reason = INVALID_CONTROL_NOT_RUN
-        elif terminal == "RUNNER_UP_REVISION_REQUIRED":
+        terminal = baseline.terminal
+        if terminal == "RUNNER_UP_REVISION_REQUIRED":
             status = STATUS_RUNNER_UP_PAUSE
             reason = "RUNNER_UP_REVISION_REQUIRED"
         elif terminal in CASE_A_TERMINALS:
@@ -676,7 +1014,7 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
 
 def build_representation_probe_packet(
     control: ControlBaseline | Mapping[str, Any],
-    representation: NormalizedTrajectoryRepresentation | Mapping[str, Any],
+    representation: NormalizedTrajectoryRepresentation,
     *,
     owner_focus: str | None = None,
     registered_probe_identity_sha256: str | None = None,
@@ -710,6 +1048,7 @@ __all__ = [
     "INVALID_MEMORY_BASELINE_DRIFT",
     "INVALID_PACKET_BUDGET",
     "INVALID_PROBE_IDENTITY",
+    "INVALID_REPRESENTATION_SCHEMA",
     "INVALID_TRIGGER_NOT_MET",
     "MAX_CHALLENGER_RUNS_PER_CONTROL_EPOCH",
     "PROBE_PERMIT_TERMINALS",

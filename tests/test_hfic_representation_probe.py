@@ -17,17 +17,16 @@ from solana_alpha_lab.factory.hfic_control_integrity import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_preflight import MAX_PACKET_BYTES  # noqa: E402
 from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
+    ControlBaseline,
     INVALID_CONTROL_PACKET_HASH,
+    INVALID_CONTROL_NOT_RUN,
+    INVALID_PROBE_IDENTITY,
     INVALID_MEMORY_BASELINE_DRIFT,
     INVALID_PACKET_BUDGET,
     INVALID_TRIGGER_NOT_MET,
-    STATUS_ALREADY_EXISTS,
-    STATUS_COMPLETE,
     STATUS_CONTROL_REQUIRED,
     STATUS_ELIGIBLE,
-    STATUS_MARKET_FALSIFIER_FIRST,
     STATUS_OBSERVABILITY_BLOCKED,
-    STATUS_RUNNER_UP_PAUSE,
     RepresentationProbeError,
     build_challenger_packet,
     control_baseline_from_receipt,
@@ -37,6 +36,7 @@ from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
     representation_status,
 )
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (  # noqa: E402
+    PACKET_KEY,
     project_normalized_trajectory,
 )
 from solana_alpha_lab.factory.run_passport import canonical_sha256  # noqa: E402
@@ -141,7 +141,8 @@ class HficRepresentationProbeTests(unittest.TestCase):
         self.assertEqual(challenger["memory_baseline_sha256"], baseline.memory_baseline_sha256)
         self.assertEqual(challenger["critic_input_packet"], baseline.packet)
         lifecycle_input = existing_hfic_lifecycle_fixture_input(challenger)
-        self.assertEqual(lifecycle_input["representation"], challenger["representation"])
+        self.assertEqual(lifecycle_input["representation"], challenger[PACKET_KEY])
+        self.assertEqual(challenger[PACKET_KEY], challenger["normalized_trajectory_v1"])
         self.assertEqual(existing_hfic_packet(challenger), baseline.packet)
         self.assertNotEqual(
             challenger["representation_search_key_sha256"],
@@ -189,7 +190,56 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 project_normalized_trajectory([]),
                 registered_probe_identity_sha256="dd" * 32,
             )
+        self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
+
+        challenger = build_challenger_packet(baseline, project_normalized_trajectory([]))
+        with self.assertRaises(RepresentationProbeError) as raised:
+            build_challenger_packet(
+                baseline,
+                project_normalized_trajectory([]),
+                registered_probe_identity_sha256=challenger["probe_identity_sha256"],
+            )
         self.assertEqual(str(raised.exception), "REPRESENTATION_PROBE_ALREADY_EXISTS")
+
+    def test_public_control_baseline_constructor_cannot_grant_verification(self) -> None:
+        with self.assertRaises(RepresentationProbeError) as raised:
+            ControlBaseline(
+                session_id="session",
+                terminal="NO_WORTHY_HYPOTHESIS",
+                evidence_epoch_sha256="aa" * 32,
+                prompt_version="HFIC-V1.2",
+                packet={},
+                packet_sha256="bb" * 32,
+                memory_baseline_sha256="cc" * 32,
+                receipt_verified=True,
+            )
+        self.assertEqual(str(raised.exception), INVALID_CONTROL_NOT_RUN)
+
+    def test_raw_mapping_cannot_enter_challenger_representation(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        raw_mapping = {
+            "packet_schema": "smial.normalized-trajectory-v1",
+            "representation_id": "NORMALIZED_TRAJECTORY_V1",
+            "raw_values": [1.0],
+        }
+        raw_mapping["payload_sha256"] = canonical_sha256(raw_mapping)
+        with self.assertRaises(RepresentationProbeError) as raised:
+            build_challenger_packet(baseline, raw_mapping)
+        self.assertIn(
+            str(raised.exception),
+            {"REPRESENTATION_INVALID", "INVALID_REPRESENTATION_SCHEMA"},
+        )
+
+    def test_fixture_bridge_rechecks_outer_identity(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        challenger = build_challenger_packet(baseline, project_normalized_trajectory([]))
+        drifted = dict(challenger)
+        drifted["control_session_id"] = "different-session"
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_lifecycle_fixture_input(drifted)
+        self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
 
     def test_runner_up_or_case_a_cannot_create_challenger(self) -> None:
         receipt = _control_receipt()
@@ -205,20 +255,14 @@ class HficRepresentationProbeTests(unittest.TestCase):
         huge = dict(baseline.packet)
         huge["known_unknowns"] = ["x" * (MAX_PACKET_BYTES * 2)]
         huge_hash = canonical_sha256(huge)
-        from solana_alpha_lab.factory.hfic_representation_probe import ControlBaseline
-
-        oversized = ControlBaseline(
-            session_id=baseline.session_id,
-            terminal=baseline.terminal,
-            evidence_epoch_sha256=baseline.evidence_epoch_sha256,
-            prompt_version=baseline.prompt_version,
-            packet=huge,
-            packet_sha256=huge_hash,
-            memory_baseline_sha256=baseline.memory_baseline_sha256,
-            receipt_verified=True,
+        oversized_receipt = dict(_control_receipt())
+        oversized_receipt["critic_input_packet"] = huge
+        oversized_receipt["critic_input_packet_sha256"] = huge_hash
+        oversized_receipt["memory_baseline_sha256"] = control_memory_baseline_sha256(
+            oversized_receipt
         )
         with self.assertRaises(RepresentationProbeError) as raised:
-            build_challenger_packet(oversized, project_normalized_trajectory([]))
+            build_challenger_packet(oversized_receipt, project_normalized_trajectory([]))
         self.assertEqual(str(raised.exception), INVALID_PACKET_BUDGET)
 
 
@@ -261,16 +305,16 @@ class RepresentationStatusTests(unittest.TestCase):
         self.assertEqual(
             representation_status(
                 {
-                    **{key: value for key, value in eligible.items() if key != "control_receipt"},
+                    **eligible,
                     "control_terminal": "PASS_FAST_LANE_READY",
                 }
             )["status"],
-            STATUS_MARKET_FALSIFIER_FIRST,
+            STATUS_OBSERVABILITY_BLOCKED,
         )
         self.assertEqual(
             representation_status(
                 {
-                    **{key: value for key, value in eligible.items() if key != "control_receipt"},
+                    **eligible,
                     "control_terminal": "KILL_DATA_INFEASIBLE",
                 }
             )["status"],
@@ -279,11 +323,11 @@ class RepresentationStatusTests(unittest.TestCase):
         self.assertEqual(
             representation_status(
                 {
-                    **{key: value for key, value in eligible.items() if key != "control_receipt"},
+                    **eligible,
                     "control_terminal": "RUNNER_UP_REVISION_REQUIRED",
                 }
             )["status"],
-            STATUS_RUNNER_UP_PAUSE,
+            STATUS_OBSERVABILITY_BLOCKED,
         )
         self.assertEqual(
             representation_status(
@@ -295,7 +339,7 @@ class RepresentationStatusTests(unittest.TestCase):
             )[
                 "status"
             ],
-            STATUS_ALREADY_EXISTS,
+            STATUS_OBSERVABILITY_BLOCKED,
         )
         self.assertEqual(
             representation_status(
@@ -307,7 +351,7 @@ class RepresentationStatusTests(unittest.TestCase):
             )[
                 "status"
             ],
-            STATUS_COMPLETE,
+            STATUS_OBSERVABILITY_BLOCKED,
         )
         self.assertEqual(
             representation_status({**eligible, "representation_probe_exists": True})[
@@ -319,6 +363,20 @@ class RepresentationStatusTests(unittest.TestCase):
         self.assertTrue(result["read_only"])
         self.assertFalse(result["probe_executed"])
         self.assertFalse(result["alpha_claim"])
+
+        for missing_key in (
+            "control_session_id",
+            "evidence_epoch_sha256",
+            "control_packet_sha256",
+            "memory_baseline_sha256",
+        ):
+            missing_anchor = dict(eligible)
+            del missing_anchor[missing_key]
+            self.assertEqual(
+                representation_status(missing_anchor)["status"],
+                STATUS_OBSERVABILITY_BLOCKED,
+                missing_key,
+            )
 
 
 if __name__ == "__main__":

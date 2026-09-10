@@ -29,6 +29,9 @@ validated lifecycle schedule. It uses the member-anchor plus `Y1800` cutoff,
 keeps missing or late slots as `M`, normalizes within each member's admissible
 prefix history, and emits only an anonymous cohort motif histogram. The frozen
 channels are `PRICE`, `LIQUIDITY`, activity volume, and `TRADERS`.
+Every projection carries a deterministic `schedule_sha256` binding; the
+challenger accepts only the closed representation payload produced by this
+projection, never an arbitrary raw mapping.
 
 Taker volume is used only when observed. If taker volume is unavailable and
 both buy and sell volume are observed, two fallback channels are emitted. Buy
@@ -53,12 +56,15 @@ M-heavy representative is retained when the eight-tuple bound is reached.
 requires the effective CONTROL terminal and exact hash-bound CONTROL packet,
 with `evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1`. The adapter
 clones that packet byte-for-byte into a separate challenger envelope and adds
-the compact representation beside it. The existing HFIC packet schema and
+the compact representation under the exact frozen packet key
+`normalized_trajectory_v1`. The existing HFIC packet schema and
 lifecycle fixture therefore remain readable and unchanged.
 
 The `existing_hfic_lifecycle_fixture_input` bridge carries the representation
 as explicit outer context while handing the unchanged nested packet to the
-existing fixture. The representation payload hash is part of both the search
+existing fixture. The bridge revalidates the closed envelope, nested packet,
+schedule binding, payload hash, search identity, and one-run probe identity
+before transport. The representation payload hash is part of both the search
 identity and the one-run probe identity, so two payloads cannot share a
 CONTROL/epoch identity. Recorded CONTROL packet and memory-baseline hashes are
 mandatory; missing or mismatched anchors fail closed.
@@ -72,8 +78,10 @@ budget. Any epoch, packet, memory, grounding, or byte-budget drift fails closed.
 `CONTROL_REQUIRED`, `NORMALIZED_TRAJECTORY_V1_ELIGIBLE`,
 `MARKET_FALSIFIER_FIRST`, `OBSERVABILITY_BLOCKED`, `RUNNER_UP_PAUSE`,
 `REPRESENTATION_PROBE_ALREADY_EXISTS`, or
-`REPRESENTATION_PROBE_COMPLETE`. None of these statuses executes a probe or
-claims alpha.
+`REPRESENTATION_PROBE_COMPLETE`. It first verifies a current CONTROL receipt
+and all session, epoch, packet, memory, mode, and terminal anchors; caller-
+declared prior states require a complete baseline-bound probe receipt. None of
+these statuses executes a probe or claims alpha.
 
 ## Rollback and non-claims
 
