@@ -88,10 +88,7 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
       - CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001
-    DELIVERY_EVIDENCE:
-      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_completion_evidence_v1.json
-      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_independent_review_v1.json
-      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_factory_fit_v1.json
+    DELIVERY_EVIDENCE: []
     HISTORICAL_CONTEXT: []
   exact_role_paths:
     LIFECYCLE:
@@ -99,7 +96,10 @@ context_requirements:
       - docs/tasks/HFIC_FRESH_CONTROL_DECISION_INTEGRITY_CLOSURE_V1.md
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_independent_review_v1.json
+      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
