@@ -25,10 +25,14 @@ from solana_alpha_lab.factory.discovery_evidence_release import (
     _schema_sha256,
     sha256_bytes,
 )
-from solana_alpha_lab.factory.observation_panel_publisher import (
-    rebuild_observation_panel_from_rdp,
+from solana_alpha_lab.factory.members_snapshot_delta import (
+    MembersDeltaError,
+    load_member_rows_for_location,
 )
-from solana_alpha_lab.factory.research_store import ResearchStore
+from solana_alpha_lab.factory.research_store import (
+    ExistingResearchStoreReader,
+    ResearchStoreError,
+)
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from solana_alpha_lab.factory.tokens_v2_typed_projection import (
     FEATURE_FAMILY_ORDER,
@@ -60,9 +64,29 @@ SEALABLE_READY = frozenset(
     {
         "READY_VALID",
         "READY_VALID_WITH_COVERAGE_LIMITATION",
-        "READY_LOW_YIELD",
     }
 )
+COVERAGE_LIMITED_CLASSES = frozenset(
+    {
+        "GAP_SUSPECTED",
+        "DISCOVERY_COVERAGE_UNKNOWN",
+    }
+)
+_COVERAGE_RANK = {
+    "GAP_CONFIRMED": 0,
+    "GAP_SUSPECTED": 1,
+    "DISCOVERY_COVERAGE_UNKNOWN": 2,
+    "EMPIRICAL_OVERLAP_ONLY": 3,
+    "PROVIDER_CONTRACT_PROVEN": 4,
+}
+
+
+def cohort_snapshot_path(observation_rdp_root: Path, cohort_id: str) -> Path:
+    _require(
+        cohort_id.startswith("REL-") and cohort_id.count("-") == 2,
+        "COHORT_ID_INVALID",
+    )
+    return Path(observation_rdp_root) / "live_observation_rebuild" / f"cohort={cohort_id}" / "source_snapshot.json"
 
 REQUIRED_LABELS = {
     "evidence_role": LIVE_EVIDENCE_ROLE,
@@ -156,10 +180,14 @@ def cohort_window_bounds(cohort_id: str) -> tuple[datetime, datetime]:
 
 
 def write_observation_rdp_source(
-    observation_rdp_root: Path, snapshot: Mapping[str, Any]
+    observation_rdp_root: Path,
+    snapshot: Mapping[str, Any],
+    *,
+    cohort_id: str | None = None,
 ) -> Path:
     root = Path(observation_rdp_root)
-    path = root / OBSERVATION_RDP_REBUILD_NAME
+    cid = cohort_id or str(snapshot.get("cohort_id") or "")
+    path = cohort_snapshot_path(root, cid) if cid else root / OBSERVATION_RDP_REBUILD_NAME
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(
         json.dumps(
@@ -169,11 +197,33 @@ def write_observation_rdp_source(
     return path
 
 
+def _sha40(value: object) -> str | None:
+    text = str(value or "")
+    if len(text) == 40 and all(c in "0123456789abcdef" for c in text):
+        return text
+    return None
+
+
+def _contributing_producers(payload: Mapping[str, Any]) -> list[str]:
+    raw = payload.get("contributing_producer_git_shas")
+    if isinstance(raw, list) and raw:
+        out: list[str] = []
+        for item in raw:
+            digest = _sha40(item)
+            _require(digest is not None, "RELEASE_INVALID_SOURCE_INTEGRITY")
+            assert digest is not None
+            out.append(digest)
+        return sorted(dict.fromkeys(out))
+    singular = _sha40(payload.get("producer_git_sha"))
+    _require(singular is not None, "RELEASE_INVALID_SOURCE_INTEGRITY")
+    assert singular is not None
+    return [singular]
+
+
 def _validate_source_payload(payload: Mapping[str, Any], *, source_sha256: str) -> dict[str, Any]:
     for key in (
         "schedule_sha256",
         "activation_id",
-        "producer_git_sha",
         "members",
         "observations",
         "starts_at",
@@ -192,38 +242,91 @@ def _validate_source_payload(payload: Mapping[str, Any], *, source_sha256: str) 
         and all(c in "0123456789abcdef" for c in schedule_sha),
         "RELEASE_INVALID_SOURCE_INTEGRITY",
     )
-    producer = str(payload["producer_git_sha"])
-    _require(
-        len(producer) == 40 and all(c in "0123456789abcdef" for c in producer),
-        "RELEASE_INVALID_SOURCE_INTEGRITY",
+    contributing = _contributing_producers(payload)
+    singular = _sha40(payload.get("producer_git_sha"))
+    if len(contributing) == 1:
+        if singular is None:
+            singular = contributing[0]
+        _require(singular == contributing[0], "RELEASE_INVALID_SOURCE_INTEGRITY")
+    else:
+        # Multi-producer: a singular SHA would be false; omit it.
+        _require(singular is None, "LIVE_SOURCE_LINEAGE_CONFLICT")
+        singular = None
+    schedule_producer = _sha40(payload.get("schedule_producer_git_sha")) or (
+        contributing[0] if len(contributing) == 1 else None
     )
     starts = str(payload["starts_at"])
     stops = str(payload["stops_admitting_at"])
     _parse_utc(starts)
     _parse_utc(stops)
-    return {
+    out = {
         "schedule_sha256": schedule_sha,
         "activation_id": str(payload["activation_id"]),
-        "producer_git_sha": producer,
         "starts_at": starts,
         "stops_admitting_at": stops,
         "members": members,
         "observations": observations,
         "source_sha256": source_sha256,
         "discovery_coverage_class": str(
-            payload.get("discovery_coverage_class") or "GAP_SUSPECTED"
+            payload.get("discovery_coverage_class") or "DISCOVERY_COVERAGE_UNKNOWN"
         ),
-        "open_publication": bool(payload.get("open_publication") or False),
-        "unresolved_due": bool(payload.get("unresolved_due") or False),
-        "in_flight": bool(payload.get("in_flight") or False),
-        "budget_blocked": bool(payload.get("budget_blocked") or False),
+        "open_publication": _require_closure_flag(payload, "open_publication"),
+        "unresolved_due": _require_closure_flag(payload, "unresolved_due"),
+        "in_flight": _require_closure_flag(payload, "in_flight"),
+        "budget_blocked": _require_closure_flag(payload, "budget_blocked"),
+        "contributing_producer_git_shas": contributing,
+        "schedule_producer_git_sha": schedule_producer,
+        "release_builder_git_sha": _sha40(payload.get("release_builder_git_sha")),
+        "cohort_id": payload.get("cohort_id"),
+        "window_start": payload.get("window_start"),
+        "window_end_exclusive": payload.get("window_end_exclusive"),
+        "closure_receipt_sha256": payload.get("closure_receipt_sha256"),
+        "closure_receipt": payload.get("closure_receipt"),
     }
+    if singular is not None:
+        out["producer_git_sha"] = singular
+    return out
 
 
-def load_observation_rdp_source(observation_rdp_root: Path) -> dict[str, Any]:
+def _require_closure_flag(payload: Mapping[str, Any], key: str) -> bool:
+    _require(key in payload, "CLOSED_RECEIPT_MISSING")
+    value = payload[key]
+    _require(isinstance(value, bool), "CLOSED_RECEIPT_MISSING")
+    return value
+
+
+def load_observation_rdp_source(
+    observation_rdp_root: Path,
+    *,
+    cohort_id: str | None = None,
+) -> dict[str, Any]:
     """Load previously built live source snapshot from Observation RDP."""
     root = Path(observation_rdp_root)
-    path = root / OBSERVATION_RDP_REBUILD_NAME
+    path = (
+        cohort_snapshot_path(root, cohort_id)
+        if cohort_id
+        else root / OBSERVATION_RDP_REBUILD_NAME
+    )
+    if (not path.is_file() or path.is_symlink()) and cohort_id:
+        fallback = root / OBSERVATION_RDP_REBUILD_NAME
+        if fallback.is_file() and not fallback.is_symlink():
+            try:
+                preview = json.loads(fallback.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+                raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY") from exc
+            if not isinstance(preview, Mapping):
+                raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY")
+            labeled = str(preview.get("cohort_id") or "")
+            if labeled and labeled != cohort_id:
+                raise LiveCohortReleaseError("IDENTITY_CONFLICT")
+            start, end = cohort_window_bounds(cohort_id)
+            for member in preview.get("members") or []:
+                if not isinstance(member, Mapping):
+                    continue
+                admission = _member_admission_instant(member)
+                if admission is not None and not (start <= admission < end):
+                    raise LiveCohortReleaseError("IDENTITY_CONFLICT")
+            path = fallback
     if not path.is_file() or path.is_symlink():
         raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY")
     try:
@@ -489,19 +592,114 @@ def _schedule_document_activation_id(document: Mapping[str, Any]) -> str:
     return str(activation.get("activation_id") or "").strip()
 
 
+def _worst_coverage(classes: Sequence[str]) -> str:
+    present = [item.strip() for item in classes if isinstance(item, str) and item.strip()]
+    if not present:
+        return "DISCOVERY_COVERAGE_UNKNOWN"
+    return min(
+        present,
+        key=lambda item: _COVERAGE_RANK.get(item, _COVERAGE_RANK["DISCOVERY_COVERAGE_UNKNOWN"]),
+    )
+
+
+def _member_admission_instant(row: Mapping[str, Any]) -> datetime | None:
+    for key in (COHORT_ADMISSION_FIELD, "first_reliable_available_at"):
+        raw = row.get(key)
+        if isinstance(raw, str) and raw:
+            try:
+                return _parse_utc(raw)
+            except Exception:
+                continue
+    return None
+
+
+def _producer_fields(source: Mapping[str, Any]) -> dict[str, Any]:
+    contributing = list(
+        source.get("contributing_producer_git_shas") or _contributing_producers(source)
+    )
+    out: dict[str, Any] = {
+        "contributing_producer_git_shas": contributing,
+        "schedule_producer_git_sha": source.get("schedule_producer_git_sha"),
+        "release_builder_git_sha": source.get("release_builder_git_sha"),
+    }
+    if len(contributing) == 1:
+        out["producer_git_sha"] = contributing[0]
+    return out
+
+
+def _apply_closure_receipt(
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+    cohort_id: str,
+    closure_receipt: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    _require(isinstance(closure_receipt, Mapping), "CLOSED_RECEIPT_MISSING")
+    assert closure_receipt is not None
+    _require(
+        str(closure_receipt.get("schedule_sha256") or "") == schedule_sha256
+        and str(closure_receipt.get("activation_id") or "") == activation_id
+        and str(closure_receipt.get("cohort_id") or "") == cohort_id,
+        "CLOSED_RECEIPT_IDENTITY_MISMATCH",
+    )
+    receipt_sha = str(closure_receipt.get("closure_identity_sha256") or "")
+    if len(receipt_sha) != 64:
+        receipt_sha = str(closure_receipt.get("receipt_sha256") or "")
+    _require(len(receipt_sha) == 64, "CLOSED_RECEIPT_IDENTITY_MISMATCH")
+    return {
+        "open_publication": _require_closure_flag(closure_receipt, "open_publication"),
+        "unresolved_due": _require_closure_flag(closure_receipt, "unresolved_due"),
+        "in_flight": _require_closure_flag(closure_receipt, "in_flight"),
+        "budget_blocked": _require_closure_flag(closure_receipt, "budget_blocked"),
+        "closure_receipt_sha256": receipt_sha,
+        "pending_due_for_cohort": _require_closure_int(
+            closure_receipt, "pending_due_for_cohort"
+        ),
+        "claimed_or_in_flight": _require_closure_int(
+            closure_receipt, "claimed_or_in_flight"
+        ),
+    }
+
+
+def _require_closure_int(payload: Mapping[str, Any], key: str) -> int:
+    _require(key in payload, "CLOSED_RECEIPT_INCOMPLETE")
+    value = payload[key]
+    _require(isinstance(value, int) and not isinstance(value, bool), "CLOSED_RECEIPT_INCOMPLETE")
+    return value
+
+
+def bound_schedule_from_rdp(
+    observation_rdp_root: Path,
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+) -> tuple[dict[str, Any], str | None, list[dict[str, Any]]]:
+    """Public schedule/activation bind used by list/publish."""
+    return _lineage_from_rdp(
+        observation_rdp_root,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+    )
+
+
 def _lineage_from_rdp(
     observation_rdp_root: Path,
     *,
     schedule_sha256: str,
     activation_id: str,
-) -> tuple[dict[str, Any], str, str | None]:
-    """Return schedule document, producer_git_sha, coverage class from RDP events."""
+) -> tuple[dict[str, Any], str | None, list[dict[str, Any]]]:
+    """Bind schedule by digest; require unambiguous activation-scoped lifecycle."""
     wanted = str(activation_id or "").strip()
     _require(bool(wanted), "LIVE_SOURCE_ACTIVATION_MISSING")
-    store = ResearchStore(Path(observation_rdp_root))
-    schedule_doc: dict[str, Any] | None = None
-    producers: set[str] = set()
-    coverage: str | None = None
+    try:
+        store = ExistingResearchStoreReader(Path(observation_rdp_root))
+    except ResearchStoreError as exc:
+        raise LiveCohortReleaseError("LIVE_SOURCE_RDP_UNREADABLE") from exc
+    schedule_docs: list[dict[str, Any]] = []
+    schedule_producers: set[str] = set()
+    activation_evidence = False
+    seen_activations: set[str] = set()
+    lifecycle_rows: list[dict[str, Any]] = []
     for record in store.iter_committed_records():
         kind = str(record.record_kind)
         try:
@@ -510,53 +708,326 @@ def _lineage_from_rdp(
             continue
         if not isinstance(payload, Mapping):
             continue
-        producer = str(record.producer_git_sha or "")
         digest = str(payload.get("schedule_sha256") or "")
         if digest != schedule_sha256:
             continue
+        producer = _sha40(record.producer_git_sha)
         event_activation = _event_activation_id(record, payload)
         if kind == "OBSERVATION_SCHEDULE":
             document = payload.get("schedule")
             if not isinstance(document, Mapping):
                 continue
-            sched_activation = _schedule_document_activation_id(document)
-            if sched_activation and sched_activation != wanted:
-                continue
-            if event_activation and event_activation != wanted:
-                continue
-            # Require an explicit activation bind via schedule document and/or run_id.
-            if sched_activation != wanted and event_activation != wanted:
-                continue
-            schedule_doc = dict(document)
+            schedule_docs.append(dict(document))
             if producer:
-                producers.add(producer)
-        elif kind == "OBSERVATION_SCHEDULE_AUTHORITY":
-            # Authority is schedule-scoped; bind only when run_id matches activation.
-            if event_activation == wanted and producer:
-                producers.add(producer)
-        elif kind in {
+                schedule_producers.add(producer)
+            continue
+        if kind in {
+            "OBSERVATION_SCHEDULE_STATE",
             "OBSERVATION_BATCH",
             "OBSERVATION_MEMBER_BATCH",
             "OBSERVATION_PANEL_SNAPSHOT",
         }:
-            if event_activation == wanted and producer:
-                producers.add(producer)
-                if coverage is None:
-                    raw = payload.get("discovery_coverage_class")
-                    if isinstance(raw, str) and raw.strip():
-                        coverage = raw.strip()
-    _require(schedule_doc is not None, "LIVE_SOURCE_SCHEDULE_MISSING")
-    assert schedule_doc is not None
-    if len(producers) > 1:
-        raise LiveCohortReleaseError("LIVE_SOURCE_LINEAGE_CONFLICT")
-    _require(len(producers) == 1, "LIVE_SOURCE_PRODUCER_MISSING")
-    producer_git_sha = next(iter(producers))
+            if event_activation:
+                seen_activations.add(event_activation)
+            if event_activation == wanted:
+                activation_evidence = True
+                lifecycle_rows.append(
+                    {
+                        "kind": kind,
+                        "producer_git_sha": producer,
+                        "effective_at": str(getattr(record, "effective_at", "") or ""),
+                        "payload": dict(payload),
+                    }
+                )
+    if len(schedule_docs) > 1:
+        encoded = {
+            json.dumps(item, sort_keys=True, separators=(",", ":"))
+            for item in schedule_docs
+        }
+        if len(encoded) > 1:
+            raise LiveCohortReleaseError("IDENTITY_CONFLICT")
+    _require(bool(schedule_docs), "LIVE_SOURCE_SCHEDULE_MISSING")
+    schedule_doc = schedule_docs[0]
     activation = schedule_doc.get("activation")
     _require(isinstance(activation, Mapping), "LIVE_SOURCE_ACTIVATION_MISSING")
     sched_activation = _schedule_document_activation_id(schedule_doc)
-    if sched_activation:
-        _require(sched_activation == wanted, "LIVE_SOURCE_ACTIVATION_MISMATCH")
-    return schedule_doc, producer_git_sha, coverage
+    if sched_activation and sched_activation != wanted:
+        raise LiveCohortReleaseError("IDENTITY_CONFLICT")
+    if not activation_evidence:
+        raise LiveCohortReleaseError("LIVE_SOURCE_ACTIVATION_MISSING")
+    schedule_producer = None
+    if len(schedule_producers) == 1:
+        schedule_producer = next(iter(schedule_producers))
+    elif len(schedule_producers) > 1:
+        raise LiveCohortReleaseError("IDENTITY_CONFLICT")
+    return schedule_doc, schedule_producer, lifecycle_rows
+
+
+def _cohort_contributing_lineage(
+    observation_rdp_root: Path,
+    *,
+    lifecycle_rows: Sequence[Mapping[str, Any]],
+    window_start: datetime,
+    window_end: datetime,
+    cohort_entity_ids: set[str],
+) -> tuple[list[str], str, set[str]]:
+    del cohort_entity_ids  # C-pure admission filter, not mint set
+    contributing: set[str] = set()
+    coverages: list[str] = []
+    contributing_manifests: set[str] = set()
+    for row in lifecycle_rows:
+        if str(row.get("kind") or "") != "OBSERVATION_MEMBER_BATCH":
+            continue
+        payload = row.get("payload")
+        producer = _sha40(row.get("producer_git_sha"))
+        if not isinstance(payload, Mapping):
+            continue
+        location = str(payload.get("member_location") or "")
+        if not location:
+            continue
+        try:
+            members = load_member_rows_for_location(Path(observation_rdp_root), location)
+        except (MembersDeltaError, OSError, pa.ArrowException) as exc:
+            raise LiveCohortReleaseError(
+                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+            ) from exc
+        hits = False
+        later = False
+        for member in members:
+            if not isinstance(member, Mapping):
+                continue
+            admission = _member_admission_instant(member)
+            if admission is None:
+                continue
+            if window_start <= admission < window_end:
+                hits = True
+            elif admission >= window_end:
+                later = True
+        if not hits or later:
+            continue
+        if producer:
+            contributing.add(producer)
+        manifest = str(payload.get("dataset_manifest_id") or "")
+        if manifest:
+            contributing_manifests.add(manifest)
+        raw = payload.get("discovery_coverage_class")
+        if isinstance(raw, str) and raw.strip():
+            coverages.append(raw.strip())
+    for row in lifecycle_rows:
+        kind = str(row.get("kind") or "")
+        payload = row.get("payload")
+        producer = _sha40(row.get("producer_git_sha"))
+        if kind != "OBSERVATION_BATCH":
+            continue
+        if not isinstance(payload, Mapping):
+            continue
+        manifest = str(payload.get("dataset_manifest_id") or "")
+        if not manifest or manifest not in contributing_manifests:
+            continue
+        if producer:
+            contributing.add(producer)
+        raw = payload.get("discovery_coverage_class")
+        if isinstance(raw, str) and raw.strip():
+            coverages.append(raw.strip())
+    _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
+    return sorted(contributing), _worst_coverage(coverages), contributing_manifests
+
+
+def _member_batch_is_cohort_pure(
+    members: Sequence[Any],
+    *,
+    window_start: datetime,
+    window_end: datetime,
+) -> bool:
+    has_in = False
+    later = False
+    for member in members:
+        if not isinstance(member, Mapping):
+            continue
+        admission = _member_admission_instant(member)
+        if admission is None:
+            continue
+        if window_start <= admission < window_end:
+            has_in = True
+        elif admission >= window_end:
+            later = True
+    return has_in and not later
+
+
+def _observation_instant(row: Mapping[str, Any]) -> datetime | None:
+    for key in (
+        COHORT_ADMISSION_FIELD,
+        "first_reliable_available_at",
+        "event_time",
+        "response_received_at",
+        "request_started_at",
+    ):
+        raw = row.get(key)
+        if isinstance(raw, str) and raw:
+            try:
+                return _parse_utc(raw)
+            except Exception:
+                continue
+    return None
+
+
+def _cohort_members_from_lifecycle(
+    observation_rdp_root: Path,
+    *,
+    lifecycle_rows: Sequence[Mapping[str, Any]],
+    window_start: datetime,
+    window_end: datetime,
+    schedule_sha256: str,
+    activation_id: str,
+    sampling_policy: str | None,
+    sampling_seed: str | None,
+    inclusion_probability: str | None,
+) -> list[dict[str, Any]]:
+    """Members from C-pure batches only so a later cohort snapshot cannot rewrite C1."""
+    by_entity: dict[str, tuple[str, dict[str, Any]]] = {}
+    for row in lifecycle_rows:
+        if str(row.get("kind") or "") != "OBSERVATION_MEMBER_BATCH":
+            continue
+        payload = row.get("payload")
+        if not isinstance(payload, Mapping):
+            continue
+        location = str(payload.get("member_location") or "")
+        if not location:
+            continue
+        try:
+            members = load_member_rows_for_location(Path(observation_rdp_root), location)
+        except (MembersDeltaError, OSError, pa.ArrowException) as exc:
+            raise LiveCohortReleaseError(
+                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+            ) from exc
+        has_in = False
+        later = False
+        for member in members:
+            if not isinstance(member, Mapping):
+                continue
+            admission = _member_admission_instant(member)
+            if admission is None:
+                continue
+            if window_start <= admission < window_end:
+                has_in = True
+            elif admission >= window_end:
+                later = True
+        if not has_in or later:
+            continue
+        order = str(row.get("effective_at") or "")
+        for member in members:
+            if not isinstance(member, Mapping):
+                continue
+            admission = _member_admission_instant(member)
+            if admission is None or not (window_start <= admission < window_end):
+                continue
+            normalized = _normalize_member_row(
+                member,
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                sampling_policy=sampling_policy,
+                sampling_seed_default=sampling_seed,
+                inclusion_probability_default=inclusion_probability,
+            )
+            if normalized is None:
+                continue
+            entity = str(normalized.get("mint") or "")
+            current = by_entity.get(entity)
+            if current is None or order >= current[0]:
+                by_entity[entity] = (order, normalized)
+    out = [item[1] for item in by_entity.values()]
+    out.sort(key=lambda item: (str(item.get("mint")), str(item.get(COHORT_ADMISSION_FIELD))))
+    return out
+
+
+def _cohort_observations_from_rdp(
+    observation_rdp_root: Path,
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+    cohort_mints: set[str],
+    window_start: datetime,
+    window_end: datetime,
+    pure_manifest_ids: set[str],
+) -> list[dict[str, Any]]:
+    """Observations from C-pure dataset manifests only."""
+    del window_start, window_end
+    rebuilt: dict[tuple[str, str, str, str, str], tuple[datetime, str, dict[str, Any]]] = {}
+    manifests_dir = Path(observation_rdp_root) / "datasets" / "manifests"
+    if not manifests_dir.is_dir():
+        return []
+    for marker in sorted(manifests_dir.glob("dataset-*.published")):
+        marker_payload = json.loads(marker.read_text(encoding="utf-8"))
+        manifest_id = str(marker_payload.get("dataset_manifest_id") or "")
+        manifest_path = manifests_dir / f"{manifest_id}.json"
+        if not manifest_path.is_file():
+            continue
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if not isinstance(manifest, Mapping):
+            continue
+        if str(manifest.get("dataset_id") or "").startswith("observation-panel-") is False:
+            continue
+        if manifest_id not in pure_manifest_ids:
+            continue
+        try:
+            manifest_order = _parse_utc(
+                str(manifest.get("created_at") or manifest.get("first_reliable_available_at"))
+            )
+        except Exception:
+            manifest_order = datetime.min.replace(tzinfo=UTC)
+        partitions = list(manifest.get("partitions") or [])
+        if not partitions:
+            partitions_dir = manifests_dir / "partitions"
+            for partition_path in sorted(partitions_dir.glob("partition-*.json")):
+                partition = json.loads(partition_path.read_text(encoding="utf-8"))
+                if (
+                    isinstance(partition, Mapping)
+                    and str(partition.get("dataset_manifest_id") or "") == manifest_id
+                ):
+                    partitions.append(partition)
+        for partition in partitions:
+            if str(partition.get("partition_id") or "").endswith("-members"):
+                continue
+            location = str(partition.get("logical_location") or "")
+            path = Path(observation_rdp_root) / location
+            if not path.is_file():
+                continue
+            rows = pq.read_table(path).to_pylist()
+            for row in rows:
+                if not isinstance(row, Mapping):
+                    continue
+                if row.get("schedule_sha256") not in {None, "", schedule_sha256}:
+                    continue
+                for item in _explode_observation_rows(
+                    row, schedule_sha256=schedule_sha256, activation_id=activation_id
+                ):
+                    mint = str(item.get("mint") or "")
+                    if mint not in cohort_mints:
+                        continue
+                    if _observation_instant(item) is None:
+                        continue
+                    key = (
+                        mint,
+                        str(item.get("point_id") or ""),
+                        str(item.get("primitive_id") or ""),
+                        str(item.get("field_id") or ""),
+                        str(item.get("call_occurrence_id") or ""),
+                    )
+                    candidate = (manifest_order, manifest_id, item)
+                    current = rebuilt.get(key)
+                    if current is None or candidate[:2] >= current[:2]:
+                        rebuilt[key] = candidate
+    out = [item[2] for item in rebuilt.values()]
+    out.sort(
+        key=lambda item: (
+            str(item.get("mint")),
+            str(item.get("point_id")),
+            str(item.get("primitive_id")),
+            str(item.get("field_id")),
+            str(item.get("call_occurrence_id") or ""),
+        )
+    )
+    return out
 
 
 def build_live_observation_source_from_rdp(
@@ -564,20 +1035,27 @@ def build_live_observation_source_from_rdp(
     observation_rdp_root: Path,
     schedule_sha256: str,
     activation_id: str,
+    cohort_id: str,
+    as_of: datetime | None = None,
+    closure_receipt: Mapping[str, Any] | None = None,
     discovery_coverage_class: str | None = None,
-    open_publication: bool = False,
-    unresolved_due: bool = False,
-    in_flight: bool = False,
-    budget_blocked: bool = False,
 ) -> dict[str, Any]:
-    """Deterministically rebuild live release source from immutable Observation RDP."""
+    """Rebuild a cohort-scoped live source from immutable Observation RDP."""
+    del as_of  # closure receipt already binds as_of; unused for scientific rows
     root = Path(observation_rdp_root)
     _require(
         len(schedule_sha256) == 64
         and all(c in "0123456789abcdef" for c in schedule_sha256),
         "RELEASE_INVALID_SOURCE_INTEGRITY",
     )
-    schedule_doc, producer_git_sha, lineage_coverage = _lineage_from_rdp(
+    window_start, window_end = cohort_window_bounds(cohort_id)
+    closure_flags = _apply_closure_receipt(
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        cohort_id=cohort_id,
+        closure_receipt=closure_receipt,
+    )
+    schedule_doc, schedule_producer, lifecycle_rows = _lineage_from_rdp(
         root, schedule_sha256=schedule_sha256, activation_id=activation_id
     )
     activation = schedule_doc.get("activation")
@@ -585,6 +1063,19 @@ def build_live_observation_source_from_rdp(
     starts_at = str(activation.get("starts_at") or "")
     stops_admitting_at = str(activation.get("stops_admitting_at") or "")
     _require(bool(starts_at) and bool(stops_admitting_at), "LIVE_SOURCE_ACTIVATION_MISSING")
+    campaign_start = _parse_utc(starts_at)
+    campaign_stop = _parse_utc(stops_admitting_at)
+    allowed = {
+        cid: (start, end)
+        for cid, start, end in campaign_cohort_windows(campaign_start, campaign_stop)
+    }
+    if cohort_id not in allowed:
+        raise LiveCohortReleaseError("COHORT_NOT_IN_CAMPAIGN_WINDOW")
+    expected_start, expected_end = allowed[cohort_id]
+    _require(
+        expected_start == window_start and expected_end == window_end,
+        "IDENTITY_CONFLICT",
+    )
     sampling = schedule_doc.get("sampling") if isinstance(schedule_doc.get("sampling"), Mapping) else {}
     sampling_policy = str(sampling.get("policy") or "") or None
     sampling_seed = str(sampling.get("seed") or "") or None
@@ -594,58 +1085,56 @@ def build_live_observation_source_from_rdp(
         else None
     )
 
-    panel = rebuild_observation_panel_from_rdp(
-        data_root=root, schedule_sha256=schedule_sha256
+    members = _cohort_members_from_lifecycle(
+        root,
+        lifecycle_rows=lifecycle_rows,
+        window_start=window_start,
+        window_end=window_end,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        sampling_policy=sampling_policy,
+        sampling_seed=sampling_seed,
+        inclusion_probability=inclusion_probability,
     )
-    members: list[dict[str, Any]] = []
-    for row in panel.get("members") or []:
-        if not isinstance(row, Mapping):
-            continue
-        normalized = _normalize_member_row(
-            row,
-            schedule_sha256=schedule_sha256,
-            activation_id=activation_id,
-            sampling_policy=sampling_policy,
-            sampling_seed_default=sampling_seed,
-            inclusion_probability_default=inclusion_probability,
-        )
-        if normalized is not None:
-            members.append(normalized)
-    observations: list[dict[str, Any]] = []
-    for row in panel.get("observations") or []:
-        if not isinstance(row, Mapping):
-            continue
-        observations.extend(
-            _explode_observation_rows(
-                row, schedule_sha256=schedule_sha256, activation_id=activation_id
-            )
-        )
-    members.sort(key=lambda item: (str(item.get("mint")), str(item.get(COHORT_ADMISSION_FIELD))))
-    observations.sort(
-        key=lambda item: (
-            str(item.get("mint")),
-            str(item.get("point_id")),
-            str(item.get("primitive_id")),
-            str(item.get("field_id")),
-            str(item.get("call_occurrence_id") or ""),
-        )
+    cohort_mints = {str(item.get("mint")) for item in members}
+    contributing, lineage_coverage, pure_manifests = _cohort_contributing_lineage(
+        root,
+        lifecycle_rows=lifecycle_rows,
+        window_start=window_start,
+        window_end=window_end,
+        cohort_entity_ids=cohort_mints,
     )
-    resolved_coverage = discovery_coverage_class or lineage_coverage or "GAP_SUSPECTED"
-    snapshot = {
+    observations = _cohort_observations_from_rdp(
+        root,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        cohort_mints=cohort_mints,
+        window_start=window_start,
+        window_end=window_end,
+        pure_manifest_ids=pure_manifests,
+    )
+    observed_classes = [lineage_coverage]
+    if isinstance(discovery_coverage_class, str) and discovery_coverage_class.strip():
+        observed_classes.append(discovery_coverage_class.strip())
+    resolved_coverage = _worst_coverage(observed_classes)
+    snapshot: dict[str, Any] = {
         "schedule_sha256": schedule_sha256,
         "activation_id": activation_id,
-        "producer_git_sha": producer_git_sha,
+        "cohort_id": cohort_id,
+        "window_start": _render_utc(window_start),
+        "window_end_exclusive": _render_utc(window_end),
+        "schedule_producer_git_sha": schedule_producer,
+        "contributing_producer_git_shas": contributing,
         "starts_at": starts_at,
         "stops_admitting_at": stops_admitting_at,
         "discovery_coverage_class": resolved_coverage,
-        "open_publication": open_publication,
-        "unresolved_due": unresolved_due,
-        "in_flight": in_flight,
-        "budget_blocked": budget_blocked,
         "members": members,
         "observations": observations,
+        **closure_flags,
     }
-    path = write_observation_rdp_source(root, snapshot)
+    if len(contributing) == 1:
+        snapshot["producer_git_sha"] = contributing[0]
+    path = write_observation_rdp_source(root, snapshot, cohort_id=cohort_id)
     return _validate_source_payload(
         snapshot, source_sha256=sha256_bytes(path.read_bytes())
     )
@@ -673,25 +1162,43 @@ def classify_cohort_readiness(
             "state": "RELEASE_INVALID_SOURCE_INTEGRITY",
             "sealable": False,
         }
-    if source.get("open_publication"):
+    receipt = source.get("closure_receipt_sha256")
+    if not (isinstance(receipt, str) and len(receipt) == 64):
+        return {
+            "cohort_id": cohort_id,
+            "state": "CLOSED_RECEIPT_MISSING",
+            "sealable": False,
+        }
+    try:
+        open_publication = _require_closure_flag(source, "open_publication")
+        budget_blocked = _require_closure_flag(source, "budget_blocked")
+        unresolved_due = _require_closure_flag(source, "unresolved_due")
+        in_flight = _require_closure_flag(source, "in_flight")
+    except DiscoveryReleaseError:
+        return {
+            "cohort_id": cohort_id,
+            "state": "CLOSED_RECEIPT_MISSING",
+            "sealable": False,
+        }
+    if open_publication:
         return {
             "cohort_id": cohort_id,
             "state": "RELEASE_BLOCKED_OPEN_PUBLICATION",
             "sealable": False,
         }
-    if source.get("budget_blocked"):
+    if budget_blocked:
         return {
             "cohort_id": cohort_id,
             "state": "RELEASE_BLOCKED_BUDGET",
             "sealable": False,
         }
-    if source.get("unresolved_due"):
+    if unresolved_due:
         return {
             "cohort_id": cohort_id,
             "state": "RELEASE_BLOCKED_UNRESOLVED_DUE",
             "sealable": False,
         }
-    if source.get("in_flight"):
+    if in_flight:
         return {
             "cohort_id": cohort_id,
             "state": "RELEASE_BLOCKED_IN_FLIGHT",
@@ -741,11 +1248,20 @@ def classify_cohort_readiness(
 
     n = len(members)
     observed = denom.get("observed", 0) + denom.get("typed_missing", 0)
-    coverage_limited = str(source.get("discovery_coverage_class") or "") in {
-        "GAP_SUSPECTED",
-        "GAP_CONFIRMED",
-        "DISCOVERY_COVERAGE_UNKNOWN",
-    }
+    coverage = str(source.get("discovery_coverage_class") or "")
+    if coverage == "GAP_CONFIRMED":
+        return {
+            "cohort_id": cohort_id,
+            "state": "COVERAGE_CONFIRMED_BROKEN",
+            "sealable": False,
+            "member_count": n,
+            "denominator": denom,
+            "discovery_coverage_class": coverage,
+            "admission_field": COHORT_ADMISSION_FIELD,
+            "window_start": _render_utc(start),
+            "window_end_exclusive": _render_utc(end),
+        }
+    coverage_limited = coverage in COVERAGE_LIMITED_CLASSES
     low_yield = n < 3 or observed == 0
     if low_yield:
         state = "READY_LOW_YIELD"
@@ -766,7 +1282,8 @@ def classify_cohort_readiness(
     }
 
 
-def _release_id_for(source: Mapping[str, Any], cohort_id: str) -> str:
+def release_id_for(source: Mapping[str, Any], cohort_id: str) -> str:
+    producers = _producer_fields(source)
     return canonical_sha256(
         {
             "schema": RELEASE_SCHEMA,
@@ -774,15 +1291,22 @@ def _release_id_for(source: Mapping[str, Any], cohort_id: str) -> str:
             "cohort_id": cohort_id,
             "schedule_sha256": source["schedule_sha256"],
             "activation_id": source["activation_id"],
-            "producer_git_sha": source["producer_git_sha"],
+            "contributing_producer_git_shas": producers["contributing_producer_git_shas"],
+            "schedule_producer_git_sha": producers.get("schedule_producer_git_sha"),
             "source_sha256": source["source_sha256"],
             "starts_at": source.get("starts_at"),
             "stops_admitting_at": source.get("stops_admitting_at"),
+            "window_start": source.get("window_start"),
+            "window_end_exclusive": source.get("window_end_exclusive"),
             "admission_field": COHORT_ADMISSION_FIELD,
             "projection_id": PROJECTION_ID,
             "projection_version": PROJECTION_VERSION,
         }
     )
+
+
+def _release_id_for(source: Mapping[str, Any], cohort_id: str) -> str:
+    return release_id_for(source, cohort_id)
 
 
 def _build_live_tables(
@@ -796,6 +1320,7 @@ def _build_live_tables(
     observation_rows: list[dict[str, Any]] = []
     typed_for_families: list[dict[str, Any]] = []
     mints_in: set[str] = set()
+    producers = _producer_fields(source)
 
     for member in source["members"]:
         if not isinstance(member, Mapping):
@@ -817,7 +1342,7 @@ def _build_live_tables(
                 "cohort_id": cohort_id,
                 "source_schedule_sha256": source["schedule_sha256"],
                 "activation_id": source["activation_id"],
-                "producer_git_sha": source["producer_git_sha"],
+                "producer_git_sha": producers.get("producer_git_sha") or "",
                 "mint": mint,
                 "discovery_first_reliable_available_at": admission,
                 "authoritative_anchor": member.get("authoritative_anchor"),
@@ -939,8 +1464,9 @@ def seal_live_cohort(
     release_root: Path,
     sealed_at: datetime | None = None,
     as_of: datetime | None = None,
+    release_builder_git_sha: str | None = None,
 ) -> dict[str, Any]:
-    source = load_observation_rdp_source(observation_rdp_root)
+    source = load_observation_rdp_source(observation_rdp_root, cohort_id=cohort_id)
     readiness = classify_cohort_readiness(source, cohort_id=cohort_id, as_of=as_of)
     _require(readiness.get("sealable") is True, str(readiness.get("state") or "NOT_READY"))
     release_id = _release_id_for(source, cohort_id)
@@ -952,18 +1478,25 @@ def seal_live_cohort(
     root.mkdir(parents=True, exist_ok=True)
     census_bytes = _parquet_bytes(census)
     obs_bytes = _parquet_bytes(observations)
+    producers = _producer_fields(source)
     inventory = {
         "cohort_id": cohort_id,
         "schedule_sha256": source["schedule_sha256"],
         "activation_id": source["activation_id"],
-        "producer_git_sha": source["producer_git_sha"],
         "source_sha256": source["source_sha256"],
         "starts_at": source.get("starts_at"),
         "stops_admitting_at": source.get("stops_admitting_at"),
+        "window_start": source.get("window_start"),
+        "window_end_exclusive": source.get("window_end_exclusive"),
         "admission_field": COHORT_ADMISSION_FIELD,
         "readiness_state": readiness["state"],
         "discovery_coverage_class": source.get("discovery_coverage_class"),
+        "closure_receipt_sha256": source.get("closure_receipt_sha256"),
+        **producers,
     }
+    builder = _sha40(release_builder_git_sha)
+    if builder:
+        inventory["release_builder_git_sha"] = builder
     manifest = {
         "schema": RELEASE_SCHEMA,
         "schema_version": RELEASE_SCHEMA_VERSION,
@@ -972,7 +1505,6 @@ def seal_live_cohort(
         "sealed_at": _render_utc(sealed),
         "schedule_sha256": source["schedule_sha256"],
         "activation_id": source["activation_id"],
-        "producer_git_sha": source["producer_git_sha"],
         "source_sha256": source["source_sha256"],
         "starts_at": source.get("starts_at"),
         "stops_admitting_at": source.get("stops_admitting_at"),
@@ -990,7 +1522,11 @@ def seal_live_cohort(
         "discovery_coverage_class": source.get("discovery_coverage_class"),
         "projection_id": PROJECTION_ID,
         "projection_version": PROJECTION_VERSION,
+        "closure_receipt_sha256": source.get("closure_receipt_sha256"),
+        **producers,
     }
+    if builder:
+        manifest["release_builder_git_sha"] = builder
     _publish_bytes(root / CENSUS_NAME, census_bytes)
     _publish_bytes(root / OBSERVATIONS_NAME, obs_bytes)
     _publish_bytes(
@@ -1428,16 +1964,18 @@ def live_cohort_status(
     cohort_id: str,
     as_of: datetime | None = None,
 ) -> dict[str, Any]:
-    source = load_observation_rdp_source(observation_rdp_root)
+    source = load_observation_rdp_source(observation_rdp_root, cohort_id=cohort_id)
     readiness = classify_cohort_readiness(source, cohort_id=cohort_id, as_of=as_of)
+    producers = _producer_fields(source)
     return {
         "schedule_sha256": source["schedule_sha256"],
         "activation_id": source["activation_id"],
-        "producer_git_sha": source["producer_git_sha"],
+        "cohort_id": source.get("cohort_id") or cohort_id,
         "starts_at": source.get("starts_at"),
         "stops_admitting_at": source.get("stops_admitting_at"),
         "admission_field": COHORT_ADMISSION_FIELD,
         "readiness": readiness,
+        **producers,
     }
 
 

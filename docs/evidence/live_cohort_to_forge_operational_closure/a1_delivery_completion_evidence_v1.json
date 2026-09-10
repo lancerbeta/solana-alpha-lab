@@ -1,0 +1,75 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-10",
+  "task_id": "LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1",
+  "state_change": "LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_READY_FOR_MERGE",
+  "base_main": "7ce0b87c9518914af7636a9860d068b6517b0943",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "3b09c25322ebc72caca5b84b781e979ad60e1ad6a6d26d2715b427879e72f455",
+    "catalog/assets/lifecycle.yaml": "6470f57702d7905328bab45c2b153c3d0f827d7dfb9fdfe6495fa21f936c0ae7",
+    "catalog/catalog_manifest.yaml": "481fd3909fb49cdfcc207b7d36febaa18b68b1bcb9cf6eaddfd3fdd7752e31c2",
+    "catalog/generated/asset_edges.json": "2d878638bb840e8d108c28ad7babe1e5741930aa2e0edfefc91246141922144b",
+    "configs/factory_semantic_operability_v1.yaml": "371de3175ac1550752f121c89cb7476e731cbd2a393dbbfc5eabaafd074dcb89",
+    "docs/FACTORY_SEMANTIC_MAP.md": "302b2a57761a8b46310ec6fca1a0c2781956f7643a524555328630ce68f08c5d",
+    "docs/PROJECT_MAP.md": "4abc767eb877f530fe25dcf47a59316d7147bf4c16f0cb017c8174ea0b713dc5",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "3fdc16d558261f9dabfcab14032ff9c54bacc8cf03694a9294a65dcb3d47a290",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "d32b3360e43e413ccaa822a0c68665b198d8c7726f41480fb4a6bd7730013a55",
+    "docs/reports/live_cohort_to_forge_operational_closure/a1_owner_readout_v1.md": "bc887ee6f84695c667fea2db16fb57ade7597436d6270186d5e3011da21013d8",
+    "docs/tasks/LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1.md": "a9b00c769a3531313d2ba32646ae394a207cd39c0a32cdbc4cdfaf05dada4ad9",
+    "scripts/discovery_evidence_release.py": "35d58c3317f4a5a2ac3740ce6e2d070bb1d47e7e331bc10abbe337945352f117",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "5c412b98a7ebcb39ec2a914c61859519aac7a4b9aac6729aea6f036f5572e25c",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "6e0c21c47e928f545c330937cbfb971496008196ed9b45b82de5d44cbe9736d7",
+    "tests/test_live_cohort_discovery_release_series.py": "131e75b2748b5f694b465687e46202915116b1bb64685a3cdbb91be734b889e2",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "1f588972d000a2135d7f49d120cd1e8a4f5e76e4a7b85b87cf9de23aa1a73f6e",
+    "tests/test_live_evidence_consumer_truth_closure.py": "392db2fc2222377f9fcb83ae6dcc968118987cc4852c38cdd8f0d158641aa859"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_cohort_to_forge_operational_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "eefd05082bb83624fe72d0e1110a47fc8e194403b2bdd63e5b2ca6ce5de4455d",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE",
+    "independent_review": {
+      "path": "docs/evidence/live_cohort_to_forge_operational_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "1f9c71fcf118e5af0128bddc7769dc885c6503120d15aecde82705366bfc9332",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_SEAL_OR_IMPORT_IN_THIS_ATOM",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

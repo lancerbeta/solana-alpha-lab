@@ -41,13 +41,16 @@ from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     load_observation_schedule,
 )
-from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
+from solana_alpha_lab.factory.live_cohort_to_forge import (  # noqa: E402
+    synthetic_closed_receipt,
+)
 
 PRODUCER = "669745ec8de59c6db4aa04418af845253872bfde"
 ACTIVATION = "ACT-619AE64E885E995E"
 C4_STARTS = datetime(2026, 9, 2, 11, 19, 0, tzinfo=UTC)
 C4_STOPS = datetime(2026, 9, 23, 11, 19, 0, tzinfo=UTC)
 NOW = datetime(2026, 9, 2, 11, 31, 18, tzinfo=UTC)
+COHORT1 = "REL-20260902T111900Z-20260909T111900Z"
 
 
 def _c4_style_schedule(root: Path) -> dict:
@@ -79,6 +82,16 @@ def _c4_style_schedule(root: Path) -> dict:
     digest = schedule_sha256(validated)
     validated["schedule_sha256"] = digest
     return validated
+
+
+def _receipt(digest: str, *, as_of: datetime = NOW) -> dict:
+    return synthetic_closed_receipt(
+        schedule_sha256=digest,
+        activation_id=ACTIVATION,
+        cohort_id=COHORT1,
+        as_of=as_of,
+        members_total=2,
+    )
 
 
 class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
@@ -232,6 +245,8 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                 observation_rdp_root=data_root,
                 schedule_sha256=digest,
                 activation_id=ACTIVATION,
+                cohort_id=COHORT1,
+                closure_receipt=_receipt(digest),
             )
             self.assertEqual(source["activation_id"], ACTIVATION)
             self.assertEqual(source["producer_git_sha"], PRODUCER)
@@ -280,9 +295,11 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                 observation_rdp_root=data_root,
                 schedule_sha256=digest,
                 activation_id=ACTIVATION,
+                cohort_id=COHORT1,
+                closure_receipt=_receipt(digest),
             )
             self.assertEqual(again["source_sha256"], source["source_sha256"])
-            loaded = load_observation_rdp_source(data_root)
+            loaded = load_observation_rdp_source(data_root, cohort_id=COHORT1)
             self.assertEqual(loaded["source_sha256"], source["source_sha256"])
             self.assertFalse((data_root / "observation_schedule_state.sqlite").exists())
 
@@ -380,6 +397,7 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                     "unresolved_due": False,
                     "in_flight": False,
                     "budget_blocked": False,
+                    "closure_receipt_sha256": "c" * 64,
                     "members": [
                         {
                             "mint": "M1",
@@ -421,6 +439,7 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                 "unresolved_due": False,
                 "in_flight": False,
                 "budget_blocked": False,
+                "closure_receipt_sha256": "c" * 64,
                 "members": [
                     {
                         "mint": "UnknownMint",
@@ -498,6 +517,7 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                     "unresolved_due": False,
                     "in_flight": False,
                     "budget_blocked": False,
+                    "closure_receipt_sha256": "c" * 64,
                     "members": [
                         {
                             "mint": f"{mint}{suffix}",
@@ -630,6 +650,8 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                 observation_rdp_root=side,
                 schedule_sha256=side_digest,
                 activation_id=ACTIVATION,
+                cohort_id=COHORT1,
+                closure_receipt=_receipt(side_digest),
             )
             rebuild_epoch = evidence_epoch_sha256(
                 evidence_epoch_material(ROOT, data_root)
@@ -715,6 +737,8 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                 observation_rdp_root=data_root,
                 schedule_sha256=digest,
                 activation_id=ACTIVATION,
+                cohort_id=COHORT1,
+                closure_receipt=_receipt(digest),
             )
             self.assertEqual(source["producer_git_sha"], PRODUCER)
             mints = {m["mint"] for m in source["members"]}

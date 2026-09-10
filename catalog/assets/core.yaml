@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: a69a260c39d2449bfcad078bfb23b3f7b70514c0d8c30686dcc312404ebd6b9e}
+  integrity: {kind: sha256, sha256: 3fdc16d558261f9dabfcab14032ff9c54bacc8cf03694a9294a65dcb3d47a290}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33401,7 +33401,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/discovery_evidence_release.py', repository_path: scripts/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: 4f8778122b2d413b562abad255f9dd820f7946403f1a0b140f0a9fe1b60b258e}
+  integrity: {kind: sha256, sha256: 35d58c3317f4a5a2ac3740ce6e2d070bb1d47e7e331bc10abbe337945352f117}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -33963,7 +33963,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: 77bafb0ff71b0eb54e426a55090d3c15d34f3465ca64fb871c1456053d4ba0e9}
+  integrity: {kind: sha256, sha256: 5c412b98a7ebcb39ec2a914c61859519aac7a4b9aac6729aea6f036f5572e25c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -33981,7 +33981,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_discovery_release_series.py', repository_path: tests/test_live_cohort_discovery_release_series.py}
-  integrity: {kind: sha256, sha256: 0c0e56e32872fe11dd325f585270009309d68e9db81bf07e2c4eafafec658a00}
+  integrity: {kind: sha256, sha256: 131e75b2748b5f694b465687e46202915116b1bb64685a3cdbb91be734b889e2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -33989,6 +33989,61 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [LIVE_COHORT, CORPUS, VERTICAL_PROOF, TWELVE_WEEK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Operationalize recurring mature-cohort publication from Observation RDP through verified transport into LIVE CORPUS and Forge CONTROL readiness.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-10'
+  truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1.md', repository_path: docs/tasks/LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1.md}
+  integrity: {kind: sha256, sha256: a9b00c769a3531313d2ba32646ae394a207cd39c0a32cdbc4cdfaf05dada4ad9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [LIVE_COHORT, FORGE_CONTROL_READY, PUBLISH_LIVE_COHORT, CLOSURE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-LIVE-COHORT-TO-FORGE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Cohort-scoped closure receipt, verified transport, one-shot publish-live-cohort, and read-only forge-control-ready.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-10'
+  truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_to_forge.py', repository_path: src/solana_alpha_lab/factory/live_cohort_to_forge.py}
+  integrity: {kind: sha256, sha256: 6e0c21c47e928f545c330937cbfb971496008196ed9b45b82de5d44cbe9736d7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [PUBLISH_LIVE_COHORT, FORGE_CONTROL_READY, CLOSURE_RECEIPT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Production-shape regression for register-before-activation, rolling producers, next-cohort-active, GAP_SUSPECTED, transport, import idempotency, and Forge CONTROL readiness.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-10'
+  truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
+  integrity: {kind: sha256, sha256: 1f588972d000a2135d7f49d120cd1e8a4f5e76e4a7b85b87cf9de23aa1a73f6e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-TO-FORGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIVE_COHORT, PRODUCTION_SHAPE, IDEMPOTENT_REIMPORT, FORGE_CONTROL]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001
@@ -34018,7 +34073,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_evidence_consumer_truth_closure.py', repository_path: tests/test_live_evidence_consumer_truth_closure.py}
-  integrity: {kind: sha256, sha256: dd9c27adc5eabf929abb088466211eb0dc0d0620b9a9cc8ab1a8cd47bfa8f363}
+  integrity: {kind: sha256, sha256: 392db2fc2222377f9fcb83ae6dcc968118987cc4852c38cdd8f0d158641aa859}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001}
@@ -34200,7 +34255,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: e2994b4d2eb6db638d1cf84df5a722a9208f66d365428da0f9d50730b844fcad}
+  integrity: {kind: sha256, sha256: 371de3175ac1550752f121c89cb7476e731cbd2a393dbbfc5eabaafd074dcb89}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34253,7 +34308,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 081dd0253235f196a48c75c8cad8462795fb3e91e8f95030883b724c790d6088}
+  integrity: {kind: sha256, sha256: d32b3360e43e413ccaa822a0c68665b198d8c7726f41480fb4a6bd7730013a55}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34307,7 +34362,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/FACTORY_SEMANTIC_MAP.md', repository_path: docs/FACTORY_SEMANTIC_MAP.md}
-  integrity: {kind: sha256, sha256: 79c4a7c714148c9f182d1bfadb43c66667f7dfcf1b24cad542b988c17abff462}
+  integrity: {kind: sha256, sha256: 302b2a57761a8b46310ec6fca1a0c2781956f7643a524555328630ce68f08c5d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-FACTORY-SEMANTIC-OPERABILITY-001}
