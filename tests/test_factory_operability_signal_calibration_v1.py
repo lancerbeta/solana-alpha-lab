@@ -8,6 +8,7 @@ import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -406,6 +407,37 @@ class StorageResidentRunwayTests(unittest.TestCase):
             self.assertLess(abs(int(growth)), OPEN_SPIKE)
             projected = int(packet["projected_97d_bytes"])
             self.assertLess(projected, int(packet["observation_sqlite_bytes"]) + resident + OPEN_SPIKE * HORIZON_DAYS)
+            self.assertTrue(
+                storage_history_sample_blocked(
+                    publication_jobs_open_count=packet["publication_jobs_open_count"],
+                    publication_jobs_open_bytes=packet["publication_jobs_open_bytes"],
+                )
+            )
+            store.close()
+
+    def test_unreadable_rdp_walk_fails_closed_to_unknown(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp)
+            rdp = root / "observation_rdp"
+            _write_bytes(rdp / "datasets" / "science.bin", RESIDENT_SCIENCE)
+            store = ObservationScheduleStore(root / "ops.sqlite")
+
+            def _boom_walk(path, onerror=None, followlinks=False):
+                if onerror is not None:
+                    onerror(OSError("walk-unreadable"))
+                return iter(())
+
+            with patch(
+                "solana_alpha_lab.factory.collector_operational_packet.os.walk",
+                _boom_walk,
+            ):
+                packet = build_collector_operational_packet(
+                    root=root, store=store, now=NOW, observation_rdp=rdp
+                )
+            self.assertEqual(packet["observation_rdp_bytes"], "UNKNOWN")
+            self.assertEqual(packet["publication_jobs_open_bytes"], "UNKNOWN")
+            self.assertEqual(packet["observation_rdp_resident_bytes"], "UNKNOWN")
+            self.assertEqual(packet["projected_97d_bytes"], "UNKNOWN")
             self.assertTrue(
                 storage_history_sample_blocked(
                     publication_jobs_open_count=packet["publication_jobs_open_count"],

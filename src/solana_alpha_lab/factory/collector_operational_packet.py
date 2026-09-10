@@ -7,6 +7,7 @@ and live-release readiness. Does not own a second monitoring platform.
 from __future__ import annotations
 
 import json
+import os
 import shutil
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -195,16 +196,34 @@ def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
     total = 0
     open_bytes = 0
     open_count = 0
+    scan_failed = False
+
+    def onerror(_err: OSError) -> None:
+        nonlocal scan_failed
+        scan_failed = True
+
     try:
-        files: list[Path]
+        files: list[Path] = []
         if path.is_file():
             files = [path]
         else:
-            files = [
-                child
-                for child in path.rglob("*")
-                if child.is_file() and not child.is_symlink()
-            ]
+            for dirpath, dirnames, filenames in os.walk(
+                path, onerror=onerror, followlinks=False
+            ):
+                if scan_failed:
+                    break
+                dirnames[:] = [
+                    name
+                    for name in dirnames
+                    if not (Path(dirpath) / name).is_symlink()
+                ]
+                for name in filenames:
+                    child = Path(dirpath) / name
+                    if child.is_symlink() or not child.is_file():
+                        continue
+                    files.append(child)
+            if scan_failed:
+                return UNKNOWN, UNKNOWN, UNKNOWN
         for child in files:
             try:
                 size = int(child.stat().st_size)
