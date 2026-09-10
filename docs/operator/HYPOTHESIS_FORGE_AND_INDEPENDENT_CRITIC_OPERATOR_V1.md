@@ -337,6 +337,40 @@ For a completed CONTROL/general session, operator readout of the CONTROL probe
 branch uses `effective_control_terminal` (`final_session_terminal` when present,
 else `critic_terminal`). F3 still preserves primary `critic_terminal` as C1.
 
+### Dormant representation challenger
+
+The repository also contains the dormant `NORMALIZED_TRAJECTORY_V1` capability.
+Keep the modes distinct:
+
+| Mode | Meaning | Runtime effect |
+| --- | --- | --- |
+| `ORDINARY` | normal `/hypothesis-forge` | unchanged |
+| `CONTROL` | `CURRENT_REPRESENTATION_CONTROL_V1` | trajectory-blind; unchanged |
+| `REPRESENTATION_CHALLENGER` | exact CONTROL packet plus compact anonymous motif histogram | separate bounded one-run lane; not automatic |
+
+The status surface is read-only and accepts an explicit JSON snapshot:
+
+```text
+uv run --locked --managed-python python -B scripts/hypothesis_forge_representation.py representation-status --input <json>
+```
+
+The adapter requires the effective CONTROL terminal, the same evidence epoch,
+the same pre-CONTROL memory baseline, the existing `HFIC-V1.2` prompt and the
+existing 16384-byte packet budget. A `PASS_*` CONTROL result means
+`MARKET_FALSIFIER_FIRST`; runner-up revision pauses; observability or grounding
+failure is blocked. It never reads raw current lifecycle rows in CONTROL and
+never turns a motif into a new `FEAT-*` alias.
+
+The challenger envelope records the representation payload hash in its search
+and one-run identity. The recorded CONTROL packet hash and memory-baseline hash
+are required, not recomputed from an unbound packet. The existing HFIC fixture
+receives explicit representation context beside the unchanged nested CONTROL
+packet; this does not modify the ordinary packet schema or `/hypothesis-forge`.
+
+`IMPLEMENTED_DORMANT_NOT_EXECUTED` is a Git capability terminal: code, contract,
+tests and navigation exist, but no representation probe was executed. It is
+not a scientific PASS, alpha, cohort release, deployment, or product DONE.
+
 External public research не даёт market/provider authority. Приоритет источников: исполнимая собственная реальность → официальные спецификации → воспроизводимые papers/code/data → прозрачная аналитика → агрегаторы → social/KOL только как источник идеи.
 
 ## A1. Entry Gate: восстанови фактическую реальность

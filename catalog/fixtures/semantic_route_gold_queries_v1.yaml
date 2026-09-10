@@ -317,3 +317,15 @@ queries:
 - query_id: SGQ-OWNER-RUNTIME-CAPITAL-RU
   query: Где текущий лимит открытого риска капитала?
   required_top_route: SEM-OWNER-LIFECYCLE
+- query_id: SGQ-LIFECYCLE-REPRESENTATION
+  query: lifecycle representation
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-FORGE-REPRESENTATION
+  query: Forge representation
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-LIFECYCLE-REPRESENTATION-RU
+  query: другое представление lifecycle
+  required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-TOKEN-TRAJECTORY-RU
+  query: траектория токена
+  required_top_route: SEM-HYPOTHESIS-FORGE
