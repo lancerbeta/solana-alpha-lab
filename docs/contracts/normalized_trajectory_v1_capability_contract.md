@@ -38,7 +38,9 @@ activation binding, and the anonymous payload carries release, cohort, source,
 census, and observation-byte hashes without mint identities.
 When a full imported schedule document is supplied, its schedule key and
 landmark offsets must match the compact projection fields before its hash is
-accepted.
+accepted. The frozen X300 synthetic digest cannot be reused for another X
+selection, and membership is admitted only when the X liquidity observation is
+observed by its own X cutoff and is at least USD 1000.
 
 Taker volume is used only when observed. If taker volume is unavailable and
 both buy and sell volume are observed, two fallback channels are emitted. Buy
@@ -86,14 +88,19 @@ receipt.
 
 The challenger builder and fixture transport also reject a verified readiness
 receipt with `GAP_CONFIRMED` coverage or fewer than the preregistered minimum
-usable yield-eligible members. Extracting the unchanged HFIC packet requires
-that same verified readiness receipt, so a packet cannot be detached from its
-release/source/census/observation-byte binding.
+usable yield-eligible members. The representation's eligible-member count
+must equal the verified receipt's `yield_eligible` count; an empty or partial
+packet cannot occupy the probe seam. Extracting the unchanged HFIC packet
+requires that same verified readiness receipt, so a packet cannot be detached
+from its release/source/census/observation-byte binding.
 
 The envelope binds the same evidence epoch, prompt (`HFIC-V1.2`), prior-memory
 baseline, packet hash, and one-run representation identity. It does not rebuild
 context from a later ResearchStore state and does not add ordinary Forge search
 budget. Any epoch, packet, memory, grounding, or byte-budget drift fails closed.
+A caller-supplied prior probe identity is not authority: the builder accepts it
+only alongside a complete hash-bound
+`REPRESENTATION_PROBE_REGISTRY_READBACK_V1` receipt.
 
 `representation-status` is read-only. It can return
 `CONTROL_REQUIRED`, `NORMALIZED_TRAJECTORY_V1_ELIGIBLE`,

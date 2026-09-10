@@ -698,6 +698,8 @@ def _assert_representation_bound_to_readiness(
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT) from None
     if binding.as_dict() != expected:
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    if representation.get("eligible_member_count") != readiness["yield_eligible"]:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
 
 
 def _memory_baseline_sha256(
@@ -937,6 +939,7 @@ def build_challenger_packet(
     owner_focus: str | None = None,
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
     registered_probe_identity_sha256: str | None = None,
+    registration_readback_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build a bounded challenger envelope around exact CONTROL context.
 
@@ -1001,8 +1004,19 @@ def build_challenger_packet(
     )
     if registered_probe_identity_sha256 is not None:
         _hash64("registered_probe_identity_sha256", registered_probe_identity_sha256)
-        if registered_probe_identity_sha256 != probe_identity:
+        if (
+            registration_readback_receipt is None
+            or registered_probe_identity_sha256 != probe_identity
+        ):
             raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    if registration_readback_receipt is not None:
+        _validate_registration_receipt(
+            registration_readback_receipt,
+            baseline=baseline,
+            representation_payload_sha256=payload_sha256,
+            representation_search_key_sha256=search_key,
+            probe_identity_sha256=probe_identity,
+        )
         raise RepresentationProbeError(REPRESENTATION_PROBE_ALREADY_EXISTS)
     challenger: dict[str, Any] = {
         "packet_schema": REPRESENTATION_PROBE_SCHEMA,
@@ -1707,6 +1721,7 @@ def build_representation_probe_packet(
     owner_focus: str | None = None,
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
     registered_probe_identity_sha256: str | None = None,
+    registration_readback_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Explicit name for the dormant challenger packet boundary."""
 
@@ -1716,6 +1731,7 @@ def build_representation_probe_packet(
         owner_focus=owner_focus,
         cohort_readiness_receipt=cohort_readiness_receipt,
         registered_probe_identity_sha256=registered_probe_identity_sha256,
+        registration_readback_receipt=registration_readback_receipt,
     )
 
 

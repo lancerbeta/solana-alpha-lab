@@ -63,6 +63,10 @@ def _row(
 
 
 def _series(member: str, field: str, values: tuple[object | None, ...]) -> list[TypedLifecycleObservation]:
+    if field == "LIQUIDITY":
+        values = tuple(
+            None if value is None else float(value) * 1000.0 for value in values
+        )
     rows: list[TypedLifecycleObservation] = []
     for due, value in zip(DEFAULT_SCHEDULE.prefix_due_offsets, values, strict=True):
         rows.append(_row(member, due, field, value, observed=value is not None))
@@ -147,6 +151,20 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         self.assertEqual(len(fallback_motifs), 1)
         self.assertNotIn("VOLUME_BUY", fallback_motifs[0])
         self.assertNotIn("VOLUME_SELL", fallback_motifs[0])
+
+    def test_x_eligibility_filters_members_at_the_x_pit(self) -> None:
+        rows = []
+        rows.extend(_series("eligible", "PRICE", (1.0, 2.0, 3.0)))
+        rows.extend(_series("eligible", "LIQUIDITY", (1.0, 1.0, 1.0)))
+        rows.extend(_series("eligible", "TRADERS", (1.0, 1.0, 1.0)))
+        rows.extend(_series("below-floor", "PRICE", (1.0, 2.0, 3.0)))
+        rows.extend(_series("below-floor", "LIQUIDITY", (0.999, 0.999, 0.999)))
+        rows.extend(_series("below-floor", "TRADERS", (1.0, 1.0, 1.0)))
+
+        projected = project_normalized_trajectory(rows)
+
+        self.assertEqual(projected.payload["eligible_member_count"], 1)
+        self.assertEqual(projected.payload["histogram_member_count"], 1)
 
     def test_invalid_and_late_values_emit_m_without_dropping_slots(self) -> None:
         rows = []
@@ -250,6 +268,10 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         with self.assertRaises(NormalizedTrajectoryError) as raised:
             LifecycleSchedule(schedule_sha256="00" * 32)
         self.assertEqual(str(raised.exception), "SCHEDULE_DOCUMENT_REQUIRED")
+
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            LifecycleSchedule(x_due_offset_seconds=600)
+        self.assertEqual(str(raised.exception), "SCHEDULE_SHA256_MISMATCH")
 
     def test_observations_must_share_imported_schedule_and_activation(self) -> None:
         rows = _series("synthetic-a", "PRICE", (1.0, 2.0, 3.0))

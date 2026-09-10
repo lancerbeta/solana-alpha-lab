@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import sys
 import unittest
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from jsonschema import Draft202012Validator
@@ -24,6 +25,7 @@ from solana_alpha_lab.factory.hfic_representation_probe import (
     INVALID_CONTROL_NOT_RUN,
     INVALID_CONTROL_PACKET_HASH,
     INVALID_COVERAGE_BROKEN,
+    INVALID_COHORT_READINESS_RECEIPT,
     INVALID_INSUFFICIENT_YIELD,
     INVALID_PACKET_BUDGET,
     INVALID_PROBE_IDENTITY,
@@ -47,6 +49,7 @@ from solana_alpha_lab.factory.hfic_session import freeze_draft
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DEFAULT_SCHEDULE,
     PACKET_KEY,
+    TypedLifecycleObservation,
     project_normalized_trajectory,
 )
 from solana_alpha_lab.factory.run_passport import (
@@ -253,6 +256,32 @@ def _cohort_readiness_receipt(
     }
 
 
+def _representation_fixture():
+    anchor = datetime(2026, 1, 1, tzinfo=UTC)
+    rows: list[TypedLifecycleObservation] = []
+    for index in range(10):
+        member = f"synthetic-{index}"
+        for field, values in (
+            ("FIELD-USD-PRICE-001", (1.0, 2.0, 3.0)),
+            ("FIELD-LIQUIDITY-USD-001", (1000.0, 1000.0, 1000.0)),
+            ("FIELD-STATS5M-NUM-TRADERS-001", (1.0, 1.0, 1.0)),
+        ):
+            for due, value in zip(DEFAULT_SCHEDULE.prefix_due_offsets, values, strict=True):
+                rows.append(
+                    TypedLifecycleObservation(
+                        member_id=member,
+                        member_anchor_at=anchor,
+                        due_offset_seconds=due,
+                        field_id=field,
+                        value=value,
+                        first_reliable_available_at=anchor + timedelta(seconds=due),
+                        schedule_sha256=DEFAULT_SCHEDULE.schedule_sha256,
+                        activation_id=DEFAULT_SCHEDULE.activation_id,
+                    )
+                )
+    return project_normalized_trajectory(rows)
+
+
 def _registration_receipt(challenger: dict[str, object]) -> dict[str, object]:
     base: dict[str, object] = {
         "schema": "smial.normalized-trajectory-v1-registration-receipt",
@@ -289,7 +318,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
     def test_exact_control_clone_and_existing_hfic_fixture(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
-        representation = project_normalized_trajectory([])
+        representation = _representation_fixture()
         readiness = _cohort_readiness_receipt()
         challenger = build_challenger_packet(
             baseline,
@@ -384,7 +413,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         with self.assertRaises(RepresentationProbeError) as raised:
             build_challenger_packet(
                 baseline,
-                project_normalized_trajectory([]),
+                _representation_fixture(),
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
                 registered_probe_identity_sha256="dd" * 32,
             )
@@ -392,15 +421,25 @@ class HficRepresentationProbeTests(unittest.TestCase):
 
         challenger = build_challenger_packet(
             baseline,
-            project_normalized_trajectory([]),
+            _representation_fixture(),
             cohort_readiness_receipt=_cohort_readiness_receipt(),
         )
         with self.assertRaises(RepresentationProbeError) as raised:
             build_challenger_packet(
                 baseline,
-                project_normalized_trajectory([]),
+                _representation_fixture(),
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
                 registered_probe_identity_sha256=challenger["probe_identity_sha256"],
+            )
+        self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
+
+        with self.assertRaises(RepresentationProbeError) as raised:
+            build_challenger_packet(
+                baseline,
+                _representation_fixture(),
+                cohort_readiness_receipt=_cohort_readiness_receipt(),
+                registered_probe_identity_sha256=challenger["probe_identity_sha256"],
+                registration_readback_receipt=_registration_receipt(challenger),
             )
         self.assertEqual(str(raised.exception), "REPRESENTATION_PROBE_ALREADY_EXISTS")
 
@@ -421,10 +460,18 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 with self.assertRaises(RepresentationProbeError) as raised:
                     build_challenger_packet(
                         baseline,
-                        project_normalized_trajectory([]),
+                        _representation_fixture(),
                         cohort_readiness_receipt=readiness,
                     )
                 self.assertEqual(str(raised.exception), expected)
+
+        with self.assertRaises(RepresentationProbeError) as raised:
+            build_challenger_packet(
+                baseline,
+                project_normalized_trajectory([]),
+                cohort_readiness_receipt=_cohort_readiness_receipt(),
+            )
+        self.assertEqual(str(raised.exception), INVALID_COHORT_READINESS_RECEIPT)
 
     def test_control_memory_anchors_must_match_packet(self) -> None:
         receipt = _control_receipt()
@@ -477,7 +524,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         readiness = _cohort_readiness_receipt()
         challenger = build_challenger_packet(
             baseline,
-            project_normalized_trajectory([]),
+            _representation_fixture(),
             cohort_readiness_receipt=readiness,
         )
         drifted = json.loads(json.dumps(challenger))
@@ -500,7 +547,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         readiness = _cohort_readiness_receipt()
         challenger = build_challenger_packet(
             baseline,
-            project_normalized_trajectory([]),
+            _representation_fixture(),
             cohort_readiness_receipt=readiness,
         )
         drifted = json.loads(json.dumps(challenger))
@@ -520,7 +567,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
     def test_representation_is_bound_to_verified_release_bytes(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
-        representation = project_normalized_trajectory([])
+        representation = _representation_fixture()
         with self.assertRaises(RepresentationProbeError) as raised:
             build_challenger_packet(baseline, representation)
         self.assertEqual(str(raised.exception), "INVALID_COHORT_READINESS_RECEIPT")
@@ -574,7 +621,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         baseline = control_baseline_from_receipt(receipt)
         challenger = build_challenger_packet(
             baseline,
-            project_normalized_trajectory([]),
+            _representation_fixture(),
             cohort_readiness_receipt=_cohort_readiness_receipt(),
         )
         drifted = dict(challenger)
@@ -592,7 +639,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         baseline = control_baseline_from_receipt(receipt)
         challenger = build_challenger_packet(
             baseline,
-            project_normalized_trajectory([]),
+            _representation_fixture(),
             cohort_readiness_receipt=_cohort_readiness_receipt(),
         )
         drifted = json.loads(json.dumps(challenger))
@@ -640,7 +687,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         with self.assertRaises(RepresentationProbeError) as raised:
             build_challenger_packet(
                 baseline,
-                project_normalized_trajectory([]),
+                _representation_fixture(),
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
             )
         self.assertEqual(str(raised.exception), INVALID_TRIGGER_NOT_MET)
@@ -662,7 +709,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
         with self.assertRaises(RepresentationProbeError) as raised:
             build_challenger_packet(
                 oversized_receipt,
-                project_normalized_trajectory([]),
+                _representation_fixture(),
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
             )
         self.assertEqual(str(raised.exception), INVALID_PACKET_BUDGET)
@@ -691,7 +738,7 @@ class RepresentationStatusTests(unittest.TestCase):
 
         challenger = build_challenger_packet(
             baseline,
-            project_normalized_trajectory([]),
+            _representation_fixture(),
             cohort_readiness_receipt=_cohort_readiness_receipt(),
         )
         registered = json.loads(json.dumps(challenger))
@@ -824,7 +871,7 @@ class RepresentationStatusTests(unittest.TestCase):
 
         challenger = build_challenger_packet(
             baseline,
-            project_normalized_trajectory([]),
+            _representation_fixture(),
             cohort_readiness_receipt=_cohort_readiness_receipt(),
         )
         incomplete_execution_receipt = {

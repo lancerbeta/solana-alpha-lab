@@ -30,6 +30,7 @@ PACKET_KEY = "normalized_trajectory_v1"
 PREFERRED_SCHEDULE_ID = "OBS-ALWAYS-ON-TOKENS-V2-LIFECYCLE-21D-001"
 ALLOWED_X_POINTS = (300, 600, 900)
 PREFERRED_X_SECONDS = 300
+MIN_X_LIQUIDITY_USD = 1000.0
 DECLARED_Y_POINTS = (900, 1800, 3600, 7200, 14400, 43200, 86400)
 DECISION_T_DUE_OFFSET_SECONDS = 1800
 MIN_MOTIF_STEPS = 2
@@ -389,6 +390,11 @@ class LifecycleSchedule:
             self.schedule_sha256
         ) is None:
             raise NormalizedTrajectoryError("SCHEDULE_SHA256_INVALID")
+        if (
+            self.schedule_sha256 == _SYNTHETIC_SCHEDULE_SHA256
+            and x_point != PREFERRED_X_SECONDS
+        ):
+            raise NormalizedTrajectoryError("SCHEDULE_SHA256_MISMATCH")
         if not isinstance(self.activation_id, str) or not self.activation_id.strip():
             raise NormalizedTrajectoryError("ACTIVATION_ID_INVALID")
         if schedule_document is not None:
@@ -793,6 +799,24 @@ def project_normalized_trajectory(
     if future_only_members:
         raise NormalizedTrajectoryError("FUTURE_ONLY_MEMBER_NOT_BOUND_TO_PREFIX")
 
+    def x_eligible(rows: Mapping[tuple[int, str], TypedLifecycleObservation]) -> bool:
+        liquidity = rows.get(
+            (bound_schedule.x_due_offset_seconds, FIELD_IDS["LIQUIDITY"])
+        )
+        if liquidity is None:
+            return False
+        anchor = next(iter(rows.values())).member_anchor_at
+        x_cutoff = anchor + timedelta(seconds=bound_schedule.x_due_offset_seconds)
+        return _valid_at_cutoff(liquidity, cutoff=x_cutoff) and float(
+            liquidity.value
+        ) >= MIN_X_LIQUIDITY_USD
+
+    grouped = {
+        member_id: rows
+        for member_id, rows in grouped.items()
+        if x_eligible(rows)
+    }
+
     cutoff_by_member = {
         member_id: next(iter(rows.values())).member_anchor_at
         + cutoff_delta
@@ -950,6 +974,7 @@ __all__ = [
     "REPRESENTATION_VERSION",
     "LifecycleCorpusBinding",
     "LifecycleSchedule",
+    "MIN_X_LIQUIDITY_USD",
     "NormalizedTrajectoryError",
     "NormalizedTrajectoryRepresentation",
     "TypedLifecycleObservation",
