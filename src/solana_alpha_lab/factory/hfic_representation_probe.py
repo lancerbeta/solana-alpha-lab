@@ -44,6 +44,7 @@ from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     ALLOWED_X_POINTS,
     DECISION_T_DUE_OFFSET_SECONDS,
     DECLARED_Y_POINTS,
+    DEFAULT_SCHEDULE,
     FIELD_IDS,
     MIN_MOTIF_STEPS,
     PACKET_KEY,
@@ -467,6 +468,8 @@ def _validate_serialized_representation_payload(
         or truncation["m_heavy_members_retained"] is not True
     ):
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if dropped_tuples == 0 and histogram_member_count != eligible_member_count:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
 
     declared_hash = _hash64("payload_sha256", payload["payload_sha256"])
     base = {key: item for key, item in payload.items() if key != "payload_sha256"}
@@ -697,6 +700,23 @@ def _assert_representation_bound_to_readiness(
     except (KeyError, TypeError, ValueError):
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT) from None
     if binding.as_dict() != expected:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    expected_schedule = {
+        "schedule_id": DEFAULT_SCHEDULE.schedule_id,
+        "activation_id": DEFAULT_SCHEDULE.activation_id,
+        "x_due_offset_seconds": DEFAULT_SCHEDULE.x_due_offset_seconds,
+        "declared_y_due_offset_seconds": list(DEFAULT_SCHEDULE.y_due_offset_seconds),
+        "prefix_due_offset_seconds": list(DEFAULT_SCHEDULE.prefix_due_offsets),
+        "decision_t_due_offset_seconds": DEFAULT_SCHEDULE.decision_t_due_offset_seconds,
+        "schedule_sha256": DEFAULT_SCHEDULE.schedule_sha256,
+    }
+    if representation.get("schedule") != expected_schedule:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    synthetic_binding = DEFAULT_SCHEDULE.corpus_binding
+    if (
+        not isinstance(synthetic_binding, LifecycleCorpusBinding)
+        or binding.as_dict() != synthetic_binding.as_dict()
+    ):
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
     if representation.get("eligible_member_count") != readiness["yield_eligible"]:
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
@@ -1234,6 +1254,8 @@ def existing_hfic_lifecycle_fixture_input(
     validated, representation = _validate_challenger_packet(challenger_packet)
     baseline = control_baseline_from_receipt(control_receipt)
     _assert_challenger_bound_to_control(validated, baseline)
+    if not control_probe_permitted(baseline.terminal):
+        raise RepresentationProbeError(INVALID_TRIGGER_NOT_MET)
     readiness = _validate_cohort_readiness_receipt(
         cohort_readiness_receipt,
         expected_schedule_sha256=representation["schedule"]["schedule_sha256"],

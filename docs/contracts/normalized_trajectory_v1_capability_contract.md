@@ -40,7 +40,10 @@ When a full imported schedule document is supplied, its schedule key and
 landmark offsets must match the compact projection fields before its hash is
 accepted. The frozen X300 synthetic digest cannot be reused for another X
 selection, and membership is admitted only when the X liquidity observation is
-observed by its own X cutoff and is at least USD 1000.
+observed by its own X cutoff and is at least USD 1000. This dormant atom
+accepts only the synthetic corpus binding; a non-synthetic release needs a
+future verified projection/input receipt that proves row provenance before it
+can enter the HFIC seam.
 
 Taker volume is used only when observed. If taker volume is unavailable and
 both buy and sell volume are observed, two fallback channels are emitted. Buy

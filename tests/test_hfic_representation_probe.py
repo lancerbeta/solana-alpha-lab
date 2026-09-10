@@ -48,6 +48,8 @@ from solana_alpha_lab.factory.hfic_representation_probe import (
 from solana_alpha_lab.factory.hfic_session import freeze_draft
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DEFAULT_SCHEDULE,
+    LifecycleCorpusBinding,
+    LifecycleSchedule,
     PACKET_KEY,
     TypedLifecycleObservation,
     project_normalized_trajectory,
@@ -282,6 +284,47 @@ def _representation_fixture():
     return project_normalized_trajectory(rows)
 
 
+def _foreign_representation_fixture():
+    binding = LifecycleCorpusBinding(
+        release_id="11" * 32,
+        cohort_id="FOREIGN-COHORT-001",
+        schedule_sha256="22" * 32,
+        activation_id="FOREIGN-ACTIVATION-001",
+        producer_git_sha="1" * 40,
+        source_sha256="33" * 32,
+        census_sha256="44" * 32,
+        observations_sha256="55" * 32,
+    )
+    schedule = LifecycleSchedule(
+        schedule_sha256=binding.schedule_sha256,
+        activation_id=binding.activation_id,
+        corpus_binding=binding,
+    )
+    anchor = datetime(2026, 1, 1, tzinfo=UTC)
+    rows: list[TypedLifecycleObservation] = []
+    for index in range(10):
+        member = f"foreign-{index}"
+        for field, values in (
+            ("FIELD-USD-PRICE-001", (1.0, 2.0, 3.0)),
+            ("FIELD-LIQUIDITY-USD-001", (1000.0, 1000.0, 1000.0)),
+            ("FIELD-STATS5M-NUM-TRADERS-001", (1.0, 1.0, 1.0)),
+        ):
+            for due, value in zip(schedule.prefix_due_offsets, values, strict=True):
+                rows.append(
+                    TypedLifecycleObservation(
+                        member_id=member,
+                        member_anchor_at=anchor,
+                        due_offset_seconds=due,
+                        field_id=field,
+                        value=value,
+                        first_reliable_available_at=anchor + timedelta(seconds=due),
+                        schedule_sha256=schedule.schedule_sha256,
+                        activation_id=schedule.activation_id,
+                    )
+                )
+    return project_normalized_trajectory(rows, schedule=schedule), binding
+
+
 def _registration_receipt(challenger: dict[str, object]) -> dict[str, object]:
     base: dict[str, object] = {
         "schema": "smial.normalized-trajectory-v1-registration-receipt",
@@ -312,6 +355,43 @@ def _registration_receipt(challenger: dict[str, object]) -> dict[str, object]:
         "probe_identity_sha256": challenger["probe_identity_sha256"],
     }
     return {**base, "receipt_sha256": canonical_sha256(base)}
+
+
+def _rehashed_challenger_with_representation_mutation(
+    challenger: dict[str, object],
+    mutate,
+) -> dict[str, object]:
+    drifted = json.loads(json.dumps(challenger))
+    representation = drifted[PACKET_KEY]
+    mutate(representation)
+    representation["payload_sha256"] = canonical_sha256(
+        {
+            key: value
+            for key, value in representation.items()
+            if key != "payload_sha256"
+        }
+    )
+    drifted["representation_payload_sha256"] = representation["payload_sha256"]
+    drifted["representation_search_key_sha256"] = representation_search_key_sha256(
+        evidence_epoch_sha256=drifted["evidence_epoch_sha256"],
+        owner_focus=drifted["owner_focus"],
+        prompt_version=drifted["prompt_version"],
+        memory_baseline_sha256=drifted["memory_baseline_sha256"],
+        representation_id=drifted["representation_id"],
+        representation_payload_sha256=drifted["representation_payload_sha256"],
+        control_packet_sha256=drifted["control_packet_sha256"],
+    )
+    drifted["probe_identity_sha256"] = representation_probe_identity_sha256(
+        control_session_id=drifted["control_session_id"],
+        evidence_epoch_sha256=drifted["evidence_epoch_sha256"],
+        representation_id=drifted["representation_id"],
+        representation_search_key=drifted["representation_search_key_sha256"],
+        representation_payload_sha256=drifted["representation_payload_sha256"],
+    )
+    drifted["packet_bytes"] = 0
+    for _ in range(4):
+        drifted["packet_bytes"] = len(canonical_json_bytes(drifted))
+    return drifted
 
 
 class HficRepresentationProbeTests(unittest.TestCase):
@@ -616,6 +696,46 @@ class HficRepresentationProbeTests(unittest.TestCase):
             )
         self.assertEqual(str(raised.exception), "INVALID_COHORT_READINESS_RECEIPT")
 
+    def test_non_synthetic_binding_is_fail_closed_until_verified_input_receipt(
+        self,
+    ) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        representation, binding = _foreign_representation_fixture()
+        readiness = _cohort_readiness_receipt()
+        manifest = dict(readiness["release_manifest"])
+        manifest.update(
+            {
+                "release_id": binding.release_id,
+                "cohort_id": binding.cohort_id,
+                "schedule_sha256": binding.schedule_sha256,
+                "activation_id": binding.activation_id,
+                "producer_git_sha": binding.producer_git_sha,
+                "source_sha256": binding.source_sha256,
+                "census_sha256": binding.census_sha256,
+                "observations_sha256": binding.observations_sha256,
+            }
+        )
+        readiness["release_manifest"] = manifest
+        readiness["release_id"] = manifest["release_id"]
+        readiness["manifest_sha256"] = canonical_sha256(manifest)
+        readiness["schedule_sha256"] = manifest["schedule_sha256"]
+        readiness["receipt_sha256"] = canonical_sha256(
+            {
+                key: value
+                for key, value in readiness.items()
+                if key != "receipt_sha256"
+            }
+        )
+
+        with self.assertRaises(RepresentationProbeError) as raised:
+            build_challenger_packet(
+                baseline,
+                representation,
+                cohort_readiness_receipt=readiness,
+            )
+        self.assertEqual(str(raised.exception), INVALID_COHORT_READINESS_RECEIPT)
+
     def test_fixture_bridge_rechecks_outer_identity(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
@@ -672,6 +792,75 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
             )
         self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
+
+    def test_fixture_bridge_rechecks_control_terminal(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        challenger = build_challenger_packet(
+            baseline,
+            _representation_fixture(),
+            cohort_readiness_receipt=_cohort_readiness_receipt(),
+        )
+        receipt["final_session_terminal"] = "RUNNER_UP_REVISION_REQUIRED"
+        assert isinstance(receipt["session_receipt"], dict)
+        receipt["session_receipt"]["final_session_terminal"] = (
+            "RUNNER_UP_REVISION_REQUIRED"
+        )
+        receipt["session_receipt"]["effective_control_terminal"] = (
+            "RUNNER_UP_REVISION_REQUIRED"
+        )
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_lifecycle_fixture_input(
+                challenger,
+                control_receipt=receipt,
+                cohort_readiness_receipt=_cohort_readiness_receipt(),
+            )
+        self.assertEqual(str(raised.exception), INVALID_TRIGGER_NOT_MET)
+
+    def test_fixture_bridge_rejects_schedule_offset_hash_drift(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        challenger = build_challenger_packet(
+            baseline,
+            _representation_fixture(),
+            cohort_readiness_receipt=_cohort_readiness_receipt(),
+        )
+        drifted = _rehashed_challenger_with_representation_mutation(
+            challenger,
+            lambda representation: representation["schedule"].update(
+                {
+                    "x_due_offset_seconds": 600,
+                    "prefix_due_offset_seconds": [600, 900, 1800],
+                }
+            ),
+        )
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_packet(
+                drifted,
+                cohort_readiness_receipt=_cohort_readiness_receipt(),
+            )
+        self.assertEqual(str(raised.exception), INVALID_COHORT_READINESS_RECEIPT)
+
+    def test_fixture_bridge_rejects_rehashed_partial_histogram(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        challenger = build_challenger_packet(
+            baseline,
+            _representation_fixture(),
+            cohort_readiness_receipt=_cohort_readiness_receipt(),
+        )
+        drifted = _rehashed_challenger_with_representation_mutation(
+            challenger,
+            lambda representation: representation.update(
+                {"histogram": [], "histogram_member_count": 0}
+            ),
+        )
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_packet(
+                drifted,
+                cohort_readiness_receipt=_cohort_readiness_receipt(),
+            )
+        self.assertEqual(str(raised.exception), INVALID_REPRESENTATION_SCHEMA)
 
     def test_runner_up_or_case_a_cannot_create_challenger(self) -> None:
         receipt = _control_receipt()
