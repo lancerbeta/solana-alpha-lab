@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-SIGNAL-CALIBRATION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-10",
+  "task_id": "FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "f042597cee1c8932d8e666527f11b5d8abbceb5ffcccf5ebc86cf1c91d09f0ab",
+  "reviewed_inventory_sha256": "2a9853a1920a389c5a9b678534a16b690780765744d369d8c18793d630536f42",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "SAME_PRIMITIVE_HTTP_OK_RECOVERY_ONLY",
+        "STARTED_ROWS_IGNORED",
+        "FUTURE_ROWS_FAIL_CLOSED",
+        "OPEN_DIR_BYTES_STAGED_ONCE",
+        "OS_WALK_LSTAT_UNKNOWN",
+        "HISTORY_BASIS_CUTOVER_WATCH"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OWNER_FALSIFIERS_1_TO_13_NO",
+        "TIMEOUT_24H_DIAGNOSTIC_PRESERVED",
+        "QUOTE_PRIMITIVE_PROTECTED",
+        "OPEN_NOT_MULTIPLIED_BY_97",
+        "GENUINE_RESIDENT_GROWTH_AMPLIFIED",
+        "SOURCE_DATA_STALE_UNCHANGED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_bound_to_head_a6f9ba30be449e40f749c2c0c120bb455b0a775f",
+        "24H_ONE_PASS_CURRENT_STATE",
+        "NO_OPERABILITY_WATCH_CHANGE",
+        "NO_HISTORY_SCHEMA_MIGRATION",
+        "HISTORY_BASIS_CUTOVER_WATCH",
+        "NO_EXECUTION_SCOPE_LEAK"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}

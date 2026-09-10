@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-SIGNAL-CALIBRATION-FACTORY-FIT-001",
+  "as_of": "2026-09-10",
+  "task_id": "FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "f042597cee1c8932d8e666527f11b5d8abbceb5ffcccf5ebc86cf1c91d09f0ab",
+  "reviewed_inventory_sha256": "2a9853a1920a389c5a9b678534a16b690780765744d369d8c18793d630536f42",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SOURCE_DATA_STALE_LONG_TICK_FALSE_POSITIVE_WATCH"
+  },
+  "dimensions": {
+    "mission": "PASS recovery-aware operability without quieter real-failure detection",
+    "flexibility_and_history": "PASS no history migration; HISTORY_BASIS_CUTOVER_WATCH residual",
+    "context_efficiency": "PASS one 24h call scan plus one RDP walk",
+    "research_truth": "PASS scientific observations and PIT unchanged",
+    "owner_operability": "PASS pulse still succeeds when storage sample skipped",
+    "execution_to_cashflow": "PASS no trading or cash path",
+    "monitoring_and_recovery": "PASS current provider classes plus OPEN counted once",
+    "build_vs_buy": "PASS no new daemon timer or monitoring framework",
+    "security": "PASS no credentials deploy or provider calls",
+    "red_team": "PASS owner falsifiers 1-13 closed on HEAD a6f9ba30"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION",
+    "SOURCE_DATA_STALE_LONG_TICK_FALSE_POSITIVE_WATCH",
+    "HISTORY_BASIS_CUTOVER_WATCH"
+  ],
+  "recovery": "REVERT"
+}

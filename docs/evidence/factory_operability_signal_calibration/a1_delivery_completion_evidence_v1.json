@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-OPERABILITY-SIGNAL-CALIBRATION-COMPLETION-001",
+  "as_of": "2026-09-10",
+  "task_id": "FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1",
+  "state_change": "FACTORY_OPERABILITY_SIGNAL_CALIBRATION_READY_FOR_MERGE_GATE",
+  "base_main": "18a1111e07b9edcf19c090fa61b119f80983c894",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "f4c2b39e1007876ae3762b63254ce7d2bde55d6012798a3cf497a0dc45307962",
+    "catalog/assets/lifecycle.yaml": "590d78734863432dde777ee2ee97ea86e30c1cd010cace02628c302e9f45b3be",
+    "catalog/catalog_manifest.yaml": "0ec9e6b64378037130e16a481a959f359846c4aac8c715b53ea9f3156d75a46e",
+    "catalog/generated/asset_edges.json": "55b9b446146543ba1d59adbdc985459e0d9aff6e79776a053a52e79c08166457",
+    "docs/PROJECT_MAP.md": "e8cc30308c697a288a55e5e0443236e4d663fbe191b3142662c410cc67353c2e",
+    "docs/reports/factory_operability_signal_calibration/a1_owner_readout_v1.md": "3db34f16b4600353ea57feca33eb2ffec63ed0fac3970184d302414f626277e8",
+    "docs/tasks/FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1.md": "6d94c4e3abb770883101cfb9ea4c1bb6dda8e9919aa94f7932e96f67d578fee7",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "c0d375d6c6bcebd8cb523b73036fdb6e0c046228bc266dfd47b7499205da8b6a",
+    "src/solana_alpha_lab/factory/collector_owner_pulse.py": "724aa93bcfe7f60395dee5a4c4644c2b3e9e834cede7785b42eaa17337347b72",
+    "src/solana_alpha_lab/factory/collector_read_model.py": "1f848a5fffc532705f1f25e331e670963a12f75336ce6df7efb38750b0b40669",
+    "tests/test_factory_operability_signal_calibration_v1.py": "724152a96f70047bf2ad5ec01b6d8301038d0aa7f843dc3c5de40dd186268f99"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_operability_signal_calibration/a1_delivery_factory_fit_v1.json",
+    "sha256": "d42d1901498fbdb4336a90e43024ae3208e44f67aa3d08300aceed3c5ba654cc",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_OPERABILITY_SIGNAL_CALIBRATION_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_operability_signal_calibration/a1_delivery_independent_review_v1.json",
+      "sha256": "7cb16da656a0375a08e39e8ad0572ee8773629b2a3c2b050491841afb606a5e5",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_PROVIDER_CURRENT_STATE_P1_P10",
+      "PASS_RESIDENT_97D_OPEN_ONCE",
+      "PASS_HISTORY_SKIP_DURING_OPEN"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

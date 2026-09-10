@@ -27,6 +27,12 @@ from solana_alpha_lab.factory.observation_schedule_store import ObservationSched
 DISCOVERY = "PRIM-JUPITER-TOKENS-V2-RECENT-001"
 SEARCH = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
 
+_KIND_AUTH = "auth"
+_KIND_RATE = "rate"
+_KIND_FAILED = "failed"
+_KIND_OK = "ok"
+_KIND_OTHER = "other"
+
 
 def _safe_parse(raw: object) -> datetime | None:
     if not isinstance(raw, str) or not raw:
@@ -52,6 +58,94 @@ def _http_bucket(http_class: object) -> str | None:
     if text == HTTP_CLASS_TRANSPORT:
         return "TRANSPORT_ERROR_24h"
     return None
+
+
+def _attempt_kind(http_class: object) -> str:
+    text = str(http_class or "")
+    if text in {HTTP_CLASS_401, HTTP_CLASS_403}:
+        return _KIND_AUTH
+    if text == HTTP_CLASS_429:
+        return _KIND_RATE
+    if text in {HTTP_CLASS_5XX, HTTP_CLASS_TIMEOUT, HTTP_CLASS_TRANSPORT}:
+        return _KIND_FAILED
+    if text == HTTP_CLASS_OK:
+        return _KIND_OK
+    return _KIND_OTHER
+
+
+def derive_current_provider_state(
+    calls: list[dict[str, Any]],
+    *,
+    now: datetime,
+) -> dict[str, bool]:
+    """Latest-by-time per primitive; 24h counters stay separate diagnostics.
+
+    Proven recovery is a later same-primitive HTTP_OK on a non-STARTED
+    ledger row. A later STARTED or unclassified call cannot clear an unresolved
+    failure. Future timestamps cannot manufacture recovery. A later success on
+    a different primitive cannot clear another primitive. Malformed
+    timestamps never count as success. Future-dated rows cannot replace a
+    valid-time classification: future HTTP_OK is ignored, and future failures
+    remain unresolved without becoming the latest attempt.
+    """
+
+    latest_failure_at: dict[str, datetime] = {}
+    latest_failure_kinds: dict[str, set[str]] = {}
+    latest_success_at: dict[str, datetime] = {}
+    malformed_kinds: dict[str, set[str]] = {}
+
+    for call in calls:
+        payload = call.get("payload") or {}
+        if isinstance(payload, str):
+            continue
+        primitive = str(call.get("primitive_id") or "")
+        if str(call.get("state") or "") == "STARTED":
+            continue
+        kind = _attempt_kind(payload.get("http_class"))
+        updated = _safe_parse(call.get("updated_at") or call.get("created_at"))
+        if updated is None:
+            if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
+                malformed_kinds.setdefault(primitive, set()).add(kind)
+            continue
+        if updated > now:
+            if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
+                malformed_kinds.setdefault(primitive, set()).add(kind)
+            continue
+        if kind == _KIND_OK:
+            success_at = latest_success_at.get(primitive)
+            if success_at is None or updated > success_at:
+                latest_success_at[primitive] = updated
+            continue
+        if kind not in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
+            continue
+        previous_at = latest_failure_at.get(primitive)
+        if previous_at is None or updated > previous_at:
+            latest_failure_at[primitive] = updated
+            latest_failure_kinds[primitive] = {kind}
+        elif updated == previous_at:
+            latest_failure_kinds.setdefault(primitive, set()).add(kind)
+
+    auth = False
+    rate = False
+    failed = False
+    primitives = set(latest_failure_kinds) | set(malformed_kinds)
+    for primitive in primitives:
+        unresolved: set[str] = set(malformed_kinds.get(primitive) or ())
+        failure_at = latest_failure_at.get(primitive)
+        success_at = latest_success_at.get(primitive)
+        if failure_at is not None and (success_at is None or success_at <= failure_at):
+            unresolved.update(latest_failure_kinds.get(primitive) or ())
+        if _KIND_AUTH in unresolved:
+            auth = True
+        if _KIND_RATE in unresolved:
+            rate = True
+        if _KIND_FAILED in unresolved:
+            failed = True
+    return {
+        "provider_current_auth_failed": auth,
+        "provider_current_rate_limited": rate,
+        "provider_current_failed": failed,
+    }
 
 
 def build_collector_read_model(
@@ -108,14 +202,19 @@ def build_collector_read_model(
     last_source_poll_attempt_at = None
     last_source_poll_success_at = None
     last_search_success_at = None
+    current_state_calls: list[dict[str, Any]] = []
 
     for call in store.list_calls():
         payload = call.get("payload") or {}
         if isinstance(payload, str):
             continue
         updated = _safe_parse(call.get("updated_at") or call.get("created_at"))
-        if updated is None or updated < window_start:
+        if updated is None:
+            current_state_calls.append(call)
             continue
+        if updated < window_start:
+            continue
+        current_state_calls.append(call)
         primitive = str(call.get("primitive_id") or "")
         http_class = payload.get("http_class")
         bucket = _http_bucket(http_class)
@@ -168,13 +267,18 @@ def build_collector_read_model(
         period_seconds=period_seconds,
         empirical_overlap_seconds=empirical_overlap_seconds,
     )
+    current_provider = derive_current_provider_state(current_state_calls, now=now)
 
     health_flags: list[str] = []
     if store.restore_marker_unresolved():
         health_flags.append("BACKUP_DEGRADED")
     if activation_state == "ACTIVE":
         health_flags.append("PROCESS_OK")
-    if any(http_counts[key] for key in http_counts):
+    if current_provider["provider_current_auth_failed"]:
+        health_flags.append("PROVIDER_AUTH_FAILED")
+    if current_provider["provider_current_rate_limited"]:
+        health_flags.append("PROVIDER_RATE_LIMITED")
+    if current_provider["provider_current_failed"]:
         health_flags.append("PROVIDER_FAILED")
     if coverage == "GAP_CONFIRMED":
         health_flags.append("DISCOVERY_GAP")
@@ -223,6 +327,7 @@ def build_collector_read_model(
         "typed_missing_24h": typed_missing_24h,
         "censored_late_24h": censored_late_24h,
         **http_counts,
+        **current_provider,
         "observation_rdp_last_publish_at": None,
         "disk_used_pct": None,
         "disk_growth_24h": None,
@@ -237,4 +342,4 @@ def build_collector_read_model(
     }
 
 
-__all__ = ["build_collector_read_model"]
+__all__ = ["build_collector_read_model", "derive_current_provider_state"]

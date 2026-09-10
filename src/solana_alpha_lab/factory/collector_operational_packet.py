@@ -7,7 +7,9 @@ and live-release readiness. Does not own a second monitoring platform.
 from __future__ import annotations
 
 import json
+import os
 import shutil
+import stat
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
@@ -24,6 +26,7 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
 )
 from solana_alpha_lab.factory.observation_publication_jobs import (
     journal_stats,
+    open_dir,
     project_7d_disk_used,
     rdp_bytes_excluding_publication_jobs,
 )
@@ -132,6 +135,122 @@ def _publication_freshness_stale(packet: Mapping[str, Any], *, activation_state:
     pub = _safe_parse(publish_at)
     now = _safe_parse(str(packet.get("observed_at") or "")) or datetime.now(UTC)
     return pub is not None and (now - pub).total_seconds() > 6 * 3600
+
+
+def _current_provider_flag(
+    packet: Mapping[str, Any], key: str, *, fallback: bool
+) -> bool:
+    """Current-state booleans win; missing evidence stays fail-closed on 24h counts."""
+
+    value = packet.get(key)
+    if value is True:
+        return True
+    if value is False:
+        return False
+    return fallback
+
+
+def resident_rdp_bytes(
+    observation_rdp_bytes: Any, publication_jobs_open_bytes: Any
+) -> Any:
+    """Full RDP minus OPEN job bytes measured from the same filesystem view."""
+
+    if not isinstance(observation_rdp_bytes, int):
+        return UNKNOWN
+    open_bytes = (
+        publication_jobs_open_bytes
+        if isinstance(publication_jobs_open_bytes, int)
+        else UNKNOWN
+    )
+    if open_bytes is UNKNOWN:
+        return UNKNOWN
+    return max(0, observation_rdp_bytes - open_bytes)
+
+
+def storage_history_sample_blocked(
+    *,
+    publication_jobs_open_count: Any,
+    publication_jobs_open_bytes: Any,
+) -> bool:
+    """Skip persisted growth samples while an OPEN publication job exists."""
+
+    if not isinstance(publication_jobs_open_count, int) or not isinstance(
+        publication_jobs_open_bytes, int
+    ):
+        return True
+    if publication_jobs_open_count > 0 or publication_jobs_open_bytes > 0:
+        return True
+    return False
+
+
+def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
+    """One filesystem walk: total RDP bytes plus OPEN-dir bytes.
+
+    Every regular file under ``publication_jobs/open`` is transient,
+    including empty and atomic ``*.json.tmp``. Any unreadable directory or
+    file fails the whole measurement closed.
+    """
+
+    if not path.exists():
+        return UNKNOWN, 0, 0
+    open_root = open_dir(path)
+    total = 0
+    open_bytes = 0
+    open_count = 0
+    scan_failed = False
+
+    def onerror(_err: OSError) -> None:
+        nonlocal scan_failed
+        scan_failed = True
+
+    try:
+        files: list[tuple[Path, int]] = []
+        if path.is_file():
+            try:
+                files = [(path, int(path.stat().st_size))]
+            except OSError:
+                return UNKNOWN, UNKNOWN, UNKNOWN
+        else:
+            for dirpath, dirnames, filenames in os.walk(
+                path, onerror=onerror, followlinks=False
+            ):
+                if scan_failed:
+                    break
+                pending_dirs = list(dirnames)
+                dirnames[:] = []
+                for name in pending_dirs:
+                    try:
+                        mode = os.lstat(os.path.join(dirpath, name)).st_mode
+                    except OSError:
+                        scan_failed = True
+                        break
+                    if stat.S_ISLNK(mode):
+                        continue
+                    dirnames.append(name)
+                if scan_failed:
+                    break
+                for name in filenames:
+                    child = Path(dirpath) / name
+                    try:
+                        info = os.lstat(child)
+                    except OSError:
+                        return UNKNOWN, UNKNOWN, UNKNOWN
+                    if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+                        continue
+                    files.append((child, int(info.st_size)))
+            if scan_failed:
+                return UNKNOWN, UNKNOWN, UNKNOWN
+        for child, size in files:
+            total += size
+            try:
+                child.relative_to(open_root)
+            except ValueError:
+                continue
+            open_bytes += size
+            open_count += 1
+    except OSError:
+        return UNKNOWN, UNKNOWN, UNKNOWN
+    return total, open_count, open_bytes
 
 
 def _tree_bytes(path: Path) -> int | None:
@@ -474,11 +593,23 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
     http_5xx = int(packet.get("HTTP_5XX_24h") or 0)
     timeouts = int(packet.get("TIMEOUT_24h") or 0)
     transport = int(packet.get("TRANSPORT_ERROR_24h") or 0)
-    if http_401 or http_403:
+    if _current_provider_flag(
+        packet,
+        "provider_current_auth_failed",
+        fallback=bool(http_401 or http_403),
+    ):
         flags.append("PROVIDER_AUTH_FAILED")
-    if http_429:
+    if _current_provider_flag(
+        packet,
+        "provider_current_rate_limited",
+        fallback=bool(http_429),
+    ):
         flags.append("PROVIDER_RATE_LIMITED")
-    if http_5xx or timeouts or transport:
+    if _current_provider_flag(
+        packet,
+        "provider_current_failed",
+        fallback=bool(http_5xx or timeouts or transport),
+    ):
         flags.append("PROVIDER_FAILED")
     # Zero eligible market supply must NOT become provider failure (handled by absence).
 
@@ -669,12 +800,9 @@ def build_collector_operational_packet(
         except OSError:
             sqlite_bytes = UNKNOWN
 
-    rdp_bytes: Any = UNKNOWN
-    measured = _tree_bytes(rdp)
-    if measured is not None:
-        rdp_bytes = measured
-
+    rdp_bytes, open_job_count, open_job_bytes = _rdp_total_and_open_json(rdp)
     jobs = journal_stats(rdp)
+    resident_rdp = resident_rdp_bytes(rdp_bytes, open_job_bytes)
     rdp_science_bytes: Any = UNKNOWN
     try:
         rdp_science_bytes = rdp_bytes_excluding_publication_jobs(rdp)
@@ -776,7 +904,7 @@ def build_collector_operational_packet(
             "observed_at": observed_at,
             "disk_used_pct": disk_pct if isinstance(disk_pct, int) else None,
             "sqlite_bytes": sqlite_bytes if isinstance(sqlite_bytes, int) else None,
-            "rdp_bytes": rdp_bytes if isinstance(rdp_bytes, int) else None,
+            "rdp_bytes": resident_rdp if isinstance(resident_rdp, int) else None,
         }
     ]
     disk_growth, data_growth, projected = _growth_and_projection(
@@ -790,7 +918,7 @@ def build_collector_operational_packet(
         disk_used_bytes=disk_used,
         sqlite_bytes=sqlite_bytes if isinstance(sqlite_bytes, int) else None,
         rdp_science_bytes=rdp_science_bytes if isinstance(rdp_science_bytes, int) else None,
-        job_open_bytes=int(jobs["publication_jobs_open_bytes"]),
+        job_open_bytes=open_job_bytes if isinstance(open_job_bytes, int) else 0,
         job_completed_bytes=int(jobs["publication_jobs_completed_bytes"]),
         job_legacy_bytes=int(jobs["publication_jobs_legacy_full_bytes"]),
         elapsed_campaign_days=elapsed_days,
@@ -846,14 +974,18 @@ def build_collector_operational_packet(
         "HTTP_5XX_24h": base.get("HTTP_5XX_24h"),
         "TIMEOUT_24h": base.get("TIMEOUT_24h"),
         "TRANSPORT_ERROR_24h": base.get("TRANSPORT_ERROR_24h"),
+        "provider_current_auth_failed": base.get("provider_current_auth_failed"),
+        "provider_current_rate_limited": base.get("provider_current_rate_limited"),
+        "provider_current_failed": base.get("provider_current_failed"),
         # STORAGE
         "filesystem_disk_used_pct": disk_pct,
         "filesystem_disk_free_bytes": disk_free,
         "observation_sqlite_bytes": sqlite_bytes,
         "observation_rdp_bytes": rdp_bytes,
+        "observation_rdp_resident_bytes": resident_rdp,
         "observation_rdp_bytes_excluding_publication_jobs": rdp_science_bytes,
-        "publication_jobs_open_count": jobs["publication_jobs_open_count"],
-        "publication_jobs_open_bytes": jobs["publication_jobs_open_bytes"],
+        "publication_jobs_open_count": open_job_count,
+        "publication_jobs_open_bytes": open_job_bytes,
         "publication_jobs_completed_count": jobs["publication_jobs_completed_count"],
         "publication_jobs_completed_bytes": jobs["publication_jobs_completed_bytes"],
         "publication_jobs_legacy_full_count": jobs["publication_jobs_legacy_full_count"],
@@ -956,22 +1088,26 @@ def build_collector_operational_packet(
     packet["immutable_archive_last_terminal"] = last_terminal
     incremental = data_growth if isinstance(data_growth, int) and data_growth >= 0 else 0
     current_bytes = 0
-    for item in (sqlite_bytes, rdp_bytes):
+    for item in (sqlite_bytes, resident_rdp):
         if isinstance(item, int):
             current_bytes += item
-    try:
-        runway = project_storage_runway(
-            incremental_compressed_bytes_per_day=incremental,
-            current_same_volume_factory_bytes=current_bytes,
-            mutable_backup_peak_bytes=int(backup_sink_bytes)
-            if isinstance(backup_sink_bytes, int)
-            else 0,
-            staging_peak_bytes=0,
-            retention_class="HOT90_RESIDENT",
-        )
-        packet["projected_97d_bytes"] = runway["projected_total_same_volume_bytes"]
-        packet["projected_97d_status"] = runway["status"]
-    except Exception:
+    if isinstance(resident_rdp, int) and isinstance(open_job_bytes, int):
+        try:
+            runway = project_storage_runway(
+                incremental_compressed_bytes_per_day=incremental,
+                current_same_volume_factory_bytes=current_bytes,
+                mutable_backup_peak_bytes=int(backup_sink_bytes)
+                if isinstance(backup_sink_bytes, int)
+                else 0,
+                staging_peak_bytes=open_job_bytes,
+                retention_class="HOT90_RESIDENT",
+            )
+            packet["projected_97d_bytes"] = runway["projected_total_same_volume_bytes"]
+            packet["projected_97d_status"] = runway["status"]
+        except Exception:
+            packet["projected_97d_bytes"] = UNKNOWN
+            packet["projected_97d_status"] = UNKNOWN
+    else:
         packet["projected_97d_bytes"] = UNKNOWN
         packet["projected_97d_status"] = UNKNOWN
     health = compose_health_classes(packet)
@@ -996,4 +1132,6 @@ __all__ = [
     "classify_publication_expectation",
     "collector_verdict",
     "compose_health_classes",
+    "resident_rdp_bytes",
+    "storage_history_sample_blocked",
 ]
