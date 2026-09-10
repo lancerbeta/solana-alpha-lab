@@ -241,9 +241,59 @@ class ProviderCurrentStateTests(unittest.TestCase):
         )
         self.assertTrue(malformed_failure["provider_current_failed"])
 
+    def test_started_without_http_class_does_not_clear_timeout(self) -> None:
+        current = derive_current_provider_state(
+            [
+                _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
+                {
+                    "primitive_id": RECENT,
+                    "updated_at": render_utc(NOW - timedelta(minutes=1)),
+                    "created_at": render_utc(NOW - timedelta(minutes=1)),
+                    "payload": {"url": "https://api.jup.ag/tokens/v2/recent"},
+                },
+            ]
+        )
+        self.assertTrue(current["provider_current_failed"])
+        classes = compose_health_classes(
+            {
+                "TIMEOUT_24h": 1,
+                **current,
+            }
+        )
+        self.assertIn("PROVIDER_FAILED", classes)
+
+    def test_equal_timestamp_keeps_auth_and_timeout(self) -> None:
+        stamp = NOW - timedelta(minutes=3)
+        current = derive_current_provider_state(
+            [
+                _call(RECENT, stamp, HTTP_CLASS_TIMEOUT),
+                _call(RECENT, stamp, HTTP_CLASS_401),
+            ]
+        )
+        self.assertTrue(current["provider_current_failed"])
+        self.assertTrue(current["provider_current_auth_failed"])
+        classes = compose_health_classes(
+            {
+                "TIMEOUT_24h": 1,
+                "HTTP_401_24h": 1,
+                **current,
+            }
+        )
+        self.assertIn("PROVIDER_FAILED", classes)
+        self.assertIn("PROVIDER_AUTH_FAILED", classes)
+
     def test_fail_closed_missing_current_fields_still_use_24h(self) -> None:
         classes = compose_health_classes({"TIMEOUT_24h": 1, "HTTP_5XX_24h": 0})
         self.assertIn("PROVIDER_FAILED", classes)
+        recovered = compose_health_classes(
+            {
+                "TIMEOUT_24h": 1,
+                "provider_current_failed": False,
+                "provider_current_auth_failed": False,
+                "provider_current_rate_limited": False,
+            }
+        )
+        self.assertNotIn("PROVIDER_FAILED", recovered)
 
     def test_transport_and_5xx_are_current_provider_failure(self) -> None:
         for http_class in (HTTP_CLASS_5XX, HTTP_CLASS_TRANSPORT):
@@ -367,9 +417,10 @@ class StorageResidentRunwayTests(unittest.TestCase):
             self.assertGreater(growth, extra // 2)
             projected = int(packet["projected_97d_bytes"])
             sqlite = int(packet["observation_sqlite_bytes"])
-            self.assertGreater(
+            current_resident = RESIDENT_SCIENCE + extra
+            self.assertGreaterEqual(
                 projected,
-                sqlite + RESIDENT_SCIENCE + extra + extra * 50,
+                sqlite + current_resident + extra * 90,
             )
             store.close()
 
@@ -378,6 +429,7 @@ class StorageResidentRunwayTests(unittest.TestCase):
         resident = resident_rdp_bytes(total, OPEN_SPIKE)
         self.assertEqual(resident, total - OPEN_SPIKE)
         self.assertEqual(resident, RESIDENT_SCIENCE + COMPLETED_RESIDENT + LEGACY_RESIDENT)
+        self.assertEqual(resident_rdp_bytes(total, "UNKNOWN"), "UNKNOWN")
 
     def test_s6_physical_disk_critical_unchanged(self) -> None:
         classes = compose_health_classes(
@@ -388,6 +440,7 @@ class StorageResidentRunwayTests(unittest.TestCase):
             }
         )
         self.assertIn("DISK_CRITICAL", classes)
+        self.assertEqual(DISK_CRITICAL_PCT, 85)
 
     def test_s7_target40_hard50_unchanged(self) -> None:
         self.assertEqual(TARGET_BYTES, 40 * 1024**3)
@@ -431,6 +484,11 @@ class StorageResidentRunwayTests(unittest.TestCase):
         self.assertFalse(
             storage_history_sample_blocked(
                 publication_jobs_open_count=0, publication_jobs_open_bytes=0
+            )
+        )
+        self.assertTrue(
+            storage_history_sample_blocked(
+                publication_jobs_open_count="UNKNOWN", publication_jobs_open_bytes=0
             )
         )
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

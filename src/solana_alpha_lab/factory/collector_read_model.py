@@ -76,13 +76,14 @@ def _attempt_kind(http_class: object) -> str:
 def derive_current_provider_state(calls: list[dict[str, Any]]) -> dict[str, bool]:
     """Latest-by-time per primitive; 24h counters stay separate diagnostics.
 
-    A later success on a different primitive cannot clear another primitive.
-    Malformed timestamps never count as success. A malformed failure keeps that
-    primitive conservatively unresolved.
+    Proven recovery is a later same-primitive HTTP_OK only. A later STARTED
+    or unclassified call cannot clear an unresolved failure. A later success
+    on a different primitive cannot clear another primitive. Malformed
+    timestamps never count as success.
     """
 
-    latest_at: dict[str, datetime] = {}
-    latest_kind: dict[str, str] = {}
+    latest_failure_at: dict[str, datetime] = {}
+    latest_failure_kinds: dict[str, set[str]] = {}
     latest_success_at: dict[str, datetime] = {}
     malformed_kinds: dict[str, set[str]] = {}
 
@@ -97,34 +98,30 @@ def derive_current_provider_state(calls: list[dict[str, Any]]) -> dict[str, bool
             if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
                 malformed_kinds.setdefault(primitive, set()).add(kind)
             continue
-        previous_at = latest_at.get(primitive)
-        previous_kind = latest_kind.get(primitive)
-        if previous_at is None or updated > previous_at:
-            latest_at[primitive] = updated
-            latest_kind[primitive] = kind
-        elif updated == previous_at:
-            # Equal timestamps cannot prove recovery.
-            if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
-                latest_kind[primitive] = kind
-            elif previous_kind not in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
-                latest_kind[primitive] = kind
         if kind == _KIND_OK:
             success_at = latest_success_at.get(primitive)
             if success_at is None or updated > success_at:
                 latest_success_at[primitive] = updated
+            continue
+        if kind not in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
+            continue
+        previous_at = latest_failure_at.get(primitive)
+        if previous_at is None or updated > previous_at:
+            latest_failure_at[primitive] = updated
+            latest_failure_kinds[primitive] = {kind}
+        elif updated == previous_at:
+            latest_failure_kinds.setdefault(primitive, set()).add(kind)
 
     auth = False
     rate = False
     failed = False
-    primitives = set(latest_kind) | set(malformed_kinds)
+    primitives = set(latest_failure_kinds) | set(malformed_kinds)
     for primitive in primitives:
         unresolved: set[str] = set(malformed_kinds.get(primitive) or ())
-        kind = latest_kind.get(primitive)
-        attempt_at = latest_at.get(primitive)
+        failure_at = latest_failure_at.get(primitive)
         success_at = latest_success_at.get(primitive)
-        if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED} and attempt_at is not None:
-            if success_at is None or success_at <= attempt_at:
-                unresolved.add(kind)
+        if failure_at is not None and (success_at is None or success_at <= failure_at):
+            unresolved.update(latest_failure_kinds.get(primitive) or ())
         if _KIND_AUTH in unresolved:
             auth = True
         if _KIND_RATE in unresolved:

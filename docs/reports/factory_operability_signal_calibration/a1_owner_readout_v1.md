@@ -6,8 +6,9 @@ Collector operability health is now **recovery-aware**.
 
 - 24h provider counters stay diagnostics.
 - Current `PROVIDER_FAILED` / `PROVIDER_AUTH_FAILED` / `PROVIDER_RATE_LIMITED` follow the **latest outcome per primitive**, by timestamp.
+- Proven recovery is a later same-primitive `HTTP_OK` only. A later `STARTED` or unclassified call cannot clear an unresolved failure.
 - A later success on a **different** primitive cannot hide an unresolved failure.
-- 97d runway uses `resident_rdp_bytes = observation_rdp_bytes - publication_jobs_open_bytes`.
+- 97d runway uses `resident_rdp_bytes = observation_rdp_bytes - publication_jobs_open_bytes` from one filesystem walk.
 - OPEN job bytes count **once** as `staging_peak_bytes`.
 - Daily storage-history sample is skipped while an OPEN publication job exists; the pulse still succeeds.
 

@@ -24,6 +24,7 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
 )
 from solana_alpha_lab.factory.observation_publication_jobs import (
     journal_stats,
+    open_dir,
     project_7d_disk_used,
     rdp_bytes_excluding_publication_jobs,
 )
@@ -157,8 +158,10 @@ def resident_rdp_bytes(
     open_bytes = (
         publication_jobs_open_bytes
         if isinstance(publication_jobs_open_bytes, int)
-        else 0
+        else UNKNOWN
     )
+    if open_bytes is UNKNOWN:
+        return UNKNOWN
     return max(0, observation_rdp_bytes - open_bytes)
 
 
@@ -169,11 +172,46 @@ def storage_history_sample_blocked(
 ) -> bool:
     """Skip persisted growth samples while an OPEN publication job exists."""
 
-    if isinstance(publication_jobs_open_count, int) and publication_jobs_open_count > 0:
+    if not isinstance(publication_jobs_open_count, int) or not isinstance(
+        publication_jobs_open_bytes, int
+    ):
         return True
-    if isinstance(publication_jobs_open_bytes, int) and publication_jobs_open_bytes > 0:
+    if publication_jobs_open_count > 0 or publication_jobs_open_bytes > 0:
         return True
     return False
+
+
+def _rdp_total_and_open_json(path: Path) -> tuple[Any, int, int]:
+    """One filesystem walk: total RDP bytes plus OPEN *.json count/bytes."""
+
+    if not path.exists():
+        return UNKNOWN, 0, 0
+    open_root = open_dir(path)
+    total = 0
+    open_bytes = 0
+    open_count = 0
+    try:
+        files: list[Path]
+        if path.is_file():
+            files = [path]
+        else:
+            files = [child for child in path.rglob("*") if child.is_file() and not child.is_symlink()]
+        for child in files:
+            try:
+                size = int(child.stat().st_size)
+            except OSError:
+                continue
+            total += size
+            try:
+                child.relative_to(open_root)
+            except ValueError:
+                continue
+            if child.suffix == ".json":
+                open_count += 1
+                open_bytes += size
+    except OSError:
+        return UNKNOWN, 0, 0
+    return total, open_count, open_bytes
 
 
 def _tree_bytes(path: Path) -> int | None:
@@ -723,13 +761,12 @@ def build_collector_operational_packet(
         except OSError:
             sqlite_bytes = UNKNOWN
 
-    rdp_bytes: Any = UNKNOWN
-    measured = _tree_bytes(rdp)
-    if measured is not None:
-        rdp_bytes = measured
+    rdp_bytes, open_job_count, open_job_bytes = _rdp_total_and_open_json(rdp)
 
     jobs = journal_stats(rdp)
-    open_job_bytes = int(jobs["publication_jobs_open_bytes"])
+    if not isinstance(rdp_bytes, int):
+        open_job_count = int(jobs["publication_jobs_open_count"])
+        open_job_bytes = int(jobs["publication_jobs_open_bytes"])
     resident_rdp = resident_rdp_bytes(rdp_bytes, open_job_bytes)
     rdp_science_bytes: Any = UNKNOWN
     try:
@@ -846,7 +883,7 @@ def build_collector_operational_packet(
         disk_used_bytes=disk_used,
         sqlite_bytes=sqlite_bytes if isinstance(sqlite_bytes, int) else None,
         rdp_science_bytes=rdp_science_bytes if isinstance(rdp_science_bytes, int) else None,
-        job_open_bytes=int(jobs["publication_jobs_open_bytes"]),
+        job_open_bytes=int(open_job_bytes),
         job_completed_bytes=int(jobs["publication_jobs_completed_bytes"]),
         job_legacy_bytes=int(jobs["publication_jobs_legacy_full_bytes"]),
         elapsed_campaign_days=elapsed_days,
@@ -912,8 +949,8 @@ def build_collector_operational_packet(
         "observation_rdp_bytes": rdp_bytes,
         "observation_rdp_resident_bytes": resident_rdp,
         "observation_rdp_bytes_excluding_publication_jobs": rdp_science_bytes,
-        "publication_jobs_open_count": jobs["publication_jobs_open_count"],
-        "publication_jobs_open_bytes": jobs["publication_jobs_open_bytes"],
+        "publication_jobs_open_count": open_job_count,
+        "publication_jobs_open_bytes": open_job_bytes,
         "publication_jobs_completed_count": jobs["publication_jobs_completed_count"],
         "publication_jobs_completed_bytes": jobs["publication_jobs_completed_bytes"],
         "publication_jobs_legacy_full_count": jobs["publication_jobs_legacy_full_count"],
