@@ -34,13 +34,19 @@ from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
     control_memory_baseline_sha256,
     existing_hfic_lifecycle_fixture_input,
     existing_hfic_packet,
+    representation_probe_identity_sha256,
+    representation_search_key_sha256,
     representation_status,
 )
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (  # noqa: E402
+    DEFAULT_SCHEDULE,
     PACKET_KEY,
     project_normalized_trajectory,
 )
-from solana_alpha_lab.factory.run_passport import canonical_sha256  # noqa: E402
+from solana_alpha_lab.factory.run_passport import (  # noqa: E402
+    canonical_json_bytes,
+    canonical_sha256,
+)
 from solana_alpha_lab.factory.document_runner import repository_git_snapshot  # noqa: E402
 from solana_alpha_lab.factory.hfic_identity import candidate_identity  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import freeze_draft  # noqa: E402
@@ -189,15 +195,61 @@ def _control_receipt() -> dict[str, object]:
 
 
 def _cohort_readiness_receipt(*, yield_eligible: object = 10) -> dict[str, object]:
+    manifest: dict[str, object] = {
+        "schema": "smial.live-cohort-discovery-release",
+        "schema_version": "1.0",
+        "release_id": "",
+        "cohort_id": "COHORT-FIXTURE-001",
+        "sealed_at": "2026-09-01T00:00:00Z",
+        "schedule_sha256": DEFAULT_SCHEDULE.schedule_sha256,
+        "activation_id": "ACTIVATION-FIXTURE-001",
+        "producer_git_sha": "33" * 20,
+        "source_sha256": "44" * 32,
+        "starts_at": "2026-01-01T00:00:00Z",
+        "stops_admitting_at": "2026-01-22T00:00:00Z",
+        "admission_field": "discovery_first_reliable_available_at",
+        "evidence_role": "EXPLORATORY_REUSE",
+        "confirmatory_reuse_forbidden": True,
+        "census_sha256": "55" * 32,
+        "observations_sha256": "66" * 32,
+        "census_row_count": 10,
+        "observation_row_count": 30,
+        "feature_families": [],
+        "yield_eligible": 10,
+        "yield_missing": 0,
+        "readiness_state": "READY_VALID",
+        "discovery_coverage_class": "DISCOVERY_COVERAGE_CONFIRMED",
+        "projection_id": "TOKENS_V2_TYPED_PROJECTION_V1",
+        "projection_version": "1.0",
+    }
+    manifest["release_id"] = canonical_sha256(
+        {
+            "schema": manifest["schema"],
+            "schema_version": manifest["schema_version"],
+            "cohort_id": manifest["cohort_id"],
+            "schedule_sha256": manifest["schedule_sha256"],
+            "activation_id": manifest["activation_id"],
+            "producer_git_sha": manifest["producer_git_sha"],
+            "source_sha256": manifest["source_sha256"],
+            "starts_at": manifest["starts_at"],
+            "stops_admitting_at": manifest["stops_admitting_at"],
+            "admission_field": manifest["admission_field"],
+            "projection_id": manifest["projection_id"],
+            "projection_version": manifest["projection_version"],
+        }
+    )
     base: dict[str, object] = {
         "schema": "smial.normalized-trajectory-v1-readiness-receipt",
         "schema_version": "1.0",
-        "source_kind": "LIVE_COHORT_RELEASE_MANIFEST",
-        "release_id": "LIVE-RELEASE-FIXTURE-001",
-        "manifest_sha256": "11" * 32,
-        "schedule_sha256": "22" * 32,
-        "readiness_state": "READY_VALID",
-        "discovery_coverage_class": "DISCOVERY_COVERAGE_CONFIRMED",
+        "source_kind": "VERIFIED_LIVE_COHORT_RELEASE_READBACK_V1",
+        "readback_verified": True,
+        "readback_verifier": "solana_alpha_lab.factory.live_cohort_discovery_release.verify_live_cohort",
+        "release_manifest": manifest,
+        "release_id": manifest["release_id"],
+        "manifest_sha256": canonical_sha256(manifest),
+        "schedule_sha256": manifest["schedule_sha256"],
+        "readiness_state": manifest["readiness_state"],
+        "discovery_coverage_class": manifest["discovery_coverage_class"],
         "first_fresh_cohort_sealed_verified_imported": True,
         "confirmatory_reuse_forbidden": True,
         "yield_eligible": yield_eligible,
@@ -219,7 +271,9 @@ class HficRepresentationProbeTests(unittest.TestCase):
         self.assertEqual(challenger["control_packet_sha256"], baseline.packet_sha256)
         self.assertEqual(challenger["memory_baseline_sha256"], baseline.memory_baseline_sha256)
         self.assertEqual(challenger["critic_input_packet"], baseline.packet)
-        lifecycle_input = existing_hfic_lifecycle_fixture_input(challenger)
+        lifecycle_input = existing_hfic_lifecycle_fixture_input(
+            challenger, control_receipt=receipt
+        )
         self.assertEqual(lifecycle_input["representation"], challenger[PACKET_KEY])
         self.assertEqual(challenger[PACKET_KEY], challenger["normalized_trajectory_v1"])
         self.assertEqual(existing_hfic_packet(challenger), baseline.packet)
@@ -334,7 +388,42 @@ class HficRepresentationProbeTests(unittest.TestCase):
         drifted = dict(challenger)
         drifted["control_session_id"] = "different-session"
         with self.assertRaises(RepresentationProbeError) as raised:
-            existing_hfic_lifecycle_fixture_input(drifted)
+            existing_hfic_lifecycle_fixture_input(
+                drifted, control_receipt=receipt
+            )
+        self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
+
+    def test_fixture_bridge_rejects_rehashed_outer_baseline_drift(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        challenger = build_challenger_packet(baseline, project_normalized_trajectory([]))
+        drifted = json.loads(json.dumps(challenger))
+        drifted["control_session_id"] = "different-session"
+        drifted["evidence_epoch_sha256"] = "ff" * 32
+        drifted["representation_search_key_sha256"] = representation_search_key_sha256(
+            evidence_epoch_sha256=drifted["evidence_epoch_sha256"],
+            owner_focus=drifted["owner_focus"],
+            prompt_version=drifted["prompt_version"],
+            memory_baseline_sha256=drifted["memory_baseline_sha256"],
+            representation_id=drifted["representation_id"],
+            representation_payload_sha256=drifted["representation_payload_sha256"],
+            control_packet_sha256=drifted["control_packet_sha256"],
+        )
+        drifted["probe_identity_sha256"] = representation_probe_identity_sha256(
+            control_session_id=drifted["control_session_id"],
+            evidence_epoch_sha256=drifted["evidence_epoch_sha256"],
+            representation_id=drifted["representation_id"],
+            representation_search_key=drifted["representation_search_key_sha256"],
+            representation_payload_sha256=drifted["representation_payload_sha256"],
+        )
+        drifted["packet_bytes"] = 0
+        for _ in range(3):
+            drifted["packet_bytes"] = len(canonical_json_bytes(drifted))
+
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_lifecycle_fixture_input(
+                drifted, control_receipt=receipt
+            )
         self.assertEqual(str(raised.exception), INVALID_PROBE_IDENTITY)
 
     def test_runner_up_or_case_a_cannot_create_challenger(self) -> None:
@@ -479,6 +568,25 @@ class RepresentationStatusTests(unittest.TestCase):
         self.assertEqual(
             representation_status(
                 {key: value for key, value in eligible.items() if key != "cohort_readiness_receipt"}
+            )["status"],
+            STATUS_OBSERVABILITY_BLOCKED,
+        )
+
+        tampered_readiness = json.loads(
+            json.dumps(eligible["cohort_readiness_receipt"])
+        )
+        tampered_readiness["release_manifest"]["schedule_sha256"] = "22" * 32
+        tampered_readiness["schedule_sha256"] = "22" * 32
+        tampered_readiness["receipt_sha256"] = canonical_sha256(
+            {
+                key: value
+                for key, value in tampered_readiness.items()
+                if key != "receipt_sha256"
+            }
+        )
+        self.assertEqual(
+            representation_status(
+                {**eligible, "cohort_readiness_receipt": tampered_readiness}
             )["status"],
             STATUS_OBSERVABILITY_BLOCKED,
         )

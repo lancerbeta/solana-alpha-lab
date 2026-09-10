@@ -16,6 +16,7 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from numbers import Real
+from types import MappingProxyType
 from typing import Any
 
 from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
@@ -103,6 +104,15 @@ def _is_positive_finite(value: object) -> bool:
     return math.isfinite(numeric) and numeric > 0.0
 
 
+def _is_finite_numeric(value: object) -> bool:
+    if not _is_typed_numeric(value):
+        return False
+    try:
+        return math.isfinite(float(value))
+    except (TypeError, ValueError, OverflowError):
+        return False
+
+
 def _is_observed_at_cutoff(
     observation: "TypedLifecycleObservation | None",
     *,
@@ -116,7 +126,7 @@ def _is_observed_at_cutoff(
         return False
     if observation.first_reliable_available_at > cutoff:
         return False
-    return observation.value is not None and _is_typed_numeric(observation.value)
+    return observation.value is not None and _is_finite_numeric(observation.value)
 
 
 @dataclass(frozen=True)
@@ -206,10 +216,13 @@ class LifecycleSchedule:
             y_points = value.get("declared_y_due_offset_seconds", DECLARED_Y_POINTS)
         if not isinstance(y_points, (list, tuple)):
             raise NormalizedTrajectoryError("Y_POINTS_INVALID")
+        schedule_id = value.get(
+            "schedule_id", value.get("schedule_key", PREFERRED_SCHEDULE_ID)
+        )
+        if not isinstance(schedule_id, str):
+            raise NormalizedTrajectoryError("SCHEDULE_ID_INVALID")
         return cls(
-            schedule_id=str(
-                value.get("schedule_id", value.get("schedule_key", PREFERRED_SCHEDULE_ID))
-            ),
+            schedule_id=schedule_id,
             x_due_offset_seconds=value.get("x_due_offset_seconds", PREFERRED_X_SECONDS),
             y_due_offset_seconds=tuple(y_points),
             decision_t_due_offset_seconds=value.get(
@@ -273,11 +286,15 @@ class TypedLifecycleObservation:
         field_id = value.get("field_id")
         if member_id is None or anchor is None or due is None or field_id is None:
             raise NormalizedTrajectoryError("OBSERVATION_REQUIRED_FIELD_MISSING")
+        if not isinstance(member_id, str) or not member_id:
+            raise NormalizedTrajectoryError("MEMBER_KEY_INVALID")
+        if not isinstance(field_id, str):
+            raise NormalizedTrajectoryError("FIELD_ID_NOT_ALLOWED")
         return cls(
-            member_id=str(member_id),
+            member_id=member_id,
             member_anchor_at=_parse_datetime("member_anchor_at", anchor, allow_none=False),
             due_offset_seconds=due,
-            field_id=str(field_id),
+            field_id=field_id,
             value=value.get("value"),
             first_reliable_available_at=_parse_datetime(
                 "first_reliable_available_at",
@@ -373,6 +390,24 @@ def _contains_forbidden_output_key(value: object) -> bool:
     return False
 
 
+def _freeze_payload(value: object) -> object:
+    if isinstance(value, Mapping):
+        return MappingProxyType(
+            {key: _freeze_payload(item) for key, item in value.items()}
+        )
+    if isinstance(value, (list, tuple)):
+        return tuple(_freeze_payload(item) for item in value)
+    return value
+
+
+def _thaw_payload(value: object) -> object:
+    if isinstance(value, Mapping):
+        return {key: _thaw_payload(item) for key, item in value.items()}
+    if isinstance(value, tuple):
+        return [_thaw_payload(item) for item in value]
+    return value
+
+
 @dataclass(frozen=True)
 class NormalizedTrajectoryRepresentation:
     """Immutable view over the anonymous representation payload."""
@@ -388,7 +423,10 @@ class NormalizedTrajectoryRepresentation:
             raise NormalizedTrajectoryError("REPRESENTATION_CONSTRUCTION_FORBIDDEN")
         if not isinstance(self._base_payload, Mapping):
             raise NormalizedTrajectoryError("REPRESENTATION_PAYLOAD_INVALID")
-        payload = deepcopy(dict(self._base_payload))
+        thawed = _thaw_payload(self._base_payload)
+        if not isinstance(thawed, Mapping):
+            raise NormalizedTrajectoryError("REPRESENTATION_PAYLOAD_INVALID")
+        payload = deepcopy(dict(thawed))
         if _contains_forbidden_output_key(payload) or "payload_sha256" in payload:
             raise NormalizedTrajectoryError("IDENTITY_LEAK_IN_REPRESENTATION")
         payload_sha256 = canonical_sha256(payload)
@@ -397,16 +435,20 @@ class NormalizedTrajectoryRepresentation:
             and self._sealed_payload_sha256 != payload_sha256
         ):
             raise NormalizedTrajectoryError("REPRESENTATION_PROVENANCE_DRIFT")
-        object.__setattr__(self, "_base_payload", payload)
+        object.__setattr__(self, "_base_payload", _freeze_payload(payload))
         object.__setattr__(self, "_sealed_payload_sha256", payload_sha256)
 
     @property
     def payload_sha256(self) -> str:
-        return canonical_sha256(self._base_payload)
+        assert self._sealed_payload_sha256 is not None
+        return self._sealed_payload_sha256
 
     @property
     def payload(self) -> dict[str, Any]:
-        payload = deepcopy(dict(self._base_payload))
+        thawed = _thaw_payload(self._base_payload)
+        if not isinstance(thawed, dict):
+            raise NormalizedTrajectoryError("REPRESENTATION_PAYLOAD_INVALID")
+        payload = thawed
         payload["payload_sha256"] = self.payload_sha256
         return payload
 

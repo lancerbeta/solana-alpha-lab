@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import sys
 import unittest
 from datetime import UTC, datetime, timedelta
@@ -149,6 +150,42 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         self.assertEqual(projected.payload["histogram"][0]["motif"]["VOLUME"], "M-M")
         self.assertNotIn("VOLUME_BUY", projected.payload["histogram"][0]["motif"])
 
+    def test_nonfinite_taker_is_unavailable_and_allows_buy_sell_fallback(self) -> None:
+        rows = []
+        rows.extend(_series("synthetic-a", "PRICE", (1.0, 2.0, 3.0)))
+        rows.extend(_series("synthetic-a", "LIQUIDITY", (1.0, 1.0, 1.0)))
+        rows.extend(_series("synthetic-a", "TRADERS", (1.0, 1.0, 1.0)))
+        rows.extend(_series("synthetic-a", "VOLUME", (math.nan, math.inf, -math.inf)))
+        rows.extend(_series("synthetic-a", "VOLUME_BUY", (5.0, 6.0, 7.0)))
+        rows.extend(_series("synthetic-a", "VOLUME_SELL", (4.0, 4.0, 5.0)))
+
+        projected = project_normalized_trajectory(rows)
+
+        self.assertEqual(
+            projected.payload["volume_mode"],
+            "ACTIVITY_VOLUME_OBSERVED_BUY_PLUS_SELL",
+        )
+        self.assertIn("VOLUME_BUY", projected.payload["field_ids"])
+        self.assertNotIn("VOLUME", projected.payload["field_ids"])
+
+    def test_mapping_identity_fields_are_not_coerced(self) -> None:
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            TypedLifecycleObservation.from_mapping(
+                {
+                    "member_id": 7,
+                    "member_anchor_at": ANCHOR,
+                    "due_offset_seconds": 300,
+                    "field_id": FIELD_IDS["PRICE"],
+                    "value": 1.0,
+                    "first_reliable_available_at": ANCHOR,
+                }
+            )
+        self.assertEqual(str(raised.exception), "MEMBER_KEY_INVALID")
+
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            LifecycleSchedule.from_mapping({"schedule_id": 7})
+        self.assertEqual(str(raised.exception), "SCHEDULE_ID_INVALID")
+
     def test_schedule_x_900_is_insufficient_prefix(self) -> None:
         with self.assertRaises(NormalizedTrajectoryError) as raised:
             LifecycleSchedule(x_due_offset_seconds=900)
@@ -183,6 +220,14 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         self.assertEqual(
             str(raised.exception), "REPRESENTATION_CONSTRUCTION_FORBIDDEN"
         )
+
+    def test_representation_payload_is_recursively_immutable(self) -> None:
+        projected = project_normalized_trajectory([])
+        with self.assertRaises(TypeError):
+            projected._base_payload["histogram"] = ()  # type: ignore[index]
+        with self.assertRaises(TypeError):
+            projected._base_payload["schedule"]["schedule_id"] = "drift"  # type: ignore[index]
+        self.assertEqual(projected.payload["schedule"]["schedule_id"], DEFAULT_SCHEDULE.schedule_id)
 
     def test_histogram_is_bounded_and_m_heavy_tuples_are_allowed(self) -> None:
         rows: list[TypedLifecycleObservation] = []

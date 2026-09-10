@@ -10905,6 +10905,11 @@
     {
       "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
       "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001"
     },
     {

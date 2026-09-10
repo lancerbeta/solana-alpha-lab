@@ -87,8 +87,19 @@ Eligibility also requires a hash-bound
 `smial.normalized-trajectory-v1-readiness-receipt` from the existing verified
 cohort-release readback plane. Raw caller fields such as `cohort_ready`,
 `readiness`, or `yield_eligible` are not trusted; a missing, malformed, or
-drifted receipt returns `OBSERVABILITY_BLOCKED`. The status surface does not
-open the cohort, read scientific values, or verify a release at runtime.
+drifted receipt returns `OBSERVABILITY_BLOCKED`. The receipt must carry the
+complete `smial.live-cohort-discovery-release` manifest, its canonical
+manifest hash, the release-id recomputed by the existing release owner, and
+the frozen V1 schedule hash. This keeps eligibility anchored to a verified
+release readback instead of a caller-supplied readiness summary. The status
+surface does not open the cohort, read scientific values, or verify a release
+at runtime.
+
+`REPRESENTATION_PROBE_COMPLETE` is reserved for a separate runtime readback
+receipt. That receipt must bind the execution result hash, CONTROL/epoch
+identity, representation identity, and an explicit readback verifier contract;
+an arbitrary `execution_result_sha256` or `probe_executed` flag is never
+sufficient. This atom supplies no such receipt and does not execute the probe.
 
 ## Rollback and non-claims
 

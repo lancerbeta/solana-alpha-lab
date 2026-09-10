@@ -33,6 +33,14 @@ from solana_alpha_lab.factory.early_market_panel_importer import (
 )
 from solana_alpha_lab.factory.hfic_preflight import MAX_PACKET_BYTES
 from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION
+from solana_alpha_lab.factory.live_cohort_discovery_release import (
+    LIVE_EVIDENCE_ROLE,
+    PROJECTION_ID,
+    PROJECTION_VERSION,
+    RELEASE_SCHEMA,
+    RELEASE_SCHEMA_VERSION,
+    _release_id_for,
+)
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     ALLOWED_X_POINTS,
     DECISION_T_DUE_OFFSET_SECONDS,
@@ -41,6 +49,7 @@ from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     MIN_MOTIF_STEPS,
     PACKET_KEY,
     PREFERRED_SCHEDULE_ID,
+    DEFAULT_SCHEDULE,
     REPRESENTATION_ID,
     REPRESENTATION_VERSION,
     NormalizedTrajectoryRepresentation,
@@ -126,6 +135,9 @@ _COHORT_READINESS_RECEIPT_KEYS = {
     "schema",
     "schema_version",
     "source_kind",
+    "readback_verified",
+    "readback_verifier",
+    "release_manifest",
     "release_id",
     "manifest_sha256",
     "schedule_sha256",
@@ -136,6 +148,57 @@ _COHORT_READINESS_RECEIPT_KEYS = {
     "yield_eligible",
     "receipt_sha256",
 }
+_LIVE_RELEASE_MANIFEST_KEYS = {
+    "schema",
+    "schema_version",
+    "release_id",
+    "cohort_id",
+    "sealed_at",
+    "schedule_sha256",
+    "activation_id",
+    "producer_git_sha",
+    "source_sha256",
+    "starts_at",
+    "stops_admitting_at",
+    "admission_field",
+    "evidence_role",
+    "confirmatory_reuse_forbidden",
+    "census_sha256",
+    "observations_sha256",
+    "census_row_count",
+    "observation_row_count",
+    "feature_families",
+    "yield_eligible",
+    "yield_missing",
+    "readiness_state",
+    "discovery_coverage_class",
+    "projection_id",
+    "projection_version",
+}
+_EXECUTION_RECEIPT_KEYS = {
+    "schema",
+    "schema_version",
+    "source_kind",
+    "readback_verified",
+    "readback_verifier",
+    "probe_state",
+    "probe_executed",
+    "execution_terminal",
+    "control_session_id",
+    "evidence_epoch_sha256",
+    "control_packet_sha256",
+    "memory_baseline_sha256",
+    "representation_payload_sha256",
+    "representation_search_key_sha256",
+    "probe_identity_sha256",
+    "execution_result",
+    "execution_result_sha256",
+    "receipt_sha256",
+}
+_EXECUTION_READBACK_SOURCE_KIND = "REPRESENTATION_PROBE_RUNTIME_READBACK_V1"
+_EXECUTION_READBACK_VERIFIER = (
+    "solana_alpha_lab.factory.hfic_representation_probe.runtime_readback"
+)
 
 
 class RepresentationProbeError(ValueError):
@@ -409,6 +472,21 @@ def _validate_control_receipt_contract(
             raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
     if session_receipt.get("critic_input_packet_sha256") != canonical_sha256(packet):
         raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    for packet_key, receipt_key in (
+        ("session_id", "session_id"),
+        ("evidence_epoch_sha256", "evidence_epoch_sha256"),
+        ("generator_prompt_version", "prompt_version"),
+        ("focus_key_sha256", "focus_key_sha256"),
+        ("search_key_sha256", "search_key_sha256"),
+        ("memory_eligibility_sha256", "memory_eligibility_sha256"),
+    ):
+        packet_value = packet.get(packet_key)
+        if packet_value is not None and packet_value != receipt.get(receipt_key):
+            raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    for key in ("focus_key_sha256", "search_key_sha256"):
+        nested_value = session_receipt.get(key)
+        if nested_value is not None and nested_value != receipt.get(key):
+            raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
     if session_receipt.get("evidence_surface_mode") != CURRENT_REPRESENTATION_CONTROL_V1:
         raise RepresentationProbeError(INVALID_CONTROL_MODE)
     if session_receipt.get("final_session_terminal") != receipt.get(
@@ -417,25 +495,119 @@ def _validate_control_receipt_contract(
         raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
 
 
-def _validate_cohort_readiness_receipt(value: object) -> dict[str, Any]:
+def _validate_live_cohort_release_manifest(
+    value: object,
+    *,
+    expected_schedule_sha256: str,
+) -> dict[str, Any]:
+    if not isinstance(value, Mapping) or set(value) != _LIVE_RELEASE_MANIFEST_KEYS:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    manifest = deepcopy(dict(value))
+    if (
+        manifest["schema"] != RELEASE_SCHEMA
+        or manifest["schema_version"] != RELEASE_SCHEMA_VERSION
+        or not isinstance(manifest["cohort_id"], str)
+        or not manifest["cohort_id"].strip()
+        or not isinstance(manifest["sealed_at"], str)
+        or not manifest["sealed_at"].strip()
+        or not isinstance(manifest["activation_id"], str)
+        or not manifest["activation_id"].strip()
+        or not isinstance(manifest["starts_at"], str)
+        or not manifest["starts_at"].strip()
+        or not isinstance(manifest["stops_admitting_at"], str)
+        or not manifest["stops_admitting_at"].strip()
+        or manifest["admission_field"] != "discovery_first_reliable_available_at"
+        or manifest["evidence_role"] != LIVE_EVIDENCE_ROLE
+        or manifest["confirmatory_reuse_forbidden"] is not True
+        or manifest["readiness_state"]
+        not in {"READY_VALID", "READY_VALID_WITH_COVERAGE_LIMITATION"}
+        or not isinstance(manifest["discovery_coverage_class"], str)
+        or not manifest["discovery_coverage_class"].strip()
+        or manifest["projection_id"] != PROJECTION_ID
+        or manifest["projection_version"] != PROJECTION_VERSION
+        or not isinstance(manifest["feature_families"], list)
+    ):
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    for name in (
+        "schedule_sha256",
+        "source_sha256",
+        "census_sha256",
+        "observations_sha256",
+    ):
+        _hash64(name, manifest[name])
+    producer_git_sha = manifest["producer_git_sha"]
+    if (
+        not isinstance(producer_git_sha, str)
+        or len(producer_git_sha) != 40
+        or any(char not in "0123456789abcdef" for char in producer_git_sha)
+    ):
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    if manifest["schedule_sha256"] != expected_schedule_sha256:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    for name in (
+        "census_row_count",
+        "observation_row_count",
+        "yield_eligible",
+        "yield_missing",
+    ):
+        if (
+            isinstance(manifest[name], bool)
+            or not isinstance(manifest[name], int)
+            or manifest[name] < 0
+        ):
+            raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    expected_release_id = _release_id_for(
+        {
+            "schedule_sha256": manifest["schedule_sha256"],
+            "activation_id": manifest["activation_id"],
+            "producer_git_sha": manifest["producer_git_sha"],
+            "source_sha256": manifest["source_sha256"],
+            "starts_at": manifest["starts_at"],
+            "stops_admitting_at": manifest["stops_admitting_at"],
+        },
+        manifest["cohort_id"],
+    )
+    if manifest["release_id"] != expected_release_id:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    return manifest
+
+
+def _validate_cohort_readiness_receipt(
+    value: object,
+    *,
+    expected_schedule_sha256: str = DEFAULT_SCHEDULE.schedule_sha256,
+) -> dict[str, Any]:
     if not isinstance(value, Mapping) or set(value) != _COHORT_READINESS_RECEIPT_KEYS:
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
     receipt = deepcopy(dict(value))
     if (
         receipt["schema"] != "smial.normalized-trajectory-v1-readiness-receipt"
         or receipt["schema_version"] != "1.0"
-        or receipt["source_kind"] != "LIVE_COHORT_RELEASE_MANIFEST"
-        or not isinstance(receipt["release_id"], str)
-        or not receipt["release_id"].strip()
-        or receipt["readiness_state"]
-        not in {"READY_VALID", "READY_VALID_WITH_COVERAGE_LIMITATION"}
-        or not isinstance(receipt["discovery_coverage_class"], str)
-        or not receipt["discovery_coverage_class"].strip()
+        or receipt["source_kind"] != "VERIFIED_LIVE_COHORT_RELEASE_READBACK_V1"
+        or receipt["readback_verified"] is not True
+        or receipt["readback_verifier"]
+        != "solana_alpha_lab.factory.live_cohort_discovery_release.verify_live_cohort"
         or receipt["first_fresh_cohort_sealed_verified_imported"] is not True
         or receipt["confirmatory_reuse_forbidden"] is not True
         or isinstance(receipt["yield_eligible"], bool)
         or not isinstance(receipt["yield_eligible"], int)
         or receipt["yield_eligible"] < 0
+    ):
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    manifest = _validate_live_cohort_release_manifest(
+        receipt["release_manifest"],
+        expected_schedule_sha256=expected_schedule_sha256,
+    )
+    if (
+        receipt["release_id"] != manifest["release_id"]
+        or receipt["schedule_sha256"] != manifest["schedule_sha256"]
+        or receipt["readiness_state"] != manifest["readiness_state"]
+        or receipt["discovery_coverage_class"]
+        != manifest["discovery_coverage_class"]
+        or receipt["confirmatory_reuse_forbidden"]
+        != manifest["confirmatory_reuse_forbidden"]
+        or receipt["yield_eligible"] != manifest["yield_eligible"]
+        or receipt["manifest_sha256"] != canonical_sha256(manifest)
     ):
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
     _hash64("manifest_sha256", receipt["manifest_sha256"])
@@ -700,9 +872,11 @@ def build_challenger_packet(
     payload = _representation_payload(representation)
     payload_sha256 = payload.get("payload_sha256")
     _hash64("representation_payload_sha256", payload_sha256)
-    bound_focus = str(
-        baseline.packet.get("owner_focus", baseline.focus_key_sha256 or "CONTROL")
+    bound_focus = baseline.packet.get(
+        "owner_focus", baseline.focus_key_sha256 or "CONTROL"
     )
+    if not isinstance(bound_focus, str) or not bound_focus.strip():
+        raise RepresentationProbeError(INVALID_CONTROL_FOCUS)
     if owner_focus is not None and owner_focus != bound_focus:
         raise RepresentationProbeError(INVALID_CONTROL_FOCUS)
     focus = bound_focus
@@ -878,8 +1052,37 @@ def existing_hfic_packet(challenger_packet: Mapping[str, Any]) -> dict[str, Any]
     return deepcopy(dict(validated["critic_input_packet"]))
 
 
+def _assert_challenger_bound_to_control(
+    challenger: Mapping[str, Any], baseline: ControlBaseline
+) -> None:
+    expected = {
+        "control_session_id": baseline.session_id,
+        "evidence_epoch_sha256": baseline.evidence_epoch_sha256,
+        "control_packet_sha256": baseline.packet_sha256,
+        "memory_baseline_sha256": baseline.memory_baseline_sha256,
+        "memory_eligibility_sha256": baseline.memory_eligibility_sha256,
+        "prompt_version": baseline.prompt_version,
+    }
+    for key, expected_value in expected.items():
+        if challenger.get(key) != expected_value:
+            raise RepresentationProbeError(
+                INVALID_EVIDENCE_EPOCH_MISMATCH
+                if key == "evidence_epoch_sha256"
+                else INVALID_PROBE_IDENTITY
+            )
+    expected_focus = baseline.packet.get(
+        "owner_focus", baseline.focus_key_sha256 or "CONTROL"
+    )
+    if challenger.get("owner_focus") != expected_focus:
+        raise RepresentationProbeError(INVALID_CONTROL_FOCUS)
+    if challenger.get("critic_input_packet") != baseline.packet:
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+
+
 def existing_hfic_lifecycle_fixture_input(
     challenger_packet: Mapping[str, Any],
+    *,
+    control_receipt: Mapping[str, Any],
 ) -> dict[str, Any]:
     """Bridge the outer dormant envelope into the unchanged HFIC fixture seam.
 
@@ -889,6 +1092,8 @@ def existing_hfic_lifecycle_fixture_input(
     """
 
     validated, representation = _validate_challenger_packet(challenger_packet)
+    baseline = control_baseline_from_receipt(control_receipt)
+    _assert_challenger_bound_to_control(validated, baseline)
     packet = existing_hfic_packet(validated)
     return {
         "lifecycle_mode": REPRESENTATION_PROBE_KIND,
@@ -965,31 +1170,44 @@ def _status_probe_identity_reason(
         return INVALID_PROBE_IDENTITY
     if receipt.get("representation_packet_key") != PACKET_KEY:
         return INVALID_PROBE_IDENTITY
-    if require_execution:
-        if (
-            receipt.get("probe_state") != "EXECUTED"
-            or receipt.get("probe_executed") is not True
-            or receipt.get("execution_terminal") != "REPRESENTATION_PROBE_EXECUTED"
-        ):
-            return INVALID_PROBE_IDENTITY
-        try:
-            _hash64(
-                "execution_result_sha256", receipt.get("execution_result_sha256")
-            )
-        except RepresentationProbeError:
-            return INVALID_PROBE_IDENTITY
-    elif receipt.get("probe_state") not in {"DORMANT_PACKET_ONLY", "REGISTERED"}:
+    challenger_keys = {
+        "packet_schema",
+        "packet_version",
+        "probe_kind",
+        "probe_state",
+        "representation_id",
+        "representation_packet_key",
+        "control_session_id",
+        "evidence_epoch_sha256",
+        "control_packet_sha256",
+        "memory_baseline_sha256",
+        "memory_eligibility_sha256",
+        "owner_focus",
+        "representation_payload_sha256",
+        "prompt_version",
+        "representation_search_key_sha256",
+        "probe_identity_sha256",
+        "ordinary_search_budget_unchanged",
+        "max_challenger_runs_per_representation_control_epoch",
+        "max_packet_bytes",
+        "critic_input_packet",
+        PACKET_KEY,
+        "non_claims",
+        "packet_bytes",
+    }
+    if not challenger_keys.issubset(receipt):
         return INVALID_PROBE_IDENTITY
     try:
-        representation = _validate_serialized_representation_payload(
-            receipt[PACKET_KEY]
+        validated_challenger, representation = _validate_challenger_packet(
+            {key: receipt[key] for key in challenger_keys}
         )
+        _assert_challenger_bound_to_control(validated_challenger, baseline)
+        if receipt.get("probe_state") not in {"DORMANT_PACKET_ONLY", "REGISTERED"}:
+            return INVALID_PROBE_IDENTITY
         payload_sha256 = representation["payload_sha256"]
         expected_search_key = representation_search_key_sha256(
             evidence_epoch_sha256=baseline.evidence_epoch_sha256,
-            owner_focus=str(
-                baseline.packet.get("owner_focus", baseline.focus_key_sha256 or "CONTROL")
-            ),
+            owner_focus=validated_challenger["owner_focus"],
             prompt_version=baseline.prompt_version,
             memory_baseline_sha256=baseline.memory_baseline_sha256,
             representation_id=REPRESENTATION_ID,
@@ -1016,7 +1234,66 @@ def _status_probe_identity_reason(
     }.items():
         if receipt.get(key) != expected:
             return INVALID_PROBE_IDENTITY
+    if require_execution:
+        try:
+            execution = _validate_execution_receipt(
+                receipt.get("execution_receipt"),
+                baseline=baseline,
+                representation_payload_sha256=payload_sha256,
+                representation_search_key_sha256=expected_search_key,
+                probe_identity_sha256=expected_identity,
+            )
+        except (KeyError, RepresentationProbeError):
+            return INVALID_PROBE_IDENTITY
+        if execution["probe_state"] != "EXECUTED":
+            return INVALID_PROBE_IDENTITY
     return None
+
+
+def _validate_execution_receipt(
+    value: object,
+    *,
+    baseline: ControlBaseline,
+    representation_payload_sha256: str,
+    representation_search_key_sha256: str,
+    probe_identity_sha256: str,
+) -> dict[str, Any]:
+    if not isinstance(value, Mapping) or set(value) != _EXECUTION_RECEIPT_KEYS:
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    receipt = deepcopy(dict(value))
+    if (
+        receipt["schema"] != "smial.normalized-trajectory-v1-execution-receipt"
+        or receipt["schema_version"] != "1.0"
+        or receipt["source_kind"] != _EXECUTION_READBACK_SOURCE_KIND
+        or receipt["readback_verified"] is not True
+        or receipt["readback_verifier"] != _EXECUTION_READBACK_VERIFIER
+        or receipt["probe_state"] != "EXECUTED"
+        or receipt["probe_executed"] is not True
+        or receipt["execution_terminal"] != "REPRESENTATION_PROBE_EXECUTED"
+    ):
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    for key, expected in {
+        "control_session_id": baseline.session_id,
+        "evidence_epoch_sha256": baseline.evidence_epoch_sha256,
+        "control_packet_sha256": baseline.packet_sha256,
+        "memory_baseline_sha256": baseline.memory_baseline_sha256,
+        "representation_payload_sha256": representation_payload_sha256,
+        "representation_search_key_sha256": representation_search_key_sha256,
+        "probe_identity_sha256": probe_identity_sha256,
+    }.items():
+        if receipt[key] != expected:
+            raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    result = receipt["execution_result"]
+    if not isinstance(result, Mapping) or _contains_key(result, _FORBIDDEN_CONTROL_KEYS) or _contains_key(result, _FORBIDDEN_IDENTITY_KEYS):
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    if receipt["execution_result_sha256"] != canonical_sha256(result):
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    _hash64("execution_result_sha256", receipt["execution_result_sha256"])
+    _hash64("receipt_sha256", receipt["receipt_sha256"])
+    base = {key: item for key, item in receipt.items() if key != "receipt_sha256"}
+    if receipt["receipt_sha256"] != canonical_sha256(base):
+        raise RepresentationProbeError(INVALID_PROBE_IDENTITY)
+    return receipt
 
 
 def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
