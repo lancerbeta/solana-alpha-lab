@@ -45,6 +45,9 @@ managed_write_set:
   - docs/FACTORY_SEMANTIC_MAP.md
   - docs/PROJECT_MAP.md
   - docs/OPERATOR_NAVIGATION.md
+  - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_completion_evidence_v1.json
+  - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_independent_review_v1.json
+  - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_factory_fit_v1.json
 
 external_caps:
   network: false
@@ -76,6 +79,7 @@ context_requirements:
   l2_roles:
     - LIFECYCLE
     - ARCHITECTURE_DECISIONS
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
@@ -84,7 +88,10 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS:
       - CONFIG-HYPOTHESIS-FORGE-INDEPENDENT-CRITIC-001
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_independent_review_v1.json
+      - docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
   exact_role_paths:
     LIFECYCLE:

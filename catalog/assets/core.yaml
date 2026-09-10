@@ -36657,7 +36657,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY.md', repository_path: docs/tasks/LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY.md}
-  integrity: {kind: sha256, sha256: c714aa02ec3b082a240651c027e51ec51a32d24bd97ea231be85d7b9a9f8404c}
+  integrity: {kind: sha256, sha256: e3047a157c76f6fcfe28bdf235414fc2eef5b6a2be0e9813e1a38b1d254b201c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001}

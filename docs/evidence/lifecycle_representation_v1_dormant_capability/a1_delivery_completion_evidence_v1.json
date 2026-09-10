@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-COMPLETION-001",
+  "as_of": "2026-09-10",
+  "task_id": "LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY",
+  "state_change": "IMPLEMENTED_DORMANT_NOT_EXECUTED",
+  "base_main": "9bb972b56da3f24fc796262f09669ac5895ad1ef",
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING_BIND_EVIDENCE",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LIFECYCLE_REPRESENTATION_DORMANT_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING_BIND_EVIDENCE",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CATALOG_SYNC",
+      "PASS_CATALOG_SEMANTIC_VALIDATION",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH",
+      "PASS_FOCUSED_SYNTHETIC_FIXTURE_SUITE",
+      "PASS_EXACT_HEAD_CI_34521591832"
+    ]
+  },
+  "non_claims": [
+    "NO_CONTROL_EXECUTION",
+    "NO_CHALLENGER_EXECUTION",
+    "NO_NORMALIZED_TRAJECTORY_V1_RUNTIME_EXECUTION",
+    "NO_CURRENT_COHORT_SCIENCE",
+    "NO_ALPHA_OR_SCIENTIFIC_PASS",
+    "NO_COLLECTOR_OBSERVATION_SCHEDULE_SEAL_VERIFY_IMPORT_CHANGE",
+    "NO_PROVIDER_CALLS",
+    "NO_DEPLOYMENT_OR_VPS",
+    "NO_ORDINARY_FORGE_BUDGET_OR_BEHAVIOR_CHANGE",
+    "NO_GENERIC_REPRESENTATION_FRAMEWORK",
+    "NO_INTERPOLATION_IMPUTATION_OR_FUTURE_NORMALIZATION",
+    "NO_MINT_IDENTITIES_IN_FORGE_REPRESENTATION",
+    "NO_RUNTIME_DURABLE_REGISTRY_CLAIM"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "generator_code_added": 0,
+    "new_db": 0
+  }
+}

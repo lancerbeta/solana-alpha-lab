@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-FACTORY-FIT-001",
+  "as_of": "2026-09-10",
+  "task_id": "LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY",
+  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_DORMANT_VERTICAL_SLICE_ONLY",
+    "flexibility_and_history": "PASS_EXISTING_HFIC_FIXTURE_NO_NEW_FRAMEWORK",
+    "context_efficiency": "PASS_EXISTING_SEM_HYPOTHESIS_FORGE_OWNER_ROUTE",
+    "research_truth": "PASS_FROZEN_PIT_MISSINGNESS_AND_SYNTHETIC_BOUNDARY",
+    "owner_operability": "PASS_READ_ONLY_STATUS_AND_FAIL_CLOSED_DRIFT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_PROBE_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT_NO_RUNTIME_TOUCH",
+    "build_vs_buy": "PASS_REUSES_NORMALIZED_TRAJECTORY_AND_EXISTING_HFIC_SEAM",
+    "security": "PASS_NO_SECRETS_PROVIDERS_OR_COHORT_VALUES",
+    "red_team": "PASS_CONTROL_BASELINE_AND_ONE_RUN_IDENTITY_BOUND"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FRESH_CONTROL_REQUIRED_BEFORE_ANY_FUTURE_PROBE"
+  },
+  "recovery": "Revert the bounded implementation, contract and Catalog changes; do not touch collector, ObservationSchedule, seal, verify, import, runtime, VPS or cohort state.",
+  "limits": [
+    "NO_CONTROL_EXECUTION",
+    "NO_CHALLENGER_EXECUTION",
+    "NO_CURRENT_COHORT_SCIENCE",
+    "NO_COLLECTOR_OR_SCHEDULE_CHANGE",
+    "NO_SEAL_VERIFY_IMPORT_CHANGE",
+    "NO_PROVIDER_OR_DEPLOYMENT",
+    "NO_ORDINARY_FORGE_CHANGE",
+    "NO_ALPHA",
+    "NO_RUNTIME_PROBE_REGISTRATION"
+  ]
+}
