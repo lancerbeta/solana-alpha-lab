@@ -1,0 +1,191 @@
+from __future__ import annotations
+
+import json
+import sys
+import unittest
+from datetime import UTC, datetime, timedelta
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from solana_alpha_lab.factory.normalized_trajectory_v1 import (  # noqa: E402
+    DEFAULT_SCHEDULE,
+    FIELD_IDS,
+    LifecycleSchedule,
+    NormalizedTrajectoryError,
+    TypedLifecycleObservation,
+    project_normalized_trajectory,
+)
+
+
+ANCHOR = datetime(2026, 1, 1, tzinfo=UTC)
+
+
+def _row(
+    member: str,
+    due: int,
+    field: str,
+    value: object | None,
+    *,
+    observed: bool = True,
+    available_at: datetime | None = None,
+) -> TypedLifecycleObservation:
+    return TypedLifecycleObservation(
+        member_id=member,
+        member_anchor_at=ANCHOR,
+        due_offset_seconds=due,
+        field_id=FIELD_IDS[field],
+        value=value,
+        first_reliable_available_at=(
+            ANCHOR + timedelta(seconds=due)
+            if available_at is None and observed
+            else available_at
+        ),
+        observed=observed,
+    )
+
+
+def _series(member: str, field: str, values: tuple[object | None, ...]) -> list[TypedLifecycleObservation]:
+    rows: list[TypedLifecycleObservation] = []
+    for due, value in zip(DEFAULT_SCHEDULE.prefix_due_offsets, values, strict=True):
+        rows.append(_row(member, due, field, value, observed=value is not None))
+    return rows
+
+
+class NormalizedTrajectoryProjectionTests(unittest.TestCase):
+    def test_pit_missing_volume_fallback_and_future_are_deterministic(self) -> None:
+        rows = []
+        rows.extend(_series("mint-a", "PRICE", (1.0, 2.0, 1.0)))
+        rows.extend(_series("mint-a", "LIQUIDITY", (10.0, 10.0, 5.0)))
+        rows.extend(_series("mint-a", "VOLUME", (3.0, 4.0, 2.0)))
+        rows.extend(_series("mint-a", "TRADERS", (1.0, 2.0, 2.0)))
+
+        rows.extend(_series("mint-b", "PRICE", (1.0, None, 2.0)))
+        rows.extend(_series("mint-b", "LIQUIDITY", (8.0, 8.0, 8.0)))
+        rows.extend(_series("mint-b", "VOLUME", (1.0, None, 2.0)))
+        rows.extend(_series("mint-b", "TRADERS", (2.0, 1.0, 1.0)))
+        rows.append(_row("mint-b", 3600, "PRICE", 999999.0))
+
+        projected = project_normalized_trajectory(rows)
+        reversed_projected = project_normalized_trajectory(list(reversed(rows)))
+        self.assertEqual(projected.payload, reversed_projected.payload)
+        self.assertEqual(projected.payload["eligible_member_count"], 2)
+        self.assertEqual(projected.payload["volume_mode"], "TAKER_OBSERVED")
+        self.assertEqual(projected.payload["histogram_member_count"], 2)
+        rendered = json.dumps(projected.payload, sort_keys=True)
+        self.assertNotIn("mint-a", rendered)
+        self.assertNotIn("mint-b", rendered)
+        self.assertNotIn("999999", rendered)
+        motifs = [item["motif"] for item in projected.payload["histogram"]]
+        self.assertIn(
+            {
+                "PRICE": "U-D",
+                "LIQUIDITY": "F-D",
+                "VOLUME": "U-D",
+                "TRADERS": "U-F",
+            },
+            motifs,
+        )
+        self.assertTrue(projected.payload_sha256)
+        self.assertEqual(projected.payload["payload_sha256"], projected.payload_sha256)
+
+    def test_missing_stays_missing_and_buy_sell_are_not_summed(self) -> None:
+        rows = []
+        rows.extend(_series("synthetic-a", "PRICE", (1.0, None, 2.0)))
+        rows.extend(_series("synthetic-a", "LIQUIDITY", (2.0, 3.0, 4.0)))
+        rows.extend(_series("synthetic-a", "TRADERS", (1.0, 1.0, 2.0)))
+        rows.extend(_series("synthetic-a", "VOLUME_BUY", (5.0, 7.0, 6.0)))
+        rows.extend(_series("synthetic-a", "VOLUME_SELL", (4.0, 4.0, 8.0)))
+        projected = project_normalized_trajectory(rows)
+        self.assertEqual(
+            projected.payload["volume_mode"],
+            "ACTIVITY_VOLUME_OBSERVED_BUY_PLUS_SELL",
+        )
+        motif = projected.payload["histogram"][0]["motif"]
+        self.assertEqual(motif["PRICE"], "M-M")
+        self.assertEqual(motif["VOLUME_BUY"], "U-D")
+        self.assertEqual(motif["VOLUME_SELL"], "F-U")
+        self.assertNotIn("VOLUME", motif)
+
+    def test_invalid_and_late_values_emit_m_without_dropping_slots(self) -> None:
+        rows = []
+        rows.extend(_series("synthetic-a", "PRICE", (0.0, 2.0, 3.0)))
+        rows.extend(_series("synthetic-a", "LIQUIDITY", (1.0, 2.0, 3.0)))
+        rows.extend(_series("synthetic-a", "TRADERS", (1.0, 1.0, 1.0)))
+        rows.append(
+            _row(
+                "synthetic-a",
+                300,
+                "VOLUME",
+                1.0,
+                available_at=ANCHOR + timedelta(seconds=1801),
+            )
+        )
+        rows.append(_row("synthetic-a", 900, "VOLUME", 2.0))
+        rows.append(_row("synthetic-a", 1800, "VOLUME", 3.0))
+        projected = project_normalized_trajectory(rows)
+        motif = projected.payload["histogram"][0]["motif"]
+        self.assertEqual(motif["PRICE"], "M-U")
+        self.assertEqual(motif["VOLUME"], "M-U")
+
+    def test_typed_values_are_not_coerced_and_observed_zero_does_not_create_fallback(self) -> None:
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            _row("synthetic-a", 300, "PRICE", "1")
+        self.assertEqual(str(raised.exception), "VALUE_MUST_BE_TYPED_NUMERIC_OR_NULL")
+
+        rows = []
+        rows.extend(_series("synthetic-a", "PRICE", (1.0, 2.0, 3.0)))
+        rows.extend(_series("synthetic-a", "LIQUIDITY", (1.0, 1.0, 1.0)))
+        rows.extend(_series("synthetic-a", "TRADERS", (1.0, 1.0, 1.0)))
+        rows.extend(_series("synthetic-a", "VOLUME", (0.0, 0.0, 0.0)))
+        rows.extend(_series("synthetic-a", "VOLUME_BUY", (5.0, 6.0, 7.0)))
+        rows.extend(_series("synthetic-a", "VOLUME_SELL", (4.0, 4.0, 5.0)))
+        projected = project_normalized_trajectory(rows)
+        self.assertEqual(projected.payload["volume_mode"], "TAKER_OBSERVED")
+        self.assertEqual(projected.payload["histogram"][0]["motif"]["VOLUME"], "M-M")
+        self.assertNotIn("VOLUME_BUY", projected.payload["histogram"][0]["motif"])
+
+    def test_schedule_x_900_is_insufficient_prefix(self) -> None:
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            LifecycleSchedule(x_due_offset_seconds=900)
+        self.assertEqual(str(raised.exception), "INVALID_INSUFFICIENT_PREFIX")
+
+    def test_histogram_is_bounded_and_m_heavy_tuples_are_allowed(self) -> None:
+        rows: list[TypedLifecycleObservation] = []
+        patterns = (
+            (1.0, 2.0, 3.0),
+            (1.0, 3.0, 2.0),
+            (1.0, 1.0, 2.0),
+            (1.0, 2.0, 2.0),
+            (2.0, 1.0, 3.0),
+            (2.0, 3.0, 1.0),
+            (2.0, 2.0, 1.0),
+            (3.0, 2.0, 1.0),
+            (3.0, 1.0, 2.0),
+        )
+        for index, pattern in enumerate(patterns):
+            member = f"synthetic-{index}"
+            rows.extend(_series(member, "PRICE", pattern))
+            rows.extend(_series(member, "LIQUIDITY", (1.0, 1.0, 1.0)))
+            rows.extend(_series(member, "TRADERS", (1.0, 1.0, 1.0)))
+        rows.extend(_series("synthetic-m-heavy", "PRICE", (None, None, 3.0)))
+        rows.extend(_series("synthetic-m-heavy", "LIQUIDITY", (1.0, 1.0, 1.0)))
+        rows.extend(_series("synthetic-m-heavy", "TRADERS", (1.0, 1.0, 1.0)))
+        projected = project_normalized_trajectory(rows)
+        self.assertLessEqual(len(projected.payload["histogram"]), 8)
+        self.assertEqual(projected.payload["eligible_member_count"], 10)
+        self.assertTrue(projected.payload["histogram_truncation"]["m_heavy_members_retained"])
+        self.assertTrue(
+            any(
+                "M" in symbol
+                for item in projected.payload["histogram"]
+                for symbol in item["motif"].values()
+            )
+        )
+
+
+if __name__ == "__main__":
+    unittest.main()

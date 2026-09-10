@@ -253,6 +253,34 @@ KILL/STOP is a complete useful result. Primary `KILL_*` plus pending C2 screen
 is not evening-complete. C2 `RUNNER_UP_REVISION_REQUIRED` is a typed PAUSE STOP,
 not a prompt to shop another candidate or start a second AUTO search.
 
+## Dormant representation challenger
+
+`NORMALIZED_TRAJECTORY_V1` is a separate dormant capability. It does not change
+ordinary `/hypothesis-forge` and does not add a current CONTROL trajectory. The
+three explicit modes are:
+
+- `ORDINARY`: existing `/hypothesis-forge` path and budget;
+- `CONTROL`: `--control-current-representation`, still trajectory-blind;
+- `REPRESENTATION_CHALLENGER`: a later, one-run bounded envelope built from the
+  exact hash-verified CONTROL packet plus the compact anonymous representation.
+
+The implementation boundary is `src/solana_alpha_lab/factory/normalized_trajectory_v1.py`
+plus `hfic_representation_probe.py`. The read-only status surface is
+`uv run --locked --managed-python python -B scripts/hypothesis_forge_representation.py representation-status --input <json>`.
+It consumes a supplied snapshot and does not read current cohort values,
+ResearchStore, providers, or runtime state by default.
+
+The challenger must reuse the same evidence epoch, `HFIC-V1.2` prompt, prior
+memory baseline, feature grounding, candidate constraints, and 16384-byte
+packet budget. CONTROL terminal `PASS_*` routes to
+`MARKET_FALSIFIER_FIRST`; `RUNNER_UP_REVISION_REQUIRED` pauses; observability
+or grounding failures are blocked. The adapter never runs the probe and never
+creates a `FEAT-*` alias from a motif.
+
+`IMPLEMENTED_DORMANT_NOT_EXECUTED` means code and tests exist. It does not mean
+the representation probe ran, passed, produced alpha, or changed runtime
+deployment.
+
 ## Model effort
 
 Use `SOL_XHIGH` for mechanism/PIT/estimand reasoning. Critic handoff may use the

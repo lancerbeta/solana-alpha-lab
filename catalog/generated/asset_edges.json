@@ -1583,6 +1583,26 @@
       "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001"
     },
     {
+      "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001"
+    },
+    {
       "source_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001"
@@ -3501,6 +3521,31 @@
       "source_asset_id": "CTRL-LATEST-HANDOFF-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-T06-CATALOG-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001",
+      "relation": "contains",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001"
     },
     {
       "source_asset_id": "CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001",
@@ -10823,6 +10868,31 @@
       "target_asset_id": "CTRL-HFIC-NEXT-FORWARD-EVIDENCE-EXECUTION-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-CONTROL-INTEGRITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
       "source_asset_id": "MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
@@ -10871,6 +10941,21 @@
       "source_asset_id": "MODULE-MARKET-EVIDENCE-001",
       "relation": "governed_by",
       "target_asset_id": "DOC-MARKET-DATA-AWARENESS-001"
+    },
+    {
+      "source_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001",
+      "relation": "derived_from",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001"
     },
     {
       "source_asset_id": "MODULE-OBSERVATION-PRIMITIVES-001",
@@ -14453,6 +14538,16 @@
       "target_asset_id": "CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001"
     },
     {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-REPRESENTATION-STATUS-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-HYPOTHESIS-FORGE-REPRESENTATION-STATUS-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
       "source_asset_id": "SCRIPT-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
@@ -15773,6 +15868,21 @@
       "target_asset_id": "CTRL-HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-001"
     },
     {
+      "source_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
       "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",
       "relation": "depends_on",
       "target_asset_id": "TEST-HYPOTHESIS-FAST-LANE-CLASSIFIER-001"
@@ -15916,6 +16026,16 @@
       "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001"
     },
     {
       "source_asset_id": "TEST-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001",
