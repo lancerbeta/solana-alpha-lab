@@ -76,7 +76,7 @@ def _attempt_kind(http_class: object) -> str:
 def derive_current_provider_state(
     calls: list[dict[str, Any]],
     *,
-    now: datetime | None = None,
+    now: datetime,
 ) -> dict[str, bool]:
     """Latest-by-time per primitive; 24h counters stay separate diagnostics.
 
@@ -99,17 +99,17 @@ def derive_current_provider_state(
         if isinstance(payload, str):
             continue
         primitive = str(call.get("primitive_id") or "")
+        if str(call.get("state") or "") == "STARTED":
+            continue
         kind = _attempt_kind(payload.get("http_class"))
         updated = _safe_parse(call.get("updated_at") or call.get("created_at"))
         if updated is None:
             if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
                 malformed_kinds.setdefault(primitive, set()).add(kind)
             continue
-        if now is not None and updated > now and kind == _KIND_OK:
+        if updated > now and kind == _KIND_OK:
             continue
         if kind == _KIND_OK:
-            if str(call.get("state") or "") == "STARTED":
-                continue
             success_at = latest_success_at.get(primitive)
             if success_at is None or updated > success_at:
                 latest_success_at[primitive] = updated

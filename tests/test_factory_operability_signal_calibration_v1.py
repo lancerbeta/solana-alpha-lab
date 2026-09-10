@@ -61,6 +61,10 @@ COMPLETED_RESIDENT = 50_000
 LEGACY_RESIDENT = 25_000
 
 
+def _provider_state(calls: list[dict[str, object]], *, now: datetime = NOW) -> dict[str, bool]:
+    return derive_current_provider_state(calls, now=now)
+
+
 def _call(
     primitive: str,
     at: datetime | str,
@@ -121,7 +125,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
             _call(RECENT, t0, HTTP_CLASS_TIMEOUT),
             _call(RECENT, t1, HTTP_CLASS_OK),
         ]
-        current = derive_current_provider_state(calls)
+        current = _provider_state(calls)
         self.assertFalse(current["provider_current_failed"])
         classes = compose_health_classes(
             {
@@ -134,7 +138,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertNotIn("PROVIDER_FAILED", classes)
 
     def test_p2_search_ok_does_not_mask_recent_timeout(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
                 _call(SEARCH, NOW - timedelta(hours=1), HTTP_CLASS_OK),
@@ -143,7 +147,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertTrue(current["provider_current_failed"])
 
     def test_p3_quote_timeout_not_cleared_by_recent_ok(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(QUOTE_BUY, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
                 _call(RECENT, NOW - timedelta(hours=1), HTTP_CLASS_OK),
@@ -152,7 +156,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertTrue(current["provider_current_failed"])
 
     def test_p4_quote_recovery_same_primitive(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(QUOTE_BUY, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
                 _call(QUOTE_BUY, NOW - timedelta(hours=1), HTTP_CLASS_OK),
@@ -163,14 +167,14 @@ class ProviderCurrentStateTests(unittest.TestCase):
     def test_p5_current_auth_401_and_403(self) -> None:
         for http_class in (HTTP_CLASS_401, HTTP_CLASS_403):
             with self.subTest(http_class=http_class):
-                current = derive_current_provider_state(
+                current = _provider_state(
                     [_call(RECENT, NOW - timedelta(minutes=5), http_class)]
                 )
                 self.assertTrue(current["provider_current_auth_failed"])
                 self.assertFalse(current["provider_current_failed"])
 
     def test_p6_recovered_auth_keeps_24h_absent_current(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_401),
                 _call(RECENT, NOW - timedelta(hours=1), HTTP_CLASS_OK),
@@ -188,11 +192,11 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertNotIn("PROVIDER_AUTH_FAILED", classes)
 
     def test_p7_rate_limit_same_semantics(self) -> None:
-        unresolved = derive_current_provider_state(
+        unresolved = _provider_state(
             [_call(RECENT, NOW - timedelta(minutes=5), HTTP_CLASS_429)]
         )
         self.assertTrue(unresolved["provider_current_rate_limited"])
-        recovered = derive_current_provider_state(
+        recovered = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_429),
                 _call(RECENT, NOW - timedelta(hours=1), HTTP_CLASS_OK),
@@ -201,7 +205,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertFalse(recovered["provider_current_rate_limited"])
 
     def test_p8_one_recovered_plus_one_unresolved_stays_failed(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=3), HTTP_CLASS_TIMEOUT),
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_OK),
@@ -217,24 +221,24 @@ class ProviderCurrentStateTests(unittest.TestCase):
             _call(RECENT, ok_at, HTTP_CLASS_OK),
             _call(RECENT, timeout_at, HTTP_CLASS_TIMEOUT),
         ]
-        self.assertFalse(derive_current_provider_state(reversed_list)["provider_current_failed"])
+        self.assertFalse(_provider_state(reversed_list)["provider_current_failed"])
         later_timeout_first = [
             _call(RECENT, timeout_at, HTTP_CLASS_TIMEOUT),
             _call(RECENT, NOW - timedelta(hours=3), HTTP_CLASS_OK),
         ]
         self.assertTrue(
-            derive_current_provider_state(later_timeout_first)["provider_current_failed"]
+            _provider_state(later_timeout_first)["provider_current_failed"]
         )
 
     def test_p10_malformed_ordering_cannot_manufacture_ok(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
                 _call(RECENT, "not-a-timestamp", HTTP_CLASS_OK),
             ]
         )
         self.assertTrue(current["provider_current_failed"])
-        malformed_failure = derive_current_provider_state(
+        malformed_failure = _provider_state(
             [
                 _call(RECENT, "bad-time", HTTP_CLASS_TIMEOUT),
                 _call(RECENT, NOW - timedelta(minutes=1), HTTP_CLASS_OK),
@@ -243,7 +247,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertTrue(malformed_failure["provider_current_failed"])
 
     def test_started_without_http_class_does_not_clear_timeout(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
                 {
@@ -265,7 +269,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
 
     def test_equal_timestamp_keeps_auth_and_timeout(self) -> None:
         stamp = NOW - timedelta(minutes=3)
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, stamp, HTTP_CLASS_TIMEOUT),
                 _call(RECENT, stamp, HTTP_CLASS_401),
@@ -284,7 +288,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertIn("PROVIDER_AUTH_FAILED", classes)
 
     def test_later_same_primitive_failure_class_is_latest_outcome(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_401),
                 _call(RECENT, NOW - timedelta(hours=1), HTTP_CLASS_429),
@@ -308,7 +312,7 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertNotIn("PROVIDER_FAILED", recovered)
 
     def test_started_http_ok_does_not_clear_timeout(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
                 {
@@ -322,8 +326,24 @@ class ProviderCurrentStateTests(unittest.TestCase):
         )
         self.assertTrue(current["provider_current_failed"])
 
+    def test_started_timeout_does_not_replace_completed_auth(self) -> None:
+        current = _provider_state(
+            [
+                _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_401),
+                {
+                    "primitive_id": RECENT,
+                    "state": "STARTED",
+                    "updated_at": render_utc(NOW - timedelta(minutes=1)),
+                    "created_at": render_utc(NOW - timedelta(minutes=1)),
+                    "payload": {"http_class": HTTP_CLASS_TIMEOUT},
+                },
+            ]
+        )
+        self.assertTrue(current["provider_current_auth_failed"])
+        self.assertFalse(current["provider_current_failed"])
+
     def test_future_http_ok_does_not_manufacture_recovery(self) -> None:
-        current = derive_current_provider_state(
+        current = _provider_state(
             [
                 _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
                 _call(RECENT, NOW + timedelta(minutes=5), HTTP_CLASS_OK),
@@ -331,9 +351,11 @@ class ProviderCurrentStateTests(unittest.TestCase):
             now=NOW,
         )
         self.assertTrue(current["provider_current_failed"])
+
+    def test_transport_and_5xx_are_current_provider_failure(self) -> None:
         for http_class in (HTTP_CLASS_5XX, HTTP_CLASS_TRANSPORT):
             with self.subTest(http_class=http_class):
-                current = derive_current_provider_state(
+                current = _provider_state(
                     [_call(QUOTE_BUY, NOW - timedelta(minutes=3), http_class)]
                 )
                 self.assertTrue(current["provider_current_failed"])
