@@ -181,8 +181,13 @@ def storage_history_sample_blocked(
     return False
 
 
-def _rdp_total_and_open_json(path: Path) -> tuple[Any, int, int]:
-    """One filesystem walk: total RDP bytes plus OPEN *.json count/bytes."""
+def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
+    """One filesystem walk: total RDP bytes plus OPEN-dir bytes.
+
+    Every regular file under ``publication_jobs/open`` is transient,
+    including atomic ``*.json.tmp``. Finalized OPEN job count stays
+    ``*.json`` only. Any unreadable file fails the whole measurement closed.
+    """
 
     if not path.exists():
         return UNKNOWN, 0, 0
@@ -195,22 +200,26 @@ def _rdp_total_and_open_json(path: Path) -> tuple[Any, int, int]:
         if path.is_file():
             files = [path]
         else:
-            files = [child for child in path.rglob("*") if child.is_file() and not child.is_symlink()]
+            files = [
+                child
+                for child in path.rglob("*")
+                if child.is_file() and not child.is_symlink()
+            ]
         for child in files:
             try:
                 size = int(child.stat().st_size)
             except OSError:
-                continue
+                return UNKNOWN, UNKNOWN, UNKNOWN
             total += size
             try:
                 child.relative_to(open_root)
             except ValueError:
                 continue
+            open_bytes += size
             if child.suffix == ".json":
                 open_count += 1
-                open_bytes += size
     except OSError:
-        return UNKNOWN, 0, 0
+        return UNKNOWN, UNKNOWN, UNKNOWN
     return total, open_count, open_bytes
 
 
@@ -762,11 +771,7 @@ def build_collector_operational_packet(
             sqlite_bytes = UNKNOWN
 
     rdp_bytes, open_job_count, open_job_bytes = _rdp_total_and_open_json(rdp)
-
     jobs = journal_stats(rdp)
-    if not isinstance(rdp_bytes, int):
-        open_job_count = int(jobs["publication_jobs_open_count"])
-        open_job_bytes = int(jobs["publication_jobs_open_bytes"])
     resident_rdp = resident_rdp_bytes(rdp_bytes, open_job_bytes)
     rdp_science_bytes: Any = UNKNOWN
     try:
@@ -883,7 +888,7 @@ def build_collector_operational_packet(
         disk_used_bytes=disk_used,
         sqlite_bytes=sqlite_bytes if isinstance(sqlite_bytes, int) else None,
         rdp_science_bytes=rdp_science_bytes if isinstance(rdp_science_bytes, int) else None,
-        job_open_bytes=int(open_job_bytes),
+        job_open_bytes=open_job_bytes if isinstance(open_job_bytes, int) else 0,
         job_completed_bytes=int(jobs["publication_jobs_completed_bytes"]),
         job_legacy_bytes=int(jobs["publication_jobs_legacy_full_bytes"]),
         elapsed_campaign_days=elapsed_days,
@@ -1056,19 +1061,23 @@ def build_collector_operational_packet(
     for item in (sqlite_bytes, resident_rdp):
         if isinstance(item, int):
             current_bytes += item
-    try:
-        runway = project_storage_runway(
-            incremental_compressed_bytes_per_day=incremental,
-            current_same_volume_factory_bytes=current_bytes,
-            mutable_backup_peak_bytes=int(backup_sink_bytes)
-            if isinstance(backup_sink_bytes, int)
-            else 0,
-            staging_peak_bytes=open_job_bytes,
-            retention_class="HOT90_RESIDENT",
-        )
-        packet["projected_97d_bytes"] = runway["projected_total_same_volume_bytes"]
-        packet["projected_97d_status"] = runway["status"]
-    except Exception:
+    if isinstance(resident_rdp, int) and isinstance(open_job_bytes, int):
+        try:
+            runway = project_storage_runway(
+                incremental_compressed_bytes_per_day=incremental,
+                current_same_volume_factory_bytes=current_bytes,
+                mutable_backup_peak_bytes=int(backup_sink_bytes)
+                if isinstance(backup_sink_bytes, int)
+                else 0,
+                staging_peak_bytes=open_job_bytes,
+                retention_class="HOT90_RESIDENT",
+            )
+            packet["projected_97d_bytes"] = runway["projected_total_same_volume_bytes"]
+            packet["projected_97d_status"] = runway["status"]
+        except Exception:
+            packet["projected_97d_bytes"] = UNKNOWN
+            packet["projected_97d_status"] = UNKNOWN
+    else:
         packet["projected_97d_bytes"] = UNKNOWN
         packet["projected_97d_status"] = UNKNOWN
     health = compose_health_classes(packet)

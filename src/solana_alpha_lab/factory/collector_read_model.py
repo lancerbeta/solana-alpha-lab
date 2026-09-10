@@ -79,7 +79,9 @@ def derive_current_provider_state(calls: list[dict[str, Any]]) -> dict[str, bool
     Proven recovery is a later same-primitive HTTP_OK only. A later STARTED
     or unclassified call cannot clear an unresolved failure. A later success
     on a different primitive cannot clear another primitive. Malformed
-    timestamps never count as success.
+    timestamps never count as success. A later same-primitive failure of a
+    different class replaces the current class; it does not keep every prior
+    class until OK.
     """
 
     latest_failure_at: dict[str, datetime] = {}

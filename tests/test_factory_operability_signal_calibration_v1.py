@@ -282,6 +282,17 @@ class ProviderCurrentStateTests(unittest.TestCase):
         self.assertIn("PROVIDER_FAILED", classes)
         self.assertIn("PROVIDER_AUTH_FAILED", classes)
 
+    def test_later_same_primitive_failure_class_is_latest_outcome(self) -> None:
+        current = derive_current_provider_state(
+            [
+                _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_401),
+                _call(RECENT, NOW - timedelta(hours=1), HTTP_CLASS_429),
+            ]
+        )
+        self.assertFalse(current["provider_current_auth_failed"])
+        self.assertTrue(current["provider_current_rate_limited"])
+        self.assertFalse(current["provider_current_failed"])
+
     def test_fail_closed_missing_current_fields_still_use_24h(self) -> None:
         classes = compose_health_classes({"TIMEOUT_24h": 1, "HTTP_5XX_24h": 0})
         self.assertIn("PROVIDER_FAILED", classes)
@@ -361,6 +372,46 @@ class StorageResidentRunwayTests(unittest.TestCase):
             self.assertEqual(projected, baseline["projected_total_same_volume_bytes"])
             self.assertLess(projected, sqlite + resident + amplified)
             self.assertGreaterEqual(projected, sqlite + resident + OPEN_SPIKE - 1)
+            store.close()
+
+    def test_open_tmp_bytes_are_transient_not_resident_growth(self) -> None:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp)
+            rdp = root / "observation_rdp"
+            _write_bytes(rdp / "datasets" / "science.bin", RESIDENT_SCIENCE)
+            _write_bytes(
+                rdp / "datasets" / "publication_jobs" / "completed" / "done.json",
+                COMPLETED_RESIDENT,
+            )
+            _write_bytes(
+                rdp / "datasets" / "publication_jobs" / "open" / "hot.json.tmp",
+                OPEN_SPIKE,
+            )
+            resident = RESIDENT_SCIENCE + COMPLETED_RESIDENT
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            _write_history(
+                root,
+                observed_at=NOW - timedelta(hours=24),
+                sqlite_bytes=_sqlite_bytes(store),
+                rdp_bytes=resident,
+            )
+            packet = build_collector_operational_packet(
+                root=root, store=store, now=NOW, observation_rdp=rdp
+            )
+            self.assertEqual(packet["publication_jobs_open_bytes"], OPEN_SPIKE)
+            self.assertEqual(packet["publication_jobs_open_count"], 0)
+            self.assertEqual(packet["observation_rdp_resident_bytes"], resident)
+            growth = packet["data_growth_24h_bytes"]
+            self.assertIsInstance(growth, int)
+            self.assertLess(abs(int(growth)), OPEN_SPIKE)
+            projected = int(packet["projected_97d_bytes"])
+            self.assertLess(projected, int(packet["observation_sqlite_bytes"]) + resident + OPEN_SPIKE * HORIZON_DAYS)
+            self.assertTrue(
+                storage_history_sample_blocked(
+                    publication_jobs_open_count=packet["publication_jobs_open_count"],
+                    publication_jobs_open_bytes=packet["publication_jobs_open_bytes"],
+                )
+            )
             store.close()
 
     def test_s3_open_gone_does_not_oscillate_from_open_lifecycle(self) -> None:
@@ -489,6 +540,12 @@ class StorageResidentRunwayTests(unittest.TestCase):
         self.assertTrue(
             storage_history_sample_blocked(
                 publication_jobs_open_count="UNKNOWN", publication_jobs_open_bytes=0
+            )
+        )
+        self.assertTrue(
+            storage_history_sample_blocked(
+                publication_jobs_open_count="UNKNOWN",
+                publication_jobs_open_bytes="UNKNOWN",
             )
         )
         with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:

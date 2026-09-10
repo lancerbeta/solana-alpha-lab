@@ -33856,7 +33856,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_read_model.py', repository_path: src/solana_alpha_lab/factory/collector_read_model.py}
-  integrity: {kind: sha256, sha256: bc1a8f6b0b8a805107e80360b31208dbc16ebcdde72eedc3f485837a086e25a0}
+  integrity: {kind: sha256, sha256: 1246f5ae23b42a9c8f0c05f0ea353a6a7a389032c1147d046f04c71b01b8c48f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
@@ -34054,7 +34054,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: d4f27c210c4d0d9e1ec08b5e59baeec95a4cc9c413d66341440478d34722e9b3}
+  integrity: {kind: sha256, sha256: 59f176c6535b335b487dc911e5cab21dfb818218bc2f152a1b16020f0b82005e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}
@@ -34146,7 +34146,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_operability_signal_calibration_v1.py', repository_path: tests/test_factory_operability_signal_calibration_v1.py}
-  integrity: {kind: sha256, sha256: 8e006dbd6832f85a9b08b292ca01d629cacc3ff3b8840e5d01ed7f99b0eb5ee5}
+  integrity: {kind: sha256, sha256: de08f36da7217e51959615b651410fe2d07b609172fc66d2d5be55960b5a46d8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001}
@@ -34214,7 +34214,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/factory_operability_signal_calibration/a1_owner_readout_v1.md', repository_path: docs/reports/factory_operability_signal_calibration/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: df34741795611594c09d1271c125789be81e1c9e5f16b79a36245365abf8e96b}
+  integrity: {kind: sha256, sha256: 3db34f16b4600353ea57feca33eb2ffec63ed0fac3970184d302414f626277e8}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001}
