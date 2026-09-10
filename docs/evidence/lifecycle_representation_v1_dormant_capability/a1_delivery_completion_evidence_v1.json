@@ -7,7 +7,27 @@
   "state_change": "IMPLEMENTED_DORMANT_NOT_EXECUTED",
   "base_main": "9bb972b56da3f24fc796262f09669ac5895ad1ef",
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "152736209297acff0296728cc60cdbd11b77a3aa8fb330daa43f8076b6385833",
+    ".cursor/commands/hypothesis-forge.md": "aa94261255226573ec54258d62df378faa8051c7bc7f8ab2398f3337bc0e5e7f",
+    "catalog/assets/core.yaml": "65492abb1accbcbab26f4989c24cb1f84088ee9ee89b9c50995d05cee19b333c",
+    "catalog/assets/lifecycle.yaml": "212fade9758a514e9507992af10c2de572597582ce099967e4a4c86ab15b1708",
+    "catalog/catalog_manifest.yaml": "76344ff0ce07c528ff880ead838bc9f51792244220ee1739032496b33d77f0ec",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "d2e873a47777ec26468cfdd26a4e743bdf3963a331bcce13123797cac6657679",
+    "catalog/generated/asset_edges.json": "932c8fd4e2944a1dca45ded1045cf8081f7af4cd26415dfc94c1fce9771cc7ff",
+    "configs/factory_semantic_operability_v1.yaml": "e2994b4d2eb6db638d1cf84df5a722a9208f66d365428da0f9d50730b844fcad",
+    "docs/FACTORY_SEMANTIC_MAP.md": "79c4a7c714148c9f182d1bfadb43c66667f7dfcf1b24cad542b988c17abff462",
+    "docs/PROJECT_MAP.md": "933f4e59f5e095d038432f95c0ca6a75b8037744093a20b16fdcf6ad97229023",
+    "docs/contracts/normalized_trajectory_v1_capability_contract.md": "e5c69c480c488b9bdbfdd72faafee5c47a7007ea42a6be165803907efb7de776",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "081dd0253235f196a48c75c8cad8462795fb3e91e8f95030883b724c790d6088",
+    "docs/tasks/LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY.md": "ee865a0b331f85f9b8fb75a2da93de32d8b60ee2f6563df035f2b9e71d246871",
+    "scripts/hypothesis_forge_representation.py": "9c593c50fa14ce7f94909ae579fa1ccb5f0cdaef4803d5f659d00bb6d9be1c79",
+    "src/solana_alpha_lab/factory/hfic_representation_probe.py": "c4958cd994fcb31bc39c2a8707ffe0b1ed59706d0bd1e0cd098d4e6af390606d",
+    "src/solana_alpha_lab/factory/normalized_trajectory_v1.py": "8c65bb674b281984eaf94012aa61c4ac848dac4263070b0ea5a5d4c2361131b2",
+    "tests/test_hfic_representation_probe.py": "5479df0928f6551d18f6d2ca8dd4e7943a2611d66f82b2c58e3ef4a7baf0eaae",
+    "tests/test_normalized_trajectory_probe_preregistration_v1.py": "f60248e857c26dfe84ba87cf8ce4c394f72fb1c6b0d318eedc2940c8a3a2a9ed",
+    "tests/test_normalized_trajectory_v1.py": "c59670715cf447d1255bb91a65d771af916604d5c8aec74ce3f7a2e6874b233d"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -18,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING_BIND_EVIDENCE",
+    "sha256": "a75741e80c3167014ed906c1ac3621fca8e496e29a4b24132e1f0023ca80bd9c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIFECYCLE_REPRESENTATION_DORMANT_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/lifecycle_representation_v1_dormant_capability/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING_BIND_EVIDENCE",
+      "sha256": "48f7754eadcf0915461675345f2f875be31c78ed76d4b04a1c4f96c32c8dec64",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

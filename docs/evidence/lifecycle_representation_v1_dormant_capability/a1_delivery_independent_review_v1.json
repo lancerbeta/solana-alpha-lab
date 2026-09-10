@@ -4,8 +4,8 @@
   "review_id": "LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-10",
   "task_id": "LIFECYCLE_REPRESENTATION_V1_DORMANT_CAPABILITY",
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "2e0ec63b18d1882f585b7c1134724b2ed95e1a6ead5955c320d22159c0eb6744",
+  "reviewed_inventory_sha256": "2081885a32602b8935479f6243500ec0a43bdc5368d87e8cb8db9eed4e67cbe9",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
