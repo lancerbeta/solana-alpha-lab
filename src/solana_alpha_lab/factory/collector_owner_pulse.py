@@ -19,6 +19,7 @@ from solana_alpha_lab.factory.collector_operational_packet import (
     UNKNOWN,
     append_storage_history,
     build_collector_operational_packet,
+    storage_history_sample_blocked,
 )
 from solana_alpha_lab.factory.observation_schedule import render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -259,7 +260,11 @@ def run_daily_owner_pulse(
     if mode == "dry-run":
         return result
 
-    if record_storage_history:
+    if record_storage_history and not storage_history_sample_blocked(
+        publication_jobs_open_count=packet.get("publication_jobs_open_count"),
+        publication_jobs_open_bytes=packet.get("publication_jobs_open_bytes"),
+    ):
+        resident = packet.get("observation_rdp_resident_bytes")
         append_storage_history(
             root,
             observed_at=str(packet["observed_at"]),
@@ -273,11 +278,7 @@ def run_daily_owner_pulse(
                 if isinstance(packet.get("observation_sqlite_bytes"), int)
                 else None
             ),
-            rdp_bytes=(
-                packet["observation_rdp_bytes"]
-                if isinstance(packet.get("observation_rdp_bytes"), int)
-                else None
-            ),
+            rdp_bytes=resident if isinstance(resident, int) else None,
         )
 
     delivery = emit_daily_owner_pulse(

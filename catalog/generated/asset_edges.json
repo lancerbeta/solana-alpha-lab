@@ -2878,6 +2878,26 @@
       "target_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001"
     },
     {
+      "source_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-OPERATIONAL-PACKET-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-OWNER-PULSE-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COLLECTOR-READ-MODEL-001"
+    },
+    {
+      "source_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
+    },
+    {
       "source_asset_id": "CTRL-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",
       "relation": "governed_by",
       "target_asset_id": "ARCH-INTENT-005"
@@ -5338,6 +5358,11 @@
       "target_asset_id": "CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001"
     },
     {
+      "source_asset_id": "DOC-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-OWNER-READOUT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
+    },
+    {
       "source_asset_id": "DOC-FACTORY-REMOTE-HOST-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
@@ -5996,6 +6021,21 @@
       "source_asset_id": "EVIDENCE-FACTORY-97D-LIVE-FORENSICS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-COMPLETION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-FACTORY-FIT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-INDEPENDENT-REVIEW-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
     },
     {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
@@ -15496,6 +15536,11 @@
       "source_asset_id": "TEST-FACTORY-HOT90-IMMUTABLE-DRIVE-ARCHIVE-IMPL-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-HOT90-RUNTIME-ACTIVATION-BOUNDARY-REPAIR-001"
+    },
+    {
+      "source_asset_id": "TEST-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
     },
     {
       "source_asset_id": "TEST-FACTORY-ORDINARY-HYPOTHESIS-THROUGH-SURFACE-001",

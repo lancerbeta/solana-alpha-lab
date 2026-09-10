@@ -1,0 +1,23 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-SIGNAL-CALIBRATION-FACTORY-FIT-001",
+  "as_of": "2026-09-10",
+  "task_id": "FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "NOT_READY",
+  "reviewed_bindings_sha256": "pending",
+  "reviewed_inventory_sha256": "pending",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SOURCE_DATA_STALE_LONG_TICK_FALSE_POSITIVE_WATCH"
+  },
+  "dimensions": {},
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION"
+  ],
+  "recovery": "REVERT"
+}

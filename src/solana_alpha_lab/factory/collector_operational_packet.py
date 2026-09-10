@@ -134,6 +134,48 @@ def _publication_freshness_stale(packet: Mapping[str, Any], *, activation_state:
     return pub is not None and (now - pub).total_seconds() > 6 * 3600
 
 
+def _current_provider_flag(
+    packet: Mapping[str, Any], key: str, *, fallback: bool
+) -> bool:
+    """Current-state booleans win; missing evidence stays fail-closed on 24h counts."""
+
+    value = packet.get(key)
+    if value is True:
+        return True
+    if value is False:
+        return False
+    return fallback
+
+
+def resident_rdp_bytes(
+    observation_rdp_bytes: Any, publication_jobs_open_bytes: Any
+) -> Any:
+    """Full RDP minus OPEN job bytes measured from the same filesystem view."""
+
+    if not isinstance(observation_rdp_bytes, int):
+        return UNKNOWN
+    open_bytes = (
+        publication_jobs_open_bytes
+        if isinstance(publication_jobs_open_bytes, int)
+        else 0
+    )
+    return max(0, observation_rdp_bytes - open_bytes)
+
+
+def storage_history_sample_blocked(
+    *,
+    publication_jobs_open_count: Any,
+    publication_jobs_open_bytes: Any,
+) -> bool:
+    """Skip persisted growth samples while an OPEN publication job exists."""
+
+    if isinstance(publication_jobs_open_count, int) and publication_jobs_open_count > 0:
+        return True
+    if isinstance(publication_jobs_open_bytes, int) and publication_jobs_open_bytes > 0:
+        return True
+    return False
+
+
 def _tree_bytes(path: Path) -> int | None:
     if not path.exists():
         return None
@@ -474,11 +516,23 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
     http_5xx = int(packet.get("HTTP_5XX_24h") or 0)
     timeouts = int(packet.get("TIMEOUT_24h") or 0)
     transport = int(packet.get("TRANSPORT_ERROR_24h") or 0)
-    if http_401 or http_403:
+    if _current_provider_flag(
+        packet,
+        "provider_current_auth_failed",
+        fallback=bool(http_401 or http_403),
+    ):
         flags.append("PROVIDER_AUTH_FAILED")
-    if http_429:
+    if _current_provider_flag(
+        packet,
+        "provider_current_rate_limited",
+        fallback=bool(http_429),
+    ):
         flags.append("PROVIDER_RATE_LIMITED")
-    if http_5xx or timeouts or transport:
+    if _current_provider_flag(
+        packet,
+        "provider_current_failed",
+        fallback=bool(http_5xx or timeouts or transport),
+    ):
         flags.append("PROVIDER_FAILED")
     # Zero eligible market supply must NOT become provider failure (handled by absence).
 
@@ -675,6 +729,8 @@ def build_collector_operational_packet(
         rdp_bytes = measured
 
     jobs = journal_stats(rdp)
+    open_job_bytes = int(jobs["publication_jobs_open_bytes"])
+    resident_rdp = resident_rdp_bytes(rdp_bytes, open_job_bytes)
     rdp_science_bytes: Any = UNKNOWN
     try:
         rdp_science_bytes = rdp_bytes_excluding_publication_jobs(rdp)
@@ -776,7 +832,7 @@ def build_collector_operational_packet(
             "observed_at": observed_at,
             "disk_used_pct": disk_pct if isinstance(disk_pct, int) else None,
             "sqlite_bytes": sqlite_bytes if isinstance(sqlite_bytes, int) else None,
-            "rdp_bytes": rdp_bytes if isinstance(rdp_bytes, int) else None,
+            "rdp_bytes": resident_rdp if isinstance(resident_rdp, int) else None,
         }
     ]
     disk_growth, data_growth, projected = _growth_and_projection(
@@ -846,11 +902,15 @@ def build_collector_operational_packet(
         "HTTP_5XX_24h": base.get("HTTP_5XX_24h"),
         "TIMEOUT_24h": base.get("TIMEOUT_24h"),
         "TRANSPORT_ERROR_24h": base.get("TRANSPORT_ERROR_24h"),
+        "provider_current_auth_failed": base.get("provider_current_auth_failed"),
+        "provider_current_rate_limited": base.get("provider_current_rate_limited"),
+        "provider_current_failed": base.get("provider_current_failed"),
         # STORAGE
         "filesystem_disk_used_pct": disk_pct,
         "filesystem_disk_free_bytes": disk_free,
         "observation_sqlite_bytes": sqlite_bytes,
         "observation_rdp_bytes": rdp_bytes,
+        "observation_rdp_resident_bytes": resident_rdp,
         "observation_rdp_bytes_excluding_publication_jobs": rdp_science_bytes,
         "publication_jobs_open_count": jobs["publication_jobs_open_count"],
         "publication_jobs_open_bytes": jobs["publication_jobs_open_bytes"],
@@ -956,7 +1016,7 @@ def build_collector_operational_packet(
     packet["immutable_archive_last_terminal"] = last_terminal
     incremental = data_growth if isinstance(data_growth, int) and data_growth >= 0 else 0
     current_bytes = 0
-    for item in (sqlite_bytes, rdp_bytes):
+    for item in (sqlite_bytes, resident_rdp):
         if isinstance(item, int):
             current_bytes += item
     try:
@@ -966,7 +1026,7 @@ def build_collector_operational_packet(
             mutable_backup_peak_bytes=int(backup_sink_bytes)
             if isinstance(backup_sink_bytes, int)
             else 0,
-            staging_peak_bytes=0,
+            staging_peak_bytes=open_job_bytes,
             retention_class="HOT90_RESIDENT",
         )
         packet["projected_97d_bytes"] = runway["projected_total_same_volume_bytes"]
@@ -996,4 +1056,6 @@ __all__ = [
     "classify_publication_expectation",
     "collector_verdict",
     "compose_health_classes",
+    "resident_rdp_bytes",
+    "storage_history_sample_blocked",
 ]
