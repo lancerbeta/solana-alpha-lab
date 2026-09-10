@@ -235,8 +235,7 @@ def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
             except ValueError:
                 continue
             open_bytes += size
-            if child.suffix == ".json":
-                open_count += 1
+            open_count += 1
     except OSError:
         return UNKNOWN, UNKNOWN, UNKNOWN
     return total, open_count, open_bytes

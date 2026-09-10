@@ -400,7 +400,7 @@ class StorageResidentRunwayTests(unittest.TestCase):
                 root=root, store=store, now=NOW, observation_rdp=rdp
             )
             self.assertEqual(packet["publication_jobs_open_bytes"], OPEN_SPIKE)
-            self.assertEqual(packet["publication_jobs_open_count"], 0)
+            self.assertEqual(packet["publication_jobs_open_count"], 1)
             self.assertEqual(packet["observation_rdp_resident_bytes"], resident)
             growth = packet["data_growth_24h_bytes"]
             self.assertIsInstance(growth, int)
@@ -438,6 +438,33 @@ class StorageResidentRunwayTests(unittest.TestCase):
             self.assertEqual(packet["publication_jobs_open_bytes"], "UNKNOWN")
             self.assertEqual(packet["observation_rdp_resident_bytes"], "UNKNOWN")
             self.assertEqual(packet["projected_97d_bytes"], "UNKNOWN")
+            self.assertTrue(
+                storage_history_sample_blocked(
+                    publication_jobs_open_count=packet["publication_jobs_open_count"],
+                    publication_jobs_open_bytes=packet["publication_jobs_open_bytes"],
+                )
+            )
+            store.close()
+
+    def test_zero_byte_open_file_still_skips_history_sample(self) -> None:
+        self.assertTrue(
+            storage_history_sample_blocked(
+                publication_jobs_open_count=1, publication_jobs_open_bytes=0
+            )
+        )
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            root = Path(tmp)
+            rdp = root / "observation_rdp"
+            _write_bytes(
+                rdp / "datasets" / "publication_jobs" / "open" / "hot.json.tmp",
+                0,
+            )
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            packet = build_collector_operational_packet(
+                root=root, store=store, now=NOW, observation_rdp=rdp
+            )
+            self.assertEqual(packet["publication_jobs_open_count"], 1)
+            self.assertEqual(packet["publication_jobs_open_bytes"], 0)
             self.assertTrue(
                 storage_history_sample_blocked(
                     publication_jobs_open_count=packet["publication_jobs_open_count"],
