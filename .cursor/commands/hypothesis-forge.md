@@ -45,3 +45,24 @@ launch Critic; `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`).
 **Auto-launch** Independent Critic in new isolated context; no owner copy/paste.
 
 No Git mutation, no provider calls, no experiment execution, no autonomous generator.
+
+## Representation mode boundary
+
+The normal slash command remains `ORDINARY`; its behavior and search budget are
+unchanged. `--control-current-representation` remains the trajectory-blind
+`CONTROL` mode. `NORMALIZED_TRAJECTORY_V1` is only a dormant
+`REPRESENTATION_CHALLENGER` capability: a later bounded adapter clones the
+exact CONTROL packet and carries one anonymous histogram beside it. It does
+not rebuild a newer context, inspect current cohort values, or invoke a second
+ordinary Forge search.
+
+For read-only routing/status from a supplied synthetic or runtime snapshot use:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge_representation.py representation-status --input <json>
+```
+
+`NORMALIZED_TRAJECTORY_V1_ELIGIBLE` is permission for a separately governed
+one-run comparison, not execution. `IMPLEMENTED_DORMANT_NOT_EXECUTED` means
+the code exists and the probe has not run; it is not alpha, scientific PASS,
+or deployment evidence.

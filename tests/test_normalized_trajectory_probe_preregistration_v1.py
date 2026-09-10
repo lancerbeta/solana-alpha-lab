@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import re
 import sys
 import unittest
@@ -41,6 +42,9 @@ from validate_catalog import load_and_validate  # noqa: E402
 
 CONTRACT_PATH = ROOT / "docs/contracts/normalized_trajectory_representation_probe_v1.md"
 TOKENS_V2_PATH = ROOT / "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py"
+FROZEN_PREREGISTRATION_SHA256 = (
+    "617879817f2f7b0810bb66c657ba94f22b02acb54dd7b42f5b3b8df3a6908357"
+)
 
 
 def _load_frozen_contract() -> dict:
@@ -230,23 +234,28 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
         self.assertEqual(len(self.contract["pass_requires_all"]), 5)
         self.assertGreaterEqual(len(self.contract["kill_if_any"]), 5)
 
-    def test_no_projection_implementation_landed(self) -> None:
-        src = ROOT / "src"
-        matches = [
-            str(path.relative_to(ROOT).as_posix())
-            for path in src.rglob("*")
-            if path.is_file()
-            and (
-                "normalized_trajectory" in path.name
-                or "trajectory_projection" in path.name
-                or "motif_encoder" in path.name
-            )
-        ]
-        self.assertEqual(matches, [])
-        self.assertFalse(
-            (
-                ROOT / "src/solana_alpha_lab/factory/normalized_trajectory_v1.py"
-            ).exists()
+    def test_frozen_preregistration_unchanged_and_capability_is_dormant(self) -> None:
+        preregistration_bytes = CONTRACT_PATH.read_bytes()
+        self.assertEqual(
+            hashlib.sha256(preregistration_bytes).hexdigest(),
+            FROZEN_PREREGISTRATION_SHA256,
+        )
+        capability = ROOT / "docs/contracts/normalized_trajectory_v1_capability_contract.md"
+        self.assertTrue(capability.exists())
+        capability_text = capability.read_text(encoding="utf-8")
+        self.assertIn("implementation_status: IMPLEMENTED_DORMANT_NOT_EXECUTED", capability_text)
+        self.assertIn("execution_status: NOT_EXECUTED", capability_text)
+        self.assertTrue(
+            (ROOT / "src/solana_alpha_lab/factory/normalized_trajectory_v1.py").exists()
+        )
+        ordinary = (ROOT / "scripts/hypothesis_forge.py").read_text(encoding="utf-8")
+        self.assertNotIn("normalized_trajectory_v1", ordinary)
+        control = (
+            ROOT / "src/solana_alpha_lab/factory/hfic_control_integrity.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("CURRENT_REPRESENTATION_CONTROL_V1", control)
+        self.assertNotIn(
+            "from solana_alpha_lab.factory.normalized_trajectory_v1", control
         )
 
     def test_discoverable_from_hypothesis_forge_route(self) -> None:
@@ -284,6 +293,37 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
             record["status"],
             "ACCEPTED_DIRECTION_NOT_IMPLEMENTED",
         )
+
+        capability = self.snapshot.assets[
+            "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+        ]
+        self.assertEqual(
+            capability["location"]["repository_path"],
+            "docs/contracts/normalized_trajectory_v1_capability_contract.md",
+        )
+        self.assertEqual(capability["status"], "IMPLEMENTED_UNVERIFIED")
+        root_ids = [item["asset_id"] for item in resolved["root_assets"]]
+        self.assertIn("CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001", root_ids)
+        self.assertIn("SKILL-HYPOTHESIS-FORGE-001", root_ids)
+        self.assertNotIn("MODULE-HFIC-REPRESENTATION-PROBE-001", root_ids)
+
+    def test_representation_search_gold_queries_use_existing_route(self) -> None:
+        for query in (
+            "lifecycle representation",
+            "normalized trajectory",
+            "Forge representation",
+            "другое представление lifecycle",
+            "траектория токена",
+        ):
+            hits = search_semantic_routes(
+                self.projection,
+                query,
+                assets=self.assets,
+                bindings=self.bindings,
+                limit=3,
+            )
+            self.assertTrue(hits, query)
+            self.assertEqual(hits[0]["semantic_route_id"], "SEM-HYPOTHESIS-FORGE")
 
 
 if __name__ == "__main__":

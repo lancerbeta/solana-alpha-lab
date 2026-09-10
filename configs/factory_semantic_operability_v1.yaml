@@ -64,11 +64,16 @@ routes:
       - normalized trajectory
       - NORMALIZED_TRAJECTORY
       - representation probe
+      - lifecycle representation
+      - Forge representation
+      - другое представление lifecycle
+      - траектория токена
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids: [ACTIVE-HYPOTHESIS-FORGE]
     root_asset_ids:
       - DOC-HYPOTHESIS-FORGE-OPERATOR-001
       - SKILL-HYPOTHESIS-FORGE-001
+      - CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001
     query_recipe_ids: []
     status_plane: CAPABILITY
     runtime_resolution: {mode: NONE, operator_asset_ids: []}
