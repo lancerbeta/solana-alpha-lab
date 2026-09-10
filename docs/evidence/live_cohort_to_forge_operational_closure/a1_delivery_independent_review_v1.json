@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-10",
+  "task_id": "LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "C_PURE_OBS_FAIL_CLOSED",
+        "ACTIVATION_BIND_RUN_ID_NULL",
+        "PRODUCER_SET_NO_LATEST_SHA",
+        "CLOSURE_FLAGS_REQUIRED_BOOL",
+        "TRANSPORT_HASH_MISMATCH_RAISED",
+        "CLI_PUBLISH_HAPPY_PATH"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "CLI_PUBLISH_OMIT_COHORT_ID",
+        "GAP_SUSPECTED_CLI_COVERAGE",
+        "LIST_NEXT_MATURE_COHORT1",
+        "LOW_YIELD_BEFORE_IMPORT",
+        "IDEMPOTENT_REIMPORT_EPOCH",
+        "NO_HYPOTHESIS_FORGE_IN_ATOM"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=ca48463123d96befbf7b9686790ae1d0ec35f64714069c4e11c42210da47300c",
+        "FACTORY_BUILD_LIVE_SOURCE_GATES",
+        "C1_SOURCE_STABLE_AFTER_C2",
+        "SQLITE_OPERATIONAL_NOT_SCIENCE",
+        "SEALABLE_GAP_SUSPECTED_NOT_CONFIRMED",
+        "CONTROL_FIRST_OPERATOR_NEXT"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_SEAL_OR_IMPORT_IN_THIS_ATOM",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION",
+    "NO_ALPHA"
+  ]
+}

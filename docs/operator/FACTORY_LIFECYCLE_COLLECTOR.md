@@ -372,31 +372,87 @@ Live PASS, nonempty restore proof, and `legacy_full` reclaim are historical
 
 ### Live cohort seal / import (zero-provider)
 
-Scientific path (not weekly A3 singleton):
+Recurring owner path after a cohort is mature. Canonical planes:
 
-Immutable Observation RDP → `build-live-source` → cohort readiness →
-`seal-live-cohort` → `verify-live` → `import-live` → **cumulative** LIVE CORPUS →
-evidence_epoch.
+VPS Observation RDP → sealed verified release → verified transport →
+`local/factory_v1/data_plane` LIVE CORPUS. Do not import a moving Observation
+RDP into Forge.
 
-```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --observation-rdp <OBS_RDP> --schedule-sha256 <64hex> --activation-id <ACT-...>
-```
-
-```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py live-status --observation-rdp <OBS_RDP> --cohort-id REL-YYYYMMDDTHHMMSSZ-YYYYMMDDTHHMMSSZ
-```
+One-shot when Observation RDP and Forge `data_plane` are **already on the
+same host** (local tests). Do **not** run this on the VPS if Forge reads
+`local/factory_v1/data_plane` on the owner machine. Omit `--cohort-id` to
+publish the next mature unimported cohort. Optional
+`--discovery-coverage-class GAP_SUSPECTED` when collector coverage is known.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py seal-live-cohort --observation-rdp <OBS_RDP> --cohort-id REL-... --release-root <RELEASE>
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
 ```
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py verify-live --release-root <RELEASE>
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py publish-live-cohort --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+```
+
+Relative paths resolve against the repository root. The sealed tree is kept
+by default at `<observation_rdp.parent>/live_cohort_releases/<cohort_id>/`.
+Process-owned transport staging is deleted after verified import.
+Same-identity retry reuses that sealed tree (does not rewrite `sealed_at`).
+Override with `--release-root` only when the durable location must differ.
+On a Factory VPS shell, skip this same-host one-shot if Forge is local.
+
+Cross-plane (VPS Observation RDP, local Forge). Do not import a moving
+Observation RDP into Forge.
+
+On VPS, list mature campaign windows. Without local Forge `--data-root`,
+`imported` is unknown — pick the mature `cohort_id` that is not already in
+the local LIVE CORPUS. `build-live-source` now fail-closes on incomplete
+closure (same gates as publish). Then seal/verify:
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root <RELEASE> --data-root <LOCAL_RDP>
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
 ```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py seal-live-cohort --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --cohort-id <REL-...> --release-root /opt/solana-alpha-lab/local/factory_v1/live_cohort_releases/<cohort_id>
+```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py verify-live --release-root /opt/solana-alpha-lab/local/factory_v1/live_cohort_releases/<cohort_id>
+```
+
+Copy that sealed directory to the local machine, then:
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root local/factory_v1/live_cohort_releases/<cohort_id> --data-root local/factory_v1/data_plane
+```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
+```
+
+Happy readback terminal is `FORGE_CONTROL_READY`. NEXT:
+
+```
+/hypothesis-forge CURRENT_REPRESENTATION_CONTROL
+```
+
+Do not treat ordinary Forge as a fallback when CONTROL corpus/yield
+preconditions fail. Optional `--imported-cohort-id` checks that exact
+cohort appears in lineage; do not paste the placeholder `REL-...`.
+
+Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
+`PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
+`LOW_YIELD`, `IMPORT_CONFLICT`. FAIL JSON may include `next`. `LOW_YIELD`
+is raised before import when projected cumulative yield is below
+`MIN_USABLE_YIELD_ELIGIBLE`. `GAP_SUSPECTED` and another cohort being ACTIVE
+are not crashes. `GAP_CONFIRMED` is not sealable.
+
+Primitives remain available (`build-live-source` requires `--cohort-id` and
+`--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /
+`import-live`).
 
 Admission clock: `discovery_first_reliable_available_at` on campaign-relative
 half-open 7-day windows from schedule `activation.starts_at` /

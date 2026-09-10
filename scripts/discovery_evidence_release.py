@@ -29,6 +29,33 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     seal_live_cohort,
     verify_live_cohort,
 )
+from solana_alpha_lab.factory.live_cohort_to_forge import (
+    LiveCohortToForgeError,
+    assert_closure_ready,
+    assert_source_matches_receipt,
+    build_closure_receipt,
+    forge_control_ready,
+    list_live_cohorts,
+    publish_live_cohort,
+    resolve_operator_path,
+)
+
+FAIL_OWNER_NEXT = {
+    "NOT_MATURE": "WAIT_UNTIL_COHORT_MATURE",
+    "COHORT_DUE_OPEN": "WAIT_UNTIL_COHORT_DUES_CLOSED",
+    "PUBLICATION_OPEN": "WAIT_UNTIL_PUBLICATION_JOBS_CLOSED",
+    "IDENTITY_CONFLICT": "STOP_DO_NOT_RESEAL",
+    "COVERAGE_CONFIRMED_BROKEN": "STOP_DO_NOT_SEAL",
+    "LOW_YIELD": "WAIT_UNTIL_YIELD_ELIGIBLE",
+    "IMPORT_CONFLICT": "STOP_DO_NOT_REIMPORT",
+    "COHORT_ALREADY_IMPORTED": "STOP_DO_NOT_REIMPORT",
+    "CLOSED_RECEIPT_INCOMPLETE": "STOP_MISSING_CLOSURE_EVIDENCE",
+    "CLOSED_RECEIPT_MISSING": "STOP_MISSING_CLOSURE_EVIDENCE",
+    "CLOSED_RECEIPT_STORE_MISSING": "STOP_MISSING_CLOSURE_EVIDENCE",
+    "RELEASE_BLOCKED_BUDGET": "WAIT_UNTIL_BUDGET_UNBLOCKED",
+    "CURRENT_CORPUS_MISSING": "IMPORT_VERIFIED_RELEASE_FIRST",
+    "TRANSPORT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
+}
 
 
 def _parse_utc(value: str | None) -> datetime | None:
@@ -38,6 +65,10 @@ def _parse_utc(value: str | None) -> datetime | None:
     if text.endswith("Z"):
         text = text[:-1] + "+00:00"
     return datetime.fromisoformat(text)
+
+
+def _path(value: Path) -> Path:
+    return resolve_operator_path(ROOT, value)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -61,11 +92,15 @@ def main(argv: list[str] | None = None) -> int:
 
     build_live = sub.add_parser(
         "build-live-source",
-        help="Rebuild deterministic live source snapshot from Observation RDP",
+        help="Rebuild cohort-scoped live source snapshot from Observation RDP",
     )
     build_live.add_argument("--observation-rdp", type=Path, required=True)
+    build_live.add_argument("--ops-store", type=Path, required=True)
     build_live.add_argument("--schedule-sha256", required=True)
     build_live.add_argument("--activation-id", required=True)
+    build_live.add_argument("--cohort-id", required=True)
+    build_live.add_argument("--as-of", type=str, default=None)
+    build_live.add_argument("--discovery-coverage-class", default=None)
 
     live_status = sub.add_parser(
         "live-status", help="Cohort readiness from immutable Observation RDP"
@@ -80,6 +115,7 @@ def main(argv: list[str] | None = None) -> int:
     seal_live.add_argument("--release-root", type=Path, required=True)
     seal_live.add_argument("--sealed-at", type=str, default=None)
     seal_live.add_argument("--as-of", type=str, default=None)
+    seal_live.add_argument("--release-builder-git-sha", default=None)
 
     verify_live = sub.add_parser("verify-live", help="Verify a sealed live cohort")
     verify_live.add_argument("--release-root", type=Path, required=True)
@@ -91,57 +127,143 @@ def main(argv: list[str] | None = None) -> int:
     import_live.add_argument("--data-root", type=Path, required=True)
     import_live.add_argument("--import-at", type=str, default=None)
 
+    publish = sub.add_parser(
+        "publish-live-cohort",
+        help="One-shot: closure → source → seal → verify → transport → import → Forge CONTROL",
+    )
+    publish.add_argument("--observation-rdp", type=Path, required=True)
+    publish.add_argument("--ops-store", type=Path, required=True)
+    publish.add_argument("--schedule-sha256", required=True)
+    publish.add_argument("--activation-id", required=True)
+    publish.add_argument("--cohort-id", default=None)
+    publish.add_argument("--data-root", type=Path, required=True)
+    publish.add_argument("--release-root", type=Path, default=None)
+    publish.add_argument("--as-of", type=str, default=None)
+    publish.add_argument("--release-builder-git-sha", default=None)
+    publish.add_argument("--discovery-coverage-class", default=None)
+
+    listed = sub.add_parser(
+        "list-live-cohorts",
+        help="List campaign cohorts and the next mature unimported cohort",
+    )
+    listed.add_argument("--observation-rdp", type=Path, required=True)
+    listed.add_argument("--ops-store", type=Path, required=True)
+    listed.add_argument("--schedule-sha256", required=True)
+    listed.add_argument("--activation-id", required=True)
+    listed.add_argument("--data-root", type=Path, default=None)
+    listed.add_argument("--as-of", type=str, default=None)
+
+    forge_ready = sub.add_parser(
+        "forge-control-ready",
+        help="Read-only Forge CONTROL readiness (does not run /hypothesis-forge)",
+    )
+    forge_ready.add_argument("--data-root", type=Path, required=True)
+    forge_ready.add_argument("--imported-cohort-id", default=None)
+
     args = parser.parse_args(argv)
     try:
         if args.command == "seal":
             inventory = load_source_inventory(
-                body_path=args.body,
-                envelope_path=args.envelope,
-                source_receipt_path=args.source_receipt,
+                body_path=_path(args.body),
+                envelope_path=_path(args.envelope),
+                source_receipt_path=(
+                    None if args.source_receipt is None else _path(args.source_receipt)
+                ),
             )
             result = seal_discovery_release(
                 inventory=inventory,
-                release_root=args.release_root,
+                release_root=_path(args.release_root),
                 sealed_at=_parse_utc(args.sealed_at),
             )
         elif args.command == "verify":
-            result = verify_discovery_release(args.release_root)
+            result = verify_discovery_release(_path(args.release_root))
         elif args.command == "import":
             result = import_discovery_release(
-                release_root=args.release_root,
-                data_root=args.data_root,
+                release_root=_path(args.release_root),
+                data_root=_path(args.data_root),
                 import_time=_parse_utc(args.import_at),
             )
         elif args.command == "build-live-source":
-            result = build_live_observation_source_from_rdp(
-                observation_rdp_root=args.observation_rdp,
+            observation_rdp = _path(args.observation_rdp)
+            as_of = _parse_utc(args.as_of) or datetime.now().astimezone()
+            receipt = build_closure_receipt(
+                ops_store=_path(args.ops_store),
+                observation_rdp=observation_rdp,
                 schedule_sha256=args.schedule_sha256,
                 activation_id=args.activation_id,
+                cohort_id=args.cohort_id,
+                as_of=as_of,
             )
+            assert_closure_ready(receipt)
+            result = build_live_observation_source_from_rdp(
+                observation_rdp_root=observation_rdp,
+                schedule_sha256=args.schedule_sha256,
+                activation_id=args.activation_id,
+                cohort_id=args.cohort_id,
+                as_of=as_of,
+                closure_receipt=receipt,
+                discovery_coverage_class=args.discovery_coverage_class,
+            )
+            assert_source_matches_receipt(result, receipt)
         elif args.command == "live-status":
             result = live_cohort_status(
-                observation_rdp_root=args.observation_rdp,
+                observation_rdp_root=_path(args.observation_rdp),
                 cohort_id=args.cohort_id,
                 as_of=_parse_utc(args.as_of),
             )
         elif args.command == "seal-live-cohort":
             result = seal_live_cohort(
-                observation_rdp_root=args.observation_rdp,
+                observation_rdp_root=_path(args.observation_rdp),
                 cohort_id=args.cohort_id,
-                release_root=args.release_root,
+                release_root=_path(args.release_root),
                 sealed_at=_parse_utc(args.sealed_at),
                 as_of=_parse_utc(args.as_of),
+                release_builder_git_sha=args.release_builder_git_sha,
             )
         elif args.command == "verify-live":
-            result = verify_live_cohort(args.release_root)
-        else:
+            result = verify_live_cohort(_path(args.release_root))
+        elif args.command == "import-live":
             result = import_live_cohort(
-                release_root=args.release_root,
-                data_root=args.data_root,
+                release_root=_path(args.release_root),
+                data_root=_path(args.data_root),
                 import_time=_parse_utc(args.import_at),
             )
-    except (DiscoveryReleaseError, LiveCohortReleaseError) as exc:
-        print(json.dumps({"status": "FAIL", "code": str(exc)}, sort_keys=True))
+        elif args.command == "publish-live-cohort":
+            result = publish_live_cohort(
+                repo_root=ROOT,
+                observation_rdp=_path(args.observation_rdp),
+                ops_store=_path(args.ops_store),
+                schedule_sha256=args.schedule_sha256,
+                activation_id=args.activation_id,
+                cohort_id=args.cohort_id,
+                data_root=_path(args.data_root),
+                release_root=None if args.release_root is None else _path(args.release_root),
+                as_of=_parse_utc(args.as_of),
+                release_builder_git_sha=args.release_builder_git_sha,
+                discovery_coverage_class=args.discovery_coverage_class,
+            )
+        elif args.command == "list-live-cohorts":
+            result = list_live_cohorts(
+                observation_rdp=_path(args.observation_rdp),
+                ops_store=_path(args.ops_store),
+                schedule_sha256=args.schedule_sha256,
+                activation_id=args.activation_id,
+                data_root=None if args.data_root is None else _path(args.data_root),
+                as_of=_parse_utc(args.as_of),
+            )
+        else:
+            result = forge_control_ready(
+                data_root=_path(args.data_root),
+                repo_root=ROOT,
+                imported_cohort_id=args.imported_cohort_id,
+            )
+    except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError) as exc:
+        code = str(exc)
+        payload = {"status": "FAIL", "code": code}
+        nxt = FAIL_OWNER_NEXT.get(code)
+        if nxt:
+            payload["next"] = nxt
+        print(json.dumps(payload, sort_keys=True))
         return 2
     print(json.dumps({"status": "PASS", "result": result}, sort_keys=True, default=str))
     return 0

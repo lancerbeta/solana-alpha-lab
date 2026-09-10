@@ -305,6 +305,21 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 - подготовка design packet, Experiment Card, draft ExperimentSpec и bounded PRD+SSD;
 - append-only запись session/hypothesis draft в Research Data Plane только если для этого уже существует accepted no-Git capability. Если её нет — выведи packet, но не создавай Git gap автоматически.
 
+Machine readback that the LIVE CORPUS is CONTROL-ready, without invoking this
+slash:
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
+```
+
+Happy terminal `FORGE_CONTROL_READY`. The operator surface NEXT is exactly:
+
+```
+/hypothesis-forge CURRENT_REPRESENTATION_CONTROL
+```
+
+Do not run ordinary Forge as a fallback when CONTROL corpus/yield preconditions fail.
+
 `CURRENT_REPRESENTATION_CONTROL_V1` (preflight `--control-current-representation`)
 is the preregistered unchanged-representation CONTROL mode. It does not change
 default/general Forge. In CONTROL mode Prompt A may use only:

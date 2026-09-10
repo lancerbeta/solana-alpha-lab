@@ -132,6 +132,7 @@ def _snapshot_for_week(
         "unresolved_due": False,
         "in_flight": False,
         "budget_blocked": False,
+        "closure_receipt_sha256": "c" * 64,
         "as_of": (base + timedelta(days=10)).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "members": members,
         "observations": observations,

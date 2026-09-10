@@ -236,13 +236,18 @@ routes:
       - discovery release
       - Observation RDP
       - cumulative corpus
+      - publish-live-cohort
+      - forge-control-ready
+      - list-live-cohorts
       - live rdp
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
     root_binding_ids: [ACTIVE-LIVE-LIFECYCLE-EVIDENCE]
-    root_asset_ids: []
+    root_asset_ids: [MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001, MODULE-LIVE-COHORT-TO-FORGE-001]
     query_recipe_ids: []
     status_plane: MIXED
-    runtime_resolution: {mode: NONE, operator_asset_ids: []}
+    runtime_resolution:
+      mode: NONE
+      operator_asset_ids: [DOC-FACTORY-LIFECYCLE-COLLECTOR-001]
     forge_visibility: INCLUDE
     related_route_ids: [SEM-PRIOR-WORK, SEM-LIVE-COLLECTION]
 

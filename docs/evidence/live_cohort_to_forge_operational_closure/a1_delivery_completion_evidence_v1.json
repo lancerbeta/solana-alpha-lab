@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-10",
+  "task_id": "LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1",
+  "state_change": "LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_READY_FOR_MERGE",
+  "base_main": "9bb972b56da3f24fc796262f09669ac5895ad1ef",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_cohort_to_forge_operational_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE",
+    "independent_review": {
+      "path": "docs/evidence/live_cohort_to_forge_operational_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_SEAL_OR_IMPORT_IN_THIS_ATOM",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}
