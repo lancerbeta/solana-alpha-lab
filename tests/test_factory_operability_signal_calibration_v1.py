@@ -307,7 +307,30 @@ class ProviderCurrentStateTests(unittest.TestCase):
         )
         self.assertNotIn("PROVIDER_FAILED", recovered)
 
-    def test_transport_and_5xx_are_current_provider_failure(self) -> None:
+    def test_started_http_ok_does_not_clear_timeout(self) -> None:
+        current = derive_current_provider_state(
+            [
+                _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
+                {
+                    "primitive_id": RECENT,
+                    "state": "STARTED",
+                    "updated_at": render_utc(NOW - timedelta(minutes=1)),
+                    "created_at": render_utc(NOW - timedelta(minutes=1)),
+                    "payload": {"http_class": HTTP_CLASS_OK},
+                },
+            ]
+        )
+        self.assertTrue(current["provider_current_failed"])
+
+    def test_future_http_ok_does_not_manufacture_recovery(self) -> None:
+        current = derive_current_provider_state(
+            [
+                _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_TIMEOUT),
+                _call(RECENT, NOW + timedelta(minutes=5), HTTP_CLASS_OK),
+            ],
+            now=NOW,
+        )
+        self.assertTrue(current["provider_current_failed"])
         for http_class in (HTTP_CLASS_5XX, HTTP_CLASS_TRANSPORT):
             with self.subTest(http_class=http_class):
                 current = derive_current_provider_state(

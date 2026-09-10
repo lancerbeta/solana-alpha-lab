@@ -73,12 +73,17 @@ def _attempt_kind(http_class: object) -> str:
     return _KIND_OTHER
 
 
-def derive_current_provider_state(calls: list[dict[str, Any]]) -> dict[str, bool]:
+def derive_current_provider_state(
+    calls: list[dict[str, Any]],
+    *,
+    now: datetime | None = None,
+) -> dict[str, bool]:
     """Latest-by-time per primitive; 24h counters stay separate diagnostics.
 
-    Proven recovery is a later same-primitive HTTP_OK only. A later STARTED
-    or unclassified call cannot clear an unresolved failure. A later success
-    on a different primitive cannot clear another primitive. Malformed
+    Proven recovery is a later same-primitive HTTP_OK on a non-STARTED
+    ledger row. A later STARTED or unclassified call cannot clear an unresolved
+    failure. Future timestamps cannot manufacture recovery. A later success on
+    a different primitive cannot clear another primitive. Malformed
     timestamps never count as success. A later same-primitive failure of a
     different class replaces the current class; it does not keep every prior
     class until OK.
@@ -100,7 +105,11 @@ def derive_current_provider_state(calls: list[dict[str, Any]]) -> dict[str, bool
             if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
                 malformed_kinds.setdefault(primitive, set()).add(kind)
             continue
+        if now is not None and updated > now and kind == _KIND_OK:
+            continue
         if kind == _KIND_OK:
+            if str(call.get("state") or "") == "STARTED":
+                continue
             success_at = latest_success_at.get(primitive)
             if success_at is None or updated > success_at:
                 latest_success_at[primitive] = updated
@@ -256,7 +265,7 @@ def build_collector_read_model(
         period_seconds=period_seconds,
         empirical_overlap_seconds=empirical_overlap_seconds,
     )
-    current_provider = derive_current_provider_state(current_state_calls)
+    current_provider = derive_current_provider_state(current_state_calls, now=now)
 
     health_flags: list[str] = []
     if store.restore_marker_unresolved():

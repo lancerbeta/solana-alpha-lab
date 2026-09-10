@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import shutil
+import stat
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
@@ -186,8 +187,8 @@ def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
     """One filesystem walk: total RDP bytes plus OPEN-dir bytes.
 
     Every regular file under ``publication_jobs/open`` is transient,
-    including atomic ``*.json.tmp``. Finalized OPEN job count stays
-    ``*.json`` only. Any unreadable file fails the whole measurement closed.
+    including empty and atomic ``*.json.tmp``. Any unreadable directory or
+    file fails the whole measurement closed.
     """
 
     if not path.exists():
@@ -203,32 +204,43 @@ def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
         scan_failed = True
 
     try:
-        files: list[Path] = []
+        files: list[tuple[Path, int]] = []
         if path.is_file():
-            files = [path]
+            try:
+                files = [(path, int(path.stat().st_size))]
+            except OSError:
+                return UNKNOWN, UNKNOWN, UNKNOWN
         else:
             for dirpath, dirnames, filenames in os.walk(
                 path, onerror=onerror, followlinks=False
             ):
                 if scan_failed:
                     break
-                dirnames[:] = [
-                    name
-                    for name in dirnames
-                    if not (Path(dirpath) / name).is_symlink()
-                ]
+                pending_dirs = list(dirnames)
+                dirnames[:] = []
+                for name in pending_dirs:
+                    try:
+                        mode = os.lstat(os.path.join(dirpath, name)).st_mode
+                    except OSError:
+                        scan_failed = True
+                        break
+                    if stat.S_ISLNK(mode):
+                        continue
+                    dirnames.append(name)
+                if scan_failed:
+                    break
                 for name in filenames:
                     child = Path(dirpath) / name
-                    if child.is_symlink() or not child.is_file():
+                    try:
+                        info = os.lstat(child)
+                    except OSError:
+                        return UNKNOWN, UNKNOWN, UNKNOWN
+                    if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
                         continue
-                    files.append(child)
+                    files.append((child, int(info.st_size)))
             if scan_failed:
                 return UNKNOWN, UNKNOWN, UNKNOWN
-        for child in files:
-            try:
-                size = int(child.stat().st_size)
-            except OSError:
-                return UNKNOWN, UNKNOWN, UNKNOWN
+        for child, size in files:
             total += size
             try:
                 child.relative_to(open_root)
