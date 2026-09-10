@@ -84,9 +84,9 @@ def derive_current_provider_state(
     ledger row. A later STARTED or unclassified call cannot clear an unresolved
     failure. Future timestamps cannot manufacture recovery. A later success on
     a different primitive cannot clear another primitive. Malformed
-    timestamps never count as success. A later same-primitive failure of a
-    different class replaces the current class; it does not keep every prior
-    class until OK.
+    timestamps never count as success. Future-dated rows cannot replace a
+    valid-time classification: future HTTP_OK is ignored, and future failures
+    remain unresolved without becoming the latest attempt.
     """
 
     latest_failure_at: dict[str, datetime] = {}
@@ -107,7 +107,9 @@ def derive_current_provider_state(
             if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
                 malformed_kinds.setdefault(primitive, set()).add(kind)
             continue
-        if updated > now and kind == _KIND_OK:
+        if updated > now:
+            if kind in {_KIND_AUTH, _KIND_RATE, _KIND_FAILED}:
+                malformed_kinds.setdefault(primitive, set()).add(kind)
             continue
         if kind == _KIND_OK:
             success_at = latest_success_at.get(primitive)

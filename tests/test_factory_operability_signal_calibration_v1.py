@@ -352,6 +352,16 @@ class ProviderCurrentStateTests(unittest.TestCase):
         )
         self.assertTrue(current["provider_current_failed"])
 
+    def test_future_timeout_does_not_replace_valid_auth(self) -> None:
+        current = _provider_state(
+            [
+                _call(RECENT, NOW - timedelta(hours=2), HTTP_CLASS_401),
+                _call(RECENT, NOW + timedelta(minutes=5), HTTP_CLASS_TIMEOUT),
+            ]
+        )
+        self.assertTrue(current["provider_current_auth_failed"])
+        self.assertTrue(current["provider_current_failed"])
+
     def test_transport_and_5xx_are_current_provider_failure(self) -> None:
         for http_class in (HTTP_CLASS_5XX, HTTP_CLASS_TRANSPORT):
             with self.subTest(http_class=http_class):
