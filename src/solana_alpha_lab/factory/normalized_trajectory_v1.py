@@ -396,6 +396,30 @@ class LifecycleSchedule:
                 schedule_document
             ):
                 raise NormalizedTrajectoryError("SCHEDULE_DOCUMENT_INVALID")
+            document_schedule_id = schedule_document.get("schedule_key")
+            document_x_point = schedule_document.get("x_point")
+            document_y_points = schedule_document.get("y_points")
+            if (
+                not isinstance(document_schedule_id, str)
+                or not isinstance(document_x_point, Mapping)
+                or not isinstance(document_y_points, (list, tuple))
+            ):
+                raise NormalizedTrajectoryError("SCHEDULE_DOCUMENT_INVALID")
+            document_x_due = document_x_point.get("due_offset_seconds")
+            document_y_due = tuple(
+                point.get("due_offset_seconds")
+                for point in document_y_points
+                if isinstance(point, Mapping)
+            )
+            if (
+                document_schedule_id != self.schedule_id
+                or document_x_due != x_point
+                or len(document_y_due) != len(document_y_points)
+                or document_y_due != y_points
+            ):
+                raise NormalizedTrajectoryError(
+                    "SCHEDULE_DOCUMENT_BINDING_MISMATCH"
+                )
             try:
                 expected_schedule_sha256 = canonical_observation_schedule_sha256(
                     schedule_document
@@ -649,6 +673,12 @@ def _transition_motif(
     return "-".join(symbols)
 
 
+def _missing_transition_count(
+    motif: tuple[tuple[str, str], ...],
+) -> int:
+    return sum(symbol.split("-").count("M") for _channel, symbol in motif)
+
+
 def _contains_forbidden_output_key(value: object) -> bool:
     if isinstance(value, Mapping):
         if any(str(key).lower() in _FORBIDDEN_OUTPUT_KEYS for key in value):
@@ -818,12 +848,12 @@ def project_normalized_trajectory(
     m_heavy_candidates = [
         item
         for item in ranked
-        if sum(symbol == "M" for _channel, symbol in item[0]) > 0
+        if _missing_transition_count(item[0]) > 0
     ]
     m_heavy = min(
         m_heavy_candidates,
         key=lambda item: (
-            -sum(symbol == "M" for _channel, symbol in item[0]),
+            -_missing_transition_count(item[0]),
             motif_rank(item),
         ),
     ) if m_heavy_candidates else None

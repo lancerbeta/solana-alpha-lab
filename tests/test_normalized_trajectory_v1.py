@@ -4,6 +4,7 @@ import json
 import math
 import sys
 import unittest
+from copy import deepcopy
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -12,6 +13,7 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.factory import normalized_trajectory_v1 as normalized_trajectory_module
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DEFAULT_SCHEDULE,
     FIELD_IDS,
@@ -21,6 +23,7 @@ from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     TypedLifecycleObservation,
     project_normalized_trajectory,
 )
+from solana_alpha_lab.factory.observation_schedule import schedule_sha256
 
 ANCHOR = datetime(2026, 1, 1, tzinfo=UTC)
 
@@ -205,6 +208,20 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         schedule = projected.payload["schedule"]
         self.assertRegex(schedule["schedule_sha256"], r"^[0-9a-f]{64}$")
 
+    def test_schedule_document_must_match_compact_schedule_fields(self) -> None:
+        document = deepcopy(normalized_trajectory_module._SYNTHETIC_SCHEDULE_DOCUMENT)
+        x_point = dict(document["x_point"])
+        x_point["point_id"] = "X600"
+        x_point["due_offset_seconds"] = 600
+        document["x_point"] = x_point
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            LifecycleSchedule(
+                x_due_offset_seconds=300,
+                schedule_sha256=schedule_sha256(document),
+                schedule_document=document,
+            )
+        self.assertEqual(str(raised.exception), "SCHEDULE_DOCUMENT_BINDING_MISMATCH")
+
     def test_schedule_hash_must_match_canonical_schedule_contents(self) -> None:
         with self.assertRaises(NormalizedTrajectoryError) as raised:
             LifecycleSchedule(schedule_sha256="00" * 32)
@@ -285,6 +302,12 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
                 "M" in symbol
                 for item in projected.payload["histogram"]
                 for symbol in item["motif"].values()
+            )
+        )
+        self.assertTrue(
+            any(
+                "M-M" in item["motif"].values()
+                for item in projected.payload["histogram"]
             )
         )
 

@@ -36,6 +36,9 @@ the canonical full `ObservationSchedule` hash, not a hash of the four compact
 projection offsets. Every typed row also carries the exact schedule and
 activation binding, and the anonymous payload carries release, cohort, source,
 census, and observation-byte hashes without mint identities.
+When a full imported schedule document is supplied, its schedule key and
+landmark offsets must match the compact projection fields before its hash is
+accepted.
 
 Taker volume is used only when observed. If taker volume is unavailable and
 both buy and sell volume are observed, two fallback channels are emitted. Buy
@@ -77,6 +80,12 @@ exact packet plus the existing memory eligibility/policy anchors. Caller-
 declared prior state is accepted only with a separate, hash-bound
 `REPRESENTATION_PROBE_REGISTRY_READBACK_V1` registration receipt keyed by the
 CONTROL/epoch slot; a raw boolean or challenger packet is not registration.
+
+The challenger builder and fixture transport also reject a verified readiness
+receipt with `GAP_CONFIRMED` coverage or fewer than the preregistered minimum
+usable yield-eligible members. Extracting the unchanged HFIC packet requires
+that same verified readiness receipt, so a packet cannot be detached from its
+release/source/census/observation-byte binding.
 
 The envelope binds the same evidence epoch, prompt (`HFIC-V1.2`), prior-memory
 baseline, packet hash, and one-run representation identity. It does not rebuild

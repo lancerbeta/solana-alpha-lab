@@ -84,6 +84,8 @@ INVALID_TRIGGER_NOT_MET = "INVALID_TRIGGER_NOT_MET"
 INVALID_CASE_C_OBSERVABILITY = "INVALID_CASE_C_OBSERVABILITY"
 INVALID_OBSERVABILITY_INPUT = "INVALID_OBSERVABILITY_INPUT"
 INVALID_COHORT_READINESS_RECEIPT = "INVALID_COHORT_READINESS_RECEIPT"
+INVALID_COVERAGE_BROKEN = "INVALID_COVERAGE_BROKEN"
+INVALID_INSUFFICIENT_YIELD = "INVALID_INSUFFICIENT_YIELD"
 REPRESENTATION_PROBE_ALREADY_EXISTS = "REPRESENTATION_PROBE_ALREADY_EXISTS"
 INVALID_REPRESENTATION_SCHEMA = "INVALID_REPRESENTATION_SCHEMA"
 
@@ -491,6 +493,18 @@ def _packet_from_receipt(receipt: Mapping[str, Any]) -> Mapping[str, Any] | None
 def _validate_control_receipt_contract(
     receipt: Mapping[str, Any], packet: Mapping[str, Any]
 ) -> None:
+    for anchor_name in (
+        "memory_eligibility_sha256",
+        "memory_policy_head_sha256",
+    ):
+        receipt_anchor = receipt.get(anchor_name)
+        packet_anchor = packet.get(anchor_name)
+        if (
+            receipt_anchor is not None
+            and packet_anchor is not None
+            and receipt_anchor != packet_anchor
+        ):
+            raise RepresentationProbeError(INVALID_MEMORY_BASELINE_DRIFT)
     _validate_json_schema(packet, _HFIC_PACKET_SCHEMA_PATH, INVALID_CONTROL_PACKET_HASH)
     session_receipt = receipt.get("session_receipt")
     if not isinstance(session_receipt, Mapping):
@@ -648,6 +662,13 @@ def _validate_cohort_readiness_receipt(
     if receipt["receipt_sha256"] != canonical_sha256(base):
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
     return receipt
+
+
+def _assert_probe_readiness_eligible(receipt: Mapping[str, Any]) -> None:
+    if receipt["discovery_coverage_class"] == "GAP_CONFIRMED":
+        raise RepresentationProbeError(INVALID_COVERAGE_BROKEN)
+    if receipt["yield_eligible"] < MIN_USABLE_YIELD_ELIGIBLE:
+        raise RepresentationProbeError(INVALID_INSUFFICIENT_YIELD)
 
 
 def _assert_representation_bound_to_readiness(
@@ -952,6 +973,7 @@ def build_challenger_packet(
         cohort_readiness_receipt,
         expected_schedule_sha256=payload["schedule"]["schedule_sha256"],
     )
+    _assert_probe_readiness_eligible(readiness)
     _assert_representation_bound_to_readiness(payload, readiness)
     bound_focus = baseline.packet.get(
         "owner_focus", baseline.focus_key_sha256 or "CONTROL"
@@ -1135,10 +1157,20 @@ def _validate_challenger_packet(
     return packet, representation
 
 
-def existing_hfic_packet(challenger_packet: Mapping[str, Any]) -> dict[str, Any]:
+def existing_hfic_packet(
+    challenger_packet: Mapping[str, Any],
+    *,
+    cohort_readiness_receipt: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     """Return the unchanged critic packet for an existing HFIC lifecycle fixture."""
 
-    validated, _representation = _validate_challenger_packet(challenger_packet)
+    validated, representation = _validate_challenger_packet(challenger_packet)
+    readiness = _validate_cohort_readiness_receipt(
+        cohort_readiness_receipt,
+        expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
+    )
+    _assert_probe_readiness_eligible(readiness)
+    _assert_representation_bound_to_readiness(representation, readiness)
     return deepcopy(dict(validated["critic_input_packet"]))
 
 
@@ -1191,7 +1223,10 @@ def existing_hfic_lifecycle_fixture_input(
         expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
     )
     _assert_representation_bound_to_readiness(representation, readiness)
-    packet = existing_hfic_packet(validated)
+    packet = existing_hfic_packet(
+        validated,
+        cohort_readiness_receipt=readiness,
+    )
     return {
         "lifecycle_mode": REPRESENTATION_PROBE_KIND,
         "probe_state": validated["probe_state"],
@@ -1302,6 +1337,12 @@ def _status_probe_identity_reason(
             {key: receipt[key] for key in challenger_keys}
         )
         _assert_challenger_bound_to_control(validated_challenger, baseline)
+        readiness = _validate_cohort_readiness_receipt(
+            snapshot.get("cohort_readiness_receipt"),
+            expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
+        )
+        _assert_probe_readiness_eligible(readiness)
+        _assert_representation_bound_to_readiness(representation, readiness)
         if receipt.get("probe_state") not in {"DORMANT_PACKET_ONLY", "REGISTERED"}:
             return INVALID_PROBE_IDENTITY
         payload_sha256 = representation["payload_sha256"]
@@ -1624,9 +1665,9 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
                 "READY_VALID",
                 "READY_VALID_WITH_COVERAGE_LIMITATION",
             } or invalid_reason is None and coverage == "GAP_CONFIRMED":
-                invalid_reason = "INVALID_COVERAGE_BROKEN"
+                invalid_reason = INVALID_COVERAGE_BROKEN
             elif invalid_reason is None and yield_eligible < MIN_USABLE_YIELD_ELIGIBLE:
-                invalid_reason = "INVALID_INSUFFICIENT_YIELD"
+                invalid_reason = INVALID_INSUFFICIENT_YIELD
             if invalid_reason == INVALID_CONTROL_NOT_RUN:
                 status = STATUS_CONTROL_REQUIRED
                 reason = invalid_reason
@@ -1686,6 +1727,7 @@ __all__ = [
     "CURRENT_REPRESENTATION_CONTROL_V1",
     "INVALID_CASE_C_OBSERVABILITY",
     "INVALID_COHORT_READINESS_RECEIPT",
+    "INVALID_COVERAGE_BROKEN",
     "INVALID_CONTROL_FOCUS",
     "INVALID_CONTROL_MODE",
     "INVALID_CONTROL_NOT_RUN",
@@ -1694,6 +1736,7 @@ __all__ = [
     "INVALID_EVIDENCE_EPOCH_MISMATCH",
     "INVALID_MEMORY_BASELINE_DRIFT",
     "INVALID_OBSERVABILITY_INPUT",
+    "INVALID_INSUFFICIENT_YIELD",
     "INVALID_PACKET_BUDGET",
     "INVALID_PROBE_IDENTITY",
     "INVALID_REPRESENTATION_SCHEMA",

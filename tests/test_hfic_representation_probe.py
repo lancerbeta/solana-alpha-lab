@@ -23,6 +23,8 @@ from solana_alpha_lab.factory.hfic_preflight import MAX_PACKET_BYTES
 from solana_alpha_lab.factory.hfic_representation_probe import (
     INVALID_CONTROL_NOT_RUN,
     INVALID_CONTROL_PACKET_HASH,
+    INVALID_COVERAGE_BROKEN,
+    INVALID_INSUFFICIENT_YIELD,
     INVALID_PACKET_BUDGET,
     INVALID_PROBE_IDENTITY,
     INVALID_REPRESENTATION_SCHEMA,
@@ -194,7 +196,11 @@ def _control_receipt() -> dict[str, object]:
     return receipt
 
 
-def _cohort_readiness_receipt(*, yield_eligible: object = 10) -> dict[str, object]:
+def _cohort_readiness_receipt(
+    *,
+    yield_eligible: object = 10,
+    coverage: str = "DISCOVERY_COVERAGE_CONFIRMED",
+) -> dict[str, object]:
     binding = DEFAULT_SCHEDULE.corpus_binding
     assert binding is not None
     binding_values = binding.as_dict()
@@ -218,10 +224,10 @@ def _cohort_readiness_receipt(*, yield_eligible: object = 10) -> dict[str, objec
         "census_row_count": 10,
         "observation_row_count": 30,
         "feature_families": [],
-        "yield_eligible": 10,
+        "yield_eligible": yield_eligible,
         "yield_missing": 0,
         "readiness_state": "READY_VALID",
-        "discovery_coverage_class": "DISCOVERY_COVERAGE_CONFIRMED",
+        "discovery_coverage_class": coverage,
         "projection_id": "TOKENS_V2_TYPED_PROJECTION_V1",
         "projection_version": "1.0",
     }
@@ -302,7 +308,13 @@ class HficRepresentationProbeTests(unittest.TestCase):
         )
         self.assertEqual(lifecycle_input["representation"], challenger[PACKET_KEY])
         self.assertEqual(challenger[PACKET_KEY], challenger["normalized_trajectory_v1"])
-        self.assertEqual(existing_hfic_packet(challenger), baseline.packet)
+        self.assertEqual(
+            existing_hfic_packet(
+                challenger,
+                cohort_readiness_receipt=readiness,
+            ),
+            baseline.packet,
+        )
         self.assertNotEqual(
             challenger["representation_search_key_sha256"],
             receipt["search_key_sha256"],
@@ -319,7 +331,12 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 encoding="utf-8"
             )
         )
-        Draft202012Validator(schema).validate(existing_hfic_packet(challenger))
+        Draft202012Validator(schema).validate(
+            existing_hfic_packet(
+                challenger,
+                cohort_readiness_receipt=readiness,
+            )
+        )
         critic = _critic_result_from_packet_only(
             lifecycle_input["critic_input_packet"], "KILL_MECHANISM"
         )
@@ -368,6 +385,43 @@ class HficRepresentationProbeTests(unittest.TestCase):
             )
         self.assertEqual(str(raised.exception), "REPRESENTATION_PROBE_ALREADY_EXISTS")
 
+    def test_builder_rejects_unusable_readiness(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        for readiness, expected in (
+            (
+                _cohort_readiness_receipt(yield_eligible=9),
+                INVALID_INSUFFICIENT_YIELD,
+            ),
+            (
+                _cohort_readiness_receipt(coverage="GAP_CONFIRMED"),
+                INVALID_COVERAGE_BROKEN,
+            ),
+        ):
+            with self.subTest(expected=expected):
+                with self.assertRaises(RepresentationProbeError) as raised:
+                    build_challenger_packet(
+                        baseline,
+                        project_normalized_trajectory([]),
+                        cohort_readiness_receipt=readiness,
+                    )
+                self.assertEqual(str(raised.exception), expected)
+
+    def test_control_memory_anchors_must_match_packet(self) -> None:
+        receipt = _control_receipt()
+        receipt["memory_policy_head_sha256"] = "aa" * 32
+        packet = receipt["critic_input_packet"]
+        assert isinstance(packet, dict)
+        packet["memory_policy_head_sha256"] = "bb" * 32
+        packet_hash = canonical_sha256(packet)
+        receipt["critic_input_packet_sha256"] = packet_hash
+        session_receipt = receipt["session_receipt"]
+        assert isinstance(session_receipt, dict)
+        session_receipt["critic_input_packet_sha256"] = packet_hash
+        with self.assertRaises(RepresentationProbeError) as raised:
+            control_baseline_from_receipt(receipt)
+        self.assertEqual(str(raised.exception), "INVALID_MEMORY_BASELINE_DRIFT")
+
     def test_public_control_baseline_constructor_cannot_grant_verification(self) -> None:
         with self.assertRaises(RepresentationProbeError) as raised:
             ControlBaseline(
@@ -401,10 +455,11 @@ class HficRepresentationProbeTests(unittest.TestCase):
     def test_schedule_hash_drift_cannot_enter_challenger(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
+        readiness = _cohort_readiness_receipt()
         challenger = build_challenger_packet(
             baseline,
             project_normalized_trajectory([]),
-            cohort_readiness_receipt=_cohort_readiness_receipt(),
+            cohort_readiness_receipt=readiness,
         )
         drifted = json.loads(json.dumps(challenger))
         representation = drifted[PACKET_KEY]
@@ -414,16 +469,20 @@ class HficRepresentationProbeTests(unittest.TestCase):
         )
         drifted["representation_payload_sha256"] = representation["payload_sha256"]
         with self.assertRaises(RepresentationProbeError) as raised:
-            existing_hfic_packet(drifted)
+            existing_hfic_packet(
+                drifted,
+                cohort_readiness_receipt=readiness,
+            )
         self.assertEqual(str(raised.exception), INVALID_REPRESENTATION_SCHEMA)
 
     def test_invalid_x900_cannot_enter_serialized_challenger(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
+        readiness = _cohort_readiness_receipt()
         challenger = build_challenger_packet(
             baseline,
             project_normalized_trajectory([]),
-            cohort_readiness_receipt=_cohort_readiness_receipt(),
+            cohort_readiness_receipt=readiness,
         )
         drifted = json.loads(json.dumps(challenger))
         representation = drifted[PACKET_KEY]
@@ -433,7 +492,10 @@ class HficRepresentationProbeTests(unittest.TestCase):
             {key: value for key, value in representation.items() if key != "payload_sha256"}
         )
         with self.assertRaises(RepresentationProbeError) as raised:
-            existing_hfic_packet(drifted)
+            existing_hfic_packet(
+                drifted,
+                cohort_readiness_receipt=readiness,
+            )
         self.assertEqual(str(raised.exception), INVALID_REPRESENTATION_SCHEMA)
 
     def test_representation_is_bound_to_verified_release_bytes(self) -> None:
