@@ -6023,21 +6023,6 @@
       "target_asset_id": "CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001"
     },
     {
-      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-COMPLETION-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
-    },
-    {
-      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-FACTORY-FIT-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
-    },
-    {
-      "source_asset_id": "EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-INDEPENDENT-REVIEW-001",
-      "relation": "governed_by",
-      "target_asset_id": "CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001"
-    },
-    {
       "source_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-ACCEPTANCE-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FACTORY-ORDINARY-HYPOTHESIS-RUNTIME-001"

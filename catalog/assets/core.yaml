@@ -34154,57 +34154,6 @@ records:
   evidence: []
   search_terms: [PROVIDER_CURRENT_STATE, RESIDENT_RDP, OPEN_JOB]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
-- asset_id: EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-COMPLETION-001
-  record_version: '1.0'
-  asset_type: evidence
-  purpose: Delivery completion evidence for FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1.
-  status: IMPLEMENTED_UNVERIFIED
-  origin: REPOSITORY
-  as_of: '2026-09-10'
-  truth_owner: FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1
-  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_operability_signal_calibration/a1_delivery_completion_evidence_v1.json', repository_path: docs/evidence/factory_operability_signal_calibration/a1_delivery_completion_evidence_v1.json}
-  integrity: {kind: sha256, sha256: 4c5e74e1693381d7856100bcfd4a7d32fc1aad6d1495b69db26a2cd7a8990e89}
-  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
-  relations:
-  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001}
-  consumers: [FACTORY-001]
-  evidence: []
-  search_terms: [DELIVERY_COMPLETION, OPERABILITY_CALIBRATION]
-  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
-- asset_id: EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-INDEPENDENT-REVIEW-001
-  record_version: '1.0'
-  asset_type: evidence
-  purpose: Independent review evidence for FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1.
-  status: IMPLEMENTED_UNVERIFIED
-  origin: REPOSITORY
-  as_of: '2026-09-10'
-  truth_owner: FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1
-  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_operability_signal_calibration/a1_delivery_independent_review_v1.json', repository_path: docs/evidence/factory_operability_signal_calibration/a1_delivery_independent_review_v1.json}
-  integrity: {kind: sha256, sha256: 095256b6b6a4125f0c0ca516fe82876ab7acd93b1c565430b12ccf60aafcfff0}
-  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
-  relations:
-  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001}
-  consumers: [FACTORY-001]
-  evidence: []
-  search_terms: [INDEPENDENT_REVIEW, OPERABILITY_CALIBRATION]
-  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
-- asset_id: EVIDENCE-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-FACTORY-FIT-001
-  record_version: '1.0'
-  asset_type: evidence
-  purpose: Factory Fit review for FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1.
-  status: IMPLEMENTED_UNVERIFIED
-  origin: REPOSITORY
-  as_of: '2026-09-10'
-  truth_owner: FACTORY_OPERABILITY_SIGNAL_CALIBRATION_V1
-  location: {kind: git_path, logical_uri: 'repo://docs/evidence/factory_operability_signal_calibration/a1_delivery_factory_fit_v1.json', repository_path: docs/evidence/factory_operability_signal_calibration/a1_delivery_factory_fit_v1.json}
-  integrity: {kind: sha256, sha256: 2918af557f2b43f056132fe6dd12cf299d18f5c4b230eb3c232f419f2420a29a}
-  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
-  relations:
-  - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-001}
-  consumers: [FACTORY-001]
-  evidence: []
-  search_terms: [FACTORY_FIT, OPERABILITY_CALIBRATION]
-  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: DOC-FACTORY-OPERABILITY-SIGNAL-CALIBRATION-OWNER-READOUT-001
   record_version: '1.0'
   asset_type: evidence
