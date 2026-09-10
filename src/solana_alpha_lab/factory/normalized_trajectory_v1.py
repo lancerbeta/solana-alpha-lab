@@ -13,7 +13,7 @@ import re
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from numbers import Real
 from typing import Any
@@ -33,6 +33,7 @@ MIN_MOTIF_STEPS = 2
 MIN_PREFIX_SLOTS = 3
 MAX_DISTINCT_MOTIF_TUPLES = 8
 _HASH64_RE = re.compile(r"^[0-9a-f]{64}$")
+_REPRESENTATION_CONSTRUCTION_TOKEN = object()
 
 FIELD_IDS = {
     "PRICE": "FIELD-USD-PRICE-001",
@@ -162,19 +163,22 @@ class LifecycleSchedule:
             or _HASH64_RE.fullmatch(self.schedule_sha256) is None
         ):
             raise NormalizedTrajectoryError("SCHEDULE_SHA256_INVALID")
+        expected_schedule_sha256 = canonical_sha256(
+            {
+                "schedule_id": self.schedule_id,
+                "x_due_offset_seconds": x_point,
+                "y_due_offset_seconds": list(y_points),
+                "decision_t_due_offset_seconds": decision_t,
+            }
+        )
         if self.schedule_sha256 is None:
             object.__setattr__(
                 self,
                 "schedule_sha256",
-                canonical_sha256(
-                    {
-                        "schedule_id": self.schedule_id,
-                        "x_due_offset_seconds": x_point,
-                        "y_due_offset_seconds": list(y_points),
-                        "decision_t_due_offset_seconds": decision_t,
-                    }
-                ),
+                expected_schedule_sha256,
             )
+        elif self.schedule_sha256 != expected_schedule_sha256:
+            raise NormalizedTrajectoryError("SCHEDULE_SHA256_MISMATCH")
 
     @property
     def prefix_due_offsets(self) -> tuple[int, ...]:
@@ -374,6 +378,27 @@ class NormalizedTrajectoryRepresentation:
     """Immutable view over the anonymous representation payload."""
 
     _base_payload: Mapping[str, Any]
+    _construction_token: object | None = field(default=None, repr=False, compare=False)
+    _sealed_payload_sha256: str | None = field(
+        default=None, repr=False, compare=False
+    )
+
+    def __post_init__(self) -> None:
+        if self._construction_token is not _REPRESENTATION_CONSTRUCTION_TOKEN:
+            raise NormalizedTrajectoryError("REPRESENTATION_CONSTRUCTION_FORBIDDEN")
+        if not isinstance(self._base_payload, Mapping):
+            raise NormalizedTrajectoryError("REPRESENTATION_PAYLOAD_INVALID")
+        payload = deepcopy(dict(self._base_payload))
+        if _contains_forbidden_output_key(payload) or "payload_sha256" in payload:
+            raise NormalizedTrajectoryError("IDENTITY_LEAK_IN_REPRESENTATION")
+        payload_sha256 = canonical_sha256(payload)
+        if (
+            self._sealed_payload_sha256 is not None
+            and self._sealed_payload_sha256 != payload_sha256
+        ):
+            raise NormalizedTrajectoryError("REPRESENTATION_PROVENANCE_DRIFT")
+        object.__setattr__(self, "_base_payload", payload)
+        object.__setattr__(self, "_sealed_payload_sha256", payload_sha256)
 
     @property
     def payload_sha256(self) -> str:
@@ -414,6 +439,14 @@ def project_normalized_trajectory(
         anchors = {row.member_anchor_at for row in rows.values()}
         if len(anchors) != 1:
             raise NormalizedTrajectoryError("MEMBER_ANCHOR_DRIFT")
+
+    future_only_members = sorted(
+        member_id
+        for member_id, rows in grouped.items()
+        if not any(due in prefix_slots for due, _field_id in rows)
+    )
+    if future_only_members:
+        raise NormalizedTrajectoryError("FUTURE_ONLY_MEMBER_NOT_BOUND_TO_PREFIX")
 
     cutoff_by_member = {
         member_id: next(iter(rows.values())).member_anchor_at
@@ -538,7 +571,10 @@ def project_normalized_trajectory(
     base_payload["schedule"]["schedule_sha256"] = bound_schedule.schedule_sha256
     if _contains_forbidden_output_key(base_payload):
         raise NormalizedTrajectoryError("IDENTITY_LEAK_IN_REPRESENTATION")
-    return NormalizedTrajectoryRepresentation(base_payload)
+    return NormalizedTrajectoryRepresentation(
+        base_payload,
+        _construction_token=_REPRESENTATION_CONSTRUCTION_TOKEN,
+    )
 
 
 def build_representation(

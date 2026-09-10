@@ -83,6 +83,13 @@ and all session, epoch, packet, memory, mode, and terminal anchors; caller-
 declared prior states require a complete baseline-bound probe receipt. None of
 these statuses executes a probe or claims alpha.
 
+Eligibility also requires a hash-bound
+`smial.normalized-trajectory-v1-readiness-receipt` from the existing verified
+cohort-release readback plane. Raw caller fields such as `cohort_ready`,
+`readiness`, or `yield_eligible` are not trusted; a missing, malformed, or
+drifted receipt returns `OBSERVABILITY_BLOCKED`. The status surface does not
+open the cohort, read scientific values, or verify a release at runtime.
+
 ## Rollback and non-claims
 
 Rollback removes or repairs only this capability and its navigation records.

@@ -9,11 +9,15 @@ changes the ordinary Forge budget.
 
 from __future__ import annotations
 
+import json
 import re
 from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
+
+from jsonschema import Draft202012Validator
 
 from solana_alpha_lab.factory.hfic_control_integrity import (
     CASE_A_TERMINALS,
@@ -34,6 +38,7 @@ from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DECISION_T_DUE_OFFSET_SECONDS,
     DECLARED_Y_POINTS,
     FIELD_IDS,
+    MIN_MOTIF_STEPS,
     PACKET_KEY,
     PREFERRED_SCHEDULE_ID,
     REPRESENTATION_ID,
@@ -70,6 +75,8 @@ INVALID_MINT_IDENTITY = "INVALID_MINT_IDENTITY"
 INVALID_PROBE_IDENTITY = "INVALID_PROBE_IDENTITY"
 INVALID_TRIGGER_NOT_MET = "INVALID_TRIGGER_NOT_MET"
 INVALID_CASE_C_OBSERVABILITY = "INVALID_CASE_C_OBSERVABILITY"
+INVALID_OBSERVABILITY_INPUT = "INVALID_OBSERVABILITY_INPUT"
+INVALID_COHORT_READINESS_RECEIPT = "INVALID_COHORT_READINESS_RECEIPT"
 REPRESENTATION_PROBE_ALREADY_EXISTS = "REPRESENTATION_PROBE_ALREADY_EXISTS"
 INVALID_REPRESENTATION_SCHEMA = "INVALID_REPRESENTATION_SCHEMA"
 
@@ -91,6 +98,13 @@ _FORBIDDEN_IDENTITY_KEYS = {
     "token_address",
 }
 _VERIFIED_BASELINE_TOKEN = object()
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
+_HFIC_PACKET_SCHEMA_PATH = (
+    _REPOSITORY_ROOT / "catalog/schemas/hypothesis_critic_input_v1.schema.json"
+)
+_HFIC_SESSION_RECEIPT_SCHEMA_PATH = (
+    _REPOSITORY_ROOT / "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json"
+)
 _REPRESENTATION_PAYLOAD_KEYS = {
     "anonymous",
     "eligible_member_count",
@@ -107,6 +121,20 @@ _REPRESENTATION_PAYLOAD_KEYS = {
     "representation_version",
     "schedule",
     "volume_mode",
+}
+_COHORT_READINESS_RECEIPT_KEYS = {
+    "schema",
+    "schema_version",
+    "source_kind",
+    "release_id",
+    "manifest_sha256",
+    "schedule_sha256",
+    "readiness_state",
+    "discovery_coverage_class",
+    "first_fresh_cohort_sealed_verified_imported",
+    "confirmatory_reuse_forbidden",
+    "yield_eligible",
+    "receipt_sha256",
 }
 
 
@@ -160,6 +188,18 @@ def _require_nonnegative_int(value: object) -> int:
     return value
 
 
+def _validate_json_schema(
+    value: Mapping[str, Any], path: Path, error_code: str
+) -> None:
+    try:
+        schema = json.loads(path.read_text(encoding="utf-8"))
+        errors = list(Draft202012Validator(schema).iter_errors(dict(value)))
+    except (OSError, json.JSONDecodeError, TypeError):
+        raise RepresentationProbeError(error_code) from None
+    if errors:
+        raise RepresentationProbeError(error_code)
+
+
 def _validate_serialized_representation_payload(
     value: Mapping[str, Any],
 ) -> dict[str, Any]:
@@ -191,7 +231,11 @@ def _validate_serialized_representation_payload(
     )
     if schedule["schedule_id"] != PREFERRED_SCHEDULE_ID:
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
-    if schedule["x_due_offset_seconds"] not in ALLOWED_X_POINTS:
+    if (
+        isinstance(schedule["x_due_offset_seconds"], bool)
+        or not isinstance(schedule["x_due_offset_seconds"], int)
+        or schedule["x_due_offset_seconds"] not in ALLOWED_X_POINTS
+    ):
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
     if schedule["declared_y_due_offset_seconds"] != list(DECLARED_Y_POINTS):
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
@@ -205,9 +249,23 @@ def _validate_serialized_representation_payload(
     )
     if schedule["prefix_due_offset_seconds"] != expected_prefix:
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if len(expected_prefix) != MIN_MOTIF_STEPS + 1:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
     if schedule["decision_t_due_offset_seconds"] != DECISION_T_DUE_OFFSET_SECONDS:
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
     _hash64("schedule_sha256", schedule["schedule_sha256"])
+    expected_schedule_sha256 = canonical_sha256(
+        {
+            "schedule_id": schedule["schedule_id"],
+            "x_due_offset_seconds": schedule["x_due_offset_seconds"],
+            "y_due_offset_seconds": schedule["declared_y_due_offset_seconds"],
+            "decision_t_due_offset_seconds": schedule[
+                "decision_t_due_offset_seconds"
+            ],
+        }
+    )
+    if schedule["schedule_sha256"] != expected_schedule_sha256:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
 
     if payload["pit"] != {
         "cutoff": "member_anchor_plus_Y1800",
@@ -254,14 +312,35 @@ def _validate_serialized_representation_payload(
     histogram = payload["histogram"]
     if not isinstance(histogram, list) or len(histogram) > 8:
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    eligible_member_count = _require_nonnegative_int(payload["eligible_member_count"])
     total_histogram_count = 0
+    previous_sort_key: tuple[int, bytes] | None = None
+    seen_motifs: set[bytes] = set()
     for item in histogram:
         item_mapping = _require_exact_keys(item, {"motif", "count"})
         item_motif = _require_exact_keys(item_mapping["motif"], set(channels))
-        if any(symbol not in {"U", "F", "D", "M"} for symbol in item_motif.values()):
+        motif_bytes = canonical_json_bytes(dict(item_motif))
+        if motif_bytes in seen_motifs:
             raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
-        total_histogram_count += _require_nonnegative_int(item_mapping["count"])
+        seen_motifs.add(motif_bytes)
+        for symbol in item_motif.values():
+            if (
+                not isinstance(symbol, str)
+                or any(step not in {"U", "F", "D", "M"} for step in symbol.split("-"))
+                or len(symbol.split("-")) != MIN_MOTIF_STEPS
+            ):
+                raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+        count = _require_nonnegative_int(item_mapping["count"])
+        if count == 0:
+            raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+        sort_key = (-count, motif_bytes)
+        if previous_sort_key is not None and sort_key < previous_sort_key:
+            raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+        previous_sort_key = sort_key
+        total_histogram_count += count
     if histogram_member_count != total_histogram_count:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if histogram_member_count > eligible_member_count:
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
     truncation = _require_exact_keys(
         payload["histogram_truncation"],
@@ -278,7 +357,13 @@ def _validate_serialized_representation_payload(
         or not isinstance(truncation["m_heavy_members_retained"], bool)
     ):
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
-    _require_nonnegative_int(truncation["dropped_lowest_count_tuples"])
+    dropped_tuples = _require_nonnegative_int(truncation["dropped_lowest_count_tuples"])
+    if (
+        (dropped_tuples == 0 and len(histogram) > 8)
+        or (dropped_tuples > 0 and len(histogram) != 8)
+        or truncation["m_heavy_members_retained"] is not True
+    ):
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
 
     declared_hash = _hash64("payload_sha256", payload["payload_sha256"])
     base = {key: item for key, item in payload.items() if key != "payload_sha256"}
@@ -300,6 +385,66 @@ def _packet_from_receipt(receipt: Mapping[str, Any]) -> Mapping[str, Any] | None
     ):
         return context
     return None
+
+
+def _validate_control_receipt_contract(
+    receipt: Mapping[str, Any], packet: Mapping[str, Any]
+) -> None:
+    _validate_json_schema(packet, _HFIC_PACKET_SCHEMA_PATH, INVALID_CONTROL_PACKET_HASH)
+    session_receipt = receipt.get("session_receipt")
+    if not isinstance(session_receipt, Mapping):
+        raise RepresentationProbeError(INVALID_CONTROL_NOT_RUN)
+    _validate_json_schema(
+        session_receipt,
+        _HFIC_SESSION_RECEIPT_SCHEMA_PATH,
+        INVALID_CONTROL_NOT_RUN,
+    )
+    for key in (
+        "session_id",
+        "evidence_epoch_sha256",
+        "prompt_version",
+        "critic_input_packet_sha256",
+    ):
+        if session_receipt.get(key) != receipt.get(key):
+            raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    if session_receipt.get("critic_input_packet_sha256") != canonical_sha256(packet):
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    if session_receipt.get("evidence_surface_mode") != CURRENT_REPRESENTATION_CONTROL_V1:
+        raise RepresentationProbeError(INVALID_CONTROL_MODE)
+    if session_receipt.get("final_session_terminal") != receipt.get(
+        "final_session_terminal"
+    ) or session_receipt.get("critic_terminal") != receipt.get("critic_terminal"):
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+
+
+def _validate_cohort_readiness_receipt(value: object) -> dict[str, Any]:
+    if not isinstance(value, Mapping) or set(value) != _COHORT_READINESS_RECEIPT_KEYS:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    receipt = deepcopy(dict(value))
+    if (
+        receipt["schema"] != "smial.normalized-trajectory-v1-readiness-receipt"
+        or receipt["schema_version"] != "1.0"
+        or receipt["source_kind"] != "LIVE_COHORT_RELEASE_MANIFEST"
+        or not isinstance(receipt["release_id"], str)
+        or not receipt["release_id"].strip()
+        or receipt["readiness_state"]
+        not in {"READY_VALID", "READY_VALID_WITH_COVERAGE_LIMITATION"}
+        or not isinstance(receipt["discovery_coverage_class"], str)
+        or not receipt["discovery_coverage_class"].strip()
+        or receipt["first_fresh_cohort_sealed_verified_imported"] is not True
+        or receipt["confirmatory_reuse_forbidden"] is not True
+        or isinstance(receipt["yield_eligible"], bool)
+        or not isinstance(receipt["yield_eligible"], int)
+        or receipt["yield_eligible"] < 0
+    ):
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    _hash64("manifest_sha256", receipt["manifest_sha256"])
+    _hash64("schedule_sha256", receipt["schedule_sha256"])
+    _hash64("receipt_sha256", receipt["receipt_sha256"])
+    base = {key: item for key, item in receipt.items() if key != "receipt_sha256"}
+    if receipt["receipt_sha256"] != canonical_sha256(base):
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    return receipt
 
 
 def _memory_baseline_sha256(
@@ -382,6 +527,7 @@ def control_baseline_from_receipt(receipt: Mapping[str, Any]) -> ControlBaseline
         raise RepresentationProbeError(INVALID_CONTROL_NOT_RUN)
     if control_packet_has_raw_sequences(packet) or _contains_key(packet, _FORBIDDEN_CONTROL_KEYS):
         raise RepresentationProbeError(INVALID_CONTROL_TRAJECTORY)
+    _validate_control_receipt_contract(receipt, packet)
 
     if receipt.get("evidence_surface_mode") != CURRENT_REPRESENTATION_CONTROL_V1:
         raise RepresentationProbeError(INVALID_CONTROL_MODE)
@@ -809,11 +955,30 @@ def _status_binding_reason(
 def _status_probe_identity_reason(
     snapshot: Mapping[str, Any],
     baseline: ControlBaseline,
+    *,
+    require_execution: bool = False,
 ) -> str | None:
     """Require a complete, baseline-bound receipt for declared prior state."""
 
     receipt = snapshot.get("representation_probe_receipt")
     if not isinstance(receipt, Mapping) or receipt.get("receipt_verified") is not True:
+        return INVALID_PROBE_IDENTITY
+    if receipt.get("representation_packet_key") != PACKET_KEY:
+        return INVALID_PROBE_IDENTITY
+    if require_execution:
+        if (
+            receipt.get("probe_state") != "EXECUTED"
+            or receipt.get("probe_executed") is not True
+            or receipt.get("execution_terminal") != "REPRESENTATION_PROBE_EXECUTED"
+        ):
+            return INVALID_PROBE_IDENTITY
+        try:
+            _hash64(
+                "execution_result_sha256", receipt.get("execution_result_sha256")
+            )
+        except RepresentationProbeError:
+            return INVALID_PROBE_IDENTITY
+    elif receipt.get("probe_state") not in {"DORMANT_PACKET_ONLY", "REGISTERED"}:
         return INVALID_PROBE_IDENTITY
     try:
         representation = _validate_serialized_representation_payload(
@@ -920,7 +1085,9 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
         "existing_probe_state",
     )
     if existing_state in {"COMPLETE", STATUS_COMPLETE, "PASS", "PROBE_EXECUTED"}:
-        identity_reason = _status_probe_identity_reason(snapshot, baseline)
+        identity_reason = _status_probe_identity_reason(
+            snapshot, baseline, require_execution=True
+        )
         if identity_reason is not None:
             status = STATUS_OBSERVABILITY_BLOCKED
             reason = identity_reason
@@ -929,7 +1096,9 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
             reason = "REPRESENTATION_PROBE_ALREADY_COMPLETED"
     elif (
         existing_state in {"EXISTS", STATUS_ALREADY_EXISTS, "RUNNING", "REGISTERED"}
-        or bool(_value_or(snapshot, "representation_probe_exists", "probe_exists", default=False))
+        or _value_or(
+            snapshot, "representation_probe_exists", "probe_exists", default=False
+        )
     ):
         identity_reason = _status_probe_identity_reason(snapshot, baseline)
         if identity_reason is not None:
@@ -956,22 +1125,39 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
             readiness = _value_or(snapshot, "readiness", "readiness_class")
             coverage = _value_or(snapshot, "discovery_coverage_class", default="")
             yield_eligible = _value_or(snapshot, "yield_eligible", default=None)
-            cohort_imported = bool(
-                _value_or(
-                    snapshot,
-                    "first_fresh_cohort_sealed_verified_imported",
-                    "cohort_ready",
-                    default=False,
-                )
-            )
             try:
-                yield_value = int(yield_eligible)
-            except (TypeError, ValueError):
-                yield_value = -1
+                readiness_receipt = _validate_cohort_readiness_receipt(
+                    snapshot.get("cohort_readiness_receipt")
+                )
+            except RepresentationProbeError as exc:
+                readiness_receipt = None
+                invalid_readiness_reason = str(exc)
+            else:
+                invalid_readiness_reason = None
+            if readiness_receipt is not None:
+                readiness = readiness_receipt["readiness_state"]
+                coverage = readiness_receipt["discovery_coverage_class"]
+                yield_eligible = readiness_receipt["yield_eligible"]
+                cohort_imported = readiness_receipt[
+                    "first_fresh_cohort_sealed_verified_imported"
+                ]
+            else:
+                cohort_imported = False
             invalid_reason: str | None = _status_binding_reason(
                 snapshot, receipt_mapping
             )
-            if invalid_reason is None and not cohort_imported:
+            if invalid_reason is None and invalid_readiness_reason is not None:
+                invalid_reason = invalid_readiness_reason
+            elif (
+                invalid_reason is None
+                and (
+                    not isinstance(cohort_imported, bool)
+                    or isinstance(yield_eligible, bool)
+                    or not isinstance(yield_eligible, int)
+                )
+            ):
+                invalid_reason = INVALID_OBSERVABILITY_INPUT
+            elif invalid_reason is None and not cohort_imported:
                 invalid_reason = INVALID_CASE_C_OBSERVABILITY
             elif invalid_reason is None and readiness not in {
                 "READY_VALID",
@@ -980,7 +1166,7 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
                 invalid_reason = "INVALID_COVERAGE_BROKEN"
             elif invalid_reason is None and coverage == "GAP_CONFIRMED":
                 invalid_reason = "INVALID_COVERAGE_BROKEN"
-            elif invalid_reason is None and yield_value < MIN_USABLE_YIELD_ELIGIBLE:
+            elif invalid_reason is None and yield_eligible < MIN_USABLE_YIELD_ELIGIBLE:
                 invalid_reason = "INVALID_INSUFFICIENT_YIELD"
             if invalid_reason == INVALID_CONTROL_NOT_RUN:
                 status = STATUS_CONTROL_REQUIRED
@@ -1046,6 +1232,8 @@ __all__ = [
     "INVALID_CONTROL_TRAJECTORY",
     "INVALID_EVIDENCE_EPOCH_MISMATCH",
     "INVALID_MEMORY_BASELINE_DRIFT",
+    "INVALID_COHORT_READINESS_RECEIPT",
+    "INVALID_OBSERVABILITY_INPUT",
     "INVALID_PACKET_BUDGET",
     "INVALID_PROBE_IDENTITY",
     "INVALID_REPRESENTATION_SCHEMA",

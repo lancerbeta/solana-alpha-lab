@@ -16,6 +16,7 @@ from solana_alpha_lab.factory.normalized_trajectory_v1 import (  # noqa: E402
     FIELD_IDS,
     LifecycleSchedule,
     NormalizedTrajectoryError,
+    NormalizedTrajectoryRepresentation,
     TypedLifecycleObservation,
     project_normalized_trajectory,
 )
@@ -157,6 +158,31 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         projected = project_normalized_trajectory([])
         schedule = projected.payload["schedule"]
         self.assertRegex(schedule["schedule_sha256"], r"^[0-9a-f]{64}$")
+
+    def test_schedule_hash_must_match_canonical_schedule_contents(self) -> None:
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            LifecycleSchedule(schedule_sha256="00" * 32)
+        self.assertEqual(str(raised.exception), "SCHEDULE_SHA256_MISMATCH")
+
+    def test_future_only_member_cannot_enter_pre_t_denominator(self) -> None:
+        rows = []
+        rows.extend(_series("known-member", "PRICE", (1.0, 2.0, 3.0)))
+        rows.extend(_series("known-member", "LIQUIDITY", (1.0, 1.0, 1.0)))
+        rows.extend(_series("known-member", "TRADERS", (1.0, 1.0, 1.0)))
+        rows.append(_row("future-only-member", 3600, "PRICE", 999.0))
+
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            project_normalized_trajectory(rows)
+        self.assertEqual(
+            str(raised.exception), "FUTURE_ONLY_MEMBER_NOT_BOUND_TO_PREFIX"
+        )
+
+    def test_representation_constructor_is_not_public_provenance_boundary(self) -> None:
+        with self.assertRaises(NormalizedTrajectoryError) as raised:
+            NormalizedTrajectoryRepresentation({})
+        self.assertEqual(
+            str(raised.exception), "REPRESENTATION_CONSTRUCTION_FORBIDDEN"
+        )
 
     def test_histogram_is_bounded_and_m_heavy_tuples_are_allowed(self) -> None:
         rows: list[TypedLifecycleObservation] = []

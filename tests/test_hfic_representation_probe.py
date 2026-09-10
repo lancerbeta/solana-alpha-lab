@@ -23,6 +23,7 @@ from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
     INVALID_PROBE_IDENTITY,
     INVALID_MEMORY_BASELINE_DRIFT,
     INVALID_PACKET_BUDGET,
+    INVALID_REPRESENTATION_SCHEMA,
     INVALID_TRIGGER_NOT_MET,
     STATUS_CONTROL_REQUIRED,
     STATUS_ELIGIBLE,
@@ -113,6 +114,63 @@ def _control_receipt() -> dict[str, object]:
     frozen = _frozen_control()
     packet = frozen["critic_input_packet"]
     assert isinstance(packet, dict)
+    session_receipt: dict[str, object] = {
+        "session_id": frozen["session_id"],
+        "session_state": "SYNTHESIS_COMPLETE",
+        "evidence_epoch_sha256": "aa" * 32,
+        "focus_key_sha256": "bb" * 32,
+        "search_key_sha256": "cc" * 32,
+        "prompt_version": "HFIC-V1.2",
+        "receipt_schema_version": "1.3",
+        "live_git_head": packet["live_git_head"],
+        "store_inventory_digest": "dd" * 32,
+        "candidate_ids": list(frozen["candidate_ids"]),
+        "selected_candidate_id": frozen["selected_candidate_id"],
+        "runner_up_candidate_id": frozen["runner_up_candidate_id"],
+        "critic_input_packet_sha256": frozen["critic_input_packet_sha256"],
+        "critic_result_sha256": "ee" * 32,
+        "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+        "lane_classifier_terminal": None,
+        "decision_event_ids": [],
+        "next": "STOP",
+        "authority": {
+            "git_mutation": 0,
+            "experiment_execution": 0,
+            "provider_api_rpc_wss_calls": 0,
+        },
+        "no_git_fence_receipt": {},
+        "created_at": "2026-08-27T12:00:00Z",
+        "diagnostics": {
+            "candidate_count": 4,
+            "known_feature_reference_count": 0,
+            "known_capability_reference_count": 0,
+            "candidate_with_unresolved_requirement_count": 0,
+            "unresolved_requirement_count": 0,
+            "unique_structural_signature_count": 4,
+            "structural_repetition_count": 0,
+            "structural_repetition_ratio": 0.0,
+            "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+            "selected_candidate_present": True,
+            "no_worthy_hypothesis": False,
+        },
+        "primary_selected_candidate_id": frozen["selected_candidate_id"],
+        "primary_critic_terminal": "KILL_UNBOUND_EVIDENCE",
+        "primary_critic_result_sha256": "ee" * 32,
+        "primary_critic_input_packet_sha256": frozen["critic_input_packet_sha256"],
+        "runner_up_failover_used": False,
+        "runner_up_critic_input_packet_sha256": frozen[
+            "runner_up_critic_input_packet_sha256"
+        ],
+        "runner_up_critic_terminal": None,
+        "runner_up_critic_result_sha256": None,
+        "final_survivor_candidate_id": None,
+        "final_session_terminal": "NO_WORTHY_HYPOTHESIS",
+        "effective_control_terminal": "NO_WORTHY_HYPOTHESIS",
+        "critic_screen_count": 1,
+        "critic_launched": True,
+        "forge_context_packet_sha256": frozen["forge_context_packet_sha256"],
+        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+    }
     receipt: dict[str, object] = {
         "session_id": frozen["session_id"],
         "critic_input_packet": packet,
@@ -124,9 +182,30 @@ def _control_receipt() -> dict[str, object]:
         "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
         "final_session_terminal": "NO_WORTHY_HYPOTHESIS",
         "critic_terminal": "KILL_UNBOUND_EVIDENCE",
+        "session_receipt": session_receipt,
     }
     receipt["memory_baseline_sha256"] = control_memory_baseline_sha256(receipt)
     return receipt
+
+
+def _cohort_readiness_receipt(*, yield_eligible: object = 10) -> dict[str, object]:
+    base: dict[str, object] = {
+        "schema": "smial.normalized-trajectory-v1-readiness-receipt",
+        "schema_version": "1.0",
+        "source_kind": "LIVE_COHORT_RELEASE_MANIFEST",
+        "release_id": "LIVE-RELEASE-FIXTURE-001",
+        "manifest_sha256": "11" * 32,
+        "schedule_sha256": "22" * 32,
+        "readiness_state": "READY_VALID",
+        "discovery_coverage_class": "DISCOVERY_COVERAGE_CONFIRMED",
+        "first_fresh_cohort_sealed_verified_imported": True,
+        "confirmatory_reuse_forbidden": True,
+        "yield_eligible": yield_eligible,
+    }
+    return {
+        **base,
+        "receipt_sha256": canonical_sha256(base),
+    }
 
 
 class HficRepresentationProbeTests(unittest.TestCase):
@@ -231,6 +310,23 @@ class HficRepresentationProbeTests(unittest.TestCase):
             {"REPRESENTATION_INVALID", "INVALID_REPRESENTATION_SCHEMA"},
         )
 
+    def test_schedule_hash_drift_cannot_enter_challenger(self) -> None:
+        receipt = _control_receipt()
+        baseline = control_baseline_from_receipt(receipt)
+        challenger = build_challenger_packet(
+            baseline, project_normalized_trajectory([])
+        )
+        drifted = json.loads(json.dumps(challenger))
+        representation = drifted[PACKET_KEY]
+        representation["schedule"]["schedule_sha256"] = "00" * 32
+        representation["payload_sha256"] = canonical_sha256(
+            {key: value for key, value in representation.items() if key != "payload_sha256"}
+        )
+        drifted["representation_payload_sha256"] = representation["payload_sha256"]
+        with self.assertRaises(RepresentationProbeError) as raised:
+            existing_hfic_packet(drifted)
+        self.assertEqual(str(raised.exception), INVALID_REPRESENTATION_SCHEMA)
+
     def test_fixture_bridge_rechecks_outer_identity(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
@@ -244,6 +340,13 @@ class HficRepresentationProbeTests(unittest.TestCase):
     def test_runner_up_or_case_a_cannot_create_challenger(self) -> None:
         receipt = _control_receipt()
         receipt["final_session_terminal"] = "RUNNER_UP_REVISION_REQUIRED"
+        assert isinstance(receipt["session_receipt"], dict)
+        receipt["session_receipt"]["final_session_terminal"] = (
+            "RUNNER_UP_REVISION_REQUIRED"
+        )
+        receipt["session_receipt"]["effective_control_terminal"] = (
+            "RUNNER_UP_REVISION_REQUIRED"
+        )
         baseline = control_baseline_from_receipt(receipt)
         with self.assertRaises(RepresentationProbeError) as raised:
             build_challenger_packet(baseline, project_normalized_trajectory([]))
@@ -258,6 +361,8 @@ class HficRepresentationProbeTests(unittest.TestCase):
         oversized_receipt = dict(_control_receipt())
         oversized_receipt["critic_input_packet"] = huge
         oversized_receipt["critic_input_packet_sha256"] = huge_hash
+        assert isinstance(oversized_receipt["session_receipt"], dict)
+        oversized_receipt["session_receipt"]["critic_input_packet_sha256"] = huge_hash
         oversized_receipt["memory_baseline_sha256"] = control_memory_baseline_sha256(
             oversized_receipt
         )
@@ -281,8 +386,7 @@ class RepresentationStatusTests(unittest.TestCase):
             "control_packet_sha256": baseline.packet_sha256,
             "memory_baseline_sha256": baseline.memory_baseline_sha256,
             "cohort_ready": True,
-            "readiness": "READY_VALID",
-            "yield_eligible": 10,
+            "cohort_readiness_receipt": _cohort_readiness_receipt(),
         }
         self.assertEqual(representation_status({})["status"], STATUS_CONTROL_REQUIRED)
         self.assertEqual(representation_status(eligible)["status"], STATUS_ELIGIBLE)
@@ -363,6 +467,39 @@ class RepresentationStatusTests(unittest.TestCase):
         self.assertTrue(result["read_only"])
         self.assertFalse(result["probe_executed"])
         self.assertFalse(result["alpha_claim"])
+
+        invalid_readiness = dict(eligible["cohort_readiness_receipt"])
+        invalid_readiness["yield_eligible"] = "10"
+        self.assertEqual(
+            representation_status(
+                {**eligible, "cohort_readiness_receipt": invalid_readiness}
+            )["status"],
+            STATUS_OBSERVABILITY_BLOCKED,
+        )
+        self.assertEqual(
+            representation_status(
+                {key: value for key, value in eligible.items() if key != "cohort_readiness_receipt"}
+            )["status"],
+            STATUS_OBSERVABILITY_BLOCKED,
+        )
+
+        challenger = build_challenger_packet(
+            baseline, project_normalized_trajectory([])
+        )
+        incomplete_execution_receipt = {
+            **challenger,
+            "receipt_verified": True,
+        }
+        self.assertEqual(
+            representation_status(
+                {
+                    **eligible,
+                    "representation_probe_state": "COMPLETE",
+                    "representation_probe_receipt": incomplete_execution_receipt,
+                }
+            )["status"],
+            STATUS_OBSERVABILITY_BLOCKED,
+        )
 
         for missing_key in (
             "control_session_id",
