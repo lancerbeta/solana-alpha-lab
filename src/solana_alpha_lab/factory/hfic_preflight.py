@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -123,6 +123,61 @@ def is_fast_lane_commissioned(data_root: Path) -> bool:
     except HficPreflightError:
         return False
     return True
+
+
+def is_live_corpus_dataset(item: Mapping[str, Any]) -> bool:
+    from solana_alpha_lab.factory.live_cohort_discovery_release import CORPUS_DATASET_ID
+
+    if str(item.get("dataset_id") or "") != CORPUS_DATASET_ID:
+        return False
+    labels = item.get("labels") if isinstance(item.get("labels"), Mapping) else {}
+    logical = str((labels or {}).get("logical_dataset_id") or "")
+    if logical and logical != CORPUS_DATASET_ID:
+        return False
+    return True
+
+
+def select_forge_packet_datasets(
+    enumerated: Sequence[Mapping[str, Any]],
+    *,
+    evidence_surface_mode: str | None = None,
+    max_datasets: int = MAX_DATASETS,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Current-version selection plus CONTROL-protected LIVE CORPUS slot."""
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        select_current_datasets_for_forge,
+    )
+
+    current = select_current_datasets_for_forge(enumerated)
+    receipt: dict[str, Any] = {
+        "truncated": False,
+        "max_datasets": max_datasets,
+        "selection_policy": "current_version_per_dataset_id",
+        "live_corpus_protected": False,
+        "live_corpus_in_packet": False,
+    }
+    if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        corpus = [item for item in current if is_live_corpus_dataset(item)]
+        others = [item for item in current if not is_live_corpus_dataset(item)]
+        slots = max(0, max_datasets - len(corpus))
+        selected = corpus + others[:slots]
+        selected.sort(key=lambda item: str(item.get("dataset_manifest_id") or ""))
+        receipt["truncated"] = len(current) > len(selected)
+        receipt["live_corpus_protected"] = True
+        receipt["live_corpus_in_packet"] = bool(corpus)
+        receipt["selection_policy"] = "control_protect_live_corpus_then_cap"
+        return selected, receipt
+    selected = current[:max_datasets]
+    if len(current) > max_datasets:
+        receipt["truncated"] = True
+        receipt["selection_policy"] = "current_version_per_dataset_id_then_cap"
+    receipt["live_corpus_in_packet"] = any(
+        is_live_corpus_dataset(item) for item in selected
+    )
+    return selected, receipt
 
 
 def store_inventory_digest(data_root: Path) -> str | None:
@@ -982,6 +1037,12 @@ def build_forge_context_packet(
     evidence_surface_mode: str | None = None,
 ) -> tuple[dict[str, Any], str]:
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
+    ds_trunc: dict[str, Any] = {
+        "truncated": False,
+        "selection_policy": "current_version_per_dataset_id",
+        "live_corpus_protected": False,
+        "live_corpus_in_packet": False,
+    }
     if not datasets:
         datasets = [
             {
@@ -1000,11 +1061,9 @@ def build_forge_context_packet(
             }
         ]
     else:
-        from solana_alpha_lab.factory.live_cohort_discovery_release import (
-            select_current_datasets_for_forge,
+        datasets, ds_trunc = select_forge_packet_datasets(
+            datasets, evidence_surface_mode=evidence_surface_mode
         )
-
-        datasets = select_current_datasets_for_forge(datasets)
     assert_capability_registry_v2_superset(repo_root)
     capabilities = enumerate_accepted_capabilities(repo_root)
     closed_family_ledger = enumerate_closed_park_terminals(repo_root, data_root)
@@ -1102,12 +1161,14 @@ def build_forge_context_packet(
         "max_feature_families": MAX_FEATURE_FAMILIES,
         "max_capabilities": MAX_CAPABILITIES,
         "max_packet_bytes": MAX_PACKET_BYTES,
-        "selection_policy": "current_version_per_dataset_id",
+        "selection_policy": ds_trunc.get(
+            "selection_policy", "current_version_per_dataset_id"
+        ),
+        "live_corpus_protected": bool(ds_trunc.get("live_corpus_protected")),
+        "live_corpus_in_packet": bool(ds_trunc.get("live_corpus_in_packet")),
     }
-    if len(datasets) > MAX_DATASETS:
-        datasets = datasets[:MAX_DATASETS]
+    if ds_trunc.get("truncated"):
         truncation["truncated"] = True
-        truncation["selection_policy"] = "current_version_per_dataset_id_then_cap"
     if len(feature_hints) > MAX_FEATURE_HINTS:
         feature_hints = feature_hints[:MAX_FEATURE_HINTS]
         truncation["truncated"] = True
@@ -1348,7 +1409,6 @@ def run_preflight(
     from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         CORPUS_DATASET_ID,
-        select_current_datasets_for_forge,
     )
 
     epoch = evidence_epoch_sha256(evidence_epoch_material(repo_root, data_root))
@@ -1367,7 +1427,9 @@ def run_preflight(
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
         if datasets:
-            datasets = select_current_datasets_for_forge(datasets)
+            datasets, _ds_trunc = select_forge_packet_datasets(
+                datasets, evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1
+            )
         gate, yield_eligible = resolve_control_corpus_yield(
             datasets,
             corpus_dataset_id=CORPUS_DATASET_ID,

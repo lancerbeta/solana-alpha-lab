@@ -318,6 +318,13 @@ Happy terminal `FORGE_CONTROL_READY`. The operator surface NEXT is exactly:
 /hypothesis-forge CURRENT_REPRESENTATION_CONTROL
 ```
 
+CONTROL bounded packet selection (`MAX_DATASETS=8`) keeps a protected slot
+for the current `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` identified by
+canonical `dataset_id`, not a foreign label impersonation.
+`forge-control-ready` uses the same selection function as the actual CONTROL
+packet builder and requires the selected corpus `dataset_manifest_id` to
+equal `lineage.current_dataset_manifest_id` when lineage exists.
+
 Do not run ordinary Forge as a fallback when CONTROL corpus/yield preconditions fail.
 
 `CURRENT_REPRESENTATION_CONTROL_V1` (preflight `--control-current-representation`)

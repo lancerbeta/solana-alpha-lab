@@ -2214,8 +2214,7 @@ def _member_snapshot(
                 "sampling_seed": payload.get("sampling_seed"),
                 "event_time": payload.get("authoritative_anchor")
                 or payload.get("anchor_event_time"),
-                "first_reliable_available_at": payload.get("discovery_available_at")
-                or render_utc(now),
+                "first_reliable_available_at": payload.get("discovery_available_at"),
                 "field_values": _typed_member_values(
                     payload,
                     now,
@@ -2263,6 +2262,7 @@ def _typed_member_values(
     *,
     registry: ObservationPrimitiveRegistry | None = None,
 ) -> list[dict[str, Any]]:
+    del now
     source = payload.get("source_row")
     source_row = source if isinstance(source, Mapping) else {}
     anchor = _first_non_none(
@@ -2296,8 +2296,7 @@ def _typed_member_values(
                 "primitive_id": DISCOVERY,
                 "point_id": "MEMBER",
                 "event_time": anchor,
-                "first_reliable_available_at": payload.get("discovery_available_at")
-                or render_utc(now),
+                "first_reliable_available_at": payload.get("discovery_available_at"),
                 "request_sha256": payload.get("discovery_request_sha256"),
                 "call_occurrence_id": payload.get("discovery_call_occurrence_id"),
             }
@@ -2550,6 +2549,17 @@ def _propagate_buy_out(
             store.merge_due_payload(row, {"buy_out_amount": buy_out_amount}, clock=now)
 
 
+def _discovery_admission_clock(discovery_context: Mapping[str, Any]) -> str | None:
+    raw = discovery_context.get("first_reliable_available_at")
+    if not isinstance(raw, str) or not raw.strip():
+        return None
+    try:
+        parse_utc(raw)
+    except Exception:
+        return None
+    return raw
+
+
 def _admit_candidates(
     *,
     store: ObservationScheduleStore,
@@ -2625,36 +2635,36 @@ def _admit_candidates(
             )
         ):
             continue
+        payload = {
+            "first_seen_at": (
+                str(row["first_seen_at"])
+                if isinstance(row.get("first_seen_at"), str)
+                else render_utc(now)
+            ),
+            "discovery_request_sha256": discovery_context.get("request_sha256"),
+            "discovery_call_occurrence_id": discovery_context.get(
+                "call_occurrence_id"
+            ),
+            "discovery_request_started_at": discovery_context.get(
+                "request_started_at"
+            ),
+            "discovery_response_received_at": discovery_context.get(
+                "response_received_at"
+            ),
+            "inclusion_probability": sampling["inclusion_probability"],
+            "sampling_seed": sampling["seed"],
+            "source_row": _sanitized_source_row(row),
+        }
+        admission_clock = _discovery_admission_clock(discovery_context)
+        if admission_clock is not None:
+            payload["discovery_available_at"] = admission_clock
         inserted = store.insert_candidate(
             {
                 "schedule_sha256": digest,
                 "activation_id": activation_id,
                 "entity_id": entity_id,
                 "state": "CANDIDATE",
-                "payload": {
-                    "first_seen_at": (
-                        str(row["first_seen_at"])
-                        if isinstance(row.get("first_seen_at"), str)
-                        else render_utc(now)
-                    ),
-                    "discovery_available_at": discovery_context.get(
-                        "first_reliable_available_at"
-                    )
-                    or render_utc(now),
-                    "discovery_request_sha256": discovery_context.get("request_sha256"),
-                    "discovery_call_occurrence_id": discovery_context.get(
-                        "call_occurrence_id"
-                    ),
-                    "discovery_request_started_at": discovery_context.get(
-                        "request_started_at"
-                    ),
-                    "discovery_response_received_at": discovery_context.get(
-                        "response_received_at"
-                    ),
-                    "inclusion_probability": sampling["inclusion_probability"],
-                    "sampling_seed": sampling["seed"],
-                    "source_row": _sanitized_source_row(row),
-                },
+                "payload": payload,
             },
             clock=now,
         )

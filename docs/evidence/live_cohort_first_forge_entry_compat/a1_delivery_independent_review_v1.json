@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-COHORT-FIRST-FORGE-ENTRY-COMPAT-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-11",
+  "task_id": "LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "TICK_INSERT_OMITS_NOW",
+        "ADMISSION_COUNTS_STRICT_INT",
+        "PROD_DISCOVERY_AVAILABLE_AT",
+        "NO_FIRST_SEEN_FALLBACK",
+        "MIXED_BATCH_ROW_LEVEL"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NO_VISIBLE_SOFTWARE_BLOCKER",
+        "DISCOVERY_AVAILABLE_AT_REPAIR",
+        "MIXED_BATCH_AND_CUTOFF",
+        "CONTROL_PACKET_PROTECT",
+        "POST_MERGE_LIVE_ACCEPTANCE_ONLY"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=5962e1a9d22a021770da3601723b1cc5f2976537508b03ba62a99d5b4ce80526",
+        "CLOSURE_CUTOFF_FREEZES_C1",
+        "CONTROL_CANONICAL_DATASET_ID",
+        "ADMISSION_FAIL_CLOSED",
+        "FIRST_PUBLICATION_HORIZON"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_SEAL_OR_IMPORT_IN_THIS_ATOM",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_FORGE",
+    "NO_ALPHA"
+  ]
+}

@@ -2531,5 +2531,53 @@ class ObservationSchedulerTests(unittest.TestCase):
             )
 
 
+    def test_admit_without_discovery_clock_does_not_write_now(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            activation_id = _activate(store, schedule)
+            opener = _Opener()
+            try:
+                result = tick_once(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule=schedule,
+                    activation_id=activation_id,
+                    now=NOW,
+                    opener=opener,
+                    producer_git_sha=GIT_SHA,
+                    discovery_rows=[
+                        {
+                            "id": MINT,
+                            "liquidity": "2000",
+                            "firstPool": {
+                                "createdAt": "2026-09-01T00:00:00Z",
+                                "source": "pump.fun",
+                            },
+                        }
+                    ],
+                )
+                self.assertEqual(result["terminal"], "TICK_COMPLETE")
+                rows = [
+                    item
+                    for item in store.list_candidates(
+                        schedule_sha256=schedule["schedule_sha256"],
+                        activation_id=activation_id,
+                    )
+                    if str(item.get("entity_id")) == MINT
+                ]
+                self.assertEqual(len(rows), 1)
+                payload = dict(rows[0].get("payload") or {})
+                self.assertNotIn("discovery_available_at", payload)
+                self.assertIsNotNone(payload.get("first_seen_at"))
+            finally:
+                store.close()
+
+
 if __name__ == "__main__":
     unittest.main()
