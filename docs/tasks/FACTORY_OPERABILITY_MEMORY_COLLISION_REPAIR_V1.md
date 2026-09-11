@@ -77,7 +77,9 @@ context_requirements:
       - src/solana_alpha_lab/factory/collector_owner_pulse.py
       - src/solana_alpha_lab/factory/live_cohort_discovery_release.py
     DELIVERY_EVIDENCE:
-      - docs/reports/factory_operability_memory_collision_repair/a1_owner_readout_v1.md
+      - docs/evidence/factory_operability_memory_collision_repair/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/factory_operability_memory_collision_repair/a1_delivery_independent_review_v1.json
+      - docs/evidence/factory_operability_memory_collision_repair/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
