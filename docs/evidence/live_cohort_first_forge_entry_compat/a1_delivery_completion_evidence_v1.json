@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE-COHORT-FIRST-FORGE-ENTRY-COMPAT-COMPLETION-001",
+  "as_of": "2026-09-11",
+  "task_id": "LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT_V1",
+  "state_change": "LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT_READY_FOR_MERGE",
+  "base_main": "8b230e036613dcc3acab274c83232ec87698a744",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "78dafdbb8f0318f499a27ac0ec5b091c66fd516299af857499ca2435456602c0",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "2d093f2f81e91dc85456f79329a228c8864380f286159ba8fe4f296f5bdef960",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a987c8e5686f8362529f3a1a3ec8b9a0895f99a78830d8dbfe1cd67900bbd6d4",
+    "docs/reports/live_cohort_first_forge_entry_compat/a1_owner_readout_v1.md": "743503f70aca730dd311d9382816a31f2de30a9ffb348fce6c9b981c988a8f7e",
+    "docs/tasks/LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT_V1.md": "71bf874f072cb4bf97a657216b4e546c8894378d3da063af17fcfe1d8e467af6",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "d0237a3a2b35058252000eb3674b6df1127555aa39fe63df38fd455a621f45a7",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "fd4baea7847d810fde5d837b47e901b1127b800caef80d4e2ed838095fddb907",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "3a503113c3c32c1f371b77a7b87ba04dff6bfce822f02fa56ee53ae557c6df70",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "a5b3f9bae50c6cb5d6f704b17332a179c6359a4bcf398eee52c6f12c4666762a",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "f0d3605a26a466940016255ea13897a1a2dec895a5d0a4b8353ff1746f10b024",
+    "tests/test_observation_scheduler.py": "2b1de7442895f32c8bb5fdd0c9afb40f15bad858759c186dd8126b8304aff4e0"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_factory_fit_v1.json",
+    "sha256": "0cc807de8b73656478d6e00995ea9e4f684a557edd4e8e838658e7db500461db",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT",
+    "independent_review": {
+      "path": "docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_independent_review_v1.json",
+      "sha256": "66b14cddac4efd66a7d683c2eb1795be3f3dc7645da2635fa3dca98ccee9834d",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_SEAL_OR_IMPORT_IN_THIS_ATOM",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_FORGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

@@ -454,9 +454,25 @@ Primitives remain available (`build-live-source` requires `--cohort-id` and
 `--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /
 `import-live`).
 
-Admission clock: `discovery_first_reliable_available_at` on campaign-relative
+Admission clock: canonical semantic field
+`discovery_first_reliable_available_at` on campaign-relative
 half-open 7-day windows from schedule `activation.starts_at` /
 `stops_admitting_at` (not unix-epoch calendar buckets).
+Producer equivalents, when they parse to the same instant:
+`first_reliable_available_at` and `discovery_available_at`.
+`first_seen_at` is not an admission fallback. Missing or unparseable
+admission is unassignable. Sampled members with missing or invalid
+admission fail closed (`ADMISSION_CLOCK_MISSING` /
+`ADMISSION_CLOCK_INVALID`) instead of dropping out of the denominator.
+Producer insert does not fabricate `discovery_available_at=now`.
+Mixed cumulative MEMBER_BATCH snapshots are
+extracted row-level by that admission identity; later-cohort rows never
+enter an earlier cohort source. Frozen C1 identity uses machine
+`closure_cutoff_at` (max of mature_at, terminal C1 due `updated_at`, and
+completed C1 observation-panel `created_at` at or before `as_of`) so later
+C2 publication cannot rewrite C1 member/observation/producer set or
+`source_sha256`. Winning C1 member-batch producers stay in lineage even
+when the freeze snapshot is mixed.
 Current corpus version rebinds all accepted cohort partitions without parquet
 byte duplication. Live role: `EXPLORATORY_REUSE` with
 `confirmatory_reuse_forbidden=true`.

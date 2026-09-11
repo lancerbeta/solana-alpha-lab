@@ -23,32 +23,48 @@ from solana_alpha_lab.factory.early_market_panel_importer import (
     MIN_USABLE_YIELD_ELIGIBLE,
 )
 from solana_alpha_lab.factory.hfic_preflight import (
+    AUTO_FOCUS,
+    HficPreflightError,
     _query_hfic_sessions,
+    decide_preflight_action,
     enumerate_rdp_datasets,
     evidence_epoch_material,
+    is_live_corpus_dataset,
+    prove_fast_lane_commissioned,
+    select_forge_packet_datasets,
 )
-from solana_alpha_lab.factory.hfic_memory_policy import quarantined_session_ids
+from solana_alpha_lab.factory.hfic_control_integrity import (
+    CURRENT_REPRESENTATION_CONTROL_V1,
+)
+from solana_alpha_lab.factory.hfic_memory_policy import effective_policy, quarantined_session_ids
+from solana_alpha_lab.factory.hfic_session import (
+    PROMPT_VERSION,
+    evidence_epoch_sha256,
+    focus_key_sha256,
+    search_key_sha256,
+)
 from solana_alpha_lab.factory.hfic_prior_memory import (
     MEMORY_HARD_CLOSE,
     MEMORY_PARK,
     build_prior_memory_snapshot,
 )
-from solana_alpha_lab.factory.hfic_session import evidence_epoch_sha256
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
-    COHORT_ADMISSION_FIELD,
     CORPUS_DATASET_ID,
     RELEASE_MANIFEST_NAME,
     LiveCohortReleaseError,
     bound_schedule_from_rdp,
     build_live_observation_source_from_rdp,
     campaign_cohort_windows,
+    classify_cohort_admission_clock,
     classify_cohort_readiness,
     cohort_snapshot_path,
     cohort_window_bounds,
     import_live_cohort,
+    latest_c1_observation_manifest_at,
     live_cohort_status,
     load_observation_rdp_source,
     release_id_for,
+    resolve_cohort_admission_instant,
     seal_live_cohort,
     select_current_datasets_for_forge,
     verify_live_cohort,
@@ -78,6 +94,14 @@ BROKEN_SESSION_STATES = frozenset(
 _OPEN_DUE = frozenset({"PENDING", "DUE", "CLAIMED"})
 _IN_FLIGHT = frozenset({"CLAIMED", "IN_FLIGHT", "IN_FLIGHT_CALL_INDETERMINATE"})
 _SAMPLED = frozenset({"ADMITTED", "SAMPLED_MEMBER", "X_ELIGIBLE", "X_POPULATION_INELIGIBLE"})
+_ADMISSION_REQUIRED_STATES = _SAMPLED | frozenset(
+    {
+        "NOT_SELECTED_HASH_SAMPLE",
+        "NOT_SELECTED_CAPACITY",
+        "NOT_SELECTED_PREDICATE",
+        "ANCHOR_UNKNOWN",
+    }
+)
 _CLOSURE_IDENTITY_KEYS = (
     "schema",
     "schema_version",
@@ -88,17 +112,17 @@ _CLOSURE_IDENTITY_KEYS = (
     "window_end_exclusive",
     "members_total",
     "entity_ids",
-    "member_states",
+    "member_identity_sha256",
     "due_states",
     "pending_due_for_cohort",
     "pending_future",
     "claimed_or_in_flight",
     "deadline_missed",
     "budget_blocked",
-    "publication_jobs_open_count",
     "cohort_open_count",
     "ambiguous_open_count",
     "open_publication",
+    "closure_cutoff_at",
     "unresolved_due",
     "in_flight",
 )
@@ -171,14 +195,7 @@ def verify_transported_release(*, source_root: Path, dest_root: Path) -> dict[st
 
 
 def _candidate_admission(payload: Mapping[str, Any]) -> datetime | None:
-    for key in (COHORT_ADMISSION_FIELD, "first_reliable_available_at"):
-        raw = payload.get(key)
-        if isinstance(raw, str) and raw:
-            try:
-                return parse_utc(raw)
-            except Exception:
-                continue
-    return None
+    return resolve_cohort_admission_instant(payload)
 
 
 def _job_in_cohort(job: Mapping[str, Any], *, start: datetime, end: datetime) -> bool | None:
@@ -190,9 +207,7 @@ def _job_in_cohort(job: Mapping[str, Any], *, start: datetime, end: datetime) ->
     for row in members:
         if not isinstance(row, Mapping):
             continue
-        admission = _candidate_admission(row) or _parse_utc(
-            row.get("first_reliable_available_at")
-        )
+        admission = resolve_cohort_admission_instant(row)
         if admission is None:
             continue
         known += 1
@@ -201,6 +216,16 @@ def _job_in_cohort(job: Mapping[str, Any], *, start: datetime, end: datetime) ->
     if known == 0:
         return None
     return hits > 0
+
+
+def _member_identity_sha256(rows: Sequence[tuple[str, str, str]]) -> str:
+    payload = {
+        "members": [
+            {"entity_id": entity_id, "state": state, "admission_at": admission}
+            for entity_id, state, admission in sorted(rows)
+        ]
+    }
+    return canonical_sha256(payload)
 
 
 def collect_open_publication(
@@ -272,13 +297,27 @@ def build_closure_receipt(
         ).fetchall()
         cohort_entities: set[str] = set()
         member_states: Counter[str] = Counter()
+        member_identity_rows: list[tuple[str, str, str]] = []
+        admission_invalid = 0
+        admission_missing_sampled = 0
         for row in candidates:
             payload = json.loads(row["payload_json"] or "{}")
+            clock_status = classify_cohort_admission_clock(payload)
+            state = str(row["state"])
+            if clock_status == "invalid":
+                admission_invalid += 1
+                continue
+            if clock_status == "missing":
+                if state in _ADMISSION_REQUIRED_STATES:
+                    admission_missing_sampled += 1
+                continue
             admission = _candidate_admission(payload)
             if admission is None or not (start <= admission < end):
                 continue
-            cohort_entities.add(str(row["entity_id"]))
-            member_states[str(row["state"])] += 1
+            entity_id = str(row["entity_id"])
+            cohort_entities.add(entity_id)
+            member_identity_rows.append((entity_id, state, render_utc(admission)))
+            member_states[state] += 1
         due_states: Counter[str] = Counter()
         pending_due_by_mature = 0
         pending_future = 0
@@ -286,9 +325,10 @@ def build_closure_receipt(
         actually_overdue = 0
         deadline_missed = 0
         budget_blocked = 0
+        cutoff = mature_at
         dues = conn.execute(
             """
-            SELECT entity_id, point_id, state, due_at, deadline_at
+            SELECT entity_id, point_id, state, due_at, deadline_at, updated_at
             FROM due_observations
             WHERE schedule_sha256 = ? AND activation_id = ?
             """,
@@ -313,8 +353,25 @@ def build_closure_receipt(
                     pending_future += 1
                 if due_at <= as_of:
                     actually_overdue += 1
+            updated = _parse_utc(row["updated_at"])
+            if (
+                updated is not None
+                and state not in _OPEN_DUE
+                and state not in _IN_FLIGHT
+                and updated > cutoff
+            ):
+                cutoff = updated
     finally:
         conn.close()
+    horizon = latest_c1_observation_manifest_at(
+        observation_rdp,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        cohort_mints=cohort_entities,
+        not_after=as_of,
+    )
+    if horizon is not None and horizon > cutoff:
+        cutoff = horizon
     publication = collect_open_publication(
         observation_rdp,
         schedule_sha256=schedule_sha256,
@@ -335,6 +392,9 @@ def build_closure_receipt(
         "now_ge_mature_at": as_of >= mature_at,
         "members_total": len(cohort_entities),
         "entity_ids": sorted(cohort_entities),
+        "member_identity_sha256": _member_identity_sha256(member_identity_rows),
+        "admission_clock_invalid_count": admission_invalid,
+        "admission_clock_missing_sampled_count": admission_missing_sampled,
         "member_states": dict(member_states),
         "due_states": dict(due_states),
         "pending_due_for_cohort": pending_due_by_mature,
@@ -347,6 +407,7 @@ def build_closure_receipt(
         "cohort_open_count": publication["cohort_open_count"],
         "ambiguous_open_count": publication["ambiguous_open_count"],
         "open_publication": publication["open_publication"],
+        "closure_cutoff_at": render_utc(cutoff),
         "unresolved_due": pending_due_by_mature > 0,
         "in_flight": claimed_or_in_flight > 0,
     }
@@ -366,6 +427,12 @@ def assert_closure_ready(receipt: Mapping[str, Any]) -> None:
     _require(bool(receipt.get("now_ge_mature_at")), "NOT_MATURE")
     _require("members_total" in receipt, "CLOSED_RECEIPT_INCOMPLETE")
     _require(int(receipt["members_total"]) > 0, "CLOSED_RECEIPT_INCOMPLETE")
+    invalid_count = receipt.get("admission_clock_invalid_count")
+    missing_count = receipt.get("admission_clock_missing_sampled_count")
+    _require(type(invalid_count) is int, "CLOSED_RECEIPT_INCOMPLETE")
+    _require(type(missing_count) is int, "CLOSED_RECEIPT_INCOMPLETE")
+    _require(invalid_count == 0, "ADMISSION_CLOCK_INVALID")
+    _require(missing_count == 0, "ADMISSION_CLOCK_MISSING")
     _require(isinstance(receipt.get("due_states"), dict), "CLOSED_RECEIPT_INCOMPLETE")
     due_total = sum(int(v) for v in receipt["due_states"].values())
     _require(due_total > 0, "CLOSED_RECEIPT_INCOMPLETE")
@@ -378,6 +445,7 @@ def assert_closure_ready(receipt: Mapping[str, Any]) -> None:
     ):
         _require(key in receipt, "CLOSED_RECEIPT_INCOMPLETE")
     _require(int(receipt["pending_due_for_cohort"]) == 0, "COHORT_DUE_OPEN")
+    _require(int(receipt.get("pending_future") or 0) == 0, "COHORT_PENDING_FUTURE")
     _require(int(receipt["claimed_or_in_flight"]) == 0, "COHORT_DUE_OPEN")
     _require(receipt["in_flight"] is False, "COHORT_DUE_OPEN")
     _require(receipt["open_publication"] is False, "PUBLICATION_OPEN")
@@ -398,6 +466,36 @@ def assert_source_matches_receipt(
     _require(
         len(source.get("members") or []) == int(receipt["members_total"]),
         "CLOSED_RECEIPT_INCOMPLETE",
+    )
+    _require(
+        str(source.get("closure_cutoff_at") or "") == str(receipt.get("closure_cutoff_at") or ""),
+        "CLOSED_RECEIPT_INCOMPLETE",
+    )
+    start = parse_utc(str(receipt.get("window_start") or ""))
+    end = parse_utc(str(receipt.get("window_end_exclusive") or ""))
+    identity_rows: list[tuple[str, str, str]] = []
+    for item in source.get("members") or []:
+        if not isinstance(item, Mapping):
+            continue
+        admission = resolve_cohort_admission_instant(item)
+        _require(admission is not None, "CLOSED_RECEIPT_INCOMPLETE")
+        _require(start <= admission < end, "C2_ROW_IN_C1")
+        identity_rows.append(
+            (
+                str(item.get("mint") or ""),
+                str(item.get("candidate_state") or ""),
+                render_utc(admission),
+            )
+        )
+    _require(
+        str(source.get("closure_receipt_sha256") or "")
+        == str(receipt.get("closure_identity_sha256") or receipt.get("receipt_sha256") or ""),
+        "CLOSED_RECEIPT_INCOMPLETE",
+    )
+    source_identity = _member_identity_sha256(identity_rows)
+    _require(
+        source_identity == str(receipt.get("member_identity_sha256") or ""),
+        "STALE_MEMBER_STATE",
     )
 
 
@@ -492,19 +590,21 @@ def forge_control_ready(
     probe = Path(repo_root) / PROBE_CONTRACT_RELATIVE
     _require(probe.is_file(), "CONTROL_PROBE_CONTRACT_MISSING")
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
-    current = [
-        item
-        for item in select_current_datasets_for_forge(datasets)
-        if str(item.get("dataset_id") or "") == CORPUS_DATASET_ID
-        or str((item.get("labels") or {}).get("logical_dataset_id") or "") == CORPUS_DATASET_ID
-    ]
-    _require(bool(current), "CURRENT_CORPUS_MISSING")
+    bounded, trunc = select_forge_packet_datasets(
+        datasets,
+        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    current = [item for item in bounded if is_live_corpus_dataset(item)]
+    if not current:
+        all_current = [
+            item
+            for item in select_current_datasets_for_forge(datasets)
+            if is_live_corpus_dataset(item)
+        ]
+        _require(not all_current, "CURRENT_CORPUS_EXCLUDED_FROM_CONTROL_PACKET")
+        _require(False, "CURRENT_CORPUS_MISSING")
     chosen = current[0]
     labels = dict(chosen.get("labels") or {})
-    yield_eligible = int(labels.get("yield_eligible") or chosen.get("yield_eligible") or 0)
-    coverage = str(labels.get("discovery_coverage_class") or "")
-    _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
-    _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     if imported_cohort_id:
         lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
         _require(lineage_path.is_file(), "CORPUS_LINEAGE_INCOMPLETE")
@@ -515,6 +615,26 @@ def forge_control_ready(
             if isinstance(c, Mapping)
         ]
         _require(imported_cohort_id in ids, "IMPORTED_COHORT_MISSING")
+        current_mid = str(lineage.get("current_dataset_manifest_id") or "")
+        _require(bool(current_mid), "CORPUS_LINEAGE_INCOMPLETE")
+        _require(
+            str(chosen.get("dataset_manifest_id") or "") == current_mid,
+            "CONTROL_CORPUS_MANIFEST_MISMATCH",
+        )
+    else:
+        lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+        if lineage_path.is_file():
+            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+            current_mid = str(lineage.get("current_dataset_manifest_id") or "")
+            if current_mid:
+                _require(
+                    str(chosen.get("dataset_manifest_id") or "") == current_mid,
+                    "CONTROL_CORPUS_MANIFEST_MISMATCH",
+                )
+    yield_eligible = int(labels.get("yield_eligible") or chosen.get("yield_eligible") or 0)
+    coverage = str(labels.get("discovery_coverage_class") or "")
+    _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
+    _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     material = evidence_epoch_material(repo_root=repo_root, data_root=data_root)
     epoch = evidence_epoch_sha256(material)
     sessions = _query_hfic_sessions(Path(data_root))
@@ -525,11 +645,13 @@ def forge_control_ready(
         and str(item.get("evidence_epoch_sha256") or "") == epoch
     ]
     _require(not blocking, "HFIC_SESSION_BLOCKED")
+    store: ExistingResearchStoreReader | None
     try:
         store = ExistingResearchStoreReader(Path(data_root))
     except ResearchStoreError:
-        prior: dict[str, Any] = {"capsules": [], "eligible_count": 0}
-        blocked: set[str] = set()
+        store = None
+        prior = {"capsules": [], "eligible_count": 0}
+        blocked = set()
     else:
         prior = build_prior_memory_snapshot(
             store,
@@ -545,6 +667,39 @@ def forge_control_ready(
             _require(session_id not in blocked, "QUARANTINED_MEMORY_ELIGIBLE")
         status = str(capsule.get("memory_status") or "")
         _require(status not in {MEMORY_HARD_CLOSE, MEMORY_PARK}, "QUARANTINED_MEMORY_ELIGIBLE")
+    try:
+        prove_fast_lane_commissioned(Path(data_root))
+    except HficPreflightError as exc:
+        raise LiveCohortToForgeError(str(exc) or "FAST_LANE_NOT_COMMISSIONED") from exc
+    policy_head = effective_policy(store)
+    focus = AUTO_FOCUS
+    focus_key = focus_key_sha256(focus)
+    memory_eligibility = str(policy_head.get("memory_eligibility_sha256") or "0" * 64)
+    search_key = search_key_sha256(
+        epoch, focus, PROMPT_VERSION, memory_eligibility, CURRENT_REPRESENTATION_CONTROL_V1
+    )
+    action, _bound = decide_preflight_action(
+        sessions,
+        search_key=search_key,
+        evidence_epoch=epoch,
+        focus_key=focus_key,
+        owner_focus=focus,
+        memory_eligibility_sha256=memory_eligibility,
+        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    _require(action != "STOP", "SEARCH_BUDGET_EXHAUSTED")
+    _require(
+        action
+        in {
+            "START_NEW_SESSION",
+            "RESUME_FINALIZE",
+            "RESUME_REVISE",
+            "RESUME_CLASSIFY",
+            "RESUME_CRITIC",
+            "RETURN_EXISTING_SESSION",
+        },
+        "CONTROL_SESSION_NOT_ENTERABLE",
+    )
     return {
         "terminal": "FORGE_CONTROL_READY",
         "dataset_id": CORPUS_DATASET_ID,
@@ -559,6 +714,9 @@ def forge_control_ready(
         "next": CONTROL_NEXT,
         "control_run_required_first": True,
         "normalized_trajectory_executed": False,
+        "live_corpus_in_packet": bool(trunc.get("live_corpus_in_packet")),
+        "control_search_action": action,
+        "bounded_dataset_count": len(bounded),
     }
 
 
@@ -801,6 +959,9 @@ def synthetic_closed_receipt(
         "now_ge_mature_at": as_of.astimezone(UTC) >= mature_at,
         "members_total": members_total,
         "entity_ids": [],
+        "member_identity_sha256": _member_identity_sha256([]),
+        "admission_clock_invalid_count": 0,
+        "admission_clock_missing_sampled_count": 0,
         "member_states": {},
         "due_states": {},
         "pending_due_for_cohort": 0,
@@ -813,6 +974,7 @@ def synthetic_closed_receipt(
         "cohort_open_count": 0,
         "ambiguous_open_count": 0,
         "open_publication": False,
+        "closure_cutoff_at": render_utc(mature_at),
         "unresolved_due": False,
         "in_flight": False,
     }
