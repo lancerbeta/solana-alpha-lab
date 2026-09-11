@@ -71,7 +71,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_completion_evidence_v1.json
+    - docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_independent_review_v1.json
+    - docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

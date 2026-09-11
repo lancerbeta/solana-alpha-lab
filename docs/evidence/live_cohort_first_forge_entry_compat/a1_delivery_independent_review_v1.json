@@ -10,8 +10,8 @@
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC"
   ],
-  "reviewed_bindings_sha256": "PENDING_BIND_EVIDENCE",
-  "reviewed_inventory_sha256": "PENDING_BIND_EVIDENCE",
+  "reviewed_bindings_sha256": "281f0aad34a6863832bf42a0a987597242a8046327644a7450354017a3e71471",
+  "reviewed_inventory_sha256": "b5b142dd35bd2fd38aa6eb7a46f55a8143b53e26fbc26c21c88112cdc64e4550",
   "reviews": [
     {
       "role": "CODE_REVIEWER",
