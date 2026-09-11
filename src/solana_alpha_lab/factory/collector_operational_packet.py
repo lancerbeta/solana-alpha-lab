@@ -20,15 +20,11 @@ from solana_alpha_lab.factory.hot90_activation import load_hot90_activation
 from solana_alpha_lab.factory.hot90_closed_day_loop import archive_backlog, read_receipt
 from solana_alpha_lab.factory.hot90_mutable_backup import mutable_backup_sources
 from solana_alpha_lab.factory.hot90_storage_admission import project_storage_runway
-from solana_alpha_lab.factory.live_cohort_discovery_release import (
-    CORPUS_DATASET_ID,
-    load_observation_rdp_source,
-)
 from solana_alpha_lab.factory.observation_publication_jobs import (
     journal_stats,
+    jobs_root,
     open_dir,
     project_7d_disk_used,
-    rdp_bytes_excluding_publication_jobs,
 )
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
@@ -43,6 +39,10 @@ from solana_alpha_lab.factory.remote_ops import (
 
 UNKNOWN = "UNKNOWN"
 NOT_APPLICABLE = "NOT_APPLICABLE"
+# Copied from the scientific release module so the monitor path does not
+# import PyArrow / parquet just to name a manifest file.
+RELEASE_MANIFEST_NAME = "release_manifest.json"
+CORPUS_DATASET_ID = "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
 
 DISK_WARNING_EARLY_PCT = 70
 DISK_WARNING_PCT = 80
@@ -183,20 +183,31 @@ def storage_history_sample_blocked(
     return False
 
 
-def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
-    """One filesystem walk: total RDP bytes plus OPEN-dir bytes.
+def _under_root(child: Path, root: Path) -> bool:
+    try:
+        child.relative_to(root)
+    except ValueError:
+        return False
+    return True
 
+
+def _rdp_inventory_bytes(path: Path) -> tuple[Any, Any, Any, Any]:
+    """Stream RDP regular-file bytes. Do not retain a path inventory.
+
+    Returns ``(total, open_count, open_bytes, science_excluding_jobs)``.
     Every regular file under ``publication_jobs/open`` is transient,
     including empty and atomic ``*.json.tmp``. Any unreadable directory or
     file fails the whole measurement closed.
     """
 
     if not path.exists():
-        return UNKNOWN, 0, 0
+        return UNKNOWN, 0, 0, 0
     open_root = open_dir(path)
+    jobs = jobs_root(path)
     total = 0
     open_bytes = 0
     open_count = 0
+    science = 0
     scan_failed = False
 
     def onerror(_err: OSError) -> None:
@@ -204,53 +215,53 @@ def _rdp_total_and_open_json(path: Path) -> tuple[Any, Any, Any]:
         scan_failed = True
 
     try:
-        files: list[tuple[Path, int]] = []
         if path.is_file():
             try:
-                files = [(path, int(path.stat().st_size))]
+                size = int(path.stat().st_size)
             except OSError:
-                return UNKNOWN, UNKNOWN, UNKNOWN
-        else:
-            for dirpath, dirnames, filenames in os.walk(
-                path, onerror=onerror, followlinks=False
-            ):
-                if scan_failed:
-                    break
-                pending_dirs = list(dirnames)
-                dirnames[:] = []
-                for name in pending_dirs:
-                    try:
-                        mode = os.lstat(os.path.join(dirpath, name)).st_mode
-                    except OSError:
-                        scan_failed = True
-                        break
-                    if stat.S_ISLNK(mode):
-                        continue
-                    dirnames.append(name)
-                if scan_failed:
-                    break
-                for name in filenames:
-                    child = Path(dirpath) / name
-                    try:
-                        info = os.lstat(child)
-                    except OSError:
-                        return UNKNOWN, UNKNOWN, UNKNOWN
-                    if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
-                        continue
-                    files.append((child, int(info.st_size)))
+                return UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN
+            return size, 0, 0, size
+        for dirpath, dirnames, filenames in os.walk(
+            path, onerror=onerror, followlinks=False
+        ):
             if scan_failed:
-                return UNKNOWN, UNKNOWN, UNKNOWN
-        for child, size in files:
-            total += size
-            try:
-                child.relative_to(open_root)
-            except ValueError:
-                continue
-            open_bytes += size
-            open_count += 1
+                break
+            pending_dirs = list(dirnames)
+            dirnames[:] = []
+            for name in pending_dirs:
+                try:
+                    mode = os.lstat(os.path.join(dirpath, name)).st_mode
+                except OSError:
+                    scan_failed = True
+                    break
+                if stat.S_ISLNK(mode):
+                    continue
+                dirnames.append(name)
+            if scan_failed:
+                break
+            current = Path(dirpath)
+            in_open = _under_root(current, open_root)
+            in_jobs = in_open or _under_root(current, jobs)
+            for name in filenames:
+                child = current / name
+                try:
+                    info = os.lstat(child)
+                except OSError:
+                    return UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN
+                if stat.S_ISLNK(info.st_mode) or not stat.S_ISREG(info.st_mode):
+                    continue
+                size = int(info.st_size)
+                total += size
+                if in_open:
+                    open_bytes += size
+                    open_count += 1
+                elif not in_jobs:
+                    science += size
+        if scan_failed:
+            return UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN
     except OSError:
-        return UNKNOWN, UNKNOWN, UNKNOWN
-    return total, open_count, open_bytes
+        return UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN
+    return total, open_count, open_bytes, science
 
 
 def _tree_bytes(path: Path) -> int | None:
@@ -478,13 +489,39 @@ def _count_x_eligible_24h(
     return seen
 
 
+def _bounded_release_manifests(search_root: Path) -> list[Path]:
+    """Small known release-manifest locations only. No whole-RDP glob."""
+
+    found: list[Path] = []
+    direct = search_root / RELEASE_MANIFEST_NAME
+    if direct.is_file() and not direct.is_symlink():
+        found.append(direct)
+    try:
+        for child in search_root.iterdir():
+            if not child.is_dir() or child.is_symlink():
+                continue
+            if not child.name.startswith("live_cohort_release_"):
+                continue
+            manifest = child / RELEASE_MANIFEST_NAME
+            if manifest.is_file() and not manifest.is_symlink():
+                found.append(manifest)
+    except OSError:
+        return found
+    found.sort(key=lambda path: str(path))
+    return found
+
+
 def _live_release_fields(
     observation_rdp: Path,
     *,
     now: datetime,
     scientific_rdp_root: Path | None = None,
 ) -> dict[str, Any]:
-    """Best-effort live cohort / corpus fields without inventing zeros."""
+    """Best-effort live cohort / corpus fields without inventing zeros.
+
+    Must not load ``live_observation_rebuild/source_snapshot.json``. Absent
+    bounded metadata stays UNKNOWN rather than deserializing the corpus.
+    """
 
     out: dict[str, Any] = {
         "cohort_id": UNKNOWN,
@@ -494,82 +531,31 @@ def _live_release_fields(
         "current_live_corpus_version": UNKNOWN,
         "release_blocked_reasons": [],
     }
-    snapshot_path = observation_rdp / "live_observation_rebuild" / "source_snapshot.json"
-    if not snapshot_path.is_file():
-        return out
-    try:
-        source = load_observation_rdp_source(observation_rdp)
-    except Exception:
-        out["release_state"] = "RELEASE_INVALID_SOURCE_INTEGRITY"
-        return out
-
-    # Derive current UTC week cohort id from admission clock when possible.
-    members = list(source.get("members") or [])
-    if not members:
-        out["cohort_readiness_state"] = "COLLECTING"
-        out["release_state"] = "COLLECTING"
-        return out
-
-    # Prefer readiness flags already on snapshot.
-    open_pub = bool(source.get("open_publication"))
-    unresolved = bool(source.get("unresolved_due"))
-    in_flight = bool(source.get("in_flight"))
-    budget = bool(source.get("budget_blocked"))
-    blockers = []
-    if open_pub:
-        blockers.append("RELEASE_BLOCKED_OPEN_PUBLICATION")
-    if unresolved:
-        blockers.append("RELEASE_BLOCKED_UNRESOLVED_DUE")
-    if in_flight:
-        blockers.append("RELEASE_BLOCKED_IN_FLIGHT")
-    if budget:
-        blockers.append("RELEASE_BLOCKED_BUDGET")
-    out["release_blocked_reasons"] = blockers
-    coverage = source.get("discovery_coverage_class")
-    if blockers:
-        out["release_state"] = "RELEASE_BLOCKED"
-        out["cohort_readiness_state"] = "RELEASE_BLOCKED"
-    else:
-        out["release_state"] = str(coverage or "COLLECTING")
-        out["cohort_readiness_state"] = str(coverage or "COLLECTING")
-
-    # Sealed releases under optional scientific RDP root.
     search_root = scientific_rdp_root or observation_rdp
-    sealed: list[Path] = []
-    direct = search_root / "release_manifest.json"
-    if direct.is_file():
-        sealed.append(direct)
-    sealed.extend(sorted(search_root.glob("**/live_cohort_release_*/release_manifest.json")))
-    sealed.extend(sorted(search_root.glob("**/release_manifest.json")))
-    # de-dupe preserving order
-    seen: set[str] = set()
-    unique: list[Path] = []
-    for path in sealed:
-        key = str(path.resolve())
-        if key in seen:
-            continue
-        seen.add(key)
-        unique.append(path)
-    sealed = unique
+    sealed = _bounded_release_manifests(search_root)
     if sealed:
         latest = sealed[-1]
         try:
             manifest = json.loads(latest.read_text(encoding="utf-8"))
-            out["last_sealed_release_id"] = str(
-                manifest.get("release_id") or latest.parent.name
-            )
+            if not isinstance(manifest, dict):
+                raise TypeError("release manifest is not an object")
+            release_id = manifest.get("release_id")
+            if isinstance(release_id, str) and release_id:
+                out["last_sealed_release_id"] = release_id
             version = manifest.get("corpus_version")
             if version is not None:
                 out["current_live_corpus_version"] = version
             labels = manifest.get("labels") if isinstance(manifest.get("labels"), dict) else {}
             if isinstance(labels, dict) and labels.get("corpus_version") is not None:
                 out["current_live_corpus_version"] = labels.get("corpus_version")
-            if isinstance(labels, dict) and labels.get("logical_dataset_id"):
+            if isinstance(labels, dict) and isinstance(labels.get("logical_dataset_id"), str):
                 out["corpus_dataset_id"] = labels.get("logical_dataset_id")
             else:
                 out["corpus_dataset_id"] = CORPUS_DATASET_ID
-        except (OSError, json.JSONDecodeError):
-            out["last_sealed_release_id"] = latest.parent.name
+        except (OSError, json.JSONDecodeError, TypeError):
+            out["last_sealed_release_id"] = UNKNOWN
+            out["current_live_corpus_version"] = UNKNOWN
+            out["corpus_dataset_id"] = CORPUS_DATASET_ID
     else:
         out["corpus_dataset_id"] = CORPUS_DATASET_ID
     _ = now  # reserved for future cohort-id derivation
@@ -800,14 +786,11 @@ def build_collector_operational_packet(
         except OSError:
             sqlite_bytes = UNKNOWN
 
-    rdp_bytes, open_job_count, open_job_bytes = _rdp_total_and_open_json(rdp)
+    rdp_bytes, open_job_count, open_job_bytes, rdp_science_bytes = _rdp_inventory_bytes(
+        rdp
+    )
     jobs = journal_stats(rdp)
     resident_rdp = resident_rdp_bytes(rdp_bytes, open_job_bytes)
-    rdp_science_bytes: Any = UNKNOWN
-    try:
-        rdp_science_bytes = rdp_bytes_excluding_publication_jobs(rdp)
-    except OSError:
-        rdp_science_bytes = UNKNOWN
 
     declared_raw: Any = UNKNOWN
     remaining_canonical: Any = UNKNOWN

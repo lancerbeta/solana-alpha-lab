@@ -32,7 +32,7 @@ from solana_alpha_lab.factory.remote_ops import (
 TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
 PULSE_DEDUP_RELATIVE = "local/factory_v1/collector_owner_pulse_dedup.json"
 # Ordinary documented UTC time — deterministic schedule bytes.
-DAILY_PULSE_ON_CALENDAR = "*-*-* 06:15:00 UTC"
+DAILY_PULSE_ON_CALENDAR = "*-*-* 06:20:00 UTC"
 
 
 def _fmt(value: object) -> str:

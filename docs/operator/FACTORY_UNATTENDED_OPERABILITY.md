@@ -25,7 +25,7 @@ After a later owner-gated commissioning (not this Git change):
 | Lifecycle collection | existing `factory-observation-schedule.timer` | existing collector cadence |
 | Mutable-state backup | existing `factory-remote-backup*.timer` | existing backup cadence |
 | Closed-day immutable archive | `factory-hot90-closed-day-archive.timer` | `01:15 / 07:15 / 13:15 / 19:15 UTC`, max 3 days/run |
-| Daily owner pulse | `factory-collector-owner-pulse.timer` | `*-*-* 06:15:00 UTC` |
+| Daily owner pulse | `factory-collector-owner-pulse.timer` | `*-*-* 06:20:00 UTC` |
 | Local operability watch | `factory-operability-watch.timer` | every 15 minutes UTC |
 | External heartbeat (local half) | `factory-external-heartbeat.timer` | every 5 minutes UTC |
 
@@ -81,7 +81,7 @@ account, or provider is in Git.
 
 ## WHAT MESSAGE SHOULD THE OWNER EXPECT?
 
-- One daily card at 06:15 UTC: `FACTORY / DAILY — OK | DEGRADED | ACTION`.
+- One daily card at 06:20 UTC: `FACTORY / DAILY — OK | DEGRADED | ACTION`.
 - One `INCIDENT` when a material fail persists past the owned grace.
 - One `RECOVERED` when it clears.
 - No routine PENDING / historical STARTED / single transient transport spam.

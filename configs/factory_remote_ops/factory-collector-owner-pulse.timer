@@ -1,11 +1,13 @@
 [Unit]
-Description=Daily Factory collector owner pulse at 06:15 UTC
+Description=Daily Factory collector owner pulse at 06:20 UTC
 # Template only — install/enable only after owner-gated
 # FACTORY_UNATTENDED_OPERABILITY commissioning (not COLLECTOR pulse atom).
 # OnCalendar is deterministic; do not invent a scheduling subsystem.
+# Offset from the :15 operability watch to avoid a deterministic 06:15
+# double packet-builder start. Watch cadence stays *:0/15:00 UTC.
 
 [Timer]
-OnCalendar=*-*-* 06:15:00 UTC
+OnCalendar=*-*-* 06:20:00 UTC
 Persistent=true
 Unit=factory-collector-owner-pulse.service
 
