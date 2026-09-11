@@ -6,8 +6,8 @@
   "task_id": "FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0",
-  "reviewed_inventory_sha256": "0",
+  "reviewed_bindings_sha256": "d144b9cc8bddd50e9200eef18d88ee663959d9f78585bc5449c90da49c7d8181",
+  "reviewed_inventory_sha256": "3a3dbdb2c50dfbde268f05c5adf0f3bf4e4f279b0481cb1ad010f8a4fee26f0b",
   "capability_radar": {
     "now": "NONE",
     "watch": "FACTORY_SOURCE_DATA_STALE_EXPECTATION_AWARE_V1"
