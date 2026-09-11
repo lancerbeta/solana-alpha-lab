@@ -15,7 +15,7 @@
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "2d093f2f81e91dc85456f79329a228c8864380f286159ba8fe4f296f5bdef960",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a987c8e5686f8362529f3a1a3ec8b9a0895f99a78830d8dbfe1cd67900bbd6d4",
     "docs/reports/live_cohort_first_forge_entry_compat/a1_owner_readout_v1.md": "743503f70aca730dd311d9382816a31f2de30a9ffb348fce6c9b981c988a8f7e",
-    "docs/tasks/LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT_V1.md": "f0767f00b386e370c2c8d681f9ede2fa4cac40c8bcc95936a3da668625c000b4",
+    "docs/tasks/LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT_V1.md": "71bf874f072cb4bf97a657216b4e546c8894378d3da063af17fcfe1d8e467af6",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "d0237a3a2b35058252000eb3674b6df1127555aa39fe63df38fd455a621f45a7",
     "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "fd4baea7847d810fde5d837b47e901b1127b800caef80d4e2ed838095fddb907",
     "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "3a503113c3c32c1f371b77a7b87ba04dff6bfce822f02fa56ee53ae557c6df70",
@@ -33,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_factory_fit_v1.json",
-    "sha256": "fa5f258df78903e4df15fb386f8abcd79178b9853b0b653a84a628f9902cef41",
+    "sha256": "0cc807de8b73656478d6e00995ea9e4f684a557edd4e8e838658e7db500461db",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT",
     "independent_review": {
       "path": "docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_independent_review_v1.json",
-      "sha256": "edfb5740078eff89ad99a8fa8d679df0ab0b108e9f58aefc9e5eaf59e07ade73",
+      "sha256": "66b14cddac4efd66a7d683c2eb1795be3f3dc7645da2635fa3dca98ccee9834d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
