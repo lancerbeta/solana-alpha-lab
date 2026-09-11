@@ -10,8 +10,8 @@
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC"
   ],
-  "reviewed_bindings_sha256": "c96b033e8909eabe80006fbdfd34ace712da6870746d302a265c7fa169c55851",
-  "reviewed_inventory_sha256": "d16811dabf365018b60820cb6b6f812390c412d928d2d60a694d2db7d975b950",
+  "reviewed_bindings_sha256": "da19b4c4ca47915e1323f026997e7271536e747bf14414cafecc0f655449bf7d",
+  "reviewed_inventory_sha256": "9429ad0e168e0582ae3e92840e5a34fd5af2fed104925d70c26b886f7680882e",
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
