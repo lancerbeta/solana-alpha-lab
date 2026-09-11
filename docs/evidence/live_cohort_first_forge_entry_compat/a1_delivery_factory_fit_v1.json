@@ -7,7 +7,7 @@
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "reviewed_bindings_sha256": "281f0aad34a6863832bf42a0a987597242a8046327644a7450354017a3e71471",
-  "reviewed_inventory_sha256": "b5b142dd35bd2fd38aa6eb7a46f55a8143b53e26fbc26c21c88112cdc64e4550",
+  "reviewed_inventory_sha256": "7a51f7c261a6fb484641ac860db4b748c9b00579170f91665dee096d914aaa14",
   "capability_radar": {
     "now": "NONE",
     "watch": "POST_MERGE_COHORT1_LIVE_ACCEPTANCE"

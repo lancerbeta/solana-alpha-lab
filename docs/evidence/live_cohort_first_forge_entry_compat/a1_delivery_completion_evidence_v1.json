@@ -33,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_factory_fit_v1.json",
-    "sha256": "e65ca0453c4e16f4502a8afcf0172231fad1c56deb6130a1d6c69ff9ae9986cc",
+    "sha256": "fa5f258df78903e4df15fb386f8abcd79178b9853b0b653a84a628f9902cef41",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LIVE_COHORT_FIRST_FORGE_ENTRY_COMPAT",
     "independent_review": {
       "path": "docs/evidence/live_cohort_first_forge_entry_compat/a1_delivery_independent_review_v1.json",
-      "sha256": "e77d65dd6281081a1440a4667399613f11adfe90dabd496b2514caef1a7cebfb",
+      "sha256": "edfb5740078eff89ad99a8fa8d679df0ab0b108e9f58aefc9e5eaf59e07ade73",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
