@@ -34073,7 +34073,7 @@ records:
   as_of: '2026-09-11'
   truth_owner: LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_source_bundle.py', repository_path: src/solana_alpha_lab/factory/live_cohort_source_bundle.py}
-  integrity: {kind: sha256, sha256: dc2d67dd6c5bc6f86520b7412d011831bcaa3fe787f9d861e7d053eafd93211c}
+  integrity: {kind: sha256, sha256: ff5c11941b57adce05489fff9f0b455c37bb56745e4d1b813e3159d187814d4d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001}

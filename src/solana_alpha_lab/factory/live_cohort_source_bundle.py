@@ -31,7 +31,7 @@ SOURCE_OBSERVATIONS_NAME = "observations.parquet"
 SOURCE_STAGING_PREFIX = ".build-"
 BATCH_SIZE = 2048
 HASH_CHUNK = 1024 * 1024
-DEFAULT_AS_LIMIT_BYTES = 1536 * 1024 * 1024
+DEFAULT_AS_LIMIT_BYTES = 4096 * 1024 * 1024
 SOURCE_BUILD_RSS_CEILING_BYTES = 1250 * 1024 * 1024
 SOURCE_BUILD_WORKER_ENV = "LIVE_COHORT_SOURCE_BUILD_WORKER"
 SOURCE_BUILD_AS_LIMIT_ENV = "LIVE_COHORT_SOURCE_BUILD_AS_LIMIT_BYTES"
@@ -172,14 +172,22 @@ def source_build_child_was_resource_killed(returncode: int) -> bool:
 
 
 def apply_source_build_address_limit(limit_bytes: int | None = None) -> int | None:
-    """Fail the build process before host OOM. Linux RLIMIT_AS; no-op elsewhere."""
+    """Fail the build process before host OOM. Linux RLIMIT_AS; no-op elsewhere.
+
+    The cap is virtual address space, not RSS. PyArrow needs headroom above
+    the 1.25 GiB RSS ceiling; 1.5 GiB AS aborts tiny publishes with SIGABRT.
+    """
     if os.name != "posix":
         return None
     import resource
 
     raw = os.environ.get(SOURCE_BUILD_AS_LIMIT_ENV)
     if limit_bytes is None:
+        if raw == "0":
+            return None
         limit_bytes = int(raw) if raw else DEFAULT_AS_LIMIT_BYTES
+    if int(limit_bytes) <= 0:
+        return None
     resource.setrlimit(resource.RLIMIT_AS, (limit_bytes, limit_bytes))
     return limit_bytes
 
