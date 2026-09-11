@@ -30,6 +30,8 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E4
     classify_cohort_readiness,
     cohort_id_for_admission,
     load_observation_rdp_source,
+    iter_source_member_rows,
+    iter_source_observation_rows,
     resolve_cohort_admission_instant,
     select_current_datasets_for_forge,
     write_observation_rdp_source,
@@ -74,6 +76,14 @@ C1_ADMIT = datetime(2026, 9, 2, 12, 0, 0, tzinfo=UTC)
 C2_ADMIT = datetime(2026, 9, 9, 12, 0, 0, tzinfo=UTC)
 PUBLISH_C1 = C1_ADMIT
 PUBLISH_C2 = C2_ADMIT
+
+
+def _members(source: dict) -> list[dict]:
+    return list(iter_source_member_rows(source))
+
+
+def _observations(source: dict) -> list[dict]:
+    return list(iter_source_observation_rows(source))
 
 
 def _schedule(root: Path) -> dict:
@@ -558,7 +568,7 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 closure_receipt=receipt,
                 discovery_coverage_class="GAP_SUSPECTED",
             )
-            self.assertEqual(len(source["members"]), 12)
+            self.assertEqual(len(_members(source)), 12)
             first_sha = source["source_sha256"]
             first_lineage = source["contributing_producer_git_shas"]
             publish_observation_batch(
@@ -581,7 +591,7 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 closure_receipt=receipt,
                 discovery_coverage_class="GAP_SUSPECTED",
             )
-            self.assertEqual(len(mixed["members"]), 12)
+            self.assertEqual(len(_members(mixed)), 12)
             self.assertEqual(mixed["contributing_producer_git_shas"], first_lineage)
             later_c2 = datetime(2026, 9, 17, 12, 0, tzinfo=UTC)
             publish_observation_batch(
@@ -639,10 +649,10 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 ),
             )
             self.assertEqual(c2_source["contributing_producer_git_shas"], [PRODUCER_C])
-            self.assertEqual(len(c2_source["members"]), 3)
+            self.assertEqual(len(_members(c2_source)), 3)
             self.assertTrue(
-                set(m["mint"] for m in c2_source["members"]).isdisjoint(
-                    {m["mint"] for m in again["members"]}
+                set(m["mint"] for m in _members(c2_source)).isdisjoint(
+                    {m["mint"] for m in _members(again)}
                 )
             )
 
@@ -1763,13 +1773,13 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 closure_receipt=receipt,
                 discovery_coverage_class="GAP_SUSPECTED",
             )
-            self.assertEqual(len(source["members"]), 3)
+            self.assertEqual(len(_members(source)), 3)
             self.assertTrue(
                 any(
                     item.get("mint") == c1[0]
                     and str(item.get("first_reliable_available_at") or "")
                     == "2026-09-10T12:00:00Z"
-                    for item in source["observations"]
+                    for item in _observations(source)
                 )
             )
             first_sha = source["source_sha256"]

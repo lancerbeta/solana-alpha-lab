@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-11",
+  "task_id": "LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=6ca93ef9d139ece38bcb2a8ab24e34b07cfa5c5acfad29d8e29385d69eae101e",
+        "C1_BUNDLE_NO_JSON_ROW_DUP",
+        "C2_SQLITE_INDEX_NOT_ID_SET_CLONE",
+        "C3_SCIENCE_PRESERVED_AT_295_NET",
+        "C4_NOT_WIDENED_TO_PLATFORM",
+        "NO_CLAIM_RSS_INDEPENDENT_OF_COHORT_CARDINALITY"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "NO_SET_ENTITY_IDS_CLONE",
+        "SEEN_UNSEEN_NEEDED_IN_SQLITE",
+        "SEAL_MINTS_SQLITE_SPILL",
+        "LOCATION_FLAGS_SKIP_RECONSTRUCT",
+        "SOURCE_SNAPSHOT_JSON_UNSAFE_32MIB"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "COMPLEXITY_10_VS_100_RECONSTRUCT_CALLS_1",
+        "STRESS_150K_MAXRSS_170143744",
+        "SOURCE_BUNDLE_V1_PRODUCTION",
+        "NO_LIVE_VPS_IN_THIS_ATOM",
+        "SKIP_PROVEN_LATEST_UNIT_ONLY"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_SOURCE_SEAL_IMPORT",
+    "NO_PROVIDER_CALLS",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION",
+    "NO_SWAP_OR_HOST_RESIZE",
+    "NO_CLAIM_RSS_INDEPENDENT_OF_COHORT_CARDINALITY"
+  ]
+}

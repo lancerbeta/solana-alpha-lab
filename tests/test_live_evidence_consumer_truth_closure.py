@@ -28,6 +28,8 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E4
     cohort_id_for_admission,
     current_corpus_partition_rows,
     import_live_cohort,
+    iter_source_member_rows,
+    iter_source_observation_rows,
     load_observation_rdp_source,
     seal_live_cohort,
     select_current_datasets_for_forge,
@@ -51,6 +53,14 @@ C4_STARTS = datetime(2026, 9, 2, 11, 19, 0, tzinfo=UTC)
 C4_STOPS = datetime(2026, 9, 23, 11, 19, 0, tzinfo=UTC)
 NOW = datetime(2026, 9, 2, 11, 31, 18, tzinfo=UTC)
 COHORT1 = "REL-20260902T111900Z-20260909T111900Z"
+
+
+def _members(source: dict) -> list[dict]:
+    return list(iter_source_member_rows(source))
+
+
+def _observations(source: dict) -> list[dict]:
+    return list(iter_source_observation_rows(source))
 
 
 def _c4_style_schedule(root: Path) -> dict:
@@ -252,11 +262,11 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
             self.assertEqual(source["producer_git_sha"], PRODUCER)
             self.assertEqual(source["starts_at"], "2026-09-02T11:19:00Z")
             self.assertEqual(source["stops_admitting_at"], "2026-09-23T11:19:00Z")
-            mints = {m["mint"] for m in source["members"]}
+            mints = {m["mint"] for m in _members(source)}
             self.assertIn("EyGHwfTbPyfw9o7Kxic7pZdAmNScjXchnV5kzHmtpump", mints)
             admitted = next(
                 m
-                for m in source["members"]
+                for m in _members(source)
                 if m["mint"] == "EyGHwfTbPyfw9o7Kxic7pZdAmNScjXchnV5kzHmtpump"
             )
             self.assertEqual(
@@ -269,7 +279,7 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
             self.assertEqual(admitted["selected_or_excluded"], "SELECTED")
             excluded = next(
                 m
-                for m in source["members"]
+                for m in _members(source)
                 if m["mint"].startswith("HashExcluded")
             )
             self.assertEqual(excluded["selected_or_excluded"], "EXCLUDED")
@@ -278,7 +288,7 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
 
             field_rows = [
                 o
-                for o in source["observations"]
+                for o in _observations(source)
                 if o["point_id"] == "X300" and o["field_id"] == "FIELD-LIQUIDITY-USD-001"
             ]
             self.assertEqual(len(field_rows), 1)
@@ -741,7 +751,7 @@ class LiveEvidenceConsumerTruthClosureTests(unittest.TestCase):
                 closure_receipt=_receipt(digest),
             )
             self.assertEqual(source["producer_git_sha"], PRODUCER)
-            mints = {m["mint"] for m in source["members"]}
+            mints = {m["mint"] for m in _members(source)}
             self.assertIn("MintScopedProducerAAAA111111111111111111111", mints)
             # Foreign activation members stay out of this activation's source.
             self.assertNotIn("MintForeignActivationBBBB222222222222222222", mints)

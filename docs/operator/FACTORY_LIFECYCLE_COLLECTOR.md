@@ -445,7 +445,8 @@ cohort appears in lineage; do not paste the placeholder `REL-...`.
 
 Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
 `PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
-`LOW_YIELD`, `IMPORT_CONFLICT`. FAIL JSON may include `next`. `LOW_YIELD`
+`LOW_YIELD`, `IMPORT_CONFLICT`, `SOURCE_BUILD_RESOURCE_LIMIT`. FAIL JSON
+may include `next`. `LOW_YIELD`
 is raised before import when projected cumulative yield is below
 `MIN_USABLE_YIELD_ELIGIBLE`. `GAP_SUSPECTED` and another cohort being ACTIVE
 are not crashes. `GAP_CONFIRMED` is not sealable.
@@ -473,6 +474,35 @@ completed C1 observation-panel `created_at` at or before `as_of`) so later
 C2 publication cannot rewrite C1 member/observation/producer set or
 `source_sha256`. Winning C1 member-batch producers stay in lineage even
 when the freeze snapshot is mixed.
+
+Production `build-live-source` writes a memory-bounded source bundle, not a
+monolithic JSON snapshot:
+
+`live_observation_rebuild/cohort=<cohort_id>/source_manifest.json`
+`members.parquet`
+`observations.parquet`
+
+The CLI isolates `build-live-source`, `publish-live-cohort`, and
+`list-live-cohorts` in a child process with a bounded address space on Linux.
+`SOURCE_BUILD_RESOURCE_LIMIT` / `STOP_RETRY_BOUNDED_SOURCE_BUILD` means:
+retry the same bounded command; Factory should still be up (check doctor /
+timer). It is not host-down and is not a `STOP_DO_NOT_*` halt. It fires when
+the child is SIGKILL/SIGSEGV (137/139) or Python `MemoryError`. Ordinary FAIL
+codes (`NOT_MATURE`, `COHORT_DUE_OPEN`, exit `2` with another `code`) keep
+their own `code`/`next`. Collector, SSH, and workbench stay up. Do not add
+swap or resize the VPS. Do not retry the pre-repair giant
+`source_snapshot.json` path on the current host class.
+
+The 150k publication stress is a C1-shaped bound (census-sized members,
+one observation identity per member, mixed SNAPSHOT_PLUS_DELTA plus a
+later C2 panel). It proves the helper stays under the 1.25 GiB worker
+ceiling without N× Python member censuses. Reconstruct peak is the
+reconstructed publication census, not a C1-filtered subset. It is not
+proof that a mixed live snapshot much larger than C1, or a field-exploded
+observation panel, stays under 1 GiB. History growth is bounded by
+avoiding snapshot_count × census full-row materialization; it is not a
+claim that peak RSS is independent of cohort cardinality.
+
 Current corpus version rebinds all accepted cohort partitions without parquet
 byte duplication. Live role: `EXPLORATORY_REUSE` with
 `confirmatory_reuse_forbidden=true`.
