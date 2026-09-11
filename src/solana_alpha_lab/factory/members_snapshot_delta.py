@@ -4,7 +4,11 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping, Sequence
+import os
+import pickle
+import sqlite3
+import tempfile
+from collections.abc import Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -22,8 +26,10 @@ DELTA_SCHEMA_VERSION_V2 = "2.0"
 SUPPORTED_DELTA_SCHEMA_VERSIONS = frozenset(
     {DELTA_SCHEMA_VERSION_V1, DELTA_SCHEMA_VERSION_V2}
 )
+_MEMBER_BATCH_SIZE = 2048
 
 _FINGERPRINT_WORK = {"snapshot_fingerprint": 0, "row_fingerprint": 0}
+_RECONSTRUCT_STATS = {"peak_sqlite_rows": 0, "reconstruct_calls": 0}
 
 
 class MembersDeltaError(ValueError):
@@ -33,10 +39,16 @@ class MembersDeltaError(ValueError):
 def reset_fingerprint_work() -> None:
     _FINGERPRINT_WORK["snapshot_fingerprint"] = 0
     _FINGERPRINT_WORK["row_fingerprint"] = 0
+    _RECONSTRUCT_STATS["peak_sqlite_rows"] = 0
+    _RECONSTRUCT_STATS["reconstruct_calls"] = 0
 
 
 def fingerprint_work() -> dict[str, int]:
     return dict(_FINGERPRINT_WORK)
+
+
+def reconstruct_stats() -> dict[str, int]:
+    return dict(_RECONSTRUCT_STATS)
 
 
 def row_fingerprint(row: Mapping[str, Any]) -> str:
@@ -244,11 +256,109 @@ def append_delta_publication(
     return unit
 
 
-def reconstruct_publication(
+def _sha256_file_streaming(path: Path, *, chunk_size: int = 1024 * 1024) -> str:
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        while True:
+            chunk = handle.read(chunk_size)
+            if not chunk:
+                break
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _spill_members_db() -> tuple[Path, sqlite3.Connection]:
+    handle, name = tempfile.mkstemp(prefix="members-delta-", suffix=".sqlite")
+    os.close(handle)
+    path = Path(name)
+    conn = sqlite3.connect(str(path))
+    conn.execute(
+        "CREATE TABLE members (entity_id TEXT PRIMARY KEY NOT NULL, payload BLOB NOT NULL)"
+    )
+    return path, conn
+
+
+def _load_anchor_into_sqlite(conn: sqlite3.Connection, snapshot_path: Path) -> None:
+    pf = pq.ParquetFile(snapshot_path)
+    for batch in pf.iter_batches(batch_size=_MEMBER_BATCH_SIZE):
+        rows = []
+        for row in batch.to_pylist():
+            payload = dict(row)
+            entity_id = str(payload.get("entity_id") or "")
+            if not entity_id:
+                raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+            rows.append((entity_id, pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL)))
+        conn.executemany("INSERT INTO members(entity_id, payload) VALUES (?,?)", rows)
+    conn.commit()
+
+
+def _apply_delta_sqlite(
+    conn: sqlite3.Connection,
+    delta: Mapping[str, Any],
+    *,
+    removed_out: list[dict[str, Any]] | None = None,
+    removed_at_seq: int | None = None,
+) -> None:
+    for item in delta.get("removed") or []:
+        entity_id = str(item.get("entity_id") or "")
+        loaded = conn.execute(
+            "SELECT payload FROM members WHERE entity_id=?", (entity_id,)
+        ).fetchone()
+        if loaded is None:
+            raise MembersDeltaError("DELTA_REMOVE_MISSING")
+        current = pickle.loads(loaded[0])
+        if row_fingerprint(current) != str(item.get("fingerprint") or ""):
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        if removed_out is not None:
+            payload = dict(current)
+            if removed_at_seq is not None:
+                payload["_delta_removed_at_seq"] = int(removed_at_seq)
+            removed_out.append(payload)
+        conn.execute("DELETE FROM members WHERE entity_id=?", (entity_id,))
+    for row in list(delta.get("changed") or []) + list(delta.get("added") or []):
+        payload = dict(row)
+        entity_id = str(payload.get("entity_id") or "")
+        if not entity_id:
+            raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+        conn.execute(
+            "INSERT OR REPLACE INTO members(entity_id, payload) VALUES (?,?)",
+            (entity_id, pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL)),
+        )
+    conn.commit()
+
+
+def _fingerprint_sqlite(conn: sqlite3.Connection) -> str:
+    """Same digest as snapshot_fingerprint, without materializing the census list."""
+    _FINGERPRINT_WORK["snapshot_fingerprint"] += 1
+    digest = hashlib.sha256()
+    digest.update(b"[")
+    first = True
+    for (blob,) in conn.execute("SELECT payload FROM members ORDER BY entity_id"):
+        encoded = json.dumps(
+            dict(pickle.loads(blob)),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        ).encode("utf-8")
+        if not first:
+            digest.update(b",")
+        first = False
+        digest.update(encoded)
+    digest.update(b"]")
+    return digest.hexdigest()
+
+
+def iter_reconstructed_publication_batches(
     data_root: Path,
     unit: Mapping[str, Any],
     dataset_manifest_id: str,
-) -> list[dict[str, Any]]:
+    *,
+    columns: Sequence[str] | None = None,
+    batch_size: int = _MEMBER_BATCH_SIZE,
+    removed_out: list[dict[str, Any]] | None = None,
+) -> Iterator[list[dict[str, Any]]]:
+    """Replay SNAPSHOT_PLUS_DELTA into process-owned SQLite; yield bounded batches."""
     publications = list(unit.get("publications") or [])
     if not publications:
         raise MembersDeltaError("ANCHOR_MISSING")
@@ -262,72 +372,159 @@ def reconstruct_publication(
     snapshot_path = data_root / str(anchor["rel"])
     if snapshot_path.is_file() is False:
         raise MembersDeltaError("ANCHOR_MISSING")
-    observed = hashlib.sha256(snapshot_path.read_bytes()).hexdigest()
+    observed = _sha256_file_streaming(snapshot_path)
     if observed != str(anchor.get("sha256") or ""):
         raise MembersDeltaError("DELTA_HASH_MISMATCH")
-    current = [dict(row) for row in pq.read_table(snapshot_path).to_pylist()]
-    running_fp = snapshot_fingerprint(current)
-    if running_fp != str(anchor.get("snapshot_fingerprint") or ""):
-        raise MembersDeltaError("DELTA_HASH_MISMATCH")
-    previous_id = str(anchor.get("dataset_manifest_id") or "")
-    if previous_id == dataset_manifest_id:
-        return current
-    for index, item in enumerate(publications[1:], start=1):
+    spill, conn = _spill_members_db()
+    try:
+        _load_anchor_into_sqlite(conn, snapshot_path)
+        n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+        _RECONSTRUCT_STATS["reconstruct_calls"] += 1
+        if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
+            _RECONSTRUCT_STATS["peak_sqlite_rows"] = n_rows
+        running_fp = _fingerprint_sqlite(conn)
+        if running_fp != str(anchor.get("snapshot_fingerprint") or ""):
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        previous_id = str(anchor.get("dataset_manifest_id") or "")
+        reached = previous_id == dataset_manifest_id
+        if not reached:
+            for index, item in enumerate(publications[1:], start=1):
+                try:
+                    item_seq = int(item.get("seq"))
+                except (TypeError, ValueError):
+                    raise MembersDeltaError("DELTA_SEQUENCE_INVALID") from None
+                if item_seq != index:
+                    raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+                if str(item.get("kind") or "") != "delta":
+                    raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+                rel = str(item.get("rel") or "")
+                path = data_root / rel
+                if path.is_file() is False:
+                    raise MembersDeltaError("DELTA_MISSING")
+                file_sha = _sha256_file_streaming(path)
+                if file_sha != str(item.get("sha256") or ""):
+                    raise MembersDeltaError("DELTA_HASH_MISMATCH")
+                payload = path.read_bytes() if path.suffix == ".json" else b""
+                delta = _read_delta_payload(path, payload)
+                schema_version = str(delta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
+                if schema_version not in SUPPORTED_DELTA_SCHEMA_VERSIONS:
+                    raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
+                if str(delta.get("previous_dataset_manifest_id") or "") != previous_id:
+                    raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+                if str(delta.get("dataset_manifest_id") or "") != str(
+                    item.get("dataset_manifest_id") or ""
+                ):
+                    raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+                if str(delta.get("previous_fingerprint") or "") != running_fp:
+                    raise MembersDeltaError("DELTA_HASH_MISMATCH")
+                _apply_delta_sqlite(
+                    conn, delta, removed_out=removed_out, removed_at_seq=item_seq
+                )
+                n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+                if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
+                    _RECONSTRUCT_STATS["peak_sqlite_rows"] = n_rows
+                unit_fp = str(item.get("snapshot_fingerprint") or "")
+                current_fp = str(delta.get("current_fingerprint") or "")
+                is_target = str(item.get("dataset_manifest_id") or "") == dataset_manifest_id
+                if schema_version == DELTA_SCHEMA_VERSION_V2:
+                    if not current_fp:
+                        raise MembersDeltaError("DELTA_CORRUPT")
+                    if unit_fp and current_fp != unit_fp:
+                        raise MembersDeltaError("DELTA_HASH_MISMATCH")
+                if is_target:
+                    observed_fp = _fingerprint_sqlite(conn)
+                    if unit_fp and observed_fp != unit_fp:
+                        raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+                    if schema_version == DELTA_SCHEMA_VERSION_V2 and observed_fp != current_fp:
+                        raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+                    reached = True
+                    break
+                running_fp = current_fp or unit_fp
+                if not running_fp:
+                    raise MembersDeltaError("DELTA_CORRUPT")
+                previous_id = str(item.get("dataset_manifest_id") or "")
+        if not reached:
+            raise MembersDeltaError("PUBLICATION_NOT_IN_UNIT")
+        batch: list[dict[str, Any]] = []
+        for (blob,) in conn.execute("SELECT payload FROM members ORDER BY entity_id"):
+            row = pickle.loads(blob)
+            if columns is None:
+                batch.append(dict(row))
+            else:
+                batch.append({key: row.get(key) for key in columns})
+            if len(batch) >= batch_size:
+                yield batch
+                batch = []
+        if batch:
+            yield batch
+    finally:
+        conn.close()
+        spill.unlink(missing_ok=True)
+
+
+def reconstruct_publication(
+    data_root: Path,
+    unit: Mapping[str, Any],
+    dataset_manifest_id: str,
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for batch in iter_reconstructed_publication_batches(
+        data_root, unit, dataset_manifest_id
+    ):
+        rows.extend(batch)
+    return rows
+
+
+def publication_seq_for_location(
+    data_root: Path, logical_location: str, layout: Mapping[str, Any] | None
+) -> int | None:
+    if not isinstance(layout, Mapping):
+        return None
+    unit_rel = str(layout.get("unit_rel") or "")
+    manifest = str(layout.get("dataset_manifest_id") or "")
+    if not unit_rel or not manifest:
+        return None
+    unit_path = Path(data_root) / unit_rel
+    if not unit_path.is_file():
+        return None
+    try:
+        unit = json.loads(unit_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    if not isinstance(unit, Mapping):
+        return None
+    for item in unit.get("publications") or []:
+        if not isinstance(item, Mapping):
+            continue
+        if str(item.get("dataset_manifest_id") or "") != manifest:
+            continue
         try:
-            item_seq = int(item.get("seq"))
+            return int(item.get("seq"))
         except (TypeError, ValueError):
-            raise MembersDeltaError("DELTA_SEQUENCE_INVALID") from None
-        if item_seq != index:
-            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
-        if str(item.get("kind") or "") != "delta":
-            raise MembersDeltaError("UNIT_LAYOUT_INVALID")
-        rel = str(item.get("rel") or "")
-        path = data_root / rel
-        if path.is_file() is False:
-            raise MembersDeltaError("DELTA_MISSING")
-        payload = path.read_bytes()
-        if hashlib.sha256(payload).hexdigest() != str(item.get("sha256") or ""):
-            raise MembersDeltaError("DELTA_HASH_MISMATCH")
-        delta = _read_delta_payload(path, payload)
-        schema_version = str(delta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
-        if schema_version not in SUPPORTED_DELTA_SCHEMA_VERSIONS:
-            raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
-        if str(delta.get("previous_dataset_manifest_id") or "") != previous_id:
-            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
-        if str(delta.get("dataset_manifest_id") or "") != str(item.get("dataset_manifest_id") or ""):
-            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
-        if str(delta.get("previous_fingerprint") or "") != running_fp:
-            raise MembersDeltaError("DELTA_HASH_MISMATCH")
-        current = apply_member_delta(
-            current,
-            delta,
-            previous_fingerprint=running_fp,
-            verify_unchanged=False,
-            verify_base_hash=False,
-        )
-        unit_fp = str(item.get("snapshot_fingerprint") or "")
-        current_fp = str(delta.get("current_fingerprint") or "")
-        is_target = str(item.get("dataset_manifest_id") or "") == dataset_manifest_id
-        if schema_version == DELTA_SCHEMA_VERSION_V2:
-            if not current_fp:
-                raise MembersDeltaError("DELTA_CORRUPT")
-            if unit_fp and current_fp != unit_fp:
-                raise MembersDeltaError("DELTA_HASH_MISMATCH")
-        if is_target:
-            observed_fp = snapshot_fingerprint(current)
-            if unit_fp and observed_fp != unit_fp:
-                raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
-            if schema_version == DELTA_SCHEMA_VERSION_V2 and observed_fp != current_fp:
-                raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
-            return current
-        running_fp = current_fp or unit_fp
-        if not running_fp:
-            raise MembersDeltaError("DELTA_CORRUPT")
-        previous_id = str(item.get("dataset_manifest_id") or "")
-    raise MembersDeltaError("PUBLICATION_NOT_IN_UNIT")
+            return None
+    return None
 
 
-def load_member_rows_for_location(data_root: Path, logical_location: str) -> list[dict[str, Any]]:
+def read_member_layout(data_root: Path, logical_location: str) -> dict[str, Any] | None:
+    sidecar = (Path(data_root) / logical_location).with_name("members.layout.json")
+    if not sidecar.is_file() or sidecar.is_symlink():
+        return None
+    try:
+        payload = json.loads(sidecar.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return None
+    return payload if isinstance(payload, dict) else None
+
+
+def iter_member_row_batches_for_location(
+    data_root: Path,
+    logical_location: str,
+    *,
+    columns: Sequence[str] | None = None,
+    batch_size: int = _MEMBER_BATCH_SIZE,
+    removed_out: list[dict[str, Any]] | None = None,
+) -> Iterator[list[dict[str, Any]]]:
+    """Yield bounded member-row dict batches. Delta layout reconstructs via SQLite spill."""
     path = data_root / logical_location
     sidecar = path.with_name("members.layout.json")
     if sidecar.is_file():
@@ -341,19 +538,37 @@ def load_member_rows_for_location(data_root: Path, logical_location: str) -> lis
             unit = json.loads(unit_path.read_text(encoding="utf-8"))
             if not isinstance(unit, dict):
                 raise MembersDeltaError("UNIT_LAYOUT_INVALID")
-            return reconstruct_publication(
+            yield from iter_reconstructed_publication_batches(
                 data_root,
                 unit,
                 str(layout.get("dataset_manifest_id") or ""),
+                columns=columns,
+                batch_size=batch_size,
+                removed_out=removed_out,
             )
+            return
         if kind != LEGACY_KIND:
             raise MembersDeltaError("UNIT_LAYOUT_INVALID")
     if path.is_file() is False:
         raise MembersDeltaError("MEMBER_FILE_MISSING")
-    table = pq.read_table(path)
-    if "entity_id" not in table.column_names:
+    pf = pq.ParquetFile(path)
+    names = list(pf.schema_arrow.names)
+    if "entity_id" not in names:
         raise MembersDeltaError("LAYOUT_SIDECAR_MISSING")
-    return [dict(row) for row in table.to_pylist()]
+    use_cols = None
+    if columns is not None:
+        use_cols = [name for name in columns if name in names]
+        if not use_cols:
+            return
+    for batch in pf.iter_batches(batch_size=batch_size, columns=use_cols):
+        yield batch.to_pylist()
+
+
+def load_member_rows_for_location(data_root: Path, logical_location: str) -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    for batch in iter_member_row_batches_for_location(data_root, logical_location):
+        out.extend(batch)
+    return out
 
 
 def persist_delta_payload(path: Path, delta_payload: Mapping[str, Any]) -> str:

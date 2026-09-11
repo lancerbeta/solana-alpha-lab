@@ -1,0 +1,75 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-COMPLETION-001",
+  "as_of": "2026-09-11",
+  "task_id": "LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1",
+  "state_change": "LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_READY_FOR_MERGE",
+  "base_main": "77de3bacb09ee32c97cca95582cda760642b5c1b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "3d72ede0d21cf02461610504dfdb841c38126c005f6800cb02fa28922a915401",
+    "catalog/assets/lifecycle.yaml": "10e90f368f729ee0fc1adba4a9f2109795625a469dbb1f3610aacdf59fa5e9cc",
+    "catalog/catalog_manifest.yaml": "90ab8cdd5fab0e1bf266524277d666c652facd18dbefac12777c2392c336bdaf",
+    "catalog/generated/asset_edges.json": "44f3b468ac135c1ccc8ee63f13c8b895d322cef4b184053d1f109f22840dc1a2",
+    "docs/PROJECT_MAP.md": "107129464d104f5c58f71771b8ae5f822ec5a2c5da707bd278a6cd03add71a16",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "c48eec4ee90048445c3b87a47bf8f70ac4f5c7e7848c988a0baa8e26ac9a6729",
+    "docs/reports/live_cohort_memory_bounded_publication/a1_owner_readout_v1.md": "4c1c09075f65f37ab39d593de3a8f04a38242d455b13cc175f2da88e041f4254",
+    "docs/tasks/LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1.md": "da9025b6901c9cfaa7844d914783ed7e6f124b961231d31f18ea79744e773818",
+    "scripts/discovery_evidence_release.py": "3f75a670697c66e443f079f2d305696034c5b67cdd3314aaa067991164e9aed6",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "7a2627e9daa12fcde2073cec754ef5b096112cb17566860a76d50745cb92e53f",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "ff5c11941b57adce05489fff9f0b455c37bb56745e4d1b813e3159d187814d4d",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "a8e9deafde76baa672e450ebe935e8b30f3ae5140cb8cbf4f752fd42e0385c02",
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "e399e40630687fe766e4c0c8d0aef428a59f578b06d7e6ca48946402e1d06221",
+    "tests/test_live_cohort_memory_bounded_publication_v1.py": "e7775b56d07a45019ffefa7466d7e8ea578275905c99dda1ab90ce3c7a085e54",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "6c88172503643f1c6ea15b39113cb01e551a1801d480cd1ba1598bfc42063fef",
+    "tests/test_live_evidence_consumer_truth_closure.py": "9818d4231da0f66672824455a6cd003fe5f7436b5c699ed438fe474a88a5dd42"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_cohort_memory_bounded_publication/a1_delivery_factory_fit_v1.json",
+    "sha256": "789c49b7d6f103bc622f3a6503e2f683ebdd5f1b9525a02b1648c398eda572c5",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION",
+    "independent_review": {
+      "path": "docs/evidence/live_cohort_memory_bounded_publication/a1_delivery_independent_review_v1.json",
+      "sha256": "d9749551da0580f3aec5d892a1f962248ffc43ea0b3fae941fdaa22918c2b929",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_MEMORY_UNIT_AND_150K_STRESS",
+      "PASS_ISOLATED_ARCHITECTURE_CODE_GOAL_DOD",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_SOURCE_SEAL_IMPORT",
+    "NO_PROVIDER_CALLS",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION",
+    "NO_SWAP_OR_HOST_RESIZE",
+    "NO_CLAIM_RSS_INDEPENDENT_OF_COHORT_CARDINALITY"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

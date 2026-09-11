@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -28,6 +30,11 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     live_cohort_status,
     seal_live_cohort,
     verify_live_cohort,
+)
+from solana_alpha_lab.factory.live_cohort_source_bundle import (
+    SOURCE_BUILD_WORKER_ENV,
+    apply_source_build_address_limit,
+    source_build_child_was_resource_killed,
 )
 from solana_alpha_lab.factory.live_cohort_to_forge import (
     LiveCohortToForgeError,
@@ -55,6 +62,7 @@ FAIL_OWNER_NEXT = {
     "RELEASE_BLOCKED_BUDGET": "WAIT_UNTIL_BUDGET_UNBLOCKED",
     "CURRENT_CORPUS_MISSING": "IMPORT_VERIFIED_RELEASE_FIRST",
     "TRANSPORT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "SOURCE_BUILD_RESOURCE_LIMIT": "STOP_RETRY_BOUNDED_SOURCE_BUILD",
 }
 
 
@@ -69,6 +77,36 @@ def _parse_utc(value: str | None) -> datetime | None:
 
 def _path(value: Path) -> Path:
     return resolve_operator_path(ROOT, value)
+
+
+def _spawn_source_build_worker(argv: list[str]) -> int:
+    env = os.environ.copy()
+    env[SOURCE_BUILD_WORKER_ENV] = "1"
+    capture = not sys.stdout.isatty()
+    proc = subprocess.run(
+        [sys.executable, "-B", str(Path(__file__).resolve()), *argv],
+        env=env,
+        capture_output=capture,
+        text=True if capture else None,
+    )
+    if source_build_child_was_resource_killed(proc.returncode):
+        payload = {
+            "status": "FAIL",
+            "code": "SOURCE_BUILD_RESOURCE_LIMIT",
+            "next": FAIL_OWNER_NEXT["SOURCE_BUILD_RESOURCE_LIMIT"],
+        }
+        print(json.dumps(payload, sort_keys=True))
+        return 2
+    if capture:
+        if proc.stdout:
+            sys.stdout.write(proc.stdout)
+            if not proc.stdout.endswith("\n"):
+                sys.stdout.write("\n")
+        if proc.stderr:
+            sys.stderr.write(proc.stderr)
+            if not proc.stderr.endswith("\n"):
+                sys.stderr.write("\n")
+    return int(proc.returncode)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -92,7 +130,7 @@ def main(argv: list[str] | None = None) -> int:
 
     build_live = sub.add_parser(
         "build-live-source",
-        help="Rebuild cohort-scoped live source snapshot from Observation RDP",
+        help="Rebuild cohort-scoped live source bundle from Observation RDP",
     )
     build_live.add_argument("--observation-rdp", type=Path, required=True)
     build_live.add_argument("--ops-store", type=Path, required=True)
@@ -161,6 +199,18 @@ def main(argv: list[str] | None = None) -> int:
     forge_ready.add_argument("--imported-cohort-id", default=None)
 
     args = parser.parse_args(argv)
+    if args.command in {
+        "build-live-source",
+        "publish-live-cohort",
+        "list-live-cohorts",
+        "seal-live-cohort",
+        "verify-live",
+        "live-status",
+    }:
+        argv = argv if argv is not None else sys.argv[1:]
+        if os.environ.get(SOURCE_BUILD_WORKER_ENV) != "1":
+            return _spawn_source_build_worker(list(argv))
+        apply_source_build_address_limit()
     try:
         if args.command == "seal":
             inventory = load_source_inventory(
@@ -257,6 +307,16 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root=ROOT,
                 imported_cohort_id=args.imported_cohort_id,
             )
+    except MemoryError:
+        if os.environ.get(SOURCE_BUILD_WORKER_ENV) != "1":
+            raise
+        payload = {
+            "status": "FAIL",
+            "code": "SOURCE_BUILD_RESOURCE_LIMIT",
+            "next": FAIL_OWNER_NEXT["SOURCE_BUILD_RESOURCE_LIMIT"],
+        }
+        print(json.dumps(payload, sort_keys=True))
+        return 2
     except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError) as exc:
         code = str(exc)
         payload = {"status": "FAIL", "code": code}

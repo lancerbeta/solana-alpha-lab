@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: ec6cf1ac2ed292b91ec9d647da0e7128a32d3c19e3b458281ebbf2e9d9c685ef}
+  integrity: {kind: sha256, sha256: c48eec4ee90048445c3b87a47bf8f70ac4f5c7e7848c988a0baa8e26ac9a6729}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33401,7 +33401,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/discovery_evidence_release.py', repository_path: scripts/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: 35d58c3317f4a5a2ac3740ce6e2d070bb1d47e7e331bc10abbe337945352f117}
+  integrity: {kind: sha256, sha256: 3f75a670697c66e443f079f2d305696034c5b67cdd3314aaa067991164e9aed6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -33957,13 +33957,13 @@ records:
 - asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Live cohort readiness, seal/verify/import into versioned LIVE LIFECYCLE DISCOVERY CORPUS from immutable Observation RDP.
+  purpose: Live cohort readiness, bounded source bundle, seal/verify/import into versioned LIVE LIFECYCLE DISCOVERY CORPUS from immutable Observation RDP.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: fd4baea7847d810fde5d837b47e901b1127b800caef80d4e2ed838095fddb907}
+  integrity: {kind: sha256, sha256: 7a2627e9daa12fcde2073cec754ef5b096112cb17566860a76d50745cb92e53f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -34018,7 +34018,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_to_forge.py', repository_path: src/solana_alpha_lab/factory/live_cohort_to_forge.py}
-  integrity: {kind: sha256, sha256: 3a503113c3c32c1f371b77a7b87ba04dff6bfce822f02fa56ee53ae557c6df70}
+  integrity: {kind: sha256, sha256: a8e9deafde76baa672e450ebe935e8b30f3ae5140cb8cbf4f752fd42e0385c02}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34036,7 +34036,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: f0d3605a26a466940016255ea13897a1a2dec895a5d0a4b8353ff1746f10b024}
+  integrity: {kind: sha256, sha256: 6c88172503643f1c6ea15b39113cb01e551a1801d480cd1ba1598bfc42063fef}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34044,6 +34044,61 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [LIVE_COHORT, PRODUCTION_SHAPE, IDEMPOTENT_REIMPORT, FORGE_CONTROL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Repair live cohort publication so source/readiness/seal/verify stay memory-bounded beside the always-on collector.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-11'
+  truth_owner: LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1.md', repository_path: docs/tasks/LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1.md}
+  integrity: {kind: sha256, sha256: da9025b6901c9cfaa7844d914783ed7e6f124b961231d31f18ea79744e773818}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [LIVE_COHORT, SOURCE_BUNDLE, MEMORY_BOUNDED, SOURCE_BUILD_RESOURCE_LIMIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-LIVE-COHORT-SOURCE-BUNDLE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Memory-bounded live source bundle IO, streaming hashes, crash-safe staging, and build process resource envelope.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-11'
+  truth_owner: LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_source_bundle.py', repository_path: src/solana_alpha_lab/factory/live_cohort_source_bundle.py}
+  integrity: {kind: sha256, sha256: ff5c11941b57adce05489fff9f0b455c37bb56745e4d1b813e3159d187814d4d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SOURCE_MANIFEST, MEMBERS_PARQUET, SOURCE_BUILD_RESOURCE_LIMIT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Production-shape 150k MaxRSS publication stress, cumulative-snapshot complexity, and crash-safe staging proofs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-11'
+  truth_owner: LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_memory_bounded_publication_v1.py', repository_path: tests/test_live_cohort_memory_bounded_publication_v1.py}
+  integrity: {kind: sha256, sha256: e7775b56d07a45019ffefa7466d7e8ea578275905c99dda1ab90ce3c7a085e54}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-SOURCE-BUNDLE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [MAXRSS, SOURCE_BUNDLE, CUMULATIVE_SNAPSHOT, CRASH_SAFE]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001
@@ -34073,7 +34128,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: LIVE_EVIDENCE_CONSUMER_TRUTH_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_evidence_consumer_truth_closure.py', repository_path: tests/test_live_evidence_consumer_truth_closure.py}
-  integrity: {kind: sha256, sha256: 392db2fc2222377f9fcb83ae6dcc968118987cc4852c38cdd8f0d158641aa859}
+  integrity: {kind: sha256, sha256: 9818d4231da0f66672824455a6cd003fe5f7436b5c699ed438fe474a88a5dd42}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001}

@@ -3593,6 +3593,16 @@
       "target_asset_id": "MODULE-DISCOVERY-EVIDENCE-RELEASE-001"
     },
     {
+      "source_asset_id": "CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
       "source_asset_id": "CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
@@ -10973,6 +10983,16 @@
       "target_asset_id": "CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001"
     },
     {
+      "source_asset_id": "MODULE-LIVE-COHORT-SOURCE-BUNDLE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "MODULE-LIVE-COHORT-SOURCE-BUNDLE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001"
+    },
+    {
       "source_asset_id": "MODULE-LIVE-COHORT-TO-FORGE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
@@ -16081,6 +16101,16 @@
       "source_asset_id": "TEST-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-SOURCE-BUNDLE-001"
+    },
+    {
+      "source_asset_id": "TEST-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001"
     },
     {
       "source_asset_id": "TEST-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001",

@@ -7,7 +7,11 @@ historical A3 singleton release bytes. Zero network.
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
+import os
+import shutil
+import sqlite3
+import tempfile
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -18,16 +22,54 @@ import pyarrow.parquet as pq
 from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
 from solana_alpha_lab.factory.discovery_evidence_release import (
     DiscoveryReleaseError,
-    _parquet_bytes,
     _publish_bytes,
     _render_utc,
     _require,
     _schema_sha256,
     sha256_bytes,
 )
+from solana_alpha_lab.factory.live_cohort_source_bundle import (
+    BATCH_SIZE,
+    CENSUS_RELEASE_SCHEMA,
+    MEMBER_SCHEMA,
+    OBS_RELEASE_SCHEMA,
+    OBSERVATION_SCHEMA,
+    RELEASE_PARQUET_WRITE_KWARGS,
+    SOURCE_BUNDLE_SCHEMA,
+    SOURCE_BUNDLE_SCHEMA_VERSION,
+    SOURCE_MANIFEST_NAME,
+    SOURCE_MEMBERS_NAME,
+    SOURCE_OBSERVATIONS_NAME,
+    SOURCE_REPRESENTATION_BUNDLE,
+    SOURCE_REPRESENTATION_LEGACY_JSON,
+    compact_source_view,
+    commit_source_bundle,
+    compute_source_identity,
+    cohort_source_dir,
+    discard_stale_staging,
+    iter_parquet_row_batches,
+    member_from_parquet_row,
+    new_staging_dir,
+    note_admission_probe_rows,
+    note_full_member_rows,
+    note_member_file_open,
+    note_member_full_column_scan,
+    note_observation_rows,
+    observation_from_parquet_row,
+    parquet_row_count,
+    row_for_member_parquet,
+    row_for_observation_parquet,
+    sha256_file_streaming,
+    sha256_files_concat_streaming,
+    spill_sqlite,
+    write_parquet_from_row_batches,
+)
 from solana_alpha_lab.factory.members_snapshot_delta import (
+    LAYOUT_KIND,
     MembersDeltaError,
-    load_member_rows_for_location,
+    iter_member_row_batches_for_location,
+    publication_seq_for_location,
+    read_member_layout,
 )
 from solana_alpha_lab.factory.research_store import (
     ExistingResearchStoreReader,
@@ -35,10 +77,14 @@ from solana_alpha_lab.factory.research_store import (
 )
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from solana_alpha_lab.factory.tokens_v2_typed_projection import (
+    FEATURE_FAMILY_MISSINGNESS,
     FEATURE_FAMILY_ORDER,
+    FIELD_TO_FAMILY,
     PROJECTION_ID,
     PROJECTION_VERSION,
-    feature_families_from_typed_values,
+    STATE_EXCLUDED,
+    STATE_MISSING,
+    STATE_OBSERVED,
 )
 from solana_alpha_lab.storage.manifests import (
     canonical_manifest_bytes,
@@ -64,6 +110,7 @@ CENSUS_NAME = "census.parquet"
 OBSERVATIONS_NAME = "observations.parquet"
 SOURCE_INVENTORY_NAME = "source_inventory.json"
 OBSERVATION_RDP_REBUILD_NAME = "live_observation_rebuild/source_snapshot.json"
+LEGACY_SOURCE_JSON_MAX_BYTES = 32 * 1024 * 1024
 
 SEALABLE_READY = frozenset(
     {
@@ -92,6 +139,14 @@ def cohort_snapshot_path(observation_rdp_root: Path, cohort_id: str) -> Path:
         "COHORT_ID_INVALID",
     )
     return Path(observation_rdp_root) / "live_observation_rebuild" / f"cohort={cohort_id}" / "source_snapshot.json"
+
+
+def cohort_source_manifest_path(observation_rdp_root: Path, cohort_id: str) -> Path:
+    _require(
+        cohort_id.startswith("REL-") and cohort_id.count("-") == 2,
+        "COHORT_ID_INVALID",
+    )
+    return cohort_source_dir(observation_rdp_root, cohort_id) / SOURCE_MANIFEST_NAME
 
 REQUIRED_LABELS = {
     "evidence_role": LIVE_EVIDENCE_ROLE,
@@ -225,22 +280,26 @@ def _contributing_producers(payload: Mapping[str, Any]) -> list[str]:
     return [singular]
 
 
-def _validate_source_payload(payload: Mapping[str, Any], *, source_sha256: str) -> dict[str, Any]:
+def _validate_source_payload(
+    payload: Mapping[str, Any],
+    *,
+    source_sha256: str,
+    require_row_lists: bool = True,
+) -> dict[str, Any]:
     for key in (
         "schedule_sha256",
         "activation_id",
-        "members",
-        "observations",
         "starts_at",
         "stops_admitting_at",
     ):
         _require(key in payload, "RELEASE_INVALID_SOURCE_INTEGRITY")
-    members = payload["members"]
-    observations = payload["observations"]
-    _require(
-        isinstance(members, list) and isinstance(observations, list),
-        "RELEASE_INVALID_SOURCE_INTEGRITY",
-    )
+    members = payload.get("members")
+    observations = payload.get("observations")
+    if require_row_lists:
+        _require(
+            isinstance(members, list) and isinstance(observations, list),
+            "RELEASE_INVALID_SOURCE_INTEGRITY",
+        )
     schedule_sha = str(payload["schedule_sha256"])
     _require(
         len(schedule_sha) == 64
@@ -269,8 +328,6 @@ def _validate_source_payload(payload: Mapping[str, Any], *, source_sha256: str) 
         "activation_id": str(payload["activation_id"]),
         "starts_at": starts,
         "stops_admitting_at": stops,
-        "members": members,
-        "observations": observations,
         "source_sha256": source_sha256,
         "discovery_coverage_class": str(
             payload.get("discovery_coverage_class") or "DISCOVERY_COVERAGE_UNKNOWN"
@@ -290,7 +347,25 @@ def _validate_source_payload(payload: Mapping[str, Any], *, source_sha256: str) 
         "closure_cutoff_at": payload.get("closure_cutoff_at"),
         "pending_due_for_cohort": payload.get("pending_due_for_cohort"),
         "claimed_or_in_flight": payload.get("claimed_or_in_flight"),
+        "member_count": payload.get("member_count"),
+        "observation_count": payload.get("observation_count"),
+        "members_sha256": payload.get("members_sha256"),
+        "observations_sha256": payload.get("observations_sha256"),
+        "members_partition": payload.get("members_partition"),
+        "observations_partition": payload.get("observations_partition"),
+        "source_representation": payload.get("source_representation"),
+        "source_dir": payload.get("source_dir"),
     }
+    if require_row_lists:
+        out["members"] = members
+        out["observations"] = observations
+        out["source_representation"] = payload.get(
+            "source_representation"
+        ) or SOURCE_REPRESENTATION_LEGACY_JSON
+    else:
+        out["source_representation"] = str(
+            payload.get("source_representation") or SOURCE_REPRESENTATION_BUNDLE
+        )
     if singular is not None:
         out["producer_git_sha"] = singular
     return out
@@ -303,6 +378,101 @@ def _require_closure_flag(payload: Mapping[str, Any], key: str) -> bool:
     return value
 
 
+def iter_source_member_rows(source: Mapping[str, Any]) -> Iterator[dict[str, Any]]:
+    members = source.get("members")
+    if isinstance(members, list):
+        for item in members:
+            if isinstance(item, Mapping):
+                yield dict(item)
+        return
+    path = _source_members_parquet(source)
+    if path is None:
+        return
+    for batch in iter_parquet_row_batches(path):
+        for row in batch:
+            yield member_from_parquet_row(row)
+
+
+def iter_source_observation_rows(source: Mapping[str, Any]) -> Iterator[dict[str, Any]]:
+    observations = source.get("observations")
+    if isinstance(observations, list):
+        for item in observations:
+            if isinstance(item, Mapping):
+                yield dict(item)
+        return
+    path = _source_observations_parquet(source)
+    if path is None:
+        return
+    for batch in iter_parquet_row_batches(path):
+        for row in batch:
+            yield observation_from_parquet_row(row)
+
+
+def _source_members_parquet(source: Mapping[str, Any]) -> Path | None:
+    raw = source.get("members_partition")
+    if isinstance(raw, str) and raw:
+        path = Path(raw)
+        if path.is_file():
+            return path
+    directory = source.get("source_dir")
+    if isinstance(directory, str) and directory:
+        path = Path(directory) / SOURCE_MEMBERS_NAME
+        if path.is_file():
+            return path
+    return None
+
+
+def _source_observations_parquet(source: Mapping[str, Any]) -> Path | None:
+    raw = source.get("observations_partition")
+    if isinstance(raw, str) and raw:
+        path = Path(raw)
+        if path.is_file():
+            return path
+    directory = source.get("source_dir")
+    if isinstance(directory, str) and directory:
+        path = Path(directory) / SOURCE_OBSERVATIONS_NAME
+        if path.is_file():
+            return path
+    return None
+
+
+def _load_source_bundle(manifest_path: Path) -> dict[str, Any]:
+    try:
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY") from exc
+    _require(isinstance(payload, Mapping), "RELEASE_INVALID_SOURCE_INTEGRITY")
+    _require(payload.get("schema") == SOURCE_BUNDLE_SCHEMA, "RELEASE_INVALID_SOURCE_INTEGRITY")
+    source_dir = manifest_path.parent
+    members_path = source_dir / SOURCE_MEMBERS_NAME
+    obs_path = source_dir / SOURCE_OBSERVATIONS_NAME
+    _require(members_path.is_file() and not members_path.is_symlink(), "RELEASE_INVALID_SOURCE_INTEGRITY")
+    _require(obs_path.is_file() and not obs_path.is_symlink(), "RELEASE_INVALID_SOURCE_INTEGRITY")
+    members_sha = sha256_file_streaming(members_path)
+    obs_sha = sha256_file_streaming(obs_path)
+    _require(members_sha == payload.get("members_sha256"), "RELEASE_INVALID_SOURCE_INTEGRITY")
+    _require(obs_sha == payload.get("observations_sha256"), "RELEASE_INVALID_SOURCE_INTEGRITY")
+    _require(
+        parquet_row_count(members_path) == int(payload.get("member_count") or 0)
+        and payload.get("member_count") is not None,
+        "RELEASE_INVALID_SOURCE_INTEGRITY",
+    )
+    _require(
+        parquet_row_count(obs_path) == int(payload.get("observation_count") or 0)
+        and payload.get("observation_count") is not None,
+        "RELEASE_INVALID_SOURCE_INTEGRITY",
+    )
+    payload = dict(payload)
+    payload["members_partition"] = str(members_path)
+    payload["observations_partition"] = str(obs_path)
+    payload["source_dir"] = str(source_dir)
+    payload["source_representation"] = SOURCE_REPRESENTATION_BUNDLE
+    source_sha = str(payload.get("source_sha256") or "")
+    identity = compute_source_identity(payload)
+    _require(source_sha == identity, "RELEASE_INVALID_SOURCE_INTEGRITY")
+    return _validate_source_payload(payload, source_sha256=source_sha, require_row_lists=False)
+
+
 def load_observation_rdp_source(
     observation_rdp_root: Path,
     *,
@@ -310,6 +480,10 @@ def load_observation_rdp_source(
 ) -> dict[str, Any]:
     """Load previously built live source snapshot from Observation RDP."""
     root = Path(observation_rdp_root)
+    if cohort_id:
+        manifest_path = cohort_source_manifest_path(root, cohort_id)
+        if manifest_path.is_file() and not manifest_path.is_symlink():
+            return _load_source_bundle(manifest_path)
     path = (
         cohort_snapshot_path(root, cohort_id)
         if cohort_id
@@ -319,6 +493,8 @@ def load_observation_rdp_source(
         fallback = root / OBSERVATION_RDP_REBUILD_NAME
         if fallback.is_file() and not fallback.is_symlink():
             try:
+                if fallback.stat().st_size > LEGACY_SOURCE_JSON_MAX_BYTES:
+                    raise LiveCohortReleaseError("SOURCE_SNAPSHOT_JSON_UNSAFE")
                 preview = json.loads(fallback.read_text(encoding="utf-8"))
             except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
                 raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY") from exc
@@ -338,11 +514,15 @@ def load_observation_rdp_source(
     if not path.is_file() or path.is_symlink():
         raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY")
     try:
+        if path.stat().st_size > LEGACY_SOURCE_JSON_MAX_BYTES:
+            raise LiveCohortReleaseError("SOURCE_SNAPSHOT_JSON_UNSAFE")
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY") from exc
     _require(isinstance(payload, Mapping), "RELEASE_INVALID_SOURCE_INTEGRITY")
-    return _validate_source_payload(payload, source_sha256=sha256_bytes(path.read_bytes()))
+    return _validate_source_payload(
+        payload, source_sha256=sha256_file_streaming(path), require_row_lists=True
+    )
 
 
 def _map_selected_or_excluded(candidate_state: str | None, membership_state: str | None) -> str:
@@ -828,14 +1008,72 @@ def _lineage_from_rdp(
     return schedule_doc, schedule_producer, lifecycle_rows
 
 
+def _iter_member_batches(
+    observation_rdp_root: Path,
+    location: str,
+    *,
+    columns: Sequence[str] | None = None,
+    removed_out: list[dict[str, Any]] | None = None,
+) -> Iterator[list[dict[str, Any]]]:
+    note_member_file_open()
+    if columns is None:
+        note_member_full_column_scan()
+    try:
+        for batch in iter_member_row_batches_for_location(
+            Path(observation_rdp_root),
+            location,
+            columns=columns,
+            removed_out=removed_out,
+        ):
+            if columns is None:
+                note_full_member_rows(len(batch))
+            else:
+                note_admission_probe_rows(len(batch))
+            yield batch
+    except (MembersDeltaError, OSError, pa.ArrowException) as exc:
+        raise LiveCohortReleaseError("LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE") from exc
+
+
+def _member_batch_window_flags(
+    observation_rdp_root: Path,
+    location: str,
+    *,
+    window_start: datetime,
+    window_end: datetime,
+    cached_flags: dict[str, tuple[bool, bool]] | None = None,
+) -> tuple[bool, bool]:
+    if cached_flags is not None and location in cached_flags:
+        return cached_flags[location]
+    has_in = False
+    later = False
+    columns = ("entity_id", "mint", *ADMISSION_REPRESENTATIONS)
+    for batch in _iter_member_batches(observation_rdp_root, location, columns=columns):
+        for member in batch:
+            admission = resolve_cohort_admission_instant(member)
+            if admission is None:
+                continue
+            if window_start <= admission < window_end:
+                has_in = True
+            elif admission >= window_end:
+                later = True
+            if has_in and later:
+                if cached_flags is not None:
+                    cached_flags[location] = (True, True)
+                return True, True
+    if cached_flags is not None:
+        cached_flags[location] = (has_in, later)
+    return has_in, later
+
+
 def _cohort_contributing_lineage(
     observation_rdp_root: Path,
     *,
     lifecycle_rows: Sequence[Mapping[str, Any]],
     window_start: datetime,
     window_end: datetime,
-    cohort_entity_ids: set[str],
+    mint_is_member: Callable[[str], bool],
     cutoff_at: datetime | None = None,
+    location_flags: dict[str, tuple[bool, bool]] | None = None,
 ) -> tuple[list[str], str, set[str]]:
     contributing: set[str] = set()
     coverages: list[str] = []
@@ -852,24 +1090,13 @@ def _cohort_contributing_lineage(
         location = str(payload.get("member_location") or "")
         if not location:
             continue
-        try:
-            members = load_member_rows_for_location(Path(observation_rdp_root), location)
-        except (MembersDeltaError, OSError, pa.ArrowException) as exc:
-            raise LiveCohortReleaseError(
-                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-            ) from exc
-        has_in = False
-        later = False
-        for member in members:
-            if not isinstance(member, Mapping):
-                continue
-            admission = resolve_cohort_admission_instant(member)
-            if admission is None:
-                continue
-            if window_start <= admission < window_end:
-                has_in = True
-            elif admission >= window_end:
-                later = True
+        has_in, later = _member_batch_window_flags(
+            observation_rdp_root,
+            location,
+            window_start=window_start,
+            window_end=window_end,
+            cached_flags=location_flags,
+        )
         if not has_in:
             continue
         manifest = str(payload.get("dataset_manifest_id") or "")
@@ -898,18 +1125,21 @@ def _cohort_contributing_lineage(
             path = Path(observation_rdp_root) / location
             if path.is_file():
                 try:
-                    rows = pq.read_table(path).to_pylist()
+                    for batch in iter_parquet_row_batches(
+                        path, columns=("entity_id", "mint")
+                    ):
+                        note_observation_rows(len(batch))
+                        for item in batch:
+                            mint = str(item.get("entity_id") or item.get("mint") or "")
+                            if mint and mint_is_member(mint):
+                                hits_c1 = True
+                                break
+                        if hits_c1:
+                            break
                 except (OSError, pa.ArrowException) as exc:
                     raise LiveCohortReleaseError(
                         "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
                     ) from exc
-                for item in rows:
-                    if not isinstance(item, Mapping):
-                        continue
-                    mint = str(item.get("entity_id") or item.get("mint") or "")
-                    if mint in cohort_entity_ids:
-                        hits_c1 = True
-                        break
         manifest = str(payload.get("dataset_manifest_id") or "")
         if manifest:
             contributing_manifests.add(manifest)
@@ -960,9 +1190,10 @@ def _observation_instant(row: Mapping[str, Any]) -> datetime | None:
     return None
 
 
-def _cohort_members_from_lifecycle(
+def _cohort_members_into_sqlite(
     observation_rdp_root: Path,
     *,
+    conn: Any,
     lifecycle_rows: Sequence[Mapping[str, Any]],
     window_start: datetime,
     window_end: datetime,
@@ -972,52 +1203,199 @@ def _cohort_members_from_lifecycle(
     sampling_seed: str | None,
     inclusion_probability: str | None,
     cutoff_at: datetime | None = None,
-) -> tuple[list[dict[str, Any]], set[str]]:
-    """Row-level C1 extraction from cumulative MEMBER_BATCH snapshots."""
-    by_entity: dict[str, tuple[str, dict[str, Any], str | None]] = {}
-    for row in lifecycle_rows:
+    location_flags: dict[str, tuple[bool, bool]] | None = None,
+) -> tuple[set[str], int]:
+    """Latest-snapshot full scan; older same-unit SNAPSHOT_PLUS_DELTA uses removed rows."""
+    conn.execute(
+        """
+        CREATE TABLE members (
+            mint TEXT PRIMARY KEY,
+            admission TEXT NOT NULL,
+            producer_git_sha TEXT,
+            payload_json TEXT NOT NULL
+        )
+        """
+    )
+    conn.execute("CREATE TABLE needed (mint TEXT PRIMARY KEY)")
+    flags = location_flags if location_flags is not None else {}
+    batches: list[tuple[int, str, Mapping[str, Any], str | None]] = []
+    for index, row in enumerate(lifecycle_rows):
         if str(row.get("kind") or "") != "OBSERVATION_MEMBER_BATCH":
             continue
         if not _lifecycle_row_at_or_before_cutoff(row, cutoff_at):
             continue
         payload = row.get("payload")
-        producer = _sha40(row.get("producer_git_sha"))
         if not isinstance(payload, Mapping):
             continue
         location = str(payload.get("member_location") or "")
         if not location:
             continue
-        try:
-            members = load_member_rows_for_location(Path(observation_rdp_root), location)
-        except (MembersDeltaError, OSError, pa.ArrowException) as exc:
-            raise LiveCohortReleaseError(
-                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-            ) from exc
-        order = str(row.get("effective_at") or "")
-        for member in members:
-            if not isinstance(member, Mapping):
-                continue
-            admission = resolve_cohort_admission_instant(member)
-            if admission is None or not (window_start <= admission < window_end):
-                continue
-            normalized = _normalize_member_row(
-                member,
-                schedule_sha256=schedule_sha256,
-                activation_id=activation_id,
-                sampling_policy=sampling_policy,
-                sampling_seed_default=sampling_seed,
-                inclusion_probability_default=inclusion_probability,
+        batches.append(
+            (
+                index,
+                str(row.get("effective_at") or ""),
+                payload,
+                _sha40(row.get("producer_git_sha")),
             )
-            if normalized is None:
-                continue
-            entity = str(normalized.get("mint") or "")
-            current = by_entity.get(entity)
-            if current is None or order >= current[0]:
-                by_entity[entity] = (order, normalized, producer)
-    out = [item[1] for item in by_entity.values()]
-    out.sort(key=lambda item: (str(item.get("mint")), str(item.get(COHORT_ADMISSION_FIELD))))
-    winning_producers = {item[2] for item in by_entity.values() if item[2]}
-    return out, winning_producers
+        )
+    batches.sort(key=lambda item: (item[1], item[0]), reverse=True)
+    winning_producers: set[str] = set()
+    unit_removed: dict[str, list[dict[str, Any]]] = {}
+    latest_has_in = False
+
+    def _ingest(member: Mapping[str, Any], producer_sha: str | None) -> bool:
+        if not isinstance(member, Mapping):
+            return False
+        row = {
+            key: value
+            for key, value in member.items()
+            if key != "_delta_removed_at_seq"
+        }
+        admission = resolve_cohort_admission_instant(row)
+        loc_has_in = False
+        loc_later = False
+        if admission is not None:
+            if window_start <= admission < window_end:
+                loc_has_in = True
+            elif admission >= window_end:
+                loc_later = True
+        if admission is None or not (window_start <= admission < window_end):
+            return loc_later
+        normalized = _normalize_member_row(
+            row,
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            sampling_policy=sampling_policy,
+            sampling_seed_default=sampling_seed,
+            inclusion_probability_default=inclusion_probability,
+        )
+        if normalized is None:
+            return loc_later
+        entity = str(normalized.get("mint") or "")
+        if not entity:
+            return loc_has_in or loc_later
+        conn.execute(
+            "INSERT OR IGNORE INTO members(mint, admission, producer_git_sha, payload_json) VALUES (?,?,?,?)",
+            (
+                entity,
+                str(normalized.get(COHORT_ADMISSION_FIELD) or ""),
+                producer_sha,
+                json.dumps(normalized, sort_keys=True, separators=(",", ":")),
+            ),
+        )
+        if int(conn.execute("SELECT changes()").fetchone()[0]) != 1:
+            return loc_has_in or loc_later
+        if producer_sha:
+            winning_producers.add(producer_sha)
+        return loc_has_in or loc_later
+
+    for rank, (_index, _order, payload, producer) in enumerate(batches):
+        location = str(payload.get("member_location") or "")
+        layout = read_member_layout(observation_rdp_root, location)
+        unit_rel = (
+            str(layout.get("unit_rel") or "")
+            if isinstance(layout, Mapping) and str(layout.get("kind") or "") == LAYOUT_KIND
+            else ""
+        )
+        loc_seq = publication_seq_for_location(observation_rdp_root, location, layout)
+        if rank > 0 and unit_rel and unit_rel in unit_removed:
+            recovered: list[dict[str, Any]] = []
+            for item in unit_removed[unit_rel]:
+                removed_at = item.get("_delta_removed_at_seq")
+                if loc_seq is not None and removed_at is not None:
+                    try:
+                        if int(removed_at) <= loc_seq:
+                            continue
+                    except (TypeError, ValueError):
+                        pass
+                recovered.append(item)
+                _ingest(item, producer)
+            has_in = latest_has_in
+            later = False
+            for member in recovered:
+                admission = resolve_cohort_admission_instant(
+                    {key: value for key, value in member.items() if key != "_delta_removed_at_seq"}
+                )
+                if admission is None:
+                    continue
+                if window_start <= admission < window_end:
+                    has_in = True
+                elif admission >= window_end:
+                    later = True
+            flags[location] = (has_in, later)
+            continue
+        if rank == 0:
+            removed_acc: list[dict[str, Any]] = []
+            loc_has_in = False
+            loc_later = False
+            for batch in _iter_member_batches(
+                observation_rdp_root,
+                location,
+                columns=None,
+                removed_out=removed_acc if unit_rel else None,
+            ):
+                for member in batch:
+                    if not isinstance(member, Mapping):
+                        continue
+                    admission = resolve_cohort_admission_instant(member)
+                    if admission is not None:
+                        if window_start <= admission < window_end:
+                            loc_has_in = True
+                        elif admission >= window_end:
+                            loc_later = True
+                    _ingest(member, producer)
+            flags[location] = (loc_has_in, loc_later)
+            latest_has_in = loc_has_in
+            if unit_rel:
+                unit_removed[unit_rel] = removed_acc
+            continue
+        conn.execute("DELETE FROM needed")
+        loc_has_in = False
+        loc_later = False
+        probe_cols = ("entity_id", "mint", *ADMISSION_REPRESENTATIONS)
+        for batch in _iter_member_batches(
+            observation_rdp_root, location, columns=probe_cols
+        ):
+            for member in batch:
+                admission = resolve_cohort_admission_instant(member)
+                if admission is None:
+                    continue
+                if window_start <= admission < window_end:
+                    loc_has_in = True
+                    entity = str(member.get("entity_id") or member.get("mint") or "")
+                    if entity and conn.execute(
+                        "SELECT 1 FROM members WHERE mint=?", (entity,)
+                    ).fetchone() is None:
+                        conn.execute(
+                            "INSERT OR IGNORE INTO needed(mint) VALUES (?)", (entity,)
+                        )
+                elif admission >= window_end:
+                    loc_later = True
+        flags[location] = (loc_has_in, loc_later)
+        if int(conn.execute("SELECT COUNT(*) FROM needed").fetchone()[0]) == 0:
+            continue
+        for batch in _iter_member_batches(observation_rdp_root, location, columns=None):
+            for member in batch:
+                if not isinstance(member, Mapping):
+                    continue
+                entity = str(member.get("entity_id") or member.get("mint") or "")
+                if not entity:
+                    continue
+                if conn.execute("SELECT 1 FROM needed WHERE mint=?", (entity,)).fetchone() is None:
+                    continue
+                if conn.execute("SELECT 1 FROM members WHERE mint=?", (entity,)).fetchone() is not None:
+                    continue
+                admission = resolve_cohort_admission_instant(member)
+                if admission is None or not (window_start <= admission < window_end):
+                    continue
+                _ingest(member, producer)
+                conn.execute("DELETE FROM needed WHERE mint=?", (entity,))
+            if int(conn.execute("SELECT COUNT(*) FROM needed").fetchone()[0]) == 0:
+                break
+    conn.execute("DELETE FROM needed")
+    conn.commit()
+    member_count = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+    return winning_producers, member_count
 
 
 def latest_c1_observation_manifest_at(
@@ -1025,19 +1403,101 @@ def latest_c1_observation_manifest_at(
     *,
     schedule_sha256: str,
     activation_id: str,
-    cohort_mints: set[str],
     not_after: datetime,
+    cohort_mints: set[str] | None = None,
+    mint_is_member: Callable[[str], bool] | None = None,
 ) -> datetime | None:
     """First publication time of each C1 observation identity, max of those <= not_after.
 
     Republished C1 rows in a later mixed panel do not advance the freeze horizon.
     """
-    if not cohort_mints:
+    def _in_cohort(mint: str) -> bool:
+        if mint_is_member is not None:
+            return mint_is_member(mint)
+        if cohort_mints is not None:
+            return mint in cohort_mints
+        return False
+
+    if mint_is_member is None and not cohort_mints:
         return None
-    panels: list[tuple[datetime, set[tuple[str, str, str, str, str]]]] = []
+    handle, name = tempfile.mkstemp(prefix="live-cohort-first-seen-", suffix=".sqlite")
+    os.close(handle)
+    spill = Path(name)
+    conn = sqlite3.connect(str(spill))
+    try:
+        conn.execute(
+            """
+            CREATE TABLE first_seen (
+                mint TEXT NOT NULL,
+                point_id TEXT NOT NULL,
+                primitive_id TEXT NOT NULL,
+                field_id TEXT NOT NULL,
+                call_occurrence_id TEXT NOT NULL,
+                seen_at TEXT NOT NULL,
+                PRIMARY KEY (mint, point_id, primitive_id, field_id, call_occurrence_id)
+            )
+            """
+        )
+        insert = conn.execute
+        for manifest_order, _manifest_id, location in _iter_observation_panel_locations(
+            observation_rdp_root, not_after=not_after, skip_unparseable=True
+        ):
+            path = Path(observation_rdp_root) / location
+            if not path.is_file():
+                continue
+            stamp = _render_utc(manifest_order)
+            try:
+                for batch in iter_parquet_row_batches(path):
+                    note_observation_rows(len(batch))
+                    for row in batch:
+                        if not isinstance(row, Mapping):
+                            continue
+                        if row.get("schedule_sha256") not in {None, "", schedule_sha256}:
+                            continue
+                        for item in _explode_observation_rows(
+                            row, schedule_sha256=schedule_sha256, activation_id=activation_id
+                        ):
+                            mint = str(item.get("mint") or "")
+                            if not _in_cohort(mint) or _observation_instant(item) is None:
+                                continue
+                            insert(
+                                """
+                                INSERT OR IGNORE INTO first_seen(
+                                    mint, point_id, primitive_id, field_id, call_occurrence_id, seen_at
+                                ) VALUES (?,?,?,?,?,?)
+                                """,
+                                (
+                                    mint,
+                                    str(item.get("point_id") or ""),
+                                    str(item.get("primitive_id") or ""),
+                                    str(item.get("field_id") or ""),
+                                    str(item.get("call_occurrence_id") or ""),
+                                    stamp,
+                                ),
+                            )
+            except (OSError, pa.ArrowException):
+                continue
+        conn.commit()
+        row = conn.execute("SELECT MAX(seen_at) FROM first_seen").fetchone()
+        if not row or row[0] is None:
+            return None
+        return _parse_utc(str(row[0]))
+    finally:
+        conn.close()
+        spill.unlink(missing_ok=True)
+
+
+def _iter_observation_panel_locations(
+    observation_rdp_root: Path,
+    *,
+    not_after: datetime | None,
+    newest_first: bool = False,
+    skip_unparseable: bool = False,
+) -> Iterator[tuple[datetime, str, str]]:
     manifests_dir = Path(observation_rdp_root) / "datasets" / "manifests"
     if not manifests_dir.is_dir():
-        return None
+        return
+    found: list[tuple[datetime, str, str]] = []
     for marker in sorted(manifests_dir.glob("dataset-*.published")):
         try:
             marker_payload = json.loads(marker.read_text(encoding="utf-8"))
@@ -1060,8 +1520,10 @@ def latest_c1_observation_manifest_at(
                 str(manifest.get("created_at") or manifest.get("first_reliable_available_at"))
             )
         except Exception:
-            continue
-        if manifest_order > not_after:
+            if skip_unparseable:
+                continue
+            manifest_order = datetime.min.replace(tzinfo=UTC)
+        if not_after is not None and manifest_order > not_after:
             continue
         partitions = list(manifest.get("partitions") or [])
         if not partitions:
@@ -1077,19 +1539,48 @@ def latest_c1_observation_manifest_at(
                         and str(partition.get("dataset_manifest_id") or "") == manifest_id
                     ):
                         partitions.append(partition)
-        keys: set[tuple[str, str, str, str, str]] = set()
         for partition in partitions:
             if str(partition.get("partition_id") or "").endswith("-members"):
                 continue
             location = str(partition.get("logical_location") or "")
-            path = Path(observation_rdp_root) / location
-            if not path.is_file():
-                continue
-            try:
-                rows = pq.read_table(path).to_pylist()
-            except (OSError, pa.ArrowException):
-                continue
-            for row in rows:
+            if location:
+                found.append((manifest_order, manifest_id, location))
+    found.sort(key=lambda item: (item[0], item[1]), reverse=newest_first)
+    yield from found
+
+
+def _cohort_observations_into_sqlite(
+    observation_rdp_root: Path,
+    *,
+    conn: Any,
+    schedule_sha256: str,
+    activation_id: str,
+    mint_is_member: Callable[[str], bool],
+    cutoff_at: datetime | None = None,
+) -> int:
+    """C1 observations by member mint identity; newest panel wins."""
+    conn.execute(
+        """
+        CREATE TABLE observations (
+            mint TEXT NOT NULL,
+            point_id TEXT NOT NULL,
+            primitive_id TEXT NOT NULL,
+            field_id TEXT NOT NULL,
+            call_occurrence_id TEXT NOT NULL,
+            payload_json TEXT NOT NULL,
+            PRIMARY KEY (mint, point_id, primitive_id, field_id, call_occurrence_id)
+        )
+        """
+    )
+    for _order, _manifest_id, location in _iter_observation_panel_locations(
+        observation_rdp_root, not_after=cutoff_at, newest_first=False
+    ):
+        path = Path(observation_rdp_root) / location
+        if not path.is_file():
+            continue
+        for batch in iter_parquet_row_batches(path):
+            note_observation_rows(len(batch))
+            for row in batch:
                 if not isinstance(row, Mapping):
                     continue
                 if row.get("schedule_sha256") not in {None, "", schedule_sha256}:
@@ -1098,118 +1589,27 @@ def latest_c1_observation_manifest_at(
                     row, schedule_sha256=schedule_sha256, activation_id=activation_id
                 ):
                     mint = str(item.get("mint") or "")
-                    if mint not in cohort_mints or _observation_instant(item) is None:
+                    if not mint or not mint_is_member(mint):
                         continue
-                    keys.add(
+                    if _observation_instant(item) is None:
+                        continue
+                    conn.execute(
+                        """
+                        INSERT OR REPLACE INTO observations(
+                            mint, point_id, primitive_id, field_id, call_occurrence_id, payload_json
+                        ) VALUES (?,?,?,?,?,?)
+                        """,
                         (
                             mint,
                             str(item.get("point_id") or ""),
                             str(item.get("primitive_id") or ""),
                             str(item.get("field_id") or ""),
                             str(item.get("call_occurrence_id") or ""),
-                        )
+                            json.dumps(item, sort_keys=True, separators=(",", ":")),
+                        ),
                     )
-        if keys:
-            panels.append((manifest_order, keys))
-    first_seen: dict[tuple[str, str, str, str, str], datetime] = {}
-    for order, keys in sorted(panels, key=lambda item: item[0]):
-        for key in keys:
-            if key not in first_seen:
-                first_seen[key] = order
-    if not first_seen:
-        return None
-    return max(first_seen.values())
-
-
-def _cohort_observations_from_rdp(
-    observation_rdp_root: Path,
-    *,
-    schedule_sha256: str,
-    activation_id: str,
-    cohort_mints: set[str],
-    window_start: datetime,
-    window_end: datetime,
-    pure_manifest_ids: set[str],
-    cutoff_at: datetime | None = None,
-) -> list[dict[str, Any]]:
-    """C1 observations by member mint identity; not C-pure batch membership."""
-    del window_start, window_end, pure_manifest_ids
-    rebuilt: dict[tuple[str, str, str, str, str], tuple[datetime, str, dict[str, Any]]] = {}
-    manifests_dir = Path(observation_rdp_root) / "datasets" / "manifests"
-    if not manifests_dir.is_dir():
-        return []
-    for marker in sorted(manifests_dir.glob("dataset-*.published")):
-        marker_payload = json.loads(marker.read_text(encoding="utf-8"))
-        manifest_id = str(marker_payload.get("dataset_manifest_id") or "")
-        manifest_path = manifests_dir / f"{manifest_id}.json"
-        if not manifest_path.is_file():
-            continue
-        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        if not isinstance(manifest, Mapping):
-            continue
-        if str(manifest.get("dataset_id") or "").startswith("observation-panel-") is False:
-            continue
-        try:
-            manifest_order = _parse_utc(
-                str(manifest.get("created_at") or manifest.get("first_reliable_available_at"))
-            )
-        except Exception:
-            manifest_order = datetime.min.replace(tzinfo=UTC)
-        if cutoff_at is not None and manifest_order > cutoff_at:
-            continue
-        partitions = list(manifest.get("partitions") or [])
-        if not partitions:
-            partitions_dir = manifests_dir / "partitions"
-            for partition_path in sorted(partitions_dir.glob("partition-*.json")):
-                partition = json.loads(partition_path.read_text(encoding="utf-8"))
-                if (
-                    isinstance(partition, Mapping)
-                    and str(partition.get("dataset_manifest_id") or "") == manifest_id
-                ):
-                    partitions.append(partition)
-        for partition in partitions:
-            if str(partition.get("partition_id") or "").endswith("-members"):
-                continue
-            location = str(partition.get("logical_location") or "")
-            path = Path(observation_rdp_root) / location
-            if not path.is_file():
-                continue
-            rows = pq.read_table(path).to_pylist()
-            for row in rows:
-                if not isinstance(row, Mapping):
-                    continue
-                if row.get("schedule_sha256") not in {None, "", schedule_sha256}:
-                    continue
-                for item in _explode_observation_rows(
-                    row, schedule_sha256=schedule_sha256, activation_id=activation_id
-                ):
-                    mint = str(item.get("mint") or "")
-                    if mint not in cohort_mints:
-                        continue
-                    if _observation_instant(item) is None:
-                        continue
-                    key = (
-                        mint,
-                        str(item.get("point_id") or ""),
-                        str(item.get("primitive_id") or ""),
-                        str(item.get("field_id") or ""),
-                        str(item.get("call_occurrence_id") or ""),
-                    )
-                    candidate = (manifest_order, manifest_id, item)
-                    current = rebuilt.get(key)
-                    if current is None or candidate[:2] >= current[:2]:
-                        rebuilt[key] = candidate
-    out = [item[2] for item in rebuilt.values()]
-    out.sort(
-        key=lambda item: (
-            str(item.get("mint")),
-            str(item.get("point_id")),
-            str(item.get("primitive_id")),
-            str(item.get("field_id")),
-            str(item.get("call_occurrence_id") or ""),
-        )
-    )
-    return out
+    conn.commit()
+    return int(conn.execute("SELECT COUNT(*) FROM observations").fetchone()[0])
 
 
 def build_live_observation_source_from_rdp(
@@ -1271,63 +1671,132 @@ def build_live_observation_source_from_rdp(
     if isinstance(cutoff_raw, str) and cutoff_raw:
         cutoff_at = _parse_utc(cutoff_raw)
 
-    members, winning_producers = _cohort_members_from_lifecycle(
-        root,
-        lifecycle_rows=lifecycle_rows,
-        window_start=window_start,
-        window_end=window_end,
-        schedule_sha256=schedule_sha256,
-        activation_id=activation_id,
-        sampling_policy=sampling_policy,
-        sampling_seed=sampling_seed,
-        inclusion_probability=inclusion_probability,
-        cutoff_at=cutoff_at,
-    )
-    cohort_mints = {str(item.get("mint")) for item in members}
-    contributing, lineage_coverage, pure_manifests = _cohort_contributing_lineage(
-        root,
-        lifecycle_rows=lifecycle_rows,
-        window_start=window_start,
-        window_end=window_end,
-        cohort_entity_ids=cohort_mints,
-        cutoff_at=cutoff_at,
-    )
-    contributing = sorted(set(contributing) | winning_producers)
-    observations = _cohort_observations_from_rdp(
-        root,
-        schedule_sha256=schedule_sha256,
-        activation_id=activation_id,
-        cohort_mints=cohort_mints,
-        window_start=window_start,
-        window_end=window_end,
-        pure_manifest_ids=pure_manifests,
-        cutoff_at=cutoff_at,
-    )
-    observed_classes = [lineage_coverage]
-    if isinstance(discovery_coverage_class, str) and discovery_coverage_class.strip():
-        observed_classes.append(discovery_coverage_class.strip())
-    resolved_coverage = _worst_coverage(observed_classes)
-    snapshot: dict[str, Any] = {
-        "schedule_sha256": schedule_sha256,
-        "activation_id": activation_id,
-        "cohort_id": cohort_id,
-        "window_start": _render_utc(window_start),
-        "window_end_exclusive": _render_utc(window_end),
-        "schedule_producer_git_sha": schedule_producer,
-        "contributing_producer_git_shas": contributing,
-        "starts_at": starts_at,
-        "stops_admitting_at": stops_admitting_at,
-        "discovery_coverage_class": resolved_coverage,
-        "members": members,
-        "observations": observations,
-        **closure_flags,
-    }
-    if len(contributing) == 1:
-        snapshot["producer_git_sha"] = contributing[0]
-    path = write_observation_rdp_source(root, snapshot, cohort_id=cohort_id)
-    return _validate_source_payload(
-        snapshot, source_sha256=sha256_bytes(path.read_bytes())
-    )
+    source_dir = cohort_source_dir(root, cohort_id)
+    discard_stale_staging(source_dir)
+    staging = new_staging_dir(source_dir)
+    spill_path = staging / "extract.sqlite"
+    conn = spill_sqlite(spill_path)
+    location_flags: dict[str, tuple[bool, bool]] = {}
+    try:
+        winning_producers, extracted_members = _cohort_members_into_sqlite(
+            root,
+            conn=conn,
+            lifecycle_rows=lifecycle_rows,
+            window_start=window_start,
+            window_end=window_end,
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            sampling_policy=sampling_policy,
+            sampling_seed=sampling_seed,
+            inclusion_probability=inclusion_probability,
+            cutoff_at=cutoff_at,
+            location_flags=location_flags,
+        )
+
+        def _member_in_extract(mint: str) -> bool:
+            return conn.execute("SELECT 1 FROM members WHERE mint=?", (mint,)).fetchone() is not None
+
+        contributing, lineage_coverage, _pure_manifests = _cohort_contributing_lineage(
+            root,
+            lifecycle_rows=lifecycle_rows,
+            window_start=window_start,
+            window_end=window_end,
+            mint_is_member=_member_in_extract,
+            cutoff_at=cutoff_at,
+            location_flags=location_flags,
+        )
+        contributing = sorted(set(contributing) | winning_producers)
+        _cohort_observations_into_sqlite(
+            root,
+            conn=conn,
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            mint_is_member=_member_in_extract,
+            cutoff_at=cutoff_at,
+        )
+        observed_classes = [lineage_coverage]
+        if isinstance(discovery_coverage_class, str) and discovery_coverage_class.strip():
+            observed_classes.append(discovery_coverage_class.strip())
+        resolved_coverage = _worst_coverage(observed_classes)
+
+        def _member_batches() -> Iterator[list[dict[str, Any]]]:
+            batch: list[dict[str, Any]] = []
+            for payload_json, in conn.execute(
+                "SELECT payload_json FROM members ORDER BY mint, admission"
+            ):
+                batch.append(row_for_member_parquet(json.loads(payload_json)))
+                if len(batch) >= BATCH_SIZE:
+                    yield batch
+                    batch = []
+            if batch:
+                yield batch
+
+        def _obs_batches() -> Iterator[list[dict[str, Any]]]:
+            batch: list[dict[str, Any]] = []
+            for payload_json, in conn.execute(
+                """
+                SELECT payload_json FROM observations
+                ORDER BY mint, point_id, primitive_id, field_id, call_occurrence_id
+                """
+            ):
+                batch.append(row_for_observation_parquet(json.loads(payload_json)))
+                if len(batch) >= BATCH_SIZE:
+                    yield batch
+                    batch = []
+            if batch:
+                yield batch
+
+        members_path = staging / SOURCE_MEMBERS_NAME
+        obs_path = staging / SOURCE_OBSERVATIONS_NAME
+        member_count = write_parquet_from_row_batches(
+            members_path, _member_batches(), schema=MEMBER_SCHEMA
+        )
+        observation_count = write_parquet_from_row_batches(
+            obs_path, _obs_batches(), schema=OBSERVATION_SCHEMA
+        )
+        _require(member_count == extracted_members, "RELEASE_INVALID_SOURCE_INTEGRITY")
+        members_sha = sha256_file_streaming(members_path)
+        observations_sha = sha256_file_streaming(obs_path)
+        snapshot: dict[str, Any] = {
+            "schema": SOURCE_BUNDLE_SCHEMA,
+            "schema_version": SOURCE_BUNDLE_SCHEMA_VERSION,
+            "schedule_sha256": schedule_sha256,
+            "activation_id": activation_id,
+            "cohort_id": cohort_id,
+            "window_start": _render_utc(window_start),
+            "window_end_exclusive": _render_utc(window_end),
+            "schedule_producer_git_sha": schedule_producer,
+            "contributing_producer_git_shas": contributing,
+            "starts_at": starts_at,
+            "stops_admitting_at": stops_admitting_at,
+            "discovery_coverage_class": resolved_coverage,
+            "admission_field": COHORT_ADMISSION_FIELD,
+            "member_count": member_count,
+            "observation_count": observation_count,
+            "members_sha256": members_sha,
+            "observations_sha256": observations_sha,
+            "members_partition": SOURCE_MEMBERS_NAME,
+            "observations_partition": SOURCE_OBSERVATIONS_NAME,
+            "source_representation": SOURCE_REPRESENTATION_BUNDLE,
+            **closure_flags,
+        }
+        if len(contributing) == 1:
+            snapshot["producer_git_sha"] = contributing[0]
+        snapshot["source_sha256"] = compute_source_identity(snapshot)
+        conn.close()
+        conn = None
+        spill_path.unlink(missing_ok=True)
+        commit_source_bundle(source_dir=source_dir, staging=staging, manifest=snapshot)
+    except Exception:
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
+        discard_stale_staging(source_dir)
+        raise
+    loaded = load_observation_rdp_source(root, cohort_id=cohort_id)
+    return compact_source_view(loaded)
 
 
 def _require_campaign_cohort(source: Mapping[str, Any], cohort_id: str) -> tuple[datetime, datetime]:
@@ -1397,14 +1866,25 @@ def classify_cohort_readiness(
 
     now = (as_of or datetime.now(tz=UTC)).astimezone(UTC)
     start, end = _require_campaign_cohort(source, cohort_id)
-    members = [
-        m
-        for m in source["members"]
-        if isinstance(m, Mapping)
-        and isinstance(m.get(COHORT_ADMISSION_FIELD), str)
-        and start <= _parse_utc(str(m[COHORT_ADMISSION_FIELD])) < end
-    ]
-    if not members:
+    denom = {state: 0 for state in DENOMINATOR_STATES}
+    member_count = 0
+    for member in iter_source_member_rows(source):
+        admission = member.get(COHORT_ADMISSION_FIELD)
+        if not isinstance(admission, str):
+            continue
+        try:
+            in_window = start <= _parse_utc(str(admission)) < end
+        except Exception:
+            continue
+        if not in_window:
+            continue
+        member_count += 1
+        state = str(member.get("denominator_state") or "unknown")
+        if state in denom:
+            denom[state] += 1
+        else:
+            denom["unknown"] += 1
+    if member_count == 0:
         return {
             "cohort_id": cohort_id,
             "state": "COLLECTING",
@@ -1416,7 +1896,7 @@ def classify_cohort_readiness(
             "cohort_id": cohort_id,
             "state": "COLLECTING",
             "sealable": False,
-            "member_count": len(members),
+            "member_count": member_count,
         }
 
     mature_at = end + timedelta(seconds=86400)
@@ -1425,18 +1905,10 @@ def classify_cohort_readiness(
             "cohort_id": cohort_id,
             "state": "MATURING",
             "sealable": False,
-            "member_count": len(members),
+            "member_count": member_count,
         }
 
-    denom = {state: 0 for state in DENOMINATOR_STATES}
-    for m in members:
-        state = str(m.get("denominator_state") or "unknown")
-        if state in denom:
-            denom[state] += 1
-        else:
-            denom["unknown"] += 1
-
-    n = len(members)
+    n = member_count
     observed = denom.get("observed", 0) + denom.get("typed_missing", 0)
     coverage = str(source.get("discovery_coverage_class") or "")
     if coverage == "GAP_CONFIRMED":
@@ -1499,152 +1971,191 @@ def _release_id_for(source: Mapping[str, Any], cohort_id: str) -> str:
     return release_id_for(source, cohort_id)
 
 
-def _build_live_tables(
+def _census_row_from_member(
+    member: Mapping[str, Any],
+    *,
+    source: Mapping[str, Any],
+    cohort_id: str,
+    release_id: str,
+    producers: Mapping[str, Any],
+) -> dict[str, Any]:
+    admission = member.get(COHORT_ADMISSION_FIELD)
+    mint = str(member.get("mint") or member.get("entity_id") or "")
+    selected = str(member.get("selected_or_excluded") or "UNKNOWN")
+    return {
+        "release_id": release_id,
+        "cohort_id": cohort_id,
+        "source_schedule_sha256": source["schedule_sha256"],
+        "activation_id": source["activation_id"],
+        "producer_git_sha": producers.get("producer_git_sha") or "",
+        "mint": mint,
+        "discovery_first_reliable_available_at": admission,
+        "authoritative_anchor": member.get("authoritative_anchor"),
+        "candidate_state": member.get("candidate_state") or "UNKNOWN",
+        "membership_state": member.get("membership_state") or "UNKNOWN",
+        "denominator_state": member.get("denominator_state") or "unknown",
+        "sampling_policy": member.get("sampling_policy"),
+        "sampling_seed": member.get("sampling_seed"),
+        "inclusion_probability": str(member.get("inclusion_probability") or ""),
+        "selected_or_excluded": selected,
+        "exclusion_reason": member.get("exclusion_reason"),
+        "discovery_coverage_class": source.get("discovery_coverage_class"),
+        "source_request_sha256": member.get("source_request_sha256"),
+        "source_response_sha256": member.get("source_response_sha256"),
+        "evidence_role": LIVE_EVIDENCE_ROLE,
+    }
+
+
+def _observation_release_row(
+    obs: Mapping[str, Any],
+    *,
+    cohort_id: str,
+    release_id: str,
+) -> dict[str, Any]:
+    typed_value = obs.get("typed_value")
+    if not isinstance(typed_value, str) and typed_value is not None:
+        typed_value = json.dumps(typed_value, sort_keys=True)
+    http_status = obs.get("http_status")
+    if http_status not in (None, ""):
+        try:
+            http_status = int(http_status)
+        except (TypeError, ValueError):
+            http_status = None
+    else:
+        http_status = None
+    return {
+        "release_id": release_id,
+        "cohort_id": cohort_id,
+        "mint": str(obs.get("mint") or obs.get("entity_id") or ""),
+        "point_id": str(obs.get("point_id") or ""),
+        "primitive_id": obs.get("primitive_id"),
+        "field_id": obs.get("field_id"),
+        "value_kind": obs.get("value_kind"),
+        "typed_value": typed_value,
+        "state": obs.get("state"),
+        "missing_reason": obs.get("missing_reason"),
+        "event_time": obs.get("event_time"),
+        "request_started_at": obs.get("request_started_at"),
+        "response_received_at": obs.get("response_received_at"),
+        "first_reliable_available_at": obs.get("first_reliable_available_at"),
+        "request_sha256": obs.get("request_sha256"),
+        "response_sha256": obs.get("response_sha256"),
+        "call_occurrence_id": obs.get("call_occurrence_id"),
+        "http_status": http_status,
+        "http_class": obs.get("http_class"),
+        "evidence_role": LIVE_EVIDENCE_ROLE,
+        "confirmatory_reuse_forbidden": True,
+    }
+
+
+def _write_live_release_tables(
     source: Mapping[str, Any],
     *,
     cohort_id: str,
     release_id: str,
-) -> tuple[pa.Table, pa.Table, list[str], int, int]:
+    census_path: Path,
+    observations_path: Path,
+) -> tuple[int, int, list[str], int, int]:
     start, end = _require_campaign_cohort(source, cohort_id)
-    census_rows: list[dict[str, Any]] = []
-    observation_rows: list[dict[str, Any]] = []
-    typed_for_families: list[dict[str, Any]] = []
-    mints_in: set[str] = set()
     producers = _producer_fields(source)
+    handle, name = tempfile.mkstemp(prefix="live-cohort-seal-mints-", suffix=".sqlite")
+    os.close(handle)
+    spill = Path(name)
+    mint_conn = sqlite3.connect(str(spill))
+    mint_conn.execute("CREATE TABLE mints (mint TEXT PRIMARY KEY)")
+    yield_eligible = 0
+    yield_missing = 0
+    try:
 
-    for member in source["members"]:
-        if not isinstance(member, Mapping):
-            continue
-        admission = member.get(COHORT_ADMISSION_FIELD)
-        if not isinstance(admission, str):
-            continue
-        adm_dt = _parse_utc(admission)
-        if not (start <= adm_dt < end):
-            continue
-        mint = str(member.get("mint") or member.get("entity_id") or "")
-        _require(bool(mint), "TOKEN_MINT_MISSING")
-        selected = str(member.get("selected_or_excluded") or "UNKNOWN")
-        _require(selected in {"SELECTED", "EXCLUDED", "UNKNOWN"}, "SELECTED_STATE_INVALID")
-        mints_in.add(mint)
-        census_rows.append(
-            {
-                "release_id": release_id,
-                "cohort_id": cohort_id,
-                "source_schedule_sha256": source["schedule_sha256"],
-                "activation_id": source["activation_id"],
-                "producer_git_sha": producers.get("producer_git_sha") or "",
-                "mint": mint,
-                "discovery_first_reliable_available_at": admission,
-                "authoritative_anchor": member.get("authoritative_anchor"),
-                "candidate_state": member.get("candidate_state") or "UNKNOWN",
-                "membership_state": member.get("membership_state") or "UNKNOWN",
-                "denominator_state": member.get("denominator_state") or "unknown",
-                "sampling_policy": member.get("sampling_policy"),
-                "sampling_seed": member.get("sampling_seed"),
-                "inclusion_probability": str(member.get("inclusion_probability") or ""),
-                "selected_or_excluded": selected,
-                "exclusion_reason": member.get("exclusion_reason"),
-                "discovery_coverage_class": source.get("discovery_coverage_class"),
-                "source_request_sha256": member.get("source_request_sha256"),
-                "source_response_sha256": member.get("source_response_sha256"),
-                "evidence_role": LIVE_EVIDENCE_ROLE,
-            }
-        )
+        def _census_batches() -> Iterator[list[dict[str, Any]]]:
+            nonlocal yield_eligible, yield_missing
+            batch: list[dict[str, Any]] = []
+            for member in iter_source_member_rows(source):
+                admission = member.get(COHORT_ADMISSION_FIELD)
+                if not isinstance(admission, str):
+                    continue
+                adm_dt = _parse_utc(admission)
+                if not (start <= adm_dt < end):
+                    continue
+                mint = str(member.get("mint") or member.get("entity_id") or "")
+                _require(bool(mint), "TOKEN_MINT_MISSING")
+                selected = str(member.get("selected_or_excluded") or "UNKNOWN")
+                _require(selected in {"SELECTED", "EXCLUDED", "UNKNOWN"}, "SELECTED_STATE_INVALID")
+                mint_conn.execute("INSERT OR IGNORE INTO mints(mint) VALUES (?)", (mint,))
+                row = _census_row_from_member(
+                    member,
+                    source=source,
+                    cohort_id=cohort_id,
+                    release_id=release_id,
+                    producers=producers,
+                )
+                denom = str(row.get("denominator_state") or "")
+                if denom == "observed":
+                    yield_eligible += 1
+                elif denom in {"typed_missing", "censored_late", "disappeared"}:
+                    yield_missing += 1
+                batch.append(
+                    {
+                        key: None if row.get(key) is None else str(row.get(key))
+                        for key in CENSUS_RELEASE_SCHEMA.names
+                    }
+                )
+                if len(batch) >= BATCH_SIZE:
+                    yield batch
+                    batch = []
+            if batch:
+                yield batch
 
-    for obs in source["observations"]:
-        if not isinstance(obs, Mapping):
-            continue
-        mint = str(obs.get("mint") or obs.get("entity_id") or "")
-        if mint not in mints_in:
-            continue
-        point_id = str(obs.get("point_id") or "")
-        _require(point_id and point_id != "R0", "LIVE_POINT_ID_REQUIRED")
-        typed = {
-            "field_id": obs.get("field_id"),
-            "value_kind": obs.get("value_kind"),
-            "typed_value": obs.get("typed_value"),
-            "state": obs.get("state"),
-            "missing_reason": obs.get("missing_reason"),
-        }
-        typed_for_families.append(typed)
-        typed_value = obs.get("typed_value")
-        if not isinstance(typed_value, str) and typed_value is not None:
-            typed_value = json.dumps(typed_value, sort_keys=True)
-        observation_rows.append(
-            {
-                "release_id": release_id,
-                "cohort_id": cohort_id,
-                "mint": mint,
-                "point_id": point_id,
-                "primitive_id": obs.get("primitive_id"),
-                "field_id": obs.get("field_id"),
-                "value_kind": obs.get("value_kind"),
-                "typed_value": typed_value,
-                "state": obs.get("state"),
-                "missing_reason": obs.get("missing_reason"),
-                "event_time": obs.get("event_time"),
-                "request_started_at": obs.get("request_started_at"),
-                "response_received_at": obs.get("response_received_at"),
-                "first_reliable_available_at": obs.get("first_reliable_available_at"),
-                "request_sha256": obs.get("request_sha256"),
-                "response_sha256": obs.get("response_sha256"),
-                "call_occurrence_id": obs.get("call_occurrence_id"),
-                "http_status": obs.get("http_status"),
-                "http_class": obs.get("http_class"),
-                "evidence_role": LIVE_EVIDENCE_ROLE,
-                "confirmatory_reuse_forbidden": True,
-            }
+        census_rows = write_parquet_from_row_batches(
+            census_path,
+            _census_batches(),
+            schema=CENSUS_RELEASE_SCHEMA,
+            write_kwargs=RELEASE_PARQUET_WRITE_KWARGS,
         )
+        _require(census_rows > 0, "COHORT_EMPTY")
+        observed_families: set[str] = set()
+        missing_or_excluded = False
 
-    _require(bool(census_rows), "COHORT_EMPTY")
-    families = feature_families_from_typed_values(typed_for_families)
-    families = [f for f in FEATURE_FAMILY_ORDER if f in set(families)] or list(
-        FEATURE_FAMILY_ORDER[:1]
-    )
-    yield_eligible = sum(
-        1 for r in census_rows if str(r.get("denominator_state")) == "observed"
-    )
-    yield_missing = sum(
-        1
-        for r in census_rows
-        if str(r.get("denominator_state"))
-        in {"typed_missing", "censored_late", "disappeared"}
-    )
-    if observation_rows:
-        obs_table = pa.Table.from_pylist(observation_rows)
-    else:
-        obs_table = pa.table(
-            {
-                "release_id": pa.array([], type=pa.string()),
-                "cohort_id": pa.array([], type=pa.string()),
-                "mint": pa.array([], type=pa.string()),
-                "point_id": pa.array([], type=pa.string()),
-                "primitive_id": pa.array([], type=pa.string()),
-                "field_id": pa.array([], type=pa.string()),
-                "value_kind": pa.array([], type=pa.string()),
-                "typed_value": pa.array([], type=pa.string()),
-                "state": pa.array([], type=pa.string()),
-                "missing_reason": pa.array([], type=pa.string()),
-                "event_time": pa.array([], type=pa.string()),
-                "request_started_at": pa.array([], type=pa.string()),
-                "response_received_at": pa.array([], type=pa.string()),
-                "first_reliable_available_at": pa.array([], type=pa.string()),
-                "request_sha256": pa.array([], type=pa.string()),
-                "response_sha256": pa.array([], type=pa.string()),
-                "call_occurrence_id": pa.array([], type=pa.string()),
-                "http_status": pa.array([], type=pa.int64()),
-                "http_class": pa.array([], type=pa.string()),
-                "evidence_role": pa.array([], type=pa.string()),
-                "confirmatory_reuse_forbidden": pa.array([], type=pa.bool_()),
-            }
+        def _obs_batches() -> Iterator[list[dict[str, Any]]]:
+            nonlocal missing_or_excluded
+            batch: list[dict[str, Any]] = []
+            for obs in iter_source_observation_rows(source):
+                mint = str(obs.get("mint") or obs.get("entity_id") or "")
+                if mint_conn.execute("SELECT 1 FROM mints WHERE mint=?", (mint,)).fetchone() is None:
+                    continue
+                point_id = str(obs.get("point_id") or "")
+                _require(point_id and point_id != "R0", "LIVE_POINT_ID_REQUIRED")
+                field_id = str(obs.get("field_id") or "")
+                state = str(obs.get("state") or "")
+                family = FIELD_TO_FAMILY.get(field_id)
+                if state == STATE_OBSERVED and family is not None:
+                    observed_families.add(family)
+                if state in {STATE_MISSING, STATE_EXCLUDED}:
+                    missing_or_excluded = True
+                batch.append(
+                    _observation_release_row(obs, cohort_id=cohort_id, release_id=release_id)
+                )
+                if len(batch) >= BATCH_SIZE:
+                    yield batch
+                    batch = []
+            if batch:
+                yield batch
+
+        observation_rows = write_parquet_from_row_batches(
+            observations_path,
+            _obs_batches(),
+            schema=OBS_RELEASE_SCHEMA,
+            write_kwargs=RELEASE_PARQUET_WRITE_KWARGS,
         )
-    return (
-        pa.Table.from_pylist(census_rows),
-        obs_table,
-        families,
-        yield_eligible,
-        yield_missing,
-    )
+        if missing_or_excluded:
+            observed_families.add(FEATURE_FAMILY_MISSINGNESS)
+        families = [item for item in FEATURE_FAMILY_ORDER if item in observed_families] or list(
+            FEATURE_FAMILY_ORDER[:1]
+        )
+        return census_rows, observation_rows, families, yield_eligible, yield_missing
+    finally:
+        mint_conn.close()
+        spill.unlink(missing_ok=True)
 
 
 def seal_live_cohort(
@@ -1660,14 +2171,26 @@ def seal_live_cohort(
     readiness = classify_cohort_readiness(source, cohort_id=cohort_id, as_of=as_of)
     _require(readiness.get("sealable") is True, str(readiness.get("state") or "NOT_READY"))
     release_id = _release_id_for(source, cohort_id)
-    census, observations, families, yield_eligible, yield_missing = _build_live_tables(
-        source, cohort_id=cohort_id, release_id=release_id
-    )
     sealed = (sealed_at or datetime.now(tz=UTC)).astimezone(UTC)
     root = Path(release_root)
     root.mkdir(parents=True, exist_ok=True)
-    census_bytes = _parquet_bytes(census)
-    obs_bytes = _parquet_bytes(observations)
+    staging = root / f".seal-{release_id[:12]}"
+    if staging.exists():
+        shutil.rmtree(staging, ignore_errors=True)
+    staging.mkdir(parents=True, exist_ok=False)
+    census_tmp = staging / CENSUS_NAME
+    obs_tmp = staging / OBSERVATIONS_NAME
+    census_rows, observation_rows, families, yield_eligible, yield_missing = (
+        _write_live_release_tables(
+            source,
+            cohort_id=cohort_id,
+            release_id=release_id,
+            census_path=census_tmp,
+            observations_path=obs_tmp,
+        )
+    )
+    census_sha = sha256_file_streaming(census_tmp)
+    obs_sha = sha256_file_streaming(obs_tmp)
     producers = _producer_fields(source)
     inventory = {
         "cohort_id": cohort_id,
@@ -1701,10 +2224,10 @@ def seal_live_cohort(
         "admission_field": COHORT_ADMISSION_FIELD,
         "evidence_role": LIVE_EVIDENCE_ROLE,
         "confirmatory_reuse_forbidden": True,
-        "census_sha256": sha256_bytes(census_bytes),
-        "observations_sha256": sha256_bytes(obs_bytes),
-        "census_row_count": census.num_rows,
-        "observation_row_count": observations.num_rows if observations.num_columns else 0,
+        "census_sha256": census_sha,
+        "observations_sha256": obs_sha,
+        "census_row_count": census_rows,
+        "observation_row_count": observation_rows,
         "feature_families": families,
         "yield_eligible": yield_eligible,
         "yield_missing": yield_missing,
@@ -1717,8 +2240,8 @@ def seal_live_cohort(
     }
     if builder:
         manifest["release_builder_git_sha"] = builder
-    _publish_bytes(root / CENSUS_NAME, census_bytes)
-    _publish_bytes(root / OBSERVATIONS_NAME, obs_bytes)
+    census_tmp.replace(root / CENSUS_NAME)
+    obs_tmp.replace(root / OBSERVATIONS_NAME)
     _publish_bytes(
         root / SOURCE_INVENTORY_NAME,
         json.dumps(inventory, sort_keys=True, separators=(",", ":")).encode("utf-8"),
@@ -1727,6 +2250,7 @@ def seal_live_cohort(
         root / RELEASE_MANIFEST_NAME,
         json.dumps(manifest, sort_keys=True, separators=(",", ":")).encode("utf-8"),
     )
+    shutil.rmtree(staging, ignore_errors=True)
     return manifest
 
 
@@ -1743,14 +2267,16 @@ def verify_live_cohort(release_root: Path) -> dict[str, Any]:
         raise LiveCohortReleaseError("RELEASE_MANIFEST_CORRUPT") from exc
     _require(isinstance(manifest, Mapping), "RELEASE_MANIFEST_CORRUPT")
     _require(manifest.get("schema") == RELEASE_SCHEMA, "RELEASE_SCHEMA_MISMATCH")
-    census_bytes = (root / CENSUS_NAME).read_bytes()
-    obs_bytes = (root / OBSERVATIONS_NAME).read_bytes()
+    census_path = root / CENSUS_NAME
+    obs_path = root / OBSERVATIONS_NAME
+    _require(census_path.is_file() and not census_path.is_symlink(), "CENSUS_HASH_MISMATCH")
+    _require(obs_path.is_file() and not obs_path.is_symlink(), "OBSERVATIONS_HASH_MISMATCH")
     _require(
-        sha256_bytes(census_bytes) == manifest.get("census_sha256"),
+        sha256_file_streaming(census_path) == manifest.get("census_sha256"),
         "CENSUS_HASH_MISMATCH",
     )
     _require(
-        sha256_bytes(obs_bytes) == manifest.get("observations_sha256"),
+        sha256_file_streaming(obs_path) == manifest.get("observations_sha256"),
         "OBSERVATIONS_HASH_MISMATCH",
     )
     _require(
@@ -1840,9 +2366,11 @@ def import_live_cohort(
     _require(imported_at >= sealed_at, "IMPORT_BEFORE_SEAL")
     release_id = str(manifest["release_id"])
     cohort_id = str(manifest["cohort_id"])
-    census_bytes = (Path(release_root) / CENSUS_NAME).read_bytes()
-    obs_bytes = (Path(release_root) / OBSERVATIONS_NAME).read_bytes()
-    content_sha = sha256_bytes(census_bytes + obs_bytes)
+    census_path = Path(release_root) / CENSUS_NAME
+    obs_path = Path(release_root) / OBSERVATIONS_NAME
+    content_sha = sha256_files_concat_streaming([census_path, obs_path])
+    census_sha = sha256_file_streaming(census_path)
+    obs_sha = sha256_file_streaming(obs_path)
 
     lineage = _load_lineage(data_root)
     existing_cohorts = list(lineage.get("cohorts") or [])
@@ -1918,8 +2446,8 @@ def import_live_cohort(
             "content_sha256": content_sha,
             "census_rel": census_rel,
             "obs_rel": obs_rel,
-            "census_sha256": sha256_bytes(census_bytes),
-            "observations_sha256": sha256_bytes(obs_bytes),
+            "census_sha256": census_sha,
+            "observations_sha256": obs_sha,
             "census_row_count": int(manifest["census_row_count"]),
             "observation_row_count": int(manifest["observation_row_count"]),
             "feature_families": list(manifest["feature_families"]),
@@ -1956,9 +2484,13 @@ def import_live_cohort(
         content_sha256=cumulative_content_sha,
     )
 
+    dest_census = Path(data_root) / census_rel
+    dest_obs = Path(data_root) / obs_rel
+    dest_census.parent.mkdir(parents=True, exist_ok=True)
+    dest_obs.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(census_path, dest_census)
+    shutil.copyfile(obs_path, dest_obs)
     root = Path(data_root)
-    _publish_bytes(root / census_rel, census_bytes)
-    _publish_bytes(root / obs_rel, obs_bytes)
 
     # Rebind all cumulative cohort partitions onto the new current dataset id.
     # Parquet bytes for prior cohorts are referenced in place (no O(N²) copy).
@@ -2103,8 +2635,8 @@ def import_live_cohort(
             "imported_at": _render_utc(imported_at),
             "census_rel": census_rel,
             "obs_rel": obs_rel,
-            "census_sha256": sha256_bytes(census_bytes),
-            "observations_sha256": sha256_bytes(obs_bytes),
+            "census_sha256": census_sha,
+            "observations_sha256": obs_sha,
             "census_row_count": int(manifest["census_row_count"]),
             "observation_row_count": int(manifest["observation_row_count"]),
             "feature_families": list(manifest["feature_families"]),

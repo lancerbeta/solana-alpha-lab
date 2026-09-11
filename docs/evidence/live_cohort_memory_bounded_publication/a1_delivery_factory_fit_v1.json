@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-FACTORY-FIT-001",
+  "as_of": "2026-09-11",
+  "task_id": "LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1",
+  "reviewed_bindings_sha256": "da19b4c4ca47915e1323f026997e7271536e747bf14414cafecc0f655449bf7d",
+  "reviewed_inventory_sha256": "9429ad0e168e0582ae3e92840e5a34fd5af2fed104925d70c26b886f7680882e",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_REPAIR_PUBLICATION_MEMORY_LIFETIME",
+    "flexibility_and_history": "PASS_295_IDENTITY_UNCHANGED",
+    "context_efficiency": "PASS_STREAM_SPILL_NO_NEW_PLATFORM",
+    "research_truth": "PASS_C3_AT_EXISTING_TEST_NET",
+    "owner_operability": "PASS_TYPED_SOURCE_BUILD_RESOURCE_LIMIT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_CONTROL",
+    "monitoring_and_recovery": "PASS_CHILD_ISOLATION_RETRY_SAME_COMMAND",
+    "build_vs_buy": "PASS_ADOPT_SQLITE_PARQUET_NO_SPARK",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_LIVE_RDP",
+    "red_team": "PASS_STRESS_AND_COMPLEXITY_AND_295"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_BOUNDED_C1_PUBLICATION"
+  },
+  "recovery": "REVERT cursor/live-cohort-memory-bounded-publication-v1 BRANCH. PRODUCTION SOURCE REMAINS BUNDLE; DO NOT RESTORE source_snapshot.json AS THE LIVE PATH.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_SOURCE_SEAL_IMPORT",
+    "NO_PROVIDER_CALLS",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION",
+    "NO_SWAP_OR_HOST_RESIZE",
+    "NO_CLAIM_RSS_INDEPENDENT_OF_COHORT_CARDINALITY",
+    "C4_IS_C1_SHAPED_ONE_OBS_NOT_FIELD_EXPLOSION"
+  ]
+}

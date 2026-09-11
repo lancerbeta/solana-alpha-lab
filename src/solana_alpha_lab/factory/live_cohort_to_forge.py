@@ -8,12 +8,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sqlite3
 import shutil
 import sys
 import tempfile
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -57,25 +58,28 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     campaign_cohort_windows,
     classify_cohort_admission_clock,
     classify_cohort_readiness,
+    cohort_source_manifest_path,
     cohort_snapshot_path,
     cohort_window_bounds,
     import_live_cohort,
     latest_c1_observation_manifest_at,
     live_cohort_status,
     load_observation_rdp_source,
+    iter_source_member_rows,
     release_id_for,
     resolve_cohort_admission_instant,
     seal_live_cohort,
     select_current_datasets_for_forge,
     verify_live_cohort,
 )
+from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 from solana_alpha_lab.factory.observation_publication_jobs import (
     iter_open_job_paths,
     journal_stats,
 )
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 from solana_alpha_lab.factory.research_store import ExistingResearchStoreReader, ResearchStoreError
-from solana_alpha_lab.factory.run_passport import canonical_sha256
+from solana_alpha_lab.factory.run_passport import canonical_json_bytes, canonical_sha256
 
 REQUIRED_PYTHON = "3.13.14"
 PROBE_CONTRACT_RELATIVE = "docs/contracts/normalized_trajectory_representation_probe_v1.md"
@@ -176,7 +180,7 @@ def hash_release_tree(release_root: Path) -> dict[str, str]:
     for name in RELEASE_FILES:
         path = root / name
         _require(path.is_file() and not path.is_symlink(), "RELEASE_TREE_INCOMPLETE")
-        out[name] = hashlib.sha256(path.read_bytes()).hexdigest()
+        out[name] = sha256_file_streaming(path)
     return out
 
 
@@ -219,13 +223,28 @@ def _job_in_cohort(job: Mapping[str, Any], *, start: datetime, end: datetime) ->
 
 
 def _member_identity_sha256(rows: Sequence[tuple[str, str, str]]) -> str:
-    payload = {
-        "members": [
-            {"entity_id": entity_id, "state": state, "admission_at": admission}
-            for entity_id, state, admission in sorted(rows)
-        ]
-    }
-    return canonical_sha256(payload)
+    return _member_identity_sha256_ordered(sorted(rows))
+
+
+def _member_identity_sha256_ordered(rows: Iterable[tuple[str, str, str]]) -> str:
+    """Same digest as canonical_sha256 of sorted identity rows, streamed."""
+    digest = hashlib.sha256()
+    digest.update(b'{"members":[')
+    first = True
+    for entity_id, state, admission in rows:
+        encoded = canonical_json_bytes(
+            {
+                "entity_id": entity_id,
+                "state": state,
+                "admission_at": admission,
+            }
+        )
+        if not first:
+            digest.update(b",")
+        first = False
+        digest.update(encoded)
+    digest.update(b"]}")
+    return digest.hexdigest()
 
 
 def collect_open_publication(
@@ -282,25 +301,43 @@ def build_closure_receipt(
     mature_at = end + timedelta(seconds=86400)
     path = Path(ops_store)
     _require(path.is_file() and not path.is_symlink(), "CLOSED_RECEIPT_STORE_MISSING")
-    conn = sqlite3.connect(f"file:{path.resolve().as_posix()}?mode=ro", uri=True)
-    conn.row_factory = sqlite3.Row
+    identity_handle, identity_name = tempfile.mkstemp(
+        prefix="live-cohort-identity-", suffix=".sqlite"
+    )
+    os.close(identity_handle)
+    identity_path = Path(identity_name)
+    identity_conn = sqlite3.connect(str(identity_path))
+    member_states: Counter[str] = Counter()
+    due_states: Counter[str] = Counter()
+    admission_invalid = 0
+    admission_missing_sampled = 0
+    pending_due_by_mature = 0
+    pending_future = 0
+    claimed_or_in_flight = 0
+    actually_overdue = 0
+    deadline_missed = 0
+    budget_blocked = 0
+    cutoff = mature_at
+    entity_ids: list[str] = []
+    member_identity_sha256 = _member_identity_sha256(())
+    conn: sqlite3.Connection | None = None
+    horizon: datetime | None = None
     try:
+        identity_conn.execute(
+            "CREATE TABLE identity (entity_id TEXT PRIMARY KEY NOT NULL, state TEXT NOT NULL, admission TEXT NOT NULL)"
+        )
+        conn = sqlite3.connect(f"file:{path.resolve().as_posix()}?mode=ro", uri=True)
+        conn.row_factory = sqlite3.Row
         integrity = str(conn.execute("PRAGMA integrity_check").fetchone()[0])
         _require(integrity == "ok", "CLOSED_RECEIPT_SQLITE_CORRUPT")
-        candidates = conn.execute(
+        for row in conn.execute(
             """
             SELECT entity_id, state, payload_json
             FROM candidate_members
             WHERE schedule_sha256 = ? AND activation_id = ?
             """,
             (schedule_sha256, activation_id),
-        ).fetchall()
-        cohort_entities: set[str] = set()
-        member_states: Counter[str] = Counter()
-        member_identity_rows: list[tuple[str, str, str]] = []
-        admission_invalid = 0
-        admission_missing_sampled = 0
-        for row in candidates:
+        ):
             payload = json.loads(row["payload_json"] or "{}")
             clock_status = classify_cohort_admission_clock(payload)
             state = str(row["state"])
@@ -314,28 +351,25 @@ def build_closure_receipt(
             admission = _candidate_admission(payload)
             if admission is None or not (start <= admission < end):
                 continue
-            entity_id = str(row["entity_id"])
-            cohort_entities.add(entity_id)
-            member_identity_rows.append((entity_id, state, render_utc(admission)))
+            identity_conn.execute(
+                "INSERT OR REPLACE INTO identity(entity_id, state, admission) VALUES (?,?,?)",
+                (str(row["entity_id"]), state, render_utc(admission)),
+            )
             member_states[state] += 1
-        due_states: Counter[str] = Counter()
-        pending_due_by_mature = 0
-        pending_future = 0
-        claimed_or_in_flight = 0
-        actually_overdue = 0
-        deadline_missed = 0
-        budget_blocked = 0
-        cutoff = mature_at
-        dues = conn.execute(
+        identity_conn.commit()
+        for row in conn.execute(
             """
             SELECT entity_id, point_id, state, due_at, deadline_at, updated_at
             FROM due_observations
             WHERE schedule_sha256 = ? AND activation_id = ?
             """,
             (schedule_sha256, activation_id),
-        ).fetchall()
-        for row in dues:
-            if str(row["entity_id"]) not in cohort_entities:
+        ):
+            hit = identity_conn.execute(
+                "SELECT 1 FROM identity WHERE entity_id=?",
+                (str(row["entity_id"]),),
+            ).fetchone()
+            if hit is None:
                 continue
             state = str(row["state"])
             due_states[state] += 1
@@ -361,15 +395,33 @@ def build_closure_receipt(
                 and updated > cutoff
             ):
                 cutoff = updated
+        entity_ids = [
+            str(item[0])
+            for item in identity_conn.execute("SELECT entity_id FROM identity ORDER BY entity_id")
+        ]
+        member_identity_sha256 = _member_identity_sha256_ordered(
+            (str(eid), str(state), str(admission))
+            for eid, state, admission in identity_conn.execute(
+                "SELECT entity_id, state, admission FROM identity ORDER BY entity_id, state, admission"
+            )
+        )
+        if entity_ids:
+            horizon = latest_c1_observation_manifest_at(
+                observation_rdp,
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                mint_is_member=lambda mint: identity_conn.execute(
+                    "SELECT 1 FROM identity WHERE entity_id=?",
+                    (mint,),
+                ).fetchone()
+                is not None,
+                not_after=as_of,
+            )
     finally:
-        conn.close()
-    horizon = latest_c1_observation_manifest_at(
-        observation_rdp,
-        schedule_sha256=schedule_sha256,
-        activation_id=activation_id,
-        cohort_mints=cohort_entities,
-        not_after=as_of,
-    )
+        if conn is not None:
+            conn.close()
+        identity_conn.close()
+        identity_path.unlink(missing_ok=True)
     if horizon is not None and horizon > cutoff:
         cutoff = horizon
     publication = collect_open_publication(
@@ -390,9 +442,9 @@ def build_closure_receipt(
         "window_end_exclusive": render_utc(end),
         "mature_at": render_utc(mature_at),
         "now_ge_mature_at": as_of >= mature_at,
-        "members_total": len(cohort_entities),
-        "entity_ids": sorted(cohort_entities),
-        "member_identity_sha256": _member_identity_sha256(member_identity_rows),
+        "members_total": len(entity_ids),
+        "entity_ids": entity_ids,
+        "member_identity_sha256": member_identity_sha256,
         "admission_clock_invalid_count": admission_invalid,
         "admission_clock_missing_sampled_count": admission_missing_sampled,
         "member_states": dict(member_states),
@@ -456,47 +508,74 @@ def assert_source_matches_receipt(
     source: Mapping[str, Any],
     receipt: Mapping[str, Any],
 ) -> None:
-    source_mints = sorted(
-        str(item.get("mint") or "")
-        for item in (source.get("members") or [])
-        if isinstance(item, Mapping)
-    )
-    receipt_ids = sorted(str(item) for item in (receipt.get("entity_ids") or []))
-    _require(source_mints == receipt_ids, "CLOSED_RECEIPT_INCOMPLETE")
-    _require(
-        len(source.get("members") or []) == int(receipt["members_total"]),
-        "CLOSED_RECEIPT_INCOMPLETE",
-    )
-    _require(
-        str(source.get("closure_cutoff_at") or "") == str(receipt.get("closure_cutoff_at") or ""),
-        "CLOSED_RECEIPT_INCOMPLETE",
-    )
+    member_count = 0
     start = parse_utc(str(receipt.get("window_start") or ""))
     end = parse_utc(str(receipt.get("window_end_exclusive") or ""))
-    identity_rows: list[tuple[str, str, str]] = []
-    for item in source.get("members") or []:
-        if not isinstance(item, Mapping):
-            continue
-        admission = resolve_cohort_admission_instant(item)
-        _require(admission is not None, "CLOSED_RECEIPT_INCOMPLETE")
-        _require(start <= admission < end, "C2_ROW_IN_C1")
-        identity_rows.append(
-            (
-                str(item.get("mint") or ""),
-                str(item.get("candidate_state") or ""),
-                render_utc(admission),
+    identity_handle, identity_name = tempfile.mkstemp(
+        prefix="live-cohort-source-identity-", suffix=".sqlite"
+    )
+    os.close(identity_handle)
+    identity_path = Path(identity_name)
+    identity_conn = sqlite3.connect(str(identity_path))
+    try:
+        identity_conn.execute(
+            "CREATE TABLE identity (entity_id TEXT PRIMARY KEY NOT NULL, state TEXT NOT NULL, admission TEXT NOT NULL)"
+        )
+        identity_conn.execute(
+            "CREATE TABLE expected (entity_id TEXT PRIMARY KEY NOT NULL)"
+        )
+        for item in receipt.get("entity_ids") or []:
+            identity_conn.execute(
+                "INSERT OR IGNORE INTO expected(entity_id) VALUES (?)",
+                (str(item),),
+            )
+        for item in iter_source_member_rows(source):
+            member_count += 1
+            mint = str(item.get("mint") or "")
+            identity_conn.execute("DELETE FROM expected WHERE entity_id=?", (mint,))
+            _require(
+                int(identity_conn.execute("SELECT changes()").fetchone()[0]) == 1,
+                "CLOSED_RECEIPT_INCOMPLETE",
+            )
+            admission = resolve_cohort_admission_instant(item)
+            _require(admission is not None, "CLOSED_RECEIPT_INCOMPLETE")
+            _require(start <= admission < end, "C2_ROW_IN_C1")
+            identity_conn.execute(
+                "INSERT OR REPLACE INTO identity(entity_id, state, admission) VALUES (?,?,?)",
+                (
+                    mint,
+                    str(item.get("candidate_state") or ""),
+                    render_utc(admission),
+                ),
+            )
+        identity_conn.commit()
+        leftover = identity_conn.execute("SELECT COUNT(*) FROM expected").fetchone()
+        _require(int(leftover[0] if leftover else 0) == 0, "CLOSED_RECEIPT_INCOMPLETE")
+        expected_total = int(receipt["members_total"])
+        _require(member_count == expected_total, "CLOSED_RECEIPT_INCOMPLETE")
+        source_identity = _member_identity_sha256_ordered(
+            (str(eid), str(state), str(admission))
+            for eid, state, admission in identity_conn.execute(
+                "SELECT entity_id, state, admission FROM identity ORDER BY entity_id, state, admission"
             )
         )
-    _require(
-        str(source.get("closure_receipt_sha256") or "")
-        == str(receipt.get("closure_identity_sha256") or receipt.get("receipt_sha256") or ""),
-        "CLOSED_RECEIPT_INCOMPLETE",
-    )
-    source_identity = _member_identity_sha256(identity_rows)
-    _require(
-        source_identity == str(receipt.get("member_identity_sha256") or ""),
-        "STALE_MEMBER_STATE",
-    )
+        _require(
+            str(source.get("closure_cutoff_at") or "")
+            == str(receipt.get("closure_cutoff_at") or ""),
+            "CLOSED_RECEIPT_INCOMPLETE",
+        )
+        _require(
+            str(source.get("closure_receipt_sha256") or "")
+            == str(receipt.get("closure_identity_sha256") or receipt.get("receipt_sha256") or ""),
+            "CLOSED_RECEIPT_INCOMPLETE",
+        )
+        _require(
+            source_identity == str(receipt.get("member_identity_sha256") or ""),
+            "STALE_MEMBER_STATE",
+        )
+    finally:
+        identity_conn.close()
+        identity_path.unlink(missing_ok=True)
 
 
 def _imported_cohort_ids(data_root: Path | None) -> set[str]:
@@ -898,7 +977,7 @@ def _publish_live_cohort_inner(
             "epoch_after": epoch_after,
             "forge": control,
             "next": CONTROL_NEXT,
-            "snapshot": str(cohort_snapshot_path(observation_rdp, cohort_id).as_posix()),
+            "snapshot": str(cohort_source_manifest_path(observation_rdp, cohort_id).as_posix()),
         }
     finally:
         if transport_dir is not None:
