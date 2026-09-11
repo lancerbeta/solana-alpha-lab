@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-MEMORY-COLLISION-REPAIR-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-11",
+  "task_id": "FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "0",
+  "reviewed_inventory_sha256": "0",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "STREAMING_RDP_INVENTORY",
+        "NO_SOURCE_SNAPSHOT_ON_MONITOR_PATH",
+        "NO_LIVE_COHORT_IMPORT",
+        "PULSE_OFFSET_0620",
+        "SOURCE_DATA_STALE_UNCHANGED",
+        "RESIDUAL_HOT90_PYARROW_IMPORT",
+        "RESIDUAL_ARCHIVE_BACKLOG_ON_WATCH",
+        "RESIDUAL_BACKUP_SINK_RGLOB"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LAST_SEALED_RELEASE_ID_DIRECTORY_FALLBACK_TESTED",
+        "R4C_EMPTY_OBJECT_STAYS_UNKNOWN",
+        "R4C_NON_JSON_STAYS_UNKNOWN",
+        "R1_R9_PROVED",
+        "CHEAPEST_FALSIFIER_PRESENT"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_bound_to_head_c2797a7082c9a01b25fef956be0f4f3d648c13bf",
+        "packet_fingerprint_sha256=b1d3246cbd9413e7d0bc8cda9d3bbb83aa6d6019a479192943b90bef91220de5",
+        "NO_LIVE_COHORT_IMPORT",
+        "UNKNOWN_NOT_FABRICATED_READY",
+        "NO_NEW_DAEMON_QUEUE_METRICS_LOCK_CGROUP_SWAP",
+        "SMALL_OPERATIONAL_REPAIR"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}
