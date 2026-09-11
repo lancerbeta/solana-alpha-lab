@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-OPERABILITY-MEMORY-COLLISION-REPAIR-COMPLETION-001",
+  "as_of": "2026-09-11",
+  "task_id": "FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_V1",
+  "state_change": "FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_READY_FOR_MERGE_GATE",
+  "base_main": "c2797a7082c9a01b25fef956be0f4f3d648c13bf",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "182eac5fa6591b932daf4a1645da7637a13980710b4c9bf4eaa7a371c364ad04",
+    "catalog/assets/lifecycle.yaml": "06eff2f00f73808a85209719bb3706d325de1dcb77facbd135f697b3c0d9c807",
+    "catalog/catalog_manifest.yaml": "52f081fb53b24e24996e8db8df8666485b4f3f94d40c4fab22c322ddd128e801",
+    "catalog/generated/asset_edges.json": "07499135aba6f803d8a8868ece338b380f1507260d8fa8aec9450693503764a9",
+    "configs/factory_remote_ops/factory-collector-owner-pulse.timer": "5e9bc115e307c043fa88254ccec88a9850dfbfe786b1c537b7b8160fb70c7b5d",
+    "docs/PROJECT_MAP.md": "693925a008559fc423e79fdf697ab72a0b9ea12c3321c902d6b56f012377df40",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "ec6cf1ac2ed292b91ec9d647da0e7128a32d3c19e3b458281ebbf2e9d9c685ef",
+    "docs/operator/FACTORY_UNATTENDED_OPERABILITY.md": "1ff4b16f6c0f712a33150e93fc9481d8ad0205fa063db01536bab32c9865d407",
+    "docs/reports/factory_operability_memory_collision_repair/a1_owner_readout_v1.md": "0fb54c8bbf97cf0e4ae8ab59a6f8e4abe9b8d550c86311a7ffa8b535bbfaa201",
+    "docs/tasks/FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_V1.md": "2885a19098d7ce97c1eaf23ffeccc247f066d2d2c281c98dd7190c3731273620",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "448bca15e8afabe61fc762003387d4cf41dd3ccef4c9ae4d1301df71d7eb4eac",
+    "src/solana_alpha_lab/factory/collector_owner_pulse.py": "8a689388574232aec59ece9ed2ff4fa44548c5c7059f9ef7d833c255b0f3e97d",
+    "tests/test_factory_operability_memory_collision_repair_v1.py": "1939d45483a73387cfb970e3b3aaa57d603027958dc44b35d4035163b36f1874",
+    "tests/test_factory_unattended_operability_closure_v1.py": "2045c46a5bc569087a996bd327bc3549ca5d4b790a0f32e75b58abc30822a2c9"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_operability_memory_collision_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "b70c54adbde8e3a9ada1e2e985f0b921467904167b2b032f01fe2aa000ca1da5",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/factory_operability_memory_collision_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "8508583d5ff40826660b320b531eea48237ee21d55106a7fa7ac4b9bd733afba",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_R1_R9_MEMORY_COLLISION",
+      "PASS_NO_SCIENTIFIC_SNAPSHOT_ON_MONITOR_PATH",
+      "PASS_PULSE_OFFSET_0620"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_PROVIDER_CALLS"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

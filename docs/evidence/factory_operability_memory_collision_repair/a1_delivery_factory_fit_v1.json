@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-OPERABILITY-MEMORY-COLLISION-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-11",
+  "task_id": "FACTORY_OPERABILITY_MEMORY_COLLISION_REPAIR_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "d144b9cc8bddd50e9200eef18d88ee663959d9f78585bc5449c90da49c7d8181",
+  "reviewed_inventory_sha256": "3a3dbdb2c50dfbde268f05c5adf0f3bf4e4f279b0481cb1ad010f8a4fee26f0b",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "FACTORY_SOURCE_DATA_STALE_EXPECTATION_AWARE_V1"
+  },
+  "dimensions": {
+    "mission": "PASS owner-operable VPS monitoring without quieter real incidents",
+    "flexibility_and_history": "PASS no CENSORED_LATE rewrite; historical 06:15 readout stays historical",
+    "context_efficiency": "PASS one streaming RDP walk plus bounded manifests",
+    "research_truth": "PASS scientific loader and RDP contents unchanged",
+    "owner_operability": "PASS daily pulse still renders; schedule is 06:20 UTC in operator docs",
+    "execution_to_cashflow": "PASS no trading or cash path",
+    "monitoring_and_recovery": "PASS pulse off the :15 watch boundary; no swap or cgroup cap",
+    "build_vs_buy": "PASS no new daemon timer framework lock or metrics platform",
+    "security": "PASS no credentials deploy or provider calls",
+    "red_team": "PASS owner falsifiers 1-12 closed; residuals HOT90 PyArrow and backup-sink rglob"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCTION_DEPLOY",
+    "NO_VPS_MUTATION",
+    "REMOTE_DOCTOR_SINGLE_SAMPLE_FALSE_DOWN_WATCH",
+    "RESIDUAL_HOT90_PYARROW_IMPORT"
+  ],
+  "recovery": "REVERT"
+}

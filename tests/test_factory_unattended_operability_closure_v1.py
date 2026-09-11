@@ -658,7 +658,7 @@ class IncidentDailyHeartbeatUtcTests(unittest.TestCase):
         collector = (ROOT / "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("OnCalendar=*-*-* 06:15:00 UTC", collector)
+        self.assertIn("OnCalendar=*-*-* 06:20:00 UTC", collector)
         archive_timer = (
             ROOT / "configs/factory_remote_ops/factory-hot90-closed-day-archive.timer"
         ).read_text(encoding="utf-8")
