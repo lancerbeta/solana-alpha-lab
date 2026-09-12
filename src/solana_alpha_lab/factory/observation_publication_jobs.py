@@ -580,6 +580,97 @@ def stream_legacy_fat_open_job_for_artifacts_resume(path: Path) -> dict[str, Any
     return found
 
 
+def _confine_data_rel(root: Path, rel: str) -> Path:
+    rel_path = Path(str(rel).replace("\\", "/"))
+    if (
+        not rel
+        or rel.startswith("/")
+        or rel_path.is_absolute()
+        or (len(rel) >= 2 and rel[1] == ":")
+        or any(part == ".." for part in rel_path.parts)
+    ):
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+    artifact = (root / rel).resolve()
+    try:
+        artifact.relative_to(root)
+    except ValueError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
+    if not artifact.is_file() or artifact.is_symlink():
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+    return artifact
+
+
+def _read_bounded_json_object(path: Path) -> dict[str, Any]:
+    try:
+        size = path.stat().st_size
+    except OSError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
+    if size > FAT_RESUME_CAPTURE_MAX_BYTES:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
+    if not isinstance(payload, dict):
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+    return payload
+
+
+def _prove_snapshot_plus_delta_chain(
+    root: Path,
+    member_rel: str,
+    dataset_manifest_id: str,
+    *,
+    member_count: int,
+    member_sha256: str,
+) -> None:
+    from solana_alpha_lab.factory.members_snapshot_delta import LAYOUT_KIND, read_member_layout
+
+    member_path = _confine_data_rel(root, member_rel)
+    sidecar = member_path.with_name("members.layout.json")
+    posix = member_rel.replace("\\", "/")
+    if "members_snapshot_plus_delta" in posix and (
+        not sidecar.is_file() or sidecar.is_symlink()
+    ):
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+    if sidecar.is_file() is False:
+        return
+    try:
+        sidecar.resolve().relative_to(root)
+    except ValueError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
+    try:
+        if sidecar.stat().st_size > FAT_RESUME_CAPTURE_MAX_BYTES:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
+    except OSError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
+    layout = read_member_layout(root, member_rel)
+    if not isinstance(layout, dict) or str(layout.get("kind") or "") != LAYOUT_KIND:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+    if str(layout.get("dataset_manifest_id") or "") != dataset_manifest_id:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+    unit_path = _confine_data_rel(root, str(layout.get("unit_rel") or ""))
+    unit = _read_bounded_json_object(unit_path)
+    if str(unit.get("layout") or "") != LAYOUT_KIND:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+    match: dict[str, Any] | None = None
+    for item in unit.get("publications") or []:
+        if not isinstance(item, dict):
+            continue
+        if str(item.get("dataset_manifest_id") or "") == dataset_manifest_id:
+            match = item
+            break
+    if match is None:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+    if str(match.get("rel") or "").replace("\\", "/") != posix:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    if str(match.get("sha256") or "") != member_sha256:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
+    row_count = match.get("row_count")
+    if type(row_count) is not int or row_count != member_count:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+
+
 def prove_legacy_fat_open_artifacts_source(
     data_root: Path,
     content_sha256: str,
@@ -675,6 +766,13 @@ def prove_legacy_fat_open_artifacts_source(
         if _sha256_file(artifact) != digest:
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
         proven_paths[label] = artifact
+    _prove_snapshot_plus_delta_chain(
+        root,
+        member_rel,
+        str(job["dataset_manifest_id"]),
+        member_count=member_count,
+        member_sha256=str(job["member_sha256"]),
+    )
     import pyarrow.parquet as pq
 
     try:

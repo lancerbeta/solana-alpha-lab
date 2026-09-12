@@ -54,8 +54,9 @@ still raise `LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION`.
   partitions, RDP payloads, published marker, and compact receipt keys.
 - Fault/retry after RDP / manifest / marker / compact receipt converges once.
 - Artifact hash mismatch, wrong stage, empty activations, unknown states,
-  activation mismatch, missing `members[]`, path escape, and unbounded
-  captured strings refuse with the source untouched.
+  activation mismatch, missing `members[]`, path escape, unbounded
+  captured strings, and SNAPSHOT_PLUS_DELTA missing/corrupt sidecar or unit
+  identity mismatch refuse with the source untouched.
 - ACTIVE/DRAINING refuse. Already-complete inspect is distinct from READY_RETRY.
 - Memory child: generated members array; MaxRSS below the 768 MiB soft
   envelope. `provider_calls=0`.
