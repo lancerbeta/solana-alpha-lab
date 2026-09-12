@@ -108,7 +108,9 @@ def _producer_git_sha(configured: str | None) -> str:
 def _load_store(store_path: Path, *, readonly: bool = False) -> tuple[list[dict], ObservationScheduleStore]:
     if not store_path.is_file():
         raise PublicationJobError(COLLECTOR_STORE_MISSING)
-    store = ObservationScheduleStore(store_path, readonly=readonly)
+    store = ObservationScheduleStore(
+        store_path, readonly=readonly, immutable=not readonly
+    )
     try:
         activations = store.list_activations()
     except Exception:

@@ -73,7 +73,7 @@ def _now(clock: datetime | None = None) -> str:
 
 
 class ObservationScheduleStore:
-    def __init__(self, path: Path, *, readonly: bool = False) -> None:
+    def __init__(self, path: Path, *, readonly: bool = False, immutable: bool = True) -> None:
         if path.is_absolute() is False:
             raise ObservationScheduleStoreError("OPS_STORE_PATH_NOT_ABSOLUTE")
         self.path = path
@@ -84,9 +84,12 @@ class ObservationScheduleStore:
                 raise ObservationScheduleStoreError("SOURCE_INVALID")
             if path.is_file() is False:
                 raise ObservationScheduleStoreError("SOURCE_NOT_PRESENT")
+            query = "?mode=ro"
+            if immutable:
+                query += "&immutable=1"
             try:
                 self._conn = sqlite3.connect(
-                    path.resolve().as_uri() + "?mode=ro&immutable=1",
+                    path.resolve().as_uri() + query,
                     uri=True,
                     check_same_thread=False,
                 )

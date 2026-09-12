@@ -373,6 +373,7 @@ def _skip_value(reader: _JsonByteReader, first: str) -> None:
                 depth -= 1
         return
     if first in "-0123456789":
+        size = 1
         while True:
             char = reader.read()
             if not char:
@@ -380,6 +381,9 @@ def _skip_value(reader: _JsonByteReader, first: str) -> None:
             if char in ",}] \t\r\n":
                 reader.unread(char)
                 return
+            size += 1
+            if size > 64:
+                raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
         return
     literal = first
     while True:
@@ -389,6 +393,8 @@ def _skip_value(reader: _JsonByteReader, first: str) -> None:
                 reader.unread(char)
             break
         literal += char
+        if len(literal) > 16:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
     if literal not in {"true", "false", "null"}:
         raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
 
@@ -641,9 +647,10 @@ def prove_legacy_fat_open_artifacts_source(
     job["parquet_rel"] = parquet_rel
     job["member_rel"] = member_rel
     root = Path(data_root).resolve()
-    for rel, digest in (
-        (parquet_rel, str(job["file_sha256"])),
-        (member_rel, str(job["member_sha256"])),
+    proven_paths: dict[str, Path] = {}
+    for rel, digest, label in (
+        (parquet_rel, str(job["file_sha256"]), "parquet"),
+        (member_rel, str(job["member_sha256"]), "member"),
     ):
         rel_path = Path(rel.replace("\\", "/"))
         if (
@@ -663,6 +670,16 @@ def prove_legacy_fat_open_artifacts_source(
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
         if _sha256_file(artifact) != digest:
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
+        proven_paths[label] = artifact
+    import pyarrow.parquet as pq
+
+    try:
+        parquet_rows = int(pq.read_metadata(proven_paths["parquet"]).num_rows)
+        member_rows = int(pq.read_metadata(proven_paths["member"]).num_rows)
+    except Exception as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
+    if parquet_rows != observation_count or member_rows != member_count:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
     completed = completed_job_path(data_root, content_sha256)
     if completed.is_file():
         try:
@@ -694,7 +711,15 @@ def probe_open_job_for_routine_path(path: Path) -> OpenJobRoutineProbe:
         raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION) from exc
     if size <= ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES:
         return OpenJobRoutineProbe(kind="FULL_PARSE_OK", size_bytes=size)
-    meta = _stream_open_job_top_level_meta(path)
+    try:
+        meta = _stream_open_job_top_level_meta(path)
+    except PublicationJobError as exc:
+        if str(exc) in {
+            FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE,
+            FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID,
+        }:
+            raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION) from exc
+        raise
     return OpenJobRoutineProbe(
         kind="LEGACY_FAT_REQUIRES_PAUSED_MIGRATION",
         size_bytes=size,
@@ -923,6 +948,15 @@ def _revalidate_source(path: Path, size: int, digest: str) -> None:
         raise PublicationJobError(SOURCE_CHANGED_AFTER_PLAN)
 
 
+def revalidate_open_job_source(
+    data_root: Path, content: str, expected: tuple[int, str]
+) -> None:
+    leftover = open_job_path(data_root, content)
+    if leftover.is_file() is False or leftover.is_symlink():
+        raise PublicationJobError(SOURCE_CHANGED_AFTER_PLAN)
+    _revalidate_source(leftover, expected[0], expected[1])
+
+
 def _load_json_object(path: Path) -> dict[str, Any]:
     try:
         with path.open(encoding="utf-8") as handle:
@@ -1096,9 +1130,10 @@ def complete_publication_job(
         ):
             leftover.unlink(missing_ok=True)
         return existing
-    if expected_open_source is not None:
-        leftover = open_job_path(data_root, content)
-        if leftover.is_file():
+        if expected_open_source is not None:
+            leftover = open_job_path(data_root, content)
+            if leftover.is_file() is False or leftover.is_symlink():
+                raise PublicationJobError(SOURCE_CHANGED_AFTER_PLAN)
             _revalidate_source(
                 leftover, expected_open_source[0], expected_open_source[1]
             )
@@ -1437,10 +1472,11 @@ __all__ = [
     "load_open_job_for_routine_path",
     "open_job_probe_matches_activation",
     "probe_open_job_for_routine_path",
+    "prove_legacy_fat_open_artifacts_source",
     "open_dir",
     "plan_migration",
     "project_7d_disk_used",
-    "prove_legacy_fat_open_artifacts_source",
+    "revalidate_open_job_source",
     "publication_artifacts_proven",
     "rdp_bytes_excluding_publication_jobs",
     "save_open_job",

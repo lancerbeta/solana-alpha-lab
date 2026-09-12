@@ -20,6 +20,7 @@ managed_write_set:
 - docs/tasks/LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1.md
 - src/solana_alpha_lab/factory/observation_publication_jobs.py
 - src/solana_alpha_lab/factory/observation_panel_publisher.py
+- src/solana_alpha_lab/factory/observation_schedule_store.py
 - scripts/observation_publication_jobs.py
 - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
 - docs/PROJECT_MAP.md

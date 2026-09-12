@@ -65,8 +65,8 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     open_job_probe_matches_activation,
     probe_open_job_for_routine_path,
     prove_legacy_fat_open_artifacts_source,
+    revalidate_open_job_source,
     save_open_job,
-    _revalidate_source,
 )
 from solana_alpha_lab.storage.manifests import (
     build_dataset_manifest,
@@ -811,6 +811,9 @@ def publish_observation_batch(
         obs_record_id = f"OBS-BATCH-{content[:16].upper()}"
         member_record_id = f"OBS-MEMB-{content[:16].upper()}"
 
+        if expected_open_source is not None:
+            revalidate_open_job_source(data_root, content, expected_open_source)
+
         if published_path.is_file():
             if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
                 raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
@@ -1000,11 +1003,7 @@ def publish_observation_batch(
         )
 
         if expected_open_source is not None:
-            leftover = open_job_path(data_root, content)
-            if leftover.is_file():
-                _revalidate_source(
-                    leftover, expected_open_source[0], expected_open_source[1]
-                )
+            revalidate_open_job_source(data_root, content, expected_open_source)
 
         if job.get("stage") in {STAGE_ARTIFACTS, None}:
             _append_event(data_root, obs_event)
@@ -1137,6 +1136,18 @@ def inspect_legacy_fat_open_artifacts(
             activation_id=str(existing.get("activation_id") or ""),
         ) is False:
             raise PublicationJobError(COLLECTOR_NOT_PAUSED)
+        obs_record_id = f"OBS-BATCH-{content_sha256[:16].upper()}"
+        member_record_id = f"OBS-MEMB-{content_sha256[:16].upper()}"
+        if not _rdp_has(data_root, obs_record_id) or not _rdp_has(
+            data_root, member_record_id
+        ):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        manifests = data_root / "datasets" / "manifests"
+        manifest_id = str(existing["dataset_manifest_id"])
+        if not (manifests / f"{manifest_id}.json").is_file() or not (
+            manifests / f"{manifest_id}.published"
+        ).is_file():
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
         return {
             "terminal": FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
             "content_sha256": content_sha256,
