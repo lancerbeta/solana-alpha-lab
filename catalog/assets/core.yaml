@@ -35076,7 +35076,7 @@ records:
   as_of: '2026-09-12'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_publication_jobs.py', repository_path: src/solana_alpha_lab/factory/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: 6f171af8414d66da09941eb1c0aa20d77012b2cebd539df49bc2d72cd5de7c45}
+  integrity: {kind: sha256, sha256: c51eee10254da7a454215219f5916fe5a322d36909ef0beee42901a67d9b93d7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}

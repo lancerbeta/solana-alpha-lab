@@ -632,12 +632,16 @@ def prove_legacy_fat_open_artifacts_source(
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
     if CONTENT_SHA256_RE.fullmatch(str(job.get("member_sha256") or "")) is None:
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
-    try:
-        observation_count = int(job.get("observation_count") or 0)
-        member_count = int(job.get("member_count") or 0)
-    except (TypeError, ValueError) as exc:
-        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH) from exc
-    if observation_count <= 0 or member_count <= 0:
+    observation_count = job.get("observation_count")
+    member_count = job.get("member_count")
+    if (
+        isinstance(observation_count, bool)
+        or type(observation_count) is not int
+        or observation_count <= 0
+        or isinstance(member_count, bool)
+        or type(member_count) is not int
+        or member_count <= 0
+    ):
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
     observations = job.get("observations")
     if not isinstance(observations, list) or len(observations) != observation_count:
@@ -675,10 +679,9 @@ def prove_legacy_fat_open_artifacts_source(
 
     try:
         parquet_rows = int(pq.read_metadata(proven_paths["parquet"]).num_rows)
-        member_rows = int(pq.read_metadata(proven_paths["member"]).num_rows)
     except Exception as exc:
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
-    if parquet_rows != observation_count or member_rows != member_count:
+    if parquet_rows != observation_count:
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
     completed = completed_job_path(data_root, content_sha256)
     if completed.is_file():
@@ -1118,6 +1121,8 @@ def complete_publication_job(
 
     content = str(job["content_sha256"])
     destination = completed_job_path(data_root, content)
+    if expected_open_source is not None and destination.is_file() is False:
+        revalidate_open_job_source(data_root, content, expected_open_source)
     if destination.is_file():
         existing = json.loads(destination.read_text(encoding="utf-8"))
         if not isinstance(existing, dict) or not is_compact_receipt(existing):
@@ -1130,13 +1135,6 @@ def complete_publication_job(
         ):
             leftover.unlink(missing_ok=True)
         return existing
-        if expected_open_source is not None:
-            leftover = open_job_path(data_root, content)
-            if leftover.is_file() is False or leftover.is_symlink():
-                raise PublicationJobError(SOURCE_CHANGED_AFTER_PLAN)
-            _revalidate_source(
-                leftover, expected_open_source[0], expected_open_source[1]
-            )
     if not publication_artifacts_proven(data_root, job):
         raise PublicationJobError("PUBLICATION_NOT_PROVEN")
     receipt = compact_receipt_from_job(

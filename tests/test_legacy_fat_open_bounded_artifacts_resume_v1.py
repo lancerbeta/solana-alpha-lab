@@ -49,7 +49,9 @@ from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E40
     LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
     ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES,
     PublicationJobError,
+    SOURCE_CHANGED_AFTER_PLAN,
     collector_pause_proven,
+    complete_publication_job,
     completed_job_path,
     is_compact_receipt,
     load_open_job_for_routine_path,
@@ -553,6 +555,30 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
                     schedule=schedule,
                 )
             self.assertEqual(str(unknown_err.exception), COLLECTOR_NOT_PAUSED)
+
+    def test_complete_missing_open_source_fails_closed(self) -> None:
+        schedule = _schedule()
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, fault_after="AFTER_ARTIFACTS")
+            content = next(
+                (data_root / "datasets" / "publication_jobs" / "open").glob("*.json")
+            ).stem
+            job_path = open_job_path(data_root, content)
+            _inflate_open_job(job_path)
+            proven = prove_legacy_fat_open_artifacts_source(data_root, content)
+            job_path.unlink()
+            with self.assertRaises(PublicationJobError) as err:
+                complete_publication_job(
+                    data_root,
+                    proven["job"],
+                    completed_at=NOW,
+                    expected_open_source=(proven["source_size"], proven["source_sha256"]),
+                )
+            self.assertEqual(str(err.exception), SOURCE_CHANGED_AFTER_PLAN)
+            self.assertFalse(completed_job_path(data_root, content).is_file())
 
     def test_fault_retry_matrix_converges_once(self) -> None:
         schedule = _schedule()
