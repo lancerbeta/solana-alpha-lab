@@ -520,9 +520,20 @@ def classify_legacy_payload(
     if stage in {STAGE_MARKER, STAGE_COMPLETE}:
         return CLASS_AMBIGUOUS
     members = payload.get("members")
-    if not isinstance(members, list) or not members:
-        return CLASS_AMBIGUOUS
-    return CLASS_OPEN
+    if isinstance(members, list) and members:
+        return CLASS_OPEN
+    # Memory-bounded open jobs retain hashes/counts/observations, not the census.
+    if (
+        stage
+        and payload.get("member_count")
+        and payload.get("file_sha256")
+        and payload.get("member_sha256")
+        and payload.get("parquet_rel")
+        and payload.get("member_rel")
+        and isinstance(payload.get("observations"), list)
+    ):
+        return CLASS_OPEN
+    return CLASS_AMBIGUOUS
 
 
 def _iter_unmigrated_paths(data_root: Path) -> list[Path]:

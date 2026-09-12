@@ -140,12 +140,110 @@ def apply_member_delta(
 
 
 def _write_parquet_zstd(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
+    spill, conn = _spill_member_sequence(rows)
+    try:
+        return _write_parquet_zstd_from_conn(path, conn)
+    finally:
+        conn.close()
+        spill.unlink(missing_ok=True)
+
+
+def _spill_member_sequence(
+    rows: Sequence[Mapping[str, Any]] | Iterator[Mapping[str, Any]],
+) -> tuple[Path, sqlite3.Connection]:
+    spill, conn = _spill_members_db()
+    batch: list[tuple[str, bytes]] = []
+    seen: set[str] = set()
+    try:
+        for row in rows:
+            payload = dict(row)
+            entity_id = str(payload.get("entity_id") or "")
+            if not entity_id:
+                raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+            if entity_id in seen:
+                raise MembersDeltaError("DUPLICATE_ENTITY_ID")
+            seen.add(entity_id)
+            batch.append(
+                (entity_id, pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL))
+            )
+            if len(batch) >= _MEMBER_BATCH_SIZE:
+                conn.executemany(
+                    "INSERT INTO members(entity_id, payload) VALUES (?,?)", batch
+                )
+                batch = []
+        if batch:
+            conn.executemany(
+                "INSERT INTO members(entity_id, payload) VALUES (?,?)", batch
+            )
+        conn.commit()
+    except Exception:
+        conn.close()
+        spill.unlink(missing_ok=True)
+        raise
+    return spill, conn
+
+
+def _arrow_schema_from_members(conn: sqlite3.Connection) -> pa.Schema:
+    schema: pa.Schema | None = None
+    batch: list[dict[str, Any]] = []
+    for (blob,) in conn.execute("SELECT payload FROM members ORDER BY entity_id"):
+        batch.append(dict(pickle.loads(blob)))
+        if len(batch) >= _MEMBER_BATCH_SIZE:
+            table = pa.Table.from_pylist(batch)
+            schema = table.schema if schema is None else pa.unify_schemas([schema, table.schema])
+            batch = []
+    if batch:
+        table = pa.Table.from_pylist(batch)
+        schema = table.schema if schema is None else pa.unify_schemas([schema, table.schema])
+    if schema is None:
+        return pa.schema([])
+    return schema
+
+
+def _write_parquet_zstd_from_conn(path: Path, conn: sqlite3.Connection) -> str:
+    return _write_members_parquet_from_conn(path, conn, compression="zstd")
+
+
+def _write_members_parquet_from_conn(
+    path: Path,
+    conn: sqlite3.Connection,
+    *,
+    compression: str | None = "zstd",
+) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
-    table = pa.Table.from_pylist([dict(row) for row in rows])
     tmp = path.with_suffix(path.suffix + ".tmp")
-    pq.write_table(table, tmp, compression="zstd", compression_level=3)
-    payload = tmp.read_bytes()
-    digest = hashlib.sha256(payload).hexdigest()
+    schema = _arrow_schema_from_members(conn)
+    writer: pq.ParquetWriter | None = None
+    try:
+        batch: list[dict[str, Any]] = []
+        for (blob,) in conn.execute("SELECT payload FROM members ORDER BY entity_id"):
+            batch.append(dict(pickle.loads(blob)))
+            if len(batch) >= _MEMBER_BATCH_SIZE:
+                table = pa.Table.from_pylist(batch, schema=schema)
+                if writer is None:
+                    kwargs: dict[str, Any] = {}
+                    if compression == "zstd":
+                        kwargs = {"compression": "zstd", "compression_level": 3}
+                    writer = pq.ParquetWriter(tmp, schema, **kwargs)
+                writer.write_table(table)
+                batch = []
+        if batch:
+            table = pa.Table.from_pylist(batch, schema=schema)
+            if writer is None:
+                kwargs = {}
+                if compression == "zstd":
+                    kwargs = {"compression": "zstd", "compression_level": 3}
+                writer = pq.ParquetWriter(tmp, schema, **kwargs)
+            writer.write_table(table)
+        if writer is None:
+            write_kwargs: dict[str, Any] = {}
+            if compression == "zstd":
+                write_kwargs = {"compression": "zstd", "compression_level": 3}
+            pq.write_table(schema.empty_table(), tmp, **write_kwargs)
+    finally:
+        if writer is not None:
+            writer.close()
+    digest = _sha256_file_streaming(tmp)
     tmp.replace(path)
     return digest
 
@@ -155,13 +253,34 @@ def write_snapshot_unit(
     *,
     utc_day: str,
     dataset_manifest_id: str,
-    rows: Sequence[Mapping[str, Any]],
+    rows: Sequence[Mapping[str, Any]] | Iterator[Mapping[str, Any]],
+) -> dict[str, Any]:
+    spill, conn = _spill_member_sequence(rows)
+    try:
+        return _write_snapshot_unit_from_conn(
+            data_root,
+            utc_day=utc_day,
+            dataset_manifest_id=dataset_manifest_id,
+            conn=conn,
+        )
+    finally:
+        conn.close()
+        spill.unlink(missing_ok=True)
+
+
+def _write_snapshot_unit_from_conn(
+    data_root: Path,
+    *,
+    utc_day: str,
+    dataset_manifest_id: str,
+    conn: sqlite3.Connection,
 ) -> dict[str, Any]:
     unit_dir = data_root / "datasets" / "members_snapshot_plus_delta" / utc_day
-    _require_unique_entity_ids(rows)
     rel = f"datasets/members_snapshot_plus_delta/{utc_day}/snapshot/{dataset_manifest_id}/members.parquet"
     path = data_root / rel
-    file_sha256 = _write_snapshot_or_reuse(path, rows)
+    file_sha256 = _write_parquet_zstd_from_conn(path, conn)
+    row_count = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+    fingerprint = _fingerprint_sqlite(conn)
     unit = {
         "schema": UNIT_SCHEMA,
         "schema_version": "1.0",
@@ -175,8 +294,8 @@ def write_snapshot_unit(
                 "kind": "snapshot",
                 "rel": rel.replace("\\", "/"),
                 "sha256": file_sha256,
-                "row_count": len(rows),
-                "snapshot_fingerprint": snapshot_fingerprint(rows),
+                "row_count": row_count,
+                "snapshot_fingerprint": fingerprint,
             }
         ],
     }
@@ -190,70 +309,149 @@ def append_delta_publication(
     *,
     utc_day: str,
     dataset_manifest_id: str,
-    rows: Sequence[Mapping[str, Any]],
+    rows: Sequence[Mapping[str, Any]] | Iterator[Mapping[str, Any]] | None = None,
+    member_conn: sqlite3.Connection | None = None,
 ) -> dict[str, Any]:
     unit_dir = data_root / "datasets" / "members_snapshot_plus_delta" / utc_day
     unit_path = unit_dir / "unit.json"
     if unit_path.is_file() is False:
         raise MembersDeltaError("ANCHOR_MISSING")
-    _require_unique_entity_ids(rows)
     unit = json.loads(unit_path.read_text(encoding="utf-8"))
     if not isinstance(unit, dict) or unit.get("layout") != LAYOUT_KIND:
         raise MembersDeltaError("UNIT_LAYOUT_INVALID")
     previous_id = str(unit["publications"][-1]["dataset_manifest_id"])
-    reconstructed = reconstruct_publication(data_root, unit, previous_id)
     previous_fp = str(unit["publications"][-1]["snapshot_fingerprint"])
-    delta = diff_member_snapshots(reconstructed, rows, include_unchanged=False)
-    current_fp = snapshot_fingerprint(rows)
-    delta_payload = {
-        "schema": DELTA_SCHEMA,
-        "schema_version": DELTA_SCHEMA_VERSION_V2,
-        "dataset_manifest_id": dataset_manifest_id,
-        "previous_dataset_manifest_id": previous_id,
-        "previous_fingerprint": previous_fp,
-        "current_fingerprint": current_fp,
-        "added": delta["added"],
-        "changed": delta["changed"],
-        "removed": delta["removed"],
-        "counts": {
-            "added": len(delta["added"]),
-            "changed": len(delta["changed"]),
-            "removed": len(delta["removed"]),
-            "previous_row_count": len(reconstructed),
-            "current_row_count": len(rows),
-        },
-    }
-    seq = int(unit["publications"][-1]["seq"]) + 1
-    rel = (
-        f"datasets/members_snapshot_plus_delta/{utc_day}/deltas/"
-        f"{seq:04d}-{dataset_manifest_id}/members.parquet"
-    )
-    path = data_root / rel
-    digest = persist_delta_payload(path, delta_payload)
-    applied = apply_member_delta(
-        reconstructed,
-        delta_payload,
-        previous_fingerprint=previous_fp,
-        verify_unchanged=False,
-        verify_base_hash=False,
-    )
-    if snapshot_fingerprint(applied) != current_fp:
-        raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
-    unit["publications"].append(
-        {
-            "seq": seq,
+    prev_spill, prev_conn = _reconstruct_to_sqlite(data_root, unit, previous_id)
+    owned_curr = member_conn is None
+    if owned_curr:
+        if rows is None:
+            raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+        curr_spill, curr_conn = _spill_member_sequence(rows)
+    else:
+        curr_spill = None
+        curr_conn = member_conn
+    replay_spill: Path | None = None
+    replay_conn: sqlite3.Connection | None = None
+    try:
+        observed_prev = _fingerprint_sqlite(prev_conn)
+        if observed_prev != previous_fp:
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        delta = _diff_sqlite_members(prev_conn, curr_conn)
+        current_fp = _fingerprint_sqlite(curr_conn)
+        current_count = int(curr_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+        previous_count = int(prev_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+        delta_payload = {
+            "schema": DELTA_SCHEMA,
+            "schema_version": DELTA_SCHEMA_VERSION_V2,
             "dataset_manifest_id": dataset_manifest_id,
-            "kind": "delta",
-            "rel": rel.replace("\\", "/"),
-            "sha256": digest,
-            "row_count": len(rows),
-            "snapshot_fingerprint": current_fp,
-            "delta_schema_version": DELTA_SCHEMA_VERSION_V2,
+            "previous_dataset_manifest_id": previous_id,
+            "previous_fingerprint": previous_fp,
+            "current_fingerprint": current_fp,
+            "added": delta["added"],
+            "changed": delta["changed"],
+            "removed": delta["removed"],
+            "counts": {
+                "added": len(delta["added"]),
+                "changed": len(delta["changed"]),
+                "removed": len(delta["removed"]),
+                "previous_row_count": previous_count,
+                "current_row_count": current_count,
+            },
         }
-    )
-    _write_unit(unit_path, unit)
-    _write_layout_sidecar(path, unit, dataset_manifest_id)
-    return unit
+        seq = int(unit["publications"][-1]["seq"]) + 1
+        rel = (
+            f"datasets/members_snapshot_plus_delta/{utc_day}/deltas/"
+            f"{seq:04d}-{dataset_manifest_id}/members.parquet"
+        )
+        path = data_root / rel
+        digest = persist_delta_payload(path, delta_payload)
+        replay_spill, replay_conn = _clone_members_db(prev_conn)
+        _apply_delta_sqlite(replay_conn, delta_payload)
+        if _fingerprint_sqlite(replay_conn) != current_fp:
+            raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+        unit["publications"].append(
+            {
+                "seq": seq,
+                "dataset_manifest_id": dataset_manifest_id,
+                "kind": "delta",
+                "rel": rel.replace("\\", "/"),
+                "sha256": digest,
+                "row_count": current_count,
+                "snapshot_fingerprint": current_fp,
+                "delta_schema_version": DELTA_SCHEMA_VERSION_V2,
+            }
+        )
+        _write_unit(unit_path, unit)
+        _write_layout_sidecar(path, unit, dataset_manifest_id)
+        return unit
+    finally:
+        prev_conn.close()
+        prev_spill.unlink(missing_ok=True)
+        if owned_curr:
+            curr_conn.close()
+            if curr_spill is not None:
+                curr_spill.unlink(missing_ok=True)
+        if replay_conn is not None:
+            replay_conn.close()
+        if replay_spill is not None:
+            replay_spill.unlink(missing_ok=True)
+
+
+def _diff_sqlite_members(
+    prev_conn: sqlite3.Connection,
+    curr_conn: sqlite3.Connection,
+) -> dict[str, list[Any]]:
+    curr_ids: set[str] = set()
+    added: list[dict[str, Any]] = []
+    changed: list[dict[str, Any]] = []
+    for entity_id, blob in curr_conn.execute("SELECT entity_id, payload FROM members"):
+        entity = str(entity_id)
+        curr_ids.add(entity)
+        curr_row = dict(pickle.loads(blob))
+        loaded = prev_conn.execute(
+            "SELECT payload FROM members WHERE entity_id=?", (entity,)
+        ).fetchone()
+        if loaded is None:
+            added.append(curr_row)
+            continue
+        prev_row = dict(pickle.loads(loaded[0]))
+        if row_fingerprint(curr_row) != row_fingerprint(prev_row):
+            changed.append(curr_row)
+    removed: list[dict[str, str]] = []
+    for entity_id, blob in prev_conn.execute("SELECT entity_id, payload FROM members"):
+        entity = str(entity_id)
+        if entity in curr_ids:
+            continue
+        removed.append(
+            {
+                "entity_id": entity,
+                "fingerprint": row_fingerprint(dict(pickle.loads(blob))),
+            }
+        )
+    return {"added": added, "changed": changed, "removed": removed}
+
+
+def _clone_members_db(conn: sqlite3.Connection) -> tuple[Path, sqlite3.Connection]:
+    spill, clone = _spill_members_db()
+    try:
+        batch: list[tuple[str, bytes]] = []
+        for entity_id, blob in conn.execute("SELECT entity_id, payload FROM members"):
+            batch.append((str(entity_id), blob))
+            if len(batch) >= _MEMBER_BATCH_SIZE:
+                clone.executemany(
+                    "INSERT INTO members(entity_id, payload) VALUES (?,?)", batch
+                )
+                batch = []
+        if batch:
+            clone.executemany(
+                "INSERT INTO members(entity_id, payload) VALUES (?,?)", batch
+            )
+        clone.commit()
+    except Exception:
+        clone.close()
+        spill.unlink(missing_ok=True)
+        raise
+    return spill, clone
 
 
 def _sha256_file_streaming(path: Path, *, chunk_size: int = 1024 * 1024) -> str:
@@ -273,7 +471,13 @@ def _spill_members_db() -> tuple[Path, sqlite3.Connection]:
     path = Path(name)
     conn = sqlite3.connect(str(path))
     conn.execute(
-        "CREATE TABLE members (entity_id TEXT PRIMARY KEY NOT NULL, payload BLOB NOT NULL)"
+        """
+        CREATE TABLE members (
+            seq INTEGER PRIMARY KEY AUTOINCREMENT,
+            entity_id TEXT NOT NULL UNIQUE,
+            payload BLOB NOT NULL
+        )
+        """
     )
     return path, conn
 
@@ -349,16 +553,13 @@ def _fingerprint_sqlite(conn: sqlite3.Connection) -> str:
     return digest.hexdigest()
 
 
-def iter_reconstructed_publication_batches(
+def _reconstruct_to_sqlite(
     data_root: Path,
     unit: Mapping[str, Any],
     dataset_manifest_id: str,
     *,
-    columns: Sequence[str] | None = None,
-    batch_size: int = _MEMBER_BATCH_SIZE,
     removed_out: list[dict[str, Any]] | None = None,
-) -> Iterator[list[dict[str, Any]]]:
-    """Replay SNAPSHOT_PLUS_DELTA into process-owned SQLite; yield bounded batches."""
+) -> tuple[Path, sqlite3.Connection]:
     publications = list(unit.get("publications") or [])
     if not publications:
         raise MembersDeltaError("ANCHOR_MISSING")
@@ -445,6 +646,27 @@ def iter_reconstructed_publication_batches(
                 previous_id = str(item.get("dataset_manifest_id") or "")
         if not reached:
             raise MembersDeltaError("PUBLICATION_NOT_IN_UNIT")
+        return spill, conn
+    except Exception:
+        conn.close()
+        spill.unlink(missing_ok=True)
+        raise
+
+
+def iter_reconstructed_publication_batches(
+    data_root: Path,
+    unit: Mapping[str, Any],
+    dataset_manifest_id: str,
+    *,
+    columns: Sequence[str] | None = None,
+    batch_size: int = _MEMBER_BATCH_SIZE,
+    removed_out: list[dict[str, Any]] | None = None,
+) -> Iterator[list[dict[str, Any]]]:
+    """Replay SNAPSHOT_PLUS_DELTA into process-owned SQLite; yield bounded batches."""
+    spill, conn = _reconstruct_to_sqlite(
+        data_root, unit, dataset_manifest_id, removed_out=removed_out
+    )
+    try:
         batch: list[dict[str, Any]] = []
         for (blob,) in conn.execute("SELECT payload FROM members ORDER BY entity_id"):
             row = pickle.loads(blob)
@@ -460,6 +682,13 @@ def iter_reconstructed_publication_batches(
     finally:
         conn.close()
         spill.unlink(missing_ok=True)
+
+
+def iter_spilled_member_rows(
+    conn: sqlite3.Connection,
+) -> Iterator[dict[str, Any]]:
+    for (blob,) in conn.execute("SELECT payload FROM members ORDER BY seq"):
+        yield dict(pickle.loads(blob))
 
 
 def reconstruct_publication(
@@ -577,8 +806,7 @@ def persist_delta_payload(path: Path, delta_payload: Mapping[str, Any]) -> str:
     table = pa.table({"delta_json": [encoded]})
     tmp = path.with_suffix(path.suffix + ".tmp")
     pq.write_table(table, tmp, compression="zstd", compression_level=3)
-    payload = tmp.read_bytes()
-    digest = hashlib.sha256(payload).hexdigest()
+    digest = _sha256_file_streaming(tmp)
     tmp.replace(path)
     return digest
 

@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 import sqlite3
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -20,6 +20,24 @@ from solana_alpha_lab.factory.observation_schedule import (
 
 LEASE_SECONDS = 120
 GLOBAL_LEASE_ID = "observation-scheduler"
+_STORE_READ_STATS = {
+    "due_in_states_calls": 0,
+    "due_in_states_rows": 0,
+    "list_candidates_calls": 0,
+    "list_candidates_rows": 0,
+    "get_candidate_calls": 0,
+    "iter_candidates_pages": 0,
+    "count_due_in_states_calls": 0,
+}
+
+
+def reset_store_read_stats() -> None:
+    for key in _STORE_READ_STATS:
+        _STORE_READ_STATS[key] = 0
+
+
+def store_read_stats() -> dict[str, int]:
+    return dict(_STORE_READ_STATS)
 _TERMINAL_DUE_STATES = frozenset(
     {
         "OBSERVED",
@@ -135,6 +153,12 @@ class ObservationScheduleStore:
                     schedule_sha256, activation_id, entity_id, point_id, primitive_id
                 )
             );
+            CREATE INDEX IF NOT EXISTS idx_due_observations_activation_state_due
+                ON due_observations(
+                    schedule_sha256, activation_id, state, due_at, deadline_at
+                );
+            CREATE INDEX IF NOT EXISTS idx_due_observations_activation_entity
+                ON due_observations(schedule_sha256, activation_id, entity_id);
             CREATE TABLE IF NOT EXISTS call_ledger (
                 request_sha256 TEXT NOT NULL,
                 call_occurrence_id TEXT NOT NULL PRIMARY KEY
@@ -961,6 +985,7 @@ class ObservationScheduleStore:
         if due_at_max is not None:
             extra = " AND due_at <= ?"
             params.append(render_utc(due_at_max))
+        _STORE_READ_STATS["due_in_states_calls"] += 1
         rows = self._conn.execute(
             f"""
             SELECT * FROM due_observations
@@ -974,7 +999,205 @@ class ObservationScheduleStore:
             payload = dict(row)
             payload["payload"] = json.loads(payload.pop("payload_json"))
             decoded.append(payload)
+        _STORE_READ_STATS["due_in_states_rows"] += len(decoded)
         return decoded
+
+    def _decode_payload_row(self, row: sqlite3.Row) -> dict[str, Any]:
+        payload = dict(row)
+        payload["payload"] = json.loads(payload.pop("payload_json"))
+        return payload
+
+    def count_due_in_states(
+        self,
+        states: Sequence[str],
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        due_at_max: datetime | None = None,
+        deadline_after: datetime | None = None,
+    ) -> int:
+        placeholders = ",".join("?" for _ in states)
+        params: list[Any] = list(states)
+        extra = " AND schedule_sha256 = ? AND activation_id = ?"
+        params.extend((schedule_sha256, activation_id))
+        if due_at_max is not None:
+            extra += " AND due_at <= ?"
+            params.append(render_utc(due_at_max))
+        if deadline_after is not None:
+            extra += " AND deadline_at > ?"
+            params.append(render_utc(deadline_after))
+        _STORE_READ_STATS["count_due_in_states_calls"] += 1
+        row = self._conn.execute(
+            f"""
+            SELECT COUNT(*) AS n FROM due_observations
+            WHERE state IN ({placeholders}){extra}
+            """,
+            params,
+        ).fetchone()
+        return int(row["n"] if row is not None else 0)
+
+    def iter_due_in_states(
+        self,
+        states: Sequence[str],
+        *,
+        schedule_sha256: str | None = None,
+        activation_id: str | None = None,
+        entity_id: str | None = None,
+        point_id: str | None = None,
+        primitive_ids: Sequence[str] | None = None,
+        due_at_max: datetime | None = None,
+        limit: int | None = None,
+        page_size: int = 256,
+    ) -> Iterator[dict[str, Any]]:
+        placeholders = ",".join("?" for _ in states)
+        params: list[Any] = list(states)
+        extra = ""
+        if schedule_sha256 is not None:
+            extra += " AND schedule_sha256 = ?"
+            params.append(schedule_sha256)
+        if activation_id is not None:
+            extra += " AND activation_id = ?"
+            params.append(activation_id)
+        if entity_id is not None:
+            extra += " AND entity_id = ?"
+            params.append(entity_id)
+        if point_id is not None:
+            extra += " AND point_id = ?"
+            params.append(point_id)
+        if primitive_ids is not None:
+            if not primitive_ids:
+                extra += " AND 0"
+            else:
+                extra += f" AND primitive_id IN ({','.join('?' for _ in primitive_ids)})"
+                params.extend(list(primitive_ids))
+        if due_at_max is not None:
+            extra += " AND due_at <= ?"
+            params.append(render_utc(due_at_max))
+        limiter = ""
+        if limit is not None:
+            extra += ""
+            limiter = " LIMIT ?"
+            params.append(int(limit))
+        cursor = self._conn.execute(
+            f"""
+            SELECT * FROM due_observations
+            WHERE state IN ({placeholders}){extra}
+            ORDER BY deadline_at ASC, due_at ASC, schedule_sha256 ASC, entity_id ASC, point_id ASC
+            {limiter}
+            """,
+            params,
+        )
+        yielded = 0
+        while True:
+            batch = cursor.fetchmany(max(1, int(page_size)))
+            if not batch:
+                break
+            for row in batch:
+                yield self._decode_payload_row(row)
+                yielded += 1
+                if limit is not None and yielded >= int(limit):
+                    return
+
+    def list_due_in_states_scoped(
+        self,
+        states: Sequence[str],
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        entity_id: str | None = None,
+        point_id: str | None = None,
+        primitive_ids: Sequence[str] | None = None,
+        due_at_max: datetime | None = None,
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
+        return list(
+            self.iter_due_in_states(
+                states,
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                entity_id=entity_id,
+                point_id=point_id,
+                primitive_ids=primitive_ids,
+                due_at_max=due_at_max,
+                limit=limit,
+            )
+        )
+
+    def due_states_for_entities(
+        self,
+        states: Sequence[str] | None = None,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        entity_ids: Sequence[str],
+    ) -> dict[str, list[str]]:
+        if not entity_ids:
+            return {}
+        placeholders = ",".join("?" for _ in entity_ids)
+        params: list[Any] = [schedule_sha256, activation_id, *list(entity_ids)]
+        extra = ""
+        if states:
+            extra = f" AND state IN ({','.join('?' for _ in states)})"
+            params.extend(list(states))
+        rows = self._conn.execute(
+            f"""
+            SELECT entity_id, state FROM due_observations
+            WHERE schedule_sha256 = ? AND activation_id = ?
+              AND entity_id IN ({placeholders}){extra}
+            """,
+            params,
+        ).fetchall()
+        out: dict[str, list[str]] = {}
+        for row in rows:
+            out.setdefault(str(row["entity_id"]), []).append(str(row["state"]))
+        return out
+
+    def get_candidate(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        entity_id: str,
+    ) -> dict[str, Any] | None:
+        _STORE_READ_STATS["get_candidate_calls"] += 1
+        row = self._conn.execute(
+            """
+            SELECT * FROM candidate_members
+            WHERE schedule_sha256 = ? AND activation_id = ? AND entity_id = ?
+            """,
+            (schedule_sha256, activation_id, entity_id),
+        ).fetchone()
+        if row is None:
+            return None
+        return self._decode_payload_row(row)
+
+    def iter_candidates(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        page_size: int = 256,
+    ) -> Iterator[dict[str, Any]]:
+        after = ""
+        size = max(1, int(page_size))
+        while True:
+            _STORE_READ_STATS["iter_candidates_pages"] += 1
+            rows = self._conn.execute(
+                """
+                SELECT * FROM candidate_members
+                WHERE schedule_sha256 = ? AND activation_id = ?
+                  AND entity_id > ?
+                ORDER BY entity_id ASC
+                LIMIT ?
+                """,
+                (schedule_sha256, activation_id, after, size),
+            ).fetchall()
+            if not rows:
+                return
+            for row in rows:
+                decoded = self._decode_payload_row(row)
+                after = str(decoded["entity_id"])
+                yield decoded
 
     def merge_due_payload(
         self,
@@ -1341,7 +1564,12 @@ class ObservationScheduleStore:
 
     def mark_recovery_gap(self, *, cutoff: datetime) -> int:
         self._require_write_lease(cutoff)
-        rows = self.due_in_states(("PENDING", "DUE", "CLAIMED"), due_at_max=cutoff)
+        rows = list(
+            self.iter_due_in_states(
+                ("PENDING", "DUE", "CLAIMED"),
+                due_at_max=cutoff,
+            )
+        )
         for payload in rows:
             new_state = (
                 "IN_FLIGHT_CALL_INDETERMINATE"
@@ -1863,6 +2091,7 @@ class ObservationScheduleStore:
         schedule_sha256: str,
         activation_id: str,
     ) -> list[dict[str, Any]]:
+        _STORE_READ_STATS["list_candidates_calls"] += 1
         rows = self._conn.execute(
             """
             SELECT * FROM candidate_members
@@ -1876,6 +2105,7 @@ class ObservationScheduleStore:
             payload = dict(row)
             payload["payload"] = json.loads(payload.pop("payload_json"))
             decoded.append(payload)
+        _STORE_READ_STATS["list_candidates_rows"] += len(decoded)
         return decoded
 
     def candidate_exists(

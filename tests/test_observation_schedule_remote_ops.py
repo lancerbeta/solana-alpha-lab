@@ -55,6 +55,9 @@ class ObservationScheduleRemoteOpsTests(unittest.TestCase):
         self.assertIn("tick --once", service)
         self.assertIn("OnUnitActiveSec=60s", timer)
         self.assertIn("Persistent=true", timer)
+        self.assertIn("MemoryHigh=768M", service)
+        self.assertIn("MemoryMax=1G", service)
+        self.assertNotIn("TimeoutStartSec=", service)
 
     def test_sqlite_backup_api_is_consistent(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

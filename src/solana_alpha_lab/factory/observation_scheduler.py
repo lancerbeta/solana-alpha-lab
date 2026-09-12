@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
@@ -514,13 +514,10 @@ def _apply_x_phase(
             reason,
             other_censored,
         )
-    candidates = store.list_candidates(
+    candidate = store.get_candidate(
         schedule_sha256=str(claim["schedule_sha256"]),
         activation_id=activation_id,
-    )
-    candidate = next(
-        (item for item in candidates if str(item["entity_id"]) == str(claim["entity_id"])),
-        None,
+        entity_id=str(claim["entity_id"]),
     )
     candidate_payload = dict(candidate.get("payload") or {}) if candidate else {}
     x_evidence = dict(candidate_payload.get("x_evidence") or {})
@@ -545,7 +542,7 @@ def _apply_x_phase(
     }
     observed_x_primitives = {
         str(item["primitive_id"])
-        for item in store.due_in_states(
+        for item in store.list_due_in_states_scoped(
             (
                 "OBSERVED",
                 "MISSING_TYPED",
@@ -555,13 +552,13 @@ def _apply_x_phase(
                 "IN_FLIGHT_CALL_INDETERMINATE",
                 "DEPENDENCY_MISSING",
                 "BLOCKED_BUDGET",
-            )
+            ),
+            schedule_sha256=str(claim["schedule_sha256"]),
+            activation_id=activation_id,
+            entity_id=str(claim["entity_id"]),
+            point_id=str(claim["point_id"]),
+            primitive_ids=tuple(x_primitive_ids),
         )
-        if str(item["schedule_sha256"]) == str(claim["schedule_sha256"])
-        and str(item["activation_id"]) == activation_id
-        and str(item["entity_id"]) == str(claim["entity_id"])
-        and str(item["point_id"]) == str(claim["point_id"])
-        and str(item["primitive_id"]) in x_primitive_ids
     }
     if terminal_state in x_terminal_states:
         observed_x_primitives.add(str(claim["primitive_id"]))
@@ -581,15 +578,14 @@ def _apply_x_phase(
             clock=now,
         )
         return terminal_state, missing_reason, reanchored_censored
-    x_rows = [
-        item
-        for item in store.due_in_states(tuple(x_terminal_states))
-        if str(item["schedule_sha256"]) == str(claim["schedule_sha256"])
-        and str(item["activation_id"]) == activation_id
-        and str(item["entity_id"]) == str(claim["entity_id"])
-        and str(item["point_id"]) == str(claim["point_id"])
-        and str(item["primitive_id"]) in x_primitive_ids
-    ]
+    x_rows = store.list_due_in_states_scoped(
+        tuple(x_terminal_states),
+        schedule_sha256=str(claim["schedule_sha256"]),
+        activation_id=activation_id,
+        entity_id=str(claim["entity_id"]),
+        point_id=str(claim["point_id"]),
+        primitive_ids=tuple(x_primitive_ids),
+    )
     if terminal_state != "OBSERVED" or any(
         str(item["state"]) != "OBSERVED" for item in x_rows
     ):
@@ -1169,13 +1165,12 @@ def tick_once(
             or (state == "DRAINING" and predecessor_before_cutover)
         )
         poll_enabled = bool(schedule.get("source_poll", {}).get("enabled", True))
-        matured_due_count = sum(
-            1
-            for item in store.due_in_states(("PENDING", "DUE", "CLAIMED"), due_at_max=now)
-            if str(item.get("schedule_sha256")) == digest
-            and str(item.get("activation_id")) == activation_id
-            and parse_utc(str(item["due_at"])) <= now
-            and parse_utc(str(item["deadline_at"])) > now
+        matured_due_count = store.count_due_in_states(
+            ("PENDING", "DUE", "CLAIMED"),
+            schedule_sha256=digest,
+            activation_id=activation_id,
+            due_at_max=now,
+            deadline_after=now,
         )
         # Fairness: continuous due load must not suppress /recent indefinitely.
         # Attempt the current poll slot first (reuse is free); then claim due work.
@@ -1251,14 +1246,16 @@ def tick_once(
                 accounts=accounts,
                 discovery_context=discovery_context,
             )
-        recovered = [
-            item
-            for item in store.due_in_states(("CLAIMED",), due_at_max=now)
-            if str(item["schedule_sha256"]) == digest
-            and str(item["activation_id"]) == activation_id
-        ]
-        claims = recovered + store.claim_due(
+        recovered = store.list_due_in_states_scoped(
+            ("CLAIMED",),
+            schedule_sha256=digest,
+            activation_id=activation_id,
+            due_at_max=now,
             limit=max_claims,
+        )
+        remaining = max(0, int(max_claims) - len(recovered))
+        claims = recovered + store.claim_due(
+            limit=remaining,
             now=now,
             owner=OWNER,
             schedule_sha256=digest,
@@ -2058,25 +2055,34 @@ def tick_once(
                         missing_reason="BLOCKED_BUDGET",
                     )
                 )
-        members = _member_snapshot(
-            store,
-            digest=digest,
-            activation_id=activation_id,
-            now=now,
-            registry=registry,
-        )
-        if members and published_rows:
-            publish_observation_batch(
-                data_root=data_root,
-                root=root,
-                schedule=schedule,
+        if published_rows:
+            member_iter = iter_member_snapshot(
+                store,
+                digest=digest,
                 activation_id=activation_id,
                 now=now,
-                producer_git_sha=producer_git_sha,
-                members=members,
-                observations=published_rows,
-                fault_after=fault_after,
+                registry=registry,
             )
+            try:
+                first_member = next(member_iter)
+            except StopIteration:
+                first_member = None
+            if first_member is not None:
+                def _members() -> Iterator[dict[str, Any]]:
+                    yield first_member
+                    yield from member_iter
+
+                publish_observation_batch(
+                    data_root=data_root,
+                    root=root,
+                    schedule=schedule,
+                    activation_id=activation_id,
+                    now=now,
+                    producer_git_sha=producer_git_sha,
+                    members=_members(),
+                    observations=published_rows,
+                    fault_after=fault_after,
+                )
         draining_completion = None
         if state == "DRAINING":
             admission_just_closed = (
@@ -2131,6 +2137,168 @@ def tick_once(
         store.release_lease(lease_token)
 
 
+_MEMBER_SNAPSHOT_BATCH = 256
+_MEMBER_DUE_STATES = (
+    "PENDING",
+    "DUE",
+    "CLAIMED",
+    "OBSERVED",
+    "MISSING_TYPED",
+    "DISAPPEARED",
+    "CENSORED",
+    "CENSORED_LATE",
+    "IN_FLIGHT_CALL_INDETERMINATE",
+    "DEPENDENCY_MISSING",
+    "X_POPULATION_INELIGIBLE",
+    "BLOCKED_BUDGET",
+)
+_MEMBERSHIP_STATE_MAP = {
+    "CANDIDATE": "DISCOVERED",
+    "NOT_SELECTED_PREDICATE": "PREDICATE_REJECTED",
+    "NOT_SELECTED_HASH_SAMPLE": "PREDICATE_REJECTED",
+    "NOT_SELECTED_CAPACITY": "CAPACITY_EXCLUDED",
+    "ADMITTED": "ADMITTED",
+    "SAMPLED_MEMBER": "SAMPLED_MEMBER",
+    "ANCHOR_UNKNOWN": "PREDICATE_REJECTED",
+    "X_POPULATION_INELIGIBLE": "X_POPULATION_INELIGIBLE",
+}
+
+
+def _membership_state_from_due_states(
+    candidate_state: str,
+    payload: Mapping[str, Any],
+    due_states: Sequence[str],
+) -> str:
+    membership_state = _MEMBERSHIP_STATE_MAP.get(str(candidate_state), str(candidate_state))
+    if membership_state == "X_POPULATION_INELIGIBLE" or str(
+        payload.get("x_eligibility_state") or ""
+    ) == "X_POPULATION_INELIGIBLE":
+        return "X_POPULATION_INELIGIBLE"
+    if any(state == "DISAPPEARED" for state in due_states):
+        return "DISAPPEARED"
+    if any(state == "MISSING_TYPED" for state in due_states):
+        return "MISSING_TYPED"
+    if any(state == "CENSORED_LATE" for state in due_states):
+        return "CENSORED_LATE"
+    if any(state == "CENSORED" for state in due_states):
+        return "CENSORED"
+    if any(
+        state in {"IN_FLIGHT_CALL_INDETERMINATE", "DEPENDENCY_MISSING"}
+        for state in due_states
+    ):
+        return "MISSING_TYPED"
+    if any(state in {"PENDING", "DUE", "CLAIMED"} for state in due_states):
+        return "SCHEDULED"
+    if any(state == "OBSERVED" for state in due_states):
+        return "OBSERVED"
+    return membership_state
+
+
+def _project_member_row(
+    *,
+    digest: str,
+    activation_id: str,
+    candidate: Mapping[str, Any],
+    due_states: Sequence[str],
+    now: datetime,
+    registry: ObservationPrimitiveRegistry | None,
+) -> dict[str, Any]:
+    payload = candidate.get("payload") or {}
+    return {
+        "schedule_sha256": digest,
+        "activation_id": activation_id,
+        "entity_id": str(candidate["entity_id"]),
+        "membership_state": _membership_state_from_due_states(
+            str(candidate["state"]),
+            payload,
+            due_states,
+        ),
+        "candidate_state": candidate["state"],
+        "authoritative_anchor": payload.get("authoritative_anchor")
+        or payload.get("anchor_event_time"),
+        "provisional_due": bool(
+            payload.get("provisional_due") or payload.get("provisional_schedule_anchor")
+        ),
+        "inclusion_probability": payload.get("inclusion_probability"),
+        "sampling_seed": payload.get("sampling_seed"),
+        "event_time": payload.get("authoritative_anchor")
+        or payload.get("anchor_event_time"),
+        "first_reliable_available_at": payload.get("discovery_available_at"),
+        "field_values": _typed_member_values(
+            payload,
+            now,
+            registry=registry,
+        ),
+    }
+
+
+def iter_member_snapshot(
+    store: ObservationScheduleStore,
+    *,
+    digest: str,
+    activation_id: str,
+    now: datetime,
+    registry: ObservationPrimitiveRegistry | None = None,
+    batch_size: int = _MEMBER_SNAPSHOT_BATCH,
+) -> Iterator[dict[str, Any]]:
+    page: list[Mapping[str, Any]] = []
+    page_limit = max(1, int(batch_size))
+    for candidate in store.iter_candidates(
+        schedule_sha256=digest,
+        activation_id=activation_id,
+        page_size=page_limit,
+    ):
+        page.append(candidate)
+        if len(page) >= page_limit:
+            yield from _project_member_page(
+                store=store,
+                digest=digest,
+                activation_id=activation_id,
+                page=page,
+                now=now,
+                registry=registry,
+            )
+            page = []
+    if page:
+        yield from _project_member_page(
+            store=store,
+            digest=digest,
+            activation_id=activation_id,
+            page=page,
+            now=now,
+            registry=registry,
+        )
+
+
+def _project_member_page(
+    *,
+    store: ObservationScheduleStore,
+    digest: str,
+    activation_id: str,
+    page: Sequence[Mapping[str, Any]],
+    now: datetime,
+    registry: ObservationPrimitiveRegistry | None,
+) -> list[dict[str, Any]]:
+    entity_ids = [str(item["entity_id"]) for item in page]
+    due_by_entity = store.due_states_for_entities(
+        _MEMBER_DUE_STATES,
+        schedule_sha256=digest,
+        activation_id=activation_id,
+        entity_ids=entity_ids,
+    )
+    return [
+        _project_member_row(
+            digest=digest,
+            activation_id=activation_id,
+            candidate=candidate,
+            due_states=due_by_entity.get(str(candidate["entity_id"]), ()),
+            now=now,
+            registry=registry,
+        )
+        for candidate in page
+    ]
+
+
 def _member_snapshot(
     store: ObservationScheduleStore,
     *,
@@ -2139,90 +2307,15 @@ def _member_snapshot(
     now: datetime,
     registry: ObservationPrimitiveRegistry | None = None,
 ) -> list[dict[str, Any]]:
-    members: list[dict[str, Any]] = []
-    dues = store.due_in_states(
-        (
-            "PENDING",
-            "DUE",
-            "CLAIMED",
-            "OBSERVED",
-            "MISSING_TYPED",
-            "DISAPPEARED",
-            "CENSORED",
-            "CENSORED_LATE",
-            "IN_FLIGHT_CALL_INDETERMINATE",
-            "DEPENDENCY_MISSING",
-            "X_POPULATION_INELIGIBLE",
-            "BLOCKED_BUDGET",
+    return list(
+        iter_member_snapshot(
+            store,
+            digest=digest,
+            activation_id=activation_id,
+            now=now,
+            registry=registry,
         )
     )
-    due_by_entity: dict[str, list[dict[str, Any]]] = {}
-    for row in dues:
-        if row["schedule_sha256"] == digest and row["activation_id"] == activation_id:
-            due_by_entity.setdefault(str(row["entity_id"]), []).append(row)
-    for candidate in store.list_candidates(schedule_sha256=digest, activation_id=activation_id):
-        entity_id = str(candidate["entity_id"])
-        payload = candidate.get("payload") or {}
-        points = due_by_entity.get(entity_id) or []
-        membership_state = str(candidate["state"])
-        state_map = {
-            "CANDIDATE": "DISCOVERED",
-            "NOT_SELECTED_PREDICATE": "PREDICATE_REJECTED",
-            "NOT_SELECTED_HASH_SAMPLE": "PREDICATE_REJECTED",
-            "NOT_SELECTED_CAPACITY": "CAPACITY_EXCLUDED",
-            "ADMITTED": "ADMITTED",
-            "SAMPLED_MEMBER": "SAMPLED_MEMBER",
-            "ANCHOR_UNKNOWN": "PREDICATE_REJECTED",
-            "X_POPULATION_INELIGIBLE": "X_POPULATION_INELIGIBLE",
-        }
-        membership_state = state_map.get(membership_state, membership_state)
-        if membership_state == "X_POPULATION_INELIGIBLE" or str(
-            payload.get("x_eligibility_state") or ""
-        ) == "X_POPULATION_INELIGIBLE":
-            membership_state = "X_POPULATION_INELIGIBLE"
-        elif any(item["state"] == "DISAPPEARED" for item in points):
-            membership_state = "DISAPPEARED"
-        elif any(item["state"] == "MISSING_TYPED" for item in points):
-            membership_state = "MISSING_TYPED"
-        elif any(item["state"] == "CENSORED_LATE" for item in points):
-            membership_state = "CENSORED_LATE"
-        elif any(item["state"] == "CENSORED" for item in points):
-            membership_state = "CENSORED"
-        elif any(
-            item["state"] in {"IN_FLIGHT_CALL_INDETERMINATE", "DEPENDENCY_MISSING"}
-            for item in points
-        ):
-            membership_state = "MISSING_TYPED"
-        elif any(item["state"] in {"PENDING", "DUE", "CLAIMED"} for item in points):
-            membership_state = "SCHEDULED"
-        elif any(item["state"] == "OBSERVED" for item in points):
-            membership_state = "OBSERVED"
-        members.append(
-            {
-                "schedule_sha256": digest,
-                "activation_id": activation_id,
-                "entity_id": entity_id,
-                "membership_state": membership_state,
-                "candidate_state": candidate["state"],
-                "authoritative_anchor": payload.get("authoritative_anchor")
-                or payload.get("anchor_event_time"),
-                "provisional_due": bool(
-                    payload.get("provisional_due")
-                    or payload.get("provisional_schedule_anchor")
-                ),
-                "inclusion_probability": payload.get("inclusion_probability"),
-                "sampling_seed": payload.get("sampling_seed"),
-                "event_time": payload.get("authoritative_anchor")
-                or payload.get("anchor_event_time"),
-                "first_reliable_available_at": payload.get("discovery_available_at"),
-                "field_values": _typed_member_values(
-                    payload,
-                    now,
-                    registry=registry,
-                ),
-            }
-        )
-    return members
 
 
 @lru_cache(maxsize=4)
@@ -2538,15 +2631,15 @@ def _propagate_buy_out(
     now: datetime,
 ) -> None:
     digest = str(schedule["schedule_sha256"])
-    pending = store.due_in_states(("PENDING", "DUE", "CLAIMED"))
+    pending = store.list_due_in_states_scoped(
+        ("PENDING", "DUE", "CLAIMED"),
+        schedule_sha256=digest,
+        activation_id=activation_id,
+        entity_id=entity_id,
+        primitive_ids=(reverse_primitive_id,),
+    )
     for row in pending:
-        if (
-            row["schedule_sha256"] == digest
-            and row["activation_id"] == activation_id
-            and row["entity_id"] == entity_id
-            and row["primitive_id"] == reverse_primitive_id
-        ):
-            store.merge_due_payload(row, {"buy_out_amount": buy_out_amount}, clock=now)
+        store.merge_due_payload(row, {"buy_out_amount": buy_out_amount}, clock=now)
 
 
 def _discovery_admission_clock(discovery_context: Mapping[str, Any]) -> str | None:

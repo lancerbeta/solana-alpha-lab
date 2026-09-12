@@ -509,36 +509,41 @@ def materialize_pending_observation_snapshots(
     )
 
     outcomes: list[dict[str, Any]] = []
+    pending_bindings = [
+        pending
+        for pending in load_pending_observation_bindings(data_root)
+        if pending.get("state") == "WAITING_FOR_PANEL"
+        and str(pending.get("covering_schedule_sha256") or "") == schedule_sha256
+    ]
+    if not pending_bindings:
+        return outcomes
     coverage = load_coverage_from_rdp(data_root)
-    due_rows = store.due_in_states(
-        tuple(
-            {
-                "OBSERVED",
-                "MISSING_TYPED",
-                "DISAPPEARED",
-                "CENSORED",
-                "CENSORED_LATE",
-                "X_POPULATION_INELIGIBLE",
-                "DEPENDENCY_MISSING",
-                "PENDING",
-                "DUE",
-                "CLAIMED",
-                "IN_FLIGHT_CALL_INDETERMINATE",
-                "BLOCKED_BUDGET",
-            }
-        )
+    due_states = (
+        "OBSERVED",
+        "MISSING_TYPED",
+        "DISAPPEARED",
+        "CENSORED",
+        "CENSORED_LATE",
+        "X_POPULATION_INELIGIBLE",
+        "DEPENDENCY_MISSING",
+        "PENDING",
+        "DUE",
+        "CLAIMED",
+        "IN_FLIGHT_CALL_INDETERMINATE",
+        "BLOCKED_BUDGET",
+    )
+    due_rows = store.list_due_in_states_scoped(
+        due_states,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
     )
     publication_complete = not has_open_publication_jobs(
         data_root=data_root,
         schedule_sha256=schedule_sha256,
         activation_id=activation_id,
     )
-    for pending in load_pending_observation_bindings(data_root):
-        if pending.get("state") != "WAITING_FOR_PANEL":
-            continue
-        covering = str(pending.get("covering_schedule_sha256") or "")
-        if covering != schedule_sha256:
-            continue
+    for pending in pending_bindings:
+        covering = schedule_sha256
         required = required_point_ids(pending)
         proving_snapshot = None
         for item in coverage.snapshots.values():
@@ -1219,14 +1224,12 @@ def complete_draining_schedule(
             "schedule_sha256": schedule_sha256,
             "state": "DRAINING",
         }
-    open_states = {"PENDING", "DUE", "CLAIMED"}
-    unresolved_states = {"IN_FLIGHT_CALL_INDETERMINATE", "BLOCKED_BUDGET"}
-    due_rows = store.due_in_states(tuple(open_states | unresolved_states))
-    if any(
-        str(row["schedule_sha256"]) == schedule_sha256
-        and str(row["activation_id"]) == activation_id
-        and str(row["state"]) in open_states | unresolved_states
-        for row in due_rows
+    open_states = ("PENDING", "DUE", "CLAIMED")
+    unresolved_states = ("IN_FLIGHT_CALL_INDETERMINATE", "BLOCKED_BUDGET")
+    if store.count_due_in_states(
+        open_states + unresolved_states,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
     ):
         return {
             "terminal": "DRAINING_PENDING",
