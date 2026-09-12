@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-ROUTINE-PUBLICATION-WALLCLOCK-COMPLETION-001",
+  "as_of": "2026-09-12",
+  "task_id": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1",
+  "state_change": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_READY_FOR_OWNER_MERGE_GATE",
+  "base_main": "90c1c181d4461b7c81e7a79f6e1eb2cd4b1619f0",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING_BIND",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_ROUTINE_PUBLICATION_WALLCLOCK",
+    "independent_review": {
+      "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING_BIND",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_WALLCLOCK_UNIT",
+      "PASS_ECONOMY_DELTA",
+      "PASS_MEMORY_FAT_OPEN_COLLECTOR_42",
+      "PASS_CANDIDATE_ENVELOPE_4_11X",
+      "PASS_ISOLATED_ARCHITECTURE_CODE_GOAL_DOD"
+    ]
+  },
+  "non_claims": [
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_SCIENTIFIC_TRUTH_FROM_OPERATIONAL_CACHE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}
