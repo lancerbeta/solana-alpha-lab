@@ -20,8 +20,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "FACTORY-COLLECTOR-MEMORY-BOUNDED-TICK-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "23918bb9a699f95c377aefb239d6af9eac6f3e7c68a4af728e54f8ddafe59a11",
-  "reviewed_inventory_sha256": "fef140be4b7b462b73359160dbb16be7db573e8d2ca49cb2fbcef4e457bcb5d9",
+  "reviewed_bindings_sha256": "57ccd223c4550afbbb812daa0960b1003c9fc840837d4370ff622cfbbd4733e8",
+  "reviewed_inventory_sha256": "768016e754e684b23e1c0e015a7057477d0b08cea56c5d44eaea95b31e4112e0",
   "reviews": [
     {
       "findings": [
