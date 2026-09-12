@@ -33,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/legacy_fat_open_bounded_artifacts_resume/a1_delivery_factory_fit_v1.json",
-    "sha256": "debc6c41b0df187eb8e12390e31e09064f682ffd7df0105a58ab5137a423c257",
+    "sha256": "71ce2953d624e187c58f722f339396c19578f33e1a6d6532469b183b30bf339a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME",
     "independent_review": {
       "path": "docs/evidence/legacy_fat_open_bounded_artifacts_resume/a1_delivery_independent_review_v1.json",
-      "sha256": "9081b34b4f347a93cc1c961ea7c878e45857cf6b0e804a9b19742586f44b6a7f",
+      "sha256": "82da4b925644b26306542195a96ab1a0ae857da8bbf614934416696617000b5f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

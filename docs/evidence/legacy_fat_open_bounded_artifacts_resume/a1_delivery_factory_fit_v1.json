@@ -5,7 +5,7 @@
   "as_of": "2026-09-12",
   "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
   "reviewed_bindings_sha256": "d8ec1becec390775123d4202368353f35cd5ed6ff7087fe19fd8ce6c4f32d238",
-  "reviewed_inventory_sha256": "426e2cc5525407c3e203694bb5dd2a22c79157cec1fd14c7d415bfd63d1aa359",
+  "reviewed_inventory_sha256": "591e32054c6f54534b3c7610a76c3e4576a04560bb59116eb13c36e23e4bf1aa",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
