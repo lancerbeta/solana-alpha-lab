@@ -39,9 +39,32 @@ _PUBLICATION_STAGE_STATS = {
 }
 
 # Non-canonical, rebuildable tail cache. Never a scientific truth owner.
+# Final names and every owned temporary replacement form live here so the
+# archive boundary and pruning can share one deterministic predicate.
 _OPERATIONAL_LATEST_DB = ".operational_latest_members.sqlite"
 _OPERATIONAL_LATEST_META = ".operational_latest_members.meta.json"
 _OPERATIONAL_LATEST_SCHEMA = "smial.members-operational-latest-v1"
+# _store_operational_latest() temporary forms inside the unit dir:
+#   mkstemp(prefix="operational-latest-", suffix=".sqlite")  -> crash leftover DB
+#   f".operational_latest_members.meta.{os.getpid()}.tmp"    -> crash leftover meta
+_OPERATIONAL_CACHE_TMP_DB_PREFIX = "operational-latest-"
+_OPERATIONAL_CACHE_TMP_META_PREFIX = ".operational_latest_members.meta."
+
+
+def is_operational_cache_name(name: str) -> bool:
+    """Deterministic boundary for every owned operational-cache file form.
+
+    Matches final cache files AND temporary replacement files. Canonical
+    scientific names cannot collide: every matched form either starts with a
+    dot-prefixed owner namespace or the exact tmp prefix ``operational-latest-``
+    reserved by mkstemp in this module.
+    """
+
+    if name in (_OPERATIONAL_LATEST_DB, _OPERATIONAL_LATEST_META):
+        return True
+    return name.startswith(_OPERATIONAL_CACHE_TMP_DB_PREFIX) or name.startswith(
+        _OPERATIONAL_CACHE_TMP_META_PREFIX
+    )
 
 
 class MembersDeltaError(ValueError):

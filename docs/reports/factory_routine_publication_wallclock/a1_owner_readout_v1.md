@@ -11,8 +11,12 @@ verified on the full production-shaped post-provider path.
 - **Full post-provider path** (`publish_observation_batch` with a small
   realistic observation batch on an open day: member spill, canonical content
   hashing, SNAPSHOT_PLUS_DELTA append, artifact hash verification, manifests,
-  RDP events, marker, receipt finalization): **5.818s** measured wall
-  (target ≤45s PASS; fence 60s not approached), **peak RSS 208.4 MiB**
+  RDP events, marker, receipt finalization): **5.818s** measured wall. The
+  timer brackets exactly the `publish_observation_batch` call (member
+  projection/iteration of the 205,847-row input happens before the timer
+  starts), so the precise claim name is **publish_observation_batch wall**,
+  not the entire post-provider wall. Target **≤45s PASS** (fence 60s not
+  approached; commissioning target unchanged), **peak RSS 208.4 MiB**
   (target ≤512 MiB PASS; fence 768 MiB), **provider calls = 0**
 - Full-population passes in the measured publish: **1** (canonical census hash
   over the spilled 205,847 members); operational cache hit = 1, misses = 0
@@ -32,17 +36,20 @@ verified on the full production-shaped post-provider path.
 
 ## Archive boundary (review closure 1)
 
-Operational latest cache files (`datasets/members_snapshot_plus_delta/<utc_day>/
-.operational_latest_members.*`) are excluded from
-`list_closed_day_relative_paths()`: cache bytes NEVER enter closed-day
-scientific inventory/archive. Regression test proves identical archive
-inventory with cache present/absent/stale/corrupt, and reconstruction stays
-exact in all four states. Retention is bounded by
-`prune_stale_operational_caches()` (run at closed-day durability loop): only
+ Operational latest cache files (`datasets/members_snapshot_plus_delta/<utc_day>/
+.operational_latest_members.*`) — and every owned temporary replacement form
+(`operational-latest-*.sqlite` mkstemp files, `.operational_latest_members.meta.<pid>.tmp`)
+— are excluded from `list_closed_day_relative_paths()` by one deterministic
+predicate (`is_operational_cache_name`): cache bytes NEVER enter closed-day
+scientific inventory/archive, including SIGTERM/crash leftovers during
+`_store_operational_latest()`. Regression test proves identical archive
+`inventory_sha256` with cache present/absent/stale/corrupt AND with crash-leftover
+tmp fixtures, and reconstruction stays exact in all states. Retention is bounded
+by `prune_stale_operational_caches()` (run at closed-day durability loop): only
 verified days within the 1-closed-day retention window keep a cache; the open
-day always keeps its working cache; older days are pruned, so day-over-day
-retention cannot grow unbounded. Canonical unit/delta archive content is not
-weakened.
+day always keeps its working cache while crash-leftover tmp files are pruned
+even on the open day; older days are pruned fully, so day-over-day retention
+cannot grow unbounded. Canonical unit/delta archive content is not weakened.
 
 ## Non-claims
 

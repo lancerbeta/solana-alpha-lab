@@ -662,6 +662,101 @@ class RoutinePublicationWallclockV1Tests(unittest.TestCase):
             self.assertEqual(report2["pruned"], [])
             self.assertTrue((today_dir / _OPERATIONAL_LATEST_DB).is_file())
 
+    def test_crash_leftover_tmp_files_never_enter_archive_inventory(self) -> None:
+        """SIGTERM-during-_store_operational_latest leftovers stay out of inventory.
+
+        Deterministic boundary: final cache AND every owned temporary form
+        (mkstemp sqlite, meta pid tmp) are excluded, so a crash leftover cannot
+        change inventory_sha256. Canonical names cannot collide with the rule.
+        """
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_root = root / "rdp"
+            data_root.mkdir()
+            write_snapshot_unit(
+                data_root,
+                utc_day="20260912",
+                dataset_manifest_id="dataset-anchor",
+                rows=[_member(i) for i in range(30)],
+            )
+            append_delta_publication(
+                data_root,
+                utc_day="20260912",
+                dataset_manifest_id="dataset-d1",
+                rows=[_member(i, tag="B" if i == 1 else "A") for i in range(30)],
+            )
+            baseline = list_closed_day_relative_paths(data_root, "20260912")
+            from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+
+            baseline_inventory = canonical_sha256(
+                [{"path": rel} for rel in baseline]
+            )
+
+            unit_dir = data_root / "datasets/members_snapshot_plus_delta/20260912"
+            # Crash leftovers exactly as produced by _store_operational_latest:
+            leftovers = [
+                unit_dir / "operational-latest-ab12cd34.sqlite",
+                unit_dir / "operational-latest-ef567890.sqlite",
+                unit_dir / f".operational_latest_members.meta.{999999}.tmp",
+            ]
+            for p in leftovers:
+                p.write_bytes(b"torn-write" * 64)
+            with_crash = list_closed_day_relative_paths(data_root, "20260912")
+            self.assertEqual(with_crash, baseline)
+            packed = package_closed_day_archive(
+                data_root,
+                utc_day="20260912",
+                relative_paths=with_crash,
+                dest_dir=root / "a-crash",
+            )
+            from solana_alpha_lab.factory.hot90_archive import (
+                list_closed_day_relative_paths as _l,
+            )
+
+            self.assertEqual(
+                packed["inventory_sha256"],
+                package_closed_day_archive(
+                    data_root,
+                    utc_day="20260912",
+                    relative_paths=baseline,
+                    dest_dir=root / "a-clean",
+                )["inventory_sha256"],
+            )
+            # Crash leftovers cannot accumulate unboundedly: prune removes tmp
+            # forms even for the open/current day, keeping the working cache.
+            from solana_alpha_lab.factory.hot90_closed_day_loop import (
+                prune_stale_operational_caches as prune,
+            )
+
+            loop_root = root / "loop"
+            rdp = loop_root / "local/factory_v1/observation_rdp"
+            today_dir = rdp / "datasets/members_snapshot_plus_delta/20260912"
+            today_dir.mkdir(parents=True)
+            (today_dir / _OPERATIONAL_LATEST_DB).write_bytes(b"w" * 16)
+            (today_dir / _OPERATIONAL_LATEST_META).write_text("{}", encoding="utf-8")
+            (today_dir / "operational-latest-ffff0000.sqlite").write_bytes(b"x" * 16)
+            (today_dir / ".operational_latest_members.meta.424242.tmp").write_bytes(
+                b"y" * 16
+            )
+            report = prune(loop_root, today="20260912")
+            self.assertEqual(report["pruned"], ["20260912"])
+            self.assertTrue((today_dir / _OPERATIONAL_LATEST_DB).is_file())
+            self.assertTrue((today_dir / _OPERATIONAL_LATEST_META).is_file())
+            self.assertFalse((today_dir / "operational-latest-ffff0000.sqlite").is_file())
+            self.assertFalse(
+                (today_dir / ".operational_latest_members.meta.424242.tmp").is_file()
+            )
+            print(
+                json.dumps(
+                    {
+                        "schema": "smial.factory-routine-publication-wallclock-crash-leftover-boundary",
+                        "contract": "crash leftovers change neither inventory_sha256 nor archive bytes; pruned deterministically",
+                    },
+                    sort_keys=True,
+                )
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -71,6 +71,7 @@ def prune_stale_operational_caches(root: Path, *, today: str) -> dict[str, objec
     from solana_alpha_lab.factory.members_snapshot_delta import (
         _OPERATIONAL_LATEST_DB,
         _OPERATIONAL_LATEST_META,
+        is_operational_cache_name,
     )
 
     rdp = root / RDP_RELATIVE
@@ -91,21 +92,38 @@ def prune_stale_operational_caches(root: Path, *, today: str) -> dict[str, objec
         if day is None or day_dir.is_dir() is False:
             continue
         if day >= today:
-            # Open/current day may always keep its working cache.
+            # Open/current day may always keep its working cache, but a crash
+            # leftover temporary file is never a working cache; prune it now.
+            leftovers = [
+                p for p in day_dir.iterdir() if p.is_file() and is_operational_cache_name(p.name)
+            ]
+            stale = [
+                p
+                for p in leftovers
+                if p.name not in (_OPERATIONAL_LATEST_DB, _OPERATIONAL_LATEST_META)
+            ]
+            if stale:
+                for p in stale:
+                    try:
+                        p.unlink(missing_ok=True)
+                    except OSError:
+                        continue
+                pruned.append(day)
             continue
         if day in keep:
             continue
-        db_path = day_dir / _OPERATIONAL_LATEST_DB
-        meta_path = day_dir / _OPERATIONAL_LATEST_META
-        if db_path.is_file() is False and meta_path.is_file() is False:
-            continue
-        try:
-            db_path.unlink(missing_ok=True)
-            meta_path.unlink(missing_ok=True)
-        except OSError:
-            continue
-        pruned.append(day)
-    return {"pruned": sorted(pruned), "kept_days": sorted(keep)}
+        removed = False
+        for p in list(day_dir.iterdir()):
+            if p.is_file() is False or is_operational_cache_name(p.name) is False:
+                continue
+            try:
+                p.unlink(missing_ok=True)
+                removed = True
+            except OSError:
+                continue
+        if removed:
+            pruned.append(day)
+    return {"pruned": sorted(set(pruned)), "kept_days": sorted(keep)}
 
 
 def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
