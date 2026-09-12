@@ -34,6 +34,7 @@ managed_write_set:
 - tests/test_observation_schedule_remote_ops.py
 - tests/test_observation_schedule_commissioning.py
 - tests/test_live_cohort_memory_bounded_publication_v1.py
+- tests/test_factory_97d_storage_architecture_proof_v1.py
 - docs/evidence/factory_collector_memory_bounded_tick/a1_delivery_completion_evidence_v1.json
 - docs/evidence/factory_collector_memory_bounded_tick/a1_delivery_independent_review_v1.json
 - docs/evidence/factory_collector_memory_bounded_tick/a1_delivery_factory_fit_v1.json

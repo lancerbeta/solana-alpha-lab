@@ -35219,7 +35219,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_97d_storage_architecture_proof_v1.py', repository_path: tests/test_factory_97d_storage_architecture_proof_v1.py}
-  integrity: {kind: sha256, sha256: 383f432dd1796418917e3747c628a194bf85662a012ed2bc2a39a5baa59e068e}
+  integrity: {kind: sha256, sha256: a8b4ffa11af6385d5bffda1de62abe7a6480874a3ff1e2452384d8819494e1c9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}
