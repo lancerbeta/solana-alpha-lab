@@ -1250,8 +1250,12 @@ def tick_once(
         # Recovered CLAIMED stay uncapped vs max_claims. Page the ops ledger so
         # ordinary ticks never materialize the whole CLAIMED set at once; SEARCH
         # rows stay grouped in memory (small), quote work reloads by primary key.
+        # Quote order matches pre-paging semantics: recovered then newly claimed,
+        # then one stable sell-rank sort so all buys precede all sells.
         search_by_due: dict[str, list[Mapping[str, Any]]] = {}
-        quote_order: list[tuple[int, tuple[str, str, str, str, str]]] = []
+        quote_order: list[
+            tuple[int, str, tuple[str, str, str, str, str] | Mapping[str, Any]]
+        ] = []
         for page in store.iter_due_in_states_pages(
             ("CLAIMED",),
             schedule_sha256=digest,
@@ -1268,6 +1272,7 @@ def tick_once(
                             1
                             if str(item["primitive_id"]) in SELL_PRIMITIVES
                             else 0,
+                            "key",
                             (
                                 str(item["schedule_sha256"]),
                                 str(item["activation_id"]),
@@ -1284,12 +1289,17 @@ def tick_once(
             schedule_sha256=digest,
             activation_id=activation_id,
         )
-        new_quotes: list[Mapping[str, Any]] = []
         for item in new_claims:
             if str(item["primitive_id"]) == SEARCH:
                 search_by_due.setdefault(str(item["due_at"]), []).append(item)
             else:
-                new_quotes.append(item)
+                quote_order.append(
+                    (
+                        1 if str(item["primitive_id"]) in SELL_PRIMITIVES else 0,
+                        "row",
+                        item,
+                    )
+                )
         holder = redact_with
         batch_size = int(registry.require_primitive(SEARCH).get("max_batch_size") or 1)
         for due_at in sorted(search_by_due):
@@ -1631,16 +1641,29 @@ def tick_once(
                     for item in censored_points
                 )
         quote_order.sort(key=lambda item: item[0])
-        new_quotes.sort(
-            key=lambda item: 1 if str(item["primitive_id"]) in SELL_PRIMITIVES else 0
-        )
 
         def _iter_quote_claims() -> Iterator[Mapping[str, Any]]:
             page = RECOVERED_CLAIMED_PAGE_SIZE
-            for index in range(0, len(quote_order), page):
-                keys = [item[1] for item in quote_order[index : index + page]]
-                yield from store.get_due_rows_by_keys(keys)
-            yield from new_quotes
+            pending_keys: list[tuple[str, str, str, str, str]] = []
+
+            def _flush_keys() -> Iterator[Mapping[str, Any]]:
+                nonlocal pending_keys
+                if pending_keys:
+                    keys = pending_keys
+                    pending_keys = []
+                    yield from store.get_due_rows_by_keys(keys)
+
+            for _sell_rank, kind, payload in quote_order:
+                if kind == "key":
+                    assert isinstance(payload, tuple)
+                    pending_keys.append(payload)
+                    if len(pending_keys) >= page:
+                        yield from _flush_keys()
+                else:
+                    yield from _flush_keys()
+                    assert isinstance(payload, Mapping)
+                    yield payload
+            yield from _flush_keys()
 
         for claim in _iter_quote_claims():
             current_due = store.get_due(claim)
@@ -2148,9 +2171,7 @@ def tick_once(
             producer_git_sha=producer_git_sha,
         )
         claims_count = (
-            sum(len(group) for group in search_by_due.values())
-            + len(quote_order)
-            + len(new_quotes)
+            sum(len(group) for group in search_by_due.values()) + len(quote_order)
         )
         store.record_event(
             "TICK",

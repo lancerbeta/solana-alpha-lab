@@ -722,6 +722,8 @@ def load_job_by_content(data_root: Path, content: str) -> dict[str, Any] | None:
     ):
         if not path.is_file():
             continue
+        if OPEN_DIRNAME in Path(path).parts:
+            return load_open_job_for_routine_path(path)
         loaded = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(loaded, dict):
             raise PublicationJobError("PUBLICATION_JOB_INVALID")

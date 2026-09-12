@@ -1141,11 +1141,14 @@ def has_open_publication_jobs(
                 ):
                     raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
                 continue
-            job = load_open_job_for_routine_path(path)
+            try:
+                job = load_open_job_for_routine_path(path)
+            except PublicationJobError as exc:
+                if str(exc) == "PUBLICATION_JOB_INVALID":
+                    return True
+                raise
         except PublicationJobError as exc:
             raise ObservationPanelPublisherError(str(exc)) from exc
-        except (OSError, json.JSONDecodeError):
-            return True
         if (
             str(job.get("schedule_sha256")) == schedule_sha256
             and str(job.get("activation_id")) == activation_id
