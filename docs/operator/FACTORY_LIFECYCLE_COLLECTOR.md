@@ -310,13 +310,20 @@ Ordinary tick/`repair`/`has_open` must still refuse an oversized `open/` job wit
 edit the JSON. This path is only for a job that already reached `stage=ARTIFACTS`
 with durable observation/member artifacts (including `SNAPSHOT_PLUS_DELTA`).
 
-Take `--content` from the `open/<content_sha256>.json` filename stem. Do not
-invent it.
+Copy `--content` from the filename stem. Do not invent it.
+
+```
+ls -1 /opt/solana-alpha-lab/local/factory_v1/observation_rdp/datasets/publication_jobs/open
+```
 
 Stop immediately (source untouched) if inspect prints any terminal other than
-`FAT_ARTIFACTS_RESUME_READY` or `FAT_ARTIFACTS_RESUME_READY_RETRY`: collector
-`ACTIVE`/`DRAINING`, wrong stage, hash mismatch, identity mismatch, missing
-artifacts, or not a legacy-fat file.
+`FAT_ARTIFACTS_RESUME_READY` or `FAT_ARTIFACTS_RESUME_READY_RETRY`. That includes
+collector `ACTIVE`/`DRAINING`, empty/unknown activation set, wrong stage, hash
+mismatch, identity mismatch, missing artifacts, or not a legacy-fat file.
+
+`FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE` means the compact `completed/` receipt
+already exists and the fat `open/` file is gone. That is done, not a next
+action.
 
 ```
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py inspect-fat-open --runtime-config configs/observation_schedule_runtime_v1.yaml --content <64-hex-content-sha256>
@@ -326,6 +333,14 @@ If READY / READY_RETRY:
 
 ```
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py resume-fat-artifacts --runtime-config configs/observation_schedule_runtime_v1.yaml --content <64-hex-content-sha256> --i-understand-resume
+```
+
+Producer identity is runtime config, then Git HEAD, then `.factory_deploy_sha`.
+On an exact-SHA deploy without `.git`, the pin file is enough. Only if resume
+prints `FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED`, pass the 40-hex pin:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py resume-fat-artifacts --runtime-config configs/observation_schedule_runtime_v1.yaml --content <64-hex-content-sha256> --i-understand-resume --producer-git-sha <40-hex-from-factory-deploy-sha>
 ```
 
 Expect `FAT_ARTIFACTS_RESUME_COMPLETED`, compact `completed/` receipt, and the

@@ -36,15 +36,20 @@ from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
 )
 from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E402
     COLLECTOR_NOT_PAUSED,
+    FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
+    FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING,
     FAT_ARTIFACTS_RESUME_COMPLETED,
+    FAT_ARTIFACTS_RESUME_CONFLICT,
     FAT_ARTIFACTS_RESUME_HASH_MISMATCH,
     FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT,
+    FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE,
     FAT_ARTIFACTS_RESUME_READY,
     FAT_ARTIFACTS_RESUME_READY_RETRY,
     FAT_ARTIFACTS_RESUME_UNSUPPORTED_STAGE,
     LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
     ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES,
     PublicationJobError,
+    collector_pause_proven,
     completed_job_path,
     is_compact_receipt,
     load_open_job_for_routine_path,
@@ -209,6 +214,18 @@ def _register_paused_store(store_path: Path, schedule: dict) -> None:
             "stops_admitting_at": "2026-09-02T00:00:00Z",
             "payload": {},
         },
+        clock=NOW,
+    )
+    store.close()
+
+
+def _register_schedule_only(store_path: Path, schedule: dict) -> None:
+    store = ObservationScheduleStore(store_path)
+    store.acquire_lease("owner", clock=NOW)
+    store.persist_registered_schedule(
+        schedule_sha256=schedule["schedule_sha256"],
+        schedule_key=schedule["schedule_key"],
+        document=schedule,
         clock=NOW,
     )
     store.close()
@@ -438,6 +455,58 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
                 )
             self.assertEqual(job_path.read_bytes(), source)
 
+    def test_empty_activations_and_bounds_fail_closed(self) -> None:
+        schedule = _schedule()
+        self.assertFalse(collector_pause_proven([]))
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, fault_after="AFTER_ARTIFACTS")
+            content = next((data_root / "datasets" / "publication_jobs" / "open").glob("*.json")).stem
+            job_path = open_job_path(data_root, content)
+            source = job_path.read_bytes()
+            with self.assertRaises(PublicationJobError) as err:
+                inspect_legacy_fat_open_artifacts(
+                    data_root=data_root,
+                    root=ROOT,
+                    content_sha256=content,
+                    activations=[],
+                    schedule=schedule,
+                )
+            self.assertEqual(str(err.exception), COLLECTOR_NOT_PAUSED)
+            self.assertEqual(job_path.read_bytes(), source)
+            compact = json.loads(job_path.read_text(encoding="utf-8"))
+            compact["parquet_rel"] = "../escape.parquet"
+            job_path.write_text(json.dumps(compact), encoding="utf-8")
+            _inflate_open_job(job_path)
+            with self.assertRaises(PublicationJobError) as path_err:
+                prove_legacy_fat_open_artifacts_source(data_root, content)
+            self.assertEqual(str(path_err.exception), FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+            job_path.write_bytes(source)
+            compact = json.loads(job_path.read_text(encoding="utf-8"))
+            compact["dataset_manifest_id"] = "tampered-manifest-id"
+            job_path.write_text(json.dumps(compact), encoding="utf-8")
+            _inflate_open_job(job_path)
+            with self.assertRaises(PublicationJobError) as manifest_err:
+                inspect_legacy_fat_open_artifacts(
+                    data_root=data_root,
+                    root=ROOT,
+                    content_sha256=content,
+                    activations=_paused(),
+                    schedule=schedule,
+                )
+            self.assertEqual(str(manifest_err.exception), FAT_ARTIFACTS_RESUME_CONFLICT)
+            huge = Path(tmp) / "huge-string.json"
+            padding = "0," * 200000
+            huge.write_text(
+                '{"stage":"ARTIFACTS","dataset_version":"' + ("v" * 300) + '","members":[' + padding + "0]}",
+                encoding="utf-8",
+            )
+            with self.assertRaises(PublicationJobError) as huge_err:
+                stream_legacy_fat_open_job_for_artifacts_resume(huge)
+            self.assertEqual(str(huge_err.exception), FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
+
     def test_fault_retry_matrix_converges_once(self) -> None:
         schedule = _schedule()
         for stage in (
@@ -475,10 +544,11 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
                         activations=_paused(),
                         schedule=schedule,
                     )
-                    self.assertIn(
-                        inspected["terminal"],
-                        {FAT_ARTIFACTS_RESUME_READY, FAT_ARTIFACTS_RESUME_READY_RETRY},
-                    )
+                    expected = {FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE} if stage == "AFTER_COMPLETE" else {
+                        FAT_ARTIFACTS_RESUME_READY,
+                        FAT_ARTIFACTS_RESUME_READY_RETRY,
+                    }
+                    self.assertIn(inspected["terminal"], expected)
                     finished = resume_legacy_fat_open_artifacts(
                         data_root=data_root,
                         root=ROOT,
@@ -577,6 +647,66 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
             resumed = json.loads(buf.getvalue())
             self.assertEqual(resumed["terminal"], FAT_ARTIFACTS_RESUME_COMPLETED)
             self.assertEqual(resumed["provider_calls"], 0)
+            buf = io.StringIO()
+            with patch.object(sys, "stdout", buf):
+                code = module.main(
+                    [
+                        "inspect-fat-open",
+                        "--data-root",
+                        str(data_root),
+                        "--ops-store",
+                        str(store_path),
+                        "--content",
+                        content,
+                    ]
+                )
+            self.assertEqual(code, 0)
+            self.assertEqual(
+                json.loads(buf.getvalue())["terminal"],
+                FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
+            )
+            empty_store = Path(tmp) / "empty-ops.sqlite"
+            _register_schedule_only(empty_store, schedule)
+            buf = io.StringIO()
+            with patch.object(sys, "stdout", buf):
+                code = module.main(
+                    [
+                        "inspect-fat-open",
+                        "--data-root",
+                        str(data_root),
+                        "--ops-store",
+                        str(empty_store),
+                        "--content",
+                        content,
+                    ]
+                )
+            self.assertEqual(code, 2)
+            self.assertEqual(json.loads(buf.getvalue())["terminal"], COLLECTOR_NOT_PAUSED)
+            from solana_alpha_lab.factory.observation_schedule_runtime import (
+                ObservationRuntimeError,
+            )
+
+            buf = io.StringIO()
+            with patch.object(
+                module, "git_sha", side_effect=ObservationRuntimeError("PRODUCER_GIT_SHA_UNAVAILABLE")
+            ), patch.object(sys, "stdout", buf):
+                code = module.main(
+                    [
+                        "resume-fat-artifacts",
+                        "--data-root",
+                        str(data_root),
+                        "--ops-store",
+                        str(store_path),
+                        "--content",
+                        content,
+                        "--i-understand-resume",
+                    ]
+                )
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                json.loads(buf.getvalue())["terminal"],
+                "FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED",
+            )
 
     def test_memory_envelope_subprocess(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
@@ -42,6 +41,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E40
     FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID,
     FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID,
     FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE,
+    FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED,
     FAT_ARTIFACTS_RESUME_REQUIRES_FLAG,
     FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING,
     FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN,
@@ -52,6 +52,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E40
     PublicationJobError,
     apply_migration,
     collector_blocks_apply,
+    collector_pause_proven,
     completed_job_path,
     dry_run_migration,
     is_compact_receipt,
@@ -61,6 +62,8 @@ from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E40
 )
 from solana_alpha_lab.factory.observation_schedule_runtime import (  # noqa: E402
     DEFAULT_RUNTIME_RELATIVE,
+    ObservationRuntimeError,
+    git_sha,
     load_runtime_config,
     resolve_data_root,
 )
@@ -81,6 +84,7 @@ FAT_RESUME_TERMINALS = {
     FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID,
     FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID,
     FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE,
+    FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED,
     FAT_ARTIFACTS_RESUME_REQUIRES_FLAG,
     FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING,
     FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN,
@@ -94,13 +98,11 @@ def _emit(payload: dict, code: int) -> int:
     return code
 
 
-def _repo_head() -> str:
-    output = subprocess.check_output(
-        ["git", "rev-parse", "HEAD"],
-        cwd=ROOT,
-        text=True,
-    )
-    return output.strip()
+def _producer_git_sha(configured: str | None) -> str:
+    try:
+        return git_sha(ROOT, configured)
+    except ObservationRuntimeError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED) from exc
 
 
 def _load_store(store_path: Path) -> tuple[list[dict], ObservationScheduleStore]:
@@ -205,7 +207,7 @@ def main(argv: list[str] | None = None) -> int:
             activations, store = _load_store(store_path)
         except PublicationJobError as exc:
             return _emit(_fat_error_payload(exc), 2)
-        if collector_blocks_apply(activations):
+        if collector_pause_proven(activations) is False:
             store.close()
             return _emit(
                 {
@@ -244,7 +246,8 @@ def main(argv: list[str] | None = None) -> int:
                     schedule=schedule,
                 )
                 return _emit(report, 0)
-            producer = str(args.producer_git_sha or "").strip() or _repo_head()
+            configured = str(args.producer_git_sha or "").strip() or None
+            producer = _producer_git_sha(configured)
             report = resume_legacy_fat_open_artifacts(
                 data_root=data_root,
                 root=ROOT,

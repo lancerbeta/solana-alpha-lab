@@ -62,6 +62,12 @@ FAT_ARTIFACTS_RESUME_REQUIRES_FLAG = "FAT_ARTIFACTS_RESUME_REQUIRES_FLAG"
 FAT_ARTIFACTS_RESUME_READY = "FAT_ARTIFACTS_RESUME_READY"
 FAT_ARTIFACTS_RESUME_READY_RETRY = "FAT_ARTIFACTS_RESUME_READY_RETRY"
 FAT_ARTIFACTS_RESUME_COMPLETED = "FAT_ARTIFACTS_RESUME_COMPLETED"
+FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE = "FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE"
+FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED = (
+    "FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED"
+)
+FAT_RESUME_KEY_MAX_CHARS = 64
+FAT_RESUME_STRING_MAX_CHARS = 256
 FAT_RESUME_STRING_KEYS = frozenset(
     {
         "stage",
@@ -138,6 +144,14 @@ def collector_blocks_apply(activations: Sequence[Mapping[str, Any]]) -> bool:
     """APPLY is allowed only when no live ACTIVE/DRAINING collector remains."""
 
     return any(str(item.get("state") or "") in APPLY_ACTIVE_STATES for item in activations)
+
+
+def collector_pause_proven(activations: Sequence[Mapping[str, Any]]) -> bool:
+    """Pause is proven only when at least one activation exists and none are live."""
+
+    if not activations:
+        return False
+    return not collector_blocks_apply(activations)
 
 
 class PublicationJobError(ValueError):
@@ -246,7 +260,7 @@ def _skip_string(reader: _JsonByteReader) -> None:
             return
 
 
-def _read_string(reader: _JsonByteReader) -> str:
+def _read_string(reader: _JsonByteReader, *, max_chars: int | None = None) -> str:
     chars: list[str] = []
     while True:
         char = reader.read()
@@ -271,12 +285,14 @@ def _read_string(reader: _JsonByteReader) -> str:
                 if len(hex_digits) != 4:
                     raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
                 chars.append(chr(int(hex_digits, 16)))
-                continue
-            chars.append(escapes.get(escaped, escaped))
-            continue
-        if char == '"':
+            else:
+                chars.append(escapes.get(escaped, escaped))
+        elif char == '"':
             return "".join(chars)
-        chars.append(char)
+        else:
+            chars.append(char)
+        if max_chars is not None and len(chars) > max_chars:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
 
 
 def _skip_value(reader: _JsonByteReader, first: str) -> None:
@@ -475,7 +491,7 @@ def stream_legacy_fat_open_job_for_artifacts_resume(path: Path) -> dict[str, Any
                 continue
             if char != '"':
                 raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
-            key = _read_string(reader)
+            key = _read_string(reader, max_chars=FAT_RESUME_KEY_MAX_CHARS)
             sep = _skip_ws(reader)
             if sep != ":":
                 raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
@@ -488,7 +504,9 @@ def stream_legacy_fat_open_job_for_artifacts_resume(path: Path) -> dict[str, Any
                 _skip_value(reader, value_first)
                 continue
             if key in FAT_RESUME_STRING_KEYS and value_first == '"':
-                found[key] = _read_string(reader)
+                found[key] = _read_string(
+                    reader, max_chars=FAT_RESUME_STRING_MAX_CHARS
+                )
             elif key in FAT_RESUME_STRING_KEYS and value_first == "n":
                 rest = "".join(reader.read() for _ in range(3))
                 if rest != "ull":
@@ -573,11 +591,18 @@ def prove_legacy_fat_open_artifacts_source(
     member_rel = str(job["member_rel"]).replace("\\", "/")
     job["parquet_rel"] = parquet_rel
     job["member_rel"] = member_rel
+    root = Path(data_root).resolve()
     for rel, digest in (
         (parquet_rel, str(job["file_sha256"])),
         (member_rel, str(job["member_sha256"])),
     ):
-        artifact = Path(data_root) / rel
+        if not rel or rel.startswith("/") or any(part == ".." for part in Path(rel).parts):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+        artifact = (root / rel).resolve()
+        try:
+            artifact.relative_to(root)
+        except ValueError as exc:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
         if not artifact.is_file() or artifact.is_symlink():
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
         if _sha256_file(artifact) != digest:
@@ -1304,6 +1329,7 @@ __all__ = [
     "COMPLETED_RECEIPT_CONFLICT",
     "CONTENT_IDENTITY_COLLISION",
     "CONTENT_SHA256_INVALID",
+    "FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE",
     "FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING",
     "FAT_ARTIFACTS_RESUME_COMPLETED",
     "FAT_ARTIFACTS_RESUME_CONFLICT",
@@ -1314,6 +1340,7 @@ __all__ = [
     "FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID",
     "FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID",
     "FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE",
+    "FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED",
     "FAT_ARTIFACTS_RESUME_READY",
     "FAT_ARTIFACTS_RESUME_READY_RETRY",
     "FAT_ARTIFACTS_RESUME_REQUIRES_FLAG",
@@ -1339,6 +1366,7 @@ __all__ = [
     "apply_migration",
     "assert_routine_hot_path",
     "collector_blocks_apply",
+    "collector_pause_proven",
     "compact_receipt_from_job",
     "complete_publication_job",
     "completed_dir",

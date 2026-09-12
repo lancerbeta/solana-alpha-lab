@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: df7e75bc44cffc02cc6f7a11d059ee3732f3ea3073b062253290c724e782db78}
+  integrity: {kind: sha256, sha256: 4d2422d7591810ecfef3952840ed9c288cad9df65f2ff9ffa1d33bb87b87f8a5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -35076,7 +35076,7 @@ records:
   as_of: '2026-09-12'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_publication_jobs.py', repository_path: src/solana_alpha_lab/factory/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: e53b274d919ba0afd5cccb9f29da52f0807fe0204f00ddc91834efceffd4cc50}
+  integrity: {kind: sha256, sha256: 9169d92d529f0fd52f8a0a84b5f350b869397d2d4295fb6fd4e59e0a2303f373}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}
@@ -35093,7 +35093,7 @@ records:
   as_of: '2026-09-12'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_publication_jobs.py', repository_path: scripts/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: 49de0b76344ebe17881007d4d5aa0a6c58f5631804ec9982bc0e314e914f1ad5}
+  integrity: {kind: sha256, sha256: 8f26f324c7a2c02aaaf1cc9102721bd56c4dc242d50c359f00f6f742749b81c1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}

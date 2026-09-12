@@ -43,6 +43,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     COLLECTOR_NOT_PAUSED,
     CONTENT_SHA256_INVALID,
     CONTENT_SHA256_RE,
+    FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
     FAT_ARTIFACTS_RESUME_COMPLETED,
     FAT_ARTIFACTS_RESUME_CONFLICT,
     FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID,
@@ -52,7 +53,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
     PublicationJobError,
     assert_routine_hot_path,
-    collector_blocks_apply,
+    collector_pause_proven,
     complete_publication_job,
     completed_job_path,
     is_compact_receipt,
@@ -1095,7 +1096,7 @@ def inspect_legacy_fat_open_artifacts(
 ) -> dict[str, Any]:
     """Paused-only dry-run for one oversized ARTIFACTS open job. No mutation."""
 
-    if collector_blocks_apply(activations):
+    if collector_pause_proven(activations) is False:
         raise PublicationJobError(COLLECTOR_NOT_PAUSED)
     if CONTENT_SHA256_RE.fullmatch(content_sha256) is None:
         raise PublicationJobError(CONTENT_SHA256_INVALID)
@@ -1115,7 +1116,7 @@ def inspect_legacy_fat_open_artifacts(
         ):
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING)
         return {
-            "terminal": FAT_ARTIFACTS_RESUME_READY_RETRY,
+            "terminal": FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
             "content_sha256": content_sha256,
             "stage": str(existing.get("stage")),
             "schedule_sha256": str(existing["schedule_sha256"]),
@@ -1144,6 +1145,12 @@ def inspect_legacy_fat_open_artifacts(
     digest = str(schedule.get("schedule_sha256") or "")
     if digest != str(job["schedule_sha256"]):
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING)
+    expected_manifest = compute_dataset_manifest_id(
+        f"observation-panel-{digest[:12]}",
+        str(job["dataset_version"]),
+    )
+    if str(job["dataset_manifest_id"]) != expected_manifest:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
     try:
         registry = load_observation_primitive_registry(root)
     except PrimitiveRegistryError as exc:
@@ -1238,7 +1245,7 @@ def resume_legacy_fat_open_artifacts(
         activations=activations,
         schedule=schedule,
     )
-    if (
+    if inspected.get("terminal") == FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE or (
         inspected.get("durable_progress", {}).get("completed")
         and open_job_path(data_root, content_sha256).is_file() is False
     ):
