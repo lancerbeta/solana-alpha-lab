@@ -1,0 +1,8 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-12",
+  "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
+  "verdict": "NOT_READY"
+}

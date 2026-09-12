@@ -42,6 +42,48 @@ COLLECTOR_STORE_MISSING = "COLLECTOR_STORE_MISSING"
 LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION = (
     "LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION"
 )
+STAGE_ARTIFACTS = "ARTIFACTS"
+FAT_RESUME_CAPTURE_MAX_BYTES = 512 * 1024
+FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT = "FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT"
+FAT_ARTIFACTS_RESUME_UNSUPPORTED_STAGE = "FAT_ARTIFACTS_RESUME_UNSUPPORTED_STAGE"
+FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH = "FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH"
+FAT_ARTIFACTS_RESUME_HASH_MISMATCH = "FAT_ARTIFACTS_RESUME_HASH_MISMATCH"
+FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING = "FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING"
+FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE = "FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE"
+FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID = "FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID"
+FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN = (
+    "FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN"
+)
+FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING = "FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING"
+FAT_ARTIFACTS_RESUME_CONTENT_REQUIRED = "FAT_ARTIFACTS_RESUME_CONTENT_REQUIRED"
+FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID = "FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID"
+FAT_ARTIFACTS_RESUME_CONFLICT = "FAT_ARTIFACTS_RESUME_CONFLICT"
+FAT_ARTIFACTS_RESUME_REQUIRES_FLAG = "FAT_ARTIFACTS_RESUME_REQUIRES_FLAG"
+FAT_ARTIFACTS_RESUME_READY = "FAT_ARTIFACTS_RESUME_READY"
+FAT_ARTIFACTS_RESUME_READY_RETRY = "FAT_ARTIFACTS_RESUME_READY_RETRY"
+FAT_ARTIFACTS_RESUME_COMPLETED = "FAT_ARTIFACTS_RESUME_COMPLETED"
+FAT_RESUME_STRING_KEYS = frozenset(
+    {
+        "stage",
+        "content_sha256",
+        "schedule_sha256",
+        "activation_id",
+        "utc_day",
+        "dataset_version",
+        "dataset_manifest_id",
+        "parquet_rel",
+        "member_rel",
+        "file_sha256",
+        "member_sha256",
+        "dataset_fingerprint",
+        "created_at",
+        "completed_at",
+    }
+)
+FAT_RESUME_INT_KEYS = frozenset({"observation_count", "member_count"})
+FAT_RESUME_JSON_KEYS = frozenset(
+    {"sampling", "observations", "normalized_observations"}
+)
 CONTENT_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 STREAM_HASH_CHUNK = 1024 * 1024
 # Ordinary collector/tick/status may full-parse only below this size. Larger open/
@@ -356,6 +398,209 @@ def _stream_open_job_top_level_meta(path: Path) -> dict[str, Any]:
             else:
                 _skip_value(reader, value_first)
     return found
+
+
+class _CollectingReader:
+    """Capture a small JSON value while reusing the skip walker."""
+
+    __slots__ = ("_inner", "_parts", "_size", "_max")
+
+    def __init__(
+        self,
+        inner: _JsonByteReader,
+        *,
+        max_bytes: int,
+        initial: str,
+    ) -> None:
+        self._inner = inner
+        self._parts = [initial]
+        self._size = len(initial.encode("utf-8"))
+        self._max = max_bytes
+        if self._size > max_bytes:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
+
+    def read(self) -> str:
+        char = self._inner.read()
+        if not char:
+            return ""
+        encoded_len = len(char.encode("utf-8"))
+        if self._size + encoded_len > self._max:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
+        self._parts.append(char)
+        self._size += encoded_len
+        return char
+
+    def unread(self, char: str) -> None:
+        if char and self._parts and self._parts[-1] == char:
+            popped = self._parts.pop()
+            self._size -= len(popped.encode("utf-8"))
+        self._inner.unread(char)
+
+    def raw(self) -> str:
+        return "".join(self._parts)
+
+
+def _read_bounded_json_value(
+    reader: _JsonByteReader,
+    first: str,
+    *,
+    max_bytes: int,
+) -> Any:
+    collector = _CollectingReader(reader, max_bytes=max_bytes, initial=first)
+    _skip_value(collector, first)  # type: ignore[arg-type]
+    try:
+        return json.loads(collector.raw())
+    except json.JSONDecodeError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID) from exc
+
+
+def stream_legacy_fat_open_job_for_artifacts_resume(path: Path) -> dict[str, Any]:
+    """Stream ARTIFACTS resume fields; skip ``members[]`` without materializing it.
+
+    Memory is bounded by metadata plus the small observation/sampling payload.
+    Never ``read_text`` / ``read_bytes`` / ``json.load`` of the whole job.
+    """
+
+    found: dict[str, Any] = {"has_members_array": False}
+    with path.open("r", encoding="utf-8", newline="") as raw:
+        reader = _JsonByteReader(raw)
+        first = _skip_ws(reader)
+        if first != "{":
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
+        while True:
+            char = _skip_ws(reader)
+            if char == "}":
+                break
+            if char == ",":
+                continue
+            if char != '"':
+                raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
+            key = _read_string(reader)
+            sep = _skip_ws(reader)
+            if sep != ":":
+                raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
+            value_first = _skip_ws(reader)
+            if not value_first:
+                raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
+            if key == "members":
+                if value_first == "[":
+                    found["has_members_array"] = True
+                _skip_value(reader, value_first)
+                continue
+            if key in FAT_RESUME_STRING_KEYS and value_first == '"':
+                found[key] = _read_string(reader)
+            elif key in FAT_RESUME_STRING_KEYS and value_first == "n":
+                rest = "".join(reader.read() for _ in range(3))
+                if rest != "ull":
+                    raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
+                found[key] = None
+            elif key in FAT_RESUME_INT_KEYS:
+                found[key] = _read_bounded_json_value(
+                    reader, value_first, max_bytes=64
+                )
+            elif key in FAT_RESUME_JSON_KEYS:
+                found[key] = _read_bounded_json_value(
+                    reader, value_first, max_bytes=FAT_RESUME_CAPTURE_MAX_BYTES
+                )
+            else:
+                _skip_value(reader, value_first)
+    if "members" in found:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
+    return found
+
+
+def prove_legacy_fat_open_artifacts_source(
+    data_root: Path,
+    content_sha256: str,
+) -> dict[str, Any]:
+    """Fail-closed filesystem proofs for one oversized ARTIFACTS open job."""
+
+    if CONTENT_SHA256_RE.fullmatch(content_sha256) is None:
+        raise PublicationJobError(CONTENT_SHA256_INVALID)
+    path = open_job_path(data_root, content_sha256)
+    if path.parent.name != OPEN_DIRNAME:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN)
+    if not path.is_file() or path.is_symlink():
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN)
+    try:
+        resolved = path.resolve()
+    except OSError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN) from exc
+    if resolved.name != f"{content_sha256}.json":
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN)
+    assert_routine_hot_path(path)
+    probe = probe_open_job_for_routine_path(path)
+    if probe.kind != "LEGACY_FAT_REQUIRES_PAUSED_MIGRATION":
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT)
+    source_size, source_sha256 = _source_fingerprint(path)
+    job = stream_legacy_fat_open_job_for_artifacts_resume(path)
+    if str(job.get("stage") or "") != STAGE_ARTIFACTS:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_UNSUPPORTED_STAGE)
+    if str(job.get("content_sha256") or "") != content_sha256:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    if CONTENT_SHA256_RE.fullmatch(str(job.get("schedule_sha256") or "")) is None:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    activation_id = str(job.get("activation_id") or "")
+    if not activation_id.startswith("ACT-") or len(activation_id) < 8:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    for key in (
+        "utc_day",
+        "dataset_version",
+        "dataset_manifest_id",
+        "parquet_rel",
+        "member_rel",
+        "file_sha256",
+        "member_sha256",
+        "created_at",
+    ):
+        if not str(job.get(key) or ""):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    if CONTENT_SHA256_RE.fullmatch(str(job.get("file_sha256") or "")) is None:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
+    if CONTENT_SHA256_RE.fullmatch(str(job.get("member_sha256") or "")) is None:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
+    try:
+        observation_count = int(job.get("observation_count") or 0)
+        member_count = int(job.get("member_count") or 0)
+    except (TypeError, ValueError) as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH) from exc
+    if observation_count <= 0 or member_count <= 0:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    observations = job.get("observations")
+    if not isinstance(observations, list) or len(observations) != observation_count:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID)
+    parquet_rel = str(job["parquet_rel"]).replace("\\", "/")
+    member_rel = str(job["member_rel"]).replace("\\", "/")
+    job["parquet_rel"] = parquet_rel
+    job["member_rel"] = member_rel
+    for rel, digest in (
+        (parquet_rel, str(job["file_sha256"])),
+        (member_rel, str(job["member_sha256"])),
+    ):
+        artifact = Path(data_root) / rel
+        if not artifact.is_file() or artifact.is_symlink():
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
+        if _sha256_file(artifact) != digest:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
+    completed = completed_job_path(data_root, content_sha256)
+    if completed.is_file():
+        try:
+            existing = json.loads(completed.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT) from exc
+        if not isinstance(existing, dict) or not is_compact_receipt(existing):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if str(existing.get("dataset_manifest_id")) != str(job.get("dataset_manifest_id")):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if str(existing.get("content_sha256") or "") != content_sha256:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+    return {
+        "path": path,
+        "job": job,
+        "probe": probe,
+        "source_size": source_size,
+        "source_sha256": source_sha256,
+    }
 
 
 def probe_open_job_for_routine_path(path: Path) -> OpenJobRoutineProbe:
@@ -734,7 +979,16 @@ def load_job_by_content(data_root: Path, content: str) -> dict[str, Any] | None:
 def save_open_job(data_root: Path, content: str, payload: Mapping[str, Any]) -> None:
     if str(payload.get("stage") or "") == STAGE_COMPLETE:
         raise PublicationJobError("COMPACT_RECEIPT_IN_OPEN")
-    _atomic_write_json(open_job_path(data_root, content), payload)
+    path = open_job_path(data_root, content)
+    if path.is_file():
+        try:
+            size = int(path.stat().st_size)
+        except OSError as exc:
+            raise PublicationJobError("PUBLICATION_JOB_INVALID") from exc
+        if size > ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES:
+            # Preserve oversized legacy source until canonical complete unlinks it.
+            return
+    _atomic_write_json(path, payload)
 
 
 def complete_publication_job(
@@ -743,6 +997,7 @@ def complete_publication_job(
     *,
     completed_at: datetime,
     dataset_fingerprint: str | None = None,
+    expected_open_source: tuple[int, str] | None = None,
 ) -> dict[str, Any]:
     """Write compact receipt and remove the full open/flat job. Never rewrite RDP."""
 
@@ -760,6 +1015,12 @@ def complete_publication_job(
         ):
             leftover.unlink(missing_ok=True)
         return existing
+    if expected_open_source is not None:
+        leftover = open_job_path(data_root, content)
+        if leftover.is_file():
+            _revalidate_source(
+                leftover, expected_open_source[0], expected_open_source[1]
+            )
     if not publication_artifacts_proven(data_root, job):
         raise PublicationJobError("PUBLICATION_NOT_PROVEN")
     receipt = compact_receipt_from_job(
@@ -1043,6 +1304,22 @@ __all__ = [
     "COMPLETED_RECEIPT_CONFLICT",
     "CONTENT_IDENTITY_COLLISION",
     "CONTENT_SHA256_INVALID",
+    "FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING",
+    "FAT_ARTIFACTS_RESUME_COMPLETED",
+    "FAT_ARTIFACTS_RESUME_CONFLICT",
+    "FAT_ARTIFACTS_RESUME_CONTENT_REQUIRED",
+    "FAT_ARTIFACTS_RESUME_HASH_MISMATCH",
+    "FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH",
+    "FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT",
+    "FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID",
+    "FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID",
+    "FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE",
+    "FAT_ARTIFACTS_RESUME_READY",
+    "FAT_ARTIFACTS_RESUME_READY_RETRY",
+    "FAT_ARTIFACTS_RESUME_REQUIRES_FLAG",
+    "FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING",
+    "FAT_ARTIFACTS_RESUME_SOURCE_NOT_REGULAR_OPEN",
+    "FAT_ARTIFACTS_RESUME_UNSUPPORTED_STAGE",
     "HOT_PATH_FORBIDDEN",
     "LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION",
     "LEGACY_FULL_BYTE_MISMATCH",
@@ -1054,6 +1331,7 @@ __all__ = [
     "ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES",
     "ROUTINE_TICK_PUBLICATION_REPAIR",
     "SOURCE_CHANGED_AFTER_PLAN",
+    "STAGE_ARTIFACTS",
     "STAGE_COMPLETE",
     "STAGE_MARKER",
     "UNAVAILABLE_FILESYSTEM_TRUTH",
@@ -1076,7 +1354,9 @@ __all__ = [
     "open_dir",
     "plan_migration",
     "project_7d_disk_used",
+    "prove_legacy_fat_open_artifacts_source",
     "publication_artifacts_proven",
     "rdp_bytes_excluding_publication_jobs",
     "save_open_job",
+    "stream_legacy_fat_open_job_for_artifacts_resume",
 ]

@@ -1,0 +1,8 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-COMPLETION-001",
+  "as_of": "2026-09-12",
+  "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
+  "state_change": "IN_PROGRESS"
+}

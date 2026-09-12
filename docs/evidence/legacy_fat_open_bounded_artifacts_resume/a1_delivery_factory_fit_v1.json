@@ -1,0 +1,9 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-FACTORY-FIT-001",
+  "as_of": "2026-09-12",
+  "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
+  "mode": "FULL_REVIEW",
+  "verdict": "NOT_READY"
+}
