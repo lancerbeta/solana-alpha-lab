@@ -132,10 +132,10 @@ def _append_v1_fat(
 
 
 def _read_delta_json(path: Path) -> dict[str, object]:
-    import pyarrow.parquet as pq
+    from solana_alpha_lab.factory.members_snapshot_delta import _read_delta_payload
 
-    rows = pq.read_table(path).to_pylist()
-    return json.loads(str(rows[0]["delta_json"]))
+    payload = path.read_bytes() if path.suffix == ".json" else b""
+    return _read_delta_payload(path, payload)
 
 
 class CompactDeltaEconomyTests(unittest.TestCase):

@@ -6,7 +6,7 @@ import hashlib
 import json
 import math
 import re
-from collections.abc import Mapping
+from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -59,6 +59,44 @@ def canonical_json_bytes(value: object) -> bytes:
 
 def canonical_sha256(value: object) -> str:
     return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
+
+
+def canonical_sha256_array(items: Iterable[object]) -> str:
+    """Streaming equivalent of canonical_sha256(list(items))."""
+    digest = hashlib.sha256()
+    digest.update(b"[")
+    first = True
+    for item in items:
+        if not first:
+            digest.update(b",")
+        first = False
+        digest.update(canonical_json_bytes(item))
+    digest.update(b"]")
+    return digest.hexdigest()
+
+
+def canonical_sha256_members_observations(
+    members: Iterable[object],
+    observations: Iterable[object],
+) -> str:
+    """Streaming equivalent of canonical_sha256({"members": ..., "observations": ...})."""
+    digest = hashlib.sha256()
+    digest.update(b'{"members":[')
+    first = True
+    for item in members:
+        if not first:
+            digest.update(b",")
+        first = False
+        digest.update(canonical_json_bytes(item))
+    digest.update(b'],"observations":[')
+    first = True
+    for item in observations:
+        if not first:
+            digest.update(b",")
+        first = False
+        digest.update(canonical_json_bytes(item))
+    digest.update(b"]}")
+    return digest.hexdigest()
 
 
 def parse_utc(value: object) -> datetime:

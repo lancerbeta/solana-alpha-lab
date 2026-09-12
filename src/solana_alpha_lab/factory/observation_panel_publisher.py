@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -16,11 +16,16 @@ from solana_alpha_lab.factory.hot90_activation import load_hot90_activation
 from solana_alpha_lab.factory.members_snapshot_delta import (
     MembersDeltaError,
     append_delta_publication,
+    iter_spilled_member_rows,
     load_member_rows_for_location,
-    write_snapshot_unit,
+    _sha256_file_streaming,
+    _spill_member_sequence,
+    _write_members_parquet_from_conn,
+    _write_snapshot_unit_from_conn,
 )
 from solana_alpha_lab.factory.observation_schedule import (
     canonical_sha256,
+    canonical_sha256_members_observations,
     parse_utc,
     render_utc,
 )
@@ -35,11 +40,15 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
     load_observation_primitive_registry,
 )
 from solana_alpha_lab.factory.observation_publication_jobs import (
+    LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
     PublicationJobError,
     assert_routine_hot_path,
     complete_publication_job,
     iter_open_job_paths,
     load_job_by_content,
+    load_open_job_for_routine_path,
+    open_job_probe_matches_activation,
+    probe_open_job_for_routine_path,
     save_open_job,
 )
 from solana_alpha_lab.storage.manifests import (
@@ -74,16 +83,47 @@ def _schema_sha256(root: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _write_parquet(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
+_PARQUET_BATCH = 2048
+
+
+def _write_parquet_batches(
+    path: Path,
+    batches: Iterable[Sequence[Mapping[str, Any]]],
+    *,
+    compression: str | None = None,
+) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
-    table = pa.Table.from_pylist([dict(row) for row in rows])
     tmp = path.with_suffix(".parquet.tmp")
-    pq.write_table(table, tmp)
-    payload = tmp.read_bytes()
-    digest = hashlib.sha256(payload).hexdigest()
+    writer: pq.ParquetWriter | None = None
+    schema: pa.Schema | None = None
+    try:
+        for batch in batches:
+            if not batch:
+                continue
+            table = pa.Table.from_pylist([dict(row) for row in batch])
+            if schema is None:
+                schema = table.schema
+                kwargs: dict[str, Any] = {}
+                if compression == "zstd":
+                    kwargs = {"compression": "zstd", "compression_level": 3}
+                writer = pq.ParquetWriter(tmp, schema, **kwargs)
+            else:
+                table = table.cast(schema)
+            assert writer is not None
+            writer.write_table(table)
+        if writer is None:
+            empty = pa.table({})
+            if compression == "zstd":
+                pq.write_table(empty, tmp, compression="zstd", compression_level=3)
+            else:
+                pq.write_table(empty, tmp)
+    finally:
+        if writer is not None:
+            writer.close()
+    digest = _sha256_file_streaming(tmp)
     if path.is_file():
         try:
-            existing_digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            existing_digest = _sha256_file_streaming(path)
         finally:
             tmp.unlink(missing_ok=True)
         if existing_digest != digest:
@@ -91,25 +131,27 @@ def _write_parquet(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
     else:
         tmp.replace(path)
     return digest
+
+
+def _batched_rows(
+    rows: Iterable[Mapping[str, Any]], *, batch_size: int = _PARQUET_BATCH
+) -> Iterable[list[dict[str, Any]]]:
+    batch: list[dict[str, Any]] = []
+    for row in rows:
+        batch.append(dict(row))
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
+    if batch:
+        yield batch
+
+
+def _write_parquet(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
+    return _write_parquet_batches(path, _batched_rows(rows))
 
 
 def _write_selected_zstd_parquet(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    table = pa.Table.from_pylist([dict(row) for row in rows])
-    tmp = path.with_suffix(".parquet.tmp")
-    pq.write_table(table, tmp, compression="zstd", compression_level=3)
-    payload = tmp.read_bytes()
-    digest = hashlib.sha256(payload).hexdigest()
-    if path.is_file():
-        try:
-            existing_digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        finally:
-            tmp.unlink(missing_ok=True)
-        if existing_digest != digest:
-            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
-    else:
-        tmp.replace(path)
-    return digest
+    return _write_parquet_batches(path, _batched_rows(rows), compression="zstd")
 
 
 def _publish_immutable_bytes(path: Path, payload: bytes) -> None:
@@ -668,14 +710,12 @@ def publish_observation_batch(
     activation_id: str,
     now: datetime,
     producer_git_sha: str,
-    members: Sequence[Mapping[str, Any]] | None = None,
+    members: Iterable[Mapping[str, Any]] | None = None,
     observations: Sequence[Mapping[str, Any]] | None = None,
     fault_after: str | None = None,
     content_sha256: str | None = None,
 ) -> dict[str, Any]:
     now = now.astimezone(UTC)
-    if not members:
-        raise ObservationPanelPublisherError("PARTIAL_DATASET_FORBIDDEN")
     digest = str(schedule["schedule_sha256"])
     input_observations = list(observations or [])
     try:
@@ -686,308 +726,341 @@ def publish_observation_batch(
         _normalize_observation_row(item, registry=registry)
         for item in input_observations
     ]
-    member_rows = [dict(item) for item in members]
-    # Keep the publication identity bound to the caller's immutable input
-    # rows.  Normalization enriches the durable representation but must not
-    # make a retry after a calendar boundary look like a new scientific batch.
-    computed_content = canonical_sha256(
-        {
-            "members": member_rows,
-            "observations": [dict(item) for item in input_observations],
-        }
-    )
-    content = content_sha256 or computed_content
-    if len(content) != 64 or any(
-        character not in "0123456789abcdef" for character in content
-    ):
-        raise ObservationPanelPublisherError("CONTENT_IDENTITY_INVALID")
-    job = _load_job(data_root, content)
-    if job is not None and (
-        str(job.get("schedule_sha256") or "") != digest
-        or str(job.get("activation_id") or "") != str(activation_id)
-    ):
-        raise ObservationPanelPublisherError("PUBLICATION_JOB_CONFLICT")
-    if content_sha256 is not None and content != computed_content:
-        if (
-            job is None
-            or job.get("content_sha256") != content
-            or job.get("observations") != [dict(item) for item in input_observations]
-            or job.get("members") != [dict(item) for item in members]
+    job = _load_job(data_root, content_sha256) if content_sha256 else None
+    member_spill = None
+    member_conn = None
+    try:
+        if members is not None:
+            member_spill, member_conn = _spill_member_sequence(members)
+            member_count = int(
+                member_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0]
+            )
+            if member_count <= 0:
+                raise ObservationPanelPublisherError("PARTIAL_DATASET_FORBIDDEN")
+            computed_content = canonical_sha256_members_observations(
+                iter_spilled_member_rows(member_conn),
+                (dict(item) for item in input_observations),
+            )
+        elif job is not None and job.get("content_sha256"):
+            member_count = int(job.get("member_count") or 0)
+            computed_content = str(job["content_sha256"])
+            if member_count <= 0:
+                raise ObservationPanelPublisherError("PARTIAL_DATASET_FORBIDDEN")
+        else:
+            raise ObservationPanelPublisherError("PARTIAL_DATASET_FORBIDDEN")
+        content = content_sha256 or computed_content
+        if len(content) != 64 or any(
+            character not in "0123456789abcdef" for character in content
         ):
             raise ObservationPanelPublisherError("CONTENT_IDENTITY_INVALID")
-    job = job or {"stage": None, "content_sha256": content}
-    utc_day = str(job.get("utc_day") or now.strftime("%Y%m%d"))
-    dataset_id = f"observation-panel-{digest[:12]}"
-    dataset_version = str(job.get("dataset_version") or f"{utc_day}-1-{content[:12]}")
-    dataset_manifest_id = str(
-        job.get("dataset_manifest_id") or compute_dataset_manifest_id(dataset_id, dataset_version)
-    )
-    manifests_dir = data_root / "datasets" / "manifests"
-    manifests_dir.mkdir(parents=True, exist_ok=True)
-    manifest_path = manifests_dir / f"{dataset_manifest_id}.json"
-    published_path = manifests_dir / f"{dataset_manifest_id}.published"
-    obs_record_id = f"OBS-BATCH-{content[:16].upper()}"
-    member_record_id = f"OBS-MEMB-{content[:16].upper()}"
+        if job is None:
+            job = _load_job(data_root, content)
+        if job is not None and (
+            str(job.get("schedule_sha256") or "") != digest
+            or str(job.get("activation_id") or "") != str(activation_id)
+        ):
+            raise ObservationPanelPublisherError("PUBLICATION_JOB_CONFLICT")
+        if content_sha256 is not None and content != computed_content:
+            if (
+                job is None
+                or job.get("content_sha256") != content
+                or job.get("observations") != [dict(item) for item in input_observations]
+            ):
+                raise ObservationPanelPublisherError("CONTENT_IDENTITY_INVALID")
+        job = job or {"stage": None, "content_sha256": content}
+    except Exception:
+        if member_conn is not None:
+            member_conn.close()
+        if member_spill is not None:
+            member_spill.unlink(missing_ok=True)
+        raise
+    try:
+        utc_day = str(job.get("utc_day") or now.strftime("%Y%m%d"))
+        dataset_id = f"observation-panel-{digest[:12]}"
+        dataset_version = str(job.get("dataset_version") or f"{utc_day}-1-{content[:12]}")
+        dataset_manifest_id = str(
+            job.get("dataset_manifest_id") or compute_dataset_manifest_id(dataset_id, dataset_version)
+        )
+        manifests_dir = data_root / "datasets" / "manifests"
+        manifests_dir.mkdir(parents=True, exist_ok=True)
+        manifest_path = manifests_dir / f"{dataset_manifest_id}.json"
+        published_path = manifests_dir / f"{dataset_manifest_id}.published"
+        obs_record_id = f"OBS-BATCH-{content[:16].upper()}"
+        member_record_id = f"OBS-MEMB-{content[:16].upper()}"
 
-    if published_path.is_file():
+        if published_path.is_file():
+            if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
+                raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
+            loaded = json.loads(published_path.read_text(encoding="utf-8"))
+            fingerprint = str(
+                loaded.get("dataset_fingerprint")
+                or (job or {}).get("dataset_fingerprint")
+                or content
+            )
+            if job is not None and job.get("parquet_rel"):
+                created = parse_utc(str(job["created_at"])) if job.get("created_at") else now
+                persist_observation_schedule(
+                    data_root=data_root,
+                    schedule=schedule,
+                    now=created,
+                    producer_git_sha=producer_git_sha,
+                    activation_id=activation_id,
+                )
+                _complete_job(
+                    data_root,
+                    job,
+                    completed_at=created,
+                    dataset_fingerprint=fingerprint,
+                )
+            return {
+                "dataset_manifest_id": dataset_manifest_id,
+                "dataset_fingerprint": fingerprint,
+                "replay": True,
+            }
+
+        created_at = parse_utc(str(job["created_at"])) if job.get("created_at") else now
+        min_event, max_event, min_available, max_available = _clocks_from_rows(
+            rows,
+            fallback=created_at,
+        )
+        if max_available > created_at:
+            created_at = max_available
+        parquet_rel = str(
+            job.get("parquet_rel") or f"datasets/parquet/{dataset_manifest_id}/observations.parquet"
+        )
+        member_rel = str(
+            job.get("member_rel") or f"datasets/parquet/{dataset_manifest_id}/members.parquet"
+        )
+        parquet_path = data_root / parquet_rel
+        member_path = data_root / member_rel
+
+        if job.get("stage") is None:
+            if member_conn is None:
+                raise ObservationPanelPublisherError("PARTIAL_DATASET_FORBIDDEN")
+            activation = load_hot90_activation(root)
+            writer = _write_selected_zstd_parquet if activation["new_write_zstd"] else _write_parquet
+            file_sha256 = writer(parquet_path, rows)
+            if activation["members_layout"] == "SNAPSHOT_PLUS_DELTA":
+                unit_path = (
+                    data_root / "datasets" / "members_snapshot_plus_delta" / utc_day / "unit.json"
+                )
+                if unit_path.is_file():
+                    unit = append_delta_publication(
+                        data_root,
+                        utc_day=utc_day,
+                        dataset_manifest_id=dataset_manifest_id,
+                        member_conn=member_conn,
+                    )
+                else:
+                    unit = _write_snapshot_unit_from_conn(
+                        data_root,
+                        utc_day=utc_day,
+                        dataset_manifest_id=dataset_manifest_id,
+                        conn=member_conn,
+                    )
+                last = unit["publications"][-1]
+                member_rel = str(last["rel"]).replace("\\", "/")
+                member_path = data_root / member_rel
+                member_sha256 = str(last["sha256"])
+            else:
+                member_sha256 = _write_members_parquet_from_conn(
+                    member_path,
+                    member_conn,
+                    compression="zstd" if activation["new_write_zstd"] else None,
+                )
+            if not parquet_path.is_file() or _sha256_file_streaming(parquet_path) != file_sha256:
+                raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+            job = {
+                "stage": STAGE_ARTIFACTS,
+                "content_sha256": content,
+                "file_sha256": file_sha256,
+                "member_sha256": member_sha256,
+                "observation_count": len(rows),
+                "member_count": member_count,
+                "dataset_manifest_id": dataset_manifest_id,
+                "utc_day": utc_day,
+                "dataset_version": dataset_version,
+                "parquet_rel": parquet_rel.replace("\\", "/"),
+                "member_rel": member_rel.replace("\\", "/"),
+                "created_at": render_utc(created_at),
+                "sampling": dict(schedule.get("sampling") or {}),
+                "schedule_sha256": digest,
+                "activation_id": activation_id,
+                "observations": [dict(item) for item in input_observations],
+                "normalized_observations": rows,
+            }
+            _save_job(data_root, content, job)
+            _maybe_fault(fault_after, "AFTER_ARTIFACTS")
+        if member_conn is not None:
+            member_conn.close()
+            member_conn = None
+        if member_spill is not None:
+            member_spill.unlink(missing_ok=True)
+            member_spill = None
+
+        for artifact_path, hash_key in (
+            (parquet_path, "file_sha256"),
+            (member_path, "member_sha256"),
+        ):
+            if (
+                artifact_path.is_file() is False
+                or _sha256_file_streaming(artifact_path) != str(job.get(hash_key))
+            ):
+                raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
+
+        partition = build_partition_manifest(
+            dataset_id=dataset_id,
+            dataset_version=dataset_version,
+            partition_id=f"utc-day-{utc_day}",
+            logical_location=parquet_rel.replace("\\", "/"),
+            file_sha256=str(job["file_sha256"]),
+            content_sha256=content,
+            row_count=len(rows),
+            min_event_time=min_event,
+            max_event_time=max_event,
+            min_available_to_strategy_at=min_available,
+            max_available_to_strategy_at=max_available,
+            first_reliable_available_at=max_available,
+            created_at=created_at,
+        )
+        member_partition = build_partition_manifest(
+            dataset_id=dataset_id,
+            dataset_version=dataset_version,
+            partition_id=f"utc-day-{utc_day}-members",
+            logical_location=member_rel.replace("\\", "/"),
+            file_sha256=str(job["member_sha256"]),
+            content_sha256=content,
+            row_count=member_count,
+            min_event_time=min_event,
+            max_event_time=max_event,
+            min_available_to_strategy_at=min_available,
+            max_available_to_strategy_at=max_available,
+            first_reliable_available_at=max_available,
+            created_at=created_at,
+        )
+
+        obs_event = _research_event(
+            record_id=obs_record_id,
+            record_kind=RecordKind.OBSERVATION_BATCH,
+            entity_id=digest,
+            payload={
+                "batch_id": f"BATCH-{content[:12].upper()}",
+                "schedule_sha256": digest,
+                "dataset_manifest_id": dataset_manifest_id,
+                "observation_sha256": job["file_sha256"],
+                "row_count": len(rows),
+                "dataset_fingerprint": content,
+            },
+            now=created_at,
+            producer_git_sha=producer_git_sha,
+            run_id=activation_id,
+            transaction_id=f"RESEARCH-TXN-OBS-{content[:12].upper()}",
+        )
+        member_event = _research_event(
+            record_id=member_record_id,
+            record_kind=RecordKind.OBSERVATION_MEMBER_BATCH,
+            entity_id=digest,
+            payload={
+                "batch_id": f"MEMB-{content[:12].upper()}",
+                "schedule_sha256": digest,
+                "dataset_manifest_id": dataset_manifest_id,
+                "member_location": member_rel.replace("\\", "/"),
+                "content_sha256": job["member_sha256"],
+                "row_count": member_count,
+                "sampling": dict(schedule.get("sampling") or {}),
+            },
+            now=created_at,
+            producer_git_sha=producer_git_sha,
+            run_id=activation_id,
+            transaction_id=f"RESEARCH-TXN-MEM-{content[:12].upper()}",
+        )
+
+        if job.get("stage") in {STAGE_ARTIFACTS, None}:
+            _append_event(data_root, obs_event)
+            job["stage"] = STAGE_RDP_OBS
+            _save_job(data_root, content, job)
+            _maybe_fault(fault_after, "AFTER_ONE_RDP_EVENT")
+
+        if job.get("stage") == STAGE_RDP_OBS:
+            _append_event(data_root, member_event)
+            job["stage"] = STAGE_RDP_MEMBER
+            _save_job(data_root, content, job)
+
         if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
             raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
-        loaded = json.loads(published_path.read_text(encoding="utf-8"))
-        fingerprint = str(
-            loaded.get("dataset_fingerprint")
-            or (job or {}).get("dataset_fingerprint")
-            or content
+
+        manifest = build_dataset_manifest(
+            dataset_id=dataset_id,
+            dataset_version=dataset_version,
+            schema_id=SCHEMA_ID,
+            schema_sha256=_schema_sha256(root),
+            generation_task_id="DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-V1",
+            generation_run_id=activation_id,
+            validation_receipt_sha256=content,
+            first_reliable_available_at=max_available,
+            created_at=created_at,
+            partitions=[partition, member_partition],
         )
-        if job is not None and job.get("parquet_rel"):
-            created = parse_utc(str(job["created_at"])) if job.get("created_at") else now
+        partitions_dir = manifests_dir / "partitions"
+        partitions_dir.mkdir(parents=True, exist_ok=True)
+        if job.get("stage") == STAGE_RDP_MEMBER:
+            for part in (partition, member_partition):
+                part_path = partitions_dir / f"{part.partition_manifest_id}.json"
+                _publish_immutable_bytes(
+                    part_path, part.model_dump_json().encode("utf-8")
+                )
+            _publish_immutable_bytes(
+                manifest_path, manifest.model_dump_json().encode("utf-8")
+            )
+            job["stage"] = STAGE_MANIFEST
+            job["dataset_fingerprint"] = manifest.dataset_fingerprint
+            _save_job(data_root, content, job)
+            _maybe_fault(fault_after, "AFTER_MANIFEST")
+
+        if job.get("stage") == STAGE_MANIFEST:
+            _publish_immutable_bytes(
+                published_path,
+                json.dumps(
+                    {
+                        "dataset_manifest_id": dataset_manifest_id,
+                        "dataset_fingerprint": manifest.dataset_fingerprint,
+                    },
+                    sort_keys=True,
+                ).encode("utf-8"),
+            )
+            job["stage"] = STAGE_MARKER
+            _save_job(data_root, content, job)
             persist_observation_schedule(
                 data_root=data_root,
                 schedule=schedule,
-                now=created,
+                now=created_at,
                 producer_git_sha=producer_git_sha,
                 activation_id=activation_id,
             )
+            _maybe_fault(fault_after, "AFTER_MARKER")
             _complete_job(
                 data_root,
                 job,
-                completed_at=created,
-                dataset_fingerprint=fingerprint,
+                completed_at=created_at,
+                dataset_fingerprint=str(manifest.dataset_fingerprint),
             )
+            _maybe_fault(fault_after, "AFTER_COMPLETE")
+
         return {
             "dataset_manifest_id": dataset_manifest_id,
-            "dataset_fingerprint": fingerprint,
-            "replay": True,
-        }
-
-    created_at = parse_utc(str(job["created_at"])) if job.get("created_at") else now
-    min_event, max_event, min_available, max_available = _clocks_from_rows(
-        rows,
-        fallback=created_at,
-    )
-    if max_available > created_at:
-        created_at = max_available
-    parquet_rel = str(
-        job.get("parquet_rel") or f"datasets/parquet/{dataset_manifest_id}/observations.parquet"
-    )
-    member_rel = str(
-        job.get("member_rel") or f"datasets/parquet/{dataset_manifest_id}/members.parquet"
-    )
-    parquet_path = data_root / parquet_rel
-    member_path = data_root / member_rel
-
-    if job.get("stage") is None:
-        activation = load_hot90_activation(root)
-        writer = _write_selected_zstd_parquet if activation["new_write_zstd"] else _write_parquet
-        file_sha256 = writer(parquet_path, rows)
-        if activation["members_layout"] == "SNAPSHOT_PLUS_DELTA":
-            unit_path = (
-                data_root / "datasets" / "members_snapshot_plus_delta" / utc_day / "unit.json"
-            )
-            if unit_path.is_file():
-                unit = append_delta_publication(
-                    data_root,
-                    utc_day=utc_day,
-                    dataset_manifest_id=dataset_manifest_id,
-                    rows=member_rows,
-                )
-            else:
-                unit = write_snapshot_unit(
-                    data_root,
-                    utc_day=utc_day,
-                    dataset_manifest_id=dataset_manifest_id,
-                    rows=member_rows,
-                )
-            last = unit["publications"][-1]
-            member_rel = str(last["rel"]).replace("\\", "/")
-            member_path = data_root / member_rel
-            member_sha256 = str(last["sha256"])
-        else:
-            member_sha256 = writer(member_path, member_rows)
-        existing_obs = parquet_path.read_bytes() if parquet_path.is_file() else b""
-        if hashlib.sha256(existing_obs).hexdigest() != file_sha256:
-            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
-        job = {
-            "stage": STAGE_ARTIFACTS,
-            "content_sha256": content,
-            "file_sha256": file_sha256,
-            "member_sha256": member_sha256,
+            "dataset_fingerprint": manifest.dataset_fingerprint,
+            "snapshot_cutoff": render_utc(max_available),
+            "min_event_time": None if min_event is None else render_utc(min_event),
+            "first_reliable_available_at": render_utc(max_available),
+            "replay": False,
+            "member_count": member_count,
             "observation_count": len(rows),
-            "member_count": len(member_rows),
-            "dataset_manifest_id": dataset_manifest_id,
-            "utc_day": utc_day,
-            "dataset_version": dataset_version,
-            "parquet_rel": parquet_rel.replace("\\", "/"),
-            "member_rel": member_rel.replace("\\", "/"),
-            "created_at": render_utc(created_at),
-            "sampling": dict(schedule.get("sampling") or {}),
-            "schedule_sha256": digest,
-            "activation_id": activation_id,
-            "observations": [dict(item) for item in input_observations],
-            "normalized_observations": rows,
-            "members": member_rows,
         }
-        _save_job(data_root, content, job)
-        _maybe_fault(fault_after, "AFTER_ARTIFACTS")
-
-    for artifact_path, hash_key in (
-        (parquet_path, "file_sha256"),
-        (member_path, "member_sha256"),
-    ):
-        if (
-            artifact_path.is_file() is False
-            or hashlib.sha256(artifact_path.read_bytes()).hexdigest()
-            != str(job.get(hash_key))
-        ):
-            raise ObservationPanelPublisherError("CANONICAL_TARGET_CONFLICT")
-
-    partition = build_partition_manifest(
-        dataset_id=dataset_id,
-        dataset_version=dataset_version,
-        partition_id=f"utc-day-{utc_day}",
-        logical_location=parquet_rel.replace("\\", "/"),
-        file_sha256=str(job["file_sha256"]),
-        content_sha256=content,
-        row_count=len(rows),
-        min_event_time=min_event,
-        max_event_time=max_event,
-        min_available_to_strategy_at=min_available,
-        max_available_to_strategy_at=max_available,
-        first_reliable_available_at=max_available,
-        created_at=created_at,
-    )
-    member_partition = build_partition_manifest(
-        dataset_id=dataset_id,
-        dataset_version=dataset_version,
-        partition_id=f"utc-day-{utc_day}-members",
-        logical_location=member_rel.replace("\\", "/"),
-        file_sha256=str(job["member_sha256"]),
-        content_sha256=content,
-        row_count=len(member_rows),
-        min_event_time=min_event,
-        max_event_time=max_event,
-        min_available_to_strategy_at=min_available,
-        max_available_to_strategy_at=max_available,
-        first_reliable_available_at=max_available,
-        created_at=created_at,
-    )
-
-    obs_event = _research_event(
-        record_id=obs_record_id,
-        record_kind=RecordKind.OBSERVATION_BATCH,
-        entity_id=digest,
-        payload={
-            "batch_id": f"BATCH-{content[:12].upper()}",
-            "schedule_sha256": digest,
-            "dataset_manifest_id": dataset_manifest_id,
-            "observation_sha256": job["file_sha256"],
-            "row_count": len(rows),
-            "dataset_fingerprint": content,
-        },
-        now=created_at,
-        producer_git_sha=producer_git_sha,
-        run_id=activation_id,
-        transaction_id=f"RESEARCH-TXN-OBS-{content[:12].upper()}",
-    )
-    member_event = _research_event(
-        record_id=member_record_id,
-        record_kind=RecordKind.OBSERVATION_MEMBER_BATCH,
-        entity_id=digest,
-        payload={
-            "batch_id": f"MEMB-{content[:12].upper()}",
-            "schedule_sha256": digest,
-            "dataset_manifest_id": dataset_manifest_id,
-            "member_location": member_rel.replace("\\", "/"),
-            "content_sha256": job["member_sha256"],
-            "row_count": len(member_rows),
-            "sampling": dict(schedule.get("sampling") or {}),
-        },
-        now=created_at,
-        producer_git_sha=producer_git_sha,
-        run_id=activation_id,
-        transaction_id=f"RESEARCH-TXN-MEM-{content[:12].upper()}",
-    )
-
-    if job.get("stage") in {STAGE_ARTIFACTS, None}:
-        _append_event(data_root, obs_event)
-        job["stage"] = STAGE_RDP_OBS
-        _save_job(data_root, content, job)
-        _maybe_fault(fault_after, "AFTER_ONE_RDP_EVENT")
-
-    if job.get("stage") == STAGE_RDP_OBS:
-        _append_event(data_root, member_event)
-        job["stage"] = STAGE_RDP_MEMBER
-        _save_job(data_root, content, job)
-
-    if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
-        raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
-
-    manifest = build_dataset_manifest(
-        dataset_id=dataset_id,
-        dataset_version=dataset_version,
-        schema_id=SCHEMA_ID,
-        schema_sha256=_schema_sha256(root),
-        generation_task_id="DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-V1",
-        generation_run_id=activation_id,
-        validation_receipt_sha256=content,
-        first_reliable_available_at=max_available,
-        created_at=created_at,
-        partitions=[partition, member_partition],
-    )
-    partitions_dir = manifests_dir / "partitions"
-    partitions_dir.mkdir(parents=True, exist_ok=True)
-    if job.get("stage") == STAGE_RDP_MEMBER:
-        for part in (partition, member_partition):
-            part_path = partitions_dir / f"{part.partition_manifest_id}.json"
-            _publish_immutable_bytes(
-                part_path, part.model_dump_json().encode("utf-8")
-            )
-        _publish_immutable_bytes(
-            manifest_path, manifest.model_dump_json().encode("utf-8")
-        )
-        job["stage"] = STAGE_MANIFEST
-        job["dataset_fingerprint"] = manifest.dataset_fingerprint
-        _save_job(data_root, content, job)
-        _maybe_fault(fault_after, "AFTER_MANIFEST")
-
-    if job.get("stage") == STAGE_MANIFEST:
-        _publish_immutable_bytes(
-            published_path,
-            json.dumps(
-                {
-                    "dataset_manifest_id": dataset_manifest_id,
-                    "dataset_fingerprint": manifest.dataset_fingerprint,
-                },
-                sort_keys=True,
-            ).encode("utf-8"),
-        )
-        job["stage"] = STAGE_MARKER
-        _save_job(data_root, content, job)
-        persist_observation_schedule(
-            data_root=data_root,
-            schedule=schedule,
-            now=created_at,
-            producer_git_sha=producer_git_sha,
-            activation_id=activation_id,
-        )
-        _maybe_fault(fault_after, "AFTER_MARKER")
-        _complete_job(
-            data_root,
-            job,
-            completed_at=created_at,
-            dataset_fingerprint=str(manifest.dataset_fingerprint),
-        )
-        _maybe_fault(fault_after, "AFTER_COMPLETE")
-
-    return {
-        "dataset_manifest_id": dataset_manifest_id,
-        "dataset_fingerprint": manifest.dataset_fingerprint,
-        "snapshot_cutoff": render_utc(max_available),
-        "min_event_time": None if min_event is None else render_utc(min_event),
-        "first_reliable_available_at": render_utc(max_available),
-        "replay": False,
-        "member_count": len(member_rows),
-        "observation_count": len(rows),
-    }
+    finally:
+        if member_conn is not None:
+            member_conn.close()
+        if member_spill is not None:
+            member_spill.unlink(missing_ok=True)
 
 
 def repair_open_publication_jobs(
@@ -1005,11 +1078,18 @@ def repair_open_publication_jobs(
     for path in iter_open_job_paths(data_root):
         try:
             assert_routine_hot_path(path)
-            job = json.loads(path.read_text(encoding="utf-8"))
+            probe = probe_open_job_for_routine_path(path)
+            if probe.kind != "FULL_PARSE_OK":
+                if open_job_probe_matches_activation(
+                    probe,
+                    schedule_sha256=digest,
+                    activation_id=str(activation_id),
+                ):
+                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+                continue
+            job = load_open_job_for_routine_path(path)
         except PublicationJobError as exc:
             raise ObservationPanelPublisherError(str(exc)) from exc
-        if not isinstance(job, dict):
-            raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
         if job.get("schedule_sha256") != digest:
             continue
         if str(job.get("activation_id") or "") != str(activation_id):
@@ -1017,8 +1097,12 @@ def repair_open_publication_jobs(
                 raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
             continue
         observations = list(job.get("observations") or [])
-        members = list(job.get("members") or [])
-        if not members:
+        members = job.get("members")
+        if isinstance(members, list) and members:
+            publish_members: Iterable[Mapping[str, Any]] | None = members
+        elif job.get("stage"):
+            publish_members = None
+        else:
             raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
         repaired.append(
             publish_observation_batch(
@@ -1028,7 +1112,7 @@ def repair_open_publication_jobs(
                 activation_id=activation_id,
                 now=now,
                 producer_git_sha=producer_git_sha,
-                members=members,
+                members=publish_members,
                 observations=observations,
                 fault_after=fault_after,
                 content_sha256=path.stem,
@@ -1048,14 +1132,23 @@ def has_open_publication_jobs(
     for path in iter_open_job_paths(data_root):
         try:
             assert_routine_hot_path(path)
+            probe = probe_open_job_for_routine_path(path)
+            if probe.kind != "FULL_PARSE_OK":
+                if open_job_probe_matches_activation(
+                    probe,
+                    schedule_sha256=schedule_sha256,
+                    activation_id=activation_id,
+                ):
+                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+                continue
+            try:
+                job = load_open_job_for_routine_path(path)
+            except PublicationJobError as exc:
+                if str(exc) == "PUBLICATION_JOB_INVALID":
+                    return True
+                raise
         except PublicationJobError as exc:
             raise ObservationPanelPublisherError(str(exc)) from exc
-        try:
-            job = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            return True
-        if not isinstance(job, dict):
-            return True
         if (
             str(job.get("schedule_sha256")) == schedule_sha256
             and str(job.get("activation_id")) == activation_id

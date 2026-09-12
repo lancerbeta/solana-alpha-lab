@@ -68,6 +68,7 @@ Host identity: `docs/operator/FACTORY_REMOTE_HOST.md` +
 | Runtime config | `configs/observation_schedule_runtime_v1.yaml` |
 | Units | `factory-observation-schedule.service` / `.timer` |
 | Unit templates | `configs/factory_remote_ops/factory-observation-schedule.*` |
+| Collector memory envelope | template `MemoryHigh=768M` / `MemoryMax=1G` (oneshot tick dies instead of taking the 5.8 GiB / 0-swap host). **Not live until** exact-SHA deploy copies the unit, then `daemon-reload` + restart/start under a separate owner OPERATE gate. |
 | Production tick env | systemd `EnvironmentFile=-/etc/solana-alpha-lab/secrets.env` (not bare `uv tick`) |
 | SQLite | `local/factory_v1/observation_schedule_state.sqlite` |
 | Observation RDP | `local/factory_v1/observation_rdp` |
@@ -311,6 +312,17 @@ operator procedure (`timeout` of the `systemctl` client, then explicit service
 stop). Bare `sudo uv … tick` without that EnvironmentFile is **not** a canonical
 production surface: live proof observed `CREDENTIAL_ENV_MISSING`. Do not
 change the unit for documentation.
+
+**Collector memory fence (Git template):** `MemoryHigh=768M` / `MemoryMax=1G`.
+A regression must fail as one oneshot tick, not as a dead VPS. Copying the
+template onto the host requires a separate owner OPERATE exact-SHA deploy +
+`systemctl daemon-reload`. This software atom does not mutate the live unit.
+
+**Residual — wall clock:** a memory-bounded tick can still run a long time.
+Do not add `TimeoutStartSec` as the primary fix: mid-tick SIGKILL/SIGTERM has
+no separately proven scientific recovery meaning beyond existing publication-job
+repair + lease expiry. Provider call wall deadline stays. Memory safety is
+mandatory; wall-time redesign is not.
 
 ```
 sudo systemctl stop factory-observation-schedule.timer

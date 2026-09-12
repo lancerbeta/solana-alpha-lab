@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: c48eec4ee90048445c3b87a47bf8f70ac4f5c7e7848c988a0baa8e26ac9a6729}
+  integrity: {kind: sha256, sha256: 233c33f4c2adb2e7d291a85455a7270fa8f7ef070f7b5b181c788057d9d8392c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33073,7 +33073,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 80fe61fae18de9a7965dedc3039596e53fd720f87a00e101874f72c80c70b1cf}
+  integrity: {kind: sha256, sha256: 18fdda3efe8e3ec15c19c69635031038e464cfd7da4b593b0e5b5ba6bef9324a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33455,7 +33455,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_scheduler.py', repository_path: src/solana_alpha_lab/factory/observation_scheduler.py}
-  integrity: {kind: sha256, sha256: a5b3f9bae50c6cb5d6f704b17332a179c6359a4bcf398eee52c6f12c4666762a}
+  integrity: {kind: sha256, sha256: 67c32e57718f6ba90603603508ebae82b99a204a1d3391a0ba39386c757d076e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -35076,7 +35076,7 @@ records:
   as_of: '2026-09-04'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_publication_jobs.py', repository_path: src/solana_alpha_lab/factory/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: 06b8e0671399f7d6cf10c6167cb2cd44c4cb020d25f9d12d913884b531ffad07}
+  integrity: {kind: sha256, sha256: 77c35301e269d202049e26ddff615f00a6c2cb0a8842bb7cc9cb942f862605f1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}
@@ -35219,7 +35219,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: FACTORY_97D_STORAGE_ARCHITECTURE_PROOF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_97d_storage_architecture_proof_v1.py', repository_path: tests/test_factory_97d_storage_architecture_proof_v1.py}
-  integrity: {kind: sha256, sha256: 383f432dd1796418917e3747c628a194bf85662a012ed2bc2a39a5baa59e068e}
+  integrity: {kind: sha256, sha256: a8b4ffa11af6385d5bffda1de62abe7a6480874a3ff1e2452384d8819494e1c9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-97D-STORAGE-ARCHITECTURE-PROOF-001}

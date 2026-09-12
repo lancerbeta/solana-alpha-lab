@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
@@ -197,6 +197,7 @@ def snapshot_proves_required_points(
     covering_schedule_sha256: str,
     required_points: Sequence[str],
     due_rows: Sequence[Mapping[str, Any]] | None = None,
+    due_prove: Callable[[Sequence[str]], bool] | None = None,
     now: datetime | None = None,
 ) -> bool:
     """An existing snapshot is reusable only if it independently proves this consumer."""
@@ -211,6 +212,8 @@ def snapshot_proves_required_points(
     parquet_points = snapshot_manifest_point_ids(data_root, snapshot)
     if parquet_points and not set(required_points).issubset(parquet_points):
         return False
+    if due_prove is not None:
+        return bool(due_prove(required_points))
     if due_rows is not None:
         return due_rows_prove_required_points(
             due_rows,
@@ -228,7 +231,8 @@ def pending_consumer_satisfiable(
     data_root,
     covering_schedule_sha256: str,
     required_points: Sequence[str],
-    due_rows: Sequence[Mapping[str, Any]],
+    due_rows: Sequence[Mapping[str, Any]] | None = None,
+    due_prove: Callable[[Sequence[str]], bool] | None = None,
     snapshot: Mapping[str, Any] | None = None,
     publication_complete: bool,
     now: datetime | None = None,
@@ -239,12 +243,18 @@ def pending_consumer_satisfiable(
         return False
     if not publication_complete:
         return False
-    if not due_rows_prove_required_points(
-        due_rows,
-        covering_schedule_sha256=covering_schedule_sha256,
-        required_points=required_points,
-        now=now,
-    ):
+    if due_prove is not None:
+        proved = bool(due_prove(required_points))
+    elif due_rows is not None:
+        proved = due_rows_prove_required_points(
+            due_rows,
+            covering_schedule_sha256=covering_schedule_sha256,
+            required_points=required_points,
+            now=now,
+        )
+    else:
+        return False
+    if not proved:
         return False
     if snapshot is not None:
         return snapshot_proves_required_points(
@@ -253,6 +263,7 @@ def pending_consumer_satisfiable(
             covering_schedule_sha256=covering_schedule_sha256,
             required_points=required_points,
             due_rows=due_rows,
+            due_prove=due_prove,
             now=now,
         )
     return True

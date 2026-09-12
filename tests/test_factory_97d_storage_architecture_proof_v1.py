@@ -156,7 +156,10 @@ class Factory97dStorageArchitectureProofTests(unittest.TestCase):
         self.assertIn("isolated temporary data_root", prd)
         self.assertIn("STORAGE_TARGET_REQUIRES_CAPTURE_POLICY_CHANGE", prd)
         publisher = PUBLISHER.read_text(encoding="utf-8")
-        self.assertIn("pq.write_table(table, tmp)", publisher)
-        self.assertNotIn("compression=", publisher.split("def _write_parquet", 1)[1][:400])
+        self.assertIn("def _write_parquet_batches(", publisher)
+        self.assertIn("pq.ParquetWriter", publisher)
+        self.assertIn("writer.write_table(table)", publisher)
+        # Empty-table fallback still uses write_table; batched path owns large writes.
+        self.assertIn("pq.write_table(empty, tmp)", publisher)
         self.assertIn("no architecture implementation", prd.lower())
         self.assertIn("Destructive eviction is a **later** gate", prd)
