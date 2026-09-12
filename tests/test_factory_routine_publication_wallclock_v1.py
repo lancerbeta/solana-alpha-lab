@@ -687,11 +687,6 @@ class RoutinePublicationWallclockV1Tests(unittest.TestCase):
                 rows=[_member(i, tag="B" if i == 1 else "A") for i in range(30)],
             )
             baseline = list_closed_day_relative_paths(data_root, "20260912")
-            from solana_alpha_lab.factory.observation_schedule import canonical_sha256
-
-            baseline_inventory = canonical_sha256(
-                [{"path": rel} for rel in baseline]
-            )
 
             unit_dir = data_root / "datasets/members_snapshot_plus_delta/20260912"
             # Crash leftovers exactly as produced by _store_operational_latest:
@@ -710,10 +705,6 @@ class RoutinePublicationWallclockV1Tests(unittest.TestCase):
                 relative_paths=with_crash,
                 dest_dir=root / "a-crash",
             )
-            from solana_alpha_lab.factory.hot90_archive import (
-                list_closed_day_relative_paths as _l,
-            )
-
             self.assertEqual(
                 packed["inventory_sha256"],
                 package_closed_day_archive(

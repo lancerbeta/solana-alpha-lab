@@ -21,8 +21,8 @@
     "scripts/bench_routine_publication_full_path.py": "c517f701dcf5e7a1d799992c3c5eed534c79861f8ea5aefdb5c542163af425d3",
     "src/solana_alpha_lab/factory/hot90_archive.py": "e1e37c2d8680d03fc8217ab88b86cf4d1bc5c2790cebbb8706d5f50b44adfca1",
     "src/solana_alpha_lab/factory/hot90_closed_day_loop.py": "215cd314726a9914828b82e51736efb7f5cac756448617ed34ad5a08d64d7ae1",
-    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "9b336ee8e14abe58882964a9fbeb1ab415aeefaee3bacde8a0dedb958dbff896",
-    "tests/test_factory_routine_publication_wallclock_v1.py": "8261ef00e79b694dc13335c4f3e3085c99552395e59e135d591225012bc695e3"
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "59e1686782e56fe80a3967b89511175da282827c8b67033624553e7edbae3260",
+    "tests/test_factory_routine_publication_wallclock_v1.py": "a88206cccbfe6358456c7a95c5430e289fca8115623655266b758e7c71d03739"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -34,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_factory_fit_v1.json",
-    "sha256": "cd7c0d2612c620591f448367f874914dee07c1bc87d187bfe87d7d54a5ec0a42",
+    "sha256": "f9fa6d01d1d09e13f131b58942cc0bf82014f528163f589b2d23cf8ca532a364",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_ROUTINE_PUBLICATION_WALLCLOCK",
     "independent_review": {
       "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_independent_review_v1.json",
-      "sha256": "acca6c421c24d1d238aa5b4665e28cf874738832cdece90578a7d9b7683350b0",
+      "sha256": "b4aec89bf7310b5293c9a0f5e56b41c06dda4c3f74e2d71f779a992ee29a3b8b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

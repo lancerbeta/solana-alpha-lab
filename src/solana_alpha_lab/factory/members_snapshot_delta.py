@@ -489,13 +489,17 @@ def _store_operational_latest(
 
     db_path, meta_path = _operational_latest_paths(unit_dir)
     unit_dir.mkdir(parents=True, exist_ok=True)
+    # tmp forms MUST stay covered by is_operational_cache_name(); the archive
+    # boundary and pruning derive from these exact shared constants.
     handle, tmp_name = tempfile.mkstemp(
-        prefix="operational-latest-", suffix=".sqlite", dir=str(unit_dir)
+        prefix=_OPERATIONAL_CACHE_TMP_DB_PREFIX, suffix=".sqlite", dir=str(unit_dir)
     )
     os.close(handle)
     tmp_db = Path(tmp_name)
     tmp_db.unlink(missing_ok=True)
-    tmp_meta = unit_dir / f".operational_latest_members.meta.{os.getpid()}.tmp"
+    tmp_meta = unit_dir / (
+        f"{_OPERATIONAL_CACHE_TMP_META_PREFIX}{os.getpid()}.tmp"
+    )
     dest: sqlite3.Connection | None = None
     try:
         dest = sqlite3.connect(str(tmp_db))
