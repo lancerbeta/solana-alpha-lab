@@ -1,0 +1,62 @@
+{
+  "as_of": "2026-09-12",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_MUTATION_IN_THIS_ATOM",
+    "NO_C1_RESUME_SEAL_IMPORT",
+    "NO_PROVIDER_CALLS",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION",
+    "NO_SWAP_OR_HOST_RESIZE",
+    "NO_LIVE_CONCURRENCY_COMMISSIONING",
+    "SOFTWARE_CONCURRENCY_BUDGET_PASS_ONLY"
+  ],
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "review_id": "FACTORY-COLLECTOR-MEMORY-BOUNDED-TICK-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviews": [
+    {
+      "findings": [
+        "packet_fingerprint_sha256=fb6349d4c486bea67bf995d5a426d8a98ddd1a3c5789246b5e4d436799ee30bc",
+        "CLAIM_002_SCHEDULE_WIDE_SQL_PROVE",
+        "CLAIM_006_RECOVERED_CLAIMED_UNCAPPED",
+        "ACCEPT_WITH_RESIDUAL_STRESS_NOT_LIVE_RSS",
+        "ACCEPT_WITH_RESIDUAL_COUNT_DUE_TEXT_PREDICATES"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "DUE_PROVE_UTC_PARSE_UTC",
+        "SCHEDULE_WIDE_PROVE_PARITY",
+        "RECOVERED_CLAIMED_TICK_UNCAPPED",
+        "V2_STREAMED_DELTA_OPS"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "PROVE_SCOPE_MATCHES_BASE",
+        "RECOVERED_VIA_TICK_ONCE",
+        "STRESS_150K_UNDER_1GIB",
+        "SYSTEMD_MEMORY_FENCE_TEMPLATE"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_COLLECTOR_MEMORY_BOUNDED_TICK_V1",
+  "verdict": "PASS"
+}

@@ -1,0 +1,41 @@
+{
+  "as_of": "2026-09-12",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_PAUSED_FIRST_TICK_MEMORYPEAK"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_ADOPT_SQLITE_PARQUET_NO_SPARK",
+    "context_efficiency": "PASS_SCOPED_SQL_STREAM_DELTA_NO_NEW_PLATFORM",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_CONTROL",
+    "flexibility_and_history": "PASS_SCHEDULE_WIDE_PROVE_AND_V1_DELTA_READ",
+    "mission": "PASS_REPAIR_ORDINARY_TICK_MEMORY",
+    "monitoring_and_recovery": "PASS_SYSTEMD_MEMORYMAX_WITH_LEASE_RECOVERY",
+    "owner_operability": "PASS_TEMPLATE_MEMORY_FENCE_OPERATE_LATER",
+    "red_team": "PASS_STRESS_PROVE_PARITY_RECOVERY_TICK",
+    "research_truth": "PASS_BASE_PROVE_AND_RECOVERY_PARITY",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_LIVE_RDP"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_LIVE_VPS_MUTATION_IN_THIS_ATOM",
+    "NO_C1_RESUME_SEAL_IMPORT",
+    "NO_PROVIDER_CALLS",
+    "NO_RDP_REWRITE",
+    "NO_HYPOTHESIS_GENERATION",
+    "NO_SWAP_OR_HOST_RESIZE",
+    "NO_LIVE_CONCURRENCY_COMMISSIONING",
+    "SOFTWARE_CONCURRENCY_BUDGET_PASS_ONLY",
+    "STRESS_RSS_IS_WORKER_NOT_LIVE_HOST"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT cursor/factory-collector-memory-bounded-tick-v1. DO NOT RESUME LIVE COLLECTOR UNTIL EXACT-SHA DEPLOY AND UNIT SYNC.",
+  "review_id": "FACTORY-COLLECTOR-MEMORY-BOUNDED-TICK-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_COLLECTOR_MEMORY_BOUNDED_TICK_V1",
+  "verdict": "PASS"
+}
