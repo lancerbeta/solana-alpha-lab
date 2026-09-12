@@ -282,6 +282,13 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
                 self.assertEqual(
                     str(repair_err.exception), LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION
                 )
+                import inspect
+
+                from solana_alpha_lab.factory.observation_scheduler import tick_once
+
+                self.assertIn(
+                    "repair_open_publication_jobs(", inspect.getsource(tick_once)
+                )
 
     def test_normal_and_recovery_converge(self) -> None:
         schedule = _schedule()
@@ -379,6 +386,53 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
             self.assertEqual(recovered["terminal"], FAT_ARTIFACTS_RESUME_COMPLETED)
             self.assertIn("members_snapshot_plus_delta", compact["member_rel"])
 
+    def test_snapshot_plus_delta_normal_and_recovery_converge(self) -> None:
+        schedule = _schedule()
+        with tempfile.TemporaryDirectory() as tmp:
+            modern_root = Path(tmp) / "modern"
+            recover_root = Path(tmp) / "recover"
+            modern_root.mkdir()
+            recover_root.mkdir()
+            with patch(
+                "solana_alpha_lab.factory.observation_panel_publisher.load_hot90_activation",
+                return_value=HOT90_DELTA,
+            ):
+                modern = _publish(modern_root, schedule)
+                with self.assertRaises(PublicationFault):
+                    _publish(recover_root, schedule, fault_after="AFTER_ARTIFACTS")
+            content = next(
+                (recover_root / "datasets" / "publication_jobs" / "open").glob("*.json")
+            ).stem
+            job_path = open_job_path(recover_root, content)
+            _inflate_open_job(job_path)
+            with patch(
+                "solana_alpha_lab.factory.observation_panel_publisher.load_hot90_activation",
+                return_value=HOT90_DELTA,
+            ):
+                recovered = resume_legacy_fat_open_artifacts(
+                    data_root=recover_root,
+                    root=ROOT,
+                    content_sha256=content,
+                    activations=_paused(),
+                    schedule=schedule,
+                    producer_git_sha=GIT_SHA,
+                    now=NOW,
+                )
+            self.assertEqual(recovered["terminal"], FAT_ARTIFACTS_RESUME_COMPLETED)
+            self.assertEqual(modern["dataset_manifest_id"], recovered["dataset_manifest_id"])
+            self.assertEqual(modern["dataset_fingerprint"], recovered["dataset_fingerprint"])
+            self.assertEqual(_rdp_identity(modern_root), _rdp_identity(recover_root))
+            modern_receipt = json.loads(
+                completed_job_path(modern_root, content).read_text(encoding="utf-8")
+            )
+            recover_receipt = json.loads(
+                completed_job_path(recover_root, content).read_text(encoding="utf-8")
+            )
+            self.assertEqual(modern_receipt["member_rel"], recover_receipt["member_rel"])
+            self.assertEqual(modern_receipt["member_sha256"], recover_receipt["member_sha256"])
+            self.assertEqual(modern_receipt["member_count"], recover_receipt["member_count"])
+            self.assertIn("members_snapshot_plus_delta", recover_receipt["member_rel"])
+
     def test_snapshot_plus_delta_missing_sidecar_fails_closed(self) -> None:
         schedule = _schedule()
         with tempfile.TemporaryDirectory() as tmp:
@@ -451,6 +505,25 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
             unit = json.loads(unit_path.read_text(encoding="utf-8"))
             unit["publications"][0]["row_count"] = int(compact["member_count"]) + 1
             unit_path.write_text(json.dumps(unit), encoding="utf-8")
+            _inflate_open_job(job_path)
+            with self.assertRaises(PublicationJobError) as err:
+                prove_legacy_fat_open_artifacts_source(data_root, content)
+            self.assertEqual(str(err.exception), FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+
+    def test_classic_member_parquet_row_count_mismatch_fails_closed(self) -> None:
+        schedule = _schedule()
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            with self.assertRaises(PublicationFault):
+                _publish(data_root, schedule, fault_after="AFTER_ARTIFACTS")
+            content = next(
+                (data_root / "datasets" / "publication_jobs" / "open").glob("*.json")
+            ).stem
+            job_path = open_job_path(data_root, content)
+            compact = json.loads(job_path.read_text(encoding="utf-8"))
+            compact["member_count"] = int(compact["member_count"]) + 1
+            job_path.write_text(json.dumps(compact), encoding="utf-8")
             _inflate_open_job(job_path)
             with self.assertRaises(PublicationJobError) as err:
                 prove_legacy_fat_open_artifacts_source(data_root, content)

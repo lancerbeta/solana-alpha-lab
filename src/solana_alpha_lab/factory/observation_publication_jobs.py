@@ -623,7 +623,7 @@ def _prove_snapshot_plus_delta_chain(
     *,
     member_count: int,
     member_sha256: str,
-) -> None:
+) -> bool:
     from solana_alpha_lab.factory.members_snapshot_delta import LAYOUT_KIND, read_member_layout
 
     member_path = _confine_data_rel(root, member_rel)
@@ -634,7 +634,7 @@ def _prove_snapshot_plus_delta_chain(
     ):
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
     if sidecar.is_file() is False:
-        return
+        return False
     try:
         sidecar.resolve().relative_to(root)
     except ValueError as exc:
@@ -669,6 +669,7 @@ def _prove_snapshot_plus_delta_chain(
     row_count = match.get("row_count")
     if type(row_count) is not int or row_count != member_count:
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    return True
 
 
 def prove_legacy_fat_open_artifacts_source(
@@ -766,7 +767,7 @@ def prove_legacy_fat_open_artifacts_source(
         if _sha256_file(artifact) != digest:
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_HASH_MISMATCH)
         proven_paths[label] = artifact
-    _prove_snapshot_plus_delta_chain(
+    layout_proven = _prove_snapshot_plus_delta_chain(
         root,
         member_rel,
         str(job["dataset_manifest_id"]),
@@ -781,6 +782,13 @@ def prove_legacy_fat_open_artifacts_source(
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
     if parquet_rows != observation_count:
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
+    if layout_proven is False:
+        try:
+            member_rows = int(pq.read_metadata(proven_paths["member"]).num_rows)
+        except Exception as exc:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING) from exc
+        if member_rows != member_count:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_IDENTITY_MISMATCH)
     completed = completed_job_path(data_root, content_sha256)
     if completed.is_file():
         try:
