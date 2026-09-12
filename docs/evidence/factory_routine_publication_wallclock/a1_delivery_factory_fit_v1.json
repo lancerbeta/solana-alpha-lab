@@ -4,8 +4,8 @@
   "review_id": "FACTORY-ROUTINE-PUBLICATION-WALLCLOCK-FACTORY-FIT-001",
   "as_of": "2026-09-12",
   "task_id": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "535e78425c93f2cca1c7a64c201688b4d63ff5dea9fbdf49016f8404c71ab749",
+  "reviewed_inventory_sha256": "0ce85a4491268129b8c04f7b4f7c7a80dbce6dc0a724db1971eabaa99afd6189",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
