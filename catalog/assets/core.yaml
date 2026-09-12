@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 233c33f4c2adb2e7d291a85455a7270fa8f7ef070f7b5b181c788057d9d8392c}
+  integrity: {kind: sha256, sha256: 1d7356f44c2c6b2420c68b7a5d4467905ac319b3460ae14dce8a72de23ed1dbd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -35070,37 +35070,37 @@ records:
 - asset_id: MODULE-OBSERVATION-PUBLICATION-JOBS-001
   record_version: '1.0'
   asset_type: script
-  purpose: Filesystem publication-job journal with open-only routine repair, compact completed receipts, and byte-identical legacy_full migration.
+  purpose: Filesystem publication-job journal with open-only routine repair, compact completed receipts, byte-identical legacy_full migration, and paused-only streaming ARTIFACTS resume for oversized open jobs.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-09-04'
+  as_of: '2026-09-12'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_publication_jobs.py', repository_path: src/solana_alpha_lab/factory/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: 77c35301e269d202049e26ddff615f00a6c2cb0a8842bb7cc9cb942f862605f1}
+  integrity: {kind: sha256, sha256: 048098f34ca0d51fd2b52bea7efc129d25ffb0b5ccd0a3b640fb3dfb856059b3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}
   consumers: [FACTORY-001]
   evidence: []
-  search_terms: [PUBLICATION_JOBS, COMPLETE, LEGACY_FULL, HOT_PATH]
+  search_terms: [PUBLICATION_JOBS, COMPLETE, LEGACY_FULL, HOT_PATH, ARTIFACTS_RESUME]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: SCRIPT-OBSERVATION-PUBLICATION-JOBS-CLI-001
   record_version: '1.0'
   asset_type: script
-  purpose: Operator status/dry-run/apply surface for publication-job journal migration with PAUSED-collector APPLY gate.
+  purpose: Operator status/dry-run/apply plus paused-only inspect-fat-open / resume-fat-artifacts for oversized ARTIFACTS open jobs.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
-  as_of: '2026-09-04'
+  as_of: '2026-09-12'
   truth_owner: OBSERVATION_RAW_CAPTURE_PUBLICATION_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_publication_jobs.py', repository_path: scripts/observation_publication_jobs.py}
-  integrity: {kind: sha256, sha256: a59daccc960bf048e78cffcdb504102eb44718eb976bb2fcb005d1a8a9703297}
+  integrity: {kind: sha256, sha256: 17ac45a202b2f38e2e9a4e5b08f49e1177dbe2233d5b5a5bc77fc4e90bd1dead}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-OBSERVATION-RAW-CAPTURE-PUBLICATION-OPERABILITY-001}
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-PUBLICATION-JOBS-001}
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
-  search_terms: [PUBLICATION_JOB_MIGRATION, DRY_RUN, APPLY, COLLECTOR_NOT_PAUSED]
+  search_terms: [PUBLICATION_JOB_MIGRATION, DRY_RUN, APPLY, COLLECTOR_NOT_PAUSED, INSPECT_FAT_OPEN, RESUME_FAT_ARTIFACTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: TEST-OBSERVATION-PUBLICATION-JOB-LIFECYCLE-001
   record_version: '1.0'

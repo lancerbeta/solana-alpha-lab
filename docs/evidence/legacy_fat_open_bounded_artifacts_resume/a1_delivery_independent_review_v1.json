@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-12",
+  "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
+  "reviewed_bindings_sha256": "20a914efc1827aea7927f1b96f0a8c53b6755c23c1dc4c9ab4ad225c567c08d6",
+  "reviewed_inventory_sha256": "4c62249813deb70cbb6d1b7ce7ec016821de52d7f799730e9394f3b89a72fb85",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=95dbbc6671b3a21e8ef2194b88314673821f66c7f784f68a43faccd2942b392a",
+        "BOUNDED_READER_NO_MEMBERS_MATERIALIZATION",
+        "CANONICAL_PUBLISH_OBSERVATION_BATCH_CONTINUATION",
+        "PAUSED_ONLY_DUAL_GATE",
+        "NO_ROUTINE_VPS_BURDEN",
+        "NO_INCIDENT_HARDCODE",
+        "CLASSIC_AND_SNAPSHOT_MEMBER_COUNT_PROVEN",
+        "PAUSE_SNAPSHOT_TOCTOU_NON_GOAL"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CLASSIC_MEMBER_PARQUET_NUM_ROWS_EQ_MEMBER_COUNT",
+        "FAT_OPEN_STAGE_NOT_PERSISTED_OVERSIZED_INTENTIONAL",
+        "RESUME_MEMBERS_NONE_CANONICAL_PATH",
+        "TARGETED_TESTS_17_PASS",
+        "LIFECYCLE_TESTS_17_PASS",
+        "NO_LIVE_IDENTITY_HARDCODE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OWNER_FALSIFIERS_1_TO_9_COVERED",
+        "OPERATOR_B2_AND_READOUT_ALIGNED",
+        "MAXRSS_BELOW_SOFT_ENVELOPE_768MIB",
+        "MAXRSS_CI_LINUX_OBSERVED_391147520",
+        "PROVIDER_CALLS_0",
+        "NO_CLAIM_LIVE_616MB_RSS"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_SCHEDULER_LEASE_LOCK",
+    "NO_MEMBERS_CENSUS_RECOVERY"
+  ]
+}

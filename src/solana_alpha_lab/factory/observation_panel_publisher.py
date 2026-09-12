@@ -40,15 +40,32 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
     load_observation_primitive_registry,
 )
 from solana_alpha_lab.factory.observation_publication_jobs import (
+    COLLECTOR_NOT_PAUSED,
+    CONTENT_SHA256_INVALID,
+    CONTENT_SHA256_RE,
+    FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
+    FAT_ARTIFACTS_RESUME_COMPLETED,
+    FAT_ARTIFACTS_RESUME_CONFLICT,
+    FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID,
+    FAT_ARTIFACTS_RESUME_READY,
+    FAT_ARTIFACTS_RESUME_READY_RETRY,
+    FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING,
     LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
     PublicationJobError,
     assert_routine_hot_path,
+    collector_pause_proven,
     complete_publication_job,
+    completed_job_path,
+    fat_resume_activation_paused,
+    is_compact_receipt,
     iter_open_job_paths,
     load_job_by_content,
     load_open_job_for_routine_path,
+    open_job_path,
     open_job_probe_matches_activation,
     probe_open_job_for_routine_path,
+    prove_legacy_fat_open_artifacts_source,
+    revalidate_open_job_source,
     save_open_job,
 )
 from solana_alpha_lab.storage.manifests import (
@@ -664,6 +681,7 @@ def _complete_job(
     *,
     completed_at: datetime,
     dataset_fingerprint: str | None = None,
+    expected_open_source: tuple[int, str] | None = None,
 ) -> dict[str, Any]:
     try:
         return complete_publication_job(
@@ -671,6 +689,7 @@ def _complete_job(
             job,
             completed_at=completed_at,
             dataset_fingerprint=dataset_fingerprint,
+            expected_open_source=expected_open_source,
         )
     except PublicationJobError as exc:
         raise ObservationPanelPublisherError(str(exc)) from exc
@@ -714,6 +733,8 @@ def publish_observation_batch(
     observations: Sequence[Mapping[str, Any]] | None = None,
     fault_after: str | None = None,
     content_sha256: str | None = None,
+    open_job: Mapping[str, Any] | None = None,
+    expected_open_source: tuple[int, str] | None = None,
 ) -> dict[str, Any]:
     now = now.astimezone(UTC)
     digest = str(schedule["schedule_sha256"])
@@ -726,7 +747,9 @@ def publish_observation_batch(
         _normalize_observation_row(item, registry=registry)
         for item in input_observations
     ]
-    job = _load_job(data_root, content_sha256) if content_sha256 else None
+    job = dict(open_job) if open_job is not None else (
+        _load_job(data_root, content_sha256) if content_sha256 else None
+    )
     member_spill = None
     member_conn = None
     try:
@@ -788,6 +811,9 @@ def publish_observation_batch(
         obs_record_id = f"OBS-BATCH-{content[:16].upper()}"
         member_record_id = f"OBS-MEMB-{content[:16].upper()}"
 
+        if expected_open_source is not None:
+            revalidate_open_job_source(data_root, content, expected_open_source)
+
         if published_path.is_file():
             if not _rdp_has(data_root, obs_record_id) or not _rdp_has(data_root, member_record_id):
                 raise ObservationPanelPublisherError("PUBLICATION_INCOMPLETE")
@@ -811,6 +837,7 @@ def publish_observation_batch(
                     job,
                     completed_at=created,
                     dataset_fingerprint=fingerprint,
+                    expected_open_source=expected_open_source,
                 )
             return {
                 "dataset_manifest_id": dataset_manifest_id,
@@ -975,6 +1002,9 @@ def publish_observation_batch(
             transaction_id=f"RESEARCH-TXN-MEM-{content[:12].upper()}",
         )
 
+        if expected_open_source is not None:
+            revalidate_open_job_source(data_root, content, expected_open_source)
+
         if job.get("stage") in {STAGE_ARTIFACTS, None}:
             _append_event(data_root, obs_event)
             job["stage"] = STAGE_RDP_OBS
@@ -1043,6 +1073,7 @@ def publish_observation_batch(
                 job,
                 completed_at=created_at,
                 dataset_fingerprint=str(manifest.dataset_fingerprint),
+                expected_open_source=expected_open_source,
             )
             _maybe_fault(fault_after, "AFTER_COMPLETE")
 
@@ -1061,6 +1092,237 @@ def publish_observation_batch(
             member_conn.close()
         if member_spill is not None:
             member_spill.unlink(missing_ok=True)
+
+
+def inspect_legacy_fat_open_artifacts(
+    *,
+    data_root: Path,
+    root: Path,
+    content_sha256: str,
+    activations: Sequence[Mapping[str, Any]],
+    schedule: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Paused-only dry-run for one oversized ARTIFACTS open job. No mutation."""
+
+    if collector_pause_proven(activations) is False:
+        raise PublicationJobError(COLLECTOR_NOT_PAUSED)
+    if CONTENT_SHA256_RE.fullmatch(content_sha256) is None:
+        raise PublicationJobError(CONTENT_SHA256_INVALID)
+    open_path = open_job_path(data_root, content_sha256)
+    completed_path = completed_job_path(data_root, content_sha256)
+    if open_path.is_file() is False and completed_path.is_file():
+        try:
+            existing = json.loads(completed_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT) from exc
+        if not isinstance(existing, dict) or not is_compact_receipt(existing):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if str(existing.get("content_sha256") or "") != content_sha256:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if str(schedule.get("schedule_sha256") or "") != str(
+            existing.get("schedule_sha256") or ""
+        ):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING)
+        digest = str(existing["schedule_sha256"])
+        expected_manifest = compute_dataset_manifest_id(
+            f"observation-panel-{digest[:12]}",
+            str(existing.get("dataset_version") or ""),
+        )
+        if str(existing.get("dataset_manifest_id") or "") != expected_manifest:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if fat_resume_activation_paused(
+            activations,
+            schedule_sha256=digest,
+            activation_id=str(existing.get("activation_id") or ""),
+        ) is False:
+            raise PublicationJobError(COLLECTOR_NOT_PAUSED)
+        obs_record_id = f"OBS-BATCH-{content_sha256[:16].upper()}"
+        member_record_id = f"OBS-MEMB-{content_sha256[:16].upper()}"
+        if not _rdp_has(data_root, obs_record_id) or not _rdp_has(
+            data_root, member_record_id
+        ):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        manifests = data_root / "datasets" / "manifests"
+        manifest_id = str(existing["dataset_manifest_id"])
+        if not (manifests / f"{manifest_id}.json").is_file() or not (
+            manifests / f"{manifest_id}.published"
+        ).is_file():
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        return {
+            "terminal": FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
+            "content_sha256": content_sha256,
+            "stage": str(existing.get("stage")),
+            "schedule_sha256": str(existing["schedule_sha256"]),
+            "activation_id": str(existing.get("activation_id") or ""),
+            "source_size": 0,
+            "source_sha256": None,
+            "parquet_rel": existing.get("parquet_rel"),
+            "member_rel": existing.get("member_rel"),
+            "observation_count": int(existing.get("observation_count") or 0),
+            "member_count": int(existing.get("member_count") or 0),
+            "dataset_manifest_id": str(existing["dataset_manifest_id"]),
+            "dataset_fingerprint": str(existing.get("dataset_fingerprint") or ""),
+            "durable_progress": {
+                "rdp_obs": True,
+                "rdp_member": True,
+                "manifest": True,
+                "published": True,
+                "completed": True,
+            },
+            "open_job_rewrite": "already_complete",
+            "provider_calls": 0,
+            "scientific_writes": 0,
+        }
+    proven = prove_legacy_fat_open_artifacts_source(data_root, content_sha256)
+    job = proven["job"]
+    digest = str(schedule.get("schedule_sha256") or "")
+    if digest != str(job["schedule_sha256"]):
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING)
+    if fat_resume_activation_paused(
+        activations,
+        schedule_sha256=digest,
+        activation_id=str(job["activation_id"]),
+    ) is False:
+        raise PublicationJobError(COLLECTOR_NOT_PAUSED)
+    expected_manifest = compute_dataset_manifest_id(
+        f"observation-panel-{digest[:12]}",
+        str(job["dataset_version"]),
+    )
+    if str(job["dataset_manifest_id"]) != expected_manifest:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+    try:
+        registry = load_observation_primitive_registry(root)
+    except PrimitiveRegistryError as exc:
+        raise ObservationPanelPublisherError("TYPED_VALUE_REGISTRY_INVALID") from exc
+    try:
+        rows = [
+            _normalize_observation_row(item, registry=registry)
+            for item in list(job.get("observations") or [])
+        ]
+    except ObservationPanelPublisherError as exc:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID) from exc
+    stored = job.get("normalized_observations")
+    if stored is not None and stored != rows:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_OBSERVATION_INVALID)
+    content = str(job["content_sha256"])
+    manifest_id = str(job["dataset_manifest_id"])
+    manifest_path = data_root / "datasets" / "manifests" / f"{manifest_id}.json"
+    published_path = data_root / "datasets" / "manifests" / f"{manifest_id}.published"
+    if manifest_path.is_file():
+        try:
+            loaded = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT) from exc
+        if not isinstance(loaded, dict):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if str(loaded.get("dataset_version") or "") != str(job.get("dataset_version") or ""):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        stored_fp = str(job.get("dataset_fingerprint") or "")
+        loaded_fp = str(loaded.get("dataset_fingerprint") or "")
+        if stored_fp and loaded_fp and stored_fp != loaded_fp:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+    if published_path.is_file():
+        try:
+            marker = json.loads(published_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT) from exc
+        if not isinstance(marker, dict):
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if str(marker.get("dataset_manifest_id") or "") != manifest_id:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+    obs_record_id = f"OBS-BATCH-{content[:16].upper()}"
+    member_record_id = f"OBS-MEMB-{content[:16].upper()}"
+    durable = {
+        "rdp_obs": _rdp_has(data_root, obs_record_id),
+        "rdp_member": _rdp_has(data_root, member_record_id),
+        "manifest": manifest_path.is_file(),
+        "published": published_path.is_file(),
+        "completed": completed_job_path(data_root, content).is_file(),
+    }
+    terminal = (
+        FAT_ARTIFACTS_RESUME_READY_RETRY
+        if any(durable.values())
+        else FAT_ARTIFACTS_RESUME_READY
+    )
+    return {
+        "terminal": terminal,
+        "content_sha256": content,
+        "stage": str(job["stage"]),
+        "schedule_sha256": digest,
+        "activation_id": str(job["activation_id"]),
+        "source_size": proven["source_size"],
+        "source_sha256": proven["source_sha256"],
+        "parquet_rel": job["parquet_rel"],
+        "member_rel": job["member_rel"],
+        "observation_count": int(job["observation_count"]),
+        "member_count": int(job["member_count"]),
+        "dataset_manifest_id": manifest_id,
+        "durable_progress": durable,
+        "open_job_rewrite": "skipped_oversized",
+        "provider_calls": 0,
+        "scientific_writes": 0,
+    }
+
+
+def resume_legacy_fat_open_artifacts(
+    *,
+    data_root: Path,
+    root: Path,
+    content_sha256: str,
+    activations: Sequence[Mapping[str, Any]],
+    schedule: Mapping[str, Any],
+    producer_git_sha: str,
+    now: datetime,
+    fault_after: str | None = None,
+) -> dict[str, Any]:
+    """Operator-invoked continuation of one proven ARTIFACTS fat open job."""
+
+    inspected = inspect_legacy_fat_open_artifacts(
+        data_root=data_root,
+        root=root,
+        content_sha256=content_sha256,
+        activations=activations,
+        schedule=schedule,
+    )
+    if inspected.get("terminal") == FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE or (
+        inspected.get("durable_progress", {}).get("completed")
+        and open_job_path(data_root, content_sha256).is_file() is False
+    ):
+        return {
+            "terminal": FAT_ARTIFACTS_RESUME_COMPLETED,
+            "replay": True,
+            "dataset_manifest_id": inspected["dataset_manifest_id"],
+            "dataset_fingerprint": inspected.get("dataset_fingerprint"),
+            "provider_calls": 0,
+            "content_sha256": content_sha256,
+        }
+    proven = prove_legacy_fat_open_artifacts_source(data_root, content_sha256)
+    if (
+        proven["source_sha256"] != inspected["source_sha256"]
+        or proven["source_size"] != inspected["source_size"]
+    ):
+        raise PublicationJobError("SOURCE_CHANGED_AFTER_PLAN")
+    job = proven["job"]
+    created = parse_utc(str(job["created_at"])) if job.get("created_at") else now
+    published = publish_observation_batch(
+        data_root=data_root,
+        root=root,
+        schedule=schedule,
+        activation_id=str(job["activation_id"]),
+        now=created,
+        producer_git_sha=producer_git_sha,
+        members=None,
+        observations=list(job.get("observations") or []),
+        fault_after=fault_after,
+        content_sha256=content_sha256,
+        open_job=job,
+        expected_open_source=(proven["source_size"], proven["source_sha256"]),
+    )
+    published["terminal"] = FAT_ARTIFACTS_RESUME_COMPLETED
+    published["provider_calls"] = 0
+    published["source_sha256"] = proven["source_sha256"]
+    published["content_sha256"] = content_sha256
+    return published
 
 
 def repair_open_publication_jobs(
@@ -1314,6 +1576,7 @@ __all__ = [
     "PublicationFault",
     "build_panel_snapshot",
     "has_open_publication_jobs",
+    "inspect_legacy_fat_open_artifacts",
     "load_pending_observation_bindings",
     "pending_observation_binding_sha256",
     "persist_observation_schedule",
@@ -1322,5 +1585,6 @@ __all__ = [
     "publish_observation_batch",
     "rebuild_observation_panel_from_rdp",
     "repair_open_publication_jobs",
+    "resume_legacy_fat_open_artifacts",
     "satisfy_pending_observation_binding",
 ]

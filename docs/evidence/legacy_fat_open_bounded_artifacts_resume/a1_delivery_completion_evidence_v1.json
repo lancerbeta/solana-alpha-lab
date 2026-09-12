@@ -1,0 +1,74 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-COMPLETION-001",
+  "as_of": "2026-09-12",
+  "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
+  "state_change": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_READY_FOR_OWNER_MERGE_GATE",
+  "base_main": "f47755aa4a49cc7981396606e405369d8e02f24f",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "327585f3051396300bba8cf79842f922622381e8ccfce7da3842142521b5bda6",
+    "catalog/assets/lifecycle.yaml": "b35aae0f71883191baf00571d565604d5cca8086a78ee266e1d7e050d7c5b526",
+    "docs/PROJECT_MAP.md": "612a25ef5f1dd4f03300acaf12efdbee4b240bb8af3cc313d66fdfe34d942fa8",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "1d7356f44c2c6b2420c68b7a5d4467905ac319b3460ae14dce8a72de23ed1dbd",
+    "docs/reports/legacy_fat_open_bounded_artifacts_resume/a1_owner_readout_v1.md": "965f0867415d2d64f6ea4398ed514aea6539978d8b91a8075d1e5444307a3963",
+    "docs/tasks/LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1.md": "67446ba3750d22876029a88a1f59ec7a4828c1da468a8a643948330e9d50f26d",
+    "scripts/observation_publication_jobs.py": "17ac45a202b2f38e2e9a4e5b08f49e1177dbe2233d5b5a5bc77fc4e90bd1dead",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "3e2ea6088f23532215f217daa96e1eedc3d87d6fa04997241559b87ae775f925",
+    "src/solana_alpha_lab/factory/observation_publication_jobs.py": "048098f34ca0d51fd2b52bea7efc129d25ffb0b5ccd0a3b640fb3dfb856059b3",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "6717694544ef0023bce5857667dca1aaa1ddc3d4ae49bc75c1653ad930092cac",
+    "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "07eec34d8a05c4198785edf9e34856458bd3bf17e2d8b6f652dfa9ef5735c182"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/legacy_fat_open_bounded_artifacts_resume/a1_delivery_factory_fit_v1.json",
+    "sha256": "e782f49e1794151b2362209f928ac4f875c46cfd59a0d9a23f072a3e4991feed",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME",
+    "independent_review": {
+      "path": "docs/evidence/legacy_fat_open_bounded_artifacts_resume/a1_delivery_independent_review_v1.json",
+      "sha256": "f1071212213c8506fdc6dc5c56f9b27e8c56a9f2337636f0654f4a15eba24ec1",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FAT_RESUME_UNIT_17",
+      "PASS_ISOLATED_ARCHITECTURE_CODE_GOAL_DOD",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH",
+      "PASS_MEMORY_CHILD_BELOW_SOFT_ENVELOPE_768MIB"
+    ]
+  },
+  "non_claims": [
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_SCHEDULER_LEASE_LOCK",
+    "NO_MEMBERS_CENSUS_RECOVERY",
+    "NO_CLAIM_LIVE_616MB_RSS"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

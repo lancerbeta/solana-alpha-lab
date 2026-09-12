@@ -220,7 +220,7 @@ Do **not** trust chat “current status”. Machine-resolve:
 | Latest **historical** A3 discovery release | RDP singleton `DATASET-MANIFEST-DISCOVERY-EVIDENCE-RELEASE-001*` (unchanged) |
 | Latest **live** lifecycle corpus | RDP `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` current version via lineage `datasets/live_lifecycle_corpus/lineage.json` + HFIC current-version selection |
 | Forge evidence epoch | HFIC preflight / `evidence_epoch_sha256` over canonical local RDP |
-| Publication-job journal | `scripts/observation_publication_jobs.py status` / `dry-run` |
+| Publication-job journal | `scripts/observation_publication_jobs.py status` / `dry-run` / `inspect-fat-open` |
 
 **Operational vs recovery journal (do not conflate):** `open/` is the only
 routine tick repair glob. `completed/` holds compact terminal receipts without
@@ -302,6 +302,54 @@ Prove scientific Parquet/manifests/RDP inventory excluding the journal (compare 
 ```
 
 Prove `legacy_full` bytes preserved and `publication_jobs_open_count` bounded to genuine incomplete jobs via `status`.
+
+### B2. Oversized legacy ARTIFACTS resume (paused-only, explicit)
+
+Ordinary tick/`repair`/`has_open` must still refuse an oversized `open/` job with
+`LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION`. Do not raise parse limits. Do not
+edit the JSON. This path is only for a job that already reached `stage=ARTIFACTS`
+with durable observation/member artifacts (including `SNAPSHOT_PLUS_DELTA`).
+
+Copy `--content` from the filename stem. Do not invent it. If `open/` is empty,
+stop. If several files exist, choose the one stem you intend — this command does
+not auto-scan.
+
+```
+ls -1 /opt/solana-alpha-lab/local/factory_v1/observation_rdp/datasets/publication_jobs/open
+```
+
+Inspect is the pause proof. Stop immediately (source untouched) if inspect
+prints any terminal other than `FAT_ARTIFACTS_RESUME_READY` or
+`FAT_ARTIFACTS_RESUME_READY_RETRY`. That includes `COLLECTOR_NOT_PAUSED` (live
+collector, empty set, or the job activation is not `PAUSED_OPERATOR`), wrong
+stage, hash mismatch, identity mismatch, missing artifacts, or not a
+legacy-fat file.
+
+`FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE` means the compact `completed/` receipt
+already exists and the fat `open/` file is gone. That is done, not a next
+action.
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py inspect-fat-open --runtime-config configs/observation_schedule_runtime_v1.yaml --content <64-hex-content-sha256>
+```
+
+If READY / READY_RETRY:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py resume-fat-artifacts --runtime-config configs/observation_schedule_runtime_v1.yaml --content <64-hex-content-sha256> --i-understand-resume
+```
+
+Producer identity is runtime config, then Git HEAD, then `.factory_deploy_sha`.
+On an exact-SHA deploy without `.git`, the pin file is enough. Only if resume
+prints `FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED`, pass the 40-hex pin:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_publication_jobs.py resume-fat-artifacts --runtime-config configs/observation_schedule_runtime_v1.yaml --content <64-hex-content-sha256> --i-understand-resume --producer-git-sha <40-hex-from-factory-deploy-sha>
+```
+
+Expect `FAT_ARTIFACTS_RESUME_COMPLETED`, compact `completed/` receipt, and the
+fat `open/` file removed. Retry is safe after a crash. No provider calls. Do not
+run this while the collector is live. Do not use it for pre-ARTIFACTS jobs.
 
 ### C. One manual production tick
 
