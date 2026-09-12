@@ -8,6 +8,7 @@ import os
 import pickle
 import sqlite3
 import tempfile
+import time
 from collections.abc import Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Any
@@ -30,6 +31,17 @@ _MEMBER_BATCH_SIZE = 2048
 
 _FINGERPRINT_WORK = {"snapshot_fingerprint": 0, "row_fingerprint": 0}
 _RECONSTRUCT_STATS = {"peak_sqlite_rows": 0, "reconstruct_calls": 0}
+_PUBLICATION_STAGE_STATS = {
+    "full_population_passes": 0,
+    "operational_latest_hits": 0,
+    "operational_latest_misses": 0,
+    "reconstruct_calls_hot": 0,
+}
+
+# Non-canonical, rebuildable tail cache. Never a scientific truth owner.
+_OPERATIONAL_LATEST_DB = ".operational_latest_members.sqlite"
+_OPERATIONAL_LATEST_META = ".operational_latest_members.meta.json"
+_OPERATIONAL_LATEST_SCHEMA = "smial.members-operational-latest-v1"
 
 
 class MembersDeltaError(ValueError):
@@ -41,6 +53,8 @@ def reset_fingerprint_work() -> None:
     _FINGERPRINT_WORK["row_fingerprint"] = 0
     _RECONSTRUCT_STATS["peak_sqlite_rows"] = 0
     _RECONSTRUCT_STATS["reconstruct_calls"] = 0
+    for key in _PUBLICATION_STAGE_STATS:
+        _PUBLICATION_STAGE_STATS[key] = 0
 
 
 def fingerprint_work() -> dict[str, int]:
@@ -49,6 +63,51 @@ def fingerprint_work() -> dict[str, int]:
 
 def reconstruct_stats() -> dict[str, int]:
     return dict(_RECONSTRUCT_STATS)
+
+
+def publication_stage_stats() -> dict[str, int]:
+    return dict(_PUBLICATION_STAGE_STATS)
+
+
+def _emit_publication_stage(
+    stage: str,
+    *,
+    elapsed_ms: int | None = None,
+    member_count: int | None = None,
+    observation_count: int | None = None,
+    history_depth: int | None = None,
+    changed_count: int | None = None,
+    cache_hit: bool | None = None,
+) -> None:
+    """Minimal structured stage marker for journal/stdout. No payloads/secrets."""
+
+    if os.environ.get("SMIAL_PUBLICATION_STAGE_TIMING", "1").strip() in {
+        "0",
+        "false",
+        "False",
+        "no",
+        "OFF",
+        "off",
+    }:
+        return
+    payload: dict[str, Any] = {
+        "schema": "smial.publication-stage-timing",
+        "schema_version": "1.0",
+        "stage": stage,
+    }
+    if elapsed_ms is not None:
+        payload["elapsed_ms"] = int(elapsed_ms)
+    if member_count is not None:
+        payload["member_count"] = int(member_count)
+    if observation_count is not None:
+        payload["observation_count"] = int(observation_count)
+    if history_depth is not None:
+        payload["history_depth"] = int(history_depth)
+    if changed_count is not None:
+        payload["changed_count"] = int(changed_count)
+    if cache_hit is not None:
+        payload["cache_hit"] = bool(cache_hit)
+    print(json.dumps(payload, sort_keys=True, separators=(",", ":")), flush=True)
 
 
 def row_fingerprint(row: Mapping[str, Any]) -> str:
@@ -301,7 +360,151 @@ def _write_snapshot_unit_from_conn(
     }
     _write_unit(unit_dir / "unit.json", unit)
     _write_layout_sidecar(path, unit, dataset_manifest_id)
+    _store_operational_latest(
+        unit_dir,
+        conn,
+        dataset_manifest_id=dataset_manifest_id,
+        snapshot_fingerprint=fingerprint,
+        seq=0,
+        row_count=row_count,
+    )
     return unit
+
+
+def _operational_latest_paths(unit_dir: Path) -> tuple[Path, Path]:
+    return unit_dir / _OPERATIONAL_LATEST_DB, unit_dir / _OPERATIONAL_LATEST_META
+
+
+def _invalidate_operational_latest(unit_dir: Path) -> None:
+    db_path, meta_path = _operational_latest_paths(unit_dir)
+    meta_path.unlink(missing_ok=True)
+    db_path.unlink(missing_ok=True)
+
+
+def _try_open_operational_latest(
+    unit_dir: Path,
+    *,
+    dataset_manifest_id: str,
+    snapshot_fingerprint: str,
+    seq: int,
+    row_count: int,
+) -> tuple[Path, sqlite3.Connection] | None:
+    """Clone rebuildable latest-state cache into a process-owned spill when meta binds."""
+
+    db_path, meta_path = _operational_latest_paths(unit_dir)
+    if db_path.is_file() is False or meta_path.is_file() is False:
+        return None
+    try:
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        _invalidate_operational_latest(unit_dir)
+        return None
+    if not isinstance(meta, dict):
+        _invalidate_operational_latest(unit_dir)
+        return None
+    try:
+        meta_seq = int(meta["seq"])
+        meta_rows = int(meta["row_count"])
+    except (KeyError, TypeError, ValueError):
+        _invalidate_operational_latest(unit_dir)
+        return None
+    if (
+        str(meta.get("schema") or "") != _OPERATIONAL_LATEST_SCHEMA
+        or str(meta.get("dataset_manifest_id") or "") != dataset_manifest_id
+        or str(meta.get("snapshot_fingerprint") or "") != snapshot_fingerprint
+        or meta_seq != int(seq)
+        or meta_rows != int(row_count)
+    ):
+        _invalidate_operational_latest(unit_dir)
+        return None
+    source: sqlite3.Connection | None = None
+    try:
+        source = sqlite3.connect(str(db_path))
+        observed = int(source.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+        if observed != int(row_count):
+            source.close()
+            source = None
+            _invalidate_operational_latest(unit_dir)
+            return None
+        spill, clone = _clone_members_db(source)
+        source.close()
+        source = None
+        return spill, clone
+    except sqlite3.Error:
+        if source is not None:
+            source.close()
+        _invalidate_operational_latest(unit_dir)
+        return None
+
+
+def _store_operational_latest(
+    unit_dir: Path,
+    source: sqlite3.Connection,
+    *,
+    dataset_manifest_id: str,
+    snapshot_fingerprint: str,
+    seq: int,
+    row_count: int,
+) -> None:
+    """Atomically replace operational latest-state cache. Never scientific truth."""
+
+    db_path, meta_path = _operational_latest_paths(unit_dir)
+    unit_dir.mkdir(parents=True, exist_ok=True)
+    handle, tmp_name = tempfile.mkstemp(
+        prefix="operational-latest-", suffix=".sqlite", dir=str(unit_dir)
+    )
+    os.close(handle)
+    tmp_db = Path(tmp_name)
+    tmp_db.unlink(missing_ok=True)
+    tmp_meta = unit_dir / f".operational_latest_members.meta.{os.getpid()}.tmp"
+    dest: sqlite3.Connection | None = None
+    try:
+        dest = sqlite3.connect(str(tmp_db))
+        dest.execute(
+            """
+            CREATE TABLE members (
+                seq INTEGER PRIMARY KEY AUTOINCREMENT,
+                entity_id TEXT NOT NULL UNIQUE,
+                payload BLOB NOT NULL
+            )
+            """
+        )
+        batch: list[tuple[str, bytes]] = []
+        for entity_id, blob in source.execute("SELECT entity_id, payload FROM members"):
+            batch.append((str(entity_id), blob))
+            if len(batch) >= _MEMBER_BATCH_SIZE:
+                dest.executemany(
+                    "INSERT INTO members(entity_id, payload) VALUES (?,?)", batch
+                )
+                batch = []
+        if batch:
+            dest.executemany(
+                "INSERT INTO members(entity_id, payload) VALUES (?,?)", batch
+            )
+        dest.commit()
+        dest.close()
+        dest = None
+        meta = {
+            "schema": _OPERATIONAL_LATEST_SCHEMA,
+            "schema_version": "1.0",
+            "dataset_manifest_id": dataset_manifest_id,
+            "snapshot_fingerprint": snapshot_fingerprint,
+            "seq": int(seq),
+            "row_count": int(row_count),
+            "scientific_truth": False,
+        }
+        tmp_meta.write_text(
+            json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+            encoding="utf-8",
+        )
+        os.replace(tmp_db, db_path)
+        os.replace(tmp_meta, meta_path)
+    except Exception:
+        if dest is not None:
+            dest.close()
+        tmp_db.unlink(missing_ok=True)
+        tmp_meta.unlink(missing_ok=True)
+        return
 
 
 def append_delta_publication(
@@ -319,12 +522,57 @@ def append_delta_publication(
     unit = json.loads(unit_path.read_text(encoding="utf-8"))
     if not isinstance(unit, dict) or unit.get("layout") != LAYOUT_KIND:
         raise MembersDeltaError("UNIT_LAYOUT_INVALID")
-    previous_id = str(unit["publications"][-1]["dataset_manifest_id"])
-    previous_fp = str(unit["publications"][-1]["snapshot_fingerprint"])
-    prev_spill, prev_conn = _reconstruct_to_sqlite(data_root, unit, previous_id)
+    tail = unit["publications"][-1]
+    previous_id = str(tail["dataset_manifest_id"])
+    previous_fp = str(tail["snapshot_fingerprint"])
+    previous_seq = int(tail["seq"])
+    previous_row_count = int(tail.get("row_count") or 0)
+    history_depth = max(0, len(unit["publications"]) - 1)
+    append_t0 = time.perf_counter()
+    _emit_publication_stage(
+        "PUBLICATION_APPEND_START",
+        history_depth=history_depth,
+        member_count=previous_row_count or None,
+    )
+
+    cache_hit = False
+    owned_prev_spill = False
+    prev_spill: Path | None = None
+    cached = _try_open_operational_latest(
+        unit_dir,
+        dataset_manifest_id=previous_id,
+        snapshot_fingerprint=previous_fp,
+        seq=previous_seq,
+        row_count=previous_row_count,
+    )
+    recon_t0 = time.perf_counter()
+    if cached is not None:
+        prev_spill, prev_conn = cached
+        owned_prev_spill = True
+        cache_hit = True
+        _PUBLICATION_STAGE_STATS["operational_latest_hits"] += 1
+        observed_prev = previous_fp
+    else:
+        _PUBLICATION_STAGE_STATS["operational_latest_misses"] += 1
+        _PUBLICATION_STAGE_STATS["reconstruct_calls_hot"] += 1
+        prev_spill, prev_conn, observed_prev = _reconstruct_to_sqlite(
+            data_root, unit, previous_id
+        )
+        owned_prev_spill = True
+    _emit_publication_stage(
+        "PUBLICATION_PREV_READY",
+        elapsed_ms=int((time.perf_counter() - recon_t0) * 1000),
+        history_depth=history_depth,
+        cache_hit=cache_hit,
+        member_count=previous_row_count or None,
+    )
+
     owned_curr = member_conn is None
     if owned_curr:
         if rows is None:
+            prev_conn.close()
+            if owned_prev_spill and prev_spill is not None:
+                prev_spill.unlink(missing_ok=True)
             raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
         curr_spill, curr_conn = _spill_member_sequence(rows)
     else:
@@ -333,14 +581,29 @@ def append_delta_publication(
     replay_spill: Path | None = None
     replay_conn: sqlite3.Connection | None = None
     try:
-        observed_prev = _fingerprint_sqlite(prev_conn)
         if observed_prev != previous_fp:
             raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        diff_t0 = time.perf_counter()
         ops_spill, ops_conn, counts = _diff_sqlite_members_to_ops(prev_conn, curr_conn)
+        changed_total = counts["added"] + counts["changed"] + counts["removed"]
+        _emit_publication_stage(
+            "PUBLICATION_DIFF",
+            elapsed_ms=int((time.perf_counter() - diff_t0) * 1000),
+            changed_count=changed_total,
+            history_depth=history_depth,
+            cache_hit=cache_hit,
+        )
         try:
+            fp_t0 = time.perf_counter()
             current_fp = _fingerprint_sqlite(curr_conn)
             current_count = int(curr_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
             previous_count = int(prev_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+            _PUBLICATION_STAGE_STATS["full_population_passes"] += 1
+            _emit_publication_stage(
+                "PUBLICATION_FINGERPRINT_CURR",
+                elapsed_ms=int((time.perf_counter() - fp_t0) * 1000),
+                member_count=current_count,
+            )
             meta = {
                 "schema": DELTA_SCHEMA,
                 "schema_version": DELTA_SCHEMA_VERSION_V2,
@@ -381,13 +644,30 @@ def append_delta_publication(
             )
             _write_unit(unit_path, unit)
             _write_layout_sidecar(path, unit, dataset_manifest_id)
+            _store_operational_latest(
+                unit_dir,
+                curr_conn,
+                dataset_manifest_id=dataset_manifest_id,
+                snapshot_fingerprint=current_fp,
+                seq=seq,
+                row_count=current_count,
+            )
+            _emit_publication_stage(
+                "PUBLICATION_APPEND_END",
+                elapsed_ms=int((time.perf_counter() - append_t0) * 1000),
+                member_count=current_count,
+                changed_count=changed_total,
+                history_depth=history_depth,
+                cache_hit=cache_hit,
+            )
             return unit
         finally:
             ops_conn.close()
             ops_spill.unlink(missing_ok=True)
     finally:
         prev_conn.close()
-        prev_spill.unlink(missing_ok=True)
+        if owned_prev_spill and prev_spill is not None:
+            prev_spill.unlink(missing_ok=True)
         if owned_curr:
             curr_conn.close()
             if curr_spill is not None:
@@ -402,7 +682,7 @@ def _diff_sqlite_members_to_ops(
     prev_conn: sqlite3.Connection,
     curr_conn: sqlite3.Connection,
 ) -> tuple[Path, sqlite3.Connection, dict[str, int]]:
-    """Diff two member spills into an ops spill without materializing change lists."""
+    """Diff two member spills via sorted merge; no per-row point lookups."""
 
     ops_spill, ops_conn = _spill_ops_db()
     counts = {"added": 0, "changed": 0, "removed": 0}
@@ -419,33 +699,49 @@ def _diff_sqlite_members_to_ops(
             )
             batch = []
 
-        for entity_id, blob in curr_conn.execute("SELECT entity_id, payload FROM members"):
-            entity = str(entity_id)
-            loaded = prev_conn.execute(
-                "SELECT payload FROM members WHERE entity_id=?", (entity,)
-            ).fetchone()
-            if loaded is None:
-                batch.append(("added", entity, blob, None))
+        prev_cur = prev_conn.execute(
+            "SELECT entity_id, payload FROM members ORDER BY entity_id"
+        )
+        curr_cur = curr_conn.execute(
+            "SELECT entity_id, payload FROM members ORDER BY entity_id"
+        )
+        prev_row = prev_cur.fetchone()
+        curr_row = curr_cur.fetchone()
+        while prev_row is not None or curr_row is not None:
+            if prev_row is None:
+                entity = str(curr_row[0])
+                batch.append(("added", entity, curr_row[1], None))
                 counts["added"] += 1
-            elif loaded[0] != blob:
-                curr_row = dict(pickle.loads(blob))
-                prev_row = dict(pickle.loads(loaded[0]))
-                if row_fingerprint(curr_row) != row_fingerprint(prev_row):
-                    batch.append(("changed", entity, blob, None))
-                    counts["changed"] += 1
-            if len(batch) >= _MEMBER_BATCH_SIZE:
-                _flush()
-        _flush()
-        for entity_id, blob in prev_conn.execute("SELECT entity_id, payload FROM members"):
-            entity = str(entity_id)
-            exists = curr_conn.execute(
-                "SELECT 1 FROM members WHERE entity_id=? LIMIT 1", (entity,)
-            ).fetchone()
-            if exists is not None:
-                continue
-            fingerprint = row_fingerprint(dict(pickle.loads(blob)))
-            batch.append(("removed", entity, None, fingerprint))
-            counts["removed"] += 1
+                curr_row = curr_cur.fetchone()
+            elif curr_row is None:
+                entity = str(prev_row[0])
+                fingerprint = row_fingerprint(dict(pickle.loads(prev_row[1])))
+                batch.append(("removed", entity, None, fingerprint))
+                counts["removed"] += 1
+                prev_row = prev_cur.fetchone()
+            else:
+                prev_id = str(prev_row[0])
+                curr_id = str(curr_row[0])
+                if curr_id < prev_id:
+                    batch.append(("added", curr_id, curr_row[1], None))
+                    counts["added"] += 1
+                    curr_row = curr_cur.fetchone()
+                elif prev_id < curr_id:
+                    fingerprint = row_fingerprint(dict(pickle.loads(prev_row[1])))
+                    batch.append(("removed", prev_id, None, fingerprint))
+                    counts["removed"] += 1
+                    prev_row = prev_cur.fetchone()
+                else:
+                    prev_blob = prev_row[1]
+                    curr_blob = curr_row[1]
+                    if prev_blob != curr_blob:
+                        curr_payload = dict(pickle.loads(curr_blob))
+                        prev_payload = dict(pickle.loads(prev_blob))
+                        if row_fingerprint(curr_payload) != row_fingerprint(prev_payload):
+                            batch.append(("changed", curr_id, curr_blob, None))
+                            counts["changed"] += 1
+                    prev_row = prev_cur.fetchone()
+                    curr_row = curr_cur.fetchone()
             if len(batch) >= _MEMBER_BATCH_SIZE:
                 _flush()
         _flush()
@@ -730,7 +1026,7 @@ def _reconstruct_to_sqlite(
     dataset_manifest_id: str,
     *,
     removed_out: list[dict[str, Any]] | None = None,
-) -> tuple[Path, sqlite3.Connection]:
+) -> tuple[Path, sqlite3.Connection, str]:
     publications = list(unit.get("publications") or [])
     if not publications:
         raise MembersDeltaError("ANCHOR_MISSING")
@@ -759,6 +1055,7 @@ def _reconstruct_to_sqlite(
             raise MembersDeltaError("DELTA_HASH_MISMATCH")
         previous_id = str(anchor.get("dataset_manifest_id") or "")
         reached = previous_id == dataset_manifest_id
+        result_fp = running_fp if reached else ""
         if not reached:
             for index, item in enumerate(publications[1:], start=1):
                 try:
@@ -813,6 +1110,7 @@ def _reconstruct_to_sqlite(
                         raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
                     if schema_version == DELTA_SCHEMA_VERSION_V2 and observed_fp != current_fp:
                         raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+                    result_fp = observed_fp
                     reached = True
                     break
                 running_fp = current_fp or unit_fp
@@ -821,7 +1119,7 @@ def _reconstruct_to_sqlite(
                 previous_id = str(item.get("dataset_manifest_id") or "")
         if not reached:
             raise MembersDeltaError("PUBLICATION_NOT_IN_UNIT")
-        return spill, conn
+        return spill, conn, result_fp
     except Exception:
         conn.close()
         spill.unlink(missing_ok=True)
@@ -838,7 +1136,7 @@ def iter_reconstructed_publication_batches(
     removed_out: list[dict[str, Any]] | None = None,
 ) -> Iterator[list[dict[str, Any]]]:
     """Replay SNAPSHOT_PLUS_DELTA into process-owned SQLite; yield bounded batches."""
-    spill, conn = _reconstruct_to_sqlite(
+    spill, conn, _fp = _reconstruct_to_sqlite(
         data_root, unit, dataset_manifest_id, removed_out=removed_out
     )
     try:

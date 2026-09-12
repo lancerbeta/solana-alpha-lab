@@ -1,0 +1,89 @@
+{
+  "at": "2026-09-12T17:34:35.811763Z",
+  "baseline_hot_substage_wall_sum_s": 20.416,
+  "envelope_pass_warm_ge_2x": true,
+  "envelope_pass_warm_le_45s": true,
+  "n": 205847,
+  "schema": "smial.factory-routine-publication-wallclock-candidate-profile",
+  "speedup_vs_baseline_warm": 4.11,
+  "stages": [
+    {
+      "cpu_s": 3.656,
+      "fingerprint_work": {
+        "row_fingerprint": 0,
+        "snapshot_fingerprint": 1
+      },
+      "publication_stage_stats": {
+        "full_population_passes": 0,
+        "operational_latest_hits": 0,
+        "operational_latest_misses": 0,
+        "reconstruct_calls_hot": 0
+      },
+      "reconstruct_stats": {
+        "peak_sqlite_rows": 0,
+        "reconstruct_calls": 0
+      },
+      "result": {
+        "pubs": 1
+      },
+      "stage": "D0_write_snapshot_anchor",
+      "wall_s": 3.842
+    },
+    {
+      "cpu_s": 4.688,
+      "fingerprint_work": {
+        "row_fingerprint": 412,
+        "snapshot_fingerprint": 2
+      },
+      "publication_stage_stats": {
+        "full_population_passes": 1,
+        "operational_latest_hits": 1,
+        "operational_latest_misses": 0,
+        "reconstruct_calls_hot": 0
+      },
+      "reconstruct_stats": {
+        "peak_sqlite_rows": 0,
+        "reconstruct_calls": 0
+      },
+      "result": {
+        "pubs": 2,
+        "stats": {
+          "full_population_passes": 1,
+          "operational_latest_hits": 1,
+          "operational_latest_misses": 0,
+          "reconstruct_calls_hot": 0
+        }
+      },
+      "stage": "E_append_from_anchor_cache",
+      "wall_s": 5.073
+    },
+    {
+      "cpu_s": 4.688,
+      "fingerprint_work": {
+        "row_fingerprint": 412,
+        "snapshot_fingerprint": 2
+      },
+      "publication_stage_stats": {
+        "full_population_passes": 1,
+        "operational_latest_hits": 1,
+        "operational_latest_misses": 0,
+        "reconstruct_calls_hot": 0
+      },
+      "reconstruct_stats": {
+        "peak_sqlite_rows": 0,
+        "reconstruct_calls": 0
+      },
+      "result": {
+        "pubs": 3,
+        "stats": {
+          "full_population_passes": 1,
+          "operational_latest_hits": 1,
+          "operational_latest_misses": 0,
+          "reconstruct_calls_hot": 0
+        }
+      },
+      "stage": "F_append_warm_cache",
+      "wall_s": 4.968
+    }
+  ]
+}
