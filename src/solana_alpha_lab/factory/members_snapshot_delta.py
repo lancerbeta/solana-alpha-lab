@@ -408,17 +408,23 @@ def _try_open_operational_latest(
     except (KeyError, TypeError, ValueError):
         _invalidate_operational_latest(unit_dir)
         return None
+    members_db_sha256 = str(meta.get("members_db_sha256") or "")
     if (
         str(meta.get("schema") or "") != _OPERATIONAL_LATEST_SCHEMA
         or str(meta.get("dataset_manifest_id") or "") != dataset_manifest_id
         or str(meta.get("snapshot_fingerprint") or "") != snapshot_fingerprint
         or meta_seq != int(seq)
         or meta_rows != int(row_count)
+        or len(members_db_sha256) != 64
     ):
         _invalidate_operational_latest(unit_dir)
         return None
     source: sqlite3.Connection | None = None
     try:
+        observed_file_sha = _sha256_file_streaming(db_path)
+        if observed_file_sha != members_db_sha256:
+            _invalidate_operational_latest(unit_dir)
+            return None
         source = sqlite3.connect(str(db_path))
         observed = int(source.execute("SELECT COUNT(*) FROM members").fetchone()[0])
         if observed != int(row_count):
@@ -430,7 +436,7 @@ def _try_open_operational_latest(
         source.close()
         source = None
         return spill, clone
-    except sqlite3.Error:
+    except (OSError, sqlite3.Error):
         if source is not None:
             source.close()
         _invalidate_operational_latest(unit_dir)
@@ -484,6 +490,7 @@ def _store_operational_latest(
         dest.commit()
         dest.close()
         dest = None
+        file_sha = _sha256_file_streaming(tmp_db)
         meta = {
             "schema": _OPERATIONAL_LATEST_SCHEMA,
             "schema_version": "1.0",
@@ -491,6 +498,7 @@ def _store_operational_latest(
             "snapshot_fingerprint": snapshot_fingerprint,
             "seq": int(seq),
             "row_count": int(row_count),
+            "members_db_sha256": file_sha,
             "scientific_truth": False,
         }
         tmp_meta.write_text(

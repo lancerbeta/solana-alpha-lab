@@ -160,6 +160,35 @@ class RoutinePublicationWallclockV1Tests(unittest.TestCase):
                 "C",
             )
 
+    def test_poisoned_operational_db_with_intact_meta_misses(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_root = root / "rdp"
+            data_root.mkdir()
+            write_snapshot_unit(
+                data_root,
+                utc_day="20260912",
+                dataset_manifest_id="dataset-anchor",
+                rows=[_member(i) for i in range(30)],
+            )
+            unit_dir = data_root / "datasets/members_snapshot_plus_delta/20260912"
+            db_path = unit_dir / _OPERATIONAL_LATEST_DB
+            # Tamper durable bytes while leaving meta untouched.
+            raw = bytearray(db_path.read_bytes())
+            raw[-17] = (raw[-17] + 1) % 256
+            db_path.write_bytes(bytes(raw))
+            reset_fingerprint_work()
+            append_delta_publication(
+                data_root,
+                utc_day="20260912",
+                dataset_manifest_id="dataset-d1",
+                rows=[_member(i, tag="P" if i == 1 else "A") for i in range(30)],
+            )
+            self.assertGreaterEqual(
+                publication_stage_stats()["operational_latest_misses"], 1
+            )
+            self.assertEqual(publication_stage_stats()["operational_latest_hits"], 0)
+
     def test_cache_invalidate_helper_forces_reconstruct(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
