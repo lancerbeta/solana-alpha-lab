@@ -1,0 +1,79 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FACTORY-ROUTINE-PUBLICATION-WALLCLOCK-COMPLETION-001",
+  "as_of": "2026-09-12",
+  "task_id": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1",
+  "state_change": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_READY_FOR_OWNER_MERGE_GATE",
+  "base_main": "90c1c181d4461b7c81e7a79f6e1eb2cd4b1619f0",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "42ff672c771f1e7c727993f4e8ab349014648c61e0ded2735e6128731936c9e4",
+    "docs/evidence/factory_routine_publication_wallclock/baseline_stage_profile_v1.json": "207211ac3dc7e9de3e42326dc3b642a737b9b9b515cac013749296bf7215c453",
+    "docs/evidence/factory_routine_publication_wallclock/candidate_stage_profile_v1.json": "e059740d02cca50cd67d830d3b92746b391a052a7477c22c716a584cbac775bb",
+    "docs/evidence/factory_routine_publication_wallclock/full_path_benchmark_v1.json": "6bbaaba17b093f856c9536246b7cc14de86c0f6e1b243b434d294b85bc07dc2e",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "bdd090cfedd96d45de214b47772ec8c81e74fc991c573d1c72d45293c2ec98ef",
+    "docs/reports/factory_routine_publication_wallclock/a1_owner_readout_v1.md": "2aef06ba1a496552eccb27c92f3b2918e681e117416eff306d647fe6b20bdf77",
+    "docs/tasks/FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1.md": "7cf3c56b78c8aa8105045c35b6866b06e6738b31e78153834bf38e0b6ee78299",
+    "scripts/bench_routine_publication_full_path.py": "c517f701dcf5e7a1d799992c3c5eed534c79861f8ea5aefdb5c542163af425d3",
+    "src/solana_alpha_lab/factory/hot90_archive.py": "e1e37c2d8680d03fc8217ab88b86cf4d1bc5c2790cebbb8706d5f50b44adfca1",
+    "src/solana_alpha_lab/factory/hot90_closed_day_loop.py": "215cd314726a9914828b82e51736efb7f5cac756448617ed34ad5a08d64d7ae1",
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "59e1686782e56fe80a3967b89511175da282827c8b67033624553e7edbae3260",
+    "tests/test_factory_routine_publication_wallclock_v1.py": "a88206cccbfe6358456c7a95c5430e289fca8115623655266b758e7c71d03739"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_factory_fit_v1.json",
+    "sha256": "1a332215bd05584ad7dad7cfa7c95828d223054db9b80882d3fd0ce46a86a337",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FACTORY_ROUTINE_PUBLICATION_WALLCLOCK",
+    "independent_review": {
+      "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_independent_review_v1.json",
+      "sha256": "ebb4440adb889af425056cc05b0ef253f92bc47cd5f49ffb880ba7e3f6b9ebec",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_WALLCLOCK_UNIT_11",
+      "PASS_ECONOMY_DELTA_10",
+      "PASS_HOT90_ARCHIVE_LOOP_35",
+      "PASS_FAT_OPEN_HOT90_ARCHIVE_43",
+      "PASS_MEMORY_COLLECTOR_COHORT_25",
+      "PASS_OBSERVATION_PUBLISHER_LIFECYCLE_25",
+      "PASS_FULL_POST_PROVIDER_BENCHMARK_5_818S_RSS_208_4MIB",
+      "PASS_ARCHIVE_INVENTORY_CACHE_INVARIANT",
+      "PASS_DEPTH_100_WARM_HOT_PATH",
+      "PASS_DEPTH_60_MISS_FALLBACK_CORRECT",
+      "PASS_ISOLATED_ARCHITECTURE_CODE_GOAL_DOD"
+    ]
+  },
+  "non_claims": [
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_SCIENTIFIC_TRUTH_FROM_OPERATIONAL_CACHE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from solana_alpha_lab.factory.members_snapshot_delta import (
+    is_operational_cache_name,
     load_member_rows_for_location,
 )
 from solana_alpha_lab.factory.observation_schedule import canonical_sha256
@@ -54,6 +55,10 @@ def list_closed_day_relative_paths(source_root: Path, utc_day: str) -> list[str]
     if members_root.is_dir():
         for path in members_root.rglob("*"):
             if path.is_file() and path.is_symlink() is False:
+                if is_operational_cache_name(path.name):
+                    # Non-canonical rebuildable operational cache, including
+                    # every temporary replacement form: never archive.
+                    continue
                 relatives.add(path.relative_to(source_root).as_posix())
     unit_path = members_root / "unit.json"
     if unit_path.is_file():
