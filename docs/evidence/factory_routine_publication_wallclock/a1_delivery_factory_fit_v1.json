@@ -5,7 +5,7 @@
   "as_of": "2026-09-12",
   "task_id": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1",
   "reviewed_bindings_sha256": "86330e994fa3bd9d334b784f127a31b4490773fa163b36f8b159a0294633fa1e",
-  "reviewed_inventory_sha256": "ff3b81377e6bca9d23884faf681fa723098176b441e7f865ab9509289413c499",
+  "reviewed_inventory_sha256": "01b47a5d6bbdd84c568e7692c6c9b25767c02951f2a713a8678dfd6eb8bc6f6d",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
