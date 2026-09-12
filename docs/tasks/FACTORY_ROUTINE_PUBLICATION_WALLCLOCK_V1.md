@@ -21,6 +21,8 @@ objective: Profile and optimize the routine SNAPSHOT_PLUS_DELTA publication hot
 managed_write_set:
 - docs/tasks/FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1.md
 - src/solana_alpha_lab/factory/members_snapshot_delta.py
+- src/solana_alpha_lab/factory/hot90_archive.py
+- src/solana_alpha_lab/factory/hot90_closed_day_loop.py
 - tests/test_factory_routine_publication_wallclock_v1.py
 - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
 - docs/evidence/factory_routine_publication_wallclock/a1_delivery_completion_evidence_v1.json
@@ -28,6 +30,8 @@ managed_write_set:
 - docs/evidence/factory_routine_publication_wallclock/a1_delivery_factory_fit_v1.json
 - docs/evidence/factory_routine_publication_wallclock/baseline_stage_profile_v1.json
 - docs/evidence/factory_routine_publication_wallclock/candidate_stage_profile_v1.json
+- docs/evidence/factory_routine_publication_wallclock/full_path_benchmark_v1.json
+- scripts/bench_routine_publication_full_path.py
 - docs/reports/factory_routine_publication_wallclock/a1_owner_readout_v1.md
 - catalog/assets/core.yaml
 - catalog/catalog_manifest.yaml

@@ -15,10 +15,10 @@
     "docs/evidence/factory_routine_publication_wallclock/baseline_stage_profile_v1.json": "207211ac3dc7e9de3e42326dc3b642a737b9b9b515cac013749296bf7215c453",
     "docs/evidence/factory_routine_publication_wallclock/candidate_stage_profile_v1.json": "e059740d02cca50cd67d830d3b92746b391a052a7477c22c716a584cbac775bb",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "bdd090cfedd96d45de214b47772ec8c81e74fc991c573d1c72d45293c2ec98ef",
-    "docs/reports/factory_routine_publication_wallclock/a1_owner_readout_v1.md": "758b259fede31fb24bc04c9cfd117d3c3e92f337969b098a2ea9cc88d7d29b7c",
-    "docs/tasks/FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1.md": "58c13488d0ba01d92b39531cc33c06e72f5699ab1a86239e50ace392fa1e0052",
-    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "13943e365f1949e9ee200b5e342e6be558118a06cffcdaa9b551e2a82987e08a",
-    "tests/test_factory_routine_publication_wallclock_v1.py": "8af90d1ac656f13318365597d740e5aa36e0463de2d98909ce8ab0dfa04e1469"
+    "docs/reports/factory_routine_publication_wallclock/a1_owner_readout_v1.md": "761f657b678ef70186993ed775eb75e5e29cf79a19cc28777b1b1b4a45a59cea",
+    "docs/tasks/FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1.md": "7cf3c56b78c8aa8105045c35b6866b06e6738b31e78153834bf38e0b6ee78299",
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "b02fa1242547f9ec773c35947b38c2436ed690d87a0fef23074ee0d92d813cdc",
+    "tests/test_factory_routine_publication_wallclock_v1.py": "1aa4b958e679c875845ae15a549ba7946f534ddde32effc0abe3e74253ebabb8"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -30,23 +30,29 @@
   },
   "factory_fit": {
     "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_factory_fit_v1.json",
-    "sha256": "c5c4a0918c4829cb56c8ddedba8e3aaafab81367dd7235de2536e000e21be9fa",
+    "sha256": "f19846a0cb2696bc17f38caef6d1949c6010021eaa5e58676f24ddc6074541da",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FACTORY_ROUTINE_PUBLICATION_WALLCLOCK",
     "independent_review": {
       "path": "docs/evidence/factory_routine_publication_wallclock/a1_delivery_independent_review_v1.json",
-      "sha256": "f1c4fff23898da02abfc8d0ce2450237c2b6a0afd34e7637c744e4f78c855a62",
+      "sha256": "77d1f3533cc522fd41ac33a75ad2bde222118644ac61245a2fed76bf46e445b5",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
-      "PASS_WALLCLOCK_UNIT",
-      "PASS_ECONOMY_DELTA",
-      "PASS_MEMORY_FAT_OPEN_COLLECTOR_42",
-      "PASS_CANDIDATE_ENVELOPE_4_11X",
+      "PASS_WALLCLOCK_UNIT_11",
+      "PASS_ECONOMY_DELTA_10",
+      "PASS_HOT90_ARCHIVE_LOOP_35",
+      "PASS_FAT_OPEN_HOT90_ARCHIVE_43",
+      "PASS_MEMORY_COLLECTOR_COHORT_25",
+      "PASS_OBSERVATION_PUBLISHER_LIFECYCLE_25",
+      "PASS_FULL_POST_PROVIDER_BENCHMARK_5_818S_RSS_208_4MIB",
+      "PASS_ARCHIVE_INVENTORY_CACHE_INVARIANT",
+      "PASS_DEPTH_100_WARM_HOT_PATH",
+      "PASS_DEPTH_60_MISS_FALLBACK_CORRECT",
       "PASS_ISOLATED_ARCHITECTURE_CODE_GOAL_DOD"
     ]
   },

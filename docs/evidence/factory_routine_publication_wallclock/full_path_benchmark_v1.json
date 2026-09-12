@@ -1,0 +1,87 @@
+{
+  "schema": "smial.factory-routine-publication-wallclock-full-path-benchmark",
+  "schema_version": "1.0",
+  "at": "2026-09-12T18:26:55.719184+00:00",
+  "recorded_into_evidence": "2026-09-12T21:34:43.962Z",
+  "python_version": "3.13.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "n_members": 205847,
+  "observation_rows_measured_batch": 32,
+  "provider_calls": 0,
+  "provider_gate": "offline deterministic synthetic members; no network",
+  "anchor_phase_unmeasured_wall_s": 3.48,
+  "measured_publish_wall_s": 5.818,
+  "process_wall_s_incl_python_startup": 9.831,
+  "stage_timings_s": {
+    "canonical_content_hashing": 1.3777,
+    "dataset_manifest": 0.0009,
+    "member_spill_full_population": 1.267,
+    "observations_parquet_write": 0.019,
+    "partition_manifests": 0.0008,
+    "rdp_event_commit": 0.0987,
+    "receipt_finalize": 0.0027,
+    "schedule_persist": 0.0287,
+    "snapshot_anchor_write": 1.9635,
+    "snapshot_plus_delta_append": 4.3436
+  },
+  "peak_rss_bytes": 218566656,
+  "peak_rss_mib": 208.4,
+  "cache_bytes": {
+    "cache_db_bytes": 65052672,
+    "cache_meta_bytes": 441
+  },
+  "cache_total_bytes": 65053113,
+  "full_population_passes": 1,
+  "operational_latest_hits": 1,
+  "operational_latest_misses": 0,
+  "reconstruct_calls_hot": 0,
+  "publish_result": {
+    "dataset_manifest_id": "dataset-a3ffdca4d44b695ebacb39aa61d57877b127345785c2b1e2c65576be9260c856",
+    "member_count": 205847,
+    "observation_count": 32,
+    "replay": false
+  },
+  "history_depth_proof": {
+    "depth": 100,
+    "fixture_rows": 200,
+    "warm_hot_path_wall_s_max": 2.0,
+    "full_population_passes_warm": 1,
+    "reconstruct_calls_warm": 0,
+    "verdict": "WARM_HOT_PATH_DOES_NOT_SCALE_WITH_HISTORY_DEPTH"
+  },
+  "cache_miss_fallback_proof": {
+    "depth": 60,
+    "fixture_rows": 200,
+    "fallback_wall_s": 0.346,
+    "fallback_wall_upper_bound_s": 60.0,
+    "correctness": "EXACT_TAGS_VERIFIED_AT_DEPTH_30_AND_TAIL",
+    "contract": "COLD_FALLBACK_MUST_BE_CORRECT_NOT_FAST"
+  },
+  "archive_boundary": {
+    "cache_files": [
+      "datasets/members_snapshot_plus_delta/<utc_day>/.operational_latest_members.sqlite",
+      "datasets/members_snapshot_plus_delta/<utc_day>/.operational_latest_members.meta.json"
+    ],
+    "excluded_from_closed_day_inventory": true,
+    "inventory_invariant": "SAME_INVENTORY_WITH_CACHE_PRESENT_ABSENT_STALE_CORRUPT",
+    "retention_bound": "ONE_VERIFIED_CLOSED_DAY_PLUS_OPEN_DAY; OLDER_DAYS_PRUNED_BY_CLOSED_DAY_LOOP"
+  },
+  "acceptance": {
+    "target_full_path_wall_s": 45.0,
+    "fence_full_path_wall_s": 60.0,
+    "target_rss_mib": 512.0,
+    "fence_rss_mib": 768.0
+  },
+  "envelope_pass_wall_le_45s": true,
+  "envelope_pass_wall_le_60s_fence": true,
+  "envelope_pass_rss_le_512mib": true,
+  "envelope_pass_rss_below_768mib_fence": true,
+  "non_claims": [
+    "NOT_LIVE_HOST_MEASUREMENT",
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS",
+    "NO_TICK",
+    "NO_C1"
+  ]
+}

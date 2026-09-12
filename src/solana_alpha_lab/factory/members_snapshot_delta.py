@@ -375,6 +375,16 @@ def _operational_latest_paths(unit_dir: Path) -> tuple[Path, Path]:
     return unit_dir / _OPERATIONAL_LATEST_DB, unit_dir / _OPERATIONAL_LATEST_META
 
 
+def operational_latest_cache_bytes(unit_dir: Path) -> dict[str, int]:
+    """Measure non-canonical operational latest cache bytes in one day dir."""
+
+    db_path, meta_path = _operational_latest_paths(unit_dir)
+    return {
+        "cache_db_bytes": db_path.stat().st_size if db_path.is_file() else 0,
+        "cache_meta_bytes": meta_path.stat().st_size if meta_path.is_file() else 0,
+    }
+
+
 def _invalidate_operational_latest(unit_dir: Path) -> None:
     db_path, meta_path = _operational_latest_paths(unit_dir)
     meta_path.unlink(missing_ok=True)

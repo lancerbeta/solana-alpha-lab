@@ -4,7 +4,7 @@
   "review_id": "FACTORY-ROUTINE-PUBLICATION-WALLCLOCK-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-12",
   "task_id": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1",
-  "reviewed_bindings_sha256": "535e78425c93f2cca1c7a64c201688b4d63ff5dea9fbdf49016f8404c71ab749",
+  "reviewed_bindings_sha256": "6b4f8214d43afa1678e8fdaa6f4a88fae941d599c6a45097aa4769633479a62b",
   "reviewed_inventory_sha256": "0ce85a4491268129b8c04f7b4f7c7a80dbce6dc0a724db1971eabaa99afd6189",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
