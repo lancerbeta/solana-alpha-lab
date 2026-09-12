@@ -564,6 +564,7 @@ class CollectorMemoryBoundedTickTests(unittest.TestCase):
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
         )
         with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
             store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
             try:
                 activation_id = _activate(store, schedule)
@@ -583,23 +584,104 @@ class CollectorMemoryBoundedTickTests(unittest.TestCase):
                         },
                         clock=NOW,
                     )
-                recovered = store.list_due_in_states_scoped(
+                tick_once(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule=schedule,
+                    activation_id=activation_id,
+                    now=NOW,
+                    opener=_Opener(),
+                    producer_git_sha=GIT_SHA,
+                    max_claims=2,
+                    discovery_rows=[],
+                )
+                remaining = store.list_due_in_states_scoped(
                     ("CLAIMED",),
                     schedule_sha256=digest,
                     activation_id=activation_id,
-                    due_at_max=NOW,
                 )
-                capped = store.list_due_in_states_scoped(
-                    ("CLAIMED",),
+                closed = store.list_due_in_states_scoped(
+                    ("CENSORED_LATE",),
                     schedule_sha256=digest,
                     activation_id=activation_id,
-                    due_at_max=NOW,
-                    limit=2,
                 )
-                self.assertEqual(len(recovered), 5)
-                self.assertEqual(len(capped), 2)
-                # Tick contract: recovered path uses uncapped selection.
-                self.assertGreater(len(recovered), 2)
+                self.assertEqual(len(remaining), 0)
+                self.assertEqual(len(closed), 5)
+            finally:
+                store.close()
+
+    def test_due_points_prove_matches_schedule_wide_legacy(self) -> None:
+        from solana_alpha_lab.factory.observation_panel_coverage import (
+            due_rows_prove_required_points,
+        )
+
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            try:
+                live = _activate(store, schedule, activation_id="ACT-LIVE")
+                other = _activate(store, schedule, activation_id="ACT-OTHER")
+                digest = schedule["schedule_sha256"]
+                store.insert_due(
+                    {
+                        "schedule_sha256": digest,
+                        "activation_id": live,
+                        "entity_id": _entity(0),
+                        "point_id": "X300",
+                        "primitive_id": SEARCH,
+                        "state": "OBSERVED",
+                        "due_at": "2026-09-01T00:05:00Z",
+                        "deadline_at": "2026-09-01T00:20:00Z",
+                        "payload": {},
+                    },
+                    clock=NOW,
+                )
+                store.insert_due(
+                    {
+                        "schedule_sha256": digest,
+                        "activation_id": other,
+                        "entity_id": _entity(1),
+                        "point_id": "X300",
+                        "primitive_id": SEARCH,
+                        "state": "PENDING",
+                        "due_at": "2026-09-01T00:05:00Z",
+                        "deadline_at": "2026-09-01T00:20:00Z",
+                        "payload": {},
+                    },
+                    clock=NOW,
+                )
+                legacy = due_rows_prove_required_points(
+                    store.due_in_states(
+                        (
+                            "OBSERVED",
+                            "MISSING_TYPED",
+                            "DISAPPEARED",
+                            "CENSORED",
+                            "CENSORED_LATE",
+                            "X_POPULATION_INELIGIBLE",
+                            "DEPENDENCY_MISSING",
+                            "PENDING",
+                            "DUE",
+                            "CLAIMED",
+                            "IN_FLIGHT_CALL_INDETERMINATE",
+                            "BLOCKED_BUDGET",
+                        )
+                    ),
+                    covering_schedule_sha256=digest,
+                    required_points=["X300"],
+                    now=NOW,
+                )
+                sql = store.due_points_prove_required(
+                    schedule_sha256=digest,
+                    activation_id=live,
+                    required_points=["X300"],
+                    now=NOW,
+                )
+                self.assertEqual(legacy, sql)
+                self.assertFalse(sql)
             finally:
                 store.close()
 

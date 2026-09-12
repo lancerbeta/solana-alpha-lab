@@ -1131,11 +1131,13 @@ class ObservationScheduleStore:
         required_points: Sequence[str],
         now: datetime | None = None,
     ) -> bool:
-        """Activation-scoped prove for pending materialize (same scope as prior
-        list_due_in_states_scoped + due_rows_prove_required_points call site).
+        """Schedule-scoped prove matching due_rows_prove_required_points + base
+        materialize_pending (due_in_states filtered by covering_schedule_sha256).
 
-        Not a schedule-wide multi-activation census; matches the live activation
-        only. Future-closed checks use parse_utc, not TEXT order of render_utc.
+        activation_id is accepted for call-site clarity but does not narrow the
+        prove: unresolved dues on any activation under the same schedule_sha256
+        keep WAITING_FOR_PANEL fail-closed, as before this atom.
+        Future-closed checks use parse_utc, not TEXT order of render_utc.
         """
         from solana_alpha_lab.factory.observation_panel_coverage import (
             SCIENTIFIC_CLOSED_DUE_STATES,
@@ -1147,25 +1149,25 @@ class ObservationScheduleStore:
         reference = None
         if now is not None:
             reference = now.astimezone(UTC) if now.tzinfo is not None else now
+        _ = activation_id  # call-site continuity; prove remains schedule-wide
         for point_id in required_points:
             total = self._conn.execute(
                 """
                 SELECT COUNT(*) AS n FROM due_observations
-                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                WHERE schedule_sha256 = ? AND point_id = ?
                 """,
-                (schedule_sha256, activation_id, str(point_id)),
+                (schedule_sha256, str(point_id)),
             ).fetchone()
             if int(total["n"] if total is not None else 0) <= 0:
                 return False
             unresolved = self._conn.execute(
                 f"""
                 SELECT COUNT(*) AS n FROM due_observations
-                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                WHERE schedule_sha256 = ? AND point_id = ?
                   AND state IN ({",".join("?" for _ in UNRESOLVED_REQUIRED_DUE_STATES)})
                 """,
                 (
                     schedule_sha256,
-                    activation_id,
                     str(point_id),
                     *sorted(UNRESOLVED_REQUIRED_DUE_STATES),
                 ),
@@ -1175,22 +1177,21 @@ class ObservationScheduleStore:
             blocked = self._conn.execute(
                 """
                 SELECT COUNT(*) AS n FROM due_observations
-                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                WHERE schedule_sha256 = ? AND point_id = ?
                   AND state = 'BLOCKED_BUDGET'
                 """,
-                (schedule_sha256, activation_id, str(point_id)),
+                (schedule_sha256, str(point_id)),
             ).fetchone()
             if int(blocked["n"] if blocked is not None else 0) > 0:
                 return False
             non_closed = self._conn.execute(
                 f"""
                 SELECT COUNT(*) AS n FROM due_observations
-                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                WHERE schedule_sha256 = ? AND point_id = ?
                   AND state NOT IN ({",".join("?" for _ in SCIENTIFIC_CLOSED_DUE_STATES)})
                 """,
                 (
                     schedule_sha256,
-                    activation_id,
                     str(point_id),
                     *sorted(SCIENTIFIC_CLOSED_DUE_STATES),
                 ),
@@ -1203,12 +1204,11 @@ class ObservationScheduleStore:
                 for row in self._conn.execute(
                     f"""
                     SELECT due_at FROM due_observations
-                    WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                    WHERE schedule_sha256 = ? AND point_id = ?
                       AND state IN ({",".join("?" for _ in SCIENTIFIC_CLOSED_DUE_STATES)})
                     """,
                     (
                         schedule_sha256,
-                        activation_id,
                         str(point_id),
                         *sorted(SCIENTIFIC_CLOSED_DUE_STATES),
                     ),
