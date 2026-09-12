@@ -1123,6 +1123,96 @@ class ObservationScheduleStore:
             )
         )
 
+    def due_points_prove_required(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        required_points: Sequence[str],
+        now: datetime | None = None,
+    ) -> bool:
+        """SQL equivalent of due_rows_prove_required_points for one activation."""
+        from solana_alpha_lab.factory.observation_panel_coverage import (
+            SCIENTIFIC_CLOSED_DUE_STATES,
+            UNRESOLVED_REQUIRED_DUE_STATES,
+        )
+
+        if not required_points:
+            return False
+        reference = None
+        if now is not None:
+            reference = now.astimezone(UTC) if now.tzinfo is not None else now
+            reference_text = render_utc(reference)
+        for point_id in required_points:
+            total = self._conn.execute(
+                """
+                SELECT COUNT(*) AS n FROM due_observations
+                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                """,
+                (schedule_sha256, activation_id, str(point_id)),
+            ).fetchone()
+            if int(total["n"] if total is not None else 0) <= 0:
+                return False
+            unresolved = self._conn.execute(
+                f"""
+                SELECT COUNT(*) AS n FROM due_observations
+                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                  AND state IN ({",".join("?" for _ in UNRESOLVED_REQUIRED_DUE_STATES)})
+                """,
+                (
+                    schedule_sha256,
+                    activation_id,
+                    str(point_id),
+                    *sorted(UNRESOLVED_REQUIRED_DUE_STATES),
+                ),
+            ).fetchone()
+            if int(unresolved["n"] if unresolved is not None else 0) > 0:
+                return False
+            blocked = self._conn.execute(
+                """
+                SELECT COUNT(*) AS n FROM due_observations
+                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                  AND state = 'BLOCKED_BUDGET'
+                """,
+                (schedule_sha256, activation_id, str(point_id)),
+            ).fetchone()
+            if int(blocked["n"] if blocked is not None else 0) > 0:
+                return False
+            non_closed = self._conn.execute(
+                f"""
+                SELECT COUNT(*) AS n FROM due_observations
+                WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                  AND state NOT IN ({",".join("?" for _ in SCIENTIFIC_CLOSED_DUE_STATES)})
+                """,
+                (
+                    schedule_sha256,
+                    activation_id,
+                    str(point_id),
+                    *sorted(SCIENTIFIC_CLOSED_DUE_STATES),
+                ),
+            ).fetchone()
+            if int(non_closed["n"] if non_closed is not None else 0) > 0:
+                return False
+            if reference is not None:
+                future_closed = self._conn.execute(
+                    f"""
+                    SELECT COUNT(*) AS n FROM due_observations
+                    WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
+                      AND state IN ({",".join("?" for _ in SCIENTIFIC_CLOSED_DUE_STATES)})
+                      AND due_at > ?
+                    """,
+                    (
+                        schedule_sha256,
+                        activation_id,
+                        str(point_id),
+                        *sorted(SCIENTIFIC_CLOSED_DUE_STATES),
+                        reference_text,
+                    ),
+                ).fetchone()
+                if int(future_closed["n"] if future_closed is not None else 0) > 0:
+                    return False
+        return True
+
     def due_states_for_entities(
         self,
         states: Sequence[str] | None = None,

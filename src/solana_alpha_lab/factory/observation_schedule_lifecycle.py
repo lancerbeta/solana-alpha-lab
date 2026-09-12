@@ -518,25 +518,15 @@ def materialize_pending_observation_snapshots(
     if not pending_bindings:
         return outcomes
     coverage = load_coverage_from_rdp(data_root)
-    due_states = (
-        "OBSERVED",
-        "MISSING_TYPED",
-        "DISAPPEARED",
-        "CENSORED",
-        "CENSORED_LATE",
-        "X_POPULATION_INELIGIBLE",
-        "DEPENDENCY_MISSING",
-        "PENDING",
-        "DUE",
-        "CLAIMED",
-        "IN_FLIGHT_CALL_INDETERMINATE",
-        "BLOCKED_BUDGET",
-    )
-    due_rows = store.list_due_in_states_scoped(
-        due_states,
-        schedule_sha256=schedule_sha256,
-        activation_id=activation_id,
-    )
+
+    def _due_prove(required_points: Sequence[str]) -> bool:
+        return store.due_points_prove_required(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            required_points=required_points,
+            now=now,
+        )
+
     publication_complete = not has_open_publication_jobs(
         data_root=data_root,
         schedule_sha256=schedule_sha256,
@@ -563,7 +553,7 @@ def materialize_pending_observation_snapshots(
                 snapshot=item,
                 covering_schedule_sha256=covering,
                 required_points=required,
-                due_rows=due_rows,
+                due_prove=_due_prove,
                 now=now,
             ):
                 proving_snapshot = item
@@ -573,7 +563,7 @@ def materialize_pending_observation_snapshots(
                 data_root=data_root,
                 covering_schedule_sha256=covering,
                 required_points=required,
-                due_rows=due_rows,
+                due_prove=_due_prove,
                 snapshot=None,
                 publication_complete=publication_complete,
                 now=now,
@@ -605,7 +595,7 @@ def materialize_pending_observation_snapshots(
                 snapshot=proving_snapshot,
                 covering_schedule_sha256=covering,
                 required_points=required,
-                due_rows=due_rows,
+                due_prove=_due_prove,
                 now=now,
             ):
                 continue
@@ -614,7 +604,7 @@ def materialize_pending_observation_snapshots(
                 data_root=data_root,
                 covering_schedule_sha256=covering,
                 required_points=required,
-                due_rows=due_rows,
+                due_prove=_due_prove,
                 snapshot=proving_snapshot,
                 publication_complete=publication_complete,
                 now=now,

@@ -464,6 +464,108 @@ class CollectorMemoryBoundedTickTests(unittest.TestCase):
             delta_path = data_root / str(last["rel"])
             self.assertLess(delta_path.stat().st_size, 200_000)
             self.assertEqual(last["row_count"], n)
+            from solana_alpha_lab.factory.members_snapshot_delta import (
+                _delta_file_is_monolith,
+                reconstruct_publication,
+                reset_fingerprint_work,
+                reconstruct_stats,
+            )
+
+            self.assertFalse(_delta_file_is_monolith(delta_path, b""))
+            reset_fingerprint_work()
+            rows = reconstruct_publication(
+                data_root, unit, str(last["dataset_manifest_id"])
+            )
+            self.assertEqual(len(rows), n)
+            self.assertLessEqual(reconstruct_stats()["peak_sqlite_rows"], n)
+
+    def test_due_points_prove_required_avoids_due_census(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            try:
+                activation_id = _activate(store, schedule)
+                digest = schedule["schedule_sha256"]
+                for index in range(5_000):
+                    store.insert_due(
+                        {
+                            "schedule_sha256": digest,
+                            "activation_id": activation_id,
+                            "entity_id": _entity(index),
+                            "point_id": "X300",
+                            "primitive_id": SEARCH,
+                            "state": "OBSERVED",
+                            "due_at": "2026-09-01T00:05:00Z",
+                            "deadline_at": "2026-09-01T00:20:00Z",
+                            "payload": {},
+                        },
+                        clock=NOW,
+                    )
+                reset_store_read_stats()
+                proved = store.due_points_prove_required(
+                    schedule_sha256=digest,
+                    activation_id=activation_id,
+                    required_points=["X300"],
+                    now=NOW,
+                )
+                stats = store_read_stats()
+                self.assertTrue(proved)
+                self.assertEqual(stats["due_in_states_calls"], 0)
+                self.assertEqual(stats["due_in_states_rows"], 0)
+            finally:
+                store.close()
+
+    def test_long_delta_chain_reconstruct_peak_is_census(self) -> None:
+        from solana_alpha_lab.factory.members_snapshot_delta import (
+            reconstruct_publication,
+            reset_fingerprint_work,
+            reconstruct_stats,
+        )
+
+        n = 512
+        rows = [
+            {
+                "entity_id": _entity(index),
+                "membership_state": "SAMPLED_MEMBER",
+                "field_values": [{"field_id": "F", "typed_value_or_null": "0"}],
+            }
+            for index in range(n)
+        ]
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            write_snapshot_unit(
+                data_root,
+                utc_day="20260901",
+                dataset_manifest_id="dataset-000",
+                rows=rows,
+            )
+            unit = None
+            current = rows
+            for step in range(1, 21):
+                nxt = [dict(row) for row in current]
+                nxt[step % n] = {
+                    **nxt[step % n],
+                    "field_values": [
+                        {"field_id": "F", "typed_value_or_null": str(step)}
+                    ],
+                }
+                unit = append_delta_publication(
+                    data_root,
+                    utc_day="20260901",
+                    dataset_manifest_id=f"dataset-{step:03d}",
+                    rows=nxt,
+                )
+                current = nxt
+            assert unit is not None
+            reset_fingerprint_work()
+            reconstructed = reconstruct_publication(
+                data_root, unit, str(unit["publications"][-1]["dataset_manifest_id"])
+            )
+            self.assertEqual(len(reconstructed), n)
+            self.assertLessEqual(reconstruct_stats()["peak_sqlite_rows"], n)
+
 
     def test_systemd_template_has_memory_fence_not_timeout(self) -> None:
         text = UNIT.read_text(encoding="utf-8")

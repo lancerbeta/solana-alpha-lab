@@ -336,54 +336,55 @@ def append_delta_publication(
         observed_prev = _fingerprint_sqlite(prev_conn)
         if observed_prev != previous_fp:
             raise MembersDeltaError("DELTA_HASH_MISMATCH")
-        delta = _diff_sqlite_members(prev_conn, curr_conn)
-        current_fp = _fingerprint_sqlite(curr_conn)
-        current_count = int(curr_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
-        previous_count = int(prev_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
-        delta_payload = {
-            "schema": DELTA_SCHEMA,
-            "schema_version": DELTA_SCHEMA_VERSION_V2,
-            "dataset_manifest_id": dataset_manifest_id,
-            "previous_dataset_manifest_id": previous_id,
-            "previous_fingerprint": previous_fp,
-            "current_fingerprint": current_fp,
-            "added": delta["added"],
-            "changed": delta["changed"],
-            "removed": delta["removed"],
-            "counts": {
-                "added": len(delta["added"]),
-                "changed": len(delta["changed"]),
-                "removed": len(delta["removed"]),
-                "previous_row_count": previous_count,
-                "current_row_count": current_count,
-            },
-        }
-        seq = int(unit["publications"][-1]["seq"]) + 1
-        rel = (
-            f"datasets/members_snapshot_plus_delta/{utc_day}/deltas/"
-            f"{seq:04d}-{dataset_manifest_id}/members.parquet"
-        )
-        path = data_root / rel
-        digest = persist_delta_payload(path, delta_payload)
-        replay_spill, replay_conn = _clone_members_db(prev_conn)
-        _apply_delta_sqlite(replay_conn, delta_payload)
-        if _fingerprint_sqlite(replay_conn) != current_fp:
-            raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
-        unit["publications"].append(
-            {
-                "seq": seq,
+        ops_spill, ops_conn, counts = _diff_sqlite_members_to_ops(prev_conn, curr_conn)
+        try:
+            current_fp = _fingerprint_sqlite(curr_conn)
+            current_count = int(curr_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+            previous_count = int(prev_conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+            meta = {
+                "schema": DELTA_SCHEMA,
+                "schema_version": DELTA_SCHEMA_VERSION_V2,
                 "dataset_manifest_id": dataset_manifest_id,
-                "kind": "delta",
-                "rel": rel.replace("\\", "/"),
-                "sha256": digest,
-                "row_count": current_count,
-                "snapshot_fingerprint": current_fp,
-                "delta_schema_version": DELTA_SCHEMA_VERSION_V2,
+                "previous_dataset_manifest_id": previous_id,
+                "previous_fingerprint": previous_fp,
+                "current_fingerprint": current_fp,
+                "counts": {
+                    "added": counts["added"],
+                    "changed": counts["changed"],
+                    "removed": counts["removed"],
+                    "previous_row_count": previous_count,
+                    "current_row_count": current_count,
+                },
             }
-        )
-        _write_unit(unit_path, unit)
-        _write_layout_sidecar(path, unit, dataset_manifest_id)
-        return unit
+            seq = int(unit["publications"][-1]["seq"]) + 1
+            rel = (
+                f"datasets/members_snapshot_plus_delta/{utc_day}/deltas/"
+                f"{seq:04d}-{dataset_manifest_id}/members.parquet"
+            )
+            path = data_root / rel
+            digest = _persist_delta_ops(path, meta, ops_conn)
+            replay_spill, replay_conn = _clone_members_db(prev_conn)
+            _apply_delta_ops_sqlite(replay_conn, ops_conn)
+            if _fingerprint_sqlite(replay_conn) != current_fp:
+                raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+            unit["publications"].append(
+                {
+                    "seq": seq,
+                    "dataset_manifest_id": dataset_manifest_id,
+                    "kind": "delta",
+                    "rel": rel.replace("\\", "/"),
+                    "sha256": digest,
+                    "row_count": current_count,
+                    "snapshot_fingerprint": current_fp,
+                    "delta_schema_version": DELTA_SCHEMA_VERSION_V2,
+                }
+            )
+            _write_unit(unit_path, unit)
+            _write_layout_sidecar(path, unit, dataset_manifest_id)
+            return unit
+        finally:
+            ops_conn.close()
+            ops_spill.unlink(missing_ok=True)
     finally:
         prev_conn.close()
         prev_spill.unlink(missing_ok=True)
@@ -397,38 +398,89 @@ def append_delta_publication(
             replay_spill.unlink(missing_ok=True)
 
 
+def _diff_sqlite_members_to_ops(
+    prev_conn: sqlite3.Connection,
+    curr_conn: sqlite3.Connection,
+) -> tuple[Path, sqlite3.Connection, dict[str, int]]:
+    """Diff two member spills into an ops spill without materializing change lists."""
+
+    ops_spill, ops_conn = _spill_ops_db()
+    counts = {"added": 0, "changed": 0, "removed": 0}
+    try:
+        batch: list[tuple[str, str, bytes | None, str | None]] = []
+
+        def _flush() -> None:
+            nonlocal batch
+            if not batch:
+                return
+            ops_conn.executemany(
+                "INSERT INTO delta_ops(op, entity_id, payload, fingerprint) VALUES (?,?,?,?)",
+                batch,
+            )
+            batch = []
+
+        for entity_id, blob in curr_conn.execute("SELECT entity_id, payload FROM members"):
+            entity = str(entity_id)
+            loaded = prev_conn.execute(
+                "SELECT payload FROM members WHERE entity_id=?", (entity,)
+            ).fetchone()
+            if loaded is None:
+                batch.append(("added", entity, blob, None))
+                counts["added"] += 1
+            elif loaded[0] != blob:
+                curr_row = dict(pickle.loads(blob))
+                prev_row = dict(pickle.loads(loaded[0]))
+                if row_fingerprint(curr_row) != row_fingerprint(prev_row):
+                    batch.append(("changed", entity, blob, None))
+                    counts["changed"] += 1
+            if len(batch) >= _MEMBER_BATCH_SIZE:
+                _flush()
+        _flush()
+        for entity_id, blob in prev_conn.execute("SELECT entity_id, payload FROM members"):
+            entity = str(entity_id)
+            exists = curr_conn.execute(
+                "SELECT 1 FROM members WHERE entity_id=? LIMIT 1", (entity,)
+            ).fetchone()
+            if exists is not None:
+                continue
+            fingerprint = row_fingerprint(dict(pickle.loads(blob)))
+            batch.append(("removed", entity, None, fingerprint))
+            counts["removed"] += 1
+            if len(batch) >= _MEMBER_BATCH_SIZE:
+                _flush()
+        _flush()
+        ops_conn.commit()
+    except Exception:
+        ops_conn.close()
+        ops_spill.unlink(missing_ok=True)
+        raise
+    return ops_spill, ops_conn, counts
+
+
 def _diff_sqlite_members(
     prev_conn: sqlite3.Connection,
     curr_conn: sqlite3.Connection,
 ) -> dict[str, list[Any]]:
-    curr_ids: set[str] = set()
-    added: list[dict[str, Any]] = []
-    changed: list[dict[str, Any]] = []
-    for entity_id, blob in curr_conn.execute("SELECT entity_id, payload FROM members"):
-        entity = str(entity_id)
-        curr_ids.add(entity)
-        curr_row = dict(pickle.loads(blob))
-        loaded = prev_conn.execute(
-            "SELECT payload FROM members WHERE entity_id=?", (entity,)
-        ).fetchone()
-        if loaded is None:
-            added.append(curr_row)
-            continue
-        prev_row = dict(pickle.loads(loaded[0]))
-        if row_fingerprint(curr_row) != row_fingerprint(prev_row):
-            changed.append(curr_row)
-    removed: list[dict[str, str]] = []
-    for entity_id, blob in prev_conn.execute("SELECT entity_id, payload FROM members"):
-        entity = str(entity_id)
-        if entity in curr_ids:
-            continue
-        removed.append(
-            {
-                "entity_id": entity,
-                "fingerprint": row_fingerprint(dict(pickle.loads(blob))),
-            }
-        )
-    return {"added": added, "changed": changed, "removed": removed}
+    """Compatibility helper for tests; prefer _diff_sqlite_members_to_ops on hot paths."""
+
+    ops_spill, ops_conn, _counts = _diff_sqlite_members_to_ops(prev_conn, curr_conn)
+    try:
+        added: list[dict[str, Any]] = []
+        changed: list[dict[str, Any]] = []
+        removed: list[dict[str, str]] = []
+        for op, entity_id, payload, fingerprint in ops_conn.execute(
+            "SELECT op, entity_id, payload, fingerprint FROM delta_ops ORDER BY seq"
+        ):
+            if op == "added":
+                added.append(dict(pickle.loads(payload)))
+            elif op == "changed":
+                changed.append(dict(pickle.loads(payload)))
+            else:
+                removed.append({"entity_id": str(entity_id), "fingerprint": str(fingerprint)})
+        return {"added": added, "changed": changed, "removed": removed}
+    finally:
+        ops_conn.close()
+        ops_spill.unlink(missing_ok=True)
 
 
 def _clone_members_db(conn: sqlite3.Connection) -> tuple[Path, sqlite3.Connection]:
@@ -482,6 +534,25 @@ def _spill_members_db() -> tuple[Path, sqlite3.Connection]:
     return path, conn
 
 
+def _spill_ops_db() -> tuple[Path, sqlite3.Connection]:
+    handle, name = tempfile.mkstemp(prefix="members-delta-ops-", suffix=".sqlite")
+    os.close(handle)
+    path = Path(name)
+    conn = sqlite3.connect(str(path))
+    conn.execute(
+        """
+        CREATE TABLE delta_ops (
+            seq INTEGER PRIMARY KEY AUTOINCREMENT,
+            op TEXT NOT NULL,
+            entity_id TEXT NOT NULL,
+            payload BLOB,
+            fingerprint TEXT
+        )
+        """
+    )
+    return path, conn
+
+
 def _load_anchor_into_sqlite(conn: sqlite3.Connection, snapshot_path: Path) -> None:
     pf = pq.ParquetFile(snapshot_path)
     for batch in pf.iter_batches(batch_size=_MEMBER_BATCH_SIZE):
@@ -493,6 +564,45 @@ def _load_anchor_into_sqlite(conn: sqlite3.Connection, snapshot_path: Path) -> N
                 raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
             rows.append((entity_id, pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL)))
         conn.executemany("INSERT INTO members(entity_id, payload) VALUES (?,?)", rows)
+    conn.commit()
+
+
+def _apply_delta_ops_sqlite(
+    conn: sqlite3.Connection,
+    ops_conn: sqlite3.Connection,
+    *,
+    removed_out: list[dict[str, Any]] | None = None,
+    removed_at_seq: int | None = None,
+) -> None:
+    for op, entity_id, payload, fingerprint in ops_conn.execute(
+        "SELECT op, entity_id, payload, fingerprint FROM delta_ops ORDER BY seq"
+    ):
+        entity = str(entity_id)
+        if op == "removed":
+            loaded = conn.execute(
+                "SELECT payload FROM members WHERE entity_id=?", (entity,)
+            ).fetchone()
+            if loaded is None:
+                raise MembersDeltaError("DELTA_REMOVE_MISSING")
+            current = pickle.loads(loaded[0])
+            if row_fingerprint(current) != str(fingerprint or ""):
+                raise MembersDeltaError("DELTA_HASH_MISMATCH")
+            if removed_out is not None:
+                item = dict(current)
+                if removed_at_seq is not None:
+                    item["_delta_removed_at_seq"] = int(removed_at_seq)
+                removed_out.append(item)
+            conn.execute("DELETE FROM members WHERE entity_id=?", (entity,))
+            continue
+        if payload is None:
+            raise MembersDeltaError("DELTA_CORRUPT")
+        row = dict(pickle.loads(payload))
+        if str(row.get("entity_id") or "") != entity:
+            raise MembersDeltaError("DELTA_CORRUPT")
+        conn.execute(
+            "INSERT OR REPLACE INTO members(entity_id, payload) VALUES (?,?)",
+            (entity, pickle.dumps(row, protocol=pickle.HIGHEST_PROTOCOL)),
+        )
     conn.commit()
 
 
@@ -529,6 +639,67 @@ def _apply_delta_sqlite(
             (entity_id, pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL)),
         )
     conn.commit()
+
+
+def _apply_delta_file_sqlite(
+    conn: sqlite3.Connection,
+    path: Path,
+    *,
+    payload: bytes = b"",
+    removed_out: list[dict[str, Any]] | None = None,
+    removed_at_seq: int | None = None,
+) -> dict[str, Any]:
+    """Apply one delta file without retaining the full change-set in Python."""
+
+    meta = _read_delta_meta(path, payload)
+    schema_version = str(meta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
+    if schema_version not in SUPPORTED_DELTA_SCHEMA_VERSIONS:
+        raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
+    if path.suffix == ".json" or _delta_file_is_monolith(path, payload):
+        delta = _read_delta_payload(path, payload)
+        _apply_delta_sqlite(
+            conn, delta, removed_out=removed_out, removed_at_seq=removed_at_seq
+        )
+        return meta
+    pf = pq.ParquetFile(path)
+    for batch in pf.iter_batches(batch_size=_MEMBER_BATCH_SIZE):
+        for row in batch.to_pylist():
+            kind = str(row.get("record_kind") or "")
+            if kind == "meta":
+                continue
+            entity_id = str(row.get("entity_id") or "")
+            if kind == "removed":
+                loaded = conn.execute(
+                    "SELECT payload FROM members WHERE entity_id=?", (entity_id,)
+                ).fetchone()
+                if loaded is None:
+                    raise MembersDeltaError("DELTA_REMOVE_MISSING")
+                current = pickle.loads(loaded[0])
+                if row_fingerprint(current) != str(row.get("fingerprint") or ""):
+                    raise MembersDeltaError("DELTA_HASH_MISMATCH")
+                if removed_out is not None:
+                    item = dict(current)
+                    if removed_at_seq is not None:
+                        item["_delta_removed_at_seq"] = int(removed_at_seq)
+                    removed_out.append(item)
+                conn.execute("DELETE FROM members WHERE entity_id=?", (entity_id,))
+                continue
+            if kind not in {"added", "changed"}:
+                raise MembersDeltaError("DELTA_CORRUPT")
+            row_json = row.get("row_json")
+            if not isinstance(row_json, str):
+                raise MembersDeltaError("DELTA_CORRUPT")
+            parsed = json.loads(row_json)
+            if not isinstance(parsed, dict):
+                raise MembersDeltaError("DELTA_CORRUPT")
+            if str(parsed.get("entity_id") or "") != entity_id:
+                raise MembersDeltaError("DELTA_CORRUPT")
+            conn.execute(
+                "INSERT OR REPLACE INTO members(entity_id, payload) VALUES (?,?)",
+                (entity_id, pickle.dumps(parsed, protocol=pickle.HIGHEST_PROTOCOL)),
+            )
+    conn.commit()
+    return meta
 
 
 def _fingerprint_sqlite(conn: sqlite3.Connection) -> str:
@@ -606,26 +777,30 @@ def _reconstruct_to_sqlite(
                 if file_sha != str(item.get("sha256") or ""):
                     raise MembersDeltaError("DELTA_HASH_MISMATCH")
                 payload = path.read_bytes() if path.suffix == ".json" else b""
-                delta = _read_delta_payload(path, payload)
-                schema_version = str(delta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
+                meta = _read_delta_meta(path, payload)
+                schema_version = str(meta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
                 if schema_version not in SUPPORTED_DELTA_SCHEMA_VERSIONS:
                     raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
-                if str(delta.get("previous_dataset_manifest_id") or "") != previous_id:
+                if str(meta.get("previous_dataset_manifest_id") or "") != previous_id:
                     raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
-                if str(delta.get("dataset_manifest_id") or "") != str(
+                if str(meta.get("dataset_manifest_id") or "") != str(
                     item.get("dataset_manifest_id") or ""
                 ):
                     raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
-                if str(delta.get("previous_fingerprint") or "") != running_fp:
+                if str(meta.get("previous_fingerprint") or "") != running_fp:
                     raise MembersDeltaError("DELTA_HASH_MISMATCH")
-                _apply_delta_sqlite(
-                    conn, delta, removed_out=removed_out, removed_at_seq=item_seq
+                _apply_delta_file_sqlite(
+                    conn,
+                    path,
+                    payload=payload,
+                    removed_out=removed_out,
+                    removed_at_seq=item_seq,
                 )
                 n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
                 if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
                     _RECONSTRUCT_STATS["peak_sqlite_rows"] = n_rows
                 unit_fp = str(item.get("snapshot_fingerprint") or "")
-                current_fp = str(delta.get("current_fingerprint") or "")
+                current_fp = str(meta.get("current_fingerprint") or "")
                 is_target = str(item.get("dataset_manifest_id") or "") == dataset_manifest_id
                 if schema_version == DELTA_SCHEMA_VERSION_V2:
                     if not current_fp:
@@ -801,11 +976,131 @@ def load_member_rows_for_location(data_root: Path, logical_location: str) -> lis
 
 
 def persist_delta_payload(path: Path, delta_payload: Mapping[str, Any]) -> str:
+    """Persist a delta. V2 writes row-oriented ops; V1/legacy keep monolith JSON."""
+
+    version = str(delta_payload.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
+    if version == DELTA_SCHEMA_VERSION_V1 or "unchanged" in delta_payload:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        encoded = json.dumps(dict(delta_payload), sort_keys=True, separators=(",", ":"))
+        table = pa.table({"delta_json": [encoded]})
+        tmp = path.with_suffix(path.suffix + ".tmp")
+        pq.write_table(table, tmp, compression="zstd", compression_level=3)
+        digest = _sha256_file_streaming(tmp)
+        tmp.replace(path)
+        return digest
+
+    ops_spill, ops_conn = _spill_ops_db()
+    try:
+        batch: list[tuple[str, str, bytes | None, str | None]] = []
+        for row in delta_payload.get("added") or []:
+            payload = dict(row)
+            entity_id = str(payload.get("entity_id") or "")
+            if not entity_id:
+                raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+            batch.append(
+                (
+                    "added",
+                    entity_id,
+                    pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL),
+                    None,
+                )
+            )
+        for row in delta_payload.get("changed") or []:
+            payload = dict(row)
+            entity_id = str(payload.get("entity_id") or "")
+            if not entity_id:
+                raise MembersDeltaError("MEMBER_ENTITY_ID_REQUIRED")
+            batch.append(
+                (
+                    "changed",
+                    entity_id,
+                    pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL),
+                    None,
+                )
+            )
+        for item in delta_payload.get("removed") or []:
+            entity_id = str(item.get("entity_id") or "")
+            batch.append(("removed", entity_id, None, str(item.get("fingerprint") or "")))
+        if batch:
+            ops_conn.executemany(
+                "INSERT INTO delta_ops(op, entity_id, payload, fingerprint) VALUES (?,?,?,?)",
+                batch,
+            )
+            ops_conn.commit()
+        meta = {
+            key: value
+            for key, value in dict(delta_payload).items()
+            if key not in {"added", "changed", "removed", "unchanged"}
+        }
+        if "counts" not in meta:
+            meta["counts"] = {
+                "added": len(delta_payload.get("added") or []),
+                "changed": len(delta_payload.get("changed") or []),
+                "removed": len(delta_payload.get("removed") or []),
+            }
+        return _persist_delta_ops(path, meta, ops_conn)
+    finally:
+        ops_conn.close()
+        ops_spill.unlink(missing_ok=True)
+
+
+def _persist_delta_ops(
+    path: Path,
+    meta: Mapping[str, Any],
+    ops_conn: sqlite3.Connection,
+) -> str:
     path.parent.mkdir(parents=True, exist_ok=True)
-    encoded = json.dumps(delta_payload, sort_keys=True, separators=(",", ":"))
-    table = pa.table({"delta_json": [encoded]})
+    schema = pa.schema(
+        [
+            ("record_kind", pa.string()),
+            ("meta_json", pa.string()),
+            ("entity_id", pa.string()),
+            ("fingerprint", pa.string()),
+            ("row_json", pa.string()),
+        ]
+    )
     tmp = path.with_suffix(path.suffix + ".tmp")
-    pq.write_table(table, tmp, compression="zstd", compression_level=3)
+    writer = pq.ParquetWriter(
+        tmp, schema, compression="zstd", compression_level=3
+    )
+    try:
+        meta_row = {
+            "record_kind": "meta",
+            "meta_json": json.dumps(dict(meta), sort_keys=True, separators=(",", ":")),
+            "entity_id": None,
+            "fingerprint": None,
+            "row_json": None,
+        }
+        writer.write_table(pa.Table.from_pylist([meta_row], schema=schema))
+        batch: list[dict[str, Any]] = []
+        for op, entity_id, payload, fingerprint in ops_conn.execute(
+            "SELECT op, entity_id, payload, fingerprint FROM delta_ops ORDER BY seq"
+        ):
+            row_json = None
+            if payload is not None:
+                row_json = json.dumps(
+                    dict(pickle.loads(payload)),
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    ensure_ascii=False,
+                    allow_nan=False,
+                )
+            batch.append(
+                {
+                    "record_kind": str(op),
+                    "meta_json": None,
+                    "entity_id": str(entity_id),
+                    "fingerprint": None if fingerprint is None else str(fingerprint),
+                    "row_json": row_json,
+                }
+            )
+            if len(batch) >= _MEMBER_BATCH_SIZE:
+                writer.write_table(pa.Table.from_pylist(batch, schema=schema))
+                batch = []
+        if batch:
+            writer.write_table(pa.Table.from_pylist(batch, schema=schema))
+    finally:
+        writer.close()
     digest = _sha256_file_streaming(tmp)
     tmp.replace(path)
     return digest
@@ -815,22 +1110,112 @@ def _write_delta_parquet(path: Path, delta_payload: Mapping[str, Any]) -> str:
     return persist_delta_payload(path, delta_payload)
 
 
+def _delta_file_is_monolith(path: Path, payload: bytes) -> bool:
+    if path.suffix == ".json":
+        return True
+    try:
+        schema = pq.read_schema(path)
+    except (pa.ArrowException, OSError):
+        return False
+    names = set(schema.names)
+    return "delta_json" in names and "record_kind" not in names
+
+
+def _read_delta_meta(path: Path, payload: bytes = b"") -> dict[str, Any]:
+    try:
+        if path.suffix == ".json":
+            delta = json.loads(payload.decode("utf-8"))
+            if not isinstance(delta, dict):
+                raise MembersDeltaError("DELTA_CORRUPT")
+            return {
+                key: value
+                for key, value in delta.items()
+                if key not in {"added", "changed", "removed", "unchanged"}
+            }
+        if _delta_file_is_monolith(path, payload):
+            delta = _read_delta_payload(path, payload)
+            return {
+                key: value
+                for key, value in delta.items()
+                if key not in {"added", "changed", "removed", "unchanged"}
+            }
+        pf = pq.ParquetFile(path)
+        for batch in pf.iter_batches(batch_size=1):
+            rows = batch.to_pylist()
+            if not rows:
+                continue
+            row = rows[0]
+            if str(row.get("record_kind") or "") != "meta":
+                raise MembersDeltaError("DELTA_CORRUPT")
+            meta_json = row.get("meta_json")
+            if not isinstance(meta_json, str):
+                raise MembersDeltaError("DELTA_CORRUPT")
+            meta = json.loads(meta_json)
+            if not isinstance(meta, dict):
+                raise MembersDeltaError("DELTA_CORRUPT")
+            return meta
+        raise MembersDeltaError("DELTA_CORRUPT")
+    except MembersDeltaError:
+        raise
+    except (UnicodeDecodeError, json.JSONDecodeError, pa.ArrowException, OSError, TypeError) as exc:
+        raise MembersDeltaError("DELTA_CORRUPT") from exc
+
+
 def _read_delta_payload(path: Path, payload: bytes) -> dict[str, Any]:
     try:
         if path.suffix == ".json":
             delta = json.loads(payload.decode("utf-8"))
-        else:
+            if not isinstance(delta, dict):
+                raise MembersDeltaError("DELTA_CORRUPT")
+            return delta
+        if _delta_file_is_monolith(path, payload):
             rows = pq.read_table(path).to_pylist()
             if len(rows) != 1 or not isinstance(rows[0].get("delta_json"), str):
                 raise MembersDeltaError("DELTA_CORRUPT")
             delta = json.loads(str(rows[0]["delta_json"]))
+            if not isinstance(delta, dict):
+                raise MembersDeltaError("DELTA_CORRUPT")
+            return delta
+        meta = _read_delta_meta(path, payload)
+        added: list[dict[str, Any]] = []
+        changed: list[dict[str, Any]] = []
+        removed: list[dict[str, str]] = []
+        pf = pq.ParquetFile(path)
+        for batch in pf.iter_batches(batch_size=_MEMBER_BATCH_SIZE):
+            for row in batch.to_pylist():
+                kind = str(row.get("record_kind") or "")
+                if kind == "meta":
+                    continue
+                if kind == "removed":
+                    removed.append(
+                        {
+                            "entity_id": str(row.get("entity_id") or ""),
+                            "fingerprint": str(row.get("fingerprint") or ""),
+                        }
+                    )
+                    continue
+                row_json = row.get("row_json")
+                if not isinstance(row_json, str):
+                    raise MembersDeltaError("DELTA_CORRUPT")
+                parsed = json.loads(row_json)
+                if not isinstance(parsed, dict):
+                    raise MembersDeltaError("DELTA_CORRUPT")
+                if kind == "added":
+                    added.append(parsed)
+                elif kind == "changed":
+                    changed.append(parsed)
+                else:
+                    raise MembersDeltaError("DELTA_CORRUPT")
+        return {
+            **meta,
+            "added": added,
+            "changed": changed,
+            "removed": removed,
+        }
     except MembersDeltaError:
         raise
-    except (UnicodeDecodeError, json.JSONDecodeError, pa.ArrowException, OSError) as exc:
+    except (UnicodeDecodeError, json.JSONDecodeError, pa.ArrowException, OSError, TypeError) as exc:
         raise MembersDeltaError("DELTA_CORRUPT") from exc
-    if not isinstance(delta, dict):
-        raise MembersDeltaError("DELTA_CORRUPT")
-    return delta
 
 
 def _write_snapshot_or_reuse(path: Path, rows: Sequence[Mapping[str, Any]]) -> str:
