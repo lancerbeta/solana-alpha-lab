@@ -73,6 +73,7 @@ from solana_alpha_lab.factory.observation_schedule_store import (
 )
 
 OWNER = "tick-once"
+RECOVERED_CLAIMED_PAGE_SIZE = 256
 SEARCH = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
 DISCOVERY = "PRIM-JUPITER-TOKENS-V2-RECENT-001"
 DEPENDENT_SELL = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001"
@@ -1246,28 +1247,51 @@ def tick_once(
                 accounts=accounts,
                 discovery_context=discovery_context,
             )
-        recovered = store.list_due_in_states_scoped(
+        # Recovered CLAIMED stay uncapped vs max_claims. Page the ops ledger so
+        # ordinary ticks never materialize the whole CLAIMED set at once; SEARCH
+        # rows stay grouped in memory (small), quote work reloads by primary key.
+        search_by_due: dict[str, list[Mapping[str, Any]]] = {}
+        quote_order: list[tuple[int, tuple[str, str, str, str, str]]] = []
+        for page in store.iter_due_in_states_pages(
             ("CLAIMED",),
             schedule_sha256=digest,
             activation_id=activation_id,
             due_at_max=now,
-        )
-        # Recovered CLAIMED are small ops ledger rows, not the member census.
-        # Process the full recovered set so deadline/ledger outcomes match the
-        # pre-memory-bound tick; only freshly claimed work stays max_claims-capped.
-        claims = recovered + store.claim_due(
+            page_size=RECOVERED_CLAIMED_PAGE_SIZE,
+        ):
+            for item in page:
+                if str(item["primitive_id"]) == SEARCH:
+                    search_by_due.setdefault(str(item["due_at"]), []).append(item)
+                else:
+                    quote_order.append(
+                        (
+                            1
+                            if str(item["primitive_id"]) in SELL_PRIMITIVES
+                            else 0,
+                            (
+                                str(item["schedule_sha256"]),
+                                str(item["activation_id"]),
+                                str(item["entity_id"]),
+                                str(item["point_id"]),
+                                str(item["primitive_id"]),
+                            ),
+                        )
+                    )
+        new_claims = store.claim_due(
             limit=max_claims,
             now=now,
             owner=OWNER,
             schedule_sha256=digest,
             activation_id=activation_id,
         )
+        new_quotes: list[Mapping[str, Any]] = []
+        for item in new_claims:
+            if str(item["primitive_id"]) == SEARCH:
+                search_by_due.setdefault(str(item["due_at"]), []).append(item)
+            else:
+                new_quotes.append(item)
         holder = redact_with
         batch_size = int(registry.require_primitive(SEARCH).get("max_batch_size") or 1)
-        search_claims = [item for item in claims if str(item["primitive_id"]) == SEARCH]
-        search_by_due: dict[str, list[Mapping[str, Any]]] = {}
-        for item in search_claims:
-            search_by_due.setdefault(str(item["due_at"]), []).append(item)
         for due_at in sorted(search_by_due):
           for index in range(0, len(search_by_due[due_at]), max(1, batch_size)):
             chunk = search_by_due[due_at][index : index + max(1, batch_size)]
@@ -1606,13 +1630,19 @@ def tick_once(
                     )
                     for item in censored_points
                 )
-        quote_claims = [
-            item for item in claims if str(item["primitive_id"]) != SEARCH
-        ]
-        quote_claims.sort(
+        quote_order.sort(key=lambda item: item[0])
+        new_quotes.sort(
             key=lambda item: 1 if str(item["primitive_id"]) in SELL_PRIMITIVES else 0
         )
-        for claim in quote_claims:
+
+        def _iter_quote_claims() -> Iterator[Mapping[str, Any]]:
+            page = RECOVERED_CLAIMED_PAGE_SIZE
+            for index in range(0, len(quote_order), page):
+                keys = [item[1] for item in quote_order[index : index + page]]
+                yield from store.get_due_rows_by_keys(keys)
+            yield from new_quotes
+
+        for claim in _iter_quote_claims():
             current_due = store.get_due(claim)
             current_due_state = current_due.get("state") if current_due else None
             if current_due_state != "CLAIMED":
@@ -1976,14 +2006,6 @@ def tick_once(
                     reverse_primitive_id=reverse_id,
                     now=now,
                 )
-                for later in claims:
-                    if (
-                        later.get("entity_id") == claim["entity_id"]
-                        and later.get("primitive_id") == reverse_id
-                    ):
-                        payload = dict(later.get("payload") or {})
-                        payload["buy_out_amount"] = str(buy_out)
-                        later["payload"] = payload
             published_rows.append(
                 _observation_row(
                     claim,
@@ -2013,49 +2035,63 @@ def tick_once(
                 for item in censored_points
             )
         if stop_reason == "PACE_WAIT":
-            for claim in claims:
-                if store.due_state(claim) != "CLAIMED":
-                    continue
-                store.insert_due(
-                    _due_copy(
-                        claim,
-                        state="PENDING",
-                        payload={"deferred_reason": "PACE_WAIT"},
-                    ),
-                    clock=now,
-                )
-        if stop_reason == "BLOCKED_BUDGET":
-            for claim in claims:
-                current_state = store.due_state(claim)
-                if current_state in {
-                    "OBSERVED",
-                    "MISSING_TYPED",
-                    "DISAPPEARED",
-                    "CENSORED",
-                    "CENSORED_LATE",
-                    "IN_FLIGHT_CALL_INDETERMINATE",
-                    "DEPENDENCY_MISSING",
-                    "X_POPULATION_INELIGIBLE",
-                    "BLOCKED_BUDGET",
-                }:
-                    continue
-                store.insert_due(
-                    _due_copy(
-                        claim,
-                        state="BLOCKED_BUDGET",
-                        payload={"missing_reason": "BLOCKED_BUDGET"},
-                    ),
-                    clock=now,
-                )
-                published_rows.append(
-                    _observation_row(
-                        claim,
-                        "BLOCKED_BUDGET",
-                        now,
-                        claim.get("request_sha256"),
-                        missing_reason="BLOCKED_BUDGET",
+            for page in store.iter_due_in_states_pages(
+                ("CLAIMED",),
+                schedule_sha256=digest,
+                activation_id=activation_id,
+                due_at_max=now,
+                page_size=RECOVERED_CLAIMED_PAGE_SIZE,
+            ):
+                for claim in page:
+                    if store.due_state(claim) != "CLAIMED":
+                        continue
+                    store.insert_due(
+                        _due_copy(
+                            claim,
+                            state="PENDING",
+                            payload={"deferred_reason": "PACE_WAIT"},
+                        ),
+                        clock=now,
                     )
-                )
+        if stop_reason == "BLOCKED_BUDGET":
+            for page in store.iter_due_in_states_pages(
+                ("CLAIMED",),
+                schedule_sha256=digest,
+                activation_id=activation_id,
+                due_at_max=now,
+                page_size=RECOVERED_CLAIMED_PAGE_SIZE,
+            ):
+                for claim in page:
+                    current_state = store.due_state(claim)
+                    if current_state in {
+                        "OBSERVED",
+                        "MISSING_TYPED",
+                        "DISAPPEARED",
+                        "CENSORED",
+                        "CENSORED_LATE",
+                        "IN_FLIGHT_CALL_INDETERMINATE",
+                        "DEPENDENCY_MISSING",
+                        "X_POPULATION_INELIGIBLE",
+                        "BLOCKED_BUDGET",
+                    }:
+                        continue
+                    store.insert_due(
+                        _due_copy(
+                            claim,
+                            state="BLOCKED_BUDGET",
+                            payload={"missing_reason": "BLOCKED_BUDGET"},
+                        ),
+                        clock=now,
+                    )
+                    published_rows.append(
+                        _observation_row(
+                            claim,
+                            "BLOCKED_BUDGET",
+                            now,
+                            claim.get("request_sha256"),
+                            missing_reason="BLOCKED_BUDGET",
+                        )
+                    )
         if published_rows:
             member_iter = iter_member_snapshot(
                 store,
@@ -2111,13 +2147,18 @@ def tick_once(
             now=now,
             producer_git_sha=producer_git_sha,
         )
+        claims_count = (
+            sum(len(group) for group in search_by_due.values())
+            + len(quote_order)
+            + len(new_quotes)
+        )
         store.record_event(
             "TICK",
             {
                 "schedule_sha256": digest,
                 "provider_calls": provider_calls,
                 "credential_reads": credential_reads,
-                "claims": len(claims),
+                "claims": claims_count,
             },
             clock=now,
         )
@@ -2125,7 +2166,7 @@ def tick_once(
             "terminal": stop_reason or "TICK_COMPLETE",
             "provider_calls": accounts.tick_calls,
             "credential_reads": credential_reads,
-            "claims": len(claims),
+            "claims": claims_count,
             "published": len(published_rows),
             "source_poll_reused": source_poll_reused,
             "activation_state": (

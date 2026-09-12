@@ -10,6 +10,7 @@ import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -25,17 +26,22 @@ from solana_alpha_lab.factory.members_snapshot_delta import (  # noqa: E402
     write_snapshot_unit,
 )
 from solana_alpha_lab.factory.observation_panel_publisher import (  # noqa: E402
+    ObservationPanelPublisherError,
     PublicationFault,
+    has_open_publication_jobs,
     publish_observation_batch,
     repair_open_publication_jobs,
 )
 from solana_alpha_lab.factory.observation_publication_jobs import (  # noqa: E402
+    LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
     open_dir,
+    probe_open_job_for_routine_path,
 )
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     canonical_sha256,
     canonical_sha256_members_observations,
     load_observation_schedule,
+    parse_utc,
     render_utc,
 )
 from solana_alpha_lab.factory.observation_schedule_store import (  # noqa: E402
@@ -608,6 +614,181 @@ class CollectorMemoryBoundedTickTests(unittest.TestCase):
                 )
                 self.assertEqual(len(remaining), 0)
                 self.assertEqual(len(closed), 5)
+            finally:
+                store.close()
+
+    def test_legacy_fat_open_job_fail_closed_without_body_parse(self) -> None:
+        import solana_alpha_lab.factory.observation_publication_jobs as jobs_mod
+
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        digest = schedule["schedule_sha256"]
+        activation_id = "ACT-OBS-001"
+        previous = jobs_mod.ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES
+        jobs_mod.ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES = 4096
+        self.addCleanup(
+            setattr,
+            jobs_mod,
+            "ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES",
+            previous,
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            open_path = open_dir(data_root)
+            open_path.mkdir(parents=True)
+            content = "a" * 64
+            job_path = open_path / f"{content}.json"
+            # members before schedule_sha256 (sort_keys order) forces streaming past a
+            # giant array before identity scalars; sparse hole avoids dense disk fill.
+            prefix = (
+                '{"activation_id":"'
+                + activation_id
+                + '","content_sha256":"'
+                + content
+                + '","members":["'
+            ).encode("ascii")
+            suffix = (
+                '"],"observations":[],"schedule_sha256":"'
+                + digest
+                + '","stage":"ARTIFACTS"}'
+            ).encode("ascii")
+            hole = 50_000
+            with job_path.open("wb") as handle:
+                handle.write(prefix)
+                handle.seek(len(prefix) + hole)
+                handle.write(suffix)
+            self.assertGreater(
+                job_path.stat().st_size,
+                jobs_mod.ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES,
+            )
+            source_bytes = job_path.read_bytes()
+            probe = probe_open_job_for_routine_path(job_path)
+            self.assertEqual(probe.kind, "LEGACY_FAT_REQUIRES_PAUSED_MIGRATION")
+            self.assertTrue(probe.has_members_array)
+            self.assertEqual(probe.schedule_sha256, digest)
+            self.assertEqual(probe.activation_id, activation_id)
+
+            read_text_hits: list[Path] = []
+            real_read_text = Path.read_text
+
+            def _guarded_read_text(self: Path, *args: object, **kwargs: object) -> str:
+                if self.resolve() == job_path.resolve():
+                    read_text_hits.append(self)
+                    raise AssertionError("legacy open job body materialization")
+                return real_read_text(self, *args, **kwargs)
+
+            with mock.patch.object(Path, "read_text", _guarded_read_text):
+                with self.assertRaises(ObservationPanelPublisherError) as has_open_err:
+                    has_open_publication_jobs(
+                        data_root=data_root,
+                        schedule_sha256=digest,
+                        activation_id=activation_id,
+                    )
+                self.assertIn(
+                    LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
+                    str(has_open_err.exception),
+                )
+                with self.assertRaises(ObservationPanelPublisherError) as repair_err:
+                    repair_open_publication_jobs(
+                        data_root=data_root,
+                        root=ROOT,
+                        schedule=schedule,
+                        activation_id=activation_id,
+                        now=NOW,
+                        producer_git_sha=GIT_SHA,
+                    )
+                self.assertIn(
+                    LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
+                    str(repair_err.exception),
+                )
+            self.assertEqual(read_text_hits, [])
+            self.assertEqual(job_path.read_bytes(), source_bytes)
+
+    def test_claimed_keyset_pagination_crash_retry_preserves_rows(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            try:
+                activation_id = _activate(store, schedule)
+                digest = schedule["schedule_sha256"]
+                expected: list[tuple[str, str, str, str, str]] = []
+                for index in range(11):
+                    entity = _entity(index)
+                    store.insert_due(
+                        {
+                            "schedule_sha256": digest,
+                            "activation_id": activation_id,
+                            "entity_id": entity,
+                            "point_id": "X300",
+                            "primitive_id": SEARCH,
+                            "state": "CLAIMED",
+                            "due_at": "2026-09-01T00:04:00Z",
+                            "deadline_at": f"2026-09-01T00:06:{index:02d}Z",
+                            "payload": {"idx": index},
+                        },
+                        clock=NOW,
+                    )
+                    expected.append(
+                        (digest, activation_id, entity, "X300", SEARCH)
+                    )
+                page_size = 3
+                seen: list[tuple[str, str, str, str, str]] = []
+                after = None
+                # Simulate crash after first page, then resume.
+                first = store.list_due_in_states_keyset_page(
+                    ("CLAIMED",),
+                    schedule_sha256=digest,
+                    activation_id=activation_id,
+                    due_at_max=NOW,
+                    after=None,
+                    limit=page_size,
+                )
+                self.assertEqual(len(first), page_size)
+                for row in first:
+                    seen.append(
+                        (
+                            str(row["schedule_sha256"]),
+                            str(row["activation_id"]),
+                            str(row["entity_id"]),
+                            str(row["point_id"]),
+                            str(row["primitive_id"]),
+                        )
+                    )
+                after = store.due_keyset_cursor(first[-1])
+                while True:
+                    page = store.list_due_in_states_keyset_page(
+                        ("CLAIMED",),
+                        schedule_sha256=digest,
+                        activation_id=activation_id,
+                        due_at_max=NOW,
+                        after=after,
+                        limit=page_size,
+                    )
+                    if not page:
+                        break
+                    for row in page:
+                        key = (
+                            str(row["schedule_sha256"]),
+                            str(row["activation_id"]),
+                            str(row["entity_id"]),
+                            str(row["point_id"]),
+                            str(row["primitive_id"]),
+                        )
+                        self.assertNotIn(key, seen)
+                        seen.append(key)
+                        self.assertEqual(row["state"], "CLAIMED")
+                        self.assertLessEqual(
+                            parse_utc(str(row["due_at"])), NOW
+                        )
+                        self.assertEqual(
+                            parse_utc(str(row["deadline_at"])).second,
+                            int(str(row["payload"]["idx"])),
+                        )
+                    after = store.due_keyset_cursor(page[-1])
+                self.assertEqual(seen, expected)
             finally:
                 store.close()
 

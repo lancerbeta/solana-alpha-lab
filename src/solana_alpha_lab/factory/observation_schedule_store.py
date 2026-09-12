@@ -1045,6 +1045,7 @@ class ObservationScheduleStore:
         entity_id: str | None = None,
         point_id: str | None = None,
         primitive_ids: Sequence[str] | None = None,
+        primitive_ids_exclude: Sequence[str] | None = None,
         due_at_max: datetime | None = None,
         limit: int | None = None,
         page_size: int = 256,
@@ -1070,6 +1071,11 @@ class ObservationScheduleStore:
             else:
                 extra += f" AND primitive_id IN ({','.join('?' for _ in primitive_ids)})"
                 params.extend(list(primitive_ids))
+        if primitive_ids_exclude is not None and primitive_ids_exclude:
+            extra += (
+                f" AND primitive_id NOT IN ({','.join('?' for _ in primitive_ids_exclude)})"
+            )
+            params.extend(list(primitive_ids_exclude))
         if due_at_max is not None:
             extra += " AND due_at <= ?"
             params.append(render_utc(due_at_max))
@@ -1082,7 +1088,8 @@ class ObservationScheduleStore:
             f"""
             SELECT * FROM due_observations
             WHERE state IN ({placeholders}){extra}
-            ORDER BY deadline_at ASC, due_at ASC, schedule_sha256 ASC, entity_id ASC, point_id ASC
+            ORDER BY deadline_at ASC, due_at ASC, schedule_sha256 ASC,
+                     activation_id ASC, entity_id ASC, point_id ASC, primitive_id ASC
             {limiter}
             """,
             params,
@@ -1097,6 +1104,194 @@ class ObservationScheduleStore:
                 yielded += 1
                 if limit is not None and yielded >= int(limit):
                     return
+
+    def due_keyset_cursor(self, row: Mapping[str, Any]) -> tuple[str, str, str, str, str, str, str]:
+        return (
+            str(row["deadline_at"]),
+            str(row["due_at"]),
+            str(row["schedule_sha256"]),
+            str(row["activation_id"]),
+            str(row["entity_id"]),
+            str(row["point_id"]),
+            str(row["primitive_id"]),
+        )
+
+    def list_due_in_states_keyset_page(
+        self,
+        states: Sequence[str],
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        due_at_max: datetime | None = None,
+        primitive_ids: Sequence[str] | None = None,
+        primitive_ids_exclude: Sequence[str] | None = None,
+        after: tuple[str, str, str, str, str, str, str] | None = None,
+        limit: int = 256,
+    ) -> list[dict[str, Any]]:
+        """Stable keyset page over due rows; crash/retry resumes without skip/dup."""
+
+        placeholders = ",".join("?" for _ in states)
+        params: list[Any] = list(states)
+        extra = " AND schedule_sha256 = ? AND activation_id = ?"
+        params.extend([schedule_sha256, activation_id])
+        if primitive_ids is not None:
+            if not primitive_ids:
+                return []
+            extra += f" AND primitive_id IN ({','.join('?' for _ in primitive_ids)})"
+            params.extend(list(primitive_ids))
+        if primitive_ids_exclude is not None and primitive_ids_exclude:
+            extra += (
+                f" AND primitive_id NOT IN ({','.join('?' for _ in primitive_ids_exclude)})"
+            )
+            params.extend(list(primitive_ids_exclude))
+        if due_at_max is not None:
+            extra += " AND due_at <= ?"
+            params.append(render_utc(due_at_max))
+        if after is not None:
+            extra += """
+                AND (
+                    deadline_at > ?
+                    OR (deadline_at = ? AND due_at > ?)
+                    OR (deadline_at = ? AND due_at = ? AND schedule_sha256 > ?)
+                    OR (
+                        deadline_at = ? AND due_at = ? AND schedule_sha256 = ?
+                        AND activation_id > ?
+                    )
+                    OR (
+                        deadline_at = ? AND due_at = ? AND schedule_sha256 = ?
+                        AND activation_id = ? AND entity_id > ?
+                    )
+                    OR (
+                        deadline_at = ? AND due_at = ? AND schedule_sha256 = ?
+                        AND activation_id = ? AND entity_id = ? AND point_id > ?
+                    )
+                    OR (
+                        deadline_at = ? AND due_at = ? AND schedule_sha256 = ?
+                        AND activation_id = ? AND entity_id = ? AND point_id = ?
+                        AND primitive_id > ?
+                    )
+                )
+            """
+            (
+                deadline_at,
+                due_at,
+                schedule,
+                activation,
+                entity_id,
+                point_id,
+                primitive_id,
+            ) = after
+            params.extend(
+                [
+                    deadline_at,
+                    deadline_at,
+                    due_at,
+                    deadline_at,
+                    due_at,
+                    schedule,
+                    deadline_at,
+                    due_at,
+                    schedule,
+                    activation,
+                    deadline_at,
+                    due_at,
+                    schedule,
+                    activation,
+                    entity_id,
+                    deadline_at,
+                    due_at,
+                    schedule,
+                    activation,
+                    entity_id,
+                    point_id,
+                    deadline_at,
+                    due_at,
+                    schedule,
+                    activation,
+                    entity_id,
+                    point_id,
+                    primitive_id,
+                ]
+            )
+        page_limit = max(1, int(limit))
+        params.append(page_limit)
+        rows = self._conn.execute(
+            f"""
+            SELECT * FROM due_observations
+            WHERE state IN ({placeholders}){extra}
+            ORDER BY deadline_at ASC, due_at ASC, schedule_sha256 ASC,
+                     activation_id ASC, entity_id ASC, point_id ASC, primitive_id ASC
+            LIMIT ?
+            """,
+            params,
+        ).fetchall()
+        return [self._decode_payload_row(row) for row in rows]
+
+    def iter_due_in_states_pages(
+        self,
+        states: Sequence[str],
+        *,
+        schedule_sha256: str,
+        activation_id: str,
+        due_at_max: datetime | None = None,
+        primitive_ids: Sequence[str] | None = None,
+        primitive_ids_exclude: Sequence[str] | None = None,
+        page_size: int = 256,
+    ) -> Iterator[list[dict[str, Any]]]:
+        after: tuple[str, str, str, str, str, str, str] | None = None
+        size = max(1, int(page_size))
+        while True:
+            page = self.list_due_in_states_keyset_page(
+                states,
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                due_at_max=due_at_max,
+                primitive_ids=primitive_ids,
+                primitive_ids_exclude=primitive_ids_exclude,
+                after=after,
+                limit=size,
+            )
+            if not page:
+                return
+            yield page
+            after = self.due_keyset_cursor(page[-1])
+
+    def get_due_rows_by_keys(
+        self,
+        keys: Sequence[tuple[str, str, str, str, str]],
+    ) -> list[dict[str, Any]]:
+        """Load due rows by primary key in the given key order."""
+
+        if not keys:
+            return []
+        loaded: dict[tuple[str, str, str, str, str], dict[str, Any]] = {}
+        chunk = 256
+        for index in range(0, len(keys), chunk):
+            part = list(keys[index : index + chunk])
+            placeholders = ",".join("(?,?,?,?,?)" for _ in part)
+            params: list[Any] = []
+            for key in part:
+                params.extend(key)
+            rows = self._conn.execute(
+                f"""
+                SELECT * FROM due_observations
+                WHERE (schedule_sha256, activation_id, entity_id, point_id, primitive_id)
+                    IN ({placeholders})
+                """,
+                params,
+            ).fetchall()
+            for row in rows:
+                decoded = self._decode_payload_row(row)
+                loaded[
+                    (
+                        str(decoded["schedule_sha256"]),
+                        str(decoded["activation_id"]),
+                        str(decoded["entity_id"]),
+                        str(decoded["point_id"]),
+                        str(decoded["primitive_id"]),
+                    )
+                ] = decoded
+        return [loaded[key] for key in keys if key in loaded]
 
     def list_due_in_states_scoped(
         self,

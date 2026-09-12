@@ -40,11 +40,15 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
     load_observation_primitive_registry,
 )
 from solana_alpha_lab.factory.observation_publication_jobs import (
+    LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION,
     PublicationJobError,
     assert_routine_hot_path,
     complete_publication_job,
     iter_open_job_paths,
     load_job_by_content,
+    load_open_job_for_routine_path,
+    open_job_probe_matches_activation,
+    probe_open_job_for_routine_path,
     save_open_job,
 )
 from solana_alpha_lab.storage.manifests import (
@@ -1074,11 +1078,18 @@ def repair_open_publication_jobs(
     for path in iter_open_job_paths(data_root):
         try:
             assert_routine_hot_path(path)
-            job = json.loads(path.read_text(encoding="utf-8"))
+            probe = probe_open_job_for_routine_path(path)
+            if probe.kind != "FULL_PARSE_OK":
+                if open_job_probe_matches_activation(
+                    probe,
+                    schedule_sha256=digest,
+                    activation_id=str(activation_id),
+                ):
+                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+                continue
+            job = load_open_job_for_routine_path(path)
         except PublicationJobError as exc:
             raise ObservationPanelPublisherError(str(exc)) from exc
-        if not isinstance(job, dict):
-            raise ObservationPanelPublisherError("PUBLICATION_JOB_INVALID")
         if job.get("schedule_sha256") != digest:
             continue
         if str(job.get("activation_id") or "") != str(activation_id):
@@ -1121,13 +1132,19 @@ def has_open_publication_jobs(
     for path in iter_open_job_paths(data_root):
         try:
             assert_routine_hot_path(path)
+            probe = probe_open_job_for_routine_path(path)
+            if probe.kind != "FULL_PARSE_OK":
+                if open_job_probe_matches_activation(
+                    probe,
+                    schedule_sha256=schedule_sha256,
+                    activation_id=activation_id,
+                ):
+                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+                continue
+            job = load_open_job_for_routine_path(path)
         except PublicationJobError as exc:
             raise ObservationPanelPublisherError(str(exc)) from exc
-        try:
-            job = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
-            return True
-        if not isinstance(job, dict):
             return True
         if (
             str(job.get("schedule_sha256")) == schedule_sha256

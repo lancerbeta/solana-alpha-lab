@@ -12,9 +12,10 @@ import json
 import os
 import re
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
 
@@ -38,15 +39,22 @@ CONTENT_IDENTITY_COLLISION = "CONTENT_IDENTITY_COLLISION"
 SOURCE_CHANGED_AFTER_PLAN = "SOURCE_CHANGED_AFTER_PLAN"
 COLLECTOR_NOT_PAUSED = "COLLECTOR_NOT_PAUSED"
 COLLECTOR_STORE_MISSING = "COLLECTOR_STORE_MISSING"
+LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION = (
+    "LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION"
+)
 CONTENT_SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
 STREAM_HASH_CHUNK = 1024 * 1024
+# Ordinary collector/tick/status may full-parse only below this size. Larger open/
+# files require bounded metadata classification and paused-collector migration.
+ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES = 2 * 1024 * 1024
 PLAN_FORBIDDEN_PAYLOAD_KEYS = frozenset(
     {"raw", "payload", "observations", "normalized_observations", "members"}
 )
 MIGRATION_PEAK_PAYLOAD_MEMORY = "O(max_job_bytes)"
-ROUTINE_TICK_PUBLICATION_REPAIR = "O(open_job_bytes)"
+ROUTINE_TICK_PUBLICATION_REPAIR = "O(open_job_metadata_or_compact_bytes)"
 UNAVAILABLE_FILESYSTEM_TRUTH = "UNAVAILABLE_FILESYSTEM_TRUTH"
 UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET = "UNAVAILABLE_NO_HISTORY_OR_DECLARED_BUDGET"
+RoutineOpenKind = Literal["FULL_PARSE_OK", "LEGACY_FAT_REQUIRES_PAUSED_MIGRATION"]
 COMPACT_IDENTITY_KEYS = (
     "content_sha256",
     "schedule_sha256",
@@ -132,6 +140,286 @@ def assert_routine_hot_path(path: Path) -> None:
     parts = Path(path).parts
     if COMPLETED_DIRNAME in parts or LEGACY_FULL_DIRNAME in parts:
         raise PublicationJobError(HOT_PATH_FORBIDDEN)
+
+
+@dataclass(frozen=True)
+class OpenJobRoutineProbe:
+    """Bounded classification of an ``open/`` job before any full-body parse."""
+
+    kind: RoutineOpenKind
+    size_bytes: int
+    schedule_sha256: str | None = None
+    activation_id: str | None = None
+    has_members_array: bool = False
+
+
+class _JsonByteReader:
+    """Single-byte reader with a one-byte pushback; never materializes the file."""
+
+    __slots__ = ("_handle", "_pending")
+
+    def __init__(self, handle: Any) -> None:
+        self._handle = handle
+        self._pending: int | None = None
+
+    def read(self) -> str:
+        if self._pending is not None:
+            code = self._pending
+            self._pending = None
+            return chr(code)
+        chunk = self._handle.read(1)
+        if not chunk:
+            return ""
+        return chunk
+
+    def unread(self, char: str) -> None:
+        if not char:
+            return
+        if self._pending is not None:
+            raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+        self._pending = ord(char[0])
+        if len(char) != 1:
+            raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+
+
+def _skip_ws(reader: _JsonByteReader) -> str:
+    while True:
+        char = reader.read()
+        if not char:
+            return ""
+        if char not in " \t\r\n":
+            return char
+
+
+def _skip_string(reader: _JsonByteReader) -> None:
+    while True:
+        char = reader.read()
+        if not char:
+            raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+        if char == "\\":
+            if not reader.read():
+                raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+            continue
+        if char == '"':
+            return
+
+
+def _read_string(reader: _JsonByteReader) -> str:
+    chars: list[str] = []
+    while True:
+        char = reader.read()
+        if not char:
+            raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+        if char == "\\":
+            escaped = reader.read()
+            if not escaped:
+                raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+            escapes = {
+                '"': '"',
+                "\\": "\\",
+                "/": "/",
+                "b": "\b",
+                "f": "\f",
+                "n": "\n",
+                "r": "\r",
+                "t": "\t",
+            }
+            if escaped == "u":
+                hex_digits = "".join(reader.read() for _ in range(4))
+                if len(hex_digits) != 4:
+                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+                chars.append(chr(int(hex_digits, 16)))
+                continue
+            chars.append(escapes.get(escaped, escaped))
+            continue
+        if char == '"':
+            return "".join(chars)
+        chars.append(char)
+
+
+def _skip_value(reader: _JsonByteReader, first: str) -> None:
+    if first == '"':
+        _skip_string(reader)
+        return
+    if first == "{":
+        depth = 1
+        in_string = False
+        escape = False
+        while depth:
+            char = reader.read()
+            if not char:
+                raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+            if in_string:
+                if escape:
+                    escape = False
+                elif char == "\\":
+                    escape = True
+                elif char == '"':
+                    in_string = False
+                continue
+            if char == '"':
+                in_string = True
+            elif char == "{":
+                depth += 1
+            elif char == "}":
+                depth -= 1
+        return
+    if first == "[":
+        depth = 1
+        in_string = False
+        escape = False
+        while depth:
+            char = reader.read()
+            if not char:
+                raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+            if in_string:
+                if escape:
+                    escape = False
+                elif char == "\\":
+                    escape = True
+                elif char == '"':
+                    in_string = False
+                continue
+            if char == '"':
+                in_string = True
+            elif char == "[":
+                depth += 1
+            elif char == "]":
+                depth -= 1
+        return
+    if first in "-0123456789":
+        while True:
+            char = reader.read()
+            if not char:
+                return
+            if char in ",}] \t\r\n":
+                reader.unread(char)
+                return
+        return
+    literal = first
+    while True:
+        char = reader.read()
+        if not char or char in ",}] \t\r\n":
+            if char:
+                reader.unread(char)
+            break
+        literal += char
+    if literal not in {"true", "false", "null"}:
+        raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+
+
+def _stream_open_job_top_level_meta(path: Path) -> dict[str, Any]:
+    """Extract identity scalars and whether a top-level ``members`` array exists.
+
+    Nested values are skipped without materializing. Used only when the open job
+    exceeds ``ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES``.
+    """
+
+    wanted = {"schedule_sha256", "activation_id", "content_sha256", "stage"}
+    found: dict[str, Any] = {
+        "schedule_sha256": None,
+        "activation_id": None,
+        "content_sha256": None,
+        "stage": None,
+        "has_members_array": False,
+    }
+    with path.open("r", encoding="utf-8", newline="") as raw:
+        reader = _JsonByteReader(raw)
+        first = _skip_ws(reader)
+        if first != "{":
+            raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+        while True:
+            char = _skip_ws(reader)
+            if char == "}":
+                break
+            if char == ",":
+                continue
+            if char != '"':
+                raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+            key = _read_string(reader)
+            sep = _skip_ws(reader)
+            if sep != ":":
+                raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+            value_first = _skip_ws(reader)
+            if not value_first:
+                raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+            if key == "members" and value_first == "[":
+                found["has_members_array"] = True
+                _skip_value(reader, value_first)
+            elif key in wanted and value_first == '"':
+                found[key] = _read_string(reader)
+            elif key in wanted and value_first == "n":
+                rest = "".join(reader.read() for _ in range(3))
+                if rest != "ull":
+                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+                found[key] = None
+            else:
+                _skip_value(reader, value_first)
+    return found
+
+
+def probe_open_job_for_routine_path(path: Path) -> OpenJobRoutineProbe:
+    """Classify an ``open/`` job using size + bounded metadata only when oversized."""
+
+    assert_routine_hot_path(path)
+    try:
+        size = int(path.stat().st_size)
+    except OSError as exc:
+        raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION) from exc
+    if size <= ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES:
+        return OpenJobRoutineProbe(kind="FULL_PARSE_OK", size_bytes=size)
+    meta = _stream_open_job_top_level_meta(path)
+    return OpenJobRoutineProbe(
+        kind="LEGACY_FAT_REQUIRES_PAUSED_MIGRATION",
+        size_bytes=size,
+        schedule_sha256=(
+            str(meta["schedule_sha256"])
+            if meta.get("schedule_sha256") is not None
+            else None
+        ),
+        activation_id=(
+            str(meta["activation_id"])
+            if meta.get("activation_id") is not None
+            else None
+        ),
+        has_members_array=bool(meta.get("has_members_array")),
+    )
+
+
+def load_open_job_for_routine_path(path: Path) -> dict[str, Any]:
+    """Full-parse an ``open/`` job only after routine-path classification allows it."""
+
+    probe = probe_open_job_for_routine_path(path)
+    if probe.kind != "FULL_PARSE_OK":
+        raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
+    try:
+        loaded = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise PublicationJobError("PUBLICATION_JOB_INVALID") from exc
+    if not isinstance(loaded, dict):
+        raise PublicationJobError("PUBLICATION_JOB_INVALID")
+    return loaded
+
+
+def open_job_probe_matches_activation(
+    probe: OpenJobRoutineProbe,
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+) -> bool:
+    """Whether an oversized open job is in-scope for this activation.
+
+    Mirrors ``has_open_publication_jobs`` identity rules using streamed scalars
+    only. Unknown identity fails closed via the caller raising migration required.
+    """
+
+    if probe.schedule_sha256 is None:
+        return True
+    if str(probe.schedule_sha256) != str(schedule_sha256):
+        return False
+    if probe.activation_id is None:
+        return True
+    return str(probe.activation_id) == str(activation_id)
 
 
 def _dir_file_stats(directory: Path) -> tuple[int, int]:
@@ -754,11 +1042,14 @@ __all__ = [
     "CONTENT_IDENTITY_COLLISION",
     "CONTENT_SHA256_INVALID",
     "HOT_PATH_FORBIDDEN",
+    "LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION",
     "LEGACY_FULL_BYTE_MISMATCH",
     "MIGRATION_PEAK_PAYLOAD_MEMORY",
     "OPEN_JOB_CONFLICT",
+    "OpenJobRoutineProbe",
     "PLAN_FORBIDDEN_PAYLOAD_KEYS",
     "PublicationJobError",
+    "ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES",
     "ROUTINE_TICK_PUBLICATION_REPAIR",
     "SOURCE_CHANGED_AFTER_PLAN",
     "STAGE_COMPLETE",
@@ -777,6 +1068,9 @@ __all__ = [
     "journal_stats",
     "legacy_full_dir",
     "load_job_by_content",
+    "load_open_job_for_routine_path",
+    "open_job_probe_matches_activation",
+    "probe_open_job_for_routine_path",
     "open_dir",
     "plan_migration",
     "project_7d_disk_used",
