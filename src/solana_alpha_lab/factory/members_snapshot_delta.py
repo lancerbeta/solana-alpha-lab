@@ -559,7 +559,21 @@ def append_delta_publication(
         owned_prev_spill = True
         cache_hit = True
         _PUBLICATION_STAGE_STATS["operational_latest_hits"] += 1
-        observed_prev = previous_fp
+        # Fail-closed: meta+file sha bind is not enough against coordinated rebind.
+        observed_prev = _fingerprint_sqlite(prev_conn)
+        if observed_prev != previous_fp:
+            prev_conn.close()
+            if prev_spill is not None:
+                prev_spill.unlink(missing_ok=True)
+            _invalidate_operational_latest(unit_dir)
+            _PUBLICATION_STAGE_STATS["operational_latest_hits"] -= 1
+            _PUBLICATION_STAGE_STATS["operational_latest_misses"] += 1
+            _PUBLICATION_STAGE_STATS["reconstruct_calls_hot"] += 1
+            prev_spill, prev_conn, observed_prev = _reconstruct_to_sqlite(
+                data_root, unit, previous_id
+            )
+            owned_prev_spill = True
+            cache_hit = False
     else:
         _PUBLICATION_STAGE_STATS["operational_latest_misses"] += 1
         _PUBLICATION_STAGE_STATS["reconstruct_calls_hot"] += 1

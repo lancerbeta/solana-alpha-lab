@@ -189,6 +189,61 @@ class RoutinePublicationWallclockV1Tests(unittest.TestCase):
             )
             self.assertEqual(publication_stage_stats()["operational_latest_hits"], 0)
 
+    def test_coordinated_meta_db_rebind_falls_back_to_reconstruct(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_root = root / "rdp"
+            data_root.mkdir()
+            write_snapshot_unit(
+                data_root,
+                utc_day="20260912",
+                dataset_manifest_id="dataset-anchor",
+                rows=[_member(i) for i in range(25)],
+            )
+            # Build a foreign cache with matching seq/count but different members.
+            foreign = data_root / "foreign"
+            foreign.mkdir()
+            write_snapshot_unit(
+                foreign,
+                utc_day="20260912",
+                dataset_manifest_id="dataset-anchor",
+                rows=[_member(i, tag="X") for i in range(25)],
+            )
+            unit_dir = data_root / "datasets/members_snapshot_plus_delta/20260912"
+            foreign_dir = foreign / "datasets/members_snapshot_plus_delta/20260912"
+            meta = json.loads(
+                (unit_dir / _OPERATIONAL_LATEST_META).read_text(encoding="utf-8")
+            )
+            # Swap DB bytes from foreign population; keep unit-tail fingerprint in meta
+            # but recompute members_db_sha256 so file-bind alone would accept.
+            import hashlib
+
+            foreign_db = (foreign_dir / _OPERATIONAL_LATEST_DB).read_bytes()
+            (unit_dir / _OPERATIONAL_LATEST_DB).write_bytes(foreign_db)
+            meta["members_db_sha256"] = hashlib.sha256(foreign_db).hexdigest()
+            (unit_dir / _OPERATIONAL_LATEST_META).write_text(
+                json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            reset_fingerprint_work()
+            unit = append_delta_publication(
+                data_root,
+                utc_day="20260912",
+                dataset_manifest_id="dataset-d1",
+                rows=[_member(i, tag="Y" if i == 2 else "A") for i in range(25)],
+            )
+            # Hit attempted then fingerprint mismatch → reconstruct path.
+            self.assertGreaterEqual(
+                publication_stage_stats()["reconstruct_calls_hot"], 1
+            )
+            reconstructed = reconstruct_publication(data_root, unit, "dataset-d1")
+            self.assertEqual(
+                next(r for r in reconstructed if r["typed_values"]["idx"] == 2)[
+                    "typed_values"
+                ]["tag"],
+                "Y",
+            )
+
     def test_cache_invalidate_helper_forces_reconstruct(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
