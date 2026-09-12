@@ -56,6 +56,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     collector_pause_proven,
     complete_publication_job,
     completed_job_path,
+    fat_resume_activation_paused,
     is_compact_receipt,
     iter_open_job_paths,
     load_job_by_content,
@@ -65,6 +66,7 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     probe_open_job_for_routine_path,
     prove_legacy_fat_open_artifacts_source,
     save_open_job,
+    _revalidate_source,
 )
 from solana_alpha_lab.storage.manifests import (
     build_dataset_manifest,
@@ -997,6 +999,13 @@ def publish_observation_batch(
             transaction_id=f"RESEARCH-TXN-MEM-{content[:12].upper()}",
         )
 
+        if expected_open_source is not None:
+            leftover = open_job_path(data_root, content)
+            if leftover.is_file():
+                _revalidate_source(
+                    leftover, expected_open_source[0], expected_open_source[1]
+                )
+
         if job.get("stage") in {STAGE_ARTIFACTS, None}:
             _append_event(data_root, obs_event)
             job["stage"] = STAGE_RDP_OBS
@@ -1115,6 +1124,19 @@ def inspect_legacy_fat_open_artifacts(
             existing.get("schedule_sha256") or ""
         ):
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING)
+        digest = str(existing["schedule_sha256"])
+        expected_manifest = compute_dataset_manifest_id(
+            f"observation-panel-{digest[:12]}",
+            str(existing.get("dataset_version") or ""),
+        )
+        if str(existing.get("dataset_manifest_id") or "") != expected_manifest:
+            raise PublicationJobError(FAT_ARTIFACTS_RESUME_CONFLICT)
+        if fat_resume_activation_paused(
+            activations,
+            schedule_sha256=digest,
+            activation_id=str(existing.get("activation_id") or ""),
+        ) is False:
+            raise PublicationJobError(COLLECTOR_NOT_PAUSED)
         return {
             "terminal": FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE,
             "content_sha256": content_sha256,
@@ -1145,6 +1167,12 @@ def inspect_legacy_fat_open_artifacts(
     digest = str(schedule.get("schedule_sha256") or "")
     if digest != str(job["schedule_sha256"]):
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_SCHEDULE_MISSING)
+    if fat_resume_activation_paused(
+        activations,
+        schedule_sha256=digest,
+        activation_id=str(job["activation_id"]),
+    ) is False:
+        raise PublicationJobError(COLLECTOR_NOT_PAUSED)
     expected_manifest = compute_dataset_manifest_id(
         f"observation-panel-{digest[:12]}",
         str(job["dataset_version"]),

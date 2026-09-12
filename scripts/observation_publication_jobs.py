@@ -105,10 +105,10 @@ def _producer_git_sha(configured: str | None) -> str:
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_PRODUCER_SHA_REQUIRED) from exc
 
 
-def _load_store(store_path: Path) -> tuple[list[dict], ObservationScheduleStore]:
+def _load_store(store_path: Path, *, readonly: bool = False) -> tuple[list[dict], ObservationScheduleStore]:
     if not store_path.is_file():
         raise PublicationJobError(COLLECTOR_STORE_MISSING)
-    store = ObservationScheduleStore(store_path)
+    store = ObservationScheduleStore(store_path, readonly=readonly)
     try:
         activations = store.list_activations()
     except Exception:
@@ -204,7 +204,7 @@ def main(argv: list[str] | None = None) -> int:
                 2,
             )
         try:
-            activations, store = _load_store(store_path)
+            activations, store = _load_store(store_path, readonly=True)
         except PublicationJobError as exc:
             return _emit(_fat_error_payload(exc), 2)
         if collector_pause_proven(activations) is False:

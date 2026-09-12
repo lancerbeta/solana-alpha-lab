@@ -310,16 +310,20 @@ Ordinary tick/`repair`/`has_open` must still refuse an oversized `open/` job wit
 edit the JSON. This path is only for a job that already reached `stage=ARTIFACTS`
 with durable observation/member artifacts (including `SNAPSHOT_PLUS_DELTA`).
 
-Copy `--content` from the filename stem. Do not invent it.
+Copy `--content` from the filename stem. Do not invent it. If `open/` is empty,
+stop. If several files exist, choose the one stem you intend — this command does
+not auto-scan.
 
 ```
 ls -1 /opt/solana-alpha-lab/local/factory_v1/observation_rdp/datasets/publication_jobs/open
 ```
 
-Stop immediately (source untouched) if inspect prints any terminal other than
-`FAT_ARTIFACTS_RESUME_READY` or `FAT_ARTIFACTS_RESUME_READY_RETRY`. That includes
-collector `ACTIVE`/`DRAINING`, empty/unknown activation set, wrong stage, hash
-mismatch, identity mismatch, missing artifacts, or not a legacy-fat file.
+Inspect is the pause proof. Stop immediately (source untouched) if inspect
+prints any terminal other than `FAT_ARTIFACTS_RESUME_READY` or
+`FAT_ARTIFACTS_RESUME_READY_RETRY`. That includes `COLLECTOR_NOT_PAUSED` (live
+collector, empty set, or the job activation is not `PAUSED_OPERATOR`), wrong
+stage, hash mismatch, identity mismatch, missing artifacts, or not a
+legacy-fat file.
 
 `FAT_ARTIFACTS_RESUME_ALREADY_COMPLETE` means the compact `completed/` receipt
 already exists and the fat `open/` file is gone. That is done, not a next

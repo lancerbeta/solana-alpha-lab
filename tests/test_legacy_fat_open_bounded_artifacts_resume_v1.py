@@ -116,8 +116,15 @@ def _observations(schedule: dict) -> list[dict]:
     ]
 
 
-def _paused() -> list[dict]:
-    return [{"state": "PAUSED_OPERATOR"}]
+def _paused(schedule: dict | None = None) -> list[dict]:
+    schedule = schedule or _schedule()
+    return [
+        {
+            "state": "PAUSED_OPERATOR",
+            "activation_id": "ACT-OBS-001",
+            "schedule_sha256": schedule["schedule_sha256"],
+        }
+    ]
 
 
 def _publish(data_root: Path, schedule: dict, *, fault_after: str | None = None):
@@ -506,6 +513,46 @@ class LegacyFatOpenBoundedArtifactsResumeTests(unittest.TestCase):
             with self.assertRaises(PublicationJobError) as huge_err:
                 stream_legacy_fat_open_job_for_artifacts_resume(huge)
             self.assertEqual(str(huge_err.exception), FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE)
+            job_path.write_bytes(source)
+            compact = json.loads(job_path.read_text(encoding="utf-8"))
+            job_path.write_text(json.dumps(compact), encoding="utf-8")
+            _inflate_open_job(job_path)
+            text = job_path.read_text(encoding="utf-8")
+            job_path.write_text(text.replace(',"members":[', ',"no_members":['), encoding="utf-8")
+            with self.assertRaises(PublicationJobError) as members_err:
+                prove_legacy_fat_open_artifacts_source(data_root, content)
+            self.assertEqual(str(members_err.exception), FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT)
+            job_path.write_bytes(source)
+            compact = json.loads(job_path.read_text(encoding="utf-8"))
+            compact["activation_id"] = "ACT-OTHER-999"
+            job_path.write_text(json.dumps(compact), encoding="utf-8")
+            _inflate_open_job(job_path)
+            with self.assertRaises(PublicationJobError) as act_err:
+                inspect_legacy_fat_open_artifacts(
+                    data_root=data_root,
+                    root=ROOT,
+                    content_sha256=content,
+                    activations=_paused(schedule),
+                    schedule=schedule,
+                )
+            self.assertEqual(str(act_err.exception), COLLECTOR_NOT_PAUSED)
+            job_path.write_bytes(source)
+            _inflate_open_job(job_path)
+            with self.assertRaises(PublicationJobError) as unknown_err:
+                inspect_legacy_fat_open_artifacts(
+                    data_root=data_root,
+                    root=ROOT,
+                    content_sha256=content,
+                    activations=[
+                        {
+                            "state": "COMPLETE",
+                            "activation_id": "ACT-OBS-001",
+                            "schedule_sha256": schedule["schedule_sha256"],
+                        }
+                    ],
+                    schedule=schedule,
+                )
+            self.assertEqual(str(unknown_err.exception), COLLECTOR_NOT_PAUSED)
 
     def test_fault_retry_matrix_converges_once(self) -> None:
         schedule = _schedule()

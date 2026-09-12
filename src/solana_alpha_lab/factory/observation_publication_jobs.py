@@ -116,6 +116,7 @@ COMPACT_IDENTITY_KEYS = (
     "member_sha256",
 )
 APPLY_ACTIVE_STATES = frozenset({"ACTIVE", "DRAINING"})
+APPLY_PAUSED_STATES = frozenset({"PAUSED_OPERATOR"})
 COMPACT_FORBIDDEN_KEYS = frozenset(
     {"observations", "normalized_observations", "members"}
 )
@@ -147,11 +148,32 @@ def collector_blocks_apply(activations: Sequence[Mapping[str, Any]]) -> bool:
 
 
 def collector_pause_proven(activations: Sequence[Mapping[str, Any]]) -> bool:
-    """Pause is proven only when at least one activation exists and none are live."""
+    """Pause is proven only when a PAUSED_OPERATOR row exists and none are live."""
 
     if not activations:
         return False
-    return not collector_blocks_apply(activations)
+    if collector_blocks_apply(activations):
+        return False
+    return any(str(item.get("state") or "") in APPLY_PAUSED_STATES for item in activations)
+
+
+def fat_resume_activation_paused(
+    activations: Sequence[Mapping[str, Any]],
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+) -> bool:
+    """True when the exact job activation is registered and PAUSED_OPERATOR."""
+
+    if not schedule_sha256 or not activation_id:
+        return False
+    for item in activations:
+        if str(item.get("activation_id") or "") != activation_id:
+            continue
+        if str(item.get("schedule_sha256") or "") != schedule_sha256:
+            continue
+        return str(item.get("state") or "") in APPLY_PAUSED_STATES
+    return False
 
 
 class PublicationJobError(ValueError):
@@ -282,9 +304,14 @@ def _read_string(reader: _JsonByteReader, *, max_chars: int | None = None) -> st
             }
             if escaped == "u":
                 hex_digits = "".join(reader.read() for _ in range(4))
-                if len(hex_digits) != 4:
-                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
-                chars.append(chr(int(hex_digits, 16)))
+                if len(hex_digits) != 4 or any(
+                    character not in "0123456789abcdefABCDEF" for character in hex_digits
+                ):
+                    raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID)
+                try:
+                    chars.append(chr(int(hex_digits, 16)))
+                except ValueError as exc:
+                    raise PublicationJobError(FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID) from exc
             else:
                 chars.append(escapes.get(escaped, escaped))
         elif char == '"':
@@ -394,7 +421,15 @@ def _stream_open_job_top_level_meta(path: Path) -> dict[str, Any]:
                 continue
             if char != '"':
                 raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
-            key = _read_string(reader)
+            try:
+                key = _read_string(reader, max_chars=FAT_RESUME_KEY_MAX_CHARS)
+            except PublicationJobError as exc:
+                if str(exc) in {
+                    FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE,
+                    FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID,
+                }:
+                    raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION) from exc
+                raise
             sep = _skip_ws(reader)
             if sep != ":":
                 raise PublicationJobError(LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION)
@@ -405,7 +440,19 @@ def _stream_open_job_top_level_meta(path: Path) -> dict[str, Any]:
                 found["has_members_array"] = True
                 _skip_value(reader, value_first)
             elif key in wanted and value_first == '"':
-                found[key] = _read_string(reader)
+                try:
+                    found[key] = _read_string(
+                        reader, max_chars=FAT_RESUME_STRING_MAX_CHARS
+                    )
+                except PublicationJobError as exc:
+                    if str(exc) in {
+                        FAT_ARTIFACTS_RESUME_PAYLOAD_TOO_LARGE,
+                        FAT_ARTIFACTS_RESUME_PAYLOAD_INVALID,
+                    }:
+                        raise PublicationJobError(
+                            LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION
+                        ) from exc
+                    raise
             elif key in wanted and value_first == "n":
                 rest = "".join(reader.read() for _ in range(3))
                 if rest != "ull":
@@ -552,6 +599,8 @@ def prove_legacy_fat_open_artifacts_source(
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT)
     source_size, source_sha256 = _source_fingerprint(path)
     job = stream_legacy_fat_open_job_for_artifacts_resume(path)
+    if job.get("has_members_array") is not True:
+        raise PublicationJobError(FAT_ARTIFACTS_RESUME_NOT_LEGACY_FAT)
     if str(job.get("stage") or "") != STAGE_ARTIFACTS:
         raise PublicationJobError(FAT_ARTIFACTS_RESUME_UNSUPPORTED_STAGE)
     if str(job.get("content_sha256") or "") != content_sha256:
@@ -596,7 +645,14 @@ def prove_legacy_fat_open_artifacts_source(
         (parquet_rel, str(job["file_sha256"])),
         (member_rel, str(job["member_sha256"])),
     ):
-        if not rel or rel.startswith("/") or any(part == ".." for part in Path(rel).parts):
+        rel_path = Path(rel.replace("\\", "/"))
+        if (
+            not rel
+            or rel.startswith("/")
+            or rel_path.is_absolute()
+            or (len(rel) >= 2 and rel[1] == ":")
+            or any(part == ".." for part in rel_path.parts)
+        ):
             raise PublicationJobError(FAT_ARTIFACTS_RESUME_ARTIFACT_MISSING)
         artifact = (root / rel).resolve()
         try:
@@ -1319,6 +1375,7 @@ def project_7d_disk_used(
 __all__ = [
     "AMBIGUOUS_BLOCKS_APPLY",
     "APPLY_ACTIVE_STATES",
+    "APPLY_PAUSED_STATES",
     "CLASS_AMBIGUOUS",
     "CLASS_OPEN",
     "CLASS_PROVEN_COMPLETED",
@@ -1367,6 +1424,7 @@ __all__ = [
     "assert_routine_hot_path",
     "collector_blocks_apply",
     "collector_pause_proven",
+    "fat_resume_activation_paused",
     "compact_receipt_from_job",
     "complete_publication_job",
     "completed_dir",
