@@ -1251,11 +1251,12 @@ def tick_once(
             schedule_sha256=digest,
             activation_id=activation_id,
             due_at_max=now,
-            limit=max_claims,
         )
-        remaining = max(0, int(max_claims) - len(recovered))
+        # Recovered CLAIMED are small ops ledger rows, not the member census.
+        # Process the full recovered set so deadline/ledger outcomes match the
+        # pre-memory-bound tick; only freshly claimed work stays max_claims-capped.
         claims = recovered + store.claim_due(
-            limit=remaining,
+            limit=max_claims,
             now=now,
             owner=OWNER,
             schedule_sha256=digest,

@@ -23,12 +23,14 @@ managed_write_set:
 - src/solana_alpha_lab/factory/observation_schedule_store.py
 - src/solana_alpha_lab/factory/observation_scheduler.py
 - src/solana_alpha_lab/factory/observation_schedule_lifecycle.py
+- src/solana_alpha_lab/factory/observation_panel_coverage.py
 - src/solana_alpha_lab/factory/observation_panel_publisher.py
 - src/solana_alpha_lab/factory/observation_publication_jobs.py
 - src/solana_alpha_lab/factory/members_snapshot_delta.py
 - configs/factory_remote_ops/factory-observation-schedule.service
 - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
 - tests/test_factory_collector_memory_bounded_tick_v1.py
+- tests/test_factory_snapshot_delta_economy_and_signal_repair_v1.py
 - tests/test_observation_schedule_remote_ops.py
 - tests/test_observation_schedule_commissioning.py
 - tests/test_live_cohort_memory_bounded_publication_v1.py

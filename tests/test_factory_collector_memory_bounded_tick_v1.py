@@ -503,6 +503,21 @@ class CollectorMemoryBoundedTickTests(unittest.TestCase):
                         },
                         clock=NOW,
                     )
+                # Microsecond-form due_at must not TEXT-order false-fail vs seconds now.
+                store.insert_due(
+                    {
+                        "schedule_sha256": digest,
+                        "activation_id": activation_id,
+                        "entity_id": _entity(5_000),
+                        "point_id": "X300",
+                        "primitive_id": SEARCH,
+                        "state": "OBSERVED",
+                        "due_at": "2026-09-01T00:05:00.500000Z",
+                        "deadline_at": "2026-09-01T00:20:00Z",
+                        "payload": {},
+                    },
+                    clock=NOW,
+                )
                 reset_store_read_stats()
                 proved = store.due_points_prove_required(
                     schedule_sha256=digest,
@@ -514,6 +529,77 @@ class CollectorMemoryBoundedTickTests(unittest.TestCase):
                 self.assertTrue(proved)
                 self.assertEqual(stats["due_in_states_calls"], 0)
                 self.assertEqual(stats["due_in_states_rows"], 0)
+                # Exact-second now matching a seconds-form due_at is not "future".
+                # Keep only dues at/before the equality bound for this check.
+                self.assertTrue(
+                    store.due_points_prove_required(
+                        schedule_sha256=digest,
+                        activation_id=activation_id,
+                        required_points=["X300"],
+                        now=datetime(2026, 9, 1, 0, 5, 0, 500000, tzinfo=UTC),
+                    )
+                )
+                # Seconds-form bound must not TEXT-order-beat a later microsecond due_at.
+                self.assertFalse(
+                    store.due_points_prove_required(
+                        schedule_sha256=digest,
+                        activation_id=activation_id,
+                        required_points=["X300"],
+                        now=datetime(2026, 9, 1, 0, 5, 0, tzinfo=UTC),
+                    )
+                )
+                self.assertFalse(
+                    store.due_points_prove_required(
+                        schedule_sha256=digest,
+                        activation_id=activation_id,
+                        required_points=["X300"],
+                        now=datetime(2026, 9, 1, 0, 4, 59, tzinfo=UTC),
+                    )
+                )
+            finally:
+                store.close()
+
+    def test_recovered_claimed_not_capped_by_max_claims(self) -> None:
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            try:
+                activation_id = _activate(store, schedule)
+                digest = schedule["schedule_sha256"]
+                for index in range(5):
+                    store.insert_due(
+                        {
+                            "schedule_sha256": digest,
+                            "activation_id": activation_id,
+                            "entity_id": _entity(index),
+                            "point_id": "X300",
+                            "primitive_id": SEARCH,
+                            "state": "CLAIMED",
+                            "due_at": "2026-09-01T00:04:00Z",
+                            "deadline_at": "2026-09-01T00:06:00Z",
+                            "payload": {},
+                        },
+                        clock=NOW,
+                    )
+                recovered = store.list_due_in_states_scoped(
+                    ("CLAIMED",),
+                    schedule_sha256=digest,
+                    activation_id=activation_id,
+                    due_at_max=NOW,
+                )
+                capped = store.list_due_in_states_scoped(
+                    ("CLAIMED",),
+                    schedule_sha256=digest,
+                    activation_id=activation_id,
+                    due_at_max=NOW,
+                    limit=2,
+                )
+                self.assertEqual(len(recovered), 5)
+                self.assertEqual(len(capped), 2)
+                # Tick contract: recovered path uses uncapped selection.
+                self.assertGreater(len(recovered), 2)
             finally:
                 store.close()
 

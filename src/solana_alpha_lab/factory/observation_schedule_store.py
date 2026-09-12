@@ -1131,7 +1131,12 @@ class ObservationScheduleStore:
         required_points: Sequence[str],
         now: datetime | None = None,
     ) -> bool:
-        """SQL equivalent of due_rows_prove_required_points for one activation."""
+        """Activation-scoped prove for pending materialize (same scope as prior
+        list_due_in_states_scoped + due_rows_prove_required_points call site).
+
+        Not a schedule-wide multi-activation census; matches the live activation
+        only. Future-closed checks use parse_utc, not TEXT order of render_utc.
+        """
         from solana_alpha_lab.factory.observation_panel_coverage import (
             SCIENTIFIC_CLOSED_DUE_STATES,
             UNRESOLVED_REQUIRED_DUE_STATES,
@@ -1142,7 +1147,6 @@ class ObservationScheduleStore:
         reference = None
         if now is not None:
             reference = now.astimezone(UTC) if now.tzinfo is not None else now
-            reference_text = render_utc(reference)
         for point_id in required_points:
             total = self._conn.execute(
                 """
@@ -1194,23 +1198,26 @@ class ObservationScheduleStore:
             if int(non_closed["n"] if non_closed is not None else 0) > 0:
                 return False
             if reference is not None:
-                future_closed = self._conn.execute(
+                # Stream due_at only and parse like due_rows_prove_required_points.
+                # Do not TEXT-compare render_utc forms (seconds vs microseconds).
+                for row in self._conn.execute(
                     f"""
-                    SELECT COUNT(*) AS n FROM due_observations
+                    SELECT due_at FROM due_observations
                     WHERE schedule_sha256 = ? AND activation_id = ? AND point_id = ?
                       AND state IN ({",".join("?" for _ in SCIENTIFIC_CLOSED_DUE_STATES)})
-                      AND due_at > ?
                     """,
                     (
                         schedule_sha256,
                         activation_id,
                         str(point_id),
                         *sorted(SCIENTIFIC_CLOSED_DUE_STATES),
-                        reference_text,
                     ),
-                ).fetchone()
-                if int(future_closed["n"] if future_closed is not None else 0) > 0:
-                    return False
+                ):
+                    try:
+                        if parse_utc(str(row["due_at"])) > reference:
+                            return False
+                    except Exception:
+                        return False
         return True
 
     def due_states_for_entities(
