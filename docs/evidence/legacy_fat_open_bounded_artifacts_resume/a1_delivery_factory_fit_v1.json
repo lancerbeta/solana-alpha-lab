@@ -4,8 +4,8 @@
   "review_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-FACTORY-FIT-001",
   "as_of": "2026-09-12",
   "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
-  "reviewed_bindings_sha256": "d8ec1becec390775123d4202368353f35cd5ed6ff7087fe19fd8ce6c4f32d238",
-  "reviewed_inventory_sha256": "591e32054c6f54534b3c7610a76c3e4576a04560bb59116eb13c36e23e4bf1aa",
+  "reviewed_bindings_sha256": "20a914efc1827aea7927f1b96f0a8c53b6755c23c1dc4c9ab4ad225c567c08d6",
+  "reviewed_inventory_sha256": "4c62249813deb70cbb6d1b7ce7ec016821de52d7f799730e9394f3b89a72fb85",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

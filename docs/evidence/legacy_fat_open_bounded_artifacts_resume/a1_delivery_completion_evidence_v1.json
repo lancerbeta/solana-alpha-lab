@@ -15,13 +15,13 @@
     "catalog/assets/lifecycle.yaml": "b35aae0f71883191baf00571d565604d5cca8086a78ee266e1d7e050d7c5b526",
     "docs/PROJECT_MAP.md": "612a25ef5f1dd4f03300acaf12efdbee4b240bb8af3cc313d66fdfe34d942fa8",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "1d7356f44c2c6b2420c68b7a5d4467905ac319b3460ae14dce8a72de23ed1dbd",
-    "docs/reports/legacy_fat_open_bounded_artifacts_resume/a1_owner_readout_v1.md": "e2d9b1957d361c52dc36c7e364c984d1f3f414874707b1a19f424658713682b5",
+    "docs/reports/legacy_fat_open_bounded_artifacts_resume/a1_owner_readout_v1.md": "965f0867415d2d64f6ea4398ed514aea6539978d8b91a8075d1e5444307a3963",
     "docs/tasks/LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1.md": "67446ba3750d22876029a88a1f59ec7a4828c1da468a8a643948330e9d50f26d",
     "scripts/observation_publication_jobs.py": "17ac45a202b2f38e2e9a4e5b08f49e1177dbe2233d5b5a5bc77fc4e90bd1dead",
     "src/solana_alpha_lab/factory/observation_panel_publisher.py": "3e2ea6088f23532215f217daa96e1eedc3d87d6fa04997241559b87ae775f925",
     "src/solana_alpha_lab/factory/observation_publication_jobs.py": "048098f34ca0d51fd2b52bea7efc129d25ffb0b5ccd0a3b640fb3dfb856059b3",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "6717694544ef0023bce5857667dca1aaa1ddc3d4ae49bc75c1653ad930092cac",
-    "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "2e98d4b27a346125dc3f5c0d410dbeb6eed15cf8f92cfc24ab87ec6e804c996f"
+    "tests/test_legacy_fat_open_bounded_artifacts_resume_v1.py": "07eec34d8a05c4198785edf9e34856458bd3bf17e2d8b6f652dfa9ef5735c182"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -33,14 +33,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/legacy_fat_open_bounded_artifacts_resume/a1_delivery_factory_fit_v1.json",
-    "sha256": "71ce2953d624e187c58f722f339396c19578f33e1a6d6532469b183b30bf339a",
+    "sha256": "e782f49e1794151b2362209f928ac4f875c46cfd59a0d9a23f072a3e4991feed",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME",
     "independent_review": {
       "path": "docs/evidence/legacy_fat_open_bounded_artifacts_resume/a1_delivery_independent_review_v1.json",
-      "sha256": "82da4b925644b26306542195a96ab1a0ae857da8bbf614934416696617000b5f",
+      "sha256": "f1071212213c8506fdc6dc5c56f9b27e8c56a9f2337636f0654f4a15eba24ec1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
