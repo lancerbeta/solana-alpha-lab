@@ -73,7 +73,9 @@ NOW = datetime(2026, 9, 1, 0, 10, tzinfo=UTC)
 FAT_EXTRA_BYTES = ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES + 8192
 MEMORY_FAT_BYTES = 16 * 1024 * 1024
 SOFT_RSS = 768 * 1024 * 1024
-COMFORTABLE_RSS = 256 * 1024 * 1024
+# Linux CI runners load pyarrow/duckdb with a higher baseline RSS than Windows.
+# Owner DoD requires comfortably below the 768 MiB soft envelope, not a 256 MiB cap.
+COMFORTABLE_RSS = 512 * 1024 * 1024
 HOT90_DELTA = {
     "activation_stage": STAGE_WRITE_ONLY_SHADOW,
     "production_compaction_enabled": False,

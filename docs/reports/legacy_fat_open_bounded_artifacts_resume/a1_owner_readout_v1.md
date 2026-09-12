@@ -59,8 +59,9 @@ still raise `LEGACY_FAT_OPEN_REQUIRES_PAUSED_MIGRATION`.
   SNAPSHOT_PLUS_DELTA missing/corrupt sidecar or unit identity mismatch
   refuse with the source untouched.
 - ACTIVE/DRAINING refuse. Already-complete inspect is distinct from READY_RETRY.
-- Memory child: generated members array; MaxRSS `84766720` (~80.8 MiB), below
-  the 768 MiB soft envelope. `provider_calls=0`.
+- Memory child: generated members array; MaxRSS remains below the 768 MiB soft
+  envelope (local ~80.8 MiB; Linux CI observed ~373 MiB under a 512 MiB
+  comfortable bound). `provider_calls=0`.
 - Isolated critics PASS: CODE_REVIEWER, GOAL_DOD_CRITIC, ARCHITECTURE_CRITIC
   (`packet_fingerprint_sha256=95dbbc6671b3a21e8ef2194b88314673821f66c7f784f68a43faccd2942b392a`).
 
