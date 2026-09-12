@@ -11,11 +11,20 @@ from pathlib import Path
 from typing import Any
 
 from solana_alpha_lab.factory.members_snapshot_delta import (
+    _OPERATIONAL_LATEST_DB as _OPERATIONAL_CACHE_DB_NAME,
+    _OPERATIONAL_LATEST_META as _OPERATIONAL_CACHE_META_NAME,
     load_member_rows_for_location,
 )
 from solana_alpha_lab.factory.observation_schedule import canonical_sha256
 
 ARCHIVE_KIND = "FACTORY_HOT90_CLOSED_DAY_ARCHIVE"
+
+# Non-canonical operational latest cache files are rebuildable runtime state and
+# MUST NOT enter closed-day scientific archive inventory. Exclusion is by exact
+# cache file names (not a name prefix) so no canonical artifact can ever match.
+_OPERATIONAL_CACHE_EXACT_NAMES = frozenset(
+    {_OPERATIONAL_CACHE_DB_NAME, _OPERATIONAL_CACHE_META_NAME}
+)
 
 
 class Hot90ArchiveError(ValueError):
@@ -54,6 +63,10 @@ def list_closed_day_relative_paths(source_root: Path, utc_day: str) -> list[str]
     if members_root.is_dir():
         for path in members_root.rglob("*"):
             if path.is_file() and path.is_symlink() is False:
+                name = path.name
+                if name in _OPERATIONAL_CACHE_EXACT_NAMES:
+                    # Non-canonical rebuildable operational cache: never archive.
+                    continue
                 relatives.add(path.relative_to(source_root).as_posix())
     unit_path = members_root / "unit.json"
     if unit_path.is_file():

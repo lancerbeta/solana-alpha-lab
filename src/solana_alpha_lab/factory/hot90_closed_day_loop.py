@@ -47,11 +47,65 @@ ARCHIVE_CATCH_UP_ON_CALENDAR = (
     "*-*-* 13:15:00 UTC",
     "*-*-* 19:15:00 UTC",
 )
+# Operational latest cache retention is bounded: only the latest CLOSED day may
+# keep a rebuildable cache once its day is archived and Drive-verified. Older
+# verified days are pruned, so day-over-day retention cannot grow unbounded.
+CACHE_RETENTION_CLOSED_DAYS = 1
 RcloneRunner = Callable[[list[str]], Any]
 
 
 class ClosedDayLoopError(ValueError):
     """Typed closed-day durability loop failure."""
+
+
+def prune_stale_operational_caches(root: Path, *, today: str) -> dict[str, object]:
+    """Bound day-over-day operational latest cache retention.
+
+    The rebuildable cache is only meaningful for appending to the newest
+    closed day with verified history. Once a day is Drive-archived
+    (verified receipt exists) and a newer verified day exists, older cache
+    files are removed so retention cannot grow unbounded. The open/current
+    day always keeps its working cache. Returns a deterministic report.
+    """
+
+    from solana_alpha_lab.factory.members_snapshot_delta import (
+        _OPERATIONAL_LATEST_DB,
+        _OPERATIONAL_LATEST_META,
+    )
+
+    rdp = root / RDP_RELATIVE
+    members_root = rdp / "datasets" / "members_snapshot_plus_delta"
+    if members_root.is_dir() is False:
+        return {"pruned": [], "kept_days": []}
+    verified_days: list[str] = []
+    for day_dir in sorted(members_root.iterdir()):
+        day = normalize_utc_day(day_dir.name)
+        if day is None or day_dir.is_dir() is False:
+            continue
+        if receipt_verified(read_receipt(root, day)):
+            verified_days.append(day)
+    keep = set(verified_days[-CACHE_RETENTION_CLOSED_DAYS:])
+    pruned: list[str] = []
+    for day_dir in sorted(members_root.iterdir()):
+        day = normalize_utc_day(day_dir.name)
+        if day is None or day_dir.is_dir() is False:
+            continue
+        if day >= today:
+            # Open/current day may always keep its working cache.
+            continue
+        if day in keep:
+            continue
+        db_path = day_dir / _OPERATIONAL_LATEST_DB
+        meta_path = day_dir / _OPERATIONAL_LATEST_META
+        if db_path.is_file() is False and meta_path.is_file() is False:
+            continue
+        try:
+            db_path.unlink(missing_ok=True)
+            meta_path.unlink(missing_ok=True)
+        except OSError:
+            continue
+        pruned.append(day)
+    return {"pruned": sorted(pruned), "kept_days": sorted(keep)}
 
 
 def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
@@ -448,6 +502,7 @@ def run_closed_day_durability(
         )
         wall = datetime.now(UTC)
     remaining = archive_backlog(root, now=clock)
+    cache_prune = prune_stale_operational_caches(root, today=current_utc_day(clock))
     return {
         "processed": processed,
         "backlog_before": backlog["backlog_days"],
@@ -456,4 +511,5 @@ def run_closed_day_durability(
         "latest_verified_day": remaining["latest_verified_day"],
         "on_calendar_utc": ARCHIVE_ON_CALENDAR,
         "max_days_per_run": loaded_max,
+        "operational_cache_prune": cache_prune,
     }

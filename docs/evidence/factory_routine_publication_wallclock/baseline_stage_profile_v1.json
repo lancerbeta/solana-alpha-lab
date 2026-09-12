@@ -1,0 +1,28 @@
+{
+  "schema": "smial.factory-routine-publication-wallclock-baseline-profile",
+  "schema_version": "1.0",
+  "at": "2026-09-12T16:55:38.573865Z",
+  "n": 205847,
+  "depth": 1,
+  "label": "prod_shaped_n205847_d1",
+  "hot_substage_wall_sum_s": 20.416,
+  "root_cause": {
+    "classification": "HOT_PATH_PER_ROW_DIFF_PLUS_HISTORY_RECONSTRUCT",
+    "dominant_substage": "diff",
+    "substages_s": {
+      "reconstruct": 2.872,
+      "fingerprint_prev": 1.063,
+      "spill_curr": 0.715,
+      "diff": 13.106,
+      "fingerprint_curr": 1.035,
+      "clone_prev": 0.584,
+      "apply_ops": 0.021,
+      "fingerprint_replay": 1.02
+    },
+    "history_note": "reconstruct grows with delta depth; operational latest cache removes that from the hot path"
+  },
+  "notes": [
+    "Offline deterministic synthetic members; no provider calls.",
+    "Pre-optimization _diff_sqlite_members_to_ops used per-row SELECT lookups."
+  ]
+}

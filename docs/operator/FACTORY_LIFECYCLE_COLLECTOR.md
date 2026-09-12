@@ -395,6 +395,14 @@ test "$rc" -eq 0
 
 Hard acceptance: no `TICK_HARD_CUTOFF_90S`; no `LEASE_FENCED`; no leaked worker; no unbounded pre-provider CPU; publication repair with zero open jobs comfortably <2s; tick reaches provider path; new provider occurrence does not remain STARTED; raw call record has request/response/timing/status/hash provenance; no scientific corruption. Ordinary service failure (`rc` not 0 and not 124) stays distinct from timeout. A legitimate market `no eligible rows` is not failure — it must be explicit. `CREDENTIAL_ENV_MISSING` is a credential-surface miss, not a publication-CPU fail.
 
+Routine `SNAPSHOT_PLUS_DELTA` publication emits one-line JSON stage markers
+(`schema=smial.publication-stage-timing`) to stdout/journal covering prev-ready,
+diff, fingerprint and append end (`PUBLICATION_*`). Disable with
+`SMIAL_PUBLICATION_STAGE_TIMING=0`. An optional non-canonical
+`.operational_latest_members.sqlite` (+ `.meta.json`) under the day unit dir
+bounds history-depth reconstruct cost; it is rebuildable, fail-closed on meta
+mismatch, and never scientific truth.
+
 ### D. Three normal timer ticks
 
 If the manual tick PASS, run exactly three ordinary 60s timer cycles / max ~4 minutes.

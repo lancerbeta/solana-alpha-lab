@@ -1,0 +1,62 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-ROUTINE-PUBLICATION-WALLCLOCK-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-12",
+  "task_id": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1",
+  "reviewed_bindings_sha256": "6b4f8214d43afa1678e8fdaa6f4a88fae941d599c6a45097aa4769633479a62b",
+  "reviewed_inventory_sha256": "0ce85a4491268129b8c04f7b4f7c7a80dbce6dc0a724db1971eabaa99afd6189",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=97cfd1ca7ab734c67dd4cd216ce34ae4eb82a3edb44ac7aac5b14ac3df387b54",
+        "CACHE_HIT_FINGERPRINTS_PREV_SPILL",
+        "META_DB_REBIND_FALLS_BACK_TO_RECONSTRUCT",
+        "OPERATIONAL_CACHE_NON_CANONICAL",
+        "SCIENTIFIC_TRUTH_UNIT_PLUS_DELTA",
+        "NO_PUBLIC_SCHEMA_EXPANSION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CACHE_HIT_SKIPS_PREV_FP_FIXED",
+        "MEMBERS_DB_SHA256_BIND",
+        "POISON_AND_REBIND_REGRESSIONS",
+        "MERGE_DIFF_PARITY",
+        "TARGETED_WALLCLOCK_TESTS_PASS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ENVELOPE_205K_WARM_4_968S_4_11X",
+        "STAGE_TELEMETRY_PRESENT",
+        "FAIL_CLOSED_AND_LOSSLESS_FIXTURE",
+        "NO_MERGE_DEPLOY_VPS_TICK_C1"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_SCIENTIFIC_TRUTH_FROM_OPERATIONAL_CACHE"
+  ]
+}

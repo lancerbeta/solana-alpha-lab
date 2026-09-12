@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FACTORY-ROUTINE-PUBLICATION-WALLCLOCK-FACTORY-FIT-001",
+  "as_of": "2026-09-12",
+  "task_id": "FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_V1",
+  "reviewed_bindings_sha256": "6b4f8214d43afa1678e8fdaa6f4a88fae941d599c6a45097aa4769633479a62b",
+  "reviewed_inventory_sha256": "0ce85a4491268129b8c04f7b4f7c7a80dbce6dc0a724db1971eabaa99afd6189",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ROUTINE_PUBLICATION_WALLCLOCK_ENVELOPE",
+    "flexibility_and_history": "PASS_HISTORY_BOUNDED_BY_OPS_CACHE",
+    "context_efficiency": "PASS_MERGE_DIFF_AND_FOLDED_RECON_FP",
+    "research_truth": "PASS_CACHE_NON_CANONICAL_FP_VERIFY_ON_HIT",
+    "owner_operability": "PASS_STAGE_TELEMETRY_AND_COLLECTOR_NOTE",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_CONTROL",
+    "monitoring_and_recovery": "PASS_FAIL_CLOSED_CACHE_AND_RECONSTRUCT",
+    "build_vs_buy": "PASS_EXTEND_MEMBERS_DELTA_NOT_NEW_STACK",
+    "security": "PASS_NO_PROVIDER_NO_SECRETS_NO_VPS",
+    "red_team": "PASS_POISON_AND_META_REBIND_TESTS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_OPERATE_COMMISSIONING_TICK"
+  },
+  "recovery": "REVERT BRANCH cursor/factory-routine-publication-wallclock-v1. OPERATIONAL CACHE IS REBUILDABLE; SCIENTIFIC TRUTH REMAINS UNIT+DELTA REPLAY.",
+  "limits": [
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_SCIENTIFIC_TRUTH_FROM_OPERATIONAL_CACHE"
+  ]
+}
