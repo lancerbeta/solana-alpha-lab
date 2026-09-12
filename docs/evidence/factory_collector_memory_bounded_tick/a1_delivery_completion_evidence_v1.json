@@ -9,25 +9,25 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/factory_collector_memory_bounded_tick/a1_delivery_factory_fit_v1.json",
-    "sha256": "a25215175b633d55aea2aba92e9c1caf1217b456f9eab9ebb7789269996b82f0",
+    "sha256": "63bcb5372dccc56b8b5f02fba45c1eb539a2eb1a37b33337e0762a81e0335556",
     "verdict": "PASS"
   },
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "cb6e0dbf39bb39191056a4cbed015ee185994822bc4d5bccde00420d9bda4005",
+    "catalog/assets/core.yaml": "3831492bf515a902aa66efd05ae57c9fbb7f976bb27a624b99767a4beb2389e3",
     "configs/factory_remote_ops/factory-observation-schedule.service": "843db6a9ea05a69348e2b66fca39f1b4b4394e5963dae25f6b14aab309937cbd",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "233c33f4c2adb2e7d291a85455a7270fa8f7ef070f7b5b181c788057d9d8392c",
     "docs/reports/factory_collector_memory_bounded_tick/a1_owner_readout_v1.md": "29e454e6e8fb7492dc1d9f7a7e8ab58e7d4a0a5b0654e8e50b2640dc147074b2",
     "docs/tasks/FACTORY_COLLECTOR_MEMORY_BOUNDED_TICK_V1.md": "8d2971696103ee93f091302a197cde21cd6c87d6cc6b8c498c133625a9d8fc84",
     "src/solana_alpha_lab/factory/members_snapshot_delta.py": "a7f4437ce1b3112c710524cc0a166c1f0dc2adce0aa02326ddcd731aefa589d7",
     "src/solana_alpha_lab/factory/observation_panel_coverage.py": "0970e8d313c9af444c8ceb78e85110dd6b34da4a7ff037be118b9c4ff8495702",
-    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "3f788c0aa4d64d1733f6be7524943a6aebe9f7e3692f0f1ba294bc17d6285c93",
-    "src/solana_alpha_lab/factory/observation_publication_jobs.py": "507ae925c27e53cf2821bd4e147f2a7753ddf8d40d8df942cebec884c75379ef",
+    "src/solana_alpha_lab/factory/observation_panel_publisher.py": "da036d2162fc76fe3b6b9ab7ad037a4a1601dbf266302e9d7cb786067aaa51e4",
+    "src/solana_alpha_lab/factory/observation_publication_jobs.py": "77c35301e269d202049e26ddff615f00a6c2cb0a8842bb7cc9cb942f862605f1",
     "src/solana_alpha_lab/factory/observation_schedule.py": "ac2627e6e284bd45336a90cb84b70a86fc6cdf412569ff223fc440ace82123ba",
     "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "18fdda3efe8e3ec15c19c69635031038e464cfd7da4b593b0e5b5ba6bef9324a",
-    "src/solana_alpha_lab/factory/observation_schedule_store.py": "e3562ed8b2a7f2f35ca729dad3beebb30e6f5d59a007b20aaeab6da995a99f2c",
-    "src/solana_alpha_lab/factory/observation_scheduler.py": "e3ca7bbd17bf56544aa0433c657aa7e80ca1d6d732f6272572e913918c2ac573",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "866bd6aa1ee9628adf35a79dcaf5f53d1472c10ace955a1fed4d24d44647a3d9",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "67c32e57718f6ba90603603508ebae82b99a204a1d3391a0ba39386c757d076e",
     "tests/test_factory_97d_storage_architecture_proof_v1.py": "a8b4ffa11af6385d5bffda1de62abe7a6480874a3ff1e2452384d8819494e1c9",
-    "tests/test_factory_collector_memory_bounded_tick_v1.py": "c80230f13fa6b1e00e865415fe753757e49ca63b79e9c25bda9b1444ee53c57e",
+    "tests/test_factory_collector_memory_bounded_tick_v1.py": "d6983d260fa917ad6ebac52cdc962698773d08b3a46e347279e3643855ece82a",
     "tests/test_factory_snapshot_delta_economy_and_signal_repair_v1.py": "68954e714e29b9809a327d0bc58f1b426bb116b7a2d5201820cf7dd7b9b4d041",
     "tests/test_observation_schedule_remote_ops.py": "f36b612bfbcacc1642217d870e7ad2002486b90174a43d3c141d49d544bd4e04"
   },
@@ -65,7 +65,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/factory_collector_memory_bounded_tick/a1_delivery_independent_review_v1.json",
-      "sha256": "b36e335a52381cf62a4703047f5ffd0555cf66fc9667a1194968297803f0b0a9",
+      "sha256": "a742b7666f38e2fad8341fb4b2bda8d76a50103b208d43aa873b40dcba321631",
       "verdict": "PASS"
     },
     "project_checks": [
