@@ -4,6 +4,38 @@
   "review_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-FACTORY-FIT-001",
   "as_of": "2026-09-12",
   "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
+  "reviewed_bindings_sha256": "d8ec1becec390775123d4202368353f35cd5ed6ff7087fe19fd8ce6c4f32d238",
+  "reviewed_inventory_sha256": "426e2cc5525407c3e203694bb5dd2a22c79157cec1fd14c7d415bfd63d1aa359",
   "mode": "FULL_REVIEW",
-  "verdict": "NOT_READY"
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_PAUSED_ONLY_ARTIFACTS_RESUME_WITHOUT_MEMBERS_CENSUS",
+    "flexibility_and_history": "PASS_CONTENT_PARAMETERIZED_NO_INCIDENT_HARDCODE",
+    "context_efficiency": "PASS_STREAMING_READER_AND_SIDECAR_PROOFS",
+    "research_truth": "PASS_CANONICAL_RDP_MANIFEST_MARKER_IDENTITY",
+    "owner_operability": "PASS_INSPECT_THEN_RESUME_CLI_AND_B2",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_CONTROL",
+    "monitoring_and_recovery": "PASS_FAULT_RETRY_AND_READY_RETRY",
+    "build_vs_buy": "PASS_EXTEND_JOURNAL_NOT_SECOND_PUBLISHER",
+    "security": "PASS_NO_PROVIDER_NO_SECRETS_NO_VPS",
+    "red_team": "PASS_PAUSE_HASH_STAGE_COUNT_AND_ROUTINE_FAIL_CLOSED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_OPERATE_LIVE_FAT_OPEN_RESUME"
+  },
+  "recovery": "REVERT BRANCH cursor/legacy-fat-open-bounded-artifacts-resume-v1. ROUTINE TICK REMAINS FAIL-CLOSED ON LEGACY FAT OPEN. DO NOT WEAKEN ROUTINE_OPEN_JOB_FULL_PARSE_MAX_BYTES.",
+  "limits": [
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_SCHEDULER_LEASE_LOCK",
+    "NO_MEMBERS_CENSUS_RECOVERY",
+    "NO_CLAIM_LIVE_616MB_RSS",
+    "PAUSE_IS_ACTIVATION_SNAPSHOT_NOT_LEASE"
+  ]
 }

@@ -4,5 +4,64 @@
   "review_id": "LEGACY-FAT-OPEN-BOUNDED-ARTIFACTS-RESUME-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-12",
   "task_id": "LEGACY_FAT_OPEN_BOUNDED_ARTIFACTS_RESUME_V1",
-  "verdict": "NOT_READY"
+  "reviewed_bindings_sha256": "d8ec1becec390775123d4202368353f35cd5ed6ff7087fe19fd8ce6c4f32d238",
+  "reviewed_inventory_sha256": "426e2cc5525407c3e203694bb5dd2a22c79157cec1fd14c7d415bfd63d1aa359",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=95dbbc6671b3a21e8ef2194b88314673821f66c7f784f68a43faccd2942b392a",
+        "BOUNDED_READER_NO_MEMBERS_MATERIALIZATION",
+        "CANONICAL_PUBLISH_OBSERVATION_BATCH_CONTINUATION",
+        "PAUSED_ONLY_DUAL_GATE",
+        "NO_ROUTINE_VPS_BURDEN",
+        "NO_INCIDENT_HARDCODE",
+        "CLASSIC_AND_SNAPSHOT_MEMBER_COUNT_PROVEN",
+        "PAUSE_SNAPSHOT_TOCTOU_NON_GOAL"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CLASSIC_MEMBER_PARQUET_NUM_ROWS_EQ_MEMBER_COUNT",
+        "FAT_OPEN_STAGE_NOT_PERSISTED_OVERSIZED_INTENTIONAL",
+        "RESUME_MEMBERS_NONE_CANONICAL_PATH",
+        "TARGETED_TESTS_17_PASS",
+        "LIFECYCLE_TESTS_17_PASS",
+        "NO_LIVE_IDENTITY_HARDCODE"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OWNER_FALSIFIERS_1_TO_9_COVERED",
+        "OPERATOR_B2_AND_READOUT_ALIGNED",
+        "MAXRSS_GENERATED_FIXTURE_84766720",
+        "PROVIDER_CALLS_0",
+        "NO_CLAIM_LIVE_616MB_RSS"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SINGLE_AGENT_REVIEW_FALLBACK",
+    "NO_MERGE",
+    "NO_DEPLOY",
+    "NO_VPS_MUTATION",
+    "NO_LIVE_TICK",
+    "NO_C1_CHANGE",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_SCHEDULER_LEASE_LOCK",
+    "NO_MEMBERS_CENSUS_RECOVERY"
+  ]
 }
