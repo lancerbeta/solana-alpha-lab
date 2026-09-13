@@ -40,6 +40,7 @@ from solana_alpha_lab.factory.live_cohort_to_forge import (  # noqa: E402
 )
 from solana_alpha_lab.factory.members_snapshot_delta import (  # noqa: E402
     _invalidate_operational_latest,
+    _operational_latest_paths,
     append_delta_publication,
     operational_latest_cache_bytes,
     reconstruct_stats,
@@ -412,6 +413,7 @@ def _build(fixture: dict[str, Any], *, label: str) -> dict[str, Any]:
     counters = extraction_counters()
     stats = reconstruct_stats()
     cache = operational_latest_cache_bytes(fixture["unit_dir"])
+    tail_delta_counts = fixture["unit"]["publications"][-1].get("delta_counts")
     scratch_bytes = sum(
         path.stat().st_size
         for path in fixture["data_root"].rglob(".build-*")
@@ -427,6 +429,8 @@ def _build(fixture: dict[str, Any], *, label: str) -> dict[str, Any]:
         "anchor_loads": stats["anchor_loads"],
         "reconstruct_calls": stats["reconstruct_calls"],
         "delta_files_applied": stats["delta_files_applied"],
+        "incremental_extensions": stats["incremental_extensions"],
+        "tail_delta_counts": tail_delta_counts,
         "repeated_exact_publication_reconstruction_count": sum(
             count - 1 for count in Counter(targets).values() if count > 1
         ),
@@ -451,11 +455,18 @@ def _build(fixture: dict[str, Any], *, label: str) -> dict[str, Any]:
 
 def _one_step(fixture: dict[str, Any]) -> None:
     sequence = len(fixture["unit"]["publications"])
+    db_path, meta_path = _operational_latest_paths(fixture["unit_dir"])
+    previous_cache = (db_path.read_bytes(), meta_path.read_bytes())
+    rows = _rows_for_depth(fixture["digest"], fixture["member_count"], sequence - 1)
+    rows[0] = dict(rows[0])
+    rows[0]["response_sha256"] = hashlib.sha256(
+        b"one-step-single-changed-member"
+    ).hexdigest()
     unit = append_delta_publication(
         fixture["data_root"],
         utc_day="20260902",
         dataset_manifest_id="bench-one-step-delta",
-        rows=_rows_for_depth(fixture["digest"], fixture["member_count"], sequence),
+        rows=rows,
     )
     observation_path = (
         fixture["data_root"] / "datasets" / "parquet" / "bench-one-step" / "observations.parquet"
@@ -479,6 +490,12 @@ def _one_step(fixture: dict[str, Any]) -> None:
         observation_count=len(rows),
         tag="one-step",
     )
+    # The publication writer may already refresh the latest cache.  Preserve
+    # the prior tail here to exercise the source-builder's one-delta extension
+    # path, which is the production case when canonical append and source
+    # materialization are decoupled.
+    db_path.write_bytes(previous_cache[0])
+    meta_path.write_bytes(previous_cache[1])
     fixture["unit"] = unit
 
 
@@ -509,13 +526,20 @@ def run_benchmark() -> dict[str, Any]:
                 and warm["member_snapshot_full_column_scans"] == 0
             ),
             "one_step_reuses_new_tail": (
-                one_step["reconstruct_calls"] == 1
-                and one_step["checkpoint_hits"] == 1
+                one_step["reconstruct_calls"] == 0
+                and one_step["checkpoint_hits"] == 2
                 and one_step["target_cache_hits"] == 9
-                and one_step["member_snapshot_full_column_scans"] == 1
+                and one_step["member_snapshot_full_column_scans"] == 0
+                and one_step["incremental_extensions"] == 1
+                and one_step["delta_files_applied"] == 1
+                and one_step["tail_delta_counts"]["added"] == 0
+                and one_step["tail_delta_counts"]["changed"] == 1
+                and one_step["tail_delta_counts"]["removed"] == 0
             ),
             "one_step_source_parity": (
                 one_step["source_sha256"] == one_step_cold["source_sha256"]
+                and one_step["incremental_extensions"] == 1
+                and one_step["delta_files_applied"] == 1
                 and one_step_cold["reconstruct_calls"] == 2
                 and one_step_cold["anchor_loads"] == 2
             ),

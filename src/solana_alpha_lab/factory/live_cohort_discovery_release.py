@@ -74,9 +74,11 @@ from solana_alpha_lab.factory.members_snapshot_delta import (
     MembersDeltaError,
     canonical_unit_binding,
     canonical_unit_files_binding,
+    canonical_unit_files_binding_fast,
     canonical_unit_noop_transitions,
     _reconstruct_to_sqlite,
     _store_operational_latest,
+    _try_extend_operational_latest,
     _try_open_operational_latest,
     _contained_data_path,
     iter_member_row_batches_for_location,
@@ -1140,7 +1142,12 @@ def _cohort_contributing_lineage(
             )
             hits_c1 = False
             if location:
-                path = Path(observation_rdp_root) / location
+                try:
+                    path = _contained_data_path(Path(observation_rdp_root), location)
+                except MembersDeltaError as exc:
+                    raise LiveCohortReleaseError(
+                        "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+                    ) from exc
                 if path.is_file():
                     try:
                         for batch in iter_parquet_row_batches(
@@ -1259,6 +1266,7 @@ def _cohort_members_into_sqlite(
     batches.sort(key=lambda item: (item[1], item[0]), reverse=True)
     winning_producers: set[str] = set()
     unit_bindings: dict[str, tuple[str, str | None]] = {}
+    unit_prefix_bindings: dict[str, dict[int, tuple[str, str | None]]] = {}
     unit_noop_transitions: dict[str, tuple[bool, ...]] = {}
     target_cache: OrderedDict[str, None] = OrderedDict()
     target_state_cache: dict[tuple[str, str, int, str, str], str] = {}
@@ -1331,6 +1339,53 @@ def _cohort_members_into_sqlite(
             publications[-1].get("dataset_manifest_id") or ""
         )
         return unit_path.parent, target, is_tail, unit
+
+    def _unit_prefix_binding(
+        unit_rel: str,
+        unit: Mapping[str, Any],
+        target_seq: int,
+        current_binding: tuple[str, str | None],
+    ) -> tuple[str, str | None]:
+        """Return the exact cache binding for the target's unit prefix.
+
+        A canonical append can leave the durable latest cache one publication
+        behind while older observation panels still point at that prior tail.
+        Reusing that cache is safe only when its own prefix metadata and file
+        bytes bind exactly to the requested PIT.  Prefix bindings are memoized
+        per unit and never change the scientific RDP.
+        """
+
+        publications = list(unit.get("publications") or [])
+        if target_seq == len(publications) - 1:
+            return current_binding
+        cached = unit_prefix_bindings.setdefault(unit_rel, {}).get(target_seq)
+        if cached is not None:
+            return cached
+        prefix = dict(unit)
+        prefix["publications"] = publications[: target_seq + 1]
+        target_publication = prefix["publications"][-1]
+        target_chain = str(
+            target_publication.get("canonical_files_binding_sha256") or ""
+        )
+        if target_chain:
+            prefix["canonical_files_binding_sha256"] = target_chain
+        else:
+            prefix.pop("canonical_files_binding_sha256", None)
+        prefix_binding = (canonical_unit_binding(prefix), None)
+        prefix_binding = (
+            prefix_binding[0],
+            canonical_unit_files_binding_fast(prefix),
+        )
+        if prefix_binding[1] is None:
+            try:
+                prefix_binding = (
+                    prefix_binding[0],
+                    canonical_unit_files_binding(Path(observation_rdp_root), prefix),
+                )
+            except (MembersDeltaError, OSError):
+                pass
+        unit_prefix_bindings[unit_rel][target_seq] = prefix_binding
+        return prefix_binding
 
     def _consume_full_unit_rows(
         rows: Iterator[Mapping[str, Any]], producer_sha: str | None
@@ -1532,9 +1587,11 @@ def _cohort_members_into_sqlite(
             if binding is None:
                 unit_sha = canonical_unit_binding(unit)
                 try:
-                    files_sha = canonical_unit_files_binding(
-                        Path(observation_rdp_root), unit
-                    )
+                    files_sha = canonical_unit_files_binding_fast(unit)
+                    if files_sha is None:
+                        files_sha = canonical_unit_files_binding(
+                            Path(observation_rdp_root), unit
+                        )
                 except (MembersDeltaError, OSError):
                     files_sha = None
                 binding = (unit_sha, files_sha)
@@ -1565,19 +1622,33 @@ def _cohort_members_into_sqlite(
                 source_spill: Path | None = None
                 source_conn: Any | None = None
                 try:
-                    if is_tail and binding[1] is not None:
+                    cache_binding = _unit_prefix_binding(
+                        unit_rel, unit, target_seq, binding
+                    )
+                    if cache_binding[1] is not None:
                         cached = _try_open_operational_latest(
                             unit_dir,
                             dataset_manifest_id=target_id,
                             snapshot_fingerprint=target_fp,
                             seq=target_seq,
                             row_count=target_rows,
-                            canonical_unit_sha256=binding[0],
-                            canonical_unit_files_sha256=binding[1],
+                            canonical_unit_sha256=cache_binding[0],
+                            canonical_unit_files_sha256=cache_binding[1],
+                            invalidate_on_identity_mismatch=False,
                         )
                         if cached is not None:
                             note_member_checkpoint_hit()
                             source_spill, source_conn = cached
+                    if source_conn is None and is_tail and binding[1] is not None:
+                        extended = _try_extend_operational_latest(
+                            Path(observation_rdp_root),
+                            unit_dir,
+                            unit,
+                            publication,
+                        )
+                        if extended is not None:
+                            note_member_checkpoint_hit()
+                            source_spill, source_conn = extended
                     if source_conn is None:
                         note_member_checkpoint_miss()
                         note_member_file_open()
@@ -1742,7 +1813,12 @@ def latest_c1_observation_manifest_at(
         for manifest_order, _manifest_id, location in _iter_observation_panel_locations(
             observation_rdp_root, not_after=not_after, skip_unparseable=True
         ):
-            path = Path(observation_rdp_root) / location
+            try:
+                path = _contained_data_path(Path(observation_rdp_root), location)
+            except MembersDeltaError as exc:
+                raise LiveCohortReleaseError(
+                    "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+                ) from exc
             if not path.is_file():
                 continue
             stamp = _render_utc(manifest_order)
@@ -1914,7 +1990,12 @@ def _cohort_observations_into_sqlite(
     for _order, _manifest_id, location in _iter_observation_panel_locations(
         observation_rdp_root, not_after=cutoff_at, newest_first=False
     ):
-        path = Path(observation_rdp_root) / location
+        try:
+            path = _contained_data_path(Path(observation_rdp_root), location)
+        except MembersDeltaError as exc:
+            raise LiveCohortReleaseError(
+                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+            ) from exc
         if not path.is_file():
             continue
         hits_c1 = False
