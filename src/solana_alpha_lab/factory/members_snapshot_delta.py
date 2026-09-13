@@ -30,7 +30,12 @@ SUPPORTED_DELTA_SCHEMA_VERSIONS = frozenset(
 _MEMBER_BATCH_SIZE = 2048
 
 _FINGERPRINT_WORK = {"snapshot_fingerprint": 0, "row_fingerprint": 0}
-_RECONSTRUCT_STATS = {"peak_sqlite_rows": 0, "reconstruct_calls": 0}
+_RECONSTRUCT_STATS = {
+    "peak_sqlite_rows": 0,
+    "reconstruct_calls": 0,
+    "anchor_loads": 0,
+    "delta_files_applied": 0,
+}
 _PUBLICATION_STAGE_STATS = {
     "full_population_passes": 0,
     "operational_latest_hits": 0,
@@ -43,7 +48,7 @@ _PUBLICATION_STAGE_STATS = {
 # archive boundary and pruning can share one deterministic predicate.
 _OPERATIONAL_LATEST_DB = ".operational_latest_members.sqlite"
 _OPERATIONAL_LATEST_META = ".operational_latest_members.meta.json"
-_OPERATIONAL_LATEST_SCHEMA = "smial.members-operational-latest-v1"
+_OPERATIONAL_LATEST_SCHEMA = "smial.members-operational-latest-v3"
 # _store_operational_latest() temporary forms inside the unit dir:
 #   mkstemp(prefix="operational-latest-", suffix=".sqlite")  -> crash leftover DB
 #   f".operational_latest_members.meta.{os.getpid()}.tmp"    -> crash leftover meta
@@ -76,6 +81,8 @@ def reset_fingerprint_work() -> None:
     _FINGERPRINT_WORK["row_fingerprint"] = 0
     _RECONSTRUCT_STATS["peak_sqlite_rows"] = 0
     _RECONSTRUCT_STATS["reconstruct_calls"] = 0
+    _RECONSTRUCT_STATS["anchor_loads"] = 0
+    _RECONSTRUCT_STATS["delta_files_applied"] = 0
     for key in _PUBLICATION_STAGE_STATS:
         _PUBLICATION_STAGE_STATS[key] = 0
 
@@ -390,12 +397,145 @@ def _write_snapshot_unit_from_conn(
         snapshot_fingerprint=fingerprint,
         seq=0,
         row_count=row_count,
+        canonical_unit_sha256=canonical_unit_binding(unit),
+        canonical_unit_files_sha256=canonical_unit_files_binding(data_root, unit),
     )
     return unit
 
 
 def _operational_latest_paths(unit_dir: Path) -> tuple[Path, Path]:
     return unit_dir / _OPERATIONAL_LATEST_DB, unit_dir / _OPERATIONAL_LATEST_META
+
+
+def canonical_unit_binding(unit: Mapping[str, Any]) -> str:
+    """Return the identity of the immutable unit metadata used by a cache."""
+
+    encoded = json.dumps(
+        dict(unit), ensure_ascii=False, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    return hashlib.sha256(encoded).hexdigest()
+
+
+def _contained_data_path(data_root: Path, relative: str) -> Path:
+    """Resolve an RDP-relative path without allowing root or symlink escape."""
+
+    root = Path(data_root).resolve()
+    candidate = (root / Path(str(relative))).resolve()
+    try:
+        candidate.relative_to(root)
+    except ValueError as exc:
+        raise MembersDeltaError("PATH_OUTSIDE_DATA_ROOT") from exc
+    return candidate
+
+
+def canonical_unit_files_binding(data_root: Path, unit: Mapping[str, Any]) -> str:
+    """Bind a cache to the declared canonical files and their immutable stats."""
+
+    root = Path(data_root).resolve()
+    entries: list[dict[str, Any]] = []
+    publications = unit.get("publications")
+    if not isinstance(publications, Sequence) or isinstance(publications, (str, bytes)):
+        raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+    for publication in publications:
+        if not isinstance(publication, Mapping):
+            raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+        relative = str(publication.get("rel") or "")
+        if not relative:
+            raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+        raw_path = root / Path(relative)
+        if raw_path.is_symlink():
+            raise MembersDeltaError("CANONICAL_PATH_SYMLINK")
+        path = _contained_data_path(root, relative)
+        if not path.is_file():
+            raise MembersDeltaError("CANONICAL_FILE_MISSING")
+        stat = path.stat()
+        entries.append(
+            {
+                "rel": relative.replace("\\", "/"),
+                "declared_sha256": str(publication.get("sha256") or ""),
+                "size": int(stat.st_size),
+                "mtime_ns": int(stat.st_mtime_ns),
+            }
+        )
+    encoded = json.dumps(entries, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
+
+
+def canonical_unit_noop_transitions(
+    data_root: Path, unit: Mapping[str, Any]
+) -> tuple[bool, ...]:
+    """Prove which adjacent unit transitions carry no member operations.
+
+    This is a metadata-only fast-path proof. It hashes each declared delta and
+    validates its sequence/fingerprint links, but never decodes member rows.
+    A false entry means that an exact canonical replay remains required.
+    """
+
+    publications = list(unit.get("publications") or [])
+    if not publications:
+        raise MembersDeltaError("ANCHOR_MISSING")
+    anchor = publications[0]
+    try:
+        anchor_seq = int(anchor.get("seq"))
+    except (TypeError, ValueError):
+        raise MembersDeltaError("ANCHOR_MISSING") from None
+    if str(anchor.get("kind") or "") != "snapshot" or anchor_seq != 0:
+        raise MembersDeltaError("ANCHOR_MISSING")
+    previous_id = str(anchor.get("dataset_manifest_id") or "")
+    previous_fp = str(anchor.get("snapshot_fingerprint") or "")
+    if not previous_id or len(previous_fp) != 64:
+        raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+
+    transitions = [True]
+    for expected_seq, publication in enumerate(publications[1:], start=1):
+        if not isinstance(publication, Mapping):
+            raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+        try:
+            item_seq = int(publication.get("seq"))
+        except (TypeError, ValueError):
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID") from None
+        if item_seq != expected_seq or str(publication.get("kind") or "") != "delta":
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+        dataset_id = str(publication.get("dataset_manifest_id") or "")
+        item_fp = str(publication.get("snapshot_fingerprint") or "")
+        rel = str(publication.get("rel") or "")
+        if not dataset_id or len(item_fp) != 64 or not rel:
+            raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+        path = _contained_data_path(data_root, rel)
+        if path.is_file() is False:
+            raise MembersDeltaError("DELTA_MISSING")
+        if _sha256_file_streaming(path) != str(publication.get("sha256") or ""):
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        payload = path.read_bytes() if path.suffix == ".json" else b""
+        meta = _read_delta_meta(path, payload)
+        schema_version = str(meta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
+        if schema_version not in SUPPORTED_DELTA_SCHEMA_VERSIONS:
+            raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
+        if str(meta.get("previous_dataset_manifest_id") or "") != previous_id:
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+        if str(meta.get("dataset_manifest_id") or "") != dataset_id:
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+        if str(meta.get("previous_fingerprint") or "") != previous_fp:
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        current_fp = str(meta.get("current_fingerprint") or "")
+        if schema_version == DELTA_SCHEMA_VERSION_V2 and not current_fp:
+            raise MembersDeltaError("DELTA_CORRUPT")
+        if current_fp and current_fp != item_fp:
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        counts = meta.get("counts")
+        noop = False
+        if current_fp == previous_fp and isinstance(counts, Mapping):
+            try:
+                noop = all(
+                    int(counts.get(key, -1)) == 0
+                    for key in ("added", "changed", "removed")
+                )
+            except (TypeError, ValueError):
+                raise MembersDeltaError("DELTA_CORRUPT") from None
+        transitions.append(noop)
+        previous_id = dataset_id
+        previous_fp = current_fp or item_fp
+    return tuple(transitions)
 
 
 def operational_latest_cache_bytes(unit_dir: Path) -> dict[str, int]:
@@ -421,9 +561,38 @@ def _try_open_operational_latest(
     snapshot_fingerprint: str,
     seq: int,
     row_count: int,
+    canonical_unit_sha256: str | None = None,
+    canonical_unit_files_sha256: str | None = None,
 ) -> tuple[Path, sqlite3.Connection] | None:
-    """Clone rebuildable latest-state cache into a process-owned spill when meta binds."""
+    """Clone rebuildable latest-state cache into a process-owned spill."""
 
+    opened = _open_operational_latest(
+        unit_dir,
+        dataset_manifest_id=dataset_manifest_id,
+        snapshot_fingerprint=snapshot_fingerprint,
+        seq=seq,
+        row_count=row_count,
+        invalidate_on_identity_mismatch=True,
+        canonical_unit_sha256=canonical_unit_sha256,
+        canonical_unit_files_sha256=canonical_unit_files_sha256,
+    )
+    if opened is None:
+        return None
+    spill, clone = opened
+    return spill, clone
+
+
+def _open_operational_latest(
+    unit_dir: Path,
+    *,
+    dataset_manifest_id: str,
+    snapshot_fingerprint: str,
+    seq: int,
+    row_count: int,
+    invalidate_on_identity_mismatch: bool,
+    canonical_unit_sha256: str | None,
+    canonical_unit_files_sha256: str | None,
+) -> tuple[Path, sqlite3.Connection] | None:
     db_path, meta_path = _operational_latest_paths(unit_dir)
     if db_path.is_file() is False or meta_path.is_file() is False:
         return None
@@ -442,36 +611,53 @@ def _try_open_operational_latest(
         _invalidate_operational_latest(unit_dir)
         return None
     members_db_sha256 = str(meta.get("members_db_sha256") or "")
-    if (
-        str(meta.get("schema") or "") != _OPERATIONAL_LATEST_SCHEMA
-        or str(meta.get("dataset_manifest_id") or "") != dataset_manifest_id
-        or str(meta.get("snapshot_fingerprint") or "") != snapshot_fingerprint
-        or meta_seq != int(seq)
-        or meta_rows != int(row_count)
-        or len(members_db_sha256) != 64
-    ):
-        _invalidate_operational_latest(unit_dir)
+    identity_matches = (
+        str(meta.get("schema") or "") == _OPERATIONAL_LATEST_SCHEMA
+        and str(meta.get("dataset_manifest_id") or "") == dataset_manifest_id
+        and str(meta.get("snapshot_fingerprint") or "") == snapshot_fingerprint
+        and meta_seq == int(seq)
+        and meta_rows == int(row_count)
+        and len(members_db_sha256) == 64
+        and (
+            canonical_unit_sha256 is None
+            or str(meta.get("canonical_unit_sha256") or "") == canonical_unit_sha256
+        )
+        and (
+            canonical_unit_files_sha256 is None
+            or str(meta.get("canonical_unit_files_sha256") or "")
+            == canonical_unit_files_sha256
+        )
+    )
+    if not identity_matches:
+        if invalidate_on_identity_mismatch:
+            _invalidate_operational_latest(unit_dir)
         return None
+
     source: sqlite3.Connection | None = None
+    spill: Path | None = None
+    clone: sqlite3.Connection | None = None
     try:
         observed_file_sha = _sha256_file_streaming(db_path)
         if observed_file_sha != members_db_sha256:
-            _invalidate_operational_latest(unit_dir)
-            return None
+            raise sqlite3.DatabaseError("OPERATIONAL_CACHE_FILE_HASH_MISMATCH")
         source = sqlite3.connect(str(db_path))
         observed = int(source.execute("SELECT COUNT(*) FROM members").fetchone()[0])
         if observed != int(row_count):
-            source.close()
-            source = None
-            _invalidate_operational_latest(unit_dir)
-            return None
+            raise sqlite3.DatabaseError("OPERATIONAL_CACHE_ROW_COUNT_MISMATCH")
         spill, clone = _clone_members_db(source)
         source.close()
         source = None
+        observed_fp = _fingerprint_sqlite(clone)
+        if observed_fp != snapshot_fingerprint:
+            raise sqlite3.DatabaseError("OPERATIONAL_CACHE_FINGERPRINT_MISMATCH")
         return spill, clone
-    except (OSError, sqlite3.Error):
+    except Exception:
         if source is not None:
             source.close()
+        if clone is not None:
+            clone.close()
+        if spill is not None:
+            spill.unlink(missing_ok=True)
         _invalidate_operational_latest(unit_dir)
         return None
 
@@ -484,6 +670,8 @@ def _store_operational_latest(
     snapshot_fingerprint: str,
     seq: int,
     row_count: int,
+    canonical_unit_sha256: str | None = None,
+    canonical_unit_files_sha256: str | None = None,
 ) -> None:
     """Atomically replace operational latest-state cache. Never scientific truth."""
 
@@ -530,7 +718,7 @@ def _store_operational_latest(
         file_sha = _sha256_file_streaming(tmp_db)
         meta = {
             "schema": _OPERATIONAL_LATEST_SCHEMA,
-            "schema_version": "1.0",
+            "schema_version": "3.0",
             "dataset_manifest_id": dataset_manifest_id,
             "snapshot_fingerprint": snapshot_fingerprint,
             "seq": int(seq),
@@ -538,6 +726,10 @@ def _store_operational_latest(
             "members_db_sha256": file_sha,
             "scientific_truth": False,
         }
+        if canonical_unit_sha256 is not None:
+            meta["canonical_unit_sha256"] = canonical_unit_sha256
+        if canonical_unit_files_sha256 is not None:
+            meta["canonical_unit_files_sha256"] = canonical_unit_files_sha256
         tmp_meta.write_text(
             json.dumps(meta, ensure_ascii=False, sort_keys=True, indent=2) + "\n",
             encoding="utf-8",
@@ -589,6 +781,8 @@ def append_delta_publication(
         snapshot_fingerprint=previous_fp,
         seq=previous_seq,
         row_count=previous_row_count,
+        canonical_unit_sha256=canonical_unit_binding(unit),
+        canonical_unit_files_sha256=canonical_unit_files_binding(data_root, unit),
     )
     recon_t0 = time.perf_counter()
     if cached is not None:
@@ -710,6 +904,8 @@ def append_delta_publication(
                 snapshot_fingerprint=current_fp,
                 seq=seq,
                 row_count=current_count,
+                canonical_unit_sha256=canonical_unit_binding(unit),
+                canonical_unit_files_sha256=canonical_unit_files_binding(data_root, unit),
             )
             _emit_publication_stage(
                 "PUBLICATION_APPEND_END",
@@ -1013,7 +1209,10 @@ def _apply_delta_file_sqlite(
     if path.suffix == ".json" or _delta_file_is_monolith(path, payload):
         delta = _read_delta_payload(path, payload)
         _apply_delta_sqlite(
-            conn, delta, removed_out=removed_out, removed_at_seq=removed_at_seq
+            conn,
+            delta,
+            removed_out=removed_out,
+            removed_at_seq=removed_at_seq,
         )
         return meta
     pf = pq.ParquetFile(path)
@@ -1096,7 +1295,7 @@ def _reconstruct_to_sqlite(
         raise MembersDeltaError("ANCHOR_MISSING") from None
     if str(anchor.get("kind") or "") != "snapshot" or anchor_seq != 0:
         raise MembersDeltaError("ANCHOR_MISSING")
-    snapshot_path = data_root / str(anchor["rel"])
+    snapshot_path = _contained_data_path(data_root, str(anchor["rel"]))
     if snapshot_path.is_file() is False:
         raise MembersDeltaError("ANCHOR_MISSING")
     observed = _sha256_file_streaming(snapshot_path)
@@ -1105,6 +1304,7 @@ def _reconstruct_to_sqlite(
     spill, conn = _spill_members_db()
     try:
         _load_anchor_into_sqlite(conn, snapshot_path)
+        _RECONSTRUCT_STATS["anchor_loads"] += 1
         n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
         _RECONSTRUCT_STATS["reconstruct_calls"] += 1
         if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
@@ -1126,7 +1326,7 @@ def _reconstruct_to_sqlite(
                 if str(item.get("kind") or "") != "delta":
                     raise MembersDeltaError("UNIT_LAYOUT_INVALID")
                 rel = str(item.get("rel") or "")
-                path = data_root / rel
+                path = _contained_data_path(data_root, rel)
                 if path.is_file() is False:
                     raise MembersDeltaError("DELTA_MISSING")
                 file_sha = _sha256_file_streaming(path)
@@ -1152,6 +1352,7 @@ def _reconstruct_to_sqlite(
                     removed_out=removed_out,
                     removed_at_seq=item_seq,
                 )
+                _RECONSTRUCT_STATS["delta_files_applied"] += 1
                 n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
                 if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
                     _RECONSTRUCT_STATS["peak_sqlite_rows"] = n_rows
@@ -1245,7 +1446,7 @@ def publication_seq_for_location(
     manifest = str(layout.get("dataset_manifest_id") or "")
     if not unit_rel or not manifest:
         return None
-    unit_path = Path(data_root) / unit_rel
+    unit_path = _contained_data_path(Path(data_root), unit_rel)
     if not unit_path.is_file():
         return None
     try:
@@ -1267,7 +1468,9 @@ def publication_seq_for_location(
 
 
 def read_member_layout(data_root: Path, logical_location: str) -> dict[str, Any] | None:
-    sidecar = (Path(data_root) / logical_location).with_name("members.layout.json")
+    sidecar = _contained_data_path(Path(data_root), logical_location).with_name(
+        "members.layout.json"
+    )
     if not sidecar.is_file() or sidecar.is_symlink():
         return None
     try:
@@ -1286,14 +1489,14 @@ def iter_member_row_batches_for_location(
     removed_out: list[dict[str, Any]] | None = None,
 ) -> Iterator[list[dict[str, Any]]]:
     """Yield bounded member-row dict batches. Delta layout reconstructs via SQLite spill."""
-    path = data_root / logical_location
+    path = _contained_data_path(data_root, logical_location)
     sidecar = path.with_name("members.layout.json")
     if sidecar.is_file():
         layout = json.loads(sidecar.read_text(encoding="utf-8"))
         kind = str(layout.get("kind") or "")
         if kind == LAYOUT_KIND:
             unit_rel = str(layout.get("unit_rel") or "")
-            unit_path = data_root / unit_rel
+            unit_path = _contained_data_path(data_root, unit_rel)
             if unit_path.is_file() is False:
                 raise MembersDeltaError("ANCHOR_MISSING")
             unit = json.loads(unit_path.read_text(encoding="utf-8"))
