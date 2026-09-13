@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "repo://catalog/schemas/execution_evidence_binding_v1.schema.json",
+  "title": "SMIAL ExecutionEvidenceBinding v1.0",
+  "description": "Decision-time execution-regime attestation frozen inside a new scientific PROMOTE payload. Provider-neutral; quote evidence is never a fill claim.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "binding_id",
+    "experiment_id",
+    "experiment_spec_sha256",
+    "population_ref",
+    "regimes",
+    "direct_evidence_refs",
+    "binding_sha256"
+  ],
+  "properties": {
+    "schema": {"const": "smial.execution-evidence-binding"},
+    "schema_version": {"const": "1.0"},
+    "binding_id": {"type": "string", "pattern": "^EEB-[0-9A-Z]{24}$"},
+    "experiment_id": {"type": "string", "minLength": 3, "maxLength": 120},
+    "experiment_spec_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "population_ref": {"type": "string", "minLength": 3, "maxLength": 120},
+    "regimes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tested_notional_usd",
+          "evidence_class",
+          "population_n",
+          "two_way_n",
+          "entry_only_n",
+          "no_entry_n",
+          "unknown_n",
+          "cost_evidence_refs"
+        ],
+        "properties": {
+          "tested_notional_usd": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "description": "Exactly one tested notional per regime; each regime owns its own denominator."
+          },
+          "evidence_class": {"const": "DECISION_TIME_QUOTE_PAIR_V1"},
+          "population_n": {"type": "integer", "minimum": 0},
+          "two_way_n": {"type": "integer", "minimum": 0},
+          "entry_only_n": {"type": "integer", "minimum": 0},
+          "no_entry_n": {"type": "integer", "minimum": 0},
+          "unknown_n": {"type": "integer", "minimum": 0},
+          "strategy_fee_bps_assumption": {
+            "type": ["integer", "null"],
+            "minimum": 0,
+            "maximum": 10000,
+            "description": "The explicit scientific fee assumption a StrategyVersion fee_bps must match. Never total roundtrip friction."
+          },
+          "cost_evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["record_id", "payload_sha256"],
+              "properties": {
+                "record_id": {"type": "string", "minLength": 3, "maxLength": 160},
+                "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "direct_evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["record_id", "payload_sha256"],
+        "properties": {
+          "record_id": {"type": "string", "minLength": 3, "maxLength": 160},
+          "payload_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        }
+      }
+    },
+    "binding_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

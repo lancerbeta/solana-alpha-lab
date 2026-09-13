@@ -17,8 +17,12 @@ from solana_alpha_lab.factory.strategy_runtime import (
 
 
 SCHEMA_RELATIVE = "catalog/schemas/promotion_handoff_manifest_v1.schema.json"
+SCHEMA_V1_1_RELATIVE = "catalog/schemas/promotion_handoff_manifest_v1_1.schema.json"
+BINDING_SCHEMA_RELATIVE = "catalog/schemas/execution_evidence_binding_v1.schema.json"
 STRATEGY_ROOT = "configs/strategies"
 MANIFEST_SCHEMA = "smial.promotion-handoff-manifest"
+BINDING_SCHEMA = "smial.execution-evidence-binding"
+EVIDENCE_CLASS_QUOTE_PAIR = "DECISION_TIME_QUOTE_PAIR_V1"
 HANDOFF_SCHEMA = "smial.science-to-strategy-handoff"
 STATES = (
     "NOT_PROMOTED",
@@ -34,6 +38,11 @@ BLOCKER_CODES = (
     "EVIDENCE_RELATION_GAP",
     "EVIDENCE_HASH_CONFLICT",
     "EXECUTION_INPUT_GAP",
+    "EXECUTION_EVIDENCE_BINDING_GAP",
+    "EXECUTION_REGIME_MISMATCH",
+    "NOTIONAL_EVIDENCE_MISMATCH",
+    "COST_ASSUMPTION_BINDING_GAP",
+    "COST_EVIDENCE_MISMATCH",
     "STRATEGY_IDENTITY_CONFLICT",
     "STRATEGY_CONTENT_CONFLICT",
     "SOURCE_UNAVAILABLE",
@@ -103,12 +112,66 @@ def _load_schema(root: Path) -> dict[str, Any]:
     return loaded
 
 
+def _load_schema_v1_1(root: Path) -> dict[str, Any]:
+    path = root / SCHEMA_V1_1_RELATIVE
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise PromotionHandoffError("HANDOFF_MANIFEST_SCHEMA_INVALID")
+    return loaded
+
+
+def _load_binding_schema(root: Path) -> dict[str, Any]:
+    path = root / BINDING_SCHEMA_RELATIVE
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(loaded, dict):
+        raise PromotionHandoffError("EXECUTION_EVIDENCE_BINDING_INVALID")
+    return loaded
+
+
+
 def unsigned_manifest(manifest: Mapping[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in dict(manifest).items() if key != "manifest_sha256"}
 
 
 def manifest_sha256(manifest: Mapping[str, Any]) -> str:
     return _sha256_json(unsigned_manifest(manifest))
+
+
+def unsigned_binding(binding: Mapping[str, Any]) -> dict[str, Any]:
+    return {key: value for key, value in dict(binding).items() if key != "binding_sha256"}
+
+
+def binding_sha256(binding: Mapping[str, Any]) -> str:
+    return _sha256_json(unsigned_binding(binding))
+
+
+def validate_execution_evidence_binding(
+    binding: Mapping[str, Any],
+    *,
+    root: Path,
+) -> dict[str, Any]:
+    """Validate an ExecutionEvidenceBindingV1 attestation fail-closed."""
+    if not isinstance(binding, Mapping):
+        raise PromotionHandoffError("EXECUTION_EVIDENCE_BINDING_INVALID")
+    try:
+        jsonschema.validate(dict(binding), _load_binding_schema(root))
+    except jsonschema.ValidationError as exc:
+        raise PromotionHandoffError("EXECUTION_EVIDENCE_BINDING_INVALID") from exc
+    claimed = str(binding.get("binding_sha256") or "")
+    actual = binding_sha256(binding)
+    if claimed != actual:
+        raise PromotionHandoffError("EXECUTION_EVIDENCE_BINDING_INVALID")
+    notionals: list[float] = []
+    for regime in binding["regimes"]:
+        counts = regime["two_way_n"] + regime["entry_only_n"] + regime["no_entry_n"] + regime["unknown_n"]
+        if counts != regime["population_n"]:
+            raise PromotionHandoffError("EXECUTION_REGIME_MISMATCH")
+        if regime["evidence_class"] != EVIDENCE_CLASS_QUOTE_PAIR:
+            raise PromotionHandoffError("EXECUTION_EVIDENCE_BINDING_INVALID")
+        notionals.append(float(regime["tested_notional_usd"]))
+    if len(notionals) != len(set(notionals)):
+        raise PromotionHandoffError("EXECUTION_REGIME_MISMATCH")
+    return dict(binding)
 
 
 def validate_promotion_handoff_manifest(
@@ -118,8 +181,12 @@ def validate_promotion_handoff_manifest(
 ) -> dict[str, Any]:
     if not isinstance(manifest, Mapping):
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    version = str(manifest.get("schema_version") or "")
+    if version not in {"1.0", "1.1"}:
+        raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    schema = _load_schema_v1_1(root) if version == "1.1" else _load_schema(root)
     try:
-        jsonschema.validate(dict(manifest), _load_schema(root))
+        jsonschema.validate(dict(manifest), schema)
     except jsonschema.ValidationError as exc:
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID") from exc
     claimed = str(manifest.get("manifest_sha256") or "")
@@ -129,12 +196,77 @@ def validate_promotion_handoff_manifest(
     return dict(manifest)
 
 
+def _regime_codes(
+    binding: Mapping[str, Any] | None,
+    *,
+    notional_usd: float | None,
+    fee_bps: int | None,
+) -> list[str]:
+    """Compatibility blockers between a strategy execution request and the bound regime."""
+    if binding is None:
+        return ["EXECUTION_EVIDENCE_BINDING_GAP"]
+    regimes = [item for item in binding.get("regimes") or [] if isinstance(item, Mapping)]
+    if not regimes:
+        return ["EXECUTION_EVIDENCE_BINDING_GAP"]
+    if notional_usd is None:
+        return ["EXECUTION_INPUT_GAP"]
+    exact = [r for r in regimes if float(r["tested_notional_usd"]) == float(notional_usd)]
+    if not exact:
+        return ["NOTIONAL_EVIDENCE_MISMATCH"]
+    regime = exact[0]
+    if "strategy_fee_bps_assumption" not in regime or regime.get("strategy_fee_bps_assumption") is None:
+        return ["COST_ASSUMPTION_BINDING_GAP"]
+    if fee_bps is None:
+        return ["COST_ASSUMPTION_BINDING_GAP"]
+    if int(regime["strategy_fee_bps_assumption"]) != int(fee_bps):
+        return ["COST_EVIDENCE_MISMATCH"]
+    return []
+
+
+def execution_regime_compatibility(
+    *,
+    root: Path,
+    manifest: Mapping[str, Any],
+    binding: Mapping[str, Any] | None,
+    execution_inputs: Mapping[str, Any] | None,
+) -> list[str]:
+    """Validate binding/manifest identity plus requested notional/fee compatibility."""
+    validate_promotion_handoff_manifest(manifest, root=root)
+    version = str(manifest.get("schema_version") or "")
+    if version != "1.1":
+        return ["EXECUTION_EVIDENCE_BINDING_GAP"]
+    if binding is None:
+        return ["EXECUTION_EVIDENCE_BINDING_GAP"]
+    try:
+        binding = validate_execution_evidence_binding(binding, root=root)
+    except PromotionHandoffError as exc:
+        if str(exc) == "EXECUTION_REGIME_MISMATCH":
+            return ["EXECUTION_REGIME_MISMATCH"]
+        return ["EXECUTION_EVIDENCE_BINDING_GAP"]
+    if (
+        str(manifest.get("execution_evidence_binding_id") or "") != str(binding.get("binding_id") or "")
+        or str(manifest.get("execution_evidence_binding_sha256") or "") != str(binding.get("binding_sha256") or "")
+    ):
+        return ["EXECUTION_EVIDENCE_BINDING_GAP"]
+    if (
+        str(binding.get("experiment_id") or "") != str(manifest.get("experiment_id") or "")
+        or str(binding.get("experiment_spec_sha256") or "") != str(manifest.get("experiment_spec_sha256") or "")
+        or str(binding.get("population_ref") or "") != str(manifest.get("population_ref") or "")
+    ):
+        return ["EXECUTION_REGIME_MISMATCH"]
+    parsed = _parse_execution_inputs(execution_inputs)
+    if parsed is None:
+        return []
+    return _regime_codes(binding, notional_usd=parsed["notional_usd"], fee_bps=parsed["fee_bps"])
+
+
 def freeze_promotion_handoff_manifest(
     dossier: Mapping[str, Any],
     *,
     root: Path,
     decision_event_id: str,
     decision_effective_at: str,
+    execution_evidence_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     locator = dossier.get("locator") if isinstance(dossier.get("locator"), Mapping) else {}
     tested = dossier.get("tested") if isinstance(dossier.get("tested"), Mapping) else {}
@@ -186,9 +318,33 @@ def freeze_promotion_handoff_manifest(
     bound_at = _text(decision_effective_at)
     if not bound_event or not bound_at:
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    version = "1.0"
+    binding_fields: dict[str, Any] = {}
+    if execution_evidence_binding is not None:
+        frozen_binding = validate_execution_evidence_binding(
+            execution_evidence_binding, root=root
+        )
+        if (
+            str(frozen_binding.get("experiment_id") or "") != experiment_id
+            or str(frozen_binding.get("experiment_spec_sha256") or "") != spec_digest
+            or str(frozen_binding.get("population_ref") or "") != population_ref
+        ):
+            raise PromotionHandoffError("EXECUTION_REGIME_MISMATCH")
+        binding_refs = {
+            str(item.get("record_id") or "")
+            for item in frozen_binding.get("direct_evidence_refs") or []
+            if isinstance(item, Mapping)
+        }
+        if not binding_refs.issubset({item["record_id"] for item in direct}):
+            raise PromotionHandoffError("EVIDENCE_RELATION_GAP")
+        version = "1.1"
+        binding_fields = {
+            "execution_evidence_binding_id": str(frozen_binding["binding_id"]),
+            "execution_evidence_binding_sha256": str(frozen_binding["binding_sha256"]),
+        }
     unsigned = {
         "schema": MANIFEST_SCHEMA,
-        "schema_version": "1.0",
+        "schema_version": version,
         "decision_event_id": bound_event,
         "decision_effective_at": bound_at,
         "experiment_id": experiment_id,
@@ -201,6 +357,7 @@ def freeze_promotion_handoff_manifest(
         "obligations": obligations,
         "promotion_packet_sha256": packet,
         "population_ref": population_ref,
+        **binding_fields,
     }
     frozen = dict(unsigned)
     frozen["manifest_sha256"] = manifest_sha256(unsigned)
@@ -449,6 +606,7 @@ def check_materialization(
     decision_event_id: str | None = None,
     created_at: str | None = None,
     existing_blockers: Sequence[str] | None = None,
+    execution_evidence_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     blockers = [
         code
@@ -505,6 +663,14 @@ def check_materialization(
             "strategy_identity": identity,
         }
     blockers.extend(_execution_gaps(execution_inputs))
+    blockers.extend(
+        execution_regime_compatibility(
+            root=root,
+            manifest=manifest,
+            binding=execution_evidence_binding,
+            execution_inputs=execution_inputs,
+        )
+    )
     if blockers:
         return {
             "handoff_state": "BLOCKED",
@@ -529,6 +695,7 @@ def render_strategy_version(
     decision_event_id: str,
     created_at: str,
     execution_inputs: Mapping[str, Any],
+    execution_evidence_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     parsed = _parse_execution_inputs(execution_inputs)
     if parsed is None:
@@ -539,6 +706,14 @@ def render_strategy_version(
     bound_at = str(manifest["decision_effective_at"])
     if created_at != bound_at:
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    regime_blockers = execution_regime_compatibility(
+        root=root,
+        manifest=manifest,
+        binding=execution_evidence_binding,
+        execution_inputs=execution_inputs,
+    )
+    if regime_blockers:
+        raise PromotionHandoffError(regime_blockers[0])
     bound_event = str(manifest["decision_event_id"])
     strategy_id = strategy_id_from_experiment(str(manifest["experiment_id"]))
     unsigned = {
@@ -582,6 +757,7 @@ def render_strategy_version(
         candidate,
         manifest=manifest,
         decision_event_id=decision_event_id,
+        execution_evidence_binding=execution_evidence_binding,
     )
 
 
@@ -591,6 +767,7 @@ def verify_strategy_version(
     *,
     manifest: Mapping[str, Any],
     decision_event_id: str,
+    execution_evidence_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     validate_promotion_handoff_manifest(manifest, root=root)
     if not _require_bound_decision(manifest, decision_event_id):
@@ -606,6 +783,20 @@ def verify_strategy_version(
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
     if not _science_lineage_matches(validated, manifest):
         raise PromotionHandoffError("HANDOFF_MANIFEST_INVALID")
+    regime_blockers = execution_regime_compatibility(
+        root=root,
+        manifest=manifest,
+        binding=execution_evidence_binding,
+        execution_inputs={
+            "max_age_seconds": (validated.get("signal_input") or {}).get("max_age_seconds"),
+            "notional_usd": (validated.get("notional_policy") or {}).get("notional_usd"),
+            "fee_bps": (validated.get("notional_policy") or {}).get("fee_bps"),
+            "max_open_positions": (validated.get("risk_policy") or {}).get("max_open_positions"),
+            "shadow": (validated.get("mode_eligibility") or {}).get("shadow"),
+        },
+    )
+    if regime_blockers:
+        raise PromotionHandoffError(regime_blockers[0])
     return validated
 
 
@@ -616,16 +807,32 @@ def materialize_strategy_candidate(
     decision_event_id: str,
     created_at: str,
     execution_inputs: Mapping[str, Any] | None,
+    execution_evidence_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     gaps = _execution_gaps(execution_inputs)
-    if gaps:
+    regime_blockers = []
+    try:
+        regime_blockers = execution_regime_compatibility(
+            root=root,
+            manifest=manifest,
+            binding=execution_evidence_binding,
+            execution_inputs=execution_inputs,
+        )
+    except PromotionHandoffError as exc:
+        regime_blockers = [str(exc)]
+    if gaps or regime_blockers:
         check = check_materialization(
             root=root,
             manifest=manifest,
             execution_inputs=execution_inputs,
             decision_event_id=decision_event_id,
             created_at=created_at,
+            execution_evidence_binding=execution_evidence_binding,
         )
+        if regime_blockers and regime_blockers != check.get("blocker_codes"):
+            check = dict(check)
+            check["blocker_codes"] = sorted(set([*check.get("blocker_codes", []), *regime_blockers]))
+            check["handoff_state"] = "BLOCKED"
         return {**check, "candidate": None, "disposition": check["handoff_state"]}
     candidate = render_strategy_version(
         root=root,
@@ -633,6 +840,7 @@ def materialize_strategy_candidate(
         decision_event_id=decision_event_id,
         created_at=created_at,
         execution_inputs=execution_inputs or {},
+        execution_evidence_binding=execution_evidence_binding,
     )
     identity, state, collision = _strategy_relation(
         root=root,
@@ -707,6 +915,7 @@ def compose_science_to_strategy_handoff(
             "source_revalidation": "UNKNOWN",
             "direct_evidence": [],
             "experiment_spec_binding": None,
+            "execution_evidence_binding": None,
         },
         "materialization": {
             "strategy_relation": "ABSENT",
@@ -806,6 +1015,26 @@ def compose_science_to_strategy_handoff(
         }
     science["handoff_manifest_sha256"] = manifest["manifest_sha256"]
     science["obligations"] = list(manifest.get("obligations") or [])
+    raw_binding = payload.get("execution_evidence_binding")
+    binding = None
+    binding_status = "MISSING"
+    if str(manifest.get("schema_version") or "") == "1.1":
+        if not isinstance(raw_binding, Mapping):
+            binding_status = "MISSING"
+        else:
+            try:
+                binding = validate_execution_evidence_binding(raw_binding, root=root)
+                binding_status = "PRESENT"
+                if (
+                    str(manifest.get("execution_evidence_binding_id") or "")
+                    != str(binding.get("binding_id") or "")
+                    or str(manifest.get("execution_evidence_binding_sha256") or "")
+                    != str(binding.get("binding_sha256") or "")
+                ):
+                    binding_status = "CONFLICT"
+                    binding = None
+            except PromotionHandoffError as exc:
+                binding_status = "CONFLICT" if str(exc) == "EXECUTION_REGIME_MISMATCH" else "MISSING"
     revalidation, revalidation_codes = _source_revalidation(
         manifest, store_records, records_status
     )
@@ -817,6 +1046,7 @@ def compose_science_to_strategy_handoff(
         decision_event_id=decision_event_id,
         created_at=science["decision_effective_at"],
         existing_blockers=blockers,
+        execution_evidence_binding=binding,
     )
     next_action = {
         "NOT_PROMOTED": "NO_SCIENTIFIC_PROMOTE",
@@ -842,6 +1072,28 @@ def compose_science_to_strategy_handoff(
                 "source_value": manifest["experiment_spec_source_value"],
                 "spec_sha256": manifest["experiment_spec_sha256"],
             },
+            "execution_evidence_binding": (
+                None
+                if binding is None
+                else {
+                    "binding_id": binding.get("binding_id"),
+                    "binding_sha256": binding.get("binding_sha256"),
+                    "binding_status": binding_status,
+                    "regimes": [
+                        {
+                            "tested_notional_usd": item.get("tested_notional_usd"),
+                            "population_n": item.get("population_n"),
+                            "two_way_n": item.get("two_way_n"),
+                            "entry_only_n": item.get("entry_only_n"),
+                            "no_entry_n": item.get("no_entry_n"),
+                            "unknown_n": item.get("unknown_n"),
+                            "cost_evidence_bound": bool(item.get("cost_evidence_refs")),
+                        }
+                        for item in binding.get("regimes") or []
+                        if isinstance(item, Mapping)
+                    ],
+                }
+            ),
             "informational_codes": informational,
         },
         "materialization": {
@@ -867,6 +1119,16 @@ def compose_science_to_strategy_handoff(
 def _blocked_next(codes: Sequence[str]) -> str:
     if "EVIDENCE_HASH_CONFLICT" in codes:
         return "FAIL_CLOSED_EVIDENCE_HASH_CONFLICT"
+    if "NOTIONAL_EVIDENCE_MISMATCH" in codes:
+        return "BIND_EXECUTION_EVIDENCE_TO_REQUESTED_NOTIONAL"
+    if "COST_EVIDENCE_MISMATCH" in codes:
+        return "ALIGN_STRATEGY_FEE_ASSUMPTION_WITH_SCIENCE"
+    if "COST_ASSUMPTION_BINDING_GAP" in codes:
+        return "BIND_EXPLICIT_FEE_ASSUMPTION_INTO_EXECUTION_EVIDENCE"
+    if "EXECUTION_REGIME_MISMATCH" in codes:
+        return "REBIND_EXECUTION_EVIDENCE_TO_EXPERIMENT_IDENTITY"
+    if "EXECUTION_EVIDENCE_BINDING_GAP" in codes:
+        return "FREEZE_EXECUTION_EVIDENCE_BINDING_BEFORE_PROMOTE"
     if "EXECUTION_INPUT_GAP" in codes:
         return "SUPPLY_EXPLICIT_EXECUTION_INPUTS"
     if "LEGACY_PROVENANCE_GAP" in codes:
