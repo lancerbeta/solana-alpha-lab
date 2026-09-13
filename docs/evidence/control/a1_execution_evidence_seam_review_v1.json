@@ -1,0 +1,44 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "EXECUTION-EVIDENCE-SEAM-REVIEW-001",
+  "as_of": "2026-09-13",
+  "task_id": "EXECUTION_EVIDENCE_SEAM_V1",
+  "reviewed_bindings_sha256": "ba33d6f2d14b5ad4be598ee05fe524b07c30829055911cc9479ebea40546db0e",
+  "reviewed_inventory_sha256": "a400833bea98962e36dbf135a362bddb259baf93187ff7b544e11f98241e3926",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Round 1 NOT_READY findings fixed in acc8859e: freeze now cross-checks direct_evidence_refs and cost_evidence_refs payload hashes (EVIDENCE_HASH_CONFLICT, COST_EVIDENCE_MISMATCH) and zero-population regimes are EXECUTION_EVIDENCE_BINDING_INVALID; T21/T22 pin both",
+        "Invariants verified: v1.0 manifests validate unchanged; new PROMOTE fail-closed without binding; quotes never fills; strategy_version_v1_1 byte-identity vs frozen base; per-regime denominator closure; fee uses strategy_fee_bps_assumption only; no secrets in receipts; verify orders manifest/lineage before regime compatibility"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Round 1 NOT_READY findings fixed in acc8859e: behavioral T18b pins eligible PROMOTE blocked solely by EXECUTION_REGIME_BINDING (PROMOTE_BLOCKED) and T16/T17 byte-identity now compares against frozen base e79adc0b instead of HEAD",
+        "Seam is end-to-end and falsifiable: guard -> freeze v1.1 -> CHECK/RENDER/VERIFY all route through execution_regime_compatibility; both-direction notional and fee mismatch, denominator, identity, tamper and determinism all pinned by tests"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Round 1 F1 (record_id-only ref check) and F2 (unvalidated cost_evidence_refs) fixed in acc8859e; remaining F3-F8 are informational V1 non-claims (PRESENT means consistency, not sufficiency; attested counters, not derived)",
+        "Reversibility holds: legacy v1.0 dispatch, no historical rewrite, revert is ordinary merge revert; unknown_n stays a first-class denominator bucket, never coerced"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
