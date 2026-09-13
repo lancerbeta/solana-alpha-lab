@@ -9,7 +9,7 @@
   "cloud_bundle_smoke_required": false,
   "factory_fit": {
     "path": "docs/evidence/control/a1_execution_evidence_seam_factory_fit_v1.json",
-    "sha256": "6bfec5d7f066f369598a25212441df1a257dcd24631926c3f31638cdfe98ba17",
+    "sha256": "32b25378f99b6dd65eaf2f08ad4c7595c3b8de18212877bf8ae329bc856d736b",
     "verdict": "PASS"
   },
   "implementation_bindings": {
@@ -61,7 +61,7 @@
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "independent_review": {
       "path": "docs/evidence/control/a1_execution_evidence_seam_review_v1.json",
-      "sha256": "b4284bede542a95789f58c688eee52dbf10ea7e49c8e471cd160393cfadb0ec0",
+      "sha256": "7f1b2ab3509f19b725161462a31fb7eb30b8753dc4b6369f44a73123414353f0",
       "verdict": "PASS"
     },
     "project_checks": [
