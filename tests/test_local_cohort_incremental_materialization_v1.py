@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import sqlite3
 import sys
 import tempfile
@@ -25,10 +26,17 @@ from solana_alpha_lab.factory.live_cohort_source_bundle import (
     reset_extraction_counters,
 )
 from solana_alpha_lab.factory.members_snapshot_delta import (
+    MembersDeltaError,
     append_delta_publication,
+    canonical_unit_files_binding,
+    canonical_unit_noop_transitions,
+    _fingerprint_sqlite,
     _invalidate_operational_latest,
+    _operational_latest_paths,
+    _refresh_canonical_files_binding,
     reconstruct_stats,
     reset_fingerprint_work,
+    _try_extend_operational_latest,
     write_snapshot_unit,
 )
 from solana_alpha_lab.factory.live_cohort_to_forge import synthetic_closed_receipt
@@ -596,6 +604,117 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
                 tail_meta_path.read_text(encoding="utf-8")
             )
             self.assertEqual(preserved_tail_meta["dataset_manifest_id"], "unit-tail")
+
+    def test_new_tail_extends_previous_latest_cache_without_full_replay(self) -> None:
+        """A lagging latest cache advances by one verified canonical delta."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "observation_rdp"
+            data_root.mkdir()
+            unit = write_snapshot_unit(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-anchor",
+                rows=[_member("kept")],
+            )
+            unit = append_delta_publication(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-tail-1",
+                rows=[_member("kept"), _member("first")],
+            )
+            unit_dir = data_root / "datasets/members_snapshot_plus_delta/20260902"
+            db_path, meta_path = _operational_latest_paths(unit_dir)
+            previous_cache = (db_path.read_bytes(), meta_path.read_bytes())
+            unit = append_delta_publication(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-tail-2",
+                rows=[_member("kept"), _member("first"), _member("second")],
+            )
+            # Recreate the realistic lagging-cache window after canonical append.
+            db_path.write_bytes(previous_cache[0])
+            meta_path.write_bytes(previous_cache[1])
+
+            reset_fingerprint_work()
+            extended = _try_extend_operational_latest(
+                data_root,
+                unit_dir,
+                unit,
+                unit["publications"][-1],
+            )
+            self.assertIsNotNone(extended)
+            spill, conn = extended
+            try:
+                self.assertEqual(
+                    int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0]),
+                    3,
+                )
+                self.assertEqual(
+                    _fingerprint_sqlite(conn),
+                    unit["publications"][-1]["snapshot_fingerprint"],
+                )
+            finally:
+                conn.close()
+                spill.unlink(missing_ok=True)
+            stats = reconstruct_stats()
+            self.assertEqual(stats["reconstruct_calls"], 0)
+            self.assertEqual(stats["incremental_extensions"], 1)
+            self.assertEqual(stats["delta_files_applied"], 1)
+
+    def test_canonical_file_binding_rejects_same_stat_byte_mutation(self) -> None:
+        """A preserved size/mtime cannot make altered canonical bytes trusted."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "observation_rdp"
+            data_root.mkdir()
+            unit = write_snapshot_unit(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-anchor",
+                rows=[_member("kept")],
+            )
+            path = data_root / unit["publications"][0]["rel"]
+            original_stat = path.stat()
+            payload = bytearray(path.read_bytes())
+            payload[-1] ^= 1
+            path.write_bytes(payload)
+            os.utime(
+                path,
+                ns=(int(original_stat.st_atime_ns), int(original_stat.st_mtime_ns)),
+            )
+            with self.assertRaisesRegex(MembersDeltaError, "CANONICAL_FILE_HASH_MISMATCH"):
+                canonical_unit_files_binding(data_root, unit)
+
+    def test_noop_proof_rejects_false_zero_counts_with_real_delta_ops(self) -> None:
+        """A delta with real ops cannot become a cache-reuse no-op by metadata."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "observation_rdp"
+            data_root.mkdir()
+            unit = write_snapshot_unit(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-anchor",
+                rows=[_member("kept")],
+            )
+            unit = append_delta_publication(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-tail",
+                rows=[_member("kept"), _member("added")],
+            )
+            anchor = unit["publications"][0]
+            tail = unit["publications"][-1]
+            tail["row_count"] = anchor["row_count"]
+            tail["snapshot_fingerprint"] = anchor["snapshot_fingerprint"]
+            tail["current_fingerprint"] = anchor["snapshot_fingerprint"]
+            tail["delta_counts"] = {"added": 0, "changed": 0, "removed": 0}
+            _refresh_canonical_files_binding(unit)
+
+            transitions = canonical_unit_noop_transitions(data_root, unit)
+
+            self.assertEqual(transitions, (True, False))
 
     def test_snapshot_plus_delta_unit_path_escape_fails_closed(self) -> None:
         """A sidecar cannot redirect canonical replay or cache outside the RDP root."""
