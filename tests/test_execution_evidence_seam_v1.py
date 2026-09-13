@@ -3,6 +3,8 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import shutil
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -62,7 +64,7 @@ def _regime(
         "unknown_n": unknown_n,
         "strategy_fee_bps_assumption": fee_bps,
         "cost_evidence_refs": [
-            {"record_id": "REC-COST-001", "payload_sha256": "c" * 64}
+            {"record_id": "REC-001", "payload_sha256": "d" * 64}
         ],
     }
 
@@ -298,17 +300,12 @@ class ExecutionEvidenceSeamTests(unittest.TestCase):
         with self.assertRaises(PromotionHandoffError):
             validate_execution_evidence_binding(poisoned, root=self.root)
 
-    # T16/T17: strategy v1.1 schema unchanged (byte identity)
+    # T16/T17: strategy v1.1 schema unchanged (byte identity vs frozen base)
     def test_t16_t17_strategy_schema_unchanged(self) -> None:
-        expected = (
-            "a8f0e6e2f6b74c5f9b3e2a6d8c4f1e5b7a9d3c6f2e8b1a4d7c9f3e6b2a5d8c1f"
-        )
-        del expected  # no pinned hash: assert file untouched by this atom instead
         current = (ROOT / "catalog/schemas/strategy_version_v1_1.schema.json").read_bytes()
-        import subprocess
-
+        base = "e79adc0b7b8d765ef14e1560ba81f08efcdcf61a"
         blob = subprocess.run(
-            ["git", "show", "HEAD:catalog/schemas/strategy_version_v1_1.schema.json"],
+            ["git", "show", f"{base}:catalog/schemas/strategy_version_v1_1.schema.json"],
             capture_output=True,
             cwd=ROOT,
             check=True,
@@ -326,6 +323,151 @@ class ExecutionEvidenceSeamTests(unittest.TestCase):
         )
         self.assertEqual(codes, ["EXECUTION_EVIDENCE_BINDING_GAP"])
         self.assertIn("EXECUTION_REGIME_BINDING", OBLIGATIONS)
+
+    # T18b: behavioral — eligible PROMOTE blocked solely by missing binding
+    def test_t18b_promote_blocked_without_binding_obligation(self) -> None:
+        import shutil as _shutil
+        import tempfile as _tempfile
+
+        from solana_alpha_lab.factory.application import ApplicationError, FactoryApplication
+        from solana_alpha_lab.factory.research_store import ResearchEvent, ResearchStore
+
+        sys.path.insert(0, str(ROOT / "tests"))
+        handoff_fixtures = __import__("test_science_to_strategy_handoff_v1")
+
+        with _tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            store = ResearchStore(data_root)
+            eligible = handoff_fixtures._eligible_records()
+            stripped = []
+            for record in eligible:
+                payload = json.loads(record.payload_json)
+                if "execution_evidence_binding" in payload:
+                    del payload["execution_evidence_binding"]
+                    payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+                    record = ResearchEvent(
+                        record_id=record.record_id,
+                        record_kind=record.record_kind,
+                        entity_id=record.entity_id,
+                        hypothesis_version_id=record.hypothesis_version_id,
+                        run_id=record.run_id,
+                        transaction_id=record.transaction_id,
+                        effective_at=record.effective_at,
+                        first_reliable_available_at=record.first_reliable_available_at,
+                        supersedes_record_id=record.supersedes_record_id,
+                        payload_json=payload_json,
+                        payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+                        schema_version=record.schema_version,
+                        producer_capability_id=record.producer_capability_id,
+                        producer_git_sha=record.producer_git_sha,
+                        created_at=record.created_at,
+                    )
+                stripped.append(record)
+            store.append(stripped, transaction_id="RESEARCH-TXN-ELIGIBLE-001")
+            app = FactoryApplication(
+                root=ROOT,
+                spec_relative="configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml",
+                research_data_root=data_root,
+            )
+            detail = app.research_detail(handoff_fixtures.LOCATOR)
+            statuses = {
+                item["code"]: item["status"] for item in detail["dossier"]["obligations"]
+            }
+            others_present = all(
+                statuses.get(code) in {"PRESENT", "NOT_APPLICABLE"}
+                for code in statuses
+                if code != "EXECUTION_REGIME_BINDING"
+            )
+            self.assertTrue(others_present, statuses)
+            self.assertIn(
+                "EXECUTION_REGIME_BINDING", detail["dossier"]["science_guard"]["blocked_codes"]
+            )
+            with self.assertRaises(ApplicationError) as blocked:
+                app.record_research_decision(
+                    {
+                        "entity_id": handoff_fixtures.EXPERIMENT_ID,
+                        "truth_plane": "GIT",
+                        "native_kind": "EXPERIMENT_SPEC",
+                        "decision_kind": "PROMOTE",
+                        "expected_evidence_snapshot_sha256": detail["dossier"][
+                            "evidence_snapshot_sha256"
+                        ],
+                        "promote_scientific_only": "1",
+                    }
+                )
+            self.assertEqual(str(blocked.exception), "PROMOTE_BLOCKED")
+
+    # T21: zero-population regime cannot authorize a notional
+    def test_t21_zero_population_regime_invalid(self) -> None:
+        empty = _binding(
+            regimes=[_regime(population_n=0, two_way_n=0, entry_only_n=0, no_entry_n=0, unknown_n=0)]
+        )
+        with self.assertRaises(PromotionHandoffError) as raised:
+            validate_execution_evidence_binding(empty, root=self.root)
+        self.assertEqual(str(raised.exception), "EXECUTION_EVIDENCE_BINDING_INVALID")
+
+    # T22: freeze cross-checks binding payload hashes against direct evidence
+    def test_t22_freeze_hash_mismatch_fails_closed(self) -> None:
+        dossier = {
+            "locator": {"entity_id": EXPERIMENT_ID},
+            "tested": {"hypothesis_version_id": HYPOTHESIS_ID, "population": POPULATION_REF},
+            "experiment_spec_binding": {
+                "source_kind": "git_path",
+                "source_value": "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml",
+                "spec_sha256": SPEC_SHA,
+            },
+            "evidence_snapshot_sha256": "e" * 64,
+            "direct_evidence": [{"record_id": "REC-001", "payload_sha256": "d" * 64}],
+            "obligations": [{"code": "FALSIFIER", "status": "PRESENT"}],
+        }
+        wrong_hash = _binding()
+        unsigned = unsigned_binding(wrong_hash)
+        unsigned["direct_evidence_refs"] = [
+            {"record_id": "REC-001", "payload_sha256": "f" * 64}
+        ]
+        wrong_hash["direct_evidence_refs"] = unsigned["direct_evidence_refs"]
+        wrong_hash["binding_sha256"] = _binding_sha(unsigned)
+        with self.assertRaises(PromotionHandoffError) as direct:
+            freeze_promotion_handoff_manifest(
+                dossier,
+                root=self.root,
+                decision_event_id="DECISION-EVENT-0000000009",
+                decision_effective_at="2026-09-06T12:00:00Z",
+                execution_evidence_binding=wrong_hash,
+            )
+        self.assertEqual(str(direct.exception), "EVIDENCE_HASH_CONFLICT")
+        phantom_cost = _binding()
+        unsigned_cost = unsigned_binding(phantom_cost)
+        unsigned_cost["regimes"][0]["cost_evidence_refs"] = [
+            {"record_id": "REC-PHANTOM-COST", "payload_sha256": "c" * 64}
+        ]
+        phantom_cost["regimes"] = unsigned_cost["regimes"]
+        phantom_cost["binding_sha256"] = _binding_sha(unsigned_cost)
+        with self.assertRaises(PromotionHandoffError) as cost:
+            freeze_promotion_handoff_manifest(
+                dossier,
+                root=self.root,
+                decision_event_id="DECISION-EVENT-0000000010",
+                decision_effective_at="2026-09-06T12:00:00Z",
+                execution_evidence_binding=phantom_cost,
+            )
+        self.assertEqual(str(cost.exception), "COST_EVIDENCE_MISMATCH")
+        wrong_cost_hash = _binding()
+        unsigned_cost_hash = unsigned_binding(wrong_cost_hash)
+        unsigned_cost_hash["regimes"][0]["cost_evidence_refs"] = [
+            {"record_id": "REC-001", "payload_sha256": "0" * 64}
+        ]
+        wrong_cost_hash["regimes"] = unsigned_cost_hash["regimes"]
+        wrong_cost_hash["binding_sha256"] = _binding_sha(unsigned_cost_hash)
+        with self.assertRaises(PromotionHandoffError) as cost_hash:
+            freeze_promotion_handoff_manifest(
+                dossier,
+                root=self.root,
+                decision_event_id="DECISION-EVENT-0000000011",
+                decision_effective_at="2026-09-06T12:00:00Z",
+                execution_evidence_binding=wrong_cost_hash,
+            )
+        self.assertEqual(str(cost_hash.exception), "COST_EVIDENCE_MISMATCH")
 
     # T19: CHECK / RENDER / VERIFY agree (via check_materialization parity)
     def test_t19_check_render_verify_agree(self) -> None:

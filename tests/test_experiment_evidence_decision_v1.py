@@ -128,6 +128,21 @@ def _scientific_payload(**overrides: object) -> dict[str, object]:
     return payload
 
 
+def _run_payload_digest() -> str:
+    run_payload = {
+        "experiment_id": EXPERIMENT_ID,
+        "run_id": "RUN-ELIGIBLE-001",
+        "availability_cutoff": "2026-09-01T00:00:00Z",
+        "first_reliable_available_at": "2026-09-01T00:00:00Z",
+        "observed_n": 24,
+        "robustness": "HOLD_SPLIT",
+        "outcome": "INCONCLUSIVE",
+    }
+    return hashlib.sha256(
+        json.dumps(run_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
 def _eligible_run() -> ResearchEvent:
     return _event(
         record_id="RUN-ELIGIBLE-001",
@@ -169,7 +184,7 @@ def _execution_binding(**regime_overrides: object) -> dict[str, object]:
         "unknown_n": 1,
         "strategy_fee_bps_assumption": 100,
         "cost_evidence_refs": [
-            {"record_id": "EVIDENCE-BINDING-ELIGIBLE-001", "payload_sha256": "c" * 64}
+            {"record_id": "RUN-ELIGIBLE-001", "payload_sha256": _run_payload_digest()}
         ],
     }
     regime.update(regime_overrides)
@@ -182,7 +197,7 @@ def _execution_binding(**regime_overrides: object) -> dict[str, object]:
         "population_ref": POPULATION_REF,
         "regimes": [regime],
         "direct_evidence_refs": [
-            {"record_id": "EVIDENCE-BINDING-ELIGIBLE-001", "payload_sha256": "c" * 64}
+            {"record_id": "RUN-ELIGIBLE-001", "payload_sha256": _run_payload_digest()}
         ],
     }
     digest = hashlib.sha256(

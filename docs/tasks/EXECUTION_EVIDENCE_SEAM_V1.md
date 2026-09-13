@@ -28,12 +28,17 @@ managed_write_set:
 - tests/test_execution_evidence_seam_v1.py
 - tests/test_science_to_strategy_handoff_v1.py
 - tests/test_experiment_evidence_decision_v1.py
+- tests/test_factory_ordinary_market_hypothesis.py
 - catalog/catalog_manifest.yaml
 - catalog/assets/core.yaml
 - catalog/assets/lifecycle.yaml
 - catalog/generated/asset_edges.json
 - docs/PROJECT_MAP.md
 - configs/ci_test_shards_v1.json
+- docs/evidence/control/a1_execution_evidence_seam_completion_v1.json
+- docs/evidence/control/a1_execution_evidence_seam_review_v1.json
+- docs/evidence/control/a1_execution_evidence_seam_factory_fit_v1.json
+- docs/reports/control/a1_execution_evidence_seam_owner_readout_v1.md
 external_caps:
   network: false
   credentials: false
@@ -51,14 +56,18 @@ context_requirements:
   catalog_asset_ids:
   - SCHEMA-EXECUTION-EVIDENCE-BINDING-V1-001
   - SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-1-001
-  l2_roles: []
+  l2_roles:
+  - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/control/a1_execution_evidence_seam_completion_v1.json
+    - docs/evidence/control/a1_execution_evidence_seam_review_v1.json
+    - docs/evidence/control/a1_execution_evidence_seam_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

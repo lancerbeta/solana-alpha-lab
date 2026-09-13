@@ -63,6 +63,8 @@ def _spec_digest() -> str:
 def _execution_binding(
     *,
     binding_id: str = "EEB-" + "T0" * 11 + "XX",
+    cost_ref_record: str = "EVIDENCE-BINDING-ELIGIBLE-001",
+    cost_ref_digest: str = "c" * 64,
     **regime_overrides: object,
 ) -> dict[str, object]:
     regime: dict[str, object] = {
@@ -75,7 +77,7 @@ def _execution_binding(
         "unknown_n": 1,
         "strategy_fee_bps_assumption": 100,
         "cost_evidence_refs": [
-            {"record_id": "EVIDENCE-BINDING-ELIGIBLE-001", "payload_sha256": "c" * 64}
+            {"record_id": cost_ref_record, "payload_sha256": cost_ref_digest}
         ],
     }
     regime.update(regime_overrides)
@@ -88,7 +90,7 @@ def _execution_binding(
         "population_ref": POPULATION_REF,
         "regimes": [regime],
         "direct_evidence_refs": [
-            {"record_id": "EVIDENCE-BINDING-ELIGIBLE-001", "payload_sha256": "c" * 64}
+            {"record_id": cost_ref_record, "payload_sha256": cost_ref_digest}
         ],
     }
     digest = hashlib.sha256(
@@ -178,13 +180,32 @@ def _scientific_payload(**overrides: object) -> dict[str, object]:
         "uncertainty": ["SMALL_SAMPLE"],
         "robustness": "HOLD_SPLIT",
         "evidence_class": "DIAGNOSTIC",
-        "execution_evidence_binding": _execution_binding(),
     }
     payload.update(overrides)
     return payload
 
 
+def _payload_digest(payload: dict[str, object]) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
 def _eligible_records() -> list[ResearchEvent]:
+    run_payload = {
+        "experiment_id": EXPERIMENT_ID,
+        "run_id": "RUN-ELIGIBLE-001",
+        "availability_cutoff": "2026-09-01T00:00:00Z",
+        "first_reliable_available_at": "2026-09-01T00:00:00Z",
+        "observed_n": 24,
+        "robustness": "HOLD_SPLIT",
+        "outcome": "INCONCLUSIVE",
+    }
+    binding = _execution_binding(
+        cost_ref_record="RUN-ELIGIBLE-001",
+        cost_ref_digest=_payload_digest(run_payload),
+    )
+    evidence_payload = {**_scientific_payload(), "execution_evidence_binding": binding}
     return [
         _event(
             record_id="RUN-ELIGIBLE-001",
@@ -192,15 +213,7 @@ def _eligible_records() -> list[ResearchEvent]:
             entity_id="RUN-ELIGIBLE-001",
             run_id="RUN-ELIGIBLE-001",
             hypothesis_version_id=HYPOTHESIS_ID,
-            payload={
-                "experiment_id": EXPERIMENT_ID,
-                "run_id": "RUN-ELIGIBLE-001",
-                "availability_cutoff": "2026-09-01T00:00:00Z",
-                "first_reliable_available_at": "2026-09-01T00:00:00Z",
-                "observed_n": 24,
-                "robustness": "HOLD_SPLIT",
-                "outcome": "INCONCLUSIVE",
-            },
+            payload=run_payload,
             transaction_id="RESEARCH-TXN-ELIGIBLE-001",
         ),
         _event(
@@ -208,7 +221,7 @@ def _eligible_records() -> list[ResearchEvent]:
             record_kind="EVIDENCE_BINDING",
             entity_id="EVIDENCE-BINDING-ELIGIBLE-001",
             hypothesis_version_id=HYPOTHESIS_ID,
-            payload=_scientific_payload(),
+            payload=evidence_payload,
             transaction_id="RESEARCH-TXN-ELIGIBLE-001",
         ),
     ]
@@ -367,7 +380,10 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                         record_kind="EVIDENCE_BINDING",
                         entity_id="EVIDENCE-BINDING-LATER-001",
                         hypothesis_version_id=HYPOTHESIS_ID,
-                        payload=_scientific_payload(observed_n=48),
+                        payload={
+                            **_scientific_payload(observed_n=48),
+                            "execution_evidence_binding": _execution_binding(),
+                        },
                         transaction_id="RESEARCH-TXN-LATER-001",
                     )
                 ],

@@ -35847,7 +35847,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_experiment_evidence_decision_v1.py', repository_path: tests/test_experiment_evidence_decision_v1.py}
-  integrity: {kind: sha256, sha256: 4cf59c3f01c55e6f9b3a8cdd1340bb506429aaedaa288637e314a3635d35d5f9}
+  integrity: {kind: sha256, sha256: 49ea38dd4e362738c99cf92c592f09e32500678aca36e49288dfece7644729ee}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35958,7 +35958,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/promotion_handoff.py', repository_path: src/solana_alpha_lab/factory/promotion_handoff.py}
-  integrity: {kind: sha256, sha256: 6282790d72d0ca6dc5659ebd9237e794fae1096c01a19c64a800b3013c7039d6}
+  integrity: {kind: sha256, sha256: 58421dc22d6391c15725a8df4b5d374fd02de3008d837eb621ca2ee249c92a12}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35977,7 +35977,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_science_to_strategy_handoff_v1.py', repository_path: tests/test_science_to_strategy_handoff_v1.py}
-  integrity: {kind: sha256, sha256: cc2e9f64d2748c22f570578732cd6634054f1d2bd86801395184a8feb94e6f68}
+  integrity: {kind: sha256, sha256: f3d159b2f33f5345bcd5e9ef3b2983da8236c678131776685d38ffbcc85cef65}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35995,7 +35995,7 @@ records:
   as_of: '2026-09-13'
   truth_owner: EXECUTION_EVIDENCE_SEAM_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_execution_evidence_seam_v1.py', repository_path: tests/test_execution_evidence_seam_v1.py}
-  integrity: {kind: sha256, sha256: 13de896074df806ad32d8c00916108f980d99e54479ce33fc219902b8286ac26}
+  integrity: {kind: sha256, sha256: 9d394bb18dede602275f624ac24fef4d98fdeaa21d8f0c89e7936a8249300fe9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}

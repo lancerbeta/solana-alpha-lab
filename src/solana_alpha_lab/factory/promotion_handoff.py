@@ -166,6 +166,8 @@ def validate_execution_evidence_binding(
         counts = regime["two_way_n"] + regime["entry_only_n"] + regime["no_entry_n"] + regime["unknown_n"]
         if counts != regime["population_n"]:
             raise PromotionHandoffError("EXECUTION_REGIME_MISMATCH")
+        if regime["population_n"] < 1:
+            raise PromotionHandoffError("EXECUTION_EVIDENCE_BINDING_INVALID")
         if regime["evidence_class"] != EVIDENCE_CLASS_QUOTE_PAIR:
             raise PromotionHandoffError("EXECUTION_EVIDENCE_BINDING_INVALID")
         notionals.append(float(regime["tested_notional_usd"]))
@@ -337,6 +339,33 @@ def freeze_promotion_handoff_manifest(
         }
         if not binding_refs.issubset({item["record_id"] for item in direct}):
             raise PromotionHandoffError("EVIDENCE_RELATION_GAP")
+        direct_payloads = {item["record_id"]: str(item["payload_sha256"]) for item in direct}
+        for ref in frozen_binding.get("direct_evidence_refs") or []:
+            if not isinstance(ref, Mapping):
+                continue
+            if direct_payloads.get(str(ref.get("record_id") or "")) != str(
+                ref.get("payload_sha256") or ""
+            ):
+                raise PromotionHandoffError("EVIDENCE_HASH_CONFLICT")
+        binding_cost_ids = {
+            str(ref.get("record_id") or "")
+            for regime in frozen_binding.get("regimes") or []
+            if isinstance(regime, Mapping)
+            for ref in regime.get("cost_evidence_refs") or []
+            if isinstance(ref, Mapping)
+        }
+        if not binding_cost_ids.issubset(direct_payloads):
+            raise PromotionHandoffError("COST_EVIDENCE_MISMATCH")
+        for regime in frozen_binding.get("regimes") or []:
+            if not isinstance(regime, Mapping):
+                continue
+            for ref in regime.get("cost_evidence_refs") or []:
+                if not isinstance(ref, Mapping):
+                    continue
+                if direct_payloads.get(str(ref.get("record_id") or "")) != str(
+                    ref.get("payload_sha256") or ""
+                ):
+                    raise PromotionHandoffError("COST_EVIDENCE_MISMATCH")
         version = "1.1"
         binding_fields = {
             "execution_evidence_binding_id": str(frozen_binding["binding_id"]),
@@ -819,7 +848,8 @@ def materialize_strategy_candidate(
             execution_inputs=execution_inputs,
         )
     except PromotionHandoffError as exc:
-        regime_blockers = [str(exc)]
+        code = str(exc)
+        regime_blockers = [code] if code in BLOCKER_CODES else ["HANDOFF_MANIFEST_INVALID"]
     if gaps or regime_blockers:
         check = check_materialization(
             root=root,
@@ -1033,8 +1063,8 @@ def compose_science_to_strategy_handoff(
                 ):
                     binding_status = "CONFLICT"
                     binding = None
-            except PromotionHandoffError as exc:
-                binding_status = "CONFLICT" if str(exc) == "EXECUTION_REGIME_MISMATCH" else "MISSING"
+            except PromotionHandoffError:
+                binding_status = "CONFLICT"
     revalidation, revalidation_codes = _source_revalidation(
         manifest, store_records, records_status
     )
