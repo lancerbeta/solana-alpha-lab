@@ -50,6 +50,55 @@ EXECUTION_INPUTS = {
     "max_open_positions": 1,
     "shadow": False,
 }
+POPULATION_REF = "A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE"
+_SPEC_RELATIVE = "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml"
+
+
+def _spec_digest() -> str:
+    from solana_alpha_lab.factory.experiment_spec import spec_sha256
+
+    return spec_sha256(ROOT, _SPEC_RELATIVE)
+
+
+def _execution_binding(
+    *,
+    binding_id: str = "EEB-" + "T0" * 11 + "XX",
+    cost_ref_record: str = "EVIDENCE-BINDING-ELIGIBLE-001",
+    cost_ref_digest: str = "c" * 64,
+    **regime_overrides: object,
+) -> dict[str, object]:
+    regime: dict[str, object] = {
+        "tested_notional_usd": 25.0,
+        "evidence_class": "DECISION_TIME_QUOTE_PAIR_V1",
+        "population_n": 24,
+        "two_way_n": 18,
+        "entry_only_n": 4,
+        "no_entry_n": 1,
+        "unknown_n": 1,
+        "strategy_fee_bps_assumption": 100,
+        "cost_evidence_refs": [
+            {"record_id": cost_ref_record, "payload_sha256": cost_ref_digest}
+        ],
+    }
+    regime.update(regime_overrides)
+    unsigned = {
+        "schema": "smial.execution-evidence-binding",
+        "schema_version": "1.0",
+        "binding_id": binding_id,
+        "experiment_id": EXPERIMENT_ID,
+        "experiment_spec_sha256": _spec_digest(),
+        "population_ref": POPULATION_REF,
+        "regimes": [regime],
+        "direct_evidence_refs": [
+            {"record_id": cost_ref_record, "payload_sha256": cost_ref_digest}
+        ],
+    }
+    digest = hashlib.sha256(
+        json.dumps(unsigned, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+            "utf-8"
+        )
+    ).hexdigest()
+    return {**unsigned, "binding_sha256": digest}
 
 
 def _event(
@@ -136,7 +185,27 @@ def _scientific_payload(**overrides: object) -> dict[str, object]:
     return payload
 
 
+def _payload_digest(payload: dict[str, object]) -> str:
+    return hashlib.sha256(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+
+
 def _eligible_records() -> list[ResearchEvent]:
+    run_payload = {
+        "experiment_id": EXPERIMENT_ID,
+        "run_id": "RUN-ELIGIBLE-001",
+        "availability_cutoff": "2026-09-01T00:00:00Z",
+        "first_reliable_available_at": "2026-09-01T00:00:00Z",
+        "observed_n": 24,
+        "robustness": "HOLD_SPLIT",
+        "outcome": "INCONCLUSIVE",
+    }
+    binding = _execution_binding(
+        cost_ref_record="RUN-ELIGIBLE-001",
+        cost_ref_digest=_payload_digest(run_payload),
+    )
+    evidence_payload = {**_scientific_payload(), "execution_evidence_binding": binding}
     return [
         _event(
             record_id="RUN-ELIGIBLE-001",
@@ -144,15 +213,7 @@ def _eligible_records() -> list[ResearchEvent]:
             entity_id="RUN-ELIGIBLE-001",
             run_id="RUN-ELIGIBLE-001",
             hypothesis_version_id=HYPOTHESIS_ID,
-            payload={
-                "experiment_id": EXPERIMENT_ID,
-                "run_id": "RUN-ELIGIBLE-001",
-                "availability_cutoff": "2026-09-01T00:00:00Z",
-                "first_reliable_available_at": "2026-09-01T00:00:00Z",
-                "observed_n": 24,
-                "robustness": "HOLD_SPLIT",
-                "outcome": "INCONCLUSIVE",
-            },
+            payload=run_payload,
             transaction_id="RESEARCH-TXN-ELIGIBLE-001",
         ),
         _event(
@@ -160,7 +221,7 @@ def _eligible_records() -> list[ResearchEvent]:
             record_kind="EVIDENCE_BINDING",
             entity_id="EVIDENCE-BINDING-ELIGIBLE-001",
             hypothesis_version_id=HYPOTHESIS_ID,
-            payload=_scientific_payload(),
+            payload=evidence_payload,
             transaction_id="RESEARCH-TXN-ELIGIBLE-001",
         ),
     ]
@@ -202,6 +263,14 @@ def _schema_root(tmp: Path) -> Path:
         ROOT / "catalog/schemas/promotion_handoff_manifest_v1.schema.json",
         tmp / "catalog/schemas/promotion_handoff_manifest_v1.schema.json",
     )
+    shutil.copy(
+        ROOT / "catalog/schemas/promotion_handoff_manifest_v1_1.schema.json",
+        tmp / "catalog/schemas/promotion_handoff_manifest_v1_1.schema.json",
+    )
+    shutil.copy(
+        ROOT / "catalog/schemas/execution_evidence_binding_v1.schema.json",
+        tmp / "catalog/schemas/execution_evidence_binding_v1.schema.json",
+    )
     return tmp
 
 
@@ -209,6 +278,13 @@ def _stored_manifest(store: ResearchStore, event_id: str) -> dict:
     for record in store.iter_committed_records():
         if record.record_id == event_id:
             return json.loads(record.payload_json)["promotion_handoff_manifest"]
+    raise AssertionError(event_id)
+
+
+def _stored_binding(store: ResearchStore, event_id: str) -> dict | None:
+    for record in store.iter_committed_records():
+        if record.record_id == event_id:
+            return json.loads(record.payload_json).get("execution_evidence_binding")
     raise AssertionError(event_id)
 
 
@@ -241,12 +317,16 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 manifest["decision_event_id"],
                 recorded["decision_result"]["decision_event_id"],
             )
+            binding = _stored_binding(
+                store, recorded["decision_result"]["decision_event_id"]
+            )
             rendered = materialize_strategy_candidate(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=recorded["decision_result"]["decision_event_id"],
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             self.assertEqual(rendered["handoff_state"], "READY_TO_MATERIALIZE")
             self.assertEqual(rendered["disposition"], "RENDERED")
@@ -300,7 +380,10 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                         record_kind="EVIDENCE_BINDING",
                         entity_id="EVIDENCE-BINDING-LATER-001",
                         hypothesis_version_id=HYPOTHESIS_ID,
-                        payload=_scientific_payload(observed_n=48),
+                        payload={
+                            **_scientific_payload(observed_n=48),
+                            "execution_evidence_binding": _execution_binding(),
+                        },
                         transaction_id="RESEARCH-TXN-LATER-001",
                     )
                 ],
@@ -380,12 +463,14 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             candidate = render_strategy_version(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             schema_root = _schema_root(Path(tmp) / "git")
             replay = dict(candidate)
@@ -399,6 +484,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             self.assertEqual(identical["handoff_state"], "MATERIALIZED")
             self.assertEqual(identical["disposition"], "REPLAY_IDENTICAL")
@@ -416,6 +502,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             self.assertEqual(clash["handoff_state"], "CONFLICT")
             self.assertIn("STRATEGY_CONTENT_CONFLICT", clash["blocker_codes"])
@@ -477,12 +564,14 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             first = render_strategy_version(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             second = render_strategy_version(
                 root=ROOT,
@@ -490,6 +579,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             self.assertEqual(first, second)
             payload = None
@@ -510,6 +600,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             with self.assertRaises(PromotionHandoffError) as mismatch:
                 render_strategy_version(
                     root=ROOT,
@@ -538,6 +629,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             coerced = dict(EXECUTION_INPUTS)
             coerced["shadow"] = "false"
             stringed = materialize_strategy_candidate(
@@ -605,6 +697,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             schema_root = _schema_root(Path(tmp) / "git")
             (schema_root / "configs" / "strategies" / "broken.yaml").write_text(
                 "not: [unterminated",
@@ -616,6 +709,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             self.assertEqual(blocked["handoff_state"], "CONFLICT")
             self.assertIn("STRATEGY_CONTENT_CONFLICT", blocked["blocker_codes"])
@@ -630,6 +724,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             schema_root = _schema_root(Path(tmp) / "git")
             candidate = render_strategy_version(
                 root=ROOT,
@@ -637,6 +732,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             (schema_root / "configs" / "strategies" / "replay.yaml").write_text(
                 yaml.safe_dump(candidate, sort_keys=False, allow_unicode=True),
@@ -664,6 +760,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = dict(_stored_manifest(store, event_id))
+            binding = _stored_binding(store, event_id)
             manifest["manifest_sha256"] = "ab" * 32
             check = check_materialization(
                 root=ROOT,
@@ -686,12 +783,14 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             candidate = render_strategy_version(
                 root=ROOT,
                 manifest=manifest,
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             unsigned = {
                 key: value for key, value in candidate.items() if key != "spec_sha256"
@@ -761,6 +860,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
             recorded = _promote(app)
             event_id = recorded["decision_result"]["decision_event_id"]
             manifest = _stored_manifest(store, event_id)
+            binding = _stored_binding(store, event_id)
             schema_root = _schema_root(Path(tmp) / "git")
             candidate = render_strategy_version(
                 root=ROOT,
@@ -768,6 +868,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 decision_event_id=event_id,
                 created_at=manifest["decision_effective_at"],
                 execution_inputs=EXECUTION_INPUTS,
+                execution_evidence_binding=binding,
             )
             (schema_root / "configs" / "strategies" / "replay.yaml").write_text(
                 yaml.safe_dump(candidate, sort_keys=False, allow_unicode=True),
@@ -778,6 +879,7 @@ class ScienceToStrategyHandoffTests(unittest.TestCase):
                 manifest=manifest,
                 execution_inputs=EXECUTION_INPUTS,
                 decision_event_id=event_id,
+                execution_evidence_binding=binding,
             )
             self.assertEqual(missing_clock["handoff_state"], "BLOCKED")
             self.assertIn("HANDOFF_MANIFEST_INVALID", missing_clock["blocker_codes"])

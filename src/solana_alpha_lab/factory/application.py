@@ -429,6 +429,44 @@ class FactoryApplication:
             and committed.get("target_entity_id") == locator.entity_id
         )
 
+    def _extract_execution_evidence_binding(self, dossier: Mapping[str, Any]) -> Any:
+        """Latest typed execution-evidence binding among DIRECT science evidence, fail-closed on conflict."""
+        from solana_alpha_lab.factory.promotion_handoff import (
+            PromotionHandoffError,
+            validate_execution_evidence_binding,
+        )
+
+        candidates: list[Mapping[str, Any]] = []
+        for card in dossier.get("direct_evidence") or []:
+            if not isinstance(card, Mapping):
+                continue
+            if str(card.get("record_kind") or "") not in {
+                "EXPERIMENT_METRIC",
+                "EVIDENCE_BINDING",
+                "PROMOTION_CANDIDATE",
+            }:
+                continue
+            raw = (card.get("summary_fields") or {}).get("execution_evidence_binding")
+            if isinstance(raw, Mapping):
+                candidates.append(raw)
+        if not candidates:
+            return None
+        validated = []
+        for candidate in candidates:
+            try:
+                validated.append(
+                    validate_execution_evidence_binding(candidate, root=self.root)
+                )
+            except PromotionHandoffError:
+                raise ApplicationError("EXECUTION_EVIDENCE_BINDING_INVALID")
+        digests = {
+            json.dumps(item, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+            for item in validated
+        }
+        if len(digests) > 1:
+            raise ApplicationError("EXECUTION_REGIME_MISMATCH")
+        return validated[-1]
+
     def record_research_decision(self, command: Mapping[str, Any]) -> dict[str, Any]:
         from datetime import UTC, datetime
 
@@ -508,15 +546,18 @@ class FactoryApplication:
             snapshot_sha256=expected,
         )
         manifest = None
+        binding = None
         now = datetime.now(UTC).replace(microsecond=0)
         stamp = now.strftime("%Y-%m-%dT%H:%M:%SZ")
         if kind == "PROMOTE":
+            binding = self._extract_execution_evidence_binding(reread_dossier)
             try:
                 manifest = freeze_promotion_handoff_manifest(
                     reread_dossier,
                     root=self.root,
                     decision_event_id=event_id,
                     decision_effective_at=stamp,
+                    execution_evidence_binding=binding,
                 )
             except PromotionHandoffError as exc:
                 raise ApplicationError(str(exc) or "EXPERIMENT_SPEC_BINDING_GAP") from exc
@@ -532,6 +573,7 @@ class FactoryApplication:
                 next_condition=command.get("next_condition"),
                 decision_event_id=event_id,
                 promotion_handoff_manifest=manifest,
+                execution_evidence_binding=binding,
             )
         except ResearchWorkbenchError as exc:
             raise ApplicationError(str(exc)) from exc

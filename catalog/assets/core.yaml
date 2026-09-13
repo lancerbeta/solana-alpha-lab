@@ -25667,7 +25667,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/application.py', repository_path: src/solana_alpha_lab/factory/application.py}
-  integrity: {kind: sha256, sha256: 3c66455bba496f0efca0a411545d44b04a53baa100388f3651a35a89e283d196}
+  integrity: {kind: sha256, sha256: 0373815dae821687180eeb37f86920c95e02968735819563de91864a177f65ce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RUNNER-001}
@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: c1928be3150eff94a791e3b4844178cd667236d3c67da4a80920518ced2ca03f}
+  integrity: {kind: sha256, sha256: 6ce943ea941873150c3233b3b5adc38008d3b1a6d6f2b6d6b7158d857eb4671d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -35810,7 +35810,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_evidence.py', repository_path: src/solana_alpha_lab/factory/experiment_evidence.py}
-  integrity: {kind: sha256, sha256: 314d80154e0201d71bedd70653bb3dcd4145c28c3ae6c4ac4e78a49a59a29371}
+  integrity: {kind: sha256, sha256: ce040faa3b58ec2b4242a8721ffb0de059c53ff0b0d78d2c70ddd93374f00d43}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35829,7 +35829,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/owner_language.py', repository_path: src/solana_alpha_lab/factory/owner_language.py}
-  integrity: {kind: sha256, sha256: c638009fa417c99dfbe7121198097d6797a47b925052f21cafe6552ece051ca2}
+  integrity: {kind: sha256, sha256: a65008f623f7cd1d8b3ce7176fa8548d321e1fb84b0d49226d2991e099f82771}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35847,7 +35847,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: EXPERIMENT_EVIDENCE_DECISION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_experiment_evidence_decision_v1.py', repository_path: tests/test_experiment_evidence_decision_v1.py}
-  integrity: {kind: sha256, sha256: d0c19305ef4ac63e5ef9555c6611de88f8470abf7fda519c58d641e42845cb0b}
+  integrity: {kind: sha256, sha256: 49ea38dd4e362738c99cf92c592f09e32500678aca36e49288dfece7644729ee}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-EXPERIMENT-EVIDENCE-DECISION-001}
@@ -35913,6 +35913,42 @@ records:
   evidence: []
   search_terms: [promotion_handoff_manifest, MANIFEST_SHA256]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Machine schema for promotion_handoff_manifest v1.1 adding immutable execution-evidence binding reference; v1.0 semantics unchanged.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-13'
+  truth_owner: EXECUTION_EVIDENCE_SEAM_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/promotion_handoff_manifest_v1_1.schema.json', repository_path: catalog/schemas/promotion_handoff_manifest_v1_1.schema.json}
+  integrity: {kind: sha256, sha256: 457dd7308680374a0b74319877be878f57dd0e6ecccde4413591656150ce77bd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXECUTION-EVIDENCE-BINDING-V1-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [promotion_handoff_manifest_v1_1, EXECUTION_EVIDENCE_BINDING]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-EXECUTION-EVIDENCE-BINDING-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: Provider-neutral decision-time execution-regime attestation frozen inside new PROMOTE payloads; per-notional denominators with explicit TWO_WAY/ENTRY_ONLY/NO_ENTRY/UNKNOWN closure.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-13'
+  truth_owner: EXECUTION_EVIDENCE_SEAM_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/execution_evidence_binding_v1.schema.json', repository_path: catalog/schemas/execution_evidence_binding_v1.schema.json}
+  integrity: {kind: sha256, sha256: 98ba162ba3940b816a2d652df23db24ecf8ff0046aea5a0b08a90ea93959d3f4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [execution_evidence_binding, DECISION_TIME_QUOTE_PAIR_V1, NOTIONAL_EVIDENCE_MISMATCH]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: MODULE-PROMOTION-HANDOFF-001
   record_version: '1.0'
   asset_type: script
@@ -35922,7 +35958,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/promotion_handoff.py', repository_path: src/solana_alpha_lab/factory/promotion_handoff.py}
-  integrity: {kind: sha256, sha256: c910b2a406c77c6e514f9d57f74fe763405e8dc3c3b4837c7b348fd6752d33c1}
+  integrity: {kind: sha256, sha256: 58421dc22d6391c15725a8df4b5d374fd02de3008d837eb621ca2ee249c92a12}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35941,7 +35977,7 @@ records:
   as_of: '2026-09-06'
   truth_owner: SCIENCE_TO_STRATEGY_HANDOFF_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_science_to_strategy_handoff_v1.py', repository_path: tests/test_science_to_strategy_handoff_v1.py}
-  integrity: {kind: sha256, sha256: 32973ddc63b8c48e4a8c2e43445554c1eb31cd47f67c358200a865018a588682}
+  integrity: {kind: sha256, sha256: f3d159b2f33f5345bcd5e9ef3b2983da8236c678131776685d38ffbcc85cef65}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
@@ -35949,6 +35985,25 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [HANDOFF_VERTICAL, LEGACY_PROVENANCE_GAP]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-EXECUTION-EVIDENCE-SEAM-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Machine acceptance T1-T20 for ExecutionEvidenceBindingV1, manifest v1.1 dispatch, denominator closure, notional/fee compatibility and deterministic hashing.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-13'
+  truth_owner: EXECUTION_EVIDENCE_SEAM_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_execution_evidence_seam_v1.py', repository_path: tests/test_execution_evidence_seam_v1.py}
+  integrity: {kind: sha256, sha256: 9d394bb18dede602275f624ac24fef4d98fdeaa21d8f0c89e7936a8249300fe9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXECUTION-EVIDENCE-BINDING-V1-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-1-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [EXECUTION_EVIDENCE_SEAM, EXECUTION_REGIME_BINDING, NOTIONAL_EVIDENCE_MISMATCH]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 - asset_id: DOC-FACTORY-UNATTENDED-OPERABILITY-001
   record_version: '1.0'

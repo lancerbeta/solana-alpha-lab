@@ -1,0 +1,44 @@
+{
+  "as_of": "2026-09-13",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "EXECUTION-EVIDENCE-SEAM-REVIEW-001",
+  "reviewed_bindings_sha256": "79f5a39b69cb1c5a803dfb3e1c88c34356d95f0f01a46035ec1f5f95fb4f6df3",
+  "reviewed_inventory_sha256": "9d2a8ddc9fb1360ef81a411c97b654f31bb62159ff585907c06dc3cca017de4e",
+  "reviews": [
+    {
+      "findings": [
+        "Round 1 NOT_READY findings fixed in acc8859e: freeze now cross-checks direct_evidence_refs and cost_evidence_refs payload hashes (EVIDENCE_HASH_CONFLICT, COST_EVIDENCE_MISMATCH) and zero-population regimes are EXECUTION_EVIDENCE_BINDING_INVALID; T21/T22 pin both",
+        "Invariants verified: v1.0 manifests validate unchanged; new PROMOTE fail-closed without binding; quotes never fills; strategy_version_v1_1 byte-identity vs frozen base; per-regime denominator closure; fee uses strategy_fee_bps_assumption only; no secrets in receipts; verify orders manifest/lineage before regime compatibility"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Round 1 NOT_READY findings fixed in acc8859e: behavioral T18b pins eligible PROMOTE blocked solely by EXECUTION_REGIME_BINDING (PROMOTE_BLOCKED) and T16/T17 byte-identity now compares against frozen base e79adc0b instead of HEAD",
+        "Seam is end-to-end and falsifiable: guard -> freeze v1.1 -> CHECK/RENDER/VERIFY all route through execution_regime_compatibility; both-direction notional and fee mismatch, denominator, identity, tamper and determinism all pinned by tests"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "Round 1 F1 (record_id-only ref check) and F2 (unvalidated cost_evidence_refs) fixed in acc8859e; remaining F3-F8 are informational V1 non-claims (PRESENT means consistency, not sufficiency; attested counters, not derived)",
+        "Reversibility holds: legacy v1.0 dispatch, no historical rewrite, revert is ordinary merge revert; unknown_n stays a first-class denominator bucket, never coerced"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "EXECUTION_EVIDENCE_SEAM_V1",
+  "verdict": "PASS"
+}
