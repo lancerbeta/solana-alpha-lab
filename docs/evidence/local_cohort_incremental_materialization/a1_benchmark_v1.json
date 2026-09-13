@@ -38,6 +38,8 @@
         "cache_db_bytes": 471040,
         "cache_meta_bytes": 585
       },
+      "cache_dataset_manifest_id": "bench-cold-delta-010",
+      "cache_seq": 10,
       "checkpoint_hits": 0,
       "checkpoint_misses": 1,
       "delta_files_applied": 10,
@@ -57,17 +59,20 @@
       "observation_count": 64,
       "observation_panel_rows_decoded": 640,
       "reconstruct_calls": 1,
+      "reconstruct_targets": [
+        "bench-cold-delta-010"
+      ],
       "repeated_exact_publication_reconstruction_count": 0,
       "scratch_bytes_after": 0,
       "source_sha256": "e67ae65bcc981be0a2a3f2a17183797dbc943d4452bfea2fa95f9b5b21894ab4",
       "stage_timings_s": {
-        "build_wall_s": 0.279514,
-        "cohort_selection_wall_s": 5.7e-05,
-        "member_materialization_wall_s": 0.193664,
-        "member_reconstruction_wall_s": 0.156723,
-        "observation_extraction_wall_s": 0.030519,
-        "parquet_hash_wall_s": 0.001301,
-        "parquet_write_wall_s": 0.006914
+        "build_wall_s": 0.264808,
+        "cohort_selection_wall_s": 5e-05,
+        "member_materialization_wall_s": 0.183807,
+        "member_reconstruction_wall_s": 0.152154,
+        "observation_extraction_wall_s": 0.027631,
+        "parquet_hash_wall_s": 0.001322,
+        "parquet_write_wall_s": 0.006556
       },
       "tail_delta_counts": {
         "added": 0,
@@ -75,7 +80,7 @@
         "removed": 0
       },
       "target_cache_hits": 9,
-      "wall_s": 0.279514
+      "wall_s": 0.264808
     },
     {
       "anchor_loads": 0,
@@ -83,6 +88,8 @@
         "cache_db_bytes": 471040,
         "cache_meta_bytes": 585
       },
+      "cache_dataset_manifest_id": "bench-cold-delta-010",
+      "cache_seq": 10,
       "checkpoint_hits": 1,
       "checkpoint_misses": 0,
       "delta_files_applied": 0,
@@ -102,16 +109,17 @@
       "observation_count": 64,
       "observation_panel_rows_decoded": 640,
       "reconstruct_calls": 0,
+      "reconstruct_targets": [],
       "repeated_exact_publication_reconstruction_count": 0,
       "scratch_bytes_after": 0,
       "source_sha256": "e67ae65bcc981be0a2a3f2a17183797dbc943d4452bfea2fa95f9b5b21894ab4",
       "stage_timings_s": {
-        "build_wall_s": 0.115875,
-        "cohort_selection_wall_s": 4.6e-05,
-        "member_materialization_wall_s": 0.033726,
-        "observation_extraction_wall_s": 0.0287,
-        "parquet_hash_wall_s": 0.00143,
-        "parquet_write_wall_s": 0.008451
+        "build_wall_s": 0.114083,
+        "cohort_selection_wall_s": 4.2e-05,
+        "member_materialization_wall_s": 0.033426,
+        "observation_extraction_wall_s": 0.028807,
+        "parquet_hash_wall_s": 0.001435,
+        "parquet_write_wall_s": 0.006625
       },
       "tail_delta_counts": {
         "added": 0,
@@ -119,7 +127,7 @@
         "removed": 0
       },
       "target_cache_hits": 9,
-      "wall_s": 0.115875
+      "wall_s": 0.114083
     },
     {
       "anchor_loads": 0,
@@ -127,6 +135,8 @@
         "cache_db_bytes": 471040,
         "cache_meta_bytes": 585
       },
+      "cache_dataset_manifest_id": "bench-one-step-delta",
+      "cache_seq": 11,
       "checkpoint_hits": 2,
       "checkpoint_misses": 0,
       "delta_files_applied": 1,
@@ -146,24 +156,25 @@
       "observation_count": 64,
       "observation_panel_rows_decoded": 704,
       "reconstruct_calls": 0,
+      "reconstruct_targets": [],
       "repeated_exact_publication_reconstruction_count": 0,
       "scratch_bytes_after": 0,
       "source_sha256": "f02566d75da6189fb009c14c558a494032523b965d63d267e1cc11bb46d11dec",
       "stage_timings_s": {
-        "build_wall_s": 0.153796,
-        "cohort_selection_wall_s": 4.7e-05,
-        "member_materialization_wall_s": 0.065892,
-        "observation_extraction_wall_s": 0.030778,
-        "parquet_hash_wall_s": 0.001269,
-        "parquet_write_wall_s": 0.006708
+        "build_wall_s": 0.178109,
+        "cohort_selection_wall_s": 5.3e-05,
+        "member_materialization_wall_s": 0.075882,
+        "observation_extraction_wall_s": 0.035657,
+        "parquet_hash_wall_s": 0.00136,
+        "parquet_write_wall_s": 0.006694
       },
       "tail_delta_counts": {
         "added": 0,
         "changed": 1,
         "removed": 0
       },
-      "target_cache_hits": 9,
-      "wall_s": 0.153796
+      "target_cache_hits": 10,
+      "wall_s": 0.178109
     },
     {
       "anchor_loads": 2,
@@ -171,6 +182,8 @@
         "cache_db_bytes": 471040,
         "cache_meta_bytes": 585
       },
+      "cache_dataset_manifest_id": "bench-one-step-delta",
+      "cache_seq": 11,
       "checkpoint_hits": 0,
       "checkpoint_misses": 2,
       "delta_files_applied": 21,
@@ -190,17 +203,21 @@
       "observation_count": 64,
       "observation_panel_rows_decoded": 704,
       "reconstruct_calls": 2,
+      "reconstruct_targets": [
+        "bench-one-step-delta",
+        "bench-step-delta-010"
+      ],
       "repeated_exact_publication_reconstruction_count": 0,
       "scratch_bytes_after": 0,
       "source_sha256": "f02566d75da6189fb009c14c558a494032523b965d63d267e1cc11bb46d11dec",
       "stage_timings_s": {
-        "build_wall_s": 0.433951,
+        "build_wall_s": 0.433902,
         "cohort_selection_wall_s": 4.7e-05,
-        "member_materialization_wall_s": 0.346547,
-        "member_reconstruction_wall_s": 0.299742,
-        "observation_extraction_wall_s": 0.030675,
-        "parquet_hash_wall_s": 0.001538,
-        "parquet_write_wall_s": 0.008175
+        "member_materialization_wall_s": 0.332837,
+        "member_reconstruction_wall_s": 0.292428,
+        "observation_extraction_wall_s": 0.034683,
+        "parquet_hash_wall_s": 0.001342,
+        "parquet_write_wall_s": 0.007398
       },
       "tail_delta_counts": {
         "added": 0,
@@ -208,7 +225,7 @@
         "removed": 0
       },
       "target_cache_hits": 9,
-      "wall_s": 0.433951
+      "wall_s": 0.433902
     },
     {
       "anchor_loads": 0,
@@ -216,6 +233,8 @@
         "cache_db_bytes": 471040,
         "cache_meta_bytes": 586
       },
+      "cache_dataset_manifest_id": "bench-deep-delta-100",
+      "cache_seq": 100,
       "checkpoint_hits": 1,
       "checkpoint_misses": 0,
       "delta_files_applied": 0,
@@ -235,16 +254,17 @@
       "observation_count": 64,
       "observation_panel_rows_decoded": 6400,
       "reconstruct_calls": 0,
+      "reconstruct_targets": [],
       "repeated_exact_publication_reconstruction_count": 0,
       "scratch_bytes_after": 0,
       "source_sha256": "db0cacb6bc44d1287e1c467de8eb9ca04c7955f80d9f03f7a997fc73e7083f14",
       "stage_timings_s": {
-        "build_wall_s": 0.905936,
-        "cohort_selection_wall_s": 0.00032,
-        "member_materialization_wall_s": 0.138824,
-        "observation_extraction_wall_s": 0.334013,
-        "parquet_hash_wall_s": 0.001281,
-        "parquet_write_wall_s": 0.021424
+        "build_wall_s": 0.882234,
+        "cohort_selection_wall_s": 0.000306,
+        "member_materialization_wall_s": 0.135399,
+        "observation_extraction_wall_s": 0.309059,
+        "parquet_hash_wall_s": 0.001414,
+        "parquet_write_wall_s": 0.021221
       },
       "tail_delta_counts": {
         "added": 0,
@@ -252,7 +272,7 @@
         "removed": 0
       },
       "target_cache_hits": 99,
-      "wall_s": 0.905936
+      "wall_s": 0.882234
     }
   ],
   "schema": "smial.local-cohort-incremental-materialization-benchmark",

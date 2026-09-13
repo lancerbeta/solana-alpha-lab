@@ -838,6 +838,11 @@ def _try_extend_operational_latest(
         return None
     if target_seq <= 0 or target_seq >= len(publications):
         return None
+    if str(target_publication.get("kind") or "") != "delta":
+        return None
+    canonical_target = publications[target_seq]
+    if not isinstance(canonical_target, Mapping) or canonical_target != target_publication:
+        return None
     previous_publication = publications[target_seq - 1]
     if not isinstance(previous_publication, Mapping):
         return None
@@ -846,14 +851,27 @@ def _try_extend_operational_latest(
         previous_rows = int(previous_publication.get("row_count") or 0)
     except (KeyError, TypeError, ValueError):
         return None
-    if previous_seq != target_seq - 1:
+    expected_previous_kind = "snapshot" if previous_seq == 0 else "delta"
+    if (
+        previous_seq != target_seq - 1
+        or str(previous_publication.get("kind") or "") != expected_previous_kind
+    ):
         return None
     previous_id = str(previous_publication.get("dataset_manifest_id") or "")
     previous_fp = str(previous_publication.get("snapshot_fingerprint") or "")
     target_id = str(target_publication.get("dataset_manifest_id") or "")
     target_fp = str(target_publication.get("snapshot_fingerprint") or "")
     target_rel = str(target_publication.get("rel") or "")
-    if not previous_id or len(previous_fp) != 64 or not target_id or not target_rel:
+    target_row_count = target_publication.get("row_count")
+    if (
+        not previous_id
+        or len(previous_fp) != 64
+        or not target_id
+        or not target_rel
+        or len(target_fp) != 64
+        or not isinstance(target_row_count, int)
+        or target_row_count < 0
+    ):
         return None
 
     prefix = dict(unit)
@@ -908,7 +926,7 @@ def _try_extend_operational_latest(
             raise MembersDeltaError("DELTA_CORRUPT")
         _apply_delta_file_sqlite(conn, path, payload=payload, removed_at_seq=target_seq)
         observed_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
-        if observed_rows != int(target_publication.get("row_count") or 0):
+        if observed_rows != target_row_count:
             raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
         observed_fp = _fingerprint_sqlite(conn)
         if observed_fp != target_fp:

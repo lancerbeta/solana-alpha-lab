@@ -413,6 +413,10 @@ def _build(fixture: dict[str, Any], *, label: str) -> dict[str, Any]:
     counters = extraction_counters()
     stats = reconstruct_stats()
     cache = operational_latest_cache_bytes(fixture["unit_dir"])
+    _db_path, cache_meta_path = _operational_latest_paths(fixture["unit_dir"])
+    cache_meta = {}
+    if cache_meta_path.is_file():
+        cache_meta = json.loads(cache_meta_path.read_text(encoding="utf-8"))
     tail_delta_counts = fixture["unit"]["publications"][-1].get("delta_counts")
     scratch_bytes = sum(
         path.stat().st_size
@@ -428,9 +432,12 @@ def _build(fixture: dict[str, Any], *, label: str) -> dict[str, Any]:
         "stage_timings_s": {key: round(value, 6) for key, value in sorted(timings.items())},
         "anchor_loads": stats["anchor_loads"],
         "reconstruct_calls": stats["reconstruct_calls"],
+        "reconstruct_targets": targets,
         "delta_files_applied": stats["delta_files_applied"],
         "incremental_extensions": stats["incremental_extensions"],
         "tail_delta_counts": tail_delta_counts,
+        "cache_dataset_manifest_id": cache_meta.get("dataset_manifest_id"),
+        "cache_seq": cache_meta.get("seq"),
         "repeated_exact_publication_reconstruction_count": sum(
             count - 1 for count in Counter(targets).values() if count > 1
         ),
@@ -528,10 +535,12 @@ def run_benchmark() -> dict[str, Any]:
             "one_step_reuses_new_tail": (
                 one_step["reconstruct_calls"] == 0
                 and one_step["checkpoint_hits"] == 2
-                and one_step["target_cache_hits"] == 9
+                and one_step["target_cache_hits"] == 10
                 and one_step["member_snapshot_full_column_scans"] == 0
                 and one_step["incremental_extensions"] == 1
                 and one_step["delta_files_applied"] == 1
+                and one_step["cache_dataset_manifest_id"] == "bench-one-step-delta"
+                and one_step["cache_seq"] == 11
                 and one_step["tail_delta_counts"]["added"] == 0
                 and one_step["tail_delta_counts"]["changed"] == 1
                 and one_step["tail_delta_counts"]["removed"] == 0

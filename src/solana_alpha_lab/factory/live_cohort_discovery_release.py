@@ -1266,7 +1266,9 @@ def _cohort_members_into_sqlite(
     batches.sort(key=lambda item: (item[1], item[0]), reverse=True)
     winning_producers: set[str] = set()
     unit_bindings: dict[str, tuple[str, str | None]] = {}
-    unit_prefix_bindings: dict[str, dict[int, tuple[str, str | None]]] = {}
+    unit_prefix_bindings: dict[
+        str, OrderedDict[int, tuple[str, str | None]]
+    ] = {}
     unit_noop_transitions: dict[str, tuple[bool, ...]] = {}
     target_cache: OrderedDict[str, None] = OrderedDict()
     target_state_cache: dict[tuple[str, str, int, str, str], str] = {}
@@ -1358,8 +1360,10 @@ def _cohort_members_into_sqlite(
         publications = list(unit.get("publications") or [])
         if target_seq == len(publications) - 1:
             return current_binding
-        cached = unit_prefix_bindings.setdefault(unit_rel, {}).get(target_seq)
+        prefix_cache = unit_prefix_bindings.setdefault(unit_rel, OrderedDict())
+        cached = prefix_cache.get(target_seq)
         if cached is not None:
+            prefix_cache.move_to_end(target_seq)
             return cached
         prefix = dict(unit)
         prefix["publications"] = publications[: target_seq + 1]
@@ -1384,7 +1388,10 @@ def _cohort_members_into_sqlite(
                 )
             except (MembersDeltaError, OSError):
                 pass
-        unit_prefix_bindings[unit_rel][target_seq] = prefix_binding
+        prefix_cache[target_seq] = prefix_binding
+        prefix_cache.move_to_end(target_seq)
+        while len(prefix_cache) > 8:
+            prefix_cache.popitem(last=False)
         return prefix_binding
 
     def _consume_full_unit_rows(
@@ -1640,6 +1647,76 @@ def _cohort_members_into_sqlite(
                             note_member_checkpoint_hit()
                             source_spill, source_conn = cached
                     if source_conn is None and is_tail and binding[1] is not None:
+                        # Keep the previous tail available for older panels in
+                        # this same build before promoting the durable cache to
+                        # the new tail.  Otherwise the promotion would erase
+                        # the only checkpoint that can satisfy those older PITs.
+                        if target_seq > 0:
+                            previous_publication = unit["publications"][target_seq - 1]
+                            if isinstance(previous_publication, Mapping):
+                                try:
+                                    previous_seq = int(previous_publication["seq"])
+                                    previous_rows = int(
+                                        previous_publication.get("row_count") or 0
+                                    )
+                                except (KeyError, TypeError, ValueError):
+                                    previous_seq = -1
+                                    previous_rows = -1
+                                previous_id = str(
+                                    previous_publication.get("dataset_manifest_id") or ""
+                                )
+                                previous_fp = str(
+                                    previous_publication.get("snapshot_fingerprint") or ""
+                                )
+                                if (
+                                    previous_seq == target_seq - 1
+                                    and previous_rows >= 0
+                                    and previous_id
+                                    and len(previous_fp) == 64
+                                ):
+                                    previous_binding = _unit_prefix_binding(
+                                        unit_rel, unit, previous_seq, binding
+                                    )
+                                    previous_cache_key = _target_key(
+                                        unit_rel,
+                                        previous_id,
+                                        previous_fp,
+                                        previous_seq,
+                                        previous_rows,
+                                        binding,
+                                    )
+                                    if (
+                                        previous_cache_key not in target_cache
+                                        and previous_binding[1] is not None
+                                    ):
+                                        previous_cached = _try_open_operational_latest(
+                                            unit_dir,
+                                            dataset_manifest_id=previous_id,
+                                            snapshot_fingerprint=previous_fp,
+                                            seq=previous_seq,
+                                            row_count=previous_rows,
+                                            canonical_unit_sha256=previous_binding[0],
+                                            canonical_unit_files_sha256=previous_binding[1],
+                                            invalidate_on_identity_mismatch=False,
+                                        )
+                                        if previous_cached is not None:
+                                            note_member_checkpoint_hit()
+                                            previous_spill, previous_conn = previous_cached
+                                            try:
+                                                _cache_target_rows(
+                                                    previous_cache_key,
+                                                    previous_conn,
+                                                    state_key=_target_state_key(
+                                                        unit_rel,
+                                                        previous_fp,
+                                                        previous_rows,
+                                                        binding,
+                                                    ),
+                                                    target_seq=previous_seq,
+                                                )
+                                            finally:
+                                                previous_conn.close()
+                                                previous_spill.unlink(missing_ok=True)
                         extended = _try_extend_operational_latest(
                             Path(observation_rdp_root),
                             unit_dir,
@@ -1649,6 +1726,16 @@ def _cohort_members_into_sqlite(
                         if extended is not None:
                             note_member_checkpoint_hit()
                             source_spill, source_conn = extended
+                            _store_operational_latest(
+                                unit_dir,
+                                source_conn,
+                                dataset_manifest_id=target_id,
+                                snapshot_fingerprint=target_fp,
+                                seq=target_seq,
+                                row_count=target_rows,
+                                canonical_unit_sha256=binding[0],
+                                canonical_unit_files_sha256=binding[1],
+                            )
                     if source_conn is None:
                         note_member_checkpoint_miss()
                         note_member_file_open()

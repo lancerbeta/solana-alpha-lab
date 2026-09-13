@@ -662,6 +662,21 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
             self.assertEqual(stats["incremental_extensions"], 1)
             self.assertEqual(stats["delta_files_applied"], 1)
 
+            invalid_kind = dict(unit["publications"][-1])
+            invalid_kind["kind"] = "snapshot"
+            self.assertIsNone(
+                _try_extend_operational_latest(
+                    data_root, unit_dir, unit, invalid_kind
+                )
+            )
+            invalid_position = dict(unit["publications"][-1])
+            invalid_position["seq"] = 99
+            self.assertIsNone(
+                _try_extend_operational_latest(
+                    data_root, unit_dir, unit, invalid_position
+                )
+            )
+
     def test_canonical_file_binding_rejects_same_stat_byte_mutation(self) -> None:
         """A preserved size/mtime cannot make altered canonical bytes trusted."""
 
