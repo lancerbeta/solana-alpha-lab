@@ -8,9 +8,11 @@ from __future__ import annotations
 
 import json
 import os
+import pickle
 import shutil
 import sqlite3
 import tempfile
+from collections import OrderedDict
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -51,6 +53,9 @@ from solana_alpha_lab.factory.live_cohort_source_bundle import (
     member_from_parquet_row,
     new_staging_dir,
     note_admission_probe_rows,
+    note_member_checkpoint_hit,
+    note_member_checkpoint_miss,
+    note_member_target_cache_hit,
     note_full_member_rows,
     note_member_file_open,
     note_member_full_column_scan,
@@ -67,8 +72,17 @@ from solana_alpha_lab.factory.live_cohort_source_bundle import (
 from solana_alpha_lab.factory.members_snapshot_delta import (
     LAYOUT_KIND,
     MembersDeltaError,
+    canonical_unit_binding,
+    canonical_unit_files_binding,
+    canonical_unit_files_binding_fast,
+    canonical_unit_noop_range,
+    _reconstruct_to_sqlite,
+    _store_operational_latest,
+    _try_extend_operational_latest,
+    _try_open_operational_latest,
+    _contained_data_path,
     iter_member_row_batches_for_location,
-    publication_seq_for_location,
+    iter_spilled_member_rows,
     read_member_layout,
 )
 from solana_alpha_lab.factory.research_store import (
@@ -103,6 +117,8 @@ ADMISSION_REPRESENTATIONS = (
     "discovery_available_at",
 )
 COHORT_WINDOW_DAYS = 7
+_MAX_LOCAL_UNIT_CONTEXTS = 8
+_MAX_LOCAL_PREFIX_BINDINGS = 8
 RELEASE_SCHEMA = "smial.live-cohort-discovery-release"
 RELEASE_SCHEMA_VERSION = "1.0"
 RELEASE_MANIFEST_NAME = "release_manifest.json"
@@ -1074,6 +1090,7 @@ def _cohort_contributing_lineage(
     mint_is_member: Callable[[str], bool],
     cutoff_at: datetime | None = None,
     location_flags: dict[str, tuple[bool, bool]] | None = None,
+    include_observations: bool = True,
 ) -> tuple[list[str], str, set[str]]:
     contributing: set[str] = set()
     coverages: list[str] = []
@@ -1109,45 +1126,55 @@ def _cohort_contributing_lineage(
             continue
         if producer:
             contributing.add(producer)
-    for row in lifecycle_rows:
-        kind = str(row.get("kind") or "")
-        payload = row.get("payload")
-        producer = _sha40(row.get("producer_git_sha"))
-        if kind != "OBSERVATION_BATCH":
-            continue
-        if not _lifecycle_row_at_or_before_cutoff(row, cutoff_at):
-            continue
-        if not isinstance(payload, Mapping):
-            continue
-        location = str(payload.get("observation_location") or payload.get("logical_location") or "")
-        hits_c1 = False
-        if location:
-            path = Path(observation_rdp_root) / location
-            if path.is_file():
+    if include_observations:
+        for row in lifecycle_rows:
+            kind = str(row.get("kind") or "")
+            payload = row.get("payload")
+            producer = _sha40(row.get("producer_git_sha"))
+            if kind != "OBSERVATION_BATCH":
+                continue
+            if not _lifecycle_row_at_or_before_cutoff(row, cutoff_at):
+                continue
+            if not isinstance(payload, Mapping):
+                continue
+            location = str(
+                payload.get("observation_location")
+                or payload.get("logical_location")
+                or ""
+            )
+            hits_c1 = False
+            if location:
                 try:
-                    for batch in iter_parquet_row_batches(
-                        path, columns=("entity_id", "mint")
-                    ):
-                        note_observation_rows(len(batch))
-                        for item in batch:
-                            mint = str(item.get("entity_id") or item.get("mint") or "")
-                            if mint and mint_is_member(mint):
-                                hits_c1 = True
-                                break
-                        if hits_c1:
-                            break
-                except (OSError, pa.ArrowException) as exc:
+                    path = _contained_data_path(Path(observation_rdp_root), location)
+                except MembersDeltaError as exc:
                     raise LiveCohortReleaseError(
                         "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
                     ) from exc
-        manifest = str(payload.get("dataset_manifest_id") or "")
-        if manifest:
-            contributing_manifests.add(manifest)
-        if hits_c1 and producer:
-            contributing.add(producer)
-        raw = payload.get("discovery_coverage_class")
-        if isinstance(raw, str) and raw.strip():
-            coverages.append(raw.strip())
+                if path.is_file():
+                    try:
+                        for batch in iter_parquet_row_batches(
+                            path, columns=("entity_id", "mint")
+                        ):
+                            note_observation_rows(len(batch))
+                            for item in batch:
+                                mint = str(item.get("entity_id") or item.get("mint") or "")
+                                if mint and mint_is_member(mint):
+                                    hits_c1 = True
+                                    break
+                            if hits_c1:
+                                break
+                    except (OSError, pa.ArrowException) as exc:
+                        raise LiveCohortReleaseError(
+                            "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+                        ) from exc
+            manifest = str(payload.get("dataset_manifest_id") or "")
+            if manifest:
+                contributing_manifests.add(manifest)
+            if hits_c1 and producer:
+                contributing.add(producer)
+            raw = payload.get("discovery_coverage_class")
+            if isinstance(raw, str) and raw.strip():
+                coverages.append(raw.strip())
     _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
     return sorted(contributing), _worst_coverage(coverages), contributing_manifests
 
@@ -1205,7 +1232,7 @@ def _cohort_members_into_sqlite(
     cutoff_at: datetime | None = None,
     location_flags: dict[str, tuple[bool, bool]] | None = None,
 ) -> tuple[set[str], int]:
-    """Latest-snapshot full scan; older same-unit SNAPSHOT_PLUS_DELTA uses removed rows."""
+    """Materialize exact PITs with a bounded process-local target cache."""
     conn.execute(
         """
         CREATE TABLE members (
@@ -1240,8 +1267,162 @@ def _cohort_members_into_sqlite(
         )
     batches.sort(key=lambda item: (item[1], item[0]), reverse=True)
     winning_producers: set[str] = set()
-    unit_removed: dict[str, list[dict[str, Any]]] = {}
-    latest_has_in = False
+    unit_contexts: OrderedDict[str, dict[str, Any]] = OrderedDict()
+    target_cache: OrderedDict[str, None] = OrderedDict()
+    target_state_cache: dict[tuple[str, str, int, str, str], str] = {}
+    target_state_sequences: dict[tuple[str, str, int, str, str], int] = {}
+    target_state_flags: dict[str, tuple[bool, bool, int]] = {}
+    conn.execute(
+        """
+        CREATE TEMP TABLE materialization_target_rows (
+            cache_key TEXT NOT NULL,
+            row_order INTEGER PRIMARY KEY AUTOINCREMENT,
+            payload BLOB NOT NULL
+        )
+        """
+    )
+
+    def _validated_publication(
+        publications: Sequence[Mapping[str, Any]], target_id: str
+    ) -> dict[str, Any] | None:
+        for publication in publications:
+            if not isinstance(publication, Mapping):
+                continue
+            if str(publication.get("dataset_manifest_id") or "") != target_id:
+                continue
+            try:
+                seq = int(publication["seq"])
+                row_count = int(publication.get("row_count") or 0)
+            except (KeyError, TypeError, ValueError):
+                return None
+            fingerprint = str(publication.get("snapshot_fingerprint") or "")
+            if (
+                seq < 0
+                or row_count < 0
+                or len(fingerprint) != 64
+                or any(char not in "0123456789abcdef" for char in fingerprint)
+            ):
+                return None
+            normalized = dict(publication)
+            normalized["seq"] = seq
+            normalized["row_count"] = row_count
+            normalized["snapshot_fingerprint"] = fingerprint
+            return normalized
+        return None
+
+    def _unit_target(
+        layout: Mapping[str, Any] | None,
+    ) -> tuple[Path, dict[str, Any], bool, Mapping[str, Any]] | None:
+        if not isinstance(layout, Mapping) or str(layout.get("kind") or "") != LAYOUT_KIND:
+            return None
+        unit_rel = str(layout.get("unit_rel") or "")
+        target_id = str(layout.get("dataset_manifest_id") or "")
+        if not unit_rel or not target_id:
+            return None
+        try:
+            unit_path = _contained_data_path(Path(observation_rdp_root), unit_rel)
+        except MembersDeltaError as exc:
+            raise LiveCohortReleaseError(
+                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+            ) from exc
+        try:
+            unit = json.loads(unit_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            return None
+        if not isinstance(unit, Mapping):
+            return None
+        publications = list(unit.get("publications") or [])
+        target = _validated_publication(publications, target_id)
+        if target is None:
+            return None
+        is_tail = bool(publications) and target_id == str(
+            publications[-1].get("dataset_manifest_id") or ""
+        )
+        return unit_path.parent, target, is_tail, unit
+
+    def _unit_context(unit_rel: str) -> dict[str, Any]:
+        context = unit_contexts.get(unit_rel)
+        if context is None:
+            context = {"binding": None, "prefix_bindings": OrderedDict()}
+            unit_contexts[unit_rel] = context
+        unit_contexts.move_to_end(unit_rel)
+        while len(unit_contexts) > _MAX_LOCAL_UNIT_CONTEXTS:
+            unit_contexts.popitem(last=False)
+        return context
+
+    def _unit_prefix_binding(
+        unit_rel: str,
+        unit: Mapping[str, Any],
+        target_seq: int,
+        current_binding: tuple[str, str | None],
+    ) -> tuple[str, str | None]:
+        """Return the exact cache binding for the target's unit prefix.
+
+        A canonical append can leave the durable latest cache one publication
+        behind while older observation panels still point at that prior tail.
+        Reusing that cache is safe only when its own prefix metadata and file
+        bytes bind exactly to the requested PIT.  Prefix bindings are memoized
+        per unit and never change the scientific RDP.
+        """
+
+        publications = list(unit.get("publications") or [])
+        if target_seq == len(publications) - 1:
+            return current_binding
+        context = _unit_context(unit_rel)
+        prefix_cache = context["prefix_bindings"]
+        cached = prefix_cache.get(target_seq)
+        if cached is not None:
+            prefix_cache.move_to_end(target_seq)
+            return cached
+        prefix = dict(unit)
+        prefix["publications"] = publications[: target_seq + 1]
+        target_publication = prefix["publications"][-1]
+        target_chain = str(
+            target_publication.get("canonical_files_binding_sha256") or ""
+        )
+        if target_chain:
+            prefix["canonical_files_binding_sha256"] = target_chain
+        else:
+            prefix.pop("canonical_files_binding_sha256", None)
+        prefix_binding = (canonical_unit_binding(prefix), None)
+        prefix_binding = (
+            prefix_binding[0],
+            canonical_unit_files_binding_fast(prefix),
+        )
+        if prefix_binding[1] is None:
+            try:
+                prefix_binding = (
+                    prefix_binding[0],
+                    canonical_unit_files_binding(Path(observation_rdp_root), prefix),
+                )
+            except (MembersDeltaError, OSError):
+                pass
+        prefix_cache[target_seq] = prefix_binding
+        prefix_cache.move_to_end(target_seq)
+        while len(prefix_cache) > _MAX_LOCAL_PREFIX_BINDINGS:
+            prefix_cache.popitem(last=False)
+        return prefix_binding
+
+    def _consume_full_unit_rows(
+        rows: Iterator[Mapping[str, Any]], producer_sha: str | None
+    ) -> tuple[bool, bool, int]:
+        loc_has_in = False
+        loc_later = False
+        consumed = 0
+        for member in rows:
+            if not isinstance(member, Mapping):
+                continue
+            consumed += 1
+            admission = resolve_cohort_admission_instant(member)
+            if admission is not None:
+                if window_start <= admission < window_end:
+                    loc_has_in = True
+                elif admission >= window_end:
+                    loc_later = True
+            _ingest(member, producer_sha)
+        if consumed:
+            note_full_member_rows(consumed)
+        return loc_has_in, loc_later, consumed
 
     def _ingest(member: Mapping[str, Any], producer_sha: str | None) -> bool:
         if not isinstance(member, Mapping):
@@ -1289,50 +1470,332 @@ def _cohort_members_into_sqlite(
             winning_producers.add(producer_sha)
         return loc_has_in or loc_later
 
+    def _target_key(
+        unit_rel: str,
+        target_id: str,
+        target_fp: str,
+        target_seq: int,
+        target_rows: int,
+        binding: tuple[str, str | None],
+    ) -> str:
+        return "\x1f".join(
+            (
+                unit_rel,
+                target_id,
+                target_fp,
+                str(target_seq),
+                str(target_rows),
+                binding[0],
+                str(binding[1] or ""),
+            )
+        )
+
+    def _target_state_key(
+        unit_rel: str,
+        target_fp: str,
+        target_rows: int,
+        binding: tuple[str, str | None],
+    ) -> tuple[str, str, int, str, str]:
+        """Identify equal materialized state without conflating unit histories."""
+
+        return (
+            unit_rel,
+            target_fp,
+            target_rows,
+            binding[0],
+            str(binding[1] or ""),
+        )
+
+    def _state_transition_is_noop(
+        unit_rel: str,
+        unit: Mapping[str, Any],
+        lower_seq: int,
+        upper_seq: int,
+    ) -> bool:
+        if lower_seq == upper_seq:
+            return True
+        if lower_seq > upper_seq:
+            lower_seq, upper_seq = upper_seq, lower_seq
+        _unit_context(unit_rel)
+        return canonical_unit_noop_range(unit, lower_seq, upper_seq) is True
+
+    def _cache_target_rows(
+        cache_key: str,
+        source_conn: Any,
+        *,
+        state_key: tuple[str, str, int, str, str],
+        target_seq: int,
+    ) -> None:
+        batch: list[tuple[str, bytes]] = []
+        for (payload,) in source_conn.execute("SELECT payload FROM members ORDER BY seq"):
+            if not isinstance(payload, (bytes, bytearray, memoryview)):
+                raise LiveCohortReleaseError("LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE")
+            batch.append((cache_key, bytes(payload)))
+            if len(batch) >= 2048:
+                conn.executemany(
+                    "INSERT INTO materialization_target_rows(cache_key, payload) VALUES (?,?)",
+                    batch,
+                )
+                batch = []
+        if batch:
+            conn.executemany(
+                "INSERT INTO materialization_target_rows(cache_key, payload) VALUES (?,?)",
+                batch,
+            )
+        target_cache[cache_key] = None
+        target_cache.move_to_end(cache_key)
+        while len(target_cache) > 8:
+            evicted, _ = target_cache.popitem(last=False)
+            conn.execute(
+                "DELETE FROM materialization_target_rows WHERE cache_key=?", (evicted,)
+            )
+            for state, mapped_key in list(target_state_cache.items()):
+                if mapped_key == evicted:
+                    del target_state_cache[state]
+                    target_state_sequences.pop(state, None)
+            target_state_flags.pop(evicted, None)
+        target_state_cache[state_key] = cache_key
+        target_state_sequences[state_key] = target_seq
+
+    def _iter_cached_target_rows(cache_key: str) -> Iterator[Mapping[str, Any]]:
+        for (payload,) in conn.execute(
+            "SELECT payload FROM materialization_target_rows WHERE cache_key=? ORDER BY row_order",
+            (cache_key,),
+        ):
+            try:
+                row = pickle.loads(payload)
+            except Exception as exc:
+                raise LiveCohortReleaseError(
+                    "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+                ) from exc
+            if not isinstance(row, Mapping):
+                raise LiveCohortReleaseError("LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE")
+            yield row
+
     for rank, (_index, _order, payload, producer) in enumerate(batches):
         location = str(payload.get("member_location") or "")
-        layout = read_member_layout(observation_rdp_root, location)
+        try:
+            layout = read_member_layout(observation_rdp_root, location)
+        except MembersDeltaError as exc:
+            raise LiveCohortReleaseError(
+                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+            ) from exc
         unit_rel = (
             str(layout.get("unit_rel") or "")
             if isinstance(layout, Mapping) and str(layout.get("kind") or "") == LAYOUT_KIND
             else ""
         )
-        loc_seq = publication_seq_for_location(observation_rdp_root, location, layout)
-        if rank > 0 and unit_rel and unit_rel in unit_removed:
-            recovered: list[dict[str, Any]] = []
-            for item in unit_removed[unit_rel]:
-                removed_at = item.get("_delta_removed_at_seq")
-                if loc_seq is not None and removed_at is not None:
-                    try:
-                        if int(removed_at) <= loc_seq:
-                            continue
-                    except (TypeError, ValueError):
-                        pass
-                recovered.append(item)
-                _ingest(item, producer)
-            has_in = latest_has_in
-            later = False
-            for member in recovered:
-                admission = resolve_cohort_admission_instant(
-                    {key: value for key, value in member.items() if key != "_delta_removed_at_seq"}
+        target = _unit_target(layout)
+        if unit_rel and target is not None:
+            unit_dir, publication, is_tail, unit = target
+            target_id = str(publication["dataset_manifest_id"])
+            target_fp = str(publication["snapshot_fingerprint"])
+            target_seq = int(publication["seq"])
+            target_rows = int(publication["row_count"])
+            unit_context = _unit_context(unit_rel)
+            binding = unit_context.get("binding")
+            if binding is None:
+                unit_sha = canonical_unit_binding(unit)
+                try:
+                    files_sha = canonical_unit_files_binding_fast(unit)
+                    if files_sha is None:
+                        files_sha = canonical_unit_files_binding(
+                            Path(observation_rdp_root), unit
+                        )
+                except (MembersDeltaError, OSError):
+                    files_sha = None
+                binding = (unit_sha, files_sha)
+                unit_context["binding"] = binding
+            loc_has_in: bool
+            loc_later: bool
+            consumed: int
+            cache_key = _target_key(
+                unit_rel, target_id, target_fp, target_seq, target_rows, binding
+            )
+            state_key = _target_state_key(unit_rel, target_fp, target_rows, binding)
+            source_cache_key = cache_key
+            if cache_key in target_cache:
+                target_cache.move_to_end(cache_key)
+                note_member_target_cache_hit()
+            elif (
+                cached_state_key := target_state_cache.get(state_key)
+            ) is not None and cached_state_key in target_cache and _state_transition_is_noop(
+                unit_rel,
+                unit,
+                target_seq,
+                target_state_sequences[state_key],
+            ):
+                source_cache_key = cached_state_key
+                target_cache.move_to_end(cached_state_key)
+                note_member_target_cache_hit()
+            else:
+                source_spill: Path | None = None
+                source_conn: Any | None = None
+                try:
+                    cache_binding = _unit_prefix_binding(
+                        unit_rel, unit, target_seq, binding
+                    )
+                    if cache_binding[1] is not None:
+                        cached = _try_open_operational_latest(
+                            unit_dir,
+                            dataset_manifest_id=target_id,
+                            snapshot_fingerprint=target_fp,
+                            seq=target_seq,
+                            row_count=target_rows,
+                            canonical_unit_sha256=cache_binding[0],
+                            canonical_unit_files_sha256=cache_binding[1],
+                            invalidate_on_identity_mismatch=False,
+                        )
+                        if cached is not None:
+                            note_member_checkpoint_hit()
+                            source_spill, source_conn = cached
+                    if source_conn is None and is_tail and binding[1] is not None:
+                        # Keep the previous tail available for older panels in
+                        # this same build before promoting the durable cache to
+                        # the new tail.  Otherwise the promotion would erase
+                        # the only checkpoint that can satisfy those older PITs.
+                        if target_seq > 0:
+                            previous_publication = unit["publications"][target_seq - 1]
+                            if isinstance(previous_publication, Mapping):
+                                try:
+                                    previous_seq = int(previous_publication["seq"])
+                                    previous_rows = int(
+                                        previous_publication.get("row_count") or 0
+                                    )
+                                except (KeyError, TypeError, ValueError):
+                                    previous_seq = -1
+                                    previous_rows = -1
+                                previous_id = str(
+                                    previous_publication.get("dataset_manifest_id") or ""
+                                )
+                                previous_fp = str(
+                                    previous_publication.get("snapshot_fingerprint") or ""
+                                )
+                                if (
+                                    previous_seq == target_seq - 1
+                                    and previous_rows >= 0
+                                    and previous_id
+                                    and len(previous_fp) == 64
+                                ):
+                                    previous_binding = _unit_prefix_binding(
+                                        unit_rel, unit, previous_seq, binding
+                                    )
+                                    previous_cache_key = _target_key(
+                                        unit_rel,
+                                        previous_id,
+                                        previous_fp,
+                                        previous_seq,
+                                        previous_rows,
+                                        binding,
+                                    )
+                                    if (
+                                        previous_cache_key not in target_cache
+                                        and previous_binding[1] is not None
+                                    ):
+                                        previous_cached = _try_open_operational_latest(
+                                            unit_dir,
+                                            dataset_manifest_id=previous_id,
+                                            snapshot_fingerprint=previous_fp,
+                                            seq=previous_seq,
+                                            row_count=previous_rows,
+                                            canonical_unit_sha256=previous_binding[0],
+                                            canonical_unit_files_sha256=previous_binding[1],
+                                            invalidate_on_identity_mismatch=False,
+                                        )
+                                        if previous_cached is not None:
+                                            note_member_checkpoint_hit()
+                                            previous_spill, previous_conn = previous_cached
+                                            try:
+                                                _cache_target_rows(
+                                                    previous_cache_key,
+                                                    previous_conn,
+                                                    state_key=_target_state_key(
+                                                        unit_rel,
+                                                        previous_fp,
+                                                        previous_rows,
+                                                        binding,
+                                                    ),
+                                                    target_seq=previous_seq,
+                                                )
+                                            finally:
+                                                previous_conn.close()
+                                                previous_spill.unlink(missing_ok=True)
+                        extended = _try_extend_operational_latest(
+                            Path(observation_rdp_root),
+                            unit_dir,
+                            unit,
+                            publication,
+                        )
+                        if extended is not None:
+                            note_member_checkpoint_hit()
+                            source_spill, source_conn = extended
+                            _store_operational_latest(
+                                unit_dir,
+                                source_conn,
+                                dataset_manifest_id=target_id,
+                                snapshot_fingerprint=target_fp,
+                                seq=target_seq,
+                                row_count=target_rows,
+                                canonical_unit_sha256=binding[0],
+                                canonical_unit_files_sha256=binding[1],
+                            )
+                    if source_conn is None:
+                        note_member_checkpoint_miss()
+                        note_member_file_open()
+                        note_member_full_column_scan()
+                        source_spill, source_conn, reconstructed_fp = _reconstruct_to_sqlite(
+                            observation_rdp_root,
+                            unit,
+                            target_id,
+                        )
+                        _require(
+                            reconstructed_fp == target_fp,
+                            "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE",
+                        )
+                        if is_tail:
+                            _store_operational_latest(
+                                unit_dir,
+                                source_conn,
+                                dataset_manifest_id=target_id,
+                                snapshot_fingerprint=target_fp,
+                                seq=target_seq,
+                                row_count=target_rows,
+                                canonical_unit_sha256=binding[0],
+                                canonical_unit_files_sha256=binding[1],
+                            )
+                    _cache_target_rows(
+                        cache_key,
+                        source_conn,
+                        state_key=state_key,
+                        target_seq=target_seq,
+                    )
+                except (MembersDeltaError, OSError, sqlite3.Error, pa.ArrowException) as exc:
+                    raise LiveCohortReleaseError(
+                        "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+                    ) from exc
+                finally:
+                    if source_conn is not None:
+                        source_conn.close()
+                    if source_spill is not None:
+                        source_spill.unlink(missing_ok=True)
+            cached_flags = target_state_flags.get(source_cache_key)
+            if cached_flags is None:
+                cached_flags = _consume_full_unit_rows(
+                    _iter_cached_target_rows(source_cache_key), producer
                 )
-                if admission is None:
-                    continue
-                if window_start <= admission < window_end:
-                    has_in = True
-                elif admission >= window_end:
-                    later = True
-            flags[location] = (has_in, later)
+                target_state_flags[source_cache_key] = cached_flags
+            loc_has_in, loc_later, consumed = cached_flags
+            _require(consumed == target_rows, "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE")
+            flags[location] = (loc_has_in, loc_later)
             continue
+
         if rank == 0:
-            removed_acc: list[dict[str, Any]] = []
             loc_has_in = False
             loc_later = False
             for batch in _iter_member_batches(
                 observation_rdp_root,
                 location,
                 columns=None,
-                removed_out=removed_acc if unit_rel else None,
             ):
                 for member in batch:
                     if not isinstance(member, Mapping):
@@ -1345,9 +1808,6 @@ def _cohort_members_into_sqlite(
                             loc_later = True
                     _ingest(member, producer)
             flags[location] = (loc_has_in, loc_later)
-            latest_has_in = loc_has_in
-            if unit_rel:
-                unit_removed[unit_rel] = removed_acc
             continue
         conn.execute("DELETE FROM needed")
         loc_has_in = False
@@ -1393,6 +1853,7 @@ def _cohort_members_into_sqlite(
             if int(conn.execute("SELECT COUNT(*) FROM needed").fetchone()[0]) == 0:
                 break
     conn.execute("DELETE FROM needed")
+    conn.execute("DROP TABLE materialization_target_rows")
     conn.commit()
     member_count = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
     return winning_producers, member_count
@@ -1442,7 +1903,12 @@ def latest_c1_observation_manifest_at(
         for manifest_order, _manifest_id, location in _iter_observation_panel_locations(
             observation_rdp_root, not_after=not_after, skip_unparseable=True
         ):
-            path = Path(observation_rdp_root) / location
+            try:
+                path = _contained_data_path(Path(observation_rdp_root), location)
+            except MembersDeltaError as exc:
+                raise LiveCohortReleaseError(
+                    "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+                ) from exc
             if not path.is_file():
                 continue
             stamp = _render_utc(manifest_order)
@@ -1557,6 +2023,8 @@ def _cohort_observations_into_sqlite(
     activation_id: str,
     mint_is_member: Callable[[str], bool],
     cutoff_at: datetime | None = None,
+    lifecycle_rows: Sequence[Mapping[str, Any]] | None = None,
+    observation_lineage: dict[str, Any] | None = None,
 ) -> int:
     """C1 observations by member mint identity; newest panel wins."""
     conn.execute(
@@ -1572,17 +2040,63 @@ def _cohort_observations_into_sqlite(
         )
         """
     )
+    observation_events: dict[str, list[tuple[str, str]]] = {}
+    lineage_producers: set[str] = set()
+    lineage_coverages: list[str] = []
+    lineage_manifests: set[str] = set()
+    if observation_lineage is not None:
+        for row in lifecycle_rows or ():
+            if str(row.get("kind") or "") != "OBSERVATION_BATCH":
+                continue
+            if not _lifecycle_row_at_or_before_cutoff(row, cutoff_at):
+                continue
+            payload = row.get("payload")
+            if not isinstance(payload, Mapping):
+                continue
+            location = str(
+                payload.get("observation_location")
+                or payload.get("logical_location")
+                or ""
+            )
+            if not location:
+                continue
+            producer = _sha40(row.get("producer_git_sha"))
+            manifest = str(payload.get("dataset_manifest_id") or "")
+            if manifest:
+                lineage_manifests.add(manifest)
+            raw_coverage = payload.get("discovery_coverage_class")
+            if isinstance(raw_coverage, str) and raw_coverage.strip():
+                lineage_coverages.append(raw_coverage.strip())
+            observation_events.setdefault(location, []).append((producer, manifest))
+
+    def _safe_observation_batches(path: Path) -> Iterator[list[dict[str, Any]]]:
+        try:
+            yield from iter_parquet_row_batches(path)
+        except (OSError, pa.ArrowException) as exc:
+            raise LiveCohortReleaseError(
+                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+            ) from exc
+
     for _order, _manifest_id, location in _iter_observation_panel_locations(
         observation_rdp_root, not_after=cutoff_at, newest_first=False
     ):
-        path = Path(observation_rdp_root) / location
+        try:
+            path = _contained_data_path(Path(observation_rdp_root), location)
+        except MembersDeltaError as exc:
+            raise LiveCohortReleaseError(
+                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
+            ) from exc
         if not path.is_file():
             continue
-        for batch in iter_parquet_row_batches(path):
+        hits_c1 = False
+        for batch in _safe_observation_batches(path):
             note_observation_rows(len(batch))
             for row in batch:
                 if not isinstance(row, Mapping):
                     continue
+                mint = str(row.get("entity_id") or row.get("mint") or "")
+                if mint and mint_is_member(mint):
+                    hits_c1 = True
                 if row.get("schedule_sha256") not in {None, "", schedule_sha256}:
                     continue
                 for item in _explode_observation_rows(
@@ -1608,7 +2122,19 @@ def _cohort_observations_into_sqlite(
                             json.dumps(item, sort_keys=True, separators=(",", ":")),
                         ),
                     )
+        if observation_lineage is not None and hits_c1:
+            for producer, _manifest in observation_events.get(location, []):
+                if producer:
+                    lineage_producers.add(producer)
     conn.commit()
+    if observation_lineage is not None:
+        observation_lineage.update(
+            {
+                "producers": lineage_producers,
+                "coverages": lineage_coverages,
+                "manifests": lineage_manifests,
+            }
+        )
     return int(conn.execute("SELECT COUNT(*) FROM observations").fetchone()[0])
 
 
@@ -1704,17 +2230,26 @@ def build_live_observation_source_from_rdp(
             mint_is_member=_member_in_extract,
             cutoff_at=cutoff_at,
             location_flags=location_flags,
+            include_observations=False,
         )
-        contributing = sorted(set(contributing) | winning_producers)
-        _cohort_observations_into_sqlite(
+        observation_lineage: dict[str, Any] = {}
+        extracted_observation_count = _cohort_observations_into_sqlite(
             root,
             conn=conn,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
             mint_is_member=_member_in_extract,
             cutoff_at=cutoff_at,
+            lifecycle_rows=lifecycle_rows,
+            observation_lineage=observation_lineage,
+        )
+        contributing = sorted(
+            set(contributing)
+            | winning_producers
+            | set(observation_lineage.get("producers") or ())
         )
         observed_classes = [lineage_coverage]
+        observed_classes.extend(observation_lineage.get("coverages") or ())
         if isinstance(discovery_coverage_class, str) and discovery_coverage_class.strip():
             observed_classes.append(discovery_coverage_class.strip())
         resolved_coverage = _worst_coverage(observed_classes)
@@ -1753,6 +2288,10 @@ def build_live_observation_source_from_rdp(
         )
         observation_count = write_parquet_from_row_batches(
             obs_path, _obs_batches(), schema=OBSERVATION_SCHEMA
+        )
+        _require(
+            observation_count == extracted_observation_count,
+            "RELEASE_INVALID_SOURCE_INTEGRITY",
         )
         _require(member_count == extracted_members, "RELEASE_INVALID_SOURCE_INTEGRITY")
         members_sha = sha256_file_streaming(members_path)

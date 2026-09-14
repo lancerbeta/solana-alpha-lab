@@ -67,6 +67,9 @@ _EXTRACTION_COUNTERS = {
     "member_snapshot_admission_probes": 0,
     "member_parquet_files_opened": 0,
     "observation_panel_rows_decoded": 0,
+    "member_checkpoint_hits": 0,
+    "member_checkpoint_misses": 0,
+    "member_target_cache_hits": 0,
 }
 
 
@@ -97,6 +100,18 @@ def note_admission_probe_rows(count: int) -> None:
 
 def note_observation_rows(count: int) -> None:
     _EXTRACTION_COUNTERS["observation_panel_rows_decoded"] += int(count)
+
+
+def note_member_checkpoint_hit() -> None:
+    _EXTRACTION_COUNTERS["member_checkpoint_hits"] += 1
+
+
+def note_member_checkpoint_miss() -> None:
+    _EXTRACTION_COUNTERS["member_checkpoint_misses"] += 1
+
+
+def note_member_target_cache_hit() -> None:
+    _EXTRACTION_COUNTERS["member_target_cache_hits"] += 1
 
 
 def sha256_file_streaming(path: Path, *, chunk_size: int = HASH_CHUNK) -> str:

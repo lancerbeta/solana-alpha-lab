@@ -832,10 +832,10 @@ class LiveCohortMemoryBoundedPublicationTests(unittest.TestCase):
 
         ten = _build_with_snapshots(10)
         hundred = _build_with_snapshots(100)
-        self.assertEqual(ten["reconstruct_calls"], 1)
-        self.assertEqual(hundred["reconstruct_calls"], 1)
-        self.assertEqual(ten["member_snapshot_full_column_scans"], 1)
-        self.assertEqual(hundred["member_snapshot_full_column_scans"], 1)
+        self.assertEqual(ten["reconstruct_calls"], 0)
+        self.assertEqual(hundred["reconstruct_calls"], 0)
+        self.assertEqual(ten["member_snapshot_full_column_scans"], 0)
+        self.assertEqual(hundred["member_snapshot_full_column_scans"], 0)
         self.assertLess(
             hundred["full_member_row_materializations"],
             ten["full_member_row_materializations"] * 2,

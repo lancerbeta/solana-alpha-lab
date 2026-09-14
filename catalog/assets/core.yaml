@@ -33963,7 +33963,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: 7a2627e9daa12fcde2073cec754ef5b096112cb17566860a76d50745cb92e53f}
+  integrity: {kind: sha256, sha256: f1a1d08fd00e89a0af326067d501d2c14cb932a3b3e554efd5ca9a8da7f1cbad}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -34073,7 +34073,7 @@ records:
   as_of: '2026-09-11'
   truth_owner: LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_source_bundle.py', repository_path: src/solana_alpha_lab/factory/live_cohort_source_bundle.py}
-  integrity: {kind: sha256, sha256: ff5c11941b57adce05489fff9f0b455c37bb56745e4d1b813e3159d187814d4d}
+  integrity: {kind: sha256, sha256: 531d669ddce2d9ffc58ec7d56ad1aca047e6b6282deca27c6996c0e80aeb8669}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001}
@@ -34091,7 +34091,7 @@ records:
   as_of: '2026-09-11'
   truth_owner: LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_memory_bounded_publication_v1.py', repository_path: tests/test_live_cohort_memory_bounded_publication_v1.py}
-  integrity: {kind: sha256, sha256: e7775b56d07a45019ffefa7466d7e8ea578275905c99dda1ab90ce3c7a085e54}
+  integrity: {kind: sha256, sha256: 52fe87c83ff25e5707223232601154372451a514172d8c585903f4bdafde6de6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-MEMORY-BOUNDED-PUBLICATION-001}

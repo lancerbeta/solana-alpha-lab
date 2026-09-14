@@ -1,0 +1,366 @@
+{
+  "acceptance": {
+    "cold_replays_once": true,
+    "deep_history_same_warm_class": true,
+    "deep_noop_range_bounded": true,
+    "no_repeated_exact_publication_reconstruction": true,
+    "one_step_reuses_new_tail": true,
+    "one_step_source_parity": true,
+    "scratch_clean_after_warm_paths": true,
+    "unchanged_source_parity": true,
+    "warm_reuses_tail": true,
+    "writer_binding_incremental": true
+  },
+  "all_acceptance_pass": true,
+  "member_count": 512,
+  "network": "NONE",
+  "non_claims": [
+    "NOT_LIVE_C1",
+    "NOT_LIVE_HOST_SLO",
+    "NO_PROVIDER_BEHAVIOR",
+    "NO_VPS_RUNTIME_CHANGE",
+    "NO_SEAL_VERIFY_IMPORT",
+    "NO_FORGE_EXECUTION"
+  ],
+  "observation_history": {
+    "cold_decoded_rows": 640,
+    "deep_decoded_rows": 6400,
+    "deep_noop_decoded_rows": 6400,
+    "deep_to_one_step_decoded_row_ratio": 9.091,
+    "note": "The patch removes the duplicate lineage pass; an index for historical observation panels is outside this atom.",
+    "one_step_decoded_rows": 704,
+    "status": "LINEAR_WITH_CONSIDERED_OBSERVATION_PANEL_INPUT"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "provider_calls": 0,
+  "python_version": "3.13.14",
+  "scenarios": [
+    {
+      "anchor_loads": 1,
+      "cache_bytes": {
+        "cache_db_bytes": 471040,
+        "cache_meta_bytes": 585
+      },
+      "cache_dataset_manifest_id": "bench-cold-delta-010",
+      "cache_seq": 10,
+      "canonical_binding_extensions": 0,
+      "canonical_binding_full_refreshes": 0,
+      "checkpoint_hits": 0,
+      "checkpoint_misses": 1,
+      "delta_files_applied": 10,
+      "full_member_row_materializations": 512,
+      "incremental_extensions": 0,
+      "label": "cold_depth_10",
+      "member_count": 512,
+      "member_snapshot_admission_probes": 0,
+      "member_snapshot_full_column_scans": 1,
+      "non_claims": [
+        "NOT_LIVE_HOST_MEASUREMENT",
+        "NO_PROVIDER_CALLS",
+        "NO_VPS",
+        "NO_SEAL_VERIFY_IMPORT",
+        "NO_FORGE_EXECUTION"
+      ],
+      "noop_marker_files_scanned": 0,
+      "noop_range_fallbacks": 0,
+      "noop_range_fast_hits": 0,
+      "observation_count": 64,
+      "observation_panel_rows_decoded": 640,
+      "reconstruct_calls": 1,
+      "reconstruct_targets": [
+        "bench-cold-delta-010"
+      ],
+      "repeated_exact_publication_reconstruction_count": 0,
+      "scratch_bytes_after": 0,
+      "source_sha256": "e67ae65bcc981be0a2a3f2a17183797dbc943d4452bfea2fa95f9b5b21894ab4",
+      "stage_timings_s": {
+        "build_wall_s": 0.273768,
+        "cohort_selection_wall_s": 5.6e-05,
+        "member_materialization_wall_s": 0.18878,
+        "member_reconstruction_wall_s": 0.156502,
+        "observation_extraction_wall_s": 0.02873,
+        "parquet_hash_wall_s": 0.001402,
+        "parquet_write_wall_s": 0.006604
+      },
+      "tail_delta_counts": {
+        "added": 0,
+        "changed": 512,
+        "removed": 0
+      },
+      "target_cache_hits": 9,
+      "wall_s": 0.273768
+    },
+    {
+      "anchor_loads": 0,
+      "cache_bytes": {
+        "cache_db_bytes": 471040,
+        "cache_meta_bytes": 585
+      },
+      "cache_dataset_manifest_id": "bench-cold-delta-010",
+      "cache_seq": 10,
+      "canonical_binding_extensions": 0,
+      "canonical_binding_full_refreshes": 0,
+      "checkpoint_hits": 1,
+      "checkpoint_misses": 0,
+      "delta_files_applied": 0,
+      "full_member_row_materializations": 512,
+      "incremental_extensions": 0,
+      "label": "warm_unchanged_depth_10",
+      "member_count": 512,
+      "member_snapshot_admission_probes": 0,
+      "member_snapshot_full_column_scans": 0,
+      "non_claims": [
+        "NOT_LIVE_HOST_MEASUREMENT",
+        "NO_PROVIDER_CALLS",
+        "NO_VPS",
+        "NO_SEAL_VERIFY_IMPORT",
+        "NO_FORGE_EXECUTION"
+      ],
+      "noop_marker_files_scanned": 0,
+      "noop_range_fallbacks": 0,
+      "noop_range_fast_hits": 0,
+      "observation_count": 64,
+      "observation_panel_rows_decoded": 640,
+      "reconstruct_calls": 0,
+      "reconstruct_targets": [],
+      "repeated_exact_publication_reconstruction_count": 0,
+      "scratch_bytes_after": 0,
+      "source_sha256": "e67ae65bcc981be0a2a3f2a17183797dbc943d4452bfea2fa95f9b5b21894ab4",
+      "stage_timings_s": {
+        "build_wall_s": 0.114077,
+        "cohort_selection_wall_s": 4.9e-05,
+        "member_materialization_wall_s": 0.034092,
+        "observation_extraction_wall_s": 0.028788,
+        "parquet_hash_wall_s": 0.001287,
+        "parquet_write_wall_s": 0.006345
+      },
+      "tail_delta_counts": {
+        "added": 0,
+        "changed": 512,
+        "removed": 0
+      },
+      "target_cache_hits": 9,
+      "wall_s": 0.114077
+    },
+    {
+      "anchor_loads": 0,
+      "cache_bytes": {
+        "cache_db_bytes": 471040,
+        "cache_meta_bytes": 585
+      },
+      "cache_dataset_manifest_id": "bench-one-step-delta",
+      "cache_seq": 11,
+      "canonical_binding_extensions": 0,
+      "canonical_binding_full_refreshes": 0,
+      "checkpoint_hits": 2,
+      "checkpoint_misses": 0,
+      "delta_files_applied": 1,
+      "full_member_row_materializations": 1024,
+      "incremental_extensions": 1,
+      "label": "one_step_incremental_depth_11",
+      "member_count": 512,
+      "member_snapshot_admission_probes": 0,
+      "member_snapshot_full_column_scans": 0,
+      "non_claims": [
+        "NOT_LIVE_HOST_MEASUREMENT",
+        "NO_PROVIDER_CALLS",
+        "NO_VPS",
+        "NO_SEAL_VERIFY_IMPORT",
+        "NO_FORGE_EXECUTION"
+      ],
+      "noop_marker_files_scanned": 0,
+      "noop_range_fallbacks": 0,
+      "noop_range_fast_hits": 0,
+      "observation_count": 64,
+      "observation_panel_rows_decoded": 704,
+      "reconstruct_calls": 0,
+      "reconstruct_targets": [],
+      "repeated_exact_publication_reconstruction_count": 0,
+      "scratch_bytes_after": 0,
+      "source_sha256": "f02566d75da6189fb009c14c558a494032523b965d63d267e1cc11bb46d11dec",
+      "stage_timings_s": {
+        "build_wall_s": 0.318711,
+        "cohort_selection_wall_s": 6.1e-05,
+        "member_materialization_wall_s": 0.223377,
+        "observation_extraction_wall_s": 0.034793,
+        "parquet_hash_wall_s": 0.001263,
+        "parquet_write_wall_s": 0.006835
+      },
+      "tail_delta_counts": {
+        "added": 0,
+        "changed": 1,
+        "removed": 0
+      },
+      "target_cache_hits": 10,
+      "wall_s": 0.318711
+    },
+    {
+      "anchor_loads": 2,
+      "cache_bytes": {
+        "cache_db_bytes": 471040,
+        "cache_meta_bytes": 585
+      },
+      "cache_dataset_manifest_id": "bench-one-step-delta",
+      "cache_seq": 11,
+      "canonical_binding_extensions": 0,
+      "canonical_binding_full_refreshes": 0,
+      "checkpoint_hits": 0,
+      "checkpoint_misses": 2,
+      "delta_files_applied": 21,
+      "full_member_row_materializations": 1024,
+      "incremental_extensions": 0,
+      "label": "one_step_cold_depth_11",
+      "member_count": 512,
+      "member_snapshot_admission_probes": 0,
+      "member_snapshot_full_column_scans": 2,
+      "non_claims": [
+        "NOT_LIVE_HOST_MEASUREMENT",
+        "NO_PROVIDER_CALLS",
+        "NO_VPS",
+        "NO_SEAL_VERIFY_IMPORT",
+        "NO_FORGE_EXECUTION"
+      ],
+      "noop_marker_files_scanned": 0,
+      "noop_range_fallbacks": 0,
+      "noop_range_fast_hits": 0,
+      "observation_count": 64,
+      "observation_panel_rows_decoded": 704,
+      "reconstruct_calls": 2,
+      "reconstruct_targets": [
+        "bench-one-step-delta",
+        "bench-step-delta-010"
+      ],
+      "repeated_exact_publication_reconstruction_count": 0,
+      "scratch_bytes_after": 0,
+      "source_sha256": "f02566d75da6189fb009c14c558a494032523b965d63d267e1cc11bb46d11dec",
+      "stage_timings_s": {
+        "build_wall_s": 0.430886,
+        "cohort_selection_wall_s": 4.8e-05,
+        "member_materialization_wall_s": 0.335728,
+        "member_reconstruction_wall_s": 0.292667,
+        "observation_extraction_wall_s": 0.035098,
+        "parquet_hash_wall_s": 0.001342,
+        "parquet_write_wall_s": 0.006747
+      },
+      "tail_delta_counts": {
+        "added": 0,
+        "changed": 1,
+        "removed": 0
+      },
+      "target_cache_hits": 9,
+      "wall_s": 0.430886
+    },
+    {
+      "anchor_loads": 0,
+      "cache_bytes": {
+        "cache_db_bytes": 471040,
+        "cache_meta_bytes": 586
+      },
+      "cache_dataset_manifest_id": "bench-deep-delta-100",
+      "cache_seq": 100,
+      "canonical_binding_extensions": 0,
+      "canonical_binding_full_refreshes": 0,
+      "checkpoint_hits": 1,
+      "checkpoint_misses": 0,
+      "delta_files_applied": 0,
+      "full_member_row_materializations": 512,
+      "incremental_extensions": 0,
+      "label": "warm_deep_depth_100",
+      "member_count": 512,
+      "member_snapshot_admission_probes": 0,
+      "member_snapshot_full_column_scans": 0,
+      "non_claims": [
+        "NOT_LIVE_HOST_MEASUREMENT",
+        "NO_PROVIDER_CALLS",
+        "NO_VPS",
+        "NO_SEAL_VERIFY_IMPORT",
+        "NO_FORGE_EXECUTION"
+      ],
+      "noop_marker_files_scanned": 0,
+      "noop_range_fallbacks": 0,
+      "noop_range_fast_hits": 0,
+      "observation_count": 64,
+      "observation_panel_rows_decoded": 6400,
+      "reconstruct_calls": 0,
+      "reconstruct_targets": [],
+      "repeated_exact_publication_reconstruction_count": 0,
+      "scratch_bytes_after": 0,
+      "source_sha256": "db0cacb6bc44d1287e1c467de8eb9ca04c7955f80d9f03f7a997fc73e7083f14",
+      "stage_timings_s": {
+        "build_wall_s": 0.943165,
+        "cohort_selection_wall_s": 0.000295,
+        "member_materialization_wall_s": 0.16903,
+        "observation_extraction_wall_s": 0.326811,
+        "parquet_hash_wall_s": 0.00126,
+        "parquet_write_wall_s": 0.021164
+      },
+      "tail_delta_counts": {
+        "added": 0,
+        "changed": 512,
+        "removed": 0
+      },
+      "target_cache_hits": 99,
+      "wall_s": 0.943165
+    },
+    {
+      "anchor_loads": 1,
+      "cache_bytes": {
+        "cache_db_bytes": 471040,
+        "cache_meta_bytes": 591
+      },
+      "cache_dataset_manifest_id": "bench-noop-deep-delta-100",
+      "cache_seq": 100,
+      "canonical_binding_extensions": 0,
+      "canonical_binding_full_refreshes": 0,
+      "checkpoint_hits": 0,
+      "checkpoint_misses": 1,
+      "delta_files_applied": 99,
+      "full_member_row_materializations": 512,
+      "incremental_extensions": 0,
+      "label": "warm_noop_deep_depth_100",
+      "member_count": 512,
+      "member_snapshot_admission_probes": 0,
+      "member_snapshot_full_column_scans": 1,
+      "non_claims": [
+        "NOT_LIVE_HOST_MEASUREMENT",
+        "NO_PROVIDER_CALLS",
+        "NO_VPS",
+        "NO_SEAL_VERIFY_IMPORT",
+        "NO_FORGE_EXECUTION"
+      ],
+      "noop_marker_files_scanned": 0,
+      "noop_range_fallbacks": 0,
+      "noop_range_fast_hits": 99,
+      "observation_count": 64,
+      "observation_panel_rows_decoded": 6400,
+      "reconstruct_calls": 1,
+      "reconstruct_targets": [
+        "bench-noop-deep-delta-099"
+      ],
+      "repeated_exact_publication_reconstruction_count": 0,
+      "scratch_bytes_after": 0,
+      "source_sha256": "3df0dd64278f63b9ce9fcb686ca2cc8d6d0e373de5c442d8608594da4ccc9049",
+      "stage_timings_s": {
+        "build_wall_s": 1.213085,
+        "cohort_selection_wall_s": 0.000359,
+        "member_materialization_wall_s": 0.428477,
+        "member_reconstruction_wall_s": 0.282921,
+        "observation_extraction_wall_s": 0.326051,
+        "parquet_hash_wall_s": 0.001573,
+        "parquet_write_wall_s": 0.020543
+      },
+      "tail_delta_counts": {
+        "added": 0,
+        "changed": 0,
+        "removed": 0
+      },
+      "target_cache_hits": 99,
+      "wall_s": 1.213085
+    }
+  ],
+  "schema": "smial.local-cohort-incremental-materialization-benchmark",
+  "schema_version": "1.0",
+  "scientific_claim": "NONE",
+  "seal_verify_import": "NOT_RUN_OFFLINE",
+  "task_id": "LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_V1"
+}
