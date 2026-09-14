@@ -10,7 +10,7 @@
     ".cursor/commands/delivery-finish.md": "9dad7f29c5b1abf0d7f2d9018a7c3dca649ba46dd170aaed60d53d59dffb5115",
     ".cursor/rules/10-input-routing.mdc": "04214b04281797ed2b9d5d989b41a2f5d6c181e4d2ee8d72f2dbbdd9085a1163",
     "AGENTS.md": "7bd6249928edae8787e8dd43a516ef0a604207a241392837fdca935ba4f1a7f7",
-    "catalog/assets/core.yaml": "f7b34c736f1807ac8bca65987ad6aaab6b400356729cdfbf1feb3b145d31c2d3",
+    "catalog/assets/core.yaml": "3f5889cd7365784e4dd51c238126140c72113d1ceec734e667e3236775e04ace",
     "delivery-harness/harness.yaml": "a16d2f5a82c6d0b1844430b6d389470a82cd01c7a107d3db68a54769b4f0f885",
     "delivery-harness/templates/portable-bundle-manifest.json": "a08c0473a4cd0dbfd2c71c80afc80a53165cf7fa7f548c6617c4340dc157b207",
     "delivery-harness/templates/portable-core/AGENTS.md.tmpl": "496313a7d7efc4ca68ab0199fe0fc39493027d54b2b6aec9aa92f5ce58aa4cad",
@@ -19,7 +19,8 @@
     "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md": "07bfd251340082dfc5f431ef325a1969bde4509a094e2e107f15aa48e930b00f",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "0efa07ba1ff2619217f22869459c68f859e22352004c5d22b21d63f20dd5ca07",
     "docs/evidence/control/delivery_harness_acceptance_v1.json": "bc203896054c1506a36f5531f3cf16d25c529842b79b0c47867523824cf118fd",
-    "docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md": "7b5d9cc5c3f6667ab51e4bafb075b5d8aaddfbef3e6f7480f29397c8dc59e150",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "6ec47c46e6333de97dd77e0de6902c644eabd63498896ee9cf1459e66f32b125",
+    "docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md": "a5703f3a2b652c9f2cb36f1f5409fc8c913bd6147ef2b8b4d5eaab543faf5bd5",
     "scripts/delivery_harness.py": "6abd951bdea6404c3ada8a0bfdecd3beb36c26db9998db9ec936d995ca8f13b8",
     "scripts/harness_sync.py": "2a2c8c5fcbb0c9fdfec751b2e99d59ff34465b9f848849887d8ef22047e7bfb1",
     "scripts/owner_attention_gate.py": "910a7afa07e9e53c0df0841f7c84a7e1cda5f6e971d9c60ca23dad1f0d703ce2",
@@ -42,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_delivery_harness_deterministic_finish_factory_fit_v1.json",
-    "sha256": "69a22959915dc44847d64f058d62615c85ebe08a38fa4389c473f4a2cb50d056",
+    "sha256": "704f584ea44068ab741b3021418ccb4d503fca2a0ef5674f1a4c7bd45293d9b3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TARGETED_DELIVERY_HARNESS_SUITES",
     "independent_review": {
       "path": "docs/evidence/control/a1_delivery_harness_deterministic_finish_review_v1.json",
-      "sha256": "a27ebe156ce52536b00faf65295690da187d98ed9d12affcfd3d5bc2585258ff",
+      "sha256": "6fd4bb2721c15c5e0116aef625b5f53df21bdccceb0af6be80e023f8f4359ec5",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
