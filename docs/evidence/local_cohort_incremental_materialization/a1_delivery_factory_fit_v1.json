@@ -4,8 +4,8 @@
   "review_id": "LOCAL-COHORT-INCREMENTAL-MATERIALIZATION-FACTORY-FIT-001",
   "as_of": "2026-09-14",
   "task_id": "LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_V1",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "56cbdb633f1e8a1ab3821a4096540ae782943e4d9cbdfc263f459681dfb653b7",
+  "reviewed_inventory_sha256": "e6d55749b622af5f10440d45c6c97cf1f3b8d7c1cc8ecb11196a6c777c1e1833",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

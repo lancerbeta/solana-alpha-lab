@@ -10,7 +10,18 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "1b0ba03656e824256a070ebcbf15804f537197b48009b46ff4e6604c1cf5a25d",
+    "docs/evidence/local_cohort_incremental_materialization/a1_benchmark_v1.json": "f3085644ac92863cbd42965402b604f3f6feb682a95560e1be9a978fbde6eef2",
+    "docs/reports/local_cohort_incremental_materialization/a1_owner_readout_v1.md": "4d24fbf86b8ddf909fd07da73998dd4f29d5f7014822905dda406fe0f9e38d59",
+    "docs/tasks/LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_V1.md": "065a81493d73576fa7dc4144b38f35486db9cc06bd80037182af45444201f7d1",
+    "scripts/bench_local_materialization_v1.py": "1c9afb79f1e1a910255b4740208d698114ed7e1524a549c216540a210a6ca881",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "f1a1d08fd00e89a0af326067d501d2c14cb932a3b3e554efd5ca9a8da7f1cbad",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "531d669ddce2d9ffc58ec7d56ad1aca047e6b6282deca27c6996c0e80aeb8669",
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "637e902f5ec124ab8eceedbbe6a7bc59a6734a9840a4df479a96c01c91ef27de",
+    "tests/test_live_cohort_memory_bounded_publication_v1.py": "52fe87c83ff25e5707223232601154372451a514172d8c585903f4bdafde6de6",
+    "tests/test_local_cohort_incremental_materialization_v1.py": "ae41996706a42250a7d90aa3c086a2751e323572f7db5ccfc12f2490932def47"
+  },
   "active_stop_conditions": [
     "NO_MERGE_AUTHORITY_GRANTED",
     "GITHUB_CI_REQUIRED_AT_GUARDED_MERGE"
@@ -45,7 +56,7 @@
     "targeted": "PASS_LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_AND_REGRESSION_GATES",
     "independent_review": {
       "path": "docs/evidence/local_cohort_incremental_materialization/a1_delivery_independent_review_v1.json",
-      "sha256": "PENDING_BIND",
+      "sha256": "6ec41982afc15874f990103036627b0cf0cf3565559a297a34f47deb6fdbf30d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -63,7 +74,7 @@
   },
   "factory_fit": {
     "path": "docs/evidence/local_cohort_incremental_materialization/a1_delivery_factory_fit_v1.json",
-    "sha256": "PENDING_BIND",
+    "sha256": "2d477b0809c86a27c5012e05cdc9c4a90381ac64a9a0df17d1f1fc8506c8f8f3",
     "verdict": "PASS"
   }
 }
