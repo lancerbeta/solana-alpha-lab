@@ -5,7 +5,27 @@
   "as_of": "2026-09-14",
   "task_id": "M1_EXECUTION_REALITY_CALIBRATION_V1",
   "state_change": "M1_EXECUTION_REALITY_CALIBRATION_CAPABILITY_IMPLEMENTED",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "3b6006b259b1021f0fc004cc88f833ebfb9a21e803fa817a1efe531a899ee57a",
+    "catalog/assets/lifecycle.yaml": "4635d6eeb7e2e27e0355bfb4f2c2b9cead8eb173b34a09387d08168168246080",
+    "catalog/catalog_manifest.yaml": "d91199b16e3bb0fba080f68d59663a6540cd96de1a0a1b0a19305aab1f9d6d4a",
+    "catalog/generated/asset_edges.json": "9233a66beafdab362926c8199b7a5324407c8f4a67bf0901cb0f5001bd1e71ce",
+    "configs/observation_primitive_registry_v1.yaml": "9416236fa7bb7da83506af0e42a2f4201c4284ecb54d2a7d58099b9f7e2ee60e",
+    "docs/PROJECT_MAP.md": "7e83e28f7343613ff6b2c1bbfe612e08f99e66f4e599de805e4d0248da5bfc4e",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "50360d79b412b99125b66e23dd97c44c683497d7cdd1d680788dc54bc33100de",
+    "docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md": "cbaeaf68f4a3585d02ab9285236e051dcb82de09279201e7a753efe44be1db49",
+    "scripts/build_m1_calibration_report.py": "b8186d939c4df8d0952a32a3c9339b8446d12e01a1a0aaceafd72b95843971dd",
+    "scripts/m1_successor_preflight.py": "39e80eded2e100971ed664c01630dfd26719f5212c23ffedc507566778dd5b36",
+    "src/solana_alpha_lab/factory/collector_read_model.py": "f554e27bf43d6c7de6631a250d6f67e4cb59faece941b4527b0f2eb6ad4fdce6",
+    "src/solana_alpha_lab/factory/m1_calibration_report.py": "f3b45f77dc74e19022f2be05a72588484a19375b0ccb3f55dd1df8f80158bbf2",
+    "src/solana_alpha_lab/factory/m1_execution_reality.py": "7d714249c926d7c84c6d47f63de26ef6620acc0ccfc621d3444c69cf7ccd1753",
+    "src/solana_alpha_lab/factory/m1_successor_preflight.py": "0875903c55aec7a7f483160aaa2ff8b616b8858f79880bfba243d93e4382029e",
+    "src/solana_alpha_lab/factory/observation_primitives.py": "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1",
+    "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "a82f11116d3139058e7ee90d7317afc9a02072879e79e184f58303194b6e4861",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "80dcbd89df85aba97b27a22c05aa4a0bf9a38254901a8a1b63b225ddd2afd94c",
+    "tests/fixtures/observation_schedule/m1_quote_surface.yaml": "8dfb1a97a99f27fae3fcfbe3eaea017eea0831c51f1be3d2e689a2cfa9ed2c59",
+    "tests/test_m1_execution_reality.py": "6a042dda64d260b25ae264d2ce998c6894506f42883ff1d05c7d4ab21ffb7191"
+  },
   "base_main": "5e36ef349f85d741c140c418af2de136d99521b7",
   "active_stop_conditions": [
     "NO_MERGE_AUTHORITY_STOP_BEFORE_MERGE"
@@ -19,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_m1_execution_reality_calibration_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "d0854f365dd7eb9a4842da7a8ba712c971b479fe4a2bd33ba973e2037dcbd1d6",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_M1_EXECUTION_REALITY_AND_REGRESSION_SUITES",
     "independent_review": {
       "path": "docs/evidence/control/a1_m1_execution_reality_calibration_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "47db4f19c1887ddabde275ed82506fb340dff92f70a0c7fd4c8f1bf84cd03b37",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
