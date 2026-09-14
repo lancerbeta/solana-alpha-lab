@@ -1,8 +1,8 @@
 ---
 task_id: LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_V1
 task_version: "1.0"
-status: IN_PROGRESS
-as_of: "2026-09-13"
+status: IMPLEMENTED_UNVERIFIED
+as_of: "2026-09-14"
 owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
