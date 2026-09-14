@@ -4,8 +4,8 @@
   "review_id": "LOCAL-COHORT-INCREMENTAL-MATERIALIZATION-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-14",
   "task_id": "LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_V1",
-  "reviewed_bindings_sha256": "2269d6f8e6b56555f330673c872abc36334d64ca2e19906a1eb2d6b7cd73b72f",
-  "reviewed_inventory_sha256": "3e8b9109228222f2ccc7f6fb4221c76eb1f72adaa813ce0d799ac592e9ddc29c",
+  "reviewed_bindings_sha256": "254fd302c1e390dc95dcab852b29f891b14acaaa718aba7e7a4809a255b41f99",
+  "reviewed_inventory_sha256": "16e32d49f177ec59014aaca4ddde120c037e3c8242bb68985b5461082106e895",
   "required_roles": [
     "CODE_REVIEWER",
     "ARCHITECTURE_CRITIC",
