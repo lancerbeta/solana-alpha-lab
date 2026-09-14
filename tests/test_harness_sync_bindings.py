@@ -177,6 +177,7 @@ class BindEvidenceIntegrationTests(unittest.TestCase):
         self.addCleanup(setattr, harness_sync, "ROOT", original_root)
         first = self._run_bind("--apply")
         self.assertEqual(first.returncode, 0, first.stderr)
+        _commit_all(self.worktree, "bind evidence")
         before = {
             relative: (self.worktree / relative).read_bytes()
             for relative in [
@@ -267,12 +268,53 @@ class BindEvidenceIntegrationTests(unittest.TestCase):
         original_bindings_sha = fit.get("reviewed_bindings_sha256")
         fit["mode"] = "PROPORTIONAL"
         fit_path.write_text(json.dumps(fit, indent=2) + "\n", encoding="utf-8")
+        _commit_all(self.worktree, "break fit shape")
         apply = self._run_bind("--apply")
         self.assertEqual(apply.returncode, 2, apply.stderr)
         self.assertIn("BIND_EVIDENCE_MERGE_GATE_SHAPE", apply.stderr)
         after = json.loads(fit_path.read_text(encoding="utf-8"))
         self.assertEqual(after["mode"], "PROPORTIONAL")
         self.assertEqual(after.get("reviewed_bindings_sha256"), original_bindings_sha)
+
+    def test_apply_refuses_dirty_worktree_and_binds_committed_bytes(self) -> None:
+        original_root = harness_sync.ROOT
+        harness_sync.ROOT = self.worktree.resolve()
+        self.addCleanup(setattr, harness_sync, "ROOT", original_root)
+        apply = self._run_bind("--apply")
+        self.assertEqual(apply.returncode, 0, apply.stderr)
+        _commit_all(self.worktree, "bind clean candidate")
+        impl = self.worktree / "scripts/harness_sync.py"
+        committed = impl.read_bytes()
+        # Acceptance item 2: implementation binding equals the committed Git
+        # blob bytes (git show HEAD:path), not any worktree representation.
+        bind_head = _run(
+            ["git", "-C", str(self.worktree), "rev-parse", "HEAD"], cwd=self.worktree
+        ).stdout.strip()
+        blob = subprocess.run(
+            ["git", "-C", str(self.worktree), "show", f"{bind_head}:scripts/harness_sync.py"],
+            capture_output=True,
+            check=True,
+        ).stdout
+        completion = json.loads(
+            (
+                self.worktree
+                / "docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_completion_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            completion["implementation_bindings"]["scripts/harness_sync.py"],
+            hashlib.sha256(blob).hexdigest(),
+        )
+        # Worktree drift (any byte representation, e.g. CRLF) cannot change
+        # the already-committed binding, but a new apply on a dirty tree must
+        # refuse before any write.
+        impl.write_bytes(committed.replace(b"\n", b"\r\n"))
+        dirty_apply = self._run_bind("--apply")
+        self.assertEqual(dirty_apply.returncode, 2, dirty_apply.stderr)
+        self.assertIn("BIND_EVIDENCE_DIRTY_WORKTREE", dirty_apply.stderr)
+        verify = self._run_bind("--verify")
+        self.assertEqual(verify.returncode, 0, verify.stderr)
+        impl.write_bytes(committed)
 
 
 if __name__ == "__main__":

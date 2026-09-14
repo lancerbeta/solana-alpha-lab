@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "DELIVERY-HARNESS-DETERMINISTIC-FINISH-FACTORY-FIT-001",
+  "as_of": "2026-09-14",
+  "task_id": "DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
+  "reviewed_bindings_sha256": "8a24d04fd9942dc7935271d2892e70f1d58092154ef1fbb41f83a1b7af001694",
+  "reviewed_inventory_sha256": "8df96957e5770b58a6e4f703dc9c50f370a583ed84938cf526c3329ab7a6b58e",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS - narrow control-plane CLI and prefix policy; REVERT recovery straightforward",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS - owner_phrase copy/paste-able (unescaped Cyrillic), preflight reasons carry REPAIR_HINTs",
+    "execution_to_cashflow": "PASS - no product/research behavior changed",
+    "monitoring_and_recovery": "PASS - preflight exit codes stable (0/2), DENY reasons deterministic",
+    "build_vs_buy": "PASS - all code is stdlib-only Python in repo-owned scripts; no new dependencies",
+    "security": "PASS - no secrets, tokens, absolute paths in outputs; phrase renderer fails closed",
+    "red_team": "PASS - reorder/crash paths now fail closed at render; dirty worktree cannot enter exact-head bindings"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_MERGE_AUTHORITY",
+    "NO_REVIEW_ROUTING_CHANGE",
+    "NO_CI_ARCHITECTURE_CHANGE",
+    "NO_PRODUCT_BEHAVIOR_CHANGE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_CANONICAL_DONE"
+  ]
+}

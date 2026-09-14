@@ -16,7 +16,7 @@
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/harness.yaml",
       "destination": "delivery-harness/harness.yaml",
-      "sha256": "ad3bc689e9d384505b55ac9d44544883bbcb3a78d4e5f10c71e9322f7735dce4"
+      "sha256": "1391189a0e94aa087d848e620df9d31ffafa65b2dc1457649d6d6ed1ba805261"
     },
     {
       "source": "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml",
@@ -91,17 +91,17 @@
     {
       "source": "scripts/owner_attention_gate.py",
       "destination": "scripts/owner_attention_gate.py",
-      "sha256": "4372166adcbecd0ff098c66a9e8f8e7a71516bc61d036fa35313b873807d400b"
+      "sha256": "910a7afa07e9e53c0df0841f7c84a7e1cda5f6e971d9c60ca23dad1f0d703ce2"
     },
     {
       "source": "delivery-harness/templates/portable-core/AGENTS.md.tmpl",
       "destination": "AGENTS.md",
-      "sha256": "c99c7e32c5cfbce0e30cd13e40306449aee1d2a2531461a1eaee5f7bf1e3d114"
+      "sha256": "496313a7d7efc4ca68ab0199fe0fc39493027d54b2b6aec9aa92f5ce58aa4cad"
     },
     {
       "source": "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md",
       "destination": ".agents/skills/delivery-harness/SKILL.md",
-      "sha256": "781b65017a2706933fdf8451823e07d51e4eee07e0f1ae26f00b41e188a46bb4"
+      "sha256": "9803d1c63be1c41b42daad2df0b266cd060e811375deb2875e89a5a4c2641678"
     },
     {
       "source": "delivery-harness/templates/portable-core/dot-cursor/rules/00-authority.mdc",
@@ -131,7 +131,7 @@
     {
       "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md",
       "destination": ".cursor/commands/delivery-finish.md",
-      "sha256": "b4507738285ebd757e51ae5df87a967efe176d3f323c032304eb12f5d38450d2"
+      "sha256": "07bfd251340082dfc5f431ef325a1969bde4509a094e2e107f15aa48e930b00f"
     }
   ]
 }

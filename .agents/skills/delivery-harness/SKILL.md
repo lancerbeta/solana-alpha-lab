@@ -7,7 +7,11 @@ description: Use when starting, resuming, implementing, reviewing or finishing b
 
 Run one workflow:
 
-`CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK`
+`CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH CONTENT -> BIND EVIDENCE -> PREFLIGHT-PUSH -> PUSH/PR -> EXACT-HEAD CI -> MERGE-READINESS -> OWNER PHRASE -> GUARDED MERGE -> POST-MERGE READBACK`
+
+`ORIENTATION` never transitions into this workflow in the same turn; it may
+return `CONTINUE` plus the exact recommended task and must stop. A subsequent
+explicit execution/resume command is required.
 
 ## Check and context
 
@@ -100,10 +104,18 @@ uv run --locked --managed-python python -B scripts/harness_sync.py --apply --bas
 ```
 
 Bare `--apply` is recovery/full oracle only; pre-commit and CI drift lines
-prefer `--base-ref` when the branch task contract is unambiguous. After exact-head CI run
+prefer `--base-ref` when the branch task contract is unambiguous. Before the
+first remote push of the task branch, run the read-only local
+`uv run --locked --managed-python python -B scripts/delivery_harness.py preflight-push
+--task-id <TASK> --contract docs/tasks/<TASK>.md --route <ROUTE> --actor <ACTOR>`
+on the final committed, evidence-bound candidate. It fails closed locally on
+stale bindings, write-set violations, derived drift and malformed evidence,
+claims no CI/merge/acceptance, and a normal push requires its PASS. It does
+not replace merge-readiness. After exact-head CI run
 `scripts/owner_attention_gate.py --merge-readiness` (no phrase, no `gh pr merge`).
-STOP for one exact owner approval only when `ready_for_owner_phrase` is true.
-Order: `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
+STOP for one exact owner approval only when `ready_for_owner_phrase` is true;
+the response carries `owner_phrase` (exact copy/paste phrase) when ready and
+`null` otherwise. Order: `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
 The owner never clicks GitHub Merge. Product work uses
 `context --contract --task-id`. `context --pr` is `LIVE_PR_HEAD` only when every
 changed path is inside `harness_control_write_prefixes`; otherwise

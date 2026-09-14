@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "DELIVERY-HARNESS-DETERMINISTIC-FINISH-REVIEW-001",
+  "as_of": "2026-09-14",
+  "task_id": "DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
+  "reviewed_bindings_sha256": "8a24d04fd9942dc7935271d2892e70f1d58092154ef1fbb41f83a1b7af001694",
+  "reviewed_inventory_sha256": "8df96957e5770b58a6e4f703dc9c50f370a583ed84938cf526c3329ab7a6b58e",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "MINOR: portable skill preflight wording differs slightly from live skill",
+        "MINOR: duplicated path_in_managed_write_set helper",
+        "MINOR: historical acceptance evidence amended rather than pinned separately",
+        "MINOR: acceptance matrix pins test files textually; a hash pin would be stronger",
+        "MINOR: stray stderr HARNESS_SYNC_PLAN noise in machine JSON gate",
+        "REMEDIATION: no DoD gaps; sibling-critic MAJOR items remediated in f45f97f8 (real-path write-set test, monkeypatched network guard, renderer order guard)"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "MAJOR: portable-core skill/commands mandate preflight-push but bundled portable delivery_harness.py has no such subcommand and harness_sync.py is not shipped - portable FINISH dead-ends",
+        "MAJOR: render_owner_merge_phrase is group-order-agnostic while validate_exact_merge_approval hardcodes group(1)=PR - reordered policy pattern renders phrase that crashes at merge",
+        "MINOR: crash-with-traceback paths in preflight drift/evidence helpers escape CLI as tracebacks instead of stable DENY reason codes",
+        "MINOR: hardcoded origin/main in _preflight_drift_problems duplicates contract expected_upstream binding",
+        "MINOR: two truth owners for write-set semantics (delivery_harness.py local helper vs owner_attention_gate.py)",
+        "MINOR: no live-vs-portable prefix parity test",
+        "MINOR: skill ordering text lacks evidence-commit step",
+        "REMEDIATION: renderer order guard + crash-to-DENY + expected_upstream binding + parity test fixed in f45f97f8; portable MAJOR resolved in eac7c1f9 by qualifying portable wording (capability parity would require PORTABLE_CORE_REDESIGN, out of scope); write-set truth-owner unification fixed in 2c5410fa"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "MAJOR: --guarded-merge computed but discarded the normalized actor; raw argv casing flowed into execute_guarded_merge and DENIED with ACTOR_NOT_ALLOWED_FOR_ROUTE",
+        "MINOR: render_owner_merge_phrase accepts invalid regex escapes that later raise re.error (not ValueError) past the JSON error boundary",
+        "MINOR: preflight evidence verifier let OSError/FileNotFoundError escape as traceback instead of stable DELIVERY_EVIDENCE_INVALID exit-2 DENY",
+        "MINOR: preflight write-set DENY only structurally tested (no real out-of-write-set diff exercised)",
+        "MINOR: duplicated path_in_managed_write_set omits safe_repo_path normalization and can drift from the gate's authoritative copy",
+        "MINOR: harness_sync.ROOT global swap is CLI-sound but not concurrency-safe",
+        "MINOR: orientation acceptance is a text assertion, not a behavioral one",
+        "REMEDIATION: MAJOR actor fix + re.error fail-closed + OSError-to-DENY + single write-set truth owner fixed in 2c5410fa with regression tests (CLI-boundary actor test, backref/escape renderer tests, absent-evidence stable-DENY test); real-path write-set test added in f45f97f8; concurrency-safety and behavioral orientation enforcement remain named follow-ups (design limits, not regressions)"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

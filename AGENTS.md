@@ -15,7 +15,9 @@ delivery agents over one Git-native control core. Read this file first, then:
 Git is the working project-memory owner. Mutation, delivery and merge require
 an exact task contract named by the owner or an exact canonical READY Git
 contract. Owner navigation phrases such as го дальше inspect Git truth without
-a new contract and must not mutate or invent a task. Discriminate
+a new contract and must not mutate or invent a task; `ORIENTATION` may return
+`CONTINUE` plus the exact recommended task but never enters `EXECUTE` in the
+same turn. Discriminate
 `ORIENTATION` versus `EXECUTE` with `.cursor/rules/10-input-routing.mdc`.
 Never search for the newest/latest/current task, handoff, Issue, branch or file.
 
@@ -68,7 +70,9 @@ override it.
 Both direct agents stop once after exact-head CI **and**
 `scripts/owner_attention_gate.py --merge-readiness` reports
 `ready_for_owner_phrase: true` for the exact owner phrase bound to the
-current PR and unchanged 40-hex head. Order is
+current PR and unchanged 40-hex head; the readiness response carries
+`owner_phrase` with the exact machine-rendered phrase when ready and `null`
+otherwise. Order is
 `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
 The owner never clicks GitHub Merge. Do not ask the phrase before readiness.
 Product diffs use `context --contract`. `context --pr` (`LIVE_PR_HEAD`) is
@@ -84,7 +88,7 @@ force push, history rewrite, branch deletion or settings change.
 On `EXECUTE`, use the repository skill at
 `.agents/skills/delivery-harness/SKILL.md`:
 
-`CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK`
+`CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH CONTENT -> BIND EVIDENCE -> PREFLIGHT-PUSH -> PUSH/PR -> EXACT-HEAD CI -> MERGE-READINESS -> OWNER PHRASE -> GUARDED MERGE -> POST-MERGE READBACK`
 
 On `ORIENTATION`, do not start that workflow.
 

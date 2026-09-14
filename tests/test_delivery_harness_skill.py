@@ -24,9 +24,11 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
         self.assertEqual(metadata["name"], "delivery-harness")
         self.assertIn("starting, resuming, implementing, reviewing or finishing", metadata["description"])
         self.assertIn(
-            "CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK",
+            "CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH CONTENT -> BIND EVIDENCE -> PREFLIGHT-PUSH -> PUSH/PR -> EXACT-HEAD CI -> MERGE-READINESS -> OWNER PHRASE -> GUARDED MERGE -> POST-MERGE READBACK",
             text,
         )
+        self.assertIn("preflight-push", text)
+        self.assertIn("ORIENTATION` never transitions into this workflow", text)
         self.assertIn("Do not use for orientation phrases", metadata["description"])
         self.assertIn("classifies the turn as `ORIENTATION`", text)
         self.assertIn("probe and fix that on the working path", text)
@@ -58,6 +60,8 @@ class DeliveryHarnessSkillTests(unittest.TestCase):
         self.assertIn("never on microsteps", text)
         self.assertIn("--merge-readiness", text)
         self.assertIn("ready_for_owner_phrase", text)
+        self.assertIn("`owner_phrase`", text)
+        self.assertIn("`null` otherwise", text)
         self.assertIn("IDENTITY_MODE_MISMATCH", text)
         self.assertIn("Do not widen those prefixes", text)
         self.assertIn("CONTROL_RUNTIME_CHANGED", text)
