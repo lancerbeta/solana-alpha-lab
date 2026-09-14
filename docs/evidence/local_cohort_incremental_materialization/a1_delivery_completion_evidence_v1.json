@@ -1,0 +1,69 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LOCAL-COHORT-INCREMENTAL-MATERIALIZATION-COMPLETION-001",
+  "as_of": "2026-09-14",
+  "task_id": "LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_V1",
+  "state_change": "LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_READY_FOR_MERGE_GATE",
+  "base_main": "e79adc0b7b8d765ef14e1560ba81f08efcdcf61a",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [
+    "NO_MERGE_AUTHORITY_GRANTED",
+    "GITHUB_CI_REQUIRED_AT_GUARDED_MERGE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "non_claims": [
+    "NO_LIVE_C1_OR_FACTORY_VALIDATION",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOYMENT",
+    "NO_SEAL_VERIFY_IMPORT",
+    "NO_FORGE_EXECUTION",
+    "NO_ALPHA_OR_ECONOMIC_RESULT",
+    "OBSERVATION_PANEL_INDEX_REMAINS_OUTSIDE_THIS_ATOM",
+    "FAST_NOOP_PROOF_IS_SCOPED_TO_APPEND_ONLY_WRITER_ISSUED_ARTIFACTS",
+    "STRICT_BYTE_AUDIT_AND_CANONICAL_REPLAY_REMAIN_AUDIT_RECOVERY_FALLBACK",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0,
+    "deployment_mutation": 0
+  },
+  "validation": {
+    "targeted": "PASS_LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_AND_REGRESSION_GATES",
+    "independent_review": {
+      "path": "docs/evidence/local_cohort_incremental_materialization/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING_BIND",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_10_OF_10",
+      "PASS_LIVE_COHORT_DISCOVERY_RELEASE_SERIES_6_OF_6",
+      "PASS_LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_22_OF_22",
+      "PASS_LIVE_COHORT_MEMORY_BOUNDED_PUBLICATION_9_OF_9_STRESS_RSS_161906688",
+      "PASS_FACTORY_ROUTINE_PUBLICATION_WALLCLOCK_13_OF_13",
+      "PASS_LOCAL_MATERIALIZATION_BENCHMARK_ALL_ACCEPTANCE",
+      "PASS_FACTORY_STATIC_VALIDATOR",
+      "PASS_COMPILEALL_AND_DIFF_CHECK"
+    ]
+  },
+  "factory_fit": {
+    "path": "docs/evidence/local_cohort_incremental_materialization/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING_BIND",
+    "verdict": "PASS"
+  }
+}

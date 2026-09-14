@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "LOCAL-COHORT-INCREMENTAL-MATERIALIZATION-FACTORY-FIT-001",
+  "as_of": "2026-09-14",
+  "task_id": "LOCAL_COHORT_INCREMENTAL_MATERIALIZATION_V1",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS: bounded incremental reuse addresses the measured local mature-cohort materialization bottleneck.",
+    "flexibility_and_history": "PASS: cold, warm, one-step, deep-history, no-op, and strict fallback paths are retained.",
+    "context_efficiency": "PASS: latest-only operational cache and bounded process-local LRU contexts avoid unbounded control state.",
+    "research_truth": "PASS: operational cache is scientific_truth=false and PIT, lineage, fingerprint, and publication identity remain canonical.",
+    "owner_operability": "PASS: stage counters, typed fallbacks, and explicit non-claims make the optimization inspectable.",
+    "execution_to_cashflow": "PASS_WITH_SCOPE_LIMIT: this atom improves preparation throughput and makes no live execution or cashflow claim.",
+    "monitoring_and_recovery": "PASS: cache miss, corruption, staleness, and audit needs route to canonical replay without scientific rewrite.",
+    "build_vs_buy": "PASS: existing latest-cache and replay primitives are extended; no second durable checkpoint schema is introduced.",
+    "security": "PASS_WITH_SCOPE_LIMIT: path, symlink, byte, marker, and identity checks fail closed; fast proof is explicitly writer-trust scoped.",
+    "red_team": "PASS_WITH_SCOPE_LIMIT: false-zero, corrupt-meta, path-escape, byte-mutation, remove/readd, and non-monotonic cases are covered or fallback-bound."
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "Observation-panel indexing is a separate future atom; live Factory/VPS commissioning remains owner-gated."
+  },
+  "recovery": "Disable or remove the rebuildable operational cache and fall back to canonical replay; do not rewrite scientific history.",
+  "limits": [
+    "NO_LIVE_C1_OR_FACTORY_VALIDATION",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOYMENT",
+    "NO_SEAL_VERIFY_IMPORT",
+    "NO_FORGE_EXECUTION",
+    "NO_OBSERVATION_PANEL_INDEX_IN_THIS_ATOM",
+    "NO_MERGE_AUTHORITY"
+  ]
+}
