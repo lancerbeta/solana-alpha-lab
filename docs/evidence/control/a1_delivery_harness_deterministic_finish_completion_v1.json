@@ -31,9 +31,7 @@
     "tests/test_harness_sync_bindings.py": "062e17bf7ec8beac4959f2bfb8bc59f366e2999af3eb8b7e997db1edba4ac80f"
   },
   "base_main": "b652a66af554d96fb4ce3e2de3410c1d04e8bfd1",
-  "active_stop_conditions": [
-    "NO_MERGE_AUTHORITY_STOP_BEFORE_MERGE"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "external_material_action": false,
