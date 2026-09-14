@@ -56,7 +56,6 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
-      - docs/evidence/local_cohort_incremental_materialization/a1_benchmark_v1.json
       - docs/evidence/local_cohort_incremental_materialization/a1_delivery_completion_evidence_v1.json
       - docs/evidence/local_cohort_incremental_materialization/a1_delivery_independent_review_v1.json
       - docs/evidence/local_cohort_incremental_materialization/a1_delivery_factory_fit_v1.json
