@@ -91,6 +91,17 @@ class DeterministicFinishAcceptanceTests(unittest.TestCase):
                     pr_number=PR, head_sha=HEAD, policy=policy
                 )
 
+    # a reordered policy pattern (head group first) must fail closed at
+    # render time: validate_exact_merge_approval binds group(1) to the PR
+    # number, so a rendered-but-reordered phrase would crash at merge.
+    def test_renderer_fails_closed_on_reordered_groups(self) -> None:
+        pattern = "^head ([0-9a-f]{40}), PR #([1-9][0-9]*) ok$"
+        policy = {"merge_approval": {"exact_phrase_pattern": pattern}}
+        with self.assertRaisesRegex(ValueError, "OWNER_PHRASE_PATTERN_INVALID"):
+            self.gate.render_owner_merge_phrase(
+                pr_number=PR, head_sha=HEAD, policy=policy
+            )
+
     # render validates pr/head shapes
     def test_renderer_rejects_invalid_pr_or_head(self) -> None:
         with self.assertRaisesRegex(ValueError, "OWNER_PHRASE_PR_NUMBER_INVALID"):
@@ -171,6 +182,42 @@ class DeterministicFinishAcceptanceTests(unittest.TestCase):
         self.assertNotIn("and follow EXECUTE", text)
 
 
+class LivePortablePrefixParityTests(unittest.TestCase):
+    """Live harness_control_write_prefixes stay a superset of the portable list."""
+
+    def test_portable_prefixes_are_a_subset_of_live(self) -> None:
+        import yaml
+
+        live = yaml.safe_load(
+            (ROOT / "delivery-harness/harness.yaml").read_text(encoding="utf-8")
+        )
+        portable = yaml.safe_load(
+            (
+                ROOT
+                / "delivery-harness/templates/portable-core/delivery-harness/harness.yaml"
+            ).read_text(encoding="utf-8")
+        )
+        live_prefixes = set(live["merge_policy"]["harness_control_write_prefixes"])
+        portable_prefixes = set(
+            portable["merge_policy"]["harness_control_write_prefixes"]
+        )
+        # Portable bundle ships fewer artifacts; every portable control path
+        # must remain LIVE_PR_HEAD-eligible in the canonical repo.
+        self.assertTrue(
+            portable_prefixes <= live_prefixes,
+            sorted(portable_prefixes - live_prefixes),
+        )
+        # The required examples must be denied in BOTH lists.
+        for product_path in (
+            "src/solana_alpha_lab/factory/observation_scheduler.py",
+            "scripts/hypothesis_forge.py",
+            ".cursor/commands/hypothesis-forge.md",
+            "catalog/assets/lifecycle.yaml",
+        ):
+            self.assertNotIn(product_path, live_prefixes)
+            self.assertNotIn(product_path, portable_prefixes)
+
+
 class PreflightPushAcceptanceTests(unittest.TestCase):
     """Acceptance matrix items 4-8 and 13-14 for the preflight-push gate."""
 
@@ -196,7 +243,7 @@ class PreflightPushAcceptanceTests(unittest.TestCase):
             task_contract="docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md",
             route="DIRECT_CURSOR_DELIVERY",
             actor=actor,
-            drift_checker=lambda _root: drift or [],
+            drift_checker=lambda _root, **_k: drift or [],
             evidence_verifier=lambda _root, **_k: evidence or [],
         )
 
@@ -249,31 +296,89 @@ class PreflightPushAcceptanceTests(unittest.TestCase):
         self.assertFalse(result["ready_for_first_push"])
         self.assertFalse(result["checks"]["derived_state_current"])
 
-    # 5. missed managed write path -> preflight DENY (structural: checker
-    # wiring asserts write_set_pass flips when the candidate diff leaves the
-    # managed write set; covered end-to-end by the contract-scoped fixture in
-    # test_harness_sync_bindings; here we assert the flag exists and is
-    # enforced by all(checks.values()) aggregation).
+    # 5. missed managed write path -> preflight DENY (real path: an injected
+    # git reader reports a candidate diff containing a path outside the task
+    # managed write set; preflight must flip write_set_pass and DENY).
+    def test_write_set_violation_denies_on_real_wiring(self) -> None:
+        module = self.module
+
+        class ViolatingReader:
+            def __init__(self) -> None:
+                self.calls: list[tuple[str, ...]] = []
+
+            def __call__(self, root, *args: str) -> str:
+                self.calls.append(tuple(args))
+                joined = " ".join(args)
+                if (
+                    tuple(args[:3]) == ("diff", "--name-only", "--no-renames")
+                    and args[3].endswith("...HEAD")
+                ):
+                    return "src/solana_alpha_lab/factory/rogue_module.py"
+                return module.git_text(root, *args)
+
+        reader = ViolatingReader()
+        result = module.preflight_push(
+            ROOT,
+            task_id="DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
+            task_contract="docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md",
+            route="DIRECT_CURSOR_DELIVERY",
+            actor="CURSOR",
+            drift_checker=lambda _root, **_k: [],
+            evidence_verifier=lambda _root, **_k: [],
+            git_reader=reader,
+        )
+        self.assertFalse(result["ready_for_first_push"])
+        self.assertFalse(result["checks"]["write_set_pass"])
+        self.assertTrue(
+            any(reason.startswith("WRITE_SET_VIOLATION:src/solana_alpha_lab")
+                for reason in result["reasons"]),
+            result["reasons"],
+        )
+
     def test_ready_requires_every_check_true(self) -> None:
         result = self._result()
-        # With injected-clean helpers on the real branch state, write-set and
-        # identity checks still derive from real Git truth; a DENY here must
-        # enumerate deterministic reasons only.
         if not result["ready_for_first_push"]:
             for reason in result["reasons"]:
                 self.assertRegex(reason, r"^[A-Z0-9_]+(:.*)?$")
-        # Force one check false and confirm aggregation denies.
         forced = dict(result)
         forced["checks"] = dict(result["checks"])
         forced["checks"]["write_set_pass"] = False
         self.assertFalse(all(forced["checks"].values()))
 
-    # 8. preflight attempts gh/network -> test failure (structural guard)
-    def test_preflight_module_never_imports_gh_or_network_clients(self) -> None:
-        source = (ROOT / "scripts/delivery_harness.py").read_text(encoding="utf-8")
-        preflight_body = source.split("def preflight_push(")[1].split("\ndef ")[0]
-        for forbidden in ("gh pr", "requests", "urllib", "socket", "http"):
-            self.assertNotIn(forbidden, preflight_body)
+    # 8. preflight attempts gh/network -> test failure: monkeypatched
+    # subprocess.run records every spawned argv; assert no gh/provider
+    # binary is ever spawned (local git is expected) and no socket opens.
+    def test_preflight_never_spawns_gh_or_network(self) -> None:
+        import subprocess as subprocess_module
+        from unittest import mock
+
+        spawned: list[list[str]] = []
+        real_run = subprocess_module.run
+
+        def recording_run(args, *rest: Any, **kwargs: Any) -> Any:
+            spawned.append(list(args))
+            return real_run(args, *rest, **kwargs)
+
+        def failing_socket(*_args: Any, **_kwargs: Any) -> Any:
+            raise AssertionError("preflight opened a socket")
+
+        with (
+            mock.patch.object(subprocess_module, "run", side_effect=recording_run),
+            mock.patch("socket.socket", side_effect=failing_socket),
+            mock.patch("socket.create_connection", side_effect=failing_socket),
+        ):
+            result = self.module.preflight_push(
+                ROOT,
+                task_id="DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
+                task_contract="docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md",
+                route="DIRECT_CURSOR_DELIVERY",
+                actor="CURSOR",
+                drift_checker=lambda _root, **_k: [],
+                evidence_verifier=lambda _root, **_k: [],
+            )
+        binaries = {argv[0] for argv in spawned if argv}
+        self.assertLessEqual(binaries, {"git"}, spawned)
+        self.assertEqual(result["schema"], "smial.delivery-preflight-push")
 
 
 if __name__ == "__main__":

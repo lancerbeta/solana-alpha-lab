@@ -225,10 +225,12 @@ def preflight_push(
             checks["context_rebuild_deterministic"] = False
             reasons.append("CONTEXT_CONTRACT_MISMATCH")
 
+    expected_upstream = "origin/main"
     if receipt is not None:
         metadata = parse_task_contract(root, task_contract.replace("\\", "/"), task_id)
         binding = metadata["git_binding"]
         expected_base = binding["expected_base"]
+        expected_upstream = binding["expected_upstream"]
         merge_base = git_read(root, "merge-base", "HEAD", binding["expected_upstream"])
         checks["task_base_frozen"] = merge_base == expected_base
         if merge_base != expected_base:
@@ -254,7 +256,7 @@ def preflight_push(
             reasons.append("WRITE_SET_VIOLATION:" + ",".join(sorted(outside)))
 
     drift = drift_checker or _preflight_drift_problems
-    drift_reasons = drift(root)
+    drift_reasons = drift(root, expected_upstream=expected_upstream)
     checks["derived_state_current"] = not drift_reasons
     if drift_reasons:
         reasons.append(
@@ -288,30 +290,47 @@ def preflight_push(
     }
 
 
-def _preflight_drift_problems(root: Path) -> list[str]:
-    """Scoped derived-state drift for the whole candidate diff."""
+def _preflight_drift_problems(
+    root: Path, *, expected_upstream: str = "origin/main"
+) -> list[str]:
+    """Scoped derived-state drift for the whole candidate diff.
+
+    Any git/harness failure inside this read-only helper becomes a stable
+    DENY reason; it never escapes as a traceback through the CLI boundary.
+    """
 
     import harness_sync
 
-    expected_base = git_text(root, "merge-base", "HEAD", "origin/main")
-    changed = {
-        path.replace("\\", "/")
-        for path in git_text(
-            root, "diff", "--name-only", "--no-renames", f"{expected_base}...HEAD"
-        ).splitlines()
-        if path
-    }
+    try:
+        expected_base = git_text(root, "merge-base", "HEAD", expected_upstream)
+        changed = {
+            path.replace("\\", "/")
+            for path in git_text(
+                root, "diff", "--name-only", "--no-renames", f"{expected_base}...HEAD"
+            ).splitlines()
+            if path
+        }
+    except ValueError:
+        return [f"DRIFT_SCOPE_UNRESOLVED:{expected_upstream}"]
     original_root = harness_sync.ROOT
     harness_sync.ROOT = root.resolve()
     try:
         problems = harness_sync.check_drift(scoped_paths=changed)
+    except harness_sync.HarnessSyncError as exc:
+        return [f"DERIVED_STATE_CHECK_FAILED:{exc}"]
+    except ValueError as exc:
+        return [f"DERIVED_STATE_CHECK_FAILED:{exc}"]
     finally:
         harness_sync.ROOT = original_root
     return [f"DERIVED_STATE_DRIFT:{problem}" for problem in problems]
 
 
 def _preflight_evidence_problems(root: Path, *, task_id: str, task_contract: str) -> list[str]:
-    """Committed-blob evidence chain verification without any write."""
+    """Committed-blob evidence chain verification without any write.
+
+    Any harness failure becomes a stable DENY reason; it never escapes as a
+    traceback through the CLI boundary.
+    """
 
     import harness_sync
 
@@ -322,6 +341,8 @@ def _preflight_evidence_problems(root: Path, *, task_id: str, task_contract: str
             task_id=task_id, contract=task_contract
         )
     except harness_sync.HarnessSyncError as exc:
+        return [f"DELIVERY_EVIDENCE_INVALID:{exc}"]
+    except ValueError as exc:
         return [f"DELIVERY_EVIDENCE_INVALID:{exc}"]
     finally:
         harness_sync.ROOT = original_root

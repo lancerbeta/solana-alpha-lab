@@ -74,6 +74,26 @@ def normalize_cli_actor(value: str) -> str:
     return canonical
 
 
+pr_group = r"([1-9][0-9]*)"
+head_group = r"([0-9a-f]{40})"
+pr_token, head_token = "\x00PR\x00", "\x00HEAD\x00"
+
+
+def template_is_reordered(
+    literal_chars: list[str], pr_token: str, head_token: str
+) -> bool:
+    """True when the head group precedes the PR group in pattern order.
+
+    ``validate_exact_merge_approval`` binds ``group(1)`` to the PR number and
+    ``group(2)`` to the head, so a reordered pattern would render a valid
+    phrase that the approval validator cannot parse. Such a pattern fails
+    closed at render time instead of crashing after the owner interaction.
+    """
+
+    tokens = [item for item in literal_chars if item in (pr_token, head_token)]
+    return tokens != [pr_token, head_token]
+
+
 def render_owner_merge_phrase(
     *,
     pr_number: int,
@@ -107,7 +127,8 @@ def render_owner_merge_phrase(
     # either backslash-escaped (a literal to copy into the phrase) or part of
     # one of the two recognized capture groups. Anything else (alternation,
     # classes, quantifiers, backrefs, named groups) cannot be rendered as a
-    # single deterministic phrase and fails closed.
+    # single deterministic phrase and fails closed. The PR group must come
+    # first: the approval validator binds group(1) to the PR number.
     pr_group = r"([1-9][0-9]*)"
     head_group = r"([0-9a-f]{40})"
     pr_token, head_token = "\x00PR\x00", "\x00HEAD\x00"
@@ -139,6 +160,8 @@ def render_owner_merge_phrase(
         literal_chars.append(ch)
         i += 1
     if not seen_pr or not seen_head:
+        raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
+    if template_is_reordered(literal_chars, pr_token, head_token):
         raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
     template = "".join(literal_chars)
     phrase = template.replace(pr_token, str(pr_number)).replace(head_token, head_sha)

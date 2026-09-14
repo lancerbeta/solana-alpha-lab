@@ -16308,7 +16308,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: f5cb77a298f011acbe292ffcf5e8f114b3f2dc8db43350e8c8efa166d646718d}
+  integrity: {kind: sha256, sha256: 80bd9b73dc91a1f61898c26ba220b513c3a2959237ad6be836b4e2bb9ed0555b}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19821,7 +19821,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: 063cb3bf98dd9febe0d7a9e74ef5421a79ae40639ca52c103bb7f2850481b03d}
+  integrity: {kind: sha256, sha256: 0c023a118fa376151af493bd148d13e465260df6698a7ec8c2766660bdabbde1}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}

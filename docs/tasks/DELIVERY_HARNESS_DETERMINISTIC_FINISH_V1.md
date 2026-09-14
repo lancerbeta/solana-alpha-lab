@@ -38,6 +38,7 @@ managed_write_set:
 - tests/test_delivery_harness_authority.py
 - tests/test_delivery_harness_bootstrap.py
 - tests/test_delivery_harness_deterministic_finish.py
+- delivery-harness/templates/portable-core/AGENTS.md.tmpl
 - delivery-harness/templates/portable-core/delivery-harness/harness.yaml
 - catalog/assets/core.yaml
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_completion_v1.json
@@ -45,6 +46,7 @@ managed_write_set:
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_factory_fit_v1.json
 - docs/evidence/control/delivery_harness_acceptance_v1.json
 - docs/evidence/control/delivery_harness_factory_fit_v1.json
+- docs/evidence/control/a1_delivery_harness_deterministic_finish_ux_v1.json
 external_caps:
   network: false
   credentials: false
