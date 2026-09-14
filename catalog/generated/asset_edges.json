@@ -3623,6 +3623,36 @@
       "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
     },
     {
+      "source_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-M1-CALIBRATION-REPORT-001"
+    },
+    {
+      "source_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-M1-EXECUTION-REALITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-M1-SUCCESSOR-PREFLIGHT-001"
+    },
+    {
+      "source_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-M1-CALIBRATION-REPORT-001"
+    },
+    {
+      "source_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001",
+      "relation": "contains",
+      "target_asset_id": "SCRIPT-M1-SUCCESSOR-PREFLIGHT-001"
+    },
+    {
+      "source_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-M1-EXECUTION-REALITY-001"
+    },
+    {
       "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
       "relation": "consumes",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
@@ -11003,6 +11033,41 @@
       "target_asset_id": "CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001"
     },
     {
+      "source_asset_id": "MODULE-M1-CALIBRATION-REPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-M1-EXECUTION-REALITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-M1-CALIBRATION-REPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-OBSERVATION-PANEL-SNAPSHOT-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-M1-CALIBRATION-REPORT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-M1-EXECUTION-REALITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "MODULE-M1-SUCCESSOR-PREFLIGHT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-M1-EXECUTION-REALITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-M1-SUCCESSOR-PREFLIGHT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULER-001"
+    },
+    {
+      "source_asset_id": "MODULE-M1-SUCCESSOR-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001"
+    },
+    {
       "source_asset_id": "MODULE-MARKET-CONTEXT-001",
       "relation": "consumes",
       "target_asset_id": "CONFIG-FACTORY-V1-COMMON-MARKET-FEATURE-SURFACE-001"
@@ -14668,6 +14733,26 @@
       "target_asset_id": "MODULE-IN-SCOPE-POPULATION-SUPPLY-GATE-001"
     },
     {
+      "source_asset_id": "SCRIPT-M1-CALIBRATION-REPORT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-M1-CALIBRATION-REPORT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-M1-CALIBRATION-REPORT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-M1-SUCCESSOR-PREFLIGHT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-M1-SUCCESSOR-PREFLIGHT-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-M1-SUCCESSOR-PREFLIGHT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001"
+    },
+    {
       "source_asset_id": "SCRIPT-MATURITY-PROBE-LOOKUP-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-EARLY-ICP-FREEZE-AND-MATURITY-BRANCH-CLOSE-001"
@@ -16166,6 +16251,26 @@
       "source_asset_id": "TEST-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-LIVE-EVIDENCE-CONSUMER-TRUTH-CLOSURE-001"
+    },
+    {
+      "source_asset_id": "TEST-M1-EXECUTION-REALITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-M1-EXECUTION-REALITY-CALIBRATION-001"
+    },
+    {
+      "source_asset_id": "TEST-M1-EXECUTION-REALITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "MODULE-M1-CALIBRATION-REPORT-001"
+    },
+    {
+      "source_asset_id": "TEST-M1-EXECUTION-REALITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "MODULE-M1-EXECUTION-REALITY-001"
+    },
+    {
+      "source_asset_id": "TEST-M1-EXECUTION-REALITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "MODULE-M1-SUCCESSOR-PREFLIGHT-001"
     },
     {
       "source_asset_id": "TEST-MARKET-DATA-AWARENESS-001",

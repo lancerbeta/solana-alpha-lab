@@ -192,6 +192,58 @@ bundles:
       - FIELD-QUOTE-ROUTE-HOP-COUNT-001
       - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
       - FIELD-QUOTE-RESPONSE-SHA256-001
+  - bundle_id: BUNDLE-JUPITER-QUOTE-BUY-USDC10-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC10-001
+    field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+  - bundle_id: BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-USDC10-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC10-001
+    field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+  - bundle_id: BUNDLE-JUPITER-QUOTE-BUY-USDC100-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC100-001
+    field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+  - bundle_id: BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-USDC100-001
+    primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC100-001
+    field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
 primitives:
   - primitive_id: PRIM-JUPITER-TOKENS-V2-RECENT-001
     version: '1.0'
@@ -203,7 +255,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -244,7 +296,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -296,7 +348,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -342,7 +394,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -388,7 +440,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -436,7 +488,7 @@ primitives:
     implementation_asset_ids:
       - MODULE-OBSERVATION-PRIMITIVES-001
     implementation_git_hashes:
-      MODULE-OBSERVATION-PRIMITIVES-001: "d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631"
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
     parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
     output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
     output_field_ids:
@@ -467,6 +519,194 @@ primitives:
       requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-1M-001
     terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
     missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC10-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: POINT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract: null
+    terminal_classes: [OBSERVED, MISSING_TYPED]
+    missing_classes: [NO_ROUTE, NOTIONAL_NO_ROUTE, UNKNOWN_PROVIDER_ERROR, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC100-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: POINT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-BUY-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract: null
+    terminal_classes: [OBSERVED, MISSING_TYPED]
+    missing_classes: [NO_ROUTE, NOTIONAL_NO_ROUTE, UNKNOWN_PROVIDER_ERROR, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC10-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: DEPENDENT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract:
+      recipe_id: DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001
+      requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-USDC10-001
+    terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
+    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, NOTIONAL_NO_ROUTE, UNKNOWN_PROVIDER_ERROR, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
+    error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
+    retry: false
+    fallback: false
+    idempotency_policy: EXACT_REQUEST_HASH
+    data_zone: DATA_ROOT_ONLY
+    raw_retention_class: RAW_BOUNDED
+    redaction_profile: NO_SECRETS_NO_CREDENTIAL_HEADERS
+  - primitive_id: PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC100-001
+    version: '1.0'
+    status: ACCEPTED
+    kind: DEPENDENT_OBSERVATION
+    provider_route_ids:
+      - JUPITER-SOLANA-SWAP-V2-ORDER-FREE-API-KEY-001
+    access_class: LOCAL_ENV_CREDENTIAL
+    implementation_asset_ids:
+      - MODULE-OBSERVATION-PRIMITIVES-001
+    implementation_git_hashes:
+      MODULE-OBSERVATION-PRIMITIVES-001: "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1"
+    parameter_schema_asset_id: SCHEMA-OBSERVATION-PRIMITIVE-DESCRIPTOR-V1-001
+    output_schema_asset_id: SCHEMA-OBSERVATION-SCHEDULE-V1-001
+    output_field_ids:
+      - FIELD-QUOTE-SELL-OUT-AMOUNT-001
+      - FIELD-QUOTE-IN-AMOUNT-001
+      - FIELD-QUOTE-PRICE-IMPACT-PCT-001
+      - FIELD-QUOTE-FEE-BPS-001
+      - FIELD-QUOTE-PLATFORM-FEE-001
+      - FIELD-QUOTE-ROUTER-001
+      - FIELD-QUOTE-MODE-001
+      - FIELD-QUOTE-ROUTE-HOP-COUNT-001
+      - FIELD-QUOTE-ROUTE-FEE-AMOUNTS-PRESENT-001
+      - FIELD-QUOTE-RESPONSE-SHA256-001
+    pit_support: true
+    authoritative_clock_field_ids:
+      - FIELD-FIRST-POOL-CREATED-AT-001
+    request_cardinality: ONE
+    max_batch_size: 1
+    call_cost:
+      model_id: COST-HTTP-CALL-001
+      calls_per_request: 1
+    modeled_credit_cost:
+      model_id: CREDIT-JUPITER-SWAP-QUOTE-V1
+      credits_per_request: 1
+      status: ACCEPTED
+    dependency_contract:
+      recipe_id: DEPENDENT-REVERSE-SELL-FROM-BUY-OUTPUT-001
+      requires_bundle_id: BUNDLE-JUPITER-QUOTE-BUY-USDC100-001
+    terminal_classes: [OBSERVED, MISSING_TYPED, CENSORED]
+    missing_classes: [DEPENDENCY_MISSING, NO_ROUTE, NOTIONAL_NO_ROUTE, UNKNOWN_PROVIDER_ERROR, INVALID_RESPONSE, FIELD_ABSENT, ABSENT, "NULL", UNKNOWN, RESPONSE_BODY_TOO_LARGE, RESPONSE_JSON_INVALID]
     error_classes: [HTTP_ERROR, TIMEOUT, PROVIDER_SCHEMA_DRIFT]
     retry: false
     fallback: false
