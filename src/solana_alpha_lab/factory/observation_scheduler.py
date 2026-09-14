@@ -36,6 +36,7 @@ from solana_alpha_lab.factory.observation_primitives import (
     BUY_AMOUNT,
     RECENT_URL,
     SOL_MINT,
+    USDC_MINT,
     execute_primitive,
     call_occurrence_id,
     parse_anchor,
@@ -80,13 +81,27 @@ DEPENDENT_SELL = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001"
 QUOTE_BUY = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001"
 BUY_1M = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-1M-001"
 REVERSE_1M = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-1M-001"
-REVERSE_FOR_BUY = {QUOTE_BUY: DEPENDENT_SELL, BUY_1M: REVERSE_1M}
+BUY_USDC10 = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC10-001"
+BUY_USDC100 = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC100-001"
+REVERSE_USDC10 = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC10-001"
+REVERSE_USDC100 = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC100-001"
+SELL_PRIMITIVES_USDC = frozenset({REVERSE_USDC10, REVERSE_USDC100})
+REVERSE_FOR_BUY = {
+    QUOTE_BUY: DEPENDENT_SELL,
+    BUY_1M: REVERSE_1M,
+    BUY_USDC10: REVERSE_USDC10,
+    BUY_USDC100: REVERSE_USDC100,
+}
 BUNDLE_TO_PRIMITIVE = {
     "BUNDLE-JUPITER-TOKEN-SEARCH-SNAPSHOT-001": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
     "BUNDLE-JUPITER-QUOTE-BUY-001": QUOTE_BUY,
     "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-001": DEPENDENT_SELL,
     "BUNDLE-JUPITER-QUOTE-BUY-1M-001": BUY_1M,
     "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-1M-001": REVERSE_1M,
+    "BUNDLE-JUPITER-QUOTE-BUY-USDC10-001": BUY_USDC10,
+    "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-USDC10-001": REVERSE_USDC10,
+    "BUNDLE-JUPITER-QUOTE-BUY-USDC100-001": BUY_USDC100,
+    "BUNDLE-JUPITER-DEPENDENT-REVERSE-SELL-USDC100-001": REVERSE_USDC100,
 }
 SCHEMA_REQUIRED_KEYS = {
     "PRIM-JUPITER-TOKENS-V2-RECENT-001": ("id",),
@@ -95,13 +110,28 @@ SCHEMA_REQUIRED_KEYS = {
     DEPENDENT_SELL: ("outAmount",),
     BUY_1M: ("outAmount",),
     REVERSE_1M: ("outAmount",),
+    BUY_USDC10: ("outAmount",),
+    REVERSE_USDC10: ("outAmount",),
+    BUY_USDC100: ("outAmount",),
+    REVERSE_USDC100: ("outAmount",),
 }
+# Fixed notional input amounts by entry primitive. SOL entries keep lamport
+# semantics; USDC entries use canonical 6-decimal atomic USDC.
 QUOTE_AMOUNT = {
     QUOTE_BUY: BUY_AMOUNT,
     BUY_1M: "1000000",
+    BUY_USDC10: "10000000",
+    BUY_USDC100: "100000000",
 }
+# Entry primitives whose input mint is USDC (M1 execution calibration).
+USDC_ENTRY_PRIMITIVES = frozenset({BUY_USDC10, BUY_USDC100})
 BUY_PRIMITIVES = frozenset(QUOTE_AMOUNT)
 SELL_PRIMITIVES = frozenset(REVERSE_FOR_BUY.values())
+# M1 execution-calibration primitives (USDC entries + dependent reverses) are
+# additive measurement only: they must never participate in the scientific
+# X-eligibility gate, otherwise a typed NO_ROUTE entry would make the member
+# X_POPULATION_INELIGIBLE and NO_ENTRY would become unobservable.
+M1_EXECUTION_PRIMITIVES = USDC_ENTRY_PRIMITIVES | SELL_PRIMITIVES_USDC
 SURFACE_FIELD_KEYS = {
     "FIELD-QUOTE-IN-AMOUNT-001": "in_amount",
     "FIELD-QUOTE-PRICE-IMPACT-PCT-001": "price_impact_pct",
@@ -447,6 +477,7 @@ def _apply_x_phase(
         BUNDLE_TO_PRIMITIVE[str(bundle_id)]
         for bundle_id in schedule["x_point"]["bundle_ids"]
         if BUNDLE_TO_PRIMITIVE[str(bundle_id)] not in SELL_PRIMITIVES
+        and BUNDLE_TO_PRIMITIVE[str(bundle_id)] not in M1_EXECUTION_PRIMITIVES
     }
     if str(claim["primitive_id"]) not in x_primitive_ids:
         return terminal_state, missing_reason, []
@@ -2669,8 +2700,9 @@ def _url_for_claim(schedule: Mapping[str, Any], claim: Mapping[str, Any]) -> tup
     if primitive_id == "PRIM-JUPITER-TOKENS-V2-SEARCH-001":
         return search_url([entity_id]), "1.0"
     if primitive_id in QUOTE_AMOUNT:
+        input_mint = USDC_MINT if primitive_id in USDC_ENTRY_PRIMITIVES else SOL_MINT
         return quote_url(
-            input_mint=SOL_MINT,
+            input_mint=input_mint,
             output_mint=entity_id,
             amount=QUOTE_AMOUNT[primitive_id],
         ), "1.0"
@@ -2679,8 +2711,32 @@ def _url_for_claim(schedule: Mapping[str, Any], claim: Mapping[str, Any]) -> tup
         amount = payload.get("buy_out_amount")
         if not amount:
             return None
+        entry_input_mint = _reverse_entry_input_mint(primitive_id)
+        if entry_input_mint is not None:
+            # M1 USDC dependent reverse: exact same-notional entry outAmount
+            # (token) → USDC.
+            return quote_url(
+                input_mint=entity_id,
+                output_mint=entry_input_mint,
+                amount=str(amount),
+            ), "1.0"
         return quote_url(input_mint=entity_id, output_mint=SOL_MINT, amount=str(amount)), "1.0"
     raise ObservationSchedulerError("CHANGE_LANE_PRIMITIVE_GAP")
+
+
+def _reverse_entry_input_mint(reverse_primitive_id: str) -> str | None:
+    """Input mint of the entry primitive a reverse leg belongs to.
+
+    USDC reverse legs are bound (via REVERSE_FOR_BUY) to USDC entry
+    primitives, so the reverse returns to USDC; SOL reverse legs return to
+    wrapped SOL. Same-notional binding is structural: each reverse maps to
+    exactly one entry primitive.
+    """
+
+    for entry_id, reverse_id in REVERSE_FOR_BUY.items():
+        if reverse_id == reverse_primitive_id:
+            return USDC_MINT if entry_id in USDC_ENTRY_PRIMITIVES else None
+    return None
 
 
 def _propagate_buy_out(

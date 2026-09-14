@@ -204,6 +204,74 @@ No wallet / signer / transaction credentials in this collector path.
 - Sampling / Free-tier envelope from `collector_campaign_preflight` / oracle
 - Retry=false, fallback=false, cash=$0
 
+## M1 execution reality calibration (capability, not commissioned)
+
+M1 measures the Jupiter execution surface (TWO_WAY / ENTRY_ONLY / NO_ENTRY /
+UNKNOWN + quote-implied roundtrip friction) for the canonical EARLY population
+at fixed $10/$100 USDC notionals through the existing collector spine. The
+capability is repository-merged only; **no VPS deployment, activation or
+rollover happened in its implementing atom**.
+
+- Typed quote parity: Jupiter `errorCode` route-unavailable bodies
+  (`NO_ROUTES_FOUND`, `COULD_NOT_FIND_ANY_ROUTE`, `TOKEN_NOT_TRADABLE`,
+  `MARKET_NOT_FOUND`, `FAILED TO GET QUOTES`) classify as typed `NO_ROUTE`
+  (`NOTIONAL_NO_ROUTE` for `ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT`) on
+  `/swap/v2/order` responses of any HTTP status; everything else stays
+  `HTTP_ERROR`/`TIMEOUT`/`PROVIDER_SCHEMA_DRIFT`/`UNKNOWN_PROVIDER_ERROR`
+  (→ M1 UNKNOWN). Never substring heuristics.
+- USDC primitives: `PRIM-…-QUOTE-BUY-USDC10/100-001` (entry, USDC→token,
+  10_000_000 / 100_000_000 atomic 6-dec USDC) and
+  `PRIM-…-DEPENDENT-REVERSE-SELL-USDC10/100-001` (reverse consumes the exact
+  same-notional entry `outAmount`, token→USDC). SOL/lamport primitives
+  unchanged.
+- Denominator invariant per notional:
+  `population_n = two_way_n + entry_only_n + no_entry_n + unknown_n`; UNKNOWN
+  is never coerced.
+- Provisional progress: collector read-model projection
+  `build_m1_progress_projection` (sampled / complete dual-notional /
+  provisional outcome counts / M1 calls used / last progress / exact blocker).
+  Final science only from the frozen report.
+
+### Future operator flow (no activation in the implementing atom)
+
+```text
+MERGED CAPABILITY
+→ exact-SHA deploy gate
+→ fresh runtime doctor/status
+→ zero-network M1 successor preflight
+→ owner reviews exact proposal
+→ exact owner schedule authorization
+→ existing rollover/activation
+→ unattended timer operation
+→ drain/complete
+→ immutable snapshot
+→ deterministic M1 report
+→ owner/science review
+```
+
+Zero-network M1 successor preflight (no authorize, no activate, no mutation):
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/m1_successor_preflight.py --predecessor-readback <READBACK_JSON> --predecessor-schedule <SCHEDULE_YAML> --target-members 100 --campaign-days 7
+```
+
+Deterministic M1 calibration report from immutable RDP lineage only:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/build_m1_calibration_report.py --data-root local/factory_v1/observation_rdp --schedule-sha256 <SHA> --activation-id <ACT> --availability-cutoff <UTC_Z> --population-ref <REF> --sampling-file <SAMPLING_JSON> --lineage-file <LINEAGE_JSON>
+```
+
+Blockers surfaced by the preflight: `PREDECESSOR_READBACK_NOT_ACTIVE`,
+`PREDECESSOR_READBACK_IDENTITY_MISSING`, `PREDECESSOR_IDENTITY_MISMATCH`,
+`M1_BUNDLE_CAPACITY_GAP`, `M1_PROVIDER_BUDGET_GAP`,
+`SUCCESSOR_SEMANTIC_CONSERVATION_FAILED`. Runtime commissioning additionally
+fails closed on current collector health semantics
+(restore gap, backlog, provider auth/rate/failure, stale discovery, unsafe
+cutover). The budget envelope combines the M1 increment (at most 4 calls per
+sampled eligible member) with the predecessor X-point baseline (one call per
+inherited bundle per member per day) and rejects a successor whose declared
+budgets cannot carry both.
+
 ## How a future agent recovers current state
 
 Do **not** trust chat “current status”. Machine-resolve:

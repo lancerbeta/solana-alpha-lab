@@ -212,9 +212,17 @@ class JupiterReadonlyOpener:
                     "url_has_api_key": False,
                 }
         except urllib.error.HTTPError as exc:
+            # Preserve the typed provider error body (bounded) so quote
+            # primitives can classify Jupiter route-unavailable errorCode
+            # bodies instead of collapsing them into generic HTTP_ERROR.
+            try:
+                error_bytes = read_bounded_http_body(exc)
+                error_body: object = parse_bounded_json(error_bytes)
+            except Exception:
+                error_body = None
             return {
                 "http_status": int(exc.code),
-                "body": None,
+                "body": error_body,
                 "url_has_api_key": False,
             }
         except TimeoutError:

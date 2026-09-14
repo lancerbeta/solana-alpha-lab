@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping as MappingLike
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -32,6 +33,13 @@ _KIND_RATE = "rate"
 _KIND_FAILED = "failed"
 _KIND_OK = "ok"
 _KIND_OTHER = "other"
+
+
+def _payload_missing_reason(row: MappingLike) -> object:
+    payload = row.get("payload")
+    if isinstance(payload, dict):
+        return payload.get("missing_reason")
+    return None
 
 
 def _safe_parse(raw: object) -> datetime | None:
@@ -342,4 +350,160 @@ def build_collector_read_model(
     }
 
 
-__all__ = ["build_collector_read_model", "derive_current_provider_state"]
+__all__ = [
+    "build_collector_read_model",
+    "build_m1_progress_projection",
+    "derive_current_provider_state",
+]
+
+
+def build_m1_progress_projection(
+    store: ObservationScheduleStore,
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+    now: datetime,
+) -> dict[str, Any]:
+    """Minimal provisional M1 campaign progress projection (§23).
+
+    Operational provisional counters only; the final scientific M1 result
+    comes from the frozen immutable-lineage calibration report, never from
+    this moving read-model projection.
+    """
+
+    from solana_alpha_lab.factory.m1_execution_reality import (
+        NOTIONAL_ENTRY_PRIMITIVE,
+        NOTIONAL_REVERSE_PRIMITIVE,
+        M1_NOTIONALS,
+    )
+
+    m1_primitives = {
+        NOTIONAL_ENTRY_PRIMITIVE[n] for n in M1_NOTIONALS
+    } | {NOTIONAL_REVERSE_PRIMITIVE[n] for n in M1_NOTIONALS}
+    del m1_primitives  # documentation only; counting goes through scoped rows
+    sampled = 0
+    complete_dual_notional = 0
+    outcome_counts: dict[str, dict[str, int]] = {
+        n: {"TWO_WAY": 0, "ENTRY_ONLY": 0, "NO_ENTRY": 0, "UNKNOWN": 0}
+        for n in M1_NOTIONALS
+    }
+    m1_calls = 0
+    last_progress_at = None
+    blocker: str | None = None
+
+    from solana_alpha_lab.factory.m1_execution_reality import (
+        classify_execution_outcome,
+        leg_class,
+    )
+
+    terminal_states = (
+        "PENDING",
+        "DUE",
+        "CLAIMED",
+        "STARTED",
+        "OBSERVED",
+        "MISSING_TYPED",
+        "DISAPPEARED",
+        "CENSORED",
+        "CENSORED_LATE",
+        "IN_FLIGHT_CALL_INDETERMINATE",
+        "DEPENDENCY_MISSING",
+        "BLOCKED_BUDGET",
+    )
+    # States that imply a provider call was actually issued for the leg.
+    # PENDING/DUE/CLAIMED/STARTED are scheduled but unexecuted;
+    # DEPENDENCY_MISSING/BLOCKED_BUDGET/CENSORED never opened a socket.
+    _call_issued_states = frozenset(
+        {
+            "OBSERVED",
+            "MISSING_TYPED",
+            "DISAPPEARED",
+            "CENSORED_LATE",
+            "IN_FLIGHT_CALL_INDETERMINATE",
+        }
+    )
+
+    def _scoped_leg_rows(entity_id: str, primitive_id: str) -> list[dict[str, Any]]:
+        return store.list_due_in_states_scoped(
+            terminal_states,
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            entity_id=entity_id,
+            primitive_ids=(primitive_id,),
+        )
+
+    for cand in store.list_candidates(
+        schedule_sha256=schedule_sha256, activation_id=activation_id
+    ):
+        if str(cand.get("state") or "") not in {"X_ELIGIBLE", "SAMPLED_MEMBER", "MEMBER"}:
+            continue
+        entity_id = str(cand.get("entity_id") or "")
+        if not entity_id:
+            continue
+        sampled += 1
+        member_outcomes: dict[str, str] = {}
+        for notional in M1_NOTIONALS:
+            entry_rows = _scoped_leg_rows(entity_id, NOTIONAL_ENTRY_PRIMITIVE[notional])
+            reverse_rows = _scoped_leg_rows(
+                entity_id, NOTIONAL_REVERSE_PRIMITIVE[notional]
+            )
+            m1_calls += sum(
+                1
+                for row in entry_rows + reverse_rows
+                if str(row.get("state") or "") in _call_issued_states
+            )
+            entry_row = entry_rows[-1] if entry_rows else None
+            reverse_row = reverse_rows[-1] if reverse_rows else None
+            for row in (entry_row, reverse_row):
+                if row is None:
+                    continue
+                updated = _safe_parse(row.get("updated_at") or row.get("created_at"))
+                if updated is not None and (
+                    last_progress_at is None or updated > last_progress_at
+                ):
+                    last_progress_at = updated
+            entry_leg = (
+                leg_class(
+                    state=str(entry_row.get("state") or ""),
+                    missing_reason=_payload_missing_reason(entry_row),
+                )
+                if entry_row is not None
+                else "UNKNOWN"
+            )
+            reverse_leg = (
+                leg_class(
+                    state=str(reverse_row.get("state") or ""),
+                    missing_reason=_payload_missing_reason(reverse_row),
+                )
+                if reverse_row is not None
+                else None
+            )
+            member_outcomes[notional] = classify_execution_outcome(entry_leg, reverse_leg)
+            outcome_counts[notional][member_outcomes[notional]] += 1
+        if all(member_outcomes[n] != "UNKNOWN" for n in M1_NOTIONALS):
+            complete_dual_notional += 1
+
+    # Exact blocker: only material operational blockers surfaced by the
+    # existing read-model semantics.
+    activations = store.get_activation(schedule_sha256, activation_id)
+    state = str((activations or {}).get("state") or "NONE") if activations else "NONE"
+    if state != "ACTIVE":
+        blocker = f"ACTIVATION_{state}"
+    elif store.restore_marker_unresolved():
+        blocker = "BACKUP_DEGRADED"
+
+    return {
+        "projection": "M1_PROGRESS_PROVISIONAL",
+        "m1_active": state == "ACTIVE",
+        "schedule_sha256": schedule_sha256,
+        "activation_id": activation_id,
+        "sampled_member_count": sampled,
+        "complete_dual_notional_member_count": complete_dual_notional,
+        "provisional_outcome_counts": {
+            f"notional_{n}_usd": outcome_counts[n] for n in M1_NOTIONALS
+        },
+        "m1_provider_calls_used": m1_calls,
+        "last_m1_progress_at": render_utc(last_progress_at) if last_progress_at else None,
+        "blocker": blocker,
+        "final_result_source": "FROZEN_M1_CALIBRATION_REPORT_ONLY",
+    }

@@ -16,8 +16,31 @@ from solana_alpha_lab.factory.observation_schedule import canonical_sha256, pars
 
 API_HOST = "api.jup.ag"
 SOL_MINT = "So11111111111111111111111111111111111111112"
+# Canonical Solana USDC identity (owner: jupiter_quote_logger.py task10 contract).
+USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"
+USDC_DECIMALS = 6
+USDC_NOTIONAL_10_ATOMIC = "10000000"
+USDC_NOTIONAL_100_ATOMIC = "100000000"
 BUY_AMOUNT = "10000000"
 SLIPPAGE_BPS = "100"
+# Typed Jupiter swap/v2/order route-unavailable codes. Exact match on the
+# whitespace-normalized uppercase provider code (quote_native panel canon);
+# never a substring heuristic, never a generic HTTP fallback.
+JUPITER_MARKET_NO_ROUTE_CODES = frozenset(
+    {
+        "NO_ROUTES_FOUND",
+        "COULD_NOT_FIND_ANY_ROUTE",
+        "TOKEN_NOT_TRADABLE",
+        "MARKET_NOT_FOUND",
+        # Exact Jupiter swap/v2/order prose after whitespace-normalized
+        # uppercasing.
+        "FAILED TO GET QUOTES",
+    }
+)
+JUPITER_NOTIONAL_NO_ROUTE_CODES = frozenset(
+    {"ROUTE_PLAN_DOES_NOT_CONSUME_ALL_THE_AMOUNT"}
+)
+JUPITER_ERROR_BODY_MAX_KEYS = 8
 ALLOWED_PATHS = frozenset(
     {
         "/tokens/v2/recent",
@@ -72,6 +95,49 @@ def classify_http_transport(
     if 500 <= status <= 599:
         return status, HTTP_CLASS_5XX
     return status, HTTP_CLASS_NO_RESPONSE
+
+
+def normalize_jupiter_error_code(value: object) -> str | None:
+    """Whitespace-normalized uppercase provider code, or None."""
+
+    if not isinstance(value, str) or not value.strip():
+        return None
+    return " ".join(value.upper().split())
+
+
+def classify_jupiter_quote_error_body(body: object) -> tuple[str, str] | None:
+    """Classify a typed Jupiter swap/v2/order error body.
+
+    Returns ``(missing_reason, provider_error_code)`` for a recognized typed
+    error body, else ``None`` (caller keeps its generic classification).
+
+    Recognized:
+    - ``NO_ROUTE`` for canonical market route-unavailable codes.
+    - ``NOTIONAL_NO_ROUTE`` for the canonical size-bound route code.
+    - ``UNKNOWN_PROVIDER_ERROR`` for any other typed provider error shape.
+
+    Never a substring heuristic: the normalized code must be exactly equal to
+    a known canonical code. A generic HTTP_ERROR must never become NO_ROUTE,
+    and a known route code must never collapse into generic UNKNOWN.
+    """
+
+    if not isinstance(body, Mapping):
+        return None
+    if len(body) > JUPITER_ERROR_BODY_MAX_KEYS:
+        return None
+    error_code = body.get("errorCode")
+    if error_code is None:
+        # Some Jupiter error surfaces carry the code only in ``error`` prose.
+        raw_error = body.get("error")
+        error_code = raw_error if isinstance(raw_error, str) else None
+    normalized = normalize_jupiter_error_code(error_code)
+    if normalized is None:
+        return None
+    if normalized in JUPITER_MARKET_NO_ROUTE_CODES:
+        return "NO_ROUTE", normalized
+    if normalized in JUPITER_NOTIONAL_NO_ROUTE_CODES:
+        return "NOTIONAL_NO_ROUTE", normalized
+    return "UNKNOWN_PROVIDER_ERROR", normalized
 
 
 def request_sha256(*, method: str, url: str, body: Mapping[str, Any] | None, primitive_version: str) -> str:
@@ -237,10 +303,43 @@ def execute_primitive(
         payload_text = json.dumps(result, default=str)
         if redact_with in payload_text:
             raise ObservationPrimitiveError("SECRET_LEAK")
+    # Typed Jupiter quote error codes are a swap/v2/order semantic. For other
+    # surfaces keep the historical generic classification.
+    quote_surface = urlsplit(url).path == "/swap/v2/order"
     if status in {404}:
+        typed_error = (
+            classify_jupiter_quote_error_body(body) if quote_surface else None
+        )
+        if typed_error is not None:
+            return typed_missing(
+                typed_error[0],
+                response_received_at,
+                http_status=status,
+            )
         return typed_missing("NO_ROUTE", response_received_at, http_status=status)
     if status >= 400:
+        typed_error = (
+            classify_jupiter_quote_error_body(body) if quote_surface else None
+        )
+        if typed_error is not None:
+            return typed_missing(
+                typed_error[0],
+                response_received_at,
+                http_status=status,
+            )
         return typed_missing("HTTP_ERROR", response_received_at, http_status=status)
+    # Jupiter can return a typed route-unavailable error body with HTTP 200
+    # (legacy TASK-10 canon: EXPLICIT_NO_ROUTE under SUCCESS). Classify it
+    # before schema validation so a typed no-route never becomes
+    # PROVIDER_SCHEMA_DRIFT.
+    if quote_surface and schema_required_keys:
+        typed_error = classify_jupiter_quote_error_body(body)
+        if typed_error is not None:
+            return typed_missing(
+                typed_error[0],
+                response_received_at,
+                http_status=status,
+            )
     if schema_required_keys:
         if not isinstance(body, Mapping) and not isinstance(body, list):
             return typed_missing(

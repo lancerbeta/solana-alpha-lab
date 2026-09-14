@@ -1,0 +1,78 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "M1-EXECUTION-REALITY-CALIBRATION-COMPLETION-001",
+  "as_of": "2026-09-14",
+  "task_id": "M1_EXECUTION_REALITY_CALIBRATION_V1",
+  "state_change": "M1_EXECUTION_REALITY_CALIBRATION_CAPABILITY_IMPLEMENTED",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "518a4c0f10939856377fc1b0a0fe884c5960256b88b9e099b2f288d0eb0c7124",
+    "catalog/assets/lifecycle.yaml": "4635d6eeb7e2e27e0355bfb4f2c2b9cead8eb173b34a09387d08168168246080",
+    "catalog/catalog_manifest.yaml": "d91199b16e3bb0fba080f68d59663a6540cd96de1a0a1b0a19305aab1f9d6d4a",
+    "catalog/generated/asset_edges.json": "9233a66beafdab362926c8199b7a5324407c8f4a67bf0901cb0f5001bd1e71ce",
+    "configs/observation_primitive_registry_v1.yaml": "c88ac29ae72e22e62d2aa0e7b21c27ab089c5edf766d763408f257319c4533b0",
+    "docs/PROJECT_MAP.md": "7e83e28f7343613ff6b2c1bbfe612e08f99e66f4e599de805e4d0248da5bfc4e",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "f772d00f7d856321ac0e823ccf09f9a28d9e68dc0d73778a7dd30829f3829b88",
+    "docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md": "c3fb6b2ac9e5cee5166b247456e6f534cb5cf3739b41354483851d114a2f9d87",
+    "scripts/build_m1_calibration_report.py": "b8186d939c4df8d0952a32a3c9339b8446d12e01a1a0aaceafd72b95843971dd",
+    "scripts/m1_successor_preflight.py": "39e80eded2e100971ed664c01630dfd26719f5212c23ffedc507566778dd5b36",
+    "src/solana_alpha_lab/factory/collector_read_model.py": "1ccf08211f51b815fbb55426858abb8ca267e4dcb6f223ef360eaed7cae064e0",
+    "src/solana_alpha_lab/factory/m1_calibration_report.py": "b3821f235a8e94c69f2828e9adfbab502d9882ec07dd2f47803993f101c08201",
+    "src/solana_alpha_lab/factory/m1_execution_reality.py": "7d714249c926d7c84c6d47f63de26ef6620acc0ccfc621d3444c69cf7ccd1753",
+    "src/solana_alpha_lab/factory/m1_successor_preflight.py": "fa34b7fc3590149eba3fc6b9b2d266fc2cc9a20fe0f41388e192d1a56b29f66e",
+    "src/solana_alpha_lab/factory/observation_primitives.py": "e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1",
+    "src/solana_alpha_lab/factory/observation_schedule_runtime.py": "a82f11116d3139058e7ee90d7317afc9a02072879e79e184f58303194b6e4861",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "0a4c42c44fde9117660292cfe8910d60a0d6a51ecbec66b520f4517b9f72b490",
+    "tests/fixtures/observation_schedule/m1_quote_surface.yaml": "8dfb1a97a99f27fae3fcfbe3eaea017eea0831c51f1be3d2e689a2cfa9ed2c59",
+    "tests/test_m1_execution_reality.py": "e8d389bf7a6541f51fbb3097925a7d05f419d5b8f97b30512447bb780426da35"
+  },
+  "base_main": "5e36ef349f85d741c140c418af2de136d99521b7",
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_m1_execution_reality_calibration_factory_fit_v1.json",
+    "sha256": "05a65a3a843792fe5596dba0006d8e4f511fdbb7c53d4b934c22de62e1e44945",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_M1_EXECUTION_REALITY_AND_REGRESSION_SUITES",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_m1_execution_reality_calibration_review_v1.json",
+      "sha256": "bfba7018b7fc530b6664dee5cbdd56532af63a11d5cb37f3d54bb748f5307753",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_M1_EXECUTION_REALITY_AND_REGRESSION_SUITES"
+    ]
+  },
+  "non_claims": [
+    "RUNTIME_NOT_COMMISSIONED",
+    "NO_M1_PROVIDER_EVIDENCE_COLLECTED",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_REAL_MONEY",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_CANONICAL_DONE",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "provider_requests": 0,
+    "credential_reads": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE"
+}

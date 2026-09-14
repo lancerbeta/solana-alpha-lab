@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: bdd090cfedd96d45de214b47772ec8c81e74fc991c573d1c72d45293c2ec98ef}
+  integrity: {kind: sha256, sha256: f772d00f7d856321ac0e823ccf09f9a28d9e68dc0d73778a7dd30829f3829b88}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -32986,7 +32986,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/observation_primitive_registry_v1.yaml', repository_path: configs/observation_primitive_registry_v1.yaml}
-  integrity: {kind: sha256, sha256: 04aee01ebfbe6a26bf8cdc54aff94a415715a63b9df02b7eab59c41a58a797aa}
+  integrity: {kind: sha256, sha256: c88ac29ae72e22e62d2aa0e7b21c27ab089c5edf766d763408f257319c4533b0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33056,7 +33056,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_runtime.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_runtime.py}
-  integrity: {kind: sha256, sha256: 0a7439d5c40bb9af8f7e79443b7e462901acb0650e517767471d209b57409f59}
+  integrity: {kind: sha256, sha256: a82f11116d3139058e7ee90d7317afc9a02072879e79e184f58303194b6e4861}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33107,7 +33107,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_primitives.py', repository_path: src/solana_alpha_lab/factory/observation_primitives.py}
-  integrity: {kind: sha256, sha256: d094f4104d4be4c61fb8b4e375d32bd3df0946cd3d6206f2eba87dc64c36f631}
+  integrity: {kind: sha256, sha256: e1338a40e2e964203a95bd478de936783075a1dc9916965930ced04e71e611f1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33455,7 +33455,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_scheduler.py', repository_path: src/solana_alpha_lab/factory/observation_scheduler.py}
-  integrity: {kind: sha256, sha256: 67c32e57718f6ba90603603508ebae82b99a204a1d3391a0ba39386c757d076e}
+  integrity: {kind: sha256, sha256: 0a4c42c44fde9117660292cfe8910d60a0d6a51ecbec66b520f4517b9f72b490}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33856,7 +33856,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_read_model.py', repository_path: src/solana_alpha_lab/factory/collector_read_model.py}
-  integrity: {kind: sha256, sha256: 1f848a5fffc532705f1f25e331e670963a12f75336ce6df7efb38750b0b40669}
+  integrity: {kind: sha256, sha256: 1ccf08211f51b815fbb55426858abb8ca267e4dcb6f223ef360eaed7cae064e0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
@@ -37008,4 +37008,138 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [REPRESENTATION_CHALLENGER, CONTROL, HFIC, packet grounding, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-M1-EXECUTION-REALITY-CALIBRATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for the M1 execution reality calibration capability (typed quote parity, USDC fixed-notional primitives, denominator invariant, zero-network successor preflight, immutable-lineage calibration report); capability only, never commissioned by the contract.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-14'
+  truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md', repository_path: docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md}
+  integrity: {kind: sha256, sha256: c3fb6b2ac9e5cee5166b247456e6f534cb5cf3739b41354483851d114a2f9d87}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-M1-EXECUTION-REALITY-001}
+  - {relation_type: contains, target_asset_id: MODULE-M1-SUCCESSOR-PREFLIGHT-001}
+  - {relation_type: contains, target_asset_id: MODULE-M1-CALIBRATION-REPORT-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-M1-SUCCESSOR-PREFLIGHT-001}
+  - {relation_type: contains, target_asset_id: SCRIPT-M1-CALIBRATION-REPORT-001}
+  - {relation_type: validated_by, target_asset_id: TEST-M1-EXECUTION-REALITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [M1, EXECUTION_REALITY, USDC, NOTIONAL, CALIBRATION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-M1-EXECUTION-REALITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure typed M1 classification (TWO_WAY/ENTRY_ONLY/NO_ENTRY/UNKNOWN), per-notional denominator invariant, deterministic quote-implied roundtrip friction and cross-notional diagnostics.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-14'
+  truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/m1_execution_reality.py', repository_path: src/solana_alpha_lab/factory/m1_execution_reality.py}
+  integrity: {kind: sha256, sha256: 7d714249c926d7c84c6d47f63de26ef6620acc0ccfc621d3444c69cf7ccd1753}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-M1-EXECUTION-REALITY-CALIBRATION-001}
+  consumers: [MODULE-M1-CALIBRATION-REPORT-001, MODULE-COLLECTOR-READ-MODEL-001]
+  evidence: []
+  search_terms: [M1, OUTCOMES, DENOMINATOR, FRICTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-M1-SUCCESSOR-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network M1 successor composer/checker proposing an immutable successor that preserves predecessor semantics while adding USDC execution observations; fails closed on capacity/budget/conservation gaps.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-14'
+  truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/m1_successor_preflight.py', repository_path: src/solana_alpha_lab/factory/m1_successor_preflight.py}
+  integrity: {kind: sha256, sha256: fa34b7fc3590149eba3fc6b9b2d266fc2cc9a20fe0f41388e192d1a56b29f66e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-M1-EXECUTION-REALITY-CALIBRATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-M1-EXECUTION-REALITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULER-001}
+  consumers: [SCRIPT-M1-SUCCESSOR-PREFLIGHT-001]
+  evidence: []
+  search_terms: [M1, SUCCESSOR, PREFLIGHT, ROLLOVER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-M1-CALIBRATION-REPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic M1 calibration projection/report built exclusively from immutable Observation RDP lineage; rejects moving SQLite fail-closed; no fabricated experiment identity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-14'
+  truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/m1_calibration_report.py', repository_path: src/solana_alpha_lab/factory/m1_calibration_report.py}
+  integrity: {kind: sha256, sha256: b3821f235a8e94c69f2828e9adfbab502d9882ec07dd2f47803993f101c08201}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-M1-EXECUTION-REALITY-CALIBRATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-M1-EXECUTION-REALITY-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-OBSERVATION-PANEL-SNAPSHOT-V1-001}
+  consumers: [SCRIPT-M1-CALIBRATION-REPORT-001]
+  evidence: []
+  search_terms: [M1, REPORT, IMMUTABLE, LINEAGE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-M1-SUCCESSOR-PREFLIGHT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI wrapper for the zero-network M1 successor preflight; never authorizes or activates.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-14'
+  truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/m1_successor_preflight.py', repository_path: scripts/m1_successor_preflight.py}
+  integrity: {kind: sha256, sha256: 39e80eded2e100971ed664c01630dfd26719f5212c23ffedc507566778dd5b36}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-M1-EXECUTION-REALITY-CALIBRATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-M1-SUCCESSOR-PREFLIGHT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [M1, PREFLIGHT, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCRIPT-M1-CALIBRATION-REPORT-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: CLI wrapper building the deterministic M1 calibration report from immutable RDP lineage.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-14'
+  truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://scripts/build_m1_calibration_report.py', repository_path: scripts/build_m1_calibration_report.py}
+  integrity: {kind: sha256, sha256: b8186d939c4df8d0952a32a3c9339b8446d12e01a1a0aaceafd72b95843971dd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-M1-EXECUTION-REALITY-CALIBRATION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-M1-CALIBRATION-REPORT-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [M1, REPORT, CLI]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-M1-EXECUTION-REALITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network essential tests for typed NO_ROUTE parity, USDC fixed-notional semantics, denominator invariant, friction, successor preflight conservation, immutable-lineage report and operability projection.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-14'
+  truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_m1_execution_reality.py', repository_path: tests/test_m1_execution_reality.py}
+  integrity: {kind: sha256, sha256: e8d389bf7a6541f51fbb3097925a7d05f419d5b8f97b30512447bb780426da35}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-M1-EXECUTION-REALITY-CALIBRATION-001}
+  - {relation_type: validated_by, target_asset_id: MODULE-M1-EXECUTION-REALITY-001}
+  - {relation_type: validated_by, target_asset_id: MODULE-M1-SUCCESSOR-PREFLIGHT-001}
+  - {relation_type: validated_by, target_asset_id: MODULE-M1-CALIBRATION-REPORT-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [M1, TESTS, PARITY, DENOMINATOR]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
