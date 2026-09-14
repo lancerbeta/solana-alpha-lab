@@ -4,8 +4,8 @@
   "review_id": "CTRL-DETERMINISTIC-FINISH-POSTMERGE-TESTS-REVIEW-001",
   "as_of": "2026-09-15",
   "task_id": "CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1",
-  "reviewed_bindings_sha256": "d98cb4f6c3764546b58ed2fad82f997613846bec89752e2eaf838f933a214a37",
-  "reviewed_inventory_sha256": "f8b6e36b26b94ba6f98ca41321462ac3c3fa8c3442bee0c05ece86065098e535",
+  "reviewed_bindings_sha256": "38126661ca4d772f43e100556a0cdef2fee72d68d62f0bfc945fa29ba0c23282",
+  "reviewed_inventory_sha256": "5644f7c49815aca0510a660341c28f31aeb15967ccc48a5558239c5223223a27",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",

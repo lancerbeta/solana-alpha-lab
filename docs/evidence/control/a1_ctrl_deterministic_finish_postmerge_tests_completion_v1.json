@@ -6,7 +6,7 @@
   "task_id": "CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1",
   "state_change": "POSTMERGE_ACCEPTANCE_TESTS_BRANCH_STATE_TOLERANT",
   "implementation_bindings": {
-    "docs/tasks/CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1.md": "07d4e935c4491e620207eca2c072046b46719bdb0e2c98f986e9c208cb79c90f",
+    "docs/tasks/CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1.md": "6d6d2ef0fd7e11a86b64b56a74c940f80a293eb12c20baf6473d13d3cb0f95ae",
     "tests/test_delivery_harness_deterministic_finish.py": "5752f5028a2133f2f03c65f9f1f384c4b2428d2af67572d6ec47959527ba2d52"
   },
   "base_main": "a39a14581054d185592da593e163fdf5cbec5325",
@@ -20,14 +20,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_completion_v1.json",
-    "sha256": "2a378192f94962495f55cf554f3a25a9b1750200a9ead2b129a9510a0e554ca5",
+    "sha256": "da59d4252c89ab8056e040b068fc49c018420da6d9299b104007a0e4f77045b4",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TARGETED_SUITES_ON_MAIN_STATE",
     "independent_review": {
       "path": "docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_review_v1.json",
-      "sha256": "613eb94ca1c66fb9b3e29a6e20c44f6bc229a1838b0f626d73301c9cf2a09ba5",
+      "sha256": "50359b30cffd014ef38c6e31ff9d710cadc923e66c9a12446f806738094e2c9e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
