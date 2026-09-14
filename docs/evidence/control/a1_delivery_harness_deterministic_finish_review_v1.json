@@ -37,6 +37,20 @@
         "MINOR: skill ordering text lacks evidence-commit step"
       ],
       "remediation": "MAJOR renderer order guard + MINOR crash-to-DENY hardening + MINOR expected_upstream binding + MINOR parity test fixed in f45f97f8. Portable MAJOR resolved in eac7c1f9 by qualifying portable wording (capability parity would require PORTABLE_CORE_REDESIGN, out of atom scope per stop conditions). Write-set helper duplication and skill ordering text recorded as named follow-up."
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "MAJOR: --guarded-merge computed but discarded the normalized actor; raw argv casing flowed into execute_guarded_merge and DENIED with ACTOR_NOT_ALLOWED_FOR_ROUTE",
+        "MINOR: render_owner_merge_phrase accepts invalid regex escapes that later raise re.error (not ValueError) past the JSON error boundary",
+        "MINOR: preflight evidence verifier let OSError/FileNotFoundError escape as traceback instead of stable DELIVERY_EVIDENCE_INVALID exit-2 DENY",
+        "MINOR: preflight write-set DENY only structurally tested (no real out-of-write-set diff exercised)",
+        "MINOR: duplicated path_in_managed_write_set omits safe_repo_path normalization and can drift from the gate's authoritative copy",
+        "MINOR: harness_sync.ROOT global swap is CLI-sound but not concurrency-safe",
+        "MINOR: orientation acceptance is a text assertion, not a behavioral one"
+      ],
+      "remediation": "MAJOR actor fix plus MINOR re.error fail-closed, MINOR OSError-to-DENY, MINOR single write-set truth owner (gate delegation) fixed in 2c5410fa with regression tests (CLI-boundary actor test, backref/escape renderer tests, absent-evidence stable-DENY test). MINOR write-set real-path test was added in f45f97f8. Concurrency-safety and behavioral orientation enforcement remain named follow-ups (inherent design limits, not regressions)."
     }
   ],
   "verdict": "PASS",
