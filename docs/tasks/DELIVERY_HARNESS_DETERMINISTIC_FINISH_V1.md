@@ -37,6 +37,9 @@ managed_write_set:
 - tests/test_harness_sync_bindings.py
 - tests/test_delivery_harness_authority.py
 - tests/test_delivery_harness_bootstrap.py
+- tests/test_delivery_harness_deterministic_finish.py
+- delivery-harness/templates/portable-core/delivery-harness/harness.yaml
+- catalog/assets/core.yaml
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_completion_v1.json
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_review_v1.json
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_factory_fit_v1.json
@@ -80,6 +83,19 @@ context_requirements:
 ---
 
 # DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1
+
+## Managed write set additions (exact reasons)
+
+- `tests/test_delivery_harness_deterministic_finish.py` — mandated 18-point
+  acceptance matrix home.
+- `delivery-harness/templates/portable-core/delivery-harness/harness.yaml` —
+  required Part C/H source: portable prefix narrowing plus bundle-manifest
+  hash propagation.
+- `catalog/assets/core.yaml` — sanctioned `harness_sync --apply --base-ref`
+  derived output for the cataloged bytes this atom changes.
+- `docs/evidence/control/delivery_harness_acceptance_v1.json` and
+  `docs/evidence/control/delivery_harness_factory_fit_v1.json` — pin
+  retargeting after sanctioned edits of pinned files (precedent `5403a8ab`).
 
 ## Task Outcome Brief
 
