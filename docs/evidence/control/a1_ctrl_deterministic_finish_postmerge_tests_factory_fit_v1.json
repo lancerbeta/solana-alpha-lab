@@ -4,8 +4,8 @@
   "review_id": "CTRL-DETERMINISTIC-FINISH-POSTMERGE-TESTS-FACTORY-FIT-001",
   "as_of": "2026-09-15",
   "task_id": "CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1",
-  "reviewed_bindings_sha256": "",
-  "reviewed_inventory_sha256": "",
+  "reviewed_bindings_sha256": "e03004087cc6c1fff43e857d4e76868443376d5744f1e60a41a2460f1e44ba0c",
+  "reviewed_inventory_sha256": "1384c5983dd787e44fa5df84aeefb0f8eba73187162774e944b65fa2f1a6d85e",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
