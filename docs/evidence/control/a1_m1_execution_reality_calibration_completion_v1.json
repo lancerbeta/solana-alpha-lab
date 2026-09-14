@@ -6,14 +6,14 @@
   "task_id": "M1_EXECUTION_REALITY_CALIBRATION_V1",
   "state_change": "M1_EXECUTION_REALITY_CALIBRATION_CAPABILITY_IMPLEMENTED",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "3b6006b259b1021f0fc004cc88f833ebfb9a21e803fa817a1efe531a899ee57a",
+    "catalog/assets/core.yaml": "33058135c2ddbfadded1c2f9bcf53934de9a62bf256bfc28ed7a94439389d62b",
     "catalog/assets/lifecycle.yaml": "4635d6eeb7e2e27e0355bfb4f2c2b9cead8eb173b34a09387d08168168246080",
     "catalog/catalog_manifest.yaml": "d91199b16e3bb0fba080f68d59663a6540cd96de1a0a1b0a19305aab1f9d6d4a",
     "catalog/generated/asset_edges.json": "9233a66beafdab362926c8199b7a5324407c8f4a67bf0901cb0f5001bd1e71ce",
     "configs/observation_primitive_registry_v1.yaml": "9416236fa7bb7da83506af0e42a2f4201c4284ecb54d2a7d58099b9f7e2ee60e",
     "docs/PROJECT_MAP.md": "7e83e28f7343613ff6b2c1bbfe612e08f99e66f4e599de805e4d0248da5bfc4e",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "50360d79b412b99125b66e23dd97c44c683497d7cdd1d680788dc54bc33100de",
-    "docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md": "cbaeaf68f4a3585d02ab9285236e051dcb82de09279201e7a753efe44be1db49",
+    "docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md": "c3fb6b2ac9e5cee5166b247456e6f534cb5cf3739b41354483851d114a2f9d87",
     "scripts/build_m1_calibration_report.py": "b8186d939c4df8d0952a32a3c9339b8446d12e01a1a0aaceafd72b95843971dd",
     "scripts/m1_successor_preflight.py": "39e80eded2e100971ed664c01630dfd26719f5212c23ffedc507566778dd5b36",
     "src/solana_alpha_lab/factory/collector_read_model.py": "f554e27bf43d6c7de6631a250d6f67e4cb59faece941b4527b0f2eb6ad4fdce6",
@@ -39,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_m1_execution_reality_calibration_factory_fit_v1.json",
-    "sha256": "d0854f365dd7eb9a4842da7a8ba712c971b479fe4a2bd33ba973e2037dcbd1d6",
+    "sha256": "50fe1c089ee418def4856baf166c3f11fec77a30bcd5394d7c959fd44827156e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_M1_EXECUTION_REALITY_AND_REGRESSION_SUITES",
     "independent_review": {
       "path": "docs/evidence/control/a1_m1_execution_reality_calibration_review_v1.json",
-      "sha256": "47db4f19c1887ddabde275ed82506fb340dff92f70a0c7fd4c8f1bf84cd03b37",
+      "sha256": "5fdd3bfa022317c716428c13c38d57b20608f9aa677066ad5f687da204645197",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
