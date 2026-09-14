@@ -17,6 +17,9 @@ objective: "Repair two branch-state-dependent acceptance tests that failed in po
 managed_write_set:
 - docs/tasks/CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1.md
 - tests/test_delivery_harness_deterministic_finish.py
+- docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_completion_v1.json
+- docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_review_v1.json
+- docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_factory_fit_v1.json
 external_caps:
   network: false
   credentials: false
