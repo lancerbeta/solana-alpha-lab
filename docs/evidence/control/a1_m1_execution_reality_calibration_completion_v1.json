@@ -27,9 +27,7 @@
     "tests/test_m1_execution_reality.py": "6a042dda64d260b25ae264d2ce998c6894506f42883ff1d05c7d4ab21ffb7191"
   },
   "base_main": "5e36ef349f85d741c140c418af2de136d99521b7",
-  "active_stop_conditions": [
-    "NO_MERGE_AUTHORITY_STOP_BEFORE_MERGE"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "external_material_action": false,
