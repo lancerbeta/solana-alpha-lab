@@ -1,0 +1,45 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "CTRL-DETERMINISTIC-FINISH-POSTMERGE-TESTS-REVIEW-001",
+  "as_of": "2026-09-15",
+  "task_id": "CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1",
+  "reviewed_bindings_sha256": "",
+  "reviewed_inventory_sha256": "",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Both tests now derive expectations from the actual rebuild outcome; no unconditional branch-state assumption remains",
+        "The shape test enumerates exactly two stable output forms (branch 8-key, merged 5-key + recorded failure)",
+        "REMEDIATION: none required"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "The parent atom's primary success condition (failures knowable locally are caught locally) is preserved: the merged-state degradation is asserted as a deterministic recorded reason, not an assumed shape",
+        "REMEDIATION: none required"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "No new truth owner: tests consume the same preflight_push output contract; no production code changed",
+        "REMEDIATION: none required"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}
