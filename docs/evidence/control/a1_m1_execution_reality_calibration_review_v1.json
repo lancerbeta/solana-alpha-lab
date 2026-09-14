@@ -4,8 +4,8 @@
   "review_id": "M1-EXECUTION-REALITY-CALIBRATION-REVIEW-001",
   "as_of": "2026-09-14",
   "task_id": "M1_EXECUTION_REALITY_CALIBRATION_V1",
-  "reviewed_bindings_sha256": "6abf245df8f48e51da6796e2073bdd96f5ff4bebf139b71f051920fc1b12d703",
-  "reviewed_inventory_sha256": "0a32ceea925460b524c9a25c916001e6d666ba149be31ab5b7718bfa00153b5c",
+  "reviewed_bindings_sha256": "placeholder",
+  "reviewed_inventory_sha256": "placeholder",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -14,30 +14,34 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "PASS",
+      "verdict": "FIX_FIRST_REMEDIATED",
       "findings": [
-        "Typed Jupiter quote error classification is exact-match on normalized errorCode sets scoped to /swap/v2/order only; generic 4xx on other endpoints keeps historical NO_ROUTE semantics; HTTP 200 error bodies and 4xx quote bodies both classified without substring heuristics",
-        "USDC $10/$100 atomic amounts correct (10000000/100000000 at 6 decimals); reverse legs contractually bound to same-notional entry bundle outAmount, cross-wire impossible; SOL/lamport primitives byte-identical in semantics",
-        "Denominator invariant verified structurally (population_n = two_way_n + entry_only_n + no_entry_n + unknown_n per notional); UNKNOWN never coerced; friction math correct (1 - reverse_out/entry_notional) kept per-notional",
-        "Safety verified: no taker, no /build, no /execute, no transaction material, retry=false, fallback=false, cash=$0; all tests zero-network with injected fixtures"
+        "BLOCKER (remediated): M1 USDC entry primitives participated in the X-eligibility gate, so a typed NO_ROUTE entry made the member X_POPULATION_INELIGIBLE and NO_ENTRY was unobservable through the real collector spine. Remediation: M1_EXECUTION_PRIMITIVES excluded from x_primitive_ids; regression test XGateM1IsolationTests proves a NO_ROUTE entry keeps the member X_ELIGIBLE with MISSING_TYPED M1 legs",
+        "MAJOR (remediated): population gate in the report read payload.x_eligibility_state which member rows never publish, emptying the primary denominator. Remediation: gate on published candidate_state == X_ELIGIBLE with membership_state guard",
+        "MAJOR (remediated): preflight accepted an identity-less readback (no schedule_sha256). Remediation: PREDECESSOR_READBACK_IDENTITY_MISSING fail-closed blocker + test",
+        "MAJOR (remediated): typed classification changed the SOL primitives' missing-reason vocabulary without registry declaration. Remediation: SOL quote/reverse registry missing_classes now declare NOTIONAL_NO_ROUTE and UNKNOWN_PROVIDER_ERROR",
+        "MINOR (remediated): budget envelope ignored the predecessor baseline; availability_cutoff was recorded but not enforced; m1_calls counter counted never-executed legs; empty lineage yielded a valid-shaped zero report; _collect_semantics raised KeyError on malformed predecessors"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "PASS",
+      "verdict": "FIX_FIRST_REMEDIATED",
       "findings": [
-        "Capability expressed through existing ObservationSchedule spine: new registered primitives/bundles + existing rollover lifecycle + existing timer/store/call-ledger/publication/recovery; no second probe/discovery/daemon/database",
-        "All contract DoD bullets pinned by tests/test_m1_execution_reality.py (29 cases) plus regression suites; successor preflight zero-network fail-closed; report rejects moving SQLite; no experiment identity fabrication",
-        "Outcome falsifiable and useful: a later commissioned M1 campaign can answer the owner question through existing surfaces; runtime deliberately not commissioned (STOP BEFORE MERGE)"
+        "GAP 1 (remediated): shared quote path emitted undeclared error classes for SOL primitives; fixed by declaring the vocabulary in the four SOL registry entries",
+        "Capability expressed through existing ObservationSchedule spine: registered primitives/bundles + existing rollover lifecycle + existing timer/store/call-ledger/publication/recovery; no second probe/discovery/daemon/database",
+        "Outcome falsifiable: a later commissioned M1 campaign can answer the owner question through existing surfaces; runtime deliberately not commissioned (STOP BEFORE MERGE)"
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "PASS",
+      "verdict": "FIX_FIRST_REMEDIATED",
       "findings": [
+        "BREAKS_RESEARCH_VALIDITY (remediated): population gate read a field published member rows never carry, leading to an empty or inverted primary denominator. Remediation: gate on published candidate_state; end-to-end test drives a real member row through the scheduler",
+        "RISK (remediated): budget envelope combined only the M1 increment against declared budgets; now combines predecessor X-point baseline upper bound + M1 increment",
+        "RISK (remediated): availability_cutoff was recorded but not enforced; now filters members and observations by first_reliable_available_at <= cutoff",
+        "RISK (remediated): empty source lineage produced a valid-shaped zero report; now fails closed on missing dataset manifests/fingerprints",
         "Endpoint-scoped typed classification degrades safely: unknown future error codes fall to UNKNOWN_PROVIDER_ERROR, never silently to NO_ROUTE; per-notional dependency contracts prevent cross-wiring at scheduler level",
-        "Research validity preserved: members never dropped (UNKNOWN is a first-class bucket); report sources only immutable RDP lineage with fail-closed rejection of moving SQLite; admission anchored to canonical PIT clock",
-        "Reversibility: ordinary Git revert, zero live-provider consequence; predecessor semantics conserved by successor preflight (only X-point gains M1 bundles)"
+        "Reversibility: ordinary Git revert, zero live-provider consequence; successor conservation now also pins sampling policy/seed, budgets retry/fallback/cash and exact y_points"
       ]
     }
   ],
@@ -47,6 +51,7 @@
     "NO_M1_PROVIDER_EVIDENCE_COLLECTED",
     "NO_ALPHA",
     "NO_LIVE",
-    "NO_REAL_MONEY"
+    "NO_REAL_MONEY",
+    "REMEDIATION_HISTORY: initial independent review returned FIX_FIRST (X-gate coupling BLOCKER, report gate field drift, identity-less readback, SOL registry vocabulary drift); every finding was remediated in-task with regression tests before merge"
   ]
 }

@@ -85,6 +85,7 @@ BUY_USDC10 = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC10-001"
 BUY_USDC100 = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC100-001"
 REVERSE_USDC10 = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC10-001"
 REVERSE_USDC100 = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-USDC100-001"
+SELL_PRIMITIVES_USDC = frozenset({REVERSE_USDC10, REVERSE_USDC100})
 REVERSE_FOR_BUY = {
     QUOTE_BUY: DEPENDENT_SELL,
     BUY_1M: REVERSE_1M,
@@ -126,6 +127,11 @@ QUOTE_AMOUNT = {
 USDC_ENTRY_PRIMITIVES = frozenset({BUY_USDC10, BUY_USDC100})
 BUY_PRIMITIVES = frozenset(QUOTE_AMOUNT)
 SELL_PRIMITIVES = frozenset(REVERSE_FOR_BUY.values())
+# M1 execution-calibration primitives (USDC entries + dependent reverses) are
+# additive measurement only: they must never participate in the scientific
+# X-eligibility gate, otherwise a typed NO_ROUTE entry would make the member
+# X_POPULATION_INELIGIBLE and NO_ENTRY would become unobservable.
+M1_EXECUTION_PRIMITIVES = USDC_ENTRY_PRIMITIVES | SELL_PRIMITIVES_USDC
 SURFACE_FIELD_KEYS = {
     "FIELD-QUOTE-IN-AMOUNT-001": "in_amount",
     "FIELD-QUOTE-PRICE-IMPACT-PCT-001": "price_impact_pct",
@@ -471,6 +477,7 @@ def _apply_x_phase(
         BUNDLE_TO_PRIMITIVE[str(bundle_id)]
         for bundle_id in schedule["x_point"]["bundle_ids"]
         if BUNDLE_TO_PRIMITIVE[str(bundle_id)] not in SELL_PRIMITIVES
+        and BUNDLE_TO_PRIMITIVE[str(bundle_id)] not in M1_EXECUTION_PRIMITIVES
     }
     if str(claim["primitive_id"]) not in x_primitive_ids:
         return terminal_state, missing_reason, []

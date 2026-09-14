@@ -165,18 +165,21 @@ def run_m1_successor_preflight(
         predecessor_readback.get("schedule_sha256") or ""
     )
     registered_digest = str(predecessor_schedule.get("schedule_sha256") or "")
-    if not readback_digest or readback_digest != registered_digest:
-        # Recompute when the caller passed an unhashed document.
-        try:
-            registered_digest = compute_schedule_sha256(predecessor_schedule)
-        except ObservationScheduleError:
-            return _blocked("PREDECESSOR_SCHEDULE_MISSING")
-        if readback_digest and readback_digest != registered_digest:
-            return _blocked(
-                "PREDECESSOR_IDENTITY_MISMATCH",
-                readback_schedule_sha256=readback_digest or None,
-                predecessor_schedule_sha256=registered_digest,
-            )
+    # Recompute when the caller passed an unhashed document.
+    try:
+        registered_digest = compute_schedule_sha256(predecessor_schedule)
+    except ObservationScheduleError:
+        return _blocked("PREDECESSOR_SCHEDULE_MISSING")
+    if not readback_digest:
+        # An identity-less readback cannot prove which schedule is running;
+        # fail closed instead of proposing a successor bound to a guess.
+        return _blocked("PREDECESSOR_READBACK_IDENTITY_MISSING")
+    if readback_digest != registered_digest:
+        return _blocked(
+            "PREDECESSOR_IDENTITY_MISMATCH",
+            readback_schedule_sha256=readback_digest,
+            predecessor_schedule_sha256=registered_digest,
+        )
 
     # --- Campaign request bounds ---------------------------------------
     try:
@@ -193,7 +196,10 @@ def run_m1_successor_preflight(
     )
 
     # --- Conservation baseline -----------------------------------------
-    predecessor_semantics = _collect_semantics(predecessor_schedule)
+    try:
+        predecessor_semantics = _collect_semantics(predecessor_schedule)
+    except (KeyError, TypeError, ValueError, IndexError):
+        return _blocked("PREDECESSOR_SCHEDULE_MISSING")
 
     # --- Compose successor ---------------------------------------------
     successor = deepcopy(dict(predecessor_schedule))
@@ -251,15 +257,33 @@ def run_m1_successor_preflight(
         )
 
     # --- Budget envelope -------------------------------------------------
+    # M1 increment: at most 4 quote calls per sampled eligible member.
     per_member_day = M1_CALLS_PER_MEMBER_MAX * target_members
     lifetime = per_member_day * campaign_days
+    # Predecessor baseline: the inherited non-M1 X-point bundles still draw
+    # from the same activation budget; a successor that only fits the M1
+    # increment would hit BLOCKED_BUDGET mid-campaign. Model one call per
+    # inherited bundle per member per day as the baseline upper bound.
+    inherited_x_bundles = [
+        bundle_id
+        for bundle_id in (str(item) for item in validated["x_point"]["bundle_ids"])
+        if bundle_id not in set(_m1_bundles())
+    ]
+    predecessor_baseline_day = max(len(inherited_x_bundles), 0) * target_members
+    predecessor_baseline_lifetime = predecessor_baseline_day * campaign_days
+    total_day = predecessor_baseline_day + per_member_day
+    total_lifetime = predecessor_baseline_lifetime + lifetime
     declared_day = int(validated["budgets"]["provider_calls_per_utc_day_max"])
     declared_life = int(validated["budgets"]["provider_calls_lifetime_max"])
-    if declared_day < per_member_day or declared_life < lifetime:
+    if declared_day < total_day or declared_life < total_lifetime:
         return _blocked(
             "M1_PROVIDER_BUDGET_GAP",
             m1_incremental_per_utc_day_max=per_member_day,
             m1_incremental_lifetime_max=lifetime,
+            predecessor_baseline_per_utc_day_upper_bound=predecessor_baseline_day,
+            predecessor_baseline_lifetime_upper_bound=predecessor_baseline_lifetime,
+            combined_required_per_utc_day=total_day,
+            combined_required_lifetime=total_lifetime,
             declared_per_utc_day_max=declared_day,
             declared_lifetime_max=declared_life,
         )
@@ -269,11 +293,16 @@ def run_m1_successor_preflight(
     preserved_keys = [
         "source_poll",
         "population",
+        "sampling_policy",
+        "sampling_seed",
         "missingness",
         "disappearance",
         "retention",
         "authority",
         "outputs",
+        "budgets_retry",
+        "budgets_fallback",
+        "budgets_cash_usd_max",
     ]
     semantic_diff: dict[str, Any] = {"changed": [], "added_m1_bundles_by_point": added_bundles_by_point}
     for key in preserved_keys:
@@ -283,7 +312,7 @@ def run_m1_successor_preflight(
         return _blocked("SUCCESSOR_SEMANTIC_CONSERVATION_FAILED", semantic_key="x_point_id")
     if successor_semantics["x_point_offset"] != predecessor_semantics["x_point_offset"]:
         return _blocked("SUCCESSOR_SEMANTIC_CONSERVATION_FAILED", semantic_key="x_point_offset")
-    if successor_semantics["y_points"] != predecessor_semantics["y_points"][: len(successor_semantics["y_points"])]:
+    if successor_semantics["y_points"] != predecessor_semantics["y_points"]:
         return _blocked("SUCCESSOR_SEMANTIC_CONSERVATION_FAILED", semantic_key="y_points")
     semantic_diff["changed"] = [
         "schedule_key",
@@ -338,8 +367,12 @@ def run_m1_successor_preflight(
             "m1_calls_per_member_max": M1_CALLS_PER_MEMBER_MAX,
             "m1_incremental_per_utc_day_max": per_member_day,
             "m1_incremental_lifetime_max": lifetime,
-            "resulting_declared_per_utc_day_max": declared_day,
-            "resulting_declared_lifetime_max": declared_life,
+            "predecessor_baseline_per_utc_day_upper_bound": predecessor_baseline_day,
+            "predecessor_baseline_lifetime_upper_bound": predecessor_baseline_lifetime,
+            "combined_required_per_utc_day": total_day,
+            "combined_required_lifetime": total_lifetime,
+            "declared_per_utc_day_max": declared_day,
+            "declared_lifetime_max": declared_life,
         },
         "cutover_proposal": cutover_proposal,
         "authority_request_material": authority,

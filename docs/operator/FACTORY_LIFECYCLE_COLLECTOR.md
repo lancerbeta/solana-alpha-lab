@@ -262,11 +262,15 @@ Deterministic M1 calibration report from immutable RDP lineage only:
 ```
 
 Blockers surfaced by the preflight: `PREDECESSOR_READBACK_NOT_ACTIVE`,
-`PREDECESSOR_IDENTITY_MISMATCH`, `M1_BUNDLE_CAPACITY_GAP`,
-`M1_PROVIDER_BUDGET_GAP`, `SUCCESSOR_SEMANTIC_CONSERVATION_FAILED`. Runtime
-commissioning additionally fails closed on current collector health semantics
+`PREDECESSOR_READBACK_IDENTITY_MISSING`, `PREDECESSOR_IDENTITY_MISMATCH`,
+`M1_BUNDLE_CAPACITY_GAP`, `M1_PROVIDER_BUDGET_GAP`,
+`SUCCESSOR_SEMANTIC_CONSERVATION_FAILED`. Runtime commissioning additionally
+fails closed on current collector health semantics
 (restore gap, backlog, provider auth/rate/failure, stale discovery, unsafe
-cutover).
+cutover). The budget envelope combines the M1 increment (at most 4 calls per
+sampled eligible member) with the predecessor X-point baseline (one call per
+inherited bundle per member per day) and rejects a successor whose declared
+budgets cannot carry both.
 
 ## How a future agent recovers current state
 

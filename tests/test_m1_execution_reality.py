@@ -59,6 +59,7 @@ from solana_alpha_lab.factory.observation_primitives import (
 )
 from solana_alpha_lab.factory.observation_schedule import (
     load_observation_schedule,
+    schedule_sha256 as compute_schedule_sha256,
 )
 from solana_alpha_lab.factory.observation_schedule_store import (
     ObservationScheduleStore,
@@ -419,19 +420,14 @@ class SuccessorPreflightTests(unittest.TestCase):
         return {
             "activation_state": "ACTIVE",
             "activation_id": "ACT-PRED-1",
-            "schedule_sha256": schedule.get("schedule_sha256")
-            or json.dumps(sorted(schedule.keys()))[:16],
+            "schedule_sha256": compute_schedule_sha256(schedule),
         }
 
     def test_compatible_successor_preserves_predecessor(self) -> None:
         predecessor = self._predecessor()
         result = run_m1_successor_preflight(
             root=ROOT,
-            predecessor_readback={
-                "activation_state": "ACTIVE",
-                "activation_id": "ACT-PRED-1",
-                "schedule_sha256": None,
-            },
+            predecessor_readback=self._readback(predecessor),
             predecessor_schedule=predecessor,
             m1_campaign_request={"target_members": 100, "campaign_days": 7},
             now=NOW,
@@ -485,7 +481,7 @@ class SuccessorPreflightTests(unittest.TestCase):
         ]
         result = run_m1_successor_preflight(
             root=ROOT,
-            predecessor_readback={"activation_state": "ACTIVE", "activation_id": "A"},
+            predecessor_readback=self._readback(predecessor),
             predecessor_schedule=predecessor,
             m1_campaign_request={"target_members": 10, "campaign_days": 3},
             now=NOW,
@@ -499,7 +495,7 @@ class SuccessorPreflightTests(unittest.TestCase):
         predecessor["budgets"]["provider_calls_lifetime_max"] = 10
         result = run_m1_successor_preflight(
             root=ROOT,
-            predecessor_readback={"activation_state": "ACTIVE", "activation_id": "A"},
+            predecessor_readback=self._readback(predecessor),
             predecessor_schedule=predecessor,
             m1_campaign_request={"target_members": 100, "campaign_days": 7},
             now=NOW,
@@ -525,6 +521,26 @@ class SuccessorPreflightTests(unittest.TestCase):
         )
         self.assertFalse(result["compatible"])
         self.assertEqual(result["blocked_reason"], "PREDECESSOR_IDENTITY_MISMATCH")
+
+    def test_identityless_readback_fails_closed(self) -> None:
+        # An ACTIVE readback without schedule_sha256 cannot prove which
+        # schedule runs; the preflight must not propose a successor anyway.
+        predecessor = self._predecessor()
+        result = run_m1_successor_preflight(
+            root=ROOT,
+            predecessor_readback={
+                "activation_state": "ACTIVE",
+                "activation_id": "A",
+                "schedule_sha256": None,
+            },
+            predecessor_schedule=predecessor,
+            m1_campaign_request={"target_members": 10, "campaign_days": 3},
+            now=NOW,
+        )
+        self.assertFalse(result["compatible"])
+        self.assertEqual(
+            result["blocked_reason"], "PREDECESSOR_READBACK_IDENTITY_MISSING"
+        )
 
 
 class CalibrationReportTests(unittest.TestCase):
@@ -581,7 +597,10 @@ class CalibrationReportTests(unittest.TestCase):
             availability_cutoff=NOW,
             population_ref="EARLY_ICP_V1",
             sampling_identity={},
-            source_lineage={},
+            source_lineage={
+                "dataset_manifest_ids": ["DATASET-1"],
+                "dataset_fingerprints": ["f" * 64],
+            },
         )
         counts10 = report["regime_counts"]["notional_10_usd"]
         counts100 = report["regime_counts"]["notional_100_usd"]
@@ -590,6 +609,22 @@ class CalibrationReportTests(unittest.TestCase):
         self.assertEqual(
             sum(counts100.values()), report["sample_accounting"]["primary_members_n"]
         )
+
+    def test_empty_lineage_fails_closed(self) -> None:
+        # An empty lineage must not silently produce a zero-science report;
+        # immutable dataset manifests/fingerprints are mandatory evidence.
+        root = self._panel_root()
+        with self.assertRaises(M1CalibrationReportError) as ctx:
+            build_m1_calibration_report(
+                data_root=root,
+                schedule_sha256="a" * 64,
+                activation_id="ACT-1",
+                availability_cutoff=NOW,
+                population_ref="EARLY_ICP_V1",
+                sampling_identity={},
+                source_lineage={},
+            )
+        self.assertIn("SOURCE_LINEAGE_MISSING", str(ctx.exception))
 
 
 class OperabilityProjectionTests(unittest.TestCase):
@@ -616,6 +651,104 @@ class OperabilityProjectionTests(unittest.TestCase):
         self.assertEqual(
             projection["final_result_source"], "FROZEN_M1_CALIBRATION_REPORT_ONLY"
         )
+
+
+class XGateM1IsolationTests(unittest.TestCase):
+    """Regression: M1 USDC execution primitives must never flip the scientific
+    X-eligibility gate (review BLOCKER). A typed NO_ROUTE on the M1 entry at
+    the X point keeps the member eligible, so NO_ENTRY stays observable."""
+
+    def test_no_route_entry_keeps_member_in_primary_denominator(self) -> None:
+        import tempfile
+
+        from solana_alpha_lab.factory.observation_scheduler import tick_once
+        from tests.test_observation_scheduler import _activate as _sched_activate
+        from tests.test_observation_scheduler import NOW as SCHED_NOW
+        from tests.test_observation_scheduler import GIT_SHA as SCHED_GIT_SHA
+
+        schedule = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/m1_quote_surface.yaml"
+        )
+
+        class _NoRouteOpener:
+            """Search succeeds; every swap/v2/order quote returns a typed
+            Jupiter NO_ROUTES_FOUND body (HTTP 461) — the M1 entry fails."""
+
+            def __init__(self) -> None:
+                self.quote_urls: list[str] = []
+
+            def open(self, url: str) -> dict:
+                if "/tokens/v2/search" in url:
+                    return {
+                        "http_status": 200,
+                        "body": [{"id": TOKEN, "liquidity": "2000"}],
+                    }
+                if "/swap/v2/order" in url:
+                    self.quote_urls.append(url)
+                    return {
+                        "http_status": 461,
+                        "body": {
+                            "code": 6000,
+                            "errorCode": "NO_ROUTES_FOUND",
+                            "message": "No routes found",
+                        },
+                        "url_has_api_key": False,
+                    }
+                return {"http_status": 200, "body": [{"id": TOKEN}]}
+
+        opener = _NoRouteOpener()
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            try:
+                activation_id = _sched_activate(store, schedule)
+                tick_once(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule=schedule,
+                    activation_id=activation_id,
+                    now=SCHED_NOW,
+                    opener=opener,
+                    producer_git_sha=SCHED_GIT_SHA,
+                    discovery_rows=[
+                        {
+                            "id": TOKEN,
+                            "liquidity": "2000",
+                            "launchpad": "pump.fun",
+                            "firstPool": {
+                                "createdAt": "2026-09-01T00:00:00Z",
+                                "source": "pump.fun",
+                            },
+                        }
+                    ],
+                )
+                candidates = store.list_candidates(
+                    schedule_sha256=schedule["schedule_sha256"],
+                    activation_id=activation_id,
+                )
+                self.assertTrue(candidates, "member must exist after X tick")
+                self.assertEqual(candidates[0]["state"], "X_ELIGIBLE")
+                # The M1 entry legs landed as typed MISSING (NO_ROUTE) but the
+                # member is NOT X_POPULATION_INELIGIBLE: M1 stays measurement,
+                # not a population gate.
+                dues = store.list_due_in_states_scoped(
+                    ("MISSING_TYPED",),
+                    schedule_sha256=schedule["schedule_sha256"],
+                    activation_id=activation_id,
+                    entity_id=TOKEN,
+                    point_id="X300",
+                )
+                m1_missing = {
+                    str(item["primitive_id"]) for item in dues
+                }
+                self.assertIn(
+                    "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-USDC10-001", m1_missing
+                )
+                self.assertTrue(opener.quote_urls, "M1 entry quotes were issued")
+            finally:
+                store.close()
 
 
 class ZeroNetworkTests(unittest.TestCase):

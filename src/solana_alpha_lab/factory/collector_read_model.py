@@ -410,6 +410,18 @@ def build_m1_progress_projection(
         "DEPENDENCY_MISSING",
         "BLOCKED_BUDGET",
     )
+    # States that imply a provider call was actually issued for the leg.
+    # PENDING/DUE/CLAIMED/STARTED are scheduled but unexecuted;
+    # DEPENDENCY_MISSING/BLOCKED_BUDGET/CENSORED never opened a socket.
+    _call_issued_states = frozenset(
+        {
+            "OBSERVED",
+            "MISSING_TYPED",
+            "DISAPPEARED",
+            "CENSORED_LATE",
+            "IN_FLIGHT_CALL_INDETERMINATE",
+        }
+    )
 
     def _scoped_leg_rows(entity_id: str, primitive_id: str) -> list[dict[str, Any]]:
         return store.list_due_in_states_scoped(
@@ -435,7 +447,11 @@ def build_m1_progress_projection(
             reverse_rows = _scoped_leg_rows(
                 entity_id, NOTIONAL_REVERSE_PRIMITIVE[notional]
             )
-            m1_calls += len(entry_rows) + len(reverse_rows)
+            m1_calls += sum(
+                1
+                for row in entry_rows + reverse_rows
+                if str(row.get("state") or "") in _call_issued_states
+            )
             entry_row = entry_rows[-1] if entry_rows else None
             reverse_row = reverse_rows[-1] if reverse_rows else None
             for row in (entry_row, reverse_row):

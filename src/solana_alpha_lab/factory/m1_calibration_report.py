@@ -167,18 +167,38 @@ def build_m1_calibration_report(
         rendered = json.dumps(value, default=str).casefold()
         for hint in _FORBIDDEN_SQLITE_HINTS:
             _require(hint not in rendered, "MOVING_SQLITE_REJECTED_AS_M1_EVIDENCE")
+    _require(
+        bool(source_lineage.get("dataset_manifest_ids")),
+        "SOURCE_LINEAGE_MISSING_DATASET_MANIFESTS",
+    )
+    _require(
+        bool(source_lineage.get("dataset_fingerprints")),
+        "SOURCE_LINEAGE_MISSING_DATASET_FINGERPRINTS",
+    )
     panel = rebuild_observation_panel_from_rdp(
         data_root=data_root,
         schedule_sha256=schedule_sha256,
     )
+    cutoff_iso = availability_cutoff.astimezone(UTC).isoformat().replace("+00:00", "Z")
+
+    def _available_at_or_before_cutoff(row: Mapping[str, Any]) -> bool:
+        # PIT cutoff: only rows first reliably available at or before the
+        # declared cutoff may enter the report; later publications are not
+        # part of the frozen evidence set.
+        available_at = str(row.get("first_reliable_available_at") or "")
+        return bool(available_at) and available_at <= cutoff_iso
+
     members = [
         row
         for row in panel.get("members") or []
         if str(row.get("activation_id") or "") == activation_id
+        and _available_at_or_before_cutoff(row)
     ]
     observations_by_member: dict[str, dict[tuple[str, str], dict[str, Any]]] = {}
     for row in panel.get("observations") or []:
         if str(row.get("activation_id") or "") != activation_id:
+            continue
+        if not _available_at_or_before_cutoff(row):
             continue
         member = str(row.get("entity_id") or "")
         observations_by_member.setdefault(member, {})[
@@ -186,21 +206,24 @@ def build_m1_calibration_report(
         ] = row
 
     # X eligibility gate: primary M1 denominator requires the member to be a
-    # canonical X-eligible member (never X_POPULATION_INELIGIBLE).
+    # canonical X-eligible member. The publisher projects candidate_state
+    # (authoritative) and membership_state; payload is NOT projected into
+    # member rows, so x_eligibility_state must never be read from payload.
     primary_members: list[Mapping[str, Any]] = []
     excluded = []
     for member in members:
-        payload = member.get("payload") if isinstance(member.get("payload"), Mapping) else {}
-        state = str(member.get("membership_state") or member.get("state") or "")
-        x_eligibility = str(payload.get("x_eligibility_state") or "")
-        if x_eligibility == "X_ELIGIBLE" or state == "X_ELIGIBLE":
+        candidate_state = str(member.get("candidate_state") or "")
+        membership_state = str(member.get("membership_state") or "")
+        # membership_state X_POPULATION_INELIGIBLE is derived from
+        # candidate_state/payload at publication time and is authoritative.
+        if candidate_state == "X_ELIGIBLE" and membership_state != "X_POPULATION_INELIGIBLE":
             primary_members.append(member)
         else:
             excluded.append(
                 {
                     "entity_id": str(member.get("entity_id") or ""),
-                    "state": state or None,
-                    "x_eligibility_state": x_eligibility or None,
+                    "candidate_state": candidate_state or None,
+                    "membership_state": membership_state or None,
                 }
             )
 
@@ -345,9 +368,7 @@ def build_m1_calibration_report(
             ),
             "evidence_class": "IMMUTABLE_OBSERVATION_RDP_LINEAGE",
         },
-        "availability_cutoff": availability_cutoff.astimezone(UTC).isoformat().replace(
-            "+00:00", "Z"
-        ),
+        "availability_cutoff": cutoff_iso,
         "population_ref": population_ref,
         "sampling_identity": dict(sampling_identity),
         "sample_accounting": {
