@@ -4,7 +4,7 @@ task_version: "1.0"
 status: IMPLEMENTED_UNVERIFIED
 as_of: "2026-09-14"
 owner: GOAL_OWNER
-allowed_routes: [DIRECT_CURSOR_DELIVERY]
+allowed_routes: [DIRECT_CODEX_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: 9c955d9434f46e9d01a4b67812a30b38056ed492
