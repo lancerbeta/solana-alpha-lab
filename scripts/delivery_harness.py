@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -12,6 +13,7 @@ import stat
 import subprocess
 import sys
 from pathlib import Path, PurePosixPath, PureWindowsPath
+from types import ModuleType
 from typing import Any
 
 try:  # init must remain stdlib-only in a clean target environment.
@@ -142,17 +144,67 @@ PREFLIGHT_PUSH_NON_CLAIMS = (
 
 
 def path_in_managed_write_set(path: str, managed: list[str]) -> bool:
-    """Exact task write-set membership with the gate's prefix semantics."""
+    """Exact task write-set membership delegated to the gate's authority.
 
-    normalized = path.replace("\\", "/")
-    for entry in managed:
-        if entry.endswith("/**"):
-            prefix = entry[:-3]
-            if normalized.startswith(prefix + "/"):
-                return True
-        elif normalized == entry:
-            return True
-    return False
+    ``owner_attention_gate.path_in_managed_write_set`` is the single truth
+    owner for this predicate (including ``safe_repo_path`` normalization);
+    the preflight must never carry a second drifting copy.
+    """
+
+    gate = _load_gate_module()
+    return gate.path_in_managed_write_set(path, managed)
+
+
+def _load_gate_module() -> ModuleType:
+    """Import the gate script whether invoked as CLI or loaded by path."""
+
+    global _GATE_MODULE_CACHE
+    if _GATE_MODULE_CACHE is not None:
+        return _GATE_MODULE_CACHE
+    try:
+        import owner_attention_gate as gate
+
+        _GATE_MODULE_CACHE = gate
+        return gate
+    except ImportError:
+        spec = importlib.util.spec_from_file_location(
+            "owner_attention_gate", ROOT / "scripts" / "owner_attention_gate.py"
+        )
+        if spec is None or spec.loader is None:
+            raise
+        gate = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(gate)
+        _GATE_MODULE_CACHE = gate
+        return gate
+
+
+_GATE_MODULE_CACHE: ModuleType | None = None
+
+
+def _load_harness_sync_module() -> ModuleType:
+    """Import harness_sync whether invoked as CLI or loaded by path."""
+
+    global _HARNESS_SYNC_MODULE_CACHE
+    if _HARNESS_SYNC_MODULE_CACHE is not None:
+        return _HARNESS_SYNC_MODULE_CACHE
+    try:
+        import harness_sync as harness
+
+        _HARNESS_SYNC_MODULE_CACHE = harness
+        return harness
+    except ImportError:
+        spec = importlib.util.spec_from_file_location(
+            "harness_sync", ROOT / "scripts" / "harness_sync.py"
+        )
+        if spec is None or spec.loader is None:
+            raise
+        harness = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(harness)
+        _HARNESS_SYNC_MODULE_CACHE = harness
+        return harness
+
+
+_HARNESS_SYNC_MODULE_CACHE: ModuleType | None = None
 
 
 def preflight_push(
@@ -299,7 +351,7 @@ def _preflight_drift_problems(
     DENY reason; it never escapes as a traceback through the CLI boundary.
     """
 
-    import harness_sync
+    harness_sync = _load_harness_sync_module()
 
     try:
         expected_base = git_text(root, "merge-base", "HEAD", expected_upstream)
@@ -332,7 +384,7 @@ def _preflight_evidence_problems(root: Path, *, task_id: str, task_contract: str
     traceback through the CLI boundary.
     """
 
-    import harness_sync
+    harness_sync = _load_harness_sync_module()
 
     original_root = harness_sync.ROOT
     harness_sync.ROOT = root.resolve()
@@ -344,6 +396,10 @@ def _preflight_evidence_problems(root: Path, *, task_id: str, task_contract: str
         return [f"DELIVERY_EVIDENCE_INVALID:{exc}"]
     except ValueError as exc:
         return [f"DELIVERY_EVIDENCE_INVALID:{exc}"]
+    except OSError as exc:
+        # Missing/unreadable evidence files are a pre-bind normal state and
+        # must become a stable DENY reason, never a traceback.
+        return [f"DELIVERY_EVIDENCE_INVALID:{type(exc).__name__}"]
     finally:
         harness_sync.ROOT = original_root
     return [f"DELIVERY_EVIDENCE_DRIFT:{problem}" for problem in problems]

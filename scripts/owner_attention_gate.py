@@ -118,6 +118,12 @@ def render_owner_merge_phrase(
     pattern = policy.get("merge_approval", {}).get("exact_phrase_pattern")
     if not isinstance(pattern, str) or not pattern:
         raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
+    try:
+        re.compile(pattern)
+    except re.error:
+        # Invalid escapes or other regex defects must fail closed as a
+        # stable ValueError, never leak re.error past the JSON boundary.
+        raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
     body = pattern
     if body.startswith("^"):
         body = body[1:]
@@ -2699,7 +2705,7 @@ def main() -> int:
             repository=args.repository,
             pr_number=args.pr_number,
             route=args.route,
-            actor=args.actor,
+            actor=actor,
             approval_phrase=args.approval_phrase,
             context_receipt=receipt,
         )

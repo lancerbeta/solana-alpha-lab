@@ -6,8 +6,8 @@
   "task_id": "DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
   "state_change": "DETERMINISTIC_FINISH_CAPABILITY_IMPLEMENTED",
   "implementation_bindings": {},
-  "base_main": "",
-  "active_stop_conditions": [],
+  "base_main": "b652a66af554d96fb4ce3e2de3410c1d04e8bfd1",
+  "active_stop_conditions": ["NO_MERGE_AUTHORITY_STOP_BEFORE_MERGE"],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "external_material_action": false,

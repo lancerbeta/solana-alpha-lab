@@ -91,7 +91,7 @@
     {
       "source": "scripts/owner_attention_gate.py",
       "destination": "scripts/owner_attention_gate.py",
-      "sha256": "80bd9b73dc91a1f61898c26ba220b513c3a2959237ad6be836b4e2bb9ed0555b"
+      "sha256": "910a7afa07e9e53c0df0841f7c84a7e1cda5f6e971d9c60ca23dad1f0d703ce2"
     },
     {
       "source": "delivery-harness/templates/portable-core/AGENTS.md.tmpl",

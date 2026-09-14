@@ -11,7 +11,34 @@
     "GOAL_DOD_CRITIC",
     "ARCHITECTURE_CRITIC"
   ],
-  "reviews": [],
+  "reviews": [
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "MINOR: portable skill preflight wording differs slightly from live skill",
+        "MINOR: duplicated path_in_managed_write_set helper",
+        "MINOR: historical acceptance evidence amended rather than pinned separately",
+        "MINOR: acceptance matrix pins test files textually; a hash pin would be stronger",
+        "MINOR: stray stderr HARNESS_SYNC_PLAN noise in machine JSON gate"
+      ],
+      "remediation": "No DoD gaps. Findings recorded for follow-up; MAJOR items from sibling critics were remediated in f45f97f8 (real-path write-set test, monkeypatched network guard, renderer order guard)."
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "MAJOR: portable-core skill/commands mandate preflight-push but bundled portable delivery_harness.py has no such subcommand and harness_sync.py is not shipped - portable FINISH dead-ends",
+        "MAJOR: render_owner_merge_phrase is group-order-agnostic while validate_exact_merge_approval hardcodes group(1)=PR - reordered policy pattern renders phrase that crashes at merge",
+        "MINOR: crash-with-traceback paths in preflight drift/evidence helpers escape CLI as tracebacks instead of stable DENY reason codes",
+        "MINOR: hardcoded origin/main in _preflight_drift_problems duplicates contract expected_upstream binding",
+        "MINOR: two truth owners for write-set semantics (delivery_harness.py local helper vs owner_attention_gate.py)",
+        "MINOR: no live-vs-portable prefix parity test",
+        "MINOR: skill ordering text lacks evidence-commit step"
+      ],
+      "remediation": "MAJOR renderer order guard + MINOR crash-to-DENY hardening + MINOR expected_upstream binding + MINOR parity test fixed in f45f97f8. Portable MAJOR resolved in eac7c1f9 by qualifying portable wording (capability parity would require PORTABLE_CORE_REDESIGN, out of atom scope per stop conditions). Write-set helper duplication and skill ordering text recorded as named follow-up."
+    }
+  ],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"

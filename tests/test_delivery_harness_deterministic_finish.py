@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import re
+import sys
 import unittest
 from pathlib import Path
 from types import ModuleType
@@ -84,12 +86,23 @@ class DeterministicFinishAcceptanceTests(unittest.TestCase):
             "^PR #(\\d+), head ([0-9a-f]{40}) ok$",
             "^PR #([1-9][0-9]*)|x$",
             "^no groups here$",
+            # invalid regex escapes must fail closed as ValueError, never
+            # leak re.error past the JSON boundary
+            "^PR \\g #([1-9][0-9]*), head ([0-9a-f]{40})$",
         ):
             policy = {"merge_approval": {"exact_phrase_pattern": broken}}
             with self.assertRaisesRegex(ValueError, "OWNER_PHRASE_PATTERN_INVALID"):
                 self.gate.render_owner_merge_phrase(
                     pr_number=PR, head_sha=HEAD, policy=policy
                 )
+        # a backref compiles but cannot match its rendered phrase, so the
+        # renderer still fails closed with a stable ValueError.
+        policy = {"merge_approval": {"exact_phrase_pattern": "^PR #([1-9][0-9]*), head \\1([0-9a-f]{40})$"}}
+        with self.assertRaises(ValueError) as ctx:
+            self.gate.render_owner_merge_phrase(
+                pr_number=PR, head_sha=HEAD, policy=policy
+            )
+        self.assertIn(str(ctx.exception), ("OWNER_PHRASE_PATTERN_INVALID", "OWNER_PHRASE_RENDER_MISMATCH"))
 
     # a reordered policy pattern (head group first) must fail closed at
     # render time: validate_exact_merge_approval binds group(1) to the PR
@@ -171,6 +184,45 @@ class DeterministicFinishAcceptanceTests(unittest.TestCase):
         self.assertFalse(
             any(call[:3] == ("gh", "pr", "merge") for call in runner.calls)
         )
+
+    # 13 at the guarded-merge CLI boundary: main() must pass the
+    # normalize_cli_actor result into execute_guarded_merge, never the raw
+    # argv casing (the exact one-line defect found in code review).
+    def test_guarded_merge_cli_passes_normalized_actor(self) -> None:
+        from unittest import mock
+
+        captured: dict[str, Any] = {}
+
+        def fake_execute(root, **kwargs: Any) -> dict[str, Any]:
+            captured.update(kwargs)
+            return {
+                "schema": "smial.guarded-merge-submission",
+                "schema_version": "1.0",
+                "decision": "AUTONOMOUS",
+                "merge_submitted": True,
+            }
+
+        receipt_file = ROOT / "control/owner_attention_gate_v2.yaml"
+        argv = [
+            "owner_attention_gate.py",
+            "--guarded-merge",
+            "--repository", "lancerbeta/solana-alpha-lab",
+            "--pr-number", str(PR),
+            "--route", "DIRECT_CURSOR_DELIVERY",
+            "--actor", "cursor",
+            "--approval-phrase", f"PR #{PR}, head {HEAD} проверен; ready + merge разрешаю.",
+            "--context-receipt", str(receipt_file),
+        ]
+        with (
+            mock.patch.object(sys, "argv", argv),
+            mock.patch.object(
+                self.gate, "execute_guarded_merge", side_effect=fake_execute
+            ),
+            mock.patch("builtins.print"),
+        ):
+            exit_code = self.gate.main()
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(captured["actor"], "CURSOR")
 
     # 12. ORIENTATION + resumable task -> remains read-only in same turn
     def test_orientation_rule_never_enters_execute_in_same_turn(self) -> None:
@@ -289,6 +341,42 @@ class PreflightPushAcceptanceTests(unittest.TestCase):
         result = self._result(evidence=["DELIVERY_EVIDENCE_INVALID:shape"])
         self.assertFalse(result["ready_for_first_push"])
         self.assertIn("DELIVERY_EVIDENCE_INVALID:shape", result["reasons"])
+
+    # 7 (real path): the real verifier on this worktree must return stable
+    # DENY reason codes without raising (pre-bind state surfaces as DRIFT).
+    def test_real_evidence_verifier_returns_stable_reasons(self) -> None:
+        try:
+            problems = self.module._preflight_evidence_problems(
+                ROOT,
+                task_id="DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
+                task_contract="docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md",
+            )
+        except Exception as exc:  # pragma: no cover - the failure mode itself
+            self.fail(f"verifier escaped with {exc!r}")
+        for problem in problems:
+            self.assertRegex(problem, r"^DELIVERY_EVIDENCE_(INVALID|DRIFT):")
+
+    # 7 (absent-file unit): a missing evidence file must become a stable
+    # DELIVERY_EVIDENCE_INVALID reason, never a FileNotFoundError traceback.
+    def test_absent_evidence_file_becomes_stable_deny(self) -> None:
+        harness_sync = self.module._load_harness_sync_module()
+        original = harness_sync.verify_evidence_chain
+
+        def raising_verify(**_kwargs):
+            raise FileNotFoundError("missing completion evidence")
+
+        harness_sync.verify_evidence_chain = raising_verify
+        try:
+            problems = self.module._preflight_evidence_problems(
+                ROOT,
+                task_id="DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
+                task_contract="docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md",
+            )
+        finally:
+            harness_sync.verify_evidence_chain = original
+        self.assertEqual(
+            problems, ["DELIVERY_EVIDENCE_INVALID:FileNotFoundError"]
+        )
 
     # 6. stale derived hash -> preflight DENY
     def test_stale_derived_state_denies(self) -> None:

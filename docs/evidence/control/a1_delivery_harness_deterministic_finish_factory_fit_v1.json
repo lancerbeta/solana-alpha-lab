@@ -10,15 +10,15 @@
   "verdict": "PASS",
   "dimensions": {
     "mission": "PASS",
-    "flexibility_and_history": "PASS",
+    "flexibility_and_history": "PASS - narrow control-plane CLI and prefix policy; REVERT recovery straightforward",
     "context_efficiency": "PASS",
     "research_truth": "PASS",
-    "owner_operability": "PASS",
-    "execution_to_cashflow": "PASS",
-    "monitoring_and_recovery": "PASS",
-    "build_vs_buy": "PASS",
-    "security": "PASS",
-    "red_team": "PASS"
+    "owner_operability": "PASS - owner_phrase copy/paste-able (unescaped Cyrillic), preflight reasons carry REPAIR_HINTs",
+    "execution_to_cashflow": "PASS - no product/research behavior changed",
+    "monitoring_and_recovery": "PASS - preflight exit codes stable (0/2), DENY reasons deterministic",
+    "build_vs_buy": "PASS - all code is stdlib-only Python in repo-owned scripts; no new dependencies",
+    "security": "PASS - no secrets, tokens, absolute paths in outputs; phrase renderer fails closed",
+    "red_team": "PASS - reorder/crash paths now fail closed at render; dirty worktree cannot enter exact-head bindings"
   },
   "capability_radar": {
     "now": "NONE",
