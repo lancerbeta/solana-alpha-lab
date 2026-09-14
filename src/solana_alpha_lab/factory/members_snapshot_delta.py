@@ -454,6 +454,31 @@ def _canonical_publication_binding(publication: Mapping[str, Any]) -> dict[str, 
     }
 
 
+def _is_legacy_unbound_publication(publication: Mapping[str, Any]) -> bool:
+    """Identify a pre-rolling publication that can trail a bound prefix."""
+
+    if (
+        str(publication.get("kind") or "") != "delta"
+        or "canonical_files_binding_sha256" in publication
+    ):
+        return False
+    # Older V1/V2 unit writers did not emit the rolling-binding and operation
+    # accounting fields.  A modern record with only its binding removed must
+    # not be silently treated as legacy: these lineage fields make that
+    # distinction fail closed.
+    return not any(
+        key in publication
+        for key in (
+            "previous_dataset_manifest_id",
+            "previous_fingerprint",
+            "current_fingerprint",
+            "delta_counts",
+            "member_operations_count",
+            "member_operations_cumulative",
+        )
+    )
+
+
 def _canonical_files_binding_next(
     previous_chain: str,
     publication: Mapping[str, Any],
@@ -590,7 +615,14 @@ def _contained_data_path(data_root: Path, relative: str) -> Path:
 
 
 def canonical_unit_files_binding(data_root: Path, unit: Mapping[str, Any]) -> str:
-    """Strictly bind a cache to the verified bytes of every canonical file."""
+    """Strictly bind a cache to verified canonical bytes and lineage.
+
+    A legacy writer may append an unbound V1/V2 publication while preserving
+    the rolling binding of the earlier prefix.  That prefix binding is
+    accepted only after every canonical file hash is re-verified and only
+    when every trailing publication is explicitly legacy-shaped.  Modern
+    rolling-bound records still require an exact chain binding.
+    """
 
     root = Path(data_root).resolve()
     publications = unit.get("publications")
@@ -619,13 +651,30 @@ def canonical_unit_files_binding(data_root: Path, unit: Mapping[str, Any]) -> st
     )
     observed_binding = values[-1] if values else ""
     declared_binding = str(unit.get("canonical_files_binding_sha256") or "")
-    if declared_binding and declared_binding != observed_binding:
-        raise MembersDeltaError("CANONICAL_CHAIN_MISMATCH")
-    for publication, value in zip(publications, values):
+    declared_indices: list[int] = []
+    for index, (publication, value) in enumerate(zip(publications, values)):
         declared_value = str(
             publication.get("canonical_files_binding_sha256") or ""
         )
+        if declared_value:
+            declared_indices.append(index)
         if declared_value and declared_value != value:
+            raise MembersDeltaError("CANONICAL_CHAIN_MISMATCH")
+    if declared_binding and declared_binding != observed_binding:
+        if not declared_indices:
+            raise MembersDeltaError("CANONICAL_CHAIN_MISMATCH")
+        last_bound_index = max(
+            index
+            for index, publication in enumerate(publications)
+            if str(publication.get("canonical_files_binding_sha256") or "")
+        )
+        if (
+            declared_binding != values[last_bound_index]
+            or not all(
+                _is_legacy_unbound_publication(publication)
+                for publication in publications[last_bound_index + 1 :]
+            )
+        ):
             raise MembersDeltaError("CANONICAL_CHAIN_MISMATCH")
     return observed_binding
 
