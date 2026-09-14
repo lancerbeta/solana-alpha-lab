@@ -4,8 +4,8 @@
   "review_id": "M1-EXECUTION-REALITY-CALIBRATION-FACTORY-FIT-001",
   "as_of": "2026-09-14",
   "task_id": "M1_EXECUTION_REALITY_CALIBRATION_V1",
-  "reviewed_bindings_sha256": "placeholder",
-  "reviewed_inventory_sha256": "placeholder",
+  "reviewed_bindings_sha256": "f26cdb629258b5699e703ff507da5c0a8e5b70c2f5b7af9ae4c7782bfc523831",
+  "reviewed_inventory_sha256": "4666a2fe4e66eb1ca543cec40c4e4faa6bcc4f66aee889ed7b90ef6d3e106c0e",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

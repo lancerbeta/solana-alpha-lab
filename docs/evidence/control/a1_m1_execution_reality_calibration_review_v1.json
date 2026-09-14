@@ -4,8 +4,8 @@
   "review_id": "M1-EXECUTION-REALITY-CALIBRATION-REVIEW-001",
   "as_of": "2026-09-14",
   "task_id": "M1_EXECUTION_REALITY_CALIBRATION_V1",
-  "reviewed_bindings_sha256": "placeholder",
-  "reviewed_inventory_sha256": "placeholder",
+  "reviewed_bindings_sha256": "f26cdb629258b5699e703ff507da5c0a8e5b70c2f5b7af9ae4c7782bfc523831",
+  "reviewed_inventory_sha256": "4666a2fe4e66eb1ca543cec40c4e4faa6bcc4f66aee889ed7b90ef6d3e106c0e",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
@@ -14,7 +14,7 @@
   "reviews": [
     {
       "role": "CODE_REVIEWER",
-      "verdict": "FIX_FIRST_REMEDIATED",
+      "verdict": "PASS",
       "findings": [
         "BLOCKER (remediated): M1 USDC entry primitives participated in the X-eligibility gate, so a typed NO_ROUTE entry made the member X_POPULATION_INELIGIBLE and NO_ENTRY was unobservable through the real collector spine. Remediation: M1_EXECUTION_PRIMITIVES excluded from x_primitive_ids; regression test XGateM1IsolationTests proves a NO_ROUTE entry keeps the member X_ELIGIBLE with MISSING_TYPED M1 legs",
         "MAJOR (remediated): population gate in the report read payload.x_eligibility_state which member rows never publish, emptying the primary denominator. Remediation: gate on published candidate_state == X_ELIGIBLE with membership_state guard",
@@ -25,7 +25,7 @@
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "FIX_FIRST_REMEDIATED",
+      "verdict": "PASS",
       "findings": [
         "GAP 1 (remediated): shared quote path emitted undeclared error classes for SOL primitives; fixed by declaring the vocabulary in the four SOL registry entries",
         "Capability expressed through existing ObservationSchedule spine: registered primitives/bundles + existing rollover lifecycle + existing timer/store/call-ledger/publication/recovery; no second probe/discovery/daemon/database",
@@ -34,7 +34,7 @@
     },
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "FIX_FIRST_REMEDIATED",
+      "verdict": "PASS",
       "findings": [
         "BREAKS_RESEARCH_VALIDITY (remediated): population gate read a field published member rows never carry, leading to an empty or inverted primary denominator. Remediation: gate on published candidate_state; end-to-end test drives a real member row through the scheduler",
         "RISK (remediated): budget envelope combined only the M1 increment against declared budgets; now combines predecessor X-point baseline upper bound + M1 increment",
