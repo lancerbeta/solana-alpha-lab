@@ -10,6 +10,9 @@ import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import pyarrow as pa
+import pyarrow.parquet as pq
+
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
 if str(SRC) not in sys.path:
@@ -730,6 +733,46 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
             transitions = canonical_unit_noop_transitions(data_root, unit)
 
             self.assertEqual(transitions, (True, False))
+
+    def test_noop_audit_rejects_corrupt_parquet_meta_identity(self) -> None:
+        """A zero-op marker cannot hide inconsistent canonical lineage metadata."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "observation_rdp"
+            data_root.mkdir()
+            unit = write_snapshot_unit(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-anchor",
+                rows=[_member("kept")],
+            )
+            unit = append_delta_publication(
+                data_root,
+                utc_day="20260902",
+                dataset_manifest_id="unit-noop",
+                rows=[_member("kept")],
+            )
+            tail = unit["publications"][-1]
+            path = data_root / tail["rel"]
+            table = pq.read_table(path)
+            rows = table.to_pylist()
+            corrupted_meta = json.loads(rows[0]["meta_json"])
+            corrupted_meta["previous_fingerprint"] = "f" * 64
+            rows[0]["meta_json"] = json.dumps(
+                corrupted_meta, sort_keys=True, separators=(",", ":")
+            )
+            tmp_path = path.with_suffix(path.suffix + ".tampered")
+            pq.write_table(
+                pa.Table.from_pylist(rows, schema=table.schema),
+                tmp_path,
+                compression="zstd",
+            )
+            tmp_path.replace(path)
+            tail["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+            _refresh_canonical_files_binding(unit)
+
+            with self.assertRaisesRegex(MembersDeltaError, "DELTA_HASH_MISMATCH"):
+                canonical_unit_noop_transitions(data_root, unit)
 
     def test_snapshot_plus_delta_unit_path_escape_fails_closed(self) -> None:
         """A sidecar cannot redirect canonical replay or cache outside the RDP root."""

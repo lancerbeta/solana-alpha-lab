@@ -75,7 +75,7 @@ from solana_alpha_lab.factory.members_snapshot_delta import (
     canonical_unit_binding,
     canonical_unit_files_binding,
     canonical_unit_files_binding_fast,
-    canonical_unit_noop_transitions,
+    canonical_unit_noop_range,
     _reconstruct_to_sqlite,
     _store_operational_latest,
     _try_extend_operational_latest,
@@ -117,6 +117,8 @@ ADMISSION_REPRESENTATIONS = (
     "discovery_available_at",
 )
 COHORT_WINDOW_DAYS = 7
+_MAX_LOCAL_UNIT_CONTEXTS = 8
+_MAX_LOCAL_PREFIX_BINDINGS = 8
 RELEASE_SCHEMA = "smial.live-cohort-discovery-release"
 RELEASE_SCHEMA_VERSION = "1.0"
 RELEASE_MANIFEST_NAME = "release_manifest.json"
@@ -1265,11 +1267,7 @@ def _cohort_members_into_sqlite(
         )
     batches.sort(key=lambda item: (item[1], item[0]), reverse=True)
     winning_producers: set[str] = set()
-    unit_bindings: dict[str, tuple[str, str | None]] = {}
-    unit_prefix_bindings: dict[
-        str, OrderedDict[int, tuple[str, str | None]]
-    ] = {}
-    unit_noop_transitions: dict[str, tuple[bool, ...]] = {}
+    unit_contexts: OrderedDict[str, dict[str, Any]] = OrderedDict()
     target_cache: OrderedDict[str, None] = OrderedDict()
     target_state_cache: dict[tuple[str, str, int, str, str], str] = {}
     target_state_sequences: dict[tuple[str, str, int, str, str], int] = {}
@@ -1342,6 +1340,16 @@ def _cohort_members_into_sqlite(
         )
         return unit_path.parent, target, is_tail, unit
 
+    def _unit_context(unit_rel: str) -> dict[str, Any]:
+        context = unit_contexts.get(unit_rel)
+        if context is None:
+            context = {"binding": None, "prefix_bindings": OrderedDict()}
+            unit_contexts[unit_rel] = context
+        unit_contexts.move_to_end(unit_rel)
+        while len(unit_contexts) > _MAX_LOCAL_UNIT_CONTEXTS:
+            unit_contexts.popitem(last=False)
+        return context
+
     def _unit_prefix_binding(
         unit_rel: str,
         unit: Mapping[str, Any],
@@ -1360,7 +1368,8 @@ def _cohort_members_into_sqlite(
         publications = list(unit.get("publications") or [])
         if target_seq == len(publications) - 1:
             return current_binding
-        prefix_cache = unit_prefix_bindings.setdefault(unit_rel, OrderedDict())
+        context = _unit_context(unit_rel)
+        prefix_cache = context["prefix_bindings"]
         cached = prefix_cache.get(target_seq)
         if cached is not None:
             prefix_cache.move_to_end(target_seq)
@@ -1390,7 +1399,7 @@ def _cohort_members_into_sqlite(
                 pass
         prefix_cache[target_seq] = prefix_binding
         prefix_cache.move_to_end(target_seq)
-        while len(prefix_cache) > 8:
+        while len(prefix_cache) > _MAX_LOCAL_PREFIX_BINDINGS:
             prefix_cache.popitem(last=False)
         return prefix_binding
 
@@ -1507,15 +1516,8 @@ def _cohort_members_into_sqlite(
             return True
         if lower_seq > upper_seq:
             lower_seq, upper_seq = upper_seq, lower_seq
-        transitions = unit_noop_transitions.get(unit_rel)
-        if transitions is None:
-            transitions = canonical_unit_noop_transitions(
-                Path(observation_rdp_root), unit
-            )
-            unit_noop_transitions[unit_rel] = transitions
-        if lower_seq < 0 or upper_seq >= len(transitions):
-            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
-        return all(transitions[lower_seq + 1 : upper_seq + 1])
+        _unit_context(unit_rel)
+        return canonical_unit_noop_range(unit, lower_seq, upper_seq) is True
 
     def _cache_target_rows(
         cache_key: str,
@@ -1590,7 +1592,8 @@ def _cohort_members_into_sqlite(
             target_fp = str(publication["snapshot_fingerprint"])
             target_seq = int(publication["seq"])
             target_rows = int(publication["row_count"])
-            binding = unit_bindings.get(unit_rel)
+            unit_context = _unit_context(unit_rel)
+            binding = unit_context.get("binding")
             if binding is None:
                 unit_sha = canonical_unit_binding(unit)
                 try:
@@ -1602,7 +1605,7 @@ def _cohort_members_into_sqlite(
                 except (MembersDeltaError, OSError):
                     files_sha = None
                 binding = (unit_sha, files_sha)
-                unit_bindings[unit_rel] = binding
+                unit_context["binding"] = binding
             loc_has_in: bool
             loc_later: bool
             consumed: int

@@ -37,6 +37,11 @@ _RECONSTRUCT_STATS = {
     "anchor_loads": 0,
     "delta_files_applied": 0,
     "incremental_extensions": 0,
+    "canonical_binding_full_refreshes": 0,
+    "canonical_binding_extensions": 0,
+    "noop_range_fast_hits": 0,
+    "noop_range_fallbacks": 0,
+    "noop_marker_files_scanned": 0,
 }
 _PUBLICATION_STAGE_STATS = {
     "full_population_passes": 0,
@@ -87,6 +92,11 @@ def reset_fingerprint_work() -> None:
     _RECONSTRUCT_STATS["anchor_loads"] = 0
     _RECONSTRUCT_STATS["delta_files_applied"] = 0
     _RECONSTRUCT_STATS["incremental_extensions"] = 0
+    _RECONSTRUCT_STATS["canonical_binding_full_refreshes"] = 0
+    _RECONSTRUCT_STATS["canonical_binding_extensions"] = 0
+    _RECONSTRUCT_STATS["noop_range_fast_hits"] = 0
+    _RECONSTRUCT_STATS["noop_range_fallbacks"] = 0
+    _RECONSTRUCT_STATS["noop_marker_files_scanned"] = 0
     for key in _PUBLICATION_STAGE_STATS:
         _PUBLICATION_STAGE_STATS[key] = 0
 
@@ -389,6 +399,8 @@ def _write_snapshot_unit_from_conn(
                 "sha256": file_sha256,
                 "row_count": row_count,
                 "snapshot_fingerprint": fingerprint,
+                "member_operations_count": 0,
+                "member_operations_cumulative": 0,
             }
         ],
     }
@@ -435,7 +447,33 @@ def _canonical_publication_binding(publication: Mapping[str, Any]) -> dict[str, 
         "previous_fingerprint": publication.get("previous_fingerprint"),
         "current_fingerprint": publication.get("current_fingerprint"),
         "delta_counts": publication.get("delta_counts"),
+        "member_operations_count": publication.get("member_operations_count"),
+        "member_operations_cumulative": publication.get(
+            "member_operations_cumulative"
+        ),
     }
+
+
+def _canonical_files_binding_next(
+    previous_chain: str,
+    publication: Mapping[str, Any],
+    *,
+    observed_sha256: str | None = None,
+) -> str:
+    normalized = dict(publication)
+    normalized.pop("canonical_files_binding_sha256", None)
+    if observed_sha256 is not None:
+        normalized["sha256"] = observed_sha256
+    payload = json.dumps(
+        {
+            "previous": previous_chain,
+            "publication": _canonical_publication_binding(normalized),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _canonical_files_binding_chain_values(
@@ -448,20 +486,11 @@ def _canonical_files_binding_chain_values(
     for index, publication in enumerate(publications):
         if not isinstance(publication, Mapping):
             raise MembersDeltaError("UNIT_LAYOUT_INVALID")
-        normalized = dict(publication)
-        normalized.pop("canonical_files_binding_sha256", None)
-        if observed_sha256 is not None:
-            normalized["sha256"] = observed_sha256[index]
-        payload = json.dumps(
-            {
-                "previous": chain,
-                "publication": _canonical_publication_binding(normalized),
-            },
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-        chain = hashlib.sha256(payload).hexdigest()
+        chain = _canonical_files_binding_next(
+            chain,
+            publication,
+            observed_sha256=None if observed_sha256 is None else observed_sha256[index],
+        )
         values.append(chain)
     return values
 
@@ -469,6 +498,7 @@ def _canonical_files_binding_chain_values(
 def _refresh_canonical_files_binding(unit: dict[str, Any]) -> dict[str, Any]:
     """Attach an append-only rolling binding without changing member data."""
 
+    _RECONSTRUCT_STATS["canonical_binding_full_refreshes"] += 1
     publications = unit.get("publications")
     if not isinstance(publications, Sequence) or isinstance(publications, (str, bytes)):
         raise MembersDeltaError("UNIT_LAYOUT_INVALID")
@@ -478,6 +508,27 @@ def _refresh_canonical_files_binding(unit: dict[str, Any]) -> dict[str, Any]:
         publication["canonical_files_binding_sha256"] = value
     unit["publications"] = copied
     unit["canonical_files_binding_sha256"] = values[-1] if values else ""
+    return unit
+
+
+def _append_canonical_files_binding(unit: dict[str, Any]) -> dict[str, Any]:
+    """Extend a valid writer-issued commitment by exactly one publication."""
+
+    publications = unit.get("publications")
+    if not isinstance(publications, list) or len(publications) < 2:
+        return _refresh_canonical_files_binding(unit)
+    previous = publications[-2]
+    current = publications[-1]
+    if not isinstance(previous, Mapping) or not isinstance(current, Mapping):
+        return _refresh_canonical_files_binding(unit)
+    previous_chain = str(previous.get("canonical_files_binding_sha256") or "")
+    declared_root = str(unit.get("canonical_files_binding_sha256") or "")
+    if not _is_sha256(previous_chain) or declared_root != previous_chain:
+        return _refresh_canonical_files_binding(unit)
+    next_chain = _canonical_files_binding_next(previous_chain, current)
+    current["canonical_files_binding_sha256"] = next_chain
+    unit["canonical_files_binding_sha256"] = next_chain
+    _RECONSTRUCT_STATS["canonical_binding_extensions"] += 1
     return unit
 
 
@@ -579,7 +630,60 @@ def canonical_unit_files_binding(data_root: Path, unit: Mapping[str, Any]) -> st
     return observed_binding
 
 
-def _delta_file_has_member_operations(path: Path, payload: bytes = b"") -> bool:
+def _validate_noop_delta_meta(
+    meta: Mapping[str, Any], expected: Mapping[str, Any]
+) -> None:
+    """Validate the metadata row before accepting an actual no-op marker."""
+
+    for key in (
+        "schema",
+        "dataset_manifest_id",
+        "previous_dataset_manifest_id",
+        "previous_fingerprint",
+        "current_fingerprint",
+    ):
+        if str(meta.get(key) or "") != str(expected.get(key) or ""):
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+    expected_version = expected.get("schema_version")
+    if expected_version is not None and str(meta.get("schema_version") or "") != str(
+        expected_version
+    ):
+        raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
+    expected_operation_count = expected.get("member_operations_count")
+    if expected_operation_count is not None:
+        try:
+            observed_operation_count = int(meta["member_operations_count"])
+        except (KeyError, TypeError, ValueError):
+            raise MembersDeltaError("DELTA_CORRUPT") from None
+        if observed_operation_count != int(expected_operation_count):
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+    expected_counts = expected.get("counts")
+    observed_counts = meta.get("counts")
+    if not isinstance(expected_counts, Mapping) or not isinstance(
+        observed_counts, Mapping
+    ):
+        raise MembersDeltaError("DELTA_CORRUPT")
+    for key in ("added", "changed", "removed"):
+        try:
+            if int(observed_counts[key]) != int(expected_counts[key]):
+                raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        except (KeyError, TypeError, ValueError):
+            raise MembersDeltaError("DELTA_CORRUPT") from None
+    for key in ("previous_row_count", "current_row_count"):
+        if key in expected_counts:
+            try:
+                if int(observed_counts[key]) != int(expected_counts[key]):
+                    raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+            except (KeyError, TypeError, ValueError):
+                raise MembersDeltaError("DELTA_CORRUPT") from None
+
+
+def _delta_file_has_member_operations(
+    path: Path,
+    payload: bytes = b"",
+    *,
+    expected_meta: Mapping[str, Any] | None = None,
+) -> bool:
     """Inspect the operation marker without materializing member payloads.
 
     Publication metadata is useful for the hot path, but it is not by itself
@@ -590,9 +694,11 @@ def _delta_file_has_member_operations(path: Path, payload: bytes = b"") -> bool:
     at the caller; malformed structure fails closed.
     """
 
+    _RECONSTRUCT_STATS["noop_marker_files_scanned"] += 1
     try:
         if path.suffix == ".json" or _delta_file_is_monolith(path, payload):
             delta = _read_delta_payload(path, payload)
+            has_operations = False
             for key in ("added", "changed", "removed"):
                 value = delta.get(key)
                 if value is None:
@@ -600,27 +706,56 @@ def _delta_file_has_member_operations(path: Path, payload: bytes = b"") -> bool:
                 if not isinstance(value, (list, tuple)):
                     raise MembersDeltaError("DELTA_CORRUPT")
                 if value:
-                    return True
-            return False
+                    has_operations = True
+            if not has_operations and expected_meta is not None:
+                _validate_noop_delta_meta(delta, expected_meta)
+            return has_operations
 
         pf = pq.ParquetFile(path)
-        if "record_kind" not in set(pf.schema_arrow.names):
+        names = set(pf.schema_arrow.names)
+        if "record_kind" not in names:
+            raise MembersDeltaError("DELTA_CORRUPT")
+        if expected_meta is not None and "meta_json" not in names:
             raise MembersDeltaError("DELTA_CORRUPT")
         meta_rows = 0
+        meta: dict[str, Any] | None = None
+        has_operations = False
+        columns = ["record_kind"]
+        if "meta_json" in names:
+            columns.append("meta_json")
         for batch in pf.iter_batches(
-            batch_size=_MEMBER_BATCH_SIZE, columns=["record_kind"]
+            batch_size=_MEMBER_BATCH_SIZE, columns=columns
         ):
-            for raw_kind in batch.column(0).to_pylist():
+            kinds = batch.column(0).to_pylist()
+            meta_json_values = (
+                batch.column(1).to_pylist() if len(columns) > 1 else [None] * len(kinds)
+            )
+            for raw_kind, raw_meta_json in zip(kinds, meta_json_values):
                 kind = str(raw_kind or "")
                 if kind == "meta":
                     meta_rows += 1
+                    if not isinstance(raw_meta_json, str):
+                        raise MembersDeltaError("DELTA_CORRUPT")
+                    try:
+                        parsed_meta = json.loads(raw_meta_json)
+                    except (TypeError, json.JSONDecodeError) as exc:
+                        raise MembersDeltaError("DELTA_CORRUPT") from exc
+                    if not isinstance(parsed_meta, dict):
+                        raise MembersDeltaError("DELTA_CORRUPT")
+                    if meta is not None:
+                        raise MembersDeltaError("DELTA_CORRUPT")
+                    meta = parsed_meta
                 elif kind in {"added", "changed", "removed"}:
-                    return True
+                    has_operations = True
                 else:
                     raise MembersDeltaError("DELTA_CORRUPT")
         if meta_rows != 1:
             raise MembersDeltaError("DELTA_CORRUPT")
-        return False
+        if not has_operations and expected_meta is not None:
+            if meta is None:
+                raise MembersDeltaError("DELTA_CORRUPT")
+            _validate_noop_delta_meta(meta, expected_meta)
+        return has_operations
     except MembersDeltaError:
         raise
     except (pa.ArrowException, OSError, TypeError, ValueError) as exc:
@@ -655,6 +790,10 @@ def canonical_unit_noop_transitions(
     fast_metadata = (
         canonical_unit_files_binding_fast(unit) is not None
         and all(
+            key in anchor
+            for key in ("member_operations_count", "member_operations_cumulative")
+        )
+        and all(
             isinstance(publication, Mapping)
             and all(
                 key in publication
@@ -664,12 +803,23 @@ def canonical_unit_noop_transitions(
                     "current_fingerprint",
                     "delta_counts",
                     "canonical_files_binding_sha256",
+                    "member_operations_count",
+                    "member_operations_cumulative",
                 )
             )
             for publication in publications[1:]
         )
     )
     if fast_metadata:
+        try:
+            previous_row_count = int(anchor.get("row_count") or 0)
+            previous_operations_cumulative = int(
+                anchor["member_operations_cumulative"]
+            )
+        except (KeyError, TypeError, ValueError):
+            raise MembersDeltaError("DELTA_CORRUPT") from None
+        if previous_operations_cumulative < 0:
+            raise MembersDeltaError("DELTA_CORRUPT")
         transitions = [True]
         for expected_seq, publication in enumerate(publications[1:], start=1):
             try:
@@ -700,7 +850,29 @@ def canonical_unit_noop_transitions(
             except (TypeError, ValueError):
                 raise MembersDeltaError("DELTA_CORRUPT") from None
             noop = False
-            if counts_zero and item_fp == previous_fp:
+            try:
+                current_row_count = int(publication.get("row_count") or 0)
+                operation_count = int(publication["member_operations_count"])
+                operations_cumulative = int(
+                    publication["member_operations_cumulative"]
+                )
+                operation_counts = {
+                    key: int(counts.get(key, -1))
+                    for key in ("added", "changed", "removed")
+                }
+            except (KeyError, TypeError, ValueError):
+                raise MembersDeltaError("DELTA_CORRUPT") from None
+            operation_metadata_consistent = (
+                all(value >= 0 for value in operation_counts.values())
+                and operation_count == sum(operation_counts.values())
+                and operations_cumulative
+                == previous_operations_cumulative + operation_count
+            )
+            if (
+                operation_metadata_consistent
+                and counts_zero
+                and item_fp == previous_fp
+            ):
                 rel = str(publication.get("rel") or "")
                 if not rel:
                     raise MembersDeltaError("UNIT_LAYOUT_INVALID")
@@ -711,10 +883,29 @@ def canonical_unit_noop_transitions(
                 if not path.is_file():
                     raise MembersDeltaError("DELTA_MISSING")
                 payload = path.read_bytes() if path.suffix == ".json" else b""
-                noop = not _delta_file_has_member_operations(path, payload)
+                noop = not _delta_file_has_member_operations(
+                    path,
+                    payload,
+                    expected_meta={
+                        "schema": DELTA_SCHEMA,
+                        "schema_version": publication.get("delta_schema_version"),
+                        "dataset_manifest_id": dataset_id,
+                        "previous_dataset_manifest_id": previous_id,
+                        "previous_fingerprint": previous_fp,
+                        "current_fingerprint": item_fp,
+                        "member_operations_count": operation_count,
+                        "counts": {
+                            **operation_counts,
+                            "previous_row_count": previous_row_count,
+                            "current_row_count": current_row_count,
+                        },
+                    },
+                )
             transitions.append(noop)
             previous_id = dataset_id
             previous_fp = item_fp
+            previous_row_count = current_row_count
+            previous_operations_cumulative = operations_cumulative
         return tuple(transitions)
 
     transitions = [True]
@@ -769,6 +960,70 @@ def canonical_unit_noop_transitions(
         previous_id = dataset_id
         previous_fp = current_fp or item_fp
     return tuple(transitions)
+
+
+def canonical_unit_noop_range(
+    unit: Mapping[str, Any], lower_seq: int, upper_seq: int
+) -> bool | None:
+    """Return a bounded no-op proof for a writer-issued publication range.
+
+    New writers commit the cumulative number of member operations into every
+    publication.  Equal cumulative values prove that the range cannot contain
+    a member operation because counts are non-negative.  A missing or
+    inconsistent proof returns ``None`` so callers take exact replay.  The
+    proof is intentionally scoped to the append-only canonical-writer contract;
+    ``canonical_unit_noop_transitions`` remains the strict audit path that
+    reads and validates the canonical delta markers.
+    """
+
+    if lower_seq > upper_seq:
+        lower_seq, upper_seq = upper_seq, lower_seq
+    if lower_seq == upper_seq:
+        return True
+    publications = list(unit.get("publications") or [])
+    if (
+        lower_seq < 0
+        or upper_seq >= len(publications)
+        or canonical_unit_files_binding_fast(unit) is None
+    ):
+        _RECONSTRUCT_STATS["noop_range_fallbacks"] += 1
+        return None
+
+    cumulative: dict[int, int] = {}
+    for sequence in (lower_seq, upper_seq):
+        publication = publications[sequence]
+        if not isinstance(publication, Mapping):
+            raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+        try:
+            item_seq = int(publication["seq"])
+            operation_count = int(publication["member_operations_count"])
+            operation_cumulative = int(publication["member_operations_cumulative"])
+            counts = publication.get("delta_counts")
+            if sequence == 0:
+                if str(publication.get("kind") or "") != "snapshot":
+                    raise MembersDeltaError("ANCHOR_MISSING")
+                expected_count = 0
+            else:
+                if str(publication.get("kind") or "") != "delta":
+                    raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+                if not isinstance(counts, Mapping):
+                    _RECONSTRUCT_STATS["noop_range_fallbacks"] += 1
+                    return None
+                expected_count = sum(
+                    int(counts.get(key, -1))
+                    for key in ("added", "changed", "removed")
+                )
+        except (KeyError, TypeError, ValueError):
+            _RECONSTRUCT_STATS["noop_range_fallbacks"] += 1
+            return None
+        if item_seq != sequence or operation_count < 0 or operation_cumulative < 0:
+            raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+        if operation_count != expected_count:
+            _RECONSTRUCT_STATS["noop_range_fallbacks"] += 1
+            return None
+        cumulative[sequence] = operation_cumulative
+    _RECONSTRUCT_STATS["noop_range_fast_hits"] += 1
+    return cumulative[lower_seq] == cumulative[upper_seq]
 
 
 def operational_latest_cache_bytes(unit_dir: Path) -> dict[str, int]:
@@ -1229,6 +1484,7 @@ def append_delta_publication(
                 "previous_dataset_manifest_id": previous_id,
                 "previous_fingerprint": previous_fp,
                 "current_fingerprint": current_fp,
+                "member_operations_count": changed_total,
                 "counts": {
                     "added": counts["added"],
                     "changed": counts["changed"],
@@ -1248,23 +1504,33 @@ def append_delta_publication(
             _apply_delta_ops_sqlite(replay_conn, ops_conn)
             if _fingerprint_sqlite(replay_conn) != current_fp:
                 raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
-            unit["publications"].append(
-                {
-                    "seq": seq,
-                    "dataset_manifest_id": dataset_manifest_id,
-                    "kind": "delta",
-                    "rel": rel.replace("\\", "/"),
-                    "sha256": digest,
-                    "row_count": current_count,
-                    "snapshot_fingerprint": current_fp,
-                    "delta_schema_version": DELTA_SCHEMA_VERSION_V2,
-                    "previous_dataset_manifest_id": previous_id,
-                    "previous_fingerprint": previous_fp,
-                    "current_fingerprint": current_fp,
-                    "delta_counts": dict(counts),
-                }
-            )
-            _refresh_canonical_files_binding(unit)
+            publication = {
+                "seq": seq,
+                "dataset_manifest_id": dataset_manifest_id,
+                "kind": "delta",
+                "rel": rel.replace("\\", "/"),
+                "sha256": digest,
+                "row_count": current_count,
+                "snapshot_fingerprint": current_fp,
+                "delta_schema_version": DELTA_SCHEMA_VERSION_V2,
+                "previous_dataset_manifest_id": previous_id,
+                "previous_fingerprint": previous_fp,
+                "current_fingerprint": current_fp,
+                "delta_counts": dict(counts),
+                "member_operations_count": changed_total,
+            }
+            try:
+                previous_operations_cumulative = int(
+                    tail["member_operations_cumulative"]
+                )
+            except (KeyError, TypeError, ValueError):
+                previous_operations_cumulative = None
+            if previous_operations_cumulative is not None and previous_operations_cumulative >= 0:
+                publication["member_operations_cumulative"] = (
+                    previous_operations_cumulative + changed_total
+                )
+            unit["publications"].append(publication)
+            _append_canonical_files_binding(unit)
             _write_unit(unit_path, unit)
             _write_layout_sidecar(path, unit, dataset_manifest_id)
             _store_operational_latest(

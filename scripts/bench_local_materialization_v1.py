@@ -265,7 +265,14 @@ def _rows_for_depth(digest: str, count: int, depth: int) -> list[dict[str, str]]
     return [_member(digest, index, tag=f"D{depth}") for index in range(count)]
 
 
-def _fixture(data_root: Path, *, depth: int, member_count: int, tag: str) -> dict[str, Any]:
+def _fixture(
+    data_root: Path,
+    *,
+    depth: int,
+    member_count: int,
+    tag: str,
+    stable_member_state: bool = False,
+) -> dict[str, Any]:
     schedule = _schedule()
     digest = str(schedule["schedule_sha256"])
     persist_observation_schedule(
@@ -275,18 +282,24 @@ def _fixture(data_root: Path, *, depth: int, member_count: int, tag: str) -> dic
         producer_git_sha=PRODUCER_A,
         activation_id=ACTIVATION_ID,
     )
+    reset_fingerprint_work()
     unit = write_snapshot_unit(
         data_root,
         utc_day="20260902",
         dataset_manifest_id=f"bench-{tag}-anchor",
         rows=_rows_for_depth(digest, member_count, 0),
     )
+    stable_rows = _rows_for_depth(digest, member_count, 0)
     for sequence in range(1, depth + 1):
         unit = append_delta_publication(
             data_root,
             utc_day="20260902",
             dataset_manifest_id=f"bench-{tag}-delta-{sequence:03d}",
-            rows=_rows_for_depth(digest, member_count, sequence),
+            rows=(
+                stable_rows
+                if stable_member_state
+                else _rows_for_depth(digest, member_count, sequence)
+            ),
         )
     tail_location = str(unit["publications"][-1]["rel"])
     observation_rows = [
@@ -310,12 +323,17 @@ def _fixture(data_root: Path, *, depth: int, member_count: int, tag: str) -> dic
             data_root,
             digest=digest,
             effective_at=WINDOW_START + timedelta(minutes=depth + panel_index + 1),
-            member_location=tail_location,
+            member_location=(
+                str(unit["publications"][panel_index]["rel"])
+                if stable_member_state
+                else tail_location
+            ),
             observation_location=observation_path.relative_to(data_root).as_posix(),
             member_count=member_count,
             observation_count=len(observation_rows),
             tag=f"{tag}-{panel_index:03d}",
         )
+    writer_stats = reconstruct_stats()
     return {
         "data_root": data_root,
         "schedule": schedule,
@@ -324,6 +342,14 @@ def _fixture(data_root: Path, *, depth: int, member_count: int, tag: str) -> dic
         "unit_dir": data_root / "datasets" / "members_snapshot_plus_delta" / "20260902",
         "tail_location": tail_location,
         "member_count": member_count,
+        "writer_binding_stats": {
+            "canonical_binding_full_refreshes": writer_stats[
+                "canonical_binding_full_refreshes"
+            ],
+            "canonical_binding_extensions": writer_stats[
+                "canonical_binding_extensions"
+            ],
+        },
     }
 
 
@@ -435,6 +461,11 @@ def _build(fixture: dict[str, Any], *, label: str) -> dict[str, Any]:
         "reconstruct_targets": targets,
         "delta_files_applied": stats["delta_files_applied"],
         "incremental_extensions": stats["incremental_extensions"],
+        "canonical_binding_full_refreshes": stats["canonical_binding_full_refreshes"],
+        "canonical_binding_extensions": stats["canonical_binding_extensions"],
+        "noop_range_fast_hits": stats["noop_range_fast_hits"],
+        "noop_range_fallbacks": stats["noop_range_fallbacks"],
+        "noop_marker_files_scanned": stats["noop_marker_files_scanned"],
         "tail_delta_counts": tail_delta_counts,
         "cache_dataset_manifest_id": cache_meta.get("dataset_manifest_id"),
         "cache_seq": cache_meta.get("seq"),
@@ -523,6 +554,14 @@ def run_benchmark() -> dict[str, Any]:
 
         deep_fixture = _fixture(root / "deep", depth=100, member_count=512, tag="deep")
         deep = _build(deep_fixture, label="warm_deep_depth_100")
+        noop_fixture = _fixture(
+            root / "noop-deep",
+            depth=100,
+            member_count=512,
+            tag="noop-deep",
+            stable_member_state=True,
+        )
+        noop_deep = _build(noop_fixture, label="warm_noop_deep_depth_100")
 
         parity = cold["source_sha256"] == warm["source_sha256"]
         acceptance = {
@@ -559,15 +598,28 @@ def run_benchmark() -> dict[str, Any]:
                 and deep["member_snapshot_full_column_scans"]
                 == warm["member_snapshot_full_column_scans"]
             ),
+            "deep_noop_range_bounded": (
+                noop_deep["reconstruct_calls"] == 1
+                and noop_deep["noop_range_fast_hits"] == 99
+                and noop_deep["noop_range_fallbacks"] == 0
+                and noop_deep["noop_marker_files_scanned"] == 0
+                and noop_deep["target_cache_hits"] == 99
+            ),
+            "writer_binding_incremental": (
+                deep_fixture["writer_binding_stats"]["canonical_binding_full_refreshes"] == 1
+                and deep_fixture["writer_binding_stats"]["canonical_binding_extensions"]
+                == 100
+            ),
             "unchanged_source_parity": parity,
             "no_repeated_exact_publication_reconstruction": all(
                 item["repeated_exact_publication_reconstruction_count"] == 0
-                for item in (cold, warm, one_step, one_step_cold, deep)
+                for item in (cold, warm, one_step, one_step_cold, deep, noop_deep)
             ),
             "scratch_clean_after_warm_paths": (
                 warm["scratch_bytes_after"] == 0
                 and one_step["scratch_bytes_after"] == 0
                 and deep["scratch_bytes_after"] == 0
+                and noop_deep["scratch_bytes_after"] == 0
             ),
         }
         return {
@@ -577,12 +629,13 @@ def run_benchmark() -> dict[str, Any]:
             "python_version": platform.python_version(),
             "platform": platform.platform(),
             "member_count": 512,
-            "scenarios": [cold, warm, one_step, one_step_cold, deep],
+            "scenarios": [cold, warm, one_step, one_step_cold, deep, noop_deep],
             "acceptance": acceptance,
             "observation_history": {
                 "cold_decoded_rows": cold["observation_panel_rows_decoded"],
                 "one_step_decoded_rows": one_step["observation_panel_rows_decoded"],
                 "deep_decoded_rows": deep["observation_panel_rows_decoded"],
+                "deep_noop_decoded_rows": noop_deep["observation_panel_rows_decoded"],
                 "deep_to_one_step_decoded_row_ratio": round(
                     deep["observation_panel_rows_decoded"]
                     / max(one_step["observation_panel_rows_decoded"], 1),
