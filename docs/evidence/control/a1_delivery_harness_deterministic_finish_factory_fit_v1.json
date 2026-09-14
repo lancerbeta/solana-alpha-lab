@@ -4,8 +4,8 @@
   "review_id": "DELIVERY-HARNESS-DETERMINISTIC-FINISH-FACTORY-FIT-001",
   "as_of": "2026-09-14",
   "task_id": "DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
-  "reviewed_bindings_sha256": "",
-  "reviewed_inventory_sha256": "",
+  "reviewed_bindings_sha256": "4fb9fccda3c0844dab7fc8b1b8e6b0029a214cec2a4f42e5eef86a75d6f3a298",
+  "reviewed_inventory_sha256": "42a1cd2284fe3f8bd5cee5f82566df9bfdd9c8dceee712c8c1fada73b4f4fa61",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

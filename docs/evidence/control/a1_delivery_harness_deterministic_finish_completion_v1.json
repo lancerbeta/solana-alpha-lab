@@ -5,9 +5,34 @@
   "as_of": "2026-09-14",
   "task_id": "DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
   "state_change": "DETERMINISTIC_FINISH_CAPABILITY_IMPLEMENTED",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "e850598a3de26de115c1af348e5cb7ee3900ddd0c63bcf8644d9ce5e299c4ec0",
+    ".cursor/commands/delivery-finish.md": "9dad7f29c5b1abf0d7f2d9018a7c3dca649ba46dd170aaed60d53d59dffb5115",
+    ".cursor/rules/10-input-routing.mdc": "04214b04281797ed2b9d5d989b41a2f5d6c181e4d2ee8d72f2dbbdd9085a1163",
+    "AGENTS.md": "7bd6249928edae8787e8dd43a516ef0a604207a241392837fdca935ba4f1a7f7",
+    "catalog/assets/core.yaml": "f7b34c736f1807ac8bca65987ad6aaab6b400356729cdfbf1feb3b145d31c2d3",
+    "delivery-harness/harness.yaml": "a16d2f5a82c6d0b1844430b6d389470a82cd01c7a107d3db68a54769b4f0f885",
+    "delivery-harness/templates/portable-bundle-manifest.json": "a08c0473a4cd0dbfd2c71c80afc80a53165cf7fa7f548c6617c4340dc157b207",
+    "delivery-harness/templates/portable-core/AGENTS.md.tmpl": "496313a7d7efc4ca68ab0199fe0fc39493027d54b2b6aec9aa92f5ce58aa4cad",
+    "delivery-harness/templates/portable-core/delivery-harness/harness.yaml": "1391189a0e94aa087d848e620df9d31ffafa65b2dc1457649d6d6ed1ba805261",
+    "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md": "9803d1c63be1c41b42daad2df0b266cd060e811375deb2875e89a5a4c2641678",
+    "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md": "07bfd251340082dfc5f431ef325a1969bde4509a094e2e107f15aa48e930b00f",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "0efa07ba1ff2619217f22869459c68f859e22352004c5d22b21d63f20dd5ca07",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "bc203896054c1506a36f5531f3cf16d25c529842b79b0c47867523824cf118fd",
+    "docs/tasks/DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1.md": "7b5d9cc5c3f6667ab51e4bafb075b5d8aaddfbef3e6f7480f29397c8dc59e150",
+    "scripts/delivery_harness.py": "6abd951bdea6404c3ada8a0bfdecd3beb36c26db9998db9ec936d995ca8f13b8",
+    "scripts/harness_sync.py": "2a2c8c5fcbb0c9fdfec751b2e99d59ff34465b9f848849887d8ef22047e7bfb1",
+    "scripts/owner_attention_gate.py": "910a7afa07e9e53c0df0841f7c84a7e1cda5f6e971d9c60ca23dad1f0d703ce2",
+    "tests/test_delivery_harness_context.py": "74fe8d5e4631ac0f1158d3b92cbdb3aecdf45d9f29f41876b0bee0c577b1b61b",
+    "tests/test_delivery_harness_deterministic_finish.py": "1d95b119abe82f3185a35cff89137af9751aabafb74c55882fa2a098926c2bd8",
+    "tests/test_delivery_harness_merge_guard.py": "c1f9e2c75b32a968dbe4b26950ac0ac397a49bd03e73b83625917bc02a504f8f",
+    "tests/test_delivery_harness_skill.py": "c0a2feeb6d920b4d81358da692a9dc3e9b8686a0eb6a6b1923c5339e8425abee",
+    "tests/test_harness_sync_bindings.py": "062e17bf7ec8beac4959f2bfb8bc59f366e2999af3eb8b7e997db1edba4ac80f"
+  },
   "base_main": "b652a66af554d96fb4ce3e2de3410c1d04e8bfd1",
-  "active_stop_conditions": ["NO_MERGE_AUTHORITY_STOP_BEFORE_MERGE"],
+  "active_stop_conditions": [
+    "NO_MERGE_AUTHORITY_STOP_BEFORE_MERGE"
+  ],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "external_material_action": false,
@@ -17,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_delivery_harness_deterministic_finish_factory_fit_v1.json",
-    "sha256": "",
+    "sha256": "69a22959915dc44847d64f058d62615c85ebe08a38fa4389c473f4a2cb50d056",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_TARGETED_DELIVERY_HARNESS_SUITES",
     "independent_review": {
       "path": "docs/evidence/control/a1_delivery_harness_deterministic_finish_review_v1.json",
-      "sha256": "",
+      "sha256": "a27ebe156ce52536b00faf65295690da187d98ed9d12affcfd3d5bc2585258ff",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
