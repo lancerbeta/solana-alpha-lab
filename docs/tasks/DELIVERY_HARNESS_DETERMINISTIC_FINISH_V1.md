@@ -1,7 +1,7 @@
 ---
 task_id: DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1
 task_version: '1.0'
-status: IN_PROGRESS
+status: VALIDATED
 as_of: '2026-09-14'
 owner: GOAL_OWNER
 allowed_routes:
