@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "DELIVERY-HARNESS-DETERMINISTIC-FINISH-COMPLETION-001",
+  "as_of": "2026-09-14",
+  "task_id": "DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1",
+  "state_change": "DETERMINISTIC_FINISH_CAPABILITY_IMPLEMENTED",
+  "implementation_bindings": {},
+  "base_main": "",
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_delivery_harness_deterministic_finish_factory_fit_v1.json",
+    "sha256": "",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TARGETED_DELIVERY_HARNESS_SUITES",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_delivery_harness_deterministic_finish_review_v1.json",
+      "sha256": "",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_DELIVERY_HARNESS_SUITES"
+    ]
+  },
+  "non_claims": [
+    "NO_REVIEW_ROUTING_CHANGE",
+    "NO_CI_ARCHITECTURE_CHANGE",
+    "NO_PRODUCT_BEHAVIOR_CHANGE",
+    "NO_RUNTIME_DEPLOYMENT",
+    "NO_EXTERNAL_AUTHORITY",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_REAL_MONEY",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "provider_requests": 0,
+    "credential_reads": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE"
+}
