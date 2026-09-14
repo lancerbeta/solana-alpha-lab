@@ -37019,7 +37019,7 @@ records:
   as_of: '2026-09-14'
   truth_owner: M1_EXECUTION_REALITY_CALIBRATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md', repository_path: docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md}
-  integrity: {kind: sha256, sha256: e2803b4212a911d3663c7b1ba5e302d7d4aa5be7a2ed04b0ef115ee9ed6a536a}
+  integrity: {kind: sha256, sha256: cbaeaf68f4a3585d02ab9285236e051dcb82de09279201e7a753efe44be1db49}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-M1-EXECUTION-REALITY-001}

@@ -1,0 +1,52 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "M1-EXECUTION-REALITY-CALIBRATION-REVIEW-001",
+  "as_of": "2026-09-14",
+  "task_id": "M1_EXECUTION_REALITY_CALIBRATION_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Typed Jupiter quote error classification is exact-match on normalized errorCode sets scoped to /swap/v2/order only; generic 4xx on other endpoints keeps historical NO_ROUTE semantics; HTTP 200 error bodies and 4xx quote bodies both classified without substring heuristics",
+        "USDC $10/$100 atomic amounts correct (10000000/100000000 at 6 decimals); reverse legs contractually bound to same-notional entry bundle outAmount, cross-wire impossible; SOL/lamport primitives byte-identical in semantics",
+        "Denominator invariant verified structurally (population_n = two_way_n + entry_only_n + no_entry_n + unknown_n per notional); UNKNOWN never coerced; friction math correct (1 - reverse_out/entry_notional) kept per-notional",
+        "Safety verified: no taker, no /build, no /execute, no transaction material, retry=false, fallback=false, cash=$0; all tests zero-network with injected fixtures"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Capability expressed through existing ObservationSchedule spine: new registered primitives/bundles + existing rollover lifecycle + existing timer/store/call-ledger/publication/recovery; no second probe/discovery/daemon/database",
+        "All contract DoD bullets pinned by tests/test_m1_execution_reality.py (29 cases) plus regression suites; successor preflight zero-network fail-closed; report rejects moving SQLite; no experiment identity fabrication",
+        "Outcome falsifiable and useful: a later commissioned M1 campaign can answer the owner question through existing surfaces; runtime deliberately not commissioned (STOP BEFORE MERGE)"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Endpoint-scoped typed classification degrades safely: unknown future error codes fall to UNKNOWN_PROVIDER_ERROR, never silently to NO_ROUTE; per-notional dependency contracts prevent cross-wiring at scheduler level",
+        "Research validity preserved: members never dropped (UNKNOWN is a first-class bucket); report sources only immutable RDP lineage with fail-closed rejection of moving SQLite; admission anchored to canonical PIT clock",
+        "Reversibility: ordinary Git revert, zero live-provider consequence; predecessor semantics conserved by successor preflight (only X-point gains M1 bundles)"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_M1_PROVIDER_EVIDENCE_COLLECTED",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_REAL_MONEY"
+  ]
+}

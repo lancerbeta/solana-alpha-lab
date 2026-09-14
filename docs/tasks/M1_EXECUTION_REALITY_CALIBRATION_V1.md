@@ -16,10 +16,14 @@ git_binding:
 objective: "Materialize the minimum reusable M1 capability so the Factory can later measure, through its existing ObservationSchedule collector spine, the Jupiter execution surface (TWO_WAY / ENTRY_ONLY / NO_ENTRY / UNKNOWN) and quote-implied roundtrip friction for canonical fresh EARLY pump.fun candidates at fixed $10 and $100 USDC notionals at decision time. M1 is execution calibration only - not alpha, not LIVE trading."
 managed_write_set:
 - docs/tasks/M1_EXECUTION_REALITY_CALIBRATION_V1.md
+- docs/evidence/control/a1_m1_execution_reality_calibration_completion_v1.json
+- docs/evidence/control/a1_m1_execution_reality_calibration_review_v1.json
+- docs/evidence/control/a1_m1_execution_reality_calibration_factory_fit_v1.json
 - configs/observation_primitive_registry_v1.yaml
 - src/solana_alpha_lab/factory/observation_primitives.py
 - src/solana_alpha_lab/factory/observation_scheduler.py
 - src/solana_alpha_lab/factory/observation_schedule_runtime.py
+- src/solana_alpha_lab/factory/collector_read_model.py
 - src/solana_alpha_lab/factory/m1_execution_reality.py
 - src/solana_alpha_lab/factory/m1_successor_preflight.py
 - src/solana_alpha_lab/factory/m1_calibration_report.py
@@ -55,7 +59,10 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE: []
+    DELIVERY_EVIDENCE:
+    - docs/evidence/control/a1_m1_execution_reality_calibration_completion_v1.json
+    - docs/evidence/control/a1_m1_execution_reality_calibration_review_v1.json
+    - docs/evidence/control/a1_m1_execution_reality_calibration_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
