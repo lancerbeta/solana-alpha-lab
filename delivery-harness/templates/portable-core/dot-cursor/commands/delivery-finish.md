@@ -2,7 +2,10 @@
 
 Bind targeted evidence, run the read-only local
 `scripts/delivery_harness.py preflight-push` and require its PASS before the
-first remote push, run `--merge-readiness`, and stop for exact PR/head
+first remote push (available where the repository carries the full harness
+scripts alongside `harness_sync.py`; a fresh stdlib-only portable install
+skips this step until its bootstrap binds the full toolchain), run
+`--merge-readiness`, and stop for exact PR/head
 approval only after `ready_for_owner_phrase: true`; the readiness response
 exposes `owner_phrase` with the exact copy/paste phrase when ready and `null`
 otherwise. Order:

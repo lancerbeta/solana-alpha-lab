@@ -16308,7 +16308,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: c5273802a3f718c2c896178526eddb63e23e0e10ea6bba92cb2d580b1bb90300}
+  integrity: {kind: sha256, sha256: f5cb77a298f011acbe292ffcf5e8f114b3f2dc8db43350e8c8efa166d646718d}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19802,7 +19802,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://delivery-harness/templates/portable-bundle-manifest.json', repository_path: delivery-harness/templates/portable-bundle-manifest.json}
-  integrity: {kind: sha256, sha256: bbf49eebd34195106034d5d24eb9c78d0de54a3d386713a586460efd61a737d6}
+  integrity: {kind: sha256, sha256: 3076bbb5151eb9040326ebcdb04508bb25f805c312e6331d2bf69e7f2f7a3cbb}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19821,7 +19821,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: 9c47761dcd8b02f51fc8ddfd0834308eb40eca84d6b83f0d93b2e0178d8c39a8}
+  integrity: {kind: sha256, sha256: 063cb3bf98dd9febe0d7a9e74ef5421a79ae40639ca52c103bb7f2850481b03d}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}

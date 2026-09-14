@@ -190,12 +190,14 @@ def preflight_push(
         if lowered in aliases:
             canonical_actor = aliases[lowered]
         else:
-            raise ValueError("ACTOR_INVALID")
+            raise ValueError(
+                "ACTOR_INVALID: expected one of cursor|Cursor|CURSOR|codex|Codex|CODEX"
+            )
 
     identity = git_identity(root)
     checks["worktree_clean"] = identity["dirty"] is False
     if identity["dirty"]:
-        reasons.append("DIRTY_WORKTREE")
+        reasons.append("DIRTY_WORKTREE: commit or restore all changes, then re-run")
 
     harness = check_harness(root)
     checks["harness_check_pass"] = harness["status"] == "PASS"
@@ -254,11 +256,19 @@ def preflight_push(
     drift = drift_checker or _preflight_drift_problems
     drift_reasons = drift(root)
     checks["derived_state_current"] = not drift_reasons
+    if drift_reasons:
+        reasons.append(
+            "REPAIR_HINT: run scripts/harness_sync.py --apply --base-ref <task expected_base>"
+        )
     reasons.extend(drift_reasons)
 
     verify = evidence_verifier or _preflight_evidence_problems
     evidence_reasons = verify(root, task_id=task_id, task_contract=task_contract.replace("\\", "/"))
     checks["delivery_evidence_bound"] = not evidence_reasons
+    if evidence_reasons:
+        reasons.append(
+            "REPAIR_HINT: fill expected DELIVERY_EVIDENCE then scripts/harness_sync.py bind-evidence --task-id <TASK_ID> --apply"
+        )
     reasons.extend(evidence_reasons)
 
     ready = all(checks.values())
@@ -1836,12 +1846,22 @@ def parse_args() -> argparse.Namespace:
     radar.add_argument("--root", type=Path, default=ROOT)
     radar.add_argument("--events", required=True)
     radar.add_argument("--format", choices=("json",), default="json")
-    preflight = sub.add_parser("preflight-push")
+    preflight = sub.add_parser(
+        "preflight-push",
+        help="Read-only local readiness gate: run before the first remote task-branch push",
+    )
     preflight.add_argument("--root", type=Path, default=ROOT)
-    preflight.add_argument("--task-id", required=True)
-    preflight.add_argument("--contract", required=True)
-    preflight.add_argument("--route", required=True)
-    preflight.add_argument("--actor")
+    preflight.add_argument("--task-id", required=True, help="Exact task contract id")
+    preflight.add_argument("--contract", required=True, help="Task contract repository path")
+    preflight.add_argument(
+        "--route",
+        required=True,
+        help="Active route: DIRECT_CODEX_DELIVERY | DIRECT_CURSOR_DELIVERY | DESIGN_ONLY",
+    )
+    preflight.add_argument(
+        "--actor",
+        help="Acting agent: cursor | Cursor | CURSOR | codex | Codex | CODEX",
+    )
     preflight.add_argument("--format", choices=("json",), default="json")
     init = sub.add_parser("init")
     init.add_argument("--target", type=Path, required=True)
@@ -1945,4 +1965,24 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except ValueError as exc:
+        message = str(exc)
+        if not message or not message.split(":", 1)[0].isupper():
+            message = "STABLE_VALIDATION_ERROR"
+        print(
+            json.dumps(
+                {
+                    "schema": "delivery-harness.error",
+                    "status": "DENY",
+                    "reason": message,
+                },
+                indent=2,
+                sort_keys=True,
+                ensure_ascii=False,
+            )
+        )
+        raise SystemExit(2) from None

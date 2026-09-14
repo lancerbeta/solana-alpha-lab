@@ -30,7 +30,10 @@ Task-contract merge may land drifted `CONTROL_RUNTIME_PATHS` listed in that
 task `managed_write_set`; unlisted runtime drift stays `CONTROL_RUNTIME_CHANGED`.
 Last content commit then `bind-evidence` then read-only local
 `scripts/delivery_harness.py preflight-push` PASS before the first remote
-push, then `--merge-readiness` then phrase.
+push (available where the repository carries the full harness scripts
+alongside `harness_sync.py`; a fresh stdlib-only portable install skips
+this step until its bootstrap binds the full toolchain), then
+`--merge-readiness` then phrase.
 After the exact PR/head owner
 phrase, use the repository-owned grounded merge
 entrypoint; never replace its live checks with caller-supplied booleans.

@@ -68,7 +68,9 @@ def normalize_cli_actor(value: str) -> str:
         raise ValueError("ACTOR_INVALID")
     canonical = CLI_ACTOR_ALIASES.get(value)
     if canonical is None:
-        raise ValueError("ACTOR_INVALID")
+        raise ValueError(
+            "ACTOR_INVALID: expected one of cursor|Cursor|CURSOR|codex|Codex|CODEX"
+        )
     return canonical
 
 
@@ -2626,7 +2628,7 @@ def main() -> int:
             context_receipt=receipt,
             submission_receipt=submission,
         )
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
         return 0
     if args.merge_readiness:
         if args.approval_phrase is not None:
@@ -2652,7 +2654,7 @@ def main() -> int:
             actor=actor,
             context_receipt=receipt,
         )
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
         return 0 if result.get("ready_for_owner_phrase") is True else 2
     if args.guarded_merge:
         required = (
@@ -2678,7 +2680,7 @@ def main() -> int:
             approval_phrase=args.approval_phrase,
             context_receipt=receipt,
         )
-        print(json.dumps(result, indent=2, sort_keys=True))
+        print(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
         return 0 if result.get("merge_submitted") is True else 2
     if args.request is None:
         raise ValueError("REQUEST_REQUIRED")
@@ -2686,9 +2688,29 @@ def main() -> int:
     if not isinstance(request, dict):
         raise ValueError("request must be a JSON object")
     result = evaluate(request, load_mapping(args.policy))
-    print(json.dumps(result, indent=2, sort_keys=True))
+    print(json.dumps(result, indent=2, sort_keys=True, ensure_ascii=False))
     return 0 if result["decision"] != "DENY" else 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except SystemExit:
+        raise
+    except ValueError as exc:
+        message = str(exc)
+        if not message or not message.split(":", 1)[0].isupper():
+            message = "STABLE_VALIDATION_ERROR"
+        print(
+            json.dumps(
+                {
+                    "schema": "owner-attention-gate.error",
+                    "status": "DENY",
+                    "reason": message,
+                },
+                indent=2,
+                sort_keys=True,
+                ensure_ascii=False,
+            )
+        )
+        raise SystemExit(2) from None
