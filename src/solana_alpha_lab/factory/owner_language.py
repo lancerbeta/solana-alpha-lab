@@ -161,6 +161,7 @@ OBLIGATION_LABELS = {
     "ENTRY_EXECUTABILITY": "Исполняемость входа",
     "EXIT_EXECUTABILITY": "Исполняемость выхода",
     "COST_EVIDENCE": "Доказательства издержек",
+    "EXECUTION_REGIME_BINDING": "Привязка режима исполнения",
     "RESULT": "Результат",
     "UNCERTAINTY": "Неопределённость",
     "ROBUSTNESS": "Устойчивость",
@@ -189,6 +190,11 @@ BLOCKER_LABELS = {
     "EVIDENCE_RELATION_GAP": "Нет явной связи с доказательствами",
     "EVIDENCE_HASH_CONFLICT": "Хеш доказательств не совпадает с решением",
     "EXECUTION_INPUT_GAP": "Нет явных параметров исполнения/риска",
+    "EXECUTION_EVIDENCE_BINDING_GAP": "Нет замороженной привязки режима исполнения",
+    "EXECUTION_REGIME_MISMATCH": "Привязка режима исполнения расходится с экспериментом",
+    "NOTIONAL_EVIDENCE_MISMATCH": "Запрошенный размер не подтверждён доказательствами",
+    "COST_ASSUMPTION_BINDING_GAP": "В доказательствах нет явной fee-гипотезы для этого режима",
+    "COST_EVIDENCE_MISMATCH": "Fee-гипотеза стратегии расходится с научной",
     "STRATEGY_IDENTITY_CONFLICT": "Конфликт идентификатора стратегии",
     "STRATEGY_CONTENT_CONFLICT": "Конфликт содержимого StrategyVersion",
     "SOURCE_UNAVAILABLE": "Исходный ResearchStore сейчас недоступен",
@@ -240,6 +246,21 @@ NEXT_ACTION_GLOSS = {
     ),
     "FAIL_CLOSED_INVALID_MANIFEST": "Handoff-манифест недействителен — не материализовать",
     "FAIL_CLOSED_EVIDENCE_HASH_CONFLICT": "Конфликт хеша доказательств — не материализовать",
+    "FREEZE_EXECUTION_EVIDENCE_BINDING_BEFORE_PROMOTE": (
+        "Сначала заморозить привязку режима исполнения, затем PROMOTE"
+    ),
+    "REBIND_EXECUTION_EVIDENCE_TO_EXPERIMENT_IDENTITY": (
+        "Привязка режима должна совпадать с экспериментом и популяцией"
+    ),
+    "BIND_EXPLICIT_FEE_ASSUMPTION_INTO_EXECUTION_EVIDENCE": (
+        "В привязку режима нужно явно включить fee-гипотезу науки"
+    ),
+    "ALIGN_STRATEGY_FEE_ASSUMPTION_WITH_SCIENCE": (
+        "Fee-гипотеза стратегии должна совпадать с научной для этого режима"
+    ),
+    "BIND_EXECUTION_EVIDENCE_TO_REQUESTED_NOTIONAL": (
+        "Размер стратегии должен быть среди проверенных научных размеров"
+    ),
     "RESOLVE_RESEARCH_STORE": "Восстановить доступ к ResearchStore",
     "INSPECT_HANDOFF_BLOCKER": "Разобрать указанный blocker перехода",
     "BOUNDED_GIT_MATERIALIZATION_STEP": (

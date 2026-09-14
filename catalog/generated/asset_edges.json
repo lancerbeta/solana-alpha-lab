@@ -13578,6 +13578,11 @@
       "target_asset_id": "TEST-DELIVERY-HARNESS-001"
     },
     {
+      "source_asset_id": "SCHEMA-EXECUTION-EVIDENCE-BINDING-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
       "source_asset_id": "SCHEMA-EXIT-DECISION-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-STRATEGY-EXECUTION-BOUNDARY-001"
@@ -13764,6 +13769,21 @@
     },
     {
       "source_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-1-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXECUTION-EVIDENCE-BINDING-V1-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-1-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
     },
@@ -15651,6 +15671,21 @@
       "source_asset_id": "TEST-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-EARLY-VALUATION-LIQUIDITY-DIVERGENCE-CONFIRMATION-001"
+    },
+    {
+      "source_asset_id": "TEST-EXECUTION-EVIDENCE-SEAM-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXECUTION-EVIDENCE-BINDING-V1-001"
+    },
+    {
+      "source_asset_id": "TEST-EXECUTION-EVIDENCE-SEAM-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-PROMOTION-HANDOFF-MANIFEST-V1-1-001"
+    },
+    {
+      "source_asset_id": "TEST-EXECUTION-EVIDENCE-SEAM-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-SCIENCE-TO-STRATEGY-HANDOFF-001"
     },
     {
       "source_asset_id": "TEST-EXPERIMENT-EVIDENCE-DECISION-001",

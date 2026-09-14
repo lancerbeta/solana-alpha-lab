@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-09-13",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "EXECUTION_COST_EVIDENCE_DERIVATION_FROM_RAW_QUOTES"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS",
+    "context_efficiency": "PASS",
+    "execution_to_cashflow": "PASS",
+    "flexibility_and_history": "PASS",
+    "mission": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "owner_operability": "PASS",
+    "red_team": "PASS",
+    "research_truth": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA_CLAIM"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "REVERT",
+  "review_id": "EXECUTION-EVIDENCE-SEAM-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "79f5a39b69cb1c5a803dfb3e1c88c34356d95f0f01a46035ec1f5f95fb4f6df3",
+  "reviewed_inventory_sha256": "9d2a8ddc9fb1360ef81a411c97b654f31bb62159ff585907c06dc3cca017de4e",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "EXECUTION_EVIDENCE_SEAM_V1",
+  "verdict": "PASS"
+}

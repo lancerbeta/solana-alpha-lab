@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from solana_alpha_lab.factory.experiment_spec import load_experiment_spec, spec_sha256
@@ -24,6 +25,7 @@ OBLIGATIONS = (
     "ENTRY_EXECUTABILITY",
     "EXIT_EXECUTABILITY",
     "COST_EVIDENCE",
+    "EXECUTION_REGIME_BINDING",
     "RESULT",
     "UNCERTAINTY",
     "ROBUSTNESS",
@@ -193,6 +195,7 @@ def _record_card(record: Any, relation: str) -> dict[str, Any]:
                 "observed_n",
                 "packet_sha256",
                 "evidence_class",
+                "execution_evidence_binding",
             )
             if payload.get(key) not in (None, "")
         },
@@ -329,6 +332,48 @@ def _holdout_status(
     return _obligation("HOLDOUT", "MISSING", source="ResearchStore")
 
 
+def _execution_regime_binding_status(
+    spec: Mapping[str, Any],
+    *,
+    entity: Mapping[str, Any],
+    scientific: Sequence[Mapping[str, Any]],
+    store_records: Sequence[Any],
+    root: Path | None,
+) -> tuple[str, str | None, Any]:
+    """Typed presence check for a frozen ExecutionEvidenceBindingV1 in DIRECT science records."""
+    raw_values = _collect_payload_values(scientific, store_records, "execution_evidence_binding")
+    if not raw_values:
+        return "MISSING", None, None
+    valid = None
+    for candidate in raw_values:
+        if not isinstance(candidate, Mapping):
+            continue
+        if root is None:
+            return "UNKNOWN", "схема binding недоступна без корня репозитория", None
+        from solana_alpha_lab.factory.promotion_handoff import (
+            PromotionHandoffError,
+            validate_execution_evidence_binding,
+        )
+
+        try:
+            checked = validate_execution_evidence_binding(candidate, root=root)
+        except PromotionHandoffError as exc:
+            if str(exc) == "EXECUTION_REGIME_MISMATCH":
+                return "CONFLICT", "замыкание знаменателя режима не сходится", None
+            return "UNKNOWN", "binding не проходит машинную валидацию", None
+        if (
+            str(checked.get("experiment_id") or "") != str(entity.get("entity_id") or "")
+            or str(checked.get("population_ref") or "") != str(spec.get("population") or "")
+        ):
+            return "CONFLICT", "binding идентичность расходится с экспериментом", None
+        if valid is not None and canonical_dumps(valid) != canonical_dumps(checked):
+            return "CONFLICT", "несколько bindings не совпадают", None
+        valid = checked
+    if valid is None:
+        return "UNKNOWN", "binding отсутствует среди научных записей", None
+    return "PRESENT", None, valid.get("binding_id")
+
+
 def _build_obligations(
     spec: Mapping[str, Any],
     *,
@@ -336,6 +381,7 @@ def _build_obligations(
     direct: Sequence[Mapping[str, Any]],
     records: Sequence[Any] | None,
     records_status: str,
+    root: Path | None = None,
 ) -> list[dict[str, Any]]:
     if records_status == "UNAVAILABLE":
         return [
@@ -384,6 +430,13 @@ def _build_obligations(
         scientific, store_records, "uncertainty", "limitation_codes"
     )
     robustness_values = _collect_payload_values(scientific, store_records, "robustness")
+    regime_status, regime_note, regime_binding_id = _execution_regime_binding_status(
+        spec,
+        entity=entity,
+        scientific=scientific,
+        store_records=store_records,
+        root=root,
+    )
     class_values = _collect_payload_values(scientific, store_records, "evidence_class")
     pit_cutoff = pit_cutoffs[0] if pit_cutoffs else None
     pit_available = pit_available_values[0] if pit_available_values else None
@@ -499,6 +552,19 @@ def _build_obligations(
             source="ResearchStore",
             note=cost_note or "нарратив про fees не заменяет машинное доказательство",
             values={"cost": cost},
+        ),
+        *(
+            ()
+            if records_status == "UNAVAILABLE"
+            else (
+                _obligation(
+                    "EXECUTION_REGIME_BINDING",
+                    regime_status,
+                    source="ResearchStore",
+                    note=regime_note,
+                    values={"binding_id": regime_binding_id},
+                ),
+            )
         ),
         _obligation(
             "RESULT",
@@ -702,6 +768,7 @@ def compose_experiment_dossier(
         direct=direct,
         records=store_records,
         records_status=records_status,
+        root=root,
     )
     guard = science_guard(obligations)
     packet = _first_payload_value(_scientific_cards(direct), store_records, "packet_sha256")
@@ -780,6 +847,7 @@ def decision_payload(
     decision_event_id: str,
     next_condition: str | None = None,
     promotion_handoff_manifest: Mapping[str, Any] | None = None,
+    execution_evidence_binding: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     kind = str(decision_kind or "")
     if kind not in OWNER_DECISION_KINDS:
@@ -803,4 +871,8 @@ def decision_payload(
         if not isinstance(promotion_handoff_manifest, Mapping):
             raise ResearchWorkbenchError("EXPERIMENT_SPEC_BINDING_GAP")
         payload["promotion_handoff_manifest"] = dict(promotion_handoff_manifest)
+        if str(promotion_handoff_manifest.get("schema_version") or "") == "1.1":
+            if not isinstance(execution_evidence_binding, Mapping):
+                raise ResearchWorkbenchError("EXECUTION_EVIDENCE_BINDING_GAP")
+            payload["execution_evidence_binding"] = dict(execution_evidence_binding)
     return payload

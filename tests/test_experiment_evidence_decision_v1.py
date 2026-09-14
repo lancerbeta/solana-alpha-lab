@@ -122,9 +122,25 @@ def _scientific_payload(**overrides: object) -> dict[str, object]:
         "uncertainty": ["SMALL_SAMPLE"],
         "robustness": "HOLD_SPLIT",
         "evidence_class": "DIAGNOSTIC",
+        "execution_evidence_binding": _execution_binding(),
     }
     payload.update(overrides)
     return payload
+
+
+def _run_payload_digest() -> str:
+    run_payload = {
+        "experiment_id": EXPERIMENT_ID,
+        "run_id": "RUN-ELIGIBLE-001",
+        "availability_cutoff": "2026-09-01T00:00:00Z",
+        "first_reliable_available_at": "2026-09-01T00:00:00Z",
+        "observed_n": 24,
+        "robustness": "HOLD_SPLIT",
+        "outcome": "INCONCLUSIVE",
+    }
+    return hashlib.sha256(
+        json.dumps(run_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
 
 
 def _eligible_run() -> ResearchEvent:
@@ -145,6 +161,51 @@ def _eligible_run() -> ResearchEvent:
         },
         transaction_id="RESEARCH-TXN-ELIGIBLE-001",
     )
+
+
+POPULATION_REF = "A24_LIMITED_DIAGNOSTIC_POOL_DAY_RETROSPECTIVE"
+_SPEC_RELATIVE = "configs/experiment_specs/ordinary_price_path_buy_pressure_v1.yaml"
+
+
+def _spec_digest() -> str:
+    from solana_alpha_lab.factory.experiment_spec import spec_sha256
+
+    return spec_sha256(ROOT, _SPEC_RELATIVE)
+
+
+def _execution_binding(**regime_overrides: object) -> dict[str, object]:
+    regime: dict[str, object] = {
+        "tested_notional_usd": 25.0,
+        "evidence_class": "DECISION_TIME_QUOTE_PAIR_V1",
+        "population_n": 24,
+        "two_way_n": 18,
+        "entry_only_n": 4,
+        "no_entry_n": 1,
+        "unknown_n": 1,
+        "strategy_fee_bps_assumption": 100,
+        "cost_evidence_refs": [
+            {"record_id": "RUN-ELIGIBLE-001", "payload_sha256": _run_payload_digest()}
+        ],
+    }
+    regime.update(regime_overrides)
+    unsigned = {
+        "schema": "smial.execution-evidence-binding",
+        "schema_version": "1.0",
+        "binding_id": "EEB-" + "T0" * 11 + "XX",
+        "experiment_id": EXPERIMENT_ID,
+        "experiment_spec_sha256": _spec_digest(),
+        "population_ref": POPULATION_REF,
+        "regimes": [regime],
+        "direct_evidence_refs": [
+            {"record_id": "RUN-ELIGIBLE-001", "payload_sha256": _run_payload_digest()}
+        ],
+    }
+    digest = hashlib.sha256(
+        json.dumps(unsigned, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+            "utf-8"
+        )
+    ).hexdigest()
+    return {**unsigned, "binding_sha256": digest}
 
 
 def _eligible_binding(**overrides: object) -> ResearchEvent:
