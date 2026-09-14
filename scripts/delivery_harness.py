@@ -134,6 +134,190 @@ L2_L3_ROLE_ORDER = (
 RESOLUTION_EXACT_PATH = "EXACT_PATH"
 RESOLUTION_CATALOG_ASSET_ID = "CATALOG_ASSET_ID"
 PORTABLE_MANIFEST_PATH = "delivery-harness/templates/portable-bundle-manifest.json"
+PREFLIGHT_PUSH_NON_CLAIMS = (
+    "NO_CI_CLAIM",
+    "NO_MERGE_AUTHORITY",
+    "NO_PRODUCT_ACCEPTANCE",
+)
+
+
+def path_in_managed_write_set(path: str, managed: list[str]) -> bool:
+    """Exact task write-set membership with the gate's prefix semantics."""
+
+    normalized = path.replace("\\", "/")
+    for entry in managed:
+        if entry.endswith("/**"):
+            prefix = entry[:-3]
+            if normalized.startswith(prefix + "/"):
+                return True
+        elif normalized == entry:
+            return True
+    return False
+
+
+def preflight_push(
+    root: Path,
+    *,
+    task_id: str,
+    task_contract: str,
+    route: str,
+    actor: str | None = None,
+    profile_path: str = PROFILE_PATH,
+    drift_checker=None,
+    evidence_verifier=None,
+    git_reader=None,
+) -> dict[str, Any]:
+    """Read-only local readiness gate before the first remote task-branch push.
+
+    Thin orchestration over existing deterministic helpers: the harness
+    check, exact task-contract validation, scoped derived-state drift,
+    committed-blob evidence binding verification, deterministic context
+    rebuild and write-set/branch/identity assertions. Zero GitHub/network
+    calls, zero writes, zero mutations; it launches no critics, runs no CI,
+    and does not replace merge-readiness.
+    """
+
+    root = root.resolve()
+    git_read = git_reader or git_text
+    checks: dict[str, bool] = {}
+    reasons: list[str] = []
+
+    # Actor casing is normalized at the human CLI boundary only when supplied.
+    canonical_actor: str | None = None
+    if actor is not None:
+        aliases = {"cursor": "CURSOR", "codex": "CODEX"}
+        lowered = actor.lower() if isinstance(actor, str) else None
+        if lowered in aliases:
+            canonical_actor = aliases[lowered]
+        else:
+            raise ValueError("ACTOR_INVALID")
+
+    identity = git_identity(root)
+    checks["worktree_clean"] = identity["dirty"] is False
+    if identity["dirty"]:
+        reasons.append("DIRTY_WORKTREE")
+
+    harness = check_harness(root)
+    checks["harness_check_pass"] = harness["status"] == "PASS"
+    if harness["status"] != "PASS":
+        reasons.extend(harness.get("errors") or [])
+
+    try:
+        receipt = build_context_receipt(
+            root,
+            task_id=task_id,
+            task_contract=task_contract,
+            route=route,
+            profile_path=profile_path,
+        )
+        checks["context_rebuild_deterministic"] = True
+    except ValueError as exc:
+        checks["context_rebuild_deterministic"] = False
+        receipt = None
+        reasons.append(f"CONTEXT_REBUILD_FAILED:{exc}")
+    if receipt is not None:
+        if receipt["repository"]["head"] != identity["head"]:
+            checks["context_rebuild_deterministic"] = False
+            reasons.append("CONTEXT_HEAD_MISMATCH")
+        if receipt["task"]["path"] != task_contract.replace("\\", "/"):
+            checks["context_rebuild_deterministic"] = False
+            reasons.append("CONTEXT_CONTRACT_MISMATCH")
+
+    if receipt is not None:
+        metadata = parse_task_contract(root, task_contract.replace("\\", "/"), task_id)
+        binding = metadata["git_binding"]
+        expected_base = binding["expected_base"]
+        merge_base = git_read(root, "merge-base", "HEAD", binding["expected_upstream"])
+        checks["task_base_frozen"] = merge_base == expected_base
+        if merge_base != expected_base:
+            reasons.append("TASK_EXPECTED_BASE_MISMATCH")
+        changed = [
+            path.replace("\\", "/")
+            for path in git_read(
+                root,
+                "diff",
+                "--name-only",
+                "--no-renames",
+                f"{expected_base}...HEAD",
+            ).splitlines()
+            if path
+        ]
+        checks["candidate_non_empty"] = bool(changed)
+        if not changed:
+            reasons.append("CANDIDATE_EMPTY_DIFF")
+        managed = metadata["managed_write_set"]
+        outside = [path for path in changed if not path_in_managed_write_set(path, managed)]
+        checks["write_set_pass"] = not outside
+        if outside:
+            reasons.append("WRITE_SET_VIOLATION:" + ",".join(sorted(outside)))
+
+    drift = drift_checker or _preflight_drift_problems
+    drift_reasons = drift(root)
+    checks["derived_state_current"] = not drift_reasons
+    reasons.extend(drift_reasons)
+
+    verify = evidence_verifier or _preflight_evidence_problems
+    evidence_reasons = verify(root, task_id=task_id, task_contract=task_contract.replace("\\", "/"))
+    checks["delivery_evidence_bound"] = not evidence_reasons
+    reasons.extend(evidence_reasons)
+
+    ready = all(checks.values())
+    return {
+        "schema": "smial.delivery-preflight-push",
+        "schema_version": "1.0",
+        "ready_for_first_push": ready,
+        "task_id": task_id,
+        "head": identity["head"],
+        "tree": identity["tree"],
+        "branch": identity["branch"],
+        "route": route,
+        "actor": canonical_actor,
+        "checks": checks,
+        "reasons": reasons,
+        "non_claims": list(PREFLIGHT_PUSH_NON_CLAIMS),
+    }
+
+
+def _preflight_drift_problems(root: Path) -> list[str]:
+    """Scoped derived-state drift for the whole candidate diff."""
+
+    import harness_sync
+
+    expected_base = git_text(root, "merge-base", "HEAD", "origin/main")
+    changed = {
+        path.replace("\\", "/")
+        for path in git_text(
+            root, "diff", "--name-only", "--no-renames", f"{expected_base}...HEAD"
+        ).splitlines()
+        if path
+    }
+    original_root = harness_sync.ROOT
+    harness_sync.ROOT = root.resolve()
+    try:
+        problems = harness_sync.check_drift(scoped_paths=changed)
+    finally:
+        harness_sync.ROOT = original_root
+    return [f"DERIVED_STATE_DRIFT:{problem}" for problem in problems]
+
+
+def _preflight_evidence_problems(root: Path, *, task_id: str, task_contract: str) -> list[str]:
+    """Committed-blob evidence chain verification without any write."""
+
+    import harness_sync
+
+    original_root = harness_sync.ROOT
+    harness_sync.ROOT = root.resolve()
+    try:
+        problems = harness_sync.verify_evidence_chain(
+            task_id=task_id, contract=task_contract
+        )
+    except harness_sync.HarnessSyncError as exc:
+        return [f"DELIVERY_EVIDENCE_INVALID:{exc}"]
+    finally:
+        harness_sync.ROOT = original_root
+    return [f"DELIVERY_EVIDENCE_DRIFT:{problem}" for problem in problems]
+
+
 def canonical_json_bytes(value: Any) -> bytes:
     return (
         json.dumps(
@@ -1652,6 +1836,13 @@ def parse_args() -> argparse.Namespace:
     radar.add_argument("--root", type=Path, default=ROOT)
     radar.add_argument("--events", required=True)
     radar.add_argument("--format", choices=("json",), default="json")
+    preflight = sub.add_parser("preflight-push")
+    preflight.add_argument("--root", type=Path, default=ROOT)
+    preflight.add_argument("--task-id", required=True)
+    preflight.add_argument("--contract", required=True)
+    preflight.add_argument("--route", required=True)
+    preflight.add_argument("--actor")
+    preflight.add_argument("--format", choices=("json",), default="json")
     init = sub.add_parser("init")
     init.add_argument("--target", type=Path, required=True)
     init.add_argument("--repository")
@@ -1701,6 +1892,18 @@ def main() -> int:
         )
         print(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True))
         return 0 if result["decision"] != "RADAR_REPLAN_REQUIRED" else 2
+    if args.command == "preflight-push":
+        if not args.task_id or not args.contract or not args.route:
+            raise ValueError("PREFLIGHT_PUSH_ARGUMENTS_REQUIRED")
+        result = preflight_push(
+            args.root.resolve(),
+            task_id=args.task_id,
+            task_contract=args.contract,
+            route=args.route,
+            actor=args.actor,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True))
+        return 0 if result["ready_for_first_push"] is True else 2
     if args.command == "init":
         plan = plan_initialization(
             args.target,
@@ -1717,26 +1920,28 @@ def main() -> int:
             result = apply_initialization(args.target, plan)
         print(json.dumps(result, indent=2, ensure_ascii=False, sort_keys=True))
         return 0 if result.get("decision") not in {"CONFLICT_REFUSAL"} else 2
-    if args.pr is not None:
-        if args.task_id is not None or args.contract is not None:
-            raise ValueError("CONTEXT_IDENTITY_MODE_CONFLICT")
-        receipt = build_live_pr_head_receipt(
-            args.root, pr_number=args.pr, route=args.route
-        )
-    else:
-        if not args.task_id or not args.contract:
-            raise ValueError("TASK_CONTRACT_EXACT_PATH_REQUIRED")
-        receipt = build_context_receipt(
-            args.root,
-            task_id=args.task_id,
-            task_contract=args.contract,
-            route=args.route,
-        )
-    if args.write_receipt:
-        path = write_context_receipt(args.root, receipt)
-        receipt = {**receipt, "local_receipt": path.relative_to(args.root.resolve()).as_posix()}
-    print(json.dumps(receipt, indent=2, ensure_ascii=False, sort_keys=True))
-    return 0
+    if args.command == "context":
+        if args.pr is not None:
+            if args.task_id is not None or args.contract is not None:
+                raise ValueError("CONTEXT_IDENTITY_MODE_CONFLICT")
+            receipt = build_live_pr_head_receipt(
+                args.root, pr_number=args.pr, route=args.route
+            )
+        else:
+            if not args.task_id or not args.contract:
+                raise ValueError("TASK_CONTRACT_EXACT_PATH_REQUIRED")
+            receipt = build_context_receipt(
+                args.root,
+                task_id=args.task_id,
+                task_contract=args.contract,
+                route=args.route,
+            )
+        if args.write_receipt:
+            path = write_context_receipt(args.root, receipt)
+            receipt = {**receipt, "local_receipt": path.relative_to(args.root.resolve()).as_posix()}
+        print(json.dumps(receipt, indent=2, ensure_ascii=False, sort_keys=True))
+        return 0
+    raise ValueError("COMMAND_UNKNOWN")
 
 
 if __name__ == "__main__":

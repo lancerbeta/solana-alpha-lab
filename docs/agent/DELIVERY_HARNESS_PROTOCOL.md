@@ -9,10 +9,12 @@ harness_id: DELIVERY_HARNESS_V1
 
 ## Exact workflow
 
-`CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH -> EXACT MERGE GATE -> READ-BACK`
+`CHECK -> CONTEXT -> ENTRY/OUTCOME -> EXECUTE -> RISK-ROUTED REVIEW -> FINISH CONTENT -> BIND EVIDENCE -> PREFLIGHT-PUSH -> PUSH/PR -> EXACT-HEAD CI -> MERGE-READINESS -> OWNER PHRASE -> GUARDED MERGE -> POST-MERGE READBACK`
 
 Owner navigation phrases inspect Git truth without a new contract and must not
-mutate. Discriminate `ORIENTATION` versus `EXECUTE` with
+mutate. `ORIENTATION` may return `CONTINUE` plus the exact recommended task but
+never enters `EXECUTE` in the same turn; a subsequent explicit execution/resume
+command is required. Discriminate `ORIENTATION` versus `EXECUTE` with
 `.cursor/rules/10-input-routing.mdc`. The workflow below starts only on
 `EXECUTE`.
 
@@ -82,7 +84,26 @@ uv run --locked --managed-python python -B scripts/harness_sync.py bind-evidence
 `bind-evidence --verify` checks the active branch chain against the task
 contract scope. `bind-evidence --verify-all-delivered` is a read-only audit of
 historical completion chains. Sync updates only binding fields the guard reads;
-verdicts, findings and non-claims remain agent-owned.
+verdicts, findings and non-claims remain agent-owned. `--apply` operates
+against the committed HEAD and requires a clean worktree; implementation
+bindings hash committed Git blob bytes (`git show <head>:<path>`), so
+worktree/CRLF representation can never alter a binding.
+
+### Preflight-push
+
+After the evidence commit and before the first remote push of the task branch,
+run the read-only local preflight:
+
+```text
+uv run --locked --managed-python python -B scripts/delivery_harness.py preflight-push --task-id <TASK_ID> --contract docs/tasks/<TASK_ID>.md --route <ROUTE> --actor <ACTOR>
+```
+
+It orchestrates existing validators (identity, contract shape, write set,
+derived drift, evidence chain, deterministic context rebuild) with zero
+GitHub/network calls and zero mutations. Exit 0 and
+`ready_for_first_push: true` are required before any normal remote task-branch
+push; it claims no CI, no merge authority and no product acceptance, and does
+not replace merge-readiness.
 
 ### CI fail-closed presentation
 
@@ -150,7 +171,9 @@ Run Factory Fit, Product Horizon and capability radar. Record exact inventory,
 head/tree, tests, limitations, non-claims and rollback. Capability candidates
 grant no installation/credential/network/spend authority. Require exact-head CI, then
 `scripts/owner_attention_gate.py --merge-readiness` with `ready_for_owner_phrase: true`,
-and only then the exact owner PR/head phrase. The owner never
+and only then the exact owner PR/head phrase; the readiness response exposes
+`owner_phrase` with the exact copy/paste phrase when ready, `null` otherwise.
+The owner never
 clicks GitHub Merge. Re-read machine state, evaluate v2, merge once only on
 `AUTONOMOUS`, then verify the base-bound profile default branch and its
 post-merge CI. Order:

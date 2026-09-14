@@ -373,32 +373,45 @@ class DeliveryHarnessContextTests(unittest.TestCase):
             path.unlink(missing_ok=True)
 
     def test_live_pr_head_receipt_refuses_product_diff(self) -> None:
-        merge_base = "c" * 40
-        values = {
-            ("rev-parse", "HEAD"): "a" * 40,
-            ("rev-parse", "HEAD^{tree}"): "b" * 40,
-            ("branch", "--show-current"): "product-branch",
-            ("status", "--porcelain=v1"): "",
-            ("remote", "get-url", "origin"): "git@github.com:lancerbeta/solana-alpha-lab.git",
-            ("merge-base", "HEAD", "origin/main"): merge_base,
-            (
-                "diff",
-                "--name-only",
-                "--no-renames",
-                f"{merge_base}...HEAD",
-            ): "src/solana_alpha_lab/factory/research_store.py",
-        }
+        # Acceptance matrix 9/10: product Factory modules, product Forge
+        # scripts, product-shaped commands, ordinary product task contracts
+        # and catalog assets are IDENTITY_MODE_MISMATCH under the narrowed
+        # harness_control_write_prefixes.
+        product_paths = (
+            "src/solana_alpha_lab/factory/observation_scheduler.py",
+            "scripts/hypothesis_forge.py",
+            ".cursor/commands/hypothesis-forge.md",
+            "docs/tasks/SOME_PRODUCT_TASK_V1.md",
+            "catalog/assets/lifecycle.yaml",
+        )
+        for product_path in product_paths:
+            with self.subTest(path=product_path):
+                merge_base = "c" * 40
+                values = {
+                    ("rev-parse", "HEAD"): "a" * 40,
+                    ("rev-parse", "HEAD^{tree}"): "b" * 40,
+                    ("branch", "--show-current"): "product-branch",
+                    ("status", "--porcelain=v1"): "",
+                    ("remote", "get-url", "origin"): "git@github.com:lancerbeta/solana-alpha-lab.git",
+                    ("merge-base", "HEAD", "origin/main"): merge_base,
+                    (
+                        "diff",
+                        "--name-only",
+                        "--no-renames",
+                        f"{merge_base}...HEAD",
+                    ): product_path,
+                }
 
-        def respond(_root: Path, *args: str) -> str:
-            if args not in values:
-                raise AssertionError(f"unexpected git fixture call: {args!r}")
-            return values[args]
+                def respond(_root: Path, *args: str, _v=values) -> str:
+                    if args not in _v:
+                        raise AssertionError(f"unexpected git fixture call: {args!r}")
+                    return _v[args]
 
-        with mock.patch.object(self.module, "git_text", side_effect=respond):
-            with self.assertRaisesRegex(ValueError, "IDENTITY_MODE_MISMATCH"):
-                self.module.build_live_pr_head_receipt(
-                    ROOT, pr_number=222, route="DIRECT_CURSOR_DELIVERY"
-                )
+                with mock.patch.object(self.module, "git_text", side_effect=respond):
+                    with self.assertRaisesRegex(ValueError, "IDENTITY_MODE_MISMATCH"):
+                        self.module.build_live_pr_head_receipt(
+                            ROOT, pr_number=222, route="DIRECT_CURSOR_DELIVERY"
+                        )
 
     def test_staged_task_contract_schema_rejects_implementation_unverified(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

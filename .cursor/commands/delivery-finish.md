@@ -12,7 +12,9 @@ Product work uses `--contract`. `context --pr` is `LIVE_PR_HEAD` only inside
 `harness_control_write_prefixes`; a product path is `IDENTITY_MODE_MISMATCH`.
 Do not widen those prefixes. Control work with a task contract still uses
 `--contract`. Last content commit then `bind-evidence --apply` then
-`--merge-readiness` then phrase.
+`preflight-push` PASS then first push/PR then
+`--merge-readiness` then phrase; the readiness response exposes `owner_phrase`
+with the exact copy/paste phrase when ready and `null` otherwise.
 Only then let the guarded merge execute the elected
 project-bound gate once via
 `scripts/owner_attention_gate.py --guarded-merge`.

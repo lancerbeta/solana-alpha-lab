@@ -5,7 +5,7 @@ description: Use for bounded Git-native repository delivery from exact task cont
 
 # Delivery Harness
 
-Run `CHECK -> CONTEXT -> EXECUTE -> REVIEW -> FINISH -> MERGE GATE -> READ-BACK`.
+Run `CHECK -> CONTEXT -> EXECUTE -> REVIEW -> FINISH CONTENT -> BIND EVIDENCE -> PREFLIGHT-PUSH -> PUSH/PR -> EXACT-HEAD CI -> MERGE-READINESS -> OWNER PHRASE -> GUARDED MERGE -> POST-MERGE READBACK`.
 Require one exact task contract and explicit missingness. Keep routine work
 autonomous; stop only for material authority or the exact PR/head merge gate.
 Use targeted checks during work. After bootstrap, guarded merge is the sole
@@ -18,7 +18,8 @@ project-owned commands and the live workflow/job identity first.
 Order: `CI -> merge-readiness PASS -> owner phrase -> guarded-merge -> post-merge-readback`.
 Stop for the exact PR/head phrase only after
 `scripts/owner_attention_gate.py --merge-readiness` reports
-`ready_for_owner_phrase`. Product work uses `--contract`; `context --pr`
+`ready_for_owner_phrase`; the response exposes `owner_phrase` with the exact
+copy/paste phrase when ready and `null` otherwise. Product work uses `--contract`; `context --pr`
 (`LIVE_PR_HEAD`) is refused with `IDENTITY_MODE_MISMATCH` when any changed path
 is outside `harness_control_write_prefixes`. Do not widen those prefixes.
 Control-shaped work with a task contract still uses `--contract`.
@@ -27,7 +28,9 @@ After cataloged script changes, repair derived hashes incrementally before commi
 Bare `--apply` is recovery/full oracle only.
 Task-contract merge may land drifted `CONTROL_RUNTIME_PATHS` listed in that
 task `managed_write_set`; unlisted runtime drift stays `CONTROL_RUNTIME_CHANGED`.
-Last content commit then `bind-evidence` then `--merge-readiness` then phrase.
+Last content commit then `bind-evidence` then read-only local
+`scripts/delivery_harness.py preflight-push` PASS before the first remote
+push, then `--merge-readiness` then phrase.
 After the exact PR/head owner
 phrase, use the repository-owned grounded merge
 entrypoint; never replace its live checks with caller-supplied booleans.

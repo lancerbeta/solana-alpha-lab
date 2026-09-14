@@ -1384,6 +1384,45 @@ def _delivery_inventory_sha256(
     )
 
 
+def committed_blob_bytes(head: str, path: str) -> bytes:
+    """Exact committed Git object bytes for a path at ``head``.
+
+    Git blob bytes are canonical; no CRLF/worktree normalization happens
+    here. Staged or unstaged bytes can never enter exact-head bindings.
+    """
+
+    payload = _run_git(["git", "show", f"{head}:{path}"])
+    return payload
+
+
+def _resolve_current_head() -> str:
+    return _run_git(["git", "rev-parse", "HEAD"]).decode("ascii", errors="strict").strip()
+
+
+def _committed_blob_sha(head: str, path: str) -> str | None:
+    """Committed-blob sha256, or None when the path is absent at ``head``."""
+
+    completed = subprocess.run(
+        ["git", "show", f"{head}:{path}"],
+        cwd=str(ROOT),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if completed.returncode != 0:
+        return None
+    return hashlib.sha256(completed.stdout).hexdigest()
+
+
+def _assert_clean_worktree() -> None:
+    status = _run_git(["git", "status", "--porcelain=v1"]).decode(
+        "utf-8", errors="strict"
+    )
+    if status.strip():
+        raise HarnessSyncError("BIND_EVIDENCE_DIRTY_WORKTREE")
+
+
 def build_implementation_bindings(
     *,
     expected_base: str,
@@ -1402,12 +1441,7 @@ def build_implementation_bindings(
             continue
         if not _path_in_managed_write_set(path, managed):
             raise HarnessSyncError(f"BINDING_SCOPE_VIOLATION:{path}")
-        candidate = ROOT / path
-        if candidate.is_file():
-            payload = candidate.read_bytes()
-        else:
-            payload = _run_git(["git", "show", f"{head}:{path}"])
-        bindings[path] = hashlib.sha256(payload).hexdigest()
+        bindings[path] = hashlib.sha256(committed_blob_bytes(head, path)).hexdigest()
     if not bindings:
         raise HarnessSyncError("BINDING_INVENTORY_EMPTY")
     return dict(sorted(bindings.items()))
@@ -1628,15 +1662,16 @@ def verify_evidence_chain_internal(completion_path: str) -> list[str]:
     if review.get("reviewed_inventory_sha256") != fit.get("reviewed_inventory_sha256"):
         problems.append("review_fit_inventory_sha_mismatch")
     problems.extend(_completion_evidence_key_problems(completion))
+    head = _resolve_current_head()
     for path, expected_sha in bindings.items():
         if not isinstance(path, str) or not isinstance(expected_sha, str):
             problems.append("implementation_binding_invalid")
             continue
-        candidate = ROOT / path
-        if not candidate.is_file():
+        committed_sha = _committed_blob_sha(head, path)
+        if committed_sha is None:
             problems.append(f"binding_target_missing:{path}")
             continue
-        if hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_sha:
+        if committed_sha != expected_sha:
             problems.append(f"binding_target_hash_mismatch:{path}")
     problems.extend(
         _verify_nested_evidence_hashes(
@@ -1663,6 +1698,8 @@ def verify_evidence_chain_internal(completion_path: str) -> list[str]:
 def apply_evidence_chain(*, task_id: str, contract: str | None = None, head: str | None = None) -> dict[str, Any]:
     expected = compute_evidence_chain(task_id=task_id, contract=contract, head=head)
     _assert_bind_allowed(expected["completion_path"])
+    if head is None:
+        _assert_clean_worktree()
     review_path = ROOT / expected["review_path"]
     fit_path = ROOT / expected["fit_path"]
     completion_path = ROOT / expected["completion_path"]

@@ -1493,36 +1493,25 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         )
         self.assertFalse(checks["write_set_pass"])
 
-    def test_live_pr_head_write_set_allows_exact_atom_b_paths(self) -> None:
+    def test_live_pr_head_write_set_rejects_historical_product_shaped_exceptions(self) -> None:
+        # Deterministic-finish atom removed product/history-shaped LIVE_PR_HEAD
+        # eligibility: catalog assets, PROJECT_MAP, product evidence and
+        # historical task contracts are no longer control-plane prefixes.
         atom_b_paths = (
             "catalog/assets/lifecycle.yaml",
             "catalog/generated/asset_edges.json",
+            "catalog/catalog_manifest.yaml",
             "docs/PROJECT_MAP.md",
             "docs/evidence/kcdn_atom_b/a1_delivery_completion_evidence_v1.json",
-            "docs/evidence/kcdn_atom_b/a1_delivery_factory_fit_v1.json",
-            "docs/evidence/kcdn_atom_b/a1_delivery_independent_review_v1.json",
             "docs/tasks/KCDN_ATOM_B_STABLE_DELIVERY_CONTEXT_REFERENCES_V1.md",
-            "tests/test_delivery_harness_stable_asset_references.py",
         )
         live = yaml.safe_load(
             (ROOT / "delivery-harness/harness.yaml").read_text(encoding="utf-8")
         )
-        portable = json.loads(
-            (ROOT / "delivery-harness/templates/portable-core/delivery-harness/harness.yaml").read_text(
-                encoding="utf-8"
-            )
-        )
         live_prefixes = live["merge_policy"]["harness_control_write_prefixes"]
-        portable_prefixes = portable["merge_policy"]["harness_control_write_prefixes"]
         for path in atom_b_paths:
-            self.assertNotIn("/**", path)
-            self.assertIn(path, live_prefixes)
-            self.assertIn(path, portable_prefixes)
-            self.assertTrue(self.module.path_in_managed_write_set(path, live_prefixes))
-            self.assertTrue(self.module.path_in_managed_write_set(path, portable_prefixes))
-        sibling = "docs/evidence/kcdn_atom_a/a1_delivery_completion_evidence_v1.json"
-        self.assertNotIn(sibling, live_prefixes)
-        self.assertFalse(self.module.path_in_managed_write_set(sibling, live_prefixes))
+            self.assertNotIn(path, live_prefixes)
+            self.assertFalse(self.module.path_in_managed_write_set(path, live_prefixes), path)
 
         receipt = live_pr_head_receipt(self.module)
         runner = FakeRunner()
@@ -1543,13 +1532,11 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             ci_pass=True,
             runner=atom_b_diff,
         )
-        self.assertTrue(checks["write_set_pass"])
+        self.assertFalse(checks["write_set_pass"])
 
-    def test_live_pr_head_write_set_allows_observation_fast_lane_paths(self) -> None:
+    def test_live_pr_head_write_set_rejects_observation_fast_lane_paths(self) -> None:
         observation_paths = (
             "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_completion_evidence_v1.json",
-            "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_factory_fit_v1.json",
-            "docs/evidence/observation_fast_lane_routing_closure/a1_delivery_independent_review_v1.json",
             "docs/tasks/OBSERVATION_FAST_LANE_ROUTING_CLOSURE_V1.md",
             "src/solana_alpha_lab/factory/lane_classifier.py",
             "src/solana_alpha_lab/factory/observation_fast_lane_terminals.py",
@@ -1567,9 +1554,8 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
         )
         live_prefixes = live["merge_policy"]["harness_control_write_prefixes"]
         for path in observation_paths:
-            self.assertNotIn("/**", path)
-            self.assertIn(path, live_prefixes)
-            self.assertTrue(
+            self.assertNotIn(path, live_prefixes)
+            self.assertFalse(
                 self.module.path_in_managed_write_set(path, live_prefixes),
                 path,
             )
@@ -1593,7 +1579,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
             ci_pass=True,
             runner=observation_diff,
         )
-        self.assertTrue(checks["write_set_pass"])
+        self.assertFalse(checks["write_set_pass"])
 
     def test_live_pr_head_write_set_rejects_sibling_kcdn_atom_a_evidence(self) -> None:
         receipt = live_pr_head_receipt(self.module)

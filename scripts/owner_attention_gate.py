@@ -51,6 +51,99 @@ OPTIONAL_COMPLETION_EVIDENCE_KEYS = {
 }
 SINGLE_AGENT_REVIEW_FALLBACK = "SINGLE_AGENT_REVIEW_FALLBACK"
 
+# Human CLI boundary accepts case variants of existing actors only; internal
+# receipts stay uppercase and unknown actors remain invalid (no fuzzy aliases).
+CLI_ACTOR_ALIASES = {
+    "cursor": "CURSOR",
+    "Cursor": "CURSOR",
+    "CURSOR": "CURSOR",
+    "codex": "CODEX",
+    "Codex": "CODEX",
+    "CODEX": "CODEX",
+}
+
+
+def normalize_cli_actor(value: str) -> str:
+    if not isinstance(value, str):
+        raise ValueError("ACTOR_INVALID")
+    canonical = CLI_ACTOR_ALIASES.get(value)
+    if canonical is None:
+        raise ValueError("ACTOR_INVALID")
+    return canonical
+
+
+def render_owner_merge_phrase(
+    *,
+    pr_number: int,
+    head_sha: str,
+    policy: dict[str, Any],
+) -> str:
+    """Render the canonical owner merge phrase and fail closed on drift.
+
+    The base-bound policy ``merge_approval.exact_phrase_pattern`` stays the
+    single template authority. The renderer mechanically instantiates that
+    pattern for the exact PR number and 40-hex head (substituting the two
+    bound capture groups and unescaping regex literals), then re-validates
+    the result with ``re.fullmatch`` against the unchanged pattern. Any
+    pattern change that survives this substitution but changes semantics
+    fails closed. Rendering grants no approval and submits no merge.
+    """
+
+    if type(pr_number) is not int or pr_number < 1:
+        raise ValueError("OWNER_PHRASE_PR_NUMBER_INVALID")
+    if not isinstance(head_sha, str) or re.fullmatch(r"[0-9a-f]{40}", head_sha) is None:
+        raise ValueError("OWNER_PHRASE_HEAD_INVALID")
+    pattern = policy.get("merge_approval", {}).get("exact_phrase_pattern")
+    if not isinstance(pattern, str) or not pattern:
+        raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
+    body = pattern
+    if body.startswith("^"):
+        body = body[1:]
+    if body.endswith("$"):
+        body = body[:-1]
+    # Mechanically parse the raw pattern: every regex metacharacter must be
+    # either backslash-escaped (a literal to copy into the phrase) or part of
+    # one of the two recognized capture groups. Anything else (alternation,
+    # classes, quantifiers, backrefs, named groups) cannot be rendered as a
+    # single deterministic phrase and fails closed.
+    pr_group = r"([1-9][0-9]*)"
+    head_group = r"([0-9a-f]{40})"
+    pr_token, head_token = "\x00PR\x00", "\x00HEAD\x00"
+    literal_chars: list[str] = []
+    i = 0
+    n = len(body)
+    seen_pr = False
+    seen_head = False
+    while i < n:
+        ch = body[i]
+        if ch == "\\":
+            if i + 1 >= n:
+                raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
+            literal_chars.append(body[i + 1])
+            i += 2
+            continue
+        if body.startswith(pr_group, i) and not seen_pr:
+            literal_chars.append(pr_token)
+            i += len(pr_group)
+            seen_pr = True
+            continue
+        if body.startswith(head_group, i) and not seen_head:
+            literal_chars.append(head_token)
+            i += len(head_group)
+            seen_head = True
+            continue
+        if ch in "^$.*+?[]{}()|\\":
+            raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
+        literal_chars.append(ch)
+        i += 1
+    if not seen_pr or not seen_head:
+        raise ValueError("OWNER_PHRASE_PATTERN_INVALID")
+    template = "".join(literal_chars)
+    phrase = template.replace(pr_token, str(pr_number)).replace(head_token, head_sha)
+    if re.fullmatch(pattern, phrase) is None:
+        raise ValueError("OWNER_PHRASE_RENDER_MISMATCH")
+    return phrase
+
 
 def review_records_single_agent_fallback(review: dict[str, Any]) -> bool:
     """True when the receipt admits author-as-reviewer. Merge must deny."""
@@ -2008,6 +2101,16 @@ def evaluate_merge_readiness(
     identity_mode = (
         "LIVE_PR_HEAD" if is_live_pr_head(context_receipt) else "TASK_CONTEXT_RECEIPT"
     )
+    owner_phrase = None
+    if ready:
+        merge_checks = request.get("merge_checks")
+        owner_phrase = render_owner_merge_phrase(
+            pr_number=pr_number,
+            head_sha=str(merge_checks.get("observed_head_sha") or "")
+            if isinstance(merge_checks, dict)
+            else "",
+            policy=policy,
+        )
     return {
         "schema": "smial.merge-readiness",
         "schema_version": "1.0",
@@ -2016,6 +2119,7 @@ def evaluate_merge_readiness(
         "reasons": reasons,
         "merge_checks": request.get("merge_checks"),
         "identity_mode": identity_mode,
+        "owner_phrase": owner_phrase,
         "merge_submitted": False,
     }
 
@@ -2536,6 +2640,7 @@ def main() -> int:
         )
         if any(value is None for value in required):
             raise ValueError("MERGE_READINESS_ARGUMENTS_REQUIRED")
+        actor = normalize_cli_actor(args.actor)
         receipt = decode_json_mapping(
             args.context_receipt.read_bytes(), "CONTEXT_RECEIPT_INVALID"
         )
@@ -2544,7 +2649,7 @@ def main() -> int:
             repository=args.repository,
             pr_number=args.pr_number,
             route=args.route,
-            actor=args.actor,
+            actor=actor,
             context_receipt=receipt,
         )
         print(json.dumps(result, indent=2, sort_keys=True))
@@ -2560,6 +2665,7 @@ def main() -> int:
         )
         if any(value is None for value in required):
             raise ValueError("GUARDED_MERGE_ARGUMENTS_REQUIRED")
+        actor = normalize_cli_actor(args.actor)
         receipt = decode_json_mapping(
             args.context_receipt.read_bytes(), "CONTEXT_RECEIPT_INVALID"
         )

@@ -40,6 +40,8 @@ managed_write_set:
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_completion_v1.json
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_review_v1.json
 - docs/evidence/control/a1_delivery_harness_deterministic_finish_factory_fit_v1.json
+- docs/evidence/control/delivery_harness_acceptance_v1.json
+- docs/evidence/control/delivery_harness_factory_fit_v1.json
 external_caps:
   network: false
   credentials: false
