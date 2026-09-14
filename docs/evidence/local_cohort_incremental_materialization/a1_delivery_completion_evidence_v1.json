@@ -22,8 +22,7 @@
     "tests/test_live_cohort_memory_bounded_publication_v1.py": "52fe87c83ff25e5707223232601154372451a514172d8c585903f4bdafde6de6",
     "tests/test_local_cohort_incremental_materialization_v1.py": "ae41996706a42250a7d90aa3c086a2751e323572f7db5ccfc12f2490932def47"
   },
-  "active_stop_conditions": [
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
