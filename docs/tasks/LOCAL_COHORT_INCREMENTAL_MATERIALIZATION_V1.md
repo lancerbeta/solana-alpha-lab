@@ -7,9 +7,9 @@ owner: GOAL_OWNER
 allowed_routes: [DIRECT_CURSOR_DELIVERY]
 expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
-  expected_base: e79adc0b7b8d765ef14e1560ba81f08efcdcf61a
+  expected_base: 9c955d9434f46e9d01a4b67812a30b38056ed492
   expected_upstream: origin/main
-  expected_upstream_oid: e79adc0b7b8d765ef14e1560ba81f08efcdcf61a
+  expected_upstream_oid: 9c955d9434f46e9d01a4b67812a30b38056ed492
   expected_branch: local-cohort-incremental-materialization-v1
   dirty_mode: ALLOW_REPORTED
 objective: >-
