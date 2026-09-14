@@ -1,16 +1,19 @@
-# CTRL-DETERMINISTIC-FINISH-POSTMERGE-TESTS-V1
-
+---
 task_id: CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1
-owner_intent: "Repair two branch-state-dependent acceptance tests that fail on merged main after PR #304; tests must be deterministic on any checkout state."
+task_version: '1.0'
 status: IN_PROGRESS
-created: 2026-09-15
-route: DIRECT_CURSOR_DELIVERY
+as_of: '2026-09-15'
+owner: GOAL_OWNER
+allowed_routes:
+- DIRECT_CURSOR_DELIVERY
+expected_repository: lancerbeta/solana-alpha-lab
 git_binding:
   expected_base: a39a14581054d185592da593e163fdf5cbec5325
   expected_upstream: origin/main
+  expected_upstream_oid: a39a14581054d185592da593e163fdf5cbec5325
   expected_branch: cursor/ctrl-deterministic-finish-postmerge-tests-v1
   dirty_mode: ALLOW_REPORTED
-objective: "Make the two DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1 acceptance tests (test_output_shape_is_stable_and_non_claiming, test_write_set_violation_denies_on_real_wiring) branch-state tolerant: on a checkout whose merge-base with origin/main no longer equals the task contract's frozen expected_base (merged main, fresh clone), the preflight context rebuild deterministically omits task-scoped checks (task_base_frozen, candidate_non_empty, write_set_pass) and records CONTEXT_REBUILD_FAILED. The tests must assert the stable schema and non-claims on any state, and assert the full 8-check branch form only when the receipt rebuild succeeds on a matching frozen base - no merge authority, no product change."
+objective: "Repair two branch-state-dependent acceptance tests that failed in post-merge CI on main after PR #304: the tests must tolerate the deterministic context-rebuild degradation that legitimately occurs on a checkout whose merge-base with origin/main no longer equals the task contract frozen base - no merge authority, no product change, no new capability."
 managed_write_set:
 - docs/tasks/CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1.md
 - tests/test_delivery_harness_deterministic_finish.py
@@ -25,31 +28,45 @@ stop_conditions:
 - NO_MERGE_AUTHORITY_STOP_BEFORE_MERGE
 - PRECHECK_NEEDS_GITHUB_OR_NETWORK
 - SCOPE_WIDENING_REQUIRED
+context_requirements:
+  catalog_asset_ids: []
+  l2_roles: []
+  l3_roles: []
+  roadmap_path: null
+  exact_role_paths:
+    LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: []
+    ARCHITECTURE_DECISIONS: []
+    DELIVERY_EVIDENCE: []
+    HISTORICAL_CONTEXT: []
+---
 
-## Task Outcome Brief
+# CTRL-DETERMINISTIC-FINISH-POSTMERGE-TESTS-V1
 
-Post-merge CI on main (run 34908165528) failed on two acceptance tests of the just-merged
-DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1 atom. Root cause: the tests assume the working
-branch state (merge-base == frozen expected_base). On merged main the context rebuild
-legitimately cannot rebuild the task receipt (base moved), so `checks` carries only the
-five state-independent keys and `CONTEXT_REBUILD_FAILED` is recorded. This is the same
-"CI as a linter for locally knowable failures" class the atom was created to close.
+Post-merge CI on main (run 34908165528) failed on two acceptance tests of the
+just-merged DELIVERY_HARNESS_DETERMINISTIC_FINISH_V1 atom:
 
-Fix approach: (1) the shape test accepts either the full 8-key branch form or the
-reduced 5-key merged/other-state form, requiring the schema, non-claims, and
-state-independent keys unconditionally; (2) the write-set test derives expectations
-from the actual rebuild outcome: when rebuild fails on this state it asserts the
-recorded CONTEXT_REBUILD_FAILED reason and the reduced key set; when rebuild succeeds
-it asserts the WRITE_SET_VIOLATION DENY via the injected violating reader exactly as
-before. Both tests remain fully deterministic on branch and main checkouts.
+- `test_output_shape_is_stable_and_non_claiming` asserted the full 8-key
+  `checks` form unconditionally;
+- `test_write_set_violation_denies_on_real_wiring` asserted the
+  `write_set_pass` key unconditionally.
+
+Root cause: on merged main the preflight context rebuild legitimately cannot
+rebuild the task receipt (merge-base != frozen expected_base), so `checks`
+carries only the five state-independent keys and `CONTEXT_REBUILD_FAILED` is
+recorded. Both tests passed on the task branch where the base was frozen and
+failed on the merged checkout. This is exactly the "CI as a linter for
+locally knowable failures" class the parent atom closes.
+
+Fix: the shape test accepts the branch form (8 keys, rebuild deterministic)
+and the merged/other-state form (5 keys + recorded rebuild failure) as the
+two stable outputs; the write-set test derives its expectation from the
+actual rebuild outcome. Both remain deterministic on any checkout state,
+which is verified on this branch (main-based) before push.
 
 ## Managed write set
 
-Derived consumers: none expected; `catalog/assets/core.yaml` may require harness_sync
-re-application if the changed test file is a tracked record hash target; use the
-sanctioned sync tool if drift is reported by preflight.
-
-## Next
-
-Finish content, run the two tests on main-state and branch-state, preflight-push PASS,
-PR, exact-head CI, merge-readiness, stop for owner phrase.
+Derived consumers: none expected; `catalog/assets/core.yaml` re-application
+is not required because the changed test file is not a record-hash target of
+the catalog (verified via preflight `derived_state_current=true` without
+sync on this branch).
