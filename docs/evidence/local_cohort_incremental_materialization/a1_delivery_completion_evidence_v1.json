@@ -23,8 +23,6 @@
     "tests/test_local_cohort_incremental_materialization_v1.py": "ae41996706a42250a7d90aa3c086a2751e323572f7db5ccfc12f2490932def47"
   },
   "active_stop_conditions": [
-    "NO_MERGE_AUTHORITY_GRANTED",
-    "GITHUB_CI_REQUIRED_AT_GUARDED_MERGE"
   ],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -42,8 +40,7 @@
     "NO_ALPHA_OR_ECONOMIC_RESULT",
     "OBSERVATION_PANEL_INDEX_REMAINS_OUTSIDE_THIS_ATOM",
     "FAST_NOOP_PROOF_IS_SCOPED_TO_APPEND_ONLY_WRITER_ISSUED_ARTIFACTS",
-    "STRICT_BYTE_AUDIT_AND_CANONICAL_REPLAY_REMAIN_AUDIT_RECOVERY_FALLBACK",
-    "NO_MERGE"
+    "STRICT_BYTE_AUDIT_AND_CANONICAL_REPLAY_REMAIN_AUDIT_RECOVERY_FALLBACK"
   ],
   "side_effects": {
     "provider_api_rpc_wss_calls": 0,
