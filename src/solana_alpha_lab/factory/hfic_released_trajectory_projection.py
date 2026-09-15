@@ -88,11 +88,7 @@ def _anchor_key(mint: str) -> str:
     return hashlib.sha256(("mint-group:" + mint).encode("utf-8")).hexdigest()
 
 
-def resolve_release_projection_input(
-    release_root: Path,
-    *,
-    schedule_document: dict[str, Any] | None = None,
-) -> dict[str, Any]:
+def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
     """Verify one imported release and project it through the frozen lens.
 
     The release directory must contain the hash-verified
@@ -102,9 +98,18 @@ def resolve_release_projection_input(
     and the anonymous representation payload — nothing else.
     """
     root = Path(release_root)
+    if not root.is_dir():
+        raise RepresentationProbeError("RELEASE_ROOT_NOT_FOUND")
     try:
         manifest = verify_live_cohort(root)
     except Exception as exc:  # noqa: BLE001 - typed translation below
+        # Preserve the underlying typed code for operator diagnostics;
+        # the terminal stays INVALID_PROJECTION_PROVENANCE.
+        underlying = getattr(exc, "code", None)
+        if isinstance(underlying, str) and underlying:
+            raise RepresentationProbeError(
+                f"{INVALID_PROJECTION_PROVENANCE}:{underlying}"
+            ) from exc
         raise RepresentationProbeError(INVALID_PROJECTION_PROVENANCE) from exc
 
     binding = LifecycleCorpusBinding(

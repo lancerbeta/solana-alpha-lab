@@ -77,7 +77,8 @@ def _frozen_control() -> dict[str, object]:
         "session_started_at": "2026-08-27T12:00:00Z",
         "forge_context_packet_sha256": "ab" * 32,
         "forge_context_packet": {
-            "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"]
+            "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+            "vision_integrity": {"status": "PASS"},
         },
     }
     return freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)

@@ -363,6 +363,10 @@ def cmd_preview_reopened_prior_routing(
     return emit(payload, exit_code=exit_code)
 
 
+FORGE_VISION_BLOCKED_CODE = "FORGE_VISION_INTEGRITY_BLOCKED"
+INVALID_PROJECTION_CODE = "INVALID_PROJECTION_PROVENANCE"
+
+
 def cmd_vision_acceptance(
     repo_root: Path,
     explicit_data_root: Path | None,
@@ -419,6 +423,12 @@ def cmd_vision_acceptance(
         for item in hard_family
         if (item.get("family_close_authority") or {}).get("class") != "POSITIVE"
     ]
+    ambiguous_hard = [
+        item["terminal"]
+        for item in ledger
+        if str(item.get("suppression_class") or "").startswith("AMBIGUOUS")
+        and item.get("reopen_forbidden") is True
+    ]
     parks_hard = [
         item["terminal"]
         for item in ledger
@@ -432,9 +442,24 @@ def cmd_vision_acceptance(
         and item.get("scope_kind") == "FAMILY"
     ]
     evidence["suppression"] = {
-        "active_hard_closes": len(hard_family),
+        "family_hard_closes": len(hard_family),
+        "reopen_forbidden_by_scope": {
+            kind: sum(
+                1
+                for item in ledger
+                if item.get("reopen_forbidden") is True
+                and str(item.get("scope_kind") or "") == kind
+            )
+            for kind in sorted(
+                {
+                    str(item.get("scope_kind") or "")
+                    for item in ledger
+                    if item.get("reopen_forbidden") is True
+                }
+            )
+        },
         "not_portable_acting_as_hard_close": len(unauthorized),
-        "ambiguous_acting_as_hard_close": len(unauthorized),
+        "ambiguous_acting_as_hard_close": len(ambiguous_hard),
         "parks_acting_as_hard_close": len(parks_hard),
         "scope_overclosure": len(scope_widened),
         "terminals": {
@@ -464,6 +489,19 @@ def cmd_vision_acceptance(
         "ranked_body_mismatch": abs(ranked_count - len(bodies)),
         "dropped_material_priors": int(trunc.get("dropped_priors") or 0),
         "prior_bodies": bodies,
+        "basis": "planned_post_commission_overlay",
+    }
+    current_memory = preview.get("CURRENT_SEARCH_MEMORY") or {}
+    evidence["calibration"] = {
+        "defective_session": DEFECTIVE_CONTROL_SESSION_ID,
+        "planned_exact_session_quarantine": [DEFECTIVE_CONTROL_SESSION_ID],
+        "planned_terminal": preview.get("terminal"),
+        "quarantine_removes_calibration_hfic": True,
+        "commission_applied": bool(
+            current_memory.get("h11") and current_memory.get("h13")
+        ),
+        "store_h11_present": current_memory.get("h11") is True,
+        "store_h13_present": current_memory.get("h13") is True,
     }
 
     # FEATURE/CAPABILITY VISION + PACKET + CONTROL
@@ -498,16 +536,18 @@ def cmd_vision_acceptance(
         vision = ctx_packet.get("vision_integrity") or {}
         packet_bytes = len(canonical_json_bytes(ctx_packet))
         control_ok = {
+            # Single positive field: raw trajectory leak is blocked (i.e.
+            # preview fence CONTROL_TRAJECTORY_BLIND_FENCE is True).
             "trajectory_blind": preview.get("CONTROL_TRAJECTORY_BLIND_FENCE")
             is True,
-            "raw_trajectory_leak": preview.get("NO_RAW_TRAJECTORY_LEAK") is False,
             "packet_bytes": packet_bytes,
             "packet_within_bound": packet_bytes <= 16384,
             "evidence_surface_mode": ctx_packet.get("evidence_surface_mode"),
         }
     except Exception as exc:  # noqa: BLE001
-        vision = {"status": "BLOCKED", "reason": str(exc)}
-        control_ok = {"packet_error": str(exc)}
+        # Exception text never enters receipts: typed code only.
+        vision = {"status": "BLOCKED", "reason": FORGE_VISION_BLOCKED_CODE}
+        control_ok = {"packet_error": FORGE_VISION_BLOCKED_CODE}
     evidence["vision"] = {
         "status": vision.get("status"),
         "material_information_loss": vision.get("material_information_loss"),
@@ -523,12 +563,6 @@ def cmd_vision_acceptance(
         "planned_action": preview.get("PLANNED_PREFLIGHT_ACTION"),
         "search_budget": "available",
     }
-    evidence["calibration"] = {
-        "defective_session": DEFECTIVE_CONTROL_SESSION_ID,
-        "planned_exact_session_quarantine": [DEFECTIVE_CONTROL_SESSION_ID],
-        "planned_terminal": preview.get("terminal"),
-        "quarantine_removes_calibration_hfic": True,
-    }
 
     # CHALLENGER OPERABILITY (metadata/provenance only, no motif projection)
     challenger: dict[str, Any] = {
@@ -542,22 +576,33 @@ def cmd_vision_acceptance(
         "no_future_git_atom_required": True,
     }
     if release_root is not None:
-        try:
-            result = hfic_released_trajectory_projection.resolve_release_projection_input(
-                Path(release_root)
-            )
-            challenger["verified_release_binding"] = result[
-                "projection_input_receipt"
-            ]["corpus_binding"]
-            challenger["seam_status"] = "VERIFIED"
-        except Exception as exc:  # noqa: BLE001
-            challenger["seam_status"] = f"BLOCKED:{getattr(exc, 'code', exc)}"
+        if not Path(release_root).is_dir():
+            challenger["seam_status"] = "BLOCKED:RELEASE_ROOT_NOT_FOUND"
+        else:
+            try:
+                result = hfic_released_trajectory_projection.resolve_release_projection_input(
+                    Path(release_root)
+                )
+                receipt = result["projection_input_receipt"]
+                challenger["verified_release_binding"] = receipt["corpus_binding"]
+                challenger["observation_row_count"] = receipt.get(
+                    "observation_row_count"
+                )
+                challenger["projected_observation_count"] = receipt.get(
+                    "projected_observation_count"
+                )
+                challenger["seam_status"] = "VERIFIED"
+            except Exception as exc:  # noqa: BLE001
+                code = getattr(exc, "code", None)
+                if not isinstance(code, str) or not code:
+                    code = INVALID_PROJECTION_CODE
+                challenger["seam_status"] = f"BLOCKED:{code}"
     else:
         challenger["seam_status"] = "NOT_REQUESTED"
     evidence["challenger_operability"] = challenger
 
     suppression_ok = (
-        not unauthorized and not parks_hard and not scope_widened
+        not unauthorized and not ambiguous_hard and not parks_hard and not scope_widened
     )
     priors_ok = (
         evidence["priors"]["h11_visible_body_ranked"]
@@ -569,28 +614,44 @@ def cmd_vision_acceptance(
     packet_ok = (
         control_ok.get("packet_within_bound") is True
         and control_ok.get("trajectory_blind") is True
-        and control_ok.get("raw_trajectory_leak") is False
     )
     calibration_ok = (
         evidence["calibration"]["planned_terminal"]
         == "CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION"
     )
-    challenger_ok = challenger["seam_status"] in {"VERIFIED", "NOT_REQUESTED"}
-    passed = all(
-        (
-            suppression_ok,
-            priors_ok,
-            vision_ok,
-            packet_ok,
-            calibration_ok,
-            challenger_ok,
-        )
+    challenger_ok = challenger["seam_status"] == "VERIFIED"
+    checks = {
+        "suppression": suppression_ok,
+        "priors": priors_ok,
+        "vision": vision_ok,
+        "packet": packet_ok,
+        "calibration": calibration_ok,
+        "challenger": challenger_ok,
+    }
+    failed = [name for name, ok in checks.items() if not ok]
+    evidence["checks"] = checks
+    evidence["failed_checks"] = failed
+    evidence["next_hint"] = (
+        None
+        if not failed
+        else _VISION_ACCEPTANCE_HINTS.get(failed[0], "See failed_checks fields.")
     )
+    passed = not failed
     evidence["terminal"] = (
         "FORGE_VISION_ACCEPTANCE_PASS" if passed else "FORGE_VISION_ACCEPTANCE_BLOCKED"
     )
     _assert_no_path_leak(evidence, str(data_root), str(repo_root))
     return emit(evidence, exit_code=0 if passed else 2)
+
+
+_VISION_ACCEPTANCE_HINTS = {
+    "suppression": "Unauthorized hard close in ledger; inspect suppression.terminals authority values.",
+    "priors": "Run preview-reopened-prior-routing and read BLOCKER_NEXT.",
+    "vision": "Packet vision integrity blocked; inspect vision.status and material losses.",
+    "packet": "Packet over bound or not trajectory-blind; inspect packet_control fields.",
+    "calibration": "Run preview-reopened-prior-routing; commission APPLY not yet ready.",
+    "challenger": "Pass --release-root <live_cohort_releases dir> or fix the release path; seam must be VERIFIED for PASS.",
+}
 
 
 def cmd_commission_reopened_priors(
@@ -1120,7 +1181,12 @@ def build_parser() -> argparse.ArgumentParser:
         "vision-acceptance",
         help="read-only FORGE_VISION_ACCEPTANCE machine evidence over suppression/priors/vision/packet/challenger",
     )
-    vision_cmd.add_argument("--release-root", type=Path, default=None)
+    vision_cmd.add_argument(
+        "--release-root",
+        type=Path,
+        default=None,
+        help="verified live-cohort release directory (live_cohort_releases/<cohort_id>); required for challenger seam VERIFIED and acceptance PASS",
+    )
     vision_cmd.add_argument("--format", choices=("json",), default="json")
     reopen_apply = subparsers.add_parser(
         "commission-reopened-priors",

@@ -38,7 +38,9 @@ Date: 2026-09-15 · Route: DIRECT_CURSOR_DELIVERY · Terminal: ready for PR
 ## Real C1 read-only acceptance
 
 `vision-acceptance` (new read-only CLI) over `local/factory_v1/data_plane`
-plus the real imported release:
+plus the real imported release (**`--release-root` is required for PASS** —
+without it the challenger check is `NOT_REQUESTED` and the terminal is
+BLOCKED with `next_hint`):
 
 - SUPPRESSION: not_portable_as_hard_close=0, ambiguous=0, parks=0,
   scope_overclosure=0; 6 portable family hard-closes with POSITIVE authority.
@@ -47,8 +49,11 @@ plus the real imported release:
 - PACKET/CONTROL: 15913 ≤ 16384 bytes, trajectory-blind, no raw leak,
   planned action START_NEW_SESSION, yield gate OK (148).
 - CALIBRATION: defective session HFIC-SESS-8F4A703030408365 is the exact
-  planned quarantine; post-state has no undesired calibration HFIC memory.
-- CHALLENGER: seam VERIFIED on the real release; no future Git atom needed.
+  planned quarantine; post-state has no undesired calibration HFIC memory;
+  `commission_applied` is honestly false pre-merge (the APPLY is separately
+  owner-authorized post-merge).
+- CHALLENGER: seam VERIFIED on the real release (78080 → 29280 rows,
+  yield_eligible=148); no future Git atom needed.
 
 Terminal: **FORGE_VISION_ACCEPTANCE_PASS**
 (evidence: `docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json`).
@@ -58,10 +63,21 @@ Terminal: **FORGE_VISION_ACCEPTANCE_PASS**
 1. `preview-reopened-prior-routing` (read-only, idempotent — tested)
 2. owner-authorized `commission-reopened-priors --confirm-append-only`
    (append-only, repeat-safe — tested)
-3. `vision-acceptance` machine readback → PASS
+3. `vision-acceptance --release-root local/factory_mirror/live_cohort_releases/<cohort_id>`
+   → must show `seam_status: "VERIFIED"` and terminal PASS; after step 2
+   `calibration.commission_applied` must be true
 4. `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`
 5. if terminal permits: NORMALIZED_TRAJECTORY_V1 executes through the merged
    seam — no new PR.
+
+Typed stops the owner may see and their meaning:
+- `FORGE_VISION_INTEGRITY_BLOCKED` — the declared evidence surface cannot be
+  represented completely in the bounded packet; never a scientific verdict.
+- `INVALID_PROJECTION_PROVENANCE:<code>` — release verification failed; the
+  suffix names the underlying check (e.g. CENSUS_HASH_MISMATCH).
+- `RELEASE_ROOT_NOT_FOUND` — wrong `--release-root` path.
+- `UNSUPPORTED_POINT_SHAPE` / `FUTURE_POINT_LEAKAGE` — release shape does not
+  match the frozen preregistered schedule.
 
 ## Factory fit
 

@@ -56,6 +56,12 @@ SCOPE_AMBIGUOUS = "AMBIGUOUS"
 _TYPED_RUNTIME_RECEIPT_RE = re.compile(
     r"^smial\.[a-z0-9]+(?:[.-][a-z0-9]+)*\.runtime-receipt$"
 )
+# Evidence provenance hashes: 64-hex content sha, 40-hex git sha, or a
+# repository-relative receipt path (docs/evidence/... or datasets/...).
+_HASH_RE = r"(?:[0-9a-f]{64}|[0-9a-f]{40})"
+_PROVENANCE_RE = re.compile(
+    rf"^(?:{_HASH_RE}|(?:docs|datasets)/[A-Za-z0-9_./-]+\.(?:json|parquet))$"
+)
 _CLOSE_RE = re.compile(r"^CLOSE_[A-Z0-9_]+$")
 _PARK_RE = re.compile(r"^PARK_[A-Z0-9_]+$")
 _STEM_RE = re.compile(r"^(?:CLOSE|PARK)_(.+?)(?:_FAMILY)?$")
@@ -169,8 +175,10 @@ def _has_positive_science(payload: Mapping[str, Any]) -> bool:
         probe = payload.get(key)
         if isinstance(probe, Mapping) and probe.get("science") is False:
             return False
+    # Empty containers (``{}`` / ``[]``) are NOT "science ran": a marker
+    # must be non-empty to count as positive evidence.
     if any(
-        isinstance(payload.get(key), (Mapping, list)) for key in _RAN_MARKER_KEYS
+        _non_empty_container(payload.get(key)) for key in _RAN_MARKER_KEYS
     ) or any(
         isinstance(payload.get(key), (int, float)) and not isinstance(payload.get(key), bool)
         for key in _RAN_MARKER_KEYS
@@ -182,6 +190,14 @@ def _has_positive_science(payload: Mapping[str, Any]) -> bool:
         isinstance(payload.get(key), (int, float)) and not isinstance(payload.get(key), bool)
         for key in _NUMERIC_RESULT_KEYS
     ) and str(payload.get("reason") or "").strip() != ""
+
+
+def _non_empty_container(value: Any) -> bool:
+    if isinstance(value, Mapping):
+        return bool(value)
+    if isinstance(value, list):
+        return bool(value)
+    return False
 
 
 def _has_population_or_estimand_context(payload: Mapping[str, Any]) -> bool:
@@ -199,7 +215,15 @@ def _has_population_or_estimand_context(payload: Mapping[str, Any]) -> bool:
 
 
 def _has_hash_binding(payload: Mapping[str, Any]) -> bool:
-    return any(isinstance(payload.get(key), str) and payload.get(key) for key in _HASH_BINDING_KEYS)
+    # Evidence provenance must be a plausible content hash (64-hex sha /
+    # 40-hex git sha) OR an existing repository-relative receipt path
+    # (verified at enumeration time when repo_root is known). Placeholder
+    # strings ("draft", "pending") are not provenance.
+    for key in _HASH_BINDING_KEYS:
+        value = payload.get(key)
+        if isinstance(value, str) and _PROVENANCE_RE.fullmatch(value):
+            return True
+    return False
 
 
 def family_close_authority(payload: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -241,7 +265,7 @@ def family_close_authority(payload: Mapping[str, Any]) -> dict[str, Any] | None:
         "hash_binding": next(
             str(body.get(key))
             for key in _HASH_BINDING_KEYS
-            if isinstance(body.get(key), str) and body.get(key)
+            if isinstance(body.get(key), str) and _PROVENANCE_RE.fullmatch(body.get(key))
         ),
     }
 

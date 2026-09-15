@@ -980,6 +980,8 @@ def _diagnostics_for_receipt(
 
 def _assert_vision_integrity_for_surface(
     preflight_receipt: Mapping[str, Any] | None,
+    *,
+    prompt_version: str | None = None,
 ) -> None:
     """NO_WORTHY / selected-candidate paths require VISION_INTEGRITY=PASS.
 
@@ -987,13 +989,28 @@ def _assert_vision_integrity_for_surface(
     scientifically interpretable terminal from a packet whose declared
     evidence surface was silently incomplete.  A vision failure is typed
     FORGE_VISION_INTEGRITY_BLOCKED, never NO_WORTHY_HYPOTHESIS.
+
+    Fail-closed: for drafts under the current protocol, an absent or
+    malformed ``vision_integrity`` receipt is BLOCKED, not PASS.  Legacy
+    drafts predating vision receipts are out of scope here and are already
+    fenced by the fresh-session stale-draft rejection.
     """
     if not isinstance(preflight_receipt, Mapping):
+        # A missing receipt on a freeze under the current protocol is a
+        # malformed machine path, but legacy drafts legitimately carry no
+        # machine preflight receipt at all; the stale-fresh-session fence
+        # covers the fresh-session case, so absence stays out of scope here.
         return
     packet = preflight_receipt.get("forge_context_packet")
     if not isinstance(packet, Mapping):
+        if prompt_version == PROMPT_VERSION:
+            raise HficSessionError("FORGE_VISION_INTEGRITY_BLOCKED")
         return
     vision = packet.get("vision_integrity")
+    if prompt_version == PROMPT_VERSION and not isinstance(vision, Mapping):
+        # Fail closed: a current-protocol packet without a vision receipt
+        # is not provably complete — absence is not PASS.
+        raise HficSessionError("FORGE_VISION_INTEGRITY_BLOCKED")
     if isinstance(vision, Mapping) and vision.get("status") != "PASS":
         raise HficSessionError("FORGE_VISION_INTEGRITY_BLOCKED")
 
@@ -1036,7 +1053,8 @@ def freeze_draft(
 
     selected_ref = draft.get("selected_candidate_ref")
     if selected_ref in (None, ""):
-        return _freeze_no_worthy(            draft,
+        return _freeze_no_worthy(
+            draft,
             identities=identities,
             preflight_receipt=preflight_receipt,
             store=store,
@@ -1050,7 +1068,9 @@ def freeze_draft(
     if next_action_draft is not None:
         raise HficSessionError("HFIC_NEXT_ACTION_FORBIDDEN_FOR_SELECTED")
 
-    _assert_vision_integrity_for_surface(preflight_receipt)
+    _assert_vision_integrity_for_surface(
+        preflight_receipt, prompt_version=prompt_version
+    )
     selected_index = _resolve_ref(selected_ref, identities)
     if selected_index < 0:
         raise HficSessionError("SELECTED_CANDIDATE_MISSING")
@@ -1444,7 +1464,9 @@ def _freeze_no_worthy(
     prompt_version: str = PROMPT_VERSION_V1_1,
     packet_version: str = "1.1",
 ) -> dict[str, Any]:
-    _assert_vision_integrity_for_surface(preflight_receipt)
+    _assert_vision_integrity_for_surface(
+        preflight_receipt, prompt_version=prompt_version
+    )
     runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
     if runner_up_index < 0:
         raise HficSessionError("CROSS_REFERENCE_MISMATCH")

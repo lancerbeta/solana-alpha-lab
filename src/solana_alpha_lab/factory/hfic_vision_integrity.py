@@ -110,13 +110,11 @@ def classify_feature_omission(
     # A distinct availability distinction that can change admissibility is
     # material unless the exact distinction is retained elsewhere.
     if availability in _DECISION_MATERIAL_AVAILABILITY:
+        # Exact concept identity only: prefix similarity (FEAT-X vs
+        # FEAT-X-V2) is not evidence the concept is represented.
         represented = (
             concept in retained_concept_set
             and availability in retained_availability_set
-        ) or availability in retained_availability_set and any(
-            concept == other or concept.startswith(other)
-            for other in retained_concept_set
-            if other.startswith("FEAT-")
         )
         if not represented:
             return {
@@ -185,7 +183,6 @@ def compute_vision_integrity(
     retained_availability_classes: Sequence[str] | None = None,
     dropped_semantic_routes: Sequence[str] | None = None,
     retained_capability_ids: Sequence[str] | None = None,
-    all_semantic_routes: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """Compute the deterministic vision-integrity receipt for one packet.
 
@@ -215,15 +212,15 @@ def compute_vision_integrity(
         availability = str(entry.get("availability_class") or "")
         if feature_id in retained_feature_set or feature_id in index_feature_ids:
             continue
-        if availability in _DECISION_MATERIAL_AVAILABILITY and availability in index_availability:
-            # The availability distinction survives in the compact index; the
-            # per-feature row was redundant verbosity.
+        if availability in _DECISION_MATERIAL_AVAILABILITY and availability in index_availability and feature_id in index_feature_ids:
+            # The availability distinction AND this exact feature survive in
+            # the compact index; the per-feature verbose row was redundant.
             omissions.append(
                 {
                     "feature_id": feature_id,
                     "availability_class": availability,
                     "omission_class": REDUNDANT_WITH_RETAINED_INFORMATION,
-                    "why": "Availability distinction retained by the compact index.",
+                    "why": "Feature and availability distinction retained by the compact index.",
                 }
             )
             continue

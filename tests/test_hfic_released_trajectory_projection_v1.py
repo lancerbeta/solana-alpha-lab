@@ -230,7 +230,11 @@ class ReleaseProjectionInputReceipt(unittest.TestCase):
             manifest_path.write_text(json.dumps(manifest, sort_keys=True))
             with self.assertRaises(RepresentationProbeError) as raised:
                 resolve_release_projection_input(release_root)
-            self.assertEqual(str(raised.exception), INVALID_PROJECTION_PROVENANCE)
+            # Terminal keeps INVALID_PROJECTION_PROVENANCE, now with the
+            # underlying typed code appended for operator diagnostics.
+            self.assertTrue(
+                str(raised.exception).startswith(INVALID_PROJECTION_PROVENANCE)
+            )
 
 
 class ReleaseProjectionGuards(unittest.TestCase):
