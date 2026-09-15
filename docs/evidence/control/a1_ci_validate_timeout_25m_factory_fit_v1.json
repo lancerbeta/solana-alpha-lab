@@ -4,8 +4,8 @@
   "review_id": "CI-VALIDATE-TIMEOUT-25M-FACTORY-FIT-001",
   "as_of": "2026-09-15",
   "task_id": "CTRL_CI_VALIDATE_TIMEOUT_25M_V1",
-  "reviewed_bindings_sha256": "68178fd15a428fdc1bd37d1ce13578db425ab271e26f108a655867dc2519815e",
-  "reviewed_inventory_sha256": "0f3fe13a831e9e822aec3983540f6044b84a35b54dae07bbb61c5cb7b95e6fc4",
+  "reviewed_bindings_sha256": "aa23217dd1eaa14de69876b00278997f4e4805f602666a875b930eaca7c6df67",
+  "reviewed_inventory_sha256": "639c110469e97cd509d6f35ac4e2ab5bb0e51e066addc12cb5e5664cb1e6f49a",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

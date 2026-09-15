@@ -12,12 +12,13 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".github/workflows/ci.yml": "f9f127394cc06ac66980e47d73b73f7754815f6e8bd4d53f90cb18e3ddc5262f",
-    "catalog/assets/core.yaml": "045f9cf68cc08851920648d5d2571bfffb05551daf75a519b2a01b93f58d6fba",
+    "catalog/assets/core.yaml": "66246b70e886503516329024a2e59de889d30b27b603209b89bf5325729d7847",
     "catalog/assets/lifecycle.yaml": "868a6de02702e7487aaa6d919a66616c25a902cfccfe72b29da702bf53b86b55",
     "catalog/catalog_manifest.yaml": "3b818e8077b5bcb8a0bfd7ebab19bd24cdccd421e2ad0f9ed17f8ee404caf7a8",
     "catalog/generated/asset_edges.json": "cf0abb3cb52e8f0c9fc3bfbbddea310d695a48431809de0cf61ea82613d5ccdd",
     "docs/PROJECT_MAP.md": "87bce1ee1eb961f91eaef9a0d48a7f9657d5bd5b5df8767bb0e37a7bd4033720",
-    "docs/tasks/CTRL_CI_VALIDATE_TIMEOUT_25M_V1.md": "fd2aa10fd77d316d61048988452fa3cbaa65cb05af6c2b60bd11a731e6c09ab0",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "3a5b5529174b2e507e1f44f3b13327c161c76ec589d5ae8b9eedf81c56edc2c6",
+    "docs/tasks/CTRL_CI_VALIDATE_TIMEOUT_25M_V1.md": "bc8f3567595d09b5708d845dbd4af17f3bdde5d57bc99d2b87c121fb142966f6",
     "scripts/validate_ci.py": "f3325b200e3a2cd527ed99091e05d490ee3ce1defe37604830ccd2c22209d583"
   },
   "active_stop_conditions": [],
@@ -30,14 +31,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_ci_validate_timeout_25m_factory_fit_v1.json",
-    "sha256": "6f68e9dab765248364397d46fb4735bb2892cc216363518c348c53e7b9a41703",
+    "sha256": "d106cd4031219cf4820964bebe32f69a67b0557403b9edadf58474dc9d191190",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_CI_VALIDATE_TIMEOUT_25M_TESTS",
     "independent_review": {
       "path": "docs/evidence/control/a1_ci_validate_timeout_25m_review_v1.json",
-      "sha256": "83055e04286c941351a48bd714c81088939bbd00b367ac40b0d1247aa24ed75e",
+      "sha256": "5b81dad982dcfab3c378ed52bb87d867d1c8c44d5a8b0776520b3e9b5aeff5e1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
