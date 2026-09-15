@@ -193,5 +193,9 @@
     "exact_next_atom": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
     "provider_or_panel_capture_authority": "NOT_GRANTED",
     "catalog_or_repository_delivery_authority": "NOT_GRANTED_BY_THIS_ATOM"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Risk-routed review control-plane atom re-pinned stale artifact hash bindings (AGENTS.md, owner_attention_gate.py, catalog core.yaml bytes legitimately changed by this atom); no Project Source semantic role or release payload changes."
   }
 }
