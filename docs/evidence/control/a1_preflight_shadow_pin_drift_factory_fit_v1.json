@@ -9,16 +9,16 @@
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "PASS - locally knowable shadow-pin and CRLF divergence classes move into preflight",
-    "flexibility_and_history": "PASS - frozen-commit pins exempted by registry; no historical JSON migration",
-    "context_efficiency": "PASS - scan is scoped to candidate-diff targets",
-    "research_truth": "PASS - no product/research behavior",
-    "owner_operability": "PASS - DENY before first push with repair hints",
-    "execution_to_cashflow": "PASS",
+    "mission": "PASS - locally knowable shadow-pin and CRLF divergence classes move into preflight before first remote push",
+    "flexibility_and_history": "PASS - frozen-commit pins exempted by a two-file registry; no historical JSON migration",
+    "context_efficiency": "PASS - scan is scoped to candidate-diff targets, not all-pins-vs-worktree",
+    "research_truth": "PASS - no product or research behavior",
+    "owner_operability": "PASS - DENY before first push with named repair reasons; no new owner surface",
+    "execution_to_cashflow": "PASS - control-plane only; no cash/runtime change",
     "monitoring_and_recovery": "PASS - revert restores prior preflight; frozen registry is explicit",
-    "build_vs_buy": "PASS - thin helpers inside existing preflight orchestrator",
-    "security": "PASS - read-only, no network, fail-closed scan errors",
-    "red_team": "PASS - co-moved evidence does not silent-pass SEPARATE drift; frozen exemption is named"
+    "build_vs_buy": "PASS - thin helpers inside the existing preflight orchestrator",
+    "security": "PASS - read-only, no network, no secrets; unreadable evidence JSON is skipped per file rather than SHADOW_PIN_SCAN_FAILED",
+    "red_team": "PASS - co-moved evidence does not silent-pass SEPARATE drift; frozen exemption is named and test-locked to two files"
   },
   "capability_radar": {
     "now": "NONE",
@@ -27,6 +27,7 @@
   "recovery": "REVERT",
   "limits": [
     "Frozen-semantics registry is explicit and small; a new frozen acceptance must update it",
-    "Does not auto-re-pin; repair remains a visible commit"
+    "Does not auto-re-pin; repair remains a visible commit",
+    "Malformed evidence JSON is skipped for that file; a readable SEPARATE drifted pin still DENYs"
   ]
 }

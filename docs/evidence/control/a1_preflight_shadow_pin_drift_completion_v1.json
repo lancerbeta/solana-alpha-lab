@@ -49,8 +49,11 @@
     "NO_REAL_MONEY"
   ],
   "side_effects": {
-    "files_changed": [],
-    "commands_run": [],
-    "external_calls": []
+    "repository_commits": true,
+    "github_pr": true,
+    "github_ci": true,
+    "external_provider_calls": false,
+    "wallet_or_signer_action": false,
+    "deployment": false
   }
 }

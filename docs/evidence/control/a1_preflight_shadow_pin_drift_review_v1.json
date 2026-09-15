@@ -15,17 +15,33 @@
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
-      "findings": ["placeholder before isolated critic"]
+      "findings": [
+        "PASS on d1ed4334a1f34bfb58120b5710ea4ba80eb400eb. A/B/C match the contract: SEPARATE {path,sha256} vs git show HEAD:path, frozen registry is exactly the two task21 files, worktree vs blob, implementation_bindings via git show. git_bytes does not strip/decode. Discriminator tests cover drift, co-move, exemption, missing blob, CRLF, and git-show vs worktree. OWNER_UX_CRITIC not required (preflight-push is agent delivery machinery).",
+        "MINOR: tests/test_delivery_harness_deterministic_finish.py _result() stubs both new checkers to []; no test that a real SHADOW_PIN_DRIFT / WORKTREE_COMMITTED_DIVERGENCE flips shadow_pins_current / worktree_matches_committed and ready_for_first_push. Covered instead by tests/test_preflight_shadow_pin_drift.py.",
+        "MINOR: unreadable/malformed evidence JSON is skipped (fail-open for that file) instead of SHADOW_PIN_SCAN_FAILED. A readable SEPARATE drifted pin still DENYs. Accepted as non-blocking."
+      ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
-      "findings": ["placeholder before isolated critic"]
+      "findings": [
+        "Owner outcome met: SEPARATE drift DENYs SHADOW_PIN_DRIFT and is wired into preflight_push as shadow_pins_current; ready_for_first_push is all(checks). Worktree/committed divergence DENYs WORKTREE_COMMITTED_DIVERGENCE as worktree_matches_committed.",
+        "Frozen exempt with no history rewrite: FROZEN_SEMANTICS_EVIDENCE_FILES is exactly the two listed files; cheapest falsifier locks that set. Portable core still has no preflight-push command. Class C: bound_delivery_evidence hashes implementation_bindings via git show <head>:<path>.",
+        "Cheapest falsifier tests/test_preflight_shadow_pin_drift.py kills both classes, co-moved/unrelated non-DENY, missing target, and the 2-file registry. Non-blockers: existing preflight_push acceptance tests stub the new checkers; placeholder hashes were pre-bind ceremony."
+      ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
-      "findings": ["placeholder before isolated critic"]
+      "findings": [
+        "STANDARD profile; SEMANTIC_PREMISE path triggers did not require a packet. Control validity holds on SEPARATE + path-in-diff + sha vs git show HEAD:path, not all-pins-vs-worktree. Frozen is a two-file registry; miss would be extra DENY (closed). Portable preflight-push not required.",
+        "Future fail-open if the registry is widened onto current-byte evidence (a20r1 / pulse / gate). The cheapest falsifier pins exactly two frozen paths.",
+        "Out of contract: implementation_bindings as map path->sha is not walked as {path,sha256}; gate still read_bytes() for JSON completion (possible extra DENY, not the CI-red binding class). bound_delivery_evidence for bindings uses git show / raw stdout."
+      ]
     }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
   ]
 }
