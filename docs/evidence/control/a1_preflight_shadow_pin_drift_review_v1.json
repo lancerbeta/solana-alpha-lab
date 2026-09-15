@@ -18,7 +18,8 @@
       "findings": [
         "PASS on d1ed4334a1f34bfb58120b5710ea4ba80eb400eb. A/B/C match the contract: SEPARATE {path,sha256} vs git show HEAD:path, frozen registry is exactly the two task21 files, worktree vs blob, implementation_bindings via git show. git_bytes does not strip/decode. Discriminator tests cover drift, co-move, exemption, missing blob, CRLF, and git-show vs worktree. OWNER_UX_CRITIC not required (preflight-push is agent delivery machinery).",
         "MINOR: tests/test_delivery_harness_deterministic_finish.py _result() stubs both new checkers to []; no test that a real SHADOW_PIN_DRIFT / WORKTREE_COMMITTED_DIVERGENCE flips shadow_pins_current / worktree_matches_committed and ready_for_first_push. Covered instead by tests/test_preflight_shadow_pin_drift.py.",
-        "MINOR: unreadable/malformed evidence JSON is skipped (fail-open for that file) instead of SHADOW_PIN_SCAN_FAILED. A readable SEPARATE drifted pin still DENYs. Accepted as non-blocking."
+        "MINOR: unreadable/malformed evidence JSON is skipped (fail-open for that file) instead of SHADOW_PIN_SCAN_FAILED. A readable SEPARATE drifted pin still DENYs. Accepted as non-blocking.",
+        "CI follow-up on 6f3118da: test_13_preflight_and_merge_gate_resolve_identical_set ERROR BINDING_SCOPE_VIOLATION against live HEAD after this atom. Pinned compute_evidence_chain to the last commit that bound DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1 completion evidence so the shared-resolver cheapest falsifier still runs on later branches. 26/26 risk-routing tests PASS."
       ]
     },
     {
