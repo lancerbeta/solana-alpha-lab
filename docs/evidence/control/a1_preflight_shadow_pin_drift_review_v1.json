@@ -4,8 +4,8 @@
   "review_id": "a1_preflight_shadow_pin_drift_v1",
   "as_of": "2026-09-15",
   "task_id": "PREFLIGHT_SHADOW_PIN_DRIFT_V1",
-  "reviewed_bindings_sha256": "3323b547c69d357420de10f59bf646d565fd894ea931b96e00b348bb9b83cb83",
-  "reviewed_inventory_sha256": "0366c64d6618729f4ad1ffe62c06b6ef3107a3db215fe7d10d376c5cb3a30792",
+  "reviewed_bindings_sha256": "3c906541d2931b9d2746cc1005d1c9c62bb9c9cd70ebd10da9be61b80d116dec",
+  "reviewed_inventory_sha256": "0a0a72f781cc47bdf01d86a841a85baf9b52de6f0afc5fcf4ab9ae742cd9f28c",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",

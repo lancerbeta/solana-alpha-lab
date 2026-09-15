@@ -19,11 +19,12 @@
     "docs/evidence/control/owner_attention_gate_acceptance_v1.json": "5d7769690d6a9ca3f816bea9f97e95ef75983816b2ba2537b1c1f72f9bd82d19",
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "72e78fc8d2feae293569dda74d11ab6fdc43e2838c0fb41d0d8d504acd4430fa",
     "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "29b3edbe890e9b14da5bb21a060585398d90b87a83db57698df0a1fadc7f2023",
-    "docs/tasks/PREFLIGHT_SHADOW_PIN_DRIFT_V1.md": "328ecffc91c83ac897dc9d313b4e169c54c461e653fcbfae23ddc1cc6b45cd0b",
+    "docs/tasks/PREFLIGHT_SHADOW_PIN_DRIFT_V1.md": "c296b3e0fffee09c74b5302b1dadd25378d57039ee209bc91d9b3c4aef564329",
     "scripts/delivery_harness.py": "88303e36bfc8e0b4a2b1c9757401962905cef7d691467725ae98280be6a5114c",
     "scripts/owner_attention_gate.py": "e5976193d7bb9ee7adb2063fb38955cf2f0a38bea28539854d571950cb74e1fe",
     "tests/test_delivery_harness_deterministic_finish.py": "0a7737e686b80462d26d6f4e5b0a3591991bfae785af667cc63742eabe082263",
     "tests/test_delivery_harness_merge_guard.py": "7804aba59571d6e717167fa9eded5eb5d3f331484ab5a25b3a0d9b136b2a43ae",
+    "tests/test_delivery_harness_risk_routing.py": "353d4e110b4e20e8e3813bc9e76ab08702f0c59c5b3a04d1444d87eb15d2c0a6",
     "tests/test_preflight_shadow_pin_drift.py": "c98b85927053c8273f8f12e545cfd225ac168ec396dc67ad5f00444364c81321"
   },
   "active_stop_conditions": [],
@@ -36,14 +37,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_preflight_shadow_pin_drift_factory_fit_v1.json",
-    "sha256": "cad007c91adc3839f96e6072012d82eed94c9c4f9933ea209d68e9c6e464b446",
+    "sha256": "f5aef78dabaa9acd062ee72dacb238e5f8098660a09e972a13b0ce653acb654a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_tests_test_preflight_shadow_pin_drift",
     "independent_review": {
       "path": "docs/evidence/control/a1_preflight_shadow_pin_drift_review_v1.json",
-      "sha256": "de00f18cdd47921d00a0ecd4fd1893a3b94d3155c72ce1c4bc29ec85818ea001",
+      "sha256": "6cea51d3950dcc388efb2c98c3057db240048b8de3f95c18ad428f321e0a4bb6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
