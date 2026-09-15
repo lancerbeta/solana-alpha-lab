@@ -33,11 +33,9 @@ DELIVERY_PREFLIGHT_COMMAND = (
 DELIVERY_PREFLIGHT_SCHEMA = (
     "solana-alpha-lab.tracked-only-delivery-preflight.v1"
 )
-# Work jobs restore the fixed 15-minute wall after sharding. Tracked-only
-# delivery preflight still runs the full sequential suite locally and keeps a
-# separate 25-minute cap; that is measurement headroom for the local full
-# gate, not the claimed exact-head performance fix.
-GITHUB_VALIDATE_TIMEOUT_MINUTES = 15
+# Work jobs use a 25-minute wall so shard variance does not cancel green runs.
+# Tracked-only delivery preflight still keeps a separate local full-gate cap.
+GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
 GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60

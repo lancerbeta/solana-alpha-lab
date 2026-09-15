@@ -2458,6 +2458,16 @@
       "target_asset_id": "TEST-BUY-DT-QUOTE-MS-ASSOCIATION-001"
     },
     {
+      "source_asset_id": "CTRL-CI-VALIDATE-TIMEOUT-25M-001",
+      "relation": "depends_on",
+      "target_asset_id": "CI-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "CTRL-CI-VALIDATE-TIMEOUT-25M-001",
+      "relation": "depends_on",
+      "target_asset_id": "CI-WORKFLOW-001"
+    },
+    {
       "source_asset_id": "CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"

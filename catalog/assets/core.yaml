@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 21cc282d19346d03785cdb2c2f51b2f6e55ae73f1f3b943cffb31ed4bb5d57fd
+    sha256: f9f127394cc06ac66980e47d73b73f7754815f6e8bd4d53f90cb18e3ddc5262f
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: 9dd16a03a2da27aa89bb417d89241a00f0ffe8a043501820af522837ad0a7098
+    sha256: f3325b200e3a2cd527ed99091e05d490ee3ce1defe37604830ccd2c22209d583
   access:
     mode: read_only
     method: command
@@ -37203,4 +37203,23 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [HYPOTHESIS_FORGE, HFIC, SEARCH_MEMORY, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-CI-VALIDATE-TIMEOUT-25M-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract to raise GitHub validate job timeout-minutes from 15 to 25 without shard or coverage change.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-15'
+  truth_owner: CTRL_CI_VALIDATE_TIMEOUT_25M_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/CTRL_CI_VALIDATE_TIMEOUT_25M_V1.md', repository_path: docs/tasks/CTRL_CI_VALIDATE_TIMEOUT_25M_V1.md}
+  integrity: {kind: sha256, sha256: fd2aa10fd77d316d61048988452fa3cbaa65cb05af6c2b60bd11a731e6c09ab0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CI-VALIDATOR-001}
+  - {relation_type: depends_on, target_asset_id: CI-WORKFLOW-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [CI, TIMEOUT, VALIDATE, HEADROOM]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
