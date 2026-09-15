@@ -14,7 +14,7 @@
     },
     "evaluator": {
       "path": "scripts/owner_attention_gate.py",
-      "sha256": "64724347c32df4db81c652cb3908dc28055b02a59a791be3768ee01156c1c7cd"
+      "sha256": "e5976193d7bb9ee7adb2063fb38955cf2f0a38bea28539854d571950cb74e1fe"
     },
     "tests": {
       "path": "tests/test_owner_attention_gate_policy.py",

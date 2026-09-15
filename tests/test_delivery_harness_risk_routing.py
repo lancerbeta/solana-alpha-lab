@@ -367,22 +367,31 @@ class SharedEnforcementTest(unittest.TestCase):
         sys.path.insert(0, str(SCRIPTS))
         import harness_sync  # noqa: E402
 
-        # The full compute path requires the contract's evidence paths to be
-        # committed (they are the excluded inventory entries). Mid-flow local
-        # runs before the evidence commit skip; CI runs on the exact PR head
-        # where they are committed and exercise the full path.
-        committed = subprocess.run(
-            ["git", "diff", "--name-only", "--no-renames",
-             f"{self.expected_base}...{self.head}"],
-            cwd=ROOT, capture_output=True, text=True, check=True,
-        ).stdout.splitlines()
+        # Pin the compute path to the commit that last bound this contract's
+        # completion evidence. Live HEAD after a later atom includes files
+        # outside this write set and would raise BINDING_SCOPE_VIOLATION
+        # even though the shared resolver is unchanged.
         evidence_paths = set(
             self.metadata["context_requirements"]["exact_role_paths"]["DELIVERY_EVIDENCE"]
         ) if isinstance(
             self.metadata.get("context_requirements", {}).get("exact_role_paths"),
             dict,
         ) else set()
-        if not evidence_paths or not evidence_paths.issubset(set(committed)):
+        completion_path = next(iter(sorted(evidence_paths)), "")
+        originating_head = subprocess.run(
+            ["git", "log", "-1", "--format=%H", "--", completion_path],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        if not originating_head or not evidence_paths:
+            self.skipTest(
+                "evidence paths not yet committed (mid-flow before BIND EVIDENCE)"
+            )
+        committed = subprocess.run(
+            ["git", "diff", "--name-only", "--no-renames",
+             f"{self.expected_base}...{originating_head}"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout.splitlines()
+        if not evidence_paths.issubset(set(committed)):
             self.skipTest(
                 "evidence paths not yet committed (mid-flow before BIND EVIDENCE)"
             )
@@ -391,7 +400,9 @@ class SharedEnforcementTest(unittest.TestCase):
         harness_sync.ROOT = ROOT
         try:
             chain = harness_sync.compute_evidence_chain(
-                task_id=self.TASK_ID, contract=self.TASK_RELATIVE
+                task_id=self.TASK_ID,
+                contract=self.TASK_RELATIVE,
+                head=originating_head,
             )
         finally:
             harness_sync.ROOT = original_root

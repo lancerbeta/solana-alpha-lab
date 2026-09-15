@@ -430,6 +430,20 @@ def grounded_evidence(
     }
 
 
+def fixture_show_runner(root: Path):
+    """git-show double for temp fixtures that are not git repositories."""
+
+    def runner(args: list[str], cwd: Path) -> bytes:
+        if len(args) >= 3 and args[0] == "git" and args[1] == "show" and ":" in args[2]:
+            relative = args[2].split(":", 1)[1]
+            path = root / relative
+            if path.is_file():
+                return path.read_bytes()
+        raise ValueError("LIVE_READBACK_FAILED")
+
+    return runner
+
+
 def write_delivery_evidence_fixture(
     module: ModuleType,
     root: Path,
@@ -731,6 +745,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 "expected_base": BASE,
                 "head": HEAD,
                 "inventory_builder": lambda *args, **kwargs: "1" * 64,
+                "runner": fixture_show_runner(root),
             }
             self.assertTrue(
                 self.module.bound_delivery_evidence(
@@ -797,6 +812,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                     expected_base=BASE,
                     head=HEAD,
                     inventory_builder=lambda *args, **kwargs: "1" * 64,
+                    runner=fixture_show_runner(root),
                 )
                 self.assertFalse(result["factory_fit_pass"])
                 self.assertEqual(
@@ -819,6 +835,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 expected_base=BASE,
                 head=HEAD,
                 inventory_builder=lambda *args, **kwargs: "1" * 64,
+                runner=fixture_show_runner(root),
             )
             self.assertFalse(result["factory_fit_pass"])
             self.assertEqual(
@@ -858,6 +875,7 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                     expected_base=BASE,
                     head=HEAD,
                     inventory_builder=lambda *args, **kwargs: "1" * 64,
+                    runner=fixture_show_runner(root),
                 )["factory_fit_pass"]
             )
 
