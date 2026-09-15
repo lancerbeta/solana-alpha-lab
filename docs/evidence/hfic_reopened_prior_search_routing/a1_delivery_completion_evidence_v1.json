@@ -5,7 +5,7 @@
   "as_of": "2026-09-15",
   "task_id": "HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1",
   "state_change": "Reopenable Git parks commission into non-HFIC search-memory and Prompt A receives one-to-one compact prior bodies. Defective CONTROL session stays immutable.",
-  "base_main": "3d828150fef69d22845602b656bc304452c5dc8b",
+  "base_main": "5c95ad4b7d753fc04dddc43560a1485d812fa15e",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
@@ -16,16 +16,17 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "e5173c2d3d1a2cd4fb08276a17a86804ce03a6999de5f4cffe013b92bc41bcf6",
-    "catalog/assets/core.yaml": "8d083cf8f7581a118d0c9a6d9d6658e15e9b8597214a6c4ac6be98de0976a6ea",
+    "catalog/assets/core.yaml": "7bb83027f98da89d3a1fbf42a14d7711572f0dccba92bddbd42180ae7c9603a8",
     "catalog/assets/lifecycle.yaml": "f9a1cb732f21f277502e17790ed1bbf40b55df3721da783f150e90f890fc284b",
     "catalog/catalog_manifest.yaml": "69713e98dd48a0ee2905b7c146a4e2c5a5b7ebaf6d5935710343f08ef7d03ed7",
     "catalog/generated/asset_edges.json": "f8d440257713f498c7dc70d896de8469ef531a56a75f1674b3c24f2597595b24",
     "catalog/schemas/hypothesis_critic_input_v1.schema.json": "d7668c43c7d102f654abf1f4271a014b07590a89248ebb6f412efbc388caaf80",
     "docs/PROJECT_MAP.md": "ecc6df8aa77a096745a44d1170290503ac80681febb0dc560f917e04d6268acb",
     "docs/evidence/hfic_reopened_prior_search_routing/a1_active_rdp_preview_v1.json": "7fe4873a50230a80ecd17e2398e0184e8a38bdefa093e277b44b92f24fcfda0b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "bf35919fef9f1042d510496e8237f056b1cdaf9df990c9d3b4f62e1d6dd90297",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b53485c270068393ae2d1883cf3c27ccb2c2ecdb80bb046572c7e8644b734c0f",
     "docs/reports/hfic_reopened_prior_search_routing/a1_owner_readout_v1.md": "63b8cab656c5af69833cdf3b5ffada2ab93baa5cd093825bc780a67fdb5f48bf",
-    "docs/tasks/HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1.md": "53ad0c728d2e9bd25c9918492bd71953817645064fd156a9c24e7842592e07cb",
+    "docs/tasks/HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1.md": "2b4d1a5959d84ed6c7f47601464dea4716ff5067893ed46389aecb6f6180197c",
     "scripts/hypothesis_forge.py": "d8cacfc4c89e51fe8cb3df6391c864f0e6d94f0a84e0db32a1a8a7605be2039e",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "f8ac4c13889a72549e83154dcba641c5d8950afc1304cdd524f3754b203d1386",
     "src/solana_alpha_lab/factory/hfic_prior_memory.py": "04a7d5a26e4f862e0e3afb3092a3110af41d58c8b7db0ec80aa04bcc3479fa83",
@@ -56,14 +57,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_factory_fit_v1.json",
-    "sha256": "6007ea7a5d0947dbd69bde419898d6c69012c5977de2c8a318d794e65d73961c",
+    "sha256": "20b2c45b1d258367b7fb2c56c02b1414b09ddc87528d74291b4ef33e27eff956",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_REOPENED_PRIOR_ROUTING_UNIT",
     "independent_review": {
       "path": "docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_independent_review_v1.json",
-      "sha256": "277e004607ece6dc885595a6f6cf57dcc2f7cd8a2770e98db4eb18c452b4ed23",
+      "sha256": "0a9a7426e08aa43e9798c8d3e23baf8e018ff7ec3f4d0ff71e8002fb2bf2ab6e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

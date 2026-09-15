@@ -4,8 +4,8 @@
   "review_id": "HFIC-REOPENED-PRIOR-SEARCH-ROUTING-FACTORY-FIT-001",
   "as_of": "2026-09-15",
   "task_id": "HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1",
-  "reviewed_bindings_sha256": "64c0989696f6ce96660e9a42df14f44727f7b8a3b58185e1785304889afed7a0",
-  "reviewed_inventory_sha256": "3b387fe6542e57bd90ac17da1b6554fdcd97d153a1abe4f95543d96b3b87fc97",
+  "reviewed_bindings_sha256": "1e38a0a51ad4a7199104792ed3e69f8320b285394dc7d7a7ec902a9456a107e5",
+  "reviewed_inventory_sha256": "03f799eb5e8c61a67ebd3082af74403fa639e3284f9aa7e6452dc32e15a96353",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
