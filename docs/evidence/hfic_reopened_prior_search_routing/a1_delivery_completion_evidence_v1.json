@@ -34,20 +34,7 @@
     "tests/test_hfic_cli.py": "1030c2e1f20db95fbe3de53edda37cde4252a9f536f1c0762985630d7eb595d8",
     "tests/test_hfic_reopened_prior_search_routing_v1.py": "a653e7c4696c51b8be19ca304645ceedf5b01e7aa526859b0ea4d08a231efaf4"
   },
-  "active_stop_conditions": [
-    "ACTIVE_RDP_WRITE",
-    "REAL_HYPOTHESIS_FORGE_SLASH",
-    "HISTORICAL_SESSION_REWRITE",
-    "NEW_RANKER_OR_MAX_RANKED_PRIORS_CHANGE",
-    "PACKET_LIMIT_RAISE",
-    "PRIOR_MEMORY_BOUND_RAISE",
-    "NEW_DATABASE_OR_SERVICE",
-    "TRAJECTORY_CHALLENGER_EXECUTED",
-    "PROVIDER_API_RPC_WSS_REQUIRED",
-    "C2_IMPORT",
-    "H11_H13_SCIENTIFIC_VERDICT",
-    "MERGE_WITHOUT_OWNER_PHRASE"
-  ],
+  "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
     "material_owner_decision": false,
