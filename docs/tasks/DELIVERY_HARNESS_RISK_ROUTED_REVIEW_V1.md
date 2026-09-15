@@ -48,6 +48,7 @@ managed_write_set:
   - docs/evidence/control/a1_delivery_harness_risk_routed_review_completion_v1.json
   - docs/evidence/control/a1_delivery_harness_risk_routed_review_review_v1.json
   - docs/evidence/control/a1_delivery_harness_risk_routed_review_factory_fit_v1.json
+  - docs/evidence/control/delivery_harness_acceptance_v1.json
 external_caps:
   network: false
   credentials: false
