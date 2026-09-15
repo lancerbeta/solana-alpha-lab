@@ -20,7 +20,7 @@
     "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md": "e28cdc235de8f303e37e4297b71c27330aa383a0d961d322445697acfaaa3133",
     "delivery-harness/templates/portable-core/scripts/delivery_harness.py": "359e887dd670f7165b0a86db52ae373702b7408ed3f5a6c9af4f7602ae15353d",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "2c849e6ed367315fb773afa3bfbb357ad811bdda3b54f2bab841495431f48af1",
-    "docs/evidence/control/delivery_harness_acceptance_v1.json": "c605038935b5be2a6c24784032c4944cb22dfa82abe7f1261031c1b31ba2098d",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "4848dc710a5c2f5b9a4450fafc151bdd64fb5ead6ec42665fdb20656a3ce8346",
     "docs/tasks/DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1.md": "c000c53a5fc4fd225540eff23063d6c8c6636190f209800dd21c00bdf97abdab",
     "scripts/harness_sync.py": "1b8148c034b2a1cd14ce4f461e6a8183be33531c56a4f7957f7d84b3248cf02c",
     "scripts/owner_attention_gate.py": "64724347c32df4db81c652cb3908dc28055b02a59a791be3768ee01156c1c7cd",
@@ -36,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_delivery_harness_risk_routed_review_factory_fit_v1.json",
-    "sha256": "c0b592615589f0492fe2621bf20551f169e402291aabd6c49511d7c33760bc30",
+    "sha256": "8b0dab88d31ee150f1606b4d47a7925ad30095499c672fd01be0250a8d6a5cd6",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_tests_test_delivery_harness_risk_routing_26_tests",
     "independent_review": {
       "path": "docs/evidence/control/a1_delivery_harness_risk_routed_review_review_v1.json",
-      "sha256": "8273aeccbc1845f04aa7720d5ed68f9851824760bdebbb098f4f443f61d99510",
+      "sha256": "0aa974916d18583f6f43421c14961fee6dbbac69b69f858e5c8e837ee5affd5f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
