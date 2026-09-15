@@ -1,0 +1,87 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-REOPENED-PRIOR-SEARCH-ROUTING-REVIEW-001",
+  "as_of": "2026-09-15",
+  "task_id": "HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1",
+  "reviewed_bindings_sha256": "1e38a0a51ad4a7199104792ed3e69f8320b285394dc7d7a7ec902a9456a107e5",
+  "reviewed_inventory_sha256": "03f799eb5e8c61a67ebd3082af74403fa639e3284f9aa7e6452dc32e15a96353",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=04f9167f70862d7a05e2e79b30f10664049885e88483fa8a9e53c942fefbce06",
+        "HONEST_LEGACY_DEFINITION_NO_CLAIM_REMAP",
+        "EMPTY_BODY_FAIL_CLOSED",
+        "HISTORICAL_PARK_BLOCKED_DATA_PRESERVED",
+        "OPTIONAL_CRITIC_CAPSULE_KEYS_ADDITIVE",
+        "GENERIC_LEDGER_INVENTORY",
+        "DEFECTIVE_SESSION_READABLE_EXISTING_POLICY",
+        "CONTROL_FENCE_AND_C1_CORPUS_UNCHANGED"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_PRIOR_BLOCKER_CAPSULE_ADDITIONALPROPERTIES",
+        "CHECKED_COMMISSIONED_CAPSULES_VALIDATE_CRITIC_SCHEMA",
+        "CHECKED_HISTORICAL_PACKETS_STILL_VALIDATE",
+        "CHECKED_WRITE_SET",
+        "CHECKED_COMMISSION_THEN_POLICY",
+        "CHECKED_EMPTY_BODY_FAIL_CLOSED",
+        "CHECKED_NO_LIVE_RDP_WRITE",
+        "CHECKED_MAX_RANKED_PRIORS_UNCHANGED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_HONEST_LEGACY_DEFINITION",
+        "DOD_RANKED_BODY_BIJECTION_FAIL_CLOSED",
+        "DOD_H11_H13_IN_PROMPT_A_SET",
+        "DOD_CRITIC_SCHEMA_FREEZE_VALID",
+        "DOD_NO_LIVE_RDP_WRITE",
+        "STOP_NO_NEW_RANKER_TRAJECTORY_GENERATOR"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OWNER_UX_COPY_EXACT_COMMISSION_THEN_MEMORY_POLICY",
+        "OWNER_UX_BLOCKER_NEXT_ON_NOT_READY",
+        "OWNER_UX_PETR_DOES_NOT_MANAGE_RECORD_IDS",
+        "OWNER_UX_NO_LIVE_RDP_WRITE_THIS_ATOM"
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "CRITIC_CAPSULE_ADDITIONAL_PROPERTIES",
+      "observed_head": "aeb97caaca79e3c739d9666eaf8c894218d279d4",
+      "resolved_by_head": "ef3b525847cdf2e8b2b9bed95a6fe941af8fe358"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_H11_H13_SCIENTIFIC_VERDICT",
+    "NO_LIVE_RDP_WRITE",
+    "NO_GENERATOR",
+    "NO_CANONICAL_DONE"
+  ]
+}

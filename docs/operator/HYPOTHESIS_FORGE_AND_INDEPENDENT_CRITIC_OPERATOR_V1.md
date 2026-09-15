@@ -118,6 +118,46 @@ per id and `--reason OWNER_MEMORY_RESTORE`, save the nested `proposal`
 object as `proposal.json`, then apply. A→B→A restore recovers the original A
 search identity.
 
+**Legacy reopenable-prior routing (не часть `/hypothesis-forge`).** After
+`HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1` merge, one-time local commissioning
+gives Prompt A compact bodies for Git parks that are
+`visible_as_prior_work=true` and `reopen_forbidden=false` (currently H11/H13).
+This is append-only ResearchStore work, not a Git rewrite and not a new
+CONTROL slash. Preview is read-only. Apply requires `--confirm-append-only`.
+Quarantine of defective CONTROL `HFIC-SESS-8F4A703030408365` reuses existing
+memory-policy with reason `PRE_CAPABILITY_BASELINE_CALIBRATION_RESET`.
+
+Read-only CONTROL reconsideration preview:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py preview-reopened-prior-routing
+```
+
+Append-only legacy prior HYPOTHESIS_VERSION records, only after the applicable
+owner gate. Do this **before** memory-policy preview so the proposal is not
+stale against the post-commission store:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py commission-reopened-priors --confirm-append-only
+```
+
+Exact-session quarantine preview (save nested `proposal` as `proposal.json`):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py memory-policy-preview --quarantine-session HFIC-SESS-8F4A703030408365 --reason PRE_CAPABILITY_BASELINE_CALIBRATION_RESET
+```
+
+Append-only apply of that exact proposal:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py memory-policy-apply --proposal proposal.json --confirm-append-only
+```
+
+Re-run the read-only preview. Expected terminal
+`CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION`. If the terminal is
+`CONTROL_RECONSIDERATION_NOT_READY`, follow `BLOCKER_NEXT` in the JSON.
+Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
+
 ---
 
 ## 1. Простая модель

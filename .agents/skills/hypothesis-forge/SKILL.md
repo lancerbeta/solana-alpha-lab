@@ -281,6 +281,29 @@ creates a `FEAT-*` alias from a motif.
 the representation probe ran, passed, produced alpha, or changed runtime
 deployment.
 
+## Post-merge CONTROL reconsideration
+
+Not part of `/hypothesis-forge`. After merge of
+`HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1`, local append-only commissioning is:
+
+1. read-only `preview-reopened-prior-routing`;
+2. `commission-reopened-priors --confirm-append-only` after the applicable
+   owner gate;
+3. read-only `memory-policy-preview` for
+   `HFIC-SESS-8F4A703030408365` with
+   `PRE_CAPABILITY_BASELINE_CALIBRATION_RESET` (must follow commissioning so
+   the proposal binds the post-commission store head);
+4. `memory-policy-apply --proposal proposal.json --confirm-append-only`;
+5. machine readback and another `preview-reopened-prior-routing` expecting
+   `CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION` (post-apply preview
+   compares the defective session identity, not a pending overlay delta);
+6. owner `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
+
+Do not rewrite `HFIC-SESS-8F4A703030408365`. Do not invent FEAT/capability IDs.
+Ordinary Prompt A packets now carry `ranked_prior_entries` one-to-one with
+`ranked_prior_candidate_ids`; missing bodies fail closed as
+`RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE`.
+
 ## Model effort
 
 Use `SOL_XHIGH` for mechanism/PIT/estimand reasoning. Critic handoff may use the

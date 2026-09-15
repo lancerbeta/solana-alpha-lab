@@ -437,6 +437,7 @@ def rank_prior_candidate_ids(
     owner_focus: str,
     feature_hints: list[str],
     limit: int = MAX_RANKED_PRIORS,
+    payloads: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[list[str], int]:
     from solana_alpha_lab.factory.hfic_memory_policy import (
         iter_search_memory_hypothesis_payloads,
@@ -452,7 +453,12 @@ def rank_prior_candidate_ids(
         )
     scored: list[tuple[int, str]] = []
     seen: set[str] = set()
-    for payload in iter_search_memory_hypothesis_payloads(store):
+    source = (
+        payloads
+        if payloads is not None
+        else iter_search_memory_hypothesis_payloads(store)
+    )
+    for payload in source:
         hyp_id = payload.get("hypothesis_version_id")
         if not isinstance(hyp_id, str) or hyp_id in seen:
             continue
@@ -1035,6 +1041,8 @@ def build_forge_context_packet(
     stage_time: datetime | None = None,
     clock: Clock | None = None,
     evidence_surface_mode: str | None = None,
+    persist: bool = True,
+    search_payloads: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], str]:
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
     ds_trunc: dict[str, Any] = {
@@ -1136,7 +1144,29 @@ def build_forge_context_packet(
         store,
         owner_focus=owner_focus,
         feature_hints=usable_hint_ids,
+        payloads=search_payloads,
     )
+    from solana_alpha_lab.factory.hfic_reopened_prior_routing import (
+        BODY_INCOMPLETE,
+        ReopenedPriorRoutingError,
+        ranked_prior_entries_for_ids,
+    )
+
+    body_source = (
+        list(search_payloads)
+        if search_payloads is not None
+        else None
+    )
+    if body_source is None:
+        from solana_alpha_lab.factory.hfic_memory_policy import (
+            iter_search_memory_hypothesis_payloads as _iter_hv,
+        )
+
+        body_source = _iter_hv(store)
+    try:
+        ranked_prior_entries = ranked_prior_entries_for_ids(ranked, body_source)
+    except ReopenedPriorRoutingError as exc:
+        raise HficPreflightError(str(exc) or BODY_INCOMPLETE) from exc
     truth_roots = [
         "catalog/catalog_manifest.yaml",
         "configs/hypothesis_forge_independent_critic_v1.yaml",
@@ -1263,6 +1293,7 @@ def build_forge_context_packet(
         ),
         "context_warnings": warnings,
         "ranked_prior_candidate_ids": ranked,
+        "ranked_prior_entries": ranked_prior_entries,
         "truncation_receipt": {
             **truncation,
             "feature_grounding_truncated": False,
@@ -1316,26 +1347,19 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
-        packet["ranked_prior_candidate_ids"] = ranked[:3]
-        packet["prior_work_receipts"] = prior_work_receipts[:5]
-        packet["truncation_receipt"] = {
-            **packet["truncation_receipt"],
-            "truncated": True,
-            "kept_priors": min(3, len(ranked)),
-            "reason": "MAX_PACKET_BYTES",
-        }
-        encoded = canonical_json_bytes(packet)
-        if len(encoded) > MAX_PACKET_BYTES:
-            raise HficPreflightError("PACKET_SIZE_EXCEEDED")
-    digest = persist_forge_context_packet(
-        data_root,
-        packet,
-        store=store,
-        repo_root=repo_root,
-        stage_time=stage_time,
-        clock=clock,
-    )
-    verify_forge_context_packet(data_root, digest)
+        raise HficPreflightError("RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE")
+    if persist:
+        digest = persist_forge_context_packet(
+            data_root,
+            packet,
+            store=store,
+            repo_root=repo_root,
+            stage_time=stage_time,
+            clock=clock,
+        )
+        verify_forge_context_packet(data_root, digest)
+    else:
+        digest = hashlib.sha256(encoded).hexdigest()
     return packet, digest
 
 

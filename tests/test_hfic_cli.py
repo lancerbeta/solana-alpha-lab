@@ -122,6 +122,8 @@ class HficCliContractTests(unittest.TestCase):
             "memory-policy-status",
             "memory-policy-preview",
             "memory-policy-apply",
+            "preview-reopened-prior-routing",
+            "commission-reopened-priors",
         ):
             self.assertIn(command, completed.stdout)
 

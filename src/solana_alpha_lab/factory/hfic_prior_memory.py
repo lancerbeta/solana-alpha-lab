@@ -255,6 +255,15 @@ def _latest_decisions(store: Any) -> dict[str, dict[str, str]]:
     }
 
 
+def compact_prior_entry(
+    hyp_id: str,
+    payload: Mapping[str, Any],
+    decision: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Prompt-A / Critic compact capsule; one identity per ranked prior."""
+    return _capsule_from_payload(hyp_id, payload, decision)
+
+
 def _capsule_from_payload(
     hyp_id: str,
     payload: Mapping[str, Any],
@@ -286,6 +295,20 @@ def _capsule_from_payload(
         else:
             value = str(payload.get(field) or "")
         capsule[field] = value or None
+    legacy = payload.get("legacy_definition")
+    if isinstance(legacy, Mapping) and legacy:
+        compact_legacy = {
+            key: value
+            for key, value in legacy.items()
+            if value not in (None, "", [], {})
+        }
+        if compact_legacy:
+            capsule["legacy_definition"] = compact_legacy
+    provenance = payload.get("provenance")
+    if isinstance(provenance, Mapping):
+        park_status = provenance.get("park_status")
+        if isinstance(park_status, str) and park_status.strip():
+            capsule["park_status"] = park_status
     return capsule
 
 

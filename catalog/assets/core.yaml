@@ -32287,7 +32287,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: fec8f0aa120e5b7214038ba435ba3cd689cc40642bfffa1f0c40963dacf806ad}
+  integrity: {kind: sha256, sha256: d8cacfc4c89e51fe8cb3df6391c864f0e6d94f0a84e0db32a1a8a7605be2039e}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34416,7 +34416,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: a987c8e5686f8362529f3a1a3ec8b9a0895f99a78830d8dbfe1cd67900bbd6d4}
+  integrity: {kind: sha256, sha256: b53485c270068393ae2d1883cf3c27ccb2c2ecdb80bb046572c7e8644b734c0f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34434,7 +34434,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 152736209297acff0296728cc60cdbd11b77a3aa8fb330daa43f8076b6385833}
+  integrity: {kind: sha256, sha256: e5173c2d3d1a2cd4fb08276a17a86804ce03a6999de5f4cffe013b92bc41bcf6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37142,4 +37142,65 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [M1, TESTS, PARITY, DENOMINATOR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract to commission reopenable Git parks into search-memory and require Prompt A compact bodies for every ranked prior ID.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-15'
+  truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1.md', repository_path: docs/tasks/HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1.md}
+  integrity: {kind: sha256, sha256: 2b4d1a5959d84ed6c7f47601464dea4716ff5067893ed46389aecb6f6180197c}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-REOPENED-PRIOR-ROUTING-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SEARCH_MEMORY, REOPENED_PRIOR, PROMPT_A]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-FACTORY-V1-HFIC-REOPENED-PRIOR-ROUTING-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: One-time/idempotent adapter projecting reopenable Git parks into non-HFIC HYPOTHESIS_VERSION records and compact Prompt A prior bodies.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-15'
+  truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py', repository_path: src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py}
+  integrity: {kind: sha256, sha256: b119036064e5faf6426bb68f315afd0f492d4ab3d56ed59cca76167a571d92fc}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-RESEARCH-STORE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-MEMORY-POLICY-001}
+  consumers: [FACTORY-001, SCRIPT-HYPOTHESIS-FORGE-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, REOPENED_PRIOR, HYPOTHESIS_VERSION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Zero-network proofs that reopenable H11/H13 parks commission into search-memory and ranked prior IDs carry compact Prompt A bodies.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-15'
+  truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_reopened_prior_search_routing_v1.py', repository_path: tests/test_hfic_reopened_prior_search_routing_v1.py}
+  integrity: {kind: sha256, sha256: a653e7c4696c51b8be19ca304645ceedf5b01e7aa526859b0ea4d08a231efaf4}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-REOPENED-PRIOR-ROUTING-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SEARCH_MEMORY, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

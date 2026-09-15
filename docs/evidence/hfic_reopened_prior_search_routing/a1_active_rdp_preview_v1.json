@@ -1,0 +1,172 @@
+{
+  "BLOCKER_NEXT": null,
+  "C1_CORPUS_IDENTITY": {
+    "corpus_dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+    "dataset_fingerprints": [
+      "56976100b9a8569acdc43de06180d4ce938ce86fff3057f74a0f3e8e83e59ea5",
+      "713fbdc507194a955654c36788c3d1cbe766df90311b6dd493d87a96a8f1173b",
+      "aa8be9cdd34bb0a271c0cd38c864b2f245dc668a2ab872d3f2b3e079b21b6957",
+      "94a78df31a2707dec5cc8a32de429598abfd2f34bb45bc107b77ec85ee6f883c",
+      "ce824431fecf1c4fb3c492916a7ce91f8ac15cf7f23041fa5357074077ad599d"
+    ],
+    "dataset_ids": [
+      "DATASET-DISCOVERY-EVIDENCE-RELEASE-001",
+      "DATASET-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "DATASET-EARLY-MARKET-PANEL-VALUATION-WINDOW-001",
+      "DATASET-FAST-LANE-COMMISSIONING-001",
+      "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
+    ],
+    "dataset_manifest_ids": [
+      "DATASET-MANIFEST-DISCOVERY-EVIDENCE-RELEASE-001",
+      "DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001",
+      "DATASET-MANIFEST-EARLY-MARKET-PANEL-VALUATION-WINDOW-001",
+      "DATASET-MANIFEST-FAST-LANE-COMMISSIONING-001",
+      "dataset-547faaf3e34ba6a3a8749731f04b2148ae462814e359f1aaf8a21372fd16a391"
+    ]
+  },
+  "CANONICAL_BODY_RESOLUTION": "PASS",
+  "CONTROL_TRAJECTORY_BLIND_FENCE": true,
+  "CURRENT_DEFECT_SESSION": {
+    "found": true,
+    "session_id": "HFIC-SESS-8F4A703030408365",
+    "session_state": "SYNTHESIS_COMPLETE"
+  },
+  "CURRENT_ELIGIBLE_COUNT": 7,
+  "CURRENT_REOPENABLE_INVENTORY": [
+    {
+      "hypothesis_version_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+      "reopen_forbidden": false,
+      "source_receipt": "docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json",
+      "terminal": "PARK_H11_FROM_PRIORITY",
+      "visible_as_prior_work": true
+    },
+    {
+      "hypothesis_version_id": "RC001-H13-COMPOSITE-VETO",
+      "reopen_forbidden": false,
+      "source_receipt": "docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json",
+      "terminal": "PARK_H13_FROM_PRIORITY",
+      "visible_as_prior_work": true
+    }
+  ],
+  "CURRENT_SEARCH_MEMORY": {
+    "h11": false,
+    "h13": false
+  },
+  "H11_IN_PROMPT_A_SET": true,
+  "H13_IN_PROMPT_A_SET": true,
+  "MAX_PACKET_BYTES": 16384,
+  "NO_RAW_TRAJECTORY_LEAK": true,
+  "OLD_EVIDENCE_EPOCH": "237ee70916824b9616f34e8c8742fa4d59cd183ec1dbaa7b95e707afe1a9c937",
+  "OLD_MEMORY_ELIGIBILITY": "b20f834cd386ea6edf8190183c62e9a3efb10864c3ab4f6defc538c361e86b29",
+  "PLANNED_NEW_EVIDENCE_EPOCH": "81cd823d12b9fc707703e300e39f7c9f28b645e618a0edad89e3d5cdc362511b",
+  "PLANNED_NEW_MEMORY_ELIGIBILITY": "be64c8a3c5fd683dbb1aae896e498b905a7318c327a48fc4552b9c9e7f69173e",
+  "PLANNED_PREFLIGHT_ACTION": "START_NEW_SESSION",
+  "PLANNED_QUARANTINE": {
+    "existing_memory_policy_reused": true,
+    "reason": "PRE_CAPABILITY_BASELINE_CALIBRATION_RESET",
+    "session_id": "HFIC-SESS-8F4A703030408365"
+  },
+  "PLANNED_REHYDRATION": [
+    {
+      "hypothesis_version_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+      "record_id": "HV-REOPENED-BA7A88B3D16C1E8E",
+      "source_hashes": {
+        "configs/task36_rc002_h11_lifecycle_clock_screen_v1.yaml": "bd2ce1e016e8f8d48265c6651ea1f287a4868d22f195c85524db75952e5014f0",
+        "docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json": "de2fe1c1abf8bbe2f27b46ee8c23c6b1e1496d5355591a7274df2582ab4332e5"
+      }
+    },
+    {
+      "hypothesis_version_id": "RC001-H13-COMPOSITE-VETO",
+      "record_id": "HV-REOPENED-CFD724CDD5D7C983",
+      "source_hashes": {
+        "configs/task28_rc001_registry_freeze_v1.yaml": "c4fbb7157a13d1dee0f2b1f163e8f8fc1a38da4bc850275fba25bc0d70a785a7",
+        "docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json": "94b620bd3a9317c2b2f0dba6567780d62777b415ccf738b73dba40d22e12ebfd"
+      }
+    }
+  ],
+  "POST_PLAN_CONTROL_CORPUS": {
+    "gate": "OK",
+    "live_present": true,
+    "min_usable_yield_eligible": 10,
+    "yield_eligible": 148
+  },
+  "POST_PLAN_ELIGIBLE_MEMORY": 4,
+  "POST_PLAN_FORGE_CONTEXT_BYTES": 14708,
+  "POST_PLAN_FREEZE_COMPAT_SMOKE": "PASS",
+  "POST_PLAN_PRIOR_BODIES": [
+    "HYP-EARLY-TAKER-VOLUME-MIX-H900-V1",
+    "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+    "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+    "RC001-H13-COMPOSITE-VETO"
+  ],
+  "POST_PLAN_PRIOR_MEMORY_CAPACITY": "PASS",
+  "POST_PLAN_RANKING": [
+    {
+      "feature_term_hits": [
+        "mix",
+        "r0",
+        "taker",
+        "volume"
+      ],
+      "focus_term_hits": [],
+      "hypothesis_version_id": "HYP-EARLY-TAKER-VOLUME-MIX-H900-V1",
+      "score": 12
+    },
+    {
+      "feature_term_hits": [],
+      "focus_term_hits": [],
+      "hypothesis_version_id": "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+      "score": 0
+    },
+    {
+      "feature_term_hits": [],
+      "focus_term_hits": [],
+      "hypothesis_version_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+      "score": 0
+    },
+    {
+      "feature_term_hits": [],
+      "focus_term_hits": [],
+      "hypothesis_version_id": "RC001-H13-COMPOSITE-VETO",
+      "score": 0
+    }
+  ],
+  "POST_PLAN_TRUNCATION": {
+    "dropped_feature_count": 19,
+    "dropped_priors": 0,
+    "dropped_semantic_routes": [
+      "SEM-EXPERIMENT-CAPABILITIES",
+      "SEM-LIVE-EVIDENCE-TO-FORGE",
+      "SEM-MARKET-DATA-FEATURES",
+      "SEM-PRIOR-WORK",
+      "SEM-PROVIDER-ROUTES"
+    ],
+    "feature_grounding_truncated": true,
+    "kept_priors": 4,
+    "kept_semantic_routes": [],
+    "live_corpus_in_packet": true,
+    "live_corpus_protected": true,
+    "max_capabilities": 16,
+    "max_closed_families": 8,
+    "max_datasets": 8,
+    "max_feature_families": 8,
+    "max_feature_hints": 8,
+    "max_packet_bytes": 16384,
+    "max_priors": 8,
+    "reason": "MAX_PACKET_BYTES_DROP_FEATURE_GROUNDING",
+    "selection_policy": "control_protect_live_corpus_then_cap",
+    "semantic_projection_truncated": true,
+    "tie_break": "stable_id_asc",
+    "truncated": true
+  },
+  "PRIOR_MEMORY_BYTES_AFTER": 4084,
+  "PRIOR_MEMORY_COUNT_AFTER": 4,
+  "authority": {
+    "experiment_execution": 0,
+    "git_mutation": 0,
+    "provider_api_rpc_wss_calls": 0,
+    "rdp_mutation": 0
+  },
+  "blockers": [],
+  "terminal": "CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION"
+}

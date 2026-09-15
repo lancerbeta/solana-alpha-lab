@@ -278,7 +278,12 @@
               "primary_y": {"type": ["string", "null"]},
               "horizon_notional": {"type": ["string", "null"]},
               "negative_control": {"type": ["string", "null"]},
-              "cheapest_falsifier": {"type": ["string", "null"]}
+              "cheapest_falsifier": {"type": ["string", "null"]},
+              "legacy_definition": {
+                "type": ["object", "null"],
+                "additionalProperties": true
+              },
+              "park_status": {"type": ["string", "null"]}
             }
           }
         }
