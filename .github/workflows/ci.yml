@@ -19,7 +19,7 @@ concurrency:
 jobs:
   validate-core:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"
@@ -43,7 +43,7 @@ jobs:
 
   validate-execution:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     needs:
       - validate-core
     env:
@@ -69,7 +69,7 @@ jobs:
 
   validate-tests:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 25
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"

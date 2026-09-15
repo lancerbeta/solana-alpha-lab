@@ -1,0 +1,33 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "CI-VALIDATE-TIMEOUT-25M-FACTORY-FIT-001",
+  "as_of": "2026-09-15",
+  "task_id": "CTRL_CI_VALIDATE_TIMEOUT_25M_V1",
+  "reviewed_bindings_sha256": "aa23217dd1eaa14de69876b00278997f4e4805f602666a875b930eaca7c6df67",
+  "reviewed_inventory_sha256": "639c110469e97cd509d6f35ac4e2ab5bb0e51e066addc12cb5e5664cb1e6f49a",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_SHARD_REBALANCE",
+    "DOES_NOT_RESCUE_BAKED_15M_SHA"
+  ]
+}

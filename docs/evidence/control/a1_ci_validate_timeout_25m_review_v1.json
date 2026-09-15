@@ -1,0 +1,53 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "CI-VALIDATE-TIMEOUT-25M-REVIEW-001",
+  "as_of": "2026-09-15",
+  "task_id": "CTRL_CI_VALIDATE_TIMEOUT_25M_V1",
+  "reviewed_bindings_sha256": "aa23217dd1eaa14de69876b00278997f4e4805f602666a875b930eaca7c6df67",
+  "reviewed_inventory_sha256": "639c110469e97cd509d6f35ac4e2ab5bb0e51e066addc12cb5e5664cb1e6f49a",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "TIMEOUT_CONSTANT_ONLY",
+        "AGGREGATOR_REMAINS_5M",
+        "NO_SHARD_REBALANCE",
+        "NO_PRODUCT_RUNTIME_CHANGE"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "CHECKED_VALIDATE_CI_TIMEOUT_25",
+        "CHECKED_RENDERED_CI_YML_25",
+        "CHECKED_AGGREGATOR_TIMEOUT_5",
+        "CHECKED_TEST_CI_PASS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_TIMEOUT_15_TO_25",
+        "DOD_NO_SHARD_OR_COVERAGE_CHANGE",
+        "DOD_NO_RUNNER_OR_SETTINGS_CHANGE",
+        "STOP_OWNER_MERGE_GATE"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "DOES_NOT_RESCUE_BAKED_15M_SHA"
+  ]
+}
