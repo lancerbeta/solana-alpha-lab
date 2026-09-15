@@ -30,6 +30,7 @@ managed_write_set:
   - docs/evidence/control/a1_ci_validate_timeout_25m_completion_v1.json
   - docs/evidence/control/a1_ci_validate_timeout_25m_review_v1.json
   - docs/evidence/control/a1_ci_validate_timeout_25m_factory_fit_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 external_caps:
   network: false
   credentials: false

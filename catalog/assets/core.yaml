@@ -37214,7 +37214,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: CTRL_CI_VALIDATE_TIMEOUT_25M_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/CTRL_CI_VALIDATE_TIMEOUT_25M_V1.md', repository_path: docs/tasks/CTRL_CI_VALIDATE_TIMEOUT_25M_V1.md}
-  integrity: {kind: sha256, sha256: fd2aa10fd77d316d61048988452fa3cbaa65cb05af6c2b60bd11a731e6c09ab0}
+  integrity: {kind: sha256, sha256: bc8f3567595d09b5708d845dbd4af17f3bdde5d57bc99d2b87c121fb142966f6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CI-VALIDATOR-001}
