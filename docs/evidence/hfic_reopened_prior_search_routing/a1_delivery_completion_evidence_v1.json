@@ -15,7 +15,23 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "placeholder": "0000000000000000000000000000000000000000000000000000000000000000"
+    ".agents/skills/hypothesis-forge/SKILL.md": "e5173c2d3d1a2cd4fb08276a17a86804ce03a6999de5f4cffe013b92bc41bcf6",
+    "catalog/assets/core.yaml": "bd127d1c62aa265dd29dfff3ca7fce6db60a7e06b15e25f1e96f8f3828609c09",
+    "catalog/assets/lifecycle.yaml": "f9a1cb732f21f277502e17790ed1bbf40b55df3721da783f150e90f890fc284b",
+    "catalog/catalog_manifest.yaml": "69713e98dd48a0ee2905b7c146a4e2c5a5b7ebaf6d5935710343f08ef7d03ed7",
+    "catalog/generated/asset_edges.json": "f8d440257713f498c7dc70d896de8469ef531a56a75f1674b3c24f2597595b24",
+    "catalog/schemas/hypothesis_critic_input_v1.schema.json": "d7668c43c7d102f654abf1f4271a014b07590a89248ebb6f412efbc388caaf80",
+    "docs/PROJECT_MAP.md": "ecc6df8aa77a096745a44d1170290503ac80681febb0dc560f917e04d6268acb",
+    "docs/evidence/hfic_reopened_prior_search_routing/a1_active_rdp_preview_v1.json": "7fe4873a50230a80ecd17e2398e0184e8a38bdefa093e277b44b92f24fcfda0b",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b53485c270068393ae2d1883cf3c27ccb2c2ecdb80bb046572c7e8644b734c0f",
+    "docs/reports/hfic_reopened_prior_search_routing/a1_owner_readout_v1.md": "63b8cab656c5af69833cdf3b5ffada2ab93baa5cd093825bc780a67fdb5f48bf",
+    "docs/tasks/HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1.md": "323b792b5c57580d52b0be9d44a6d453d2d17b9071f5b6d3ff4bfc725fbd9359",
+    "scripts/hypothesis_forge.py": "d8cacfc4c89e51fe8cb3df6391c864f0e6d94f0a84e0db32a1a8a7605be2039e",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "f8ac4c13889a72549e83154dcba641c5d8950afc1304cdd524f3754b203d1386",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "04a7d5a26e4f862e0e3afb3092a3110af41d58c8b7db0ec80aa04bcc3479fa83",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "b119036064e5faf6426bb68f315afd0f492d4ab3d56ed59cca76167a571d92fc",
+    "tests/test_hfic_cli.py": "1030c2e1f20db95fbe3de53edda37cde4252a9f536f1c0762985630d7eb595d8",
+    "tests/test_hfic_reopened_prior_search_routing_v1.py": "a653e7c4696c51b8be19ca304645ceedf5b01e7aa526859b0ea4d08a231efaf4"
   },
   "active_stop_conditions": [
     "ACTIVE_RDP_WRITE",
@@ -40,14 +56,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "d5b8dd038ad5b2a56b3a6287439453d39ff46c32924f3304f93d00e0064a163c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_REOPENED_PRIOR_ROUTING_UNIT",
     "independent_review": {
       "path": "docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "281283915851d459947c1147a69abf108abe5897508d15730755b43b9a49698d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
