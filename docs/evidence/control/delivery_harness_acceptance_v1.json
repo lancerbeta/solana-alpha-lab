@@ -43,7 +43,7 @@
     "delivery-harness/policies/solana-alpha-lab.md": "a4692be7cf58ee7ad1d5a20f6d96a8bc8902d133e28b2a0483655e15d09b2d23",
     "delivery-harness/project-profile.yaml": "311c76061dcf41e29ac5942b9fc421076f22e10300dc9cbf976c16ecc564af02",
     "delivery-harness/templates/bootstrap-prompt.md": "0af2660e84b4f37d917832db88e5a03069fc85c3a331bc9476e24eddee171aef",
-    "delivery-harness/templates/portable-bundle-manifest.json": "11e0c8d497b1ebe196eb439dcd17135481045ca7d36c9efde5463fce21e5aaac",
+    "delivery-harness/templates/portable-bundle-manifest.json": "6df4f76143d7ee20c64f65ad6c0d95c4afb26e8479a75cd4bca081ea9871dfd2",
     "delivery-harness/templates/portable-core/AGENTS.md.tmpl": "496313a7d7efc4ca68ab0199fe0fc39493027d54b2b6aec9aa92f5ce58aa4cad",
     "delivery-harness/templates/portable-core/control/owner_attention_gate_v2.yaml": "6b915495cd20cf9bd20a4d8c7f838d1ecfb5d0e26e08e3551b1d0097d3903006",
     "delivery-harness/templates/portable-core/delivery-harness/context-map.yaml": "d37b99984d084aa19c92e56c01d47565cc9a0620ae8da845953930ad9bb7cde1",
