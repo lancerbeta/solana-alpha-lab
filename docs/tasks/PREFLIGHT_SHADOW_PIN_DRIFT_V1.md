@@ -26,6 +26,7 @@ managed_write_set:
   - tests/test_preflight_shadow_pin_drift.py
   - tests/test_delivery_harness_deterministic_finish.py
   - tests/test_delivery_harness_merge_guard.py
+  - tests/test_delivery_harness_risk_routing.py
   - AGENTS.md
   - .agents/skills/delivery-harness/SKILL.md
   - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
