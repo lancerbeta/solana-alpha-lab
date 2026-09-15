@@ -19,8 +19,8 @@
     "unresolved_safety_or_truth_conflict": false
   },
   "factory_fit": {
-    "path": "docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_completion_v1.json",
-    "sha256": "da59d4252c89ab8056e040b068fc49c018420da6d9299b104007a0e4f77045b4",
+    "path": "docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_factory_fit_v1.json",
+    "sha256": "",
     "verdict": "PASS"
   },
   "validation": {
