@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "a1_delivery_harness_risk_routed_review_v1",
+  "as_of": "2026-09-15",
+  "task_id": "DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1",
+  "state_change": "Risk-routed review enforcement: contract-frozen required_review_roles with deterministic floors resolved by one canonical effective_required_roles consumed identically by bind-evidence, preflight-push, merge-readiness and guarded-merge; OWNER_UX_CRITIC first-class; optional validated remediation_history.",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_delivery_harness_risk_routed_review_factory_fit_v1.json",
+    "sha256": "",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_tests_test_delivery_harness_risk_routing_24_tests",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_delivery_harness_risk_routed_review_review_v1.json",
+      "sha256": "",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_tests_harness_sync_bindings",
+      "PASS_tests_delivery_harness_merge_guard",
+      "PASS_tests_delivery_harness_skill",
+      "PASS_tests_delivery_harness_context",
+      "PASS_tests_delivery_harness_deterministic_finish",
+      "PASS_tests_semantic_premise_review"
+    ]
+  },
+  "non_claims": [
+    "NO_NEW_REVIEW_ORCHESTRATOR",
+    "NO_AI_RISK_CLASSIFIER",
+    "NO_REVIEWER_IDENTITY_OR_SIGNATURE_SYSTEM",
+    "NO_HISTORICAL_EVIDENCE_MIGRATION",
+    "NO_GENERIC_SCIENCE_CRITIC_PROMOTION",
+    "NO_CI_ARCHITECTURE_CHANGE",
+    "NO_OWNER_AUTHORITY_CHANGE",
+    "NO_PRODUCT_RUNTIME_CHANGE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_ALPHA",
+    "NO_REAL_MONEY"
+  ],
+  "side_effects": {
+    "repository_commits": true,
+    "github_pr": true,
+    "github_ci": true,
+    "external_provider_calls": false,
+    "wallet_or_signer_action": false,
+    "deployment": false
+  }
+}

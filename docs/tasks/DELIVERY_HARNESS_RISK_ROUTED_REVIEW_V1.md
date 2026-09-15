@@ -1,7 +1,7 @@
 ---
 task_id: DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1
 task_version: '1.0'
-status: IN_PROGRESS
+status: VALIDATED
 as_of: '2026-09-15'
 owner: lance
 allowed_routes:
@@ -33,6 +33,10 @@ managed_write_set:
   - .cursor/agents/code-reviewer.md
   - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
   - delivery-harness/templates/portable-bundle-manifest.json
+  - delivery-harness/templates/portable-core/scripts/delivery_harness.py
+  - delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md
+  - delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md
+  - delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md
   - tests/test_delivery_harness_merge_guard.py
   - tests/test_delivery_harness_context.py
   - tests/test_delivery_harness_skill.py

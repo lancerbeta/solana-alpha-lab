@@ -1,5 +1,10 @@
 # Delivery finish
 
+Independent review must carry exactly the effective required role-set
+resolved from the task contract `required_review_roles` plus deterministic
+floors (code always; architecture on control/schema/authority surfaces);
+absent field or LIVE_PR_HEAD uses the legacy triple. Machine gates require
+the exact resolved role-set through one shared resolver.
 Bind targeted evidence, run the read-only local
 `scripts/delivery_harness.py preflight-push` and require its PASS before the
 first remote push (available where the repository carries the full harness

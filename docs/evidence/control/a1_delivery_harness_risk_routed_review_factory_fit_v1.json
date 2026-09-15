@@ -1,0 +1,32 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "DELIVERY-HARNESS-RISK-ROUTED-REVIEW-FACTORY-FIT-001",
+  "as_of": "2026-09-15",
+  "task_id": "DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1",
+  "reviewed_bindings_sha256": "",
+  "reviewed_inventory_sha256": "",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS - machine enforcement now matches canonical risk-routed review semantics",
+    "flexibility_and_history": "PASS - additive schema fields, legacy triple preserved, no historical migration",
+    "context_efficiency": "PASS - one resolver, no duplicated role logic",
+    "research_truth": "PASS - no product/research behavior touched",
+    "owner_operability": "PASS - predictable role-set frozen at contract time; review-plan under-scope surfaced as NOT_READY with exact role",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS - revert restores fixed-triple enforcement; remediation_history is audit-only",
+    "build_vs_buy": "PASS - thin orchestration over existing validators, no new subsystem",
+    "security": "PASS - fail-closed resolver, no secrets, no external surfaces",
+    "red_team": "PASS - cannot weaken roles after execution; floors cannot be waived by critics; SINGLE_AGENT_FALLBACK stays merge-blocking"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "Machine enforcement only; critic quality remains process-bound",
+    "Floor surfaces are deliberately small and do not model product risk taxonomy"
+  ]
+}

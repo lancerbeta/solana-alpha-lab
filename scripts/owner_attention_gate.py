@@ -34,7 +34,11 @@ REVIEW_ROLE_UNIVERSE = frozenset(
     }
 )
 # Deliberately small deterministic floor surfaces: paths that mechanically
-# add ARCHITECTURE_CRITIC to the effective required role-set.
+# add ARCHITECTURE_CRITIC to the effective required role-set. This tuple is
+# an intentional SUBSET of harness.yaml harness_control_write_prefixes
+# (control-plane delivery eligibility); it is not derived from it, because
+# floor risk and delivery eligibility are different contracts. Keep it
+# small: it is a safety floor, not a project risk taxonomy.
 ARCHITECTURE_FLOOR_PREFIXES = (
     "catalog/schemas/",
     "control/",
@@ -555,7 +559,14 @@ def load_delivery_harness_runtime(root: Path) -> Any:
 def _task_contract_metadata(
     root: Path, receipt: dict[str, Any], *, runner=run_read
 ) -> dict[str, Any] | None:
-    """Parse the exact task contract bound to the receipt (shared truth)."""
+    """Parse the exact task contract bound to the receipt (shared truth).
+
+    Returns ``None`` only when the receipt carries no contract binding
+    (LIVE_PR_HEAD-style receipts) — the caller then applies the LEGACY_TRIPLE
+    fallback deliberately. A receipt that names a contract which cannot be
+    read or parsed raises ``ValueError`` (fail-closed) instead of silently
+    degrading the effective role-set.
+    """
 
     task = receipt.get("task")
     if not isinstance(task, dict) or not (
@@ -566,19 +577,27 @@ def _task_contract_metadata(
         module = load_delivery_harness_runtime(root)
         parser = getattr(module, "parse_task_contract", None)
         if not callable(parser):
-            return None
+            raise ValueError("CONTEXT_RUNTIME_UNAVAILABLE")
         return parser(root, task["path"], task["task_id"])
-    except (OSError, ValueError):
-        return None
+    except (OSError, ValueError) as error:
+        raise ValueError("TASK_CONTRACT_UNREADABLE") from error
 
 
 def _candidate_paths_for_roles(
     root: Path, receipt: dict[str, Any], *, runner=run_read
 ) -> "set[str] | None":
-    """Changed paths base..HEAD for deterministic architecture floors."""
+    """Changed paths base..HEAD for deterministic architecture floors.
+
+    Returns ``None`` only when the receipt carries no contract binding (same
+    condition as :func:`_task_contract_metadata`); a bound receipt whose diff
+    cannot be read raises ``ValueError`` (fail-closed) rather than silently
+    dropping the architecture floor.
+    """
 
     task = receipt.get("task")
-    if not isinstance(task, dict):
+    if not isinstance(task, dict) or not (
+        isinstance(task.get("path"), str) and isinstance(task.get("task_id"), str)
+    ):
         return None
     try:
         head = runner(
@@ -593,8 +612,8 @@ def _candidate_paths_for_roles(
             ],
             root,
         )
-    except (OSError, ValueError, UnicodeDecodeError):
-        return None
+    except (OSError, ValueError, UnicodeDecodeError) as error:
+        raise ValueError("CANDIDATE_PATHS_UNREADABLE") from error
     return {
         item.replace("\\", "/")
         for item in output.decode("utf-8", errors="strict").split("\0")
@@ -1450,13 +1469,17 @@ def bound_delivery_evidence(
         return denied
     # Risk-routed review roles: resolve the effective role-set from the exact
     # task contract plus deterministic floors over the candidate diff.
+    # Fail-closed: a bound contract/diff that cannot be read raises and denies
+    # evidence grounding rather than degrading to the legacy triple (which
+    # would silently drop contract-frozen roles and the architecture floor).
+    # An unbound receipt (no contract path) resolves to the LEGACY_TRIPLE.
     try:
+        task_metadata = _task_contract_metadata(root, receipt, runner=runner)
+        candidate_paths = _candidate_paths_for_roles(root, receipt, runner=runner)
         gate_effective_roles = effective_required_roles(
-            _task_contract_metadata(root, receipt, runner=runner),
+            task_metadata,
             live_pr_head=False,
-            candidate_paths=_candidate_paths_for_roles(
-                root, receipt, runner=runner
-            ),
+            candidate_paths=candidate_paths,
         )
     except ValueError:
         return denied

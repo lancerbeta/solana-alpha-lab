@@ -10,6 +10,7 @@ guarded-merge.
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -160,6 +161,31 @@ class EffectiveRequiredRolesTest(unittest.TestCase):
         )
         self.assertEqual(effective, set(gate.LEGACY_TRIPLE))
 
+    def test_fail_closed_bound_contract_unreadable(self) -> None:
+        # MINOR 4 remediation: a receipt that names a contract which cannot
+        # be read must raise (DENY) instead of silently degrading to the
+        # legacy triple. Absence of a binding stays LEGACY_TRIPLE.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            receipt = {
+                "task": {"task_id": "TEST", "path": "docs/tasks/missing.md"}
+            }
+            with self.assertRaisesRegex(ValueError, "TASK_CONTRACT_UNREADABLE"):
+                gate._task_contract_metadata(root, receipt)
+            with self.assertRaisesRegex(
+                ValueError, "CANDIDATE_PATHS_UNREADABLE"
+            ):
+                gate._candidate_paths_for_roles(
+                    root, {"task": {"task_id": "TEST", "path": "docs/tasks/missing.md", "sha256": "0" * 64}}
+                )
+        # No binding at all -> deliberate legacy triple, not an error.
+        self.assertEqual(
+            gate.effective_required_roles(
+                gate._task_contract_metadata(Path("."), {"task": {"task_id": "X"}})
+            ),
+            set(gate.LEGACY_TRIPLE),
+        )
+
 
 class RemediationHistoryTest(unittest.TestCase):
     @staticmethod
@@ -244,55 +270,122 @@ class RemediationHistoryTest(unittest.TestCase):
 
 
 class SharedEnforcementTest(unittest.TestCase):
-    """Acceptance 12/13: identical role resolution across gates."""
+    """Acceptance 12/13: identical role resolution across gates.
+
+    Real two-path comparison: the merge-gate path (gate resolver over the
+    receipt-bound contract metadata and candidate diff) versus the
+    bind/preflight path (harness_sync._effective_required_roles_for_task over
+    the same contract and the same base..head diff), executed on this live
+    worktree.
+    """
+
+    TASK_RELATIVE = "docs/tasks/DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1.md"
+    TASK_ID = "DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1"
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        import subprocess
+
+        cls.head = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=ROOT,
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        cls.metadata = gate.load_delivery_harness_runtime(ROOT).parse_task_contract(
+            ROOT, cls.TASK_RELATIVE, cls.TASK_ID
+        )
+        cls.expected_base = cls.metadata["git_binding"]["expected_base"]
 
     def test_12_bind_evidence_and_merge_gate_resolve_identical_set(self) -> None:
-        metadata = {"required_review_roles": ["CODE_REVIEWER", "GOAL_DOD_CRITIC"]}
-        paths = {"catalog/schemas/x.schema.json", "scripts/harness_sync.py"}
-        gate_set = gate.effective_required_roles(
-            gate._task_contract_metadata.__wrapped__
-            if hasattr(gate._task_contract_metadata, "__wrapped__")
-            else metadata,
-            live_pr_head=False,
-            candidate_paths=paths,
-        )
-        # harness_sync delegates to the same canonical resolver.
+        import subprocess
+
         sys.path.insert(0, str(SCRIPTS))
         import harness_sync  # noqa: E402
 
-        sync_set = harness_sync._effective_required_roles_for_task(
-            metadata, expected_base="0" * 40, head="1" * 40
-        ) if False else gate.effective_required_roles(
-            metadata, live_pr_head=False, candidate_paths=paths
+        # Merge-gate path: canonical resolver over contract metadata plus the
+        # candidate diff computed exactly like bound_delivery_evidence does.
+        diff_output = subprocess.run(
+            ["git", "diff", "--name-only", "--no-renames", "-z",
+             f"{self.expected_base}...{self.head}"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout
+        candidate_paths = {
+            item.replace("\\", "/") for item in diff_output.split("\0") if item
+        }
+        gate_set = gate.effective_required_roles(
+            self.metadata, live_pr_head=False, candidate_paths=candidate_paths
         )
+        # Bind/preflight path: the harness_sync wrapper over the same
+        # contract and diff, used by compute_evidence_chain.
+        original_root = harness_sync.ROOT
+        harness_sync.ROOT = ROOT
+        try:
+            sync_set = harness_sync._effective_required_roles_for_task(
+                self.metadata, expected_base=self.expected_base, head=self.head
+            )
+        finally:
+            harness_sync.ROOT = original_root
         self.assertEqual(gate_set, sync_set)
+        # The frozen contract lists the triple; the atom diff touches
+        # schema/control surfaces so the architecture floor must hold on both
+        # paths identically.
         self.assertEqual(
-            gate_set, {"CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"}
+            gate_set,
+            {"CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"},
         )
 
     def test_13_preflight_and_merge_gate_resolve_identical_set(self) -> None:
-        # Preflight delegates to harness_sync.verify_evidence_chain which
-        # resolves roles through compute_evidence_chain -> the canonical
-        # gate resolver; merge-readiness resolves through
-        # bound_delivery_evidence -> the same resolver. Both consumers
-        # therefore cannot disagree for the same candidate.
-        metadata = {"required_review_roles": ["CODE_REVIEWER"]}
-        paths = {"AGENTS.md"}
-        expected = {"CODE_REVIEWER", "ARCHITECTURE_CRITIC"}
-        self.assertEqual(
-            gate.effective_required_roles(
-                metadata, live_pr_head=False, candidate_paths=paths
-            ),
-            expected,
+        # Preflight reaches the resolver through verify_evidence_chain ->
+        # compute_evidence_chain -> _effective_required_roles_for_task; the
+        # merge gate reaches it through bound_delivery_evidence. Exercise the
+        # shared entry (compute path) for the exact receipt-bound head and
+        # compare with the gate-side resolver over the same inputs.
+        import subprocess
+
+        sys.path.insert(0, str(SCRIPTS))
+        import harness_sync  # noqa: E402
+
+        # The full compute path requires the contract's evidence paths to be
+        # committed (they are the excluded inventory entries). Mid-flow local
+        # runs before the evidence commit skip; CI runs on the exact PR head
+        # where they are committed and exercise the full path.
+        committed = subprocess.run(
+            ["git", "diff", "--name-only", "--no-renames",
+             f"{self.expected_base}...{self.head}"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout.splitlines()
+        evidence_paths = set(
+            self.metadata["context_requirements"]["exact_role_paths"]["DELIVERY_EVIDENCE"]
+        ) if isinstance(
+            self.metadata.get("context_requirements", {}).get("exact_role_paths"),
+            dict,
+        ) else set()
+        if not evidence_paths or not evidence_paths.issubset(set(committed)):
+            self.skipTest(
+                "evidence paths not yet committed (mid-flow before BIND EVIDENCE)"
+            )
+
+        original_root = harness_sync.ROOT
+        harness_sync.ROOT = ROOT
+        try:
+            chain = harness_sync.compute_evidence_chain(
+                task_id=self.TASK_ID, contract=self.TASK_RELATIVE
+            )
+        finally:
+            harness_sync.ROOT = original_root
+        preflight_roles = set(chain["effective_required_roles"])
+
+        diff_output = subprocess.run(
+            ["git", "diff", "--name-only", "--no-renames", "-z",
+             f"{self.expected_base}...{chain['head']}"],
+            cwd=ROOT, capture_output=True, text=True, check=True,
+        ).stdout
+        candidate_paths = {
+            item.replace("\\", "/") for item in diff_output.split("\0") if item
+        }
+        merge_roles = gate.effective_required_roles(
+            self.metadata, live_pr_head=False, candidate_paths=candidate_paths
         )
-        # The two harness_sync consumers used by preflight and bind use the
-        # identical code path (compute_evidence_chain).
-        self.assertEqual(
-            gate.effective_required_roles(
-                metadata, live_pr_head=False, candidate_paths=set(paths)
-            ),
-            expected,
-        )
+        self.assertEqual(preflight_roles, merge_roles)
 
     def test_20_under_scope_finding_blocks_final_closure(self) -> None:
         # A CODE_REVIEWER under-scope finding is a NOT_READY verdict on the

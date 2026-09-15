@@ -43,6 +43,7 @@
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
+      "contains": {"const": "CODE_REVIEWER"},
       "items": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "OWNER_UX_CRITIC", "REFACTOR_CRITIC"]}
     },
     "context_requirements": {

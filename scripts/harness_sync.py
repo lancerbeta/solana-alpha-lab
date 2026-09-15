@@ -1472,18 +1472,19 @@ def _load_json(path: Path) -> dict[str, Any]:
 def _effective_required_roles_for_task(
     metadata: dict[str, Any], *, expected_base: str, head: str
 ) -> set[str]:
-    """Resolve the effective review role-set via the canonical gate resolver."""
+    """Resolve the effective review role-set via the canonical gate resolver.
+
+    Fail-closed: a git read failure raises instead of silently dropping the
+    deterministic architecture floor.
+    """
 
     from owner_attention_gate import effective_required_roles
 
-    try:
-        paths = _git_nul_paths(
-            ["git", "diff", "--name-only", "--no-renames", "-z",
-             f"{expected_base}...{head}"],
-            ROOT,
-        )
-    except HarnessSyncError:
-        paths = set()
+    paths = _git_nul_paths(
+        ["git", "diff", "--name-only", "--no-renames", "-z",
+         f"{expected_base}...{head}"],
+        ROOT,
+    )
     return effective_required_roles(metadata, live_pr_head=False, candidate_paths=paths)
 
 

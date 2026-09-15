@@ -6,6 +6,13 @@ description: Use for bounded Git-native repository delivery from exact task cont
 # Delivery Harness
 
 Run `CHECK -> CONTEXT -> EXECUTE -> REVIEW -> FINISH CONTENT -> BIND EVIDENCE -> PREFLIGHT-PUSH -> PUSH/PR -> EXACT-HEAD CI -> MERGE-READINESS -> OWNER PHRASE -> GUARDED MERGE -> POST-MERGE READBACK`.
+Independent review carries exactly the effective required role-set: code
+review always; other roles frozen by the task contract
+`required_review_roles` per canonical triggers and strengthened by
+deterministic floors (architecture on control/schema/authority surfaces);
+absent field or LIVE_PR_HEAD uses the legacy triple
+CODE_REVIEWER+GOAL_DOD_CRITIC+ARCHITECTURE_CRITIC. Machine gates require
+the exact resolved role-set.
 Require one exact task contract and explicit missingness. Keep routine work
 autonomous; stop only for material authority or the exact PR/head merge gate.
 Use targeted checks during work. After bootstrap, guarded merge is the sole

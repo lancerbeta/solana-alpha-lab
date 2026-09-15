@@ -415,9 +415,23 @@ def validate_task(metadata: dict[str, Any], task_id: str) -> None:
             "allowed_routes", "expected_repository", "git_binding", "objective",
             "managed_write_set", "external_caps", "stop_conditions",
             "context_requirements",
-        },
+        }
+        | ({"required_review_roles"} if "required_review_roles" in metadata else set()),
         code,
     )
+    if "required_review_roles" in metadata and not (
+        unique_strings(metadata.get("required_review_roles"), minimum=1)
+        and set(metadata["required_review_roles"])
+        <= {
+            "CODE_REVIEWER",
+            "GOAL_DOD_CRITIC",
+            "ARCHITECTURE_CRITIC",
+            "OWNER_UX_CRITIC",
+            "REFACTOR_CRITIC",
+        }
+        and "CODE_REVIEWER" in metadata["required_review_roles"]
+    ):
+        raise ValueError(code)
     if metadata.get("task_id") != task_id:
         raise ValueError("TASK_CONTRACT_MISMATCH")
     if not (
