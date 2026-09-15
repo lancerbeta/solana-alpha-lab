@@ -11,7 +11,7 @@
     ".cursor/commands/delivery-finish.md": "aa34d4da547a7807841a2bf51d5731168af3c11d1a8abc1593aa3e0718a270bb",
     ".cursor/commands/delivery-review.md": "853f8f1ce6915ea13050b6db789486c1bef546c1b1d48b3f4b2ad5944bbb6e76",
     "AGENTS.md": "efba5b8b379ba6eb0421ae317c72a621b2193dc8c9e273646e50a766beec6264",
-    "catalog/assets/core.yaml": "e282d4098288c1202173a62408020569502e1b45b0e2fdea44ffba798e767c14",
+    "catalog/assets/core.yaml": "5d104d9eed232b8ec5e805ecce3d94f4adca13afe6effc2d64ac36121ab70a0b",
     "catalog/schemas/delivery_harness_independent_review_evidence.schema.json": "2215c42dfc99ed205f68c5ad40eafa80d6205167ebb55323e0f77546608f5178",
     "catalog/schemas/delivery_harness_task_contract.schema.json": "a23e5233f8c3193495b3aa9a7719793408a6355d870d9ff9692612ebfab1a87f",
     "delivery-harness/templates/portable-bundle-manifest.json": "6df4f76143d7ee20c64f65ad6c0d95c4afb26e8479a75cd4bca081ea9871dfd2",
@@ -21,7 +21,10 @@
     "delivery-harness/templates/portable-core/scripts/delivery_harness.py": "359e887dd670f7165b0a86db52ae373702b7408ed3f5a6c9af4f7602ae15353d",
     "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "2c849e6ed367315fb773afa3bfbb357ad811bdda3b54f2bab841495431f48af1",
     "docs/evidence/control/delivery_harness_acceptance_v1.json": "4848dc710a5c2f5b9a4450fafc151bdd64fb5ead6ec42665fdb20656a3ce8346",
-    "docs/tasks/DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1.md": "c000c53a5fc4fd225540eff23063d6c8c6636190f209800dd21c00bdf97abdab",
+    "docs/evidence/control/owner_attention_gate_acceptance_v1.json": "5074b60f0b7cfc171eb263c1ac0d820d0a6df4ecfbb38e5332940fc2c9fd1e8e",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "0ad8f3b1ac6780366dd73cff6c1e0a095d0ef4ce663d0ee5e171a9f9f77624a3",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "b38489c698063bb273686ae38d03e41f53b82e1d2985bb4f6aeede59d7175569",
+    "docs/tasks/DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1.md": "bf93351d7a8773d44327ab5941531d65615c349f945d566ead95aeaf0089ce53",
     "scripts/harness_sync.py": "1b8148c034b2a1cd14ce4f461e6a8183be33531c56a4f7957f7d84b3248cf02c",
     "scripts/owner_attention_gate.py": "64724347c32df4db81c652cb3908dc28055b02a59a791be3768ee01156c1c7cd",
     "tests/test_delivery_harness_risk_routing.py": "2d1cbe666c6e3e60f839aa4ce59016c9e9e6bd7f4c31024ccb729aa766b70477"
@@ -36,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_delivery_harness_risk_routed_review_factory_fit_v1.json",
-    "sha256": "8b0dab88d31ee150f1606b4d47a7925ad30095499c672fd01be0250a8d6a5cd6",
+    "sha256": "8681a55784b1341d34c0f1f12268c46862dec7231cca62c570d884c785c9a8e1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_tests_test_delivery_harness_risk_routing_26_tests",
     "independent_review": {
       "path": "docs/evidence/control/a1_delivery_harness_risk_routed_review_review_v1.json",
-      "sha256": "0aa974916d18583f6f43421c14961fee6dbbac69b69f858e5c8e837ee5affd5f",
+      "sha256": "a9ca15993e225610a6495f6cd89a1a0a246d49185c0c1a974d56150ab8d9eb28",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
