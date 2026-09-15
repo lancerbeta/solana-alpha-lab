@@ -255,6 +255,15 @@ def _latest_decisions(store: Any) -> dict[str, dict[str, str]]:
     }
 
 
+def compact_prior_entry(
+    hyp_id: str,
+    payload: Mapping[str, Any],
+    decision: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Prompt-A / Critic compact capsule; one identity per ranked prior."""
+    return _capsule_from_payload(hyp_id, payload, decision)
+
+
 def _capsule_from_payload(
     hyp_id: str,
     payload: Mapping[str, Any],

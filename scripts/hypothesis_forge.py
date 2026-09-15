@@ -91,6 +91,12 @@ from solana_alpha_lab.factory.hfic_memory_policy import (  # noqa: E402
     memory_policy_status,
     preview_memory_policy,
 )
+from solana_alpha_lab.factory.hfic_reopened_prior_routing import (  # noqa: E402
+    DEFECTIVE_CONTROL_SESSION_ID,
+    ReopenedPriorRoutingError,
+    commission_reopened_priors,
+    preview_control_reconsideration,
+)
 from solana_alpha_lab.factory.research_store import (  # noqa: E402
     ResearchStore,
     ResearchStoreError,
@@ -332,6 +338,44 @@ def cmd_memory_policy_apply(
         store,
         repo_root=repo_root,
         proposal=body,
+        confirm_append_only=confirm_append_only,
+    )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
+def cmd_preview_reopened_prior_routing(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+) -> int:
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    payload = preview_control_reconsideration(
+        store,
+        repo_root,
+        data_root=data_root,
+        defective_session_id=DEFECTIVE_CONTROL_SESSION_ID,
+    )
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    exit_code = 0 if payload.get("terminal") == (
+        "CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION"
+    ) else 2
+    return emit(payload, exit_code=exit_code)
+
+
+def cmd_commission_reopened_priors(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    confirm_append_only: bool,
+) -> int:
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    git_sha = repository_git_snapshot(repo_root).head_sha.lower()
+    payload = commission_reopened_priors(
+        store,
+        repo_root,
+        git_sha=git_sha,
         confirm_append_only=confirm_append_only,
     )
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
@@ -837,6 +881,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="required; appends policy only; never rewrites historical RDP bytes",
     )
     apply_cmd.add_argument("--format", choices=("json",), default="json")
+    reopen_preview = subparsers.add_parser(
+        "preview-reopened-prior-routing",
+        help="read-only CONTROL reconsideration preview after planned legacy-prior commission and exact-session quarantine",
+    )
+    reopen_preview.add_argument("--format", choices=("json",), default="json")
+    reopen_apply = subparsers.add_parser(
+        "commission-reopened-priors",
+        help="append-only legacy reopenable prior HYPOTHESIS_VERSION records; requires --confirm-append-only",
+    )
+    reopen_apply.add_argument("--format", choices=("json",), default="json")
+    reopen_apply.add_argument(
+        "--confirm-append-only",
+        action="store_true",
+        help="required; appends non-HFIC HYPOTHESIS_VERSION only; never rewrites historical RDP bytes",
+    )
     return parser
 
 
@@ -957,8 +1016,16 @@ def main(argv: list[str] | None = None) -> int:
                 proposal_path=args.proposal,
                 confirm_append_only=bool(args.confirm_append_only),
             )
+        if args.command == "preview-reopened-prior-routing":
+            return cmd_preview_reopened_prior_routing(repo_root, args.data_root)
+        if args.command == "commission-reopened-priors":
+            return cmd_commission_reopened_priors(
+                repo_root,
+                explicit_data_root=args.data_root,
+                confirm_append_only=bool(args.confirm_append_only),
+            )
         raise HficCliError(f"HFIC_COMMAND_NOT_READY:{args.command}")
-    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, HficSuppressionError, HficMemoryPolicyError, DataRootError, ResearchStoreError) as exc:
+    except (HficCliError, HficSessionError, HficPreflightError, HficProspectError, HficSuppressionError, HficMemoryPolicyError, ReopenedPriorRoutingError, DataRootError, ResearchStoreError) as exc:
         return emit_error(str(exc))
     except (OSError, ValueError, json.JSONDecodeError):
         return emit_error("HFIC_PROTOCOL_INVALID")
