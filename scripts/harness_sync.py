@@ -1469,6 +1469,24 @@ def _load_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _effective_required_roles_for_task(
+    metadata: dict[str, Any], *, expected_base: str, head: str
+) -> set[str]:
+    """Resolve the effective review role-set via the canonical gate resolver."""
+
+    from owner_attention_gate import effective_required_roles
+
+    try:
+        paths = _git_nul_paths(
+            ["git", "diff", "--name-only", "--no-renames", "-z",
+             f"{expected_base}...{head}"],
+            ROOT,
+        )
+    except HarnessSyncError:
+        paths = set()
+    return effective_required_roles(metadata, live_pr_head=False, candidate_paths=paths)
+
+
 def compute_evidence_chain(
     *,
     task_id: str,
@@ -1496,6 +1514,9 @@ def compute_evidence_chain(
         head=head,
         excluded_paths=excluded,
     )
+    effective_roles = _effective_required_roles_for_task(
+        metadata, expected_base=expected_base, head=head
+    )
     return {
         "task_id": task_id,
         "expected_base": expected_base,
@@ -1506,6 +1527,7 @@ def compute_evidence_chain(
         "implementation_bindings": bindings,
         "reviewed_bindings_sha256": bindings_sha,
         "reviewed_inventory_sha256": inventory_sha,
+        "effective_required_roles": sorted(effective_roles),
     }
 
 
@@ -1533,6 +1555,7 @@ def _delivery_evidence_merge_shape_problems(
     review: dict[str, Any],
     fit: dict[str, Any],
     task_id: str | None = None,
+    effective_roles: "set[str] | None" = None,
 ) -> list[str]:
     from owner_attention_gate import (
         delivery_factory_fit_shape_problems,
@@ -1541,7 +1564,9 @@ def _delivery_evidence_merge_shape_problems(
 
     problems: list[str] = []
     problems.extend(
-        delivery_independent_review_shape_problems(review, task_id=task_id)
+        delivery_independent_review_shape_problems(
+            review, task_id=task_id, effective_roles=effective_roles
+        )
     )
     problems.extend(delivery_factory_fit_shape_problems(fit, task_id=task_id))
     validation = completion.get("validation")
@@ -1615,6 +1640,7 @@ def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: st
             review=review,
             fit=fit,
             task_id=task_id,
+            effective_roles=set(expected["effective_required_roles"]),
         )
     )
     return problems
@@ -1711,6 +1737,7 @@ def apply_evidence_chain(*, task_id: str, contract: str | None = None, head: str
         review=review,
         fit=fit,
         task_id=task_id,
+        effective_roles=set(expected["effective_required_roles"]),
     )
     if shape_problems:
         raise HarnessSyncError(

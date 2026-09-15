@@ -3,7 +3,12 @@
 For the exact task contract and candidate fingerprint under
 `DELIVERY_HARNESS_V1`, run
 `scripts/delivery_harness.py check`, proportional Factory Fit, Product Horizon,
-capability radar, exact inventory and targeted checks. Prepare the PR/read-back.
+capability radar, exact inventory and targeted checks. Independent review must
+carry exactly the effective required role-set resolved from the task contract
+`required_review_roles` plus deterministic floors (code always; architecture
+on control/schema/authority surfaces); the shared resolver used by
+bind-evidence, preflight-push, merge-readiness and guarded-merge is the single
+truth. Prepare the PR/read-back.
 Stop once after exact-head CI **and** `--merge-readiness`
 `ready_for_owner_phrase: true` for exact PR/head owner approval; the owner never
 clicks GitHub Merge. Order:

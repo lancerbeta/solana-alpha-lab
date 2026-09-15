@@ -135,9 +135,19 @@ installation alone uses the predecessor route and one pre-PR tracked-only
 gate. A changed fingerprint invalidates evidence.
 
 Risk-route review: launch isolated read-only critics for the exact contract
-and diff (code always; goal/DoD and architecture on their triggers).
-Architecture review must name what can pass tests and still break research
-validity. `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge; the
+and diff. Code review always. Other roles are frozen by the exact task
+contract `required_review_roles` according to canonical triggers
+(goal/DoD for a new/changed outcome, architecture for
+boundaries/contracts/schemas/security/multi-component risk, owner-UX for
+owner-operable surfaces, refactor only on its measured trigger) and
+strengthened by deterministic floors (CODE_REVIEWER always; ARCHITECTURE_CRITIC
+on control/schema/authority surfaces). Contracts without the field and
+LIVE_PR_HEAD resolve to the legacy triple
+CODE_REVIEWER+GOAL_DOD_CRITIC+ARCHITECTURE_CRITIC. Machine gates
+(bind-evidence, preflight-push, merge-readiness, guarded merge) require the
+exact resolved role-set via one shared resolver. Architecture review must
+name what can pass tests and still break research validity.
+`SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge; the
 owner-attention gate denies PASS evidence that records it.
 
 Before task closure run the proportional `FACTORY_FIT_REVIEW` and

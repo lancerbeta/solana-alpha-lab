@@ -39,6 +39,12 @@
       }
     },
     "stop_conditions": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "required_review_roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "OWNER_UX_CRITIC", "REFACTOR_CRITIC"]}
+    },
     "context_requirements": {
       "type": "object", "additionalProperties": false,
       "required": ["catalog_asset_ids", "l2_roles", "l3_roles", "roadmap_path", "exact_role_paths"],

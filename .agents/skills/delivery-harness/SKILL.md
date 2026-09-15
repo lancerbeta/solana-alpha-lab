@@ -61,10 +61,20 @@ widens provider, dependency, credential, spend or install authority.
 
 ## Review
 
-Run code review for every delivery. Add goal/DoD review for a new/changed
-outcome, architecture review for boundaries/contracts/schemas/security or
-multiple components, owner-UX review when CLI/console/readouts/manual operator
-flows change, and refactor review only after correctness with measured cost.
+Run code review for every delivery. The exact required role-set is frozen by
+the task contract `required_review_roles`: add goal/DoD review for a
+new/changed outcome, architecture review for
+boundaries/contracts/schemas/security or multiple components, owner-UX review
+when CLI/console/readouts/manual operator flows change, and refactor review
+only after correctness with measured cost. Deterministic floors add
+CODE_REVIEWER always and ARCHITECTURE_CRITIC on control/schema/authority
+surfaces; contracts without the field and LIVE_PR_HEAD resolve to the legacy
+triple CODE_REVIEWER+GOAL_DOD_CRITIC+ARCHITECTURE_CRITIC. Machine gates
+require the exact resolved role-set through one shared resolver
+(`effective_required_roles`). The code reviewer returns
+`NOT_READY REVIEW_PLAN_UNDERSCOPED:<ROLE>` when a canonical trigger requires
+a role missing from the frozen plan; strengthening requires replan, never
+weakening.
 Launch critics in isolated context. Before architecture review, classify
 `scripts/semantic_premise_review_cli.py classify`. On `SEMANTIC_PREMISE`, build a
 frozen packet, run fail-closed `validate-launch`, launch the architecture critic
