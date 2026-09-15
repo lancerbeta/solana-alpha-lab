@@ -44,7 +44,16 @@ fingerprint. If a leftover space, encoded query, wrong endpoint or shape can
 still fail the atom, probe and fix it on the working path before Catalog,
 receipts, reviews or PR. Do not document a five-second mechanical miss.
 Code review is mandatory. Goal/DoD, architecture, refactor and owner-UX critics
-are trigger-routed and must run in isolated context. Launch `owner-ux-critic`
+are trigger-routed and must run in isolated context. The exact required
+role-set is frozen by the task contract `required_review_roles` and
+strengthened by deterministic floors (CODE_REVIEWER always; ARCHITECTURE_CRITIC
+on control/schema/authority surfaces); contracts without the field and
+LIVE_PR_HEAD resolve to the legacy triple
+CODE_REVIEWER+GOAL_DOD_CRITIC+ARCHITECTURE_CRITIC. Machine gates
+(bind-evidence, preflight-push, merge-readiness, guarded merge) require the
+exact resolved role-set through one shared resolver; a candidate cannot pass
+bind/preflight and later fail merge because stages interpreted roles
+differently. Launch `owner-ux-critic`
 only when the diff changes owner-operable surfaces (CLI/console entrypoints,
 manual operator flows, readouts, cockpit/workbench interaction, or owner-facing
 error/next-action copy). `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge;

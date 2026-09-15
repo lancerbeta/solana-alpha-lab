@@ -1469,6 +1469,25 @@ def _load_json(path: Path) -> dict[str, Any]:
     return payload
 
 
+def _effective_required_roles_for_task(
+    metadata: dict[str, Any], *, expected_base: str, head: str
+) -> set[str]:
+    """Resolve the effective review role-set via the canonical gate resolver.
+
+    Fail-closed: a git read failure raises instead of silently dropping the
+    deterministic architecture floor.
+    """
+
+    from owner_attention_gate import effective_required_roles
+
+    paths = _git_nul_paths(
+        ["git", "diff", "--name-only", "--no-renames", "-z",
+         f"{expected_base}...{head}"],
+        ROOT,
+    )
+    return effective_required_roles(metadata, live_pr_head=False, candidate_paths=paths)
+
+
 def compute_evidence_chain(
     *,
     task_id: str,
@@ -1496,6 +1515,9 @@ def compute_evidence_chain(
         head=head,
         excluded_paths=excluded,
     )
+    effective_roles = _effective_required_roles_for_task(
+        metadata, expected_base=expected_base, head=head
+    )
     return {
         "task_id": task_id,
         "expected_base": expected_base,
@@ -1506,6 +1528,7 @@ def compute_evidence_chain(
         "implementation_bindings": bindings,
         "reviewed_bindings_sha256": bindings_sha,
         "reviewed_inventory_sha256": inventory_sha,
+        "effective_required_roles": sorted(effective_roles),
     }
 
 
@@ -1533,6 +1556,7 @@ def _delivery_evidence_merge_shape_problems(
     review: dict[str, Any],
     fit: dict[str, Any],
     task_id: str | None = None,
+    effective_roles: "set[str] | None" = None,
 ) -> list[str]:
     from owner_attention_gate import (
         delivery_factory_fit_shape_problems,
@@ -1541,7 +1565,9 @@ def _delivery_evidence_merge_shape_problems(
 
     problems: list[str] = []
     problems.extend(
-        delivery_independent_review_shape_problems(review, task_id=task_id)
+        delivery_independent_review_shape_problems(
+            review, task_id=task_id, effective_roles=effective_roles
+        )
     )
     problems.extend(delivery_factory_fit_shape_problems(fit, task_id=task_id))
     validation = completion.get("validation")
@@ -1615,6 +1641,7 @@ def verify_evidence_chain(*, task_id: str, contract: str | None = None, head: st
             review=review,
             fit=fit,
             task_id=task_id,
+            effective_roles=set(expected["effective_required_roles"]),
         )
     )
     return problems
@@ -1682,12 +1709,30 @@ def verify_evidence_chain_internal(completion_path: str) -> list[str]:
     )
     task_id = completion.get("task_id")
     if isinstance(task_id, str) and task_id:
+        effective_roles = None
+        try:
+            # Historical audit resolves the effective role-set through the
+            # same canonical resolver (contract recovered from task_id),
+            # so a contract-frozen role-set audits identically to bind and
+            # merge gates instead of false-MISMATCHing against the triple.
+            _, contract_metadata = resolve_task_contract(task_id)
+            base = completion.get("base_main")
+            effective_roles = _effective_required_roles_for_task(
+                contract_metadata,
+                expected_base=base if isinstance(base, str) else "",
+                head=head,
+            )
+        except (HarnessSyncError, ValueError):
+            # Pre-resolver delivered tasks (no recoverable contract/diff)
+            # fall back to the shape validator's LEGACY_TRIPLE default.
+            effective_roles = None
         problems.extend(
             _delivery_evidence_merge_shape_problems(
                 completion=completion,
                 review=review,
                 fit=fit,
                 task_id=task_id,
+                effective_roles=effective_roles,
             )
         )
     else:
@@ -1711,6 +1756,7 @@ def apply_evidence_chain(*, task_id: str, contract: str | None = None, head: str
         review=review,
         fit=fit,
         task_id=task_id,
+        effective_roles=set(expected["effective_required_roles"]),
     )
     if shape_problems:
         raise HarnessSyncError(
@@ -1803,16 +1849,38 @@ def bind_evidence_main(argv: list[str]) -> int:
         print("HARNESS_SYNC_ERROR: --task-id is required", file=sys.stderr)
         return 2
     if args.verify:
-        problems = verify_evidence_chain(
+        try:
+            problems = verify_evidence_chain(
+                task_id=args.task_id, contract=args.contract, head=args.head
+            )
+        except (HarnessSyncError, ValueError) as error:
+            print(f"HARNESS_SYNC_ERROR: {error}", file=sys.stderr)
+            return 2
+        if not problems:
+            # Surface the resolved effective role-set so the operator sees
+            # which frozen roles the machine enforced for this candidate.
+            try:
+                expected = compute_evidence_chain(
+                    task_id=args.task_id, contract=args.contract, head=args.head
+                )
+                print(
+                    "HARNESS_SYNC_BIND_EVIDENCE: PASS "
+                    "effective_required_roles="
+                    + ",".join(sorted(expected["effective_required_roles"]))
+                )
+            except (HarnessSyncError, ValueError):
+                print("HARNESS_SYNC_BIND_EVIDENCE: PASS")
+            return 0
+        for problem in problems:
+            print(f"BIND_EVIDENCE_DRIFT: {problem}", file=sys.stderr)
+        return 1
+    try:
+        result = apply_evidence_chain(
             task_id=args.task_id, contract=args.contract, head=args.head
         )
-        if problems:
-            for problem in problems:
-                print(f"BIND_EVIDENCE_DRIFT: {problem}", file=sys.stderr)
-            return 1
-        print("HARNESS_SYNC_BIND_EVIDENCE: PASS")
-        return 0
-    result = apply_evidence_chain(task_id=args.task_id, contract=args.contract, head=args.head)
+    except (HarnessSyncError, ValueError) as error:
+        print(f"HARNESS_SYNC_ERROR: {error}", file=sys.stderr)
+        return 2
     print(json.dumps(result, indent=2))
     return 0
 

@@ -20,22 +20,22 @@
     {
       "path": "configs/task21_owner_pulse_read_model_v1.yaml",
       "bytes": 4760,
-      "sha256": "18010b514cc6233757de0d1187b68b4091c867f9112743fda51cb5a27a6bbed9"
+      "sha256": "f69abae794444b8d165ea87f871264fd83c1ec5d60d9a108167354c981842d7c"
     },
     {
       "path": "docs/contracts/task21_owner_pulse_read_model_contract_v1.md",
       "bytes": 5322,
-      "sha256": "a5047333a230cca7f5f73fb550edba8c90a48537efc76a98286dbea0308961e0"
+      "sha256": "f4d1eb7770004347566bc9b9ef162aeb26c0bd9f17a3625389f57bcf5febca4d"
     },
     {
       "path": "src/solana_alpha_lab/task21_owner_pulse.py",
       "bytes": 26631,
-      "sha256": "f0f47c02dda8a4112f06b61fb7a57dd04d129268aee7d7a173aa4a9fc009811a"
+      "sha256": "faa94db1c52b40e823c95134505637154af39dc613f878ef7aab339e08762823"
     },
     {
       "path": "tests/test_task21_owner_pulse.py",
       "bytes": 15406,
-      "sha256": "9c8ea049f07c3b1e8b173419ef30edccbc40c6ca89b9f6084250649fcc38e81e"
+      "sha256": "4efe09496a5a37d744ab412fedb3a12581dcff93807c92b39d351230a9ffcd7c"
     }
   ],
   "protected_inputs": [
@@ -67,7 +67,7 @@
     {
       "path": "control/active_time_gates.json",
       "bytes": 2964,
-      "sha256": "6261073a93b24edc32e1335c03a65240091b68bc016d4f271677a96706ba8942"
+      "sha256": "d66c73a25515a2be16d0923e604634c3d1243230b1e050533445c65953679522"
     },
     {
       "path": "docs/evidence/task21/observation_horizon_policy_acceptance_v1.json",
@@ -82,12 +82,12 @@
     {
       "path": "AGENTS.md",
       "bytes": 9376,
-      "sha256": "4fb3a6c1322bf35265b65aefc870c8d8f27aab1a3d7f4ee97ee86b977aafb714"
+      "sha256": "efba5b8b379ba6eb0421ae317c72a621b2193dc8c9e273646e50a766beec6264"
     },
     {
       "path": "catalog/assets/core.yaml",
       "bytes": 331062,
-      "sha256": "ecc8a0a20f3235df1f7b7b45985a2f001fc84e9eece6b50413bed2bc41cb10e4"
+      "sha256": "e282d4098288c1202173a62408020569502e1b45b0e2fdea44ffba798e767c14"
     }
   ],
   "deterministic_acceptance": {
@@ -193,5 +193,9 @@
     "exact_next_atom": "T21-A6S_BOUNDED_ADMISSION_AND_MULTI_HORIZON_CAPTURE_V1",
     "provider_or_panel_capture_authority": "NOT_GRANTED",
     "catalog_or_repository_delivery_authority": "NOT_GRANTED_BY_THIS_ATOM"
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Risk-routed review control-plane atom re-pinned stale artifact hash bindings (AGENTS.md, owner_attention_gate.py, catalog core.yaml bytes legitimately changed by this atom); no Project Source semantic role or release payload changes."
   }
 }

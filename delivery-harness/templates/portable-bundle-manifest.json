@@ -61,7 +61,7 @@
     {
       "source": "catalog/schemas/delivery_harness_task_contract.schema.json",
       "destination": "catalog/schemas/delivery_harness_task_contract.schema.json",
-      "sha256": "9be40d70cfc17364813aa4b1e3e71ec62d32057f413b94440be6eee02c3fbfdc"
+      "sha256": "a23e5233f8c3193495b3aa9a7719793408a6355d870d9ff9692612ebfab1a87f"
     },
     {
       "source": "catalog/schemas/delivery_harness_completion_evidence.schema.json",
@@ -71,7 +71,7 @@
     {
       "source": "catalog/schemas/delivery_harness_independent_review_evidence.schema.json",
       "destination": "catalog/schemas/delivery_harness_independent_review_evidence.schema.json",
-      "sha256": "f5ecbb2ead0255e98ed03a026181190651d97c1f9214234a44ea197d39c0d40f"
+      "sha256": "2215c42dfc99ed205f68c5ad40eafa80d6205167ebb55323e0f77546608f5178"
     },
     {
       "source": "catalog/schemas/owner_attention_gate_v2.schema.json",
@@ -86,12 +86,12 @@
     {
       "source": "delivery-harness/templates/portable-core/scripts/delivery_harness.py",
       "destination": "scripts/delivery_harness.py",
-      "sha256": "82fe8395015108a0bc3c2c06970cc9d88b29f6da8444f919b518955a71783738"
+      "sha256": "359e887dd670f7165b0a86db52ae373702b7408ed3f5a6c9af4f7602ae15353d"
     },
     {
       "source": "scripts/owner_attention_gate.py",
       "destination": "scripts/owner_attention_gate.py",
-      "sha256": "910a7afa07e9e53c0df0841f7c84a7e1cda5f6e971d9c60ca23dad1f0d703ce2"
+      "sha256": "64724347c32df4db81c652cb3908dc28055b02a59a791be3768ee01156c1c7cd"
     },
     {
       "source": "delivery-harness/templates/portable-core/AGENTS.md.tmpl",
@@ -101,7 +101,7 @@
     {
       "source": "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md",
       "destination": ".agents/skills/delivery-harness/SKILL.md",
-      "sha256": "9803d1c63be1c41b42daad2df0b266cd060e811375deb2875e89a5a4c2641678"
+      "sha256": "0a0bc8ab3d4b04c4809b6b0eb1b0f74a33c194b76989c1fc41b8d4b92b6be0be"
     },
     {
       "source": "delivery-harness/templates/portable-core/dot-cursor/rules/00-authority.mdc",
@@ -126,12 +126,12 @@
     {
       "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-review.md",
       "destination": ".cursor/commands/delivery-review.md",
-      "sha256": "f201246efe7cf15da45ed82c4dcc0c4f24468b053c09df6d4c10bda5a2a02d5f"
+      "sha256": "e28cdc235de8f303e37e4297b71c27330aa383a0d961d322445697acfaaa3133"
     },
     {
       "source": "delivery-harness/templates/portable-core/dot-cursor/commands/delivery-finish.md",
       "destination": ".cursor/commands/delivery-finish.md",
-      "sha256": "07bfd251340082dfc5f431ef325a1969bde4509a094e2e107f15aa48e930b00f"
+      "sha256": "81f0652e2e3a2ca5a43e14135b050ed3d3ba69ebfaa5c366dcede57bb20188c0"
     }
   ]
 }

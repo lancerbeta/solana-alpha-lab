@@ -20,11 +20,38 @@ DEFAULT_POLICY = ROOT / "control" / "owner_attention_gate_v2.yaml"
 PROJECT_PROFILE = ROOT / "delivery-harness" / "project-profile.yaml"
 REQUEST_SCHEMA = "smial.owner-attention-request"
 REQUEST_VERSION = "1.0"
-REQUIRED_REVIEW_ROLES = {
-    "CODE_REVIEWER",
-    "GOAL_DOD_CRITIC",
-    "ARCHITECTURE_CRITIC",
-}
+# Canonical risk-routed review roles. LEGACY_TRIPLE is the compatibility
+# default for task contracts without explicit required_review_roles and for
+# every LIVE_PR_HEAD receipt.
+LEGACY_TRIPLE = frozenset({"CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"})
+REVIEW_ROLE_UNIVERSE = frozenset(
+    {
+        "CODE_REVIEWER",
+        "GOAL_DOD_CRITIC",
+        "ARCHITECTURE_CRITIC",
+        "OWNER_UX_CRITIC",
+        "REFACTOR_CRITIC",
+    }
+)
+# Deliberately small deterministic floor surfaces: paths that mechanically
+# add ARCHITECTURE_CRITIC to the effective required role-set. This tuple is
+# an intentional SUBSET of harness.yaml harness_control_write_prefixes
+# (control-plane delivery eligibility); it is not derived from it, because
+# floor risk and delivery eligibility are different contracts. Keep it
+# small: it is a safety floor, not a project risk taxonomy.
+ARCHITECTURE_FLOOR_PREFIXES = (
+    "catalog/schemas/",
+    "control/",
+    "delivery-harness/",
+    "AGENTS.md",
+    ".cursor/rules/",
+    ".cursor/agents/",
+    ".agents/skills/delivery-harness/",
+    "scripts/owner_attention_gate.py",
+    "scripts/delivery_harness.py",
+    "scripts/harness_sync.py",
+)
+REQUIRED_REVIEW_ROLES = LEGACY_TRIPLE
 REQUIRED_COMPLETION_EVIDENCE_KEYS = {
     "schema",
     "schema_version",
@@ -226,6 +253,8 @@ EXPECTED_FACTORY_FIT_DIMENSIONS = frozenset(
     }
 )
 ALLOWED_FACTORY_FIT_MODES = frozenset({"FAST_PATH", "FULL_REVIEW"})
+# Optional independent-review evidence keys (additive, schema_version stays 1.0).
+OPTIONAL_REVIEW_KEYS = frozenset({"remediation_history"})
 INDEPENDENT_REVIEW_KEYS = frozenset(
     {
         "schema",
@@ -237,23 +266,85 @@ INDEPENDENT_REVIEW_KEYS = frozenset(
         "reviewed_inventory_sha256",
         "required_roles",
         "reviews",
+        "remediation_history",
         "verdict",
         "non_claims",
     }
 )
 
 
+def effective_required_roles(
+    task_metadata: dict[str, Any] | None,
+    *,
+    live_pr_head: bool = False,
+    candidate_paths: "set[str] | None" = None,
+) -> set[str]:
+    """Canonical resolver for the effective required review role-set.
+
+    Priority: explicit task-contract required_review_roles, strengthened by
+    deterministic safety floors (CODE_REVIEWER always; ARCHITECTURE_CRITIC on
+    control/schema/authority surfaces). Contracts without the field and every
+    LIVE_PR_HEAD receipt resolve to LEGACY_TRIPLE. One truth owner consumed
+    by bind-evidence, preflight-push, merge-readiness and guarded-merge.
+    """
+
+    explicit = None
+    if task_metadata is not None and not live_pr_head:
+        explicit = task_metadata.get("required_review_roles")
+    if explicit is None:
+        effective = set(LEGACY_TRIPLE)
+    elif (
+        not isinstance(explicit, list)
+        or not explicit
+        or not all(isinstance(item, str) for item in explicit)
+        or len(set(explicit)) != len(explicit)
+        or not set(explicit) <= REVIEW_ROLE_UNIVERSE
+        or "CODE_REVIEWER" not in explicit
+    ):
+        raise ValueError("REQUIRED_REVIEW_ROLES_INVALID")
+    else:
+        effective = set(explicit)
+    effective.add("CODE_REVIEWER")
+    if candidate_paths:
+        for path in candidate_paths:
+            normalized = str(path).replace("\\", "/")
+            for prefix in ARCHITECTURE_FLOOR_PREFIXES:
+                # Exact equality for file entries (AGENTS.md), directory
+                # prefix semantics only for trailing-slash entries
+                # (catalog/schemas/). Prevents AGENTS.md.bak-style
+                # over-matching while never under-matching directories.
+                if prefix.endswith("/"):
+                    matched = normalized.startswith(prefix)
+                else:
+                    matched = normalized == prefix or normalized.startswith(
+                        prefix + "/"
+                    )
+                if matched:
+                    effective.add("ARCHITECTURE_CRITIC")
+                    break
+    if not effective or not effective <= REVIEW_ROLE_UNIVERSE:
+        raise ValueError("REQUIRED_REVIEW_ROLES_INVALID")
+    return effective
+
+
 def delivery_independent_review_shape_problems(
     review: dict[str, Any],
     *,
     task_id: str | None = None,
+    effective_roles: "set[str] | frozenset[str] | None" = None,
 ) -> list[str]:
     """Structural checks shared by merge-readiness and bind-evidence."""
 
+    expected_roles = (
+        LEGACY_TRIPLE
+        if effective_roles is None
+        else frozenset(effective_roles)
+    )
     problems: list[str] = []
-    if set(review) != INDEPENDENT_REVIEW_KEYS:
+    required_review_keys = INDEPENDENT_REVIEW_KEYS - OPTIONAL_REVIEW_KEYS
+    if set(review) - INDEPENDENT_REVIEW_KEYS or required_review_keys - set(review):
         extra = sorted(set(review) - INDEPENDENT_REVIEW_KEYS)
-        missing = sorted(INDEPENDENT_REVIEW_KEYS - set(review))
+        missing = sorted(required_review_keys - set(review))
         if extra:
             problems.append("review_unexpected_keys:" + ",".join(extra))
         if missing:
@@ -278,10 +369,38 @@ def delivery_independent_review_shape_problems(
         isinstance(item, str) for item in required_roles
     ):
         problems.append("review_required_roles_invalid")
-    elif set(required_roles) != REQUIRED_REVIEW_ROLES or len(required_roles) != len(
-        REQUIRED_REVIEW_ROLES
+    elif set(required_roles) != expected_roles or len(required_roles) != len(
+        expected_roles
     ):
         problems.append("review_required_roles_incomplete")
+    remediation_history = review.get("remediation_history")
+    if remediation_history is not None:
+        valid = isinstance(remediation_history, list) and all(
+            isinstance(entry, dict)
+            and set(entry)
+            == {
+                "role",
+                "prior_verdict",
+                "severity",
+                "finding",
+                "observed_head",
+                "resolved_by_head",
+            }
+            and entry.get("role") in expected_roles
+            and entry.get("prior_verdict") == "NOT_READY"
+            and entry.get("severity") in {"BLOCKER", "MAJOR", "MINOR"}
+            and isinstance(entry.get("finding"), str)
+            and bool(entry["finding"])
+            and isinstance(entry.get("observed_head"), str)
+            and re.fullmatch(r"[0-9a-f]{40}", entry["observed_head"]) is not None
+            and isinstance(entry.get("resolved_by_head"), str)
+            and re.fullmatch(r"[0-9a-f]{40}", entry["resolved_by_head"]) is not None
+            for entry in remediation_history
+        )
+        if not valid or len(
+            {json.dumps(entry, sort_keys=True) for entry in remediation_history or []}
+        ) != len(remediation_history or []):
+            problems.append("review_remediation_history_invalid")
     non_claims = review.get("non_claims")
     if not isinstance(non_claims, list) or not all(
         isinstance(item, str) and bool(item) for item in non_claims
@@ -309,13 +428,13 @@ def delivery_independent_review_shape_problems(
             problems.append("review_entry_fields_invalid")
             continue
         reviews_by_role.setdefault(item["role"], []).append(item)
-    if set(reviews_by_role) != REQUIRED_REVIEW_ROLES:
+    if set(reviews_by_role) != expected_roles:
         problems.append("review_roles_incomplete")
-    elif len(reviews) != len(REQUIRED_REVIEW_ROLES):
+    elif len(reviews) != len(expected_roles):
         problems.append("review_role_count_invalid")
     elif any(
         len(reviews_by_role[role]) != 1 or reviews_by_role[role][0]["verdict"] != "PASS"
-        for role in REQUIRED_REVIEW_ROLES
+        for role in expected_roles
     ):
         problems.append("review_role_verdict_not_pass")
     if review_records_single_agent_fallback(review):
@@ -445,6 +564,79 @@ def load_delivery_harness_runtime(root: Path) -> Any:
     except (OSError, ImportError, ValueError):
         raise ValueError("CONTEXT_RUNTIME_UNAVAILABLE") from None
     return module
+
+
+def _task_contract_metadata(
+    root: Path, receipt: dict[str, Any], *, runner=run_read
+) -> dict[str, Any] | None:
+    """Parse the exact task contract bound to the receipt (shared truth).
+
+    Returns ``None`` only when the receipt carries no contract binding
+    (LIVE_PR_HEAD-style receipts) — the caller then applies the LEGACY_TRIPLE
+    fallback deliberately. A receipt that names a contract which cannot be
+    read or parsed raises ``ValueError`` (fail-closed) instead of silently
+    degrading the effective role-set.
+    """
+
+    task = receipt.get("task")
+    if not isinstance(task, dict) or not (
+        isinstance(task.get("path"), str) and isinstance(task.get("task_id"), str)
+    ):
+        return None
+    try:
+        module = load_delivery_harness_runtime(root)
+        parser = getattr(module, "parse_task_contract", None)
+        if not callable(parser):
+            raise ValueError("CONTEXT_RUNTIME_UNAVAILABLE")
+        return parser(root, task["path"], task["task_id"])
+    except (OSError, ValueError) as error:
+        raise ValueError("TASK_CONTRACT_UNREADABLE") from error
+
+
+def _candidate_paths_for_roles(
+    root: Path,
+    receipt: dict[str, Any],
+    *,
+    runner=run_read,
+    head: str | None = None,
+) -> "set[str] | None":
+    """Changed paths base..HEAD for deterministic architecture floors.
+
+    Returns ``None`` only when the receipt carries no contract binding (same
+    condition as :func:`_task_contract_metadata`); a bound receipt whose diff
+    cannot be read raises ``ValueError`` (fail-closed) rather than silently
+    dropping the architecture floor. ``head`` derives the floor from the same
+    argument the caller binds evidence to; it falls back to ``rev-parse HEAD``
+    only when unset.
+    """
+
+    task = receipt.get("task")
+    if not isinstance(task, dict) or not (
+        isinstance(task.get("path"), str) and isinstance(task.get("task_id"), str)
+    ):
+        return None
+    try:
+        if head is None:
+            head = runner(
+                ["git", "rev-parse", "HEAD"], root
+            ).decode("ascii", errors="strict").strip()
+        scope = task_delivery_scope(root, receipt, runner=runner)
+        expected_base = scope[0]
+        output = runner(
+            [
+                "git", "diff", "--name-only", "--no-renames", "-z",
+                f"{expected_base}...{head}",
+            ],
+            root,
+        )
+        decoded = output.decode("utf-8", errors="strict")
+    except (OSError, ValueError, UnicodeDecodeError) as error:
+        raise ValueError("CANDIDATE_PATHS_UNREADABLE") from error
+    return {
+        item.replace("\\", "/")
+        for item in decoded.split("\0")
+        if item
+    }
 
 
 def safe_repo_path(value: str, *, allow_prefix: bool = False) -> str:
@@ -1293,6 +1485,24 @@ def bound_delivery_evidence(
     task = receipt.get("task")
     if not isinstance(task, dict):
         return denied
+    # Risk-routed review roles: resolve the effective role-set from the exact
+    # task contract plus deterministic floors over the candidate diff.
+    # Fail-closed: a bound contract/diff that cannot be read raises and denies
+    # evidence grounding rather than degrading to the legacy triple (which
+    # would silently drop contract-frozen roles and the architecture floor).
+    # An unbound receipt (no contract path) resolves to the LEGACY_TRIPLE.
+    try:
+        task_metadata = _task_contract_metadata(root, receipt, runner=runner)
+        candidate_paths = _candidate_paths_for_roles(
+            root, receipt, runner=runner, head=head
+        )
+        gate_effective_roles = effective_required_roles(
+            task_metadata,
+            live_pr_head=False,
+            candidate_paths=candidate_paths,
+        )
+    except ValueError:
+        return denied
     completion_paths: list[str] = []
     for selected in receipt.get("selected", []):
         if not isinstance(selected, dict) or selected.get("semantic_role") != "DELIVERY_EVIDENCE":
@@ -1472,7 +1682,7 @@ def bound_delivery_evidence(
         except ValueError:
             continue
         if delivery_independent_review_shape_problems(
-            review, task_id=task.get("task_id")
+            review, task_id=task.get("task_id"), effective_roles=gate_effective_roles
         ) or not (
             review.get("reviewed_bindings_sha256")
             == sha256_bytes(canonical_json_bytes(bindings))

@@ -19,7 +19,7 @@
     "reviewed_inventory_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "required_roles": {
       "type": "array", "minItems": 1, "uniqueItems": true,
-      "items": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "REFACTOR_CRITIC"]}
+      "items": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "OWNER_UX_CRITIC", "REFACTOR_CRITIC"]}
     },
     "reviews": {
       "type": "array", "minItems": 1,
@@ -27,9 +27,24 @@
         "type": "object", "additionalProperties": false,
         "required": ["role", "verdict", "findings"],
         "properties": {
-          "role": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "REFACTOR_CRITIC"]},
+          "role": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "OWNER_UX_CRITIC", "REFACTOR_CRITIC"]},
           "verdict": {"enum": ["PASS", "NOT_READY"]},
           "findings": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "remediation_history": {
+      "type": "array", "uniqueItems": true,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["role", "prior_verdict", "severity", "finding", "observed_head", "resolved_by_head"],
+        "properties": {
+          "role": {"enum": ["CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC", "OWNER_UX_CRITIC", "REFACTOR_CRITIC"]},
+          "prior_verdict": {"const": "NOT_READY"},
+          "severity": {"enum": ["BLOCKER", "MAJOR", "MINOR"]},
+          "finding": {"type": "string", "minLength": 1},
+          "observed_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+          "resolved_by_head": {"type": "string", "pattern": "^[0-9a-f]{40}$"}
         }
       }
     },

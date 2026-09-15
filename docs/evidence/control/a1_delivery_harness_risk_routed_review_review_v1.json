@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "a1_delivery_harness_risk_routed_review_v1",
+  "as_of": "2026-09-15",
+  "task_id": "DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1",
+  "reviewed_bindings_sha256": "91864ecb52f58d96ee92b7aa1fc41b1a743f009901ee57631224e759a1931640",
+  "reviewed_inventory_sha256": "90920f34c2175d06fc24d245db109a55cc7a71d068049da5bc5834f463a0b08b",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "Initial NOT_READY (b99a5e0f): 3 MAJOR + 5 MINOR/INFO findings including fail-open role resolution on both merge-gate and bind sides, vacuous acceptance test_12, portable template divergence and pin drift.",
+        "Remediated in 4322027c + f9613c45: fail-closed TASK_CONTRACT_UNREADABLE/CANDIDATE_PATHS_UNREADABLE denies, unswallowed git failures in harness_sync, real two-path shared-resolver tests, resolver-backed historical audit (153 chains re-verified, no new problem classes), exact-match floor prefixes, wrapped bind CLI with effective_required_roles readout, head= plumbing, byte-exact manifest/catalog pins (25 entries re-hashed).",
+        "Re-review on f9613c45: PASS. Acceptance suite 26/26 zero skips; 115 neighbor tests OK. Residual INFO A (decode label) fixed post-verdict; INFO B (double compute on CLI PASS path) accepted as harmless."
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Initial NOT_READY (b99a5e0f): BLOCKER on vacuous acceptance 12/13 (if False else dead branch), MAJOR on dogfood gap and LIVE_PR_HEAD triple only flag-level, MINORs on schema contains, test_20 duplication, CLI role-set visibility.",
+        "Remediated: real two-path acceptance tests over live worktree (26/26, zero skips; test_13 executed full compute_evidence_chain path), portable write-set gap found and fixed, staged-dogfood proven fail-closed (placeholder hashes deny until bind --apply), test_20 proves frozen-plan denial -> strengthened-plan denial -> clean pass, schema contains CODE_REVIEWER, CLI prints effective_required_roles.",
+        "Re-review verdict PASS; residuals R1 (LIVE_PR_HEAD flag documented, no live consumer at enforcement site) and R2 (historical audit triple fallback) accepted as non-blocking; R4 test-count label corrected."
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "Initial NOT_READY (b99a5e0f, SEMANTIC_PREMISE packet a167c188): MAJOR on portable-core internal inconsistency (validator rejecting schema-valid required_review_roles), MINORs on fail-open degradation, schema/resolver disagreement, undocumented floor-prefix authority relation, weak acceptance 12/13.",
+        "Remediated: portable validate_task accepts optional field rule-identical to canonical schema; fail-closed resolver inputs; documented deliberate-subset relation of ARCHITECTURE_FLOOR_PREFIXES to harness_control_write_prefixes (derivation judged the wrong fix); real two-path acceptance tests; all 26 manifest pins and catalog pins independently re-verified.",
+        "Re-review verdict PASS: all four frozen semantic claims (resolver-single-truth, contract-frozen-roles, deterministic-floors, exact-role-set-evidence) hold on HEAD; only fail-closed divergence directions remain; residuals R2-1 (historical audit false-MISMATCH on deleted contract, fail-closed noise only) and R2-2 (typo, fixed) non-blocking."
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Fail-open role resolution both sides + vacuous test_12 + portable divergence/pin drift; remediated via fail-closed denies, real two-path tests, portable convergence, LF-normalized pins",
+      "observed_head": "b99a5e0f42bc24d69bf43b4377cda0c1887a2ea1",
+      "resolved_by_head": "f9613c454252f87c36aa441db2e7bf13a4d53379"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Acceptance 12/13 vacuous (dead branch); remediated with real two-path resolver equality tests over the live worktree plus branch-state-tolerant skip guard",
+      "observed_head": "b99a5e0f42bc24d69bf43b4377cda0c1887a2ea1",
+      "resolved_by_head": "4322027cfa3fe715eb3d82c123e61de951365de1"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Portable-core distribution internally inconsistent with new canonical schema; remediated via optional-field portable validation + doc convergence + pin recomputation",
+      "observed_head": "b99a5e0f42bc24d69bf43b4377cda0c1887a2ea1",
+      "resolved_by_head": "4322027cfa3fe715eb3d82c123e61de951365de1"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+  ]
+}

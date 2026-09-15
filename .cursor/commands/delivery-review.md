@@ -1,10 +1,18 @@
 # Delivery review
 
 For the exact task contract and exact diff, verify `DELIVERY_HARNESS_V1` with
-`scripts/delivery_harness.py check`. Launch isolated critics: code review always;
-add goal/DoD, architecture or refactor critics on their triggers. If isolated
-critics cannot run, record `SINGLE_AGENT_REVIEW_FALLBACK` with verdict
-`NOT_READY`. Merge denies fallback. Apply the same deterministic gates.
+`scripts/delivery_harness.py check`. Launch isolated critics: code review
+always; the remaining roles are frozen by the task contract
+`required_review_roles` according to canonical triggers (goal/DoD for a
+new/changed outcome, architecture on boundaries/contracts/schemas/security
+risk, owner-UX on owner-operable surfaces, refactor on its measured trigger)
+and strengthened by deterministic floors (ARCHITECTURE_CRITIC on
+control/schema/authority surfaces). Contracts without the field and
+LIVE_PR_HEAD use the legacy triple CODE_REVIEWER+GOAL_DOD_CRITIC+
+ARCHITECTURE_CRITIC. Machine gates require the exact resolved role-set via
+one shared resolver. If isolated critics cannot run, record
+`SINGLE_AGENT_REVIEW_FALLBACK` with verdict `NOT_READY`. Merge denies
+fallback. Apply the same deterministic gates.
 
 Before launching the architecture critic, classify the review profile:
 
