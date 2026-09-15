@@ -95,7 +95,8 @@ context_requirements:
   exact_role_paths:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
-    ARCHITECTURE_DECISIONS: []
+    ARCHITECTURE_DECISIONS:
+      - catalog/schemas/hypothesis_critic_input_v1.schema.json
     DELIVERY_EVIDENCE:
       - docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_completion_evidence_v1.json
       - docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_independent_review_v1.json
