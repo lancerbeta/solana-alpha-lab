@@ -13620,7 +13620,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: TASK-30
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json', repository_path: docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 6ec47c46e6333de97dd77e0de6902c644eabd63498896ee9cf1459e66f32b125}
+  integrity: {kind: sha256, sha256: b38489c698063bb273686ae38d03e41f53b82e1d2985bb4f6aeede59d7175569}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: derived_from, target_asset_id: CONFIG-PROVIDER-ROUTE-CAPABILITY-REGISTRY-004}
@@ -16381,7 +16381,7 @@ records:
   as_of: '2026-08-08'
   truth_owner: CTRL-OWNER-ATTENTION-GATE
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/control/owner_attention_gate_acceptance_v1.json', repository_path: docs/evidence/control/owner_attention_gate_acceptance_v1.json}
-  integrity: {kind: sha256, sha256: 890ebfa4b4ae5e0de1b7db4831a3cf824ad5f9348bb287a01e599af5f736556a}
+  integrity: {kind: sha256, sha256: 5074b60f0b7cfc171eb263c1ac0d820d0a6df4ecfbb38e5332940fc2c9fd1e8e}
   access: *t25_read_file
   relations:
   - {relation_type: derived_from, target_asset_id: POLICY-OWNER-ATTENTION-GATE-001}

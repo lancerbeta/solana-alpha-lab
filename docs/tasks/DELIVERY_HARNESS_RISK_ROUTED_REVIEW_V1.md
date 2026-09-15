@@ -49,6 +49,9 @@ managed_write_set:
   - docs/evidence/control/a1_delivery_harness_risk_routed_review_review_v1.json
   - docs/evidence/control/a1_delivery_harness_risk_routed_review_factory_fit_v1.json
   - docs/evidence/control/delivery_harness_acceptance_v1.json
+  - docs/evidence/control/owner_attention_gate_acceptance_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
+  - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 external_caps:
   network: false
   credentials: false

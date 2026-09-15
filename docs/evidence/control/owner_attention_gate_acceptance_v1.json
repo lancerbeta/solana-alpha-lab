@@ -14,11 +14,11 @@
     },
     "evaluator": {
       "path": "scripts/owner_attention_gate.py",
-      "sha256": "f047fcb0186db68533211f0a3c4d5cb770204592856b11ec9cc6d44152131820"
+      "sha256": "64724347c32df4db81c652cb3908dc28055b02a59a791be3768ee01156c1c7cd"
     },
     "tests": {
       "path": "tests/test_owner_attention_gate_policy.py",
-      "sha256": "254a274bc92399bb8d4871bd48c11a96b33cfc1010f0b4a7307ad73359885c62"
+      "sha256": "1aa4bc944f1b8ca896ecf0752c795043ca054718fca6c8e4b0a64b6dcc90a9e9"
     },
     "project_instruction_candidate": {
       "path": "docs/agent/PROJECT_INSTRUCTION_V3_4.md",
