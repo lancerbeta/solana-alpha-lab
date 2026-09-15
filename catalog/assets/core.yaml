@@ -37153,7 +37153,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1.md', repository_path: docs/tasks/HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1.md}
-  integrity: {kind: sha256, sha256: 5078ae201c4f0f31d43f7e364c7d788083f6f1384686638f87998ac6de377714}
+  integrity: {kind: sha256, sha256: 323b792b5c57580d52b0be9d44a6d453d2d17b9071f5b6d3ff4bfc725fbd9359}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

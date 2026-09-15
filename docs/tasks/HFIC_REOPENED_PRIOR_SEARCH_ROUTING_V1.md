@@ -100,8 +100,8 @@ context_requirements:
       - docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_completion_evidence_v1.json
       - docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_independent_review_v1.json
       - docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_factory_fit_v1.json
+    HISTORICAL_CONTEXT:
       - docs/evidence/hfic_reopened_prior_search_routing/a1_active_rdp_preview_v1.json
-    HISTORICAL_CONTEXT: []
 ---
 
 # HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1

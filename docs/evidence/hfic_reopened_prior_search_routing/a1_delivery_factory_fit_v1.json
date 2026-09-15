@@ -1,0 +1,38 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-REOPENED-PRIOR-SEARCH-ROUTING-FACTORY-FIT-001",
+  "as_of": "2026-09-15",
+  "task_id": "HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_REOPENABLE_PRIORS_REACH_PROMPT_A",
+    "flexibility_and_history": "PASS_DEFECTIVE_SESSION_IMMUTABLE",
+    "context_efficiency": "PASS_ONE_ADAPTER_NO_MEMORY_PLATFORM",
+    "research_truth": "PASS_UNKNOWN_AND_HISTORICAL_BLOCKERS_PRESERVED",
+    "owner_operability": "PASS_PREVIEW_COMMISSION_POLICY_COPY_EXACT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_CONTROL",
+    "monitoring_and_recovery": "PASS_EXISTING_MEMORY_POLICY_ROLLBACK",
+    "build_vs_buy": "PASS_ADOPT_RESEARCHSTORE_AND_HFIC_POLICY",
+    "security": "PASS_NO_SECRETS_NO_PROVIDER_NO_LIVE_RDP",
+    "red_team": "PASS_ID_ONLY_PRIOR_FAIL_CLOSED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "CORRECTED_CONTROL_AFTER_LOCAL_COMMISSION"
+  },
+  "recovery": "DO_NOT_REWRITE_HISTORY. SUPERSEDE COMMISSIONED HV OR RESTORE MEMORY POLICY. REVERT BRANCH IF CODE IS WRONG.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_GENERATOR",
+    "NO_LIVE_CONTROL",
+    "NO_ACTIVE_RDP_WRITE",
+    "NO_H11_H13_SCIENTIFIC_VERDICT",
+    "NO_TRAJECTORY_CHALLENGER",
+    "NO_NEW_RANKER"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-REOPENED-PRIOR-SEARCH-ROUTING-ACCEPT-001",
+  "as_of": "2026-09-15",
+  "task_id": "HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1",
+  "state_change": "Reopenable Git parks commission into non-HFIC search-memory and Prompt A receives one-to-one compact prior bodies. Defective CONTROL session stays immutable.",
+  "base_main": "3d828150fef69d22845602b656bc304452c5dc8b",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "placeholder": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [
+    "ACTIVE_RDP_WRITE",
+    "REAL_HYPOTHESIS_FORGE_SLASH",
+    "HISTORICAL_SESSION_REWRITE",
+    "NEW_RANKER_OR_MAX_RANKED_PRIORS_CHANGE",
+    "PACKET_LIMIT_RAISE",
+    "PRIOR_MEMORY_BOUND_RAISE",
+    "NEW_DATABASE_OR_SERVICE",
+    "TRAJECTORY_CHALLENGER_EXECUTED",
+    "PROVIDER_API_RPC_WSS_REQUIRED",
+    "C2_IMPORT",
+    "H11_H13_SCIENTIFIC_VERDICT",
+    "MERGE_WITHOUT_OWNER_PHRASE"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_REOPENED_PRIOR_ROUTING_UNIT",
+    "independent_review": {
+      "path": "docs/evidence/hfic_reopened_prior_search_routing/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_REOPENED_PRIOR_ROUTING",
+      "PASS_READ_ONLY_ACTIVE_RDP_PREVIEW"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_GENERATOR",
+    "NO_LIVE_RDP_WRITE",
+    "NO_H11_H13_SCIENTIFIC_VERDICT",
+    "NO_TRAJECTORY_CHALLENGER",
+    "NO_C2",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "rdp_mutation": 0,
+    "provider_calls": 0
+  }
+}
