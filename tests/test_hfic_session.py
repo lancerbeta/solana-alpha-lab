@@ -42,6 +42,9 @@ def _preflight_receipt() -> dict[str, object]:
         "live_git_head": git.head_sha.lower(),
         "git_composite_sha256": git.composite_sha256,
         "session_started_at": "2026-08-27T12:00:00Z",
+        "forge_context_packet": {
+            "vision_integrity": {"status": "PASS"},
+        },
     }
 
 
