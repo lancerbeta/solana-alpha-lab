@@ -4,8 +4,8 @@
   "review_id": "a1_delivery_harness_risk_routed_review_v1",
   "as_of": "2026-09-15",
   "task_id": "DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1",
-  "reviewed_bindings_sha256": "1ceab58f4fb80d224f75a2f9f3f3e76cee7c5ba1a62a37b1d11a8ca260a6f8b5",
-  "reviewed_inventory_sha256": "0aabc525f7a5cdc587084d01ed32893676ca39a9a02fb5c43f34e72da2fc2cf0",
+  "reviewed_bindings_sha256": "e7a7d541e8207d56b8c7c9357d03dc5f473b4ce5b418452899b51e4df56ea56f",
+  "reviewed_inventory_sha256": "d1963362339a79ca9743de2f4dceb207b76703c4f8afec31613b95110c74e2b0",
   "required_roles": [
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
