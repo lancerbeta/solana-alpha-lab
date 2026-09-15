@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "CTRL-DETERMINISTIC-FINISH-POSTMERGE-TESTS-COMPLETION-001",
+  "as_of": "2026-09-15",
+  "task_id": "CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1",
+  "state_change": "POSTMERGE_ACCEPTANCE_TESTS_BRANCH_STATE_TOLERANT",
+  "implementation_bindings": {
+    "docs/tasks/CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1.md": "6d6d2ef0fd7e11a86b64b56a74c940f80a293eb12c20baf6473d13d3cb0f95ae",
+    "tests/test_delivery_harness_deterministic_finish.py": "5752f5028a2133f2f03c65f9f1f384c4b2428d2af67572d6ec47959527ba2d52"
+  },
+  "base_main": "a39a14581054d185592da593e163fdf5cbec5325",
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_factory_fit_v1.json",
+    "sha256": "da59d4252c89ab8056e040b068fc49c018420da6d9299b104007a0e4f77045b4",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_TARGETED_SUITES_ON_MAIN_STATE",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_ctrl_deterministic_finish_postmerge_tests_review_v1.json",
+      "sha256": "50359b30cffd014ef38c6e31ff9d710cadc923e66c9a12446f806738094e2c9e",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_SUITES_ON_MAIN_STATE"
+    ]
+  },
+  "non_claims": [
+    "NO_REVIEW_ROUTING_CHANGE",
+    "NO_CI_ARCHITECTURE_CHANGE",
+    "NO_PRODUCT_BEHAVIOR_CHANGE",
+    "NO_RUNTIME_DEPLOYMENT",
+    "NO_EXTERNAL_AUTHORITY",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_ALPHA",
+    "NO_LIVE",
+    "NO_REAL_MONEY",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "provider_requests": 0,
+    "credential_reads": 0,
+    "retries": 0,
+    "fallbacks": 0,
+    "cash_spend_usd_cents": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE"
+}

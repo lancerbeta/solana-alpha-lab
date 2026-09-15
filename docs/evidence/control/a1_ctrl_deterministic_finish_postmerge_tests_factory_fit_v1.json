@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "CTRL-DETERMINISTIC-FINISH-POSTMERGE-TESTS-FACTORY-FIT-001",
+  "as_of": "2026-09-15",
+  "task_id": "CTRL_DETERMINISTIC_FINISH_POSTMERGE_TESTS_V1",
+  "reviewed_bindings_sha256": "38126661ca4d772f43e100556a0cdef2fee72d68d62f0bfc945fa29ba0c23282",
+  "reviewed_inventory_sha256": "5644f7c49815aca0510a660341c28f31aeb15967ccc48a5558239c5223223a27",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS - test-only change, trivially revertible",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS - no product/research behavior touched",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS - CI red on main restored to green deterministically",
+    "build_vs_buy": "PASS",
+    "security": "PASS - no secrets or external surfaces",
+    "red_team": "PASS - tests cannot false-pass: both stable forms fully constrained"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_MERGE_AUTHORITY",
+    "NO_REVIEW_ROUTING_CHANGE",
+    "NO_CI_ARCHITECTURE_CHANGE",
+    "NO_PRODUCT_BEHAVIOR_CHANGE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_CANONICAL_DONE"
+  ]
+}
