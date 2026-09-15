@@ -33,11 +33,13 @@ No new Forge slash. No merge in this atom.
 - Current eligible count: 7. Planned eligible: 4.
 - H11/H13 currently absent from search-memory; both reach the Prompt A set
   after planned overlay + exact-session quarantine.
-- Packet 13404 bytes / 16384. Prior-memory 4 records / 2780 bytes.
-- Old epoch `237ee709…` → planned `482ad503…`.
+- Packet 14708 bytes / 16384. Prior-memory 4 records / 4084 bytes.
+- Old epoch `237ee709…` → planned `81cd823d…`.
 - Eligibility `b20f834c…` → `be64c8a3…`.
 - Planned preflight action: `START_NEW_SESSION`.
 - Freeze compat smoke: PASS. CONTROL trajectory-blind fence: intact.
+- Feature grounding/semantic rows may truncate under 16 KiB; ranked prior
+  bodies are not dropped (`dropped_priors: 0`).
 
 ## Explicit non-claims
 
@@ -49,5 +51,5 @@ No new Forge slash. No merge in this atom.
 ## NEXT
 
 Exact-head CI, then merge-readiness, then one owner merge phrase. After merge,
-local preview → commission → exact-session quarantine apply → preview again →
-`/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
+local preview → commission → exact-session quarantine preview/apply → preview
+again (BLOCKER_NEXT if not READY) → `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.

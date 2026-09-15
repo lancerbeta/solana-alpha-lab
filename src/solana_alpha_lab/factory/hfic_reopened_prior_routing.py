@@ -119,9 +119,9 @@ def resolve_reopened_prior(
             raise ReopenedPriorRoutingError(BODY_UNRESOLVABLE)
         declared_def = declared_def or park_def
     frozen_hash = declared_def or yaml_hash
-    claim = definition.get("claim")
-    if not isinstance(claim, str) or not claim.strip():
+    if not _legacy_body_present(definition.get("legacy_definition")):
         raise ReopenedPriorRoutingError(BODY_UNRESOLVABLE)
+    claim = definition.get("claim")
     binding = {
         "hypothesis_identity": identity,
         "source_paths": source_paths,
@@ -137,7 +137,7 @@ def resolve_reopened_prior(
         "schema": SCHEMA,
         "schema_version": SCHEMA_VERSION,
         "hypothesis_version_id": identity,
-        "claim": claim,
+        "claim": claim if isinstance(claim, str) and claim.strip() else None,
         "mechanism": definition.get("mechanism"),
         "actor_counterparty": definition.get("actor_counterparty"),
         "population": definition.get("population"),
@@ -208,9 +208,12 @@ def ranked_prior_entries_for_ids(
     entries: list[dict[str, Any]] = []
     for hyp_id in ranked_ids:
         payload = by_id.get(str(hyp_id))
-        if payload is None:
+        if payload is None or not _decision_useful_payload(payload):
             raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
-        entries.append(compact_prior_entry(str(hyp_id), payload))
+        entry = compact_prior_entry(str(hyp_id), payload)
+        if not _decision_useful_payload(entry):
+            raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
+        entries.append(entry)
     if {item["hypothesis_version_id"] for item in entries} != set(ranked_ids):
         raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
     return entries
@@ -428,23 +431,49 @@ def preview_control_reconsideration(
     freeze_smoke = freeze_reopened_prior_compat_smoke(repo_root)
     h11_id = "HYP-RC002-H11-LIFECYCLE-CLOCK-V1"
     h13_id = "RC001-H13-COMPOSITE-VETO"
-    ready = (
-        session is not None
-        and str(session.get("session_state") or "") == "SYNTHESIS_COMPLETE"
-        and h11_id in identities
-        and h13_id in identities
-        and h11_id in set(ranked)
-        and h13_id in set(ranked)
-        and packet_bytes <= MAX_PACKET_BYTES
-        and planned_eligible <= records_bound
-        and prior_bytes <= bytes_bound
-        and action == "START_NEW_SESSION"
-        and gate == "OK"
-        and yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE
-        and (old_epoch != new_epoch or old_eligibility != new_eligibility)
-        and not trajectory_leak
-        and freeze_smoke.get("status") == "PASS"
+    session_epoch = (
+        str(session.get("evidence_epoch_sha256") or "")
+        if session is not None
+        else old_epoch
     )
+    session_eligibility = (
+        str(session.get("memory_eligibility_sha256") or "")
+        if session is not None
+        else old_eligibility
+    )
+    session_search = (
+        str(session.get("search_key_sha256") or "") if session is not None else ""
+    )
+    identity_changed = (
+        session_epoch != new_epoch
+        or session_eligibility != new_eligibility
+        or session_search != planned_search_key
+    )
+    dropped_priors = int((packet.get("truncation_receipt") or {}).get("dropped_priors") or 0)
+    blockers: list[str] = []
+    if session is None or str(session.get("session_state") or "") != "SYNTHESIS_COMPLETE":
+        blockers.append("DEFECT_SESSION_NOT_SYNTHESIS_COMPLETE")
+    if h11_id not in identities or h13_id not in identities:
+        blockers.append("REOPENABLE_INVENTORY_MISSING_H11_H13")
+    if h11_id not in set(ranked) or h13_id not in set(ranked):
+        blockers.append("H11_H13_NOT_IN_PROMPT_A_SET")
+    if packet_bytes > MAX_PACKET_BYTES:
+        blockers.append("FORGE_CONTEXT_PACKET_OVERSIZE")
+    if planned_eligible > records_bound or prior_bytes > bytes_bound:
+        blockers.append("PRIOR_MEMORY_CAPACITY")
+    if action != "START_NEW_SESSION":
+        blockers.append("PREFLIGHT_ACTION_NOT_START_NEW_SESSION")
+    if gate != "OK" or yield_eligible < MIN_USABLE_YIELD_ELIGIBLE:
+        blockers.append("CONTROL_CORPUS_YIELD")
+    if not identity_changed:
+        blockers.append("DEFECTIVE_CONTROL_IDENTITY_UNCHANGED")
+    if trajectory_leak:
+        blockers.append("CONTROL_RAW_SEQUENCE_FORBIDDEN")
+    if freeze_smoke.get("status") != "PASS":
+        blockers.append("FREEZE_COMPAT_SMOKE")
+    if dropped_priors:
+        blockers.append("SILENT_REOPENED_PRIOR_TRUNCATION")
+    ready = not blockers
     counts = eligible_counts(store)
     return {
         "CURRENT_DEFECT_SESSION": {
@@ -499,9 +528,9 @@ def preview_control_reconsideration(
         "MAX_PACKET_BYTES": MAX_PACKET_BYTES,
         "PRIOR_MEMORY_COUNT_AFTER": planned_eligible,
         "PRIOR_MEMORY_BYTES_AFTER": prior_bytes,
-        "OLD_EVIDENCE_EPOCH": old_epoch,
+        "OLD_EVIDENCE_EPOCH": session_epoch,
         "PLANNED_NEW_EVIDENCE_EPOCH": new_epoch,
-        "OLD_MEMORY_ELIGIBILITY": old_eligibility,
+        "OLD_MEMORY_ELIGIBILITY": session_eligibility or old_eligibility,
         "PLANNED_NEW_MEMORY_ELIGIBILITY": new_eligibility,
         "PLANNED_PREFLIGHT_ACTION": action,
         "POST_PLAN_CONTROL_CORPUS": {
@@ -529,6 +558,8 @@ def preview_control_reconsideration(
         },
         "POST_PLAN_TRUNCATION": packet.get("truncation_receipt") or {},
         "terminal": READY_TERMINAL if ready else "CONTROL_RECONSIDERATION_NOT_READY",
+        "BLOCKER_NEXT": None if ready else blockers[0],
+        "blockers": blockers,
         "authority": {
             "git_mutation": 0,
             "experiment_execution": 0,
@@ -556,14 +587,18 @@ def freeze_reopened_prior_compat_smoke(repo_root: Path) -> dict[str, Any]:
     if prior is None:
         return {"status": "FAIL", "reason": BODY_UNRESOLVABLE}
     card = dict(draft["candidates"][2])
-    card["claim"] = str(prior["payload"].get("claim") or card["claim"])
-    card["cheapest_falsifier"] = str(
-        prior["payload"].get("cheapest_falsifier") or card.get("cheapest_falsifier")
-    )
     card["prior_work_refs"] = [str(prior["hypothesis_version_id"])]
-    card["unresolved_requirements"] = [
-        "current decision-time composite-veto inputs remain unavailable"
-    ]
+    legacy = prior["payload"].get("legacy_definition")
+    if isinstance(legacy, Mapping):
+        hist = legacy.get("historical_expected_admissibility")
+        if isinstance(hist, Mapping) and hist.get("state"):
+            card["unresolved_requirements"] = [
+                f"historical_{hist.get('state')} remains typed; current grounding decides usability"
+            ]
+    if not card.get("unresolved_requirements"):
+        card["unresolved_requirements"] = [
+            "current decision-time composite-veto inputs remain unavailable"
+        ]
     draft["candidates"][2] = card
     try:
         frozen = freeze_draft(
@@ -784,51 +819,54 @@ def _project_definition(
             {
                 "frozen_definition_id": group.get("frozen_definition_id"),
                 "feature_id": group.get("feature_id"),
+                "group_id": group.get("group_id") or identity,
+                "falsifier": group.get("falsifier"),
                 "definition_inputs": inputs,
                 "historical_requirements": requirements,
                 "historical_expected_admissibility": expected,
+                "target_metrics": group.get("target_metrics"),
             }
         )
-        claim = str(group.get("falsifier") or "").strip() or None
-        family = str(group.get("group_id") or identity)
-        horizon = None
-        if isinstance(group.get("target_metrics"), list):
-            horizon = ",".join(str(item) for item in group["target_metrics"])
         return {
-            "claim": claim,
+            "claim": None,
             "mechanism": None,
             "actor_counterparty": None,
             "population": None,
             "decision_timestamp": None,
-            "primary_x_family": family,
+            "primary_x_family": None,
             "primary_y": None,
-            "horizon_notional": horizon,
+            "horizon_notional": None,
             "negative_control": None,
-            "cheapest_falsifier": claim,
-            "legacy_definition": legacy,
+            "cheapest_falsifier": None,
+            "legacy_definition": _compact_legacy(legacy),
         }
     question = str(screen.get("primary_question") or "").strip() or None
     features = screen.get("primary_features")
     if isinstance(features, list):
         legacy["primary_features"] = features
-    legacy["data_semantics"] = screen.get("data_semantics")
-    legacy["live_PIT_claim"] = screen.get("live_PIT_claim")
+    legacy.update(
+        {
+            "primary_question": question,
+            "family": screen.get("family"),
+            "universe": screen.get("universe"),
+            "data_semantics": screen.get("data_semantics"),
+            "live_PIT_claim": screen.get("live_PIT_claim"),
+            "baseline": screen.get("baseline"),
+            "outcome_horizon_seconds": screen.get("outcome_horizon_seconds"),
+        }
+    )
     return {
-        "claim": question,
+        "claim": None,
         "mechanism": None,
         "actor_counterparty": None,
-        "population": screen.get("universe"),
-        "decision_timestamp": screen.get("data_semantics"),
-        "primary_x_family": screen.get("family"),
+        "population": None,
+        "decision_timestamp": None,
+        "primary_x_family": None,
         "primary_y": None,
-        "horizon_notional": (
-            f"H{screen['outcome_horizon_seconds']}"
-            if isinstance(screen.get("outcome_horizon_seconds"), int)
-            else None
-        ),
-        "negative_control": screen.get("baseline"),
-        "cheapest_falsifier": question,
-        "legacy_definition": legacy,
+        "horizon_notional": None,
+        "negative_control": None,
+        "cheapest_falsifier": None,
+        "legacy_definition": _compact_legacy(legacy),
     }
 
 
@@ -882,13 +920,77 @@ def _latest_hv_by_id(store: ResearchStore) -> dict[str, dict[str, Any]]:
 
 
 def _equivalent_binding(existing: Mapping[str, Any], incoming: Mapping[str, Any]) -> bool:
-    left = existing.get("provenance") if isinstance(existing.get("provenance"), Mapping) else {}
-    right = incoming.get("provenance") if isinstance(incoming.get("provenance"), Mapping) else {}
-    return (
-        left.get("source_content_sha256") == right.get("source_content_sha256")
-        and left.get("frozen_definition_sha256") == right.get("frozen_definition_sha256")
-        and existing.get("claim") == incoming.get("claim")
+    return _body_fingerprint(existing) == _body_fingerprint(incoming)
+
+
+def _body_fingerprint(payload: Mapping[str, Any]) -> str:
+    provenance = (
+        payload.get("provenance") if isinstance(payload.get("provenance"), Mapping) else {}
     )
+    return canonical_sha256(
+        {
+            "source_content_sha256": provenance.get("source_content_sha256"),
+            "frozen_definition_sha256": provenance.get("frozen_definition_sha256"),
+            "scientific": {
+                field: payload.get(field)
+                for field in (
+                    "claim",
+                    "mechanism",
+                    "actor_counterparty",
+                    "population",
+                    "decision_timestamp",
+                    "primary_x_family",
+                    "primary_y",
+                    "horizon_notional",
+                    "negative_control",
+                    "cheapest_falsifier",
+                    "definition_sha256",
+                )
+            },
+            "legacy_definition": payload.get("legacy_definition") or {},
+        }
+    )
+
+
+def _compact_legacy(legacy: Mapping[str, Any]) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in legacy.items()
+        if value not in (None, "", [], {})
+    }
+
+
+def _legacy_body_present(legacy: object) -> bool:
+    if not isinstance(legacy, Mapping):
+        return False
+    markers = (
+        "primary_question",
+        "falsifier",
+        "frozen_definition_id",
+        "park_terminal",
+    )
+    return any(
+        str(legacy.get(key) or "").strip()
+        for key in markers
+    )
+
+
+def _decision_useful_payload(payload: Mapping[str, Any]) -> bool:
+    for field in (
+        "claim",
+        "mechanism",
+        "actor_counterparty",
+        "population",
+        "decision_timestamp",
+        "primary_x_family",
+        "primary_y",
+        "horizon_notional",
+        "negative_control",
+        "cheapest_falsifier",
+    ):
+        if str(payload.get(field) or "").strip():
+            return True
+    return _legacy_body_present(payload.get("legacy_definition"))
 
 
 def _event(

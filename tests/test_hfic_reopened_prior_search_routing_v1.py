@@ -200,8 +200,21 @@ class CanonicalProjectionTests(unittest.TestCase):
                     hashlib.sha256((ROOT / rel).read_bytes()).hexdigest(),
                 )
             payload = item["payload"]
-            self.assertTrue(str(payload["claim"]).strip())
+            self.assertIsNone(payload.get("claim"))
             self.assertIsNone(payload.get("mechanism"))
+            self.assertIsNone(payload.get("cheapest_falsifier"))
+            self.assertIsNone(payload.get("primary_x_family"))
+            legacy = payload["legacy_definition"]
+            self.assertTrue(legacy)
+            if hyp_id == H11:
+                self.assertTrue(str(legacy.get("primary_question") or "").strip())
+                self.assertNotEqual(payload.get("claim"), legacy.get("primary_question"))
+            if hyp_id == H13:
+                self.assertTrue(str(legacy.get("falsifier") or "").strip())
+                self.assertEqual(
+                    (legacy.get("historical_expected_admissibility") or {}).get("state"),
+                    "BLOCKED_DATA",
+                )
             self.assertFalse(str(item["record_id"]).startswith("HFIC-"))
             self.assertNotIn("hfic_protocol", payload)
 
@@ -397,10 +410,24 @@ class PromptABodyTests(unittest.TestCase):
         entries = ranked_prior_entries_for_ids(ranked, bodies)
         self.assertEqual({item["hypothesis_version_id"] for item in entries}, set(ranked))
         for entry in entries:
-            self.assertTrue(str(entry.get("claim") or "").strip())
+            self.assertTrue(
+                str(entry.get("claim") or "").strip()
+                or (entry.get("legacy_definition") or {})
+            )
+            self.assertNotEqual(
+                entry.get("claim"),
+                (entry.get("legacy_definition") or {}).get("primary_question")
+                or (entry.get("legacy_definition") or {}).get("falsifier"),
+            )
         with self.assertRaises(ReopenedPriorRoutingError) as raised:
             ranked_prior_entries_for_ids(["MISSING-ID"], bodies)
         self.assertEqual(raised.exception.code, BODY_INCOMPLETE)
+        with self.assertRaises(ReopenedPriorRoutingError) as empty:
+            ranked_prior_entries_for_ids(
+                ["EMPTY-ID"],
+                [{"hypothesis_version_id": "EMPTY-ID"}],
+            )
+        self.assertEqual(empty.exception.code, BODY_INCOMPLETE)
 
     def test_packet_one_to_one_within_16kib_and_no_silent_drop(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

@@ -46,6 +46,7 @@ managed_write_set:
   - tests/test_hfic_legacy_science_rebase.py
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
   - docs/OPERATOR_NAVIGATION.md

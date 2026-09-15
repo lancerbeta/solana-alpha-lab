@@ -1,4 +1,5 @@
 {
+  "BLOCKER_NEXT": null,
   "C1_CORPUS_IDENTITY": {
     "corpus_dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
     "dataset_fingerprints": [
@@ -57,7 +58,7 @@
   "NO_RAW_TRAJECTORY_LEAK": true,
   "OLD_EVIDENCE_EPOCH": "237ee70916824b9616f34e8c8742fa4d59cd183ec1dbaa7b95e707afe1a9c937",
   "OLD_MEMORY_ELIGIBILITY": "b20f834cd386ea6edf8190183c62e9a3efb10864c3ab4f6defc538c361e86b29",
-  "PLANNED_NEW_EVIDENCE_EPOCH": "482ad5038b098b9c8c0d7597f085ca0fc9ccf60a78a8a951f612cb7bbd07b18b",
+  "PLANNED_NEW_EVIDENCE_EPOCH": "81cd823d12b9fc707703e300e39f7c9f28b645e618a0edad89e3d5cdc362511b",
   "PLANNED_NEW_MEMORY_ELIGIBILITY": "be64c8a3c5fd683dbb1aae896e498b905a7318c327a48fc4552b9c9e7f69173e",
   "PLANNED_PREFLIGHT_ACTION": "START_NEW_SESSION",
   "PLANNED_QUARANTINE": {
@@ -90,7 +91,7 @@
     "yield_eligible": 148
   },
   "POST_PLAN_ELIGIBLE_MEMORY": 4,
-  "POST_PLAN_FORGE_CONTEXT_BYTES": 13404,
+  "POST_PLAN_FORGE_CONTEXT_BYTES": 14708,
   "POST_PLAN_FREEZE_COMPAT_SMOKE": "PASS",
   "POST_PLAN_PRIOR_BODIES": [
     "HYP-EARLY-TAKER-VOLUME-MIX-H900-V1",
@@ -158,7 +159,7 @@
     "tie_break": "stable_id_asc",
     "truncated": true
   },
-  "PRIOR_MEMORY_BYTES_AFTER": 2780,
+  "PRIOR_MEMORY_BYTES_AFTER": 4084,
   "PRIOR_MEMORY_COUNT_AFTER": 4,
   "authority": {
     "experiment_execution": 0,
@@ -166,5 +167,6 @@
     "provider_api_rpc_wss_calls": 0,
     "rdp_mutation": 0
   },
+  "blockers": [],
   "terminal": "CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION"
 }
