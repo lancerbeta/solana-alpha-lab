@@ -25,6 +25,7 @@ managed_write_set:
   - scripts/owner_attention_gate.py
   - tests/test_preflight_shadow_pin_drift.py
   - tests/test_delivery_harness_deterministic_finish.py
+  - tests/test_delivery_harness_merge_guard.py
   - AGENTS.md
   - .agents/skills/delivery-harness/SKILL.md
   - docs/agent/DELIVERY_HARNESS_PROTOCOL.md
@@ -35,6 +36,9 @@ managed_write_set:
   - docs/evidence/control/a1_preflight_shadow_pin_drift_review_v1.json
   - docs/evidence/control/a1_preflight_shadow_pin_drift_factory_fit_v1.json
   - docs/evidence/control/delivery_harness_acceptance_v1.json
+  - docs/evidence/control/owner_attention_gate_acceptance_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
+  - docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json
 external_caps:
   network: false
   credentials: false
