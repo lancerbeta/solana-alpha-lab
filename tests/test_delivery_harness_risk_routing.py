@@ -347,9 +347,10 @@ class SharedEnforcementTest(unittest.TestCase):
         finally:
             harness_sync.ROOT = original_root
         self.assertEqual(gate_set, sync_set)
-        # The frozen contract lists the triple; the atom diff touches
-        # schema/control surfaces so the architecture floor must hold on both
-        # paths identically.
+        # The frozen contract lists the triple; note this assertion pins the
+        # resolved set value only (the floor itself is proven directly by
+        # test_6/6b/6c/6d, since this contract already freezes
+        # ARCHITECTURE_CRITIC so the floor is not discriminated here).
         self.assertEqual(
             gate_set,
             {"CODE_REVIEWER", "GOAL_DOD_CRITIC", "ARCHITECTURE_CRITIC"},
@@ -426,7 +427,7 @@ class SharedEnforcementTest(unittest.TestCase):
                 "findings": ["BLOCKER REVIEW_PLAN_UNDERSCOPED:OWNER_UX_CRITIC"],
             }
         ]
-        # Under the frozen (unstRENGTHENED) plan the role-set is still
+        # Under the frozen (unstrengthened) plan the role-set is still
         # [CODE_REVIEWER] only -> exact-set mismatch denies closure.
         frozen_plan_problems = gate.delivery_independent_review_shape_problems(
             review, effective_roles={"CODE_REVIEWER"}

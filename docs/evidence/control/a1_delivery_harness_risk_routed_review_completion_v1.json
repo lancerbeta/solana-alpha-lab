@@ -20,7 +20,7 @@
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_tests_test_delivery_harness_risk_routing_24_tests",
+    "targeted": "PASS_tests_test_delivery_harness_risk_routing_26_tests",
     "independent_review": {
       "path": "docs/evidence/control/a1_delivery_harness_risk_routed_review_review_v1.json",
       "sha256": "",
@@ -33,6 +33,7 @@
       "PASS_tests_delivery_harness_merge_guard",
       "PASS_tests_delivery_harness_skill",
       "PASS_tests_delivery_harness_context",
+      "PASS_tests_delivery_harness_bootstrap",
       "PASS_tests_delivery_harness_deterministic_finish",
       "PASS_tests_semantic_premise_review"
     ]

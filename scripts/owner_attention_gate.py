@@ -629,11 +629,12 @@ def _candidate_paths_for_roles(
             ],
             root,
         )
+        decoded = output.decode("utf-8", errors="strict")
     except (OSError, ValueError, UnicodeDecodeError) as error:
         raise ValueError("CANDIDATE_PATHS_UNREADABLE") from error
     return {
         item.replace("\\", "/")
-        for item in output.decode("utf-8", errors="strict").split("\0")
+        for item in decoded.split("\0")
         if item
     }
 
