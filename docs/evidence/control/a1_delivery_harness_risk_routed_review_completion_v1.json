@@ -5,6 +5,9 @@
   "as_of": "2026-09-15",
   "task_id": "DELIVERY_HARNESS_RISK_ROUTED_REVIEW_V1",
   "state_change": "Risk-routed review enforcement: contract-frozen required_review_roles with deterministic floors resolved by one canonical effective_required_roles consumed identically by bind-evidence, preflight-push, merge-readiness and guarded-merge; OWNER_UX_CRITIC first-class; optional validated remediation_history.",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
     ".agents/skills/delivery-harness/SKILL.md": "fbd69c2ea9e6a90992a7af7ace19bfe404447b8e250b08e195dded00dee5a023",
     ".cursor/agents/code-reviewer.md": "55241ededd0f8edaa32e033ff8c64eed4b254ab2f976a609a6d01023e72ed135",
