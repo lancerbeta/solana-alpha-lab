@@ -696,12 +696,23 @@ class HficRepresentationProbeTests(unittest.TestCase):
             )
         self.assertEqual(str(raised.exception), "INVALID_COHORT_READINESS_RECEIPT")
 
-    def test_non_synthetic_binding_is_fail_closed_until_verified_input_receipt(
+    def test_non_synthetic_binding_requires_verified_readiness_receipt(
         self,
     ) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
         representation, binding = _foreign_representation_fixture()
+        # A foreign binding WITHOUT a matching verified readiness receipt
+        # stays fail-closed.
+        with self.assertRaises(RepresentationProbeError) as raised:
+            build_challenger_packet(
+                baseline,
+                representation,
+                cohort_readiness_receipt=_cohort_readiness_receipt(),
+            )
+        self.assertEqual(str(raised.exception), INVALID_COHORT_READINESS_RECEIPT)
+        # With an exactly matching verified readiness receipt the imported
+        # corpus reaches the challenger adapter (runtime seam, not executed).
         readiness = _cohort_readiness_receipt()
         manifest = dict(readiness["release_manifest"])
         manifest.update(
@@ -727,14 +738,16 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 if key != "receipt_sha256"
             }
         )
-
-        with self.assertRaises(RepresentationProbeError) as raised:
-            build_challenger_packet(
-                baseline,
-                representation,
-                cohort_readiness_receipt=readiness,
-            )
-        self.assertEqual(str(raised.exception), INVALID_COHORT_READINESS_RECEIPT)
+        packet = build_challenger_packet(
+            baseline,
+            representation,
+            cohort_readiness_receipt=readiness,
+        )
+        self.assertEqual(packet["probe_kind"], "REPRESENTATION_CHALLENGER")
+        self.assertEqual(
+            packet[PACKET_KEY]["corpus_binding"]["release_id"],
+            binding.release_id,
+        )
 
     def test_fixture_bridge_rechecks_outer_identity(self) -> None:
         receipt = _control_receipt()

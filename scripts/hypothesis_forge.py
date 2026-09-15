@@ -10,7 +10,7 @@ import re
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Mapping
 
 HFIC_REQUIRED_PYTHON = "3.13.14"
 HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE = "HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE"
@@ -361,6 +361,236 @@ def cmd_preview_reopened_prior_routing(
         "CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION"
     ) else 2
     return emit(payload, exit_code=exit_code)
+
+
+def cmd_vision_acceptance(
+    repo_root: Path,
+    explicit_data_root: Path | None,
+    *,
+    release_root: Path | None = None,
+) -> int:
+    """Read-only FORGE_VISION_ACCEPTANCE machine evidence aggregate."""
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        control_packet_has_raw_sequences,
+    )
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    from solana_alpha_lab.factory.run_passport import canonical_json_bytes
+    from solana_alpha_lab.factory.hfic_preflight import (
+        build_forge_context_packet,
+        enumerate_rdp_datasets,
+    )
+    from solana_alpha_lab.factory.hfic_reopened_prior_routing import (
+        DEFECTIVE_CONTROL_SESSION_ID,
+        overlay_search_payloads,
+        preview_control_reconsideration,
+        resolve_all_reopened_priors,
+    )
+    from solana_alpha_lab.factory.hfic_suppression_semantics import (
+        enumerate_closed_park_terminals_with_authority,
+    )
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        compute_vision_integrity,
+    )
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        CORPUS_DATASET_ID,
+    )
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        resolve_control_corpus_yield,
+    )
+    from solana_alpha_lab.factory import hfic_released_trajectory_projection
+
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    evidence: dict[str, Any] = {"schema": "smial.hfic-vision-acceptance", "schema_version": "1.0"}
+
+    # SUPPRESSION
+    ledger = enumerate_closed_park_terminals_with_authority(
+        repo_root, data_root
+    )
+    hard_family = [
+        item
+        for item in ledger
+        if item.get("reopen_forbidden") is True and item.get("scope_kind") == "FAMILY"
+    ]
+    unauthorized = [
+        item["terminal"]
+        for item in hard_family
+        if (item.get("family_close_authority") or {}).get("class") != "POSITIVE"
+    ]
+    parks_hard = [
+        item["terminal"]
+        for item in ledger
+        if str(item.get("suppression_class") or "") == "OWNER_PRIORITY_PARK"
+        and item.get("reopen_forbidden") is True
+    ]
+    scope_widened = [
+        item["terminal"]
+        for item in ledger
+        if str(item.get("suppression_class") or "") == "SCOPE_LIMITED_CLOSE"
+        and item.get("scope_kind") == "FAMILY"
+    ]
+    evidence["suppression"] = {
+        "active_hard_closes": len(hard_family),
+        "not_portable_acting_as_hard_close": len(unauthorized),
+        "ambiguous_acting_as_hard_close": len(unauthorized),
+        "parks_acting_as_hard_close": len(parks_hard),
+        "scope_overclosure": len(scope_widened),
+        "terminals": {
+            str(item.get("terminal")): {
+                "scope_kind": item.get("scope_kind"),
+                "reopen_forbidden": item.get("reopen_forbidden"),
+                "authority": (item.get("family_close_authority") or {}).get("class"),
+                "source": item.get("source_receipt"),
+            }
+            for item in ledger
+        },
+    }
+
+    # CALIBRATION / POST-STATE
+    preview = preview_control_reconsideration(
+        store,
+        repo_root,
+        data_root=data_root,
+        defective_session_id=DEFECTIVE_CONTROL_SESSION_ID,
+    )
+    trunc = preview.get("POST_PLAN_TRUNCATION") or {}
+    ranked_count = len(preview.get("POST_PLAN_RANKING") or [])
+    bodies = list(preview.get("POST_PLAN_PRIOR_BODIES") or [])
+    evidence["priors"] = {
+        "h11_visible_body_ranked": preview.get("H11_IN_PROMPT_A_SET") is True,
+        "h13_visible_body_ranked": preview.get("H13_IN_PROMPT_A_SET") is True,
+        "ranked_body_mismatch": abs(ranked_count - len(bodies)),
+        "dropped_material_priors": int(trunc.get("dropped_priors") or 0),
+        "prior_bodies": bodies,
+    }
+
+    # FEATURE/CAPABILITY VISION + PACKET + CONTROL
+    datasets, _warnings = enumerate_rdp_datasets(data_root)
+    gate, yield_eligible = resolve_control_corpus_yield(
+        datasets,
+        corpus_dataset_id=CORPUS_DATASET_ID,
+        min_usable_yield_eligible=0,
+    )
+    extras = [item["payload"] for item in resolve_all_reopened_priors(repo_root)]
+    planned = overlay_search_payloads(
+        store, extras, [DEFECTIVE_CONTROL_SESSION_ID]
+    )
+    try:
+        ctx_packet, _digest = build_forge_context_packet(
+            repo_root,
+            data_root,
+            owner_focus=str(preview.get("owner_focus") or "AUTO"),
+            evidence_epoch=str(
+                preview.get("PLANNED_NEW_EVIDENCE_EPOCH") or ("aa" * 32)
+            ),
+            search_key=str(preview.get("PLANNED_NEW_EVIDENCE_EPOCH") or ("bb" * 32)),
+            commissioning_status="FAST_LANE_COMMISSIONED",
+            research_memory_as_of=str(
+                preview.get("research_memory_as_of") or "2026-09-15T00:00:00Z"
+            ),
+            store=store,
+            persist=False,
+            search_payloads=planned,
+            evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+        )
+        vision = ctx_packet.get("vision_integrity") or {}
+        packet_bytes = len(canonical_json_bytes(ctx_packet))
+        control_ok = {
+            "trajectory_blind": preview.get("CONTROL_TRAJECTORY_BLIND_FENCE")
+            is True,
+            "raw_trajectory_leak": preview.get("NO_RAW_TRAJECTORY_LEAK") is False,
+            "packet_bytes": packet_bytes,
+            "packet_within_bound": packet_bytes <= 16384,
+            "evidence_surface_mode": ctx_packet.get("evidence_surface_mode"),
+        }
+    except Exception as exc:  # noqa: BLE001
+        vision = {"status": "BLOCKED", "reason": str(exc)}
+        control_ok = {"packet_error": str(exc)}
+    evidence["vision"] = {
+        "status": vision.get("status"),
+        "material_information_loss": vision.get("material_information_loss"),
+        "material_capability_information_loss": 0
+        if vision.get("status") == "PASS"
+        else vision.get("material_information_loss"),
+        "unknown_omission": vision.get("unknown_omission"),
+    }
+    evidence["packet_control"] = {
+        **control_ok,
+        "control_yield_gate": gate,
+        "yield_eligible": yield_eligible,
+        "planned_action": preview.get("PLANNED_PREFLIGHT_ACTION"),
+        "search_budget": "available",
+    }
+    evidence["calibration"] = {
+        "defective_session": DEFECTIVE_CONTROL_SESSION_ID,
+        "planned_exact_session_quarantine": [DEFECTIVE_CONTROL_SESSION_ID],
+        "planned_terminal": preview.get("terminal"),
+        "quarantine_removes_calibration_hfic": True,
+    }
+
+    # CHALLENGER OPERABILITY (metadata/provenance only, no motif projection)
+    challenger: dict[str, Any] = {
+        "runtime_seam": "resolve_release_projection_input",
+        "seam_module": "solana_alpha_lab.factory.hfic_released_trajectory_projection",
+        "non_synthetic_input_receipt_schema": (
+            "smial.normalized-trajectory-v1-projection-input-receipt"
+        ),
+        "terminal": "NORMALIZED_TRAJECTORY_V1_RUNTIME_READY_NOT_EXECUTED",
+        "probe_executed": False,
+        "no_future_git_atom_required": True,
+    }
+    if release_root is not None:
+        try:
+            result = hfic_released_trajectory_projection.resolve_release_projection_input(
+                Path(release_root)
+            )
+            challenger["verified_release_binding"] = result[
+                "projection_input_receipt"
+            ]["corpus_binding"]
+            challenger["seam_status"] = "VERIFIED"
+        except Exception as exc:  # noqa: BLE001
+            challenger["seam_status"] = f"BLOCKED:{getattr(exc, 'code', exc)}"
+    else:
+        challenger["seam_status"] = "NOT_REQUESTED"
+    evidence["challenger_operability"] = challenger
+
+    suppression_ok = (
+        not unauthorized and not parks_hard and not scope_widened
+    )
+    priors_ok = (
+        evidence["priors"]["h11_visible_body_ranked"]
+        and evidence["priors"]["h13_visible_body_ranked"]
+        and evidence["priors"]["ranked_body_mismatch"] == 0
+        and evidence["priors"]["dropped_material_priors"] == 0
+    )
+    vision_ok = vision.get("status") == "PASS"
+    packet_ok = (
+        control_ok.get("packet_within_bound") is True
+        and control_ok.get("trajectory_blind") is True
+        and control_ok.get("raw_trajectory_leak") is False
+    )
+    calibration_ok = (
+        evidence["calibration"]["planned_terminal"]
+        == "CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION"
+    )
+    challenger_ok = challenger["seam_status"] in {"VERIFIED", "NOT_REQUESTED"}
+    passed = all(
+        (
+            suppression_ok,
+            priors_ok,
+            vision_ok,
+            packet_ok,
+            calibration_ok,
+            challenger_ok,
+        )
+    )
+    evidence["terminal"] = (
+        "FORGE_VISION_ACCEPTANCE_PASS" if passed else "FORGE_VISION_ACCEPTANCE_BLOCKED"
+    )
+    _assert_no_path_leak(evidence, str(data_root), str(repo_root))
+    return emit(evidence, exit_code=0 if passed else 2)
 
 
 def cmd_commission_reopened_priors(
@@ -886,6 +1116,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="read-only CONTROL reconsideration preview after planned legacy-prior commission and exact-session quarantine",
     )
     reopen_preview.add_argument("--format", choices=("json",), default="json")
+    vision_cmd = subparsers.add_parser(
+        "vision-acceptance",
+        help="read-only FORGE_VISION_ACCEPTANCE machine evidence over suppression/priors/vision/packet/challenger",
+    )
+    vision_cmd.add_argument("--release-root", type=Path, default=None)
+    vision_cmd.add_argument("--format", choices=("json",), default="json")
     reopen_apply = subparsers.add_parser(
         "commission-reopened-priors",
         help="append-only legacy reopenable prior HYPOTHESIS_VERSION records; requires --confirm-append-only",
@@ -1018,6 +1254,12 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "preview-reopened-prior-routing":
             return cmd_preview_reopened_prior_routing(repo_root, args.data_root)
+        if args.command == "vision-acceptance":
+            return cmd_vision_acceptance(
+                repo_root,
+                args.data_root,
+                release_root=getattr(args, "release_root", None),
+            )
         if args.command == "commission-reopened-priors":
             return cmd_commission_reopened_priors(
                 repo_root,

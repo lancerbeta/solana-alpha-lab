@@ -869,7 +869,10 @@ def enumerate_closed_park_terminals(
                 for match in _CLOSED_PARK_RE.findall(blob):
                     _add(match, NEGATIVE_RESULTS_RELATIVE, row)
     evidence_root = root / "docs" / "evidence"
-    for path in sorted(evidence_root.rglob("*acceptance*.json")) if evidence_root.is_dir() else []:
+    for path in (
+        sorted(evidence_root.rglob("*acceptance*.json"))
+        + sorted(evidence_root.rglob("*family_decision*.json"))
+    ) if evidence_root.is_dir() else []:
         if _is_symlink_path(path) or not path.is_file():
             continue
         try:
@@ -887,6 +890,7 @@ def enumerate_closed_park_terminals(
             "confirmatory_scientific_terminal",
             "runtime_terminal",
             "terminal",
+            "family_decision",
         ):
             value = payload.get(key)
             if isinstance(value, str):
@@ -1255,6 +1259,34 @@ def build_forge_context_packet(
     feature_grounding_source_digest = str(
         grounding_projection.get("feature_grounding_source_digest_sha256") or ""
     )
+    # Compact equivalent machine fields (repair order: remove redundant
+    # verbosity before any drop).  Family rows collapse to one
+    # (family, evidence_role, confirmatory fence) triple per family; the
+    # per-dataset manifest ids are redundant with the compact entries.
+    compact_families: list[dict[str, Any]] = []
+    seen_family_ids: set[str] = set()
+    for row in feature_families:
+        family = str(row.get("feature_family") or "")
+        if not family or family in seen_family_ids:
+            continue
+        seen_family_ids.add(family)
+        compact_families.append(
+            {
+                "feature_family": family,
+                "evidence_role": row.get("evidence_role"),
+                "confirmatory_reuse_forbidden": row.get(
+                    "confirmatory_reuse_forbidden"
+                ),
+            }
+        )
+    compact_semantic = [
+        {
+            "semantic_route_id": entry.get("semantic_route_id"),
+            "root_asset_ids": entry.get("root_asset_ids"),
+            "status_plane": entry.get("status_plane"),
+        }
+        for entry in (semantic_slice.get("semantic_capability_entries") or [])
+    ]
     packet = {
         "prompt_version": PROMPT_VERSION,
         "owner_focus": owner_focus,
@@ -1282,12 +1314,11 @@ def build_forge_context_packet(
         "capability_ids": [item["capability_id"] for item in capabilities],
         "capability_entries": capabilities,
         "feature_hints": feature_hints,
-        "feature_families": feature_families,
+        "feature_families": compact_families,
         "feature_grounding_entries": feature_grounding_entries,
         "feature_grounding_source_digest_sha256": feature_grounding_source_digest,
         "closed_family_ledger": closed_family_ledger,
-        "semantic_capability_entries": semantic_slice.get("semantic_capability_entries")
-        or [],
+        "semantic_capability_entries": compact_semantic,
         "semantic_capability_digest_sha256": semantic_slice.get(
             "semantic_capability_digest_sha256"
         ),
@@ -1318,6 +1349,16 @@ def build_forge_context_packet(
         packet["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
         if control_packet_has_raw_sequences(packet):
             raise HficPreflightError("CONTROL_RAW_SEQUENCE_FORBIDDEN")
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        FORGE_VISION_INTEGRITY_BLOCKED,
+        compact_feature_grounding_entries,
+        compute_vision_integrity,
+    )
+
+    all_grounding_entries = list(feature_grounding_entries)
+    packet["feature_grounding_entries"] = compact_feature_grounding_entries(
+        all_grounding_entries
+    )
     encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
         # Semantic navigation is lower priority than datasets / closed families / priors.
@@ -1335,19 +1376,56 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
-        # Drop feature grounding rows after semantic, keeping source digest.
-        dropped = len(feature_grounding_entries)
+        # Drop redundant per-feature grounding detail (already represented by
+        # the compact availability index) while keeping the source digest.
         packet["feature_grounding_entries"] = []
         packet["truncation_receipt"] = {
             **packet["truncation_receipt"],
             "truncated": True,
             "feature_grounding_truncated": True,
-            "dropped_feature_count": dropped,
+            "dropped_feature_count": len(all_grounding_entries),
             "reason": "MAX_PACKET_BYTES_DROP_FEATURE_GROUNDING",
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
         raise HficPreflightError("RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE")
+    vision = compute_vision_integrity(
+        grounding_entries=all_grounding_entries,
+        retained_feature_ids=[
+            str(hint.get("feature_id") or "")
+            for hint in feature_hints
+            if hint.get("feature_id")
+        ],
+        retained_families=[
+            str(family.get("feature_family") or "")
+            for family in feature_families
+            if family.get("feature_family")
+        ],
+        retained_grounding_index=packet["feature_grounding_entries"],
+        dropped_semantic_routes=list(
+            packet["truncation_receipt"].get("dropped_semantic_routes") or []
+        ),
+        retained_capability_ids=[
+            str(entry.get("capability_id") or "")
+            for entry in packet.get("capability_entries") or []
+            if entry.get("capability_id")
+        ],
+    )
+    packet["vision_integrity"] = vision
+    encoded = canonical_json_bytes(packet)
+    if len(encoded) > MAX_PACKET_BYTES:
+        # The integrity receipt itself must not overflow the bound: keep the
+        # verdict, drop the per-item narrative (it is available via the STOP).
+        packet["vision_integrity"] = {
+            key: value
+            for key, value in vision.items()
+            if key not in ("material_omissions", "unknown_omissions")
+        }
+        encoded = canonical_json_bytes(packet)
+    if len(encoded) > MAX_PACKET_BYTES:
+        raise HficPreflightError("RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE")
+    if vision.get("status") != "PASS":
+        raise HficPreflightError(FORGE_VISION_INTEGRITY_BLOCKED)
     if persist:
         digest = persist_forge_context_packet(
             data_root,

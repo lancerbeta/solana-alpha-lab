@@ -146,6 +146,106 @@ def _is_typed_runtime_receipt(payload: Mapping[str, Any]) -> bool:
     return isinstance(schema, str) and _TYPED_RUNTIME_RECEIPT_RE.fullmatch(schema) is not None
 
 
+# Positive-authority markers for family hard-close. A CLOSE_* name (with or
+# without ``_FAMILY``) is never authority by itself: the source payload must
+# positively establish the scientific dimensions for that exact scope.
+_SCIENCE_NEGATION_KEYS = ("design_probe",)
+_RAN_MARKER_KEYS = ("criteria", "score", "retention", "t0_screen", "veto", "capture")
+_NUMERIC_RESULT_KEYS = ("tau_b_window_a", "decision_time_eligible", "rankable_h900")
+_SCOPE_ID_KEYS = ("atom_id", "hypothesis_id", "group_id", "task_id")
+_HASH_BINDING_KEYS = (
+    "source_runtime_receipt_sha256",
+    "runtime_receipt_sha256",
+    "acceptance_sha256",
+    "confirmatory_runtime_sha256",
+    "task40_acceptance_sha256",
+    "window_a_receipt",
+)
+
+
+def _has_positive_science(payload: Mapping[str, Any]) -> bool:
+    """Scientific result actually ran / is scientific where required."""
+    for key in _SCIENCE_NEGATION_KEYS:
+        probe = payload.get(key)
+        if isinstance(probe, Mapping) and probe.get("science") is False:
+            return False
+    if any(
+        isinstance(payload.get(key), (Mapping, list)) for key in _RAN_MARKER_KEYS
+    ) or any(
+        isinstance(payload.get(key), (int, float)) and not isinstance(payload.get(key), bool)
+        for key in _RAN_MARKER_KEYS
+    ):
+        return True
+    # Numeric scientific-result markers (e.g. tau_b_window_a observed) count
+    # as "the scientific result actually ran".
+    return any(
+        isinstance(payload.get(key), (int, float)) and not isinstance(payload.get(key), bool)
+        for key in _NUMERIC_RESULT_KEYS
+    ) and str(payload.get("reason") or "").strip() != ""
+
+
+def _has_population_or_estimand_context(payload: Mapping[str, Any]) -> bool:
+    """Population / estimand compatibility sufficient for that close."""
+    for key in ("cohort", "population", "estimand", "criteria", "score", "design_probe"):
+        value = payload.get(key)
+        if isinstance(value, Mapping) and value:
+            return True
+    # Numeric cohort-size markers (rankable/decision-time eligible counts)
+    # establish population context for typed scientific family decisions.
+    return any(
+        isinstance(payload.get(key), (int, float)) and not isinstance(payload.get(key), bool)
+        for key in ("rankable_h900", "decision_time_eligible")
+    )
+
+
+def _has_hash_binding(payload: Mapping[str, Any]) -> bool:
+    return any(isinstance(payload.get(key), str) and payload.get(key) for key in _HASH_BINDING_KEYS)
+
+
+def family_close_authority(payload: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Return the positive authority body for a family close, or ``None``.
+
+    Positive authority requires all materially necessary dimensions:
+    scientific result ran, exact scope identity, population/estimand
+    compatibility context, and evidence provenance binding. Naming,
+    ``_FAMILY`` suffix, filename, historical priority decision, owner PARK,
+    generic CLOSE, or absence of contrary evidence never authorize a family
+    hard-close.
+    """
+    body = payload if isinstance(payload, Mapping) else {}
+    if not body:
+        return None
+    if _is_typed_runtime_receipt(body):
+        # Typed RDP runtime receipts carry machine-bound decision payloads
+        # (classifier terminal, outcome_consumed, dataset_fingerprint binding).
+        if body.get("outcome_consumed") is True and _scope_id(body):
+            return {
+                "class": "POSITIVE",
+                "source": "TYPED_RUNTIME_RECEIPT",
+                "scope_id": _scope_id(body),
+                "hash_binding": str(body.get("dataset_fingerprint") or ""),
+            }
+        return None
+    if not _has_positive_science(body):
+        return None
+    if not _scope_id(body):
+        return None
+    if not _has_population_or_estimand_context(body):
+        return None
+    if not _has_hash_binding(body):
+        return None
+    return {
+        "class": "POSITIVE",
+        "source": "GIT_ACCEPTANCE",
+        "scope_id": _scope_id(body),
+        "hash_binding": next(
+            str(body.get(key))
+            for key in _HASH_BINDING_KEYS
+            if isinstance(body.get(key), str) and body.get(key)
+        ),
+    }
+
+
 def _is_legacy_measurement(payload: Mapping[str, Any]) -> bool:
     terminal = payload.get("terminal")
     rule_id = payload.get("rule_id")
@@ -183,15 +283,26 @@ def classify_source_payload(
             scope_id=str(body.get("rule_id") or ""),
         )
     if _CLOSE_RE.fullmatch(terminal):
-        if _family_close_declared(body, terminal) or (
-            _is_typed_runtime_receipt(body) and terminal.endswith("_FAMILY")
-        ):
+        authority = family_close_authority(body)
+        family_declared = _family_close_declared(body, terminal)
+        if family_declared and authority is not None:
             return _ledger_item(
                 terminal=terminal,
                 source_receipt=source_receipt,
                 reopen_forbidden=True,
                 suppression_class=SCIENTIFIC_CLOSE_VALID,
                 scope_kind=SCOPE_FAMILY,
+                scope_id=_scope_id(body),
+            )
+        if family_declared:
+            # LABEL IS NOT AUTHORITY: a *_FAMILY terminal without positive
+            # machine evidence stays typed, visible, reopenable prior work.
+            return _ledger_item(
+                terminal=terminal,
+                source_receipt=source_receipt,
+                reopen_forbidden=False,
+                suppression_class=AMBIGUOUS_REQUIRES_OWNER,
+                scope_kind=SCOPE_AMBIGUOUS,
                 scope_id=_scope_id(body),
             )
         if _scope_id(body) or _is_typed_runtime_receipt(body):
@@ -228,6 +339,43 @@ def classify_source_payload(
         suppression_class=AMBIGUOUS_REQUIRES_OWNER,
         scope_kind=SCOPE_AMBIGUOUS,
     )
+
+
+def enumerate_closed_park_terminals_with_authority(
+    repo_root: Path,
+    data_root: Path | None = None,
+) -> list[dict[str, Any]]:
+    """Enumerate with positive-authority proof attached to family items."""
+    from solana_alpha_lab.factory.hfic_preflight import (
+        enumerate_closed_park_terminals,
+    )
+
+    items = enumerate_closed_park_terminals(Path(repo_root), data_root)
+    out: list[dict[str, Any]] = []
+    for item in items:
+        cloned = dict(item)
+        source = str(item.get("source_receipt") or "")
+        payload: Mapping[str, Any] | None = None
+        if source and not source.startswith("datasets/"):
+            path = Path(repo_root) / source
+            if path.is_file():
+                try:
+                    loaded = json.loads(path.read_text(encoding="utf-8"))
+                except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                    loaded = None
+                payload = loaded if isinstance(loaded, Mapping) else None
+        elif source and data_root is not None:
+            decision = Path(data_root) / source
+            if decision.is_file():
+                try:
+                    loaded = json.loads(decision.read_text(encoding="utf-8"))
+                except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                    loaded = None
+                payload = loaded if isinstance(loaded, Mapping) else None
+        if payload is not None:
+            cloned["family_close_authority"] = family_close_authority(payload)
+        out.append(cloned)
+    return out
 
 
 def _source_rank(source: str) -> int:

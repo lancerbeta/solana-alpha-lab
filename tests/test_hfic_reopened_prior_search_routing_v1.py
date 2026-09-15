@@ -160,6 +160,10 @@ class ReopenedInventoryTests(unittest.TestCase):
             {
                 "scientific_terminal": "CLOSE_TAKER_VOLUME_MIX_FAMILY",
                 "family_close": True,
+                "atom_id": "SYNTHETIC_TAKER_MIX_FALSIFIER_V1",
+                "criteria": {"ran": True},
+                "cohort": {"n": 60},
+                "source_runtime_receipt_sha256": "ab" * 32,
             },
             terminal="CLOSE_TAKER_VOLUME_MIX_FAMILY",
             source_receipt="docs/evidence/synthetic/a1_family_close.json",

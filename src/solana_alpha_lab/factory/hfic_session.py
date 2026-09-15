@@ -978,6 +978,26 @@ def _diagnostics_for_receipt(
     )
 
 
+def _assert_vision_integrity_for_surface(
+    preflight_receipt: Mapping[str, Any] | None,
+) -> None:
+    """NO_WORTHY / selected-candidate paths require VISION_INTEGRITY=PASS.
+
+    Fresh HFIC sessions under the current protocol must not persist a
+    scientifically interpretable terminal from a packet whose declared
+    evidence surface was silently incomplete.  A vision failure is typed
+    FORGE_VISION_INTEGRITY_BLOCKED, never NO_WORTHY_HYPOTHESIS.
+    """
+    if not isinstance(preflight_receipt, Mapping):
+        return
+    packet = preflight_receipt.get("forge_context_packet")
+    if not isinstance(packet, Mapping):
+        return
+    vision = packet.get("vision_integrity")
+    if isinstance(vision, Mapping) and vision.get("status") != "PASS":
+        raise HficSessionError("FORGE_VISION_INTEGRITY_BLOCKED")
+
+
 def freeze_draft(
     draft: Mapping[str, Any],
     *,
@@ -1016,8 +1036,7 @@ def freeze_draft(
 
     selected_ref = draft.get("selected_candidate_ref")
     if selected_ref in (None, ""):
-        return _freeze_no_worthy(
-            draft,
+        return _freeze_no_worthy(            draft,
             identities=identities,
             preflight_receipt=preflight_receipt,
             store=store,
@@ -1031,6 +1050,7 @@ def freeze_draft(
     if next_action_draft is not None:
         raise HficSessionError("HFIC_NEXT_ACTION_FORBIDDEN_FOR_SELECTED")
 
+    _assert_vision_integrity_for_surface(preflight_receipt)
     selected_index = _resolve_ref(selected_ref, identities)
     if selected_index < 0:
         raise HficSessionError("SELECTED_CANDIDATE_MISSING")
@@ -1424,6 +1444,7 @@ def _freeze_no_worthy(
     prompt_version: str = PROMPT_VERSION_V1_1,
     packet_version: str = "1.1",
 ) -> dict[str, Any]:
+    _assert_vision_integrity_for_surface(preflight_receipt)
     runner_up_index = _resolve_ref(draft.get("runner_up_candidate_ref"), identities)
     if runner_up_index < 0:
         raise HficSessionError("CROSS_REFERENCE_MISMATCH")
