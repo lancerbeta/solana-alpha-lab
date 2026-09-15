@@ -141,6 +141,18 @@ PREFLIGHT_PUSH_NON_CLAIMS = (
     "NO_MERGE_AUTHORITY",
     "NO_PRODUCT_ACCEPTANCE",
 )
+SHA256_HEX = re.compile(r"^[0-9a-f]{64}$")
+# Evidence files whose {path, sha256} pins are verified by tests against a
+# frozen historical commit (`git show <ACCEPTED_*_COMMIT>:path`), not HEAD.
+# A SEPARATE+drift flag against these files is not current-byte CI risk.
+# Adding a new frozen-semantics acceptance requires updating this registry
+# in the same atom; missing an entry fails closed (extra DENY).
+FROZEN_SEMANTICS_EVIDENCE_FILES = frozenset(
+    {
+        "docs/evidence/task21/durable_resume_router_binding_acceptance_v1.json",
+        "docs/evidence/task21/task21_artifact_index_v1.json",
+    }
+)
 
 
 def path_in_managed_write_set(path: str, managed: list[str]) -> bool:
@@ -218,15 +230,18 @@ def preflight_push(
     drift_checker=None,
     evidence_verifier=None,
     git_reader=None,
+    shadow_pin_checker=None,
+    divergence_checker=None,
 ) -> dict[str, Any]:
     """Read-only local readiness gate before the first remote task-branch push.
 
     Thin orchestration over existing deterministic helpers: the harness
     check, exact task-contract validation, scoped derived-state drift,
-    committed-blob evidence binding verification, deterministic context
-    rebuild and write-set/branch/identity assertions. Zero GitHub/network
-    calls, zero writes, zero mutations; it launches no critics, runs no CI,
-    and does not replace merge-readiness.
+    committed-blob evidence binding verification, shadow-pin drift against
+    the candidate diff, worktree-versus-committed byte identity,
+    deterministic context rebuild and write-set/branch/identity assertions.
+    Zero GitHub/network calls, zero writes, zero mutations; it launches no
+    critics, runs no CI, and does not replace merge-readiness.
     """
 
     root = root.resolve()
@@ -306,6 +321,36 @@ def preflight_push(
         checks["write_set_pass"] = not outside
         if outside:
             reasons.append("WRITE_SET_VIOLATION:" + ",".join(sorted(outside)))
+
+        pin_checker = shadow_pin_checker or _preflight_shadow_pin_problems
+        try:
+            pin_reasons = pin_checker(
+                root, head=identity["head"], changed=set(changed)
+            )
+        except (OSError, ValueError, TypeError) as exc:
+            pin_reasons = [f"SHADOW_PIN_SCAN_FAILED:{exc}"]
+        checks["shadow_pins_current"] = not pin_reasons
+        if pin_reasons:
+            reasons.append(
+                "REPAIR_HINT: re-pin SEPARATE evidence sha256 to git show HEAD:<path> "
+                "and add that evidence file to this task managed_write_set"
+            )
+        reasons.extend(pin_reasons)
+
+        div_checker = divergence_checker or _preflight_worktree_committed_divergence
+        try:
+            div_reasons = div_checker(
+                root, head=identity["head"], changed=changed
+            )
+        except (OSError, ValueError, TypeError) as exc:
+            div_reasons = [f"WORKTREE_COMMITTED_SCAN_FAILED:{exc}"]
+        checks["worktree_matches_committed"] = not div_reasons
+        if div_reasons:
+            reasons.append(
+                "REPAIR_HINT: worktree bytes differ from git show HEAD:<path> "
+                "(often CRLF); rewrite the path from the committed blob"
+            )
+        reasons.extend(div_reasons)
 
     drift = drift_checker or _preflight_drift_problems
     drift_reasons = drift(root, expected_upstream=expected_upstream)
@@ -403,6 +448,138 @@ def _preflight_evidence_problems(root: Path, *, task_id: str, task_contract: str
     finally:
         harness_sync.ROOT = original_root
     return [f"DELIVERY_EVIDENCE_DRIFT:{problem}" for problem in problems]
+
+
+def walk_path_sha256_pins(node: Any) -> list[tuple[str, str]]:
+    """Collect nested {path, sha256} pairs that look like artifact bindings."""
+
+    found: list[tuple[str, str]] = []
+    if isinstance(node, dict):
+        path = node.get("path")
+        sha = node.get("sha256")
+        if (
+            isinstance(path, str)
+            and isinstance(sha, str)
+            and SHA256_HEX.fullmatch(sha)
+            and path
+            and not path.startswith("/")
+            and ".." not in path.replace("\\", "/").split("/")
+        ):
+            found.append((path.replace("\\", "/"), sha))
+        for value in node.values():
+            found.extend(walk_path_sha256_pins(value))
+    elif isinstance(node, list):
+        for value in node:
+            found.extend(walk_path_sha256_pins(value))
+    return found
+
+
+def git_bytes(root: Path, *args: str) -> bytes:
+    """Raw git stdout; never strip or decode. Fail closed on non-zero."""
+
+    completed = subprocess.run(
+        ["git", *args],
+        cwd=root,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+        shell=False,
+    )
+    if completed.returncode != 0:
+        raise ValueError("GIT_BYTES_FAILED")
+    return completed.stdout
+
+
+def _committed_sha_at(root: Path, head: str, relative: str) -> str | None:
+    try:
+        blob = git_bytes(root, "show", f"{head}:{relative}")
+    except ValueError:
+        return None
+    return hashlib.sha256(blob).hexdigest()
+
+
+def _preflight_shadow_pin_problems(
+    root: Path,
+    *,
+    head: str,
+    changed: set[str],
+    evidence_root: Path | None = None,
+    blob_sha_lookup=None,
+    frozen_evidence: frozenset[str] | None = None,
+) -> list[str]:
+    """DENY SEPARATE historical pins whose target drifted vs HEAD blobs.
+
+    A pin is in scope when:
+    - the pinning evidence file is under docs/evidence/**/*.json
+    - that evidence file is NOT in the candidate diff (not co-moved)
+    - the evidence file is not in the frozen-semantics registry
+    - the pinned path IS in the candidate diff
+    - pinned sha256 != sha256(git show HEAD:pinned_path)
+    """
+
+    if not changed:
+        return []
+    lookup = blob_sha_lookup or (
+        lambda relative: _committed_sha_at(root, head, relative)
+    )
+    committed: dict[str, str | None] = {}
+    for path in changed:
+        committed[path] = lookup(path)
+    exempt = frozen_evidence if frozen_evidence is not None else FROZEN_SEMANTICS_EVIDENCE_FILES
+    scan_root = evidence_root if evidence_root is not None else (root / "docs" / "evidence")
+    reasons: list[str] = []
+    if not scan_root.is_dir():
+        return []
+    for evidence_path in sorted(scan_root.rglob("*.json")):
+        try:
+            rel = evidence_path.resolve().relative_to(root.resolve()).as_posix()
+        except ValueError:
+            continue
+        if rel in changed or rel in exempt:
+            continue
+        try:
+            payload = json.loads(evidence_path.read_bytes().decode("utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError, ValueError):
+            continue
+        for pinned_path, sha in walk_path_sha256_pins(payload):
+            if pinned_path not in changed:
+                continue
+            actual = committed.get(pinned_path)
+            if actual is None:
+                reasons.append(f"SHADOW_PIN_TARGET_MISSING:{rel}->{pinned_path}")
+            elif actual != sha:
+                reasons.append(f"SHADOW_PIN_DRIFT:{rel}->{pinned_path}")
+    return sorted(set(reasons))
+
+
+def _preflight_worktree_committed_divergence(
+    root: Path,
+    *,
+    head: str,
+    changed: list[str],
+    blob_reader=None,
+) -> list[str]:
+    """DENY when a candidate path's worktree bytes differ from the HEAD blob."""
+
+    reader = blob_reader or (lambda relative: git_bytes(root, "show", f"{head}:{relative}"))
+    reasons: list[str] = []
+    for relative in changed:
+        worktree = root / relative
+        if not worktree.is_file():
+            continue
+        try:
+            blob = reader(relative)
+        except (OSError, ValueError):
+            reasons.append(f"WORKTREE_COMMITTED_BLOB_UNREADABLE:{relative}")
+            continue
+        try:
+            live = worktree.read_bytes()
+        except OSError:
+            reasons.append(f"WORKTREE_COMMITTED_WORKTREE_UNREADABLE:{relative}")
+            continue
+        if live != blob:
+            reasons.append(f"WORKTREE_COMMITTED_DIVERGENCE:{relative}")
+    return reasons
 
 
 def canonical_json_bytes(value: Any) -> bytes:

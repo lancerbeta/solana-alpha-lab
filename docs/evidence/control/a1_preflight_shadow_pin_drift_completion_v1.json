@@ -1,0 +1,56 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "a1_preflight_shadow_pin_drift_v1",
+  "as_of": "2026-09-15",
+  "task_id": "PREFLIGHT_SHADOW_PIN_DRIFT_V1",
+  "state_change": "preflight-push DENYs SEPARATE historical shadow-pin drift and worktree/committed byte divergence before first remote push; implementation_bindings compare committed Git blobs.",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/control/a1_preflight_shadow_pin_drift_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_tests_test_preflight_shadow_pin_drift",
+    "independent_review": {
+      "path": "docs/evidence/control/a1_preflight_shadow_pin_drift_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_tests_delivery_harness_deterministic_finish",
+      "PASS_tests_delivery_harness_merge_guard"
+    ]
+  },
+  "non_claims": [
+    "NO_HISTORICAL_EVIDENCE_MIGRATION",
+    "NO_TASK_CONTRACT_SCHEMA_EXPANSION",
+    "NO_DETERMINISTIC_FINISH_REDESIGN",
+    "NO_CI_ARCHITECTURE_CHANGE",
+    "NO_NEW_REVIEW_ORCHESTRATOR",
+    "NO_OWNER_AUTHORITY_CHANGE",
+    "NO_PRODUCT_RUNTIME_CHANGE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_ALPHA",
+    "NO_REAL_MONEY"
+  ],
+  "side_effects": {
+    "files_changed": [],
+    "commands_run": [],
+    "external_calls": []
+  }
+}

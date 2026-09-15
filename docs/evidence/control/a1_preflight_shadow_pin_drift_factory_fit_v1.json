@@ -1,0 +1,32 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PREFLIGHT-SHADOW-PIN-DRIFT-FACTORY-FIT-001",
+  "as_of": "2026-09-15",
+  "task_id": "PREFLIGHT_SHADOW_PIN_DRIFT_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS - locally knowable shadow-pin and CRLF divergence classes move into preflight",
+    "flexibility_and_history": "PASS - frozen-commit pins exempted by registry; no historical JSON migration",
+    "context_efficiency": "PASS - scan is scoped to candidate-diff targets",
+    "research_truth": "PASS - no product/research behavior",
+    "owner_operability": "PASS - DENY before first push with repair hints",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS - revert restores prior preflight; frozen registry is explicit",
+    "build_vs_buy": "PASS - thin helpers inside existing preflight orchestrator",
+    "security": "PASS - read-only, no network, fail-closed scan errors",
+    "red_team": "PASS - co-moved evidence does not silent-pass SEPARATE drift; frozen exemption is named"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "Frozen-semantics registry is explicit and small; a new frozen acceptance must update it",
+    "Does not auto-re-pin; repair remains a visible commit"
+  ]
+}

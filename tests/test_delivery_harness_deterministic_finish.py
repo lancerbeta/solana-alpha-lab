@@ -297,13 +297,15 @@ class PreflightPushAcceptanceTests(unittest.TestCase):
             actor=actor,
             drift_checker=lambda _root, **_k: drift or [],
             evidence_verifier=lambda _root, **_k: evidence or [],
+            shadow_pin_checker=lambda _root, **_k: [],
+            divergence_checker=lambda _root, **_k: [],
         )
 
-    # The eight task-scoped keys exist only when the context receipt
-    # rebuilds on a checkout whose merge-base equals the contract's frozen
-    # expected_base. On merged main (or any state where the base moved) the
-    # rebuild deterministically degrades to the five state-independent keys
-    # with CONTEXT_REBUILD_FAILED recorded; both forms are stable output.
+    # Task-scoped keys exist only when the context receipt rebuilds on a
+    # checkout whose merge-base equals the contract's frozen expected_base.
+    # On merged main (or any state where the base moved) the rebuild
+    # deterministically degrades to the five state-independent keys with
+    # CONTEXT_REBUILD_FAILED recorded; both forms are stable output.
     STATE_INDEPENDENT_CHECKS = {
         "worktree_clean",
         "harness_check_pass",
@@ -315,6 +317,8 @@ class PreflightPushAcceptanceTests(unittest.TestCase):
         "task_base_frozen",
         "candidate_non_empty",
         "write_set_pass",
+        "shadow_pins_current",
+        "worktree_matches_committed",
     }
 
     def test_output_shape_is_stable_and_non_claiming(self) -> None:

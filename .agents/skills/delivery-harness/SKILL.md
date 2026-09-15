@@ -119,8 +119,11 @@ first remote push of the task branch, run the read-only local
 `uv run --locked --managed-python python -B scripts/delivery_harness.py preflight-push
 --task-id <TASK> --contract docs/tasks/<TASK>.md --route <ROUTE> --actor <ACTOR>`
 on the final committed, evidence-bound candidate. It fails closed locally on
-stale bindings, write-set violations, derived drift and malformed evidence,
-claims no CI/merge/acceptance, and a normal push requires its PASS. It does
+stale bindings, write-set violations, derived drift, malformed evidence,
+SEPARATE historical shadow-pin drift against the candidate diff, and
+worktree-versus-committed byte divergence (CRLF), claims no CI/merge/acceptance,
+and a normal push requires its PASS. Frozen-commit pin semantics
+(`FROZEN_SEMANTICS_EVIDENCE_FILES`) stay exempt. It does
 not replace merge-readiness. After exact-head CI run
 `scripts/owner_attention_gate.py --merge-readiness` (no phrase, no `gh pr merge`).
 STOP for one exact owner approval only when `ready_for_owner_phrase` is true;
