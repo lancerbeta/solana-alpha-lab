@@ -39,8 +39,10 @@ Last content commit then `bind-evidence` then read-only local
 `scripts/delivery_harness.py preflight-push` PASS before the first remote
 push (available where the repository carries the full harness scripts
 alongside `harness_sync.py`; a fresh stdlib-only portable install skips
-this step until its bootstrap binds the full toolchain), then
-`--merge-readiness` then phrase.
+this step until its bootstrap binds the full toolchain). Full-script
+preflight also DENYs SEPARATE historical shadow-pin drift and
+worktree/committed byte divergence; it does not replace merge-readiness.
+Then `--merge-readiness` then phrase.
 After the exact PR/head owner
 phrase, use the repository-owned grounded merge
 entrypoint; never replace its live checks with caller-supplied booleans.

@@ -148,7 +148,10 @@ CODE_REVIEWER+GOAL_DOD_CRITIC+ARCHITECTURE_CRITIC. Machine gates
 exact resolved role-set via one shared resolver. Architecture review must
 name what can pass tests and still break research validity.
 `SINGLE_AGENT_REVIEW_FALLBACK` is `NOT_READY` for merge; the
-owner-attention gate denies PASS evidence that records it.
+owner-attention gate denies PASS evidence that records it. `preflight-push`
+additionally DENYs SEPARATE historical evidence pins whose target is in
+the candidate diff and worktree bytes that diverge from committed Git
+blobs; frozen-commit pin files stay exempt.
 
 Before task closure run the proportional `FACTORY_FIT_REVIEW` and
 `PRODUCT_HORIZON_RADAR` from the domain policy. Generated files are never

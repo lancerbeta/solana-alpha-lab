@@ -1,0 +1,33 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "PREFLIGHT-SHADOW-PIN-DRIFT-FACTORY-FIT-001",
+  "as_of": "2026-09-15",
+  "task_id": "PREFLIGHT_SHADOW_PIN_DRIFT_V1",
+  "reviewed_bindings_sha256": "3c906541d2931b9d2746cc1005d1c9c62bb9c9cd70ebd10da9be61b80d116dec",
+  "reviewed_inventory_sha256": "0a0a72f781cc47bdf01d86a841a85baf9b52de6f0afc5fcf4ab9ae742cd9f28c",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS - locally knowable shadow-pin and CRLF divergence classes move into preflight before first remote push",
+    "flexibility_and_history": "PASS - frozen-commit pins exempted by a two-file registry; no historical JSON migration",
+    "context_efficiency": "PASS - scan is scoped to candidate-diff targets, not all-pins-vs-worktree",
+    "research_truth": "PASS - no product or research behavior",
+    "owner_operability": "PASS - DENY before first push with named repair reasons; no new owner surface",
+    "execution_to_cashflow": "PASS - control-plane only; no cash/runtime change",
+    "monitoring_and_recovery": "PASS - revert restores prior preflight; frozen registry is explicit",
+    "build_vs_buy": "PASS - thin helpers inside the existing preflight orchestrator",
+    "security": "PASS - read-only, no network, no secrets; unreadable evidence JSON is skipped per file rather than SHADOW_PIN_SCAN_FAILED",
+    "red_team": "PASS - co-moved evidence does not silent-pass SEPARATE drift; frozen exemption is named and test-locked to two files"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "Frozen-semantics registry is explicit and small; a new frozen acceptance must update it",
+    "Does not auto-re-pin; repair remains a visible commit",
+    "Malformed evidence JSON is skipped for that file; a readable SEPARATE drifted pin still DENYs"
+  ]
+}

@@ -108,8 +108,12 @@ uv run --locked --managed-python python -B scripts/delivery_harness.py preflight
 ```
 
 It orchestrates existing validators (identity, contract shape, write set,
-derived drift, evidence chain, deterministic context rebuild) with zero
-GitHub/network calls and zero mutations. Exit 0 and
+derived drift, evidence chain, deterministic context rebuild) plus two
+local classes that CI previously had to catch after push: SEPARATE
+historical `{path,sha256}` pins whose target is in the candidate diff, and
+worktree bytes that differ from `git show HEAD:<path>`. Frozen-commit
+evidence files listed in `FROZEN_SEMANTICS_EVIDENCE_FILES` are exempt.
+Zero GitHub/network calls and zero mutations. Exit 0 and
 `ready_for_first_push: true` are required before any normal remote task-branch
 push; it claims no CI, no merge authority and no product acceptance, and does
 not replace merge-readiness.

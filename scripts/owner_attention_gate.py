@@ -1627,11 +1627,15 @@ def bound_delivery_evidence(
             if not isinstance(binding_path, str) or not isinstance(expected_sha, str):
                 bindings_match = False
                 break
-            candidate = (root / binding_path).resolve()
-            if root.resolve() not in candidate.parents or not candidate.is_file():
+            try:
+                blob = runner(
+                    ["git", "show", f"{head}:{binding_path}"],
+                    root,
+                )
+            except ValueError:
                 bindings_match = False
                 break
-            if hashlib.sha256(candidate.read_bytes()).hexdigest() != expected_sha:
+            if hashlib.sha256(blob).hexdigest() != expected_sha:
                 bindings_match = False
                 break
         if not bindings_match:
