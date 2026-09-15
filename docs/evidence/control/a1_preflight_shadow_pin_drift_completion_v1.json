@@ -8,7 +8,24 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/delivery-harness/SKILL.md": "627f5a8047a655768838ebf0e7a211a00dfc35db05ddf5727f9ea80244c3d4c8",
+    "AGENTS.md": "fc8e8c1dfe992b9e508e2885f0ecc75b4e7207a8664c56ec72bd4969b2c4026a",
+    "catalog/assets/core.yaml": "bd3785658c69d94af084674547270d7c69c26e2ca344c68f008e8046de21dced",
+    "delivery-harness/templates/portable-bundle-manifest.json": "816b8bfddd1787560f927cbc6c38f1708056666b02ec9ed010b127b8e7c92db3",
+    "delivery-harness/templates/portable-core/dot-agents/skills/delivery-harness/SKILL.md": "28afb8b0031c19a3602769088139ef11edf60e1c730df6ee1a53ca5a09c36b1d",
+    "docs/agent/DELIVERY_HARNESS_PROTOCOL.md": "78893392f4b548c1fb6d98b251cf4beec5b86c252afd43705aeee88f318698d8",
+    "docs/evidence/control/delivery_harness_acceptance_v1.json": "be343f5019418fb92863dee723c1b0f671eebb3d46abe7a4595f646c34c0c912",
+    "docs/evidence/control/owner_attention_gate_acceptance_v1.json": "5d7769690d6a9ca3f816bea9f97e95ef75983816b2ba2537b1c1f72f9bd82d19",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "72e78fc8d2feae293569dda74d11ab6fdc43e2838c0fb41d0d8d504acd4430fa",
+    "docs/evidence/task30/a20r1_provider_route_capability_registry_acceptance_v1.json": "29b3edbe890e9b14da5bb21a060585398d90b87a83db57698df0a1fadc7f2023",
+    "docs/tasks/PREFLIGHT_SHADOW_PIN_DRIFT_V1.md": "328ecffc91c83ac897dc9d313b4e169c54c461e653fcbfae23ddc1cc6b45cd0b",
+    "scripts/delivery_harness.py": "88303e36bfc8e0b4a2b1c9757401962905cef7d691467725ae98280be6a5114c",
+    "scripts/owner_attention_gate.py": "e5976193d7bb9ee7adb2063fb38955cf2f0a38bea28539854d571950cb74e1fe",
+    "tests/test_delivery_harness_deterministic_finish.py": "0a7737e686b80462d26d6f4e5b0a3591991bfae785af667cc63742eabe082263",
+    "tests/test_delivery_harness_merge_guard.py": "7804aba59571d6e717167fa9eded5eb5d3f331484ab5a25b3a0d9b136b2a43ae",
+    "tests/test_preflight_shadow_pin_drift.py": "c98b85927053c8273f8f12e545cfd225ac168ec396dc67ad5f00444364c81321"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -19,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/control/a1_preflight_shadow_pin_drift_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "cad007c91adc3839f96e6072012d82eed94c9c4f9933ea209d68e9c6e464b446",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_tests_test_preflight_shadow_pin_drift",
     "independent_review": {
       "path": "docs/evidence/control/a1_preflight_shadow_pin_drift_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "de00f18cdd47921d00a0ecd4fd1893a3b94d3155c72ce1c4bc29ec85818ea001",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -55,5 +72,6 @@
     "external_provider_calls": false,
     "wallet_or_signer_action": false,
     "deployment": false
-  }
+  },
+  "base_main": "3d828150fef69d22845602b656bc304452c5dc8b"
 }
