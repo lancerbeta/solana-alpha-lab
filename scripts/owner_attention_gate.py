@@ -309,7 +309,17 @@ def effective_required_roles(
         for path in candidate_paths:
             normalized = str(path).replace("\\", "/")
             for prefix in ARCHITECTURE_FLOOR_PREFIXES:
-                if normalized == prefix or normalized.startswith(prefix):
+                # Exact equality for file entries (AGENTS.md), directory
+                # prefix semantics only for trailing-slash entries
+                # (catalog/schemas/). Prevents AGENTS.md.bak-style
+                # over-matching while never under-matching directories.
+                if prefix.endswith("/"):
+                    matched = normalized.startswith(prefix)
+                else:
+                    matched = normalized == prefix or normalized.startswith(
+                        prefix + "/"
+                    )
+                if matched:
                     effective.add("ARCHITECTURE_CRITIC")
                     break
     if not effective or not effective <= REVIEW_ROLE_UNIVERSE:
@@ -584,14 +594,20 @@ def _task_contract_metadata(
 
 
 def _candidate_paths_for_roles(
-    root: Path, receipt: dict[str, Any], *, runner=run_read
+    root: Path,
+    receipt: dict[str, Any],
+    *,
+    runner=run_read,
+    head: str | None = None,
 ) -> "set[str] | None":
     """Changed paths base..HEAD for deterministic architecture floors.
 
     Returns ``None`` only when the receipt carries no contract binding (same
     condition as :func:`_task_contract_metadata`); a bound receipt whose diff
     cannot be read raises ``ValueError`` (fail-closed) rather than silently
-    dropping the architecture floor.
+    dropping the architecture floor. ``head`` derives the floor from the same
+    argument the caller binds evidence to; it falls back to ``rev-parse HEAD``
+    only when unset.
     """
 
     task = receipt.get("task")
@@ -600,9 +616,10 @@ def _candidate_paths_for_roles(
     ):
         return None
     try:
-        head = runner(
-            ["git", "rev-parse", "HEAD"], root
-        ).decode("ascii", errors="strict").strip()
+        if head is None:
+            head = runner(
+                ["git", "rev-parse", "HEAD"], root
+            ).decode("ascii", errors="strict").strip()
         scope = task_delivery_scope(root, receipt, runner=runner)
         expected_base = scope[0]
         output = runner(
@@ -1475,7 +1492,9 @@ def bound_delivery_evidence(
     # An unbound receipt (no contract path) resolves to the LEGACY_TRIPLE.
     try:
         task_metadata = _task_contract_metadata(root, receipt, runner=runner)
-        candidate_paths = _candidate_paths_for_roles(root, receipt, runner=runner)
+        candidate_paths = _candidate_paths_for_roles(
+            root, receipt, runner=runner, head=head
+        )
         gate_effective_roles = effective_required_roles(
             task_metadata,
             live_pr_head=False,

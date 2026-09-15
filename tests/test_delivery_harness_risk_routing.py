@@ -114,6 +114,28 @@ class EffectiveRequiredRolesTest(unittest.TestCase):
         )
         self.assertEqual(effective, {"CODE_REVIEWER"})
 
+    def test_6d_floor_prefix_matching_is_exact_for_files(self) -> None:
+        # CODE_REVIEWER MINOR 6: file entries match exactly; sibling files
+        # using the name as a prefix (AGENTS.md.bak) must not trigger the
+        # floor, while subpaths under directory entries and exact script
+        # paths must.
+        for path, expected_arch in [
+            ("AGENTS.md.bak", False),
+            ("AGENTS.md", True),
+            ("scripts/owner_attention_gate.py.orig", False),
+            ("scripts/owner_attention_gate.py", True),
+            ("control/anything.yaml", True),
+            ("controlx/anything.yaml", False),
+        ]:
+            with self.subTest(path=path):
+                effective = gate.effective_required_roles(
+                    {"required_review_roles": ["CODE_REVIEWER"]},
+                    candidate_paths={path},
+                )
+                self.assertEqual(
+                    "ARCHITECTURE_CRITIC" in effective, expected_arch
+                )
+
     def test_7_owner_ux_is_valid_canonical_role(self) -> None:
         effective = gate.effective_required_roles(
             {"required_review_roles": ["CODE_REVIEWER", "OWNER_UX_CRITIC"]}
@@ -389,8 +411,14 @@ class SharedEnforcementTest(unittest.TestCase):
 
     def test_20_under_scope_finding_blocks_final_closure(self) -> None:
         # A CODE_REVIEWER under-scope finding is a NOT_READY verdict on the
-        # final required critic, which the shape validator denies.
-        review = _review(required=["CODE_REVIEWER"])
+        # final required critic, which the shape validator denies. The
+        # finding text itself (REVIEW_PLAN_UNDERSCOPED:<ROLE>) carries the
+        # missing role; closure requires strengthening the plan (replan +
+        # new context receipt) and re-review, which acceptance 3 enforces:
+        # a review claiming the missing role as required while the frozen
+        # plan lacks it is an exact-set MISMATCH and stays denied until the
+        # contract itself is strengthened.
+        review = _review(required=["CODE_REVIEWER", "OWNER_UX_CRITIC"])
         review["reviews"] = [
             {
                 "role": "CODE_REVIEWER",
@@ -398,10 +426,32 @@ class SharedEnforcementTest(unittest.TestCase):
                 "findings": ["BLOCKER REVIEW_PLAN_UNDERSCOPED:OWNER_UX_CRITIC"],
             }
         ]
-        problems = gate.delivery_independent_review_shape_problems(
+        # Under the frozen (unstRENGTHENED) plan the role-set is still
+        # [CODE_REVIEWER] only -> exact-set mismatch denies closure.
+        frozen_plan_problems = gate.delivery_independent_review_shape_problems(
             review, effective_roles={"CODE_REVIEWER"}
         )
-        self.assertIn("review_role_verdict_not_pass", problems)
+        self.assertIn("review_required_roles_incomplete", frozen_plan_problems)
+        self.assertIn("review_role_verdict_not_pass", frozen_plan_problems)
+        # After a legitimate strengthening replan, the strengthened plan
+        # resolves both roles; until a final PASS exists for every role
+        # (including the added OWNER_UX_CRITIC) closure stays denied — the
+        # under-scope finding's demanded role cannot be skipped.
+        strengthened_problems = gate.delivery_independent_review_shape_problems(
+            review, effective_roles={"CODE_REVIEWER", "OWNER_UX_CRITIC"}
+        )
+        self.assertNotIn("review_required_roles_incomplete", strengthened_problems)
+        self.assertIn("review_roles_incomplete", strengthened_problems)
+        # And once the strengthened plan is fully re-reviewed with final PASS
+        # entries for both roles, closure passes.
+        healed = _review(
+            required=["CODE_REVIEWER", "OWNER_UX_CRITIC"],
+            roles=["CODE_REVIEWER", "OWNER_UX_CRITIC"],
+        )
+        healed_problems = gate.delivery_independent_review_shape_problems(
+            healed, effective_roles={"CODE_REVIEWER", "OWNER_UX_CRITIC"}
+        )
+        self.assertEqual(healed_problems, [])
 
 
 class SchemaConvergenceTest(unittest.TestCase):

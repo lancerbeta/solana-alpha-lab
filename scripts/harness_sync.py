@@ -1709,12 +1709,30 @@ def verify_evidence_chain_internal(completion_path: str) -> list[str]:
     )
     task_id = completion.get("task_id")
     if isinstance(task_id, str) and task_id:
+        effective_roles = None
+        try:
+            # Historical audit resolves the effective role-set through the
+            # same canonical resolver (contract recovered from task_id),
+            # so a contract-frozen role-set audits identically to bind and
+            # merge gates instead of false-MISMATCHing against the triple.
+            _, contract_metadata = resolve_task_contract(task_id)
+            base = completion.get("base_main")
+            effective_roles = _effective_required_roles_for_task(
+                contract_metadata,
+                expected_base=base if isinstance(base, str) else "",
+                head=head,
+            )
+        except (HarnessSyncError, ValueError):
+            # Pre-resolver delivered tasks (no recoverable contract/diff)
+            # fall back to the shape validator's LEGACY_TRIPLE default.
+            effective_roles = None
         problems.extend(
             _delivery_evidence_merge_shape_problems(
                 completion=completion,
                 review=review,
                 fit=fit,
                 task_id=task_id,
+                effective_roles=effective_roles,
             )
         )
     else:
@@ -1831,16 +1849,38 @@ def bind_evidence_main(argv: list[str]) -> int:
         print("HARNESS_SYNC_ERROR: --task-id is required", file=sys.stderr)
         return 2
     if args.verify:
-        problems = verify_evidence_chain(
+        try:
+            problems = verify_evidence_chain(
+                task_id=args.task_id, contract=args.contract, head=args.head
+            )
+        except (HarnessSyncError, ValueError) as error:
+            print(f"HARNESS_SYNC_ERROR: {error}", file=sys.stderr)
+            return 2
+        if not problems:
+            # Surface the resolved effective role-set so the operator sees
+            # which frozen roles the machine enforced for this candidate.
+            try:
+                expected = compute_evidence_chain(
+                    task_id=args.task_id, contract=args.contract, head=args.head
+                )
+                print(
+                    "HARNESS_SYNC_BIND_EVIDENCE: PASS "
+                    "effective_required_roles="
+                    + ",".join(sorted(expected["effective_required_roles"]))
+                )
+            except (HarnessSyncError, ValueError):
+                print("HARNESS_SYNC_BIND_EVIDENCE: PASS")
+            return 0
+        for problem in problems:
+            print(f"BIND_EVIDENCE_DRIFT: {problem}", file=sys.stderr)
+        return 1
+    try:
+        result = apply_evidence_chain(
             task_id=args.task_id, contract=args.contract, head=args.head
         )
-        if problems:
-            for problem in problems:
-                print(f"BIND_EVIDENCE_DRIFT: {problem}", file=sys.stderr)
-            return 1
-        print("HARNESS_SYNC_BIND_EVIDENCE: PASS")
-        return 0
-    result = apply_evidence_chain(task_id=args.task_id, contract=args.contract, head=args.head)
+    except (HarnessSyncError, ValueError) as error:
+        print(f"HARNESS_SYNC_ERROR: {error}", file=sys.stderr)
+        return 2
     print(json.dumps(result, indent=2))
     return 0
 
