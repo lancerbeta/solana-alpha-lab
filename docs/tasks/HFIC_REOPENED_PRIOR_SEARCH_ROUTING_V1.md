@@ -47,6 +47,7 @@ managed_write_set:
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
+  - catalog/schemas/hypothesis_critic_input_v1.schema.json
   - catalog/generated/asset_edges.json
   - docs/PROJECT_MAP.md
   - docs/OPERATOR_NAVIGATION.md

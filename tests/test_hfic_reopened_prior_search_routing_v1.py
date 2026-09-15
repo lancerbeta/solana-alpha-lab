@@ -33,6 +33,9 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     evidence_epoch_material,
     rank_prior_candidate_ids,
 )
+from solana_alpha_lab.factory.hfic_prior_memory import (  # noqa: E402
+    build_prior_memory_snapshot,
+)
 from solana_alpha_lab.factory.hfic_reopened_prior_routing import (  # noqa: E402
     BODY_INCOMPLETE,
     BODY_UNRESOLVABLE,
@@ -513,6 +516,36 @@ class PromptABodyTests(unittest.TestCase):
             )
             self.assertEqual(ranked[0], "HYP-MMM-TAKER-VOLUME-001")
             self.assertEqual(dropped, 0)
+
+    def test_commissioned_capsules_validate_critic_schema(self) -> None:
+        from jsonschema import Draft202012Validator
+
+        schema = json.loads(
+            (
+                ROOT / "catalog/schemas/hypothesis_critic_input_v1.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        capsule_schema = schema["properties"]["prior_memory"]["properties"]["capsules"][
+            "items"
+        ]
+        validator = Draft202012Validator(capsule_schema)
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            commission_reopened_priors(
+                store, ROOT, git_sha="0" * 40, clock=CLOCK, confirm_append_only=True
+            )
+            snapshot = build_prior_memory_snapshot(
+                store,
+                store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+                repo_root=ROOT,
+            )
+            self.assertGreaterEqual(snapshot["emitted_count"], 2)
+            for capsule in snapshot["capsules"]:
+                validator.validate(capsule)
+                if capsule["hypothesis_version_id"] in {H11, H13}:
+                    self.assertTrue(capsule.get("legacy_definition"))
+                    self.assertTrue(str(capsule.get("park_status") or "").strip())
+                    self.assertIsNone(capsule.get("claim"))
 
 
 class FreezeCompatAndCliTests(unittest.TestCase):
