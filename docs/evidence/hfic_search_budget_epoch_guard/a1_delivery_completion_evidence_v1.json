@@ -17,6 +17,7 @@
   "implementation_bindings": {
     "catalog/assets/core.yaml": "30d868e6d1118fe252d1c87eb834ac9250408d4ae7f112069e55d1f44543bf2a",
     "docs/evidence/hfic_search_budget_epoch_guard/a1_active_rdp_preview_v1.json": "e9103cc791c7aef4d636f6399be442a0f9156a34b9323a6065259fcbd543bed5",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "b954e76d93def50e9e104660c097aae1a0bab97e7e1a0255ae283f55c43d9d20",
     "docs/reports/hfic_search_budget_epoch_guard/a1_owner_readout_v1.md": "e98d6a5a5d5d93de4f3145354c3bbcafe56971f3eea58b1b66cffee21f8397b5",
     "docs/tasks/HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1.md": "be4d79b008400b05a1df977311dc0b2973449f407c96bad169fded88768bd986",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "51a32cc2c6f57d73d54e0feb902bc3981e6a6923e9412ddea9d000ff3929d22a",
@@ -33,14 +34,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_search_budget_epoch_guard/a1_delivery_factory_fit_v1.json",
-    "sha256": "46b01588c4aea210b4a86afd15ef04fc04aba3e0d695eab0f3952a45af9c2417",
+    "sha256": "b70d56c3dfda5c121b882747db82df5938f0ea3c2725cddef3bdd072c0d9e60a",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_SEARCH_BUDGET_EPOCH_GUARD",
     "independent_review": {
       "path": "docs/evidence/hfic_search_budget_epoch_guard/a1_delivery_independent_review_v1.json",
-      "sha256": "0875bf988c091a9ebcd371a0da2e61afffcbf5e564d870731e0588f6f2d82bc8",
+      "sha256": "ad8f82a107047b9f4c5fbd8c5b6c6fd74552329bccedd76b145b3c082368ee58",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

@@ -4,8 +4,8 @@
   "review_id": "HFIC-SEARCH-BUDGET-EPOCH-GUARD-FACTORY-FIT-001",
   "as_of": "2026-09-16",
   "task_id": "HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1",
-  "reviewed_bindings_sha256": "d479bca4968360617a337ef5aca4d285adfa4a94cc26470ffb1000a411b63f5d",
-  "reviewed_inventory_sha256": "0086ad8e1a9d08832a6bf63e43a1945a28837d2df6ac44547ffc7b780a803c16",
+  "reviewed_bindings_sha256": "7c1f60fa05cc6dea6cad0f291a862ca60e452b63b861f210e91272e508803f68",
+  "reviewed_inventory_sha256": "e4168dd861fa8703387ae00b7a3e4284e583b5f7ce4b0b936a6f2a50072f2eb3",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
