@@ -1284,6 +1284,9 @@ def build_forge_context_packet(
             "semantic_route_id": entry.get("semantic_route_id"),
             "root_asset_ids": entry.get("root_asset_ids"),
             "status_plane": entry.get("status_plane"),
+            # authority boundary must survive compaction: route visibility
+            # never grants call authority.
+            "authority_granted": entry.get("authority_granted", False),
         }
         for entry in (semantic_slice.get("semantic_capability_entries") or [])
     ]

@@ -1,1 +1,153 @@
-{"calibration":{"commission_applied":false,"defective_session":"HFIC-SESS-8F4A703030408365","planned_exact_session_quarantine":["HFIC-SESS-8F4A703030408365"],"planned_terminal":"CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION","quarantine_removes_calibration_hfic":true,"store_h11_present":false,"store_h13_present":false},"challenger_operability":{"no_future_git_atom_required":true,"non_synthetic_input_receipt_schema":"smial.normalized-trajectory-v1-projection-input-receipt","observation_row_count":78080,"probe_executed":false,"projected_observation_count":29280,"runtime_seam":"resolve_release_projection_input","seam_module":"solana_alpha_lab.factory.hfic_released_trajectory_projection","seam_status":"VERIFIED","terminal":"NORMALIZED_TRAJECTORY_V1_RUNTIME_READY_NOT_EXECUTED","verified_release_binding":{"activation_id":"ACT-619AE64E885E995E","census_sha256":"cfa7d8404dc5400c4e223c4d5303193ad2209f92cac3af2d61862e384ebfd5bf","cohort_id":"REL-20260902T111900Z-20260909T111900Z","observations_sha256":"7b26425c69cc95baf8a9e0b9ea506de1042b98b83d48a2dae07f5a33a7d66d7d","producer_git_sha":"669745ec8de59c6db4aa04418af845253872bfde","release_id":"633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154","schedule_sha256":"619ae64e885e995ee09d562f7b11d93f2ff7aca8b642abbb1f81c390c7d7896d","source_sha256":"ace91647af04ba116a4c42d11ec62ed38c2570c18c6433498f2b51e7f69ff533"}},"checks":{"calibration":true,"challenger":true,"packet":true,"priors":true,"suppression":true,"vision":true},"failed_checks":[],"next_hint":null,"packet_control":{"control_yield_gate":"OK","evidence_surface_mode":"CURRENT_REPRESENTATION_CONTROL_V1","packet_bytes":15913,"packet_within_bound":true,"planned_action":"START_NEW_SESSION","search_budget":"available","trajectory_blind":true,"yield_eligible":148},"priors":{"basis":"planned_post_commission_overlay","dropped_material_priors":0,"h11_visible_body_ranked":true,"h13_visible_body_ranked":true,"prior_bodies":["HYP-EARLY-TAKER-VOLUME-MIX-H900-V1","HYP-QUOTE-NATIVE-FRICTION-H900-V1","HYP-RC002-H11-LIFECYCLE-CLOCK-V1","RC001-H13-COMPOSITE-VETO"],"ranked_body_mismatch":0},"schema":"smial.hfic-vision-acceptance","schema_version":"1.0","suppression":{"ambiguous_acting_as_hard_close":0,"family_hard_closes":6,"not_portable_acting_as_hard_close":0,"parks_acting_as_hard_close":0,"reopen_forbidden_by_scope":{"CANDIDATE":1,"FAMILY":6,"ROUTE":1},"scope_overclosure":0,"terminals":{"CLOSE_EARLY_PATH_CANDIDATE":{"authority":null,"reopen_forbidden":true,"scope_kind":"CANDIDATE","source":"docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json"},"CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY":{"authority":"POSITIVE","reopen_forbidden":true,"scope_kind":"FAMILY","source":"docs/evidence/early_structural_backing_pit_commissioning/a1_family_decision_v1.json"},"CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY":{"authority":"POSITIVE","reopen_forbidden":true,"scope_kind":"FAMILY","source":"datasets/manifests/DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.decision.json"},"CLOSE_EXACT_FRICTION_VETO_FAMILY":{"authority":"POSITIVE","reopen_forbidden":true,"scope_kind":"FAMILY","source":"docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json"},"CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY":{"authority":"POSITIVE","reopen_forbidden":true,"scope_kind":"FAMILY","source":"docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_acceptance_v1.json"},"CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY":{"authority":"POSITIVE","reopen_forbidden":true,"scope_kind":"FAMILY","source":"docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json"},"CLOSE_TASK40_WITH_CREATE_AT_GAP_AND_BOUND_MIGRATION_AT":{"authority":null,"reopen_forbidden":true,"scope_kind":"ROUTE","source":"docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_task40_close_create_at_gap_migration_at_bound_acceptance_v1.json"},"CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY":{"authority":"POSITIVE","reopen_forbidden":true,"scope_kind":"FAMILY","source":"docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json"},"PARK_H11_FROM_PRIORITY":{"authority":null,"reopen_forbidden":false,"scope_kind":"PRIORITY_PARK","source":"docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json"},"PARK_H13_FROM_PRIORITY":{"authority":null,"reopen_forbidden":false,"scope_kind":"PRIORITY_PARK","source":"docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json"}}},"terminal":"FORGE_VISION_ACCEPTANCE_PASS","vision":{"material_capability_information_loss":0,"material_information_loss":0,"status":"PASS","unknown_omission":0}}
+{
+  "calibration": {
+    "commission_applied": false,
+    "defective_session": "HFIC-SESS-8F4A703030408365",
+    "planned_exact_session_quarantine": [
+      "HFIC-SESS-8F4A703030408365"
+    ],
+    "planned_terminal": "CONTROL_RECONSIDERATION_READY_AFTER_COMMISSION",
+    "quarantine_removes_calibration_hfic": true,
+    "store_h11_present": false,
+    "store_h13_present": false
+  },
+  "challenger_operability": {
+    "no_future_git_atom_required": true,
+    "non_synthetic_input_receipt_schema": "smial.normalized-trajectory-v1-projection-input-receipt",
+    "observation_row_count": 78080,
+    "probe_executed": false,
+    "projected_observation_count": 29280,
+    "runtime_seam": "resolve_release_projection_input",
+    "seam_module": "solana_alpha_lab.factory.hfic_released_trajectory_projection",
+    "seam_status": "VERIFIED",
+    "terminal": "NORMALIZED_TRAJECTORY_V1_RUNTIME_READY_NOT_EXECUTED",
+    "verified_release_binding": {
+      "activation_id": "ACT-619AE64E885E995E",
+      "census_sha256": "cfa7d8404dc5400c4e223c4d5303193ad2209f92cac3af2d61862e384ebfd5bf",
+      "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+      "observations_sha256": "7b26425c69cc95baf8a9e0b9ea506de1042b98b83d48a2dae07f5a33a7d66d7d",
+      "producer_git_sha": "669745ec8de59c6db4aa04418af845253872bfde",
+      "release_id": "633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154",
+      "schedule_sha256": "619ae64e885e995ee09d562f7b11d93f2ff7aca8b642abbb1f81c390c7d7896d",
+      "source_sha256": "ace91647af04ba116a4c42d11ec62ed38c2570c18c6433498f2b51e7f69ff533"
+    }
+  },
+  "checks": {
+    "calibration": true,
+    "challenger": true,
+    "packet": true,
+    "priors": true,
+    "suppression": true,
+    "vision": true
+  },
+  "failed_checks": [],
+  "next_hint": null,
+  "packet_control": {
+    "control_yield_gate": "OK",
+    "evidence_surface_mode": "CURRENT_REPRESENTATION_CONTROL_V1",
+    "packet_bytes": 15913,
+    "packet_within_bound": true,
+    "planned_action": "START_NEW_SESSION",
+    "search_budget": "available",
+    "trajectory_blind": true,
+    "yield_eligible": 148
+  },
+  "priors": {
+    "basis": "planned_post_commission_overlay",
+    "dropped_material_priors": 0,
+    "h11_visible_body_ranked": true,
+    "h13_visible_body_ranked": true,
+    "prior_bodies": [
+      "HYP-EARLY-TAKER-VOLUME-MIX-H900-V1",
+      "HYP-QUOTE-NATIVE-FRICTION-H900-V1",
+      "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+      "RC001-H13-COMPOSITE-VETO"
+    ],
+    "ranked_body_mismatch": 0
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.hfic-vision-acceptance",
+  "schema_version": "1.0",
+  "suppression": {
+    "ambiguous_acting_as_hard_close": 0,
+    "family_hard_closes": 6,
+    "not_portable_acting_as_hard_close": 0,
+    "parks_acting_as_hard_close": 0,
+    "reopen_forbidden_by_scope": {
+      "CANDIDATE": 1,
+      "FAMILY": 6,
+      "ROUTE": 1
+    },
+    "scope_overclosure": 0,
+    "terminals": {
+      "CLOSE_EARLY_PATH_CANDIDATE": {
+        "authority": null,
+        "reopen_forbidden": true,
+        "scope_kind": "CANDIDATE",
+        "source": "docs/evidence/ordinary_recent_early_path_h900_failed_quotes_meu_reproject/a1_ordinary_recent_early_path_h900_failed_quotes_meu_reproject_acceptance_v1.json"
+      },
+      "CLOSE_EARLY_STRUCTURAL_BACKING_FAMILY": {
+        "authority": "POSITIVE",
+        "reopen_forbidden": true,
+        "scope_kind": "FAMILY",
+        "source": "docs/evidence/early_structural_backing_pit_commissioning/a1_family_decision_v1.json"
+      },
+      "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY": {
+        "authority": "POSITIVE",
+        "reopen_forbidden": true,
+        "scope_kind": "FAMILY",
+        "source": "datasets/manifests/DATASET-MANIFEST-EARLY-ICP-FIRST-HIT-MIX-FALSIFIER-001.decision.json"
+      },
+      "CLOSE_EXACT_FRICTION_VETO_FAMILY": {
+        "authority": "POSITIVE",
+        "reopen_forbidden": true,
+        "scope_kind": "FAMILY",
+        "source": "docs/evidence/fresh_oos_friction_veto/a5_fresh_oos_friction_veto_acceptance_v1.json"
+      },
+      "CLOSE_EXACT_QUOTE_SURFACE_RETENTION_FAMILY": {
+        "authority": "POSITIVE",
+        "reopen_forbidden": true,
+        "scope_kind": "FAMILY",
+        "source": "docs/evidence/quote_surface_retention_confirmatory/c1_quote_surface_retention_confirmatory_acceptance_v1.json"
+      },
+      "CLOSE_EXACT_T0_FRICTION_SCREEN_FAMILY": {
+        "authority": "POSITIVE",
+        "reopen_forbidden": true,
+        "scope_kind": "FAMILY",
+        "source": "docs/evidence/prior_git_t0_friction_screen/a6_prior_git_t0_friction_screen_acceptance_v1.json"
+      },
+      "CLOSE_TASK40_WITH_CREATE_AT_GAP_AND_BOUND_MIGRATION_AT": {
+        "authority": null,
+        "reopen_forbidden": true,
+        "scope_kind": "ROUTE",
+        "source": "docs/evidence/rc002_h11_task40_close_create_at_gap_migration_at_bound/a1_task40_close_create_at_gap_migration_at_bound_acceptance_v1.json"
+      },
+      "CLOSE_VALUATION_LIQUIDITY_DIVERGENCE_FAMILY": {
+        "authority": "POSITIVE",
+        "reopen_forbidden": true,
+        "scope_kind": "FAMILY",
+        "source": "docs/evidence/early_valuation_liquidity_divergence_confirmation/a1_acceptance_v1.json"
+      },
+      "PARK_H11_FROM_PRIORITY": {
+        "authority": null,
+        "reopen_forbidden": false,
+        "scope_kind": "PRIORITY_PARK",
+        "source": "docs/evidence/rc002_h11_park_from_priority/a1_h11_park_from_priority_acceptance_v1.json"
+      },
+      "PARK_H13_FROM_PRIORITY": {
+        "authority": null,
+        "reopen_forbidden": false,
+        "scope_kind": "PRIORITY_PARK",
+        "source": "docs/evidence/rc001_h13_park_from_priority/a1_h13_park_from_priority_acceptance_v1.json"
+      }
+    }
+  },
+  "terminal": "FORGE_VISION_ACCEPTANCE_PASS",
+  "vision": {
+    "material_capability_information_loss": 0,
+    "material_information_loss": 0,
+    "status": "PASS",
+    "unknown_omission": 0
+  }
+}
