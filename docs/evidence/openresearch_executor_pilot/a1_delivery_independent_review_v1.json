@@ -1,4 +1,4 @@
-﻿{
+{
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "review_id": "OPENRESEARCH-EXECUTOR-PILOT-REVIEW-001",
@@ -16,7 +16,7 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "CHECKED_GIT_BINDING_BRANCH_FROM_BASE_6612299_ONE_COMMIT_TIP_MATCHES",
+        "CHECKED_GIT_BINDING_BRANCH_FROM_BASE_6612299_TIP_MATCHES",
         "CHECKED_RUN_EXPERIMENT_SHA_CONSISTENCY_ACROSS_TASK_REPORT_EVIDENCE",
         "CHECKED_TERMINALS_AND_STATUS_COMPLETE_X3_FEATURE_SURFACE_COMPOSITION_PASS",
         "CHECKED_REPLAY_PASS_FOUR_WALL_CLOCK_FIELDS_ONLY",
@@ -57,7 +57,7 @@
       "severity": "BLOCKER",
       "finding": "COMPLETION_EVIDENCE_SCHEMA_MISMATCH_DELIVERY_EVIDENCE_TRIPLE_INCOMPLETE_ABSOLUTE_PATH",
       "observed_head": "59b545adaa25c3ef94b647e4e0960e4dc5fc37a7",
-      "resolved_by_head": "0000000000000000000000000000000000000000"
+      "resolved_by_head": "8a41110a47a6d9ca7d6e0e27110b6fec544647ef"
     },
     {
       "role": "GOAL_DOD_CRITIC",
@@ -65,7 +65,7 @@
       "severity": "MAJOR",
       "finding": "REVIEW_AND_FIT_EVIDENCE_MISSING_FROM_DELIVERY",
       "observed_head": "59b545adaa25c3ef94b647e4e0960e4dc5fc37a7",
-      "resolved_by_head": "0000000000000000000000000000000000000000"
+      "resolved_by_head": "8a41110a47a6d9ca7d6e0e27110b6fec544647ef"
     },
     {
       "role": "ARCHITECTURE_CRITIC",
@@ -73,7 +73,7 @@
       "severity": "MAJOR",
       "finding": "ABSOLUTE_MACHINE_PATH_IN_ROLLBACK_AND_TASK_CONTRACT",
       "observed_head": "59b545adaa25c3ef94b647e4e0960e4dc5fc37a7",
-      "resolved_by_head": "0000000000000000000000000000000000000000"
+      "resolved_by_head": "8a41110a47a6d9ca7d6e0e27110b6fec544647ef"
     }
   ],
   "verdict": "PASS",
