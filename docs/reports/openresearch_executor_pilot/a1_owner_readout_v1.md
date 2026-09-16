@@ -31,6 +31,8 @@ Verdict: **`KEEP_EXTERNAL_EXPERIMENTAL`**
 | `64daedfc…` | Sibling A liquidity | COMPLETE | `FEATURE_SURFACE_COMPOSITION_PASS` | ожидаемый для этой spec |
 | `48c7162c…` | Sibling B creator-pressure | COMPLETE | `FEATURE_SURFACE_COMPOSITION_PASS` | ожидаемый для этой spec |
 
+Оговорка: siblings — вариации на уровне семейства (общий метод/capability/surface/класс estimand, один snapshot-tar), а не повторение одного literal-вопроса; каждая spec несёт свой вопрос, feature-набор и sealed-входы. Конструкция зафиксирована в READY task-контракте до исполнения; для executor-pilot это более сильный тест изоляции/lineage, чем косметические клоны.
+
 ## Isolation / parallelism
 
 - A/B/Baseline не видели transient-артефакты друг друга (разделённые run-dir + собственная распаковка repo из одного tar).
@@ -40,7 +42,7 @@ Verdict: **`KEEP_EXTERNAL_EXPERIMENTAL`**
 
 ## Clean replay
 
-Новый чистый каталог, только saved evidence (tar + команда): статус/блокер/терминал/метрики идентичны; отличаются ровно 4 wall-clock поля (`as_of`, `observed_at` ×2, attention-подборка с таймстампами). **`REPLAY_PASS`** (детерминированные выходы совпали; tolerance не изобретался — различия по конструкции время-несущие).
+Новый чистый каталог, только saved evidence (tar + команда): статус/блокер/терминал/метрики идентичны; отличаются ровно 4 wall-clock поля (`economics.as_of`, `system_operability.observed_at`, `owner_attention.current_attention`, `system_operability.attention` — время-несущие поля/подборки). **`REPLAY_PASS`** (детерминированные выходы совпали; tolerance не изобретался — различия по конструкции время-несущие).
 
 ## Canonical integrity
 

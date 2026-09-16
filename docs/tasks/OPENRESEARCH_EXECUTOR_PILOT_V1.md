@@ -64,8 +64,7 @@ context_requirements:
     LIFECYCLE: []
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
-    DELIVERY_EVIDENCE:
-      - docs/evidence/openresearch_executor_pilot/a1_delivery_completion_evidence_v1.json
+    DELIVERY_EVIDENCE: []
     HISTORICAL_CONTEXT: []
   exact_role_paths:
     LIFECYCLE: []
@@ -73,6 +72,8 @@ context_requirements:
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
       - docs/evidence/openresearch_executor_pilot/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/openresearch_executor_pilot/a1_delivery_independent_review_v1.json
+      - docs/evidence/openresearch_executor_pilot/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
@@ -122,7 +123,7 @@ design a minimal optional Forge->ORX path (explicitly not this atom).
 - OpenResearch pinned: repo shallow clone at
   325eb509dc8e4ca7074568cf0ae1f0f98704eac0 (2026-09-15); CLI release
   `orx 0.2.3` (Windows x86_64 zip). Telemetry off (`orx telemetry off`).
-- Disposable workspace `C:\Users\lance\Projects\orx_pilot`:
+- Disposable workspace `orx_pilot` (machine-local path intentionally untracked):
   bare canonical mirror clone (fetch-only), lab clone with no remotes on
   branch pilot/openresearch-executor-v1 @ 661229914718727e3208df2562ee8a69697e905f,
   immutable dataset snapshot (9 files, digests recorded and re-verified after runs).

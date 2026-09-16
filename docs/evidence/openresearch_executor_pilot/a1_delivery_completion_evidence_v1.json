@@ -4,7 +4,7 @@
   "acceptance_id": "OPENRESEARCH-EXECUTOR-PILOT-ACCEPT-001",
   "as_of": "2026-09-16",
   "task_id": "OPENRESEARCH_EXECUTOR_PILOT_V1",
-  "state_change": "One disposable-workspace executor pilot for alphaXiv/OpenResearch; canonical repo receives only this evidence/report/task triple. No Forge/HFIC/RDP semantics touched.",
+  "state_change": "One disposable-workspace executor pilot for alphaXiv/OpenResearch (PILOT_REPLAY_ONLY); canonical repo receives only the pilot docs/evidence set. No Forge/HFIC/RDP semantics touched. Verdict: KEEP_EXTERNAL_EXPERIMENTAL.",
   "base_main": "661229914718727e3208df2562ee8a69697e905f",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -14,81 +14,34 @@
     "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {
-    "docs/tasks/OPENRESEARCH_EXECUTOR_PILOT_V1.md": "PILOT_TASK_CONTRACT",
-    "docs/reports/openresearch_executor_pilot/a1_owner_readout_v1.md": "PILOT_DURABLE_REPORT"
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
   },
-  "pilot": {
-    "pilot_id": "OPENRESEARCH-EXECUTOR-PILOT-001",
-    "execution_mode": "PILOT_REPLAY_ONLY",
-    "source_repo_sha": "661229914718727e3208df2562ee8a69697e905f",
-    "openresearch_repo_sha": "325eb509dc8e4ca7074568cf0ae1f0f98704eac0",
-    "openresearch_cli_version": "0.2.3",
-    "telemetry": "off",
-    "experiment_spec_ids": [
-      "EXP-MARKET-FEATURE-PRICE-PATH-ARCHETYPE-001",
-      "EXP-MARKET-FEATURE-LIQUIDITY-ARCHETYPE-001",
-      "EXP-MARKET-FEATURE-CREATOR-PRESSURE-ARCHETYPE-001"
-    ],
-    "shared_method": "resolve_market_feature_snapshot",
-    "shared_capability": "CAP-OFFLINE-MARKET-FEATURE-RESOLVE-001",
-    "provider_api_rpc_wss_calls": 0,
-    "orx_project_id": "3406bcc7-98df-4331-808d-70fc819d54b7",
-    "orx_experiment_ids": {
-      "baseline": "02fc2675-054d-47ce-9dc1-fc0372d6a541",
-      "sibling_a": "7db1fdf8-4d84-4e10-aa4e-44d151c981e5",
-      "sibling_b": "8763ecd0-2a9b-4545-8b5a-73b52e0063d1"
+  "factory_fit": {
+    "path": "docs/evidence/openresearch_executor_pilot/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_DOCS_ONLY_NO_RUNTIME_TARGETED_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/openresearch_executor_pilot/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PENDING"
     },
-    "orx_run_ids": {
-      "baseline": "eff0915c-2db2-4c1b-adc8-d6bf2251cd22",
-      "sibling_a": "64daedfc-f6bb-469e-af45-aaa855569dc8",
-      "sibling_b": "48c7162c-b0be-49a3-9fff-10046584a2d7"
-    },
-    "source_snapshot_tar_sha256_name": "e8ab4e2ef2aafe2f65840e442adf9791c4b64a9f273cde799008b94b80edd921",
-    "run_terminals": {
-      "baseline": "FEATURE_SURFACE_COMPOSITION_PASS",
-      "sibling_a": "FEATURE_SURFACE_COMPOSITION_PASS",
-      "sibling_b": "FEATURE_SURFACE_COMPOSITION_PASS"
-    },
-    "run_status": {
-      "baseline": "COMPLETE",
-      "sibling_a": "COMPLETE",
-      "sibling_b": "COMPLETE"
-    }
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_HARNESS_SYNC_DERIVED_STATE",
+      "PASS_PRE_COMMIT_TASK_CONTRACT_SCHEMA"
+    ]
   },
-  "isolation": {
-    "independent_run_dirs": true,
-    "per_run_source_snapshot_untar": true,
-    "canonical_working_tree_clean_after": true,
-    "canonical_head_unchanged": "661229914718727e3208df2562ee8a69697e905f",
-    "lab_clone_remotes": "none",
-    "github_publication": "off",
-    "dataset_snapshot_digests_unchanged": true
-  },
-  "replay": {
-    "attempted": true,
-    "clean_directory": true,
-    "from_saved_evidence_only": true,
-    "deterministic_outputs_equal": true,
-    "differing_fields": [
-      "economics.as_of",
-      "owner_attention.current_attention",
-      "system_operability.attention",
-      "system_operability.observed_at"
-    ],
-    "differing_fields_class": "wall_clock_timestamps",
-    "terminal": "REPLAY_PASS"
-  },
-  "operator_burden_vs_agent_path": "SAME_OR_SLIGHTLY_WORSE_FOR_CURRENT_PROFILE",
-  "added_complexity": "MATERIAL_FOR_ADOPTION_AT_CURRENT_SCALE",
-  "hard_failure_conditions_hit": [],
-  "verdict": "KEEP_EXTERNAL_EXPERIMENTAL",
-  "limitations": [
-    "Pilot covered short deterministic offline replays only; long-running or remote-compute executor behavior untested.",
-    "orx project import required the dashboard HTTP API (no CLI import command).",
-    "orx local state (SQLite store, run dirs) lives outside Git.",
-    "Windows beta maturity of the CLI."
-  ],
   "non_claims": [
     "NO_ALPHA",
     "NO_NETRETURN",
@@ -101,5 +54,16 @@
     "ORX_WINNER_NEVER_FORGE_PASS",
     "NO_CANONICAL_DONE"
   ],
-  "rollback": "Delete docs artifacts; disposable workspace C:\\Users\\lance\\Projects\\orx_pilot and orx local store are outside canonical Git and can be removed without repo impact."
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "provider_requests": 0,
+    "wallet_signer_transaction_actions": 0,
+    "orx_disposable_workspace_outside_git": true
+  },
+  "delivery_efficiency": {
+    "substantive_commits": 1,
+    "repair_commits": 1,
+    "control_only_commits": 0
+  }
 }
