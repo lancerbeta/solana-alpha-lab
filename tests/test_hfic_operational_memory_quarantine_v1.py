@@ -613,8 +613,9 @@ class HficOperationalMemoryQuarantineTests(unittest.TestCase):
                 owner_focus="AUTO",
                 memory_eligibility_sha256=GENESIS_MEMORY_ELIGIBILITY_SHA256,
             )
+            self.assertEqual(genesis_action, "STOP")
+            self.assertEqual(genesis_sid, "SEARCH_BUDGET_EXHAUSTED")
             self.assertNotEqual(genesis_sid, extra)
-            self.assertNotEqual(genesis_action, "RETURN_EXISTING_SESSION")
 
 
 if __name__ == "__main__":

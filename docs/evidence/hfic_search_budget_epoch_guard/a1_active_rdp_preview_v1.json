@@ -1,0 +1,33 @@
+{
+  "schema": "smial.hfic-search-budget-epoch-guard-rdp-preview",
+  "schema_version": "1.0",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1",
+  "persist": false,
+  "live_git_head": "6f144de9be51b85195bdffe2c7277580686295fe",
+  "owner_focus": "IDENTIFIABLE_NOW",
+  "evidence_epoch_sha256": "ba8844147733e4421c2b497b7e70d23f20a22afa95f76e84f6beb3aff753effc",
+  "session_60fb": "HFIC-SESS-60FB3DA7C8EB33FC",
+  "action": "START_NEW_SESSION",
+  "ordinary_bound": 20480,
+  "ordinary_actual_bytes": 18313,
+  "vision": "PASS",
+  "material_information_loss": 0,
+  "unknown_omission": 0,
+  "ranked_prior_count": 8,
+  "ranked_one_to_one": true,
+  "c1_reason": "KILL_STATISTICALLY_UNIDENTIFIABLE",
+  "c1_scope_present": true,
+  "c2_reason": "KILL_DATA_INFEASIBLE",
+  "c2_scope_present": true,
+  "search_budget": {
+    "auto_sessions_used": 1,
+    "auto_sessions_per_evidence_epoch": 1,
+    "distinct_focus_used": 1,
+    "distinct_focus_sessions_per_evidence_epoch": 3,
+    "distinct_focus_remaining": 2
+  },
+  "pending_session": null,
+  "rdp_writes": 0,
+  "provider_calls": 0
+}

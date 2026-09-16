@@ -1,0 +1,34 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-SEARCH-BUDGET-EPOCH-GUARD-FACTORY-FIT-001",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_EPOCH_SCOPED_SEARCH_BUDGET",
+    "flexibility_and_history": "PASS_ELIGIBILITY_IDENTITY_PRESERVED",
+    "context_efficiency": "PASS_NARROW_PREFLIGHT_PATCH",
+    "research_truth": "PASS_NO_BUDGET_RESET_ON_QUARANTINE",
+    "owner_operability": "PASS_SEARCH_BUDGET_ON_RECEIPT",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_FORGE_SLASH",
+    "monitoring_and_recovery": "PASS_FAIL_CLOSED_EXHAUSTION",
+    "build_vs_buy": "PASS_DETERMINISTIC_HELPER",
+    "security": "PASS_NO_SECRETS",
+    "red_team": "PASS_NO_SECOND_AUTO_VIA_ELIGIBILITY"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "Revert decide_preflight_action budget filter to prior eligibility conjunction only with explicit owner replan.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_PACKET_BUDGET_CHANGE",
+    "NO_QUARANTINE_POLICY_CHANGE"
+  ]
+}

@@ -36614,7 +36614,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_operational_memory_quarantine_v1.py', repository_path: tests/test_hfic_operational_memory_quarantine_v1.py}
-  integrity: {kind: sha256, sha256: a6dc33f82e5153a2c1e2582a9c666562234ee17070679b142f9a497518e80d43}
+  integrity: {kind: sha256, sha256: a1b99dea91face16b3a1c8cbb48b159723b7e83fb4e6c6b717c707c051689ec5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}

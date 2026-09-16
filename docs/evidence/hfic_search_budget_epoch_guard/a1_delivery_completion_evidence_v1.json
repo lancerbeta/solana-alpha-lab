@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-SEARCH-BUDGET-EPOCH-GUARD-ACCEPT-001",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1",
+  "state_change": "HFIC search-budget AUTO/distinct counters now count all sessions in the evidence epoch; memory_eligibility remains in search_key/same_focus only. Real IDENTIFIABLE_NOW preview: distinct 1/3 used, START_NEW_SESSION.",
+  "base_main": "6f144de9be51b85195bdffe2c7277580686295fe",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_search_budget_epoch_guard/a1_delivery_factory_fit_v1.json",
+    "sha256": "PENDING",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_SEARCH_BUDGET_EPOCH_GUARD",
+    "independent_review": {
+      "path": "docs/evidence/hfic_search_budget_epoch_guard/a1_delivery_independent_review_v1.json",
+      "sha256": "PENDING",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_SEARCH_BUDGET_EPOCH_GUARD",
+      "PASS_UNIT_OPERATIONAL_MEMORY_QUARANTINE_T14",
+      "PASS_READ_ONLY_IDENTIFIABLE_NOW_BUDGET_PREVIEW"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_PACKET_BUDGET_CHANGE",
+    "NO_QUARANTINE_POLICY_CHANGE",
+    "NO_CRITIC_OR_REPRESENTATION_CHANGE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "rdp_mutation": 0,
+    "provider_calls": 0
+  }
+}
