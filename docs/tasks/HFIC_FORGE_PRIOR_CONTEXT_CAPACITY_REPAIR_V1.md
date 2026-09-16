@@ -25,10 +25,11 @@ git_binding:
 objective: >-
   Repair the measured Forge routing dead-end where eligible search-memory
   bodies from a completed HFIC cycle make the next distinct-focus
-  FORGE_CONTEXT_PACKET exceed 16384 bytes. Introduce a Forge-specific
+  FORGE_CONTEXT_PACKET exceed capacity. Introduce a Forge-specific
   ranked-prior projection, distinguish capacity vs missing-body terminals,
-  and leave Critic prior_memory, ranker, budgets, quarantine, and
-  representation semantics unchanged.
+  apply owner-authorized mode-scoped packet budgets (ordinary 20480;
+  CONTROL/challenger frozen 16384), and leave Critic prior_memory, ranker,
+  search budgets, quarantine, and representation semantics unchanged.
 
 managed_write_set:
   - docs/tasks/HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1.md
@@ -57,7 +58,8 @@ external_caps:
   deployment: false
 
 stop_conditions:
-  - PACKET_LIMIT_RAISE
+  - CONTROL_OR_CHALLENGER_PACKET_BUDGET_CHANGE
+  - GLOBAL_UNSCOPED_PACKET_LIMIT_RAISE
   - RANKER_OR_SEARCH_BUDGET_CHANGE
   - RANKED_PRIOR_DROP
   - ARBITRARY_TEXT_TRUNCATION
@@ -96,25 +98,31 @@ context_requirements:
 
 SPEC_ROUTE=NONE. Exact owner atom: restore next distinct-focus Forge
 reachability after CONTROL-enriched search memory without changing Critic
-memory, ranker, budgets, quarantine, or representation.
+memory, ranker, search budgets, quarantine, or representation; enlarge
+ordinary Forge packet capacity only under an explicit mode-scoped bound.
 
 ## Task Outcome Brief
 
 - **Owner decision:** Prompt A must not die on capacity after a valid completed
-  HFIC cycle keeps eligible prior bodies.
-- **Product outcome:** `FORGE_CONTEXT_PACKET <= 16384` with one-to-one ranked
+  HFIC cycle keeps eligible prior bodies. Ordinary Forge may use 20480 bytes;
+  CONTROL and representation challenger remain frozen at 16384.
+- **Product outcome:** mode-scoped `FORGE_CONTEXT_PACKET` bounds
+  (ordinary <= 20480; CONTROL/challenger == 16384) with one-to-one ranked
   prior Forge projections; capacity vs missing-body terminals distinguished;
-  Critic prior memory unchanged.
+  Critic prior memory unchanged; CONTROL↔NORMALIZED_TRAJECTORY comparability
+  preserved.
 - **Named consumer:** ordinary `/hypothesis-forge` with a non-AUTO distinct
   focus on the current first-cohort evidence epoch (e.g. `IDENTIFIABLE_NOW`).
-- **Cheapest falsifier:** T1–T7 in
-  `tests/test_hfic_forge_prior_context_capacity_repair_v1.py` plus PR308
-  reopened-prior / vision / representation isolation suites.
+- **Cheapest falsifier:** mode-scoped unit suites in
+  `tests/test_hfic_forge_prior_context_capacity_repair_v1.py` plus
+  reopened-prior / vision / representation isolation suites and read-only
+  60FB IDENTIFIABLE_NOW preflight preview.
 - **Terminal:** `HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_PASS` after reviews,
   exact-head CI and merge-readiness. Stop before owner merge phrase. Do not run
   the real IDENTIFIABLE_NOW slash in this atom.
-- **Non-goals:** packet limit raise, ranker/budget change, quarantine of 60FB,
-  Critic memory thinning, representation probe, RAG/new memory platform.
+- **Non-goals:** CONTROL/challenger packet-budget change, global unscoped
+  packet raise, ranker/search-budget change, quarantine of 60FB, Critic memory
+  thinning, representation probe, RAG/new memory platform.
 - **Evidence budget:** disposable fixtures + read-only local RDP measurement.
   No intentional active-RDP mutation for demo.
 - **SPEC_ROUTE=NONE**
@@ -122,11 +130,13 @@ memory, ranker, budgets, quarantine, or representation.
 ## Decision capsule
 
 - `DECISION_DELTA`: Forge-specific ranked-prior projection + typed capacity
-  terminal; Critic capsules untouched.
-- `UNCERTAINTY_REMOVED`: IDENTIFIABLE_NOW dead-end after 60FB is capacity /
-  projection, not missing bodies or search-policy exhaustion.
-- `CAPABILITY_OR_EVIDENCE`: measured packet fit + START_NEW_SESSION reachability
-  without quarantine.
+  terminal + mode-scoped ordinary 20 KiB / CONTROL 16 KiB budgets; Critic
+  capsules untouched.
+- `UNCERTAINTY_REMOVED`: IDENTIFIABLE_NOW dead-end after 60FB was ordinary
+  context capacity under frozen CONTROL 16 KiB, not missing bodies or
+  search-policy exhaustion.
+- `CAPABILITY_OR_EVIDENCE`: measured ordinary packet fit + START_NEW_SESSION
+  reachability without quarantine; CONTROL/challenger 16384 regressions PASS.
 - `STOP`: merge-readiness; owner phrase gate.
 - `NEXT`: after merge, owner may run ordinary IDENTIFIABLE_NOW Forge.
 

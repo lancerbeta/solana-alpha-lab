@@ -1,35 +1,35 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-FACTORY-FIT-002",
+  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-FACTORY-FIT-003",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "ccbea7ab1d115effab388e0381f5ca244df3e890ba7ab16a2907058dc8f305af",
-  "reviewed_inventory_sha256": "78ef6fd132106ff33eaa91c9b04187001c5f297bb24bb79bbd73760a1f2ef9aa",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "PASS_DECISION_AND_SCOPE_SEMANTICS_WITH_HONEST_FENCE",
+    "mission": "PASS_MODE_SCOPED_ORDINARY_REACHABILITY",
     "flexibility_and_history": "PASS_CRITIC_MEMORY_UNCHANGED",
     "context_efficiency": "PASS_NO_SILENT_COMPRESSION",
-    "research_truth": "PASS_KILL_VS_SCOPE_DISTINGUISHABLE",
-    "owner_operability": "PASS_MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND",
+    "research_truth": "PASS_CONTROL_CHALLENGER_COMPARABILITY_FROZEN",
+    "owner_operability": "PASS_ORDINARY_20KIB_CONTROL_16KIB_DOCUMENTED",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_FORGE_SLASH",
-    "monitoring_and_recovery": "PASS_FAIL_CLOSED_NO_VISION_MASK",
-    "build_vs_buy": "PASS_SHARED_DECISION_RESOLVER",
+    "monitoring_and_recovery": "PASS_FAIL_CLOSED_OVER_ORDINARY_BOUND",
+    "build_vs_buy": "PASS_DETERMINISTIC_MODE_RESOLVER",
     "security": "PASS_NO_SECRETS",
-    "red_team": "PASS_NO_QUARANTINE_NO_LIMIT_RAISE"
+    "red_team": "PASS_NO_QUARANTINE_NO_CONTROL_BUDGET_THAW"
   },
   "capability_radar": {
     "now": "NONE",
-    "watch": "OWNER_PACKET_BOUND_OR_REDESIGN"
+    "watch": "ORDINARY_CAPACITY_STILL_BOUNDED_AT_20480"
   },
-  "recovery": "DO NOT RAISE PACKET LIMIT OR DROP PRIORS WITHOUT OWNER ARCHITECTURE DECISION.",
+  "recovery": "Do not raise CONTROL/challenger 16384 or treat ordinary 20480 as unbounded. Further ordinary raises need a new owner architecture decision.",
   "limits": [
     "NO_ALPHA",
-    "NO_START_NEW_SESSION",
-    "NO_PACKET_LIMIT_RAISE",
+    "NO_CONTROL_OR_CHALLENGER_BUDGET_RAISE",
     "NO_MEMORY_QUARANTINE",
-    "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "ORDINARY_BOUND_STILL_FAIL_CLOSED"
   ]
 }

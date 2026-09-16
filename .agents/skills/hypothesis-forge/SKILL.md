@@ -306,13 +306,19 @@ Ordinary Prompt A packets now carry `ranked_prior_entries` one-to-one with
 
 ## Packet capacity vs missing prior body
 
+Ordinary Forge packet budget is **20480** bytes
+(`ORDINARY_FORGE_MAX_PACKET_BYTES`). Representation CONTROL and challenger
+budgets remain **16384** (`MAX_PACKET_BYTES`). Resolve via
+`forge_context_packet_max_bytes(evidence_surface_mode)` — never from focus text.
+The ordinary enlargement is not alpha or representation permission.
+
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` means a ranked prior identity has no
 decision-useful resolvable body (one-to-one Prompt A body closure failed).
 
 `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` means required bodies are complete
-but the bounded `FORGE_CONTEXT_PACKET` (16384 bytes) cannot represent a
+but the effective mode-scoped `FORGE_CONTEXT_PACKET` bound cannot represent a
 non-minimal Forge search context after allowed semantic/feature-grounding
-compaction (for example oversized HISTORICAL/NOT_SELECTED-only priors).
+compaction.
 
 `MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` means Prompt A already carries the
 disposition-gated scientific minimum (HARD_CLOSE/PARK with scope axes from

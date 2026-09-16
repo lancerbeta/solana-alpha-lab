@@ -500,6 +500,7 @@ class PromptABodyTests(unittest.TestCase):
                         store=store,
                         persist=False,
                         search_payloads=planned,
+                        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
                     )
                 self.assertEqual(
                     str(raised.exception),

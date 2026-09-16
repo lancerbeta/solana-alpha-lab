@@ -34416,7 +34416,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: c97c36626cac2b5efdbc715d2e011d6a6551176679b016e54f5d6450cf54ebab}
+  integrity: {kind: sha256, sha256: 9082e0445cff065cff81f0d6f13d3ed5012aa62376e1ef655c5980ffa2cd6940}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34434,7 +34434,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: a1de933e3cdef2660ad82cffbef901c7fb23b6d8679af6e68a252d17943a1851}
+  integrity: {kind: sha256, sha256: 32f7e2bc202620ffff3b76c50904ac4bcddf34bf5e584df1aee682b7646a617e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37194,7 +37194,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_reopened_prior_search_routing_v1.py', repository_path: tests/test_hfic_reopened_prior_search_routing_v1.py}
-  integrity: {kind: sha256, sha256: 8f6eb43bd94f0d15910c4dfd98c6a8c9bf03146d4a4bc2f49d7266e9a8b0a28a}
+  integrity: {kind: sha256, sha256: dc528c138e9c11a2040e6438148a4a0ba1dc0e8951a2acca4d1a8acae974e52e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}

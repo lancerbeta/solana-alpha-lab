@@ -1,56 +1,64 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-REVIEW-002",
+  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-REVIEW-003",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "ccbea7ab1d115effab388e0381f5ca244df3e890ba7ab16a2907058dc8f305af",
-  "reviewed_inventory_sha256": "78ef6fd132106ff33eaa91c9b04187001c5f297bb24bb79bbd73760a1f2ef9aa",
+  "reviewed_bindings_sha256": "PENDING_BIND",
+  "reviewed_inventory_sha256": "PENDING_BIND",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC"
   ],
+  "architecture_question": "Does the mode-scoped budget change preserve the frozen CONTROL↔NORMALIZED_TRAJECTORY comparison while only enlarging ordinary Forge context capacity?",
+  "architecture_answer": "YES",
   "reviews": [
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "SHARED_LATEST_HYPOTHESIS_DECISIONS",
-        "HARD_CLOSE_SCOPE_RETAINED",
-        "NOT_SELECTED_LEAN_OK",
-        "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND_FENCE",
-        "NO_VISION_MASK"
+        "MODE_SCOPED_RESOLVER_CORRECT",
+        "CONTROL_16384_FROZEN",
+        "ORDINARY_20480_OWNER_AUTHORIZED",
+        "FAIL_CLOSED_OVER_20480",
+        "TASK_AND_EVIDENCE_RECONCILED"
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PROMPT_A_CAN_DISTINGUISH_KILL_FROM_SCOPE_YES",
-        "CRITIC_MEMORY_UNCHANGED",
-        "SHARED_DECISION_WALKER",
-        "HONEST_CAPACITY_FENCE_18317"
+        "ARCH_Q_YES_CONTROL_CHALLENGER_16384",
+        "ORDINARY_ONLY_20480",
+        "RESOLVER_USES_EVIDENCE_SURFACE_NOT_FOCUS",
+        "CHALLENGER_IMPORTS_MAX_PACKET_BYTES",
+        "RANKER_CRITIC_QUARANTINE_UNCHANGED"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PATCH_DOD_A_B_PASS",
-        "PRIOR_START_NEW_SESSION_CLAIM_INVALID",
-        "FENCE_NOT_REACHABILITY_PASS"
+        "ORDINARY_PREVIEW_18312_OF_20480_VISION_PASS",
+        "C1_C2_SCOPE_RETAINED",
+        "START_NEW_SESSION_EXPECTED",
+        "CONTROL_CHALLENGER_16384_FALSIFIABLE",
+        "FAIL_CLOSED_OVER_ORDINARY_BOUND"
       ]
     }
   ],
-  "remediation_history": [],
+  "remediation_history": [
+    "CODE_REVIEWER_FAIL_ON_STALE_NO_PACKET_LIMIT_RAISE_CLAIM_THEN_TASK_AND_EVIDENCE_UPDATED"
+  ],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "REVIEW_IS_NOT_SEMANTIC_DONE",
     "NO_ALPHA",
-    "NO_PACKET_LIMIT_RAISE",
-    "NO_START_NEW_SESSION_CLAIM",
-    "NO_CANONICAL_DONE"
+    "NO_CONTROL_OR_CHALLENGER_BUDGET_RAISE",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_CANONICAL_DONE",
+    "NO_MERGE"
   ]
 }

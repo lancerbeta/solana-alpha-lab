@@ -73,7 +73,11 @@ MAX_FEATURE_HINTS = 8
 MAX_FEATURE_FAMILIES = 8
 MAX_CLOSED_FAMILIES = 8
 MAX_CAPABILITIES = 16
+# CONTROL / representation-challenger packet budget (frozen comparability).
 MAX_PACKET_BYTES = 16384
+CONTROL_FORGE_MAX_PACKET_BYTES = MAX_PACKET_BYTES
+# Ordinary /hypothesis-forge packet budget (mode-scoped; not representation permission).
+ORDINARY_FORGE_MAX_PACKET_BYTES = 20480
 FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED = "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED"
 MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND = "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
 FORGE_CONTEXT_ARTIFACT_DIR = "research/artifacts/forge_context"
@@ -110,6 +114,23 @@ class HficPreflightError(ValueError):
     def __init__(self, code: str) -> None:
         self.code = code
         super().__init__(code)
+
+
+def forge_context_packet_max_bytes(evidence_surface_mode: str | None = None) -> int:
+    """Mode-scoped Forge context packet bound.
+
+    Ordinary Forge uses ORDINARY_FORGE_MAX_PACKET_BYTES. Representation CONTROL
+    (and anything that shares its frozen budget with the challenger) uses
+    CONTROL_FORGE_MAX_PACKET_BYTES / MAX_PACKET_BYTES (16384). Do not infer from
+    owner_focus text.
+    """
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        return MAX_PACKET_BYTES
+    return ORDINARY_FORGE_MAX_PACKET_BYTES
 
 
 def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> bool:
@@ -1074,6 +1095,7 @@ def build_forge_context_packet(
     persist: bool = True,
     search_payloads: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], str]:
+    packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
     ds_trunc: dict[str, Any] = {
         "truncated": False,
@@ -1226,7 +1248,7 @@ def build_forge_context_packet(
         "max_feature_hints": MAX_FEATURE_HINTS,
         "max_feature_families": MAX_FEATURE_FAMILIES,
         "max_capabilities": MAX_CAPABILITIES,
-        "max_packet_bytes": MAX_PACKET_BYTES,
+        "max_packet_bytes": packet_bound,
         "selection_policy": ds_trunc.get(
             "selection_policy", "current_version_per_dataset_id"
         ),
@@ -1390,7 +1412,7 @@ def build_forge_context_packet(
         all_grounding_entries
     )
     encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
         # Semantic navigation is lower priority than datasets / closed families / priors.
         packet["semantic_capability_entries"] = []
         packet["truncation_receipt"] = {
@@ -1405,7 +1427,7 @@ def build_forge_context_packet(
             "reason": "MAX_PACKET_BYTES_DROP_SEMANTIC",
         }
         encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
         # When ranked Forge priors already carry the disposition-gated
         # scientific minimum (HARD_CLOSE/PARK scope axes), do not strip
         # feature grounding to squeeze the packet — that would mislabel the
@@ -1423,7 +1445,7 @@ def build_forge_context_packet(
             "reason": "MAX_PACKET_BYTES_DROP_FEATURE_GROUNDING",
         }
         encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
         raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
     vision = compute_vision_integrity(
         grounding_entries=all_grounding_entries,
@@ -1449,7 +1471,7 @@ def build_forge_context_packet(
     )
     packet["vision_integrity"] = vision
     encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
         # The integrity receipt itself must not overflow the bound: keep the
         # verdict counters, drop per-item narrative and breakdown detail.
         packet["vision_integrity"] = {
@@ -1463,7 +1485,7 @@ def build_forge_context_packet(
             )
         }
         encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
         if _ranked_priors_carry_minimal_scientific_scope(packet):
             raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
         raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)

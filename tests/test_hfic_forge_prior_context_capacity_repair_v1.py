@@ -25,9 +25,11 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     MAX_DISTINCT_FOCUSES_PER_EPOCH,
     MAX_PACKET_BYTES,
     MAX_RANKED_PRIORS,
+    ORDINARY_FORGE_MAX_PACKET_BYTES,
     build_forge_context_packet,
     decide_preflight_action,
     evidence_epoch_material,
+    forge_context_packet_max_bytes,
     rank_prior_candidate_ids,
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (  # noqa: E402
@@ -244,7 +246,11 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 search_payloads=payloads,
             )
             encoded = canonical_json_bytes(packet)
-            self.assertLessEqual(len(encoded), MAX_PACKET_BYTES)
+            self.assertLessEqual(len(encoded), ORDINARY_FORGE_MAX_PACKET_BYTES)
+            self.assertEqual(
+                packet["truncation_receipt"]["max_packet_bytes"],
+                ORDINARY_FORGE_MAX_PACKET_BYTES,
+            )
             ranked = packet["ranked_prior_candidate_ids"]
             entries = packet["ranked_prior_entries"]
             self.assertEqual(len(ranked), len(entries))
@@ -392,7 +398,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
             )
             payloads = list(iter_search_memory_hypothesis_payloads(store))
             with patch(
-                "solana_alpha_lab.factory.hfic_preflight.MAX_PACKET_BYTES",
+                "solana_alpha_lab.factory.hfic_preflight.ORDINARY_FORGE_MAX_PACKET_BYTES",
                 64,
             ):
                 with self.assertRaises(HficPreflightError) as raised:
@@ -433,7 +439,7 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
             )
             payloads = list(iter_search_memory_hypothesis_payloads(store))
             with patch(
-                "solana_alpha_lab.factory.hfic_preflight.MAX_PACKET_BYTES",
+                "solana_alpha_lab.factory.hfic_preflight.ORDINARY_FORGE_MAX_PACKET_BYTES",
                 2500,
             ):
                 with self.assertRaises(HficPreflightError) as raised:
@@ -454,6 +460,62 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND",
             )
             self.assertNotEqual(str(raised.exception), BODY_INCOMPLETE)
+
+    def test_mode_scoped_packet_bounds(self) -> None:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            CURRENT_REPRESENTATION_CONTROL_V1,
+        )
+
+        self.assertEqual(forge_context_packet_max_bytes(None), 20480)
+        self.assertEqual(forge_context_packet_max_bytes(""), 20480)
+        self.assertEqual(
+            forge_context_packet_max_bytes(CURRENT_REPRESENTATION_CONTROL_V1),
+            16384,
+        )
+        self.assertEqual(MAX_PACKET_BYTES, 16384)
+        self.assertEqual(ORDINARY_FORGE_MAX_PACKET_BYTES, 20480)
+
+    def test_ordinary_exceeds_20kib_still_capacity_terminal(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            txn = "RESEARCH-TXN-ORDINARY-20K"
+            events = [_fat_hfic_candidate(i, transaction_id=txn) for i in range(1, 9)]
+            for i in range(1, 3):
+                events.append(
+                    _decision_event(
+                        f"HFIC-CAND-FAT{i:04d}DEADBEEF",
+                        decision_kind="REJECT",
+                        reason_code="KILL_DATA_INFEASIBLE",
+                        transaction_id=txn,
+                    )
+                )
+            store.append(events, transaction_id=txn)
+            payloads = list(iter_search_memory_hypothesis_payloads(store))
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.ORDINARY_FORGE_MAX_PACKET_BYTES",
+                4000,
+            ):
+                with self.assertRaises(HficPreflightError) as raised:
+                    build_forge_context_packet(
+                        ROOT,
+                        Path(raw),
+                        owner_focus=FOCUS,
+                        evidence_epoch="aa" * 32,
+                        search_key="bb" * 32,
+                        commissioning_status="FAST_LANE_COMMISSIONED",
+                        research_memory_as_of="2026-09-16T00:00:00Z",
+                        store=store,
+                        persist=False,
+                        search_payloads=payloads,
+                    )
+            self.assertIn(
+                str(raised.exception),
+                {
+                    "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED",
+                    "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND",
+                    "FORGE_VISION_INTEGRITY_BLOCKED",
+                },
+            )
 
     def test_decision_event_flows_into_forge_ranked_entries(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
