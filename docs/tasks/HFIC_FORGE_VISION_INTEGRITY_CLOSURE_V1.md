@@ -42,6 +42,9 @@ managed_write_set:
   - tests/test_hfic_vision_acceptance_operations_v1.py
   - tests/test_hfic_vision_integrity_v1.py
   - docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json
+  - docs/evidence/hfic_forge_vision_integrity_closure/a1_completion_v1.json
+  - docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json
+  - docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json
   - docs/reports/hfic_forge_vision_integrity_closure/a1_owner_readout_v1.md
   - catalog/assets/core.yaml
 external_caps:
@@ -82,6 +85,9 @@ context_requirements:
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
       - docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json
+  - docs/evidence/hfic_forge_vision_integrity_closure/a1_completion_v1.json
+  - docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json
+  - docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 

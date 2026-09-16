@@ -1,0 +1,60 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-VISION-INTEGRITY-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1",
+  "state_change": "FORGE_VISION_INTEGRITY_CLOSED_POSITIVE_AUTHORITY_MACHINE_VISION_TRAJECTORY_SEAM",
+  "base_main": "22c8b1ae115cf82f6a4793d30a1b6ceb41032182",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_VISION_INTEGRITY_TEST_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TEST_HFIC_SUPPRESSION_POSITIVE_AUTHORITY_V1",
+      "PASS_TEST_HFIC_VISION_INTEGRITY_V1",
+      "PASS_TEST_HFIC_RELEASED_TRAJECTORY_PROJECTION_V1",
+      "PASS_TEST_HFIC_VISION_ACCEPTANCE_OPERATIONS_V1",
+      "PASS_TEST_HFIC_SESSION",
+      "PASS_TEST_HFIC_PREFLIGHT",
+      "PASS_REAL_C1_VISION_ACCEPTANCE"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PRODUCT_ACCEPTANCE",
+    "NO_SCIENTIFIC_CHALLENGER_EXECUTION",
+    "NO_CONTROL_RUN"
+  ],
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  }
+}
