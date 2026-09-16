@@ -46,9 +46,7 @@
       ]
     }
   ],
-  "remediation_history": [
-    "CODE_REVIEWER_FAIL_ON_STALE_NO_PACKET_LIMIT_RAISE_CLAIM_THEN_TASK_AND_EVIDENCE_UPDATED"
-  ],
+  "remediation_history": [],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
