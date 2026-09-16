@@ -4,8 +4,8 @@
   "review_id": "HFIC-SEARCH-BUDGET-EPOCH-GUARD-REVIEW-001",
   "as_of": "2026-09-16",
   "task_id": "HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1",
-  "reviewed_bindings_sha256": "PENDING_BIND",
-  "reviewed_inventory_sha256": "PENDING_BIND",
+  "reviewed_bindings_sha256": "d479bca4968360617a337ef5aca4d285adfa4a94cc26470ffb1000a411b63f5d",
+  "reviewed_inventory_sha256": "0086ad8e1a9d08832a6bf63e43a1945a28837d2df6ac44547ffc7b780a803c16",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
