@@ -13,8 +13,9 @@
   "implementation_bindings": {
     "catalog/assets/core.yaml": "eda5f94925f3ac573dc2520b3223ce1f314d090b10427a2f3af0d8637bb39f72",
     "docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json": "105a66d3eca7b6519f1fd71fedb72e861f8e986e7b1b9c02b3d0605f6fe70b36",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "a7fa6bc38bb018c7cc9c769301ddf5a6bed539f8aec996a49c32a308031f9b77",
     "docs/reports/hfic_forge_vision_integrity_closure/a1_owner_readout_v1.md": "933c7c3d945a4538a86c2e60baca1f3afe5b462a0761bffb2bff1e1354150519",
-    "docs/tasks/HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1.md": "baa8b1117286588c42f1d8b3726211b93a54647a79c55b8fe96a52e9d03f0fd8",
+    "docs/tasks/HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1.md": "53e8e177c430ee5dc6ae17a99962a2be2e671ce7d29b1a8e72e192e9b8e05dae",
     "scripts/hypothesis_forge.py": "23b6164741b91c50c6b74c2440bd9512e4bb937568861637af93cec4178e6c45",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "9fd1dfcd10f2681e3bb1befa7f9e7db4458fc714ea76bad3e557b9814c181f91",
     "src/solana_alpha_lab/factory/hfic_released_trajectory_projection.py": "7486e879bc05f46eab98328bea436fd88c390430d7638ffd9a9a2133feb05036",
@@ -45,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json",
-    "sha256": "162e90ece08d683585dcdafa2991c632a0dc00f72448b73c61e8629125b194e2",
+    "sha256": "0c2bf6dd57adf976b2df699de9e87b34d87d3b1bad2eb39c4b8e38f42dde31da",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_VISION_INTEGRITY_TEST_SUITE",
     "independent_review": {
       "path": "docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json",
-      "sha256": "48acb3513346b12c2cc7ea904f447b7a4c66552d8dc9041291b9dff676a86717",
+      "sha256": "0a3b9cf0034eae884a193b2ecd843bf8f07a435b4c7ba3571e7b691146095d6e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

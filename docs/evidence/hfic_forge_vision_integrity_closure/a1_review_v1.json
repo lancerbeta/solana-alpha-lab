@@ -4,8 +4,8 @@
   "review_id": "HFIC-VISION-INTEGRITY-CLOSURE-REVIEW-001",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1",
-  "reviewed_bindings_sha256": "6dd1e5422d450fc1ad7535402d529d4e71587004a65109be906d02eee1bfa500",
-  "reviewed_inventory_sha256": "657b6ea4379ee54d4fa708b301d1f384bf938cc06c7e4ac5e5f81aede0c6ed97",
+  "reviewed_bindings_sha256": "ccebbb5bef1b7ba50435f8397dd197e9bd7ee7de9639a9b6f7a310eeaf6decca",
+  "reviewed_inventory_sha256": "28bff8dea59eb142a47c426d90833647b090567ed35bf7a986122b0966df3b02",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
