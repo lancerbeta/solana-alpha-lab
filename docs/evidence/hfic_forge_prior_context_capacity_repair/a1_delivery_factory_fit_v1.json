@@ -4,8 +4,8 @@
   "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-FACTORY-FIT-002",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "3e3104d8c7da19d2db34ee9c27f8fd47f966d7c3b9722dd4bc30b996f95883e9",
-  "reviewed_inventory_sha256": "0f5769494e7c995862f3c0ea83211782fbe92c03028b2709e15f62cfb8d29aed",
+  "reviewed_bindings_sha256": "ccbea7ab1d115effab388e0381f5ca244df3e890ba7ab16a2907058dc8f305af",
+  "reviewed_inventory_sha256": "78ef6fd132106ff33eaa91c9b04187001c5f297bb24bb79bbd73760a1f2ef9aa",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
