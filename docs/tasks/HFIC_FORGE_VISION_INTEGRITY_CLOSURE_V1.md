@@ -1,9 +1,91 @@
-# HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1
+---
+task_id: HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1
+task_version: '1.0'
+status: VALIDATED
+as_of: '2026-09-16'
+owner: GOAL_OWNER
+allowed_routes:
+  - DIRECT_CURSOR_DELIVERY
+expected_repository: lancerbeta/solana-alpha-lab
+git_binding:
+  expected_base: 22c8b1ae115cf82f6a4793d30a1b6ceb41032182
+  expected_upstream: origin/main
+  expected_upstream_oid: 22c8b1ae115cf82f6a4793d30a1b6ceb41032182
+  expected_branch: cursor/hfic-forge-vision-integrity-closure-v1
+  dirty_mode: ALLOW_REPORTED
+objective: >-
+  Close the Forge vision-integrity problem durably: positive suppression
+  authority for family hard-closes, deterministic machine vision-integrity
+  receipts for bounded Forge packets with a NO_WORTHY trust gate, PR308
+  reopened-prior invariants preserved, and a mechanically runtime-ready
+  NORMALIZED_TRAJECTORY_V1 seam for the real imported cohort — without
+  unbounded context, packet-limit increases, or new infrastructure.
+managed_write_set:
+  - docs/tasks/HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1.md
+  - scripts/hypothesis_forge.py
+  - src/solana_alpha_lab/factory/hfic_preflight.py
+  - src/solana_alpha_lab/factory/hfic_released_trajectory_projection.py
+  - src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
+  - src/solana_alpha_lab/factory/hfic_representation_probe.py
+  - src/solana_alpha_lab/factory/hfic_session.py
+  - src/solana_alpha_lab/factory/hfic_suppression_semantics.py
+  - src/solana_alpha_lab/factory/hfic_vision_integrity.py
+  - tests/test_hfic_fresh_control_decision_integrity_closure_v1.py
+  - tests/test_hfic_legacy_science_rebase.py
+  - tests/test_hfic_manual_grounding_contract_diagnostics_v1.py
+  - tests/test_hfic_packet14_availability_fast_lane_guard_v1.py
+  - tests/test_hfic_released_trajectory_projection_v1.py
+  - tests/test_hfic_reopened_prior_search_routing_v1.py
+  - tests/test_hfic_representation_probe.py
+  - tests/test_hfic_session.py
+  - tests/test_hfic_suppression_positive_authority_v1.py
+  - tests/test_hfic_vision_acceptance_operations_v1.py
+  - tests/test_hfic_vision_integrity_v1.py
+  - docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json
+  - docs/reports/hfic_forge_vision_integrity_closure/a1_owner_readout_v1.md
+  - catalog/assets/core.yaml
+external_caps:
+  network: false
+  credentials: false
+  external_system: false
+  signing_or_financial_action: false
+  cash_spend: false
+  deployment: false
+stop_conditions:
+  - SCIENTIFIC_ESTIMAND_AMBIGUITY
+  - NEW_PORTABILITY_JUDGMENT_REQUIRED
+  - FROZEN_CHALLENGER_SEMANTICS_CHANGE_REQUIRED
+  - NEW_PROVIDER_DATA_REQUIRED
+  - SERVICE_OR_DB_REQUIREMENT
+  - PACKET_INTEGRITY_VIA_SEARCH_STRATEGY_CHANGE
+  - REAL_C1_SCIENTIFIC_VALUES_INSPECTION_REQUIRED
+required_review_roles:
+  - CODE_REVIEWER
+  - GOAL_DOD_CRITIC
+  - ARCHITECTURE_CRITIC
+  - OWNER_UX_CRITIC
+context_requirements:
+  catalog_asset_ids: []
+  l2_roles:
+    - DELIVERY_EVIDENCE
+  l3_roles: []
+  roadmap_path: null
+  exact_role_asset_ids:
+    LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: []
+    ARCHITECTURE_DECISIONS: []
+    DELIVERY_EVIDENCE: []
+    HISTORICAL_CONTEXT: []
+  exact_role_paths:
+    LIFECYCLE: []
+    EXTERNAL_ROUTE_KNOWLEDGE: []
+    ARCHITECTURE_DECISIONS: []
+    DELIVERY_EVIDENCE:
+      - docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json
+    HISTORICAL_CONTEXT: []
+---
 
-- **owner_authorization**: explicit EXECUTE, 2026-09-15
-- **route**: DIRECT_CURSOR_DELIVERY
-- **base_main**: e85b291ff4c5a22a43f3c51438a970fd881c0d21 (retarget if main advanced legitimately)
-- **contract_id**: HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1
+# HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1
 
 ## Mission
 
@@ -72,27 +154,6 @@ No CONTROL run, no challenger execution, no Critic, no provider calls, no C2
 import, no deploy, no ranker change, no search-budget change, no
 representation-semantics change, no packet-limit increase, no new service/DB,
 no historical receipt rewrite, no per-cohort suppressor maintenance.
-
-## Write set (managed_write_set)
-
-- `src/solana_alpha_lab/factory/hfic_suppression_semantics.py`
-- `src/solana_alpha_lab/factory/hfic_preflight.py`
-- `src/solana_alpha_lab/factory/hfic_session.py` (vision gate on freeze)
-- `src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py` (preview proof fields)
-- `src/solana_alpha_lab/factory/hfic_representation_probe.py` (non-synthetic seam)
-- `src/solana_alpha_lab/factory/live_cohort_discovery_release.py` (typed observation row reader; read-only)
-- new `src/solana_alpha_lab/factory/hfic_vision_integrity.py`
-- new `src/solana_alpha_lab/factory/hfic_released_trajectory_projection.py`
-- `tests/test_hfic_suppression_positive_authority_v1.py` (new)
-- `tests/test_hfic_vision_integrity_v1.py` (new)
-- `tests/test_hfic_released_trajectory_projection_v1.py` (new)
-- `tests/test_hfic_vision_acceptance_operations_v1.py` (new)
-- `tests/test_hfic_representation_probe.py` (non-synthetic seam)
-- `tests/test_hfic_reopened_prior_search_routing_v1.py` (regression add-ons)
-- `tests/test_hfic_legacy_science_rebase.py` (regression add-ons)
-- `scripts/hypothesis_forge.py` (read-only vision acceptance subcommand)
-- `docs/evidence/hfic_forge_vision_integrity_closure/` (evidence dir)
-- `docs/tasks/HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1.md` (this contract)
 
 ## Review roles (required_review_roles)
 
