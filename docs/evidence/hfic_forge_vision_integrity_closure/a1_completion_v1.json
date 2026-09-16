@@ -10,7 +10,31 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "eda5f94925f3ac573dc2520b3223ce1f314d090b10427a2f3af0d8637bb39f72",
+    "docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json": "105a66d3eca7b6519f1fd71fedb72e861f8e986e7b1b9c02b3d0605f6fe70b36",
+    "docs/reports/hfic_forge_vision_integrity_closure/a1_owner_readout_v1.md": "933c7c3d945a4538a86c2e60baca1f3afe5b462a0761bffb2bff1e1354150519",
+    "docs/tasks/HFIC_FORGE_VISION_INTEGRITY_CLOSURE_V1.md": "baa8b1117286588c42f1d8b3726211b93a54647a79c55b8fe96a52e9d03f0fd8",
+    "scripts/hypothesis_forge.py": "23b6164741b91c50c6b74c2440bd9512e4bb937568861637af93cec4178e6c45",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "9fd1dfcd10f2681e3bb1befa7f9e7db4458fc714ea76bad3e557b9814c181f91",
+    "src/solana_alpha_lab/factory/hfic_released_trajectory_projection.py": "7486e879bc05f46eab98328bea436fd88c390430d7638ffd9a9a2133feb05036",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "e7361aabd3db49c47e98d6eab6e41294fb4cde1c78b11f2a56c49469776ed0a1",
+    "src/solana_alpha_lab/factory/hfic_representation_probe.py": "73dbfb701712b9141ec54ae46b93fc7aaa060bec8ef9fabfdcbe9a4a0bfd67b4",
+    "src/solana_alpha_lab/factory/hfic_session.py": "6959320ddb998b566c7dc31268b10ead3d20d648b73d423bce41216222c37abf",
+    "src/solana_alpha_lab/factory/hfic_suppression_semantics.py": "613de727a275adab4ed55371655db4f9c3e9d5079d331c7b70fd76d58f3fd195",
+    "src/solana_alpha_lab/factory/hfic_vision_integrity.py": "02b7e83cdc36dab470d879a1f863e0553fd3ef8346b76bd11061568057ecd0f9",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "5c9e0602499f8964a029b4c9504f2c68fced4841c38811e253c7ae6c0426cc77",
+    "tests/test_hfic_legacy_science_rebase.py": "d4543e41e67cbe97c3fdad79373c379e3af831f7b683bc2a5bdff26c4356a0a9",
+    "tests/test_hfic_manual_grounding_contract_diagnostics_v1.py": "c6bf0f1b1e6aef96fd4af01157dbd64504ad886d3353dcb05ac9afffa5af331c",
+    "tests/test_hfic_packet14_availability_fast_lane_guard_v1.py": "f9ae6fe5d1826472df5724d3691fe43569903e5eae02403600e3c49c60d749b3",
+    "tests/test_hfic_released_trajectory_projection_v1.py": "182b4daa8334380eac4ad89453b069fc4ac34628e161c74753d3cd2228b6a12b",
+    "tests/test_hfic_reopened_prior_search_routing_v1.py": "62532283b697fecaeeac93cc0f674fc1d2538c9c669e67f85252bcb87c5c5cfb",
+    "tests/test_hfic_representation_probe.py": "acf6f878b95f320fe1ce4f037ed42a8e43fc09687e10614e4398d442234929ab",
+    "tests/test_hfic_session.py": "404860ca2eb6f09ccf7926fdefc6e9349824314a4c0097b314e5b2b36f729bfc",
+    "tests/test_hfic_suppression_positive_authority_v1.py": "92df87f4e4d49604142fc1d92ad1a36d2ee5f55c04805ec45c847feeb6f14aa5",
+    "tests/test_hfic_vision_acceptance_operations_v1.py": "56a7dee551afc765191c73364327ef09c3dd77df0698541e9debe082ac06a561",
+    "tests/test_hfic_vision_integrity_v1.py": "bc4645843323bdae25c4803cd4d39f12198db8b887072e902d1fc11e9c586b4d"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +45,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "162e90ece08d683585dcdafa2991c632a0dc00f72448b73c61e8629125b194e2",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_VISION_INTEGRITY_TEST_SUITE",
     "independent_review": {
       "path": "docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "48acb3513346b12c2cc7ea904f447b7a4c66552d8dc9041291b9dff676a86717",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
