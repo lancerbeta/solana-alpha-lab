@@ -46,7 +46,7 @@
     "targeted": "PASS_HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_UNIT",
     "independent_review": {
       "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "663e7d15a3fef92f796553977660dc42b53e1aa2d0021871df858173256a577d",
+      "sha256": "4335ba1bbf0ba1fe9df2efbe8cf97d97a67adee8eb16b508b69dc174b2d1a1e0",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

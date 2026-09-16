@@ -57,14 +57,16 @@
       "prior_verdict": "NOT_READY",
       "severity": "BLOCKER",
       "finding": "POST_PROJECTION_BODY_INCOMPLETE_CONFLATION",
-      "resolved_by": "source-only usefulness gate + forge fallback distinguishers + T6b"
+      "observed_head": "f910e3d19d35e24b954aef0e5948c2f887b0bc33",
+      "resolved_by_head": "ad1d776ca999ee51ee63ea7398917d8eb9482c92"
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "prior_verdict": "NOT_READY",
       "severity": "BLOCKER",
       "finding": "RDP_AFTER_UNPINNED_AND_REVIEWS_PENDING",
-      "resolved_by": "a1_active_rdp_preview_v1.json + filled reviews + sha bindings"
+      "observed_head": "f910e3d19d35e24b954aef0e5948c2f887b0bc33",
+      "resolved_by_head": "ad1d776ca999ee51ee63ea7398917d8eb9482c92"
     }
   ],
   "verdict": "PASS",
