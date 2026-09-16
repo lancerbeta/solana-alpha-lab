@@ -1,0 +1,78 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-REVIEW-001",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
+  "reviewed_bindings_sha256": "62a4fd19ac5a3c4c9fa399466cb1312a32fd1409c1867c31d88c75ed62254d7e",
+  "reviewed_inventory_sha256": "4ee5526c56fe439bef8579c175796227051c8ad228b5d81c755ccc5fba52fb86",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "FORGE_CRITIC_DECOUPLE_OK",
+        "CAPACITY_TERMINAL_DISTINCT",
+        "MISSING_BODY_PRESERVED",
+        "NO_RANKED_DROP_NO_LIMIT_RAISE",
+        "VISION_GATE_NOT_WEAKENED",
+        "NO_QUARANTINE_PATH",
+        "T6B_POPULATION_ONLY_NOT_MISLABELED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "LAYER1_LAYER2_DECOUPLE_HOLDS",
+        "SOURCE_ONLY_USEFULNESS_GATE",
+        "FALLBACK_DISTINGUISHERS_NO_ID_ONLY",
+        "RECEIPT_DEDUPE_PERMANENT_AUDIT_ONLY",
+        "CRITIC_BOUNDS_UNCHANGED",
+        "REMEDIATED_TERMINAL_CONFLATION"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PINNED_RDP_AFTER_16045",
+        "START_NEW_SESSION_IDENTIFIABLE_NOW",
+        "ONE_TO_ONE_RANKED_PRIORS",
+        "CRITIC_MEMORY_UNCHANGED_PATH",
+        "NO_ELIGIBILITY_RESET",
+        "VISION_PASS_UNDER_EXISTING_STANDARD",
+        "BUDGETS_RANKER_REPRESENTATION_UNCHANGED"
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "POST_PROJECTION_BODY_INCOMPLETE_CONFLATION",
+      "resolved_by": "source-only usefulness gate + forge fallback distinguishers + T6b"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "RDP_AFTER_UNPINNED_AND_REVIEWS_PENDING",
+      "resolved_by": "a1_active_rdp_preview_v1.json + filled reviews + sha bindings"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_CANONICAL_DONE"
+  ]
+}

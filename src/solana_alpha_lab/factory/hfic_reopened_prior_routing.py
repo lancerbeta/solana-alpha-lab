@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.hfic_preflight import (
     select_forge_packet_datasets,
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (
+    compact_forge_prior_entry,
     compact_prior_entry,
     prior_memory_bounds,
 )
@@ -210,8 +211,12 @@ def ranked_prior_entries_for_ids(
         payload = by_id.get(str(hyp_id))
         if payload is None or not _decision_useful_payload(payload):
             raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
-        entry = compact_prior_entry(str(hyp_id), payload)
-        if not _decision_useful_payload(entry):
+        # Gate usefulness on the canonical source body only. Forge projection
+        # deliberately omits Critic-only fields; re-checking the lean entry with
+        # the Critic usefulness predicate would mislabel capacity/projection
+        # outcomes as RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE.
+        entry = compact_forge_prior_entry(str(hyp_id), payload)
+        if str(entry.get("hypothesis_version_id") or "") != str(hyp_id):
             raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
         entries.append(entry)
     if {item["hypothesis_version_id"] for item in entries} != set(ranked_ids):

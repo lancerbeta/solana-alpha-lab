@@ -260,8 +260,127 @@ def compact_prior_entry(
     payload: Mapping[str, Any],
     decision: Mapping[str, str] | None = None,
 ) -> dict[str, Any]:
-    """Prompt-A / Critic compact capsule; one identity per ranked prior."""
+    """Critic / history compact capsule; one identity per eligible prior.
+
+    Prompt A ranked-prior projection uses :func:`compact_forge_prior_entry`.
+    Do not silently thin this capsule to solve Forge packet capacity.
+    """
     return _capsule_from_payload(hyp_id, payload, decision)
+
+
+_FORGE_LEGACY_KEEP = (
+    "family",
+    "primary_question",
+    "primary_features",
+    "park_terminal",
+    "park_hypothesis_verdict",
+    "science_disposition",
+    "priority_disposition",
+    "falsifier",
+    "feature_id",
+    "frozen_definition_id",
+    "baseline",
+    "data_semantics",
+    "universe",
+    "outcome_horizon_seconds",
+    "live_PIT_claim",
+    "group_id",
+    "primary_x",
+    "mechanism",
+    "claim",
+)
+
+
+def compact_forge_prior_entry(
+    hyp_id: str,
+    payload: Mapping[str, Any],
+    decision: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Prompt-A search-memory projection; thinner than Critic capsules.
+
+    Retains one-to-one identity, disposition, substantive mechanism/claim,
+    X/Y axes, actor/falsifier when present, definition hash for traceability,
+    and enough legacy_definition for reopenable parks. Omits Critic/audit
+    fields that Prompt A does not need (session_id, hfic_protocol) and omits
+    population/decision_timestamp/horizon_notional/negative_control when a
+    lean distinguisher already remains; those Critic-rich fields are retained
+    as fallback when they are the only source distinguishers.
+    """
+    full = _capsule_from_payload(hyp_id, payload, decision)
+    out: dict[str, Any] = {
+        "hypothesis_version_id": hyp_id,
+        "memory_status": full.get("memory_status"),
+    }
+    for key in (
+        "decision_kind",
+        "reason_code",
+        "park_status",
+        "definition_sha256",
+        "primary_x_family",
+        "primary_y",
+        "cheapest_falsifier",
+    ):
+        value = full.get(key)
+        if value not in (None, "", [], {}):
+            out[key] = value
+    # actor_counterparty is retained only when mechanism/claim text is absent;
+    # otherwise the causal role is already carried by the substantive field.
+    mechanism = full.get("mechanism")
+    claim = full.get("claim")
+    if isinstance(mechanism, str) and mechanism.strip():
+        out["mechanism"] = mechanism
+    elif isinstance(claim, str) and claim.strip():
+        out["claim"] = claim
+    else:
+        actor = full.get("actor_counterparty")
+        if actor not in (None, "", [], {}):
+            out["actor_counterparty"] = actor
+    legacy = full.get("legacy_definition")
+    if isinstance(legacy, Mapping) and legacy:
+        keep = {
+            key: legacy[key]
+            for key in _FORGE_LEGACY_KEEP
+            if key in legacy and legacy[key] not in (None, "", [], {})
+        }
+        if keep:
+            out["legacy_definition"] = keep
+    # If the source body is useful only via Critic-rich distinguishers that the
+    # lean path normally omits, retain them so Prompt A still has one-to-one
+    # anti-rediscovery context (never ID-only).
+    if not _forge_entry_has_distinguisher(out):
+        for key in (
+            "population",
+            "horizon_notional",
+            "negative_control",
+            "decision_timestamp",
+        ):
+            value = full.get(key)
+            if value not in (None, "", [], {}):
+                out[key] = value
+    return out
+
+
+def _forge_entry_has_distinguisher(entry: Mapping[str, Any]) -> bool:
+    for key in (
+        "mechanism",
+        "claim",
+        "actor_counterparty",
+        "primary_x_family",
+        "primary_y",
+        "cheapest_falsifier",
+        "legacy_definition",
+        "population",
+        "horizon_notional",
+        "negative_control",
+        "decision_timestamp",
+    ):
+        value = entry.get(key)
+        if isinstance(value, Mapping):
+            if value:
+                return True
+        elif value not in (None, "", [], {}):
+            return True
+    return False
 
 
 def _capsule_from_payload(

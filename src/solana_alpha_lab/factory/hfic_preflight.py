@@ -1181,8 +1181,10 @@ def build_forge_context_packet(
         "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
         "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
         "QUERY-HFIC-PENDING-SESSION-001",
-        *ranked,
-    ][:8]
+    ]
+    # Ranked prior identities live only in ranked_prior_candidate_ids /
+    # ranked_prior_entries (GENERATION_SEARCH_CONTEXT). Do not duplicate them
+    # into prior_work_receipts (MACHINE_BINDING query recipes only).
     truncation = {
         "truncated": False,
         "kept_priors": len(ranked),
@@ -1295,11 +1297,6 @@ def build_forge_context_packet(
         "owner_focus": owner_focus,
         "evidence_epoch_sha256": evidence_epoch,
         "search_key_sha256": search_key,
-        "related_prior_recipe_ids": [
-            "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
-            "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
-            "QUERY-HFIC-PENDING-SESSION-001",
-        ],
         "truth_roots_used": truth_roots,
         "commissioning_status": commissioning_status,
         "research_memory_as_of": research_memory_as_of,
@@ -1391,7 +1388,7 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
-        raise HficPreflightError("RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE")
+        raise HficPreflightError("FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED")
     vision = compute_vision_integrity(
         grounding_entries=all_grounding_entries,
         retained_feature_ids=[
@@ -1418,15 +1415,20 @@ def build_forge_context_packet(
     encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
         # The integrity receipt itself must not overflow the bound: keep the
-        # verdict, drop the per-item narrative (it is available via the STOP).
+        # verdict counters, drop per-item narrative and breakdown detail.
         packet["vision_integrity"] = {
             key: value
             for key, value in vision.items()
-            if key not in ("material_omissions", "unknown_omissions")
+            if key
+            not in (
+                "material_omissions",
+                "unknown_omissions",
+                "omission_breakdown",
+            )
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
-        raise HficPreflightError("RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE")
+        raise HficPreflightError("FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED")
     if vision.get("status") != "PASS":
         raise HficPreflightError(FORGE_VISION_INTEGRITY_BLOCKED)
     if persist:

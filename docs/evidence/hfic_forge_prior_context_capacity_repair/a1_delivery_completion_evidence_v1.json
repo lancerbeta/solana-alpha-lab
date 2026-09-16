@@ -1,0 +1,76 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-ACCEPT-001",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
+  "state_change": "Prompt A ranked priors use compact_forge_prior_entry; FORGE_CONTEXT_PACKET capacity terminal distinguished from missing-body; Critic prior_memory unchanged; second-focus IDENTIFIABLE_NOW packet fits.",
+  "base_main": "f910e3d19d35e24b954aef0e5948c2f887b0bc33",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "ba70d43f9aec604bae01005af6dc36d56abfcfb67c6c359a97e51ed7d969d09c",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b53702e94c67d1cde2f38e20dc8e41d4ccbe84a34c921f8bad555dcd34cf0ebd",
+    "docs/tasks/HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1.md": "c63cd5c909174fb3c70a008bc9b690c1f1a6c4f02d2319abf6fd91b0254c22ea",
+    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_owner_readout_v1.md": "871a49521f4889ebca32c7e1879f1004dabe46f3c4b5a4133e9807125eb706e5",
+    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_consumer_map_v1.md": "993d634b7ed398ffbc1af2e1d02c8e97bd4092d4c6d832e887347be1212a807a",
+    "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json": "28cc28455e1398e087ef01a953924cc5ebfa6fb3ab1ac97365126c27e8382588",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "66d10767f6e73b4daac22027f43fb011482c2791bb3a8497cff13bb50e5dea0c",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "ad4d123feb755203be4504e415afb21002c8f61f7b8c6be9821354bc865a0903",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "7a7d4ec6ca86e80d568f4952e398ed66ed92e566bd186c2150c3faf1a1fba5e8",
+    "tests/test_hfic_forge_prior_context_capacity_repair_v1.py": "04ddd915633478e706cfb73721a81dd8806e319e362d8bc4585a8c38c6e6aabd",
+    "tests/test_hfic_reopened_prior_search_routing_v1.py": "8f6eb43bd94f0d15910c4dfd98c6a8c9bf03146d4a4bc2f49d7266e9a8b0a28a",
+    "catalog/assets/core.yaml": "7669aab546636542f3284cf9394e6e8ec3b3aa2c0d55cf21f3daedac071b874c"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "12dcb7e59cafdb996bc23ef01e266e36a15c0e897116b532f6ee853a525618cd",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_UNIT",
+    "independent_review": {
+      "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "3cc26bac1d3caa8c80a2b85a8620be9c60d24a6bcbfa1a96fb31762f4ac4f228",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_CAPACITY_REPAIR",
+      "PASS_UNIT_REOPENED_PRIOR_ROUTING",
+      "PASS_UNIT_VISION_INTEGRITY",
+      "PASS_UNIT_REPRESENTATION_ISOLATION",
+      "PASS_READ_ONLY_ACTIVE_RDP_PREVIEW"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_MEMORY_QUARANTINE",
+    "NO_CRITIC_MEMORY_CHANGE",
+    "NO_REPRESENTATION_CHANGE",
+    "NO_PACKET_LIMIT_RAISE",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "rdp_mutation": 0,
+    "provider_calls": 0
+  }
+}

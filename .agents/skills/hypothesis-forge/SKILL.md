@@ -304,6 +304,21 @@ Ordinary Prompt A packets now carry `ranked_prior_entries` one-to-one with
 `ranked_prior_candidate_ids`; missing bodies fail closed as
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE`.
 
+## Packet capacity vs missing prior body
+
+`RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` means a ranked prior identity has no
+decision-useful resolvable body (one-to-one Prompt A body closure failed).
+
+`FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` means required bodies are complete
+but the bounded `FORGE_CONTEXT_PACKET` (16384 bytes) cannot represent the
+minimum Forge search context after allowed semantic/feature-grounding
+compaction. This is not a quarantine signal and not permission to drop ranked
+priors or raise the packet limit inside a slash.
+
+Prompt A `ranked_prior_entries` use a Forge-specific projection
+(`compact_forge_prior_entry`). Critic `prior_memory` continues to use the
+fuller `compact_prior_entry` / `build_prior_memory_snapshot` path.
+
 ## Model effort
 
 Use `SOL_XHIGH` for mechanism/PIT/estimand reasoning. Critic handoff may use the
