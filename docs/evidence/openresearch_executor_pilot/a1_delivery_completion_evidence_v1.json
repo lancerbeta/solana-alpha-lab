@@ -63,10 +63,5 @@
     "provider_requests": 0,
     "wallet_signer_transaction_actions": 0,
     "orx_disposable_workspace_outside_git": true
-  },
-  "delivery_efficiency": {
-    "substantive_commits": 1,
-    "repair_commits": 1,
-    "control_only_commits": 0
   }
 }
