@@ -11,8 +11,6 @@
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC"
   ],
-  "architecture_question": "Does the mode-scoped budget change preserve the frozen CONTROL↔NORMALIZED_TRAJECTORY comparison while only enlarging ordinary Forge context capacity?",
-  "architecture_answer": "YES",
   "reviews": [
     {
       "role": "CODE_REVIEWER",
@@ -29,7 +27,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "ARCH_Q_YES_CONTROL_CHALLENGER_16384",
+        "ARCH_Q_YES_MODE_SCOPED_PRESERVES_CONTROL_NORMALIZED_TRAJECTORY",
         "ORDINARY_ONLY_20480",
         "RESOLVER_USES_EVIDENCE_SURFACE_NOT_FOCUS",
         "CHALLENGER_IMPORTS_MAX_PACKET_BYTES",
