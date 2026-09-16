@@ -62,7 +62,8 @@ def _grounded_preflight() -> dict:
     receipt = dict(_preflight_receipt())
     receipt["forge_context_packet_sha256"] = CONTEXT_SHA
     receipt["forge_context_packet"] = {
-        "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"]
+        "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+        "vision_integrity": {"status": "PASS"},
     }
     return receipt
 

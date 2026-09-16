@@ -87,7 +87,14 @@ class LegacyScienceRebaseTests(unittest.TestCase):
     def test_t1_priority_parks_survive_consumer_packet_cap(self) -> None:
         hard = [
             classify_source_payload(
-                {"scientific_terminal": f"CLOSE_SYNTHETIC_FAMILY_{index:02d}_FAMILY", "family_close": True},
+                {
+                    "scientific_terminal": f"CLOSE_SYNTHETIC_FAMILY_{index:02d}_FAMILY",
+                    "family_close": True,
+                    "atom_id": f"SYNTHETIC_FAMILY_ATOM_{index:02d}_V1",
+                    "criteria": {"ran": True},
+                    "cohort": {"n": 60},
+                    "source_runtime_receipt_sha256": f"{index:02d}" * 32,
+                },
                 terminal=f"CLOSE_SYNTHETIC_FAMILY_{index:02d}_FAMILY",
                 source_receipt=f"docs/evidence/synthetic/a1_family_{index:02d}.json",
             )
@@ -126,6 +133,8 @@ class LegacyScienceRebaseTests(unittest.TestCase):
                 "family_close": True,
                 "schema": "smial.early-icp-first-hit-mix-falsifier.runtime-receipt",
                 "outcome_consumed": True,
+                "atom_id": "EARLY_ICP_FIRST_HIT_MIX_FALSIFIER_V1",
+                "dataset_fingerprint": "ab" * 32,
             },
             terminal=TAKER_FAMILY,
             source_receipt=f"datasets/manifests/{TAKER_MANIFEST_ID}.decision.json",
