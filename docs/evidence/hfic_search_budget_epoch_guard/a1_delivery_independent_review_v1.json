@@ -1,0 +1,54 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-SEARCH-BUDGET-EPOCH-GUARD-REVIEW-001",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1",
+  "reviewed_bindings_sha256": "7c1f60fa05cc6dea6cad0f291a862ca60e452b63b861f210e91272e508803f68",
+  "reviewed_inventory_sha256": "e4168dd861fa8703387ae00b7a3e4284e583b5f7ce4b0b936a6f2a50072f2eb3",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "EPOCH_ONLY_BUDGET_FILTER",
+        "SAME_FOCUS_AND_SEARCH_KEY_STILL_ELIGIBILITY_AWARE",
+        "QUARANTINE_T14_STRENGTHENED",
+        "SIX_REGRESSION_CASES_COVERED"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ARCH_Q_YES_IDENTITY_PRESERVED_BUDGET_EPOCH_SCOPED",
+        "AUTO_1_DISTINCT_3_ENFORCED",
+        "ELIGIBILITY_NO_LONGER_RESETS_BUDGET"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "REAL_STATE_DISTINCT_1_REMAINING_2",
+        "START_NEW_SESSION",
+        "SIX_OWNER_CASES_PRESENT"
+      ]
+    }
+  ],
+  "remediation_history": [],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_PACKET_BUDGET_CHANGE",
+    "NO_CANONICAL_DONE"
+  ]
+}

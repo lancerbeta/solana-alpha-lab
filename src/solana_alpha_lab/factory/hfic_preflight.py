@@ -448,16 +448,18 @@ def decide_preflight_action(
         chosen = pick_session(matching)
         return ("RETURN_EXISTING_SESSION", str(chosen.get("session_id") or ""))
 
-    same_epoch = [
+    # Search-budget accounting is per evidence epoch only. memory_eligibility
+    # remains in search_key / same_focus / exact replay identity above, but must
+    # not reset AUTO or distinct-focus counters after quarantine/restore.
+    same_epoch_for_budget = [
         item
         for item in sessions
         if item.get("evidence_epoch_sha256") == evidence_epoch
-        and session_memory_eligibility(item) == expected_memory
     ]
     if _is_auto_focus(owner_focus):
         auto_count = sum(
             1
-            for item in same_epoch
+            for item in same_epoch_for_budget
             if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
         )
         if auto_count >= AUTO_SESSIONS_PER_EPOCH:
@@ -466,12 +468,46 @@ def decide_preflight_action(
 
     distinct = {
         str(item.get("focus_key_sha256") or "")
-        for item in same_epoch
+        for item in same_epoch_for_budget
         if item.get("focus_key_sha256")
     }
     if focus_key not in distinct and len(distinct) >= MAX_DISTINCT_FOCUSES_PER_EPOCH:
         return ("STOP", "SEARCH_BUDGET_EXHAUSTED")
     return ("START_NEW_SESSION", None)
+
+
+def epoch_search_budget_usage(
+    sessions: Sequence[Mapping[str, Any]],
+    *,
+    evidence_epoch: str,
+) -> dict[str, Any]:
+    """Epoch-scoped AUTO / distinct-focus usage (independent of memory eligibility)."""
+    same_epoch = [
+        item
+        for item in sessions
+        if item.get("evidence_epoch_sha256") == evidence_epoch
+    ]
+    auto_used = sum(
+        1
+        for item in same_epoch
+        if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+    )
+    distinct = {
+        str(item.get("focus_key_sha256") or "")
+        for item in same_epoch
+        if item.get("focus_key_sha256")
+    }
+    return {
+        "evidence_epoch_sha256": evidence_epoch,
+        "auto_sessions_used": auto_used,
+        "auto_sessions_per_evidence_epoch": AUTO_SESSIONS_PER_EPOCH,
+        "distinct_focus_used": len(distinct),
+        "distinct_focus_sessions_per_evidence_epoch": MAX_DISTINCT_FOCUSES_PER_EPOCH,
+        "distinct_focus_remaining": max(
+            0, MAX_DISTINCT_FOCUSES_PER_EPOCH - len(distinct)
+        ),
+        "focus_key_sha256_set": sorted(distinct),
+    }
 
 
 def _term_set(value: str) -> set[str]:
@@ -1635,6 +1671,7 @@ def run_preflight(
         memory_eligibility_sha256=memory_eligibility,
         evidence_surface_mode=control_mode,
     )
+    search_budget = epoch_search_budget_usage(sessions, evidence_epoch=epoch)
     live_git_head = "0" * 40
     git_composite = None
     if isinstance(git_snapshot, Mapping):
@@ -1666,6 +1703,7 @@ def run_preflight(
             list(policy_head.get("quarantined_session_ids") or [])
         ),
         "evidence_epoch_policy_binding": "UNCHANGED_BY_HFIC_MEMORY_POLICY",
+        "search_budget": search_budget,
         "live_git_head": live_git_head,
         "git_composite_sha256": git_composite,
         "store_inventory_digest": digest,

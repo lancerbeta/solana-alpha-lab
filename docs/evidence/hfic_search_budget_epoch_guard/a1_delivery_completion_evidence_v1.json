@@ -1,0 +1,68 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-SEARCH-BUDGET-EPOCH-GUARD-ACCEPT-001",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1",
+  "state_change": "HFIC search-budget AUTO/distinct counters now count all sessions in the evidence epoch; memory_eligibility remains in search_key/same_focus only. Real IDENTIFIABLE_NOW preview: distinct 1/3 used, START_NEW_SESSION.",
+  "base_main": "6f144de9be51b85195bdffe2c7277580686295fe",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "30d868e6d1118fe252d1c87eb834ac9250408d4ae7f112069e55d1f44543bf2a",
+    "docs/evidence/hfic_search_budget_epoch_guard/a1_active_rdp_preview_v1.json": "e9103cc791c7aef4d636f6399be442a0f9156a34b9323a6065259fcbd543bed5",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "b954e76d93def50e9e104660c097aae1a0bab97e7e1a0255ae283f55c43d9d20",
+    "docs/reports/hfic_search_budget_epoch_guard/a1_owner_readout_v1.md": "e98d6a5a5d5d93de4f3145354c3bbcafe56971f3eea58b1b66cffee21f8397b5",
+    "docs/tasks/HFIC_SEARCH_BUDGET_EPOCH_GUARD_V1.md": "be4d79b008400b05a1df977311dc0b2973449f407c96bad169fded88768bd986",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "51a32cc2c6f57d73d54e0feb902bc3981e6a6923e9412ddea9d000ff3929d22a",
+    "tests/test_hfic_operational_memory_quarantine_v1.py": "a1b99dea91face16b3a1c8cbb48b159723b7e83fb4e6c6b717c707c051689ec5",
+    "tests/test_hfic_search_budget_epoch_guard_v1.py": "0b151526ea8e677be73ebf964ead4b387cad7405263d454f01fe8252cd4bfe8d"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_search_budget_epoch_guard/a1_delivery_factory_fit_v1.json",
+    "sha256": "b70d56c3dfda5c121b882747db82df5938f0ea3c2725cddef3bdd072c0d9e60a",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_SEARCH_BUDGET_EPOCH_GUARD",
+    "independent_review": {
+      "path": "docs/evidence/hfic_search_budget_epoch_guard/a1_delivery_independent_review_v1.json",
+      "sha256": "ad8f82a107047b9f4c5fbd8c5b6c6fd74552329bccedd76b145b3c082368ee58",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_SEARCH_BUDGET_EPOCH_GUARD",
+      "PASS_UNIT_OPERATIONAL_MEMORY_QUARANTINE_T14",
+      "PASS_READ_ONLY_IDENTIFIABLE_NOW_BUDGET_PREVIEW"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_PACKET_BUDGET_CHANGE",
+    "NO_QUARANTINE_POLICY_CHANGE",
+    "NO_CRITIC_OR_REPRESENTATION_CHANGE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "rdp_mutation": 0,
+    "provider_calls": 0
+  }
+}
