@@ -607,7 +607,8 @@ def freeze_reopened_prior_compat_smoke(repo_root: Path) -> dict[str, Any]:
                 "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
                 "forge_context_packet_sha256": "ab" * 32,
                 "forge_context_packet": {
-                    "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"]
+                    "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+                    "vision_integrity": {"status": "PASS"},
                 },
             },
             repo_root=root,

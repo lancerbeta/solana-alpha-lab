@@ -703,24 +703,21 @@ def _assert_representation_bound_to_readiness(
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
     expected_schedule = {
         "schedule_id": DEFAULT_SCHEDULE.schedule_id,
-        "activation_id": DEFAULT_SCHEDULE.activation_id,
+        "activation_id": binding.activation_id,
         "x_due_offset_seconds": DEFAULT_SCHEDULE.x_due_offset_seconds,
         "declared_y_due_offset_seconds": list(DEFAULT_SCHEDULE.y_due_offset_seconds),
         "prefix_due_offset_seconds": list(DEFAULT_SCHEDULE.prefix_due_offsets),
         "decision_t_due_offset_seconds": DEFAULT_SCHEDULE.decision_t_due_offset_seconds,
-        "schedule_sha256": DEFAULT_SCHEDULE.schedule_sha256,
+        "schedule_sha256": binding.schedule_sha256,
     }
     if representation.get("schedule") != expected_schedule:
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
-    synthetic_binding = DEFAULT_SCHEDULE.corpus_binding
-    if (
-        not isinstance(synthetic_binding, LifecycleCorpusBinding)
-        or binding.as_dict() != synthetic_binding.as_dict()
-    ):
-        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    # Non-synthetic corpus bindings are the intended runtime path: the
+    # binding above already matches the verified release manifest exactly
+    # (release/source/census/observations/schedule/activation).  Only the
+    # frozen schedule geometry (points/offsets/schedule_id) is fixed.
     if representation.get("eligible_member_count") != readiness["yield_eligible"]:
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
-
 
 def _memory_baseline_sha256(
     packet: Mapping[str, Any],
