@@ -14,7 +14,21 @@
     "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "32f7e2bc202620ffff3b76c50904ac4bcddf34bf5e584df1aee682b7646a617e",
+    "catalog/assets/core.yaml": "b836f2eca251590391750a55e83bede276d7d5ce1cf29409365f820d290a0544",
+    "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json": "ed1dc232f6a39ca662855e76820c0246728daf3d88f55f92a9b1c6707c736e9a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "4b238390b62e393de17b061e006bdeb566cb783ec6b89d198c51949657cbbdb1",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "9082e0445cff065cff81f0d6f13d3ed5012aa62376e1ef655c5980ffa2cd6940",
+    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_consumer_map_v1.md": "364064ea8afba398abab6ad834c41c0d4866fabc519e9040f731736be73784be",
+    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_owner_readout_v1.md": "01722e4529c3a66a72915223744f37039eccc3d4dd64521059470ee9b1a52877",
+    "docs/tasks/HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1.md": "eca0d21e85e8eaf3bbefa1698e0dc20df4570bb5a01780aea20a9e8f85fa538b",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "aed9ea7e879755ab72492d5ba87f651b9e3b6b5e7f46c49fb670cf3492b93f2c",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "ae6c40ffcbaeb7d171b7b8d53e6daf0cf6d7c2ce47f130db3ba2b0dfc092a1fb",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "03193aed441d6b730f7b1fb93d1ebbd2706aa2121fec4abf4e46c865c9d01955",
+    "tests/test_hfic_forge_prior_context_capacity_repair_v1.py": "28c3f90150156f859e9c6029a7fb171d8db5f702ec38aa7edd60141ed3a36eb6",
+    "tests/test_hfic_reopened_prior_search_routing_v1.py": "dc528c138e9c11a2040e6438148a4a0ba1dc0e8951a2acca4d1a8acae974e52e"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -25,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "693d427ff6d0b033a850c03fd7d6c7ddb391cb5706021390982f4cba28458e75",
+    "sha256": "a0fb56dcd623c672295a6a62896d90a1ba5316b9017a58ca8f2184f29dc0ab03",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MODE_SCOPED_BUDGET_UNIT_AND_REAL_PREVIEW",
     "independent_review": {
       "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "f0adbad11e1e186e354845ac4132579c89f4349e1bf8534a57ebd3ca79188e17",
+      "sha256": "6587945811c1f4c1d0fcaa33d39f5fb71779c246b5a34a17dfc17edba1a55d4e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
