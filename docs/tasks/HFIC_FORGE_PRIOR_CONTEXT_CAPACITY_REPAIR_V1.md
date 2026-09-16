@@ -45,6 +45,8 @@ managed_write_set:
   - docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_independent_review_v1.json
   - docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_factory_fit_v1.json
   - docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
+  - catalog/assets/core.yaml
 
 external_caps:
   network: false

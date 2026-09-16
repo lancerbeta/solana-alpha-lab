@@ -17,10 +17,11 @@
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "ba70d43f9aec604bae01005af6dc36d56abfcfb67c6c359a97e51ed7d969d09c",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b53702e94c67d1cde2f38e20dc8e41d4ccbe84a34c921f8bad555dcd34cf0ebd",
-    "docs/tasks/HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1.md": "c63cd5c909174fb3c70a008bc9b690c1f1a6c4f02d2319abf6fd91b0254c22ea",
+    "docs/tasks/HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1.md": "28938ab56ce6b691cd6e37d28ffbb07f35fd26584cb74e7b3930d5da840ed208",
     "docs/reports/hfic_forge_prior_context_capacity_repair/a1_owner_readout_v1.md": "871a49521f4889ebca32c7e1879f1004dabe46f3c4b5a4133e9807125eb706e5",
     "docs/reports/hfic_forge_prior_context_capacity_repair/a1_consumer_map_v1.md": "993d634b7ed398ffbc1af2e1d02c8e97bd4092d4c6d832e887347be1212a807a",
-    "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json": "28cc28455e1398e087ef01a953924cc5ebfa6fb3ab1ac97365126c27e8382588",
+    "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json": "7635c12d4080fd0f75be1bca508c6fd05d29e67a37c3296e667cc2104915d3a7",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "d45da4443f8258c0eeec922a2a6250f3a9056c07c7cc62cf059679efc84673b8",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "66d10767f6e73b4daac22027f43fb011482c2791bb3a8497cff13bb50e5dea0c",
     "src/solana_alpha_lab/factory/hfic_prior_memory.py": "ad4d123feb755203be4504e415afb21002c8f61f7b8c6be9821354bc865a0903",
     "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "7a7d4ec6ca86e80d568f4952e398ed66ed92e566bd186c2150c3faf1a1fba5e8",
@@ -38,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "12dcb7e59cafdb996bc23ef01e266e36a15c0e897116b532f6ee853a525618cd",
+    "sha256": "ba2c13d35cf8fb2e1464c26b37df64613022a05428dd2cc4ebe0cf42f3ec7439",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_UNIT",
     "independent_review": {
       "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "3cc26bac1d3caa8c80a2b85a8620be9c60d24a6bcbfa1a96fb31762f4ac4f228",
+      "sha256": "663e7d15a3fef92f796553977660dc42b53e1aa2d0021871df858173256a577d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
