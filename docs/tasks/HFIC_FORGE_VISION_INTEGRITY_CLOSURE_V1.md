@@ -45,6 +45,7 @@ managed_write_set:
   - docs/evidence/hfic_forge_vision_integrity_closure/a1_completion_v1.json
   - docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json
   - docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - docs/reports/hfic_forge_vision_integrity_closure/a1_owner_readout_v1.md
   - catalog/assets/core.yaml
 external_caps:
