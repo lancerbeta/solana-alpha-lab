@@ -14,7 +14,10 @@
     "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
   },
   "capability_radar_now": "NONE",
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    "docs/reports/openresearch_executor_pilot/a1_owner_readout_v1.md": "ce56340c2217db0437d671593d9c885f421b5a2a4d44e32812945967aff52a42",
+    "docs/tasks/OPENRESEARCH_EXECUTOR_PILOT_V1.md": "6c15785f991190b9bd60e63632f94f96289d12e312e5981caa241243b5d9d98f"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -25,14 +28,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/openresearch_executor_pilot/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "0800239123dc79e85f88fe35c23691ea0c5eab9a9003186e19351107c35cbbe2",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_DOCS_ONLY_NO_RUNTIME_TARGETED_TESTS",
     "independent_review": {
       "path": "docs/evidence/openresearch_executor_pilot/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "bcd569d46fdd90f6aecdc08fdadad8288886454b13dbdcfa018eaf2a55f2866d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
