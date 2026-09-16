@@ -6,7 +6,7 @@
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
   "reviewed_bindings_sha256": "f3d3c7c5306f48289acec53b84db7dcb3e8053b91f9798a003bff24c3f19e192",
   "reviewed_inventory_sha256": "eb831008b7e346b946f598c173dad58251608acef086f10b7350a7a2203a48b3",
-  "mode": "PROPORTIONAL",
+  "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
     "mission": "PASS_SECOND_FOCUS_REACHABILITY_RESTORED",

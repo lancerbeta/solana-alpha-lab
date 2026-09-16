@@ -39,7 +39,7 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "ba2c13d35cf8fb2e1464c26b37df64613022a05428dd2cc4ebe0cf42f3ec7439",
+    "sha256": "ca91e9a1386dd7856210ae24d4a94fb76268ca17fc31186f8715ff4111021d4f",
     "verdict": "PASS"
   },
   "validation": {
