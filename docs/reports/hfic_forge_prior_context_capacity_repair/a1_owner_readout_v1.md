@@ -1,53 +1,52 @@
 # HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1 — Owner readout
 
-Date: 2026-09-16 · Route: DIRECT_CURSOR_DELIVERY · Terminal: `HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_PASS` (pending merge)
+Date: 2026-09-16 · Route: DIRECT_CURSOR_DELIVERY
 
-Pinned real-state AFTER: `docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json`
+Pinned real-state: `docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json`
 
-## Measured dead-end (real local RDP)
+## Semantic patch (PR #312 follow-up)
 
-- cohort: `REL-20260902T111900Z-20260909T111900Z`
-- evidence epoch: `ba8844147733e4421c2b497b7e70d23f20a22afa95f76e84f6beb3aff753effc`
-- completed CONTROL: `HFIC-SESS-60FB3DA7C8EB33FC` (still search-memory eligible; not quarantined)
-- focus under test: `IDENTIFIABLE_NOW`
+1. Forge ranked priors use shared `latest_hypothesis_decisions(store)` (same walker as Critic).
+2. HARD_CLOSE/PARK retain scope axes (`population` / `decision_timestamp` / `horizon_notional` / `negative_control`).
+3. `NOT_SELECTED_IN_SESSION` stays thinner when a lean distinguisher remains.
 
-### BEFORE (Critic-grade capsule reused for Prompt A)
+## 60FB decision readback (store-resolved, not hardcoded)
+
+| Candidate | reason_code | forge memory_status | scope retained |
+| --- | --- | --- | --- |
+| HFIC-CAND-992D6CF8407B | KILL_STATISTICALLY_UNIDENTIFIABLE | HARD_CLOSE | population+horizon |
+| HFIC-CAND-52CC773188C7 | KILL_DATA_INFEASIBLE | HARD_CLOSE | population+horizon |
+| HFIC-CAND-8EF7214122D7 | NOT_SELECTED_IN_SESSION | NOT_SELECTED_IN_SESSION | omitted (lean OK) |
+| HFIC-CAND-985C6CF5B7CB | NOT_SELECTED_IN_SESSION | NOT_SELECTED_IN_SESSION | omitted |
+| HFIC-CAND-FB105AA77240 | NOT_SELECTED_IN_SESSION | NOT_SELECTED_IN_SESSION | omitted |
+
+## Capacity fence — STOP
+
+With correct decisions + scientifically sufficient HARD_CLOSE scope:
 
 | Metric | Value |
 | --- | --- |
-| ranked prior count | 8 (dropped_priors=1 honest) |
-| ranked prior bytes | 9298 |
-| total packet bytes | >16384 after semantic/feature-grounding compaction |
-| terminal | capacity overflow (historically mislabeled `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE`; with this patch the same shape raises `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED`) |
+| ranked prior count | 8 (one-to-one) |
+| ranked prior bytes | 5774 |
+| unbounded total packet bytes | 18317 |
+| MAX_PACKET_BYTES | 16384 |
+| over_bytes | 1933 |
+| bounded terminal | `MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` |
+| IDENTIFIABLE_NOW | not reachable without new owner architecture decision |
 
-### AFTER (Forge projection + duplicate recipe cleanup)
+### Section bytes (unbounded, vision would be PASS)
 
-| Metric | Value |
-| --- | --- |
-| ranked prior count | 8 |
-| ranked prior bytes | 4431 |
-| total packet bytes | 16045 |
-| vision | PASS (feature grounding retained; semantic dropped via existing compaction) |
-| expected preflight action | `START_NEW_SESSION` |
-| fits_bound | true |
-| one_to_one | true |
+See `section_bytes` in the pinned RDP preview (largest: ranked_prior_entries 5774, closed_family_ledger 3502, feature_grounding_entries 1416, capability_entries 1058, dataset_entries 1054, semantic_capability_entries 967).
 
-## Invariants confirmed
+## Explicit non-actions
 
-- 60FB quarantine status unchanged (`quarantine_marker=null`)
-- search-memory eligibility unchanged
-- Critic `prior_memory` / `compact_prior_entry` semantics unchanged
-- distinct-focus budget unchanged (1/3 used; AUTO exhausted; 2 remain)
-- representation gate unchanged (`INVALID_CASE_C_OBSERVABILITY` still blocks challenger)
-- no real `/hypothesis-forge IDENTIFIABLE_NOW` session executed in this atom
+- No packet-limit raise
+- No ranked-prior drop
+- No 60FB quarantine/reset
+- No arbitrary string truncation
+- No Critic prior-memory change
+- No real `/hypothesis-forge IDENTIFIABLE_NOW`
 
-## What changed
+## Required owner decision (outside this patch)
 
-1. `compact_forge_prior_entry` for Prompt A ranked bodies (Critic-rich fields only as fallback distinguishers)
-2. `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` distinct from missing-body
-3. Removed duplicate `related_prior_recipe_ids` and ranked IDs from `prior_work_receipts` (permanent AUDIT_ONLY de-dupe)
-4. Source-only usefulness gate so lean projection cannot mislabel as `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE`
-
-## Non-claims
-
-Not alpha. Not representation eligibility. Not permission to run IDENTIFIABLE_NOW inside this PR.
+Choose one: raise bound / redesign packet / accept second-focus blocked under current 16KiB with full scientific Forge minimum.

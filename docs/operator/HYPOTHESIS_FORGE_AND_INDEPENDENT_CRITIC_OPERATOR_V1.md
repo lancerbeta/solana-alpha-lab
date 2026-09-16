@@ -439,10 +439,14 @@ Ordinary Forge `FORGE_CONTEXT_PACKET` stays bounded at 16384 bytes.
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` is reserved for ranked IDs whose
 decision-useful body cannot be resolved one-to-one.
 `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` is the typed STOP when bodies are
-complete but the minimum Forge search context still cannot fit after allowed
-semantic/feature-grounding compaction. Do not quarantine valid HFIC memory or
-drop ranked priors to paper over capacity. Prompt A uses
-`compact_forge_prior_entry`; Critic `prior_memory` keeps the fuller capsule.
+complete but a non-minimal Forge search context still cannot fit after allowed
+semantic/feature-grounding compaction.
+`MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` is the typed STOP when HARD_CLOSE/PARK
+Forge priors already carry disposition-gated scope axes (via the shared
+DECISION_EVENT resolver) and fitting would require stripping material feature
+grounding. Do not quarantine valid HFIC memory or drop ranked priors to paper
+over capacity. Prompt A uses `compact_forge_prior_entry`; Critic `prior_memory`
+keeps the fuller capsule.
 
 External public research не даёт market/provider authority. Приоритет источников: исполнимая собственная реальность → официальные спецификации → воспроизводимые papers/code/data → прозрачная аналитика → агрегаторы → social/KOL только как источник идеи.
 

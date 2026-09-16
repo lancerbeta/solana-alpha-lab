@@ -31,9 +31,13 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     rank_prior_candidate_ids,
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (  # noqa: E402
+    MEMORY_HARD_CLOSE,
+    MEMORY_NOT_SELECTED,
+    MEMORY_PARK,
     build_prior_memory_snapshot,
     compact_forge_prior_entry,
     compact_prior_entry,
+    latest_hypothesis_decisions,
 )
 from solana_alpha_lab.factory.hfic_reopened_prior_routing import (  # noqa: E402
     BODY_INCOMPLETE,
@@ -126,6 +130,28 @@ def _fat_hfic_candidate(index: int, *, transaction_id: str) -> ResearchEvent:
         payload=payload,
         transaction_id=transaction_id,
         hypothesis_version_id=hyp_id,
+    )
+
+
+def _decision_event(
+    hyp_id: str,
+    *,
+    decision_kind: str,
+    reason_code: str,
+    transaction_id: str,
+) -> ResearchEvent:
+    return _event(
+        record_id=f"DEC-{hyp_id}",
+        kind=RecordKind.DECISION_EVENT,
+        entity_id=f"DEC-{hyp_id}",
+        hypothesis_version_id=hyp_id,
+        payload={
+            "decision_event_id": f"DEC-{hyp_id}",
+            "hypothesis_version_id": hyp_id,
+            "decision_kind": decision_kind,
+            "reason_code": reason_code,
+        },
+        transaction_id=transaction_id,
     )
 
 
@@ -387,6 +413,271 @@ class ForgePriorContextCapacityRepairTests(unittest.TestCase):
                 "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED",
             )
             self.assertNotEqual(str(raised.exception), BODY_INCOMPLETE)
+
+    def test_minimal_forge_context_exceeds_bound_when_scope_required(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            txn = "RESEARCH-TXN-MINIMAL-BOUND"
+            hyp = _fat_hfic_candidate(1, transaction_id=txn)
+            store.append(
+                [
+                    hyp,
+                    _decision_event(
+                        "HFIC-CAND-FAT0001DEADBEEF",
+                        decision_kind="REJECT",
+                        reason_code="KILL_DATA_INFEASIBLE",
+                        transaction_id=txn,
+                    ),
+                ],
+                transaction_id=txn,
+            )
+            payloads = list(iter_search_memory_hypothesis_payloads(store))
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.MAX_PACKET_BYTES",
+                2500,
+            ):
+                with self.assertRaises(HficPreflightError) as raised:
+                    build_forge_context_packet(
+                        ROOT,
+                        Path(raw),
+                        owner_focus=FOCUS,
+                        evidence_epoch="aa" * 32,
+                        search_key="bb" * 32,
+                        commissioning_status="FAST_LANE_COMMISSIONED",
+                        research_memory_as_of="2026-09-16T00:00:00Z",
+                        store=store,
+                        persist=False,
+                        search_payloads=payloads,
+                    )
+            self.assertEqual(
+                str(raised.exception),
+                "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND",
+            )
+            self.assertNotEqual(str(raised.exception), BODY_INCOMPLETE)
+
+    def test_decision_event_flows_into_forge_ranked_entries(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            txn = "RESEARCH-TXN-DECISION-FORGE"
+            selected = _fat_hfic_candidate(1, transaction_id=txn)
+            runner = _fat_hfic_candidate(2, transaction_id=txn)
+            portfolio = _fat_hfic_candidate(3, transaction_id=txn)
+            store.append(
+                [
+                    selected,
+                    runner,
+                    portfolio,
+                    _decision_event(
+                        "HFIC-CAND-FAT0001DEADBEEF",
+                        decision_kind="REJECT",
+                        reason_code="KILL_STATISTICALLY_UNIDENTIFIABLE",
+                        transaction_id=txn,
+                    ),
+                    _decision_event(
+                        "HFIC-CAND-FAT0002DEADBEEF",
+                        decision_kind="REJECT",
+                        reason_code="KILL_DATA_INFEASIBLE",
+                        transaction_id=txn,
+                    ),
+                    _decision_event(
+                        "HFIC-CAND-FAT0003DEADBEEF",
+                        decision_kind="PAUSE",
+                        reason_code="NOT_SELECTED_IN_SESSION",
+                        transaction_id=txn,
+                    ),
+                ],
+                transaction_id=txn,
+            )
+            payloads = list(iter_search_memory_hypothesis_payloads(store))
+            ranked = [
+                "HFIC-CAND-FAT0001DEADBEEF",
+                "HFIC-CAND-FAT0002DEADBEEF",
+                "HFIC-CAND-FAT0003DEADBEEF",
+            ]
+            entries = ranked_prior_entries_for_ids(ranked, payloads, store=store)
+            by_id = {item["hypothesis_version_id"]: item for item in entries}
+            self.assertEqual(
+                by_id["HFIC-CAND-FAT0001DEADBEEF"]["reason_code"],
+                "KILL_STATISTICALLY_UNIDENTIFIABLE",
+            )
+            self.assertEqual(
+                by_id["HFIC-CAND-FAT0001DEADBEEF"]["memory_status"],
+                MEMORY_HARD_CLOSE,
+            )
+            self.assertEqual(
+                by_id["HFIC-CAND-FAT0002DEADBEEF"]["reason_code"],
+                "KILL_DATA_INFEASIBLE",
+            )
+            self.assertEqual(
+                by_id["HFIC-CAND-FAT0003DEADBEEF"]["reason_code"],
+                "NOT_SELECTED_IN_SESSION",
+            )
+            self.assertEqual(
+                by_id["HFIC-CAND-FAT0003DEADBEEF"]["memory_status"],
+                MEMORY_NOT_SELECTED,
+            )
+            # Shared resolver matches Critic.
+            decisions = latest_hypothesis_decisions(store)
+            self.assertEqual(
+                decisions["HFIC-CAND-FAT0001DEADBEEF"]["reason_code"],
+                "KILL_STATISTICALLY_UNIDENTIFIABLE",
+            )
+
+    def test_hard_close_retains_scope_axes_for_anti_rediscovery(self) -> None:
+        shared_mech = "same mechanism text for both scoped variants"
+        shared_x = "SAME_X_FAMILY"
+        shared_y = "SAME_Y"
+        pop_a = "yield-eligible members in cohort A"
+        pop_b = "yield-eligible members in cohort B"
+        horizon_a = "H900 / 0.01 SOL"
+        horizon_b = "H3600 / 1.0 SOL"
+        payload_a = {
+            "hypothesis_version_id": "HFIC-CAND-SCOPE-A",
+            "hfic_protocol": "HFIC-V1.2",
+            "mechanism": shared_mech,
+            "claim": "scoped claim A",
+            "population": pop_a,
+            "decision_timestamp": "clock-A",
+            "primary_x_family": shared_x,
+            "primary_y": shared_y,
+            "horizon_notional": horizon_a,
+            "negative_control": "control-A",
+            "cheapest_falsifier": "falsifier-A",
+            "definition_sha256": "aa" * 32,
+        }
+        payload_b = {
+            **payload_a,
+            "hypothesis_version_id": "HFIC-CAND-SCOPE-B",
+            "population": pop_b,
+            "decision_timestamp": "clock-B",
+            "horizon_notional": horizon_b,
+            "negative_control": "control-B",
+            "definition_sha256": "bb" * 32,
+        }
+        decision = {
+            "decision_kind": "REJECT",
+            "reason_code": "KILL_MECHANISM",
+        }
+        forge_a = compact_forge_prior_entry(
+            "HFIC-CAND-SCOPE-A", payload_a, decision
+        )
+        forge_b = compact_forge_prior_entry(
+            "HFIC-CAND-SCOPE-B", payload_b, decision
+        )
+        self.assertEqual(forge_a["memory_status"], MEMORY_HARD_CLOSE)
+        self.assertEqual(forge_a["population"], pop_a)
+        self.assertEqual(forge_a["horizon_notional"], horizon_a)
+        self.assertEqual(forge_a["negative_control"], "control-A")
+        self.assertEqual(forge_a["decision_timestamp"], "clock-A")
+        self.assertEqual(forge_b["population"], pop_b)
+        self.assertEqual(forge_b["horizon_notional"], horizon_b)
+        # Same mechanism must not collapse to an unscoped close.
+        self.assertEqual(forge_a["mechanism"], forge_b["mechanism"])
+        self.assertNotEqual(forge_a["population"], forge_b["population"])
+        self.assertNotEqual(forge_a["horizon_notional"], forge_b["horizon_notional"])
+
+    def test_not_selected_may_omit_scope_when_lean_distinguisher_exists(self) -> None:
+        payload = {
+            "hypothesis_version_id": "HFIC-CAND-NS",
+            "hfic_protocol": "HFIC-V1.2",
+            "mechanism": "portfolio runner mechanism text",
+            "population": "should-omit-for-not-selected",
+            "decision_timestamp": "should-omit-ts",
+            "horizon_notional": "should-omit-horizon",
+            "negative_control": "should-omit-nc",
+            "primary_x_family": "X_NS",
+            "primary_y": "Y_NS",
+            "definition_sha256": "cc" * 32,
+        }
+        forge = compact_forge_prior_entry(
+            "HFIC-CAND-NS",
+            payload,
+            {"decision_kind": "PAUSE", "reason_code": "NOT_SELECTED_IN_SESSION"},
+        )
+        self.assertEqual(forge["memory_status"], MEMORY_NOT_SELECTED)
+        self.assertEqual(forge["mechanism"], "portfolio runner mechanism text")
+        self.assertNotIn("population", forge)
+        self.assertNotIn("horizon_notional", forge)
+
+    def test_critic_snapshot_unchanged_with_forge_decision_wiring(self) -> None:
+        with tempfile.TemporaryDirectory() as raw:
+            store = ResearchStore(Path(raw))
+            txn = "RESEARCH-TXN-CRITIC-UNCHANGED"
+            hyp = _fat_hfic_candidate(1, transaction_id=txn)
+            store.append(
+                [
+                    hyp,
+                    _decision_event(
+                        "HFIC-CAND-FAT0001DEADBEEF",
+                        decision_kind="REJECT",
+                        reason_code="KILL_DATA_INFEASIBLE",
+                        transaction_id=txn,
+                    ),
+                ],
+                transaction_id=txn,
+            )
+            snapshot = build_prior_memory_snapshot(
+                store,
+                store_inventory_digest=store.diagnostics().committed_inventory_sha256,
+                repo_root=ROOT,
+            )
+            capsule = snapshot["capsules"][0]
+            self.assertEqual(capsule["reason_code"], "KILL_DATA_INFEASIBLE")
+            self.assertIn("session_id", capsule)
+            self.assertIn("population", capsule)
+            self.assertIn("hfic_protocol", capsule)
+            forge = compact_forge_prior_entry(
+                capsule["hypothesis_version_id"],
+                {
+                    "hypothesis_version_id": capsule["hypothesis_version_id"],
+                    "session_id": capsule["session_id"],
+                    "hfic_protocol": capsule["hfic_protocol"],
+                    "mechanism": capsule["mechanism"],
+                    "claim": capsule.get("claim"),
+                    "population": capsule["population"],
+                    "decision_timestamp": capsule["decision_timestamp"],
+                    "primary_x_family": capsule["primary_x_family"],
+                    "primary_y": capsule["primary_y"],
+                    "horizon_notional": capsule["horizon_notional"],
+                    "negative_control": capsule["negative_control"],
+                    "cheapest_falsifier": capsule["cheapest_falsifier"],
+                    "definition_sha256": capsule["definition_sha256"],
+                },
+                {
+                    "decision_kind": capsule["decision_kind"],
+                    "reason_code": capsule["reason_code"],
+                },
+            )
+            # Critic remains richer than Forge; Forge still gets kill + scope.
+            self.assertIn("session_id", capsule)
+            self.assertNotIn("session_id", forge)
+            self.assertEqual(forge["reason_code"], "KILL_DATA_INFEASIBLE")
+            self.assertEqual(forge["population"], capsule["population"])
+
+    def test_park_historical_semantics_preserved_on_forge(self) -> None:
+        payload = {
+            "hypothesis_version_id": "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+            "legacy_definition": {
+                "primary_question": "lifecycle clock park question",
+                "park_terminal": "PARK_FAMILY",
+                "falsifier": "offline park falsifier",
+            },
+            "definition_sha256": "dd" * 32,
+        }
+        forge = compact_forge_prior_entry(
+            "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+            payload,
+            {"decision_kind": "PARK", "reason_code": "PARK_FAMILY"},
+        )
+        critic = compact_prior_entry(
+            "HYP-RC002-H11-LIFECYCLE-CLOCK-V1",
+            payload,
+            {"decision_kind": "PARK", "reason_code": "PARK_FAMILY"},
+        )
+        self.assertEqual(forge["memory_status"], MEMORY_PARK)
+        self.assertEqual(critic["memory_status"], MEMORY_PARK)
+        self.assertIn("legacy_definition", forge)
+        self.assertEqual(forge.get("reason_code"), "PARK_FAMILY")
 
 
 if __name__ == "__main__":

@@ -19,7 +19,12 @@ Forge prior entry retained keys (when present):
 `park_status`, `definition_sha256`, `mechanism` xor `claim`,
 `primary_x_family`, `primary_y`, `cheapest_falsifier`,
 `actor_counterparty` only if mechanism/claim absent,
-compact `legacy_definition` subset for reopenables.
+compact `legacy_definition` subset for reopenables,
+and for HARD_CLOSE/PARK (KILL_/CLOSE_/PARK_*) the scope axes
+`population` / `decision_timestamp` / `horizon_notional` / `negative_control`.
+`decision_kind` / `reason_code` come from the shared
+`latest_hypothesis_decisions(store)` DECISION_EVENT resolver (same as Critic).
+`NOT_SELECTED_IN_SESSION` may omit scope axes when a lean distinguisher remains.
 
 ## CRITIC_MEMORY (unchanged)
 
@@ -48,12 +53,17 @@ overflow valve that runs only when the packet is oversize:
 | `related_prior_recipe_ids` | Was byte-identical to QUERY list in `prior_work_receipts`; no other consumer; removed |
 | Ranked IDs inside `prior_work_receipts` | Duplicated `ranked_prior_candidate_ids`; removed from receipts |
 
-## CRITIC-ONLY richness (omitted from Prompt A when a lean distinguisher remains)
+## SCOPE AXES (Forge Prompt A — disposition-gated)
+
+| Field | Notes |
+| --- | --- |
+| `population`, `decision_timestamp`, `horizon_notional`, `negative_control` | Retained for HARD_CLOSE/PARK so Prompt A can distinguish mechanism-wide vs scoped kills; optional omit for `NOT_SELECTED_IN_SESSION` when lean distinguisher remains; always retained as fallback when they are the only distinguishers |
+
+## CRITIC-ONLY richness (still omitted from Prompt A)
 
 | Field | Notes |
 | --- | --- |
 | `session_id`, `hfic_protocol` | Machine/audit binding; not Prompt A anti-rediscovery |
-| `population`, `decision_timestamp`, `horizon_notional`, `negative_control` | Omitted when mechanism/claim/X/Y/falsifier/legacy already distinguish; retained as fallback when they are the only source distinguishers |
 
 ## UNKNOWN → do not change
 

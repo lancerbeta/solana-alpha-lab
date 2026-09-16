@@ -1,10 +1,10 @@
 {
   "schema": "smial.delivery-completion-evidence",
   "schema_version": "1.0",
-  "acceptance_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-ACCEPT-001",
+  "acceptance_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-ACCEPT-002",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
-  "state_change": "Prompt A ranked priors use compact_forge_prior_entry; FORGE_CONTEXT_PACKET capacity terminal distinguished from missing-body; Critic prior_memory unchanged; second-focus IDENTIFIABLE_NOW packet fits.",
+  "state_change": "Forge priors decision-aware via shared latest_hypothesis_decisions; HARD_CLOSE/PARK retain scope axes; 60FB scientific minimum exceeds 16384 with honest MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND (18317 unbounded).",
   "base_main": "f910e3d19d35e24b954aef0e5948c2f887b0bc33",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -15,38 +15,40 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    ".agents/skills/hypothesis-forge/SKILL.md": "ba70d43f9aec604bae01005af6dc36d56abfcfb67c6c359a97e51ed7d969d09c",
-    "catalog/assets/core.yaml": "7669aab546636542f3284cf9394e6e8ec3b3aa2c0d55cf21f3daedac071b874c",
-    "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json": "7635c12d4080fd0f75be1bca508c6fd05d29e67a37c3296e667cc2104915d3a7",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "d45da4443f8258c0eeec922a2a6250f3a9056c07c7cc62cf059679efc84673b8",
-    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b53702e94c67d1cde2f38e20dc8e41d4ccbe84a34c921f8bad555dcd34cf0ebd",
-    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_consumer_map_v1.md": "993d634b7ed398ffbc1af2e1d02c8e97bd4092d4c6d832e887347be1212a807a",
-    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_owner_readout_v1.md": "871a49521f4889ebca32c7e1879f1004dabe46f3c4b5a4133e9807125eb706e5",
+    ".agents/skills/hypothesis-forge/SKILL.md": "a1de933e3cdef2660ad82cffbef901c7fb23b6d8679af6e68a252d17943a1851",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "c97c36626cac2b5efdbc715d2e011d6a6551176679b016e54f5d6450cf54ebab",
     "docs/tasks/HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1.md": "28938ab56ce6b691cd6e37d28ffbb07f35fd26584cb74e7b3930d5da840ed208",
-    "src/solana_alpha_lab/factory/hfic_preflight.py": "66d10767f6e73b4daac22027f43fb011482c2791bb3a8497cff13bb50e5dea0c",
-    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "ad4d123feb755203be4504e415afb21002c8f61f7b8c6be9821354bc865a0903",
-    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "7a7d4ec6ca86e80d568f4952e398ed66ed92e566bd186c2150c3faf1a1fba5e8",
-    "tests/test_hfic_forge_prior_context_capacity_repair_v1.py": "04ddd915633478e706cfb73721a81dd8806e319e362d8bc4585a8c38c6e6aabd",
-    "tests/test_hfic_reopened_prior_search_routing_v1.py": "8f6eb43bd94f0d15910c4dfd98c6a8c9bf03146d4a4bc2f49d7266e9a8b0a28a"
+    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_owner_readout_v1.md": "004cc058de64e779a916f4c81428c3ce5d8d5c6796a20e353cc10f4b7f494f16",
+    "docs/reports/hfic_forge_prior_context_capacity_repair/a1_consumer_map_v1.md": "364064ea8afba398abab6ad834c41c0d4866fabc519e9040f731736be73784be",
+    "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_active_rdp_preview_v1.json": "883b89aa01b7627ec47dfa3a2d3c74a28d62c4004974eb3d2a6ea089b222dbd0",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "4b238390b62e393de17b061e006bdeb566cb783ec6b89d198c51949657cbbdb1",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "e774091a52aabfa0e92a0db0b5239f05380e942d238b2d72d61566ebecd32602",
+    "src/solana_alpha_lab/factory/hfic_prior_memory.py": "ae6c40ffcbaeb7d171b7b8d53e6daf0cf6d7c2ce47f130db3ba2b0dfc092a1fb",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "03193aed441d6b730f7b1fb93d1ebbd2706aa2121fec4abf4e46c865c9d01955",
+    "tests/test_hfic_forge_prior_context_capacity_repair_v1.py": "d310db2f6ed7737bb186c0e3ef47247da9048aea7f4541438d46b0f0426c22bb",
+    "tests/test_hfic_reopened_prior_search_routing_v1.py": "8f6eb43bd94f0d15910c4dfd98c6a8c9bf03146d4a4bc2f49d7266e9a8b0a28a",
+    "catalog/assets/core.yaml": "4fdd2a4635066bf8cd6126335101ad381f9570b0944ff8308ab65e42f5da51c4"
   },
-  "active_stop_conditions": [],
+  "active_stop_conditions": [
+    "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
+  ],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
-    "material_owner_decision": false,
+    "material_owner_decision": true,
     "user_only_activation": false,
     "external_material_action": false,
     "unresolved_safety_or_truth_conflict": false
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "87c9c2b2113286b026339b7ee325d7841f236d55cd97ffb98e1dc62376fdbe06",
+    "sha256": "a9a82e6f0ccf1c763fd3b7a119c0b81505141fdf18dbffe4b87aee07ebed6aa7",
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_UNIT",
+    "targeted": "PASS_DECISION_SCOPE_AND_FENCE_UNIT",
     "independent_review": {
       "path": "docs/evidence/hfic_forge_prior_context_capacity_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "05ec2b82c24a7cc78c6a2513e69e93680bc5471dc3bda831dec6b73114ef035e",
+      "sha256": "8d45e693ab37a2582c2873dfb2f8526a7d2a5ef7717544204718a56c6b809811",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
@@ -54,9 +56,7 @@
     "project_checks": [
       "PASS_UNIT_CAPACITY_REPAIR",
       "PASS_UNIT_REOPENED_PRIOR_ROUTING",
-      "PASS_UNIT_VISION_INTEGRITY",
-      "PASS_UNIT_REPRESENTATION_ISOLATION",
-      "PASS_READ_ONLY_ACTIVE_RDP_PREVIEW"
+      "PASS_READ_ONLY_ACTIVE_RDP_PREVIEW_FENCE"
     ]
   },
   "non_claims": [
@@ -65,8 +65,8 @@
     "NO_REAL_IDENTIFIABLE_NOW_SLASH",
     "NO_MEMORY_QUARANTINE",
     "NO_CRITIC_MEMORY_CHANGE",
-    "NO_REPRESENTATION_CHANGE",
     "NO_PACKET_LIMIT_RAISE",
+    "NO_START_NEW_SESSION",
     "NO_MERGE"
   ],
   "side_effects": {

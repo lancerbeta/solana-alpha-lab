@@ -1,11 +1,11 @@
 {
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
-  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-REVIEW-001",
+  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-REVIEW-002",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "cfbfaa9ec076f553880de6d98a16e769afe8b79cca4969ab30d882892b04c919",
-  "reviewed_inventory_sha256": "36ed73f0615cf51623ef28f6f670b7492ae9a77216da1cb074e634f1a6f665de",
+  "reviewed_bindings_sha256": "3e3104d8c7da19d2db34ee9c27f8fd47f966d7c3b9722dd4bc30b996f95883e9",
+  "reviewed_inventory_sha256": "0f5769494e7c995862f3c0ea83211782fbe92c03028b2709e15f62cfb8d29aed",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -16,65 +16,41 @@
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "FORGE_CRITIC_DECOUPLE_OK",
-        "CAPACITY_TERMINAL_DISTINCT",
-        "MISSING_BODY_PRESERVED",
-        "NO_RANKED_DROP_NO_LIMIT_RAISE",
-        "VISION_GATE_NOT_WEAKENED",
-        "NO_QUARANTINE_PATH",
-        "T6B_POPULATION_ONLY_NOT_MISLABELED"
+        "SHARED_LATEST_HYPOTHESIS_DECISIONS",
+        "HARD_CLOSE_SCOPE_RETAINED",
+        "NOT_SELECTED_LEAN_OK",
+        "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND_FENCE",
+        "NO_VISION_MASK"
       ]
     },
     {
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "LAYER1_LAYER2_DECOUPLE_HOLDS",
-        "SOURCE_ONLY_USEFULNESS_GATE",
-        "FALLBACK_DISTINGUISHERS_NO_ID_ONLY",
-        "RECEIPT_DEDUPE_PERMANENT_AUDIT_ONLY",
-        "CRITIC_BOUNDS_UNCHANGED",
-        "REMEDIATED_TERMINAL_CONFLATION"
+        "PROMPT_A_CAN_DISTINGUISH_KILL_FROM_SCOPE_YES",
+        "CRITIC_MEMORY_UNCHANGED",
+        "SHARED_DECISION_WALKER",
+        "HONEST_CAPACITY_FENCE_18317"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PINNED_RDP_AFTER_16045",
-        "START_NEW_SESSION_IDENTIFIABLE_NOW",
-        "ONE_TO_ONE_RANKED_PRIORS",
-        "CRITIC_MEMORY_UNCHANGED_PATH",
-        "NO_ELIGIBILITY_RESET",
-        "VISION_PASS_UNDER_EXISTING_STANDARD",
-        "BUDGETS_RANKER_REPRESENTATION_UNCHANGED"
+        "PATCH_DOD_A_B_PASS",
+        "PRIOR_START_NEW_SESSION_CLAIM_INVALID",
+        "FENCE_NOT_REACHABILITY_PASS"
       ]
     }
   ],
-  "remediation_history": [
-    {
-      "role": "ARCHITECTURE_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "BLOCKER",
-      "finding": "POST_PROJECTION_BODY_INCOMPLETE_CONFLATION",
-      "observed_head": "f910e3d19d35e24b954aef0e5948c2f887b0bc33",
-      "resolved_by_head": "ad1d776ca999ee51ee63ea7398917d8eb9482c92"
-    },
-    {
-      "role": "GOAL_DOD_CRITIC",
-      "prior_verdict": "NOT_READY",
-      "severity": "BLOCKER",
-      "finding": "RDP_AFTER_UNPINNED_AND_REVIEWS_PENDING",
-      "observed_head": "f910e3d19d35e24b954aef0e5948c2f887b0bc33",
-      "resolved_by_head": "ad1d776ca999ee51ee63ea7398917d8eb9482c92"
-    }
-  ],
+  "remediation_history": [],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "REVIEW_IS_NOT_SEMANTIC_DONE",
     "NO_ALPHA",
-    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_PACKET_LIMIT_RAISE",
+    "NO_START_NEW_SESSION_CLAIM",
     "NO_CANONICAL_DONE"
   ]
 }

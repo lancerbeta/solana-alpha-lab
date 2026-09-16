@@ -164,7 +164,7 @@ def build_prior_memory_snapshot(
         iter_search_memory_hypothesis_payloads,
     )
 
-    decisions = _latest_decisions(store)
+    decisions = latest_hypothesis_decisions(store)
     capsules_by_id: dict[str, dict[str, Any]] = {}
     for payload in iter_search_memory_hypothesis_payloads(store):
         hyp_id = str(payload.get("hypothesis_version_id") or "")
@@ -225,7 +225,12 @@ def _payload_mapping(record: Any) -> dict[str, Any]:
     return payload if isinstance(payload, dict) else {}
 
 
-def _latest_decisions(store: Any) -> dict[str, dict[str, str]]:
+def latest_hypothesis_decisions(store: Any) -> dict[str, dict[str, str]]:
+    """Latest DECISION_EVENT disposition per hypothesis_version_id.
+
+    Shared read-only resolver for Critic prior-memory capsules and Forge
+    Prompt-A ranked-prior projection. Do not fork a second decision walker.
+    """
     latest: dict[str, tuple[tuple[str, str], str, str]] = {}
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
@@ -253,6 +258,11 @@ def _latest_decisions(store: Any) -> dict[str, dict[str, str]]:
         hyp_id: {"decision_kind": kind, "reason_code": reason}
         for hyp_id, (_key, kind, reason) in latest.items()
     }
+
+
+def _latest_decisions(store: Any) -> dict[str, dict[str, str]]:
+    """Compatibility alias; prefer :func:`latest_hypothesis_decisions`."""
+    return latest_hypothesis_decisions(store)
 
 
 def compact_prior_entry(
@@ -291,6 +301,35 @@ _FORGE_LEGACY_KEEP = (
 )
 
 
+_FORGE_SCOPE_KEYS = (
+    "population",
+    "decision_timestamp",
+    "horizon_notional",
+    "negative_control",
+)
+
+
+def _forge_requires_scope_axes(
+    *,
+    memory_status: str | None,
+    reason_code: str | None,
+) -> bool:
+    """HARD_CLOSE / PARK (and KILL_/CLOSE_ reasons) need readable scope axes.
+
+    NOT_SELECTED_IN_SESSION is not a negative scientific verdict and may stay
+    thinner when a lean distinguisher already exists.
+    """
+    status = str(memory_status or "")
+    reason = str(reason_code or "")
+    if status in {MEMORY_HARD_CLOSE, MEMORY_PARK}:
+        return True
+    if reason.startswith("KILL_") or reason.startswith("CLOSE_"):
+        return True
+    if reason.startswith("PARK_") or reason == "OWNER_PRIORITY_PARK":
+        return True
+    return False
+
+
 def compact_forge_prior_entry(
     hyp_id: str,
     payload: Mapping[str, Any],
@@ -301,10 +340,13 @@ def compact_forge_prior_entry(
     Retains one-to-one identity, disposition, substantive mechanism/claim,
     X/Y axes, actor/falsifier when present, definition hash for traceability,
     and enough legacy_definition for reopenable parks. Omits Critic/audit
-    fields that Prompt A does not need (session_id, hfic_protocol) and omits
-    population/decision_timestamp/horizon_notional/negative_control when a
-    lean distinguisher already remains; those Critic-rich fields are retained
-    as fallback when they are the only source distinguishers.
+    fields Prompt A does not need (session_id, hfic_protocol).
+
+    Scope axes (population / decision_timestamp / horizon_notional /
+    negative_control) are retained for HARD_CLOSE and PARK dispositions so
+    Prompt A can tell what was killed from the scope in which it was killed.
+    NOT_SELECTED_IN_SESSION may omit them when a lean distinguisher remains;
+    they are still retained as fallback when they are the only distinguishers.
     """
     full = _capsule_from_payload(hyp_id, payload, decision)
     out: dict[str, Any] = {
@@ -344,16 +386,12 @@ def compact_forge_prior_entry(
         }
         if keep:
             out["legacy_definition"] = keep
-    # If the source body is useful only via Critic-rich distinguishers that the
-    # lean path normally omits, retain them so Prompt A still has one-to-one
-    # anti-rediscovery context (never ID-only).
-    if not _forge_entry_has_distinguisher(out):
-        for key in (
-            "population",
-            "horizon_notional",
-            "negative_control",
-            "decision_timestamp",
-        ):
+    require_scope = _forge_requires_scope_axes(
+        memory_status=str(out.get("memory_status") or "") or None,
+        reason_code=str(out.get("reason_code") or "") or None,
+    )
+    if require_scope or not _forge_entry_has_distinguisher(out):
+        for key in _FORGE_SCOPE_KEYS:
             value = full.get(key)
             if value not in (None, "", [], {}):
                 out[key] = value
@@ -369,10 +407,7 @@ def _forge_entry_has_distinguisher(entry: Mapping[str, Any]) -> bool:
         "primary_y",
         "cheapest_falsifier",
         "legacy_definition",
-        "population",
-        "horizon_notional",
-        "negative_control",
-        "decision_timestamp",
+        *_FORGE_SCOPE_KEYS,
     ):
         value = entry.get(key)
         if isinstance(value, Mapping):

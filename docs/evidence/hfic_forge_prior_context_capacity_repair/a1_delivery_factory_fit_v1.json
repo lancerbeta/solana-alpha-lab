@@ -1,37 +1,35 @@
 {
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
-  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-FACTORY-FIT-001",
+  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-FACTORY-FIT-002",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "cfbfaa9ec076f553880de6d98a16e769afe8b79cca4969ab30d882892b04c919",
-  "reviewed_inventory_sha256": "36ed73f0615cf51623ef28f6f670b7492ae9a77216da1cb074e634f1a6f665de",
+  "reviewed_bindings_sha256": "3e3104d8c7da19d2db34ee9c27f8fd47f966d7c3b9722dd4bc30b996f95883e9",
+  "reviewed_inventory_sha256": "0f5769494e7c995862f3c0ea83211782fbe92c03028b2709e15f62cfb8d29aed",
   "mode": "FAST_PATH",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "PASS_SECOND_FOCUS_REACHABILITY_RESTORED",
-    "flexibility_and_history": "PASS_CRITIC_MEMORY_AND_RDP_HISTORY_UNCHANGED",
-    "context_efficiency": "PASS_FORGE_PROJECTION_NOT_MEMORY_PLATFORM",
-    "research_truth": "PASS_ONE_TO_ONE_PRIORS_NO_SILENT_DROP",
-    "owner_operability": "PASS_TYPED_CAPACITY_VS_MISSING_BODY",
+    "mission": "PASS_DECISION_AND_SCOPE_SEMANTICS_WITH_HONEST_FENCE",
+    "flexibility_and_history": "PASS_CRITIC_MEMORY_UNCHANGED",
+    "context_efficiency": "PASS_NO_SILENT_COMPRESSION",
+    "research_truth": "PASS_KILL_VS_SCOPE_DISTINGUISHABLE",
+    "owner_operability": "PASS_MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_FORGE_SLASH",
-    "monitoring_and_recovery": "PASS_EXISTING_COMPACTION_AND_FAIL_CLOSED",
-    "build_vs_buy": "PASS_ADOPT_EXISTING_HFIC_BOUNDARIES",
-    "security": "PASS_NO_SECRETS_NO_PROVIDER",
-    "red_team": "PASS_NO_QUARANTINE_WORKAROUND_NO_LIMIT_RAISE"
+    "monitoring_and_recovery": "PASS_FAIL_CLOSED_NO_VISION_MASK",
+    "build_vs_buy": "PASS_SHARED_DECISION_RESOLVER",
+    "security": "PASS_NO_SECRETS",
+    "red_team": "PASS_NO_QUARANTINE_NO_LIMIT_RAISE"
   },
   "capability_radar": {
     "now": "NONE",
-    "watch": "IDENTIFIABLE_NOW_AFTER_MERGE"
+    "watch": "OWNER_PACKET_BOUND_OR_REDESIGN"
   },
-  "recovery": "REVERT BRANCH. DO NOT QUARANTINE 60FB FOR CAPACITY. DO NOT RAISE PACKET LIMIT.",
+  "recovery": "DO NOT RAISE PACKET LIMIT OR DROP PRIORS WITHOUT OWNER ARCHITECTURE DECISION.",
   "limits": [
     "NO_ALPHA",
-    "NO_CANONICAL_DONE",
-    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "NO_START_NEW_SESSION",
+    "NO_PACKET_LIMIT_RAISE",
     "NO_MEMORY_QUARANTINE",
-    "NO_CRITIC_MEMORY_CHANGE",
-    "NO_REPRESENTATION_CHANGE",
-    "NO_PACKET_LIMIT_RAISE"
+    "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
   ]
 }

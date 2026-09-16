@@ -310,14 +310,20 @@ Ordinary Prompt A packets now carry `ranked_prior_entries` one-to-one with
 decision-useful resolvable body (one-to-one Prompt A body closure failed).
 
 `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` means required bodies are complete
-but the bounded `FORGE_CONTEXT_PACKET` (16384 bytes) cannot represent the
-minimum Forge search context after allowed semantic/feature-grounding
-compaction. This is not a quarantine signal and not permission to drop ranked
-priors or raise the packet limit inside a slash.
+but the bounded `FORGE_CONTEXT_PACKET` (16384 bytes) cannot represent a
+non-minimal Forge search context after allowed semantic/feature-grounding
+compaction (for example oversized HISTORICAL/NOT_SELECTED-only priors).
+
+`MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` means Prompt A already carries the
+disposition-gated scientific minimum (HARD_CLOSE/PARK with scope axes from
+shared `latest_hypothesis_decisions`) and the packet still cannot fit without
+stripping material feature grounding. Do not quarantine, drop ranked priors,
+or raise the packet limit inside a slash — return to owner.
 
 Prompt A `ranked_prior_entries` use a Forge-specific projection
-(`compact_forge_prior_entry`). Critic `prior_memory` continues to use the
-fuller `compact_prior_entry` / `build_prior_memory_snapshot` path.
+(`compact_forge_prior_entry`) wired to the same DECISION_EVENT resolver as
+Critic. Critic `prior_memory` continues to use the fuller
+`compact_prior_entry` / `build_prior_memory_snapshot` path.
 
 ## Model effort
 

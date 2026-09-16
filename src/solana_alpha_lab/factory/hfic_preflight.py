@@ -74,6 +74,8 @@ MAX_FEATURE_FAMILIES = 8
 MAX_CLOSED_FAMILIES = 8
 MAX_CAPABILITIES = 16
 MAX_PACKET_BYTES = 16384
+FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED = "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED"
+MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND = "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
 FORGE_CONTEXT_ARTIFACT_DIR = "research/artifacts/forge_context"
 FORGE_CONTEXT_ARTIFACT_KIND = "FORGE_CONTEXT_PACKET"
 CAPABILITY_REGISTRY_RELATIVE = "configs/experiment_capability_registry_v2.yaml"
@@ -108,6 +110,30 @@ class HficPreflightError(ValueError):
     def __init__(self, code: str) -> None:
         self.code = code
         super().__init__(code)
+
+
+def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> bool:
+    """True when Prompt-A priors already include disposition-gated scope axes."""
+    from solana_alpha_lab.factory.hfic_prior_memory import (
+        MEMORY_HARD_CLOSE,
+        MEMORY_PARK,
+    )
+
+    scope_keys = (
+        "population",
+        "decision_timestamp",
+        "horizon_notional",
+        "negative_control",
+    )
+    for entry in packet.get("ranked_prior_entries") or []:
+        if not isinstance(entry, Mapping):
+            continue
+        status = str(entry.get("memory_status") or "")
+        if status not in {MEMORY_HARD_CLOSE, MEMORY_PARK}:
+            continue
+        if any(entry.get(key) not in (None, "", [], {}) for key in scope_keys):
+            return True
+    return False
 
 
 def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
@@ -1168,7 +1194,11 @@ def build_forge_context_packet(
 
         body_source = _iter_hv(store)
     try:
-        ranked_prior_entries = ranked_prior_entries_for_ids(ranked, body_source)
+        ranked_prior_entries = ranked_prior_entries_for_ids(
+            ranked,
+            body_source,
+            store=store,
+        )
     except ReopenedPriorRoutingError as exc:
         raise HficPreflightError(str(exc) or BODY_INCOMPLETE) from exc
     truth_roots = [
@@ -1376,6 +1406,12 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
+        # When ranked Forge priors already carry the disposition-gated
+        # scientific minimum (HARD_CLOSE/PARK scope axes), do not strip
+        # feature grounding to squeeze the packet — that would mislabel the
+        # failure as FORGE_VISION_INTEGRITY_BLOCKED.
+        if _ranked_priors_carry_minimal_scientific_scope(packet):
+            raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
         # Drop redundant per-feature grounding detail (already represented by
         # the compact availability index) while keeping the source digest.
         packet["feature_grounding_entries"] = []
@@ -1388,7 +1424,7 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
-        raise HficPreflightError("FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED")
+        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
     vision = compute_vision_integrity(
         grounding_entries=all_grounding_entries,
         retained_feature_ids=[
@@ -1428,7 +1464,9 @@ def build_forge_context_packet(
         }
         encoded = canonical_json_bytes(packet)
     if len(encoded) > MAX_PACKET_BYTES:
-        raise HficPreflightError("FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED")
+        if _ranked_priors_carry_minimal_scientific_scope(packet):
+            raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
+        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
     if vision.get("status") != "PASS":
         raise HficPreflightError(FORGE_VISION_INTEGRITY_BLOCKED)
     if persist:
