@@ -4,8 +4,8 @@
   "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-REVIEW-001",
   "as_of": "2026-09-16",
   "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
-  "reviewed_bindings_sha256": "f3d3c7c5306f48289acec53b84db7dcb3e8053b91f9798a003bff24c3f19e192",
-  "reviewed_inventory_sha256": "eb831008b7e346b946f598c173dad58251608acef086f10b7350a7a2203a48b3",
+  "reviewed_bindings_sha256": "cfbfaa9ec076f553880de6d98a16e769afe8b79cca4969ab30d882892b04c919",
+  "reviewed_inventory_sha256": "36ed73f0615cf51623ef28f6f670b7492ae9a77216da1cb074e634f1a6f665de",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
