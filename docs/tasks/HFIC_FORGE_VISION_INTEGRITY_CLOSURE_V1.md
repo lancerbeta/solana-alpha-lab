@@ -84,10 +84,9 @@ context_requirements:
     EXTERNAL_ROUTE_KNOWLEDGE: []
     ARCHITECTURE_DECISIONS: []
     DELIVERY_EVIDENCE:
-      - docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json
-  - docs/evidence/hfic_forge_vision_integrity_closure/a1_completion_v1.json
-  - docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json
-  - docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json
+      - docs/evidence/hfic_forge_vision_integrity_closure/a1_completion_v1.json
+      - docs/evidence/hfic_forge_vision_integrity_closure/a1_review_v1.json
+      - docs/evidence/hfic_forge_vision_integrity_closure/a1_factory_fit_v1.json
     HISTORICAL_CONTEXT: []
 ---
 
