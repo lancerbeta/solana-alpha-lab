@@ -433,6 +433,27 @@ packet; this does not modify the ordinary packet schema or `/hypothesis-forge`.
 tests and navigation exist, but no representation probe was executed. It is
 not a scientific PASS, alpha, cohort release, deployment, or product DONE.
 
+### Forge packet capacity (mode-scoped)
+
+Ordinary `/hypothesis-forge` `FORGE_CONTEXT_PACKET` is bounded at **20480**
+bytes (`ORDINARY_FORGE_MAX_PACKET_BYTES`).
+`CURRENT_REPRESENTATION_CONTROL_V1` and the representation challenger keep the
+frozen **16384**-byte budget (`MAX_PACKET_BYTES` /
+`CONTROL_FORGE_MAX_PACKET_BYTES`) so CONTROL↔challenger comparability stays
+unchanged. The larger ordinary bound is not alpha, extra data authority, or
+representation permission.
+
+`RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` is reserved for ranked IDs whose
+decision-useful body cannot be resolved one-to-one.
+`FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` is the typed STOP when bodies are
+complete but a non-minimal Forge search context still cannot fit after allowed
+semantic/feature-grounding compaction under the **effective mode bound**.
+`MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` is the typed STOP when HARD_CLOSE/PARK
+Forge priors already carry disposition-gated scope axes and fitting would
+require stripping material feature grounding. Do not quarantine valid HFIC
+memory or drop ranked priors to paper over capacity. Prompt A uses
+`compact_forge_prior_entry`; Critic `prior_memory` keeps the fuller capsule.
+
 External public research не даёт market/provider authority. Приоритет источников: исполнимая собственная реальность → официальные спецификации → воспроизводимые papers/code/data → прозрачная аналитика → агрегаторы → social/KOL только как источник идеи.
 
 ## A1. Entry Gate: восстанови фактическую реальность

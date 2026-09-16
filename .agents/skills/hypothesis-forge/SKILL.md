@@ -304,6 +304,33 @@ Ordinary Prompt A packets now carry `ranked_prior_entries` one-to-one with
 `ranked_prior_candidate_ids`; missing bodies fail closed as
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE`.
 
+## Packet capacity vs missing prior body
+
+Ordinary Forge packet budget is **20480** bytes
+(`ORDINARY_FORGE_MAX_PACKET_BYTES`). Representation CONTROL and challenger
+budgets remain **16384** (`MAX_PACKET_BYTES`). Resolve via
+`forge_context_packet_max_bytes(evidence_surface_mode)` — never from focus text.
+The ordinary enlargement is not alpha or representation permission.
+
+`RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` means a ranked prior identity has no
+decision-useful resolvable body (one-to-one Prompt A body closure failed).
+
+`FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` means required bodies are complete
+but the effective mode-scoped `FORGE_CONTEXT_PACKET` bound cannot represent a
+non-minimal Forge search context after allowed semantic/feature-grounding
+compaction.
+
+`MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` means Prompt A already carries the
+disposition-gated scientific minimum (HARD_CLOSE/PARK with scope axes from
+shared `latest_hypothesis_decisions`) and the packet still cannot fit without
+stripping material feature grounding. Do not quarantine, drop ranked priors,
+or raise the packet limit inside a slash — return to owner.
+
+Prompt A `ranked_prior_entries` use a Forge-specific projection
+(`compact_forge_prior_entry`) wired to the same DECISION_EVENT resolver as
+Critic. Critic `prior_memory` continues to use the fuller
+`compact_prior_entry` / `build_prior_memory_snapshot` path.
+
 ## Model effort
 
 Use `SOL_XHIGH` for mechanism/PIT/estimand reasoning. Critic handoff may use the

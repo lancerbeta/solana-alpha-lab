@@ -73,7 +73,13 @@ MAX_FEATURE_HINTS = 8
 MAX_FEATURE_FAMILIES = 8
 MAX_CLOSED_FAMILIES = 8
 MAX_CAPABILITIES = 16
+# CONTROL / representation-challenger packet budget (frozen comparability).
 MAX_PACKET_BYTES = 16384
+CONTROL_FORGE_MAX_PACKET_BYTES = MAX_PACKET_BYTES
+# Ordinary /hypothesis-forge packet budget (mode-scoped; not representation permission).
+ORDINARY_FORGE_MAX_PACKET_BYTES = 20480
+FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED = "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED"
+MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND = "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
 FORGE_CONTEXT_ARTIFACT_DIR = "research/artifacts/forge_context"
 FORGE_CONTEXT_ARTIFACT_KIND = "FORGE_CONTEXT_PACKET"
 CAPABILITY_REGISTRY_RELATIVE = "configs/experiment_capability_registry_v2.yaml"
@@ -108,6 +114,47 @@ class HficPreflightError(ValueError):
     def __init__(self, code: str) -> None:
         self.code = code
         super().__init__(code)
+
+
+def forge_context_packet_max_bytes(evidence_surface_mode: str | None = None) -> int:
+    """Mode-scoped Forge context packet bound.
+
+    Ordinary Forge uses ORDINARY_FORGE_MAX_PACKET_BYTES. Representation CONTROL
+    (and anything that shares its frozen budget with the challenger) uses
+    CONTROL_FORGE_MAX_PACKET_BYTES / MAX_PACKET_BYTES (16384). Do not infer from
+    owner_focus text.
+    """
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        return MAX_PACKET_BYTES
+    return ORDINARY_FORGE_MAX_PACKET_BYTES
+
+
+def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> bool:
+    """True when Prompt-A priors already include disposition-gated scope axes."""
+    from solana_alpha_lab.factory.hfic_prior_memory import (
+        MEMORY_HARD_CLOSE,
+        MEMORY_PARK,
+    )
+
+    scope_keys = (
+        "population",
+        "decision_timestamp",
+        "horizon_notional",
+        "negative_control",
+    )
+    for entry in packet.get("ranked_prior_entries") or []:
+        if not isinstance(entry, Mapping):
+            continue
+        status = str(entry.get("memory_status") or "")
+        if status not in {MEMORY_HARD_CLOSE, MEMORY_PARK}:
+            continue
+        if any(entry.get(key) not in (None, "", [], {}) for key in scope_keys):
+            return True
+    return False
 
 
 def prove_fast_lane_commissioned(data_root: Path) -> dict[str, Any]:
@@ -1048,6 +1095,7 @@ def build_forge_context_packet(
     persist: bool = True,
     search_payloads: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[dict[str, Any], str]:
+    packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
     ds_trunc: dict[str, Any] = {
         "truncated": False,
@@ -1168,7 +1216,11 @@ def build_forge_context_packet(
 
         body_source = _iter_hv(store)
     try:
-        ranked_prior_entries = ranked_prior_entries_for_ids(ranked, body_source)
+        ranked_prior_entries = ranked_prior_entries_for_ids(
+            ranked,
+            body_source,
+            store=store,
+        )
     except ReopenedPriorRoutingError as exc:
         raise HficPreflightError(str(exc) or BODY_INCOMPLETE) from exc
     truth_roots = [
@@ -1181,8 +1233,10 @@ def build_forge_context_packet(
         "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
         "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
         "QUERY-HFIC-PENDING-SESSION-001",
-        *ranked,
-    ][:8]
+    ]
+    # Ranked prior identities live only in ranked_prior_candidate_ids /
+    # ranked_prior_entries (GENERATION_SEARCH_CONTEXT). Do not duplicate them
+    # into prior_work_receipts (MACHINE_BINDING query recipes only).
     truncation = {
         "truncated": False,
         "kept_priors": len(ranked),
@@ -1194,7 +1248,7 @@ def build_forge_context_packet(
         "max_feature_hints": MAX_FEATURE_HINTS,
         "max_feature_families": MAX_FEATURE_FAMILIES,
         "max_capabilities": MAX_CAPABILITIES,
-        "max_packet_bytes": MAX_PACKET_BYTES,
+        "max_packet_bytes": packet_bound,
         "selection_policy": ds_trunc.get(
             "selection_policy", "current_version_per_dataset_id"
         ),
@@ -1295,11 +1349,6 @@ def build_forge_context_packet(
         "owner_focus": owner_focus,
         "evidence_epoch_sha256": evidence_epoch,
         "search_key_sha256": search_key,
-        "related_prior_recipe_ids": [
-            "QUERY-HFIC-EXACT-RELATED-PRIOR-001",
-            "QUERY-HFIC-SESSION-BY-SEARCH-KEY-001",
-            "QUERY-HFIC-PENDING-SESSION-001",
-        ],
         "truth_roots_used": truth_roots,
         "commissioning_status": commissioning_status,
         "research_memory_as_of": research_memory_as_of,
@@ -1363,7 +1412,7 @@ def build_forge_context_packet(
         all_grounding_entries
     )
     encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
         # Semantic navigation is lower priority than datasets / closed families / priors.
         packet["semantic_capability_entries"] = []
         packet["truncation_receipt"] = {
@@ -1378,7 +1427,13 @@ def build_forge_context_packet(
             "reason": "MAX_PACKET_BYTES_DROP_SEMANTIC",
         }
         encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
+        # When ranked Forge priors already carry the disposition-gated
+        # scientific minimum (HARD_CLOSE/PARK scope axes), do not strip
+        # feature grounding to squeeze the packet — that would mislabel the
+        # failure as FORGE_VISION_INTEGRITY_BLOCKED.
+        if _ranked_priors_carry_minimal_scientific_scope(packet):
+            raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
         # Drop redundant per-feature grounding detail (already represented by
         # the compact availability index) while keeping the source digest.
         packet["feature_grounding_entries"] = []
@@ -1390,8 +1445,8 @@ def build_forge_context_packet(
             "reason": "MAX_PACKET_BYTES_DROP_FEATURE_GROUNDING",
         }
         encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
-        raise HficPreflightError("RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE")
+    if len(encoded) > packet_bound:
+        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
     vision = compute_vision_integrity(
         grounding_entries=all_grounding_entries,
         retained_feature_ids=[
@@ -1416,17 +1471,24 @@ def build_forge_context_packet(
     )
     packet["vision_integrity"] = vision
     encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
+    if len(encoded) > packet_bound:
         # The integrity receipt itself must not overflow the bound: keep the
-        # verdict, drop the per-item narrative (it is available via the STOP).
+        # verdict counters, drop per-item narrative and breakdown detail.
         packet["vision_integrity"] = {
             key: value
             for key, value in vision.items()
-            if key not in ("material_omissions", "unknown_omissions")
+            if key
+            not in (
+                "material_omissions",
+                "unknown_omissions",
+                "omission_breakdown",
+            )
         }
         encoded = canonical_json_bytes(packet)
-    if len(encoded) > MAX_PACKET_BYTES:
-        raise HficPreflightError("RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE")
+    if len(encoded) > packet_bound:
+        if _ranked_priors_carry_minimal_scientific_scope(packet):
+            raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
+        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
     if vision.get("status") != "PASS":
         raise HficPreflightError(FORGE_VISION_INTEGRITY_BLOCKED)
     if persist:

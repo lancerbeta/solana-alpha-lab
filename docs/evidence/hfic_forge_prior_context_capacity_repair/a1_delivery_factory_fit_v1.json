@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FORGE-PRIOR-CONTEXT-CAPACITY-REPAIR-FACTORY-FIT-003",
+  "as_of": "2026-09-16",
+  "task_id": "HFIC_FORGE_PRIOR_CONTEXT_CAPACITY_REPAIR_V1",
+  "reviewed_bindings_sha256": "ae8445e6c40811a40e228c7d5c7deb1cbb00d563dc3b8fc92611cd66e76032e2",
+  "reviewed_inventory_sha256": "dee98a51e89b9ec69c68423d001632fbcd84a467dfc2a00c5eb6f7deecd60d50",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_MODE_SCOPED_ORDINARY_REACHABILITY",
+    "flexibility_and_history": "PASS_CRITIC_MEMORY_UNCHANGED",
+    "context_efficiency": "PASS_NO_SILENT_COMPRESSION",
+    "research_truth": "PASS_CONTROL_CHALLENGER_COMPARABILITY_FROZEN",
+    "owner_operability": "PASS_ORDINARY_20KIB_CONTROL_16KIB_DOCUMENTED",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_FORGE_SLASH",
+    "monitoring_and_recovery": "PASS_FAIL_CLOSED_OVER_ORDINARY_BOUND",
+    "build_vs_buy": "PASS_DETERMINISTIC_MODE_RESOLVER",
+    "security": "PASS_NO_SECRETS",
+    "red_team": "PASS_NO_QUARANTINE_NO_CONTROL_BUDGET_THAW"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "ORDINARY_CAPACITY_STILL_BOUNDED_AT_20480"
+  },
+  "recovery": "Do not raise CONTROL/challenger 16384 or treat ordinary 20480 as unbounded. Further ordinary raises need a new owner architecture decision.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_CONTROL_OR_CHALLENGER_BUDGET_RAISE",
+    "NO_MEMORY_QUARANTINE",
+    "NO_REAL_IDENTIFIABLE_NOW_SLASH",
+    "ORDINARY_BOUND_STILL_FAIL_CLOSED"
+  ]
+}

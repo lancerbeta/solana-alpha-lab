@@ -500,8 +500,12 @@ class PromptABodyTests(unittest.TestCase):
                         store=store,
                         persist=False,
                         search_payloads=planned,
+                        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
                     )
-                self.assertEqual(str(raised.exception), BODY_INCOMPLETE)
+                self.assertEqual(
+                    str(raised.exception),
+                    "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED",
+                )
 
     def test_ordinary_ranker_unchanged_except_bodies(self) -> None:
         with tempfile.TemporaryDirectory() as raw:

@@ -34,7 +34,9 @@ from solana_alpha_lab.factory.hfic_preflight import (
     select_forge_packet_datasets,
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (
+    compact_forge_prior_entry,
     compact_prior_entry,
+    latest_hypothesis_decisions,
     prior_memory_bounds,
 )
 from solana_alpha_lab.factory.hfic_provenance import is_hfic_record
@@ -199,19 +201,40 @@ def overlay_search_payloads(
 def ranked_prior_entries_for_ids(
     ranked_ids: Sequence[str],
     payloads: Sequence[Mapping[str, Any]],
+    *,
+    decisions: Mapping[str, Mapping[str, str]] | None = None,
+    store: Any | None = None,
 ) -> list[dict[str, Any]]:
     by_id = {
         str(item.get("hypothesis_version_id") or ""): item
         for item in payloads
         if isinstance(item, Mapping)
     }
+    resolved: dict[str, Mapping[str, str]] = {}
+    if decisions:
+        resolved.update(
+            {
+                str(hyp_id): decision
+                for hyp_id, decision in decisions.items()
+                if isinstance(decision, Mapping)
+            }
+        )
+    if store is not None:
+        # Same canonical DECISION_EVENT walker as Critic prior-memory.
+        for hyp_id, decision in latest_hypothesis_decisions(store).items():
+            resolved.setdefault(str(hyp_id), decision)
     entries: list[dict[str, Any]] = []
     for hyp_id in ranked_ids:
         payload = by_id.get(str(hyp_id))
         if payload is None or not _decision_useful_payload(payload):
             raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
-        entry = compact_prior_entry(str(hyp_id), payload)
-        if not _decision_useful_payload(entry):
+        # Gate usefulness on the canonical source body only. Forge projection
+        # deliberately omits Critic-only fields; re-checking the lean entry with
+        # the Critic usefulness predicate would mislabel capacity/projection
+        # outcomes as RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE.
+        decision = resolved.get(str(hyp_id))
+        entry = compact_forge_prior_entry(str(hyp_id), payload, decision)
+        if str(entry.get("hypothesis_version_id") or "") != str(hyp_id):
             raise ReopenedPriorRoutingError(BODY_INCOMPLETE)
         entries.append(entry)
     if {item["hypothesis_version_id"] for item in entries} != set(ranked_ids):
