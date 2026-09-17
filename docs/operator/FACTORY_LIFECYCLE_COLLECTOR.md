@@ -581,15 +581,41 @@ cohort appears in lineage; do not paste the placeholder `REL-...`.
 
 Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
 `PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
-`LOW_YIELD`, `IMPORT_CONFLICT`, `SOURCE_BUILD_RESOURCE_LIMIT`. FAIL JSON
-may include `next`. `LOW_YIELD`
+`LOW_YIELD`, `IMPORT_CONFLICT`, `SOURCE_BUILD_RESOURCE_LIMIT`,
+`DATASET_PUBLICATION_INCOMPLETE`, `LIVE_CORPUS_PARQUET_SYMLINK`,
+`CORPUS_PARQUET_SHA_MISMATCH`. Typed FAIL JSON includes `next`. `LOW_YIELD`
 is raised before import when projected cumulative yield is below
 `MIN_USABLE_YIELD_ELIGIBLE`. `GAP_SUSPECTED` and another cohort being ACTIVE
 are not crashes. `GAP_CONFIRMED` is not sealable.
 
 Primitives remain available (`build-live-source` requires `--cohort-id` and
 `--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /
-`import-live`).
+`import-live`). If `import-live` fail-closes with `CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR`,
+JSON `next` is `REPAIR_LIVE_CORPUS_METADATA_FIRST`. Run repair, then paste the
+**exact same** `import-live` command that just failed (same `--release-root`).
+Do not treat repair itself as the import. If repair is interrupted, or
+`.published` is missing/corrupt, rerun the same repair command.
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests --data-root local/factory_v1/data_plane
+```
+
+CLI `status` `PASS` carries operational `result.status` `REPAIRED` or
+`IDEMPOTENT_REPAIR`. That means the metadata root is published. It does not
+prove parquet rewrite, MAR, or alpha.
+
+If repair fail-closes with `CORPUS_LINEAGE_INCOMPLETE` or
+`DATASET_TERMINAL_MISSING`, JSON `next` is
+`STOP_RESTORE_LINEAGE_THEN_RETRY_REPAIR` or
+`STOP_RESTORE_LABELS_THEN_RETRY_REPAIR`. Do not loop the same repair.
+`DATASET_PUBLICATION_INCOMPLETE` has `next`
+`REPAIR_LIVE_CORPUS_METADATA_FIRST`. `LIVE_CORPUS_PARQUET_SYMLINK` and
+`CORPUS_PARQUET_SHA_MISMATCH` stop (`STOP_DO_NOT_FOLLOW_PARQUET_SYMLINK` /
+`STOP_DO_NOT_REPAIR_PARQUET_DRIFT`).
+
+Only after that published root exists, retry the canonical censoring
+diagnostic. Do not treat Git catalog/capability epoch movement as new
+market evidence.
 
 Admission clock: canonical semantic field
 `discovery_first_reliable_available_at` on campaign-relative
