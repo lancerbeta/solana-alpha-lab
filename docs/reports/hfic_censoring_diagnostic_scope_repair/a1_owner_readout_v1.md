@@ -26,6 +26,18 @@ untouched. Its 1.0 `counts["other"]` is the full-census unexpected bucket
 parquet and LIVE CORPUS are untouched. This atom did **not** run the real
 scientific diagnostic.
 
+## How to score this atom
+
+This candidate is not scientific DONE. Score it as:
+
+- **This atom complete** only after merge of the scope-repair. Task YAML
+  `status: READY` is the contract, not post-merge DONE.
+- **Later OPERATE blocked** if a 1.1 receipt has `other_in_scope > 0` or
+  `UNKNOWN_CENSUS_STATE` in `inconclusive_reasons`. Stop. Do not treat
+  `counts.other ≈ 138234` as that block.
+- **Later OPERATE not started from this merge.** This atom adds no OPERATE
+  command. The next atom is a separate READ-ONLY run.
+
 ## Receipt counts to read
 
 | Field | Meaning |

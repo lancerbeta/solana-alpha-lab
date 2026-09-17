@@ -37423,7 +37423,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/hfic_censoring_diagnostic_scope_repair/a1_owner_readout_v1.md', repository_path: docs/reports/hfic_censoring_diagnostic_scope_repair/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: 1038dbd3bf9fb018626c0bbf76dfbbea3ab988aa230956546d3095bf910f23a6}
+  integrity: {kind: sha256, sha256: 31d68cb5b1c83e88314c60ead6b9809b8d9707d6d51fe356b0ce195a0dfed779}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001}
