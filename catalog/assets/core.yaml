@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: e119eb0b2ff20068aeb927cc4c93ba8b81db168257cee3587fdf42c3cd4e4951}
+  integrity: {kind: sha256, sha256: 814ce325ae66f7e2a6b0cdb0b6ae51b3d6687d4b1629366b59d6466c0c547725}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33403,7 +33403,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/discovery_evidence_release.py', repository_path: scripts/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: 0626b267c6b614702e6992ff67e72d688ad52e3d963bfe4b1a4c1a8342d15134}
+  integrity: {kind: sha256, sha256: b17cdf093bdd34435fe6ee24289940cd764358b0320b8acf47e088e6b4af3ae1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -34023,7 +34023,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_logical_rows.py', repository_path: src/solana_alpha_lab/factory/live_corpus_logical_rows.py}
-  integrity: {kind: sha256, sha256: 7477f33f556b0903f01c32df18ceec66e941028f02ad6bd0379f8504cc19aad1}
+  integrity: {kind: sha256, sha256: 2ba111553e1eb8ffff6899c0eae3d90eb5aa8438bb6f02359c87c96a08d7353a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
@@ -34041,7 +34041,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: 967de0f8e5f96e52db682e55aa67205e6b096b24b47c333d90c0243dd37f772f}
+  integrity: {kind: sha256, sha256: 79e48eaa8f6b370d5d4ab3302b4f0f18e0612a38d7169b78de233d7c16097633}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
@@ -34060,7 +34060,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_corpus_manifest_contract_repair_v1.py', repository_path: tests/test_live_corpus_manifest_contract_repair_v1.py}
-  integrity: {kind: sha256, sha256: 98dc408f82038f04ff74c63c7c0c16a12bb5bfb603a88125cf5203e55ce04dea}
+  integrity: {kind: sha256, sha256: d0ee4f6bf807686ab3410e92b4e2f4a519a9d0f2aa287cb04085fc8d1f8359fd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}

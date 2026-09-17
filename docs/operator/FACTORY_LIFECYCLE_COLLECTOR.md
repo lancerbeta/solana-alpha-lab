@@ -590,19 +590,23 @@ are not crashes. `GAP_CONFIRMED` is not sealable.
 Primitives remain available (`build-live-source` requires `--cohort-id` and
 `--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /
 `import-live`). If `import-live` fail-closes with `CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR`,
-JSON `next` is `REPAIR_LIVE_CORPUS_METADATA_FIRST`. Repair, then **retry the
-same** `import-live` command. Do not treat repair itself as the import.
+JSON `next` is `REPAIR_LIVE_CORPUS_METADATA_FIRST`. Run repair, then paste the
+**exact same** `import-live` command that just failed (same `--release-root`).
+Do not treat repair itself as the import. If repair is interrupted, or
+`.published` is missing/corrupt, rerun the same repair command.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests --data-root local/factory_v1/data_plane
 ```
 
-Repair JSON `status` `REPAIRED` or `IDEMPOTENT_REPAIR` means the metadata
-root is published. It does not prove parquet rewrite, MAR, or alpha. Then:
+CLI `status` `PASS` carries operational `result.status` `REPAIRED` or
+`IDEMPOTENT_REPAIR`. That means the metadata root is published. It does not
+prove parquet rewrite, MAR, or alpha.
 
-```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root <sealed-release> --data-root local/factory_v1/data_plane
-```
+If repair fail-closes with `CORPUS_LINEAGE_INCOMPLETE` or
+`DATASET_TERMINAL_MISSING`, JSON `next` is
+`STOP_RESTORE_LINEAGE_THEN_RETRY_REPAIR` or
+`STOP_RESTORE_LABELS_THEN_RETRY_REPAIR`. Do not loop the same repair.
 
 Only after that published root exists, retry the canonical censoring
 diagnostic. Do not treat Git catalog/capability epoch movement as new

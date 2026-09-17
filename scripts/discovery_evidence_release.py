@@ -65,8 +65,11 @@ FAIL_OWNER_NEXT = {
     "TRANSPORT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SOURCE_BUILD_RESOURCE_LIMIT": "STOP_RETRY_BOUNDED_SOURCE_BUILD",
     "CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR": "REPAIR_LIVE_CORPUS_METADATA_FIRST",
-    "CORPUS_LINEAGE_INCOMPLETE": "REPAIR_LIVE_CORPUS_METADATA_FIRST",
-    "DATASET_TERMINAL_MISSING": "REPAIR_LIVE_CORPUS_METADATA_FIRST",
+    "CORPUS_LINEAGE_INCOMPLETE": "STOP_RESTORE_LINEAGE_THEN_RETRY_REPAIR",
+    "DATASET_TERMINAL_MISSING": "STOP_RESTORE_LABELS_THEN_RETRY_REPAIR",
+    "CORPUS_PARQUET_SHA_MISMATCH": "STOP_DO_NOT_REPAIR_PARQUET_DRIFT",
+    "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE": "STOP_DO_NOT_REPAIR_PARQUET_UNREADABLE",
+    "CANONICAL_TARGET_CONFLICT": "STOP_DO_NOT_OVERWRITE_CANONICAL_TARGET",
 }
 
 
@@ -335,10 +338,11 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError) as exc:
         code = str(exc)
-        payload = {"status": "FAIL", "code": code}
-        nxt = FAIL_OWNER_NEXT.get(code)
-        if nxt:
-            payload["next"] = nxt
+        payload = {
+            "status": "FAIL",
+            "code": code,
+            "next": FAIL_OWNER_NEXT.get(code, "STOP_INSPECT_FAIL_CODE"),
+        }
         print(json.dumps(payload, sort_keys=True))
         return 2
     print(json.dumps({"status": "PASS", "result": result}, sort_keys=True, default=str))

@@ -723,6 +723,24 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 )["current_corpus_version"],
                 1,
             )
+            published_path.write_text("{not-json", encoding="utf-8")
+            recovered_corrupt = repair_live_corpus_manifests(
+                data_root=data_root,
+                published_at=datetime(2026, 9, 21, tzinfo=UTC),
+            )
+            self.assertEqual(recovered_corrupt["dataset_manifest_id"], new_mid)
+            recovered_corrupt_dataset = DatasetManifest.model_validate_json(
+                (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
+            )
+            self.assertEqual(
+                recovered_corrupt_dataset.first_reliable_available_at,
+                datetime(2026, 9, 21, tzinfo=UTC),
+            )
+            published_after = json.loads(published_path.read_text(encoding="utf-8"))
+            self.assertEqual(
+                published_after["dataset_fingerprint"],
+                recovered_corrupt_dataset.dataset_fingerprint,
+            )
 
     def test_repair_fail_closed_on_missing_yield(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -749,6 +767,59 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                     published_at=datetime(2026, 9, 17, tzinfo=UTC),
                 )
             self.assertEqual(str(missing.exception), "CORPUS_LINEAGE_INCOMPLETE")
+
+    def test_repair_fail_closed_on_non_mapping_cohort(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            data_root = base / "rdp"
+            data_root.mkdir()
+            release0, sealed0, _cohort0 = _seal_week(base, 0)
+            _install_legacy_corpus(
+                data_root=data_root,
+                release=release0,
+                sealed=sealed0,
+                imported_at=datetime(2026, 1, 20, 1, tzinfo=UTC),
+            )
+            lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+            lineage["cohorts"].append("not-a-mapping")
+            lineage_path.write_text(
+                json.dumps(lineage, sort_keys=True, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            with self.assertRaises((LiveCohortReleaseError, DiscoveryReleaseError)) as missing:
+                repair_live_corpus_manifests(
+                    data_root=data_root,
+                    published_at=datetime(2026, 9, 17, tzinfo=UTC),
+                )
+            self.assertEqual(str(missing.exception), "CORPUS_LINEAGE_INCOMPLETE")
+
+    def test_future_import_fail_closed_on_historical_parquet_drift(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            data_root = base / "rdp"
+            data_root.mkdir()
+            release0, sealed0, _cohort0 = _seal_week(base, 0)
+            legacy = _install_legacy_corpus(
+                data_root=data_root,
+                release=release0,
+                sealed=sealed0,
+                imported_at=datetime(2026, 1, 20, 1, tzinfo=UTC),
+            )
+            repair_live_corpus_manifests(
+                data_root=data_root,
+                published_at=datetime(2026, 9, 17, tzinfo=UTC),
+            )
+            census_path = data_root / legacy["census_rel"]
+            census_path.write_bytes(census_path.read_bytes() + b"\x00")
+            release1, _sealed1, _cohort1 = _seal_week(base, 1)
+            with self.assertRaises((LiveCohortReleaseError, DiscoveryReleaseError)) as drifted:
+                import_live_cohort(
+                    release_root=release1,
+                    data_root=data_root,
+                    import_time=datetime(2026, 1, 27, 1, tzinfo=UTC),
+                )
+            self.assertEqual(str(drifted.exception), "CORPUS_PARQUET_SHA_MISMATCH")
 
     def test_first_import_interrupt_not_selected_current(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

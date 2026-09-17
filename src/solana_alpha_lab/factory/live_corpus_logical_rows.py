@@ -191,10 +191,16 @@ def _parse_optional_utc(value: Any) -> datetime | None:
     return parsed.astimezone(UTC)
 
 
-def _bound_pair(values: list[datetime], *, representable: bool) -> tuple[datetime | None, datetime | None]:
-    if not representable or not values:
-        return None, None
-    return min(values), max(values)
+def _fold_bound(
+    current_min: datetime | None,
+    current_max: datetime | None,
+    value: datetime,
+) -> tuple[datetime | None, datetime | None]:
+    if current_min is None or value < current_min:
+        current_min = value
+    if current_max is None or value > current_max:
+        current_max = value
+    return current_min, current_max
 
 
 @dataclass(frozen=True, slots=True)
@@ -243,8 +249,10 @@ def measure_live_corpus_parquet(
     digest = hashlib.sha256()
     digest.update(b"[")
     first = True
-    event_times: list[datetime] = []
-    available_times: list[datetime] = []
+    min_event: datetime | None = None
+    max_event: datetime | None = None
+    min_available: datetime | None = None
+    max_available: datetime | None = None
     event_representable = True
     available_representable = True
     row_count = 0
@@ -264,12 +272,14 @@ def measure_live_corpus_parquet(
                 if event is None:
                     event_representable = False
                 else:
-                    event_times.append(event)
+                    min_event, max_event = _fold_bound(min_event, max_event, event)
                 available = _parse_optional_utc(record.get("first_reliable_available_at"))
                 if available is None:
                     available_representable = False
                 else:
-                    available_times.append(available)
+                    min_available, max_available = _fold_bound(
+                        min_available, max_available, available
+                    )
             else:
                 available = _parse_optional_utc(
                     record.get("discovery_first_reliable_available_at")
@@ -277,18 +287,16 @@ def measure_live_corpus_parquet(
                 if available is None:
                     available_representable = False
                 else:
-                    available_times.append(available)
+                    min_available, max_available = _fold_bound(
+                        min_available, max_available, available
+                    )
     digest.update(b"]")
     counted = parquet_row_count(parquet_path)
     _require(counted == row_count, "LIVE_CORPUS_ROW_COUNT_MISMATCH")
-    min_event, max_event = (
-        (None, None)
-        if kind == KIND_CENSUS
-        else _bound_pair(event_times, representable=event_representable)
-    )
-    min_available, max_available = _bound_pair(
-        available_times, representable=available_representable
-    )
+    if kind == KIND_CENSUS or not event_representable:
+        min_event, max_event = None, None
+    if not available_representable:
+        min_available, max_available = None, None
     return LiveCorpusPartitionClaims(
         kind=kind,
         partition_id=partition_id,

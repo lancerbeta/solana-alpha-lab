@@ -21,12 +21,16 @@ Separate OPERATE action, not this atom:
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests --data-root local/factory_v1/data_plane
 ```
 
-Repair JSON `status` `REPAIRED` or `IDEMPOTENT_REPAIR` means the metadata
-root is published. It is not parquet proof and not a scientific DONE.
+CLI `status` `PASS` carries operational `result.status` `REPAIRED` or
+`IDEMPOTENT_REPAIR`. That means the metadata root is published. It is not
+parquet proof and not a scientific DONE.
 
 If `import-live` was blocked with `CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR`
-(`next` = `REPAIR_LIVE_CORPUS_METADATA_FIRST`), retry the same `import-live`
-after repair. Then retry the canonical censoring diagnostic. Do not run Forge
+(`next` = `REPAIR_LIVE_CORPUS_METADATA_FIRST`), paste the exact same
+`import-live` command after repair. If repair itself is interrupted or
+`.published` is missing/corrupt, rerun the same repair command.
+
+Then retry the canonical censoring diagnostic. Do not run Forge
 between this merge and that retry merely because Git catalog hashes moved
 the evidence epoch.
 

@@ -221,6 +221,30 @@ def _parse_utc_local(value: str) -> datetime:
     return parsed.astimezone(UTC)
 
 
+def _published_marker_ok(published_path: Path, dataset: DatasetManifest) -> bool:
+    if not published_path.is_file() or published_path.is_symlink():
+        return False
+    try:
+        published = json.loads(published_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+        return False
+    return (
+        isinstance(published, dict)
+        and published.get("dataset_fingerprint") == dataset.dataset_fingerprint
+        and published.get("dataset_manifest_id") == dataset.dataset_manifest_id
+    )
+
+
+def _cohorts_from_lineage(lineage: Mapping[str, Any]) -> list[dict[str, Any]]:
+    raw = lineage.get("cohorts")
+    _require(isinstance(raw, list) and raw, "CORPUS_LINEAGE_INCOMPLETE")
+    out: list[dict[str, Any]] = []
+    for item in raw:
+        _require(isinstance(item, Mapping), "CORPUS_LINEAGE_INCOMPLETE")
+        out.append(dict(item))
+    return out
+
+
 def inspect_canonical_root(data_root: Path, dataset_manifest_id: str) -> dict[str, Any]:
     """Return whether a LIVE CORPUS dataset root is TASK-06-valid and published."""
 
@@ -269,19 +293,21 @@ def inspect_canonical_root(data_root: Path, dataset_manifest_id: str) -> dict[st
     if receipt.get("dataset_fingerprint") != dataset.dataset_fingerprint:
         return {**empty, "dataset": dataset, "partitions": partitions, "reason": "FINGERPRINT_MISMATCH"}
     artifacts_ok = True
-    complete = (
-        artifacts_ok
-        and labels_path.is_file()
-        and not labels_path.is_symlink()
-        and published_path.is_file()
-        and not published_path.is_symlink()
-    )
+    labels_ok = labels_path.is_file() and not labels_path.is_symlink()
+    published_ok = _published_marker_ok(published_path, dataset)
+    complete = artifacts_ok and labels_ok and published_ok
+    if not labels_ok:
+        reason = "LABELS_MISSING"
+    elif not published_ok:
+        reason = "UNPUBLISHED"
+    else:
+        reason = "OK"
     return {
         "artifacts_ok": artifacts_ok,
         "complete": complete,
         "dataset": dataset,
         "partitions": partitions,
-        "reason": "OK" if complete else "UNPUBLISHED",
+        "reason": reason,
     }
 
 
@@ -563,6 +589,10 @@ def _claims_for_cohort(
         part_id = f"PARTITION-LIVE-COHORT-{cohort_id}{suffix}"
         rel = str(cohort[rel_key])
         expected_file = str(cohort[sha_key])
+        parquet_path = Path(data_root) / rel
+        _require(parquet_path.is_file() and not parquet_path.is_symlink(), "LIVE_CORPUS_PARQUET_MISSING")
+        disk_sha = sha256_file_streaming(parquet_path)
+        _require(disk_sha == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
         if prior_by_id is not None and part_id in prior_by_id:
             claim = prior_by_id[part_id]
             _require(claim.file_sha256 == expected_file, "CORPUS_PARQUET_SHA_MISMATCH")
@@ -570,8 +600,6 @@ def _claims_for_cohort(
             out.append(claim)
             continue
         _require(allow_measure, "HISTORICAL_LOGICAL_RESCAN_FORBIDDEN")
-        parquet_path = Path(data_root) / rel
-        _require(parquet_path.is_file() and not parquet_path.is_symlink(), "LIVE_CORPUS_PARQUET_MISSING")
         claim = _measure_parquet(
             parquet_path,
             kind=kind,
@@ -677,8 +705,6 @@ def _retract_unpublished_canonical_metadata(
 
     manifests = _manifests_dir(data_root)
     published_path = manifests / f"{dataset_manifest_id}.published"
-    if published_path.is_file() and not published_path.is_symlink():
-        return
     dataset_path = manifests / f"{dataset_manifest_id}.json"
     dataset: DatasetManifest | None = None
     if dataset_path.is_file() and not dataset_path.is_symlink():
@@ -690,6 +716,10 @@ def _retract_unpublished_canonical_metadata(
             CANONICAL_METADATA_SUFFIX
         ):
             return
+    if dataset is not None and _published_marker_ok(published_path, dataset):
+        return
+    if published_path.is_file() and not published_path.is_symlink():
+        published_path.unlink()
     for path in (
         dataset_path,
         manifests / f"{dataset_manifest_id}.validation.json",
@@ -756,8 +786,7 @@ def repair_live_corpus_manifests(
         }
     _retract_unpublished_canonical_metadata(data_root, str(current_mid))
 
-    existing_cohorts = [dict(item) for item in lineage.get("cohorts") or [] if isinstance(item, Mapping)]
-    _require(existing_cohorts, "CURRENT_CORPUS_MISSING")
+    existing_cohorts = _cohorts_from_lineage(lineage)
     for prior in existing_cohorts:
         for key in (
             "census_rel",
@@ -928,7 +957,10 @@ def import_live_cohort_canonical(
     obs_sha = sha256_file_streaming(obs_path)
 
     lineage = load_live_corpus_lineage(data_root)
-    existing_cohorts = [dict(item) for item in lineage.get("cohorts") or [] if isinstance(item, Mapping)]
+    raw_cohorts = lineage.get("cohorts") or []
+    existing_cohorts: list[dict[str, Any]] = []
+    if raw_cohorts:
+        existing_cohorts = _cohorts_from_lineage(lineage)
     matching = next(
         (prior for prior in existing_cohorts if prior.get("release_id") == release_id),
         None,
