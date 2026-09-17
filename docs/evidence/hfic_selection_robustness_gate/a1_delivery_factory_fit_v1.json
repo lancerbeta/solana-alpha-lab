@@ -4,8 +4,8 @@
   "review_id": "HFIC-SELECTION-ROBUSTNESS-GATE-FACTORY-FIT-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
-  "reviewed_bindings_sha256": "edf7fa7b7fe81458174be5985df157d0386601a836a24c76fd1a2fe4cf9c4b38",
-  "reviewed_inventory_sha256": "79f6b196c4bd4195930549f7b1cda9c96a73e7615d8361b60a41dd0cc90692a1",
+  "reviewed_bindings_sha256": "ade60c95afd50d644ade3d44ce76476134ec89b40650dfeb2260a66d1beebb7e",
+  "reviewed_inventory_sha256": "beab3d70c9c1ec065e26857597797d43a34fc655e736824ab3c6af8ebbb4143a",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

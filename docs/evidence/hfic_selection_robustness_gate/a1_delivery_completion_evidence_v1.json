@@ -15,21 +15,22 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "42e8b7620e4d4a6574a380711199410308d6f505b8f67ded4b8edc4c084c80de",
+    "catalog/assets/core.yaml": "cf5a0e9c255a12a98b9e1c948876129e6323a2d1121af89b7ef75d18463821fc",
     "catalog/assets/lifecycle.yaml": "eecaa3a3da5853e4d11e0edcdc5095888907c5868cbca14e70522aa8914f1474",
     "catalog/catalog_manifest.yaml": "a5e7bf8496d03e82ff993c6dfed7c5038e2203ff134167877830797419d217ec",
     "catalog/generated/asset_edges.json": "4fbf8ac883fea4706528de06d80230b2f22a611ba2191421d886befeeec6868e",
     "configs/experiment_capability_registry_v2.yaml": "35a4f94ed6bf544760824f0f6cad55b2effbd25783f8aaa168ead7ab7212674b",
     "configs/hfic_selection_robustness_gate_v1.yaml": "db4cdd40edf92e05a7a9ec6cabc181783c8729c3ac7079e80373797be0d0ac0d",
     "docs/PROJECT_MAP.md": "d7268777e96d9d508ecde0ee4898a4419e8604b1614f44da85903d5e1fea5b1e",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "94ca848a5c4d2f584f7cb37c31ad7475fd8a2b57a759ddddc1cc4da0b218c4b9",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "7f87dcb91cc06af524ae62321faef5d0e0dc7125d683122f70749b515eef0e09",
     "docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md": "33d3365b04a085ab43dcc21d7e9d30d67861c397bb2cb245c68c0d357738f49c",
-    "docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md": "3a1dea4959871947c084d54217b583be3002775239edd4eaf67eec125c743977",
+    "docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md": "ad193fc3b2d71dc116218329bc0333292d54e84dd5eaf50d4daebafd6a5660bf",
     "scripts/hypothesis_forge.py": "6c7a5da0b75de04f9f65b552a6995edf78e5b33ceb87854b052bbb61e1876d6f",
     "src/solana_alpha_lab/factory/capabilities.py": "bff643190dac24712086cd58c2ce5bd8731fc4927feaf837188156c0e6115cc9",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "42cac3c8d041b7db5c892d03b90ccb2f81a146ff8cbc70da68cbb149f59b6fac",
     "src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py": "400cc6820fa36e7e6c428fa2b4f8f362d44ae49360144c45820ebf80fad8d977",
     "tests/test_discovery_evidence_release_bridge.py": "2f6d3044f3a043fcae5dc777689695d2fabdfafd81174fc281be7b72e678391f",
+    "tests/test_factory_ordinary_market_hypothesis.py": "945e61cc8fc5e49b6a2474e679a0edb64ba5cebf60efd94a0002f39d7eab5ec5",
     "tests/test_hfic_selection_robustness_gate_v1.py": "59913aac226b9873bc50dd980d1e8895f0e64c31ff153ab4dd86925b90310747"
   },
   "active_stop_conditions": [],
@@ -42,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_factory_fit_v1.json",
-    "sha256": "dcce21327813184dca3bd7f90cdcb8c1ca8bd49eb440bfd0c58599f0d880b09b",
+    "sha256": "2c2db992083fd93a0038c0c01f84ab09946fdf285a147f2477a2b0cfebba1674",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_HFIC_SELECTION_ROBUSTNESS_GATE",
     "independent_review": {
       "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_independent_review_v1.json",
-      "sha256": "73b26e3583ba655d50e2d114e95f85d28419aed47baa75a714ef836275b90eb6",
+      "sha256": "ecf01a41e19e24aecbd5c0b9a455d13fdc62c093bee0319c9410359d21f25474",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
