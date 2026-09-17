@@ -4,8 +4,8 @@
   "review_id": "HFIC-CENSORING-CANONICAL-BINDING-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_CENSORING_CANONICAL_BINDING_V1",
-  "reviewed_bindings_sha256": "a540689046de6e1b02e0bec44baed0d76e69715ecfcfabbcd24a637368c9e92c",
-  "reviewed_inventory_sha256": "8f8fd1b60c682d9bb320334bb82cbe6b6ce47ab7e40cb5a5d4d48831f3e13f4d",
+  "reviewed_bindings_sha256": "9df07a49674975956b4073a4261bd962577e261e521daba02633687fb016c862",
+  "reviewed_inventory_sha256": "8149b2e1eb8e7f506e55c357917dccd3ad1627b46578a92257e8d20605a16e9d",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
