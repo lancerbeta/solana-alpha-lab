@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-SELECTION-ROBUSTNESS-GATE-ACCEPT-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
+  "state_change": "Registered CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001 composing frozen Stage 1 with one Block-A L2-logistic OOF-AUC falsifier, a typed router_decision, and ordinary Forge preflight consumption. Canonical LIVE CORPUS OPERATE remains out of this atom.",
+  "base_main": "503de99469f972fbabc10a6161159865df6d5d37",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_HFIC_SELECTION_ROBUSTNESS_GATE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_HFIC_SELECTION_ROBUSTNESS_GATE",
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_MNAR",
+    "NO_LIVE_CORPUS_GATE_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "data_plane_mutation": 0,
+    "provider_calls": 0
+  }
+}
