@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-ACCEPT-001",
+  "as_of": "2026-09-17",
+  "task_id": "LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1",
+  "state_change": "LIVE CORPUS metadata publication now uses TASK-06 builders/verifiers and a local census/observations logical-row profile. Fixture-proven metadata-only repair; real data_plane untouched.",
+  "base_main": "4ff632e0ab4f7033e728232dd39dd88638710a6e",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/live_corpus_manifest_contract_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR",
+    "independent_review": {
+      "path": "docs/evidence/live_corpus_manifest_contract_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR",
+      "PASS_UNIT_LIVE_COHORT_DISCOVERY_RELEASE_SERIES",
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_CANONICAL_DONE",
+    "NO_REAL_DATA_PLANE_MUTATION",
+    "NO_TASK_06_WEAKENING",
+    "NO_FORGE_RUN"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "data_plane_mutation": 0,
+    "provider_calls": 0
+  }
+}

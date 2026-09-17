@@ -28,6 +28,7 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     build_live_observation_source_from_rdp,
     import_live_cohort,
     live_cohort_status,
+    repair_live_corpus_manifests,
     seal_live_cohort,
     verify_live_cohort,
 )
@@ -63,6 +64,7 @@ FAIL_OWNER_NEXT = {
     "CURRENT_CORPUS_MISSING": "IMPORT_VERIFIED_RELEASE_FIRST",
     "TRANSPORT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SOURCE_BUILD_RESOURCE_LIMIT": "STOP_RETRY_BOUNDED_SOURCE_BUILD",
+    "CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR": "REPAIR_LIVE_CORPUS_METADATA_FIRST",
 }
 
 
@@ -164,6 +166,13 @@ def main(argv: list[str] | None = None) -> int:
     import_live.add_argument("--release-root", type=Path, required=True)
     import_live.add_argument("--data-root", type=Path, required=True)
     import_live.add_argument("--import-at", type=str, default=None)
+
+    repair_live = sub.add_parser(
+        "repair-live-corpus-manifests",
+        help="Metadata-only TASK-06 repair of the current LIVE CORPUS root",
+    )
+    repair_live.add_argument("--data-root", type=Path, required=True)
+    repair_live.add_argument("--published-at", type=str, default=None)
 
     publish = sub.add_parser(
         "publish-live-cohort",
@@ -277,6 +286,11 @@ def main(argv: list[str] | None = None) -> int:
                 release_root=_path(args.release_root),
                 data_root=_path(args.data_root),
                 import_time=_parse_utc(args.import_at),
+            )
+        elif args.command == "repair-live-corpus-manifests":
+            result = repair_live_corpus_manifests(
+                data_root=_path(args.data_root),
+                published_at=_parse_utc(args.published_at),
             )
         elif args.command == "publish-live-cohort":
             result = publish_live_cohort(

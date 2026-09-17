@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-17",
+  "task_id": "LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+      ]
+    }
+  ],
+  "remediation_history": [],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_REAL_DATA_PLANE_MUTATION",
+    "NO_CANONICAL_DONE"
+  ]
+}

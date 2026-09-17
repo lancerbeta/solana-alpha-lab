@@ -21,14 +21,11 @@ from typing import Any
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
 from solana_alpha_lab.factory.discovery_evidence_release import (
     DiscoveryReleaseError,
     _publish_bytes,
     _render_utc,
     _require,
-    _schema_sha256,
-    sha256_bytes,
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import (
     BATCH_SIZE,
@@ -100,14 +97,9 @@ from solana_alpha_lab.factory.tokens_v2_typed_projection import (
     STATE_MISSING,
     STATE_OBSERVED,
 )
-from solana_alpha_lab.storage.manifests import (
-    canonical_manifest_bytes,
-    compute_dataset_manifest_id,
-)
 
 CORPUS_DATASET_ID = "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
 CORPUS_SCHEMA_ID = "SCHEMA-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
-GENERATION_TASK_ID = "LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1"
 LIVE_EVIDENCE_ROLE = "EXPLORATORY_REUSE"
 COMMIT_POINT_KIND = "LIVE_LIFECYCLE_DISCOVERY_CORPUS_PUBLICATION_V1"
 COHORT_ADMISSION_FIELD = "discovery_first_reliable_available_at"
@@ -2853,11 +2845,6 @@ def _write_lineage(data_root: Path, lineage: Mapping[str, Any]) -> None:
     tmp.replace(path)
 
 
-def _partition_rebind_id(dataset_manifest_id: str, partition_id: str) -> str:
-    digest = sha256_bytes(f"{dataset_manifest_id}:{partition_id}".encode("utf-8"))
-    return f"partition-{digest}"
-
-
 def current_corpus_partition_rows(
     data_root: Path,
     *,
@@ -2897,326 +2884,37 @@ def import_live_cohort(
     release_root: Path,
     data_root: Path,
     import_time: datetime | None = None,
+    fault_before_visibility=None,
 ) -> dict[str, Any]:
     """Import verified live cohort into cumulative LIVE CORPUS (idempotent)."""
-    manifest = verify_live_cohort(release_root)
-    imported_at = (import_time or datetime.now(tz=UTC)).astimezone(UTC)
-    sealed_at = _parse_utc(str(manifest["sealed_at"]))
-    _require(imported_at >= sealed_at, "IMPORT_BEFORE_SEAL")
-    release_id = str(manifest["release_id"])
-    cohort_id = str(manifest["cohort_id"])
-    census_path = Path(release_root) / CENSUS_NAME
-    obs_path = Path(release_root) / OBSERVATIONS_NAME
-    content_sha = sha256_files_concat_streaming([census_path, obs_path])
-    census_sha = sha256_file_streaming(census_path)
-    obs_sha = sha256_file_streaming(obs_path)
-
-    lineage = _load_lineage(data_root)
-    existing_cohorts = list(lineage.get("cohorts") or [])
-    for prior in existing_cohorts:
-        if not isinstance(prior, Mapping):
-            continue
-        if prior.get("release_id") == release_id:
-            if prior.get("content_sha256") != content_sha:
-                raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT")
-            return {
-                "status": "IDEMPOTENT_REIMPORT",
-                "cohort_id": cohort_id,
-                "release_id": release_id,
-                "corpus_version": prior.get("corpus_version"),
-                "dataset_manifest_id": prior.get("dataset_manifest_id"),
-                "evidence_role": LIVE_EVIDENCE_ROLE,
-                "epoch_bump": False,
-            }
-        if prior.get("cohort_id") == cohort_id:
-            raise LiveCohortReleaseError("COHORT_ALREADY_IMPORTED")
-
-    for prior in existing_cohorts:
-        if not isinstance(prior, Mapping):
-            continue
-        for key in (
-            "census_rel",
-            "obs_rel",
-            "census_sha256",
-            "observations_sha256",
-            "sealed_at",
-        ):
-            _require(prior.get(key), "CORPUS_LINEAGE_INCOMPLETE")
-
-    version_n = len(existing_cohorts) + 1
-    dataset_version = f"corpus-v{version_n}-{cohort_id}"
-    dataset_manifest_id = compute_dataset_manifest_id(CORPUS_DATASET_ID, dataset_version)
-    census_part_id = f"PARTITION-LIVE-COHORT-{cohort_id}-CENSUS"
-    obs_part_id = f"PARTITION-LIVE-COHORT-{cohort_id}-OBS"
-    date_key = imported_at.strftime("%Y-%m-%d")
-    census_rel = (
-        f"datasets/partitions/date={date_key}/{census_part_id}-{release_id[:16]}.parquet"
-    )
-    obs_rel = (
-        f"datasets/partitions/date={date_key}/{obs_part_id}-{release_id[:16]}.parquet"
-    )
-    available_at = imported_at
-    created_at = imported_at
-
-    cumulative_components = [
-        {
-            "cohort_id": str(c.get("cohort_id")),
-            "release_id": str(c.get("release_id")),
-            "content_sha256": str(c.get("content_sha256")),
-            "census_rel": c.get("census_rel"),
-            "obs_rel": c.get("obs_rel"),
-            "census_sha256": c.get("census_sha256"),
-            "observations_sha256": c.get("observations_sha256"),
-            "census_row_count": c.get("census_row_count"),
-            "observation_row_count": c.get("observation_row_count"),
-            "feature_families": list(c.get("feature_families") or []),
-            "yield_eligible": int(c.get("yield_eligible") or 0),
-            "yield_missing": int(c.get("yield_missing") or 0),
-            "sealed_at": c.get("sealed_at"),
-            "first_reliable_available_at": c.get("first_reliable_available_at"),
-        }
-        for c in existing_cohorts
-        if isinstance(c, Mapping)
-    ]
-    cumulative_components.append(
-        {
-            "cohort_id": cohort_id,
-            "release_id": release_id,
-            "content_sha256": content_sha,
-            "census_rel": census_rel,
-            "obs_rel": obs_rel,
-            "census_sha256": census_sha,
-            "observations_sha256": obs_sha,
-            "census_row_count": int(manifest["census_row_count"]),
-            "observation_row_count": int(manifest["observation_row_count"]),
-            "feature_families": list(manifest["feature_families"]),
-            "yield_eligible": int(manifest["yield_eligible"]),
-            "yield_missing": int(manifest["yield_missing"]),
-            "sealed_at": _render_utc(sealed_at),
-            "first_reliable_available_at": _render_utc(available_at),
-        }
-    )
-    fingerprint = canonical_sha256(
-        {
-            "dataset_manifest_id": dataset_manifest_id,
-            "cumulative_components": cumulative_components,
-            "projection_id": PROJECTION_ID,
-        }
-    )
-    cumulative_content_sha = canonical_sha256(
-        {"ordered_component_content": [c["content_sha256"] for c in cumulative_components]}
-    )
-    dataset = DatasetManifest(
-        dataset_manifest_id=dataset_manifest_id,
-        dataset_id=CORPUS_DATASET_ID,
-        dataset_version=dataset_version,
-        schema_id=CORPUS_SCHEMA_ID,
-        schema_sha256=_schema_sha256(),
-        dataset_fingerprint=fingerprint,
-        generation_task_id=GENERATION_TASK_ID,
-        generation_run_id=f"import-{release_id[:16]}",
-        validation_receipt_sha256=sha256_bytes(
-            (Path(release_root) / RELEASE_MANIFEST_NAME).read_bytes()
-        ),
-        first_reliable_available_at=available_at,
-        created_at=created_at,
-        content_sha256=cumulative_content_sha,
+    from solana_alpha_lab.factory.live_corpus_manifest_publish import (
+        import_live_cohort_canonical,
     )
 
-    dest_census = Path(data_root) / census_rel
-    dest_obs = Path(data_root) / obs_rel
-    dest_census.parent.mkdir(parents=True, exist_ok=True)
-    dest_obs.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(census_path, dest_census)
-    shutil.copyfile(obs_path, dest_obs)
-    root = Path(data_root)
-
-    # Rebind all cumulative cohort partitions onto the new current dataset id.
-    # Parquet bytes for prior cohorts are referenced in place (no O(N²) copy).
-    for component in cumulative_components:
-        for kind, rel_key, sha_key, count_key, part_suffix in (
-            (
-                "CENSUS",
-                "census_rel",
-                "census_sha256",
-                "census_row_count",
-                "-CENSUS",
-            ),
-            (
-                "OBS",
-                "obs_rel",
-                "observations_sha256",
-                "observation_row_count",
-                "-OBS",
-            ),
-        ):
-            del kind
-            part_id = f"PARTITION-LIVE-COHORT-{component['cohort_id']}{part_suffix}"
-            part_manifest_id = _partition_rebind_id(dataset_manifest_id, part_id)
-            event_clock = _parse_utc(str(component.get("sealed_at") or _render_utc(sealed_at)))
-            avail_clock = _parse_utc(
-                str(
-                    component.get("first_reliable_available_at")
-                    or component.get("sealed_at")
-                    or _render_utc(available_at)
-                )
-            )
-            # Partition contract requires first_reliable_available_at >= created_at.
-            part_created = min(avail_clock, event_clock, created_at)
-            part_available = max(avail_clock, part_created)
-            part = PartitionManifest(
-                partition_manifest_id=part_manifest_id,
-                dataset_manifest_id=dataset_manifest_id,
-                partition_id=part_id,
-                logical_location=str(component[rel_key]),
-                file_sha256=str(component[sha_key]),
-                content_sha256=str(component[sha_key]),
-                row_count=int(component[count_key] or 0),
-                min_event_time=event_clock,
-                max_event_time=event_clock,
-                min_available_to_strategy_at=part_available,
-                max_available_to_strategy_at=part_available,
-                first_reliable_available_at=part_available,
-                created_at=part_created,
-            )
-            _publish_bytes(
-                root / f"datasets/manifests/partitions/{part_manifest_id}.json",
-                canonical_manifest_bytes(part),
-            )
-
-    lineage_cohort_ids = [str(c["cohort_id"]) for c in cumulative_components]
-    feature_union: list[str] = []
-    seen_families: set[str] = set()
-    for component in cumulative_components:
-        for family in component.get("feature_families") or []:
-            if family not in seen_families:
-                seen_families.add(str(family))
-                feature_union.append(str(family))
-    feature_union = [f for f in FEATURE_FAMILY_ORDER if f in set(feature_union)] or feature_union
-    yield_eligible_sum = sum(int(c.get("yield_eligible") or 0) for c in cumulative_components)
-    yield_missing_sum = sum(int(c.get("yield_missing") or 0) for c in cumulative_components)
-    census_rows_sum = sum(int(c.get("census_row_count") or 0) for c in cumulative_components)
-    obs_rows_sum = sum(int(c.get("observation_row_count") or 0) for c in cumulative_components)
-
-    labels = {
-        **REQUIRED_LABELS,
-        "release_id": release_id,
-        "cohort_id": cohort_id,
-        "corpus_version": version_n,
-        "dataset_version": dataset_version,
-        "cohort_lineage": lineage_cohort_ids,
-        "feature_families": feature_union,
-        "feature_hint": None,
-        "yield_eligible": yield_eligible_sum,
-        "yield_missing": yield_missing_sum,
-        "census_row_count_cumulative": census_rows_sum,
-        "observation_row_count_cumulative": obs_rows_sum,
-        "dataset_terminal": "SAMPLE_VALID",
-        "readiness_state": manifest.get("readiness_state"),
-        "discovery_coverage_class": manifest.get("discovery_coverage_class"),
-        "imported_at": _render_utc(imported_at),
-        "accepted_hypothesis_id": None,
-        "is_current_corpus_version": True,
-        "cumulative_composition": True,
-    }
-    published = {
-        "commit_point": COMMIT_POINT_KIND,
-        "dataset_manifest_id": dataset_manifest_id,
-        "dataset_fingerprint": fingerprint,
-        "release_id": release_id,
-        "cohort_id": cohort_id,
-        "corpus_version": version_n,
-        "imported_at": _render_utc(imported_at),
-        "cumulative_cohort_count": len(cumulative_components),
-    }
-
-    for prior in existing_cohorts:
-        if not isinstance(prior, Mapping):
-            continue
-        prior_mid = prior.get("dataset_manifest_id")
-        if not isinstance(prior_mid, str):
-            continue
-        labels_path = root / f"datasets/manifests/{prior_mid}.labels.json"
-        if labels_path.is_file():
-            try:
-                old = json.loads(labels_path.read_text(encoding="utf-8"))
-            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-                continue
-            if isinstance(old, dict):
-                old["is_current_corpus_version"] = False
-                labels_path.write_bytes(
-                    json.dumps(old, sort_keys=True, separators=(",", ":")).encode(
-                        "utf-8"
-                    )
-                )
-
-    _publish_bytes(
-        root / f"datasets/manifests/{dataset_manifest_id}.labels.json",
-        json.dumps(labels, sort_keys=True, separators=(",", ":")).encode("utf-8"),
-    )
-    _publish_bytes(
-        root / f"datasets/manifests/{dataset_manifest_id}.json",
-        canonical_manifest_bytes(dataset),
-    )
-    _publish_bytes(
-        root / f"datasets/manifests/{dataset_manifest_id}.published",
-        json.dumps(published, sort_keys=True, separators=(",", ":")).encode("utf-8"),
+    return import_live_cohort_canonical(
+        release_root=release_root,
+        data_root=data_root,
+        import_time=import_time,
+        fault_before_visibility=fault_before_visibility,
     )
 
-    existing_cohorts.append(
-        {
-            "cohort_id": cohort_id,
-            "release_id": release_id,
-            "content_sha256": content_sha,
-            "corpus_version": version_n,
-            "dataset_manifest_id": dataset_manifest_id,
-            "dataset_version": dataset_version,
-            "imported_at": _render_utc(imported_at),
-            "census_rel": census_rel,
-            "obs_rel": obs_rel,
-            "census_sha256": census_sha,
-            "observations_sha256": obs_sha,
-            "census_row_count": int(manifest["census_row_count"]),
-            "observation_row_count": int(manifest["observation_row_count"]),
-            "feature_families": list(manifest["feature_families"]),
-            "yield_eligible": int(manifest["yield_eligible"]),
-            "yield_missing": int(manifest["yield_missing"]),
-            "sealed_at": _render_utc(sealed_at),
-            "first_reliable_available_at": _render_utc(available_at),
-        }
+
+def repair_live_corpus_manifests(
+    *,
+    data_root: Path,
+    published_at: datetime | None = None,
+    fault_before_visibility=None,
+) -> dict[str, Any]:
+    """Metadata-only TASK-06 repair of the current LIVE CORPUS root."""
+    from solana_alpha_lab.factory.live_corpus_manifest_publish import (
+        repair_live_corpus_manifests as _repair,
     )
-    lineage_out = {
-        "corpus_dataset_id": CORPUS_DATASET_ID,
-        "current_corpus_version": version_n,
-        "current_dataset_manifest_id": dataset_manifest_id,
-        "cohorts": existing_cohorts,
-        "versions": [
-            {
-                "corpus_version": c["corpus_version"],
-                "dataset_manifest_id": c["dataset_manifest_id"],
-                "cohort_id": c["cohort_id"],
-            }
-            for c in existing_cohorts
-        ],
-    }
-    _write_lineage(data_root, lineage_out)
-    return {
-        "status": "IMPORTED",
-        "cohort_id": cohort_id,
-        "release_id": release_id,
-        "corpus_version": version_n,
-        "dataset_id": CORPUS_DATASET_ID,
-        "dataset_version": dataset_version,
-        "dataset_manifest_id": dataset_manifest_id,
-        "dataset_fingerprint": fingerprint,
-        "cohort_lineage": lineage_cohort_ids,
-        "evidence_role": LIVE_EVIDENCE_ROLE,
-        "feature_families": feature_union,
-        "imported_at": _render_utc(imported_at),
-        "epoch_bump": True,
-        "cumulative_census_rows": census_rows_sum,
-        "cumulative_observation_rows": obs_rows_sum,
-    }
+
+    return _repair(
+        data_root=data_root,
+        published_at=published_at,
+        fault_before_visibility=fault_before_visibility,
+    )
 
 
 def live_cohort_status(

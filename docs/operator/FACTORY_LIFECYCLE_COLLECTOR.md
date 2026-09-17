@@ -589,7 +589,19 @@ are not crashes. `GAP_CONFIRMED` is not sealable.
 
 Primitives remain available (`build-live-source` requires `--cohort-id` and
 `--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /
-`import-live`).
+`import-live`). If the current LIVE CORPUS root is still legacy/malformed,
+`import-live` fail-closes with `CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR`.
+Metadata-only republish of the same scientific composition (does not rewrite
+parquet or sealed release bytes):
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests --data-root local/factory_v1/data_plane
+```
+
+That OPERATE action is separate from the implementation atom. After repair,
+verify the new DatasetManifest/PartitionManifest, parquet byte identity, HFIC
+epoch, then retry the canonical censoring diagnostic. Do not treat Git
+catalog/capability epoch movement as new market evidence.
 
 Admission clock: canonical semantic field
 `discovery_first_reliable_available_at` on campaign-relative

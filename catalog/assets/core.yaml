@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: f772d00f7d856321ac0e823ccf09f9a28d9e68dc0d73778a7dd30829f3829b88}
+  integrity: {kind: sha256, sha256: dfad30f2f53329bdf6f17e40226c3c0761bc825978675f8718f80c9a691c8200}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33397,17 +33397,18 @@ records:
 - asset_id: SCRIPT-DISCOVERY-EVIDENCE-RELEASE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Zero-network CLI for discovery release seal, verify, and RDP import.
+  purpose: Zero-network CLI for discovery release seal/verify/import and LIVE CORPUS import plus metadata-only TASK-06 repair.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/discovery_evidence_release.py', repository_path: scripts/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: 3f75a670697c66e443f079f2d305696034c5b67cdd3314aaa067991164e9aed6}
+  integrity: {kind: sha256, sha256: b2b3ce3768abb903a0e55a65b95d66772efbf2d2e5ee08c169082ace7e9f3e29}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
   - {relation_type: depends_on, target_asset_id: MODULE-DISCOVERY-EVIDENCE-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [DISCOVERY_RELEASE, CLI]
@@ -33959,17 +33960,19 @@ records:
 - asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Live cohort readiness, bounded source bundle, seal/verify/import into versioned LIVE LIFECYCLE DISCOVERY CORPUS from immutable Observation RDP.
+  purpose: Live cohort readiness, bounded source bundle, seal/verify/import into versioned LIVE LIFECYCLE DISCOVERY CORPUS with TASK-06-valid DatasetManifest publication.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: f1a1d08fd00e89a0af326067d501d2c14cb932a3b3e554efd5ca9a8da7f1cbad}
+  integrity: {kind: sha256, sha256: fe5cb0da304ab79804c754b39e86d52c8fbcefd278731b6dfd5e9651843c9dbf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
   - {relation_type: depends_on, target_asset_id: MODULE-DISCOVERY-EVIDENCE-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001}
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [LIVE_COHORT, CORPUS, EXPLORATORY_REUSE]
@@ -33991,6 +33994,80 @@ records:
   consumers: [FACTORY-001]
   evidence: []
   search_terms: [LIVE_COHORT, CORPUS, VERTICAL_PROOF, TWELVE_WEEK]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract to republish LIVE CORPUS metadata through TASK-06 builders without changing scientific parquet or sealed release bytes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1.md', repository_path: docs/tasks/LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1.md}
+  integrity: {kind: sha256, sha256: 78bfdb1b39883a9bbbb90dd6a68c2f504deeea1d899d5afd632899728bc22b1b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  - {relation_type: depends_on, target_asset_id: DOC-FACTORY-LIFECYCLE-COLLECTOR-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [LIVE_CORPUS, TASK-06, DATASET_MANIFEST, REPAIR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Local census/observations canonical logical-row profile and LIVE CORPUS schema hash for TASK-06 content_sha256.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_logical_rows.py', repository_path: src/solana_alpha_lab/factory/live_corpus_logical_rows.py}
+  integrity: {kind: sha256, sha256: 7477f33f556b0903f01c32df18ceec66e941028f02ad6bd0379f8504cc19aad1}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-SOURCE-BUNDLE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIVE_CORPUS, LOGICAL_ROWS, CONTENT_SHA256]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: TASK-06 builder-owned LIVE CORPUS DatasetManifest publication, metadata repair, and fail-closed commit-point sequence.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
+  integrity: {kind: sha256, sha256: 96349e6d8e1fb23f3000cc641f4f6e6ea1857e27099efd01b8368a37c4a891d7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-CORPUS-LOGICAL-ROWS-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIVE_CORPUS, PARTITION_MANIFEST, DATASET_MANIFEST, REPAIR]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Fixture proofs that LIVE CORPUS metadata repair leaves parquet bytes unchanged and future import emits TASK-06-valid cumulative manifests.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_live_corpus_manifest_contract_repair_v1.py', repository_path: tests/test_live_corpus_manifest_contract_repair_v1.py}
+  integrity: {kind: sha256, sha256: d2c04a7cb9bc0d688ad96a234dfbd97ae7bcd4ffb58dff796894ecf2b6f4dffd}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [LIVE_CORPUS, TASK-06, REPAIR, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
 
 - asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001
