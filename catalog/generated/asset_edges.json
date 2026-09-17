@@ -933,6 +933,11 @@
       "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
     },
     {
+      "source_asset_id": "CONFIG-HFIC-SELECTION-ROBUSTNESS-GATE-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
+    },
+    {
       "source_asset_id": "CONFIG-HYPOTHESIS-FAST-LANE-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
@@ -3421,6 +3426,21 @@
       "source_asset_id": "CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001"
     },
     {
       "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
@@ -11108,6 +11128,21 @@
       "target_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-HFIC-SELECTION-ROBUSTNESS-GATE-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
+    },
+    {
       "source_asset_id": "MODULE-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-IN-SCOPE-POPULATION-FIT-RECONCILIATION-001"
@@ -13491,6 +13526,11 @@
       "source_asset_id": "REPORT-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
+    },
+    {
+      "source_asset_id": "REPORT-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
     },
     {
       "source_asset_id": "REPORT-IN-SCOPE-POPULATION-AND-STATE-DISCOVERY-OWNER-READOUT-001",
@@ -16301,6 +16341,16 @@
       "source_asset_id": "TEST-HFIC-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001",
+      "relation": "validated_by",
+      "target_asset_id": "MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001"
     },
     {
       "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",

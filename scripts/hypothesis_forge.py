@@ -1079,6 +1079,44 @@ def cmd_censoring_ignorability_diagnostic(
     return emit(receipt)
 
 
+def cmd_selection_robustness_gate(
+    repo_root: Path,
+    *,
+    census: Path | None,
+    observations: Path | None,
+    data_root: Path | None,
+) -> int:
+    from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+        CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED,
+        CANONICAL_MODE_EXPLICIT_PATH_CONFLICT,
+        SelectionRobustnessGateError,
+        run_selection_robustness_gate,
+    )
+
+    if data_root is not None and (census is not None or observations is not None):
+        raise HficCliError(CANONICAL_MODE_EXPLICIT_PATH_CONFLICT)
+    if data_root is None and (census is None or observations is None):
+        raise HficCliError(CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED)
+    try:
+        receipt = run_selection_robustness_gate(
+            root=repo_root,
+            census_path=census,
+            observations_path=observations,
+            data_root=data_root,
+        )
+    except SelectionRobustnessGateError as exc:
+        raise HficCliError(str(exc)) from exc
+    leak = [str(repo_root)]
+    if census is not None:
+        leak.append(str(census))
+    if observations is not None:
+        leak.append(str(observations))
+    if data_root is not None:
+        leak.append(str(data_root))
+    _assert_no_path_leak(receipt, *leak)
+    return emit(receipt)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="hypothesis_forge")
     parser.add_argument("--root", type=Path, default=ROOT)
@@ -1087,9 +1125,9 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         default=None,
         help=(
-            "factory data_root; for censoring-ignorability-diagnostic this must "
-            "be an imported LIVE CORPUS (datasets/live_lifecycle_corpus/lineage.json), "
-            "never Observation RDP"
+            "factory data_root; for censoring-ignorability-diagnostic and "
+            "selection-robustness-gate this must be an imported LIVE CORPUS "
+            "(datasets/live_lifecycle_corpus/lineage.json), never Observation RDP"
         ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -1168,6 +1206,24 @@ def build_parser() -> argparse.ArgumentParser:
     censoring.add_argument("--census", type=Path, default=None)
     censoring.add_argument("--observations", type=Path, default=None)
     censoring.add_argument("--format", choices=("json",), default="json")
+
+    selection_gate = subparsers.add_parser(
+        "selection-robustness-gate",
+        help=(
+            "offline two-stage selection gate; reuses Stage 1 then optional Block-A "
+            "logistic OOF-AUC; owner-facing field is router_decision"
+        ),
+        description=(
+            "Canonical mode: parent --data-root pointing at an imported LIVE CORPUS "
+            "data_root. Explicit --census and --observations stay noncanonical. Mixing "
+            "parent --data-root with parquet paths fails as "
+            "CANONICAL_MODE_EXPLICIT_PATH_CONFLICT. Empty invocation fails as "
+            "CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED. Does not auto-run Forge."
+        ),
+    )
+    selection_gate.add_argument("--census", type=Path, default=None)
+    selection_gate.add_argument("--observations", type=Path, default=None)
+    selection_gate.add_argument("--format", choices=("json",), default="json")
 
     backfill = subparsers.add_parser("backfill-legacy")
     backfill.add_argument("--packet", type=Path, required=True)
@@ -1354,6 +1410,13 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "censoring-ignorability-diagnostic":
             return cmd_censoring_ignorability_diagnostic(
+                repo_root,
+                census=args.census,
+                observations=args.observations,
+                data_root=args.data_root,
+            )
+        if args.command == "selection-robustness-gate":
+            return cmd_selection_robustness_gate(
                 repo_root,
                 census=args.census,
                 observations=args.observations,

@@ -154,3 +154,22 @@ capabilities:
     determinism_class: SEEDED_DETERMINISTIC
     promotion_authority: NONE
     query_recipe_required: false
+
+  - capability_id: CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001
+    status: ACCEPTED
+    entrypoint: solana_alpha_lab.factory.capabilities:run_selection_robustness_gate
+    implementation_asset_ids:
+      - MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001
+    parameter_schema_asset_id: SCHEMA-EXPERIMENT-SPEC-001
+    input_kinds:
+      - CATALOG_ASSET
+    output_kinds:
+      - RESEARCH_ARTIFACT
+    effect_class: OFFLINE_READ_ONLY
+    output_zone: DATA_ROOT_ONLY
+    provider_policy_asset_id: null
+    max_provider_calls: 0
+    supports_pit: true
+    determinism_class: SEEDED_DETERMINISTIC
+    promotion_authority: NONE
+    query_recipe_required: false

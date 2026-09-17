@@ -16,6 +16,11 @@ from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
     CensoringDiagnosticError,
     run_from_capability_spec,
 )
+from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+    CAP_HFIC_SELECTION_ROBUSTNESS_GATE,
+    SelectionRobustnessGateError,
+    run_from_capability_spec as run_selection_gate_from_capability_spec,
+)
 from solana_alpha_lab.factory.market_feature_surface import (
     CAP_OFFLINE_MARKET_FEATURE_RESOLVE,
     FeatureSurfaceError,
@@ -639,6 +644,26 @@ def run_censoring_ignorability_diagnostic(
         raise CapabilityError(str(exc)) from exc
 
 
+def run_selection_robustness_gate(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    authority_phrase: str | None = None,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Offline Stage-1 + Block-A logistic selection gate. Zero provider calls."""
+
+    del authority_phrase
+    try:
+        return run_selection_gate_from_capability_spec(
+            spec,
+            root=root,
+            capture_hooks=capture_hooks,
+        )
+    except (CensoringDiagnosticError, SelectionRobustnessGateError) as exc:
+        raise CapabilityError(str(exc)) from exc
+
+
 def compile_observation_schedule(
     spec: Mapping[str, Any],
     *,
@@ -674,6 +699,7 @@ CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_OFFLINE_MARKET_FEATURE_RESOLVE: resolve_market_feature_surface,
     CAP_OBSERVATION_SCHEDULE_COMPILE_BIND: compile_observation_schedule,
     CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC: run_censoring_ignorability_diagnostic,
+    CAP_HFIC_SELECTION_ROBUSTNESS_GATE: run_selection_robustness_gate,
 }
 
 
@@ -708,6 +734,8 @@ def execute_capability(
     if capability_id == CAP_OBSERVATION_SCHEDULE_COMPILE_BIND and budget != 0:
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     if capability_id == CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC and budget != 0:
+        raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
+    if capability_id == CAP_HFIC_SELECTION_ROBUSTNESS_GATE and budget != 0:
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     return handler(
         spec,
