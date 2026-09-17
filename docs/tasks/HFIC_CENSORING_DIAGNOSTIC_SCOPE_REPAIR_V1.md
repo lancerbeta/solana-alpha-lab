@@ -122,9 +122,9 @@ mutate frozen spec YAML/SHA, pins, parquet, manifests or LIVE CORPUS.
 ## Decision packet
 
 - **DECISION_DELTA:** keep full-file canonical bind; project diagnostic
-  census as observation-mint intersection after bind. Receipt 1.1 keeps
-  `counts["census_rows"]` as full-file total; `counts["other"]` aliases
-  `other_in_scope`.
+  census as X300 observation-mint intersection after bind. Receipt 1.1 keeps
+  `counts["census_rows"]` and `counts["other"]` as full-file 1.0 meaning.
+  `UNKNOWN_CENSUS_STATE` keys off `other_in_scope`.
 - **UNCERTAINTY_REMOVED:** whether 138234 capacity/hash/predicate rows
   outside the observation-mint set can still force `UNKNOWN_CENSUS_STATE`.
 - **CAPABILITY_OR_EVIDENCE:** scoped diagnostic + tests A–H + pinned
@@ -138,8 +138,8 @@ mutate frozen spec YAML/SHA, pins, parquet, manifests or LIVE CORPUS.
 ## Required semantics
 
 1. Full-file canonical binding unchanged; population projection only after bind.
-2. Diagnostic census = census rows whose mint is in distinct nonempty
-   observation mints.
+2. Diagnostic census = census rows whose mint appears on distinct nonempty
+   X300 observation keys (Y-only membership does not enter the population).
 3. Receipt counts `census_rows_total`, `census_distinct_mints_total`,
    `discovered_in_observation_partition`, `diagnostic_population_census_rows`,
    `diagnostic_population_distinct_mints`, `out_of_scope_census_rows`.
@@ -156,6 +156,7 @@ mutate frozen spec YAML/SHA, pins, parquet, manifests or LIVE CORPUS.
    still inconclusive; out-of-scope excluded-mint duplicates must not kill
    148-vs-327 unless a separate file-level contract forbids them.
 7. Do not mutate historical receipt `2ce8af50…`. Schema 1.1 additive.
+   Keep 1.0 meaning of `counts["other"]` (full-file unexpected states).
    Never report 138234 as `other_in_scope`.
 8. Do not edit `docs/evidence/hfic_censoring_ignorability_diagnostic/a1_denominator_closure_v1.json`.
 

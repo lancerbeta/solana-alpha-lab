@@ -1352,7 +1352,7 @@ class DiagnosticPopulationScopeTests(unittest.TestCase):
         self.assertEqual(receipt["terminal"], _atomic(SHIFT_NOT_DETECTED))
         self.assertNotIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
         self.assertEqual(receipt["counts"]["other_in_scope"], 0)
-        self.assertEqual(receipt["counts"]["other"], 0)
+        self.assertEqual(receipt["counts"]["other"], 3)
         self.assertEqual(receipt["counts"]["out_of_scope_census_rows"], 7)
         self.assertEqual(receipt["counts"]["census_rows_total"], 60)
         self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 53)
@@ -1436,7 +1436,43 @@ class DiagnosticPopulationScopeTests(unittest.TestCase):
         self.assertNotIn("DUPLICATE_CENSUS_MINT", receipt["inconclusive_reasons"])
         self.assertNotIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
         self.assertEqual(receipt["counts"]["other_in_scope"], 0)
+        self.assertEqual(receipt["counts"]["other"], 2)
         self.assertEqual(receipt["comparable_x_subset_n"], 48)
+
+    def test_y_only_mint_does_not_enter_diagnostic_population(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            rows = pq.read_table(census).to_pylist()
+            rows.append(
+                _member("yon000", candidate="WEIRD", denom="observed", anchor="ANCHOR")
+            )
+            _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            obs_rows = pq.read_table(observations).to_pylist()
+            obs_rows.append(_x300("yon000", LIQUIDITY, 1, point_id="Y900"))
+            _write_parquet(observations, obs_rows, OBS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(SHIFT_NOT_DETECTED))
+        self.assertNotIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertEqual(receipt["counts"]["other_in_scope"], 0)
+        self.assertEqual(receipt["counts"]["other"], 1)
+        self.assertEqual(receipt["counts"]["discovered_in_observation_partition"], 54)
+        self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 53)
+        self.assertEqual(receipt["y_point_rows_present_unread"], 1)
+
+    def test_y_only_mint_missing_from_census_is_not_x300_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            obs_rows = pq.read_table(observations).to_pylist()
+            obs_rows.append(_x300("ghosty", LIQUIDITY, 1, point_id="Y900"))
+            _write_parquet(observations, obs_rows, OBS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(SHIFT_NOT_DETECTED))
+        self.assertNotIn(
+            OBSERVATION_MINT_MISSING_FROM_CENSUS,
+            receipt["inconclusive_reasons"],
+        )
+        self.assertEqual(receipt["counts"]["discovered_in_observation_partition"], 54)
+        self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 53)
 
     def test_h_pinned_production_closure_is_read_only_without_permutations(
         self,
@@ -1464,6 +1500,15 @@ class DiagnosticPopulationScopeTests(unittest.TestCase):
         self.assertTrue(payload["did_not_run_scientific_diagnostic"])
         self.assertTrue(payload["ci_must_not_read_machine_local_data_plane"])
         self.assertTrue(payload["historical_receipt_not_mutated"])
+        self.assertEqual(payload["derivation"], "RESEARCH_PIN_NOT_REPRODUCED_THIS_ATOM")
+        self.assertEqual(
+            payload["historical_receipt_other_meaning"],
+            "schema_1_0_full_census_unexpected_states",
+        )
+        self.assertEqual(
+            payload["a1_denominator_closure_gap"],
+            "grouping SQL is FROM census without observation-mint / X300 intersection",
+        )
         impl = Path(censoring_mod.__file__).read_text(encoding="utf-8")
         self.assertNotIn("local/factory_v1/data_plane", impl)
 

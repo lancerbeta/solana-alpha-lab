@@ -37348,7 +37348,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py', repository_path: src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py}
-  integrity: {kind: sha256, sha256: c6baa011ff104c183926136c5d3143ba471ee0141966a8e6df7a35d2dc753b0c}
+  integrity: {kind: sha256, sha256: f250b607c5f382912941332dde7a9f06ad3e925c7d68ac918a06d22e46470c63}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -37367,7 +37367,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py', repository_path: tests/test_hfic_censoring_ignorability_diagnostic_v1.py}
-  integrity: {kind: sha256, sha256: 4e1fe069c94ef550c498e132de4aeebcb0c16bca252b234ffb933fb44d4a4218}
+  integrity: {kind: sha256, sha256: 6022b6d2e1fe33b51a720011c8770cb5974a98fe9f2d60d6593a9058a7059e71}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -37404,7 +37404,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1.md', repository_path: docs/tasks/HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1.md}
-  integrity: {kind: sha256, sha256: baaf961089c6a65043007552842d85bdbd86c9a32c7df46784c6756933e0054d}
+  integrity: {kind: sha256, sha256: ccdb140ad49ec9948b6dc62e7b6a6cb8520961a0f5df6dbb7239c7f8ff41b412}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -37423,7 +37423,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/hfic_censoring_diagnostic_scope_repair/a1_owner_readout_v1.md', repository_path: docs/reports/hfic_censoring_diagnostic_scope_repair/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: b7d212d40248b88f15f581bb4daafd0c3f946855dfe3bcec4b2abddbc33b38fc}
+  integrity: {kind: sha256, sha256: c5a3fc5758c70d3fe8e66b227bdd86490ff8bbd8c67e4734c12abb80b78a785b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001}
@@ -37440,7 +37440,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_pinned_production_closure_v1.json', repository_path: docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_pinned_production_closure_v1.json}
-  integrity: {kind: sha256, sha256: 022a3ec1c5d8bdd9cc3f4ad427567ae47a6a2d6089a594d2920d5269e643c58b}
+  integrity: {kind: sha256, sha256: 2da5f2b5cfb047b6263835e42542bc9cac4d58153d75ea5818fc2ee804eae37e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001}

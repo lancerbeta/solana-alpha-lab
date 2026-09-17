@@ -58,9 +58,9 @@ SHIFT_DETECTED = "CENSORING_OBSERVED_X_SHIFT_DETECTED"
 SHIFT_NOT_DETECTED = "CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED"
 INCONCLUSIVE = "CENSORING_DIAGNOSTIC_INCONCLUSIVE"
 OBSERVATION_MINT_MISSING_FROM_CENSUS = "OBSERVATION_MINT_MISSING_FROM_CENSUS"
-# Receipt 1.1: counts["census_rows"] stays full-file total. counts["other"] is
-# an alias of other_in_scope (in-scope unexpected states only). Out-of-scope
-# pre-X exclusions are out_of_scope_census_rows, never other_in_scope.
+# Receipt 1.1: counts["census_rows"] and counts["other"] keep 1.0 full-file
+# meaning. UNKNOWN_CENSUS_STATE keys off other_in_scope. Diagnostic census is
+# X300 observation mints after bind, not Y-only membership.
 RECEIPT_SCHEMA_VERSION = "1.1"
 ANCHOR_UNRESOLVED = "CENSORING_NO_COMPARABLE_X300_ANCHOR_UNRESOLVED"
 ADMITTED_NOT_X_ELIGIBLE = "CENSORING_ADMITTED_NOT_X_ELIGIBLE"
@@ -791,6 +791,14 @@ def _parquet_distinct_mints(path: Path) -> set[str]:
     return {str(row[0]) for row in rows if str(row[0] or "")}
 
 
+def _census_four_way(candidate: str, denom: str) -> bool:
+    if candidate == "X_ELIGIBLE" and denom in {"observed", "censored_late"}:
+        return True
+    if candidate == "ADMITTED" and denom == "censored_late":
+        return True
+    return candidate == "X_POPULATION_INELIGIBLE"
+
+
 def _group_label(row: Mapping[str, Any]) -> str | None:
     candidate = str(row.get("candidate_state") or "")
     denom = str(row.get("denominator_state") or "")
@@ -1100,6 +1108,11 @@ def _execute_censoring_diagnostic(
         observations_path, "scientific_context_session"
     )
     observation_mints = _parquet_distinct_mints(observations_path)
+    x300_mints = {
+        str(row.get("mint") or "")
+        for row in unique_obs
+        if str(row.get("mint") or "")
+    }
     rng = random.Random(_seed_int(str(spec["permutation_seed"])))
     census_rows_total = len(census_rows)
     census_distinct_mints_total = len(
@@ -1115,12 +1128,12 @@ def _execute_censoring_diagnostic(
         if str(row.get("mint") or "")
     }
     observation_mint_missing_from_census = any(
-        mint not in census_mints for mint in observation_mints
+        mint not in census_mints for mint in x300_mints
     )
     diagnostic_rows = [
         row
         for row in census_rows
-        if str(row.get("mint") or "") in observation_mints
+        if str(row.get("mint") or "") in x300_mints
     ]
     diagnostic_distinct_mints = {
         str(row.get("mint") or "")
@@ -1133,7 +1146,7 @@ def _execute_censoring_diagnostic(
         if (
             mint
             and str(row.get("candidate_state") or "") == "X_ELIGIBLE"
-            and mint not in observation_mints
+            and mint not in x300_mints
         ):
             eligible_missing_from_observations = True
 
@@ -1150,7 +1163,14 @@ def _execute_censoring_diagnostic(
         "admitted_censored_late_no_x300": 0,
         "x_population_ineligible": 0,
         "other_in_scope": 0,
-        "other": 0,
+        "other": sum(
+            1
+            for row in census_rows
+            if not _census_four_way(
+                str(row.get("candidate_state") or ""),
+                str(row.get("denominator_state") or ""),
+            )
+        ),
     }
     members: list[dict[str, Any]] = []
     unresolved: list[dict[str, Any]] = []
@@ -1202,7 +1222,6 @@ def _execute_censoring_diagnostic(
             counts["x_population_ineligible"] += 1
         else:
             counts["other_in_scope"] += 1
-            counts["other"] += 1
         if not mint:
             empty_mint = True
             continue
