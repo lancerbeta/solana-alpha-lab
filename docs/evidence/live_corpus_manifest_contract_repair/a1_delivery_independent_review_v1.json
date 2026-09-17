@@ -65,10 +65,7 @@
       ]
     }
   ],
-  "remediation_history": [
-    "CLOSED_DATASET_TO_PUBLISHED_CLOCK_BACKDATE",
-    "CLOSED_SELF_SUPERSESSION_ON_FIRST_IMPORT_RECOVERY"
-  ],
+  "remediation_history": [],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
