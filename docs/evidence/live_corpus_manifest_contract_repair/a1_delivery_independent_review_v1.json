@@ -4,8 +4,8 @@
   "review_id": "LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-17",
   "task_id": "LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1",
-  "reviewed_bindings_sha256": "f7f056ea6dfb0a6d39594ddbe227e62fde92d6c774551435e6b8682f10b36c8d",
-  "reviewed_inventory_sha256": "a1367a088d591d50f24a6594f81922e62f8f9932960848afec3899fe12832ee8",
+  "reviewed_bindings_sha256": "feb897d2dc1f4c98a0b506600c27ab585f1e09163aed1ac98a207517fa792315",
+  "reviewed_inventory_sha256": "5cc6f50ae2b81bd0f276653a2746176e3043c105b2d70f868c25025cb233db03",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

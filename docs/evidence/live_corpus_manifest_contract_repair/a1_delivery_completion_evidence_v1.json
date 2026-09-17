@@ -20,6 +20,7 @@
     "catalog/catalog_manifest.yaml": "d1e4eb642993af9497a4235440f50d220ded2a05980b9d6b8d61abe357806d6d",
     "catalog/generated/asset_edges.json": "54be3950056ba39c114e16b0161292a3743a4ffdd96fa6dba4995aafc590b7d8",
     "docs/PROJECT_MAP.md": "26a8d257fe6ca6da44138fabf37afce9ac9227fb95f5947f207089c8169a5f29",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "793c44680ce90452f1883bc6e616879d28a83d3fa19f1986797293c5762a80aa",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "579acd4a6df81c9afd141ca573b142e2920d33ddcc121ba2e97353e254d635fe",
     "docs/reports/live_corpus_manifest_contract_repair/a1_owner_readout_v1.md": "185470b37bd4b167965da4182ac1a303a58ad5202b1582ee46222e470421499f",
     "docs/tasks/LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1.md": "78bfdb1b39883a9bbbb90dd6a68c2f504deeea1d899d5afd632899728bc22b1b",
@@ -39,14 +40,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_corpus_manifest_contract_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "6141ae76280de63b8b974c4acb7e311fc1f2f8dae740020ecb163d7898a6df43",
+    "sha256": "911924a20a685f43619a9223af1add2183c845d2c7e13677847db0f5a47eba64",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR",
     "independent_review": {
       "path": "docs/evidence/live_corpus_manifest_contract_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "6468dad73404bed0203ecfcde4379cf7e8e827a8a2f29106eb7d063d4a4175eb",
+      "sha256": "ac036fd0de09ec61449482a8edeb1faee4cf460a3c9f6598bbfb42a778669b60",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
