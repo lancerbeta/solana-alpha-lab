@@ -1130,6 +1130,7 @@ def build_forge_context_packet(
     evidence_surface_mode: str | None = None,
     persist: bool = True,
     search_payloads: Sequence[Mapping[str, Any]] | None = None,
+    selection_caveat: Mapping[str, Any] | None = None,
 ) -> tuple[dict[str, Any], str]:
     packet_bound = forge_context_packet_max_bytes(evidence_surface_mode)
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
@@ -1425,6 +1426,12 @@ def build_forge_context_packet(
             ),
         },
     }
+    if selection_caveat is not None:
+        packet["selection_robustness_caveat"] = {
+            "router_decision": str(selection_caveat.get("router_decision") or ""),
+            "gate_receipt_sha256": str(selection_caveat.get("gate_receipt_sha256") or ""),
+            "limitation": "RESIDUAL_UNMEASURED_SELECTION_UNCERTAINTY",
+        }
     from solana_alpha_lab.factory.hfic_control_integrity import (
         CURRENT_REPRESENTATION_CONTROL_V1,
     )
@@ -1682,6 +1689,55 @@ def run_preflight(
         if isinstance(composite, str) and len(composite) == 64:
             git_composite = composite
 
+    selection_caveat = None
+    selection_gate_view = None
+    from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+        apply_selection_gate_to_preflight,
+        load_applicable_gate_receipt,
+    )
+
+    selection_gate_view = apply_selection_gate_to_preflight(
+        action,
+        load_applicable_gate_receipt(Path(data_root), root=Path(repo_root)),
+    )
+    if (
+        selection_gate_view.get("applicable")
+        and selection_gate_view.get("action") == "STOP"
+    ):
+        stop_body = {
+            "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": selection_gate_view.get("terminal"),
+            "router_decision": selection_gate_view.get("router_decision"),
+            "next": "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+            "owner_focus": focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": epoch,
+            "focus_key_sha256": focus_key,
+            "search_key_sha256": search_key,
+            "memory_policy_head_sha256": policy_head["policy_sha256"],
+            "memory_eligibility_sha256": memory_eligibility,
+            "session_id": None,
+            "selection_gate": {
+                "applicable": True,
+                "router_decision": selection_gate_view.get("router_decision"),
+                "gate_receipt_sha256": selection_gate_view.get(
+                    "gate_receipt_sha256"
+                ),
+            },
+            "forge_context_packet": {},
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
+        if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+            stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+        return stop_body
+    if selection_gate_view.get("caveat"):
+        selection_caveat = selection_gate_view
+
     receipt_body = {
         "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
         "action": action,
@@ -1746,9 +1802,17 @@ def run_preflight(
         store=store,
         stage_time=session_started,
         evidence_surface_mode=control_mode,
+        selection_caveat=selection_caveat,
     )
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest
+    if selection_gate_view and selection_gate_view.get("applicable"):
+        receipt_body["router_decision"] = selection_gate_view.get("router_decision")
+        receipt_body["selection_gate"] = {
+            "applicable": True,
+            "router_decision": selection_gate_view.get("router_decision"),
+            "gate_receipt_sha256": selection_gate_view.get("gate_receipt_sha256"),
+        }
     try:
         digest = store.diagnostics().committed_inventory_sha256
     except ResearchStoreError as exc:

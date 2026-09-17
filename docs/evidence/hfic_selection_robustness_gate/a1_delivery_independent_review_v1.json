@@ -1,0 +1,96 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-SELECTION-ROBUSTNESS-GATE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
+  "reviewed_bindings_sha256": "e1708cd0fed01549ea897581322d7d2afed246809669cd4b9378cc2e57cbf035",
+  "reviewed_inventory_sha256": "260695bf1e52f7fa130309e921d3ef1bb80cc1558b772d085c7bd11e35d4fce6",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=8fdd2a4aaf4b4798611e0bc985dc39cb1599a2a2fc930c553fd9ae2fceca0f61",
+        "independence.claim_scope=PACKET_INFORMATION_PATH",
+        "implementation_transcript_seen=false",
+        "C1_BINDING_IDENTITY_ON_STAGE2_SKIP",
+        "C2_BIND_CANONICAL_THEN_SEVEN_FIELD_EQUALITY",
+        "C3_STALE_VALID_HASH_NOT_NONE_NOT_CURRENT_BLOCK",
+        "C4_MATCHING_ROUTING_AND_BUDGET_PRESERVED",
+        "NO_GIT_HEAD_AS_APPLICABILITY_IDENTITY",
+        "NO_MAR_NO_IDENTIFICATION"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "RECEIPT_APPLICABLE_ONLY_ON_CURRENT_CORPUS_BINDING",
+        "DATASET_MANIFEST_ID_RUNTIME_NOT_SPEC_FROZEN",
+        "IDENTITY_MISMATCH_EVIDENCE_GAP_NOT_MISSING",
+        "IDENTITY_FREE_HASHED_RECEIPT_FAIL_CLOSED",
+        "STAGE1_FROZEN_SPEC_UNTOUCHED",
+        "NO_Y_NO_PROVIDER"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NAMED_CONSUMER_ORDINARY_FORGE_PREFLIGHT",
+        "STALE_MANIFEST_CANNOT_ALLOW_OR_FAKE_SELECTION_RISK",
+        "MATCHING_RECEIPT_KEEPS_BLOCK_AND_CAVEAT",
+        "SEARCH_BUDGET_EXHAUSTED_PRESERVED",
+        "NO_LIVE_CORPUS_OPERATE_THIS_ATOM"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PRIMARY_FIELD_ROUTER_DECISION",
+        "STALE_LATEST_JSON_STOPS_NEW_SESSION_AS_EVIDENCE_GAP",
+        "MISSING_LATEST_JSON_ORDINARY_FORGE",
+        "STALE_FILE_NOT_AUTO_DELETED",
+        "CAVEAT_IS_LIMITATION_NOT_IDENTIFICATION"
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "MAJOR",
+      "finding": "Present directory/non-file latest.json was treated as missing gate evidence",
+      "observed_head": "d45b8241f7123d75e6c0b57d85e96290c739ee55",
+      "resolved_by_head": "c01cacf5a5835be0ac7ca2afd8b96eabb94fc068"
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "SEARCH_BUDGET_EXHAUSTED was rewritten as a selection STOP without applicable gate evidence",
+      "observed_head": "d45b8241f7123d75e6c0b57d85e96290c739ee55",
+      "resolved_by_head": "c01cacf5a5835be0ac7ca2afd8b96eabb94fc068"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_MNAR",
+    "NO_LIVE_CORPUS_GATE_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ]
+}

@@ -1,0 +1,100 @@
+schema: smial.hfic-selection-robustness-gate-spec
+schema_version: '1.0'
+spec_id: HFIC_SELECTION_ROBUSTNESS_GATE_V1
+as_of: '2026-09-17'
+capability_id: CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001
+stage1_capability_id: CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001
+stage1_spec_relative: configs/hfic_censoring_ignorability_diagnostic_v1.yaml
+named_consumer: HFIC-POST-NO-WORTHY-ROUTER
+promotion_authority: NONE
+effect_class: OFFLINE_READ_ONLY
+determinism_class: SEEDED_DETERMINISTIC
+supports_pit: true
+canonical_corpus:
+  dataset_id: DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001
+  cohort_id: REL-20260902T111900Z-20260909T111900Z
+  release_id: 633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154
+  census_sha256: cfa7d8404dc5400c4e223c4d5303193ad2209f92cac3af2d61862e384ebfd5bf
+  observations_sha256: 7b26425c69cc95baf8a9e0b9ea506de1042b98b83d48a2dae07f5a33a7d66d7d
+  scientific_context_session: HFIC-SESS-560C4E1A72B4F9E6
+y_point_prefix: Y
+allowed_point_id: X300
+exclusion_policy_id: HFIC_SELECTION_BLOCK_A_EXCLUSION_V1
+exclusion_policy_version: '1.0'
+comparable_x_rule: census.candidate_state == X_ELIGIBLE
+cv_folds: 5
+cv_seed: A17C9E02
+l2_lambda: 1.0
+oof_auc_threshold: 0.57
+permutation_count: 999
+permutation_seed: A17C9E02
+permutation_p_threshold: 0.05
+rare_level_min_joint_n: 8
+rare_level_label: OTHER
+preprocessing:
+  continuous:
+    - training_fold_median_imputation
+    - training_fold_standardization
+    - explicit_missingness_indicator
+  categorical:
+    - deterministic_one_hot
+    - stage1_rare_level_policy_fold_local
+    - unseen_test_level_to_OTHER
+block_a_omnibus:
+  - feature_id: log1p_liquidity_usd
+    field_id: FIELD-LIQUIDITY-USD-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: log1p_market_cap_usd
+    field_id: FIELD-MARKET-CAP-USD-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: log1p_usd_price
+    field_id: FIELD-USD-PRICE-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: log1p_holder_count
+    field_id: FIELD-HOLDER-COUNT-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: launchpad
+    field_id: FIELD-LAUNCHPAD-001
+    value_kind: TEXT
+    transform: rare_level_collapse
+    role: categorical
+excluded_fields:
+  - FIELD-TOKEN-MINT-001
+  - FIELD-FIRST-POOL-CREATED-AT-001
+  - FIELD-FIRST-SEEN-AT-001
+  - FIELD-FIRST-POOL-SOURCE-001
+  - FIELD-R0-TAKER-VOLUME-MIX-001
+  - FIELD-STATS5M-BUY-VOLUME-001
+  - FIELD-STATS5M-NUM-BUYS-001
+  - FIELD-STATS5M-NUM-NET-BUYERS-001
+  - FIELD-STATS5M-NUM-SELLS-001
+  - FIELD-STATS5M-NUM-TRADERS-001
+  - FIELD-STATS5M-SELL-VOLUME-001
+  - FIELD-STATS5M-TAKER-VOLUME-001
+stage2_terminals:
+  - SELECTION_PREDICTABILITY_DETECTED
+  - SELECTION_PREDICTABILITY_NOT_DETECTED
+  - SELECTION_PREDICTABILITY_INCONCLUSIVE
+router_decisions:
+  - BLOCK_FORGE_SELECTION_RISK
+  - BLOCK_FORGE_EVIDENCE_GAP
+  - FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT
+non_claims:
+  - NO_MAR
+  - NO_IGNORABILITY
+  - NO_IDENTIFIABILITY
+  - NO_RANDOM_SAMPLE_CERTIFICATION
+  - NO_MNAR
+  - NO_ALPHA
+  - NO_CAUSAL_MECHANISM
+  - NO_MARKET_HYPOTHESIS_VALIDITY
+  - NO_Y_POINT_READ
+  - NO_CANONICAL_ACTIVE_RDP_RUN_THIS_ATOM

@@ -25648,7 +25648,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: bf40fa15ce2b78764650b0b678eb5f6b981081aff086e186e6d244a04ce5cb2c}
+  integrity: {kind: sha256, sha256: bff643190dac24712086cd58c2ce5bd8731fc4927feaf837188156c0e6115cc9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-PRODUCT-KERNEL-001}
@@ -25971,7 +25971,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_COMMISSIONING_HYPOTHESIS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/capabilities.py', repository_path: src/solana_alpha_lab/factory/capabilities.py}
-  integrity: {kind: sha256, sha256: bf40fa15ce2b78764650b0b678eb5f6b981081aff086e186e6d244a04ce5cb2c}
+  integrity: {kind: sha256, sha256: bff643190dac24712086cd58c2ce5bd8731fc4927feaf837188156c0e6115cc9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-V1-COMMISSIONING-HYPOTHESIS-001}
@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: ae3f4823fce0f129b819558088d67ea501c183544c18538124decf5eaebf7be9}
+  integrity: {kind: sha256, sha256: 945e61cc8fc5e49b6a2474e679a0edb64ba5cebf60efd94a0002f39d7eab5ec5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -32287,7 +32287,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 45af3f1335ba8d4a84891eaedb213267b2e756cfb8d4f01d19fcdad575b5e0c2}
+  integrity: {kind: sha256, sha256: 6c7a5da0b75de04f9f65b552a6995edf78e5b33ceb87854b052bbb61e1876d6f}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -33021,7 +33021,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/experiment_capability_registry_v2.yaml', repository_path: configs/experiment_capability_registry_v2.yaml}
-  integrity: {kind: sha256, sha256: 8ca89cf650ad3af11c1482d50eee4bd94ee96a4490105aa9fcba30b75b328f89}
+  integrity: {kind: sha256, sha256: 35a4f94ed6bf544760824f0f6cad55b2effbd25783f8aaa168ead7ab7212674b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33440,7 +33440,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_discovery_evidence_release_bridge.py', repository_path: tests/test_discovery_evidence_release_bridge.py}
-  integrity: {kind: sha256, sha256: 6d58f9bf69a076f20fc5ea64d25f9754463bb7106f9304154ac02349095fc406}
+  integrity: {kind: sha256, sha256: 2f6d3044f3a043fcae5dc777689695d2fabdfafd81174fc281be7b72e678391f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -37447,4 +37447,94 @@ records:
   consumers: [FACTORY-001, GOAL-OWNER]
   evidence: []
   search_terms: [HFIC, CENSORING, PINNED_CLOSURE, OBSERVATION_MINT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for the durable post-NO_WORTHY two-stage selection gate that emits one typed router_decision without auto-Forge or a third diagnostic.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md', repository_path: docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md}
+  integrity: {kind: sha256, sha256: 1557e84261505010232911912c55b6a7b4b4c7bca2d453c8d4f5f3b5b73e0f20}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SELECTION, ROBUSTNESS, GATE, BLOCK_A]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-HFIC-SELECTION-ROBUSTNESS-GATE-V1-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen Block-A logistic OOF-AUC selection-robustness spec, router terminals, and Stage-1 composition pins.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/hfic_selection_robustness_gate_v1.yaml', repository_path: configs/hfic_selection_robustness_gate_v1.yaml}
+  integrity: {kind: sha256, sha256: db4cdd40edf92e05a7a9ec6cabc181783c8729c3ac7079e80373797be0d0ac0d}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SELECTION, SPEC, BLOCK_A]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Offline two-stage selection gate composing frozen Stage-1 with one L2-logistic OOF-AUC falsifier and a pure Forge router; Y-point denial; promotion_authority NONE.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py', repository_path: src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py}
+  integrity: {kind: sha256, sha256: 2ab9b65deae90fda50cd0c92e09861f1af7034c9a6c0e34700aa8c6f5618f452}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-HFIC-SELECTION-ROBUSTNESS-GATE-V1-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SELECTION, LOGISTIC, ROUTER]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Synthetic proofs for Stage-1 freeze, skip/run routing, Block-A universe, leakage denial, fold-local preprocessing, terminals, and Forge consumption.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_selection_robustness_gate_v1.py', repository_path: tests/test_hfic_selection_robustness_gate_v1.py}
+  integrity: {kind: sha256, sha256: 4954c10881563849f21500c284fa56c5413e70ebfde4168d7c58deb4a47cbea9}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  - {relation_type: validated_by, target_asset_id: MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SELECTION, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-HFIC-SELECTION-ROBUSTNESS-GATE-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner readout for the selection-robustness gate without a live scientific OPERATE result.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-17'
+  truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md', repository_path: docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: 94050ec0773059506e76f5ae3a05b87ead565e22bdf9040bf65e6f92b0fe5418}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  consumers: [GOAL-OWNER]
+  evidence: []
+  search_terms: [HYPOTHESIS_FORGE, HFIC, SELECTION, READOUT]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

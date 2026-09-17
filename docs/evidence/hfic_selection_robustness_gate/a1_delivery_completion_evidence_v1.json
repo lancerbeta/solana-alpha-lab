@@ -1,0 +1,77 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-SELECTION-ROBUSTNESS-GATE-ACCEPT-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
+  "state_change": "Registered CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001 composing frozen Stage 1 with one Block-A L2-logistic OOF-AUC falsifier, a typed router_decision, and ordinary Forge preflight consumption bound to current CanonicalCorpusBinding identity. Canonical LIVE CORPUS OPERATE remains out of this atom.",
+  "base_main": "503de99469f972fbabc10a6161159865df6d5d37",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "d3f05eba3669c341738c28523288f20aa0e69a614d965e59da0d77439fdb4eda",
+    "catalog/assets/lifecycle.yaml": "eecaa3a3da5853e4d11e0edcdc5095888907c5868cbca14e70522aa8914f1474",
+    "catalog/catalog_manifest.yaml": "a5e7bf8496d03e82ff993c6dfed7c5038e2203ff134167877830797419d217ec",
+    "catalog/generated/asset_edges.json": "4fbf8ac883fea4706528de06d80230b2f22a611ba2191421d886befeeec6868e",
+    "configs/experiment_capability_registry_v2.yaml": "35a4f94ed6bf544760824f0f6cad55b2effbd25783f8aaa168ead7ab7212674b",
+    "configs/hfic_selection_robustness_gate_v1.yaml": "db4cdd40edf92e05a7a9ec6cabc181783c8729c3ac7079e80373797be0d0ac0d",
+    "docs/PROJECT_MAP.md": "d7268777e96d9d508ecde0ee4898a4419e8604b1614f44da85903d5e1fea5b1e",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "a267bb804e6b31f1af218944840aa8d14a45acc96c1775b551f5c11c22958cf5",
+    "docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md": "94050ec0773059506e76f5ae3a05b87ead565e22bdf9040bf65e6f92b0fe5418",
+    "docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md": "1557e84261505010232911912c55b6a7b4b4c7bca2d453c8d4f5f3b5b73e0f20",
+    "scripts/hypothesis_forge.py": "6c7a5da0b75de04f9f65b552a6995edf78e5b33ceb87854b052bbb61e1876d6f",
+    "src/solana_alpha_lab/factory/capabilities.py": "bff643190dac24712086cd58c2ce5bd8731fc4927feaf837188156c0e6115cc9",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "32d0486a027f0bbb4a2bb7a2db6bfb48da54b4c10695ff5ba40e8e9b55a2b068",
+    "src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py": "2ab9b65deae90fda50cd0c92e09861f1af7034c9a6c0e34700aa8c6f5618f452",
+    "tests/test_discovery_evidence_release_bridge.py": "2f6d3044f3a043fcae5dc777689695d2fabdfafd81174fc281be7b72e678391f",
+    "tests/test_factory_ordinary_market_hypothesis.py": "945e61cc8fc5e49b6a2474e679a0edb64ba5cebf60efd94a0002f39d7eab5ec5",
+    "tests/test_hfic_selection_robustness_gate_v1.py": "4954c10881563849f21500c284fa56c5413e70ebfde4168d7c58deb4a47cbea9"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_factory_fit_v1.json",
+    "sha256": "4e6ea5ff3fb538d21e4ecfd99df06a3b8ec1d5d15dd37c92099ba9f93b019592",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_HFIC_SELECTION_ROBUSTNESS_GATE",
+    "independent_review": {
+      "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_independent_review_v1.json",
+      "sha256": "ccd5b261fe771cd927031fe932d5c600d44c3d0de2f871bdd9cac0b723825612",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_HFIC_SELECTION_ROBUSTNESS_GATE",
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_MNAR",
+    "NO_LIVE_CORPUS_GATE_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "data_plane_mutation": 0,
+    "provider_calls": 0
+  }
+}

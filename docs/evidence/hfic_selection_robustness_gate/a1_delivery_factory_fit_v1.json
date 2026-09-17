@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-SELECTION-ROBUSTNESS-GATE-FACTORY-FIT-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
+  "reviewed_bindings_sha256": "e1708cd0fed01549ea897581322d7d2afed246809669cd4b9378cc2e57cbf035",
+  "reviewed_inventory_sha256": "260695bf1e52f7fa130309e921d3ef1bb80cc1558b772d085c7bd11e35d4fce6",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_SELECTION_GATE_NOT_MARKET_TEST",
+    "flexibility_and_history": "PASS_PRIOR_HFIC_SESSIONS_UNTOUCHED",
+    "context_efficiency": "PASS_SYNTHETIC_FIXTURE_ONLY",
+    "research_truth": "PASS_RECEIPT_BOUND_TO_CANONICAL_CORPUS_IDENTITY",
+    "owner_operability": "PASS_TYPED_ROUTER_DECISION",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OPERATE_THIS_ATOM",
+    "monitoring_and_recovery": "PASS_STALE_IDENTITY_FAIL_CLOSED_GAP",
+    "build_vs_buy": "PASS_REUSE_STAGE1_STDLIB_LOGISTIC",
+    "security": "PASS_NO_SECRETS_NO_PATH_LEAK",
+    "red_team": "PASS_BLOCK_A_LEAKAGE_AND_Y_DENY"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "CANONICAL_OPERATE_SELECTION_ROBUSTNESS_GATE_AFTER_MERGE"
+  },
+  "recovery": "Revert CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001 registry row, capability router entry, CLI subcommand, and Forge preflight consumption seam; keep frozen Stage-1 spec, pins, and prior HFIC sessions untouched.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_MNAR",
+    "NO_LIVE_CORPUS_GATE_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ]
+}
