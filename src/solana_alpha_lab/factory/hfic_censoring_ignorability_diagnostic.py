@@ -1142,9 +1142,10 @@ def _execute_censoring_diagnostic(
     )
     observation_mints = _parquet_distinct_mints(observations_path)
     x300_mints = {
-        str(row.get("mint") or "")
+        mint
         for row in obs_rows
-        if str(row.get("mint") or "")
+        if (mint := str(row.get("mint") or ""))
+        and str(row.get("field_id") or "")
     }
     rng = random.Random(_seed_int(str(spec["permutation_seed"])))
     census_rows_total = len(census_rows)

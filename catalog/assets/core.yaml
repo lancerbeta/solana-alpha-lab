@@ -37348,7 +37348,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py', repository_path: src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py}
-  integrity: {kind: sha256, sha256: 2014e37eacad2836779cf9c4557d73ffacac1b65396bb01c1f9dc8f04a0ce42a}
+  integrity: {kind: sha256, sha256: 2705e6841980523692416d269fd03665abdb619e304a639dbf2d97b5510855e5}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -37367,7 +37367,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py', repository_path: tests/test_hfic_censoring_ignorability_diagnostic_v1.py}
-  integrity: {kind: sha256, sha256: 13b50f0eb718faf2740fc103564ac55a744baad090f35b0987cc3e77394a1ccb}
+  integrity: {kind: sha256, sha256: 4c7cad915d3868a17511a10b57158918d0cd742db735b250fe39da35b6e94792}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}

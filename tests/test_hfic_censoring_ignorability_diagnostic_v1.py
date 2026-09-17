@@ -1463,6 +1463,28 @@ class DiagnosticPopulationScopeTests(unittest.TestCase):
         self.assertEqual(receipt["counts"]["other_in_scope"], 1)
         self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 54)
 
+    def test_x300_row_without_field_id_is_not_an_observation_key(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            rows = pq.read_table(census).to_pylist()
+            rows.append(
+                _member("ghostkey", candidate="WEIRD", denom="observed", anchor="ANCHOR")
+            )
+            _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            obs_rows = pq.read_table(observations).to_pylist()
+            obs_rows.append(_x300("ghostkey", "", 1))
+            _write_parquet(observations, obs_rows, OBS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(SHIFT_NOT_DETECTED))
+        self.assertNotIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertNotIn(
+            OBSERVATION_MINT_MISSING_FROM_CENSUS,
+            receipt["inconclusive_reasons"],
+        )
+        self.assertEqual(receipt["counts"]["other_in_scope"], 0)
+        self.assertEqual(receipt["counts"]["other"], 1)
+        self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 53)
+
     def test_y_only_mint_does_not_enter_diagnostic_population(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
