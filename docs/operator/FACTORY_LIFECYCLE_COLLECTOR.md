@@ -581,8 +581,9 @@ cohort appears in lineage; do not paste the placeholder `REL-...`.
 
 Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
 `PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
-`LOW_YIELD`, `IMPORT_CONFLICT`, `SOURCE_BUILD_RESOURCE_LIMIT`. FAIL JSON
-may include `next`. `LOW_YIELD`
+`LOW_YIELD`, `IMPORT_CONFLICT`, `SOURCE_BUILD_RESOURCE_LIMIT`,
+`DATASET_PUBLICATION_INCOMPLETE`, `LIVE_CORPUS_PARQUET_SYMLINK`,
+`CORPUS_PARQUET_SHA_MISMATCH`. Typed FAIL JSON includes `next`. `LOW_YIELD`
 is raised before import when projected cumulative yield is below
 `MIN_USABLE_YIELD_ELIGIBLE`. `GAP_SUSPECTED` and another cohort being ACTIVE
 are not crashes. `GAP_CONFIRMED` is not sealable.
@@ -607,6 +608,10 @@ If repair fail-closes with `CORPUS_LINEAGE_INCOMPLETE` or
 `DATASET_TERMINAL_MISSING`, JSON `next` is
 `STOP_RESTORE_LINEAGE_THEN_RETRY_REPAIR` or
 `STOP_RESTORE_LABELS_THEN_RETRY_REPAIR`. Do not loop the same repair.
+`DATASET_PUBLICATION_INCOMPLETE` has `next`
+`REPAIR_LIVE_CORPUS_METADATA_FIRST`. `LIVE_CORPUS_PARQUET_SYMLINK` and
+`CORPUS_PARQUET_SHA_MISMATCH` stop (`STOP_DO_NOT_FOLLOW_PARQUET_SYMLINK` /
+`STOP_DO_NOT_REPAIR_PARQUET_DRIFT`).
 
 Only after that published root exists, retry the canonical censoring
 diagnostic. Do not treat Git catalog/capability epoch movement as new

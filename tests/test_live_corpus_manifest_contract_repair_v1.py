@@ -894,6 +894,18 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                     data_root / "datasets" / "manifests" / f"{new_mid}.published"
                 ).is_file()
             )
+            lineage_after = json.loads(
+                (
+                    data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertNotEqual(
+                lineage_after["cohorts"][-1].get("superseded_dataset_manifest_id"),
+                new_mid,
+            )
+            self.assertIsNone(
+                lineage_after["cohorts"][-1].get("superseded_dataset_manifest_id")
+            )
 
 
 if __name__ == "__main__":

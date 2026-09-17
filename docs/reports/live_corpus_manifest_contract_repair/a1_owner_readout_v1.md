@@ -29,6 +29,9 @@ If `import-live` was blocked with `CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAI
 (`next` = `REPAIR_LIVE_CORPUS_METADATA_FIRST`), paste the exact same
 `import-live` command after repair. If repair itself is interrupted or
 `.published` is missing/corrupt, rerun the same repair command.
+`DATASET_PUBLICATION_INCOMPLETE` uses the same repair next.
+`LIVE_CORPUS_PARQUET_SYMLINK` / `CORPUS_PARQUET_SHA_MISMATCH` are stop codes,
+not a second repair loop.
 
 Then retry the canonical censoring diagnostic. Do not run Forge
 between this merge and that retry merely because Git catalog hashes moved

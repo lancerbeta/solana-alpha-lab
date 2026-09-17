@@ -885,11 +885,17 @@ def repair_live_corpus_manifests(
                 allow_measure=True,
             )
         )
-    superseded = latest.get("superseded_dataset_manifest_id")
+    superseded_stored = latest.get("superseded_dataset_manifest_id")
+    superseded = (
+        str(superseded_stored)
+        if isinstance(superseded_stored, str) and superseded_stored
+        else None
+    )
+    if superseded == repaired_mid:
+        superseded = None
     if not str(latest.get("dataset_version") or "").endswith(CANONICAL_METADATA_SUFFIX):
-        superseded = str(current_mid)
-    else:
-        superseded = str(superseded or current_mid)
+        if current_mid != repaired_mid:
+            superseded = str(current_mid)
     latest["superseded_dataset_manifest_id"] = superseded
     latest["dataset_manifest_id"] = repaired_mid
     latest["dataset_version"] = repaired_version
@@ -1131,6 +1137,7 @@ def import_live_cohort_canonical(
         "readiness_state": manifest.get("readiness_state"),
         "release_id": release_id,
         "sealed_at": _render_utc(sealed_at),
+        "superseded_dataset_manifest_id": previous_current_mid,
         "yield_eligible": int(manifest["yield_eligible"]),
         "yield_missing": int(manifest["yield_missing"]),
     }
