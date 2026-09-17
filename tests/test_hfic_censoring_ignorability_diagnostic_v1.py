@@ -52,6 +52,8 @@ from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
     RANDOM_SAMPLE_UNPROVEN,
     SCOPE_CANONICAL,
     SCOPE_NONCANONICAL,
+    OBSERVATION_MINT_MISSING_FROM_CENSUS,
+    RECEIPT_SCHEMA_VERSION,
     SHIFT_DETECTED,
     SHIFT_NOT_DETECTED,
     Y_POINT_READ,
@@ -77,6 +79,13 @@ from solana_alpha_lab.storage.manifests import (
 
 CLI = ROOT / "scripts" / "hypothesis_forge.py"
 SPEC = ROOT / "configs" / "hfic_censoring_ignorability_diagnostic_v1.yaml"
+PINNED_PRODUCTION_CLOSURE = (
+    ROOT
+    / "docs"
+    / "evidence"
+    / "hfic_censoring_diagnostic_scope_repair"
+    / "a1_pinned_production_closure_v1.json"
+)
 FROZEN_DATASET = "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
 FROZEN_COHORT = "REL-20260902T111900Z-20260909T111900Z"
 FROZEN_RELEASE = "633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154"
@@ -130,6 +139,17 @@ def _member(
         inclusion_probability="0.0425",
         cohort_id=cohort_id,
         release_id=release_id,
+    )
+
+
+def _identity_obs(mint: str) -> dict[str, object]:
+    return _obs_row(
+        mint=mint,
+        field_id="FIELD-TOKEN-MINT-001",
+        typed_value=mint,
+        state="OBSERVED",
+        point_id="X300",
+        value_kind="TOKEN_MINT",
     )
 
 
@@ -584,8 +604,17 @@ class HficCensoringIgnorabilityDiagnosticTests(unittest.TestCase):
             census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
             receipt = _run(census, observations)
         self.assertEqual(receipt["terminal_population_scope"], SCOPE_NONCANONICAL)
+        self.assertEqual(receipt["schema_version"], RECEIPT_SCHEMA_VERSION)
         self.assertEqual(receipt["counts"]["census_rows"], 57)
+        self.assertEqual(receipt["counts"]["census_rows_total"], 57)
+        self.assertEqual(receipt["counts"]["census_distinct_mints_total"], 57)
         self.assertEqual(receipt["counts"]["discovered_in_observation_partition"], 53)
+        self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 53)
+        self.assertEqual(receipt["counts"]["diagnostic_population_distinct_mints"], 53)
+        self.assertEqual(receipt["counts"]["out_of_scope_census_rows"], 4)
+        self.assertEqual(receipt["counts"]["other_in_scope"], 0)
+        self.assertEqual(receipt["counts"]["other"], 0)
+        self.assertEqual(receipt["counts"]["x_population_ineligible"], 0)
         self.assertIsNone(receipt["corpus_id"])
 
     def test_mixed_observation_cohort_is_inconclusive(self) -> None:
@@ -667,9 +696,14 @@ class HficCensoringIgnorabilityDiagnosticTests(unittest.TestCase):
                 _member("weird000", candidate="WEIRD", denom="observed", anchor="ANCHOR")
             )
             _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            obs_rows = pq.read_table(observations).to_pylist()
+            obs_rows.append(_identity_obs("weird000"))
+            _write_parquet(observations, obs_rows, OBS_RELEASE_SCHEMA)
             receipt = _run(census, observations)
         self.assertEqual(receipt["terminal"], _atomic(INCONCLUSIVE))
         self.assertIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertEqual(receipt["counts"]["other_in_scope"], 1)
+        self.assertEqual(receipt["counts"]["other"], 1)
         self.assertEqual(receipt["identification_status"], "IDENTIFICATION_UNPROVEN")
 
     def test_duplicate_comparable_mint_is_inconclusive(self) -> None:
@@ -1285,6 +1319,153 @@ class CanonicalBindingGateTests(unittest.TestCase):
         self.assertIn("--data-root", text)
         self.assertIn("LIVE CORPUS", text)
         self.assertIn("Observation RDP", text)
+
+
+class DiagnosticPopulationScopeTests(unittest.TestCase):
+    def test_a_out_of_scope_capacity_hash_predicate_does_not_trigger_unknown(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            rows = pq.read_table(census).to_pylist()
+            rows.extend(
+                [
+                    _member(
+                        "cap000",
+                        candidate="NOT_SELECTED_CAPACITY",
+                        denom="excluded",
+                    ),
+                    _member(
+                        "hash000",
+                        candidate="NOT_SELECTED_HASH_SAMPLE",
+                        denom="excluded",
+                    ),
+                    _member(
+                        "pred000",
+                        candidate="NOT_SELECTED_PREDICATE",
+                        denom="excluded",
+                    ),
+                ]
+            )
+            _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(SHIFT_NOT_DETECTED))
+        self.assertNotIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertEqual(receipt["counts"]["other_in_scope"], 0)
+        self.assertEqual(receipt["counts"]["other"], 0)
+        self.assertEqual(receipt["counts"]["out_of_scope_census_rows"], 7)
+        self.assertEqual(receipt["counts"]["census_rows_total"], 60)
+        self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 53)
+        self.assertEqual(receipt["counts"]["discovered_in_observation_partition"], 53)
+
+    def test_b_in_scope_garbage_still_unknown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            rows = pq.read_table(census).to_pylist()
+            rows.append(
+                _member("weird000", candidate="WEIRD", denom="observed", anchor="ANCHOR")
+            )
+            _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            obs_rows = pq.read_table(observations).to_pylist()
+            obs_rows.append(_identity_obs("weird000"))
+            _write_parquet(observations, obs_rows, OBS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(INCONCLUSIVE))
+        self.assertIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertEqual(receipt["counts"]["other_in_scope"], 1)
+        self.assertNotEqual(
+            receipt["counts"]["out_of_scope_census_rows"],
+            receipt["counts"]["other_in_scope"],
+        )
+
+    def test_d_observation_mint_missing_from_census_is_dedicated_reason(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            obs_rows = pq.read_table(observations).to_pylist()
+            obs_rows.append(_identity_obs("ghost000"))
+            _write_parquet(observations, obs_rows, OBS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(INCONCLUSIVE))
+        self.assertIn(
+            OBSERVATION_MINT_MISSING_FROM_CENSUS,
+            receipt["inconclusive_reasons"],
+        )
+        self.assertNotIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertEqual(receipt["counts"]["discovered_in_observation_partition"], 54)
+        self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 53)
+
+    def test_e_in_scope_duplicate_census_is_inconclusive(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            rows = pq.read_table(census).to_pylist()
+            rows.append(_member("adm000", candidate="ADMITTED", denom="censored_late"))
+            _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(INCONCLUSIVE))
+        self.assertIn("DUPLICATE_CENSUS_MINT", receipt["inconclusive_reasons"])
+        self.assertNotIn("DUPLICATE_COMPARABLE_MINT", receipt["inconclusive_reasons"])
+
+    def test_f_out_of_scope_duplicate_does_not_invalidate_estimand(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            rows = pq.read_table(census).to_pylist()
+            rows.append(
+                _member(
+                    "inel000",
+                    candidate="X_POPULATION_INELIGIBLE",
+                    denom="excluded",
+                )
+            )
+            rows.extend(
+                [
+                    _member(
+                        "cap000",
+                        candidate="NOT_SELECTED_CAPACITY",
+                        denom="excluded",
+                    ),
+                    _member(
+                        "cap000",
+                        candidate="NOT_SELECTED_CAPACITY",
+                        denom="excluded",
+                    ),
+                ]
+            )
+            _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(SHIFT_NOT_DETECTED))
+        self.assertNotIn("DUPLICATE_CENSUS_MINT", receipt["inconclusive_reasons"])
+        self.assertNotIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertEqual(receipt["counts"]["other_in_scope"], 0)
+        self.assertEqual(receipt["comparable_x_subset_n"], 48)
+
+    def test_h_pinned_production_closure_is_read_only_without_permutations(
+        self,
+    ) -> None:
+        payload = json.loads(
+            PINNED_PRODUCTION_CLOSURE.read_text(encoding="utf-8")
+        )
+        self.assertEqual(payload["census_rows_total"], 138844)
+        self.assertEqual(payload["census_distinct_mints_total"], 138844)
+        self.assertEqual(payload["discovered_in_observation_partition"], 610)
+        self.assertEqual(payload["diagnostic_population_census_rows"], 610)
+        self.assertEqual(payload["diagnostic_population_distinct_mints"], 610)
+        self.assertEqual(payload["out_of_scope_census_rows"], 138234)
+        self.assertEqual(payload["other_in_scope"], 0)
+        self.assertNotEqual(
+            payload["out_of_scope_census_rows"], payload["other_in_scope"]
+        )
+        four_way = payload["four_way_in_scope_capable"]
+        self.assertEqual(four_way["x_eligible_observed"], 148)
+        self.assertEqual(four_way["x_eligible_censored_late"], 327)
+        self.assertEqual(four_way["admitted_censored_late_no_x300"], 35)
+        self.assertEqual(four_way["x_population_ineligible"], 100)
+        self.assertEqual(four_way["comparable_x_subset_n"], 475)
+        self.assertTrue(payload["did_not_run_permutations"])
+        self.assertTrue(payload["did_not_run_scientific_diagnostic"])
+        self.assertTrue(payload["ci_must_not_read_machine_local_data_plane"])
+        self.assertTrue(payload["historical_receipt_not_mutated"])
+        impl = Path(censoring_mod.__file__).read_text(encoding="utf-8")
+        self.assertNotIn("local/factory_v1/data_plane", impl)
 
 
 if __name__ == "__main__":

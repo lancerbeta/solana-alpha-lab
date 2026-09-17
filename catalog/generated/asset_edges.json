@@ -3273,6 +3273,21 @@
       "target_asset_id": "TEST-HFIC-COMMISSIONING-COMPATIBILITY-001"
     },
     {
+      "source_asset_id": "CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
+    },
+    {
       "source_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
@@ -6451,6 +6466,11 @@
       "source_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-RUNTIME-001",
       "relation": "derived_from",
       "target_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "EVIDENCE-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-PINNED-CLOSURE-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001"
     },
     {
       "source_asset_id": "EVIDENCE-HYPOTHESIS-FAST-LANE-DELIVERY-COMPLETION-001",
@@ -11050,6 +11070,11 @@
     {
       "source_asset_id": "MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
       "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
+      "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
     },
     {
@@ -13456,6 +13481,11 @@
       "source_asset_id": "REPORT-FRESH-OOS-FRICTION-VETO-001",
       "relation": "derived_from",
       "target_asset_id": "EVIDENCE-FRESH-OOS-FRICTION-VETO-ACCEPTANCE-001"
+    },
+    {
+      "source_asset_id": "REPORT-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001"
     },
     {
       "source_asset_id": "REPORT-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
@@ -16141,6 +16171,11 @@
       "source_asset_id": "TEST-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-FRICTION-VETO-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-001"
     },
     {
       "source_asset_id": "TEST-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",

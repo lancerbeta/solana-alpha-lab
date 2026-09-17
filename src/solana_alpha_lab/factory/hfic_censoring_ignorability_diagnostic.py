@@ -57,6 +57,11 @@ EXPLICIT_PATH_INPUT_MODE = "EXPLICIT_PATH"
 SHIFT_DETECTED = "CENSORING_OBSERVED_X_SHIFT_DETECTED"
 SHIFT_NOT_DETECTED = "CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED"
 INCONCLUSIVE = "CENSORING_DIAGNOSTIC_INCONCLUSIVE"
+OBSERVATION_MINT_MISSING_FROM_CENSUS = "OBSERVATION_MINT_MISSING_FROM_CENSUS"
+# Receipt 1.1: counts["census_rows"] stays full-file total. counts["other"] is
+# an alias of other_in_scope (in-scope unexpected states only). Out-of-scope
+# pre-X exclusions are out_of_scope_census_rows, never other_in_scope.
+RECEIPT_SCHEMA_VERSION = "1.1"
 ANCHOR_UNRESOLVED = "CENSORING_NO_COMPARABLE_X300_ANCHOR_UNRESOLVED"
 ADMITTED_NOT_X_ELIGIBLE = "CENSORING_ADMITTED_NOT_X_ELIGIBLE"
 IGNORABILITY_UNPROVEN = "IGNORABILITY_UNPROVEN"
@@ -1096,14 +1101,55 @@ def _execute_censoring_diagnostic(
     )
     observation_mints = _parquet_distinct_mints(observations_path)
     rng = random.Random(_seed_int(str(spec["permutation_seed"])))
+    census_rows_total = len(census_rows)
+    census_distinct_mints_total = len(
+        {
+            str(row.get("mint") or "")
+            for row in census_rows
+            if str(row.get("mint") or "")
+        }
+    )
+    census_mints = {
+        str(row.get("mint") or "")
+        for row in census_rows
+        if str(row.get("mint") or "")
+    }
+    observation_mint_missing_from_census = any(
+        mint not in census_mints for mint in observation_mints
+    )
+    diagnostic_rows = [
+        row
+        for row in census_rows
+        if str(row.get("mint") or "") in observation_mints
+    ]
+    diagnostic_distinct_mints = {
+        str(row.get("mint") or "")
+        for row in diagnostic_rows
+        if str(row.get("mint") or "")
+    }
+    eligible_missing_from_observations = False
+    for row in census_rows:
+        mint = str(row.get("mint") or "")
+        if (
+            mint
+            and str(row.get("candidate_state") or "") == "X_ELIGIBLE"
+            and mint not in observation_mints
+        ):
+            eligible_missing_from_observations = True
 
     counts = {
-        "census_rows": len(census_rows),
+        "census_rows": census_rows_total,
+        "census_rows_total": census_rows_total,
+        "census_distinct_mints_total": census_distinct_mints_total,
         "discovered_in_observation_partition": len(observation_mints),
+        "diagnostic_population_census_rows": len(diagnostic_rows),
+        "diagnostic_population_distinct_mints": len(diagnostic_distinct_mints),
+        "out_of_scope_census_rows": census_rows_total - len(diagnostic_rows),
         "x_eligible_observed": 0,
         "x_eligible_censored_late": 0,
         "admitted_censored_late_no_x300": 0,
         "x_population_ineligible": 0,
+        "other_in_scope": 0,
         "other": 0,
     }
     members: list[dict[str, Any]] = []
@@ -1127,20 +1173,17 @@ def _execute_censoring_diagnostic(
 
     comparable_mints: set[str] = set()
     mint_row_n: dict[str, int] = {}
-    for row in census_rows:
+    for row in diagnostic_rows:
         mint = str(row.get("mint") or "")
         if mint:
             mint_row_n[mint] = mint_row_n.get(mint, 0) + 1
     duplicate_comparable = False
     duplicate_census = any(count > 1 for count in mint_row_n.values())
     empty_mint = False
-    eligible_missing_from_observations = False
-    for row in census_rows:
+    for row in diagnostic_rows:
         mint = str(row.get("mint") or "")
         candidate = str(row.get("candidate_state") or "")
         denom = str(row.get("denominator_state") or "")
-        if mint and candidate == "X_ELIGIBLE" and mint not in observation_mints:
-            eligible_missing_from_observations = True
         mint_obs = obs_by_mint.get(mint, {})
         has_x300 = any(
             str((mint_obs.get(str(feature["field_id"])) or {}).get("state") or "")
@@ -1158,6 +1201,7 @@ def _execute_censoring_diagnostic(
         elif candidate == "X_POPULATION_INELIGIBLE":
             counts["x_population_ineligible"] += 1
         else:
+            counts["other_in_scope"] += 1
             counts["other"] += 1
         if not mint:
             empty_mint = True
@@ -1262,7 +1306,7 @@ def _execute_censoring_diagnostic(
         inconclusive.append("GROUP_N_TOO_SMALL")
     if coverage_fail:
         inconclusive.append("COVERAGE_FLOOR_BREACH")
-    if counts["other"] > 0:
+    if counts["other_in_scope"] > 0:
         inconclusive.append("UNKNOWN_CENSUS_STATE")
     if duplicate_comparable:
         inconclusive.append("DUPLICATE_COMPARABLE_MINT")
@@ -1306,6 +1350,8 @@ def _execute_censoring_diagnostic(
         inconclusive.append("VALUE_KIND_MISMATCH")
     if eligible_missing_from_observations:
         inconclusive.append("CENSUS_MINT_MISSING_FROM_OBSERVATIONS")
+    if observation_mint_missing_from_census:
+        inconclusive.append(OBSERVATION_MINT_MISSING_FROM_CENSUS)
 
     feature_rows = _omnibus_rows(members, spec) if not inconclusive else []
     if not inconclusive:
@@ -1364,7 +1410,7 @@ def _execute_censoring_diagnostic(
     atomic_terminal = f"{terminal}|{population_scope}"
     receipt = {
         "schema": "smial.hfic-censoring-ignorability-diagnostic-receipt",
-        "schema_version": "1.0",
+        "schema_version": RECEIPT_SCHEMA_VERSION,
         "capability_id": CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC,
         "terminal": atomic_terminal,
         "scientific_terminal": terminal,
