@@ -4,7 +4,7 @@
   "acceptance_id": "HFIC-SELECTION-ROBUSTNESS-GATE-ACCEPT-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
-  "state_change": "Registered CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001 composing frozen Stage 1 with one Block-A L2-logistic OOF-AUC falsifier, a typed router_decision, and ordinary Forge preflight consumption. Canonical LIVE CORPUS OPERATE remains out of this atom.",
+  "state_change": "Registered CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001 composing frozen Stage 1 with one Block-A L2-logistic OOF-AUC falsifier, a typed router_decision, and ordinary Forge preflight consumption bound to current CanonicalCorpusBinding identity. Canonical LIVE CORPUS OPERATE remains out of this atom.",
   "base_main": "503de99469f972fbabc10a6161159865df6d5d37",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,

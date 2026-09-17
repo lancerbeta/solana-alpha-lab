@@ -12,10 +12,10 @@
     "mission": "PASS_SELECTION_GATE_NOT_MARKET_TEST",
     "flexibility_and_history": "PASS_PRIOR_HFIC_SESSIONS_UNTOUCHED",
     "context_efficiency": "PASS_SYNTHETIC_FIXTURE_ONLY",
-    "research_truth": "PASS_CAVEAT_NOT_IDENTIFICATION",
+    "research_truth": "PASS_RECEIPT_BOUND_TO_CANONICAL_CORPUS_IDENTITY",
     "owner_operability": "PASS_TYPED_ROUTER_DECISION",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_OPERATE_THIS_ATOM",
-    "monitoring_and_recovery": "PASS_TYPED_GAP_AND_BUDGET_PRESERVED",
+    "monitoring_and_recovery": "PASS_STALE_IDENTITY_FAIL_CLOSED_GAP",
     "build_vs_buy": "PASS_REUSE_STAGE1_STDLIB_LOGISTIC",
     "security": "PASS_NO_SECRETS_NO_PATH_LEAK",
     "red_team": "PASS_BLOCK_A_LEAKAGE_AND_Y_DENY"
