@@ -37457,7 +37457,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md', repository_path: docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md}
-  integrity: {kind: sha256, sha256: ad193fc3b2d71dc116218329bc0333292d54e84dd5eaf50d4daebafd6a5660bf}
+  integrity: {kind: sha256, sha256: 1557e84261505010232911912c55b6a7b4b4c7bca2d453c8d4f5f3b5b73e0f20}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -37493,7 +37493,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py', repository_path: src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py}
-  integrity: {kind: sha256, sha256: 400cc6820fa36e7e6c428fa2b4f8f362d44ae49360144c45820ebf80fad8d977}
+  integrity: {kind: sha256, sha256: 2ab9b65deae90fda50cd0c92e09861f1af7034c9a6c0e34700aa8c6f5618f452}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
@@ -37512,7 +37512,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_selection_robustness_gate_v1.py', repository_path: tests/test_hfic_selection_robustness_gate_v1.py}
-  integrity: {kind: sha256, sha256: 59913aac226b9873bc50dd980d1e8895f0e64c31ff153ab4dd86925b90310747}
+  integrity: {kind: sha256, sha256: 4954c10881563849f21500c284fa56c5413e70ebfde4168d7c58deb4a47cbea9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
@@ -37530,7 +37530,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md', repository_path: docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: 33d3365b04a085ab43dcc21d7e9d30d67861c397bb2cb245c68c0d357738f49c}
+  integrity: {kind: sha256, sha256: 94050ec0773059506e76f5ae3a05b87ead565e22bdf9040bf65e6f92b0fe5418}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}

@@ -22,10 +22,13 @@ from solana_alpha_lab.factory.capabilities import (
     execute_capability,
 )
 from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
+    CANONICAL_INPUT_MODE,
     FROZEN_SPEC_SHA256 as STAGE1_FROZEN_SPEC_SHA256,
     INCONCLUSIVE as STAGE1_INCONCLUSIVE,
+    SCOPE_CANONICAL,
     SHIFT_DETECTED,
     SHIFT_NOT_DETECTED,
+    bind_canonical_censoring_inputs,
     load_diagnostic_spec,
     run_censoring_ignorability_diagnostic,
 )
@@ -47,6 +50,7 @@ from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
     FROZEN_SPEC_SHA256,
     GATE_ARTIFACT_RELATIVE,
     RECEIPT_SCHEMA,
+    SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
     STAGE2_DETECTED,
     STAGE2_INCONCLUSIVE,
     STAGE2_NOT_DETECTED,
@@ -67,6 +71,9 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import CORPUS_DATASE
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from tests.test_hfic_censoring_ignorability_diagnostic_v1 import (
     CENSUS_RELEASE_SCHEMA,
+    FROZEN_COHORT,
+    FROZEN_DATASET,
+    FROZEN_RELEASE,
     HOLDERS,
     LAUNCHPAD,
     LIQUIDITY,
@@ -75,7 +82,9 @@ from tests.test_hfic_censoring_ignorability_diagnostic_v1 import (
     PRICE,
     _balanced_fixture,
     _block_a_obs,
+    _install_canonical_corpus,
     _member,
+    _pins_from_installed,
     _write_parquet,
     _x300,
 )
@@ -172,11 +181,43 @@ def _tiny_fixture(directory: Path, observed_n: int = 4, censored_n: int = 4) -> 
     return _mv_fixture(directory, observed_n=observed_n, censored_n=censored_n, shift=0.0)
 
 
-def _hashed_gate_receipt(decision: str) -> dict[str, object]:
-    body = {"schema": RECEIPT_SCHEMA, "router_decision": decision}
+def _hashed_gate_receipt(decision: str, **fields: object) -> dict[str, object]:
+    body: dict[str, object] = {"schema": RECEIPT_SCHEMA, "router_decision": decision}
+    body.update(fields)
     receipt = dict(body)
     receipt["receipt_sha256"] = canonical_sha256(body)
     return receipt
+
+
+def _identity_fields(installed: dict[str, str], **overrides: str) -> dict[str, str]:
+    fields = {
+        "corpus_id": FROZEN_DATASET,
+        "cohort_id": FROZEN_COHORT,
+        "release_id": FROZEN_RELEASE,
+        "census_sha256": installed["census_sha256"],
+        "observations_sha256": installed["observations_sha256"],
+        "dataset_manifest_id": installed["dataset_manifest_id"],
+        "spec_file_sha256": FROZEN_SPEC_SHA256,
+    }
+    fields.update(overrides)
+    return fields
+
+
+def _bind_installed(installed: dict[str, str]):
+    pins = _pins_from_installed(installed)
+    real = bind_canonical_censoring_inputs
+
+    def _bind(data_root: Path, _corpus: object):
+        return real(data_root, pins)
+
+    return patch(
+        "solana_alpha_lab.factory.hfic_selection_robustness_gate.bind_canonical_censoring_inputs",
+        side_effect=_bind,
+    )
+
+
+def _load_gate(data_root: Path) -> dict[str, object] | None:
+    return load_applicable_gate_receipt(data_root, root=ROOT)
 
 
 def _control_corpus(yield_eligible: int) -> dict[str, object]:
@@ -597,7 +638,7 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 },
             )
             self.assertTrue(path.is_file())
-            loaded = load_applicable_gate_receipt(Path(tmp))
+            loaded = _load_gate(Path(tmp))
             self.assertIsNotNone(loaded)
             assert loaded is not None
             self.assertTrue(loaded.get("integrity_invalid"))
@@ -606,12 +647,12 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 apply_selection_gate_to_preflight("START_NEW_SESSION", loaded)["action"],
                 "STOP",
             )
-        self.assertIsNone(load_applicable_gate_receipt(Path(tempfile.gettempdir()) / "missing-gate-root"))
+        self.assertIsNone(_load_gate(Path(tempfile.gettempdir()) / "missing-gate-root"))
         with tempfile.TemporaryDirectory() as tmp:
             binary = Path(tmp) / GATE_ARTIFACT_RELATIVE
             binary.parent.mkdir(parents=True, exist_ok=True)
             binary.write_bytes(b"\xff\xfe\x00not-utf8")
-            loaded = load_applicable_gate_receipt(Path(tmp))
+            loaded = _load_gate(Path(tmp))
             self.assertIsNotNone(loaded)
             assert loaded is not None
             self.assertTrue(loaded.get("integrity_invalid"))
@@ -620,7 +661,7 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             occupied = Path(tmp) / GATE_ARTIFACT_RELATIVE
             occupied.parent.mkdir(parents=True, exist_ok=True)
             occupied.mkdir()
-            loaded = load_applicable_gate_receipt(Path(tmp))
+            loaded = _load_gate(Path(tmp))
             self.assertIsNotNone(loaded)
             assert loaded is not None
             self.assertTrue(loaded.get("integrity_invalid"))
@@ -657,13 +698,16 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                     persist=False,
                 )
             persist_gate_receipt(Path(tmp), receipt)
-            loaded = load_applicable_gate_receipt(Path(tmp))
+            loaded = _load_gate(Path(tmp))
             self.assertIsNotNone(loaded)
             assert loaded is not None
-            self.assertEqual(loaded["receipt_sha256"], receipt["receipt_sha256"])
+            self.assertTrue(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
             self.assertEqual(
-                loaded["router_decision"], FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT
+                loaded.get("integrity_reason"),
+                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
             )
+            self.assertIsNone(receipt.get("dataset_manifest_id"))
 
     def test_dangling_symlink_latest_json_is_evidence_gap(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -674,7 +718,7 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 os.symlink(missing, dangling)
             except (OSError, NotImplementedError):
                 self.skipTest("symlink unavailable")
-            loaded = load_applicable_gate_receipt(Path(tmp))
+            loaded = _load_gate(Path(tmp))
             self.assertIsNotNone(loaded)
             assert loaded is not None
             self.assertTrue(loaded.get("integrity_invalid"))
@@ -726,7 +770,7 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             persist_gate_receipt(
                 data_root, _hashed_gate_receipt(BLOCK_FORGE_SELECTION_RISK)
             )
-            blocked = run_preflight(
+            stale_block = run_preflight(
                 ROOT,
                 data_root,
                 owner_focus="AUTO",
@@ -734,6 +778,50 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 git_snapshot=_git_snapshot(),
                 clock=_CLOCK,
             )
+            self.assertEqual(stale_block["action"], "STOP")
+            self.assertEqual(stale_block["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(stale_block["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(
+                stale_block["next"],
+                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+            )
+            artifact.unlink()
+
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT),
+            )
+            stale_allow = run_preflight(
+                ROOT,
+                data_root,
+                owner_focus="AUTO",
+                auto_commission=False,
+                git_snapshot=_git_snapshot(),
+                clock=_CLOCK,
+            )
+            self.assertEqual(stale_allow["action"], "STOP")
+            self.assertEqual(stale_allow["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertNotEqual(
+                stale_allow.get("router_decision"),
+                FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+            )
+            artifact.unlink()
+
+            installed = _install_canonical_corpus(data_root)
+            matching_block = _hashed_gate_receipt(
+                BLOCK_FORGE_SELECTION_RISK,
+                **_identity_fields(installed),
+            )
+            persist_gate_receipt(data_root, matching_block)
+            with _bind_installed(installed):
+                blocked = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    git_snapshot=_git_snapshot(),
+                    clock=_CLOCK,
+                )
             self.assertEqual(blocked["action"], "STOP")
             self.assertEqual(blocked["terminal"], BLOCK_FORGE_SELECTION_RISK)
             self.assertEqual(blocked["router_decision"], BLOCK_FORGE_SELECTION_RISK)
@@ -745,16 +833,20 @@ class SelectionRobustnessGateTests(unittest.TestCase):
 
             persist_gate_receipt(
                 data_root,
-                _hashed_gate_receipt(FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT),
+                _hashed_gate_receipt(
+                    FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+                    **_identity_fields(installed),
+                ),
             )
-            caveat = run_preflight(
-                ROOT,
-                data_root,
-                owner_focus="AUTO",
-                auto_commission=False,
-                git_snapshot=_git_snapshot(),
-                clock=_CLOCK,
-            )
+            with _bind_installed(installed):
+                caveat = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    git_snapshot=_git_snapshot(),
+                    clock=_CLOCK,
+                )
             self.assertEqual(caveat["action"], "START_NEW_SESSION")
             self.assertEqual(
                 caveat["router_decision"],
@@ -787,9 +879,13 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             )
 
             persist_gate_receipt(
-                data_root, _hashed_gate_receipt(BLOCK_FORGE_SELECTION_RISK)
+                data_root,
+                _hashed_gate_receipt(
+                    BLOCK_FORGE_SELECTION_RISK,
+                    **_identity_fields(installed),
+                ),
             )
-            with patch(
+            with _bind_installed(installed), patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 return_value=([_control_corpus(MIN_USABLE_YIELD_ELIGIBLE)], []),
             ):
@@ -885,6 +981,259 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             )
         self.assertEqual(receipt["scientific_terminal"], SHIFT_NOT_DETECTED)
         self.assertEqual(receipt["provider_requests"], 0)
+
+
+class SelectionGateReceiptIdentityTests(unittest.TestCase):
+    def test_matching_canonical_receipt_is_applicable(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            receipt = _hashed_gate_receipt(
+                FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+                git_head="deadbeef" * 5,
+                **_identity_fields(installed),
+            )
+            persist_gate_receipt(data_root, receipt)
+            with _bind_installed(installed):
+                loaded = _load_gate(data_root)
+            self.assertIsNotNone(loaded)
+            assert loaded is not None
+            self.assertFalse(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["receipt_sha256"], receipt["receipt_sha256"])
+            self.assertEqual(
+                loaded["router_decision"], FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT
+            )
+            self.assertEqual(
+                loaded["dataset_manifest_id"], installed["dataset_manifest_id"]
+            )
+
+    def test_stale_dataset_manifest_id_is_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            stale = "dataset-" + "b" * 64
+            self.assertNotEqual(stale, installed["dataset_manifest_id"])
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+                    **_identity_fields(installed, dataset_manifest_id=stale),
+                ),
+            )
+            with _bind_installed(installed):
+                loaded = _load_gate(data_root)
+            self.assertIsNotNone(loaded)
+            assert loaded is not None
+            self.assertTrue(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(
+                loaded.get("integrity_reason"),
+                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
+            )
+
+    def test_mismatched_cohort_or_release_is_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    BLOCK_FORGE_SELECTION_RISK,
+                    **_identity_fields(installed, cohort_id="REL-OTHER"),
+                ),
+            )
+            with _bind_installed(installed):
+                cohort = _load_gate(data_root)
+            assert cohort is not None
+            self.assertEqual(
+                cohort.get("integrity_reason"),
+                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
+            )
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    BLOCK_FORGE_SELECTION_RISK,
+                    **_identity_fields(installed, release_id="ff" * 32),
+                ),
+            )
+            with _bind_installed(installed):
+                release = _load_gate(data_root)
+            assert release is not None
+            self.assertEqual(
+                release.get("integrity_reason"),
+                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
+            )
+
+    def test_mismatched_census_or_observations_sha_is_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+                    **_identity_fields(installed, census_sha256="aa" * 32),
+                ),
+            )
+            with _bind_installed(installed):
+                census = _load_gate(data_root)
+            assert census is not None
+            self.assertEqual(
+                census.get("integrity_reason"),
+                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
+            )
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+                    **_identity_fields(installed, observations_sha256="bb" * 32),
+                ),
+            )
+            with _bind_installed(installed):
+                observations = _load_gate(data_root)
+            assert observations is not None
+            self.assertEqual(
+                observations.get("integrity_reason"),
+                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
+            )
+
+    def test_missing_canonical_identity_fields_are_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            persist_gate_receipt(
+                data_root, _hashed_gate_receipt(FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT)
+            )
+            with _bind_installed(installed):
+                loaded = _load_gate(data_root)
+            assert loaded is not None
+            self.assertTrue(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(
+                loaded.get("integrity_reason"),
+                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
+            )
+
+    def test_old_valid_hash_cannot_allow_after_corpus_identity_change(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+                    **_identity_fields(
+                        installed,
+                        dataset_manifest_id="dataset-" + "c" * 64,
+                    ),
+                ),
+            )
+            with _bind_installed(installed):
+                loaded = _load_gate(data_root)
+                view = apply_selection_gate_to_preflight("START_NEW_SESSION", loaded)
+            self.assertEqual(view["action"], "STOP")
+            self.assertEqual(view["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertNotEqual(
+                view.get("router_decision"), FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT
+            )
+            self.assertTrue((data_root / GATE_ARTIFACT_RELATIVE).is_file())
+
+    def test_old_valid_hash_block_is_not_current_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    BLOCK_FORGE_SELECTION_RISK,
+                    **_identity_fields(installed, release_id="00" * 32),
+                ),
+            )
+            with _bind_installed(installed):
+                loaded = _load_gate(data_root)
+                view = apply_selection_gate_to_preflight("START_NEW_SESSION", loaded)
+            self.assertEqual(view["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertNotEqual(view.get("terminal"), BLOCK_FORGE_SELECTION_RISK)
+
+    def test_matching_receipt_keeps_block_and_caveat_routing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    BLOCK_FORGE_SELECTION_RISK,
+                    **_identity_fields(installed),
+                ),
+            )
+            with _bind_installed(installed):
+                blocked = apply_selection_gate_to_preflight(
+                    "START_NEW_SESSION", _load_gate(data_root)
+                )
+            self.assertEqual(blocked["action"], "STOP")
+            self.assertEqual(blocked["terminal"], BLOCK_FORGE_SELECTION_RISK)
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+                    **_identity_fields(installed),
+                ),
+            )
+            with _bind_installed(installed):
+                caveat = apply_selection_gate_to_preflight(
+                    "START_NEW_SESSION", _load_gate(data_root)
+                )
+            self.assertEqual(caveat["action"], "START_NEW_SESSION")
+            self.assertTrue(caveat.get("caveat"))
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(
+                    BLOCK_FORGE_EVIDENCE_GAP,
+                    **_identity_fields(installed),
+                ),
+            )
+            with _bind_installed(installed):
+                gap = apply_selection_gate_to_preflight(
+                    "START_NEW_SESSION", _load_gate(data_root)
+                )
+            self.assertEqual(gap["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+
+    def test_skip_stage2_canonical_receipt_binds_dataset_manifest_id(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            installed = _install_canonical_corpus(data_root)
+            fake_stage1 = {
+                "scientific_terminal": SHIFT_DETECTED,
+                "receipt_sha256": "ab" * 32,
+                "input_mode": CANONICAL_INPUT_MODE,
+                "terminal_population_scope": SCOPE_CANONICAL,
+                "y_point_rows_present_unread": 0,
+                "counts": {},
+                "census_sha256": installed["census_sha256"],
+                "observations_sha256": installed["observations_sha256"],
+                "dataset_manifest_id": installed["dataset_manifest_id"],
+            }
+            with _bind_installed(installed), patch(
+                "solana_alpha_lab.factory.hfic_selection_robustness_gate.run_censoring_ignorability_diagnostic",
+                return_value=fake_stage1,
+            ):
+                receipt = run_selection_robustness_gate(
+                    root=ROOT,
+                    data_root=data_root,
+                    persist=True,
+                )
+            self.assertEqual(receipt["stage2_status"], STAGE2_SKIPPED)
+            self.assertEqual(receipt["router_decision"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(
+                receipt["dataset_manifest_id"], installed["dataset_manifest_id"]
+            )
+            self.assertEqual(receipt["corpus_id"], FROZEN_DATASET)
+            self.assertEqual(receipt["spec_file_sha256"], FROZEN_SPEC_SHA256)
+            with _bind_installed(installed):
+                loaded = _load_gate(data_root)
+            assert loaded is not None
+            self.assertEqual(loaded["receipt_sha256"], receipt["receipt_sha256"])
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_SELECTION_RISK)
 
 
 if __name__ == "__main__":

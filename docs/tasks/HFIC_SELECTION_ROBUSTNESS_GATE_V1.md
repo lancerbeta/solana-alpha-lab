@@ -196,7 +196,8 @@ It does not prove identification.
 - `DECISION_DELTA`: durable two-stage selection gate with one Forge-facing
   `router_decision`.
 - `UNCERTAINTY_REMOVED`: operator no longer combines Stage-1/Stage-2 by hand;
-  Forge preflight consumes the typed decision when applicable evidence exists.
+  Forge preflight consumes the typed decision only when the receipt matches
+  the current canonical corpus binding (`dataset_manifest_id` included).
 - `CAPABILITY_OR_EVIDENCE`: `CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001` +
   synthetic proofs. Canonical LIVE CORPUS result is out of this atom.
 - `STOP`: merge-readiness / exact owner phrase. No guarded merge without

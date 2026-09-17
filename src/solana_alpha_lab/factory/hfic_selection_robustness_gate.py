@@ -27,6 +27,7 @@ from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
     CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED,
     CANONICAL_INPUT_MODE,
     CANONICAL_MODE_EXPLICIT_PATH_CONFLICT,
+    CanonicalCorpusBinding,
     CensoringDiagnosticError,
     EXPLICIT_PATH_INPUT_MODE,
     INCONCLUSIVE as STAGE1_INCONCLUSIVE,
@@ -69,6 +70,19 @@ BLOCK_FORGE_EVIDENCE_GAP = "BLOCK_FORGE_EVIDENCE_GAP"
 FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT = "FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT"
 GATE_ARTIFACT_RELATIVE = (
     "research/artifacts/hfic_selection_robustness_gate/latest.json"
+)
+SELECTION_GATE_RECEIPT_UNUSABLE = "SELECTION_GATE_RECEIPT_UNUSABLE"
+SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH = (
+    "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH"
+)
+RECEIPT_INPUT_IDENTITY_FIELDS = (
+    "corpus_id",
+    "cohort_id",
+    "release_id",
+    "census_sha256",
+    "observations_sha256",
+    "dataset_manifest_id",
+    "spec_file_sha256",
 )
 KNOWN_STAGE1_TERMINALS = frozenset(
     {SHIFT_DETECTED, SHIFT_NOT_DETECTED, STAGE1_INCONCLUSIVE}
@@ -825,6 +839,7 @@ def _compose_receipt(
     census_sha256: str | None,
     observations_sha256: str | None,
     extra_reasons: Sequence[str],
+    binding: CanonicalCorpusBinding | None = None,
 ) -> dict[str, Any]:
     routed = route_selection_gate(
         stage1_terminal,
@@ -844,6 +859,20 @@ def _compose_receipt(
         reasons.extend(str(item) for item in (stage2.get("inconclusive_reasons") or []))
     corpus = spec.get("canonical_corpus") if isinstance(spec.get("canonical_corpus"), Mapping) else {}
     canonical = population_scope == SCOPE_CANONICAL
+    if binding is not None:
+        corpus_id = binding.dataset_id
+        cohort_id = binding.cohort_id
+        release_id = binding.release_id
+        bound_census = binding.census_sha256
+        bound_observations = binding.observations_sha256
+        dataset_manifest_id = binding.dataset_manifest_id
+    else:
+        corpus_id = corpus.get("dataset_id") if canonical else None
+        cohort_id = corpus.get("cohort_id") if canonical else None
+        release_id = corpus.get("release_id") if canonical else None
+        bound_census = census_sha256
+        bound_observations = observations_sha256
+        dataset_manifest_id = None
     receipt = {
         "schema": RECEIPT_SCHEMA,
         "schema_version": RECEIPT_SCHEMA_VERSION,
@@ -851,11 +880,12 @@ def _compose_receipt(
         "git_head": git_head,
         "input_mode": input_mode,
         "terminal_population_scope": population_scope,
-        "corpus_id": corpus.get("dataset_id") if canonical else None,
-        "cohort_id": corpus.get("cohort_id") if canonical else None,
-        "release_id": corpus.get("release_id") if canonical else None,
-        "census_sha256": census_sha256 if canonical else census_sha256,
-        "observations_sha256": observations_sha256,
+        "corpus_id": corpus_id,
+        "cohort_id": cohort_id,
+        "release_id": release_id,
+        "dataset_manifest_id": dataset_manifest_id,
+        "census_sha256": bound_census,
+        "observations_sha256": bound_observations,
         "scientific_context_session": (
             corpus.get("scientific_context_session") if canonical else None
         ),
@@ -906,7 +936,45 @@ def persist_gate_receipt(data_root: Path, receipt: Mapping[str, Any]) -> Path:
     return path
 
 
-def _invalid_gate_receipt() -> dict[str, Any]:
+def _canonical_binding_or_none(
+    data_root: Path, spec: Mapping[str, Any]
+) -> CanonicalCorpusBinding | None:
+    corpus = (
+        spec.get("canonical_corpus")
+        if isinstance(spec.get("canonical_corpus"), Mapping)
+        else {}
+    )
+    try:
+        return bind_canonical_censoring_inputs(Path(data_root), corpus)
+    except CensoringDiagnosticError:
+        return None
+
+
+def receipt_input_identity(payload: Mapping[str, Any]) -> dict[str, str] | None:
+    values: dict[str, str] = {}
+    for key in RECEIPT_INPUT_IDENTITY_FIELDS:
+        text = str(payload.get(key) or "").strip()
+        if not text:
+            return None
+        values[key] = text
+    return values
+
+
+def current_gate_input_identity(binding: CanonicalCorpusBinding) -> dict[str, str]:
+    return {
+        "corpus_id": binding.dataset_id,
+        "cohort_id": binding.cohort_id,
+        "release_id": binding.release_id,
+        "census_sha256": binding.census_sha256,
+        "observations_sha256": binding.observations_sha256,
+        "dataset_manifest_id": binding.dataset_manifest_id,
+        "spec_file_sha256": FROZEN_SPEC_SHA256,
+    }
+
+
+def _invalid_gate_receipt(
+    reason: str = SELECTION_GATE_RECEIPT_UNUSABLE,
+) -> dict[str, Any]:
     """Present but unusable artifact: integrity gap, not 'no gate evidence'."""
 
     return {
@@ -914,10 +982,15 @@ def _invalid_gate_receipt() -> dict[str, Any]:
         "router_decision": BLOCK_FORGE_EVIDENCE_GAP,
         "receipt_sha256": "",
         "integrity_invalid": True,
+        "integrity_reason": reason,
     }
 
 
-def load_applicable_gate_receipt(data_root: Path) -> dict[str, Any] | None:
+def load_applicable_gate_receipt(
+    data_root: Path,
+    *,
+    root: Path,
+) -> dict[str, Any] | None:
     path = Path(data_root) / GATE_ARTIFACT_RELATIVE
     present = path.exists() or path.is_symlink() or is_link_path(path)
     if not present:
@@ -943,6 +1016,20 @@ def load_applicable_gate_receipt(data_root: Path) -> dict[str, Any] | None:
     body = {key: value for key, value in loaded.items() if key != "receipt_sha256"}
     if stored != canonical_sha256(body):
         return _invalid_gate_receipt()
+    try:
+        spec = _require_frozen_gate_spec(Path(root), SPEC_RELATIVE)
+        corpus = (
+            spec.get("canonical_corpus")
+            if isinstance(spec.get("canonical_corpus"), Mapping)
+            else {}
+        )
+        binding = bind_canonical_censoring_inputs(Path(data_root), corpus)
+    except (SelectionRobustnessGateError, CensoringDiagnosticError, OSError):
+        return _invalid_gate_receipt(SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH)
+    stored_identity = receipt_input_identity(loaded)
+    current_identity = current_gate_input_identity(binding)
+    if stored_identity is None or stored_identity != current_identity:
+        return _invalid_gate_receipt(SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH)
     return loaded
 
 
@@ -963,6 +1050,10 @@ def run_selection_robustness_gate(
         raise SelectionRobustnessGateError(CANONICAL_MODE_EXPLICIT_PATH_CONFLICT)
     if data_root is None and (census_path is None or observations_path is None):
         raise SelectionRobustnessGateError(CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED)
+
+    binding: CanonicalCorpusBinding | None = None
+    if data_root is not None:
+        binding = _canonical_binding_or_none(Path(data_root), spec)
 
     stage1: dict[str, Any] | None = None
     stage1_error: str | None = None
@@ -1005,6 +1096,7 @@ def run_selection_robustness_gate(
             census_sha256=None,
             observations_sha256=None,
             extra_reasons=["STAGE1_INTEGRITY_INVALID"],
+            binding=binding,
         )
         if persist and data_root is not None:
             persist_gate_receipt(Path(data_root), receipt)
@@ -1036,6 +1128,7 @@ def run_selection_robustness_gate(
             census_sha256=None if census_sha is None else str(census_sha),
             observations_sha256=None if obs_sha is None else str(obs_sha),
             extra_reasons=[],
+            binding=binding,
         )
         if persist and data_root is not None:
             persist_gate_receipt(Path(data_root), receipt)
@@ -1043,11 +1136,12 @@ def run_selection_robustness_gate(
 
     try:
         if data_root is not None:
-            corpus = spec.get("canonical_corpus") if isinstance(spec.get("canonical_corpus"), Mapping) else {}
-            binding = bind_canonical_censoring_inputs(
-                Path(data_root),
-                corpus if isinstance(corpus, Mapping) else {},
-            )
+            if binding is None:
+                corpus = spec.get("canonical_corpus") if isinstance(spec.get("canonical_corpus"), Mapping) else {}
+                binding = bind_canonical_censoring_inputs(
+                    Path(data_root),
+                    corpus if isinstance(corpus, Mapping) else {},
+                )
             members, member_counts, stage2_y_unread, member_reasons = _load_comparable_members(
                 spec=spec,
                 census_path=binding.census_path,
@@ -1087,6 +1181,7 @@ def run_selection_robustness_gate(
             census_sha256=None if census_sha is None else str(census_sha),
             observations_sha256=None if obs_sha is None else str(obs_sha),
             extra_reasons=[],
+            binding=binding,
         )
         if persist and data_root is not None:
             persist_gate_receipt(Path(data_root), receipt)
@@ -1127,6 +1222,7 @@ def run_selection_robustness_gate(
         census_sha256=None if census_sha is None else str(census_sha),
         observations_sha256=None if obs_sha is None else str(obs_sha),
         extra_reasons=[],
+        binding=binding,
     )
     if persist and data_root is not None:
         persist_gate_receipt(Path(data_root), receipt)

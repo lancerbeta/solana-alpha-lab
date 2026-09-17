@@ -48,6 +48,14 @@ Present but unusable `latest.json` (symlink, directory/non-file, unreadable
 UTF-8, JSON/hash/schema invalid) → new-session preflight STOPs as
 `BLOCK_FORGE_EVIDENCE_GAP`.
 
+A present receipt with a valid hash is still fail-closed as
+`BLOCK_FORGE_EVIDENCE_GAP` / `SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH`
+when its corpus/cohort/release/census SHA/observations SHA/
+`dataset_manifest_id`/spec SHA do not match the current canonical
+`CanonicalCorpusBinding`. Git HEAD is not the applicability identity.
+A stale receipt is not treated as “no gate evidence”, so Forge cannot start
+on an old ALLOW. The file is not deleted; a later current OPERATE replaces it.
+
 Applicable BLOCK → new-session preflight STOPs. Primary fields are
 `action=STOP`, `terminal=<router_decision>`, `router_decision`, and
 `next=DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS`. This includes

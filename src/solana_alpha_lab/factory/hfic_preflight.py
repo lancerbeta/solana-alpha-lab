@@ -1698,7 +1698,7 @@ def run_preflight(
 
     selection_gate_view = apply_selection_gate_to_preflight(
         action,
-        load_applicable_gate_receipt(Path(data_root)),
+        load_applicable_gate_receipt(Path(data_root), root=Path(repo_root)),
     )
     if (
         selection_gate_view.get("applicable")
