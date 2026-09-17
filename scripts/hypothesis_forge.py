@@ -1044,33 +1044,54 @@ def cmd_diagnostics(
 def cmd_censoring_ignorability_diagnostic(
     repo_root: Path,
     *,
-    census: Path,
-    observations: Path,
+    census: Path | None,
+    observations: Path | None,
+    data_root: Path | None,
 ) -> int:
     from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
+        CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED,
+        CANONICAL_MODE_EXPLICIT_PATH_CONFLICT,
         CensoringDiagnosticError,
-        EXPLICIT_RELEASE_PATHS_REQUIRED,
         run_censoring_ignorability_diagnostic,
     )
 
-    if census is None or observations is None:
-        raise HficCliError(EXPLICIT_RELEASE_PATHS_REQUIRED)
+    if data_root is not None and (census is not None or observations is not None):
+        raise HficCliError(CANONICAL_MODE_EXPLICIT_PATH_CONFLICT)
+    if data_root is None and (census is None or observations is None):
+        raise HficCliError(CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED)
     try:
         receipt = run_censoring_ignorability_diagnostic(
             root=repo_root,
             census_path=census,
             observations_path=observations,
+            data_root=data_root,
         )
     except CensoringDiagnosticError as exc:
         raise HficCliError(str(exc)) from exc
-    _assert_no_path_leak(receipt, str(repo_root), str(census), str(observations))
+    leak = [str(repo_root)]
+    if census is not None:
+        leak.append(str(census))
+    if observations is not None:
+        leak.append(str(observations))
+    if data_root is not None:
+        leak.append(str(data_root))
+    _assert_no_path_leak(receipt, *leak)
     return emit(receipt)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="hypothesis_forge")
     parser.add_argument("--root", type=Path, default=ROOT)
-    parser.add_argument("--data-root", type=Path, default=None)
+    parser.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help=(
+            "factory data_root; for censoring-ignorability-diagnostic this must "
+            "be an imported LIVE CORPUS (datasets/live_lifecycle_corpus/lineage.json), "
+            "never Observation RDP"
+        ),
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     preflight = subparsers.add_parser("preflight")
@@ -1129,10 +1150,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     censoring = subparsers.add_parser(
         "censoring-ignorability-diagnostic",
-        help="offline X300 selection diagnostic; requires explicit census and observations parquet; never defaults to active RDP",
+        help=(
+            "offline X300 selection diagnostic; canonical LIVE CORPUS via parent "
+            "--data-root, or explicit parquet paths which stay noncanonical"
+        ),
+        description=(
+            "Canonical mode: pass parent --data-root pointing at an imported LIVE "
+            "CORPUS data_root that contains datasets/live_lifecycle_corpus/lineage.json. "
+            "Do not pass Observation RDP. Bind FAIL is a typed CANONICAL_* token and "
+            "does not fall back to parquet paths. Explicit --census and --observations "
+            "stay SYNTHETIC_OR_NONCANONICAL_POPULATION even if bytes match frozen "
+            "hashes. Mixing parent --data-root with --census/--observations fails as "
+            "CANONICAL_MODE_EXPLICIT_PATH_CONFLICT. Empty invocation fails as "
+            "CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED."
+        ),
     )
-    censoring.add_argument("--census", type=Path, required=True)
-    censoring.add_argument("--observations", type=Path, required=True)
+    censoring.add_argument("--census", type=Path, default=None)
+    censoring.add_argument("--observations", type=Path, default=None)
     censoring.add_argument("--format", choices=("json",), default="json")
 
     backfill = subparsers.add_parser("backfill-legacy")
@@ -1323,6 +1357,7 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root,
                 census=args.census,
                 observations=args.observations,
+                data_root=args.data_root,
             )
         if args.command == "prove-runtime":
             return cmd_prove_runtime(repo_root, args.session_id, args.data_root)

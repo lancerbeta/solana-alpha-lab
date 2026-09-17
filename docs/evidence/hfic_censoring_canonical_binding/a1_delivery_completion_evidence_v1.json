@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-CENSORING-CANONICAL-BINDING-ACCEPT-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_CENSORING_CANONICAL_BINDING_V1",
+  "state_change": "Added fail-closed canonical LIVE CORPUS binding before Block A X300 typed_value read. Explicit paths remain noncanonical. No live 148-vs-327 run.",
+  "base_main": "dc333a29231ae0dbd13374e0c97b5c45e4a4f144",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "67be180ef81efd400524b00a729e2f55ab61bd7f7c4c83d5d33eb08d16c3214f",
+    "catalog/assets/lifecycle.yaml": "669136b6303c39d008dbe1dcd997807c4988acf6192ef5ea04193c4eb4c14c81",
+    "configs/hfic_censoring_ignorability_diagnostic_v1.yaml": "47668ad5a7316b4bdb1a78be0bbc9bd1caed24ba597f10c6cf966dfaa05d556c",
+    "docs/PROJECT_MAP.md": "736069ebacc3231ba8621b900fe59dbcf9674c9f612c8e149ffc9fdcddf5fd9b",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "f79e9db12aa41f45f9ced2a0da16b31884c0c5aed356ec03e79629d21644dbb6",
+    "docs/reports/hfic_censoring_canonical_binding/a1_owner_readout_v1.md": "7fe7ae48757182f5f88e349fb3a379054a31dc2a4784fd5ae1a736e3ab097063",
+    "docs/tasks/HFIC_CENSORING_CANONICAL_BINDING_V1.md": "24dbdeae43bdf1e0cb015a3f41a8edee62d7df1ef8e10bc754d037e2986a9b79",
+    "scripts/hypothesis_forge.py": "45af3f1335ba8d4a84891eaedb213267b2e756cfb8d4f01d19fcdad575b5e0c2",
+    "src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py": "7692fe9c9cf3802c413f5b27468c86eca38856df432e415ac7280f707e612d27",
+    "tests/test_hfic_censoring_ignorability_diagnostic_v1.py": "f185a1ccf4afc0a7543b91b3d7758c98303973d28273ab243e93322367525a8b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_censoring_canonical_binding/a1_delivery_factory_fit_v1.json",
+    "sha256": "4c5d06ff1c03249bbdb531548264c667358decbaeb388e514e8c6a10cfa2adba",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_HFIC_CENSORING_CANONICAL_BINDING",
+    "independent_review": {
+      "path": "docs/evidence/hfic_censoring_canonical_binding/a1_delivery_independent_review_v1.json",
+      "sha256": "1b1889d7641347479af15e03ee379c421f85c556e6ddbaa3096f9f60e7e8e1ce",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC",
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_CANONICAL_DONE",
+    "NO_REAL_148_VS_327_DIAGNOSTIC_RUN",
+    "NO_RELEASE_SCHEMA_MUTATION"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "rdp_mutation": 0,
+    "provider_calls": 0
+  }
+}

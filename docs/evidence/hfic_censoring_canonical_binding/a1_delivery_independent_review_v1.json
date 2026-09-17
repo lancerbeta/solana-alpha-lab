@@ -1,0 +1,81 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-CENSORING-CANONICAL-BINDING-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_CENSORING_CANONICAL_BINDING_V1",
+  "reviewed_bindings_sha256": "9df07a49674975956b4073a4261bd962577e261e521daba02633687fb016c862",
+  "reviewed_inventory_sha256": "8149b2e1eb8e7f506e55c357917dccd3ad1627b46578a92257e8d20605a16e9d",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=22d4cb2c185af76e6208c640894ed669a05677a62b7a9c5c54cc5087ffb09243",
+        "PRIOR_FAILS_1_4_CLOSED",
+        "PROD_RUN_DATA_ROOT_SPEC_PINS_ONLY",
+        "READOUT_GATE_NOT_FROZEN_COHORT_RESULT",
+        "HELPER_EXC_MAPPED_CANONICAL_STAR",
+        "CLI_EMPTY_AND_HELP_TOKENS_MATCH",
+        "RESIDUAL_HELPER_CANONICAL_WITHOUT_SPEC_PIN_MATCH",
+        "RESIDUAL_PRIVATE__LOAD_LINEAGE_TRUTH_COUPLING"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "NO_CANONICAL_BINDING_PARAM",
+        "SPEC_PINS_BEFORE_XREAD",
+        "HELPER_TEST_ONLY",
+        "LINEAGE_PARTITION_MAPPED",
+        "CLI_MIXED_EMPTY_CODES",
+        "Y_READ_DENIED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_1_TO_12_COVERED",
+        "BIND_PASS_THEN_PRIVATE_X_READ",
+        "PUBLIC_RUN_NO_CANONICAL_BINDING",
+        "PUBLIC_DATA_ROOT_FAILS_FROZEN_PINS",
+        "EXPLICIT_PATH_NONCANONICAL",
+        "SESSION_UNSTAMPED_WITHOUT_SPEC_HASH_MATCH",
+        "LIVE_148_VS_327_NOT_RUN",
+        "NONCLAIMS_HONEST"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "EMPTY_INVOKE_BOTH_MODES",
+        "SUBHELP_NAMES_PARENT_DATA_ROOT",
+        "NO_RDP_DEFAULT",
+        "TYPED_BIND_FAIL_NO_FALLBACK",
+        "READOUT_GATE_COPYPASTE"
+      ]
+    }
+  ],
+  "remediation_history": [],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_REAL_148_VS_327_DIAGNOSTIC_RUN",
+    "NO_RELEASE_SCHEMA_MUTATION",
+    "NO_CANONICAL_DONE"
+  ]
+}

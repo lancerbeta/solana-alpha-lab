@@ -11,6 +11,9 @@ supports_pit: true
 canonical_corpus:
   dataset_id: DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001
   cohort_id: REL-20260902T111900Z-20260909T111900Z
+  release_id: 633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154
+  census_sha256: cfa7d8404dc5400c4e223c4d5303193ad2209f92cac3af2d61862e384ebfd5bf
+  observations_sha256: 7b26425c69cc95baf8a9e0b9ea506de1042b98b83d48a2dae07f5a33a7d66d7d
   scientific_context_session: HFIC-SESS-560C4E1A72B4F9E6
 y_point_prefix: Y
 allowed_point_id: X300
