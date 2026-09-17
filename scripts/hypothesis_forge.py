@@ -1041,6 +1041,32 @@ def cmd_diagnostics(
     return emit(payload)
 
 
+def cmd_censoring_ignorability_diagnostic(
+    repo_root: Path,
+    *,
+    census: Path,
+    observations: Path,
+) -> int:
+    from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
+        CensoringDiagnosticError,
+        EXPLICIT_RELEASE_PATHS_REQUIRED,
+        run_censoring_ignorability_diagnostic,
+    )
+
+    if census is None or observations is None:
+        raise HficCliError(EXPLICIT_RELEASE_PATHS_REQUIRED)
+    try:
+        receipt = run_censoring_ignorability_diagnostic(
+            root=repo_root,
+            census_path=census,
+            observations_path=observations,
+        )
+    except CensoringDiagnosticError as exc:
+        raise HficCliError(str(exc)) from exc
+    _assert_no_path_leak(receipt, str(repo_root), str(census), str(observations))
+    return emit(receipt)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="hypothesis_forge")
     parser.add_argument("--root", type=Path, default=ROOT)
@@ -1100,6 +1126,14 @@ def build_parser() -> argparse.ArgumentParser:
     diagnostics = subparsers.add_parser("diagnostics")
     diagnostics.add_argument("--last", type=int, required=True)
     diagnostics.add_argument("--format", choices=("json",), default="json")
+
+    censoring = subparsers.add_parser(
+        "censoring-ignorability-diagnostic",
+        help="offline X300 selection diagnostic; requires explicit census and observations parquet; never defaults to active RDP",
+    )
+    censoring.add_argument("--census", type=Path, required=True)
+    censoring.add_argument("--observations", type=Path, required=True)
+    censoring.add_argument("--format", choices=("json",), default="json")
 
     backfill = subparsers.add_parser("backfill-legacy")
     backfill.add_argument("--packet", type=Path, required=True)
@@ -1283,6 +1317,12 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root,
                 last_n=int(args.last),
                 explicit_data_root=args.data_root,
+            )
+        if args.command == "censoring-ignorability-diagnostic":
+            return cmd_censoring_ignorability_diagnostic(
+                repo_root,
+                census=args.census,
+                observations=args.observations,
             )
         if args.command == "prove-runtime":
             return cmd_prove_runtime(repo_root, args.session_id, args.data_root)

@@ -1,7 +1,7 @@
 schema: smial.experiment-capability-registry
 schema_version: '2.0'
 registry_id: EXPERIMENT_CAPABILITY_REGISTRY_V2
-as_of: '2026-08-28'
+as_of: '2026-09-17'
 capabilities:
   - capability_id: CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001
     status: ACCEPTED
@@ -133,5 +133,24 @@ capabilities:
     max_provider_calls: 0
     supports_pit: true
     determinism_class: DETERMINISTIC
+    promotion_authority: NONE
+    query_recipe_required: false
+
+  - capability_id: CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001
+    status: ACCEPTED
+    entrypoint: solana_alpha_lab.factory.capabilities:run_censoring_ignorability_diagnostic
+    implementation_asset_ids:
+      - MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001
+    parameter_schema_asset_id: SCHEMA-EXPERIMENT-SPEC-001
+    input_kinds:
+      - CATALOG_ASSET
+    output_kinds:
+      - RESEARCH_ARTIFACT
+    effect_class: OFFLINE_READ_ONLY
+    output_zone: DATA_ROOT_ONLY
+    provider_policy_asset_id: null
+    max_provider_calls: 0
+    supports_pit: true
+    determinism_class: SEEDED_DETERMINISTIC
     promotion_authority: NONE
     query_recipe_required: false

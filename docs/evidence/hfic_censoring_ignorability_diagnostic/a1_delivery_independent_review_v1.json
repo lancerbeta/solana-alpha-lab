@@ -1,0 +1,73 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1",
+  "reviewed_bindings_sha256": "fc45bcdf627396acc5cb8dbf434161fb8cca13dc72f6fab05b835a5713a4d192",
+  "reviewed_inventory_sha256": "89f562b42d6bc71e3d4fbb06c7774186487b41a2db6d2ad65923a7cc77d52281",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "TYPED_VALUE_BLOCK_A_ONLY",
+        "ALL_X300_KEY_DUP_SCAN",
+        "VALUE_KIND_MISMATCH_INCONCLUSIVE",
+        "MIXED_DATASET_SESSION_INCONCLUSIVE",
+        "TERMINAL_SCIENTIFIC_PIPE_SCOPE",
+        "FROZEN_SPEC_SHA256_PIN",
+        "TESTS_28_INCL_CANONICAL_UNREACHABLE",
+        "Y_UNREAD_BUDGET0_EXPLICIT_PATHS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NAMED_CONSUMER_USEFUL",
+        "CHEAPEST_FALSIFIER_PRESENT",
+        "NON_CLAIMS_HOLD",
+        "NO_Y_TYPED_VALUE_READ",
+        "NO_CANONICAL_ACTIVE_RDP_RUN_THIS_ATOM",
+        "CANONICAL_SCOPE_UNREACHABLE_HONEST",
+        "DENOMINATOR_PROVENANCE_BOUND",
+        "BLOCK_A_LIVE_COVERAGE_UNBOUND"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "C1_X300_KEYS_WITHOUT_TYPED_VALUE_BLOCK_A_ONLY_MATERIALIZED",
+        "C2_ATOMIC_TERMINAL_SCIENTIFIC_PIPE_SCOPE_UNPROVEN_STATUSES",
+        "C3_OFFLINE_SEEDED_PROMOTION_NONE_MAX_PROVIDER_0",
+        "C4_VALUE_KIND_MISMATCH_INCONCLUSIVE_NO_COERCE",
+        "C5_MIXED_OR_BOTH_SIDED_MISMATCH_INCONCLUSIVE",
+        "C6_CATEGORICAL_SMD_24_VS_0_EQUALS_2_0",
+        "C7_RUNTIME_PIN_FROZEN_SPEC_SHA256_FILE_BYTES",
+        "C8_NO_CANONICAL_ACTIVE_RDP_RUN_THIS_ATOM",
+        "C9_CANONICAL_SCOPE_BLOCKED_NO_SPEC_PINS_NO_IDENTITY_COLUMNS",
+        "PIT_TRUSTS_POINT_ID_X300_NOT_REVERIFIED_TIMESTAMPS"
+      ]
+    }
+  ],
+  "remediation_history": [],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_CANONICAL_ACTIVE_RDP_RUN_THIS_ATOM",
+    "NO_CANONICAL_SCOPE_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ]
+}

@@ -1,0 +1,90 @@
+schema: smial.hfic-censoring-ignorability-diagnostic-spec
+schema_version: '1.0'
+spec_id: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
+as_of: '2026-09-17'
+capability_id: CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001
+named_consumer: HFIC-POST-NO-WORTHY-ROUTER
+promotion_authority: NONE
+effect_class: OFFLINE_READ_ONLY
+determinism_class: SEEDED_DETERMINISTIC
+supports_pit: true
+canonical_corpus:
+  dataset_id: DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001
+  cohort_id: REL-20260902T111900Z-20260909T111900Z
+  scientific_context_session: HFIC-SESS-560C4E1A72B4F9E6
+y_point_prefix: Y
+allowed_point_id: X300
+denominator:
+  discovered_in_observation_partition: 610
+  x_eligible_observed: 148
+  x_eligible_censored_late: 327
+  admitted_censored_late_no_x300: 35
+  x_population_ineligible: 100
+  comparable_x_subset: 475
+  comparable_x_rule: census.candidate_state == X_ELIGIBLE
+coverage_floor_joint_observed: 0.95
+rare_level_min_joint_n: 8
+rare_level_label: OTHER
+smd_threshold: 0.25
+permutation_count: 1999
+permutation_seed: 560C4E1A
+permutation_p_threshold: 0.05
+variance_epsilon: 1.0e-18
+categorical_smd:
+  statistic: pairwise_proportion
+  pooled: joint_hits_over_joint_n
+  denominator: sqrt_max_pooled_complement_epsilon
+  omnibus_reduction: max_abs
+block_a_omnibus:
+  - feature_id: log1p_liquidity_usd
+    field_id: FIELD-LIQUIDITY-USD-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: log1p_market_cap_usd
+    field_id: FIELD-MARKET-CAP-USD-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: log1p_usd_price
+    field_id: FIELD-USD-PRICE-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: log1p_holder_count
+    field_id: FIELD-HOLDER-COUNT-001
+    value_kind: DECIMAL
+    transform: log1p
+    role: continuous
+  - feature_id: launchpad
+    field_id: FIELD-LAUNCHPAD-001
+    value_kind: TEXT
+    transform: rare_level_collapse
+    role: categorical
+block_b_descriptive_not_omnibus:
+  - feature_id: first_pool_created_at
+    field_id: FIELD-FIRST-POOL-CREATED-AT-001
+    reason: latency definitionally feeds censored_late; tautological if included in omnibus
+excluded_fields:
+  - FIELD-TOKEN-MINT-001
+  - FIELD-FIRST-POOL-SOURCE-001
+  - FIELD-R0-TAKER-VOLUME-MIX-001
+  - FIELD-STATS5M-BUY-VOLUME-001
+  - FIELD-STATS5M-NUM-BUYS-001
+  - FIELD-STATS5M-NUM-NET-BUYERS-001
+  - FIELD-STATS5M-NUM-SELLS-001
+  - FIELD-STATS5M-NUM-TRADERS-001
+  - FIELD-STATS5M-SELL-VOLUME-001
+  - FIELD-STATS5M-TAKER-VOLUME-001
+terminals:
+  - CENSORING_OBSERVED_X_SHIFT_DETECTED
+  - CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED
+  - CENSORING_DIAGNOSTIC_INCONCLUSIVE
+non_claims:
+  - NO_MAR
+  - NO_IGNORABILITY
+  - NO_IDENTIFIABILITY
+  - NO_ALPHA
+  - NO_MARKET_HYPOTHESIS_VALIDITY
+  - NO_Y_POINT_READ
+  - NO_CANONICAL_ACTIVE_RDP_RUN_THIS_ATOM

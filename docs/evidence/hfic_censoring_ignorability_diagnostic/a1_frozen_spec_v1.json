@@ -1,0 +1,46 @@
+{
+  "schema": "smial.hfic-censoring-ignorability-frozen-spec",
+  "schema_version": "1.0",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1",
+  "capability_id": "CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001",
+  "spec_relative": "configs/hfic_censoring_ignorability_diagnostic_v1.yaml",
+  "allowed_point_id": "X300",
+  "y_point_prefix": "Y",
+  "coverage_floor_joint_observed": 0.95,
+  "rare_level_min_joint_n": 8,
+  "smd_threshold": 0.25,
+  "permutation_count": 1999,
+  "permutation_seed": "560C4E1A",
+  "permutation_p_threshold": 0.05,
+  "spec_file_sha256": "c1c42d4605eda0c1005c2d4fa0c9efc0da6eb89ea627bdde4454480551a77981",
+  "block_a_field_ids": [
+    "FIELD-LIQUIDITY-USD-001",
+    "FIELD-MARKET-CAP-USD-001",
+    "FIELD-USD-PRICE-001",
+    "FIELD-HOLDER-COUNT-001",
+    "FIELD-LAUNCHPAD-001"
+  ],
+  "block_b_not_omnibus_field_ids": [
+    "FIELD-FIRST-POOL-CREATED-AT-001"
+  ],
+  "terminals": [
+    "CENSORING_OBSERVED_X_SHIFT_DETECTED",
+    "CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED",
+    "CENSORING_DIAGNOSTIC_INCONCLUSIVE"
+  ],
+  "shift_not_detected_still_unproven": [
+    "IGNORABILITY_UNPROVEN",
+    "IDENTIFICATION_UNPROVEN"
+  ],
+  "this_atom_ran_canonical_active_rdp_diagnostic": false,
+  "canonical_scope_reachable_this_atom": false,
+  "canonical_scope_blockers": [
+    "SPEC_MISSING_census_sha256",
+    "SPEC_MISSING_observations_sha256",
+    "CENSUS_RELEASE_SCHEMA_MISSING_dataset_id",
+    "CENSUS_RELEASE_SCHEMA_MISSING_scientific_context_session",
+    "OBS_RELEASE_SCHEMA_MISSING_dataset_id",
+    "OBS_RELEASE_SCHEMA_MISSING_scientific_context_session"
+  ]
+}
