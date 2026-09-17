@@ -2871,18 +2871,24 @@ def current_corpus_partition_rows(
     kind: str = "census",
 ) -> list[dict[str, Any]]:
     """Read census/observation rows exposed by the current cumulative corpus version."""
+    from solana_alpha_lab.factory.live_corpus_manifest_publish import inspect_canonical_root
+
     lineage = _load_lineage(data_root)
     current_mid = lineage.get("current_dataset_manifest_id")
     _require(isinstance(current_mid, str) and current_mid, "CURRENT_CORPUS_MISSING")
+    inspection = inspect_canonical_root(data_root, str(current_mid))
+    _require(bool(inspection.get("complete")), "DATASET_PUBLICATION_INCOMPLETE")
     partition_dir = Path(data_root) / "datasets" / "manifests" / "partitions"
     rows: list[dict[str, Any]] = []
     for path in sorted(partition_dir.glob("partition-*.json")):
+        if path.is_symlink() or not path.is_file():
+            continue
         try:
             part = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-            continue
+            raise LiveCohortReleaseError("CANONICAL_ROOT_INCOMPLETE")
         if not isinstance(part, Mapping):
-            continue
+            raise LiveCohortReleaseError("CANONICAL_ROOT_INCOMPLETE")
         if str(part.get("dataset_manifest_id") or "") != current_mid:
             continue
         partition_id = str(part.get("partition_id") or "")
@@ -2892,10 +2898,13 @@ def current_corpus_partition_rows(
             continue
         location = str(part.get("logical_location") or "")
         parquet_path = Path(data_root) / location
-        if not parquet_path.is_file():
-            continue
+        _require(
+            parquet_path.is_file() and not parquet_path.is_symlink(),
+            "LIVE_CORPUS_PARQUET_MISSING",
+        )
         table = pq.read_table(parquet_path)
         rows.extend(table.to_pylist())
+    _require(bool(rows), "CANONICAL_ROOT_INCOMPLETE")
     return rows
 
 

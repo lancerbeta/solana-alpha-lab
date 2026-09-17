@@ -292,11 +292,32 @@ def inspect_canonical_root(data_root: Path, dataset_manifest_id: str) -> dict[st
     if receipt.get("dataset_fingerprint") != dataset.dataset_fingerprint:
         return {**empty, "dataset": dataset, "partitions": partitions, "reason": "FINGERPRINT_MISMATCH"}
     artifacts_ok = True
-    labels_ok = labels_path.is_file() and not labels_path.is_symlink()
+    labels_ok = False
+    if labels_path.is_file() and not labels_path.is_symlink():
+        try:
+            labels_payload = json.loads(labels_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            labels_payload = None
+        labels_ok = (
+            isinstance(labels_payload, dict)
+            and isinstance(labels_payload.get("dataset_terminal"), str)
+            and bool(labels_payload.get("dataset_terminal"))
+        )
     published_ok = _published_marker_ok(published_path, dataset)
-    complete = artifacts_ok and labels_ok and published_ok
+    parquet_ok = True
+    for part in partitions:
+        parquet_path = Path(data_root) / part.logical_location
+        if parquet_path.is_symlink() or not parquet_path.is_file():
+            parquet_ok = False
+            break
+        if sha256_file_streaming(parquet_path) != part.file_sha256:
+            parquet_ok = False
+            break
+    complete = artifacts_ok and labels_ok and published_ok and parquet_ok
     if not labels_ok:
         reason = "LABELS_MISSING"
+    elif not parquet_ok:
+        reason = "CORPUS_PARQUET_SHA_MISMATCH"
     elif not published_ok:
         reason = "UNPUBLISHED"
     else:
@@ -481,12 +502,14 @@ def _build_dataset(
 
 def _install_parquet(src: Path, dest: Path, expected_sha: str) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
+    if dest.is_symlink():
+        raise LiveCohortReleaseError("LIVE_CORPUS_PARQUET_SYMLINK")
     if dest.is_file():
         if sha256_file_streaming(dest) != expected_sha:
             raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT")
         return
     shutil.copyfile(src, dest)
-    if sha256_file_streaming(dest) != expected_sha:
+    if dest.is_symlink() or sha256_file_streaming(dest) != expected_sha:
         dest.unlink(missing_ok=True)
         raise LiveCohortReleaseError("TRANSPORT_HASH_MISMATCH")
 
@@ -770,6 +793,8 @@ def repair_live_corpus_manifests(
     current_mid = lineage.get("current_dataset_manifest_id")
     _require(isinstance(current_mid, str) and current_mid, "CURRENT_CORPUS_MISSING")
     inspection = inspect_canonical_root(data_root, current_mid)
+    if inspection.get("reason") == "CORPUS_PARQUET_SHA_MISMATCH":
+        raise LiveCohortReleaseError("CORPUS_PARQUET_SHA_MISMATCH")
     if inspection["complete"]:
         dataset = inspection["dataset"]
         return {
@@ -802,6 +827,8 @@ def repair_live_corpus_manifests(
             "cohort_id",
             "release_id",
             "content_sha256",
+            "dataset_manifest_id",
+            "corpus_version",
         ):
             _require(prior.get(key), "CORPUS_LINEAGE_INCOMPLETE")
 
@@ -979,6 +1006,8 @@ def import_live_cohort_canonical(
             "CURRENT_CORPUS_MISSING",
         )
         current_inspection = inspect_canonical_root(data_root, str(current_mid))
+        if current_inspection.get("reason") == "CORPUS_PARQUET_SHA_MISMATCH":
+            raise LiveCohortReleaseError("CORPUS_PARQUET_SHA_MISMATCH")
         if not current_inspection["complete"]:
             if (
                 matching is not None
@@ -1047,6 +1076,11 @@ def import_live_cohort_canonical(
                 "census_sha256",
                 "observations_sha256",
                 "sealed_at",
+                "cohort_id",
+                "release_id",
+                "content_sha256",
+                "dataset_manifest_id",
+                "corpus_version",
             ):
                 _require(prior.get(key), "CORPUS_LINEAGE_INCOMPLETE")
 
