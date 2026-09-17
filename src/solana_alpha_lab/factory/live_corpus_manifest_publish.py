@@ -480,17 +480,37 @@ def _feature_union(components: Sequence[Mapping[str, Any]]) -> list[str]:
     return [item for item in FEATURE_FAMILY_ORDER if item in seen] or ordered
 
 
+def _stage_labels_and_lineage(
+    *,
+    data_root: Path,
+    dataset_manifest_id: str,
+    labels: Mapping[str, Any],
+    lineage_out: Mapping[str, Any],
+    previous_current_mid: str | None,
+) -> None:
+    root = Path(data_root)
+    manifests = _manifests_dir(root)
+    _atomic_replace_json(manifests / f"{dataset_manifest_id}.labels.json", labels)
+    if previous_current_mid and previous_current_mid != dataset_manifest_id:
+        prev_labels_path = manifests / f"{previous_current_mid}.labels.json"
+        if prev_labels_path.is_file() and not prev_labels_path.is_symlink():
+            try:
+                old = json.loads(prev_labels_path.read_text(encoding="utf-8"))
+            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+                old = None
+            if isinstance(old, dict):
+                old["is_current_corpus_version"] = False
+                _atomic_replace_json(prev_labels_path, old)
+    write_live_corpus_lineage(root, lineage_out)
+
+
 def _commit_canonical_root(
     *,
     data_root: Path,
     dataset: DatasetManifest,
     partitions: Sequence[PartitionManifest],
     receipt_bytes: bytes,
-    labels: Mapping[str, Any],
     published: Mapping[str, Any],
-    lineage_out: Mapping[str, Any],
-    previous_current_mid: str | None,
-    fault_before_visibility: Callable[[], None] | None,
 ) -> None:
     root = Path(data_root)
     manifests = _manifests_dir(root)
@@ -503,30 +523,10 @@ def _commit_canonical_root(
         manifests / f"{dataset.dataset_manifest_id}.validation.json",
         receipt_bytes,
     )
-    _atomic_replace_json(
-        manifests / f"{dataset.dataset_manifest_id}.labels.json",
-        labels,
-    )
-    if (
-        previous_current_mid
-        and previous_current_mid != dataset.dataset_manifest_id
-    ):
-        prev_labels_path = manifests / f"{previous_current_mid}.labels.json"
-        if prev_labels_path.is_file() and not prev_labels_path.is_symlink():
-            try:
-                old = json.loads(prev_labels_path.read_text(encoding="utf-8"))
-            except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-                old = None
-            if isinstance(old, dict):
-                old["is_current_corpus_version"] = False
-                _atomic_replace_json(prev_labels_path, old)
     _publish_bytes(
         manifests / f"{dataset.dataset_manifest_id}.json",
         canonical_manifest_bytes(dataset),
     )
-    write_live_corpus_lineage(root, lineage_out)
-    if fault_before_visibility is not None:
-        fault_before_visibility()
     _publish_bytes(
         manifests / f"{dataset.dataset_manifest_id}.published",
         json.dumps(dict(published), sort_keys=True, separators=(",", ":")).encode(
@@ -602,6 +602,15 @@ def _publish_from_claims(
 ) -> tuple[DatasetManifest, list[PartitionManifest], str]:
     schema_sha256 = live_corpus_schema_sha256()
     dataset_manifest_id = compute_dataset_manifest_id(CORPUS_DATASET_ID, dataset_version)
+    _stage_labels_and_lineage(
+        data_root=data_root,
+        dataset_manifest_id=dataset_manifest_id,
+        labels=labels,
+        lineage_out=lineage_out,
+        previous_current_mid=previous_current_mid,
+    )
+    if fault_before_visibility is not None:
+        fault_before_visibility()
     clock = _freeze_publication_clock(data_root, dataset_manifest_id, published_at)
     partitions = _build_partitions(
         dataset_version=dataset_version,
@@ -643,6 +652,7 @@ def _publish_from_claims(
         "cumulative_cohort_count": len(composition),
         "dataset_fingerprint": dataset.dataset_fingerprint,
         "dataset_manifest_id": dataset.dataset_manifest_id,
+        "metadata_clock_at": _stamp_utc(clock),
         "published_at": _stamp_utc(clock),
         "release_id": composition[-1]["release_id"] if composition else None,
     }
@@ -651,11 +661,7 @@ def _publish_from_claims(
         dataset=dataset,
         partitions=partitions,
         receipt_bytes=receipt_bytes,
-        labels=labels,
         published=published,
-        lineage_out=lineage_out,
-        previous_current_mid=previous_current_mid,
-        fault_before_visibility=fault_before_visibility,
     )
     return dataset, list(partitions), fingerprint
 
@@ -672,6 +678,7 @@ def _published_payload(
         "cumulative_cohort_count": len(cohorts),
         "dataset_fingerprint": dataset.dataset_fingerprint,
         "dataset_manifest_id": dataset.dataset_manifest_id,
+        "metadata_clock_at": _stamp_utc(dataset.first_reliable_available_at),
         "published_at": _stamp_utc(dataset.first_reliable_available_at),
         "release_id": latest.get("release_id"),
     }
@@ -940,19 +947,38 @@ def import_live_cohort_canonical(
                 matching is not None
                 and matching.get("content_sha256") == content_sha
                 and str(matching.get("dataset_manifest_id") or "") == current_mid
-                and current_inspection["artifacts_ok"]
             ):
-                finish_unpublished_visibility(data_root, str(current_mid))
-                return {
-                    "status": "IMPORTED",
-                    "cohort_id": cohort_id,
-                    "release_id": release_id,
-                    "corpus_version": matching.get("corpus_version"),
-                    "dataset_manifest_id": current_mid,
-                    "evidence_role": LIVE_EVIDENCE_ROLE,
-                    "logical_rows_measured_partitions": 0,
-                    "epoch_bump": True,
-                }
+                if current_inspection["artifacts_ok"]:
+                    finish_unpublished_visibility(data_root, str(current_mid))
+                    return {
+                        "status": "IMPORTED",
+                        "cohort_id": cohort_id,
+                        "release_id": release_id,
+                        "corpus_version": matching.get("corpus_version"),
+                        "dataset_manifest_id": current_mid,
+                        "evidence_role": LIVE_EVIDENCE_ROLE,
+                        "logical_rows_measured_partitions": 0,
+                        "epoch_bump": True,
+                    }
+                if str(matching.get("dataset_version") or "").endswith(
+                    CANONICAL_METADATA_SUFFIX
+                ):
+                    rebuilt = repair_live_corpus_manifests(
+                        data_root=data_root,
+                        published_at=imported_at,
+                    )
+                    return {
+                        "status": "IMPORTED",
+                        "cohort_id": cohort_id,
+                        "release_id": release_id,
+                        "corpus_version": rebuilt.get("corpus_version"),
+                        "dataset_manifest_id": rebuilt["dataset_manifest_id"],
+                        "evidence_role": LIVE_EVIDENCE_ROLE,
+                        "logical_rows_measured_partitions": rebuilt.get(
+                            "logical_rows_measured_partitions", 0
+                        ),
+                        "epoch_bump": True,
+                    }
             if (
                 matching is not None
                 and matching.get("content_sha256") != content_sha

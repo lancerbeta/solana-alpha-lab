@@ -687,6 +687,13 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
             )
             self.assertEqual(rerun["dataset_manifest_id"], new_mid)
             self.assertTrue(published_path.is_file())
+            published_dataset = DatasetManifest.model_validate_json(
+                (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
+            )
+            self.assertEqual(
+                published_dataset.first_reliable_available_at,
+                datetime(2026, 9, 19, tzinfo=UTC),
+            )
             self.assertEqual(_sha256_path(census_path), census_before)
             enumerated, _ = enumerate_rdp_datasets(data_root)
             current = [
@@ -760,12 +767,8 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 if item.get("dataset_id") == CORPUS_DATASET_ID
             ]
             self.assertEqual(current, [])
-            self.assertTrue(
-                any(
-                    item.get("code") == "DATASET_PUBLICATION_INCOMPLETE"
-                    and item.get("dataset_manifest_id") == new_mid
-                    for item in warnings
-                )
+            self.assertFalse(
+                (data_root / "datasets" / "manifests" / f"{new_mid}.json").is_file()
             )
             rerun = import_live_cohort(
                 release_root=release0,
