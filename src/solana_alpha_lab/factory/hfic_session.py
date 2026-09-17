@@ -3163,6 +3163,9 @@ def run_live_classifier(
         as_of = datetime.now(UTC)
     packet = dict(submission)
     packet.setdefault("hypothesis_definition_sha256", frozen.get("selected_definition_sha256"))
+    for key in ("outcome_readiness", "scientific_eligibility_projection"):
+        if key in critic_result and key not in packet:
+            packet[key] = critic_result[key]
     decision = classify_lane(
         packet,
         root=Path(repo_root),

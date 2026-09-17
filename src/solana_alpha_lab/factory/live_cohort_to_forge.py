@@ -23,6 +23,9 @@ from solana_alpha_lab.factory.discovery_evidence_release import DiscoveryRelease
 from solana_alpha_lab.factory.early_market_panel_importer import (
     MIN_USABLE_YIELD_ELIGIBLE,
 )
+from solana_alpha_lab.factory.scientific_eligibility_projection import (
+    MIN_USABLE_BASE_X_POPULATION,
+)
 from solana_alpha_lab.factory.hfic_preflight import (
     AUTO_FOCUS,
     HficPreflightError,
@@ -711,6 +714,10 @@ def forge_control_ready(
                     "CONTROL_CORPUS_MANIFEST_MISMATCH",
                 )
     yield_eligible = int(labels.get("yield_eligible") or chosen.get("yield_eligible") or 0)
+    raw_base_x = labels.get("base_x_population_n", chosen.get("base_x_population_n"))
+    if raw_base_x is None:
+        raw_base_x = chosen.get("base_x_n")
+    base_x_n = int(raw_base_x) if raw_base_x is not None else None
     coverage = str(labels.get("discovery_coverage_class") or "")
     _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
     _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
@@ -786,7 +793,9 @@ def forge_control_ready(
         "dataset_version": chosen.get("dataset_version") or labels.get("dataset_version"),
         "corpus_version": labels.get("corpus_version"),
         "yield_eligible": yield_eligible,
+        "base_x_population_n": base_x_n,
         "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
+        "min_usable_base_x_population": MIN_USABLE_BASE_X_POPULATION,
         "evidence_epoch_sha256": epoch,
         "discovery_coverage_class": coverage or None,
         "enumerate_warnings": list(warnings),

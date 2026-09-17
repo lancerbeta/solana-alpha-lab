@@ -527,14 +527,16 @@ class HficRepresentationProbeTests(unittest.TestCase):
     def test_builder_rejects_unusable_readiness(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
-        for readiness, expected in (
+        for readiness, expected, base_x in (
             (
                 _cohort_readiness_receipt(yield_eligible=9),
                 INVALID_INSUFFICIENT_YIELD,
+                9,
             ),
             (
                 _cohort_readiness_receipt(coverage="GAP_CONFIRMED"),
                 INVALID_COVERAGE_BROKEN,
+                None,
             ),
         ):
             with self.subTest(expected=expected):
@@ -543,6 +545,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
                         baseline,
                         _representation_fixture(),
                         cohort_readiness_receipt=readiness,
+                        base_x_population_n=base_x,
                     )
                 self.assertEqual(str(raised.exception), expected)
 
@@ -552,7 +555,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 project_normalized_trajectory([]),
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
             )
-        self.assertEqual(str(raised.exception), INVALID_COHORT_READINESS_RECEIPT)
+        self.assertEqual(str(raised.exception), INVALID_INSUFFICIENT_YIELD)
 
     def test_control_memory_anchors_must_match_packet(self) -> None:
         receipt = _control_receipt()
@@ -935,6 +938,7 @@ class RepresentationStatusTests(unittest.TestCase):
             "representation_schedule_sha256": DEFAULT_SCHEDULE.schedule_sha256,
             "cohort_ready": True,
             "cohort_readiness_receipt": _cohort_readiness_receipt(),
+            "base_x_population_n": 10,
         }
         self.assertEqual(representation_status({})["status"], STATUS_CONTROL_REQUIRED)
         self.assertEqual(representation_status(eligible)["status"], STATUS_ELIGIBLE)

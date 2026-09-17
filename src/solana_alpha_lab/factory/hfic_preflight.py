@@ -687,6 +687,9 @@ def enumerate_rdp_datasets(
                 evidence_role = role
         yield_eligible = int((labels or {}).get("yield_eligible") or 0)
         feature_usable = yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE
+        raw_base_x = None
+        if isinstance(labels, Mapping):
+            raw_base_x = labels.get("base_x_population_n", labels.get("base_x_n"))
         feature_families: list[str] = []
         raw_families = (labels or {}).get("feature_families")
         if isinstance(raw_families, list):
@@ -739,6 +742,9 @@ def enumerate_rdp_datasets(
                 "evidence_role": evidence_role,
                 "labels": labels,
                 "yield_eligible": yield_eligible,
+                "base_x_population_n": (
+                    int(raw_base_x) if raw_base_x is not None else None
+                ),
                 "yield_missing": int((labels or {}).get("yield_missing") or 0),
                 "feature_usable": feature_usable,
                 "dataset_terminal": dataset_terminal,
@@ -1430,7 +1436,11 @@ def build_forge_context_packet(
         packet["selection_robustness_caveat"] = {
             "router_decision": str(selection_caveat.get("router_decision") or ""),
             "gate_receipt_sha256": str(selection_caveat.get("gate_receipt_sha256") or ""),
-            "limitation": "RESIDUAL_UNMEASURED_SELECTION_UNCERTAINTY",
+            "eligibility_scope": str(
+                selection_caveat.get("eligibility_scope")
+                or "FULL_LIFECYCLE_COMPLETENESS"
+            ),
+            "limitation": "FULL_LIFECYCLE_COMPLETENESS_NOT_BASE_X_POPULATION",
         }
     from solana_alpha_lab.factory.hfic_control_integrity import (
         CURRENT_REPRESENTATION_CONTROL_V1,
@@ -1616,6 +1626,9 @@ def run_preflight(
         CURRENT_REPRESENTATION_CONTROL_V1,
         resolve_control_corpus_yield,
     )
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        MIN_USABLE_BASE_X_POPULATION,
+    )
     from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         CORPUS_DATASET_ID,
@@ -1643,7 +1656,7 @@ def run_preflight(
         gate, yield_eligible = resolve_control_corpus_yield(
             datasets,
             corpus_dataset_id=CORPUS_DATASET_ID,
-            min_usable_yield_eligible=MIN_USABLE_YIELD_ELIGIBLE,
+            min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
         )
         if gate != "OK":
             return {
@@ -1659,7 +1672,7 @@ def run_preflight(
                 "memory_eligibility_sha256": memory_eligibility,
                 "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
                 "control_yield_eligible": yield_eligible,
-                "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
+                "min_usable_yield_eligible": MIN_USABLE_BASE_X_POPULATION,
                 "session_id": None,
                 "forge_context_packet": {},
                 "authority": {

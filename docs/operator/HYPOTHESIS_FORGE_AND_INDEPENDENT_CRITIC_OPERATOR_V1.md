@@ -752,7 +752,7 @@ evidence that upgrade unlocks
 
 ### Если `FAST_LANE_CANDIDATE`
 
-Подготовь draft, совместимый с фактической текущей `ExperimentSpec` schema, но не запускай его. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
+Подготовь draft, совместимый с `ExperimentSpec` 1.3 (`required_outcomes` обязателен), но не запускай его. `primary_y` / `horizon_notional` остаются identity text. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
 
 Выведи:
 
@@ -1087,10 +1087,18 @@ OWNER_DECISION_REQUIRED
 ## B5. Если terminal = PASS_TO_CLASSIFICATION
 
 1. Сформируй финальный frozen Hypothesis Contract.
-2. Подготовь machine-valid ExperimentSpec по **фактической текущей schema**.
+2. Подготовь machine-valid ExperimentSpec **1.3** с явным `required_outcomes`.
+   `primary_y` / `horizon_notional` остаются identity text, не parser.
+   Не создавай `CRITIC_INPUT_PACKET` 1.5.
 3. Разреши stable IDs, hashes/fingerprints, capabilities, query recipes и parameter schema. Отсутствующие значения не выдумывай.
-4. Выполни только schema validation и deterministic lane classification network-free. Эксперимент не запускай.
-5. Результат classifier сильнее provisional lane Forge.
+4. Исторический selection receipt остаётся byte-immutable caveat
+   `FULL_LIFECYCLE_COMPLETENESS`. Не делай глобальный STOP `START_NEW_SESSION`
+   и не veto horizon-specific experiment, пока required Y set не равен
+   bound schedule Y set в точности.
+5. Выполни только schema validation и deterministic lane classification network-free. Эксперимент не запускай.
+   `outcome_readiness=MISSINGNESS_UNRESOLVED` fail-close в существующий
+   data/science-option route и не сжимает N.
+6. Результат classifier сильнее provisional lane Forge.
 
 Преобразуй classifier outcome:
 

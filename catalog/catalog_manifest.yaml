@@ -4,9 +4,9 @@ catalog_version: 0.130.0
 as_of: '2026-09-07'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1803
+  assets: 1809
   asset_registries: 4
-  schemas: 94
+  schemas: 96
   queries: 19
   lifecycle_registries: 9
   lifecycle_records: 84
@@ -200,6 +200,8 @@ root_resolver:
   - catalog/schemas/factory_remote_operations.schema.json
   - catalog/schemas/factory_remote_operations_v1_1.schema.json
   - catalog/schemas/experiment_spec_v1_2.schema.json
+  - catalog/schemas/experiment_spec_v1_3.schema.json
+  - catalog/schemas/scientific_eligibility_projection_v1.schema.json
   - catalog/schemas/observation_schedule_v1.schema.json
   - catalog/schemas/observation_primitive_descriptor_v1.schema.json
   - catalog/schemas/observation_panel_snapshot_v1.schema.json
@@ -1128,5 +1130,11 @@ mandatory_asset_ids:
 - MODULE-LIVE-CORPUS-LOGICAL-ROWS-001
 - MODULE-LIVE-CORPUS-MANIFEST-PUBLISH-001
 - TEST-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001
+- CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001
+- CONFIG-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001
+- SCHEMA-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001
+- SCHEMA-EXPERIMENT-SPEC-V1-3-001
+- MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001
+- TEST-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001
 deferred_capabilities:
 - GRAPH_DATABASE

@@ -168,31 +168,76 @@ def route_selection_gate(
     }
 
 
+def interpret_selection_gate_receipt(
+    gate_receipt: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Scope a historical v1.0 receipt without mutating its bytes."""
+
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+    )
+
+    decision = str(gate_receipt.get("router_decision") or "")
+    return {
+        "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+        "router_decision": decision,
+        "gate_receipt_sha256": str(gate_receipt.get("receipt_sha256") or ""),
+        "bytes_mutated": False,
+    }
+
+
 def apply_selection_gate_to_preflight(
     action: str,
     gate_receipt: Mapping[str, Any] | None,
+    *,
+    required_outcome_point_ids: Sequence[str] | None = None,
+    schedule_y_point_ids: Sequence[str] | None = None,
 ) -> dict[str, Any]:
-    """Smallest ordinary-Forge consumption seam. Resume paths stay unchanged."""
+    """Forge START consumes the receipt as a scoped caveat, not a global veto."""
+
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+        full_lifecycle_scope_equivalent,
+    )
 
     if action != "START_NEW_SESSION" or not isinstance(gate_receipt, Mapping):
         return {"applicable": False, "action": action, "terminal": None}
-    decision = str(gate_receipt.get("router_decision") or "")
-    if decision in BLOCK_DECISIONS:
+    scoped = interpret_selection_gate_receipt(gate_receipt)
+    decision = str(scoped["router_decision"] or "")
+    equivalent = full_lifecycle_scope_equivalent(
+        required_outcome_point_ids,
+        schedule_y_point_ids,
+    )
+    if decision == BLOCK_FORGE_EVIDENCE_GAP:
         return {
             "applicable": True,
             "action": "STOP",
             "terminal": decision,
             "router_decision": decision,
-            "gate_receipt_sha256": str(gate_receipt.get("receipt_sha256") or ""),
+            "gate_receipt_sha256": scoped["gate_receipt_sha256"],
+            "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+            "full_lifecycle_equivalent": False,
         }
-    if decision == FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT:
+    if decision == BLOCK_FORGE_SELECTION_RISK and equivalent:
+        return {
+            "applicable": True,
+            "action": "STOP",
+            "terminal": decision,
+            "router_decision": decision,
+            "gate_receipt_sha256": scoped["gate_receipt_sha256"],
+            "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+            "full_lifecycle_equivalent": True,
+        }
+    if decision in {BLOCK_FORGE_SELECTION_RISK, FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT}:
         return {
             "applicable": True,
             "action": action,
             "terminal": None,
             "router_decision": decision,
-            "gate_receipt_sha256": str(gate_receipt.get("receipt_sha256") or ""),
+            "gate_receipt_sha256": scoped["gate_receipt_sha256"],
+            "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
             "caveat": True,
+            "full_lifecycle_equivalent": False,
         }
     return {"applicable": False, "action": action, "terminal": None}
 

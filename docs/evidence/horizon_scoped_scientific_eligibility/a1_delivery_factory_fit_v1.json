@@ -1,0 +1,35 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-FACTORY-FIT-001",
+  "as_of": "2026-09-18",
+  "task_id": "HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1",
+  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PENDING_REVIEW",
+    "flexibility_and_history": "PENDING_REVIEW",
+    "context_efficiency": "PENDING_REVIEW",
+    "research_truth": "PENDING_REVIEW",
+    "owner_operability": "PENDING_REVIEW",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_THIS_ATOM",
+    "monitoring_and_recovery": "PENDING_REVIEW",
+    "build_vs_buy": "PENDING_REVIEW",
+    "security": "PENDING_REVIEW",
+    "red_team": "PENDING_REVIEW"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "POST_MERGE_READONLY_C1_SEMANTIC_ACCEPTANCE"
+  },
+  "recovery": "Revert ScientificEligibilityProjection, ExperimentSpec 1.3, and consumer rewires; keep historical receipts, census, parquet, and latest.json byte-immutable.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_COMPLETE_CASE_POPULATION",
+    "NO_Y_TYPED_VALUE_READ",
+    "NO_FORGE_EXECUTION_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ]
+}

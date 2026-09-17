@@ -1,0 +1,58 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-ACCEPT-001",
+  "as_of": "2026-09-18",
+  "task_id": "HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1",
+  "state_change": "Registered ScientificEligibilityProjection so X300-valid X_ELIGIBLE is the scientific denominator, ExperimentSpec 1.3 carries required_outcomes, and the historical selection receipt is a FULL_LIFECYCLE_COMPLETENESS caveat rather than a global START veto.",
+  "base_main": "6515e8b3a880065327a43448f592fe4101026dfb",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "configs/scientific_eligibility_projection_v1.yaml": "abc487f5cb403108fda0bbd363447d32bf7e855b7528f966ffcb09440e1a593b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/horizon_scoped_scientific_eligibility/a1_delivery_factory_fit_v1.json",
+    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY",
+    "independent_review": {
+      "path": "docs/evidence/horizon_scoped_scientific_eligibility/a1_delivery_independent_review_v1.json",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "verdict": "PENDING"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_COMPLETE_CASE_POPULATION",
+    "NO_Y_TYPED_VALUE_READ",
+    "NO_FORGE_EXECUTION_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "data_plane_mutation": 0,
+    "provider_calls": 0
+  }
+}

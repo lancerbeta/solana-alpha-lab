@@ -1,0 +1,30 @@
+schema: smial.scientific-eligibility-projection-spec
+schema_version: '1.0'
+spec_id: SCIENTIFIC_ELIGIBILITY_PROJECTION_V1
+as_of: '2026-09-18'
+rule_id: BASE_X_X300_VALID_X_ELIGIBLE_V1
+x_point_id: X300
+x_field_id: FIELD-LIQUIDITY-USD-001
+x_due_offset_seconds: 300
+x_allowed_lateness_seconds: 300
+min_usable_base_x_population: 10
+canonical_c1:
+  dataset_id: DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001
+  cohort_id: REL-20260902T111900Z-20260909T111900Z
+  release_id: 633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154
+  expected_base_x_n: 475
+  expected_lifecycle_observed_n: 148
+  expected_lifecycle_censored_late_n: 327
+y_point_prefix: Y
+resolved_observation_states:
+  - OBSERVED
+  - MISSING_TYPED
+  - CENSORED_LATE
+  - CENSORED
+  - DISAPPEARED
+  - EXCLUDED_AMBIGUOUS
+non_claims:
+  - NO_COMPLETE_CASE_POPULATION
+  - NO_Y_TYPED_VALUE_READ
+  - NO_PRIMARY_Y_PARSER
+  - NO_SCHEDULER_MUTATION

@@ -88,10 +88,12 @@ def _corpus(yield_eligible: int) -> dict:
         "dataset_fingerprint": "bb" * 32,
         "evidence_role": "UNSPECIFIED",
         "yield_eligible": yield_eligible,
+        "base_x_population_n": yield_eligible,
         "yield_missing": 0,
         "feature_usable": yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE,
         "labels": {
             "yield_eligible": yield_eligible,
+            "base_x_population_n": yield_eligible,
             "logical_dataset_id": CORPUS_DATASET_ID,
         },
     }

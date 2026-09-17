@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.run_passport import (
 
 SPEC_SCHEMA_RELATIVE = "catalog/schemas/experiment_spec_v1_1.schema.json"
 SPEC_SCHEMA_V1_2_RELATIVE = "catalog/schemas/experiment_spec_v1_2.schema.json"
+SPEC_SCHEMA_V1_3_RELATIVE = "catalog/schemas/experiment_spec_v1_3.schema.json"
 DESCRIPTOR_SCHEMA_RELATIVE = (
     "catalog/schemas/experiment_capability_descriptor.schema.json"
 )
@@ -128,7 +129,9 @@ def _validate_spec(
         return None
     version = spec.get("schema_version")
     schema_relative = SPEC_SCHEMA_RELATIVE
-    if version == "1.2":
+    if version == "1.3":
+        schema_relative = SPEC_SCHEMA_V1_3_RELATIVE
+    elif version == "1.2":
         schema_relative = SPEC_SCHEMA_V1_2_RELATIVE
     elif version not in {None, "1.1"}:
         return None
@@ -284,6 +287,32 @@ def _change_lane(reason_code: str) -> LaneDecision:
     )
 
 
+def _submission_outcome_readiness(
+    spec: Mapping[str, Any],
+    submission: Mapping[str, Any],
+) -> str:
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        READINESS_COMPLETE,
+        READINESS_MISSINGNESS_UNRESOLVED,
+        READINESS_UNSPECIFIED,
+    )
+
+    if spec.get("schema_version") != "1.3":
+        return READINESS_UNSPECIFIED
+    allowed = {
+        READINESS_COMPLETE,
+        READINESS_MISSINGNESS_UNRESOLVED,
+        READINESS_UNSPECIFIED,
+    }
+    raw = submission.get("outcome_readiness")
+    if raw in allowed:
+        return str(raw)
+    projection = submission.get("scientific_eligibility_projection")
+    if isinstance(projection, Mapping) and projection.get("outcome_readiness") in allowed:
+        return str(projection["outcome_readiness"])
+    return READINESS_MISSINGNESS_UNRESOLVED
+
+
 def _blocked_data(reason_code: str) -> LaneDecision:
     return _decision(
         Lane.FAST_LANE,
@@ -329,9 +358,10 @@ def classify_lane(
         )
 
     capability_id = str(spec["capability_id"])
+    uses_observation_request = spec.get("schema_version") in {"1.2", "1.3"}
     registry_relative = (
         CAPABILITY_REGISTRY_V2_RELATIVE
-        if spec.get("schema_version") == "1.2"
+        if uses_observation_request
         else CAPABILITY_REGISTRY_RELATIVE
     )
     try:
@@ -364,7 +394,7 @@ def classify_lane(
     if requested_calls > int(descriptor["max_provider_calls"]):
         return _change_lane("GUARDRAIL_CHANGE_REQUIRED")
 
-    if spec.get("schema_version") == "1.2":
+    if uses_observation_request:
         from solana_alpha_lab.factory.observation_schedule_compiler import (
             compile_observation_request,
         )
@@ -514,6 +544,14 @@ def classify_lane(
             prior_run_id=prior_run.run_id,
             next_action="REPLAY_PRIOR_RUN",
         )
+
+    if spec.get("schema_version") == "1.3":
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            READINESS_COMPLETE,
+        )
+
+        if _submission_outcome_readiness(spec, submission) != READINESS_COMPLETE:
+            return _blocked_data("OUTCOME_MISSINGNESS_UNRESOLVED")
 
     if descriptor["effect_class"] == "PROVIDER_READ_ONLY_BOUNDED":
         return _decision(

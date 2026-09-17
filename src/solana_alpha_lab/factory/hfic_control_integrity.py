@@ -232,10 +232,17 @@ def resolve_control_corpus_yield(
         break
     if current is None:
         return CONTROL_CORPUS_UNRESOLVABLE, None
-    yield_eligible = int(current.get("yield_eligible") or 0)
-    if yield_eligible < int(min_usable_yield_eligible):
-        return CONTROL_YIELD_BELOW_MIN, yield_eligible
-    return "OK", yield_eligible
+    raw = current.get("base_x_population_n", current.get("base_x_n"))
+    if raw is None:
+        labels = current.get("labels")
+        if isinstance(labels, Mapping):
+            raw = labels.get("base_x_population_n", labels.get("base_x_n"))
+    if raw is None:
+        return CONTROL_CORPUS_UNRESOLVABLE, None
+    base_x_n = int(raw)
+    if base_x_n < int(min_usable_yield_eligible):
+        return CONTROL_YIELD_BELOW_MIN, base_x_n
+    return "OK", base_x_n
 
 
 def control_packet_has_raw_sequences(packet: Mapping[str, Any]) -> bool:

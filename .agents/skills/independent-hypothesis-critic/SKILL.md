@@ -97,8 +97,17 @@ Hard boundaries — same as Forge:
 3. Execute **PROMPT B** attack matrix and terminal policy.
 4. Return critic sections B7 in order: one terminal, one NEXT, at most one execution
    unit.
-5. On `PASS_TO_CLASSIFICATION` path only: schema-validate ExperimentSpec and run
-   deterministic lane classifier **network-free**. Do not execute experiments.
+5. On `PASS_TO_CLASSIFICATION` path only: emit schema-valid **ExperimentSpec 1.3**
+   with explicit `required_outcomes`. `primary_y` / `horizon_notional` remain
+   identity text, not a parser. Do **not** create `CRITIC_INPUT_PACKET` 1.5.
+   Historical selection receipts stay byte-immutable
+   `FULL_LIFECYCLE_COMPLETENESS` caveats; do not globally veto
+   `START_NEW_SESSION` and do not auto-veto a horizon-specific experiment unless
+   its required Y point set exactly equals the bound schedule Y set.
+   Schema-validate the 1.3 spec and run deterministic lane classifier
+   **network-free**. `outcome_readiness=MISSINGNESS_UNRESOLVED` fail-closes into
+   the existing data/science-option route and must not shrink N. Do not execute
+   experiments.
 
 ## Context isolation
 
