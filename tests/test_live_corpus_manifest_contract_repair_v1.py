@@ -730,6 +730,55 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 )
             self.assertEqual(str(missing.exception), "CORPUS_LINEAGE_INCOMPLETE")
 
+    def test_first_import_interrupt_not_selected_current(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            data_root = base / "rdp"
+            data_root.mkdir()
+            release0, _sealed0, _cohort0 = _seal_week(base, 0)
+
+            def _fault() -> None:
+                raise _VisibilityFault("before published")
+
+            with self.assertRaises(_VisibilityFault):
+                import_live_cohort(
+                    release_root=release0,
+                    data_root=data_root,
+                    import_time=datetime(2026, 1, 20, 1, tzinfo=UTC),
+                    fault_before_visibility=_fault,
+                )
+            lineage = json.loads(
+                (
+                    data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+                ).read_text(encoding="utf-8")
+            )
+            new_mid = lineage["current_dataset_manifest_id"]
+            enumerated, warnings = enumerate_rdp_datasets(data_root)
+            current = [
+                item
+                for item in select_current_datasets_for_forge(enumerated)
+                if item.get("dataset_id") == CORPUS_DATASET_ID
+            ]
+            self.assertEqual(current, [])
+            self.assertTrue(
+                any(
+                    item.get("code") == "DATASET_PUBLICATION_INCOMPLETE"
+                    and item.get("dataset_manifest_id") == new_mid
+                    for item in warnings
+                )
+            )
+            rerun = import_live_cohort(
+                release_root=release0,
+                data_root=data_root,
+                import_time=datetime(2026, 1, 20, 2, tzinfo=UTC),
+            )
+            self.assertEqual(rerun["dataset_manifest_id"], new_mid)
+            self.assertTrue(
+                (
+                    data_root / "datasets" / "manifests" / f"{new_mid}.published"
+                ).is_file()
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

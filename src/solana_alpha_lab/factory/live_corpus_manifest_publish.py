@@ -503,10 +503,6 @@ def _commit_canonical_root(
         manifests / f"{dataset.dataset_manifest_id}.validation.json",
         receipt_bytes,
     )
-    _publish_bytes(
-        manifests / f"{dataset.dataset_manifest_id}.json",
-        canonical_manifest_bytes(dataset),
-    )
     _atomic_replace_json(
         manifests / f"{dataset.dataset_manifest_id}.labels.json",
         labels,
@@ -524,6 +520,10 @@ def _commit_canonical_root(
             if isinstance(old, dict):
                 old["is_current_corpus_version"] = False
                 _atomic_replace_json(prev_labels_path, old)
+    _publish_bytes(
+        manifests / f"{dataset.dataset_manifest_id}.json",
+        canonical_manifest_bytes(dataset),
+    )
     write_live_corpus_lineage(root, lineage_out)
     if fault_before_visibility is not None:
         fault_before_visibility()
