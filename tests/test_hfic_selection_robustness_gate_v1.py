@@ -36,6 +36,7 @@ from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
     CAP_HFIC_SELECTION_ROBUSTNESS_GATE,
     FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
     FROZEN_SPEC_SHA256,
+    GATE_ARTIFACT_RELATIVE,
     STAGE2_DETECTED,
     STAGE2_INCONCLUSIVE,
     STAGE2_NOT_DETECTED,
@@ -570,6 +571,15 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 "STOP",
             )
         self.assertIsNone(load_applicable_gate_receipt(Path(tempfile.gettempdir()) / "missing-gate-root"))
+        with tempfile.TemporaryDirectory() as tmp:
+            binary = Path(tmp) / GATE_ARTIFACT_RELATIVE
+            binary.parent.mkdir(parents=True, exist_ok=True)
+            binary.write_bytes(b"\xff\xfe\x00not-utf8")
+            loaded = load_applicable_gate_receipt(Path(tmp))
+            self.assertIsNotNone(loaded)
+            assert loaded is not None
+            self.assertTrue(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
         preflight_src = (
             ROOT / "src/solana_alpha_lab/factory/hfic_preflight.py"
         ).read_text(encoding="utf-8")

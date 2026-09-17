@@ -918,13 +918,13 @@ def _invalid_gate_receipt() -> dict[str, Any]:
 
 def load_applicable_gate_receipt(data_root: Path) -> dict[str, Any] | None:
     path = Path(data_root) / GATE_ARTIFACT_RELATIVE
-    if not path.exists():
-        return None
-    if path.is_symlink() or not path.is_file():
+    if path.is_symlink():
         return _invalid_gate_receipt()
+    if not path.is_file():
+        return None
     try:
         loaded = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError):
         return _invalid_gate_receipt()
     if not isinstance(loaded, dict):
         return _invalid_gate_receipt()

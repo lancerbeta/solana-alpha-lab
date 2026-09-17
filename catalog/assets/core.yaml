@@ -37493,7 +37493,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py', repository_path: src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py}
-  integrity: {kind: sha256, sha256: a25d7cd509d9c244f42547b246d1168e6bfbd25d5654f5f1b079eb3c3ea8a7fd}
+  integrity: {kind: sha256, sha256: 1f423965017401cee4c55d48d9d97fd9ab3db25615a63cbfa7ec53e5cda7b81a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
@@ -37512,7 +37512,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_selection_robustness_gate_v1.py', repository_path: tests/test_hfic_selection_robustness_gate_v1.py}
-  integrity: {kind: sha256, sha256: 97e3e980a7c2d05efad04e1810fd03b9f891c1f64943563eeef8fdad3761915e}
+  integrity: {kind: sha256, sha256: d0f349d6591c7efcece48b35a57100711a387ed27ce1bc286397ecc4650a7df2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
