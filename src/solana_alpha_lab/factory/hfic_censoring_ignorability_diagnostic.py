@@ -11,21 +11,49 @@ import json
 import math
 import random
 from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
 import yaml
 
+from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
+from solana_alpha_lab.factory.live_cohort_discovery_release import (
+    _corpus_lineage_path,
+    _load_lineage,
+)
+from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from solana_alpha_lab.factory.tokens_v2_typed_projection import STATE_OBSERVED
+from solana_alpha_lab.storage.manifests import verify_partition_manifest
 
 CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC = (
     "CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
 )
 SPEC_RELATIVE = "configs/hfic_censoring_ignorability_diagnostic_v1.yaml"
-FROZEN_SPEC_SHA256 = "c1c42d4605eda0c1005c2d4fa0c9efc0da6eb89ea627bdde4454480551a77981"
+FROZEN_SPEC_SHA256 = "47668ad5a7316b4bdb1a78be0bbc9bd1caed24ba597f10c6cf966dfaa05d556c"
 Y_POINT_READ = "Y_POINT_READ"
 EXPLICIT_RELEASE_PATHS_REQUIRED = "EXPLICIT_RELEASE_PATHS_REQUIRED"
+CANONICAL_MODE_EXPLICIT_PATH_CONFLICT = "CANONICAL_MODE_EXPLICIT_PATH_CONFLICT"
+CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED = (
+    "CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED"
+)
+CANONICAL_HASH_PIN_MISSING = "CANONICAL_HASH_PIN_MISSING"
+CANONICAL_LINEAGE_MISSING = "CANONICAL_LINEAGE_MISSING"
+CANONICAL_LOGICAL_DATASET_MISMATCH = "CANONICAL_LOGICAL_DATASET_MISMATCH"
+CANONICAL_COHORT_ABSENT = "CANONICAL_COHORT_ABSENT"
+CANONICAL_COHORT_DUPLICATE = "CANONICAL_COHORT_DUPLICATE"
+CANONICAL_RELEASE_MISMATCH = "CANONICAL_RELEASE_MISMATCH"
+CANONICAL_DATASET_MANIFEST_MISSING = "CANONICAL_DATASET_MANIFEST_MISSING"
+CANONICAL_PARTITION_MISSING = "CANONICAL_PARTITION_MISSING"
+CANONICAL_PARTITION_LOCATION_MISMATCH = "CANONICAL_PARTITION_LOCATION_MISMATCH"
+CANONICAL_PARTITION_HASH_MISMATCH = "CANONICAL_PARTITION_HASH_MISMATCH"
+CANONICAL_CENSUS_HASH_MISMATCH = "CANONICAL_CENSUS_HASH_MISMATCH"
+CANONICAL_OBSERVATIONS_HASH_MISMATCH = "CANONICAL_OBSERVATIONS_HASH_MISMATCH"
+CANONICAL_CENSUS_IDENTITY_INVALID = "CANONICAL_CENSUS_IDENTITY_INVALID"
+CANONICAL_OBSERVATIONS_IDENTITY_INVALID = "CANONICAL_OBSERVATIONS_IDENTITY_INVALID"
+CANONICAL_INPUT_MODE = "CANONICAL"
+EXPLICIT_PATH_INPUT_MODE = "EXPLICIT_PATH"
 SHIFT_DETECTED = "CENSORING_OBSERVED_X_SHIFT_DETECTED"
 SHIFT_NOT_DETECTED = "CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED"
 INCONCLUSIVE = "CENSORING_DIAGNOSTIC_INCONCLUSIVE"
@@ -124,6 +152,238 @@ def _require_frozen_spec(root: Path, spec_relative: str) -> dict[str, Any]:
     if _sha256_file(path) != FROZEN_SPEC_SHA256:
         raise CensoringDiagnosticError("FROZEN_SPEC_HASH_MISMATCH")
     return load_diagnostic_spec(root, SPEC_RELATIVE)
+
+
+BLOCK_A_TYPED_READ_CALLS = 0
+
+
+def reset_block_a_typed_read_probe() -> None:
+    global BLOCK_A_TYPED_READ_CALLS
+    BLOCK_A_TYPED_READ_CALLS = 0
+
+
+@dataclass(frozen=True)
+class CanonicalCorpusBinding:
+    census_path: Path
+    observations_path: Path
+    dataset_id: str
+    cohort_id: str
+    release_id: str
+    census_sha256: str
+    observations_sha256: str
+    dataset_manifest_id: str
+    census_logical_location: str
+    observations_logical_location: str
+
+
+def _require_hash64(value: object, code: str) -> str:
+    text = str(value or "")
+    if len(text) != 64 or any(char not in "0123456789abcdef" for char in text):
+        raise CensoringDiagnosticError(code)
+    return text
+
+
+def _require_relative_parquet(location: object, code: str) -> str:
+    text = str(location or "").replace("\\", "/")
+    if not text or _unsafe(text) or not text.endswith(".parquet"):
+        raise CensoringDiagnosticError(code)
+    return text
+
+
+def _require_row_release_cohort(
+    path: Path,
+    *,
+    release_id: str,
+    cohort_id: str,
+    code: str,
+) -> None:
+    if not path.is_file() or path.is_symlink():
+        raise CensoringDiagnosticError(code)
+    connection = _duckdb_connect()
+    try:
+        columns = _parquet_columns(connection, path)
+        if "release_id" not in columns or "cohort_id" not in columns:
+            raise CensoringDiagnosticError(code)
+        pairs = connection.execute(
+            (
+                "SELECT CAST(release_id AS VARCHAR), CAST(cohort_id AS VARCHAR), "
+                "COUNT(*) FROM read_parquet(?) GROUP BY 1, 2"
+            ),
+            [str(path)],
+        ).fetchall()
+        if len(pairs) != 1:
+            raise CensoringDiagnosticError(code)
+        got_release, got_cohort, count = pairs[0]
+        if (
+            not got_release
+            or not got_cohort
+            or int(count) < 1
+            or str(got_release) != release_id
+            or str(got_cohort) != cohort_id
+        ):
+            raise CensoringDiagnosticError(code)
+    except CensoringDiagnosticError:
+        raise
+    except Exception as exc:
+        raise CensoringDiagnosticError(code) from exc
+    finally:
+        connection.close()
+
+
+def _load_partition(
+    data_root: Path,
+    *,
+    dataset_manifest_id: str,
+    partition_id: str,
+) -> PartitionManifest:
+    part_dir = Path(data_root) / "datasets" / "manifests" / "partitions"
+    matches: list[PartitionManifest] = []
+    if part_dir.is_dir():
+        for path in sorted(part_dir.glob("partition-*.json")):
+            if path.is_symlink() or not path.is_file():
+                continue
+            try:
+                part = PartitionManifest.model_validate_json(path.read_bytes())
+            except Exception:
+                continue
+            if (
+                part.dataset_manifest_id == dataset_manifest_id
+                and part.partition_id == partition_id
+            ):
+                matches.append(part)
+    if len(matches) != 1:
+        raise CensoringDiagnosticError(CANONICAL_PARTITION_MISSING)
+    try:
+        verify_partition_manifest(matches[0])
+    except CensoringDiagnosticError:
+        raise
+    except Exception as exc:
+        raise CensoringDiagnosticError(CANONICAL_PARTITION_HASH_MISMATCH) from exc
+    return matches[0]
+
+
+def bind_canonical_censoring_inputs(
+    data_root: Path,
+    corpus: Mapping[str, Any] | None,
+) -> CanonicalCorpusBinding:
+    """Fail closed before any Block A X300 typed_value read."""
+
+    pins = corpus if isinstance(corpus, Mapping) else {}
+    frozen_dataset = str(pins.get("dataset_id") or "")
+    frozen_cohort = str(pins.get("cohort_id") or "")
+    frozen_release = str(pins.get("release_id") or "")
+    frozen_census = _require_hash64(
+        pins.get("census_sha256"), CANONICAL_HASH_PIN_MISSING
+    )
+    frozen_obs = _require_hash64(
+        pins.get("observations_sha256"), CANONICAL_HASH_PIN_MISSING
+    )
+    if not frozen_dataset or not frozen_cohort or not frozen_release:
+        raise CensoringDiagnosticError(CANONICAL_HASH_PIN_MISSING)
+    root = Path(data_root)
+    lineage_path = _corpus_lineage_path(root)
+    if not lineage_path.is_file() or lineage_path.is_symlink():
+        raise CensoringDiagnosticError(CANONICAL_LINEAGE_MISSING)
+    try:
+        lineage = _load_lineage(root)
+    except CensoringDiagnosticError:
+        raise
+    except Exception as exc:
+        raise CensoringDiagnosticError(CANONICAL_LINEAGE_MISSING) from exc
+    if str(lineage.get("corpus_dataset_id") or "") != frozen_dataset:
+        raise CensoringDiagnosticError(CANONICAL_LOGICAL_DATASET_MISMATCH)
+    matches = [
+        item
+        for item in (lineage.get("cohorts") or [])
+        if isinstance(item, Mapping) and str(item.get("cohort_id") or "") == frozen_cohort
+    ]
+    if not matches:
+        raise CensoringDiagnosticError(CANONICAL_COHORT_ABSENT)
+    if len(matches) != 1:
+        raise CensoringDiagnosticError(CANONICAL_COHORT_DUPLICATE)
+    component = matches[0]
+    if str(component.get("release_id") or "") != frozen_release:
+        raise CensoringDiagnosticError(CANONICAL_RELEASE_MISMATCH)
+    census_rel = _require_relative_parquet(
+        component.get("census_rel"), CANONICAL_PARTITION_LOCATION_MISMATCH
+    )
+    obs_rel = _require_relative_parquet(
+        component.get("obs_rel"), CANONICAL_PARTITION_LOCATION_MISMATCH
+    )
+    lineage_census = _require_hash64(
+        component.get("census_sha256"), CANONICAL_CENSUS_HASH_MISMATCH
+    )
+    lineage_obs = _require_hash64(
+        component.get("observations_sha256"), CANONICAL_OBSERVATIONS_HASH_MISMATCH
+    )
+    if lineage_census != frozen_census:
+        raise CensoringDiagnosticError(CANONICAL_CENSUS_HASH_MISMATCH)
+    if lineage_obs != frozen_obs:
+        raise CensoringDiagnosticError(CANONICAL_OBSERVATIONS_HASH_MISMATCH)
+    current_mid = str(lineage.get("current_dataset_manifest_id") or "")
+    manifest_path = root / "datasets" / "manifests" / f"{current_mid}.json"
+    if not current_mid or not manifest_path.is_file() or manifest_path.is_symlink():
+        raise CensoringDiagnosticError(CANONICAL_DATASET_MANIFEST_MISSING)
+    try:
+        dataset = DatasetManifest.model_validate_json(manifest_path.read_bytes())
+    except Exception as exc:
+        raise CensoringDiagnosticError(CANONICAL_DATASET_MANIFEST_MISSING) from exc
+    if dataset.dataset_id != frozen_dataset or dataset.dataset_manifest_id != current_mid:
+        raise CensoringDiagnosticError(CANONICAL_LOGICAL_DATASET_MISMATCH)
+    census_part = _load_partition(
+        root,
+        dataset_manifest_id=current_mid,
+        partition_id=f"PARTITION-LIVE-COHORT-{frozen_cohort}-CENSUS",
+    )
+    obs_part = _load_partition(
+        root,
+        dataset_manifest_id=current_mid,
+        partition_id=f"PARTITION-LIVE-COHORT-{frozen_cohort}-OBS",
+    )
+    if census_part.logical_location != census_rel:
+        raise CensoringDiagnosticError(CANONICAL_PARTITION_LOCATION_MISMATCH)
+    if obs_part.logical_location != obs_rel:
+        raise CensoringDiagnosticError(CANONICAL_PARTITION_LOCATION_MISMATCH)
+    if census_part.file_sha256 != frozen_census:
+        raise CensoringDiagnosticError(CANONICAL_PARTITION_HASH_MISMATCH)
+    if obs_part.file_sha256 != frozen_obs:
+        raise CensoringDiagnosticError(CANONICAL_PARTITION_HASH_MISMATCH)
+    census_path = root / census_rel
+    obs_path = root / obs_rel
+    if not census_path.is_file() or census_path.is_symlink():
+        raise CensoringDiagnosticError(CANONICAL_CENSUS_HASH_MISMATCH)
+    if not obs_path.is_file() or obs_path.is_symlink():
+        raise CensoringDiagnosticError(CANONICAL_OBSERVATIONS_HASH_MISMATCH)
+    actual_census = sha256_file_streaming(census_path)
+    actual_obs = sha256_file_streaming(obs_path)
+    if actual_census != frozen_census:
+        raise CensoringDiagnosticError(CANONICAL_CENSUS_HASH_MISMATCH)
+    if actual_obs != frozen_obs:
+        raise CensoringDiagnosticError(CANONICAL_OBSERVATIONS_HASH_MISMATCH)
+    _require_row_release_cohort(
+        census_path,
+        release_id=frozen_release,
+        cohort_id=frozen_cohort,
+        code=CANONICAL_CENSUS_IDENTITY_INVALID,
+    )
+    _require_row_release_cohort(
+        obs_path,
+        release_id=frozen_release,
+        cohort_id=frozen_cohort,
+        code=CANONICAL_OBSERVATIONS_IDENTITY_INVALID,
+    )
+    return CanonicalCorpusBinding(
+        census_path=census_path,
+        observations_path=obs_path,
+        dataset_id=frozen_dataset,
+        cohort_id=frozen_cohort,
+        release_id=frozen_release,
+        census_sha256=frozen_census,
+        observations_sha256=frozen_obs,
+        dataset_manifest_id=current_mid,
+        census_logical_location=census_rel,
+        observations_logical_location=obs_rel,
+    )
 
 
 def _duckdb_connect() -> Any:
@@ -397,6 +657,8 @@ def _load_block_a_typed(
         raise CensoringDiagnosticError("DIAGNOSTIC_SPEC_INVALID")
     if allowed_point_id.startswith(y_prefix):
         raise CensoringDiagnosticError(Y_POINT_READ)
+    global BLOCK_A_TYPED_READ_CALLS
+    BLOCK_A_TYPED_READ_CALLS += 1
     connection = _duckdb_connect()
     try:
         columns = _parquet_columns(connection, path)
@@ -713,14 +975,88 @@ def _relabel(
     return out
 
 
+def _spec_pins_match_binding(
+    spec: Mapping[str, Any], binding: CanonicalCorpusBinding
+) -> bool:
+    corpus = spec.get("canonical_corpus")
+    pins = corpus if isinstance(corpus, Mapping) else {}
+    return (
+        binding.dataset_id == str(pins.get("dataset_id") or "")
+        and binding.cohort_id == str(pins.get("cohort_id") or "")
+        and binding.release_id == str(pins.get("release_id") or "")
+        and binding.census_sha256 == str(pins.get("census_sha256") or "")
+        and binding.observations_sha256 == str(pins.get("observations_sha256") or "")
+    )
+
+
+def _run_with_verified_binding(
+    *,
+    root: Path,
+    binding: CanonicalCorpusBinding,
+    spec_relative: str = SPEC_RELATIVE,
+) -> dict[str, Any]:
+    """Test helper after bind PASS. Not a production input mode."""
+
+    spec = _require_frozen_spec(root, spec_relative)
+    return _execute_censoring_diagnostic(
+        spec=spec,
+        census_path=binding.census_path,
+        observations_path=binding.observations_path,
+        binding=binding,
+        population_scope=SCOPE_CANONICAL,
+        input_mode=CANONICAL_INPUT_MODE,
+    )
+
+
 def run_censoring_ignorability_diagnostic(
     *,
     root: Path,
-    census_path: Path,
-    observations_path: Path,
+    census_path: Path | None = None,
+    observations_path: Path | None = None,
+    data_root: Path | None = None,
     spec_relative: str = SPEC_RELATIVE,
 ) -> dict[str, Any]:
     spec = _require_frozen_spec(root, spec_relative)
+    explicit = census_path is not None or observations_path is not None
+    if data_root is not None and explicit:
+        raise CensoringDiagnosticError(CANONICAL_MODE_EXPLICIT_PATH_CONFLICT)
+    if data_root is not None:
+        corpus = spec.get("canonical_corpus")
+        binding = bind_canonical_censoring_inputs(
+            Path(data_root),
+            corpus if isinstance(corpus, Mapping) else {},
+        )
+        return _execute_censoring_diagnostic(
+            spec=spec,
+            census_path=binding.census_path,
+            observations_path=binding.observations_path,
+            binding=binding,
+            population_scope=SCOPE_CANONICAL,
+            input_mode=CANONICAL_INPUT_MODE,
+        )
+    if census_path is None or observations_path is None:
+        raise CensoringDiagnosticError(CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED)
+    return _execute_censoring_diagnostic(
+        spec=spec,
+        census_path=Path(census_path),
+        observations_path=Path(observations_path),
+        binding=None,
+        population_scope=SCOPE_NONCANONICAL,
+        input_mode=EXPLICIT_PATH_INPUT_MODE,
+    )
+
+
+def _execute_censoring_diagnostic(
+    *,
+    spec: Mapping[str, Any],
+    census_path: Path,
+    observations_path: Path,
+    binding: CanonicalCorpusBinding | None,
+    population_scope: str,
+    input_mode: str,
+) -> dict[str, Any]:
+    census_path = Path(census_path)
+    observations_path = Path(observations_path)
     allowed_point_id = str(spec["allowed_point_id"])
     y_prefix = str(spec["y_point_prefix"])
     block_a = list(spec["block_a_omnibus"])
@@ -1013,52 +1349,18 @@ def run_censoring_ignorability_diagnostic(
         terminal = SHIFT_NOT_DETECTED
 
     warnings = ["SUPPORT_OVERLAP_WARNING"] if overlap_warning else []
-    expected = spec.get("denominator") if isinstance(spec.get("denominator"), Mapping) else {}
     corpus = spec.get("canonical_corpus") if isinstance(spec.get("canonical_corpus"), Mapping) else {}
-    frozen_cohort = str(corpus.get("cohort_id") or "")
-    frozen_dataset = str(corpus.get("dataset_id") or "")
     frozen_session = str(corpus.get("scientific_context_session") or "")
-    frozen_census_sha = str(corpus.get("census_sha256") or "")
-    frozen_obs_sha = str(corpus.get("observations_sha256") or "")
-    census_sha = _sha256_file(census_path)
-    observations_sha = _sha256_file(observations_path)
-    count_match = (
-        comparable_n == int(expected.get("comparable_x_subset") or -1)
-        and counts["discovered_in_observation_partition"]
-        == int(expected.get("discovered_in_observation_partition") or -1)
-        and counts["x_eligible_observed"] == int(expected.get("x_eligible_observed") or -1)
-        and counts["x_eligible_censored_late"]
-        == int(expected.get("x_eligible_censored_late") or -1)
-        and counts["admitted_censored_late_no_x300"]
-        == int(expected.get("admitted_censored_late_no_x300") or -1)
-        and counts["x_population_ineligible"]
-        == int(expected.get("x_population_ineligible") or -1)
+    census_sha = (
+        binding.census_sha256 if binding is not None else _sha256_file(census_path)
     )
-    identity_match = bool(
-        frozen_cohort
-        and frozen_dataset
-        and frozen_session
-        and census_cohort == frozen_cohort
-        and obs_cohort == frozen_cohort
-        and census_dataset == frozen_dataset
-        and obs_dataset == frozen_dataset
-        and census_session == frozen_session
-        and obs_session == frozen_session
-        and not census_cohort_mixed
-        and not obs_cohort_mixed
-        and not census_dataset_mixed
-        and not obs_dataset_mixed
-        and not census_session_mixed
-        and not obs_session_mixed
+    observations_sha = (
+        binding.observations_sha256
+        if binding is not None
+        else _sha256_file(observations_path)
     )
-    hash_match = bool(
-        len(frozen_census_sha) == 64
-        and len(frozen_obs_sha) == 64
-        and frozen_census_sha == census_sha
-        and frozen_obs_sha == observations_sha
-    )
-    canonical_match = count_match and identity_match and hash_match
-    population_scope = SCOPE_CANONICAL if canonical_match else SCOPE_NONCANONICAL
+    canonical = population_scope == SCOPE_CANONICAL
+    spec_pin_match = binding is not None and _spec_pins_match_binding(spec, binding)
     atomic_terminal = f"{terminal}|{population_scope}"
     receipt = {
         "schema": "smial.hfic-censoring-ignorability-diagnostic-receipt",
@@ -1068,8 +1370,20 @@ def run_censoring_ignorability_diagnostic(
         "scientific_terminal": terminal,
         "terminal_with_scope": atomic_terminal,
         "terminal_population_scope": population_scope,
-        "corpus_id": corpus.get("dataset_id") if canonical_match else None,
-        "cohort_id": frozen_cohort if canonical_match else None,
+        "input_mode": input_mode,
+        "corpus_id": (
+            binding.dataset_id if canonical and binding is not None else None
+        ),
+        "cohort_id": (
+            binding.cohort_id if canonical and binding is not None else None
+        ),
+        "release_id": binding.release_id if binding is not None else None,
+        "dataset_manifest_id": (
+            binding.dataset_manifest_id if binding is not None else None
+        ),
+        "scientific_context_session": (
+            frozen_session if canonical and spec_pin_match else None
+        ),
         "input_census_cohort_id": census_cohort,
         "input_observations_cohort_id": obs_cohort,
         "ignorability_status": IGNORABILITY_UNPROVEN,
@@ -1145,21 +1459,35 @@ def run_from_capability_spec(
     observations_relative = hooks.get("observations_relative") or parameters.get(
         "observations_relative"
     )
-    if not isinstance(census_relative, str) or not isinstance(observations_relative, str):
-        raise CensoringDiagnosticError(EXPLICIT_RELEASE_PATHS_REQUIRED)
-    if _unsafe(census_relative) or _unsafe(observations_relative):
-        raise CensoringDiagnosticError("CAPABILITY_PATH_UNSAFE")
+    data_root_relative = hooks.get("data_root_relative") or parameters.get(
+        "data_root_relative"
+    )
     spec_relative = hooks.get("spec_relative") or parameters.get("spec_relative") or SPEC_RELATIVE
     if not isinstance(spec_relative, str) or _unsafe(spec_relative):
         raise CensoringDiagnosticError("DIAGNOSTIC_SPEC_PATH_UNSAFE")
     if _canonical_spec_relative(spec_relative) != SPEC_RELATIVE:
         raise CensoringDiagnosticError("FROZEN_SPEC_PATH_REQUIRED")
-    receipt = run_censoring_ignorability_diagnostic(
-        root=root,
-        census_path=root / census_relative,
-        observations_path=root / observations_relative,
-        spec_relative=spec_relative,
-    )
+    if isinstance(data_root_relative, str) and data_root_relative:
+        if isinstance(census_relative, str) or isinstance(observations_relative, str):
+            raise CensoringDiagnosticError(CANONICAL_MODE_EXPLICIT_PATH_CONFLICT)
+        if _unsafe(data_root_relative):
+            raise CensoringDiagnosticError("CAPABILITY_PATH_UNSAFE")
+        receipt = run_censoring_ignorability_diagnostic(
+            root=root,
+            data_root=root / data_root_relative,
+            spec_relative=spec_relative,
+        )
+    else:
+        if not isinstance(census_relative, str) or not isinstance(observations_relative, str):
+            raise CensoringDiagnosticError(EXPLICIT_RELEASE_PATHS_REQUIRED)
+        if _unsafe(census_relative) or _unsafe(observations_relative):
+            raise CensoringDiagnosticError("CAPABILITY_PATH_UNSAFE")
+        receipt = run_censoring_ignorability_diagnostic(
+            root=root,
+            census_path=root / census_relative,
+            observations_path=root / observations_relative,
+            spec_relative=spec_relative,
+        )
     atomic = str(receipt["terminal_with_scope"])
     return {
         "status": "COMPLETE",

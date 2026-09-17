@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-CENSORING-CANONICAL-BINDING-FACTORY-FIT-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_CENSORING_CANONICAL_BINDING_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CANONICAL_BIND_BEFORE_X_NOT_MARKET_TEST",
+    "flexibility_and_history": "PASS_EXISTING_LINEAGE_MANIFEST_HASH_OWNERS",
+    "context_efficiency": "PASS_SYNTHETIC_GATE_FIXTURES_ONLY",
+    "research_truth": "PASS_GATE_NOT_FROZEN_COHORT_RESULT",
+    "owner_operability": "PASS_PARENT_DATA_ROOT_OR_EXPLICIT_PATHS",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_LIVE_DIAGNOSTIC_RUN",
+    "monitoring_and_recovery": "PASS_TYPED_CANONICAL_FAIL_CLOSED",
+    "build_vs_buy": "PASS_REUSE_LINEAGE_MANIFEST_STREAMING_SHA",
+    "security": "PASS_NO_SECRETS_NO_PATH_LEAK",
+    "red_team": "PASS_NO_EXPLICIT_PATH_SELF_PROMOTION"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "SEPARATE_READ_ONLY_CANONICAL_DIAGNOSTIC_RUN"
+  },
+  "recovery": "Revert the canonical bind gate, spec hash pins, CLI mode split, and catalog purpose/hash updates; keep the prior explicit-path diagnostic.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_REAL_148_VS_327_DIAGNOSTIC_RUN",
+    "NO_RELEASE_SCHEMA_MUTATION",
+    "NO_CANONICAL_DONE"
+  ]
+}

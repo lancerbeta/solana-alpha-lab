@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import json
 import os
 import shutil
@@ -9,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pyarrow as pa
@@ -20,36 +22,64 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
+from solana_alpha_lab.contracts.schema_v1 import DatasetManifest
 from solana_alpha_lab.factory.capabilities import (
     CAPABILITY_ROUTER,
     CapabilityError,
     execute_capability,
 )
+from solana_alpha_lab.factory import hfic_censoring_ignorability_diagnostic as censoring_mod
 from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
     ADMITTED_NOT_X_ELIGIBLE,
     ANCHOR_UNRESOLVED,
+    CANONICAL_CENSUS_HASH_MISMATCH,
+    CANONICAL_CENSUS_IDENTITY_INVALID,
+    CANONICAL_COHORT_ABSENT,
+    CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED,
+    CANONICAL_HASH_PIN_MISSING,
+    CANONICAL_INPUT_MODE,
+    CANONICAL_LOGICAL_DATASET_MISMATCH,
+    CANONICAL_MODE_EXPLICIT_PATH_CONFLICT,
+    CANONICAL_OBSERVATIONS_IDENTITY_INVALID,
+    CANONICAL_PARTITION_HASH_MISMATCH,
+    CANONICAL_PARTITION_LOCATION_MISMATCH,
+    CANONICAL_RELEASE_MISMATCH,
     CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC,
+    EXPLICIT_PATH_INPUT_MODE,
     FROZEN_SPEC_SHA256,
     IGNORABILITY_UNPROVEN,
     INCONCLUSIVE,
     RANDOM_SAMPLE_UNPROVEN,
+    SCOPE_CANONICAL,
     SCOPE_NONCANONICAL,
     SHIFT_DETECTED,
     SHIFT_NOT_DETECTED,
     Y_POINT_READ,
     CensoringDiagnosticError,
+    bind_canonical_censoring_inputs,
     _proportion_smd,
+    _run_with_verified_binding,
     load_diagnostic_spec,
+    reset_block_a_typed_read_probe,
     run_censoring_ignorability_diagnostic,
 )
 from solana_alpha_lab.factory.hfic_preflight import assert_capability_registry_v2_superset
 from solana_alpha_lab.factory.live_cohort_source_bundle import (
     CENSUS_RELEASE_SCHEMA,
     OBS_RELEASE_SCHEMA,
+    sha256_file_streaming,
+)
+from solana_alpha_lab.storage.manifests import (
+    build_partition_manifest,
+    canonical_manifest_bytes,
+    compute_dataset_manifest_id,
 )
 
 CLI = ROOT / "scripts" / "hypothesis_forge.py"
 SPEC = ROOT / "configs" / "hfic_censoring_ignorability_diagnostic_v1.yaml"
+FROZEN_DATASET = "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
+FROZEN_COHORT = "REL-20260902T111900Z-20260909T111900Z"
+FROZEN_RELEASE = "633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154"
 
 LIQUIDITY = "FIELD-LIQUIDITY-USD-001"
 MCAP = "FIELD-MARKET-CAP-USD-001"
@@ -88,6 +118,8 @@ def _member(
     candidate: str,
     denom: str,
     anchor: str | None = None,
+    cohort_id: str = "REL-SYN",
+    release_id: str = "REL-SYN",
 ) -> dict[str, str | None]:
     return _census_row(
         mint=mint,
@@ -96,6 +128,8 @@ def _member(
         authoritative_anchor=anchor,
         discovery_first_reliable_available_at="2026-09-02T12:00:00Z",
         inclusion_probability="0.0425",
+        cohort_id=cohort_id,
+        release_id=release_id,
     )
 
 
@@ -145,6 +179,8 @@ def _balanced_fixture(
     holder_coverage: bool = True,
     include_y: bool = False,
     latency_shift: bool = False,
+    cohort_id: str = "REL-SYN",
+    release_id: str = "REL-SYN",
 ) -> tuple[Path, Path]:
     census: list[dict[str, object]] = []
     observations: list[dict[str, object]] = []
@@ -190,6 +226,12 @@ def _balanced_fixture(
         census.append(
             _member(f"inel{index:03d}", candidate="X_POPULATION_INELIGIBLE", denom="excluded")
         )
+    for row in census:
+        row["cohort_id"] = cohort_id
+        row["release_id"] = release_id
+    for row in observations:
+        row["cohort_id"] = cohort_id
+        row["release_id"] = release_id
     census_path = directory / "census.parquet"
     observations_path = directory / "observations.parquet"
     _write_parquet(census_path, census, CENSUS_RELEASE_SCHEMA)
@@ -227,6 +269,197 @@ def _run_with_spec(
         observations_path=observations,
         spec_relative=f"configs/{SPEC.name}",
     )
+
+
+def _partition_rels(cohort_id: str, release_id: str) -> tuple[str, str]:
+    short = release_id[:16]
+    census_rel = (
+        "datasets/partitions/date=2026-09-13/"
+        f"PARTITION-LIVE-COHORT-{cohort_id}-CENSUS-{short}.parquet"
+    )
+    obs_rel = (
+        "datasets/partitions/date=2026-09-13/"
+        f"PARTITION-LIVE-COHORT-{cohort_id}-OBS-{short}.parquet"
+    )
+    return census_rel, obs_rel
+
+
+def _publish_dataset(
+    data_root: Path,
+    *,
+    dataset_id: str,
+    dataset_version: str,
+    census_rel: str,
+    obs_rel: str,
+    census_sha: str,
+    obs_sha: str,
+    census_n: int,
+    obs_n: int,
+    cohort_id: str,
+) -> str:
+    created = datetime(2026, 9, 13, 11, 57, 49, tzinfo=UTC)
+    manifest_id = compute_dataset_manifest_id(dataset_id, dataset_version)
+    dataset = DatasetManifest(
+        dataset_manifest_id=manifest_id,
+        dataset_id=dataset_id,
+        dataset_version=dataset_version,
+        schema_id="SCHEMA-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+        schema_sha256="ab" * 32,
+        dataset_fingerprint="cd" * 32,
+        generation_task_id="LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1",
+        generation_run_id=f"import-{manifest_id[-16:]}",
+        validation_receipt_sha256="ef" * 32,
+        first_reliable_available_at=created,
+        created_at=created,
+        content_sha256="11" * 32,
+    )
+    census_part = build_partition_manifest(
+        dataset_id=dataset_id,
+        dataset_version=dataset_version,
+        partition_id=f"PARTITION-LIVE-COHORT-{cohort_id}-CENSUS",
+        logical_location=census_rel,
+        file_sha256=census_sha,
+        content_sha256=census_sha,
+        row_count=census_n,
+        first_reliable_available_at=created,
+        created_at=created,
+        min_event_time=created,
+        max_event_time=created,
+        min_available_to_strategy_at=created,
+        max_available_to_strategy_at=created,
+    )
+    obs_part = build_partition_manifest(
+        dataset_id=dataset_id,
+        dataset_version=dataset_version,
+        partition_id=f"PARTITION-LIVE-COHORT-{cohort_id}-OBS",
+        logical_location=obs_rel,
+        file_sha256=obs_sha,
+        content_sha256=obs_sha,
+        row_count=obs_n,
+        first_reliable_available_at=created,
+        created_at=created,
+        min_event_time=created,
+        max_event_time=created,
+        min_available_to_strategy_at=created,
+        max_available_to_strategy_at=created,
+    )
+    manifests = data_root / "datasets" / "manifests"
+    partitions = manifests / "partitions"
+    partitions.mkdir(parents=True, exist_ok=True)
+    (manifests / f"{manifest_id}.json").write_bytes(canonical_manifest_bytes(dataset))
+    (partitions / f"{census_part.partition_manifest_id}.json").write_bytes(
+        canonical_manifest_bytes(census_part)
+    )
+    (partitions / f"{obs_part.partition_manifest_id}.json").write_bytes(
+        canonical_manifest_bytes(obs_part)
+    )
+    return manifest_id
+
+
+def _write_lineage(
+    data_root: Path,
+    *,
+    dataset_id: str,
+    current_mid: str,
+    cohorts: list[dict[str, object]],
+) -> None:
+    path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "corpus_dataset_id": dataset_id,
+        "current_corpus_version": len(cohorts),
+        "current_dataset_manifest_id": current_mid,
+        "cohorts": cohorts,
+        "versions": [
+            {
+                "corpus_version": item.get("corpus_version"),
+                "dataset_manifest_id": item.get("dataset_manifest_id"),
+                "cohort_id": item.get("cohort_id"),
+            }
+            for item in cohorts
+        ],
+    }
+    path.write_text(
+        json.dumps(payload, sort_keys=True, separators=(",", ":")),
+        encoding="utf-8",
+    )
+
+
+def _install_canonical_corpus(
+    data_root: Path,
+    *,
+    dataset_id: str = FROZEN_DATASET,
+    cohort_id: str = FROZEN_COHORT,
+    release_id: str = FROZEN_RELEASE,
+    dataset_version: str = "corpus-v1-REL-20260902T111900Z-20260909T111900Z",
+) -> dict[str, str]:
+    staging = data_root / "_fixture"
+    staging.mkdir(parents=True, exist_ok=True)
+    census_src, obs_src = _balanced_fixture(
+        staging,
+        shift_liquidity=False,
+        cohort_id=cohort_id,
+        release_id=release_id,
+    )
+    census_rel, obs_rel = _partition_rels(cohort_id, release_id)
+    census_path = data_root / census_rel
+    obs_path = data_root / obs_rel
+    census_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(census_src, census_path)
+    shutil.copyfile(obs_src, obs_path)
+    census_sha = sha256_file_streaming(census_path)
+    obs_sha = sha256_file_streaming(obs_path)
+    census_n = pq.read_table(census_path).num_rows
+    obs_n = pq.read_table(obs_path).num_rows
+    manifest_id = _publish_dataset(
+        data_root,
+        dataset_id=dataset_id,
+        dataset_version=dataset_version,
+        census_rel=census_rel,
+        obs_rel=obs_rel,
+        census_sha=census_sha,
+        obs_sha=obs_sha,
+        census_n=census_n,
+        obs_n=obs_n,
+        cohort_id=cohort_id,
+    )
+    _write_lineage(
+        data_root,
+        dataset_id=dataset_id,
+        current_mid=manifest_id,
+        cohorts=[
+            {
+                "cohort_id": cohort_id,
+                "release_id": release_id,
+                "census_rel": census_rel,
+                "obs_rel": obs_rel,
+                "census_sha256": census_sha,
+                "observations_sha256": obs_sha,
+                "corpus_version": 1,
+                "dataset_manifest_id": manifest_id,
+                "dataset_version": dataset_version,
+            }
+        ],
+    )
+    return {
+        "census_sha256": census_sha,
+        "observations_sha256": obs_sha,
+        "dataset_manifest_id": manifest_id,
+        "census_rel": census_rel,
+        "obs_rel": obs_rel,
+        "census_path": str(census_path),
+        "obs_path": str(obs_path),
+    }
+
+
+def _pins_from_installed(installed: dict[str, str]) -> dict[str, str]:
+    return {
+        "dataset_id": FROZEN_DATASET,
+        "cohort_id": FROZEN_COHORT,
+        "release_id": FROZEN_RELEASE,
+        "census_sha256": installed["census_sha256"],
+        "observations_sha256": installed["observations_sha256"],
+    }
 
 
 class HficCensoringIgnorabilityDiagnosticTests(unittest.TestCase):
@@ -619,6 +852,7 @@ class HficCensoringIgnorabilityDiagnosticTests(unittest.TestCase):
                 check=False,
             )
             self.assertNotEqual(missing.returncode, 0)
+            self.assertIn(CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED, missing.stderr)
 
     def test_y_point_as_allowed_point_is_protocol_error(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -695,19 +929,362 @@ class HficCensoringIgnorabilityDiagnosticTests(unittest.TestCase):
         self.assertEqual(plain["scientific_terminal"], poisoned["scientific_terminal"])
         self.assertEqual(plain["observed_max_abs_smd"], poisoned["observed_max_abs_smd"])
 
-    def test_canonical_scope_unreachable_without_identity_columns_or_sha_pins(self) -> None:
+    def test_explicit_path_stays_noncanonical_even_with_identity_columns(self) -> None:
         spec = yaml.safe_load(SPEC.read_text(encoding="utf-8"))
         corpus = spec["canonical_corpus"]
-        self.assertFalse(corpus.get("census_sha256"))
-        self.assertFalse(corpus.get("observations_sha256"))
+        self.assertEqual(
+            corpus["census_sha256"],
+            "cfa7d8404dc5400c4e223c4d5303193ad2209f92cac3af2d61862e384ebfd5bf",
+        )
+        self.assertEqual(
+            corpus["observations_sha256"],
+            "7b26425c69cc95baf8a9e0b9ea506de1042b98b83d48a2dae07f5a33a7d66d7d",
+        )
+        self.assertEqual(corpus["release_id"], FROZEN_RELEASE)
         census_names = set(CENSUS_RELEASE_SCHEMA.names)
         obs_names = set(OBS_RELEASE_SCHEMA.names)
         self.assertNotIn("dataset_id", census_names)
         self.assertNotIn("scientific_context_session", census_names)
         self.assertNotIn("dataset_id", obs_names)
         self.assertNotIn("scientific_context_session", obs_names)
-        self.assertIn("cohort_id", census_names)
-        self.assertIn("cohort_id", obs_names)
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(
+                Path(tmp),
+                shift_liquidity=False,
+                cohort_id=FROZEN_COHORT,
+                release_id=FROZEN_RELEASE,
+            )
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal_population_scope"], SCOPE_NONCANONICAL)
+        self.assertEqual(receipt["input_mode"], EXPLICIT_PATH_INPUT_MODE)
+        self.assertIsNone(receipt["corpus_id"])
+
+
+class CanonicalBindingGateTests(unittest.TestCase):
+    def test_exact_binding_allows_canonical_x_read(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            reset_block_a_typed_read_probe()
+            binding = bind_canonical_censoring_inputs(
+                data_root, _pins_from_installed(installed)
+            )
+            self.assertEqual(binding.release_id, FROZEN_RELEASE)
+            receipt = _run_with_verified_binding(
+                root=ROOT,
+                binding=binding,
+            )
+        self.assertGreater(censoring_mod.BLOCK_A_TYPED_READ_CALLS, 0)
+        self.assertEqual(receipt["terminal_population_scope"], SCOPE_CANONICAL)
+        self.assertEqual(receipt["input_mode"], CANONICAL_INPUT_MODE)
+        self.assertEqual(receipt["corpus_id"], FROZEN_DATASET)
+        self.assertEqual(receipt["cohort_id"], FROZEN_COHORT)
+        self.assertEqual(receipt["release_id"], FROZEN_RELEASE)
+        self.assertEqual(
+            receipt["dataset_manifest_id"], installed["dataset_manifest_id"]
+        )
+        self.assertIsNone(receipt["scientific_context_session"])
+        self.assertEqual(receipt["scientific_terminal"], SHIFT_NOT_DETECTED)
+
+    def test_altered_file_bytes_fail_before_typed_read(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            census_path = data_root / installed["census_rel"]
+            census_path.write_bytes(census_path.read_bytes() + b"\x00")
+            reset_block_a_typed_read_probe()
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(raised.exception.code, CANONICAL_CENSUS_HASH_MISMATCH)
+            self.assertEqual(censoring_mod.BLOCK_A_TYPED_READ_CALLS, 0)
+
+    def test_frozen_sha_mismatch_fails_before_typed_read(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            pins["census_sha256"] = "aa" * 32
+            reset_block_a_typed_read_probe()
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(raised.exception.code, CANONICAL_CENSUS_HASH_MISMATCH)
+            self.assertEqual(censoring_mod.BLOCK_A_TYPED_READ_CALLS, 0)
+            reset_block_a_typed_read_probe()
+            with self.assertRaises(CensoringDiagnosticError) as public:
+                run_censoring_ignorability_diagnostic(
+                    root=ROOT, data_root=data_root
+                )
+            self.assertEqual(public.exception.code, CANONICAL_CENSUS_HASH_MISMATCH)
+            self.assertEqual(censoring_mod.BLOCK_A_TYPED_READ_CALLS, 0)
+
+    def test_wrong_release_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            pins["release_id"] = "00" * 32
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(raised.exception.code, CANONICAL_RELEASE_MISMATCH)
+
+    def test_wrong_cohort_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            pins["cohort_id"] = "REL-OTHER-WINDOW"
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(raised.exception.code, CANONICAL_COHORT_ABSENT)
+
+    def test_wrong_logical_dataset_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            pins["dataset_id"] = "DATASET-OTHER-001"
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(raised.exception.code, CANONICAL_LOGICAL_DATASET_MISMATCH)
+
+    def test_mixed_row_identity_fails_before_typed_read(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            census_path = data_root / installed["census_rel"]
+            rows = pq.read_table(census_path).to_pylist()
+            rows[0]["release_id"] = "ff" * 32
+            _write_parquet(census_path, rows, CENSUS_RELEASE_SCHEMA)
+            new_sha = sha256_file_streaming(census_path)
+            lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+            lineage["cohorts"][0]["census_sha256"] = new_sha
+            lineage_path.write_text(
+                json.dumps(lineage, sort_keys=True, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            pins["census_sha256"] = new_sha
+            part_dir = data_root / "datasets" / "manifests" / "partitions"
+            for path in list(part_dir.glob("partition-*.json")):
+                path.unlink()
+            _publish_dataset(
+                data_root,
+                dataset_id=FROZEN_DATASET,
+                dataset_version="corpus-v1-REL-20260902T111900Z-20260909T111900Z",
+                census_rel=installed["census_rel"],
+                obs_rel=installed["obs_rel"],
+                census_sha=new_sha,
+                obs_sha=installed["observations_sha256"],
+                census_n=len(rows),
+                obs_n=pq.read_table(data_root / installed["obs_rel"]).num_rows,
+                cohort_id=FROZEN_COHORT,
+            )
+            reset_block_a_typed_read_probe()
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(
+                raised.exception.code, CANONICAL_CENSUS_IDENTITY_INVALID
+            )
+            self.assertEqual(censoring_mod.BLOCK_A_TYPED_READ_CALLS, 0)
+
+    def test_partition_location_or_hash_disagrees_with_lineage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            part_dir = data_root / "datasets" / "manifests" / "partitions"
+            for path in list(part_dir.glob("partition-*.json")):
+                path.unlink()
+            _publish_dataset(
+                data_root,
+                dataset_id=FROZEN_DATASET,
+                dataset_version="corpus-v1-REL-20260902T111900Z-20260909T111900Z",
+                census_rel="datasets/partitions/date=2026-09-13/wrong-census.parquet",
+                obs_rel=installed["obs_rel"],
+                census_sha=installed["census_sha256"],
+                obs_sha=installed["observations_sha256"],
+                census_n=1,
+                obs_n=1,
+                cohort_id=FROZEN_COHORT,
+            )
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(
+                raised.exception.code, CANONICAL_PARTITION_LOCATION_MISMATCH
+            )
+
+    def test_partition_hash_disagrees_with_lineage(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            part_dir = data_root / "datasets" / "manifests" / "partitions"
+            for path in list(part_dir.glob("partition-*.json")):
+                path.unlink()
+            _publish_dataset(
+                data_root,
+                dataset_id=FROZEN_DATASET,
+                dataset_version="corpus-v1-REL-20260902T111900Z-20260909T111900Z",
+                census_rel=installed["census_rel"],
+                obs_rel=installed["obs_rel"],
+                census_sha="aa" * 32,
+                obs_sha=installed["observations_sha256"],
+                census_n=1,
+                obs_n=1,
+                cohort_id=FROZEN_COHORT,
+            )
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(raised.exception.code, CANONICAL_PARTITION_HASH_MISMATCH)
+
+    def test_mixed_observation_identity_fails_before_typed_read(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            obs_path = data_root / installed["obs_rel"]
+            rows = pq.read_table(obs_path).to_pylist()
+            rows[0]["cohort_id"] = "REL-OTHER"
+            _write_parquet(obs_path, rows, OBS_RELEASE_SCHEMA)
+            new_sha = sha256_file_streaming(obs_path)
+            lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+            lineage["cohorts"][0]["observations_sha256"] = new_sha
+            lineage_path.write_text(
+                json.dumps(lineage, sort_keys=True, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            pins["observations_sha256"] = new_sha
+            part_dir = data_root / "datasets" / "manifests" / "partitions"
+            for path in list(part_dir.glob("partition-*.json")):
+                path.unlink()
+            _publish_dataset(
+                data_root,
+                dataset_id=FROZEN_DATASET,
+                dataset_version="corpus-v1-REL-20260902T111900Z-20260909T111900Z",
+                census_rel=installed["census_rel"],
+                obs_rel=installed["obs_rel"],
+                census_sha=installed["census_sha256"],
+                obs_sha=new_sha,
+                census_n=pq.read_table(data_root / installed["census_rel"]).num_rows,
+                obs_n=len(rows),
+                cohort_id=FROZEN_COHORT,
+            )
+            reset_block_a_typed_read_probe()
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(
+                raised.exception.code, CANONICAL_OBSERVATIONS_IDENTITY_INVALID
+            )
+            self.assertEqual(censoring_mod.BLOCK_A_TYPED_READ_CALLS, 0)
+
+    def test_new_dataset_manifest_id_with_unchanged_bytes_still_binds(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            rebound = _publish_dataset(
+                data_root,
+                dataset_id=FROZEN_DATASET,
+                dataset_version="corpus-v2-later-cohort-unchanged-bytes",
+                census_rel=installed["census_rel"],
+                obs_rel=installed["obs_rel"],
+                census_sha=installed["census_sha256"],
+                obs_sha=installed["observations_sha256"],
+                census_n=pq.read_table(data_root / installed["census_rel"]).num_rows,
+                obs_n=pq.read_table(data_root / installed["obs_rel"]).num_rows,
+                cohort_id=FROZEN_COHORT,
+            )
+            lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+            lineage["current_dataset_manifest_id"] = rebound
+            lineage["current_corpus_version"] = 2
+            lineage_path.write_text(
+                json.dumps(lineage, sort_keys=True, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            binding = bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(binding.dataset_manifest_id, rebound)
+            self.assertNotEqual(rebound, installed["dataset_manifest_id"])
+            self.assertEqual(binding.census_sha256, installed["census_sha256"])
+
+    def test_missing_hash_pin_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            installed = _install_canonical_corpus(data_root)
+            pins = _pins_from_installed(installed)
+            pins["census_sha256"] = ""
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                bind_canonical_censoring_inputs(data_root, pins)
+            self.assertEqual(raised.exception.code, CANONICAL_HASH_PIN_MISSING)
+
+    def test_cli_rejects_mixed_canonical_and_explicit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            env = dict(os.environ)
+            env["PYTHONPATH"] = str(SRC)
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "-B",
+                    str(CLI),
+                    "--data-root",
+                    str(tmp),
+                    "censoring-ignorability-diagnostic",
+                    "--census",
+                    str(census),
+                    "--observations",
+                    str(observations),
+                ],
+                cwd=str(ROOT),
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        self.assertNotEqual(completed.returncode, 0)
+        self.assertIn(CANONICAL_MODE_EXPLICIT_PATH_CONFLICT, completed.stderr + completed.stdout)
+
+    def test_public_run_has_no_canonical_binding_parameter(self) -> None:
+        self.assertNotIn(
+            "canonical_binding",
+            inspect.signature(run_censoring_ignorability_diagnostic).parameters,
+        )
+
+    def test_public_data_root_uses_frozen_spec_pins_before_typed_read(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            _install_canonical_corpus(data_root)
+            reset_block_a_typed_read_probe()
+            with self.assertRaises(CensoringDiagnosticError) as raised:
+                run_censoring_ignorability_diagnostic(root=ROOT, data_root=data_root)
+            self.assertEqual(raised.exception.code, CANONICAL_CENSUS_HASH_MISMATCH)
+            self.assertEqual(censoring_mod.BLOCK_A_TYPED_READ_CALLS, 0)
+
+    def test_cli_help_names_parent_data_root(self) -> None:
+        env = dict(os.environ)
+        env["PYTHONPATH"] = str(SRC)
+        completed = subprocess.run(
+            [
+                sys.executable,
+                "-B",
+                str(CLI),
+                "censoring-ignorability-diagnostic",
+                "--help",
+            ],
+            cwd=str(ROOT),
+            env=env,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        text = completed.stdout + completed.stderr
+        self.assertIn("--data-root", text)
+        self.assertIn("LIVE CORPUS", text)
+        self.assertIn("Observation RDP", text)
 
 
 if __name__ == "__main__":

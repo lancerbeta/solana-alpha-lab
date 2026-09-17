@@ -32281,13 +32281,13 @@ records:
 - asset_id: SCRIPT-HYPOTHESIS-FORGE-001
   record_version: '1.0'
   asset_type: script
-  purpose: Thin network-free CLI for HFIC preflight, freeze, finalize, prior lookup, runtime proof, placeholder-time inventory, append-only provenance correction, append-only search-memory policy, and explicit-path censoring ignorability diagnostic.
+  purpose: Thin network-free CLI for HFIC preflight, freeze, finalize, prior lookup, runtime proof, placeholder-time inventory, append-only provenance correction, append-only search-memory policy, and censoring ignorability diagnostic via canonical LIVE CORPUS data_root or explicit noncanonical parquet paths.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: ea683e66183c059190bd2d5368e5822ec120f67aeea6821ddd8919c83d7cc355}
+  integrity: {kind: sha256, sha256: 45af3f1335ba8d4a84891eaedb213267b2e756cfb8d4f01d19fcdad575b5e0c2}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37248,13 +37248,13 @@ records:
 - asset_id: CONFIG-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-V1-001
   record_version: '1.0'
   asset_type: configuration
-  purpose: Frozen X300 Block A/B diagnostic spec, denominator, permutation seed and typed terminals.
+  purpose: Frozen X300 Block A/B diagnostic spec, denominator, permutation seed, typed terminals, and durable canonical LIVE CORPUS binding pins.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://configs/hfic_censoring_ignorability_diagnostic_v1.yaml', repository_path: configs/hfic_censoring_ignorability_diagnostic_v1.yaml}
-  integrity: {kind: sha256, sha256: c1c42d4605eda0c1005c2d4fa0c9efc0da6eb89ea627bdde4454480551a77981}
+  integrity: {kind: sha256, sha256: 47668ad5a7316b4bdb1a78be0bbc9bd1caed24ba597f10c6cf966dfaa05d556c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -37265,13 +37265,13 @@ records:
 - asset_id: MODULE-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001
   record_version: '1.0'
   asset_type: script
-  purpose: Offline seeded X300 selection diagnostic with Y-point denial and typed terminals; promotion_authority NONE.
+  purpose: Offline seeded X300 selection diagnostic with fail-closed canonical LIVE CORPUS binding before Block A typed_value read, Y-point denial, and typed terminals; promotion_authority NONE.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py', repository_path: src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py}
-  integrity: {kind: sha256, sha256: 91d5f37483649eaad839d46e5993dc1a4de2ae1b1d3e1a6d7b585d006e799435}
+  integrity: {kind: sha256, sha256: 7692fe9c9cf3802c413f5b27468c86eca38856df432e415ac7280f707e612d27}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
@@ -37283,13 +37283,13 @@ records:
 - asset_id: TEST-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001
   record_version: '1.0'
   asset_type: script
-  purpose: Synthetic-only proofs for Y-point denial, denominator classes, permutation terminals and explicit-path CLI.
+  purpose: Synthetic proofs for canonical lineage/manifest/hash binding before X-read, fail-closed identity classes, Y-point denial, and explicit-path noncanonical CLI.
   status: IMPLEMENTED_UNVERIFIED
   origin: REPOSITORY
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_censoring_ignorability_diagnostic_v1.py', repository_path: tests/test_hfic_censoring_ignorability_diagnostic_v1.py}
-  integrity: {kind: sha256, sha256: 1e2a6d5e2f687ca89a9f79509c484c2fdd4efb12c73fb7ca52ebe0f76fc34b43}
+  integrity: {kind: sha256, sha256: f185a1ccf4afc0a7543b91b3d7758c98303973d28273ab243e93322367525a8b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001}
