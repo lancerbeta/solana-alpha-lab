@@ -29,7 +29,16 @@ from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
     load_diagnostic_spec,
     run_censoring_ignorability_diagnostic,
 )
-from solana_alpha_lab.factory.hfic_preflight import assert_capability_registry_v2_superset
+from solana_alpha_lab.factory.early_market_panel_importer import (
+    MIN_USABLE_YIELD_ELIGIBLE,
+)
+from solana_alpha_lab.factory.hfic_control_integrity import (
+    CURRENT_REPRESENTATION_CONTROL_V1,
+)
+from solana_alpha_lab.factory.hfic_preflight import (
+    assert_capability_registry_v2_superset,
+    run_preflight,
+)
 from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
     BLOCK_FORGE_EVIDENCE_GAP,
     BLOCK_FORGE_SELECTION_RISK,
@@ -37,6 +46,7 @@ from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
     FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
     FROZEN_SPEC_SHA256,
     GATE_ARTIFACT_RELATIVE,
+    RECEIPT_SCHEMA,
     STAGE2_DETECTED,
     STAGE2_INCONCLUSIVE,
     STAGE2_NOT_DETECTED,
@@ -53,6 +63,8 @@ from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
     run_selection_robustness_gate,
     stratified_kfold,
 )
+from solana_alpha_lab.factory.live_cohort_discovery_release import CORPUS_DATASET_ID
+from solana_alpha_lab.factory.run_passport import canonical_sha256
 from tests.test_hfic_censoring_ignorability_diagnostic_v1 import (
     CENSUS_RELEASE_SCHEMA,
     HOLDERS,
@@ -67,6 +79,7 @@ from tests.test_hfic_censoring_ignorability_diagnostic_v1 import (
     _write_parquet,
     _x300,
 )
+from tests.test_hfic_preflight import _CLOCK, _commission, _git_snapshot
 
 CLI = ROOT / "scripts" / "hypothesis_forge.py"
 STAGE1_SPEC = ROOT / "configs" / "hfic_censoring_ignorability_diagnostic_v1.yaml"
@@ -157,6 +170,29 @@ def _mv_fixture(
 
 def _tiny_fixture(directory: Path, observed_n: int = 4, censored_n: int = 4) -> tuple[Path, Path]:
     return _mv_fixture(directory, observed_n=observed_n, censored_n=censored_n, shift=0.0)
+
+
+def _hashed_gate_receipt(decision: str) -> dict[str, object]:
+    body = {"schema": RECEIPT_SCHEMA, "router_decision": decision}
+    receipt = dict(body)
+    receipt["receipt_sha256"] = canonical_sha256(body)
+    return receipt
+
+
+def _control_corpus(yield_eligible: int) -> dict[str, object]:
+    return {
+        "dataset_id": CORPUS_DATASET_ID,
+        "dataset_manifest_id": "dataset-" + "a" * 64,
+        "dataset_fingerprint": "bb" * 32,
+        "evidence_role": "UNSPECIFIED",
+        "yield_eligible": yield_eligible,
+        "yield_missing": 0,
+        "feature_usable": yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE,
+        "labels": {
+            "yield_eligible": yield_eligible,
+            "logical_dataset_id": CORPUS_DATASET_ID,
+        },
+    }
 
 
 class SelectionRobustnessGateTests(unittest.TestCase):
@@ -580,6 +616,19 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             assert loaded is not None
             self.assertTrue(loaded.get("integrity_invalid"))
             self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+        with tempfile.TemporaryDirectory() as tmp:
+            occupied = Path(tmp) / GATE_ARTIFACT_RELATIVE
+            occupied.parent.mkdir(parents=True, exist_ok=True)
+            occupied.mkdir()
+            loaded = load_applicable_gate_receipt(Path(tmp))
+            self.assertIsNotNone(loaded)
+            assert loaded is not None
+            self.assertTrue(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(
+                apply_selection_gate_to_preflight("START_NEW_SESSION", loaded)["action"],
+                "STOP",
+            )
         preflight_src = (
             ROOT / "src/solana_alpha_lab/factory/hfic_preflight.py"
         ).read_text(encoding="utf-8")
@@ -614,6 +663,154 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             self.assertEqual(loaded["receipt_sha256"], receipt["receipt_sha256"])
             self.assertEqual(
                 loaded["router_decision"], FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT
+            )
+
+    def test_dangling_symlink_latest_json_is_evidence_gap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            dangling = Path(tmp) / GATE_ARTIFACT_RELATIVE
+            dangling.parent.mkdir(parents=True, exist_ok=True)
+            missing = Path(tmp) / "missing-target.json"
+            try:
+                os.symlink(missing, dangling)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlink unavailable")
+            loaded = load_applicable_gate_receipt(Path(tmp))
+            self.assertIsNotNone(loaded)
+            assert loaded is not None
+            self.assertTrue(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+
+    def test_run_preflight_consumes_gate_without_rewriting_budget_stop(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _commission(data_root)
+            missing = run_preflight(
+                ROOT,
+                data_root,
+                owner_focus="AUTO",
+                auto_commission=False,
+                git_snapshot=_git_snapshot(),
+                clock=_CLOCK,
+            )
+            self.assertEqual(missing["action"], "START_NEW_SESSION")
+            self.assertIsNone(missing.get("router_decision"))
+            self.assertNotEqual(
+                missing.get("next"),
+                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+            )
+            self.assertNotEqual(
+                (missing.get("selection_gate") or {}).get("applicable"),
+                True,
+            )
+
+            artifact = data_root / GATE_ARTIFACT_RELATIVE
+            artifact.parent.mkdir(parents=True, exist_ok=True)
+            artifact.mkdir()
+            directory = run_preflight(
+                ROOT,
+                data_root,
+                owner_focus="AUTO",
+                auto_commission=False,
+                git_snapshot=_git_snapshot(),
+                clock=_CLOCK,
+            )
+            self.assertEqual(directory["action"], "STOP")
+            self.assertEqual(directory["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(directory["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(
+                directory["next"],
+                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+            )
+            artifact.rmdir()
+
+            persist_gate_receipt(
+                data_root, _hashed_gate_receipt(BLOCK_FORGE_SELECTION_RISK)
+            )
+            blocked = run_preflight(
+                ROOT,
+                data_root,
+                owner_focus="AUTO",
+                auto_commission=False,
+                git_snapshot=_git_snapshot(),
+                clock=_CLOCK,
+            )
+            self.assertEqual(blocked["action"], "STOP")
+            self.assertEqual(blocked["terminal"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(blocked["router_decision"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(
+                blocked["next"],
+                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+            )
+            artifact.unlink()
+
+            persist_gate_receipt(
+                data_root,
+                _hashed_gate_receipt(FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT),
+            )
+            caveat = run_preflight(
+                ROOT,
+                data_root,
+                owner_focus="AUTO",
+                auto_commission=False,
+                git_snapshot=_git_snapshot(),
+                clock=_CLOCK,
+            )
+            self.assertEqual(caveat["action"], "START_NEW_SESSION")
+            self.assertEqual(
+                caveat["router_decision"],
+                FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+            )
+            artifact.unlink()
+
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.decide_preflight_action",
+                return_value=("STOP", "SEARCH_BUDGET_EXHAUSTED"),
+            ):
+                budget = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    git_snapshot=_git_snapshot(),
+                    clock=_CLOCK,
+                )
+            self.assertEqual(budget["action"], "STOP")
+            self.assertEqual(budget["terminal"], "SEARCH_BUDGET_EXHAUSTED")
+            self.assertIsNone(budget.get("router_decision"))
+            self.assertNotEqual(
+                budget.get("next"),
+                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+            )
+            self.assertNotEqual(
+                (budget.get("selection_gate") or {}).get("applicable"),
+                True,
+            )
+
+            persist_gate_receipt(
+                data_root, _hashed_gate_receipt(BLOCK_FORGE_SELECTION_RISK)
+            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                return_value=([_control_corpus(MIN_USABLE_YIELD_ELIGIBLE)], []),
+            ):
+                control = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    git_snapshot=_git_snapshot(),
+                    clock=_CLOCK,
+                    evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+                )
+            self.assertEqual(control["action"], "STOP")
+            self.assertEqual(control["terminal"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(
+                control["evidence_surface_mode"],
+                CURRENT_REPRESENTATION_CONTROL_V1,
+            )
+            self.assertEqual(
+                control["next"],
+                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
             )
 
     def test_prior_hfic_sessions_remain_in_scientific_context(self) -> None:

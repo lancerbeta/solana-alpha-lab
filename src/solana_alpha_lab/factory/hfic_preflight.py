@@ -1700,7 +1700,10 @@ def run_preflight(
         action,
         load_applicable_gate_receipt(Path(data_root)),
     )
-    if selection_gate_view.get("action") == "STOP":
+    if (
+        selection_gate_view.get("applicable")
+        and selection_gate_view.get("action") == "STOP"
+    ):
         stop_body = {
             "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
             "action": "STOP",

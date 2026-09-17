@@ -41,10 +41,12 @@ identification, MAR, ignorability, or MNAR.
 
 ## Forge consumption (after OPERATE)
 
-No `latest.json` → ordinary preflight unchanged.
+No `latest.json` → ordinary preflight unchanged, including
+`SEARCH_BUDGET_EXHAUSTED`. The selection seam does not rewrite that STOP.
 
-Present but unreadable / hash-invalid `latest.json` → new-session preflight
-STOPs as `BLOCK_FORGE_EVIDENCE_GAP`.
+Present but unusable `latest.json` (symlink, directory/non-file, unreadable
+UTF-8, JSON/hash/schema invalid) → new-session preflight STOPs as
+`BLOCK_FORGE_EVIDENCE_GAP`.
 
 Applicable BLOCK → new-session preflight STOPs. Primary fields are
 `action=STOP`, `terminal=<router_decision>`, `router_decision`, and

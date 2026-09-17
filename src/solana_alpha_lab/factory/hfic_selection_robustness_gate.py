@@ -18,6 +18,7 @@ from typing import Any
 
 import yaml
 
+from solana_alpha_lab.factory.early_market_panel_importer import is_link_path
 from solana_alpha_lab.factory.git_write_fence import (
     GitFenceError,
     repository_git_snapshot,
@@ -918,10 +919,11 @@ def _invalid_gate_receipt() -> dict[str, Any]:
 
 def load_applicable_gate_receipt(data_root: Path) -> dict[str, Any] | None:
     path = Path(data_root) / GATE_ARTIFACT_RELATIVE
-    if path.is_symlink():
-        return _invalid_gate_receipt()
-    if not path.is_file():
+    present = path.exists() or path.is_symlink() or is_link_path(path)
+    if not present:
         return None
+    if path.is_symlink() or is_link_path(path) or not path.is_file():
+        return _invalid_gate_receipt()
     try:
         loaded = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, UnicodeDecodeError, json.JSONDecodeError):
