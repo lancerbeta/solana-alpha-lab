@@ -40,6 +40,7 @@ managed_write_set:
   - scripts/hypothesis_forge.py
   - tests/test_hfic_selection_robustness_gate_v1.py
   - tests/test_discovery_evidence_release_bridge.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - catalog/catalog_manifest.yaml
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
