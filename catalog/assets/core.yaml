@@ -34041,7 +34041,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: 5a72697095c61e31332dee81273cd532bb5749fe429752d4553c8bb056eb13f8}
+  integrity: {kind: sha256, sha256: 967de0f8e5f96e52db682e55aa67205e6b096b24b47c333d90c0243dd37f772f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
@@ -34060,7 +34060,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_corpus_manifest_contract_repair_v1.py', repository_path: tests/test_live_corpus_manifest_contract_repair_v1.py}
-  integrity: {kind: sha256, sha256: 3e85b168a95493609500c0f518a8c29d2648e0cd696d29b72eca66b28eb901be}
+  integrity: {kind: sha256, sha256: 98dc408f82038f04ff74c63c7c0c16a12bb5bfb603a88125cf5203e55ce04dea}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}

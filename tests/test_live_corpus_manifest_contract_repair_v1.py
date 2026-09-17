@@ -694,6 +694,19 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 published_dataset.first_reliable_available_at,
                 datetime(2026, 9, 19, tzinfo=UTC),
             )
+            published_path.unlink()
+            recovered = repair_live_corpus_manifests(
+                data_root=data_root,
+                published_at=datetime(2026, 9, 20, tzinfo=UTC),
+            )
+            self.assertEqual(recovered["dataset_manifest_id"], new_mid)
+            recovered_dataset = DatasetManifest.model_validate_json(
+                (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
+            )
+            self.assertEqual(
+                recovered_dataset.first_reliable_available_at,
+                datetime(2026, 9, 20, tzinfo=UTC),
+            )
             self.assertEqual(_sha256_path(census_path), census_before)
             enumerated, _ = enumerate_rdp_datasets(data_root)
             current = [
