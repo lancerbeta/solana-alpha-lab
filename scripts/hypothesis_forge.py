@@ -1215,10 +1215,15 @@ def build_parser() -> argparse.ArgumentParser:
         ),
         description=(
             "Canonical mode: parent --data-root pointing at an imported LIVE CORPUS "
-            "data_root. Explicit --census and --observations stay noncanonical. Mixing "
-            "parent --data-root with parquet paths fails as "
+            "data_root that contains datasets/live_lifecycle_corpus/lineage.json. "
+            "Do not pass Observation RDP. Bind FAIL is a typed CANONICAL_* token and "
+            "does not fall back to parquet paths. Explicit --census and --observations "
+            "stay SYNTHETIC_OR_NONCANONICAL_POPULATION and do not write latest.json. "
+            "Mixing parent --data-root with --census/--observations fails as "
             "CANONICAL_MODE_EXPLICIT_PATH_CONFLICT. Empty invocation fails as "
-            "CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED. Does not auto-run Forge."
+            "CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED. Owner-facing field is "
+            "router_decision. Does not auto-run Forge. A later OPERATE on --data-root "
+            "is required before ordinary preflight consumes the gate."
         ),
     )
     selection_gate.add_argument("--census", type=Path, default=None)

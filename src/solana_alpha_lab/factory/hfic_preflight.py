@@ -1691,45 +1691,49 @@ def run_preflight(
 
     selection_caveat = None
     selection_gate_view = None
-    if control_mode != CURRENT_REPRESENTATION_CONTROL_V1:
-        from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
-            apply_selection_gate_to_preflight,
-            load_applicable_gate_receipt,
-        )
+    from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+        apply_selection_gate_to_preflight,
+        load_applicable_gate_receipt,
+    )
 
-        selection_gate_view = apply_selection_gate_to_preflight(
-            action,
-            load_applicable_gate_receipt(Path(data_root)),
-        )
-        if selection_gate_view.get("action") == "STOP":
-            return {
-                "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
-                "action": "STOP",
-                "terminal": selection_gate_view.get("terminal"),
-                "owner_focus": focus,
-                "prompt_version": PROMPT_VERSION,
-                "evidence_epoch_sha256": epoch,
-                "focus_key_sha256": focus_key,
-                "search_key_sha256": search_key,
-                "memory_policy_head_sha256": policy_head["policy_sha256"],
-                "memory_eligibility_sha256": memory_eligibility,
-                "session_id": None,
-                "selection_gate": {
-                    "applicable": True,
-                    "router_decision": selection_gate_view.get("router_decision"),
-                    "gate_receipt_sha256": selection_gate_view.get(
-                        "gate_receipt_sha256"
-                    ),
-                },
-                "forge_context_packet": {},
-                "authority": {
-                    "git_mutation": 0,
-                    "experiment_execution": 0,
-                    "provider_api_rpc_wss_calls": 0,
-                },
-            }
-        if selection_gate_view.get("caveat"):
-            selection_caveat = selection_gate_view
+    selection_gate_view = apply_selection_gate_to_preflight(
+        action,
+        load_applicable_gate_receipt(Path(data_root)),
+    )
+    if selection_gate_view.get("action") == "STOP":
+        stop_body = {
+            "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": selection_gate_view.get("terminal"),
+            "router_decision": selection_gate_view.get("router_decision"),
+            "next": "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+            "owner_focus": focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": epoch,
+            "focus_key_sha256": focus_key,
+            "search_key_sha256": search_key,
+            "memory_policy_head_sha256": policy_head["policy_sha256"],
+            "memory_eligibility_sha256": memory_eligibility,
+            "session_id": None,
+            "selection_gate": {
+                "applicable": True,
+                "router_decision": selection_gate_view.get("router_decision"),
+                "gate_receipt_sha256": selection_gate_view.get(
+                    "gate_receipt_sha256"
+                ),
+            },
+            "forge_context_packet": {},
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
+        if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+            stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+        return stop_body
+    if selection_gate_view.get("caveat"):
+        selection_caveat = selection_gate_view
 
     receipt_body = {
         "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
@@ -1800,6 +1804,7 @@ def run_preflight(
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest
     if selection_gate_view and selection_gate_view.get("applicable"):
+        receipt_body["router_decision"] = selection_gate_view.get("router_decision")
         receipt_body["selection_gate"] = {
             "applicable": True,
             "router_decision": selection_gate_view.get("router_decision"),

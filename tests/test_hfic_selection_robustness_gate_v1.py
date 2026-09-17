@@ -561,7 +561,23 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             )
             self.assertTrue(path.is_file())
             loaded = load_applicable_gate_receipt(Path(tmp))
-            self.assertIsNone(loaded)
+            self.assertIsNotNone(loaded)
+            assert loaded is not None
+            self.assertTrue(loaded.get("integrity_invalid"))
+            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(
+                apply_selection_gate_to_preflight("START_NEW_SESSION", loaded)["action"],
+                "STOP",
+            )
+        self.assertIsNone(load_applicable_gate_receipt(Path(tempfile.gettempdir()) / "missing-gate-root"))
+        preflight_src = (
+            ROOT / "src/solana_alpha_lab/factory/hfic_preflight.py"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn(
+            "if control_mode != CURRENT_REPRESENTATION_CONTROL_V1:",
+            preflight_src,
+        )
+        self.assertIn("DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS", preflight_src)
         with tempfile.TemporaryDirectory() as tmp:
             census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
             with patch(

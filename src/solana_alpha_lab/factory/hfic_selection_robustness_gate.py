@@ -905,29 +905,42 @@ def persist_gate_receipt(data_root: Path, receipt: Mapping[str, Any]) -> Path:
     return path
 
 
+def _invalid_gate_receipt() -> dict[str, Any]:
+    """Present but unusable artifact: integrity gap, not 'no gate evidence'."""
+
+    return {
+        "schema": RECEIPT_SCHEMA,
+        "router_decision": BLOCK_FORGE_EVIDENCE_GAP,
+        "receipt_sha256": "",
+        "integrity_invalid": True,
+    }
+
+
 def load_applicable_gate_receipt(data_root: Path) -> dict[str, Any] | None:
     path = Path(data_root) / GATE_ARTIFACT_RELATIVE
-    if not path.is_file() or path.is_symlink():
+    if not path.exists():
         return None
+    if path.is_symlink() or not path.is_file():
+        return _invalid_gate_receipt()
     try:
         loaded = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
-        return None
+        return _invalid_gate_receipt()
     if not isinstance(loaded, dict):
-        return None
+        return _invalid_gate_receipt()
     if str(loaded.get("schema") or "") != RECEIPT_SCHEMA:
-        return None
+        return _invalid_gate_receipt()
     decision = str(loaded.get("router_decision") or "")
     if decision not in {
         BLOCK_FORGE_SELECTION_RISK,
         BLOCK_FORGE_EVIDENCE_GAP,
         FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
     }:
-        return None
+        return _invalid_gate_receipt()
     stored = str(loaded.get("receipt_sha256") or "")
     body = {key: value for key, value in loaded.items() if key != "receipt_sha256"}
     if stored != canonical_sha256(body):
-        return None
+        return _invalid_gate_receipt()
     return loaded
 
 
@@ -1162,12 +1175,13 @@ def run_from_capability_spec(
             spec_relative=spec_relative,
             persist=False,
         )
+    decision = str(receipt["router_decision"])
     return {
         "status": "COMPLETE",
-        "blocker": "NONE",
-        "terminal": receipt["router_decision"],
-        "result": receipt["router_decision"],
-        "router_decision": receipt["router_decision"],
+        "blocker": decision if decision in BLOCK_DECISIONS else "NONE",
+        "terminal": decision,
+        "result": decision,
+        "router_decision": decision,
         "provider_api_rpc_wss_calls": 0,
         "credential_reads": 0,
         "receipt": receipt,

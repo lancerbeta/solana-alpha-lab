@@ -4,20 +4,18 @@ Date: 2026-09-17 · Route: DIRECT_CURSOR_DELIVERY
 
 ## What landed
 
-Ordinary Forge now has one durable post-`NO_WORTHY` selection gate:
-
-`CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001`
-
-It reuses frozen Stage 1 `CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001`
-and, only when Stage 1 is `CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED`, runs one
-L2-logistic out-of-sample AUC check on the same Block A X300 surface.
+Capability `CAP-HFIC-SELECTION-ROBUSTNESS-GATE-001` exists. It reuses frozen
+Stage 1 `CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001` and, only when Stage 1
+is `CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED`, runs one L2-logistic
+out-of-sample AUC check on the same Block A X300 surface.
 
 The owner-facing field is `router_decision`. Project Chat does not need to
 combine Stage-1 and Stage-2 statistics by hand.
 
-This atom does **not** run the canonical LIVE CORPUS OPERATE. A later bounded
-OPERATE command is the scientific result. DETECTED / NOT_DETECTED /
-INCONCLUSIVE after that run is already a decision, not a reason for another
+This atom does **not** run the canonical LIVE CORPUS OPERATE. Until that later
+OPERATE writes `latest.json` on the LIVE CORPUS `--data-root`, ordinary
+`/hypothesis-forge` preflight stays as it was. DETECTED / NOT_DETECTED /
+INCONCLUSIVE after OPERATE is already a decision, not a reason for another
 implementation PR.
 
 ## How to score this atom
@@ -41,14 +39,30 @@ implementation PR.
 unmeasured-selection uncertainty stays a limitation. It does not prove
 identification, MAR, ignorability, or MNAR.
 
-If no gate receipt is in the data root, ordinary Forge preflight is unchanged.
-An applicable BLOCK stops **new-session** preflight with the typed decision.
-Resume paths stay unchanged. Existing HFIC sessions are not quarantined.
+## Forge consumption (after OPERATE)
+
+No `latest.json` → ordinary preflight unchanged.
+
+Present but unreadable / hash-invalid `latest.json` → new-session preflight
+STOPs as `BLOCK_FORGE_EVIDENCE_GAP`.
+
+Applicable BLOCK → new-session preflight STOPs. Primary fields are
+`action=STOP`, `terminal=<router_decision>`, `router_decision`, and
+`next=DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS`. This includes
+`preflight --control-current-representation`. Resume paths stay unchanged.
+
+Applicable caveat → new-session preflight continues, but the receipt still
+shows top-level `router_decision=FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT`. That
+is a limitation, not a cleared identification result. Existing HFIC sessions
+are not quarantined.
 
 ## Operator command (after merge; not this atom)
 
 Canonical OPERATE uses parent `--data-root` on the imported LIVE CORPUS, never
-Observation RDP. Explicit parquet paths stay noncanonical.
+Observation RDP. Bind FAIL does not fall back to parquet. Empty invocation
+fails as `CANONICAL_DATA_ROOT_OR_EXPLICIT_PATHS_REQUIRED`. Mixing
+`--data-root` with `--census`/`--observations` fails as
+`CANONICAL_MODE_EXPLICIT_PATH_CONFLICT`.
 
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-root <LIVE_CORPUS_data_root> selection-robustness-gate
@@ -57,9 +71,17 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py --data-ro
 Read `router_decision` first. Then `stage1_terminal`, `stage2_status`,
 `stage2_terminal`, `oof_roc_auc`, and `permutation_p`.
 
-Forge consumption: the same `--data-root` must hold
-`research/artifacts/hfic_selection_robustness_gate/latest.json`. Do not auto-run
-Forge from this command.
+Explicit parquet:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py selection-robustness-gate --census <census.parquet> --observations <observations.parquet>
+```
+
+That path stays noncanonical and does **not** write `latest.json`, so Forge
+preflight will not consume it.
+
+Forge consumption needs the same `--data-root` as OPERATE. Do not auto-run
+Forge from the gate command.
 
 ## Non-claims
 
