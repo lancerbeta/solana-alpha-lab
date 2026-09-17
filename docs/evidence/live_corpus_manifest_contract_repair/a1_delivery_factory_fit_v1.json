@@ -15,7 +15,7 @@
     "research_truth": "PASS_TASK06_BUILDERS_LOCAL_LOGICAL_PROFILE",
     "owner_operability": "PASS_REPAIR_CLI_AND_LEGACY_FAIL_CLOSED",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_OPERATE_REPUBLISH",
-    "monitoring_and_recovery": "PASS_PUBLISHED_MARKER_COMMIT_POINT",
+    "monitoring_and_recovery": "PASS_PUBLISHED_MARKER_COMMIT_POINT_NO_SELF_SUPERSESSION",
     "build_vs_buy": "PASS_REUSE_TASK06_AND_CENSUS_OBS_SCHEMAS",
     "security": "PASS_NO_SECRETS_NO_PATH_LEAK",
     "red_team": "PASS_INTERRUPT_NOT_FALSE_CURRENT"

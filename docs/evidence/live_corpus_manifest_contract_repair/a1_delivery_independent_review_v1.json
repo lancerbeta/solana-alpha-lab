@@ -17,32 +17,58 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+        "packet_fingerprint_sha256=b6fec00d74950bfa5100e2c85ddba82cc239b370b26d5818b532425a4c639429",
+        "independence.claim_scope=PACKET_INFORMATION_PATH",
+        "implementation_transcript_seen=false",
+        "UNPUBLISHED_RECOVERY_SAME_PROSPECTIVE_ID",
+        "NO_SELF_SUPERSESSION",
+        "PUBLISHED_MARKER_FINGERPRINT_ALIGN_FORGE",
+        "PARQUET_IDENTITY_BEFORE_CLAIM_REUSE",
+        "INCOMPLETE_CURRENT_ROWS_FAIL_CLOSED",
+        "RESIDUAL_PRIVATE_HELPER_IMPORTS"
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+        "INSPECT_COMPLETE_LABELS_PUBLISHED_PARQUET",
+        "SYMLINK_PARQUET_REJECTED",
+        "LINEAGE_REQUIRED_KEYS",
+        "SUPERSEDED_NOT_SELF",
+        "IDEMPOTENT_USES_INSPECT_COMPLETE"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+        "FIXTURE_METADATA_ONLY_PARQUET_UNCHANGED",
+        "TASK06_VERIFY_ON_REPAIRED_ROOT",
+        "LEGACY_GATE_THEN_FUTURE_IMPORT",
+        "INTERRUPT_NEW_CLOCK_SAME_ID",
+        "EMPTY_COHORTS_FAIL_CLOSED",
+        "PARQUET_DRIFT_FAIL_CLOSED",
+        "NONCLAIMS_HONEST"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PLACEHOLDER_PENDING_ISOLATED_CRITIC"
+        "REPAIR_CLI_COPYPASTE",
+        "RETRY_SAME_IMPORT_LIVE",
+        "TYPED_FAIL_ALWAYS_HAS_NEXT",
+        "LINEAGE_STOP_NOT_REPAIR_LOOP",
+        "SYMLINK_AND_DRIFT_STOP_CODES",
+        "JSON_PASS_NOT_MAR"
       ]
     }
   ],
-  "remediation_history": [],
+  "remediation_history": [
+    "CLOSED_DATASET_TO_PUBLISHED_CLOCK_BACKDATE",
+    "CLOSED_SELF_SUPERSESSION_ON_FIRST_IMPORT_RECOVERY"
+  ],
   "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
