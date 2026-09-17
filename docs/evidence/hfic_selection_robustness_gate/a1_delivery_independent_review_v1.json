@@ -4,8 +4,8 @@
   "review_id": "HFIC-SELECTION-ROBUSTNESS-GATE-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
-  "reviewed_bindings_sha256": "cc0a2c60bc17bfd00900f33737d21d46a49479410d5c2d328f21435676f57d63",
-  "reviewed_inventory_sha256": "7cefd14fe187ca351cfec740692bb5ed1ec1e72c59582d4eebca4f01cb7abf8d",
+  "reviewed_bindings_sha256": "edf7fa7b7fe81458174be5985df157d0386601a836a24c76fd1a2fe4cf9c4b38",
+  "reviewed_inventory_sha256": "79f6b196c4bd4195930549f7b1cda9c96a73e7615d8361b60a41dd0cc90692a1",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

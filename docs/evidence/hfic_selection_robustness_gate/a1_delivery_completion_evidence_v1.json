@@ -22,6 +22,7 @@
     "configs/experiment_capability_registry_v2.yaml": "35a4f94ed6bf544760824f0f6cad55b2effbd25783f8aaa168ead7ab7212674b",
     "configs/hfic_selection_robustness_gate_v1.yaml": "db4cdd40edf92e05a7a9ec6cabc181783c8729c3ac7079e80373797be0d0ac0d",
     "docs/PROJECT_MAP.md": "d7268777e96d9d508ecde0ee4898a4419e8604b1614f44da85903d5e1fea5b1e",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "94ca848a5c4d2f584f7cb37c31ad7475fd8a2b57a759ddddc1cc4da0b218c4b9",
     "docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md": "33d3365b04a085ab43dcc21d7e9d30d67861c397bb2cb245c68c0d357738f49c",
     "docs/tasks/HFIC_SELECTION_ROBUSTNESS_GATE_V1.md": "3a1dea4959871947c084d54217b583be3002775239edd4eaf67eec125c743977",
     "scripts/hypothesis_forge.py": "6c7a5da0b75de04f9f65b552a6995edf78e5b33ceb87854b052bbb61e1876d6f",
@@ -41,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_factory_fit_v1.json",
-    "sha256": "c97784ed2a2c0585e29d70fb33c5c6e78ee602683e3a98e1244754d849a2c242",
+    "sha256": "dcce21327813184dca3bd7f90cdcb8c1ca8bd49eb440bfd0c58599f0d880b09b",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_HFIC_SELECTION_ROBUSTNESS_GATE",
     "independent_review": {
       "path": "docs/evidence/hfic_selection_robustness_gate/a1_delivery_independent_review_v1.json",
-      "sha256": "fc0e80ffdbba0be5b9c5411b437a9bb946e775436c680a901c105b2a089374f9",
+      "sha256": "73b26e3583ba655d50e2d114e95f85d28419aed47baa75a714ef836275b90eb6",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
