@@ -21,6 +21,7 @@
     "catalog/generated/asset_edges.json": "b62a322b08e4f1a9f37b91849d941c374fa6a164695ab3d2010156117b817dd5",
     "docs/PROJECT_MAP.md": "df2ca0b1869f7681a8b1843ce4e8d4049e78d8524cb8882431159ef7efa5b1cf",
     "docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_pinned_production_closure_v1.json": "2b5ffb4585abefccaac8171773b7bfda6651808e5ad07f9bfe3445d342174233",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "21039939f2927a7677c63da0c8ddfd2998b682facb1d500bd50599aaf42d5d7c",
     "docs/reports/hfic_censoring_diagnostic_scope_repair/a1_owner_readout_v1.md": "31d68cb5b1c83e88314c60ead6b9809b8d9707d6d51fe356b0ce195a0dfed779",
     "docs/reports/hfic_censoring_ignorability_diagnostic/a1_owner_readout_v1.md": "1e5bd957d84d9303283d9d8fda57244dbbd5727af16014b2b7dcbeddc1b44322",
     "docs/tasks/HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1.md": "a1d403f92126a8825aa7a3c2048120d64135fd69d49452cba4850611d5fd05b3",
@@ -37,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "258cc5c75c08885a67117a785192c3ae436c145fc0ef896e2cfc419a6e2cce03",
+    "sha256": "f502dcc5b90d64cc8fc12efb9215137734bbf132a30f4c95102483825bb80d46",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC",
     "independent_review": {
       "path": "docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "37b75be215474e46fa69b0447f3e90a479c30dd885dfcd3ba1d676e82d610361",
+      "sha256": "f9409e5da6cea0abf4c551386db7d2aa76c8ab0967a2b9363163830d1ccfe430",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

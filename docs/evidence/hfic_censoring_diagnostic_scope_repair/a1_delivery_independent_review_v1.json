@@ -4,8 +4,8 @@
   "review_id": "HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1",
-  "reviewed_bindings_sha256": "9727ff5b61627cdb6912ac694ee117544ac1fdbe0631568f870ecbbf8880292a",
-  "reviewed_inventory_sha256": "e094202666a306320e18cf475540eb2c708a71e1282fbafa6aa10838b1482d06",
+  "reviewed_bindings_sha256": "91600250fb34e25511a3212cc3aefe851de8b9c476110cec47e97a4fbf0184f0",
+  "reviewed_inventory_sha256": "96a2cc7d1346b23f66291e4405083077068ecb30267531d54006032caee7d400",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
