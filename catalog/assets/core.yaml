@@ -27664,7 +27664,7 @@ records:
   as_of: '2026-08-20'
   truth_owner: FACTORY_ORDINARY_HYPOTHESIS_THROUGH_SURFACE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_ordinary_market_hypothesis.py', repository_path: tests/test_factory_ordinary_market_hypothesis.py}
-  integrity: {kind: sha256, sha256: 6ce943ea941873150c3233b3b5adc38008d3b1a6d6f2b6d6b7158d857eb4671d}
+  integrity: {kind: sha256, sha256: ae3f4823fce0f129b819558088d67ea501c183544c18538124decf5eaebf7be9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-EXPERIMENT-SPEC-ORDINARY-PRICE-PATH-BUY-PRESSURE-001}
@@ -37235,7 +37235,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1.md', repository_path: docs/tasks/HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1.md}
-  integrity: {kind: sha256, sha256: ff371d47b6d98b641fa2ec16c4400bc610e336116dfa63cebecff81a13b29e8d}
+  integrity: {kind: sha256, sha256: 6fb46d5e789209b354004e676f0f72fe65e77be24889b0587b6fdec3615a4966}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}

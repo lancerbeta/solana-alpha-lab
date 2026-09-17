@@ -37,6 +37,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py
   - src/solana_alpha_lab/factory/capabilities.py
   - tests/test_hfic_censoring_ignorability_diagnostic_v1.py
+  - tests/test_factory_ordinary_market_hypothesis.py
   - tests/test_discovery_evidence_release_bridge.py
   - scripts/hypothesis_forge.py
   - catalog/catalog_manifest.yaml
