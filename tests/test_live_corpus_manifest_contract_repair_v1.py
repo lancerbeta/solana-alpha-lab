@@ -485,6 +485,13 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                     import_time=datetime(2026, 1, 27, 1, tzinfo=UTC),
                 )
             self.assertEqual(str(blocked.exception), LEGACY_CORPUS_REQUIRES_REPAIR)
+            with self.assertRaises(LiveCohortReleaseError) as reimport:
+                import_live_cohort(
+                    release_root=release0,
+                    data_root=data_root,
+                    import_time=datetime(2026, 1, 27, 1, tzinfo=UTC),
+                )
+            self.assertEqual(str(reimport.exception), LEGACY_CORPUS_REQUIRES_REPAIR)
 
             published_at = datetime(2026, 9, 17, 10, tzinfo=UTC)
             repaired = repair_live_corpus_manifests(
@@ -542,6 +549,13 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
             )
             self.assertEqual(receipt["dataset_fingerprint"], dataset.dataset_fingerprint)
             self.assertEqual(receipt["superseded_dataset_manifest_id"], legacy["dataset_manifest_id"])
+            repaired_labels = json.loads(
+                (
+                    data_root / "datasets" / "manifests" / f"{new_mid}.labels.json"
+                ).read_text(encoding="utf-8")
+            )
+            self.assertEqual(repaired_labels["dataset_terminal"], "SAMPLE_VALID")
+            self.assertEqual(repaired_labels["yield_eligible"], int(sealed0["yield_eligible"]))
             lineage = json.loads(
                 (data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json").read_text(
                     encoding="utf-8"
@@ -658,6 +672,14 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
             self.assertNotEqual(current[0]["dataset_manifest_id"], new_mid)
             self.assertEqual(_sha256_path(census_path), census_before)
             self.assertEqual(len(lineage["cohorts"]), 1)
+            release1, _sealed1, _cohort1 = _seal_week(base, 1)
+            with self.assertRaises(LiveCohortReleaseError) as blocked:
+                import_live_cohort(
+                    release_root=release1,
+                    data_root=data_root,
+                    import_time=datetime(2026, 1, 27, 1, tzinfo=UTC),
+                )
+            self.assertEqual(str(blocked.exception), LEGACY_CORPUS_REQUIRES_REPAIR)
 
             rerun = repair_live_corpus_manifests(
                 data_root=data_root,
@@ -681,6 +703,32 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 )["current_corpus_version"],
                 1,
             )
+
+    def test_repair_fail_closed_on_missing_yield(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            data_root = base / "rdp"
+            data_root.mkdir()
+            release0, sealed0, _cohort0 = _seal_week(base, 0)
+            _install_legacy_corpus(
+                data_root=data_root,
+                release=release0,
+                sealed=sealed0,
+                imported_at=datetime(2026, 1, 20, 1, tzinfo=UTC),
+            )
+            lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+            del lineage["cohorts"][0]["yield_eligible"]
+            lineage_path.write_text(
+                json.dumps(lineage, sort_keys=True, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            with self.assertRaises(LiveCohortReleaseError) as missing:
+                repair_live_corpus_manifests(
+                    data_root=data_root,
+                    published_at=datetime(2026, 9, 17, tzinfo=UTC),
+                )
+            self.assertEqual(str(missing.exception), "CORPUS_LINEAGE_INCOMPLETE")
 
 
 if __name__ == "__main__":

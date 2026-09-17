@@ -33966,7 +33966,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: LIVE_COHORT_DISCOVERY_RELEASE_SERIES_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_discovery_release.py', repository_path: src/solana_alpha_lab/factory/live_cohort_discovery_release.py}
-  integrity: {kind: sha256, sha256: fe5cb0da304ab79804c754b39e86d52c8fbcefd278731b6dfd5e9651843c9dbf}
+  integrity: {kind: sha256, sha256: 9ff84b49501f038c28a4d76f53f1fb955e1b34d2f32d30f5f4a86771df9fdd7d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-DISCOVERY-RELEASE-SERIES-001}
@@ -34041,7 +34041,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_corpus_manifest_publish.py', repository_path: src/solana_alpha_lab/factory/live_corpus_manifest_publish.py}
-  integrity: {kind: sha256, sha256: 96349e6d8e1fb23f3000cc641f4f6e6ea1857e27099efd01b8368a37c4a891d7}
+  integrity: {kind: sha256, sha256: 4226960786e3e573bea0f0336c37eca9289c9d5c4c5eec836b77dcd55a637c7d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}
@@ -34060,7 +34060,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_corpus_manifest_contract_repair_v1.py', repository_path: tests/test_live_corpus_manifest_contract_repair_v1.py}
-  integrity: {kind: sha256, sha256: d2c04a7cb9bc0d688ad96a234dfbd97ae7bcd4ffb58dff796894ecf2b6f4dffd}
+  integrity: {kind: sha256, sha256: 9e0a454ca01f743e47101593963d78715136331b328c8eb3a3d37b8b2ed9bceb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-CORPUS-MANIFEST-CONTRACT-REPAIR-001}

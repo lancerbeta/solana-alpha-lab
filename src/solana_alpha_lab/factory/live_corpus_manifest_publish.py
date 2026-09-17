@@ -40,10 +40,10 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     LIVE_EVIDENCE_ROLE,
     REQUIRED_LABELS,
     LiveCohortReleaseError,
-    _load_lineage,
-    _parse_utc,
-    _write_lineage,
+    load_live_corpus_lineage,
+    parse_live_corpus_utc,
     verify_live_cohort,
+    write_live_corpus_lineage,
 )
 from solana_alpha_lab.storage.manifests import (
     ManifestContractError,
@@ -285,6 +285,34 @@ def inspect_canonical_root(data_root: Path, dataset_manifest_id: str) -> dict[st
     }
 
 
+def _lineage_int(item: Mapping[str, Any], key: str) -> int:
+    if key not in item or item[key] is None:
+        raise LiveCohortReleaseError("CORPUS_LINEAGE_INCOMPLETE")
+    try:
+        return int(item[key])
+    except (TypeError, ValueError) as exc:
+        raise LiveCohortReleaseError("CORPUS_LINEAGE_INCOMPLETE") from exc
+
+
+def _dataset_terminal_from_current(
+    data_root: Path, current_mid: str, latest: Mapping[str, Any]
+) -> str:
+    labels_path = _manifests_dir(data_root) / f"{current_mid}.labels.json"
+    if labels_path.is_file() and not labels_path.is_symlink():
+        try:
+            payload = json.loads(labels_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
+            payload = None
+        else:
+            if isinstance(payload, dict):
+                terminal = payload.get("dataset_terminal")
+                if isinstance(terminal, str) and terminal:
+                    return terminal
+    terminal = latest.get("dataset_terminal")
+    _require(isinstance(terminal, str) and bool(terminal), "DATASET_TERMINAL_MISSING")
+    return str(terminal)
+
+
 def _measure_parquet(
     path: Path,
     *,
@@ -496,7 +524,7 @@ def _commit_canonical_root(
             if isinstance(old, dict):
                 old["is_current_corpus_version"] = False
                 _atomic_replace_json(prev_labels_path, old)
-    _write_lineage(root, lineage_out)
+    write_live_corpus_lineage(root, lineage_out)
     if fault_before_visibility is not None:
         fault_before_visibility()
     _publish_bytes(
@@ -661,7 +689,7 @@ def finish_unpublished_visibility(
         return dataset
     labels_path = _manifests_dir(data_root) / f"{dataset_manifest_id}.labels.json"
     _require(labels_path.is_file() and not labels_path.is_symlink(), "DATASET_LABELS_MISSING")
-    lineage = _load_lineage(data_root)
+    lineage = load_live_corpus_lineage(data_root)
     _publish_bytes(
         _manifests_dir(data_root) / f"{dataset_manifest_id}.published",
         json.dumps(
@@ -681,7 +709,7 @@ def repair_live_corpus_manifests(
 ) -> dict[str, Any]:
     """Republish current LIVE CORPUS composition as TASK-06-valid metadata."""
 
-    lineage = _load_lineage(data_root)
+    lineage = load_live_corpus_lineage(data_root)
     current_mid = lineage.get("current_dataset_manifest_id")
     _require(isinstance(current_mid, str) and current_mid, "CURRENT_CORPUS_MISSING")
     inspection = inspect_canonical_root(data_root, current_mid)
@@ -758,7 +786,7 @@ def repair_live_corpus_manifests(
             "current_dataset_manifest_id": repaired_mid,
             "versions": _lineage_versions(existing_cohorts),
         }
-        _write_lineage(data_root, lineage_out)
+        write_live_corpus_lineage(data_root, lineage_out)
         if not already["complete"]:
             dataset = finish_unpublished_visibility(data_root, repaired_mid)
             status = "REPAIRED"
@@ -808,10 +836,10 @@ def repair_live_corpus_manifests(
         for item in existing_cohorts
     ]
     feature_union = _feature_union(existing_cohorts)
-    yield_eligible_sum = sum(int(item.get("yield_eligible") or 0) for item in existing_cohorts)
-    yield_missing_sum = sum(int(item.get("yield_missing") or 0) for item in existing_cohorts)
-    census_rows_sum = sum(int(item.get("census_row_count") or 0) for item in existing_cohorts)
-    obs_rows_sum = sum(int(item.get("observation_row_count") or 0) for item in existing_cohorts)
+    yield_eligible_sum = sum(_lineage_int(item, "yield_eligible") for item in existing_cohorts)
+    yield_missing_sum = sum(_lineage_int(item, "yield_missing") for item in existing_cohorts)
+    census_rows_sum = sum(_lineage_int(item, "census_row_count") for item in existing_cohorts)
+    obs_rows_sum = sum(_lineage_int(item, "observation_row_count") for item in existing_cohorts)
     clock_proposed = (published_at or datetime.now(tz=UTC)).astimezone(UTC)
     labels = {
         **REQUIRED_LABELS,
@@ -821,7 +849,9 @@ def repair_live_corpus_manifests(
         "cohort_lineage": [str(item["cohort_id"]) for item in existing_cohorts],
         "corpus_version": version_n,
         "cumulative_composition": True,
-        "dataset_terminal": "SAMPLE_VALID",
+        "dataset_terminal": _dataset_terminal_from_current(
+            data_root, str(current_mid), latest
+        ),
         "dataset_version": repaired_version,
         "discovery_coverage_class": latest.get("discovery_coverage_class"),
         "feature_families": feature_union,
@@ -881,7 +911,7 @@ def import_live_cohort_canonical(
 ) -> dict[str, Any]:
     manifest = verify_live_cohort(release_root)
     imported_at = (import_time or datetime.now(tz=UTC)).astimezone(UTC)
-    sealed_at = _parse_utc(str(manifest["sealed_at"]))
+    sealed_at = parse_live_corpus_utc(str(manifest["sealed_at"]))
     _require(imported_at >= sealed_at, "IMPORT_BEFORE_SEAL")
     release_id = str(manifest["release_id"])
     cohort_id = str(manifest["cohort_id"])
@@ -891,53 +921,70 @@ def import_live_cohort_canonical(
     census_sha = sha256_file_streaming(census_path)
     obs_sha = sha256_file_streaming(obs_path)
 
-    lineage = _load_lineage(data_root)
+    lineage = load_live_corpus_lineage(data_root)
     existing_cohorts = [dict(item) for item in lineage.get("cohorts") or [] if isinstance(item, Mapping)]
-    for prior in existing_cohorts:
-        if prior.get("release_id") == release_id:
-            if prior.get("content_sha256") != content_sha:
-                raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT")
-            prior_mid = str(prior.get("dataset_manifest_id") or "")
-            inspection = inspect_canonical_root(data_root, prior_mid)
-            if inspection["artifacts_ok"] and not inspection["complete"] and prior_mid:
-                finish_unpublished_visibility(data_root, prior_mid)
+    matching = next(
+        (prior for prior in existing_cohorts if prior.get("release_id") == release_id),
+        None,
+    )
+    current_mid = lineage.get("current_dataset_manifest_id")
+    current_inspection: dict[str, Any] | None = None
+    if existing_cohorts:
+        _require(
+            isinstance(current_mid, str) and current_mid,
+            "CURRENT_CORPUS_MISSING",
+        )
+        current_inspection = inspect_canonical_root(data_root, str(current_mid))
+        if not current_inspection["complete"]:
+            if (
+                matching is not None
+                and matching.get("content_sha256") == content_sha
+                and str(matching.get("dataset_manifest_id") or "") == current_mid
+                and current_inspection["artifacts_ok"]
+            ):
+                finish_unpublished_visibility(data_root, str(current_mid))
                 return {
                     "status": "IMPORTED",
                     "cohort_id": cohort_id,
                     "release_id": release_id,
-                    "corpus_version": prior.get("corpus_version"),
-                    "dataset_manifest_id": prior_mid,
+                    "corpus_version": matching.get("corpus_version"),
+                    "dataset_manifest_id": current_mid,
                     "evidence_role": LIVE_EVIDENCE_ROLE,
                     "logical_rows_measured_partitions": 0,
                     "epoch_bump": True,
                 }
+            if (
+                matching is not None
+                and matching.get("content_sha256") != content_sha
+                and current_inspection["artifacts_ok"]
+            ):
+                raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT")
+            raise LiveCohortReleaseError(LEGACY_CORPUS_REQUIRES_REPAIR)
+        if matching is not None:
+            if matching.get("content_sha256") != content_sha:
+                raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT")
             return {
                 "status": "IDEMPOTENT_REIMPORT",
                 "cohort_id": cohort_id,
                 "release_id": release_id,
-                "corpus_version": prior.get("corpus_version"),
-                "dataset_manifest_id": prior.get("dataset_manifest_id"),
+                "corpus_version": matching.get("corpus_version"),
+                "dataset_manifest_id": matching.get("dataset_manifest_id"),
                 "evidence_role": LIVE_EVIDENCE_ROLE,
                 "logical_rows_measured_partitions": 0,
                 "epoch_bump": False,
             }
+    for prior in existing_cohorts:
         if prior.get("cohort_id") == cohort_id:
             raise LiveCohortReleaseError("COHORT_ALREADY_IMPORTED")
 
     prior_by_id: dict[str, LiveCorpusPartitionClaims] | None = None
     previous_current_mid: str | None = None
     if existing_cohorts:
-        previous_current_mid = lineage.get("current_dataset_manifest_id")
-        _require(
-            isinstance(previous_current_mid, str) and previous_current_mid,
-            "CURRENT_CORPUS_MISSING",
-        )
-        inspection = inspect_canonical_root(data_root, previous_current_mid)
-        if not inspection["complete"]:
-            raise LiveCohortReleaseError(LEGACY_CORPUS_REQUIRES_REPAIR)
+        previous_current_mid = str(current_mid)
+        _require(current_inspection is not None, "CURRENT_CORPUS_MISSING")
         prior_by_id = {
             part.partition_id: claims_from_partition(part)
-            for part in inspection["partitions"]
+            for part in current_inspection["partitions"]
         }
         for prior in existing_cohorts:
             for key in (
@@ -1018,10 +1065,10 @@ def import_live_cohort_canonical(
         for item in cumulative
     ]
     feature_union = _feature_union(cumulative)
-    yield_eligible_sum = sum(int(item.get("yield_eligible") or 0) for item in cumulative)
-    yield_missing_sum = sum(int(item.get("yield_missing") or 0) for item in cumulative)
-    census_rows_sum = sum(int(item.get("census_row_count") or 0) for item in cumulative)
-    obs_rows_sum = sum(int(item.get("observation_row_count") or 0) for item in cumulative)
+    yield_eligible_sum = sum(_lineage_int(item, "yield_eligible") for item in cumulative)
+    yield_missing_sum = sum(_lineage_int(item, "yield_missing") for item in cumulative)
+    census_rows_sum = sum(_lineage_int(item, "census_row_count") for item in cumulative)
+    obs_rows_sum = sum(_lineage_int(item, "observation_row_count") for item in cumulative)
     labels = {
         **REQUIRED_LABELS,
         "accepted_hypothesis_id": None,

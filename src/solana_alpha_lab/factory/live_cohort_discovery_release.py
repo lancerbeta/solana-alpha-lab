@@ -2845,6 +2845,26 @@ def _write_lineage(data_root: Path, lineage: Mapping[str, Any]) -> None:
     tmp.replace(path)
 
 
+def load_live_corpus_lineage(data_root: Path) -> dict[str, Any]:
+    """Public lineage read for LIVE CORPUS publication."""
+
+    return _load_lineage(data_root)
+
+
+def write_live_corpus_lineage(
+    data_root: Path, lineage: Mapping[str, Any]
+) -> None:
+    """Public lineage write for LIVE CORPUS publication."""
+
+    _write_lineage(data_root, lineage)
+
+
+def parse_live_corpus_utc(value: str) -> datetime:
+    """Public UTC parser for LIVE CORPUS publication."""
+
+    return _parse_utc(value)
+
+
 def current_corpus_partition_rows(
     data_root: Path,
     *,
