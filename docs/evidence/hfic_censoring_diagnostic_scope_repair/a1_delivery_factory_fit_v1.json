@@ -4,28 +4,34 @@
   "review_id": "HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-FACTORY-FIT-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "9727ff5b61627cdb6912ac694ee117544ac1fdbe0631568f870ecbbf8880292a",
+  "reviewed_inventory_sha256": "e094202666a306320e18cf475540eb2c708a71e1282fbafa6aa10838b1482d06",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
-    "mission": "PASS",
-    "flexibility_and_history": "PASS",
-    "context_efficiency": "PASS",
-    "research_truth": "PASS",
-    "owner_operability": "PASS",
-    "execution_to_cashflow": "PASS",
-    "monitoring_and_recovery": "PASS",
-    "build_vs_buy": "PASS",
-    "security": "PASS",
-    "red_team": "PASS"
+    "mission": "PASS_SCOPE_REPAIR_NOT_MARKET_TEST",
+    "flexibility_and_history": "PASS_RECEIPT_1_1_KEEPS_1_0_OTHER",
+    "context_efficiency": "PASS_SYNTHETIC_TESTS_AND_RESEARCH_PIN",
+    "research_truth": "PASS_UNKNOWN_KEYS_OFF_OTHER_IN_SCOPE",
+    "owner_operability": "PASS_GLOSSARY_AND_SCORING_STATES",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_OPERATE_THIS_ATOM",
+    "monitoring_and_recovery": "PASS_TYPED_INCONCLUSIVE_REASONS",
+    "build_vs_buy": "PASS_REUSE_EXISTING_DIAGNOSTIC",
+    "security": "PASS_NO_SECRETS_NO_PATH_LEAK",
+    "red_team": "PASS_Y_ONLY_AND_EMPTY_FIELD_ID_HELD_OUT"
   },
   "capability_radar": {
     "now": "NONE",
-    "watch": "READ_ONLY_OPERATE"
+    "watch": "READ_ONLY_OPERATE_CENSORING_RERUN"
   },
-  "recovery": "revert",
+  "recovery": "Revert the diagnostic population projection, receipt 1.1 additive counts, tests A-H extras, and catalog hashes; keep frozen spec YAML, pins, parquet and historical receipt 2ce8af50 untouched.",
   "limits": [
-    "NO_ALPHA"
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_LIVE_SCIENTIFIC_DIAGNOSTIC",
+    "NO_FROZEN_SPEC_MUTATION",
+    "NO_CANONICAL_DONE"
   ]
 }

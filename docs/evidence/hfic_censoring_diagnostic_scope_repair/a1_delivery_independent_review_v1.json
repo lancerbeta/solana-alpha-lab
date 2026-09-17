@@ -4,18 +4,76 @@
   "review_id": "HFIC-CENSORING-DIAGNOSTIC-SCOPE-REPAIR-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "9727ff5b61627cdb6912ac694ee117544ac1fdbe0631568f870ecbbf8880292a",
+  "reviewed_inventory_sha256": "e094202666a306320e18cf475540eb2c708a71e1282fbafa6aa10838b1482d06",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
     "GOAL_DOD_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviews": [],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=b028cc832fd1d104e6a69d33e61990ce59b29baf092e3090c4a71e05a11f78ad",
+        "independence.claim_scope=PACKET_INFORMATION_PATH",
+        "implementation_transcript_seen=false",
+        "C1_X300_RAW_NONEMPTY_MINT_AND_FIELD_ID",
+        "C2_OTHER_FULL_FILE_UNKNOWN_OTHER_IN_SCOPE",
+        "C3_DUP_CENSUS_AND_MISSING_CENSUS_X300_ONLY",
+        "C4_RESEARCH_PIN_NOT_REPRODUCED_THIS_ATOM",
+        "NON_CLAIMS_INTACT"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "X300_MINTS_FROM_RAW_OBS_ROWS",
+        "UNIQUE_OBS_KEPT_FOR_DUP_AND_MATRIX",
+        "Y_ONLY_EXCLUDED",
+        "EMPTY_FIELD_ID_NOT_A_KEY",
+        "OTHER_1_0_FULL_FILE",
+        "NO_HARDCODED_FOUR_WAY",
+        "FROZEN_SPEC_UNTOUCHED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NAMED_CONSUMER_LATER_OPERATE",
+        "NO_LIVE_DIAGNOSTIC",
+        "TESTS_A_H_Y_ONLY_DUP_KEY_EMPTY_FIELD",
+        "PIN_IS_RESEARCH_NOT_RERUN",
+        "NON_CLAIMS_HOLD"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "SCORE_ATOM_COMPLETE_ONLY_AFTER_MERGE",
+        "OPERATE_BLOCKED_ON_OTHER_IN_SCOPE",
+        "OTHER_138234_NOT_UNKNOWN",
+        "COUNT_GLOSSARY_ON_RECEIPT",
+        "NO_OPERATE_COMMAND_THIS_ATOM"
+      ]
+    }
+  ],
   "remediation_history": [],
   "verdict": "PASS",
   "non_claims": [
-    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY"
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_LIVE_SCIENTIFIC_DIAGNOSTIC",
+    "NO_FROZEN_SPEC_MUTATION",
+    "NO_CANONICAL_DONE"
   ]
 }
