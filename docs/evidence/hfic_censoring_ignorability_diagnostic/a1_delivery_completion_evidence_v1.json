@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-ACCEPT-001",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1",
+  "state_change": "Registered CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001 with frozen spec, synthetic tests, and explicit-path CLI. Canonical live diagnostic remains out of this atom; canonical scope cannot emit until identity columns and spec SHA pins exist.",
+  "base_main": "461f5c1be2fb3f88f23aaac9eb7bf522fa1d11c0",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1.md": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_censoring_ignorability_diagnostic/a1_delivery_factory_fit_v1.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC",
+    "independent_review": {
+      "path": "docs/evidence/hfic_censoring_ignorability_diagnostic/a1_delivery_independent_review_v1.json",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC",
+      "PASS_UNIT_DISCOVERY_EVIDENCE_RELEASE_BRIDGE",
+      "PASS_VALIDATE_CATALOG"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_CANONICAL_DONE",
+    "NO_CANONICAL_ACTIVE_RDP_RUN_THIS_ATOM",
+    "NO_CANONICAL_SCOPE_THIS_ATOM",
+    "NO_PACKET_BUDGET_CHANGE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "rdp_mutation": 0,
+    "provider_calls": 0
+  }
+}

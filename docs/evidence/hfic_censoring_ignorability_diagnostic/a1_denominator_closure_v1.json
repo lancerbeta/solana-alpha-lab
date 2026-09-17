@@ -1,0 +1,94 @@
+{
+  "schema": "smial.hfic-censoring-ignorability-denominator-closure",
+  "schema_version": "1.1",
+  "as_of": "2026-09-17",
+  "task_id": "HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1",
+  "corpus_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+  "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+  "scientific_context_session": "HFIC-SESS-560C4E1A72B4F9E6",
+  "readback_kind": "CENSUS_CANDIDATE_STATE_NO_Y_VALUES",
+  "this_atom_ran_canonical_active_rdp_diagnostic": false,
+  "canonical_scope_reachable": false,
+  "counts": {
+    "discovered_in_observation_partition": 610,
+    "x_eligible_observed": 148,
+    "x_eligible_censored_late": 327,
+    "admitted_censored_late_no_x300": 35,
+    "x_population_ineligible": 100,
+    "comparable_x_subset": 475
+  },
+  "comparable_x_rule": "census.candidate_state == X_ELIGIBLE",
+  "observed_label_is_not_complete_pair_proof": true,
+  "admitted_35_coverage_class": "CENSORING_NO_COMPARABLE_X300_ANCHOR_UNRESOLVED",
+  "source_release": {
+    "release_id": "633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154",
+    "census_basename": "PARTITION-LIVE-COHORT-REL-20260902T111900Z-20260909T111900Z-CENSUS-633a57088a5eb16d.parquet",
+    "observations_basename": "PARTITION-LIVE-COHORT-REL-20260902T111900Z-20260909T111900Z-OBS-633a57088a5eb16d.parquet",
+    "census_sha256": "cfa7d8404dc5400c4e223c4d5303193ad2209f92cac3af2d61862e384ebfd5bf",
+    "observations_sha256": "7b26425c69cc95baf8a9e0b9ea506de1042b98b83d48a2dae07f5a33a7d66d7d",
+    "producer_git_sha": "669745ec8de59c6db4aa04418af845253872bfde",
+    "hash_cross_check": "docs/evidence/hfic_forge_vision_integrity_closure/a1_real_c1_vision_acceptance_v1.json",
+    "pins_do_not_authorize_canonical_scope": true
+  },
+  "source_columns_present": {
+    "census": [
+      "cohort_id",
+      "candidate_state",
+      "denominator_state",
+      "authoritative_anchor",
+      "mint"
+    ],
+    "observations": [
+      "cohort_id",
+      "mint",
+      "point_id"
+    ]
+  },
+  "source_identity_columns_absent": [
+    "dataset_id",
+    "scientific_context_session"
+  ],
+  "query_bindings": [
+    {
+      "id": "CENSUS_CANDIDATE_BY_DENOMINATOR",
+      "sql": "SELECT candidate_state, denominator_state, count(*) AS mints FROM census GROUP BY 1, 2",
+      "result_rows": [
+        {"candidate_state": "X_ELIGIBLE", "denominator_state": "censored_late", "mints": 327},
+        {"candidate_state": "X_ELIGIBLE", "denominator_state": "observed", "mints": 148},
+        {"candidate_state": "X_POPULATION_INELIGIBLE", "denominator_state": "x_ineligible", "mints": 100},
+        {"candidate_state": "ADMITTED", "denominator_state": "censored_late", "mints": 35}
+      ]
+    },
+    {
+      "id": "OBSERVATION_DISTINCT_MINTS",
+      "sql": "SELECT count(DISTINCT mint) AS discovered_in_observation_partition FROM observations",
+      "result": 610
+    },
+    {
+      "id": "ADMITTED_CENSORED_LATE_EMPTY_ANCHOR",
+      "sql": "SELECT count(*) FROM census WHERE candidate_state = 'ADMITTED' AND denominator_state = 'censored_late' AND (authoritative_anchor IS NULL OR CAST(authoritative_anchor AS VARCHAR) = '')",
+      "result": 35,
+      "typed_value_projected": false,
+      "y_point_values_read": false
+    }
+  ],
+  "canonical_scope_blockers": [
+    "SPEC_MISSING_census_sha256",
+    "SPEC_MISSING_observations_sha256",
+    "LIVE_PARQUET_MISSING_dataset_id",
+    "LIVE_PARQUET_MISSING_scientific_context_session",
+    "CENSUS_RELEASE_SCHEMA_MISSING_dataset_id",
+    "CENSUS_RELEASE_SCHEMA_MISSING_scientific_context_session",
+    "OBS_RELEASE_SCHEMA_MISSING_dataset_id",
+    "OBS_RELEASE_SCHEMA_MISSING_scientific_context_session"
+  ],
+  "non_claims": [
+    "NO_MAR",
+    "NO_IGNORABILITY",
+    "NO_IDENTIFIABILITY",
+    "NO_ALPHA",
+    "NO_Y_POINT_READ",
+    "NO_CANONICAL_ACTIVE_RDP_RUN_THIS_ATOM",
+    "NO_CANONICAL_SCOPE_THIS_ATOM"
+  ]
+}

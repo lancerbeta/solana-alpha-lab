@@ -11,6 +11,11 @@ from typing import Any, Callable
 
 import yaml
 
+from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
+    CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC,
+    CensoringDiagnosticError,
+    run_from_capability_spec,
+)
 from solana_alpha_lab.factory.market_feature_surface import (
     CAP_OFFLINE_MARKET_FEATURE_RESOLVE,
     FeatureSurfaceError,
@@ -614,6 +619,26 @@ def capture_early_icp_first_hit_mix_falsifier(
     }
 
 
+def run_censoring_ignorability_diagnostic(
+    spec: Mapping[str, Any],
+    *,
+    root: Path,
+    authority_phrase: str | None = None,
+    capture_hooks: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Offline X300 selection diagnostic. Zero provider calls. No Y reads."""
+
+    del authority_phrase
+    try:
+        return run_from_capability_spec(
+            spec,
+            root=root,
+            capture_hooks=capture_hooks,
+        )
+    except CensoringDiagnosticError as exc:
+        raise CapabilityError(str(exc)) from exc
+
+
 def compile_observation_schedule(
     spec: Mapping[str, Any],
     *,
@@ -648,6 +673,7 @@ CAPABILITY_ROUTER: dict[str, Callable[..., dict[str, Any]]] = {
     CAP_JUPITER_FREE_KEY_EARLY_ICP_FIRST_HIT_MIX_FALSIFIER: capture_early_icp_first_hit_mix_falsifier,
     CAP_OFFLINE_MARKET_FEATURE_RESOLVE: resolve_market_feature_surface,
     CAP_OBSERVATION_SCHEDULE_COMPILE_BIND: compile_observation_schedule,
+    CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC: run_censoring_ignorability_diagnostic,
 }
 
 
@@ -680,6 +706,8 @@ def execute_capability(
         if budget < 1 or budget > 60:
             raise CapabilityError("PROVIDER_BUDGET_INVALID")
     if capability_id == CAP_OBSERVATION_SCHEDULE_COMPILE_BIND and budget != 0:
+        raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
+    if capability_id == CAP_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC and budget != 0:
         raise CapabilityError("PROVIDER_BUDGET_NOT_ZERO")
     return handler(
         spec,
