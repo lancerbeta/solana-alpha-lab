@@ -15,7 +15,7 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "962b66158a435bdf4119fcc1b2082600752404c57ac082071564a76cb4396995",
+    "catalog/assets/core.yaml": "6ac991223524c00d3bf5647776e9099faf6100af077c69cb981483b513924322",
     "catalog/assets/lifecycle.yaml": "6e6769e8102e2ef32436b0d509fe3d0d31f46ba6c5b359d58681f2061d4c5205",
     "catalog/catalog_manifest.yaml": "14a163eefbe11b41f0f9f97d5b9b2e6926c8531c3318cf1e36f63ac006b1533a",
     "catalog/generated/asset_edges.json": "12dfa6805b1ed8219a371361e294631edbe3fbb4984b6f980d35cb31f2915e63",
@@ -24,13 +24,14 @@
     "docs/PROJECT_MAP.md": "e97c22897009eb14dde11abdb1fe5352a6cbaab2c40104202c531bbeb2d8d75e",
     "docs/evidence/hfic_censoring_ignorability_diagnostic/a1_denominator_closure_v1.json": "1a79e8a10d6164260c5cada27683a211544ac962c04f855f50d466396fa416b9",
     "docs/evidence/hfic_censoring_ignorability_diagnostic/a1_frozen_spec_v1.json": "408df5d076163ac929c6354e73f1366ae06b8380a1eaa5e31c0f90554b77c967",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "e061748261d5d9a9f8c95de66c72d74bf80ccad82affb46e7695d246588ad1a3",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "25e13f707df81c90c4ce370a21eb35e403d36c4d58e15d36c702df290c37c3f5",
     "docs/reports/hfic_censoring_ignorability_diagnostic/a1_owner_readout_v1.md": "e38b7782af9d57cf5c0984ecbc8af0f2bd9b6aab5b0d7baf83da8a145ad29b93",
-    "docs/tasks/HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1.md": "ff371d47b6d98b641fa2ec16c4400bc610e336116dfa63cebecff81a13b29e8d",
+    "docs/tasks/HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1.md": "6fb46d5e789209b354004e676f0f72fe65e77be24889b0587b6fdec3615a4966",
     "scripts/hypothesis_forge.py": "ea683e66183c059190bd2d5368e5822ec120f67aeea6821ddd8919c83d7cc355",
     "src/solana_alpha_lab/factory/capabilities.py": "bf40fa15ce2b78764650b0b678eb5f6b981081aff086e186e6d244a04ce5cb2c",
     "src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py": "91d5f37483649eaad839d46e5993dc1a4de2ae1b1d3e1a6d7b585d006e799435",
     "tests/test_discovery_evidence_release_bridge.py": "6d58f9bf69a076f20fc5ea64d25f9754463bb7106f9304154ac02349095fc406",
+    "tests/test_factory_ordinary_market_hypothesis.py": "ae3f4823fce0f129b819558088d67ea501c183544c18538124decf5eaebf7be9",
     "tests/test_hfic_censoring_ignorability_diagnostic_v1.py": "1e2a6d5e2f687ca89a9f79509c484c2fdd4efb12c73fb7ca52ebe0f76fc34b43"
   },
   "active_stop_conditions": [],
@@ -43,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_censoring_ignorability_diagnostic/a1_delivery_factory_fit_v1.json",
-    "sha256": "62954560fbbc06ffe9d07d365ac7c8b85ea422f528d569c0b06e639a8c9f588c",
+    "sha256": "8af5e567587f63e34e92c7458c26dea7d6b19c2243b6acb1a44e5826025bc3ba",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC",
     "independent_review": {
       "path": "docs/evidence/hfic_censoring_ignorability_diagnostic/a1_delivery_independent_review_v1.json",
-      "sha256": "9ca5f154d6b350c5d3a5a5b5b2b107e01a777add569d0892b794c6da5faa6a52",
+      "sha256": "251534613dade5e24675fba144ae77289e6d060f93708cc78500c568ae1c98c1",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

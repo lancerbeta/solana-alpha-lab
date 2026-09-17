@@ -4,8 +4,8 @@
   "review_id": "HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-17",
   "task_id": "HFIC_CENSORING_IGNORABILITY_DIAGNOSTIC_V1",
-  "reviewed_bindings_sha256": "0f72c5fca92941fb58ca00f26c92799048b6c06407ce461074d963c62c3a01ec",
-  "reviewed_inventory_sha256": "05496cad31a019581a28f3da94952ddbe92d28b7f11a8970432f288e46d38298",
+  "reviewed_bindings_sha256": "fc45bcdf627396acc5cb8dbf434161fb8cca13dc72f6fab05b835a5713a4d192",
+  "reviewed_inventory_sha256": "89f562b42d6bc71e3d4fbb06c7774186487b41a2db6d2ad65923a7cc77d52281",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
