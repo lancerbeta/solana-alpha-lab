@@ -34,6 +34,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_censoring_ignorability_diagnostic.py
   - tests/test_hfic_censoring_ignorability_diagnostic_v1.py
   - docs/reports/hfic_censoring_diagnostic_scope_repair/a1_owner_readout_v1.md
+  - docs/reports/hfic_censoring_ignorability_diagnostic/a1_owner_readout_v1.md
   - docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_pinned_production_closure_v1.json
   - docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_delivery_completion_evidence_v1.json
   - docs/evidence/hfic_censoring_diagnostic_scope_repair/a1_delivery_independent_review_v1.json

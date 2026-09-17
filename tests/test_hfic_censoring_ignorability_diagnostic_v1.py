@@ -615,6 +615,11 @@ class HficCensoringIgnorabilityDiagnosticTests(unittest.TestCase):
         self.assertEqual(receipt["counts"]["other_in_scope"], 0)
         self.assertEqual(receipt["counts"]["other"], 0)
         self.assertEqual(receipt["counts"]["x_population_ineligible"], 0)
+        self.assertIn("not the UNKNOWN gate", receipt["count_glossary"]["other"])
+        self.assertIn(
+            "UNKNOWN_CENSUS_STATE",
+            receipt["count_glossary"]["other_in_scope"],
+        )
         self.assertIsNone(receipt["corpus_id"])
 
     def test_mixed_observation_cohort_is_inconclusive(self) -> None:
@@ -1439,6 +1444,25 @@ class DiagnosticPopulationScopeTests(unittest.TestCase):
         self.assertEqual(receipt["counts"]["other"], 2)
         self.assertEqual(receipt["comparable_x_subset_n"], 48)
 
+    def test_duplicated_sole_x300_key_still_enters_diagnostic_population(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
+            rows = pq.read_table(census).to_pylist()
+            rows.append(
+                _member("duponly", candidate="WEIRD", denom="observed", anchor="ANCHOR")
+            )
+            _write_parquet(census, rows, CENSUS_RELEASE_SCHEMA)
+            obs_rows = pq.read_table(observations).to_pylist()
+            obs_rows.append(_identity_obs("duponly"))
+            obs_rows.append(_identity_obs("duponly"))
+            _write_parquet(observations, obs_rows, OBS_RELEASE_SCHEMA)
+            receipt = _run(census, observations)
+        self.assertEqual(receipt["terminal"], _atomic(INCONCLUSIVE))
+        self.assertIn("DUPLICATE_X300_OBSERVATION", receipt["inconclusive_reasons"])
+        self.assertIn("UNKNOWN_CENSUS_STATE", receipt["inconclusive_reasons"])
+        self.assertEqual(receipt["counts"]["other_in_scope"], 1)
+        self.assertEqual(receipt["counts"]["diagnostic_population_census_rows"], 54)
+
     def test_y_only_mint_does_not_enter_diagnostic_population(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             census, observations = _balanced_fixture(Path(tmp), shift_liquidity=False)
@@ -1486,6 +1510,7 @@ class DiagnosticPopulationScopeTests(unittest.TestCase):
         self.assertEqual(payload["diagnostic_population_census_rows"], 610)
         self.assertEqual(payload["diagnostic_population_distinct_mints"], 610)
         self.assertEqual(payload["out_of_scope_census_rows"], 138234)
+        self.assertEqual(payload["other_full_file_unexpected_states"], 138234)
         self.assertEqual(payload["other_in_scope"], 0)
         self.assertNotEqual(
             payload["out_of_scope_census_rows"], payload["other_in_scope"]

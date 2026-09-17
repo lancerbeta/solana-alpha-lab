@@ -2,6 +2,13 @@
 
 Date: 2026-09-17 · Route: DIRECT_CURSOR_DELIVERY
 
+**Scope repair (later atom):** population and UNKNOWN gating now live in
+`docs/reports/hfic_censoring_diagnostic_scope_repair/a1_owner_readout_v1.md`.
+After a 1.1 canonical receipt, `counts["other"]` can still be ~138234; that
+is full-file unexpected states, not UNKNOWN. Read `other_in_scope` and
+`inconclusive_reasons`. NEXT after that repair is a separate READ-ONLY
+OPERATE rerun, not the identity-column atom described below.
+
 ## What landed
 
 Reusable offline capability `CAP-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001`.
@@ -35,8 +42,9 @@ diagnostic result.
 - `CENSORING_OBSERVED_X_SHIFT_NOT_DETECTED` — still
   `IGNORABILITY_UNPROVEN` / `IDENTIFICATION_UNPROVEN` /
   `RANDOM_SAMPLE_UNPROVEN`
-- `CENSORING_DIAGNOSTIC_INCONCLUSIVE` — coverage / n / unknown census /
-  duplicate mint or X300 / value_kind / mixed dataset-session / integrity fail
+- `CENSORING_DIAGNOSTIC_INCONCLUSIVE` — coverage / n / unknown census
+  (`other_in_scope`, not `counts.other`) / duplicate mint or X300 /
+  value_kind / mixed dataset-session / integrity fail
 
 CLI and capability `terminal` is the atomic pair
 `scientific_terminal|population_scope`. Canonical scope requires frozen
@@ -65,6 +73,8 @@ SHA-256 pins. Counts in the denominator receipt are bound to those parquet
 hashes and grouping SQL; they are not a `CANONICAL_COMPARABLE_X_SUBSET`
 diagnostic result.
 
-The next atom must add those identity columns and pin the file hashes before
-any run can emit canonical scope. Explicit paths alone are not enough. This
-merge does not authorize a scientific diagnostic against canonical active RDP.
+Identity columns and hash pins are a later canonical-scope atom, not the
+immediate NEXT after the scope-repair merge. After
+`HFIC_CENSORING_DIAGNOSTIC_SCOPE_REPAIR_V1` lands, NEXT is a separate
+READ-ONLY OPERATE scientific rerun. This capability merge still does not
+authorize that run or a diagnostic against canonical active RDP.

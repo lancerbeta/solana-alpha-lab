@@ -47,10 +47,17 @@ Pinned production expectation (not a live rerun):
 - `diagnostic_population_census_rows` = 610
 - `diagnostic_population_distinct_mints` = 610
 - `out_of_scope_census_rows` = 138234
+- `other` = 138234 (full-file unexpected; same mass as out_of_scope here)
 - `other_in_scope` = 0
 
-Do not call 138234 unknown. On that historical 1.0 receipt it was stored as
-`other`; after this repair it is `out_of_scope_census_rows`.
+Do not call 138234 unknown. On a later 1.1 OPERATE receipt, **expect both**
+`out_of_scope_census_rows = 138234` **and** `counts["other"] ≈ 138234`.
+Those are the same row mass counted two ways: rows outside the X300
+projection, and full-file unexpected states. They are **not**
+`UNKNOWN_CENSUS_STATE`. Score UNKNOWN only from `other_in_scope` (expect 0)
+and `inconclusive_reasons`. Historical 1.0 receipt `2ce8af50…` stored that
+mass as `other` and then treated it as unknown; that gate is what this
+repair removes.
 
 A dedicated fail-closed reason `OBSERVATION_MINT_MISSING_FROM_CENSUS` covers
 an **X300** observation mint with no census row. Y-only membership does not

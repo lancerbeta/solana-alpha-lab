@@ -62,6 +62,39 @@ OBSERVATION_MINT_MISSING_FROM_CENSUS = "OBSERVATION_MINT_MISSING_FROM_CENSUS"
 # meaning. UNKNOWN_CENSUS_STATE keys off other_in_scope. Diagnostic census is
 # X300 observation mints after bind, not Y-only membership.
 RECEIPT_SCHEMA_VERSION = "1.1"
+COUNT_GLOSSARY = {
+    "census_rows": (
+        "full-file loaded census rows; schema 1.0 alias of census_rows_total"
+    ),
+    "census_rows_total": "full-file loaded census rows",
+    "census_distinct_mints_total": "distinct nonempty census mints in the full file",
+    "discovered_in_observation_partition": (
+        "distinct nonempty mints in the observations file, any point_id"
+    ),
+    "diagnostic_population_census_rows": (
+        "census rows whose mint appears on X300 observation keys"
+    ),
+    "diagnostic_population_distinct_mints": (
+        "distinct mints in the X300 diagnostic population"
+    ),
+    "out_of_scope_census_rows": (
+        "full-file census rows outside the X300 diagnostic population; not UNKNOWN"
+    ),
+    "x_eligible_observed": "in-scope X_ELIGIBLE + observed",
+    "x_eligible_censored_late": "in-scope X_ELIGIBLE + censored_late",
+    "admitted_censored_late_no_x300": (
+        "in-scope ADMITTED + censored_late without X300 Block A anchor"
+    ),
+    "x_population_ineligible": "in-scope X_POPULATION_INELIGIBLE",
+    "other": (
+        "schema 1.0: unexpected non-four-way states on the full census file; "
+        "not the UNKNOWN gate"
+    ),
+    "other_in_scope": (
+        "unexpected states inside the X300 diagnostic population; "
+        "UNKNOWN_CENSUS_STATE keys off this field, not other"
+    ),
+}
 ANCHOR_UNRESOLVED = "CENSORING_NO_COMPARABLE_X300_ANCHOR_UNRESOLVED"
 ADMITTED_NOT_X_ELIGIBLE = "CENSORING_ADMITTED_NOT_X_ELIGIBLE"
 IGNORABILITY_UNPROVEN = "IGNORABILITY_UNPROVEN"
@@ -1110,7 +1143,7 @@ def _execute_censoring_diagnostic(
     observation_mints = _parquet_distinct_mints(observations_path)
     x300_mints = {
         str(row.get("mint") or "")
-        for row in unique_obs
+        for row in obs_rows
         if str(row.get("mint") or "")
     }
     rng = random.Random(_seed_int(str(spec["permutation_seed"])))
@@ -1456,6 +1489,7 @@ def _execute_censoring_diagnostic(
         "complete_case_random_sample_certified": False,
         "complete_case_random_sample_status": RANDOM_SAMPLE_UNPROVEN,
         "counts": counts,
+        "count_glossary": dict(COUNT_GLOSSARY),
         "comparable_x_subset_n": comparable_n,
         "unresolved_anchor_n": len(unresolved),
         "unresolved_anchor_class": ANCHOR_UNRESOLVED if unresolved else None,

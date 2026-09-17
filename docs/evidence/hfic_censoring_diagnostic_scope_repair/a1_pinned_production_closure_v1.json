@@ -21,6 +21,7 @@
   "diagnostic_population_census_rows": 610,
   "diagnostic_population_distinct_mints": 610,
   "out_of_scope_census_rows": 138234,
+  "other_full_file_unexpected_states": 138234,
   "other_in_scope": 0,
   "four_way_in_scope_capable": {
     "x_eligible_observed": 148,
