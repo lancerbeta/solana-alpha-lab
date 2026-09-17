@@ -15,7 +15,19 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "9fb671a971d079d9a80d4a395e8dc3feba98447d153b50db2f5257113465a64c",
+    "catalog/assets/lifecycle.yaml": "30f3972f2d3222f704516586968b760fcff1299d66a377e3d70ab36461bad3d3",
+    "catalog/catalog_manifest.yaml": "d1e4eb642993af9497a4235440f50d220ded2a05980b9d6b8d61abe357806d6d",
+    "catalog/generated/asset_edges.json": "54be3950056ba39c114e16b0161292a3743a4ffdd96fa6dba4995aafc590b7d8",
+    "docs/PROJECT_MAP.md": "26a8d257fe6ca6da44138fabf37afce9ac9227fb95f5947f207089c8169a5f29",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "579acd4a6df81c9afd141ca573b142e2920d33ddcc121ba2e97353e254d635fe",
+    "docs/reports/live_corpus_manifest_contract_repair/a1_owner_readout_v1.md": "185470b37bd4b167965da4182ac1a303a58ad5202b1582ee46222e470421499f",
+    "docs/tasks/LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR_V1.md": "78bfdb1b39883a9bbbb90dd6a68c2f504deeea1d899d5afd632899728bc22b1b",
+    "scripts/discovery_evidence_release.py": "ee74beb178a12cf660f6c9d7ce9f677b3232b4563371f7fd1238a067e50bc024",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "78d2cde18430f00e027122853c5ef75b282a65d3ff9f792653b3bd6eec36a93a",
+    "src/solana_alpha_lab/factory/live_corpus_logical_rows.py": "2ba111553e1eb8ffff6899c0eae3d90eb5aa8438bb6f02359c87c96a08d7353a",
+    "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "4c459a684137ad001e5f94b7d826eb1ac4f34f1a0c77b7f8535bcb95fe105bd0",
+    "tests/test_live_corpus_manifest_contract_repair_v1.py": "8c77dba8cbae80bf4760064211c4da02c8dbf6f94a0041f94568dc15a8499baf"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -27,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/live_corpus_manifest_contract_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "6141ae76280de63b8b974c4acb7e311fc1f2f8dae740020ecb163d7898a6df43",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_LIVE_CORPUS_MANIFEST_CONTRACT_REPAIR",
     "independent_review": {
       "path": "docs/evidence/live_corpus_manifest_contract_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "6468dad73404bed0203ecfcde4379cf7e8e827a8a2f29106eb7d063d4a4175eb",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
