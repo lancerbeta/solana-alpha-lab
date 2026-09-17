@@ -231,7 +231,6 @@ def _published_marker_ok(published_path: Path, dataset: DatasetManifest) -> bool
     return (
         isinstance(published, dict)
         and published.get("dataset_fingerprint") == dataset.dataset_fingerprint
-        and published.get("dataset_manifest_id") == dataset.dataset_manifest_id
     )
 
 
@@ -784,6 +783,12 @@ def repair_live_corpus_manifests(
             "superseded_dataset_manifest_id": None,
             "epoch_bump": False,
         }
+    prior_by_id: dict[str, LiveCorpusPartitionClaims] | None = None
+    if inspection["artifacts_ok"] and inspection.get("partitions"):
+        prior_by_id = {
+            part.partition_id: claims_from_partition(part)
+            for part in inspection["partitions"]
+        }
     _retract_unpublished_canonical_metadata(data_root, str(current_mid))
 
     existing_cohorts = _cohorts_from_lineage(lineage)
@@ -848,7 +853,7 @@ def repair_live_corpus_manifests(
             _claims_for_cohort(
                 data_root=data_root,
                 cohort=cohort,
-                prior_by_id=None,
+                prior_by_id=prior_by_id,
                 measured=measured,
                 allow_measure=True,
             )
@@ -957,9 +962,10 @@ def import_live_cohort_canonical(
     obs_sha = sha256_file_streaming(obs_path)
 
     lineage = load_live_corpus_lineage(data_root)
-    raw_cohorts = lineage.get("cohorts") or []
+    current_mid = lineage.get("current_dataset_manifest_id")
+    raw_cohorts = lineage.get("cohorts")
     existing_cohorts: list[dict[str, Any]] = []
-    if raw_cohorts:
+    if current_mid or raw_cohorts:
         existing_cohorts = _cohorts_from_lineage(lineage)
     matching = next(
         (prior for prior in existing_cohorts if prior.get("release_id") == release_id),

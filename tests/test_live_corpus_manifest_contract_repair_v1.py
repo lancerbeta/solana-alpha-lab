@@ -700,6 +700,7 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 published_at=datetime(2026, 9, 20, tzinfo=UTC),
             )
             self.assertEqual(recovered["dataset_manifest_id"], new_mid)
+            self.assertEqual(recovered["logical_rows_measured_partitions"], 0)
             recovered_dataset = DatasetManifest.model_validate_json(
                 (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
             )
@@ -729,6 +730,7 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                 published_at=datetime(2026, 9, 21, tzinfo=UTC),
             )
             self.assertEqual(recovered_corrupt["dataset_manifest_id"], new_mid)
+            self.assertEqual(recovered_corrupt["logical_rows_measured_partitions"], 0)
             recovered_corrupt_dataset = DatasetManifest.model_validate_json(
                 (data_root / "datasets" / "manifests" / f"{new_mid}.json").read_bytes()
             )
@@ -820,6 +822,33 @@ class LiveCorpusManifestContractRepairTests(unittest.TestCase):
                     import_time=datetime(2026, 1, 27, 1, tzinfo=UTC),
                 )
             self.assertEqual(str(drifted.exception), "CORPUS_PARQUET_SHA_MISMATCH")
+
+    def test_import_fail_closed_when_current_pointer_has_empty_cohorts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            data_root = base / "rdp"
+            data_root.mkdir()
+            release0, sealed0, _cohort0 = _seal_week(base, 0)
+            _install_legacy_corpus(
+                data_root=data_root,
+                release=release0,
+                sealed=sealed0,
+                imported_at=datetime(2026, 1, 20, 1, tzinfo=UTC),
+            )
+            lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
+            lineage["cohorts"] = []
+            lineage_path.write_text(
+                json.dumps(lineage, sort_keys=True, separators=(",", ":")),
+                encoding="utf-8",
+            )
+            with self.assertRaises((LiveCohortReleaseError, DiscoveryReleaseError)) as missing:
+                import_live_cohort(
+                    release_root=release0,
+                    data_root=data_root,
+                    import_time=datetime(2026, 1, 20, 2, tzinfo=UTC),
+                )
+            self.assertEqual(str(missing.exception), "CORPUS_LINEAGE_INCOMPLETE")
 
     def test_first_import_interrupt_not_selected_current(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
