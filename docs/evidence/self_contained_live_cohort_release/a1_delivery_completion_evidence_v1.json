@@ -16,9 +16,10 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     "catalog/assets/core.yaml": "ab0f43f1c35952a6dcdfd3a0a29ae4d178f745ddf1d909ca97ba809ad9f81572",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "dc6d078a6304446ce23f00bb0c3f124f02928c8074177ba66e6b99b43694c496",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "b8d2c699f3403b59b8233e6df64ecbed7ba98012e4c7b589d86b241f57dd0423",
     "docs/reports/self_contained_live_cohort_release/a1_owner_readout_v1.md": "64fb5617ece3040c445d61711c17eb0d93988ff2c7e0cf5c12513c43038a2e52",
-    "docs/tasks/SELF_CONTAINED_LIVE_COHORT_RELEASE_V1.md": "44953ea388b1733a88236e2edf995886eda524dc1579de54dba6164658b1851b",
+    "docs/tasks/SELF_CONTAINED_LIVE_COHORT_RELEASE_V1.md": "346055e70944eefdf228fafac2631384e428826ebd88c7ef63bd1a313115e4b4",
     "scripts/discovery_evidence_release.py": "397960629fa3ec56f6528d8e216195cca593c9e0a6b8a9e1ededc74abf846b72",
     "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "7b27611ba0928f394d307347a439f5b07d46f8682a40bb9803d929f55b033bc2",
     "src/solana_alpha_lab/factory/live_cohort_schedule_artifact.py": "ce5abd9ff4f7bbe96ca083d7822d6c1315d1130e9a81ac07f03dbb6827aaac56",
@@ -38,14 +39,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_factory_fit_v1.json",
-    "sha256": "b325dee496a2fb73b9a0e5d8b2d1ecb368820cdec3f431210dcbab7efeaeb520",
+    "sha256": "5b7af7583d4ab0dbce457a41519adbf468947822d3b9766564c7af16ac9d410d",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_SELF_CONTAINED_LIVE_COHORT_RELEASE",
     "independent_review": {
       "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_independent_review_v1.json",
-      "sha256": "45c6c7604073c6c67dcae5260a210e3befb20c0c461baa3b7e8a9cb5de3ed3f0",
+      "sha256": "04458962374f833d544c5b05b079af08bc5bc65cd47111e3b9c6a96ef7b5b8e2",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
