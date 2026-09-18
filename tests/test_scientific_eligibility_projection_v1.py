@@ -207,8 +207,18 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         from solana_alpha_lab.factory.lane_classifier import (
             _submission_outcome_readiness,
         )
+        from solana_alpha_lab.factory.run_passport import canonical_sha256
 
-        spec = {"schema_version": "1.3"}
+        spec = {
+            "schema_version": "1.3",
+            "required_outcomes": [
+                {
+                    "point_id": "Y900",
+                    "field_ids": ["FIELD-USD-PRICE-001"],
+                    "role": "PRIMARY",
+                }
+            ],
+        }
         self.assertEqual(
             _submission_outcome_readiness(spec, {}),
             READINESS_MISSINGNESS_UNRESOLVED,
@@ -218,12 +228,88 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
                 spec,
                 {"outcome_readiness": READINESS_COMPLETE},
             ),
+            READINESS_MISSINGNESS_UNRESOLVED,
+        )
+        bound = project_scientific_eligibility(
+            [_census("a", "observed")],
+            [
+                _x300("a"),
+                _y("a", "Y900", "FIELD-USD-PRICE-001", "OBSERVED"),
+            ],
+            spec=spec,
+        )
+        self.assertEqual(bound["experiment_spec_sha256"], canonical_sha256(spec))
+        self.assertEqual(
+            _submission_outcome_readiness(
+                spec,
+                {"scientific_eligibility_projection": bound},
+            ),
             READINESS_COMPLETE,
         )
         self.assertEqual(
             _submission_outcome_readiness({"schema_version": "1.2"}, {}),
             READINESS_UNSPECIFIED,
         )
+
+    def test_duplicate_census_does_not_inflate_lifecycle(self) -> None:
+        census = [_census("a", "observed"), _census("a", "censored_late")]
+        obs = [_x300("a"), _x300("a")]
+        projected = project_scientific_eligibility(census, obs)
+        self.assertEqual(projected["base_x_population"]["n"], 1)
+        self.assertEqual(projected["lifecycle_coverage"]["n_observed"], 1)
+        self.assertEqual(projected["lifecycle_coverage"]["n_censored_late"], 0)
+
+    def test_later_x300_observed_wins(self) -> None:
+        census = [_census("a", "observed")]
+        late_ok = _x300("a")
+        earlier_missing = _x300("a")
+        earlier_missing["state"] = "MISSING_TYPED"
+        earlier_missing["first_reliable_available_at"] = ANCHOR.isoformat().replace(
+            "+00:00", "Z"
+        )
+        projected = project_scientific_eligibility(
+            census, [earlier_missing, late_ok]
+        )
+        self.assertEqual(projected["base_x_population"]["n"], 1)
+
+    def test_control_yield_projects_rows_without_label(self) -> None:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            resolve_control_corpus_yield,
+        )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            CORPUS_DATASET_ID,
+        )
+
+        census = [_census(f"m{i}", "observed") for i in range(10)]
+        obs = [_x300(f"m{i}") for i in range(10)]
+        gate, observed = resolve_control_corpus_yield(
+            [
+                {
+                    "dataset_id": CORPUS_DATASET_ID,
+                    "yield_eligible": 99,
+                    "census_rows": census,
+                    "observation_rows": obs,
+                }
+            ],
+            corpus_dataset_id=CORPUS_DATASET_ID,
+            min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
+        )
+        self.assertEqual(gate, "OK")
+        self.assertEqual(observed, 10)
+
+    def test_horizon_spec_is_not_auto_vetoed(self) -> None:
+        receipt = {
+            "router_decision": BLOCK_FORGE_SELECTION_RISK,
+            "receipt_sha256": "a" * 64,
+        }
+        view = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION",
+            receipt,
+            required_outcome_point_ids=("Y900",),
+            schedule_y_point_ids=("Y900", "Y1800", "Y86400"),
+        )
+        self.assertEqual(view["action"], "START_NEW_SESSION")
+        self.assertTrue(view["caveat"])
 
     def test_control_yield_requires_base_x_field(self) -> None:
         from solana_alpha_lab.factory.hfic_control_integrity import (

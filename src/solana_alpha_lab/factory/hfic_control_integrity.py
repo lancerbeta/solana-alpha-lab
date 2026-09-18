@@ -221,6 +221,8 @@ def resolve_control_corpus_yield(
     *,
     corpus_dataset_id: str,
     min_usable_yield_eligible: int,
+    data_root: Any | None = None,
+    repo_root: Any | None = None,
 ) -> tuple[str, int | None]:
     current: Mapping[str, Any] | None = None
     for item in datasets:
@@ -237,6 +239,37 @@ def resolve_control_corpus_yield(
         labels = current.get("labels")
         if isinstance(labels, Mapping):
             raw = labels.get("base_x_population_n", labels.get("base_x_n"))
+    if raw is None:
+        census_rows = current.get("census_rows")
+        observation_rows = current.get("observation_rows")
+        if isinstance(census_rows, Sequence) and isinstance(observation_rows, Sequence):
+            from solana_alpha_lab.factory.scientific_eligibility_projection import (
+                project_scientific_eligibility,
+                sanitize_projection_row,
+            )
+
+            projected = project_scientific_eligibility(
+                [row for row in census_rows if isinstance(row, Mapping)],
+                [
+                    sanitize_projection_row(row)
+                    for row in observation_rows
+                    if isinstance(row, Mapping)
+                ],
+            )
+            raw = projected["base_x_population"]["n"]
+    if raw is None and data_root is not None and repo_root is not None:
+        from pathlib import Path
+
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            try_project_scientific_eligibility_from_data_root,
+        )
+
+        projected = try_project_scientific_eligibility_from_data_root(
+            Path(data_root),
+            repo_root=Path(repo_root),
+        )
+        if projected is not None:
+            raw = projected["base_x_population"]["n"]
     if raw is None:
         return CONTROL_CORPUS_UNRESOLVABLE, None
     base_x_n = int(raw)

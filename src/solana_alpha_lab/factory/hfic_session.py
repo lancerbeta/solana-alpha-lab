@@ -3163,9 +3163,27 @@ def run_live_classifier(
         as_of = datetime.now(UTC)
     packet = dict(submission)
     packet.setdefault("hypothesis_definition_sha256", frozen.get("selected_definition_sha256"))
-    for key in ("outcome_readiness", "scientific_eligibility_projection"):
-        if key in critic_result and key not in packet:
-            packet[key] = critic_result[key]
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        try_project_scientific_eligibility_from_data_root,
+    )
+
+    attached = critic_result.get("scientific_eligibility_projection")
+    if (
+        isinstance(attached, Mapping)
+        and attached.get("experiment_spec_sha256") == canonical_sha256(dict(validated))
+        and "scientific_eligibility_projection" not in packet
+    ):
+        packet["scientific_eligibility_projection"] = attached
+    if "scientific_eligibility_projection" not in packet:
+        request = validated.get("observation_request")
+        projected = try_project_scientific_eligibility_from_data_root(
+            Path(data_root),
+            repo_root=Path(repo_root),
+            spec=validated,
+            schedule=request if isinstance(request, Mapping) else None,
+        )
+        if projected is not None:
+            packet["scientific_eligibility_projection"] = projected
     decision = classify_lane(
         packet,
         root=Path(repo_root),

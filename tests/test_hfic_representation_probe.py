@@ -36,15 +36,30 @@ from solana_alpha_lab.factory.hfic_representation_probe import (
     STATUS_OBSERVABILITY_BLOCKED,
     ControlBaseline,
     RepresentationProbeError,
-    build_challenger_packet,
+    build_challenger_packet as _build_challenger_packet,
     control_baseline_from_receipt,
     control_memory_baseline_sha256,
-    existing_hfic_lifecycle_fixture_input,
-    existing_hfic_packet,
+    existing_hfic_lifecycle_fixture_input as _existing_hfic_lifecycle_fixture_input,
+    existing_hfic_packet as _existing_hfic_packet,
     representation_probe_identity_sha256,
     representation_search_key_sha256,
     representation_status,
 )
+
+
+def build_challenger_packet(*args, **kwargs):
+    kwargs.setdefault("base_x_population_n", 10)
+    return _build_challenger_packet(*args, **kwargs)
+
+
+def existing_hfic_packet(*args, **kwargs):
+    kwargs.setdefault("base_x_population_n", 10)
+    return _existing_hfic_packet(*args, **kwargs)
+
+
+def existing_hfic_lifecycle_fixture_input(*args, **kwargs):
+    kwargs.setdefault("base_x_population_n", 10)
+    return _existing_hfic_lifecycle_fixture_input(*args, **kwargs)
 from solana_alpha_lab.factory.hfic_session import freeze_draft
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DEFAULT_SCHEDULE,
@@ -554,6 +569,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 baseline,
                 project_normalized_trajectory([]),
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
+                base_x_population_n=0,
             )
         self.assertEqual(str(raised.exception), INVALID_INSUFFICIENT_YIELD)
 

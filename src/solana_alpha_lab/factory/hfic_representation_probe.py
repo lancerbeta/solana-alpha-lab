@@ -756,7 +756,6 @@ def _assert_representation_bound_to_readiness(
         raw_base_x = _resolve_probe_base_x(
             readiness,
             representation,
-            fallback=representation.get("eligible_member_count"),
         )
     if raw_base_x is None:
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
@@ -1044,7 +1043,6 @@ def build_challenger_packet(
         if base_x_population_n is not None
         else {},
         projection_input_receipt,
-        fallback=payload.get("eligible_member_count"),
     )
     _assert_probe_readiness_eligible(readiness, base_x_population_n=resolved_base_x)
     _assert_representation_bound_to_readiness(
@@ -1249,6 +1247,8 @@ def existing_hfic_packet(
     challenger_packet: Mapping[str, Any],
     *,
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
+    base_x_population_n: int | None = None,
+    projection_input_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return the unchanged critic packet for an existing HFIC lifecycle fixture."""
 
@@ -1260,8 +1260,11 @@ def existing_hfic_packet(
         expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
     )
     resolved_base_x = _resolve_probe_base_x(
+        {"base_x_population_n": base_x_population_n}
+        if base_x_population_n is not None
+        else {},
+        projection_input_receipt,
         challenger_packet,
-        fallback=representation.get("eligible_member_count"),
     )
     _assert_probe_readiness_eligible(readiness, base_x_population_n=resolved_base_x)
     _assert_representation_bound_to_readiness(
@@ -1305,6 +1308,8 @@ def existing_hfic_lifecycle_fixture_input(
     *,
     control_receipt: Mapping[str, Any],
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
+    base_x_population_n: int | None = None,
+    projection_input_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Bridge the outer dormant envelope into the unchanged HFIC fixture seam.
 
@@ -1323,8 +1328,11 @@ def existing_hfic_lifecycle_fixture_input(
         expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
     )
     resolved_base_x = _resolve_probe_base_x(
+        {"base_x_population_n": base_x_population_n}
+        if base_x_population_n is not None
+        else {},
+        projection_input_receipt,
         challenger_packet,
-        fallback=representation.get("eligible_member_count"),
     )
     _assert_representation_bound_to_readiness(
         representation,
@@ -1334,6 +1342,8 @@ def existing_hfic_lifecycle_fixture_input(
     packet = existing_hfic_packet(
         validated,
         cohort_readiness_receipt=readiness,
+        base_x_population_n=resolved_base_x,
+        projection_input_receipt=projection_input_receipt,
     )
     return {
         "lifecycle_mode": REPRESENTATION_PROBE_KIND,
@@ -1452,7 +1462,6 @@ def _status_probe_identity_reason(
         resolved_base_x = _resolve_probe_base_x(
             snapshot,
             receipt,
-            fallback=representation.get("eligible_member_count"),
         )
         _assert_probe_readiness_eligible(readiness, base_x_population_n=resolved_base_x)
         _assert_representation_bound_to_readiness(
@@ -1765,13 +1774,9 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
             representation_payload = snapshot.get("representation")
             if not isinstance(representation_payload, Mapping):
                 representation_payload = snapshot.get("normalized_trajectory_v1")
-            fallback_n = None
-            if isinstance(representation_payload, Mapping):
-                fallback_n = representation_payload.get("eligible_member_count")
             base_x_n = _resolve_probe_base_x(
                 snapshot,
                 readiness_receipt if isinstance(readiness_receipt, Mapping) else None,
-                fallback=fallback_n,
             )
             invalid_reason: str | None = _status_binding_reason(
                 snapshot, receipt_mapping

@@ -613,10 +613,11 @@ class SelectionRobustnessGateTests(unittest.TestCase):
         self.assertTrue(blocked.get("caveat"))
         self.assertEqual(blocked["router_decision"], BLOCK_FORGE_SELECTION_RISK)
         self.assertIsNone(blocked.get("terminal"))
-        self.assertEqual(
-            apply_selection_gate_to_preflight("START_NEW_SESSION", gap)["terminal"],
-            BLOCK_FORGE_EVIDENCE_GAP,
-        )
+        gap_view = apply_selection_gate_to_preflight("START_NEW_SESSION", gap)
+        self.assertEqual(gap_view["action"], "START_NEW_SESSION")
+        self.assertTrue(gap_view.get("caveat"))
+        self.assertEqual(gap_view["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+        self.assertIsNone(gap_view.get("terminal"))
         eligible = apply_selection_gate_to_preflight("START_NEW_SESSION", caveat)
         self.assertEqual(eligible["action"], "START_NEW_SESSION")
         self.assertTrue(eligible.get("caveat"))
@@ -1198,7 +1199,9 @@ class SelectionGateReceiptIdentityTests(unittest.TestCase):
                 gap = apply_selection_gate_to_preflight(
                     "START_NEW_SESSION", _load_gate(data_root)
                 )
-            self.assertEqual(gap["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(gap["action"], "START_NEW_SESSION")
+            self.assertTrue(gap.get("caveat"))
+            self.assertEqual(gap["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
 
     def test_skip_stage2_canonical_receipt_binds_dataset_manifest_id(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

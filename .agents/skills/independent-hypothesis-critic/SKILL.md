@@ -105,9 +105,13 @@ Hard boundaries — same as Forge:
    `START_NEW_SESSION` and do not auto-veto a horizon-specific experiment unless
    its required Y point set exactly equals the bound schedule Y set.
    Schema-validate the 1.3 spec and run deterministic lane classifier
-   **network-free**. `outcome_readiness=MISSINGNESS_UNRESOLVED` fail-closes into
-   the existing data/science-option route and must not shrink N. Do not execute
-   experiments.
+   **network-free**. Do not stamp `outcome_readiness=COMPLETE`. Attach a
+   spec-bound `ScientificEligibilityProjection` when the release can be
+   projected; the classifier ignores a bare readiness stamp.
+   `COMPLETE` = every required outcome has a resolved state (including
+   censored / typed-missing) against `base_x.n`. `MISSINGNESS_UNRESOLVED`
+   fail-closes into the existing data/science-option route and must not
+   shrink N. Do not execute experiments.
 
 ## Context isolation
 

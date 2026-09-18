@@ -1657,6 +1657,8 @@ def run_preflight(
             datasets,
             corpus_dataset_id=CORPUS_DATASET_ID,
             min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
+            data_root=Path(data_root),
+            repo_root=Path(repo_root),
         )
         if gate != "OK":
             return {
@@ -1709,9 +1711,38 @@ def run_preflight(
         load_applicable_gate_receipt,
     )
 
+    required_outcome_point_ids = None
+    schedule_y_ids = None
+    if bound_session and action != "START_NEW_SESSION":
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            required_outcome_point_ids as _required_points,
+            schedule_y_point_ids,
+        )
+
+        try:
+            resume_bundle = load_session_bundle(store, bound_session)
+        except Exception:
+            resume_bundle = None
+        if isinstance(resume_bundle, Mapping):
+            critic = resume_bundle.get("critic_result")
+            spec = None
+            if isinstance(critic, Mapping):
+                spec = critic.get("experiment_spec") or (
+                    critic.get("experiment_spec_packet") or {}
+                )
+                if isinstance(spec, Mapping) and spec.get("schema") != "smial.experiment-spec":
+                    spec = spec.get("experiment_spec")
+            if isinstance(spec, Mapping):
+                required_outcome_point_ids = _required_points(spec)
+                request = spec.get("observation_request")
+                schedule_y_ids = schedule_y_point_ids(
+                    request if isinstance(request, Mapping) else spec
+                )
     selection_gate_view = apply_selection_gate_to_preflight(
         action,
         load_applicable_gate_receipt(Path(data_root), root=Path(repo_root)),
+        required_outcome_point_ids=required_outcome_point_ids,
+        schedule_y_point_ids=schedule_y_ids,
     )
     if (
         selection_gate_view.get("applicable")
@@ -1736,6 +1767,11 @@ def run_preflight(
                 "router_decision": selection_gate_view.get("router_decision"),
                 "gate_receipt_sha256": selection_gate_view.get(
                     "gate_receipt_sha256"
+                ),
+                "eligibility_scope": selection_gate_view.get("eligibility_scope"),
+                "caveat": bool(selection_gate_view.get("caveat")),
+                "full_lifecycle_equivalent": bool(
+                    selection_gate_view.get("full_lifecycle_equivalent")
                 ),
             },
             "forge_context_packet": {},
@@ -1825,6 +1861,11 @@ def run_preflight(
             "applicable": True,
             "router_decision": selection_gate_view.get("router_decision"),
             "gate_receipt_sha256": selection_gate_view.get("gate_receipt_sha256"),
+            "eligibility_scope": selection_gate_view.get("eligibility_scope"),
+            "caveat": bool(selection_gate_view.get("caveat")),
+            "full_lifecycle_equivalent": bool(
+                selection_gate_view.get("full_lifecycle_equivalent")
+            ),
         }
     try:
         digest = store.diagnostics().committed_inventory_sha256

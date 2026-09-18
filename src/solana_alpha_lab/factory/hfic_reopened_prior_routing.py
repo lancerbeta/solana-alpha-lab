@@ -433,6 +433,8 @@ def preview_control_reconsideration(
         selected or datasets,
         corpus_dataset_id=CORPUS_DATASET_ID,
         min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
+        data_root=Path(data_root),
+        repo_root=Path(repo_root),
     )
     sessions = _query_hfic_sessions(Path(data_root))
     session = next(

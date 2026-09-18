@@ -365,6 +365,14 @@ canonical `dataset_id`, not a foreign label impersonation.
 packet builder and requires the selected corpus `dataset_manifest_id` to
 equal `lineage.current_dataset_manifest_id` when lineage exists.
 
+Scientific CONTROL floor is consume-time `base_x_population.n` (X300-valid
+`X_ELIGIBLE`), not historical `yield_eligible`. `forge-control-ready` reports
+both: `base_x_population_n` when the canonical release can be projected, and
+`yield_eligible` as the immutable lifecycle-completeness label. A READY
+terminal with `base_x_population_n=null` is operational import only; CONTROL
+preflight fail-closes `CONTROL_CORPUS_UNRESOLVABLE` until `base_x` is
+projected. Do not treat `yield_eligible` as scientific N.
+
 Do not run ordinary Forge as a fallback when CONTROL corpus/yield preconditions fail.
 
 `CURRENT_REPRESENTATION_CONTROL_V1` (preflight `--control-current-representation`)
@@ -1096,8 +1104,14 @@ OWNER_DECISION_REQUIRED
    и не veto horizon-specific experiment, пока required Y set не равен
    bound schedule Y set в точности.
 5. Выполни только schema validation и deterministic lane classification network-free. Эксперимент не запускай.
-   `outcome_readiness=MISSINGNESS_UNRESOLVED` fail-close в существующий
-   data/science-option route и не сжимает N.
+   Не штампуй `outcome_readiness=COMPLETE`. Classifier принимает COMPLETE
+   только из spec-bound `ScientificEligibilityProjection` (schema +
+   `experiment_spec_sha256`). `COMPLETE` значит: каждый required outcome имеет
+   resolved observation state, включая `CENSORED_LATE` / `MISSING_TYPED`. Это
+   не complete-case и не сжимает `base_x.n`.
+   `MISSINGNESS_UNRESOLVED` (absent/unknown state) fail-close в существующий
+   data/science-option route. NEXT classifier =
+   `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`, не «почини binding».
 6. Результат classifier сильнее provisional lane Forge.
 
 Преобразуй classifier outcome:
@@ -1108,6 +1122,8 @@ OWNER_DECISION_REQUIRED
 | Existing live capability, но нужна exact owner authority | `OWNER_DECISION_REQUIRED` |
 | Named reusable capability отсутствует | `PASS_CHANGE_LANE_REQUIRED` |
 | Required forward-only data отсутствуют | `PASS_DATA_OPTION_REQUIRED` |
+| `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` (N не сжимать) |
+| `BLOCKED_DATA` + `FULL_LIFECYCLE_SELECTION_SCOPE` | `PASS_DATA_OPTION_REQUIRED` (сузь required Y set) |
 | Spec incoherent/invalid | соответствующий `KILL_*` либо один `REVISE_ONCE` |
 | Promotion requested | `OWNER_DECISION_REQUIRED`; promotion не выполнять |
 

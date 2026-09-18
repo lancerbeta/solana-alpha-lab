@@ -292,33 +292,30 @@ def _submission_outcome_readiness(
     submission: Mapping[str, Any],
 ) -> str:
     from solana_alpha_lab.factory.scientific_eligibility_projection import (
-        READINESS_COMPLETE,
-        READINESS_MISSINGNESS_UNRESOLVED,
         READINESS_UNSPECIFIED,
+        validated_projection_readiness,
     )
 
     if spec.get("schema_version") != "1.3":
         return READINESS_UNSPECIFIED
-    allowed = {
-        READINESS_COMPLETE,
-        READINESS_MISSINGNESS_UNRESOLVED,
-        READINESS_UNSPECIFIED,
-    }
-    raw = submission.get("outcome_readiness")
-    if raw in allowed:
-        return str(raw)
     projection = submission.get("scientific_eligibility_projection")
-    if isinstance(projection, Mapping) and projection.get("outcome_readiness") in allowed:
-        return str(projection["outcome_readiness"])
-    return READINESS_MISSINGNESS_UNRESOLVED
+    return validated_projection_readiness(
+        spec,
+        projection if isinstance(projection, Mapping) else None,
+    )
 
 
 def _blocked_data(reason_code: str) -> LaneDecision:
+    next_action = "RESOLVE_IMMUTABLE_DATA_BINDINGS"
+    if reason_code == "OUTCOME_MISSINGNESS_UNRESOLVED":
+        next_action = "REPORT_OUTCOME_COVERAGE_KEEP_BASE_X"
+    elif reason_code == "FULL_LIFECYCLE_SELECTION_SCOPE":
+        next_action = "NARROW_REQUIRED_OUTCOMES_OR_STOP"
     return _decision(
         Lane.FAST_LANE,
         "BLOCKED_DATA",
         reason_codes=(reason_code,),
-        next_action="RESOLVE_IMMUTABLE_DATA_BINDINGS",
+        next_action=next_action,
     )
 
 
@@ -546,12 +543,45 @@ def classify_lane(
         )
 
     if spec.get("schema_version") == "1.3":
+        from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+            apply_selection_gate_to_preflight,
+            load_applicable_gate_receipt,
+        )
         from solana_alpha_lab.factory.scientific_eligibility_projection import (
             READINESS_COMPLETE,
+            required_outcome_point_ids,
+            schedule_y_point_ids,
+            try_project_scientific_eligibility_from_data_root,
         )
 
-        if _submission_outcome_readiness(spec, submission) != READINESS_COMPLETE:
+        request = spec.get("observation_request")
+        schedule = request if isinstance(request, Mapping) else None
+        if uses_observation_request:
+            compiled_schedule = compiled.schedule if compiled.schedule else None
+            if isinstance(compiled_schedule, Mapping):
+                schedule = compiled_schedule
+        working = dict(submission)
+        if not isinstance(working.get("scientific_eligibility_projection"), Mapping):
+            projected = try_project_scientific_eligibility_from_data_root(
+                Path(data_root),
+                repo_root=Path(root),
+                spec=spec,
+                schedule=schedule,
+            )
+            if projected is not None:
+                working["scientific_eligibility_projection"] = projected
+        if _submission_outcome_readiness(spec, working) != READINESS_COMPLETE:
             return _blocked_data("OUTCOME_MISSINGNESS_UNRESOLVED")
+        selection_view = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION",
+            load_applicable_gate_receipt(Path(data_root), root=Path(root)),
+            required_outcome_point_ids=required_outcome_point_ids(spec),
+            schedule_y_point_ids=schedule_y_point_ids(schedule),
+        )
+        if selection_view.get("action") == "STOP" and selection_view.get(
+            "full_lifecycle_equivalent"
+        ):
+            return _blocked_data("FULL_LIFECYCLE_SELECTION_SCOPE")
 
     if descriptor["effect_class"] == "PROVIDER_READ_ONLY_BOUNDED":
         return _decision(

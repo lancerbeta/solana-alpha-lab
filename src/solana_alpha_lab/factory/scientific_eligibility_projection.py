@@ -102,6 +102,25 @@ def _x300_pit_ok(
     return observed_at <= deadline
 
 
+def _available_at_rank(row: Mapping[str, Any]) -> datetime:
+    parsed = _parse_utc(row.get("first_reliable_available_at"))
+    if parsed is None:
+        return datetime.min.replace(tzinfo=UTC)
+    return parsed
+
+
+def required_outcome_point_ids(spec: Mapping[str, Any] | None) -> tuple[str, ...]:
+    return tuple(
+        dict.fromkeys(item["point_id"] for item in required_outcomes_from_spec(spec))
+    )
+
+
+def sanitize_projection_row(row: Mapping[str, Any]) -> dict[str, Any]:
+    """Drop Y/X typed values. Coverage uses state and clocks only."""
+
+    return {key: value for key, value in row.items() if key != "typed_value"}
+
+
 def required_outcomes_from_spec(spec: Mapping[str, Any] | None) -> list[dict[str, str]]:
     if not isinstance(spec, Mapping):
         return []
@@ -193,14 +212,15 @@ def project_scientific_eligibility(
             continue
         state = str(row.get("state") or "")
         obs_index[(mint, point_id, field_id)] = state
-        if (
-            point_id == X_POINT_ID
-            and field_id == X_FIELD_ID
-            and mint not in x300_by_mint
-        ):
-            x300_by_mint[mint] = row
+        if point_id == X_POINT_ID and field_id == X_FIELD_ID:
+            previous = x300_by_mint.get(mint)
+            if previous is None or _available_at_rank(row) >= _available_at_rank(
+                previous
+            ):
+                x300_by_mint[mint] = row
 
     base_mints: list[str] = []
+    seen_mints: set[str] = set()
     lifecycle = {
         "n_observed": 0,
         "n_censored_late": 0,
@@ -213,7 +233,7 @@ def project_scientific_eligibility(
         if str(row.get("candidate_state") or "") != "X_ELIGIBLE":
             continue
         mint = _mint(row)
-        if not mint:
+        if not mint or mint in seen_mints:
             continue
         x300 = x300_by_mint.get(mint)
         if x300 is None:
@@ -227,6 +247,7 @@ def project_scientific_eligibility(
             allowed_lateness_seconds=x_allowed_lateness_seconds,
         ):
             continue
+        seen_mints.add(mint)
         base_mints.append(mint)
         denom = str(row.get("denominator_state") or "")
         if denom == "observed":
@@ -238,7 +259,7 @@ def project_scientific_eligibility(
         else:
             lifecycle["n_other"] += 1
 
-    base_mints = sorted(set(base_mints))
+    base_mints = sorted(base_mints)
     required = required_outcomes_from_spec(spec)
     coverage: list[dict[str, Any]] = []
     unresolved = 0
@@ -330,6 +351,134 @@ def project_scientific_eligibility(
     return payload
 
 
+def load_projection_tables(
+    census_path: Path,
+    observations_path: Path,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Load census + observation states. Never selects typed_value."""
+
+    import duckdb
+
+    census_columns = (
+        "mint",
+        "entity_id",
+        "candidate_state",
+        "denominator_state",
+        "authoritative_anchor",
+    )
+    obs_columns = (
+        "mint",
+        "entity_id",
+        "point_id",
+        "field_id",
+        "state",
+        "first_reliable_available_at",
+    )
+    if not Path(census_path).is_file() or Path(census_path).is_symlink():
+        raise ScientificEligibilityError("CENSUS_PARQUET_MISSING")
+    if not Path(observations_path).is_file() or Path(observations_path).is_symlink():
+        raise ScientificEligibilityError("OBSERVATIONS_PARQUET_MISSING")
+    connection = duckdb.connect(database=":memory:")
+    try:
+        def _select(path: Path, wanted: Sequence[str]) -> list[dict[str, Any]]:
+            described = connection.execute(
+                "DESCRIBE SELECT * FROM read_parquet(?)",
+                [str(path)],
+            ).fetchall()
+            available = {str(item[0]) for item in described}
+            if "typed_value" in available:
+                available.discard("typed_value")
+            selected = [name for name in wanted if name in available]
+            if "mint" not in selected and "entity_id" not in selected:
+                raise ScientificEligibilityError("PROJECTION_TABLE_SCHEMA_INVALID")
+            quoted = ", ".join(f'"{name}"' for name in selected)
+            relation = connection.execute(
+                f"SELECT {quoted} FROM read_parquet(?)",
+                [str(path)],
+            )
+            names = [item[0] for item in relation.description]
+            return [dict(zip(names, row, strict=True)) for row in relation.fetchall()]
+
+        return _select(Path(census_path), census_columns), _select(
+            Path(observations_path), obs_columns
+        )
+    except ScientificEligibilityError:
+        raise
+    except Exception as exc:
+        raise ScientificEligibilityError("PROJECTION_TABLE_UNREADABLE") from exc
+    finally:
+        connection.close()
+
+
+def try_project_scientific_eligibility_from_data_root(
+    data_root: Path,
+    *,
+    repo_root: Path,
+    spec: Mapping[str, Any] | None = None,
+    schedule: Mapping[str, Any] | None = None,
+) -> dict[str, Any] | None:
+    """Consume-time projection over the bound canonical release. None if unbound."""
+
+    try:
+        from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
+            bind_canonical_censoring_inputs,
+            load_diagnostic_spec,
+        )
+
+        diagnostic = load_diagnostic_spec(Path(repo_root))
+        corpus = diagnostic.get("canonical_corpus")
+        if not isinstance(corpus, Mapping):
+            return None
+        binding = bind_canonical_censoring_inputs(Path(data_root), corpus)
+        census_rows, observation_rows = load_projection_tables(
+            binding.census_path,
+            binding.observations_path,
+        )
+        return project_scientific_eligibility(
+            census_rows,
+            observation_rows,
+            spec=spec,
+            schedule=schedule,
+            release_binding={
+                "release_id": binding.release_id,
+                "cohort_id": binding.cohort_id,
+                "census_sha256": binding.census_sha256,
+                "observations_sha256": binding.observations_sha256,
+            },
+        )
+    except Exception:
+        return None
+
+
+def validated_projection_readiness(
+    spec: Mapping[str, Any],
+    projection: Mapping[str, Any] | None,
+) -> str:
+    """Accept COMPLETE only from a spec-bound projection, never a bare stamp."""
+
+    if spec.get("schema_version") != "1.3":
+        return READINESS_UNSPECIFIED
+    if not isinstance(projection, Mapping):
+        return READINESS_MISSINGNESS_UNRESOLVED
+    if (
+        projection.get("schema") != PROJECTION_SCHEMA
+        or projection.get("schema_version") != PROJECTION_SCHEMA_VERSION
+        or projection.get("rule_id") != RULE_ID
+    ):
+        return READINESS_MISSINGNESS_UNRESOLVED
+    expected = canonical_sha256(dict(spec))
+    if projection.get("experiment_spec_sha256") != expected:
+        return READINESS_MISSINGNESS_UNRESOLVED
+    readiness = projection.get("outcome_readiness")
+    if readiness not in {
+        READINESS_COMPLETE,
+        READINESS_MISSINGNESS_UNRESOLVED,
+        READINESS_UNSPECIFIED,
+    }:
+        return READINESS_MISSINGNESS_UNRESOLVED
+    return str(readiness)
+
+
 def y_columns_forbidden(row: Mapping[str, Any]) -> None:
     """Guard test/helpers: Y typed values must not enter the working set."""
 
@@ -369,8 +518,13 @@ __all__ = [
     "assert_c1_shape",
     "full_lifecycle_scope_equivalent",
     "load_projection_spec",
+    "load_projection_tables",
     "project_scientific_eligibility",
+    "required_outcome_point_ids",
     "required_outcomes_from_spec",
+    "sanitize_projection_row",
     "schedule_y_point_ids",
+    "try_project_scientific_eligibility_from_data_root",
+    "validated_projection_readiness",
     "y_columns_forbidden",
 ]

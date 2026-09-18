@@ -200,7 +200,7 @@ def apply_selection_gate_to_preflight(
         full_lifecycle_scope_equivalent,
     )
 
-    if action != "START_NEW_SESSION" or not isinstance(gate_receipt, Mapping):
+    if not isinstance(gate_receipt, Mapping):
         return {"applicable": False, "action": action, "terminal": None}
     scoped = interpret_selection_gate_receipt(gate_receipt)
     decision = str(scoped["router_decision"] or "")
@@ -208,16 +208,34 @@ def apply_selection_gate_to_preflight(
         required_outcome_point_ids,
         schedule_y_point_ids,
     )
-    if decision == BLOCK_FORGE_EVIDENCE_GAP:
+    if gate_receipt.get("integrity_invalid"):
         return {
             "applicable": True,
             "action": "STOP",
-            "terminal": decision,
-            "router_decision": decision,
+            "terminal": BLOCK_FORGE_EVIDENCE_GAP,
+            "router_decision": BLOCK_FORGE_EVIDENCE_GAP,
             "gate_receipt_sha256": scoped["gate_receipt_sha256"],
             "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
             "full_lifecycle_equivalent": False,
+            "integrity_invalid": True,
         }
+    if action != "START_NEW_SESSION" and not equivalent:
+        if decision in {
+            BLOCK_FORGE_SELECTION_RISK,
+            BLOCK_FORGE_EVIDENCE_GAP,
+            FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+        }:
+            return {
+                "applicable": True,
+                "action": action,
+                "terminal": None,
+                "router_decision": decision,
+                "gate_receipt_sha256": scoped["gate_receipt_sha256"],
+                "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+                "caveat": True,
+                "full_lifecycle_equivalent": False,
+            }
+        return {"applicable": False, "action": action, "terminal": None}
     if decision == BLOCK_FORGE_SELECTION_RISK and equivalent:
         return {
             "applicable": True,
@@ -228,7 +246,11 @@ def apply_selection_gate_to_preflight(
             "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
             "full_lifecycle_equivalent": True,
         }
-    if decision in {BLOCK_FORGE_SELECTION_RISK, FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT}:
+    if decision in {
+        BLOCK_FORGE_SELECTION_RISK,
+        BLOCK_FORGE_EVIDENCE_GAP,
+        FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+    }:
         return {
             "applicable": True,
             "action": action,

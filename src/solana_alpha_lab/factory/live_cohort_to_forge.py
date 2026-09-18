@@ -717,10 +717,22 @@ def forge_control_ready(
     raw_base_x = labels.get("base_x_population_n", chosen.get("base_x_population_n"))
     if raw_base_x is None:
         raw_base_x = chosen.get("base_x_n")
-    base_x_n = int(raw_base_x) if raw_base_x is not None else None
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        try_project_scientific_eligibility_from_data_root,
+    )
+
+    projected = try_project_scientific_eligibility_from_data_root(
+        Path(data_root),
+        repo_root=Path(repo_root),
+    )
+    if projected is not None:
+        base_x_n = int(projected["base_x_population"]["n"])
+        _require(base_x_n >= MIN_USABLE_BASE_X_POPULATION, "LOW_YIELD")
+    else:
+        base_x_n = int(raw_base_x) if raw_base_x is not None else None
+        _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     coverage = str(labels.get("discovery_coverage_class") or "")
     _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
-    _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     material = evidence_epoch_material(repo_root=repo_root, data_root=data_root)
     epoch = evidence_epoch_sha256(material)
     sessions = _query_hfic_sessions(Path(data_root))
