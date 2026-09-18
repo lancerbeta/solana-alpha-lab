@@ -45,6 +45,13 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     verify_live_cohort,
     write_live_corpus_lineage,
 )
+from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
+    OBSERVATION_SCHEDULE_ARTIFACT_NAME,
+    RELEASE_SCHEMA_VERSION_SELF_CONTAINED,
+    SCHEDULE_ARTIFACT_MISSING,
+    SCHEDULE_PRODUCER_UNBOUND,
+    decode_schedule_artifact,
+)
 from solana_alpha_lab.storage.manifests import (
     ManifestContractError,
     ManifestIntegrityError,
@@ -975,6 +982,70 @@ def repair_live_corpus_manifests(
     }
 
 
+def _producer_for_imported_schedule(manifest: Mapping[str, Any]) -> str:
+    for key in (
+        "schedule_producer_git_sha",
+        "release_builder_git_sha",
+        "producer_git_sha",
+    ):
+        value = str(manifest.get(key) or "")
+        if len(value) == 40 and all(c in "0123456789abcdef" for c in value):
+            return value
+    raw = manifest.get("contributing_producer_git_shas")
+    if isinstance(raw, list):
+        for item in raw:
+            value = str(item or "")
+            if len(value) == 40 and all(c in "0123456789abcdef" for c in value):
+                return value
+    raise LiveCohortReleaseError(SCHEDULE_PRODUCER_UNBOUND)
+
+
+def persist_imported_release_schedule(
+    *,
+    release_root: Path,
+    data_root: Path,
+    manifest: Mapping[str, Any],
+    imported_at: datetime,
+) -> None:
+    """Bind the 1.1 schedule artifact into ResearchStore. Legacy 1.0 is a no-op."""
+
+    version = str(manifest.get("schema_version") or "")
+    if version != RELEASE_SCHEMA_VERSION_SELF_CONTAINED:
+        return
+    from solana_alpha_lab.factory.observation_panel_publisher import (
+        ObservationPanelPublisherError,
+        persist_observation_schedule,
+    )
+
+    artifact = Path(release_root) / OBSERVATION_SCHEDULE_ARTIFACT_NAME
+    if not artifact.is_file() or artifact.is_symlink():
+        raise LiveCohortReleaseError(SCHEDULE_ARTIFACT_MISSING)
+    wanted = str(manifest.get("schedule_sha256") or "")
+    expected_byte = str(manifest.get("observation_schedule_sha256") or "") or None
+    try:
+        document = decode_schedule_artifact(
+            artifact.read_bytes(),
+            wanted_sha=wanted,
+            expected_byte_sha256=expected_byte,
+        )
+    except ValueError as exc:
+        raise LiveCohortReleaseError(str(exc)) from exc
+    persist_doc = dict(document)
+    persist_doc["schedule_sha256"] = wanted
+    producer = _producer_for_imported_schedule(manifest)
+    activation = str(manifest.get("activation_id") or "") or None
+    try:
+        persist_observation_schedule(
+            data_root=data_root,
+            schedule=persist_doc,
+            now=imported_at,
+            producer_git_sha=producer,
+            activation_id=activation,
+        )
+    except ObservationPanelPublisherError as exc:
+        raise LiveCohortReleaseError(str(exc)) from exc
+
+
 def import_live_cohort_canonical(
     *,
     release_root: Path,
@@ -984,6 +1055,12 @@ def import_live_cohort_canonical(
 ) -> dict[str, Any]:
     manifest = verify_live_cohort(release_root)
     imported_at = (import_time or datetime.now(tz=UTC)).astimezone(UTC)
+    persist_imported_release_schedule(
+        release_root=Path(release_root),
+        data_root=Path(data_root),
+        manifest=manifest,
+        imported_at=imported_at,
+    )
     sealed_at = parse_live_corpus_utc(str(manifest["sealed_at"]))
     _require(imported_at >= sealed_at, "IMPORT_BEFORE_SEAL")
     release_id = str(manifest["release_id"])

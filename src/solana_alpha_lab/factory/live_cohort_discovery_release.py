@@ -36,9 +36,11 @@ from solana_alpha_lab.factory.live_cohort_source_bundle import (
     RELEASE_PARQUET_WRITE_KWARGS,
     SOURCE_BUNDLE_SCHEMA,
     SOURCE_BUNDLE_SCHEMA_VERSION,
+    SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED,
     SOURCE_MANIFEST_NAME,
     SOURCE_MEMBERS_NAME,
     SOURCE_OBSERVATIONS_NAME,
+    SOURCE_SCHEDULE_NAME,
     SOURCE_REPRESENTATION_BUNDLE,
     SOURCE_REPRESENTATION_LEGACY_JSON,
     compact_source_view,
@@ -87,6 +89,22 @@ from solana_alpha_lab.factory.research_store import (
     ResearchStoreError,
 )
 from solana_alpha_lab.factory.run_passport import canonical_sha256
+from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
+    CENSUS_SCHEDULE_SHA_MISMATCH,
+    OBSERVATION_SCHEDULE_ARTIFACT_NAME,
+    RELEASE_SCHEMA_VERSION_LEGACY,
+    RELEASE_SCHEMA_VERSION_SELF_CONTAINED,
+    SCHEDULE_ARTIFACT_HASH_MISMATCH,
+    SCHEDULE_ARTIFACT_MISSING,
+    SCHEDULE_DOCUMENT_CONFLICT,
+    SCHEDULE_DOCUMENT_MISSING,
+    SCHEDULE_PARSER_INVALID,
+    SCHEDULE_SEMANTIC_SHA_MISMATCH,
+    agree_schedule_documents,
+    decode_schedule_artifact,
+    encode_schedule_artifact,
+    load_ops_schedule_document,
+)
 from solana_alpha_lab.factory.tokens_v2_typed_projection import (
     FEATURE_FAMILY_MISSINGNESS,
     FEATURE_FAMILY_ORDER,
@@ -112,7 +130,7 @@ COHORT_WINDOW_DAYS = 7
 _MAX_LOCAL_UNIT_CONTEXTS = 8
 _MAX_LOCAL_PREFIX_BINDINGS = 8
 RELEASE_SCHEMA = "smial.live-cohort-discovery-release"
-RELEASE_SCHEMA_VERSION = "1.0"
+RELEASE_SCHEMA_VERSION = RELEASE_SCHEMA_VERSION_LEGACY
 RELEASE_MANIFEST_NAME = "release_manifest.json"
 CENSUS_NAME = "census.parquet"
 OBSERVATIONS_NAME = "observations.parquet"
@@ -361,6 +379,9 @@ def _validate_source_payload(
         "observations_sha256": payload.get("observations_sha256"),
         "members_partition": payload.get("members_partition"),
         "observations_partition": payload.get("observations_partition"),
+        "observation_schedule_partition": payload.get("observation_schedule_partition"),
+        "observation_schedule_sha256": payload.get("observation_schedule_sha256"),
+        "schema_version": payload.get("schema_version"),
         "source_representation": payload.get("source_representation"),
         "source_dir": payload.get("source_dir"),
     }
@@ -470,6 +491,29 @@ def _load_source_bundle(manifest_path: Path) -> dict[str, Any]:
         and payload.get("observation_count") is not None,
         "RELEASE_INVALID_SOURCE_INTEGRITY",
     )
+    version = str(payload.get("schema_version") or SOURCE_BUNDLE_SCHEMA_VERSION)
+    if version == SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED:
+        schedule_path = source_dir / SOURCE_SCHEDULE_NAME
+        _require(
+            schedule_path.is_file() and not schedule_path.is_symlink(),
+            SCHEDULE_ARTIFACT_MISSING,
+        )
+        schedule_sha = sha256_file_streaming(schedule_path)
+        _require(
+            schedule_sha == payload.get("observation_schedule_sha256"),
+            SCHEDULE_ARTIFACT_HASH_MISMATCH,
+        )
+        wanted = str(payload.get("schedule_sha256") or "")
+        try:
+            decode_schedule_artifact(
+                schedule_path.read_bytes(),
+                wanted_sha=wanted,
+                expected_byte_sha256=schedule_sha,
+            )
+        except ValueError as exc:
+            raise LiveCohortReleaseError(str(exc)) from exc
+        payload = dict(payload)
+        payload["observation_schedule_partition"] = str(schedule_path)
     payload = dict(payload)
     payload["members_partition"] = str(members_path)
     payload["observations_partition"] = str(obs_path)
@@ -1014,6 +1058,71 @@ def _lineage_from_rdp(
     elif len(schedule_producers) > 1:
         raise LiveCohortReleaseError("IDENTITY_CONFLICT")
     return schedule_doc, schedule_producer, lifecycle_rows
+
+
+def _encode_bound_schedule(
+    document: Mapping[str, Any], *, wanted_sha: str
+) -> tuple[dict[str, Any], bytes, str]:
+    try:
+        return encode_schedule_artifact(document, wanted_sha=wanted_sha)
+    except ValueError as exc:
+        raise LiveCohortReleaseError(str(exc)) from exc
+
+
+def _try_resolve_schedule_for_seal(
+    source: Mapping[str, Any],
+    observation_rdp_root: Path,
+    *,
+    wanted_sha: str,
+    activation_id: str,
+) -> tuple[dict[str, Any], bytes, str] | None:
+    """Prefer source-bundle artifact; RDP document is source-time fallback only."""
+
+    source_dir = source.get("source_dir")
+    if isinstance(source_dir, str) and source_dir:
+        artifact = Path(source_dir) / SOURCE_SCHEDULE_NAME
+        if artifact.is_file() and not artifact.is_symlink():
+            expected = str(source.get("observation_schedule_sha256") or "") or None
+            try:
+                document = decode_schedule_artifact(
+                    artifact.read_bytes(),
+                    wanted_sha=wanted_sha,
+                    expected_byte_sha256=expected,
+                )
+            except ValueError as exc:
+                raise LiveCohortReleaseError(str(exc)) from exc
+            return _encode_bound_schedule(document, wanted_sha=wanted_sha)
+    embedded = source.get("observation_schedule")
+    if isinstance(embedded, Mapping):
+        return _encode_bound_schedule(embedded, wanted_sha=wanted_sha)
+    try:
+        rdp_doc, _, _ = _lineage_from_rdp(
+            observation_rdp_root,
+            schedule_sha256=wanted_sha,
+            activation_id=activation_id,
+        )
+    except (LiveCohortReleaseError, DiscoveryReleaseError) as exc:
+        code = str(exc)
+        if code == "IDENTITY_CONFLICT":
+            raise LiveCohortReleaseError(SCHEDULE_DOCUMENT_CONFLICT) from exc
+        if code in {
+            "LIVE_SOURCE_SCHEDULE_MISSING",
+            "LIVE_SOURCE_RDP_UNREADABLE",
+            "LIVE_SOURCE_ACTIVATION_MISSING",
+        }:
+            return None
+        raise
+    return _encode_bound_schedule(rdp_doc, wanted_sha=wanted_sha)
+
+
+def _census_schedule_identity(census_path: Path, wanted_sha: str) -> None:
+    table = pq.read_table(census_path, columns=["source_schedule_sha256"])
+    unique = {
+        str(value)
+        for value in table.column("source_schedule_sha256").to_pylist()
+        if value
+    }
+    _require(unique == {wanted_sha}, CENSUS_SCHEDULE_SHA_MISMATCH)
 
 
 def _iter_member_batches(
@@ -2139,6 +2248,7 @@ def build_live_observation_source_from_rdp(
     as_of: datetime | None = None,
     closure_receipt: Mapping[str, Any] | None = None,
     discovery_coverage_class: str | None = None,
+    ops_store: Path | None = None,
 ) -> dict[str, Any]:
     """Rebuild a cohort-scoped live source from immutable Observation RDP."""
     del as_of  # closure receipt already binds as_of; unused for scientific rows
@@ -2158,6 +2268,18 @@ def build_live_observation_source_from_rdp(
     schedule_doc, schedule_producer, lifecycle_rows = _lineage_from_rdp(
         root, schedule_sha256=schedule_sha256, activation_id=activation_id
     )
+    bound_doc, artifact_bytes, artifact_sha = _encode_bound_schedule(
+        schedule_doc, wanted_sha=schedule_sha256
+    )
+    if ops_store is not None:
+        ops_doc = load_ops_schedule_document(Path(ops_store), schedule_sha256)
+        if ops_doc is not None:
+            try:
+                agree_schedule_documents(
+                    bound_doc, ops_doc, wanted_sha=schedule_sha256
+                )
+            except ValueError as exc:
+                raise LiveCohortReleaseError(SCHEDULE_DOCUMENT_CONFLICT) from exc
     activation = schedule_doc.get("activation")
     assert isinstance(activation, Mapping)
     starts_at = str(activation.get("starts_at") or "")
@@ -2275,6 +2397,7 @@ def build_live_observation_source_from_rdp(
 
         members_path = staging / SOURCE_MEMBERS_NAME
         obs_path = staging / SOURCE_OBSERVATIONS_NAME
+        schedule_path = staging / SOURCE_SCHEDULE_NAME
         member_count = write_parquet_from_row_batches(
             members_path, _member_batches(), schema=MEMBER_SCHEMA
         )
@@ -2288,9 +2411,10 @@ def build_live_observation_source_from_rdp(
         _require(member_count == extracted_members, "RELEASE_INVALID_SOURCE_INTEGRITY")
         members_sha = sha256_file_streaming(members_path)
         observations_sha = sha256_file_streaming(obs_path)
+        schedule_path.write_bytes(artifact_bytes)
         snapshot: dict[str, Any] = {
             "schema": SOURCE_BUNDLE_SCHEMA,
-            "schema_version": SOURCE_BUNDLE_SCHEMA_VERSION,
+            "schema_version": SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED,
             "schedule_sha256": schedule_sha256,
             "activation_id": activation_id,
             "cohort_id": cohort_id,
@@ -2306,8 +2430,10 @@ def build_live_observation_source_from_rdp(
             "observation_count": observation_count,
             "members_sha256": members_sha,
             "observations_sha256": observations_sha,
+            "observation_schedule_sha256": artifact_sha,
             "members_partition": SOURCE_MEMBERS_NAME,
             "observations_partition": SOURCE_OBSERVATIONS_NAME,
+            "observation_schedule_partition": SOURCE_SCHEDULE_NAME,
             "source_representation": SOURCE_REPRESENTATION_BUNDLE,
             **closure_flags,
         }
@@ -2477,25 +2603,32 @@ def classify_cohort_readiness(
 
 def release_id_for(source: Mapping[str, Any], cohort_id: str) -> str:
     producers = _producer_fields(source)
-    return canonical_sha256(
-        {
-            "schema": RELEASE_SCHEMA,
-            "schema_version": RELEASE_SCHEMA_VERSION,
-            "cohort_id": cohort_id,
-            "schedule_sha256": source["schedule_sha256"],
-            "activation_id": source["activation_id"],
-            "contributing_producer_git_shas": producers["contributing_producer_git_shas"],
-            "schedule_producer_git_sha": producers.get("schedule_producer_git_sha"),
-            "source_sha256": source["source_sha256"],
-            "starts_at": source.get("starts_at"),
-            "stops_admitting_at": source.get("stops_admitting_at"),
-            "window_start": source.get("window_start"),
-            "window_end_exclusive": source.get("window_end_exclusive"),
-            "admission_field": COHORT_ADMISSION_FIELD,
-            "projection_id": PROJECTION_ID,
-            "projection_version": PROJECTION_VERSION,
-        }
-    )
+    artifact_sha = source.get("observation_schedule_sha256")
+    self_contained = isinstance(artifact_sha, str) and len(artifact_sha) == 64
+    body: dict[str, Any] = {
+        "schema": RELEASE_SCHEMA,
+        "schema_version": (
+            RELEASE_SCHEMA_VERSION_SELF_CONTAINED
+            if self_contained
+            else RELEASE_SCHEMA_VERSION_LEGACY
+        ),
+        "cohort_id": cohort_id,
+        "schedule_sha256": source["schedule_sha256"],
+        "activation_id": source["activation_id"],
+        "contributing_producer_git_shas": producers["contributing_producer_git_shas"],
+        "schedule_producer_git_sha": producers.get("schedule_producer_git_sha"),
+        "source_sha256": source["source_sha256"],
+        "starts_at": source.get("starts_at"),
+        "stops_admitting_at": source.get("stops_admitting_at"),
+        "window_start": source.get("window_start"),
+        "window_end_exclusive": source.get("window_end_exclusive"),
+        "admission_field": COHORT_ADMISSION_FIELD,
+        "projection_id": PROJECTION_ID,
+        "projection_version": PROJECTION_VERSION,
+    }
+    if self_contained:
+        body["observation_schedule_sha256"] = artifact_sha
+    return canonical_sha256(body)
 
 
 def _release_id_for(source: Mapping[str, Any], cohort_id: str) -> str:
@@ -2701,7 +2834,27 @@ def seal_live_cohort(
     source = load_observation_rdp_source(observation_rdp_root, cohort_id=cohort_id)
     readiness = classify_cohort_readiness(source, cohort_id=cohort_id, as_of=as_of)
     _require(readiness.get("sealable") is True, str(readiness.get("state") or "NOT_READY"))
-    release_id = _release_id_for(source, cohort_id)
+    wanted_sha = str(source["schedule_sha256"])
+    source_version = str(source.get("schema_version") or SOURCE_BUNDLE_SCHEMA_VERSION)
+    require_schedule = source_version == SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED
+    bound = _try_resolve_schedule_for_seal(
+        source,
+        Path(observation_rdp_root),
+        wanted_sha=wanted_sha,
+        activation_id=str(source["activation_id"]),
+    )
+    if bound is None:
+        _require(not require_schedule, SCHEDULE_DOCUMENT_MISSING)
+        artifact_bytes = None
+        artifact_sha = None
+        schema_version = RELEASE_SCHEMA_VERSION_LEGACY
+        source_for_id = source
+    else:
+        _document, artifact_bytes, artifact_sha = bound
+        schema_version = RELEASE_SCHEMA_VERSION_SELF_CONTAINED
+        source_for_id = dict(source)
+        source_for_id["observation_schedule_sha256"] = artifact_sha
+    release_id = _release_id_for(source_for_id, cohort_id)
     sealed = (sealed_at or datetime.now(tz=UTC)).astimezone(UTC)
     root = Path(release_root)
     root.mkdir(parents=True, exist_ok=True)
@@ -2741,9 +2894,12 @@ def seal_live_cohort(
     builder = _sha40(release_builder_git_sha)
     if builder:
         inventory["release_builder_git_sha"] = builder
+    if artifact_sha is not None:
+        inventory["observation_schedule_artifact"] = OBSERVATION_SCHEDULE_ARTIFACT_NAME
+        inventory["observation_schedule_sha256"] = artifact_sha
     manifest = {
         "schema": RELEASE_SCHEMA,
-        "schema_version": RELEASE_SCHEMA_VERSION,
+        "schema_version": schema_version,
         "release_id": release_id,
         "cohort_id": cohort_id,
         "sealed_at": _render_utc(sealed),
@@ -2771,8 +2927,13 @@ def seal_live_cohort(
     }
     if builder:
         manifest["release_builder_git_sha"] = builder
+    if artifact_sha is not None:
+        manifest["observation_schedule_artifact"] = OBSERVATION_SCHEDULE_ARTIFACT_NAME
+        manifest["observation_schedule_sha256"] = artifact_sha
     census_tmp.replace(root / CENSUS_NAME)
     obs_tmp.replace(root / OBSERVATIONS_NAME)
+    if artifact_bytes is not None:
+        _publish_bytes(root / OBSERVATION_SCHEDULE_ARTIFACT_NAME, artifact_bytes)
     _publish_bytes(
         root / SOURCE_INVENTORY_NAME,
         json.dumps(inventory, sort_keys=True, separators=(",", ":")).encode("utf-8"),
@@ -2814,6 +2975,57 @@ def verify_live_cohort(release_root: Path) -> dict[str, Any]:
         manifest.get("confirmatory_reuse_forbidden") is True, "CONFIRM_FENCE_MISSING"
     )
     _require(manifest.get("evidence_role") == LIVE_EVIDENCE_ROLE, "EVIDENCE_ROLE_MISMATCH")
+    version = str(manifest.get("schema_version") or RELEASE_SCHEMA_VERSION_LEGACY)
+    _require(
+        version
+        in {RELEASE_SCHEMA_VERSION_LEGACY, RELEASE_SCHEMA_VERSION_SELF_CONTAINED},
+        "RELEASE_SCHEMA_MISMATCH",
+    )
+    if version == RELEASE_SCHEMA_VERSION_SELF_CONTAINED:
+        schedule_path = root / OBSERVATION_SCHEDULE_ARTIFACT_NAME
+        _require(
+            schedule_path.is_file() and not schedule_path.is_symlink(),
+            SCHEDULE_ARTIFACT_MISSING,
+        )
+        byte_sha = sha256_file_streaming(schedule_path)
+        _require(
+            byte_sha == manifest.get("observation_schedule_sha256"),
+            SCHEDULE_ARTIFACT_HASH_MISMATCH,
+        )
+        wanted = str(manifest.get("schedule_sha256") or "")
+        try:
+            decode_schedule_artifact(
+                schedule_path.read_bytes(),
+                wanted_sha=wanted,
+                expected_byte_sha256=byte_sha,
+            )
+        except ValueError as exc:
+            raise LiveCohortReleaseError(str(exc)) from exc
+        _census_schedule_identity(census_path, wanted)
+        inventory_path = root / SOURCE_INVENTORY_NAME
+        _require(
+            inventory_path.is_file() and not inventory_path.is_symlink(),
+            "RELEASE_INVALID_SOURCE_INTEGRITY",
+        )
+        try:
+            inventory = json.loads(inventory_path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY") from exc
+        _require(isinstance(inventory, Mapping), "RELEASE_INVALID_SOURCE_INTEGRITY")
+        _require(
+            inventory.get("schedule_sha256") == wanted, SCHEDULE_SEMANTIC_SHA_MISMATCH
+        )
+        _require(
+            inventory.get("observation_schedule_sha256") == byte_sha,
+            SCHEDULE_ARTIFACT_HASH_MISMATCH,
+        )
+        _require(
+            inventory.get("activation_id") == manifest.get("activation_id"),
+            "IDENTITY_CONFLICT",
+        )
+        _require(
+            inventory.get("cohort_id") == manifest.get("cohort_id"), "IDENTITY_CONFLICT"
+        )
     return dict(manifest)
 
 

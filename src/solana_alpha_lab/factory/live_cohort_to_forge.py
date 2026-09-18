@@ -76,6 +76,12 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     verify_live_cohort,
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
+from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
+    OBSERVATION_SCHEDULE_ARTIFACT_NAME,
+    RELEASE_SCHEMA_VERSION_LEGACY,
+    RELEASE_SCHEMA_VERSION_SELF_CONTAINED,
+    SCHEDULE_ARTIFACT_MISSING,
+)
 from solana_alpha_lab.factory.observation_publication_jobs import (
     iter_open_job_paths,
     journal_stats,
@@ -177,11 +183,38 @@ def _require(cond: bool, code: str) -> None:
         raise LiveCohortToForgeError(code)
 
 
+def release_files_for_tree(release_root: Path) -> tuple[str, ...]:
+    """Versioned sealed-tree membership. Schema 1.1 requires the schedule artifact."""
+
+    root = Path(release_root)
+    manifest_path = root / "release_manifest.json"
+    _require(
+        manifest_path.is_file() and not manifest_path.is_symlink(),
+        "RELEASE_TREE_INCOMPLETE",
+    )
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise LiveCohortToForgeError("RELEASE_TREE_INCOMPLETE") from exc
+    if not isinstance(manifest, Mapping):
+        raise LiveCohortToForgeError("RELEASE_TREE_INCOMPLETE")
+    version = str(manifest.get("schema_version") or RELEASE_SCHEMA_VERSION_LEGACY)
+    if version == RELEASE_SCHEMA_VERSION_SELF_CONTAINED:
+        return RELEASE_FILES + (OBSERVATION_SCHEDULE_ARTIFACT_NAME,)
+    if version == RELEASE_SCHEMA_VERSION_LEGACY:
+        return RELEASE_FILES
+    raise LiveCohortToForgeError("RELEASE_SCHEMA_MISMATCH")
+
+
 def hash_release_tree(release_root: Path) -> dict[str, str]:
     root = Path(release_root)
     out: dict[str, str] = {}
-    for name in RELEASE_FILES:
+    for name in release_files_for_tree(root):
         path = root / name
+        if name == OBSERVATION_SCHEDULE_ARTIFACT_NAME and (
+            not path.is_file() or path.is_symlink()
+        ):
+            raise LiveCohortToForgeError(SCHEDULE_ARTIFACT_MISSING)
         _require(path.is_file() and not path.is_symlink(), "RELEASE_TREE_INCOMPLETE")
         out[name] = sha256_file_streaming(path)
     return out
@@ -192,8 +225,9 @@ def verify_transported_release(*, source_root: Path, dest_root: Path) -> dict[st
     src = Path(source_root)
     dest = Path(dest_root)
     dest.mkdir(parents=True, exist_ok=True)
+    names = release_files_for_tree(src)
     source_hashes = hash_release_tree(src)
-    for name in RELEASE_FILES:
+    for name in names:
         shutil.copy2(src / name, dest / name)
     dest_hashes = hash_release_tree(dest)
     _require(source_hashes == dest_hashes, "TRANSPORT_HASH_MISMATCH")
@@ -929,6 +963,7 @@ def _publish_live_cohort_inner(
         as_of=now,
         closure_receipt=receipt,
         discovery_coverage_class=discovery_coverage_class,
+        ops_store=ops_store,
     )
     status = live_cohort_status(
         observation_rdp_root=observation_rdp,
@@ -1104,6 +1139,7 @@ __all__ = [
     "hash_release_tree",
     "publish_live_cohort",
     "list_live_cohorts",
+    "release_files_for_tree",
     "resolve_operator_path",
     "synthetic_closed_receipt",
     "verify_transported_release",

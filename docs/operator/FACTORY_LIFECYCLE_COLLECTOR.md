@@ -530,6 +530,9 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 
 Relative paths resolve against the repository root. The sealed tree is kept
 by default at `<observation_rdp.parent>/live_cohort_releases/<cohort_id>/`.
+Schema `1.1` sealed trees automatically include `observation_schedule.json`
+(the exact ObservationSchedule document). Copy the whole sealed directory.
+There is no separate bind-schedule / attach-schedule operator step.
 Process-owned transport staging is deleted after verified import.
 Same-identity retry reuses that sealed tree (does not rewrite `sealed_at`).
 Override with `--release-root` only when the durable location must differ.
@@ -586,7 +589,10 @@ Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
 `CORPUS_PARQUET_SHA_MISMATCH`. Typed FAIL JSON includes `next`. `LOW_YIELD`
 is raised before import when projected cumulative yield is below
 `MIN_USABLE_YIELD_ELIGIBLE`. `GAP_SUSPECTED` and another cohort being ACTIVE
-are not crashes. `GAP_CONFIRMED` is not sealable.
+are not crashes. `GAP_CONFIRMED` is not sealable. New self-contained releases
+fail closed on missing/tampered/mismatched `observation_schedule.json`
+(`SEAL_SCHEDULE_DOCUMENT_MISSING`, `SCHEDULE_ARTIFACT_MISSING`,
+`SCHEDULE_SEMANTIC_SHA_MISMATCH`). Do not invent a bind-schedule command.
 
 Primitives remain available (`build-live-source` requires `--cohort-id` and
 `--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /

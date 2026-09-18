@@ -72,6 +72,14 @@ FAIL_OWNER_NEXT = {
     "CANONICAL_TARGET_CONFLICT": "STOP_DO_NOT_OVERWRITE_CANONICAL_TARGET",
     "DATASET_PUBLICATION_INCOMPLETE": "REPAIR_LIVE_CORPUS_METADATA_FIRST",
     "LIVE_CORPUS_PARQUET_SYMLINK": "STOP_DO_NOT_FOLLOW_PARQUET_SYMLINK",
+    "SEAL_SCHEDULE_DOCUMENT_MISSING": "STOP_SCHEDULE_DOCUMENT_REQUIRED",
+    "SCHEDULE_DOCUMENT_CONFLICT": "STOP_DO_NOT_SEAL",
+    "SCHEDULE_ARTIFACT_MISSING": "STOP_DO_NOT_IMPORT",
+    "SCHEDULE_ARTIFACT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "SCHEDULE_SEMANTIC_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "SCHEDULE_PARSER_INVALID": "STOP_DO_NOT_IMPORT",
+    "SCHEDULE_PRODUCER_UNBOUND": "STOP_SCHEDULE_PRODUCER_REQUIRED",
+    "CENSUS_SCHEDULE_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
 }
 
 
@@ -269,6 +277,7 @@ def main(argv: list[str] | None = None) -> int:
                 as_of=as_of,
                 closure_receipt=receipt,
                 discovery_coverage_class=args.discovery_coverage_class,
+                ops_store=_path(args.ops_store),
             )
             assert_source_matches_receipt(result, receipt)
         elif args.command == "live-status":
