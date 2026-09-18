@@ -1010,6 +1010,20 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
             self.assertEqual(sealed, default_sealed_release_root(observation_rdp, COHORT1))
             self.assertTrue((sealed / "release_manifest.json").is_file())
             self.assertTrue((sealed / "census.parquet").is_file())
+            self.assertTrue((sealed / "observation_schedule.json").is_file())
+            sealed_manifest = json.loads(
+                (sealed / "release_manifest.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(sealed_manifest["schema_version"], "1.1")
+            self.assertEqual(sealed_manifest["schedule_sha256"], digest)
+            self.assertEqual(
+                sealed_manifest["observation_schedule_sha256"],
+                hashlib.sha256(
+                    (sealed / "observation_schedule.json").read_bytes()
+                ).hexdigest(),
+            )
+            tree_hashes = hash_release_tree(sealed)
+            self.assertIn("observation_schedule.json", tree_hashes)
             self.assertEqual(published["next"], CONTROL_NEXT)
             self.assertEqual(
                 published["readiness"]["state"],

@@ -23,11 +23,13 @@ from solana_alpha_lab.factory.run_passport import canonical_sha256
 
 SOURCE_BUNDLE_SCHEMA = "smial.live-cohort-source-bundle"
 SOURCE_BUNDLE_SCHEMA_VERSION = "1.0"
+SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED = "1.1"
 SOURCE_REPRESENTATION_BUNDLE = "SOURCE_BUNDLE_V1"
 SOURCE_REPRESENTATION_LEGACY_JSON = "LEGACY_SOURCE_SNAPSHOT_JSON"
 SOURCE_MANIFEST_NAME = "source_manifest.json"
 SOURCE_MEMBERS_NAME = "members.parquet"
 SOURCE_OBSERVATIONS_NAME = "observations.parquet"
+SOURCE_SCHEDULE_NAME = "observation_schedule.json"
 SOURCE_STAGING_PREFIX = ".build-"
 BATCH_SIZE = 2048
 HASH_CHUNK = 1024 * 1024
@@ -337,7 +339,12 @@ def commit_source_bundle(
     dest.mkdir(parents=True, exist_ok=True)
     members_src = staging / SOURCE_MEMBERS_NAME
     obs_src = staging / SOURCE_OBSERVATIONS_NAME
+    schedule_src = staging / SOURCE_SCHEDULE_NAME
+    version = str(manifest.get("schema_version") or SOURCE_BUNDLE_SCHEMA_VERSION)
+    require_schedule = version == SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED
     if not members_src.is_file() or not obs_src.is_file():
+        raise OSError("SOURCE_BUNDLE_STAGING_INCOMPLETE")
+    if require_schedule and not schedule_src.is_file():
         raise OSError("SOURCE_BUNDLE_STAGING_INCOMPLETE")
     committed = dest / SOURCE_MANIFEST_NAME
     if committed.is_file() and not committed.is_symlink():
@@ -355,14 +362,22 @@ def commit_source_bundle(
                 obs_ok = sha256_file_streaming(dest / SOURCE_OBSERVATIONS_NAME) == existing.get(
                     "observations_sha256"
                 )
+                schedule_ok = True
+                if require_schedule:
+                    schedule_ok = sha256_file_streaming(
+                        dest / SOURCE_SCHEDULE_NAME
+                    ) == existing.get("observation_schedule_sha256")
             except OSError:
                 members_ok = False
                 obs_ok = False
-            if members_ok and obs_ok:
+                schedule_ok = False
+            if members_ok and obs_ok and schedule_ok:
                 discard_stale_staging(dest)
                 return committed
     os.replace(members_src, dest / SOURCE_MEMBERS_NAME)
     os.replace(obs_src, dest / SOURCE_OBSERVATIONS_NAME)
+    if require_schedule:
+        os.replace(schedule_src, dest / SOURCE_SCHEDULE_NAME)
     manifest_bytes = json.dumps(
         dict(manifest), sort_keys=True, separators=(",", ":"), ensure_ascii=True
     ).encode("utf-8")
@@ -375,35 +390,43 @@ def commit_source_bundle(
 
 
 def compute_source_identity(manifest_body: Mapping[str, Any]) -> str:
-    return canonical_sha256(
-        {
-            "schema": SOURCE_BUNDLE_SCHEMA,
-            "schema_version": SOURCE_BUNDLE_SCHEMA_VERSION,
-            "schedule_sha256": manifest_body.get("schedule_sha256"),
-            "activation_id": manifest_body.get("activation_id"),
-            "cohort_id": manifest_body.get("cohort_id"),
-            "window_start": manifest_body.get("window_start"),
-            "window_end_exclusive": manifest_body.get("window_end_exclusive"),
-            "starts_at": manifest_body.get("starts_at"),
-            "stops_admitting_at": manifest_body.get("stops_admitting_at"),
-            "closure_receipt_sha256": manifest_body.get("closure_receipt_sha256"),
-            "closure_cutoff_at": manifest_body.get("closure_cutoff_at"),
-            "discovery_coverage_class": manifest_body.get("discovery_coverage_class"),
-            "member_count": manifest_body.get("member_count"),
-            "observation_count": manifest_body.get("observation_count"),
-            "members_sha256": manifest_body.get("members_sha256"),
-            "observations_sha256": manifest_body.get("observations_sha256"),
-            "contributing_producer_git_shas": manifest_body.get(
-                "contributing_producer_git_shas"
-            ),
-            "schedule_producer_git_sha": manifest_body.get("schedule_producer_git_sha"),
-            "admission_field": manifest_body.get("admission_field"),
-            "open_publication": manifest_body.get("open_publication"),
-            "unresolved_due": manifest_body.get("unresolved_due"),
-            "in_flight": manifest_body.get("in_flight"),
-            "budget_blocked": manifest_body.get("budget_blocked"),
-        }
-    )
+    version = str(manifest_body.get("schema_version") or SOURCE_BUNDLE_SCHEMA_VERSION)
+    body: dict[str, Any] = {
+        "schema": SOURCE_BUNDLE_SCHEMA,
+        "schema_version": (
+            SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED
+            if version == SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED
+            else SOURCE_BUNDLE_SCHEMA_VERSION
+        ),
+        "schedule_sha256": manifest_body.get("schedule_sha256"),
+        "activation_id": manifest_body.get("activation_id"),
+        "cohort_id": manifest_body.get("cohort_id"),
+        "window_start": manifest_body.get("window_start"),
+        "window_end_exclusive": manifest_body.get("window_end_exclusive"),
+        "starts_at": manifest_body.get("starts_at"),
+        "stops_admitting_at": manifest_body.get("stops_admitting_at"),
+        "closure_receipt_sha256": manifest_body.get("closure_receipt_sha256"),
+        "closure_cutoff_at": manifest_body.get("closure_cutoff_at"),
+        "discovery_coverage_class": manifest_body.get("discovery_coverage_class"),
+        "member_count": manifest_body.get("member_count"),
+        "observation_count": manifest_body.get("observation_count"),
+        "members_sha256": manifest_body.get("members_sha256"),
+        "observations_sha256": manifest_body.get("observations_sha256"),
+        "contributing_producer_git_shas": manifest_body.get(
+            "contributing_producer_git_shas"
+        ),
+        "schedule_producer_git_sha": manifest_body.get("schedule_producer_git_sha"),
+        "admission_field": manifest_body.get("admission_field"),
+        "open_publication": manifest_body.get("open_publication"),
+        "unresolved_due": manifest_body.get("unresolved_due"),
+        "in_flight": manifest_body.get("in_flight"),
+        "budget_blocked": manifest_body.get("budget_blocked"),
+    }
+    if version == SOURCE_BUNDLE_SCHEMA_VERSION_SELF_CONTAINED:
+        body["observation_schedule_sha256"] = manifest_body.get(
+            "observation_schedule_sha256"
+        )
+    return canonical_sha256(body)
 
 
 def compact_source_view(source: Mapping[str, Any]) -> dict[str, Any]:

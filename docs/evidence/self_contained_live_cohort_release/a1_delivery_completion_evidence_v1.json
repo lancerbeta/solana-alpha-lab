@@ -1,0 +1,71 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SELF-CONTAINED-LIVE-COHORT-RELEASE-ACCEPT-001",
+  "as_of": "2026-09-18",
+  "task_id": "SELF_CONTAINED_LIVE_COHORT_RELEASE_V1",
+  "state_change": "New LIVE cohort releases automatically carry, verify, transport and locally persist the exact ObservationSchedule document so canonical consume-time can resolve it without VPS or a manual bind step.",
+  "base_main": "5baca80892aebdfc7d415191bf7d85744070d46f",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "ab0f43f1c35952a6dcdfd3a0a29ae4d178f745ddf1d909ca97ba809ad9f81572",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "dc6d078a6304446ce23f00bb0c3f124f02928c8074177ba66e6b99b43694c496",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "b8d2c699f3403b59b8233e6df64ecbed7ba98012e4c7b589d86b241f57dd0423",
+    "docs/reports/self_contained_live_cohort_release/a1_owner_readout_v1.md": "64fb5617ece3040c445d61711c17eb0d93988ff2c7e0cf5c12513c43038a2e52",
+    "docs/tasks/SELF_CONTAINED_LIVE_COHORT_RELEASE_V1.md": "346055e70944eefdf228fafac2631384e428826ebd88c7ef63bd1a313115e4b4",
+    "scripts/discovery_evidence_release.py": "397960629fa3ec56f6528d8e216195cca593c9e0a6b8a9e1ededc74abf846b72",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "7b27611ba0928f394d307347a439f5b07d46f8682a40bb9803d929f55b033bc2",
+    "src/solana_alpha_lab/factory/live_cohort_schedule_artifact.py": "ce5abd9ff4f7bbe96ca083d7822d6c1315d1130e9a81ac07f03dbb6827aaac56",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "20dd596277873cbfaa54bf22fc4bf98515bcc87e8c5784a9101b33ed14b86401",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "d3067118b4aa68a4e46db39e35d8e274034aeeed460cff377fa431d835874888",
+    "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "263ad56d23bac3e438d1b92fa02481fc0ce6ad4a01bcbb02eba1b4358572d5a0",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "50bf8a2301fdea377679226e212db15dc7a3a27a67bdeef37111cb592dd0c1c7",
+    "tests/test_self_contained_live_cohort_release_v1.py": "b71f4f83a479ec5d13769e02e0cbf45342f73fa471fef1ef273ae843a3c4298c"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_factory_fit_v1.json",
+    "sha256": "5b7af7583d4ab0dbce457a41519adbf468947822d3b9766564c7af16ac9d410d",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_SELF_CONTAINED_LIVE_COHORT_RELEASE",
+    "independent_review": {
+      "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_independent_review_v1.json",
+      "sha256": "04458962374f833d544c5b05b079af08bc5bc65cd47111e3b9c6a96ef7b5b8e2",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_SELF_CONTAINED_LIVE_COHORT_RELEASE"
+    ]
+  },
+  "non_claims": [
+    "NO_C2_OPERATION",
+    "NO_FORGE",
+    "NO_PROVIDER",
+    "NO_RUNTIME_MUTATION",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "data_plane_mutation": 0,
+    "provider_calls": 0
+  }
+}
