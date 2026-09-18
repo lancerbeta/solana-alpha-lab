@@ -1674,7 +1674,14 @@ def run_preflight(
                 "memory_eligibility_sha256": memory_eligibility,
                 "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
                 "control_yield_eligible": yield_eligible,
+                "base_x_population_n": yield_eligible,
                 "min_usable_yield_eligible": MIN_USABLE_BASE_X_POPULATION,
+                "min_usable_base_x_population": MIN_USABLE_BASE_X_POPULATION,
+                "next": (
+                    "STOP_CORPUS_UNRESOLVABLE"
+                    if gate == "CONTROL_CORPUS_UNRESOLVABLE"
+                    else "WAIT_FOR_IMPORT_OR_STOP"
+                ),
                 "session_id": None,
                 "forge_context_packet": {},
                 "authority": {
@@ -1773,6 +1780,7 @@ def run_preflight(
                 "full_lifecycle_equivalent": bool(
                     selection_gate_view.get("full_lifecycle_equivalent")
                 ),
+                "integrity_invalid": bool(selection_gate_view.get("integrity_invalid")),
             },
             "forge_context_packet": {},
             "authority": {

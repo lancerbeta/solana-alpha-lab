@@ -394,14 +394,17 @@ equivalent of the challenger representation. The phrase "explicitly resolved
 evidence" does not authorize those bodies in CONTROL mode. Ordinary Git/Catalog
 validation remains allowed. Do not build a filesystem sandbox.
 
-CONTROL preflight enforces `MIN_USABLE_YIELD_ELIGIBLE` from
-`early_market_panel_importer.py` using corpus metadata/labels only. Below-min
-or unresolvable current lifecycle corpus is `CONTROL_YIELD_BELOW_MIN` /
-`CONTROL_CORPUS_UNRESOLVABLE` and must not consume the CONTROL search slot.
-`OWNER NEXT` is `WAIT_FOR_IMPORT_OR_STOP` or `STOP_CORPUS_UNRESOLVABLE`.
-Do not recover by dropping `--control-current-representation` and running
-general Forge. Report `control_yield_eligible` vs `min_usable_yield_eligible`
-when present.
+CONTROL preflight floors on consume-time `base_x_population.n`
+(`MIN_USABLE_BASE_X_POPULATION`). Below-min or unresolvable scientific N is
+`CONTROL_YIELD_BELOW_MIN` / `CONTROL_CORPUS_UNRESOLVABLE` and must not
+consume the CONTROL search slot. `OWNER NEXT` is `WAIT_FOR_IMPORT_OR_STOP`
+or `STOP_CORPUS_UNRESOLVABLE`. Do not recover by dropping
+`--control-current-representation` and running general Forge.
+Report `base_x_population_n` (also copied to `control_yield_eligible` for
+compat) vs `min_usable_base_x_population`. `yield_eligible` remains the
+lifecycle-completeness label, not scientific N.
+If `forge-control-ready` returns `base_x_population_n=null`, do not run the
+CONTROL slash; that READY is operational import only.
 
 For a completed CONTROL/general session, operator readout of the CONTROL probe
 branch uses `effective_control_terminal` (`final_session_terminal` when present,
@@ -1122,7 +1125,7 @@ OWNER_DECISION_REQUIRED
 | Existing live capability, но нужна exact owner authority | `OWNER_DECISION_REQUIRED` |
 | Named reusable capability отсутствует | `PASS_CHANGE_LANE_REQUIRED` |
 | Required forward-only data отсутствуют | `PASS_DATA_OPTION_REQUIRED` |
-| `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` (N не сжимать) |
+| `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` — это coverage report на `base_x`, не заказ новой collection. NEXT=`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X` |
 | `BLOCKED_DATA` + `FULL_LIFECYCLE_SELECTION_SCOPE` | `PASS_DATA_OPTION_REQUIRED` (сузь required Y set) |
 | Spec incoherent/invalid | соответствующий `KILL_*` либо один `REVISE_ONCE` |
 | Promotion requested | `OWNER_DECISION_REQUIRED`; promotion не выполнять |

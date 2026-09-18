@@ -727,9 +727,13 @@ def forge_control_ready(
     )
     if projected is not None:
         base_x_n = int(projected["base_x_population"]["n"])
+    elif raw_base_x is not None:
+        base_x_n = int(raw_base_x)
+    else:
+        base_x_n = None
+    if base_x_n is not None:
         _require(base_x_n >= MIN_USABLE_BASE_X_POPULATION, "LOW_YIELD")
     else:
-        base_x_n = int(raw_base_x) if raw_base_x is not None else None
         _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     coverage = str(labels.get("discovery_coverage_class") or "")
     _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
@@ -806,6 +810,9 @@ def forge_control_ready(
         "corpus_version": labels.get("corpus_version"),
         "yield_eligible": yield_eligible,
         "base_x_population_n": base_x_n,
+        "scientific_control_ready": (
+            base_x_n is not None and base_x_n >= MIN_USABLE_BASE_X_POPULATION
+        ),
         "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
         "min_usable_base_x_population": MIN_USABLE_BASE_X_POPULATION,
         "evidence_epoch_sha256": epoch,

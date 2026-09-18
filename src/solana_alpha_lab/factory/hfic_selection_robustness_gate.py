@@ -236,7 +236,7 @@ def apply_selection_gate_to_preflight(
                 "full_lifecycle_equivalent": False,
             }
         return {"applicable": False, "action": action, "terminal": None}
-    if decision == BLOCK_FORGE_SELECTION_RISK and equivalent:
+    if equivalent and decision in {BLOCK_FORGE_SELECTION_RISK, BLOCK_FORGE_EVIDENCE_GAP}:
         return {
             "applicable": True,
             "action": "STOP",

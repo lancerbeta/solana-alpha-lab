@@ -31971,7 +31971,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: 09b2905aa7aec5866cf1b0cd1808541d2a0d26bddc286936d53934c76e6acd12}
+  integrity: {kind: sha256, sha256: e6d49c43f784936def0456283386e67732e24e4ddc408b276418c6bcb7595a40}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 44c5c3692680437362ea765898ae1cbb6ba04ca8edd15131b3fdd2eab0be6c4f}
+  integrity: {kind: sha256, sha256: c6b9cd6fba0b37f9f253a8ef7650909953fc7fed23b2e7690c8e8d71f5e71d6f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34097,7 +34097,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_to_forge.py', repository_path: src/solana_alpha_lab/factory/live_cohort_to_forge.py}
-  integrity: {kind: sha256, sha256: 30cd9f751b15e47bf8000c1db4740594c1d62d4c8747b654f965315dcc668ef3}
+  integrity: {kind: sha256, sha256: 2693ef5f50ec1c4edaf3c9256f713612a5d7dd25bcb044854c83b45fd9a58417}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34495,7 +34495,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 4dbc07c45a8e6e986c3c40614b610c0e017e1c5611ffb8cb65e090cec6ec4d5a}
+  integrity: {kind: sha256, sha256: 193931e5bc33d8e6eb966bb7a8efa168653f36f7d7944850dd617cf829466247}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37493,7 +37493,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py', repository_path: src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py}
-  integrity: {kind: sha256, sha256: 17e59cb8096b900d2c238832c6fcc1012d16cf756eb49e8a642b0c1a1c83a734}
+  integrity: {kind: sha256, sha256: 79ccdc3471c24f4a783a745addf016fca4bd8acadb653bdb0ac94d9f749f6b9a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
@@ -37618,7 +37618,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/scientific_eligibility_projection.py', repository_path: src/solana_alpha_lab/factory/scientific_eligibility_projection.py}
-  integrity: {kind: sha256, sha256: d9bfbd96d74cac989cb0a3d6eb4b82415ca6bb52f8fefec618847e48a2143f71}
+  integrity: {kind: sha256, sha256: 32afd9f75ce51f218d8d81c10f58c4a35110b4576929d11cc5f51e682e4aa6ed}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
@@ -37637,7 +37637,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_scientific_eligibility_projection_v1.py', repository_path: tests/test_scientific_eligibility_projection_v1.py}
-  integrity: {kind: sha256, sha256: b034c5ed41bd67b71f71e7993e5459bcf2117dacf09d0dfe415bc4865534f475}
+  integrity: {kind: sha256, sha256: cb0264cc50c288c1f95d111411b15820aec123716ccfbff07ba2f2dd4ce1e6fa}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}

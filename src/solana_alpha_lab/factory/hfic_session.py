@@ -3167,23 +3167,22 @@ def run_live_classifier(
         try_project_scientific_eligibility_from_data_root,
     )
 
-    attached = critic_result.get("scientific_eligibility_projection")
-    if (
-        isinstance(attached, Mapping)
-        and attached.get("experiment_spec_sha256") == canonical_sha256(dict(validated))
-        and "scientific_eligibility_projection" not in packet
-    ):
-        packet["scientific_eligibility_projection"] = attached
-    if "scientific_eligibility_projection" not in packet:
-        request = validated.get("observation_request")
-        projected = try_project_scientific_eligibility_from_data_root(
-            Path(data_root),
-            repo_root=Path(repo_root),
-            spec=validated,
-            schedule=request if isinstance(request, Mapping) else None,
-        )
-        if projected is not None:
-            packet["scientific_eligibility_projection"] = projected
+    request = validated.get("observation_request")
+    projected = try_project_scientific_eligibility_from_data_root(
+        Path(data_root),
+        repo_root=Path(repo_root),
+        spec=validated,
+        schedule=request if isinstance(request, Mapping) else None,
+    )
+    if projected is not None:
+        packet["scientific_eligibility_projection"] = projected
+    else:
+        attached = critic_result.get("scientific_eligibility_projection")
+        if (
+            isinstance(attached, Mapping)
+            and attached.get("experiment_spec_sha256") == canonical_sha256(dict(validated))
+        ):
+            packet["scientific_eligibility_projection"] = attached
     decision = classify_lane(
         packet,
         root=Path(repo_root),

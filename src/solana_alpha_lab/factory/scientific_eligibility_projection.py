@@ -194,7 +194,7 @@ def project_scientific_eligibility(
 
     if isinstance(schedule, Mapping):
         x_point = schedule.get("x_point")
-        if isinstance(x_point, Mapping):
+        if isinstance(x_point, Mapping) and str(x_point.get("point_id") or "") == X_POINT_ID:
             if x_point.get("due_offset_seconds") is not None:
                 x_due_offset_seconds = int(x_point["due_offset_seconds"])
             if x_point.get("allowed_lateness_seconds") is not None:
@@ -465,6 +465,9 @@ def validated_projection_readiness(
         or projection.get("schema_version") != PROJECTION_SCHEMA_VERSION
         or projection.get("rule_id") != RULE_ID
     ):
+        return READINESS_MISSINGNESS_UNRESOLVED
+    body = {key: value for key, value in projection.items() if key != "projection_sha256"}
+    if projection.get("projection_sha256") != canonical_sha256(body):
         return READINESS_MISSINGNESS_UNRESOLVED
     expected = canonical_sha256(dict(spec))
     if projection.get("experiment_spec_sha256") != expected:

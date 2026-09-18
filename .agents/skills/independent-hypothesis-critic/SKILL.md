@@ -110,8 +110,11 @@ Hard boundaries — same as Forge:
    projected; the classifier ignores a bare readiness stamp.
    `COMPLETE` = every required outcome has a resolved state (including
    censored / typed-missing) against `base_x.n`. `MISSINGNESS_UNRESOLVED`
-   fail-closes into the existing data/science-option route and must not
-   shrink N. Do not execute experiments.
+   fail-closes into the existing data/science-option route
+   (`PASS_DATA_OPTION_REQUIRED`, classifier NEXT
+   `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`) and must not shrink N. This is a
+   coverage report, not a new collection commission. Do not execute
+   experiments.
 
 ## Context isolation
 

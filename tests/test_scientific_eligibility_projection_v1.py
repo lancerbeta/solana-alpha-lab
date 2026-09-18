@@ -297,6 +297,74 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         self.assertEqual(gate, "OK")
         self.assertEqual(observed, 10)
 
+    def test_non_x300_schedule_does_not_move_pit(self) -> None:
+        census = [_census("a", "observed")]
+        obs = [_x300("a")]
+        projected = project_scientific_eligibility(
+            census,
+            obs,
+            schedule={
+                "x_point": {
+                    "point_id": "X900",
+                    "due_offset_seconds": 1,
+                    "allowed_lateness_seconds": 0,
+                }
+            },
+        )
+        self.assertEqual(projected["base_x_population"]["n"], 1)
+        self.assertEqual(
+            projected["base_x_population"]["x_due_offset_seconds"],
+            X_DUE_OFFSET_SECONDS,
+        )
+
+    def test_equivalent_evidence_gap_is_scoped_stop(self) -> None:
+        from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+            BLOCK_FORGE_EVIDENCE_GAP,
+        )
+
+        receipt = {
+            "router_decision": BLOCK_FORGE_EVIDENCE_GAP,
+            "receipt_sha256": "c" * 64,
+        }
+        view = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION",
+            receipt,
+            required_outcome_point_ids=("Y900", "Y1800"),
+            schedule_y_point_ids=("Y900", "Y1800"),
+        )
+        self.assertEqual(view["action"], "STOP")
+        self.assertEqual(view["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+
+    def test_forged_complete_stamp_is_unresolved(self) -> None:
+        from solana_alpha_lab.factory.lane_classifier import (
+            _submission_outcome_readiness,
+        )
+
+        spec = {
+            "schema_version": "1.3",
+            "required_outcomes": [
+                {
+                    "point_id": "Y900",
+                    "field_ids": ["FIELD-USD-PRICE-001"],
+                    "role": "PRIMARY",
+                }
+            ],
+        }
+        fake = {
+            "schema": "smial.scientific-eligibility-projection",
+            "schema_version": "1.0",
+            "rule_id": "BASE_X_X300_VALID_X_ELIGIBLE_V1",
+            "experiment_spec_sha256": "0" * 64,
+            "outcome_readiness": READINESS_COMPLETE,
+            "projection_sha256": "0" * 64,
+        }
+        self.assertEqual(
+            _submission_outcome_readiness(
+                spec, {"scientific_eligibility_projection": fake}
+            ),
+            READINESS_MISSINGNESS_UNRESOLVED,
+        )
+
     def test_horizon_spec_is_not_auto_vetoed(self) -> None:
         receipt = {
             "router_decision": BLOCK_FORGE_SELECTION_RISK,

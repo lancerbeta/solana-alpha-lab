@@ -311,6 +311,8 @@ def _blocked_data(reason_code: str) -> LaneDecision:
         next_action = "REPORT_OUTCOME_COVERAGE_KEEP_BASE_X"
     elif reason_code == "FULL_LIFECYCLE_SELECTION_SCOPE":
         next_action = "NARROW_REQUIRED_OUTCOMES_OR_STOP"
+    elif reason_code == "SELECTION_RECEIPT_INTEGRITY_INVALID":
+        next_action = "REBIND_SELECTION_RECEIPT_IDENTITY"
     return _decision(
         Lane.FAST_LANE,
         "BLOCKED_DATA",
@@ -561,15 +563,14 @@ def classify_lane(
             if isinstance(compiled_schedule, Mapping):
                 schedule = compiled_schedule
         working = dict(submission)
-        if not isinstance(working.get("scientific_eligibility_projection"), Mapping):
-            projected = try_project_scientific_eligibility_from_data_root(
-                Path(data_root),
-                repo_root=Path(root),
-                spec=spec,
-                schedule=schedule,
-            )
-            if projected is not None:
-                working["scientific_eligibility_projection"] = projected
+        computed = try_project_scientific_eligibility_from_data_root(
+            Path(data_root),
+            repo_root=Path(root),
+            spec=spec,
+            schedule=schedule,
+        )
+        if computed is not None:
+            working["scientific_eligibility_projection"] = computed
         if _submission_outcome_readiness(spec, working) != READINESS_COMPLETE:
             return _blocked_data("OUTCOME_MISSINGNESS_UNRESOLVED")
         selection_view = apply_selection_gate_to_preflight(
@@ -578,10 +579,11 @@ def classify_lane(
             required_outcome_point_ids=required_outcome_point_ids(spec),
             schedule_y_point_ids=schedule_y_point_ids(schedule),
         )
-        if selection_view.get("action") == "STOP" and selection_view.get(
-            "full_lifecycle_equivalent"
-        ):
-            return _blocked_data("FULL_LIFECYCLE_SELECTION_SCOPE")
+        if selection_view.get("action") == "STOP":
+            if selection_view.get("integrity_invalid"):
+                return _blocked_data("SELECTION_RECEIPT_INTEGRITY_INVALID")
+            if selection_view.get("full_lifecycle_equivalent"):
+                return _blocked_data("FULL_LIFECYCLE_SELECTION_SCOPE")
 
     if descriptor["effect_class"] == "PROVIDER_READ_ONLY_BOUNDED":
         return _decision(
