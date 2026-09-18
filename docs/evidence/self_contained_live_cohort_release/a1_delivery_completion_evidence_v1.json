@@ -15,7 +15,18 @@
   },
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/SELF_CONTAINED_LIVE_COHORT_RELEASE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "ab0f43f1c35952a6dcdfd3a0a29ae4d178f745ddf1d909ca97ba809ad9f81572",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "b8d2c699f3403b59b8233e6df64ecbed7ba98012e4c7b589d86b241f57dd0423",
+    "docs/reports/self_contained_live_cohort_release/a1_owner_readout_v1.md": "64fb5617ece3040c445d61711c17eb0d93988ff2c7e0cf5c12513c43038a2e52",
+    "docs/tasks/SELF_CONTAINED_LIVE_COHORT_RELEASE_V1.md": "44953ea388b1733a88236e2edf995886eda524dc1579de54dba6164658b1851b",
+    "scripts/discovery_evidence_release.py": "397960629fa3ec56f6528d8e216195cca593c9e0a6b8a9e1ededc74abf846b72",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "7b27611ba0928f394d307347a439f5b07d46f8682a40bb9803d929f55b033bc2",
+    "src/solana_alpha_lab/factory/live_cohort_schedule_artifact.py": "ce5abd9ff4f7bbe96ca083d7822d6c1315d1130e9a81ac07f03dbb6827aaac56",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "20dd596277873cbfaa54bf22fc4bf98515bcc87e8c5784a9101b33ed14b86401",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "d3067118b4aa68a4e46db39e35d8e274034aeeed460cff377fa431d835874888",
+    "src/solana_alpha_lab/factory/live_corpus_manifest_publish.py": "263ad56d23bac3e438d1b92fa02481fc0ce6ad4a01bcbb02eba1b4358572d5a0",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "50bf8a2301fdea377679226e212db15dc7a3a27a67bdeef37111cb592dd0c1c7",
+    "tests/test_self_contained_live_cohort_release_v1.py": "b71f4f83a479ec5d13769e02e0cbf45342f73fa471fef1ef273ae843a3c4298c"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -27,14 +38,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "b325dee496a2fb73b9a0e5d8b2d1ecb368820cdec3f431210dcbab7efeaeb520",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_SELF_CONTAINED_LIVE_COHORT_RELEASE",
     "independent_review": {
       "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "45c6c7604073c6c67dcae5260a210e3befb20c0c461baa3b7e8a9cb5de3ed3f0",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

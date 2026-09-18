@@ -4,8 +4,8 @@
   "review_id": "SELF-CONTAINED-LIVE-COHORT-RELEASE-FACTORY-FIT-001",
   "as_of": "2026-09-18",
   "task_id": "SELF_CONTAINED_LIVE_COHORT_RELEASE_V1",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "5ecb418899dbc991626dd14e2f49155a36c1852ca90bd81d85aef3edc4d71b9c",
+  "reviewed_inventory_sha256": "ec0cbea2fcb098082233cc92c7bdeeb4ec8d640e56045ccaab02b16407fd74c5",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
