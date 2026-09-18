@@ -1722,8 +1722,8 @@ def run_preflight(
     schedule_y_ids = None
     if bound_session and action != "START_NEW_SESSION":
         from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            bound_schedule_y_point_ids,
             required_outcome_point_ids as _required_points,
-            schedule_y_point_ids,
         )
 
         try:
@@ -1741,10 +1741,7 @@ def run_preflight(
                     spec = spec.get("experiment_spec")
             if isinstance(spec, Mapping):
                 required_outcome_point_ids = _required_points(spec)
-                request = spec.get("observation_request")
-                schedule_y_ids = schedule_y_point_ids(
-                    request if isinstance(request, Mapping) else spec
-                )
+                schedule_y_ids = bound_schedule_y_point_ids(repo_root)
     selection_gate_view = apply_selection_gate_to_preflight(
         action,
         load_applicable_gate_receipt(Path(data_root), root=Path(repo_root)),

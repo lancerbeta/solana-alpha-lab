@@ -176,6 +176,20 @@ def schedule_y_point_ids(schedule: Mapping[str, Any] | None) -> tuple[str, ...]:
     return tuple(out)
 
 
+def bound_schedule_y_point_ids(root: Path | None = None) -> tuple[str, ...]:
+    """Factory-bound lifecycle Y set. Never the experiment's own y_points."""
+
+    loaded = load_projection_spec(Path(root) if root is not None else Path("."))
+    raw = loaded.get("bound_schedule_y_point_ids")
+    if not isinstance(raw, list):
+        return ()
+    return tuple(
+        str(item)
+        for item in raw
+        if str(item).startswith(Y_POINT_PREFIX)
+    )
+
+
 def project_scientific_eligibility(
     census_rows: Sequence[Mapping[str, Any]],
     observation_rows: Sequence[Mapping[str, Any]],
@@ -202,6 +216,7 @@ def project_scientific_eligibility(
 
     x300_by_mint: dict[str, Mapping[str, Any]] = {}
     obs_index: dict[tuple[str, str, str], str] = {}
+    obs_rank: dict[tuple[str, str, str], datetime] = {}
     for row in observation_rows:
         if not isinstance(row, Mapping):
             continue
@@ -211,12 +226,15 @@ def project_scientific_eligibility(
         if not mint or not point_id or not field_id:
             continue
         state = str(row.get("state") or "")
-        obs_index[(mint, point_id, field_id)] = state
+        key = (mint, point_id, field_id)
+        rank = _available_at_rank(row)
+        previous_rank = obs_rank.get(key)
+        if previous_rank is None or rank >= previous_rank:
+            obs_index[key] = state
+            obs_rank[key] = rank
         if point_id == X_POINT_ID and field_id == X_FIELD_ID:
             previous = x300_by_mint.get(mint)
-            if previous is None or _available_at_rank(row) >= _available_at_rank(
-                previous
-            ):
+            if previous is None or rank >= _available_at_rank(previous):
                 x300_by_mint[mint] = row
 
     base_mints: list[str] = []
@@ -567,6 +585,7 @@ __all__ = [
     "X_FIELD_ID",
     "X_POINT_ID",
     "assert_c1_shape",
+    "bound_schedule_y_point_ids",
     "full_lifecycle_scope_equivalent",
     "load_projection_spec",
     "load_projection_tables",

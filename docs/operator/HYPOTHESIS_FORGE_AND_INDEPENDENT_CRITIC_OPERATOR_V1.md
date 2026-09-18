@@ -1108,10 +1108,10 @@ OWNER_DECISION_REQUIRED
    bound schedule Y set в точности.
 5. Выполни только schema validation и deterministic lane classification network-free. Эксперимент не запускай.
    Не штампуй `outcome_readiness=COMPLETE`. Classifier принимает COMPLETE
-   только из spec-bound `ScientificEligibilityProjection` (schema +
-   `experiment_spec_sha256`). `COMPLETE` значит: каждый required outcome имеет
-   resolved observation state, включая `CENSORED_LATE` / `MISSING_TYPED`. Это
-   не complete-case и не сжимает `base_x.n`.
+   только из live release projection. Attached/self-hashed stamps fail closed.
+   `COMPLETE` значит: каждый required outcome имеет resolved observation
+   state, включая `CENSORED_LATE` / `MISSING_TYPED`. Это не complete-case и
+   не сжимает `base_x.n`.
    `MISSINGNESS_UNRESOLVED` (absent/unknown state) fail-close в существующий
    data/science-option route. NEXT classifier =
    `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`, не «почини binding».

@@ -551,8 +551,8 @@ def classify_lane(
         )
         from solana_alpha_lab.factory.scientific_eligibility_projection import (
             READINESS_COMPLETE,
+            bound_schedule_y_point_ids,
             required_outcome_point_ids,
-            schedule_y_point_ids,
             try_project_scientific_eligibility_from_data_root,
         )
 
@@ -578,7 +578,7 @@ def classify_lane(
             "START_NEW_SESSION",
             load_applicable_gate_receipt(Path(data_root), root=Path(root)),
             required_outcome_point_ids=required_outcome_point_ids(spec),
-            schedule_y_point_ids=schedule_y_point_ids(schedule),
+            schedule_y_point_ids=bound_schedule_y_point_ids(root),
         )
         if selection_view.get("action") == "STOP":
             if selection_view.get("integrity_invalid"):

@@ -35,6 +35,7 @@ from solana_alpha_lab.factory.scientific_eligibility_projection import (
     X_FIELD_ID,
     X_POINT_ID,
     assert_c1_shape,
+    bound_schedule_y_point_ids,
     full_lifecycle_scope_equivalent,
     project_scientific_eligibility,
     y_columns_forbidden,
@@ -409,6 +410,54 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         )
         self.assertEqual(gate, CONTROL_YIELD_BELOW_MIN)
         self.assertEqual(observed, 1)
+
+    def test_experiment_own_y_points_do_not_make_full_lifecycle(self) -> None:
+        bound = bound_schedule_y_point_ids(ROOT)
+        self.assertIn("Y900", bound)
+        self.assertIn("Y86400", bound)
+        self.assertFalse(full_lifecycle_scope_equivalent(("Y900",), bound))
+        view = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION",
+            {
+                "router_decision": BLOCK_FORGE_SELECTION_RISK,
+                "receipt_sha256": "a" * 64,
+            },
+            required_outcome_point_ids=("Y900",),
+            schedule_y_point_ids=bound,
+        )
+        self.assertEqual(view["action"], "START_NEW_SESSION")
+        self.assertTrue(view["caveat"])
+        self.assertFalse(view.get("full_lifecycle_equivalent"))
+
+    def test_later_y_state_wins_regardless_of_file_order(self) -> None:
+        census = [_census("a", "observed")]
+        earlier = _y("a", "Y900", "FIELD-USD-PRICE-001", "OBSERVED")
+        earlier["first_reliable_available_at"] = ANCHOR.isoformat().replace(
+            "+00:00", "Z"
+        )
+        later = _y("a", "Y900", "FIELD-USD-PRICE-001", "CENSORED_LATE")
+        later["first_reliable_available_at"] = (
+            ANCHOR + timedelta(seconds=900)
+        ).isoformat().replace("+00:00", "Z")
+        spec = {
+            "schema_version": "1.3",
+            "required_outcomes": [
+                {
+                    "point_id": "Y900",
+                    "field_ids": ["FIELD-USD-PRICE-001"],
+                    "role": "PRIMARY",
+                }
+            ],
+        }
+        first = project_scientific_eligibility(
+            census, [_x300("a"), later, earlier], spec=spec
+        )
+        second = project_scientific_eligibility(
+            census, [_x300("a"), earlier, later], spec=spec
+        )
+        self.assertEqual(first["outcome_coverage"][0]["n_censored_late"], 1)
+        self.assertEqual(second["outcome_coverage"][0]["n_censored_late"], 1)
+        self.assertEqual(first["outcome_coverage"][0]["n_observed"], 0)
 
     def test_horizon_spec_is_not_auto_vetoed(self) -> None:
         receipt = {

@@ -16,6 +16,17 @@ canonical_c1:
   expected_lifecycle_observed_n: 148
   expected_lifecycle_censored_late_n: 327
 y_point_prefix: Y
+observation_collapse:
+  rule: LAST_WINS_BY_FIRST_RELIABLE_AVAILABLE_AT
+  tie: LAST_SEEN_ROW
+bound_schedule_y_point_ids:
+  - Y900
+  - Y1800
+  - Y3600
+  - Y7200
+  - Y14400
+  - Y43200
+  - Y86400
 resolved_observation_states:
   - OBSERVED
   - MISSING_TYPED
