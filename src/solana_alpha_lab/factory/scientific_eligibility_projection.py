@@ -206,13 +206,7 @@ def project_scientific_eligibility(
     Y ``typed_value`` is never read.
     """
 
-    if isinstance(schedule, Mapping):
-        x_point = schedule.get("x_point")
-        if isinstance(x_point, Mapping) and str(x_point.get("point_id") or "") == X_POINT_ID:
-            if x_point.get("due_offset_seconds") is not None:
-                x_due_offset_seconds = int(x_point["due_offset_seconds"])
-            if x_point.get("allowed_lateness_seconds") is not None:
-                x_allowed_lateness_seconds = int(x_point["allowed_lateness_seconds"])
+    _ = schedule  # X PIT is factory-bound; experiment schedules cannot widen base_x.
 
     x300_by_mint: dict[str, Mapping[str, Any]] = {}
     obs_index: dict[tuple[str, str, str], str] = {}

@@ -298,6 +298,25 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         self.assertEqual(gate, "OK")
         self.assertEqual(observed, 10)
 
+    def test_experiment_x300_offsets_do_not_widen_factory_pit(self) -> None:
+        census = [_census("a", "observed")]
+        projected = project_scientific_eligibility(
+            census,
+            [_x300("a", late=True)],
+            schedule={
+                "x_point": {
+                    "point_id": X_POINT_ID,
+                    "due_offset_seconds": 300,
+                    "allowed_lateness_seconds": 10_000,
+                }
+            },
+        )
+        self.assertEqual(projected["base_x_population"]["n"], 0)
+        self.assertEqual(
+            projected["base_x_population"]["x_allowed_lateness_seconds"],
+            X_ALLOWED_LATENESS_SECONDS,
+        )
+
     def test_non_x300_schedule_does_not_move_pit(self) -> None:
         census = [_census("a", "observed")]
         obs = [_x300("a")]

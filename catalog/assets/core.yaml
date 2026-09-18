@@ -37618,7 +37618,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/scientific_eligibility_projection.py', repository_path: src/solana_alpha_lab/factory/scientific_eligibility_projection.py}
-  integrity: {kind: sha256, sha256: 1930a8e5dbefafee64bfb9a43b641207ede3fce8b9224c51f6ed2ff791c6851e}
+  integrity: {kind: sha256, sha256: 284ea6501600e5e5229798157dd7a95e4a0de61f1afabdbe859d71591c502576}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
@@ -37637,7 +37637,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_scientific_eligibility_projection_v1.py', repository_path: tests/test_scientific_eligibility_projection_v1.py}
-  integrity: {kind: sha256, sha256: bb4cf756f6b5a79d216434d290e6d058b7649db00da1a8d9e2342a4fa8aa1edc}
+  integrity: {kind: sha256, sha256: 036d436d49607336e3e215b476ad2b9cf1f147b8403843adb3930cdf8a8f104a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
