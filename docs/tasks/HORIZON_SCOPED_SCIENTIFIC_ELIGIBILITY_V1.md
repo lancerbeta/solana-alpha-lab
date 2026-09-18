@@ -55,6 +55,7 @@ managed_write_set:
   - docs/contracts/normalized_trajectory_v1_capability_contract.md
   - docs/contracts/normalized_trajectory_representation_probe_v1.md
   - tests/test_scientific_eligibility_projection_v1.py
+  - tests/test_horizon_eligibility_vertical_slice_v1.py
   - tests/test_hfic_selection_robustness_gate_v1.py
   - tests/test_hfic_representation_probe.py
   - tests/test_hfic_released_trajectory_projection_v1.py
@@ -134,7 +135,8 @@ Owner START after DESIGN checkpoint `PATCH`. One PR. Stop at merge-readiness.
   horizon-specific spec is not auto-vetoed, 1.3 required_outcomes, Critic
   packet stays 1.4.
 - **Terminal:** reviews, exact-head CI, merge-readiness, owner phrase.
-  Post-merge read-only C1 semantic acceptance is the next atom, not this one.
+  In-task read-only sealed C1 acceptance is required before the new owner
+  phrase. Do not merge. Do not run Forge.
 - **Non-goals:** Forge execution; packet 1.5; scheduler/census/parquet/
   latest.json mutation; M1 edits; IPW; collection redesign; primary_y parser.
 
@@ -144,11 +146,13 @@ Owner START after DESIGN checkpoint `PATCH`. One PR. Stop at merge-readiness.
    `FIELD-LIQUIDITY-USD-001 == OBSERVED` AND PIT `<= due_at + allowed_lateness`.
    Do not require the entire X300 bundle.
 2. `base_x.n` is always the scientific denominator.
-   `outcome_readiness` = `COMPLETE | MISSINGNESS_UNRESOLVED | UNSPECIFIED`.
+   `COMPLETE` iff every required outcome is `OBSERVED` on all of `base_x`.
+   Censored/typed-missing/absent required outcomes are
+   `MISSINGNESS_UNRESOLVED` coverage, not a second population.
 3. ExperimentSpec 1.3 adds `required_outcomes`. No Critic packet 1.5.
 4. Historical selection receipt is byte-immutable
    `FULL_LIFECYCLE_COMPLETENESS` caveat. No global START STOP.
-   Veto only when required Y point set equals the bound schedule Y set.
+   Y-point-set equality alone does not auto-veto ExperimentSpec 1.3.
 5. CONTROL/NT floor and equality use `base_x.n`. Keep NT M semantics.
 6. M1 out of scope.
 7. Historical corpus/receipts immutable.
@@ -161,8 +165,8 @@ Owner START after DESIGN checkpoint `PATCH`. One PR. Stop at merge-readiness.
 - `UNCERTAINTY_REMOVED`: Forge no longer treats full-ladder completeness
   as the base population or as a global START veto.
 - `CAPABILITY_OR_EVIDENCE`: projection + 1.3 schema + consumer rewiring.
-- `STOP`: merge-readiness / owner phrase.
-- `NEXT`: post-merge read-only canonical C1 semantic acceptance. No Forge.
+- `STOP`: merge-readiness / owner phrase. Do not merge. Do not run Forge.
+- `NEXT`: owner phrase on the patched head after in-task sealed C1 readback.
 - `REPLAN_TRIGGER`: need to mutate scheduler rows; need packet 1.5;
   C1-shape predicates cannot reproduce 475/148/327.
 - `SPEC_ROUTE=DESIGN_SPEC`

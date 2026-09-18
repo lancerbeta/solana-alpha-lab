@@ -256,13 +256,19 @@ def resolve_control_corpus_yield(
         from pathlib import Path
 
         from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            ScientificEligibilityError,
             try_project_scientific_eligibility_from_data_root,
         )
 
-        projected = try_project_scientific_eligibility_from_data_root(
-            Path(data_root),
-            repo_root=Path(repo_root),
-        )
+        try:
+            projected = try_project_scientific_eligibility_from_data_root(
+                Path(data_root),
+                repo_root=Path(repo_root),
+            )
+        except ScientificEligibilityError:
+            # Bound C1 identity with unproven/incompatible X300 geometry must
+            # not fall back to a stamped yield / complete-case N.
+            return CONTROL_CORPUS_UNRESOLVABLE, None
         if projected is not None:
             raw = projected["base_x_population"]["n"]
     if raw is None:

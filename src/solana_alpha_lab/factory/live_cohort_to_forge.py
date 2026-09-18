@@ -718,13 +718,17 @@ def forge_control_ready(
     if raw_base_x is None:
         raw_base_x = chosen.get("base_x_n")
     from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        ScientificEligibilityError,
         try_project_scientific_eligibility_from_data_root,
     )
 
-    projected = try_project_scientific_eligibility_from_data_root(
-        Path(data_root),
-        repo_root=Path(repo_root),
-    )
+    try:
+        projected = try_project_scientific_eligibility_from_data_root(
+            Path(data_root),
+            repo_root=Path(repo_root),
+        )
+    except ScientificEligibilityError as exc:
+        _require(False, str(exc.code or "CONTROL_CORPUS_UNRESOLVABLE"))
     if projected is not None:
         base_x_n = int(projected["base_x_population"]["n"])
     elif raw_base_x is not None:

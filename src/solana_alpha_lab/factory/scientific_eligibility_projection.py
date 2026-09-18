@@ -8,6 +8,7 @@ population. Never materializes Y typed values.
 from __future__ import annotations
 
 import hashlib
+import json
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -48,6 +49,10 @@ C1_EXPECTED = {
     "lifecycle_observed_n": 148,
     "lifecycle_censored_late_n": 327,
 }
+CANONICAL_X300_SCHEDULE_INCOMPATIBLE = "CANONICAL_X300_SCHEDULE_INCOMPATIBLE"
+CANONICAL_SCHEDULE_UNBOUND = "CANONICAL_SCHEDULE_UNBOUND"
+CANONICAL_RELEASE_IDENTITY_UNBOUND = "CANONICAL_RELEASE_IDENTITY_UNBOUND"
+CANONICAL_RELEASE_BIND_FAILED = "CANONICAL_RELEASE_BIND_FAILED"
 
 
 class ScientificEligibilityError(ValueError):
@@ -190,6 +195,222 @@ def bound_schedule_y_point_ids(root: Path | None = None) -> tuple[str, ...]:
     )
 
 
+def canonical_c1_identity(root: Path | None = None) -> dict[str, str]:
+    loaded = load_projection_spec(Path(root) if root is not None else Path("."))
+    c1 = loaded.get("canonical_c1")
+    if not isinstance(c1, Mapping):
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+    dataset_id = str(c1.get("dataset_id") or "")
+    cohort_id = str(c1.get("cohort_id") or "")
+    release_id = str(c1.get("release_id") or "")
+    if not dataset_id or not cohort_id or not release_id:
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+    return {
+        "dataset_id": dataset_id,
+        "cohort_id": cohort_id,
+        "release_id": release_id,
+    }
+
+
+def verify_factory_x300_schedule(schedule: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Fail closed unless the bound collection schedule matches factory X300 PIT."""
+
+    if not isinstance(schedule, Mapping):
+        raise ScientificEligibilityError(CANONICAL_X300_SCHEDULE_INCOMPATIBLE)
+    x_point = schedule.get("x_point")
+    if not isinstance(x_point, Mapping):
+        raise ScientificEligibilityError(CANONICAL_X300_SCHEDULE_INCOMPATIBLE)
+    try:
+        due = int(x_point.get("due_offset_seconds"))
+        late = int(x_point.get("allowed_lateness_seconds"))
+    except (TypeError, ValueError) as exc:
+        raise ScientificEligibilityError(CANONICAL_X300_SCHEDULE_INCOMPATIBLE) from exc
+    point_id = str(x_point.get("point_id") or "")
+    if (
+        point_id != X_POINT_ID
+        or due != X_DUE_OFFSET_SECONDS
+        or late != X_ALLOWED_LATENESS_SECONDS
+    ):
+        raise ScientificEligibilityError(CANONICAL_X300_SCHEDULE_INCOMPATIBLE)
+    population = (
+        schedule.get("population")
+        if isinstance(schedule.get("population"), Mapping)
+        else {}
+    )
+    predicates = population.get("x_eligibility_predicates") if isinstance(population, Mapping) else None
+    field_ok = False
+    if isinstance(predicates, list):
+        for item in predicates:
+            if isinstance(item, Mapping) and str(item.get("field_id") or "") == X_FIELD_ID:
+                field_ok = True
+                break
+    if not field_ok:
+        raise ScientificEligibilityError(CANONICAL_X300_SCHEDULE_INCOMPATIBLE)
+    from solana_alpha_lab.factory.observation_schedule import (
+        schedule_sha256 as hash_schedule,
+    )
+
+    return {
+        "schedule_key": str(schedule.get("schedule_key") or schedule.get("schedule_id") or ""),
+        "schedule_sha256": hash_schedule(schedule),
+        "x_point_id": X_POINT_ID,
+        "x_field_id": X_FIELD_ID,
+        "x_due_offset_seconds": due,
+        "x_allowed_lateness_seconds": late,
+        "compatible": True,
+    }
+
+
+def lineage_canonical_corpus_pins(
+    data_root: Path,
+    *,
+    repo_root: Path,
+) -> dict[str, str]:
+    """Resolve expected C1 identity through current lineage hashes, not ExperimentSpec."""
+
+    expected = canonical_c1_identity(repo_root)
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        load_live_corpus_lineage,
+    )
+
+    try:
+        lineage = load_live_corpus_lineage(Path(data_root))
+    except Exception as exc:
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND) from exc
+    if str(lineage.get("corpus_dataset_id") or "") != expected["dataset_id"]:
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+    matches = [
+        item
+        for item in (lineage.get("cohorts") or [])
+        if isinstance(item, Mapping)
+        and str(item.get("cohort_id") or "") == expected["cohort_id"]
+    ]
+    if len(matches) != 1:
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+    component = matches[0]
+    if str(component.get("release_id") or "") != expected["release_id"]:
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+    census_sha = str(component.get("census_sha256") or "")
+    obs_sha = str(component.get("observations_sha256") or "")
+    if len(census_sha) != 64 or len(obs_sha) != 64:
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+    if any(char not in "0123456789abcdef" for char in census_sha + obs_sha):
+        raise ScientificEligibilityError(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+    return {
+        "dataset_id": expected["dataset_id"],
+        "cohort_id": expected["cohort_id"],
+        "release_id": expected["release_id"],
+        "census_sha256": census_sha,
+        "observations_sha256": obs_sha,
+    }
+
+
+def _schedule_document_from_ops_store(
+    data_root: Path, wanted: str
+) -> dict[str, Any] | None:
+    """Read-only lookup of the registered schedule on this data_root."""
+
+    from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+        observation_ops_store_path,
+    )
+    from solana_alpha_lab.factory.observation_schedule_store import (
+        ObservationScheduleStore,
+        ObservationScheduleStoreError,
+    )
+
+    path = observation_ops_store_path(Path(data_root))
+    try:
+        store = ObservationScheduleStore(path, readonly=True)
+    except ObservationScheduleStoreError:
+        return None
+    try:
+        row = store.get_registered_schedule(wanted)
+    finally:
+        store._conn.close()
+    if not isinstance(row, Mapping):
+        return None
+    document = row.get("document")
+    if not isinstance(document, Mapping):
+        return None
+    return dict(document)
+
+
+def bind_lineage_canonical_release(data_root: Path, *, repo_root: Path) -> Any:
+    """Reuse canonical hash-bind machinery on lineage pins for the expected C1."""
+
+    from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
+        bind_canonical_censoring_inputs,
+    )
+
+    pins = lineage_canonical_corpus_pins(data_root, repo_root=repo_root)
+    return bind_canonical_censoring_inputs(Path(data_root), pins)
+
+
+def resolve_canonical_release_schedule(
+    data_root: Path,
+    census_rows: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Load the release-bound schedule document. Never trust ExperimentSpec."""
+
+    digests: list[str] = []
+    seen: set[str] = set()
+    for row in census_rows:
+        if not isinstance(row, Mapping):
+            continue
+        digest = str(row.get("source_schedule_sha256") or row.get("schedule_sha256") or "")
+        if len(digest) == 64 and digest not in seen:
+            seen.add(digest)
+            digests.append(digest)
+    if len(digests) != 1:
+        raise ScientificEligibilityError(CANONICAL_SCHEDULE_UNBOUND)
+    wanted = digests[0]
+    from solana_alpha_lab.factory.observation_schedule import (
+        schedule_sha256 as hash_schedule,
+    )
+    from solana_alpha_lab.factory.research_store import (
+        ExistingResearchStoreReader,
+        ResearchStoreError,
+    )
+
+    documents: list[dict[str, Any]] = []
+    encoded: set[str] = set()
+    try:
+        store = ExistingResearchStoreReader(Path(data_root))
+    except ResearchStoreError:
+        store = None
+    if store is not None:
+        for record in store.iter_committed_records():
+            if str(getattr(record, "record_kind", "") or "") != "OBSERVATION_SCHEDULE":
+                continue
+            try:
+                payload = json.loads(record.payload_json)
+            except (TypeError, json.JSONDecodeError, AttributeError):
+                continue
+            if not isinstance(payload, Mapping):
+                continue
+            if str(payload.get("schedule_sha256") or "") != wanted:
+                continue
+            document = payload.get("schedule")
+            if not isinstance(document, Mapping):
+                continue
+            as_dict = dict(document)
+            marker = json.dumps(as_dict, sort_keys=True, separators=(",", ":"))
+            if marker in encoded:
+                continue
+            encoded.add(marker)
+            documents.append(as_dict)
+    if len(documents) != 1:
+        ops_document = _schedule_document_from_ops_store(Path(data_root), wanted)
+        documents = [] if ops_document is None else [ops_document]
+    if len(documents) != 1:
+        raise ScientificEligibilityError(CANONICAL_SCHEDULE_UNBOUND)
+    document = documents[0]
+    if hash_schedule(document) != wanted:
+        raise ScientificEligibilityError(CANONICAL_X300_SCHEDULE_INCOMPATIBLE)
+    verify_factory_x300_schedule(document)
+    return document
+
+
 def project_scientific_eligibility(
     census_rows: Sequence[Mapping[str, Any]],
     observation_rows: Sequence[Mapping[str, Any]],
@@ -197,18 +418,25 @@ def project_scientific_eligibility(
     spec: Mapping[str, Any] | None = None,
     schedule: Mapping[str, Any] | None = None,
     release_binding: Mapping[str, Any] | None = None,
+    canonical_schedule: Mapping[str, Any] | None = None,
+    require_canonical_schedule: bool = False,
     x_due_offset_seconds: int = X_DUE_OFFSET_SECONDS,
     x_allowed_lateness_seconds: int = X_ALLOWED_LATENESS_SECONDS,
 ) -> dict[str, Any]:
     """Project base_x, lifecycle coverage, and typed outcome readiness.
 
     Observation rows may carry only mint/point_id/field_id/state/clocks.
-    Y ``typed_value`` is never read.
+    Y ``typed_value`` is never read. ExperimentSpec ``schedule`` never
+    widens factory X300 PIT. Canonical consume-time must pass the
+    release-bound schedule and fail closed on geometry mismatch.
     """
 
     _ = schedule
     x_due_offset_seconds = X_DUE_OFFSET_SECONDS
     x_allowed_lateness_seconds = X_ALLOWED_LATENESS_SECONDS
+    schedule_identity: dict[str, Any] | None = None
+    if require_canonical_schedule or canonical_schedule is not None:
+        schedule_identity = verify_factory_x300_schedule(canonical_schedule)
 
     census_by_mint: dict[str, Mapping[str, Any]] = {}
     for row in census_rows:
@@ -315,13 +543,11 @@ def project_scientific_eligibility(
                     n_absent += 1
                     unresolved += 1
                     continue
-                if state not in RESOLVED_OBSERVATION_STATES:
-                    n_other += 1
-                    unresolved += 1
-                    continue
                 if state == STATE_OBSERVED:
                     n_observed += 1
-                elif state in {"CENSORED_LATE", "CENSORED"}:
+                    continue
+                unresolved += 1
+                if state in {"CENSORED_LATE", "CENSORED"}:
                     n_censored_late += 1
                 elif state == "MISSING_TYPED":
                     n_typed_missing += 1
@@ -352,7 +578,10 @@ def project_scientific_eligibility(
         "schema": PROJECTION_SCHEMA,
         "schema_version": PROJECTION_SCHEMA_VERSION,
         "rule_id": RULE_ID,
-        "release_binding": dict(release_binding or {}),
+        "release_binding": {
+            **dict(release_binding or {}),
+            **({} if schedule_identity is None else {"canonical_schedule": schedule_identity}),
+        },
         "experiment_spec_sha256": (
             None
             if spec is None
@@ -398,6 +627,9 @@ def load_projection_tables(
         "candidate_state",
         "denominator_state",
         "authoritative_anchor",
+        "source_schedule_sha256",
+        "schedule_sha256",
+        "activation_id",
     )
     obs_columns = (
         "mint",
@@ -450,37 +682,65 @@ def try_project_scientific_eligibility_from_data_root(
     spec: Mapping[str, Any] | None = None,
     schedule: Mapping[str, Any] | None = None,
 ) -> dict[str, Any] | None:
-    """Consume-time projection over the bound canonical release. None if unbound."""
+    """Consume-time projection over the bound canonical release.
+
+    Unbound identity (this data_root is not the expected C1) returns None.
+    Bound identity with unproven or incompatible X300 geometry raises a typed
+    error instead of silently applying factory 300+300.
+    """
 
     try:
-        from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
-            bind_canonical_censoring_inputs,
-            load_diagnostic_spec,
+        pins = lineage_canonical_corpus_pins(
+            Path(data_root), repo_root=Path(repo_root)
         )
-
-        diagnostic = load_diagnostic_spec(Path(repo_root))
-        corpus = diagnostic.get("canonical_corpus")
-        if not isinstance(corpus, Mapping):
+    except ScientificEligibilityError as exc:
+        if exc.code == CANONICAL_RELEASE_IDENTITY_UNBOUND:
             return None
-        binding = bind_canonical_censoring_inputs(Path(data_root), corpus)
+        raise
+    from solana_alpha_lab.factory.hfic_censoring_ignorability_diagnostic import (
+        bind_canonical_censoring_inputs,
+    )
+
+    try:
+        binding = bind_canonical_censoring_inputs(Path(data_root), pins)
+    except ScientificEligibilityError:
+        raise
+    except Exception as exc:
+        code = getattr(exc, "code", None)
+        raise ScientificEligibilityError(
+            str(code)
+            if isinstance(code, str) and code
+            else CANONICAL_RELEASE_BIND_FAILED
+        ) from exc
+    try:
         census_rows, observation_rows = load_projection_tables(
             binding.census_path,
             binding.observations_path,
+        )
+        canonical_schedule = resolve_canonical_release_schedule(
+            Path(data_root),
+            census_rows,
         )
         return project_scientific_eligibility(
             census_rows,
             observation_rows,
             spec=spec,
             schedule=schedule,
+            canonical_schedule=canonical_schedule,
+            require_canonical_schedule=True,
             release_binding={
                 "release_id": binding.release_id,
                 "cohort_id": binding.cohort_id,
+                "dataset_id": binding.dataset_id,
+                "dataset_manifest_id": binding.dataset_manifest_id,
                 "census_sha256": binding.census_sha256,
                 "observations_sha256": binding.observations_sha256,
             },
         )
-    except Exception:
-        return None
+    except ScientificEligibilityError:
+        raise
+    except Exception as exc:
+        raise ScientificEligibilityError("PROJECTION_TABLE_UNREADABLE") from exc
 
 
 def _projection_structurally_valid(projection: Mapping[str, Any]) -> bool:
@@ -594,6 +854,10 @@ def assert_c1_shape(projection: Mapping[str, Any]) -> None:
 
 __all__ = [
     "C1_EXPECTED",
+    "CANONICAL_RELEASE_BIND_FAILED",
+    "CANONICAL_RELEASE_IDENTITY_UNBOUND",
+    "CANONICAL_SCHEDULE_UNBOUND",
+    "CANONICAL_X300_SCHEDULE_INCOMPATIBLE",
     "ELIGIBILITY_SCOPE_BASE_X",
     "ELIGIBILITY_SCOPE_FULL_LIFECYCLE",
     "MIN_USABLE_BASE_X_POPULATION",
@@ -608,16 +872,21 @@ __all__ = [
     "X_FIELD_ID",
     "X_POINT_ID",
     "assert_c1_shape",
+    "bind_lineage_canonical_release",
     "bound_schedule_y_point_ids",
+    "canonical_c1_identity",
     "full_lifecycle_scope_equivalent",
+    "lineage_canonical_corpus_pins",
     "load_projection_spec",
     "load_projection_tables",
     "project_scientific_eligibility",
     "required_outcome_point_ids",
     "required_outcomes_from_spec",
+    "resolve_canonical_release_schedule",
     "sanitize_projection_row",
     "schedule_y_point_ids",
     "try_project_scientific_eligibility_from_data_root",
     "validated_projection_readiness",
+    "verify_factory_x300_schedule",
     "y_columns_forbidden",
 ]

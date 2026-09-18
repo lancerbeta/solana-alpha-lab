@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -17,6 +18,7 @@ from solana_alpha_lab.factory.experiment_spec import (
     validate_experiment_document,
 )
 from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+    BLOCK_FORGE_EVIDENCE_GAP,
     BLOCK_FORGE_SELECTION_RISK,
     FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
     apply_selection_gate_to_preflight,
@@ -24,6 +26,7 @@ from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
 )
 from solana_alpha_lab.factory.scientific_eligibility_projection import (
     C1_EXPECTED,
+    CANONICAL_SCHEDULE_UNBOUND,
     ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
     MIN_USABLE_BASE_X_POPULATION,
     READINESS_COMPLETE,
@@ -38,6 +41,7 @@ from solana_alpha_lab.factory.scientific_eligibility_projection import (
     bound_schedule_y_point_ids,
     full_lifecycle_scope_equivalent,
     project_scientific_eligibility,
+    try_project_scientific_eligibility_from_data_root,
     y_columns_forbidden,
 )
 
@@ -107,6 +111,38 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
             475,
         )
 
+    def test_c1_shape_required_y86400_keeps_denominator(self) -> None:
+        census, obs = _c1_shape()
+        projected = project_scientific_eligibility(
+            census,
+            obs,
+            spec={
+                "schema_version": "1.3",
+                "required_outcomes": [
+                    {
+                        "point_id": "Y86400",
+                        "field_ids": ["FIELD-USD-PRICE-001"],
+                        "role": "PRIMARY",
+                    }
+                ],
+            },
+        )
+        assert_c1_shape(projected)
+        coverage = projected["outcome_coverage"][0]
+        self.assertEqual(projected["base_x_population"]["n"], 475)
+        self.assertEqual(coverage["denominator_n"], 475)
+        self.assertEqual(coverage["n_observed"], 148)
+        self.assertEqual(coverage["n_censored_late"], 327)
+        self.assertEqual(
+            coverage["n_observed"]
+            + coverage["n_censored_late"]
+            + coverage["n_typed_missing"]
+            + coverage["n_absent"]
+            + coverage["n_other"],
+            475,
+        )
+        self.assertEqual(projected["outcome_readiness"], READINESS_MISSINGNESS_UNRESOLVED)
+
     def test_late_x300_excluded_from_base_x(self) -> None:
         census = [_census("a", "observed"), _census("b", "observed")]
         obs = [_x300("a"), _x300("b", late=True)]
@@ -134,7 +170,7 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
             },
         )
         self.assertEqual(projected["base_x_population"]["n"], 1)
-        self.assertEqual(projected["outcome_readiness"], READINESS_COMPLETE)
+        self.assertEqual(projected["outcome_readiness"], READINESS_MISSINGNESS_UNRESOLVED)
         self.assertEqual(projected["outcome_coverage"][0]["n_censored_late"], 1)
         self.assertEqual(projected["outcome_coverage"][0]["denominator_n"], 1)
 
@@ -183,14 +219,15 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         self.assertEqual(view["action"], "START_NEW_SESSION")
         self.assertTrue(view["caveat"])
         self.assertEqual(view["eligibility_scope"], ELIGIBILITY_SCOPE_FULL_LIFECYCLE)
-        veto = apply_selection_gate_to_preflight(
+        equal_points = apply_selection_gate_to_preflight(
             "START_NEW_SESSION",
             receipt,
             required_outcome_point_ids=("Y900", "Y1800"),
             schedule_y_point_ids=("Y900", "Y1800"),
         )
-        self.assertEqual(veto["action"], "STOP")
-        self.assertEqual(veto["router_decision"], BLOCK_FORGE_SELECTION_RISK)
+        self.assertEqual(equal_points["action"], "START_NEW_SESSION")
+        self.assertTrue(equal_points["caveat"])
+        self.assertFalse(equal_points.get("full_lifecycle_equivalent"))
 
     def test_caveat_pass_through(self) -> None:
         receipt = {
@@ -376,8 +413,10 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
             required_outcome_point_ids=("Y900", "Y1800"),
             schedule_y_point_ids=("Y900", "Y1800"),
         )
-        self.assertEqual(view["action"], "STOP")
+        self.assertEqual(view["action"], "START_NEW_SESSION")
+        self.assertTrue(view["caveat"])
         self.assertEqual(view["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+        self.assertFalse(view.get("full_lifecycle_equivalent"))
 
     def test_forged_complete_stamp_is_unresolved(self) -> None:
         from solana_alpha_lab.factory.lane_classifier import (
@@ -454,6 +493,42 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         self.assertEqual(gate, CONTROL_YIELD_BELOW_MIN)
         self.assertEqual(observed, 1)
 
+    def test_control_bound_identity_without_schedule_does_not_stamp(self) -> None:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            CONTROL_CORPUS_UNRESOLVABLE,
+            resolve_control_corpus_yield,
+        )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            CORPUS_DATASET_ID,
+        )
+        from tests.test_hfic_censoring_ignorability_diagnostic_v1 import (
+            _install_canonical_corpus,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _install_canonical_corpus(data_root)
+            with self.assertRaises(ScientificEligibilityError) as raised:
+                try_project_scientific_eligibility_from_data_root(
+                    data_root, repo_root=ROOT
+                )
+            self.assertEqual(str(raised.exception), CANONICAL_SCHEDULE_UNBOUND)
+            gate, observed = resolve_control_corpus_yield(
+                [
+                    {
+                        "dataset_id": CORPUS_DATASET_ID,
+                        "base_x_population_n": 475,
+                        "labels": {"base_x_population_n": 475},
+                    }
+                ],
+                corpus_dataset_id=CORPUS_DATASET_ID,
+                min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
+                data_root=data_root,
+                repo_root=ROOT,
+            )
+            self.assertEqual(gate, CONTROL_CORPUS_UNRESOLVABLE)
+            self.assertIsNone(observed)
+
     def test_experiment_own_y_points_do_not_make_full_lifecycle(self) -> None:
         bound = bound_schedule_y_point_ids(ROOT)
         self.assertIn("Y900", bound)
@@ -501,6 +576,7 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         self.assertEqual(first["outcome_coverage"][0]["n_censored_late"], 1)
         self.assertEqual(second["outcome_coverage"][0]["n_censored_late"], 1)
         self.assertEqual(first["outcome_coverage"][0]["n_observed"], 0)
+        self.assertEqual(first["outcome_readiness"], READINESS_MISSINGNESS_UNRESOLVED)
 
     def test_horizon_spec_is_not_auto_vetoed(self) -> None:
         receipt = {
@@ -538,6 +614,111 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         )
         self.assertEqual(gate, CONTROL_CORPUS_UNRESOLVABLE)
         self.assertIsNone(observed)
+
+    def test_required_observed_is_complete(self) -> None:
+        census = [_census("a", "observed")]
+        projected = project_scientific_eligibility(
+            census,
+            [_x300("a"), _y("a", "Y900", "FIELD-USD-PRICE-001", "OBSERVED")],
+            spec={
+                "schema_version": "1.3",
+                "required_outcomes": [
+                    {
+                        "point_id": "Y900",
+                        "field_ids": ["FIELD-USD-PRICE-001"],
+                        "role": "PRIMARY",
+                    }
+                ],
+            },
+        )
+        self.assertEqual(projected["base_x_population"]["n"], 1)
+        self.assertEqual(projected["outcome_readiness"], READINESS_COMPLETE)
+        self.assertEqual(projected["outcome_coverage"][0]["n_observed"], 1)
+
+    def test_required_non_observed_states_are_unresolved(self) -> None:
+        census = [_census("a", "observed")]
+        spec = {
+            "schema_version": "1.3",
+            "required_outcomes": [
+                {
+                    "point_id": "Y900",
+                    "field_ids": ["FIELD-USD-PRICE-001"],
+                    "role": "PRIMARY",
+                }
+            ],
+        }
+        for state in (
+            "MISSING_TYPED",
+            "CENSORED",
+            "DISAPPEARED",
+            "EXCLUDED_AMBIGUOUS",
+            "UNKNOWN_STATE",
+        ):
+            projected = project_scientific_eligibility(
+                census,
+                [_x300("a"), _y("a", "Y900", "FIELD-USD-PRICE-001", state)],
+                spec=spec,
+            )
+            self.assertEqual(projected["base_x_population"]["n"], 1, state)
+            self.assertEqual(
+                projected["outcome_readiness"],
+                READINESS_MISSINGNESS_UNRESOLVED,
+                state,
+            )
+            self.assertEqual(projected["outcome_coverage"][0]["denominator_n"], 1, state)
+
+    def test_canonical_schedule_mismatch_fails_closed(self) -> None:
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            CANONICAL_X300_SCHEDULE_INCOMPATIBLE,
+            verify_factory_x300_schedule,
+        )
+
+        with self.assertRaises(ScientificEligibilityError) as raised:
+            project_scientific_eligibility(
+                [_census("a", "observed")],
+                [_x300("a")],
+                canonical_schedule={
+                    "schedule_key": "OBS-MISMATCH",
+                    "population": {
+                        "x_eligibility_predicates": [
+                            {"field_id": X_FIELD_ID, "operator": "GTE"}
+                        ]
+                    },
+                    "x_point": {
+                        "point_id": X_POINT_ID,
+                        "due_offset_seconds": 300,
+                        "allowed_lateness_seconds": 10_000,
+                    },
+                },
+            )
+        self.assertEqual(str(raised.exception), CANONICAL_X300_SCHEDULE_INCOMPATIBLE)
+        with self.assertRaises(ScientificEligibilityError):
+            verify_factory_x300_schedule(
+                {
+                    "population": {
+                        "x_eligibility_predicates": [
+                            {"field_id": "FIELD-MARKET-CAP-USD-001"}
+                        ]
+                    },
+                    "x_point": {
+                        "point_id": X_POINT_ID,
+                        "due_offset_seconds": X_DUE_OFFSET_SECONDS,
+                        "allowed_lateness_seconds": X_ALLOWED_LATENESS_SECONDS,
+                    },
+                }
+            )
+
+    def test_integrity_invalid_receipt_still_stops(self) -> None:
+        view = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION",
+            {
+                "router_decision": BLOCK_FORGE_EVIDENCE_GAP,
+                "receipt_sha256": "",
+                "integrity_invalid": True,
+            },
+        )
+        self.assertEqual(view["action"], "STOP")
+        self.assertTrue(view.get("integrity_invalid"))
 
     def test_experiment_spec_1_3_requires_required_outcomes(self) -> None:
         with self.assertRaises(ExperimentSpecError):

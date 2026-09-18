@@ -293,7 +293,7 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 |---|---|
 | `PASS_FAST_LANE_READY` | Передать сюда итог Critic. После проверки отдельно разрешить no-Git run. |
 | `PASS_CHANGE_LANE_REQUIRED` | Передать сюда PRD+SSD capability-атома. После проверки отдельно разрешить один PR. |
-| `PASS_DATA_OPTION_REQUIRED` | Смотри classifier `reason_codes`. `OUTCOME_MISSINGNESS_UNRESOLVED` = coverage report на `base_x` (`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`), не collection. `FULL_LIFECYCLE_SELECTION_SCOPE` = сузь required Y (`NARROW_REQUIRED_OUTCOMES_OR_STOP`). `SELECTION_RECEIPT_INTEGRITY_INVALID` = rebind receipt identity (`REBIND_SELECTION_RECEIPT_IDENTITY`). Только residual data-gap без этих reason = collection option. |
+| `PASS_DATA_OPTION_REQUIRED` | Смотри classifier `reason_codes`. `OUTCOME_MISSINGNESS_UNRESOLVED` = coverage report на `base_x` (`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`), не collection. `SELECTION_RECEIPT_INTEGRITY_INVALID` = rebind receipt identity (`REBIND_SELECTION_RECEIPT_IDENTITY`). `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` / `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` = `RESOLVE_IMMUTABLE_DATA_BINDINGS`, не collection и не stamped N. Исторический FULL_LIFECYCLE receipt сам по себе = caveat, не auto-veto. Только residual data-gap без этих reason = collection option. |
 | `REVISE_ONCE` | Только primary/C1. Fallback: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. Если это Critic #2 / C2: **не** revise. `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`. `OWNER NEXT=STOP`. |
 | `KILL_*` | Если это ещё primary/C1: same slash auto-screens the already-frozen runner-up once (`RUNNER_UP_AWAITING_CRITIC`). Do not regenerate, do not pick another portfolio candidate, do not start a new AUTO search. Если это уже C2: session complete, no survivor unless a PASS terminal. |
 | `RUNNER_UP_REVISION_REQUIRED` | Typed PAUSE after C2 `REVISE_ONCE`. Evening STOP. Preserve C2 in memory. Do not claim scientific fail or pass. No C3. |
@@ -1103,18 +1103,20 @@ OWNER_DECISION_REQUIRED
    Не создавай `CRITIC_INPUT_PACKET` 1.5.
 3. Разреши stable IDs, hashes/fingerprints, capabilities, query recipes и parameter schema. Отсутствующие значения не выдумывай.
 4. Исторический selection receipt остаётся byte-immutable caveat
-   `FULL_LIFECYCLE_COMPLETENESS`. Не делай глобальный STOP `START_NEW_SESSION`
-   и не veto horizon-specific experiment, пока required Y set не равен
-   bound schedule Y set в точности.
+   `FULL_LIFECYCLE_COMPLETENESS`. Не делай глобальный STOP `START_NEW_SESSION`.
+   Равенство Y-point set bound schedule **не** veto ExperimentSpec 1.3.
+   Сломанный/mismatched receipt остаётся integrity fail-closed.
 5. Выполни только schema validation и deterministic lane classification network-free. Эксперимент не запускай.
    Не штампуй `outcome_readiness=COMPLETE`. Classifier принимает COMPLETE
    только из live release projection. Attached/self-hashed stamps fail closed.
-   `COMPLETE` значит: каждый required outcome имеет resolved observation
-   state, включая `CENSORED_LATE` / `MISSING_TYPED`. Это не complete-case и
+   `COMPLETE` значит: каждый required `(point_id, field_id)` имеет
+   `state == OBSERVED` для каждого member в `base_x`.
+   `CENSORED_LATE` / `MISSING_TYPED` / absent — это coverage, не наблюдение
+   required value, и дают `MISSINGNESS_UNRESOLVED`. Это не complete-case и
    не сжимает `base_x.n`.
-   `MISSINGNESS_UNRESOLVED` (absent/unknown state) fail-close в существующий
-   data/science-option route. NEXT classifier =
-   `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`, не «почини binding».
+   `MISSINGNESS_UNRESOLVED` fail-close в существующий data/science-option
+   route. NEXT classifier = `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`,
+   не «почини binding».
 6. Результат classifier сильнее provisional lane Forge.
 
 Преобразуй classifier outcome:
@@ -1126,8 +1128,8 @@ OWNER_DECISION_REQUIRED
 | Named reusable capability отсутствует | `PASS_CHANGE_LANE_REQUIRED` |
 | Required forward-only data отсутствуют | `PASS_DATA_OPTION_REQUIRED` |
 | `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` — coverage report на `base_x`, не заказ новой collection. NEXT=`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X` |
-| `BLOCKED_DATA` + `FULL_LIFECYCLE_SELECTION_SCOPE` | `PASS_DATA_OPTION_REQUIRED` — сузь required Y set. NEXT=`NARROW_REQUIRED_OUTCOMES_OR_STOP`. Не collection. |
 | `BLOCKED_DATA` + `SELECTION_RECEIPT_INTEGRITY_INVALID` | `PASS_DATA_OPTION_REQUIRED` — сломан/mismatched historical receipt. NEXT=`REBIND_SELECTION_RECEIPT_IDENTITY`. Это integrity STOP, не selection veto и не collection. |
+| `BLOCKED_DATA` + `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` / `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` | `PASS_DATA_OPTION_REQUIRED` — consume-time identity/geometry. NEXT=`RESOLVE_IMMUTABLE_DATA_BINDINGS`. Не collection и не stamped N. |
 | Spec incoherent/invalid | соответствующий `KILL_*` либо один `REVISE_ONCE` |
 | Promotion requested | `OWNER_DECISION_REQUIRED`; promotion не выполнять |
 
@@ -1183,10 +1185,13 @@ Post-merge path back to no-Git Fast Lane
 
 - `OUTCOME_MISSINGNESS_UNRESOLVED` / `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`:
   верни coverage report на `base_x.n`. N не сжимать. Не заказывай collection.
-- `FULL_LIFECYCLE_SELECTION_SCOPE` / `NARROW_REQUIRED_OUTCOMES_OR_STOP`:
-  сузь `required_outcomes` до horizon-specific Y set или STOP. Не collection.
 - `SELECTION_RECEIPT_INTEGRITY_INVALID` / `REBIND_SELECTION_RECEIPT_IDENTITY`:
   пересобери identity/binding исторического receipt. Это не selection veto.
+- `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` /
+  `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` /
+  `RESOLVE_IMMUTABLE_DATA_BINDINGS`:
+  consume-time identity или factory X300 geometry не доказаны. Не штампуй
+  N и не заказывай collection.
 - иначе (residual required forward-only data): верни только collection
   decision contract. Collector PRD+SSD появится лишь после owner acceptance
   стоимости/authority и положительного option-value gate.

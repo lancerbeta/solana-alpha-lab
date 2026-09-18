@@ -36,6 +36,7 @@ from solana_alpha_lab.factory.early_market_panel_importer import (
     MIN_USABLE_YIELD_ELIGIBLE,
 )
 from solana_alpha_lab.factory.hfic_control_integrity import (
+    CONTROL_CORPUS_UNRESOLVABLE,
     CURRENT_REPRESENTATION_CONTROL_V1,
 )
 from solana_alpha_lab.factory.hfic_preflight import (
@@ -900,16 +901,13 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                     clock=_CLOCK,
                     evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
                 )
-            self.assertEqual(control["action"], "START_NEW_SESSION")
-            self.assertEqual(control["router_decision"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(control["action"], "STOP")
+            self.assertEqual(control["terminal"], CONTROL_CORPUS_UNRESOLVABLE)
             self.assertEqual(
                 control["evidence_surface_mode"],
                 CURRENT_REPRESENTATION_CONTROL_V1,
             )
-            self.assertNotEqual(
-                control.get("next"),
-                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
-            )
+            self.assertIsNone(control.get("router_decision"))
 
     def test_prior_hfic_sessions_remain_in_scientific_context(self) -> None:
         spec = load_gate_spec(ROOT)

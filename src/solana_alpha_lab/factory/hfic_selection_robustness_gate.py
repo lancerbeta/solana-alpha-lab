@@ -197,17 +197,13 @@ def apply_selection_gate_to_preflight(
 
     from solana_alpha_lab.factory.scientific_eligibility_projection import (
         ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
-        full_lifecycle_scope_equivalent,
     )
 
     if not isinstance(gate_receipt, Mapping):
         return {"applicable": False, "action": action, "terminal": None}
     scoped = interpret_selection_gate_receipt(gate_receipt)
     decision = str(scoped["router_decision"] or "")
-    equivalent = full_lifecycle_scope_equivalent(
-        required_outcome_point_ids,
-        schedule_y_point_ids,
-    )
+    del required_outcome_point_ids, schedule_y_point_ids
     if gate_receipt.get("integrity_invalid"):
         return {
             "applicable": True,
@@ -218,33 +214,6 @@ def apply_selection_gate_to_preflight(
             "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
             "full_lifecycle_equivalent": False,
             "integrity_invalid": True,
-        }
-    if action != "START_NEW_SESSION" and not equivalent:
-        if decision in {
-            BLOCK_FORGE_SELECTION_RISK,
-            BLOCK_FORGE_EVIDENCE_GAP,
-            FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
-        }:
-            return {
-                "applicable": True,
-                "action": action,
-                "terminal": None,
-                "router_decision": decision,
-                "gate_receipt_sha256": scoped["gate_receipt_sha256"],
-                "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
-                "caveat": True,
-                "full_lifecycle_equivalent": False,
-            }
-        return {"applicable": False, "action": action, "terminal": None}
-    if equivalent and decision in {BLOCK_FORGE_SELECTION_RISK, BLOCK_FORGE_EVIDENCE_GAP}:
-        return {
-            "applicable": True,
-            "action": "STOP",
-            "terminal": decision,
-            "router_decision": decision,
-            "gate_receipt_sha256": scoped["gate_receipt_sha256"],
-            "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
-            "full_lifecycle_equivalent": True,
         }
     if decision in {
         BLOCK_FORGE_SELECTION_RISK,
@@ -1084,14 +1053,21 @@ def load_applicable_gate_receipt(
     if stored != canonical_sha256(body):
         return _invalid_gate_receipt()
     try:
-        spec = _require_frozen_gate_spec(Path(root), SPEC_RELATIVE)
-        corpus = (
-            spec.get("canonical_corpus")
-            if isinstance(spec.get("canonical_corpus"), Mapping)
-            else {}
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            ScientificEligibilityError,
+            bind_lineage_canonical_release,
         )
-        binding = bind_canonical_censoring_inputs(Path(data_root), corpus)
-    except (SelectionRobustnessGateError, CensoringDiagnosticError, OSError):
+
+        binding = bind_lineage_canonical_release(
+            Path(data_root), repo_root=Path(root)
+        )
+        _require_frozen_gate_spec(Path(root), SPEC_RELATIVE)
+    except (
+        SelectionRobustnessGateError,
+        CensoringDiagnosticError,
+        ScientificEligibilityError,
+        OSError,
+    ):
         return _invalid_gate_receipt(SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH)
     stored_identity = receipt_input_identity(loaded)
     current_identity = current_gate_input_identity(binding)
