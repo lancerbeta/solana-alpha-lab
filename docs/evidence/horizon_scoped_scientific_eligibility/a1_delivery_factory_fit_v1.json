@@ -4,8 +4,8 @@
   "review_id": "HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-FACTORY-FIT-001",
   "as_of": "2026-09-18",
   "task_id": "HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1",
-  "reviewed_bindings_sha256": "a54dae6ce57a9707a07b7fd07421455c8ac48d4128a77e0a82ed2485cde44ba6",
-  "reviewed_inventory_sha256": "23ff14e30a879ffcc3d85586c72ca2bf2bc3b7b71b7d2e296d949e3ba981cc9f",
+  "reviewed_bindings_sha256": "996e51ffe4e4d5ce82dbf6250354e7f4e43646895c675cde60af8b00a7b50e38",
+  "reviewed_inventory_sha256": "4fe6293edeb3010a795fad588b22826721796c0da0f7122b818225c21a383bad",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
