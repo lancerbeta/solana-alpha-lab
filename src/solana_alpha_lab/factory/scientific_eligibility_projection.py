@@ -206,7 +206,17 @@ def project_scientific_eligibility(
     Y ``typed_value`` is never read.
     """
 
-    _ = schedule  # X PIT is factory-bound; experiment schedules cannot widen base_x.
+    _ = schedule
+    x_due_offset_seconds = X_DUE_OFFSET_SECONDS
+    x_allowed_lateness_seconds = X_ALLOWED_LATENESS_SECONDS
+
+    census_by_mint: dict[str, Mapping[str, Any]] = {}
+    for row in census_rows:
+        if not isinstance(row, Mapping):
+            continue
+        mint = _mint(row)
+        if mint and mint not in census_by_mint:
+            census_by_mint[mint] = row
 
     x300_by_mint: dict[str, Mapping[str, Any]] = {}
     obs_index: dict[tuple[str, str, str], str] = {}
@@ -227,6 +237,16 @@ def project_scientific_eligibility(
             obs_index[key] = state
             obs_rank[key] = rank
         if point_id == X_POINT_ID and field_id == X_FIELD_ID:
+            census = census_by_mint.get(mint)
+            if census is None:
+                continue
+            if not _x300_pit_ok(
+                available_at=row.get("first_reliable_available_at"),
+                anchor=census.get("authoritative_anchor"),
+                due_offset_seconds=x_due_offset_seconds,
+                allowed_lateness_seconds=x_allowed_lateness_seconds,
+            ):
+                continue
             previous = x300_by_mint.get(mint)
             if previous is None or rank >= _available_at_rank(previous):
                 x300_by_mint[mint] = row
@@ -519,6 +539,15 @@ def validated_projection_readiness(
         return READINESS_MISSINGNESS_UNRESOLVED
     if not _projection_structurally_valid(projection):
         return READINESS_MISSINGNESS_UNRESOLVED
+    population = projection.get("base_x_population")
+    if isinstance(population, Mapping):
+        try:
+            due = population.get("x_due_offset_seconds", X_DUE_OFFSET_SECONDS)
+            late = population.get("x_allowed_lateness_seconds", X_ALLOWED_LATENESS_SECONDS)
+            if int(due) != X_DUE_OFFSET_SECONDS or int(late) != X_ALLOWED_LATENESS_SECONDS:
+                return READINESS_MISSINGNESS_UNRESOLVED
+        except (TypeError, ValueError):
+            return READINESS_MISSINGNESS_UNRESOLVED
     body = {key: value for key, value in projection.items() if key != "projection_sha256"}
     if projection.get("projection_sha256") != canonical_sha256(body):
         return READINESS_MISSINGNESS_UNRESOLVED

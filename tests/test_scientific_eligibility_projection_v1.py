@@ -298,6 +298,30 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
         self.assertEqual(gate, "OK")
         self.assertEqual(observed, 10)
 
+    def test_caller_offset_kwargs_cannot_widen_factory_pit(self) -> None:
+        census = [_census("a", "observed")]
+        projected = project_scientific_eligibility(
+            census,
+            [_x300("a", late=True)],
+            x_due_offset_seconds=300,
+            x_allowed_lateness_seconds=10_000,
+        )
+        self.assertEqual(projected["base_x_population"]["n"], 0)
+
+    def test_late_x300_duplicate_does_not_evict_timely_observed(self) -> None:
+        census = [_census("a", "observed")]
+        timely = _x300("a")
+        late_missing = _x300("a", late=True)
+        late_missing["state"] = "MISSING_TYPED"
+        projected = project_scientific_eligibility(
+            census, [timely, late_missing]
+        )
+        self.assertEqual(projected["base_x_population"]["n"], 1)
+        reversed_order = project_scientific_eligibility(
+            census, [late_missing, timely]
+        )
+        self.assertEqual(reversed_order["base_x_population"]["n"], 1)
+
     def test_experiment_x300_offsets_do_not_widen_factory_pit(self) -> None:
         census = [_census("a", "observed")]
         projected = project_scientific_eligibility(
