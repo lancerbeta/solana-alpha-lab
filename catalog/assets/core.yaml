@@ -37547,7 +37547,7 @@ records:
   as_of: '2026-09-18'
   truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1.md', repository_path: docs/tasks/HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1.md}
-  integrity: {kind: sha256, sha256: 0d0f5ec0cd31a2ebd83dc494e17c9ffb59c79373b7ea6e63b23c8ce3ab274404}
+  integrity: {kind: sha256, sha256: 199a4be0c52b904d912a4f1487c2d99b057b4c34e4f5ce6c63cbddf61bcceadf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
