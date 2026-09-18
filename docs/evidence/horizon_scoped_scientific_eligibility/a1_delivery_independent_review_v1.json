@@ -4,8 +4,8 @@
   "review_id": "HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-18",
   "task_id": "HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1",
-  "reviewed_bindings_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "reviewed_inventory_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "reviewed_bindings_sha256": "1849c7c37b998b14b2d4dad7a1da162e81cfb487403a79ec36dde72ff2cc2177",
+  "reviewed_inventory_sha256": "5f115d538c707ba6fb068b42e7c1a9e2bbfa92057ac3842f5938ae2f39a40b77",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -15,40 +15,66 @@
   "reviews": [
     {
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "REVIEW_PENDING"
+        "packet_fingerprint_sha256=0b86b6a6b5cc3bf4c7adc36dd1b683f2bb672f5990951c7dab01d2295a02e1f4",
+        "independence.claim_scope=PACKET_INFORMATION_PATH",
+        "implementation_transcript_seen=false",
+        "FACTORY_X300_PIT_SEALED_300_PLUS_300",
+        "LATE_X300_CANNOT_EVICT_TIMELY_OBSERVED",
+        "BOUND_SCHEDULE_Y_SET_IS_VETO_COMPARATOR",
+        "LIVE_PROJECTION_ONLY_COMPLETE",
+        "Y_MISSINGNESS_DOES_NOT_SHRINK_N"
       ]
     },
     {
       "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "REVIEW_PENDING"
+        "CALLER_OFFSET_KWARGS_OVERWRITTEN",
+        "PIT_WINDOWED_X300_COLLAPSE",
+        "VALIDATED_READINESS_REJECTS_NON_FACTORY_OFFSETS",
+        "CLASSIFY_FAILS_CLOSED_WITHOUT_LIVE_PROJECTION",
+        "NO_GLOBAL_START_VETO",
+        "NO_PACKET_1_5",
+        "NO_Y_TYPED_VALUE_READ"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "REVIEW_PENDING"
+        "C1_SHAPE_475_148_327_SYNTHETIC",
+        "BASE_X_ALWAYS_DENOMINATOR",
+        "EXPERIMENT_SPEC_1_3_REQUIRED_OUTCOMES",
+        "CRITIC_PACKET_STAYS_1_4",
+        "HORIZON_SPEC_NOT_AUTO_VETOED",
+        "CONTROL_NT_FLOOR_USES_BASE_X",
+        "NO_FORGE_THIS_ATOM"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
-      "verdict": "NOT_READY",
+      "verdict": "PASS",
       "findings": [
-        "REVIEW_PENDING"
+        "PASS_DATA_OPTION_REQUIRED_DISPATCHES_ON_REASON_CODES",
+        "THREE_TYPED_NEXT_PAIRS",
+        "COMPLETE_LIVE_PROJECTION_ONLY",
+        "NULL_BASE_X_IS_IMPORT_ONLY",
+        "INTEGRITY_STOP_VS_TOO_WIDE_Y",
+        "NO_NEW_OWNER_COMMAND"
       ]
     }
   ],
-  "verdict": "PENDING",
+  "remediation_history": [],
+  "verdict": "PASS",
   "non_claims": [
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
     "REVIEW_IS_NOT_SEMANTIC_DONE",
     "NO_ALPHA",
     "NO_COMPLETE_CASE_POPULATION",
     "NO_Y_TYPED_VALUE_READ",
+    "NO_CRITIC_INPUT_PACKET_1_5",
     "NO_FORGE_EXECUTION_THIS_ATOM",
     "NO_CANONICAL_DONE"
   ]
