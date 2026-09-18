@@ -4,8 +4,8 @@
   "review_id": "HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-18",
   "task_id": "HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1",
-  "reviewed_bindings_sha256": "1849c7c37b998b14b2d4dad7a1da162e81cfb487403a79ec36dde72ff2cc2177",
-  "reviewed_inventory_sha256": "5f115d538c707ba6fb068b42e7c1a9e2bbfa92057ac3842f5938ae2f39a40b77",
+  "reviewed_bindings_sha256": "a54dae6ce57a9707a07b7fd07421455c8ac48d4128a77e0a82ed2485cde44ba6",
+  "reviewed_inventory_sha256": "23ff14e30a879ffcc3d85586c72ca2bf2bc3b7b71b7d2e296d949e3ba981cc9f",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",

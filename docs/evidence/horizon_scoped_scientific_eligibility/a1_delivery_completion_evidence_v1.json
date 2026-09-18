@@ -16,7 +16,7 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     ".agents/skills/independent-hypothesis-critic/SKILL.md": "fda7e5fb207904c3d4a6946dfcda4aa6716e0bb3e9783941e98652dd30ab70aa",
-    "catalog/assets/core.yaml": "9cdbc029c393cc555b5cd80529cbff9fe0fc61ca323a4952a8b5e8817f6c5892",
+    "catalog/assets/core.yaml": "4c55f0d88fee79e4d571aea8b6f2b88e474275a515f4602ac3077d507bcde9ae",
     "catalog/assets/lifecycle.yaml": "2ae7b49b9a47afe8cbf460c20ff0c8f8886b525eff6a376677bf3c51dc0b4444",
     "catalog/catalog_manifest.yaml": "03c98dcb4618d70d795edfd83993eb8b0f5bf1bb02abd1179261ceaff4028520",
     "catalog/generated/asset_edges.json": "b810564454eedfa3f5172aa0fce0565fe2044d97216a751b3138771dfb29c884",
@@ -26,9 +26,10 @@
     "docs/PROJECT_MAP.md": "02ae6ed0b97a2b644c91d51b558b0a06d5c0b22f464ee0de7e51f515461177f4",
     "docs/contracts/normalized_trajectory_representation_probe_v1.md": "dca1c1d298e00bc18abfe40a4c8cc05dc9d3af84dee413fbb06e30ad4fcb4bf0",
     "docs/contracts/normalized_trajectory_v1_capability_contract.md": "93f9ff833ba271d94aa2b0d4be18fccb55ce19a8d593f644381ebdc460e3e8da",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "2b56c9fc68a6c4358bc9e41208657f7a0f60be49cb8820d30ad0e8da058bf351",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "d258093b751e343906a163a460f4755909dad6404264850a729abef58a2fd76f",
     "docs/reports/horizon_scoped_scientific_eligibility/a1_owner_readout_v1.md": "20581cb3603d3c7dddf6e4031f85a59aa411e0c73f8c141c17b5ff37ce955fe1",
-    "docs/tasks/HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1.md": "0d0f5ec0cd31a2ebd83dc494e17c9ffb59c79373b7ea6e63b23c8ce3ab274404",
+    "docs/tasks/HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1.md": "199a4be0c52b904d912a4f1487c2d99b057b4c34e4f5ce6c63cbddf61bcceadf",
     "src/solana_alpha_lab/factory/experiment_spec.py": "6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac",
     "src/solana_alpha_lab/factory/hfic_control_integrity.py": "c236404e6291bfa20b21aa6c7c18e9ff7bf930b03f8177e371f2c8e446988f6b",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "cbd2d0444f7a3fd5d0df0c13e0d7aec8552b65dde6739b1f6a71afae95b36108",
@@ -57,14 +58,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/horizon_scoped_scientific_eligibility/a1_delivery_factory_fit_v1.json",
-    "sha256": "7ddbb8d00f1e8314a4d2aa221b99f71e386c590852341dde2c2a396925e1ae26",
+    "sha256": "0f2876bca358bfc796b404d2dcaa428be7f50848dd0bbe1f0bd7937ccbc5f0b3",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_UNIT_HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY",
     "independent_review": {
       "path": "docs/evidence/horizon_scoped_scientific_eligibility/a1_delivery_independent_review_v1.json",
-      "sha256": "7e77a27fef751eb62a47f8c20a976eb23d16238456a1010a6408d086335cd421",
+      "sha256": "92bb868d69ce959cb8092d3eab8dfa2fb42286b6b0aca800f07e6f77d874b5c7",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
