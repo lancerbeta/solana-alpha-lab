@@ -308,9 +308,10 @@ def project_scientific_eligibility(
                     "denominator_n": len(base_mints),
                 }
             )
-        readiness = (
-            READINESS_MISSINGNESS_UNRESOLVED if unresolved else READINESS_COMPLETE
-        )
+        if not base_mints or unresolved:
+            readiness = READINESS_MISSINGNESS_UNRESOLVED
+        else:
+            readiness = READINESS_COMPLETE
 
     member_ids_sha256 = hashlib.sha256(
         ("\n".join(base_mints)).encode("utf-8")
@@ -450,11 +451,49 @@ def try_project_scientific_eligibility_from_data_root(
         return None
 
 
+def _projection_structurally_valid(projection: Mapping[str, Any]) -> bool:
+    required = (
+        "schema",
+        "schema_version",
+        "rule_id",
+        "base_x_population",
+        "lifecycle_coverage",
+        "outcome_coverage",
+        "outcome_readiness",
+        "invariants",
+        "projection_sha256",
+    )
+    if any(key not in projection for key in required):
+        return False
+    invariants = projection.get("invariants")
+    population = projection.get("base_x_population")
+    lifecycle = projection.get("lifecycle_coverage")
+    coverage = projection.get("outcome_coverage")
+    if not isinstance(invariants, Mapping):
+        return False
+    if invariants.get("missing_y_never_shrinks_base_x") is not True:
+        return False
+    if invariants.get("no_complete_case_population") is not True:
+        return False
+    if invariants.get("no_y_typed_value_read") is not True:
+        return False
+    if not isinstance(population, Mapping) or not isinstance(lifecycle, Mapping):
+        return False
+    if not isinstance(coverage, list):
+        return False
+    try:
+        n = int(population["n"])
+        denom = int(lifecycle["denominator_n"])
+    except (KeyError, TypeError, ValueError):
+        return False
+    return n == denom and n >= 0
+
+
 def validated_projection_readiness(
     spec: Mapping[str, Any],
     projection: Mapping[str, Any] | None,
 ) -> str:
-    """Accept COMPLETE only from a spec-bound projection, never a bare stamp."""
+    """Accept COMPLETE only from a structurally valid spec-bound projection."""
 
     if spec.get("schema_version") != "1.3":
         return READINESS_UNSPECIFIED
@@ -465,6 +504,8 @@ def validated_projection_readiness(
         or projection.get("schema_version") != PROJECTION_SCHEMA_VERSION
         or projection.get("rule_id") != RULE_ID
     ):
+        return READINESS_MISSINGNESS_UNRESOLVED
+    if not _projection_structurally_valid(projection):
         return READINESS_MISSINGNESS_UNRESOLVED
     body = {key: value for key, value in projection.items() if key != "projection_sha256"}
     if projection.get("projection_sha256") != canonical_sha256(body):
@@ -479,6 +520,13 @@ def validated_projection_readiness(
         READINESS_UNSPECIFIED,
     }:
         return READINESS_MISSINGNESS_UNRESOLVED
+    if readiness == READINESS_COMPLETE:
+        try:
+            n = int(projection["base_x_population"]["n"])
+        except (KeyError, TypeError, ValueError):
+            return READINESS_MISSINGNESS_UNRESOLVED
+        if n < 1:
+            return READINESS_MISSINGNESS_UNRESOLVED
     return str(readiness)
 
 

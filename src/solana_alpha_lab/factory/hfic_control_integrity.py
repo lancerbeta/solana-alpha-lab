@@ -234,29 +234,24 @@ def resolve_control_corpus_yield(
         break
     if current is None:
         return CONTROL_CORPUS_UNRESOLVABLE, None
-    raw = current.get("base_x_population_n", current.get("base_x_n"))
-    if raw is None:
-        labels = current.get("labels")
-        if isinstance(labels, Mapping):
-            raw = labels.get("base_x_population_n", labels.get("base_x_n"))
-    if raw is None:
-        census_rows = current.get("census_rows")
-        observation_rows = current.get("observation_rows")
-        if isinstance(census_rows, Sequence) and isinstance(observation_rows, Sequence):
-            from solana_alpha_lab.factory.scientific_eligibility_projection import (
-                project_scientific_eligibility,
-                sanitize_projection_row,
-            )
+    raw = None
+    census_rows = current.get("census_rows")
+    observation_rows = current.get("observation_rows")
+    if isinstance(census_rows, Sequence) and isinstance(observation_rows, Sequence):
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            project_scientific_eligibility,
+            sanitize_projection_row,
+        )
 
-            projected = project_scientific_eligibility(
-                [row for row in census_rows if isinstance(row, Mapping)],
-                [
-                    sanitize_projection_row(row)
-                    for row in observation_rows
-                    if isinstance(row, Mapping)
-                ],
-            )
-            raw = projected["base_x_population"]["n"]
+        projected = project_scientific_eligibility(
+            [row for row in census_rows if isinstance(row, Mapping)],
+            [
+                sanitize_projection_row(row)
+                for row in observation_rows
+                if isinstance(row, Mapping)
+            ],
+        )
+        raw = projected["base_x_population"]["n"]
     if raw is None and data_root is not None and repo_root is not None:
         from pathlib import Path
 
@@ -270,6 +265,12 @@ def resolve_control_corpus_yield(
         )
         if projected is not None:
             raw = projected["base_x_population"]["n"]
+    if raw is None:
+        raw = current.get("base_x_population_n", current.get("base_x_n"))
+        if raw is None:
+            labels = current.get("labels")
+            if isinstance(labels, Mapping):
+                raw = labels.get("base_x_population_n", labels.get("base_x_n"))
     if raw is None:
         return CONTROL_CORPUS_UNRESOLVABLE, None
     base_x_n = int(raw)

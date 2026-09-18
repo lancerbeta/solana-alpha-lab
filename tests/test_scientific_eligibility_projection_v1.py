@@ -365,6 +365,51 @@ class ScientificEligibilityProjectionTests(unittest.TestCase):
             READINESS_MISSINGNESS_UNRESOLVED,
         )
 
+    def test_empty_base_x_is_not_complete(self) -> None:
+        projected = project_scientific_eligibility(
+            [_census("a", "observed", candidate="NOT_ELIGIBLE")],
+            [_x300("a")],
+            spec={
+                "schema_version": "1.3",
+                "required_outcomes": [
+                    {
+                        "point_id": "Y900",
+                        "field_ids": ["FIELD-USD-PRICE-001"],
+                        "role": "PRIMARY",
+                    }
+                ],
+            },
+        )
+        self.assertEqual(projected["base_x_population"]["n"], 0)
+        self.assertEqual(projected["outcome_readiness"], READINESS_MISSINGNESS_UNRESOLVED)
+
+    def test_control_prefers_live_rows_over_stamp(self) -> None:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            CONTROL_YIELD_BELOW_MIN,
+            resolve_control_corpus_yield,
+        )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            CORPUS_DATASET_ID,
+        )
+
+        census = [_census("a", "observed")]
+        obs = [_x300("a")]
+        gate, observed = resolve_control_corpus_yield(
+            [
+                {
+                    "dataset_id": CORPUS_DATASET_ID,
+                    "base_x_population_n": 99,
+                    "labels": {"base_x_population_n": 99},
+                    "census_rows": census,
+                    "observation_rows": obs,
+                }
+            ],
+            corpus_dataset_id=CORPUS_DATASET_ID,
+            min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
+        )
+        self.assertEqual(gate, CONTROL_YIELD_BELOW_MIN)
+        self.assertEqual(observed, 1)
+
     def test_horizon_spec_is_not_auto_vetoed(self) -> None:
         receipt = {
             "router_decision": BLOCK_FORGE_SELECTION_RISK,

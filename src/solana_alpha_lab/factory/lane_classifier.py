@@ -569,8 +569,9 @@ def classify_lane(
             spec=spec,
             schedule=schedule,
         )
-        if computed is not None:
-            working["scientific_eligibility_projection"] = computed
+        if computed is None:
+            return _blocked_data("OUTCOME_MISSINGNESS_UNRESOLVED")
+        working["scientific_eligibility_projection"] = computed
         if _submission_outcome_readiness(spec, working) != READINESS_COMPLETE:
             return _blocked_data("OUTCOME_MISSINGNESS_UNRESOLVED")
         selection_view = apply_selection_gate_to_preflight(

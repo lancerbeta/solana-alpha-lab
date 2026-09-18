@@ -293,7 +293,7 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 |---|---|
 | `PASS_FAST_LANE_READY` | Передать сюда итог Critic. После проверки отдельно разрешить no-Git run. |
 | `PASS_CHANGE_LANE_REQUIRED` | Передать сюда PRD+SSD capability-атома. После проверки отдельно разрешить один PR. |
-| `PASS_DATA_OPTION_REQUIRED` | Сначала решить, оправдан ли forward collection по цене и option value. |
+| `PASS_DATA_OPTION_REQUIRED` | Смотри classifier `reason_codes`. `OUTCOME_MISSINGNESS_UNRESOLVED` = coverage report на `base_x` (`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`), не collection. `FULL_LIFECYCLE_SELECTION_SCOPE` = сузь required Y (`NARROW_REQUIRED_OUTCOMES_OR_STOP`). `SELECTION_RECEIPT_INTEGRITY_INVALID` = rebind receipt identity (`REBIND_SELECTION_RECEIPT_IDENTITY`). Только residual data-gap без этих reason = collection option. |
 | `REVISE_ONCE` | Только primary/C1. Fallback: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. Если это Critic #2 / C2: **не** revise. `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`. `OWNER NEXT=STOP`. |
 | `KILL_*` | Если это ещё primary/C1: same slash auto-screens the already-frozen runner-up once (`RUNNER_UP_AWAITING_CRITIC`). Do not regenerate, do not pick another portfolio candidate, do not start a new AUTO search. Если это уже C2: session complete, no survivor unless a PASS terminal. |
 | `RUNNER_UP_REVISION_REQUIRED` | Typed PAUSE after C2 `REVISE_ONCE`. Evening STOP. Preserve C2 in memory. Do not claim scientific fail or pass. No C3. |
@@ -1125,8 +1125,9 @@ OWNER_DECISION_REQUIRED
 | Existing live capability, но нужна exact owner authority | `OWNER_DECISION_REQUIRED` |
 | Named reusable capability отсутствует | `PASS_CHANGE_LANE_REQUIRED` |
 | Required forward-only data отсутствуют | `PASS_DATA_OPTION_REQUIRED` |
-| `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` — это coverage report на `base_x`, не заказ новой collection. NEXT=`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X` |
-| `BLOCKED_DATA` + `FULL_LIFECYCLE_SELECTION_SCOPE` | `PASS_DATA_OPTION_REQUIRED` (сузь required Y set) |
+| `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` — coverage report на `base_x`, не заказ новой collection. NEXT=`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X` |
+| `BLOCKED_DATA` + `FULL_LIFECYCLE_SELECTION_SCOPE` | `PASS_DATA_OPTION_REQUIRED` — сузь required Y set. NEXT=`NARROW_REQUIRED_OUTCOMES_OR_STOP`. Не collection. |
+| `BLOCKED_DATA` + `SELECTION_RECEIPT_INTEGRITY_INVALID` | `PASS_DATA_OPTION_REQUIRED` — сломан/mismatched historical receipt. NEXT=`REBIND_SELECTION_RECEIPT_IDENTITY`. Это integrity STOP, не selection veto и не collection. |
 | Spec incoherent/invalid | соответствующий `KILL_*` либо один `REVISE_ONCE` |
 | Promotion requested | `OWNER_DECISION_REQUIRED`; promotion не выполнять |
 
@@ -1178,7 +1179,17 @@ Post-merge path back to no-Git Fast Lane
 
 ### Для `PASS_DATA_OPTION_REQUIRED`
 
-Верни только collection decision contract. Collector PRD+SSD появится лишь после owner acceptance стоимости/authority и положительного option-value gate.
+Сначала прочитай classifier `reason_codes` / NEXT. Один terminal не значит «заказать collection».
+
+- `OUTCOME_MISSINGNESS_UNRESOLVED` / `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`:
+  верни coverage report на `base_x.n`. N не сжимать. Не заказывай collection.
+- `FULL_LIFECYCLE_SELECTION_SCOPE` / `NARROW_REQUIRED_OUTCOMES_OR_STOP`:
+  сузь `required_outcomes` до horizon-specific Y set или STOP. Не collection.
+- `SELECTION_RECEIPT_INTEGRITY_INVALID` / `REBIND_SELECTION_RECEIPT_IDENTITY`:
+  пересобери identity/binding исторического receipt. Это не selection veto.
+- иначе (residual required forward-only data): верни только collection
+  decision contract. Collector PRD+SSD появится лишь после owner acceptance
+  стоимости/authority и положительного option-value gate.
 
 ## B7. Обязательный формат ответа
 

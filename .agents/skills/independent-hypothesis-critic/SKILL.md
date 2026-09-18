@@ -105,16 +105,18 @@ Hard boundaries — same as Forge:
    `START_NEW_SESSION` and do not auto-veto a horizon-specific experiment unless
    its required Y point set exactly equals the bound schedule Y set.
    Schema-validate the 1.3 spec and run deterministic lane classifier
-   **network-free**. Do not stamp `outcome_readiness=COMPLETE`. Attach a
-   spec-bound `ScientificEligibilityProjection` when the release can be
-   projected; the classifier ignores a bare readiness stamp.
+   **network-free**. Do not stamp `outcome_readiness=COMPLETE`. The
+   classifier authorizes `COMPLETE` only from a live release projection;
+   attached or self-hashed stamps fail closed.
    `COMPLETE` = every required outcome has a resolved state (including
    censored / typed-missing) against `base_x.n`. `MISSINGNESS_UNRESOLVED`
    fail-closes into the existing data/science-option route
    (`PASS_DATA_OPTION_REQUIRED`, classifier NEXT
    `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`) and must not shrink N. This is a
-   coverage report, not a new collection commission. Do not execute
-   experiments.
+   coverage report, not a new collection commission.
+   `FULL_LIFECYCLE_SELECTION_SCOPE` → `NARROW_REQUIRED_OUTCOMES_OR_STOP`.
+   `SELECTION_RECEIPT_INTEGRITY_INVALID` → `REBIND_SELECTION_RECEIPT_IDENTITY`.
+   Do not execute experiments.
 
 ## Context isolation
 

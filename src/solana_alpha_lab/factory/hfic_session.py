@@ -3176,13 +3176,6 @@ def run_live_classifier(
     )
     if projected is not None:
         packet["scientific_eligibility_projection"] = projected
-    else:
-        attached = critic_result.get("scientific_eligibility_projection")
-        if (
-            isinstance(attached, Mapping)
-            and attached.get("experiment_spec_sha256") == canonical_sha256(dict(validated))
-        ):
-            packet["scientific_eligibility_projection"] = attached
     decision = classify_lane(
         packet,
         root=Path(repo_root),
