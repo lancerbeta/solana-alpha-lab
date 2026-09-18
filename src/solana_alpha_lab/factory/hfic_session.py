@@ -3163,6 +3163,23 @@ def run_live_classifier(
         as_of = datetime.now(UTC)
     packet = dict(submission)
     packet.setdefault("hypothesis_definition_sha256", frozen.get("selected_definition_sha256"))
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        ScientificEligibilityError,
+        try_project_scientific_eligibility_from_data_root,
+    )
+
+    request = validated.get("observation_request")
+    try:
+        projected = try_project_scientific_eligibility_from_data_root(
+            Path(data_root),
+            repo_root=Path(repo_root),
+            spec=validated,
+            schedule=request if isinstance(request, Mapping) else None,
+        )
+    except ScientificEligibilityError:
+        projected = None
+    if projected is not None:
+        packet["scientific_eligibility_projection"] = projected
     decision = classify_lane(
         packet,
         root=Path(repo_root),

@@ -168,31 +168,67 @@ def route_selection_gate(
     }
 
 
+def interpret_selection_gate_receipt(
+    gate_receipt: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Scope a historical v1.0 receipt without mutating its bytes."""
+
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+    )
+
+    decision = str(gate_receipt.get("router_decision") or "")
+    return {
+        "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+        "router_decision": decision,
+        "gate_receipt_sha256": str(gate_receipt.get("receipt_sha256") or ""),
+        "bytes_mutated": False,
+    }
+
+
 def apply_selection_gate_to_preflight(
     action: str,
     gate_receipt: Mapping[str, Any] | None,
+    *,
+    required_outcome_point_ids: Sequence[str] | None = None,
+    schedule_y_point_ids: Sequence[str] | None = None,
 ) -> dict[str, Any]:
-    """Smallest ordinary-Forge consumption seam. Resume paths stay unchanged."""
+    """Forge START consumes the receipt as a scoped caveat, not a global veto."""
 
-    if action != "START_NEW_SESSION" or not isinstance(gate_receipt, Mapping):
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+    )
+
+    if not isinstance(gate_receipt, Mapping):
         return {"applicable": False, "action": action, "terminal": None}
-    decision = str(gate_receipt.get("router_decision") or "")
-    if decision in BLOCK_DECISIONS:
+    scoped = interpret_selection_gate_receipt(gate_receipt)
+    decision = str(scoped["router_decision"] or "")
+    del required_outcome_point_ids, schedule_y_point_ids
+    if gate_receipt.get("integrity_invalid"):
         return {
             "applicable": True,
             "action": "STOP",
-            "terminal": decision,
-            "router_decision": decision,
-            "gate_receipt_sha256": str(gate_receipt.get("receipt_sha256") or ""),
+            "terminal": BLOCK_FORGE_EVIDENCE_GAP,
+            "router_decision": BLOCK_FORGE_EVIDENCE_GAP,
+            "gate_receipt_sha256": scoped["gate_receipt_sha256"],
+            "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
+            "full_lifecycle_equivalent": False,
+            "integrity_invalid": True,
         }
-    if decision == FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT:
+    if decision in {
+        BLOCK_FORGE_SELECTION_RISK,
+        BLOCK_FORGE_EVIDENCE_GAP,
+        FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
+    }:
         return {
             "applicable": True,
             "action": action,
             "terminal": None,
             "router_decision": decision,
-            "gate_receipt_sha256": str(gate_receipt.get("receipt_sha256") or ""),
+            "gate_receipt_sha256": scoped["gate_receipt_sha256"],
+            "eligibility_scope": ELIGIBILITY_SCOPE_FULL_LIFECYCLE,
             "caveat": True,
+            "full_lifecycle_equivalent": False,
         }
     return {"applicable": False, "action": action, "terminal": None}
 
@@ -1017,14 +1053,21 @@ def load_applicable_gate_receipt(
     if stored != canonical_sha256(body):
         return _invalid_gate_receipt()
     try:
-        spec = _require_frozen_gate_spec(Path(root), SPEC_RELATIVE)
-        corpus = (
-            spec.get("canonical_corpus")
-            if isinstance(spec.get("canonical_corpus"), Mapping)
-            else {}
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            ScientificEligibilityError,
+            bind_lineage_canonical_release,
         )
-        binding = bind_canonical_censoring_inputs(Path(data_root), corpus)
-    except (SelectionRobustnessGateError, CensoringDiagnosticError, OSError):
+
+        binding = bind_lineage_canonical_release(
+            Path(data_root), repo_root=Path(root)
+        )
+        _require_frozen_gate_spec(Path(root), SPEC_RELATIVE)
+    except (
+        SelectionRobustnessGateError,
+        CensoringDiagnosticError,
+        ScientificEligibilityError,
+        OSError,
+    ):
         return _invalid_gate_receipt(SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH)
     stored_identity = receipt_input_identity(loaded)
     current_identity = current_gate_input_identity(binding)

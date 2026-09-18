@@ -1,0 +1,91 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-ACCEPT-001",
+  "as_of": "2026-09-18",
+  "task_id": "HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1",
+  "state_change": "Patched ScientificEligibilityProjection so COMPLETE requires every required outcome OBSERVED on all of base_x, historical selection evidence is a FULL_LIFECYCLE caveat rather than a Y-set veto, and consume-time X300 geometry fail-closes instead of silent 300+300.",
+  "base_main": "6515e8b3a880065327a43448f592fe4101026dfb",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "075a659ee2a812040c6506d3555f3b5370a0cbf7bc31162705197d40e9c0f2af",
+    "catalog/assets/core.yaml": "5d18d70c04e97821dff50675d0031ae6b9bf4eceec5ab24ea84ac5e7dfd0fdc9",
+    "catalog/assets/lifecycle.yaml": "2ae7b49b9a47afe8cbf460c20ff0c8f8886b525eff6a376677bf3c51dc0b4444",
+    "catalog/catalog_manifest.yaml": "03c98dcb4618d70d795edfd83993eb8b0f5bf1bb02abd1179261ceaff4028520",
+    "catalog/generated/asset_edges.json": "b810564454eedfa3f5172aa0fce0565fe2044d97216a751b3138771dfb29c884",
+    "catalog/schemas/experiment_spec_v1_3.schema.json": "3270b93209d26e5bfa2afec9c567a0e42338fd466ccc7acebcab174f909cee88",
+    "catalog/schemas/scientific_eligibility_projection_v1.schema.json": "3f41ada7b5bb00644e4b2a8a2133da8dadaa3970a3ca971d3f4ef9b1d2ef009f",
+    "configs/scientific_eligibility_projection_v1.yaml": "f239f4a78c3ab0f0626db2c0927b07b8f51c7c70cb13ea99ac3b6feebb61b6d0",
+    "docs/PROJECT_MAP.md": "02ae6ed0b97a2b644c91d51b558b0a06d5c0b22f464ee0de7e51f515461177f4",
+    "docs/contracts/normalized_trajectory_representation_probe_v1.md": "dca1c1d298e00bc18abfe40a4c8cc05dc9d3af84dee413fbb06e30ad4fcb4bf0",
+    "docs/contracts/normalized_trajectory_v1_capability_contract.md": "93f9ff833ba271d94aa2b0d4be18fccb55ce19a8d593f644381ebdc460e3e8da",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "c47cc36d207236f0f93bc78df562684d4867eb715758176c18a7030587b686a8",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "b75b15975937225b6c0644e986f125e6e9f9efbb6561b24c5628705f9ed0d72d",
+    "docs/reports/horizon_scoped_scientific_eligibility/a1_owner_readout_v1.md": "b24eb3333b141c885bae3ec4834d035ace12cae0f59b99006b01bf1c1ed76230",
+    "docs/tasks/HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1.md": "51eb922753e105a37f34431df018aa3b04433b4cecff0e4a9d0ffad452aab156",
+    "src/solana_alpha_lab/factory/experiment_spec.py": "6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac",
+    "src/solana_alpha_lab/factory/hfic_control_integrity.py": "376504cce2990566497471977fbffdce11923fb42b8d057da4532eebabd39458",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "cbd2d0444f7a3fd5d0df0c13e0d7aec8552b65dde6739b1f6a71afae95b36108",
+    "src/solana_alpha_lab/factory/hfic_released_trajectory_projection.py": "94829e7b2802029d03f9b69563c6043608d8ae61bcf29f22eb7f168e0af7b4f5",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "f351cb6726c3a09cf8dc0cf1fcdfa5f0e3b317bbb790e959b95e3f49dae99ac4",
+    "src/solana_alpha_lab/factory/hfic_representation_probe.py": "9f0b0eec7769911eb14c8512b75377989f26976cd5eee569ff288f9bb45cd3f0",
+    "src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py": "a556d8262c81341ea0de510fc5fd6fbb673e04129267505111c7eb6271277da2",
+    "src/solana_alpha_lab/factory/hfic_session.py": "1c2bf9eca18f2490a2e34d0703da6cd8d498bd6c7a3e99821afadde32756e2f2",
+    "src/solana_alpha_lab/factory/lane_classifier.py": "3387f33e3a996135993e5680ce00d5259b076556352e45aeac77e808b4478d52",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "c90e7dafaea4cff7f957cff9056910e5e6cf4a99d35eae3fc17a4cc78af96c4a",
+    "src/solana_alpha_lab/factory/scientific_eligibility_projection.py": "22374fef4c7e6eb4fcf4e5934b188190bd9985ec98023f30c8ae2f80ba88f599",
+    "tests/test_hfic_fresh_control_decision_integrity_closure_v1.py": "9459bdb0a19b88a4de50e0ec7fa83a1fdb2ba3d88bbe97bd97c165fa6c2279b3",
+    "tests/test_hfic_released_trajectory_projection_v1.py": "11cac9535af0e42e8a4e54e3e0617f28234957ee503de3b717fd62cc36727e60",
+    "tests/test_hfic_representation_probe.py": "98e34d12a23a26d92bbab652e26a2a34cd87fcc8862b94e5c4b9de7d0d30a988",
+    "tests/test_hfic_selection_robustness_gate_v1.py": "3b3e3c37d2a9ebb7c26726158cf62a2c992f97fcd6d5c4dcee306f3543c66e06",
+    "tests/test_horizon_eligibility_vertical_slice_v1.py": "99c4db5d2b0d6e240cc30adc52462e0af368f8492fd7d8a82e984f1716835500",
+    "tests/test_normalized_trajectory_probe_preregistration_v1.py": "25d2f2b38561a8851171242d6f7b422f63174457cbbf5735a5aad9bb3d36bc65",
+    "tests/test_scientific_eligibility_projection_v1.py": "82698e9c13f3ed29bff8e9346d8ce1b793a057ee767204acb7b670343d3f9b77"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/horizon_scoped_scientific_eligibility/a1_delivery_factory_fit_v1.json",
+    "sha256": "45e343194ef8e020e8b7f2ca70a8df3de493098a88dd85c70a4acb5205a7036d",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY",
+    "independent_review": {
+      "path": "docs/evidence/horizon_scoped_scientific_eligibility/a1_delivery_independent_review_v1.json",
+      "sha256": "3e264832b3f73ca8d7f89eeb5d608824be7b4bc30e8d088b2e1960c70b63b377",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_COMPLETE_CASE_POPULATION",
+    "NO_Y_TYPED_VALUE_READ",
+    "NO_CRITIC_INPUT_PACKET_1_5",
+    "NO_FORGE_EXECUTION_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "data_plane_mutation": 0,
+    "provider_calls": 0
+  }
+}

@@ -16,6 +16,8 @@ evidence_role: EXPLORATORY_REUSE
 confirmatory_reuse_forbidden: true
 min_usable_yield_eligible: 10
 min_usable_yield_eligible_owner: src/solana_alpha_lab/factory/early_market_panel_importer.py::MIN_USABLE_YIELD_ELIGIBLE
+min_usable_base_x_population: 10
+min_usable_base_x_population_owner: src/solana_alpha_lab/factory/scientific_eligibility_projection.py::MIN_USABLE_BASE_X_POPULATION
 cohort_normalization: 'OFF'
 cohort_normalization_activation: NEW_PREREGISTRATION_REQUIRED
 current_live_cohort_scientific_content_accessed: false
@@ -131,6 +133,8 @@ trigger_all_required:
   - first_fresh_cohort_sealed_verified_imported
   - readiness_in_READY_VALID_or_READY_VALID_WITH_COVERAGE_LIMITATION
   - yield_eligible_ge_min_usable_yield_eligible
+  - base_x_population_n_ge_min_usable_base_x_population
+  - eligible_member_count_equals_base_x_population_n
   - one_control_forge_run_on_unchanged_current_representation_same_evidence_epoch
   - control_terminal_permits_probe
   - not_case_c_observability

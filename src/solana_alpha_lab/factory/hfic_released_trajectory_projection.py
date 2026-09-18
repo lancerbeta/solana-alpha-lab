@@ -211,6 +211,34 @@ def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
         "first_fresh_cohort_sealed_verified_imported": True,
         "confirmatory_reuse_forbidden": True,
     }
+    if any(
+        isinstance(row, dict) and row.get("candidate_state")
+        for row in census_rows
+    ):
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            ScientificEligibilityError,
+            project_scientific_eligibility,
+            resolve_canonical_release_schedule,
+        )
+
+        sanitized_obs = [
+            {key: value for key, value in row.items() if key != "typed_value"}
+            for row in rows
+            if isinstance(row, dict)
+        ]
+        try:
+            canonical_schedule = resolve_canonical_release_schedule(
+                root, census_rows
+            )
+            projected = project_scientific_eligibility(
+                census_rows,
+                sanitized_obs,
+                canonical_schedule=canonical_schedule,
+                require_canonical_schedule=True,
+            )
+        except ScientificEligibilityError as exc:
+            raise RepresentationProbeError(str(exc)) from exc
+        receipt["base_x_population_n"] = int(projected["base_x_population"]["n"])
     receipt["receipt_sha256"] = hashlib.sha256(
         json.dumps(
             {k: v for k, v in receipt.items()}, sort_keys=True, separators=(",", ":")

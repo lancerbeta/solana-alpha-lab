@@ -293,7 +293,7 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 |---|---|
 | `PASS_FAST_LANE_READY` | Передать сюда итог Critic. После проверки отдельно разрешить no-Git run. |
 | `PASS_CHANGE_LANE_REQUIRED` | Передать сюда PRD+SSD capability-атома. После проверки отдельно разрешить один PR. |
-| `PASS_DATA_OPTION_REQUIRED` | Сначала решить, оправдан ли forward collection по цене и option value. |
+| `PASS_DATA_OPTION_REQUIRED` | Смотри classifier `reason_codes`. `OUTCOME_MISSINGNESS_UNRESOLVED` = coverage report на `base_x` (`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`), не collection. `SELECTION_RECEIPT_INTEGRITY_INVALID` = rebind receipt identity (`REBIND_SELECTION_RECEIPT_IDENTITY`). `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` / `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` = `RESOLVE_IMMUTABLE_DATA_BINDINGS`, не collection и не stamped N. Исторический FULL_LIFECYCLE receipt сам по себе = caveat, не auto-veto. Только residual data-gap без этих reason = collection option. |
 | `REVISE_ONCE` | Только primary/C1. Fallback: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. Если это Critic #2 / C2: **не** revise. `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`. `OWNER NEXT=STOP`. |
 | `KILL_*` | Если это ещё primary/C1: same slash auto-screens the already-frozen runner-up once (`RUNNER_UP_AWAITING_CRITIC`). Do not regenerate, do not pick another portfolio candidate, do not start a new AUTO search. Если это уже C2: session complete, no survivor unless a PASS terminal. |
 | `RUNNER_UP_REVISION_REQUIRED` | Typed PAUSE after C2 `REVISE_ONCE`. Evening STOP. Preserve C2 in memory. Do not claim scientific fail or pass. No C3. |
@@ -365,6 +365,14 @@ canonical `dataset_id`, not a foreign label impersonation.
 packet builder and requires the selected corpus `dataset_manifest_id` to
 equal `lineage.current_dataset_manifest_id` when lineage exists.
 
+Scientific CONTROL floor is consume-time `base_x_population.n` (X300-valid
+`X_ELIGIBLE`), not historical `yield_eligible`. `forge-control-ready` reports
+both: `base_x_population_n` when the canonical release can be projected, and
+`yield_eligible` as the immutable lifecycle-completeness label. A READY
+terminal with `base_x_population_n=null` is operational import only; CONTROL
+preflight fail-closes `CONTROL_CORPUS_UNRESOLVABLE` until `base_x` is
+projected. Do not treat `yield_eligible` as scientific N.
+
 Do not run ordinary Forge as a fallback when CONTROL corpus/yield preconditions fail.
 
 `CURRENT_REPRESENTATION_CONTROL_V1` (preflight `--control-current-representation`)
@@ -386,14 +394,17 @@ equivalent of the challenger representation. The phrase "explicitly resolved
 evidence" does not authorize those bodies in CONTROL mode. Ordinary Git/Catalog
 validation remains allowed. Do not build a filesystem sandbox.
 
-CONTROL preflight enforces `MIN_USABLE_YIELD_ELIGIBLE` from
-`early_market_panel_importer.py` using corpus metadata/labels only. Below-min
-or unresolvable current lifecycle corpus is `CONTROL_YIELD_BELOW_MIN` /
-`CONTROL_CORPUS_UNRESOLVABLE` and must not consume the CONTROL search slot.
-`OWNER NEXT` is `WAIT_FOR_IMPORT_OR_STOP` or `STOP_CORPUS_UNRESOLVABLE`.
-Do not recover by dropping `--control-current-representation` and running
-general Forge. Report `control_yield_eligible` vs `min_usable_yield_eligible`
-when present.
+CONTROL preflight floors on consume-time `base_x_population.n`
+(`MIN_USABLE_BASE_X_POPULATION`). Below-min or unresolvable scientific N is
+`CONTROL_YIELD_BELOW_MIN` / `CONTROL_CORPUS_UNRESOLVABLE` and must not
+consume the CONTROL search slot. `OWNER NEXT` is `WAIT_FOR_IMPORT_OR_STOP`
+or `STOP_CORPUS_UNRESOLVABLE`. Do not recover by dropping
+`--control-current-representation` and running general Forge.
+Report `base_x_population_n` (also copied to `control_yield_eligible` for
+compat) vs `min_usable_base_x_population`. `yield_eligible` remains the
+lifecycle-completeness label, not scientific N.
+If `forge-control-ready` returns `base_x_population_n=null`, do not run the
+CONTROL slash; that READY is operational import only.
 
 For a completed CONTROL/general session, operator readout of the CONTROL probe
 branch uses `effective_control_terminal` (`final_session_terminal` when present,
@@ -752,7 +763,7 @@ evidence that upgrade unlocks
 
 ### Если `FAST_LANE_CANDIDATE`
 
-Подготовь draft, совместимый с фактической текущей `ExperimentSpec` schema, но не запускай его. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
+Подготовь draft, совместимый с `ExperimentSpec` 1.3 (`required_outcomes` обязателен), но не запускай его. `primary_y` / `horizon_notional` остаются identity text. Разреши реальные stable IDs, hashes/fingerprints, recipe IDs и capabilities; не выдумывай отсутствующие bindings.
 
 Выведи:
 
@@ -1087,10 +1098,26 @@ OWNER_DECISION_REQUIRED
 ## B5. Если terminal = PASS_TO_CLASSIFICATION
 
 1. Сформируй финальный frozen Hypothesis Contract.
-2. Подготовь machine-valid ExperimentSpec по **фактической текущей schema**.
+2. Подготовь machine-valid ExperimentSpec **1.3** с явным `required_outcomes`.
+   `primary_y` / `horizon_notional` остаются identity text, не parser.
+   Не создавай `CRITIC_INPUT_PACKET` 1.5.
 3. Разреши stable IDs, hashes/fingerprints, capabilities, query recipes и parameter schema. Отсутствующие значения не выдумывай.
-4. Выполни только schema validation и deterministic lane classification network-free. Эксперимент не запускай.
-5. Результат classifier сильнее provisional lane Forge.
+4. Исторический selection receipt остаётся byte-immutable caveat
+   `FULL_LIFECYCLE_COMPLETENESS`. Не делай глобальный STOP `START_NEW_SESSION`.
+   Равенство Y-point set bound schedule **не** veto ExperimentSpec 1.3.
+   Сломанный/mismatched receipt остаётся integrity fail-closed.
+5. Выполни только schema validation и deterministic lane classification network-free. Эксперимент не запускай.
+   Не штампуй `outcome_readiness=COMPLETE`. Classifier принимает COMPLETE
+   только из live release projection. Attached/self-hashed stamps fail closed.
+   `COMPLETE` значит: каждый required `(point_id, field_id)` имеет
+   `state == OBSERVED` для каждого member в `base_x`.
+   `CENSORED_LATE` / `MISSING_TYPED` / absent — это coverage, не наблюдение
+   required value, и дают `MISSINGNESS_UNRESOLVED`. Это не complete-case и
+   не сжимает `base_x.n`.
+   `MISSINGNESS_UNRESOLVED` fail-close в существующий data/science-option
+   route. NEXT classifier = `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`,
+   не «почини binding».
+6. Результат classifier сильнее provisional lane Forge.
 
 Преобразуй classifier outcome:
 
@@ -1100,6 +1127,9 @@ OWNER_DECISION_REQUIRED
 | Existing live capability, но нужна exact owner authority | `OWNER_DECISION_REQUIRED` |
 | Named reusable capability отсутствует | `PASS_CHANGE_LANE_REQUIRED` |
 | Required forward-only data отсутствуют | `PASS_DATA_OPTION_REQUIRED` |
+| `BLOCKED_DATA` + `OUTCOME_MISSINGNESS_UNRESOLVED` | `PASS_DATA_OPTION_REQUIRED` — coverage report на `base_x`, не заказ новой collection. NEXT=`REPORT_OUTCOME_COVERAGE_KEEP_BASE_X` |
+| `BLOCKED_DATA` + `SELECTION_RECEIPT_INTEGRITY_INVALID` | `PASS_DATA_OPTION_REQUIRED` — сломан/mismatched historical receipt. NEXT=`REBIND_SELECTION_RECEIPT_IDENTITY`. Это integrity STOP, не selection veto и не collection. |
+| `BLOCKED_DATA` + `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` / `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` | `PASS_DATA_OPTION_REQUIRED` — consume-time identity/geometry. NEXT=`RESOLVE_IMMUTABLE_DATA_BINDINGS`. Не collection и не stamped N. |
 | Spec incoherent/invalid | соответствующий `KILL_*` либо один `REVISE_ONCE` |
 | Promotion requested | `OWNER_DECISION_REQUIRED`; promotion не выполнять |
 
@@ -1151,7 +1181,20 @@ Post-merge path back to no-Git Fast Lane
 
 ### Для `PASS_DATA_OPTION_REQUIRED`
 
-Верни только collection decision contract. Collector PRD+SSD появится лишь после owner acceptance стоимости/authority и положительного option-value gate.
+Сначала прочитай classifier `reason_codes` / NEXT. Один terminal не значит «заказать collection».
+
+- `OUTCOME_MISSINGNESS_UNRESOLVED` / `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`:
+  верни coverage report на `base_x.n`. N не сжимать. Не заказывай collection.
+- `SELECTION_RECEIPT_INTEGRITY_INVALID` / `REBIND_SELECTION_RECEIPT_IDENTITY`:
+  пересобери identity/binding исторического receipt. Это не selection veto.
+- `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` /
+  `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED` /
+  `RESOLVE_IMMUTABLE_DATA_BINDINGS`:
+  consume-time identity или factory X300 geometry не доказаны. Не штампуй
+  N и не заказывай collection.
+- иначе (residual required forward-only data): верни только collection
+  decision contract. Collector PRD+SSD появится лишь после owner acceptance
+  стоимости/authority и положительного option-value gate.
 
 ## B7. Обязательный формат ответа
 

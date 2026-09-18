@@ -221,6 +221,8 @@ def resolve_control_corpus_yield(
     *,
     corpus_dataset_id: str,
     min_usable_yield_eligible: int,
+    data_root: Any | None = None,
+    repo_root: Any | None = None,
 ) -> tuple[str, int | None]:
     current: Mapping[str, Any] | None = None
     for item in datasets:
@@ -232,10 +234,55 @@ def resolve_control_corpus_yield(
         break
     if current is None:
         return CONTROL_CORPUS_UNRESOLVABLE, None
-    yield_eligible = int(current.get("yield_eligible") or 0)
-    if yield_eligible < int(min_usable_yield_eligible):
-        return CONTROL_YIELD_BELOW_MIN, yield_eligible
-    return "OK", yield_eligible
+    raw = None
+    census_rows = current.get("census_rows")
+    observation_rows = current.get("observation_rows")
+    if isinstance(census_rows, Sequence) and isinstance(observation_rows, Sequence):
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            project_scientific_eligibility,
+            sanitize_projection_row,
+        )
+
+        projected = project_scientific_eligibility(
+            [row for row in census_rows if isinstance(row, Mapping)],
+            [
+                sanitize_projection_row(row)
+                for row in observation_rows
+                if isinstance(row, Mapping)
+            ],
+        )
+        raw = projected["base_x_population"]["n"]
+    if raw is None and data_root is not None and repo_root is not None:
+        from pathlib import Path
+
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            ScientificEligibilityError,
+            try_project_scientific_eligibility_from_data_root,
+        )
+
+        try:
+            projected = try_project_scientific_eligibility_from_data_root(
+                Path(data_root),
+                repo_root=Path(repo_root),
+            )
+        except ScientificEligibilityError:
+            # Bound C1 identity with unproven/incompatible X300 geometry must
+            # not fall back to a stamped yield / complete-case N.
+            return CONTROL_CORPUS_UNRESOLVABLE, None
+        if projected is not None:
+            raw = projected["base_x_population"]["n"]
+    if raw is None:
+        raw = current.get("base_x_population_n", current.get("base_x_n"))
+        if raw is None:
+            labels = current.get("labels")
+            if isinstance(labels, Mapping):
+                raw = labels.get("base_x_population_n", labels.get("base_x_n"))
+    if raw is None:
+        return CONTROL_CORPUS_UNRESOLVABLE, None
+    base_x_n = int(raw)
+    if base_x_n < int(min_usable_yield_eligible):
+        return CONTROL_YIELD_BELOW_MIN, base_x_n
+    return "OK", base_x_n
 
 
 def control_packet_has_raw_sequences(packet: Mapping[str, Any]) -> bool:

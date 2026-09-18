@@ -36,15 +36,30 @@ from solana_alpha_lab.factory.hfic_representation_probe import (
     STATUS_OBSERVABILITY_BLOCKED,
     ControlBaseline,
     RepresentationProbeError,
-    build_challenger_packet,
+    build_challenger_packet as _build_challenger_packet,
     control_baseline_from_receipt,
     control_memory_baseline_sha256,
-    existing_hfic_lifecycle_fixture_input,
-    existing_hfic_packet,
+    existing_hfic_lifecycle_fixture_input as _existing_hfic_lifecycle_fixture_input,
+    existing_hfic_packet as _existing_hfic_packet,
     representation_probe_identity_sha256,
     representation_search_key_sha256,
     representation_status,
 )
+
+
+def build_challenger_packet(*args, **kwargs):
+    kwargs.setdefault("base_x_population_n", 10)
+    return _build_challenger_packet(*args, **kwargs)
+
+
+def existing_hfic_packet(*args, **kwargs):
+    kwargs.setdefault("base_x_population_n", 10)
+    return _existing_hfic_packet(*args, **kwargs)
+
+
+def existing_hfic_lifecycle_fixture_input(*args, **kwargs):
+    kwargs.setdefault("base_x_population_n", 10)
+    return _existing_hfic_lifecycle_fixture_input(*args, **kwargs)
 from solana_alpha_lab.factory.hfic_session import freeze_draft
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DEFAULT_SCHEDULE,
@@ -527,14 +542,16 @@ class HficRepresentationProbeTests(unittest.TestCase):
     def test_builder_rejects_unusable_readiness(self) -> None:
         receipt = _control_receipt()
         baseline = control_baseline_from_receipt(receipt)
-        for readiness, expected in (
+        for readiness, expected, base_x in (
             (
                 _cohort_readiness_receipt(yield_eligible=9),
                 INVALID_INSUFFICIENT_YIELD,
+                9,
             ),
             (
                 _cohort_readiness_receipt(coverage="GAP_CONFIRMED"),
                 INVALID_COVERAGE_BROKEN,
+                None,
             ),
         ):
             with self.subTest(expected=expected):
@@ -543,6 +560,7 @@ class HficRepresentationProbeTests(unittest.TestCase):
                         baseline,
                         _representation_fixture(),
                         cohort_readiness_receipt=readiness,
+                        base_x_population_n=base_x,
                     )
                 self.assertEqual(str(raised.exception), expected)
 
@@ -551,8 +569,9 @@ class HficRepresentationProbeTests(unittest.TestCase):
                 baseline,
                 project_normalized_trajectory([]),
                 cohort_readiness_receipt=_cohort_readiness_receipt(),
+                base_x_population_n=0,
             )
-        self.assertEqual(str(raised.exception), INVALID_COHORT_READINESS_RECEIPT)
+        self.assertEqual(str(raised.exception), INVALID_INSUFFICIENT_YIELD)
 
     def test_control_memory_anchors_must_match_packet(self) -> None:
         receipt = _control_receipt()
@@ -935,6 +954,7 @@ class RepresentationStatusTests(unittest.TestCase):
             "representation_schedule_sha256": DEFAULT_SCHEDULE.schedule_sha256,
             "cohort_ready": True,
             "cohort_readiness_receipt": _cohort_readiness_receipt(),
+            "base_x_population_n": 10,
         }
         self.assertEqual(representation_status({})["status"], STATUS_CONTROL_REQUIRED)
         self.assertEqual(representation_status(eligible)["status"], STATUS_ELIGIBLE)

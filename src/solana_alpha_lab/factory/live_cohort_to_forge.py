@@ -23,6 +23,9 @@ from solana_alpha_lab.factory.discovery_evidence_release import DiscoveryRelease
 from solana_alpha_lab.factory.early_market_panel_importer import (
     MIN_USABLE_YIELD_ELIGIBLE,
 )
+from solana_alpha_lab.factory.scientific_eligibility_projection import (
+    MIN_USABLE_BASE_X_POPULATION,
+)
 from solana_alpha_lab.factory.hfic_preflight import (
     AUTO_FOCUS,
     HficPreflightError,
@@ -711,9 +714,33 @@ def forge_control_ready(
                     "CONTROL_CORPUS_MANIFEST_MISMATCH",
                 )
     yield_eligible = int(labels.get("yield_eligible") or chosen.get("yield_eligible") or 0)
+    raw_base_x = labels.get("base_x_population_n", chosen.get("base_x_population_n"))
+    if raw_base_x is None:
+        raw_base_x = chosen.get("base_x_n")
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        ScientificEligibilityError,
+        try_project_scientific_eligibility_from_data_root,
+    )
+
+    try:
+        projected = try_project_scientific_eligibility_from_data_root(
+            Path(data_root),
+            repo_root=Path(repo_root),
+        )
+    except ScientificEligibilityError as exc:
+        _require(False, str(exc.code or "CONTROL_CORPUS_UNRESOLVABLE"))
+    if projected is not None:
+        base_x_n = int(projected["base_x_population"]["n"])
+    elif raw_base_x is not None:
+        base_x_n = int(raw_base_x)
+    else:
+        base_x_n = None
+    if base_x_n is not None:
+        _require(base_x_n >= MIN_USABLE_BASE_X_POPULATION, "LOW_YIELD")
+    else:
+        _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     coverage = str(labels.get("discovery_coverage_class") or "")
     _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
-    _require(yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE, "LOW_YIELD")
     material = evidence_epoch_material(repo_root=repo_root, data_root=data_root)
     epoch = evidence_epoch_sha256(material)
     sessions = _query_hfic_sessions(Path(data_root))
@@ -786,7 +813,12 @@ def forge_control_ready(
         "dataset_version": chosen.get("dataset_version") or labels.get("dataset_version"),
         "corpus_version": labels.get("corpus_version"),
         "yield_eligible": yield_eligible,
+        "base_x_population_n": base_x_n,
+        "scientific_control_ready": (
+            base_x_n is not None and base_x_n >= MIN_USABLE_BASE_X_POPULATION
+        ),
         "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
+        "min_usable_base_x_population": MIN_USABLE_BASE_X_POPULATION,
         "evidence_epoch_sha256": epoch,
         "discovery_coverage_class": coverage or None,
         "enumerate_warnings": list(warnings),

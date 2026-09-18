@@ -687,6 +687,9 @@ def enumerate_rdp_datasets(
                 evidence_role = role
         yield_eligible = int((labels or {}).get("yield_eligible") or 0)
         feature_usable = yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE
+        raw_base_x = None
+        if isinstance(labels, Mapping):
+            raw_base_x = labels.get("base_x_population_n", labels.get("base_x_n"))
         feature_families: list[str] = []
         raw_families = (labels or {}).get("feature_families")
         if isinstance(raw_families, list):
@@ -739,6 +742,9 @@ def enumerate_rdp_datasets(
                 "evidence_role": evidence_role,
                 "labels": labels,
                 "yield_eligible": yield_eligible,
+                "base_x_population_n": (
+                    int(raw_base_x) if raw_base_x is not None else None
+                ),
                 "yield_missing": int((labels or {}).get("yield_missing") or 0),
                 "feature_usable": feature_usable,
                 "dataset_terminal": dataset_terminal,
@@ -1430,7 +1436,11 @@ def build_forge_context_packet(
         packet["selection_robustness_caveat"] = {
             "router_decision": str(selection_caveat.get("router_decision") or ""),
             "gate_receipt_sha256": str(selection_caveat.get("gate_receipt_sha256") or ""),
-            "limitation": "RESIDUAL_UNMEASURED_SELECTION_UNCERTAINTY",
+            "eligibility_scope": str(
+                selection_caveat.get("eligibility_scope")
+                or "FULL_LIFECYCLE_COMPLETENESS"
+            ),
+            "limitation": "FULL_LIFECYCLE_COMPLETENESS_NOT_BASE_X_POPULATION",
         }
     from solana_alpha_lab.factory.hfic_control_integrity import (
         CURRENT_REPRESENTATION_CONTROL_V1,
@@ -1616,6 +1626,9 @@ def run_preflight(
         CURRENT_REPRESENTATION_CONTROL_V1,
         resolve_control_corpus_yield,
     )
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        MIN_USABLE_BASE_X_POPULATION,
+    )
     from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         CORPUS_DATASET_ID,
@@ -1643,7 +1656,9 @@ def run_preflight(
         gate, yield_eligible = resolve_control_corpus_yield(
             datasets,
             corpus_dataset_id=CORPUS_DATASET_ID,
-            min_usable_yield_eligible=MIN_USABLE_YIELD_ELIGIBLE,
+            min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
+            data_root=Path(data_root),
+            repo_root=Path(repo_root),
         )
         if gate != "OK":
             return {
@@ -1659,7 +1674,14 @@ def run_preflight(
                 "memory_eligibility_sha256": memory_eligibility,
                 "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
                 "control_yield_eligible": yield_eligible,
-                "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
+                "base_x_population_n": yield_eligible,
+                "min_usable_yield_eligible": MIN_USABLE_BASE_X_POPULATION,
+                "min_usable_base_x_population": MIN_USABLE_BASE_X_POPULATION,
+                "next": (
+                    "STOP_CORPUS_UNRESOLVABLE"
+                    if gate == "CONTROL_CORPUS_UNRESOLVABLE"
+                    else "WAIT_FOR_IMPORT_OR_STOP"
+                ),
                 "session_id": None,
                 "forge_context_packet": {},
                 "authority": {
@@ -1696,9 +1718,35 @@ def run_preflight(
         load_applicable_gate_receipt,
     )
 
+    required_outcome_point_ids = None
+    schedule_y_ids = None
+    if bound_session and action != "START_NEW_SESSION":
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            bound_schedule_y_point_ids,
+            required_outcome_point_ids as _required_points,
+        )
+
+        try:
+            resume_bundle = load_session_bundle(store, bound_session)
+        except Exception:
+            resume_bundle = None
+        if isinstance(resume_bundle, Mapping):
+            critic = resume_bundle.get("critic_result")
+            spec = None
+            if isinstance(critic, Mapping):
+                spec = critic.get("experiment_spec") or (
+                    critic.get("experiment_spec_packet") or {}
+                )
+                if isinstance(spec, Mapping) and spec.get("schema") != "smial.experiment-spec":
+                    spec = spec.get("experiment_spec")
+            if isinstance(spec, Mapping):
+                required_outcome_point_ids = _required_points(spec)
+                schedule_y_ids = bound_schedule_y_point_ids(repo_root)
     selection_gate_view = apply_selection_gate_to_preflight(
         action,
         load_applicable_gate_receipt(Path(data_root), root=Path(repo_root)),
+        required_outcome_point_ids=required_outcome_point_ids,
+        schedule_y_point_ids=schedule_y_ids,
     )
     if (
         selection_gate_view.get("applicable")
@@ -1724,6 +1772,12 @@ def run_preflight(
                 "gate_receipt_sha256": selection_gate_view.get(
                     "gate_receipt_sha256"
                 ),
+                "eligibility_scope": selection_gate_view.get("eligibility_scope"),
+                "caveat": bool(selection_gate_view.get("caveat")),
+                "full_lifecycle_equivalent": bool(
+                    selection_gate_view.get("full_lifecycle_equivalent")
+                ),
+                "integrity_invalid": bool(selection_gate_view.get("integrity_invalid")),
             },
             "forge_context_packet": {},
             "authority": {
@@ -1812,6 +1866,11 @@ def run_preflight(
             "applicable": True,
             "router_decision": selection_gate_view.get("router_decision"),
             "gate_receipt_sha256": selection_gate_view.get("gate_receipt_sha256"),
+            "eligibility_scope": selection_gate_view.get("eligibility_scope"),
+            "caveat": bool(selection_gate_view.get("caveat")),
+            "full_lifecycle_equivalent": bool(
+                selection_gate_view.get("full_lifecycle_equivalent")
+            ),
         }
     try:
         digest = store.diagnostics().committed_inventory_sha256

@@ -320,6 +320,10 @@ class ReleaseProjectionGuards(unittest.TestCase):
                 baseline,
                 result["representation"],
                 cohort_readiness_receipt=readiness,
+                projection_input_receipt=result["projection_input_receipt"],
+                base_x_population_n=result["projection_input_receipt"].get(
+                    "base_x_population_n", result.get("eligible_member_count")
+                ),
             )
             self.assertEqual(packet["probe_kind"], "REPRESENTATION_CHALLENGER")
             self.assertEqual(

@@ -36,6 +36,7 @@ from solana_alpha_lab.factory.early_market_panel_importer import (
     MIN_USABLE_YIELD_ELIGIBLE,
 )
 from solana_alpha_lab.factory.hfic_control_integrity import (
+    CONTROL_CORPUS_UNRESOLVABLE,
     CURRENT_REPRESENTATION_CONTROL_V1,
 )
 from solana_alpha_lab.factory.hfic_preflight import (
@@ -227,10 +228,12 @@ def _control_corpus(yield_eligible: int) -> dict[str, object]:
         "dataset_fingerprint": "bb" * 32,
         "evidence_role": "UNSPECIFIED",
         "yield_eligible": yield_eligible,
+        "base_x_population_n": yield_eligible,
         "yield_missing": 0,
         "feature_usable": yield_eligible >= MIN_USABLE_YIELD_ELIGIBLE,
         "labels": {
             "yield_eligible": yield_eligible,
+            "base_x_population_n": yield_eligible,
             "logical_dataset_id": CORPUS_DATASET_ID,
         },
     }
@@ -606,18 +609,16 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             apply_selection_gate_to_preflight("START_NEW_SESSION", None)["action"],
             "START_NEW_SESSION",
         )
-        self.assertEqual(
-            apply_selection_gate_to_preflight("START_NEW_SESSION", block)["action"],
-            "STOP",
-        )
-        self.assertEqual(
-            apply_selection_gate_to_preflight("START_NEW_SESSION", block)["terminal"],
-            BLOCK_FORGE_SELECTION_RISK,
-        )
-        self.assertEqual(
-            apply_selection_gate_to_preflight("START_NEW_SESSION", gap)["terminal"],
-            BLOCK_FORGE_EVIDENCE_GAP,
-        )
+        blocked = apply_selection_gate_to_preflight("START_NEW_SESSION", block)
+        self.assertEqual(blocked["action"], "START_NEW_SESSION")
+        self.assertTrue(blocked.get("caveat"))
+        self.assertEqual(blocked["router_decision"], BLOCK_FORGE_SELECTION_RISK)
+        self.assertIsNone(blocked.get("terminal"))
+        gap_view = apply_selection_gate_to_preflight("START_NEW_SESSION", gap)
+        self.assertEqual(gap_view["action"], "START_NEW_SESSION")
+        self.assertTrue(gap_view.get("caveat"))
+        self.assertEqual(gap_view["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+        self.assertIsNone(gap_view.get("terminal"))
         eligible = apply_selection_gate_to_preflight("START_NEW_SESSION", caveat)
         self.assertEqual(eligible["action"], "START_NEW_SESSION")
         self.assertTrue(eligible.get("caveat"))
@@ -822,11 +823,13 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                     git_snapshot=_git_snapshot(),
                     clock=_CLOCK,
                 )
-            self.assertEqual(blocked["action"], "STOP")
-            self.assertEqual(blocked["terminal"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(blocked["action"], "START_NEW_SESSION")
             self.assertEqual(blocked["router_decision"], BLOCK_FORGE_SELECTION_RISK)
-            self.assertEqual(
-                blocked["next"],
+            self.assertTrue((blocked.get("forge_context_packet") or {}).get(
+                "selection_robustness_caveat"
+            ))
+            self.assertNotEqual(
+                blocked.get("next"),
                 "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
             )
             artifact.unlink()
@@ -899,15 +902,12 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                     evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
                 )
             self.assertEqual(control["action"], "STOP")
-            self.assertEqual(control["terminal"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(control["terminal"], CONTROL_CORPUS_UNRESOLVABLE)
             self.assertEqual(
                 control["evidence_surface_mode"],
                 CURRENT_REPRESENTATION_CONTROL_V1,
             )
-            self.assertEqual(
-                control["next"],
-                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
-            )
+            self.assertIsNone(control.get("router_decision"))
 
     def test_prior_hfic_sessions_remain_in_scientific_context(self) -> None:
         spec = load_gate_spec(ROOT)
@@ -1170,8 +1170,9 @@ class SelectionGateReceiptIdentityTests(unittest.TestCase):
                 blocked = apply_selection_gate_to_preflight(
                     "START_NEW_SESSION", _load_gate(data_root)
                 )
-            self.assertEqual(blocked["action"], "STOP")
-            self.assertEqual(blocked["terminal"], BLOCK_FORGE_SELECTION_RISK)
+            self.assertEqual(blocked["action"], "START_NEW_SESSION")
+            self.assertTrue(blocked.get("caveat"))
+            self.assertEqual(blocked["router_decision"], BLOCK_FORGE_SELECTION_RISK)
             persist_gate_receipt(
                 data_root,
                 _hashed_gate_receipt(
@@ -1196,7 +1197,9 @@ class SelectionGateReceiptIdentityTests(unittest.TestCase):
                 gap = apply_selection_gate_to_preflight(
                     "START_NEW_SESSION", _load_gate(data_root)
                 )
-            self.assertEqual(gap["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(gap["action"], "START_NEW_SESSION")
+            self.assertTrue(gap.get("caveat"))
+            self.assertEqual(gap["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
 
     def test_skip_stage2_canonical_receipt_binds_dataset_manifest_id(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

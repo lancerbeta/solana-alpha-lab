@@ -19,8 +19,8 @@ from typing import Any
 
 from jsonschema import Draft202012Validator
 
-from solana_alpha_lab.factory.early_market_panel_importer import (
-    MIN_USABLE_YIELD_ELIGIBLE,
+from solana_alpha_lab.factory.scientific_eligibility_projection import (
+    MIN_USABLE_BASE_X_POPULATION,
 )
 from solana_alpha_lab.factory.hfic_control_integrity import (
     CASE_A_TERMINALS,
@@ -667,16 +667,51 @@ def _validate_cohort_readiness_receipt(
     return receipt
 
 
-def _assert_probe_readiness_eligible(receipt: Mapping[str, Any]) -> None:
+def _resolve_probe_base_x(*sources: object, fallback: int | None = None) -> int | None:
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        for key in ("base_x_population_n", "base_x_n"):
+            raw = source.get(key)
+            if raw is not None:
+                return int(raw)
+        population = source.get("base_x_population")
+        if isinstance(population, Mapping) and population.get("n") is not None:
+            return int(population["n"])
+        nested = source.get("projection_input_receipt")
+        if isinstance(nested, Mapping) and nested is not source:
+            found = _resolve_probe_base_x(nested)
+            if found is not None:
+                return found
+        nested = source.get("scientific_eligibility_projection")
+        if isinstance(nested, Mapping) and nested is not source:
+            found = _resolve_probe_base_x(nested)
+            if found is not None:
+                return found
+    return fallback
+
+
+def _assert_probe_readiness_eligible(
+    receipt: Mapping[str, Any],
+    *,
+    base_x_population_n: int | None = None,
+) -> None:
     if receipt["discovery_coverage_class"] == "GAP_CONFIRMED":
         raise RepresentationProbeError(INVALID_COVERAGE_BROKEN)
-    if receipt["yield_eligible"] < MIN_USABLE_YIELD_ELIGIBLE:
+    floor_n = base_x_population_n
+    if floor_n is None:
+        floor_n = _resolve_probe_base_x(receipt)
+    if floor_n is None:
+        raise RepresentationProbeError(INVALID_INSUFFICIENT_YIELD)
+    if int(floor_n) < MIN_USABLE_BASE_X_POPULATION:
         raise RepresentationProbeError(INVALID_INSUFFICIENT_YIELD)
 
 
 def _assert_representation_bound_to_readiness(
     representation: Mapping[str, Any],
     readiness: Mapping[str, Any],
+    *,
+    base_x_population_n: int | None = None,
 ) -> None:
     """Bind the compact packet to the exact verified release readback."""
 
@@ -716,7 +751,15 @@ def _assert_representation_bound_to_readiness(
     # binding above already matches the verified release manifest exactly
     # (release/source/census/observations/schedule/activation).  Only the
     # frozen schedule geometry (points/offsets/schedule_id) is fixed.
-    if representation.get("eligible_member_count") != readiness["yield_eligible"]:
+    raw_base_x = base_x_population_n
+    if raw_base_x is None:
+        raw_base_x = _resolve_probe_base_x(
+            readiness,
+            representation,
+        )
+    if raw_base_x is None:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    if representation.get("eligible_member_count") != int(raw_base_x):
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
 
 def _memory_baseline_sha256(
@@ -955,6 +998,8 @@ def build_challenger_packet(
     *,
     owner_focus: str | None = None,
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
+    base_x_population_n: int | None = None,
+    projection_input_receipt: Mapping[str, Any] | None = None,
     registered_probe_identity_sha256: str | None = None,
     registration_readback_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -993,8 +1038,18 @@ def build_challenger_packet(
         cohort_readiness_receipt,
         expected_schedule_sha256=payload["schedule"]["schedule_sha256"],
     )
-    _assert_probe_readiness_eligible(readiness)
-    _assert_representation_bound_to_readiness(payload, readiness)
+    resolved_base_x = _resolve_probe_base_x(
+        {"base_x_population_n": base_x_population_n}
+        if base_x_population_n is not None
+        else {},
+        projection_input_receipt,
+    )
+    _assert_probe_readiness_eligible(readiness, base_x_population_n=resolved_base_x)
+    _assert_representation_bound_to_readiness(
+        payload,
+        readiness,
+        base_x_population_n=resolved_base_x,
+    )
     bound_focus = baseline.packet.get(
         "owner_focus", baseline.focus_key_sha256 or "CONTROL"
     )
@@ -1192,6 +1247,8 @@ def existing_hfic_packet(
     challenger_packet: Mapping[str, Any],
     *,
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
+    base_x_population_n: int | None = None,
+    projection_input_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Return the unchanged critic packet for an existing HFIC lifecycle fixture."""
 
@@ -1202,8 +1259,19 @@ def existing_hfic_packet(
         cohort_readiness_receipt,
         expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
     )
-    _assert_probe_readiness_eligible(readiness)
-    _assert_representation_bound_to_readiness(representation, readiness)
+    resolved_base_x = _resolve_probe_base_x(
+        {"base_x_population_n": base_x_population_n}
+        if base_x_population_n is not None
+        else {},
+        projection_input_receipt,
+        challenger_packet,
+    )
+    _assert_probe_readiness_eligible(readiness, base_x_population_n=resolved_base_x)
+    _assert_representation_bound_to_readiness(
+        representation,
+        readiness,
+        base_x_population_n=resolved_base_x,
+    )
     return deepcopy(dict(validated["critic_input_packet"]))
 
 
@@ -1240,6 +1308,8 @@ def existing_hfic_lifecycle_fixture_input(
     *,
     control_receipt: Mapping[str, Any],
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
+    base_x_population_n: int | None = None,
+    projection_input_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Bridge the outer dormant envelope into the unchanged HFIC fixture seam.
 
@@ -1257,10 +1327,23 @@ def existing_hfic_lifecycle_fixture_input(
         cohort_readiness_receipt,
         expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
     )
-    _assert_representation_bound_to_readiness(representation, readiness)
+    resolved_base_x = _resolve_probe_base_x(
+        {"base_x_population_n": base_x_population_n}
+        if base_x_population_n is not None
+        else {},
+        projection_input_receipt,
+        challenger_packet,
+    )
+    _assert_representation_bound_to_readiness(
+        representation,
+        readiness,
+        base_x_population_n=resolved_base_x,
+    )
     packet = existing_hfic_packet(
         validated,
         cohort_readiness_receipt=readiness,
+        base_x_population_n=resolved_base_x,
+        projection_input_receipt=projection_input_receipt,
     )
     return {
         "lifecycle_mode": REPRESENTATION_PROBE_KIND,
@@ -1376,8 +1459,16 @@ def _status_probe_identity_reason(
             snapshot.get("cohort_readiness_receipt"),
             expected_schedule_sha256=representation["schedule"]["schedule_sha256"],
         )
-        _assert_probe_readiness_eligible(readiness)
-        _assert_representation_bound_to_readiness(representation, readiness)
+        resolved_base_x = _resolve_probe_base_x(
+            snapshot,
+            receipt,
+        )
+        _assert_probe_readiness_eligible(readiness, base_x_population_n=resolved_base_x)
+        _assert_representation_bound_to_readiness(
+            representation,
+            readiness,
+            base_x_population_n=resolved_base_x,
+        )
         if receipt.get("probe_state") not in {"DORMANT_PACKET_ONLY", "REGISTERED"}:
             return INVALID_PROBE_IDENTITY
         payload_sha256 = representation["payload_sha256"]
@@ -1680,6 +1771,13 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
                 ]
             else:
                 cohort_imported = False
+            representation_payload = snapshot.get("representation")
+            if not isinstance(representation_payload, Mapping):
+                representation_payload = snapshot.get("normalized_trajectory_v1")
+            base_x_n = _resolve_probe_base_x(
+                snapshot,
+                readiness_receipt if isinstance(readiness_receipt, Mapping) else None,
+            )
             invalid_reason: str | None = _status_binding_reason(
                 snapshot, receipt_mapping
             )
@@ -1701,7 +1799,9 @@ def representation_status(snapshot: Mapping[str, Any]) -> dict[str, Any]:
                 "READY_VALID_WITH_COVERAGE_LIMITATION",
             } or invalid_reason is None and coverage == "GAP_CONFIRMED":
                 invalid_reason = INVALID_COVERAGE_BROKEN
-            elif invalid_reason is None and yield_eligible < MIN_USABLE_YIELD_ELIGIBLE:
+            elif invalid_reason is None and (
+                base_x_n is None or int(base_x_n) < MIN_USABLE_BASE_X_POPULATION
+            ):
                 invalid_reason = INVALID_INSUFFICIENT_YIELD
             if invalid_reason == INVALID_CONTROL_NOT_RUN:
                 status = STATUS_CONTROL_REQUIRED
@@ -1739,6 +1839,8 @@ def build_representation_probe_packet(
     *,
     owner_focus: str | None = None,
     cohort_readiness_receipt: Mapping[str, Any] | None = None,
+    base_x_population_n: int | None = None,
+    projection_input_receipt: Mapping[str, Any] | None = None,
     registered_probe_identity_sha256: str | None = None,
     registration_readback_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
@@ -1749,6 +1851,8 @@ def build_representation_probe_packet(
         representation,
         owner_focus=owner_focus,
         cohort_readiness_receipt=cohort_readiness_receipt,
+        base_x_population_n=base_x_population_n,
+        projection_input_receipt=projection_input_receipt,
         registered_probe_identity_sha256=registered_probe_identity_sha256,
         registration_readback_receipt=registration_readback_receipt,
     )

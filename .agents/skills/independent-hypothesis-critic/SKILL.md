@@ -97,8 +97,30 @@ Hard boundaries — same as Forge:
 3. Execute **PROMPT B** attack matrix and terminal policy.
 4. Return critic sections B7 in order: one terminal, one NEXT, at most one execution
    unit.
-5. On `PASS_TO_CLASSIFICATION` path only: schema-validate ExperimentSpec and run
-   deterministic lane classifier **network-free**. Do not execute experiments.
+5. On `PASS_TO_CLASSIFICATION` path only: emit schema-valid **ExperimentSpec 1.3**
+   with explicit `required_outcomes`. `primary_y` / `horizon_notional` remain
+   identity text, not a parser. Do **not** create `CRITIC_INPUT_PACKET` 1.5.
+   Historical selection receipts stay byte-immutable
+   `FULL_LIFECYCLE_COMPLETENESS` caveats; do not globally veto
+   `START_NEW_SESSION` and do not auto-veto ExperimentSpec 1.3 from Y-point-set
+   equality alone. Invalid/stale receipt identity remains fail-closed.
+   Schema-validate the 1.3 spec and run deterministic lane classifier
+   **network-free**. Do not stamp `outcome_readiness=COMPLETE`. The
+   classifier authorizes `COMPLETE` only from a live release projection;
+   attached or self-hashed stamps fail closed.
+   `COMPLETE` = every required `(point_id, field_id)` is `OBSERVED` for every
+   member of `base_x`. Censored / typed-missing / absent required outcomes are
+   `MISSINGNESS_UNRESOLVED` coverage against `base_x.n`, not a complete-case
+   shrink. `MISSINGNESS_UNRESOLVED` fail-closes into the existing
+   data/science-option route (`PASS_DATA_OPTION_REQUIRED`, classifier NEXT
+   `REPORT_OUTCOME_COVERAGE_KEEP_BASE_X`) and must not shrink N. This is a
+   coverage report, not a new collection commission.
+   `CANONICAL_SCHEDULE_UNBOUND` / `CANONICAL_X300_SCHEDULE_INCOMPATIBLE` /
+   `CANONICAL_RELEASE_IDENTITY_UNBOUND` / `CANONICAL_RELEASE_BIND_FAILED`
+   are consume-time binding/geometry failures
+   (`RESOLVE_IMMUTABLE_DATA_BINDINGS`), not collection.
+   `SELECTION_RECEIPT_INTEGRITY_INVALID` → `REBIND_SELECTION_RECEIPT_IDENTITY`.
+   Do not execute experiments.
 
 ## Context isolation
 

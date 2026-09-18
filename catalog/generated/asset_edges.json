@@ -1223,6 +1223,11 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "CONFIG-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001"
+    },
+    {
       "source_asset_id": "CONFIG-SEMANTIC-PREMISE-REVIEW-PROFILE-001",
       "relation": "depends_on",
       "target_asset_id": "SCHEMA-SEMANTIC-PREMISE-REVIEW-PACKET-001"
@@ -3441,6 +3446,21 @@
       "source_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001"
     },
     {
       "source_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001",
@@ -11873,6 +11893,21 @@
       "target_asset_id": "CTRL-RISK-AND-ECONOMICS-001"
     },
     {
+      "source_asset_id": "MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONFIG-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001"
+    },
+    {
       "source_asset_id": "MODULE-SEMANTIC-PREMISE-REVIEW-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-SEMANTIC-PREMISE-REVIEW-PROFILE-001"
@@ -13883,6 +13918,16 @@
       "target_asset_id": "CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001"
     },
     {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-3-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-2-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-EXPERIMENT-SPEC-V1-3-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001"
+    },
+    {
       "source_asset_id": "SCHEMA-FACTORY-REMOTE-OPERATIONS-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FACTORY-REMOTE-OPERATIONS-001"
@@ -14126,6 +14171,11 @@
       "source_asset_id": "SCHEMA-RUN-PASSPORT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HYPOTHESIS-FAST-LANE-001"
+    },
+    {
+      "source_asset_id": "SCHEMA-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001"
     },
     {
       "source_asset_id": "SCHEMA-SEMANTIC-PREMISE-REVIEW-PACKET-001",
@@ -16351,6 +16401,16 @@
       "source_asset_id": "TEST-HFIC-SELECTION-ROBUSTNESS-GATE-001",
       "relation": "validated_by",
       "target_asset_id": "MODULE-HFIC-SELECTION-ROBUSTNESS-GATE-001"
+    },
+    {
+      "source_asset_id": "TEST-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001"
     },
     {
       "source_asset_id": "TEST-HYPOTHESIS-FAST-LANE-ACCEPTANCE-001",

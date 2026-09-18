@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.run_passport import (
 
 SPEC_SCHEMA_RELATIVE = "catalog/schemas/experiment_spec_v1_1.schema.json"
 SPEC_SCHEMA_V1_2_RELATIVE = "catalog/schemas/experiment_spec_v1_2.schema.json"
+SPEC_SCHEMA_V1_3_RELATIVE = "catalog/schemas/experiment_spec_v1_3.schema.json"
 DESCRIPTOR_SCHEMA_RELATIVE = (
     "catalog/schemas/experiment_capability_descriptor.schema.json"
 )
@@ -128,7 +129,9 @@ def _validate_spec(
         return None
     version = spec.get("schema_version")
     schema_relative = SPEC_SCHEMA_RELATIVE
-    if version == "1.2":
+    if version == "1.3":
+        schema_relative = SPEC_SCHEMA_V1_3_RELATIVE
+    elif version == "1.2":
         schema_relative = SPEC_SCHEMA_V1_2_RELATIVE
     elif version not in {None, "1.1"}:
         return None
@@ -284,12 +287,35 @@ def _change_lane(reason_code: str) -> LaneDecision:
     )
 
 
+def _submission_outcome_readiness(
+    spec: Mapping[str, Any],
+    submission: Mapping[str, Any],
+) -> str:
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        READINESS_UNSPECIFIED,
+        validated_projection_readiness,
+    )
+
+    if spec.get("schema_version") != "1.3":
+        return READINESS_UNSPECIFIED
+    projection = submission.get("scientific_eligibility_projection")
+    return validated_projection_readiness(
+        spec,
+        projection if isinstance(projection, Mapping) else None,
+    )
+
+
 def _blocked_data(reason_code: str) -> LaneDecision:
+    next_action = "RESOLVE_IMMUTABLE_DATA_BINDINGS"
+    if reason_code == "OUTCOME_MISSINGNESS_UNRESOLVED":
+        next_action = "REPORT_OUTCOME_COVERAGE_KEEP_BASE_X"
+    elif reason_code == "SELECTION_RECEIPT_INTEGRITY_INVALID":
+        next_action = "REBIND_SELECTION_RECEIPT_IDENTITY"
     return _decision(
         Lane.FAST_LANE,
         "BLOCKED_DATA",
         reason_codes=(reason_code,),
-        next_action="RESOLVE_IMMUTABLE_DATA_BINDINGS",
+        next_action=next_action,
     )
 
 
@@ -329,9 +355,10 @@ def classify_lane(
         )
 
     capability_id = str(spec["capability_id"])
+    uses_observation_request = spec.get("schema_version") in {"1.2", "1.3"}
     registry_relative = (
         CAPABILITY_REGISTRY_V2_RELATIVE
-        if spec.get("schema_version") == "1.2"
+        if uses_observation_request
         else CAPABILITY_REGISTRY_RELATIVE
     )
     try:
@@ -364,7 +391,7 @@ def classify_lane(
     if requested_calls > int(descriptor["max_provider_calls"]):
         return _change_lane("GUARDRAIL_CHANGE_REQUIRED")
 
-    if spec.get("schema_version") == "1.2":
+    if uses_observation_request:
         from solana_alpha_lab.factory.observation_schedule_compiler import (
             compile_observation_request,
         )
@@ -514,6 +541,52 @@ def classify_lane(
             prior_run_id=prior_run.run_id,
             next_action="REPLAY_PRIOR_RUN",
         )
+
+    if spec.get("schema_version") == "1.3":
+        from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+            apply_selection_gate_to_preflight,
+            load_applicable_gate_receipt,
+        )
+        from solana_alpha_lab.factory.scientific_eligibility_projection import (
+            CANONICAL_RELEASE_BIND_FAILED,
+            CANONICAL_RELEASE_IDENTITY_UNBOUND,
+            READINESS_COMPLETE,
+            ScientificEligibilityError,
+            try_project_scientific_eligibility_from_data_root,
+        )
+
+        request = spec.get("observation_request")
+        schedule = request if isinstance(request, Mapping) else None
+        if uses_observation_request:
+            compiled_schedule = compiled.schedule if compiled.schedule else None
+            if isinstance(compiled_schedule, Mapping):
+                schedule = compiled_schedule
+        working = dict(submission)
+        try:
+            computed = try_project_scientific_eligibility_from_data_root(
+                Path(data_root),
+                repo_root=Path(root),
+                spec=spec,
+                schedule=schedule,
+            )
+        except ScientificEligibilityError as exc:
+            code = str(exc.code or "")
+            if code == "OUTCOME_MISSINGNESS_UNRESOLVED":
+                return _blocked_data(code)
+            return _blocked_data(code or CANONICAL_RELEASE_BIND_FAILED)
+        if computed is None:
+            return _blocked_data(CANONICAL_RELEASE_IDENTITY_UNBOUND)
+        working["scientific_eligibility_projection"] = computed
+        if _submission_outcome_readiness(spec, working) != READINESS_COMPLETE:
+            return _blocked_data("OUTCOME_MISSINGNESS_UNRESOLVED")
+        selection_view = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION",
+            load_applicable_gate_receipt(Path(data_root), root=Path(root)),
+        )
+        if selection_view.get("action") == "STOP":
+            if selection_view.get("integrity_invalid"):
+                return _blocked_data("SELECTION_RECEIPT_INTEGRITY_INVALID")
+            return _blocked_data("SELECTION_RECEIPT_INTEGRITY_INVALID")
 
     if descriptor["effect_class"] == "PROVIDER_READ_ONLY_BOUNDED":
         return _decision(

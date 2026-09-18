@@ -22,6 +22,9 @@ from solana_alpha_lab.factory.collector_schedulability_oracle import (  # noqa: 
 from solana_alpha_lab.factory.early_market_panel_importer import (  # noqa: E402
     MIN_USABLE_YIELD_ELIGIBLE,
 )
+from solana_alpha_lab.factory.scientific_eligibility_projection import (  # noqa: E402
+    MIN_USABLE_BASE_X_POPULATION,
+)
 from solana_alpha_lab.factory.hfic_preflight import MAX_PACKET_BYTES  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import PROMPT_VERSION  # noqa: E402
 from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
@@ -43,7 +46,7 @@ from validate_catalog import load_and_validate  # noqa: E402
 CONTRACT_PATH = ROOT / "docs/contracts/normalized_trajectory_representation_probe_v1.md"
 TOKENS_V2_PATH = ROOT / "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py"
 FROZEN_PREREGISTRATION_SHA256 = (
-    "617879817f2f7b0810bb66c657ba94f22b02acb54dd7b42f5b3b8df3a6908357"
+    "dca1c1d298e00bc18abfe40a4c8cc05dc9d3af84dee413fbb06e30ad4fcb4bf0"
 )
 
 
@@ -96,6 +99,11 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
             MIN_USABLE_YIELD_ELIGIBLE,
         )
         self.assertEqual(MIN_USABLE_YIELD_ELIGIBLE, 10)
+        self.assertEqual(
+            self.contract["min_usable_base_x_population"],
+            MIN_USABLE_BASE_X_POPULATION,
+        )
+        self.assertEqual(MIN_USABLE_BASE_X_POPULATION, 10)
 
     def test_field_ids_exist_and_taker_is_not_invented(self) -> None:
         fields = self.contract["fields"]

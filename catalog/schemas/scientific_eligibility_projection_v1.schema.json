@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smial.local/schemas/scientific_eligibility_projection_v1.schema.json",
+  "title": "SMIAL ScientificEligibilityProjection v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "schema_version",
+    "rule_id",
+    "base_x_population",
+    "lifecycle_coverage",
+    "outcome_coverage",
+    "outcome_readiness",
+    "invariants",
+    "projection_sha256"
+  ],
+  "properties": {
+    "schema": {"const": "smial.scientific-eligibility-projection"},
+    "schema_version": {"const": "1.0"},
+    "rule_id": {"const": "BASE_X_X300_VALID_X_ELIGIBLE_V1"},
+    "release_binding": {"type": "object"},
+    "experiment_spec_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^([0-9a-f]{64})?$"
+    },
+    "base_x_population": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "n", "member_ids_sha256", "x_point_id", "x_field_id"],
+      "properties": {
+        "rule_id": {"type": "string"},
+        "n": {"type": "integer", "minimum": 0},
+        "member_ids_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+        "x_point_id": {"const": "X300"},
+        "x_field_id": {"const": "FIELD-LIQUIDITY-USD-001"},
+        "x_due_offset_seconds": {"type": "integer", "minimum": 0},
+        "x_allowed_lateness_seconds": {"type": "integer", "minimum": 0}
+      }
+    },
+    "lifecycle_coverage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner",
+        "n_observed",
+        "n_censored_late",
+        "n_typed_missing",
+        "n_other",
+        "denominator_n"
+      ],
+      "properties": {
+        "owner": {"type": "string"},
+        "n_observed": {"type": "integer", "minimum": 0},
+        "n_censored_late": {"type": "integer", "minimum": 0},
+        "n_typed_missing": {"type": "integer", "minimum": 0},
+        "n_other": {"type": "integer", "minimum": 0},
+        "denominator_n": {"type": "integer", "minimum": 0}
+      }
+    },
+    "outcome_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "point_id",
+          "field_id",
+          "role",
+          "n_observed",
+          "n_censored_late",
+          "n_typed_missing",
+          "n_absent",
+          "n_other",
+          "denominator_n"
+        ],
+        "properties": {
+          "point_id": {"type": "string"},
+          "field_id": {"type": "string"},
+          "role": {"enum": ["PRIMARY", "AUXILIARY"]},
+          "n_observed": {"type": "integer", "minimum": 0},
+          "n_censored_late": {"type": "integer", "minimum": 0},
+          "n_typed_missing": {"type": "integer", "minimum": 0},
+          "n_absent": {"type": "integer", "minimum": 0},
+          "n_other": {"type": "integer", "minimum": 0},
+          "denominator_n": {"type": "integer", "minimum": 0}
+        }
+      }
+    },
+    "outcome_readiness": {
+      "enum": ["COMPLETE", "MISSINGNESS_UNRESOLVED", "UNSPECIFIED"]
+    },
+    "invariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "missing_y_never_shrinks_base_x",
+        "no_complete_case_population",
+        "no_y_typed_value_read"
+      ],
+      "properties": {
+        "missing_y_never_shrinks_base_x": {"const": true},
+        "no_complete_case_population": {"const": true},
+        "no_y_typed_value_read": {"const": true}
+      }
+    },
+    "projection_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

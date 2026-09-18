@@ -25858,7 +25858,7 @@ records:
   as_of: '2026-08-19'
   truth_owner: FACTORY_V1_PRODUCT_KERNEL_LOCAL_VERTICAL_SLICE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/experiment_spec.py', repository_path: src/solana_alpha_lab/factory/experiment_spec.py}
-  integrity: {kind: sha256, sha256: 09eb649b2bbf453bcd3da0e8f0dc6a26f5311493cb71749a9058e77092ecf8e3}
+  integrity: {kind: sha256, sha256: 6bff053c5d458f6e33929cec67bb88ce9a13bf9979d59364ab6eb425ccc29cac}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-001}
@@ -31971,7 +31971,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/lane_classifier.py', repository_path: src/solana_alpha_lab/factory/lane_classifier.py}
-  integrity: {kind: sha256, sha256: 2bb6e94b59c4301d938a8bc17154534eb70e0892116416e8f26039326266cf23}
+  integrity: {kind: sha256, sha256: 3387f33e3a996135993e5680ce00d5259b076556352e45aeac77e808b4478d52}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 6959320ddb998b566c7dc31268b10ead3d20d648b73d423bce41216222c37abf}
+  integrity: {kind: sha256, sha256: 1c2bf9eca18f2490a2e34d0703da6cd8d498bd6c7a3e99821afadde32756e2f2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34097,7 +34097,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_to_forge.py', repository_path: src/solana_alpha_lab/factory/live_cohort_to_forge.py}
-  integrity: {kind: sha256, sha256: a8e9deafde76baa672e450ebe935e8b30f3ae5140cb8cbf4f752fd42e0385c02}
+  integrity: {kind: sha256, sha256: c90e7dafaea4cff7f957cff9056910e5e6cf4a99d35eae3fc17a4cc78af96c4a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34495,7 +34495,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 9082e0445cff065cff81f0d6f13d3ed5012aa62376e1ef655c5980ffa2cd6940}
+  integrity: {kind: sha256, sha256: b75b15975937225b6c0644e986f125e6e9f9efbb6561b24c5628705f9ed0d72d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -35514,7 +35514,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_representation_probe_v1.md', repository_path: docs/contracts/normalized_trajectory_representation_probe_v1.md}
-  integrity: {kind: sha256, sha256: 617879817f2f7b0810bb66c657ba94f22b02acb54dd7b42f5b3b8df3a6908357}
+  integrity: {kind: sha256, sha256: dca1c1d298e00bc18abfe40a4c8cc05dc9d3af84dee413fbb06e30ad4fcb4bf0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
@@ -35534,7 +35534,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_normalized_trajectory_probe_preregistration_v1.py', repository_path: tests/test_normalized_trajectory_probe_preregistration_v1.py}
-  integrity: {kind: sha256, sha256: f60248e857c26dfe84ba87cf8ce4c394f72fb1c6b0d318eedc2940c8a3a2a9ed}
+  integrity: {kind: sha256, sha256: 25d2f2b38561a8851171242d6f7b422f63174457cbbf5735a5aad9bb3d36bc65}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}
@@ -36734,7 +36734,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: HFIC_PACKET14_AVAILABILITY_FAST_LANE_GUARD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_control_integrity.py', repository_path: src/solana_alpha_lab/factory/hfic_control_integrity.py}
-  integrity: {kind: sha256, sha256: 30cc794351459c00774e8aba06bf6823bfd82b0ae5f1ca4145db85291ff8d671}
+  integrity: {kind: sha256, sha256: 376504cce2990566497471977fbffdce11923fb42b8d057da4532eebabd39458}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-001}
@@ -36976,7 +36976,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_v1_capability_contract.md', repository_path: docs/contracts/normalized_trajectory_v1_capability_contract.md}
-  integrity: {kind: sha256, sha256: e5c69c480c488b9bdbfdd72faafee5c47a7007ea42a6be165803907efb7de776}
+  integrity: {kind: sha256, sha256: 93f9ff833ba271d94aa2b0d4be18fccb55ce19a8d593f644381ebdc460e3e8da}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001}
@@ -37017,7 +37017,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_probe.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_probe.py}
-  integrity: {kind: sha256, sha256: 73dbfb701712b9141ec54ae46b93fc7aaa060bec8ef9fabfdcbe9a4a0bfd67b4}
+  integrity: {kind: sha256, sha256: 9f0b0eec7769911eb14c8512b75377989f26976cd5eee569ff288f9bb45cd3f0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-NORMALIZED-TRAJECTORY-V1-001}
@@ -37078,7 +37078,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_representation_probe.py', repository_path: tests/test_hfic_representation_probe.py}
-  integrity: {kind: sha256, sha256: acf6f878b95f320fe1ce4f037ed42a8e43fc09687e10614e4398d442234929ab}
+  integrity: {kind: sha256, sha256: 98e34d12a23a26d92bbab652e26a2a34cd87fcc8862b94e5c4b9de7d0d30a988}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-HFIC-REPRESENTATION-PROBE-001}
@@ -37253,7 +37253,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py', repository_path: src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py}
-  integrity: {kind: sha256, sha256: 03193aed441d6b730f7b1fb93d1ebbd2706aa2121fec4abf4e46c865c9d01955}
+  integrity: {kind: sha256, sha256: f351cb6726c3a09cf8dc0cf1fcdfa5f0e3b317bbb790e959b95e3f49dae99ac4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
@@ -37493,7 +37493,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py', repository_path: src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py}
-  integrity: {kind: sha256, sha256: 2ab9b65deae90fda50cd0c92e09861f1af7034c9a6c0e34700aa8c6f5618f452}
+  integrity: {kind: sha256, sha256: a556d8262c81341ea0de510fc5fd6fbb673e04129267505111c7eb6271277da2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
@@ -37512,7 +37512,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HFIC_SELECTION_ROBUSTNESS_GATE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_selection_robustness_gate_v1.py', repository_path: tests/test_hfic_selection_robustness_gate_v1.py}
-  integrity: {kind: sha256, sha256: 4954c10881563849f21500c284fa56c5413e70ebfde4168d7c58deb4a47cbea9}
+  integrity: {kind: sha256, sha256: 3b3e3c37d2a9ebb7c26726158cf62a2c992f97fcd6d5c4dcee306f3543c66e06}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
@@ -37537,4 +37537,112 @@ records:
   consumers: [GOAL-OWNER]
   evidence: []
   search_terms: [HYPOTHESIS_FORGE, HFIC, SELECTION, READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact contract for X300-valid X_ELIGIBLE scientific denominator, ExperimentSpec 1.3 required_outcomes, and scoped selection-receipt interpretation.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-18'
+  truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1.md', repository_path: docs/tasks/HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1.md}
+  integrity: {kind: sha256, sha256: 51eb922753e105a37f34431df018aa3b04433b4cecff0e4a9d0ffad452aab156}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
+  consumers: [FACTORY-001, GOAL-OWNER]
+  evidence: []
+  search_terms: [SCIENTIFIC_ELIGIBILITY, BASE_X, REQUIRED_OUTCOMES, HORIZON]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CONFIG-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Frozen X300 liquidity-only base_x rule and sealed C1 shape 475/148/327.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-18'
+  truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/scientific_eligibility_projection_v1.yaml', repository_path: configs/scientific_eligibility_projection_v1.yaml}
+  integrity: {kind: sha256, sha256: f239f4a78c3ab0f0626db2c0927b07b8f51c7c70cb13ea99ac3b6feebb61b6d0}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SCIENTIFIC_ELIGIBILITY, BASE_X, X300, C1_SHAPE]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: ScientificEligibilityProjection v1 payload with base_x, lifecycle coverage, and typed outcome_readiness.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-18'
+  truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/scientific_eligibility_projection_v1.schema.json', repository_path: catalog/schemas/scientific_eligibility_projection_v1.schema.json}
+  integrity: {kind: sha256, sha256: 3f41ada7b5bb00644e4b2a8a2133da8dadaa3970a3ca971d3f4ef9b1d2ef009f}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SCIENTIFIC_ELIGIBILITY, SCHEMA, OUTCOME_READINESS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: SCHEMA-EXPERIMENT-SPEC-V1-3-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: ExperimentSpec v1.3 schema requiring explicit required_outcomes; primary_y remains identity text.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-18'
+  truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/experiment_spec_v1_3.schema.json', repository_path: catalog/schemas/experiment_spec_v1_3.schema.json}
+  integrity: {kind: sha256, sha256: 3270b93209d26e5bfa2afec9c567a0e42338fd466ccc7acebcab174f909cee88}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-EXPERIMENT-SPEC-V1-2-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [EXPERIMENT_SPEC, V1_3, REQUIRED_OUTCOMES]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Pure read-time ScientificEligibilityProjection; never reads Y typed values or shrinks base_x.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-18'
+  truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/scientific_eligibility_projection.py', repository_path: src/solana_alpha_lab/factory/scientific_eligibility_projection.py}
+  integrity: {kind: sha256, sha256: 22374fef4c7e6eb4fcf4e5934b188190bd9985ec98023f30c8ae2f80ba88f599}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
+  - {relation_type: depends_on, target_asset_id: CONFIG-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001}
+  - {relation_type: depends_on, target_asset_id: SCHEMA-SCIENTIFIC-ELIGIBILITY-PROJECTION-V1-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SCIENTIFIC_ELIGIBILITY, BASE_X, PROJECTION]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: C1-shape 475/148/327, no complete-case shrink, scoped selection caveat, and ExperimentSpec 1.3 required_outcomes proofs.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-18'
+  truth_owner: HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_scientific_eligibility_projection_v1.py', repository_path: tests/test_scientific_eligibility_projection_v1.py}
+  integrity: {kind: sha256, sha256: 82698e9c13f3ed29bff8e9346d8ce1b793a057ee767204acb7b670343d3f9b77}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-001}
+  - {relation_type: validated_by, target_asset_id: MODULE-SCIENTIFIC-ELIGIBILITY-PROJECTION-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [SCIENTIFIC_ELIGIBILITY, C1_SHAPE, TESTS]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

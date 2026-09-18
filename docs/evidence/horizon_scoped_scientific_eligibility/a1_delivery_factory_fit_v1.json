@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HORIZON-SCOPED-SCIENTIFIC-ELIGIBILITY-FACTORY-FIT-001",
+  "as_of": "2026-09-18",
+  "task_id": "HORIZON_SCOPED_SCIENTIFIC_ELIGIBILITY_V1",
+  "reviewed_bindings_sha256": "996e51ffe4e4d5ce82dbf6250354e7f4e43646895c675cde60af8b00a7b50e38",
+  "reviewed_inventory_sha256": "4fe6293edeb3010a795fad588b22826721796c0da0f7122b818225c21a383bad",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_BASE_X_IS_SCIENTIFIC_DENOMINATOR",
+    "flexibility_and_history": "PASS_RECEIPT_BYTE_IMMUTABLE_FULL_LIFECYCLE_CAVEAT",
+    "context_efficiency": "PASS_HERMETIC_AB_AND_READONLY_C1",
+    "research_truth": "PASS_OBSERVED_ONLY_COMPLETE_AND_CANONICAL_X300_FAIL_CLOSED",
+    "owner_operability": "PASS_TYPED_NEXT_INCLUDING_BIND_FAILED",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_THIS_ATOM",
+    "monitoring_and_recovery": "PASS_MISSINGNESS_INTEGRITY_AND_BINDING_NEXT",
+    "build_vs_buy": "PASS_PURE_PROJECTION_OVER_EXISTING_RELEASE",
+    "security": "PASS_NO_SECRETS_NO_Y_TYPED_VALUES",
+    "red_team": "PASS_NO_SILENT_300_PLUS_300_ON_UNPROVEN_SCHEDULE"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "recovery": "Revert ScientificEligibilityProjection, ExperimentSpec 1.3, consumer rewires, Critic/operator B5, and catalog hashes; keep historical receipts, census, parquet, manifests, yield_eligible and latest.json byte-immutable.",
+  "limits": [
+    "NO_ALPHA",
+    "NO_COMPLETE_CASE_POPULATION",
+    "NO_Y_TYPED_VALUE_READ",
+    "NO_CRITIC_INPUT_PACKET_1_5",
+    "NO_FORGE_EXECUTION_THIS_ATOM",
+    "NO_CANONICAL_DONE"
+  ]
+}

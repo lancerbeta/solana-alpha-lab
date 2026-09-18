@@ -91,9 +91,12 @@ receipt.
 
 The challenger builder and fixture transport also reject a verified readiness
 receipt with `GAP_CONFIRMED` coverage or fewer than the preregistered minimum
-usable yield-eligible members. The representation's eligible-member count
-must equal the verified receipt's `yield_eligible` count; an empty or partial
-packet cannot occupy the probe seam. Extracting the unchanged HFIC packet
+usable `base_x_population.n` members. The representation's eligible-member
+count must equal that `base_x_population.n`; historical `yield_eligible`
+remains the lifecycle-completeness label and is not the scientific
+denominator. An empty or partial packet cannot occupy the probe seam.
+NT missingness/M semantics stay unchanged; this atom does not add a generic
+lifecycle-completeness floor. Extracting the unchanged HFIC packet
 requires that same verified readiness receipt, so a packet cannot be detached
 from its release/source/census/observation-byte binding.
 

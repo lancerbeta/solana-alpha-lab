@@ -325,6 +325,9 @@ def preview_control_reconsideration(
     from solana_alpha_lab.factory.early_market_panel_importer import (
         MIN_USABLE_YIELD_ELIGIBLE,
     )
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        MIN_USABLE_BASE_X_POPULATION,
+    )
     from solana_alpha_lab.factory.hfic_control_integrity import (
         CURRENT_REPRESENTATION_CONTROL_V1,
         control_packet_has_raw_sequences,
@@ -429,7 +432,9 @@ def preview_control_reconsideration(
     gate, yield_eligible = resolve_control_corpus_yield(
         selected or datasets,
         corpus_dataset_id=CORPUS_DATASET_ID,
-        min_usable_yield_eligible=MIN_USABLE_YIELD_ELIGIBLE,
+        min_usable_yield_eligible=MIN_USABLE_BASE_X_POPULATION,
+        data_root=Path(data_root),
+        repo_root=Path(repo_root),
     )
     sessions = _query_hfic_sessions(Path(data_root))
     session = next(
@@ -486,7 +491,7 @@ def preview_control_reconsideration(
         blockers.append("PRIOR_MEMORY_CAPACITY")
     if action != "START_NEW_SESSION":
         blockers.append("PREFLIGHT_ACTION_NOT_START_NEW_SESSION")
-    if gate != "OK" or yield_eligible < MIN_USABLE_YIELD_ELIGIBLE:
+    if gate != "OK" or yield_eligible < MIN_USABLE_BASE_X_POPULATION:
         blockers.append("CONTROL_CORPUS_YIELD")
     if not identity_changed:
         blockers.append("DEFECTIVE_CONTROL_IDENTITY_UNCHANGED")
@@ -560,7 +565,7 @@ def preview_control_reconsideration(
             "gate": gate,
             "live_present": live_present,
             "yield_eligible": yield_eligible,
-            "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
+            "min_usable_yield_eligible": MIN_USABLE_BASE_X_POPULATION,
         },
         "CONTROL_TRAJECTORY_BLIND_FENCE": not trajectory_leak,
         "NO_RAW_TRAJECTORY_LEAK": not trajectory_leak,
