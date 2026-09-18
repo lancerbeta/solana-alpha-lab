@@ -1,0 +1,59 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "SELF-CONTAINED-LIVE-COHORT-RELEASE-ACCEPT-001",
+  "as_of": "2026-09-18",
+  "task_id": "SELF_CONTAINED_LIVE_COHORT_RELEASE_V1",
+  "state_change": "New LIVE cohort releases automatically carry, verify, transport and locally persist the exact ObservationSchedule document so canonical consume-time can resolve it without VPS or a manual bind step.",
+  "base_main": "5baca80892aebdfc7d415191bf7d85744070d46f",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "OWNER_MANAGED_OPTIONAL_EXPORT"
+  },
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "docs/tasks/SELF_CONTAINED_LIVE_COHORT_RELEASE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_UNIT_SELF_CONTAINED_LIVE_COHORT_RELEASE",
+    "independent_review": {
+      "path": "docs/evidence/self_contained_live_cohort_release/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_UNIT_SELF_CONTAINED_LIVE_COHORT_RELEASE"
+    ]
+  },
+  "non_claims": [
+    "NO_C2_OPERATION",
+    "NO_FORGE",
+    "NO_PROVIDER",
+    "NO_RUNTIME_MUTATION",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ],
+  "side_effects": {
+    "git_mutation": "TASK_BRANCH_ONLY",
+    "data_plane_mutation": 0,
+    "provider_calls": 0
+  }
+}

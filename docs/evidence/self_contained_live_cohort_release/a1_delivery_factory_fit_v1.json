@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "SELF-CONTAINED-LIVE-COHORT-RELEASE-FACTORY-FIT-001",
+  "as_of": "2026-09-18",
+  "task_id": "SELF_CONTAINED_LIVE_COHORT_RELEASE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_SELF_CONTAINED_SCHEDULE_PUBLICATION",
+    "flexibility_and_history": "PASS_LEGACY_1_0_UNBOUND_NO_PARQUET_REWRITE",
+    "context_efficiency": "PASS_WRAP_EXISTING_RELEASE_IMPORT_SEAM",
+    "research_truth": "PASS_EXACT_DOCUMENT_PLUS_SEMANTIC_AND_BYTE_SHA",
+    "owner_operability": "PASS_NO_MANUAL_BIND_SCHEDULE_STEP",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_THIS_ATOM",
+    "monitoring_and_recovery": "PASS_TYPED_STOP_AND_IDEMPOTENT_RETRY",
+    "build_vs_buy": "PASS_ADOPT_RESEARCHSTORE_OBSERVATION_SCHEDULE",
+    "security": "PASS_NO_SECRETS_NO_VPS_AFTER_IMPORT",
+    "red_team": "PASS_TAMPER_MISMATCH_MISSING_AND_BEFORE_SEAL_FAIL_CLOSED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "C2_OPERATION_PENDING"
+  },
+  "recovery": "Revert live cohort source/seal/verify/transport/import schedule carriage, the 1.1 observation_schedule.json artifact helper, operator doc lines, and catalog hashes; keep historical 1.0 sealed trees and imported parquet/census bytes unchanged.",
+  "limits": [
+    "NO_C2_OPERATION",
+    "NO_FORGE",
+    "NO_PROVIDER",
+    "NO_RUNTIME_MUTATION",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}

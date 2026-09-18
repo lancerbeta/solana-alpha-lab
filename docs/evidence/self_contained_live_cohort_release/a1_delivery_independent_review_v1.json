@@ -1,0 +1,83 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "SELF-CONTAINED-LIVE-COHORT-RELEASE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-18",
+  "task_id": "SELF_CONTAINED_LIVE_COHORT_RELEASE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=aa0bea08b15fafb6cdb15d8d31a987cf285a37e3a1d69eb97716ef13406e9fee",
+        "independence.claim_scope=PACKET_INFORMATION_PATH",
+        "implementation_transcript_seen=false",
+        "MANUAL_C3_SCHEDULE_REPAIR_REQUIRED=NO",
+        "ONE_SCHEDULE_OWNER=ResearchStore_OBSERVATION_SCHEDULE",
+        "NO_SECOND_SCHEDULE_DB",
+        "LEGACY_1_0_NOT_FAKE_BOUND",
+        "NO_VPS_AFTER_IMPORT",
+        "IMPORT_BEFORE_SEAL_DOES_NOT_BIND"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "SCHEMA_1_1_CARRIES_EXACT_SCHEDULE_DOCUMENT",
+        "SEMANTIC_SHA_DISTINCT_FROM_ARTIFACT_BYTE_SHA",
+        "IMPORT_BEFORE_SEAL_PRECEDES_PERSIST",
+        "REJECTED_IMPORT_DOES_NOT_BIND_RESEARCHSTORE",
+        "LEGACY_1_0_PERSIST_NOOP_STAYS_UNBOUND",
+        "NO_C1_C2_IDS_IN_PRODUCT_CODE",
+        "CANONICAL_SCHEDULE_UNBOUND_UNCHANGED"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "DOD_1_12_MET_HERMETIC_A_I",
+        "FORWARD_1_1_VERTICAL_RESOLVES_LOCAL_SCHEDULE",
+        "SHARED_SHA_BINDS_EARLIER_COHORT_WITHOUT_PARQUET_REWRITE",
+        "LEGACY_1_0_STAYS_CANONICAL_SCHEDULE_UNBOUND",
+        "IMPORT_BEFORE_SEAL_REJECT_DOES_NOT_BIND",
+        "NO_MANUAL_BIND_SCHEDULE_STEP",
+        "NO_C2_OPERATION",
+        "NO_FORGE"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "ORDINARY_PUBLICATION_NEEDS_NO_SCHEDULE_SPECIFIC_ACTION=NO",
+        "NO_BIND_SCHEDULE_COMMAND",
+        "NO_ATTACH_SCHEDULE_COMMAND",
+        "NO_SCHEDULE_DOCUMENT_CLI_FLAG",
+        "PUBLISH_LIVE_COHORT_INHERITS_1_1_CARRIAGE",
+        "TYPED_STOP_DOES_NOT_INVENT_MANUAL_BIND_RITUAL"
+      ]
+    }
+  ],
+  "remediation_history": [],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_C2_OPERATION",
+    "NO_FORGE",
+    "NO_PROVIDER",
+    "NO_RUNTIME_MUTATION",
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE"
+  ]
+}
