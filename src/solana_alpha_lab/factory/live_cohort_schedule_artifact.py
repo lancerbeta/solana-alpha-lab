@@ -110,7 +110,7 @@ def load_ops_schedule_document(
     except (ObservationScheduleStoreError, sqlite3.Error):
         return None
     finally:
-        store._conn.close()
+        store.close()
     if not isinstance(row, Mapping):
         return None
     document = row.get("document")

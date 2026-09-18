@@ -572,6 +572,139 @@ class SelfContainedLiveCohortReleaseTests(unittest.TestCase):
                 bound = resolve_canonical_release_schedule(data_root, rows)
                 self.assertEqual(schedule_sha256(bound), digest)
 
+    def test_rejected_import_before_seal_does_not_bind_schedule(self) -> None:
+        schedule = _schedule(ROOT)
+        digest = schedule["schedule_sha256"]
+        cohort_a = [_entity("A", i) for i in range(3)]
+        cohort_b = [_entity("C", i) for i in range(3)]
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            data_root = base / "data_plane"
+            data_root.mkdir()
+            legacy_rdp = base / "legacy_rdp"
+            legacy_release = base / "legacy_release"
+            snap = {
+                "schedule_sha256": digest,
+                "activation_id": ACTIVATION,
+                "producer_git_sha": PRODUCER_A,
+                "starts_at": "2026-09-02T11:19:00Z",
+                "stops_admitting_at": "2026-09-23T11:19:00Z",
+                "discovery_coverage_class": "EMPIRICAL_OVERLAP_ONLY",
+                "open_publication": False,
+                "unresolved_due": False,
+                "in_flight": False,
+                "budget_blocked": False,
+                "closure_receipt_sha256": "c" * 64,
+                "members": [
+                    {
+                        "mint": entity,
+                        "discovery_first_reliable_available_at": C1_ADMIT.strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                        "authoritative_anchor": C1_ADMIT.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                        "candidate_state": "ADMITTED",
+                        "membership_state": "OBSERVED",
+                        "denominator_state": "observed",
+                        "sampling_policy": "DETERMINISTIC_HASH_BERNOULLI",
+                        "sampling_seed": "ALWAYS-ON-LIFECYCLE-COLLECTOR-V1",
+                        "inclusion_probability": "0.0425",
+                        "selected_or_excluded": "SELECTED",
+                        "exclusion_reason": None,
+                    }
+                    for entity in cohort_a
+                ],
+                "observations": [
+                    {
+                        "mint": entity,
+                        "point_id": "X300",
+                        "field_id": "FIELD-LIQUIDITY-USD-001",
+                        "due_at": (C1_ADMIT + timedelta(seconds=300)).strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                        "observed_at": (C1_ADMIT + timedelta(seconds=300)).strftime(
+                            "%Y-%m-%dT%H:%M:%SZ"
+                        ),
+                        "state": "OBSERVED",
+                        "response_sha256": "f" * 64,
+                        "call_occurrence_id": "1" * 64,
+                        "http_status": 200,
+                        "http_class": "OK",
+                    }
+                    for entity in cohort_a
+                ],
+            }
+            write_observation_rdp_source(legacy_rdp, snap)
+            seal_live_cohort(
+                observation_rdp_root=legacy_rdp,
+                cohort_id=COHORT1,
+                release_root=legacy_release,
+                sealed_at=AS_OF_C1,
+                as_of=AS_OF_C1,
+            )
+            import_live_cohort(
+                release_root=legacy_release,
+                data_root=data_root,
+                import_time=AS_OF_C1 + timedelta(hours=1),
+            )
+            hashes_before = _cohort_parquet_hashes(data_root, COHORT1)
+            census_a = [
+                row
+                for row in current_corpus_partition_rows(data_root, kind="census")
+                if str(row.get("cohort_id")) == COHORT1
+            ]
+            with self.assertRaises(ScientificEligibilityError) as unbound:
+                resolve_canonical_release_schedule(data_root, census_a)
+            self.assertEqual(unbound.exception.code, CANONICAL_SCHEDULE_UNBOUND)
+
+            later_rdp = base / "later_rdp"
+            later_rdp.mkdir()
+            later_ops = base / "later_ops.sqlite"
+            later_release = base / "later_release"
+            _seed_rdp(
+                later_rdp,
+                schedule=schedule,
+                entities=cohort_b,
+                admission=C2_ADMIT,
+                producer=PRODUCER_C,
+                now=PUBLISH_C2,
+            )
+            _seed_ops(
+                later_ops,
+                digest=digest,
+                cohort1=cohort_b,
+                cohort2=[],
+                cohort1_admissions={entity: C2_ADMIT for entity in cohort_b},
+            )
+            sealed_b = _build_and_seal(
+                observation_rdp=later_rdp,
+                ops=later_ops,
+                digest=digest,
+                cohort_id=COHORT2,
+                as_of=AS_OF_C2,
+                release_root=later_release,
+            )
+            too_early = datetime.fromisoformat(
+                str(sealed_b["sealed_at"]).replace("Z", "+00:00")
+            ) - timedelta(seconds=1)
+            with self.assertRaises(
+                (LiveCohortReleaseError, DiscoveryReleaseError)
+            ) as before_seal:
+                import_live_cohort(
+                    release_root=later_release,
+                    data_root=data_root,
+                    import_time=too_early,
+                )
+            self.assertEqual(str(before_seal.exception), "IMPORT_BEFORE_SEAL")
+            self.assertEqual(hashes_before, _cohort_parquet_hashes(data_root, COHORT1))
+            still_unbound = [
+                row
+                for row in current_corpus_partition_rows(data_root, kind="census")
+                if str(row.get("cohort_id")) == COHORT1
+            ]
+            with self.assertRaises(ScientificEligibilityError) as after_reject:
+                resolve_canonical_release_schedule(data_root, still_unbound)
+            self.assertEqual(after_reject.exception.code, CANONICAL_SCHEDULE_UNBOUND)
+
     def test_different_schedule_does_not_satisfy_other_cohort(self) -> None:
         schedule = _schedule(ROOT)
         other = _alt_schedule(schedule)

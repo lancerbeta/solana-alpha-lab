@@ -1055,12 +1055,6 @@ def import_live_cohort_canonical(
 ) -> dict[str, Any]:
     manifest = verify_live_cohort(release_root)
     imported_at = (import_time or datetime.now(tz=UTC)).astimezone(UTC)
-    persist_imported_release_schedule(
-        release_root=Path(release_root),
-        data_root=Path(data_root),
-        manifest=manifest,
-        imported_at=imported_at,
-    )
     sealed_at = parse_live_corpus_utc(str(manifest["sealed_at"]))
     _require(imported_at >= sealed_at, "IMPORT_BEFORE_SEAL")
     release_id = str(manifest["release_id"])
@@ -1103,6 +1097,12 @@ def import_live_cohort_canonical(
                     )
                 )
             ):
+                persist_imported_release_schedule(
+                    release_root=Path(release_root),
+                    data_root=Path(data_root),
+                    manifest=manifest,
+                    imported_at=imported_at,
+                )
                 rebuilt = repair_live_corpus_manifests(
                     data_root=data_root,
                     published_at=imported_at,
@@ -1129,6 +1129,12 @@ def import_live_cohort_canonical(
         if matching is not None:
             if matching.get("content_sha256") != content_sha:
                 raise LiveCohortReleaseError("CANONICAL_TARGET_CONFLICT")
+            persist_imported_release_schedule(
+                release_root=Path(release_root),
+                data_root=Path(data_root),
+                manifest=manifest,
+                imported_at=imported_at,
+            )
             return {
                 "status": "IDEMPOTENT_REIMPORT",
                 "cohort_id": cohort_id,
@@ -1180,6 +1186,12 @@ def import_live_cohort_canonical(
     )
     dest_census = Path(data_root) / census_rel
     dest_obs = Path(data_root) / obs_rel
+    persist_imported_release_schedule(
+        release_root=Path(release_root),
+        data_root=Path(data_root),
+        manifest=manifest,
+        imported_at=imported_at,
+    )
     _install_parquet(census_path, dest_census, census_sha)
     _install_parquet(obs_path, dest_obs, obs_sha)
 

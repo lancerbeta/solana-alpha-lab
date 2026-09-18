@@ -77,7 +77,6 @@ context_requirements:
     - MODULE-LIVE-COHORT-SOURCE-BUNDLE-001
   l2_roles:
     - LIFECYCLE
-    - ARCHITECTURE_DECISIONS
     - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
@@ -163,6 +162,8 @@ promoted to SCHEDULE_BOUND.
   `observation_schedule_sha256` (byte) beside existing `schedule_sha256`.
 - Source-time ops sqlite may confirm identity; it is not a Forge dependency.
 - RDP vs ops disagreement at build is typed STOP.
+- Import persists the schedule only after `IMPORT_BEFORE_SEAL` and identity
+  gates. A rejected import does not bind ResearchStore.
 - Resolver stays `resolve_canonical_release_schedule` on local data_root.
 
 ## Frozen rules
