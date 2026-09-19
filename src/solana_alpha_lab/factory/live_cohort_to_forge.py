@@ -48,8 +48,6 @@ from solana_alpha_lab.factory.hfic_session import (
     search_key_sha256,
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (
-    MEMORY_HARD_CLOSE,
-    MEMORY_PARK,
     build_prior_memory_snapshot,
 )
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
@@ -810,9 +808,9 @@ def forge_control_ready(
             continue
         session_id = capsule.get("session_id")
         if isinstance(session_id, str) and session_id:
+            # Integrity only: a policy-quarantined session must not appear in
+            # emitted search-memory capsules. Eligible HARD_CLOSE/PARK stay.
             _require(session_id not in blocked, "QUARANTINED_MEMORY_ELIGIBLE")
-        status = str(capsule.get("memory_status") or "")
-        _require(status not in {MEMORY_HARD_CLOSE, MEMORY_PARK}, "QUARANTINED_MEMORY_ELIGIBLE")
     try:
         prove_fast_lane_commissioned(Path(data_root))
     except HficPreflightError as exc:
