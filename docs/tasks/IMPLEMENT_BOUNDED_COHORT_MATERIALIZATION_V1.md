@@ -46,6 +46,7 @@ managed_write_set:
   - docs/evidence/bounded_cohort_materialization/c100_payload_work_v1.json
   - docs/evidence/bounded_cohort_materialization/old_residual_cleanup_candidates_v1.json
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 external_caps:
   network: false
   credentials: false
