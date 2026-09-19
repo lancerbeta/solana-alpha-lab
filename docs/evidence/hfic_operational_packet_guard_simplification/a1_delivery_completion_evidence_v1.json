@@ -20,6 +20,7 @@
     "docs/contracts/normalized_trajectory_representation_probe_v1.md": "35fa5a6b4c099a2f5b1a54e5fb598423c890651f6caa79dceade3b20352df73d",
     "docs/contracts/normalized_trajectory_v1_capability_contract.md": "c4ff7f832a93b903ce8ad71ad599ccf126f3e1f14aa23143f1bcd956789cd280",
     "docs/evidence/hfic_operational_packet_guard_simplification/a1_c2_packet_acceptance_v1.json": "2da58e6704ac8bdfe806d58b9d199fc9ce49affee465e124259acd96bd86b6ff",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "761368e9a1cbfa66c1c29fde522981dc30889852221f58e2d86f21b9cca648ca",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "96d571e4a712296462b855057f3c466b2a9aa44df3a9d11e951920a44610ece6",
     "docs/reports/hfic_operational_packet_guard_simplification/a1_owner_readout_v1.md": "f78a5f14d04b8ae60d15666814fa99d4981c0ae08efba5edbca0abb8e07da60c",
     "docs/tasks/HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1.md": "7c5f4019ce7dcf03e5b0eab77fb59ac3b88fbd65680c83ed5e0656ef9819bb6b",
@@ -43,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_operational_packet_guard_simplification/a1_delivery_factory_fit_v1.json",
-    "sha256": "2370aa71f1644ebc72ed0bcc72d9bdc8794a7fff6d723c7d4d6ed887218e90e7",
+    "sha256": "8f7d5ff3aa7a9e642317e2d2c9e5b35f897f6add5be511175993ebca3126a655",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_OPERATIONAL_PACKET_GUARD",
     "independent_review": {
       "path": "docs/evidence/hfic_operational_packet_guard_simplification/a1_delivery_independent_review_v1.json",
-      "sha256": "0ef3a766bd6507605fe99a554f173c2ad8b5348ee50dd2fcd37ff0d028e94835",
+      "sha256": "93cd500a3dd1e5593655cbeb7cce04660ca2a14e4873d139964de97b68e9a954",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

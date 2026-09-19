@@ -6,8 +6,8 @@
   "task_id": "HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1",
   "mode": "FAST_PATH",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "048dfc855432b6415db9bb35582ced302957470f198490e7357a2e1ff8a23807",
-  "reviewed_inventory_sha256": "381c9e4f511346b46de107e29c2dc219c707ff62a1a197689b89fe5b9243fd52",
+  "reviewed_bindings_sha256": "2225ea850c6d21ff92e379d4a63f6f2946b890cb5a0cb5ada15900a307f369c7",
+  "reviewed_inventory_sha256": "8f1e38460e3bb1177fd5a2895873b4b4dc0b212f750e097da534aa513e7cc777",
   "capability_radar": {
     "now": "NONE",
     "watch": "HYPOTHESIS_FORGE_CURRENT_REPRESENTATION_CONTROL"
