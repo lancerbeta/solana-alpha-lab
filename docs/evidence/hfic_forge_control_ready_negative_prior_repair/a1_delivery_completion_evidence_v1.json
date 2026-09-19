@@ -11,7 +11,15 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+    "catalog/assets/core.yaml": "fce1383b1619a38760daab18b02ca808fb1c8ca72482246e2b1ccdf7e941c952",
+    "catalog/assets/lifecycle.yaml": "08ccdd8ce44aee8efbd709cdda3cb0e42575c8487fef501d7fd754dab7bc142f",
+    "catalog/catalog_manifest.yaml": "3e3dcecc13b94fec5effab3baf5f88b86bd3a32944afb33bb0fc2f842d2a4d0d",
+    "catalog/generated/asset_edges.json": "8596a95a64a7a0299f139e7afcd4dbe54e13b3851b35e8642d462054b3422e7a",
+    "docs/PROJECT_MAP.md": "7511b803930666b214c616452a233104e34704799a1d282b1946ecde161ed50e",
+    "docs/reports/hfic_forge_control_ready_negative_prior_repair/a1_owner_readout_v1.md": "8e76446e22e2f17ba91aac35fb15989ab6d084b05ba6f44239d5647bf1097f18",
+    "docs/tasks/HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1.md": "b951c5ea50247b4d95c7a9aaaae02aa962bb7087836878de26c01ccc0b7d37cd",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "2ffe3f4f037570665ed97d349dbd0435e13b3fdd6ccd267e25c693df81e0db4e",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "a655821ddec5ecd26235bd0e29ceb1a8fd581a380a230dd126f446e1e963772b"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +31,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_forge_control_ready_negative_prior_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "fc21fee522dcab32afb2b3c5cb07f41c9ba89220a9ad476c32585b109ad8a5e5",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR",
     "independent_review": {
       "path": "docs/evidence/hfic_forge_control_ready_negative_prior_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "1a31d7fd28ebf1f6b2dd143df5d9cabce2511820fbe57037531a067d5cde11f8",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

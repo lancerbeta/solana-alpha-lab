@@ -6,8 +6,8 @@
   "task_id": "HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1",
   "mode": "FAST_PATH",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "33d598c2e13c7d91f0a0b731cb632d5dc844ab8a26ffec549a2b117cc7f73d20",
+  "reviewed_inventory_sha256": "2fa802f6af1cd1f8fb0a1a2c0ec47cb70c5857194606fd568b349a845cf0fbbe",
   "capability_radar": {
     "now": "NONE",
     "watch": "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
