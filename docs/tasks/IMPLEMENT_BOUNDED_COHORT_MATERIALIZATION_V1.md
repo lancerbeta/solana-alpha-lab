@@ -56,7 +56,7 @@ external_caps:
   deployment: false
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: [LIFECYCLE, ARCHITECTURE_DECISIONS]
+  l2_roles: [LIFECYCLE, ARCHITECTURE_DECISIONS, DELIVERY_EVIDENCE]
   l3_roles: [HISTORICAL_CONTEXT]
   roadmap_path: null
   exact_role_asset_ids:
