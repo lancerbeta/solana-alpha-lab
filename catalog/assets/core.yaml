@@ -37675,7 +37675,7 @@ records:
   as_of: '2026-09-19'
   truth_owner: HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/reports/hfic_forge_control_ready_negative_prior_repair/a1_owner_readout_v1.md', repository_path: docs/reports/hfic_forge_control_ready_negative_prior_repair/a1_owner_readout_v1.md}
-  integrity: {kind: sha256, sha256: f3bd93fce18e98e9898ddbc04452e647f1026c6e03c0534d0c66e23982a846be}
+  integrity: {kind: sha256, sha256: 8e76446e22e2f17ba91aac35fb15989ab6d084b05ba6f44239d5647bf1097f18}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-FORGE-CONTROL-READY-NEGATIVE-PRIOR-REPAIR-001}
