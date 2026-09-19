@@ -4,8 +4,8 @@
   "review_id": "IMPLEMENT-BOUNDED-COHORT-MATERIALIZATION-V1-FACTORY-FIT-001",
   "as_of": "2026-09-19",
   "task_id": "IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1",
-  "reviewed_bindings_sha256": "040b6fa53da7231f7515f379fd6b1ee95fec03b74afdbcef60d1eda7ad6b75dd",
-  "reviewed_inventory_sha256": "c46e79015e54dfa6cc29323b7057241880fdfebe84ce4808466e1c0d71b1efce",
+  "reviewed_bindings_sha256": "09c057b30dc3e5a9dc22037705d6ec0dd007a5f98918b0e3c07ba082c5b125c1",
+  "reviewed_inventory_sha256": "a03c69289371c2066295100e634d03c1e04983ebb236e2905cf0445055dc21e9",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

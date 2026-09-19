@@ -19,7 +19,7 @@
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5eed3278802d4a7a942b76206e2f37f74d6063f8f98ca01db45013d166fd392e",
     "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "84b8a91eb346bd8870c3002c9390ed2bfe78ca924b85cec3da62b125668b86c9",
     "docs/reports/bounded_cohort_materialization/a1_owner_readout_v1.md": "65e9ba69145dcc4d72e725f1f861e5e666fbc5af57c7d3cc2f833187a4d34981",
-    "docs/tasks/IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1.md": "86bb9e443182528f922ed7a9334fb70e1e026c32951f19afe34343d1caafaff9",
+    "docs/tasks/IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1.md": "4560c6b506b40c1f9934bf9afa3fbc67276ba54d18a0945dce4d5b9e3c1c033c",
     "scripts/bench_bounded_cohort_materialization_v1.py": "d31c0b0bfa0e122c249752222a1ee68bc662183699fea1099da18108d26caa87",
     "scripts/discovery_evidence_release.py": "5bf4cfa04c54b401b0703e78f0c70dc9d7156ca24082e2aa635e555aaef5907e",
     "src/solana_alpha_lab/factory/bounded_cohort_materialization.py": "15c9751414aa624e7a932c8848e20c96e8ebbd12f4b1cafcc186b3d515d0fc5b",
@@ -42,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/bounded_cohort_materialization/a1_delivery_factory_fit_v1.json",
-    "sha256": "765f16057bc9be632af2296cd607ce957fe94d3054525d0c963354b58d43447b",
+    "sha256": "fabfd1ec19319c51d07fec6cc4bc325d0b33054d30123af7d039a53525d2c1ce",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_BOUNDED_COHORT_MATERIALIZATION_TESTS",
     "independent_review": {
       "path": "docs/evidence/bounded_cohort_materialization/a1_delivery_independent_review_v1.json",
-      "sha256": "d168b094cb6fe6262f5d7d32dbc01aebbaf74cde489b7cd0bb159b015f471d9a",
+      "sha256": "49155bdbb142ea9f9c61de70ac1651d1e66a5a008a8c3826eaaf5dfb53729561",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
