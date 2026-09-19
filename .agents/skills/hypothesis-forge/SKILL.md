@@ -271,8 +271,9 @@ It consumes a supplied snapshot and does not read current cohort values,
 ResearchStore, providers, or runtime state by default.
 
 The challenger must reuse the same evidence epoch, `HFIC-V1.2` prompt, prior
-memory baseline, feature grounding, candidate constraints, and 16384-byte
-packet budget. CONTROL terminal `PASS_*` routes to
+memory baseline, feature grounding, candidate constraints, and the shared
+operational packet envelope (`FORGE_OPERATIONAL_PACKET_MAX_BYTES`). CONTROL
+terminal `PASS_*` routes to
 `MARKET_FALSIFIER_FIRST`; `RUNNER_UP_REVISION_REQUIRED` pauses; observability
 or grounding failures are blocked. The adapter never runs the probe and never
 creates a `FEAT-*` alias from a motif.
@@ -306,17 +307,20 @@ Ordinary Prompt A packets now carry `ranked_prior_entries` one-to-one with
 
 ## Packet capacity vs missing prior body
 
-Ordinary Forge packet budget is **20480** bytes
-(`ORDINARY_FORGE_MAX_PACKET_BYTES`). Representation CONTROL and challenger
-budgets remain **16384** (`MAX_PACKET_BYTES`). Resolve via
-`forge_context_packet_max_bytes(evidence_surface_mode)` — never from focus text.
-The ordinary enlargement is not alpha or representation permission.
+Ordinary Forge, representation CONTROL, and the challenger share one
+operational hard cap of **65536** bytes (`FORGE_OPERATIONAL_PACKET_MAX_BYTES`)
+and one growth-warning threshold of **20480** bytes
+(`FORGE_PACKET_GROWTH_WARNING_BYTES`). Resolve via
+`forge_context_packet_max_bytes(evidence_surface_mode)` — never from focus
+text, and no longer as a mode-split byte identity. This amends the previous
+16384 CONTROL freeze; it does not deny that freeze existed. Crossing 20480 warns;
+it does not drop required scientific information.
 
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` means a ranked prior identity has no
 decision-useful resolvable body (one-to-one Prompt A body closure failed).
 
 `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` means required bodies are complete
-but the effective mode-scoped `FORGE_CONTEXT_PACKET` bound cannot represent a
+but the operational `FORGE_CONTEXT_PACKET` hard cap cannot represent a
 non-minimal Forge search context after allowed semantic/feature-grounding
 compaction.
 

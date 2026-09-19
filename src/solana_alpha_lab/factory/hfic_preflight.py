@@ -73,11 +73,14 @@ MAX_FEATURE_HINTS = 8
 MAX_FEATURE_FAMILIES = 8
 MAX_CLOSED_FAMILIES = 8
 MAX_CAPABILITIES = 16
-# CONTROL / representation-challenger packet budget (frozen comparability).
-MAX_PACKET_BYTES = 16384
-CONTROL_FORGE_MAX_PACKET_BYTES = MAX_PACKET_BYTES
-# Ordinary /hypothesis-forge packet budget (mode-scoped; not representation permission).
-ORDINARY_FORGE_MAX_PACKET_BYTES = 20480
+# One operational safety envelope for ordinary Forge, CONTROL, and challenger.
+# Not a scientific threshold and not a model context-window claim.
+FORGE_OPERATIONAL_PACKET_MAX_BYTES = 65536
+FORGE_PACKET_GROWTH_WARNING_BYTES = 20480
+# Compatibility aliases — same hard cap, not independent science gates.
+MAX_PACKET_BYTES = FORGE_OPERATIONAL_PACKET_MAX_BYTES
+CONTROL_FORGE_MAX_PACKET_BYTES = FORGE_OPERATIONAL_PACKET_MAX_BYTES
+ORDINARY_FORGE_MAX_PACKET_BYTES = FORGE_OPERATIONAL_PACKET_MAX_BYTES
 FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED = "FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED"
 MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND = "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
 FORGE_CONTEXT_ARTIFACT_DIR = "research/artifacts/forge_context"
@@ -117,20 +120,27 @@ class HficPreflightError(ValueError):
 
 
 def forge_context_packet_max_bytes(evidence_surface_mode: str | None = None) -> int:
-    """Mode-scoped Forge context packet bound.
+    """Operational Forge context packet hard cap.
 
-    Ordinary Forge uses ORDINARY_FORGE_MAX_PACKET_BYTES. Representation CONTROL
-    (and anything that shares its frozen budget with the challenger) uses
-    CONTROL_FORGE_MAX_PACKET_BYTES / MAX_PACKET_BYTES (16384). Do not infer from
-    owner_focus text.
+    Ordinary, CURRENT_REPRESENTATION_CONTROL, and the representation challenger
+    share FORGE_OPERATIONAL_PACKET_MAX_BYTES. evidence_surface_mode does not
+    select a different byte ceiling. Do not infer from owner_focus text.
     """
-    from solana_alpha_lab.factory.hfic_control_integrity import (
-        CURRENT_REPRESENTATION_CONTROL_V1,
-    )
+    del evidence_surface_mode
+    return FORGE_OPERATIONAL_PACKET_MAX_BYTES
 
-    if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1:
-        return MAX_PACKET_BYTES
-    return ORDINARY_FORGE_MAX_PACKET_BYTES
+
+def _stamp_packet_growth_warning(packet: dict[str, Any], encoded: bytes) -> None:
+    """Record warning telemetry without truncating scientific fields."""
+    receipt = dict(packet.get("truncation_receipt") or {})
+    size = len(encoded)
+    receipt["packet_bytes"] = size
+    receipt["growth_warning_bytes"] = FORGE_PACKET_GROWTH_WARNING_BYTES
+    receipt["growth_warning"] = size > FORGE_PACKET_GROWTH_WARNING_BYTES
+    receipt["max_packet_bytes"] = forge_context_packet_max_bytes(
+        packet.get("evidence_surface_mode") if isinstance(packet, dict) else None
+    )
+    packet["truncation_receipt"] = receipt
 
 
 def _ranked_priors_carry_minimal_scientific_scope(packet: Mapping[str, Any]) -> bool:
@@ -1292,6 +1302,9 @@ def build_forge_context_packet(
         "max_feature_families": MAX_FEATURE_FAMILIES,
         "max_capabilities": MAX_CAPABILITIES,
         "max_packet_bytes": packet_bound,
+        "growth_warning_bytes": FORGE_PACKET_GROWTH_WARNING_BYTES,
+        "growth_warning": False,
+        "packet_bytes": 0,
         "selection_policy": ds_trunc.get(
             "selection_policy", "current_version_per_dataset_id"
         ),
@@ -1544,6 +1557,20 @@ def build_forge_context_packet(
         raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
     if vision.get("status") != "PASS":
         raise HficPreflightError(FORGE_VISION_INTEGRITY_BLOCKED)
+    stabilized = False
+    for _ in range(8):
+        _stamp_packet_growth_warning(packet, encoded)
+        restamped = canonical_json_bytes(packet)
+        if restamped == encoded:
+            stabilized = True
+            break
+        encoded = restamped
+        if len(encoded) > packet_bound:
+            if _ranked_priors_carry_minimal_scientific_scope(packet):
+                raise HficPreflightError(MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND)
+            raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
+    if not stabilized:
+        raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
     if persist:
         digest = persist_forge_context_packet(
             data_root,

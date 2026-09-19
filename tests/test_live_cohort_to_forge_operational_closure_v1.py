@@ -23,6 +23,7 @@ from solana_alpha_lab.factory.hfic_control_integrity import (  # noqa: E402
     CURRENT_REPRESENTATION_CONTROL_V1,
 )
 from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
+    FORGE_OPERATIONAL_PACKET_MAX_BYTES,
     MAX_PACKET_BYTES,
     forge_context_packet_max_bytes,
     is_live_corpus_dataset,
@@ -1810,10 +1811,14 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 self.assertTrue(capsule.get("decision_timestamp"))
                 self.assertTrue(capsule.get("horizon_notional"))
                 self.assertTrue(capsule.get("negative_control"))
-            self.assertEqual(MAX_PACKET_BYTES, 16384)
+            self.assertEqual(MAX_PACKET_BYTES, 65536)
             self.assertEqual(
                 forge_context_packet_max_bytes(CURRENT_REPRESENTATION_CONTROL_V1),
-                16384,
+                65536,
+            )
+            self.assertEqual(
+                forge_context_packet_max_bytes(None),
+                FORGE_OPERATIONAL_PACKET_MAX_BYTES,
             )
             ready = forge_control_ready(
                 data_root=data_root,

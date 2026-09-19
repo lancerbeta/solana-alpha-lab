@@ -382,6 +382,8 @@ def cmd_vision_acceptance(
     )
     from solana_alpha_lab.factory.run_passport import canonical_json_bytes
     from solana_alpha_lab.factory.hfic_preflight import (
+        FORGE_OPERATIONAL_PACKET_MAX_BYTES,
+        FORGE_PACKET_GROWTH_WARNING_BYTES,
         build_forge_context_packet,
         enumerate_rdp_datasets,
     )
@@ -541,7 +543,8 @@ def cmd_vision_acceptance(
             "trajectory_blind": preview.get("CONTROL_TRAJECTORY_BLIND_FENCE")
             is True,
             "packet_bytes": packet_bytes,
-            "packet_within_bound": packet_bytes <= 16384,
+            "packet_within_bound": packet_bytes <= FORGE_OPERATIONAL_PACKET_MAX_BYTES,
+            "growth_warning": packet_bytes > FORGE_PACKET_GROWTH_WARNING_BYTES,
             "evidence_surface_mode": ctx_packet.get("evidence_surface_mode"),
         }
     except Exception as exc:  # noqa: BLE001

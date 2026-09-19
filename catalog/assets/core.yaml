@@ -32287,7 +32287,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 6c7a5da0b75de04f9f65b552a6995edf78e5b33ceb87854b052bbb61e1876d6f}
+  integrity: {kind: sha256, sha256: 69e496fef283bb0aa454120dd07135c4346dc62b94afaf85d3f6e4bb1c214f6a}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34115,7 +34115,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: a655821ddec5ecd26235bd0e29ceb1a8fd581a380a230dd126f446e1e963772b}
+  integrity: {kind: sha256, sha256: 8d4bd873a61df17c9515c2ccf3eb0f4e65ebebd89637c12c21b00fc6f23ddd95}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34495,7 +34495,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: b75b15975937225b6c0644e986f125e6e9f9efbb6561b24c5628705f9ed0d72d}
+  integrity: {kind: sha256, sha256: 96d571e4a712296462b855057f3c466b2a9aa44df3a9d11e951920a44610ece6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34513,7 +34513,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 32f7e2bc202620ffff3b76c50904ac4bcddf34bf5e584df1aee682b7646a617e}
+  integrity: {kind: sha256, sha256: 92faa1e39c08bb459e67f59f8f6ff0cf3267ea803c09b2c1f8c9823805ce29cf}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -35514,7 +35514,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_representation_probe_v1.md', repository_path: docs/contracts/normalized_trajectory_representation_probe_v1.md}
-  integrity: {kind: sha256, sha256: dca1c1d298e00bc18abfe40a4c8cc05dc9d3af84dee413fbb06e30ad4fcb4bf0}
+  integrity: {kind: sha256, sha256: 35fa5a6b4c099a2f5b1a54e5fb598423c890651f6caa79dceade3b20352df73d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001}
@@ -35534,7 +35534,7 @@ records:
   as_of: '2026-09-05'
   truth_owner: NORMALIZED_TRAJECTORY_PROBE_PREREGISTRATION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_normalized_trajectory_probe_preregistration_v1.py', repository_path: tests/test_normalized_trajectory_probe_preregistration_v1.py}
-  integrity: {kind: sha256, sha256: 25d2f2b38561a8851171242d6f7b422f63174457cbbf5735a5aad9bb3d36bc65}
+  integrity: {kind: sha256, sha256: 1b7a4e0e8b847f245c58ed8e3013969bce1b2e54e5d861682354b5a229fba0af}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}
@@ -36976,7 +36976,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: NORMALIZED_TRAJECTORY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/contracts/normalized_trajectory_v1_capability_contract.md', repository_path: docs/contracts/normalized_trajectory_v1_capability_contract.md}
-  integrity: {kind: sha256, sha256: 93f9ff833ba271d94aa2b0d4be18fccb55ce19a8d593f644381ebdc460e3e8da}
+  integrity: {kind: sha256, sha256: c4ff7f832a93b903ce8ad71ad599ccf126f3e1f14aa23143f1bcd956789cd280}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIFECYCLE-REPRESENTATION-V1-DORMANT-CAPABILITY-001}
@@ -37017,7 +37017,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_probe.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_probe.py}
-  integrity: {kind: sha256, sha256: 9f0b0eec7769911eb14c8512b75377989f26976cd5eee569ff288f9bb45cd3f0}
+  integrity: {kind: sha256, sha256: 1428ac997557c68e76bbb14b6328b880bc1e00efd577368e3a1e2a49a881a4f7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-NORMALIZED-TRAJECTORY-V1-001}
@@ -37253,7 +37253,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py', repository_path: src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py}
-  integrity: {kind: sha256, sha256: f351cb6726c3a09cf8dc0cf1fcdfa5f0e3b317bbb790e959b95e3f49dae99ac4}
+  integrity: {kind: sha256, sha256: 3e9d9ee025480fdd1cb31d8e8764b6b0e3e8c954241a5882160cb1ba32f2e519}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
@@ -37273,7 +37273,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_reopened_prior_search_routing_v1.py', repository_path: tests/test_hfic_reopened_prior_search_routing_v1.py}
-  integrity: {kind: sha256, sha256: dc528c138e9c11a2040e6438148a4a0ba1dc0e8951a2acca4d1a8acae974e52e}
+  integrity: {kind: sha256, sha256: 2d9f2ebce754be94c59b547302ceba8eaa38301a5f952ba6f0776368e82aac0d}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
@@ -37682,4 +37682,58 @@ records:
   consumers: [GOAL-OWNER]
   evidence: []
   search_terms: [FORGE_CONTROL_READY, HARD_CLOSE, READOUT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Replace the frozen 16384/20480 Forge packet byte identities with one operational safety envelope.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-19'
+  truth_owner: HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1.md', repository_path: docs/tasks/HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1.md}
+  integrity: {kind: sha256, sha256: 7c5f4019ce7dcf03e5b0eab77fb59ac3b88fbd65680c83ed5e0656ef9819bb6b}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}
+  - {relation_type: depends_on, target_asset_id: SCRIPT-HYPOTHESIS-FORGE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-REPRESENTATION-PROBE-001}
+  - {relation_type: validated_by, target_asset_id: TEST-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [FORGE_OPERATIONAL_PACKET_MAX_BYTES, PACKET_GUARD, '65536', CONTROL]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Shared operational cap, warning-without-scientific-drop, and fail-closed over 65536 regressions.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-19'
+  truth_owner: HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_operational_packet_guard_simplification_v1.py', repository_path: tests/test_hfic_operational_packet_guard_simplification_v1.py}
+  integrity: {kind: sha256, sha256: 0ebe9b9366ec8c9971e74868b88e75bc52e77bf94fa8740e1dfc8c107adf9c04}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001}
+  consumers: [FACTORY-001]
+  evidence: []
+  search_terms: [FORGE_OPERATIONAL_PACKET_MAX_BYTES, GROWTH_WARNING, TESTS]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: REPORT-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Owner readout for the operational Forge packet envelope simplification.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-19'
+  truth_owner: HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/reports/hfic_operational_packet_guard_simplification/a1_owner_readout_v1.md', repository_path: docs/reports/hfic_operational_packet_guard_simplification/a1_owner_readout_v1.md}
+  integrity: {kind: sha256, sha256: f78a5f14d04b8ae60d15666814fa99d4981c0ae08efba5edbca0abb8e07da60c}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001}
+  consumers: [GOAL-OWNER]
+  evidence: []
+  search_terms: [FORGE_OPERATIONAL_PACKET_MAX_BYTES, READOUT, CONTROL]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

@@ -10,7 +10,7 @@ current_representation_control: TRAJECTORY_BLIND
 current_cohort_scientific_content_accessed: false
 provider_calls: 0
 deployment: NONE
-max_packet_bytes: 16384
+max_packet_bytes: 65536
 max_distinct_motif_tuples: 8
 registered_probe_runs_per_control_epoch: 1
 ---

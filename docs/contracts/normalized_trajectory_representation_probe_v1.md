@@ -8,7 +8,7 @@ probe_state: PREREGISTERED_NOT_EXECUTED
 auto_execute_after_cohort_import: false
 implementation_status: CONTRACT_ONLY
 hfic_prompt_family: HFIC-V1.2
-max_packet_bytes: 16384
+max_packet_bytes: 65536
 max_feature_families: 8
 ninth_family_workaround: forbidden
 corpus_dataset_id: DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001
@@ -160,7 +160,9 @@ invalid_coverage_broken_if:
 unknown_or_suspected_coverage_may_use: READY_VALID_WITH_COVERAGE_LIMITATION
 control:
   representation: unchanged_current_forge_packet
-  same: [evidence_epoch, corpus, prior_work_memory, critic, search_budget, prompt_family, candidate_count_constraints]
+  same: [evidence_epoch, corpus, prior_work_memory, critic, search_budget, prompt_family, candidate_count_constraints, truncation_rules, admissible_information_rules]
+  exact_control_packet_binding: required
+  unused_byte_headroom_is_not_treatment: true
 control_terminal_else: INVALID_TRIGGER_NOT_MET
 challenger:
   representation: NORMALIZED_TRAJECTORY_V1_compact_prefix_motif
@@ -173,7 +175,7 @@ challenger:
   mint_identities_in_packet: forbidden
   truncation_order: drop_lowest_count_tuples_first
   do_not_drop_dataset_identity_or_prior_work_to_fit: true
-  packet_budget_owner: HFIC_MAX_PACKET_BYTES
+  packet_budget_owner: FORGE_OPERATIONAL_PACKET_MAX_BYTES
   raw_trajectory_dump: forbidden
   variant_shopping: forbidden
   add_versus_replace_shopping: forbidden
@@ -258,6 +260,15 @@ projects the compact motif defined here.
 seal/import, provider calls and current-cohort scientific inspection are out of this atom.
 
 Preserve `EXPLORATORY_REUSE` and `confirmatory_reuse_forbidden=true`.
+
+DECLARED_FREEZE_AMENDMENT: prior `max_packet_bytes=16384` was the CONTROL↔
+challenger byte identity. This file amends that freeze to 65536 as
+`FORGE_OPERATIONAL_PACKET_MAX_BYTES`. Comparability is same
+admissible-information rules, same selection/truncation semantics, and exact
+CONTROL packet/hash binding. Unused byte headroom is not a treatment and is
+not permission to stuff CONTROL-absent information. A challenger must not
+receive information CONTROL lacked. The amendment does not claim 16384 never
+functioned as a freeze.
 
 ## When the probe may run
 

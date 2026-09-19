@@ -46,7 +46,7 @@ from validate_catalog import load_and_validate  # noqa: E402
 CONTRACT_PATH = ROOT / "docs/contracts/normalized_trajectory_representation_probe_v1.md"
 TOKENS_V2_PATH = ROOT / "src/solana_alpha_lab/factory/tokens_v2_typed_projection.py"
 FROZEN_PREREGISTRATION_SHA256 = (
-    "dca1c1d298e00bc18abfe40a4c8cc05dc9d3af84dee413fbb06e30ad4fcb4bf0"
+    "35fa5a6b4c099a2f5b1a54e5fb598423c890651f6caa79dceade3b20352df73d"
 )
 
 

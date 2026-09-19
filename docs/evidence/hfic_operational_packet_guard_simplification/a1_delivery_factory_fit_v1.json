@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-FACTORY-FIT-001",
+  "as_of": "2026-09-19",
+  "task_id": "HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "302b164bb7052048fa7d0fe83a3c1322632d7b4cd97b67f436aecf4decbf9abf",
+  "reviewed_inventory_sha256": "feb5dc5065217968368ef64b3d773114c32bfa0b49a3e25aebaf91fa5b609c94",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "HYPOTHESIS_FORGE_CURRENT_REPRESENTATION_CONTROL"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS",
+    "NO_HYPOTHESIS_FORGE",
+    "NO_RESEARCHSTORE_WRITE_ON_ACCEPTANCE",
+    "NO_MEMORY_POLICY_WRITE",
+    "NOT_A_CLASS_PROOF_FOR_ALL_17_TO_20KB_PACKETS",
+    "NOT_ZERO_INFORMATION_LOSS"
+  ],
+  "recovery": "REVERT"
+}
