@@ -1,0 +1,57 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "IMPLEMENT-BOUNDED-COHORT-MATERIALIZATION-V1-COMPLETION-001",
+  "as_of": "2026-09-19",
+  "task_id": "IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1",
+  "state_change": "BOUNDED_COHORT_MATERIALIZATION_OPERATOR_PATH",
+  "base_main": "7ef87028c933fd5335b75ad234fb830f7031eeb5",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/bounded_cohort_materialization/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_BOUNDED_COHORT_MATERIALIZATION_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/bounded_cohort_materialization/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_BOUNDED_COHORT_MATERIALIZATION_TESTS",
+      "PASS_C2_PLAN_BOUNDED",
+      "PASS_REAL_C2_UNDER_90_MIN",
+      "PASS_C100_PAYLOAD_WORK_BOUNDED"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_SEAL_IMPORT",
+    "NO_C3_EXECUTION",
+    "NO_VPS",
+    "NO_OLD_ARTIFACT_DELETION"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

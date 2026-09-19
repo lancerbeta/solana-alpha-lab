@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "IMPLEMENT-BOUNDED-COHORT-MATERIALIZATION-V1-FACTORY-FIT-001",
+  "as_of": "2026-09-19",
+  "task_id": "IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "security": "PASS",
+    "red_team": "PASS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NEXT_AUTHORIZED_C3_BUILD_WALL_VS_90MIN"
+  },
+  "recovery": "REVERT",
+  "limits": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_SEAL_IMPORT",
+    "NO_C3_EXECUTION",
+    "NO_VPS",
+    "NO_OLD_ARTIFACT_DELETION",
+    "C100_EVIDENCE_IS_SYNTHETIC_HISTORY_DEPTH"
+  ]
+}
