@@ -55,5 +55,9 @@
     "NOT_A_CLASS_PROOF_FOR_ALL_17_TO_20KB_PACKETS",
     "NOT_ZERO_INFORMATION_LOSS",
     "DECLARED_FREEZE_AMENDMENT_NOT_DENIAL_OF_PRIOR_16384_IDENTITY"
-  ]
+  ],
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE",
+    "reason": "Operational Forge packet envelope only; no Project Source semantic role or release payload changes."
+  }
 }
