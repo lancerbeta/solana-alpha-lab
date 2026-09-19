@@ -1627,12 +1627,7 @@ class ResearchStore:
             research_event_records_decoded=decoded,
             research_event_payload_bytes_read=payload_bytes,
             used_bounded_lifecycle_route=True,
-            full_committed_payload_scan=bool(
-                lifecycle_total > 0
-                and skipped_by_time == 0
-                and unknown_bounds > 0
-                and opened >= lifecycle_total
-            ),
+            full_committed_payload_scan=bool(unknown_bounds > 0),
             research_event_partitions_skipped_by_time=skipped_by_time,
             research_event_partitions_opened_unknown_bounds=unknown_bounds,
             research_event_lifecycle_partitions_total=lifecycle_total,

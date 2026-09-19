@@ -29,6 +29,7 @@ from solana_alpha_lab.factory.bounded_cohort_materialization import (
     BUILD_ALREADY_RUNNING,
     BoundedMaterializationError,
     CohortBuildLock,
+    OBSERVATION_LINEAGE_INCOMPLETE,
     UNBOUNDED_PLAN,
     WALL_BUDGET_EXCEEDED,
 )
@@ -992,6 +993,76 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
             self.assertEqual(plan["global_manifest_markers_scanned"], 0)
             self.assertEqual(int(plan["research_event_partitions_opened_unknown_bounds"]), 0)
 
+    def test_unknown_partition_bounds_is_unbounded_plan(self) -> None:
+        schedule = _schedule()
+        digest = str(schedule["schedule_sha256"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "rdp"
+            root.mkdir()
+            persist_observation_schedule(
+                data_root=root,
+                schedule=schedule,
+                now=WINDOW_START,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION_ID,
+            )
+            unit = write_snapshot_unit(
+                root,
+                utc_day="20260910",
+                dataset_manifest_id="cur",
+                rows=[_member("mint1", admit=WINDOW_START + timedelta(hours=2), digest=digest)],
+            )
+            _append_event(
+                root,
+                record_id="MEM-CUR",
+                kind=RecordKind.OBSERVATION_MEMBER_BATCH,
+                digest=digest,
+                payload={
+                    "schedule_sha256": digest,
+                    "dataset_manifest_id": "cur",
+                    "member_location": str(unit["publications"][0]["rel"]),
+                    "row_count": 1,
+                },
+                now=WINDOW_START + timedelta(hours=2),
+                txn="RESEARCH-TXN-MEM-CURUNKBND01",
+            )
+            original = ResearchStore.iter_lifecycle_records_bounded
+
+            def _with_unknown_bounds(self: ResearchStore, **kwargs: object):
+                records, telemetry = original(self, **kwargs)
+                from dataclasses import replace
+
+                return records, replace(
+                    telemetry,
+                    full_committed_payload_scan=True,
+                    research_event_partitions_opened_unknown_bounds=max(
+                        1, int(telemetry.research_event_partitions_opened_unknown_bounds)
+                    ),
+                )
+
+            receipt = synthetic_closed_receipt(
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                cohort_id=COHORT_ID,
+                as_of=AS_OF,
+                members_total=1,
+            )
+            with patch.object(ResearchStore, "iter_lifecycle_records_bounded", _with_unknown_bounds):
+                plan = build_live_observation_source_from_rdp(
+                    observation_rdp_root=root,
+                    schedule_sha256=digest,
+                    activation_id=ACTIVATION_ID,
+                    cohort_id=COHORT_ID,
+                    as_of=AS_OF,
+                    closure_receipt=receipt,
+                    plan_only=True,
+                )
+            self.assertGreater(
+                int(plan["research_event_partitions_opened_unknown_bounds"]), 0
+            )
+            self.assertTrue(plan["full_historical_research_payload_scan"])
+            self.assertEqual(plan["work_class"], UNBOUNDED_PLAN)
+
     def test_contributing_lineage_skips_uncached_independent_reconstruct(self) -> None:
         digest = "a" * 64
         with tempfile.TemporaryDirectory() as tmp:
@@ -1089,6 +1160,81 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
                     window_start=WINDOW_START,
                 )
             self.assertEqual(called["glob"], 0)
+
+    def test_latest_c1_incomplete_in_window_panel_fail_closed(self) -> None:
+        schedule = _schedule()
+        digest = str(schedule["schedule_sha256"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "rdp"
+            root.mkdir()
+            persist_observation_schedule(
+                data_root=root,
+                schedule=schedule,
+                now=WINDOW_START,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION_ID,
+            )
+            _append_event(
+                root,
+                record_id="OBS-BAD",
+                kind=RecordKind.OBSERVATION_BATCH,
+                digest=digest,
+                payload={
+                    "schedule_sha256": digest,
+                    "activation_id": ACTIVATION_ID,
+                    "dataset_manifest_id": "",
+                    "row_count": 1,
+                },
+                now=WINDOW_START + timedelta(hours=2),
+                txn="RESEARCH-TXN-OBS-BADPANEL01",
+            )
+            with self.assertRaises(LiveCohortReleaseError) as ctx:
+                latest_c1_observation_manifest_at(
+                    root,
+                    schedule_sha256=digest,
+                    activation_id=ACTIVATION_ID,
+                    not_after=AS_OF,
+                    cohort_mints={"mint1"},
+                    window_start=WINDOW_START,
+                )
+            self.assertEqual(str(ctx.exception), OBSERVATION_LINEAGE_INCOMPLETE)
+
+    def test_latest_c1_out_of_window_unreadable_is_skipped(self) -> None:
+        schedule = _schedule()
+        digest = str(schedule["schedule_sha256"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "rdp"
+            root.mkdir()
+            persist_observation_schedule(
+                data_root=root,
+                schedule=schedule,
+                now=WINDOW_START,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION_ID,
+            )
+            _append_event(
+                root,
+                record_id="OBS-OLD",
+                kind=RecordKind.OBSERVATION_BATCH,
+                digest=digest,
+                payload={
+                    "schedule_sha256": digest,
+                    "activation_id": ACTIVATION_ID,
+                    "dataset_manifest_id": "",
+                    "row_count": 1,
+                },
+                now=WINDOW_START - timedelta(days=2),
+                txn="RESEARCH-TXN-OBS-OLDPANEL01",
+            )
+            horizon = latest_c1_observation_manifest_at(
+                root,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                not_after=AS_OF,
+                cohort_mints={"mint1"},
+                window_start=WINDOW_START,
+            )
+            self.assertIsNone(horizon)
 
     def test_empty_member_selection_is_unbounded_plan(self) -> None:
         schedule = _schedule()

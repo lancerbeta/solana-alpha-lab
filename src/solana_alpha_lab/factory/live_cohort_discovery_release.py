@@ -1764,12 +1764,18 @@ def latest_c1_observation_manifest_at(
         for record in records:
             if str(record.record_kind) != "OBSERVATION_BATCH":
                 continue
+            effective = getattr(record, "effective_at", None)
+            if not isinstance(effective, datetime) or effective.tzinfo is None:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE)
+            effective = effective.astimezone(UTC)
+            if effective < window_start or effective > not_after:
+                continue
             try:
                 payload = json.loads(record.payload_json)
-            except (TypeError, json.JSONDecodeError):
-                continue
+            except (TypeError, json.JSONDecodeError) as exc:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE) from exc
             if not isinstance(payload, Mapping):
-                continue
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE)
             try:
                 path, location = resolve_observation_panel_location(
                     Path(observation_rdp_root),
@@ -1779,12 +1785,6 @@ def latest_c1_observation_manifest_at(
             except BoundedMaterializationError as exc:
                 raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE) from exc
             if location in seen_locations:
-                continue
-            effective = getattr(record, "effective_at", None)
-            if not isinstance(effective, datetime) or effective.tzinfo is None:
-                continue
-            effective = effective.astimezone(UTC)
-            if effective < window_start or effective > not_after:
                 continue
             seen_locations.add(location)
             panels.append((effective, path))
@@ -1820,8 +1820,8 @@ def latest_c1_observation_manifest_at(
                                     stamp,
                                 ),
                             )
-            except (OSError, pa.ArrowException):
-                continue
+            except (OSError, pa.ArrowException) as exc:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE) from exc
         conn.commit()
         row = conn.execute("SELECT MAX(seen_at) FROM first_seen").fetchone()
         if not row or row[0] is None:
