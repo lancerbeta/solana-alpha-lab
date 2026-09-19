@@ -32,6 +32,10 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     seal_live_cohort,
     verify_live_cohort,
 )
+from solana_alpha_lab.factory.bounded_cohort_materialization import (
+    UNBOUNDED_PLAN,
+    plan_is_unbounded,
+)
 from solana_alpha_lab.factory.live_cohort_source_bundle import (
     SOURCE_BUILD_WORKER_ENV,
     apply_source_build_address_limit,
@@ -64,6 +68,10 @@ FAIL_OWNER_NEXT = {
     "CURRENT_CORPUS_MISSING": "IMPORT_VERIFIED_RELEASE_FIRST",
     "TRANSPORT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SOURCE_BUILD_RESOURCE_LIMIT": "STOP_RETRY_BOUNDED_SOURCE_BUILD",
+    "UNBOUNDED_MATERIALIZATION_PLAN": "STOP_FIX_BOUNDED_PLAN_BEFORE_BUILD",
+    "BUILD_ALREADY_RUNNING": "STOP_WAIT_OR_RECOVER_DEAD_LOCK",
+    "MATERIALIZATION_WALL_BUDGET_EXCEEDED": "STOP_NO_PARTIAL_CANONICAL_PUBLISH",
+    "OBSERVATION_LINEAGE_INCOMPLETE": "STOP_RESTORE_OBSERVATION_LINEAGE",
     "CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR": "REPAIR_LIVE_CORPUS_METADATA_FIRST",
     "CORPUS_LINEAGE_INCOMPLETE": "STOP_RESTORE_LINEAGE_THEN_RETRY_REPAIR",
     "DATASET_TERMINAL_MISSING": "STOP_RESTORE_LABELS_THEN_RETRY_REPAIR",
@@ -156,6 +164,11 @@ def main(argv: list[str] | None = None) -> int:
     build_live.add_argument("--cohort-id", required=True)
     build_live.add_argument("--as-of", type=str, default=None)
     build_live.add_argument("--discovery-coverage-class", default=None)
+    build_live.add_argument(
+        "--plan-only",
+        action="store_true",
+        help="Emit the bounded work plan and stop before payload replay",
+    )
 
     live_status = sub.add_parser(
         "live-status", help="Cohort readiness from immutable Observation RDP"
@@ -232,9 +245,11 @@ def main(argv: list[str] | None = None) -> int:
         "live-status",
     }:
         argv = argv if argv is not None else sys.argv[1:]
-        if os.environ.get(SOURCE_BUILD_WORKER_ENV) != "1":
+        skip_worker = args.command == "build-live-source" and "--plan-only" in argv
+        if os.environ.get(SOURCE_BUILD_WORKER_ENV) != "1" and not skip_worker:
             return _spawn_source_build_worker(list(argv))
-        apply_source_build_address_limit()
+        if not skip_worker:
+            apply_source_build_address_limit()
     try:
         if args.command == "seal":
             inventory = load_source_inventory(
@@ -278,8 +293,20 @@ def main(argv: list[str] | None = None) -> int:
                 closure_receipt=receipt,
                 discovery_coverage_class=args.discovery_coverage_class,
                 ops_store=_path(args.ops_store),
+                plan_only=bool(args.plan_only),
             )
-            assert_source_matches_receipt(result, receipt)
+            if args.plan_only:
+                if plan_is_unbounded(result):
+                    payload = {
+                        "status": "FAIL",
+                        "code": UNBOUNDED_PLAN,
+                        "next": FAIL_OWNER_NEXT[UNBOUNDED_PLAN],
+                        "plan": result,
+                    }
+                    print(json.dumps(payload, sort_keys=True))
+                    return 2
+            else:
+                assert_source_matches_receipt(result, receipt)
         elif args.command == "live-status":
             result = live_cohort_status(
                 observation_rdp_root=_path(args.observation_rdp),

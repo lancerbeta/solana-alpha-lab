@@ -72,6 +72,30 @@ _EXTRACTION_COUNTERS = {
     "member_checkpoint_hits": 0,
     "member_checkpoint_misses": 0,
     "member_target_cache_hits": 0,
+    "units_considered": 0,
+    "pit_targets_after_bound": 0,
+    "anchor_loads": 0,
+    "delta_files_applied": 0,
+    "unique_target_seq_consumed": 0,
+    "historical_independent_reconstruct_calls": 0,
+    "full_population_scans": 0,
+    "candidate_member_rows_consumed": 0,
+    "member_payload_bytes_read": 0,
+    "observation_lineage_rows_selected": 0,
+    "unique_observation_locations_read": 0,
+    "global_manifest_markers_scanned": 0,
+    "observation_rows_decoded": 0,
+    "observation_payload_bytes_read": 0,
+    "research_manifest_headers_scanned": 0,
+    "research_event_partitions_opened": 0,
+    "research_event_records_decoded": 0,
+    "research_event_payload_bytes_read": 0,
+    "legacy_member_locations_read": 0,
+    "research_store_bounded_route": 0,
+    "research_store_full_committed_scan": 0,
+    "research_event_partitions_skipped_by_time": 0,
+    "research_event_partitions_opened_unknown_bounds": 0,
+    "research_event_lifecycle_partitions_total": 0,
 }
 
 
@@ -114,6 +138,12 @@ def note_member_checkpoint_miss() -> None:
 
 def note_member_target_cache_hit() -> None:
     _EXTRACTION_COUNTERS["member_target_cache_hits"] += 1
+
+
+def note_counter(name: str, count: int = 1) -> None:
+    if name not in _EXTRACTION_COUNTERS:
+        return
+    _EXTRACTION_COUNTERS[name] += int(count)
 
 
 def sha256_file_streaming(path: Path, *, chunk_size: int = HASH_CHUNK) -> str:
@@ -372,7 +402,7 @@ def commit_source_bundle(
                 obs_ok = False
                 schedule_ok = False
             if members_ok and obs_ok and schedule_ok:
-                discard_stale_staging(dest)
+                shutil.rmtree(staging, ignore_errors=True)
                 return committed
     os.replace(members_src, dest / SOURCE_MEMBERS_NAME)
     os.replace(obs_src, dest / SOURCE_OBSERVATIONS_NAME)
@@ -385,7 +415,6 @@ def commit_source_bundle(
     tmp_manifest.write_bytes(manifest_bytes)
     os.replace(tmp_manifest, dest / SOURCE_MANIFEST_NAME)
     shutil.rmtree(staging, ignore_errors=True)
-    discard_stale_staging(dest)
     return dest / SOURCE_MANIFEST_NAME
 
 

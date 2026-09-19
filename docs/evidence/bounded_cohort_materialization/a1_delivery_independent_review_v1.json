@@ -1,0 +1,86 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "IMPLEMENT-BOUNDED-COHORT-MATERIALIZATION-V1-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-19",
+  "task_id": "IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1",
+  "reviewed_bindings_sha256": "09c057b30dc3e5a9dc22037705d6ec0dd007a5f98918b0e3c07ba082c5b125c1",
+  "reviewed_inventory_sha256": "a03c69289371c2066295100e634d03c1e04983ebb236e2905cf0445055dc21e9",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "MEMBER_WORK_NOT_SUM_OF_PIT_DEPTH",
+        "RESEARCHSTORE_PAYLOAD_NOT_GROWING_WITH_ORDINAL",
+        "OBSERVATION_PAYLOAD_NOT_HISTORICAL_GLOB",
+        "DUPLICATE_HEAVY_BUILD_DENIED",
+        "packet_fingerprint_sha256=76d30036424bf90846ea203fcdb61ee6bc8a29efb3a97c09759f0d757598be94"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "LATEST_C1_TIME_FILTER_BEFORE_RESOLVE",
+        "IN_WINDOW_PANEL_FAIL_CLOSED_OBSERVATION_LINEAGE_INCOMPLETE",
+        "UNKNOWN_BOUNDS_FORCE_UNBOUNDED_MATERIALIZATION_PLAN",
+        "PREFIX_WALK_INDEPENDENT_RECONSTRUCT_ZERO"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PLAN_ONLY_BOUNDED_COHORT_WINDOW",
+        "REAL_C2_UNDER_90_MIN_CANONICAL_BUNDLE",
+        "C100_PAYLOAD_WORK_BOUNDED",
+        "TESTS_A_THROUGH_P_PRESENT"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "NORMAL_OPERATOR_SURFACE_CANNOT_START_CUMULATIVE_REPLAY",
+        "C3_REQUIRES_NO_MANUAL_CACHE_PREPARATION",
+        "PLAN_ONLY_UNBOUNDED_GATE_BEFORE_BUILD",
+        "NO_EASY_FULL_REPLAY_FLAG"
+      ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "Plan flags hardcoded and latest_c1 still globbed or fail-opened on de0d5cc8",
+      "observed_head": "de0d5cc8586fdc361e3228cf1f464cb7a88f3ed7",
+      "resolved_by_head": "7e3ed85af1a8d2bb74e9392e3fa47e85b99f82eb"
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "latest_c1 resolved before window filter and skipped unreadable parquet; unknown_bounds could stay BOUNDED",
+      "observed_head": "7e3ed85af1a8d2bb74e9392e3fa47e85b99f82eb",
+      "resolved_by_head": "8486e2a330c48d75fd68e3a3985b72b2b6d91349"
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_SEAL_IMPORT",
+    "NO_C3_EXECUTION",
+    "NO_VPS",
+    "NO_OLD_ARTIFACT_DELETION"
+  ]
+}

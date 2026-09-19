@@ -514,6 +514,28 @@ VPS Observation RDP → sealed verified release → verified transport →
 `local/factory_v1/data_plane` LIVE CORPUS. Do not import a moving Observation
 RDP into Forge.
 
+To unpack the next mature cohort, do not copy the entire historical RDP,
+replay all historical PIT states, start a second build, bypass the plan
+gate, prewarm caches, or delete random temp files. Identify the next mature
+unimported cohort, acquire only missing incremental evidence, run plan-only,
+require `BOUNDED_COHORT_WINDOW`, then build and verify. Stop at the next
+authorized scope (seal/import/Forge require their own contract).
+`--as-of` may be wall-clock now; first-seen cutoff walks keyed
+`OBSERVATION_BATCH` in `[window_start, as_of]`, never `dataset-*.published`.
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --plan-only --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
+```
+
+A plan that is not `BOUNDED_COHORT_WINDOW` is `UNBOUNDED_MATERIALIZATION_PLAN`.
+Do not run the build. Duplicate `build-live-source` for the same cohort and
+RDP is `BUILD_ALREADY_RUNNING`. The wall budget is 90 minutes; a breach
+publishes nothing canonical.
+
 One-shot when Observation RDP and Forge `data_plane` are **already on the
 same host** (local tests). Do **not** run this on the VPS if Forge reads
 `local/factory_v1/data_plane` on the owner machine. Omit `--cohort-id` to
@@ -549,6 +571,12 @@ closure (same gates as publish). Then seal/verify:
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --plan-only --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
+```
+
+Require `work_class=BOUNDED_COHORT_WINDOW` before the build.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --observation-rdp /opt/solana-alpha-lab/local/factory_v1/observation_rdp --ops-store /opt/solana-alpha-lab/local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>

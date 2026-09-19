@@ -1,0 +1,78 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "IMPLEMENT-BOUNDED-COHORT-MATERIALIZATION-V1-COMPLETION-001",
+  "as_of": "2026-09-19",
+  "task_id": "IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1",
+  "state_change": "BOUNDED_COHORT_MATERIALIZATION_OPERATOR_PATH",
+  "base_main": "7ef87028c933fd5335b75ad234fb830f7031eeb5",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "821aecff6e3c7e65fe03a996aa67084cd0590052bf1a273c41397e85e2647b78",
+    "docs/evidence/bounded_cohort_materialization/c100_payload_work_v1.json": "d93124090ad7c57d9af57591014aa1a6846f721f24e1413389d1e812845a0fab",
+    "docs/evidence/bounded_cohort_materialization/c2_build_receipt_v1.json": "7e0699bd3d9e6dc001c1f82748987f5ebde1d66a569c5b4b0dbec7972c22ecc5",
+    "docs/evidence/bounded_cohort_materialization/c2_plan_bounded_v1.json": "6081741d12a09a0de00c6874da9576045e795b7281e43cad20a769a63033c8ac",
+    "docs/evidence/bounded_cohort_materialization/old_residual_cleanup_candidates_v1.json": "f25884e6685fd7da17678e9fce23201cb3962f9a3cf174f9bd044c83f28eb18f",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "5eed3278802d4a7a942b76206e2f37f74d6063f8f98ca01db45013d166fd392e",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "84b8a91eb346bd8870c3002c9390ed2bfe78ca924b85cec3da62b125668b86c9",
+    "docs/reports/bounded_cohort_materialization/a1_owner_readout_v1.md": "65e9ba69145dcc4d72e725f1f861e5e666fbc5af57c7d3cc2f833187a4d34981",
+    "docs/tasks/IMPLEMENT_BOUNDED_COHORT_MATERIALIZATION_V1.md": "4560c6b506b40c1f9934bf9afa3fbc67276ba54d18a0945dce4d5b9e3c1c033c",
+    "scripts/bench_bounded_cohort_materialization_v1.py": "d31c0b0bfa0e122c249752222a1ee68bc662183699fea1099da18108d26caa87",
+    "scripts/discovery_evidence_release.py": "5bf4cfa04c54b401b0703e78f0c70dc9d7156ca24082e2aa635e555aaef5907e",
+    "src/solana_alpha_lab/factory/bounded_cohort_materialization.py": "15c9751414aa624e7a932c8848e20c96e8ebbd12f4b1cafcc186b3d515d0fc5b",
+    "src/solana_alpha_lab/factory/live_cohort_discovery_release.py": "9eefbb66e5c731af855ffd5650c4199f20f77c819d43bfdaa7cb0db89fef3179",
+    "src/solana_alpha_lab/factory/live_cohort_source_bundle.py": "7691520d3a22aef7696aba9b5dabd8d9a7023d00ea3db7925aed03d958a83590",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "b8a2b16bc6afc2385d195acfa4928930bdb1b3c7de882c685d2131fd5b27a5d1",
+    "src/solana_alpha_lab/factory/members_snapshot_delta.py": "3d8fe82d17bc5dfc6092ef79d10bdf7832a43b21c3672befe2db75f93504d5cb",
+    "src/solana_alpha_lab/factory/research_store.py": "9965eab3e27b2e467c883d45ffa94ffbd5a545f5f11ef5e2d597eedb539f79c6",
+    "tests/test_bounded_cohort_materialization_v1.py": "40239712e7fc7517488668ae57636b7dab7fdb7a7442e30d15e9d74dda6a13c4",
+    "tests/test_live_cohort_memory_bounded_publication_v1.py": "ac57f7ea757c1ff5f1fb2366f78bf7785ce9454fb3c1b410bef3c1be319b1f86",
+    "tests/test_local_cohort_incremental_materialization_v1.py": "a7fc57c6ee5dd6161ca63f28527f84afec1ff466c5f2be72a3d10b72e8ad741b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/bounded_cohort_materialization/a1_delivery_factory_fit_v1.json",
+    "sha256": "fabfd1ec19319c51d07fec6cc4bc325d0b33054d30123af7d039a53525d2c1ce",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_BOUNDED_COHORT_MATERIALIZATION_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/bounded_cohort_materialization/a1_delivery_independent_review_v1.json",
+      "sha256": "49155bdbb142ea9f9c61de70ac1651d1e66a5a008a8c3826eaaf5dfb53729561",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_BOUNDED_COHORT_MATERIALIZATION_TESTS",
+      "PASS_C2_PLAN_BOUNDED",
+      "PASS_REAL_C2_UNDER_90_MIN",
+      "PASS_C100_PAYLOAD_WORK_BOUNDED"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_ALPHA",
+    "NO_SEAL_IMPORT",
+    "NO_C3_EXECUTION",
+    "NO_VPS",
+    "NO_OLD_ARTIFACT_DELETION"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0
+  }
+}

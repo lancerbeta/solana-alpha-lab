@@ -9,9 +9,11 @@ from __future__ import annotations
 import json
 import os
 import pickle
+import secrets
 import shutil
 import sqlite3
 import tempfile
+import time
 from collections import OrderedDict
 from collections.abc import Callable, Iterator, Mapping, Sequence
 from datetime import UTC, datetime, timedelta
@@ -55,10 +57,13 @@ from solana_alpha_lab.factory.live_cohort_source_bundle import (
     note_member_checkpoint_hit,
     note_member_checkpoint_miss,
     note_member_target_cache_hit,
+    note_counter,
     note_full_member_rows,
     note_member_file_open,
     note_member_full_column_scan,
     note_observation_rows,
+    extraction_counters,
+    reset_extraction_counters,
     observation_from_parquet_row,
     parquet_row_count,
     row_for_member_parquet,
@@ -70,15 +75,15 @@ from solana_alpha_lab.factory.live_cohort_source_bundle import (
 )
 from solana_alpha_lab.factory.members_snapshot_delta import (
     LAYOUT_KIND,
+    LEGACY_KIND,
     MembersDeltaError,
     canonical_unit_binding,
     canonical_unit_files_binding,
     canonical_unit_files_binding_fast,
     canonical_unit_noop_range,
-    _reconstruct_to_sqlite,
-    _store_operational_latest,
-    _try_extend_operational_latest,
-    _try_open_operational_latest,
+    prefix_walk_unit,
+    reconstruct_stats,
+    reset_fingerprint_work,
     _contained_data_path,
     iter_member_row_batches_for_location,
     iter_spilled_member_rows,
@@ -86,7 +91,28 @@ from solana_alpha_lab.factory.members_snapshot_delta import (
 )
 from solana_alpha_lab.factory.research_store import (
     ExistingResearchStoreReader,
+    ResearchStoreBoundTelemetry,
     ResearchStoreError,
+)
+from solana_alpha_lab.factory.bounded_cohort_materialization import (
+    BOUNDED_WORK_CLASS,
+    BUILD_ALREADY_RUNNING,
+    BoundedMaterializationError,
+    CohortBuildLock,
+    DEFAULT_WALL_BUDGET_S,
+    MaterializationProgress,
+    OBSERVATION_LINEAGE_INCOMPLETE,
+    PROGRESS_NAME,
+    UNBOUNDED_PLAN,
+    WALL_BUDGET_EXCEEDED,
+    WallBudget,
+    file_size_for_rel,
+    inspect_member_target,
+    load_observation_partition_index,
+    plan_is_unbounded,
+    resolve_observation_panel_location,
+    select_member_batches,
+    select_observation_batches,
 )
 from solana_alpha_lab.factory.run_passport import canonical_sha256
 from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
@@ -976,6 +1002,42 @@ def bound_schedule_from_rdp(
         observation_rdp_root,
         schedule_sha256=schedule_sha256,
         activation_id=activation_id,
+        schedule_only=True,
+    )
+
+
+def _apply_research_bound_telemetry(telemetry: ResearchStoreBoundTelemetry) -> None:
+    note_counter(
+        "research_manifest_headers_scanned",
+        telemetry.research_manifest_headers_scanned,
+    )
+    note_counter(
+        "research_event_partitions_opened",
+        telemetry.research_event_partitions_opened,
+    )
+    note_counter(
+        "research_event_records_decoded",
+        telemetry.research_event_records_decoded,
+    )
+    note_counter(
+        "research_event_payload_bytes_read",
+        telemetry.research_event_payload_bytes_read,
+    )
+    if telemetry.used_bounded_lifecycle_route:
+        note_counter("research_store_bounded_route", 1)
+    if telemetry.full_committed_payload_scan:
+        note_counter("research_store_full_committed_scan", 1)
+    note_counter(
+        "research_event_partitions_skipped_by_time",
+        telemetry.research_event_partitions_skipped_by_time,
+    )
+    note_counter(
+        "research_event_partitions_opened_unknown_bounds",
+        telemetry.research_event_partitions_opened_unknown_bounds,
+    )
+    note_counter(
+        "research_event_lifecycle_partitions_total",
+        telemetry.research_event_lifecycle_partitions_total,
     )
 
 
@@ -984,20 +1046,38 @@ def _lineage_from_rdp(
     *,
     schedule_sha256: str,
     activation_id: str,
+    window_start: datetime | None = None,
+    closure_cutoff: datetime | None = None,
+    schedule_only: bool = False,
 ) -> tuple[dict[str, Any], str | None, list[dict[str, Any]]]:
-    """Bind schedule by digest; require unambiguous activation-scoped lifecycle."""
+    """Bind schedule by digest using ResearchStore partition manifests.
+
+    Full historical payload replay is not the operator path. When a cohort
+    window is supplied, only overlapping partitions plus a newest-first
+    predecessor search are verified/decoded.
+    """
     wanted = str(activation_id or "").strip()
     _require(bool(wanted), "LIVE_SOURCE_ACTIVATION_MISSING")
     try:
         store = ExistingResearchStoreReader(Path(observation_rdp_root))
     except ResearchStoreError as exc:
         raise LiveCohortReleaseError("LIVE_SOURCE_RDP_UNREADABLE") from exc
+    try:
+        records, telemetry = store.iter_lifecycle_records_bounded(
+            schedule_sha256=schedule_sha256,
+            activation_id=wanted,
+            window_start=window_start,
+            closure_cutoff=closure_cutoff,
+            schedule_only=schedule_only,
+        )
+    except ResearchStoreError as exc:
+        raise LiveCohortReleaseError("LIVE_SOURCE_RDP_UNREADABLE") from exc
+    _apply_research_bound_telemetry(telemetry)
     schedule_docs: list[dict[str, Any]] = []
     schedule_producers: set[str] = set()
     activation_evidence = False
-    seen_activations: set[str] = set()
     lifecycle_rows: list[dict[str, Any]] = []
-    for record in store.iter_committed_records():
+    for record in records:
         kind = str(record.record_kind)
         try:
             payload = json.loads(record.payload_json)
@@ -1024,8 +1104,6 @@ def _lineage_from_rdp(
             "OBSERVATION_MEMBER_BATCH",
             "OBSERVATION_PANEL_SNAPSHOT",
         }:
-            if event_activation:
-                seen_activations.add(event_activation)
             if event_activation == wanted:
                 activation_evidence = True
                 lifecycle_rows.append(
@@ -1050,7 +1128,9 @@ def _lineage_from_rdp(
     sched_activation = _schedule_document_activation_id(schedule_doc)
     if sched_activation and sched_activation != wanted:
         raise LiveCohortReleaseError("IDENTITY_CONFLICT")
-    if not activation_evidence:
+    if sched_activation == wanted:
+        activation_evidence = True
+    if not schedule_only and not activation_evidence:
         raise LiveCohortReleaseError("LIVE_SOURCE_ACTIVATION_MISSING")
     schedule_producer = None
     if len(schedule_producers) == 1:
@@ -1208,6 +1288,10 @@ def _cohort_contributing_lineage(
         location = str(payload.get("member_location") or "")
         if not location:
             continue
+        if location_flags is not None and location not in location_flags:
+            # Do not independently reconstruct uncached SNAPSHOT_PLUS_DELTA
+            # locations on the bounded path.
+            continue
         has_in, later = _member_batch_window_flags(
             observation_rdp_root,
             location,
@@ -1276,7 +1360,8 @@ def _cohort_contributing_lineage(
             raw = payload.get("discovery_coverage_class")
             if isinstance(raw, str) and raw.strip():
                 coverages.append(raw.strip())
-    _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
+    if include_observations:
+        _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
     return sorted(contributing), _worst_coverage(coverages), contributing_manifests
 
 
@@ -1332,202 +1417,41 @@ def _cohort_members_into_sqlite(
     inclusion_probability: str | None,
     cutoff_at: datetime | None = None,
     location_flags: dict[str, tuple[bool, bool]] | None = None,
+    replay_dir: Path | None = None,
+    progress: MaterializationProgress | None = None,
+    wall: WallBudget | None = None,
 ) -> tuple[set[str], int]:
-    """Materialize exact PITs with a bounded process-local target cache."""
+    """Materialize window membership with one prefix walk per SNAPSHOT_PLUS_DELTA unit."""
     conn.execute(
         """
         CREATE TABLE members (
             mint TEXT PRIMARY KEY,
             admission TEXT NOT NULL,
             producer_git_sha TEXT,
-            payload_json TEXT NOT NULL
+            payload_json TEXT NOT NULL,
+            source_effective_at TEXT NOT NULL,
+            source_index INTEGER NOT NULL
         )
         """
     )
-    conn.execute("CREATE TABLE needed (mint TEXT PRIMARY KEY)")
     flags = location_flags if location_flags is not None else {}
-    batches: list[tuple[int, str, Mapping[str, Any], str | None]] = []
-    for index, row in enumerate(lifecycle_rows):
-        if str(row.get("kind") or "") != "OBSERVATION_MEMBER_BATCH":
-            continue
-        if not _lifecycle_row_at_or_before_cutoff(row, cutoff_at):
-            continue
-        payload = row.get("payload")
-        if not isinstance(payload, Mapping):
-            continue
-        location = str(payload.get("member_location") or "")
-        if not location:
-            continue
-        batches.append(
-            (
-                index,
-                str(row.get("effective_at") or ""),
-                payload,
-                _sha40(row.get("producer_git_sha")),
-            )
-        )
-    batches.sort(key=lambda item: (item[1], item[0]), reverse=True)
-    winning_producers: set[str] = set()
-    unit_contexts: OrderedDict[str, dict[str, Any]] = OrderedDict()
-    target_cache: OrderedDict[str, None] = OrderedDict()
-    target_state_cache: dict[tuple[str, str, int, str, str], str] = {}
-    target_state_sequences: dict[tuple[str, str, int, str, str], int] = {}
-    target_state_flags: dict[str, tuple[bool, bool, int]] = {}
-    conn.execute(
-        """
-        CREATE TEMP TABLE materialization_target_rows (
-            cache_key TEXT NOT NULL,
-            row_order INTEGER PRIMARY KEY AUTOINCREMENT,
-            payload BLOB NOT NULL
-        )
-        """
+    selected, _predecessors = select_member_batches(
+        lifecycle_rows,
+        window_start=window_start,
+        closure_cutoff=cutoff_at,
     )
+    note_counter("pit_targets_after_bound", len(selected))
+    winning_producers: set[str] = set()
 
-    def _validated_publication(
-        publications: Sequence[Mapping[str, Any]], target_id: str
-    ) -> dict[str, Any] | None:
-        for publication in publications:
-            if not isinstance(publication, Mapping):
-                continue
-            if str(publication.get("dataset_manifest_id") or "") != target_id:
-                continue
-            try:
-                seq = int(publication["seq"])
-                row_count = int(publication.get("row_count") or 0)
-            except (KeyError, TypeError, ValueError):
-                return None
-            fingerprint = str(publication.get("snapshot_fingerprint") or "")
-            if (
-                seq < 0
-                or row_count < 0
-                or len(fingerprint) != 64
-                or any(char not in "0123456789abcdef" for char in fingerprint)
-            ):
-                return None
-            normalized = dict(publication)
-            normalized["seq"] = seq
-            normalized["row_count"] = row_count
-            normalized["snapshot_fingerprint"] = fingerprint
-            return normalized
-        return None
-
-    def _unit_target(
-        layout: Mapping[str, Any] | None,
-    ) -> tuple[Path, dict[str, Any], bool, Mapping[str, Any]] | None:
-        if not isinstance(layout, Mapping) or str(layout.get("kind") or "") != LAYOUT_KIND:
-            return None
-        unit_rel = str(layout.get("unit_rel") or "")
-        target_id = str(layout.get("dataset_manifest_id") or "")
-        if not unit_rel or not target_id:
-            return None
-        try:
-            unit_path = _contained_data_path(Path(observation_rdp_root), unit_rel)
-        except MembersDeltaError as exc:
-            raise LiveCohortReleaseError(
-                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-            ) from exc
-        try:
-            unit = json.loads(unit_path.read_text(encoding="utf-8"))
-        except (OSError, UnicodeDecodeError, json.JSONDecodeError):
-            return None
-        if not isinstance(unit, Mapping):
-            return None
-        publications = list(unit.get("publications") or [])
-        target = _validated_publication(publications, target_id)
-        if target is None:
-            return None
-        is_tail = bool(publications) and target_id == str(
-            publications[-1].get("dataset_manifest_id") or ""
-        )
-        return unit_path.parent, target, is_tail, unit
-
-    def _unit_context(unit_rel: str) -> dict[str, Any]:
-        context = unit_contexts.get(unit_rel)
-        if context is None:
-            context = {"binding": None, "prefix_bindings": OrderedDict()}
-            unit_contexts[unit_rel] = context
-        unit_contexts.move_to_end(unit_rel)
-        while len(unit_contexts) > _MAX_LOCAL_UNIT_CONTEXTS:
-            unit_contexts.popitem(last=False)
-        return context
-
-    def _unit_prefix_binding(
-        unit_rel: str,
-        unit: Mapping[str, Any],
-        target_seq: int,
-        current_binding: tuple[str, str | None],
-    ) -> tuple[str, str | None]:
-        """Return the exact cache binding for the target's unit prefix.
-
-        A canonical append can leave the durable latest cache one publication
-        behind while older observation panels still point at that prior tail.
-        Reusing that cache is safe only when its own prefix metadata and file
-        bytes bind exactly to the requested PIT.  Prefix bindings are memoized
-        per unit and never change the scientific RDP.
-        """
-
-        publications = list(unit.get("publications") or [])
-        if target_seq == len(publications) - 1:
-            return current_binding
-        context = _unit_context(unit_rel)
-        prefix_cache = context["prefix_bindings"]
-        cached = prefix_cache.get(target_seq)
-        if cached is not None:
-            prefix_cache.move_to_end(target_seq)
-            return cached
-        prefix = dict(unit)
-        prefix["publications"] = publications[: target_seq + 1]
-        target_publication = prefix["publications"][-1]
-        target_chain = str(
-            target_publication.get("canonical_files_binding_sha256") or ""
-        )
-        if target_chain:
-            prefix["canonical_files_binding_sha256"] = target_chain
-        else:
-            prefix.pop("canonical_files_binding_sha256", None)
-        prefix_binding = (canonical_unit_binding(prefix), None)
-        prefix_binding = (
-            prefix_binding[0],
-            canonical_unit_files_binding_fast(prefix),
-        )
-        if prefix_binding[1] is None:
-            try:
-                prefix_binding = (
-                    prefix_binding[0],
-                    canonical_unit_files_binding(Path(observation_rdp_root), prefix),
-                )
-            except (MembersDeltaError, OSError):
-                pass
-        prefix_cache[target_seq] = prefix_binding
-        prefix_cache.move_to_end(target_seq)
-        while len(prefix_cache) > _MAX_LOCAL_PREFIX_BINDINGS:
-            prefix_cache.popitem(last=False)
-        return prefix_binding
-
-    def _consume_full_unit_rows(
-        rows: Iterator[Mapping[str, Any]], producer_sha: str | None
-    ) -> tuple[bool, bool, int]:
-        loc_has_in = False
-        loc_later = False
-        consumed = 0
-        for member in rows:
-            if not isinstance(member, Mapping):
-                continue
-            consumed += 1
-            admission = resolve_cohort_admission_instant(member)
-            if admission is not None:
-                if window_start <= admission < window_end:
-                    loc_has_in = True
-                elif admission >= window_end:
-                    loc_later = True
-            _ingest(member, producer_sha)
-        if consumed:
-            note_full_member_rows(consumed)
-        return loc_has_in, loc_later, consumed
-
-    def _ingest(member: Mapping[str, Any], producer_sha: str | None) -> bool:
+    def _ingest(
+        member: Mapping[str, Any],
+        producer_sha: str | None,
+        *,
+        rank_effective: str,
+        rank_index: int,
+    ) -> tuple[bool, bool]:
         if not isinstance(member, Mapping):
-            return False
+            return False, False
         row = {
             key: value
             for key, value in member.items()
@@ -1542,7 +1466,7 @@ def _cohort_members_into_sqlite(
             elif admission >= window_end:
                 loc_later = True
         if admission is None or not (window_start <= admission < window_end):
-            return loc_later
+            return loc_has_in, loc_later
         normalized = _normalize_member_row(
             row,
             schedule_sha256=schedule_sha256,
@@ -1552,412 +1476,230 @@ def _cohort_members_into_sqlite(
             inclusion_probability_default=inclusion_probability,
         )
         if normalized is None:
-            return loc_later
+            return loc_has_in, loc_later
         entity = str(normalized.get("mint") or "")
         if not entity:
-            return loc_has_in or loc_later
+            return loc_has_in, loc_later
         conn.execute(
-            "INSERT OR IGNORE INTO members(mint, admission, producer_git_sha, payload_json) VALUES (?,?,?,?)",
+            """
+            INSERT INTO members(
+                mint, admission, producer_git_sha, payload_json,
+                source_effective_at, source_index
+            ) VALUES (?,?,?,?,?,?)
+            ON CONFLICT(mint) DO UPDATE SET
+                admission=excluded.admission,
+                producer_git_sha=excluded.producer_git_sha,
+                payload_json=excluded.payload_json,
+                source_effective_at=excluded.source_effective_at,
+                source_index=excluded.source_index
+            WHERE excluded.source_effective_at > members.source_effective_at
+               OR (
+                    excluded.source_effective_at = members.source_effective_at
+                    AND excluded.source_index > members.source_index
+               )
+            """,
             (
                 entity,
                 str(normalized.get(COHORT_ADMISSION_FIELD) or ""),
                 producer_sha,
                 json.dumps(normalized, sort_keys=True, separators=(",", ":")),
+                rank_effective,
+                int(rank_index),
             ),
         )
-        if int(conn.execute("SELECT changes()").fetchone()[0]) != 1:
-            return loc_has_in or loc_later
-        if producer_sha:
+        if int(conn.execute("SELECT changes()").fetchone()[0]) == 1 and producer_sha:
             winning_producers.add(producer_sha)
-        return loc_has_in or loc_later
+        note_counter("candidate_member_rows_consumed", 1)
+        return loc_has_in, loc_later
 
-    def _target_key(
-        unit_rel: str,
-        target_id: str,
-        target_fp: str,
-        target_seq: int,
-        target_rows: int,
-        binding: tuple[str, str | None],
-    ) -> str:
-        return "\x1f".join(
-            (
-                unit_rel,
-                target_id,
-                target_fp,
-                str(target_seq),
-                str(target_rows),
-                binding[0],
-                str(binding[1] or ""),
-            )
-        )
-
-    def _target_state_key(
-        unit_rel: str,
-        target_fp: str,
-        target_rows: int,
-        binding: tuple[str, str | None],
-    ) -> tuple[str, str, int, str, str]:
-        """Identify equal materialized state without conflating unit histories."""
-
-        return (
-            unit_rel,
-            target_fp,
-            target_rows,
-            binding[0],
-            str(binding[1] or ""),
-        )
-
-    def _state_transition_is_noop(
-        unit_rel: str,
-        unit: Mapping[str, Any],
-        lower_seq: int,
-        upper_seq: int,
-    ) -> bool:
-        if lower_seq == upper_seq:
-            return True
-        if lower_seq > upper_seq:
-            lower_seq, upper_seq = upper_seq, lower_seq
-        _unit_context(unit_rel)
-        return canonical_unit_noop_range(unit, lower_seq, upper_seq) is True
-
-    def _cache_target_rows(
-        cache_key: str,
-        source_conn: Any,
-        *,
-        state_key: tuple[str, str, int, str, str],
-        target_seq: int,
-    ) -> None:
-        batch: list[tuple[str, bytes]] = []
-        for (payload,) in source_conn.execute("SELECT payload FROM members ORDER BY seq"):
-            if not isinstance(payload, (bytes, bytearray, memoryview)):
-                raise LiveCohortReleaseError("LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE")
-            batch.append((cache_key, bytes(payload)))
-            if len(batch) >= 2048:
-                conn.executemany(
-                    "INSERT INTO materialization_target_rows(cache_key, payload) VALUES (?,?)",
-                    batch,
-                )
-                batch = []
-        if batch:
-            conn.executemany(
-                "INSERT INTO materialization_target_rows(cache_key, payload) VALUES (?,?)",
-                batch,
-            )
-        target_cache[cache_key] = None
-        target_cache.move_to_end(cache_key)
-        while len(target_cache) > 8:
-            evicted, _ = target_cache.popitem(last=False)
-            conn.execute(
-                "DELETE FROM materialization_target_rows WHERE cache_key=?", (evicted,)
-            )
-            for state, mapped_key in list(target_state_cache.items()):
-                if mapped_key == evicted:
-                    del target_state_cache[state]
-                    target_state_sequences.pop(state, None)
-            target_state_flags.pop(evicted, None)
-        target_state_cache[state_key] = cache_key
-        target_state_sequences[state_key] = target_seq
-
-    def _iter_cached_target_rows(cache_key: str) -> Iterator[Mapping[str, Any]]:
-        for (payload,) in conn.execute(
-            "SELECT payload FROM materialization_target_rows WHERE cache_key=? ORDER BY row_order",
-            (cache_key,),
-        ):
-            try:
-                row = pickle.loads(payload)
-            except Exception as exc:
-                raise LiveCohortReleaseError(
-                    "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-                ) from exc
-            if not isinstance(row, Mapping):
-                raise LiveCohortReleaseError("LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE")
-            yield row
-
-    for rank, (_index, _order, payload, producer) in enumerate(batches):
+    unit_groups: dict[str, dict[str, Any]] = {}
+    legacy_seen: dict[str, list[dict[str, Any]]] = {}
+    slow_targets: list[dict[str, Any]] = []
+    for row in selected:
+        payload = row.get("payload")
+        if not isinstance(payload, Mapping):
+            continue
         location = str(payload.get("member_location") or "")
         try:
-            layout = read_member_layout(observation_rdp_root, location)
-        except MembersDeltaError as exc:
-            raise LiveCohortReleaseError(
-                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-            ) from exc
-        unit_rel = (
-            str(layout.get("unit_rel") or "")
-            if isinstance(layout, Mapping) and str(layout.get("kind") or "") == LAYOUT_KIND
-            else ""
-        )
-        target = _unit_target(layout)
-        if unit_rel and target is not None:
-            unit_dir, publication, is_tail, unit = target
-            target_id = str(publication["dataset_manifest_id"])
-            target_fp = str(publication["snapshot_fingerprint"])
-            target_seq = int(publication["seq"])
-            target_rows = int(publication["row_count"])
-            unit_context = _unit_context(unit_rel)
-            binding = unit_context.get("binding")
-            if binding is None:
-                unit_sha = canonical_unit_binding(unit)
-                try:
-                    files_sha = canonical_unit_files_binding_fast(unit)
-                    if files_sha is None:
-                        files_sha = canonical_unit_files_binding(
-                            Path(observation_rdp_root), unit
-                        )
-                except (MembersDeltaError, OSError):
-                    files_sha = None
-                binding = (unit_sha, files_sha)
-                unit_context["binding"] = binding
-            loc_has_in: bool
-            loc_later: bool
-            consumed: int
-            cache_key = _target_key(
-                unit_rel, target_id, target_fp, target_seq, target_rows, binding
-            )
-            state_key = _target_state_key(unit_rel, target_fp, target_rows, binding)
-            source_cache_key = cache_key
-            if cache_key in target_cache:
-                target_cache.move_to_end(cache_key)
-                note_member_target_cache_hit()
-            elif (
-                cached_state_key := target_state_cache.get(state_key)
-            ) is not None and cached_state_key in target_cache and _state_transition_is_noop(
+            info = inspect_member_target(observation_rdp_root, location)
+        except BoundedMaterializationError as exc:
+            raise LiveCohortReleaseError(str(exc)) from exc
+        rank_effective = str(row.get("effective_at") or "")
+        rank_index = int(row.get("_source_index") or 0)
+        producer = _sha40(row.get("producer_git_sha"))
+        target = {
+            "row": row,
+            "location": location,
+            "producer": producer,
+            "rank_effective": rank_effective,
+            "rank_index": rank_index,
+            "info": info,
+        }
+        if info.get("snapshot_plus_delta") and info.get("seq") is not None:
+            unit_rel = str(info.get("unit_rel") or "")
+            group = unit_groups.setdefault(
                 unit_rel,
-                unit,
-                target_seq,
-                target_state_sequences[state_key],
-            ):
-                source_cache_key = cached_state_key
-                target_cache.move_to_end(cached_state_key)
-                note_member_target_cache_hit()
-            else:
-                source_spill: Path | None = None
-                source_conn: Any | None = None
-                try:
-                    cache_binding = _unit_prefix_binding(
-                        unit_rel, unit, target_seq, binding
-                    )
-                    if cache_binding[1] is not None:
-                        cached = _try_open_operational_latest(
-                            unit_dir,
-                            dataset_manifest_id=target_id,
-                            snapshot_fingerprint=target_fp,
-                            seq=target_seq,
-                            row_count=target_rows,
-                            canonical_unit_sha256=cache_binding[0],
-                            canonical_unit_files_sha256=cache_binding[1],
-                            invalidate_on_identity_mismatch=False,
-                        )
-                        if cached is not None:
-                            note_member_checkpoint_hit()
-                            source_spill, source_conn = cached
-                    if source_conn is None and is_tail and binding[1] is not None:
-                        # Keep the previous tail available for older panels in
-                        # this same build before promoting the durable cache to
-                        # the new tail.  Otherwise the promotion would erase
-                        # the only checkpoint that can satisfy those older PITs.
-                        if target_seq > 0:
-                            previous_publication = unit["publications"][target_seq - 1]
-                            if isinstance(previous_publication, Mapping):
-                                try:
-                                    previous_seq = int(previous_publication["seq"])
-                                    previous_rows = int(
-                                        previous_publication.get("row_count") or 0
-                                    )
-                                except (KeyError, TypeError, ValueError):
-                                    previous_seq = -1
-                                    previous_rows = -1
-                                previous_id = str(
-                                    previous_publication.get("dataset_manifest_id") or ""
-                                )
-                                previous_fp = str(
-                                    previous_publication.get("snapshot_fingerprint") or ""
-                                )
-                                if (
-                                    previous_seq == target_seq - 1
-                                    and previous_rows >= 0
-                                    and previous_id
-                                    and len(previous_fp) == 64
-                                ):
-                                    previous_binding = _unit_prefix_binding(
-                                        unit_rel, unit, previous_seq, binding
-                                    )
-                                    previous_cache_key = _target_key(
-                                        unit_rel,
-                                        previous_id,
-                                        previous_fp,
-                                        previous_seq,
-                                        previous_rows,
-                                        binding,
-                                    )
-                                    if (
-                                        previous_cache_key not in target_cache
-                                        and previous_binding[1] is not None
-                                    ):
-                                        previous_cached = _try_open_operational_latest(
-                                            unit_dir,
-                                            dataset_manifest_id=previous_id,
-                                            snapshot_fingerprint=previous_fp,
-                                            seq=previous_seq,
-                                            row_count=previous_rows,
-                                            canonical_unit_sha256=previous_binding[0],
-                                            canonical_unit_files_sha256=previous_binding[1],
-                                            invalidate_on_identity_mismatch=False,
-                                        )
-                                        if previous_cached is not None:
-                                            note_member_checkpoint_hit()
-                                            previous_spill, previous_conn = previous_cached
-                                            try:
-                                                _cache_target_rows(
-                                                    previous_cache_key,
-                                                    previous_conn,
-                                                    state_key=_target_state_key(
-                                                        unit_rel,
-                                                        previous_fp,
-                                                        previous_rows,
-                                                        binding,
-                                                    ),
-                                                    target_seq=previous_seq,
-                                                )
-                                            finally:
-                                                previous_conn.close()
-                                                previous_spill.unlink(missing_ok=True)
-                        extended = _try_extend_operational_latest(
-                            Path(observation_rdp_root),
-                            unit_dir,
-                            unit,
-                            publication,
-                        )
-                        if extended is not None:
-                            note_member_checkpoint_hit()
-                            source_spill, source_conn = extended
-                            _store_operational_latest(
-                                unit_dir,
-                                source_conn,
-                                dataset_manifest_id=target_id,
-                                snapshot_fingerprint=target_fp,
-                                seq=target_seq,
-                                row_count=target_rows,
-                                canonical_unit_sha256=binding[0],
-                                canonical_unit_files_sha256=binding[1],
-                            )
-                    if source_conn is None:
-                        note_member_checkpoint_miss()
-                        note_member_file_open()
-                        note_member_full_column_scan()
-                        source_spill, source_conn, reconstructed_fp = _reconstruct_to_sqlite(
-                            observation_rdp_root,
-                            unit,
-                            target_id,
-                        )
-                        _require(
-                            reconstructed_fp == target_fp,
-                            "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE",
-                        )
-                        if is_tail:
-                            _store_operational_latest(
-                                unit_dir,
-                                source_conn,
-                                dataset_manifest_id=target_id,
-                                snapshot_fingerprint=target_fp,
-                                seq=target_seq,
-                                row_count=target_rows,
-                                canonical_unit_sha256=binding[0],
-                                canonical_unit_files_sha256=binding[1],
-                            )
-                    _cache_target_rows(
-                        cache_key,
-                        source_conn,
-                        state_key=state_key,
-                        target_seq=target_seq,
-                    )
-                except (MembersDeltaError, OSError, sqlite3.Error, pa.ArrowException) as exc:
-                    raise LiveCohortReleaseError(
-                        "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-                    ) from exc
-                finally:
-                    if source_conn is not None:
-                        source_conn.close()
-                    if source_spill is not None:
-                        source_spill.unlink(missing_ok=True)
-            cached_flags = target_state_flags.get(source_cache_key)
-            if cached_flags is None:
-                cached_flags = _consume_full_unit_rows(
-                    _iter_cached_target_rows(source_cache_key), producer
-                )
-                target_state_flags[source_cache_key] = cached_flags
-            loc_has_in, loc_later, consumed = cached_flags
-            _require(consumed == target_rows, "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE")
-            flags[location] = (loc_has_in, loc_later)
+                {"unit": info.get("unit"), "targets": []},
+            )
+            group["targets"].append(target)
             continue
+        if info.get("legacy"):
+            legacy_seen.setdefault(location, []).append(target)
+            continue
+        slow_targets.append(target)
 
-        if rank == 0:
-            loc_has_in = False
-            loc_later = False
-            for batch in _iter_member_batches(
-                observation_rdp_root,
-                location,
-                columns=None,
-            ):
-                for member in batch:
-                    if not isinstance(member, Mapping):
-                        continue
-                    admission = resolve_cohort_admission_instant(member)
-                    if admission is not None:
-                        if window_start <= admission < window_end:
-                            loc_has_in = True
-                        elif admission >= window_end:
-                            loc_later = True
-                    _ingest(member, producer)
-            flags[location] = (loc_has_in, loc_later)
-            continue
-        conn.execute("DELETE FROM needed")
+    if slow_targets:
+        raise LiveCohortReleaseError("UNBOUNDED_MATERIALIZATION_PLAN")
+
+    note_counter("units_considered", len(unit_groups))
+    if progress is not None:
+        progress.units_total = len(unit_groups)
+        progress.pit_targets_total = len(selected)
+        progress.delta_files_planned = sum(
+            max((int(t["info"]["seq"]) for t in group["targets"]), default=0)
+            for group in unit_groups.values()
+        )
+        progress.stage = "members"
+        progress.write()
+
+    for unit_rel, group in unit_groups.items():
+        if wall is not None:
+            wall.check(stage="members_unit")
+        unit = group["unit"]
+        if not isinstance(unit, Mapping):
+            raise LiveCohortReleaseError("LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE")
+        by_seq: dict[int, list[dict[str, Any]]] = {}
+        for target in group["targets"]:
+            seq = int(target["info"]["seq"])
+            by_seq.setdefault(seq, []).append(target)
+        seqs = sorted(by_seq)
+        replay_path = None
+        if replay_dir is not None:
+            safe = unit_rel.replace("/", "_").replace("\\", "_")
+            replay_path = Path(replay_dir) / f"replay-{safe}.sqlite"
+        else:
+            handle, name = tempfile.mkstemp(prefix="bounded-replay-", suffix=".sqlite")
+            os.close(handle)
+            replay_path = Path(name)
+        replay_conn: Any = None
+        last_bytes = 0
+        try:
+            walker = prefix_walk_unit(
+                Path(observation_rdp_root),
+                unit,
+                seqs,
+                spill_path=replay_path,
+            )
+            for seq, replay_conn, dirty, _fp, payload_bytes in walker:
+                increment = max(0, int(payload_bytes) - last_bytes)
+                last_bytes = int(payload_bytes)
+                note_counter("member_payload_bytes_read", increment)
+                if progress is not None:
+                    progress.member_payload_bytes_read += increment
+                    progress.pit_targets_consumed += len(by_seq.get(seq, ()))
+                    progress.write()
+                if dirty is None:
+                    note_counter("full_population_scans", 1)
+                    note_member_full_column_scan()
+                    rows = [
+                        dict(pickle.loads(blob))
+                        for (blob,) in replay_conn.execute(
+                            "SELECT payload FROM members ORDER BY entity_id"
+                        )
+                    ]
+                    note_full_member_rows(len(rows))
+                else:
+                    rows = []
+                    for entity_id in dirty:
+                        loaded = replay_conn.execute(
+                            "SELECT payload FROM members WHERE entity_id=?",
+                            (entity_id,),
+                        ).fetchone()
+                        if loaded is None:
+                            continue
+                        rows.append(dict(pickle.loads(loaded[0])))
+                for target in by_seq.get(seq, ()):
+                    loc_has_in = False
+                    loc_later = False
+                    for member in rows:
+                        if not isinstance(member, Mapping):
+                            continue
+                        has_in, later = _ingest(
+                            member,
+                            target["producer"],
+                            rank_effective=target["rank_effective"],
+                            rank_index=target["rank_index"],
+                        )
+                        loc_has_in = loc_has_in or has_in
+                        loc_later = loc_later or later
+                    loc_key = str(target["location"])
+                    prev_in, prev_later = flags.get(loc_key, (False, False))
+                    flags[loc_key] = (prev_in or loc_has_in, prev_later or loc_later)
+                if progress is not None:
+                    stats = reconstruct_stats()
+                    progress.delta_files_applied = int(
+                        stats.get("delta_files_applied") or 0
+                    )
+                    progress.write()
+        finally:
+            if replay_conn is not None:
+                try:
+                    replay_conn.close()
+                except Exception:
+                    pass
+            if replay_dir is None:
+                replay_path.unlink(missing_ok=True)
+        if progress is not None:
+            progress.units_completed += 1
+            progress.write()
+
+    for location, targets in legacy_seen.items():
+        if wall is not None:
+            wall.check(stage="members_legacy")
+        note_counter("legacy_member_locations_read", 1)
+        note_member_file_open()
         loc_has_in = False
         loc_later = False
-        probe_cols = ("entity_id", "mint", *ADMISSION_REPRESENTATIONS)
-        for batch in _iter_member_batches(
-            observation_rdp_root, location, columns=probe_cols
+        newest = max(targets, key=lambda item: (item["rank_effective"], item["rank_index"]))
+        try:
+            path = _contained_data_path(Path(observation_rdp_root), location)
+            payload_bytes = int(path.stat().st_size) if path.is_file() else 0
+        except (MembersDeltaError, OSError):
+            payload_bytes = 0
+        note_counter("member_payload_bytes_read", payload_bytes)
+        for batch in iter_member_row_batches_for_location(
+            observation_rdp_root, location, columns=None
         ):
-            for member in batch:
-                admission = resolve_cohort_admission_instant(member)
-                if admission is None:
-                    continue
-                if window_start <= admission < window_end:
-                    loc_has_in = True
-                    entity = str(member.get("entity_id") or member.get("mint") or "")
-                    if entity and conn.execute(
-                        "SELECT 1 FROM members WHERE mint=?", (entity,)
-                    ).fetchone() is None:
-                        conn.execute(
-                            "INSERT OR IGNORE INTO needed(mint) VALUES (?)", (entity,)
-                        )
-                elif admission >= window_end:
-                    loc_later = True
-        flags[location] = (loc_has_in, loc_later)
-        if int(conn.execute("SELECT COUNT(*) FROM needed").fetchone()[0]) == 0:
-            continue
-        for batch in _iter_member_batches(observation_rdp_root, location, columns=None):
             for member in batch:
                 if not isinstance(member, Mapping):
                     continue
-                entity = str(member.get("entity_id") or member.get("mint") or "")
-                if not entity:
-                    continue
-                if conn.execute("SELECT 1 FROM needed WHERE mint=?", (entity,)).fetchone() is None:
-                    continue
-                if conn.execute("SELECT 1 FROM members WHERE mint=?", (entity,)).fetchone() is not None:
-                    continue
-                admission = resolve_cohort_admission_instant(member)
-                if admission is None or not (window_start <= admission < window_end):
-                    continue
-                _ingest(member, producer)
-                conn.execute("DELETE FROM needed WHERE mint=?", (entity,))
-            if int(conn.execute("SELECT COUNT(*) FROM needed").fetchone()[0]) == 0:
-                break
-    conn.execute("DELETE FROM needed")
-    conn.execute("DROP TABLE materialization_target_rows")
+                has_in, later = _ingest(
+                    member,
+                    newest["producer"],
+                    rank_effective=newest["rank_effective"],
+                    rank_index=newest["rank_index"],
+                )
+                loc_has_in = loc_has_in or has_in
+                loc_later = loc_later or later
+        flags[location] = (loc_has_in, loc_later)
+        for target in targets:
+            flags[str(target["location"])] = (loc_has_in, loc_later)
+
+    stats = reconstruct_stats()
+    note_counter("anchor_loads", int(stats.get("anchor_loads") or 0))
+    note_counter("delta_files_applied", int(stats.get("delta_files_applied") or 0))
+    note_counter(
+        "unique_target_seq_consumed",
+        int(stats.get("unique_target_seq_consumed") or 0),
+    )
+    note_counter(
+        "historical_independent_reconstruct_calls",
+        int(stats.get("historical_independent_reconstruct_calls") or 0),
+    )
     conn.commit()
     member_count = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
     return winning_producers, member_count
+
 
 
 def latest_c1_observation_manifest_at(
@@ -1968,10 +1710,13 @@ def latest_c1_observation_manifest_at(
     not_after: datetime,
     cohort_mints: set[str] | None = None,
     mint_is_member: Callable[[str], bool] | None = None,
+    window_start: datetime | None = None,
 ) -> datetime | None:
     """First publication time of each C1 observation identity, max of those <= not_after.
 
     Republished C1 rows in a later mixed panel do not advance the freeze horizon.
+    Operator path uses keyed OBSERVATION_BATCH + canonical partition identity.
+    It does not glob dataset-*.published.
     """
     def _in_cohort(mint: str) -> bool:
         if mint_is_member is not None:
@@ -1981,6 +1726,18 @@ def latest_c1_observation_manifest_at(
         return False
 
     if mint_is_member is None and not cohort_mints:
+        return None
+    if window_start is None:
+        return None
+    try:
+        store = ExistingResearchStoreReader(Path(observation_rdp_root))
+        records, _telemetry = store.iter_lifecycle_records_bounded(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            window_start=window_start,
+            closure_cutoff=not_after,
+        )
+    except ResearchStoreError:
         return None
     handle, name = tempfile.mkstemp(prefix="live-cohort-first-seen-", suffix=".sqlite")
     os.close(handle)
@@ -2001,18 +1758,39 @@ def latest_c1_observation_manifest_at(
             """
         )
         insert = conn.execute
-        for manifest_order, _manifest_id, location in _iter_observation_panel_locations(
-            observation_rdp_root, not_after=not_after, skip_unparseable=True
-        ):
-            try:
-                path = _contained_data_path(Path(observation_rdp_root), location)
-            except MembersDeltaError as exc:
-                raise LiveCohortReleaseError(
-                    "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-                ) from exc
-            if not path.is_file():
+        partition_index = load_observation_partition_index(Path(observation_rdp_root))
+        seen_locations: set[str] = set()
+        panels: list[tuple[datetime, Path]] = []
+        for record in records:
+            if str(record.record_kind) != "OBSERVATION_BATCH":
                 continue
-            stamp = _render_utc(manifest_order)
+            effective = getattr(record, "effective_at", None)
+            if not isinstance(effective, datetime) or effective.tzinfo is None:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE)
+            effective = effective.astimezone(UTC)
+            if effective < window_start or effective > not_after:
+                continue
+            try:
+                payload = json.loads(record.payload_json)
+            except (TypeError, json.JSONDecodeError) as exc:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE) from exc
+            if not isinstance(payload, Mapping):
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE)
+            try:
+                path, location = resolve_observation_panel_location(
+                    Path(observation_rdp_root),
+                    payload,
+                    partition_index=partition_index,
+                )
+            except BoundedMaterializationError as exc:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE) from exc
+            if location in seen_locations:
+                continue
+            seen_locations.add(location)
+            panels.append((effective, path))
+        panels.sort(key=lambda item: item[0])
+        for effective, path in panels:
+            stamp = _render_utc(effective)
             try:
                 for batch in iter_parquet_row_batches(path):
                     note_observation_rows(len(batch))
@@ -2042,8 +1820,8 @@ def latest_c1_observation_manifest_at(
                                     stamp,
                                 ),
                             )
-            except (OSError, pa.ArrowException):
-                continue
+            except (OSError, pa.ArrowException) as exc:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE) from exc
         conn.commit()
         row = conn.execute("SELECT MAX(seen_at) FROM first_seen").fetchone()
         if not row or row[0] is None:
@@ -2052,68 +1830,6 @@ def latest_c1_observation_manifest_at(
     finally:
         conn.close()
         spill.unlink(missing_ok=True)
-
-
-def _iter_observation_panel_locations(
-    observation_rdp_root: Path,
-    *,
-    not_after: datetime | None,
-    newest_first: bool = False,
-    skip_unparseable: bool = False,
-) -> Iterator[tuple[datetime, str, str]]:
-    manifests_dir = Path(observation_rdp_root) / "datasets" / "manifests"
-    if not manifests_dir.is_dir():
-        return
-    found: list[tuple[datetime, str, str]] = []
-    for marker in sorted(manifests_dir.glob("dataset-*.published")):
-        try:
-            marker_payload = json.loads(marker.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        manifest_id = str(marker_payload.get("dataset_manifest_id") or "")
-        manifest_path = manifests_dir / f"{manifest_id}.json"
-        if not manifest_path.is_file():
-            continue
-        try:
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if not isinstance(manifest, Mapping):
-            continue
-        if str(manifest.get("dataset_id") or "").startswith("observation-panel-") is False:
-            continue
-        try:
-            manifest_order = _parse_utc(
-                str(manifest.get("created_at") or manifest.get("first_reliable_available_at"))
-            )
-        except Exception:
-            if skip_unparseable:
-                continue
-            manifest_order = datetime.min.replace(tzinfo=UTC)
-        if not_after is not None and manifest_order > not_after:
-            continue
-        partitions = list(manifest.get("partitions") or [])
-        if not partitions:
-            partitions_dir = manifests_dir / "partitions"
-            if partitions_dir.is_dir():
-                for partition_path in sorted(partitions_dir.glob("partition-*.json")):
-                    try:
-                        partition = json.loads(partition_path.read_text(encoding="utf-8"))
-                    except (OSError, json.JSONDecodeError):
-                        continue
-                    if (
-                        isinstance(partition, Mapping)
-                        and str(partition.get("dataset_manifest_id") or "") == manifest_id
-                    ):
-                        partitions.append(partition)
-        for partition in partitions:
-            if str(partition.get("partition_id") or "").endswith("-members"):
-                continue
-            location = str(partition.get("logical_location") or "")
-            if location:
-                found.append((manifest_order, manifest_id, location))
-    found.sort(key=lambda item: (item[0], item[1]), reverse=newest_first)
-    yield from found
 
 
 def _cohort_observations_into_sqlite(
@@ -2126,8 +1842,11 @@ def _cohort_observations_into_sqlite(
     cutoff_at: datetime | None = None,
     lifecycle_rows: Sequence[Mapping[str, Any]] | None = None,
     observation_lineage: dict[str, Any] | None = None,
+    window_start: datetime | None = None,
+    progress: MaterializationProgress | None = None,
+    wall: WallBudget | None = None,
 ) -> int:
-    """C1 observations by member mint identity; newest panel wins."""
+    """C1 observations via OBSERVATION_BATCH dataset_manifest_id routing."""
     conn.execute(
         """
         CREATE TABLE observations (
@@ -2141,34 +1860,48 @@ def _cohort_observations_into_sqlite(
         )
         """
     )
-    observation_events: dict[str, list[tuple[str, str]]] = {}
+    note_counter("global_manifest_markers_scanned", 0)
     lineage_producers: set[str] = set()
     lineage_coverages: list[str] = []
     lineage_manifests: set[str] = set()
-    if observation_lineage is not None:
-        for row in lifecycle_rows or ():
-            if str(row.get("kind") or "") != "OBSERVATION_BATCH":
-                continue
-            if not _lifecycle_row_at_or_before_cutoff(row, cutoff_at):
-                continue
-            payload = row.get("payload")
-            if not isinstance(payload, Mapping):
-                continue
-            location = str(
-                payload.get("observation_location")
-                or payload.get("logical_location")
-                or ""
-            )
-            if not location:
-                continue
-            producer = _sha40(row.get("producer_git_sha"))
-            manifest = str(payload.get("dataset_manifest_id") or "")
-            if manifest:
-                lineage_manifests.add(manifest)
-            raw_coverage = payload.get("discovery_coverage_class")
-            if isinstance(raw_coverage, str) and raw_coverage.strip():
-                lineage_coverages.append(raw_coverage.strip())
-            observation_events.setdefault(location, []).append((producer, manifest))
+    if window_start is None:
+        member_ids = {
+            str((row.get("payload") or {}).get("dataset_manifest_id") or "")
+            for row in (lifecycle_rows or ())
+            if str(row.get("kind") or "") == "OBSERVATION_MEMBER_BATCH"
+            and isinstance(row.get("payload"), Mapping)
+        }
+    else:
+        selected_members, _predecessors = select_member_batches(
+            lifecycle_rows or (),
+            window_start=window_start,
+            closure_cutoff=cutoff_at,
+        )
+        member_ids = {
+            str((row.get("payload") or {}).get("dataset_manifest_id") or "")
+            for row in selected_members
+            if isinstance(row.get("payload"), Mapping)
+        }
+    member_ids.discard("")
+    if window_start is None:
+        selected = [
+            dict(row)
+            for row in (lifecycle_rows or ())
+            if str(row.get("kind") or "") == "OBSERVATION_BATCH"
+            and _lifecycle_row_at_or_before_cutoff(row, cutoff_at)
+        ]
+    else:
+        selected = select_observation_batches(
+            lifecycle_rows or (),
+            window_start=window_start,
+            closure_cutoff=cutoff_at,
+            member_dataset_ids=member_ids,
+        )
+    note_counter("observation_lineage_rows_selected", len(selected))
+    if progress is not None:
+        progress.observation_files_planned = len(selected)
+        progress.stage = "observations"
+        progress.write()
 
     def _safe_observation_batches(path: Path) -> Iterator[list[dict[str, Any]]]:
         try:
@@ -2178,30 +1911,61 @@ def _cohort_observations_into_sqlite(
                 "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
             ) from exc
 
-    for _order, _manifest_id, location in _iter_observation_panel_locations(
-        observation_rdp_root, not_after=cutoff_at, newest_first=False
-    ):
+    selected.sort(
+        key=lambda row: (
+            str(row.get("effective_at") or ""),
+            int(row.get("_source_index") or 0),
+        )
+    )
+    seen_locations: set[str] = set()
+    partition_index = load_observation_partition_index(Path(observation_rdp_root))
+    for row in selected:
+        if wall is not None:
+            wall.check(stage="observations")
+        payload = row.get("payload")
+        if not isinstance(payload, Mapping):
+            raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE)
         try:
-            path = _contained_data_path(Path(observation_rdp_root), location)
-        except MembersDeltaError as exc:
-            raise LiveCohortReleaseError(
-                "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-            ) from exc
-        if not path.is_file():
+            path, location = resolve_observation_panel_location(
+                observation_rdp_root, payload, partition_index=partition_index
+            )
+        except BoundedMaterializationError as exc:
+            raise LiveCohortReleaseError(str(exc) or OBSERVATION_LINEAGE_INCOMPLETE) from exc
+        producer = _sha40(row.get("producer_git_sha"))
+        manifest = str(payload.get("dataset_manifest_id") or "")
+        if manifest:
+            lineage_manifests.add(manifest)
+        raw_coverage = payload.get("discovery_coverage_class")
+        if isinstance(raw_coverage, str) and raw_coverage.strip():
+            lineage_coverages.append(raw_coverage.strip())
+        if location in seen_locations:
+            if progress is not None:
+                progress.observation_files_completed += 1
+                progress.write()
             continue
+        seen_locations.add(location)
+        try:
+            payload_bytes = int(path.stat().st_size)
+        except OSError:
+            payload_bytes = 0
+        note_counter("observation_payload_bytes_read", payload_bytes)
+        note_counter("unique_observation_locations_read", 1)
+        if progress is not None:
+            progress.observation_payload_bytes_read += payload_bytes
         hits_c1 = False
         for batch in _safe_observation_batches(path):
             note_observation_rows(len(batch))
-            for row in batch:
-                if not isinstance(row, Mapping):
+            note_counter("observation_rows_decoded", len(batch))
+            for item_row in batch:
+                if not isinstance(item_row, Mapping):
                     continue
-                mint = str(row.get("entity_id") or row.get("mint") or "")
+                mint = str(item_row.get("entity_id") or item_row.get("mint") or "")
                 if mint and mint_is_member(mint):
                     hits_c1 = True
-                if row.get("schedule_sha256") not in {None, "", schedule_sha256}:
+                if item_row.get("schedule_sha256") not in {None, "", schedule_sha256}:
                     continue
                 for item in _explode_observation_rows(
-                    row, schedule_sha256=schedule_sha256, activation_id=activation_id
+                    item_row, schedule_sha256=schedule_sha256, activation_id=activation_id
                 ):
                     mint = str(item.get("mint") or "")
                     if not mint or not mint_is_member(mint):
@@ -2223,10 +1987,14 @@ def _cohort_observations_into_sqlite(
                             json.dumps(item, sort_keys=True, separators=(",", ":")),
                         ),
                     )
-        if observation_lineage is not None and hits_c1:
-            for producer, _manifest in observation_events.get(location, []):
-                if producer:
-                    lineage_producers.add(producer)
+        if hits_c1 and producer:
+            lineage_producers.add(producer)
+        if progress is not None:
+            progress.observation_files_completed += 1
+            progress.observation_payload_bytes_read = int(
+                extraction_counters().get("observation_payload_bytes_read") or 0
+            )
+            progress.write()
     conn.commit()
     if observation_lineage is not None:
         observation_lineage.update(
@@ -2239,6 +2007,198 @@ def _cohort_observations_into_sqlite(
     return int(conn.execute("SELECT COUNT(*) FROM observations").fetchone()[0])
 
 
+def plan_live_source_materialization(
+    *,
+    observation_rdp_root: Path,
+    schedule_sha256: str,
+    activation_id: str,
+    cohort_id: str,
+    closure_receipt: Mapping[str, Any] | None = None,
+    ops_store: Path | None = None,
+) -> dict[str, Any]:
+    """Deterministic work plan. Fail-closed before heavy payload replay."""
+    reset_extraction_counters()
+    reset_fingerprint_work()
+    root = Path(observation_rdp_root)
+    window_start, window_end = cohort_window_bounds(cohort_id)
+    closure_flags = _apply_closure_receipt(
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        cohort_id=cohort_id,
+        closure_receipt=closure_receipt,
+    )
+    cutoff_at = None
+    cutoff_raw = closure_flags.get("closure_cutoff_at")
+    if isinstance(cutoff_raw, str) and cutoff_raw:
+        cutoff_at = _parse_utc(cutoff_raw)
+    schedule_doc, _producer, lifecycle_rows = _lineage_from_rdp(
+        root,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        window_start=window_start,
+        closure_cutoff=cutoff_at,
+    )
+    if ops_store is not None:
+        bound_doc, _artifact_bytes, _artifact_sha = _encode_bound_schedule(
+            schedule_doc, wanted_sha=schedule_sha256
+        )
+        ops_doc = load_ops_schedule_document(Path(ops_store), schedule_sha256)
+        if ops_doc is not None:
+            try:
+                agree_schedule_documents(
+                    bound_doc, ops_doc, wanted_sha=schedule_sha256
+                )
+            except ValueError as exc:
+                raise LiveCohortReleaseError(SCHEDULE_DOCUMENT_CONFLICT) from exc
+    selected_members, predecessors = select_member_batches(
+        lifecycle_rows,
+        window_start=window_start,
+        closure_cutoff=cutoff_at,
+    )
+    member_ids = {
+        str((row.get("payload") or {}).get("dataset_manifest_id") or "")
+        for row in selected_members
+        if isinstance(row.get("payload"), Mapping)
+    }
+    member_ids.discard("")
+    selected_obs = select_observation_batches(
+        lifecycle_rows,
+        window_start=window_start,
+        closure_cutoff=cutoff_at,
+        member_dataset_ids=member_ids,
+    )
+    units: dict[str, dict[str, Any]] = {}
+    legacy_locations: list[str] = []
+    slow = False
+    predicted_member_bytes = 0
+    predicted_deltas = 0
+    for row in selected_members:
+        payload = row.get("payload")
+        if not isinstance(payload, Mapping):
+            slow = True
+            continue
+        location = str(payload.get("member_location") or "")
+        try:
+            info = inspect_member_target(root, location)
+        except BoundedMaterializationError as exc:
+            raise LiveCohortReleaseError(str(exc)) from exc
+        if info.get("slow_fallback"):
+            slow = True
+            continue
+        if info.get("legacy"):
+            if location not in legacy_locations:
+                legacy_locations.append(location)
+                predicted_member_bytes += file_size_for_rel(root, location)
+            continue
+        unit_rel = str(info.get("unit_rel") or "")
+        unit = info.get("unit")
+        seq = info.get("seq")
+        if not unit_rel or not isinstance(unit, Mapping) or seq is None:
+            slow = True
+            continue
+        group = units.setdefault(unit_rel, {"unit": unit, "seqs": set()})
+        group["seqs"].add(int(seq))
+    snapshot_delta_targets = 0
+    for group in units.values():
+        seqs = sorted(group["seqs"])
+        snapshot_delta_targets += len(seqs)
+        max_seq = max(seqs) if seqs else 0
+        predicted_deltas += max_seq
+        unit = group["unit"]
+        for publication in unit.get("publications") or []:
+            if not isinstance(publication, Mapping):
+                continue
+            try:
+                seq = int(publication.get("seq"))
+            except (TypeError, ValueError):
+                continue
+            if seq > max_seq:
+                continue
+            rel = str(publication.get("rel") or "")
+            if rel:
+                predicted_member_bytes += file_size_for_rel(root, rel)
+    predicted_obs_bytes = 0
+    predicted_obs_locations = 0
+    seen_obs: set[str] = set()
+    global_glob = False
+    partition_index = load_observation_partition_index(root)
+    for row in selected_obs:
+        payload = row.get("payload") if isinstance(row.get("payload"), Mapping) else {}
+        try:
+            path, location = resolve_observation_panel_location(
+                root, payload, partition_index=partition_index
+            )
+        except BoundedMaterializationError as exc:
+            raise LiveCohortReleaseError(str(exc) or OBSERVATION_LINEAGE_INCOMPLETE) from exc
+        if location in seen_obs:
+            continue
+        seen_obs.add(location)
+        predicted_obs_locations += 1
+        try:
+            predicted_obs_bytes += int(path.stat().st_size)
+        except OSError:
+            pass
+    counters = extraction_counters()
+    independent = int(
+        reconstruct_stats().get("historical_independent_reconstruct_calls")
+        or counters.get("historical_independent_reconstruct_calls")
+        or 0
+    )
+    bounded_route = int(counters.get("research_store_bounded_route") or 0) > 0
+    full_historical = (not bounded_route) or int(
+        counters.get("research_store_full_committed_scan") or 0
+    ) > 0
+    markers = int(counters.get("global_manifest_markers_scanned") or 0)
+    global_glob = bool(global_glob or markers > 0)
+    if not selected_members:
+        slow = True
+    work_class = BOUNDED_WORK_CLASS
+    if slow or global_glob or independent != 0 or full_historical:
+        work_class = UNBOUNDED_PLAN
+    plan = {
+        "cohort_id": cohort_id,
+        "window_start": _render_utc(window_start),
+        "window_end": _render_utc(window_end),
+        "closure_cutoff": _render_utc(cutoff_at) if cutoff_at is not None else None,
+        "research_event_partitions_planned": int(
+            counters.get("research_event_partitions_opened") or 0
+        ),
+        "member_batches_selected": len(selected_members),
+        "predecessor_member_batches": len(predecessors),
+        "snapshot_delta_units": len(units),
+        "snapshot_delta_targets": snapshot_delta_targets,
+        "predicted_delta_applications": predicted_deltas,
+        "legacy_member_locations": len(legacy_locations),
+        "observation_batches_selected": len(selected_obs),
+        "predicted_observation_locations": predicted_obs_locations,
+        "predicted_member_input_bytes": predicted_member_bytes,
+        "predicted_observation_input_bytes": predicted_obs_bytes,
+        "slow_fallback_required": slow,
+        "work_class": work_class,
+        "historical_independent_reconstruct_calls": independent,
+        "global_manifest_markers_scanned": markers,
+        "full_historical_research_payload_scan": full_historical,
+        "global_historical_observation_glob": global_glob,
+        "research_store_bounded_route": bounded_route,
+        "research_event_partitions_skipped_by_time": int(
+            counters.get("research_event_partitions_skipped_by_time") or 0
+        ),
+        "research_event_partitions_opened_unknown_bounds": int(
+            counters.get("research_event_partitions_opened_unknown_bounds") or 0
+        ),
+        "research_manifest_headers_scanned": int(
+            counters.get("research_manifest_headers_scanned") or 0
+        ),
+        "research_event_records_decoded": int(
+            counters.get("research_event_records_decoded") or 0
+        ),
+        "research_event_payload_bytes_read": int(
+            counters.get("research_event_payload_bytes_read") or 0
+        ),
+    }
+    return plan
+
+
 def build_live_observation_source_from_rdp(
     *,
     observation_rdp_root: Path,
@@ -2249,6 +2209,8 @@ def build_live_observation_source_from_rdp(
     closure_receipt: Mapping[str, Any] | None = None,
     discovery_coverage_class: str | None = None,
     ops_store: Path | None = None,
+    plan_only: bool = False,
+    wall_budget_s: float = DEFAULT_WALL_BUDGET_S,
 ) -> dict[str, Any]:
     """Rebuild a cohort-scoped live source from immutable Observation RDP."""
     del as_of  # closure receipt already binds as_of; unused for scientific rows
@@ -2258,6 +2220,20 @@ def build_live_observation_source_from_rdp(
         and all(c in "0123456789abcdef" for c in schedule_sha256),
         "RELEASE_INVALID_SOURCE_INTEGRITY",
     )
+    plan = plan_live_source_materialization(
+        observation_rdp_root=root,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        cohort_id=cohort_id,
+        closure_receipt=closure_receipt,
+        ops_store=ops_store,
+    )
+    if plan_only:
+        return plan
+    if plan_is_unbounded(plan):
+        raise LiveCohortReleaseError(UNBOUNDED_PLAN)
+    reset_extraction_counters()
+    reset_fingerprint_work()
     window_start, window_end = cohort_window_bounds(cohort_id)
     closure_flags = _apply_closure_receipt(
         schedule_sha256=schedule_sha256,
@@ -2265,8 +2241,16 @@ def build_live_observation_source_from_rdp(
         cohort_id=cohort_id,
         closure_receipt=closure_receipt,
     )
+    cutoff_at = None
+    cutoff_raw = closure_flags.get("closure_cutoff_at")
+    if isinstance(cutoff_raw, str) and cutoff_raw:
+        cutoff_at = _parse_utc(cutoff_raw)
     schedule_doc, schedule_producer, lifecycle_rows = _lineage_from_rdp(
-        root, schedule_sha256=schedule_sha256, activation_id=activation_id
+        root,
+        schedule_sha256=schedule_sha256,
+        activation_id=activation_id,
+        window_start=window_start,
+        closure_cutoff=cutoff_at,
     )
     bound_doc, artifact_bytes, artifact_sha = _encode_bound_schedule(
         schedule_doc, wanted_sha=schedule_sha256
@@ -2312,12 +2296,35 @@ def build_live_observation_source_from_rdp(
         cutoff_at = _parse_utc(cutoff_raw)
 
     source_dir = cohort_source_dir(root, cohort_id)
-    discard_stale_staging(source_dir)
+    run_id = secrets.token_hex(8)
+    lock = CohortBuildLock(
+        root,
+        cohort_id,
+        run_id=run_id,
+        command_identity=f"build-live-source:{cohort_id}",
+    )
+    try:
+        lock.acquire()
+    except BoundedMaterializationError as exc:
+        raise LiveCohortReleaseError(str(exc)) from exc
+    wall = WallBudget(limit_s=float(wall_budget_s))
     staging = new_staging_dir(source_dir)
+    progress = MaterializationProgress(
+        path=staging / PROGRESS_NAME,
+        started_at=_render_utc(datetime.now(tz=UTC)),
+        stage="locked",
+        units_total=int(plan.get("snapshot_delta_units") or 0),
+        pit_targets_total=int(plan.get("member_batches_selected") or 0),
+        delta_files_planned=int(plan.get("predicted_delta_applications") or 0),
+        observation_files_planned=int(plan.get("predicted_observation_locations") or 0),
+    )
+    progress.write(scratch_dir=staging)
     spill_path = staging / "extract.sqlite"
     conn = spill_sqlite(spill_path)
     location_flags: dict[str, tuple[bool, bool]] = {}
+    telemetry: dict[str, Any] | None = None
     try:
+        wall.check(stage="members")
         winning_producers, extracted_members = _cohort_members_into_sqlite(
             root,
             conn=conn,
@@ -2331,6 +2338,9 @@ def build_live_observation_source_from_rdp(
             inclusion_probability=inclusion_probability,
             cutoff_at=cutoff_at,
             location_flags=location_flags,
+            replay_dir=staging,
+            progress=progress,
+            wall=wall,
         )
 
         def _member_in_extract(mint: str) -> bool:
@@ -2347,6 +2357,7 @@ def build_live_observation_source_from_rdp(
             include_observations=False,
         )
         observation_lineage: dict[str, Any] = {}
+        wall.check(stage="observations")
         extracted_observation_count = _cohort_observations_into_sqlite(
             root,
             conn=conn,
@@ -2356,12 +2367,16 @@ def build_live_observation_source_from_rdp(
             cutoff_at=cutoff_at,
             lifecycle_rows=lifecycle_rows,
             observation_lineage=observation_lineage,
+            window_start=window_start,
+            progress=progress,
+            wall=wall,
         )
         contributing = sorted(
             set(contributing)
             | winning_producers
             | set(observation_lineage.get("producers") or ())
         )
+        _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
         observed_classes = [lineage_coverage]
         observed_classes.extend(observation_lineage.get("coverages") or ())
         if isinstance(discovery_coverage_class, str) and discovery_coverage_class.strip():
@@ -2440,20 +2455,59 @@ def build_live_observation_source_from_rdp(
         if len(contributing) == 1:
             snapshot["producer_git_sha"] = contributing[0]
         snapshot["source_sha256"] = compute_source_identity(snapshot)
+        wall.check(stage="canonical_commit")
+        progress.canonical_commit_started = True
+        progress.stage = "canonical_commit"
+        progress.write(scratch_dir=staging)
         conn.close()
         conn = None
         spill_path.unlink(missing_ok=True)
+        reconstruct = reconstruct_stats()
+        counters = extraction_counters()
+        progress.canonical_commit_complete = True
+        progress.write(scratch_dir=staging)
+        telemetry = {
+            "work_class": plan.get("work_class"),
+            "slow_fallback_required": bool(plan.get("slow_fallback_required")),
+            "historical_independent_reconstruct_calls": int(
+                counters.get("historical_independent_reconstruct_calls")
+                or reconstruct.get("historical_independent_reconstruct_calls")
+                or 0
+            ),
+            "global_manifest_markers_scanned": int(
+                counters.get("global_manifest_markers_scanned") or 0
+            ),
+            "legacy_member_locations_read": int(
+                counters.get("legacy_member_locations_read") or 0
+            ),
+            "progress": progress.snapshot(),
+            "counters": counters,
+            "reconstruct": reconstruct,
+            "owned_scratch_removed": True,
+        }
         commit_source_bundle(source_dir=source_dir, staging=staging, manifest=snapshot)
+    except BoundedMaterializationError as exc:
+        if conn is not None:
+            try:
+                conn.close()
+            except Exception:
+                pass
+        raise LiveCohortReleaseError(str(exc)) from exc
     except Exception:
         if conn is not None:
             try:
                 conn.close()
             except Exception:
                 pass
-        discard_stale_staging(source_dir)
         raise
+    finally:
+        lock.release()
+    if telemetry is None:
+        raise LiveCohortReleaseError("RELEASE_INVALID_SOURCE_INTEGRITY")
     loaded = load_observation_rdp_source(root, cohort_id=cohort_id)
-    return compact_source_view(loaded)
+    view = compact_source_view(loaded)
+    view["materialization"] = telemetry
+    return view
 
 
 def _require_campaign_cohort(source: Mapping[str, Any], cohort_id: str) -> tuple[datetime, datetime]:
