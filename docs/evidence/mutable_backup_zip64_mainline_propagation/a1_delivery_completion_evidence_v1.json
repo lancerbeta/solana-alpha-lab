@@ -5,15 +5,15 @@
   "as_of": "2026-09-19",
   "task_id": "MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1",
   "state_change": "MUTABLE_BACKUP_ZIP64_MAINLINE_HARNESS_BOUND",
-  "base_main": "f0425162af393b790d6f6fb4c3006c7669778d29",
+  "base_main": "e9933b0b3ea3bbc9dea05dc11f669caaa68398bc",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "056e50935455c7718e0ba8b6a32088357e39ed7f2e1832d9725a097190233569",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "bf2cc08be2ccaf06b2ab432334d05c7012816c4c077f26259f13443de0fa6a20",
-    "docs/tasks/MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1.md": "6a24810b6978fd11cf46a1c278baee277e77f28e2bd428e36b3a194e4e9faf35",
+    "catalog/assets/core.yaml": "3f27ed3051af8e775138d18ee036ff5d813e8af1a4072f30854cc22fa3cf6c9e",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "7ad2bf6f37c678b8e5ed9d73c3046a6ca6025e3b86114bb3d137e1f1a4cf075a",
+    "docs/tasks/MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1.md": "f4ac11b1afefbbf7eacb9eb707e6c68f1829054b41bc83e60c64113e1c87d017",
     "src/solana_alpha_lab/factory/remote_ops.py": "926a8ced1605695ff3abc0f49815537e9c2bf2a55d4d0d170b54005141017fc4",
     "tests/test_mutable_backup_zip64_repair_v1.py": "c226fbd1383a517976efc5019ca00370d11e73c5b5d5b3976cd5806357a9f6c3"
   },
@@ -27,14 +27,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/mutable_backup_zip64_mainline_propagation/a1_delivery_factory_fit_v1.json",
-    "sha256": "ada66c24fce1831c4943288649850faa4aa1c5005eb72408e55c189d1ee3106f",
+    "sha256": "e755640bf53d0fee4d20b86711cc929ff44a755ae5ac03dd4ad7b9a164434023",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MUTABLE_BACKUP_ZIP64_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/mutable_backup_zip64_mainline_propagation/a1_delivery_independent_review_v1.json",
-      "sha256": "111760e64fa5c8fdacff05ca705834cd2e2ab65fd734f6a95222e492ddeabaf8",
+      "sha256": "8431282aa44e89fc38fdb24b6592fdb22b3e861b13569d3dd843f9c1ebf9287e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

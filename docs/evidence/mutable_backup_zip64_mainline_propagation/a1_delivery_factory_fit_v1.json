@@ -6,8 +6,8 @@
   "task_id": "MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "0a91951afc5d96227a021c8b0047980930697f7564c660e6829a298f0c11ee04",
-  "reviewed_inventory_sha256": "4a4ac7c48b2122ff3e48c729b72e1bb55db68c89e0062ed062ad94084c2f03e7",
+  "reviewed_bindings_sha256": "6dd97c4af452ea1144bc4a9284ed17a5abe341a9a369df085f6b6940de93ff06",
+  "reviewed_inventory_sha256": "f54c19b9cc2fda69d6e01372003a8a8251d4789aa8007deb810dbe065158365b",
   "capability_radar": {
     "now": "NONE",
     "watch": "SEPARATE_AUTHORITY_TO_DEPLOY_MAINLINE_ZIP64_IF_LIVE_PIN_STILL_NEEDS_IT"
