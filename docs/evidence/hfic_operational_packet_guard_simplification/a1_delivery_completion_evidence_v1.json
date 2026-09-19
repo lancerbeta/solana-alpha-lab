@@ -11,7 +11,27 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "docs/tasks/HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1.md": "a51b72a51290f53f6d10561286934bee2d232f365aac92b326bbf08427a601e4"
+    ".agents/skills/hypothesis-forge/SKILL.md": "92faa1e39c08bb459e67f59f8f6ff0cf3267ea803c09b2c1f8c9823805ce29cf",
+    "catalog/assets/core.yaml": "0b1db2393cf5cfebc98907ac72f4289b3517420ba3bf64772ba8c1cc440b4176",
+    "catalog/assets/lifecycle.yaml": "96bb146419f910c29490a47d8979ce7192b813eeeec75986552b715c7c6ded1d",
+    "catalog/catalog_manifest.yaml": "b0ac3dc222dbf2027cf87f9e7fb675b25f258287d288594ea708a187e0751e10",
+    "catalog/generated/asset_edges.json": "f1022dc11b94dcb38fb2968a9205d679ecf94582f2fc8136ed428e76e90b6f08",
+    "docs/PROJECT_MAP.md": "7813cb2dfb32ef463003dbb69ac3d907718a30209973e2a3be689984bbfe433e",
+    "docs/contracts/normalized_trajectory_representation_probe_v1.md": "35fa5a6b4c099a2f5b1a54e5fb598423c890651f6caa79dceade3b20352df73d",
+    "docs/contracts/normalized_trajectory_v1_capability_contract.md": "c4ff7f832a93b903ce8ad71ad599ccf126f3e1f14aa23143f1bcd956789cd280",
+    "docs/evidence/hfic_operational_packet_guard_simplification/a1_c2_packet_acceptance_v1.json": "2da58e6704ac8bdfe806d58b9d199fc9ce49affee465e124259acd96bd86b6ff",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "96d571e4a712296462b855057f3c466b2a9aa44df3a9d11e951920a44610ece6",
+    "docs/reports/hfic_operational_packet_guard_simplification/a1_owner_readout_v1.md": "f78a5f14d04b8ae60d15666814fa99d4981c0ae08efba5edbca0abb8e07da60c",
+    "docs/tasks/HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1.md": "7c5f4019ce7dcf03e5b0eab77fb59ac3b88fbd65680c83ed5e0656ef9819bb6b",
+    "scripts/hypothesis_forge.py": "69e496fef283bb0aa454120dd07135c4346dc62b94afaf85d3f6e4bb1c214f6a",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "dbb67d0dcea274cec302cb4bb8832e644f28896f4568906e742f3a6528258f40",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py": "3e9d9ee025480fdd1cb31d8e8764b6b0e3e8c954241a5882160cb1ba32f2e519",
+    "src/solana_alpha_lab/factory/hfic_representation_probe.py": "1428ac997557c68e76bbb14b6328b880bc1e00efd577368e3a1e2a49a881a4f7",
+    "tests/test_hfic_forge_prior_context_capacity_repair_v1.py": "101fcbc042aa7fa4246f5c1d9ea078ac9091a57a9be63016eb695f0ad3827371",
+    "tests/test_hfic_operational_packet_guard_simplification_v1.py": "0ebe9b9366ec8c9971e74868b88e75bc52e77bf94fa8740e1dfc8c107adf9c04",
+    "tests/test_hfic_reopened_prior_search_routing_v1.py": "2d9f2ebce754be94c59b547302ceba8eaa38301a5f952ba6f0776368e82aac0d",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "8d4bd873a61df17c9515c2ccf3eb0f4e65ebebd89637c12c21b00fc6f23ddd95",
+    "tests/test_normalized_trajectory_probe_preregistration_v1.py": "1b7a4e0e8b847f245c58ed8e3013969bce1b2e54e5d861682354b5a229fba0af"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/hfic_operational_packet_guard_simplification/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "2370aa71f1644ebc72ed0bcc72d9bdc8794a7fff6d723c7d4d6ed887218e90e7",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_HFIC_OPERATIONAL_PACKET_GUARD",
     "independent_review": {
       "path": "docs/evidence/hfic_operational_packet_guard_simplification/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "0ef3a766bd6507605fe99a554f173c2ad8b5348ee50dd2fcd37ff0d028e94835",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
