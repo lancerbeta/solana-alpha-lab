@@ -37656,7 +37656,7 @@ records:
   as_of: '2026-09-19'
   truth_owner: HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1.md', repository_path: docs/tasks/HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1.md}
-  integrity: {kind: sha256, sha256: b951c5ea50247b4d95c7a9aaaae02aa962bb7087836878de26c01ccc0b7d37cd}
+  integrity: {kind: sha256, sha256: 136b00ec27e036c5cf713118aea709d52c0b72cd8287926bea004ce7ad6dc83a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-LIVE-COHORT-TO-FORGE-001}
