@@ -227,7 +227,7 @@ def _stream_zip_entry(
     size = 0
     info = zipfile.ZipInfo(filename=relative, date_time=ZIP_TIMESTAMP)
     info.external_attr = 0o100644 << 16
-    with source.open("rb") as src, archive.open(info, "w") as dest:
+    with source.open("rb") as src, archive.open(info, "w", force_zip64=True) as dest:
         while True:
             chunk = src.read(BACKUP_STREAM_CHUNK)
             if not chunk:
