@@ -12,7 +12,8 @@
   "capability_radar_now": "NONE",
   "implementation_bindings": {
     "catalog/assets/core.yaml": "056e50935455c7718e0ba8b6a32088357e39ed7f2e1832d9725a097190233569",
-    "docs/tasks/MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1.md": "3e40c2766c0bd0b166b6b6f5cc92c82b20cd492bc04262ce38a2ce83519f28d7",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "bf2cc08be2ccaf06b2ab432334d05c7012816c4c077f26259f13443de0fa6a20",
+    "docs/tasks/MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1.md": "6a24810b6978fd11cf46a1c278baee277e77f28e2bd428e36b3a194e4e9faf35",
     "src/solana_alpha_lab/factory/remote_ops.py": "926a8ced1605695ff3abc0f49815537e9c2bf2a55d4d0d170b54005141017fc4",
     "tests/test_mutable_backup_zip64_repair_v1.py": "c226fbd1383a517976efc5019ca00370d11e73c5b5d5b3976cd5806357a9f6c3"
   },
@@ -26,14 +27,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/mutable_backup_zip64_mainline_propagation/a1_delivery_factory_fit_v1.json",
-    "sha256": "4d4f58174d2006ab9739e12310091b2f6f2ebcc4792732cb45b874077f5cc750",
+    "sha256": "ada66c24fce1831c4943288649850faa4aa1c5005eb72408e55c189d1ee3106f",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_MUTABLE_BACKUP_ZIP64_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/mutable_backup_zip64_mainline_propagation/a1_delivery_independent_review_v1.json",
-      "sha256": "a13f4a5556de09d9ca6b4445fda86e306920e5aadf24a5f42dac094c37193270",
+      "sha256": "111760e64fa5c8fdacff05ca705834cd2e2ab65fd734f6a95222e492ddeabaf8",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
