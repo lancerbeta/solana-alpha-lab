@@ -104,8 +104,8 @@ context_requirements:
       - docs/evidence/hfic_operational_packet_guard_simplification/a1_delivery_completion_evidence_v1.json
       - docs/evidence/hfic_operational_packet_guard_simplification/a1_delivery_independent_review_v1.json
       - docs/evidence/hfic_operational_packet_guard_simplification/a1_delivery_factory_fit_v1.json
+    HISTORICAL_CONTEXT:
       - docs/evidence/hfic_operational_packet_guard_simplification/a1_c2_packet_acceptance_v1.json
-    HISTORICAL_CONTEXT: []
 ---
 
 # HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1

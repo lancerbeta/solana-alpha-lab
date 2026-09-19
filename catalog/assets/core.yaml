@@ -37692,7 +37692,7 @@ records:
   as_of: '2026-09-19'
   truth_owner: HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1.md', repository_path: docs/tasks/HFIC_OPERATIONAL_PACKET_GUARD_SIMPLIFICATION_V1.md}
-  integrity: {kind: sha256, sha256: a51b72a51290f53f6d10561286934bee2d232f365aac92b326bbf08427a601e4}
+  integrity: {kind: sha256, sha256: 7c5f4019ce7dcf03e5b0eab77fb59ac3b88fbd65680c83ed5e0656ef9819bb6b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001}
