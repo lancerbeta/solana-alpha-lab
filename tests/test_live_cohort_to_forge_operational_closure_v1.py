@@ -19,7 +19,20 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.factory.discovery_evidence_release import DiscoveryReleaseError  # noqa: E402
-from solana_alpha_lab.factory.hfic_preflight import is_live_corpus_dataset  # noqa: E402
+from solana_alpha_lab.factory.hfic_control_integrity import (  # noqa: E402
+    CURRENT_REPRESENTATION_CONTROL_V1,
+)
+from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
+    MAX_PACKET_BYTES,
+    forge_context_packet_max_bytes,
+    is_live_corpus_dataset,
+)
+from solana_alpha_lab.factory.hfic_prior_memory import (  # noqa: E402
+    MEMORY_HARD_CLOSE,
+    MEMORY_NOT_SELECTED,
+    MEMORY_PARK,
+    build_prior_memory_snapshot,
+)
 from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
     ADMISSION_REPRESENTATIONS,
     CORPUS_DATASET_ID,
@@ -359,6 +372,226 @@ def _commission(data_root: Path) -> None:
     packet_path = data_root / "offline_commission.json"
     packet_path.write_text(json.dumps(packet), encoding="utf-8")
     module.execute_commission_offline(ROOT, data_root, packet_path)
+
+
+ELIGIBLE_SESSION = "HFIC-SESS-ELIGIBLEAAAAAA"
+QUARANTINED_SESSION = "HFIC-SESS-QBLOCKEDAAAAA"
+HARD_CLOSE_HV = "HFIC-CAND-HARDCLOSE001"
+PARK_HV = "HFIC-CAND-PARK000000001"
+NOT_SELECTED_HV = "HFIC-CAND-NOTSEL0000001"
+QUARANTINED_HV = "HFIC-CAND-QBLOCKED00001"
+STUB_CORPUS_MANIFEST = "DATASET-MANIFEST-LIVE-CORPUS-STUB-001"
+
+
+def _write_stub_live_corpus(data_root: Path, *, cohort_id: str) -> None:
+    from solana_alpha_lab.contracts.schema_v1 import DatasetManifest, PartitionManifest
+    from solana_alpha_lab.factory.commissioning_fixture import _deterministic_parquet_bytes
+    from solana_alpha_lab.storage.manifests import canonical_manifest_bytes
+
+    created = datetime(2026, 1, 1, tzinfo=UTC)
+    parquet_bytes = _deterministic_parquet_bytes()
+    file_sha = hashlib.sha256(parquet_bytes).hexdigest()
+    logical = "datasets/partitions/date=2026-01-01/PARTITION-LIVE-CORPUS-STUB-001.parquet"
+    parquet_path = data_root / logical
+    parquet_path.parent.mkdir(parents=True, exist_ok=True)
+    parquet_path.write_bytes(parquet_bytes)
+    fingerprint = hashlib.sha256(CORPUS_DATASET_ID.encode()).hexdigest()
+    dataset = DatasetManifest(
+        dataset_manifest_id=STUB_CORPUS_MANIFEST,
+        dataset_id=CORPUS_DATASET_ID,
+        dataset_version="1.0",
+        schema_id="SCHEMA-LIVE-CORPUS-STUB-001",
+        schema_sha256="ab" * 32,
+        dataset_fingerprint=fingerprint,
+        generation_task_id="HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1",
+        generation_run_id="RUN-LIVE-CORPUS-STUB-001",
+        validation_receipt_sha256="ef" * 32,
+        first_reliable_available_at=created,
+        created_at=created,
+        content_sha256=file_sha,
+    )
+    partition = PartitionManifest(
+        partition_manifest_id="PARTITION-MANIFEST-LIVE-CORPUS-STUB-001",
+        dataset_manifest_id=STUB_CORPUS_MANIFEST,
+        partition_id="PARTITION-LIVE-CORPUS-STUB-001",
+        logical_location=logical,
+        file_sha256=file_sha,
+        content_sha256=file_sha,
+        row_count=3,
+        min_event_time=created,
+        max_event_time=created,
+        min_available_to_strategy_at=created,
+        max_available_to_strategy_at=created,
+        first_reliable_available_at=created,
+        created_at=created,
+    )
+    manifests = data_root / "datasets" / "manifests"
+    partitions = manifests / "partitions"
+    manifests.mkdir(parents=True, exist_ok=True)
+    partitions.mkdir(parents=True, exist_ok=True)
+    (manifests / f"{STUB_CORPUS_MANIFEST}.json").write_bytes(canonical_manifest_bytes(dataset))
+    (partitions / f"{partition.partition_manifest_id}.json").write_bytes(
+        canonical_manifest_bytes(partition)
+    )
+    (manifests / f"{STUB_CORPUS_MANIFEST}.labels.json").write_text(
+        json.dumps(
+            {
+                "logical_dataset_id": CORPUS_DATASET_ID,
+                "evidence_role": "EXPLORATORY_REUSE",
+                "yield_eligible": 20,
+                "base_x_population_n": 20,
+                "discovery_coverage_class": "DISCOVERY_COVERAGE_UNKNOWN",
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    (manifests / f"{STUB_CORPUS_MANIFEST}.published").write_text(
+        json.dumps(
+            {
+                "dataset_manifest_id": STUB_CORPUS_MANIFEST,
+                "dataset_fingerprint": fingerprint,
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+    lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+    lineage_path.parent.mkdir(parents=True, exist_ok=True)
+    lineage_path.write_text(
+        json.dumps(
+            {
+                "corpus_dataset_id": CORPUS_DATASET_ID,
+                "current_dataset_manifest_id": STUB_CORPUS_MANIFEST,
+                "cohorts": [
+                    {
+                        "cohort_id": cohort_id,
+                        "yield_eligible": 20,
+                    }
+                ],
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
+
+
+def _decision_event(hyp_id: str, kind: str, reason: str, transaction_id: str):
+    from solana_alpha_lab.factory.research_store import RecordKind
+    from tests.test_hfic_operational_memory_quarantine_v1 import _event
+
+    return _event(
+        record_id=f"DEC-{hyp_id}",
+        kind=RecordKind.DECISION_EVENT,
+        entity_id=f"DEC-{hyp_id}",
+        hypothesis_version_id=hyp_id,
+        transaction_id=transaction_id,
+        payload={
+            "decision_event_id": f"DEC-{hyp_id}",
+            "hypothesis_version_id": hyp_id,
+            "decision_kind": kind,
+            "reason_code": reason,
+        },
+    )
+
+
+def _seed_eligible_and_quarantined_priors(data_root: Path) -> None:
+    from solana_alpha_lab.factory.hfic_memory_policy import (
+        REASON_OWNER_CALIBRATION_RESET,
+        apply_memory_policy,
+        preview_memory_policy,
+    )
+    from solana_alpha_lab.factory.research_store import RecordKind, ResearchStore
+    from tests.test_hfic_operational_memory_quarantine_v1 import _event, _session_records
+
+    store = ResearchStore(data_root, create_if_missing=False)
+    txn = f"RESEARCH-TXN-{ELIGIBLE_SESSION}"
+    eligible_records = _session_records(
+        ELIGIBLE_SESSION,
+        [HARD_CLOSE_HV, PARK_HV, NOT_SELECTED_HV],
+    )
+    scoped = {
+        HARD_CLOSE_HV: {
+            "population": "confirmed post migration pools bound respecting windows only",
+            "decision_timestamp": "pool day boundary after drawdown state onset",
+            "horizon_notional": "900s outcome horizon",
+            "negative_control": "wall clock matched pseudo clock",
+            "primary_x_family": "lifecycle_clock_moderator",
+            "primary_y": "pathrisk",
+            "cheapest_falsifier": "stratified hazard bucket probe",
+            "claim": "lifecycle clocks moderate recovery versus exit",
+            "mechanism": "clock by drawdown interaction on competing risks",
+        },
+        PARK_HV: {
+            "population": "parked family on consumed discovery evidence",
+            "decision_timestamp": "owner park clock",
+            "horizon_notional": "H900 / 0.01 SOL",
+            "negative_control": "shuffled park strata",
+            "primary_x_family": "park_family_x",
+            "primary_y": "pathrisk",
+            "cheapest_falsifier": "reopen only with new evidence",
+            "claim": "park family until cheaper falsifier exists",
+            "mechanism": "owner priority park of scoped family",
+        },
+        NOT_SELECTED_HV: {
+            "population": "cohort members with mint decision snapshot",
+            "decision_timestamp": "session ranking clock",
+            "horizon_notional": "H900",
+            "negative_control": "not applicable",
+            "primary_x_family": "pit_snapshot_ratio_stratifier",
+            "primary_y": "pathrisk",
+            "cheapest_falsifier": "offline bucket split",
+            "claim": "runner-up not selected in session",
+            "mechanism": "session ranking pause",
+        },
+    }
+    rewritten = []
+    for record in eligible_records:
+        kind = getattr(record.record_kind, "value", record.record_kind)
+        if str(kind) != "HYPOTHESIS_VERSION":
+            rewritten.append(record)
+            continue
+        payload = json.loads(record.payload_json)
+        hyp_id = str(payload.get("hypothesis_version_id") or "")
+        extra = scoped.get(hyp_id) or {}
+        payload.update(extra)
+        rewritten.append(
+            _event(
+                record_id=record.record_id,
+                kind=RecordKind.HYPOTHESIS_VERSION,
+                entity_id=record.entity_id,
+                hypothesis_version_id=hyp_id,
+                transaction_id=txn,
+                payload=payload,
+            )
+        )
+    rewritten.extend(
+        [
+            _decision_event(HARD_CLOSE_HV, "REJECT", "KILL_DATA_INFEASIBLE", txn),
+            _decision_event(PARK_HV, "PARK", "PARK_FAMILY", txn),
+            _decision_event(
+                NOT_SELECTED_HV, "PAUSE", "NOT_SELECTED_IN_SESSION", txn
+            ),
+        ]
+    )
+    store.append(rewritten, transaction_id=txn)
+    store.append(
+        _session_records(QUARANTINED_SESSION, [QUARANTINED_HV]),
+        transaction_id=f"RESEARCH-TXN-{QUARANTINED_SESSION}",
+    )
+    preview = preview_memory_policy(
+        store,
+        repo_root=ROOT,
+        quarantine_session_ids=[QUARANTINED_SESSION],
+        reason_code=REASON_OWNER_CALIBRATION_RESET,
+    )
+    apply_memory_policy(
+        store,
+        repo_root=ROOT,
+        proposal=preview["proposal"],
+        confirm_append_only=True,
+        clock=lambda: datetime(2026, 9, 19, 18, 0, tzinfo=UTC),
+    )
 
 
 def _quarantine_clean_room(data_root: Path) -> None:
@@ -1529,6 +1762,88 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
             self.assertEqual(
                 str(blocked.exception), "HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE"
             )
+
+    def test_forge_control_ready_keeps_eligible_hard_close_and_park_priors(self) -> None:
+        from solana_alpha_lab.factory.hfic_memory_policy import quarantined_session_ids
+        from solana_alpha_lab.factory.hfic_preflight import evidence_epoch_material
+        from solana_alpha_lab.factory.research_store import ExistingResearchStoreReader
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            data_root.mkdir(parents=True, exist_ok=True)
+            _commission(data_root)
+            _write_stub_live_corpus(data_root, cohort_id=COHORT2)
+            _seed_eligible_and_quarantined_priors(data_root)
+            store = ExistingResearchStoreReader(data_root)
+            material = evidence_epoch_material(repo_root=ROOT, data_root=data_root)
+            digest = str(material.get("store_inventory_digest") or "0" * 64)
+            snapshot = build_prior_memory_snapshot(
+                store,
+                store_inventory_digest=digest,
+                repo_root=ROOT,
+            )
+            by_id = {
+                str(item.get("hypothesis_version_id") or ""): item
+                for item in snapshot["capsules"]
+            }
+            blocked = set(quarantined_session_ids(store))
+            self.assertIn(QUARANTINED_SESSION, blocked)
+            self.assertNotIn(ELIGIBLE_SESSION, blocked)
+            self.assertGreaterEqual(int(snapshot.get("eligible_count") or 0), 3)
+            self.assertNotIn(QUARANTINED_HV, by_id)
+            self.assertTrue(
+                all(
+                    item.get("session_id") != QUARANTINED_SESSION
+                    for item in snapshot["capsules"]
+                )
+            )
+            hard = by_id[HARD_CLOSE_HV]
+            park = by_id[PARK_HV]
+            skipped = by_id[NOT_SELECTED_HV]
+            self.assertEqual(hard["memory_status"], MEMORY_HARD_CLOSE)
+            self.assertEqual(hard.get("decision_kind"), "REJECT")
+            self.assertEqual(hard.get("reason_code"), "KILL_DATA_INFEASIBLE")
+            self.assertEqual(park["memory_status"], MEMORY_PARK)
+            self.assertEqual(skipped["memory_status"], MEMORY_NOT_SELECTED)
+            for capsule in (hard, park):
+                self.assertTrue(capsule.get("population"))
+                self.assertTrue(capsule.get("decision_timestamp"))
+                self.assertTrue(capsule.get("horizon_notional"))
+                self.assertTrue(capsule.get("negative_control"))
+            self.assertEqual(MAX_PACKET_BYTES, 16384)
+            self.assertEqual(
+                forge_context_packet_max_bytes(CURRENT_REPRESENTATION_CONTROL_V1),
+                16384,
+            )
+            ready = forge_control_ready(
+                data_root=data_root,
+                repo_root=ROOT,
+                imported_cohort_id=COHORT2,
+            )
+            self.assertEqual(ready["terminal"], "FORGE_CONTROL_READY")
+            self.assertTrue(ready["control_run_required_first"])
+            self.assertEqual(ready["next"], CONTROL_NEXT)
+            self.assertTrue(ready["live_corpus_in_packet"])
+            injected = dict(snapshot)
+            injected["capsules"] = [
+                *list(snapshot.get("capsules") or []),
+                {
+                    "hypothesis_version_id": QUARANTINED_HV,
+                    "session_id": QUARANTINED_SESSION,
+                    "memory_status": "AMBIGUOUS",
+                },
+            ]
+            with patch(
+                "solana_alpha_lab.factory.live_cohort_to_forge.build_prior_memory_snapshot",
+                return_value=injected,
+            ):
+                with self.assertRaises(LiveCohortToForgeError) as raised:
+                    forge_control_ready(
+                        data_root=data_root,
+                        repo_root=ROOT,
+                        imported_cohort_id=COHORT2,
+                    )
+            self.assertEqual(str(raised.exception), "QUARANTINED_MEMORY_ELIGIBLE")
 
     def test_member_snapshot_does_not_fabricate_admission_now(self) -> None:
         from solana_alpha_lab.factory.observation_scheduler import (

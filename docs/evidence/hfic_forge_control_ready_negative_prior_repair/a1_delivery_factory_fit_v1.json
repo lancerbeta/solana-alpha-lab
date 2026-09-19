@@ -1,0 +1,39 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "HFIC-FORGE-CONTROL-READY-NEGATIVE-PRIOR-REPAIR-FACTORY-FIT-001",
+  "as_of": "2026-09-19",
+  "task_id": "HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1",
+  "mode": "FAST_PATH",
+  "verdict": "PASS",
+  "reviewed_bindings_sha256": "39fc0fcae370fa9210fb78d71a0ffbf0e82552bdf3fc6473508c35152eb2a080",
+  "reviewed_inventory_sha256": "61ef820c0bb2697c6041a8dbaa0b11776984a46380b92df20f7cddd151c17595",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND"
+  },
+  "dimensions": {
+    "mission": "PASS",
+    "flexibility_and_history": "PASS",
+    "context_efficiency": "PASS",
+    "research_truth": "PASS",
+    "owner_operability": "PASS",
+    "execution_to_cashflow": "PASS",
+    "monitoring_and_recovery": "PASS",
+    "build_vs_buy": "PASS",
+    "red_team": "PASS",
+    "security": "PASS"
+  },
+  "limits": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS",
+    "NO_HYPOTHESIS_FORGE",
+    "NO_RESEARCHSTORE_WRITE_ON_ACCEPTANCE",
+    "NO_MEMORY_POLICY_WRITE",
+    "NO_CONTROL_BOUND_RAISE",
+    "CAPACITY_STOP_IS_NEXT_ATOM"
+  ],
+  "recovery": "REVERT"
+}

@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "HFIC-FORGE-CONTROL-READY-NEGATIVE-PRIOR-REPAIR-COMPLETION-001",
+  "as_of": "2026-09-19",
+  "task_id": "HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1",
+  "state_change": "HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_READY_FOR_MERGE",
+  "base_main": "f0425162af393b790d6f6fb4c3006c7669778d29",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "ecee97b11360cb81abd57f7327496a4caebb1ba9cf4e84a160248a32e5bf4025",
+    "catalog/assets/lifecycle.yaml": "08ccdd8ce44aee8efbd709cdda3cb0e42575c8487fef501d7fd754dab7bc142f",
+    "catalog/catalog_manifest.yaml": "3e3dcecc13b94fec5effab3baf5f88b86bd3a32944afb33bb0fc2f842d2a4d0d",
+    "catalog/generated/asset_edges.json": "8596a95a64a7a0299f139e7afcd4dbe54e13b3851b35e8642d462054b3422e7a",
+    "docs/PROJECT_MAP.md": "7511b803930666b214c616452a233104e34704799a1d282b1946ecde161ed50e",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "4048e28a32b50b8e98575a44b507f27f47726be096ade90c66641ad7fc750d6f",
+    "docs/reports/hfic_forge_control_ready_negative_prior_repair/a1_owner_readout_v1.md": "8e76446e22e2f17ba91aac35fb15989ab6d084b05ba6f44239d5647bf1097f18",
+    "docs/tasks/HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR_REPAIR_V1.md": "136b00ec27e036c5cf713118aea709d52c0b72cd8287926bea004ce7ad6dc83a",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "2ffe3f4f037570665ed97d349dbd0435e13b3fdd6ccd267e25c693df81e0db4e",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "a655821ddec5ecd26235bd0e29ceb1a8fd581a380a230dd126f446e1e963772b"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/hfic_forge_control_ready_negative_prior_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "ea105f7bf22367b4b0fe4d442c26e8cc4b45b10fa84a34ebe6a1e7579af53a70",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_HFIC_FORGE_CONTROL_READY_NEGATIVE_PRIOR",
+    "independent_review": {
+      "path": "docs/evidence/hfic_forge_control_ready_negative_prior_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "a06117237f8d895772d5cc3f6b69d5b6d903655bfcf21fc5aea75acdc6f1d88b",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_FACTORY_STATIC"
+    ]
+  },
+  "non_claims": [
+    "NO_ALPHA",
+    "NO_CANONICAL_DONE",
+    "NO_NETRETURN",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS",
+    "NO_HYPOTHESIS_FORGE",
+    "NO_RESEARCHSTORE_WRITE_ON_ACCEPTANCE",
+    "NO_MEMORY_POLICY_WRITE",
+    "NO_CONTROL_BOUND_RAISE",
+    "CAPACITY_STOP_IS_NEXT_ATOM"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "vps_mutations": 0
+  }
+}

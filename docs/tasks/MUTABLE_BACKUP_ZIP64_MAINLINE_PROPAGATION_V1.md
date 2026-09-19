@@ -16,9 +16,9 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: f0425162af393b790d6f6fb4c3006c7669778d29
+  expected_base: e9933b0b3ea3bbc9dea05dc11f669caaa68398bc
   expected_upstream: origin/main
-  expected_upstream_oid: f0425162af393b790d6f6fb4c3006c7669778d29
+  expected_upstream_oid: e9933b0b3ea3bbc9dea05dc11f669caaa68398bc
   expected_branch: cursor/mutable-backup-zip64-repair-v1
   dirty_mode: FORBIDDEN
 
