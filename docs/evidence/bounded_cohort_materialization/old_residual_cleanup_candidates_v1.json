@@ -1,0 +1,57 @@
+{
+  "candidates": [
+    {
+      "mtime": "2026-09-18T19:47:40Z",
+      "owning_process_alive": false,
+      "path": "observation_rdp/live_observation_rebuild/cohort=REL-20260909T111900Z-20260916T111900Z/.build-dfc82399c7d0f9ea",
+      "reason_safe_to_delete": "Failed pre-repair C2 staging. Canonical C2 bundle now exists. Do not delete until a separate owner cleanup authorization.",
+      "rebuildable": true,
+      "scientific_truth": false,
+      "size_bytes": 97964032,
+      "surviving_canonical_source_or_copy": "live_observation_rebuild/cohort=REL-20260909T111900Z-20260916T111900Z/source_manifest.json"
+    },
+    {
+      "mtime": "2026-09-18T19:14:19Z",
+      "owning_process_alive": false,
+      "path": "observation_rdp/live_observation_rebuild/cohort=REL-20260909T111900Z-20260916T111900Z/.build-e06472a407ee367d",
+      "reason_safe_to_delete": "Failed pre-repair C2 staging. Canonical C2 bundle now exists. Do not delete until a separate owner cleanup authorization.",
+      "rebuildable": true,
+      "scientific_truth": false,
+      "size_bytes": 97968128,
+      "surviving_canonical_source_or_copy": "live_observation_rebuild/cohort=REL-20260909T111900Z-20260916T111900Z/source_manifest.json"
+    },
+    {
+      "mtime": "2026-09-18T23:27:47Z",
+      "owning_process_alive": false,
+      "path": "observation_rdp/datasets/members_snapshot_plus_delta/20260913/.operational_latest_members.meta.json",
+      "reason_safe_to_delete": "Rebuildable operational residue. Separate owner cleanup required.",
+      "rebuildable": true,
+      "scientific_truth": false,
+      "size_bytes": 641,
+      "surviving_canonical_source_or_copy": "live_observation_rebuild/cohort=REL-20260909T111900Z-20260916T111900Z"
+    },
+    {
+      "mtime": "2026-09-18T23:27:45Z",
+      "owning_process_alive": false,
+      "path": "observation_rdp/datasets/members_snapshot_plus_delta/20260913/.operational_latest_members.sqlite",
+      "reason_safe_to_delete": "Rebuildable operational residue. Separate owner cleanup required.",
+      "rebuildable": true,
+      "scientific_truth": false,
+      "size_bytes": 971198464,
+      "surviving_canonical_source_or_copy": "live_observation_rebuild/cohort=REL-20260909T111900Z-20260916T111900Z"
+    },
+    {
+      "mtime": "2026-09-18T17:15:32Z",
+      "owning_process_alive": false,
+      "path": "factory_mirror/c2_immutable_BACKUP_7243184daf642cdf6ded7afdb40fd2668f97fde48a6ccc6239cf11cedefa1ac4",
+      "reason_safe_to_delete": "Immutable ops SQLite backup used for C2 acceptance. Keep until owner cleanup.",
+      "rebuildable": true,
+      "scientific_truth": false,
+      "size_bytes": 2123436436,
+      "surviving_canonical_source_or_copy": "ops sqlite used for C2 closure receipt"
+    }
+  ],
+  "destructive_deletion": false,
+  "reclaimable_bytes": 3290567701,
+  "status": "OLD_RESIDUAL_CLEANUP_CANDIDATES"
+}

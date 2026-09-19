@@ -442,7 +442,10 @@ def build_closure_receipt(
                 "SELECT entity_id, state, admission FROM identity ORDER BY entity_id, state, admission"
             )
         )
-        if entity_ids:
+        # first-seen C1 publication times are <= not_after. When as_of is
+        # already at or before mature_at, that scan cannot raise cutoff
+        # above the mature_at floor, so skip the historical panel walk.
+        if entity_ids and as_of > mature_at:
             horizon = latest_c1_observation_manifest_at(
                 observation_rdp,
                 schedule_sha256=schedule_sha256,

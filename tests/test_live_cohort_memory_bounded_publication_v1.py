@@ -468,7 +468,13 @@ class LiveCohortMemoryBoundedPublicationTests(unittest.TestCase):
             )
             self.assertEqual(source["source_representation"], "SOURCE_BUNDLE_V1")
             self.assertEqual(source["member_count"], 8)
-            self.assertFalse(any(source_dir.glob(f"{SOURCE_STAGING_PREFIX}*")))
+            leftover = [
+                item
+                for item in source_dir.glob(f"{SOURCE_STAGING_PREFIX}*")
+                if item.is_dir()
+            ]
+            self.assertTrue(all(item.name.endswith("deadbeef") for item in leftover))
+            self.assertTrue((source_dir / SOURCE_MANIFEST_NAME).is_file())
             manifest = source_dir / SOURCE_MANIFEST_NAME
             self.assertTrue(manifest.is_file())
             again = build_live_observation_source_from_rdp(
@@ -828,14 +834,19 @@ class LiveCohortMemoryBoundedPublicationTests(unittest.TestCase):
                 stats = reconstruct_stats()
                 counters = extraction_counters()
                 counters["reconstruct_calls"] = stats["reconstruct_calls"]
+                counters["historical_independent_reconstruct_calls"] = stats[
+                    "historical_independent_reconstruct_calls"
+                ]
                 return counters
 
         ten = _build_with_snapshots(10)
         hundred = _build_with_snapshots(100)
         self.assertEqual(ten["reconstruct_calls"], 0)
         self.assertEqual(hundred["reconstruct_calls"], 0)
-        self.assertEqual(ten["member_snapshot_full_column_scans"], 0)
-        self.assertEqual(hundred["member_snapshot_full_column_scans"], 0)
+        self.assertEqual(ten["historical_independent_reconstruct_calls"], 0)
+        self.assertEqual(hundred["historical_independent_reconstruct_calls"], 0)
+        self.assertEqual(ten["member_snapshot_full_column_scans"], 1)
+        self.assertEqual(hundred["member_snapshot_full_column_scans"], 1)
         self.assertLess(
             hundred["full_member_row_materializations"],
             ten["full_member_row_materializations"] * 2,

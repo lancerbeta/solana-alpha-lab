@@ -42,6 +42,9 @@ _RECONSTRUCT_STATS = {
     "noop_range_fast_hits": 0,
     "noop_range_fallbacks": 0,
     "noop_marker_files_scanned": 0,
+    "historical_independent_reconstruct_calls": 0,
+    "prefix_walks": 0,
+    "unique_target_seq_consumed": 0,
 }
 _PUBLICATION_STAGE_STATS = {
     "full_population_passes": 0,
@@ -97,6 +100,9 @@ def reset_fingerprint_work() -> None:
     _RECONSTRUCT_STATS["noop_range_fast_hits"] = 0
     _RECONSTRUCT_STATS["noop_range_fallbacks"] = 0
     _RECONSTRUCT_STATS["noop_marker_files_scanned"] = 0
+    _RECONSTRUCT_STATS["historical_independent_reconstruct_calls"] = 0
+    _RECONSTRUCT_STATS["prefix_walks"] = 0
+    _RECONSTRUCT_STATS["unique_target_seq_consumed"] = 0
     for key in _PUBLICATION_STAGE_STATS:
         _PUBLICATION_STAGE_STATS[key] = 0
 
@@ -1753,10 +1759,16 @@ def _sha256_file_streaming(path: Path, *, chunk_size: int = 1024 * 1024) -> str:
     return digest.hexdigest()
 
 
-def _spill_members_db() -> tuple[Path, sqlite3.Connection]:
-    handle, name = tempfile.mkstemp(prefix="members-delta-", suffix=".sqlite")
-    os.close(handle)
-    path = Path(name)
+def _spill_members_db(*, path: Path | None = None) -> tuple[Path, sqlite3.Connection]:
+    if path is None:
+        handle, name = tempfile.mkstemp(prefix="members-delta-", suffix=".sqlite")
+        os.close(handle)
+        path = Path(name)
+    else:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        if path.exists():
+            path.unlink()
     conn = sqlite3.connect(str(path))
     conn.execute(
         """
@@ -1809,6 +1821,7 @@ def _apply_delta_ops_sqlite(
     *,
     removed_out: list[dict[str, Any]] | None = None,
     removed_at_seq: int | None = None,
+    dirty_out: set[str] | None = None,
 ) -> None:
     for op, entity_id, payload, fingerprint in ops_conn.execute(
         "SELECT op, entity_id, payload, fingerprint FROM delta_ops ORDER BY seq"
@@ -1839,6 +1852,8 @@ def _apply_delta_ops_sqlite(
             "INSERT OR REPLACE INTO members(entity_id, payload) VALUES (?,?)",
             (entity, pickle.dumps(row, protocol=pickle.HIGHEST_PROTOCOL)),
         )
+        if dirty_out is not None:
+            dirty_out.add(entity)
     conn.commit()
 
 
@@ -1848,6 +1863,7 @@ def _apply_delta_sqlite(
     *,
     removed_out: list[dict[str, Any]] | None = None,
     removed_at_seq: int | None = None,
+    dirty_out: set[str] | None = None,
 ) -> None:
     for item in delta.get("removed") or []:
         entity_id = str(item.get("entity_id") or "")
@@ -1874,6 +1890,8 @@ def _apply_delta_sqlite(
             "INSERT OR REPLACE INTO members(entity_id, payload) VALUES (?,?)",
             (entity_id, pickle.dumps(payload, protocol=pickle.HIGHEST_PROTOCOL)),
         )
+        if dirty_out is not None:
+            dirty_out.add(entity_id)
     conn.commit()
 
 
@@ -1884,6 +1902,7 @@ def _apply_delta_file_sqlite(
     payload: bytes = b"",
     removed_out: list[dict[str, Any]] | None = None,
     removed_at_seq: int | None = None,
+    dirty_out: set[str] | None = None,
 ) -> dict[str, Any]:
     """Apply one delta file without retaining the full change-set in Python."""
 
@@ -1898,6 +1917,7 @@ def _apply_delta_file_sqlite(
             delta,
             removed_out=removed_out,
             removed_at_seq=removed_at_seq,
+            dirty_out=dirty_out,
         )
         return meta
     pf = pq.ParquetFile(path)
@@ -1937,6 +1957,8 @@ def _apply_delta_file_sqlite(
                 "INSERT OR REPLACE INTO members(entity_id, payload) VALUES (?,?)",
                 (entity_id, pickle.dumps(parsed, protocol=pickle.HIGHEST_PROTOCOL)),
             )
+            if dirty_out is not None:
+                dirty_out.add(entity_id)
     conn.commit()
     return meta
 
@@ -1992,6 +2014,7 @@ def _reconstruct_to_sqlite(
         _RECONSTRUCT_STATS["anchor_loads"] += 1
         n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
         _RECONSTRUCT_STATS["reconstruct_calls"] += 1
+        _RECONSTRUCT_STATS["historical_independent_reconstruct_calls"] += 1
         if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
             _RECONSTRUCT_STATS["peak_sqlite_rows"] = n_rows
         running_fp = _fingerprint_sqlite(conn)
@@ -2065,6 +2088,148 @@ def _reconstruct_to_sqlite(
         if not reached:
             raise MembersDeltaError("PUBLICATION_NOT_IN_UNIT")
         return spill, conn, result_fp
+    except Exception:
+        conn.close()
+        spill.unlink(missing_ok=True)
+        raise
+
+
+def prefix_walk_unit(
+    data_root: Path,
+    unit: Mapping[str, Any],
+    target_seqs: Sequence[int],
+    *,
+    spill_path: Path,
+) -> Iterator[tuple[int, sqlite3.Connection, frozenset[str] | None, str, int]]:
+    """Replay one unit from anchor to max required seq, yielding each requested PIT.
+
+    Yields (seq, conn, dirty_or_None, fingerprint, payload_bytes_read).
+    dirty is None when a full population scan is required (first required seq).
+    Later yields carry only added/changed entity ids since the previous yield.
+    Does not clone SQLite state per PIT.
+    """
+
+    required = sorted({int(seq) for seq in target_seqs})
+    if not required:
+        return
+    max_seq = required[-1]
+    publications = list(unit.get("publications") or [])
+    if not publications:
+        raise MembersDeltaError("ANCHOR_MISSING")
+    anchor = publications[0]
+    try:
+        anchor_seq = int(anchor.get("seq"))
+    except (TypeError, ValueError):
+        raise MembersDeltaError("ANCHOR_MISSING") from None
+    if str(anchor.get("kind") or "") != "snapshot" or anchor_seq != 0:
+        raise MembersDeltaError("ANCHOR_MISSING")
+    snapshot_path = _contained_data_path(data_root, str(anchor["rel"]))
+    if snapshot_path.is_file() is False:
+        raise MembersDeltaError("ANCHOR_MISSING")
+    observed = _sha256_file_streaming(snapshot_path)
+    if observed != str(anchor.get("sha256") or ""):
+        raise MembersDeltaError("DELTA_HASH_MISMATCH")
+    payload_bytes = 0
+    try:
+        payload_bytes += int(snapshot_path.stat().st_size)
+    except OSError:
+        pass
+    spill, conn = _spill_members_db(path=spill_path)
+    try:
+        _load_anchor_into_sqlite(conn, snapshot_path)
+        _RECONSTRUCT_STATS["anchor_loads"] += 1
+        _RECONSTRUCT_STATS["prefix_walks"] += 1
+        n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+        if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
+            _RECONSTRUCT_STATS["peak_sqlite_rows"] = n_rows
+        running_fp = _fingerprint_sqlite(conn)
+        if running_fp != str(anchor.get("snapshot_fingerprint") or ""):
+            raise MembersDeltaError("DELTA_HASH_MISMATCH")
+        previous_id = str(anchor.get("dataset_manifest_id") or "")
+        pending_full = True
+        dirty: set[str] = set()
+        if 0 in required:
+            _RECONSTRUCT_STATS["unique_target_seq_consumed"] += 1
+            yield 0, conn, None, running_fp, payload_bytes
+            pending_full = False
+            dirty = set()
+        if max_seq == 0:
+            return
+        for index, item in enumerate(publications[1:], start=1):
+            try:
+                item_seq = int(item.get("seq"))
+            except (TypeError, ValueError):
+                raise MembersDeltaError("DELTA_SEQUENCE_INVALID") from None
+            if item_seq != index:
+                raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+            if item_seq > max_seq:
+                break
+            if str(item.get("kind") or "") != "delta":
+                raise MembersDeltaError("UNIT_LAYOUT_INVALID")
+            rel = str(item.get("rel") or "")
+            path = _contained_data_path(data_root, rel)
+            if path.is_file() is False:
+                raise MembersDeltaError("DELTA_MISSING")
+            file_sha = _sha256_file_streaming(path)
+            if file_sha != str(item.get("sha256") or ""):
+                raise MembersDeltaError("DELTA_HASH_MISMATCH")
+            try:
+                payload_bytes += int(path.stat().st_size)
+            except OSError:
+                pass
+            file_payload = path.read_bytes() if path.suffix == ".json" else b""
+            meta = _read_delta_meta(path, file_payload)
+            schema_version = str(meta.get("schema_version") or DELTA_SCHEMA_VERSION_V1)
+            if schema_version not in SUPPORTED_DELTA_SCHEMA_VERSIONS:
+                raise MembersDeltaError("DELTA_SCHEMA_UNSUPPORTED")
+            if str(meta.get("previous_dataset_manifest_id") or "") != previous_id:
+                raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+            if str(meta.get("dataset_manifest_id") or "") != str(
+                item.get("dataset_manifest_id") or ""
+            ):
+                raise MembersDeltaError("DELTA_SEQUENCE_INVALID")
+            if str(meta.get("previous_fingerprint") or "") != running_fp:
+                raise MembersDeltaError("DELTA_HASH_MISMATCH")
+            applied_dirty: set[str] = set()
+            _apply_delta_file_sqlite(
+                conn,
+                path,
+                payload=file_payload,
+                dirty_out=applied_dirty,
+                removed_at_seq=item_seq,
+            )
+            _RECONSTRUCT_STATS["delta_files_applied"] += 1
+            n_rows = int(conn.execute("SELECT COUNT(*) FROM members").fetchone()[0])
+            if n_rows > _RECONSTRUCT_STATS["peak_sqlite_rows"]:
+                _RECONSTRUCT_STATS["peak_sqlite_rows"] = n_rows
+            unit_fp = str(item.get("snapshot_fingerprint") or "")
+            current_fp = str(meta.get("current_fingerprint") or "")
+            if schema_version == DELTA_SCHEMA_VERSION_V2:
+                if not current_fp:
+                    raise MembersDeltaError("DELTA_CORRUPT")
+                if unit_fp and current_fp != unit_fp:
+                    raise MembersDeltaError("DELTA_HASH_MISMATCH")
+            if item_seq in required:
+                observed_fp = _fingerprint_sqlite(conn)
+                if unit_fp and observed_fp != unit_fp:
+                    raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+                if schema_version == DELTA_SCHEMA_VERSION_V2 and observed_fp != current_fp:
+                    raise MembersDeltaError("DELTA_REPLAY_MISMATCH")
+                running_fp = observed_fp
+                _RECONSTRUCT_STATS["unique_target_seq_consumed"] += 1
+                if pending_full:
+                    yield item_seq, conn, None, running_fp, payload_bytes
+                    pending_full = False
+                else:
+                    dirty |= applied_dirty
+                    yield item_seq, conn, frozenset(dirty), running_fp, payload_bytes
+                dirty = set()
+            else:
+                dirty |= applied_dirty
+                running_fp = current_fp or unit_fp
+                if not running_fp:
+                    raise MembersDeltaError("DELTA_CORRUPT")
+            previous_id = str(item.get("dataset_manifest_id") or "")
     except Exception:
         conn.close()
         spill.unlink(missing_ok=True)

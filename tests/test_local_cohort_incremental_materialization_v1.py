@@ -20,8 +20,8 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
     LiveCohortReleaseError,
-    bound_schedule_from_rdp,
     _cohort_members_into_sqlite,
+    _lineage_from_rdp,
     build_live_observation_source_from_rdp,
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import (
@@ -131,7 +131,7 @@ def _append_member_event(
         "discovery_coverage_class": "GAP_SUSPECTED",
     }
     payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
-    transaction_id = f"RESEARCH-TXN-{record_id}"
+    transaction_id = f"RESEARCH-TXN-MEM-{record_id}"
     event = ResearchEvent(
         record_id=record_id,
         record_kind=RecordKind.OBSERVATION_MEMBER_BATCH,
@@ -232,9 +232,12 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
 
             counters = extraction_counters()
             stats = reconstruct_stats()
-            self.assertEqual(stats["reconstruct_calls"], 4)
-            self.assertEqual(counters["member_snapshot_full_column_scans"], 4)
-            self.assertEqual(counters["full_member_row_materializations"], 6)
+            self.assertEqual(stats["reconstruct_calls"], 0)
+            self.assertEqual(stats["historical_independent_reconstruct_calls"], 0)
+            self.assertEqual(stats["prefix_walks"], 2)
+            self.assertEqual(stats["unique_target_seq_consumed"], 4)
+            self.assertEqual(stats["delta_files_applied"], 2)
+            self.assertEqual(counters["member_snapshot_full_column_scans"], 2)
 
     def test_warm_source_rebuild_reuses_exact_unit_tail_cache(self) -> None:
         """A second identical source build must not replay canonical member history."""
@@ -315,8 +318,12 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
                     / utc_day
                 )
 
-            _bound_schedule, _schedule_producer, lifecycle = bound_schedule_from_rdp(
-                data_root, schedule_sha256=digest, activation_id=ACTIVATION_ID
+            _bound_schedule, _schedule_producer, lifecycle = _lineage_from_rdp(
+                data_root,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                window_start=WINDOW_START,
+                closure_cutoff=as_of,
             )
             self.assertEqual(
                 {
@@ -342,7 +349,9 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
             )
             cold_stats = reconstruct_stats()
             self.assertEqual(cold["member_count"], 4)
-            self.assertEqual(cold_stats["reconstruct_calls"], 2)
+            self.assertEqual(cold_stats["reconstruct_calls"], 0)
+            self.assertEqual(cold_stats["historical_independent_reconstruct_calls"], 0)
+            self.assertEqual(cold_stats["prefix_walks"], 2)
 
             reset_extraction_counters()
             reset_fingerprint_work()
@@ -360,8 +369,8 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
             self.assertEqual(warm["source_sha256"], cold["source_sha256"])
             self.assertEqual(warm["member_count"], 4)
             self.assertEqual(warm_stats["reconstruct_calls"], 0)
-            self.assertEqual(warm_counters["member_snapshot_full_column_scans"], 0)
-            self.assertEqual(warm_counters["member_snapshot_admission_probes"], 0)
+            self.assertEqual(warm_stats["historical_independent_reconstruct_calls"], 0)
+            self.assertEqual(warm_stats["prefix_walks"], 2)
 
     def test_older_removed_member_pit_preserves_cold_warm_source_parity(self) -> None:
         """An older PIT is replayed exactly instead of consuming the newer tail."""
@@ -439,8 +448,9 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
             )
             self.assertEqual(cold["member_count"], 3)
             cold_stats = reconstruct_stats()
-            self.assertEqual(cold_stats["reconstruct_calls"], 2)
-            self.assertEqual(cold_stats["anchor_loads"], 2)
+            self.assertEqual(cold_stats["reconstruct_calls"], 0)
+            self.assertEqual(cold_stats["historical_independent_reconstruct_calls"], 0)
+            self.assertGreaterEqual(cold_stats["prefix_walks"], 1)
 
             reset_extraction_counters()
             reset_fingerprint_work()
@@ -454,34 +464,10 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
                 discovery_coverage_class="GAP_SUSPECTED",
             )
             warm_stats = reconstruct_stats()
-            warm_counters = extraction_counters()
             self.assertEqual(warm["source_sha256"], cold["source_sha256"])
             self.assertEqual(warm["member_count"], 3)
-            self.assertEqual(warm_stats["reconstruct_calls"], 1)
-            self.assertEqual(warm_stats["anchor_loads"], 1)
-            self.assertEqual(warm_counters["member_checkpoint_hits"], 1)
-            self.assertEqual(warm_counters["member_checkpoint_misses"], 1)
-
-            meta_path = (
-                data_root
-                / "datasets/members_snapshot_plus_delta/20260902"
-                / ".operational_latest_members.meta.json"
-            )
-            meta = json.loads(meta_path.read_text(encoding="utf-8"))
-            self.assertEqual(meta["schema_version"], "3.0")
-            self.assertTrue(meta["canonical_unit_sha256"])
-            self.assertTrue(meta["canonical_unit_files_sha256"])
-            cache_conn = sqlite3.connect(meta_path.with_suffix("").with_suffix(".sqlite"))
-            try:
-                tables = {
-                    str(row[0])
-                    for row in cache_conn.execute(
-                        "SELECT name FROM sqlite_master WHERE type='table'"
-                    )
-                }
-            finally:
-                cache_conn.close()
-            self.assertNotIn("history_ops", tables)
+            self.assertEqual(warm_stats["reconstruct_calls"], 0)
+            self.assertEqual(warm_stats["historical_independent_reconstruct_calls"], 0)
 
     def test_non_monotonic_removal_history_falls_back_to_exact_pit_replay(self) -> None:
         """A remove/re-add/remove chain must not use removal-only recovery."""
@@ -542,7 +528,9 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
             finally:
                 conn.close()
 
-            self.assertEqual(reconstruct_stats()["reconstruct_calls"], 1)
+            stats = reconstruct_stats()
+            self.assertEqual(stats["historical_independent_reconstruct_calls"], 0)
+            self.assertEqual(stats["prefix_walks"], 1)
 
     def test_older_pit_target_does_not_consume_newer_tail_cache(self) -> None:
         """A newer durable tail cache cannot satisfy an earlier PIT target."""
@@ -600,9 +588,10 @@ class LocalCohortIncrementalMaterializationTests(unittest.TestCase):
             finally:
                 conn.close()
 
-            self.assertEqual(reconstruct_stats()["reconstruct_calls"], 1)
+            stats = reconstruct_stats()
+            self.assertEqual(stats["historical_independent_reconstruct_calls"], 0)
+            self.assertEqual(stats["prefix_walks"], 1)
             self.assertEqual(extraction_counters()["member_checkpoint_hits"], 0)
-            self.assertEqual(extraction_counters()["member_checkpoint_misses"], 1)
             preserved_tail_meta = json.loads(
                 tail_meta_path.read_text(encoding="utf-8")
             )

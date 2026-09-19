@@ -1496,6 +1496,137 @@ class ResearchStore:
                 seen.add(record.record_id)
                 yield record
 
+    def iter_lifecycle_records_bounded(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str | None = None,
+        window_start: datetime | None = None,
+        closure_cutoff: datetime | None = None,
+        schedule_only: bool = False,
+    ) -> tuple[tuple[ResearchEvent, ...], "ResearchStoreBoundTelemetry"]:
+        """Open only temporally relevant observation-lifecycle partitions.
+
+        Manifest JSON headers may be enumerated for the whole store. Parquet
+        payload verification/decode is restricted to the schedule identity
+        partition plus window/cutoff overlap and a newest-first predecessor
+        search. This is not a second scientific truth owner.
+        """
+
+        manifests = self._committed_manifests()
+        headers_scanned = len(manifests)
+        opened = 0
+        decoded = 0
+        payload_bytes = 0
+        wanted_txn = observation_schedule_transaction_id(schedule_sha256)
+        cached: dict[str, tuple[tuple[ResearchEvent, ...], int]] = {}
+
+        def _open(manifest: PartitionManifest) -> tuple[ResearchEvent, ...]:
+            nonlocal opened, decoded, payload_bytes
+            cached_item = cached.get(manifest.partition_id)
+            if cached_item is not None:
+                return cached_item[0]
+            records, nbytes = self._verify_partition_with_size(manifest)
+            cached[manifest.partition_id] = (records, nbytes)
+            opened += 1
+            decoded += len(records)
+            payload_bytes += nbytes
+            return records
+
+        selected: dict[str, PartitionManifest] = {}
+        for manifest in manifests:
+            if manifest.partition_id == wanted_txn:
+                selected[manifest.partition_id] = manifest
+        if not schedule_only and window_start is not None:
+            overlap: list[PartitionManifest] = []
+            before: list[PartitionManifest] = []
+            for manifest in manifests:
+                if not _observation_lifecycle_partition(manifest.partition_id):
+                    continue
+                if manifest.partition_id == wanted_txn:
+                    continue
+                max_event = manifest.max_event_time
+                min_event = manifest.min_event_time
+                if max_event is None or min_event is None:
+                    overlap.append(manifest)
+                    continue
+                if closure_cutoff is not None and min_event > closure_cutoff:
+                    continue
+                if max_event < window_start:
+                    before.append(manifest)
+                    continue
+                overlap.append(manifest)
+            for manifest in overlap:
+                selected[manifest.partition_id] = manifest
+            before.sort(
+                key=lambda item: (
+                    item.max_event_time or _UNIX_EPOCH,
+                    item.partition_id,
+                ),
+                reverse=True,
+            )
+            for manifest in before:
+                if not _member_lifecycle_partition(manifest.partition_id):
+                    continue
+                predecessor_hit = False
+                for record in _open(manifest):
+                    if record.record_kind != RecordKind.OBSERVATION_MEMBER_BATCH:
+                        continue
+                    payload = _payload_object(record)
+                    digest = str(payload.get("schedule_sha256") or "")
+                    if digest != schedule_sha256:
+                        continue
+                    event_activation = str(
+                        record.run_id or payload.get("activation_id") or ""
+                    )
+                    if (
+                        activation_id
+                        and event_activation
+                        and event_activation != activation_id
+                    ):
+                        continue
+                    predecessor_hit = True
+                    break
+                if predecessor_hit:
+                    selected[manifest.partition_id] = manifest
+                    break
+
+        records_out: list[ResearchEvent] = []
+        seen: set[str] = set()
+        for manifest in selected.values():
+            for record in _open(manifest):
+                if record.record_id in seen:
+                    raise ResearchStoreError("DUPLICATE_RECORD_ID")
+                seen.add(record.record_id)
+                if record.record_kind not in _BOUNDED_LIFECYCLE_KINDS:
+                    continue
+                payload = _payload_object(record)
+                digest = str(payload.get("schedule_sha256") or record.entity_id or "")
+                if digest != schedule_sha256:
+                    continue
+                records_out.append(record)
+        telemetry = ResearchStoreBoundTelemetry(
+            research_manifest_headers_scanned=headers_scanned,
+            research_event_partitions_opened=opened,
+            research_event_records_decoded=decoded,
+            research_event_payload_bytes_read=payload_bytes,
+        )
+        return tuple(records_out), telemetry
+
+    def _verify_partition_with_size(
+        self, manifest: PartitionManifest
+    ) -> tuple[tuple[ResearchEvent, ...], int]:
+        path = _target_path(
+            self._root,
+            manifest.logical_location,
+            create_parents=False,
+        )
+        try:
+            nbytes = int(path.stat().st_size) if path.is_file() else 0
+        except OSError:
+            nbytes = 0
+        return self._verify_partition(manifest), nbytes
+
     def test_write_partition_without_manifest(
         self,
         records: Sequence[ResearchEvent],
@@ -1954,6 +2085,64 @@ class ResearchStore:
         return True
 
 
+@dataclass(frozen=True)
+class ResearchStoreBoundTelemetry:
+    research_manifest_headers_scanned: int
+    research_event_partitions_opened: int
+    research_event_records_decoded: int
+    research_event_payload_bytes_read: int
+
+
+_BOUNDED_LIFECYCLE_KINDS = frozenset(
+    {
+        RecordKind.OBSERVATION_SCHEDULE,
+        RecordKind.OBSERVATION_SCHEDULE_STATE,
+        RecordKind.OBSERVATION_BATCH,
+        RecordKind.OBSERVATION_MEMBER_BATCH,
+        RecordKind.OBSERVATION_PANEL_SNAPSHOT,
+    }
+)
+_SKIP_PARTITION_MARKERS = (
+    "HFIC",
+    "FWDHYP",
+    "-FWD-",
+    "-DEC-",
+    "FORGECTX",
+    "MEMPOL",
+    "REOPENED",
+    "SCIENCE-REBASE",
+    "HFICPROV",
+    "HFICLEG",
+    "HFICINT",
+    "HFICREV",
+    "HFICRU",
+    "HFICFIN",
+    "HFICNW",
+)
+_LIFECYCLE_TXN_PREFIXES = (
+    "RESEARCH-TXN-MEM-",
+    "RESEARCH-TXN-OBS-",
+)
+
+
+def _observation_lifecycle_partition(partition_id: str) -> bool:
+    pid = str(partition_id or "").upper()
+    if not any(pid.startswith(prefix) for prefix in _LIFECYCLE_TXN_PREFIXES):
+        return False
+    return not any(marker in pid for marker in _SKIP_PARTITION_MARKERS)
+
+
+def _member_lifecycle_partition(partition_id: str) -> bool:
+    pid = str(partition_id or "").upper()
+    return pid.startswith("RESEARCH-TXN-MEM-") and _observation_lifecycle_partition(
+        partition_id
+    )
+
+
+def observation_schedule_transaction_id(schedule_sha256: str) -> str:
+    return f"RESEARCH-TXN-OBS-SCHED-{schedule_sha256[:12].upper()}"
+
+
 class ExistingResearchStoreReader:
     """Read-only view of an already-present ResearchStore. No write API."""
 
@@ -1967,6 +2156,23 @@ class ExistingResearchStoreReader:
     def iter_committed_records(self) -> Iterator[ResearchEvent]:
         return self._store.iter_committed_records()
 
+    def iter_lifecycle_records_bounded(
+        self,
+        *,
+        schedule_sha256: str,
+        activation_id: str | None = None,
+        window_start: datetime | None = None,
+        closure_cutoff: datetime | None = None,
+        schedule_only: bool = False,
+    ) -> tuple[tuple[ResearchEvent, ...], ResearchStoreBoundTelemetry]:
+        return self._store.iter_lifecycle_records_bounded(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            window_start=window_start,
+            closure_cutoff=closure_cutoff,
+            schedule_only=schedule_only,
+        )
+
 
 __all__ = [
     "CommitDisposition",
@@ -1978,8 +2184,10 @@ __all__ = [
     "RecordKind",
     "ResearchEvent",
     "ResearchStore",
+    "ResearchStoreBoundTelemetry",
     "ResearchStoreError",
     "RunPassport",
     "StoreDiagnostics",
+    "observation_schedule_transaction_id",
     "probe_local_pid",
 ]
