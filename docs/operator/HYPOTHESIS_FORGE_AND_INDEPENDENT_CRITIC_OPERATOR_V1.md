@@ -428,8 +428,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge_representati
 ```
 
 The adapter requires the effective CONTROL terminal, the same evidence epoch,
-the same pre-CONTROL memory baseline, the existing `HFIC-V1.2` prompt and the
-existing 16384-byte packet budget. A `PASS_*` CONTROL result means
+the same pre-CONTROL memory baseline, the existing `HFIC-V1.2` prompt, and the
+shared operational packet envelope (`FORGE_OPERATIONAL_PACKET_MAX_BYTES=65536`,
+growth warning at `FORGE_PACKET_GROWTH_WARNING_BYTES=20480`). Comparability is
+same admissible-information rules, same selection/truncation semantics, and
+exact CONTROL packet/hash binding — not equal unused 16KiB headroom. A
+`PASS_*` CONTROL result means
 `MARKET_FALSIFIER_FIRST`; runner-up revision pauses; observability or grounding
 failure is blocked. It never reads raw current lifecycle rows in CONTROL and
 never turns a motif into a new `FEAT-*` alias.
@@ -444,24 +448,28 @@ packet; this does not modify the ordinary packet schema or `/hypothesis-forge`.
 tests and navigation exist, but no representation probe was executed. It is
 not a scientific PASS, alpha, cohort release, deployment, or product DONE.
 
-### Forge packet capacity (mode-scoped)
+### Forge packet capacity (operational envelope)
 
-Ordinary `/hypothesis-forge` `FORGE_CONTEXT_PACKET` is bounded at **20480**
-bytes (`ORDINARY_FORGE_MAX_PACKET_BYTES`).
-`CURRENT_REPRESENTATION_CONTROL_V1` and the representation challenger keep the
-frozen **16384**-byte budget (`MAX_PACKET_BYTES` /
-`CONTROL_FORGE_MAX_PACKET_BYTES`) so CONTROL↔challenger comparability stays
-unchanged. The larger ordinary bound is not alpha, extra data authority, or
-representation permission.
+Ordinary `/hypothesis-forge`, `CURRENT_REPRESENTATION_CONTROL_V1`, and the
+representation challenger share one operational hard cap of **65536** bytes
+(`FORGE_OPERATIONAL_PACKET_MAX_BYTES`) and one growth-warning threshold of
+**20480** bytes (`FORGE_PACKET_GROWTH_WARNING_BYTES`). Crossing the warning
+threshold emits telemetry and does **not** truncate required scientific
+fields. The hard cap is a runtime safety envelope, not estimand/PIT/missingness and
+not a model context-window claim. It amends the previous 16384 CONTROL
+byte identity; it does not deny that identity existed. Resolve via
+`forge_context_packet_max_bytes(evidence_surface_mode)` — the mode no longer
+selects a different byte ceiling; never infer from `owner_focus` text.
 
 `RANKED_PRIOR_BODY_CONTEXT_INCOMPLETE` is reserved for ranked IDs whose
 decision-useful body cannot be resolved one-to-one.
 `FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED` is the typed STOP when bodies are
 complete but a non-minimal Forge search context still cannot fit after allowed
-semantic/feature-grounding compaction under the **effective mode bound**.
+semantic/feature-grounding compaction under the **operational hard cap**.
 `MINIMAL_FORGE_CONTEXT_EXCEEDS_BOUND` is the typed STOP when HARD_CLOSE/PARK
 Forge priors already carry disposition-gated scope axes and fitting would
-require stripping material feature grounding. Do not quarantine valid HFIC
+require stripping material feature grounding under that same operational cap.
+Do not quarantine valid HFIC
 memory or drop ranked priors to paper over capacity. Prompt A uses
 `compact_forge_prior_entry`; Critic `prior_memory` keeps the fuller capsule.
 

@@ -24,7 +24,7 @@ from solana_alpha_lab.factory.hfic_memory_policy import (
 )
 from solana_alpha_lab.factory.hfic_preflight import (
     AUTO_FOCUS,
-    MAX_PACKET_BYTES,
+    FORGE_OPERATIONAL_PACKET_MAX_BYTES,
     MAX_RANKED_PRIORS,
     PROMPT_VERSION,
     decide_preflight_action,
@@ -485,7 +485,7 @@ def preview_control_reconsideration(
         blockers.append("REOPENABLE_INVENTORY_MISSING_H11_H13")
     if h11_id not in set(ranked) or h13_id not in set(ranked):
         blockers.append("H11_H13_NOT_IN_PROMPT_A_SET")
-    if packet_bytes > MAX_PACKET_BYTES:
+    if packet_bytes > FORGE_OPERATIONAL_PACKET_MAX_BYTES:
         blockers.append("FORGE_CONTEXT_PACKET_OVERSIZE")
     if planned_eligible > records_bound or prior_bytes > bytes_bound:
         blockers.append("PRIOR_MEMORY_CAPACITY")
@@ -553,7 +553,8 @@ def preview_control_reconsideration(
         "H11_IN_PROMPT_A_SET": h11_id in set(ranked),
         "H13_IN_PROMPT_A_SET": h13_id in set(ranked),
         "POST_PLAN_FORGE_CONTEXT_BYTES": packet_bytes,
-        "MAX_PACKET_BYTES": MAX_PACKET_BYTES,
+        "FORGE_OPERATIONAL_PACKET_MAX_BYTES": FORGE_OPERATIONAL_PACKET_MAX_BYTES,
+        "MAX_PACKET_BYTES": FORGE_OPERATIONAL_PACKET_MAX_BYTES,
         "PRIOR_MEMORY_COUNT_AFTER": planned_eligible,
         "PRIOR_MEMORY_BYTES_AFTER": prior_bytes,
         "OLD_EVIDENCE_EPOCH": session_epoch,

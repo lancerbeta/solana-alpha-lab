@@ -27,7 +27,7 @@ from solana_alpha_lab.factory.hfic_memory_policy import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     HficPreflightError,
-    MAX_PACKET_BYTES,
+    FORGE_OPERATIONAL_PACKET_MAX_BYTES,
     build_forge_context_packet,
     decide_preflight_action,
     evidence_epoch_material,
@@ -478,14 +478,14 @@ class PromptABodyTests(unittest.TestCase):
             self.assertIn(H11, ranked)
             self.assertIn(H13, ranked)
             encoded = json.dumps(packet, sort_keys=True, separators=(",", ":")).encode()
-            self.assertLessEqual(len(encoded), MAX_PACKET_BYTES)
+            self.assertLessEqual(len(encoded), FORGE_OPERATIONAL_PACKET_MAX_BYTES)
             self.assertEqual(packet["evidence_surface_mode"], CURRENT_REPRESENTATION_CONTROL_V1)
             self.assertFalse(control_packet_has_raw_sequences(packet))
             self.assertNotIn("trajectory", packet)
             self.assertNotIn("normalized_trajectory_v1", packet)
 
             with patch(
-                "solana_alpha_lab.factory.hfic_preflight.MAX_PACKET_BYTES",
+                "solana_alpha_lab.factory.hfic_preflight.FORGE_OPERATIONAL_PACKET_MAX_BYTES",
                 64,
             ):
                 with self.assertRaises(HficPreflightError) as raised:

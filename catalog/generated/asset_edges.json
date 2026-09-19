@@ -3408,6 +3408,26 @@
       "target_asset_id": "TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001"
     },
     {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001",
+      "relation": "depends_on",
+      "target_asset_id": "SCRIPT-HYPOTHESIS-FORGE-001"
+    },
+    {
+      "source_asset_id": "CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001"
+    },
+    {
       "source_asset_id": "CTRL-HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-HFIC-CONTROL-INTEGRITY-001"
@@ -13583,6 +13603,11 @@
       "target_asset_id": "CTRL-HFIC-FORGE-CONTROL-READY-NEGATIVE-PRIOR-REPAIR-001"
     },
     {
+      "source_asset_id": "REPORT-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001"
+    },
+    {
       "source_asset_id": "REPORT-HFIC-SELECTION-ROBUSTNESS-GATE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
@@ -16366,6 +16391,11 @@
       "source_asset_id": "TEST-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-HFIC-OPERATIONAL-PACKET-GUARD-SIMPLIFICATION-001"
     },
     {
       "source_asset_id": "TEST-HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-001",
