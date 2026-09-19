@@ -1027,6 +1027,18 @@ def _apply_research_bound_telemetry(telemetry: ResearchStoreBoundTelemetry) -> N
         note_counter("research_store_bounded_route", 1)
     if telemetry.full_committed_payload_scan:
         note_counter("research_store_full_committed_scan", 1)
+    note_counter(
+        "research_event_partitions_skipped_by_time",
+        telemetry.research_event_partitions_skipped_by_time,
+    )
+    note_counter(
+        "research_event_partitions_opened_unknown_bounds",
+        telemetry.research_event_partitions_opened_unknown_bounds,
+    )
+    note_counter(
+        "research_event_lifecycle_partitions_total",
+        telemetry.research_event_lifecycle_partitions_total,
+    )
 
 
 def _lineage_from_rdp(
@@ -1348,7 +1360,8 @@ def _cohort_contributing_lineage(
             raw = payload.get("discovery_coverage_class")
             if isinstance(raw, str) and raw.strip():
                 coverages.append(raw.strip())
-    _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
+    if include_observations:
+        _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
     return sorted(contributing), _worst_coverage(coverages), contributing_manifests
 
 
@@ -1763,8 +1776,8 @@ def latest_c1_observation_manifest_at(
                     payload,
                     partition_index=partition_index,
                 )
-            except BoundedMaterializationError:
-                continue
+            except BoundedMaterializationError as exc:
+                raise LiveCohortReleaseError(OBSERVATION_LINEAGE_INCOMPLETE) from exc
             if location in seen_locations:
                 continue
             effective = getattr(record, "effective_at", None)
@@ -2167,6 +2180,12 @@ def plan_live_source_materialization(
         "full_historical_research_payload_scan": full_historical,
         "global_historical_observation_glob": global_glob,
         "research_store_bounded_route": bounded_route,
+        "research_event_partitions_skipped_by_time": int(
+            counters.get("research_event_partitions_skipped_by_time") or 0
+        ),
+        "research_event_partitions_opened_unknown_bounds": int(
+            counters.get("research_event_partitions_opened_unknown_bounds") or 0
+        ),
         "research_manifest_headers_scanned": int(
             counters.get("research_manifest_headers_scanned") or 0
         ),
@@ -2357,6 +2376,7 @@ def build_live_observation_source_from_rdp(
             | winning_producers
             | set(observation_lineage.get("producers") or ())
         )
+        _require(bool(contributing), "LIVE_SOURCE_PRODUCER_MISSING")
         observed_classes = [lineage_coverage]
         observed_classes.extend(observation_lineage.get("coverages") or ())
         if isinstance(discovery_coverage_class, str) and discovery_coverage_class.strip():

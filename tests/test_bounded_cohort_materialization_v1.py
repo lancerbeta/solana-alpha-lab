@@ -370,6 +370,69 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
             self.assertNotIn("too-old-only", mints)
             self.assertEqual(count, 2)
 
+    def test_d_multiple_older_snapshots_keep_only_latest_predecessor(self) -> None:
+        digest = "a" * 64
+        admit = WINDOW_START + timedelta(seconds=30)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            older_a = write_snapshot_unit(
+                root,
+                utc_day="20260903",
+                dataset_manifest_id="older-a",
+                rows=[_member("too-old-a", admit=admit, digest=digest)],
+            )
+            older_b = write_snapshot_unit(
+                root,
+                utc_day="20260905",
+                dataset_manifest_id="older-b",
+                rows=[_member("too-old-b", admit=admit, digest=digest)],
+            )
+            pred = write_snapshot_unit(
+                root,
+                utc_day="20260908",
+                dataset_manifest_id="pred",
+                rows=[_member("straddle", admit=admit, digest=digest)],
+            )
+            inside = write_snapshot_unit(
+                root,
+                utc_day="20260910",
+                dataset_manifest_id="inside",
+                rows=[
+                    _member("straddle", admit=admit, digest=digest),
+                    _member("later", admit=WINDOW_START + timedelta(days=1), digest=digest),
+                ],
+            )
+            lifecycle = [
+                _lifecycle_member(str(older_a["publications"][0]["rel"]), WINDOW_START - timedelta(days=6), 0),
+                _lifecycle_member(str(older_b["publications"][0]["rel"]), WINDOW_START - timedelta(days=4), 1),
+                _lifecycle_member(str(pred["publications"][0]["rel"]), WINDOW_START - timedelta(minutes=5), 2),
+                _lifecycle_member(str(inside["publications"][0]["rel"]), WINDOW_START + timedelta(hours=2), 3),
+            ]
+            conn = sqlite3.connect(":memory:")
+            flags: dict[str, tuple[bool, bool]] = {}
+            reset_fingerprint_work()
+            _producers, count = _cohort_members_into_sqlite(
+                root,
+                conn=conn,
+                lifecycle_rows=lifecycle,
+                window_start=WINDOW_START,
+                window_end=WINDOW_END,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                sampling_policy="DETERMINISTIC_HASH_BERNOULLI",
+                sampling_seed="BOUNDED-TEST",
+                inclusion_probability="0.0425",
+                location_flags=flags,
+            )
+            mints = {row[0] for row in conn.execute("SELECT mint FROM members")}
+            conn.close()
+            self.assertEqual(mints, {"straddle", "later"})
+            self.assertEqual(count, 2)
+            self.assertNotIn(str(older_a["publications"][0]["rel"]), flags)
+            self.assertNotIn(str(older_b["publications"][0]["rel"]), flags)
+            self.assertIn(str(pred["publications"][0]["rel"]), flags)
+            self.assertEqual(reconstruct_stats()["historical_independent_reconstruct_calls"], 0)
+
     def test_e_first_publication_inside_cohort_needs_no_predecessor(self) -> None:
         digest = "a" * 64
         with tempfile.TemporaryDirectory() as tmp:
@@ -852,12 +915,14 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
                 self.assertFalse(plan["slow_fallback_required"])
                 self.assertEqual(plan["historical_independent_reconstruct_calls"], 0)
                 self.assertEqual(plan["global_manifest_markers_scanned"], 0)
+                self.assertGreaterEqual(int(plan["research_event_partitions_skipped_by_time"]), 0)
                 return {
                     "headers": int(plan["research_manifest_headers_scanned"]),
                     "opened": int(plan["research_event_partitions_planned"]),
                     "decoded": int(plan["research_event_records_decoded"]),
                     "payload": int(plan["research_event_payload_bytes_read"]),
                     "members": int(plan["member_batches_selected"]),
+                    "skipped": int(plan["research_event_partitions_skipped_by_time"]),
                 }
 
         c3 = _shape(3)
@@ -867,6 +932,7 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
         self.assertLessEqual(c100["payload"] / max(c3["payload"], 1), 1.5)
         self.assertLessEqual(c100["members"] / max(c3["members"], 1), 1.5)
         self.assertGreaterEqual(c100["headers"], c3["headers"])
+        self.assertGreaterEqual(c100["skipped"], c3["skipped"])
         self.assertEqual(c100["members"], c3["members"])
 
     def test_plan_flags_measured_from_bounded_route(self) -> None:
@@ -924,6 +990,7 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
             self.assertFalse(plan["global_historical_observation_glob"])
             self.assertEqual(plan["historical_independent_reconstruct_calls"], 0)
             self.assertEqual(plan["global_manifest_markers_scanned"], 0)
+            self.assertEqual(int(plan["research_event_partitions_opened_unknown_bounds"]), 0)
 
     def test_contributing_lineage_skips_uncached_independent_reconstruct(self) -> None:
         digest = "a" * 64

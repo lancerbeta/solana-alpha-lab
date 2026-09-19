@@ -32,10 +32,13 @@ bypass the plan gate, prewarm caches, or delete random temp files.
 ## C2 acceptance (frozen local RDP, no VPS/provider)
 
 - Cohort `REL-20260909T111900Z-20260916T111900Z`
-- Plan: `BOUNDED_COHORT_WINDOW`, 739 MEMBER_BATCH (1 predecessor), 7 units,
-  864 predicted delta applications, 738 observations, ~8.68 MiB observation
-  payload, 0 independent reconstruct, 0 global observation glob, 0 Sep02-Sep05
-  legacy locations
+- Plan (HEAD revalidated `--plan-only`, no rebuild): `BOUNDED_COHORT_WINDOW`,
+  739 MEMBER_BATCH (1 predecessor), 7 units, 864 predicted delta applications,
+  738 observations, ~8.68 MiB observation payload, 0 independent reconstruct,
+  0 global observation glob, 0 Sep02-Sep05 legacy locations,
+  `research_store_bounded_route=true`,
+  `research_event_partitions_skipped_by_time=2718`,
+  `research_event_partitions_opened_unknown_bounds=0`
 - Wall: 5011683 ms (83.5 min), ceiling 90 min
 - Bundle: members 113107, observations 39008, schedule artifact exact,
   `source_sha256=041fc0924ef77a5b68f785a5f48fd97edcb345b6ed6e4b711af24b29e1733e89`

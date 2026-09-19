@@ -6,6 +6,7 @@
   "window_start": "2026-09-09T11:19:00Z",
   "window_end": "2026-09-16T11:19:00Z",
   "closure_cutoff": "2026-09-17T11:19:00Z",
+  "as_of": "2026-09-19T12:02:45Z",
   "member_batches_selected": 739,
   "predecessor_member_batches": 1,
   "snapshot_delta_units": 7,
@@ -20,8 +21,15 @@
   "global_manifest_markers_scanned": 0,
   "global_historical_observation_glob": false,
   "full_historical_research_payload_scan": false,
+  "research_store_bounded_route": true,
+  "research_event_partitions_skipped_by_time": 2718,
+  "research_event_partitions_opened_unknown_bounds": 0,
   "research_manifest_headers_scanned": 5729,
   "research_event_partitions_planned": 3011,
   "research_event_records_decoded": 3013,
-  "research_event_payload_bytes_read": 25696050
+  "research_event_payload_bytes_read": 25696050,
+  "cli_status": "PASS",
+  "no_vps": true,
+  "no_provider": true,
+  "no_rebuild": true
 }

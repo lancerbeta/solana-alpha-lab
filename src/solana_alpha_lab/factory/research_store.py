@@ -1518,6 +1518,9 @@ class ResearchStore:
         opened = 0
         decoded = 0
         payload_bytes = 0
+        skipped_by_time = 0
+        unknown_bounds = 0
+        lifecycle_total = 0
         wanted_txn = observation_schedule_transaction_id(schedule_sha256)
         cached: dict[str, tuple[tuple[ResearchEvent, ...], int]] = {}
 
@@ -1532,6 +1535,12 @@ class ResearchStore:
             decoded += len(records)
             payload_bytes += nbytes
             return records
+
+        for manifest in manifests:
+            if manifest.partition_id == wanted_txn or _observation_lifecycle_partition(
+                manifest.partition_id
+            ):
+                lifecycle_total += 1
 
         selected: dict[str, PartitionManifest] = {}
         for manifest in manifests:
@@ -1549,8 +1558,10 @@ class ResearchStore:
                 min_event = manifest.min_event_time
                 if max_event is None or min_event is None:
                     overlap.append(manifest)
+                    unknown_bounds += 1
                     continue
                 if closure_cutoff is not None and min_event > closure_cutoff:
+                    skipped_by_time += 1
                     continue
                 if max_event < window_start:
                     before.append(manifest)
@@ -1565,9 +1576,13 @@ class ResearchStore:
                 ),
                 reverse=True,
             )
-            for manifest in before:
-                if not _member_lifecycle_partition(manifest.partition_id):
-                    continue
+            member_befores = [
+                item for item in before if _member_lifecycle_partition(item.partition_id)
+            ]
+            skipped_by_time += len(before) - len(member_befores)
+            predecessor_opened = 0
+            for manifest in member_befores:
+                predecessor_opened += 1
                 predecessor_hit = False
                 for record in _open(manifest):
                     if record.record_kind != RecordKind.OBSERVATION_MEMBER_BATCH:
@@ -1590,6 +1605,7 @@ class ResearchStore:
                 if predecessor_hit:
                     selected[manifest.partition_id] = manifest
                     break
+            skipped_by_time += max(0, len(member_befores) - predecessor_opened)
 
         records_out: list[ResearchEvent] = []
         seen: set[str] = set()
@@ -1611,7 +1627,15 @@ class ResearchStore:
             research_event_records_decoded=decoded,
             research_event_payload_bytes_read=payload_bytes,
             used_bounded_lifecycle_route=True,
-            full_committed_payload_scan=False,
+            full_committed_payload_scan=bool(
+                lifecycle_total > 0
+                and skipped_by_time == 0
+                and unknown_bounds > 0
+                and opened >= lifecycle_total
+            ),
+            research_event_partitions_skipped_by_time=skipped_by_time,
+            research_event_partitions_opened_unknown_bounds=unknown_bounds,
+            research_event_lifecycle_partitions_total=lifecycle_total,
         )
         return tuple(records_out), telemetry
 
@@ -2095,6 +2119,9 @@ class ResearchStoreBoundTelemetry:
     research_event_payload_bytes_read: int
     used_bounded_lifecycle_route: bool = True
     full_committed_payload_scan: bool = False
+    research_event_partitions_skipped_by_time: int = 0
+    research_event_partitions_opened_unknown_bounds: int = 0
+    research_event_lifecycle_partitions_total: int = 0
 
 
 _BOUNDED_LIFECYCLE_KINDS = frozenset(

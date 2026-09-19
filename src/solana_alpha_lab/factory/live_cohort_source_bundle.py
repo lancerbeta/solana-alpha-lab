@@ -93,6 +93,9 @@ _EXTRACTION_COUNTERS = {
     "legacy_member_locations_read": 0,
     "research_store_bounded_route": 0,
     "research_store_full_committed_scan": 0,
+    "research_event_partitions_skipped_by_time": 0,
+    "research_event_partitions_opened_unknown_bounds": 0,
+    "research_event_lifecycle_partitions_total": 0,
 }
 
 
