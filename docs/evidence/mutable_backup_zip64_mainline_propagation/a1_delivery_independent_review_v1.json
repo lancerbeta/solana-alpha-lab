@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "MUTABLE-BACKUP-ZIP64-MAINLINE-PROPAGATION-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-19",
+  "task_id": "MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1",
+  "verdict": "PASS",
+  "required_roles": [
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "reviewed_bindings_sha256": "6dd97c4af452ea1144bc4a9284ed17a5abe341a9a369df085f6b6940de93ff06",
+  "reviewed_inventory_sha256": "f54c19b9cc2fda69d6e01372003a8a8251d4789aa8007deb810dbe065158365b",
+  "reviews": [
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "FORCE_ZIP64_TRUE_ON_STREAMED_ENTRY",
+        "NO_READ_BYTES_MATERIALIZATION",
+        "REGRESSION_REPRODUCES_CLOSE_TIME_ZIP64_MISS",
+        "CATALOG_HASH_ONLY_FOR_REMOTE_OPS",
+        "NO_TIMER_CONFIG_VPS_C2_DIFF",
+        "CONTRACT_DOES_NOT_CHANGE_F8E6D173_SEMANTICS",
+        "MAINLINE_REFLECTION_ONLY"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OUTCOME_MATCHES_ALREADY_EXECUTED_ZIP64_REPAIR",
+        "FALSIFIER_IS_ZIP64REQUIREDFILE_PLUS_SOURCE_PIN",
+        "LIVE_DEPLOY_ALREADY_HAPPENED_ON_BA7F3B72",
+        "THIS_PR_IS_MAINLINE_REFLECTION_ONLY",
+        "ROLLBACK_IS_REVERT_EXACT_COMMIT",
+        "NO_ALPHA_OR_CANONICAL_DONE"
+      ]
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "OPERATIONAL_ZIP_SERIALIZATION_ONLY",
+        "NO_SCIENTIFIC_TRUTH_OWNER_CHANGE",
+        "MAINLINE_REFLECTION_OF_ALREADY_DEPLOYED_HOTFIX",
+        "THIS_PR_DOES_NOT_DEPLOY",
+        "RESEARCH_VALIDITY_UNCHANGED",
+        "packet_fingerprint_sha256=be81093fff9115aa15337d2e54d9deefeeae5e331a5f281f8aed8929c7137a23"
+      ]
+    }
+  ],
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_PROVIDER_CALLS",
+    "NO_CREDENTIAL_VALUES",
+    "NO_VPS_DEPLOY",
+    "NO_PRODUCTION_DEPLOYMENT_IN_THIS_PR",
+    "NO_TIMER_OR_BACKUP_ARCHITECTURE_CHANGE",
+    "NO_C2_CHANGE",
+    "NO_ALPHA"
+  ]
+}
