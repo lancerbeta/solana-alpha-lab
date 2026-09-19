@@ -445,6 +445,8 @@ def build_closure_receipt(
         # first-seen C1 publication times are <= not_after. When as_of is
         # already at or before mature_at, that scan cannot raise cutoff
         # above the mature_at floor, so skip the historical panel walk.
+        # After mature_at the keyed OBSERVATION_BATCH route still runs:
+        # a late first-seen inside (mature_at, as_of] can extend cutoff.
         if entity_ids and as_of > mature_at:
             horizon = latest_c1_observation_manifest_at(
                 observation_rdp,
@@ -456,6 +458,7 @@ def build_closure_receipt(
                 ).fetchone()
                 is not None,
                 not_after=as_of,
+                window_start=start,
             )
     finally:
         if conn is not None:

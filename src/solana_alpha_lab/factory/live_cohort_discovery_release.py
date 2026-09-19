@@ -1023,6 +1023,10 @@ def _apply_research_bound_telemetry(telemetry: ResearchStoreBoundTelemetry) -> N
         "research_event_payload_bytes_read",
         telemetry.research_event_payload_bytes_read,
     )
+    if telemetry.used_bounded_lifecycle_route:
+        note_counter("research_store_bounded_route", 1)
+    if telemetry.full_committed_payload_scan:
+        note_counter("research_store_full_committed_scan", 1)
 
 
 def _lineage_from_rdp(
@@ -1271,6 +1275,10 @@ def _cohort_contributing_lineage(
             continue
         location = str(payload.get("member_location") or "")
         if not location:
+            continue
+        if location_flags is not None and location not in location_flags:
+            # Do not independently reconstruct uncached SNAPSHOT_PLUS_DELTA
+            # locations on the bounded path.
             continue
         has_in, later = _member_batch_window_flags(
             observation_rdp_root,
@@ -1611,7 +1619,9 @@ def _cohort_members_into_sqlite(
                         )
                         loc_has_in = loc_has_in or has_in
                         loc_later = loc_later or later
-                    flags[str(target["location"])] = (loc_has_in, loc_later)
+                    loc_key = str(target["location"])
+                    prev_in, prev_later = flags.get(loc_key, (False, False))
+                    flags[loc_key] = (prev_in or loc_has_in, prev_later or loc_later)
                 if progress is not None:
                     stats = reconstruct_stats()
                     progress.delta_files_applied = int(
@@ -1687,10 +1697,13 @@ def latest_c1_observation_manifest_at(
     not_after: datetime,
     cohort_mints: set[str] | None = None,
     mint_is_member: Callable[[str], bool] | None = None,
+    window_start: datetime | None = None,
 ) -> datetime | None:
     """First publication time of each C1 observation identity, max of those <= not_after.
 
     Republished C1 rows in a later mixed panel do not advance the freeze horizon.
+    Operator path uses keyed OBSERVATION_BATCH + canonical partition identity.
+    It does not glob dataset-*.published.
     """
     def _in_cohort(mint: str) -> bool:
         if mint_is_member is not None:
@@ -1700,6 +1713,18 @@ def latest_c1_observation_manifest_at(
         return False
 
     if mint_is_member is None and not cohort_mints:
+        return None
+    if window_start is None:
+        return None
+    try:
+        store = ExistingResearchStoreReader(Path(observation_rdp_root))
+        records, _telemetry = store.iter_lifecycle_records_bounded(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            window_start=window_start,
+            closure_cutoff=not_after,
+        )
+    except ResearchStoreError:
         return None
     handle, name = tempfile.mkstemp(prefix="live-cohort-first-seen-", suffix=".sqlite")
     os.close(handle)
@@ -1720,18 +1745,39 @@ def latest_c1_observation_manifest_at(
             """
         )
         insert = conn.execute
-        for manifest_order, _manifest_id, location in _iter_observation_panel_locations(
-            observation_rdp_root, not_after=not_after, skip_unparseable=True
-        ):
-            try:
-                path = _contained_data_path(Path(observation_rdp_root), location)
-            except MembersDeltaError as exc:
-                raise LiveCohortReleaseError(
-                    "LIVE_SOURCE_MEMBER_PROVENANCE_UNREADABLE"
-                ) from exc
-            if not path.is_file():
+        partition_index = load_observation_partition_index(Path(observation_rdp_root))
+        seen_locations: set[str] = set()
+        panels: list[tuple[datetime, Path]] = []
+        for record in records:
+            if str(record.record_kind) != "OBSERVATION_BATCH":
                 continue
-            stamp = _render_utc(manifest_order)
+            try:
+                payload = json.loads(record.payload_json)
+            except (TypeError, json.JSONDecodeError):
+                continue
+            if not isinstance(payload, Mapping):
+                continue
+            try:
+                path, location = resolve_observation_panel_location(
+                    Path(observation_rdp_root),
+                    payload,
+                    partition_index=partition_index,
+                )
+            except BoundedMaterializationError:
+                continue
+            if location in seen_locations:
+                continue
+            effective = getattr(record, "effective_at", None)
+            if not isinstance(effective, datetime) or effective.tzinfo is None:
+                continue
+            effective = effective.astimezone(UTC)
+            if effective < window_start or effective > not_after:
+                continue
+            seen_locations.add(location)
+            panels.append((effective, path))
+        panels.sort(key=lambda item: item[0])
+        for effective, path in panels:
+            stamp = _render_utc(effective)
             try:
                 for batch in iter_parquet_row_batches(path):
                     note_observation_rows(len(batch))
@@ -1773,68 +1819,6 @@ def latest_c1_observation_manifest_at(
         spill.unlink(missing_ok=True)
 
 
-def _iter_observation_panel_locations(
-    observation_rdp_root: Path,
-    *,
-    not_after: datetime | None,
-    newest_first: bool = False,
-    skip_unparseable: bool = False,
-) -> Iterator[tuple[datetime, str, str]]:
-    manifests_dir = Path(observation_rdp_root) / "datasets" / "manifests"
-    if not manifests_dir.is_dir():
-        return
-    found: list[tuple[datetime, str, str]] = []
-    for marker in sorted(manifests_dir.glob("dataset-*.published")):
-        try:
-            marker_payload = json.loads(marker.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        manifest_id = str(marker_payload.get("dataset_manifest_id") or "")
-        manifest_path = manifests_dir / f"{manifest_id}.json"
-        if not manifest_path.is_file():
-            continue
-        try:
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (OSError, json.JSONDecodeError):
-            continue
-        if not isinstance(manifest, Mapping):
-            continue
-        if str(manifest.get("dataset_id") or "").startswith("observation-panel-") is False:
-            continue
-        try:
-            manifest_order = _parse_utc(
-                str(manifest.get("created_at") or manifest.get("first_reliable_available_at"))
-            )
-        except Exception:
-            if skip_unparseable:
-                continue
-            manifest_order = datetime.min.replace(tzinfo=UTC)
-        if not_after is not None and manifest_order > not_after:
-            continue
-        partitions = list(manifest.get("partitions") or [])
-        if not partitions:
-            partitions_dir = manifests_dir / "partitions"
-            if partitions_dir.is_dir():
-                for partition_path in sorted(partitions_dir.glob("partition-*.json")):
-                    try:
-                        partition = json.loads(partition_path.read_text(encoding="utf-8"))
-                    except (OSError, json.JSONDecodeError):
-                        continue
-                    if (
-                        isinstance(partition, Mapping)
-                        and str(partition.get("dataset_manifest_id") or "") == manifest_id
-                    ):
-                        partitions.append(partition)
-        for partition in partitions:
-            if str(partition.get("partition_id") or "").endswith("-members"):
-                continue
-            location = str(partition.get("logical_location") or "")
-            if location:
-                found.append((manifest_order, manifest_id, location))
-    found.sort(key=lambda item: (item[0], item[1]), reverse=newest_first)
-    yield from found
-
-
 def _cohort_observations_into_sqlite(
     observation_rdp_root: Path,
     *,
@@ -1867,12 +1851,24 @@ def _cohort_observations_into_sqlite(
     lineage_producers: set[str] = set()
     lineage_coverages: list[str] = []
     lineage_manifests: set[str] = set()
-    member_ids = {
-        str((row.get("payload") or {}).get("dataset_manifest_id") or "")
-        for row in (lifecycle_rows or ())
-        if str(row.get("kind") or "") == "OBSERVATION_MEMBER_BATCH"
-        and isinstance(row.get("payload"), Mapping)
-    }
+    if window_start is None:
+        member_ids = {
+            str((row.get("payload") or {}).get("dataset_manifest_id") or "")
+            for row in (lifecycle_rows or ())
+            if str(row.get("kind") or "") == "OBSERVATION_MEMBER_BATCH"
+            and isinstance(row.get("payload"), Mapping)
+        }
+    else:
+        selected_members, _predecessors = select_member_batches(
+            lifecycle_rows or (),
+            window_start=window_start,
+            closure_cutoff=cutoff_at,
+        )
+        member_ids = {
+            str((row.get("payload") or {}).get("dataset_manifest_id") or "")
+            for row in selected_members
+            if isinstance(row.get("payload"), Mapping)
+        }
     member_ids.discard("")
     if window_start is None:
         selected = [
@@ -2130,9 +2126,21 @@ def plan_live_source_materialization(
         except OSError:
             pass
     counters = extraction_counters()
-    independent = 0
+    independent = int(
+        reconstruct_stats().get("historical_independent_reconstruct_calls")
+        or counters.get("historical_independent_reconstruct_calls")
+        or 0
+    )
+    bounded_route = int(counters.get("research_store_bounded_route") or 0) > 0
+    full_historical = (not bounded_route) or int(
+        counters.get("research_store_full_committed_scan") or 0
+    ) > 0
+    markers = int(counters.get("global_manifest_markers_scanned") or 0)
+    global_glob = bool(global_glob or markers > 0)
+    if not selected_members:
+        slow = True
     work_class = BOUNDED_WORK_CLASS
-    if slow or global_glob or independent != 0:
+    if slow or global_glob or independent != 0 or full_historical:
         work_class = UNBOUNDED_PLAN
     plan = {
         "cohort_id": cohort_id,
@@ -2155,11 +2163,10 @@ def plan_live_source_materialization(
         "slow_fallback_required": slow,
         "work_class": work_class,
         "historical_independent_reconstruct_calls": independent,
-        "global_manifest_markers_scanned": int(
-            counters.get("global_manifest_markers_scanned") or 0
-        ),
-        "full_historical_research_payload_scan": False,
+        "global_manifest_markers_scanned": markers,
+        "full_historical_research_payload_scan": full_historical,
         "global_historical_observation_glob": global_glob,
+        "research_store_bounded_route": bounded_route,
         "research_manifest_headers_scanned": int(
             counters.get("research_manifest_headers_scanned") or 0
         ),

@@ -520,6 +520,8 @@ gate, prewarm caches, or delete random temp files. Identify the next mature
 unimported cohort, acquire only missing incremental evidence, run plan-only,
 require `BOUNDED_COHORT_WINDOW`, then build and verify. Stop at the next
 authorized scope (seal/import/Forge require their own contract).
+`--as-of` may be wall-clock now; first-seen cutoff walks keyed
+`OBSERVATION_BATCH` in `[window_start, as_of]`, never `dataset-*.published`.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane

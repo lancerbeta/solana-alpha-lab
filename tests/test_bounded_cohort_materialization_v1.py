@@ -34,9 +34,11 @@ from solana_alpha_lab.factory.bounded_cohort_materialization import (
 )
 from solana_alpha_lab.factory.live_cohort_discovery_release import (
     LiveCohortReleaseError,
+    _cohort_contributing_lineage,
     _cohort_members_into_sqlite,
     build_live_observation_source_from_rdp,
     cohort_source_dir,
+    latest_c1_observation_manifest_at,
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import (
     SOURCE_MANIFEST_NAME,
@@ -866,6 +868,208 @@ class BoundedCohortMaterializationTests(unittest.TestCase):
         self.assertLessEqual(c100["members"] / max(c3["members"], 1), 1.5)
         self.assertGreaterEqual(c100["headers"], c3["headers"])
         self.assertEqual(c100["members"], c3["members"])
+
+    def test_plan_flags_measured_from_bounded_route(self) -> None:
+        schedule = _schedule()
+        digest = str(schedule["schedule_sha256"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "rdp"
+            root.mkdir()
+            persist_observation_schedule(
+                data_root=root,
+                schedule=schedule,
+                now=WINDOW_START,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION_ID,
+            )
+            unit = write_snapshot_unit(
+                root,
+                utc_day="20260910",
+                dataset_manifest_id="cur",
+                rows=[_member("mint1", admit=WINDOW_START + timedelta(hours=2), digest=digest)],
+            )
+            _append_event(
+                root,
+                record_id="MEM-CUR",
+                kind=RecordKind.OBSERVATION_MEMBER_BATCH,
+                digest=digest,
+                payload={
+                    "schedule_sha256": digest,
+                    "dataset_manifest_id": "cur",
+                    "member_location": str(unit["publications"][0]["rel"]),
+                    "row_count": 1,
+                },
+                now=WINDOW_START + timedelta(hours=2),
+                txn="RESEARCH-TXN-MEM-CURFLAGS01",
+            )
+            receipt = synthetic_closed_receipt(
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                cohort_id=COHORT_ID,
+                as_of=AS_OF,
+                members_total=1,
+            )
+            plan = build_live_observation_source_from_rdp(
+                observation_rdp_root=root,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                cohort_id=COHORT_ID,
+                as_of=AS_OF,
+                closure_receipt=receipt,
+                plan_only=True,
+            )
+            self.assertEqual(plan["work_class"], BOUNDED_WORK_CLASS)
+            self.assertTrue(plan["research_store_bounded_route"])
+            self.assertFalse(plan["full_historical_research_payload_scan"])
+            self.assertFalse(plan["global_historical_observation_glob"])
+            self.assertEqual(plan["historical_independent_reconstruct_calls"], 0)
+            self.assertEqual(plan["global_manifest_markers_scanned"], 0)
+
+    def test_contributing_lineage_skips_uncached_independent_reconstruct(self) -> None:
+        digest = "a" * 64
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            older = write_snapshot_unit(
+                root,
+                utc_day="20260904",
+                dataset_manifest_id="older",
+                rows=[_member("too-old", admit=WINDOW_START + timedelta(hours=1), digest=digest)],
+            )
+            pred = write_snapshot_unit(
+                root,
+                utc_day="20260908",
+                dataset_manifest_id="pred",
+                rows=[_member("kept", admit=WINDOW_START + timedelta(hours=1), digest=digest)],
+            )
+            current = write_snapshot_unit(
+                root,
+                utc_day="20260910",
+                dataset_manifest_id="cur",
+                rows=[_member("kept", admit=WINDOW_START + timedelta(hours=1), digest=digest)],
+            )
+            lifecycle = [
+                _lifecycle_member(str(older["publications"][0]["rel"]), WINDOW_START - timedelta(days=5), 0),
+                _lifecycle_member(str(pred["publications"][0]["rel"]), WINDOW_START - timedelta(minutes=5), 1),
+                _lifecycle_member(str(current["publications"][0]["rel"]), WINDOW_START + timedelta(hours=2), 2),
+            ]
+            conn = sqlite3.connect(":memory:")
+            flags: dict[str, tuple[bool, bool]] = {}
+            reset_fingerprint_work()
+            _cohort_members_into_sqlite(
+                root,
+                conn=conn,
+                lifecycle_rows=lifecycle,
+                window_start=WINDOW_START,
+                window_end=WINDOW_END,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                sampling_policy="DETERMINISTIC_HASH_BERNOULLI",
+                sampling_seed="BOUNDED-TEST",
+                inclusion_probability="0.0425",
+                location_flags=flags,
+            )
+            after_members = int(
+                reconstruct_stats().get("historical_independent_reconstruct_calls") or 0
+            )
+            _cohort_contributing_lineage(
+                root,
+                lifecycle_rows=lifecycle,
+                window_start=WINDOW_START,
+                window_end=WINDOW_END,
+                mint_is_member=lambda mint: conn.execute(
+                    "SELECT 1 FROM members WHERE mint=?", (mint,)
+                ).fetchone()
+                is not None,
+                location_flags=flags,
+                include_observations=False,
+            )
+            conn.close()
+            self.assertEqual(after_members, 0)
+            self.assertEqual(
+                reconstruct_stats()["historical_independent_reconstruct_calls"],
+                0,
+            )
+            self.assertNotIn(str(older["publications"][0]["rel"]), flags)
+
+    def test_latest_c1_does_not_glob_published_markers(self) -> None:
+        schedule = _schedule()
+        digest = str(schedule["schedule_sha256"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "rdp"
+            root.mkdir()
+            persist_observation_schedule(
+                data_root=root,
+                schedule=schedule,
+                now=WINDOW_START,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION_ID,
+            )
+            called = {"glob": 0}
+            original = Path.glob
+
+            def _tracking_glob(self: Path, pattern: str, *args: object, **kwargs: object):
+                if pattern == "dataset-*.published":
+                    called["glob"] += 1
+                return original(self, pattern, *args, **kwargs)
+
+            with patch.object(Path, "glob", _tracking_glob):
+                latest_c1_observation_manifest_at(
+                    root,
+                    schedule_sha256=digest,
+                    activation_id=ACTIVATION_ID,
+                    not_after=AS_OF,
+                    cohort_mints={"mint1"},
+                    window_start=WINDOW_START,
+                )
+            self.assertEqual(called["glob"], 0)
+
+    def test_empty_member_selection_is_unbounded_plan(self) -> None:
+        schedule = _schedule()
+        digest = str(schedule["schedule_sha256"])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "rdp"
+            root.mkdir()
+            persist_observation_schedule(
+                data_root=root,
+                schedule=schedule,
+                now=WINDOW_START,
+                producer_git_sha=PRODUCER,
+                activation_id=ACTIVATION_ID,
+            )
+            _append_event(
+                root,
+                record_id="MEM-ACT",
+                kind=RecordKind.OBSERVATION_MEMBER_BATCH,
+                digest=digest,
+                payload={
+                    "schedule_sha256": digest,
+                    "activation_id": ACTIVATION_ID,
+                    "dataset_manifest_id": "missing",
+                    "member_location": "",
+                    "row_count": 0,
+                },
+                now=WINDOW_START + timedelta(hours=2),
+                txn="RESEARCH-TXN-MEM-EMPTYSEL01",
+            )
+            receipt = synthetic_closed_receipt(
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                cohort_id=COHORT_ID,
+                as_of=AS_OF,
+                members_total=1,
+            )
+            plan = build_live_observation_source_from_rdp(
+                observation_rdp_root=root,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION_ID,
+                cohort_id=COHORT_ID,
+                as_of=AS_OF,
+                closure_receipt=receipt,
+                plan_only=True,
+            )
+            self.assertEqual(plan["work_class"], UNBOUNDED_PLAN)
+            self.assertEqual(plan["member_batches_selected"], 0)
+
 
 
 if __name__ == "__main__":

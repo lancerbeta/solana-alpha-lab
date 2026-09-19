@@ -1610,6 +1610,8 @@ class ResearchStore:
             research_event_partitions_opened=opened,
             research_event_records_decoded=decoded,
             research_event_payload_bytes_read=payload_bytes,
+            used_bounded_lifecycle_route=True,
+            full_committed_payload_scan=False,
         )
         return tuple(records_out), telemetry
 
@@ -2091,6 +2093,8 @@ class ResearchStoreBoundTelemetry:
     research_event_partitions_opened: int
     research_event_records_decoded: int
     research_event_payload_bytes_read: int
+    used_bounded_lifecycle_route: bool = True
+    full_committed_payload_scan: bool = False
 
 
 _BOUNDED_LIFECYCLE_KINDS = frozenset(

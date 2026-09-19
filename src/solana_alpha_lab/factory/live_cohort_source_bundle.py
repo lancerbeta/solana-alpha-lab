@@ -91,6 +91,8 @@ _EXTRACTION_COUNTERS = {
     "research_event_records_decoded": 0,
     "research_event_payload_bytes_read": 0,
     "legacy_member_locations_read": 0,
+    "research_store_bounded_route": 0,
+    "research_store_full_committed_scan": 0,
 }
 
 
