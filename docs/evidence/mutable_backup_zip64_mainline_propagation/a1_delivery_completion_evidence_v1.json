@@ -4,7 +4,7 @@
   "acceptance_id": "MUTABLE-BACKUP-ZIP64-MAINLINE-PROPAGATION-COMPLETION-001",
   "as_of": "2026-09-19",
   "task_id": "MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1",
-  "state_change": "MUTABLE_BACKUP_ZIP64_MAINLINE_READY_FOR_MERGE_GATE",
+  "state_change": "MUTABLE_BACKUP_ZIP64_MAINLINE_HARNESS_BOUND",
   "base_main": "f0425162af393b790d6f6fb4c3006c7669778d29",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,

@@ -23,13 +23,14 @@ git_binding:
   dirty_mode: FORBIDDEN
 
 objective: >-
-  Bind the already-landed mainline ZIP64 backup repair to the current
-  Delivery Harness so PR 322 can enter merge-readiness. Root cause: a
-  streamed ZIP entry larger than ZIP64_LIMIT failed unless
-  archive.open(..., force_zip64=True). Scope is remote_ops.py, the
-  ZIP64 regression test, and the deterministic MODULE-FACTORY-REMOTE-OPS-001
-  catalog hash. Live production already recovered on ba7f3b72 after one
-  manual >2 GiB backup PASS. This PR does not deploy.
+  Bind the already-on-branch ZIP64 backup repair at f8e6d173 to the
+  current Delivery Harness so PR 322 can enter merge-readiness. Versus
+  origin/main the candidate includes archive.open(..., force_zip64=True)
+  because a streamed ZIP entry larger than ZIP64_LIMIT failed without it.
+  Scope is remote_ops.py, the ZIP64 regression test, and the deterministic
+  MODULE-FACTORY-REMOTE-OPS-001 catalog hash. Live ba7f3b72 recovery and
+  the manual >2 GiB backup PASS are external evidence, not a capability of
+  this head. This PR does not deploy. Do not rewrite f8e6d173.
 
 managed_write_set:
   - docs/tasks/MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1.md
@@ -80,36 +81,43 @@ context_requirements:
 
 # MUTABLE_BACKUP_ZIP64_MAINLINE_PROPAGATION_V1
 
-SPEC_ROUTE=NONE. This contract describes an already executed operational
-packaging outcome. It does not authorize a new implementation.
+SPEC_ROUTE=NONE for this atom: do not rewrite `f8e6d173`. Versus
+`origin/main` (`f0425162`) the candidate still contains that one-line ZIP64
+flag land plus this harness bind. Semantic impact is operational ZIP
+serialization, not a scientific estimand. Live `ba7f3b72` recovery is
+external evidence, not a capability of this head. This PR does not deploy.
 
-## Already-executed outcome
+## Outcome versus origin/main
 
 - **Root cause:** streamed backup ZIP entry larger than `ZIP64_LIMIT` failed
   unless `archive.open(..., force_zip64=True)`.
-- **Mainline implementation:** `force_zip64=True` in `_stream_zip_entry`
-  (`f8e6d173`). Do not change that runtime meaning.
+- **Mainline implementation already on this branch:** `force_zip64=True` in
+  `_stream_zip_entry` (`f8e6d173`). Do not change that runtime meaning.
+- **This atom:** add the canonical task contract and DELIVERY_EVIDENCE so
+  current harness merge-readiness can run.
 - **Scope:** `remote_ops.py` + ZIP64 regression test + deterministic
   `MODULE-FACTORY-REMOTE-OPS-001` catalog hash.
-- **Evidence:** live production recovery on `ba7f3b72`; one manual `>2 GiB`
-  backup PASS.
+- **In-repo falsifier:** `Zip64RequiredFile` plus source pin of
+  `force_zip64=True`. This head does not claim a `>ZIP64_LIMIT` write.
+- **External evidence, not this head:** live production recovery on
+  `ba7f3b72`; one manual `>2 GiB` backup PASS.
 - **Rollback:** revert the exact implementation commit.
-- **Semantic impact:** operational packaging only.
+- **Semantic impact:** operational packaging / ZIP write-flag only.
 - **Production deployment is not part of this PR.**
 
 ## Non-goals
 
 No timer, config, backup-architecture, VPS, or C2 changes. No new provider
-or atom. No wallet, signer, or transaction.
+or atom. No wallet, signer, or transaction. No 2 GiB fixture. No deploy.
 
 ## Decision packet
 
-- **DECISION_DELTA:** mainline backup streaming always requests ZIP64-safe
-  writes; harness binding is documentation/evidence only.
-- **UNCERTAINTY_REMOVED:** whether the already-proven ZIP64 repair can enter
-  merge-readiness without changing `f8e6d173` semantics.
-- **CAPABILITY_OR_EVIDENCE:** force_zip64 streaming + regression test +
-  catalog hash + live `ba7f3b72` backup PASS.
+- **DECISION_DELTA:** versus main, streamed backup writes request ZIP64;
+  this atom only binds harness evidence around that already-on-branch land.
+- **UNCERTAINTY_REMOVED:** whether PR 322 can enter merge-readiness without
+  changing `f8e6d173` semantics.
+- **CAPABILITY_OR_EVIDENCE:** force_zip64 streaming + in-repo ZIP64
+  regression test + catalog hash. Live `ba7f3b72` backup remains external.
 - **STOP:** merge-readiness; no owner merge phrase in this atom; no deploy.
 - **NEXT:** owner merge gate for PR 322, then a separately authorized deploy
   if live pin still needs mainline.
