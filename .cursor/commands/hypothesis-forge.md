@@ -50,11 +50,12 @@ No Git mutation, no provider calls, no experiment execution, no autonomous gener
 
 The normal slash command remains `ORDINARY`; its behavior and search budget are
 unchanged. `--control-current-representation` remains the trajectory-blind
-`CONTROL` mode. `NORMALIZED_TRAJECTORY_V1` is only a dormant
-`REPRESENTATION_CHALLENGER` capability: a later bounded adapter clones the
-exact CONTROL packet and carries one anonymous histogram beside it. It does
-not rebuild a newer context, inspect current cohort values, or invoke a second
-ordinary Forge search.
+`CONTROL` mode. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
+capability whose adapter is runtime-ready and not executed: it clones the
+exact CONTROL context (Forge context for completed `NO_WORTHY`, critic packet
+when a candidate was selected) and carries one anonymous histogram beside it.
+It does not rebuild a newer context, inspect current cohort values, or invoke
+a second ordinary Forge search.
 
 For read-only routing/status from a supplied synthetic or runtime snapshot use:
 
@@ -63,6 +64,6 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge_representati
 ```
 
 `NORMALIZED_TRAJECTORY_V1_ELIGIBLE` is permission for a separately governed
-one-run comparison, not execution. `IMPLEMENTED_DORMANT_NOT_EXECUTED` means
-the code exists and the probe has not run; it is not alpha, scientific PASS,
-or deployment evidence.
+one-run comparison, not execution. `RUNTIME_READY_NOT_EXECUTED` means the
+seam can build a hash-bound envelope and the probe has not run; it is not
+alpha, scientific PASS, or deployment evidence.

@@ -410,9 +410,9 @@ For a completed CONTROL/general session, operator readout of the CONTROL probe
 branch uses `effective_control_terminal` (`final_session_terminal` when present,
 else `critic_terminal`). F3 still preserves primary `critic_terminal` as C1.
 
-### Dormant representation challenger
+### Representation challenger (runtime-ready, not executed)
 
-The repository also contains the dormant `NORMALIZED_TRAJECTORY_V1` capability.
+The repository also contains the `NORMALIZED_TRAJECTORY_V1` capability.
 Keep the modes distinct:
 
 | Mode | Meaning | Runtime effect |
@@ -444,9 +444,11 @@ are required, not recomputed from an unbound packet. The existing HFIC fixture
 receives explicit representation context beside the unchanged nested CONTROL
 packet; this does not modify the ordinary packet schema or `/hypothesis-forge`.
 
-`IMPLEMENTED_DORMANT_NOT_EXECUTED` is a Git capability terminal: code, contract,
-tests and navigation exist, but no representation probe was executed. It is
-not a scientific PASS, alpha, cohort release, deployment, or product DONE.
+`RUNTIME_READY_NOT_EXECUTED` is a Git capability terminal: a completed
+`NO_WORTHY` CONTROL plus a verified C2 release can produce a hash-bound
+prefix-through-T payload and challenger envelope without a fake critic packet,
+but no representation probe was executed. It is not a scientific PASS, alpha,
+deployment, or product DONE.
 
 ### Forge packet capacity (operational envelope)
 

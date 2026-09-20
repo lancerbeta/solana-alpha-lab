@@ -1,0 +1,65 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-COMPLETION-001",
+  "as_of": "2026-09-20",
+  "task_id": "NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1",
+  "state_change": "RUNTIME_READY_NOT_EXECUTED",
+  "base_main": "6bd0aa1dfe072d281bebd42cf4e7ddbf281b2c26",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "docs/tasks/NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1.md": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/normalized_trajectory_v1_execution_closure/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/normalized_trajectory_v1_execution_closure/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CATALOG_SYNC",
+      "PASS_FOCUSED_SYNTHETIC_FIXTURE_SUITE",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
+    ]
+  },
+  "non_claims": [
+    "NO_PROBE_EXECUTION",
+    "NO_ALPHA",
+    "NO_A2_OR_LATER_SCOPE",
+    "NO_FAKE_CRITIC_PACKET",
+    "NO_SURVIVOR_FILTER_BY_FUTURE",
+    "NO_PROVIDER_CALLS",
+    "NO_ADDENDUM_IMPLEMENTATION",
+    "NO_ENVELOPE_BYTES_IN_GIT"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "generator_code_added": 0,
+    "new_db": 0
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-FACTORY-FIT-001",
+  "as_of": "2026-09-20",
+  "task_id": "NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_RUNTIME_READY_SEAM_NOT_ALPHA",
+    "flexibility_and_history": "PASS_REUSE_EXISTING_V1_PROJECTOR_AND_HFIC_ADAPTER",
+    "context_efficiency": "PASS_EXISTING_SEM_HYPOTHESIS_FORGE_ROUTE",
+    "research_truth": "PASS_FROZEN_PIT_PREFIX_T_AND_FAIL_CLOSED_SCHEDULE",
+    "owner_operability": "PASS_READOUT_STOP_BEFORE_PHRASE_NO_PROBE_COMMAND",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_PROBE_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_NO_YIELD_AS_SCIENTIFIC_N_NO_FAKE_CRITIC"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "A2_COHORT_DATA_ROOT_AND_IMPORT_READBACK_AFTER_MERGE"
+  },
+  "recovery": "Ordinary Git revert of the bounded adapter, tests, capability status and Catalog pins. Do not touch collector, ObservationSchedule seal, runtime, VPS or cohort state.",
+  "limits": [
+    "NO_PROBE_EXECUTION",
+    "NO_ALPHA",
+    "NO_A2_OR_LATER",
+    "NO_ADDENDUM_IMPLEMENTATION",
+    "NO_ENVELOPE_BYTES_IN_GIT",
+    "NO_PROVIDER_OR_DEPLOYMENT"
+  ]
+}

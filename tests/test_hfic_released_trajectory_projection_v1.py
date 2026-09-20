@@ -21,11 +21,13 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
+    INVALID_INSUFFICIENT_YIELD,
     RepresentationProbeError,
     build_challenger_packet,
     control_baseline_from_receipt,
 )
 from solana_alpha_lab.factory.hfic_released_trajectory_projection import (  # noqa: E402
+    CANONICAL_SCHEDULE_UNBOUND,
     INVALID_PROJECTION_PROVENANCE,
     FUTURE_POINT_LEAKAGE,
     MINT_IDENTITY_LEAK,
@@ -43,7 +45,14 @@ from tests.test_hfic_representation_probe import (  # noqa: E402
 )
 
 
-def _write_release(root: Path, *, anchor: datetime, members: int = 10) -> Path:
+def _write_release(
+    root: Path,
+    *,
+    anchor: datetime,
+    members: int = 10,
+    extra_future_only_members: int = 0,
+    with_candidate_state: bool = False,
+) -> Path:
     """Build a production-shaped release directory fixture."""
     import pyarrow as pa
     import pyarrow.parquet as pq
@@ -56,14 +65,15 @@ def _write_release(root: Path, *, anchor: datetime, members: int = 10) -> Path:
     obs_rows = []
     for index in range(members):
         member = f"member-{index:03d}"
-        census_rows.append(
-            {
-                "member_id": member,
-                "mint": f"MINT{index:03d}",
-                "admitted": True,
-                "authoritative_anchor": anchor.isoformat().replace("+00:00", "Z"),
-            }
-        )
+        row = {
+            "member_id": member,
+            "mint": f"MINT{index:03d}",
+            "admitted": True,
+            "authoritative_anchor": anchor.isoformat().replace("+00:00", "Z"),
+        }
+        if with_candidate_state:
+            row["candidate_state"] = "X_ELIGIBLE"
+        census_rows.append(row)
         # Anchor: pool creation (member anchor at).
         anchor_iso = anchor.isoformat().replace("+00:00", "Z")
         obs_rows.append(
@@ -110,6 +120,34 @@ def _write_release(root: Path, *, anchor: datetime, members: int = 10) -> Path:
                         ),
                     }
                 )
+    for extra in range(extra_future_only_members):
+        index = members + extra
+        member = f"member-{index:03d}"
+        extra_row = {
+            "member_id": member,
+            "mint": f"MINT{index:03d}",
+            "admitted": True,
+            "authoritative_anchor": anchor.isoformat().replace("+00:00", "Z"),
+        }
+        if with_candidate_state:
+            extra_row["candidate_state"] = "X_ELIGIBLE"
+        census_rows.append(extra_row)
+        future_at = anchor + timedelta(seconds=3600)
+        obs_rows.append(
+            {
+                "mint": f"MINT{index:03d}",
+                "entity_id": f"MINT{index:03d}",
+                "point_id": "Y3600",
+                "primitive_id": "PRIM-JUPITER-TOKENS-V2-SEARCH-001",
+                "field_id": FIELD_IDS["PRICE"],
+                "value_kind": "NUMERIC",
+                "typed_value": repr(999.0 + extra),
+                "state": "OBSERVED",
+                "missing_reason": None,
+                "event_time": future_at.isoformat(),
+                "first_reliable_available_at": future_at.isoformat(),
+            }
+        )
     census_path = release_root / "census.parquet"
     obs_path = release_root / "observations.parquet"
     pq.write_table(
@@ -121,6 +159,11 @@ def _write_release(root: Path, *, anchor: datetime, members: int = 10) -> Path:
                     ("mint", pa.string()),
                     ("admitted", pa.bool_()),
                     ("authoritative_anchor", pa.string()),
+                    *(
+                        [("candidate_state", pa.string())]
+                        if with_candidate_state
+                        else []
+                    ),
                 ]
             ),
         ),
@@ -216,6 +259,26 @@ class ReleaseProjectionInputReceipt(unittest.TestCase):
                 result["terminal"],
                 "NORMALIZED_TRAJECTORY_V1_RUNTIME_READY_NOT_EXECUTED",
             )
+            payload = result["representation"].payload
+            self.assertEqual(payload["schedule"]["x_allowed_lateness_seconds"], 300)
+            self.assertEqual(
+                payload["pit"]["x_eligibility_lateness_seconds_used"], 300
+            )
+            self.assertTrue(payload["pit"]["lateness_window_does_not_extend_T"])
+
+    def test_corrupt_schedule_artifact_fails_closed(self) -> None:
+        import tempfile
+
+        with tempfile.TemporaryDirectory() as raw:
+            release_root = _write_release(
+                Path(raw), anchor=datetime(2026, 9, 1, tzinfo=UTC)
+            )
+            (release_root / "observation_schedule.json").write_text(
+                "{not-json", encoding="utf-8"
+            )
+            with self.assertRaises(RepresentationProbeError) as raised:
+                resolve_release_projection_input(release_root)
+            self.assertEqual(str(raised.exception), CANONICAL_SCHEDULE_UNBOUND)
 
     def test_provenance_tamper_fails_typed(self) -> None:
         import tempfile
@@ -302,7 +365,7 @@ class ReleaseProjectionGuards(unittest.TestCase):
             payload = json.dumps(result["representation"].payload)
             self.assertIn('"M"', payload)  # missingness stays M
 
-    def test_real_corpus_representation_enters_challenger_adapter(self) -> None:
+    def test_real_corpus_without_scientific_n_cannot_enter_challenger(self) -> None:
         import tempfile
 
         with tempfile.TemporaryDirectory() as raw:
@@ -310,26 +373,21 @@ class ReleaseProjectionGuards(unittest.TestCase):
             result = resolve_release_projection_input(release_root)
             receipt = _control_receipt()
             baseline = control_baseline_from_receipt(receipt)
-            # The readiness path stays the existing one; the non-synthetic
-            # binding must no longer be rejected as FOREIGN.
             readiness = _readiness_for_binding(
                 result["projection_input_receipt"]["corpus_binding"],
                 result["projection_input_receipt"],
             )
-            packet = build_challenger_packet(
-                baseline,
-                result["representation"],
-                cohort_readiness_receipt=readiness,
-                projection_input_receipt=result["projection_input_receipt"],
-                base_x_population_n=result["projection_input_receipt"].get(
-                    "base_x_population_n", result.get("eligible_member_count")
-                ),
+            self.assertNotIn(
+                "base_x_population_n", result["projection_input_receipt"]
             )
-            self.assertEqual(packet["probe_kind"], "REPRESENTATION_CHALLENGER")
-            self.assertEqual(
-                packet["representation_payload_sha256"],
-                result["representation"].payload_sha256,
-            )
+            with self.assertRaises(RepresentationProbeError) as raised:
+                build_challenger_packet(
+                    baseline,
+                    result["representation"],
+                    cohort_readiness_receipt=readiness,
+                    projection_input_receipt=result["projection_input_receipt"],
+                )
+            self.assertEqual(str(raised.exception), INVALID_INSUFFICIENT_YIELD)
 
 
 def _readiness_for_binding(binding: dict, projection_receipt: dict) -> dict:

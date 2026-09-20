@@ -1,4 +1,4 @@
-"""Pure, dormant NORMALIZED_TRAJECTORY_V1 projection.
+"""Pure NORMALIZED_TRAJECTORY_V1 projection.
 
 This module intentionally has no collector, ResearchStore, HFIC, provider, or
 CLI dependency.  It accepts already typed schedule-bound observations and
@@ -354,6 +354,7 @@ class LifecycleSchedule:
     decision_t_due_offset_seconds: int = DECISION_T_DUE_OFFSET_SECONDS
     schedule_sha256: str = _SYNTHETIC_SCHEDULE_SHA256
     activation_id: str = _SYNTHETIC_ACTIVATION_ID
+    x_allowed_lateness_seconds: int = 300
     corpus_binding: LifecycleCorpusBinding | Mapping[str, object] | None = None
     schedule_document: InitVar[Mapping[str, object] | None] = None
 
@@ -386,6 +387,11 @@ class LifecycleSchedule:
             raise NormalizedTrajectoryError("X_DUPLICATES_Y_POINT")
         if any(point <= 0 for point in y_points):
             raise NormalizedTrajectoryError("Y_POINT_INVALID")
+        lateness = _require_int(
+            "x_allowed_lateness_seconds", self.x_allowed_lateness_seconds
+        )
+        if lateness < 0:
+            raise NormalizedTrajectoryError("X_LATENESS_INVALID")
         if not isinstance(self.schedule_sha256, str) or _HASH64_RE.fullmatch(
             self.schedule_sha256
         ) is None:
@@ -426,6 +432,11 @@ class LifecycleSchedule:
                 raise NormalizedTrajectoryError(
                     "SCHEDULE_DOCUMENT_BINDING_MISMATCH"
                 )
+            raw_late = document_x_point.get("allowed_lateness_seconds")
+            if raw_late is not None:
+                lateness = _require_int("x_allowed_lateness_seconds", raw_late)
+                if lateness < 0:
+                    raise NormalizedTrajectoryError("X_LATENESS_INVALID")
             try:
                 expected_schedule_sha256 = canonical_observation_schedule_sha256(
                     schedule_document
@@ -452,6 +463,7 @@ class LifecycleSchedule:
             or binding.activation_id != self.activation_id
         ):
             raise NormalizedTrajectoryError("CORPUS_BINDING_MISMATCH")
+        object.__setattr__(self, "x_allowed_lateness_seconds", lateness)
         object.__setattr__(self, "corpus_binding", binding)
 
     @property
@@ -781,6 +793,11 @@ def project_normalized_trajectory(
             raise NormalizedTrajectoryError("OBSERVATION_SCHEDULE_BINDING_MISMATCH")
         if row.activation_id != bound_schedule.activation_id:
             raise NormalizedTrajectoryError("OBSERVATION_ACTIVATION_BINDING_MISMATCH")
+        if row.due_offset_seconds not in prefix_slots:
+            # Declared future Y is not representation input. A member with only
+            # post-T rows is omitted from the prefix denominator; it does not
+            # fail the cohort.
+            continue
         key = (row.due_offset_seconds, row.field_id)
         if key in grouped[row.member_id]:
             raise NormalizedTrajectoryError("DUPLICATE_TYPED_OBSERVATION")
@@ -791,14 +808,6 @@ def project_normalized_trajectory(
         if len(anchors) != 1:
             raise NormalizedTrajectoryError("MEMBER_ANCHOR_DRIFT")
 
-    future_only_members = sorted(
-        member_id
-        for member_id, rows in grouped.items()
-        if not any(due in prefix_slots for due, _field_id in rows)
-    )
-    if future_only_members:
-        raise NormalizedTrajectoryError("FUTURE_ONLY_MEMBER_NOT_BOUND_TO_PREFIX")
-
     def x_eligible(rows: Mapping[tuple[int, str], TypedLifecycleObservation]) -> bool:
         liquidity = rows.get(
             (bound_schedule.x_due_offset_seconds, FIELD_IDS["LIQUIDITY"])
@@ -806,7 +815,15 @@ def project_normalized_trajectory(
         if liquidity is None:
             return False
         anchor = next(iter(rows.values())).member_anchor_at
-        x_cutoff = anchor + timedelta(seconds=bound_schedule.x_due_offset_seconds)
+        x_cutoff = anchor + timedelta(
+            seconds=bound_schedule.x_due_offset_seconds
+            + bound_schedule.x_allowed_lateness_seconds
+        )
+        t_cutoff = anchor + timedelta(
+            seconds=bound_schedule.decision_t_due_offset_seconds
+        )
+        if x_cutoff > t_cutoff:
+            x_cutoff = t_cutoff
         return _valid_at_cutoff(liquidity, cutoff=x_cutoff) and float(
             liquidity.value
         ) >= MIN_X_LIQUIDITY_USD
@@ -887,6 +904,11 @@ def project_normalized_trajectory(
         else:
             retained[-1] = m_heavy
         retained = sorted(retained, key=motif_rank)
+    used_lateness = min(
+        bound_schedule.x_allowed_lateness_seconds,
+        bound_schedule.decision_t_due_offset_seconds
+        - bound_schedule.x_due_offset_seconds,
+    )
     histogram = [
         {"motif": dict(motif_items), "count": count}
         for motif_items, count in retained
@@ -903,12 +925,17 @@ def project_normalized_trajectory(
             "declared_y_due_offset_seconds": list(bound_schedule.y_due_offset_seconds),
             "prefix_due_offset_seconds": list(prefix_slots),
             "decision_t_due_offset_seconds": bound_schedule.decision_t_due_offset_seconds,
+            "x_allowed_lateness_seconds": bound_schedule.x_allowed_lateness_seconds,
         },
         "pit": {
             "cutoff": "member_anchor_plus_Y1800",
             "first_reliable_available_at_le_cutoff": True,
             "future_points_in_denominator": False,
-            "lateness_window_does_not_extend_T": True,
+            "lateness_window_does_not_extend_T": (
+                bound_schedule.x_due_offset_seconds + used_lateness
+                <= bound_schedule.decision_t_due_offset_seconds
+            ),
+            "x_eligibility_lateness_seconds_used": used_lateness,
         },
         "normalization": {
             "kind": "OWN_HISTORY_LOG_RATIO",
