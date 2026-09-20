@@ -92,6 +92,7 @@ FAIL_OWNER_NEXT = {
     "SCHEDULE_ARTIFACT_MISSING": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_ARTIFACT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_SEMANTIC_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "CENSUS_SCHEDULE_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_PARSER_INVALID": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_PRODUCER_UNBOUND": "STOP_SCHEDULE_PRODUCER_REQUIRED",
     "DATA_ROOT_NON_GIT_CONTEXT": "STOP_USE_GIT_CHECKOUT_OR_EXPLICIT_DATA_ROOT",
@@ -118,7 +119,16 @@ def _resolved_data_root(value: Path | None) -> Path:
 
 
 def _print_import_success(result: object, data_root: Path) -> None:
-    payload: dict[str, object] = {"result": result}
+    owner_result: object = result
+    if isinstance(result, dict):
+        owner_result = dict(result)
+        owner_result.pop("next", None)
+        forge = owner_result.get("forge")
+        if isinstance(forge, dict):
+            forge = dict(forge)
+            forge.pop("next", None)
+            owner_result["forge"] = forge
+    payload: dict[str, object] = {"result": owner_result}
     status = "PASS"
     inner_status = None
     if isinstance(result, dict):
@@ -131,7 +141,9 @@ def _print_import_success(result: object, data_root: Path) -> None:
         if terminal == PASS_ALREADY_PRESENT_EXACT:
             status = PASS_ALREADY_PRESENT_EXACT
     payload["status"] = status
-    payload["readback"] = build_cohort_import_readback(data_root)
+    readback = build_cohort_import_readback(data_root)
+    payload["readback"] = readback
+    payload["next"] = readback["next_owner_action"]
     print(json.dumps(payload, sort_keys=True, default=str))
 
 

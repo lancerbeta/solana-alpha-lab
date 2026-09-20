@@ -190,6 +190,7 @@ class CohortImportReadbackTests(unittest.TestCase):
         self.assertEqual(payload["lineage_integrity"], "DUPLICATE_LINEAGE")
         self.assertEqual(payload["visible_cohorts"][0]["status"], "DUPLICATE")
         self.assertEqual(payload["visible_cohorts"][0]["lineage_count"], 2)
+        self.assertEqual(payload["next_owner_action"], STOP_IDENTITY_CONFLICT)
         self.assertIsNone(payload["visible_cohorts"][0].get("content_sha256"))
 
 
@@ -218,6 +219,10 @@ class ImportLiveCliReadbackTests(unittest.TestCase):
             parser_src,
             r'publish.add_argument\(\s*"--data-root", type=Path, required=True',
         )
+        self.assertIn(
+            '"CENSUS_SCHEDULE_SHA_MISMATCH": "STOP_DO_NOT_IMPORT"',
+            parser_src,
+        )
 
     def test_cli_prints_readback_and_exact_reimport_terminal(self) -> None:
         import importlib.util
@@ -240,6 +245,8 @@ class ImportLiveCliReadbackTests(unittest.TestCase):
             envelope = json.loads(buf.getvalue())
         self.assertEqual(envelope["status"], PASS_ALREADY_PRESENT_EXACT)
         self.assertEqual(envelope["readback"]["schema"], "smial.cohort-import-readback")
+        self.assertEqual(envelope["next"], envelope["readback"]["next_owner_action"])
+        self.assertNotIn("next", envelope["result"])
         self.assertNotIn("C:\\", json.dumps(envelope["readback"]))
 
     def test_cli_data_root_error_is_typed_json(self) -> None:
@@ -267,6 +274,104 @@ class ImportLiveCliReadbackTests(unittest.TestCase):
         self.assertEqual(payload["status"], "FAIL")
         self.assertEqual(payload["code"], "DATA_ROOT_NON_GIT_CONTEXT")
         self.assertEqual(payload["next"], "STOP_USE_GIT_CHECKOUT_OR_EXPLICIT_DATA_ROOT")
+
+
+class ExactReimportLineageTests(unittest.TestCase):
+    def test_second_exact_import_keeps_lineage_count_one(self) -> None:
+        from contextlib import redirect_stdout
+        from datetime import timedelta
+        from io import StringIO
+
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            import_live_cohort,
+        )
+        from tests.test_live_cohort_to_forge_operational_closure_v1 import (
+            AS_OF_C1,
+            C1_ADMIT,
+            COHORT1,
+            PRODUCER_A,
+            PUBLISH_C1,
+            _entity,
+            _schedule,
+            _seed_ops,
+        )
+        from tests.test_self_contained_live_cohort_release_v1 import (
+            _build_and_seal,
+            _seed_rdp,
+        )
+
+        schedule = _schedule(ROOT)
+        digest = schedule["schedule_sha256"]
+        members = [_entity("A", i) for i in range(3)]
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            observation_rdp = base / "observation_rdp"
+            observation_rdp.mkdir()
+            ops = base / "ops.sqlite"
+            release = base / "release"
+            data_root = base / "data_plane"
+            data_root.mkdir()
+            _seed_rdp(
+                observation_rdp,
+                schedule=schedule,
+                entities=members,
+                admission=C1_ADMIT,
+                producer=PRODUCER_A,
+                now=PUBLISH_C1,
+            )
+            _seed_ops(ops, digest=digest, cohort1=members, cohort2=[])
+            _build_and_seal(
+                observation_rdp=observation_rdp,
+                ops=ops,
+                digest=digest,
+                cohort_id=COHORT1,
+                as_of=AS_OF_C1,
+                release_root=release,
+            )
+            first = import_live_cohort(
+                release_root=release,
+                data_root=data_root,
+                import_time=AS_OF_C1 + timedelta(hours=1),
+            )
+            second = import_live_cohort(
+                release_root=release,
+                data_root=data_root,
+                import_time=AS_OF_C1 + timedelta(hours=2),
+            )
+            self.assertEqual(first["status"], "IMPORTED")
+            self.assertEqual(second["status"], "IDEMPOTENT_REIMPORT")
+            after_first = build_cohort_import_readback(data_root)
+            after_second = build_cohort_import_readback(data_root)
+            counts_first = {
+                item["cohort_id"]: item["lineage_count"]
+                for item in after_first["visible_cohorts"]
+            }
+            counts_second = {
+                item["cohort_id"]: item["lineage_count"]
+                for item in after_second["visible_cohorts"]
+            }
+            self.assertEqual(counts_first[COHORT1], 1)
+            self.assertEqual(counts_second[COHORT1], 1)
+            self.assertEqual(after_second["duplicate_cohort_count"], 0)
+            import importlib.util
+
+            spec = importlib.util.spec_from_file_location(
+                "discovery_evidence_release_cli_a2_reimport",
+                ROOT / "scripts" / "discovery_evidence_release.py",
+            )
+            assert spec is not None and spec.loader is not None
+            cli = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(cli)
+            buf = StringIO()
+            with redirect_stdout(buf):
+                cli._print_import_success(second, data_root)
+            envelope = json.loads(buf.getvalue())
+        self.assertEqual(envelope["status"], PASS_ALREADY_PRESENT_EXACT)
+        self.assertEqual(envelope["next"], "STOP_BEFORE_HYPOTHESIS_FORGE")
+        self.assertEqual(
+            envelope["readback"]["visible_cohorts"][0]["lineage_count"],
+            1,
+        )
 
 
 if __name__ == "__main__":

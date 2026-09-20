@@ -75,11 +75,12 @@ def build_cohort_import_readback(
         )
 
     integrity = "PASS" if duplicate_count == 0 else "DUPLICATE_LINEAGE"
-    next_action = (
-        "STOP_BEFORE_HYPOTHESIS_FORGE"
-        if visible and integrity == "PASS"
-        else "IMPORT_VERIFIED_RELEASE"
-    )
+    if not visible:
+        next_action = "IMPORT_VERIFIED_RELEASE"
+    elif integrity == "PASS":
+        next_action = "STOP_BEFORE_HYPOTHESIS_FORGE"
+    else:
+        next_action = STOP_IDENTITY_CONFLICT
     return {
         "schema": "smial.cohort-import-readback",
         "schema_version": "1.0",

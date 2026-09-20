@@ -606,7 +606,10 @@ Omit `--data-root` to land in the Git principal checkout
 `local/factory_v1/data_plane`. Success prints one
 `smial.cohort-import-readback`. Exact already-imported lineage is
 `PASS_ALREADY_PRESENT_EXACT`. That readback is the owner import terminal.
-The next command is an expert diagnostic, not an obligatory owner step.
+Do not run Forge. `readback.next_owner_action` is
+`STOP_BEFORE_HYPOTHESIS_FORGE` when lineage is present once.
+
+Expert diagnostic only (not the owner next step after import):
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
@@ -624,8 +627,9 @@ preconditions fail. Optional `--imported-cohort-id` checks that exact
 cohort appears in lineage; do not paste the placeholder `REL-...`.
 
 Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
-`PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
-`LOW_YIELD`, `IMPORT_CONFLICT`, `SOURCE_BUILD_RESOURCE_LIMIT`,
+`PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `IMPORT_CONFLICT`,
+`STOP_IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
+`LOW_YIELD`, `SOURCE_BUILD_RESOURCE_LIMIT`,
 `DATASET_PUBLICATION_INCOMPLETE`, `LIVE_CORPUS_PARQUET_SYMLINK`,
 `CORPUS_PARQUET_SHA_MISMATCH`. Typed FAIL JSON includes `next`. `LOW_YIELD`
 is raised before import when projected cumulative yield is below

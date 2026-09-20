@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: ca4431e6376e5e694d3c34fe175d8fee061ba739c2367b86032ed1a56110f300}
+  integrity: {kind: sha256, sha256: 24cdf680533e179fe00b45eb7ceaf9efbe940b19e45a4b6c2d86abded0135ea7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -33403,7 +33403,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: DISCOVERY_EVIDENCE_RELEASE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/discovery_evidence_release.py', repository_path: scripts/discovery_evidence_release.py}
-  integrity: {kind: sha256, sha256: 2b93d8fc82a0cde8938352ae4f36f5bf053d32be63bdfa06eaea50551ddef20d}
+  integrity: {kind: sha256, sha256: 96b2938a05cfcadf717480095e5f4d6c2296d8ee6452bd51638ab90dafd89e84}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DISCOVERY-EVIDENCE-RELEASE-BRIDGE-001}
@@ -34116,7 +34116,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_live_cohort_to_forge_operational_closure_v1.py', repository_path: tests/test_live_cohort_to_forge_operational_closure_v1.py}
-  integrity: {kind: sha256, sha256: 8d4bd873a61df17c9515c2ccf3eb0f4e65ebebd89637c12c21b00fc6f23ddd95}
+  integrity: {kind: sha256, sha256: 580426a386b5db99c0bc39941b3d485582a47f490ca19135337bad09781545e7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37847,7 +37847,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/cohort_import_readback.py', repository_path: src/solana_alpha_lab/factory/cohort_import_readback.py}
-  integrity: {kind: sha256, sha256: 641a513b68e5e9ff1ed9b3abf3545a5f7e9017fca30a67948eb20c8d9e454f5f}
+  integrity: {kind: sha256, sha256: bc534a5ac0f092dd7257c62a025f1224f1f9960bfdd1c4b28151cfd74531f5c9}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001}
@@ -37866,7 +37866,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_cohort_data_root_and_import_readback_v1.py', repository_path: tests/test_cohort_data_root_and_import_readback_v1.py}
-  integrity: {kind: sha256, sha256: b9386633c2fb57418e40126fda36ed09b4a795b3eb701c70c5044e026a8a4e30}
+  integrity: {kind: sha256, sha256: a51a216ba648e72665fa5dc173c2b504e09be2de4cec0d9270eb1e727d28fd0c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001}
