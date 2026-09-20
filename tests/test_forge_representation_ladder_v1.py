@@ -31,6 +31,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     freeze_draft,
     persist_frozen_session,
     persist_no_worthy_session,
+    finalize_session,
 )
 from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
     CONTROL_CONTEXT_KIND_FORGE,
@@ -109,6 +110,9 @@ def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, objec
         "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
         "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
         "vision_integrity": {"status": "PASS"},
+        "ladder_representation_id": "BASE",
+        "visible_cohort_ids": ["REL-C1", "REL-C2"],
+        "bound_visible_cohort_ids": ["REL-C1", "REL-C2"],
     }
     digest = persist_forge_context_packet(
         data_root,
@@ -468,6 +472,64 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertEqual(decision["next_action"], "START_SYNTHETIC_LATER_V2")
 
+    def test_completed_later_representation_is_not_restarted(self) -> None:
+        registry = load_ladder_registry()
+        extra = list(registry["representations"])
+        extra.append(
+            {
+                "id": "SYNTHETIC_LATER_V2",
+                "version": "1.0",
+                "order": 3,
+                "status": "ACTIVE",
+                "reuse_class": "CHALLENGER",
+                "handler": HANDLER_SYNTHETIC_LATER_V2,
+                "trigger_terminals": ["NO_WORTHY_HYPOTHESIS"],
+            }
+        )
+        registry = {**registry, "representations": extra}
+        passed = resolve_next_action(
+            [
+                _base(),
+                _v1(
+                    execution_status=EXEC_EXECUTED,
+                    effective_terminal="NO_WORTHY_HYPOTHESIS",
+                    stage_ref_sha256="aa" * 32,
+                ),
+                {
+                    "representation_id": "SYNTHETIC_LATER_V2",
+                    "execution_status": EXEC_EXECUTED,
+                    "effective_terminal": "PASS_FAST_LANE_READY",
+                    "input_scope": "REPRESENTATION_RELEASE_LOCAL",
+                    "stage_ref_sha256": "bb" * 32,
+                    "session_state": "SYNTHESIS_COMPLETE",
+                },
+            ],
+            registry=registry,
+        )
+        self.assertEqual(passed["next_action"], ACTION_OWNER_CANDIDATE)
+        self.assertNotEqual(passed["next_action"], "START_SYNTHETIC_LATER_V2")
+        exhausted = resolve_next_action(
+            [
+                _base(),
+                _v1(
+                    execution_status=EXEC_EXECUTED,
+                    effective_terminal="NO_WORTHY_HYPOTHESIS",
+                    stage_ref_sha256="aa" * 32,
+                ),
+                {
+                    "representation_id": "SYNTHETIC_LATER_V2",
+                    "execution_status": EXEC_EXECUTED,
+                    "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+                    "input_scope": "REPRESENTATION_RELEASE_LOCAL",
+                    "stage_ref_sha256": "bb" * 32,
+                    "session_state": "SYNTHESIS_COMPLETE",
+                },
+            ],
+            registry=registry,
+        )
+        self.assertEqual(exhausted["next_action"], ACTION_SEARCH_EXHAUSTED)
+        self.assertNotEqual(exhausted["next_action"], "START_SYNTHETIC_LATER_V2")
+
 
 class ScopeAndPersistenceTests(unittest.TestCase):
     def test_used_cohorts_are_not_all_visible_cohorts(self) -> None:
@@ -636,6 +698,8 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("consume_start_v1_envelope", skill)
         self.assertIn("FORGE_CONTEXT_PACKET", skill)
         self.assertIn("no fake critic", skill)
+        self.assertIn("re-run `forge-run`", skill.lower())
+        self.assertNotIn("dormant wiring", skill)
         self.assertIn("FORGE_CONTEXT_PACKET", command)
         self.assertIn("FORGE_CONTEXT_PACKET", operator)
         self.assertNotIn("Then branch on preflight action (step 2)", skill.split("forge-run")[0])
@@ -912,6 +976,325 @@ class DisposableFreezeFinalizeE2ETests(unittest.TestCase):
         self.assertNotEqual(first["input_receipt_sha256"], second["input_receipt_sha256"])
         self.assertEqual(first["next_action"], ACTION_START_V1)
         self.assertEqual(second["next_action"], ACTION_START_V1)
+
+
+def _v1_preflight(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    control_session_id: str,
+    cohorts: list[str] | None = None,
+) -> dict[str, object]:
+    git = repository_git_snapshot(ROOT)
+    packet = {
+        "schema": "smial.forge-context-packet",
+        "owner_focus": "AUTO",
+        "evidence_epoch_sha256": "aa" * 32,
+        "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+        "vision_integrity": {"status": "PASS"},
+        "ladder_representation_id": "NORMALIZED_TRAJECTORY_V1",
+        "visible_cohort_ids": list(cohorts or ["REL-C2"]),
+        "bound_visible_cohort_ids": list(cohorts or ["REL-C2"]),
+        "control_session_id": control_session_id,
+    }
+    digest = persist_forge_context_packet(
+        data_root, packet, store=store, repo_root=ROOT
+    )
+    return {
+        "receipt_id": "HFIC-PREFLIGHT-V1-FIXTURE-001",
+        "evidence_epoch_sha256": "aa" * 32,
+        "focus_key_sha256": "bb" * 32,
+        "search_key_sha256": "dd" * 32,
+        "owner_focus": "AUTO",
+        "live_git_head": git.head_sha.lower(),
+        "git_composite_sha256": git.composite_sha256,
+        "session_started_at": "2026-08-27T12:00:00Z",
+        "forge_context_packet_sha256": digest,
+        "forge_context_packet": packet,
+    }
+
+
+def _v2_preflight(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    control_session_id: str,
+) -> dict[str, object]:
+    git = repository_git_snapshot(ROOT)
+    packet = {
+        "schema": "smial.forge-context-packet",
+        "owner_focus": "AUTO",
+        "evidence_epoch_sha256": "aa" * 32,
+        "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+        "vision_integrity": {"status": "PASS"},
+        "ladder_representation_id": "SYNTHETIC_LATER_V2",
+        "visible_cohort_ids": ["REL-C2"],
+        "bound_visible_cohort_ids": ["REL-C2"],
+        "control_session_id": control_session_id,
+    }
+    digest = persist_forge_context_packet(
+        data_root, packet, store=store, repo_root=ROOT
+    )
+    return {
+        "receipt_id": "HFIC-PREFLIGHT-V2-FIXTURE-001",
+        "evidence_epoch_sha256": "aa" * 32,
+        "focus_key_sha256": "bb" * 32,
+        "search_key_sha256": "ee" * 32,
+        "owner_focus": "AUTO",
+        "live_git_head": git.head_sha.lower(),
+        "git_composite_sha256": git.composite_sha256,
+        "session_started_at": "2026-08-27T12:00:00Z",
+        "forge_context_packet_sha256": digest,
+        "forge_context_packet": packet,
+    }
+
+
+def _distinct_no_worthy_draft(*, label: str) -> dict[str, object]:
+    draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
+    for card in draft.get("candidates") or []:
+        if isinstance(card, dict):
+            claim = str(card.get("claim") or "")
+            card["claim"] = f"{label} {claim}".strip()
+    return draft
+
+
+def _later_registry() -> dict[str, object]:
+    registry = load_ladder_registry()
+    extra = list(registry["representations"])
+    extra.append(
+        {
+            "id": "SYNTHETIC_LATER_V2",
+            "version": "1.0",
+            "order": 3,
+            "status": "ACTIVE",
+            "reuse_class": "CHALLENGER",
+            "handler": HANDLER_SYNTHETIC_LATER_V2,
+            "trigger_terminals": ["NO_WORTHY_HYPOTHESIS"],
+        }
+    )
+    return {**registry, "representations": extra}
+
+
+class ProductionPathAcceptanceTests(unittest.TestCase):
+    def _no_worthy_base(self, data_root: Path, store: ResearchStore) -> dict[str, object]:
+        draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
+        preflight = _control_preflight(data_root, store)
+        frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
+        persist_no_worthy_session(
+            store,
+            frozen,
+            repo_root=ROOT,
+            identities=assign_portfolio_ids(draft["candidates"]),
+            draft=draft,
+            preflight_receipt=preflight,
+        )
+        store.rebuild_projection()
+        return frozen
+
+    def test_f1_historical_control_does_not_inherit_later_visible_cohorts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            frozen = self._no_worthy_base(data_root, store)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                matched = evaluate_forge_run(ROOT, data_root, persist=False)
+            self.assertEqual(matched["control_session_id"], frozen["session_id"])
+            self.assertEqual(matched["next_action"], ACTION_START_V1)
+            self.assertEqual(matched["stages"][0]["used_cohort_ids"], ["REL-C1", "REL-C2"])
+            self.assertEqual(matched["stages"][0]["execution_status"], EXEC_REUSED)
+            lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
+            payload = json.loads(lineage_path.read_text(encoding="utf-8"))
+            payload["cohorts"].append(
+                {"cohort_id": "REL-C3", "release_id": "rel-c3", "source_sha256": "cc" * 32}
+            )
+            lineage_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+
+            def _enumerate_c3(_data_root: Path):
+                live = _enumerate_live(_data_root)[0]
+                extra = dict(live[0])
+                extra["dataset_manifest_id"] = "MID-C3"
+                extra["labels"] = {
+                    **dict(extra.get("labels") or {}),
+                    "cohort_id": "REL-C3",
+                }
+                return [*live, extra], []
+
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_c3,
+            ):
+                drifted = evaluate_forge_run(ROOT, data_root, persist=False)
+                alt_focus = evaluate_forge_run(
+                    ROOT, data_root, persist=False, owner_focus="ALT"
+                )
+        self.assertNotIn("REL-C3", drifted["stages"][0]["used_cohort_ids"])
+        self.assertNotEqual(drifted["stages"][0]["execution_status"], EXEC_REUSED)
+        self.assertNotEqual(drifted["next_action"], ACTION_SEARCH_EXHAUSTED)
+        self.assertIsNone(alt_focus["control_session_id"])
+        self.assertEqual(alt_focus["next_action"], ACTION_START_BASE)
+
+    def test_f2_v1_candidate_from_real_artifacts_then_readback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=True)
+            self.assertEqual(started["next_action"], ACTION_START_V1)
+            self.assertEqual(started["writes"]["forge_run"], 1)
+            envelope = consume_start_v1_envelope(
+                {"next_action": started["next_action"], "owner_final": started["owner_final"]},
+                control_receipt=_no_worthy_forge_receipt(),
+                representation=_representation_fixture(),
+                cohort_readiness_receipt=_cohort_readiness_receipt(),
+                base_x_population_n=10,
+            )
+            self.assertFalse(envelope["fake_critic_packet"])
+            draft = valid_draft()
+            v1_pre = _v1_preflight(data_root, store, control_session_id=str(base["session_id"]))
+            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                mid = evaluate_forge_run(ROOT, data_root, persist=True)
+            self.assertEqual(mid["next_action"], ACTION_RESUME_V1)
+            self.assertEqual(mid["run_identity_sha256"], started["run_identity_sha256"])
+            self.assertEqual(mid["writes"]["forge_run"], 1)
+            packet = frozen["critic_input_packet"]
+            assert isinstance(packet, dict)
+            done = finalize_session(
+                frozen,
+                critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                finished = evaluate_forge_run(ROOT, data_root, persist=True)
+                retry = evaluate_forge_run(ROOT, data_root, persist=False)
+        v1 = next(
+            row
+            for row in finished["stages"]
+            if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
+        )
+        self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
+        self.assertEqual(finished["writes"]["forge_run"], 1)
+        self.assertEqual(v1["session_id"], frozen["session_id"])
+        self.assertIsInstance(v1["stage_ref_sha256"], str)
+        self.assertEqual(len(str(v1["stage_ref_sha256"])), 64)
+        self.assertEqual(v1["used_cohort_ids"], ["REL-C2"])
+        self.assertNotEqual(v1["used_cohort_ids"], finished["visible_cohort_ids"])
+        self.assertIn("candidate:", finished["owner_readout"])
+        self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
+        self.assertEqual(retry["run_identity_sha256"], started["run_identity_sha256"])
+        self.assertEqual(done["session_id"], frozen["session_id"])
+
+    def test_f2_v1_negative_exhaustion_then_retry_readback(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store)
+            draft = _distinct_no_worthy_draft(label="V1")
+            v1_pre = _v1_preflight(data_root, store, control_session_id=str(base["session_id"]))
+            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=v1_pre,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                finished = evaluate_forge_run(ROOT, data_root, persist=True)
+                retry = evaluate_forge_run(ROOT, data_root, persist=False)
+        v1 = next(
+            row
+            for row in finished["stages"]
+            if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
+        )
+        self.assertEqual(finished["next_action"], ACTION_SEARCH_EXHAUSTED)
+        self.assertEqual(v1["effective_terminal"], "NO_WORTHY_HYPOTHESIS")
+        self.assertEqual(v1["session_id"], frozen["session_id"])
+        self.assertIsInstance(v1["stage_ref_sha256"], str)
+        self.assertIn("NOT_RUN_NO_SELECTED_CANDIDATE", finished["owner_readout"])
+        self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
+
+    def test_f3_completed_v2_is_not_restarted_on_normal_entry(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store)
+            v1_draft = _distinct_no_worthy_draft(label="V1")
+            v1_pre = _v1_preflight(data_root, store, control_session_id=str(base["session_id"]))
+            v1_frozen = freeze_draft(v1_draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_no_worthy_session(
+                store,
+                v1_frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(v1_draft["candidates"]),
+                draft=v1_draft,
+                preflight_receipt=v1_pre,
+            )
+            v2_draft = valid_draft()
+            v2_pre = _v2_preflight(data_root, store, control_session_id=str(base["session_id"]))
+            v2_frozen = freeze_draft(v2_draft, preflight_receipt=v2_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                v2_frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(v2_draft["candidates"]),
+                draft=v2_draft,
+            )
+            packet = v2_frozen["critic_input_packet"]
+            assert isinstance(packet, dict)
+            finalize_session(
+                v2_frozen,
+                critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            store.rebuild_projection()
+            registry = _later_registry()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                finished = evaluate_forge_run(
+                    ROOT, data_root, persist=True, registry=registry
+                )
+                retry = evaluate_forge_run(
+                    ROOT, data_root, persist=False, registry=registry
+                )
+        self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
+        self.assertNotEqual(finished["next_action"], "START_SYNTHETIC_LATER_V2")
+        self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
 
 
 if __name__ == "__main__":

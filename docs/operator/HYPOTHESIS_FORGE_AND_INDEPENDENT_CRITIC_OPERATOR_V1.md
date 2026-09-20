@@ -213,7 +213,9 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
    C2 packet, затем `finalize`. C2 `REVISE_ONCE` не вызывает `revise`.
    If `forge-run` next is still `START_V1` after BASE `NO_WORTHY`, the evening
    path continues the CONTROL `FORGE_CONTEXT_PACKET` envelope (no fake critic;
-   do not launch Critic on empty BASE). That is not the scientific V1 probe.
+   do not launch Critic on empty BASE). After a V1 freeze/finalize, re-run
+   `forge-run` so the aggregate reads the real V1 artifacts. That is not the
+   scientific V1 probe.
    `RESUME_V1` reuses `--saved-draft-sha256`, not a new START envelope.
    Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` или
    `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: это BLOCKED, не crash. Session не

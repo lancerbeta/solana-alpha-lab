@@ -79,8 +79,9 @@ Then resolve the bounded run. Print `owner_readout` first (`status:` DONE / NEXT
 `START_V1` auto-advances; do **not** run ordinary Prompt A for that next.
 Owner pastes nothing. Same slash continues the V1 envelope via
 `consume_start_v1_envelope` on CONTROL `FORGE_CONTEXT_PACKET` (no fake critic).
-That wiring does not execute the scientific V1 probe. Do not launch Critic on
-empty BASE. `RESUME_V1` uses `--saved-draft-sha256`, not the START helper.
+Freeze/Critic only after a V1 candidate exists (fixture stubs allowed), then
+re-run `forge-run` to read real V1 artifacts. That wiring does not execute the
+scientific V1 probe. Do not launch Critic on empty BASE. `RESUME_V1` uses `--saved-draft-sha256`, not the START helper.
 Prompt C `WAIT` is not the owner-final while V1 is eligible.
 `RETURN_EXISTING_RUN` is readback. Session `RETURN_EXISTING_SESSION` does not
 mask `START_V1`. Resume a saved draft with `--saved-draft-sha256`. Persist on

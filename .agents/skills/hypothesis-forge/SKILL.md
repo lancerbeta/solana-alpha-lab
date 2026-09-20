@@ -140,10 +140,13 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      Do **not** run ordinary Prompt A / `START_NEW_SESSION`. Print `owner_readout`
      (`status: NEXT`). Owner pastes nothing. Same slash continues V1 envelope
      construction via `consume_start_v1_envelope` on the CONTROL
-     `FORGE_CONTEXT_PACKET` (no fake critic packet). That is dormant wiring,
-     not Prompt A on market evidence and not the scientific V1 probe. Do **not**
-     launch Independent Critic on empty BASE. Freeze/Critic only after a V1
-     candidate exists on that envelope (fixture stubs allowed).
+     `FORGE_CONTEXT_PACKET` (no fake critic packet). Freeze/Critic only after a
+     V1 candidate exists on that envelope (fixture stubs allowed). After
+     freeze/finalize, re-run `forge-run` so the aggregate reads the real V1
+     session artifacts; do not inject completed stages. That is the production
+     adapter for a later authorized slash, not Prompt A on market evidence and
+     not the scientific V1 probe. Do **not** launch Independent Critic on empty
+     BASE.
      Do not stop as if Prompt C `WAIT_FOR_NEW_EVIDENCE` were the owner-final.
      Do not ask the owner to «продолжить».
    - `RESUME_V1` resumes the saved V1 draft (`--saved-draft-sha256` /

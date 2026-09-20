@@ -45,8 +45,10 @@ from solana_alpha_lab.factory.hfic_representation_probe import (
 from solana_alpha_lab.factory.hfic_session import (
     RUNNER_UP_AWAITING_CRITIC,
     RUNNER_UP_REVISION_REQUIRED,
+    focus_key_sha256,
     list_hfic_sessions,
     load_session_bundle,
+    pick_session,
 )
 from solana_alpha_lab.factory.research_store import (
     RecordKind,
@@ -61,6 +63,7 @@ SCHEMA_VERSION = "1.0"
 LADDER_CONFIG_RELATIVE = "configs/hfic_representation_ladder_v1.yaml"
 FORGE_RUN_ARTIFACT_KIND = "FORGE_RUN_RECEIPT"
 EXISTING_V1_CONTROL_SESSION_ID = "HFIC-SESS-4F80F1151844EC1B"
+LADDER_REPRESENTATION_PACKET_KEY = "ladder_representation_id"
 DEFAULT_REGISTRY_PATH = Path(__file__).resolve().parents[3] / LADDER_CONFIG_RELATIVE
 RECEIPT_SCHEMA_PATH = (
     Path(__file__).resolve().parents[3]
@@ -203,6 +206,122 @@ def _validator() -> Draft202012Validator:
     return _RECEIPT_VALIDATOR
 
 
+def _start_action(representation_id: str) -> str:
+    if representation_id == "NORMALIZED_TRAJECTORY_V1":
+        return ACTION_START_V1
+    return f"START_{representation_id}"
+
+
+def _resume_action(representation_id: str) -> str:
+    if representation_id == "NORMALIZED_TRAJECTORY_V1":
+        return ACTION_RESUME_V1
+    return f"RESUME_{representation_id}"
+
+
+def _terminal_codes(representation_id: str) -> tuple[str, str, str]:
+    if representation_id == "NORMALIZED_TRAJECTORY_V1":
+        return ("V1_TERMINAL_MISSING", "V1_TERMINAL_UNMATCHED", "V1_STAGE_REF_MISSING")
+    return ("STAGE_TERMINAL_MISSING", "STAGE_TERMINAL_UNMATCHED", "STAGE_REF_MISSING")
+
+
+def _consume_representation_chain(
+    *,
+    registry: Mapping[str, Any],
+    stage_map: Mapping[str, Mapping[str, Any]],
+    start_id: str,
+    saved_draft_sha256: str | None,
+) -> dict[str, Any]:
+    current_id = start_id
+    while current_id:
+        stage = stage_map.get(current_id)
+        status = str((stage or {}).get("execution_status") or EXEC_NOT_RUN)
+        if stage is None or status == EXEC_NOT_RUN:
+            if saved_draft_sha256:
+                return {
+                    "next_action": _resume_action(current_id),
+                    "owner_final": None,
+                    "reason_code": "SAVED_DRAFT_PRESENT",
+                    "draft_sha256": saved_draft_sha256,
+                }
+            start = _start_action(current_id)
+            return {
+                "next_action": start,
+                "owner_final": None,
+                "reason_code": start,
+            }
+        terminal = stage.get("effective_terminal")
+        state = str(stage.get("session_state") or "")
+        missing, unmatched, ref_missing = _terminal_codes(current_id)
+        if status == EXEC_BLOCKED:
+            return {
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "reason_code": str(stage.get("reason_code") or ACTION_OBSERVABILITY_BLOCKED),
+            }
+        if isinstance(terminal, str) and (
+            terminal in PASS_TERMINALS or terminal in CASE_A_TERMINALS
+        ):
+            return {
+                "next_action": ACTION_OWNER_CANDIDATE,
+                "owner_final": ACTION_OWNER_CANDIDATE,
+                "reason_code": terminal,
+            }
+        if state in RESUME_STATES:
+            return {
+                "next_action": _resume_action(current_id),
+                "owner_final": None,
+                "reason_code": state,
+                "draft_sha256": saved_draft_sha256 or stage.get("draft_sha256"),
+            }
+        if state in PAUSE_STATES:
+            return {
+                "next_action": ACTION_KEEP_PAUSE,
+                "owner_final": ACTION_KEEP_PAUSE,
+                "reason_code": state,
+            }
+        if isinstance(terminal, str) and terminal in CASE_C_KILL_TERMINALS:
+            return {
+                "next_action": ACTION_NON_SCIENTIFIC_STOP,
+                "owner_final": ACTION_NON_SCIENTIFIC_STOP,
+                "reason_code": terminal,
+            }
+        if status in {EXEC_EXECUTED, EXEC_REUSED} and not isinstance(terminal, str):
+            return {
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "reason_code": missing,
+            }
+        next_rep = _next_active_after(registry, current_id, str(terminal or ""))
+        if next_rep is not None:
+            current_id = next_rep
+            continue
+        if not isinstance(terminal, str) or terminal not in (
+            KNOWN_SCIENTIFIC_NEGATIVES | CASE_C_KILL_TERMINALS | PASS_TERMINALS
+        ):
+            return {
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "reason_code": unmatched,
+            }
+        stage_ref = stage.get("stage_ref_sha256")
+        if not isinstance(stage_ref, str) or len(stage_ref) != 64:
+            return {
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "reason_code": ref_missing,
+            }
+        return {
+            "next_action": ACTION_SEARCH_EXHAUSTED,
+            "owner_final": ACTION_SEARCH_EXHAUSTED,
+            "reason_code": terminal,
+        }
+    return {
+        "next_action": ACTION_SEARCH_EXHAUSTED,
+        "owner_final": ACTION_SEARCH_EXHAUSTED,
+        "reason_code": "NO_ELIGIBLE_NEXT_REPRESENTATION",
+    }
+
+
 def resolve_next_action(
     stages: Sequence[Mapping[str, Any]],
     *,
@@ -258,13 +377,6 @@ def resolve_next_action(
             "owner_final": ACTION_OBSERVABILITY_BLOCKED,
             "reason_code": str(base.get("reason_code") or ACTION_OBSERVABILITY_BLOCKED),
         }
-    if base_state in RESUME_STATES:
-        return {
-            "next_action": ACTION_RESUME_BASE,
-            "owner_final": None,
-            "reason_code": base_state,
-            "draft_sha256": saved_draft_sha256 or base.get("draft_sha256"),
-        }
     if (
         base.get("runner_up_candidate_id")
         and base_state == RUNNER_UP_AWAITING_CRITIC
@@ -281,11 +393,20 @@ def resolve_next_action(
             "owner_final": ACTION_KEEP_PAUSE if action == ACTION_KEEP_PAUSE else None,
             "reason_code": base_state or str(base_terminal),
         }
-    if isinstance(base_terminal, str) and base_terminal in PASS_TERMINALS:
+    if isinstance(base_terminal, str) and (
+        base_terminal in PASS_TERMINALS or base_terminal in CASE_A_TERMINALS
+    ):
         return {
             "next_action": ACTION_OWNER_CANDIDATE,
             "owner_final": ACTION_OWNER_CANDIDATE,
             "reason_code": base_terminal,
+        }
+    if base_state in RESUME_STATES:
+        return {
+            "next_action": ACTION_RESUME_BASE,
+            "owner_final": None,
+            "reason_code": base_state,
+            "draft_sha256": saved_draft_sha256 or base.get("draft_sha256"),
         }
     if isinstance(base_terminal, str) and (
         base_terminal in CASE_C_KILL_TERMINALS or base_terminal == "KILL_UNBOUND_EVIDENCE"
@@ -295,15 +416,8 @@ def resolve_next_action(
             "owner_final": ACTION_NON_SCIENTIFIC_STOP,
             "reason_code": base_terminal,
         }
-    if isinstance(base_terminal, str) and base_terminal in CASE_A_TERMINALS:
-        return {
-            "next_action": ACTION_OWNER_CANDIDATE,
-            "owner_final": ACTION_OWNER_CANDIDATE,
-            "reason_code": base_terminal,
-        }
 
     v1_row = by_id.get("NORMALIZED_TRAJECTORY_V1")
-    v1_stage = stage_map.get("NORMALIZED_TRAJECTORY_V1")
     if (
         v1_row
         and v1_row["status"] == "ACTIVE"
@@ -317,90 +431,12 @@ def resolve_next_action(
                 "owner_final": ACTION_CONTROL_REQUIRED,
                 "reason_code": "CONTROL_REQUIRED",
             }
-        if v1_stage is None or str(v1_stage.get("execution_status") or EXEC_NOT_RUN) == EXEC_NOT_RUN:
-            if saved_draft_sha256:
-                return {
-                    "next_action": ACTION_RESUME_V1,
-                    "owner_final": None,
-                    "reason_code": "SAVED_DRAFT_PRESENT",
-                    "draft_sha256": saved_draft_sha256,
-                }
-            return {
-                "next_action": ACTION_START_V1,
-                "owner_final": None,
-                "reason_code": ACTION_START_V1,
-            }
-        v1_status = str(v1_stage.get("execution_status") or EXEC_NOT_RUN)
-        v1_terminal = v1_stage.get("effective_terminal")
-        if v1_status == EXEC_BLOCKED:
-            return {
-                "next_action": ACTION_OBSERVABILITY_BLOCKED,
-                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
-                "reason_code": str(
-                    v1_stage.get("reason_code") or ACTION_OBSERVABILITY_BLOCKED
-                ),
-            }
-        v1_state = str(v1_stage.get("session_state") or "")
-        if v1_state in RESUME_STATES:
-            return {
-                "next_action": ACTION_RESUME_V1,
-                "owner_final": None,
-                "reason_code": v1_state,
-                "draft_sha256": saved_draft_sha256 or v1_stage.get("draft_sha256"),
-            }
-        if v1_state in PAUSE_STATES:
-            return {
-                "next_action": ACTION_KEEP_PAUSE,
-                "owner_final": ACTION_KEEP_PAUSE,
-                "reason_code": v1_state,
-            }
-        if isinstance(v1_terminal, str) and v1_terminal in PASS_TERMINALS:
-            return {
-                "next_action": ACTION_OWNER_CANDIDATE,
-                "owner_final": ACTION_OWNER_CANDIDATE,
-                "reason_code": v1_terminal,
-            }
-        if isinstance(v1_terminal, str) and v1_terminal in CASE_C_KILL_TERMINALS:
-            return {
-                "next_action": ACTION_NON_SCIENTIFIC_STOP,
-                "owner_final": ACTION_NON_SCIENTIFIC_STOP,
-                "reason_code": v1_terminal,
-            }
-        if v1_status in {EXEC_EXECUTED, EXEC_REUSED} and not isinstance(v1_terminal, str):
-            return {
-                "next_action": ACTION_OBSERVABILITY_BLOCKED,
-                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
-                "reason_code": "V1_TERMINAL_MISSING",
-            }
-        next_rep = _next_active_after(
-            active, "NORMALIZED_TRAJECTORY_V1", str(v1_terminal or "")
+        return _consume_representation_chain(
+            registry=active,
+            stage_map=stage_map,
+            start_id="NORMALIZED_TRAJECTORY_V1",
+            saved_draft_sha256=saved_draft_sha256,
         )
-        if next_rep is not None:
-            return {
-                "next_action": f"START_{next_rep}",
-                "owner_final": None,
-                "reason_code": str(v1_terminal or "NEXT_ACTIVE"),
-            }
-        if not isinstance(v1_terminal, str) or v1_terminal not in (
-            KNOWN_SCIENTIFIC_NEGATIVES | CASE_C_KILL_TERMINALS | PASS_TERMINALS
-        ):
-            return {
-                "next_action": ACTION_OBSERVABILITY_BLOCKED,
-                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
-                "reason_code": "V1_TERMINAL_UNMATCHED",
-            }
-        stage_ref = v1_stage.get("stage_ref_sha256")
-        if not isinstance(stage_ref, str) or len(stage_ref) != 64:
-            return {
-                "next_action": ACTION_OBSERVABILITY_BLOCKED,
-                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
-                "reason_code": "V1_STAGE_REF_MISSING",
-            }
-        return {
-            "next_action": ACTION_SEARCH_EXHAUSTED,
-            "owner_final": ACTION_SEARCH_EXHAUSTED,
-            "reason_code": v1_terminal,
-        }
 
     if not isinstance(base_terminal, str):
         return {
@@ -579,6 +615,20 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 draft=draft_note,
             )
         )
+        selected = stage.get("selected_candidate_id")
+        mechanism = stage.get("candidate_mechanism")
+        critic = stage.get("critic_terminal") or stage.get("critic_decisive_reason")
+        if selected or mechanism:
+            lines.append(
+                "  candidate: {cid} mechanism={mech}".format(
+                    cid=selected or "NONE",
+                    mech=(mechanism[:80] if isinstance(mechanism, str) else "NONE"),
+                )
+            )
+        if selected:
+            lines.append(f"  critic: {critic or 'NONE'}")
+        else:
+            lines.append("  critic: NOT_RUN_NO_SELECTED_CANDIDATE")
     lines.append(f"next_action: {next_action}{next_note}")
     lines.append(f"owner_final: {receipt.get('owner_final') or 'NONE'}")
     blocking = [str(item) for item in (receipt.get("blocking_reason_codes") or []) if item]
@@ -600,41 +650,216 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def _stage_ref_sha256(bundle: Mapping[str, Any]) -> str | None:
+    for key in (
+        "session_receipt_sha256",
+        "critic_result_sha256",
+        "critic_input_packet_sha256",
+        "forge_context_packet_sha256",
+    ):
+        value = bundle.get(key)
+        if isinstance(value, str) and len(value) == 64:
+            return value
+    receipt = bundle.get("session_receipt")
+    if isinstance(receipt, Mapping):
+        return canonical_sha256(receipt)
+    packet = bundle.get("critic_input_packet")
+    if isinstance(packet, Mapping):
+        return canonical_sha256(packet)
+    return None
+
+
 def _stage_from_session(
     bundle: Mapping[str, Any],
     *,
     representation_id: str,
     used_cohort_ids: Sequence[str] | None = None,
+    packet: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
     terminal = effective_control_terminal(receipt) or effective_control_terminal(bundle)
     mode = session_evidence_surface_mode(receipt) or session_evidence_surface_mode(bundle)
     state = str(bundle.get("session_state") or "")
-    status = EXEC_REUSED if state == "SYNTHESIS_COMPLETE" else EXEC_EXECUTED
+    bound = list(used_cohort_ids or [])
+    if not bound:
+        bound = _bound_cohort_ids(bundle, packet)
+    applicable = bool(bound)
+    status = EXEC_REUSED if state == "SYNTHESIS_COMPLETE" and applicable else EXEC_EXECUTED
     if state in PAUSE_STATES or state in RESUME_STATES:
         status = EXEC_EXECUTED
+    stage_ref = _stage_ref_sha256(bundle)
     draft = bundle.get("draft_sha256") or receipt.get("draft_sha256")
+    critic_terminal = bundle.get("critic_terminal") or receipt.get("critic_terminal") or terminal
+    selected = bundle.get("selected_candidate_id") or receipt.get("selected_candidate_id")
+    mechanism = _candidate_mechanism(bundle)
+    input_scope = (
+        CURRENT_REPRESENTATION_CONTROL_V1
+        if representation_id == "BASE" and mode == CURRENT_REPRESENTATION_CONTROL_V1
+        else ("REPRESENTATION_RELEASE_LOCAL" if representation_id != "BASE" else "ORDINARY_BASE")
+    )
     return {
         "representation_id": representation_id,
         "execution_status": status,
         "effective_terminal": terminal or None,
-        "input_scope": (
-            CURRENT_REPRESENTATION_CONTROL_V1
-            if mode == CURRENT_REPRESENTATION_CONTROL_V1
-            else "ORDINARY_BASE"
-        ),
+        "input_scope": input_scope,
         "session_id": bundle.get("session_id"),
         "session_state": state,
         "evidence_surface_mode": mode,
-        "selected_candidate_id": bundle.get("selected_candidate_id"),
+        "selected_candidate_id": selected,
         "runner_up_candidate_id": bundle.get("runner_up_candidate_id"),
-        "stage_ref_sha256": bundle.get("session_receipt_sha256")
-        if isinstance(bundle.get("session_receipt_sha256"), str)
-        else None,
-        "used_cohort_ids": list(used_cohort_ids or []),
+        "stage_ref_sha256": stage_ref,
+        "used_cohort_ids": bound,
         "draft_sha256": draft if isinstance(draft, str) else None,
         "reason_code": None,
+        "critic_terminal": critic_terminal if isinstance(critic_terminal, str) else None,
+        "critic_decisive_reason": critic_terminal if isinstance(critic_terminal, str) else None,
+        "candidate_mechanism": mechanism,
     }
+
+
+def _candidate_mechanism(bundle: Mapping[str, Any]) -> str | None:
+    packet = bundle.get("critic_input_packet")
+    if not isinstance(packet, Mapping):
+        return None
+    selected = packet.get("selected_candidate")
+    if not isinstance(selected, Mapping):
+        return None
+    for key in ("mechanism", "claim", "primary_x_family"):
+        value = selected.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None
+
+
+def _bound_cohort_ids(
+    bundle: Mapping[str, Any], packet: Mapping[str, Any] | None
+) -> list[str]:
+    sources: list[Mapping[str, Any]] = []
+    if isinstance(packet, Mapping):
+        sources.append(packet)
+    receipt = bundle.get("session_receipt")
+    if isinstance(receipt, Mapping):
+        sources.append(receipt)
+    sources.append(bundle)
+    for source in sources:
+        for key in ("bound_visible_cohort_ids", "visible_cohort_ids", "used_cohort_ids"):
+            raw = source.get(key)
+            if isinstance(raw, list) and raw:
+                return [str(item) for item in raw if item]
+    return []
+
+
+def _ladder_representation_id(
+    bundle: Mapping[str, Any], packet: Mapping[str, Any] | None
+) -> str:
+    sources: list[Mapping[str, Any]] = []
+    if isinstance(packet, Mapping):
+        sources.append(packet)
+    receipt = bundle.get("session_receipt")
+    if isinstance(receipt, Mapping):
+        sources.append(receipt)
+    sources.append(bundle)
+    for source in sources:
+        rid = source.get(LADDER_REPRESENTATION_PACKET_KEY) or source.get("representation_id")
+        if rid in {"NORMALIZED_TRAJECTORY_V1", "SYNTHETIC_LATER_V2"}:
+            return str(rid)
+        if source.get("normalized_trajectory_v1"):
+            return "NORMALIZED_TRAJECTORY_V1"
+    return "BASE"
+
+
+def _focus_matches(
+    bundle: Mapping[str, Any],
+    packet: Mapping[str, Any] | None,
+    owner_focus: str,
+) -> bool:
+    receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
+    observed_focus = (
+        bundle.get("owner_focus")
+        or (packet or {}).get("owner_focus")
+        or receipt.get("owner_focus")
+    )
+    if str(observed_focus or "") == owner_focus:
+        return True
+    observed_key = (
+        bundle.get("focus_key_sha256")
+        or (packet or {}).get("focus_key_sha256")
+        or receipt.get("focus_key_sha256")
+    )
+    return observed_key == focus_key_sha256(owner_focus)
+
+
+def _cohorts_cover_current(bound: Sequence[str], visible: Sequence[str]) -> bool:
+    if not bound:
+        return False
+    return set(bound) == set(visible)
+
+
+def _packet_for_bundle(
+    data_root: Path, bundle: Mapping[str, Any], store: ResearchStore
+) -> dict[str, Any] | None:
+    packet = bundle.get("forge_context_packet")
+    if isinstance(packet, Mapping):
+        return dict(packet)
+    digest = bundle.get("forge_context_packet_sha256")
+    receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
+    if not isinstance(digest, str):
+        digest = receipt.get("forge_context_packet_sha256")
+    if not isinstance(digest, str):
+        return None
+    try:
+        loaded = load_forge_context_packet(data_root, digest, store=store)
+    except (LadderError, OSError, ValueError):
+        return None
+    return loaded if isinstance(loaded, dict) else None
+
+
+def _stage_rank(row: Mapping[str, Any]) -> int:
+    status = str(row.get("execution_status") or EXEC_NOT_RUN)
+    terminal = row.get("effective_terminal")
+    draft = row.get("draft_sha256")
+    if status == EXEC_NOT_RUN:
+        return 0
+    if status == EXEC_BLOCKED:
+        return 1
+    if isinstance(draft, str) and not isinstance(terminal, str):
+        return 2
+    if status in {EXEC_EXECUTED, EXEC_REUSED} and not isinstance(terminal, str):
+        return 3
+    if isinstance(terminal, str):
+        return 4
+    return 2
+
+
+def _prefer_stage(
+    live: Mapping[str, Any] | None, saved: Mapping[str, Any] | None
+) -> dict[str, Any] | None:
+    if live is None and saved is None:
+        return None
+    if live is None:
+        return dict(saved or {})
+    if saved is None:
+        return dict(live)
+    return dict(live if _stage_rank(live) >= _stage_rank(saved) else saved)
+
+
+def _progress_signature(receipt: Mapping[str, Any]) -> tuple[Any, ...]:
+    stages = []
+    for row in receipt.get("stages") or []:
+        if not isinstance(row, Mapping):
+            continue
+        stages.append(
+            (
+                row.get("representation_id"),
+                row.get("execution_status"),
+                row.get("effective_terminal"),
+                row.get("session_state"),
+                row.get("draft_sha256"),
+                row.get("stage_ref_sha256"),
+                row.get("session_id"),
+            )
+        )
+    return (receipt.get("next_action"), receipt.get("owner_final"), tuple(stages))
 
 
 def load_forge_context_packet(
@@ -713,6 +938,7 @@ def _lookup_run_artifact(
     store: ResearchStore, identity: str
 ) -> dict[str, Any] | None:
     latest: dict[str, Any] | None = None
+    completed: dict[str, Any] | None = None
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != RecordKind.RESEARCH_ARTIFACT.value:
@@ -726,7 +952,9 @@ def _lookup_run_artifact(
         body = json.loads(raw)
         if isinstance(body, dict) and body.get("run_identity_sha256") == identity:
             latest = body
-    return latest
+            if body.get("owner_final"):
+                completed = body
+    return completed or latest
 
 
 def _persist_run_receipt(
@@ -772,6 +1000,221 @@ def _persist_run_receipt(
     store.append([event], transaction_id=transaction_id)
 
 
+def _discover_ladder_stages(
+    *,
+    data_root: Path,
+    store: ResearchStore,
+    owner_focus: str,
+    visible: Sequence[str],
+    preferred_control_session_id: str | None,
+    saved_draft_sha256: str | None,
+    v1_snapshot: Mapping[str, Any] | None,
+) -> tuple[list[dict[str, Any]], str | None, str | None]:
+    grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
+    for item in list_hfic_sessions(store):
+        sid = str(item.get("session_id") or "")
+        if not sid:
+            continue
+        try:
+            bundle = load_session_bundle(store, sid)
+        except Exception:
+            continue
+        if bundle is None:
+            continue
+        packet = _packet_for_bundle(Path(data_root), bundle, store)
+        receipt_doc = (
+            bundle.get("session_receipt")
+            if isinstance(bundle.get("session_receipt"), Mapping)
+            else None
+        )
+        mode = (
+            session_evidence_surface_mode(receipt_doc)
+            or session_evidence_surface_mode(item)
+            or session_evidence_surface_mode(bundle)
+            or (session_evidence_surface_mode(packet) if packet else None)
+        )
+        rep_id = _ladder_representation_id(bundle, packet)
+        stage = _stage_from_session(
+            bundle, representation_id=rep_id, packet=packet
+        )
+        if mode == CURRENT_REPRESENTATION_CONTROL_V1 and rep_id == "BASE":
+            stage["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+            stage["input_scope"] = CURRENT_REPRESENTATION_CONTROL_V1
+        grouped.setdefault(rep_id, []).append((sid, stage, bundle))
+
+    chosen: tuple[str, dict[str, Any], Mapping[str, Any]] | None = None
+    if preferred_control_session_id:
+        for sid, stage, bundle in grouped.get("BASE", []):
+            if sid == preferred_control_session_id:
+                chosen = (sid, stage, bundle)
+                break
+        if chosen is None:
+            try:
+                preferred_bundle = load_session_bundle(
+                    store, preferred_control_session_id
+                )
+            except Exception:
+                preferred_bundle = None
+            if preferred_bundle is not None:
+                packet = _packet_for_bundle(Path(data_root), preferred_bundle, store)
+                chosen = (
+                    preferred_control_session_id,
+                    _stage_from_session(
+                        preferred_bundle, representation_id="BASE", packet=packet
+                    ),
+                    preferred_bundle,
+                )
+    if chosen is None:
+        applicable: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
+        for sid, stage, bundle in grouped.get("BASE", []):
+            packet = _packet_for_bundle(Path(data_root), bundle, store)
+            bound = list(stage.get("used_cohort_ids") or [])
+            if not _focus_matches(bundle, packet, owner_focus):
+                continue
+            if str(stage.get("evidence_surface_mode") or "") != CURRENT_REPRESENTATION_CONTROL_V1:
+                continue
+            if not _cohorts_cover_current(bound, visible):
+                continue
+            applicable.append((sid, stage, bundle))
+        if applicable:
+            picked = pick_session(
+                [{"session_id": sid, "session_state": stage.get("session_state")} for sid, stage, _ in applicable]
+            )
+            pick_id = str(picked.get("session_id") or "")
+            chosen = next(item for item in applicable if item[0] == pick_id)
+
+    control_session_id = None
+    legacy_epoch = None
+    resolved: list[dict[str, Any]] = []
+    if chosen is None:
+        resolved.append(
+            {
+                "representation_id": "BASE",
+                "execution_status": EXEC_NOT_RUN,
+                "effective_terminal": None,
+                "input_scope": "ORDINARY_BASE",
+                "session_id": None,
+                "used_cohort_ids": [],
+                "reason_code": ACTION_CONTROL_REQUIRED if grouped.get("BASE") else None,
+            }
+        )
+    else:
+        control_session_id, base_stage, chosen_bundle = chosen
+        bound = list(base_stage.get("used_cohort_ids") or [])
+        packet = _packet_for_bundle(Path(data_root), chosen_bundle, store)
+        if _cohorts_cover_current(bound, visible) and _focus_matches(
+            chosen_bundle, packet, owner_focus
+        ):
+            if str(base_stage.get("session_state") or "") == "SYNTHESIS_COMPLETE":
+                base_stage["execution_status"] = EXEC_REUSED
+        else:
+            base_stage["execution_status"] = EXEC_EXECUTED
+        if (
+            str(base_stage.get("evidence_surface_mode") or "")
+            == CURRENT_REPRESENTATION_CONTROL_V1
+        ):
+            base_stage["input_scope"] = CURRENT_REPRESENTATION_CONTROL_V1
+        legacy_epoch = chosen_bundle.get("evidence_epoch_sha256")
+        resolved.append(base_stage)
+
+    v1_used: list[str] = []
+    v1_status = EXEC_NOT_RUN
+    v1_terminal = None
+    v1_reason = None
+    v1_stage: dict[str, Any] | None = None
+    v1_rows = grouped.get("NORMALIZED_TRAJECTORY_V1") or []
+    if control_session_id:
+        matching = [
+            row for row in v1_rows
+            if _parent_control_id(row[2], _packet_for_bundle(Path(data_root), row[2], store))
+            in {None, control_session_id}
+        ]
+        if matching:
+            picked = pick_session(
+                [{"session_id": sid, "session_state": stage.get("session_state")} for sid, stage, _ in matching]
+            )
+            pick_id = str(picked.get("session_id") or "")
+            _, v1_stage, _ = next(item for item in matching if item[0] == pick_id)
+    if v1_stage is None and (
+        control_session_id
+        and str(resolved[0].get("effective_terminal") or "")
+        in {"NO_WORTHY_HYPOTHESIS", "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED"}
+    ):
+        if v1_snapshot:
+            try:
+                bundle = load_session_bundle(store, control_session_id)
+                if bundle is not None:
+                    control_receipt = control_receipt_from_bundle(
+                        Path(data_root), bundle, store=store
+                    )
+                    snapshot = {
+                        "control_present": True,
+                        "control_receipt": control_receipt,
+                        "control_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+                    }
+                    snapshot.update(dict(v1_snapshot))
+                    if "evidence_epoch_matches" not in snapshot:
+                        snapshot["evidence_epoch_matches"] = _evidence_epoch_matches(
+                            control_receipt, v1_snapshot
+                        )
+                    status = representation_status(snapshot)
+                    code = str(status.get("reason_code") or status.get("status") or "")
+                    if status.get("status") == "RUNNER_UP_PAUSE":
+                        v1_status = EXEC_BLOCKED
+                        v1_reason = RUNNER_UP_REVISION_REQUIRED
+                    elif status.get("status") in {
+                        "OBSERVABILITY_BLOCKED",
+                        "CONTROL_REQUIRED",
+                    }:
+                        v1_status = EXEC_BLOCKED
+                        v1_reason = code
+            except (
+                LadderError,
+                RepresentationProbeError,
+                ResearchStoreError,
+                OSError,
+                ValueError,
+            ) as exc:
+                v1_status = EXEC_BLOCKED
+                v1_reason = str(exc)
+        v1_stage = {
+            "representation_id": "NORMALIZED_TRAJECTORY_V1",
+            "execution_status": v1_status,
+            "effective_terminal": v1_terminal,
+            "input_scope": "REPRESENTATION_RELEASE_LOCAL",
+            "session_id": None,
+            "used_cohort_ids": v1_used,
+            "reason_code": v1_reason,
+            "stage_ref_sha256": None,
+            "draft_sha256": saved_draft_sha256,
+        }
+    if v1_stage is not None:
+        resolved.append(v1_stage)
+
+    for rep_id, rows in grouped.items():
+        if rep_id in {"BASE", "NORMALIZED_TRAJECTORY_V1"}:
+            continue
+        picked = pick_session(
+            [{"session_id": sid, "session_state": stage.get("session_state")} for sid, stage, _ in rows]
+        )
+        pick_id = str(picked.get("session_id") or "")
+        _, stage, _ = next(item for item in rows if item[0] == pick_id)
+        resolved.append(stage)
+    return resolved, control_session_id, legacy_epoch if isinstance(legacy_epoch, str) else None
+
+
+def _parent_control_id(
+    bundle: Mapping[str, Any], packet: Mapping[str, Any] | None
+) -> str | None:
+    for source in (packet, bundle.get("session_receipt"), bundle):
+        if not isinstance(source, Mapping):
+            continue
+        sid = source.get("control_session_id")
+        if isinstance(sid, str) and sid:
+            return sid
+    return None
+
+
 def evaluate_forge_run(
     repo_root: Path,
     data_root: Path,
@@ -779,7 +1222,7 @@ def evaluate_forge_run(
     owner_focus: str = "AUTO",
     persist: bool = False,
     registry: Mapping[str, Any] | None = None,
-    preferred_control_session_id: str | None = EXISTING_V1_CONTROL_SESSION_ID,
+    preferred_control_session_id: str | None = None,
     stages: Sequence[Mapping[str, Any]] | None = None,
     existing_completed: bool = False,
     saved_draft_sha256: str | None = None,
@@ -815,161 +1258,17 @@ def evaluate_forge_run(
                 legacy_epoch = row.get("legacy_epoch_sha256")
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
     else:
-        resolved_stages = []
-        control_candidates: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
-        for item in list_hfic_sessions(store):
-            sid = str(item.get("session_id") or "")
-            if not sid:
-                continue
-            try:
-                bundle = load_session_bundle(store, sid)
-            except Exception:
-                continue
-            if bundle is None:
-                continue
-            receipt_doc = (
-                bundle.get("session_receipt")
-                if isinstance(bundle.get("session_receipt"), Mapping)
-                else None
-            )
-            mode = (
-                session_evidence_surface_mode(receipt_doc)
-                or session_evidence_surface_mode(item)
-                or session_evidence_surface_mode(bundle)
-            )
-            if mode != CURRENT_REPRESENTATION_CONTROL_V1:
-                packet = bundle.get("forge_context_packet")
-                digest = bundle.get("forge_context_packet_sha256") or (
-                    receipt_doc.get("forge_context_packet_sha256")
-                    if isinstance(receipt_doc, Mapping)
-                    else None
-                )
-                if not isinstance(packet, Mapping) and isinstance(digest, str):
-                    try:
-                        packet = load_forge_context_packet(
-                            Path(data_root), digest, store=store
-                        )
-                    except (LadderError, OSError, ValueError):
-                        packet = None
-                if isinstance(packet, Mapping):
-                    mode = session_evidence_surface_mode(packet)
-            if mode != CURRENT_REPRESENTATION_CONTROL_V1:
-                continue
-            stage = _stage_from_session(
-                bundle, representation_id="BASE", used_cohort_ids=visible
-            )
-            stage["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
-            stage["input_scope"] = CURRENT_REPRESENTATION_CONTROL_V1
-            control_candidates.append((sid, stage, bundle))
-        chosen: tuple[str, dict[str, Any], Mapping[str, Any]] | None = None
-        if preferred_control_session_id:
-            for sid, stage, bundle in control_candidates:
-                if sid == preferred_control_session_id:
-                    chosen = (sid, stage, bundle)
-                    break
-            if chosen is None:
-                try:
-                    preferred_bundle = load_session_bundle(
-                        store, preferred_control_session_id
-                    )
-                except Exception:
-                    preferred_bundle = None
-                if preferred_bundle is not None:
-                    chosen = (
-                        preferred_control_session_id,
-                        _stage_from_session(
-                            preferred_bundle,
-                            representation_id="BASE",
-                            used_cohort_ids=visible,
-                        ),
-                        preferred_bundle,
-                    )
-        if chosen is None and len(control_candidates) == 1:
-            chosen = control_candidates[0]
-        if chosen is None:
-            base_stage = {
-                "representation_id": "BASE",
-                "execution_status": EXEC_NOT_RUN,
-                "effective_terminal": None,
-                "input_scope": (
-                    CURRENT_REPRESENTATION_CONTROL_V1
-                    if control_candidates
-                    else "ORDINARY_BASE"
-                ),
-                "session_id": None,
-                "used_cohort_ids": [],
-                "reason_code": ACTION_CONTROL_REQUIRED if control_candidates else None,
-            }
-        else:
-            control_session_id, base_stage, _bundle = chosen
-            legacy_epoch = _bundle.get("evidence_epoch_sha256")
-            if (
-                str(base_stage.get("evidence_surface_mode") or "")
-                == CURRENT_REPRESENTATION_CONTROL_V1
-            ):
-                base_stage["input_scope"] = CURRENT_REPRESENTATION_CONTROL_V1
-            if not list(base_stage.get("used_cohort_ids") or []):
-                base_stage["used_cohort_ids"] = list(visible)
-        resolved_stages.append(base_stage)
-        if (
-            control_session_id
-            and str(base_stage.get("effective_terminal") or "")
-            in {"NO_WORTHY_HYPOTHESIS", "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED"}
-        ):
-            v1_status = EXEC_NOT_RUN
-            v1_terminal = None
-            v1_reason = None
-            v1_used: list[str] = []
-            if v1_snapshot:
-                try:
-                    bundle = load_session_bundle(store, control_session_id)
-                    if bundle is not None:
-                        control_receipt = control_receipt_from_bundle(
-                            Path(data_root), bundle, store=store
-                        )
-                        snapshot = {
-                            "control_present": True,
-                            "control_receipt": control_receipt,
-                            "control_mode": CURRENT_REPRESENTATION_CONTROL_V1,
-                        }
-                        snapshot.update(dict(v1_snapshot))
-                        if "evidence_epoch_matches" not in snapshot:
-                            snapshot["evidence_epoch_matches"] = (
-                                _evidence_epoch_matches(control_receipt, v1_snapshot)
-                            )
-                        status = representation_status(snapshot)
-                        code = str(status.get("reason_code") or status.get("status") or "")
-                        if status.get("status") == "RUNNER_UP_PAUSE":
-                            v1_status = EXEC_BLOCKED
-                            v1_reason = RUNNER_UP_REVISION_REQUIRED
-                        elif status.get("status") in {
-                            "OBSERVABILITY_BLOCKED",
-                            "CONTROL_REQUIRED",
-                        }:
-                            v1_status = EXEC_BLOCKED
-                            v1_reason = code
-                except (
-                    LadderError,
-                    RepresentationProbeError,
-                    ResearchStoreError,
-                    OSError,
-                    ValueError,
-                ) as exc:
-                    v1_status = EXEC_BLOCKED
-                    v1_reason = str(exc)
-            resolved_stages.append(
-                {
-                    "representation_id": "NORMALIZED_TRAJECTORY_V1",
-                    "execution_status": v1_status,
-                    "effective_terminal": v1_terminal,
-                    "input_scope": "REPRESENTATION_RELEASE_LOCAL",
-                    "session_id": None,
-                    "used_cohort_ids": v1_used,
-                    "reason_code": v1_reason,
-                    "stage_ref_sha256": None,
-                    "draft_sha256": saved_draft_sha256,
-                }
-            )
+        resolved_stages, control_session_id, legacy_epoch = _discover_ladder_stages(
+            data_root=Path(data_root),
+            store=store,
+            owner_focus=owner_focus,
+            visible=visible,
+            preferred_control_session_id=preferred_control_session_id,
+            saved_draft_sha256=saved_draft_sha256,
+            v1_snapshot=v1_snapshot,
+        )
+        for row in resolved_stages:
+            used_cohorts.extend(list(row.get("used_cohort_ids") or []))
 
     identity_material = {
         "input_receipt_sha256": input_receipt.get("receipt_sha256"),
@@ -986,26 +1285,29 @@ def evaluate_forge_run(
         existing = None
     if existing is not None and existing.get("owner_final"):
         return _readback_existing_run(existing)
-    if existing is not None and not saved_draft_sha256:
-        for row in existing.get("stages") or []:
-            if isinstance(row, Mapping) and isinstance(row.get("draft_sha256"), str):
-                saved_draft_sha256 = row["draft_sha256"]
-                break
-        by_id = {
+    if existing is not None:
+        if not saved_draft_sha256:
+            for row in existing.get("stages") or []:
+                if isinstance(row, Mapping) and isinstance(row.get("draft_sha256"), str):
+                    saved_draft_sha256 = row["draft_sha256"]
+                    break
+        saved_by_id = {
             str(row.get("representation_id")): row
             for row in existing.get("stages") or []
             if isinstance(row, Mapping)
         }
-        for live in resolved_stages:
-            saved = by_id.get(str(live.get("representation_id")))
-            if not isinstance(saved, Mapping):
-                continue
-            if not live.get("session_state") and saved.get("session_state"):
-                live["session_state"] = saved["session_state"]
-            if not live.get("draft_sha256") and saved.get("draft_sha256"):
-                live["draft_sha256"] = saved["draft_sha256"]
-            if not live.get("stage_ref_sha256") and saved.get("stage_ref_sha256"):
-                live["stage_ref_sha256"] = saved["stage_ref_sha256"]
+        merged: list[dict[str, Any]] = []
+        seen: set[str] = set()
+        for row in resolved_stages:
+            rid = str(row.get("representation_id"))
+            seen.add(rid)
+            preferred = _prefer_stage(row, saved_by_id.get(rid))
+            if preferred is not None:
+                merged.append(preferred)
+        for rid, saved in saved_by_id.items():
+            if rid not in seen:
+                merged.append(dict(saved))
+        resolved_stages = merged
 
     decision = resolve_next_action(
         resolved_stages,
@@ -1037,6 +1339,7 @@ def evaluate_forge_run(
         blocking.extend(list(input_receipt.get("blocking_reason_codes") or []))
 
     stage_out = []
+    used_cohorts = []
     for row in resolved_stages:
         stage_out.append(
             {
@@ -1052,12 +1355,13 @@ def evaluate_forge_run(
                 "used_cohort_ids": list(row.get("used_cohort_ids") or []),
                 "draft_sha256": row.get("draft_sha256") or decision.get("draft_sha256"),
                 "reason_code": row.get("reason_code"),
+                "critic_terminal": row.get("critic_terminal"),
+                "critic_decisive_reason": row.get("critic_decisive_reason")
+                or row.get("critic_terminal"),
+                "candidate_mechanism": row.get("candidate_mechanism"),
             }
         )
         used_cohorts.extend(list(row.get("used_cohort_ids") or []))
-
-    if persist and existing is None:
-        writes = {"research_store": 1, "forge_run": 1, "session": 0}
 
     unsigned = {
         "schema": SCHEMA,
@@ -1085,8 +1389,22 @@ def evaluate_forge_run(
     if errors:
         raise LadderError("FORGE_RUN_RECEIPT_INVALID")
 
-    if persist and existing is None:
+    if persist and (
+        existing is None
+        or _progress_signature(unsigned) != _progress_signature(existing)
+    ):
+        writes = {"research_store": 1, "forge_run": 1, "session": 0}
+        unsigned["writes"] = writes
+        unsigned.pop("receipt_sha256", None)
+        unsigned["receipt_sha256"] = canonical_sha256(
+            {key: value for key, value in unsigned.items() if key != "owner_readout"}
+        )
+        unsigned["owner_readout"] = format_forge_run_owner_readout(unsigned)
+        errors = list(_validator().iter_errors(unsigned))
+        if errors:
+            raise LadderError("FORGE_RUN_RECEIPT_INVALID")
         _persist_run_receipt(store, unsigned, repo_root=Path(repo_root))
+        store.rebuild_projection()
     return unsigned
 
 
