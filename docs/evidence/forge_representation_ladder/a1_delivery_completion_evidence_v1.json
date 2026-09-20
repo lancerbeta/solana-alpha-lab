@@ -24,6 +24,7 @@
     "configs/hypothesis_forge_independent_critic_v1.yaml": "0e825c4f5dd0fe73608f7c96acd5daa33ca1efbc4e02a846fa87dbe0e3b01677",
     "docs/PROJECT_MAP.md": "9729c159d465e2b5896288d6ef20e0b84208a2080bff8632824fbb5210a42440",
     "docs/evidence/forge_representation_ladder/a1_no_write_vertical_v1.json": "7e75355d6b7ea2bfe0ca9015ba3891ff1fd0031e3b605c191dabbc3538f05c2c",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "3a4d10e0704b78a27699aea14e981e4557f33a36aa054bfcbacba8a3e7400c9f",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "0c443c75217e625daa40220d4e601c9ab8774f78fc43bcab60cdb3d4586cd712",
     "docs/reports/forge_representation_ladder/a1_owner_readout_v1.md": "0d14121e0f91df29b8b55f229406988d2e806ec53d827e17c4d57c6fa0ceb35d",
     "docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md": "24ad5ac021df7696edbb70d4e62abeeb1e3650e4f19009e18de1e576b625e129",
@@ -42,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_representation_ladder/a1_delivery_factory_fit_v1.json",
-    "sha256": "8ee59d729872a16c6244837c3fde10edcbfedd9f30f39b9bb94f5aa1d9da192c",
+    "sha256": "983fe601ea0fcf586780a78c551831c27e2ae5601474f4770059e72f68979d7e",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_REPRESENTATION_LADDER_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/forge_representation_ladder/a1_delivery_independent_review_v1.json",
-      "sha256": "3873ce964e7667027f9a234ff591bb281be76d58fdc7caef3f9545c2ae78399d",
+      "sha256": "f5c5fd0a4aafe53a2d64481d53919f24eb64fab4564bfe93b3e00892d910453f",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

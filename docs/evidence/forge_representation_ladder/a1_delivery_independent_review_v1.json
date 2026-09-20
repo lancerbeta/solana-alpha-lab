@@ -4,8 +4,8 @@
   "review_id": "FORGE-REPRESENTATION-LADDER-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-20",
   "task_id": "FORGE_REPRESENTATION_LADDER_V1",
-  "reviewed_bindings_sha256": "6030c47002d56f929bdb2c375b60472817c4dade7e2bed3f659f1f2ca1091924",
-  "reviewed_inventory_sha256": "7f004197151629597879dde653bc2db6b38601fa660aa52d98106c39566bd874",
+  "reviewed_bindings_sha256": "194c599c224212bdbc50810a49f7b25d3150f09b09780b833c4815423e03050c",
+  "reviewed_inventory_sha256": "3ca0d88df3fd8fd8968e1d4594b429cb40bb7779e46a17469c9500a858c006f7",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
