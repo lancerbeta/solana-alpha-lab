@@ -11,7 +11,25 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md": "7eff03f151f369992c04ee99480bdcf888cfe09609e364529bfc30ee2b90f8ce"
+    "catalog/assets/core.yaml": "41e9c4baa441d7facc3c9faf229dddb8d06749c37df753dc3717cddc5f48bf0a",
+    "catalog/assets/lifecycle.yaml": "350274cf4b1f87dfd5d60ddbee2ddae46fdfdd42bb3f1f48c896bb9b30f4055f",
+    "catalog/catalog_manifest.yaml": "b41c4bd4fab60f06b0c9a3e2257df081a059bf53bf0b60a9f2ddbe8be7799bca",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "4a1868b51a36b27013e08ee167102ff136e20e41e1f3d09470c2d87d09964b9b",
+    "catalog/generated/asset_edges.json": "f3eec58547bc1031125ff3206be84c44db3aa7eb79bd6e9a465d0b69b070bd2b",
+    "configs/factory_semantic_operability_v1.yaml": "464b5585b353c94c474f9118298b3677f1e0e9ae5ddb7eaccee8a64ab69cbabc",
+    "docs/PROJECT_MAP.md": "f2d7a24b1dcf7cf268aa0edf505e47f0a9a75d2db0f36354ecf36926d0f8d549",
+    "docs/evidence/cohort_data_root_and_import_readback/a1_c1_c2_readback_v1.json": "4a0a6ffdf8fde420ee1b4e97c1348fc510ba3bcdddceaf770503aeb2cdcfd6d4",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "d4bdfdefb3a1af76709292110613ade9fa9c48dc79876ebb81f956ecd8db32f8",
+    "docs/reports/cohort_data_root_and_import_readback/a1_owner_readout_v1.md": "a78f75188d127596e21a014e25e412e736c8349206b360ce9caaf3e3e81f2971",
+    "docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md": "7eff03f151f369992c04ee99480bdcf888cfe09609e364529bfc30ee2b90f8ce",
+    "scripts/discovery_evidence_release.py": "e5a33fec40104028a0691d8fdd77759f3a1d8dc8ee88d549d24978bfb13e93f1",
+    "src/solana_alpha_lab/factory/cohort_import_readback.py": "bc534a5ac0f092dd7257c62a025f1224f1f9960bfdd1c4b28151cfd74531f5c9",
+    "src/solana_alpha_lab/factory/data_root.py": "594c98c33acbc9b43ad3a45c29b58063f94946a73113d81fdc6967382c13e2b6",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "d3a8fae8eabdc3ab9f339cd4ad0a555d4ce9d344776d2c6e2961f15856bf08ed",
+    "tests/test_cohort_data_root_and_import_readback_v1.py": "5ae858fae39bde26d548a01fc2748bd9ef2b0a0695b7e51f8a5b592c7a24fd13",
+    "tests/test_hfic_preflight.py": "40e5283cc75b5f0a461b6a24171c06b961112a385070f6e24c54d4886f0e797e",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "1049b97b3f8101fbed784267747550924aedf4475f541c9e01c5dbe691a83712",
+    "tests/test_research_lifecycle_workbench_v1.py": "272f9f2032288ad17738b69c3c8da9d710c55e2f1cc437b52b83a812908b60d5"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/cohort_data_root_and_import_readback/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "5e1598cf71b81d5482b374bbf6177591af43aea90a4b13ba6758b22b99eb93b7",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COHORT_DATA_ROOT_AND_IMPORT_READBACK_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/cohort_data_root_and_import_readback/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "2483da835770eea1d84e16c0a7bbb4f2ad4e890b9bd99e48bed104fe830a2c08",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
