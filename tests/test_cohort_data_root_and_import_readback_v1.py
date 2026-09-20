@@ -69,6 +69,14 @@ class CanonicalDataRootTests(unittest.TestCase):
             self.assertEqual(discovered.status, "UNAVAILABLE")
             self.assertEqual(discovered.error, "DATA_ROOT_NON_GIT_CONTEXT")
 
+    def test_git_principal_without_plane_is_not_present(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            principal = Path(tmp) / "principal"
+            _init_repo(principal)
+            discovered = resolve_existing_data_root(principal, env={})
+            self.assertEqual(discovered.status, "NOT_PRESENT")
+            self.assertEqual(discovered.error, "RESEARCH_STORE_NOT_PRESENT")
+
     def test_missing_git_binary_is_typed_non_git_stop(self) -> None:
         from unittest.mock import patch
 

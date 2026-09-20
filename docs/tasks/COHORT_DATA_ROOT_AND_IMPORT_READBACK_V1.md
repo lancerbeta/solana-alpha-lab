@@ -39,6 +39,7 @@ managed_write_set:
   - tests/test_hfic_preflight.py
   - tests/test_research_lifecycle_workbench_v1.py
   - tests/test_live_cohort_to_forge_operational_closure_v1.py
+  - tests/test_market_data_awareness_v1.py
   - configs/factory_semantic_operability_v1.yaml
   - catalog/fixtures/semantic_route_gold_queries_v1.yaml
   - catalog/assets/core.yaml

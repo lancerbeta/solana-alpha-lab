@@ -36635,7 +36635,7 @@ records:
   as_of: '2026-09-07'
   truth_owner: MARKET_DATA_AWARENESS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_market_data_awareness_v1.py', repository_path: tests/test_market_data_awareness_v1.py}
-  integrity: {kind: sha256, sha256: cd9be24b2d77fed857420e8e103e61fd1c3dc00e56d740b9ff73d8bf03a606e1}
+  integrity: {kind: sha256, sha256: 32f5a99d1088689930109869c2b3f98310bb76deaa4c41cb41f584e68d15764f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-MARKET-DATA-AWARENESS-001}
@@ -37866,7 +37866,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_cohort_data_root_and_import_readback_v1.py', repository_path: tests/test_cohort_data_root_and_import_readback_v1.py}
-  integrity: {kind: sha256, sha256: 5ae858fae39bde26d548a01fc2748bd9ef2b0a0695b7e51f8a5b592c7a24fd13}
+  integrity: {kind: sha256, sha256: 7394f86dd4cc98c3c9ef88c131c2c6222cccde464f3dd8e48e227cf627cb90e4}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001}
@@ -37885,7 +37885,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md', repository_path: docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md}
-  integrity: {kind: sha256, sha256: 7eff03f151f369992c04ee99480bdcf888cfe09609e364529bfc30ee2b90f8ce}
+  integrity: {kind: sha256, sha256: 5b37e89fab9b6da3bba68586923d3a8795604cdd5b6ed89fcb9252da056b6846}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-FACTORY-DATA-ROOT-001}
