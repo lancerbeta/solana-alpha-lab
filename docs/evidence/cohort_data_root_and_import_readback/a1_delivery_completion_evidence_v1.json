@@ -50,7 +50,7 @@
     "targeted": "PASS_COHORT_DATA_ROOT_AND_IMPORT_READBACK_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/cohort_data_root_and_import_readback/a1_delivery_independent_review_v1.json",
-      "sha256": "ec2278356b85519038957565ae0b45f50e5cee5026de573c6ca12612fd9e954f",
+      "sha256": "7019d40f9822e319039fc6d2385ae6ac6b904715b59d89b26859d49804c1acc7",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
