@@ -11,7 +11,7 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md": "c11be881333f9349aa2c426b1663b48dbc2c4299c2dcf4d08a984becd31ba555"
+    "docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md": "7eff03f151f369992c04ee99480bdcf888cfe09609e364529bfc30ee2b90f8ce"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {

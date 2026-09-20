@@ -12,13 +12,13 @@
     "mission": "PASS_CANONICAL_IMPORT_PLANE_NOT_ALPHA",
     "flexibility_and_history": "PASS_REUSE_EXISTING_DATA_ROOT_AND_LINEAGE",
     "context_efficiency": "PASS_EXISTING_SEM_LIVE_EVIDENCE_TO_FORGE",
-    "research_truth": "PASS_FINGERPRINT_NOT_ABSOLUTE_PATH_NO_SCHEDULE_FILL",
+    "research_truth": "PASS_FINGERPRINT_NOT_PATH_NULL_SOURCE_NOT_CONTENT",
     "owner_operability": "PASS_ONE_READBACK_STOP_BEFORE_FORGE",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_OR_CASHFLOW",
     "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT_NO_DATA_DESTROY",
     "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
     "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
-    "red_team": "PASS_NO_DUPLICATE_LINEAGE_NO_NON_GIT_SILENT_DEFAULT"
+    "red_team": "PASS_NO_FALSE_UNIMPORTED_ON_OMITTED_LIST_ROOT"
   },
   "capability_radar": {
     "now": "NONE",
