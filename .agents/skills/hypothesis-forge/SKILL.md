@@ -104,6 +104,18 @@ Happy path — no owner copy/paste between the slash command and the final termi
    `CONTROL_YIELD_BELOW_MIN` or `CONTROL_CORPUS_UNRESOLVABLE` before creating a
    session when the imported live corpus yield is below
    `MIN_USABLE_YIELD_ELIGIBLE` or the corpus cannot be resolved from metadata.
+   Immediately print the preflight `owner_forge_input` block (`FORGE INPUT`:
+   visible cohorts, active evidence set, historical calibration, visibility,
+   representations, `next`). If `forge_input_receipt.forge_runnable` is false,
+   stop before Prompt A even when ordinary `action` is `START_NEW_SESSION`.
+   Typed classes are `INPUT_NOT_READY` and `OBSERVABILITY_BLOCKED`. Typed
+   `next` is `WAIT_FOR_IMPORT_OR_STOP` or `STOP_OBSERVABILITY`. Ready `next`
+   is `STOP_BEFORE_SYNTHESIS` (not slash authority). Do not invent `NO_WORTHY`.
+   A no-write diagnostic that never starts a session:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json
+```
 2. Branch on `action`:
    - `RETURN_EXISTING_SESSION` → report `effective_control_terminal` when
      present, else `critic_terminal`, plus NEXT; stop. Do not treat primary C1

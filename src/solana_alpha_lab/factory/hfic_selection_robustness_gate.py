@@ -84,6 +84,14 @@ RECEIPT_INPUT_IDENTITY_FIELDS = (
     "dataset_manifest_id",
     "spec_file_sha256",
 )
+HISTORICAL_FROZEN_INPUT_FIELDS = (
+    "corpus_id",
+    "cohort_id",
+    "release_id",
+    "census_sha256",
+    "observations_sha256",
+    "spec_file_sha256",
+)
 KNOWN_STAGE1_TERMINALS = frozenset(
     {SHIFT_DETECTED, SHIFT_NOT_DETECTED, STAGE1_INCONCLUSIVE}
 )
@@ -1071,7 +1079,13 @@ def load_applicable_gate_receipt(
         return _invalid_gate_receipt(SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH)
     stored_identity = receipt_input_identity(loaded)
     current_identity = current_gate_input_identity(binding)
-    if stored_identity is None or stored_identity != current_identity:
+    if stored_identity is None:
+        return _invalid_gate_receipt(SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH)
+    frozen_match = all(
+        stored_identity.get(key) == current_identity.get(key)
+        for key in HISTORICAL_FROZEN_INPUT_FIELDS
+    )
+    if not frozen_match:
         return _invalid_gate_receipt(SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH)
     return loaded
 

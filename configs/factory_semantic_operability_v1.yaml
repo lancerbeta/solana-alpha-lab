@@ -50,6 +50,7 @@ routes:
       - Where do hypotheses enter?
       - How do I run Hypothesis Forge?
       - What is the one-slash Forge workflow?
+      - What can Forge currently see?
       - как сгенерировать или проверить гипотезу
     search_terms:
       - hypothesis
@@ -58,16 +59,16 @@ routes:
       - HFIC
       - critic
       - /hypothesis-forge
-      - enter
       - гипотеза
       - кузница
       - normalized trajectory
       - NORMALIZED_TRAJECTORY
       - representation probe
       - lifecycle representation
-      - Forge representation
       - другое представление lifecycle
       - траектория токена
+      - FORGE INPUT
+      - forge-input
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids: [ACTIVE-HYPOTHESIS-FORGE]
     root_asset_ids:
@@ -97,6 +98,8 @@ routes:
       - прошлые результаты
       - негатив
       - prior trials
+      - historical calibration
+      - FORGE_INPUT_RECEIPT
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CURSOR-DELIVERY]
     root_binding_ids: []
     root_asset_ids:
@@ -247,6 +250,8 @@ routes:
       - PASS_ALREADY_PRESENT_EXACT
       - forge-control-ready
       - live rdp
+      - forge-input
+      - FORGE INPUT
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]
     root_binding_ids: [ACTIVE-LIVE-LIFECYCLE-EVIDENCE]
     root_asset_ids: [MODULE-LIVE-COHORT-TO-FORGE-001]

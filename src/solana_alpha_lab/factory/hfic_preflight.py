@@ -200,41 +200,31 @@ def select_forge_packet_datasets(
     evidence_surface_mode: str | None = None,
     max_datasets: int = MAX_DATASETS,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Current-version selection plus CONTROL-protected LIVE CORPUS slot."""
-    from solana_alpha_lab.factory.hfic_control_integrity import (
-        CURRENT_REPRESENTATION_CONTROL_V1,
-    )
+    """Current-version selection with a protected LIVE CORPUS slot.
+
+    Ordinary and CONTROL packets share this membership rule so compatibility
+    readiness cannot hide a live-corpus drop that actual slash would see.
+    ``evidence_surface_mode`` remains a caller label and does not change
+    dataset membership.
+    """
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         select_current_datasets_for_forge,
     )
 
+    del evidence_surface_mode
     current = select_current_datasets_for_forge(enumerated)
-    receipt: dict[str, Any] = {
-        "truncated": False,
+    corpus = [item for item in current if is_live_corpus_dataset(item)]
+    others = [item for item in current if not is_live_corpus_dataset(item)]
+    slots = max(0, max_datasets - len(corpus))
+    selected = corpus + others[:slots]
+    selected.sort(key=lambda item: str(item.get("dataset_manifest_id") or ""))
+    return selected, {
+        "truncated": len(current) > len(selected),
         "max_datasets": max_datasets,
-        "selection_policy": "current_version_per_dataset_id",
-        "live_corpus_protected": False,
-        "live_corpus_in_packet": False,
+        "selection_policy": "control_protect_live_corpus_then_cap",
+        "live_corpus_protected": True,
+        "live_corpus_in_packet": bool(corpus),
     }
-    if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1:
-        corpus = [item for item in current if is_live_corpus_dataset(item)]
-        others = [item for item in current if not is_live_corpus_dataset(item)]
-        slots = max(0, max_datasets - len(corpus))
-        selected = corpus + others[:slots]
-        selected.sort(key=lambda item: str(item.get("dataset_manifest_id") or ""))
-        receipt["truncated"] = len(current) > len(selected)
-        receipt["live_corpus_protected"] = True
-        receipt["live_corpus_in_packet"] = bool(corpus)
-        receipt["selection_policy"] = "control_protect_live_corpus_then_cap"
-        return selected, receipt
-    selected = current[:max_datasets]
-    if len(current) > max_datasets:
-        receipt["truncated"] = True
-        receipt["selection_policy"] = "current_version_per_dataset_id_then_cap"
-    receipt["live_corpus_in_packet"] = any(
-        is_live_corpus_dataset(item) for item in selected
-    )
-    return selected, receipt
 
 
 def store_inventory_digest(data_root: Path) -> str | None:
@@ -1596,6 +1586,7 @@ def run_preflight(
     git_snapshot: Mapping[str, Any] | None = None,
     clock: Clock | None = None,
     evidence_surface_mode: str | None = None,
+    persist: bool = True,
 ) -> dict[str, Any]:
     compatibility_repair: dict[str, Any] = {"status": "NONE", "appended": 0}
     try:
@@ -1650,6 +1641,7 @@ def run_preflight(
         raise HficPreflightError(str(exc)) from exc
 
     from solana_alpha_lab.factory.hfic_control_integrity import (
+        CONTROL_CORPUS_UNRESOLVABLE,
         CURRENT_REPRESENTATION_CONTROL_V1,
         resolve_control_corpus_yield,
     )
@@ -1674,6 +1666,52 @@ def run_preflight(
     search_key = search_key_sha256(
         epoch, focus, PROMPT_VERSION, memory_eligibility, control_mode
     )
+    from solana_alpha_lab.factory.forge_input_receipt import (
+        CURRENT_CORPUS_MISSING,
+        build_forge_input_receipt,
+        format_forge_input_owner_block,
+    )
+
+    forge_input = build_forge_input_receipt(
+        Path(data_root),
+        repo_root=Path(repo_root),
+        evidence_surface_mode=control_mode,
+    )
+    if control_mode == CURRENT_REPRESENTATION_CONTROL_V1 and not forge_input[
+        "forge_runnable"
+    ]:
+        codes = list(forge_input.get("blocking_reason_codes") or [])
+        terminal = str(codes[0] if codes else CURRENT_CORPUS_MISSING)
+        if terminal == CURRENT_CORPUS_MISSING:
+            terminal = CONTROL_CORPUS_UNRESOLVABLE
+        return {
+            "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": terminal,
+            "owner_class": forge_input.get("owner_class"),
+            "owner_focus": focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": epoch,
+            "focus_key_sha256": focus_key,
+            "search_key_sha256": search_key,
+            "memory_policy_head_sha256": policy_head["policy_sha256"],
+            "memory_eligibility_sha256": memory_eligibility,
+            "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+            "next": (
+                "STOP_CORPUS_UNRESOLVABLE"
+                if terminal == "CONTROL_CORPUS_UNRESOLVABLE"
+                else "WAIT_FOR_IMPORT_OR_STOP"
+            ),
+            "session_id": None,
+            "forge_context_packet": {},
+            "forge_input_receipt": forge_input,
+            "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
         if datasets:
@@ -1711,6 +1749,8 @@ def run_preflight(
                 ),
                 "session_id": None,
                 "forge_context_packet": {},
+                "forge_input_receipt": forge_input,
+                "owner_forge_input": format_forge_input_owner_block(forge_input),
                 "authority": {
                     "git_mutation": 0,
                     "experiment_execution": 0,
@@ -1883,6 +1923,7 @@ def run_preflight(
         store=store,
         stage_time=session_started,
         evidence_surface_mode=control_mode,
+        persist=persist,
         selection_caveat=selection_caveat,
     )
     receipt_body["forge_context_packet"] = packet
@@ -1957,5 +1998,7 @@ def run_preflight(
                     effective_control_terminal(bundle)
                 )
                 receipt_body["next"] = bundle.get("next")
+    receipt_body["forge_input_receipt"] = forge_input
+    receipt_body["owner_forge_input"] = format_forge_input_owner_block(forge_input)
     receipt_body["preflight_receipt_sha256"] = canonical_sha256(receipt_body)
     return receipt_body

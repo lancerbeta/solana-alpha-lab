@@ -345,24 +345,38 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 - подготовка design packet, Experiment Card, draft ExperimentSpec и bounded PRD+SSD;
 - append-only запись session/hypothesis draft в Research Data Plane только если для этого уже существует accepted no-Git capability. Если её нет — выведи packet, но не создавай Git gap автоматически.
 
-Machine readback that the LIVE CORPUS is CONTROL-ready, without invoking this
-slash:
+No-write scientific input/visibility (does not start a session, does not
+commission, does not persist Forge context). This is not owner NEXT and does
+not authorize CONTROL slash:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json
+```
+
+Typed owner `next` on that surface: `WAIT_FOR_IMPORT_OR_STOP` or
+`STOP_OBSERVABILITY` when not runnable; `STOP_BEFORE_SYNTHESIS` when
+runnable. Do not paste a slash as recovery.
+
+`forge-control-ready` remains an expert diagnostic. Happy terminal
+`FORGE_CONTROL_READY` is not the owner next after `forge-input`. Do not treat
+the CONTROL slash as the next step after visibility:
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
 ```
 
-Happy terminal `FORGE_CONTROL_READY`. The operator surface NEXT is exactly:
+Expert-only CONTROL slash (not owner NEXT after import or forge-input):
 
 ```
 /hypothesis-forge CURRENT_REPRESENTATION_CONTROL
 ```
-
 CONTROL bounded packet selection (`MAX_DATASETS=8`) keeps a protected slot
 for the current `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` identified by
 canonical `dataset_id`, not a foreign label impersonation.
-`forge-control-ready` uses the same selection function as the actual CONTROL
-packet builder and requires the selected corpus `dataset_manifest_id` to
+`forge-control-ready` uses the same canonical `build_forge_input_receipt`
+builder as actual HFIC preflight for common input/visibility checks, then
+prints a CONTROL subset. Compatibility READY cannot mean a different live
+corpus membership than slash. The selected corpus `dataset_manifest_id` must
 equal `lineage.current_dataset_manifest_id` when lineage exists.
 
 Scientific CONTROL floor is consume-time `base_x_population.n` (X300-valid

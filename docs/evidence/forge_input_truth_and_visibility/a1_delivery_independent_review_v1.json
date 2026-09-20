@@ -1,0 +1,67 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-INPUT-TRUTH-AND-VISIBILITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-20",
+  "task_id": "FORGE_INPUT_TRUTH_AND_VISIBILITY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=c40da370ac877f16474f8c82b9e09eb0fdd2c2b79493e931c65a3bb9195e6f7f",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "PASS_ONE_BUILDER_NO_COMPETING_TRUTH",
+        "PASS_HISTORICAL_IDENTITY_OMITS_CURRENT_MANIFEST",
+        "PASS_NOT_EVALUATED_PIT_FIELDS"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_CONTROL_CURRENT_CORPUS_MISSING_MAPS_UNRESOLVABLE",
+        "PASS_T26_UNCHANGED",
+        "PASS_HISTORICAL_FROZEN_INPUT_FIELDS",
+        "PASS_NO_WRITE_BUILDER",
+        "PASS_ORDINARY_MISSING_CORPUS_NOT_MACHINE_STOP"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_G_A3_1_THROUGH_5",
+        "PASS_REAL_C1_C2_NO_WRITE",
+        "PASS_NAMED_CONSUMER_FORGE_INPUT_BLOCK",
+        "PASS_FORGE_RUNNABLE_IS_INPUT_FITNESS"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_CLI_FORGE_INPUT_NEXT",
+        "PASS_SKILL_STOP_BEFORE_PROMPT_A",
+        "PASS_OPERATOR_CONTROL_NOT_SLASH_NEXT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_PASS",
+    "NO_ALPHA",
+    "NO_FORGE_EXECUTION",
+    "NO_A4_OR_LATER_SCOPE"
+  ]
+}

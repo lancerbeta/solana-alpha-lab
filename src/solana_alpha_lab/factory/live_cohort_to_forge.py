@@ -70,7 +70,6 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     release_id_for,
     resolve_cohort_admission_instant,
     seal_live_cohort,
-    select_current_datasets_for_forge,
     verify_live_cohort,
 )
 from solana_alpha_lab.factory.live_cohort_source_bundle import sha256_file_streaming
@@ -714,51 +713,29 @@ def forge_control_ready(
     imported_cohort_id: str | None = None,
 ) -> dict[str, Any]:
     """Read-only Forge CONTROL readiness. Does not invoke /hypothesis-forge."""
+    from solana_alpha_lab.factory.forge_input_receipt import build_forge_input_receipt
+
     _require(python_runtime_ok(), "HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE")
     probe = Path(repo_root) / PROBE_CONTRACT_RELATIVE
     _require(probe.is_file(), "CONTROL_PROBE_CONTRACT_MISSING")
+    input_receipt = build_forge_input_receipt(
+        Path(data_root),
+        repo_root=Path(repo_root),
+        imported_cohort_id=imported_cohort_id,
+        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    if not input_receipt["forge_runnable"]:
+        codes = list(input_receipt.get("blocking_reason_codes") or [])
+        _require(False, str(codes[0] if codes else "CURRENT_CORPUS_MISSING"))
     datasets, warnings = enumerate_rdp_datasets(Path(data_root))
     bounded, trunc = select_forge_packet_datasets(
         datasets,
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
     )
     current = [item for item in bounded if is_live_corpus_dataset(item)]
-    if not current:
-        all_current = [
-            item
-            for item in select_current_datasets_for_forge(datasets)
-            if is_live_corpus_dataset(item)
-        ]
-        _require(not all_current, "CURRENT_CORPUS_EXCLUDED_FROM_CONTROL_PACKET")
-        _require(False, "CURRENT_CORPUS_MISSING")
+    _require(bool(current), "CURRENT_CORPUS_MISSING")
     chosen = current[0]
     labels = dict(chosen.get("labels") or {})
-    if imported_cohort_id:
-        lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-        _require(lineage_path.is_file(), "CORPUS_LINEAGE_INCOMPLETE")
-        lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
-        ids = [
-            str(c.get("cohort_id"))
-            for c in (lineage.get("cohorts") or [])
-            if isinstance(c, Mapping)
-        ]
-        _require(imported_cohort_id in ids, "IMPORTED_COHORT_MISSING")
-        current_mid = str(lineage.get("current_dataset_manifest_id") or "")
-        _require(bool(current_mid), "CORPUS_LINEAGE_INCOMPLETE")
-        _require(
-            str(chosen.get("dataset_manifest_id") or "") == current_mid,
-            "CONTROL_CORPUS_MANIFEST_MISMATCH",
-        )
-    else:
-        lineage_path = Path(data_root) / "datasets" / "live_lifecycle_corpus" / "lineage.json"
-        if lineage_path.is_file():
-            lineage = json.loads(lineage_path.read_text(encoding="utf-8"))
-            current_mid = str(lineage.get("current_dataset_manifest_id") or "")
-            if current_mid:
-                _require(
-                    str(chosen.get("dataset_manifest_id") or "") == current_mid,
-                    "CONTROL_CORPUS_MANIFEST_MISMATCH",
-                )
     yield_eligible = int(labels.get("yield_eligible") or chosen.get("yield_eligible") or 0)
     raw_base_x = labels.get("base_x_population_n", chosen.get("base_x_population_n"))
     if raw_base_x is None:
@@ -874,6 +851,9 @@ def forge_control_ready(
         "live_corpus_in_packet": bool(trunc.get("live_corpus_in_packet")),
         "control_search_action": action,
         "bounded_dataset_count": len(bounded),
+        "forge_input_receipt": input_receipt,
+        "forge_runnable": True,
+        "owner_class": input_receipt.get("owner_class"),
     }
 
 

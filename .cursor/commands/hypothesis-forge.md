@@ -46,6 +46,18 @@ launch Critic; `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`).
 
 No Git mutation, no provider calls, no experiment execution, no autonomous generator.
 
+After `preflight`, show the `FORGE INPUT` owner block from `owner_forge_input`
+(visible cohorts, active evidence set, historical calibration, visibility,
+representations, `next`) before Prompt A. If `forge_input_receipt.forge_runnable`
+is false, stop; do not synthesize even if ordinary `action` is
+`START_NEW_SESSION`. Typed `next`: `WAIT_FOR_IMPORT_OR_STOP` /
+`STOP_OBSERVABILITY` / ready `STOP_BEFORE_SYNTHESIS` (not slash authority).
+No-write diagnostic:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json
+```
+
 ## Representation mode boundary
 
 The normal slash command remains `ORDINARY`; its behavior and search budget are

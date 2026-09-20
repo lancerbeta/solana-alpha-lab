@@ -20,6 +20,9 @@ queries:
 - query_id: SGQ-HYPOTHESIS-FORGE-RU
   query: как сгенерировать или проверить гипотезу
   required_top_route: SEM-HYPOTHESIS-FORGE
+- query_id: SGQ-FORGE-INPUT-EN
+  query: what can Forge currently see
+  required_top_route: SEM-HYPOTHESIS-FORGE
 - query_id: SGQ-NORMALIZED-TRAJECTORY-PROBE
   query: normalized trajectory
   required_top_route: SEM-HYPOTHESIS-FORGE

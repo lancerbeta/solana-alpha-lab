@@ -277,6 +277,65 @@ def cmd_preflight(
     return emit(payload, exit_code=exit_code)
 
 
+def cmd_forge_input(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+) -> int:
+    """No-write Forge input/visibility receipt. Never starts a session."""
+    from solana_alpha_lab.factory.forge_input_receipt import (
+        OWNER_CLASS_INPUT_NOT_READY,
+        build_forge_input_receipt,
+        format_forge_input_owner_block,
+        forge_input_owner_next,
+    )
+
+    try:
+        resolved = resolve_existing_data_root(
+            repo_root, explicit_data_root=explicit_data_root
+        )
+    except DataRootError as exc:
+        payload = {
+            "schema": "smial.forge-input-receipt",
+            "schema_version": "1.0",
+            "owner_class": OWNER_CLASS_INPUT_NOT_READY,
+            "forge_runnable": False,
+            "blocking_reason_codes": [str(exc)],
+            "session_id": None,
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
+        }
+        payload["next"] = forge_input_owner_next(payload)
+        payload["owner_forge_input"] = format_forge_input_owner_block(payload)
+        _assert_no_path_leak(payload, str(repo_root))
+        return emit(payload, exit_code=2)
+    if resolved.status != "PRESENT" or resolved.root is None:
+        payload = {
+            "schema": "smial.forge-input-receipt",
+            "schema_version": "1.0",
+            "owner_class": OWNER_CLASS_INPUT_NOT_READY,
+            "forge_runnable": False,
+            "blocking_reason_codes": [resolved.error or "CURRENT_CORPUS_MISSING"],
+            "session_id": None,
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
+        }
+        payload["next"] = forge_input_owner_next(payload)
+        payload["owner_forge_input"] = format_forge_input_owner_block(payload)
+        _assert_no_path_leak(payload, str(repo_root))
+        return emit(payload, exit_code=2)
+    receipt = build_forge_input_receipt(resolved.root, repo_root=repo_root)
+    payload = {
+        **receipt,
+        "owner_forge_input": format_forge_input_owner_block(receipt),
+        "next": forge_input_owner_next(receipt),
+        "session_id": None,
+        "no_write": True,
+        "selection_reason": resolved.selection_reason,
+    }
+    _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
+    exit_code = 0 if receipt["forge_runnable"] else 2
+    return emit(payload, exit_code=exit_code)
+
+
 def _store_root(repo_root: Path, explicit_data_root: Path | None) -> Path:
     return _active_root(repo_root, explicit_data_root).root
 
@@ -1145,6 +1204,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="CURRENT_REPRESENTATION_CONTROL_V1 evidence-surface mode",
     )
 
+    forge_input = subparsers.add_parser(
+        "forge-input",
+        help="No-write FORGE_INPUT_RECEIPT; never starts a session",
+    )
+    forge_input.add_argument("--format", choices=("json",), default="json")
+    forge_input.add_argument(
+        "--no-write",
+        action="store_true",
+        default=True,
+        help="Accepted and always true; forge-input never persists",
+    )
+
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--draft", type=Path, required=True)
     freeze.add_argument("--preflight-receipt", type=Path, required=True)
@@ -1347,6 +1418,11 @@ def main(argv: list[str] | None = None) -> int:
                 control_current_representation=bool(
                     getattr(args, "control_current_representation", False)
                 ),
+            )
+        if args.command == "forge-input":
+            return cmd_forge_input(
+                repo_root,
+                explicit_data_root=args.data_root,
             )
         if args.command == "freeze":
             return cmd_freeze(

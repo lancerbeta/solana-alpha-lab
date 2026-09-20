@@ -1382,9 +1382,11 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
             self.assertGreater(len(enumerated), 8)
             self.assertEqual(len(ordinary), 8)
             self.assertTrue(ordinary_receipt["truncated"])
-            self.assertFalse(
+            self.assertTrue(
                 any(is_live_corpus_dataset(item) for item in ordinary)
             )
+            self.assertTrue(ordinary_receipt["live_corpus_in_packet"])
+            self.assertTrue(ordinary_receipt["live_corpus_protected"])
             self.assertTrue(control_receipt["live_corpus_in_packet"])
             self.assertTrue(any(is_live_corpus_dataset(item) for item in control_packet))
             self.assertLessEqual(len(control_packet), 8)
@@ -1748,8 +1750,10 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
             evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
         )
         self.assertEqual(len(ordinary), 8)
-        self.assertFalse(any(is_live_corpus_dataset(item) for item in ordinary))
+        self.assertTrue(any(is_live_corpus_dataset(item) for item in ordinary))
         self.assertTrue(ordinary_receipt["truncated"])
+        self.assertTrue(ordinary_receipt["live_corpus_in_packet"])
+        self.assertTrue(ordinary_receipt["live_corpus_protected"])
         self.assertTrue(any(is_live_corpus_dataset(item) for item in control))
         self.assertTrue(control_receipt["live_corpus_in_packet"])
         self.assertEqual(len(control), 8)

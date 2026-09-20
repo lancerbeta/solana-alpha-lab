@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-INPUT-TRUTH-AND-VISIBILITY-FACTORY-FIT-001",
+  "as_of": "2026-09-20",
+  "task_id": "FORGE_INPUT_TRUTH_AND_VISIBILITY_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_ONE_FORGE_INPUT_RECEIPT_NOT_ALPHA",
+    "flexibility_and_history": "PASS_REUSE_PREFLIGHT_AND_CONTROL_ADAPTER",
+    "context_efficiency": "PASS_EXISTING_SEM_HYPOTHESIS_FORGE_AND_LIVE_EVIDENCE",
+    "research_truth": "PASS_HISTORICAL_CAVEAT_OWN_FROZEN_INPUTS",
+    "owner_operability": "PASS_FORGE_INPUT_BEFORE_SYNTHESIS_NO_WRITE_CLI",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_COMPATIBILITY_CANNOT_DISAGREE_ON_COMMON_CHECKS"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "A4_FORGE_REPRESENTATION_LADDER_AFTER_MERGE"
+  },
+  "recovery": "Ordinary Git revert of the bounded builder, adapters, CLI, skill, tests, operator note and Catalog pins. Do not rewrite historical selection-gate bytes or destroy imported LIVE CORPUS.",
+  "limits": [
+    "NO_FORGE_EXECUTION",
+    "NO_ALPHA",
+    "NO_A4_OR_LATER",
+    "NO_HISTORICAL_RECEIPT_REWRITE",
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROVIDER_OR_DEPLOYMENT"
+  ]
+}
