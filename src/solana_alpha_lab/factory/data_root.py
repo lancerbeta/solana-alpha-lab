@@ -71,12 +71,15 @@ def _env_mapping(env: Mapping[str, str] | None) -> Mapping[str, str]:
 
 
 def _git_stdout(start: Path, *args: str) -> str:
-    completed = subprocess.run(
-        ["git", "-C", str(start), *args],
-        capture_output=True,
-        check=False,
-        shell=False,
-    )
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(start), *args],
+            capture_output=True,
+            check=False,
+            shell=False,
+        )
+    except OSError as exc:
+        raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT") from exc
     if completed.returncode != 0:
         raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT")
     return completed.stdout.decode("utf-8", errors="replace").strip()

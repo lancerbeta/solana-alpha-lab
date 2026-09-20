@@ -69,6 +69,20 @@ class CanonicalDataRootTests(unittest.TestCase):
             self.assertEqual(discovered.status, "UNAVAILABLE")
             self.assertEqual(discovered.error, "DATA_ROOT_NON_GIT_CONTEXT")
 
+    def test_missing_git_binary_is_typed_non_git_stop(self) -> None:
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as tmp:
+            repo = Path(tmp) / "repo"
+            repo.mkdir()
+            with patch(
+                "solana_alpha_lab.factory.data_root.subprocess.run",
+                side_effect=FileNotFoundError("git"),
+            ):
+                with self.assertRaises(DataRootError) as raised:
+                    resolve_data_root(repo, env={})
+            self.assertEqual(raised.exception.code, "DATA_ROOT_NON_GIT_CONTEXT")
+
 
 class CohortImportReadbackTests(unittest.TestCase):
     def test_readback_counts_c1_c2_once_without_absolute_path(self) -> None:

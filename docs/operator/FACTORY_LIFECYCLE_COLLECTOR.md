@@ -524,8 +524,13 @@ authorized scope (seal/import/Forge require their own contract).
 `OBSERVATION_BATCH` in `[window_start, as_of]`, never `dataset-*.published`.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
+
+Omit `--data-root` on this list so a linked worktree does not look at a
+worktree-local plane. `imported` is unknown until you pass `--data-root`
+from the **principal** checkout. Do not copy a relative `--data-root` onto
+`publish-live-cohort`.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --plan-only --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
@@ -543,7 +548,7 @@ publish the next mature unimported cohort. Optional
 `--discovery-coverage-class GAP_SUSPECTED` when collector coverage is known.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
 
 ```
@@ -628,7 +633,8 @@ cohort appears in lineage; do not paste the placeholder `REL-...`.
 
 Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
 `PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `IMPORT_CONFLICT`,
-`STOP_IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
+`STOP_IDENTITY_CONFLICT`, `DATA_ROOT_NON_GIT_CONTEXT`,
+`COVERAGE_CONFIRMED_BROKEN`,
 `LOW_YIELD`, `SOURCE_BUILD_RESOURCE_LIMIT`,
 `DATASET_PUBLICATION_INCOMPLETE`, `LIVE_CORPUS_PARQUET_SYMLINK`,
 `CORPUS_PARQUET_SHA_MISMATCH`. Typed FAIL JSON includes `next`. `LOW_YIELD`

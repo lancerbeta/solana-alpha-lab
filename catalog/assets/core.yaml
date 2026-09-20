@@ -29952,7 +29952,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md', repository_path: docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md}
-  integrity: {kind: sha256, sha256: 24cdf680533e179fe00b45eb7ceaf9efbe940b19e45a4b6c2d86abded0135ea7}
+  integrity: {kind: sha256, sha256: ea254a88b58d69040cf88606d4d0c48f7942d8d601c89ae70139840b300e6172}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: DOC-FACTORY-REMOTE-HOST-001}
@@ -37830,7 +37830,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/data_root.py', repository_path: src/solana_alpha_lab/factory/data_root.py}
-  integrity: {kind: sha256, sha256: 78a37b061d1262f718a3ae675ea858fc8a09c6c0d959c3634e6f661301dcc5e6}
+  integrity: {kind: sha256, sha256: 594c98c33acbc9b43ad3a45c29b58063f94946a73113d81fdc6967382c13e2b6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001}
@@ -37866,7 +37866,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_cohort_data_root_and_import_readback_v1.py', repository_path: tests/test_cohort_data_root_and_import_readback_v1.py}
-  integrity: {kind: sha256, sha256: a51a216ba648e72665fa5dc173c2b504e09be2de4cec0d9270eb1e727d28fd0c}
+  integrity: {kind: sha256, sha256: bf2d4aae1d72332483b0670bfac924f686141c123aa3f3d5f42b6e031d7bd0f2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001}
@@ -37885,7 +37885,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md', repository_path: docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md}
-  integrity: {kind: sha256, sha256: c11be881333f9349aa2c426b1663b48dbc2c4299c2dcf4d08a984becd31ba555}
+  integrity: {kind: sha256, sha256: 7eff03f151f369992c04ee99480bdcf888cfe09609e364529bfc30ee2b90f8ce}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-FACTORY-DATA-ROOT-001}
