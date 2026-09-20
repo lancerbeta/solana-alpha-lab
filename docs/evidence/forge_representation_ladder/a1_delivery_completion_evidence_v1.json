@@ -10,7 +10,28 @@
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
-  "implementation_bindings": {},
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "a5ff274f18599e4ddeb6f624f7358d3a8def6d330d20313f95e9b980fc0b4678",
+    ".cursor/commands/hypothesis-forge.md": "9061f87008756864a788086eeea3a0245099b20262497774ec05dd714d8e6c14",
+    "catalog/assets/core.yaml": "861fd17a7e55d022c8febc080c0135f48f3852a391dc2c395f7bb5e79a028731",
+    "catalog/assets/lifecycle.yaml": "fbd9b1b8cd3974a136cbb6013880c4de1feec9241e9b12f228389f2727d13876",
+    "catalog/catalog_manifest.yaml": "56a9be27f5703209f180ae43ec2bddbac067e450f754d5321857b1292afc2ddb",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "2931c424779d6b979109860df6bdc521d0f02e2703937d7210a4c111f386838c",
+    "catalog/generated/asset_edges.json": "d50bf9b25d63a604bec1a0a3e8db376f6d88009d58952bf4da095691ba58bb91",
+    "catalog/schemas/forge_run_receipt_v1.schema.json": "c548d88955f43836d4290b49038e64b82ec71a3403be0db2127496ba18171762",
+    "configs/factory_semantic_operability_v1.yaml": "4a09c376404ba58635286b9117ee6d4eba97f46eb5ac119b64d026133ed3c182",
+    "configs/hfic_representation_ladder_v1.yaml": "402d89a9235f6195a2e05727d041f185b5409fa1e53fa9364c611e97fbb1429e",
+    "configs/hypothesis_forge_independent_critic_v1.yaml": "0e825c4f5dd0fe73608f7c96acd5daa33ca1efbc4e02a846fa87dbe0e3b01677",
+    "docs/PROJECT_MAP.md": "9729c159d465e2b5896288d6ef20e0b84208a2080bff8632824fbb5210a42440",
+    "docs/evidence/forge_representation_ladder/a1_no_write_vertical_v1.json": "7e75355d6b7ea2bfe0ca9015ba3891ff1fd0031e3b605c191dabbc3538f05c2c",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "0c443c75217e625daa40220d4e601c9ab8774f78fc43bcab60cdb3d4586cd712",
+    "docs/reports/forge_representation_ladder/a1_owner_readout_v1.md": "0d14121e0f91df29b8b55f229406988d2e806ec53d827e17c4d57c6fa0ceb35d",
+    "docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md": "24ad5ac021df7696edbb70d4e62abeeb1e3650e4f19009e18de1e576b625e129",
+    "scripts/hypothesis_forge.py": "7755d89b4888c2b3a6378bc1aac5b5d8193d8ebbcf0d1140cc8efad7e64e19e5",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "b99d4733f6b01ed4fa53ebd6904d0e190ba62e89867a6016f759e74cb18b1d0e",
+    "tests/test_forge_representation_ladder_v1.py": "08b62437e994e937597dc44b91ec70d9d3ba2f39edbb5ce3b221fc904987caa9",
+    "tests/test_hfic_provenance_clock.py": "fbfc5743b5fd705d3914c6284bc07a2cbaa232a245194e72f6b4eeb38d3c6a14"
+  },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
     "auth_or_access_recovery": false,
@@ -21,14 +42,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_representation_ladder/a1_delivery_factory_fit_v1.json",
-    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "sha256": "8ee59d729872a16c6244837c3fde10edcbfedd9f30f39b9bb94f5aa1d9da192c",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_REPRESENTATION_LADDER_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/forge_representation_ladder/a1_delivery_independent_review_v1.json",
-      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sha256": "3873ce964e7667027f9a234ff591bb281be76d58fdc7caef3f9545c2ae78399d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
