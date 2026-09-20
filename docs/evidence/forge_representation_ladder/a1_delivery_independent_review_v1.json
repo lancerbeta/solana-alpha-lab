@@ -4,8 +4,8 @@
   "review_id": "FORGE-REPRESENTATION-LADDER-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-20",
   "task_id": "FORGE_REPRESENTATION_LADDER_V1",
-  "reviewed_bindings_sha256": "194c599c224212bdbc50810a49f7b25d3150f09b09780b833c4815423e03050c",
-  "reviewed_inventory_sha256": "3ca0d88df3fd8fd8968e1d4594b429cb40bb7779e46a17469c9500a858c006f7",
+  "reviewed_bindings_sha256": "b104f8efb44c48cd465e7d2db37c352e319ab973d014967a69666f8e138ae8c2",
+  "reviewed_inventory_sha256": "bf0ce1205c739f689e2649b5adca96da578c6fcb9ee217aae6fd97951476b9db",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,34 +17,39 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=fa9ffe1ecba9a467bc11e798b75634336d63c22d6403b29c1b886f6dd7f7dbb1",
+        "packet_fingerprint_sha256=c15e7e52facacc6fa26737da8a3c5c03247365c75afa7fb6319f6f174f78ce6c",
         "PACKET_INFORMATION_PATH_ONLY",
         "MODEL_DIVERSITY_UNPROVEN",
-        "PASS_START_V1_AUTO_NOT_WAIT",
-        "PASS_NO_FALSE_EXHAUST_OBSERVABILITY",
+        "PASS_F1_NO_DEFAULT_HISTORICAL_CONTROL",
+        "PASS_F2_CLI_MISSING_PACKET_OBSERVABILITY",
+        "PASS_F3_LATER_REP_PARENT_FILTERED",
         "PASS_A3_ONLY_INPUT_OWNER",
-        "PASS_FORGE_CONTEXT_NO_FAKE_CRITIC"
+        "PASS_TO_CLASSIFICATION_AS_OWNER_CANDIDATE_ORIGINAL_A4",
+        "CONTROL_REQUIRED_EVENING_DONE_ORIGINAL_A4"
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PASS_CRITIC_RESULT_READY_IS_RESUME_BASE",
-        "PASS_RESUME_V1_NOT_START_HELPER",
-        "PASS_BASE_TERMINAL_MISSING_OBSERVABILITY",
-        "PASS_KEEP_PAUSE_READOUT_NOT_DONE",
-        "PASS_ONE_SLASH_ONE_BOUNDED_RUN_CLOCK"
+        "PASS_BLOCKED_READOUT_REFRESH",
+        "PASS_PERSIST_AFTER_ATTACH_NOT_BLOCKED",
+        "PASS_FREEZE_BIND_REAL_APIS",
+        "PASS_NO_HISTORICAL_CONTROL_DEFAULT",
+        "PASS_LATER_REP_CONSUMED",
+        "PASS_KEEP_PAUSE_NAMED",
+        "PASS_TO_CLASSIFICATION_OWNER_CANDIDATE_ORIGINAL_A4"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_CHEAPEST_FALSIFIER_START_V1",
-        "PASS_EMPTY_BASE_FORGE_CONTEXT_ENVELOPE",
-        "PASS_NO_FAKE_CRITIC_PACKET",
-        "PASS_OWNER_READOUT_SPLIT_CLONE_PATH",
+        "PASS_F1_BASE_CURRENT_BINDING",
+        "PASS_F2_V1_ARTIFACT_READBACK",
+        "PASS_F3_LATER_REP_COMPLETION",
+        "PASS_CHEAPEST_FALSIFIER_HELD",
+        "PASS_MANDATORY_EMPTY_BASE_FREEZE_FINALIZE_RETRY",
         "PASS_NO_SCIENTIFIC_V1_PROBE"
       ]
     },
@@ -52,12 +57,30 @@
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_OWNER_READOUT_STATUS_TOKENS",
-        "PASS_START_V1_PASTE_FREE",
-        "PASS_PROMPT_C_WAIT_NOT_RUN_FINAL",
-        "PASS_OPERATOR_FORGE_RUN_HEADER",
-        "PASS_RESUME_V1_SAVED_DRAFT"
+        "PASS_BLOCKED_STATUS_NOT_STALE_V1",
+        "PASS_KEEP_PAUSE_NAMED",
+        "PASS_CONTROL_REQUIRED_EVENING_DONE",
+        "PASS_OWNER_READOUT_NOT_JSON_DUMP",
+        "PASS_START_V1_LADDER_FREEZE_PREFLIGHT"
       ]
+    }
+  ],
+  "remediation_history": [
+    {
+      "role": "CODE_REVIEWER",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "stale START_V1 owner_readout after OBSERVABILITY overlay",
+      "observed_head": "b7687f4d3d4b6baf03f050f3e6616c80aa0f0c58",
+      "resolved_by_head": "18ef56be9ad77a65cfbbb6ab082c58a00196809f"
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "stale START_V1 readout after OBSERVABILITY overlay; KEEP_PAUSE unnamed in command",
+      "observed_head": "b7687f4d3d4b6baf03f050f3e6616c80aa0f0c58",
+      "resolved_by_head": "18ef56be9ad77a65cfbbb6ab082c58a00196809f"
     }
   ],
   "verdict": "PASS",
