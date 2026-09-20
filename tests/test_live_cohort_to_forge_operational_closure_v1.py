@@ -1275,10 +1275,7 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 published["readiness"]["discovery_coverage_class"],
                 "GAP_SUSPECTED",
             )
-            self.assertTrue(published["forge"]["control_run_required_first"])
-            self.assertFalse(published["forge"]["normalized_trajectory_executed"])
-            self.assertNotIn("next", published["forge"])
-            self.assertGreaterEqual(published["forge"]["yield_eligible"], 10)
+            self.assertNotIn("forge", published)
             self.assertNotEqual(published["epoch_before"], published["epoch_after"])
             retry = publish_live_cohort(
                 repo_root=ROOT,

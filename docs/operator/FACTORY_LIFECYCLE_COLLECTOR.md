@@ -528,9 +528,9 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 ```
 
 Omit `--data-root` on this list so a linked worktree does not look at a
-worktree-local plane. `imported` is unknown until you pass `--data-root`
-from the **principal** checkout. Do not copy a relative `--data-root` onto
-`publish-live-cohort`.
+worktree-local plane. `imported` is `null` and `imported_status` is
+`UNKNOWN`. `next_unimported_mature` is also null. Do not copy a relative
+`--data-root` onto `publish-live-cohort`.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --plan-only --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
@@ -613,23 +613,8 @@ Omit `--data-root` to land in the Git principal checkout
 `PASS_ALREADY_PRESENT_EXACT`. That readback is the owner import terminal.
 Do not run Forge. `readback.next_owner_action` is
 `STOP_BEFORE_HYPOTHESIS_FORGE` when lineage is present once.
-
-Expert diagnostic only (not the owner next step after import):
-
-```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
-```
-
-Happy diagnostic terminal is `FORGE_CONTROL_READY`. After A3 visibility
-PASS, ordinary Forge is:
-
-```
-/hypothesis-forge CURRENT_REPRESENTATION_CONTROL
-```
-
-Do not treat ordinary Forge as a fallback when CONTROL corpus/yield
-preconditions fail. Optional `--imported-cohort-id` checks that exact
-cohort appears in lineage; do not paste the placeholder `REL-...`.
+Do not paste `forge-control-ready` or `/hypothesis-forge` as the next
+step; those remain expert diagnostics later in this document.
 
 Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
 `PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `IMPORT_CONFLICT`,
@@ -645,6 +630,21 @@ fail closed on missing/tampered/mismatched `observation_schedule.json`
 (`SEAL_SCHEDULE_DOCUMENT_MISSING`, `SCHEDULE_ARTIFACT_MISSING`,
 `SCHEDULE_SEMANTIC_SHA_MISMATCH`). Do not invent a bind-schedule command.
 
+Expert diagnostic only, after the import loop is already `STOP_BEFORE_HYPOTHESIS_FORGE`.
+Not the owner next step. Relative `--data-root` is the principal checkout
+relative plane; do not run this from a linked worktree expecting a different
+corpus.
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
+```
+
+Happy diagnostic terminal is `FORGE_CONTROL_READY`. After later A3 visibility
+PASS, ordinary Forge is `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
+Do not treat ordinary Forge as a fallback when CONTROL corpus/yield
+preconditions fail. Optional `--imported-cohort-id` checks that exact
+cohort appears in lineage; do not paste the placeholder `REL-...`.
+
 Primitives remain available (`build-live-source` requires `--cohort-id` and
 `--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /
 `import-live`). If `import-live` fail-closes with `CURRENT_CORPUS_LEGACY_METADATA_REQUIRES_REPAIR`,
@@ -654,7 +654,7 @@ Do not treat repair itself as the import. If repair is interrupted, or
 `.published` is missing/corrupt, rerun the same repair command.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests
 ```
 
 CLI `status` `PASS` carries operational `result.status` `REPAIRED` or

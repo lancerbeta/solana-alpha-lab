@@ -300,6 +300,7 @@ class ExactReimportLineageTests(unittest.TestCase):
             import_live_cohort,
         )
         from tests.test_live_cohort_to_forge_operational_closure_v1 import (
+            ACTIVATION,
             AS_OF_C1,
             C1_ADMIT,
             COHORT1,
@@ -367,6 +368,33 @@ class ExactReimportLineageTests(unittest.TestCase):
             self.assertEqual(counts_first[COHORT1], 1)
             self.assertEqual(counts_second[COHORT1], 1)
             self.assertEqual(after_second["duplicate_cohort_count"], 0)
+            from solana_alpha_lab.factory.live_cohort_to_forge import list_live_cohorts
+
+            listed_unknown = list_live_cohorts(
+                observation_rdp=observation_rdp,
+                ops_store=ops,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION,
+                data_root=None,
+                as_of=AS_OF_C1,
+            )
+            self.assertEqual(listed_unknown["imported_status"], "UNKNOWN")
+            self.assertIsNone(listed_unknown["next_unimported_mature"])
+            self.assertTrue(
+                all(row["imported"] is None for row in listed_unknown["cohorts"])
+            )
+            listed_known = list_live_cohorts(
+                observation_rdp=observation_rdp,
+                ops_store=ops,
+                schedule_sha256=digest,
+                activation_id=ACTIVATION,
+                data_root=data_root,
+                as_of=AS_OF_C1,
+            )
+            self.assertEqual(listed_known["imported_status"], "KNOWN")
+            self.assertTrue(
+                any(row["imported"] is True for row in listed_known["cohorts"])
+            )
             import importlib.util
 
             spec = importlib.util.spec_from_file_location(

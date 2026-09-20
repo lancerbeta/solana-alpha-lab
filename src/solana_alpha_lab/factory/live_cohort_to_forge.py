@@ -653,7 +653,8 @@ def list_live_cohorts(
     _require(isinstance(activation, Mapping), "LIVE_SOURCE_ACTIVATION_MISSING")
     starts = parse_utc(str(activation.get("starts_at") or ""))
     stops = parse_utc(str(activation.get("stops_at") or activation.get("stops_admitting_at") or ""))
-    imported = _imported_cohort_ids(data_root)
+    plane_known = data_root is not None
+    imported = _imported_cohort_ids(data_root) if plane_known else set()
     rows: list[dict[str, Any]] = []
     next_id = None
     for cohort_id, start, end in campaign_cohort_windows(starts, stops):
@@ -666,9 +667,9 @@ def list_live_cohorts(
             as_of=now,
         )
         mature = bool(receipt.get("now_ge_mature_at"))
-        imported_flag = cohort_id in imported
+        imported_flag: bool | None = (cohort_id in imported) if plane_known else None
         blocked = None
-        if mature and not imported_flag:
+        if mature and imported_flag is not True:
             try:
                 assert_closure_ready(receipt)
             except (LiveCohortReleaseError, DiscoveryReleaseError) as exc:
@@ -684,13 +685,20 @@ def list_live_cohorts(
                 "blocker": blocked,
             }
         )
-        if next_id is None and mature and not imported_flag and blocked is None:
+        if (
+            plane_known
+            and next_id is None
+            and mature
+            and imported_flag is False
+            and blocked is None
+        ):
             next_id = cohort_id
     return {
         "schedule_sha256": schedule_sha256,
         "activation_id": activation_id,
         "cohorts": rows,
         "next_unimported_mature": next_id,
+        "imported_status": "KNOWN" if plane_known else "UNKNOWN",
     }
 
 

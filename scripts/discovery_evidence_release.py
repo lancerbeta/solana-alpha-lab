@@ -123,11 +123,7 @@ def _print_import_success(result: object, data_root: Path) -> None:
     if isinstance(result, dict):
         owner_result = dict(result)
         owner_result.pop("next", None)
-        forge = owner_result.get("forge")
-        if isinstance(forge, dict):
-            forge = dict(forge)
-            forge.pop("next", None)
-            owner_result["forge"] = forge
+        owner_result.pop("forge", None)
     payload: dict[str, object] = {"result": owner_result}
     status = "PASS"
     inner_status = None
@@ -247,12 +243,17 @@ def main(argv: list[str] | None = None) -> int:
         "repair-live-corpus-manifests",
         help="Metadata-only TASK-06 repair of the current LIVE CORPUS root",
     )
-    repair_live.add_argument("--data-root", type=Path, required=True)
+    repair_live.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="LIVE CORPUS root; omit to use the Git principal checkout local/factory_v1/data_plane",
+    )
     repair_live.add_argument("--published-at", type=str, default=None)
 
     publish = sub.add_parser(
         "publish-live-cohort",
-        help="One-shot: closure → source → seal → verify → transport → import → Forge CONTROL",
+        help="One-shot: closure → source → seal → verify → transport → import + readback",
     )
     publish.add_argument("--observation-rdp", type=Path, required=True)
     publish.add_argument("--ops-store", type=Path, required=True)
@@ -272,7 +273,7 @@ def main(argv: list[str] | None = None) -> int:
 
     listed = sub.add_parser(
         "list-live-cohorts",
-        help="List campaign cohorts and the next mature unimported cohort",
+        help="List campaign cohorts; imported flags require --data-root",
     )
     listed.add_argument("--observation-rdp", type=Path, required=True)
     listed.add_argument("--ops-store", type=Path, required=True)
@@ -388,7 +389,7 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         elif args.command == "repair-live-corpus-manifests":
             result = repair_live_corpus_manifests(
-                data_root=_path(args.data_root),
+                data_root=_resolved_data_root(args.data_root),
                 published_at=_parse_utc(args.published_at),
             )
         elif args.command == "publish-live-cohort":
