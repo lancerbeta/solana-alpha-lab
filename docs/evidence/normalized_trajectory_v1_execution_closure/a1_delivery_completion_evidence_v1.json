@@ -21,6 +21,7 @@
     "docs/PROJECT_MAP.md": "61bbb09a9a7f86d55effabffb7f82f14eb274492f57b2a8e2551a0d0347551d4",
     "docs/contracts/normalized_trajectory_v1_capability_contract.md": "4bd9d839c1e6e449fbd2aeb0e4def4030aeb991aae47481a1ac19b40fd63b5d0",
     "docs/evidence/normalized_trajectory_v1_execution_closure/a1_c2_persist_false_handback_v1.json": "8bbb56082869a6dd389bc90afb856c1f91b06f8f48855341c9255caff12d1b3a",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6e310ea424645733070de4f42832e2d8ad70e21e9b66feb9093b814a0df271c5",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "c4300294b3f678fa134ec5b88ed053813dd28659c8ed853746c243e135e019c9",
     "docs/reports/normalized_trajectory_v1_execution_closure/a1_owner_readout_v1.md": "f0fe011c455e2797a33411129f3ec1fc446987193ab592689c244a0bf1881fce",
     "docs/tasks/NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1.md": "6c286089972ddf7f536e66059cedc404600b164bf9a015ba5e3cc49ce26cb0bd",
@@ -42,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/normalized_trajectory_v1_execution_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "5524bc7edd51959c5bfb2ff81e48497edc803593e11d83e166791258aa9aa214",
+    "sha256": "99e679a4c7e978fc30a1ed833e425d2e3c0d04658cace74cd8a70e4c7eaba5fb",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/normalized_trajectory_v1_execution_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "bb514dbc301fed356fd9ece7d76148de2b950e846736efafebf248267a803dfd",
+      "sha256": "ea691b7616ba2cb731ccea549ad6243f7279199663b3645154198a7fc68fa4e3",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
