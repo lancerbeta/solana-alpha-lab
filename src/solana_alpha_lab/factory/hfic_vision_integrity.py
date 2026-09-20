@@ -18,6 +18,7 @@ a typed STOP that must never masquerade as ``NO_WORTHY_HYPOTHESIS``.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import Any
 
 FORGE_VISION_INTEGRITY_BLOCKED = "FORGE_VISION_INTEGRITY_BLOCKED"
@@ -282,6 +283,117 @@ def compute_vision_integrity(
             else UNKNOWN
         )
     return receipt
+
+
+def evaluate_forge_packet_vision(
+    *,
+    live_corpus_in_packet: bool,
+    material_truncation: bool = False,
+    repo_root: Path | str | None = None,
+    grounding_entries: Sequence[Mapping[str, Any]] | None = None,
+    retained_feature_ids: Sequence[str] = (),
+    retained_families: Sequence[str] = (),
+    retained_grounding_index: Sequence[Mapping[str, Any]] | None = None,
+    dropped_semantic_routes: Sequence[str] = (),
+    retained_capability_ids: Sequence[str] = (),
+) -> dict[str, Any]:
+    """Pure no-write material packet/vision visibility.
+
+    Shared by the Forge input receipt, forge-control-ready, and actual
+    ``build_forge_context_packet``. Does not persist packets, start sessions,
+    or evaluate PIT/missingness. ``retained_grounding_index`` is required for
+    a PASS; omitting it is unknown omission, not a compact-all tautology.
+    """
+
+    if grounding_entries is not None:
+        entries: list[Mapping[str, Any]] = list(grounding_entries)
+    else:
+        if repo_root is None:
+            vision = {
+                "status": "BLOCKED",
+                "schema": "smial.hfic-vision-integrity",
+                "schema_version": "1.0",
+                "material_information_loss": 0,
+                "unknown_omission": 1,
+                "reason": FORGE_VISION_INTEGRITY_BLOCKED,
+                "reason_code": UNKNOWN,
+            }
+            return _packet_vision_verdict(
+                vision,
+                live_corpus_in_packet=live_corpus_in_packet,
+                material_truncation=material_truncation,
+            )
+        from solana_alpha_lab.factory.hfic_grounding import (
+            HficGroundingError,
+            build_feature_grounding_projection,
+        )
+
+        try:
+            projection = build_feature_grounding_projection(Path(repo_root))
+        except HficGroundingError:
+            vision = {
+                "status": "BLOCKED",
+                "schema": "smial.hfic-vision-integrity",
+                "schema_version": "1.0",
+                "material_information_loss": 0,
+                "unknown_omission": 1,
+                "reason": FORGE_VISION_INTEGRITY_BLOCKED,
+                "reason_code": UNKNOWN,
+            }
+            return _packet_vision_verdict(
+                vision,
+                live_corpus_in_packet=live_corpus_in_packet,
+                material_truncation=material_truncation,
+            )
+        entries = list(projection.get("feature_grounding_entries") or [])
+    if retained_grounding_index is None:
+        vision = {
+            "status": "BLOCKED",
+            "schema": "smial.hfic-vision-integrity",
+            "schema_version": "1.0",
+            "material_information_loss": 0,
+            "unknown_omission": 1,
+            "reason": FORGE_VISION_INTEGRITY_BLOCKED,
+            "reason_code": UNKNOWN,
+        }
+        return _packet_vision_verdict(
+            vision,
+            live_corpus_in_packet=live_corpus_in_packet,
+            material_truncation=material_truncation,
+        )
+    index = list(retained_grounding_index)
+    vision = compute_vision_integrity(
+        grounding_entries=entries,
+        retained_feature_ids=retained_feature_ids,
+        retained_families=retained_families,
+        retained_grounding_index=index,
+        dropped_semantic_routes=dropped_semantic_routes,
+        retained_capability_ids=retained_capability_ids,
+    )
+    return _packet_vision_verdict(
+        vision,
+        live_corpus_in_packet=live_corpus_in_packet,
+        material_truncation=material_truncation,
+    )
+
+
+def _packet_vision_verdict(
+    vision: Mapping[str, Any],
+    *,
+    live_corpus_in_packet: bool,
+    material_truncation: bool,
+) -> dict[str, Any]:
+    grounding_ok = vision.get("status") == "PASS"
+    packet_ok = (
+        bool(live_corpus_in_packet) and not bool(material_truncation) and grounding_ok
+    )
+    return {
+        "status": "PASS" if packet_ok else "FAIL",
+        "feature_grounding": "PASS" if grounding_ok else "FAIL",
+        "packet_vision": "PASS" if packet_ok else "FAIL",
+        "vision_integrity": dict(vision),
+        "reason_code": None if grounding_ok else FORGE_VISION_INTEGRITY_BLOCKED,
+    }
 
 
 def assert_vision_integrity_pass(receipt: Mapping[str, Any]) -> None:

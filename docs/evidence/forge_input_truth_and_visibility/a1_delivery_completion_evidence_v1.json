@@ -1,0 +1,88 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-INPUT-TRUTH-AND-VISIBILITY-COMPLETION-001",
+  "as_of": "2026-09-20",
+  "task_id": "FORGE_INPUT_TRUTH_AND_VISIBILITY_V1",
+  "state_change": "CANONICAL_FORGE_INPUT_RECEIPT",
+  "base_main": "34fb6be93c68853638e5816626a78e6c020d2392",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    ".agents/skills/hypothesis-forge/SKILL.md": "0dbc7dfc063b4ed7c0eb0585ba2e804471bd7a2cb8ac33008466f1848bd38996",
+    ".cursor/commands/hypothesis-forge.md": "43b9b14eb9ab6f2a50b8ebc7b571cdc13ae06157b26479cefad3b411fe531b99",
+    "catalog/assets/core.yaml": "7ea5db0ecce498fcf71efddacee36c5b281fa0a290da9a49a0572da0ce341b36",
+    "catalog/assets/lifecycle.yaml": "1a32269b00e89a8c6696c10ef13aefe693f4456b4b6d439941de8b94c5f18231",
+    "catalog/catalog_manifest.yaml": "f1824e78ee35aeb7f11a56f059e04dd5f96092673813dd66cf34f67ddbe9e21c",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "4aadc39b67ac2c5f94e3eaa7f21e934edbee9ab1cca957f7840e449d0aabdcd4",
+    "catalog/generated/asset_edges.json": "2602234fb42e060c3a8461df1d31774e1f3186b948759f70b317805fd91c00b6",
+    "catalog/schemas/forge_input_receipt_v1.schema.json": "2bc3d994d1298cc1914177cb52820051a21a48e86b538f4fdd1a92be0bcc2256",
+    "configs/factory_semantic_operability_v1.yaml": "fcee1b23221dc0ba39583454b8e1099063c77e71cb7e7871b71e4c4783d40aca",
+    "docs/PROJECT_MAP.md": "a745f9b91a82c0452d8b9825a9f450feb328f7c885751ceeb09fda435e4e7bf1",
+    "docs/evidence/forge_input_truth_and_visibility/a1_c1_c2_forge_input_v1.json": "123c2665e5864a898d28003bb0937066cf9263d4048aa2948f249c6bac55ad0e",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6763ad83d1b849c0e36ac6d5fe0c1c849a5f873b7c3329a2609ba267887ffe42",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "28fc8dfabf23eac973fe7de9e4c395593121d13bd96ac0ba968500d77be39c8a",
+    "docs/reports/forge_input_truth_and_visibility/a1_owner_readout_v1.md": "ce60a516fbd92cf0ce2791b73c1945073e54dd63c96146ea15361c8bbc06400e",
+    "docs/tasks/FORGE_INPUT_TRUTH_AND_VISIBILITY_V1.md": "79b448c3e21151ea8e91b2ae353493e4737e568e6e6609902d1d30722b513d89",
+    "scripts/hypothesis_forge.py": "b09eeb8508108ed9a39aa87b0fa51860f18e83923af44279f509d6e0a7cf3329",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py": "c1dd40fae614fe69e1b6f2a57c5354b4a92d424f9290d724b793c4dd9bdafd51",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "c93c8546afc8e7ef8f8563a0d0ec55c6251797d7bb22ab441c37f889cd62b074",
+    "src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py": "cd205b97d48c38cfff8bc435d7dee28e80a01f6da6a27f9420855ba4417d2c66",
+    "src/solana_alpha_lab/factory/hfic_vision_integrity.py": "6b675afc16d81b3a7eef3b319b3b87ef45da9c6f1eafc75e1dfd76eebc43a12d",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "f7faae3edc74a4ea55f675ec08087860b1129fb1d876df7fd105db0c2d587370",
+    "tests/test_forge_input_truth_and_visibility_v1.py": "5ade4713ab5cc321384524f6ad64ead339a2b9549e6c062658e1c29aac56126b",
+    "tests/test_hfic_selection_robustness_gate_v1.py": "a5da7847d8afaf38802ea6358c6b3c9a823f071b05575bcf1b4db8f2651243f4",
+    "tests/test_live_cohort_discovery_release_series.py": "498857a77436e55272f5cf0cec02b9daa886d0b26565d829119137b01f402a60",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "483e620fa79c71b9950b5bbbebbc227c589cbc5d0235a92297a183a43344d84f"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_input_truth_and_visibility/a1_delivery_factory_fit_v1.json",
+    "sha256": "1ce9a5040153e8c251f903d95101755a36155ceecdb1c0f92c6198e62f988cc7",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FORGE_INPUT_TRUTH_AND_VISIBILITY_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/forge_input_truth_and_visibility/a1_delivery_independent_review_v1.json",
+      "sha256": "021a4f7443e5165b90eae2b09719022a913031116a1619fda7af2edda9117d80",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CATALOG_SYNC",
+      "PASS_FOCUSED_SYNTHETIC_FIXTURE_SUITE",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
+    ]
+  },
+  "non_claims": [
+    "NO_FORGE_EXECUTION",
+    "NO_ALPHA",
+    "NO_A4_OR_LATER_SCOPE",
+    "NO_HISTORICAL_RECEIPT_REWRITE",
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROVIDER_CALLS",
+    "NO_NEW_TRIAL"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "generator_code_added": 0,
+    "new_db": 0
+  }
+}

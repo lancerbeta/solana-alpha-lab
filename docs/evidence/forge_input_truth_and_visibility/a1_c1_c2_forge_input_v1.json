@@ -1,0 +1,86 @@
+{
+  "acceptance": {
+    "corpus_version": 2,
+    "persist": false,
+    "session_started": false,
+    "visible_cohort_count": 2,
+    "writes_unchanged": true
+  },
+  "active_evidence_set": {
+    "corpus_version": 2,
+    "current_dataset_manifest_id": "dataset-f5245e924d08f16fe02e3ee416183923f7ef2ef2426b7db2db90e8705dd1680a",
+    "evidence_set_sha256": "d88f0ea699ee217a2dec0ba37011b5a17997955119b4b309279385f0cfe49b4f",
+    "scope": "ACTIVE_EVIDENCE_SET",
+    "visible_cohort_ids": [
+      "REL-20260902T111900Z-20260909T111900Z",
+      "REL-20260909T111900Z-20260916T111900Z"
+    ]
+  },
+  "blocking_reason_codes": [],
+  "data_root_instance_fingerprint_sha256": "db5b0dede6936e17c3e35efa25105273a6b85d0305fde24bb7a932dbb3aff572",
+  "evidence_surface_mode": null,
+  "experiment_data_scope": {
+    "scope": "EXPERIMENT_DATA_SCOPE",
+    "status": "NOT_STARTED"
+  },
+  "forge_runnable": true,
+  "historical_calibration": [
+    {
+      "calibration_id": "HFIC_SELECTION_ROBUSTNESS_GATE_V1",
+      "cohort_scope": "C1",
+      "eligibility_scope": "FULL_LIFECYCLE_COMPLETENESS",
+      "integrity": "PASS",
+      "receipt_sha256": "c86764070108aef82c8dd6a8a1d4900496b4f460b867dba4b0238d7deb6f6e02",
+      "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+      "scope": "HISTORICAL_CALIBRATION"
+    }
+  ],
+  "live_corpus": {
+    "corpus_version": 2,
+    "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+    "dataset_manifest_id": "dataset-f5245e924d08f16fe02e3ee416183923f7ef2ef2426b7db2db90e8705dd1680a",
+    "dataset_version": "corpus-v2-REL-20260909T111900Z-20260916T111900Z.canonical-v1",
+    "yield_eligible": 233
+  },
+  "owner_class": "FORGE_INPUT_READY",
+  "owner_forge_input": "FORGE INPUT\nvisible_cohorts: REL-20260902T111900Z-20260909T111900Z, REL-20260909T111900Z-20260916T111900Z\nactive_evidence_set: manifest=dataset-f5245e924d08f16fe02e3ee416183923f7ef2ef2426b7db2db90e8705dd1680a corpus_version=2\nhistorical_calibration: C1 FULL_LIFECYCLE_COMPLETENESS integrity=PASS caveat_router=BLOCK_FORGE_SELECTION_RISK\nvisibility: corpus_binding=PASS, lineage=PASS, pit_semantics=NOT_EVALUATED, missingness_visible=NOT_EVALUATED, prior_memory=PASS, feature_grounding=PASS, packet_vision=PASS, material_truncation=False\nrepresentations: BASE READY; NORMALIZED_TRAJECTORY_V1 RUNTIME_READY_NOT_EXECUTED\nforge_runnable: True\nowner_class: FORGE_INPUT_READY\nforge_input_next: STOP_BEFORE_SYNTHESIS\nevidence_surface_mode: ordinary",
+  "packet": {
+    "bounded_dataset_count": 5,
+    "live_corpus_in_packet": true,
+    "live_corpus_protected": true,
+    "selection_policy": "control_protect_live_corpus_then_cap",
+    "truncated": false
+  },
+  "receipt_sha256": "1ca644284c7798eec4b17a172cbb4c38f23bf9c13937e368f4e97b1587d2a574",
+  "representation_input_scope": {
+    "scope": "REPRESENTATION_INPUT_SCOPE",
+    "status": "DECLARED"
+  },
+  "representations": [
+    {
+      "representation_id": "BASE",
+      "status": "READY"
+    },
+    {
+      "representation_id": "NORMALIZED_TRAJECTORY_V1",
+      "status": "RUNTIME_READY_NOT_EXECUTED"
+    }
+  ],
+  "schema": "smial.forge-input-receipt",
+  "schema_version": "1.0",
+  "visibility": {
+    "corpus_binding": "PASS",
+    "feature_grounding": "PASS",
+    "lineage": "PASS",
+    "material_truncation": false,
+    "missingness_visible": "NOT_EVALUATED",
+    "packet_vision": "PASS",
+    "pit_semantics": "NOT_EVALUATED",
+    "prior_memory": "PASS"
+  },
+  "writes": {
+    "forge_context": 0,
+    "research_store": 0,
+    "session": 0
+  }
+}

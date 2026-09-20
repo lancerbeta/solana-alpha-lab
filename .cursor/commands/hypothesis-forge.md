@@ -46,6 +46,24 @@ launch Critic; `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`).
 
 No Git mutation, no provider calls, no experiment execution, no autonomous generator.
 
+After `preflight`, show the `FORGE INPUT` owner block from `owner_forge_input`
+(visible cohorts, active evidence set, historical calibration including
+`caveat_router` when integrity is PASS, visibility, representations,
+`forge_input_next`, `evidence_surface_mode`) before Prompt A. Then branch on
+`action`. Prompt A only when `action` is not `STOP` and `forge_runnable` is
+true. Ordinary preflight machine-stops `OBSERVABILITY_BLOCKED` / vision
+failure. If `forge_runnable` is still false, stop; do not synthesize even if
+ordinary `action` is `START_NEW_SESSION`. Typed `forge_input_next`:
+`WAIT_FOR_IMPORT_OR_STOP` / `STOP_OBSERVABILITY` / ready
+`STOP_BEFORE_SYNTHESIS` (FORGE INPUT visibility, not slash authority, not
+CONTROL next, not an observability halt). Always show `evidence_surface_mode`
+(`ordinary` when JSON is null).
+No-write diagnostic (same `--owner-focus` as preflight):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json --owner-focus AUTO
+```
+
 ## Representation mode boundary
 
 The normal slash command remains `ORDINARY`; its behavior and search budget are

@@ -36,7 +36,6 @@ from solana_alpha_lab.factory.early_market_panel_importer import (
     MIN_USABLE_YIELD_ELIGIBLE,
 )
 from solana_alpha_lab.factory.hfic_control_integrity import (
-    CONTROL_CORPUS_UNRESOLVABLE,
     CURRENT_REPRESENTATION_CONTROL_V1,
 )
 from solana_alpha_lab.factory.hfic_preflight import (
@@ -902,12 +901,16 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                     evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
                 )
             self.assertEqual(control["action"], "STOP")
-            self.assertEqual(control["terminal"], CONTROL_CORPUS_UNRESOLVABLE)
+            self.assertEqual(control["terminal"], "CONTROL_CORPUS_MANIFEST_MISMATCH")
             self.assertEqual(
                 control["evidence_surface_mode"],
                 CURRENT_REPRESENTATION_CONTROL_V1,
             )
             self.assertIsNone(control.get("router_decision"))
+            self.assertEqual(
+                (control.get("forge_input_receipt") or {}).get("owner_class"),
+                "OBSERVABILITY_BLOCKED",
+            )
 
     def test_prior_hfic_sessions_remain_in_scientific_context(self) -> None:
         spec = load_gate_spec(ROOT)
@@ -1007,7 +1010,7 @@ class SelectionGateReceiptIdentityTests(unittest.TestCase):
                 loaded["dataset_manifest_id"], installed["dataset_manifest_id"]
             )
 
-    def test_stale_dataset_manifest_id_is_fail_closed(self) -> None:
+    def test_current_corpus_head_change_does_not_invalidate_historical_gate(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             installed = _install_canonical_corpus(data_root)
@@ -1024,12 +1027,11 @@ class SelectionGateReceiptIdentityTests(unittest.TestCase):
                 loaded = _load_gate(data_root)
             self.assertIsNotNone(loaded)
             assert loaded is not None
-            self.assertTrue(loaded.get("integrity_invalid"))
-            self.assertEqual(loaded["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertFalse(loaded.get("integrity_invalid"))
             self.assertEqual(
-                loaded.get("integrity_reason"),
-                SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH,
+                loaded["router_decision"], FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT
             )
+            self.assertEqual(loaded["dataset_manifest_id"], stale)
 
     def test_mismatched_cohort_or_release_is_fail_closed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -1131,11 +1133,12 @@ class SelectionGateReceiptIdentityTests(unittest.TestCase):
             with _bind_installed(installed):
                 loaded = _load_gate(data_root)
                 view = apply_selection_gate_to_preflight("START_NEW_SESSION", loaded)
-            self.assertEqual(view["action"], "STOP")
-            self.assertEqual(view["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
-            self.assertNotEqual(
+            self.assertEqual(view["action"], "START_NEW_SESSION")
+            self.assertTrue(view.get("caveat"))
+            self.assertEqual(
                 view.get("router_decision"), FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT
             )
+            self.assertFalse(loaded.get("integrity_invalid") if loaded else True)
             self.assertTrue((data_root / GATE_ARTIFACT_RELATIVE).is_file())
 
     def test_old_valid_hash_block_is_not_current_evidence(self) -> None:

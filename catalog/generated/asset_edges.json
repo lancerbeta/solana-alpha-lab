@@ -3268,6 +3268,21 @@
       "target_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
     },
     {
+      "source_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-FORGE-INPUT-RECEIPT-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
+    },
+    {
       "source_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
       "relation": "depends_on",
       "target_asset_id": "ARCH-INTENT-005"
@@ -11168,6 +11183,21 @@
       "target_asset_id": "MODULE-FACTORY-V1-APPLICATION-001"
     },
     {
+      "source_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COHORT-IMPORT-READBACK-001"
+    },
+    {
+      "source_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-TO-FORGE-001"
+    },
+    {
+      "source_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
+    },
+    {
       "source_asset_id": "MODULE-FORWARD-H900-QUOTE-CAPTURE-001",
       "relation": "depends_on",
       "target_asset_id": "CONFIG-FORWARD-H900-QUOTE-CAPTURE-001"
@@ -14123,6 +14153,11 @@
       "target_asset_id": "CTRL-QUOTE-SURFACE-RETENTION-FALSIFIER-001"
     },
     {
+      "source_asset_id": "SCHEMA-FORGE-INPUT-RECEIPT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
+    },
+    {
       "source_asset_id": "SCHEMA-HFIC-NEXT-EPISTEMIC-ACTION-DRAFT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
@@ -16381,6 +16416,16 @@
       "source_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
     },
     {
       "source_asset_id": "TEST-FORWARD-H900-QUOTE-CAPTURE-001",

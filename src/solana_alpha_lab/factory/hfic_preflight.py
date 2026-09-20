@@ -200,41 +200,31 @@ def select_forge_packet_datasets(
     evidence_surface_mode: str | None = None,
     max_datasets: int = MAX_DATASETS,
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    """Current-version selection plus CONTROL-protected LIVE CORPUS slot."""
-    from solana_alpha_lab.factory.hfic_control_integrity import (
-        CURRENT_REPRESENTATION_CONTROL_V1,
-    )
+    """Current-version selection with a protected LIVE CORPUS slot.
+
+    Ordinary and CONTROL packets share this membership rule so compatibility
+    readiness cannot hide a live-corpus drop that actual slash would see.
+    ``evidence_surface_mode`` remains a caller label and does not change
+    dataset membership.
+    """
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         select_current_datasets_for_forge,
     )
 
+    del evidence_surface_mode
     current = select_current_datasets_for_forge(enumerated)
-    receipt: dict[str, Any] = {
-        "truncated": False,
+    corpus = [item for item in current if is_live_corpus_dataset(item)]
+    others = [item for item in current if not is_live_corpus_dataset(item)]
+    slots = max(0, max_datasets - len(corpus))
+    selected = corpus + others[:slots]
+    selected.sort(key=lambda item: str(item.get("dataset_manifest_id") or ""))
+    return selected, {
+        "truncated": len(current) > len(selected),
         "max_datasets": max_datasets,
-        "selection_policy": "current_version_per_dataset_id",
-        "live_corpus_protected": False,
-        "live_corpus_in_packet": False,
+        "selection_policy": "control_protect_live_corpus_then_cap",
+        "live_corpus_protected": True,
+        "live_corpus_in_packet": bool(corpus),
     }
-    if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1:
-        corpus = [item for item in current if is_live_corpus_dataset(item)]
-        others = [item for item in current if not is_live_corpus_dataset(item)]
-        slots = max(0, max_datasets - len(corpus))
-        selected = corpus + others[:slots]
-        selected.sort(key=lambda item: str(item.get("dataset_manifest_id") or ""))
-        receipt["truncated"] = len(current) > len(selected)
-        receipt["live_corpus_protected"] = True
-        receipt["live_corpus_in_packet"] = bool(corpus)
-        receipt["selection_policy"] = "control_protect_live_corpus_then_cap"
-        return selected, receipt
-    selected = current[:max_datasets]
-    if len(current) > max_datasets:
-        receipt["truncated"] = True
-        receipt["selection_policy"] = "current_version_per_dataset_id_then_cap"
-    receipt["live_corpus_in_packet"] = any(
-        is_live_corpus_dataset(item) for item in selected
-    )
-    return selected, receipt
 
 
 def store_inventory_digest(data_root: Path) -> str | None:
@@ -247,6 +237,8 @@ def store_inventory_digest(data_root: Path) -> str | None:
 def evidence_epoch_material(
     repo_root: Path,
     data_root: Path | None = None,
+    *,
+    store: ResearchStore | None = None,
 ) -> dict[str, Any]:
     root = Path(repo_root)
     hashes = [
@@ -256,8 +248,8 @@ def evidence_epoch_material(
     prior_parts: list[str] = []
     if data_root is not None:
         try:
-            store = ResearchStore(Path(data_root))
-            for record in store.iter_committed_records():
+            used = store if store is not None else ResearchStore(Path(data_root))
+            for record in used.iter_committed_records():
                 try:
                     payload = json.loads(record.payload_json)
                 except (ValueError, json.JSONDecodeError):
@@ -396,7 +388,7 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
 
 def _sessions_from_store(data_root: Path) -> list[dict[str, Any]]:
     try:
-        store = ResearchStore(Path(data_root))
+        store = ResearchStore(Path(data_root), create_if_missing=False)
     except ResearchStoreError:
         return []
     return list_hfic_sessions(store)
@@ -1131,6 +1123,45 @@ def verify_forge_context_packet(data_root: Path, digest: str) -> dict[str, Any]:
     return loaded
 
 
+def evaluate_assembled_packet_vision(
+    packet: Mapping[str, Any],
+    *,
+    all_grounding_entries: Sequence[Mapping[str, Any]],
+    feature_hints: Sequence[Mapping[str, Any]],
+    feature_families: Sequence[Mapping[str, Any]],
+) -> dict[str, Any]:
+    """Vision for an assembled packet using its retained/dropped surface."""
+
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        evaluate_forge_packet_vision,
+    )
+
+    trunc = packet.get("truncation_receipt") or {}
+    live = bool(trunc.get("live_corpus_in_packet"))
+    return evaluate_forge_packet_vision(
+        live_corpus_in_packet=live,
+        material_truncation=not live,
+        grounding_entries=all_grounding_entries,
+        retained_feature_ids=[
+            str(hint.get("feature_id") or "")
+            for hint in feature_hints
+            if hint.get("feature_id")
+        ],
+        retained_families=[
+            str(family.get("feature_family") or "")
+            for family in feature_families
+            if family.get("feature_family")
+        ],
+        retained_grounding_index=list(packet.get("feature_grounding_entries") or []),
+        dropped_semantic_routes=list(trunc.get("dropped_semantic_routes") or []),
+        retained_capability_ids=[
+            str(entry.get("capability_id") or "")
+            for entry in packet.get("capability_entries") or []
+            if entry.get("capability_id")
+        ],
+    )
+
+
 def build_forge_context_packet(
     repo_root: Path,
     data_root: Path,
@@ -1470,7 +1501,6 @@ def build_forge_context_packet(
     from solana_alpha_lab.factory.hfic_vision_integrity import (
         FORGE_VISION_INTEGRITY_BLOCKED,
         compact_feature_grounding_entries,
-        compute_vision_integrity,
     )
 
     all_grounding_entries = list(feature_grounding_entries)
@@ -1513,28 +1543,13 @@ def build_forge_context_packet(
         encoded = canonical_json_bytes(packet)
     if len(encoded) > packet_bound:
         raise HficPreflightError(FORGE_CONTEXT_PACKET_CAPACITY_EXCEEDED)
-    vision = compute_vision_integrity(
-        grounding_entries=all_grounding_entries,
-        retained_feature_ids=[
-            str(hint.get("feature_id") or "")
-            for hint in feature_hints
-            if hint.get("feature_id")
-        ],
-        retained_families=[
-            str(family.get("feature_family") or "")
-            for family in feature_families
-            if family.get("feature_family")
-        ],
-        retained_grounding_index=packet["feature_grounding_entries"],
-        dropped_semantic_routes=list(
-            packet["truncation_receipt"].get("dropped_semantic_routes") or []
-        ),
-        retained_capability_ids=[
-            str(entry.get("capability_id") or "")
-            for entry in packet.get("capability_entries") or []
-            if entry.get("capability_id")
-        ],
+    vision_verdict = evaluate_assembled_packet_vision(
+        packet,
+        all_grounding_entries=all_grounding_entries,
+        feature_hints=feature_hints,
+        feature_families=feature_families,
     )
+    vision = vision_verdict["vision_integrity"]
     packet["vision_integrity"] = vision
     encoded = canonical_json_bytes(packet)
     if len(encoded) > packet_bound:
@@ -1586,6 +1601,256 @@ def build_forge_context_packet(
     return packet, digest
 
 
+def compute_slash_packet_identity(
+    repo_root: Path,
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    owner_focus: str,
+    evidence_surface_mode: str | None,
+    proof: Mapping[str, Any],
+    selection_caveat: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Identity kwargs for the slash Forge context packet. No writes."""
+
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+
+    focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
+    control_mode = (
+        CURRENT_REPRESENTATION_CONTROL_V1
+        if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
+        else None
+    )
+    epoch = evidence_epoch_sha256(
+        evidence_epoch_material(repo_root, data_root, store=store)
+    )
+    policy_head = effective_policy(store)
+    memory_eligibility = str(policy_head["memory_eligibility_sha256"])
+    search_key = search_key_sha256(
+        epoch, focus, PROMPT_VERSION, memory_eligibility, control_mode
+    )
+    return {
+        "owner_focus": focus,
+        "evidence_epoch": epoch,
+        "search_key": search_key,
+        "commissioning_status": str(proof.get("status") or ""),
+        "research_memory_as_of": str(
+            proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
+        ),
+        "selection_caveat": selection_caveat,
+        "policy_head": policy_head,
+        "memory_eligibility": memory_eligibility,
+        "control_mode": control_mode,
+        "focus_key": focus_key_sha256(focus),
+    }
+
+
+def _unknown_packet_vision_blocked(
+    repo_root: Path,
+    *,
+    reason_code: str | None = None,
+) -> dict[str, Any]:
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        FORGE_VISION_INTEGRITY_BLOCKED,
+        evaluate_forge_packet_vision,
+    )
+
+    verdict = evaluate_forge_packet_vision(
+        live_corpus_in_packet=False,
+        material_truncation=True,
+        repo_root=Path(repo_root),
+        retained_grounding_index=None,
+    )
+    if reason_code and reason_code != FORGE_VISION_INTEGRITY_BLOCKED:
+        verdict = dict(verdict)
+        verdict["reason_code"] = reason_code
+        integrity = dict(verdict.get("vision_integrity") or {})
+        integrity["reason"] = reason_code
+        verdict["vision_integrity"] = integrity
+    return verdict
+
+
+def try_packet_bound_vision(
+    repo_root: Path,
+    data_root: Path,
+    *,
+    evidence_surface_mode: str | None = None,
+    owner_focus: str = AUTO_FOCUS,
+) -> dict[str, Any] | None:
+    """No-write slash-identity packet vision. None only when uncommissioned."""
+
+    from solana_alpha_lab.factory.hfic_selection_robustness_gate import (
+        apply_selection_gate_to_preflight,
+        load_applicable_gate_receipt,
+    )
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        FORGE_VISION_INTEGRITY_BLOCKED,
+        evaluate_forge_packet_vision,
+    )
+
+    if not is_fast_lane_commissioned(Path(data_root)):
+        return None
+    try:
+        store = ResearchStore(Path(data_root), create_if_missing=False)
+        proof = prove_fast_lane_commissioned(Path(data_root))
+        gate = apply_selection_gate_to_preflight(
+            "START_NEW_SESSION",
+            load_applicable_gate_receipt(Path(data_root), root=Path(repo_root)),
+        )
+        caveat = gate if gate.get("caveat") else None
+        ident = compute_slash_packet_identity(
+            Path(repo_root),
+            Path(data_root),
+            store,
+            owner_focus=owner_focus,
+            evidence_surface_mode=evidence_surface_mode,
+            proof=proof,
+            selection_caveat=caveat,
+        )
+        packet, _digest = build_forge_context_packet(
+            Path(repo_root),
+            Path(data_root),
+            owner_focus=str(ident["owner_focus"]),
+            evidence_epoch=str(ident["evidence_epoch"]),
+            search_key=str(ident["search_key"]),
+            commissioning_status=str(ident["commissioning_status"]),
+            research_memory_as_of=str(ident["research_memory_as_of"]),
+            store=store,
+            persist=False,
+            evidence_surface_mode=evidence_surface_mode,
+            selection_caveat=ident.get("selection_caveat"),
+        )
+    except (HficPreflightError, ResearchStoreError, OSError, ValueError) as exc:
+        code = str(exc) or FORGE_VISION_INTEGRITY_BLOCKED
+        if code == FORGE_VISION_INTEGRITY_BLOCKED:
+            return evaluate_forge_packet_vision(
+                live_corpus_in_packet=False,
+                material_truncation=True,
+                repo_root=Path(repo_root),
+                retained_grounding_index=[],
+            )
+        return _unknown_packet_vision_blocked(Path(repo_root), reason_code=code)
+    trunc = packet.get("truncation_receipt") or {}
+    live = bool(trunc.get("live_corpus_in_packet"))
+    vision = packet.get("vision_integrity") or {}
+    grounding_ok = vision.get("status") == "PASS"
+    packet_ok = live and grounding_ok
+    return {
+        "status": "PASS" if packet_ok else "FAIL",
+        "feature_grounding": "PASS" if grounding_ok else "FAIL",
+        "packet_vision": "PASS" if packet_ok else "FAIL",
+        "vision_integrity": dict(vision),
+        "reason_code": None if grounding_ok else FORGE_VISION_INTEGRITY_BLOCKED,
+    }
+
+
+def preview_forge_packet_vision(
+    repo_root: Path,
+    data_root: Path,
+    *,
+    live_corpus_in_packet: bool,
+    material_truncation: bool = False,
+    evidence_surface_mode: str | None = None,
+    owner_focus: str = AUTO_FOCUS,
+) -> dict[str, Any]:
+    """Slash-identity packet vision when commissioned; catalog compact otherwise."""
+
+    from solana_alpha_lab.factory.hfic_grounding import (
+        HficGroundingError,
+        build_feature_grounding_projection,
+    )
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        compact_feature_grounding_entries,
+        evaluate_forge_packet_vision,
+    )
+
+    commissioned = is_fast_lane_commissioned(Path(data_root))
+    bound = try_packet_bound_vision(
+        Path(repo_root),
+        Path(data_root),
+        evidence_surface_mode=evidence_surface_mode,
+        owner_focus=owner_focus,
+    )
+    if commissioned:
+        if bound is None:
+            return _unknown_packet_vision_blocked(Path(repo_root))
+        return bound
+    try:
+        projection = build_feature_grounding_projection(Path(repo_root))
+        entries = list(projection.get("feature_grounding_entries") or [])
+    except HficGroundingError:
+        entries = []
+    return evaluate_forge_packet_vision(
+        live_corpus_in_packet=live_corpus_in_packet,
+        material_truncation=material_truncation,
+        grounding_entries=entries,
+        retained_grounding_index=compact_feature_grounding_entries(entries),
+    )
+
+
+def _forge_input_requires_preflight_stop(
+    forge_input: Mapping[str, Any], control_mode: str | None
+) -> bool:
+    from solana_alpha_lab.factory.forge_input_receipt import (
+        OWNER_CLASS_OBSERVABILITY_BLOCKED,
+    )
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    if forge_input.get("forge_runnable"):
+        return False
+    if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        return True
+    return str(forge_input.get("owner_class") or "") == OWNER_CLASS_OBSERVABILITY_BLOCKED
+
+
+def _forge_input_stop_terminal(
+    forge_input: Mapping[str, Any], control_mode: str | None
+) -> str:
+    from solana_alpha_lab.factory.forge_input_receipt import CURRENT_CORPUS_MISSING
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CONTROL_CORPUS_UNRESOLVABLE,
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        FORGE_VISION_INTEGRITY_BLOCKED,
+    )
+
+    codes = list(forge_input.get("blocking_reason_codes") or [])
+    if FORGE_VISION_INTEGRITY_BLOCKED in codes:
+        return FORGE_VISION_INTEGRITY_BLOCKED
+    terminal = str(codes[0] if codes else CURRENT_CORPUS_MISSING)
+    if (
+        control_mode == CURRENT_REPRESENTATION_CONTROL_V1
+        and terminal == CURRENT_CORPUS_MISSING
+    ):
+        return CONTROL_CORPUS_UNRESOLVABLE
+    return terminal
+
+
+def _forge_input_stop_next(terminal: str, owner_class: object) -> str:
+    from solana_alpha_lab.factory.forge_input_receipt import (
+        OWNER_CLASS_OBSERVABILITY_BLOCKED,
+    )
+    from solana_alpha_lab.factory.hfic_vision_integrity import (
+        FORGE_VISION_INTEGRITY_BLOCKED,
+    )
+
+    if terminal == "CONTROL_CORPUS_UNRESOLVABLE":
+        return "STOP_CORPUS_UNRESOLVABLE"
+    if (
+        terminal == FORGE_VISION_INTEGRITY_BLOCKED
+        or owner_class == OWNER_CLASS_OBSERVABILITY_BLOCKED
+    ):
+        return "STOP_OBSERVABILITY"
+    return "WAIT_FOR_IMPORT_OR_STOP"
+
+
 def run_preflight(
     repo_root: Path,
     data_root: Path,
@@ -1596,7 +1861,62 @@ def run_preflight(
     git_snapshot: Mapping[str, Any] | None = None,
     clock: Clock | None = None,
     evidence_surface_mode: str | None = None,
+    persist: bool = True,
 ) -> dict[str, Any]:
+    from solana_alpha_lab.factory.forge_input_receipt import (
+        build_forge_input_receipt,
+        format_forge_input_owner_block,
+    )
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    control_mode = (
+        CURRENT_REPRESENTATION_CONTROL_V1
+        if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
+        else None
+    )
+    focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
+    forge_input = build_forge_input_receipt(
+        Path(data_root),
+        repo_root=Path(repo_root),
+        evidence_surface_mode=control_mode,
+        owner_focus=focus,
+    )
+    stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
+    if stop_input and not persist:
+        focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
+        epoch = "0" * 64
+        focus_key = focus_key_sha256(focus)
+        terminal = _forge_input_stop_terminal(forge_input, control_mode)
+        search_key = search_key_sha256(
+            epoch, focus, PROMPT_VERSION, "0" * 64, control_mode
+        )
+        stop_body = {
+            "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": terminal,
+            "owner_class": forge_input.get("owner_class"),
+            "owner_focus": focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": epoch,
+            "focus_key_sha256": focus_key,
+            "search_key_sha256": search_key,
+            "next": _forge_input_stop_next(terminal, forge_input.get("owner_class")),
+            "session_id": None,
+            "forge_context_packet": {},
+            "forge_input_receipt": forge_input,
+            "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
+        if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+            stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+        return stop_body
+
     compatibility_repair: dict[str, Any] = {"status": "NONE", "appended": 0}
     try:
         proof = prove_fast_lane_commissioned(data_root)
@@ -1604,6 +1924,8 @@ def run_preflight(
     except HficPreflightError as exc:
         code = str(exc)
         if code == "COMMISSION_HYPOTHESIS_VERSION_MISSING":
+            if not persist:
+                raise
             try:
                 now = capture_stage_time(clock)
             except HficClockError as clock_exc:
@@ -1624,7 +1946,8 @@ def run_preflight(
             proof = prove_fast_lane_commissioned(data_root)
             commissioned_now = False
         elif (
-            auto_commission
+            persist
+            and auto_commission
             and commission_fn is not None
             and code == "FAST_LANE_NOT_COMMISSIONED"
         ):
@@ -1637,8 +1960,11 @@ def run_preflight(
             raise
 
     try:
-        store = ResearchStore(Path(data_root))
-        store.rebuild_projection()
+        if persist:
+            store = ResearchStore(Path(data_root))
+            store.rebuild_projection()
+        else:
+            store = ResearchStore(Path(data_root), create_if_missing=False)
         digest = store.diagnostics().committed_inventory_sha256
     except ResearchStoreError as exc:
         raise HficPreflightError(str(exc)) from exc
@@ -1650,30 +1976,60 @@ def run_preflight(
         raise HficPreflightError(str(exc)) from exc
 
     from solana_alpha_lab.factory.hfic_control_integrity import (
+        CONTROL_CORPUS_UNRESOLVABLE,
         CURRENT_REPRESENTATION_CONTROL_V1,
         resolve_control_corpus_yield,
     )
     from solana_alpha_lab.factory.scientific_eligibility_projection import (
         MIN_USABLE_BASE_X_POPULATION,
     )
-    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         CORPUS_DATASET_ID,
     )
 
-    epoch = evidence_epoch_sha256(evidence_epoch_material(repo_root, data_root))
-    focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
-    focus_key = focus_key_sha256(focus)
-    policy_head = effective_policy(store)
-    memory_eligibility = str(policy_head["memory_eligibility_sha256"])
-    control_mode = (
-        CURRENT_REPRESENTATION_CONTROL_V1
-        if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
-        else None
+    ident = compute_slash_packet_identity(
+        Path(repo_root),
+        Path(data_root),
+        store,
+        owner_focus=focus,
+        evidence_surface_mode=control_mode,
+        proof=proof,
+        selection_caveat=None,
     )
-    search_key = search_key_sha256(
-        epoch, focus, PROMPT_VERSION, memory_eligibility, control_mode
-    )
+    epoch = str(ident["evidence_epoch"])
+    focus = str(ident["owner_focus"])
+    focus_key = str(ident["focus_key"])
+    policy_head = ident["policy_head"]
+    memory_eligibility = str(ident["memory_eligibility"])
+    search_key = str(ident["search_key"])
+    if stop_input:
+        terminal = _forge_input_stop_terminal(forge_input, control_mode)
+        stop_body = {
+            "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": terminal,
+            "owner_class": forge_input.get("owner_class"),
+            "owner_focus": focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": epoch,
+            "focus_key_sha256": focus_key,
+            "search_key_sha256": search_key,
+            "memory_policy_head_sha256": policy_head["policy_sha256"],
+            "memory_eligibility_sha256": memory_eligibility,
+            "next": _forge_input_stop_next(terminal, forge_input.get("owner_class")),
+            "session_id": None,
+            "forge_context_packet": {},
+            "forge_input_receipt": forge_input,
+            "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
+        if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+            stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+        return stop_body
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
         if datasets:
@@ -1711,6 +2067,8 @@ def run_preflight(
                 ),
                 "session_id": None,
                 "forge_context_packet": {},
+                "forge_input_receipt": forge_input,
+                "owner_forge_input": format_forge_input_owner_block(forge_input),
                 "authority": {
                     "git_mutation": 0,
                     "experiment_execution": 0,
@@ -1876,13 +2234,12 @@ def run_preflight(
         owner_focus=focus,
         evidence_epoch=epoch,
         search_key=search_key,
-        commissioning_status=str(proof["status"]),
-        research_memory_as_of=str(
-            proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
-        ),
+        commissioning_status=str(ident["commissioning_status"]),
+        research_memory_as_of=str(ident["research_memory_as_of"]),
         store=store,
         stage_time=session_started,
         evidence_surface_mode=control_mode,
+        persist=persist,
         selection_caveat=selection_caveat,
     )
     receipt_body["forge_context_packet"] = packet
@@ -1957,5 +2314,7 @@ def run_preflight(
                     effective_control_terminal(bundle)
                 )
                 receipt_body["next"] = bundle.get("next")
+    receipt_body["forge_input_receipt"] = forge_input
+    receipt_body["owner_forge_input"] = format_forge_input_owner_block(forge_input)
     receipt_body["preflight_receipt_sha256"] = canonical_sha256(receipt_body)
     return receipt_body

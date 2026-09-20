@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "FORGE-INPUT-TRUTH-AND-VISIBILITY-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-20",
+  "task_id": "FORGE_INPUT_TRUTH_AND_VISIBILITY_V1",
+  "reviewed_bindings_sha256": "7747f70bff6126cd78ee43760bfe4a35fd5f2d1a5118babfd067f8d027a31811",
+  "reviewed_inventory_sha256": "00c16b01a24aa13673013c3ddbc4f5952139da598e121536fbc510e0dcf00141",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=6bf667090677f4942fecab5aebe267581796be9189d7711b5b293385147b3e7d",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "PASS_ONE_BUILDER_NO_COMPETING_TRUTH",
+        "PASS_SLASH_IDENTITY_COMMISSIONED_VISION",
+        "PASS_PERSIST_FALSE_NO_REBUILD",
+        "PASS_NOT_EVALUATED_PIT_FIELDS"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_PERSIST_FALSE_NO_REPAIR_OR_AUTO_COMMISSION",
+        "PASS_READY_PAIR_NONEMPTY_PACKET",
+        "PASS_TINY_BOUND_VISION_TERMINAL_CONTRACTED",
+        "PASS_NO_WRITE_BUILDER",
+        "PASS_HISTORICAL_FROZEN_INPUT_FIELDS"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_G_A3_1_THROUGH_5",
+        "PASS_READY_PERSIST_FALSE_PAIR",
+        "PASS_SC_A3_4_STORE_SPY",
+        "PASS_NAMED_CONSUMER_FORGE_INPUT_BLOCK",
+        "PASS_FORGE_RUNNABLE_IS_INPUT_FITNESS"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_CLI_FORGE_INPUT_NEXT",
+        "PASS_CAVEAT_ROUTER",
+        "PASS_SKILL_ACTION_THEN_RUNNABLE",
+        "PASS_OPERATOR_CONTROL_NOT_SLASH_NEXT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_PASS",
+    "NO_ALPHA",
+    "NO_FORGE_EXECUTION",
+    "NO_A4_OR_LATER_SCOPE"
+  ]
+}

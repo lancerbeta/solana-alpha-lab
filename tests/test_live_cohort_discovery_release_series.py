@@ -261,9 +261,9 @@ class LiveCohortDiscoveryReleaseSeriesTests(unittest.TestCase):
                 store=store,
                 stage_time=as_of + timedelta(hours=1),
             )
-            self.assertIn(
-                "current_version_per_dataset_id",
+            self.assertEqual(
                 packet["truncation_receipt"]["selection_policy"],
+                "control_protect_live_corpus_then_cap",
             )
             families = {f["feature_family"] for f in packet["feature_families"]}
             self.assertTrue(families)
