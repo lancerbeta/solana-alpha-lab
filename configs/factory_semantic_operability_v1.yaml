@@ -44,7 +44,7 @@ routes:
     related_route_ids: [SEM-AUTHORITY-BOUNDARIES, SEM-HYPOTHESIS-FORGE]
 
   - semantic_route_id: SEM-HYPOTHESIS-FORGE
-    purpose: Forge / Independent Critic one-slash workflow; V1 seam RUNTIME_READY_NOT_EXECUTED.
+    purpose: Bounded Forge run; V1 seam RUNTIME_READY_NOT_EXECUTED.
     owner_questions:
       - How do I generate or review a hypothesis?
       - Where do hypotheses enter?
@@ -63,12 +63,12 @@ routes:
       - кузница
       - normalized trajectory
       - NORMALIZED_TRAJECTORY
-      - representation probe
+      - representation ladder
       - lifecycle representation
       - другое представление lifecycle
       - траектория токена
       - FORGE INPUT
-      - forge-input
+      - forge-run
     consumers: [GOAL-OWNER, DIRECT-CURSOR-DELIVERY, DIRECT-CODEX-DELIVERY]
     root_binding_ids: [ACTIVE-HYPOTHESIS-FORGE]
     root_asset_ids:

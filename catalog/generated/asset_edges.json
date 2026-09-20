@@ -933,6 +933,11 @@
       "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
     },
     {
+      "source_asset_id": "CONFIG-HFIC-REPRESENTATION-LADDER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001"
+    },
+    {
       "source_asset_id": "CONFIG-HFIC-SELECTION-ROBUSTNESS-GATE-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-SELECTION-ROBUSTNESS-GATE-001"
@@ -3281,6 +3286,26 @@
       "source_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001",
+      "relation": "contains",
+      "target_asset_id": "CONFIG-HFIC-REPRESENTATION-LADDER-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001",
+      "relation": "contains",
+      "target_asset_id": "SCHEMA-FORGE-RUN-RECEIPT-V1-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FORGE-REPRESENTATION-LADDER-001"
     },
     {
       "source_asset_id": "CTRL-FRESH-OOS-BASELINE-VS-FRICTION-VETO-001",
@@ -11268,6 +11293,31 @@
       "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FORGE-REPRESENTATION-LADDER-001"
+    },
+    {
       "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-HFIC-CONTROL-INTEGRITY-001"
@@ -14158,6 +14208,11 @@
       "target_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
     },
     {
+      "source_asset_id": "SCHEMA-FORGE-RUN-RECEIPT-V1-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001"
+    },
+    {
       "source_asset_id": "SCHEMA-HFIC-NEXT-EPISTEMIC-ACTION-DRAFT-V1-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001"
@@ -16426,6 +16481,16 @@
       "source_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-REPRESENTATION-LADDER-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-REPRESENTATION-LADDER-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001"
     },
     {
       "source_asset_id": "TEST-FORWARD-H900-QUOTE-CAPTURE-001",

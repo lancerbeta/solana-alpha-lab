@@ -31,7 +31,9 @@ by `freeze`, not by the model.
 
 **Целевая эксплуатационная точка:** `/hypothesis-forge` →
 `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight`
-→ bounded draft → `freeze` (C1 + pre-frozen C2 packets) → isolated Critic #1
+→ `forge-run` (bounded run; `START_V1` continues CONTROL `FORGE_CONTEXT_PACKET`
+envelope, no fake critic) → bounded draft only when next is `START_BASE` →
+`freeze` (C1 + pre-frozen C2 packets) → isolated Critic #1
 → optional primary `revise` / `classify` → on final primary `KILL_*`, isolated
 Critic #2 on the pre-frozen C2 packet → `finalize`. C2 `REVISE_ONCE` is typed
 PAUSE, not a second wording repair. До commissioning preflight сам выполняет безопасный offline Fast Lane
@@ -49,10 +51,15 @@ Required interpreter is CPython `3.13.14` from `.python-version` /
 typed `HFIC_RUNTIME_PYTHON_VERSION_INCOMPATIBLE` before any project import, RDP
 write or Git mutation. Do not invoke a bare workstation `python`.
 
-`ONE_SLASH_ONE_SESSION`. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
-Один явный `/hypothesis-forge` авторизует ровно одну HFIC-сессию до финального
-terminal/STOP. Не спрашивать owner про Run или append-only RDP write между
-preflight, freeze, Critic, revision/classification и finalize.
+`ONE_SLASH_ONE_BOUNDED_RUN`. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
+Один явный `/hypothesis-forge` авторизует один bounded Forge **run** (BASE и
+допустимые ACTIVE representations) до owner-final/STOP. Терминал одной HFIC
+сессии не является автоматически итогом всего поиска. После FORGE INPUT
+резолвер `forge-run` выбирает next action. `START_V1` после effective BASE
+`NO_WORTHY` не требует owner «продолжить». Prompt C `WAIT_FOR_NEW_EVIDENCE` не
+отменяет eligible next representation. Не спрашивать owner про Run или
+append-only RDP write между preflight, forge-run, freeze, Critic,
+revision/classification и finalize.
 `PASS_TO_CLASSIFICATION` и ровно один bounded **primary** `REVISE_ONCE` продолжаются
 автоматически внутри той же slash-authority. Финальный primary `KILL_*` даёт
 ровно один экран уже замороженному runner-up. C2 `REVISE_ONCE` **не**
@@ -193,7 +200,10 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 1. Явно вызовите **`/hypothesis-forge`** в новом чате в корне актуального repository.
 2. Агент следует `.agents/skills/hypothesis-forge/SKILL.md`: executable
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight`
-   → PROMPT A выдаёт machine-valid `FORGE_DRAFT` → `freeze` создаёт
+   → `forge-run` (print `owner_readout`; `START_V1` auto-advances and is not
+   masked by session `RETURN_EXISTING_SESSION` or Prompt C WAIT)
+   → PROMPT A выдаёт machine-valid `FORGE_DRAFT` **только если** `forge-run`
+   next is `START_BASE` → `freeze` создаёт
    `CRITIC_INPUT_PACKET` (и отдельно замороженный C2 packet) → isolated Critic #1
    → при **primary** `REVISE_ONCE` ровно один
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py revise`
@@ -201,6 +211,10 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
    `uv run --locked --managed-python python -B scripts/hypothesis_forge.py classify`;
    при финальном primary `KILL_*` — isolated Critic #2 **только** на pre-frozen
    C2 packet, затем `finalize`. C2 `REVISE_ONCE` не вызывает `revise`.
+   If `forge-run` next is still `START_V1` after BASE `NO_WORTHY`, the evening
+   path continues the CONTROL `FORGE_CONTEXT_PACKET` envelope (no fake critic;
+   do not launch Critic on empty BASE). That is not the scientific V1 probe.
+   `RESUME_V1` reuses `--saved-draft-sha256`, not a new START envelope.
    Если `freeze` вернул `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` или
    `PRIOR_MEMORY_RECORD_UNIDENTIFIED`: это BLOCKED, не crash. Session не
    записан. Critic не запускать, packet не вставлять, тот же slash не ретраить
@@ -209,9 +223,10 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
    Do not run `memory-policy-apply` inside the slash.
    Bound: `prior_memory.max_records=64`, `max_bytes=65536` в
    `configs/hypothesis_forge_independent_critic_v1.yaml`.
-3. Вечерний цикл **не завершён**, пока `finalize` не записал `SESSION_RECEIPT` со
-   `session_state=SYNTHESIS_COMPLETE`, **кроме**:
-   - `NO_WORTHY_HYPOTHESIS` (Critic пропускается; complete на freeze + next action);
+3. Вечерний цикл **не завершён**, пока bounded `forge-run` не дал owner-final.
+   HFIC session `NO_WORTHY_HYPOTHESIS` пропускает Critic и complete на freeze
+   **как сессия**; если `forge-run` next is `START_V1`, вечерний **run**
+   продолжается. Не объявляйте evening-complete на Prompt C WAIT.
    - `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` / `PRIOR_MEMORY_RECORD_UNIDENTIFIED`
      (BLOCKED; session не записан; Critic не запускать; цикл останавливается на
      typed STOP, не на Critic).
@@ -297,7 +312,7 @@ typed `AUTO_HANDOFF_UNAVAILABLE`.
 | `REVISE_ONCE` | Только primary/C1. Fallback: вернуть packet Forge ровно один раз. Slash path does this without an owner prompt. Если это Critic #2 / C2: **не** revise. `PAUSE` / `RUNNER_UP_REVISION_REQUIRED`. `OWNER NEXT=STOP`. |
 | `KILL_*` | Если это ещё primary/C1: same slash auto-screens the already-frozen runner-up once (`RUNNER_UP_AWAITING_CRITIC`). Do not regenerate, do not pick another portfolio candidate, do not start a new AUTO search. Если это уже C2: session complete, no survivor unless a PASS terminal. |
 | `RUNNER_UP_REVISION_REQUIRED` | Typed PAUSE after C2 `REVISE_ONCE`. Evening STOP. Preserve C2 in memory. Do not claim scientific fail or pass. No C3. |
-| `NO_WORTHY_HYPOTHESIS` | Нормальный полезный результат. Same slash runs Prompt C and persists one typed next action. Do not invent a task. |
+| `NO_WORTHY_HYPOTHESIS` | Session-complete at freeze + Prompt C. Bounded `forge-run` is **not** evening-final while next is `START_V1`. Do not invent a task. |
 | `OWNER_DECISION_REQUIRED` | Принять только названное материальное решение; не выдавать общее разрешение. |
 
 ---
@@ -351,6 +366,22 @@ not authorize CONTROL slash:
 
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json --owner-focus AUTO
+```
+
+Bounded run resolver (default no-write). Print `owner_readout` as the owner
+result, not the raw JSON. `START_V1` is automatic after
+effective CONTROL `NO_WORTHY`; do not treat Prompt C WAIT as the search final.
+`--persist` writes `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT` (named in readout
+`persisted`, not a path).
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
+```
+
+Authorized persist (same slash, after READY):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --persist --format json --owner-focus AUTO
 ```
 
 Typed owner `forge_input_next` on that surface: `WAIT_FOR_IMPORT_OR_STOP` or
@@ -439,7 +470,7 @@ Keep the modes distinct:
 | --- | --- | --- |
 | `ORDINARY` | normal `/hypothesis-forge` | unchanged |
 | `CONTROL` | `CURRENT_REPRESENTATION_CONTROL_V1` | trajectory-blind; unchanged |
-| `REPRESENTATION_CHALLENGER` | exact CONTROL packet plus compact anonymous motif histogram | separate bounded one-run lane; not automatic |
+| `REPRESENTATION_CHALLENGER` | exact CONTROL packet plus compact anonymous motif histogram | `START_V1` auto-advance after CONTROL `NO_WORTHY`; not a second ordinary search |
 
 The status surface is read-only and accepts an explicit JSON snapshot:
 
@@ -1299,7 +1330,7 @@ Same slash, after Prompt A returns `NO_WORTHY_HYPOTHESIS`. Do not launch Indepen
 3. A single reusable missing capability blocks a named falsifier and no data-only route exists → `CAPABILITY_OPTION_READY`.
 4. Otherwise → `WAIT_FOR_NEW_EVIDENCE`.
 
-Never manufacture a forward option merely to avoid WAIT. Never route a broad collector/platform as a capability option. Unknown or ambiguous cases become WAIT with a typed reason.
+Never manufacture a forward option merely to avoid WAIT. Never route a broad collector/platform as a capability option. Unknown or ambiguous cases become WAIT with a typed reason. Session WAIT is not the bounded-run owner-final while `forge-run` next is `START_V1`.
 
 ## Output
 

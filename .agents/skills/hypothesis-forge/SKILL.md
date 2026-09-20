@@ -1,6 +1,6 @@
 ---
 name: hypothesis-forge
-description: Manual Hypothesis Forge for Solana Alpha Lab under MANUAL_FALLBACK_UNTIL_GENERATOR. Use only when the owner explicitly invokes /hypothesis-forge. Runs executable preflight → freeze → isolated Critic → optional revise/classify → finalize. No Git mutation, provider calls, experiment execution or autonomous generator.
+description: Manual Hypothesis Forge for Solana Alpha Lab under MANUAL_FALLBACK_UNTIL_GENERATOR. Use only when the owner explicitly invokes /hypothesis-forge. Runs executable preflight → forge-run → freeze → isolated Critic → optional revise/classify → finalize. No Git mutation, provider calls, experiment execution or autonomous generator.
 ---
 
 # Hypothesis Forge
@@ -25,10 +25,13 @@ Required interpreter: CPython `3.13.14`. Do not invoke a bare workstation `pytho
 Read `configs/hypothesis_forge_independent_critic_v1.yaml` and the operator pack at
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
-One explicit `/hypothesis-forge` is scoped authorization for exactly one HFIC
-session (`ONE_SLASH_ONE_SESSION`), expiring at final terminal/STOP.
+One explicit `/hypothesis-forge` is scoped authorization for exactly one bounded
+Forge **run** (`ONE_SLASH_ONE_BOUNDED_RUN`), which may contain already defined
+BASE and eligible ACTIVE representation sessions. Authority expires at the run
+owner-final or STOP. A single HFIC session terminal is not automatically the
+owner-final of the whole search.
 `ZERO_MID_CYCLE_OWNER_INTERVENTION`: do not ask the owner to press Run or
-approve an RDP write between preflight, freeze, Critic, revision/classification
+approve an RDP write between preflight, forge-run, freeze, Critic, revision/classification
 and finalize. `PASS_TO_CLASSIFICATION` and exactly one bounded **primary** `REVISE_ONCE`
 remain inside the original slash authority and continue automatically.
 A final primary `KILL_*` continues once as isolated Critic #2 on the pre-frozen
@@ -109,24 +112,64 @@ Happy path — no owner copy/paste between the slash command and the final termi
    `caveat_router` when integrity is PASS, visibility, representations,
    `forge_input_next`, `evidence_surface_mode`). Ordinary preflight
    machine-stops `OBSERVABILITY_BLOCKED` / `FORGE_VISION_INTEGRITY_BLOCKED`
-   before synthesis. Then branch on preflight `action` (step 2). Prompt A /
-   synthesis only when `action` is not `STOP` **and** `forge_runnable` is
+   before synthesis. Do **not** skip to session `RETURN_EXISTING_SESSION` stop
+   before `forge-run`. Prompt A / synthesis only when `forge-run` next is
+   `START_BASE`, preflight `action` is not `STOP`, **and** `forge_runnable` is
    true. If `forge_runnable` is false (`INPUT_NOT_READY`), stop before Prompt
    A even when ordinary `action` is `START_NEW_SESSION`. Typed classes are
    `INPUT_NOT_READY` and `OBSERVABILITY_BLOCKED`. Typed `forge_input_next` is
-   `WAIT_FOR_IMPORT_OR_STOP` or `STOP_OBSERVABILITY`. Ready `forge_input_next`
-   is `STOP_BEFORE_SYNTHESIS` (FORGE INPUT visibility, not slash authority,
+   `WAIT_FOR_IMPORT_OR_STOP` or `STOP_OBSERVABILITY`. Ready `forge_input_next` is
+   `STOP_BEFORE_SYNTHESIS` (FORGE INPUT visibility, not slash authority,
    not CONTROL next, not an observability halt). Always show
    `evidence_surface_mode` (`ordinary` when JSON is null). PIT/missingness
    `NOT_EVALUATED` is not a READY basis. Do not invent `NO_WORTHY`.
+   Then resolve the bounded run (default no-write diagnostic; persist only
+   when this slash continues past READY):
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
+```
+   Immediately print the `owner_readout` field (`FORGE RUN` block) as the owner
+   result. Do not treat the raw JSON dump as the owner result. `--persist`
+   records `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT`; the readout `persisted`
+   line names that kind, not a filesystem path.
+   Branch on `forge-run` `next_action` **before** Prompt A and **before**
+   session-level `RETURN_EXISTING_SESSION` stop:
+   - `START_V1` auto-advances from effective BASE
+     `NO_WORTHY_HYPOTHESIS` / allowed duplicate-close when V1 is eligible.
+     Do **not** run ordinary Prompt A / `START_NEW_SESSION`. Print `owner_readout`
+     (`status: NEXT`). Owner pastes nothing. Same slash continues V1 envelope
+     construction via `consume_start_v1_envelope` on the CONTROL
+     `FORGE_CONTEXT_PACKET` (no fake critic packet). That is dormant wiring,
+     not Prompt A on market evidence and not the scientific V1 probe. Do **not**
+     launch Independent Critic on empty BASE. Freeze/Critic only after a V1
+     candidate exists on that envelope (fixture stubs allowed).
+     Do not stop as if Prompt C `WAIT_FOR_NEW_EVIDENCE` were the owner-final.
+     Do not ask the owner to «продолжить».
+   - `RESUME_V1` resumes the saved V1 draft (`--saved-draft-sha256` /
+     existing freeze identity). Do **not** call `consume_start_v1_envelope`
+     (that helper is START_V1 only).
+   - `START_BASE` → only then continue to preflight `START_NEW_SESSION` / Prompt A.
+   - `RESUME_BASE` → resume the exact pending BASE stage from the saved draft;
+     do not regenerate.
+   - `RETURN_EXISTING_RUN` is readback; stop; no second trial.
+   - `FINISH_RUNNER_UP` continues isolated Critic #2; do not start V1.
+   - `OWNER_CANDIDATE` / `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` /
+     `NON_SCIENTIFIC_STOP` / `KEEP_PAUSE` / `CONTROL_REQUIRED` /
+     `INPUT_NOT_READY` / `OBSERVABILITY_BLOCKED` → print `owner_readout`; stop.
+   Technical / visibility failures stay `OBSERVABILITY_BLOCKED`, never
+   scientific `NO_WORTHY` or `SEARCH_EXHAUSTED_CURRENT_EVIDENCE`.
    A no-write diagnostic that never starts a session. Pass the same
    `--owner-focus` as preflight:
 
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json --owner-focus AUTO
 ```
-2. Branch on `action`:
-   - `RETURN_EXISTING_SESSION` → report `effective_control_terminal` when
+2. Branch on preflight `action` **only after** `forge-run` next is `START_BASE`
+   or an in-session `RESUME_*` of BASE. Session `RETURN_EXISTING_SESSION` does
+   **not** stop the bounded run when `forge-run` next is `START_V1`.
+   - `RETURN_EXISTING_SESSION` → if `forge-run` next is `START_V1` / `RESUME_V1`,
+     continue the run. Otherwise report `effective_control_terminal` when
      present, else `critic_terminal`, plus NEXT; stop. Do not treat primary C1
      `critic_terminal` as the CONTROL probe branch after F3 failover.
    - `RESUME_CRITIC` → use `critic_input_packet` from the preflight JSON
@@ -144,7 +187,7 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
      Forge. Do not freeze or launch Critic.
      For `CONTROL_CORPUS_UNRESOLVABLE`: `OWNER NEXT=STOP_CORPUS_UNRESOLVABLE`.
      Same recovery fence.
-   - `START_NEW_SESSION` → continue.
+   - `START_NEW_SESSION` → continue only when `forge-run` next is `START_BASE`.
 3. Only for `START_NEW_SESSION`, run **PROMPT A** from the operator pack using
    `HFIC-V1.2` and only the bounded `FORGE_CONTEXT_PACKET` plus explicitly
    resolved evidence. In `CURRENT_REPRESENTATION_CONTROL_V1`, "explicitly
@@ -179,7 +222,9 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
      persists deterministic `WAIT_FOR_NEW_EVIDENCE` / `NEXT_ACTION_GENERATION_FALLBACK`;
    - run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --next-action <temp-or-omit> --format json`;
    - skip Independent Critic; do not finalize; report `NO_WORTHY_HYPOTHESIS` plus
-     the typed next action. Proposed owner phrases are `PROPOSED_NOT_AUTHORITY`
+     the typed next action. Re-run `forge-run`. If `next_action` is `START_V1`,
+     continue the same slash — Prompt C `WAIT_FOR_NEW_EVIDENCE` is not the
+     owner-final. Proposed owner phrases are `PROPOSED_NOT_AUTHORITY`
      and must not be executed.
 6. Otherwise run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py freeze --draft <temp> --preflight-receipt <temp> --format json`.
    Frozen packet is authority. One schema-repair attempt, then `HFIC_PROTOCOL_INVALID`.
@@ -215,7 +260,8 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
    Fake/nonempty classifier objects are invalid. Final `PASS_*` requires a live
    network-free classifier receipt bound to session/selected/spec hash.
 9. Verify `SYNTHESIS_COMPLETE` / RDP receipt, Git mutation 0, provider calls 0
-   before telling the owner the cycle is complete.
+   before telling the owner the cycle is complete. If `forge-run` next is
+   still `START_V1` / `RESUME_V1`, the bounded run is not evening-complete.
 10. On crash/retry, resume; never regenerate the same evidence+focus search.
 
 ## Mandatory auto-handoff (non-negotiable)

@@ -861,7 +861,7 @@ class HficAuthoritySurfaceTests(unittest.TestCase):
             self.assertIn("PASS_TO_CLASSIFICATION", text)
             self.assertIn("REVISE_ONCE", text)
             self.assertIn("AUTO_HANDOFF_UNAVAILABLE", text)
-            self.assertIn("ONE_SLASH_ONE_SESSION", text)
+            self.assertIn("ONE_SLASH_ONE_BOUNDED_RUN", text)
         self.assertNotIn("only if subagent launch is unavailable", skill)
         self.assertIn("AFTER_EXACT_OWNER_MERGE_PHRASE", config)
         self.assertIn("inventory-placeholder-times", operator)

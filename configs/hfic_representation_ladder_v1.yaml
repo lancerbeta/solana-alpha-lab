@@ -1,0 +1,25 @@
+schema: smial.hfic-representation-ladder
+schema_version: '1.0'
+ladder_id: HFIC_REPRESENTATION_LADDER_V1
+as_of: '2026-09-20'
+source_owner: FORGE_REPRESENTATION_LADDER_V1
+legacy_epoch_binding: EXISTING_CONTROL_EVIDENCE_EPOCH_SHA256
+new_market_epoch: forbidden
+handlers_resolve_in_code: true
+representations:
+  - id: BASE
+    version: HFIC-V1.2
+    order: 1
+    status: ACTIVE
+    reuse_class: SESSION
+    handler: BASE_HFIC
+    trigger_terminals: []
+  - id: NORMALIZED_TRAJECTORY_V1
+    version: '1.0'
+    order: 2
+    status: ACTIVE
+    reuse_class: CHALLENGER
+    handler: NORMALIZED_TRAJECTORY_V1
+    trigger_terminals:
+      - NO_WORTHY_HYPOTHESIS
+      - KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED

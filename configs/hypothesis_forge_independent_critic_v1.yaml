@@ -86,13 +86,15 @@ authority:
   cash_spend_usd_cents: 0
   wallet_signer_transaction_actions: 0
 slash_session_authority:
-  invocation: ONE_SLASH_ONE_SESSION
+  invocation: ONE_SLASH_ONE_BOUNDED_RUN
   expires_at: FINAL_TERMINAL_OR_STOP
   mid_cycle_owner_interventions: 0
   token: ZERO_MID_CYCLE_OWNER_INTERVENTION
   auto_continue:
     - PASS_TO_CLASSIFICATION
     - REVISE_ONCE
+  run_layer_auto_advance:
+    - START_V1
   auto_continue_revise_once_scope: PRIMARY_SELECTED_ONLY
   runner_up_revise_once: RUNNER_UP_REVISION_REQUIRED
   isolated_critic_unavailable: AUTO_HANDOFF_UNAVAILABLE
@@ -101,6 +103,7 @@ slash_session_authority:
   authorized_without_mid_cycle_prompt:
     - read_only_git_catalog_active_rdp
     - preflight
+    - forge-run
     - safe_offline_commissioning
     - process_owned_os_temp_files
     - append_only_rdp_context_session_candidates_critic_revision_classifier_finalize

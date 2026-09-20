@@ -4,7 +4,7 @@ catalog_version: 0.130.0
 as_of: '2026-09-07'
 implementation_status: VALIDATED_ACTIVE
 current_checkpoint:
-  assets: 1826
+  assets: 1831
   asset_registries: 4
   schemas: 97
   queries: 19
@@ -50,6 +50,7 @@ canonical_bindings:
     current_use_evidence_asset_ids:
     - SCRIPT-HYPOTHESIS-FORGE-001
     - DOC-HYPOTHESIS-FORGE-OPERATOR-001
+    - MODULE-HFIC-REPRESENTATION-LADDER-001
   ACTIVE-EXPERIMENT-CAPABILITY-REGISTRY:
     target_asset_id: CONFIG-EXPERIMENT-CAPABILITY-REGISTRY-V2-001
     expected_asset_type: configuration
