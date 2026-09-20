@@ -1,0 +1,70 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COHORT-DATA-ROOT-AND-IMPORT-READBACK-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-20",
+  "task_id": "COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1",
+  "reviewed_bindings_sha256": "b8d7145b507b8ec31d659c7d7c2fcf2cdd0007fc6f39193463273d07cc654969",
+  "reviewed_inventory_sha256": "da1e7594aba6eaba97771c422bbc02d0b417422944ff59eab4a369f9e785d862",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=ab3e73747208161bb1088276275d4a7c44fd686cfba4eba09e59c27a7e00d6c8",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "PASS_LIST_OMITTED_DATA_ROOT_IS_UNKNOWN",
+        "PASS_CLI_STRIPS_FORGE_FROM_OWNER_ENVELOPE",
+        "C1_C2_READBACK_IS_INSTANCE_NOT_FAMILY",
+        "PASS_GIT_PRINCIPAL_WITHOUT_PLANE_NOT_PRESENT"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_WRITE_SET_INCLUDES_MARKET_AWARENESS_TEST",
+        "PASS_MISSING_GIT_TYPED_STOP",
+        "PASS_FIXTURE_GIT_INIT_MISSING_RDP_NOT_PRESENT",
+        "PASS_SOURCE_SHA_NULL",
+        "PASS_COMMAND_SCOPED_IDENTITY_REMAP"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_VA1_LINKED_WORKTREE_ONE_PLANE",
+        "PASS_VA2_C1_C2_ONCE_INSTANCE",
+        "PASS_VA3_EXACT_REIMPORT_LINEAGE_COUNT_1",
+        "PASS_NAMED_CONSUMER_OWNER_IMPORT_LOOP",
+        "PASS_GIT_PRINCIPAL_WITHOUT_PLANE_IS_NOT_PRESENT"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_ENVELOPE_NEXT_FROM_READBACK",
+        "PASS_LIST_UNKNOWN_NOT_FALSE",
+        "PASS_GIT_MISSING_PLANE_NOT_PRESENT",
+        "PASS_FORGE_CONTROL_READY_EXPERT_NOT_NEXT"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_PASS",
+    "NO_ALPHA",
+    "NO_FORGE_EXECUTION",
+    "NO_A3_OR_LATER_SCOPE"
+  ]
+}

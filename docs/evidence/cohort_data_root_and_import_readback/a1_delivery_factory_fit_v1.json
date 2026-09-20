@@ -1,0 +1,36 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "COHORT-DATA-ROOT-AND-IMPORT-READBACK-FACTORY-FIT-001",
+  "as_of": "2026-09-20",
+  "task_id": "COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1",
+  "reviewed_bindings_sha256": "b8d7145b507b8ec31d659c7d7c2fcf2cdd0007fc6f39193463273d07cc654969",
+  "reviewed_inventory_sha256": "da1e7594aba6eaba97771c422bbc02d0b417422944ff59eab4a369f9e785d862",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_CANONICAL_IMPORT_PLANE_NOT_ALPHA",
+    "flexibility_and_history": "PASS_REUSE_EXISTING_DATA_ROOT_AND_LINEAGE",
+    "context_efficiency": "PASS_EXISTING_SEM_LIVE_EVIDENCE_TO_FORGE",
+    "research_truth": "PASS_FINGERPRINT_NOT_PATH_NULL_SOURCE_NOT_CONTENT",
+    "owner_operability": "PASS_ONE_READBACK_STOP_BEFORE_FORGE",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT_NO_DATA_DESTROY",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_NO_FALSE_UNIMPORTED_ON_OMITTED_LIST_ROOT"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "A3_FORGE_INPUT_TRUTH_AND_VISIBILITY_AFTER_MERGE"
+  },
+  "recovery": "Ordinary Git revert of the bounded data-root, readback, CLI, tests, operator note and Catalog pins. Do not destroy imported LIVE CORPUS bytes, collector, ObservationSchedule, VPS or Forge sessions.",
+  "limits": [
+    "NO_FORGE_EXECUTION",
+    "NO_ALPHA",
+    "NO_A3_OR_LATER",
+    "NO_ADDENDUM_IMPLEMENTATION",
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROVIDER_OR_DEPLOYMENT"
+  ]
+}

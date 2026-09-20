@@ -1,0 +1,43 @@
+{
+  "schema": "smial.cohort-import-readback",
+  "schema_version": "1.0",
+  "acceptance_id": "COHORT-DATA-ROOT-AND-IMPORT-READBACK-C1-C2-001",
+  "as_of": "2026-09-20",
+  "task_id": "COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1",
+  "persist": false,
+  "data_root_instance_fingerprint_sha256": "db5b0dede6936e17c3e35efa25105273a6b85d0305fde24bb7a932dbb3aff572",
+  "corpus_dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+  "corpus_version": 2,
+  "current_dataset_manifest_id": "dataset-f5245e924d08f16fe02e3ee416183923f7ef2ef2426b7db2db90e8705dd1680a",
+  "visible_cohorts": [
+    {
+      "cohort_id": "REL-20260902T111900Z-20260909T111900Z",
+      "release_id": "633a57088a5eb16dcc75a56aa2eb2521bbc76d1874aeb75aceb1ecc795bf1154",
+      "source_sha256": null,
+      "schedule_sha256": null,
+      "lineage_count": 1,
+      "status": "PRESENT_ONCE"
+    },
+    {
+      "cohort_id": "REL-20260909T111900Z-20260916T111900Z",
+      "release_id": "bf6b242a717fb168a3c22f00e5bfdb4d828156a8b4e4229f15c1f1bccdd260c9",
+      "source_sha256": null,
+      "schedule_sha256": null,
+      "lineage_count": 1,
+      "status": "PRESENT_ONCE"
+    }
+  ],
+  "lineage_integrity": "PASS",
+  "duplicate_cohort_count": 0,
+  "next_owner_action": "STOP_BEFORE_HYPOTHESIS_FORGE",
+  "GIT_MUTATION_DURING_ACCEPTANCE": 0,
+  "PROVIDER_CALLS": 0,
+  "FORGE_EXECUTION": 0,
+  "non_claims": [
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_FORGE_RUN",
+    "NO_A3_VISIBILITY",
+    "NO_ADDENDUM_IMPLEMENTATION",
+    "NO_DESTRUCTIVE_RUNTIME_ROLLBACK"
+  ]
+}

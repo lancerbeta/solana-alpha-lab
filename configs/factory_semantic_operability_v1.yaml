@@ -233,6 +233,7 @@ routes:
       - How does live RDP get into Forge?
       - How does a cohort become LIVE CORPUS?
       - Does Forge see one cumulative current dataset?
+      - Where did my imported cohort land?
       - как live evidence попадает в Forge
     search_terms:
       - live evidence
@@ -241,6 +242,9 @@ routes:
       - discovery release
       - Observation RDP
       - publish-live-cohort
+      - import-live
+      - canonical data root
+      - PASS_ALREADY_PRESENT_EXACT
       - forge-control-ready
       - live rdp
     consumers: [GOAL-OWNER, HYPOTHESIS-FORGE, FACTORY-001]

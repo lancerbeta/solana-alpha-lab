@@ -202,6 +202,7 @@ class CommissioningProofTests(unittest.TestCase):
             default_root.mkdir(parents=True)
             resolved = resolve_active_data_root(
                 repo,
+                explicit_data_root=default_root,
                 env={},
                 is_commissioned=lambda _path: False,
             )

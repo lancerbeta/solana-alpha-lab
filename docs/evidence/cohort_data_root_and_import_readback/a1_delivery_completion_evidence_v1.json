@@ -1,0 +1,84 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COHORT-DATA-ROOT-AND-IMPORT-READBACK-COMPLETION-001",
+  "as_of": "2026-09-20",
+  "task_id": "COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1",
+  "state_change": "CANONICAL_DATA_ROOT_AND_IMPORT_READBACK",
+  "base_main": "70f6a97399118a55bb655886ddbbeb01ebda0fcb",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "120b29835d8d21f91d1ee1bd6a110ad0b4f42dd8642897e5ac20224ec7bca161",
+    "catalog/assets/lifecycle.yaml": "350274cf4b1f87dfd5d60ddbee2ddae46fdfdd42bb3f1f48c896bb9b30f4055f",
+    "catalog/catalog_manifest.yaml": "b41c4bd4fab60f06b0c9a3e2257df081a059bf53bf0b60a9f2ddbe8be7799bca",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "4a1868b51a36b27013e08ee167102ff136e20e41e1f3d09470c2d87d09964b9b",
+    "catalog/generated/asset_edges.json": "f3eec58547bc1031125ff3206be84c44db3aa7eb79bd6e9a465d0b69b070bd2b",
+    "configs/factory_semantic_operability_v1.yaml": "464b5585b353c94c474f9118298b3677f1e0e9ae5ddb7eaccee8a64ab69cbabc",
+    "docs/PROJECT_MAP.md": "f2d7a24b1dcf7cf268aa0edf505e47f0a9a75d2db0f36354ecf36926d0f8d549",
+    "docs/evidence/cohort_data_root_and_import_readback/a1_c1_c2_readback_v1.json": "4a0a6ffdf8fde420ee1b4e97c1348fc510ba3bcdddceaf770503aeb2cdcfd6d4",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "87fb7d34ea6afd400cb3796c2110481115c027c268eb0ad8697d00e6d8001caa",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "d4bdfdefb3a1af76709292110613ade9fa9c48dc79876ebb81f956ecd8db32f8",
+    "docs/reports/cohort_data_root_and_import_readback/a1_owner_readout_v1.md": "a78f75188d127596e21a014e25e412e736c8349206b360ce9caaf3e3e81f2971",
+    "docs/tasks/COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1.md": "5b37e89fab9b6da3bba68586923d3a8795604cdd5b6ed89fcb9252da056b6846",
+    "scripts/discovery_evidence_release.py": "e5a33fec40104028a0691d8fdd77759f3a1d8dc8ee88d549d24978bfb13e93f1",
+    "src/solana_alpha_lab/factory/cohort_import_readback.py": "bc534a5ac0f092dd7257c62a025f1224f1f9960bfdd1c4b28151cfd74531f5c9",
+    "src/solana_alpha_lab/factory/data_root.py": "594c98c33acbc9b43ad3a45c29b58063f94946a73113d81fdc6967382c13e2b6",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "d3a8fae8eabdc3ab9f339cd4ad0a555d4ce9d344776d2c6e2961f15856bf08ed",
+    "tests/test_cohort_data_root_and_import_readback_v1.py": "7394f86dd4cc98c3c9ef88c131c2c6222cccde464f3dd8e48e227cf627cb90e4",
+    "tests/test_hfic_preflight.py": "40e5283cc75b5f0a461b6a24171c06b961112a385070f6e24c54d4886f0e797e",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "1049b97b3f8101fbed784267747550924aedf4475f541c9e01c5dbe691a83712",
+    "tests/test_market_data_awareness_v1.py": "32f5a99d1088689930109869c2b3f98310bb76deaa4c41cb41f584e68d15764f",
+    "tests/test_research_lifecycle_workbench_v1.py": "272f9f2032288ad17738b69c3c8da9d710c55e2f1cc437b52b83a812908b60d5"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/cohort_data_root_and_import_readback/a1_delivery_factory_fit_v1.json",
+    "sha256": "4ab17be4a19a50fd0eef6994621033862abcaaaee5d30ce21f96e4c9b9edf036",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COHORT_DATA_ROOT_AND_IMPORT_READBACK_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/cohort_data_root_and_import_readback/a1_delivery_independent_review_v1.json",
+      "sha256": "7019d40f9822e319039fc6d2385ae6ac6b904715b59d89b26859d49804c1acc7",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CATALOG_SYNC",
+      "PASS_FOCUSED_SYNTHETIC_FIXTURE_SUITE",
+      "PASS_SEMANTIC_PREMISE_VALIDATE_LAUNCH"
+    ]
+  },
+  "non_claims": [
+    "NO_FORGE_EXECUTION",
+    "NO_ALPHA",
+    "NO_A3_OR_LATER_SCOPE",
+    "NO_ADDENDUM_IMPLEMENTATION",
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROVIDER_CALLS",
+    "NO_DESTRUCTIVE_RUNTIME_ROLLBACK"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd_cents": 0,
+    "experiment_execution": 0,
+    "holdout_touches": 0,
+    "generator_code_added": 0,
+    "new_db": 0
+  }
+}

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 import sys
 import tempfile
 import unittest
@@ -1490,6 +1491,12 @@ class MarketDataAwarenessTests(unittest.TestCase):
     def test_compose_without_rdp_is_source_not_present(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = isolated_factory_root(Path(tmp))
+            subprocess.check_call(
+                ["git", "init", "-b", "main"],
+                cwd=root,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+            )
             projection = compose_market_context(root, as_of=AS_OF)
             self.assertEqual(projection["source_status"], "NOT_PRESENT")
             self.assertEqual(projection["data_capability"]["status"], "GIT_CAPABILITY")

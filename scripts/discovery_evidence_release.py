@@ -51,6 +51,13 @@ from solana_alpha_lab.factory.live_cohort_to_forge import (
     publish_live_cohort,
     resolve_operator_path,
 )
+from solana_alpha_lab.factory.cohort_import_readback import (
+    PASS_ALREADY_PRESENT_EXACT,
+    STOP_IDENTITY_CONFLICT,
+    build_cohort_import_readback,
+    owner_import_terminal,
+)
+from solana_alpha_lab.factory.data_root import DataRootError, resolve_data_root
 
 FAIL_OWNER_NEXT = {
     "NOT_MATURE": "WAIT_UNTIL_COHORT_MATURE",
@@ -85,9 +92,10 @@ FAIL_OWNER_NEXT = {
     "SCHEDULE_ARTIFACT_MISSING": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_ARTIFACT_HASH_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_SEMANTIC_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "CENSUS_SCHEDULE_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_PARSER_INVALID": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_PRODUCER_UNBOUND": "STOP_SCHEDULE_PRODUCER_REQUIRED",
-    "CENSUS_SCHEDULE_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "DATA_ROOT_NON_GIT_CONTEXT": "STOP_USE_GIT_CHECKOUT_OR_EXPLICIT_DATA_ROOT",
 }
 
 
@@ -102,6 +110,37 @@ def _parse_utc(value: str | None) -> datetime | None:
 
 def _path(value: Path) -> Path:
     return resolve_operator_path(ROOT, value)
+
+
+def _resolved_data_root(value: Path | None) -> Path:
+    if value is None:
+        return resolve_data_root(ROOT)
+    return _path(value)
+
+
+def _print_import_success(result: object, data_root: Path) -> None:
+    owner_result: object = result
+    if isinstance(result, dict):
+        owner_result = dict(result)
+        owner_result.pop("next", None)
+        owner_result.pop("forge", None)
+    payload: dict[str, object] = {"result": owner_result}
+    status = "PASS"
+    inner_status = None
+    if isinstance(result, dict):
+        inner_status = result.get("status")
+        imported = result.get("import")
+        if inner_status is None and isinstance(imported, dict):
+            inner_status = imported.get("status")
+    if isinstance(inner_status, str):
+        terminal = owner_import_terminal(inner_status)
+        if terminal == PASS_ALREADY_PRESENT_EXACT:
+            status = PASS_ALREADY_PRESENT_EXACT
+    payload["status"] = status
+    readback = build_cohort_import_readback(data_root)
+    payload["readback"] = readback
+    payload["next"] = readback["next_owner_action"]
+    print(json.dumps(payload, sort_keys=True, default=str))
 
 
 def _spawn_source_build_worker(argv: list[str]) -> int:
@@ -192,26 +231,41 @@ def main(argv: list[str] | None = None) -> int:
         "import-live", help="Import a verified live cohort into the LIVE CORPUS"
     )
     import_live.add_argument("--release-root", type=Path, required=True)
-    import_live.add_argument("--data-root", type=Path, required=True)
+    import_live.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="LIVE CORPUS root; omit to use the Git principal checkout local/factory_v1/data_plane",
+    )
     import_live.add_argument("--import-at", type=str, default=None)
 
     repair_live = sub.add_parser(
         "repair-live-corpus-manifests",
         help="Metadata-only TASK-06 repair of the current LIVE CORPUS root",
     )
-    repair_live.add_argument("--data-root", type=Path, required=True)
+    repair_live.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="LIVE CORPUS root; omit to use the Git principal checkout local/factory_v1/data_plane",
+    )
     repair_live.add_argument("--published-at", type=str, default=None)
 
     publish = sub.add_parser(
         "publish-live-cohort",
-        help="One-shot: closure → source → seal → verify → transport → import → Forge CONTROL",
+        help="One-shot: closure → source → seal → verify → transport → import + readback",
     )
     publish.add_argument("--observation-rdp", type=Path, required=True)
     publish.add_argument("--ops-store", type=Path, required=True)
     publish.add_argument("--schedule-sha256", required=True)
     publish.add_argument("--activation-id", required=True)
     publish.add_argument("--cohort-id", default=None)
-    publish.add_argument("--data-root", type=Path, required=True)
+    publish.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="LIVE CORPUS root; omit to use the Git principal checkout local/factory_v1/data_plane",
+    )
     publish.add_argument("--release-root", type=Path, default=None)
     publish.add_argument("--as-of", type=str, default=None)
     publish.add_argument("--release-builder-git-sha", default=None)
@@ -219,7 +273,7 @@ def main(argv: list[str] | None = None) -> int:
 
     listed = sub.add_parser(
         "list-live-cohorts",
-        help="List campaign cohorts and the next mature unimported cohort",
+        help="List campaign cohorts; imported flags require --data-root",
     )
     listed.add_argument("--observation-rdp", type=Path, required=True)
     listed.add_argument("--ops-store", type=Path, required=True)
@@ -325,17 +379,21 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "verify-live":
             result = verify_live_cohort(_path(args.release_root))
         elif args.command == "import-live":
+            data_root = _resolved_data_root(args.data_root)
             result = import_live_cohort(
                 release_root=_path(args.release_root),
-                data_root=_path(args.data_root),
+                data_root=data_root,
                 import_time=_parse_utc(args.import_at),
             )
+            _print_import_success(result, data_root)
+            return 0
         elif args.command == "repair-live-corpus-manifests":
             result = repair_live_corpus_manifests(
-                data_root=_path(args.data_root),
+                data_root=_resolved_data_root(args.data_root),
                 published_at=_parse_utc(args.published_at),
             )
         elif args.command == "publish-live-cohort":
+            data_root = _resolved_data_root(args.data_root)
             result = publish_live_cohort(
                 repo_root=ROOT,
                 observation_rdp=_path(args.observation_rdp),
@@ -343,12 +401,14 @@ def main(argv: list[str] | None = None) -> int:
                 schedule_sha256=args.schedule_sha256,
                 activation_id=args.activation_id,
                 cohort_id=args.cohort_id,
-                data_root=_path(args.data_root),
+                data_root=data_root,
                 release_root=None if args.release_root is None else _path(args.release_root),
                 as_of=_parse_utc(args.as_of),
                 release_builder_git_sha=args.release_builder_git_sha,
                 discovery_coverage_class=args.discovery_coverage_class,
             )
+            _print_import_success(result, data_root)
+            return 0
         elif args.command == "list-live-cohorts":
             result = list_live_cohorts(
                 observation_rdp=_path(args.observation_rdp),
@@ -374,12 +434,17 @@ def main(argv: list[str] | None = None) -> int:
         }
         print(json.dumps(payload, sort_keys=True))
         return 2
-    except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError) as exc:
+    except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError, DataRootError) as exc:
         code = str(exc)
+        next_action = FAIL_OWNER_NEXT.get(code, "STOP_INSPECT_FAIL_CODE")
+        if args.command in {"import-live", "publish-live-cohort"}:
+            terminal = owner_import_terminal(code)
+            if terminal == STOP_IDENTITY_CONFLICT:
+                next_action = STOP_IDENTITY_CONFLICT
         payload = {
             "status": "FAIL",
             "code": code,
-            "next": FAIL_OWNER_NEXT.get(code, "STOP_INSPECT_FAIL_CODE"),
+            "next": next_action,
         }
         print(json.dumps(payload, sort_keys=True))
         return 2

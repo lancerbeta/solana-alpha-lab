@@ -1258,7 +1258,15 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
             )
             tree_hashes = hash_release_tree(sealed)
             self.assertIn("observation_schedule.json", tree_hashes)
-            self.assertEqual(published["next"], CONTROL_NEXT)
+            self.assertNotIn("next", published)
+            self.assertEqual(
+                envelope["next"],
+                envelope["readback"]["next_owner_action"],
+            )
+            self.assertEqual(
+                envelope["readback"]["next_owner_action"],
+                "STOP_BEFORE_HYPOTHESIS_FORGE",
+            )
             self.assertEqual(
                 published["readiness"]["state"],
                 "READY_VALID_WITH_COVERAGE_LIMITATION",
@@ -1267,10 +1275,7 @@ class LiveCohortToForgeOperationalClosureTests(unittest.TestCase):
                 published["readiness"]["discovery_coverage_class"],
                 "GAP_SUSPECTED",
             )
-            self.assertTrue(published["forge"]["control_run_required_first"])
-            self.assertFalse(published["forge"]["normalized_trajectory_executed"])
-            self.assertEqual(published["forge"]["next"], CONTROL_NEXT)
-            self.assertGreaterEqual(published["forge"]["yield_eligible"], 10)
+            self.assertNotIn("forge", published)
             self.assertNotEqual(published["epoch_before"], published["epoch_after"])
             retry = publish_live_cohort(
                 repo_root=ROOT,

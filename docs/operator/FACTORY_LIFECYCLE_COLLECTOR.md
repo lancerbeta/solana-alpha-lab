@@ -524,8 +524,13 @@ authorized scope (seal/import/Forge require their own contract).
 `OBSERVATION_BATCH` in `[window_start, as_of]`, never `dataset-*.published`.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
+
+Omit `--data-root` on this list so a linked worktree does not look at a
+worktree-local plane. `imported` is `null` and `imported_status` is
+`UNKNOWN`. `next_unimported_mature` is also null. Do not copy a relative
+`--data-root` onto `publish-live-cohort`.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py build-live-source --plan-only --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --cohort-id <REL-...>
@@ -543,14 +548,20 @@ publish the next mature unimported cohort. Optional
 `--discovery-coverage-class GAP_SUSPECTED` when collector coverage is known.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py list-live-cohorts --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py publish-live-cohort --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py publish-live-cohort --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
 
-Relative paths resolve against the repository root. The sealed tree is kept
+Relative paths resolve against the repository root. Omit `--data-root` to
+use the Git principal checkout `local/factory_v1/data_plane`; linked
+worktrees share that plane. After success, `publish-live-cohort` and
+`import-live` print one `smial.cohort-import-readback`. An exact already
+imported lineage is `PASS_ALREADY_PRESENT_EXACT`. `forge-control-ready`
+stays an expert diagnostic, not the obligatory owner next step.
+The sealed tree is kept
 by default at `<observation_rdp.parent>/live_cohort_releases/<cohort_id>/`.
 Schema `1.1` sealed trees automatically include `observation_schedule.json`
 (the exact ObservationSchedule document). Copy the whole sealed directory.
@@ -593,26 +604,23 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 Copy that sealed directory to the local machine, then:
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root local/factory_v1/live_cohort_releases/<cohort_id> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root local/factory_v1/live_cohort_releases/<cohort_id>
 ```
 
-```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
-```
-
-Happy readback terminal is `FORGE_CONTROL_READY`. NEXT:
-
-```
-/hypothesis-forge CURRENT_REPRESENTATION_CONTROL
-```
-
-Do not treat ordinary Forge as a fallback when CONTROL corpus/yield
-preconditions fail. Optional `--imported-cohort-id` checks that exact
-cohort appears in lineage; do not paste the placeholder `REL-...`.
+Omit `--data-root` to land in the Git principal checkout
+`local/factory_v1/data_plane`. Success prints one
+`smial.cohort-import-readback`. Exact already-imported lineage is
+`PASS_ALREADY_PRESENT_EXACT`. That readback is the owner import terminal.
+Do not run Forge. `readback.next_owner_action` is
+`STOP_BEFORE_HYPOTHESIS_FORGE` when lineage is present once.
+Do not paste `forge-control-ready` or `/hypothesis-forge` as the next
+step; those remain expert diagnostics later in this document.
 
 Typed early-stop codes include `NOT_MATURE`, `COHORT_DUE_OPEN`,
-`PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `COVERAGE_CONFIRMED_BROKEN`,
-`LOW_YIELD`, `IMPORT_CONFLICT`, `SOURCE_BUILD_RESOURCE_LIMIT`,
+`PUBLICATION_OPEN`, `IDENTITY_CONFLICT`, `IMPORT_CONFLICT`,
+`STOP_IDENTITY_CONFLICT`, `DATA_ROOT_NON_GIT_CONTEXT`,
+`COVERAGE_CONFIRMED_BROKEN`,
+`LOW_YIELD`, `SOURCE_BUILD_RESOURCE_LIMIT`,
 `DATASET_PUBLICATION_INCOMPLETE`, `LIVE_CORPUS_PARQUET_SYMLINK`,
 `CORPUS_PARQUET_SHA_MISMATCH`. Typed FAIL JSON includes `next`. `LOW_YIELD`
 is raised before import when projected cumulative yield is below
@@ -621,6 +629,21 @@ are not crashes. `GAP_CONFIRMED` is not sealable. New self-contained releases
 fail closed on missing/tampered/mismatched `observation_schedule.json`
 (`SEAL_SCHEDULE_DOCUMENT_MISSING`, `SCHEDULE_ARTIFACT_MISSING`,
 `SCHEDULE_SEMANTIC_SHA_MISMATCH`). Do not invent a bind-schedule command.
+
+Expert diagnostic only, after the import loop is already `STOP_BEFORE_HYPOTHESIS_FORGE`.
+Not the owner next step. Relative `--data-root` is the principal checkout
+relative plane; do not run this from a linked worktree expecting a different
+corpus.
+
+```
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
+```
+
+Happy diagnostic terminal is `FORGE_CONTROL_READY`. After later A3 visibility
+PASS, ordinary Forge is `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
+Do not treat ordinary Forge as a fallback when CONTROL corpus/yield
+preconditions fail. Optional `--imported-cohort-id` checks that exact
+cohort appears in lineage; do not paste the placeholder `REL-...`.
 
 Primitives remain available (`build-live-source` requires `--cohort-id` and
 `--ops-store`; `live-status` / `seal-live-cohort` / `verify-live` /
@@ -631,7 +654,7 @@ Do not treat repair itself as the import. If repair is interrupted, or
 `.published` is missing/corrupt, rerun the same repair command.
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py repair-live-corpus-manifests
 ```
 
 CLI `status` `PASS` carries operational `result.status` `REPAIRED` or

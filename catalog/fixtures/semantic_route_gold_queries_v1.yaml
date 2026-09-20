@@ -65,6 +65,9 @@ queries:
 - query_id: SGQ-LIVE-EVIDENCE-EN
   query: how live RDP gets into Forge
   required_top_route: SEM-LIVE-EVIDENCE-TO-FORGE
+- query_id: SGQ-LIVE-EVIDENCE-IMPORT-LANDING-EN
+  query: where did my imported cohort land
+  required_top_route: SEM-LIVE-EVIDENCE-TO-FORGE
 - query_id: SGQ-REMOTE-OPS-EN
   query: backup / restore / remote Factory VPS
   required_top_route: SEM-REMOTE-OPS-RECOVERY

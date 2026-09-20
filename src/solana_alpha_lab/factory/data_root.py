@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import subprocess
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -69,6 +70,60 @@ def _env_mapping(env: Mapping[str, str] | None) -> Mapping[str, str]:
     return os.environ if env is None else env
 
 
+def _git_stdout(start: Path, *args: str) -> str:
+    try:
+        completed = subprocess.run(
+            ["git", "-C", str(start), *args],
+            capture_output=True,
+            check=False,
+            shell=False,
+        )
+    except OSError as exc:
+        raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT") from exc
+    if completed.returncode != 0:
+        raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT")
+    return completed.stdout.decode("utf-8", errors="replace").strip()
+
+
+def git_principal_checkout_root(start: Path) -> Path:
+    """Return the principal checkout that owns ``git-common-dir``.
+
+    Linked worktrees share that checkout. No disk crawl and no sibling guess.
+    """
+
+    try:
+        bare = _git_stdout(start, "rev-parse", "--is-bare-repository")
+        common = _git_stdout(start, "rev-parse", "--git-common-dir")
+    except DataRootError:
+        raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT") from None
+    if bare == "true":
+        raise DataRootError("DATA_ROOT_BARE_REPOSITORY")
+    path = Path(common)
+    if not path.is_absolute():
+        path = (Path(start) / path).resolve()
+    else:
+        path = path.resolve()
+    if path.name != ".git" or not path.exists():
+        raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT")
+    return path.parent
+
+
+def try_git_principal_checkout_root(start: Path) -> Path | None:
+    try:
+        return git_principal_checkout_root(start)
+    except DataRootError:
+        return None
+
+
+def _default_data_plane_path(repo_root: Path, *, require_git: bool) -> Path:
+    principal = try_git_principal_checkout_root(repo_root)
+    if principal is None:
+        if require_git:
+            raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT")
+        return Path(repo_root) / DEFAULT_DATA_PLANE_RELATIVE
+    return principal / DEFAULT_DATA_PLANE_RELATIVE
+
+
 def inspect_existing_directory(candidate: Path) -> Path | None:
     """Return a resolved existing directory, or None. Never mkdir."""
 
@@ -124,7 +179,7 @@ def resolve_existing_data_root(
 
     env_raw = mapping.get("SMIAL_DATA_ROOT")
     default_existing = inspect_existing_directory(
-        Path(repo_root) / DEFAULT_DATA_PLANE_RELATIVE
+        _default_data_plane_path(repo_root, require_git=False)
     )
     if env_raw:
         env_existing = inspect_existing_directory(Path(env_raw))
@@ -151,6 +206,13 @@ def resolve_existing_data_root(
         return ExistingDataRootResolution(
             "PRESENT", default_existing, "DEFAULT_EXISTING", None
         )
+    if try_git_principal_checkout_root(repo_root) is None:
+        return ExistingDataRootResolution(
+            "UNAVAILABLE",
+            None,
+            "NON_GIT_CONTEXT",
+            "DATA_ROOT_NON_GIT_CONTEXT",
+        )
     return ExistingDataRootResolution(
         "NOT_PRESENT", None, "DEFAULT_MISSING", "RESEARCH_STORE_NOT_PRESENT"
     )
@@ -168,8 +230,9 @@ def resolve_data_root(
     if explicit_data_root is not None:
         return validate_data_root(Path(explicit_data_root))
     raw = mapping.get("SMIAL_DATA_ROOT")
-    candidate = Path(raw) if raw else Path(repo_root) / DEFAULT_DATA_PLANE_RELATIVE
-    return validate_data_root(candidate)
+    if raw:
+        return validate_data_root(Path(raw))
+    return validate_data_root(_default_data_plane_path(repo_root, require_git=True))
 
 
 def resolve_active_data_root(
@@ -190,11 +253,16 @@ def resolve_active_data_root(
             inventory_digest or (lambda _path: None),
         )
 
-    default_root = validate_data_root(Path(repo_root) / DEFAULT_DATA_PLANE_RELATIVE)
     env_raw = mapping.get("SMIAL_DATA_ROOT")
     env_root: Path | None = None
     if env_raw:
         env_root = validate_data_root(Path(env_raw))
+    elif try_git_principal_checkout_root(repo_root) is None:
+        raise DataRootError("DATA_ROOT_NON_GIT_CONTEXT")
+
+    default_root = validate_data_root(
+        _default_data_plane_path(repo_root, require_git=env_root is None)
+    )
 
     ordered: list[Path] = []
     for item in (env_root, default_root):
