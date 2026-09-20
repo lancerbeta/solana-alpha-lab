@@ -4,8 +4,8 @@
   "review_id": "NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-FACTORY-FIT-001",
   "as_of": "2026-09-20",
   "task_id": "NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1",
-  "reviewed_bindings_sha256": "cb14493397019505a08dd891acedaaf77dbfc45449b8651b8dedabdcf027f914",
-  "reviewed_inventory_sha256": "aeeaed45a33c88989044a718da102f007897083d4e9ccbf1bab54d30701095db",
+  "reviewed_bindings_sha256": "5c58b177a680342d8e2417d25729e53784620f3d7e666803b1a8a77b8d8a5086",
+  "reviewed_inventory_sha256": "d0264b1b00f335c769ac9e21e5d3475601891b1d8d52c31b7f711f86989afb66",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {

@@ -13,7 +13,7 @@
   "implementation_bindings": {
     ".agents/skills/hypothesis-forge/SKILL.md": "e4046ced9f35f7f94b2ce36666b632c79b59ce389f7e610001fc7cd5f56bc58e",
     ".cursor/commands/hypothesis-forge.md": "a8a93e34045a2e41fae5990f6f6fe002b90fa261bf40a43944e5cc1ee6f94f0c",
-    "catalog/assets/core.yaml": "b6c142a2c459344c98a597437bbab4b46ecebcc25659428c3c549b52ce9b40ec",
+    "catalog/assets/core.yaml": "b929ec75c518b7acbc70b38f401bc4cedccfa38e770dd101ad3cfaf1d87f6a27",
     "catalog/assets/lifecycle.yaml": "1ef7d3c52aac3fbdeda544771c2dc718095a3e93fef9f5c63f57ffc5b3f07b57",
     "catalog/catalog_manifest.yaml": "13cd7b0824c1f90de652a7aa750ef5068d7616e470596ddefe560423f7c70852",
     "catalog/generated/asset_edges.json": "7b2ec95821c728840b91561e8af18c1ecf6d0828925e53557c2bf74af037d595",
@@ -24,7 +24,7 @@
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "6e310ea424645733070de4f42832e2d8ad70e21e9b66feb9093b814a0df271c5",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "c4300294b3f678fa134ec5b88ed053813dd28659c8ed853746c243e135e019c9",
     "docs/reports/normalized_trajectory_v1_execution_closure/a1_owner_readout_v1.md": "f0fe011c455e2797a33411129f3ec1fc446987193ab592689c244a0bf1881fce",
-    "docs/tasks/NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1.md": "6c286089972ddf7f536e66059cedc404600b164bf9a015ba5e3cc49ce26cb0bd",
+    "docs/tasks/NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1.md": "4a66689417ff8014b38d9f3e9b9f64e4069a5e13ac3c6ce225cb3283bbe5718e",
     "src/solana_alpha_lab/factory/hfic_released_trajectory_projection.py": "d864144e4acd3b4926bc4b94040a413576b13ef3654382ebbb79a2fad8a60878",
     "src/solana_alpha_lab/factory/hfic_representation_probe.py": "80ad9dbce12fc057a988e9c710e4ce0e8b44c134d0dfcb8318b2330d4769a2dc",
     "src/solana_alpha_lab/factory/normalized_trajectory_v1.py": "faa10a9bfb89b9007431afabe9fe85c554a2078fc9ce755462ebc83fc36402c3",
@@ -43,14 +43,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/normalized_trajectory_v1_execution_closure/a1_delivery_factory_fit_v1.json",
-    "sha256": "99e679a4c7e978fc30a1ed833e425d2e3c0d04658cace74cd8a70e4c7eaba5fb",
+    "sha256": "18adc66302cb50a9cbaa7025d15fccf166fb02f318c1b36b9b65859a3d563595",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/normalized_trajectory_v1_execution_closure/a1_delivery_independent_review_v1.json",
-      "sha256": "ea691b7616ba2cb731ccea549ad6243f7279199663b3645154198a7fc68fa4e3",
+      "sha256": "1f0135719200071c44359ad74353d4c41124941c63e8f020fffe5484a62f7b82",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
