@@ -566,6 +566,44 @@ def prepare_ladder_freeze_preflight(
     return receipt
 
 
+def attach_ladder_freeze_preflight(
+    payload: dict[str, Any],
+    *,
+    data_root: Path,
+    store: ResearchStore,
+) -> dict[str, Any]:
+    """Attach freeze receipt for START_V1/RESUME_V1/later ACTIVE, or block."""
+
+    next_action = str(payload.get("next_action") or "")
+    control_sid = payload.get("control_session_id")
+    if next_action not in {
+        ACTION_START_V1,
+        ACTION_RESUME_V1,
+        "START_SYNTHETIC_LATER_V2",
+    } or not isinstance(control_sid, str) or not control_sid:
+        return payload
+    bundle = load_session_bundle(store, control_sid)
+    packet = _packet_for_bundle(Path(data_root), bundle, store) if bundle is not None else None
+    if isinstance(packet, dict) and packet:
+        representation_id = (
+            HANDLER_SYNTHETIC_LATER_V2
+            if "SYNTHETIC_LATER_V2" in next_action
+            else HANDLER_NORMALIZED_TRAJECTORY_V1
+        )
+        payload["ladder_freeze_preflight"] = prepare_ladder_freeze_preflight(
+            control_preflight_from_bundle(bundle, packet),
+            representation_id=representation_id,
+            control_session_id=control_sid,
+        )
+        return payload
+    payload["next_action"] = ACTION_OBSERVABILITY_BLOCKED
+    payload["owner_final"] = ACTION_OBSERVABILITY_BLOCKED
+    payload["owner_class"] = ACTION_OBSERVABILITY_BLOCKED
+    payload["blocking_reason_codes"] = ["FORGE_CONTEXT_ARTIFACT_MISSING"]
+    payload.pop("ladder_freeze_preflight", None)
+    return payload
+
+
 def control_preflight_from_bundle(
     bundle: Mapping[str, Any], packet: Mapping[str, Any] | None
 ) -> dict[str, Any]:

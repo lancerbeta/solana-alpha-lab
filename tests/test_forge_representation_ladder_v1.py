@@ -81,6 +81,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     format_forge_run_owner_readout,
     load_ladder_registry,
     prepare_ladder_freeze_preflight,
+    attach_ladder_freeze_preflight,
     resolve_next_action,
     _packet_for_bundle,
 )
@@ -1507,6 +1508,26 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(v1["used_cohort_ids"], ["REL-C1", "REL-C2"])
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
         self.assertEqual(retry["run_identity_sha256"], started["run_identity_sha256"])
+
+    def test_f2_cli_missing_control_packet_is_observability(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            self._no_worthy_base(data_root, store)
+            payload = attach_ladder_freeze_preflight(
+                {
+                    "next_action": ACTION_START_V1,
+                    "control_session_id": "HFIC-SESS-MISSINGPACKET01",
+                    "owner_class": "FORGE_RUN_IN_PROGRESS",
+                },
+                data_root=data_root,
+                store=store,
+            )
+        self.assertEqual(payload["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertEqual(payload["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertNotIn("ladder_freeze_preflight", payload)
+        self.assertIn("FORGE_CONTEXT_ARTIFACT_MISSING", payload["blocking_reason_codes"])
 
     def test_f2_orphan_v1_without_parent_is_not_bound(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

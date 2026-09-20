@@ -398,41 +398,18 @@ def cmd_forge_run(
         saved_draft_sha256=saved_draft_sha256,
     )
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
-    next_action = str(receipt.get("next_action") or "")
-    control_sid = receipt.get("control_session_id")
-    if (
-        next_action in {"START_V1", "RESUME_V1", "START_SYNTHETIC_LATER_V2"}
-        and isinstance(control_sid, str)
-        and control_sid
-    ):
-        from solana_alpha_lab.factory.hfic_representation_ladder import (
-            HANDLER_NORMALIZED_TRAJECTORY_V1,
-            HANDLER_SYNTHETIC_LATER_V2,
-            _packet_for_bundle,
-            control_preflight_from_bundle,
-            prepare_ladder_freeze_preflight,
-        )
-        from solana_alpha_lab.factory.hfic_session import load_session_bundle
-        from solana_alpha_lab.factory.research_store import ResearchStore
+    from solana_alpha_lab.factory.hfic_representation_ladder import (
+        attach_ladder_freeze_preflight,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
 
-        store = ResearchStore(resolved.root, create_if_missing=False)
-        bundle = load_session_bundle(store, control_sid)
-        if bundle is not None:
-            packet = _packet_for_bundle(resolved.root, bundle, store)
-            if isinstance(packet, dict) and packet:
-                representation_id = (
-                    HANDLER_SYNTHETIC_LATER_V2
-                    if "SYNTHETIC_LATER_V2" in next_action
-                    else HANDLER_NORMALIZED_TRAJECTORY_V1
-                )
-                payload["ladder_freeze_preflight"] = prepare_ladder_freeze_preflight(
-                    control_preflight_from_bundle(bundle, packet),
-                    representation_id=representation_id,
-                    control_session_id=control_sid,
-                )
+    store = ResearchStore(resolved.root, create_if_missing=False)
+    payload = attach_ladder_freeze_preflight(
+        payload, data_root=resolved.root, store=store
+    )
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
-        0 if receipt.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
+        0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
     ))
 
 
