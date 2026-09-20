@@ -550,7 +550,13 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py publish-live-cohort --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
 ```
 
-Relative paths resolve against the repository root. The sealed tree is kept
+Relative paths resolve against the repository root. Omit `--data-root` to
+use the Git principal checkout `local/factory_v1/data_plane`; linked
+worktrees share that plane. After success, `publish-live-cohort` and
+`import-live` print one `smial.cohort-import-readback`. An exact already
+imported lineage is `PASS_ALREADY_PRESENT_EXACT`. `forge-control-ready`
+stays an expert diagnostic, not the obligatory owner next step.
+The sealed tree is kept
 by default at `<observation_rdp.parent>/live_cohort_releases/<cohort_id>/`.
 Schema `1.1` sealed trees automatically include `observation_schedule.json`
 (the exact ObservationSchedule document). Copy the whole sealed directory.
@@ -593,14 +599,21 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 Copy that sealed directory to the local machine, then:
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root local/factory_v1/live_cohort_releases/<cohort_id> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py import-live --release-root local/factory_v1/live_cohort_releases/<cohort_id>
 ```
+
+Omit `--data-root` to land in the Git principal checkout
+`local/factory_v1/data_plane`. Success prints one
+`smial.cohort-import-readback`. Exact already-imported lineage is
+`PASS_ALREADY_PRESENT_EXACT`. That readback is the owner import terminal.
+The next command is an expert diagnostic, not an obligatory owner step.
 
 ```
 uv run --locked --managed-python python -B scripts/discovery_evidence_release.py forge-control-ready --data-root local/factory_v1/data_plane
 ```
 
-Happy readback terminal is `FORGE_CONTROL_READY`. NEXT:
+Happy diagnostic terminal is `FORGE_CONTROL_READY`. After A3 visibility
+PASS, ordinary Forge is:
 
 ```
 /hypothesis-forge CURRENT_REPRESENTATION_CONTROL

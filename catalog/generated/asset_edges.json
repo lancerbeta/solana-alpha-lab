@@ -2493,6 +2493,21 @@
       "target_asset_id": "CI-WORKFLOW-001"
     },
     {
+      "source_asset_id": "CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-COHORT-IMPORT-READBACK-001"
+    },
+    {
+      "source_asset_id": "CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-FACTORY-DATA-ROOT-001"
+    },
+    {
+      "source_asset_id": "CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001"
+    },
+    {
       "source_asset_id": "CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001",
       "relation": "depends_on",
       "target_asset_id": "DOC-FACTORY-LIFECYCLE-COLLECTOR-001"
@@ -10678,6 +10693,21 @@
       "target_asset_id": "CTRL-KCDN-ATOM-A-001"
     },
     {
+      "source_asset_id": "MODULE-COHORT-IMPORT-READBACK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-DATA-ROOT-001"
+    },
+    {
+      "source_asset_id": "MODULE-COHORT-IMPORT-READBACK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "MODULE-COHORT-IMPORT-READBACK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001"
+    },
+    {
       "source_asset_id": "MODULE-COLLECTOR-CAMPAIGN-PREFLIGHT-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-COLLECTOR-SCHEDULABILITY-ORACLE-001"
@@ -10836,6 +10866,11 @@
       "source_asset_id": "MODULE-EXPERIMENT-EVIDENCE-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-EXPERIMENT-EVIDENCE-DECISION-001"
+    },
+    {
+      "source_asset_id": "MODULE-FACTORY-DATA-ROOT-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001"
     },
     {
       "source_asset_id": "MODULE-FACTORY-REMOTE-OPS-001",
@@ -14850,6 +14885,11 @@
     {
       "source_asset_id": "SCRIPT-DISCOVERY-EVIDENCE-RELEASE-001",
       "relation": "depends_on",
+      "target_asset_id": "MODULE-COHORT-IMPORT-READBACK-001"
+    },
+    {
+      "source_asset_id": "SCRIPT-DISCOVERY-EVIDENCE-RELEASE-001",
+      "relation": "depends_on",
       "target_asset_id": "MODULE-DISCOVERY-EVIDENCE-RELEASE-001"
     },
     {
@@ -16016,6 +16056,21 @@
       "source_asset_id": "TEST-CATALOG-SEARCH-001",
       "relation": "validated_by",
       "target_asset_id": "CATALOG-VALIDATOR-001"
+    },
+    {
+      "source_asset_id": "TEST-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-COHORT-IMPORT-READBACK-001"
+    },
+    {
+      "source_asset_id": "TEST-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-DATA-ROOT-001"
+    },
+    {
+      "source_asset_id": "TEST-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-COHORT-DATA-ROOT-AND-IMPORT-READBACK-001"
     },
     {
       "source_asset_id": "TEST-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001",

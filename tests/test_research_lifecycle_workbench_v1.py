@@ -298,7 +298,8 @@ class ResearchLifecycleWorkbenchTests(unittest.TestCase):
             repo = Path(tmp) / "repo"
             missing = repo / "local" / "factory_v1" / "data_plane"
             discovered = resolve_existing_data_root(repo)
-            self.assertEqual(discovered.status, "NOT_PRESENT")
+            self.assertEqual(discovered.status, "UNAVAILABLE")
+            self.assertEqual(discovered.error, "DATA_ROOT_NON_GIT_CONTEXT")
             self.assertFalse(missing.exists())
             with self.assertRaises(ResearchStoreError):
                 ExistingResearchStoreReader(missing)

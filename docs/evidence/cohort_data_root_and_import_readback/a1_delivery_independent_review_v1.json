@@ -1,0 +1,61 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "COHORT-DATA-ROOT-AND-IMPORT-READBACK-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-20",
+  "task_id": "COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=PENDING_ISOLATED_PACKET",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_LINKED_WORKTREE_SHARES_PRINCIPAL_DATA_PLANE",
+        "PASS_NON_GIT_TYPED_STOP",
+        "PASS_READBACK_NO_ABSOLUTE_PATH"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_C1_C2_ONCE_CORPUS_VERSION_2",
+        "PASS_NO_A3_NO_FORGE_NO_ADDENDUM",
+        "PASS_NAMED_CONSUMER_IS_OWNER_IMPORT_LOOP"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_OPTIONAL_DATA_ROOT_CANONICAL_DEFAULT",
+        "PASS_ONE_COHORT_IMPORT_READBACK",
+        "PASS_FORGE_CONTROL_READY_EXPERT_NOT_OBLIGATORY"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_PASS",
+    "NO_ALPHA",
+    "NO_FORGE_EXECUTION",
+    "NO_A3_OR_LATER_SCOPE"
+  ]
+}
