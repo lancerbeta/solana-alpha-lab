@@ -547,7 +547,7 @@ uv run --locked --managed-python python -B scripts/discovery_evidence_release.py
 ```
 
 ```
-uv run --locked --managed-python python -B scripts/discovery_evidence_release.py publish-live-cohort --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...> --data-root local/factory_v1/data_plane
+uv run --locked --managed-python python -B scripts/discovery_evidence_release.py publish-live-cohort --observation-rdp local/factory_v1/observation_rdp --ops-store local/factory_v1/observation_schedule_state.sqlite --schedule-sha256 <64hex> --activation-id <ACT-...>
 ```
 
 Relative paths resolve against the repository root. Omit `--data-root` to

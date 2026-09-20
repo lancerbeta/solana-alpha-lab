@@ -22,6 +22,7 @@ _IDENTITY_CONFLICT_CODES = frozenset(
         "COHORT_ALREADY_IMPORTED",
         "CANONICAL_TARGET_CONFLICT",
         "IDENTITY_CONFLICT",
+        "IMPORT_CONFLICT",
     }
 )
 
@@ -59,7 +60,9 @@ def build_cohort_import_readback(
         if lineage_count > 1:
             duplicate_count += lineage_count - 1
         latest = group[-1]
-        source = latest.get("source_sha256") or latest.get("content_sha256")
+        source = latest.get("source_sha256")
+        if not isinstance(source, str) or not source:
+            source = None
         visible.append(
             {
                 "cohort_id": cohort_id,

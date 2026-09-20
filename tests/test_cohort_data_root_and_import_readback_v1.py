@@ -113,6 +113,28 @@ class CohortImportReadbackTests(unittest.TestCase):
         self.assertEqual(counts["REL-C1"], 1)
         self.assertEqual(counts["REL-C2"], 1)
         self.assertTrue(all(item["status"] == "PRESENT_ONCE" for item in payload["visible_cohorts"]))
+        self.assertEqual(payload["visible_cohorts"][0]["source_sha256"], "c" * 64)
+
+    def test_missing_source_hash_is_not_filled_from_content(self) -> None:
+        lineage = {
+            "current_corpus_version": 1,
+            "cohorts": [
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1",
+                    "content_sha256": "a" * 64,
+                }
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            data_root.mkdir()
+            payload = build_cohort_import_readback(
+                data_root,
+                lineage=lineage,
+                fingerprint="ef" * 32,
+            )
+        self.assertIsNone(payload["visible_cohorts"][0]["source_sha256"])
 
     def test_owner_terminals_for_reimport_and_conflict(self) -> None:
         self.assertEqual(
@@ -131,6 +153,44 @@ class CohortImportReadbackTests(unittest.TestCase):
             owner_import_terminal("IDENTITY_CONFLICT"),
             STOP_IDENTITY_CONFLICT,
         )
+        self.assertEqual(
+            owner_import_terminal("IMPORT_CONFLICT"),
+            STOP_IDENTITY_CONFLICT,
+        )
+
+    def test_duplicate_exact_cohort_row_is_not_present_once(self) -> None:
+        lineage = {
+            "corpus_dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "current_corpus_version": 2,
+            "current_dataset_manifest_id": "MID-CURRENT",
+            "cohorts": [
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1",
+                    "content_sha256": "a" * 64,
+                    "source_sha256": "c" * 64,
+                },
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1-dup",
+                    "content_sha256": "d" * 64,
+                    "source_sha256": "e" * 64,
+                },
+            ],
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            data_root.mkdir()
+            payload = build_cohort_import_readback(
+                data_root,
+                lineage=lineage,
+                fingerprint="cd" * 32,
+            )
+        self.assertEqual(payload["duplicate_cohort_count"], 1)
+        self.assertEqual(payload["lineage_integrity"], "DUPLICATE_LINEAGE")
+        self.assertEqual(payload["visible_cohorts"][0]["status"], "DUPLICATE")
+        self.assertEqual(payload["visible_cohorts"][0]["lineage_count"], 2)
+        self.assertIsNone(payload["visible_cohorts"][0].get("content_sha256"))
 
 
 class ImportLiveCliReadbackTests(unittest.TestCase):
@@ -138,16 +198,75 @@ class ImportLiveCliReadbackTests(unittest.TestCase):
         parser_src = (ROOT / "scripts" / "discovery_evidence_release.py").read_text(
             encoding="utf-8"
         )
-        self.assertIn('import_live.add_argument("--data-root"', parser_src)
+        self.assertIn(
+            "omit to use the Git principal checkout local/factory_v1/data_plane",
+            parser_src,
+        )
+        self.assertRegex(
+            parser_src,
+            r'import_live.add_argument\(\s*"--data-root",\s*type=Path,\s*default=None',
+        )
         self.assertNotRegex(
             parser_src,
             r'import_live.add_argument\(\s*"--data-root", type=Path, required=True',
         )
-        self.assertIn('publish.add_argument("--data-root"', parser_src)
+        self.assertRegex(
+            parser_src,
+            r'publish.add_argument\(\s*"--data-root",\s*type=Path,\s*default=None',
+        )
         self.assertNotRegex(
             parser_src,
             r'publish.add_argument\(\s*"--data-root", type=Path, required=True',
         )
+
+    def test_cli_prints_readback_and_exact_reimport_terminal(self) -> None:
+        import importlib.util
+        from contextlib import redirect_stdout
+        from io import StringIO
+
+        spec = importlib.util.spec_from_file_location(
+            "discovery_evidence_release_cli_a2",
+            ROOT / "scripts" / "discovery_evidence_release.py",
+        )
+        assert spec is not None and spec.loader is not None
+        cli = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cli)
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "data_plane"
+            data_root.mkdir()
+            buf = StringIO()
+            with redirect_stdout(buf):
+                cli._print_import_success({"status": "IDEMPOTENT_REIMPORT"}, data_root)
+            envelope = json.loads(buf.getvalue())
+        self.assertEqual(envelope["status"], PASS_ALREADY_PRESENT_EXACT)
+        self.assertEqual(envelope["readback"]["schema"], "smial.cohort-import-readback")
+        self.assertNotIn("C:\\", json.dumps(envelope["readback"]))
+
+    def test_cli_data_root_error_is_typed_json(self) -> None:
+        import importlib.util
+        from contextlib import redirect_stdout
+        from io import StringIO
+
+        spec = importlib.util.spec_from_file_location(
+            "discovery_evidence_release_cli_a2_err",
+            ROOT / "scripts" / "discovery_evidence_release.py",
+        )
+        assert spec is not None and spec.loader is not None
+        cli = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cli)
+
+        def _boom(_value: Path | None) -> Path:
+            raise cli.DataRootError("DATA_ROOT_NON_GIT_CONTEXT")
+
+        cli._resolved_data_root = _boom
+        buf = StringIO()
+        with redirect_stdout(buf):
+            code = cli.main(["import-live", "--release-root", str(ROOT)])
+        self.assertEqual(code, 2)
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(payload["status"], "FAIL")
+        self.assertEqual(payload["code"], "DATA_ROOT_NON_GIT_CONTEXT")
+        self.assertEqual(payload["next"], "STOP_USE_GIT_CHECKOUT_OR_EXPLICIT_DATA_ROOT")
 
 
 if __name__ == "__main__":

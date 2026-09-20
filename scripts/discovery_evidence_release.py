@@ -57,7 +57,7 @@ from solana_alpha_lab.factory.cohort_import_readback import (
     build_cohort_import_readback,
     owner_import_terminal,
 )
-from solana_alpha_lab.factory.data_root import resolve_data_root
+from solana_alpha_lab.factory.data_root import DataRootError, resolve_data_root
 
 FAIL_OWNER_NEXT = {
     "NOT_MATURE": "WAIT_UNTIL_COHORT_MATURE",
@@ -67,7 +67,7 @@ FAIL_OWNER_NEXT = {
     "COVERAGE_CONFIRMED_BROKEN": "STOP_DO_NOT_SEAL",
     "LOW_YIELD": "WAIT_UNTIL_YIELD_ELIGIBLE",
     "IMPORT_CONFLICT": "STOP_DO_NOT_REIMPORT",
-    "COHORT_ALREADY_IMPORTED": STOP_IDENTITY_CONFLICT,
+    "COHORT_ALREADY_IMPORTED": "STOP_DO_NOT_REIMPORT",
     "CLOSED_RECEIPT_INCOMPLETE": "STOP_MISSING_CLOSURE_EVIDENCE",
     "CLOSED_RECEIPT_MISSING": "STOP_MISSING_CLOSURE_EVIDENCE",
     "CLOSED_RECEIPT_STORE_MISSING": "STOP_MISSING_CLOSURE_EVIDENCE",
@@ -84,7 +84,7 @@ FAIL_OWNER_NEXT = {
     "DATASET_TERMINAL_MISSING": "STOP_RESTORE_LABELS_THEN_RETRY_REPAIR",
     "CORPUS_PARQUET_SHA_MISMATCH": "STOP_DO_NOT_REPAIR_PARQUET_DRIFT",
     "LIVE_CORPUS_LOGICAL_CONTENT_NOT_RECONSTRUCTIBLE": "STOP_DO_NOT_REPAIR_PARQUET_UNREADABLE",
-    "CANONICAL_TARGET_CONFLICT": STOP_IDENTITY_CONFLICT,
+    "CANONICAL_TARGET_CONFLICT": "STOP_DO_NOT_OVERWRITE_CANONICAL_TARGET",
     "DATASET_PUBLICATION_INCOMPLETE": "REPAIR_LIVE_CORPUS_METADATA_FIRST",
     "LIVE_CORPUS_PARQUET_SYMLINK": "STOP_DO_NOT_FOLLOW_PARQUET_SYMLINK",
     "SEAL_SCHEDULE_DOCUMENT_MISSING": "STOP_SCHEDULE_DOCUMENT_REQUIRED",
@@ -94,7 +94,7 @@ FAIL_OWNER_NEXT = {
     "SCHEDULE_SEMANTIC_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_PARSER_INVALID": "STOP_DO_NOT_IMPORT",
     "SCHEDULE_PRODUCER_UNBOUND": "STOP_SCHEDULE_PRODUCER_REQUIRED",
-    "CENSUS_SCHEDULE_SHA_MISMATCH": "STOP_DO_NOT_IMPORT",
+    "DATA_ROOT_NON_GIT_CONTEXT": "STOP_USE_GIT_CHECKOUT_OR_EXPLICIT_DATA_ROOT",
 }
 
 
@@ -223,7 +223,12 @@ def main(argv: list[str] | None = None) -> int:
         "import-live", help="Import a verified live cohort into the LIVE CORPUS"
     )
     import_live.add_argument("--release-root", type=Path, required=True)
-    import_live.add_argument("--data-root", type=Path, default=None)
+    import_live.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="LIVE CORPUS root; omit to use the Git principal checkout local/factory_v1/data_plane",
+    )
     import_live.add_argument("--import-at", type=str, default=None)
 
     repair_live = sub.add_parser(
@@ -242,7 +247,12 @@ def main(argv: list[str] | None = None) -> int:
     publish.add_argument("--schedule-sha256", required=True)
     publish.add_argument("--activation-id", required=True)
     publish.add_argument("--cohort-id", default=None)
-    publish.add_argument("--data-root", type=Path, default=None)
+    publish.add_argument(
+        "--data-root",
+        type=Path,
+        default=None,
+        help="LIVE CORPUS root; omit to use the Git principal checkout local/factory_v1/data_plane",
+    )
     publish.add_argument("--release-root", type=Path, default=None)
     publish.add_argument("--as-of", type=str, default=None)
     publish.add_argument("--release-builder-git-sha", default=None)
@@ -411,7 +421,7 @@ def main(argv: list[str] | None = None) -> int:
         }
         print(json.dumps(payload, sort_keys=True))
         return 2
-    except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError) as exc:
+    except (DiscoveryReleaseError, LiveCohortReleaseError, LiveCohortToForgeError, DataRootError) as exc:
         code = str(exc)
         next_action = FAIL_OWNER_NEXT.get(code, "STOP_INSPECT_FAIL_CODE")
         if args.command in {"import-live", "publish-live-cohort"}:

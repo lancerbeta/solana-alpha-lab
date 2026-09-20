@@ -15,7 +15,8 @@ An exact already-imported lineage is `PASS_ALREADY_PRESENT_EXACT`.
 
 ## Real C1/C2 readback
 
-persist=False against the canonical local LIVE CORPUS.
+persist=False against this machine's LIVE CORPUS instance (not a family-global
+canonical dataset).
 
 - fingerprint `db5b0dede6936e17c3e35efa25105273a6b85d0305fde24bb7a932dbb3aff572`
 - corpus_version **2**
@@ -23,6 +24,8 @@ persist=False against the canonical local LIVE CORPUS.
 - C2 `REL-20260909T111900Z-20260916T111900Z` count **1**
 - `duplicate_cohort_count=0`, `lineage_integrity=PASS`
 - next owner action `STOP_BEFORE_HYPOTHESIS_FORGE`
+- `source_sha256` is null: lineage does not carry that field, and
+  `content_sha256` is not reused as a substitute
 
 Do not commit current runtime outputs or absolute machine paths.
 
