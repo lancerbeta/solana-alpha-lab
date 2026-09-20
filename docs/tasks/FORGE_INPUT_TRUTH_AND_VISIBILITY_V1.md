@@ -107,8 +107,11 @@ context_requirements:
       - src/solana_alpha_lab/factory/hfic_preflight.py
       - src/solana_alpha_lab/factory/live_cohort_to_forge.py
     DELIVERY_EVIDENCE:
+      - docs/evidence/forge_input_truth_and_visibility/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/forge_input_truth_and_visibility/a1_delivery_independent_review_v1.json
+      - docs/evidence/forge_input_truth_and_visibility/a1_delivery_factory_fit_v1.json
+    HISTORICAL_CONTEXT:
       - docs/evidence/cohort_data_root_and_import_readback/a1_c1_c2_readback_v1.json
-    HISTORICAL_CONTEXT: []
 ---
 
 # FORGE_INPUT_TRUTH_AND_VISIBILITY_V1

@@ -37904,7 +37904,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_INPUT_TRUTH_AND_VISIBILITY_V1.md', repository_path: docs/tasks/FORGE_INPUT_TRUTH_AND_VISIBILITY_V1.md}
-  integrity: {kind: sha256, sha256: 4c9975f6e28a13a9181be3b38cfe5e5df692c6d48ac420654d3cbd812288c75b}
+  integrity: {kind: sha256, sha256: 053ef828191eabd325d0c210bb5b30b91ac570aee66272275a34041da4c19893}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-FORGE-INPUT-RECEIPT-001}
