@@ -33,6 +33,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     persist_frozen_session,
     persist_no_worthy_session,
     finalize_session,
+    load_session_bundle,
 )
 from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
     CONTROL_CONTEXT_KIND_FORGE,
@@ -72,11 +73,13 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     HANDLER_SYNTHETIC_LATER_V2,
     LadderError,
     consume_start_v1_envelope,
+    control_preflight_from_bundle,
     evaluate_forge_run,
     format_forge_run_owner_readout,
     load_ladder_registry,
     prepare_ladder_freeze_preflight,
     resolve_next_action,
+    _packet_for_bundle,
 )
 
 from tests.test_forge_input_truth_and_visibility_v1 import (  # noqa: E402
@@ -309,6 +312,22 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("status: NEXT", text)
         self.assertNotIn("status: DONE", text)
+
+    def test_control_required_readout_is_ordinary_evening_done(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "OWNER_FINAL",
+                "next_action": ACTION_CONTROL_REQUIRED,
+                "owner_final": ACTION_CONTROL_REQUIRED,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [],
+            }
+        )
+        self.assertIn("status: DONE", text)
+        self.assertIn("CONTROL_REQUIRED", text)
+        self.assertNotIn("status: NEXT", text)
 
     def test_kill_with_selected_candidate_is_not_owner_candidate(self) -> None:
         decision = resolve_next_action(
@@ -1392,6 +1411,79 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertIsNotNone(found_base_again)
         assert found_base_again is not None
         self.assertEqual(found_base_again["session_id"], base["session_id"])
+
+    def test_f2_cli_preflight_store_freeze_is_distinct_from_control(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=True)
+            self.assertEqual(started["next_action"], ACTION_START_V1)
+            bundle = load_session_bundle(store, str(base["session_id"]))
+            assert bundle is not None
+            packet = _packet_for_bundle(data_root, bundle, store)
+            self.assertIsInstance(packet, dict)
+            assert isinstance(packet, dict)
+            self.assertEqual((packet.get("vision_integrity") or {}).get("status"), "PASS")
+            v1_pre = prepare_ladder_freeze_preflight(
+                control_preflight_from_bundle(bundle, packet),
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=str(base["session_id"]),
+            )
+            v1_pre["forge_context_packet"]["visible_cohort_ids"] = ["REL-C2"]
+            v1_pre["forge_context_packet"]["bound_visible_cohort_ids"] = ["REL-C2"]
+            draft = valid_draft()
+            frozen = freeze_draft(
+                draft,
+                preflight_receipt=v1_pre,
+                store=store,
+                repo_root=ROOT,
+            )
+            self.assertNotEqual(frozen["session_id"], base["session_id"])
+            self.assertEqual(frozen["ladder_representation_id"], "NORMALIZED_TRAJECTORY_V1")
+            self.assertEqual(frozen["control_session_id"], base["session_id"])
+            self.assertNotEqual(frozen.get("action"), "START_NEW_SESSION")
+            packet_out = frozen["critic_input_packet"]
+            assert isinstance(packet_out, dict)
+            done = finalize_session(
+                frozen,
+                critic_result_from_packet_only(packet_out, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                finished = evaluate_forge_run(ROOT, data_root, persist=True)
+                retry = evaluate_forge_run(ROOT, data_root, persist=False)
+            found_v1 = find_session_by_epoch_focus(
+                store,
+                str(v1_pre["evidence_epoch_sha256"]),
+                str(v1_pre["focus_key_sha256"]),
+                ladder_representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=str(base["session_id"]),
+            )
+        self.assertIsNotNone(found_v1)
+        assert found_v1 is not None
+        self.assertEqual(found_v1["session_id"], frozen["session_id"])
+        self.assertEqual(done["session_id"], frozen["session_id"])
+        self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
+        v1 = next(
+            row
+            for row in finished["stages"]
+            if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
+        )
+        self.assertEqual(v1["session_id"], frozen["session_id"])
+        self.assertEqual(v1["used_cohort_ids"], ["REL-C2"])
+        self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
+        self.assertEqual(retry["run_identity_sha256"], started["run_identity_sha256"])
 
     def test_f2_orphan_v1_without_parent_is_not_bound(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

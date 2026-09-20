@@ -554,8 +554,6 @@ def prepare_ladder_freeze_preflight(
     packet["control_session_id"] = control_session_id
     packet.pop("evidence_surface_mode", None)
     packet.pop("visible_cohort_ids", None)
-    packet.pop("bound_visible_cohort_ids", None)
-    packet.pop("used_cohort_ids", None)
     receipt["forge_context_packet"] = packet
     receipt["control_session_id"] = control_session_id
     receipt[LADDER_REPRESENTATION_PACKET_KEY] = representation_id
@@ -633,8 +631,13 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         status = "BLOCKED — stop; not a scientific negative"
     elif next_action == ACTION_RETURN_EXISTING or receipt.get("persisted_receipt_sha256"):
         status = "READBACK — same run; do not start a second trial"
-    elif next_action in {ACTION_KEEP_PAUSE, ACTION_CONTROL_REQUIRED}:
-        status = "NEXT — typed pause or CONTROL required; evening not success"
+    elif next_action == ACTION_KEEP_PAUSE:
+        status = "NEXT — typed pause; evening not success"
+    elif next_action == ACTION_CONTROL_REQUIRED:
+        status = (
+            "DONE — CONTROL_REQUIRED; ordinary evening complete; "
+            "CONTROL slash is expert-only, not this NEXT"
+        )
     elif owner_final:
         status = "DONE — bounded-run owner-final; do not continue"
     elif next_action == ACTION_START_V1:

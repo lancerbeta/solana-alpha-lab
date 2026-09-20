@@ -100,8 +100,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
 ## Representation mode boundary
 
 The normal slash command remains `ORDINARY`; its behavior and search budget are
-unchanged. `--control-current-representation` remains the trajectory-blind
-`CONTROL` mode. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
+unchanged. Ordinary BASE `NO_WORTHY` without CONTROL surface is
+`CONTROL_REQUIRED` (`status: DONE`): evening complete, not a NEXT onto the
+CONTROL slash. `--control-current-representation` remains the trajectory-blind
+`CONTROL` mode and is expert-only. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
 capability whose adapter is runtime-ready and not executed: it clones the
 exact CONTROL context (Forge context for completed `NO_WORTHY`, critic packet
 when a candidate was selected) and carries one anonymous histogram beside it.

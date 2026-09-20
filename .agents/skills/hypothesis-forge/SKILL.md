@@ -164,6 +164,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
    - `OWNER_CANDIDATE` / `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` /
      `NON_SCIENTIFIC_STOP` / `KEEP_PAUSE` / `CONTROL_REQUIRED` /
      `INPUT_NOT_READY` / `OBSERVABILITY_BLOCKED` → print `owner_readout`; stop.
+     `CONTROL_REQUIRED` is the ordinary evening owner-final when V1 is eligible
+     but BASE is not CONTROL surface (`status: DONE`). Do not continue this
+     slash. `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` is expert-only
+     and is not owner NEXT.
    Technical / visibility failures stay `OBSERVABILITY_BLOCKED`, never
    scientific `NO_WORTHY` or `SEARCH_EXHAUSTED_CURRENT_EVIDENCE`.
    A no-write diagnostic that never starts a session. Pass the same

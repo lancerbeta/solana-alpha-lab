@@ -245,7 +245,10 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 Опциональный фокус передаётся в slash-чате, например `OWNER_FOCUS=execution-aware entry/exit asymmetry at small notional`.
 
 **Ручной fallback (если slash недоступен):** paste-блоки ниже эквивалентны, но owner должен
-сам открыть шаг 2 — предпочтительнее slash + auto-handoff.
+сам открыть шаг 2 — предпочтительнее slash + auto-handoff. После Prompt A / freeze
+всё равно выполните `forge-run` (bounded run). Ordinary BASE `NO_WORTHY` без
+CONTROL surface даёт `CONTROL_REQUIRED` — это owner-final вечера (`status: DONE`),
+не NEXT на CONTROL slash.
 
 ### Шаг 1 — Forge (manual fallback)
 

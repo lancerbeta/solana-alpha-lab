@@ -59,6 +59,7 @@ resolver, persist/readback, and owner rendering are real:
 | F2 empty BASE → stub V1 candidate → freeze/finalize → `forge-run` | `OWNER_CANDIDATE`; V1 session_id + stage ref resolve; retry `RETURN_EXISTING_RUN` |
 | F2 empty BASE → stub V1 no-worthy → `forge-run` | scoped `SEARCH_EXHAUSTED_CURRENT_EVIDENCE`; retry readback |
 | F2 CONTROL vs V1 freeze slot | same epoch/focus lookup returns BASE for BASE slot and V1 for V1 slot |
+| F2 CLI `ladder_freeze_preflight` → `freeze_draft(store=)` | V1 session_id distinct from CONTROL; no `START_NEW_SESSION` bind |
 | F2 orphan V1 without parent | not bound to current CONTROL; next remains `START_V1` |
 | F2 incomplete persist → saved V1 draft → terminal | append-only progress; no second trial |
 | F3 V1 no-worthy + completed synthetic V2 | `OWNER_CANDIDATE`, not `START_SYNTHETIC_LATER_V2`; retry readback |
@@ -69,8 +70,11 @@ resolver, persist/readback, and owner rendering are real:
 Empty-BASE V1 envelope remains CONTROL `FORGE_CONTEXT_PACKET` via
 `consume_start_v1_envelope` (no fake critic; challenger tagged
 `ladder_representation_id=NORMALIZED_TRAJECTORY_V1`). Freeze uses
-`ladder_freeze_preflight`, not the CONTROL preflight. After freeze/finalize,
-re-run `forge-run` to read artifacts. Unknown ACTIVE handler still fail-closes.
+`ladder_freeze_preflight`, not the CONTROL preflight. `cmd_freeze` /
+`freeze_draft(store=)` consumes that object (loads CONTROL packet from digest,
+skips `START_NEW_SESSION` bind). After freeze/finalize,
+re-run `forge-run` to read artifacts. Ordinary `CONTROL_REQUIRED` is
+`status: DONE` (expert CONTROL slash is not owner NEXT). Unknown ACTIVE handler still fail-closes.
 Owner readout prints candidate/declined/critic identity from artifacts.
 
 ## What did not change

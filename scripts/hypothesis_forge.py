@@ -408,6 +408,7 @@ def cmd_forge_run(
         from solana_alpha_lab.factory.hfic_representation_ladder import (
             HANDLER_NORMALIZED_TRAJECTORY_V1,
             HANDLER_SYNTHETIC_LATER_V2,
+            _packet_for_bundle,
             control_preflight_from_bundle,
             prepare_ladder_freeze_preflight,
         )
@@ -417,9 +418,7 @@ def cmd_forge_run(
         store = ResearchStore(resolved.root, create_if_missing=False)
         bundle = load_session_bundle(store, control_sid)
         if bundle is not None:
-            packet = bundle.get("forge_context_packet")
-            if not isinstance(packet, dict):
-                packet = None
+            packet = _packet_for_bundle(resolved.root, bundle, store)
             representation_id = (
                 HANDLER_SYNTHETIC_LATER_V2
                 if "SYNTHETIC_LATER_V2" in next_action
