@@ -4,8 +4,8 @@
   "review_id": "COHORT-DATA-ROOT-AND-IMPORT-READBACK-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-20",
   "task_id": "COHORT_DATA_ROOT_AND_IMPORT_READBACK_V1",
-  "reviewed_bindings_sha256": "d719f38a072dce76c9a0c3725b3cc30e95cbdd7200e03fbffa847581244dfd47",
-  "reviewed_inventory_sha256": "dd88e18c26e6c290a83eb139d65e56c92d74d3bbde5961f14ca5fabac2dec95c",
+  "reviewed_bindings_sha256": "ea83fc811017d5858732bee922ed99bf27304639fd28bdfbd55cea5643141fd0",
+  "reviewed_inventory_sha256": "3badbb124ced43868a59024f156e3251a26fa73cd6b5bb67bbd2984295bfbb8a",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
