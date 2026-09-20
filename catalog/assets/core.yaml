@@ -37161,7 +37161,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1.md', repository_path: docs/tasks/NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1.md}
-  integrity: {kind: sha256, sha256: 6c286089972ddf7f536e66059cedc404600b164bf9a015ba5e3cc49ce26cb0bd}
+  integrity: {kind: sha256, sha256: 4a66689417ff8014b38d9f3e9b9f64e4069a5e13ac3c6ce225cb3283bbe5718e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001}

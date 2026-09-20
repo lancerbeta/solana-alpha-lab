@@ -87,6 +87,7 @@ context_requirements:
   l2_roles:
     - LIFECYCLE
     - ARCHITECTURE_DECISIONS
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_asset_ids:
