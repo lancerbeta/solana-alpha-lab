@@ -376,7 +376,8 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
 Bounded run resolver (default no-write). Print `owner_readout` as the owner
 result, not the raw JSON. `START_V1` is automatic after
 effective CONTROL `NO_WORTHY`; do not treat Prompt C WAIT as the search final.
-`--persist` writes `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT` (named in readout
+`KEEP_PAUSE` is a typed pause (`status: NEXT`); print readout and stop — do not
+start V1. `--persist` writes `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT` (named in readout
 `persisted`, not a path). `START_V1` freeze uses `ladder_freeze_preflight` from
 the `forge-run` JSON, not the CONTROL preflight. After a draft, persist
 `--saved-draft-sha256` before freeze.

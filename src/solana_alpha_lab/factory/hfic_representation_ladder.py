@@ -601,6 +601,12 @@ def attach_ladder_freeze_preflight(
     payload["owner_class"] = ACTION_OBSERVABILITY_BLOCKED
     payload["blocking_reason_codes"] = ["FORGE_CONTEXT_ARTIFACT_MISSING"]
     payload.pop("ladder_freeze_preflight", None)
+    payload.pop("owner_readout", None)
+    payload.pop("receipt_sha256", None)
+    payload["receipt_sha256"] = canonical_sha256(
+        {key: value for key, value in payload.items() if key != "owner_readout"}
+    )
+    payload["owner_readout"] = format_forge_run_owner_readout(payload)
     return payload
 
 

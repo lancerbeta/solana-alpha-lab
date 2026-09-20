@@ -394,7 +394,7 @@ def cmd_forge_run(
         repo_root,
         resolved.root,
         owner_focus=owner_focus if owner_focus.strip() else "AUTO",
-        persist=persist,
+        persist=False,
         saved_draft_sha256=saved_draft_sha256,
     )
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
@@ -407,6 +407,21 @@ def cmd_forge_run(
     payload = attach_ladder_freeze_preflight(
         payload, data_root=resolved.root, store=store
     )
+    if persist and payload.get("owner_class") not in {
+        "INPUT_NOT_READY",
+        "OBSERVABILITY_BLOCKED",
+    }:
+        receipt = evaluate_forge_run(
+            repo_root,
+            resolved.root,
+            owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+            persist=True,
+            saved_draft_sha256=saved_draft_sha256,
+        )
+        payload = {**receipt, "no_write": False, "selection_reason": resolved.selection_reason}
+        payload = attach_ladder_freeze_preflight(
+            payload, data_root=resolved.root, store=store
+        )
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
         0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2

@@ -1526,8 +1526,11 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
         self.assertEqual(payload["next_action"], ACTION_OBSERVABILITY_BLOCKED)
         self.assertEqual(payload["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertEqual(payload["owner_class"], ACTION_OBSERVABILITY_BLOCKED)
         self.assertNotIn("ladder_freeze_preflight", payload)
         self.assertIn("FORGE_CONTEXT_ARTIFACT_MISSING", payload["blocking_reason_codes"])
+        self.assertIn("status: BLOCKED", payload["owner_readout"])
+        self.assertNotIn("continue V1 envelope", payload["owner_readout"])
 
     def test_f2_orphan_v1_without_parent_is_not_bound(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
