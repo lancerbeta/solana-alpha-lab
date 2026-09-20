@@ -1,10 +1,11 @@
-"""Dormant HFIC representation challenger adapter.
+"""HFIC representation challenger adapter.
 
 The adapter is deliberately separate from ordinary ``hfic_preflight`` and
 ``hfic_session``.  It validates an already-produced current CONTROL receipt,
-clones its exact critic packet, and carries the compact representation in a
-bounded challenger envelope.  It never reads ResearchStore, runs a session, or
-changes the ordinary Forge budget.
+binds completed ``NO_WORTHY`` to the exact BASE forge context, clones selected
+CONTROL critic packets, and carries the compact representation in a bounded
+challenger envelope.  It never reads ResearchStore, runs a session, or
+changes the ordinary Forge budget.  The scientific probe remains unexecuted.
 """
 
 from __future__ import annotations
@@ -39,6 +40,9 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     PROJECTION_VERSION,
     RELEASE_SCHEMA,
     RELEASE_SCHEMA_VERSION,
+)
+from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
+    RELEASE_SCHEMA_VERSION_SELF_CONTAINED,
 )
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     ALLOWED_X_POINTS,
@@ -89,6 +93,8 @@ INVALID_COVERAGE_BROKEN = "INVALID_COVERAGE_BROKEN"
 INVALID_INSUFFICIENT_YIELD = "INVALID_INSUFFICIENT_YIELD"
 REPRESENTATION_PROBE_ALREADY_EXISTS = "REPRESENTATION_PROBE_ALREADY_EXISTS"
 INVALID_REPRESENTATION_SCHEMA = "INVALID_REPRESENTATION_SCHEMA"
+CONTROL_CONTEXT_KIND_CRITIC = "CRITIC_INPUT_PACKET"
+CONTROL_CONTEXT_KIND_FORGE = "FORGE_CONTEXT_PACKET"
 
 _HASH64_RE = re.compile(r"^[0-9a-f]{64}$")
 _FORBIDDEN_CONTROL_KEYS = {
@@ -315,6 +321,7 @@ def _validate_serialized_representation_payload(
             "prefix_due_offset_seconds",
             "decision_t_due_offset_seconds",
             "schedule_sha256",
+            "x_allowed_lateness_seconds",
         },
     )
     if schedule["schedule_id"] != PREFERRED_SCHEDULE_ID:
@@ -346,6 +353,13 @@ def _validate_serialized_representation_payload(
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
     if schedule["decision_t_due_offset_seconds"] != DECISION_T_DUE_OFFSET_SECONDS:
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    raw_lateness = schedule["x_allowed_lateness_seconds"]
+    if isinstance(raw_lateness, bool) or not isinstance(raw_lateness, int) or raw_lateness < 0:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    max_lateness = (
+        DECISION_T_DUE_OFFSET_SECONDS - schedule["x_due_offset_seconds"]
+    )
+    used_lateness = min(raw_lateness, max_lateness)
     _hash64("schedule_sha256", schedule["schedule_sha256"])
 
     corpus_binding = _require_exact_keys(
@@ -371,12 +385,28 @@ def _validate_serialized_representation_payload(
     ):
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
 
-    if payload["pit"] != {
-        "cutoff": "member_anchor_plus_Y1800",
-        "first_reliable_available_at_le_cutoff": True,
-        "future_points_in_denominator": False,
-        "lateness_window_does_not_extend_T": True,
-    }:
+    pit = _require_exact_keys(
+        payload["pit"],
+        {
+            "cutoff",
+            "first_reliable_available_at_le_cutoff",
+            "future_points_in_denominator",
+            "lateness_window_does_not_extend_T",
+            "x_eligibility_lateness_seconds_used",
+        },
+    )
+    if pit["cutoff"] != "member_anchor_plus_Y1800":
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if pit["first_reliable_available_at_le_cutoff"] is not True:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if pit["future_points_in_denominator"] is not False:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if pit["lateness_window_does_not_extend_T"] is not True:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    used = pit["x_eligibility_lateness_seconds_used"]
+    if used != used_lateness:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
+    if schedule["x_due_offset_seconds"] + int(used) > DECISION_T_DUE_OFFSET_SECONDS:
         raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
     if payload["normalization"] != {
         "kind": "OWN_HISTORY_LOG_RATIO",
@@ -478,23 +508,77 @@ def _validate_serialized_representation_payload(
     return payload
 
 
-def _packet_from_receipt(receipt: Mapping[str, Any]) -> Mapping[str, Any] | None:
-    for key in ("critic_input_packet", "control_packet"):
-        packet = receipt.get(key)
-        if isinstance(packet, Mapping):
-            return packet
-    # A forge context is not a critic packet.  Accept it only when a fixture
-    # explicitly places the complete critic shape there.
+def _control_context_from_receipt(
+    receipt: Mapping[str, Any],
+) -> tuple[str, Mapping[str, Any]] | tuple[None, None]:
+    critic = receipt.get("critic_input_packet")
+    if not isinstance(critic, Mapping):
+        critic = receipt.get("control_packet")
+    if isinstance(critic, Mapping):
+        return CONTROL_CONTEXT_KIND_CRITIC, critic
     context = receipt.get("forge_context_packet")
-    if isinstance(context, Mapping) and (
-        "selected_candidate" in context or "packet_version" in context
+    if not isinstance(context, Mapping) or not context:
+        return None, None
+    if "selected_candidate" in context or "packet_version" in context:
+        # Fixture placed a critic-shaped packet under forge_context_packet.
+        return CONTROL_CONTEXT_KIND_CRITIC, context
+    if effective_control_terminal(receipt) in PROBE_PERMIT_TERMINALS:
+        return CONTROL_CONTEXT_KIND_FORGE, context
+    return None, None
+
+
+def _packet_from_receipt(receipt: Mapping[str, Any]) -> Mapping[str, Any] | None:
+    _kind, packet = _control_context_from_receipt(receipt)
+    return packet
+
+
+def _validate_forge_context_receipt(
+    receipt: Mapping[str, Any], packet: Mapping[str, Any]
+) -> None:
+    digest = receipt.get("forge_context_packet_sha256")
+    if not isinstance(digest, str) or not _HASH64_RE.fullmatch(digest):
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    if digest != canonical_sha256(packet):
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    session_receipt = receipt.get("session_receipt")
+    if not isinstance(session_receipt, Mapping):
+        raise RepresentationProbeError(INVALID_CONTROL_NOT_RUN)
+    for key in ("session_id", "evidence_epoch_sha256", "prompt_version"):
+        if session_receipt.get(key) != receipt.get(key):
+            raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    if session_receipt.get("forge_context_packet_sha256") != digest:
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    claimed_modes = [
+        value
+        for value in (
+            receipt.get("evidence_surface_mode"),
+            session_receipt.get("evidence_surface_mode"),
+            packet.get("evidence_surface_mode"),
+        )
+        if value is not None
+    ]
+    if not claimed_modes or any(
+        value != CURRENT_REPRESENTATION_CONTROL_V1 for value in claimed_modes
     ):
-        return context
-    return None
+        raise RepresentationProbeError(INVALID_CONTROL_MODE)
+    for key in ("final_session_terminal", "critic_terminal"):
+        session_value = session_receipt.get(key)
+        receipt_value = receipt.get(key)
+        if (
+            session_value is not None
+            and receipt_value is not None
+            and session_value != receipt_value
+        ):
+            raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    if isinstance(receipt.get("critic_input_packet"), Mapping):
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
 
 
 def _validate_control_receipt_contract(
-    receipt: Mapping[str, Any], packet: Mapping[str, Any]
+    receipt: Mapping[str, Any],
+    packet: Mapping[str, Any],
+    *,
+    context_kind: str,
 ) -> None:
     for anchor_name in (
         "memory_eligibility_sha256",
@@ -508,6 +592,9 @@ def _validate_control_receipt_contract(
             and receipt_anchor != packet_anchor
         ):
             raise RepresentationProbeError(INVALID_MEMORY_BASELINE_DRIFT)
+    if context_kind == CONTROL_CONTEXT_KIND_FORGE:
+        _validate_forge_context_receipt(receipt, packet)
+        return
     _validate_json_schema(packet, _HFIC_PACKET_SCHEMA_PATH, INVALID_CONTROL_PACKET_HASH)
     session_receipt = receipt.get("session_receipt")
     if not isinstance(session_receipt, Mapping):
@@ -560,7 +647,8 @@ def _validate_live_cohort_release_manifest(
     manifest = deepcopy(dict(value))
     if (
         manifest["schema"] != RELEASE_SCHEMA
-        or manifest["schema_version"] != RELEASE_SCHEMA_VERSION
+        or manifest["schema_version"]
+        not in {RELEASE_SCHEMA_VERSION, RELEASE_SCHEMA_VERSION_SELF_CONTAINED}
         or not isinstance(manifest["cohort_id"], str)
         or not manifest["cohort_id"].strip()
         or not isinstance(manifest["sealed_at"], str)
@@ -616,6 +704,60 @@ def _validate_live_cohort_release_manifest(
             raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
     _hash64("release_id", manifest["release_id"])
     return manifest
+
+
+def cohort_readiness_receipt_from_release_manifest(
+    manifest: Mapping[str, Any],
+    *,
+    producer_git_sha: str | None = None,
+) -> dict[str, Any]:
+    """Build the exact readiness receipt from a verified release manifest.
+
+    Self-contained 1.1 manifests may name ``schedule_producer_git_sha`` instead
+    of ``producer_git_sha``. Extra 1.1 keys are dropped; identity fields stay.
+    """
+
+    if not isinstance(manifest, Mapping):
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    body = {
+        key: deepcopy(manifest[key])
+        for key in _LIVE_RELEASE_MANIFEST_KEYS
+        if key in manifest
+    }
+    resolved_producer = producer_git_sha or body.get("producer_git_sha")
+    if not resolved_producer:
+        resolved_producer = manifest.get("schedule_producer_git_sha") or manifest.get(
+            "release_builder_git_sha"
+        )
+    if isinstance(resolved_producer, str):
+        body["producer_git_sha"] = resolved_producer
+    missing = _LIVE_RELEASE_MANIFEST_KEYS - set(body)
+    if missing:
+        raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
+    receipt = {
+        "schema": "smial.normalized-trajectory-v1-readiness-receipt",
+        "schema_version": "1.0",
+        "source_kind": "VERIFIED_LIVE_COHORT_RELEASE_READBACK_V1",
+        "readback_verified": True,
+        "readback_verifier": (
+            "solana_alpha_lab.factory.live_cohort_discovery_release.verify_live_cohort"
+        ),
+        "release_manifest": body,
+        "release_id": body["release_id"],
+        "manifest_sha256": canonical_sha256(body),
+        "schedule_sha256": body["schedule_sha256"],
+        "readiness_state": body["readiness_state"],
+        "discovery_coverage_class": body["discovery_coverage_class"],
+        "first_fresh_cohort_sealed_verified_imported": True,
+        "confirmatory_reuse_forbidden": True,
+        "yield_eligible": body["yield_eligible"],
+    }
+    receipt["receipt_sha256"] = canonical_sha256(
+        {key: value for key, value in receipt.items() if key != "receipt_sha256"}
+    )
+    return _validate_cohort_readiness_receipt(
+        receipt, expected_schedule_sha256=body["schedule_sha256"]
+    )
 
 
 def _validate_cohort_readiness_receipt(
@@ -744,6 +886,7 @@ def _assert_representation_bound_to_readiness(
         "prefix_due_offset_seconds": list(DEFAULT_SCHEDULE.prefix_due_offsets),
         "decision_t_due_offset_seconds": DEFAULT_SCHEDULE.decision_t_due_offset_seconds,
         "schedule_sha256": binding.schedule_sha256,
+        "x_allowed_lateness_seconds": DEFAULT_SCHEDULE.x_allowed_lateness_seconds,
     }
     if representation.get("schedule") != expected_schedule:
         raise RepresentationProbeError(INVALID_COHORT_READINESS_RECEIPT)
@@ -812,6 +955,7 @@ class ControlBaseline:
     memory_policy_head_sha256: str | None = None
     focus_key_sha256: str | None = None
     search_key_sha256: str | None = None
+    context_kind: str = CONTROL_CONTEXT_KIND_CRITIC
     receipt_verified: bool = False
     _verification_token: object | None = field(
         default=None, repr=False, compare=False
@@ -838,6 +982,11 @@ class ControlBaseline:
             _hash64("search_key_sha256", self.search_key_sha256)
         if not isinstance(self.packet, Mapping):
             raise RepresentationProbeError("CONTROL_PACKET_INVALID")
+        if self.context_kind not in {
+            CONTROL_CONTEXT_KIND_CRITIC,
+            CONTROL_CONTEXT_KIND_FORGE,
+        }:
+            raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
         object.__setattr__(self, "packet", deepcopy(dict(self.packet)))
 
 
@@ -846,14 +995,19 @@ def control_baseline_from_receipt(receipt: Mapping[str, Any]) -> ControlBaseline
 
     if not isinstance(receipt, Mapping):
         raise RepresentationProbeError(INVALID_CONTROL_NOT_RUN)
-    packet = _packet_from_receipt(receipt)
-    if packet is None:
+    context_kind, packet = _control_context_from_receipt(receipt)
+    if packet is None or context_kind is None:
         raise RepresentationProbeError(INVALID_CONTROL_NOT_RUN)
     if control_packet_has_raw_sequences(packet) or _contains_key(packet, _FORBIDDEN_CONTROL_KEYS):
         raise RepresentationProbeError(INVALID_CONTROL_TRAJECTORY)
-    _validate_control_receipt_contract(receipt, packet)
+    _validate_control_receipt_contract(
+        receipt, packet, context_kind=context_kind
+    )
 
-    if receipt.get("evidence_surface_mode") != CURRENT_REPRESENTATION_CONTROL_V1:
+    resolved_mode = receipt.get("evidence_surface_mode") or packet.get(
+        "evidence_surface_mode"
+    )
+    if resolved_mode != CURRENT_REPRESENTATION_CONTROL_V1:
         raise RepresentationProbeError(INVALID_CONTROL_MODE)
     packet_mode = packet.get("evidence_surface_mode")
     if packet_mode is not None and packet_mode != CURRENT_REPRESENTATION_CONTROL_V1:
@@ -878,7 +1032,10 @@ def control_baseline_from_receipt(receipt: Mapping[str, Any]) -> ControlBaseline
             raise RepresentationProbeError(INVALID_EVIDENCE_EPOCH_MISMATCH if packet_key == "evidence_epoch_sha256" else INVALID_CONTROL_PACKET_HASH)
 
     computed_packet_sha256 = canonical_sha256(packet)
-    recorded_packet_sha256 = receipt.get("critic_input_packet_sha256")
+    if context_kind == CONTROL_CONTEXT_KIND_FORGE:
+        recorded_packet_sha256 = receipt.get("forge_context_packet_sha256")
+    else:
+        recorded_packet_sha256 = receipt.get("critic_input_packet_sha256")
     if not isinstance(recorded_packet_sha256, str) or not _HASH64_RE.fullmatch(recorded_packet_sha256):
         raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
     if recorded_packet_sha256 != computed_packet_sha256:
@@ -918,6 +1075,7 @@ def control_baseline_from_receipt(receipt: Mapping[str, Any]) -> ControlBaseline
         ),
         focus_key_sha256=receipt.get("focus_key_sha256", packet.get("focus_key_sha256")),
         search_key_sha256=receipt.get("search_key_sha256", packet.get("search_key_sha256")),
+        context_kind=context_kind,
         receipt_verified=True,
         _verification_token=_VERIFIED_BASELINE_TOKEN,
     )
@@ -1005,9 +1163,10 @@ def build_challenger_packet(
 ) -> dict[str, Any]:
     """Build a bounded challenger envelope around exact CONTROL context.
 
-    The nested ``critic_input_packet`` remains byte-for-byte the CONTROL
-    packet.  The representation is an explicit sibling in the adapter
-    envelope, avoiding a silent mutation of the historical HFIC schema.
+    The nested CONTROL context remains byte-for-byte the verified baseline
+    packet.  Completed ``NO_WORTHY`` sessions bind ``FORGE_CONTEXT_PACKET``;
+    selected-candidate CONTROL still binds ``CRITIC_INPUT_PACKET``.  The
+    representation is an explicit sibling in the adapter envelope.
     """
 
     baseline = (
@@ -1111,7 +1270,7 @@ def build_challenger_packet(
         "ordinary_search_budget_unchanged": True,
         "max_challenger_runs_per_representation_control_epoch": MAX_CHALLENGER_RUNS_PER_CONTROL_EPOCH,
         "max_packet_bytes": FORGE_OPERATIONAL_PACKET_MAX_BYTES,
-        "critic_input_packet": deepcopy(dict(baseline.packet)),
+        "control_context_kind": baseline.context_kind,
         PACKET_KEY: payload,
         "non_claims": [
             "NO_PROBE_EXECUTION",
@@ -1119,6 +1278,10 @@ def build_challenger_packet(
             "NO_CURRENT_COHORT_SCIENTIFIC_READ",
         ],
     }
+    if baseline.context_kind == CONTROL_CONTEXT_KIND_FORGE:
+        challenger["control_context"] = deepcopy(dict(baseline.packet))
+    else:
+        challenger["critic_input_packet"] = deepcopy(dict(baseline.packet))
     challenger["packet_bytes"] = 0
     for _ in range(4):
         packet_size = len(canonical_json_bytes(challenger))
@@ -1160,11 +1323,18 @@ def _validate_challenger_packet(
         "ordinary_search_budget_unchanged",
         "max_challenger_runs_per_representation_control_epoch",
         "max_packet_bytes",
-        "critic_input_packet",
+        "control_context_kind",
         PACKET_KEY,
         "non_claims",
         "packet_bytes",
     }
+    kind = challenger_packet.get("control_context_kind")
+    if kind == CONTROL_CONTEXT_KIND_FORGE:
+        expected_keys = expected_keys | {"control_context"}
+    elif kind == CONTROL_CONTEXT_KIND_CRITIC:
+        expected_keys = expected_keys | {"critic_input_packet"}
+    else:
+        raise RepresentationProbeError(INVALID_REPRESENTATION_SCHEMA)
     packet = dict(_require_exact_keys(challenger_packet, expected_keys))
     if (
         packet["packet_schema"] != REPRESENTATION_PROBE_SCHEMA
@@ -1188,7 +1358,11 @@ def _validate_challenger_packet(
     _hash64("memory_baseline_sha256", packet["memory_baseline_sha256"])
     _nonempty_text("owner_focus", packet["owner_focus"])
 
-    control_packet = packet["critic_input_packet"]
+    control_packet = (
+        packet["control_context"]
+        if kind == CONTROL_CONTEXT_KIND_FORGE
+        else packet["critic_input_packet"]
+    )
     if not isinstance(control_packet, Mapping):
         raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
     if control_packet_has_raw_sequences(control_packet) or _contains_key(
@@ -1272,6 +1446,8 @@ def existing_hfic_packet(
         readiness,
         base_x_population_n=resolved_base_x,
     )
+    if validated.get("control_context_kind") != CONTROL_CONTEXT_KIND_CRITIC:
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
     return deepcopy(dict(validated["critic_input_packet"]))
 
 
@@ -1299,7 +1475,19 @@ def _assert_challenger_bound_to_control(
     )
     if challenger.get("owner_focus") != expected_focus:
         raise RepresentationProbeError(INVALID_CONTROL_FOCUS)
-    if challenger.get("critic_input_packet") != baseline.packet:
+    if challenger.get("control_context_kind") != baseline.context_kind:
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    bound_context = (
+        challenger.get("control_context")
+        if baseline.context_kind == CONTROL_CONTEXT_KIND_FORGE
+        else challenger.get("critic_input_packet")
+    )
+    if bound_context != baseline.packet:
+        raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
+    if (
+        baseline.context_kind == CONTROL_CONTEXT_KIND_FORGE
+        and challenger.get("critic_input_packet") is not None
+    ):
         raise RepresentationProbeError(INVALID_CONTROL_PACKET_HASH)
 
 
@@ -1422,6 +1610,7 @@ def _status_probe_identity_reason(
         return INVALID_PROBE_IDENTITY
     if receipt.get("representation_packet_key") != PACKET_KEY:
         return INVALID_PROBE_IDENTITY
+    kind = receipt.get("control_context_kind", CONTROL_CONTEXT_KIND_CRITIC)
     challenger_keys = {
         "packet_schema",
         "packet_version",
@@ -1443,11 +1632,17 @@ def _status_probe_identity_reason(
         "ordinary_search_budget_unchanged",
         "max_challenger_runs_per_representation_control_epoch",
         "max_packet_bytes",
-        "critic_input_packet",
+        "control_context_kind",
         PACKET_KEY,
         "non_claims",
         "packet_bytes",
     }
+    if kind == CONTROL_CONTEXT_KIND_FORGE:
+        challenger_keys = challenger_keys | {"control_context"}
+    elif kind == CONTROL_CONTEXT_KIND_CRITIC:
+        challenger_keys = challenger_keys | {"critic_input_packet"}
+    else:
+        return INVALID_PROBE_IDENTITY
     if not challenger_keys.issubset(receipt):
         return INVALID_PROBE_IDENTITY
     try:
@@ -1896,6 +2091,7 @@ __all__ = [
     "RepresentationProbeError",
     "build_challenger_packet",
     "build_representation_probe_packet",
+    "cohort_readiness_receipt_from_release_manifest",
     "control_baseline_from_receipt",
     "control_memory_baseline_sha256",
     "existing_hfic_lifecycle_fixture_input",

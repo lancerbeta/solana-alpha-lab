@@ -23,6 +23,10 @@ from solana_alpha_lab.factory.live_cohort_discovery_release import (
     COHORT_ADMISSION_FIELD,
     verify_live_cohort,
 )
+from solana_alpha_lab.factory.live_cohort_schedule_artifact import (
+    OBSERVATION_SCHEDULE_ARTIFACT_NAME,
+    decode_schedule_artifact,
+)
 from solana_alpha_lab.factory.normalized_trajectory_v1 import (
     DECLARED_Y_POINTS,
     DEFAULT_SCHEDULE,
@@ -40,6 +44,7 @@ INVALID_PROJECTION_PROVENANCE = "INVALID_PROJECTION_PROVENANCE"
 FUTURE_POINT_LEAKAGE = "FUTURE_POINT_LEAKAGE"
 MINT_IDENTITY_LEAK = "MINT_IDENTITY_LEAK"
 UNSUPPORTED_POINT_SHAPE = "UNSUPPORTED_POINT_SHAPE"
+CANONICAL_SCHEDULE_UNBOUND = "CANONICAL_SCHEDULE_UNBOUND"
 
 _POINT_RE = re.compile(r"^([XY])([0-9]+)$")
 _EPOCH_BOUND = timedelta(seconds=max(DECLARED_Y_POINTS) + 3600)
@@ -88,6 +93,42 @@ def _anchor_key(mint: str) -> str:
     return hashlib.sha256(("mint-group:" + mint).encode("utf-8")).hexdigest()
 
 
+def _schedule_artifact_required(manifest: dict[str, Any]) -> bool:
+    version = str(manifest.get("schema_version") or "1.0")
+    return version == "1.1" or isinstance(
+        manifest.get("observation_schedule_sha256"), str
+    )
+
+
+def _canonical_schedule_from_verified_release(
+    root: Path, manifest: dict[str, Any]
+) -> dict[str, Any] | None:
+    """Load the self-contained schedule already verified with the release.
+
+    Do not treat the sealed release directory as a ResearchStore. A missing
+    artifact on legacy 1.0 is optional. Schema 1.1, a declared byte hash, or a
+    present file that fails to decode is fail-closed.
+    """
+
+    path = Path(root) / OBSERVATION_SCHEDULE_ARTIFACT_NAME
+    required = _schedule_artifact_required(manifest)
+    if not path.is_file() or path.is_symlink():
+        if required:
+            raise RepresentationProbeError(CANONICAL_SCHEDULE_UNBOUND)
+        return None
+    wanted = str(manifest.get("schedule_sha256") or "")
+    expected_byte = manifest.get("observation_schedule_sha256")
+    expected = expected_byte if isinstance(expected_byte, str) else None
+    try:
+        return decode_schedule_artifact(
+            path.read_bytes(),
+            wanted_sha=wanted,
+            expected_byte_sha256=expected,
+        )
+    except (OSError, ValueError) as exc:
+        raise RepresentationProbeError(CANONICAL_SCHEDULE_UNBOUND) from exc
+
+
 def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
     """Verify one imported release and project it through the frozen lens.
 
@@ -127,10 +168,12 @@ def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
         census_sha256=str(manifest["census_sha256"]),
         observations_sha256=str(manifest["observations_sha256"]),
     )
+    schedule_document = _canonical_schedule_from_verified_release(root, manifest)
     schedule = LifecycleSchedule(
         schedule_sha256=binding.schedule_sha256,
         activation_id=binding.activation_id,
         corpus_binding=binding,
+        schedule_document=schedule_document,
     )
     rows = _read_parquet_rows(root / "observations.parquet")
     # Canonical member anchors come from the verified census admission field
@@ -159,6 +202,9 @@ def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
         due = int(point.group(2))
         if due not in schedule.all_due_offsets:
             raise RepresentationProbeError(UNSUPPORTED_POINT_SHAPE)
+        if due not in schedule.prefix_due_offsets:
+            # Representation input is prefix through T=Y1800 only.
+            continue
         anchor = anchors.get(member)
         if anchor is None:
             raise RepresentationProbeError(UNSUPPORTED_POINT_SHAPE)
@@ -210,6 +256,7 @@ def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
         "yield_eligible": int(manifest["yield_eligible"]),
         "first_fresh_cohort_sealed_verified_imported": True,
         "confirmatory_reuse_forbidden": True,
+        "x_allowed_lateness_seconds": int(schedule.x_allowed_lateness_seconds),
     }
     if any(
         isinstance(row, dict) and row.get("candidate_state")
@@ -218,7 +265,6 @@ def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
         from solana_alpha_lab.factory.scientific_eligibility_projection import (
             ScientificEligibilityError,
             project_scientific_eligibility,
-            resolve_canonical_release_schedule,
         )
 
         sanitized_obs = [
@@ -226,19 +272,19 @@ def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
             for row in rows
             if isinstance(row, dict)
         ]
-        try:
-            canonical_schedule = resolve_canonical_release_schedule(
-                root, census_rows
+        if schedule_document is not None:
+            try:
+                projected = project_scientific_eligibility(
+                    census_rows,
+                    sanitized_obs,
+                    canonical_schedule=schedule_document,
+                    require_canonical_schedule=True,
+                )
+            except ScientificEligibilityError as exc:
+                raise RepresentationProbeError(str(exc)) from exc
+            receipt["base_x_population_n"] = int(
+                projected["base_x_population"]["n"]
             )
-            projected = project_scientific_eligibility(
-                census_rows,
-                sanitized_obs,
-                canonical_schedule=canonical_schedule,
-                require_canonical_schedule=True,
-            )
-        except ScientificEligibilityError as exc:
-            raise RepresentationProbeError(str(exc)) from exc
-        receipt["base_x_population_n"] = int(projected["base_x_population"]["n"])
     receipt["receipt_sha256"] = hashlib.sha256(
         json.dumps(
             {k: v for k, v in receipt.items()}, sort_keys=True, separators=(",", ":")
@@ -255,6 +301,7 @@ def resolve_release_projection_input(release_root: Path) -> dict[str, Any]:
 
 
 __all__ = [
+    "CANONICAL_SCHEDULE_UNBOUND",
     "FUTURE_POINT_LEAKAGE",
     "INVALID_PROJECTION_PROVENANCE",
     "MINT_IDENTITY_LEAK",

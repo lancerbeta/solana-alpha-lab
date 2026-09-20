@@ -1,0 +1,74 @@
+{
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "review_id": "NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-INDEPENDENT-REVIEW-001",
+  "as_of": "2026-09-20",
+  "task_id": "NORMALIZED_TRAJECTORY_V1_EXECUTION_CLOSURE_V1",
+  "reviewed_bindings_sha256": "5c58b177a680342d8e2417d25729e53784620f3d7e666803b1a8a77b8d8a5086",
+  "reviewed_inventory_sha256": "d0264b1b00f335c769ac9e21e5d3475601891b1d8d52c31b7f711f86989afb66",
+  "required_roles": [
+    "ARCHITECTURE_CRITIC",
+    "CODE_REVIEWER",
+    "GOAL_DOD_CRITIC",
+    "OWNER_UX_CRITIC"
+  ],
+  "reviews": [
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "packet_fingerprint_sha256=5a2044f6fa7cbf17627744a291034c92ff03b27e28d0947fe1d222ae940139f2",
+        "PACKET_INFORMATION_PATH_ONLY",
+        "MODEL_DIVERSITY_UNPROVEN",
+        "A1_NO_LONGER_SUBSTITUTES_YIELD_OR_ELIGIBLE_AS_BASE_X",
+        "ONE_ZERO_OMITS_SCIENTIFIC_N_CHALLENGER_FAILS_INSUFFICIENT_YIELD",
+        "CAPABILITY_GIT_RECORDS_HASHES_NOT_ENVELOPE_BYTES",
+        "P2_READINESS_HELPER_STILL_STAMPS_READBACK_VERIFIED",
+        "P2_ENVELOPE_BIND_STILL_FREEZES_LATENESS_TO_DEFAULT_300"
+      ]
+    },
+    {
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_D1_FORGE_CONTEXT_NO_FAKE_CRITIC",
+        "PASS_D2_PREFIX_THROUGH_T_SKIP",
+        "PASS_SCHEDULE_ARTIFACT_FAIL_CLOSED",
+        "PASS_NO_YIELD_AS_SCIENTIFIC_N",
+        "PASS_ONE_ZERO_INSUFFICIENT_YIELD",
+        "P3_PROBE_TEST_WRAPPER_STILL_DEFAULTS_N_10"
+      ]
+    },
+    {
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_D1_D2_CLOSED",
+        "PASS_PERSIST_FALSE_C2_HASH_SUMMARY",
+        "PASS_NO_PROBE_NO_ADDENDUM",
+        "PASS_SCIENTIFIC_N_NOT_COPIED_FROM_YIELD",
+        "PASS_NAMED_CONSUMER_CONTROL_TO_V1_ADAPTER"
+      ]
+    },
+    {
+      "role": "OWNER_UX_CRITIC",
+      "verdict": "PASS",
+      "findings": [
+        "PASS_ORDINARY_SLASH_UNCHANGED",
+        "PASS_CONTROL_TRAJECTORY_BLIND",
+        "PASS_RUNTIME_READY_NOT_EXECUTED_NOT_PROBE",
+        "PASS_NO_MID_CYCLE_PASTE",
+        "PASS_ADDENDUM_NOT_IN_OPERATOR_PACK"
+      ]
+    }
+  ],
+  "verdict": "PASS",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "NO_SCIENTIFIC_PASS",
+    "NO_ALPHA",
+    "NO_PROBE_EXECUTION",
+    "NO_A2_OR_LATER_SCOPE",
+    "NO_ENVELOPE_BYTES_IN_GIT"
+  ]
+}

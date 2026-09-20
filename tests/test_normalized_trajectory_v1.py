@@ -250,6 +250,43 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         schedule = projected.payload["schedule"]
         self.assertRegex(schedule["schedule_sha256"], r"^[0-9a-f]{64}$")
 
+    def test_x_eligibility_honors_schedule_lateness_without_extending_t(self) -> None:
+        """X300 may arrive up to allowed_lateness after due; that window stays < T."""
+
+        def member_rows(name: str, liquidity_available: datetime) -> list[TypedLifecycleObservation]:
+            rows = []
+            rows.extend(_series(name, "PRICE", (1.0, 1.0, 1.0)))
+            rows.extend(_series(name, "TRADERS", (1.0, 1.0, 1.0)))
+            rows.append(
+                _row(
+                    name,
+                    300,
+                    "LIQUIDITY",
+                    1000.0,
+                    available_at=liquidity_available,
+                )
+            )
+            rows.append(_row(name, 900, "LIQUIDITY", 1000.0))
+            rows.append(_row(name, 1800, "LIQUIDITY", 1000.0))
+            return rows
+
+        on_time = project_normalized_trajectory(
+            member_rows("late-ok", ANCHOR + timedelta(seconds=500))
+        )
+        self.assertEqual(on_time.payload["eligible_member_count"], 1)
+        self.assertTrue(on_time.payload["pit"]["lateness_window_does_not_extend_T"])
+        self.assertEqual(
+            on_time.payload["pit"]["x_eligibility_lateness_seconds_used"], 300
+        )
+        self.assertEqual(
+            on_time.payload["schedule"]["x_allowed_lateness_seconds"], 300
+        )
+
+        too_late = project_normalized_trajectory(
+            member_rows("late-fail", ANCHOR + timedelta(seconds=601))
+        )
+        self.assertEqual(too_late.payload["eligible_member_count"], 0)
+
     def test_schedule_document_must_match_compact_schedule_fields(self) -> None:
         document = deepcopy(normalized_trajectory_module._SYNTHETIC_SCHEDULE_DOCUMENT)
         x_point = dict(document["x_point"])
@@ -297,10 +334,10 @@ class NormalizedTrajectoryProjectionTests(unittest.TestCase):
         rows.extend(_series("known-member", "TRADERS", (1.0, 1.0, 1.0)))
         rows.append(_row("future-only-member", 3600, "PRICE", 999.0))
 
-        with self.assertRaises(NormalizedTrajectoryError) as raised:
-            project_normalized_trajectory(rows)
+        projected = project_normalized_trajectory(rows)
+        self.assertEqual(projected.payload["eligible_member_count"], 1)
         self.assertEqual(
-            str(raised.exception), "FUTURE_ONLY_MEMBER_NOT_BOUND_TO_PREFIX"
+            projected.payload["pit"]["future_points_in_denominator"], False
         )
 
     def test_representation_constructor_is_not_public_provenance_boundary(self) -> None:

@@ -1623,6 +1623,11 @@
       "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001"
     },
     {
+      "source_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001"
+    },
+    {
       "source_asset_id": "CONTRACT-OWNER-AUTHORITY-PACKET-001",
       "relation": "derived_from",
       "target_asset_id": "CONTRACT-T26C-OWNED-CANARY-READINESS-001"
@@ -3841,6 +3846,21 @@
       "source_asset_id": "CTRL-MARKET-DATA-AWARENESS-001",
       "relation": "validated_by",
       "target_asset_id": "TEST-MARKET-DATA-AWARENESS-001"
+    },
+    {
+      "source_asset_id": "CTRL-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001",
+      "relation": "contains",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "CTRL-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001"
     },
     {
       "source_asset_id": "CTRL-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001",
@@ -11153,6 +11173,36 @@
       "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-LIVE-COHORT-DISCOVERY-RELEASE-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-HFIC-RELEASED-TRAJECTORY-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001"
+    },
+    {
       "source_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-HFIC-CONTROL-INTEGRITY-001"
@@ -16413,6 +16463,16 @@
       "target_asset_id": "CTRL-HFIC-PACKET14-AVAILABILITY-FAST-LANE-GUARD-001"
     },
     {
+      "source_asset_id": "TEST-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001"
+    },
+    {
       "source_asset_id": "TEST-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-HFIC-REOPENED-PRIOR-ROUTING-001"
@@ -16666,6 +16726,21 @@
       "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-NORMALIZED-TRAJECTORY-V1-001"
+    },
+    {
+      "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "CONTRACT-NORMALIZED-TRAJECTORY-V1-CAPABILITY-001"
+    },
+    {
+      "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001"
+    },
+    {
+      "source_asset_id": "TEST-NORMALIZED-TRAJECTORY-V1-EXECUTION-CLOSURE-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
     },
     {
       "source_asset_id": "TEST-OBSERVATION-PROVIDER-BOUNDED-RESPONSE-AND-PARSE-SAFETY-001",

@@ -2,7 +2,7 @@
 schema: smial.normalized-trajectory-v1-capability
 schema_version: '1.0'
 capability_id: NORMALIZED_TRAJECTORY_V1
-implementation_status: IMPLEMENTED_DORMANT_NOT_EXECUTED
+implementation_status: RUNTIME_READY_NOT_EXECUTED
 scientific_preregistration: docs/contracts/normalized_trajectory_representation_probe_v1.md
 execution_status: NOT_EXECUTED
 ordinary_hypothesis_forge: UNCHANGED
@@ -17,7 +17,7 @@ registered_probe_runs_per_control_epoch: 1
 
 # NORMALIZED_TRAJECTORY_V1 capability
 
-This is the implementation contract for the dormant MOVE A slice. The frozen
+This is the implementation contract for the runtime-ready MOVE A seam. The frozen
 scientific meaning remains in
 `docs/contracts/normalized_trajectory_representation_probe_v1.md`; this file
 does not amend that preregistration and is not permission to run the probe.
@@ -40,10 +40,16 @@ When a full imported schedule document is supplied, its schedule key and
 landmark offsets must match the compact projection fields before its hash is
 accepted. The frozen X300 synthetic digest cannot be reused for another X
 selection, and membership is admitted only when the X liquidity observation is
-observed by its own X cutoff and is at least USD 1000. This dormant atom
-accepts only the synthetic corpus binding; a non-synthetic release needs a
-future verified projection/input receipt that proves row provenance before it
-can enter the HFIC seam.
+observed by its own X cutoff — due plus the bound schedule
+`allowed_lateness_seconds`, never past decision `T=Y1800` — and is at least
+USD 1000. Prefix input is through `T` only: a member whose only points are
+after `T` is omitted and does not fail the cohort. Completed `NO_WORTHY`
+CONTROL binds the exact BASE `FORGE_CONTEXT_PACKET`; selected-candidate
+CONTROL still binds `CRITIC_INPUT_PACKET`. Do not synthesize a fake critic
+packet. Self-contained live-cohort release manifests (`schema_version` 1.0 or
+1.1) are admissible for the readiness receipt. A verified C2 persist=False
+projection plus challenger envelope is the runtime-ready seam; this file is
+still not permission to run the scientific probe.
 
 Taker volume is used only when observed. If taker volume is unavailable and
 both buy and sell volume are observed, two fallback channels are emitted. Buy
@@ -145,6 +151,6 @@ trading, or Workbench changes. A post-CONTROL defect invalidates the comparison
 and requires repair plus a new evidence epoch and new CONTROL; it is never
 silently repaired against the old baseline.
 
-Git proves implementation and tests only. It does not prove cohort readiness,
-CONTROL execution, challenger execution, scientific PASS, alpha, deployment,
-or product completion.
+Git records implementation, tests, and persist=False C2 payload and envelope
+hashes. Envelope bytes stay out of Git. Git does not prove scientific probe
+execution, CONTROL slash execution, alpha, deployment, or product completion.

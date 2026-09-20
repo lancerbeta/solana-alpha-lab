@@ -253,11 +253,10 @@ KILL/STOP is a complete useful result. Primary `KILL_*` plus pending C2 screen
 is not evening-complete. C2 `RUNNER_UP_REVISION_REQUIRED` is a typed PAUSE STOP,
 not a prompt to shop another candidate or start a second AUTO search.
 
-## Dormant representation challenger
+## Representation challenger (runtime-ready, not executed)
 
-`NORMALIZED_TRAJECTORY_V1` is a separate dormant capability. It does not change
-ordinary `/hypothesis-forge` and does not add a current CONTROL trajectory. The
-three explicit modes are:
+`NORMALIZED_TRAJECTORY_V1` is a separate capability. Ordinary `/hypothesis-forge`
+is unchanged and CONTROL stays trajectory-blind. The three explicit modes are:
 
 - `ORDINARY`: existing `/hypothesis-forge` path and budget;
 - `CONTROL`: `--control-current-representation`, still trajectory-blind;
@@ -278,9 +277,11 @@ terminal `PASS_*` routes to
 or grounding failures are blocked. The adapter never runs the probe and never
 creates a `FEAT-*` alias from a motif.
 
-`IMPLEMENTED_DORMANT_NOT_EXECUTED` means code and tests exist. It does not mean
-the representation probe ran, passed, produced alpha, or changed runtime
-deployment.
+`RUNTIME_READY_NOT_EXECUTED` means a completed `NO_WORTHY` CONTROL plus a
+verified C2 release can build a hash-bound prefix-through-T payload and
+challenger envelope without a fake critic packet. It does not mean the
+representation probe ran, passed, produced alpha, or changed runtime
+deployment. Comparative BASE vs V1 still requires a later atom.
 
 ## Post-merge CONTROL reconsideration
 

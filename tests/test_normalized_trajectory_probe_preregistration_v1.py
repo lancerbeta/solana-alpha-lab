@@ -242,7 +242,7 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
         self.assertEqual(len(self.contract["pass_requires_all"]), 5)
         self.assertGreaterEqual(len(self.contract["kill_if_any"]), 5)
 
-    def test_frozen_preregistration_unchanged_and_capability_is_dormant(self) -> None:
+    def test_frozen_preregistration_unchanged_and_capability_is_runtime_ready(self) -> None:
         preregistration_bytes = CONTRACT_PATH.read_bytes()
         self.assertEqual(
             hashlib.sha256(preregistration_bytes).hexdigest(),
@@ -251,7 +251,7 @@ class NormalizedTrajectoryProbePreregistrationTests(unittest.TestCase):
         capability = ROOT / "docs/contracts/normalized_trajectory_v1_capability_contract.md"
         self.assertTrue(capability.exists())
         capability_text = capability.read_text(encoding="utf-8")
-        self.assertIn("implementation_status: IMPLEMENTED_DORMANT_NOT_EXECUTED", capability_text)
+        self.assertIn("implementation_status: RUNTIME_READY_NOT_EXECUTED", capability_text)
         self.assertIn("execution_status: NOT_EXECUTED", capability_text)
         self.assertTrue(
             (ROOT / "src/solana_alpha_lab/factory/normalized_trajectory_v1.py").exists()
