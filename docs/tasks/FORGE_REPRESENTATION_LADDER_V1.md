@@ -112,9 +112,9 @@ context_requirements:
       - src/solana_alpha_lab/factory/forge_input_receipt.py
       - docs/contracts/normalized_trajectory_v1_capability_contract.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/forge_input_truth_and_visibility/a1_delivery_completion_evidence_v1.json
-      - docs/evidence/forge_input_truth_and_visibility/a1_delivery_factory_fit_v1.json
-      - docs/reports/normalized_trajectory_v1_execution_closure/a1_owner_readout_v1.md
+      - docs/evidence/forge_representation_ladder/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/forge_representation_ladder/a1_delivery_independent_review_v1.json
+      - docs/evidence/forge_representation_ladder/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT:
       - docs/evidence/forge_input_truth_and_visibility/a1_c1_c2_forge_input_v1.json
       - docs/reports/normalized_trajectory_v1_execution_closure/a1_owner_readout_v1.md

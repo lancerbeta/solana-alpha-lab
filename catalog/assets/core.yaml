@@ -37978,7 +37978,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md', repository_path: docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md}
-  integrity: {kind: sha256, sha256: 42563de430e463c3d2f159d9696cf38778d0bc59db81fd78498e038a398d8dc7}
+  integrity: {kind: sha256, sha256: 24ad5ac021df7696edbb70d4e62abeeb1e3650e4f19009e18de1e576b625e129}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: contains, target_asset_id: MODULE-HFIC-REPRESENTATION-LADDER-001}
