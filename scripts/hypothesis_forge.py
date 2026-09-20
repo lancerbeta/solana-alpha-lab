@@ -419,16 +419,17 @@ def cmd_forge_run(
         bundle = load_session_bundle(store, control_sid)
         if bundle is not None:
             packet = _packet_for_bundle(resolved.root, bundle, store)
-            representation_id = (
-                HANDLER_SYNTHETIC_LATER_V2
-                if "SYNTHETIC_LATER_V2" in next_action
-                else HANDLER_NORMALIZED_TRAJECTORY_V1
-            )
-            payload["ladder_freeze_preflight"] = prepare_ladder_freeze_preflight(
-                control_preflight_from_bundle(bundle, packet),
-                representation_id=representation_id,
-                control_session_id=control_sid,
-            )
+            if isinstance(packet, dict) and packet:
+                representation_id = (
+                    HANDLER_SYNTHETIC_LATER_V2
+                    if "SYNTHETIC_LATER_V2" in next_action
+                    else HANDLER_NORMALIZED_TRAJECTORY_V1
+                )
+                payload["ladder_freeze_preflight"] = prepare_ladder_freeze_preflight(
+                    control_preflight_from_bundle(bundle, packet),
+                    representation_id=representation_id,
+                    control_session_id=control_sid,
+                )
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
         0 if receipt.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2

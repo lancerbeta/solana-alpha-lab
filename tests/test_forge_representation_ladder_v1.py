@@ -6,11 +6,14 @@ Does not execute Prompt A/B/C, Independent Critic, or the scientific V1 probe.
 from __future__ import annotations
 
 import hashlib
+import importlib.util
+import io
 import json
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
 
@@ -104,6 +107,16 @@ from tests.test_hfic_session import (  # noqa: E402
 )
 
 NO_WORTHY_DRAFT = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
+
+
+def _load_hypothesis_forge_cli():
+    spec = importlib.util.spec_from_file_location(
+        "hypothesis_forge_cli_a4", ROOT / "scripts" / "hypothesis_forge.py"
+    )
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
@@ -1418,25 +1431,30 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             _write_lineage(data_root)
             store = ResearchStore(data_root)
             base = self._no_worthy_base(data_root, store)
+            cli = _load_hypothesis_forge_cli()
+            stdout = io.StringIO()
+            stderr = io.StringIO()
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,
             ):
-                started = evaluate_forge_run(ROOT, data_root, persist=True)
+                with redirect_stdout(stdout), redirect_stderr(stderr):
+                    code = cli.cmd_forge_run(
+                        ROOT,
+                        explicit_data_root=data_root,
+                        owner_focus="AUTO",
+                        persist=True,
+                    )
+            self.assertEqual(code, 0)
+            started = json.loads(stdout.getvalue())
             self.assertEqual(started["next_action"], ACTION_START_V1)
-            bundle = load_session_bundle(store, str(base["session_id"]))
-            assert bundle is not None
-            packet = _packet_for_bundle(data_root, bundle, store)
-            self.assertIsInstance(packet, dict)
-            assert isinstance(packet, dict)
+            v1_pre = started["ladder_freeze_preflight"]
+            packet = v1_pre["forge_context_packet"]
             self.assertEqual((packet.get("vision_integrity") or {}).get("status"), "PASS")
-            v1_pre = prepare_ladder_freeze_preflight(
-                control_preflight_from_bundle(bundle, packet),
-                representation_id="NORMALIZED_TRAJECTORY_V1",
-                control_session_id=str(base["session_id"]),
-            )
-            v1_pre["forge_context_packet"]["visible_cohort_ids"] = ["REL-C2"]
-            v1_pre["forge_context_packet"]["bound_visible_cohort_ids"] = ["REL-C2"]
+            self.assertNotIn("visible_cohort_ids", packet)
+            self.assertEqual(packet.get("bound_visible_cohort_ids"), ["REL-C1", "REL-C2"])
+            self.assertEqual(packet.get("ladder_representation_id"), "NORMALIZED_TRAJECTORY_V1")
+            self.assertIsNone(base.get("critic_input_packet"))
             draft = valid_draft()
             frozen = freeze_draft(
                 draft,
@@ -1450,6 +1468,11 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             self.assertNotEqual(frozen.get("action"), "START_NEW_SESSION")
             packet_out = frozen["critic_input_packet"]
             assert isinstance(packet_out, dict)
+            self.assertIsNotNone(packet_out.get("selected_candidate"))
+            self.assertEqual(
+                frozen["forge_context_packet"].get("ladder_representation_id"),
+                "NORMALIZED_TRAJECTORY_V1",
+            )
             done = finalize_session(
                 frozen,
                 critic_result_from_packet_only(packet_out, "PASS_TO_CLASSIFICATION"),
@@ -1481,7 +1504,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
         )
         self.assertEqual(v1["session_id"], frozen["session_id"])
-        self.assertEqual(v1["used_cohort_ids"], ["REL-C2"])
+        self.assertEqual(v1["used_cohort_ids"], ["REL-C1", "REL-C2"])
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
         self.assertEqual(retry["run_identity_sha256"], started["run_identity_sha256"])
 
