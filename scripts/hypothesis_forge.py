@@ -281,6 +281,7 @@ def cmd_forge_input(
     repo_root: Path,
     *,
     explicit_data_root: Path | None,
+    owner_focus: str = "AUTO",
 ) -> int:
     """No-write Forge input/visibility receipt. Never starts a session."""
     from solana_alpha_lab.factory.forge_input_receipt import (
@@ -304,7 +305,7 @@ def cmd_forge_input(
             "session_id": None,
             "writes": {"research_store": 0, "forge_context": 0, "session": 0},
         }
-        payload["next"] = forge_input_owner_next(payload)
+        payload["forge_input_next"] = forge_input_owner_next(payload)
         payload["owner_forge_input"] = format_forge_input_owner_block(payload)
         _assert_no_path_leak(payload, str(repo_root))
         return emit(payload, exit_code=2)
@@ -318,15 +319,19 @@ def cmd_forge_input(
             "session_id": None,
             "writes": {"research_store": 0, "forge_context": 0, "session": 0},
         }
-        payload["next"] = forge_input_owner_next(payload)
+        payload["forge_input_next"] = forge_input_owner_next(payload)
         payload["owner_forge_input"] = format_forge_input_owner_block(payload)
         _assert_no_path_leak(payload, str(repo_root))
         return emit(payload, exit_code=2)
-    receipt = build_forge_input_receipt(resolved.root, repo_root=repo_root)
+    receipt = build_forge_input_receipt(
+        resolved.root,
+        repo_root=repo_root,
+        owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+    )
     payload = {
         **receipt,
         "owner_forge_input": format_forge_input_owner_block(receipt),
-        "next": forge_input_owner_next(receipt),
+        "forge_input_next": forge_input_owner_next(receipt),
         "session_id": None,
         "no_write": True,
         "selection_reason": resolved.selection_reason,
@@ -1209,6 +1214,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="No-write FORGE_INPUT_RECEIPT; never starts a session",
     )
     forge_input.add_argument("--format", choices=("json",), default="json")
+    forge_input.add_argument("--owner-focus", default="AUTO")
     forge_input.add_argument(
         "--no-write",
         action="store_true",
@@ -1423,6 +1429,7 @@ def main(argv: list[str] | None = None) -> int:
             return cmd_forge_input(
                 repo_root,
                 explicit_data_root=args.data_root,
+                owner_focus=str(getattr(args, "owner_focus", "AUTO") or "AUTO"),
             )
         if args.command == "freeze":
             return cmd_freeze(

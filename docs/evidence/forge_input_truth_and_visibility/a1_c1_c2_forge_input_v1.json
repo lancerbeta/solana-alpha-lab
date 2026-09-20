@@ -3,7 +3,8 @@
     "corpus_version": 2,
     "persist": false,
     "session_started": false,
-    "visible_cohort_count": 2
+    "visible_cohort_count": 2,
+    "writes_unchanged": true
   },
   "active_evidence_set": {
     "corpus_version": 2,
@@ -17,6 +18,7 @@
   },
   "blocking_reason_codes": [],
   "data_root_instance_fingerprint_sha256": "db5b0dede6936e17c3e35efa25105273a6b85d0305fde24bb7a932dbb3aff572",
+  "evidence_surface_mode": null,
   "experiment_data_scope": {
     "scope": "EXPERIMENT_DATA_SCOPE",
     "status": "NOT_STARTED"
@@ -41,7 +43,7 @@
     "yield_eligible": 233
   },
   "owner_class": "FORGE_INPUT_READY",
-  "owner_forge_input": "FORGE INPUT\nvisible_cohorts: REL-20260902T111900Z-20260909T111900Z, REL-20260909T111900Z-20260916T111900Z\nactive_evidence_set: manifest=dataset-f5245e924d08f16fe02e3ee416183923f7ef2ef2426b7db2db90e8705dd1680a corpus_version=2\nhistorical_calibration: C1 FULL_LIFECYCLE_COMPLETENESS PASS\nvisibility: corpus_binding=PASS, lineage=PASS, pit_semantics=NOT_EVALUATED, missingness_visible=NOT_EVALUATED, prior_memory=PASS, feature_grounding=NOT_EVALUATED, packet_vision=PASS, material_truncation=False\nrepresentations: BASE READY; NORMALIZED_TRAJECTORY_V1 RUNTIME_READY_NOT_EXECUTED\nforge_runnable: True\nowner_class: FORGE_INPUT_READY\nnext: STOP_BEFORE_SYNTHESIS",
+  "owner_forge_input": "FORGE INPUT\nvisible_cohorts: REL-20260902T111900Z-20260909T111900Z, REL-20260909T111900Z-20260916T111900Z\nactive_evidence_set: manifest=dataset-f5245e924d08f16fe02e3ee416183923f7ef2ef2426b7db2db90e8705dd1680a corpus_version=2\nhistorical_calibration: C1 FULL_LIFECYCLE_COMPLETENESS integrity=PASS caveat_router=BLOCK_FORGE_SELECTION_RISK\nvisibility: corpus_binding=PASS, lineage=PASS, pit_semantics=NOT_EVALUATED, missingness_visible=NOT_EVALUATED, prior_memory=PASS, feature_grounding=PASS, packet_vision=PASS, material_truncation=False\nrepresentations: BASE READY; NORMALIZED_TRAJECTORY_V1 RUNTIME_READY_NOT_EXECUTED\nforge_runnable: True\nowner_class: FORGE_INPUT_READY\nforge_input_next: STOP_BEFORE_SYNTHESIS\nevidence_surface_mode: ordinary",
   "packet": {
     "bounded_dataset_count": 5,
     "live_corpus_in_packet": true,
@@ -49,7 +51,7 @@
     "selection_policy": "control_protect_live_corpus_then_cap",
     "truncated": false
   },
-  "receipt_sha256": "6749ca0347cb5745c0759e8f354725ca9a713c1682aefd38c0c99349fb9ad675",
+  "receipt_sha256": "1ca644284c7798eec4b17a172cbb4c38f23bf9c13937e368f4e97b1587d2a574",
   "representation_input_scope": {
     "scope": "REPRESENTATION_INPUT_SCOPE",
     "status": "DECLARED"
@@ -68,7 +70,7 @@
   "schema_version": "1.0",
   "visibility": {
     "corpus_binding": "PASS",
-    "feature_grounding": "NOT_EVALUATED",
+    "feature_grounding": "PASS",
     "lineage": "PASS",
     "material_truncation": false,
     "missingness_visible": "NOT_EVALUATED",

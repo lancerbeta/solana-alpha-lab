@@ -26,12 +26,14 @@ git_binding:
 objective: >-
   One Forge input/visibility builder, actual preflight and compatibility
   adapter without competing truth logic; historical calibration validates
-  against its own frozen inputs; real current C1/C2 via a proven no-write path.
+  against its own frozen inputs; real current C1/C2 via a proven no-write path;
+  one no-write packet/vision source; forge_runnable cannot precede that check.
 
 managed_write_set:
   - docs/tasks/FORGE_INPUT_TRUTH_AND_VISIBILITY_V1.md
   - src/solana_alpha_lab/factory/forge_input_receipt.py
   - src/solana_alpha_lab/factory/hfic_preflight.py
+  - src/solana_alpha_lab/factory/hfic_vision_integrity.py
   - src/solana_alpha_lab/factory/live_cohort_to_forge.py
   - src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py
   - scripts/hypothesis_forge.py
@@ -180,7 +182,14 @@ not synthesis.
 `forge_control_ready` calls the builder and prints a CONTROL subset plus
 operational extras (runtime, yield floor, session enterability, Fast Lane
 proof). Actual `run_preflight` attaches the same builder receipt. Common
-input/visibility checks cannot disagree.
+input/visibility checks cannot disagree. Material packet/vision visibility
+uses one pure `evaluate_forge_packet_vision` source. `forge_runnable=true`
+cannot precede a failing vision/feature-grounding check. PIT/missingness
+stay `NOT_EVALUATED` and are not a READY basis. Ordinary preflight
+machine-stops `OBSERVABILITY_BLOCKED` (including
+`FORGE_VISION_INTEGRITY_BLOCKED`) before synthesis. Fast Lane
+`INPUT_NOT_READY` without live corpus may still `START_NEW_SESSION` as
+the commissioning fixture; Skill still stops before Prompt A.
 
 ## Historical calibration
 
@@ -197,6 +206,9 @@ hash or wrong cohort/release/census/observations stays blocked.
 - G-A3-3 current corpus absent → `INPUT_NOT_READY`, no session from builder/CLI.
 - G-A3-4 packet material loss of live corpus → `OBSERVABILITY_BLOCKED`.
 - G-A3-5 good current C2 → `forge_runnable=true` with explicit visible cohorts.
+- Forced vision/feature-grounding failure → `forge-input`,
+  `forge-control-ready`, and actual persist=False preflight all block with
+  session/context/commissioning writes = 0.
 
 ## Real acceptance
 

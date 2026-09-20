@@ -350,12 +350,16 @@ commission, does not persist Forge context). This is not owner NEXT and does
 not authorize CONTROL slash:
 
 ```
-uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json --owner-focus AUTO
 ```
 
-Typed owner `next` on that surface: `WAIT_FOR_IMPORT_OR_STOP` or
+Typed owner `forge_input_next` on that surface: `WAIT_FOR_IMPORT_OR_STOP` or
 `STOP_OBSERVABILITY` when not runnable; `STOP_BEFORE_SYNTHESIS` when
-runnable. Do not paste a slash as recovery.
+runnable (FORGE INPUT visibility — Prompt A only if preflight `action` is
+not `STOP` and `forge_runnable` is true; this is not CONTROL next and not
+an observability halt). Always read `evidence_surface_mode` (`ordinary`
+when JSON null). Historical PASS `router_decision` prints as `caveat_router`
+on the owner block. Do not paste a slash as recovery.
 
 `forge-control-ready` remains an expert diagnostic. Happy terminal
 `FORGE_CONTROL_READY` is not the owner next after `forge-input`. Do not treat
@@ -375,8 +379,10 @@ for the current `DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001` identified by
 canonical `dataset_id`, not a foreign label impersonation.
 `forge-control-ready` uses the same canonical `build_forge_input_receipt`
 builder as actual HFIC preflight for common input/visibility checks, then
-prints a CONTROL subset. Compatibility READY cannot mean a different live
-corpus membership than slash. The selected corpus `dataset_manifest_id` must
+prints a CONTROL subset. Material packet/vision visibility is
+`evaluate_forge_packet_vision` (no-write). Compatibility READY cannot mean a
+different live corpus membership or a passing vision check that slash would
+block. PIT/missingness stay `NOT_EVALUATED` and are not a READY basis. The selected corpus `dataset_manifest_id` must
 equal `lineage.current_dataset_manifest_id` when lineage exists.
 
 Scientific CONTROL floor is consume-time `base_x_population.n` (X300-valid

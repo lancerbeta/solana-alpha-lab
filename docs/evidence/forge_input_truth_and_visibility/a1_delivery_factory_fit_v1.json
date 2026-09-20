@@ -4,8 +4,8 @@
   "review_id": "FORGE-INPUT-TRUTH-AND-VISIBILITY-FACTORY-FIT-001",
   "as_of": "2026-09-20",
   "task_id": "FORGE_INPUT_TRUTH_AND_VISIBILITY_V1",
-  "reviewed_bindings_sha256": "9cb9d2192bceb7ac2634cac96b3c57a49a693d215df38c4ac8dc11c4a4980f6e",
-  "reviewed_inventory_sha256": "43496f9f54137a0b48780fcc95699e35d249c1ccf90bac9c43a68046c14a86bf",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
@@ -18,7 +18,7 @@
     "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
     "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
     "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
-    "red_team": "PASS_COMPATIBILITY_CANNOT_DISAGREE_ON_COMMON_CHECKS"
+    "red_team": "PASS_READY_CANNOT_THEN_VISION_BLOCK"
   },
   "capability_radar": {
     "now": "NONE",

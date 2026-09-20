@@ -111,7 +111,7 @@
         "pit_semantics": {"enum": ["PASS", "FAIL", "NOT_EVALUATED"]},
         "missingness_visible": {"enum": ["PASS", "FAIL", "NOT_EVALUATED"]},
         "prior_memory": {"enum": ["PASS", "FAIL"]},
-        "feature_grounding": {"enum": ["PASS", "FAIL", "NOT_EVALUATED"]},
+        "feature_grounding": {"enum": ["PASS", "FAIL"]},
         "packet_vision": {"enum": ["PASS", "FAIL"]},
         "material_truncation": {"type": "boolean"}
       }
@@ -151,6 +151,7 @@
       "type": ["object", "null"],
       "additionalProperties": true
     },
+    "evidence_surface_mode": {"type": ["string", "null"]},
     "forge_runnable": {"type": "boolean"},
     "blocking_reason_codes": {
       "type": "array",

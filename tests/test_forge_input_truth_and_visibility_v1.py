@@ -22,6 +22,7 @@ from solana_alpha_lab.factory.data_root import (  # noqa: E402
 from solana_alpha_lab.factory.forge_input_receipt import (  # noqa: E402
     CURRENT_CORPUS_EXCLUDED_FROM_PACKET,
     CURRENT_CORPUS_MISSING,
+    FORGE_VISION_INTEGRITY_BLOCKED,
     OWNER_CLASS_INPUT_NOT_READY,
     OWNER_CLASS_OBSERVABILITY_BLOCKED,
     OWNER_CLASS_READY,
@@ -77,6 +78,7 @@ def _live_dataset(mid: str = "MID-CURRENT") -> dict[str, object]:
             "yield_eligible": 40,
         },
         "yield_eligible": 40,
+        "dataset_fingerprint": "ab" * 32,
     }
 
 
@@ -126,9 +128,16 @@ class ForgeInputReceiptTests(unittest.TestCase):
         self.assertEqual(receipt["active_evidence_set"]["corpus_version"], 2)
         self.assertTrue(receipt["packet"]["live_corpus_in_packet"])
         self.assertTrue(receipt["packet"]["live_corpus_protected"])
+        self.assertEqual(receipt["visibility"]["feature_grounding"], "PASS")
+        self.assertEqual(receipt["visibility"]["packet_vision"], "PASS")
+        self.assertEqual(receipt["visibility"]["pit_semantics"], "NOT_EVALUATED")
+        self.assertEqual(receipt["visibility"]["missingness_visible"], "NOT_EVALUATED")
+        self.assertIsNone(receipt.get("evidence_surface_mode"))
         block = format_forge_input_owner_block(receipt)
         self.assertIn("REL-C1", block)
         self.assertIn("REL-C2", block)
+        self.assertIn("evidence_surface_mode: ordinary", block)
+        self.assertIn("forge_input_next: STOP_BEFORE_SYNTHESIS", block)
 
     def test_g_a3_1_linked_worktree_sees_same_c1_c2(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -238,7 +247,343 @@ class ForgeInputReceiptTests(unittest.TestCase):
         payload = json.loads(captured.getvalue())
         self.assertEqual(payload["owner_class"], OWNER_CLASS_INPUT_NOT_READY)
         self.assertFalse(payload["forge_runnable"])
-        self.assertEqual(payload["next"], "WAIT_FOR_IMPORT_OR_STOP")
+        self.assertEqual(payload["forge_input_next"], "WAIT_FOR_IMPORT_OR_STOP")
+        self.assertNotIn("next", payload)
+
+
+    def test_forced_vision_failure_blocks_all_surfaces_no_write(self) -> None:
+        from solana_alpha_lab.factory.hfic_control_integrity import (
+            CURRENT_REPRESENTATION_CONTROL_V1,
+        )
+        from solana_alpha_lab.factory.hfic_preflight import run_preflight
+        from solana_alpha_lab.factory.live_cohort_to_forge import (
+            LiveCohortToForgeError,
+            forge_control_ready,
+        )
+
+        blocked = {
+            "status": "FAIL",
+            "feature_grounding": "FAIL",
+            "packet_vision": "FAIL",
+            "vision_integrity": {
+                "status": "BLOCKED",
+                "schema": "smial.hfic-vision-integrity",
+                "schema_version": "1.0",
+                "material_information_loss": 1,
+                "unknown_omission": 0,
+                "reason": FORGE_VISION_INTEGRITY_BLOCKED,
+                "reason_code": "MATERIAL_CANDIDATE_GENERATION_INFORMATION_LOSS",
+            },
+            "reason_code": FORGE_VISION_INTEGRITY_BLOCKED,
+        }
+
+        def _fingerprint(root: Path) -> str:
+            parts: list[str] = []
+            files = [path for path in root.rglob("*") if path.is_file() and not path.is_symlink()]
+            for path in sorted(files):
+                rel = path.relative_to(root).as_posix()
+                stat = path.stat()
+                parts.append(f"{rel}:{stat.st_size}:{stat.st_mtime_ns}")
+            return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            before = _fingerprint(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ), patch(
+                "solana_alpha_lab.factory.hfic_vision_integrity.evaluate_forge_packet_vision",
+                return_value=blocked,
+            ):
+                receipt = build_forge_input_receipt(
+                    data_root,
+                    repo_root=ROOT,
+                    evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+                )
+                self.assertFalse(receipt["forge_runnable"])
+                self.assertEqual(receipt["owner_class"], OWNER_CLASS_OBSERVABILITY_BLOCKED)
+                self.assertIn(
+                    FORGE_VISION_INTEGRITY_BLOCKED,
+                    receipt["blocking_reason_codes"],
+                )
+                self.assertEqual(receipt["visibility"]["feature_grounding"], "FAIL")
+                self.assertEqual(
+                    receipt["evidence_surface_mode"],
+                    CURRENT_REPRESENTATION_CONTROL_V1,
+                )
+                self.assertEqual(receipt["writes"]["research_store"], 0)
+                self.assertEqual(receipt["writes"]["forge_context"], 0)
+                self.assertEqual(receipt["writes"]["session"], 0)
+                block = format_forge_input_owner_block(receipt)
+                self.assertIn("STOP_OBSERVABILITY", block)
+                self.assertIn("CURRENT_REPRESENTATION_CONTROL_V1", block)
+
+                with self.assertRaises(LiveCohortToForgeError) as raised:
+                    forge_control_ready(data_root=data_root, repo_root=ROOT)
+                self.assertEqual(str(raised.exception), FORGE_VISION_INTEGRITY_BLOCKED)
+
+                preflight = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    persist=False,
+                )
+            self.assertEqual(preflight["action"], "STOP")
+            self.assertEqual(preflight["terminal"], FORGE_VISION_INTEGRITY_BLOCKED)
+            self.assertEqual(preflight["next"], "STOP_OBSERVABILITY")
+            self.assertIsNone(preflight["session_id"])
+            self.assertEqual(preflight["forge_context_packet"], {})
+            self.assertEqual(_fingerprint(data_root), before)
+
+
+    def test_commissioned_store_miss_does_not_catalog_pass(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ), patch(
+                "solana_alpha_lab.factory.hfic_preflight.is_fast_lane_commissioned",
+                return_value=True,
+            ):
+                receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
+        self.assertFalse(receipt["forge_runnable"])
+        self.assertEqual(receipt["owner_class"], OWNER_CLASS_OBSERVABILITY_BLOCKED)
+        self.assertEqual(receipt["visibility"]["feature_grounding"], "FAIL")
+        self.assertEqual(receipt["visibility"]["packet_vision"], "FAIL")
+        self.assertIn(FORGE_VISION_INTEGRITY_BLOCKED, receipt["blocking_reason_codes"])
+
+    def test_packet_bound_capacity_blocks_without_preview_mock(self) -> None:
+        from solana_alpha_lab.factory.hfic_preflight import is_fast_lane_commissioned
+        from solana_alpha_lab.factory.live_cohort_to_forge import (
+            LiveCohortToForgeError,
+            forge_control_ready,
+        )
+
+        resolved = resolve_existing_data_root(ROOT)
+        if resolved.status != "PRESENT" or resolved.root is None:
+            self.skipTest("canonical data plane not present in this checkout")
+        data_root = resolved.root
+        if not is_fast_lane_commissioned(data_root):
+            self.skipTest("canonical plane is not Fast Lane commissioned")
+
+        def fingerprint() -> str:
+            parts: list[str] = []
+            research = data_root / "research"
+            files: list[Path] = []
+            if research.is_dir():
+                files.extend(
+                    path
+                    for path in research.rglob("*")
+                    if path.is_file() and not path.is_symlink()
+                )
+            for path in sorted(files):
+                rel = path.relative_to(data_root).as_posix()
+                stat = path.stat()
+                parts.append(f"{rel}:{stat.st_size}:{stat.st_mtime_ns}")
+            return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()
+
+        before = fingerprint()
+        with patch(
+            "solana_alpha_lab.factory.hfic_preflight.forge_context_packet_max_bytes",
+            return_value=256,
+        ):
+            receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
+            self.assertFalse(receipt["forge_runnable"])
+            self.assertEqual(receipt["owner_class"], OWNER_CLASS_OBSERVABILITY_BLOCKED)
+            self.assertEqual(receipt["visibility"]["feature_grounding"], "FAIL")
+            with self.assertRaises(LiveCohortToForgeError) as raised:
+                forge_control_ready(data_root=data_root, repo_root=ROOT)
+            self.assertEqual(str(raised.exception), FORGE_VISION_INTEGRITY_BLOCKED)
+            from solana_alpha_lab.factory.hfic_preflight import run_preflight
+
+            preflight = run_preflight(
+                ROOT,
+                data_root,
+                owner_focus="AUTO",
+                auto_commission=False,
+                persist=False,
+            )
+        self.assertEqual(preflight["action"], "STOP")
+        self.assertEqual(preflight["terminal"], FORGE_VISION_INTEGRITY_BLOCKED)
+        self.assertEqual(before, fingerprint())
+        self.assertEqual(receipt["writes"]["research_store"], 0)
+        self.assertEqual(receipt["writes"]["session"], 0)
+
+    def test_commissioned_ready_agrees_with_persist_false_preflight(self) -> None:
+        from solana_alpha_lab.factory.hfic_preflight import (
+            is_fast_lane_commissioned,
+            run_preflight,
+        )
+        from solana_alpha_lab.factory.live_cohort_to_forge import forge_control_ready
+
+        resolved = resolve_existing_data_root(ROOT)
+        if resolved.status != "PRESENT" or resolved.root is None:
+            self.skipTest("canonical data plane not present in this checkout")
+        data_root = resolved.root
+        if not is_fast_lane_commissioned(data_root):
+            self.skipTest("canonical plane is not Fast Lane commissioned")
+
+        def fingerprint() -> str:
+            parts: list[str] = []
+            research = data_root / "research"
+            files: list[Path] = []
+            if research.is_dir():
+                files.extend(
+                    path
+                    for path in research.rglob("*")
+                    if path.is_file() and not path.is_symlink()
+                )
+            for path in sorted(files):
+                rel = path.relative_to(data_root).as_posix()
+                stat = path.stat()
+                parts.append(f"{rel}:{stat.st_size}:{stat.st_mtime_ns}")
+            return hashlib.sha256("\n".join(parts).encode("utf-8")).hexdigest()
+
+        from solana_alpha_lab.factory.research_store import ResearchStore as RealStore
+
+        create_flags: list[bool] = []
+        rebuilds: list[bool] = []
+
+        class SpyStore(RealStore):
+            def __init__(
+                self,
+                data_root: Path,
+                *,
+                parquet_compression: str = "NONE",
+                create_if_missing: bool = True,
+            ) -> None:
+                create_flags.append(create_if_missing)
+                super().__init__(
+                    data_root,
+                    parquet_compression=parquet_compression,
+                    create_if_missing=create_if_missing,
+                )
+
+            def rebuild_projection(self):
+                rebuilds.append(True)
+                return super().rebuild_projection()
+
+        before = fingerprint()
+        receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
+        self.assertTrue(receipt["forge_runnable"])
+        self.assertEqual(receipt["visibility"]["packet_vision"], "PASS")
+        with patch(
+            "solana_alpha_lab.factory.hfic_preflight.ResearchStore", SpyStore
+        ):
+            preflight = run_preflight(
+                ROOT,
+                data_root,
+                owner_focus="AUTO",
+                auto_commission=False,
+                persist=False,
+            )
+        self.assertTrue(create_flags)
+        self.assertTrue(all(flag is False for flag in create_flags))
+        self.assertEqual(rebuilds, [])
+        self.assertEqual(before, fingerprint())
+        self.assertNotEqual(
+            str(preflight.get("terminal") or ""), FORGE_VISION_INTEGRITY_BLOCKED
+        )
+        attached = preflight.get("forge_input_receipt") or {}
+        self.assertTrue(attached.get("forge_runnable"))
+        self.assertEqual(attached.get("owner_class"), receipt["owner_class"])
+        self.assertEqual(
+            attached.get("blocking_reason_codes"), receipt["blocking_reason_codes"]
+        )
+        self.assertEqual(preflight.get("owner_focus"), "AUTO")
+        self.assertTrue(str(preflight.get("search_key_sha256") or ""))
+        packet = preflight.get("forge_context_packet") or {}
+        self.assertTrue(packet)
+        vision = packet.get("vision_integrity") or {}
+        self.assertEqual(vision.get("status"), "PASS")
+        self.assertEqual(receipt["writes"]["research_store"], 0)
+        self.assertEqual(receipt["writes"]["session"], 0)
+        control = forge_control_ready(data_root=data_root, repo_root=ROOT)
+        self.assertEqual(control.get("terminal"), "FORGE_CONTROL_READY")
+
+    def test_persist_false_skips_legacy_commission_repair(self) -> None:
+        from solana_alpha_lab.factory.hfic_preflight import (
+            HficPreflightError,
+            run_preflight,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            with (
+                patch(
+                    "solana_alpha_lab.factory.forge_input_receipt.build_forge_input_receipt",
+                    return_value={
+                        "forge_runnable": True,
+                        "owner_class": OWNER_CLASS_READY,
+                        "blocking_reason_codes": [],
+                    },
+                ),
+                patch(
+                    "solana_alpha_lab.factory.hfic_preflight.prove_fast_lane_commissioned",
+                    side_effect=HficPreflightError(
+                        "COMMISSION_HYPOTHESIS_VERSION_MISSING"
+                    ),
+                ),
+                patch(
+                    "solana_alpha_lab.factory.hfic_preflight.apply_legacy_commissioning_hypothesis_link"
+                ) as repair,
+            ):
+                with self.assertRaises(HficPreflightError) as raised:
+                    run_preflight(
+                        ROOT,
+                        data_root,
+                        owner_focus="AUTO",
+                        auto_commission=True,
+                        persist=False,
+                        commission_fn=lambda *_args: {},
+                    )
+                self.assertEqual(
+                    str(raised.exception), "COMMISSION_HYPOTHESIS_VERSION_MISSING"
+                )
+                repair.assert_not_called()
+
+            commission = []
+
+            def _commission(*_args: object) -> dict[str, str]:
+                commission.append(True)
+                return {}
+
+            with (
+                patch(
+                    "solana_alpha_lab.factory.forge_input_receipt.build_forge_input_receipt",
+                    return_value={
+                        "forge_runnable": True,
+                        "owner_class": OWNER_CLASS_READY,
+                        "blocking_reason_codes": [],
+                    },
+                ),
+                patch(
+                    "solana_alpha_lab.factory.hfic_preflight.prove_fast_lane_commissioned",
+                    side_effect=HficPreflightError("FAST_LANE_NOT_COMMISSIONED"),
+                ),
+                patch(
+                    "solana_alpha_lab.factory.hfic_preflight.apply_legacy_commissioning_hypothesis_link"
+                ) as repair_fast,
+            ):
+                with self.assertRaises(HficPreflightError) as raised_fast:
+                    run_preflight(
+                        ROOT,
+                        data_root,
+                        owner_focus="AUTO",
+                        auto_commission=True,
+                        persist=False,
+                        commission_fn=_commission,
+                    )
+                self.assertEqual(
+                    str(raised_fast.exception), "FAST_LANE_NOT_COMMISSIONED"
+                )
+                repair_fast.assert_not_called()
+                self.assertEqual(commission, [])
 
 
 class RealPlaneNoWriteTests(unittest.TestCase):
@@ -279,6 +624,18 @@ class RealPlaneNoWriteTests(unittest.TestCase):
         ids = receipt["active_evidence_set"]["visible_cohort_ids"]
         self.assertGreaterEqual(len(ids), 2)
         self.assertEqual(receipt["active_evidence_set"]["corpus_version"], 2)
+        self.assertEqual(receipt["visibility"]["feature_grounding"], "PASS")
+        self.assertEqual(receipt["visibility"]["packet_vision"], "PASS")
+        self.assertEqual(receipt["visibility"]["pit_semantics"], "NOT_EVALUATED")
+        self.assertEqual(receipt["visibility"]["missingness_visible"], "NOT_EVALUATED")
+        self.assertTrue(receipt["forge_runnable"])
+        block = format_forge_input_owner_block(receipt)
+        self.assertIn("forge_input_next: STOP_BEFORE_SYNTHESIS", block)
+        self.assertIn("evidence_surface_mode: ordinary", block)
+        hist = receipt.get("historical_calibration") or []
+        if hist and hist[0].get("router_decision") and hist[0].get("integrity") == "PASS":
+            self.assertIn("caveat_router=" + str(hist[0]["router_decision"]), block)
+            self.assertNotRegex(block, r"PASS BLOCK_FORGE")
 
 
 if __name__ == "__main__":

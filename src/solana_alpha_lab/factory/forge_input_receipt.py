@@ -28,6 +28,7 @@ OWNER_CLASS_INPUT_NOT_READY = "INPUT_NOT_READY"
 OWNER_CLASS_OBSERVABILITY_BLOCKED = "OBSERVABILITY_BLOCKED"
 CURRENT_CORPUS_MISSING = "CURRENT_CORPUS_MISSING"
 CURRENT_CORPUS_EXCLUDED_FROM_PACKET = "CURRENT_CORPUS_EXCLUDED_FROM_CONTROL_PACKET"
+FORGE_VISION_INTEGRITY_BLOCKED = "FORGE_VISION_INTEGRITY_BLOCKED"
 IMPORTED_COHORT_MISSING = "IMPORTED_COHORT_MISSING"
 DUPLICATE_LINEAGE = "DUPLICATE_LINEAGE"
 CONTROL_CORPUS_MANIFEST_MISMATCH = "CONTROL_CORPUS_MANIFEST_MISMATCH"
@@ -55,13 +56,20 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
     else:
         parts = []
         for item in historical:
-            parts.append(
-                "{cohort} {scope} {integrity}".format(
-                    cohort=item.get("cohort_scope") or "C1",
-                    scope=item.get("eligibility_scope") or "",
-                    integrity=item.get("integrity") or "",
-                ).strip()
-            )
+            router = str(item.get("router_decision") or "")
+            integrity = str(item.get("integrity") or "")
+            cohort = item.get("cohort_scope") or "C1"
+            scope = item.get("eligibility_scope") or ""
+            if router and integrity == "PASS":
+                parts.append(
+                    f"{cohort} {scope} integrity={integrity} caveat_router={router}"
+                )
+            elif router:
+                parts.append(
+                    f"{cohort} {scope} integrity={integrity} router={router}"
+                )
+            else:
+                parts.append(f"{cohort} {scope} integrity={integrity}".strip())
         hist_text = "; ".join(parts)
     vis = receipt.get("visibility") or {}
     vis_bits = []
@@ -91,7 +99,9 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
         f"representations: {'; '.join(reps) if reps else '(none)'}",
         f"forge_runnable: {bool(receipt.get('forge_runnable'))}",
         f"owner_class: {receipt.get('owner_class')}",
-        f"next: {forge_input_owner_next(receipt)}",
+        f"forge_input_next: {forge_input_owner_next(receipt)}",
+        "evidence_surface_mode: "
+        + str(receipt.get("evidence_surface_mode") or "ordinary"),
     ]
     codes = [str(item) for item in (receipt.get("blocking_reason_codes") or [])]
     if codes:
@@ -203,19 +213,20 @@ def build_forge_input_receipt(
     repo_root: Path,
     imported_cohort_id: str | None = None,
     evidence_surface_mode: str | None = None,
+    owner_focus: str = "AUTO",
 ) -> dict[str, Any]:
     """Build the canonical Forge input/visibility receipt. No writes."""
 
     from solana_alpha_lab.factory.hfic_preflight import (
         enumerate_rdp_datasets,
         is_live_corpus_dataset,
+        preview_forge_packet_vision,
         select_forge_packet_datasets,
     )
     from solana_alpha_lab.factory.live_cohort_discovery_release import (
         select_current_datasets_for_forge,
     )
 
-    del evidence_surface_mode
     blocking: list[str] = []
     owner_class = OWNER_CLASS_READY
     readback = _load_readback(Path(data_root))
@@ -279,20 +290,29 @@ def build_forge_input_receipt(
     )
     if hist_reason:
         blocking.append(hist_reason)
-        owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
+        if owner_class == OWNER_CLASS_READY:
+            owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
 
     material_truncation = bool(current_live) and not live_in_packet
     corpus_binding = chosen is not None and not material_truncation
     prior_ok = _prior_memory_ok(Path(data_root), repo_root=Path(repo_root))
     probe_ok = (Path(repo_root) / PROBE_CONTRACT_RELATIVE).is_file()
+    vision = preview_forge_packet_vision(
+        Path(repo_root),
+        Path(data_root),
+        live_corpus_in_packet=live_in_packet,
+        material_truncation=material_truncation,
+        evidence_surface_mode=evidence_surface_mode,
+        owner_focus=owner_focus,
+    )
     visibility = {
         "corpus_binding": _pass_fail(corpus_binding),
         "lineage": _pass_fail(lineage_ok if readback is not None else False),
         "pit_semantics": "NOT_EVALUATED",
         "missingness_visible": "NOT_EVALUATED",
         "prior_memory": _pass_fail(prior_ok),
-        "feature_grounding": "NOT_EVALUATED",
-        "packet_vision": _pass_fail(live_in_packet and not material_truncation),
+        "feature_grounding": str(vision.get("feature_grounding") or "FAIL"),
+        "packet_vision": str(vision.get("packet_vision") or "FAIL"),
         "material_truncation": material_truncation,
     }
     if not prior_ok:
@@ -300,6 +320,10 @@ def build_forge_input_receipt(
         owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
     if material_truncation and CURRENT_CORPUS_EXCLUDED_FROM_PACKET not in blocking:
         blocking.append(CURRENT_CORPUS_EXCLUDED_FROM_PACKET)
+        owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
+    vision_integrity = vision.get("vision_integrity") or {}
+    if str(vision_integrity.get("status") or "") != "PASS":
+        blocking.append(FORGE_VISION_INTEGRITY_BLOCKED)
         owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
 
     representations = [
@@ -362,6 +386,7 @@ def build_forge_input_receipt(
             ),
         },
         "live_corpus": live_corpus,
+        "evidence_surface_mode": evidence_surface_mode,
         "forge_runnable": forge_runnable,
         "blocking_reason_codes": list(dict.fromkeys(blocking)),
         "writes": {"research_store": 0, "forge_context": 0, "session": 0},
@@ -375,6 +400,7 @@ def build_forge_input_receipt(
 __all__ = [
     "CURRENT_CORPUS_EXCLUDED_FROM_PACKET",
     "CURRENT_CORPUS_MISSING",
+    "FORGE_VISION_INTEGRITY_BLOCKED",
     "OWNER_CLASS_INPUT_NOT_READY",
     "OWNER_CLASS_OBSERVABILITY_BLOCKED",
     "OWNER_CLASS_READY",
