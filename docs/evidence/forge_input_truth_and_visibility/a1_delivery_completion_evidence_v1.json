@@ -11,7 +11,30 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    "docs/tasks/FORGE_INPUT_TRUTH_AND_VISIBILITY_V1.md": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    ".agents/skills/hypothesis-forge/SKILL.md": "43d87a906e266645e8da6c49fd63b339657ca0e5d8b0c18fd3e7fad08783fc2b",
+    ".cursor/commands/hypothesis-forge.md": "f186eee117fdedf8d0a9ed48f21dd2b0b72c5aa3e68ee90a611e9b905e376153",
+    "catalog/assets/core.yaml": "976db0de74ed04acd264fc6f79a48eeeadbf56d3b378b40849e448a022740af8",
+    "catalog/assets/lifecycle.yaml": "78540b7f2841590e1d1b6c0add5ab59a45eaecfe33a920ac73b216dbf9c91d7c",
+    "catalog/catalog_manifest.yaml": "f1824e78ee35aeb7f11a56f059e04dd5f96092673813dd66cf34f67ddbe9e21c",
+    "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "4aadc39b67ac2c5f94e3eaa7f21e934edbee9ab1cca957f7840e449d0aabdcd4",
+    "catalog/generated/asset_edges.json": "2602234fb42e060c3a8461df1d31774e1f3186b948759f70b317805fd91c00b6",
+    "catalog/schemas/forge_input_receipt_v1.schema.json": "0eb82e1e61f00937bd4f462471573c5bee65bc70800c7eb6d9db73f3d7392c37",
+    "configs/factory_semantic_operability_v1.yaml": "fcee1b23221dc0ba39583454b8e1099063c77e71cb7e7871b71e4c4783d40aca",
+    "docs/PROJECT_MAP.md": "8d578fd7b60ca839b3641f16cae91a896635ccca608996c91e49edd70ac8eada",
+    "docs/evidence/forge_input_truth_and_visibility/a1_c1_c2_forge_input_v1.json": "9bd2c280da39b22f28182be4e18480e8321b1bfbabc0a213493a4d1f2c2b5613",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "ddf8a36b226fcc912fc9409a7cb6309b2db6579ae30f01ac770c5241b6d249d3",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "e7f976c8686cab879778bf23629e124ae70094fde343a9aca0fbcd46bbc55296",
+    "docs/reports/forge_input_truth_and_visibility/a1_owner_readout_v1.md": "89a2f4c06fbd15b4201d11de92bfffecf16021bc6dc296b5f4900d6070b82d86",
+    "docs/tasks/FORGE_INPUT_TRUTH_AND_VISIBILITY_V1.md": "053ef828191eabd325d0c210bb5b30b91ac570aee66272275a34041da4c19893",
+    "scripts/hypothesis_forge.py": "c885047d819c38e6ab68ee9f9af308e387de65d0abc5f8643070d25fd330e431",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py": "1493784750a0fa62246cc96772ce37853c42f3356301dfb61354a56fb61d9b84",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "4db4456a84d7cb4ca583883df5ab05e594d110c4a69c97b31b7d99b006c0216f",
+    "src/solana_alpha_lab/factory/hfic_selection_robustness_gate.py": "cd205b97d48c38cfff8bc435d7dee28e80a01f6da6a27f9420855ba4417d2c66",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py": "f7faae3edc74a4ea55f675ec08087860b1129fb1d876df7fd105db0c2d587370",
+    "tests/test_forge_input_truth_and_visibility_v1.py": "f62f7af432e365dc8d32977a1ed3bc146145ae1b48b585307ece6318682c9877",
+    "tests/test_hfic_selection_robustness_gate_v1.py": "a5da7847d8afaf38802ea6358c6b3c9a823f071b05575bcf1b4db8f2651243f4",
+    "tests/test_live_cohort_discovery_release_series.py": "498857a77436e55272f5cf0cec02b9daa886d0b26565d829119137b01f402a60",
+    "tests/test_live_cohort_to_forge_operational_closure_v1.py": "483e620fa79c71b9950b5bbbebbc227c589cbc5d0235a92297a183a43344d84f"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -23,14 +46,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_input_truth_and_visibility/a1_delivery_factory_fit_v1.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sha256": "f5782600e27f2cd323779c413238d5b084e07add683eef27fc284a7a34c4f0c1",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_INPUT_TRUTH_AND_VISIBILITY_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/forge_input_truth_and_visibility/a1_delivery_independent_review_v1.json",
-      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sha256": "b3b43bbeef8751cab2a974f80251ffc4b3ddfd34948621455e127989afe22f7d",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
