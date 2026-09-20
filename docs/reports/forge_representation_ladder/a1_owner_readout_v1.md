@@ -58,14 +58,20 @@ resolver, persist/readback, and owner rendering are real:
 | F1 same CONTROL after synthetic C3 / other focus | used does not gain C3; not `REUSED_VALID` over new evidence; other focus → `START_BASE` |
 | F2 empty BASE → stub V1 candidate → freeze/finalize → `forge-run` | `OWNER_CANDIDATE`; V1 session_id + stage ref resolve; retry `RETURN_EXISTING_RUN` |
 | F2 empty BASE → stub V1 no-worthy → `forge-run` | scoped `SEARCH_EXHAUSTED_CURRENT_EVIDENCE`; retry readback |
+| F2 CONTROL vs V1 freeze slot | same epoch/focus lookup returns BASE for BASE slot and V1 for V1 slot |
+| F2 orphan V1 without parent | not bound to current CONTROL; next remains `START_V1` |
 | F2 incomplete persist → saved V1 draft → terminal | append-only progress; no second trial |
 | F3 V1 no-worthy + completed synthetic V2 | `OWNER_CANDIDATE`, not `START_SYNTHETIC_LATER_V2`; retry readback |
+| F3 completed V2 with foreign parent | not consumed; `START_SYNTHETIC_LATER_V2` |
 | Visible vs used | V1 used release-local C2; not all visible C1+C2 |
 | Two worktrees + C3 | one data root; historical A3 C1/C2 evidence bytes unchanged |
 
 Empty-BASE V1 envelope remains CONTROL `FORGE_CONTEXT_PACKET` via
-`consume_start_v1_envelope` (no fake critic). After freeze/finalize, re-run
-`forge-run` to read artifacts. Unknown ACTIVE handler still fail-closes.
+`consume_start_v1_envelope` (no fake critic; challenger tagged
+`ladder_representation_id=NORMALIZED_TRAJECTORY_V1`). Freeze uses
+`ladder_freeze_preflight`, not the CONTROL preflight. After freeze/finalize,
+re-run `forge-run` to read artifacts. Unknown ACTIVE handler still fail-closes.
+Owner readout prints candidate/declined/critic identity from artifacts.
 
 ## What did not change
 

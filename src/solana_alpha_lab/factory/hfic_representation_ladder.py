@@ -500,6 +500,9 @@ def consume_start_v1_envelope(
         cohort_readiness_receipt=cohort_readiness_receipt,
         base_x_population_n=base_x_population_n,
     )
+    if isinstance(challenger, dict):
+        challenger = dict(challenger)
+        challenger[LADDER_REPRESENTATION_PACKET_KEY] = HANDLER_NORMALIZED_TRAJECTORY_V1
     if baseline.context_kind == CONTROL_CONTEXT_KIND_FORGE:
         return {
             "next_action": ACTION_START_V1,
@@ -530,6 +533,63 @@ def consume_start_v1_envelope(
             "representation_search_key_sha256"
         ),
         "probe_executed": False,
+    }
+
+
+def prepare_ladder_freeze_preflight(
+    control_preflight: Mapping[str, Any],
+    *,
+    representation_id: str,
+    control_session_id: str,
+) -> dict[str, Any]:
+    """Copy CONTROL preflight into a freeze receipt that cannot collide with BASE."""
+
+    if representation_id not in {HANDLER_NORMALIZED_TRAJECTORY_V1, HANDLER_SYNTHETIC_LATER_V2}:
+        raise LadderError("LADDER_FREEZE_PREFLIGHT_REPRESENTATION_INVALID")
+    if not isinstance(control_session_id, str) or not control_session_id:
+        raise LadderError("LADDER_FREEZE_PREFLIGHT_CONTROL_REQUIRED")
+    receipt = dict(control_preflight)
+    packet = dict(receipt.get("forge_context_packet") or {})
+    packet[LADDER_REPRESENTATION_PACKET_KEY] = representation_id
+    packet["control_session_id"] = control_session_id
+    packet.pop("evidence_surface_mode", None)
+    packet.pop("visible_cohort_ids", None)
+    packet.pop("bound_visible_cohort_ids", None)
+    packet.pop("used_cohort_ids", None)
+    receipt["forge_context_packet"] = packet
+    receipt["control_session_id"] = control_session_id
+    receipt[LADDER_REPRESENTATION_PACKET_KEY] = representation_id
+    receipt.pop("evidence_surface_mode", None)
+    base_key = str(receipt.get("search_key_sha256") or "")
+    receipt["search_key_sha256"] = hashlib.sha256(
+        f"{base_key}:{representation_id}:{control_session_id}".encode("utf-8")
+    ).hexdigest()
+    receipt.pop("forge_context_packet_sha256", None)
+    return receipt
+
+
+def control_preflight_from_bundle(
+    bundle: Mapping[str, Any], packet: Mapping[str, Any] | None
+) -> dict[str, Any]:
+    receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
+    return {
+        "evidence_epoch_sha256": bundle.get("evidence_epoch_sha256") or receipt.get("evidence_epoch_sha256"),
+        "focus_key_sha256": bundle.get("focus_key_sha256") or receipt.get("focus_key_sha256"),
+        "search_key_sha256": bundle.get("search_key_sha256") or receipt.get("search_key_sha256"),
+        "owner_focus": bundle.get("owner_focus") or receipt.get("owner_focus") or "AUTO",
+        "live_git_head": bundle.get("live_git_head") or receipt.get("live_git_head"),
+        "git_composite_sha256": bundle.get("git_composite_sha256") or receipt.get("git_composite_sha256"),
+        "session_started_at": bundle.get("session_started_at") or receipt.get("session_started_at"),
+        "evidence_surface_mode": (
+            session_evidence_surface_mode(receipt)
+            or session_evidence_surface_mode(bundle)
+            or (session_evidence_surface_mode(packet) if packet else None)
+        ),
+        "forge_context_packet": dict(packet) if isinstance(packet, Mapping) else {},
+        "forge_context_packet_sha256": bundle.get("forge_context_packet_sha256")
+        or receipt.get("forge_context_packet_sha256"),
+        "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256")
+        or receipt.get("memory_eligibility_sha256"),
     }
 
 
@@ -617,7 +677,10 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         )
         selected = stage.get("selected_candidate_id")
         mechanism = stage.get("candidate_mechanism")
-        critic = stage.get("critic_terminal") or stage.get("critic_decisive_reason")
+        declined = stage.get("declined_candidate_ids") or []
+        identity = stage.get("critic_identity")
+        critic_term = stage.get("critic_terminal")
+        critic_reason = stage.get("critic_decisive_reason")
         if selected or mechanism:
             lines.append(
                 "  candidate: {cid} mechanism={mech}".format(
@@ -625,8 +688,25 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                     mech=(mechanism[:80] if isinstance(mechanism, str) else "NONE"),
                 )
             )
+        if declined:
+            lines.append("  declined: " + ", ".join(str(item) for item in declined))
+        elif selected:
+            lines.append("  declined: NONE")
         if selected:
-            lines.append(f"  critic: {critic or 'NONE'}")
+            if not identity and not critic_term:
+                lines.append("  critic: UNKNOWN")
+            else:
+                lines.append(
+                    "  critic: {who} terminal={term} reason={reason}".format(
+                        who=identity or "UNKNOWN",
+                        term=critic_term or "UNKNOWN",
+                        reason=(
+                            critic_reason[:120]
+                            if isinstance(critic_reason, str) and critic_reason
+                            else (critic_term or "UNKNOWN")
+                        ),
+                    )
+                )
         else:
             lines.append("  critic: NOT_RUN_NO_SELECTED_CANDIDATE")
     lines.append(f"next_action: {next_action}{next_note}")
@@ -689,9 +769,14 @@ def _stage_from_session(
         status = EXEC_EXECUTED
     stage_ref = _stage_ref_sha256(bundle)
     draft = bundle.get("draft_sha256") or receipt.get("draft_sha256")
-    critic_terminal = bundle.get("critic_terminal") or receipt.get("critic_terminal") or terminal
+    critic_terminal = bundle.get("critic_terminal") or receipt.get("critic_terminal")
+    if not isinstance(critic_terminal, str):
+        critic_terminal = terminal if isinstance(terminal, str) else None
     selected = bundle.get("selected_candidate_id") or receipt.get("selected_candidate_id")
     mechanism = _candidate_mechanism(bundle)
+    identity = _critic_identity(bundle)
+    declined = _declined_candidate_ids(bundle, selected if isinstance(selected, str) else None)
+    decisive = _critic_decisive_reason(bundle) or critic_terminal
     input_scope = (
         CURRENT_REPRESENTATION_CONTROL_V1
         if representation_id == "BASE" and mode == CURRENT_REPRESENTATION_CONTROL_V1
@@ -712,7 +797,9 @@ def _stage_from_session(
         "draft_sha256": draft if isinstance(draft, str) else None,
         "reason_code": None,
         "critic_terminal": critic_terminal if isinstance(critic_terminal, str) else None,
-        "critic_decisive_reason": critic_terminal if isinstance(critic_terminal, str) else None,
+        "critic_decisive_reason": decisive if isinstance(decisive, str) else None,
+        "critic_identity": identity,
+        "declined_candidate_ids": declined,
         "candidate_mechanism": mechanism,
     }
 
@@ -729,6 +816,48 @@ def _candidate_mechanism(bundle: Mapping[str, Any]) -> str | None:
         if isinstance(value, str) and value.strip():
             return value.strip()
     return None
+
+
+def _critic_identity(bundle: Mapping[str, Any]) -> str | None:
+    receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
+    critic_result = bundle.get("critic_result") if isinstance(bundle.get("critic_result"), Mapping) else {}
+    for source in (critic_result, receipt, bundle):
+        if not isinstance(source, Mapping):
+            continue
+        for key in ("critic_prompt_version", "critic_id"):
+            value = source.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+    return None
+
+
+def _critic_decisive_reason(bundle: Mapping[str, Any]) -> str | None:
+    receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
+    critic_result = bundle.get("critic_result") if isinstance(bundle.get("critic_result"), Mapping) else {}
+    for source in (critic_result, receipt, bundle):
+        if not isinstance(source, Mapping):
+            continue
+        for key in ("decisive_reason", "critic_decisive_reason"):
+            value = source.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+    return None
+
+
+def _declined_candidate_ids(
+    bundle: Mapping[str, Any], selected: str | None
+) -> list[str]:
+    packet = bundle.get("critic_input_packet")
+    if not isinstance(packet, Mapping):
+        return []
+    declined: list[str] = []
+    for card in packet.get("candidates") or []:
+        if not isinstance(card, Mapping):
+            continue
+        cid = card.get("candidate_id")
+        if isinstance(cid, str) and cid and cid != selected:
+            declined.append(cid)
+    return declined
 
 
 def _bound_cohort_ids(
@@ -765,6 +894,10 @@ def _ladder_representation_id(
             return str(rid)
         if source.get("normalized_trajectory_v1"):
             return "NORMALIZED_TRAJECTORY_V1"
+    parent = _parent_control_id(bundle, packet)
+    session_id = str(bundle.get("session_id") or "")
+    if parent and parent != session_id:
+        return "NORMALIZED_TRAJECTORY_V1"
     return "BASE"
 
 
@@ -1127,7 +1260,7 @@ def _discover_ladder_stages(
         matching = [
             row for row in v1_rows
             if _parent_control_id(row[2], _packet_for_bundle(Path(data_root), row[2], store))
-            in {None, control_session_id}
+            == control_session_id
         ]
         if matching:
             picked = pick_session(
@@ -1194,11 +1327,20 @@ def _discover_ladder_stages(
     for rep_id, rows in grouped.items():
         if rep_id in {"BASE", "NORMALIZED_TRAJECTORY_V1"}:
             continue
+        if not control_session_id:
+            continue
+        matching = [
+            row for row in rows
+            if _parent_control_id(row[2], _packet_for_bundle(Path(data_root), row[2], store))
+            == control_session_id
+        ]
+        if not matching:
+            continue
         picked = pick_session(
-            [{"session_id": sid, "session_state": stage.get("session_state")} for sid, stage, _ in rows]
+            [{"session_id": sid, "session_state": stage.get("session_state")} for sid, stage, _ in matching]
         )
         pick_id = str(picked.get("session_id") or "")
-        _, stage, _ = next(item for item in rows if item[0] == pick_id)
+        _, stage, _ = next(item for item in matching if item[0] == pick_id)
         resolved.append(stage)
     return resolved, control_session_id, legacy_epoch if isinstance(legacy_epoch, str) else None
 
@@ -1358,6 +1500,8 @@ def evaluate_forge_run(
                 "critic_terminal": row.get("critic_terminal"),
                 "critic_decisive_reason": row.get("critic_decisive_reason")
                 or row.get("critic_terminal"),
+                "critic_identity": row.get("critic_identity"),
+                "declined_candidate_ids": list(row.get("declined_candidate_ids") or []),
                 "candidate_mechanism": row.get("candidate_mechanism"),
             }
         )

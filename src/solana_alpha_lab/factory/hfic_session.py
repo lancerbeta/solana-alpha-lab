@@ -1133,6 +1133,8 @@ def freeze_draft(
                     preflight_receipt.get("evidence_surface_mode") or ""
                 )
                 or None,
+                ladder_representation_id=_preflight_ladder_slot(preflight_receipt)[0],
+                control_session_id=_preflight_ladder_slot(preflight_receipt)[1],
             )
         bound = bind_preflight_receipt(
             preflight_receipt,
@@ -1408,6 +1410,7 @@ def freeze_draft(
         result,
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
     )
+    _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -1415,6 +1418,9 @@ def freeze_draft(
     if store is not None and repo_root is not None:
         if not epoch or not search_key or not focus_key:
             raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
+        slot_rep, slot_parent = _preflight_ladder_slot(
+            preflight_receipt if isinstance(preflight_receipt, Mapping) else None
+        )
         existing = find_session_by_epoch_focus(
             store,
             epoch,
@@ -1435,6 +1441,8 @@ def freeze_draft(
                 else None
             )
             or None,
+            ladder_representation_id=slot_rep,
+            control_session_id=slot_parent,
         )
         if existing is not None:
             return existing
@@ -1521,6 +1529,8 @@ def _freeze_no_worthy(
                     preflight_receipt.get("evidence_surface_mode") or ""
                 )
                 or None,
+                ladder_representation_id=_preflight_ladder_slot(preflight_receipt)[0],
+                control_session_id=_preflight_ladder_slot(preflight_receipt)[1],
             )
         bound = bind_preflight_receipt(
             preflight_receipt,
@@ -1662,6 +1672,7 @@ def _freeze_no_worthy(
         result,
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
     )
+    _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -2320,6 +2331,8 @@ def persist_frozen_session(
                 "selected_definition_sha256": frozen.get("selected_definition_sha256"),
                 "selected_display_ordinal": frozen.get("selected_display_ordinal"),
                 "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
+                "ladder_representation_id": frozen.get("ladder_representation_id"),
+                "control_session_id": frozen.get("control_session_id"),
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
@@ -2614,12 +2627,103 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
     return list(latest.values())
 
 
+_LADDER_REPRESENTATION_IDS = frozenset(
+    {"NORMALIZED_TRAJECTORY_V1", "SYNTHETIC_LATER_V2"}
+)
+
+
+def _mapping_ladder_slot(source: Mapping[str, Any] | None) -> tuple[str, str | None]:
+    representation = "BASE"
+    parent: str | None = None
+    if not isinstance(source, Mapping):
+        return representation, parent
+    rid = source.get("ladder_representation_id") or source.get("representation_id")
+    if rid in _LADDER_REPRESENTATION_IDS:
+        representation = str(rid)
+    elif source.get("normalized_trajectory_v1"):
+        representation = "NORMALIZED_TRAJECTORY_V1"
+    sid = source.get("control_session_id")
+    if isinstance(sid, str) and sid:
+        parent = sid
+    if representation == "BASE" and parent:
+        representation = "NORMALIZED_TRAJECTORY_V1"
+    return representation, parent
+
+
+def _bundle_ladder_slot(
+    bundle: Mapping[str, Any], packet: Mapping[str, Any] | None = None
+) -> tuple[str, str | None]:
+    embedded = (
+        bundle.get("forge_context_packet")
+        if isinstance(bundle.get("forge_context_packet"), Mapping)
+        else None
+    )
+    receipt = (
+        bundle.get("session_receipt")
+        if isinstance(bundle.get("session_receipt"), Mapping)
+        else None
+    )
+    representation = "BASE"
+    parent: str | None = None
+    for source in (packet, embedded, receipt, bundle):
+        observed_rep, observed_parent = _mapping_ladder_slot(
+            source if isinstance(source, Mapping) else None
+        )
+        if observed_rep != "BASE":
+            representation = observed_rep
+        if observed_parent:
+            parent = observed_parent
+    session_id = str(bundle.get("session_id") or "")
+    if parent == session_id:
+        parent = None
+    return representation, parent
+
+
+def _preflight_ladder_slot(
+    preflight: Mapping[str, Any] | None,
+) -> tuple[str, str | None]:
+    if not isinstance(preflight, Mapping):
+        return "BASE", None
+    packet = (
+        preflight.get("forge_context_packet")
+        if isinstance(preflight.get("forge_context_packet"), Mapping)
+        else None
+    )
+    representation = "BASE"
+    parent: str | None = None
+    for source in (packet, preflight):
+        observed_rep, observed_parent = _mapping_ladder_slot(
+            source if isinstance(source, Mapping) else None
+        )
+        if observed_rep != "BASE":
+            representation = observed_rep
+        if observed_parent:
+            parent = observed_parent
+    return representation, parent
+
+
+def _stamp_ladder_slot(
+    result: dict[str, Any], preflight: Mapping[str, Any] | None
+) -> None:
+    if not isinstance(preflight, Mapping):
+        return
+    representation, parent = _preflight_ladder_slot(preflight)
+    result["ladder_representation_id"] = representation
+    if parent:
+        result["control_session_id"] = parent
+    packet = preflight.get("forge_context_packet")
+    if isinstance(packet, Mapping):
+        result["forge_context_packet"] = dict(packet)
+
+
 def find_session_by_epoch_focus(
     store: Any,
     epoch: str,
     focus_key: str,
     memory_eligibility_sha256: str | None = None,
     evidence_surface_mode: str | None = None,
+    ladder_representation_id: str | None = None,
+    control_session_id: str | None = None,
 ) -> dict[str, Any] | None:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -2631,17 +2735,45 @@ def find_session_by_epoch_focus(
         if evidence_surface_mode
         else None
     )
-    matched = [
-        item
-        for item in list_hfic_sessions(store)
-        if item.get("evidence_epoch_sha256") == epoch
-        and item.get("focus_key_sha256") == focus_key
-        and session_memory_eligibility(item)
-        == session_memory_eligibility(
+    wanted_rep = ladder_representation_id or "BASE"
+    wanted_parent = control_session_id if isinstance(control_session_id, str) and control_session_id else None
+    matched: list[dict[str, Any]] = []
+    for item in list_hfic_sessions(store):
+        if item.get("evidence_epoch_sha256") != epoch:
+            continue
+        if item.get("focus_key_sha256") != focus_key:
+            continue
+        if session_memory_eligibility(item) != session_memory_eligibility(
             {"memory_eligibility_sha256": memory_eligibility_sha256}
-        )
-        and session_evidence_surface_mode(item) == expected_mode
-    ]
+        ):
+            continue
+        if session_evidence_surface_mode(item) != expected_mode:
+            continue
+        bundle = load_session_bundle(store, str(item.get("session_id") or ""))
+        if bundle is None:
+            continue
+        packet = None
+        digest = bundle.get("forge_context_packet_sha256")
+        receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
+        if not isinstance(digest, str):
+            digest = receipt.get("forge_context_packet_sha256") if isinstance(receipt, Mapping) else None
+        if isinstance(digest, str) and len(digest) == 64:
+            from solana_alpha_lab.factory.hfic_preflight import FORGE_CONTEXT_ARTIFACT_DIR
+
+            blob = Path(store._root) / FORGE_CONTEXT_ARTIFACT_DIR / f"{digest}.json"
+            if blob.is_file() and not blob.is_symlink():
+                try:
+                    loaded = json.loads(blob.read_text(encoding="utf-8"))
+                except (OSError, ValueError):
+                    loaded = None
+                if isinstance(loaded, dict):
+                    packet = loaded
+        observed_rep, observed_parent = _bundle_ladder_slot(bundle, packet)
+        if observed_rep != wanted_rep:
+            continue
+        if observed_parent != wanted_parent:
+            continue
+        matched.append(item)
     if not matched:
         return None
     chosen = pick_session(matched)

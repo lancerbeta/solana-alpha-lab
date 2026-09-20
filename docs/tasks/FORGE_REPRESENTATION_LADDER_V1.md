@@ -34,6 +34,7 @@ managed_write_set:
   - configs/hfic_representation_ladder_v1.yaml
   - configs/hypothesis_forge_independent_critic_v1.yaml
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
+  - src/solana_alpha_lab/factory/hfic_session.py
   - catalog/schemas/forge_run_receipt_v1.schema.json
   - tests/test_forge_representation_ladder_v1.py
   - tests/test_hfic_provenance_clock.py

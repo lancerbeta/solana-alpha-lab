@@ -28,6 +28,7 @@ from solana_alpha_lab.factory.document_runner import repository_git_snapshot  # 
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     RUNNER_UP_AWAITING_CRITIC,
+    find_session_by_epoch_focus,
     freeze_draft,
     persist_frozen_session,
     persist_no_worthy_session,
@@ -74,6 +75,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     evaluate_forge_run,
     format_forge_run_owner_readout,
     load_ladder_registry,
+    prepare_ladder_freeze_preflight,
     resolve_next_action,
 )
 
@@ -845,6 +847,10 @@ class DisposableFreezeFinalizeE2ETests(unittest.TestCase):
         )
         self.assertFalse(envelope["probe_executed"])
         self.assertFalse(envelope["fake_critic_packet"])
+        self.assertEqual(
+            envelope["challenger"].get("ladder_representation_id"),
+            "NORMALIZED_TRAJECTORY_V1",
+        )
         self.assertEqual(envelope["control_context_kind"], CONTROL_CONTEXT_KIND_FORGE)
         self.assertIsNone(envelope["critic_input_packet"])
         self.assertIsNone(envelope["lifecycle"])
@@ -1158,8 +1164,25 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 base_x_population_n=10,
             )
             self.assertFalse(envelope["fake_critic_packet"])
+            self.assertEqual(
+                envelope["challenger"].get("ladder_representation_id"),
+                "NORMALIZED_TRAJECTORY_V1",
+            )
             draft = valid_draft()
-            v1_pre = _v1_preflight(data_root, store, control_session_id=str(base["session_id"]))
+            v1_pre = prepare_ladder_freeze_preflight(
+                _control_preflight(data_root, store),
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=str(base["session_id"]),
+            )
+            v1_pre["forge_context_packet"]["visible_cohort_ids"] = ["REL-C2"]
+            v1_pre["forge_context_packet"]["bound_visible_cohort_ids"] = ["REL-C2"]
+            digest = persist_forge_context_packet(
+                data_root,
+                v1_pre["forge_context_packet"],
+                store=store,
+                repo_root=ROOT,
+            )
+            v1_pre["forge_context_packet_sha256"] = digest
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -1216,7 +1239,18 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             store = ResearchStore(data_root)
             base = self._no_worthy_base(data_root, store)
             draft = _distinct_no_worthy_draft(label="V1")
-            v1_pre = _v1_preflight(data_root, store, control_session_id=str(base["session_id"]))
+            v1_pre = prepare_ladder_freeze_preflight(
+                _control_preflight(data_root, store),
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=str(base["session_id"]),
+            )
+            digest = persist_forge_context_packet(
+                data_root,
+                v1_pre["forge_context_packet"],
+                store=store,
+                repo_root=ROOT,
+            )
+            v1_pre["forge_context_packet_sha256"] = digest
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_no_worthy_session(
                 store,
@@ -1295,6 +1329,154 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
         self.assertNotEqual(finished["next_action"], "START_SYNTHETIC_LATER_V2")
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
+
+    def test_f2_epoch_focus_lookup_keeps_base_and_v1_slots_apart(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store)
+            control = _control_preflight(data_root, store)
+            found_base = find_session_by_epoch_focus(
+                store,
+                str(control["evidence_epoch_sha256"]),
+                str(control["focus_key_sha256"]),
+                evidence_surface_mode=str(control["evidence_surface_mode"]),
+                ladder_representation_id="BASE",
+                control_session_id=None,
+            )
+            self.assertIsNotNone(found_base)
+            assert found_base is not None
+            self.assertEqual(found_base["session_id"], base["session_id"])
+            v1_pre = prepare_ladder_freeze_preflight(
+                control,
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=str(base["session_id"]),
+            )
+            digest = persist_forge_context_packet(
+                data_root,
+                v1_pre["forge_context_packet"],
+                store=store,
+                repo_root=ROOT,
+            )
+            v1_pre["forge_context_packet_sha256"] = digest
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            store.rebuild_projection()
+            found_v1 = find_session_by_epoch_focus(
+                store,
+                str(v1_pre["evidence_epoch_sha256"]),
+                str(v1_pre["focus_key_sha256"]),
+                ladder_representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=str(base["session_id"]),
+            )
+            found_base_again = find_session_by_epoch_focus(
+                store,
+                str(control["evidence_epoch_sha256"]),
+                str(control["focus_key_sha256"]),
+                evidence_surface_mode=str(control["evidence_surface_mode"]),
+                ladder_representation_id="BASE",
+                control_session_id=None,
+            )
+        self.assertIsNotNone(found_v1)
+        assert found_v1 is not None
+        self.assertEqual(found_v1["session_id"], frozen["session_id"])
+        self.assertNotEqual(found_v1["session_id"], base["session_id"])
+        self.assertIsNotNone(found_base_again)
+        assert found_base_again is not None
+        self.assertEqual(found_base_again["session_id"], base["session_id"])
+
+    def test_f2_orphan_v1_without_parent_is_not_bound(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            self._no_worthy_base(data_root, store)
+            orphan_pre = _v1_preflight(data_root, store, control_session_id="HFIC-SESS-OTHERCONTROL01")
+            packet = dict(orphan_pre["forge_context_packet"])
+            packet.pop("control_session_id", None)
+            orphan_pre["forge_context_packet"] = packet
+            digest = persist_forge_context_packet(
+                data_root, packet, store=store, repo_root=ROOT
+            )
+            orphan_pre["forge_context_packet_sha256"] = digest
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=orphan_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=False)
+        v1 = next(
+            row
+            for row in started["stages"]
+            if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
+        )
+        self.assertEqual(started["next_action"], ACTION_START_V1)
+        self.assertIsNone(v1["session_id"])
+        self.assertEqual(v1["execution_status"], EXEC_NOT_RUN)
+
+    def test_f3_foreign_parent_v2_is_not_consumed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store)
+            v1_draft = _distinct_no_worthy_draft(label="V1")
+            v1_pre = _v1_preflight(data_root, store, control_session_id=str(base["session_id"]))
+            v1_frozen = freeze_draft(v1_draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_no_worthy_session(
+                store,
+                v1_frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(v1_draft["candidates"]),
+                draft=v1_draft,
+                preflight_receipt=v1_pre,
+            )
+            v2_draft = valid_draft()
+            v2_pre = _v2_preflight(data_root, store, control_session_id="HFIC-SESS-FOREIGNCONTROL1")
+            v2_frozen = freeze_draft(v2_draft, preflight_receipt=v2_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                v2_frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(v2_draft["candidates"]),
+                draft=v2_draft,
+            )
+            packet = v2_frozen["critic_input_packet"]
+            assert isinstance(packet, dict)
+            finalize_session(
+                v2_frozen,
+                critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            store.rebuild_projection()
+            registry = _later_registry()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                finished = evaluate_forge_run(
+                    ROOT, data_root, persist=False, registry=registry
+                )
+        self.assertEqual(finished["next_action"], "START_SYNTHETIC_LATER_V2")
+        self.assertNotEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
 
 
 if __name__ == "__main__":

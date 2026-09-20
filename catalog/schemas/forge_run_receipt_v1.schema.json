@@ -82,6 +82,8 @@
           "reason_code": {"type": ["string", "null"]},
           "critic_terminal": {"type": ["string", "null"]},
           "critic_decisive_reason": {"type": ["string", "null"]},
+          "critic_identity": {"type": ["string", "null"]},
+          "declined_candidate_ids": {"type": "array", "items": {"type": "string"}},
           "candidate_mechanism": {"type": ["string", "null"]}
         }
       }

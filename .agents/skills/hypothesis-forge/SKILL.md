@@ -140,7 +140,11 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      Do **not** run ordinary Prompt A / `START_NEW_SESSION`. Print `owner_readout`
      (`status: NEXT`). Owner pastes nothing. Same slash continues V1 envelope
      construction via `consume_start_v1_envelope` on the CONTROL
-     `FORGE_CONTEXT_PACKET` (no fake critic packet). Freeze/Critic only after a
+     `FORGE_CONTEXT_PACKET` (no fake critic packet). Freeze V1 with
+     `ladder_freeze_preflight` from the `forge-run` JSON, not the CONTROL
+     preflight (same epoch/focus would otherwise reuse BASE). After a generator
+     draft exists, immediately `forge-run --persist --saved-draft-sha256 <hash>`
+     before freeze so retry is `RESUME_V1`. Freeze/Critic only after a
      V1 candidate exists on that envelope (fixture stubs allowed). After
      freeze/finalize, re-run `forge-run` so the aggregate reads the real V1
      session artifacts; do not inject completed stages. That is the production
@@ -351,7 +355,9 @@ creates a `FEAT-*` alias from a motif.
 verified C2 release can build a hash-bound prefix-through-T payload and
 challenger envelope without a fake critic packet. It does not mean the
 representation probe ran, passed, produced alpha, or changed runtime
-deployment. Comparative BASE vs V1 still requires a later atom.
+deployment. This slash does not execute market Prompt A or the scientific
+V1 probe; after `START_V1` it freeze/Critics a V1 candidate with
+`ladder_freeze_preflight`, then re-runs `forge-run`.
 
 ## Post-merge CONTROL reconsideration
 
