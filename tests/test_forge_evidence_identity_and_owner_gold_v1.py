@@ -90,17 +90,6 @@ from tests.test_normalized_trajectory_v1_execution_closure_v1 import (  # noqa: 
 )
 
 
-def _stamp_preflight_split(preflight: dict[str, object], data_root: Path) -> dict[str, object]:
-    split = compute_split_identity(ROOT, data_root)
-    stamped = dict(preflight)
-    stamped["market_evidence_epoch_sha256"] = split["market_evidence_epoch_sha256"]
-    stamped["capability_epoch_sha256"] = split["capability_epoch_sha256"]
-    stamped["legacy_combined_evidence_epoch_sha256"] = split[
-        "legacy_combined_evidence_epoch_sha256"
-    ]
-    return stamped
-
-
 def _enumerate_c3(_data_root: Path):
     live = _enumerate_live(_data_root)[0]
     extra = dict(live[0])
@@ -118,6 +107,17 @@ def _append_c3(data_root: Path) -> None:
     lineage_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
+def _ordinary_stamped_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
+    """Ordinary BASE freeze receipt: production split stamps, no CONTROL surface."""
+
+    pre = dict(_production_control_preflight(data_root, store))
+    pre.pop("evidence_surface_mode", None)
+    packet = dict(pre.get("forge_context_packet") or {})
+    packet.pop("evidence_surface_mode", None)
+    pre["forge_context_packet"] = packet
+    return pre
+
+
 def _no_worthy_base(
     data_root: Path,
     store: ResearchStore,
@@ -125,8 +125,8 @@ def _no_worthy_base(
     production_packet: bool = False,
 ) -> dict[str, object]:
     draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
-    # Stamp under the same live enumerate used by evaluate_forge_run gold paths
-    # so CONTROL admission matches the current market basis.
+    # Stamps come from production CONTROL preflight (compute_split_identity),
+    # not a separate test-only post-hoc stamp injection.
     with patch(
         "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
         side_effect=_enumerate_live,
@@ -136,7 +136,16 @@ def _no_worthy_base(
             if production_packet
             else _control_preflight(data_root, store)
         )
-        preflight = _stamp_preflight_split(preflight, data_root)
+        if not production_packet:
+            split = compute_split_identity(ROOT, data_root)
+            preflight = dict(preflight)
+            preflight["market_evidence_epoch_sha256"] = split[
+                "market_evidence_epoch_sha256"
+            ]
+            preflight["capability_epoch_sha256"] = split["capability_epoch_sha256"]
+            preflight["legacy_combined_evidence_epoch_sha256"] = split[
+                "legacy_combined_evidence_epoch_sha256"
+            ]
     frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
     persist_no_worthy_session(
         store,
@@ -145,6 +154,42 @@ def _no_worthy_base(
         identities=assign_portfolio_ids(draft["candidates"]),
         draft=draft,
         preflight_receipt=preflight,
+    )
+    store.rebuild_projection()
+    return frozen
+
+
+def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, object]:
+    """Ordinary BASE final PASS via freeze→Critic→classify (no CONTROL surface)."""
+
+    from tests.test_fast_lane_classifier import submission
+
+    with patch(
+        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+        side_effect=_enumerate_live,
+    ):
+        preflight = _ordinary_stamped_preflight(data_root, store)
+    draft = valid_draft()
+    frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
+    persist_frozen_session(
+        store,
+        frozen,
+        repo_root=ROOT,
+        identities=assign_portfolio_ids(draft["candidates"]),
+        draft=draft,
+    )
+    packet = frozen["critic_input_packet"]
+    assert isinstance(packet, dict)
+    finalize_session(
+        frozen,
+        critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
+        store=store,
+        repo_root=ROOT,
+    )
+    spec = submission()
+    spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+    apply_classification(
+        frozen, spec, store=store, repo_root=ROOT, data_root=data_root
     )
     store.rebuild_projection()
     return frozen
@@ -280,16 +325,15 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 started = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(started["next_action"], ACTION_START_V1)
             market = started["market_evidence_epoch_sha256"]
-            capability = started["capability_epoch_sha256"]
             run_id = started["run_identity_sha256"]
-            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+            # V1 freeze preflight inherits stamps from CONTROL via
+            # control_preflight_from_bundle — no manual market/capability writes.
+            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
                 data_root,
                 store,
                 control_session_id=str(base["session_id"]),
             )
-            v1_pre = dict(v1_pre)
-            v1_pre["market_evidence_epoch_sha256"] = market
-            v1_pre["capability_epoch_sha256"] = capability
+            self.assertEqual(v1_pre.get("market_evidence_epoch_sha256"), market)
             draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             self.assertEqual(frozen.get("market_evidence_epoch_sha256"), market)
@@ -301,6 +345,19 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 draft=draft,
             )
             store.rebuild_projection()
+            listed_freeze = next(
+                item
+                for item in list_hfic_sessions(store)
+                if item.get("session_id") == frozen["session_id"]
+            )
+            self.assertEqual(listed_freeze.get("market_evidence_epoch_sha256"), market)
+            usage_freeze = epoch_search_budget_usage(
+                list_hfic_sessions(store), evidence_epoch=market
+            )
+            self.assertGreaterEqual(
+                usage_freeze["auto_sessions_used"] + usage_freeze["distinct_focus_used"],
+                1,
+            )
             packet = frozen["critic_input_packet"]
             assert isinstance(packet, dict)
             finalize_session(
@@ -332,17 +389,19 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 data_root=data_root,
             )
             store.rebuild_projection()
+            # Fresh process reader: new ResearchStore over same data_root.
+            store_reloaded = ResearchStore(data_root)
             listed_done = next(
                 item
-                for item in list_hfic_sessions(store)
+                for item in list_hfic_sessions(store_reloaded)
                 if item.get("session_id") == frozen["session_id"]
             )
             self.assertEqual(listed_done.get("market_evidence_epoch_sha256"), market)
-            bundle = load_session_bundle(store, frozen["session_id"])
+            bundle = load_session_bundle(store_reloaded, frozen["session_id"])
             assert bundle is not None
             self.assertEqual(bundle.get("market_evidence_epoch_sha256"), market)
             usage_done = epoch_search_budget_usage(
-                list_hfic_sessions(store), evidence_epoch=market
+                list_hfic_sessions(store_reloaded), evidence_epoch=market
             )
             self.assertGreaterEqual(
                 usage_done["auto_sessions_used"] + usage_done["distinct_focus_used"], 1
@@ -356,10 +415,24 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
             self.assertEqual(finished["run_identity_sha256"], run_id)
             self.assertEqual(finished["market_evidence_epoch_sha256"], market)
+            # Execution binding uses actual representation payload when present.
+            challenger = envelope.get("challenger") if isinstance(envelope, dict) else None
+            payload = None
+            if isinstance(challenger, dict):
+                payload = challenger.get("representation_payload_sha256")
+            self.assertIsInstance(finished.get("execution_binding_sha256"), str)
+            self.assertEqual(len(str(finished["execution_binding_sha256"])), 64)
+            self.assertIsInstance(finished.get("scientific_slot_sha256"), str)
+            if isinstance(payload, str) and len(payload) == 64:
+                # Binding must change if payload were absent (not readiness hash).
+                self.assertNotEqual(
+                    finished["execution_binding_sha256"],
+                    finished.get("input_receipt_sha256"),
+                )
             self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
             self.assertEqual(retry["run_identity_sha256"], run_id)
             self.assertEqual(retry["writes"]["session"], 0)
-            sessions_after = list_hfic_sessions(store)
+            sessions_after = list_hfic_sessions(store_reloaded)
             self.assertTrue(
                 any(item.get("session_id") == frozen["session_id"] for item in sessions_after)
             )
@@ -368,52 +441,37 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             )
 
     def test_f1a_ordinary_pass_then_c3_does_not_reuse_stale_market(self) -> None:
-        """F1a: ordinary PASS on C1+C2 must not answer C1+C2+C3 as REUSED_VALID."""
-
-        from tests.test_fast_lane_classifier import submission
+        """F1a: ordinary BASE PASS on C1+C2 must not answer C1+C2+C3 as REUSED_VALID."""
 
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = _no_worthy_base(data_root, store, production_packet=True)
+            frozen = _ordinary_pass_base(data_root, store)
+            self.assertIsInstance(frozen.get("market_evidence_epoch_sha256"), str)
+            self.assertNotEqual(
+                frozen.get("evidence_surface_mode"),
+                "CURRENT_REPRESENTATION_CONTROL_V1",
+            )
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,
             ):
-                started = evaluate_forge_run(ROOT, data_root, persist=True)
-            market_before = started["market_evidence_epoch_sha256"]
-            v1_pre, _ = _v1_freeze_preflight_from_envelope(
-                data_root,
-                store,
-                control_session_id=str(base["session_id"]),
-            )
-            v1_pre = dict(v1_pre)
-            v1_pre["market_evidence_epoch_sha256"] = market_before
-            v1_pre["capability_epoch_sha256"] = started["capability_epoch_sha256"]
-            draft = valid_draft()
-            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
-            persist_frozen_session(
-                store,
-                frozen,
-                repo_root=ROOT,
-                identities=assign_portfolio_ids(draft["candidates"]),
-                draft=draft,
-            )
-            finalize_session(
-                frozen,
-                critic_result_from_packet_only(
-                    frozen["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                matched = evaluate_forge_run(ROOT, data_root, persist=False)
+            market_before = matched["market_evidence_epoch_sha256"]
+            # Same market: ordinary PASS may be presented as current readback.
+            matched_stage = next(
+                (
+                    stage
+                    for stage in (matched.get("stages") or [])
+                    if isinstance(stage, dict)
+                    and stage.get("session_id") == frozen["session_id"]
                 ),
-                store=store,
-                repo_root=ROOT,
+                None,
             )
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
-            apply_classification(
-                frozen, spec, store=store, repo_root=ROOT, data_root=data_root
-            )
-            store.rebuild_projection()
+            self.assertIsNotNone(matched_stage)
+            assert matched_stage is not None
+            self.assertEqual(matched_stage.get("execution_status"), EXEC_REUSED)
             _append_c3(data_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
@@ -450,11 +508,6 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store,
                 control_session_id=str(base["session_id"]),
             )
-            v1_pre = dict(v1_pre)
-            v1_pre["market_evidence_epoch_sha256"] = started[
-                "market_evidence_epoch_sha256"
-            ]
-            v1_pre["capability_epoch_sha256"] = started["capability_epoch_sha256"]
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_no_worthy_session(
                 store,
@@ -537,11 +590,6 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store,
                 control_session_id=str(base["session_id"]),
             )
-            v1_pre = dict(v1_pre)
-            v1_pre["market_evidence_epoch_sha256"] = started[
-                "market_evidence_epoch_sha256"
-            ]
-            v1_pre["capability_epoch_sha256"] = started["capability_epoch_sha256"]
             draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
@@ -674,11 +722,6 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store,
                 control_session_id=str(base["session_id"]),
             )
-            v1_pre = dict(v1_pre)
-            v1_pre["market_evidence_epoch_sha256"] = started[
-                "market_evidence_epoch_sha256"
-            ]
-            v1_pre["capability_epoch_sha256"] = started["capability_epoch_sha256"]
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_no_worthy_session(
                 store,

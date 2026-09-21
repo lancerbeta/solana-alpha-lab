@@ -818,7 +818,7 @@ def control_preflight_from_bundle(
     bundle: Mapping[str, Any], packet: Mapping[str, Any] | None
 ) -> dict[str, Any]:
     receipt = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
-    return {
+    body = {
         "evidence_epoch_sha256": bundle.get("evidence_epoch_sha256") or receipt.get("evidence_epoch_sha256"),
         "focus_key_sha256": bundle.get("focus_key_sha256") or receipt.get("focus_key_sha256"),
         "search_key_sha256": bundle.get("search_key_sha256") or receipt.get("search_key_sha256"),
@@ -837,6 +837,11 @@ def control_preflight_from_bundle(
         "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256")
         or receipt.get("memory_eligibility_sha256"),
     }
+    for key in ("market_evidence_epoch_sha256", "capability_epoch_sha256"):
+        value = bundle.get(key) or receipt.get(key)
+        if isinstance(value, str) and len(value) == 64:
+            body[key] = value
+    return body
 
 
 def _next_active_after(
@@ -1113,6 +1118,20 @@ def _stage_from_session(
         "stage_ref_sha256": stage_ref,
         "used_cohort_ids": bound,
         "draft_sha256": draft if isinstance(draft, str) else None,
+        "representation_payload_sha256": (
+            str(packet.get("representation_payload_sha256"))
+            if isinstance(packet, Mapping)
+            and isinstance(packet.get("representation_payload_sha256"), str)
+            else (
+                str(bundle.get("representation_payload_sha256"))
+                if isinstance(bundle.get("representation_payload_sha256"), str)
+                else None
+            )
+        ),
+        "critic_input_packet_sha256": bundle.get("critic_input_packet_sha256"),
+        "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256"),
+        "market_evidence_epoch_sha256": bundle.get("market_evidence_epoch_sha256"),
+        "capability_epoch_sha256": bundle.get("capability_epoch_sha256"),
         "reason_code": None,
         "critic_terminal": critic_terminal if isinstance(critic_terminal, str) else None,
         "critic_decisive_reason": decisive if isinstance(decisive, str) else None,
@@ -1557,9 +1576,16 @@ def _discover_ladder_stages(
     chosen: tuple[str, dict[str, Any], Mapping[str, Any]] | None = None
     if preferred_control_session_id:
         for sid, stage, bundle in grouped.get("BASE", []):
-            if sid == preferred_control_session_id:
-                chosen = (sid, stage, bundle)
+            if sid != preferred_control_session_id:
+                continue
+            if not _session_applicable_to_current_market(
+                bundle,
+                current_market_epoch=current_market_epoch,
+                visible=visible,
+            ):
                 break
+            chosen = (sid, stage, bundle)
+            break
         if chosen is None:
             try:
                 preferred_bundle = load_session_bundle(
@@ -1567,7 +1593,11 @@ def _discover_ladder_stages(
                 )
             except Exception:
                 preferred_bundle = None
-            if preferred_bundle is not None:
+            if preferred_bundle is not None and _session_applicable_to_current_market(
+                preferred_bundle,
+                current_market_epoch=current_market_epoch,
+                visible=visible,
+            ):
                 packet = _packet_for_bundle(Path(data_root), preferred_bundle, store)
                 chosen = (
                     preferred_control_session_id,

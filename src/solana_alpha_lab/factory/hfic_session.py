@@ -2657,7 +2657,13 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
             for key, value in fields.items():
                 if not head.get(key):
                     head[key] = value
-            break
+            # Keep scanning: a partial early stamp must not block a later
+            # cycle from filling the missing market/capability key.
+            if all(
+                isinstance(head.get(key), str) and len(str(head.get(key))) == 64
+                for key in ("market_evidence_epoch_sha256", "capability_epoch_sha256")
+            ):
+                break
     return list(latest.values())
 
 

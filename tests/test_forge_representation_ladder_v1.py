@@ -204,10 +204,13 @@ def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict
         return enriched, warnings
 
     git = repository_git_snapshot(ROOT)
+    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+
     with patch(
         "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
         side_effect=_enumerate_production,
     ):
+        split = compute_split_identity(ROOT, data_root)
         packet, digest = build_forge_context_packet(
             ROOT,
             data_root,
@@ -232,6 +235,12 @@ def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict
         "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
         "forge_context_packet_sha256": digest,
         "forge_context_packet": packet,
+        # Same production split axes as run_preflight / forge-input admission.
+        "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
+        "capability_epoch_sha256": split["capability_epoch_sha256"],
+        "legacy_combined_evidence_epoch_sha256": split[
+            "legacy_combined_evidence_epoch_sha256"
+        ],
     }
 
 

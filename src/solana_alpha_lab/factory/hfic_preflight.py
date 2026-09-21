@@ -1891,6 +1891,10 @@ def _forge_input_requires_preflight_stop(
 
     if forge_input.get("forge_runnable"):
         return False
+    codes = [str(item) for item in (forge_input.get("blocking_reason_codes") or [])]
+    # Incomplete market is a shared admission stop for ordinary and CONTROL.
+    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
+        return True
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         return True
     return str(forge_input.get("owner_class") or "") == OWNER_CLASS_OBSERVABILITY_BLOCKED
@@ -1912,6 +1916,8 @@ def _forge_input_stop_terminal(
     codes = list(forge_input.get("blocking_reason_codes") or [])
     if FORGE_VISION_INTEGRITY_BLOCKED in codes:
         return FORGE_VISION_INTEGRITY_BLOCKED
+    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
+        return "MARKET_EVIDENCE_BASIS_INCOMPLETE"
     terminal = str(codes[0] if codes else CURRENT_CORPUS_MISSING)
     if (
         control_mode == CURRENT_REPRESENTATION_CONTROL_V1
