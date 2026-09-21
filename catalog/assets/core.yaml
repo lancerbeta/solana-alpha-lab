@@ -31918,7 +31918,7 @@ records:
   as_of: '2026-08-25'
   truth_owner: HYPOTHESIS_FAST_LANE_AND_RESEARCH_DATA_PLANE_V1
   location: {kind: git_path, logical_uri: 'repo://schemas/research_memory_projection_v1.sql', repository_path: schemas/research_memory_projection_v1.sql}
-  integrity: {kind: sha256, sha256: c39ee0d8fc725c73e4b91896bb16b95b8f85fc2ffb38d3fd91bcf51a1ffbc866}
+  integrity: {kind: sha256, sha256: 7f9f62078d639e0c4f9b9c5b4d0f686961c6ba72a70ce5664fb1cfde6b6d09d1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FAST-LANE-001}
@@ -36694,7 +36694,7 @@ records:
   as_of: '2026-09-09'
   truth_owner: HFIC_OPERATIONAL_MEMORY_QUARANTINE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_operational_memory_quarantine_v1.py', repository_path: tests/test_hfic_operational_memory_quarantine_v1.py}
-  integrity: {kind: sha256, sha256: a1b99dea91face16b3a1c8cbb48b159723b7e83fb4e6c6b717c707c051689ec5}
+  integrity: {kind: sha256, sha256: 709b4c45898b7e67c3b2fdee2c9a27b47a3fab068bc4a6c2f00eb1c0e335fa8a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-OPERATIONAL-MEMORY-QUARANTINE-001}

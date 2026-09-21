@@ -37,6 +37,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/forge_input_receipt.py
   - src/solana_alpha_lab/factory/hfic_memory_policy.py
   - src/solana_alpha_lab/factory/fast_lane_snapshot.py
+  - schemas/research_memory_projection_v1.sql
   - configs/hypothesis_forge_independent_critic_v1.yaml
   - configs/hfic_representation_ladder_v1.yaml
   - catalog/schemas/forge_run_receipt_v1.schema.json
@@ -49,6 +50,8 @@ managed_write_set:
   - tests/test_forge_representation_ladder_v1.py
   - tests/test_hfic_preflight.py
   - tests/test_hfic_session.py
+  - tests/test_hfic_search_budget_epoch_guard_v1.py
+  - tests/test_hfic_operational_memory_quarantine_v1.py
   - tests/test_forge_input_truth_and_visibility_v1.py
   - scripts/hypothesis_forge.py
   - .agents/skills/hypothesis-forge/SKILL.md

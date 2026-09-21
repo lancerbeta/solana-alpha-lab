@@ -301,6 +301,10 @@ scored AS (
         END AS session_state,
         json_extract_string(cycle.payload_json, '$.evidence_epoch_sha256')
             AS evidence_epoch_sha256,
+        json_extract_string(cycle.payload_json, '$.market_evidence_epoch_sha256')
+            AS market_evidence_epoch_sha256,
+        json_extract_string(cycle.payload_json, '$.capability_epoch_sha256')
+            AS capability_epoch_sha256,
         json_extract_string(cycle.payload_json, '$.focus_key_sha256')
             AS focus_key_sha256,
         json_extract_string(cycle.payload_json, '$.search_key_sha256')
@@ -371,6 +375,8 @@ SELECT
     session_id,
     session_state,
     evidence_epoch_sha256,
+    market_evidence_epoch_sha256,
+    capability_epoch_sha256,
     focus_key_sha256,
     search_key_sha256,
     memory_eligibility_sha256,

@@ -357,6 +357,8 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                     session_id,
                     session_state,
                     evidence_epoch_sha256,
+                    market_evidence_epoch_sha256,
+                    capability_epoch_sha256,
                     focus_key_sha256,
                     search_key_sha256,
                     prompt_version,
@@ -376,11 +378,13 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                 "session_id": row[0],
                 "session_state": row[1],
                 "evidence_epoch_sha256": row[2],
-                "focus_key_sha256": row[3],
-                "search_key_sha256": row[4],
-                "prompt_version": row[5],
-                "owner_focus": row[6],
-                "memory_eligibility_sha256": row[7],
+                "market_evidence_epoch_sha256": row[3],
+                "capability_epoch_sha256": row[4],
+                "focus_key_sha256": row[5],
+                "search_key_sha256": row[6],
+                "prompt_version": row[7],
+                "owner_focus": row[8],
+                "memory_eligibility_sha256": row[9],
             }
         )
     return sessions

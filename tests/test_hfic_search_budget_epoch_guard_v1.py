@@ -35,6 +35,8 @@ def _session(
         "session_id": session_id,
         "session_state": state,
         "evidence_epoch_sha256": epoch,
+        # A5 budget is stamp-only on market_evidence_epoch_sha256.
+        "market_evidence_epoch_sha256": epoch,
         "owner_focus": owner_focus,
         "focus_key_sha256": focus_key,
         "search_key_sha256": search_key_sha256(
