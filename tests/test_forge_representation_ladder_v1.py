@@ -15,6 +15,7 @@ import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
 from collections.abc import Mapping
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -43,6 +44,14 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_representation_probe import (  # noqa: E402
     CONTROL_CONTEXT_KIND_FORGE,
     control_baseline_from_receipt,
+    control_memory_baseline_sha256,
+)
+from solana_alpha_lab.factory.normalized_trajectory_v1 import (  # noqa: E402
+    DEFAULT_SCHEDULE,
+    LifecycleCorpusBinding,
+    LifecycleSchedule,
+    TypedLifecycleObservation,
+    project_normalized_trajectory,
 )
 from solana_alpha_lab.factory.forge_input_receipt import (  # noqa: E402
     OWNER_CLASS_INPUT_NOT_READY,
@@ -222,6 +231,115 @@ def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict
     }
 
 
+def _rel_c2_corpus_binding() -> LifecycleCorpusBinding:
+    """Release-local V1 binding: same schedule geometry, cohort REL-C2 only."""
+
+    base = DEFAULT_SCHEDULE.corpus_binding
+    assert base is not None
+    values = base.as_dict()
+    return LifecycleCorpusBinding(
+        release_id=values["release_id"],
+        cohort_id="REL-C2",
+        schedule_sha256=values["schedule_sha256"],
+        activation_id=values["activation_id"],
+        producer_git_sha=values["producer_git_sha"],
+        source_sha256=values["source_sha256"],
+        census_sha256=values["census_sha256"],
+        observations_sha256=values["observations_sha256"],
+    )
+
+
+def _representation_fixture_rel_c2():
+    binding = _rel_c2_corpus_binding()
+    schedule = LifecycleSchedule(
+        schedule_sha256=binding.schedule_sha256,
+        activation_id=binding.activation_id,
+        corpus_binding=binding,
+    )
+    anchor = datetime(2026, 1, 1, tzinfo=UTC)
+    rows: list[TypedLifecycleObservation] = []
+    for index in range(10):
+        member = f"synthetic-{index}"
+        for field, values in (
+            ("FIELD-USD-PRICE-001", (1.0, 2.0, 3.0)),
+            ("FIELD-LIQUIDITY-USD-001", (1000.0, 1000.0, 1000.0)),
+            ("FIELD-STATS5M-NUM-TRADERS-001", (1.0, 1.0, 1.0)),
+        ):
+            for due, value in zip(schedule.prefix_due_offsets, values, strict=True):
+                rows.append(
+                    TypedLifecycleObservation(
+                        member_id=member,
+                        member_anchor_at=anchor,
+                        due_offset_seconds=due,
+                        field_id=field,
+                        value=value,
+                        first_reliable_available_at=anchor + timedelta(seconds=due),
+                        schedule_sha256=schedule.schedule_sha256,
+                        activation_id=schedule.activation_id,
+                    )
+                )
+    return project_normalized_trajectory(rows, schedule=schedule)
+
+
+def _cohort_readiness_receipt_rel_c2(**kwargs: object) -> dict[str, object]:
+    from solana_alpha_lab.factory.hfic_representation_probe import (
+        cohort_readiness_receipt_from_release_manifest,
+    )
+
+    receipt = _cohort_readiness_receipt(**kwargs)
+    manifest = dict(receipt["release_manifest"])
+    binding = _rel_c2_corpus_binding().as_dict()
+    for key, value in binding.items():
+        manifest[key] = value
+    return cohort_readiness_receipt_from_release_manifest(manifest)
+
+
+def _forge_control_receipt_from_preflight(
+    preflight: Mapping[str, object],
+    *,
+    session_id: str,
+    terminal: str = "NO_WORTHY_HYPOTHESIS",
+) -> dict[str, object]:
+    """Probe-compatible CONTROL receipt bound to the exact freeze preflight packet."""
+
+    packet = dict(preflight.get("forge_context_packet") or {})
+    digest = preflight.get("forge_context_packet_sha256")
+    if not isinstance(digest, str) or len(digest) != 64:
+        digest = canonical_sha256(packet)
+    session_receipt: dict[str, object] = {
+        "session_id": session_id,
+        "session_state": "SYNTHESIS_COMPLETE",
+        "evidence_epoch_sha256": preflight.get("evidence_epoch_sha256"),
+        "focus_key_sha256": preflight.get("focus_key_sha256"),
+        "search_key_sha256": preflight.get("search_key_sha256"),
+        "prompt_version": "HFIC-V1.2",
+        "critic_input_packet_sha256": None,
+        "forge_context_packet_sha256": digest,
+        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+        "final_session_terminal": terminal,
+        "critic_terminal": terminal,
+        "effective_control_terminal": terminal,
+    }
+    receipt: dict[str, object] = {
+        "session_id": session_id,
+        "critic_input_packet": None,
+        "critic_input_packet_sha256": None,
+        "forge_context_packet": packet,
+        "forge_context_packet_sha256": digest,
+        "evidence_epoch_sha256": preflight.get("evidence_epoch_sha256"),
+        "focus_key_sha256": preflight.get("focus_key_sha256"),
+        "search_key_sha256": preflight.get("search_key_sha256"),
+        "prompt_version": "HFIC-V1.2",
+        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+        "final_session_terminal": terminal,
+        "critic_terminal": terminal,
+        "effective_control_terminal": terminal,
+        "session_receipt": session_receipt,
+    }
+    receipt["memory_baseline_sha256"] = control_memory_baseline_sha256(receipt)
+    return receipt
+
+
 def _v1_freeze_preflight_from_envelope(
     data_root: Path,
     store: ResearchStore,
@@ -229,28 +347,49 @@ def _v1_freeze_preflight_from_envelope(
     control_session_id: str,
     control_preflight: Mapping[str, object] | None = None,
 ) -> tuple[dict[str, object], dict[str, object]]:
-    """Envelope → representation-aware freeze preflight (G2 path)."""
+    """Envelope → representation-aware freeze preflight (production binding path).
 
-    control = control_preflight or _control_preflight(data_root, store)
+    Builds the challenger from the same CONTROL packet used for freeze. Does not
+    patch parent or used scope after build.
+    """
+
+    if control_preflight is None:
+        bundle = load_session_bundle(store, control_session_id)
+        if bundle is not None:
+            packet_loaded = _packet_for_bundle(data_root, bundle, store)
+            control = control_preflight_from_bundle(bundle, packet_loaded)
+        else:
+            # Disposable orphan-parent probes may name a non-persisted CONTROL id.
+            control = _control_preflight(data_root, store)
+    else:
+        control = dict(control_preflight)
+    control_receipt = _forge_control_receipt_from_preflight(
+        control, session_id=control_session_id
+    )
+    representation = _representation_fixture_rel_c2()
+    readiness = _cohort_readiness_receipt_rel_c2()
     envelope = consume_start_v1_envelope(
         {"next_action": ACTION_START_V1, "owner_final": None},
-        control_receipt=_no_worthy_forge_receipt(),
-        representation=_representation_fixture(),
-        cohort_readiness_receipt=_cohort_readiness_receipt(),
+        control_receipt=control_receipt,
+        representation=representation,
+        cohort_readiness_receipt=readiness,
         base_x_population_n=10,
     )
-    challenger = dict(envelope["challenger"])
-    challenger["control_session_id"] = control_session_id
+    challenger = envelope["challenger"]
+    assert isinstance(challenger, Mapping)
+    parent = str(envelope.get("control_session_id") or challenger.get("control_session_id"))
+    assert parent == control_session_id
     v1_pre = prepare_ladder_freeze_preflight(
         control,
         representation_id="NORMALIZED_TRAJECTORY_V1",
-        control_session_id=control_session_id,
+        control_session_id=parent,
         challenger=challenger,
+        control_receipt=control_receipt,
     )
-    # Release-local used scope for V1 (CONTROL bound may be wider).
     packet = v1_pre["forge_context_packet"]
     assert isinstance(packet, dict)
-    packet["bound_visible_cohort_ids"] = ["REL-C2"]
+    # Production embed owns release-local scope; do not assign after build.
+    assert packet.get("bound_visible_cohort_ids") == ["REL-C2"]
     digest = persist_forge_context_packet(
         data_root, packet, store=store, repo_root=ROOT
     )
@@ -1045,9 +1184,10 @@ class DisposableFreezeFinalizeE2ETests(unittest.TestCase):
         self.assertFalse(envelope["probe_executed"])
         self.assertFalse(envelope["fake_critic_packet"])
         self.assertEqual(
-            envelope["challenger"].get("ladder_representation_id"),
+            envelope.get("ladder_representation_id"),
             "NORMALIZED_TRAJECTORY_V1",
         )
+        self.assertNotIn("ladder_representation_id", envelope["challenger"])
         self.assertEqual(envelope["control_context_kind"], CONTROL_CONTEXT_KIND_FORGE)
         self.assertIsNone(envelope["critic_input_packet"])
         self.assertIsNone(envelope["lifecycle"])
@@ -1076,6 +1216,82 @@ class DisposableFreezeFinalizeE2ETests(unittest.TestCase):
                 cohort_readiness_receipt=readiness,
                 base_x_population_n=10,
             )
+
+    def test_b1_selected_control_envelope_keeps_marker_outside_challenger(self) -> None:
+        """Selected CONTROL must not inject ladder_representation_id into frozen challenger."""
+
+        envelope = consume_start_v1_envelope(
+            {"next_action": ACTION_START_V1, "owner_final": None},
+            control_receipt=_control_receipt(),
+            representation=_representation_fixture(),
+            cohort_readiness_receipt=_cohort_readiness_receipt(),
+            base_x_population_n=10,
+        )
+        self.assertEqual(envelope.get("ladder_representation_id"), "NORMALIZED_TRAJECTORY_V1")
+        challenger = envelope["challenger"]
+        assert isinstance(challenger, dict)
+        self.assertNotIn("ladder_representation_id", challenger)
+        # Downstream scientific validator accepts the exact challenger bytes.
+        existing_hfic_lifecycle_fixture_input(
+            challenger,
+            control_receipt=_control_receipt(),
+            cohort_readiness_receipt=_cohort_readiness_receipt(),
+            base_x_population_n=10,
+        )
+
+    def test_b2_payload_and_parent_tamper_rejected_before_freeze(self) -> None:
+        control = _no_worthy_forge_receipt()
+        envelope = consume_start_v1_envelope(
+            {"next_action": ACTION_START_V1, "owner_final": None},
+            control_receipt=control,
+            representation=_representation_fixture_rel_c2(),
+            cohort_readiness_receipt=_cohort_readiness_receipt_rel_c2(),
+            base_x_population_n=10,
+        )
+        challenger = dict(envelope["challenger"])
+        parent = str(challenger["control_session_id"])
+        preflight = {
+            "evidence_epoch_sha256": control["evidence_epoch_sha256"],
+            "focus_key_sha256": control["focus_key_sha256"],
+            "search_key_sha256": control["search_key_sha256"],
+            "owner_focus": "AUTO",
+            "live_git_head": "0" * 40,
+            "forge_context_packet": dict(control["forge_context_packet"]),
+            "forge_context_packet_sha256": control["forge_context_packet_sha256"],
+            "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+        }
+        # Payload bytes changed, hashes left intact → scientific reject.
+        tampered = dict(challenger)
+        payload = dict(tampered["normalized_trajectory_v1"])
+        payload["eligible_member_count"] = int(payload.get("eligible_member_count") or 0) + 1
+        tampered["normalized_trajectory_v1"] = payload
+        with self.assertRaises(LadderError) as payload_exc:
+            prepare_ladder_freeze_preflight(
+                preflight,
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=parent,
+                challenger=tampered,
+                control_receipt=control,
+            )
+        self.assertIn("LADDER_FREEZE_CHALLENGER_INVALID", str(payload_exc.exception))
+        # Parent string rewritten without matching CONTROL receipt → reject.
+        foreign = dict(challenger)
+        foreign["control_session_id"] = "HFIC-SESS-FOREIGN-PARENT"
+        with self.assertRaises(LadderError) as parent_exc:
+            prepare_ladder_freeze_preflight(
+                preflight,
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id="HFIC-SESS-FOREIGN-PARENT",
+                challenger=foreign,
+                control_receipt=control,
+            )
+        msg = str(parent_exc.exception)
+        self.assertTrue(
+            "PARENT_MISMATCH" in msg
+            or "CONTROL_UNBOUND" in msg
+            or "LADDER_FREEZE_CHALLENGER_INVALID" in msg,
+            msg,
+        )
 
     def test_v1_challenger_envelope_reaches_existing_hfic_lifecycle(self) -> None:
         control = _control_receipt()
@@ -1736,6 +1952,15 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             assert isinstance(packet_out, dict)
             self.assertIsNotNone(packet_out.get("selected_candidate"))
             self.assertEqual(
+                packet_out.get("ladder_representation_id"),
+                "NORMALIZED_TRAJECTORY_V1",
+            )
+            self.assertIn("normalized_trajectory_v1", packet_out)
+            self.assertEqual(
+                packet_out.get("representation_payload_sha256"),
+                envelope["challenger"].get("representation_payload_sha256"),
+            )
+            self.assertEqual(
                 frozen["forge_context_packet"].get("ladder_representation_id"),
                 "NORMALIZED_TRAJECTORY_V1",
             )
@@ -1871,6 +2096,16 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                     challenger=None,
                 )
         self.assertEqual(str(raised.exception), "LADDER_FREEZE_CHALLENGER_REQUIRED")
+        with self.assertRaises(LadderError) as receipt_exc:
+            prepare_ladder_freeze_preflight(
+                control,
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                control_session_id=str(base["session_id"]),
+                challenger={"control_session_id": str(base["session_id"])},
+            )
+        self.assertEqual(
+            str(receipt_exc.exception), "LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED"
+        )
 
     def test_g4_classify_after_store_reload_keeps_ladder_slot(self) -> None:
         """PASS_TO_CLASSIFICATION intermediate must stamp slot before classify reload."""

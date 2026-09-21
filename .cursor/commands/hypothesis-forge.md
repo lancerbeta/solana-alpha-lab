@@ -80,9 +80,13 @@ Then resolve the bounded run. Print `owner_readout` first (`status:` DONE / NEXT
 Owner pastes nothing. Same slash continues the V1 envelope via
 `consume_start_v1_envelope` on CONTROL `FORGE_CONTEXT_PACKET` (no fake critic).
 Freeze V1 only after `consume_start_v1_envelope` supplies the challenger:
-embed it via `prepare_ladder_freeze_preflight(..., challenger=...)` (marker/
-parent alone are insufficient; bare `forge-run` may leave
-`ladder_freeze_pending_reason`). After a draft, `forge-run --persist
+keep `ladder_representation_id` on the envelope only (never inject into the
+frozen challenger). Embed via
+`prepare_ladder_freeze_preflight(..., challenger=..., control_receipt=...)`
+(marker/parent alone are insufficient; freeze revalidates payload/CONTROL
+hashes and sets used scope from `corpus_binding.cohort_id`; compact V1 fields
+stamp onto Critic input). Bare `forge-run` may leave
+`ladder_freeze_pending_reason`. After a draft, `forge-run --persist
 --saved-draft-sha256`. Freeze/Critic only after a V1 candidate exists
 (fixture stubs allowed). `PASS_TO_CLASSIFICATION` → classify then finalize
 (`RESUME_V1`, not owner-final); then re-run `forge-run` to read real V1

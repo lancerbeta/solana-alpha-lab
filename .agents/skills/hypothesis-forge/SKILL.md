@@ -140,10 +140,14 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      Do **not** run ordinary Prompt A / `START_NEW_SESSION`. Print `owner_readout`
      (`status: NEXT`). Owner pastes nothing. Same slash continues V1 envelope
      construction via `consume_start_v1_envelope` on the CONTROL
-     `FORGE_CONTEXT_PACKET` (no fake critic packet). Marker/parent alone do
+     `FORGE_CONTEXT_PACKET` (no fake critic packet). Keep
+     `ladder_representation_id` on the envelope only — never inject it into
+     the frozen challenger schema. Marker/parent alone do
      **not** authorize freeze: embed the envelope `challenger` into
-     `prepare_ladder_freeze_preflight(..., challenger=...)` (or re-attach
-     after envelope). A bare `forge-run` may leave
+     `prepare_ladder_freeze_preflight(..., challenger=..., control_receipt=...)`
+     (or re-attach after envelope); production revalidates payload/CONTROL hashes
+     and sets used scope from representation `corpus_binding.cohort_id`. Compact V1
+     fields are stamped onto Critic input. A bare `forge-run` may leave
      `ladder_freeze_pending_reason=LADDER_FREEZE_CHALLENGER_REQUIRED` until
      the envelope supplies payload hashes. Do **not** freeze from a CONTROL
      packet copy with only a V1 marker. After a generator draft exists,

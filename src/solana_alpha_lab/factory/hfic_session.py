@@ -1185,6 +1185,18 @@ def freeze_draft(
         ),
         "non_claims": draft.get("non_claims") or ["NO_ALPHA"],
     }
+    if isinstance(preflight_receipt, Mapping):
+        forge_packet = preflight_receipt.get("forge_context_packet")
+        if (
+            isinstance(forge_packet, Mapping)
+            and forge_packet.get("ladder_representation_id")
+            == "NORMALIZED_TRAJECTORY_V1"
+        ):
+            from solana_alpha_lab.factory.hfic_representation_ladder import (
+                stamp_verified_v1_fields_onto_mapping,
+            )
+
+            stamp_verified_v1_fields_onto_mapping(packet, forge_packet)
     owner_focus = str(draft.get("owner_focus") or "AUTO")
     epoch = ""
     focus_key = ""
@@ -2702,6 +2714,7 @@ def _bound_from_ladder_challenger_preflight(
 
     Marker + parent alone are insufficient for V1: require verified
     representation payload hashes embedded on the forge_context_packet.
+    Reuses scientific challenger revalidation when the envelope is present.
     """
 
     packet = preflight.get("forge_context_packet")
@@ -2709,20 +2722,53 @@ def _bound_from_ladder_challenger_preflight(
         raise HficSessionError("FORGE_CONTEXT_REQUIRED")
     representation, parent = _preflight_ladder_slot(preflight)
     if representation == "NORMALIZED_TRAJECTORY_V1":
-        payload = packet.get("normalized_trajectory_v1")
-        payload_sha = packet.get("representation_payload_sha256")
-        search_key = packet.get("representation_search_key_sha256")
-        if not isinstance(payload, Mapping) or not payload:
-            raise HficSessionError("LADDER_CHALLENGER_PAYLOAD_REQUIRED")
-        if not isinstance(payload_sha, str) or len(payload_sha) != 64:
-            raise HficSessionError("LADDER_CHALLENGER_PAYLOAD_HASH_REQUIRED")
-        if not isinstance(search_key, str) or len(search_key) != 64:
-            raise HficSessionError("LADDER_CHALLENGER_SEARCH_KEY_REQUIRED")
-        if not parent:
-            raise HficSessionError("LADDER_CHALLENGER_PARENT_REQUIRED")
-        if packet.get("control_session_id") not in (None, "", parent):
-            if packet.get("control_session_id") != parent:
+        from solana_alpha_lab.factory.hfic_representation_probe import (
+            RepresentationProbeError,
+            _validate_challenger_packet,
+        )
+
+        challenger = preflight.get("ladder_challenger_packet")
+        if isinstance(challenger, Mapping) and challenger:
+            try:
+                validated, rep = _validate_challenger_packet(challenger)
+            except RepresentationProbeError as exc:
+                raise HficSessionError(
+                    f"LADDER_CHALLENGER_INVALID:{exc}"
+                ) from exc
+            if parent and validated.get("control_session_id") != parent:
                 raise HficSessionError("LADDER_CHALLENGER_PARENT_MISMATCH")
+            for key in (
+                "normalized_trajectory_v1",
+                "representation_payload_sha256",
+                "representation_search_key_sha256",
+            ):
+                if packet.get(key) != validated.get(key):
+                    raise HficSessionError("LADDER_CHALLENGER_PACKET_DRIFT")
+            corpus = rep.get("corpus_binding") if isinstance(rep, Mapping) else None
+            cohort = (
+                corpus.get("cohort_id")
+                if isinstance(corpus, Mapping)
+                else None
+            )
+            bound_ids = packet.get("bound_visible_cohort_ids")
+            if isinstance(cohort, str) and cohort.strip():
+                if bound_ids != [cohort.strip()]:
+                    raise HficSessionError("LADDER_CHALLENGER_SCOPE_DRIFT")
+        else:
+            payload = packet.get("normalized_trajectory_v1")
+            payload_sha = packet.get("representation_payload_sha256")
+            search_key = packet.get("representation_search_key_sha256")
+            if not isinstance(payload, Mapping) or not payload:
+                raise HficSessionError("LADDER_CHALLENGER_PAYLOAD_REQUIRED")
+            if not isinstance(payload_sha, str) or len(payload_sha) != 64:
+                raise HficSessionError("LADDER_CHALLENGER_PAYLOAD_HASH_REQUIRED")
+            if not isinstance(search_key, str) or len(search_key) != 64:
+                raise HficSessionError("LADDER_CHALLENGER_SEARCH_KEY_REQUIRED")
+            if not parent:
+                raise HficSessionError("LADDER_CHALLENGER_PARENT_REQUIRED")
+            if packet.get("control_session_id") not in (None, "", parent):
+                if packet.get("control_session_id") != parent:
+                    raise HficSessionError("LADDER_CHALLENGER_PARENT_MISMATCH")
     epoch = str(preflight.get("evidence_epoch_sha256") or "")
     focus_key = str(preflight.get("focus_key_sha256") or "")
     search_key_bound = str(preflight.get("search_key_sha256") or "")

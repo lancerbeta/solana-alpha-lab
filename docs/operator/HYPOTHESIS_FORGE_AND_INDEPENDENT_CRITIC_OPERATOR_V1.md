@@ -379,12 +379,14 @@ effective CONTROL `NO_WORTHY`; do not treat Prompt C WAIT as the search final.
 `KEEP_PAUSE` is a typed pause (`status: NEXT`); print readout and stop — do not
 start V1. `--persist` writes `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT` (named in readout
 `persisted`, not a path). `START_V1` freeze requires the envelope `challenger`
-embedded via `prepare_ladder_freeze_preflight(..., challenger=...)` (or
-re-attach after `consume_start_v1_envelope`). Marker/parent alone are not
-enough; bare `forge-run` may leave `ladder_freeze_pending_reason` until the
-envelope supplies payload hashes. After a draft, persist
-`--saved-draft-sha256` before freeze. `PASS_TO_CLASSIFICATION` stays
-`RESUME_V1` until network-free classify + finalize.
+embedded via `prepare_ladder_freeze_preflight(..., challenger=..., control_receipt=...)`
+(or re-attach after `consume_start_v1_envelope`). The ladder marker stays outside
+the frozen challenger; freeze revalidates payload/CONTROL hashes scientifically
+and sets used scope from representation `corpus_binding.cohort_id`. Compact V1
+fields are copied onto Critic input. Marker/parent alone are not enough; bare
+`forge-run` may leave `ladder_freeze_pending_reason` until the envelope supplies
+payload hashes. After a draft, persist `--saved-draft-sha256` before freeze.
+`PASS_TO_CLASSIFICATION` stays `RESUME_V1` until network-free classify + finalize.
 
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO

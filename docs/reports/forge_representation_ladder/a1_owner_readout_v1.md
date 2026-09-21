@@ -72,12 +72,14 @@ resolver, persist/readback, and owner rendering are real:
 | KEEP_PAUSE | typed pause: `owner_final` null, `FORGE_RUN_IN_PROGRESS`; not evening DONE; persist does not lock completed readback |
 | Two worktrees + C3 | one data root; historical A3 C1/C2 evidence bytes unchanged |
 
-Empty-BASE V1 envelope remains CONTROL `FORGE_CONTEXT_PACKET` via
-`consume_start_v1_envelope` (no fake critic; challenger tagged
-`ladder_representation_id=NORMALIZED_TRAJECTORY_V1` with payload hashes).
-Freeze requires that challenger embedded into
-`prepare_ladder_freeze_preflight(..., challenger=...)` — marker/parent alone
-are insufficient. `PASS_TO_CLASSIFICATION` is `RESUME_V1` until network-free
+Empty-BASE and selected-CONTROL V1 envelopes use
+`consume_start_v1_envelope`: orchestration marker
+`ladder_representation_id` stays outside the frozen challenger schema.
+Freeze revalidates via scientific `_validate_challenger_packet` /
+CONTROL bind checks; used scope is release-local
+`corpus_binding.cohort_id` (not inherited BASE C1+C2). Compact V1 fields
+are stamped onto the Critic input packet. Marker/parent alone remain
+insufficient. `PASS_TO_CLASSIFICATION` is `RESUME_V1` until network-free
 classify + finalize. Ordinary BASE without CONTROL surface is
 `START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`), not evening DONE.
 Unknown ACTIVE handler still fail-closes.
@@ -96,6 +98,6 @@ across later Git changes is A5.
 
 Named consumer after merge/readback: A5 identity/provenance + owner gold.
 `CAPABILITY_RADAR_NOW=NONE`. STOP before owner merge phrase.
-A4P2 closes PR #328 review R1–R3 on this candidate (writer/reader CONTROL
-surface, challenger-gated V1 freeze, PASS_TO_CLASSIFICATION intermediate,
-KEEP_PAUSE non-final). Do not merge prior head `d17d8b23…` alone.
+A4P3 closes PR #328 review B1/B2 on adapter boundary (marker outside
+envelope; scientific revalidation; Critic compact fields; no post-build
+parent/scope patch). Do not merge prior head `9a9bf1c8…` alone.

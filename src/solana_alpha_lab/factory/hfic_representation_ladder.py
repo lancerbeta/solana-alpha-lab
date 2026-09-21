@@ -521,14 +521,13 @@ def consume_start_v1_envelope(
         cohort_readiness_receipt=cohort_readiness_receipt,
         base_x_population_n=base_x_population_n,
     )
-    if isinstance(challenger, dict):
-        challenger = dict(challenger)
-        challenger[LADDER_REPRESENTATION_PACKET_KEY] = HANDLER_NORMALIZED_TRAJECTORY_V1
+    # Orchestration marker stays outside the frozen challenger bytes/schema.
     if baseline.context_kind == CONTROL_CONTEXT_KIND_FORGE:
         return {
             "next_action": ACTION_START_V1,
             "control_context_kind": CONTROL_CONTEXT_KIND_FORGE,
             "challenger": challenger,
+            LADDER_REPRESENTATION_PACKET_KEY: HANDLER_NORMALIZED_TRAJECTORY_V1,
             "lifecycle": None,
             "critic_input_packet": None,
             "control_session_id": challenger.get("control_session_id"),
@@ -547,7 +546,10 @@ def consume_start_v1_envelope(
     packet = lifecycle.get("critic_input_packet")
     return {
         "next_action": ACTION_START_V1,
+        "control_context_kind": baseline.context_kind,
+        LADDER_REPRESENTATION_PACKET_KEY: HANDLER_NORMALIZED_TRAJECTORY_V1,
         "lifecycle": lifecycle,
+        "challenger": challenger,
         "critic_input_packet": packet,
         "control_session_id": lifecycle.get("control_session_id"),
         "representation_search_key_sha256": challenger.get(
@@ -563,12 +565,14 @@ def prepare_ladder_freeze_preflight(
     representation_id: str,
     control_session_id: str,
     challenger: Mapping[str, Any] | None = None,
+    control_receipt: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Copy CONTROL preflight into a freeze receipt that cannot collide with BASE.
 
-    For NORMALIZED_TRAJECTORY_V1, ``challenger`` is required: marker/parent alone
-    do not prove representation input. Embed verified payload hashes from the
-    envelope so freeze/Critic bind the same challenger.
+    For NORMALIZED_TRAJECTORY_V1, ``challenger`` and ``control_receipt`` are
+    required: marker/parent alone do not prove representation input. Embed
+    verified payload hashes from the envelope so freeze/Critic bind the same
+    challenger. Scientific bind checks always run against the exact CONTROL.
     """
 
     if representation_id not in {HANDLER_NORMALIZED_TRAJECTORY_V1, HANDLER_SYNTHETIC_LATER_V2}:
@@ -581,12 +585,22 @@ def prepare_ladder_freeze_preflight(
     packet["control_session_id"] = control_session_id
     packet.pop("evidence_surface_mode", None)
     packet.pop("visible_cohort_ids", None)
+    # Do not inherit BASE CONTROL used scope; V1 release-local comes from
+    # verified representation corpus_binding after challenger revalidation.
+    packet.pop("bound_visible_cohort_ids", None)
     if representation_id == HANDLER_NORMALIZED_TRAJECTORY_V1:
         if not isinstance(challenger, Mapping) or not challenger:
             raise LadderError("LADDER_FREEZE_CHALLENGER_REQUIRED")
-        _embed_challenger_into_ladder_packet(packet, challenger, control_session_id)
+        if not isinstance(control_receipt, Mapping) or not control_receipt:
+            raise LadderError("LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED")
+        _embed_challenger_into_ladder_packet(
+            packet,
+            challenger,
+            control_session_id,
+            control_receipt=control_receipt,
+        )
         receipt["ladder_challenger_packet"] = dict(challenger)
-        search = challenger.get("representation_search_key_sha256")
+        search = packet.get("representation_search_key_sha256")
         if not isinstance(search, str) or len(search) != 64:
             raise LadderError("LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING")
         receipt["search_key_sha256"] = search
@@ -607,33 +621,90 @@ def _embed_challenger_into_ladder_packet(
     packet: dict[str, Any],
     challenger: Mapping[str, Any],
     control_session_id: str,
+    *,
+    control_receipt: Mapping[str, Any] | None = None,
 ) -> None:
-    """Stamp verified V1 representation fields onto the freeze packet."""
+    """Stamp verified V1 representation fields onto the freeze packet.
 
-    parent = challenger.get("control_session_id")
+    Reuses scientific challenger validators: hashes must match payload bytes and,
+    when ``control_receipt`` is provided, the challenger must remain bound to that
+    exact CONTROL. Release-local used scope comes from verified
+    ``corpus_binding.cohort_id``, not BASE lists.
+    """
+
+    from solana_alpha_lab.factory.hfic_representation_probe import (
+        RepresentationProbeError,
+        _assert_challenger_bound_to_control,
+        _validate_challenger_packet,
+        control_baseline_from_receipt,
+    )
+
+    try:
+        validated, representation = _validate_challenger_packet(challenger)
+    except RepresentationProbeError as exc:
+        raise LadderError(f"LADDER_FREEZE_CHALLENGER_INVALID:{exc}") from exc
+    parent = validated.get("control_session_id")
     if parent != control_session_id:
         raise LadderError("LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH")
-    payload = challenger.get("normalized_trajectory_v1")
-    payload_sha = challenger.get("representation_payload_sha256")
-    search_key = challenger.get("representation_search_key_sha256")
+    if control_receipt is None:
+        raise LadderError("LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED")
+    try:
+        baseline = control_baseline_from_receipt(control_receipt)
+        _assert_challenger_bound_to_control(validated, baseline)
+    except RepresentationProbeError as exc:
+        raise LadderError(f"LADDER_FREEZE_CHALLENGER_CONTROL_UNBOUND:{exc}") from exc
+    if baseline.session_id != control_session_id:
+        raise LadderError("LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH")
+
+    payload = validated.get("normalized_trajectory_v1")
+    payload_sha = validated.get("representation_payload_sha256")
+    search_key = validated.get("representation_search_key_sha256")
     if not isinstance(payload, Mapping) or not payload:
         raise LadderError("LADDER_FREEZE_CHALLENGER_PAYLOAD_MISSING")
     if not isinstance(payload_sha, str) or len(payload_sha) != 64:
         raise LadderError("LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISSING")
     if not isinstance(search_key, str) or len(search_key) != 64:
         raise LadderError("LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING")
-    nested_sha = payload.get("payload_sha256")
-    if isinstance(nested_sha, str) and nested_sha and nested_sha != payload_sha:
-        raise LadderError("LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISMATCH")
     packet["normalized_trajectory_v1"] = dict(payload)
     packet["representation_payload_sha256"] = payload_sha
     packet["representation_search_key_sha256"] = search_key
-    probe_id = challenger.get("probe_identity_sha256")
+    probe_id = validated.get("probe_identity_sha256")
     if isinstance(probe_id, str) and len(probe_id) == 64:
         packet["probe_identity_sha256"] = probe_id
-    control_packet_sha = challenger.get("control_packet_sha256")
+    control_packet_sha = validated.get("control_packet_sha256")
     if isinstance(control_packet_sha, str) and len(control_packet_sha) == 64:
         packet["control_packet_sha256"] = control_packet_sha
+    corpus = representation.get("corpus_binding")
+    cohort_id = None
+    if isinstance(corpus, Mapping):
+        raw = corpus.get("cohort_id")
+        if isinstance(raw, str) and raw.strip():
+            cohort_id = raw.strip()
+    if cohort_id is None:
+        raise LadderError("LADDER_FREEZE_CHALLENGER_COHORT_MISSING")
+    packet["bound_visible_cohort_ids"] = [cohort_id]
+
+
+def stamp_verified_v1_fields_onto_mapping(
+    target: dict[str, Any], source: Mapping[str, Any]
+) -> None:
+    """Copy verified compact V1 fields onto Critic/forge mappings (shared keys)."""
+
+    payload = source.get("normalized_trajectory_v1")
+    if isinstance(payload, Mapping) and payload:
+        target["normalized_trajectory_v1"] = dict(payload)
+    for key in (
+        "representation_payload_sha256",
+        "representation_search_key_sha256",
+        "probe_identity_sha256",
+    ):
+        value = source.get(key)
+        if isinstance(value, str) and len(value) == 64:
+            target[key] = value
+    if source.get(LADDER_REPRESENTATION_PACKET_KEY) == HANDLER_NORMALIZED_TRAJECTORY_V1 or (
+        isinstance(payload, Mapping) and payload
+    ):
+        target[LADDER_REPRESENTATION_PACKET_KEY] = HANDLER_NORMALIZED_TRAJECTORY_V1
 
 
 def attach_ladder_freeze_preflight(
@@ -669,16 +740,26 @@ def attach_ladder_freeze_preflight(
                 representation_id=representation_id,
                 control_session_id=control_sid,
                 challenger=challenger,
+                control_receipt=control_receipt_from_bundle(
+                    Path(data_root), bundle, store=store
+                ),
             )
         except LadderError as exc:
-            if representation_id == HANDLER_NORMALIZED_TRAJECTORY_V1 and str(exc) in {
-                "LADDER_FREEZE_CHALLENGER_REQUIRED",
-                "LADDER_FREEZE_CHALLENGER_PAYLOAD_MISSING",
-                "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISSING",
-                "LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING",
-                "LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH",
-                "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISMATCH",
-            }:
+            if representation_id == HANDLER_NORMALIZED_TRAJECTORY_V1 and (
+                str(exc)
+                in {
+                    "LADDER_FREEZE_CHALLENGER_REQUIRED",
+                    "LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED",
+                    "LADDER_FREEZE_CHALLENGER_PAYLOAD_MISSING",
+                    "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISSING",
+                    "LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING",
+                    "LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH",
+                    "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISMATCH",
+                    "LADDER_FREEZE_CHALLENGER_COHORT_MISSING",
+                }
+                or str(exc).startswith("LADDER_FREEZE_CHALLENGER_INVALID:")
+                or str(exc).startswith("LADDER_FREEZE_CHALLENGER_CONTROL_UNBOUND:")
+            ):
                 # START_V1 without envelope yet: keep next_action; freeze later
                 # after consume_start_v1_envelope supplies challenger.
                 payload.pop("ladder_freeze_preflight", None)
@@ -1190,6 +1271,8 @@ def control_receipt_from_bundle(
     *,
     store: ResearchStore,
 ) -> dict[str, Any]:
+    """Rebuild a probe-compatible CONTROL receipt from a persisted session bundle."""
+
     receipt_doc = bundle.get("session_receipt") if isinstance(bundle.get("session_receipt"), Mapping) else {}
     digest = bundle.get("forge_context_packet_sha256") or receipt_doc.get(
         "forge_context_packet_sha256"
@@ -1198,31 +1281,60 @@ def control_receipt_from_bundle(
     if not isinstance(packet, Mapping) and isinstance(digest, str):
         packet = load_forge_context_packet(data_root, digest, store=store)
     critic = bundle.get("critic_input_packet")
+    critic_sha = bundle.get("critic_input_packet_sha256") or receipt_doc.get(
+        "critic_input_packet_sha256"
+    )
     mode = (
         session_evidence_surface_mode(receipt_doc)
         or session_evidence_surface_mode(bundle)
         or (packet.get("evidence_surface_mode") if isinstance(packet, Mapping) else None)
     )
-    return {
-        "session_id": bundle.get("session_id"),
+    terminal = (
+        effective_control_terminal(receipt_doc)
+        or effective_control_terminal(bundle)
+        or receipt_doc.get("final_session_terminal")
+        or bundle.get("final_session_terminal")
+    )
+    out: dict[str, Any] = {
+        "session_id": bundle.get("session_id") or receipt_doc.get("session_id"),
         "session_receipt": receipt_doc or None,
-        "critic_input_packet": critic,
-        "critic_input_packet_sha256": bundle.get("critic_input_packet_sha256")
-        or receipt_doc.get("critic_input_packet_sha256"),
-        "forge_context_packet": packet,
-        "forge_context_packet_sha256": digest,
-        "final_session_terminal": bundle.get("final_session_terminal")
-        or receipt_doc.get("final_session_terminal"),
-        "critic_terminal": bundle.get("critic_terminal") or receipt_doc.get("critic_terminal"),
+        "final_session_terminal": terminal,
+        "effective_control_terminal": terminal,
+        "critic_terminal": bundle.get("critic_terminal")
+        or receipt_doc.get("critic_terminal")
+        or terminal,
         "evidence_epoch_sha256": bundle.get("evidence_epoch_sha256")
         or receipt_doc.get("evidence_epoch_sha256"),
         "evidence_surface_mode": mode,
-        "prompt_version": bundle.get("prompt_version") or receipt_doc.get("prompt_version"),
-        "search_key_sha256": bundle.get("search_key_sha256") or receipt_doc.get("search_key_sha256"),
-        "focus_key_sha256": bundle.get("focus_key_sha256") or receipt_doc.get("focus_key_sha256"),
+        "prompt_version": bundle.get("prompt_version")
+        or receipt_doc.get("prompt_version")
+        or "HFIC-V1.2",
+        "search_key_sha256": bundle.get("search_key_sha256")
+        or receipt_doc.get("search_key_sha256"),
+        "focus_key_sha256": bundle.get("focus_key_sha256")
+        or receipt_doc.get("focus_key_sha256"),
         "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256")
         or receipt_doc.get("memory_eligibility_sha256"),
+        "memory_policy_head_sha256": bundle.get("memory_policy_head_sha256")
+        or receipt_doc.get("memory_policy_head_sha256"),
     }
+    memory = bundle.get("memory_baseline_sha256") or receipt_doc.get(
+        "memory_baseline_sha256"
+    )
+    if isinstance(memory, str) and len(memory) == 64:
+        out["memory_baseline_sha256"] = memory
+    # Prefer critic context when present (selected CONTROL); else forge (NO_WORTHY).
+    if isinstance(critic, Mapping) and critic and isinstance(critic_sha, str) and len(critic_sha) == 64:
+        out["critic_input_packet"] = dict(critic)
+        out["critic_input_packet_sha256"] = critic_sha
+        out["forge_context_packet"] = packet if isinstance(packet, Mapping) else None
+        out["forge_context_packet_sha256"] = digest
+    else:
+        out["critic_input_packet"] = None
+        out["critic_input_packet_sha256"] = None
+        out["forge_context_packet"] = packet if isinstance(packet, Mapping) else None
+        out["forge_context_packet_sha256"] = digest
+    return out
 
 
 def _lookup_run_artifact(

@@ -203,6 +203,27 @@
     "strongest_rejected_alternative": {"type": "string", "minLength": 1},
     "known_unknowns": {"type": "array", "items": {"type": "string"}},
     "non_claims": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+    "normalized_trajectory_v1": {
+      "type": "object",
+      "description": "Optional ladder V1 compact representation copied from verified challenger; CONTEXT_ONLY for Critic.",
+      "additionalProperties": true
+    },
+    "representation_payload_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "representation_search_key_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "probe_identity_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ladder_representation_id": {
+      "type": "string",
+      "enum": ["NORMALIZED_TRAJECTORY_V1"]
+    },
     "session_id": {
       "type": "string",
       "pattern": "^HFIC-SESS-[A-Z0-9]+$"
