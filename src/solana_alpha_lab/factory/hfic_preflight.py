@@ -1658,9 +1658,48 @@ def compute_slash_packet_identity(
         if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
         else None
     )
-    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        compute_split_identity,
+    )
 
-    split = compute_split_identity(repo_root, data_root, store=store)
+    try:
+        split = compute_split_identity(repo_root, data_root, store=store)
+    except EvidenceIdentityError:
+        # Commissioning / incomplete market: keep legacy search-key continuity
+        # without claiming a scientific market admission digest.
+        from solana_alpha_lab.factory.hfic_session import (
+            evidence_epoch_sha256 as legacy_hash,
+        )
+
+        legacy_material = evidence_epoch_material(
+            Path(repo_root), Path(data_root), store=store
+        )
+        legacy_epoch = legacy_hash(legacy_material)
+        policy_head = effective_policy(store)
+        memory_eligibility = str(policy_head["memory_eligibility_sha256"])
+        search_key = search_key_sha256(
+            legacy_epoch, focus, PROMPT_VERSION, memory_eligibility, control_mode
+        )
+        return {
+            "owner_focus": focus,
+            "evidence_epoch": legacy_epoch,
+            "market_evidence_epoch_sha256": None,
+            "capability_epoch_sha256": None,
+            "legacy_combined_evidence_epoch_sha256": legacy_epoch,
+            "search_key": search_key,
+            "commissioning_status": str(proof.get("status") or ""),
+            "research_memory_as_of": str(
+                proof.get("research_memory_as_of") or "2026-08-25T00:00:00Z"
+            ),
+            "selection_caveat": selection_caveat,
+            "policy_head": policy_head,
+            "memory_eligibility": memory_eligibility,
+            "control_mode": control_mode,
+            "focus_key": focus_key_sha256(focus),
+            "market_admission_ready": False,
+        }
+
     # Scientific admission key is market evidence only (A5). Capability stays
     # in search_key / execution binding via prompt_version and capability stamp.
     epoch = str(split["evidence_epoch_sha256"])
@@ -1687,6 +1726,7 @@ def compute_slash_packet_identity(
         "memory_eligibility": memory_eligibility,
         "control_mode": control_mode,
         "focus_key": focus_key_sha256(focus),
+        "market_admission_ready": True,
     }
 
 
@@ -1843,9 +1883,6 @@ def _forge_input_requires_preflight_stop(
         CURRENT_REPRESENTATION_CONTROL_V1,
     )
 
-    codes = {str(item) for item in (forge_input.get("blocking_reason_codes") or [])}
-    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
-        return True
     if forge_input.get("forge_runnable"):
         return False
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
@@ -1867,8 +1904,6 @@ def _forge_input_stop_terminal(
     )
 
     codes = list(forge_input.get("blocking_reason_codes") or [])
-    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
-        return "MARKET_EVIDENCE_BASIS_INCOMPLETE"
     if FORGE_VISION_INTEGRITY_BLOCKED in codes:
         return FORGE_VISION_INTEGRITY_BLOCKED
     terminal = str(codes[0] if codes else CURRENT_CORPUS_MISSING)
@@ -1931,19 +1966,13 @@ def run_preflight(
         owner_focus=focus,
     )
     stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
-    incomplete_market = "MARKET_EVIDENCE_BASIS_INCOMPLETE" in {
-        str(item) for item in (forge_input.get("blocking_reason_codes") or [])
-    }
-    # Incomplete market must STOP before slash identity compute (no 0*64 market
-    # admission, no uncaught EvidenceIdentityError on ordinary preflight).
-    if incomplete_market or (stop_input and not persist):
+    if stop_input and not persist:
         focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
-        # Placeholder search material only — not a market evidence epoch.
-        placeholder = "0" * 64
+        epoch = "0" * 64
         focus_key = focus_key_sha256(focus)
         terminal = _forge_input_stop_terminal(forge_input, control_mode)
         search_key = search_key_sha256(
-            placeholder, focus, PROMPT_VERSION, placeholder, control_mode
+            epoch, focus, PROMPT_VERSION, "0" * 64, control_mode
         )
         stop_body = {
             "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
@@ -1952,7 +1981,7 @@ def run_preflight(
             "owner_class": forge_input.get("owner_class"),
             "owner_focus": focus,
             "prompt_version": PROMPT_VERSION,
-            "evidence_epoch_sha256": placeholder,
+            "evidence_epoch_sha256": epoch,
             "focus_key_sha256": focus_key,
             "search_key_sha256": search_key,
             "next": _forge_input_stop_next(terminal, forge_input.get("owner_class")),
@@ -1965,9 +1994,6 @@ def run_preflight(
                 "experiment_execution": 0,
                 "provider_api_rpc_wss_calls": 0,
             },
-            "blocking_reason_codes": list(
-                dict.fromkeys(list(forge_input.get("blocking_reason_codes") or []))
-            ),
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
@@ -2058,12 +2084,13 @@ def run_preflight(
     policy_head = ident["policy_head"]
     memory_eligibility = str(ident["memory_eligibility"])
     search_key = str(ident["search_key"])
-    market_epoch = str(ident.get("market_evidence_epoch_sha256") or epoch)
+    market_epoch = ident.get("market_evidence_epoch_sha256")
     capability_epoch = ident.get("capability_epoch_sha256")
     legacy_combined_epoch = ident.get("legacy_combined_evidence_epoch_sha256")
 
     def _stamp_split_identity(body: dict[str, Any]) -> dict[str, Any]:
-        body["market_evidence_epoch_sha256"] = market_epoch
+        if isinstance(market_epoch, str) and len(market_epoch) == 64:
+            body["market_evidence_epoch_sha256"] = market_epoch
         if isinstance(capability_epoch, str) and capability_epoch:
             body["capability_epoch_sha256"] = capability_epoch
         if isinstance(legacy_combined_epoch, str) and legacy_combined_epoch:
