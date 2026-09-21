@@ -1,0 +1,63 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-COMPLETION-001",
+  "as_of": "2026-09-21",
+  "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
+  "state_change": "CANONICAL_FORGE_MARKET_CAPABILITY_IDENTITY",
+  "base_main": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "implementation_bindings": {},
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_factory_fit_v1.json",
+    "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_FORGE_EVIDENCE_IDENTITY_OWNER_GOLD_FOCUSED_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_independent_review_v1.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_DELIVERY_HARNESS_CHECK",
+      "PASS_CATALOG_SYNC",
+      "PASS_FOCUSED_OWNER_GOLD_SUITE",
+      "PASS_A4_LADDER_F2_REGRESSION",
+      "PASS_INCOMPLETE_MARKET_FAIL_CLOSED",
+      "PASS_NO_WRITE_DISPOSITION_TABLE"
+    ]
+  },
+  "non_claims": [
+    "NO_SCIENTIFIC_FORGE",
+    "NO_ALPHA",
+    "NO_V1_SCIENTIFIC_PROBE",
+    "NO_A6",
+    "NO_HISTORICAL_RECEIPT_REWRITE",
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROVIDER_CALLS",
+    "NO_QUOTA_EXPANSION",
+    "NO_MERGE"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "network_calls": 0,
+    "git_mutation": 0,
+    "local_writes": 1
+  }
+}
