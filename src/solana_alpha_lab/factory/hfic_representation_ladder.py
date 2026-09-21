@@ -745,26 +745,58 @@ def attach_ladder_freeze_preflight(
                 ),
             )
         except LadderError as exc:
-            if representation_id == HANDLER_NORMALIZED_TRAJECTORY_V1 and (
-                str(exc)
-                in {
+            code = str(exc)
+            if representation_id == HANDLER_NORMALIZED_TRAJECTORY_V1:
+                # Soft-pend only when the envelope is not supplied yet.
+                if challenger is None and code in {
                     "LADDER_FREEZE_CHALLENGER_REQUIRED",
                     "LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED",
-                    "LADDER_FREEZE_CHALLENGER_PAYLOAD_MISSING",
-                    "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISSING",
-                    "LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING",
-                    "LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH",
-                    "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISMATCH",
-                    "LADDER_FREEZE_CHALLENGER_COHORT_MISSING",
-                }
-                or str(exc).startswith("LADDER_FREEZE_CHALLENGER_INVALID:")
-                or str(exc).startswith("LADDER_FREEZE_CHALLENGER_CONTROL_UNBOUND:")
-            ):
-                # START_V1 without envelope yet: keep next_action; freeze later
-                # after consume_start_v1_envelope supplies challenger.
-                payload.pop("ladder_freeze_preflight", None)
-                payload["ladder_freeze_pending_reason"] = str(exc)
-                return payload
+                }:
+                    payload.pop("ladder_freeze_preflight", None)
+                    payload["ladder_freeze_pending_reason"] = code
+                    payload.pop("owner_readout", None)
+                    payload.pop("receipt_sha256", None)
+                    payload["receipt_sha256"] = canonical_sha256(
+                        {
+                            key: value
+                            for key, value in payload.items()
+                            if key != "owner_readout"
+                        }
+                    )
+                    payload["owner_readout"] = format_forge_run_owner_readout(payload)
+                    return payload
+                # Present challenger that fails scientific bind/validation is
+                # integrity/observability, not "continue envelope construction".
+                if challenger is not None and (
+                    code
+                    in {
+                        "LADDER_FREEZE_CHALLENGER_PAYLOAD_MISSING",
+                        "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISSING",
+                        "LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING",
+                        "LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH",
+                        "LADDER_FREEZE_CHALLENGER_COHORT_MISSING",
+                        "LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED",
+                    }
+                    or code.startswith("LADDER_FREEZE_CHALLENGER_INVALID:")
+                    or code.startswith("LADDER_FREEZE_CHALLENGER_CONTROL_UNBOUND:")
+                ):
+                    payload.pop("ladder_freeze_preflight", None)
+                    payload["next_action"] = ACTION_OBSERVABILITY_BLOCKED
+                    payload["owner_final"] = ACTION_OBSERVABILITY_BLOCKED
+                    payload["owner_class"] = ACTION_OBSERVABILITY_BLOCKED
+                    payload["blocking_reason_codes"] = [code]
+                    payload["ladder_freeze_pending_reason"] = code
+                    payload.pop("owner_readout", None)
+                    payload.pop("receipt_sha256", None)
+                    payload["receipt_sha256"] = canonical_sha256(
+                        {
+                            key: value
+                            for key, value in payload.items()
+                            if key != "owner_readout"
+                        }
+                    )
+                    payload["owner_readout"] = format_forge_run_owner_readout(payload)
+                    return payload
             raise
         return payload
     payload["next_action"] = ACTION_OBSERVABILITY_BLOCKED
@@ -962,6 +994,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     lines.append(f"persisted: {persist_note}")
     if isinstance(persisted_sha, str) and persisted_sha:
         lines.append(f"persisted_receipt: {persisted_sha[:16]}")
+    pending = receipt.get("ladder_freeze_pending_reason")
+    if isinstance(pending, str) and pending.strip():
+        lines.append(f"freeze_pending: {pending.strip()}")
     lines.append(
         "non_claim: scoped search result on completed representations; "
         "not alpha and not proof of generator recall"
@@ -1301,14 +1336,12 @@ def control_receipt_from_bundle(
         "final_session_terminal": terminal,
         "effective_control_terminal": terminal,
         "critic_terminal": bundle.get("critic_terminal")
-        or receipt_doc.get("critic_terminal")
-        or terminal,
+        or receipt_doc.get("critic_terminal"),
         "evidence_epoch_sha256": bundle.get("evidence_epoch_sha256")
         or receipt_doc.get("evidence_epoch_sha256"),
         "evidence_surface_mode": mode,
         "prompt_version": bundle.get("prompt_version")
-        or receipt_doc.get("prompt_version")
-        or "HFIC-V1.2",
+        or receipt_doc.get("prompt_version"),
         "search_key_sha256": bundle.get("search_key_sha256")
         or receipt_doc.get("search_key_sha256"),
         "focus_key_sha256": bundle.get("focus_key_sha256")

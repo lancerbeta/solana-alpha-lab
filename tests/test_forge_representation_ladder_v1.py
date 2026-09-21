@@ -2107,6 +2107,58 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             str(receipt_exc.exception), "LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED"
         )
 
+    def test_g4_attach_tampered_challenger_is_observability_not_soft_pend(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
+            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            challenger = dict(envelope["challenger"])
+            payload = dict(challenger["normalized_trajectory_v1"])
+            payload["eligible_member_count"] = int(payload.get("eligible_member_count") or 0) + 1
+            challenger["normalized_trajectory_v1"] = payload
+            blocked = attach_ladder_freeze_preflight(
+                {
+                    "next_action": ACTION_START_V1,
+                    "control_session_id": str(base["session_id"]),
+                    "owner_class": "FORGE_RUN_IN_PROGRESS",
+                    "challenger": challenger,
+                },
+                data_root=data_root,
+                store=store,
+            )
+            self.assertEqual(blocked["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+            self.assertEqual(blocked["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
+            self.assertTrue(
+                any(
+                    str(code).startswith("LADDER_FREEZE_CHALLENGER_INVALID:")
+                    for code in (blocked.get("blocking_reason_codes") or [])
+                )
+            )
+            self.assertIn("freeze_pending:", blocked["owner_readout"])
+            self.assertNotIn("continue V1 envelope", blocked["owner_readout"])
+            # Missing envelope still soft-pends START_V1.
+            pending = attach_ladder_freeze_preflight(
+                {
+                    "next_action": ACTION_START_V1,
+                    "control_session_id": str(base["session_id"]),
+                    "owner_class": "FORGE_RUN_IN_PROGRESS",
+                },
+                data_root=data_root,
+                store=store,
+            )
+            self.assertEqual(pending["next_action"], ACTION_START_V1)
+            self.assertEqual(
+                pending.get("ladder_freeze_pending_reason"),
+                "LADDER_FREEZE_CHALLENGER_REQUIRED",
+            )
+            self.assertIn("freeze_pending:", pending["owner_readout"])
+
     def test_g4_classify_after_store_reload_keeps_ladder_slot(self) -> None:
         """PASS_TO_CLASSIFICATION intermediate must stamp slot before classify reload."""
 

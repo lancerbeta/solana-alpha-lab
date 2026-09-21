@@ -383,9 +383,11 @@ embedded via `prepare_ladder_freeze_preflight(..., challenger=..., control_recei
 (or re-attach after `consume_start_v1_envelope`). The ladder marker stays outside
 the frozen challenger; freeze revalidates payload/CONTROL hashes scientifically
 and sets used scope from representation `corpus_binding.cohort_id`. Compact V1
-fields are copied onto Critic input. Marker/parent alone are not enough; bare
+Compact V1 fields are copied onto Critic input as CONTEXT_ONLY (not estimand /
+FEAT / probe execution). Marker/parent alone are not enough; bare
 `forge-run` may leave `ladder_freeze_pending_reason` until the envelope supplies
-payload hashes. After a draft, persist `--saved-draft-sha256` before freeze.
+payload hashes — owner readout prints `freeze_pending:` when set. After a draft,
+persist `--saved-draft-sha256` before freeze.
 `PASS_TO_CLASSIFICATION` stays `RESUME_V1` until network-free classify + finalize.
 
 ```
