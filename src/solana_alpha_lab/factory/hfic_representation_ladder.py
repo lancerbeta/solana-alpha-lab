@@ -1480,6 +1480,37 @@ def _persist_run_receipt(
     store.append([event], transaction_id=transaction_id)
 
 
+def _session_applicable_to_current_market(
+    bundle: Mapping[str, Any],
+    *,
+    current_market_epoch: str | None,
+    visible: Sequence[str],
+) -> bool:
+    """True when a discovered session may answer the current market input."""
+
+    if not isinstance(current_market_epoch, str) or len(current_market_epoch) != 64:
+        return True
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        DISPOSITION_COMPATIBLE,
+        classify_legacy_session_disposition,
+        session_matches_market_epoch,
+    )
+
+    if session_matches_market_epoch(bundle, current_market_epoch):
+        return True
+    stamped = bundle.get("market_evidence_epoch_sha256")
+    if isinstance(stamped, str) and stamped:
+        return stamped == current_market_epoch
+    disposition = classify_legacy_session_disposition(
+        bundle,
+        current_market_epoch=current_market_epoch,
+        current_visible_cohort_ids=visible,
+    )
+    # Compatible reuse only. Historical / unresolved must not become REUSED_VALID
+    # for a new market; unresolved also does not free the known look.
+    return disposition.get("disposition") == DISPOSITION_COMPATIBLE
+
+
 def _discover_ladder_stages(
     *,
     data_root: Path,
@@ -1489,6 +1520,7 @@ def _discover_ladder_stages(
     preferred_control_session_id: str | None,
     saved_draft_sha256: str | None,
     v1_snapshot: Mapping[str, Any] | None,
+    current_market_epoch: str | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, str | None]:
     grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
     for item in list_hfic_sessions(store):
@@ -1555,6 +1587,12 @@ def _discover_ladder_stages(
                 continue
             if not _cohorts_cover_current(bound, visible):
                 continue
+            if not _session_applicable_to_current_market(
+                bundle,
+                current_market_epoch=current_market_epoch,
+                visible=visible,
+            ):
+                continue
             applicable.append((sid, stage, bundle))
         if applicable:
             picked = pick_session(
@@ -1579,6 +1617,14 @@ def _discover_ladder_stages(
                 continue
             packet = _packet_for_bundle(Path(data_root), bundle, store)
             if not _focus_matches(bundle, packet, owner_focus):
+                continue
+            if not _session_applicable_to_current_market(
+                bundle,
+                current_market_epoch=current_market_epoch,
+                visible=visible,
+            ):
+                # Stale ordinary PASS/pending on a prior market remains
+                # historical; do not present as CURRENT REUSED_VALID.
                 continue
             row = (sid, dict(stage), bundle)
             state = str(stage.get("session_state") or "")
@@ -1794,6 +1840,23 @@ def evaluate_forge_run(
                 legacy_epoch = row.get("legacy_epoch_sha256")
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
     else:
+        # Compute market first so discovery can refuse stale REUSED_VALID.
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError,
+            market_evidence_epoch_sha256 as _hash_market_basis,
+        )
+
+        market_epoch_for_discovery = input_receipt.get("market_evidence_epoch_sha256")
+        if (
+            not isinstance(market_epoch_for_discovery, str)
+            or len(market_epoch_for_discovery) != 64
+        ):
+            basis = input_receipt.get("market_evidence_basis")
+            if isinstance(basis, Mapping):
+                try:
+                    market_epoch_for_discovery = _hash_market_basis(basis)
+                except EvidenceIdentityError:
+                    market_epoch_for_discovery = None
         resolved_stages, control_session_id, legacy_epoch = _discover_ladder_stages(
             data_root=Path(data_root),
             store=store,
@@ -1802,6 +1865,12 @@ def evaluate_forge_run(
             preferred_control_session_id=preferred_control_session_id,
             saved_draft_sha256=saved_draft_sha256,
             v1_snapshot=v1_snapshot,
+            current_market_epoch=(
+                str(market_epoch_for_discovery)
+                if isinstance(market_epoch_for_discovery, str)
+                and len(market_epoch_for_discovery) == 64
+                else None
+            ),
         )
         for row in resolved_stages:
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
@@ -1899,12 +1968,38 @@ def evaluate_forge_run(
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     exec_binding = None
     if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
+        active_payload = None
+        for row in resolved_stages:
+            if not isinstance(row, Mapping):
+                continue
+            if str(row.get("representation_id") or "") != active_rep:
+                continue
+            for key in (
+                "representation_payload_sha256",
+                "draft_sha256",
+                "critic_input_packet_sha256",
+            ):
+                value = row.get(key)
+                if isinstance(value, str) and len(value) == 64:
+                    active_payload = value
+                    break
+            if active_payload:
+                break
+        memory_elig = None
+        for row in resolved_stages:
+            if isinstance(row, Mapping) and isinstance(
+                row.get("memory_eligibility_sha256"), str
+            ):
+                memory_elig = str(row["memory_eligibility_sha256"])
+                break
         exec_binding = execution_binding_sha256(
             scientific_slot_sha256=scientific_slot,
             capability_epoch_sha256=cap_epoch,
-            representation_payload_sha256=(
-                str(input_receipt.get("receipt_sha256"))
-                if isinstance(input_receipt.get("receipt_sha256"), str)
+            representation_payload_sha256=active_payload,
+            memory_eligibility_sha256=memory_elig,
+            model_provenance_sha256=(
+                str(input_receipt.get("model_provenance_sha256"))
+                if isinstance(input_receipt.get("model_provenance_sha256"), str)
                 else None
             ),
         )

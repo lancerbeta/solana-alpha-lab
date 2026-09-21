@@ -47,10 +47,14 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     evaluate_forge_run,
     prepare_ladder_freeze_preflight,
 )
+from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
+    epoch_search_budget_usage,
+)
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     apply_classification,
     freeze_draft,
     list_hfic_sessions,
+    load_session_bundle,
     persist_frozen_session,
     persist_no_worthy_session,
     finalize_session,
@@ -121,12 +125,18 @@ def _no_worthy_base(
     production_packet: bool = False,
 ) -> dict[str, object]:
     draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
-    preflight = (
-        _production_control_preflight(data_root, store)
-        if production_packet
-        else _control_preflight(data_root, store)
-    )
-    preflight = _stamp_preflight_split(preflight, data_root)
+    # Stamp under the same live enumerate used by evaluate_forge_run gold paths
+    # so CONTROL admission matches the current market basis.
+    with patch(
+        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+        side_effect=_enumerate_live,
+    ):
+        preflight = (
+            _production_control_preflight(data_root, store)
+            if production_packet
+            else _control_preflight(data_root, store)
+        )
+        preflight = _stamp_preflight_split(preflight, data_root)
     frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
     persist_no_worthy_session(
         store,
@@ -299,6 +309,19 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store=store,
                 repo_root=ROOT,
             )
+            store.rebuild_projection()
+            listed_mid = next(
+                item
+                for item in list_hfic_sessions(store)
+                if item.get("session_id") == frozen["session_id"]
+            )
+            self.assertEqual(listed_mid.get("market_evidence_epoch_sha256"), market)
+            usage_mid = epoch_search_budget_usage(
+                list_hfic_sessions(store), evidence_epoch=market
+            )
+            self.assertGreaterEqual(
+                usage_mid["auto_sessions_used"] + usage_mid["distinct_focus_used"], 1
+            )
             spec = submission()
             spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
             apply_classification(
@@ -309,6 +332,21 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 data_root=data_root,
             )
             store.rebuild_projection()
+            listed_done = next(
+                item
+                for item in list_hfic_sessions(store)
+                if item.get("session_id") == frozen["session_id"]
+            )
+            self.assertEqual(listed_done.get("market_evidence_epoch_sha256"), market)
+            bundle = load_session_bundle(store, frozen["session_id"])
+            assert bundle is not None
+            self.assertEqual(bundle.get("market_evidence_epoch_sha256"), market)
+            usage_done = epoch_search_budget_usage(
+                list_hfic_sessions(store), evidence_epoch=market
+            )
+            self.assertGreaterEqual(
+                usage_done["auto_sessions_used"] + usage_done["distinct_focus_used"], 1
+            )
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,
@@ -327,6 +365,72 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             )
             self.assertTrue(
                 any(item.get("session_id") == base["session_id"] for item in sessions_after)
+            )
+
+    def test_f1a_ordinary_pass_then_c3_does_not_reuse_stale_market(self) -> None:
+        """F1a: ordinary PASS on C1+C2 must not answer C1+C2+C3 as REUSED_VALID."""
+
+        from tests.test_fast_lane_classifier import submission
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = _no_worthy_base(data_root, store, production_packet=True)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=True)
+            market_before = started["market_evidence_epoch_sha256"]
+            v1_pre, _ = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            v1_pre = dict(v1_pre)
+            v1_pre["market_evidence_epoch_sha256"] = market_before
+            v1_pre["capability_epoch_sha256"] = started["capability_epoch_sha256"]
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            finalize_session(
+                frozen,
+                critic_result_from_packet_only(
+                    frozen["critic_input_packet"], "PASS_TO_CLASSIFICATION"
+                ),
+                store=store,
+                repo_root=ROOT,
+            )
+            spec = submission()
+            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            apply_classification(
+                frozen, spec, store=store, repo_root=ROOT, data_root=data_root
+            )
+            store.rebuild_projection()
+            _append_c3(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_c3,
+            ):
+                after_c3 = evaluate_forge_run(ROOT, data_root, persist=False)
+            market_after = after_c3["market_evidence_epoch_sha256"]
+            self.assertNotEqual(market_before, market_after)
+            self.assertNotEqual(after_c3["next_action"], ACTION_OWNER_CANDIDATE)
+            for stage in after_c3.get("stages") or []:
+                if not isinstance(stage, dict):
+                    continue
+                if stage.get("session_id") == frozen["session_id"]:
+                    self.assertNotEqual(stage.get("execution_status"), EXEC_REUSED)
+            self.assertIn(
+                after_c3["next_action"],
+                {ACTION_START_BASE, ACTION_START_V1, ACTION_SEARCH_EXHAUSTED},
             )
 
     def test_g4_negative_exhaustion_readback(self) -> None:

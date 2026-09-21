@@ -24,9 +24,12 @@ git_binding:
   dirty_mode: ALLOW_REPORTED
 
 objective: >-
-  Stable market/capability identities, one shared admission/reuse/resume/budget
-  rule, and full normal owner gold (G1–G12) over production bindings; A3 remains
-  input owner and A4 remains ladder owner; no scientific market Forge, no A6.
+  Shared admission→lifecycle→occupancy→readback vertical: market/capability
+  split basis, durable stamps through freeze/Critic/classify/complete, market-
+  scoped discovery reuse (no stale REUSED_VALID after C3), scientific slot and
+  execution provenance bound to actual representation payload, and owner gold
+  over production bindings. A3 remains input owner and A4 remains ladder owner;
+  no scientific market Forge, no A6.
 
 managed_write_set:
   - docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md
@@ -186,10 +189,12 @@ CI run `35588267708` success). Do not implement A6 or a scientific market run.
 
 - `DECISION_DELTA`: combined legacy `evidence_epoch_sha256` is no longer the
   sole scientific admission key; market and capability split; budgets follow
-  stamped market epochs (scientific slot/execution binding are receipt/repro
-  gloss), not Git/model provenance.
+  durable market stamps across lifecycle phases; discovery reuse requires
+  current-market applicability; scientific slot/execution binding carry actual
+  representation payload provenance.
 - `UNCERTAINTY_REMOVED`: when reuse/resume/new trial is allowed for the same
-  owner focus and visible cohort IDs.
+  owner focus and visible cohort IDs; occupied slots survive Critic/classify;
+  C3 does not inherit stale PASS as current answer.
 - `CAPABILITY_OR_EVIDENCE`: shared identity/admission helper + versioned
   receipts/projections + G1–G12 gold family + no-write disposition receipt.
 - `STOP`: merge-readiness; no scientific slash; no merge without the
@@ -211,8 +216,8 @@ proven sufficient) owns:
 |---|---|---|
 | Market epoch | A3-selected decision-bearing datasets/lineage | Immutable snapshot of what the market input is |
 | Capability epoch | Prompt/schema/representation/capability semantics | Protocol identity; not automatic budget reset |
-| Scientific slot | market + representation@version + normalized focus | Receipt/repro occupancy gloss for the active representation; budget counters still key on stamped market epoch |
-| Execution binding | slot + capability + payload/parent + memory + model provenance | Exact result reproducibility on forge-run receipts |
+| Scientific slot | market + representation@version + normalized focus | Occupancy key for the active representation; AUTO/focus budgets remain market-scoped without multiplying quota by child sessions |
+| Execution binding | slot + capability + actual representation payload + memory + model | Provenance of what ran; unknown fields stay UNKNOWN — not readiness receipt hash |
 | Run/checkpoint | frozen admission + stage artifact refs | Resume updates checkpoint, not admission |
 
 A3 remains input/vision owner. A4 remains ladder/run receipt owner. HFIC remains

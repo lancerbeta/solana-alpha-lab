@@ -2640,6 +2640,24 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         current = latest.get(session_id)
         if current is None or _cycle_better(candidate, current):
             latest[session_id] = candidate
+    # Immutable admission: restore market/capability from any earlier stamped
+    # cycle when the projected head row lost them across phase writers.
+    by_session_cycles: dict[str, list[dict[str, Any]]] = {}
+    for candidate in cycles:
+        by_session_cycles.setdefault(str(candidate["session_id"]), []).append(candidate)
+    for sid, rows in by_session_cycles.items():
+        head = latest.get(sid)
+        if head is None:
+            continue
+        ordered = sorted(rows, key=lambda item: int(item.get("hfic_cycle_seq") or 0))
+        for row in ordered:
+            fields = _split_identity_fields(row)
+            if not fields:
+                continue
+            for key, value in fields.items():
+                if not head.get(key):
+                    head[key] = value
+            break
     return list(latest.values())
 
 
@@ -3651,6 +3669,7 @@ def persist_intermediate_cycle(
     _attach_runner_up_fields(intermediate_cycle, frozen)
     _copy_evidence_surface_mode(intermediate_cycle, source)
     _copy_evidence_surface_mode(intermediate_cycle, frozen)
+    _stamp_split_identity(intermediate_cycle, source, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         intermediate_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -4001,6 +4020,7 @@ def apply_revision(
     _attach_runner_up_fields(revision_cycle, frozen)
     _copy_evidence_surface_mode(revision_cycle, existing)
     _copy_evidence_surface_mode(revision_cycle, frozen)
+    _stamp_split_identity(revision_cycle, existing, frozen)
     if prompt_version == PROMPT_VERSION and repo_root is not None:
         grounded_candidates = _ground_v12_candidates(
             revised_draft.get("candidates") or [],
@@ -4230,6 +4250,7 @@ def persist_primary_kill_awaiting_runner_up(
     }
     _copy_evidence_surface_mode(pending_cycle, existing)
     _copy_evidence_surface_mode(pending_cycle, frozen)
+    _stamp_split_identity(pending_cycle, existing, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         pending_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -4723,6 +4744,7 @@ def finalize_session(
     if isinstance(started, str) and started.strip():
         receipt["session_started_at"] = started
     _copy_evidence_surface_mode(receipt, frozen)
+    _stamp_split_identity(receipt, frozen, existing)
     diagnostics = _diagnostics_for_receipt(
         prompt_version=prompt_version,
         grounded_candidates=frozen.get("grounded_candidates")
@@ -4754,6 +4776,73 @@ def finalize_session(
             _session_receipt_schema_path(repo_root, prompt_version),
         )
     receipt_bytes = _canonical_bytes(receipt)
+    complete_cycle = {
+        "research_cycle_id": f"{session_id}-COMPLETE",
+        "session_id": session_id,
+        "phase": "SYNTHESIS_COMPLETE",
+        "hfic_protocol": prompt_version,
+        "prompt_version": prompt_version,
+        "owner_focus": frozen.get("owner_focus") or "AUTO",
+        "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
+        "focus_key_sha256": frozen.get("focus_key_sha256") or "",
+        "search_key_sha256": frozen.get("search_key_sha256") or "",
+        "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
+        "selected_candidate_id": forge_selected_id,
+        "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
+        "candidate_ids": list(frozen.get("candidate_ids") or []),
+        "critic_terminal": receipt_terminal,
+        "final_session_terminal": terminal,
+        "effective_control_terminal": terminal,
+        "next": str(critic_result.get("next") or "STOP"),
+        "critic_input_packet_sha256": receipt_packet_sha,
+        "critic_result_sha256": receipt_result_sha,
+        "session_receipt_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
+        "selected_definition_sha256": frozen.get("selected_definition_sha256"),
+        "git_composite_sha256": git_after.composite_sha256,
+        "research_memory_as_of": frozen.get("research_memory_as_of"),
+        "revision_count": int(frozen.get("revision_count") or 0),
+        "primary_critic_input_packet_sha256": receipt.get(
+            "primary_critic_input_packet_sha256"
+        )
+        or frozen.get("primary_critic_input_packet_sha256"),
+        "primary_critic_result_sha256": receipt.get("primary_critic_result_sha256")
+        or frozen.get("primary_critic_result_sha256"),
+        "primary_critic_terminal": receipt.get("primary_critic_terminal")
+        or frozen.get("primary_critic_terminal"),
+        "runner_up_critic_input_packet_sha256": frozen.get(
+            "runner_up_critic_input_packet_sha256"
+        ),
+        "runner_up_critic_result_sha256": (
+            critic_result_sha256 if failover_used else None
+        ),
+        "runner_up_critic_terminal": (
+            observed_terminal if failover_used else None
+        ),
+        "runner_up_definition_sha256": frozen.get("runner_up_definition_sha256"),
+        "runner_up_failover_used": failover_used,
+        "critic_screen_count": 2 if failover_used else 1,
+        "hfic_cycle_seq": _next_cycle_seq(existing),
+        "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256")
+        or (
+            existing.get("forge_context_packet_sha256")
+            if isinstance(existing, Mapping)
+            else None
+        ),
+        "ladder_representation_id": frozen.get("ladder_representation_id")
+        or (
+            existing.get("ladder_representation_id")
+            if isinstance(existing, Mapping)
+            else None
+        ),
+        "control_session_id": frozen.get("control_session_id")
+        or (
+            existing.get("control_session_id")
+            if isinstance(existing, Mapping)
+            else None
+        ),
+    }
+    _copy_evidence_surface_mode(complete_cycle, frozen)
+    _stamp_split_identity(complete_cycle, frozen, existing, receipt)
     records.extend(
         [
             event(
@@ -4774,84 +4863,7 @@ def finalize_session(
                 record_id=f"HFIC-CYCLE-{session_id}-COMPLETE",
                 kind=RecordKind.RESEARCH_CYCLE,
                 entity_id=session_id,
-                payload={
-                    "research_cycle_id": f"{session_id}-COMPLETE",
-                    "session_id": session_id,
-                    "phase": "SYNTHESIS_COMPLETE",
-                    "hfic_protocol": prompt_version,
-                    "prompt_version": prompt_version,
-                    "owner_focus": frozen.get("owner_focus") or "AUTO",
-                    "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
-                    "focus_key_sha256": frozen.get("focus_key_sha256") or "",
-                    "search_key_sha256": frozen.get("search_key_sha256") or "",
-                "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256"),
-                    "selected_candidate_id": forge_selected_id,
-                    "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
-                    "candidate_ids": list(frozen.get("candidate_ids") or []),
-                    "critic_terminal": receipt_terminal,
-                    "final_session_terminal": terminal,
-                    "effective_control_terminal": terminal,
-                    "next": str(critic_result.get("next") or "STOP"),
-                    "critic_input_packet_sha256": receipt_packet_sha,
-                    "critic_result_sha256": receipt_result_sha,
-                    "session_receipt_sha256": hashlib.sha256(receipt_bytes).hexdigest(),
-                    "selected_definition_sha256": frozen.get("selected_definition_sha256"),
-                    "git_composite_sha256": git_after.composite_sha256,
-                    "research_memory_as_of": frozen.get("research_memory_as_of"),
-                    "revision_count": int(frozen.get("revision_count") or 0),
-                    "primary_critic_input_packet_sha256": receipt.get(
-                        "primary_critic_input_packet_sha256"
-                    )
-                    or frozen.get("primary_critic_input_packet_sha256"),
-                    "primary_critic_result_sha256": receipt.get(
-                        "primary_critic_result_sha256"
-                    )
-                    or frozen.get("primary_critic_result_sha256"),
-                    "primary_critic_terminal": receipt.get("primary_critic_terminal")
-                    or frozen.get("primary_critic_terminal"),
-                    "runner_up_critic_input_packet_sha256": frozen.get(
-                        "runner_up_critic_input_packet_sha256"
-                    ),
-                    "runner_up_critic_result_sha256": (
-                        critic_result_sha256 if failover_used else None
-                    ),
-                    "runner_up_critic_terminal": (
-                        observed_terminal if failover_used else None
-                    ),
-                    "runner_up_definition_sha256": frozen.get(
-                        "runner_up_definition_sha256"
-                    ),
-                    "runner_up_failover_used": failover_used,
-                    "critic_screen_count": 2 if failover_used else 1,
-                    "hfic_cycle_seq": _next_cycle_seq(existing),
-                    "forge_context_packet_sha256": frozen.get(
-                        "forge_context_packet_sha256"
-                    )
-                    or (
-                        existing.get("forge_context_packet_sha256")
-                        if isinstance(existing, Mapping)
-                        else None
-                    ),
-                    "ladder_representation_id": frozen.get("ladder_representation_id")
-                    or (
-                        existing.get("ladder_representation_id")
-                        if isinstance(existing, Mapping)
-                        else None
-                    ),
-                    "control_session_id": frozen.get("control_session_id")
-                    or (
-                        existing.get("control_session_id")
-                        if isinstance(existing, Mapping)
-                        else None
-                    ),
-                    **(
-                        {
-                            "evidence_surface_mode": frozen["evidence_surface_mode"]
-                        }
-                        if frozen.get("evidence_surface_mode")
-                        else {}
-                    ),
-                },
+                payload=complete_cycle,
                 transaction_id=transaction_id,
             ),
         ]
@@ -5099,6 +5111,18 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "focus_key_sha256": cycle.get("focus_key_sha256") or "",
         "search_key_sha256": cycle.get("search_key_sha256") or "",
         "memory_eligibility_sha256": cycle.get("memory_eligibility_sha256"),
+        "market_evidence_epoch_sha256": cycle.get("market_evidence_epoch_sha256")
+        or (
+            session_receipt.get("market_evidence_epoch_sha256")
+            if isinstance(session_receipt, Mapping)
+            else None
+        ),
+        "capability_epoch_sha256": cycle.get("capability_epoch_sha256")
+        or (
+            session_receipt.get("capability_epoch_sha256")
+            if isinstance(session_receipt, Mapping)
+            else None
+        ),
         "selected_candidate_id": cycle.get("selected_candidate_id"),
         "runner_up_candidate_id": cycle.get("runner_up_candidate_id"),
         "rejected_alternative_id": cycle.get("rejected_alternative_id"),

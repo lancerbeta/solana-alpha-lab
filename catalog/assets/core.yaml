@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 0c8c9860ddd1b3e58c276b7ce884f9a63133c063da541ed3cb6457619a92d8c1}
+  integrity: {kind: sha256, sha256: 8927f205baf15abdc328fcf0a014490f65c49f1526fe66f2c9d652444643ff26}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38017,7 +38017,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: f11de785f0dd431f38be6da22989abad89e670c61cfcfdc103a3b046f04c8f01}
+  integrity: {kind: sha256, sha256: 1cfcfacaff1f3d7df02edf755cde3a5a97533687e86468f9149317a01063ffe3}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
