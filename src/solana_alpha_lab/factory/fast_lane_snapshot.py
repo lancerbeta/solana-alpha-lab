@@ -196,6 +196,15 @@ def _collect_inventory(data_root: Path) -> list[SnapshotEntry]:
             entry = _read_file_entry(source_root, relative)
             entries[entry.logical_path] = entry
 
+    forge_context_root = source_root / "research" / "artifacts" / "forge_context"
+    if forge_context_root.is_dir() and not forge_context_root.is_symlink():
+        for artifact_path in sorted(forge_context_root.glob("*.json")):
+            if artifact_path.is_symlink() or not artifact_path.is_file():
+                continue
+            relative = artifact_path.relative_to(source_root).as_posix()
+            entry = _read_file_entry(source_root, relative)
+            entries[entry.logical_path] = entry
+
     datasets_manifests = source_root / "datasets" / "manifests"
     if datasets_manifests.is_dir() and not datasets_manifests.is_symlink():
         for manifest_path in sorted(datasets_manifests.rglob("*.json")):

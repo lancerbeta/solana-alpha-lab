@@ -36,6 +36,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
   - src/solana_alpha_lab/factory/hfic_session.py
   - src/solana_alpha_lab/factory/hfic_preflight.py
+  - src/solana_alpha_lab/factory/fast_lane_snapshot.py
   - catalog/schemas/forge_run_receipt_v1.schema.json
   - tests/test_forge_representation_ladder_v1.py
   - tests/test_hfic_provenance_clock.py
