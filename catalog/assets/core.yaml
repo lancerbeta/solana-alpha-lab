@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 86cba4c3f638d06e48b8081eaaabffe2478ec1900fdbef7503ed2b74ee868a6a
+    sha256: dde090535413c981dcfd8529e4f9cfede23b4b87c4764e0ec2c6dcf357d9338d
   access:
     mode: read_only
     method: file
