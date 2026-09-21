@@ -43,6 +43,7 @@ managed_write_set:
   - tests/test_hfic_provenance_clock.py
   - scripts/hypothesis_forge.py
   - .agents/skills/hypothesis-forge/SKILL.md
+  - .agents/skills/independent-hypothesis-critic/SKILL.md
   - .cursor/commands/hypothesis-forge.md
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md
   - catalog/assets/core.yaml

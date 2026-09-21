@@ -383,10 +383,13 @@ embedded via `prepare_ladder_freeze_preflight(..., challenger=..., control_recei
 (or re-attach after `consume_start_v1_envelope`). The ladder marker stays outside
 the frozen challenger; freeze revalidates payload/CONTROL hashes scientifically
 and sets used scope from representation `corpus_binding.cohort_id`. Compact V1
-Compact V1 fields are copied onto Critic input as CONTEXT_ONLY (not estimand /
+fields are copied onto Critic input as CONTEXT_ONLY (not estimand /
 FEAT / probe execution). Marker/parent alone are not enough; bare
-`forge-run` may leave `ladder_freeze_pending_reason` until the envelope supplies
-payload hashes — owner readout prints `freeze_pending:` when set. After a draft,
+`forge-run` without an envelope may leave `ladder_freeze_pending_reason`
+and print `freeze_pending:` while `next_action` stays `START_V1` (continue
+envelope). A present-but-corrupt challenger / CONTROL bind failure is
+`OBSERVABILITY_BLOCKED` (`status: BLOCKED`, readout `freeze_block:`) — stop,
+do not treat as soft-pend. After a draft,
 persist `--saved-draft-sha256` before freeze.
 `PASS_TO_CLASSIFICATION` stays `RESUME_V1` until network-free classify + finalize.
 
@@ -993,6 +996,10 @@ decision after collection
 
 ## B0. Hard boundaries
 
+- Compact V1 orchestration fields on the packet (`normalized_trajectory_v1`,
+  representation hashes, `ladder_representation_id`), when present, are
+  **CONTEXT_ONLY** — not an estimand, not a FEAT, not probe execution evidence.
+  Do not treat them as scientific proof or as a kill/pass premise.
 - Git mutation, branch, PR, task creation: 0.
 - Experiment execution и просмотр новых outcomes: 0.
 - Untouched/forward holdout access: 0.

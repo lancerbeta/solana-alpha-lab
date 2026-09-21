@@ -86,8 +86,11 @@ frozen challenger). Embed via
 (marker/parent alone are insufficient; freeze revalidates payload/CONTROL
 hashes and sets used scope from `corpus_binding.cohort_id`; compact V1 fields
 stamp onto Critic input as CONTEXT_ONLY — not estimand / FEAT / probe
-execution). Bare `forge-run` may leave `ladder_freeze_pending_reason`
-(owner readout prints `freeze_pending:`). After a draft, `forge-run --persist
+execution). Bare `forge-run` without envelope may leave
+`ladder_freeze_pending_reason` and print `freeze_pending:` while
+`next_action` stays `START_V1` (continue envelope). Present-but-corrupt
+challenger / CONTROL bind failure is `OBSERVABILITY_BLOCKED` (`status:
+BLOCKED`, `freeze_block:`) — stop, not soft-pend. After a draft, `forge-run --persist
 --saved-draft-sha256`. Freeze/Critic only after a V1 candidate exists
 (fixture stubs allowed). `PASS_TO_CLASSIFICATION` → classify then finalize
 (`RESUME_V1`, not owner-final); then re-run `forge-run` to read real V1

@@ -147,9 +147,13 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      `prepare_ladder_freeze_preflight(..., challenger=..., control_receipt=...)`
      (or re-attach after envelope); production revalidates payload/CONTROL hashes
      and sets used scope from representation `corpus_binding.cohort_id`. Compact V1
-     fields are stamped onto Critic input. A bare `forge-run` may leave
-     `ladder_freeze_pending_reason=LADDER_FREEZE_CHALLENGER_REQUIRED` until
-     the envelope supplies payload hashes. Do **not** freeze from a CONTROL
+     fields are stamped onto Critic input as **CONTEXT_ONLY**. A bare `forge-run`
+     without envelope may leave
+     `ladder_freeze_pending_reason=LADDER_FREEZE_CHALLENGER_REQUIRED` and print
+     `freeze_pending:` while `next_action` stays `START_V1` — continue envelope.
+     A present-but-corrupt challenger or CONTROL bind failure is
+     `OBSERVABILITY_BLOCKED` (`status: BLOCKED`, `freeze_block:`) — stop; not
+     soft-pend. Do **not** freeze from a CONTROL
      packet copy with only a V1 marker. After a generator draft exists,
      immediately `forge-run --persist --saved-draft-sha256 <hash>` before
      freeze so retry is `RESUME_V1`. Freeze/Critic only after a V1 candidate

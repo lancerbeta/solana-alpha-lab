@@ -2140,7 +2140,8 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                     for code in (blocked.get("blocking_reason_codes") or [])
                 )
             )
-            self.assertIn("freeze_pending:", blocked["owner_readout"])
+            self.assertIn("freeze_block:", blocked["owner_readout"])
+            self.assertNotIn("freeze_pending:", blocked["owner_readout"])
             self.assertNotIn("continue V1 envelope", blocked["owner_readout"])
             # Missing envelope still soft-pends START_V1.
             pending = attach_ladder_freeze_preflight(
@@ -2158,6 +2159,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 "LADDER_FREEZE_CHALLENGER_REQUIRED",
             )
             self.assertIn("freeze_pending:", pending["owner_readout"])
+            self.assertNotIn("freeze_block:", pending["owner_readout"])
 
     def test_g4_classify_after_store_reload_keeps_ladder_slot(self) -> None:
         """PASS_TO_CLASSIFICATION intermediate must stamp slot before classify reload."""

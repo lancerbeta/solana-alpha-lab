@@ -996,7 +996,11 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         lines.append(f"persisted_receipt: {persisted_sha[:16]}")
     pending = receipt.get("ladder_freeze_pending_reason")
     if isinstance(pending, str) and pending.strip():
-        lines.append(f"freeze_pending: {pending.strip()}")
+        # Soft-pend keeps START_V1; integrity stop must not reuse "pending".
+        if next_action == ACTION_OBSERVABILITY_BLOCKED or owner_final == ACTION_OBSERVABILITY_BLOCKED:
+            lines.append(f"freeze_block: {pending.strip()}")
+        else:
+            lines.append(f"freeze_pending: {pending.strip()}")
     lines.append(
         "non_claim: scoped search result on completed representations; "
         "not alpha and not proof of generator recall"
