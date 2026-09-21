@@ -176,6 +176,9 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      CONTROL-compatible BASE (`evidence_surface_mode=
      CURRENT_REPRESENTATION_CONTROL_V1`) inside this same slash — print
      `owner_readout` (`status: NEXT`); do **not** treat it as evening DONE.
+     Fresh empty stores and ordinary V1-trigger negatives both emit this code
+     so the first generation is CONTROL-compatible; do **not** invent a second
+     BASE trial to switch mode after an ordinary PASS or pending session.
    - `RESUME_BASE` → resume the exact pending BASE stage from the saved draft;
      do not regenerate.
    - `RETURN_EXISTING_RUN` is readback; stop; no second trial.

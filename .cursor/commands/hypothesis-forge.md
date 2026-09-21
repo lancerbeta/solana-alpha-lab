@@ -113,10 +113,12 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
 
 ## Representation mode boundary
 
-The normal slash remains one bounded run. Ordinary BASE `NO_WORTHY` without
-CONTROL surface yields `START_BASE` + `CONTROL_SURFACE_REQUIRED`
+The normal slash remains one bounded run. Fresh empty stores and ordinary BASE
+`NO_WORTHY` without CONTROL surface yield `START_BASE` + `CONTROL_SURFACE_REQUIRED`
 (`status: NEXT`): continue CONTROL-compatible BASE inside this slash, not
-evening DONE. `--control-current-representation` remains the trajectory-blind
+evening DONE. Ordinary final PASS and pending Critic/classify stay honest
+readback/resume of that session — do not replace them with BASE NOT_RUN to
+force a CONTROL rewrite. `--control-current-representation` remains the trajectory-blind
 `CONTROL` mode and is expert-only. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
 capability whose adapter is runtime-ready and not executed: it clones the
 exact CONTROL context (Forge context for completed `NO_WORTHY`, critic packet

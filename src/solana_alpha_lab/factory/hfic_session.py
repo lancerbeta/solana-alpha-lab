@@ -2763,11 +2763,27 @@ def _bound_from_ladder_challenger_preflight(
                 raise HficSessionError("LADDER_CHALLENGER_SCOPE_DRIFT")
         else:
             raise HficSessionError("LADDER_CHALLENGER_COHORT_MISSING")
-    epoch = str(preflight.get("evidence_epoch_sha256") or "")
-    focus_key = str(preflight.get("focus_key_sha256") or "")
-    search_key_bound = str(preflight.get("search_key_sha256") or "")
-    if not epoch or not focus_key or not search_key_bound:
-        raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
+        # Outer freeze identity must equal verified CONTROL / representation keys
+        # before any store write; mutable receipt JSON cannot rebind the search.
+        epoch = str(preflight.get("evidence_epoch_sha256") or "")
+        focus_key = str(preflight.get("focus_key_sha256") or "")
+        search_key_bound = str(preflight.get("search_key_sha256") or "")
+        if not epoch or not focus_key or not search_key_bound:
+            raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
+        rep_search = str(validated.get("representation_search_key_sha256") or "")
+        if search_key_bound != rep_search:
+            raise HficSessionError("LADDER_SEARCH_KEY_DRIFT")
+        if epoch != baseline.evidence_epoch_sha256:
+            raise HficSessionError("LADDER_EVIDENCE_EPOCH_DRIFT")
+        baseline_focus = baseline.focus_key_sha256
+        if isinstance(baseline_focus, str) and baseline_focus and focus_key != baseline_focus:
+            raise HficSessionError("LADDER_FOCUS_KEY_DRIFT")
+    else:
+        epoch = str(preflight.get("evidence_epoch_sha256") or "")
+        focus_key = str(preflight.get("focus_key_sha256") or "")
+        search_key_bound = str(preflight.get("search_key_sha256") or "")
+        if not epoch or not focus_key or not search_key_bound:
+            raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
     from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
 
     digest = persist_forge_context_packet(

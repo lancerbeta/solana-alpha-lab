@@ -37,6 +37,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     apply_classification,
     find_session_by_epoch_focus,
     freeze_draft,
+    list_hfic_sessions,
     persist_frozen_session,
     persist_no_worthy_session,
     finalize_session,
@@ -59,6 +60,7 @@ from solana_alpha_lab.factory.forge_input_receipt import (  # noqa: E402
     OWNER_CLASS_OBSERVABILITY_BLOCKED,
 )
 from solana_alpha_lab.factory.hfic_control_integrity import (  # noqa: E402
+    CASE_A_TERMINALS,
     CURRENT_REPRESENTATION_CONTROL_V1,
 )
 from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
@@ -87,6 +89,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     EXISTING_V1_CONTROL_SESSION_ID,
     HANDLER_SYNTHETIC_LATER_V2,
     LadderError,
+    PASS_TERMINALS,
     consume_start_v1_envelope,
     control_preflight_from_bundle,
     evaluate_forge_run,
@@ -2290,6 +2293,195 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 )
         self.assertEqual(finished["next_action"], "START_SYNTHETIC_LATER_V2")
         self.assertNotEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
+
+    def test_n1_fresh_normal_entry_preselects_control_surface(self) -> None:
+        """Empty store: forge-run chooses CONTROL-compatible START_BASE before generation."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=False)
+        self.assertEqual(started["next_action"], ACTION_START_BASE)
+        self.assertIsNone(started["owner_final"])
+        self.assertIn("CONTROL_SURFACE_REQUIRED", started["blocking_reason_codes"])
+        self.assertIn("CONTROL-compatible BASE", started["owner_readout"])
+        base = started["stages"][0]
+        self.assertEqual(base["execution_status"], EXEC_NOT_RUN)
+        self.assertIsNone(base["session_id"])
+        self.assertEqual(base["reason_code"], "CONTROL_SURFACE_REQUIRED")
+
+    def test_n1_ordinary_final_pass_is_honest_candidate_readback(self) -> None:
+        from tests.test_fast_lane_classifier import submission
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            git = repository_git_snapshot(ROOT)
+            packet = {
+                "schema": "smial.forge-context-packet",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": "aa" * 32,
+                "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+                "vision_integrity": {"status": "PASS"},
+                "ladder_representation_id": "BASE",
+            }
+            digest = persist_forge_context_packet(
+                data_root, packet, store=store, repo_root=ROOT
+            )
+            ordinary = {
+                "receipt_id": "HFIC-PREFLIGHT-ORDINARY-PASS-001",
+                "evidence_epoch_sha256": "aa" * 32,
+                "focus_key_sha256": "bb" * 32,
+                "search_key_sha256": "cc" * 32,
+                "owner_focus": "AUTO",
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "session_started_at": "2026-08-27T12:00:00Z",
+                "forge_context_packet_sha256": digest,
+                "forge_context_packet": packet,
+            }
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=ordinary, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            critic_packet = frozen["critic_input_packet"]
+            assert isinstance(critic_packet, dict)
+            finalize_session(
+                frozen,
+                critic_result_from_packet_only(critic_packet, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            store.rebuild_projection()
+            spec = submission()
+            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            done = apply_classification(
+                frozen,
+                spec,
+                store=store,
+                repo_root=ROOT,
+                data_root=data_root,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                readback = evaluate_forge_run(ROOT, data_root, persist=False)
+        self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+        self.assertIn(done["critic_terminal"], PASS_TERMINALS | CASE_A_TERMINALS)
+        self.assertEqual(readback["next_action"], ACTION_OWNER_CANDIDATE)
+        self.assertEqual(readback["owner_final"], ACTION_OWNER_CANDIDATE)
+        self.assertNotIn("CONTROL_SURFACE_REQUIRED", readback["blocking_reason_codes"])
+        base = readback["stages"][0]
+        self.assertEqual(base["session_id"], frozen["session_id"])
+        self.assertEqual(base["effective_terminal"], done["critic_terminal"])
+        self.assertEqual(base["input_scope"], "ORDINARY_BASE")
+
+    def test_n1_ordinary_pending_classify_resumes_same_session(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            git = repository_git_snapshot(ROOT)
+            packet = {
+                "schema": "smial.forge-context-packet",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": "aa" * 32,
+                "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+                "vision_integrity": {"status": "PASS"},
+                "ladder_representation_id": "BASE",
+            }
+            digest = persist_forge_context_packet(
+                data_root, packet, store=store, repo_root=ROOT
+            )
+            ordinary = {
+                "receipt_id": "HFIC-PREFLIGHT-ORDINARY-PENDING-001",
+                "evidence_epoch_sha256": "aa" * 32,
+                "focus_key_sha256": "bb" * 32,
+                "search_key_sha256": "cc" * 32,
+                "owner_focus": "AUTO",
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "session_started_at": "2026-08-27T12:00:00Z",
+                "forge_context_packet_sha256": digest,
+                "forge_context_packet": packet,
+            }
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=ordinary, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            critic_packet = frozen["critic_input_packet"]
+            assert isinstance(critic_packet, dict)
+            awaiting = finalize_session(
+                frozen,
+                critic_result_from_packet_only(critic_packet, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                pending = evaluate_forge_run(ROOT, data_root, persist=False)
+        self.assertEqual(awaiting["session_state"], "AWAITING_CLASSIFICATION")
+        self.assertEqual(pending["next_action"], ACTION_RESUME_BASE)
+        self.assertIsNone(pending["owner_final"])
+        self.assertNotIn("CONTROL_SURFACE_REQUIRED", pending["blocking_reason_codes"])
+        base = pending["stages"][0]
+        self.assertEqual(base["session_id"], frozen["session_id"])
+        self.assertEqual(base["session_state"], "AWAITING_CLASSIFICATION")
+        self.assertEqual(base["input_scope"], "ORDINARY_BASE")
+
+    def test_i1_outer_search_key_drift_rejects_before_child_persist(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            before = {
+                str(item.get("session_id") or "") for item in list_hfic_sessions(store)
+            }
+            weak = dict(v1_pre)
+            weak["search_key_sha256"] = "ff" * 32
+            self.assertNotEqual(
+                weak["search_key_sha256"],
+                v1_pre["forge_context_packet"]["representation_search_key_sha256"],
+            )
+            with self.assertRaises(HficSessionError) as raised:
+                freeze_draft(
+                    valid_draft(),
+                    preflight_receipt=weak,
+                    store=store,
+                    repo_root=ROOT,
+                )
+            store.rebuild_projection()
+            after = {
+                str(item.get("session_id") or "") for item in list_hfic_sessions(store)
+            }
+        self.assertEqual(str(raised.exception), "LADDER_SEARCH_KEY_DRIFT")
+        self.assertEqual(after, before)
 
 
 if __name__ == "__main__":

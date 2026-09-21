@@ -1528,25 +1528,48 @@ def _discover_ladder_stages(
     legacy_epoch = None
     resolved: list[dict[str, Any]] = []
     if chosen is None:
-        # Prefer an ordinary completed BASE that would trigger V1 so resolve
-        # emits CONTROL_SURFACE_REQUIRED (NEXT). Else NOT_RUN placeholder with
-        # the same reason when any BASE exists but is not CONTROL-applicable.
-        ordinary_trigger: tuple[str, dict[str, Any], Mapping[str, Any]] | None = None
+        # No CONTROL-applicable BASE. Keep honest ordinary sessions in focus:
+        # pending → RESUME; final PASS → OWNER_CANDIDATE readback; V1-trigger
+        # negatives → resolve emits CONTROL_SURFACE_REQUIRED. Fresh / unmatched
+        # always pre-selects CONTROL-compatible START_BASE (not bare ordinary).
+        ordinary_pending: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
+        ordinary_pass: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
+        ordinary_trigger: list[tuple[str, dict[str, Any], Mapping[str, Any]]] = []
         for sid, stage, bundle in grouped.get("BASE", []):
             if str(stage.get("evidence_surface_mode") or "") == CURRENT_REPRESENTATION_CONTROL_V1:
                 continue
             packet = _packet_for_bundle(Path(data_root), bundle, store)
             if not _focus_matches(bundle, packet, owner_focus):
                 continue
+            row = (sid, dict(stage), bundle)
+            state = str(stage.get("session_state") or "")
             terminal = stage.get("effective_terminal")
-            if isinstance(terminal, str) and terminal in {
+            if state in RESUME_STATES or state in PAUSE_STATES:
+                ordinary_pending.append(row)
+            elif isinstance(terminal, str) and (
+                terminal in PASS_TERMINALS or terminal in CASE_A_TERMINALS
+            ):
+                ordinary_pass.append(row)
+            elif isinstance(terminal, str) and terminal in {
                 "NO_WORTHY_HYPOTHESIS",
                 "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
             }:
-                ordinary_trigger = (sid, dict(stage), bundle)
-                break
-        if ordinary_trigger is not None:
-            _sid, base_stage, _bundle = ordinary_trigger
+                ordinary_trigger.append(row)
+        ordinary_pick = ordinary_pending or ordinary_pass or ordinary_trigger
+        if ordinary_pick:
+            picked = pick_session(
+                [
+                    {
+                        "session_id": sid,
+                        "session_state": stage.get("session_state"),
+                    }
+                    for sid, stage, _ in ordinary_pick
+                ]
+            )
+            pick_id = str(picked.get("session_id") or "")
+            _sid, base_stage, _bundle = next(
+                item for item in ordinary_pick if item[0] == pick_id
+            )
             if str(base_stage.get("session_state") or "") == "SYNTHESIS_COMPLETE":
                 base_stage["execution_status"] = EXEC_REUSED
             base_stage["input_scope"] = "ORDINARY_BASE"
@@ -1560,9 +1583,7 @@ def _discover_ladder_stages(
                     "input_scope": "ORDINARY_BASE",
                     "session_id": None,
                     "used_cohort_ids": [],
-                    "reason_code": (
-                        "CONTROL_SURFACE_REQUIRED" if grouped.get("BASE") else None
-                    ),
+                    "reason_code": "CONTROL_SURFACE_REQUIRED",
                 }
             )
     else:

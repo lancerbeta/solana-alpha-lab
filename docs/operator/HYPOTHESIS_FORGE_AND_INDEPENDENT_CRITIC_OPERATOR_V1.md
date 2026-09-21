@@ -246,9 +246,11 @@ Only then invoke `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
 
 **Ручной fallback (если slash недоступен):** paste-блоки ниже эквивалентны, но owner должен
 сам открыть шаг 2 — предпочтительнее slash + auto-handoff. После Prompt A / freeze
-всё равно выполните `forge-run` (bounded run). Ordinary BASE `NO_WORTHY` без
+всё равно выполните `forge-run` (bounded run). Fresh empty store или ordinary BASE `NO_WORTHY` без
 CONTROL surface даёт `START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) —
-тот же slash продолжает CONTROL-compatible BASE, не evening DONE.
+тот же slash продолжает CONTROL-compatible BASE, не evening DONE. Ordinary final
+PASS и pending Critic/classify читаются/резюмируются честно; их нельзя подменять
+BASE NOT_RUN ради переключения mode.
 
 ### Шаг 1 — Forge (manual fallback)
 
