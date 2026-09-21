@@ -80,6 +80,8 @@ def select_current_activation(
 
 def classify_doctor_current_activation(
     activations: list[MappingLike] | tuple[MappingLike, ...],
+    *,
+    recovery_proofs: MappingLike | None = None,
 ) -> dict[str, Any]:
     """Map current activation selection to doctor terminal precedence.
 
@@ -94,17 +96,16 @@ def classify_doctor_current_activation(
     stops_admitting_at = (current or {}).get("stops_admitting_at")
     late_recovery_at = None
     recovery_proof = None
-    current_payload = (current or {}).get("payload")
     if current_state == "DRAINING":
         recovery_proof = "UNKNOWN"
-        if isinstance(current_payload, dict):
-            raw_recovery = current_payload.get("transition_effective_at")
-            if isinstance(raw_recovery, str) and raw_recovery:
-                try:
-                    late_recovery_at = render_utc(parse_utc(raw_recovery))
-                    recovery_proof = "DRAINING_TRANSITION"
-                except (TypeError, ValueError):
-                    late_recovery_at = None
+        proof = (
+            recovery_proofs.get(str(current_id))
+            if isinstance(recovery_proofs, MappingLike) and current_id is not None
+            else None
+        )
+        if isinstance(proof, MappingLike):
+            late_recovery_at = proof.get("late_recovery_at")
+            recovery_proof = proof.get("late_recovery_proof") or "UNKNOWN"
     lifecycle_fields = {
         "stops_admitting_at": stops_admitting_at,
         "late_recovery_at": late_recovery_at,
@@ -140,7 +141,11 @@ def classify_doctor_current_activation(
             "current_activation_state": current_state,
             "next_action": (
                 "TICK_ONCE"
-                if current_state == "ACTIVE" or late_recovery_at is not None
+                if (
+                    current_state == "ACTIVE"
+                    or late_recovery_at is not None
+                    or recovery_proof == "NOT_REQUIRED"
+                )
                 else "REPAIR_DRAINING_RECOVERY_PROOF"
             ),
         }

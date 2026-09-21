@@ -224,7 +224,7 @@ Owner recovery (post-window, Git/main already contains this repair):
 Expected while draining with historical abort present:
 
 ```json
-{"terminal":"DOCTOR_OK","live_activation":false,"current_activation_state":"DRAINING","stops_admitting_at":"<STOP>","late_recovery_at":"<RECOVERY>","late_recovery_proof":"DRAINING_TRANSITION"}
+{"terminal":"DOCTOR_OK","live_activation":false,"current_activation_state":"DRAINING","stops_admitting_at":"<STOP>","late_recovery_at":"<RECOVERY>","late_recovery_proof":"APPEND_ONLY_DRAINING_TRANSITION"}
 ```
 
 Not expected:
@@ -233,15 +233,26 @@ Not expected:
 {"terminal":"DOCTOR_ABORTED_SAFETY"}
 ```
 
-2. Read `late_recovery_at` from doctor and register + authorize a **forward**
-   successor schedule (`starts_at` ≥ that point, which is at/after predecessor
-   `stops_admitting_at`), then activate it (no rollover required once
-   predecessor is NON_ADMITTING). If doctor reports
-   `late_recovery_proof=UNKNOWN`, stop and repair/recover the lifecycle proof;
-   do not guess a timestamp.
-3. Re-run doctor: expect `current_activation_state=ACTIVE` for the successor
-   and `live_activation=true`. Predecessor remains `DRAINING` until dues
-   complete.
+2. Read `late_recovery_at` from doctor and prepare a **new** successor schedule
+   whose `starts_at` is `>=` that point and `<=` actual activation time. If
+   doctor reports `late_recovery_proof=UNKNOWN`, stop and repair/recover the
+   lifecycle proof; do not guess a timestamp. The existing CLI flow is:
+
+```text
+SCHEDULE=<forward-successor-yaml>
+uv run --locked --managed-python python -B scripts/observation_schedule.py validate --schedule "$SCHEDULE"
+uv run --locked --managed-python python -B scripts/observation_schedule.py register --schedule "$SCHEDULE" --runtime-config configs/observation_schedule_runtime_v1.yaml
+# Take schedule_sha256 from the REGISTERED JSON, then print the exact owner phrase:
+uv run --locked --managed-python python -B -c "from pathlib import Path; from solana_alpha_lab.factory.observation_schedule import load_observation_schedule; from solana_alpha_lab.factory.observation_schedule_lifecycle import build_authority_request; d=load_observation_schedule(Path('.'), '<forward-successor-yaml>'); print(build_authority_request(root=Path('.'), document=d)['exact_owner_phrase'])"
+uv run --locked --managed-python python -B scripts/observation_schedule.py authorize --schedule-sha256 <SCHEDULE_SHA256> --phrase '<EXACT_OWNER_PHRASE>' --runtime-config configs/observation_schedule_runtime_v1.yaml
+uv run --locked --managed-python python -B scripts/observation_schedule.py activate --schedule-sha256 <SCHEDULE_SHA256> --activation-id <OWNER_SELECTED_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+The exact phrase and activation ID remain owner-controlled; this repair does
+not authorize or activate anything. No rollover is required once the
+predecessor is NON_ADMITTING. Re-run doctor: expect
+`current_activation_state=ACTIVE` for the successor and `live_activation=true`.
+Predecessor remains `DRAINING` until dues complete.
 
 ### Pre-expiry owner attention
 

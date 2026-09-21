@@ -15,8 +15,8 @@ prepared.
   successor `starts_at` must be forward from the append-only DRAINING
   transition event's effective time and no later than activation; backdated
   windows denied; one admitting family preserved. Doctor exposes
-  `late_recovery_at` and `late_recovery_proof` for the owner; missing proof
-  remains fail-closed with an explicit recovery next action.
+  `late_recovery_at` and append-only `late_recovery_proof` for the owner;
+  missing proof remains fail-closed with an explicit recovery next action.
 - Current-activation selection: ACTIVE → DRAINING → freshest otherwise.
 - Pre-expiry continuity proof accepts only a live authorized window covering
   the current admission boundary or a valid rollover; historical/post-gap

@@ -121,11 +121,25 @@ def assess_campaign_successor_continuity(
         }
     stops_raw = activation.get("stops_admitting_at")
     if not isinstance(stops_raw, str) or not stops_raw:
-        return empty
+        return {
+            **empty,
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile current activation stops_admitting_at before successor assessment"
+            ),
+        }
     try:
         stops = parse_utc(stops_raw)
     except Exception:
-        return empty
+        return {
+            **empty,
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile current activation stops_admitting_at before successor assessment"
+            ),
+        }
     remaining = int((stops - now).total_seconds())
     schedule_sha = str(activation.get("schedule_sha256") or "")
     activation_id = str(activation.get("activation_id") or "")
@@ -225,17 +239,25 @@ def assess_campaign_successor_continuity(
             successor_state = best
     prepared = continuity_proven or has_active_peer
     required = 0 <= remaining <= CAMPAIGN_SUCCESSOR_WARNING_SECONDS and not prepared
+    if required and successor_state == "AUTHORIZED":
+        owner_action = (
+            "prepare a new same-family successor whose authorized window covers "
+            "the current stops_admitting_at; this AUTHORIZED window is not continuous"
+        )
+    elif required:
+        owner_action = (
+            "register+authorize a same-family successor whose window covers "
+            "the current stops_admitting_at (REGISTERED alone insufficient); "
+            "in-window use rollover, post-window late activate after NON_ADMITTING"
+        )
+    else:
+        owner_action = UNKNOWN
     return {
         "campaign_successor_state": successor_state,
         "stops_admitting_at": stops_raw,
         "campaign_time_remaining_seconds": remaining,
         "campaign_successor_required": required,
-        "campaign_successor_owner_action": (
-            "register+authorize successor (REGISTERED alone insufficient); "
-            "in-window use rollover, post-window late activate after NON_ADMITTING"
-            if required
-            else UNKNOWN
-        ),
+        "campaign_successor_owner_action": owner_action,
     }
 
 

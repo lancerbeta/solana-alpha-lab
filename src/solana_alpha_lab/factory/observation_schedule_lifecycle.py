@@ -891,18 +891,18 @@ def _activation_is_non_admitting(
     return True
 
 
-def _non_admitting_recovery_at(
+def _draining_transition_evidence(
     data_root: Path,
     row: Mapping[str, Any],
     *,
     now: datetime,
-) -> datetime | None:
-    """Return the append-only lifecycle timestamp that closed admission.
+) -> tuple[datetime, bool] | None:
+    """Return the append-only DRAINING transition evidence.
 
     ``schedule_activations.payload_json`` is an operational projection and is
     not the authority for a late handover timestamp. The DRAINING transition
-    is also emitted as an immutable ``ResearchEvent``; its ``effective_at``
-    together with the bound event payload is the minimum recovery proof.
+    is also emitted as an immutable ``ResearchEvent``. Its ``effective_at``
+    and immutable closure flag are the lifecycle proof.
     Missing, malformed, or uncommitted evidence stays fail-closed.
     """
 
@@ -952,8 +952,47 @@ def _non_admitting_recovery_at(
         effective = record.effective_at.astimezone(UTC)
         if effective < stops:
             return None
-        return effective
+        return effective, payload.get("admission_window_closed") is True
     return None
+
+
+def _non_admitting_recovery_at(
+    data_root: Path,
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> datetime | None:
+    """Return the append-only lifecycle timestamp that closed admission."""
+
+    evidence = _draining_transition_evidence(data_root, row, now=now)
+    if evidence is None or evidence[1] is not True:
+        return None
+    return evidence[0]
+
+
+def resolve_late_recovery_proof(
+    data_root: Path,
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> dict[str, str | None]:
+    """Project owner-readable recovery proof from the append-only event.
+
+    ``NOT_REQUIRED`` means the committed DRAINING transition was not an
+    admission-close transition (for example, an in-window rollover). It is
+    distinct from ``UNKNOWN``, which means the lifecycle proof is unavailable.
+    """
+
+    evidence = _draining_transition_evidence(data_root, row, now=now)
+    if evidence is None:
+        return {"late_recovery_at": None, "late_recovery_proof": "UNKNOWN"}
+    effective, admission_closed = evidence
+    if admission_closed:
+        return {
+            "late_recovery_at": render_utc(effective),
+            "late_recovery_proof": "APPEND_ONLY_DRAINING_TRANSITION",
+        }
+    return {"late_recovery_at": None, "late_recovery_proof": "NOT_REQUIRED"}
 
 
 def _require_cohort_cutover_or_unique(

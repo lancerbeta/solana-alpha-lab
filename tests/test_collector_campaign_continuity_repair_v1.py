@@ -38,6 +38,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     expected_authority_phrase,
     owner_next_action_for_lifecycle_error,
     register_schedule,
+    resolve_late_recovery_proof,
     rollover_schedule,
 )
 from solana_alpha_lab.factory.observation_schedule_store import (
@@ -278,6 +279,11 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             draining_row = store.get_activation(pred["schedule_sha256"], "ACT-PRE")
             assert draining_row is not None
+            proof = resolve_late_recovery_proof(data_root, draining_row, now=late)
+            self.assertEqual(
+                proof["late_recovery_proof"], "APPEND_ONLY_DRAINING_TRANSITION"
+            )
+            self.assertEqual(proof["late_recovery_at"], "2026-09-02T01:00:00Z")
             forged_payload = dict(draining_row["payload"])
             forged_payload["transition_effective_at"] = "2026-09-01T00:00:00Z"
             with self.assertRaisesRegex(
@@ -759,11 +765,19 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                         "transition_effective_at": "2026-09-02T01:00:00Z",
                     },
                 }
-            ]
+            ],
+            recovery_proofs={
+                "ACT-DRAIN": {
+                    "late_recovery_at": "2026-09-02T01:00:00Z",
+                    "late_recovery_proof": "APPEND_ONLY_DRAINING_TRANSITION",
+                }
+            },
         )
         self.assertEqual(report["stops_admitting_at"], "2026-09-02T00:00:00Z")
         self.assertEqual(report["late_recovery_at"], "2026-09-02T01:00:00Z")
-        self.assertEqual(report["late_recovery_proof"], "DRAINING_TRANSITION")
+        self.assertEqual(
+            report["late_recovery_proof"], "APPEND_ONLY_DRAINING_TRANSITION"
+        )
 
     def test_lifecycle_denials_have_owner_next_actions(self) -> None:
         self.assertEqual(
@@ -1032,6 +1046,25 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertEqual(continuity["campaign_successor_state"], "UNKNOWN")
             self.assertTrue(continuity["campaign_successor_required"])
             self.assertIn("reconcile", continuity["campaign_successor_owner_action"])
+            store.close()
+
+    def test_missing_active_boundary_keeps_successor_warning_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            for stops in (None, "not-an-utc-timestamp"):
+                continuity = assess_campaign_successor_continuity(
+                    store,
+                    now=NOW,
+                    activation={
+                        "schedule_sha256": "f" * 64,
+                        "activation_id": "ACT-BOUNDARY-UNKNOWN",
+                        "state": "ACTIVE",
+                        "stops_admitting_at": stops,
+                    },
+                )
+                self.assertEqual(continuity["campaign_successor_state"], "UNKNOWN")
+                self.assertTrue(continuity["campaign_successor_required"])
+                self.assertIn("reconcile", continuity["campaign_successor_owner_action"])
             store.close()
 
     def test_authorized_successor_after_gap_does_not_clear_warning(self) -> None:

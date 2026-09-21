@@ -29,6 +29,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     authorize_schedule,
     pause_schedule,
     register_schedule,
+    resolve_late_recovery_proof,
     resume_schedule,
     rollover_schedule,
     snapshot_schedule,
@@ -332,7 +333,18 @@ def main(
 
             unresolved = store.restore_marker_unresolved()
             activations = store.list_activations()
-            current_report = classify_doctor_current_activation(activations)
+            recovery_proofs = {
+                str(row.get("activation_id") or ""): resolve_late_recovery_proof(
+                    data_root, row, now=now
+                )
+                for row in activations
+                if str(row.get("state") or "") == "DRAINING"
+                and str(row.get("activation_id") or "")
+            }
+            current_report = classify_doctor_current_activation(
+                activations,
+                recovery_proofs=recovery_proofs,
+            )
             current_state = str(current_report.get("current_activation_state") or "")
             live = bool(current_report.get("live_activation"))
             current_timing = {
@@ -437,7 +449,7 @@ def main(
                 )
             health = list(collector.get("health_flags") or [])
             terminal = "DOCTOR_OK"
-            next_action = "TICK_ONCE"
+            next_action = str(current_report.get("next_action") or "TICK_ONCE")
             if "PROVIDER_FAILED" in health:
                 terminal = "DOCTOR_PROVIDER_FAILED"
                 next_action = "INSPECT_HTTP_CLASS"
