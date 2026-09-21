@@ -133,6 +133,15 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
    result. Do not treat the raw JSON dump as the owner result. `--persist`
    records `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT`; the readout `persisted`
    line names that kind, not a filesystem path.
+   Identity (A5): `market_evidence_epoch_sha256` is the scientific admission
+   key (declared datasets/cohorts/lineage). `capability_epoch_sha256` is
+   protocol provenance and does **not** alone reset AUTO/distinct-focus
+   budget. Docs/Git-only changes must not free a market slot. Completed
+   replay is `RETURN_EXISTING` with scientific writes=0 for the same market
+   + frozen representations + focus. A new cohort after a completed run is a
+   new market snapshot — do not return the old PASS/NO_WORTHY as the current
+   answer. Legacy sessions without market stamps are historical/unresolved
+   unless exact compatibility is proven; focus-only match is insufficient.
    Branch on `forge-run` `next_action` **before** Prompt A and **before**
    session-level `RETURN_EXISTING_SESSION` stop:
    - `START_V1` auto-advances from effective BASE

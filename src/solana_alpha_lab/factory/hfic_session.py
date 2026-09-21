@@ -206,6 +206,37 @@ def search_key_sha256(
     )
 
 
+def _split_identity_fields(
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, str]:
+    """Copy A5 market/capability stamps from the first source that carries them."""
+
+    out: dict[str, str] = {}
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        for key in (
+            "market_evidence_epoch_sha256",
+            "capability_epoch_sha256",
+        ):
+            if key in out:
+                continue
+            value = source.get(key)
+            if isinstance(value, str) and len(value) == 64:
+                out[key] = value
+    return out
+
+
+def _stamp_split_identity(
+    target: dict[str, Any],
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    fields = _split_identity_fields(*sources)
+    if fields:
+        target.update(fields)
+    return target
+
+
 def closed_family_terminals_from_receipt(receipt: Mapping[str, Any] | None) -> list[str]:
     return family_hard_close_terminals(ledger_from_receipt(receipt))
 
@@ -473,6 +504,7 @@ def bind_preflight_receipt(
         "commissioning_run_id": proof.get("run_id"),
         "provider_calls_actual": 0,
         "session_started_at": render_canonical_utc(started),
+        **_split_identity_fields(receipt),
     }
 
 
@@ -1224,6 +1256,9 @@ def freeze_draft(
         if isinstance(maybe_composite, str) and len(maybe_composite) == 64:
             git_composite = maybe_composite
         owner_focus = str(preflight_receipt.get("owner_focus") or owner_focus)
+    _stamp_split_identity(packet, bound, preflight_receipt)
+    if epoch:
+        packet.setdefault("evidence_epoch_sha256", epoch)
     if not focus_key:
         focus_key = focus_key_sha256(owner_focus)
     if epoch and not search_key:
@@ -1403,6 +1438,7 @@ def freeze_draft(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
     )
     _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
+    _stamp_split_identity(result, bound, preflight_receipt)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -1643,6 +1679,7 @@ def _freeze_no_worthy(
         preflight_receipt if isinstance(preflight_receipt, Mapping) else None,
     )
     _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
+    _stamp_split_identity(result, bound, preflight_receipt)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
             closed_or_suppressed_collision_count
@@ -1979,6 +2016,7 @@ def persist_no_worthy_session(
         "created_at": created_at,
         "session_started_at": started_at,
     }
+    _stamp_split_identity(receipt, frozen)
     diagnostics = _diagnostics_for_receipt(
         prompt_version=prompt_version,
         grounded_candidates=frozen.get("grounded_candidates")
@@ -2045,6 +2083,7 @@ def persist_no_worthy_session(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": 0,
+                **_split_identity_fields(frozen),
                 **(
                     {"evidence_surface_mode": frozen["evidence_surface_mode"]}
                     if frozen.get("evidence_surface_mode")
@@ -2311,6 +2350,7 @@ def persist_frozen_session(
                 "hfic_cycle_seq": 1,
             }
     _copy_evidence_surface_mode(cycle_payload, frozen)
+    _stamp_split_identity(cycle_payload, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -2582,6 +2622,10 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 "record_id": str(getattr(record, "record_id", "") or ""),
                 "hfic_cycle_seq": int(payload.get("hfic_cycle_seq") or 0),
                 "evidence_surface_mode": payload.get("evidence_surface_mode"),
+                "market_evidence_epoch_sha256": payload.get(
+                    "market_evidence_epoch_sha256"
+                ),
+                "capability_epoch_sha256": payload.get("capability_epoch_sha256"),
             }
         )
     latest: dict[str, dict[str, Any]] = {}
@@ -2886,7 +2930,11 @@ def find_session_by_epoch_focus(
     wanted_parent = control_session_id if isinstance(control_session_id, str) and control_session_id else None
     matched: list[dict[str, Any]] = []
     for item in list_hfic_sessions(store):
-        if item.get("evidence_epoch_sha256") != epoch:
+        stamped_market = item.get("market_evidence_epoch_sha256")
+        if isinstance(stamped_market, str) and stamped_market:
+            if stamped_market != epoch:
+                continue
+        elif item.get("evidence_epoch_sha256") != epoch:
             continue
         if item.get("focus_key_sha256") != focus_key:
             continue

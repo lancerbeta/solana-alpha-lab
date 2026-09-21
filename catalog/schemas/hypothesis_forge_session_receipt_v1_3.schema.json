@@ -42,6 +42,14 @@
     "session_id": {"type": "string", "minLength": 1},
     "session_state": {"const": "SYNTHESIS_COMPLETE"},
     "evidence_epoch_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "market_evidence_epoch_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "capability_epoch_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "focus_key_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "search_key_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
     "prompt_version": {"const": "HFIC-V1.2"},

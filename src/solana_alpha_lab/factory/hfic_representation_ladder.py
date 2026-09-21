@@ -929,6 +929,15 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         f"owner_class: {receipt.get('owner_class') or 'NONE'}",
         f"visible_cohorts: {', '.join(receipt.get('visible_cohort_ids') or []) or 'NONE'}",
         f"used_cohorts: {', '.join(receipt.get('used_cohort_ids') or []) or 'NONE'}",
+        (
+            "market_epoch: "
+            + (
+                str(receipt.get("market_evidence_epoch_sha256"))[:16]
+                if isinstance(receipt.get("market_evidence_epoch_sha256"), str)
+                and len(str(receipt.get("market_evidence_epoch_sha256"))) == 64
+                else "NONE"
+            )
+        ),
         f"legacy_epoch: {(receipt.get('legacy_epoch_sha256') or 'NONE')[:16]}",
     ]
     for stage in stages:
@@ -1767,14 +1776,30 @@ def evaluate_forge_run(
         for row in resolved_stages:
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
 
-    identity_material = {
-        "input_receipt_sha256": input_receipt.get("receipt_sha256"),
-        "frozen_representation_ids": frozen_ids,
-        "owner_focus": owner_focus,
-        "legacy_epoch_sha256": legacy_epoch,
-        "control_session_id": control_session_id,
-    }
-    run_identity = canonical_sha256(identity_material)
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        forge_run_identity_sha256,
+        market_evidence_epoch_sha256 as _hash_market_basis,
+    )
+
+    market_epoch = input_receipt.get("market_evidence_epoch_sha256")
+    if not isinstance(market_epoch, str) or len(market_epoch) != 64:
+        active = input_receipt.get("active_evidence_set") or {}
+        basis = input_receipt.get("market_evidence_basis")
+        if isinstance(basis, Mapping):
+            try:
+                market_epoch = _hash_market_basis(basis)
+            except Exception:
+                market_epoch = None
+        if not isinstance(market_epoch, str) or len(market_epoch) != 64:
+            # Fallback: evidence_set digest is market-scoped (cohorts + manifest).
+            market_epoch = str(active.get("evidence_set_sha256") or "") or str(
+                input_receipt.get("receipt_sha256") or ""
+            )
+    run_identity = forge_run_identity_sha256(
+        market_evidence_epoch_sha256=str(market_epoch),
+        frozen_representation_ids=frozen_ids,
+        owner_focus=owner_focus,
+    )
     existing = None
     try:
         existing = _lookup_run_artifact(store, run_identity)
@@ -1876,6 +1901,15 @@ def evaluate_forge_run(
         "frozen_representation_ids": frozen_ids,
         "stages": stage_out,
         "legacy_epoch_sha256": legacy_epoch if isinstance(legacy_epoch, str) else None,
+        "market_evidence_epoch_sha256": (
+            str(market_epoch) if isinstance(market_epoch, str) and len(market_epoch) == 64 else None
+        ),
+        "capability_epoch_sha256": (
+            str(input_receipt.get("capability_epoch_sha256"))
+            if isinstance(input_receipt.get("capability_epoch_sha256"), str)
+            and len(str(input_receipt.get("capability_epoch_sha256"))) == 64
+            else None
+        ),
         "control_session_id": control_session_id,
         "blocking_reason_codes": blocking,
         "writes": writes,

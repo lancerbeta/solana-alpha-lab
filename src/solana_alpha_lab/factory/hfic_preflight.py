@@ -450,14 +450,13 @@ def decide_preflight_action(
         chosen = pick_session(matching)
         return ("RETURN_EXISTING_SESSION", str(chosen.get("session_id") or ""))
 
-    # Search-budget accounting is per evidence epoch only. memory_eligibility
-    # remains in search_key / same_focus / exact replay identity above, but must
-    # not reset AUTO or distinct-focus counters after quarantine/restore.
-    same_epoch_for_budget = [
-        item
-        for item in sessions
-        if item.get("evidence_epoch_sha256") == evidence_epoch
-    ]
+    # Search-budget accounting is per market evidence epoch (A5). Capability /
+    # Git / memory_eligibility must not reset AUTO or distinct-focus counters.
+    from solana_alpha_lab.factory.hfic_evidence_identity import sessions_for_market_budget
+
+    same_epoch_for_budget = list(
+        sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch)
+    )
     if _is_auto_focus(owner_focus):
         auto_count = sum(
             1
@@ -483,12 +482,12 @@ def epoch_search_budget_usage(
     *,
     evidence_epoch: str,
 ) -> dict[str, Any]:
-    """Epoch-scoped AUTO / distinct-focus usage (independent of memory eligibility)."""
-    same_epoch = [
-        item
-        for item in sessions
-        if item.get("evidence_epoch_sha256") == evidence_epoch
-    ]
+    """Market-epoch-scoped AUTO / distinct-focus usage (A5; not capability/Git)."""
+    from solana_alpha_lab.factory.hfic_evidence_identity import sessions_for_market_budget
+
+    same_epoch = list(
+        sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch)
+    )
     auto_used = sum(
         1
         for item in same_epoch
@@ -1656,9 +1655,12 @@ def compute_slash_packet_identity(
         if evidence_surface_mode == CURRENT_REPRESENTATION_CONTROL_V1
         else None
     )
-    epoch = evidence_epoch_sha256(
-        evidence_epoch_material(repo_root, data_root, store=store)
-    )
+    from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
+
+    split = compute_split_identity(repo_root, data_root, store=store)
+    # Scientific admission key is market evidence only (A5). Capability stays
+    # in search_key / execution binding via prompt_version and capability stamp.
+    epoch = str(split["evidence_epoch_sha256"])
     policy_head = effective_policy(store)
     memory_eligibility = str(policy_head["memory_eligibility_sha256"])
     search_key = search_key_sha256(
@@ -1667,6 +1669,11 @@ def compute_slash_packet_identity(
     return {
         "owner_focus": focus,
         "evidence_epoch": epoch,
+        "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
+        "capability_epoch_sha256": split["capability_epoch_sha256"],
+        "legacy_combined_evidence_epoch_sha256": split[
+            "legacy_combined_evidence_epoch_sha256"
+        ],
         "search_key": search_key,
         "commissioning_status": str(proof.get("status") or ""),
         "research_memory_as_of": str(
@@ -2034,6 +2041,18 @@ def run_preflight(
     policy_head = ident["policy_head"]
     memory_eligibility = str(ident["memory_eligibility"])
     search_key = str(ident["search_key"])
+    market_epoch = str(ident.get("market_evidence_epoch_sha256") or epoch)
+    capability_epoch = ident.get("capability_epoch_sha256")
+    legacy_combined_epoch = ident.get("legacy_combined_evidence_epoch_sha256")
+
+    def _stamp_split_identity(body: dict[str, Any]) -> dict[str, Any]:
+        body["market_evidence_epoch_sha256"] = market_epoch
+        if isinstance(capability_epoch, str) and capability_epoch:
+            body["capability_epoch_sha256"] = capability_epoch
+        if isinstance(legacy_combined_epoch, str) and legacy_combined_epoch:
+            body["legacy_combined_evidence_epoch_sha256"] = legacy_combined_epoch
+        return body
+
     if stop_input:
         terminal = _forge_input_stop_terminal(forge_input, control_mode)
         stop_body = {
@@ -2061,7 +2080,7 @@ def run_preflight(
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
-        return stop_body
+        return _stamp_split_identity(stop_body)
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
         if datasets:
@@ -2205,7 +2224,7 @@ def run_preflight(
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
-        return stop_body
+        return _stamp_split_identity(stop_body)
     if selection_gate_view.get("caveat"):
         selection_caveat = selection_gate_view
 
@@ -2348,5 +2367,6 @@ def run_preflight(
                 receipt_body["next"] = bundle.get("next")
     receipt_body["forge_input_receipt"] = forge_input
     receipt_body["owner_forge_input"] = format_forge_input_owner_block(forge_input)
+    _stamp_split_identity(receipt_body)
     receipt_body["preflight_receipt_sha256"] = canonical_sha256(receipt_body)
     return receipt_body

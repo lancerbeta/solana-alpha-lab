@@ -89,8 +89,11 @@ can be excluded from *future HFIC search memory* by an append-only ResearchStore
 policy. Historical records stay immutable. Quarantine is not scientific
 rejection, deletion, supersession, CLOSE/PARK change, or a raise of
 `prior_memory.max_records=64`. Non-HFIC hypothesis versions stay eligible.
-The policy does not change `evidence_epoch_sha256`. After this capability is
-merged once, later quarantine/restore must not require Git mutation.
+The policy does not change `evidence_epoch_sha256` / market evidence epoch.
+After this capability is merged once, later quarantine/restore must not
+require Git mutation. Memory eligibility remains in search-key / exact
+replay identity; it must not reset AUTO or distinct-focus counters for the
+same market evidence epoch (A5).
 
 Status:
 

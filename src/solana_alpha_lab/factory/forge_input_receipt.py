@@ -94,6 +94,15 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
         "FORGE INPUT",
         f"visible_cohorts: {visible}",
         f"active_evidence_set: manifest={mid} corpus_version={version}",
+        (
+            "market_evidence_epoch: "
+            + (
+                str(receipt.get("market_evidence_epoch_sha256"))[:16] + "…"
+                if isinstance(receipt.get("market_evidence_epoch_sha256"), str)
+                and len(str(receipt.get("market_evidence_epoch_sha256"))) == 64
+                else "(unset)"
+            )
+        ),
         f"historical_calibration: {hist_text}",
         f"visibility: {', '.join(vis_bits)}",
         f"representations: {'; '.join(reps) if reps else '(none)'}",
@@ -350,6 +359,36 @@ def build_forge_input_receipt(
         if not blocking:
             blocking.append(CURRENT_CORPUS_MISSING)
 
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        build_market_evidence_basis,
+        capability_epoch_sha256 as _hash_capability_basis,
+        compute_capability_epoch_for_repo,
+        lineage_cohort_bindings,
+        market_evidence_epoch_sha256 as _hash_market_basis,
+    )
+
+    market_basis = build_market_evidence_basis(
+        datasets=selected,
+        visible_cohort_ids=visible_ids,
+        current_dataset_manifest_id=current_mid,
+        corpus_version=corpus_version,
+        lineage_bindings=lineage_cohort_bindings(Path(data_root)),
+    )
+    try:
+        market_epoch = _hash_market_basis(market_basis)
+    except Exception:
+        market_epoch = _evidence_set_sha256(
+            current_dataset_manifest_id=current_mid,
+            visible_cohort_ids=visible_ids,
+            corpus_version=corpus_version,
+        )
+    try:
+        capability_epoch, _cap_basis = compute_capability_epoch_for_repo(Path(repo_root))
+    except Exception:
+        capability_epoch = _hash_capability_basis(
+            {"basis_version": "CAPABILITY_EPOCH_BASIS_V1", "prompt_version": "UNKNOWN"}
+        )
+
     body = {
         "schema": SCHEMA,
         "schema_version": SCHEMA_VERSION,
@@ -365,6 +404,9 @@ def build_forge_input_receipt(
                 corpus_version=corpus_version,
             ),
         },
+        "market_evidence_epoch_sha256": market_epoch,
+        "market_evidence_basis": market_basis,
+        "capability_epoch_sha256": capability_epoch,
         "historical_calibration": historical,
         "representation_input_scope": {
             "scope": "REPRESENTATION_INPUT_SCOPE",

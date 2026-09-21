@@ -1,0 +1,64 @@
+{
+  "schema": "smial.forge-evidence-identity-no-write-disposition",
+  "schema_version": "1.0",
+  "as_of": "2026-09-21",
+  "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
+  "git_head": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
+  "a4_post_merge": {
+    "pr": 328,
+    "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
+    "approved_head": "ae657cb127a616e4679c597d965f2e0a29e4afbb",
+    "ci_run_id": 35588267708,
+    "ci_conclusion": "success",
+    "post_merge_receipt_sha256": "8ad987839d0ee5853371bf099ed97a22b1b4beeb0db816bf589f6aa69ef049c8"
+  },
+  "data_root_selection": "DEFAULT_EXISTING",
+  "visible_cohort_ids": [
+    "REL-20260902T111900Z-20260909T111900Z",
+    "REL-20260909T111900Z-20260916T111900Z"
+  ],
+  "forge_input": {
+    "owner_class": "FORGE_INPUT_READY",
+    "forge_runnable": true,
+    "blocking_reason_codes": []
+  },
+  "inventory_sha256_prefix_before": "defbc9a5a1794b05",
+  "inventory_sha256_prefix_after": "defbc9a5a1794b05",
+  "scientific_writes": 0,
+  "session_count": 17,
+  "control_sessions_present": 0,
+  "ladder_stamped_sessions": 0,
+  "first_run": {
+    "next_action": "START_BASE",
+    "blocking_reason_codes": [
+      "CONTROL_SURFACE_REQUIRED"
+    ],
+    "owner_final": null,
+    "selected_ordinary_base_session_id": "HFIC-SESS-0343447C49AC901C",
+    "selected_ordinary_terminal": "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
+    "input_scope": "ORDINARY_BASE",
+    "effective_mode_for_next_generation": "CURRENT_REPRESENTATION_CONTROL_V1",
+    "legacy_epoch_present_on_run": false
+  },
+  "disposition_summary": [
+    {
+      "class": "HISTORICAL_ONLY_OR_UNRESOLVED",
+      "reason": "No session carries CURRENT_REPRESENTATION_CONTROL_V1 or bound_visible_cohort_ids matching current C1+C2 visible set; legacy epochs differ across trials; focus-only match is insufficient for current reuse."
+    },
+    {
+      "class": "NO_COMPATIBLE_CONTROL_FOR_V1",
+      "reason": "Zero CONTROL sessions in store; first-run correctly requires CONTROL_SURFACE_REQUIRED before generation."
+    },
+    {
+      "class": "DO_NOT_ASSUME_OLD_CONTROL_COMPATIBLE",
+      "reason": "Absence of CONTROL means comparative V1 path cannot claim current C1/C2 reuse from historical ordinary NO_WORTHY alone."
+    }
+  ],
+  "non_claims": [
+    "NO_SCIENTIFIC_FORGE",
+    "NO_ALPHA",
+    "NO_PROVIDER",
+    "NO_HISTORICAL_REWRITE",
+    "NO_COMMITTED_LOCAL_PATH_AS_TRUTH"
+  ]
+}

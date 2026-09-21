@@ -224,6 +224,18 @@
       "type": "string",
       "enum": ["NORMALIZED_TRAJECTORY_V1"]
     },
+    "market_evidence_epoch_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "capability_epoch_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "evidence_epoch_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "session_id": {
       "type": "string",
       "pattern": "^HFIC-SESS-[A-Z0-9]+$"

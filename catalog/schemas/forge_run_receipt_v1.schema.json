@@ -88,6 +88,14 @@
       }
     },
     "legacy_epoch_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},
+    "market_evidence_epoch_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "capability_epoch_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "control_session_id": {"type": ["string", "null"]},
     "blocking_reason_codes": {"type": "array", "items": {"type": "string"}},
     "owner_readout": {"type": "string"},
