@@ -31,6 +31,11 @@ interpreter. Required runtime is CPython 3.13.14 via that prefix.
 Read and follow `.agents/skills/hypothesis-forge/SKILL.md` and
 `docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md`.
 
+A5 identity: market epoch admits/resumes/budgets; capability epoch does not
+free AUTO/focus quota; START ≠ RESUME ≠ REUSED; incomplete market is BLOCKED
+(not a synthetic digest). Merge phrase and scientific market run stay separate
+owner gates after this atom.
+
 Optional owner focus (default `AUTO`):
 
 ```

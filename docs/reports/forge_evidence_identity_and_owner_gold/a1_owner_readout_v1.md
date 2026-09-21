@@ -6,8 +6,10 @@
 - A4 post-merge CI `35588267708`: success on that SHA
 - No-write C1/C2 disposition:
   `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json`
-  — `forge_runnable=true`, first-run `START_BASE` + `CONTROL_SURFACE_REQUIRED`,
-  0 CONTROL sessions, inventory unchanged, scientific_writes=0
+  — per-session disposition table; `forge_runnable=true`; first-run
+    `START_BASE` + `CONTROL_SURFACE_REQUIRED`; inventory unchanged;
+    scientific_writes=0; budget matching stamp-only (legacy without market
+    stamp is historical/unresolved)
 
 ## Delivered
 
@@ -19,10 +21,12 @@
 - Schemas: input/run/critic/session receipts accept optional market/capability
 - Owner gold: `tests/test_forge_evidence_identity_and_owner_gold_v1.py`
   G1–G12 family (G1/G2, G3/G5, G4, G6 interrupt resume, G7 capability-only
-  drift, G8 C3, G9 legacy, G10 incomplete market fail-closed, G11 capability
-  does not free slot, G12 snapshot) + negative controls; A4 regression green
-- Owner blocks: market + capability epochs; START vs RESUME vs REUSED gloss
-- Skill/operator prose: market admission vs capability; no docs-driven reset
+  drift, G8 C3, G9 legacy, G10 incomplete-market fail-closed + tamper integrity,
+  G11 capability does not free slot, G12 snapshot) + negative controls; A4
+  regression green
+- Owner blocks: market + capability epochs + scientific slot; START vs RESUME
+  vs REUSED gloss; incomplete market → BLOCKED
+- Skill/operator/slash: market admission vs capability; no docs-driven reset
 
 ## Non-claims
 

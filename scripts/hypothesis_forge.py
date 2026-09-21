@@ -351,6 +351,7 @@ def cmd_forge_run(
 ) -> int:
     """Bounded Forge run receipt. persist=False never writes."""
     from solana_alpha_lab.factory.hfic_representation_ladder import (
+        LadderError,
         evaluate_forge_run,
         format_forge_run_owner_readout,
     )
@@ -390,13 +391,35 @@ def cmd_forge_run(
             "writes": {"research_store": 0, "forge_run": 0, "session": 0},
         }
         return _emit_run(payload, exit_code=2)
-    receipt = evaluate_forge_run(
-        repo_root,
-        resolved.root,
-        owner_focus=owner_focus if owner_focus.strip() else "AUTO",
-        persist=False,
-        saved_draft_sha256=saved_draft_sha256,
-    )
+    try:
+        receipt = evaluate_forge_run(
+            repo_root,
+            resolved.root,
+            owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+            persist=False,
+            saved_draft_sha256=saved_draft_sha256,
+        )
+    except LadderError as exc:
+        code = str(exc)
+        if code == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+            payload = {
+                "schema": "smial.forge-run-receipt",
+                "schema_version": "1.0",
+                "owner_class": "INPUT_NOT_READY",
+                "next_action": "INPUT_NOT_READY",
+                "owner_final": "INPUT_NOT_READY",
+                "blocking_reason_codes": [code],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "owner_readout": (
+                    "FORGE RUN\n"
+                    "status: BLOCKED — incomplete market evidence basis; "
+                    "not a scientific admission\n"
+                    f"blocking: {code}\n"
+                    "NEXT — restore decision-bearing datasets/lineage, then retry"
+                ),
+            }
+            return _emit_run(payload, exit_code=2)
+        raise
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
     from solana_alpha_lab.factory.hfic_representation_ladder import (
         attach_ladder_freeze_preflight,

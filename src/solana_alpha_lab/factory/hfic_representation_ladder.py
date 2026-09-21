@@ -942,6 +942,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 and len(str(receipt.get("market_evidence_epoch_sha256"))) == 64
                 else "NONE"
             )
+            + "  # admission/budget key"
         ),
         (
             "capability_epoch: "
@@ -951,6 +952,17 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 and len(str(receipt.get("capability_epoch_sha256"))) == 64
                 else "NONE"
             )
+            + "  # protocol; does not free market budget"
+        ),
+        (
+            "scientific_slot: "
+            + (
+                str(receipt.get("scientific_slot_sha256"))[:16]
+                if isinstance(receipt.get("scientific_slot_sha256"), str)
+                and len(str(receipt.get("scientific_slot_sha256"))) == 64
+                else "NONE"
+            )
+            + "  # market+representation+focus"
         ),
         f"legacy_epoch: {(receipt.get('legacy_epoch_sha256') or 'NONE')[:16]}",
     ]
@@ -1796,8 +1808,10 @@ def evaluate_forge_run(
 
     from solana_alpha_lab.factory.hfic_evidence_identity import (
         EvidenceIdentityError,
+        execution_binding_sha256,
         forge_run_identity_sha256,
         market_evidence_epoch_sha256 as _hash_market_basis,
+        scientific_slot_sha256,
     )
 
     market_epoch = input_receipt.get("market_evidence_epoch_sha256")
@@ -1808,11 +1822,6 @@ def evaluate_forge_run(
                 market_epoch = _hash_market_basis(basis)
             except EvidenceIdentityError as exc:
                 raise LadderError(str(exc)) from exc
-        active = input_receipt.get("active_evidence_set") or {}
-        if not isinstance(market_epoch, str) or len(market_epoch) != 64:
-            # Market-scoped evidence_set digests cohorts+manifest only — never
-            # fall back to full receipt_sha256 (capability/visibility pollution).
-            market_epoch = str(active.get("evidence_set_sha256") or "")
         if not isinstance(market_epoch, str) or len(market_epoch) != 64:
             raise LadderError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     run_identity = forge_run_identity_sha256(
@@ -1864,6 +1873,41 @@ def evaluate_forge_run(
 
     owner_final = decision.get("owner_final")
     next_action = str(decision.get("next_action"))
+    active_rep = "BASE"
+    active_version = "1"
+    if next_action in {ACTION_START_V1, ACTION_RESUME_V1}:
+        for row in resolved_stages:
+            if isinstance(row, Mapping) and str(row.get("representation_id") or "").startswith(
+                "NORMALIZED"
+            ):
+                active_rep = str(row["representation_id"])
+                active_version = str(row.get("semantic_version") or "1")
+                break
+    elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE, ACTION_RETURN_EXISTING}:
+        for row in resolved_stages:
+            rid = str(row.get("representation_id") or "") if isinstance(row, Mapping) else ""
+            if rid in {"BASE", "CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"} or rid == "BASE":
+                active_rep = rid or "BASE"
+                active_version = str(row.get("semantic_version") or "1")
+                break
+    scientific_slot = scientific_slot_sha256(
+        market_evidence_epoch_sha256=str(market_epoch),
+        representation_id=active_rep,
+        representation_semantic_version=active_version,
+        owner_focus=owner_focus,
+    )
+    cap_epoch = input_receipt.get("capability_epoch_sha256")
+    exec_binding = None
+    if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
+        exec_binding = execution_binding_sha256(
+            scientific_slot_sha256=scientific_slot,
+            capability_epoch_sha256=cap_epoch,
+            representation_payload_sha256=(
+                str(input_receipt.get("receipt_sha256"))
+                if isinstance(input_receipt.get("receipt_sha256"), str)
+                else None
+            ),
+        )
     if owner_class_input == OWNER_CLASS_INPUT_NOT_READY:
         owner_class = OWNER_CLASS_INPUT_NOT_READY
     elif owner_class_input == OWNER_CLASS_OBSERVABILITY_BLOCKED or next_action == ACTION_OBSERVABILITY_BLOCKED:
@@ -1930,6 +1974,8 @@ def evaluate_forge_run(
             and len(str(input_receipt.get("capability_epoch_sha256"))) == 64
             else None
         ),
+        "scientific_slot_sha256": scientific_slot,
+        "execution_binding_sha256": exec_binding,
         "control_session_id": control_session_id,
         "blocking_reason_codes": blocking,
         "writes": writes,
@@ -1982,17 +2028,21 @@ def _evidence_epoch_matches(
 ) -> bool:
     if extra is not None and "evidence_epoch_matches" in extra:
         return extra.get("evidence_epoch_matches") is True
-    control_epoch = control_receipt.get("evidence_epoch_sha256")
-    extra_epoch = extra.get("evidence_epoch_sha256") if extra else None
-    if extra_epoch is None and extra:
+    control_market = control_receipt.get("market_evidence_epoch_sha256")
+    extra_market = extra.get("market_evidence_epoch_sha256") if extra else None
+    if extra_market is None and extra:
         nested = extra.get("control_receipt")
         if isinstance(nested, Mapping):
-            extra_epoch = nested.get("evidence_epoch_sha256")
-    return bool(
-        isinstance(control_epoch, str)
-        and isinstance(extra_epoch, str)
-        and control_epoch == extra_epoch
-    )
+            extra_market = nested.get("market_evidence_epoch_sha256")
+    if (
+        isinstance(control_market, str)
+        and len(control_market) == 64
+        and isinstance(extra_market, str)
+        and len(extra_market) == 64
+    ):
+        return control_market == extra_market
+    # Fail-closed: legacy combined epoch alone is not market admission.
+    return False
 
 
 def representation_status_snapshot(

@@ -369,8 +369,8 @@ def build_forge_input_receipt(
             blocking.append(CURRENT_CORPUS_MISSING)
 
     from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
         build_market_evidence_basis,
-        capability_epoch_sha256 as _hash_capability_basis,
         compute_capability_epoch_for_repo,
         lineage_cohort_bindings,
         market_evidence_epoch_sha256 as _hash_market_basis,
@@ -383,20 +383,21 @@ def build_forge_input_receipt(
         corpus_version=corpus_version,
         lineage_bindings=lineage_cohort_bindings(Path(data_root)),
     )
+    market_epoch: str | None
     try:
         market_epoch = _hash_market_basis(market_basis)
-    except Exception:
-        market_epoch = _evidence_set_sha256(
-            current_dataset_manifest_id=current_mid,
-            visible_cohort_ids=visible_ids,
-            corpus_version=corpus_version,
-        )
+    except EvidenceIdentityError:
+        market_epoch = None
+        if "MARKET_EVIDENCE_BASIS_INCOMPLETE" not in blocking:
+            blocking.append("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        forge_runnable = False
+        if owner_class == OWNER_CLASS_READY:
+            owner_class = OWNER_CLASS_INPUT_NOT_READY
+    capability_epoch: str | None
     try:
         capability_epoch, _cap_basis = compute_capability_epoch_for_repo(Path(repo_root))
     except Exception:
-        capability_epoch = _hash_capability_basis(
-            {"basis_version": "CAPABILITY_EPOCH_BASIS_V1", "prompt_version": "UNKNOWN"}
-        )
+        capability_epoch = None
 
     body = {
         "schema": SCHEMA,
@@ -413,9 +414,7 @@ def build_forge_input_receipt(
                 corpus_version=corpus_version,
             ),
         },
-        "market_evidence_epoch_sha256": market_epoch,
         "market_evidence_basis": market_basis,
-        "capability_epoch_sha256": capability_epoch,
         "historical_calibration": historical,
         "representation_input_scope": {
             "scope": "REPRESENTATION_INPUT_SCOPE",
@@ -443,6 +442,10 @@ def build_forge_input_receipt(
         "writes": {"research_store": 0, "forge_context": 0, "session": 0},
         "data_root_instance_fingerprint_sha256": instance_fingerprint(Path(data_root)),
     }
+    if market_epoch is not None:
+        body["market_evidence_epoch_sha256"] = market_epoch
+    if capability_epoch is not None:
+        body["capability_epoch_sha256"] = capability_epoch
     hashed = dict(body)
     hashed["receipt_sha256"] = canonical_sha256(body)
     return hashed

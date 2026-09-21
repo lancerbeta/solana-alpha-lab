@@ -2931,10 +2931,10 @@ def find_session_by_epoch_focus(
     matched: list[dict[str, Any]] = []
     for item in list_hfic_sessions(store):
         from solana_alpha_lab.factory.hfic_evidence_identity import (
-            session_matches_market_epoch,
+            session_matches_epoch_for_lookup,
         )
 
-        if not session_matches_market_epoch(item, epoch):
+        if not session_matches_epoch_for_lookup(item, epoch):
             continue
         if item.get("focus_key_sha256") != focus_key:
             continue

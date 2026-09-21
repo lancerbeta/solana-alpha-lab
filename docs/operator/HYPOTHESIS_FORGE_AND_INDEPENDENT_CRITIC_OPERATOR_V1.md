@@ -95,6 +95,21 @@ require Git mutation. Memory eligibility remains in search-key / exact
 replay identity; it must not reset AUTO or distinct-focus counters for the
 same market evidence epoch (A5).
 
+**A5 identity gloss (owner path).** Scientific admission, resume, and budget
+use `market_evidence_epoch_sha256`. `capability_epoch_sha256` is protocol
+provenance and does **not** free AUTO/focus budget. Owner readout actions:
+
+| next_action | Owner meaning |
+|---|---|
+| `START_BASE` / `START_V1` | New scientific look on this market (or next representation slot) |
+| `RESUME_BASE` / `RESUME_V1` | Continue saved artifacts; not a new trial |
+| `RETURN_EXISTING` / REUSED_VALID | Already answered on this market; scientific writes=0 |
+| incomplete market | BLOCKED — restore decision-bearing datasets/lineage; do not invent a digest |
+
+Docs-only / Git-only capability drift must not reset an occupied market slot.
+Legacy combined `evidence_epoch_sha256` without a market stamp is historical
+or unresolved — never silent current reuse.
+
 Status:
 
 ```

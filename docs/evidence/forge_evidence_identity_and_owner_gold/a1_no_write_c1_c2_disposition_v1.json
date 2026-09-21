@@ -1,6 +1,6 @@
 {
   "schema": "smial.forge-evidence-identity-no-write-disposition",
-  "schema_version": "1.0",
+  "schema_version": "1.1",
   "as_of": "2026-09-21",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
   "git_head": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -17,41 +17,276 @@
     "REL-20260902T111900Z-20260909T111900Z",
     "REL-20260909T111900Z-20260916T111900Z"
   ],
+  "current_market_evidence_epoch_sha256": "1d4d31ecd4b32b6e",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
     "blocking_reason_codes": []
   },
-  "inventory_sha256_prefix_before": "defbc9a5a1794b05",
-  "inventory_sha256_prefix_after": "defbc9a5a1794b05",
+  "inventory_sha256_prefix_before": "f39ca5d1f2b5ce5b",
+  "inventory_sha256_prefix_after": "f39ca5d1f2b5ce5b",
   "scientific_writes": 0,
   "session_count": 17,
-  "control_sessions_present": 0,
+  "control_sessions_present": 2,
   "ladder_stamped_sessions": 0,
+  "sessions": [
+    {
+      "session_id": "HFIC-SESS-0343447C49AC901C",
+      "legacy_evidence_epoch_sha256": "01cc4494506d1825",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-0E507B71155C9DB5",
+      "legacy_evidence_epoch_sha256": "50b9ba184215abc9",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-2226C847FAAB183B",
+      "legacy_evidence_epoch_sha256": "2aa95f2187e076a6",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-5AC5EF9EF56EDCDE",
+      "legacy_evidence_epoch_sha256": "50b9ba184215abc9",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-60FB3DA7C8EB33FC",
+      "legacy_evidence_epoch_sha256": "ba8844147733e442",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-EF72FFDF5769AED6",
+      "legacy_evidence_epoch_sha256": null,
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "LEGACY_PARTIAL",
+      "disposition": "UNRESOLVED_BINDING",
+      "disposition_reasons": [
+        "MISSING_EPOCH_BINDING"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-1BA427E1D95C7AEA",
+      "legacy_evidence_epoch_sha256": "e128b07bdcf048dd",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-4F80F1151844EC1B",
+      "legacy_evidence_epoch_sha256": "456411903174e403",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": "CURRENT_REPRESENTATION_CONTROL_V1",
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-560C4E1A72B4F9E6",
+      "legacy_evidence_epoch_sha256": "ba8844147733e442",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-6DACA4A2F18AB4C0",
+      "legacy_evidence_epoch_sha256": "f2919cf5ffd7a135",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-70A72A88EE66CC14",
+      "legacy_evidence_epoch_sha256": "3969923f8470f917",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-7EDF73F4F41DD032",
+      "legacy_evidence_epoch_sha256": "6f52b6dfb4c87734",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-8B9B763DC5188358",
+      "legacy_evidence_epoch_sha256": "40dfacbf525c7d6f",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-8F4A703030408365",
+      "legacy_evidence_epoch_sha256": "237ee70916824b96",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": "CURRENT_REPRESENTATION_CONTROL_V1",
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-B735FBF93AFC82E7",
+      "legacy_evidence_epoch_sha256": "28eab6b9138b53df",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-C104993AA68805A0",
+      "legacy_evidence_epoch_sha256": "98fedffd5d91f563",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    },
+    {
+      "session_id": "HFIC-SESS-FC3216E5E68F8D4C",
+      "legacy_evidence_epoch_sha256": "e4e211f8934f8950",
+      "frozen_market_epoch_sha256": null,
+      "frozen_scope_cohort_ids": [],
+      "terminal": "SYNTHESIS_COMPLETE",
+      "disposition": "HISTORICAL_ONLY",
+      "disposition_reasons": [
+        "LEGACY_COMBINED_EPOCH_ONLY"
+      ],
+      "slot_occupied_for_current_market": false,
+      "evidence_surface_mode": null,
+      "next": "HISTORICAL_ONLY_OR_UNRESOLVED"
+    }
+  ],
   "first_run": {
     "next_action": "START_BASE",
     "blocking_reason_codes": [
       "CONTROL_SURFACE_REQUIRED"
     ],
     "owner_final": null,
-    "selected_ordinary_base_session_id": "HFIC-SESS-0343447C49AC901C",
-    "selected_ordinary_terminal": "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
-    "input_scope": "ORDINARY_BASE",
-    "effective_mode_for_next_generation": "CURRENT_REPRESENTATION_CONTROL_V1",
-    "legacy_epoch_present_on_run": false
+    "selected_ordinary_base_session_id": null,
+    "market_evidence_epoch_sha256": "1d4d31ecd4b32b6e",
+    "scientific_slot_sha256": "3c53992eeab4b9cf"
   },
   "disposition_summary": [
     {
       "class": "HISTORICAL_ONLY_OR_UNRESOLVED",
-      "reason": "No session carries CURRENT_REPRESENTATION_CONTROL_V1 or bound_visible_cohort_ids matching current C1+C2 visible set; legacy epochs differ across trials; focus-only match is insufficient for current reuse."
+      "reason": "Sessions without current market stamp are historical/unresolved; budget matching is stamp-only."
     },
     {
-      "class": "NO_COMPATIBLE_CONTROL_FOR_V1",
-      "reason": "Zero CONTROL sessions in store; first-run correctly requires CONTROL_SURFACE_REQUIRED before generation."
-    },
-    {
-      "class": "DO_NOT_ASSUME_OLD_CONTROL_COMPATIBLE",
-      "reason": "Absence of CONTROL means comparative V1 path cannot claim current C1/C2 reuse from historical ordinary NO_WORTHY alone."
+      "class": "CONTROL_PRESENT",
+      "reason": "control_sessions_present=2"
     }
   ],
   "non_claims": [

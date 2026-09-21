@@ -334,18 +334,7 @@ def compute_market_epoch_for_data_root(
         corpus_version=version,
         lineage_bindings=bindings,
     )
-    if not basis["datasets"] and not basis["visible_cohort_ids"]:
-        # Empty commissioning / no corpus: stable empty-market sentinel.
-        basis = {
-            **basis,
-            "datasets": [
-                {
-                    "dataset_manifest_id": "COMMISSIONING_EMPTY",
-                    "dataset_fingerprint": "0" * 64,
-                    "dataset_id": "COMMISSIONING",
-                }
-            ],
-        }
+    # Empty/incomplete market is not a scientific admission digest.
     return market_evidence_epoch_sha256(basis), basis
 
 
@@ -489,12 +478,35 @@ def sessions_for_market_budget(
 def session_matches_market_epoch(
     session: Mapping[str, Any], market_evidence_epoch: str
 ) -> bool:
-    """True when session occupies the scientific slot for this market epoch."""
+    """True when session occupies budget for this market epoch.
+
+    Fail-closed: only an explicit ``market_evidence_epoch_sha256`` stamp matches.
+    Legacy combined ``evidence_epoch_sha256`` alone never admits or budgets;
+    use ``classify_legacy_session_disposition`` for historical readback.
+    """
 
     stamped = session.get("market_evidence_epoch_sha256")
-    if isinstance(stamped, str) and stamped:
+    if isinstance(stamped, str) and len(stamped) == 64:
         return stamped == market_evidence_epoch
-    return session.get("evidence_epoch_sha256") == market_evidence_epoch
+    return False
+
+
+def session_matches_epoch_for_lookup(
+    session: Mapping[str, Any], epoch: str
+) -> bool:
+    """Exact resume/lookup match.
+
+    Prefer market stamp. Unstamped pre-split sessions may match on
+    ``evidence_epoch_sha256`` for exact-bytes resume only — never via budget
+    counters (``sessions_for_market_budget``).
+    """
+
+    if session_matches_market_epoch(session, epoch):
+        return True
+    stamped = session.get("market_evidence_epoch_sha256")
+    if isinstance(stamped, str) and stamped:
+        return False
+    return session.get("evidence_epoch_sha256") == epoch
 
 
 __all__ = [
@@ -518,6 +530,7 @@ __all__ = [
     "lineage_cohort_bindings",
     "market_evidence_epoch_sha256",
     "scientific_slot_sha256",
+    "session_matches_epoch_for_lookup",
     "session_matches_market_epoch",
     "sessions_for_market_budget",
 ]

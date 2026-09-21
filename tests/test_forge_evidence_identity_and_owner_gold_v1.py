@@ -490,6 +490,31 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 before_sessions,
             )
 
+    def test_g10_incomplete_market_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            # Empty RDP: no datasets/lineage → incomplete market, not a digest.
+            store = ResearchStore(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                return_value=([], []),
+            ):
+                receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
+            self.assertFalse(receipt.get("forge_runnable"))
+            self.assertIn(
+                "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+                receipt.get("blocking_reason_codes") or [],
+            )
+            self.assertNotIn("market_evidence_epoch_sha256", receipt)
+            with self.assertRaises(LadderError) as ctx:
+                with patch(
+                    "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                    return_value=([], []),
+                ):
+                    evaluate_forge_run(ROOT, data_root, persist=False)
+            self.assertEqual(str(ctx.exception), "MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            del store
+
     def test_g10_tamper_outer_key_is_integrity_stop(self) -> None:
         from solana_alpha_lab.factory.hfic_control_integrity import (
             CURRENT_REPRESENTATION_CONTROL_V1,
@@ -763,8 +788,6 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             )
 
     def test_g12_snapshot_restore_preserves_occupied_slot(self) -> None:
-        import shutil
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "data"
             snap = Path(tmp) / "snap"
@@ -780,13 +803,9 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 before = evaluate_forge_run(ROOT, data_root, persist=True)
             exported = export_snapshot(data_root, snap)
             restore_snapshot(exported.snapshot_root, restore_root)
-            # Snapshot owns ResearchStore bytes; market lineage fixtures must travel
-            # with the plane for identity continuity (not a second scientific look).
-            datasets = data_root / "datasets"
-            if datasets.is_dir():
-                shutil.copytree(
-                    datasets, restore_root / "datasets", dirs_exist_ok=True
-                )
+            # Snapshot owns ResearchStore bytes. Gold reconstitutes the same
+            # fixture lineage used at export (not a second scientific look).
+            _write_lineage(restore_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,
