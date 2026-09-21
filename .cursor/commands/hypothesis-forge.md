@@ -79,11 +79,16 @@ Then resolve the bounded run. Print `owner_readout` first (`status:` DONE / NEXT
 `START_V1` auto-advances; do **not** run ordinary Prompt A for that next.
 Owner pastes nothing. Same slash continues the V1 envelope via
 `consume_start_v1_envelope` on CONTROL `FORGE_CONTEXT_PACKET` (no fake critic).
-Freeze V1 with `ladder_freeze_preflight` from the `forge-run` JSON, not CONTROL
-preflight. After a draft, `forge-run --persist --saved-draft-sha256`. Freeze/Critic
-only after a V1 candidate exists (fixture stubs allowed), then
-re-run `forge-run` to read real V1 artifacts. That wiring does not execute the
-scientific V1 probe. Do not launch Critic on empty BASE. `RESUME_V1` uses `--saved-draft-sha256`, not the START helper.
+Freeze V1 only after `consume_start_v1_envelope` supplies the challenger:
+embed it via `prepare_ladder_freeze_preflight(..., challenger=...)` (marker/
+parent alone are insufficient; bare `forge-run` may leave
+`ladder_freeze_pending_reason`). After a draft, `forge-run --persist
+--saved-draft-sha256`. Freeze/Critic only after a V1 candidate exists
+(fixture stubs allowed). `PASS_TO_CLASSIFICATION` → classify then finalize
+(`RESUME_V1`, not owner-final); then re-run `forge-run` to read real V1
+artifacts. That wiring does not execute the scientific V1 probe. Do not
+launch Critic on empty BASE. `RESUME_V1` uses `--saved-draft-sha256` or
+pending classify, not the START helper.
 Prompt C `WAIT` is not the owner-final while V1 is eligible.
 `RETURN_EXISTING_RUN` is readback. `KEEP_PAUSE` is a typed pause (`status: NEXT`);
 print readout and stop — do not start V1. Session `RETURN_EXISTING_SESSION` does not
@@ -100,10 +105,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
 
 ## Representation mode boundary
 
-The normal slash command remains `ORDINARY`; its behavior and search budget are
-unchanged. Ordinary BASE `NO_WORTHY` without CONTROL surface is
-`CONTROL_REQUIRED` (`status: DONE`): evening complete, not a NEXT onto the
-CONTROL slash. `--control-current-representation` remains the trajectory-blind
+The normal slash remains one bounded run. Ordinary BASE `NO_WORTHY` without
+CONTROL surface yields `START_BASE` + `CONTROL_SURFACE_REQUIRED`
+(`status: NEXT`): continue CONTROL-compatible BASE inside this slash, not
+evening DONE. `--control-current-representation` remains the trajectory-blind
 `CONTROL` mode and is expert-only. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
 capability whose adapter is runtime-ready and not executed: it clones the
 exact CONTROL context (Forge context for completed `NO_WORTHY`, critic packet

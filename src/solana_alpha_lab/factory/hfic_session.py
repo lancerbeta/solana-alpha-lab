@@ -2698,15 +2698,35 @@ def _bound_from_ladder_challenger_preflight(
     repo_root: Any,
     memory_as_of: str,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
-    """Persist a stamped V1/V2 freeze without START_NEW_SESSION bind."""
+    """Persist a stamped V1/V2 freeze without START_NEW_SESSION bind.
+
+    Marker + parent alone are insufficient for V1: require verified
+    representation payload hashes embedded on the forge_context_packet.
+    """
 
     packet = preflight.get("forge_context_packet")
     if not isinstance(packet, Mapping) or not packet:
         raise HficSessionError("FORGE_CONTEXT_REQUIRED")
+    representation, parent = _preflight_ladder_slot(preflight)
+    if representation == "NORMALIZED_TRAJECTORY_V1":
+        payload = packet.get("normalized_trajectory_v1")
+        payload_sha = packet.get("representation_payload_sha256")
+        search_key = packet.get("representation_search_key_sha256")
+        if not isinstance(payload, Mapping) or not payload:
+            raise HficSessionError("LADDER_CHALLENGER_PAYLOAD_REQUIRED")
+        if not isinstance(payload_sha, str) or len(payload_sha) != 64:
+            raise HficSessionError("LADDER_CHALLENGER_PAYLOAD_HASH_REQUIRED")
+        if not isinstance(search_key, str) or len(search_key) != 64:
+            raise HficSessionError("LADDER_CHALLENGER_SEARCH_KEY_REQUIRED")
+        if not parent:
+            raise HficSessionError("LADDER_CHALLENGER_PARENT_REQUIRED")
+        if packet.get("control_session_id") not in (None, "", parent):
+            if packet.get("control_session_id") != parent:
+                raise HficSessionError("LADDER_CHALLENGER_PARENT_MISMATCH")
     epoch = str(preflight.get("evidence_epoch_sha256") or "")
     focus_key = str(preflight.get("focus_key_sha256") or "")
-    search_key = str(preflight.get("search_key_sha256") or "")
-    if not epoch or not focus_key or not search_key:
+    search_key_bound = str(preflight.get("search_key_sha256") or "")
+    if not epoch or not focus_key or not search_key_bound:
         raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
     from solana_alpha_lab.factory.hfic_preflight import persist_forge_context_packet
 
@@ -2722,7 +2742,7 @@ def _bound_from_ladder_challenger_preflight(
     bound = {
         "evidence_epoch_sha256": epoch,
         "focus_key_sha256": focus_key,
-        "search_key_sha256": search_key,
+        "search_key_sha256": search_key_bound,
         "owner_focus": str(preflight.get("owner_focus") or "AUTO"),
         "live_git_head": str(preflight.get("live_git_head") or "0" * 40).lower(),
         "git_composite_sha256": preflight.get("git_composite_sha256"),
@@ -3502,7 +3522,24 @@ def persist_intermediate_cycle(
                 "git_composite_sha256": frozen.get("git_composite_sha256"),
                 "research_memory_as_of": frozen.get("research_memory_as_of"),
                 "revision_count": int(frozen.get("revision_count") or 0),
-                "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256"),
+                "forge_context_packet_sha256": frozen.get("forge_context_packet_sha256")
+                or (
+                    existing.get("forge_context_packet_sha256")
+                    if isinstance(existing, Mapping)
+                    else None
+                ),
+                "ladder_representation_id": frozen.get("ladder_representation_id")
+                or (
+                    existing.get("ladder_representation_id")
+                    if isinstance(existing, Mapping)
+                    else None
+                ),
+                "control_session_id": frozen.get("control_session_id")
+                or (
+                    existing.get("control_session_id")
+                    if isinstance(existing, Mapping)
+                    else None
+                ),
                 "hfic_cycle_seq": cycle_seq,
             }
     source = existing if existing is not None else frozen
@@ -4683,6 +4720,26 @@ def finalize_session(
                     "runner_up_failover_used": failover_used,
                     "critic_screen_count": 2 if failover_used else 1,
                     "hfic_cycle_seq": _next_cycle_seq(existing),
+                    "forge_context_packet_sha256": frozen.get(
+                        "forge_context_packet_sha256"
+                    )
+                    or (
+                        existing.get("forge_context_packet_sha256")
+                        if isinstance(existing, Mapping)
+                        else None
+                    ),
+                    "ladder_representation_id": frozen.get("ladder_representation_id")
+                    or (
+                        existing.get("ladder_representation_id")
+                        if isinstance(existing, Mapping)
+                        else None
+                    ),
+                    "control_session_id": frozen.get("control_session_id")
+                    or (
+                        existing.get("control_session_id")
+                        if isinstance(existing, Mapping)
+                        else None
+                    ),
                     **(
                         {
                             "evidence_surface_mode": frozen["evidence_surface_mode"]
@@ -5008,6 +5065,8 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             if isinstance(session_receipt, Mapping)
             else None
         ),
+        "ladder_representation_id": cycle.get("ladder_representation_id"),
+        "control_session_id": cycle.get("control_session_id"),
         "next_action": None,
         "next_action_status": "LEGACY_NOT_RECORDED",
         "grounded_candidates": cycle.get("grounded_candidates"),

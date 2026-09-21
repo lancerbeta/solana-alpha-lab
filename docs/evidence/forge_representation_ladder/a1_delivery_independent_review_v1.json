@@ -2,10 +2,10 @@
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "review_id": "FORGE-REPRESENTATION-LADDER-INDEPENDENT-REVIEW-001",
-  "as_of": "2026-09-20",
+  "as_of": "2026-09-21",
   "task_id": "FORGE_REPRESENTATION_LADDER_V1",
-  "reviewed_bindings_sha256": "b104f8efb44c48cd465e7d2db37c352e319ab973d014967a69666f8e138ae8c2",
-  "reviewed_inventory_sha256": "bf0ce1205c739f689e2649b5adca96da578c6fcb9ee217aae6fd97951476b9db",
+  "reviewed_bindings_sha256": "pending_bind",
+  "reviewed_inventory_sha256": "pending_bind",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,79 +17,71 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=c15e7e52facacc6fa26737da8a3c5c03247365c75afa7fb6319f6f174f78ce6c",
+        "packet_fingerprint_sha256=d6ac5836e8566479e8f3524b5b113b0c3fadba0cb6b893187216c02b4307491e",
         "PACKET_INFORMATION_PATH_ONLY",
         "MODEL_DIVERSITY_UNPROVEN",
-        "PASS_F1_NO_DEFAULT_HISTORICAL_CONTROL",
-        "PASS_F2_CLI_MISSING_PACKET_OBSERVABILITY",
-        "PASS_F3_LATER_REP_PARENT_FILTERED",
-        "PASS_A3_ONLY_INPUT_OWNER",
-        "PASS_TO_CLASSIFICATION_AS_OWNER_CANDIDATE_ORIGINAL_A4",
-        "CONTROL_REQUIRED_EVENING_DONE_ORIGINAL_A4"
+        "PASS_A4P2_R1_CONTROL_SURFACE_REQUIRED_NEXT",
+        "PASS_A4P2_R2_CHALLENGER_FREEZE_REQUIRED",
+        "PASS_A4P2_R3_PASS_TO_CLASSIFICATION_INTERMEDIATE",
+        "PASS_KEEP_PAUSE_OWNER_FINAL_NULL_NO_PERSIST_LOCK",
+        "PASS_A3_ONLY_INPUT_OWNER"
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PASS_BLOCKED_READOUT_REFRESH",
-        "PASS_PERSIST_AFTER_ATTACH_NOT_BLOCKED",
-        "PASS_FREEZE_BIND_REAL_APIS",
-        "PASS_NO_HISTORICAL_CONTROL_DEFAULT",
-        "PASS_LATER_REP_CONSUMED",
-        "PASS_KEEP_PAUSE_NAMED",
-        "PASS_TO_CLASSIFICATION_OWNER_CANDIDATE_ORIGINAL_A4"
+        "PASS_A4P2_R1_WRITER_READER",
+        "PASS_A4P2_R2_CHALLENGER_BIND",
+        "PASS_A4P2_R3_LADDER_STAMPS",
+        "PASS_KEEP_PAUSE_SCHEMA_ENUM_REMOVED",
+        "PASS_NO_PERSIST_COMPLETION_LOCK",
+        "PASS_DIFF_SHA256_eb572b6519841fbc8f3739576a4e669546f0f8e27f3261189332b73d3273cd98"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_F1_BASE_CURRENT_BINDING",
-        "PASS_F2_V1_ARTIFACT_READBACK",
-        "PASS_F3_LATER_REP_COMPLETION",
-        "PASS_CHEAPEST_FALSIFIER_HELD",
-        "PASS_MANDATORY_EMPTY_BASE_FREEZE_FINALIZE_RETRY",
-        "PASS_NO_SCIENTIFIC_V1_PROBE"
+        "PASS_A4P2_DOD_R1_R3",
+        "PASS_NO_FALSE_EVENING_DONE",
+        "PASS_NO_A5",
+        "PASS_NO_SCIENTIFIC_FORGE",
+        "PASS_KEEP_PAUSE_NULL_OWNER_FINAL"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_BLOCKED_STATUS_NOT_STALE_V1",
-        "PASS_KEEP_PAUSE_NAMED",
-        "PASS_CONTROL_REQUIRED_EVENING_DONE",
-        "PASS_OWNER_READOUT_NOT_JSON_DUMP",
-        "PASS_START_V1_LADDER_FREEZE_PREFLIGHT"
+        "PASS_KEEP_PAUSE_TYPED_PAUSE_NEXT",
+        "PASS_CONTROL_SURFACE_REQUIRED_NEXT",
+        "PASS_START_V1_RESUME_NAMED",
+        "PASS_OWNER_READOUT_PRIMARY"
       ]
     }
   ],
   "remediation_history": [
     {
-      "role": "CODE_REVIEWER",
+      "role": "ARCHITECTURE_CRITIC",
       "prior_verdict": "NOT_READY",
       "severity": "BLOCKER",
-      "finding": "stale START_V1 owner_readout after OBSERVABILITY overlay",
-      "observed_head": "b7687f4d3d4b6baf03f050f3e6616c80aa0f0c58",
-      "resolved_by_head": "18ef56be9ad77a65cfbbb6ab082c58a00196809f"
+      "finding": "ordinary NO_WORTHY BASE composed bare START_BASE without CONTROL_SURFACE_REQUIRED",
+      "resolved_by": "discovery prefers ordinary trigger into resolve; else NOT_RUN with CONTROL_SURFACE_REQUIRED"
     },
     {
       "role": "OWNER_UX_CRITIC",
       "prior_verdict": "NOT_READY",
       "severity": "BLOCKER",
-      "finding": "stale START_V1 readout after OBSERVABILITY overlay; KEEP_PAUSE unnamed in command",
-      "observed_head": "b7687f4d3d4b6baf03f050f3e6616c80aa0f0c58",
-      "resolved_by_head": "18ef56be9ad77a65cfbbb6ab082c58a00196809f"
+      "finding": "Skill stop-list grouped KEEP_PAUSE with evening finals",
+      "resolved_by": "Skill separates KEEP_PAUSE as typed pause status NEXT"
+    },
+    {
+      "role": "ARCHITECTURE_CRITIC",
+      "prior_verdict": "NOT_READY",
+      "severity": "BLOCKER",
+      "finding": "KEEP_PAUSE owner_final/OWNER_FINAL locked persist to RETURN_EXISTING",
+      "resolved_by": "owner_final null; schema enum remove KEEP_PAUSE; FORGE_RUN_IN_PROGRESS"
     }
-  ],
-  "verdict": "PASS",
-  "non_claims": [
-    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
-    "NO_SCIENTIFIC_PASS",
-    "NO_ALPHA",
-    "NO_SCIENTIFIC_FORGE",
-    "NO_V1_SCIENTIFIC_PROBE",
-    "NO_A5_IDENTITY_GOLD"
   ]
 }

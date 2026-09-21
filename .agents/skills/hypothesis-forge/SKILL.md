@@ -140,13 +140,19 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      Do **not** run ordinary Prompt A / `START_NEW_SESSION`. Print `owner_readout`
      (`status: NEXT`). Owner pastes nothing. Same slash continues V1 envelope
      construction via `consume_start_v1_envelope` on the CONTROL
-     `FORGE_CONTEXT_PACKET` (no fake critic packet). Freeze V1 with
-     `ladder_freeze_preflight` from the `forge-run` JSON, not the CONTROL
-     preflight (same epoch/focus would otherwise reuse BASE). After a generator
-     draft exists, immediately `forge-run --persist --saved-draft-sha256 <hash>`
-     before freeze so retry is `RESUME_V1`. Freeze/Critic only after a
-     V1 candidate exists on that envelope (fixture stubs allowed). After
-     freeze/finalize, re-run `forge-run` so the aggregate reads the real V1
+     `FORGE_CONTEXT_PACKET` (no fake critic packet). Marker/parent alone do
+     **not** authorize freeze: embed the envelope `challenger` into
+     `prepare_ladder_freeze_preflight(..., challenger=...)` (or re-attach
+     after envelope). A bare `forge-run` may leave
+     `ladder_freeze_pending_reason=LADDER_FREEZE_CHALLENGER_REQUIRED` until
+     the envelope supplies payload hashes. Do **not** freeze from a CONTROL
+     packet copy with only a V1 marker. After a generator draft exists,
+     immediately `forge-run --persist --saved-draft-sha256 <hash>` before
+     freeze so retry is `RESUME_V1`. Freeze/Critic only after a V1 candidate
+     exists on that envelope (fixture stubs allowed). After freeze/finalize,
+     if terminal is `PASS_TO_CLASSIFICATION`, run network-free
+     `classify` then finalize — that intermediate is `RESUME_V1`, not
+     owner-final. Re-run `forge-run` so the aggregate reads real V1
      session artifacts; do not inject completed stages. That is the production
      adapter for a later authorized slash, not Prompt A on market evidence and
      not the scientific V1 probe. Do **not** launch Independent Critic on empty
@@ -154,20 +160,30 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      Do not stop as if Prompt C `WAIT_FOR_NEW_EVIDENCE` were the owner-final.
      Do not ask the owner to «продолжить».
    - `RESUME_V1` resumes the saved V1 draft (`--saved-draft-sha256` /
-     existing freeze identity). Do **not** call `consume_start_v1_envelope`
+     existing freeze identity) **or** pending classify after
+     `PASS_TO_CLASSIFICATION`. Do **not** call `consume_start_v1_envelope`
      (that helper is START_V1 only).
-   - `START_BASE` → only then continue to preflight `START_NEW_SESSION` / Prompt A.
+   - `START_BASE` → continue to preflight `START_NEW_SESSION` / Prompt A.
+     When `blocking_reason_codes` includes `CONTROL_SURFACE_REQUIRED`, use
+     CONTROL-compatible BASE (`evidence_surface_mode=
+     CURRENT_REPRESENTATION_CONTROL_V1`) inside this same slash — print
+     `owner_readout` (`status: NEXT`); do **not** treat it as evening DONE.
    - `RESUME_BASE` → resume the exact pending BASE stage from the saved draft;
      do not regenerate.
    - `RETURN_EXISTING_RUN` is readback; stop; no second trial.
    - `FINISH_RUNNER_UP` continues isolated Critic #2; do not start V1.
    - `OWNER_CANDIDATE` / `SEARCH_EXHAUSTED_CURRENT_EVIDENCE` /
-     `NON_SCIENTIFIC_STOP` / `KEEP_PAUSE` / `CONTROL_REQUIRED` /
-     `INPUT_NOT_READY` / `OBSERVABILITY_BLOCKED` → print `owner_readout`; stop.
-     `CONTROL_REQUIRED` is the ordinary evening owner-final when V1 is eligible
-     but BASE is not CONTROL surface (`status: DONE`). Do not continue this
-     slash. `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` is expert-only
-     and is not owner NEXT.
+     `NON_SCIENTIFIC_STOP` / `INPUT_NOT_READY` /
+     `OBSERVABILITY_BLOCKED` → print `owner_readout`; stop (evening-final or
+     blocked).
+   - `KEEP_PAUSE` is a typed pause (`status: NEXT`, `owner_final` null); print
+     `owner_readout` and stop — do **not** start V1 and do **not** report
+     evening DONE / success. Persisted pause must not lock the run as
+     completed readback; later slash re-resolves from live session state.
+   - Do **not** treat a missing CONTROL surface as owner-final: that path is
+     `START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) above.
+     `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` remains expert-only
+     and is not a separate owner evening.
    Technical / visibility failures stay `OBSERVABILITY_BLOCKED`, never
    scientific `NO_WORTHY` or `SEARCH_EXHAUSTED_CURRENT_EVIDENCE`.
    A no-write diagnostic that never starts a session. Pass the same

@@ -35,15 +35,14 @@
     "next_action": {"type": "string", "minLength": 1},
     "owner_final": {
       "type": ["string", "null"],
+      "description": "Owner-final of the bounded forge-run. KEEP_PAUSE and CONTROL_SURFACE_REQUIRED are NEXT (owner_final null), not DONE enums. Historical CONTROL_REQUIRED owner-final is retired.",
       "enum": [
         null,
         "OWNER_CANDIDATE",
         "SEARCH_EXHAUSTED_CURRENT_EVIDENCE",
         "NON_SCIENTIFIC_STOP",
         "INPUT_NOT_READY",
-        "OBSERVABILITY_BLOCKED",
-        "KEEP_PAUSE",
-        "CONTROL_REQUIRED"
+        "OBSERVABILITY_BLOCKED"
       ]
     },
     "input_receipt_sha256": {"type": ["string", "null"], "pattern": "^[0-9a-f]{64}$"},

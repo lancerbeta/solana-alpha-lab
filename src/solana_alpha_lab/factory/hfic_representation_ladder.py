@@ -133,9 +133,10 @@ PASS_TERMINALS = frozenset(
         "PASS_FAST_LANE_READY",
         "PASS_CHANGE_LANE_REQUIRED",
         "PASS_DATA_OPTION_REQUIRED",
-        "PASS_TO_CLASSIFICATION",
     }
 )
+# Critic intermediate: session stays AWAITING_CLASSIFICATION until classify/finalize.
+INTERMEDIATE_PASS_TERMINALS = frozenset({"PASS_TO_CLASSIFICATION"})
 
 _RECEIPT_VALIDATOR: Draft202012Validator | None = None
 
@@ -258,6 +259,17 @@ def _consume_representation_chain(
                 "owner_final": ACTION_OBSERVABILITY_BLOCKED,
                 "reason_code": str(stage.get("reason_code") or ACTION_OBSERVABILITY_BLOCKED),
             }
+        if state in RESUME_STATES or (
+            isinstance(terminal, str) and terminal in INTERMEDIATE_PASS_TERMINALS
+        ):
+            return {
+                "next_action": _resume_action(current_id),
+                "owner_final": None,
+                "reason_code": state
+                if state in RESUME_STATES
+                else str(terminal),
+                "draft_sha256": saved_draft_sha256 or stage.get("draft_sha256"),
+            }
         if isinstance(terminal, str) and (
             terminal in PASS_TERMINALS or terminal in CASE_A_TERMINALS
         ):
@@ -266,17 +278,10 @@ def _consume_representation_chain(
                 "owner_final": ACTION_OWNER_CANDIDATE,
                 "reason_code": terminal,
             }
-        if state in RESUME_STATES:
-            return {
-                "next_action": _resume_action(current_id),
-                "owner_final": None,
-                "reason_code": state,
-                "draft_sha256": saved_draft_sha256 or stage.get("draft_sha256"),
-            }
         if state in PAUSE_STATES:
             return {
                 "next_action": ACTION_KEEP_PAUSE,
-                "owner_final": ACTION_KEEP_PAUSE,
+                "owner_final": None,
                 "reason_code": state,
             }
         if isinstance(terminal, str) and terminal in CASE_C_KILL_TERMINALS:
@@ -366,6 +371,16 @@ def resolve_next_action(
     base_state = str(base.get("session_state") or "")
 
     if base_status == EXEC_NOT_RUN:
+        stage_reason = str(base.get("reason_code") or "")
+        if stage_reason in {"CONTROL_SURFACE_REQUIRED", ACTION_CONTROL_REQUIRED}:
+            # Discovery found ordinary/incomplete BASE but no CONTROL-compatible
+            # session — agent must start CONTROL surface, not bare ordinary Prompt A.
+            return {
+                "next_action": ACTION_START_BASE,
+                "owner_final": None,
+                "reason_code": "CONTROL_SURFACE_REQUIRED",
+                "base_evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+            }
         return {
             "next_action": ACTION_START_BASE,
             "owner_final": None,
@@ -390,8 +405,19 @@ def resolve_next_action(
         )
         return {
             "next_action": action,
-            "owner_final": ACTION_KEEP_PAUSE if action == ACTION_KEEP_PAUSE else None,
+            "owner_final": None,
             "reason_code": base_state or str(base_terminal),
+        }
+    if base_state in RESUME_STATES or (
+        isinstance(base_terminal, str) and base_terminal in INTERMEDIATE_PASS_TERMINALS
+    ):
+        return {
+            "next_action": ACTION_RESUME_BASE,
+            "owner_final": None,
+            "reason_code": base_state
+            if base_state in RESUME_STATES
+            else str(base_terminal),
+            "draft_sha256": saved_draft_sha256 or base.get("draft_sha256"),
         }
     if isinstance(base_terminal, str) and (
         base_terminal in PASS_TERMINALS or base_terminal in CASE_A_TERMINALS
@@ -400,13 +426,6 @@ def resolve_next_action(
             "next_action": ACTION_OWNER_CANDIDATE,
             "owner_final": ACTION_OWNER_CANDIDATE,
             "reason_code": base_terminal,
-        }
-    if base_state in RESUME_STATES:
-        return {
-            "next_action": ACTION_RESUME_BASE,
-            "owner_final": None,
-            "reason_code": base_state,
-            "draft_sha256": saved_draft_sha256 or base.get("draft_sha256"),
         }
     if isinstance(base_terminal, str) and (
         base_terminal in CASE_C_KILL_TERMINALS or base_terminal == "KILL_UNBOUND_EVIDENCE"
@@ -426,10 +445,12 @@ def resolve_next_action(
         and control_probe_permitted(base_terminal)
     ):
         if str(base.get("evidence_surface_mode") or "") != CURRENT_REPRESENTATION_CONTROL_V1:
+            # V1 needs CONTROL-compatible BASE inside the same slash — not evening DONE.
             return {
-                "next_action": ACTION_CONTROL_REQUIRED,
-                "owner_final": ACTION_CONTROL_REQUIRED,
-                "reason_code": "CONTROL_REQUIRED",
+                "next_action": ACTION_START_BASE,
+                "owner_final": None,
+                "reason_code": "CONTROL_SURFACE_REQUIRED",
+                "base_evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
             }
         return _consume_representation_chain(
             registry=active,
@@ -541,8 +562,14 @@ def prepare_ladder_freeze_preflight(
     *,
     representation_id: str,
     control_session_id: str,
+    challenger: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Copy CONTROL preflight into a freeze receipt that cannot collide with BASE."""
+    """Copy CONTROL preflight into a freeze receipt that cannot collide with BASE.
+
+    For NORMALIZED_TRAJECTORY_V1, ``challenger`` is required: marker/parent alone
+    do not prove representation input. Embed verified payload hashes from the
+    envelope so freeze/Critic bind the same challenger.
+    """
 
     if representation_id not in {HANDLER_NORMALIZED_TRAJECTORY_V1, HANDLER_SYNTHETIC_LATER_V2}:
         raise LadderError("LADDER_FREEZE_PREFLIGHT_REPRESENTATION_INVALID")
@@ -554,16 +581,59 @@ def prepare_ladder_freeze_preflight(
     packet["control_session_id"] = control_session_id
     packet.pop("evidence_surface_mode", None)
     packet.pop("visible_cohort_ids", None)
+    if representation_id == HANDLER_NORMALIZED_TRAJECTORY_V1:
+        if not isinstance(challenger, Mapping) or not challenger:
+            raise LadderError("LADDER_FREEZE_CHALLENGER_REQUIRED")
+        _embed_challenger_into_ladder_packet(packet, challenger, control_session_id)
+        receipt["ladder_challenger_packet"] = dict(challenger)
+        search = challenger.get("representation_search_key_sha256")
+        if not isinstance(search, str) or len(search) != 64:
+            raise LadderError("LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING")
+        receipt["search_key_sha256"] = search
+    else:
+        base_key = str(receipt.get("search_key_sha256") or "")
+        receipt["search_key_sha256"] = hashlib.sha256(
+            f"{base_key}:{representation_id}:{control_session_id}".encode("utf-8")
+        ).hexdigest()
     receipt["forge_context_packet"] = packet
     receipt["control_session_id"] = control_session_id
     receipt[LADDER_REPRESENTATION_PACKET_KEY] = representation_id
     receipt.pop("evidence_surface_mode", None)
-    base_key = str(receipt.get("search_key_sha256") or "")
-    receipt["search_key_sha256"] = hashlib.sha256(
-        f"{base_key}:{representation_id}:{control_session_id}".encode("utf-8")
-    ).hexdigest()
     receipt.pop("forge_context_packet_sha256", None)
     return receipt
+
+
+def _embed_challenger_into_ladder_packet(
+    packet: dict[str, Any],
+    challenger: Mapping[str, Any],
+    control_session_id: str,
+) -> None:
+    """Stamp verified V1 representation fields onto the freeze packet."""
+
+    parent = challenger.get("control_session_id")
+    if parent != control_session_id:
+        raise LadderError("LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH")
+    payload = challenger.get("normalized_trajectory_v1")
+    payload_sha = challenger.get("representation_payload_sha256")
+    search_key = challenger.get("representation_search_key_sha256")
+    if not isinstance(payload, Mapping) or not payload:
+        raise LadderError("LADDER_FREEZE_CHALLENGER_PAYLOAD_MISSING")
+    if not isinstance(payload_sha, str) or len(payload_sha) != 64:
+        raise LadderError("LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISSING")
+    if not isinstance(search_key, str) or len(search_key) != 64:
+        raise LadderError("LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING")
+    nested_sha = payload.get("payload_sha256")
+    if isinstance(nested_sha, str) and nested_sha and nested_sha != payload_sha:
+        raise LadderError("LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISMATCH")
+    packet["normalized_trajectory_v1"] = dict(payload)
+    packet["representation_payload_sha256"] = payload_sha
+    packet["representation_search_key_sha256"] = search_key
+    probe_id = challenger.get("probe_identity_sha256")
+    if isinstance(probe_id, str) and len(probe_id) == 64:
+        packet["probe_identity_sha256"] = probe_id
+    control_packet_sha = challenger.get("control_packet_sha256")
+    if isinstance(control_packet_sha, str) and len(control_packet_sha) == 64:
+        packet["control_packet_sha256"] = control_packet_sha
 
 
 def attach_ladder_freeze_preflight(
@@ -590,11 +660,31 @@ def attach_ladder_freeze_preflight(
             if "SYNTHETIC_LATER_V2" in next_action
             else HANDLER_NORMALIZED_TRAJECTORY_V1
         )
-        payload["ladder_freeze_preflight"] = prepare_ladder_freeze_preflight(
-            control_preflight_from_bundle(bundle, packet),
-            representation_id=representation_id,
-            control_session_id=control_sid,
-        )
+        challenger = payload.get("ladder_challenger") or payload.get("challenger")
+        if not isinstance(challenger, Mapping):
+            challenger = None
+        try:
+            payload["ladder_freeze_preflight"] = prepare_ladder_freeze_preflight(
+                control_preflight_from_bundle(bundle, packet),
+                representation_id=representation_id,
+                control_session_id=control_sid,
+                challenger=challenger,
+            )
+        except LadderError as exc:
+            if representation_id == HANDLER_NORMALIZED_TRAJECTORY_V1 and str(exc) in {
+                "LADDER_FREEZE_CHALLENGER_REQUIRED",
+                "LADDER_FREEZE_CHALLENGER_PAYLOAD_MISSING",
+                "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISSING",
+                "LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING",
+                "LADDER_FREEZE_CHALLENGER_PARENT_MISMATCH",
+                "LADDER_FREEZE_CHALLENGER_PAYLOAD_HASH_MISMATCH",
+            }:
+                # START_V1 without envelope yet: keep next_action; freeze later
+                # after consume_start_v1_envelope supplies challenger.
+                payload.pop("ladder_freeze_preflight", None)
+                payload["ladder_freeze_pending_reason"] = str(exc)
+                return payload
+            raise
         return payload
     payload["next_action"] = ACTION_OBSERVABILITY_BLOCKED
     payload["owner_final"] = ACTION_OBSERVABILITY_BLOCKED
@@ -679,15 +769,36 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         status = "NEXT — typed pause; evening not success"
     elif next_action == ACTION_CONTROL_REQUIRED:
         status = (
-            "DONE — CONTROL_REQUIRED; ordinary evening complete; "
-            "CONTROL slash is expert-only, not this NEXT"
+            "NEXT — CONTROL-compatible BASE required for V1; "
+            "not evening DONE; use CONTROL surface inside this slash"
+        )
+    elif next_action == ACTION_START_BASE and "CONTROL_SURFACE_REQUIRED" in {
+        str(item) for item in (receipt.get("blocking_reason_codes") or [])
+    }:
+        status = (
+            "NEXT — start CONTROL-compatible BASE for V1 ladder; "
+            "not ordinary evening DONE"
         )
     elif owner_final:
         status = "DONE — bounded-run owner-final; do not continue"
     elif next_action == ACTION_START_V1:
         status = "NEXT — continue V1 envelope; do not treat WAIT as done"
     elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE, ACTION_RESUME_V1}:
-        status = "NEXT — resume or start the named stage from saved artifacts"
+        reasons = {str(item) for item in (receipt.get("blocking_reason_codes") or [])}
+        stage_reasons = {
+            str(stage.get("reason_code") or "")
+            for stage in (receipt.get("stages") or [])
+            if isinstance(stage, Mapping)
+        }
+        if reasons & {"AWAITING_CLASSIFICATION", "PASS_TO_CLASSIFICATION"} or stage_reasons & {
+            "AWAITING_CLASSIFICATION",
+            "PASS_TO_CLASSIFICATION",
+        }:
+            status = (
+                "NEXT — classify then finalize; PASS_TO_CLASSIFICATION is not owner-final"
+            )
+        else:
+            status = "NEXT — resume or start the named stage from saved artifacts"
     elif next_action == ACTION_FINISH_RUNNER_UP:
         status = "NEXT — finish already frozen runner-up; do not start V1"
     else:
@@ -1267,17 +1378,43 @@ def _discover_ladder_stages(
     legacy_epoch = None
     resolved: list[dict[str, Any]] = []
     if chosen is None:
-        resolved.append(
-            {
-                "representation_id": "BASE",
-                "execution_status": EXEC_NOT_RUN,
-                "effective_terminal": None,
-                "input_scope": "ORDINARY_BASE",
-                "session_id": None,
-                "used_cohort_ids": [],
-                "reason_code": ACTION_CONTROL_REQUIRED if grouped.get("BASE") else None,
-            }
-        )
+        # Prefer an ordinary completed BASE that would trigger V1 so resolve
+        # emits CONTROL_SURFACE_REQUIRED (NEXT). Else NOT_RUN placeholder with
+        # the same reason when any BASE exists but is not CONTROL-applicable.
+        ordinary_trigger: tuple[str, dict[str, Any], Mapping[str, Any]] | None = None
+        for sid, stage, bundle in grouped.get("BASE", []):
+            if str(stage.get("evidence_surface_mode") or "") == CURRENT_REPRESENTATION_CONTROL_V1:
+                continue
+            packet = _packet_for_bundle(Path(data_root), bundle, store)
+            if not _focus_matches(bundle, packet, owner_focus):
+                continue
+            terminal = stage.get("effective_terminal")
+            if isinstance(terminal, str) and terminal in {
+                "NO_WORTHY_HYPOTHESIS",
+                "KILL_DUPLICATE_OR_PREVIOUSLY_CLOSED",
+            }:
+                ordinary_trigger = (sid, dict(stage), bundle)
+                break
+        if ordinary_trigger is not None:
+            _sid, base_stage, _bundle = ordinary_trigger
+            if str(base_stage.get("session_state") or "") == "SYNTHESIS_COMPLETE":
+                base_stage["execution_status"] = EXEC_REUSED
+            base_stage["input_scope"] = "ORDINARY_BASE"
+            resolved.append(base_stage)
+        else:
+            resolved.append(
+                {
+                    "representation_id": "BASE",
+                    "execution_status": EXEC_NOT_RUN,
+                    "effective_terminal": None,
+                    "input_scope": "ORDINARY_BASE",
+                    "session_id": None,
+                    "used_cohort_ids": [],
+                    "reason_code": (
+                        "CONTROL_SURFACE_REQUIRED" if grouped.get("BASE") else None
+                    ),
+                }
+            )
     else:
         control_session_id, base_stage, chosen_bundle = chosen
         bound = list(base_stage.get("used_cohort_ids") or [])

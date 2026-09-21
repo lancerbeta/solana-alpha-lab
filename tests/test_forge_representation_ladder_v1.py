@@ -14,6 +14,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import redirect_stderr, redirect_stdout
+from collections.abc import Mapping
 from pathlib import Path
 from unittest.mock import patch
 
@@ -31,6 +32,7 @@ from solana_alpha_lab.factory.document_runner import repository_git_snapshot  # 
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     RUNNER_UP_AWAITING_CRITIC,
+    apply_classification,
     find_session_by_epoch_focus,
     freeze_draft,
     persist_frozen_session,
@@ -121,7 +123,20 @@ def _load_hypothesis_forge_cli():
 
 
 def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
+    """CONTROL preflight for disposable tests.
+
+    Cohort scope is stamped via the same production helper used by
+    ``build_forge_context_packet`` (A3-compatible lineage readback). Do not use
+    this as a substitute for the G1 normal-entry path that calls the real
+    packet builder.
+    """
+
+    from solana_alpha_lab.factory.hfic_preflight import (
+        _control_bound_visible_cohort_ids,
+    )
+
     git = repository_git_snapshot(ROOT)
+    bound = _control_bound_visible_cohort_ids(data_root) or ["REL-C1", "REL-C2"]
     packet = {
         "schema": "smial.forge-context-packet",
         "owner_focus": "AUTO",
@@ -130,8 +145,7 @@ def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, objec
         "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
         "vision_integrity": {"status": "PASS"},
         "ladder_representation_id": "BASE",
-        "visible_cohort_ids": ["REL-C1", "REL-C2"],
-        "bound_visible_cohort_ids": ["REL-C1", "REL-C2"],
+        "bound_visible_cohort_ids": list(bound),
     }
     digest = persist_forge_context_packet(
         data_root,
@@ -152,6 +166,96 @@ def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, objec
         "forge_context_packet_sha256": digest,
         "forge_context_packet": packet,
     }
+
+
+def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
+    """Normal CONTROL packet via production writer (G1 acceptance path)."""
+
+    from solana_alpha_lab.factory.hfic_preflight import build_forge_context_packet
+
+    def _enumerate_production(_root: Path):
+        # Fixture enumerate returns thin rows; stamp the same evidence_role /
+        # feature fields real enumerate_rdp_datasets emits so the production
+        # packet writer is exercised without replacing it.
+        live, warnings = _enumerate_live(_root)
+        enriched: list[dict[str, object]] = []
+        for item in live:
+            row = dict(item)
+            row.setdefault("evidence_role", "UNSPECIFIED")
+            row.setdefault("feature_families", [])
+            row.setdefault("feature_hint", None)
+            row.setdefault("feature_usable", True)
+            row.setdefault("yield_missing", 0)
+            row.setdefault("dataset_terminal", None)
+            enriched.append(row)
+        return enriched, warnings
+
+    git = repository_git_snapshot(ROOT)
+    with patch(
+        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+        side_effect=_enumerate_production,
+    ):
+        packet, digest = build_forge_context_packet(
+            ROOT,
+            data_root,
+            owner_focus="AUTO",
+            evidence_epoch="aa" * 32,
+            search_key="cc" * 32,
+            commissioning_status="FAST_LANE_COMMISSIONED",
+            research_memory_as_of="2026-09-16T12:00:00Z",
+            store=store,
+            persist=True,
+            evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+        )
+    return {
+        "receipt_id": "HFIC-PREFLIGHT-PRODUCTION-001",
+        "evidence_epoch_sha256": "aa" * 32,
+        "focus_key_sha256": "bb" * 32,
+        "search_key_sha256": "cc" * 32,
+        "owner_focus": "AUTO",
+        "live_git_head": git.head_sha.lower(),
+        "git_composite_sha256": git.composite_sha256,
+        "session_started_at": "2026-08-27T12:00:00Z",
+        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+        "forge_context_packet_sha256": digest,
+        "forge_context_packet": packet,
+    }
+
+
+def _v1_freeze_preflight_from_envelope(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    control_session_id: str,
+    control_preflight: Mapping[str, object] | None = None,
+) -> tuple[dict[str, object], dict[str, object]]:
+    """Envelope → representation-aware freeze preflight (G2 path)."""
+
+    control = control_preflight or _control_preflight(data_root, store)
+    envelope = consume_start_v1_envelope(
+        {"next_action": ACTION_START_V1, "owner_final": None},
+        control_receipt=_no_worthy_forge_receipt(),
+        representation=_representation_fixture(),
+        cohort_readiness_receipt=_cohort_readiness_receipt(),
+        base_x_population_n=10,
+    )
+    challenger = dict(envelope["challenger"])
+    challenger["control_session_id"] = control_session_id
+    v1_pre = prepare_ladder_freeze_preflight(
+        control,
+        representation_id="NORMALIZED_TRAJECTORY_V1",
+        control_session_id=control_session_id,
+        challenger=challenger,
+    )
+    # Release-local used scope for V1 (CONTROL bound may be wider).
+    packet = v1_pre["forge_context_packet"]
+    assert isinstance(packet, dict)
+    packet["bound_visible_cohort_ids"] = ["REL-C2"]
+    digest = persist_forge_context_packet(
+        data_root, packet, store=store, repo_root=ROOT
+    )
+    v1_pre["forge_context_packet_sha256"] = digest
+    return v1_pre, envelope
 
 
 def _git(cwd: Path, *args: str) -> None:
@@ -212,11 +316,17 @@ class ResolveNextActionTests(unittest.TestCase):
         self.assertEqual(decision["next_action"], ACTION_START_V1)
         self.assertIsNone(decision["owner_final"])
 
-    def test_ordinary_no_worthy_is_control_required(self) -> None:
+    def test_ordinary_no_worthy_requires_control_surface_start_base(self) -> None:
         decision = resolve_next_action(
             [_base(evidence_surface_mode=None, input_scope="ORDINARY_BASE")]
         )
-        self.assertEqual(decision["next_action"], ACTION_CONTROL_REQUIRED)
+        self.assertEqual(decision["next_action"], ACTION_START_BASE)
+        self.assertIsNone(decision["owner_final"])
+        self.assertEqual(decision["reason_code"], "CONTROL_SURFACE_REQUIRED")
+        self.assertEqual(
+            decision.get("base_evidence_surface_mode"),
+            CURRENT_REPRESENTATION_CONTROL_V1,
+        )
 
     def test_v1_scientific_negative_is_scoped_exhaustion(self) -> None:
         decision = resolve_next_action(
@@ -263,6 +373,7 @@ class ResolveNextActionTests(unittest.TestCase):
             [_base(effective_terminal="RUNNER_UP_REVISION_REQUIRED")]
         )
         self.assertEqual(decision["next_action"], ACTION_KEEP_PAUSE)
+        self.assertIsNone(decision["owner_final"])
 
     def test_frozen_awaiting_critic_resumes_base(self) -> None:
         decision = resolve_next_action(
@@ -316,9 +427,9 @@ class ResolveNextActionTests(unittest.TestCase):
         text = format_forge_run_owner_readout(
             {
                 "run_id": "FORGE-RUN-TEST",
-                "owner_class": "OWNER_FINAL",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
                 "next_action": ACTION_KEEP_PAUSE,
-                "owner_final": ACTION_KEEP_PAUSE,
+                "owner_final": None,
                 "stages": [],
                 "writes": {"research_store": 0, "forge_run": 0, "session": 0},
                 "blocking_reason_codes": [],
@@ -327,21 +438,40 @@ class ResolveNextActionTests(unittest.TestCase):
         self.assertIn("status: NEXT", text)
         self.assertNotIn("status: DONE", text)
 
-    def test_control_required_readout_is_ordinary_evening_done(self) -> None:
+    def test_control_surface_required_readout_is_next_not_evening_done(self) -> None:
         text = format_forge_run_owner_readout(
             {
                 "run_id": "FORGE-RUN-TEST",
-                "owner_class": "OWNER_FINAL",
-                "next_action": ACTION_CONTROL_REQUIRED,
-                "owner_final": ACTION_CONTROL_REQUIRED,
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_START_BASE,
+                "owner_final": None,
                 "stages": [],
                 "writes": {"research_store": 0, "forge_run": 0, "session": 0},
-                "blocking_reason_codes": [],
+                "blocking_reason_codes": ["CONTROL_SURFACE_REQUIRED"],
             }
         )
-        self.assertIn("status: DONE", text)
-        self.assertIn("CONTROL_REQUIRED", text)
-        self.assertNotIn("status: NEXT", text)
+        self.assertIn("status: NEXT", text)
+        self.assertIn("CONTROL-compatible BASE", text)
+        self.assertNotIn("status: DONE", text)
+
+    def test_pass_to_classification_resumes_until_classify(self) -> None:
+        decision = resolve_next_action(
+            [
+                _base(),
+                _v1(
+                    execution_status=EXEC_EXECUTED,
+                    effective_terminal="PASS_TO_CLASSIFICATION",
+                    session_state="AWAITING_CLASSIFICATION",
+                    stage_ref_sha256="aa" * 32,
+                ),
+            ]
+        )
+        self.assertEqual(decision["next_action"], ACTION_RESUME_V1)
+        self.assertIsNone(decision["owner_final"])
+        self.assertIn(
+            decision["reason_code"],
+            {"AWAITING_CLASSIFICATION", "PASS_TO_CLASSIFICATION"},
+        )
 
     def test_kill_with_selected_candidate_is_not_owner_candidate(self) -> None:
         decision = resolve_next_action(
@@ -431,6 +561,26 @@ class ResolveNextActionTests(unittest.TestCase):
             ]
         )
         self.assertEqual(decision["next_action"], ACTION_OWNER_CANDIDATE)
+
+    def test_ordinary_no_worthy_not_run_preserves_control_surface_reason(self) -> None:
+        decision = resolve_next_action(
+            [
+                {
+                    "representation_id": "BASE",
+                    "execution_status": EXEC_NOT_RUN,
+                    "effective_terminal": None,
+                    "input_scope": "ORDINARY_BASE",
+                    "reason_code": "CONTROL_SURFACE_REQUIRED",
+                }
+            ]
+        )
+        self.assertEqual(decision["next_action"], ACTION_START_BASE)
+        self.assertIsNone(decision["owner_final"])
+        self.assertEqual(decision["reason_code"], "CONTROL_SURFACE_REQUIRED")
+        self.assertEqual(
+            decision.get("base_evidence_surface_mode"),
+            CURRENT_REPRESENTATION_CONTROL_V1,
+        )
 
     def test_start_base_when_missing(self) -> None:
         decision = resolve_next_action(
@@ -733,8 +883,22 @@ class SkillContractTests(unittest.TestCase):
         self.assertIn("consume_start_v1_envelope", skill)
         self.assertIn("FORGE_CONTEXT_PACKET", skill)
         self.assertIn("no fake critic", skill)
+        self.assertIn("challenger", skill.lower())
+        self.assertIn("CONTROL_SURFACE_REQUIRED", skill)
+        self.assertIn("PASS_TO_CLASSIFICATION", skill)
+        self.assertIn("prepare_ladder_freeze_preflight", skill)
         self.assertIn("re-run `forge-run`", skill.lower())
+        self.assertIn("`KEEP_PAUSE` is a typed pause (`status: NEXT`", skill)
+        self.assertIn("`owner_final` null", skill)
+        self.assertIn("do **not** report", skill)
+        self.assertIn("evening DONE / success", skill)
+        self.assertIn("must not lock the run as", skill)
         self.assertNotIn("dormant wiring", skill)
+        self.assertIn("CONTROL_SURFACE_REQUIRED", command)
+        self.assertIn("CONTROL_SURFACE_REQUIRED", operator)
+        self.assertIn("`KEEP_PAUSE` is a typed pause (`status: NEXT`)", command)
+        self.assertIn("`KEEP_PAUSE` is a typed pause (`status: NEXT`)", operator)
+        self.assertNotIn("evening complete, not a NEXT", command)
         self.assertIn("FORGE_CONTEXT_PACKET", command)
         self.assertIn("FORGE_CONTEXT_PACKET", operator)
         self.assertNotIn("Then branch on preflight action (step 2)", skill.split("forge-run")[0])
@@ -1024,33 +1188,23 @@ def _v1_preflight(
     control_session_id: str,
     cohorts: list[str] | None = None,
 ) -> dict[str, object]:
-    git = repository_git_snapshot(ROOT)
-    packet = {
-        "schema": "smial.forge-context-packet",
-        "owner_focus": "AUTO",
-        "evidence_epoch_sha256": "aa" * 32,
-        "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
-        "vision_integrity": {"status": "PASS"},
-        "ladder_representation_id": "NORMALIZED_TRAJECTORY_V1",
-        "visible_cohort_ids": list(cohorts or ["REL-C2"]),
-        "bound_visible_cohort_ids": list(cohorts or ["REL-C2"]),
-        "control_session_id": control_session_id,
-    }
-    digest = persist_forge_context_packet(
-        data_root, packet, store=store, repo_root=ROOT
+    """V1 freeze preflight via envelope challenger (not marker-only CONTROL copy)."""
+
+    v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+        data_root,
+        store,
+        control_session_id=control_session_id,
     )
-    return {
-        "receipt_id": "HFIC-PREFLIGHT-V1-FIXTURE-001",
-        "evidence_epoch_sha256": "aa" * 32,
-        "focus_key_sha256": "bb" * 32,
-        "search_key_sha256": "dd" * 32,
-        "owner_focus": "AUTO",
-        "live_git_head": git.head_sha.lower(),
-        "git_composite_sha256": git.composite_sha256,
-        "session_started_at": "2026-08-27T12:00:00Z",
-        "forge_context_packet_sha256": digest,
-        "forge_context_packet": packet,
-    }
+    if cohorts is not None:
+        packet = v1_pre["forge_context_packet"]
+        assert isinstance(packet, dict)
+        packet["bound_visible_cohort_ids"] = list(cohorts)
+        packet.pop("visible_cohort_ids", None)
+        digest = persist_forge_context_packet(
+            data_root, packet, store=store, repo_root=ROOT
+        )
+        v1_pre["forge_context_packet_sha256"] = digest
+    return v1_pre
 
 
 def _v2_preflight(
@@ -1115,9 +1269,19 @@ def _later_registry() -> dict[str, object]:
 
 
 class ProductionPathAcceptanceTests(unittest.TestCase):
-    def _no_worthy_base(self, data_root: Path, store: ResearchStore) -> dict[str, object]:
+    def _no_worthy_base(
+        self,
+        data_root: Path,
+        store: ResearchStore,
+        *,
+        production_packet: bool = False,
+    ) -> dict[str, object]:
         draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
-        preflight = _control_preflight(data_root, store)
+        preflight = (
+            _production_control_preflight(data_root, store)
+            if production_packet
+            else _control_preflight(data_root, store)
+        )
         frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
         persist_no_worthy_session(
             store,
@@ -1129,6 +1293,83 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         )
         store.rebuild_projection()
         return frozen
+
+    def test_g1_ordinary_no_worthy_surfaces_control_surface_required(self) -> None:
+        """Ordinary completed BASE must not bare-START without CONTROL_SURFACE_REQUIRED."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
+            git = repository_git_snapshot(ROOT)
+            packet = {
+                "schema": "smial.forge-context-packet",
+                "owner_focus": "AUTO",
+                "evidence_epoch_sha256": "aa" * 32,
+                "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
+                "vision_integrity": {"status": "PASS"},
+                "ladder_representation_id": "BASE",
+            }
+            digest = persist_forge_context_packet(
+                data_root, packet, store=store, repo_root=ROOT
+            )
+            ordinary = {
+                "receipt_id": "HFIC-PREFLIGHT-ORDINARY-001",
+                "evidence_epoch_sha256": "aa" * 32,
+                "focus_key_sha256": "bb" * 32,
+                "search_key_sha256": "cc" * 32,
+                "owner_focus": "AUTO",
+                "live_git_head": git.head_sha.lower(),
+                "git_composite_sha256": git.composite_sha256,
+                "session_started_at": "2026-08-27T12:00:00Z",
+                "forge_context_packet_sha256": digest,
+                "forge_context_packet": packet,
+            }
+            frozen = freeze_draft(draft, preflight_receipt=ordinary, repo_root=ROOT)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=ordinary,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=False)
+        self.assertEqual(started["next_action"], ACTION_START_BASE)
+        self.assertIsNone(started["owner_final"])
+        self.assertIn("CONTROL_SURFACE_REQUIRED", started["blocking_reason_codes"])
+        self.assertIn("CONTROL-compatible BASE", started["owner_readout"])
+        self.assertNotIn("status: DONE", started["owner_readout"])
+
+    def test_g1_production_packet_writer_stamps_bound_cohorts(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            preflight = _production_control_preflight(data_root, store)
+            packet = preflight["forge_context_packet"]
+            assert isinstance(packet, dict)
+            self.assertEqual(
+                packet.get("evidence_surface_mode"),
+                CURRENT_REPRESENTATION_CONTROL_V1,
+            )
+            self.assertEqual(packet.get("bound_visible_cohort_ids"), ["REL-C1", "REL-C2"])
+            self.assertNotIn("visible_cohort_ids", packet)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=False)
+        self.assertEqual(started["control_session_id"], base["session_id"])
+        self.assertEqual(started["next_action"], ACTION_START_V1)
+        self.assertEqual(started["stages"][0]["used_cohort_ids"], ["REL-C1", "REL-C2"])
 
     def test_f1_historical_control_does_not_inherit_later_visible_cohorts(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -1177,11 +1418,13 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(alt_focus["next_action"], ACTION_START_BASE)
 
     def test_f2_v1_candidate_from_real_artifacts_then_readback(self) -> None:
+        from tests.test_fast_lane_classifier import submission
+
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = self._no_worthy_base(data_root, store)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,
@@ -1189,33 +1432,18 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 started = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(started["next_action"], ACTION_START_V1)
             self.assertEqual(started["writes"]["forge_run"], 1)
-            envelope = consume_start_v1_envelope(
-                {"next_action": started["next_action"], "owner_final": started["owner_final"]},
-                control_receipt=_no_worthy_forge_receipt(),
-                representation=_representation_fixture(),
-                cohort_readiness_receipt=_cohort_readiness_receipt(),
-                base_x_population_n=10,
-            )
-            self.assertFalse(envelope["fake_critic_packet"])
-            self.assertEqual(
-                envelope["challenger"].get("ladder_representation_id"),
-                "NORMALIZED_TRAJECTORY_V1",
-            )
-            draft = valid_draft()
-            v1_pre = prepare_ladder_freeze_preflight(
-                _control_preflight(data_root, store),
-                representation_id="NORMALIZED_TRAJECTORY_V1",
+            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
                 control_session_id=str(base["session_id"]),
             )
-            v1_pre["forge_context_packet"]["visible_cohort_ids"] = ["REL-C2"]
-            v1_pre["forge_context_packet"]["bound_visible_cohort_ids"] = ["REL-C2"]
-            digest = persist_forge_context_packet(
-                data_root,
-                v1_pre["forge_context_packet"],
-                store=store,
-                repo_root=ROOT,
+            self.assertFalse(envelope["fake_critic_packet"])
+            self.assertIn("normalized_trajectory_v1", v1_pre["forge_context_packet"])
+            self.assertEqual(
+                v1_pre["forge_context_packet"].get("representation_payload_sha256"),
+                envelope["challenger"].get("representation_payload_sha256"),
             )
-            v1_pre["forge_context_packet_sha256"] = digest
+            draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -1232,14 +1460,32 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 mid = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(mid["next_action"], ACTION_RESUME_V1)
             self.assertEqual(mid["run_identity_sha256"], started["run_identity_sha256"])
-            self.assertEqual(mid["writes"]["forge_run"], 1)
             packet = frozen["critic_input_packet"]
             assert isinstance(packet, dict)
-            done = finalize_session(
+            awaiting = finalize_session(
                 frozen,
                 critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
                 store=store,
                 repo_root=ROOT,
+            )
+            self.assertEqual(awaiting["session_state"], "AWAITING_CLASSIFICATION")
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                pending = evaluate_forge_run(ROOT, data_root, persist=True)
+            self.assertEqual(pending["next_action"], ACTION_RESUME_V1)
+            self.assertIsNone(pending["owner_final"])
+            self.assertIn("classify then finalize", pending["owner_readout"])
+            spec = submission()
+            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            done = apply_classification(
+                frozen,
+                spec,
+                store=store,
+                repo_root=ROOT,
+                data_root=data_root,
             )
             store.rebuild_projection()
             with patch(
@@ -1253,8 +1499,9 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             for row in finished["stages"]
             if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
         )
+        self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+        self.assertNotEqual(done.get("critic_terminal"), "PASS_TO_CLASSIFICATION")
         self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
-        self.assertEqual(finished["writes"]["forge_run"], 1)
         self.assertEqual(v1["session_id"], frozen["session_id"])
         self.assertIsInstance(v1["stage_ref_sha256"], str)
         self.assertEqual(len(str(v1["stage_ref_sha256"])), 64)
@@ -1263,27 +1510,24 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertIn("candidate:", finished["owner_readout"])
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
         self.assertEqual(retry["run_identity_sha256"], started["run_identity_sha256"])
-        self.assertEqual(done["session_id"], frozen["session_id"])
 
     def test_f2_v1_negative_exhaustion_then_retry_readback(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = self._no_worthy_base(data_root, store)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
             draft = _distinct_no_worthy_draft(label="V1")
-            v1_pre = prepare_ladder_freeze_preflight(
-                _control_preflight(data_root, store),
-                representation_id="NORMALIZED_TRAJECTORY_V1",
+            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
                 control_session_id=str(base["session_id"]),
             )
-            digest = persist_forge_context_packet(
-                data_root,
-                v1_pre["forge_context_packet"],
-                store=store,
-                repo_root=ROOT,
+            self.assertIn("normalized_trajectory_v1", v1_pre["forge_context_packet"])
+            self.assertEqual(
+                v1_pre["forge_context_packet"].get("representation_payload_sha256"),
+                envelope["challenger"].get("representation_payload_sha256"),
             )
-            v1_pre["forge_context_packet_sha256"] = digest
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_no_worthy_session(
                 store,
@@ -1313,6 +1557,8 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
 
     def test_f3_completed_v2_is_not_restarted_on_normal_entry(self) -> None:
+        from tests.test_fast_lane_classifier import submission
+
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -1341,11 +1587,21 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             packet = v2_frozen["critic_input_packet"]
             assert isinstance(packet, dict)
-            finalize_session(
+            awaiting = finalize_session(
                 v2_frozen,
                 critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
                 store=store,
                 repo_root=ROOT,
+            )
+            self.assertEqual(awaiting["session_state"], "AWAITING_CLASSIFICATION")
+            spec = submission()
+            spec["hypothesis_definition_sha256"] = v2_frozen["selected_definition_sha256"]
+            apply_classification(
+                v2_frozen,
+                spec,
+                store=store,
+                repo_root=ROOT,
+                data_root=data_root,
             )
             store.rebuild_projection()
             registry = _later_registry()
@@ -1381,18 +1637,12 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             self.assertIsNotNone(found_base)
             assert found_base is not None
             self.assertEqual(found_base["session_id"], base["session_id"])
-            v1_pre = prepare_ladder_freeze_preflight(
-                control,
-                representation_id="NORMALIZED_TRAJECTORY_V1",
-                control_session_id=str(base["session_id"]),
-            )
-            digest = persist_forge_context_packet(
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
                 data_root,
-                v1_pre["forge_context_packet"],
-                store=store,
-                repo_root=ROOT,
+                store,
+                control_session_id=str(base["session_id"]),
+                control_preflight=control,
             )
-            v1_pre["forge_context_packet_sha256"] = digest
             draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
@@ -1427,11 +1677,13 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(found_base_again["session_id"], base["session_id"])
 
     def test_f2_cli_preflight_store_freeze_is_distinct_from_control(self) -> None:
+        from tests.test_fast_lane_classifier import submission
+
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = self._no_worthy_base(data_root, store)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
             cli = _load_hypothesis_forge_cli()
             stdout = io.StringIO()
             stderr = io.StringIO()
@@ -1449,11 +1701,24 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             self.assertEqual(code, 0)
             started = json.loads(stdout.getvalue())
             self.assertEqual(started["next_action"], ACTION_START_V1)
-            v1_pre = started["ladder_freeze_preflight"]
+            # Without envelope challenger, freeze stays pending (not marker-only).
+            self.assertNotIn("ladder_freeze_preflight", started)
+            self.assertEqual(
+                started.get("ladder_freeze_pending_reason"),
+                "LADDER_FREEZE_CHALLENGER_REQUIRED",
+            )
+            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
             packet = v1_pre["forge_context_packet"]
             self.assertEqual((packet.get("vision_integrity") or {}).get("status"), "PASS")
-            self.assertNotIn("visible_cohort_ids", packet)
-            self.assertEqual(packet.get("bound_visible_cohort_ids"), ["REL-C1", "REL-C2"])
+            self.assertIn("normalized_trajectory_v1", packet)
+            self.assertEqual(
+                packet.get("representation_payload_sha256"),
+                envelope["challenger"].get("representation_payload_sha256"),
+            )
             self.assertEqual(packet.get("ladder_representation_id"), "NORMALIZED_TRAJECTORY_V1")
             self.assertIsNone(base.get("critic_input_packet"))
             draft = valid_draft()
@@ -1474,11 +1739,29 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 frozen["forge_context_packet"].get("ladder_representation_id"),
                 "NORMALIZED_TRAJECTORY_V1",
             )
-            done = finalize_session(
+            awaiting = finalize_session(
                 frozen,
                 critic_result_from_packet_only(packet_out, "PASS_TO_CLASSIFICATION"),
                 store=store,
                 repo_root=ROOT,
+            )
+            self.assertEqual(awaiting["session_state"], "AWAITING_CLASSIFICATION")
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                pending = evaluate_forge_run(ROOT, data_root, persist=True)
+            self.assertEqual(pending["next_action"], ACTION_RESUME_V1)
+            self.assertIsNone(pending["owner_final"])
+            spec = submission()
+            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            done = apply_classification(
+                frozen,
+                spec,
+                store=store,
+                repo_root=ROOT,
+                data_root=data_root,
             )
             store.rebuild_projection()
             with patch(
@@ -1505,7 +1788,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
         )
         self.assertEqual(v1["session_id"], frozen["session_id"])
-        self.assertEqual(v1["used_cohort_ids"], ["REL-C1", "REL-C2"])
+        self.assertEqual(v1["used_cohort_ids"], ["REL-C2"])
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
         self.assertEqual(retry["run_identity_sha256"], started["run_identity_sha256"])
 
@@ -1538,10 +1821,13 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             _write_lineage(data_root)
             store = ResearchStore(data_root)
             self._no_worthy_base(data_root, store)
-            orphan_pre = _v1_preflight(data_root, store, control_session_id="HFIC-SESS-OTHERCONTROL01")
+            orphan_pre = _v1_preflight(
+                data_root, store, control_session_id="HFIC-SESS-OTHERCONTROL01"
+            )
             packet = dict(orphan_pre["forge_context_packet"])
             packet.pop("control_session_id", None)
             orphan_pre["forge_context_packet"] = packet
+            orphan_pre.pop("control_session_id", None)
             digest = persist_forge_context_packet(
                 data_root, packet, store=store, repo_root=ROOT
             )
@@ -1569,6 +1855,84 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(started["next_action"], ACTION_START_V1)
         self.assertIsNone(v1["session_id"])
         self.assertEqual(v1["execution_status"], EXEC_NOT_RUN)
+
+    def test_g4_marker_only_v1_freeze_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store)
+            control = _control_preflight(data_root, store)
+            with self.assertRaises(LadderError) as raised:
+                prepare_ladder_freeze_preflight(
+                    control,
+                    representation_id="NORMALIZED_TRAJECTORY_V1",
+                    control_session_id=str(base["session_id"]),
+                    challenger=None,
+                )
+        self.assertEqual(str(raised.exception), "LADDER_FREEZE_CHALLENGER_REQUIRED")
+
+    def test_g4_classify_after_store_reload_keeps_ladder_slot(self) -> None:
+        """PASS_TO_CLASSIFICATION intermediate must stamp slot before classify reload."""
+
+        from tests.test_fast_lane_classifier import submission
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            packet = frozen["critic_input_packet"]
+            assert isinstance(packet, dict)
+            finalize_session(
+                frozen,
+                critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            store.rebuild_projection()
+            awaiting = load_session_bundle(store, str(frozen["session_id"]))
+            assert awaiting is not None
+            self.assertEqual(awaiting["session_state"], "AWAITING_CLASSIFICATION")
+            self.assertEqual(
+                awaiting.get("ladder_representation_id"),
+                "NORMALIZED_TRAJECTORY_V1",
+            )
+            self.assertEqual(awaiting.get("control_session_id"), base["session_id"])
+            # Classify from store-reloaded bundle only (no in-memory freeze object).
+            spec = submission()
+            spec["hypothesis_definition_sha256"] = awaiting["selected_definition_sha256"]
+            done = apply_classification(
+                awaiting,
+                spec,
+                store=store,
+                repo_root=ROOT,
+                data_root=data_root,
+            )
+            store.rebuild_projection()
+            complete = load_session_bundle(store, str(frozen["session_id"]))
+            assert complete is not None
+        self.assertEqual(done["session_state"], "SYNTHESIS_COMPLETE")
+        self.assertEqual(
+            complete.get("ladder_representation_id"),
+            "NORMALIZED_TRAJECTORY_V1",
+        )
+        self.assertEqual(complete.get("control_session_id"), base["session_id"])
+        self.assertIsInstance(complete.get("forge_context_packet_sha256"), str)
 
     def test_f3_foreign_parent_v2_is_not_consumed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

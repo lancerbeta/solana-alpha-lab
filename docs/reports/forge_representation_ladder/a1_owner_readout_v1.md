@@ -56,25 +56,31 @@ resolver, persist/readback, and owner rendering are real:
 |---|---|
 | F1 fresh plane, matching C1+C2 CONTROL, no magic session id | BASE `REUSED_VALID`, used C1+C2, `START_V1` |
 | F1 same CONTROL after synthetic C3 / other focus | used does not gain C3; not `REUSED_VALID` over new evidence; other focus → `START_BASE` |
-| F2 empty BASE → stub V1 candidate → freeze/finalize → `forge-run` | `OWNER_CANDIDATE`; V1 session_id + stage ref resolve; retry `RETURN_EXISTING_RUN` |
-| F2 empty BASE → stub V1 no-worthy → `forge-run` | scoped `SEARCH_EXHAUSTED_CURRENT_EVIDENCE`; retry readback |
+| F2 empty BASE → envelope challenger → stub V1 candidate → freeze → PASS_TO_CLASSIFICATION → classify/finalize → `forge-run` | intermediate `RESUME_V1` until classify; then `OWNER_CANDIDATE`; V1 session_id + stage ref; retry `RETURN_EXISTING_RUN` |
+| F2 empty BASE → envelope challenger → stub V1 no-worthy → `forge-run` | scoped `SEARCH_EXHAUSTED_CURRENT_EVIDENCE`; retry readback |
 | F2 CONTROL vs V1 freeze slot | same epoch/focus lookup returns BASE for BASE slot and V1 for V1 slot |
-| F2 CLI `ladder_freeze_preflight` → `freeze_draft(store=)` | V1 session_id distinct from CONTROL; no `START_NEW_SESSION` bind |
+| F2 CLI without envelope | `ladder_freeze_pending_reason=LADDER_FREEZE_CHALLENGER_REQUIRED`; freeze only after challenger embed |
 | F2 orphan V1 without parent | not bound to current CONTROL; next remains `START_V1` |
 | F2 incomplete persist → saved V1 draft → terminal | append-only progress; no second trial |
-| F3 V1 no-worthy + completed synthetic V2 | `OWNER_CANDIDATE`, not `START_SYNTHETIC_LATER_V2`; retry readback |
+| F2 marker-only V1 freeze | `LADDER_FREEZE_CHALLENGER_REQUIRED` |
+| F2 classify after store reload | intermediate + complete cycles keep `ladder_representation_id` / parent |
+| F3 V1 no-worthy + completed synthetic V2 (after classify) | `OWNER_CANDIDATE`, not `START_SYNTHETIC_LATER_V2`; retry readback |
 | F3 completed V2 with foreign parent | not consumed; `START_SYNTHETIC_LATER_V2` |
 | Visible vs used | V1 used release-local C2; not all visible C1+C2 |
+| G1 production CONTROL packet writer | stamps `bound_visible_cohort_ids`; normal entry discovers BASE → `START_V1` |
+| G1 ordinary NO_WORTHY without CONTROL | `START_BASE` + `CONTROL_SURFACE_REQUIRED`, `owner_final` null, `status: NEXT` |
+| KEEP_PAUSE | typed pause: `owner_final` null, `FORGE_RUN_IN_PROGRESS`; not evening DONE; persist does not lock completed readback |
 | Two worktrees + C3 | one data root; historical A3 C1/C2 evidence bytes unchanged |
 
 Empty-BASE V1 envelope remains CONTROL `FORGE_CONTEXT_PACKET` via
 `consume_start_v1_envelope` (no fake critic; challenger tagged
-`ladder_representation_id=NORMALIZED_TRAJECTORY_V1`). Freeze uses
-`ladder_freeze_preflight`, not the CONTROL preflight. `cmd_freeze` /
-`freeze_draft(store=)` consumes that object (loads CONTROL packet from digest,
-skips `START_NEW_SESSION` bind). After freeze/finalize,
-re-run `forge-run` to read artifacts. Ordinary `CONTROL_REQUIRED` is
-`status: DONE` (expert CONTROL slash is not owner NEXT). Unknown ACTIVE handler still fail-closes.
+`ladder_representation_id=NORMALIZED_TRAJECTORY_V1` with payload hashes).
+Freeze requires that challenger embedded into
+`prepare_ladder_freeze_preflight(..., challenger=...)` — marker/parent alone
+are insufficient. `PASS_TO_CLASSIFICATION` is `RESUME_V1` until network-free
+classify + finalize. Ordinary BASE without CONTROL surface is
+`START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`), not evening DONE.
+Unknown ACTIVE handler still fail-closes.
 Owner readout prints candidate/declined/critic identity from artifacts.
 
 ## What did not change
@@ -90,4 +96,6 @@ across later Git changes is A5.
 
 Named consumer after merge/readback: A5 identity/provenance + owner gold.
 `CAPABILITY_RADAR_NOW=NONE`. STOP before owner merge phrase.
-Previous PR #328 head `9997e8dc…` is not this candidate.
+A4P2 closes PR #328 review R1–R3 on this candidate (writer/reader CONTROL
+surface, challenger-gated V1 freeze, PASS_TO_CLASSIFICATION intermediate,
+KEEP_PAUSE non-final). Do not merge prior head `d17d8b23…` alone.
