@@ -95,6 +95,56 @@ def _with_window(
     return out
 
 
+def _register_and_authorize(
+    store: ObservationScheduleStore,
+    data_root: Path,
+    document: dict,
+    *,
+    now: datetime = NOW,
+) -> tuple[dict, dict]:
+    registered = register_schedule(
+        root=ROOT,
+        data_root=data_root,
+        store=store,
+        document=document,
+        now=now,
+        producer_git_sha=GIT,
+    )
+    authority = authorize_schedule(
+        root=ROOT,
+        data_root=data_root,
+        store=store,
+        schedule_sha256=registered["schedule_sha256"],
+        phrase=_phrase(document),
+        now=now,
+        producer_git_sha=GIT,
+    )
+    return registered, authority
+
+
+def _activate_campaign(
+    store: ObservationScheduleStore,
+    data_root: Path,
+    document: dict,
+    *,
+    activation_id: str,
+    now: datetime = NOW,
+) -> tuple[dict, dict]:
+    registered, authority = _register_and_authorize(
+        store, data_root, document, now=now
+    )
+    activate_schedule(
+        root=ROOT,
+        data_root=data_root,
+        store=store,
+        schedule_sha256=registered["schedule_sha256"],
+        activation_id=activation_id,
+        now=now,
+        producer_git_sha=GIT,
+    )
+    return registered, authority
+
+
 class CollectorCampaignContinuityRepairTests(unittest.TestCase):
     def test_active_peer_still_requires_cutover(self) -> None:
         predecessor = load_observation_schedule(
@@ -158,7 +208,9 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             load_observation_schedule(
                 ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
             ),
-            starts_at="2026-09-02T00:00:00Z",
+            # The late recovery point is 01:00Z; the successor must start
+            # there, not at the predecessor's historical stop time.
+            starts_at="2026-09-02T01:00:00Z",
             stops_admitting_at="2026-09-03T00:00:00Z",
             schedule_key="OBS-EARLY-PUMPFUN-SUCCESSOR-LATE-001",
         )
@@ -279,6 +331,88 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             ]
             self.assertFalse(admission_window_open(pred_doc, late))
             self.assertTrue(admission_window_open(succ_doc, late))
+            store.close()
+
+    def test_late_successor_backdated_to_recovery_is_denied(self) -> None:
+        predecessor = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-02T00:30:00Z",
+            stops_admitting_at="2026-09-03T00:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-SUCCESSOR-RECOVERY-BACKDATED-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            pred = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=predecessor,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            authorize_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=pred["schedule_sha256"],
+                phrase=_phrase(predecessor),
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            activate_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=pred["schedule_sha256"],
+                activation_id="ACT-PRE",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            late = datetime(2026, 9, 2, 1, 0, tzinfo=UTC)
+            drain_expired_admission(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=pred["schedule_sha256"],
+                activation_id="ACT-PRE",
+                now=late,
+                producer_git_sha=GIT,
+            )
+            succ = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=successor,
+                now=late,
+                producer_git_sha=GIT,
+            )
+            authorize_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=succ["schedule_sha256"],
+                phrase=_phrase(successor),
+                now=late,
+                producer_git_sha=GIT,
+            )
+            with self.assertRaisesRegex(
+                ObservationLifecycleError, "LATE_SUCCESSOR_BACKDATED"
+            ):
+                activate_schedule(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=succ["schedule_sha256"],
+                    activation_id="ACT-SUC",
+                    now=late,
+                    producer_git_sha=GIT,
+                )
             store.close()
 
     def test_draining_without_proven_closed_still_denied(self) -> None:
@@ -698,6 +832,13 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 ),
                 1,
             )
+            attention_preview = "\n".join(first["preview_messages"])
+            self.assertIn("FACTORY / ATTENTION — ACTION", attention_preview)
+            self.assertIn("MESSAGE_TYPE=ATTENTION", attention_preview)
+            self.assertIn(
+                "OWNER_ACTION=CAMPAIGN_SUCCESSOR_REQUIRED", attention_preview
+            )
+            self.assertNotIn("FACTORY / INCIDENT — ACTION", attention_preview)
             second = evaluate_operability(
                 root=root,
                 store=store,
@@ -782,6 +923,134 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     for msg in recovered["messages"]
                 )
             )
+            store.close()
+
+    def test_historical_authorized_same_family_does_not_clear_warning(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-HIST-CURRENT-001",
+        )
+        historical = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-08-01T00:00:00Z",
+            stops_admitting_at="2026-08-02T00:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-HIST-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registered, _ = _activate_campaign(
+                store,
+                data_root,
+                current,
+                activation_id="ACT-CURRENT",
+            )
+            _register_and_authorize(store, data_root, historical)
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registered["schedule_sha256"], "ACT-CURRENT"
+                ),
+            )
+            self.assertEqual(continuity["campaign_successor_state"], "REGISTERED")
+            self.assertTrue(continuity["campaign_successor_required"])
+            store.close()
+
+    def test_authorized_successor_after_gap_does_not_clear_warning(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-GAP-CURRENT-001",
+        )
+        gap_successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T18:00:00Z",
+            stops_admitting_at="2026-09-02T18:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-GAP-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registered, _ = _activate_campaign(
+                store,
+                data_root,
+                current,
+                activation_id="ACT-CURRENT",
+            )
+            _register_and_authorize(store, data_root, gap_successor)
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registered["schedule_sha256"], "ACT-CURRENT"
+                ),
+            )
+            self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
+            self.assertTrue(continuity["campaign_successor_required"])
+            store.close()
+
+    def test_valid_rollover_clears_warning(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-ROLLOVER-CURRENT-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T06:00:00Z",
+            stops_admitting_at="2026-09-02T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-ROLLOVER-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registered, _ = _activate_campaign(
+                store,
+                data_root,
+                current,
+                activation_id="ACT-CURRENT",
+            )
+            successor_registered, successor_authority = _register_and_authorize(
+                store, data_root, successor
+            )
+            store.persist_rollover(
+                predecessor_schedule_sha256=current_registered["schedule_sha256"],
+                predecessor_activation_id="ACT-CURRENT",
+                successor_schedule_sha256=successor_registered["schedule_sha256"],
+                successor_activation_id="ACT-SUCCESSOR",
+                cutover_at="2026-09-01T06:00:00Z",
+                authority_receipt_sha256=successor_authority["receipt_sha256"],
+                clock=NOW,
+            )
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registered["schedule_sha256"], "ACT-CURRENT"
+                ),
+            )
+            self.assertEqual(continuity["campaign_successor_state"], "ROLLOVER_READY")
+            self.assertFalse(continuity["campaign_successor_required"])
             store.close()
 
     def test_source_data_stale_unchanged(self) -> None:

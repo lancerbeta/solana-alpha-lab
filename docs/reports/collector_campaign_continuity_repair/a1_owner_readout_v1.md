@@ -12,10 +12,15 @@ prepared.
 
 - Late post-window successor activate allowed when predecessor is proven
   NON_ADMITTING (DRAINING + closed admission); no rollover row required;
-  backdated successor windows denied; one admitting family preserved.
+  successor `starts_at` must be forward from the immutable late-recovery
+  transition and no later than activation; backdated windows denied; one
+  admitting family preserved.
 - Current-activation selection: ACTIVE → DRAINING → freshest otherwise.
-- Pre-expiry attention via existing incident dedupe; `SOURCE_DATA_STALE`
-  unchanged (`age > period*3`).
+- Pre-expiry continuity proof accepts only a live authorized window covering
+  the current admission boundary or a valid rollover; historical/post-gap
+  schedules remain attention. `CAMPAIGN_SUCCESSOR_REQUIRED` renders as a
+  deduped owner attention, not an incident; `SOURCE_DATA_STALE` unchanged
+  (`age > period*3`).
 
 ## Explicit non-claims
 

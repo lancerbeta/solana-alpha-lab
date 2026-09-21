@@ -99,8 +99,10 @@ def assess_campaign_successor_continuity(
 ) -> dict[str, Any]:
     """Owner-facing campaign continuity projection for pre-expiry attention.
 
-    Valid prepared successor/rollover states AUTHORIZED and ROLLOVER_READY
-    suppress CAMPAIGN_SUCCESSOR_REQUIRED. REGISTERED alone does not.
+    Only a successor that can cover the current admission boundary suppresses
+    CAMPAIGN_SUCCESSOR_REQUIRED.  A same-family REGISTERED/AUTHORIZED record
+    is useful state, but it is not continuity proof when its window is
+    historical or starts after the predecessor expires.
     """
 
     empty = {
@@ -138,45 +140,85 @@ def assess_campaign_successor_continuity(
         }
     family = cohort_family_key(registered["document"])
     successor_state = "NONE"
-    has_active_peer = False
+    continuity_proven = False
+
+    def _window_covers(document: Mapping[str, Any], boundary: datetime) -> bool:
+        try:
+            starts = parse_utc(str(document["activation"]["starts_at"]))
+            stops = parse_utc(str(document["activation"]["stops_admitting_at"]))
+        except (KeyError, TypeError, ValueError):
+            return False
+        return starts <= boundary < stops
+
+    def _authority_is_live(
+        schedule_digest: str, receipt_sha256: str | None = None
+    ) -> bool:
+        authority = (
+            store.get_authority(receipt_sha256)
+            if receipt_sha256
+            else store.latest_authority_for_schedule(schedule_digest)
+        )
+        if authority is None or str(authority.get("schedule_sha256") or "") != schedule_digest:
+            return False
+        try:
+            return parse_utc(str(authority["expires_at"])) > now
+        except (KeyError, TypeError, ValueError):
+            return False
+
+    current_stops = stops
     for item in store.list_rollovers():
         if (
             str(item.get("predecessor_schedule_sha256") or "") == schedule_sha
             and str(item.get("predecessor_activation_id") or "") == activation_id
         ):
-            successor_state = "ROLLOVER_READY"
-            break
-    if successor_state != "ROLLOVER_READY":
+            successor_sha = str(item.get("successor_schedule_sha256") or "")
+            successor_reg = store.get_registered_schedule(successor_sha)
+            if successor_reg is None or cohort_family_key(successor_reg["document"]) != family:
+                continue
+            if not _authority_is_live(
+                successor_sha, str(item.get("authority_receipt_sha256") or "") or None
+            ):
+                continue
+            if _window_covers(successor_reg["document"], current_stops):
+                successor_state = "ROLLOVER_READY"
+                continuity_proven = True
+                break
+
+    has_active_peer = False
+    if not continuity_proven:
         for other in store.list_activations():
             other_sha = str(other.get("schedule_sha256") or "")
             if other_sha == schedule_sha:
                 continue
             other_reg = store.get_registered_schedule(other_sha)
-            if other_reg is None:
+            if other_reg is None or cohort_family_key(other_reg["document"]) != family:
                 continue
-            if cohort_family_key(other_reg["document"]) != family:
-                continue
-            if str(other.get("state") or "") == "ACTIVE":
+            if (
+                str(other.get("state") or "") == "ACTIVE"
+                and _window_covers(other_reg["document"], current_stops)
+            ):
                 has_active_peer = True
+                continuity_proven = True
                 break
+
+    if successor_state != "ROLLOVER_READY":
         best = "NONE"
         for other_sha in store.list_registered_schedule_digests():
             if other_sha == schedule_sha:
                 continue
             other_reg = store.get_registered_schedule(other_sha)
-            if other_reg is None:
+            if other_reg is None or cohort_family_key(other_reg["document"]) != family:
                 continue
-            if cohort_family_key(other_reg["document"]) != family:
-                continue
-            auth = store.latest_authority_for_schedule(other_sha)
-            if auth is not None and parse_utc(str(auth["expires_at"])) > now:
+            if _authority_is_live(other_sha):
                 best = "AUTHORIZED"
-                break
-            if best == "NONE":
+                if _window_covers(other_reg["document"], current_stops):
+                    continuity_proven = True
+                    break
+            elif best == "NONE":
                 best = "REGISTERED"
         if successor_state != "ROLLOVER_READY":
             successor_state = best
-    prepared = successor_state in {"AUTHORIZED", "ROLLOVER_READY"} or has_active_peer
+    prepared = continuity_proven or has_active_peer
     required = 0 <= remaining <= CAMPAIGN_SUCCESSOR_WARNING_SECONDS and not prepared
     return {
         "campaign_successor_state": successor_state,

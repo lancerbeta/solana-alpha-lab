@@ -71,6 +71,7 @@ INCIDENT_GRACE_SECONDS = {
     "ALERTING_UNAVAILABLE": 0,
     "CAMPAIGN_SUCCESSOR_REQUIRED": 0,
 }
+OWNER_ATTENTION_CODES = frozenset({"CAMPAIGN_SUCCESSOR_REQUIRED"})
 
 
 def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
@@ -265,7 +266,7 @@ def render_incident_message(
     first_seen_at: str,
     recovered_at: str | None = None,
 ) -> str:
-    state = "ACTION" if kind == "INCIDENT" else "OK"
+    state = "ACTION" if kind in {"INCIDENT", "ATTENTION"} else "OK"
     backup_age = packet.get("backup_age_seconds")
     if isinstance(backup_age, int):
         backup_state = f"{backup_age // 3600}h" if backup_age >= 3600 else f"{backup_age // 60}m"
@@ -292,7 +293,7 @@ def render_incident_message(
         f"ARCHIVE_BACKLOG_DAYS={packet.get('immutable_archive_backlog_days')}",
         f"MUTABLE_BACKUP_STATE={backup_state}",
         f"PROJECTED_97D_BYTES={packet.get('projected_97d_bytes')}",
-        f"OWNER_ACTION={code if kind == 'INCIDENT' else 'NONE'}",
+        f"OWNER_ACTION={code if kind in {'INCIDENT', 'ATTENTION'} else 'NONE'}",
         f"DEDUP_KEY={code}",
         f"FIRST_SEEN_AT={first_seen_at}",
     ]
@@ -357,16 +358,26 @@ def evaluate_operability(
         ).total_seconds()
         grace = INCIDENT_GRACE_SECONDS.get(code, 1800)
         if elapsed >= grace and record.get("notified") is not True:
+            message_kind = (
+                "ATTENTION" if code in OWNER_ATTENTION_CODES else "INCIDENT"
+            )
             text = render_incident_message(
-                kind="INCIDENT",
+                kind=message_kind,
                 code=code,
                 detail=detail,
                 packet=packet,
                 first_seen_at=first,
             )
-            pending.append({"kind": "INCIDENT", "code": code, "text": text, "first_seen_at": first})
+            pending.append(
+                {
+                    "kind": message_kind,
+                    "code": code,
+                    "text": text,
+                    "first_seen_at": first,
+                }
+            )
             record["notified"] = True
-            messages.append({"kind": "INCIDENT", "code": code})
+            messages.append({"kind": message_kind, "code": code})
         active[code] = record
 
     for code in list(active):

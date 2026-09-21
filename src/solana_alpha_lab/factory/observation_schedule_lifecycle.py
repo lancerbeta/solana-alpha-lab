@@ -873,6 +873,25 @@ def _activation_is_non_admitting(
     return True
 
 
+def _non_admitting_recovery_at(row: Mapping[str, Any]) -> datetime | None:
+    """Return the immutable lifecycle timestamp that closed admission.
+
+    A late successor is only allowed to move forward from the recorded
+    DRAINING transition.  The caller's ``now`` proves that the predecessor is
+    no longer admitting; the transition payload proves when recovery actually
+    became possible.  Missing or malformed proof must stay fail-closed.
+    """
+
+    payload = dict(row.get("payload") or {})
+    raw = payload.get("transition_effective_at")
+    if not isinstance(raw, str) or not raw:
+        return None
+    try:
+        return parse_utc(raw)
+    except Exception:
+        return None
+
+
 def _require_cohort_cutover_or_unique(
     store: ObservationScheduleStore,
     *,
@@ -903,9 +922,12 @@ def _require_cohort_cutover_or_unique(
             continue
         if _activation_is_non_admitting(row, now=now):
             peer_stops = parse_utc(str(row["stops_admitting_at"]))
+            recovery_at = _non_admitting_recovery_at(row)
+            if recovery_at is None or recovery_at > now:
+                raise ObservationLifecycleError("LATE_SUCCESSOR_RECOVERY_UNPROVEN")
             if successor_starts > now:
                 raise ObservationLifecycleError("ACTIVATION_BEFORE_STARTS_AT")
-            if successor_starts < peer_stops:
+            if successor_starts < peer_stops or successor_starts < recovery_at:
                 raise ObservationLifecycleError("LATE_SUCCESSOR_BACKDATED")
             continue
         allowed = any(

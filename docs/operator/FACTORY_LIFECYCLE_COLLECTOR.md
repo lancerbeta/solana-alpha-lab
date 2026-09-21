@@ -205,8 +205,10 @@ If rollover was missed and the predecessor is proven **NON_ADMITTING**:
 then a forward successor may `authorize` → `activate` **without** a rollover
 row. The predecessor keeps draining existing PENDING/DUE work and admits
 nothing new. The successor becomes the sole same-family admitting activation.
-`starts_at` must be `<=` actual activation time and must not be backdated
-before the predecessor's `stops_admitting_at`.
+The immutable `DRAINING` transition timestamp is the late-recovery point:
+`starts_at` must be `>=` that point and `<=` actual activation time. A
+missing or malformed recovery timestamp is not enough proof; there is no
+clock tolerance and no backdated admission window.
 
 Owner recovery (post-window, Git/main already contains this repair):
 
@@ -228,9 +230,10 @@ Not expected:
 {"terminal":"DOCTOR_ABORTED_SAFETY"}
 ```
 
-2. Register + authorize a **forward** successor schedule (`starts_at` ≥
-   predecessor `stops_admitting_at`), then activate it (no rollover required
-   once predecessor is NON_ADMITTING).
+2. Register + authorize a **forward** successor schedule (`starts_at` ≥ the
+   recorded late-recovery point, which is at/after predecessor
+   `stops_admitting_at`), then activate it (no rollover required once
+   predecessor is NON_ADMITTING).
 3. Re-run doctor: expect `current_activation_state=ACTIVE` for the successor
    and `live_activation=true`. Predecessor remains `DRAINING` until dues
    complete.
@@ -239,9 +242,11 @@ Not expected:
 
 When the current same-family campaign is `ACTIVE` and
 `stops_admitting_at - now <= 24h` with no prepared successor
+whose authorized window can cover the current admission boundary
 (`AUTHORIZED` / `ROLLOVER_READY`; **REGISTERED alone is not enough**),
 operability watch emits one deduped `CAMPAIGN_SUCCESSOR_REQUIRED` attention
-(not `SOURCE_DATA_STALE`). Age `> period*3` remains the sole
+(not `SOURCE_DATA_STALE`). An historical or post-gap authorized schedule does
+not clear the attention. Age `> period*3` remains the sole
 `SOURCE_DATA_STALE` rule.
 
 When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
@@ -249,7 +254,9 @@ When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
 2. Register the successor schedule if missing, then **authorize** it before
    expiry (or commit in-window `rollover` while admission is still open).
-3. Attention clears once state is `AUTHORIZED` or `ROLLOVER_READY`.
+3. Attention clears once a continuity-valid state is `AUTHORIZED` or
+   `ROLLOVER_READY`; the Telegram card is `FACTORY / ATTENTION` rather than
+   an incident.
 
 ### Current-state read model
 
