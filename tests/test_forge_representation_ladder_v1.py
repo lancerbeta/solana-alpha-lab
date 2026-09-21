@@ -136,55 +136,31 @@ def _load_hypothesis_forge_cli():
 
 
 def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
-    """CONTROL preflight for disposable tests.
+    """CONTROL preflight through the production packet/identity writer.
 
-    Cohort scope is stamped via the same production helper used by
-    ``build_forge_context_packet`` (A3-compatible lineage readback). Do not use
-    this as a substitute for the G1 normal-entry path that calls the real
-    packet builder.
+    These tests exercise lifecycle boundaries, so they must carry the same
+    market/capability split and cohort binding as the real entry path. Legacy
+    combined-only receipts belong in explicit historical-disposition tests.
     """
 
-    from solana_alpha_lab.factory.hfic_preflight import (
-        _control_bound_visible_cohort_ids,
-    )
-
-    git = repository_git_snapshot(ROOT)
-    bound = _control_bound_visible_cohort_ids(data_root) or ["REL-C1", "REL-C2"]
-    packet = {
-        "schema": "smial.forge-context-packet",
-        "owner_focus": "AUTO",
-        "evidence_epoch_sha256": "aa" * 32,
-        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
-        "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
-        "vision_integrity": {"status": "PASS"},
-        "ladder_representation_id": "BASE",
-        "bound_visible_cohort_ids": list(bound),
-    }
-    digest = persist_forge_context_packet(
-        data_root,
-        packet,
-        store=store,
-        repo_root=ROOT,
-    )
-    return {
-        "receipt_id": "HFIC-PREFLIGHT-FIXTURE-001",
-        "evidence_epoch_sha256": "aa" * 32,
-        "focus_key_sha256": "bb" * 32,
-        "search_key_sha256": "cc" * 32,
-        "owner_focus": "AUTO",
-        "live_git_head": git.head_sha.lower(),
-        "git_composite_sha256": git.composite_sha256,
-        "session_started_at": "2026-08-27T12:00:00Z",
-        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
-        "forge_context_packet_sha256": digest,
-        "forge_context_packet": packet,
-    }
+    return _production_control_preflight(data_root, store)
 
 
-def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
+def _production_control_preflight(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    evidence_surface_mode: str | None = CURRENT_REPRESENTATION_CONTROL_V1,
+) -> dict[str, object]:
     """Normal CONTROL packet via production writer (G1 acceptance path)."""
 
     from solana_alpha_lab.factory.hfic_preflight import build_forge_context_packet
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_session import (
+        PROMPT_VERSION,
+        focus_key_sha256,
+        search_key_sha256,
+    )
 
     def _enumerate_production(_root: Path):
         # Fixture enumerate returns thin rows; stamp the same evidence_role /
@@ -211,28 +187,40 @@ def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict
         side_effect=_enumerate_production,
     ):
         split = compute_split_identity(ROOT, data_root)
+        policy = effective_policy(store)
+        market_epoch = str(split["market_evidence_epoch_sha256"])
+        owner_focus = "AUTO"
+        memory_eligibility = str(policy["memory_eligibility_sha256"])
+        focus_key = focus_key_sha256(owner_focus)
+        search_key = search_key_sha256(
+            market_epoch,
+            owner_focus,
+            PROMPT_VERSION,
+            memory_eligibility,
+            evidence_surface_mode,
+        )
         packet, digest = build_forge_context_packet(
             ROOT,
             data_root,
-            owner_focus="AUTO",
-            evidence_epoch="aa" * 32,
-            search_key="cc" * 32,
+            owner_focus=owner_focus,
+            evidence_epoch=market_epoch,
+            search_key=search_key,
             commissioning_status="FAST_LANE_COMMISSIONED",
             research_memory_as_of="2026-09-16T12:00:00Z",
             store=store,
             persist=True,
-            evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+            evidence_surface_mode=evidence_surface_mode,
         )
-    return {
+    result: dict[str, object] = {
         "receipt_id": "HFIC-PREFLIGHT-PRODUCTION-001",
-        "evidence_epoch_sha256": "aa" * 32,
-        "focus_key_sha256": "bb" * 32,
-        "search_key_sha256": "cc" * 32,
-        "owner_focus": "AUTO",
+        "evidence_epoch_sha256": market_epoch,
+        "focus_key_sha256": focus_key,
+        "search_key_sha256": search_key,
+        "owner_focus": owner_focus,
         "live_git_head": git.head_sha.lower(),
         "git_composite_sha256": git.composite_sha256,
         "session_started_at": "2026-08-27T12:00:00Z",
-        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+        "memory_eligibility_sha256": memory_eligibility,
         "forge_context_packet_sha256": digest,
         "forge_context_packet": packet,
         # Same production split axes as run_preflight / forge-input admission.
@@ -242,6 +230,19 @@ def _production_control_preflight(data_root: Path, store: ResearchStore) -> dict
             "legacy_combined_evidence_epoch_sha256"
         ],
     }
+    if evidence_surface_mode is not None:
+        result["evidence_surface_mode"] = evidence_surface_mode
+    return result
+
+
+def _ordinary_stamped_preflight(
+    data_root: Path, store: ResearchStore
+) -> dict[str, object]:
+    """Production split identity with the ordinary (non-CONTROL) surface."""
+
+    return _production_control_preflight(
+        data_root, store, evidence_surface_mode=None
+    )
 
 
 def _rel_c2_corpus_binding() -> LifecycleCorpusBinding:
@@ -991,14 +992,13 @@ class RealNoWriteVerticalTests(unittest.TestCase):
         self.assertEqual(receipt["writes"]["research_store"], 0)
         self.assertEqual(receipt["writes"]["session"], 0)
         self.assertEqual(fp, instance_fingerprint(data_root))
-        self.assertEqual(receipt["control_session_id"], EXISTING_V1_CONTROL_SESSION_ID)
-        self.assertEqual(receipt["next_action"], ACTION_START_V1)
+        self.assertIsNone(receipt["control_session_id"])
+        self.assertEqual(receipt["next_action"], ACTION_START_BASE)
         self.assertIsNone(receipt["owner_final"])
-        self.assertNotEqual(receipt["next_action"], ACTION_SEARCH_EXHAUSTED)
-        self.assertEqual(
-            receipt["legacy_epoch_sha256"],
-            "456411903174e403092f115cddf62fd38c9ae1bb943ebba0048c5b6bd070854e",
-        )
+        self.assertIn("CONTROL_SURFACE_REQUIRED", receipt["blocking_reason_codes"])
+        self.assertEqual(receipt["stages"][0]["reason_code"], "CONTROL_SURFACE_REQUIRED")
+        self.assertIsInstance(receipt["market_evidence_epoch_sha256"], str)
+        self.assertEqual(len(receipt["market_evidence_epoch_sha256"]), 64)
 
 
 class RegistryLoadTests(unittest.TestCase):
@@ -2090,7 +2090,11 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             for row in started["stages"]
             if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
         )
-        self.assertEqual(started["next_action"], ACTION_START_V1)
+        self.assertEqual(started["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertIn(
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+            started["blocking_reason_codes"],
+        )
         self.assertIsNone(v1["session_id"])
         self.assertEqual(v1["execution_status"], EXEC_NOT_RUN)
 
@@ -2330,30 +2334,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            git = repository_git_snapshot(ROOT)
-            packet = {
-                "schema": "smial.forge-context-packet",
-                "owner_focus": "AUTO",
-                "evidence_epoch_sha256": "aa" * 32,
-                "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
-                "vision_integrity": {"status": "PASS"},
-                "ladder_representation_id": "BASE",
-            }
-            digest = persist_forge_context_packet(
-                data_root, packet, store=store, repo_root=ROOT
-            )
-            ordinary = {
-                "receipt_id": "HFIC-PREFLIGHT-ORDINARY-PASS-001",
-                "evidence_epoch_sha256": "aa" * 32,
-                "focus_key_sha256": "bb" * 32,
-                "search_key_sha256": "cc" * 32,
-                "owner_focus": "AUTO",
-                "live_git_head": git.head_sha.lower(),
-                "git_composite_sha256": git.composite_sha256,
-                "session_started_at": "2026-08-27T12:00:00Z",
-                "forge_context_packet_sha256": digest,
-                "forge_context_packet": packet,
-            }
+            ordinary = _ordinary_stamped_preflight(data_root, store)
             draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=ordinary, repo_root=ROOT)
             persist_frozen_session(
@@ -2402,30 +2383,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            git = repository_git_snapshot(ROOT)
-            packet = {
-                "schema": "smial.forge-context-packet",
-                "owner_focus": "AUTO",
-                "evidence_epoch_sha256": "aa" * 32,
-                "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
-                "vision_integrity": {"status": "PASS"},
-                "ladder_representation_id": "BASE",
-            }
-            digest = persist_forge_context_packet(
-                data_root, packet, store=store, repo_root=ROOT
-            )
-            ordinary = {
-                "receipt_id": "HFIC-PREFLIGHT-ORDINARY-PENDING-001",
-                "evidence_epoch_sha256": "aa" * 32,
-                "focus_key_sha256": "bb" * 32,
-                "search_key_sha256": "cc" * 32,
-                "owner_focus": "AUTO",
-                "live_git_head": git.head_sha.lower(),
-                "git_composite_sha256": git.composite_sha256,
-                "session_started_at": "2026-08-27T12:00:00Z",
-                "forge_context_packet_sha256": digest,
-                "forge_context_packet": packet,
-            }
+            ordinary = _ordinary_stamped_preflight(data_root, store)
             draft = valid_draft()
             frozen = freeze_draft(draft, preflight_receipt=ordinary, repo_root=ROOT)
             persist_frozen_session(

@@ -12,7 +12,10 @@
 
 Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json`
 
-- First-run action: `START_BASE` + `CONTROL_SURFACE_REQUIRED`
+- **Status: NEXT** (not BLOCKED, not evening DONE)
+- First-run action: `START_BASE` + `CONTROL_SURFACE_REQUIRED` — same
+  `/hypothesis-forge` continues with CONTROL-compatible BASE; do not treat the
+  reason code as incomplete-market stop or as evening success
 - Inventory unchanged; `scientific_writes=0`
 - Stamp-only budget for the **current** market: unstamped legacy does not occupy
   current quota. List/load may restore stamps from earlier freeze cycles of the
@@ -23,12 +26,13 @@ Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c
 
 | Situation | Owner signal |
 |---|---|
-| Declared input matches occupied slot | `RESUME` / `RETURN_EXISTING` — same trial; do not start a second |
+| Declared input matches occupied slot | `RESUME_BASE` / `RESUME_V1` / `RETURN_EXISTING` — same trial; do not start a second |
 | Same market, completed PASS | `REUSED_VALID` / `OWNER_CANDIDATE` readback — historical answer for **this** input |
-| New cohort / new market (e.g. C3 after C1+C2 PASS) | `START_BASE` (or next registered representation) — stale PASS is historical only |
+| New cohort / new market (e.g. C3 after C1+C2 PASS) | `START_BASE` / `START_V1` — stale PASS is historical only |
+| Fresh empty / ordinary BASE without CONTROL | `START_BASE` + `CONTROL_SURFACE_REQUIRED` → **NEXT** (same slash → CONTROL BASE) |
 | Git/docs-only or capability-only change | Does **not** free market budget; occupied slot remains |
 | Incomplete market | `BLOCKED` / `MARKET_EVIDENCE_BASIS_INCOMPLETE` — restore input first; not a scientific negative |
-| Restart mid-Critic / mid-classify | `RESUME` same session; draft bytes remain addressable |
+| Restart mid-Critic / mid-classify | `RESUME_BASE` / `RESUME_V1` same session; draft bytes remain addressable |
 
 ## Whole-path counters (production APIs)
 

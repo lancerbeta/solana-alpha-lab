@@ -359,6 +359,13 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                     evidence_epoch_sha256,
                     market_evidence_epoch_sha256,
                     capability_epoch_sha256,
+                    ladder_representation_id,
+                    control_session_id,
+                    representation_semantic_version,
+                    representation_payload_sha256,
+                    scientific_slot_sha256,
+                    execution_binding_sha256,
+                    model_provenance_sha256,
                     focus_key_sha256,
                     search_key_sha256,
                     prompt_version,
@@ -380,11 +387,18 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                 "evidence_epoch_sha256": row[2],
                 "market_evidence_epoch_sha256": row[3],
                 "capability_epoch_sha256": row[4],
-                "focus_key_sha256": row[5],
-                "search_key_sha256": row[6],
-                "prompt_version": row[7],
-                "owner_focus": row[8],
-                "memory_eligibility_sha256": row[9],
+                "ladder_representation_id": row[5],
+                "control_session_id": row[6],
+                "representation_semantic_version": row[7],
+                "representation_payload_sha256": row[8],
+                "scientific_slot_sha256": row[9],
+                "execution_binding_sha256": row[10],
+                "model_provenance_sha256": row[11],
+                "focus_key_sha256": row[12],
+                "search_key_sha256": row[13],
+                "prompt_version": row[14],
+                "owner_focus": row[15],
+                "memory_eligibility_sha256": row[16],
             }
         )
     return sessions
@@ -411,6 +425,9 @@ def decide_preflight_action(
     owner_focus: str,
     memory_eligibility_sha256: str | None = None,
     evidence_surface_mode: str | None = None,
+    representation_id: str | None = None,
+    representation_semantic_version: str | None = None,
+    reservations: Sequence[Mapping[str, Any]] | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -426,9 +443,50 @@ def decide_preflight_action(
         else None
     )
     from solana_alpha_lab.factory.hfic_evidence_identity import (
+        resolve_scientific_admission,
         session_matches_epoch_for_lookup,
         sessions_for_market_budget,
     )
+
+    if representation_id is not None:
+        admission = resolve_scientific_admission(
+            sessions,
+            market_evidence_epoch=evidence_epoch,
+            representation_id=representation_id,
+            representation_semantic_version=(
+                representation_semantic_version or PROMPT_VERSION
+            ),
+            owner_focus=owner_focus,
+            reservations=reservations,
+            memory_eligibility_sha256=memory_eligibility_sha256,
+            evidence_surface_mode=evidence_surface_mode,
+            auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
+            max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
+        )
+        if admission.get("action") == "STOP":
+            return ("STOP", str(admission.get("reason_code") or "SEARCH_BUDGET_EXHAUSTED"))
+        if admission.get("action") == "START_NEW_SESSION":
+            return ("START_NEW_SESSION", None)
+        admitted_id = str(admission.get("session_id") or "")
+        chosen = next(
+            (
+                item
+                for item in [*(sessions or []), *(reservations or [])]
+                if str(item.get("session_id") or "") == admitted_id
+            ),
+            None,
+        )
+        if chosen is not None:
+            state = str(chosen.get("session_state") or "")
+            if state == "CRITIC_RESULT_READY":
+                return ("RESUME_FINALIZE", admitted_id)
+            if state == "REVISION_REQUIRED":
+                return ("RESUME_REVISE", admitted_id)
+            if state == "AWAITING_CLASSIFICATION":
+                return ("RESUME_CLASSIFY", admitted_id)
+            if state in PENDING_STATES:
+                return ("RESUME_CRITIC", admitted_id)
+            return ("RETURN_EXISTING_SESSION", admitted_id)
 
     # Resume/reuse: market stamp preferred; unstamped legacy may match on
     # evidence_epoch_sha256. Budget counters stay stamp-only below.
@@ -490,13 +548,35 @@ def epoch_search_budget_usage(
     sessions: Sequence[Mapping[str, Any]],
     *,
     evidence_epoch: str,
+    reservations: Sequence[Mapping[str, Any]] | None = None,
 ) -> dict[str, Any]:
     """Market-epoch-scoped AUTO / distinct-focus usage (A5; not capability/Git)."""
-    from solana_alpha_lab.factory.hfic_evidence_identity import sessions_for_market_budget
-
-    same_epoch = list(
-        sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch)
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        representation_identity_from_session,
+        session_scientific_slot_sha256,
+        sessions_for_market_budget,
     )
+
+    observed_sessions: list[Mapping[str, Any]] = [
+        *(sessions or []), *(reservations or [])
+    ]
+    same_epoch = list(
+        sessions_for_market_budget(
+            observed_sessions, market_evidence_epoch=evidence_epoch
+        )
+    )
+    deduped_epoch: list[Mapping[str, Any]] = []
+    seen_slots: set[tuple[str, str]] = set()
+    for item in same_epoch:
+        slot = session_scientific_slot_sha256(item)
+        session_id = str(item.get("session_id") or "")
+        identity = (session_id, slot or "")
+        if session_id and slot and identity in seen_slots:
+            continue
+        if session_id and slot:
+            seen_slots.add(identity)
+        deduped_epoch.append(item)
+    same_epoch = deduped_epoch
     auto_used = sum(
         1
         for item in same_epoch
@@ -507,6 +587,27 @@ def epoch_search_budget_usage(
         for item in same_epoch
         if item.get("focus_key_sha256")
     }
+    representation_slots: dict[str, dict[str, Any]] = {}
+    legacy_market_occupancy = 0
+    for item in same_epoch:
+        slot = session_scientific_slot_sha256(item)
+        representation, version = representation_identity_from_session(item)
+        if slot is None:
+            legacy_market_occupancy += 1
+            continue
+        key = f"{representation or 'UNKNOWN'}@{version or 'UNKNOWN'}"
+        entry = representation_slots.setdefault(
+            key,
+            {
+                "representation_id": representation,
+                "representation_semantic_version": version,
+                "scientific_slot_sha256": slot,
+                "session_ids": [],
+            },
+        )
+        session_id = item.get("session_id")
+        if isinstance(session_id, str) and session_id:
+            entry["session_ids"].append(session_id)
     return {
         "evidence_epoch_sha256": evidence_epoch,
         "auto_sessions_used": auto_used,
@@ -517,6 +618,8 @@ def epoch_search_budget_usage(
             0, MAX_DISTINCT_FOCUSES_PER_EPOCH - len(distinct)
         ),
         "focus_key_sha256_set": sorted(distinct),
+        "representation_slots": list(representation_slots.values()),
+        "legacy_market_occupancy": legacy_market_occupancy,
     }
 
 
@@ -2183,6 +2286,9 @@ def run_preflight(
                 },
             }
     sessions = _query_hfic_sessions(data_root)
+    from solana_alpha_lab.factory.hfic_session import list_scientific_slot_admissions
+
+    reservations = list_scientific_slot_admissions(store)
     action, bound_session = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -2191,8 +2297,13 @@ def run_preflight(
         owner_focus=focus,
         memory_eligibility_sha256=memory_eligibility,
         evidence_surface_mode=control_mode,
+        representation_id="BASE",
+        representation_semantic_version="HFIC-V1.2",
+        reservations=reservations,
     )
-    search_budget = epoch_search_budget_usage(sessions, evidence_epoch=epoch)
+    search_budget = epoch_search_budget_usage(
+        sessions, evidence_epoch=epoch, reservations=reservations
+    )
     live_git_head = "0" * 40
     git_composite = None
     if isinstance(git_snapshot, Mapping):

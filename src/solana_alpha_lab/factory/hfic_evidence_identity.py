@@ -22,6 +22,8 @@ SCIENTIFIC_SLOT_VERSION = "SCIENTIFIC_SLOT_V1"
 EXECUTION_BINDING_VERSION = "EXECUTION_BINDING_V1"
 RUN_IDENTITY_VERSION = "FORGE_RUN_IDENTITY_V2"
 LEGACY_EPOCH_INTERPRETATION = "LEGACY_COMBINED_EVIDENCE_EPOCH_V1"
+BASE_REPRESENTATION_ID = "BASE"
+BASE_REPRESENTATION_VERSION = "HFIC-V1.2"
 
 # Protocol / executable surfaces that define capability semantics.
 _CAPABILITY_PROTOCOL_FILES = (
@@ -262,22 +264,272 @@ def execution_binding_sha256(
     )
 
 
+def representation_identity_from_session(
+    session: Mapping[str, Any],
+) -> tuple[str | None, str | None]:
+    """Return the persisted representation identity without guessing legacy data."""
+
+    if not isinstance(session, Mapping):
+        return None, None
+    raw_representation = (
+        session.get("ladder_representation_id")
+        or session.get("representation_id")
+    )
+    if not isinstance(raw_representation, str) or not raw_representation.strip():
+        return None, None
+    representation = raw_representation.strip()
+    if representation in {"CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"}:
+        representation = BASE_REPRESENTATION_ID
+    raw_version = (
+        session.get("representation_semantic_version")
+        or session.get("semantic_version")
+        or session.get("representation_version")
+    )
+    version = str(raw_version).strip() if raw_version is not None else ""
+    return representation, version or None
+
+
+def session_scientific_slot_sha256(session: Mapping[str, Any]) -> str | None:
+    """Read an explicit slot, or derive it only from complete split fields.
+
+    A legacy row with a market stamp but without the new slot/provenance fields
+    deliberately returns ``None``.  Callers must still count that row as a
+    known historical market look; absence of the new stamp is not proof that
+    the market slot was free.
+    """
+
+    if not isinstance(session, Mapping):
+        return None
+    explicit = session.get("scientific_slot_sha256")
+    if isinstance(explicit, str) and re.fullmatch(r"[0-9a-f]{64}", explicit):
+        return explicit
+    market = session.get("market_evidence_epoch_sha256")
+    representation, version = representation_identity_from_session(session)
+    focus = session.get("owner_focus")
+    if not isinstance(market, str) or len(market) != 64:
+        return None
+    if not representation or not version or not isinstance(focus, str) or not focus:
+        return None
+    from solana_alpha_lab.factory.hfic_identity import normalize_text
+
+    derived_focus_key = hashlib.sha256(
+        normalize_text(focus).encode("utf-8")
+    ).hexdigest()
+    focus_key = session.get("focus_key_sha256")
+    if isinstance(focus_key, str) and len(focus_key) == 64 and focus_key != derived_focus_key:
+        return None
+    return scientific_slot_sha256(
+        market_evidence_epoch_sha256=market,
+        representation_id=representation,
+        representation_semantic_version=version,
+        owner_focus=focus,
+    )
+
+
+def _session_slot_focus_key(session: Mapping[str, Any]) -> str | None:
+    value = session.get("focus_key_sha256")
+    if isinstance(value, str) and len(value) == 64:
+        return value
+    owner_focus = session.get("owner_focus")
+    if isinstance(owner_focus, str) and owner_focus.strip():
+        from solana_alpha_lab.factory.hfic_identity import normalize_text
+
+        return hashlib.sha256(normalize_text(owner_focus).encode("utf-8")).hexdigest()
+    return None
+
+
+def _session_slot_matches_execution_context(
+    session: Mapping[str, Any],
+    *,
+    memory_eligibility_sha256: str | None,
+    evidence_surface_mode: str | None,
+) -> bool:
+    if memory_eligibility_sha256 is not None and session.get(
+        "memory_eligibility_sha256"
+    ) != memory_eligibility_sha256:
+        return False
+    if evidence_surface_mode is not None and session.get(
+        "evidence_surface_mode"
+    ) != evidence_surface_mode:
+        return False
+    return True
+
+
+def resolve_scientific_admission(
+    sessions: Sequence[Mapping[str, Any]],
+    *,
+    market_evidence_epoch: str,
+    representation_id: str,
+    representation_semantic_version: str,
+    owner_focus: str,
+    reservations: Sequence[Mapping[str, Any]] | None = None,
+    memory_eligibility_sha256: str | None = None,
+    evidence_surface_mode: str | None = None,
+    auto_sessions_per_market: int = 1,
+    max_distinct_focuses: int = 3,
+) -> dict[str, Any]:
+    """Resolve one shared market-slot admission decision.
+
+    The helper is intentionally storage-agnostic.  Preflight and ladder
+    callers feed it the same projected sessions, so resume/reuse and budget
+    cannot silently diverge between the two entry points.
+    """
+
+    representation = str(representation_id or BASE_REPRESENTATION_ID)
+    version = str(representation_semantic_version or "").strip()
+    if not version:
+        raise EvidenceIdentityError("REPRESENTATION_SEMANTIC_VERSION_REQUIRED")
+    target_slot = scientific_slot_sha256(
+        market_evidence_epoch_sha256=market_evidence_epoch,
+        representation_id=representation,
+        representation_semantic_version=version,
+        owner_focus=owner_focus,
+    )
+    observed_rows: list[Mapping[str, Any]] = []
+    seen_rows: set[tuple[str, str]] = set()
+    for item in [*(sessions or []), *(reservations or [])]:
+        if not isinstance(item, Mapping):
+            continue
+        identity = (
+            str(item.get("session_id") or ""),
+            str(session_scientific_slot_sha256(item) or ""),
+        )
+        if identity in seen_rows and identity[0] and identity[1]:
+            continue
+        if identity[0] and identity[1]:
+            seen_rows.add(identity)
+        observed_rows.append(item)
+    market_rows = list(
+        sessions_for_market_budget(
+            observed_rows,
+            market_evidence_epoch=market_evidence_epoch,
+        )
+    )
+    same_slot = [
+        item
+        for item in market_rows
+        if session_scientific_slot_sha256(item) == target_slot
+    ]
+    same_slot.sort(
+        key=lambda item: (
+            int(item.get("hfic_cycle_seq") or 0),
+            str(item.get("effective_at") or ""),
+            str(item.get("record_id") or ""),
+        ),
+        reverse=True,
+    )
+    if same_slot:
+        chosen = same_slot[0]
+        session_id = str(chosen.get("session_id") or "") or None
+        if _session_slot_matches_execution_context(
+            chosen,
+            memory_eligibility_sha256=memory_eligibility_sha256,
+            evidence_surface_mode=evidence_surface_mode,
+        ):
+            state = str(chosen.get("session_state") or chosen.get("phase") or "")
+            pending = {
+                "PREFLIGHT_PROVEN",
+                "DRAFT_VALIDATED",
+                "FROZEN_AWAITING_CRITIC",
+                "REVISED_AWAITING_CRITIC",
+                "RUNNER_UP_AWAITING_CRITIC",
+                "REVISION_REQUIRED",
+                "AWAITING_CLASSIFICATION",
+                "CRITIC_RESULT_READY",
+                "RESERVED",
+            }
+            action = "RESUME_EXISTING_SESSION" if state in pending else "RETURN_EXISTING_SESSION"
+            return {
+                "action": action,
+                "reason_code": state or "SCIENTIFIC_SLOT_OCCUPIED",
+                "session_id": session_id,
+                "scientific_slot_sha256": target_slot,
+                "occupancy": "OCCUPIED",
+            }
+        return {
+            "action": "STOP",
+            "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            "session_id": session_id,
+            "scientific_slot_sha256": target_slot,
+            "occupancy": "OCCUPIED",
+        }
+
+    matching_representation = [
+        item
+        for item in market_rows
+        if representation_identity_from_session(item) == (representation, version)
+    ]
+    if representation != BASE_REPRESENTATION_ID and matching_representation:
+        return {
+            "action": "STOP",
+            "reason_code": "REPRESENTATION_SLOT_OCCUPIED",
+            "session_id": str(matching_representation[0].get("session_id") or "") or None,
+            "scientific_slot_sha256": target_slot,
+            "occupancy": "REPRESENTATION_OCCUPIED",
+        }
+
+    if representation == BASE_REPRESENTATION_ID:
+        auto_count = sum(
+            1
+            for item in market_rows
+            if str(item.get("owner_focus") or "AUTO").strip().casefold() == "auto"
+        )
+        if str(owner_focus or "").strip().casefold() == "auto":
+            if auto_count >= auto_sessions_per_market:
+                return {
+                    "action": "STOP",
+                    "reason_code": "SEARCH_BUDGET_EXHAUSTED",
+                    "session_id": None,
+                    "scientific_slot_sha256": target_slot,
+                    "occupancy": "MARKET_BUDGET_EXHAUSTED",
+                }
+        else:
+            distinct = {
+                value
+                for value in (_session_slot_focus_key(item) for item in market_rows)
+                if value
+            }
+            from solana_alpha_lab.factory.hfic_identity import normalize_text
+
+            requested = hashlib.sha256(
+                normalize_text(str(owner_focus)).encode("utf-8")
+            ).hexdigest()
+            if requested not in distinct and len(distinct) >= max_distinct_focuses:
+                return {
+                    "action": "STOP",
+                    "reason_code": "SEARCH_BUDGET_EXHAUSTED",
+                    "session_id": None,
+                    "scientific_slot_sha256": target_slot,
+                    "occupancy": "MARKET_BUDGET_EXHAUSTED",
+                }
+
+    return {
+        "action": "START_NEW_SESSION",
+        "reason_code": "SCIENTIFIC_SLOT_AVAILABLE",
+        "session_id": None,
+        "scientific_slot_sha256": target_slot,
+        "occupancy": "AVAILABLE",
+    }
+
+
 def forge_run_identity_sha256(
     *,
     market_evidence_epoch_sha256: str,
     frozen_representation_ids: Sequence[str],
     owner_focus: str,
+    frozen_representation_versions: Sequence[str] | None = None,
 ) -> str:
     """Immutable run admission identity. Excludes session/progress artifacts."""
 
-    return canonical_sha256(
-        {
-            "identity_version": RUN_IDENTITY_VERSION,
-            "market_evidence_epoch_sha256": market_evidence_epoch_sha256,
-            "frozen_representation_ids": list(frozen_representation_ids),
-            "owner_focus": owner_focus,
-        }
-    )
+    payload: dict[str, Any] = {
+        "identity_version": RUN_IDENTITY_VERSION,
+        "market_evidence_epoch_sha256": market_evidence_epoch_sha256,
+        "frozen_representation_ids": list(frozen_representation_ids),
+        "owner_focus": owner_focus,
+    }
+    if frozen_representation_versions is not None:
+        payload["frozen_representation_versions"] = list(frozen_representation_versions)
+    return canonical_sha256(payload)
 
 
 def compute_market_epoch_for_data_root(
@@ -465,13 +717,27 @@ def sessions_for_market_budget(
     sessions: Sequence[Mapping[str, Any]],
     *,
     market_evidence_epoch: str,
+    representation_id: str | None = None,
+    representation_semantic_version: str | None = None,
 ) -> list[Mapping[str, Any]]:
     """Sessions that consume scientific budget for the current market epoch."""
 
     matched: list[Mapping[str, Any]] = []
     for item in sessions:
-        if session_matches_market_epoch(item, market_evidence_epoch):
-            matched.append(item)
+        if not session_matches_market_epoch(item, market_evidence_epoch):
+            continue
+        if representation_id is not None:
+            observed = representation_identity_from_session(item)
+            wanted = (str(representation_id), str(representation_semantic_version or ""))
+            if observed != wanted:
+                # A split-era BASE row may have a market stamp but no new slot
+                # fields. It still occupies the known BASE market look.
+                if not (
+                    wanted[0] == BASE_REPRESENTATION_ID
+                    and observed == (None, None)
+                ):
+                    continue
+        matched.append(item)
     return matched
 
 
@@ -511,6 +777,8 @@ def session_matches_epoch_for_lookup(
 
 __all__ = [
     "CAPABILITY_BASIS_VERSION",
+    "BASE_REPRESENTATION_ID",
+    "BASE_REPRESENTATION_VERSION",
     "DISPOSITION_COMPATIBLE",
     "DISPOSITION_HISTORICAL_ONLY",
     "DISPOSITION_UNRESOLVED",
@@ -530,6 +798,9 @@ __all__ = [
     "lineage_cohort_bindings",
     "market_evidence_epoch_sha256",
     "scientific_slot_sha256",
+    "session_scientific_slot_sha256",
+    "representation_identity_from_session",
+    "resolve_scientific_admission",
     "session_matches_epoch_for_lookup",
     "session_matches_market_epoch",
     "sessions_for_market_budget",

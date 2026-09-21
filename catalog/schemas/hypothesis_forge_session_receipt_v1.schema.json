@@ -29,6 +29,25 @@
     "session_id": {"type": "string", "minLength": 1},
     "session_state": {"const": "SYNTHESIS_COMPLETE"},
     "evidence_epoch_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ladder_representation_id": {"type": "string", "minLength": 1},
+    "control_session_id": {"type": ["string", "null"]},
+    "representation_semantic_version": {"type": "string", "minLength": 1},
+    "representation_payload_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "scientific_slot_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "execution_binding_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "model_provenance_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9a-f]{64}$"
+    },
     "market_evidence_epoch_sha256": {
       "type": "string",
       "pattern": "^[0-9a-f]{64}$"

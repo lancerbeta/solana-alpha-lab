@@ -46,6 +46,8 @@ from solana_alpha_lab.factory.hfic_session import (
     RUNNER_UP_AWAITING_CRITIC,
     RUNNER_UP_REVISION_REQUIRED,
     focus_key_sha256,
+    find_generated_draft,
+    list_scientific_slot_admissions,
     list_hfic_sessions,
     load_session_bundle,
     pick_session,
@@ -197,6 +199,17 @@ def eligible_representation_ids(registry: Mapping[str, Any]) -> list[str]:
         for row in registry.get("representations") or []
         if str(row.get("status") or "") == "ACTIVE"
     ]
+
+
+def representation_semantic_version(
+    registry: Mapping[str, Any], representation_id: str
+) -> str:
+    for row in registry.get("representations") or []:
+        if str(row.get("id") or "") == representation_id:
+            version = str(row.get("version") or "").strip()
+            if version:
+                return version
+    raise LadderError("REPRESENTATION_SEMANTIC_VERSION_MISSING")
 
 
 def _validator() -> Draft202012Validator:
@@ -613,6 +626,12 @@ def prepare_ladder_freeze_preflight(
     receipt["forge_context_packet"] = packet
     receipt["control_session_id"] = control_session_id
     receipt[LADDER_REPRESENTATION_PACKET_KEY] = representation_id
+    normalized_payload = packet.get("normalized_trajectory_v1")
+    if isinstance(normalized_payload, Mapping):
+        version = normalized_payload.get("representation_version")
+        if isinstance(version, (str, int, float)) and not isinstance(version, bool):
+            receipt["representation_semantic_version"] = str(version)
+            packet["representation_semantic_version"] = str(version)
     receipt.pop("evidence_surface_mode", None)
     receipt.pop("forge_context_packet_sha256", None)
     return receipt
@@ -970,6 +989,20 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             + "  # market+representation+focus"
         ),
         f"legacy_epoch: {(receipt.get('legacy_epoch_sha256') or 'NONE')[:16]}",
+        "frozen_versions: "
+        + (
+            ", ".join(str(item) for item in receipt.get("frozen_representation_versions") or [])
+            or "NONE"
+        ),
+        (
+            "execution_binding: "
+            + (
+                str(receipt.get("execution_binding_sha256"))[:16]
+                if isinstance(receipt.get("execution_binding_sha256"), str)
+                and len(str(receipt.get("execution_binding_sha256"))) == 64
+                else "UNKNOWN"
+            )
+        ),
     ]
     for stage in stages:
         if not isinstance(stage, Mapping):
@@ -978,8 +1011,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         draft = stage.get("draft_sha256")
         draft_note = f" draft={(draft[:16] if isinstance(draft, str) else 'NONE')}"
         lines.append(
-            "stage {id}: {status} terminal={term} scope={scope} used={used}{draft}".format(
+            "stage {id}@{version}: {status} terminal={term} scope={scope} used={used}{draft}".format(
                 id=stage.get("representation_id"),
+                version=stage.get("representation_semantic_version") or "UNKNOWN",
                 status=stage.get("execution_status"),
                 term=stage.get("effective_terminal") or "NONE",
                 scope=stage.get("input_scope"),
@@ -1100,6 +1134,16 @@ def _stage_from_session(
     identity = _critic_identity(bundle)
     declined = _declined_candidate_ids(bundle, selected if isinstance(selected, str) else None)
     decisive = _critic_decisive_reason(bundle) or critic_terminal
+    receipt_version = receipt.get("representation_semantic_version")
+    packet_version = packet.get("representation_semantic_version") if isinstance(packet, Mapping) else None
+    normalized = packet.get("normalized_trajectory_v1") if isinstance(packet, Mapping) else None
+    if not isinstance(packet_version, (str, int, float)) and isinstance(normalized, Mapping):
+        packet_version = normalized.get("representation_version")
+    semantic_version = (
+        bundle.get("representation_semantic_version")
+        or receipt_version
+        or packet_version
+    )
     input_scope = (
         CURRENT_REPRESENTATION_CONTROL_V1
         if representation_id == "BASE" and mode == CURRENT_REPRESENTATION_CONTROL_V1
@@ -1107,6 +1151,13 @@ def _stage_from_session(
     )
     return {
         "representation_id": representation_id,
+        "semantic_version": (
+            str(semantic_version)
+            if isinstance(semantic_version, (str, int, float))
+            and not isinstance(semantic_version, bool)
+            and str(semantic_version)
+            else None
+        ),
         "execution_status": status,
         "effective_terminal": terminal or None,
         "input_scope": input_scope,
@@ -1128,6 +1179,14 @@ def _stage_from_session(
                 else None
             )
         ),
+        "scientific_slot_sha256": bundle.get("scientific_slot_sha256")
+        or receipt.get("scientific_slot_sha256"),
+        "execution_binding_sha256": bundle.get("execution_binding_sha256")
+        or receipt.get("execution_binding_sha256"),
+        "control_session_id": bundle.get("control_session_id")
+        or receipt.get("control_session_id"),
+        "model_provenance_sha256": bundle.get("model_provenance_sha256")
+        or receipt.get("model_provenance_sha256"),
         "critic_input_packet_sha256": bundle.get("critic_input_packet_sha256"),
         "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256"),
         "market_evidence_epoch_sha256": bundle.get("market_evidence_epoch_sha256"),
@@ -1321,15 +1380,26 @@ def _progress_signature(receipt: Mapping[str, Any]) -> tuple[Any, ...]:
         stages.append(
             (
                 row.get("representation_id"),
+                row.get("semantic_version"),
+                row.get("representation_payload_sha256"),
+                row.get("scientific_slot_sha256"),
+                row.get("execution_binding_sha256"),
                 row.get("execution_status"),
                 row.get("effective_terminal"),
                 row.get("session_state"),
                 row.get("draft_sha256"),
                 row.get("stage_ref_sha256"),
                 row.get("session_id"),
+                row.get("control_session_id"),
             )
         )
-    return (receipt.get("next_action"), receipt.get("owner_final"), tuple(stages))
+    return (
+        receipt.get("next_action"),
+        receipt.get("owner_final"),
+        receipt.get("scientific_slot_sha256"),
+        receipt.get("execution_binding_sha256"),
+        tuple(stages),
+    )
 
 
 def load_forge_context_packet(
@@ -1538,6 +1608,7 @@ def _discover_ladder_stages(
     visible: Sequence[str],
     preferred_control_session_id: str | None,
     saved_draft_sha256: str | None,
+    saved_draft_representation_id: str | None = None,
     v1_snapshot: Mapping[str, Any] | None,
     current_market_epoch: str | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, str | None]:
@@ -1690,17 +1761,26 @@ def _discover_ladder_stages(
             base_stage["input_scope"] = "ORDINARY_BASE"
             resolved.append(base_stage)
         else:
-            resolved.append(
-                {
-                    "representation_id": "BASE",
-                    "execution_status": EXEC_NOT_RUN,
-                    "effective_terminal": None,
-                    "input_scope": "ORDINARY_BASE",
-                    "session_id": None,
-                    "used_cohort_ids": [],
-                    "reason_code": "CONTROL_SURFACE_REQUIRED",
-                }
-            )
+            fresh_base = {
+                "representation_id": "BASE",
+                "execution_status": EXEC_NOT_RUN,
+                "effective_terminal": None,
+                "input_scope": "ORDINARY_BASE",
+                "session_id": None,
+                "used_cohort_ids": [],
+                "reason_code": "CONTROL_SURFACE_REQUIRED",
+            }
+            if saved_draft_sha256 and saved_draft_representation_id == "BASE":
+                fresh_base.update(
+                    {
+                        "execution_status": EXEC_EXECUTED,
+                        "session_state": "FROZEN_AWAITING_CRITIC",
+                        "draft_sha256": saved_draft_sha256,
+                        "input_scope": CURRENT_REPRESENTATION_CONTROL_V1,
+                        "reason_code": "SAVED_DRAFT_PRESENT",
+                    }
+                )
+            resolved.append(fresh_base)
     else:
         control_session_id, base_stage, chosen_bundle = chosen
         bound = list(base_stage.get("used_cohort_ids") or [])
@@ -1789,7 +1869,11 @@ def _discover_ladder_stages(
             "used_cohort_ids": v1_used,
             "reason_code": v1_reason,
             "stage_ref_sha256": None,
-            "draft_sha256": saved_draft_sha256,
+            "draft_sha256": (
+                saved_draft_sha256
+                if saved_draft_representation_id in {None, "NORMALIZED_TRAJECTORY_V1"}
+                else None
+            ),
         }
     if v1_stage is not None:
         resolved.append(v1_stage)
@@ -1862,6 +1946,7 @@ def evaluate_forge_run(
     control_session_id = None
     legacy_epoch = None
     used_cohorts: list[str] = []
+    saved_draft_representation_id: str | None = None
     if stages is not None:
         resolved_stages = [dict(row) for row in stages]
         for row in resolved_stages:
@@ -1887,6 +1972,19 @@ def evaluate_forge_run(
                     market_epoch_for_discovery = _hash_market_basis(basis)
                 except EvidenceIdentityError:
                     market_epoch_for_discovery = None
+        if not saved_draft_sha256 and isinstance(market_epoch_for_discovery, str):
+            generated = find_generated_draft(
+                store,
+                market_evidence_epoch_sha256=market_epoch_for_discovery,
+                owner_focus=owner_focus,
+            )
+            if isinstance(generated, Mapping):
+                candidate_sha = generated.get("payload_sha256")
+                if isinstance(candidate_sha, str) and len(candidate_sha) == 64:
+                    saved_draft_sha256 = candidate_sha
+                    raw_representation = generated.get("ladder_representation_id")
+                    if isinstance(raw_representation, str) and raw_representation:
+                        saved_draft_representation_id = raw_representation
         resolved_stages, control_session_id, legacy_epoch = _discover_ladder_stages(
             data_root=Path(data_root),
             store=store,
@@ -1894,6 +1992,7 @@ def evaluate_forge_run(
             visible=visible,
             preferred_control_session_id=preferred_control_session_id,
             saved_draft_sha256=saved_draft_sha256,
+            saved_draft_representation_id=saved_draft_representation_id,
             v1_snapshot=v1_snapshot,
             current_market_epoch=(
                 str(market_epoch_for_discovery)
@@ -1910,6 +2009,7 @@ def evaluate_forge_run(
         execution_binding_sha256,
         forge_run_identity_sha256,
         market_evidence_epoch_sha256 as _hash_market_basis,
+        resolve_scientific_admission,
         scientific_slot_sha256,
     )
 
@@ -1923,14 +2023,28 @@ def evaluate_forge_run(
                 raise LadderError(str(exc)) from exc
         if not isinstance(market_epoch, str) or len(market_epoch) != 64:
             raise LadderError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    frozen_representation_versions = [
+        f"{item}@{representation_semantic_version(registry_doc, item)}"
+        for item in frozen_ids
+    ]
     run_identity = forge_run_identity_sha256(
         market_evidence_epoch_sha256=str(market_epoch),
         frozen_representation_ids=frozen_ids,
         owner_focus=owner_focus,
+        frozen_representation_versions=frozen_representation_versions,
     )
     existing = None
     try:
         existing = _lookup_run_artifact(store, run_identity)
+        if existing is None:
+            legacy_identity = forge_run_identity_sha256(
+                market_evidence_epoch_sha256=str(market_epoch),
+                frozen_representation_ids=frozen_ids,
+                owner_focus=owner_focus,
+            )
+            existing = _lookup_run_artifact(store, legacy_identity)
+            if existing is not None:
+                run_identity = str(existing.get("run_identity_sha256") or legacy_identity)
     except ResearchStoreError:
         existing = None
     if existing is not None and existing.get("owner_final"):
@@ -1973,22 +2087,72 @@ def evaluate_forge_run(
     owner_final = decision.get("owner_final")
     next_action = str(decision.get("next_action"))
     active_rep = "BASE"
-    active_version = "1"
+    active_version = representation_semantic_version(registry_doc, active_rep)
     if next_action in {ACTION_START_V1, ACTION_RESUME_V1}:
         for row in resolved_stages:
             if isinstance(row, Mapping) and str(row.get("representation_id") or "").startswith(
                 "NORMALIZED"
             ):
                 active_rep = str(row["representation_id"])
-                active_version = str(row.get("semantic_version") or "1")
+                active_version = str(
+                    row.get("semantic_version")
+                    or representation_semantic_version(registry_doc, active_rep)
+                )
                 break
     elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE, ACTION_RETURN_EXISTING}:
         for row in resolved_stages:
             rid = str(row.get("representation_id") or "") if isinstance(row, Mapping) else ""
             if rid in {"BASE", "CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"} or rid == "BASE":
                 active_rep = rid or "BASE"
-                active_version = str(row.get("semantic_version") or "1")
+                active_version = str(
+                    row.get("semantic_version")
+                    or representation_semantic_version(registry_doc, active_rep)
+                )
                 break
+
+    if next_action.startswith("START_"):
+        admission = resolve_scientific_admission(
+            list_hfic_sessions(store),
+            reservations=list_scientific_slot_admissions(store),
+            market_evidence_epoch=str(market_epoch),
+            representation_id=active_rep,
+            representation_semantic_version=active_version,
+            owner_focus=owner_focus,
+        )
+        if admission.get("action") == "STOP":
+            reason = str(
+                admission.get("reason_code") or "SCIENTIFIC_SLOT_ADMISSION_STOP"
+            )
+            decision = {
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "reason_code": reason,
+            }
+            next_action = ACTION_OBSERVABILITY_BLOCKED
+            owner_final = ACTION_OBSERVABILITY_BLOCKED
+        elif admission.get("action") in {
+            "RESUME_EXISTING_SESSION",
+            "RETURN_EXISTING_SESSION",
+        }:
+            admitted_id = str(admission.get("session_id") or "")
+            observed_ids = {
+                str(row.get("session_id") or "")
+                for row in resolved_stages
+                if isinstance(row, Mapping)
+            }
+            if admitted_id and admitted_id not in observed_ids:
+                # The reservation is authoritative for occupancy, but the
+                # lifecycle row is not safely bound/readable (for example an
+                # orphan V1 parent). Do not expose the reservation's internal
+                # phase as if it were a resumable owner action.
+                reason = "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+                decision = {
+                    "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                    "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                    "reason_code": reason,
+                }
+                next_action = ACTION_OBSERVABILITY_BLOCKED
+                owner_final = ACTION_OBSERVABILITY_BLOCKED
     scientific_slot = scientific_slot_sha256(
         market_evidence_epoch_sha256=str(market_epoch),
         representation_id=active_rep,
@@ -2004,15 +2168,9 @@ def evaluate_forge_run(
                 continue
             if str(row.get("representation_id") or "") != active_rep:
                 continue
-            for key in (
-                "representation_payload_sha256",
-                "draft_sha256",
-                "critic_input_packet_sha256",
-            ):
-                value = row.get(key)
-                if isinstance(value, str) and len(value) == 64:
-                    active_payload = value
-                    break
+            value = row.get("representation_payload_sha256")
+            if isinstance(value, str) and len(value) == 64:
+                active_payload = value
             if active_payload:
                 break
         memory_elig = None
@@ -2022,17 +2180,26 @@ def evaluate_forge_run(
             ):
                 memory_elig = str(row["memory_eligibility_sha256"])
                 break
-        exec_binding = execution_binding_sha256(
-            scientific_slot_sha256=scientific_slot,
-            capability_epoch_sha256=cap_epoch,
-            representation_payload_sha256=active_payload,
-            memory_eligibility_sha256=memory_elig,
-            model_provenance_sha256=(
-                str(input_receipt.get("model_provenance_sha256"))
-                if isinstance(input_receipt.get("model_provenance_sha256"), str)
-                else None
-            ),
-        )
+        active_model = None
+        for row in resolved_stages:
+            if isinstance(row, Mapping) and str(row.get("representation_id") or "") == active_rep:
+                candidate_model = row.get("model_provenance_sha256")
+                if isinstance(candidate_model, str) and len(candidate_model) == 64:
+                    active_model = candidate_model
+                    break
+        if active_rep == "BASE" or active_payload is not None:
+            exec_binding = execution_binding_sha256(
+                scientific_slot_sha256=scientific_slot,
+                capability_epoch_sha256=cap_epoch,
+                representation_payload_sha256=active_payload,
+                memory_eligibility_sha256=memory_elig,
+                model_provenance_sha256=active_model
+                or (
+                    str(input_receipt.get("model_provenance_sha256"))
+                    if isinstance(input_receipt.get("model_provenance_sha256"), str)
+                    else None
+                ),
+            )
     if owner_class_input == OWNER_CLASS_INPUT_NOT_READY:
         owner_class = OWNER_CLASS_INPUT_NOT_READY
     elif owner_class_input == OWNER_CLASS_OBSERVABILITY_BLOCKED or next_action == ACTION_OBSERVABILITY_BLOCKED:
@@ -2052,9 +2219,40 @@ def evaluate_forge_run(
     stage_out = []
     used_cohorts = []
     for row in resolved_stages:
+        stage_representation_id = str(row.get("representation_id") or "BASE")
+        stage_semantic_version = row.get("semantic_version")
+        if not isinstance(stage_semantic_version, str) or not stage_semantic_version:
+            stage_semantic_version = representation_semantic_version(
+                registry_doc, stage_representation_id
+            )
+        stage_slot = row.get("scientific_slot_sha256")
+        if (
+            not isinstance(stage_slot, str)
+            and row.get("session_id") is None
+            and isinstance(market_epoch, str)
+        ):
+            stage_slot = scientific_slot_sha256(
+                market_evidence_epoch_sha256=str(market_epoch),
+                representation_id=stage_representation_id,
+                representation_semantic_version=stage_semantic_version,
+                owner_focus=owner_focus,
+            )
         stage_out.append(
             {
-                "representation_id": row.get("representation_id"),
+                "representation_id": stage_representation_id,
+                "representation_semantic_version": stage_semantic_version,
+                "representation_payload_sha256": row.get(
+                    "representation_payload_sha256"
+                ),
+                "scientific_slot_sha256": stage_slot,
+                "execution_binding_sha256": row.get("execution_binding_sha256"),
+                "control_session_id": row.get("control_session_id"),
+                "model_provenance_sha256": row.get("model_provenance_sha256"),
+                "memory_eligibility_sha256": row.get("memory_eligibility_sha256"),
+                "market_evidence_epoch_sha256": row.get(
+                    "market_evidence_epoch_sha256"
+                ),
+                "capability_epoch_sha256": row.get("capability_epoch_sha256"),
                 "execution_status": row.get("execution_status") or EXEC_NOT_RUN,
                 "effective_terminal": row.get("effective_terminal"),
                 "input_scope": row.get("input_scope") or "UNDECLARED",
@@ -2088,6 +2286,7 @@ def evaluate_forge_run(
         "visible_cohort_ids": visible,
         "used_cohort_ids": list(dict.fromkeys(used_cohorts)),
         "frozen_representation_ids": frozen_ids,
+        "frozen_representation_versions": frozen_representation_versions,
         "stages": stage_out,
         "legacy_epoch_sha256": legacy_epoch if isinstance(legacy_epoch, str) else None,
         "market_evidence_epoch_sha256": (
