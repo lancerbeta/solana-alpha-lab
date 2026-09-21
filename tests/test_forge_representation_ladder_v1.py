@@ -33,6 +33,7 @@ from solana_alpha_lab.factory.document_runner import repository_git_snapshot  # 
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     RUNNER_UP_AWAITING_CRITIC,
+    HficSessionError,
     apply_classification,
     find_session_by_epoch_focus,
     freeze_draft,
@@ -2106,6 +2107,26 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(
             str(receipt_exc.exception), "LADDER_FREEZE_CONTROL_RECEIPT_REQUIRED"
         )
+
+    def test_g4_freeze_without_ladder_challenger_packet_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = self._no_worthy_base(data_root, store, production_packet=True)
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            weak = dict(v1_pre)
+            weak.pop("ladder_challenger_packet", None)
+            draft = valid_draft()
+            with self.assertRaises(HficSessionError) as raised:
+                freeze_draft(
+                    draft, preflight_receipt=weak, store=store, repo_root=ROOT
+                )
+        self.assertEqual(str(raised.exception), "LADDER_CHALLENGER_PACKET_REQUIRED")
 
     def test_g4_attach_tampered_challenger_is_observability_not_soft_pend(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

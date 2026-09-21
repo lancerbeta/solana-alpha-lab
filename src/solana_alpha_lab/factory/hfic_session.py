@@ -2724,17 +2724,29 @@ def _bound_from_ladder_challenger_preflight(
     if representation == "NORMALIZED_TRAJECTORY_V1":
         from solana_alpha_lab.factory.hfic_representation_probe import (
             RepresentationProbeError,
+            _assert_challenger_bound_to_control,
             _validate_challenger_packet,
+            control_baseline_from_receipt,
         )
 
         challenger = preflight.get("ladder_challenger_packet")
         if not isinstance(challenger, Mapping) or not challenger:
             raise HficSessionError("LADDER_CHALLENGER_PACKET_REQUIRED")
+        control_receipt = preflight.get("ladder_control_receipt")
+        if not isinstance(control_receipt, Mapping) or not control_receipt:
+            raise HficSessionError("LADDER_CONTROL_RECEIPT_REQUIRED")
         try:
             validated, rep = _validate_challenger_packet(challenger)
         except RepresentationProbeError as exc:
             raise HficSessionError(f"LADDER_CHALLENGER_INVALID:{exc}") from exc
         if parent and validated.get("control_session_id") != parent:
+            raise HficSessionError("LADDER_CHALLENGER_PARENT_MISMATCH")
+        try:
+            baseline = control_baseline_from_receipt(control_receipt)
+            _assert_challenger_bound_to_control(validated, baseline)
+        except RepresentationProbeError as exc:
+            raise HficSessionError(f"LADDER_CHALLENGER_CONTROL_UNBOUND:{exc}") from exc
+        if parent and baseline.session_id != parent:
             raise HficSessionError("LADDER_CHALLENGER_PARENT_MISMATCH")
         for key in (
             "normalized_trajectory_v1",

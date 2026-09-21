@@ -600,6 +600,7 @@ def prepare_ladder_freeze_preflight(
             control_receipt=control_receipt,
         )
         receipt["ladder_challenger_packet"] = dict(challenger)
+        receipt["ladder_control_receipt"] = dict(control_receipt)
         search = packet.get("representation_search_key_sha256")
         if not isinstance(search, str) or len(search) != 64:
             raise LadderError("LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING")
