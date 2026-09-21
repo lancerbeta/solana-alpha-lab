@@ -513,6 +513,24 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 ):
                     evaluate_forge_run(ROOT, data_root, persist=False)
             self.assertEqual(str(ctx.exception), "MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            from solana_alpha_lab.factory.hfic_preflight import run_preflight
+
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                return_value=([], []),
+            ):
+                stopped = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    persist=True,
+                )
+            self.assertEqual(stopped.get("action"), "STOP")
+            self.assertEqual(
+                stopped.get("terminal"), "MARKET_EVIDENCE_BASIS_INCOMPLETE"
+            )
+            self.assertNotIn("market_evidence_epoch_sha256", stopped)
             del store
 
     def test_g10_tamper_outer_key_is_integrity_stop(self) -> None:

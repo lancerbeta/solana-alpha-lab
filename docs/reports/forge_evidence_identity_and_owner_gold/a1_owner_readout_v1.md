@@ -14,18 +14,21 @@
 ## Delivered
 
 - Shared helper `hfic_evidence_identity.py`: market vs capability split,
-  scientific slot, execution binding, run identity, legacy disposition,
-  market-scoped budget **and** resume matching (`session_matches_market_epoch`)
-- Consumers: A3 input receipt stamps, preflight/slash identity + budget + resume,
-  ladder run identity + receipt fields, session freeze/persist/list/lookup
-- Schemas: input/run/critic/session receipts accept optional market/capability
+  scientific slot + execution binding (receipt/repro gloss), run identity,
+  legacy disposition, stamp-only market budget
+  (`session_matches_market_epoch`) and exact-bytes resume lookup bridge
+  (`session_matches_epoch_for_lookup`)
+- Consumers: A3 input receipt stamps, preflight/slash identity + budget,
+  ladder run identity + slot/binding fields, session freeze/persist/list/lookup
+- Schemas: input/run/critic/session receipts accept optional market/capability;
+  forge-run accepts scientific_slot / execution_binding
 - Owner gold: `tests/test_forge_evidence_identity_and_owner_gold_v1.py`
   G1–G12 family (G1/G2, G3/G5, G4, G6 interrupt resume, G7 capability-only
   drift, G8 C3, G9 legacy, G10 incomplete-market fail-closed + tamper integrity,
   G11 capability does not free slot, G12 snapshot) + negative controls; A4
   regression green
 - Owner blocks: market + capability epochs + scientific slot; START vs RESUME
-  vs REUSED gloss; incomplete market → BLOCKED
+  vs REUSED gloss; incomplete market → BLOCKED (forge-run and preflight STOP)
 - Skill/operator/slash: market admission vs capability; no docs-driven reset
 
 ## Non-claims

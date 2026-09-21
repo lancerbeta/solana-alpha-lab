@@ -102,6 +102,7 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
                 and len(str(receipt.get("market_evidence_epoch_sha256"))) == 64
                 else "(unset)"
             )
+            + "  # admission/budget key"
         ),
         (
             "capability_epoch: "
@@ -111,6 +112,7 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
                 and len(str(receipt.get("capability_epoch_sha256"))) == 64
                 else "(unset)"
             )
+            + "  # protocol; does not free market budget"
         ),
         f"historical_calibration: {hist_text}",
         f"visibility: {', '.join(vis_bits)}",

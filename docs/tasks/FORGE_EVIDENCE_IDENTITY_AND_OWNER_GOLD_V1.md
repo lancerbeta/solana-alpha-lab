@@ -179,7 +179,8 @@ CI run `35588267708` success). Do not implement A6 or a scientific market run.
 
 - `DECISION_DELTA`: combined legacy `evidence_epoch_sha256` is no longer the
   sole scientific admission key; market and capability split; budgets follow
-  scientific slots, not Git/model provenance.
+  stamped market epochs (scientific slot/execution binding are receipt/repro
+  gloss), not Git/model provenance.
 - `UNCERTAINTY_REMOVED`: when reuse/resume/new trial is allowed for the same
   owner focus and visible cohort IDs.
 - `CAPABILITY_OR_EVIDENCE`: shared identity/admission helper + versioned
@@ -203,8 +204,8 @@ proven sufficient) owns:
 |---|---|---|
 | Market epoch | A3-selected decision-bearing datasets/lineage | Immutable snapshot of what the market input is |
 | Capability epoch | Prompt/schema/representation/capability semantics | Protocol identity; not automatic budget reset |
-| Scientific slot | market + representation@version + normalized focus | Occupancy / trial budget |
-| Execution binding | slot + capability + payload/parent + memory + model provenance | Exact result reproducibility |
+| Scientific slot | market + representation@version + normalized focus | Receipt/repro occupancy gloss for the active representation; budget counters still key on stamped market epoch |
+| Execution binding | slot + capability + payload/parent + memory + model provenance | Exact result reproducibility on forge-run receipts |
 | Run/checkpoint | frozen admission + stage artifact refs | Resume updates checkpoint, not admission |
 
 A3 remains input/vision owner. A4 remains ladder/run receipt owner. HFIC remains

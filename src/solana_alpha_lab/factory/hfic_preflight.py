@@ -1843,6 +1843,9 @@ def _forge_input_requires_preflight_stop(
         CURRENT_REPRESENTATION_CONTROL_V1,
     )
 
+    codes = {str(item) for item in (forge_input.get("blocking_reason_codes") or [])}
+    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
+        return True
     if forge_input.get("forge_runnable"):
         return False
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
@@ -1864,6 +1867,8 @@ def _forge_input_stop_terminal(
     )
 
     codes = list(forge_input.get("blocking_reason_codes") or [])
+    if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
+        return "MARKET_EVIDENCE_BASIS_INCOMPLETE"
     if FORGE_VISION_INTEGRITY_BLOCKED in codes:
         return FORGE_VISION_INTEGRITY_BLOCKED
     terminal = str(codes[0] if codes else CURRENT_CORPUS_MISSING)
@@ -1926,13 +1931,19 @@ def run_preflight(
         owner_focus=focus,
     )
     stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
-    if stop_input and not persist:
+    incomplete_market = "MARKET_EVIDENCE_BASIS_INCOMPLETE" in {
+        str(item) for item in (forge_input.get("blocking_reason_codes") or [])
+    }
+    # Incomplete market must STOP before slash identity compute (no 0*64 market
+    # admission, no uncaught EvidenceIdentityError on ordinary preflight).
+    if incomplete_market or (stop_input and not persist):
         focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
-        epoch = "0" * 64
+        # Placeholder search material only — not a market evidence epoch.
+        placeholder = "0" * 64
         focus_key = focus_key_sha256(focus)
         terminal = _forge_input_stop_terminal(forge_input, control_mode)
         search_key = search_key_sha256(
-            epoch, focus, PROMPT_VERSION, "0" * 64, control_mode
+            placeholder, focus, PROMPT_VERSION, placeholder, control_mode
         )
         stop_body = {
             "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
@@ -1941,7 +1952,7 @@ def run_preflight(
             "owner_class": forge_input.get("owner_class"),
             "owner_focus": focus,
             "prompt_version": PROMPT_VERSION,
-            "evidence_epoch_sha256": epoch,
+            "evidence_epoch_sha256": placeholder,
             "focus_key_sha256": focus_key,
             "search_key_sha256": search_key,
             "next": _forge_input_stop_next(terminal, forge_input.get("owner_class")),
@@ -1954,6 +1965,9 @@ def run_preflight(
                 "experiment_execution": 0,
                 "provider_api_rpc_wss_calls": 0,
             },
+            "blocking_reason_codes": list(
+                dict.fromkeys(list(forge_input.get("blocking_reason_codes") or []))
+            ),
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
