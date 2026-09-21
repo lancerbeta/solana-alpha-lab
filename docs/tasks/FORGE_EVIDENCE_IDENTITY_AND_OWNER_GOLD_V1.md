@@ -126,8 +126,11 @@ context_requirements:
       - docs/contracts/normalized_trajectory_v1_capability_contract.md
       - docs/contracts/normalized_trajectory_representation_probe_v1.md
     DELIVERY_EVIDENCE:
-      - docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json
+      - docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_completion_evidence_v1.json
+      - docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_independent_review_v1.json
+      - docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_factory_fit_v1.json
     HISTORICAL_CONTEXT:
+      - docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json
       - docs/evidence/forge_representation_ladder/a1_delivery_completion_evidence_v1.json
       - docs/evidence/forge_input_truth_and_visibility/a1_c1_c2_forge_input_v1.json
 ---
