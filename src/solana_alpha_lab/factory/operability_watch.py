@@ -275,6 +275,11 @@ def render_incident_message(
     verified_day = packet.get("immutable_archive_latest_verified_day")
     if verified_day is None or verified_day == "":
         verified_day = "UNKNOWN"
+    machine_code = (
+        f"ATTENTION={code}"
+        if code in OWNER_ATTENTION_CODES
+        else f"INCIDENT={code}"
+    )
     lines = [
         f"FACTORY / {kind} — {state}",
         "",
@@ -286,7 +291,7 @@ def render_incident_message(
         "```",
         f"MESSAGE_TYPE={kind}",
         f"STATE={state}",
-        f"INCIDENT={code}",
+        machine_code,
         f"COLLECTOR_STATE={packet.get('activation_state')}",
         f"LIFECYCLE_STATE={packet.get('cohort_readiness_state')}",
         f"ARCHIVE_LAST_VERIFIED_DAY={verified_day}",

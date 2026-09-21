@@ -91,8 +91,28 @@ def classify_doctor_current_activation(
     current_id = (current or {}).get("activation_id")
     current_digest = (current or {}).get("schedule_sha256")
     live = current_state == "ACTIVE"
+    stops_admitting_at = (current or {}).get("stops_admitting_at")
+    late_recovery_at = None
+    recovery_proof = None
+    current_payload = (current or {}).get("payload")
+    if current_state == "DRAINING":
+        recovery_proof = "UNKNOWN"
+        if isinstance(current_payload, dict):
+            raw_recovery = current_payload.get("transition_effective_at")
+            if isinstance(raw_recovery, str) and raw_recovery:
+                try:
+                    late_recovery_at = render_utc(parse_utc(raw_recovery))
+                    recovery_proof = "DRAINING_TRANSITION"
+                except (TypeError, ValueError):
+                    late_recovery_at = None
+    lifecycle_fields = {
+        "stops_admitting_at": stops_admitting_at,
+        "late_recovery_at": late_recovery_at,
+        "late_recovery_proof": recovery_proof,
+    }
     if current_state == "ABORTED_SAFETY":
         return {
+            **lifecycle_fields,
             "terminal": "DOCTOR_ABORTED_SAFETY",
             "live_activation": False,
             "current_activation_id": current_id,
@@ -102,6 +122,7 @@ def classify_doctor_current_activation(
         }
     if current_state == "PAUSED_OPERATOR":
         return {
+            **lifecycle_fields,
             "terminal": "DOCTOR_PAUSED",
             "live_activation": False,
             "current_activation_id": current_id,
@@ -111,14 +132,20 @@ def classify_doctor_current_activation(
         }
     if current_state in {"ACTIVE", "DRAINING"}:
         return {
+            **lifecycle_fields,
             "terminal": "DOCTOR_CURRENT_OK",
             "live_activation": live,
             "current_activation_id": current_id,
             "current_schedule_sha256": current_digest,
             "current_activation_state": current_state,
-            "next_action": "TICK_ONCE",
+            "next_action": (
+                "TICK_ONCE"
+                if current_state == "ACTIVE" or late_recovery_at is not None
+                else "REPAIR_DRAINING_RECOVERY_PROOF"
+            ),
         }
     return {
+        **lifecycle_fields,
         "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
         "live_activation": False,
         "current_activation_id": current_id,

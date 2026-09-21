@@ -33,6 +33,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     rollover_schedule,
     snapshot_schedule,
     status_schedule,
+    owner_next_action_for_lifecycle_error,
 )
 from solana_alpha_lab.factory.observation_schedule_composition import (  # noqa: E402
     CompositionParityError,
@@ -334,6 +335,11 @@ def main(
             current_report = classify_doctor_current_activation(activations)
             current_state = str(current_report.get("current_activation_state") or "")
             live = bool(current_report.get("live_activation"))
+            current_timing = {
+                "stops_admitting_at": current_report.get("stops_admitting_at"),
+                "late_recovery_at": current_report.get("late_recovery_at"),
+                "late_recovery_proof": current_report.get("late_recovery_proof"),
+            }
             cli_digest = getattr(args, "schedule_sha256", None)
             cli_activation = getattr(args, "activation_id", None)
             if cli_digest and cli_activation:
@@ -356,6 +362,7 @@ def main(
             if unresolved:
                 return _emit(
                     {
+                        **current_timing,
                         "terminal": "DOCTOR_RESTORE_MARKER_UNRESOLVED",
                         "live_activation": live,
                         "current_activation_id": current_report.get(
@@ -372,6 +379,7 @@ def main(
             if current_report["terminal"] == "DOCTOR_ABORTED_SAFETY":
                 return _emit(
                     {
+                        **current_timing,
                         "terminal": "DOCTOR_ABORTED_SAFETY",
                         "live_activation": False,
                         "current_activation_id": current_report.get(
@@ -396,6 +404,7 @@ def main(
                 )
                 return _emit(
                     {
+                        **current_timing,
                         "terminal": "DOCTOR_PAUSED",
                         "live_activation": False,
                         "current_activation_id": current_report.get(
@@ -412,6 +421,7 @@ def main(
             if current_report["terminal"] == "DOCTOR_NO_LIVE_ACTIVATION":
                 return _emit(
                     {
+                        **current_timing,
                         "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
                         "live_activation": False,
                         "current_activation_id": current_report.get(
@@ -442,6 +452,7 @@ def main(
             code = 0 if terminal == "DOCTOR_OK" else 2
             return _emit(
                 {
+                    **current_timing,
                     "terminal": terminal,
                     "live_activation": live,
                     "current_activation_id": current_report.get("current_activation_id"),
@@ -605,7 +616,11 @@ def main(
         PrimitiveRegistryError,
         CompositionParityError,
     ) as exc:
-        return _emit({"terminal": str(exc)}, 2)
+        payload = {"terminal": str(exc)}
+        next_action = owner_next_action_for_lifecycle_error(str(exc))
+        if next_action is not None:
+            payload["next_action"] = next_action
+        return _emit(payload, 2)
     finally:
         if "store" in locals():
             store.close()

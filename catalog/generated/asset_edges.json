@@ -10769,6 +10769,11 @@
     },
     {
       "source_asset_id": "MODULE-COLLECTOR-OPERATIONAL-PACKET-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-OBSERVATION-SCHEDULE-LIFECYCLE-001"
+    },
+    {
+      "source_asset_id": "MODULE-COLLECTOR-OPERATIONAL-PACKET-001",
       "relation": "governed_by",
       "target_asset_id": "CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001"
     },

@@ -205,10 +205,13 @@ If rollover was missed and the predecessor is proven **NON_ADMITTING**:
 then a forward successor may `authorize` → `activate` **without** a rollover
 row. The predecessor keeps draining existing PENDING/DUE work and admits
 nothing new. The successor becomes the sole same-family admitting activation.
-The immutable `DRAINING` transition timestamp is the late-recovery point:
-`starts_at` must be `>=` that point and `<=` actual activation time. A
-missing or malformed recovery timestamp is not enough proof; there is no
-clock tolerance and no backdated admission window.
+The late-recovery point comes from the append-only lifecycle event for the
+`DRAINING` transition (`OBSERVATION_SCHEDULE_STATE.effective_at`), not from a
+mutable SQLite payload rewrite. `starts_at` must be `>=` that point and `<=`
+actual activation time. Missing, malformed, or uncommitted recovery evidence
+is not enough proof; there is no clock tolerance and no backdated admission
+window. `upsert_activation` preserves the recorded transition proof and the
+activation gate revalidates the append-only event.
 
 Owner recovery (post-window, Git/main already contains this repair):
 
@@ -221,7 +224,7 @@ Owner recovery (post-window, Git/main already contains this repair):
 Expected while draining with historical abort present:
 
 ```json
-{"terminal":"DOCTOR_OK","live_activation":false,"current_activation_state":"DRAINING"}
+{"terminal":"DOCTOR_OK","live_activation":false,"current_activation_state":"DRAINING","stops_admitting_at":"<STOP>","late_recovery_at":"<RECOVERY>","late_recovery_proof":"DRAINING_TRANSITION"}
 ```
 
 Not expected:
@@ -230,10 +233,12 @@ Not expected:
 {"terminal":"DOCTOR_ABORTED_SAFETY"}
 ```
 
-2. Register + authorize a **forward** successor schedule (`starts_at` ≥ the
-   recorded late-recovery point, which is at/after predecessor
+2. Read `late_recovery_at` from doctor and register + authorize a **forward**
+   successor schedule (`starts_at` ≥ that point, which is at/after predecessor
    `stops_admitting_at`), then activate it (no rollover required once
-   predecessor is NON_ADMITTING).
+   predecessor is NON_ADMITTING). If doctor reports
+   `late_recovery_proof=UNKNOWN`, stop and repair/recover the lifecycle proof;
+   do not guess a timestamp.
 3. Re-run doctor: expect `current_activation_state=ACTIVE` for the successor
    and `live_activation=true`. Predecessor remains `DRAINING` until dues
    complete.
@@ -255,8 +260,9 @@ When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 2. Register the successor schedule if missing, then **authorize** it before
    expiry (or commit in-window `rollover` while admission is still open).
 3. Attention clears once a continuity-valid state is `AUTHORIZED` or
-   `ROLLOVER_READY`; the Telegram card is `FACTORY / ATTENTION` rather than
-   an incident.
+   `ROLLOVER_READY`; the Telegram card is `FACTORY / ATTENTION — ACTION` with
+   `MESSAGE_TYPE=ATTENTION` and `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, rather
+   than an incident.
 
 ### Current-state read model
 

@@ -34,7 +34,12 @@ from solana_alpha_lab.factory.observation_schedule_store import (
     ObservationScheduleStore,
     ObservationScheduleStoreError,
 )
-from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
+from solana_alpha_lab.factory.research_store import (
+    RecordKind,
+    ResearchEvent,
+    ResearchStore,
+    ResearchStoreError,
+)
 
 AUTHORITY_SCHEMA_RELATIVE = "catalog/schemas/observation_schedule_authority_v1.schema.json"
 PRODUCER_CAPABILITY = "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001"
@@ -63,6 +68,19 @@ def require_production_producer_git_sha(producer_git_sha: str | None) -> str:
 
 class ObservationLifecycleError(ValueError):
     """Typed lifecycle failure."""
+
+
+_OWNER_NEXT_ACTION_BY_LIFECYCLE_ERROR = {
+    "LATE_SUCCESSOR_RECOVERY_UNPROVEN": "REVALIDATE_DRAINING_RECOVERY_PROOF",
+    "LATE_SUCCESSOR_BACKDATED": "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
+    "ACTIVATION_BEFORE_STARTS_AT": "WAIT_UNTIL_SUCCESSOR_STARTS_AT",
+}
+
+
+def owner_next_action_for_lifecycle_error(error_code: str) -> str | None:
+    """Map a fail-closed lifecycle denial to one owner-readable next action."""
+
+    return _OWNER_NEXT_ACTION_BY_LIFECYCLE_ERROR.get(str(error_code or ""))
 
 
 def _research_event(
@@ -873,28 +891,75 @@ def _activation_is_non_admitting(
     return True
 
 
-def _non_admitting_recovery_at(row: Mapping[str, Any]) -> datetime | None:
-    """Return the immutable lifecycle timestamp that closed admission.
+def _non_admitting_recovery_at(
+    data_root: Path,
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> datetime | None:
+    """Return the append-only lifecycle timestamp that closed admission.
 
-    A late successor is only allowed to move forward from the recorded
-    DRAINING transition.  The caller's ``now`` proves that the predecessor is
-    no longer admitting; the transition payload proves when recovery actually
-    became possible.  Missing or malformed proof must stay fail-closed.
+    ``schedule_activations.payload_json`` is an operational projection and is
+    not the authority for a late handover timestamp. The DRAINING transition
+    is also emitted as an immutable ``ResearchEvent``; its ``effective_at``
+    together with the bound event payload is the minimum recovery proof.
+    Missing, malformed, or uncommitted evidence stays fail-closed.
     """
 
-    payload = dict(row.get("payload") or {})
-    raw = payload.get("transition_effective_at")
-    if not isinstance(raw, str) or not raw:
+    schedule_sha256 = str(row.get("schedule_sha256") or "")
+    activation_id = str(row.get("activation_id") or "")
+    event_id = str(row.get("last_transition_event_id") or "")
+    stops_raw = row.get("stops_admitting_at")
+    if not schedule_sha256 or not activation_id or not event_id:
+        return None
+    if not isinstance(stops_raw, str) or not stops_raw:
         return None
     try:
-        return parse_utc(raw)
+        stops = parse_utc(stops_raw)
     except Exception:
         return None
+    try:
+        records, _telemetry = ResearchStore(
+            data_root, create_if_missing=False
+        ).iter_lifecycle_records_bounded(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            window_start=stops,
+            closure_cutoff=now,
+        )
+    except ResearchStoreError:
+        return None
+    for record in records:
+        if str(record.record_id) != event_id:
+            continue
+        if str(record.record_kind) != str(RecordKind.OBSERVATION_SCHEDULE_STATE):
+            return None
+        try:
+            payload = json.loads(record.payload_json)
+        except (TypeError, json.JSONDecodeError):
+            return None
+        if not isinstance(payload, Mapping):
+            return None
+        if (
+            str(payload.get("state_event_id") or "") != event_id
+            or str(payload.get("schedule_sha256") or "") != schedule_sha256
+            or str(payload.get("activation_id") or "") != activation_id
+            or str(payload.get("state") or "") != "DRAINING"
+            or str(payload.get("prior_state") or "") != "ACTIVE"
+            or payload.get("admission_window_closed") is not True
+        ):
+            return None
+        effective = record.effective_at.astimezone(UTC)
+        if effective < stops:
+            return None
+        return effective
+    return None
 
 
 def _require_cohort_cutover_or_unique(
     store: ObservationScheduleStore,
     *,
+    data_root: Path,
     document: Mapping[str, Any],
     schedule_sha256: str,
     activation_id: str,
@@ -922,7 +987,7 @@ def _require_cohort_cutover_or_unique(
             continue
         if _activation_is_non_admitting(row, now=now):
             peer_stops = parse_utc(str(row["stops_admitting_at"]))
-            recovery_at = _non_admitting_recovery_at(row)
+            recovery_at = _non_admitting_recovery_at(data_root, row, now=now)
             if recovery_at is None or recovery_at > now:
                 raise ObservationLifecycleError("LATE_SUCCESSOR_RECOVERY_UNPROVEN")
             if successor_starts > now:
@@ -979,6 +1044,7 @@ def activate_schedule(
             raise ObservationLifecycleError("ACTIVATION_ALREADY_LIVE")
         _require_cohort_cutover_or_unique(
             store,
+            data_root=data_root,
             document=document,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,

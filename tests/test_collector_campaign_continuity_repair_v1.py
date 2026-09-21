@@ -36,10 +36,14 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     authorize_schedule,
     drain_expired_admission,
     expected_authority_phrase,
+    owner_next_action_for_lifecycle_error,
     register_schedule,
     rollover_schedule,
 )
-from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
+from solana_alpha_lab.factory.observation_schedule_store import (
+    ObservationScheduleStore,
+    ObservationScheduleStoreError,
+)
 from solana_alpha_lab.factory.operability_watch import (
     INCIDENT_GRACE_SECONDS,
     classify_incidents,
@@ -272,6 +276,17 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store.get_activation(pred["schedule_sha256"], "ACT-PRE")["state"],
                 "DRAINING",
             )
+            draining_row = store.get_activation(pred["schedule_sha256"], "ACT-PRE")
+            assert draining_row is not None
+            forged_payload = dict(draining_row["payload"])
+            forged_payload["transition_effective_at"] = "2026-09-01T00:00:00Z"
+            with self.assertRaisesRegex(
+                ObservationScheduleStoreError, "DENY_RETROACTIVE_MUTATION"
+            ):
+                store.upsert_activation(
+                    {**draining_row, "payload": forged_payload},
+                    clock=late,
+                )
             succ = register_schedule(
                 root=ROOT,
                 data_root=data_root,
@@ -729,6 +744,37 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         self.assertFalse(report["live_activation"])
         self.assertNotEqual(report["terminal"], "DOCTOR_ABORTED_SAFETY")
 
+    def test_doctor_exposes_late_recovery_point_and_proof(self) -> None:
+        report = classify_doctor_current_activation(
+            [
+                {
+                    "activation_id": "ACT-DRAIN",
+                    "schedule_sha256": "d" * 64,
+                    "state": "DRAINING",
+                    "stops_admitting_at": "2026-09-02T00:00:00Z",
+                    "updated_at": "2026-09-02T01:00:00Z",
+                    "created_at": "2026-09-01T00:00:00Z",
+                    "payload": {
+                        "admission_window_closed": True,
+                        "transition_effective_at": "2026-09-02T01:00:00Z",
+                    },
+                }
+            ]
+        )
+        self.assertEqual(report["stops_admitting_at"], "2026-09-02T00:00:00Z")
+        self.assertEqual(report["late_recovery_at"], "2026-09-02T01:00:00Z")
+        self.assertEqual(report["late_recovery_proof"], "DRAINING_TRANSITION")
+
+    def test_lifecycle_denials_have_owner_next_actions(self) -> None:
+        self.assertEqual(
+            owner_next_action_for_lifecycle_error("LATE_SUCCESSOR_BACKDATED"),
+            "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
+        )
+        self.assertEqual(
+            owner_next_action_for_lifecycle_error("LATE_SUCCESSOR_RECOVERY_UNPROVEN"),
+            "REVALIDATE_DRAINING_RECOVERY_PROOF",
+        )
+
     def test_doctor_reports_genuine_current_aborted(self) -> None:
         activations = [
             {
@@ -837,6 +883,12 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertIn("MESSAGE_TYPE=ATTENTION", attention_preview)
             self.assertIn(
                 "OWNER_ACTION=CAMPAIGN_SUCCESSOR_REQUIRED", attention_preview
+            )
+            self.assertIn(
+                "ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED", attention_preview
+            )
+            self.assertNotIn(
+                "INCIDENT=CAMPAIGN_SUCCESSOR_REQUIRED", attention_preview
             )
             self.assertNotIn("FACTORY / INCIDENT — ACTION", attention_preview)
             second = evaluate_operability(
@@ -962,6 +1014,24 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             self.assertEqual(continuity["campaign_successor_state"], "REGISTERED")
             self.assertTrue(continuity["campaign_successor_required"])
+            store.close()
+
+    def test_missing_active_registration_keeps_successor_warning_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation={
+                    "schedule_sha256": "e" * 64,
+                    "activation_id": "ACT-UNBOUND",
+                    "state": "ACTIVE",
+                    "stops_admitting_at": "2026-09-01T12:00:00Z",
+                },
+            )
+            self.assertEqual(continuity["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertIn("reconcile", continuity["campaign_successor_owner_action"])
             store.close()
 
     def test_authorized_successor_after_gap_does_not_clear_warning(self) -> None:

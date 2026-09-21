@@ -131,12 +131,17 @@ def assess_campaign_successor_continuity(
     activation_id = str(activation.get("activation_id") or "")
     registered = store.get_registered_schedule(schedule_sha) if schedule_sha else None
     if registered is None:
+        required = 0 <= remaining <= CAMPAIGN_SUCCESSOR_WARNING_SECONDS
         return {
-            "campaign_successor_state": "NONE",
+            "campaign_successor_state": "UNKNOWN",
             "stops_admitting_at": stops_raw,
             "campaign_time_remaining_seconds": remaining,
-            "campaign_successor_required": False,
-            "campaign_successor_owner_action": UNKNOWN,
+            "campaign_successor_required": required,
+            "campaign_successor_owner_action": (
+                "reconcile active schedule registration before successor assessment"
+                if required
+                else UNKNOWN
+            ),
         }
     family = cohort_family_key(registered["document"])
     successor_state = "NONE"

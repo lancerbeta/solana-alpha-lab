@@ -525,6 +525,35 @@ class ObservationScheduleStore:
         payload = dict(row.get("payload") or {})
         if not payload and row.get("payload_json"):
             payload = json.loads(str(row["payload_json"]))
+        existing = self._conn.execute(
+            """
+            SELECT state, payload_json, last_transition_event_id
+            FROM schedule_activations
+            WHERE schedule_sha256 = ? AND activation_id = ?
+            """,
+            (str(row["schedule_sha256"]), str(row["activation_id"])),
+        ).fetchone()
+        last_transition_event_id = row.get("last_transition_event_id")
+        if existing is not None and str(existing["state"]) == "DRAINING":
+            existing_payload = json.loads(str(existing["payload_json"]))
+            for key in (
+                "admission_window_closed",
+                "transition_effective_at",
+                "transition_event_id",
+            ):
+                if key not in existing_payload:
+                    continue
+                if key in payload and payload[key] != existing_payload[key]:
+                    raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+                payload[key] = existing_payload[key]
+            existing_event_id = existing["last_transition_event_id"]
+            if (
+                existing_event_id
+                and last_transition_event_id is not None
+                and str(last_transition_event_id) != str(existing_event_id)
+            ):
+                raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+            last_transition_event_id = existing_event_id or last_transition_event_id
         self._conn.execute(
             """
             INSERT INTO schedule_activations(
@@ -559,7 +588,7 @@ class ObservationScheduleStore:
                 now,
                 now,
                 int(row.get("transition_sequence") or 0),
-                row.get("last_transition_event_id"),
+                last_transition_event_id,
             ),
         )
         self._conn.commit()
