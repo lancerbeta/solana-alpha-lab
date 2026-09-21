@@ -54,6 +54,8 @@ managed_write_set:
   - tests/test_hfic_session.py
   - tests/test_hfic_search_budget_epoch_guard_v1.py
   - tests/test_hfic_operational_memory_quarantine_v1.py
+  - tests/test_hfic_epistemic_memory_semantics.py
+  - tests/test_hfic_one_frozen_runner_up_failover_v1.py
   - tests/test_forge_input_truth_and_visibility_v1.py
   - scripts/hypothesis_forge.py
   - .agents/skills/hypothesis-forge/SKILL.md

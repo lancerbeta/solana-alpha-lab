@@ -33215,7 +33215,7 @@ records:
   as_of: '2026-08-30'
   truth_owner: HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_epistemic_memory_semantics.py', repository_path: tests/test_hfic_epistemic_memory_semantics.py}
-  integrity: {kind: sha256, sha256: 11bc6929fd9c6982235312eeba0b5fbc26cdc6843be4baacd28b6dd9a9969c5f}
+  integrity: {kind: sha256, sha256: 5b68898ff92fa7a61cc87cc46f7c0a7cb830db774413db8db6485d364411554b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001}
