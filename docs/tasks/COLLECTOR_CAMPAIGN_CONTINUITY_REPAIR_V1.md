@@ -45,6 +45,7 @@ managed_write_set:
   - docs/evidence/collector_campaign_continuity_repair/a1_delivery_independent_review_v1.json
   - docs/evidence/collector_campaign_continuity_repair/a1_delivery_factory_fit_v1.json
   - docs/reports/collector_campaign_continuity_repair/a1_owner_readout_v1.md
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
 
 external_caps:
   network: false
