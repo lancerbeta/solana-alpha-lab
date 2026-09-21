@@ -2268,6 +2268,15 @@ class ObservationScheduleStore:
         ]
         return payload
 
+    def list_registered_schedule_digests(self) -> list[str]:
+        rows = self._conn.execute(
+            """
+            SELECT schedule_sha256 FROM registered_schedules
+            ORDER BY schedule_sha256 ASC
+            """
+        ).fetchall()
+        return [str(row["schedule_sha256"]) for row in rows]
+
     def get_registered_schedule_by_key(self, schedule_key: str) -> dict[str, Any] | None:
         rows = self._conn.execute(
             """

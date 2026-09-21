@@ -326,18 +326,31 @@ def main(
         if args.command == "doctor":
             from solana_alpha_lab.factory.collector_read_model import (
                 build_collector_read_model,
+                classify_doctor_current_activation,
             )
 
             unresolved = store.restore_marker_unresolved()
             activations = store.list_activations()
-            live = any(row["state"] == "ACTIVE" for row in activations)
+            current_report = classify_doctor_current_activation(activations)
+            current_state = str(current_report.get("current_activation_state") or "")
+            live = bool(current_report.get("live_activation"))
+            cli_digest = getattr(args, "schedule_sha256", None)
+            cli_activation = getattr(args, "activation_id", None)
+            if cli_digest and cli_activation:
+                collector_digest = str(cli_digest)
+                collector_activation = str(cli_activation)
+            else:
+                collector_digest = (
+                    str(current_report.get("current_schedule_sha256") or "") or None
+                )
+                collector_activation = (
+                    str(current_report.get("current_activation_id") or "") or None
+                )
             collector = build_collector_read_model(
                 store,
                 now=now,
-                schedule_sha256=getattr(args, "schedule_sha256", None)
-                or config.get("schedule_sha256"),
-                activation_id=getattr(args, "activation_id", None)
-                or config.get("activation_id"),
+                schedule_sha256=collector_digest,
+                activation_id=collector_activation,
                 deploy_git_sha=producer,
             )
             if unresolved:
@@ -345,6 +358,10 @@ def main(
                     {
                         "terminal": "DOCTOR_RESTORE_MARKER_UNRESOLVED",
                         "live_activation": live,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state or None,
                         "restore_marker_unresolved": True,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -352,12 +369,15 @@ def main(
                     },
                     2,
                 )
-            aborted = any(row["state"] == "ABORTED_SAFETY" for row in activations)
-            if aborted and not live:
+            if current_report["terminal"] == "DOCTOR_ABORTED_SAFETY":
                 return _emit(
                     {
                         "terminal": "DOCTOR_ABORTED_SAFETY",
                         "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -365,18 +385,23 @@ def main(
                     },
                     2,
                 )
-            paused = any(row["state"] == "PAUSED_OPERATOR" for row in activations)
-            if paused and not live:
+            if current_report["terminal"] == "DOCTOR_PAUSED":
                 must_not_resume = any(
                     dict(row.get("payload") or {}).get("must_not_resume") is True
                     or str(dict(row.get("payload") or {}).get("abort_reason") or "").strip()
                     for row in activations
                     if row["state"] == "PAUSED_OPERATOR"
+                    and str(row.get("activation_id") or "")
+                    == str(current_report.get("current_activation_id") or "")
                 )
                 return _emit(
                     {
                         "terminal": "DOCTOR_PAUSED",
                         "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -384,11 +409,15 @@ def main(
                     },
                     2,
                 )
-            if not live:
+            if current_report["terminal"] == "DOCTOR_NO_LIVE_ACTIVATION":
                 return _emit(
                     {
                         "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
                         "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state or None,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -414,7 +443,9 @@ def main(
             return _emit(
                 {
                     "terminal": terminal,
-                    "live_activation": True,
+                    "live_activation": live,
+                    "current_activation_id": current_report.get("current_activation_id"),
+                    "current_activation_state": current_state,
                     "restore_marker_unresolved": False,
                     "activation_count": len(activations),
                     "collector": collector,

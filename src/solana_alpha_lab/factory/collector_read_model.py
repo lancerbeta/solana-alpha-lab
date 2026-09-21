@@ -42,6 +42,92 @@ def _payload_missing_reason(row: MappingLike) -> object:
     return None
 
 
+def _activation_freshness_key(row: MappingLike) -> tuple[str, str, str]:
+    """Canonical freshness order for current-activation selection."""
+
+    return (
+        str(row.get("updated_at") or ""),
+        str(row.get("created_at") or ""),
+        str(row.get("activation_id") or ""),
+    )
+
+
+def select_current_activation(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+) -> dict[str, Any] | None:
+    """Deterministic current campaign activation for status/doctor/operability.
+
+    Precedence:
+    1. current ACTIVE (freshest if several)
+    2. otherwise current DRAINING (freshest if several)
+    3. otherwise latest relevant activation by canonical freshness order
+
+    Historical ABORTED_SAFETY remains selectable only when no ACTIVE/DRAINING
+    peer exists; it is never preferred over a live draining campaign.
+    """
+
+    rows = [dict(row) for row in activations]
+    if not rows:
+        return None
+    active = [row for row in rows if str(row.get("state") or "") == "ACTIVE"]
+    if active:
+        return max(active, key=_activation_freshness_key)
+    draining = [row for row in rows if str(row.get("state") or "") == "DRAINING"]
+    if draining:
+        return max(draining, key=_activation_freshness_key)
+    return max(rows, key=_activation_freshness_key)
+
+
+def classify_doctor_current_activation(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+) -> dict[str, Any]:
+    """Map current activation selection to doctor terminal precedence.
+
+    Historical ABORTED_SAFETY never overrides a current ACTIVE/DRAINING campaign.
+    """
+
+    current = select_current_activation(activations)
+    current_state = str((current or {}).get("state") or "")
+    current_id = (current or {}).get("activation_id")
+    current_digest = (current or {}).get("schedule_sha256")
+    live = current_state == "ACTIVE"
+    if current_state == "ABORTED_SAFETY":
+        return {
+            "terminal": "DOCTOR_ABORTED_SAFETY",
+            "live_activation": False,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": "MUST_NOT_RESUME",
+        }
+    if current_state == "PAUSED_OPERATOR":
+        return {
+            "terminal": "DOCTOR_PAUSED",
+            "live_activation": False,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": "RESUME",
+        }
+    if current_state in {"ACTIVE", "DRAINING"}:
+        return {
+            "terminal": "DOCTOR_CURRENT_OK",
+            "live_activation": live,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": "TICK_ONCE",
+        }
+    return {
+        "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
+        "live_activation": False,
+        "current_activation_id": current_id,
+        "current_schedule_sha256": current_digest,
+        "current_activation_state": current_state or None,
+        "next_action": "REGISTER_AUTHORIZE_ACTIVATE",
+    }
+
+
 def _safe_parse(raw: object) -> datetime | None:
     if not isinstance(raw, str) or not raw:
         return None
@@ -177,8 +263,7 @@ def build_collector_read_model(
     if schedule_sha256 and activation_id:
         selected = store.get_activation(schedule_sha256, activation_id)
     elif activations:
-        live = [row for row in activations if row.get("state") == "ACTIVE"]
-        selected = live[0] if live else activations[0]
+        selected = select_current_activation(activations)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
     activation_state = str((selected or {}).get("state") or "NONE")
@@ -353,7 +438,9 @@ def build_collector_read_model(
 __all__ = [
     "build_collector_read_model",
     "build_m1_progress_projection",
+    "classify_doctor_current_activation",
     "derive_current_provider_state",
+    "select_current_activation",
 ]
 
 

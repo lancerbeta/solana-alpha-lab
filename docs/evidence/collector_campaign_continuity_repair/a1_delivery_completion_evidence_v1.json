@@ -1,0 +1,64 @@
+{
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "acceptance_id": "COLLECTOR-CAMPAIGN-CONTINUITY-REPAIR-COMPLETION-001",
+  "as_of": "2026-09-21",
+  "task_id": "COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_V1",
+  "state_change": "COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_READY_FOR_MERGE_GATE",
+  "base_main": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
+  "owner_approvals": [
+    "OK COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_V1"
+  ],
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "capability_radar_now": "NONE",
+  "implementation_bindings": {
+    "PLACEHOLDER": "PLACEHOLDER"
+  },
+  "active_stop_conditions": [],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "material_owner_decision": false,
+    "user_only_activation": false,
+    "external_material_action": false,
+    "unresolved_safety_or_truth_conflict": false
+  },
+  "factory_fit": {
+    "path": "docs/evidence/collector_campaign_continuity_repair/a1_delivery_factory_fit_v1.json",
+    "sha256": "PLACEHOLDER",
+    "verdict": "PASS"
+  },
+  "validation": {
+    "targeted": "PASS_COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_SUITE",
+    "independent_review": {
+      "path": "docs/evidence/collector_campaign_continuity_repair/a1_delivery_independent_review_v1.json",
+      "sha256": "PLACEHOLDER",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_LIFECYCLE_LATE_HANDOVER",
+      "PASS_DOCTOR_CURRENT_SELECTION",
+      "PASS_CAMPAIGN_SUCCESSOR_ATTENTION",
+      "PASS_CATALOG_VALIDATION"
+    ]
+  },
+  "non_claims": [
+    "NO_CANONICAL_DONE",
+    "NO_PROVIDER_CALLS",
+    "NO_VPS_DEPLOY",
+    "NO_LIVE_ACT_E0CC_MUTATION",
+    "NO_AUTO_AUTHORIZE",
+    "NO_SCHEMA_MIGRATION",
+    "NO_TODAYS_GAP_BACKFILL",
+    "NO_ALPHA"
+  ],
+  "side_effects": {
+    "provider_api_rpc_wss_calls": 0,
+    "credentials_read": 0,
+    "wallet_signer_transaction": 0,
+    "cash_spend_usd": 0
+  }
+}

@@ -824,7 +824,7 @@ def _require_live_authority(
     return receipt
 
 
-def _cohort_family_key(document: Mapping[str, Any]) -> str:
+def cohort_family_key(document: Mapping[str, Any]) -> str:
     """Identity of the scientific cohort, independent of Y horizon / schedule_key."""
     population = document["population"]
     return canonical_sha256(
@@ -838,14 +838,59 @@ def _cohort_family_key(document: Mapping[str, Any]) -> str:
     )
 
 
+def _cohort_family_key(document: Mapping[str, Any]) -> str:
+    """Compatibility alias; prefer cohort_family_key."""
+
+    return cohort_family_key(document)
+
+
+def _activation_is_non_admitting(
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> bool:
+    """True only when a peer is proven unable to admit new members.
+
+    Minimum proof: DRAINING, now >= stops_admitting_at, and admission closed
+    under canonical lifecycle semantics. A loose payload flag alone never
+    overrides canonical time/state that still allows admission.
+    """
+
+    if str(row.get("state") or "") != "DRAINING":
+        return False
+    stops_raw = row.get("stops_admitting_at")
+    if not isinstance(stops_raw, str) or not stops_raw:
+        return False
+    try:
+        stops = parse_utc(stops_raw)
+    except Exception:
+        return False
+    if now < stops:
+        return False
+    payload = dict(row.get("payload") or {})
+    if payload.get("admission_window_closed") is not True:
+        return False
+    return True
+
+
 def _require_cohort_cutover_or_unique(
     store: ObservationScheduleStore,
     *,
     document: Mapping[str, Any],
     schedule_sha256: str,
     activation_id: str,
+    now: datetime,
 ) -> None:
+    """Enforce at most one same-family admitting activation.
+
+    Same-family ACTIVE/admission-capable DRAINING peers still require an exact
+    rollover cutover. A proven NON_ADMITTING DRAINING predecessor does not
+    block late post-window successor activation, but a backdated successor
+    window (starts_at before the predecessor's stops_admitting_at) is denied.
+    """
+
     family = _cohort_family_key(document)
+    successor_starts = parse_utc(str(document["activation"]["starts_at"]))
     for row in store.list_activations():
         if str(row["state"]) not in {"ACTIVE", "DRAINING"}:
             continue
@@ -855,6 +900,13 @@ def _require_cohort_cutover_or_unique(
         if other is None:
             continue
         if _cohort_family_key(other["document"]) != family:
+            continue
+        if _activation_is_non_admitting(row, now=now):
+            peer_stops = parse_utc(str(row["stops_admitting_at"]))
+            if successor_starts > now:
+                raise ObservationLifecycleError("ACTIVATION_BEFORE_STARTS_AT")
+            if successor_starts < peer_stops:
+                raise ObservationLifecycleError("LATE_SUCCESSOR_BACKDATED")
             continue
         allowed = any(
             str(item["successor_schedule_sha256"]) == schedule_sha256
@@ -908,6 +960,7 @@ def activate_schedule(
             document=document,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
+            now=now,
         )
     if existing is not None:
         if str(existing.get("authority_receipt_sha256")) != receipt["receipt_sha256"]:
@@ -1590,6 +1643,7 @@ __all__ = [
     "abort_schedule",
     "authorize_schedule",
     "build_authority_request",
+    "cohort_family_key",
     "drain_expired_admission",
     "expected_authority_phrase",
     "materialize_pending_observation_snapshots",

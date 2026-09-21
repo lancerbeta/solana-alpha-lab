@@ -69,6 +69,7 @@ INCIDENT_GRACE_SECONDS = {
     "REQUIRED_TIMER_FAILED": 900,
     "WORKBENCH_SERVICE_DOWN": 0,
     "ALERTING_UNAVAILABLE": 0,
+    "CAMPAIGN_SUCCESSOR_REQUIRED": 0,
 }
 
 
@@ -217,6 +218,16 @@ def classify_incidents(
         found["SUSTAINED_PROVIDER_FAILURE"] = "Provider errors are material."
     if "DISCOVERY_GAP" in classes:
         found["MATERIAL_COVERAGE_DEGRADATION"] = "Discovery gap confirmed."
+    if "CAMPAIGN_SUCCESSOR_REQUIRED" in classes:
+        remaining = packet.get("campaign_time_remaining_seconds")
+        found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+            "Campaign admission expires soon without a prepared successor "
+            f"(activation={packet.get('activation_id')} "
+            f"stops_admitting_at={packet.get('stops_admitting_at')} "
+            f"time_remaining_seconds={remaining} "
+            f"successor_state={packet.get('campaign_successor_state')} "
+            f"owner_action={packet.get('campaign_successor_owner_action')})."
+        )
     units = unit_status or {}
     for unit in WATCH_REQUIRED_TIMERS:
         status = units.get(unit)
@@ -285,6 +296,16 @@ def render_incident_message(
         f"DEDUP_KEY={code}",
         f"FIRST_SEEN_AT={first_seen_at}",
     ]
+    if code == "CAMPAIGN_SUCCESSOR_REQUIRED":
+        lines.extend(
+            [
+                f"ACTIVATION_ID={packet.get('activation_id')}",
+                f"STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
+                f"TIME_REMAINING_SECONDS={packet.get('campaign_time_remaining_seconds')}",
+                f"SUCCESSOR_STATE={packet.get('campaign_successor_state')}",
+                f"CAMPAIGN_OWNER_ACTION={packet.get('campaign_successor_owner_action')}",
+            ]
+        )
     if recovered_at:
         lines.append(f"RECOVERED_AT={recovered_at}")
     lines.extend(["```", ""])

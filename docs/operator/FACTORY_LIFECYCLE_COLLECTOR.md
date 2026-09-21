@@ -180,6 +180,84 @@ Not expected on a healthy exact-SHA root after producer-SHA repair:
 {"terminal":"PRODUCER_GIT_SHA_UNAVAILABLE"}
 ```
 
+## Campaign continuity (admission + succession)
+
+Invariant: **at most one same-family admitting activation at any time**.
+
+`live_activation` in doctor means **ACTIVE only**. A healthy draining campaign
+is `DOCTOR_OK` with `current_activation_state=DRAINING` and
+`live_activation=false` — that is current, not “no campaign”.
+
+### Normal in-window rollover
+
+While the predecessor is still admission-capable (`ACTIVE`, or `DRAINING`
+without proven closed admission), a second same-family activation requires an
+exact `rollover` cutover binding. In-window rollover semantics are unchanged.
+
+### Late post-window successor recovery
+
+If rollover was missed and the predecessor is proven **NON_ADMITTING**:
+
+- `state == DRAINING`
+- `now >= stops_admitting_at`
+- admission closed under canonical lifecycle semantics (`admission_window_closed`)
+
+then a forward successor may `authorize` → `activate` **without** a rollover
+row. The predecessor keeps draining existing PENDING/DUE work and admits
+nothing new. The successor becomes the sole same-family admitting activation.
+`starts_at` must be `<=` actual activation time and must not be backdated
+before the predecessor's `stops_admitting_at`.
+
+Owner recovery (post-window, Git/main already contains this repair):
+
+1. Confirm current campaign:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Expected while draining with historical abort present:
+
+```json
+{"terminal":"DOCTOR_OK","live_activation":false,"current_activation_state":"DRAINING"}
+```
+
+Not expected:
+
+```json
+{"terminal":"DOCTOR_ABORTED_SAFETY"}
+```
+
+2. Register + authorize a **forward** successor schedule (`starts_at` ≥
+   predecessor `stops_admitting_at`), then activate it (no rollover required
+   once predecessor is NON_ADMITTING).
+3. Re-run doctor: expect `current_activation_state=ACTIVE` for the successor
+   and `live_activation=true`. Predecessor remains `DRAINING` until dues
+   complete.
+
+### Pre-expiry owner attention
+
+When the current same-family campaign is `ACTIVE` and
+`stops_admitting_at - now <= 24h` with no prepared successor
+(`AUTHORIZED` / `ROLLOVER_READY`; **REGISTERED alone is not enough**),
+operability watch emits one deduped `CAMPAIGN_SUCCESSOR_REQUIRED` attention
+(not `SOURCE_DATA_STALE`). Age `> period*3` remains the sole
+`SOURCE_DATA_STALE` rule.
+
+When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
+
+1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
+2. Register the successor schedule if missing, then **authorize** it before
+   expiry (or commit in-window `rollover` while admission is still open).
+3. Attention clears once state is `AUTHORIZED` or `ROLLOVER_READY`.
+
+### Current-state read model
+
+Doctor/status/operability select current activation as:
+`ACTIVE` → else `DRAINING` → else latest by freshness. Historical
+`ABORTED_SAFETY` stays historical evidence and must not trip
+`DOCTOR_ABORTED_SAFETY` while a DRAINING/ACTIVE campaign is current.
+
 ## Secrets
 
 | Location | Rule |
