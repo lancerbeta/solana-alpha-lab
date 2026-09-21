@@ -14,7 +14,17 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "PLACEHOLDER": "PLACEHOLDER"
+    "catalog/assets/core.yaml": "96a6d71537fb188370f8ed3a955a7c56372b9523d495971f2088d7a0398921d8",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "92893d3f6e74bfee99c2c3967d1fb06fb5a57c70208403f892ac2eb5947958e9",
+    "docs/reports/collector_campaign_continuity_repair/a1_owner_readout_v1.md": "b296dc47861023a15fcb7e68cdab6d3d0892bd73d902b06ab7987f81f49fae95",
+    "docs/tasks/COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_V1.md": "4b215794aaa1dc7e2fc041b36c4c3a9c8c9d4861259bb6ea376e0d64205673ed",
+    "scripts/observation_schedule.py": "4a41f46b9502eb024ed0752529313b8867b8cad749093d2decb786a0275d9195",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "d2b6f2df965161681c9653571587bd1c0a6193188b437b9a419f5a2a472067cd",
+    "src/solana_alpha_lab/factory/collector_read_model.py": "271fcb28a7ac891755aa92d27803091c6e297c13b628d24eecf8cb20230e7b3d",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "8c08548bacd795a09b0b5003bd02f0aa0c5e2bc813c3515e251ea24f8a3a0686",
+    "src/solana_alpha_lab/factory/observation_schedule_store.py": "8dd0f3d7d3fc94e2dcfc7bd4464416ad14cf2168b0bce15da1939f017de38de3",
+    "src/solana_alpha_lab/factory/operability_watch.py": "a2a2c3c092c5c7148b85c353dace2b56b5fb075b7be673897a6032ec9920d7c5",
+    "tests/test_collector_campaign_continuity_repair_v1.py": "84724a337783517e30dda74e7fdcbdfc0cfc65b725a72c8c4fc5de6711a0de5e"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -26,14 +36,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_campaign_continuity_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "PLACEHOLDER",
+    "sha256": "77efdc4d6624b4253b901320ca3583044f7a7f47cd001f5dc7f87b92c32fcafb",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/collector_campaign_continuity_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "PLACEHOLDER",
+      "sha256": "fe558a7751d9b2d79616c4e8372684b4fd189ce3dd5a8bf1966cb01d53f95751",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",

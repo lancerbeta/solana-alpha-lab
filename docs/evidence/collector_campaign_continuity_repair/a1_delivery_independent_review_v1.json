@@ -11,8 +11,8 @@
     "ARCHITECTURE_CRITIC",
     "OWNER_UX_CRITIC"
   ],
-  "reviewed_bindings_sha256": "PLACEHOLDER",
-  "reviewed_inventory_sha256": "PLACEHOLDER",
+  "reviewed_bindings_sha256": "2e6c895ce3957692db10ad919bf20313b70d8babad9606e50851f1a46264148b",
+  "reviewed_inventory_sha256": "22fe7db377ddef4dc62c32efcc9d4d830165959bd686997ad830241641cfb662",
   "reviews": [
     {
       "role": "CODE_REVIEWER",

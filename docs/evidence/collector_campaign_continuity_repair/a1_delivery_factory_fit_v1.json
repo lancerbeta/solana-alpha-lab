@@ -6,8 +6,8 @@
   "task_id": "COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "PLACEHOLDER",
-  "reviewed_inventory_sha256": "PLACEHOLDER",
+  "reviewed_bindings_sha256": "2e6c895ce3957692db10ad919bf20313b70d8babad9606e50851f1a46264148b",
+  "reviewed_inventory_sha256": "22fe7db377ddef4dc62c32efcc9d4d830165959bd686997ad830241641cfb662",
   "capability_radar": {
     "now": "NONE",
     "watch": "DEPLOY_REPAIRED_MAIN_THEN_LATE_SUCCESSOR_ACTIVATE_IF_STILL_DRAINING"
