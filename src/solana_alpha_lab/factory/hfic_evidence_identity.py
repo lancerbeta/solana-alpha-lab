@@ -200,15 +200,22 @@ def build_capability_epoch_basis(repo_root: Path) -> dict[str, Any]:
 
     root = Path(repo_root)
     protocol_files: list[dict[str, str]] = []
+    missing_protocol_files: list[str] = []
     for relative in _CAPABILITY_PROTOCOL_FILES:
         digest = _file_sha256(root, relative)
         if digest is None:
+            missing_protocol_files.append(relative)
             continue
         protocol_files.append({"path": relative, "sha256": digest})
+    if missing_protocol_files:
+        # A capability identity is an admission binding, not a best-effort
+        # inventory.  Omitting a protocol surface would make an incomplete
+        # repository look like a valid but different capability epoch.
+        raise EvidenceIdentityError("CAPABILITY_PROTOCOL_SURFACE_INCOMPLETE")
     try:
         semantic = semantic_capability_digest_for_repo(root)
     except SemanticOperabilityError:
-        semantic = _sha256_bytes(b"SEMANTIC-DIGEST-UNAVAILABLE")
+        raise EvidenceIdentityError("CAPABILITY_SEMANTIC_SURFACE_INCOMPLETE") from None
     return {
         "basis_version": CAPABILITY_BASIS_VERSION,
         "prompt_version": PROMPT_VERSION,
@@ -248,6 +255,7 @@ def execution_binding_sha256(
     *,
     scientific_slot_sha256: str,
     capability_epoch_sha256: str,
+    control_session_id: str | None = None,
     representation_payload_sha256: str | None = None,
     memory_eligibility_sha256: str | None = None,
     model_provenance_sha256: str | None = None,
@@ -257,6 +265,7 @@ def execution_binding_sha256(
             "binding_version": EXECUTION_BINDING_VERSION,
             "scientific_slot_sha256": scientific_slot_sha256,
             "capability_epoch_sha256": capability_epoch_sha256,
+            "control_session_id": control_session_id,
             "representation_payload_sha256": representation_payload_sha256,
             "memory_eligibility_sha256": memory_eligibility_sha256,
             "model_provenance_sha256": model_provenance_sha256,
@@ -301,12 +310,16 @@ def session_scientific_slot_sha256(session: Mapping[str, Any]) -> str | None:
     if not isinstance(session, Mapping):
         return None
     explicit = session.get("scientific_slot_sha256")
-    if isinstance(explicit, str) and re.fullmatch(r"[0-9a-f]{64}", explicit):
-        return explicit
+    explicit_is_present = explicit not in (None, "")
+    if explicit_is_present and (
+        not isinstance(explicit, str)
+        or re.fullmatch(r"[0-9a-f]{64}", explicit) is None
+    ):
+        return None
     market = session.get("market_evidence_epoch_sha256")
     representation, version = representation_identity_from_session(session)
     focus = session.get("owner_focus")
-    if not isinstance(market, str) or len(market) != 64:
+    if not isinstance(market, str) or re.fullmatch(r"[0-9a-f]{64}", market) is None:
         return None
     if not representation or not version or not isinstance(focus, str) or not focus:
         return None
@@ -318,12 +331,31 @@ def session_scientific_slot_sha256(session: Mapping[str, Any]) -> str | None:
     focus_key = session.get("focus_key_sha256")
     if isinstance(focus_key, str) and len(focus_key) == 64 and focus_key != derived_focus_key:
         return None
-    return scientific_slot_sha256(
+    derived = scientific_slot_sha256(
         market_evidence_epoch_sha256=market,
         representation_id=representation,
         representation_semantic_version=version,
         owner_focus=focus,
     )
+    # A persisted stamp is an assertion about its source fields.  Do not use
+    # an arbitrary 64-hex value as occupancy evidence when it cannot be
+    # reproduced from the durable market/representation/focus identity.
+    if explicit_is_present and explicit != derived:
+        return None
+    return derived
+
+
+def _session_slot_identity_is_invalid(session: Mapping[str, Any]) -> bool:
+    """Return true for a present slot stamp that cannot be recomputed."""
+
+    if not isinstance(session, Mapping):
+        return False
+    if session.get("identity_binding_status") == "CONFLICT":
+        return True
+    explicit = session.get("scientific_slot_sha256")
+    if explicit in (None, ""):
+        return False
+    return session_scientific_slot_sha256(session) is None
 
 
 def _session_slot_focus_key(session: Mapping[str, Any]) -> str | None:
@@ -387,7 +419,29 @@ def resolve_scientific_admission(
     )
     observed_rows: list[Mapping[str, Any]] = []
     seen_rows: set[tuple[str, str]] = set()
-    for item in [*(sessions or []), *(reservations or [])]:
+    all_rows = [*(sessions or []), *(reservations or [])]
+    invalid_rows = [
+        item
+        for item in all_rows
+        if isinstance(item, Mapping) and _session_slot_identity_is_invalid(item)
+    ]
+    if invalid_rows:
+        reason = (
+            "SCIENTIFIC_IDENTITY_CONFLICT"
+            if any(
+                item.get("identity_binding_status") == "CONFLICT"
+                for item in invalid_rows
+            )
+            else "SCIENTIFIC_SLOT_IDENTITY_INVALID"
+        )
+        return {
+            "action": "STOP",
+            "reason_code": reason,
+            "session_id": None,
+            "scientific_slot_sha256": target_slot,
+            "occupancy": "UNRESOLVED_BINDING",
+        }
+    for item in all_rows:
         if not isinstance(item, Mapping):
             continue
         identity = (

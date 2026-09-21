@@ -896,11 +896,18 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     next_action = receipt.get("next_action")
     owner_class = str(receipt.get("owner_class") or "")
     owner_final = receipt.get("owner_final")
+    blocking = [str(item) for item in (receipt.get("blocking_reason_codes") or []) if item]
     if owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
         ACTION_INPUT_NOT_READY,
         ACTION_OBSERVABILITY_BLOCKED,
     }:
-        status = "BLOCKED — stop; not a scientific negative"
+        if "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING" in blocking:
+            status = (
+                "BLOCKED — occupied slot has no readable lifecycle row; "
+                "not a scientific negative and not permission to regenerate"
+            )
+        else:
+            status = "BLOCKED — stop; not a scientific negative"
     elif next_action == ACTION_RETURN_EXISTING or receipt.get("persisted_receipt_sha256"):
         status = "READBACK — same run; do not start a second trial"
     elif next_action == ACTION_KEEP_PAUSE:
@@ -1061,8 +1068,25 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             lines.append("  critic: NOT_RUN_NO_SELECTED_CANDIDATE")
     lines.append(f"next_action: {next_action}{next_note}")
     lines.append(f"owner_final: {receipt.get('owner_final') or 'NONE'}")
-    blocking = [str(item) for item in (receipt.get("blocking_reason_codes") or []) if item]
     lines.append(f"blocked_by: {', '.join(blocking) if blocking else 'NONE'}")
+    if "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING" in blocking:
+        lines.append(
+            "next: RECOVER_EXISTING_READBACK — restore/rebuild the bound "
+            "session projection, then retry; do not regenerate or reset budget"
+        )
+    elif "MARKET_EVIDENCE_BASIS_INCOMPLETE" in blocking:
+        lines.append(
+            "next: RESTORE_CURRENT_EVIDENCE — restore decision-bearing datasets/lineage, "
+            "then retry normal /hypothesis-forge"
+        )
+    elif owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
+        ACTION_INPUT_NOT_READY,
+        ACTION_OBSERVABILITY_BLOCKED,
+    }:
+        lines.append(
+            "next: RESOLVE_TYPED_BLOCK — resolve the stated input/readback blocker, "
+            "then retry; do not treat this as scientific exhaustion"
+        )
     lines.append(
         "writes: store={store} forge_run={forge} session={session}".format(
             store=int(writes.get("research_store") or 0),
@@ -2163,11 +2187,16 @@ def evaluate_forge_run(
     exec_binding = None
     if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
         active_payload = None
+        active_parent = None
         for row in resolved_stages:
             if not isinstance(row, Mapping):
                 continue
             if str(row.get("representation_id") or "") != active_rep:
                 continue
+            if isinstance(row.get("control_session_id"), str) and row.get(
+                "control_session_id"
+            ):
+                active_parent = str(row["control_session_id"])
             value = row.get("representation_payload_sha256")
             if isinstance(value, str) and len(value) == 64:
                 active_payload = value
@@ -2187,10 +2216,14 @@ def evaluate_forge_run(
                 if isinstance(candidate_model, str) and len(candidate_model) == 64:
                     active_model = candidate_model
                     break
-        if active_rep == "BASE" or active_payload is not None:
+        # A binding hash is not a substitute for missing execution
+        # provenance.  Keep it UNKNOWN until at least one actual payload,
+        # memory, or model component is present.
+        if active_payload is not None or memory_elig is not None or active_model is not None:
             exec_binding = execution_binding_sha256(
                 scientific_slot_sha256=scientific_slot,
                 capability_epoch_sha256=cap_epoch,
+                control_session_id=active_parent,
                 representation_payload_sha256=active_payload,
                 memory_eligibility_sha256=memory_elig,
                 model_provenance_sha256=active_model

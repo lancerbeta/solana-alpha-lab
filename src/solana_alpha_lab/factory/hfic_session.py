@@ -330,10 +330,16 @@ def _execution_identity_fields(
             owner_focus=owner_focus,
         )
         fields["scientific_slot_sha256"] = slot
-        if capability:
+        # A binding digest is provenance for an actual execution context.  A
+        # tuple of null payload/memory/model fields is still UNKNOWN and must
+        # not be upgraded into a readiness-looking hash.  The parent control
+        # session is part of the binding whenever a representation is bound.
+        fields["execution_binding_sha256"] = None
+        if capability and (payload_sha or memory_sha or model_sha):
             fields["execution_binding_sha256"] = execution_binding_sha256(
                 scientific_slot_sha256=slot,
                 capability_epoch_sha256=capability,
+                control_session_id=parent,
                 representation_payload_sha256=payload_sha,
                 memory_eligibility_sha256=memory_sha,
                 model_provenance_sha256=model_sha,
@@ -593,6 +599,7 @@ def bind_preflight_receipt(
     receipt_memory = session_memory_eligibility(receipt)
     if receipt.get("memory_eligibility_sha256") and receipt_memory != current_memory:
         raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
+    _validate_split_identity_binding(receipt, repo_root=Path(repo_root))
     git = repository_git_snapshot(Path(repo_root))
     receipt_head = str(receipt.get("live_git_head") or "")
     if receipt_head != git.head_sha.lower():
@@ -623,6 +630,55 @@ def bind_preflight_receipt(
         "session_started_at": render_canonical_utc(started),
         **_split_identity_fields(receipt),
     }
+
+
+def _validate_split_identity_binding(
+    receipt: Mapping[str, Any],
+    *,
+    repo_root: Path,
+) -> None:
+    """Verify split stamps against the production receipt before freeze writes."""
+
+    market = receipt.get("market_evidence_epoch_sha256")
+    capability = receipt.get("capability_epoch_sha256")
+    if not isinstance(market, str) or re.fullmatch(r"[0-9a-f]{64}", market) is None:
+        raise HficSessionError("MARKET_IDENTITY_UNAVAILABLE")
+    if not isinstance(capability, str) or re.fullmatch(r"[0-9a-f]{64}", capability) is None:
+        raise HficSessionError("CAPABILITY_IDENTITY_UNAVAILABLE")
+
+    # The normal production preflight carries the no-write Forge-input
+    # receipt.  Rehash its market basis instead of trusting a caller-provided
+    # stamp.  This also keeps lineage UNKNOWN/FAIL from becoming an admission.
+    forge_input = receipt.get("forge_input_receipt")
+    if isinstance(forge_input, Mapping):
+        input_market = forge_input.get("market_evidence_epoch_sha256")
+        if input_market != market:
+            raise HficSessionError("MARKET_IDENTITY_DRIFT")
+        basis = forge_input.get("market_evidence_basis")
+        if not isinstance(basis, Mapping):
+            raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            EvidenceIdentityError,
+            market_evidence_epoch_sha256,
+        )
+
+        try:
+            if market_evidence_epoch_sha256(basis) != market:
+                raise HficSessionError("MARKET_IDENTITY_DRIFT")
+        except EvidenceIdentityError as exc:
+            raise HficSessionError(str(exc)) from exc
+
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        compute_capability_epoch_for_repo,
+    )
+
+    try:
+        computed_capability, _basis = compute_capability_epoch_for_repo(repo_root)
+    except EvidenceIdentityError as exc:
+        raise HficSessionError(str(exc)) from exc
+    if computed_capability != capability:
+        raise HficSessionError("CAPABILITY_IDENTITY_DRIFT")
 
 
 def _resolve_ref(ref: object, identities: Sequence[Any]) -> int:
@@ -2444,7 +2500,7 @@ def _assert_scientific_admission(
     if not isinstance(market, str) or not isinstance(version, str):
         # Legacy combined-only receipts remain read-only; they cannot mint a
         # new A5 slot without a current market split from production preflight.
-        return None
+        raise HficSessionError("SCIENTIFIC_ADMISSION_REQUIRED")
     from solana_alpha_lab.factory.hfic_evidence_identity import (
         resolve_scientific_admission,
     )
@@ -3140,45 +3196,59 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         current = latest.get(session_id)
         if current is None or _cycle_better(candidate, current):
             latest[session_id] = candidate
-    # Immutable admission: restore market/capability from any earlier stamped
-    # cycle when the projected head row lost them across phase writers.
+    # Immutable admission: restore identity from an earlier stamped cycle only
+    # when the complete history remains self-consistent.  A partial head must
+    # not be assembled from contradictory market/slot/binding rows.
     by_session_cycles: dict[str, list[dict[str, Any]]] = {}
     for candidate in cycles:
         by_session_cycles.setdefault(str(candidate["session_id"]), []).append(candidate)
+    identity_fields = (
+        "market_evidence_epoch_sha256",
+        "capability_epoch_sha256",
+        "ladder_representation_id",
+        "control_session_id",
+        "representation_semantic_version",
+        "representation_payload_sha256",
+        "scientific_slot_sha256",
+        "execution_binding_sha256",
+        "model_provenance_sha256",
+    )
     for sid, rows in by_session_cycles.items():
         head = latest.get(sid)
         if head is None:
             continue
         ordered = sorted(rows, key=lambda item: int(item.get("hfic_cycle_seq") or 0))
+        conflicts: set[str] = set()
         for row in ordered:
             fields = {
                 **_split_identity_fields(row),
                 **{
                     key: row[key]
-                    for key in (
-                        "ladder_representation_id",
-                        "control_session_id",
-                        "representation_semantic_version",
-                        "representation_payload_sha256",
-                        "scientific_slot_sha256",
-                        "execution_binding_sha256",
-                        "model_provenance_sha256",
-                    )
+                    for key in identity_fields
                     if row.get(key) not in (None, "")
                 },
             }
             if not fields:
                 continue
             for key, value in fields.items():
-                if not head.get(key):
+                current = head.get(key)
+                if current not in (None, "") and current != value:
+                    conflicts.add(key)
+                elif not current and key not in conflicts:
                     head[key] = value
-            # Keep scanning: a partial early stamp must not block a later
-            # cycle from filling the missing market/capability key.
-            if all(
-                isinstance(head.get(key), str) and len(str(head.get(key))) == 64
-                for key in ("market_evidence_epoch_sha256", "capability_epoch_sha256")
-            ):
-                break
+        # An explicit slot must reproduce from its durable market,
+        # representation, version and focus fields.  Otherwise this history
+        # is occupied-but-unresolved, never a free budget slot.
+        if head.get("scientific_slot_sha256") not in (None, ""):
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                session_scientific_slot_sha256,
+            )
+
+            if session_scientific_slot_sha256(head) is None:
+                conflicts.add("scientific_slot_sha256")
+        if conflicts:
+            head["identity_binding_status"] = "CONFLICT"
+            head["identity_conflict_fields"] = sorted(conflicts)
     return list(latest.values())
 
 
@@ -3349,6 +3419,7 @@ def _bound_from_ladder_challenger_preflight(
                 raise HficSessionError("LADDER_CHALLENGER_SCOPE_DRIFT")
         else:
             raise HficSessionError("LADDER_CHALLENGER_COHORT_MISSING")
+        _validate_split_identity_binding(preflight, repo_root=Path(repo_root))
         # Outer freeze identity must equal verified CONTROL / representation keys
         # before any store write; mutable receipt JSON cannot rebind the search.
         epoch = str(preflight.get("evidence_epoch_sha256") or "")

@@ -31,10 +31,14 @@ from solana_alpha_lab.factory.data_root import (  # noqa: E402
 )
 from solana_alpha_lab.factory.document_runner import repository_git_snapshot  # noqa: E402
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
+from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
+    compute_split_identity,
+)
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     RUNNER_UP_AWAITING_CRITIC,
     HficSessionError,
     apply_classification,
+    focus_key_sha256,
     find_session_by_epoch_focus,
     freeze_draft,
     list_hfic_sessions,
@@ -135,7 +139,12 @@ def _load_hypothesis_forge_cli():
     return module
 
 
-def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
+def _control_preflight(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    repo_root: Path = ROOT,
+) -> dict[str, object]:
     """CONTROL preflight through the production packet/identity writer.
 
     These tests exercise lifecycle boundaries, so they must carry the same
@@ -143,7 +152,7 @@ def _control_preflight(data_root: Path, store: ResearchStore) -> dict[str, objec
     combined-only receipts belong in explicit historical-disposition tests.
     """
 
-    return _production_control_preflight(data_root, store)
+    return _production_control_preflight(data_root, store, repo_root=repo_root)
 
 
 def _production_control_preflight(
@@ -151,6 +160,7 @@ def _production_control_preflight(
     store: ResearchStore,
     *,
     evidence_surface_mode: str | None = CURRENT_REPRESENTATION_CONTROL_V1,
+    repo_root: Path = ROOT,
 ) -> dict[str, object]:
     """Normal CONTROL packet via production writer (G1 acceptance path)."""
 
@@ -179,14 +189,14 @@ def _production_control_preflight(
             enriched.append(row)
         return enriched, warnings
 
-    git = repository_git_snapshot(ROOT)
+    git = repository_git_snapshot(repo_root)
     from solana_alpha_lab.factory.hfic_evidence_identity import compute_split_identity
 
     with patch(
         "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
         side_effect=_enumerate_production,
     ):
-        split = compute_split_identity(ROOT, data_root)
+        split = compute_split_identity(repo_root, data_root)
         policy = effective_policy(store)
         market_epoch = str(split["market_evidence_epoch_sha256"])
         owner_focus = "AUTO"
@@ -200,7 +210,7 @@ def _production_control_preflight(
             evidence_surface_mode,
         )
         packet, digest = build_forge_context_packet(
-            ROOT,
+            repo_root,
             data_root,
             owner_focus=owner_focus,
             evidence_epoch=market_epoch,
@@ -236,12 +246,12 @@ def _production_control_preflight(
 
 
 def _ordinary_stamped_preflight(
-    data_root: Path, store: ResearchStore
+    data_root: Path, store: ResearchStore, *, repo_root: Path = ROOT
 ) -> dict[str, object]:
     """Production split identity with the ordinary (non-CONTROL) surface."""
 
     return _production_control_preflight(
-        data_root, store, evidence_surface_mode=None
+        data_root, store, evidence_surface_mode=None, repo_root=repo_root
     )
 
 
@@ -360,6 +370,7 @@ def _v1_freeze_preflight_from_envelope(
     *,
     control_session_id: str,
     control_preflight: Mapping[str, object] | None = None,
+    repo_root: Path = ROOT,
 ) -> tuple[dict[str, object], dict[str, object]]:
     """Envelope → representation-aware freeze preflight (production binding path).
 
@@ -374,7 +385,7 @@ def _v1_freeze_preflight_from_envelope(
             control = control_preflight_from_bundle(bundle, packet_loaded)
         else:
             # Disposable orphan-parent probes may name a non-persisted CONTROL id.
-            control = _control_preflight(data_root, store)
+            control = _control_preflight(data_root, store, repo_root=repo_root)
     else:
         control = dict(control_preflight)
     control_receipt = _forge_control_receipt_from_preflight(
@@ -405,7 +416,7 @@ def _v1_freeze_preflight_from_envelope(
     # Production embed owns release-local scope; do not assign after build.
     assert packet.get("bound_visible_cohort_ids") == ["REL-C2"]
     digest = persist_forge_context_packet(
-        data_root, packet, store=store, repo_root=ROOT
+        data_root, packet, store=store, repo_root=repo_root
     )
     v1_pre["forge_context_packet_sha256"] = digest
     return v1_pre, envelope
@@ -606,6 +617,22 @@ class ResolveNextActionTests(unittest.TestCase):
         self.assertIn("status: NEXT", text)
         self.assertIn("CONTROL-compatible BASE", text)
         self.assertNotIn("status: DONE", text)
+
+    def test_occupied_slot_readback_block_has_owner_recovery_next(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": ACTION_OBSERVABILITY_BLOCKED,
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"],
+            }
+        )
+        self.assertIn("occupied slot has no readable lifecycle row", text)
+        self.assertIn("RECOVER_EXISTING_READBACK", text)
+        self.assertIn("do not regenerate or reset budget", text)
 
     def test_pass_to_classification_resumes_until_classify(self) -> None:
         decision = resolve_next_action(
@@ -1416,6 +1443,7 @@ def _v1_preflight(
     *,
     control_session_id: str,
     cohorts: list[str] | None = None,
+    repo_root: Path = ROOT,
 ) -> dict[str, object]:
     """V1 freeze preflight via envelope challenger (not marker-only CONTROL copy)."""
 
@@ -1423,6 +1451,7 @@ def _v1_preflight(
         data_root,
         store,
         control_session_id=control_session_id,
+        repo_root=repo_root,
     )
     if cohorts is not None:
         packet = v1_pre["forge_context_packet"]
@@ -1430,7 +1459,7 @@ def _v1_preflight(
         packet["bound_visible_cohort_ids"] = list(cohorts)
         packet.pop("visible_cohort_ids", None)
         digest = persist_forge_context_packet(
-            data_root, packet, store=store, repo_root=ROOT
+            data_root, packet, store=store, repo_root=repo_root
         )
         v1_pre["forge_context_packet_sha256"] = digest
     return v1_pre
@@ -1442,14 +1471,24 @@ def _v2_preflight(
     *,
     control_session_id: str,
 ) -> dict[str, object]:
+    with patch(
+        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+        side_effect=_enumerate_live,
+    ):
+        split = compute_split_identity(ROOT, data_root)
+    market_epoch = str(split["market_evidence_epoch_sha256"])
+    capability_epoch = str(split["capability_epoch_sha256"])
     git = repository_git_snapshot(ROOT)
     packet = {
         "schema": "smial.forge-context-packet",
         "owner_focus": "AUTO",
-        "evidence_epoch_sha256": "aa" * 32,
+        "evidence_epoch_sha256": market_epoch,
+        "market_evidence_epoch_sha256": market_epoch,
+        "capability_epoch_sha256": capability_epoch,
         "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
         "vision_integrity": {"status": "PASS"},
         "ladder_representation_id": "SYNTHETIC_LATER_V2",
+        "representation_semantic_version": "1.0",
         "visible_cohort_ids": ["REL-C2"],
         "bound_visible_cohort_ids": ["REL-C2"],
         "control_session_id": control_session_id,
@@ -1459,8 +1498,10 @@ def _v2_preflight(
     )
     return {
         "receipt_id": "HFIC-PREFLIGHT-V2-FIXTURE-001",
-        "evidence_epoch_sha256": "aa" * 32,
-        "focus_key_sha256": "bb" * 32,
+        "evidence_epoch_sha256": market_epoch,
+        "market_evidence_epoch_sha256": market_epoch,
+        "capability_epoch_sha256": capability_epoch,
+        "focus_key_sha256": focus_key_sha256("AUTO"),
         "search_key_sha256": "ee" * 32,
         "owner_focus": "AUTO",
         "live_git_head": git.head_sha.lower(),
@@ -1532,10 +1573,19 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             store = ResearchStore(data_root)
             draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
             git = repository_git_snapshot(ROOT)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                split = compute_split_identity(ROOT, data_root)
+            market_epoch = str(split["market_evidence_epoch_sha256"])
+            capability_epoch = str(split["capability_epoch_sha256"])
             packet = {
                 "schema": "smial.forge-context-packet",
                 "owner_focus": "AUTO",
-                "evidence_epoch_sha256": "aa" * 32,
+                "evidence_epoch_sha256": market_epoch,
+                "market_evidence_epoch_sha256": market_epoch,
+                "capability_epoch_sha256": capability_epoch,
                 "capability_ids": ["CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001"],
                 "vision_integrity": {"status": "PASS"},
                 "ladder_representation_id": "BASE",
@@ -1545,8 +1595,10 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             ordinary = {
                 "receipt_id": "HFIC-PREFLIGHT-ORDINARY-001",
-                "evidence_epoch_sha256": "aa" * 32,
-                "focus_key_sha256": "bb" * 32,
+                "evidence_epoch_sha256": market_epoch,
+                "market_evidence_epoch_sha256": market_epoch,
+                "capability_epoch_sha256": capability_epoch,
+                "focus_key_sha256": focus_key_sha256("AUTO"),
                 "search_key_sha256": "cc" * 32,
                 "owner_focus": "AUTO",
                 "live_git_head": git.head_sha.lower(),

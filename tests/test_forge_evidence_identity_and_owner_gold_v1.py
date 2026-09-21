@@ -31,6 +31,8 @@ from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
     compute_capability_epoch_for_repo,
     compute_split_identity,
     forge_run_identity_sha256,
+    resolve_scientific_admission,
+    session_scientific_slot_sha256,
     scientific_slot_sha256,
 )
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
@@ -126,6 +128,7 @@ def _no_worthy_base(
     store: ResearchStore,
     *,
     production_packet: bool = False,
+    repo_root: Path = ROOT,
 ) -> dict[str, object]:
     draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
     # Stamps come from production CONTROL preflight (compute_split_identity),
@@ -135,12 +138,12 @@ def _no_worthy_base(
         side_effect=_enumerate_live,
     ):
         preflight = (
-            _production_control_preflight(data_root, store)
+            _production_control_preflight(data_root, store, repo_root=repo_root)
             if production_packet
-            else _control_preflight(data_root, store)
+            else _control_preflight(data_root, store, repo_root=repo_root)
         )
         if not production_packet:
-            split = compute_split_identity(ROOT, data_root)
+            split = compute_split_identity(repo_root, data_root)
             preflight = dict(preflight)
             preflight["market_evidence_epoch_sha256"] = split[
                 "market_evidence_epoch_sha256"
@@ -149,11 +152,11 @@ def _no_worthy_base(
             preflight["legacy_combined_evidence_epoch_sha256"] = split[
                 "legacy_combined_evidence_epoch_sha256"
             ]
-    frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
+    frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=repo_root)
     persist_no_worthy_session(
         store,
         frozen,
-        repo_root=ROOT,
+        repo_root=repo_root,
         identities=assign_portfolio_ids(draft["candidates"]),
         draft=draft,
         preflight_receipt=preflight,
@@ -278,6 +281,47 @@ class IdentityUnitTests(unittest.TestCase):
         )
         self.assertEqual(slot, other)
         self.assertEqual(len(cap_a), 64)
+
+    def test_tampered_slot_stamp_is_not_occupancy_evidence(self) -> None:
+        market = "aa" * 32
+        row = {
+            "session_id": "HFIC-SESS-TAMPERED",
+            "market_evidence_epoch_sha256": market,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "scientific_slot_sha256": "00" * 32,
+        }
+        self.assertIsNone(session_scientific_slot_sha256(row))
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(decision["reason_code"], "SCIENTIFIC_SLOT_IDENTITY_INVALID")
+
+    def test_capability_unknown_does_not_become_valid_digest(self) -> None:
+        from solana_alpha_lab.factory_semantic_operability import (
+            SemanticOperabilityError,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ), patch(
+                "solana_alpha_lab.factory_semantic_operability.semantic_capability_digest_for_repo",
+                side_effect=SemanticOperabilityError("SEMANTIC_PROJECTION_INVALID"),
+            ):
+                receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
+        self.assertFalse(receipt["forge_runnable"])
+        self.assertIn("CAPABILITY_IDENTITY_UNAVAILABLE", receipt["blocking_reason_codes"])
+        self.assertNotIn("capability_epoch_sha256", receipt)
 
 
 class OwnerGoldSequentialTests(unittest.TestCase):
@@ -642,11 +686,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             # Mutate capability surface (protocol digest) without touching market.
             with patch(
                 "solana_alpha_lab.factory.hfic_evidence_identity._file_sha256",
-                side_effect=lambda root, relative: (
-                    "df" * 32
-                    if relative.endswith(".yaml") or relative.endswith(".md")
-                    else None
-                ),
+                side_effect=lambda root, relative: "df" * 32,
             ):
                 with patch(
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
@@ -886,11 +926,15 @@ class OwnerGoldSequentialTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             principal = Path(tmp) / "principal"
             linked = Path(tmp) / "linked"
-            _init_repo(principal)
-            _git(principal, "worktree", "add", str(linked), "-b", "linked-a5")
+            # Keep Git metadata inside the disposable test directory.  The
+            # real checkout may be sandboxed against worktree-admin writes.
+            _git(ROOT, "clone", "--no-local", str(ROOT), str(principal))
+            _git(principal, "worktree", "add", "--detach", str(linked), "HEAD")
+            shared_data_root = Path(tmp) / "shared-data-plane"
+            env = {"SMIAL_DATA_ROOT": str(shared_data_root)}
             try:
-                data_root = resolve_data_root(principal, env={})
-                self.assertEqual(data_root, resolve_data_root(linked, env={}))
+                data_root = resolve_data_root(principal, env=env)
+                self.assertEqual(data_root, resolve_data_root(linked, env=env))
                 data_root.mkdir(parents=True, exist_ok=True)
                 _write_lineage(data_root)
                 store = ResearchStore(data_root)
@@ -898,18 +942,20 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                     side_effect=_enumerate_live,
                 ):
-                    from_a = build_forge_input_receipt(data_root, repo_root=ROOT)
-                    from_b = build_forge_input_receipt(data_root, repo_root=ROOT)
+                    from_a = build_forge_input_receipt(data_root, repo_root=principal)
+                    from_b = build_forge_input_receipt(data_root, repo_root=linked)
                 self.assertEqual(
                     from_a["market_evidence_epoch_sha256"],
                     from_b["market_evidence_epoch_sha256"],
                 )
-                base = _no_worthy_base(data_root, store, production_packet=True)
+                base = _no_worthy_base(
+                    data_root, store, production_packet=True, repo_root=principal
+                )
                 with patch(
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                     side_effect=_enumerate_live,
                 ):
-                    started = evaluate_forge_run(ROOT, data_root, persist=True)
+                    started = evaluate_forge_run(principal, data_root, persist=True)
                 self.assertEqual(started["next_action"], ACTION_START_V1)
                 # Linked worktree / fresh store handle: completed BASE still
                 # answers without minting a second CONTROL on same market.
@@ -918,7 +964,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                     side_effect=_enumerate_live,
                 ):
-                    replay = evaluate_forge_run(ROOT, data_root, persist=False)
+                    replay = evaluate_forge_run(linked, data_root, persist=False)
                 self.assertEqual(
                     replay["market_evidence_epoch_sha256"],
                     from_a["market_evidence_epoch_sha256"],
@@ -976,17 +1022,25 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             packet.pop("evidence_surface_mode", None)
             pre["forge_context_packet"] = packet
             # Legacy combined epoch only — no market split stamp.
+            pre.pop("market_evidence_epoch_sha256", None)
+            pre.pop("capability_epoch_sha256", None)
             pre["evidence_epoch_sha256"] = "ab" * 32
             frozen = freeze_draft(draft, preflight_receipt=pre, repo_root=ROOT)
-            persist_no_worthy_session(
-                store,
-                frozen,
-                repo_root=ROOT,
-                identities=assign_portfolio_ids(draft["candidates"]),
-                draft=draft,
-                preflight_receipt=pre,
-            )
-            store.rebuild_projection()
+            with self.assertRaisesRegex(
+                HficSessionError, "SCIENTIFIC_ADMISSION_REQUIRED"
+            ):
+                persist_no_worthy_session(
+                    store,
+                    frozen,
+                    repo_root=ROOT,
+                    identities=assign_portfolio_ids(draft["candidates"]),
+                    draft=draft,
+                    preflight_receipt=pre,
+                )
+            # Legacy combined-only data remains readable/dispositioned, but
+            # this A5 writer must not create a lifecycle row or reservation.
+            self.assertEqual(list_hfic_sessions(store), [])
+            self.assertEqual(list_scientific_slot_admissions(store), [])
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,

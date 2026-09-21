@@ -274,6 +274,12 @@ def build_forge_input_receipt(
         blocking.append(CURRENT_CORPUS_MISSING)
         owner_class = OWNER_CLASS_INPUT_NOT_READY
 
+    if readback is not None and not lineage_ok:
+        # The visible corpus may be present while its current lineage is
+        # UNKNOWN/FAIL.  That is an observability stop, never a market epoch.
+        blocking.append("LINEAGE_INTEGRITY_UNVERIFIED")
+        owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
+
     if imported_cohort_id and imported_cohort_id not in visible_ids:
         blocking.append(IMPORTED_COHORT_MISSING)
         if owner_class == OWNER_CLASS_READY:
@@ -385,21 +391,26 @@ def build_forge_input_receipt(
         corpus_version=corpus_version,
         lineage_bindings=lineage_cohort_bindings(Path(data_root)),
     )
-    market_epoch: str | None
-    try:
-        market_epoch = _hash_market_basis(market_basis)
-    except EvidenceIdentityError:
-        market_epoch = None
-        if "MARKET_EVIDENCE_BASIS_INCOMPLETE" not in blocking:
-            blocking.append("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    market_epoch: str | None = None
+    if lineage_ok and readback is not None:
+        try:
+            market_epoch = _hash_market_basis(market_basis)
+        except EvidenceIdentityError:
+            if "MARKET_EVIDENCE_BASIS_INCOMPLETE" not in blocking:
+                blocking.append("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            forge_runnable = False
+            if owner_class == OWNER_CLASS_READY:
+                owner_class = OWNER_CLASS_INPUT_NOT_READY
+    else:
         forge_runnable = False
-        if owner_class == OWNER_CLASS_READY:
-            owner_class = OWNER_CLASS_INPUT_NOT_READY
     capability_epoch: str | None
     try:
         capability_epoch, _cap_basis = compute_capability_epoch_for_repo(Path(repo_root))
     except Exception:
         capability_epoch = None
+        blocking.append("CAPABILITY_IDENTITY_UNAVAILABLE")
+        forge_runnable = False
+        owner_class = OWNER_CLASS_OBSERVABILITY_BLOCKED
 
     body = {
         "schema": SCHEMA,

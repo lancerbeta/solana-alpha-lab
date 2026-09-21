@@ -103,7 +103,10 @@ artifacts. That wiring does not execute the scientific V1 probe. Do not
 launch Critic on empty BASE. `RESUME_V1` uses `--saved-draft-sha256` or
 pending classify, not the START helper.
 Prompt C `WAIT` is not the owner-final while V1 is eligible.
-`RETURN_EXISTING_RUN` is readback. `KEEP_PAUSE` is a typed pause (`status: NEXT`);
+`RETURN_EXISTING_RUN` is run-level readback. The preflight/session action
+`RETURN_EXISTING_SESSION` means the bound lifecycle session was found; the
+ladder then exposes that result as `RETURN_EXISTING_RUN`. Owner prose may use
+`RETURN_EXISTING` as the short display label for either scope. `KEEP_PAUSE` is a typed pause (`status: NEXT`);
 print readout and stop — do not start V1. Session `RETURN_EXISTING_SESSION` does not
 mask `START_V1`. Resume a saved draft with `--saved-draft-sha256`. Persist on
 an already-authorized slash:

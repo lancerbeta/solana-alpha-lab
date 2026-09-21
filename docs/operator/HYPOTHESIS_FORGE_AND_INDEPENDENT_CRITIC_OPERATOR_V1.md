@@ -104,6 +104,11 @@ provenance and does **not** free AUTO/focus budget. Owner readout actions:
 | `START_BASE` / `START_V1` | New scientific look on this market (or next representation slot) |
 | `RESUME_BASE` / `RESUME_V1` | Continue saved artifacts; not a new trial |
 | `RETURN_EXISTING` / REUSED_VALID | Already answered on this market; scientific writes=0 |
+
+`RETURN_EXISTING` is the owner-facing short label. Machine scopes are explicit:
+preflight/session admission returns `RETURN_EXISTING_SESSION`; the aggregate
+ladder/`forge-run` readback returns `RETURN_EXISTING_RUN`. The latter is not a
+new session and neither action authorizes a second trial.
 | incomplete market | BLOCKED — restore decision-bearing datasets/lineage; do not invent a digest |
 
 Docs-only / Git-only capability drift must not reset an occupied market slot.

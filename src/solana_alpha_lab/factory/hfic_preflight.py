@@ -282,8 +282,8 @@ def evidence_epoch_material(
     try:
         semantic_digest = semantic_capability_digest_for_repo(root)
     except SemanticOperabilityError:
-        semantic_digest = hashlib.sha256(b"SEMANTIC-DIGEST-UNAVAILABLE").hexdigest()
-    return {
+        semantic_digest = None
+    material = {
         "catalog_root_hashes": hashes,
         "dataset_manifest_ids": dataset_manifest_ids,
         "dataset_fingerprints": dataset_fingerprints,
@@ -294,6 +294,9 @@ def evidence_epoch_material(
         "prior_work_digest": prior_digest,
         "semantic_capability_digest_sha256": semantic_digest,
     }
+    if semantic_digest is None:
+        material.pop("semantic_capability_digest_sha256", None)
+    return material
 
 
 def build_offline_commission_packet(repo_root: Path) -> dict[str, Any]:
@@ -401,7 +404,12 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                 "memory_eligibility_sha256": row[16],
             }
         )
-    return sessions
+    # The SQL view is a derived read model and cannot express the append-only
+    # identity consistency check performed over cycle history.  When the raw
+    # ResearchStore is available, use that authoritative projection so a
+    # mixed market/slot row cannot silently become an available budget slot.
+    raw_sessions = _sessions_from_store(data_root)
+    return raw_sessions or sessions
 
 
 def _sessions_from_store(data_root: Path) -> list[dict[str, Any]]:
@@ -1519,9 +1527,7 @@ def build_forge_context_packet(
     except SemanticOperabilityError:
         semantic_slice = {
             "semantic_capability_entries": [],
-            "semantic_capability_digest_sha256": hashlib.sha256(
-                b"SEMANTIC-DIGEST-UNAVAILABLE"
-            ).hexdigest(),
+            "semantic_capability_digest_sha256": None,
             "kept_semantic_routes": [],
             "dropped_semantic_routes": [],
             "semantic_projection_truncated": True,

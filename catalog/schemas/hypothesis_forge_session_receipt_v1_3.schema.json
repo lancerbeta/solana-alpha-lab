@@ -218,6 +218,18 @@
   },
   "allOf": [
     {
+      "if": {"required": ["market_evidence_epoch_sha256"]},
+      "then": {
+        "required": [
+          "capability_epoch_sha256",
+          "ladder_representation_id",
+          "representation_semantic_version",
+          "scientific_slot_sha256",
+          "execution_binding_sha256"
+        ]
+      }
+    },
+    {
       "if": {
         "required": ["runner_up_failover_used"],
         "properties": {"runner_up_failover_used": {"const": true}}

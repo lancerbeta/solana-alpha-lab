@@ -370,25 +370,41 @@ def cmd_forge_run(
             repo_root, explicit_data_root=explicit_data_root
         )
     except DataRootError as exc:
+        reason = str(exc)
         payload = {
             "schema": "smial.forge-run-receipt",
             "schema_version": "1.0",
             "owner_class": "INPUT_NOT_READY",
             "next_action": "INPUT_NOT_READY",
             "owner_final": "INPUT_NOT_READY",
-            "blocking_reason_codes": [str(exc)],
+            "blocking_reason_codes": [reason],
             "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+            "owner_readout": (
+                "FORGE RUN\n"
+                "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
+                f"blocking: {reason}\n"
+                "NEXT — restore the canonical current corpus/data root, then retry /hypothesis-forge\n"
+                "writes: store=0 forge_run=0 session=0"
+            ),
         }
         return _emit_run(payload, exit_code=2)
     if resolved.status != "PRESENT" or resolved.root is None:
+        reason = resolved.error or "CURRENT_CORPUS_MISSING"
         payload = {
             "schema": "smial.forge-run-receipt",
             "schema_version": "1.0",
             "owner_class": "INPUT_NOT_READY",
             "next_action": "INPUT_NOT_READY",
             "owner_final": "INPUT_NOT_READY",
-            "blocking_reason_codes": [resolved.error or "CURRENT_CORPUS_MISSING"],
+            "blocking_reason_codes": [reason],
             "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+            "owner_readout": (
+                "FORGE RUN\n"
+                "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
+                f"blocking: {reason}\n"
+                "NEXT — restore/import the canonical current corpus, then retry /hypothesis-forge\n"
+                "writes: store=0 forge_run=0 session=0"
+            ),
         }
         return _emit_run(payload, exit_code=2)
     try:
