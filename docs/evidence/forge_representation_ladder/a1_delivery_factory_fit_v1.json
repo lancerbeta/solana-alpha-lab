@@ -4,21 +4,21 @@
   "review_id": "FORGE-REPRESENTATION-LADDER-FACTORY-FIT-001",
   "as_of": "2026-09-21",
   "task_id": "FORGE_REPRESENTATION_LADDER_V1",
-  "reviewed_bindings_sha256": "aaef27acfb8e9e34a5d95412c89ddd403bcc5eca40f15e96f72e92ca0cfb4261",
-  "reviewed_inventory_sha256": "d73df9741b92ce3f22aa8cd66cbf0cb969e45336a26903930b8a44f0f1f8c1af",
+  "reviewed_bindings_sha256": "8b472b11e2dfe14c65cd6a08412c6f875d8920930046604cd5fbea9eae2a03c5",
+  "reviewed_inventory_sha256": "a18c060c3380ea088579138aefaaed40d0152903fa0686dd1c106bb91e345be2",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
     "mission": "PASS_BOUNDED_RUN_NOT_ALPHA",
     "flexibility_and_history": "PASS_REUSE_A3_AND_EXISTING_HFIC_FREEZE",
     "context_efficiency": "PASS_EXISTING_SEM_HYPOTHESIS_FORGE",
-    "research_truth": "PASS_KEEP_PAUSE_AND_CONTROL_SURFACE_NOT_RUN_FINAL",
+    "research_truth": "PASS_ADAPTER_BOUND_TO_SCIENTIFIC_VALIDATORS",
     "owner_operability": "PASS_FORGE_RUN_OWNER_READOUT_NEXT_NOT_DONE",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_OR_CASHFLOW",
     "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
     "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
     "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
-    "red_team": "PASS_UNKNOWN_TERMINAL_NOT_EXHAUSTION"
+    "red_team": "PASS_TAMPER_AND_MISSING_RECEIPT_FAIL_CLOSED"
   },
   "capability_radar": {
     "now": "NONE",
