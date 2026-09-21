@@ -69,7 +69,9 @@ jobs:
 
   validate-tests:
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    # Headroom for stale shard plan + unplanned inventory (A5 gold / forge suite).
+    # Full CI_SHARD_REBALANCE remains a separate atom when profile is refreshed.
+    timeout-minutes: 40
     env:
       UV_NO_ENV_FILE: "1"
       PYTHONDONTWRITEBYTECODE: "1"
