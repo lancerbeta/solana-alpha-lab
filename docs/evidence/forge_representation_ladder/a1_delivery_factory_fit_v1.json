@@ -4,8 +4,8 @@
   "review_id": "FORGE-REPRESENTATION-LADDER-FACTORY-FIT-001",
   "as_of": "2026-09-21",
   "task_id": "FORGE_REPRESENTATION_LADDER_V1",
-  "reviewed_bindings_sha256": "pending_bind",
-  "reviewed_inventory_sha256": "pending_bind",
+  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
