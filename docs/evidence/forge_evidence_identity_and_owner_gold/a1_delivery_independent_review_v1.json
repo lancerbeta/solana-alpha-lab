@@ -4,8 +4,8 @@
   "review_id": "FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-21",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "reviewed_bindings_sha256": "4a798b651f892bc29096331dcfd48cfe273402706df0981528fbdc7c081990ef",
-  "reviewed_inventory_sha256": "5e116811454bfda03c2522cb5a449370c745a687f7ad2d07cff0daa38d43ed10",
+  "reviewed_bindings_sha256": "f7827032b4986e1631a1630d8ecaca93ce034b20f5f7cb2dcda76c4ded670382",
+  "reviewed_inventory_sha256": "88234ebbadf6f33ec8809d3cfd191b35c3c8d6223d2c87d596c646fe3c14ae8a",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
