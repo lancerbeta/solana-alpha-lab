@@ -4,8 +4,8 @@
   "review_id": "FORGE-REPRESENTATION-LADDER-FACTORY-FIT-001",
   "as_of": "2026-09-21",
   "task_id": "FORGE_REPRESENTATION_LADDER_V1",
-  "reviewed_bindings_sha256": "8b472b11e2dfe14c65cd6a08412c6f875d8920930046604cd5fbea9eae2a03c5",
-  "reviewed_inventory_sha256": "a18c060c3380ea088579138aefaaed40d0152903fa0686dd1c106bb91e345be2",
+  "reviewed_bindings_sha256": "5e1c30f45a171090d70c89fdc431cfa9e5b2622c5465f92fb71536f6f3eeef86",
+  "reviewed_inventory_sha256": "cfd1346f549eb7556cbf3e93188173648d292da848f3d9c4b1dd14bfdcbde73c",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
@@ -13,18 +13,18 @@
     "flexibility_and_history": "PASS_REUSE_A3_AND_EXISTING_HFIC_FREEZE",
     "context_efficiency": "PASS_EXISTING_SEM_HYPOTHESIS_FORGE",
     "research_truth": "PASS_ADAPTER_BOUND_TO_SCIENTIFIC_VALIDATORS",
-    "owner_operability": "PASS_FORGE_RUN_OWNER_READOUT_NEXT_NOT_DONE",
+    "owner_operability": "PASS_FORGE_RUN_FREEZE_PENDING_VS_BLOCK",
     "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_OR_CASHFLOW",
     "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
     "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
     "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
-    "red_team": "PASS_TAMPER_AND_MISSING_RECEIPT_FAIL_CLOSED"
+    "red_team": "PASS_TAMPER_AND_MISSING_PACKET_FAIL_CLOSED"
   },
   "capability_radar": {
     "now": "NONE",
     "watch": "A5_IDENTITY_PROVENANCE_OWNER_GOLD"
   },
-  "recovery": "Ordinary Git revert of the ladder resolver, run receipt, CLI, skill, command, operator note, tests and Catalog pins. Do not rewrite historical HFIC or A3 receipts or destroy imported LIVE CORPUS.",
+  "recovery": "Ordinary Git revert of the ladder resolver, run receipt, CLI, skill, command, operator note, Independent Critic skill, tests and Catalog pins. Do not rewrite historical HFIC or A3 receipts or destroy imported LIVE CORPUS.",
   "limits": [
     "NO_SCIENTIFIC_FORGE",
     "NO_ALPHA",

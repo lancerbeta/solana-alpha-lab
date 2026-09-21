@@ -11,9 +11,10 @@
   "cloud_bundle_required_by_harness": false,
   "cloud_bundle_smoke_required": false,
   "implementation_bindings": {
-    ".agents/skills/hypothesis-forge/SKILL.md": "3e7d26919b1b345f8bf21e011d5e23b8443bb9883b5085863ecec5a0b176e2b9",
-    ".cursor/commands/hypothesis-forge.md": "23c6d12201632c75594ad57d0be8fd4cec7a046868068380b46f103cfa11630a",
-    "catalog/assets/core.yaml": "c12b95aa49e7242a3cbcfa1a333ca83bfe879a42d06b57e34547d8704d9dff39",
+    ".agents/skills/hypothesis-forge/SKILL.md": "1b77d5a0e978e66f36e85b4403d1975820649f84262d04f01532a232937b8d67",
+    ".agents/skills/independent-hypothesis-critic/SKILL.md": "50bc9111aa724eaba064d961513c113078e3ff32965cf42242fa72da8a3acb73",
+    ".cursor/commands/hypothesis-forge.md": "13f0eaacc8bf8745fa06b41f0d8088ff5d214097064b2aae9d735181091fd143",
+    "catalog/assets/core.yaml": "8b542a591ddda7c751462f2bcda699daa1d92d2223f5d0f3ec694bab1ca975e4",
     "catalog/assets/lifecycle.yaml": "fbd9b1b8cd3974a136cbb6013880c4de1feec9241e9b12f228389f2727d13876",
     "catalog/catalog_manifest.yaml": "56a9be27f5703209f180ae43ec2bddbac067e450f754d5321857b1292afc2ddb",
     "catalog/fixtures/semantic_route_gold_queries_v1.yaml": "2931c424779d6b979109860df6bdc521d0f02e2703937d7210a4c111f386838c",
@@ -26,15 +27,15 @@
     "docs/PROJECT_MAP.md": "9729c159d465e2b5896288d6ef20e0b84208a2080bff8632824fbb5210a42440",
     "docs/evidence/forge_representation_ladder/a1_no_write_vertical_v1.json": "7e75355d6b7ea2bfe0ca9015ba3891ff1fd0031e3b605c191dabbc3538f05c2c",
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "3a4d10e0704b78a27699aea14e981e4557f33a36aa054bfcbacba8a3e7400c9f",
-    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "ecd8247c41af18299b39491d33e65aa81dfb983b901d5e5221e4f637495ea34a",
+    "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "84d97a464d269a477c40b18e215393ff8801f07deedfd314bed2c0ce7f7f16f4",
     "docs/reports/forge_representation_ladder/a1_owner_readout_v1.md": "243aa3633b8a71687b07570d8351175e07aa79a4cf0cebe423bd9bfffd691479",
-    "docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md": "5283ef04314d280e33c08fd63d650bf1675c1c1c44c64866b545b5e6bda885b5",
+    "docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md": "feb31c39b8f80bfd19a46624f6b1c457626aafd9c526d74d931d31e2302d05d7",
     "scripts/hypothesis_forge.py": "99634d61dfa98fe97b4250dcc85256e1e8512266dae06f7463c3052be02d886e",
     "src/solana_alpha_lab/factory/fast_lane_snapshot.py": "a50b5e9d162b22d99e54e3fc14a25e5464c059256a7deb5fce9edeaf3c1b8b8f",
     "src/solana_alpha_lab/factory/hfic_preflight.py": "7ca5dfd7fb34049db043f3b149ad8e500ffe9330ad8f43990995555bfe1d5f57",
-    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "e50866c6436495c0b6012698f6a64d4bd1f64105508d3581c4cedc5a09cb043c",
-    "src/solana_alpha_lab/factory/hfic_session.py": "b8a926688093a0ab9cc989e1f184993705f731c3af0cf79ba05e35cc511cdd13",
-    "tests/test_forge_representation_ladder_v1.py": "42e854005bf0747ab3743e99e3a0937157a55007e72da70ab48b7d4cf88488d3",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "a8f8b87dabf0d0b5a34b192165685d31be71c99eca9264d6629998160954b50c",
+    "src/solana_alpha_lab/factory/hfic_session.py": "adc07e2156c6fa429722b111538ab492c8794a055b87fbbbbbe6310217734a9d",
+    "tests/test_forge_representation_ladder_v1.py": "e941373422f40143a9ebf955c19dd97c0d9023f15c61b16a9eb7cd6aba4a81e1",
     "tests/test_hfic_provenance_clock.py": "fbfc5743b5fd705d3914c6284bc07a2cbaa232a245194e72f6b4eeb38d3c6a14"
   },
   "active_stop_conditions": [],
@@ -63,7 +64,9 @@
       "PASS_DELIVERY_HARNESS_CHECK",
       "PASS_CATALOG_SYNC",
       "PASS_FOCUSED_SYNTHETIC_FIXTURE_SUITE",
-      "PASS_A4P3_ADAPTER_BOUNDARY"
+      "PASS_A4P3_ADAPTER_BOUNDARY",
+      "PASS_A4P3_SOFT_PEND_VS_INTEGRITY",
+      "PASS_A4P3_CONTROL_REBIND_ON_FREEZE"
     ]
   },
   "non_claims": [
