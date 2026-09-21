@@ -481,16 +481,20 @@ def sessions_for_market_budget(
 
     matched: list[Mapping[str, Any]] = []
     for item in sessions:
-        stamped = item.get("market_evidence_epoch_sha256")
-        if isinstance(stamped, str) and stamped:
-            if stamped == market_evidence_epoch:
-                matched.append(item)
-            continue
-        # Legacy sessions: only count when their combined epoch equals the
-        # current market key (new admissions stamp market into evidence_epoch).
-        if item.get("evidence_epoch_sha256") == market_evidence_epoch:
+        if session_matches_market_epoch(item, market_evidence_epoch):
             matched.append(item)
     return matched
+
+
+def session_matches_market_epoch(
+    session: Mapping[str, Any], market_evidence_epoch: str
+) -> bool:
+    """True when session occupies the scientific slot for this market epoch."""
+
+    stamped = session.get("market_evidence_epoch_sha256")
+    if isinstance(stamped, str) and stamped:
+        return stamped == market_evidence_epoch
+    return session.get("evidence_epoch_sha256") == market_evidence_epoch
 
 
 __all__ = [
@@ -514,5 +518,6 @@ __all__ = [
     "lineage_cohort_bindings",
     "market_evidence_epoch_sha256",
     "scientific_slot_sha256",
+    "session_matches_market_epoch",
     "sessions_for_market_budget",
 ]

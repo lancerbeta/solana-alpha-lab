@@ -13,12 +13,15 @@
 
 - Shared helper `hfic_evidence_identity.py`: market vs capability split,
   scientific slot, execution binding, run identity, legacy disposition,
-  market-scoped budget matching
-- Consumers: A3 input receipt stamps, preflight/slash identity + budget,
+  market-scoped budget **and** resume matching (`session_matches_market_epoch`)
+- Consumers: A3 input receipt stamps, preflight/slash identity + budget + resume,
   ladder run identity + receipt fields, session freeze/persist/list/lookup
 - Schemas: input/run/critic/session receipts accept optional market/capability
 - Owner gold: `tests/test_forge_evidence_identity_and_owner_gold_v1.py`
-  (G1–G5, G7–G9, G12 + negative controls); A4+A3 regression green
+  G1–G12 family (G1/G2, G3/G5, G4, G6 interrupt resume, G7 capability-only
+  drift, G8 C3, G9 legacy, G10 incomplete market fail-closed, G11 capability
+  does not free slot, G12 snapshot) + negative controls; A4 regression green
+- Owner blocks: market + capability epochs; START vs RESUME vs REUSED gloss
 - Skill/operator prose: market admission vs capability; no docs-driven reset
 
 ## Non-claims

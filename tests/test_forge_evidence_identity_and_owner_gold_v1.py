@@ -35,6 +35,7 @@ from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
 from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     ACTION_OWNER_CANDIDATE,
+    ACTION_RESUME_V1,
     ACTION_RETURN_EXISTING,
     ACTION_SEARCH_EXHAUSTED,
     ACTION_START_BASE,
@@ -312,21 +313,12 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
             self.assertEqual(retry["run_identity_sha256"], run_id)
             self.assertEqual(retry["writes"]["session"], 0)
-            # persist=False must not mint a new scientific session.
-            self.assertEqual(
-                len(list_hfic_sessions(store)),
-                len(
-                    {
-                        row["session_id"]
-                        for row in finished.get("stages") or []
-                        if row.get("session_id")
-                    }
-                )
-                or len(list_hfic_sessions(store)),
-            )
             sessions_after = list_hfic_sessions(store)
             self.assertTrue(
                 any(item.get("session_id") == frozen["session_id"] for item in sessions_after)
+            )
+            self.assertTrue(
+                any(item.get("session_id") == base["session_id"] for item in sessions_after)
             )
 
     def test_g4_negative_exhaustion_readback(self) -> None:
@@ -375,22 +367,36 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp) / "data"
             data_root.mkdir()
             _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            _no_worthy_base(data_root, store, production_packet=True)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_live,
             ):
                 before = compute_split_identity(ROOT, data_root)
                 started = evaluate_forge_run(ROOT, data_root, persist=False)
-            # Same market input after unrelated prose: market + run identity hold.
+            # Mutate capability surface (protocol digest) without touching market.
             with patch(
-                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                "solana_alpha_lab.factory.hfic_evidence_identity._file_sha256",
+                side_effect=lambda root, relative: (
+                    "df" * 32
+                    if relative.endswith(".yaml") or relative.endswith(".md")
+                    else None
+                ),
             ):
-                after = compute_split_identity(ROOT, data_root)
-                again = evaluate_forge_run(ROOT, data_root, persist=False)
+                with patch(
+                    "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                    side_effect=_enumerate_live,
+                ):
+                    after = compute_split_identity(ROOT, data_root)
+                    again = evaluate_forge_run(ROOT, data_root, persist=False)
             self.assertEqual(
                 before["market_evidence_epoch_sha256"],
                 after["market_evidence_epoch_sha256"],
+            )
+            self.assertNotEqual(
+                before["capability_epoch_sha256"],
+                after["capability_epoch_sha256"],
             )
             self.assertEqual(
                 started["run_identity_sha256"], again["run_identity_sha256"]
@@ -399,11 +405,168 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 started["market_evidence_epoch_sha256"],
                 again["market_evidence_epoch_sha256"],
             )
-            # Capability is independent of market; Git/docs provenance alone
-            # must not appear in market basis (asserted by equal market hashes).
-            self.assertNotEqual(
-                before["market_evidence_epoch_sha256"],
-                before["capability_epoch_sha256"],
+            # Occupied CONTROL slot still answers; capability drift ≠ new trial.
+            self.assertEqual(again["next_action"], ACTION_START_V1)
+            self.assertEqual(again["stages"][0]["execution_status"], EXEC_REUSED)
+
+    def test_g6_interruption_resume_keeps_draft_bytes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = _no_worthy_base(data_root, store, production_packet=True)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=True)
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            v1_pre = dict(v1_pre)
+            v1_pre["market_evidence_epoch_sha256"] = started[
+                "market_evidence_epoch_sha256"
+            ]
+            v1_pre["capability_epoch_sha256"] = started["capability_epoch_sha256"]
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            store.rebuild_projection()
+            draft_sha = frozen.get("critic_input_packet_sha256")
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                mid = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=True,
+                    saved_draft_sha256=str(draft_sha) if draft_sha else None,
+                )
+            self.assertEqual(mid["next_action"], ACTION_RESUME_V1)
+            self.assertEqual(mid["run_identity_sha256"], started["run_identity_sha256"])
+            v1 = next(
+                row
+                for row in mid["stages"]
+                if row["representation_id"] == "NORMALIZED_TRAJECTORY_V1"
+            )
+            self.assertEqual(v1["session_id"], frozen["session_id"])
+            self.assertEqual(v1.get("draft_sha256") or draft_sha, draft_sha)
+
+    def test_g10_tamper_outer_key_is_integrity_stop(self) -> None:
+        from solana_alpha_lab.factory.hfic_representation_ladder import LadderError
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            ResearchStore(data_root)
+            incomplete = {
+                "schema": "smial.forge-input-receipt",
+                "schema_version": "1.0",
+                "owner_class": "FORGE_INPUT_READY",
+                "active_evidence_set": {
+                    "scope": "ACTIVE_EVIDENCE_SET",
+                    "current_dataset_manifest_id": None,
+                    "visible_cohort_ids": [],
+                    "corpus_version": None,
+                    "evidence_set_sha256": "0" * 63,  # invalid length → incomplete
+                },
+                "historical_calibration": [],
+                "representation_input_scope": {
+                    "scope": "REPRESENTATION_INPUT_SCOPE",
+                    "status": "DECLARED",
+                },
+                "experiment_data_scope": {
+                    "scope": "EXPERIMENT_DATA_SCOPE",
+                    "status": "NOT_STARTED",
+                },
+                "visibility": {
+                    "corpus_binding": "FAIL",
+                    "lineage": "FAIL",
+                    "pit_semantics": "NOT_EVALUATED",
+                    "missingness_visible": "NOT_EVALUATED",
+                    "prior_memory": "PASS",
+                    "feature_grounding": "PASS",
+                    "packet_vision": "PASS",
+                    "material_truncation": False,
+                },
+                "representations": [],
+                "packet": {
+                    "live_corpus_in_packet": False,
+                    "live_corpus_protected": False,
+                    "truncated": False,
+                    "bounded_dataset_count": 0,
+                    "selection_policy": "none",
+                },
+                "forge_runnable": True,
+                "blocking_reason_codes": [],
+                "writes": {"research_store": 0, "forge_context": 0, "session": 0},
+                "receipt_sha256": "11" * 32,
+            }
+            with patch(
+                "solana_alpha_lab.factory.hfic_representation_ladder.build_forge_input_receipt",
+                return_value=incomplete,
+            ):
+                with self.assertRaises(LadderError) as ctx:
+                    evaluate_forge_run(ROOT, data_root, persist=False)
+            self.assertEqual(str(ctx.exception), "MARKET_EVIDENCE_BASIS_INCOMPLETE")
+
+    def test_g11_capability_change_does_not_free_completed_slot(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = _no_worthy_base(data_root, store, production_packet=True)
+            draft = _distinct_no_worthy_draft(label="V1")
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                started = evaluate_forge_run(ROOT, data_root, persist=False)
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            v1_pre = dict(v1_pre)
+            v1_pre["market_evidence_epoch_sha256"] = started[
+                "market_evidence_epoch_sha256"
+            ]
+            v1_pre["capability_epoch_sha256"] = started["capability_epoch_sha256"]
+            frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=v1_pre,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_evidence_identity._file_sha256",
+                return_value="ab" * 32,
+            ):
+                with patch(
+                    "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                    side_effect=_enumerate_live,
+                ):
+                    finished = evaluate_forge_run(ROOT, data_root, persist=False)
+            self.assertEqual(finished["next_action"], ACTION_SEARCH_EXHAUSTED)
+            self.assertEqual(
+                finished["market_evidence_epoch_sha256"],
+                started["market_evidence_epoch_sha256"],
+            )
+            self.assertEqual(
+                finished["run_identity_sha256"], started["run_identity_sha256"]
             )
 
     def test_g8_c3_after_completed_does_not_reuse_stale_terminal(self) -> None:

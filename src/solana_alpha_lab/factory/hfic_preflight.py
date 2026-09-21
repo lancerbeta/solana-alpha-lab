@@ -421,10 +421,15 @@ def decide_preflight_action(
         if evidence_surface_mode
         else None
     )
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        session_matches_market_epoch,
+        sessions_for_market_budget,
+    )
+
     same_focus = [
         item
         for item in sessions
-        if item.get("evidence_epoch_sha256") == evidence_epoch
+        if session_matches_market_epoch(item, evidence_epoch)
         and item.get("focus_key_sha256") == focus_key
         and session_memory_eligibility(item) == expected_memory
         and session_evidence_surface_mode(item) == expected_mode
@@ -452,8 +457,6 @@ def decide_preflight_action(
 
     # Search-budget accounting is per market evidence epoch (A5). Capability /
     # Git / memory_eligibility must not reset AUTO or distinct-focus counters.
-    from solana_alpha_lab.factory.hfic_evidence_identity import sessions_for_market_budget
-
     same_epoch_for_budget = list(
         sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch)
     )

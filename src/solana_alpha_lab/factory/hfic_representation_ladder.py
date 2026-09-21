@@ -886,18 +886,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "NEXT — CONTROL-compatible BASE required for V1; "
             "not evening DONE; use CONTROL surface inside this slash"
         )
-    elif next_action == ACTION_START_BASE and "CONTROL_SURFACE_REQUIRED" in {
-        str(item) for item in (receipt.get("blocking_reason_codes") or [])
-    }:
-        status = (
-            "NEXT — start CONTROL-compatible BASE for V1 ladder; "
-            "not ordinary evening DONE"
-        )
-    elif owner_final:
-        status = "DONE — bounded-run owner-final; do not continue"
-    elif next_action == ACTION_START_V1:
-        status = "NEXT — continue V1 envelope; do not treat WAIT as done"
-    elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE, ACTION_RESUME_V1}:
+    elif next_action == ACTION_RESUME_BASE or next_action == ACTION_RESUME_V1:
         reasons = {str(item) for item in (receipt.get("blocking_reason_codes") or [])}
         stage_reasons = {
             str(stage.get("reason_code") or "")
@@ -909,10 +898,26 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "PASS_TO_CLASSIFICATION",
         }:
             status = (
-                "NEXT — classify then finalize; PASS_TO_CLASSIFICATION is not owner-final"
+                "NEXT — RESUME classify then finalize; "
+                "PASS_TO_CLASSIFICATION is not owner-final"
             )
+        elif next_action == ACTION_RESUME_BASE:
+            status = "NEXT — RESUME BASE from saved artifacts; not a new trial"
         else:
-            status = "NEXT — resume or start the named stage from saved artifacts"
+            status = "NEXT — RESUME V1 from saved artifacts; not a new trial"
+    elif next_action == ACTION_START_BASE and "CONTROL_SURFACE_REQUIRED" in {
+        str(item) for item in (receipt.get("blocking_reason_codes") or [])
+    }:
+        status = (
+            "NEXT — START CONTROL-compatible BASE for V1 ladder; "
+            "not ordinary evening DONE"
+        )
+    elif next_action == ACTION_START_BASE:
+        status = "NEXT — START BASE (new scientific look on this market)"
+    elif next_action == ACTION_START_V1:
+        status = "NEXT — continue V1 envelope; do not treat WAIT as done"
+    elif owner_final:
+        status = "DONE — bounded-run owner-final; do not continue"
     elif next_action == ACTION_FINISH_RUNNER_UP:
         status = "NEXT — finish already frozen runner-up; do not start V1"
     else:
@@ -938,6 +943,15 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 else "NONE"
             )
         ),
+        (
+            "capability_epoch: "
+            + (
+                str(receipt.get("capability_epoch_sha256"))[:16]
+                if isinstance(receipt.get("capability_epoch_sha256"), str)
+                and len(str(receipt.get("capability_epoch_sha256"))) == 64
+                else "NONE"
+            )
+        ),
         f"legacy_epoch: {(receipt.get('legacy_epoch_sha256') or 'NONE')[:16]}",
     ]
     for stage in stages:
@@ -956,6 +970,10 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 draft=draft_note,
             )
         )
+        if stage.get("execution_status") == EXEC_REUSED:
+            lines.append(
+                "  note: REUSED_VALID — already answered on this market; not a new trial"
+            )
         selected = stage.get("selected_candidate_id")
         mechanism = stage.get("candidate_mechanism")
         declined = stage.get("declined_candidate_ids") or []
@@ -1777,24 +1795,26 @@ def evaluate_forge_run(
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
 
     from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
         forge_run_identity_sha256,
         market_evidence_epoch_sha256 as _hash_market_basis,
     )
 
     market_epoch = input_receipt.get("market_evidence_epoch_sha256")
     if not isinstance(market_epoch, str) or len(market_epoch) != 64:
-        active = input_receipt.get("active_evidence_set") or {}
         basis = input_receipt.get("market_evidence_basis")
         if isinstance(basis, Mapping):
             try:
                 market_epoch = _hash_market_basis(basis)
-            except Exception:
-                market_epoch = None
+            except EvidenceIdentityError as exc:
+                raise LadderError(str(exc)) from exc
+        active = input_receipt.get("active_evidence_set") or {}
         if not isinstance(market_epoch, str) or len(market_epoch) != 64:
-            # Fallback: evidence_set digest is market-scoped (cohorts + manifest).
-            market_epoch = str(active.get("evidence_set_sha256") or "") or str(
-                input_receipt.get("receipt_sha256") or ""
-            )
+            # Market-scoped evidence_set digests cohorts+manifest only — never
+            # fall back to full receipt_sha256 (capability/visibility pollution).
+            market_epoch = str(active.get("evidence_set_sha256") or "")
+        if not isinstance(market_epoch, str) or len(market_epoch) != 64:
+            raise LadderError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     run_identity = forge_run_identity_sha256(
         market_evidence_epoch_sha256=str(market_epoch),
         frozen_representation_ids=frozen_ids,

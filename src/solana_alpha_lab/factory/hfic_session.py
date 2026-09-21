@@ -2930,11 +2930,11 @@ def find_session_by_epoch_focus(
     wanted_parent = control_session_id if isinstance(control_session_id, str) and control_session_id else None
     matched: list[dict[str, Any]] = []
     for item in list_hfic_sessions(store):
-        stamped_market = item.get("market_evidence_epoch_sha256")
-        if isinstance(stamped_market, str) and stamped_market:
-            if stamped_market != epoch:
-                continue
-        elif item.get("evidence_epoch_sha256") != epoch:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            session_matches_market_epoch,
+        )
+
+        if not session_matches_market_epoch(item, epoch):
             continue
         if item.get("focus_key_sha256") != focus_key:
             continue

@@ -103,6 +103,15 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
                 else "(unset)"
             )
         ),
+        (
+            "capability_epoch: "
+            + (
+                str(receipt.get("capability_epoch_sha256"))[:16] + "…"
+                if isinstance(receipt.get("capability_epoch_sha256"), str)
+                and len(str(receipt.get("capability_epoch_sha256"))) == 64
+                else "(unset)"
+            )
+        ),
         f"historical_calibration: {hist_text}",
         f"visibility: {', '.join(vis_bits)}",
         f"representations: {'; '.join(reps) if reps else '(none)'}",
