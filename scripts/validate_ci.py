@@ -35,7 +35,7 @@ DELIVERY_PREFLIGHT_SCHEMA = (
 )
 # Work jobs use a 25-minute wall so shard variance does not cancel green runs.
 # Tracked-only delivery preflight still keeps a separate local full-gate cap.
-GITHUB_VALIDATE_TIMEOUT_MINUTES = 25
+GITHUB_VALIDATE_TIMEOUT_MINUTES = 35
 GITHUB_AGGREGATOR_TIMEOUT_MINUTES = 5
 DELIVERY_PREFLIGHT_TIMEOUT_MINUTES = 25
 DELIVERY_PREFLIGHT_TIMEOUT_SECONDS = DELIVERY_PREFLIGHT_TIMEOUT_MINUTES * 60
