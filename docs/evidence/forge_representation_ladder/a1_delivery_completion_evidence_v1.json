@@ -48,14 +48,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_representation_ladder/a1_delivery_factory_fit_v1.json",
-    "sha256": "9be4fd342ad64d5b8d013fbb6b877f505dd6cca786cacbe2e2e69c61aa09faaa",
+    "sha256": "3473bc4d6a80351e58e3906d1cdfe029d2ccb0c07dfb4af0621e125e8dc69eb2",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_REPRESENTATION_LADDER_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/forge_representation_ladder/a1_delivery_independent_review_v1.json",
-      "sha256": "5a2c1074f9464f61412659d149e6fdfba4c025ada59921cf5f9e2736e8650e75",
+      "sha256": "94d4cc1bfb8ba370af61dd1070c6d2c6d5d1269fe36e1226f68575ba0f9bb529",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
