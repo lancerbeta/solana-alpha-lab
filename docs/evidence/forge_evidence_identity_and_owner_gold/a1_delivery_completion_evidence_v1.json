@@ -29,10 +29,10 @@
     "scripts/hypothesis_forge.py": "968759106db4d2ad30762961f5093baa37b0f17417f9b85f398f66904df5573c",
     "src/solana_alpha_lab/factory/forge_input_receipt.py": "5e62fea34ad7f04b3e552de4856810341d81a0700db482f893bd92c68edd4b5f",
     "src/solana_alpha_lab/factory/hfic_evidence_identity.py": "16ec0f7e2503120792bb1a5946b450ce4ef73a1188f79e59abc3d9047c7a96cf",
-    "src/solana_alpha_lab/factory/hfic_preflight.py": "80e10ad265613d952d358ac81813675876e61333ac9dc1fedcaff3704147355b",
+    "src/solana_alpha_lab/factory/hfic_preflight.py": "33a1c115e4cc50be71641c978dd750928167ea60d9f298e017b0263d77bfc1d7",
     "src/solana_alpha_lab/factory/hfic_representation_ladder.py": "f11de785f0dd431f38be6da22989abad89e670c61cfcfdc103a3b046f04c8f01",
     "src/solana_alpha_lab/factory/hfic_session.py": "0c8c9860ddd1b3e58c276b7ce884f9a63133c063da541ed3cb6457619a92d8c1",
-    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "caab0c6625c4506c3c8be002c4d438404406a1194e507efbb3642a68213cf458"
+    "tests/test_forge_evidence_identity_and_owner_gold_v1.py": "bbec39296837081eee2d2009995c049c8bc360cad4da881977e71b28937f376a"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -44,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_factory_fit_v1.json",
-    "sha256": "fea77c810c877076c9b5fa2a98b097409b8c93172a7bfe115b086e5985a2ea03",
+    "sha256": "94e450ad81db32e1d7ed8f1a5922cf748a59dff1e4b4d3112793c86eae5e0b50",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_EVIDENCE_IDENTITY_OWNER_GOLD_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_independent_review_v1.json",
-      "sha256": "82d451d7ccf3e70266cf8085ee9529741cba3fb33381452b51c0d85ac3eb810b",
+      "sha256": "ded783bc514487b1a018691ee68e60d5f14d33f4afd741089446c2be7cfba74a",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
