@@ -341,6 +341,93 @@ def cmd_forge_input(
     return emit(payload, exit_code=exit_code)
 
 
+def cmd_forge_run(
+    repo_root: Path,
+    *,
+    explicit_data_root: Path | None,
+    owner_focus: str = "AUTO",
+    persist: bool = False,
+    saved_draft_sha256: str | None = None,
+) -> int:
+    """Bounded Forge run receipt. persist=False never writes."""
+    from solana_alpha_lab.factory.hfic_representation_ladder import (
+        evaluate_forge_run,
+        format_forge_run_owner_readout,
+    )
+
+    def _emit_run(payload: dict[str, Any], *, exit_code: int) -> int:
+        if not payload.get("owner_readout"):
+            payload["owner_readout"] = format_forge_run_owner_readout(payload)
+        _assert_no_path_leak(payload, str(repo_root))
+        readout = payload.get("owner_readout")
+        if isinstance(readout, str) and readout.strip():
+            print(readout, file=sys.stderr)
+        return emit(payload, exit_code=exit_code)
+
+    try:
+        resolved = resolve_existing_data_root(
+            repo_root, explicit_data_root=explicit_data_root
+        )
+    except DataRootError as exc:
+        payload = {
+            "schema": "smial.forge-run-receipt",
+            "schema_version": "1.0",
+            "owner_class": "INPUT_NOT_READY",
+            "next_action": "INPUT_NOT_READY",
+            "owner_final": "INPUT_NOT_READY",
+            "blocking_reason_codes": [str(exc)],
+            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+        }
+        return _emit_run(payload, exit_code=2)
+    if resolved.status != "PRESENT" or resolved.root is None:
+        payload = {
+            "schema": "smial.forge-run-receipt",
+            "schema_version": "1.0",
+            "owner_class": "INPUT_NOT_READY",
+            "next_action": "INPUT_NOT_READY",
+            "owner_final": "INPUT_NOT_READY",
+            "blocking_reason_codes": [resolved.error or "CURRENT_CORPUS_MISSING"],
+            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+        }
+        return _emit_run(payload, exit_code=2)
+    receipt = evaluate_forge_run(
+        repo_root,
+        resolved.root,
+        owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+        persist=False,
+        saved_draft_sha256=saved_draft_sha256,
+    )
+    payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
+    from solana_alpha_lab.factory.hfic_representation_ladder import (
+        attach_ladder_freeze_preflight,
+    )
+    from solana_alpha_lab.factory.research_store import ResearchStore
+
+    store = ResearchStore(resolved.root, create_if_missing=False)
+    payload = attach_ladder_freeze_preflight(
+        payload, data_root=resolved.root, store=store
+    )
+    if persist and payload.get("owner_class") not in {
+        "INPUT_NOT_READY",
+        "OBSERVABILITY_BLOCKED",
+    }:
+        receipt = evaluate_forge_run(
+            repo_root,
+            resolved.root,
+            owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+            persist=True,
+            saved_draft_sha256=saved_draft_sha256,
+        )
+        payload = {**receipt, "no_write": False, "selection_reason": resolved.selection_reason}
+        payload = attach_ladder_freeze_preflight(
+            payload, data_root=resolved.root, store=store
+        )
+    _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
+    return _emit_run(payload, exit_code=(
+        0 if payload.get("owner_class") not in {"INPUT_NOT_READY", "OBSERVABILITY_BLOCKED"} else 2
+    ))
+
+
 def _store_root(repo_root: Path, explicit_data_root: Path | None) -> Path:
     return _active_root(repo_root, explicit_data_root).root
 
@@ -1222,6 +1309,29 @@ def build_parser() -> argparse.ArgumentParser:
         help="Accepted and always true; forge-input never persists",
     )
 
+    forge_run = subparsers.add_parser(
+        "forge-run",
+        help="Bounded representation-ladder run receipt; default no-write",
+    )
+    forge_run.add_argument("--format", choices=("json",), default="json")
+    forge_run.add_argument("--owner-focus", default="AUTO")
+    forge_run.add_argument(
+        "--no-write",
+        action="store_true",
+        default=True,
+        help="Default; never persist the aggregate run",
+    )
+    forge_run.add_argument(
+        "--persist",
+        action="store_true",
+        help="Append FORGE_RUN_RECEIPT on an already-authorized slash store",
+    )
+    forge_run.add_argument(
+        "--saved-draft-sha256",
+        default=None,
+        help="Resume the exact saved draft; do not regenerate",
+    )
+
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--draft", type=Path, required=True)
     freeze.add_argument("--preflight-receipt", type=Path, required=True)
@@ -1430,6 +1540,14 @@ def main(argv: list[str] | None = None) -> int:
                 repo_root,
                 explicit_data_root=args.data_root,
                 owner_focus=str(getattr(args, "owner_focus", "AUTO") or "AUTO"),
+            )
+        if args.command == "forge-run":
+            return cmd_forge_run(
+                repo_root,
+                explicit_data_root=args.data_root,
+                owner_focus=str(getattr(args, "owner_focus", "AUTO") or "AUTO"),
+                persist=bool(getattr(args, "persist", False)),
+                saved_draft_sha256=getattr(args, "saved_draft_sha256", None),
             )
         if args.command == "freeze":
             return cmd_freeze(

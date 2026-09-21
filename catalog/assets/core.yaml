@@ -32287,7 +32287,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: b09eeb8508108ed9a39aa87b0fa51860f18e83923af44279f509d6e0a7cf3329}
+  integrity: {kind: sha256, sha256: 99634d61dfa98fe97b4250dcc85256e1e8512266dae06f7463c3052be02d886e}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 1c2bf9eca18f2490a2e34d0703da6cd8d498bd6c7a3e99821afadde32756e2f2}
+  integrity: {kind: sha256, sha256: 175e6468ce8fd998059292ba231be5e4591085c006131702622d78ec9e46becd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34443,7 +34443,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/factory_semantic_operability_v1.yaml', repository_path: configs/factory_semantic_operability_v1.yaml}
-  integrity: {kind: sha256, sha256: fcee1b23221dc0ba39583454b8e1099063c77e71cb7e7871b71e4c4783d40aca}
+  integrity: {kind: sha256, sha256: 4a09c376404ba58635286b9117ee6d4eba97f46eb5ac119b64d026133ed3c182}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -34478,7 +34478,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://configs/hypothesis_forge_independent_critic_v1.yaml', repository_path: configs/hypothesis_forge_independent_critic_v1.yaml}
-  integrity: {kind: sha256, sha256: 192d59e6921167d12d41e2c49772abd6e5fde54659400d412a713b50616a106f}
+  integrity: {kind: sha256, sha256: 0e825c4f5dd0fe73608f7c96acd5daa33ca1efbc4e02a846fa87dbe0e3b01677}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34496,7 +34496,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md', repository_path: docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md}
-  integrity: {kind: sha256, sha256: 28fc8dfabf23eac973fe7de9e4c395593121d13bd96ac0ba968500d77be39c8a}
+  integrity: {kind: sha256, sha256: 078376515af1150f6684a829f066b2502ffd5d1e206829c8a3518ab483e97abd}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34514,7 +34514,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/hypothesis-forge/SKILL.md', repository_path: .agents/skills/hypothesis-forge/SKILL.md}
-  integrity: {kind: sha256, sha256: 0dbc7dfc063b4ed7c0eb0585ba2e804471bd7a2cb8ac33008466f1848bd38996}
+  integrity: {kind: sha256, sha256: 8c0f06c7c89933410343688010fefdf9f3312c4ec142c5d3e45178079a6b4f0e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34568,7 +34568,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://catalog/fixtures/semantic_route_gold_queries_v1.yaml', repository_path: catalog/fixtures/semantic_route_gold_queries_v1.yaml}
-  integrity: {kind: sha256, sha256: 4aadc39b67ac2c5f94e3eaa7f21e934edbee9ab1cca957f7840e449d0aabdcd4}
+  integrity: {kind: sha256, sha256: 2931c424779d6b979109860df6bdc521d0f02e2703937d7210a4c111f386838c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
@@ -37967,4 +37967,102 @@ records:
   consumers: [FACTORY-001, DIRECT-CURSOR-DELIVERY]
   evidence: []
   search_terms: [G-A3, forge_runnable, INPUT_NOT_READY, OBSERVABILITY_BLOCKED]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact A4 task contract for one bounded Forge run over BASE then eligible ACTIVE representations.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-20'
+  truth_owner: FORGE_REPRESENTATION_LADDER_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md', repository_path: docs/tasks/FORGE_REPRESENTATION_LADDER_V1.md}
+  integrity: {kind: sha256, sha256: feb31c39b8f80bfd19a46624f6b1c457626aafd9c526d74d931d31e2302d05d7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: contains, target_asset_id: MODULE-HFIC-REPRESENTATION-LADDER-001}
+  - {relation_type: contains, target_asset_id: CONFIG-HFIC-REPRESENTATION-LADDER-001}
+  - {relation_type: contains, target_asset_id: SCHEMA-FORGE-RUN-RECEIPT-V1-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FORGE-REPRESENTATION-LADDER-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  search_terms: [FORGE_REPRESENTATION_LADDER_V1, A4, forge-run]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CONFIG-HFIC-REPRESENTATION-LADDER-001
+  record_version: '1.0'
+  asset_type: configuration
+  purpose: Ordered ACTIVE representation registry; handlers resolve in code; unknown ACTIVE id fail-closes.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-20'
+  truth_owner: FORGE_REPRESENTATION_LADDER_V1
+  location: {kind: git_path, logical_uri: 'repo://configs/hfic_representation_ladder_v1.yaml', repository_path: configs/hfic_representation_ladder_v1.yaml}
+  integrity: {kind: sha256, sha256: 402d89a9235f6195a2e05727d041f185b5409fa1e53fa9364c611e97fbb1429e}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
+  consumers: [FACTORY-001, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [HFIC_REPRESENTATION_LADDER, BASE, NORMALIZED_TRAJECTORY_V1]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: MODULE-HFIC-REPRESENTATION-LADDER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Deterministic ladder resolver and aggregate smial.forge-run-receipt; persist=False default; A3 remains input owner.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-20'
+  truth_owner: FORGE_REPRESENTATION_LADDER_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
+  integrity: {kind: sha256, sha256: 7d15ebc9062d524341123b52a7354a9e150a9f5185674fb1e7a224cdb1f005fe}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FORGE-INPUT-RECEIPT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-REPRESENTATION-PROBE-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SESSION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FORGE-REPRESENTATION-LADDER-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  search_terms: [evaluate_forge_run, resolve_next_action, START_V1, FORGE_RUN_RECEIPT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: SCHEMA-FORGE-RUN-RECEIPT-V1-001
+  record_version: '1.0'
+  asset_type: schema
+  purpose: JSON Schema for smial.forge-run-receipt 1.0.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-20'
+  truth_owner: FORGE_REPRESENTATION_LADDER_V1
+  location: {kind: git_path, logical_uri: 'repo://catalog/schemas/forge_run_receipt_v1.schema.json', repository_path: catalog/schemas/forge_run_receipt_v1.schema.json}
+  integrity: {kind: sha256, sha256: d945601f6af251bb523e00ec9a99170c361c244e1cbab42baba83600a1a5d89a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
+  consumers: [FACTORY-001, HYPOTHESIS-FORGE]
+  evidence: []
+  search_terms: [smial.forge-run-receipt, FORGE_RUN_RECEIPT]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: TEST-FORGE-REPRESENTATION-LADDER-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Vertical gold for ladder transitions, freeze/finalize routing, no-write CONTROL auto-advance, and scoped exhaustion.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-20'
+  truth_owner: FORGE_REPRESENTATION_LADDER_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_forge_representation_ladder_v1.py', repository_path: tests/test_forge_representation_ladder_v1.py}
+  integrity: {kind: sha256, sha256: 7d2d2e3cc76f5361828a4583f8621134d1777efe159ae5e331e852f64122bc07}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-REPRESENTATION-LADDER-001}
+  consumers: [FACTORY-001, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  search_terms: [G-A4, START_V1, SEARCH_EXHAUSTED_CURRENT_EVIDENCE, ONE_SLASH_ONE_BOUNDED_RUN]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

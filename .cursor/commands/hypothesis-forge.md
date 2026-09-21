@@ -1,12 +1,14 @@
 # Hypothesis Forge
 
 Explicit owner invoke only. Runs `MANUAL_FALLBACK_UNTIL_GENERATOR` synthesis
-through executable `preflight` → FORGE_DRAFT (PROMPT A) → optional Prompt C after
+through executable `preflight` → `forge-run` → FORGE_DRAFT (PROMPT A only when
+next is `START_BASE`) → optional Prompt C after
 `NO_WORTHY_HYPOTHESIS` (`HFIC-NEXT-V1.0`) → `freeze` → isolated Critic
 → optional `revise` / `classify` → `finalize`. Happy path: no owner copy/paste after `/hypothesis-forge`.
 
-One `/hypothesis-forge` is `ONE_SLASH_ONE_SESSION` authority that expires at the
-final terminal or STOP. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
+One `/hypothesis-forge` is `ONE_SLASH_ONE_BOUNDED_RUN` authority that expires at the
+run owner-final or STOP. An HFIC session terminal is not automatically the
+owner-final of the whole search. Token: `ZERO_MID_CYCLE_OWNER_INTERVENTION`.
 `PASS_TO_CLASSIFICATION` and exactly one bounded **primary** `REVISE_ONCE`
 continue automatically under the same slash. A final primary `KILL_*` continues
 once for the already-frozen runner-up (`RUNNER_UP_AWAITING_CRITIC` → isolated
@@ -35,10 +37,15 @@ Optional owner focus (default `AUTO`):
 OWNER_FOCUS=AUTO
 ```
 
-Return one terminal + one NEXT after `SYNTHESIS_COMPLETE`. Primary `KILL_*` is
+Return `forge-run` `owner_readout`. Session `SYNTHESIS_COMPLETE` is **not**
+automatically the bounded-run owner-final. Primary `KILL_*` is
 **not** evening-complete while `session_state=RUNNER_UP_AWAITING_CRITIC`. After
-`NO_WORTHY`, NEXT is `WAIT_FOR_NEW_EVIDENCE`, `FORWARD_DATA_OPTION_READY` or
-`CAPABILITY_OPTION_READY` (or deterministic wait fallback). Forge is incomplete until `finalize` persists `SYNTHESIS_COMPLETE`, except `NO_WORTHY` (skips Critic; complete at freeze) and
+session `NO_WORTHY`, Prompt C NEXT may be `WAIT_FOR_NEW_EVIDENCE`,
+`FORWARD_DATA_OPTION_READY` or `CAPABILITY_OPTION_READY` (or deterministic wait
+fallback). That session NEXT is **not** the bounded-run owner-final while
+`forge-run` next is `START_V1`. Forge is incomplete until the **bounded run** owner-final, not merely a
+session freeze. Session `NO_WORTHY` skips Critic and completes the HFIC
+session at freeze, but `forge-run` `START_V1` means the evening run continues.
 `PRIOR_MEMORY_CONTEXT_CAPACITY_EXCEEDED` / `PRIOR_MEMORY_RECORD_UNIDENTIFIED`
 (BLOCKED; session not written; do not
 launch Critic; `OWNER NEXT=STOP_DO_NOT_LAUNCH_CRITIC`).
@@ -49,12 +56,16 @@ No Git mutation, no provider calls, no experiment execution, no autonomous gener
 After `preflight`, show the `FORGE INPUT` owner block from `owner_forge_input`
 (visible cohorts, active evidence set, historical calibration including
 `caveat_router` when integrity is PASS, visibility, representations,
-`forge_input_next`, `evidence_surface_mode`) before Prompt A. Then branch on
-`action`. Prompt A only when `action` is not `STOP` and `forge_runnable` is
-true. Ordinary preflight machine-stops `OBSERVABILITY_BLOCKED` / vision
-failure. If `forge_runnable` is still false, stop; do not synthesize even if
-ordinary `action` is `START_NEW_SESSION`. Typed `forge_input_next`:
-`WAIT_FOR_IMPORT_OR_STOP` / `STOP_OBSERVABILITY` / ready
+`forge_input_next`, `evidence_surface_mode`) before Prompt A. Then resolve
+`forge-run` and print `owner_readout` (`FORGE RUN`) as the owner result — not
+the raw JSON dump. `--persist` is `RESEARCH_ARTIFACT` `FORGE_RUN_RECEIPT`.
+Branch on `forge-run` `next_action` before Prompt A. Session
+`RETURN_EXISTING_SESSION` does not stop the run when next is `START_V1`.
+Prompt A only when `forge-run` next is `START_BASE`, preflight `action` is not
+`STOP`, and `forge_runnable` is true. Ordinary preflight machine-stops
+`OBSERVABILITY_BLOCKED` / vision failure. If `forge_runnable` is still false,
+stop; do not synthesize even if ordinary `action` is `START_NEW_SESSION`. Typed
+`forge_input_next`: `WAIT_FOR_IMPORT_OR_STOP` / `STOP_OBSERVABILITY` / ready
 `STOP_BEFORE_SYNTHESIS` (FORGE INPUT visibility, not slash authority, not
 CONTROL next, not an observability halt). Always show `evidence_surface_mode`
 (`ordinary` when JSON is null).
@@ -64,11 +75,51 @@ No-write diagnostic (same `--owner-focus` as preflight):
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-input --no-write --format json --owner-focus AUTO
 ```
 
+Then resolve the bounded run. Print `owner_readout` first (`status:` DONE / NEXT / BLOCKED / READBACK).
+`START_V1` auto-advances; do **not** run ordinary Prompt A for that next.
+Owner pastes nothing. Same slash continues the V1 envelope via
+`consume_start_v1_envelope` on CONTROL `FORGE_CONTEXT_PACKET` (no fake critic).
+Freeze V1 only after `consume_start_v1_envelope` supplies the challenger:
+keep `ladder_representation_id` on the envelope only (never inject into the
+frozen challenger). Embed via
+`prepare_ladder_freeze_preflight(..., challenger=..., control_receipt=...)`
+(marker/parent alone are insufficient; freeze revalidates payload/CONTROL
+hashes and sets used scope from `corpus_binding.cohort_id`; compact V1 fields
+stamp onto Critic input as CONTEXT_ONLY — not estimand / FEAT / probe
+execution). Bare `forge-run` without envelope may leave
+`ladder_freeze_pending_reason` and print `freeze_pending:` while
+`next_action` stays `START_V1` (continue envelope). Present-but-corrupt
+challenger / CONTROL bind failure is `OBSERVABILITY_BLOCKED` (`status:
+BLOCKED`, `freeze_block:`) — stop, not soft-pend. After a draft, `forge-run --persist
+--saved-draft-sha256`. Freeze/Critic only after a V1 candidate exists
+(fixture stubs allowed). `PASS_TO_CLASSIFICATION` → classify then finalize
+(`RESUME_V1`, not owner-final); then re-run `forge-run` to read real V1
+artifacts. That wiring does not execute the scientific V1 probe. Do not
+launch Critic on empty BASE. `RESUME_V1` uses `--saved-draft-sha256` or
+pending classify, not the START helper.
+Prompt C `WAIT` is not the owner-final while V1 is eligible.
+`RETURN_EXISTING_RUN` is readback. `KEEP_PAUSE` is a typed pause (`status: NEXT`);
+print readout and stop — do not start V1. Session `RETURN_EXISTING_SESSION` does not
+mask `START_V1`. Resume a saved draft with `--saved-draft-sha256`. Persist on
+an already-authorized slash:
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --persist --format json --owner-focus AUTO
+```
+
+```
+uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
+```
+
 ## Representation mode boundary
 
-The normal slash command remains `ORDINARY`; its behavior and search budget are
-unchanged. `--control-current-representation` remains the trajectory-blind
-`CONTROL` mode. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
+The normal slash remains one bounded run. Fresh empty stores and ordinary BASE
+`NO_WORTHY` without CONTROL surface yield `START_BASE` + `CONTROL_SURFACE_REQUIRED`
+(`status: NEXT`): continue CONTROL-compatible BASE inside this slash, not
+evening DONE. Ordinary final PASS and pending Critic/classify stay honest
+readback/resume of that session — do not replace them with BASE NOT_RUN to
+force a CONTROL rewrite. `--control-current-representation` remains the trajectory-blind
+`CONTROL` mode and is expert-only. `NORMALIZED_TRAJECTORY_V1` is a `REPRESENTATION_CHALLENGER`
 capability whose adapter is runtime-ready and not executed: it clones the
 exact CONTROL context (Forge context for completed `NO_WORTHY`, critic packet
 when a candidate was selected) and carries one anonymous histogram beside it.

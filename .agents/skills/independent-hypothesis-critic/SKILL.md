@@ -19,7 +19,10 @@ with `selected_candidate` set to that candidate. Reject free-form Forge
 narrative, pleas to «improve the idea», or requests to generate a new portfolio.
 Do not accept C1 Critic reasoning when screening C2. Do not accept the outer frozen envelope, Forge scratchpad, or hidden session
 context alongside the packet. Do **not** walk ResearchStore or active RDP for
-prior recall: the packet is the sole research-memory input. Return
+prior recall: the packet is the sole research-memory input. Compact V1
+orchestration fields (`normalized_trajectory_v1`, representation hashes,
+`ladder_representation_id`), when present, are **CONTEXT_ONLY** — not an
+estimand, not a FEAT, not probe execution evidence. Return
 `hypothesis_critic_result_v1`. The critic does not persist; `finalize` owns
 Research Data Plane writes.
 

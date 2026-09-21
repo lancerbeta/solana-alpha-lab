@@ -1,0 +1,77 @@
+{
+  "GIT_MUTATION_DURING_ACCEPTANCE": 0,
+  "PROVIDER_CALLS": 0,
+  "SCIENTIFIC_FORGE": 0,
+  "acceptance_id": "FORGE-REPRESENTATION-LADDER-NO-WRITE-VERTICAL-001",
+  "as_of": "2026-09-20",
+  "control_session_id": "HFIC-SESS-4F80F1151844EC1B",
+  "data_root_instance_fingerprint_sha256": "db5b0dede6936e17c3e35efa25105273a6b85d0305fde24bb7a932dbb3aff572",
+  "forge_run_receipt_sha256": "6e53798db0636c0766907a5781f6e76888059924e7880118e2f0146e7e2aa24a",
+  "legacy_epoch_sha256": "456411903174e403092f115cddf62fd38c9ae1bb943ebba0048c5b6bd070854e",
+  "next_action": "START_V1",
+  "non_claims": [
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROMPT_A_B_C",
+    "NO_INDEPENDENT_CRITIC",
+    "NO_V1_SCIENTIFIC_PROBE",
+    "NO_NEW_MARKET_EPOCH",
+    "NO_A5_IDENTITY_GOLD"
+  ],
+  "owner_class": "FORGE_RUN_IN_PROGRESS",
+  "owner_final": null,
+  "persist": false,
+  "research_fingerprint_after": "ed73e5b6b95ae828d2890bea6413a5a7856061e7e9b10da2e998fd67e13ee23e",
+  "research_fingerprint_before": "ed73e5b6b95ae828d2890bea6413a5a7856061e7e9b10da2e998fd67e13ee23e",
+  "run_identity_sha256": "b8ac57477d3a26292706f1cff71108d57f29c501426cff02cb66bdf4e34f37a5",
+  "schema": "smial.forge-representation-ladder-no-write-vertical",
+  "schema_version": "1.0",
+  "stages": [
+    {
+      "representation_id": "BASE",
+      "execution_status": "REUSED_VALID",
+      "effective_terminal": "NO_WORTHY_HYPOTHESIS",
+      "input_scope": "CURRENT_REPRESENTATION_CONTROL_V1",
+      "session_id": "HFIC-SESS-4F80F1151844EC1B",
+      "session_state": "SYNTHESIS_COMPLETE",
+      "selected_candidate_id": null,
+      "runner_up_candidate_id": "HFIC-CAND-38F085994F8E",
+      "stage_ref_sha256": "5b81a58ab4381e5c7560bdafe5380a7b976efaab39eb12ab702a756b382ab053",
+      "used_cohort_ids": [
+        "REL-20260902T111900Z-20260909T111900Z",
+        "REL-20260909T111900Z-20260916T111900Z"
+      ],
+      "draft_sha256": null,
+      "reason_code": null
+    },
+    {
+      "representation_id": "NORMALIZED_TRAJECTORY_V1",
+      "execution_status": "NOT_RUN",
+      "effective_terminal": null,
+      "input_scope": "REPRESENTATION_RELEASE_LOCAL",
+      "session_id": null,
+      "session_state": null,
+      "selected_candidate_id": null,
+      "runner_up_candidate_id": null,
+      "stage_ref_sha256": null,
+      "used_cohort_ids": [],
+      "draft_sha256": null,
+      "reason_code": null
+    }
+  ],
+  "store_inventory_digest": "defbc9a5a1794b05c23b5b63ef0eeb0a0f53708e6de18fa3752800d3a64191ef",
+  "store_inventory_unchanged": true,
+  "task_id": "FORGE_REPRESENTATION_LADDER_V1",
+  "used_cohort_ids": [
+    "REL-20260902T111900Z-20260909T111900Z",
+    "REL-20260909T111900Z-20260916T111900Z"
+  ],
+  "visible_cohort_ids": [
+    "REL-20260902T111900Z-20260909T111900Z",
+    "REL-20260909T111900Z-20260916T111900Z"
+  ],
+  "writes": {
+    "research_store": 0,
+    "forge_run": 0,
+    "session": 0
+  }
+}

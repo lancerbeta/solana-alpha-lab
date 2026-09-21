@@ -1,0 +1,37 @@
+{
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "review_id": "FORGE-REPRESENTATION-LADDER-FACTORY-FIT-001",
+  "as_of": "2026-09-21",
+  "task_id": "FORGE_REPRESENTATION_LADDER_V1",
+  "reviewed_bindings_sha256": "12b20f4df727a9237bdfb5cb47e4b9f9c7443199abdd3190e6049275cc5e6ff6",
+  "reviewed_inventory_sha256": "e6b67d0715280864f1379a81dce714314255bbc104aad9bf7f68eb328657a250",
+  "mode": "FULL_REVIEW",
+  "verdict": "PASS",
+  "dimensions": {
+    "mission": "PASS_BOUNDED_RUN_NOT_ALPHA",
+    "flexibility_and_history": "PASS_REUSE_A3_AND_EXISTING_HFIC_FREEZE",
+    "context_efficiency": "PASS_EXISTING_SEM_HYPOTHESIS_FORGE",
+    "research_truth": "PASS_HONEST_SESSION_AND_VERIFIED_SEARCH_KEY",
+    "owner_operability": "PASS_FRESH_CONTROL_AND_ORDINARY_RESUME_READBACK",
+    "execution_to_cashflow": "NOT_APPLICABLE_NO_FORGE_OR_CASHFLOW",
+    "monitoring_and_recovery": "PASS_ROLLBACK_IS_GIT_REVERT",
+    "build_vs_buy": "PASS_NO_NEW_FRAMEWORK",
+    "security": "PASS_NO_SECRETS_PROVIDERS_OR_ABSOLUTE_PATHS",
+    "red_team": "PASS_OUTER_SEARCH_KEY_TAMPER_FAIL_CLOSED"
+  },
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "A5_IDENTITY_PROVENANCE_OWNER_GOLD"
+  },
+  "recovery": "Ordinary Git revert of the ladder resolver, run receipt, CLI, skill, command, operator note, Independent Critic skill, tests and Catalog pins. Do not rewrite historical HFIC or A3 receipts or destroy imported LIVE CORPUS.",
+  "limits": [
+    "NO_SCIENTIFIC_FORGE",
+    "NO_ALPHA",
+    "NO_V1_SCIENTIFIC_PROBE",
+    "NO_A5_IDENTITY_GOLD",
+    "NO_HISTORICAL_RECEIPT_REWRITE",
+    "NO_ABSOLUTE_MACHINE_PATHS",
+    "NO_PROVIDER_OR_DEPLOYMENT"
+  ]
+}

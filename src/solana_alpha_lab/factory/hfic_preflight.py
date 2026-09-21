@@ -1162,6 +1162,33 @@ def evaluate_assembled_packet_vision(
     )
 
 
+def _control_bound_visible_cohort_ids(data_root: Path) -> list[str]:
+    """A3-compatible visible cohort ids stamped onto CONTROL forge packets."""
+
+    try:
+        from solana_alpha_lab.factory.cohort_import_readback import (
+            build_cohort_import_readback,
+        )
+        from solana_alpha_lab.factory.live_cohort_discovery_release import (
+            load_live_corpus_lineage,
+        )
+
+        lineage = load_live_corpus_lineage(Path(data_root))
+        readback = build_cohort_import_readback(Path(data_root), lineage=lineage)
+    except Exception:
+        return []
+    if not isinstance(readback, Mapping):
+        return []
+    ids: list[str] = []
+    for item in readback.get("visible_cohorts") or []:
+        if not isinstance(item, Mapping):
+            continue
+        cohort_id = item.get("cohort_id")
+        if isinstance(cohort_id, str) and cohort_id and cohort_id not in ids:
+            ids.append(cohort_id)
+    return ids
+
+
 def build_forge_context_packet(
     repo_root: Path,
     data_root: Path,
@@ -1496,6 +1523,11 @@ def build_forge_context_packet(
         )
 
         packet["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+        bound_cohorts = _control_bound_visible_cohort_ids(Path(data_root))
+        if bound_cohorts:
+            # Explicit scoped projection at write time — same contract the
+            # ladder reader consumes. Do not invent for historical packets.
+            packet["bound_visible_cohort_ids"] = bound_cohorts
         if control_packet_has_raw_sequences(packet):
             raise HficPreflightError("CONTROL_RAW_SEQUENCE_FORBIDDEN")
     from solana_alpha_lab.factory.hfic_vision_integrity import (
