@@ -22,6 +22,7 @@
     "catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json": "570135564c32c5acb3f3784994506a2c9c466ca7cef13c13462796e19718415b",
     "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json": "2dec32e2f0ed7c1104cd76ae78cd4067ea40cac24628b012a6f49e7940be8101",
     "docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json": "feccccd6a65d4898b2d56772fca70609e611b419a4740ebc48a23a286ae24ec5",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "e17bf7aaa706d761fe06d87ee12f7acc1b005f3344b1bd9555ce8b07d7bf215b",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "247673e16855d5618fa8d89bf30a1fc75e0d6a83622757e42694d3042ed5aefe",
     "docs/reports/forge_evidence_identity_and_owner_gold/a1_owner_readout_v1.md": "e615838a2183faeb768e28fed7358f31940cde598e0d23102dc6fde6a64e2a4e",
     "docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md": "579447529744f016a66a531f9090f7bdf7ff0b09bd8c2c8b8abe2e471c95c17e",
@@ -43,14 +44,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_factory_fit_v1.json",
-    "sha256": "a28fd38bb6f59571e13f52ab573d1c86eabe3d5274198b11fa373e382c1ec5cb",
+    "sha256": "fea77c810c877076c9b5fa2a98b097409b8c93172a7bfe115b086e5985a2ea03",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_EVIDENCE_IDENTITY_OWNER_GOLD_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_independent_review_v1.json",
-      "sha256": "e3d0e68e2dce518d028e9a3a36defff67a7667378e3c50013277a43501ae5a22",
+      "sha256": "82d451d7ccf3e70266cf8085ee9529741cba3fb33381452b51c0d85ac3eb810b",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
