@@ -33,8 +33,15 @@ from solana_alpha_lab.factory.observation_schedule_compiler import compile_sched
 from solana_alpha_lab.factory.observation_schedule_store import (
     ObservationScheduleStore,
     ObservationScheduleStoreError,
+    rollover_id_for,
+    transition_event_id_for,
 )
-from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore
+from solana_alpha_lab.factory.research_store import (
+    RecordKind,
+    ResearchEvent,
+    ResearchStore,
+    ResearchStoreError,
+)
 
 AUTHORITY_SCHEMA_RELATIVE = "catalog/schemas/observation_schedule_authority_v1.schema.json"
 PRODUCER_CAPABILITY = "CAP-OBSERVATION-SCHEDULE-COMPILE-BIND-001"
@@ -65,6 +72,21 @@ class ObservationLifecycleError(ValueError):
     """Typed lifecycle failure."""
 
 
+_OWNER_NEXT_ACTION_BY_LIFECYCLE_ERROR = {
+    "LATE_SUCCESSOR_RECOVERY_UNPROVEN": "REVALIDATE_DRAINING_RECOVERY_PROOF",
+    "LATE_SUCCESSOR_BACKDATED": "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
+    "ACTIVATION_BEFORE_STARTS_AT": "WAIT_UNTIL_SUCCESSOR_STARTS_AT",
+    "ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE": "INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM",
+    "ROLLOVER_CUTOVER_IN_PAST": "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
+}
+
+
+def owner_next_action_for_lifecycle_error(error_code: str) -> str | None:
+    """Map a fail-closed lifecycle denial to one owner-readable next action."""
+
+    return _OWNER_NEXT_ACTION_BY_LIFECYCLE_ERROR.get(str(error_code or ""))
+
+
 def _research_event(
     *,
     record_id: str,
@@ -75,7 +97,9 @@ def _research_event(
     producer_git_sha: str,
     run_id: str | None,
     transaction_id: str,
+    effective_at: datetime | None = None,
 ) -> ResearchEvent:
+    effective = effective_at or now
     payload_json = json.dumps(
         dict(payload),
         ensure_ascii=False,
@@ -89,7 +113,7 @@ def _research_event(
         hypothesis_version_id=None,
         run_id=run_id,
         transaction_id=transaction_id,
-        effective_at=now,
+        effective_at=effective,
         first_reliable_available_at=now,
         supersedes_record_id=None,
         payload_json=payload_json,
@@ -824,7 +848,7 @@ def _require_live_authority(
     return receipt
 
 
-def _cohort_family_key(document: Mapping[str, Any]) -> str:
+def cohort_family_key(document: Mapping[str, Any]) -> str:
     """Identity of the scientific cohort, independent of Y horizon / schedule_key."""
     population = document["population"]
     return canonical_sha256(
@@ -838,14 +862,509 @@ def _cohort_family_key(document: Mapping[str, Any]) -> str:
     )
 
 
+def _cohort_family_key(document: Mapping[str, Any]) -> str:
+    """Compatibility alias; prefer cohort_family_key."""
+
+    return cohort_family_key(document)
+
+
+def _activation_is_non_admitting(
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> bool:
+    """True only when a peer is proven unable to admit new members.
+
+    Minimum proof: DRAINING, now >= stops_admitting_at, and admission closed
+    under canonical lifecycle semantics. A loose payload flag alone never
+    overrides canonical time/state that still allows admission.
+    """
+
+    if str(row.get("state") or "") != "DRAINING":
+        return False
+    stops_raw = row.get("stops_admitting_at")
+    if not isinstance(stops_raw, str) or not stops_raw:
+        return False
+    try:
+        stops = parse_utc(stops_raw)
+    except Exception:
+        return False
+    if now < stops:
+        return False
+    payload = dict(row.get("payload") or {})
+    if payload.get("admission_window_closed") is not True:
+        return False
+    return True
+
+
+def _draining_transition_evidence(
+    data_root: Path,
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> tuple[datetime, bool] | None:
+    """Return the append-only DRAINING transition evidence.
+
+    ``schedule_activations.payload_json`` is an operational projection and is
+    not the authority for a late handover timestamp. The DRAINING transition
+    is also emitted as an immutable ``ResearchEvent``. Its ``effective_at``
+    and immutable closure flag are the lifecycle proof.
+    Missing, malformed, or uncommitted evidence stays fail-closed.
+    """
+
+    schedule_sha256 = str(row.get("schedule_sha256") or "")
+    activation_id = str(row.get("activation_id") or "")
+    event_id = str(row.get("last_transition_event_id") or "")
+    starts_raw = row.get("starts_at")
+    stops_raw = row.get("stops_admitting_at")
+    if not schedule_sha256 or not activation_id or not event_id:
+        return None
+    if not isinstance(starts_raw, str) or not starts_raw:
+        return None
+    if not isinstance(stops_raw, str) or not stops_raw:
+        return None
+    try:
+        starts = parse_utc(starts_raw)
+        stops = parse_utc(stops_raw)
+    except Exception:
+        return None
+    try:
+        records, _telemetry = ResearchStore(
+            data_root, create_if_missing=False
+        ).iter_lifecycle_records_bounded(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            # Rollover may drain before the predecessor admission window
+            # closes.  The immutable activation start is the smallest
+            # lifecycle boundary needed to recover that committed event.
+            window_start=starts,
+            # A committed rollover may be scheduled later in the predecessor
+            # window.  Its immutable event is available now even when its
+            # canonical effective_at is the future cutover.
+            closure_cutoff=max(now, stops),
+        )
+    except ResearchStoreError:
+        return None
+    for record in records:
+        if str(record.record_id) != event_id:
+            continue
+        if str(record.record_kind) != str(RecordKind.OBSERVATION_SCHEDULE_STATE):
+            return None
+        if (
+            str(record.entity_id) != schedule_sha256
+            or str(record.run_id or "") != activation_id
+            or str(record.transaction_id)
+            != f"RESEARCH-TXN-{event_id.upper()}"
+            or str(record.producer_capability_id) != PRODUCER_CAPABILITY
+            or record.created_at.astimezone(UTC) > now
+            or record.first_reliable_available_at.astimezone(UTC) > now
+        ):
+            return None
+        try:
+            payload = json.loads(record.payload_json)
+        except (TypeError, json.JSONDecodeError):
+            return None
+        if not isinstance(payload, Mapping):
+            return None
+        try:
+            transition_sequence = int(payload["transition_sequence"])
+            expected_event_id = transition_event_id_for(
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                prior_state=str(payload.get("prior_state") or ""),
+                new_state=str(
+                    payload.get("new_state") or payload.get("state") or ""
+                ),
+                transition_sequence=transition_sequence,
+                effective_at=render_utc(record.effective_at.astimezone(UTC)),
+                authority_receipt_sha256=str(
+                    payload.get("authority_receipt_sha256") or ""
+                ),
+            )
+        except (KeyError, TypeError, ValueError):
+            return None
+        if expected_event_id != event_id:
+            return None
+        if (
+            str(payload.get("state_event_id") or "") != event_id
+            or str(payload.get("schedule_sha256") or "") != schedule_sha256
+            or str(payload.get("activation_id") or "") != activation_id
+            or str(payload.get("state") or "") != "DRAINING"
+            or str(payload.get("prior_state") or "") != "ACTIVE"
+        ):
+            return None
+        admission_window_closed = payload.get("admission_window_closed")
+        rollover_id = str(payload.get("rollover_id") or "")
+        cutover_raw = str(payload.get("cutover_at") or "")
+        predecessor_schedule = str(
+            payload.get("predecessor_schedule_sha256") or ""
+        )
+        predecessor_activation = str(
+            payload.get("predecessor_activation_id") or ""
+        )
+        successor_schedule = str(payload.get("successor_schedule_sha256") or "")
+        successor_activation = str(payload.get("successor_activation_id") or "")
+        rollover_authority = str(
+            payload.get("rollover_authority_receipt_sha256") or ""
+        )
+        successor_starts_raw = str(payload.get("successor_starts_at") or "")
+        successor_stops_raw = str(
+            payload.get("successor_stops_admitting_at") or ""
+        )
+        effective = record.effective_at.astimezone(UTC)
+        if admission_window_closed is True and effective > now:
+            return None
+        rollover_proof = False
+        if all(
+            (
+                rollover_id,
+                cutover_raw,
+                predecessor_schedule == schedule_sha256,
+                predecessor_activation == activation_id,
+                successor_schedule,
+                successor_activation,
+                successor_schedule != schedule_sha256
+                or successor_activation != activation_id,
+                successor_starts_raw,
+                successor_stops_raw,
+                rollover_authority,
+            )
+        ):
+            try:
+                cutover = parse_utc(cutover_raw)
+                successor_starts = parse_utc(successor_starts_raw)
+                successor_stops = parse_utc(successor_stops_raw)
+            except Exception:
+                return None
+            if (
+                rollover_id
+                != rollover_id_for(
+                    predecessor_schedule_sha256=schedule_sha256,
+                    predecessor_activation_id=activation_id,
+                    successor_schedule_sha256=successor_schedule,
+                    successor_activation_id=successor_activation,
+                    cutover_at=render_utc(cutover),
+                    authority_receipt_sha256=rollover_authority,
+                )
+                or str(payload.get("cutover_at") or "") != render_utc(cutover)
+            ):
+                return None
+            rollover_proof = (
+                effective == cutover
+                and starts <= cutover <= stops
+                and successor_starts <= cutover < successor_stops
+            )
+        if admission_window_closed is True:
+            admission_closed = True
+        elif rollover_proof:
+            admission_closed = False
+        else:
+            return None
+        if admission_closed and effective < stops:
+            return None
+        return effective, admission_closed
+    return None
+
+
+def _non_admitting_recovery_at(
+    data_root: Path,
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> datetime | None:
+    """Return the append-only lifecycle timestamp that closed admission."""
+
+    evidence = _draining_transition_evidence(data_root, row, now=now)
+    if evidence is None or evidence[1] is not True:
+        return None
+    return evidence[0]
+
+
+def rollover_research_event_proven(
+    data_root: Path | None,
+    *,
+    item: Mapping[str, Any],
+    predecessor_document: Mapping[str, Any],
+    successor_document: Mapping[str, Any],
+    now: datetime,
+    predecessor_transition_event_id: str | None,
+    successor_transition_event_id: str | None,
+) -> bool:
+    """Require the immutable state event behind a prepared rollover row."""
+
+    if data_root is None:
+        return False
+    predecessor_schedule = str(item.get("predecessor_schedule_sha256") or "")
+    predecessor_activation = str(item.get("predecessor_activation_id") or "")
+    successor_schedule = str(item.get("successor_schedule_sha256") or "")
+    successor_activation = str(item.get("successor_activation_id") or "")
+    authority_receipt = str(item.get("authority_receipt_sha256") or "")
+    rollover_id = str(item.get("rollover_id") or "")
+    expected_predecessor_event_id = str(predecessor_transition_event_id or "")
+    expected_successor_event_id = str(successor_transition_event_id or "")
+    if not expected_predecessor_event_id or not expected_successor_event_id:
+        return False
+    try:
+        predecessor_starts = parse_utc(
+            str(predecessor_document["activation"]["starts_at"])
+        )
+        predecessor_stops = parse_utc(
+            str(predecessor_document["activation"]["stops_admitting_at"])
+        )
+        successor_starts = parse_utc(
+            str(successor_document["activation"]["starts_at"])
+        )
+        successor_stops = parse_utc(
+            str(successor_document["activation"]["stops_admitting_at"])
+        )
+        cutover = parse_utc(str(item["cutover_at"]))
+    except (KeyError, TypeError, ValueError):
+        return False
+    if str(item.get("cutover_at") or "") != render_utc(cutover):
+        return False
+    if (
+        not predecessor_schedule
+        or not predecessor_activation
+        or not successor_schedule
+        or not successor_activation
+        or not authority_receipt
+        or not rollover_id
+        or (
+            predecessor_schedule == successor_schedule
+            and predecessor_activation == successor_activation
+        )
+        or not predecessor_starts <= cutover <= predecessor_stops
+        or not successor_starts <= cutover < successor_stops
+        or rollover_id
+        != rollover_id_for(
+            predecessor_schedule_sha256=predecessor_schedule,
+            predecessor_activation_id=predecessor_activation,
+            successor_schedule_sha256=successor_schedule,
+            successor_activation_id=successor_activation,
+            cutover_at=render_utc(cutover),
+            authority_receipt_sha256=authority_receipt,
+        )
+    ):
+        return False
+    try:
+        records, _telemetry = ResearchStore(
+            data_root, create_if_missing=False
+        ).iter_lifecycle_records_bounded(
+            schedule_sha256=predecessor_schedule,
+            activation_id=predecessor_activation,
+            window_start=predecessor_starts,
+            closure_cutoff=max(now, predecessor_stops),
+        )
+    except ResearchStoreError:
+        return False
+    expected_cutover = render_utc(cutover)
+    expected_successor_starts = render_utc(successor_starts)
+    expected_successor_stops = render_utc(successor_stops)
+    expected_transaction_prefix = "RESEARCH-TXN-"
+    for record in records:
+        if (
+            str(record.record_kind) != str(RecordKind.OBSERVATION_SCHEDULE_STATE)
+            or str(record.entity_id) != predecessor_schedule
+            or str(record.run_id or "") != predecessor_activation
+            or str(record.transaction_id)
+            != f"{expected_transaction_prefix}{record.record_id.upper()}"
+            or str(record.record_id) != expected_predecessor_event_id
+            or str(record.producer_capability_id) != PRODUCER_CAPABILITY
+            or record.created_at.astimezone(UTC) > now
+            or record.first_reliable_available_at.astimezone(UTC) > now
+            or record.effective_at.astimezone(UTC) != cutover
+        ):
+            continue
+        try:
+            payload = json.loads(record.payload_json)
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, Mapping):
+            continue
+        try:
+            transition_sequence = int(payload["transition_sequence"])
+            expected_event_id = transition_event_id_for(
+                schedule_sha256=predecessor_schedule,
+                activation_id=predecessor_activation,
+                prior_state=str(payload.get("prior_state") or ""),
+                new_state=str(
+                    payload.get("new_state") or payload.get("state") or ""
+                ),
+                transition_sequence=transition_sequence,
+                effective_at=render_utc(record.effective_at.astimezone(UTC)),
+                authority_receipt_sha256=str(
+                    payload.get("authority_receipt_sha256") or ""
+                ),
+            )
+        except (KeyError, TypeError, ValueError):
+            continue
+        if (
+            expected_event_id != str(record.record_id)
+            or str(record.record_id) != expected_predecessor_event_id
+            or str(payload.get("state_event_id") or "") != str(record.record_id)
+            or str(payload.get("schedule_sha256") or "") != predecessor_schedule
+            or str(payload.get("activation_id") or "") != predecessor_activation
+            or str(payload.get("state") or "") != "DRAINING"
+            or str(payload.get("prior_state") or "") != "ACTIVE"
+            or payload.get("admission_window_closed") is not False
+            or str(payload.get("rollover_id") or "") != rollover_id
+            or str(payload.get("cutover_at") or "") != expected_cutover
+            or str(payload.get("rollover_authority_receipt_sha256") or "")
+            != authority_receipt
+            or str(payload.get("predecessor_schedule_sha256") or "")
+            != predecessor_schedule
+            or str(payload.get("predecessor_activation_id") or "")
+            != predecessor_activation
+            or str(payload.get("successor_schedule_sha256") or "")
+            != successor_schedule
+            or str(payload.get("successor_activation_id") or "")
+            != successor_activation
+            or str(payload.get("successor_starts_at") or "")
+            != expected_successor_starts
+            or str(payload.get("successor_stops_admitting_at") or "")
+            != expected_successor_stops
+        ):
+            continue
+        break
+    else:
+        return False
+
+    try:
+        successor_records, _telemetry = ResearchStore(
+            data_root, create_if_missing=False
+        ).iter_lifecycle_records_bounded(
+            schedule_sha256=successor_schedule,
+            activation_id=successor_activation,
+            window_start=successor_starts,
+            closure_cutoff=max(now, successor_stops),
+        )
+    except ResearchStoreError:
+        return False
+    for record in successor_records:
+        if (
+            str(record.record_kind) != str(RecordKind.OBSERVATION_SCHEDULE_STATE)
+            or str(record.entity_id) != successor_schedule
+            or str(record.run_id or "") != successor_activation
+            or str(record.record_id) != expected_successor_event_id
+            or str(record.transaction_id)
+            != f"{expected_transaction_prefix}{record.record_id.upper()}"
+            or str(record.producer_capability_id) != PRODUCER_CAPABILITY
+            or record.created_at.astimezone(UTC) > now
+            or record.first_reliable_available_at.astimezone(UTC) > now
+            or record.effective_at.astimezone(UTC) != cutover
+        ):
+            continue
+        try:
+            payload = json.loads(record.payload_json)
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if not isinstance(payload, Mapping):
+            continue
+        try:
+            transition_sequence = int(payload["transition_sequence"])
+            expected_event_id = transition_event_id_for(
+                schedule_sha256=successor_schedule,
+                activation_id=successor_activation,
+                prior_state=str(payload.get("prior_state") or ""),
+                new_state=str(
+                    payload.get("new_state") or payload.get("state") or ""
+                ),
+                transition_sequence=transition_sequence,
+                effective_at=render_utc(record.effective_at.astimezone(UTC)),
+                authority_receipt_sha256=str(
+                    payload.get("authority_receipt_sha256") or ""
+                ),
+            )
+        except (KeyError, TypeError, ValueError):
+            continue
+        if (
+            expected_event_id != str(record.record_id)
+            or str(payload.get("state_event_id") or "") != str(record.record_id)
+            or str(payload.get("schedule_sha256") or "") != successor_schedule
+            or str(payload.get("activation_id") or "") != successor_activation
+            or str(payload.get("state") or "") != "ACTIVE"
+            or str(payload.get("prior_state") or "")
+            not in {"UNREGISTERED", "PAUSED_OPERATOR"}
+            or payload.get("admission_window_closed") is not None
+            or str(payload.get("rollover_id") or "") != rollover_id
+            or str(payload.get("cutover_at") or "") != expected_cutover
+            or str(payload.get("authority_receipt_sha256") or "")
+            != authority_receipt
+            or str(payload.get("rollover_authority_receipt_sha256") or "")
+            != authority_receipt
+            or str(payload.get("predecessor_schedule_sha256") or "")
+            != predecessor_schedule
+            or str(payload.get("predecessor_activation_id") or "")
+            != predecessor_activation
+            or str(payload.get("successor_schedule_sha256") or "")
+            != successor_schedule
+            or str(payload.get("successor_activation_id") or "")
+            != successor_activation
+            or str(payload.get("successor_starts_at") or "")
+            != expected_successor_starts
+            or str(payload.get("successor_stops_admitting_at") or "")
+            != expected_successor_stops
+        ):
+            continue
+        return True
+    return False
+
+
+def resolve_late_recovery_proof(
+    data_root: Path,
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> dict[str, str | None]:
+    """Project owner-readable recovery proof from the append-only event.
+
+    ``NOT_REQUIRED`` means the committed DRAINING transition was not an
+    admission-close transition (for example, an in-window rollover). It is
+    distinct from ``UNKNOWN``, which means the lifecycle proof is unavailable.
+    """
+
+    evidence = _draining_transition_evidence(data_root, row, now=now)
+    event_id = str(row.get("last_transition_event_id") or "") or None
+    if evidence is None:
+        return {
+            "late_recovery_at": None,
+            "late_recovery_proof": "UNKNOWN",
+            "late_recovery_event_id": event_id,
+        }
+    effective, admission_closed = evidence
+    if admission_closed:
+        return {
+            "late_recovery_at": render_utc(effective),
+            "late_recovery_proof": "APPEND_ONLY_DRAINING_TRANSITION",
+            "late_recovery_event_id": event_id,
+        }
+    return {
+        "late_recovery_at": None,
+        "late_recovery_proof": "NOT_REQUIRED",
+        "late_recovery_event_id": event_id,
+    }
+
+
 def _require_cohort_cutover_or_unique(
     store: ObservationScheduleStore,
     *,
+    data_root: Path,
     document: Mapping[str, Any],
     schedule_sha256: str,
     activation_id: str,
+    now: datetime,
+    authority_receipt_sha256: str,
 ) -> None:
+    """Enforce at most one same-family admitting activation.
+
+    Same-family ACTIVE/admission-capable DRAINING peers still require an exact
+    rollover cutover. A proven NON_ADMITTING DRAINING predecessor does not
+    block late post-window successor activation, but a backdated successor
+    window (starts_at before the predecessor's stops_admitting_at) is denied.
+    """
+
     family = _cohort_family_key(document)
+    successor_starts = parse_utc(str(document["activation"]["starts_at"]))
     for row in store.list_activations():
         if str(row["state"]) not in {"ACTIVE", "DRAINING"}:
             continue
@@ -856,11 +1375,42 @@ def _require_cohort_cutover_or_unique(
             continue
         if _cohort_family_key(other["document"]) != family:
             continue
+        if _activation_is_non_admitting(row, now=now):
+            peer_stops = parse_utc(str(row["stops_admitting_at"]))
+            recovery_at = _non_admitting_recovery_at(data_root, row, now=now)
+            if recovery_at is None or recovery_at > now:
+                raise ObservationLifecycleError("LATE_SUCCESSOR_RECOVERY_UNPROVEN")
+            if successor_starts > now:
+                raise ObservationLifecycleError("ACTIVATION_BEFORE_STARTS_AT")
+            if successor_starts < peer_stops or successor_starts < recovery_at:
+                raise ObservationLifecycleError("LATE_SUCCESSOR_BACKDATED")
+            continue
         allowed = any(
             str(item["successor_schedule_sha256"]) == schedule_sha256
             and str(item["successor_activation_id"]) == activation_id
             and str(item["predecessor_schedule_sha256"]) == str(row["schedule_sha256"])
             and str(item["predecessor_activation_id"]) == str(row["activation_id"])
+            and str(item.get("authority_receipt_sha256") or "")
+            == authority_receipt_sha256
+            and rollover_research_event_proven(
+                data_root,
+                item=item,
+                predecessor_document=other["document"],
+                successor_document=document,
+                now=now,
+                predecessor_transition_event_id=str(
+                    row.get("last_transition_event_id") or ""
+                )
+                or None,
+                successor_transition_event_id=str(
+                    (
+                        store.get_activation(schedule_sha256, activation_id)
+                        or {}
+                    ).get("last_transition_event_id")
+                    or ""
+                )
+                or None,
+            )
             for item in store.list_rollovers()
         )
         if not allowed:
@@ -905,9 +1455,12 @@ def activate_schedule(
             raise ObservationLifecycleError("ACTIVATION_ALREADY_LIVE")
         _require_cohort_cutover_or_unique(
             store,
+            data_root=data_root,
             document=document,
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
+            now=now,
+            authority_receipt_sha256=receipt["receipt_sha256"],
         )
     if existing is not None:
         if str(existing.get("authority_receipt_sha256")) != receipt["receipt_sha256"]:
@@ -1345,6 +1898,24 @@ def rollover_schedule(
             and str(successor_existing.get("authority_receipt_sha256") or "")
             == str(matching_rollover["authority_receipt_sha256"])
         ):
+            if not rollover_research_event_proven(
+                data_root,
+                item=matching_rollover,
+                predecessor_document=predecessor_document,
+                successor_document=successor_document,
+                now=now,
+                predecessor_transition_event_id=str(
+                    predecessor.get("last_transition_event_id") or ""
+                )
+                or None,
+                successor_transition_event_id=str(
+                    successor_existing.get("last_transition_event_id") or ""
+                )
+                or None,
+            ):
+                raise ObservationLifecycleError(
+                    "ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE"
+                )
             return {
                 "terminal": "ROLLOVER_REPLAY",
                 "rollover_id": matching_rollover["rollover_id"],
@@ -1352,6 +1923,10 @@ def rollover_schedule(
                 "predecessor_state": "DRAINING",
                 "successor_state": "ACTIVE",
             }
+    if predecessor["state"] == "DRAINING":
+        raise ObservationLifecycleError("ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE")
+    if cutover < now:
+        raise ObservationLifecycleError("ROLLOVER_CUTOVER_IN_PAST")
     _require_live_authority(
         store,
         root=root,
@@ -1444,11 +2019,26 @@ def rollover_schedule(
                 "authority_receipt_sha256": transition[
                     "authority_receipt_sha256"
                 ],
+                "rollover_authority_receipt_sha256": (
+                    successor_receipt["receipt_sha256"]
+                ),
+                "admission_window_closed": (
+                    False if transition["state"] == "DRAINING" else None
+                ),
+                "predecessor_schedule_sha256": predecessor_schedule_sha256,
+                "predecessor_activation_id": predecessor_activation_id,
+                "successor_schedule_sha256": successor_schedule_sha256,
+                "successor_activation_id": successor_activation_id,
+                "successor_starts_at": successor_document["activation"]["starts_at"],
+                "successor_stops_admitting_at": successor_document["activation"][
+                    "stops_admitting_at"
+                ],
             },
             now=now,
             producer_git_sha=producer_git_sha,
             run_id=transition["activation_id"],
             transaction_id=f"RESEARCH-TXN-{transition['event_id'].upper()}",
+            effective_at=cutover,
         )
         _append_or_replay(data_root, event)
     return {
@@ -1502,6 +2092,9 @@ def status_schedule(
                 "schedule_sha256": row["schedule_sha256"],
                 "activation_id": row["activation_id"],
                 "state": row["state"],
+                "transition_event_id": (
+                    str(row.get("last_transition_event_id") or "") or "UNKNOWN"
+                ),
             }
             for row in activations
         ],
@@ -1590,6 +2183,7 @@ __all__ = [
     "abort_schedule",
     "authorize_schedule",
     "build_authority_request",
+    "cohort_family_key",
     "drain_expired_admission",
     "expected_authority_phrase",
     "materialize_pending_observation_snapshots",
