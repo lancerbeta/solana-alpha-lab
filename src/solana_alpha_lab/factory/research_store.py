@@ -1414,8 +1414,11 @@ class ResearchStore:
         records: Sequence[ResearchEvent],
         *,
         transaction_id: str,
+        before_commit: Callable[[], None] | None = None,
     ) -> CommitReceipt:
         with self.writer_lease():
+            if before_commit is not None:
+                before_commit()
             prepared = _prepare_records(
                 records,
                 transaction_id=transaction_id,

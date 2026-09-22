@@ -41,6 +41,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/live_cohort_to_forge.py
   - src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
   - src/solana_alpha_lab/factory/hfic_memory_policy.py
+  - src/solana_alpha_lab/factory/research_store.py
   - src/solana_alpha_lab/factory/fast_lane_snapshot.py
   - schemas/research_memory_projection_v1.sql
   - .github/workflows/ci.yml

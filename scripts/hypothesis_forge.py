@@ -906,6 +906,10 @@ def cmd_freeze(
         store=store,
         repo_root=repo_root,
         next_action_draft=next_action_draft,
+        # A production freeze must re-read the current A3 market surface
+        # before writing lifecycle bytes.  Fixture/unit callers retain the
+        # explicit default and do not gain a synthetic market authority.
+        verify_current_market_identity=True,
     )
     git_after = repository_git_snapshot(repo_root)
     if not git_before.unchanged(git_after):

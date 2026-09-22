@@ -84,6 +84,16 @@
             "type": ["string", "null"],
             "pattern": "^[0-9a-f]{64}$"
           },
+          "execution_provenance_status": {
+            "type": ["string", "null"],
+            "enum": [
+              null,
+              "VERIFIED_EXECUTION_BINDING",
+              "HISTORICAL_READBACK_UNKNOWN",
+              "NOT_APPLICABLE",
+              "EXECUTION_BINDING_CONFLICT"
+            ]
+          },
           "control_session_id": {"type": ["string", "null"]},
           "model_provenance_sha256": {
             "type": ["string", "null"],
@@ -138,6 +148,16 @@
     "execution_binding_sha256": {
       "type": ["string", "null"],
       "pattern": "^[0-9a-f]{64}$"
+    },
+    "execution_provenance_status": {
+      "type": ["string", "null"],
+      "enum": [
+        null,
+        "VERIFIED_EXECUTION_BINDING",
+        "HISTORICAL_READBACK_UNKNOWN",
+        "NOT_APPLICABLE",
+        "EXECUTION_BINDING_CONFLICT"
+      ]
     },
     "control_session_id": {"type": ["string", "null"]},
     "blocking_reason_codes": {"type": "array", "items": {"type": "string"}},

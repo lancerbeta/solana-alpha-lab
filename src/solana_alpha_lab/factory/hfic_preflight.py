@@ -344,7 +344,12 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     projection = Path(data_root) / RESEARCH_PROJECTION_LOCATION
     if not projection.is_file() or projection.is_symlink():
         raw = _sessions_from_store(data_root)
-        return raw if raw is not None else []
+        if raw is None:
+            # Missing projection and unreadable raw history are not an empty
+            # budget.  Treating the failure as [] would free an occupied slot
+            # after restart and permit an unsafe regeneration.
+            raise HficPreflightError("RESEARCH_MEMORY_RAW_UNAVAILABLE")
+        return raw
     connection = duckdb.connect(
         str(projection),
         read_only=True,

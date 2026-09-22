@@ -281,6 +281,31 @@ def _first_valid_hash(
     return None
 
 
+def _consistent_valid_hash(
+    sources: Sequence[Mapping[str, Any] | None], key: str
+) -> str | None:
+    """Return one hash only when every observed valid value agrees.
+
+    A lifecycle writer may receive the same identity through the outer
+    receipt, the forge-input receipt, and the context packet.  First-wins
+    would let a stale outer value silently mask a newer production value.
+    Conflicting valid values are therefore an admission conflict, not a
+    preference decision.
+    """
+
+    observed: list[str] = []
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        value = source.get(key)
+        if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+            if value not in observed:
+                observed.append(value)
+    if len(observed) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    return observed[0] if observed else None
+
+
 def _execution_identity_fields(
     *sources: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
@@ -334,9 +359,9 @@ def _execution_identity_fields(
     if semantic_version:
         fields["representation_semantic_version"] = semantic_version
 
-    market = _first_valid_hash(expanded, "market_evidence_epoch_sha256")
-    capability = _first_valid_hash(expanded, "capability_epoch_sha256")
-    focus_key = _first_valid_hash(expanded, "focus_key_sha256")
+    market = _consistent_valid_hash(expanded, "market_evidence_epoch_sha256")
+    capability = _consistent_valid_hash(expanded, "capability_epoch_sha256")
+    focus_key = _consistent_valid_hash(expanded, "focus_key_sha256")
     owner_focus = "AUTO"
     for source in expanded:
         if isinstance(source, Mapping) and isinstance(source.get("owner_focus"), str):
@@ -344,9 +369,9 @@ def _execution_identity_fields(
             break
     if focus_key is None:
         focus_key = focus_key_sha256(owner_focus)
-    payload_sha = _first_valid_hash(expanded, "representation_payload_sha256")
-    memory_sha = _first_valid_hash(expanded, "memory_eligibility_sha256")
-    model_sha = _first_valid_hash(expanded, "model_provenance_sha256")
+    payload_sha = _consistent_valid_hash(expanded, "representation_payload_sha256")
+    memory_sha = _consistent_valid_hash(expanded, "memory_eligibility_sha256")
+    model_sha = _consistent_valid_hash(expanded, "model_provenance_sha256")
     if market and semantic_version:
         from solana_alpha_lab.factory.hfic_evidence_identity import (
             execution_binding_sha256,
@@ -574,6 +599,7 @@ def bind_preflight_receipt(
     store: Any,
     repo_root: Any,
     require_current_store_digest: bool = True,
+    require_current_market_identity: bool = False,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.commissioning_proof import (
         CommissioningProofError,
@@ -581,11 +607,18 @@ def bind_preflight_receipt(
     )
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
 
-    if receipt.get("action") != "START_NEW_SESSION":
+    action = receipt.get("action")
+    if action not in {"START_NEW_SESSION", "RESUME_EXISTING_SESSION"}:
         raise HficSessionError("PREFLIGHT_ACTION_INVALID")
     if receipt.get("prompt_version") != PROMPT_VERSION:
         raise HficSessionError("PREFLIGHT_PROMPT_VERSION_INVALID")
     _reject_stale_fresh_session_draft(draft, receipt)
+    if action == "RESUME_EXISTING_SESSION":
+        draft_sha = hashlib.sha256(_canonical_bytes(draft)).hexdigest()
+        if receipt.get("draft_lifecycle") != "GENERATED_BEFORE_FREEZE":
+            raise HficSessionError("PREFLIGHT_ACTION_INVALID")
+        if receipt.get("generated_draft_sha256") != draft_sha:
+            raise HficSessionError("GENERATED_DRAFT_CONFLICT")
     observed_hash = receipt.get("preflight_receipt_sha256")
     expected_hash = canonical_preflight_receipt_sha256(receipt)
     if observed_hash != expected_hash:
@@ -629,7 +662,12 @@ def bind_preflight_receipt(
     receipt_memory = session_memory_eligibility(receipt)
     if receipt.get("memory_eligibility_sha256") and receipt_memory != current_memory:
         raise HficSessionError("PREFLIGHT_STORE_DIGEST_MISMATCH")
-    _validate_split_identity_binding(receipt, repo_root=Path(repo_root))
+    _validate_split_identity_binding(
+        receipt,
+        repo_root=Path(repo_root),
+        data_root=data_root,
+        require_current_market_identity=require_current_market_identity,
+    )
     git = repository_git_snapshot(Path(repo_root))
     receipt_head = str(receipt.get("live_git_head") or "")
     if receipt_head != git.head_sha.lower():
@@ -666,6 +704,8 @@ def _validate_split_identity_binding(
     receipt: Mapping[str, Any],
     *,
     repo_root: Path,
+    data_root: Path | None = None,
+    require_current_market_identity: bool = False,
 ) -> None:
     """Verify split stamps against the production receipt before freeze writes."""
 
@@ -701,6 +741,22 @@ def _validate_split_identity_binding(
             raise HficSessionError("MARKET_IDENTITY_DRIFT")
     except EvidenceIdentityError as exc:
         raise HficSessionError(str(exc)) from exc
+
+    if require_current_market_identity:
+        if data_root is None:
+            raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            compute_market_epoch_for_data_root,
+        )
+
+        try:
+            current_market, _current_basis = compute_market_epoch_for_data_root(
+                repo_root, data_root
+            )
+        except EvidenceIdentityError as exc:
+            raise HficSessionError(str(exc)) from exc
+        if current_market != market:
+            raise HficSessionError("MARKET_IDENTITY_DRIFT")
 
     from solana_alpha_lab.factory.hfic_evidence_identity import (
         EvidenceIdentityError,
@@ -1261,6 +1317,7 @@ def freeze_draft(
     store: Any = None,
     repo_root: Any = None,
     next_action_draft: Mapping[str, Any] | None = None,
+    verify_current_market_identity: bool = False,
 ) -> dict[str, Any]:
     if not isinstance(draft, Mapping):
         raise HficSessionError("HFIC_PROTOCOL_INVALID")
@@ -1302,6 +1359,7 @@ def freeze_draft(
             grounded_candidates=grounded_candidates,
             prompt_version=prompt_version,
             packet_version=packet_version,
+            verify_current_market_identity=verify_current_market_identity,
         )
 
     if next_action_draft is not None:
@@ -1362,6 +1420,7 @@ def freeze_draft(
             store=store,
             repo_root=repo_root,
             memory_as_of=memory_as_of,
+            verify_current_market_identity=verify_current_market_identity,
         )
         if existing_ladder is not None:
             return existing_ladder
@@ -1708,6 +1767,7 @@ def _freeze_no_worthy(
     grounded_candidates: Sequence[Mapping[str, Any]] | None = None,
     prompt_version: str = PROMPT_VERSION_V1_1,
     packet_version: str = "1.1",
+    verify_current_market_identity: bool = False,
 ) -> dict[str, Any]:
     _assert_vision_integrity_for_surface(
         preflight_receipt, prompt_version=prompt_version
@@ -1756,6 +1816,7 @@ def _freeze_no_worthy(
             store=store,
             repo_root=repo_root,
             memory_as_of=memory_as_of,
+            verify_current_market_identity=verify_current_market_identity,
         )
         if existing_ladder is not None:
             return existing_ladder
@@ -2599,6 +2660,15 @@ def _assert_scientific_admission(
             if isinstance(visible_cohort_ids, list)
             else None
         ),
+        execution_context={
+            key: fields.get(key) or binding.get(key)
+            for key in (
+                "capability_epoch_sha256",
+                "representation_payload_sha256",
+                "model_provenance_sha256",
+            )
+            if isinstance(fields.get(key) or binding.get(key), str)
+        },
     )
     action = str(admission.get("action") or "")
     if action == "STOP" and str(admission.get("reason_code") or "") == (
@@ -2724,9 +2794,26 @@ def persist_scientific_slot_admission(
         producer_git_sha=git.head_sha,
         created_at=now,
     )
+
+    def _recheck_admission_under_writer_lease() -> None:
+        # The budget/readback decision must be made while ResearchStore's
+        # cross-process writer lease is held.  A pre-check outside the lease
+        # alone allows two different slots to both observe the same free AUTO
+        # budget and then append.
+        observed = _existing_scientific_slot_admission(store, slot)
+        if observed is not None:
+            if str(observed.get("session_id") or "") != session_id:
+                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+            return
+        _assert_scientific_admission(store, binding)
+
     for attempt in range(4):
         try:
-            store.append([event], transaction_id=transaction_id)
+            store.append(
+                [event],
+                transaction_id=transaction_id,
+                before_commit=_recheck_admission_under_writer_lease,
+            )
             break
         except Exception as exc:
             # A competing writer may hold the lease briefly. Re-read after a
@@ -3405,7 +3492,7 @@ def _mapping_ladder_slot(source: Mapping[str, Any] | None) -> tuple[str, str | N
     return representation, parent
 
 
-def _bundle_ladder_slot(
+def bundle_ladder_slot(
     bundle: Mapping[str, Any], packet: Mapping[str, Any] | None = None
 ) -> tuple[str, str | None]:
     embedded = (
@@ -3432,6 +3519,11 @@ def _bundle_ladder_slot(
     if parent == session_id:
         parent = None
     return representation, parent
+
+
+# Compatibility alias for historical internal callers; new production code
+# uses the explicit public seam above.
+_bundle_ladder_slot = bundle_ladder_slot
 
 
 def _preflight_ladder_slot(
@@ -3495,6 +3587,7 @@ def _bound_from_ladder_challenger_preflight(
     store: Any,
     repo_root: Any,
     memory_as_of: str,
+    verify_current_market_identity: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     """Persist a stamped V1/V2 freeze without START_NEW_SESSION bind.
 
@@ -3568,7 +3661,12 @@ def _bound_from_ladder_challenger_preflight(
         # ladder envelope's own immutable keys.  A caller that mutates the
         # outer search key must receive the precise ladder drift reason before
         # any market-basis diagnosis, and no write may occur either way.
-        _validate_split_identity_binding(preflight, repo_root=Path(repo_root))
+        _validate_split_identity_binding(
+            preflight,
+            repo_root=Path(repo_root),
+            data_root=Path(getattr(store, "_root")),
+            require_current_market_identity=verify_current_market_identity,
+        )
     else:
         epoch = str(preflight.get("evidence_epoch_sha256") or "")
         focus_key = str(preflight.get("focus_key_sha256") or "")
@@ -3609,6 +3707,7 @@ def _bind_store_freeze_preflight(
     store: Any,
     repo_root: Any,
     memory_as_of: str,
+    verify_current_market_identity: bool = False,
 ) -> tuple[Mapping[str, Any], dict[str, Any] | None, dict[str, Any] | None]:
     """Return (receipt, existing_bundle, bound). Ladder slots skip START_NEW_SESSION."""
 
@@ -3625,6 +3724,7 @@ def _bind_store_freeze_preflight(
             store=store,
             repo_root=repo_root,
             memory_as_of=memory_as_of,
+            verify_current_market_identity=verify_current_market_identity,
         )
         return receipt, None, bound
     bound = bind_preflight_receipt(
@@ -3633,6 +3733,7 @@ def _bind_store_freeze_preflight(
         store=store,
         repo_root=repo_root,
         require_current_store_digest=existing is None,
+        require_current_market_identity=verify_current_market_identity,
     )
     if bound["research_memory_as_of"] != memory_as_of:
         raise HficSessionError("RESEARCH_MEMORY_AS_OF_MISMATCH")

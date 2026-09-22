@@ -118,10 +118,21 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
         f"visibility: {', '.join(vis_bits)}",
         f"representations: {'; '.join(reps) if reps else '(none)'}",
         f"forge_runnable: {bool(receipt.get('forge_runnable'))}",
+        (
+            "forge_input_readiness: READY — market input admitted; "
+            "STOP_BEFORE_SYNTHESIS is the phase boundary"
+            if bool(receipt.get("forge_runnable"))
+            else "forge_input_readiness: NOT_READY — resolve the typed blocker"
+        ),
         f"owner_class: {receipt.get('owner_class')}",
         f"forge_input_next: {forge_input_owner_next(receipt)}",
         "evidence_surface_mode: "
         + str(receipt.get("evidence_surface_mode") or "ordinary"),
+        "writes: research_store={store} forge_context={context} session={session}".format(
+            store=int((receipt.get("writes") or {}).get("research_store") or 0),
+            context=int((receipt.get("writes") or {}).get("forge_context") or 0),
+            session=int((receipt.get("writes") or {}).get("session") or 0),
+        ),
     ]
     codes = [str(item) for item in (receipt.get("blocking_reason_codes") or [])]
     if codes:

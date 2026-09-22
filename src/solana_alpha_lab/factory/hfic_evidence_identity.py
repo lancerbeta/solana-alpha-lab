@@ -595,6 +595,7 @@ def _session_slot_matches_execution_context(
     *,
     memory_eligibility_sha256: str | None,
     evidence_surface_mode: str | None,
+    execution_context: Mapping[str, Any] | None = None,
 ) -> bool:
     if memory_eligibility_sha256 is not None and session.get(
         "memory_eligibility_sha256"
@@ -604,6 +605,22 @@ def _session_slot_matches_execution_context(
         "evidence_surface_mode"
     ) != evidence_surface_mode:
         return False
+    if isinstance(execution_context, Mapping):
+        for key in (
+            "capability_epoch_sha256",
+            "representation_payload_sha256",
+            "model_provenance_sha256",
+        ):
+            expected = execution_context.get(key)
+            if not isinstance(expected, str) or re.fullmatch(r"[0-9a-f]{64}", expected) is None:
+                continue
+            observed = session.get(key)
+            # Missing historical provenance remains UNKNOWN and is not
+            # silently replaced.  A pending exact resume, however, must not
+            # cross into a different known execution context.
+            if isinstance(observed, str) and observed and observed != expected:
+                return False
+    return True
     return True
 
 
@@ -618,6 +635,7 @@ def resolve_scientific_admission(
     current_visible_cohort_ids: Sequence[str] | None = None,
     memory_eligibility_sha256: str | None = None,
     evidence_surface_mode: str | None = None,
+    execution_context: Mapping[str, Any] | None = None,
     auto_sessions_per_market: int = 1,
     max_distinct_focuses: int = 3,
 ) -> dict[str, Any]:
@@ -742,6 +760,7 @@ def resolve_scientific_admission(
             chosen,
             memory_eligibility_sha256=memory_eligibility_sha256,
             evidence_surface_mode=evidence_surface_mode,
+            execution_context=execution_context,
         ):
             state = str(chosen.get("session_state") or chosen.get("phase") or "")
             pending = {
@@ -873,16 +892,18 @@ def compute_market_epoch_for_data_root(
 
         enumerated, _warnings = enumerate_rdp_datasets(Path(data_root))
         datasets = list(select_current_datasets_for_forge(enumerated))
-        if not cohorts or mid is None:
-            try:
-                from solana_alpha_lab.factory.cohort_import_readback import (
-                    build_cohort_import_readback,
-                )
+        try:
+            from solana_alpha_lab.factory.cohort_import_readback import (
+                build_cohort_import_readback,
+            )
 
-                readback = build_cohort_import_readback(Path(data_root))
-            except Exception:
-                readback = None
-            if isinstance(readback, Mapping):
+            readback = build_cohort_import_readback(Path(data_root))
+        except Exception:
+            readback = None
+        if isinstance(readback, Mapping):
+            if str(readback.get("lineage_integrity") or "") != "PASS":
+                raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            if not cohorts or mid is None:
                 if not cohorts:
                     cohorts = [
                         str(item.get("cohort_id"))

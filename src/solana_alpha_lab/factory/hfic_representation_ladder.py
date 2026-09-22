@@ -52,7 +52,7 @@ from solana_alpha_lab.factory.hfic_session import (
     list_hfic_sessions,
     load_session_bundle,
     pick_session,
-    _bundle_ladder_slot,
+    bundle_ladder_slot,
 )
 from solana_alpha_lab.factory.research_store import (
     RecordKind,
@@ -107,6 +107,11 @@ EXEC_EXECUTED = "EXECUTED"
 EXEC_REUSED = "REUSED_VALID"
 EXEC_NOT_RUN = "NOT_RUN"
 EXEC_BLOCKED = "BLOCKED"
+
+EXEC_PROVENANCE_VERIFIED = "VERIFIED_EXECUTION_BINDING"
+EXEC_PROVENANCE_HISTORICAL_UNKNOWN = "HISTORICAL_READBACK_UNKNOWN"
+EXEC_PROVENANCE_NOT_APPLICABLE = "NOT_APPLICABLE"
+EXEC_PROVENANCE_CONFLICT = "EXECUTION_BINDING_CONFLICT"
 
 PAUSE_STATES = frozenset(
     {
@@ -1065,6 +1070,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 else "UNKNOWN"
             )
         ),
+        f"execution_provenance: {receipt.get('execution_provenance_status') or 'UNKNOWN'}",
     ]
     for stage in stages:
         if not isinstance(stage, Mapping):
@@ -1092,8 +1098,10 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             )
         )
         if stage.get("execution_status") == EXEC_REUSED:
+            provenance = stage.get("execution_provenance_status") or "UNKNOWN"
             lines.append(
-                "  note: REUSED_VALID — already answered on this market; not a new trial"
+                "  note: REUSED_VALID — already answered on this market; "
+                "not a new trial; execution_provenance=" + str(provenance)
             )
         selected = stage.get("selected_candidate_id")
         mechanism = stage.get("candidate_mechanism")
@@ -1134,8 +1142,10 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     lines.append(f"blocked_by: {', '.join(blocking) if blocking else 'NONE'}")
     if "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING" in blocking:
         lines.append(
-            "next: RECOVER_EXISTING_READBACK — restore/rebuild the bound "
-            "session projection, then retry; do not regenerate or reset budget"
+            "next: RECOVER_EXISTING_READBACK — operator must inspect the "
+            "authoritative ResearchStore/projection for the recorded session_id "
+            "and stage_ref_sha256, restore that readback or escalate the typed "
+            "integrity failure; then retry; do not regenerate or reset budget"
         )
     elif "MARKET_EVIDENCE_BASIS_INCOMPLETE" in blocking:
         lines.append(
@@ -1186,8 +1196,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         or next_action == ACTION_OBSERVABILITY_BLOCKED
     ):
         lines.append(
-            "next: RESTORE_SESSION_READBACK — use the recorded session_id and "
-            "stage_ref_sha256; restore authoritative readback, then retry"
+            "next: RESTORE_SESSION_READBACK — operator must use the recorded "
+            "session_id and stage_ref_sha256 against the authoritative store, "
+            "restore/read back that exact lifecycle row, then retry"
         )
     elif owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
         ACTION_INPUT_NOT_READY,
@@ -1198,7 +1209,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "then retry; do not treat this as scientific exhaustion"
         )
     lines.append(
-        "writes: store={store} forge_run={forge} session={session}".format(
+        "writes: store={store} forge_run={forge} session={session} "
+        "forge_context=reported_by_preflight".format(
             store=int(writes.get("research_store") or 0),
             forge=int(writes.get("forge_run") or 0),
             session=int(writes.get("session") or 0),
@@ -1292,6 +1304,20 @@ def _stage_from_session(
         if representation_id == "BASE" and mode == CURRENT_REPRESENTATION_CONTROL_V1
         else ("REPRESENTATION_RELEASE_LOCAL" if representation_id != "BASE" else "ORDINARY_BASE")
     )
+    stored_binding = bundle.get("execution_binding_sha256") or receipt.get(
+        "execution_binding_sha256"
+    )
+    provenance_status = _execution_provenance_status(
+        bundle,
+        receipt=receipt,
+        packet=packet,
+        scientific_slot_sha256=(
+            bundle.get("scientific_slot_sha256")
+            or receipt.get("scientific_slot_sha256")
+        ),
+        stored_binding=stored_binding,
+        execution_status=status,
+    )
     return {
         "representation_id": representation_id,
         "semantic_version": (
@@ -1325,7 +1351,8 @@ def _stage_from_session(
         "scientific_slot_sha256": bundle.get("scientific_slot_sha256")
         or receipt.get("scientific_slot_sha256"),
         "execution_binding_sha256": bundle.get("execution_binding_sha256")
-        or receipt.get("execution_binding_sha256"),
+            or receipt.get("execution_binding_sha256"),
+        "execution_provenance_status": provenance_status,
         "control_session_id": bundle.get("control_session_id")
         or receipt.get("control_session_id"),
         "model_provenance_sha256": bundle.get("model_provenance_sha256")
@@ -1341,6 +1368,73 @@ def _stage_from_session(
         "declined_candidate_ids": declined,
         "candidate_mechanism": mechanism,
     }
+
+
+def _execution_provenance_status(
+    bundle: Mapping[str, Any],
+    *,
+    receipt: Mapping[str, Any],
+    packet: Mapping[str, Any] | None,
+    scientific_slot_sha256: object,
+    stored_binding: object,
+    execution_status: str,
+) -> str:
+    """Classify binding evidence without upgrading historical rows.
+
+    A completed historical look remains reusable when its old row is known, but
+    a missing post-split binding is explicitly UNKNOWN.  It must not be
+    represented as a newly verified execution context.
+    """
+
+    if execution_status in {EXEC_NOT_RUN, EXEC_BLOCKED}:
+        return EXEC_PROVENANCE_NOT_APPLICABLE
+    binding = str(stored_binding or "")
+    if not binding:
+        return EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+    if re.fullmatch(r"[0-9a-f]{64}", binding) is None:
+        return EXEC_PROVENANCE_CONFLICT
+    slot = str(scientific_slot_sha256 or "")
+    sources = [packet, receipt, bundle]
+
+    def _hash_value(key: str) -> str | None:
+        observed: list[str] = []
+        for source in sources:
+            if isinstance(source, Mapping):
+                value = source.get(key)
+                if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+                    if value not in observed:
+                        observed.append(value)
+        if len(observed) > 1:
+            return None
+        return observed[0] if observed else None
+
+    capability = _hash_value("capability_epoch_sha256")
+    payload = _hash_value("representation_payload_sha256")
+    memory = _hash_value("memory_eligibility_sha256")
+    model = _hash_value("model_provenance_sha256")
+    parent = None
+    for source in sources:
+        if isinstance(source, Mapping):
+            value = source.get("control_session_id")
+            if isinstance(value, str) and value:
+                parent = value
+                break
+    if not all(
+        re.fullmatch(r"[0-9a-f]{64}", value or "")
+        for value in (slot, capability, payload, memory, model)
+    ):
+        return EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+    from solana_alpha_lab.factory.hfic_evidence_identity import execution_binding_sha256
+
+    expected = execution_binding_sha256(
+        scientific_slot_sha256=slot,
+        capability_epoch_sha256=capability or "",
+        control_session_id=parent,
+        representation_payload_sha256=payload or "",
+        memory_eligibility_sha256=memory or "",
+        model_provenance_sha256=model or "",
+    )
+    return EXEC_PROVENANCE_VERIFIED if expected == binding else EXEC_PROVENANCE_CONFLICT
 
 
 def _candidate_mechanism(bundle: Mapping[str, Any]) -> str | None:
@@ -1527,6 +1621,7 @@ def _progress_signature(receipt: Mapping[str, Any]) -> tuple[Any, ...]:
                 row.get("representation_payload_sha256"),
                 row.get("scientific_slot_sha256"),
                 row.get("execution_binding_sha256"),
+                row.get("execution_provenance_status"),
                 row.get("execution_status"),
                 row.get("effective_terminal"),
                 row.get("session_state"),
@@ -1541,6 +1636,7 @@ def _progress_signature(receipt: Mapping[str, Any]) -> tuple[Any, ...]:
         receipt.get("owner_final"),
         receipt.get("scientific_slot_sha256"),
         receipt.get("execution_binding_sha256"),
+        receipt.get("execution_provenance_status"),
         tuple(stages),
     )
 
@@ -1734,7 +1830,7 @@ def _session_applicable_to_current_market(
         return False
     receipt = bundle.get("session_receipt")
     packet = bundle.get("critic_input_packet")
-    representation_id, _parent = _bundle_ladder_slot(bundle, packet)
+    representation_id, _parent = bundle_ladder_slot(bundle, packet)
     version = (
         bundle.get("representation_semantic_version")
         or (receipt.get("representation_semantic_version") if isinstance(receipt, Mapping) else None)
@@ -2385,6 +2481,7 @@ def evaluate_forge_run(
     )
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     exec_binding = None
+    exec_provenance_status = EXEC_PROVENANCE_NOT_APPLICABLE
     active_row = next(
         (
             row
@@ -2405,6 +2502,10 @@ def evaluate_forge_run(
             # Reuse is a readback claim.  Never rebind an old answer to the
             # current capability/model merely because the receipt is replayed.
             exec_binding = existing_binding
+            exec_provenance_status = str(
+                active_row.get("execution_provenance_status")
+                or EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+            )
         elif active_status == EXEC_EXECUTED:
             payload = active_row.get("representation_payload_sha256")
             memory_elig = active_row.get("memory_eligibility_sha256")
@@ -2434,6 +2535,14 @@ def evaluate_forge_run(
                         representation_payload_sha256=payload,
                         memory_eligibility_sha256=memory_elig,
                         model_provenance_sha256=active_model,
+                    )
+                )
+                exec_provenance_status = str(
+                    active_row.get("execution_provenance_status")
+                    or (
+                        EXEC_PROVENANCE_VERIFIED
+                        if exec_binding
+                        else EXEC_PROVENANCE_HISTORICAL_UNKNOWN
                     )
                 )
     if owner_class_input == OWNER_CLASS_INPUT_NOT_READY:
@@ -2473,6 +2582,16 @@ def evaluate_forge_run(
                 representation_semantic_version=stage_semantic_version,
                 owner_focus=owner_focus,
             )
+        stage_status = row.get("execution_status") or EXEC_NOT_RUN
+        stage_provenance = row.get("execution_provenance_status")
+        if not isinstance(stage_provenance, str) or not stage_provenance:
+            stage_provenance = (
+                EXEC_PROVENANCE_NOT_APPLICABLE
+                if stage_status in {EXEC_NOT_RUN, EXEC_BLOCKED}
+                else EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+                if stage_status == EXEC_REUSED and not row.get("execution_binding_sha256")
+                else None
+            )
         stage_out.append(
             {
                 "representation_id": stage_representation_id,
@@ -2482,6 +2601,7 @@ def evaluate_forge_run(
                 ),
                 "scientific_slot_sha256": stage_slot,
                 "execution_binding_sha256": row.get("execution_binding_sha256"),
+                "execution_provenance_status": stage_provenance,
                 "control_session_id": row.get("control_session_id"),
                 "model_provenance_sha256": row.get("model_provenance_sha256"),
                 "memory_eligibility_sha256": row.get("memory_eligibility_sha256"),
@@ -2489,7 +2609,7 @@ def evaluate_forge_run(
                     "market_evidence_epoch_sha256"
                 ),
                 "capability_epoch_sha256": row.get("capability_epoch_sha256"),
-                "execution_status": row.get("execution_status") or EXEC_NOT_RUN,
+                "execution_status": stage_status,
                 "effective_terminal": row.get("effective_terminal"),
                 "input_scope": row.get("input_scope") or "UNDECLARED",
                 "session_id": row.get("session_id"),
@@ -2536,6 +2656,7 @@ def evaluate_forge_run(
         ),
         "scientific_slot_sha256": scientific_slot,
         "execution_binding_sha256": exec_binding,
+        "execution_provenance_status": exec_provenance_status,
         "control_session_id": control_session_id,
         "blocking_reason_codes": blocking,
         "writes": writes,
