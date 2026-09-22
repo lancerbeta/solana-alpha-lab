@@ -197,6 +197,48 @@ def assess_campaign_successor_continuity(
         except (KeyError, TypeError, ValueError):
             return False
 
+    def _rollover_proves_continuity(
+        item: Mapping[str, Any],
+        successor_sha: str,
+        successor_document: Mapping[str, Any],
+    ) -> bool:
+        receipt_sha = str(item.get("authority_receipt_sha256") or "")
+        rollover_id = str(item.get("rollover_id") or "")
+        successor_activation = str(item.get("successor_activation_id") or "")
+        if (
+            not rollover_id
+            or not receipt_sha
+            or not successor_sha
+            or not successor_activation
+            or (
+                successor_sha == schedule_sha
+                and successor_activation == activation_id
+            )
+            or not _authority_is_live(
+                successor_sha,
+                receipt_sha,
+                require_bound_receipt=True,
+            )
+        ):
+            return False
+        try:
+            predecessor_starts = parse_utc(
+                str(registered["document"]["activation"]["starts_at"])
+            )
+            cutover = parse_utc(str(item["cutover_at"]))
+            successor_starts = parse_utc(
+                str(successor_document["activation"]["starts_at"])
+            )
+            successor_stops = parse_utc(
+                str(successor_document["activation"]["stops_admitting_at"])
+            )
+        except (KeyError, TypeError, ValueError):
+            return False
+        return (
+            predecessor_starts <= cutover <= current_stops
+            and successor_starts <= cutover < successor_stops
+        )
+
     current_stops = stops
     for item in store.list_rollovers():
         if (
@@ -207,11 +249,11 @@ def assess_campaign_successor_continuity(
             successor_reg = store.get_registered_schedule(successor_sha)
             if successor_reg is None or cohort_family_key(successor_reg["document"]) != family:
                 continue
-            if not _authority_is_live(
-                successor_sha, str(item.get("authority_receipt_sha256") or "") or None
+            if _window_covers(
+                successor_reg["document"], current_stops
+            ) and _rollover_proves_continuity(
+                item, successor_sha, successor_reg["document"]
             ):
-                continue
-            if _window_covers(successor_reg["document"], current_stops):
                 successor_state = "ROLLOVER_READY"
                 continuity_proven = True
                 successor_schedule_sha256 = successor_sha
