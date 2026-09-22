@@ -13,8 +13,8 @@
 Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json`
 
 - `forge-input`: `FORGE_INPUT_READY`, `STOP_BEFORE_SYNTHESIS`, receipt
-  `f7a1b93ab4b98b601b4059c89e452080fab73b6875c55f87acb5a74245e1bd24`;
-  exact no-write Git head `c69cffc3638ec6ba02ec0dfb38b72c42f519891d`.
+  `af5b740e90baf5e2da6dd931638c6b4c2d71186f5729f209edb4ee656563e3a3`;
+  exact no-write Git head `24468a34856c2bef4f4caec68c0c673573dd8c60`.
 - `preflight`: planned action `START_NEW_SESSION`, selection
   `SINGLE_COMMISSIONED`, router `BLOCK_FORGE_SELECTION_RISK`; the gate is a
   scoped historical caveat (`caveat=true`, `full_lifecycle_equivalent=false`),
@@ -22,11 +22,11 @@ Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c
   next is `CONTINUE_WITH_SCOPED_SELECTION_CAVEAT` for the canonical no-write
   Forge/readback path; if the gate returns a typed STOP, the CLI next is
   `RESOLVE_SELECTION_GATE` and it must not create a trial. Receipt:
-  `ae5497bdff16a9f81dd82a18ac11f0cd05d129835a2f6b1aa32ce8d3ac213515`.
+  `10a333bb26eb5053e86570b51e11689d299d65a89529f8044565775f2d910ef9`.
 - Current market identity:
   `3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9`.
   Capability identity:
-  `31854d72cf803473fc286e5254cdb67c54ac9e7219d3c3ef9a79d209f9afc1d5`;
+  `114623c29589e149c791491fb54732f91b0d530c799eef33401168a360c67e0a`;
   changing capability does not free the market budget.
 - Inventory is unchanged (`defbc9a5a1794b05` before and after); the read-only
   path reports `scientific_writes=0`, 17 readable sessions, 2 historical

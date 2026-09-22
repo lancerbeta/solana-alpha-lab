@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-23",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "c69cffc3638ec6ba02ec0dfb38b72c42f519891d",
+  "git_head": "24468a34856c2bef4f4caec68c0c673573dd8c60",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -18,12 +18,12 @@
     "REL-20260909T111900Z-20260916T111900Z"
   ],
   "current_market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
-  "capability_epoch_sha256": "31854d72cf803473fc286e5254cdb67c54ac9e7219d3c3ef9a79d209f9afc1d5",
+  "capability_epoch_sha256": "114623c29589e149c791491fb54732f91b0d530c799eef33401168a360c67e0a",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
     "blocking_reason_codes": [],
-    "receipt_sha256": "f7a1b93ab4b98b601b4059c89e452080fab73b6875c55f87acb5a74245e1bd24"
+    "receipt_sha256": "af5b740e90baf5e2da6dd931638c6b4c2d71186f5729f209edb4ee656563e3a3"
   },
   "inventory_sha256_prefix_before": "defbc9a5a1794b05",
   "inventory_sha256_prefix_after": "defbc9a5a1794b05",
@@ -283,13 +283,13 @@
     "router_decision": "BLOCK_FORGE_SELECTION_RISK",
     "selection_reason": "SINGLE_COMMISSIONED",
     "current_market_occupancy": 0,
-    "capability_epoch_sha256": "31854d72cf803473fc286e5254cdb67c54ac9e7219d3c3ef9a79d209f9afc1d5",
+    "capability_epoch_sha256": "114623c29589e149c791491fb54732f91b0d530c799eef33401168a360c67e0a",
     "selection_caveat": true,
     "full_lifecycle_equivalent": false,
     "owner_next": "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
     "preflight_terminal": "NO_GIT_FAST_LANE_PROVEN",
-    "preflight_receipt_sha256": "ae5497bdff16a9f81dd82a18ac11f0cd05d129835a2f6b1aa32ce8d3ac213515",
-    "receipt_sha256": "ae5497bdff16a9f81dd82a18ac11f0cd05d129835a2f6b1aa32ce8d3ac213515"
+    "preflight_receipt_sha256": "10a333bb26eb5053e86570b51e11689d299d65a89529f8044565775f2d910ef9",
+    "receipt_sha256": "10a333bb26eb5053e86570b51e11689d299d65a89529f8044565775f2d910ef9"
   },
   "disposition_summary": [
     {
