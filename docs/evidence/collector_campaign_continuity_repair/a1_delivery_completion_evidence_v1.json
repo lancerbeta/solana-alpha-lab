@@ -14,22 +14,22 @@
   "cloud_bundle_smoke_required": false,
   "capability_radar_now": "NONE",
   "implementation_bindings": {
-    "catalog/assets/core.yaml": "dced844050258c9053a25f2250730fb8d5927e7dba5b3968598ef0d53e28ef08",
+    "catalog/assets/core.yaml": "e378a66a2b83a771eb92304520e40de6a210e7aee259e0df65a5008cf6583c91",
     "catalog/assets/lifecycle.yaml": "ff3bd0d6774d369bf1a27e53097b133fcda8e81b9c07f81c465e74b8b162232e",
     "catalog/generated/asset_edges.json": "6347f6f706db78b5cc05525818fbc18daa3dbb22f6ccf2ea7011dc3a55a5825a",
     "docs/PROJECT_MAP.md": "d36fb92c8401b4cf717736cecd80522afdb12f95de000d2e358ca36b9f3fe4f6",
     "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "10a4646deb206de4a15ac507db7bac8d572b815d16441a54bb9ba3840063b3d8",
-    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "52644c816f5d9aba5569376abfdc257bf3fa1a7e46fdb43b79668d11e5e49381",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "d088ffcb91c506524a0297c74f9cfe12a79aa71f960b98a316f6d6ee94eda75f",
     "docs/reports/collector_campaign_continuity_repair/a1_owner_readout_v1.md": "0a0704188fd2af1621e88feab704ac3d95b9c8986779773a8db749d9626741d1",
     "docs/tasks/COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_V1.md": "f93af4d38126cde6c77aeef172b3253de053fc5f45a3ec5556957e56dc3814bd",
     "scripts/observation_schedule.py": "0f79505eb17d24f73ca5556155ffd7411503ab33a453c74233c2d276d058b35c",
     "src/solana_alpha_lab/factory/collector_operational_packet.py": "9f03fb3397ee0e088047d1009a50d25da87561fe0f24d6e7c4ce12cd1e659243",
     "src/solana_alpha_lab/factory/collector_read_model.py": "148988a8ee81eb9a20900b9ac0d3a260e342ede5ea2dcea9390f8fb8b8c593e5",
-    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "ced3e548ca46b8aadffd11287483dc3dc0d411e226d20a72a6d0f72b81393a26",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "044b68c541b5664076ee9778fc3e1af9af4984b4bca37937dc11637e69950b16",
     "src/solana_alpha_lab/factory/observation_schedule_store.py": "a6d4ebe6dd6baa0b26c4bacc30296c6951d54e27b543b406ee195de5f5d3bd4b",
     "src/solana_alpha_lab/factory/operability_watch.py": "865a8262225ed0f4d7351a44bb7a23610c63492099b990f795cb1f7b4c404ce2",
     "src/solana_alpha_lab/factory/system_operability.py": "4bbf2dcafbe2a4f931d47d729e798b0c881859f88f0b3e232f0c572eb22792c7",
-    "tests/test_collector_campaign_continuity_repair_v1.py": "e92306fb5b18f99699d36384b5e33a723ba9aeac9344de515e10b2ecc0f0523f"
+    "tests/test_collector_campaign_continuity_repair_v1.py": "21524f87d9b2a83979db83ce83b85208eb4b3ce163add9e2307e97882252b33f"
   },
   "active_stop_conditions": [],
   "owner_attention_triggers": {
@@ -41,14 +41,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_campaign_continuity_repair/a1_delivery_factory_fit_v1.json",
-    "sha256": "faa61f14c7088d174ce5983e105516fee4c210fdd1168bf0e1ed3d858180b1d8",
+    "sha256": "79e3a28b0cb3c0c302d3be2ba6e4a805650e3230334acac025f23be521dd6fd7",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_SUITE",
     "independent_review": {
       "path": "docs/evidence/collector_campaign_continuity_repair/a1_delivery_independent_review_v1.json",
-      "sha256": "46d42868eaa139ef5167be901714c7eecc637a85eaf97c560b24ecff94ead085",
+      "sha256": "af0bcdcd9f4220dbf5c2c4c1a4120235405cc7f1059b5a42a6a9b4175989db4e",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
