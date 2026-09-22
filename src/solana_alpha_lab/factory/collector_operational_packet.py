@@ -30,7 +30,10 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     project_7d_disk_used,
 )
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
-from solana_alpha_lab.factory.observation_schedule_lifecycle import cohort_family_key
+from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    cohort_family_key,
+    rollover_research_event_proven,
+)
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.offhost_backup import offhost_health_snapshot
 from solana_alpha_lab.factory.remote_ops import (
@@ -96,6 +99,7 @@ def assess_campaign_successor_continuity(
     *,
     now: datetime,
     activation: Mapping[str, Any] | None,
+    data_root: Path | None = None,
 ) -> dict[str, Any]:
     """Owner-facing campaign continuity projection for pre-expiry attention.
 
@@ -253,6 +257,12 @@ def assess_campaign_successor_continuity(
                 successor_reg["document"], current_stops
             ) and _rollover_proves_continuity(
                 item, successor_sha, successor_reg["document"]
+            ) and rollover_research_event_proven(
+                data_root,
+                item=item,
+                predecessor_document=registered["document"],
+                successor_document=successor_reg["document"],
+                now=now,
             ):
                 successor_state = "ROLLOVER_READY"
                 continuity_proven = True
@@ -1000,11 +1010,18 @@ def build_collector_operational_packet(
     if schedule_sha256 and activation_id:
         continuity_activation = store.get_activation(schedule_sha256, activation_id)
     if continuity_activation is None:
-        continuity_activation = select_current_activation(store.list_activations())
+        continuity_activation = select_current_activation(
+            store.list_activations(), now=clock
+        )
     continuity = assess_campaign_successor_continuity(
         store,
         now=clock,
         activation=continuity_activation,
+        data_root=(
+            Path(observation_rdp)
+            if observation_rdp is not None
+            else root / "local/factory_v1/observation_rdp"
+        ),
     )
 
     loaded = dict(remote_config) if remote_config is not None else None

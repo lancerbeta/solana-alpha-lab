@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping as MappingLike
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -54,6 +55,8 @@ def _activation_freshness_key(row: MappingLike) -> tuple[str, str, str]:
 
 def select_current_activation(
     activations: list[MappingLike] | tuple[MappingLike, ...],
+    *,
+    now: datetime | None = None,
 ) -> dict[str, Any] | None:
     """Deterministic current campaign activation for status/doctor/operability.
 
@@ -66,7 +69,35 @@ def select_current_activation(
     peer exists; it is never preferred over a live draining campaign.
     """
 
-    rows = [dict(row) for row in activations]
+    clock = None
+    if now is not None:
+        clock = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
+        clock = clock.astimezone(UTC)
+    rows: list[dict[str, Any]] = []
+    for raw in activations:
+        row = dict(raw)
+        if clock is not None:
+            payload = row.get("payload")
+            if isinstance(payload, str):
+                try:
+                    payload = json.loads(payload)
+                except (TypeError, ValueError):
+                    payload = None
+            if isinstance(payload, dict):
+                effective_raw = payload.get("transition_effective_at")
+                if effective_raw:
+                    try:
+                        effective_at = parse_utc(str(effective_raw))
+                    except (TypeError, ValueError):
+                        effective_at = None
+                    if effective_at is not None and effective_at > clock:
+                        prior_state = str(payload.get("prior_state") or "")
+                        if prior_state in {"ACTIVE", "DRAINING"}:
+                            row["state"] = prior_state
+                            row["future_transition_pending"] = True
+                        else:
+                            continue
+        rows.append(row)
     if not rows:
         return None
     active = [row for row in rows if str(row.get("state") or "") == "ACTIVE"]
@@ -82,13 +113,14 @@ def classify_doctor_current_activation(
     activations: list[MappingLike] | tuple[MappingLike, ...],
     *,
     recovery_proofs: MappingLike | None = None,
+    now: datetime | None = None,
 ) -> dict[str, Any]:
     """Map current activation selection to doctor terminal precedence.
 
     Historical ABORTED_SAFETY never overrides a current ACTIVE/DRAINING campaign.
     """
 
-    current = select_current_activation(activations)
+    current = select_current_activation(activations, now=now)
     current_state = str((current or {}).get("state") or "")
     current_id = (current or {}).get("activation_id")
     current_digest = (current or {}).get("schedule_sha256")
@@ -318,7 +350,7 @@ def build_collector_read_model(
     if schedule_sha256 and activation_id:
         selected = store.get_activation(schedule_sha256, activation_id)
     elif activations:
-        selected = select_current_activation(activations)
+        selected = select_current_activation(activations, now=now)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
     activation_state = str((selected or {}).get("state") or "NONE")

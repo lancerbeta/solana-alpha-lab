@@ -67,6 +67,28 @@ class ObservationScheduleStoreError(ValueError):
     """Typed operational store failure."""
 
 
+def rollover_id_for(
+    *,
+    predecessor_schedule_sha256: str,
+    predecessor_activation_id: str,
+    successor_schedule_sha256: str,
+    successor_activation_id: str,
+    cutover_at: str,
+    authority_receipt_sha256: str,
+) -> str:
+    identity = {
+        "predecessor_schedule_sha256": predecessor_schedule_sha256,
+        "predecessor_activation_id": predecessor_activation_id,
+        "successor_schedule_sha256": successor_schedule_sha256,
+        "successor_activation_id": successor_activation_id,
+        "cutover_at": cutover_at,
+        "authority_receipt_sha256": authority_receipt_sha256,
+    }
+    return "OBS-ROLLOVER-" + hashlib.sha256(
+        canonical_json_bytes(identity)
+    ).hexdigest()
+
+
 def _now(clock: datetime | None = None) -> str:
     value = clock.astimezone(UTC) if clock is not None else datetime.now(UTC)
     return render_utc(value)
@@ -804,17 +826,14 @@ class ObservationScheduleStore:
         clock: datetime | None = None,
     ) -> str:
         self._require_write_lease(clock)
-        identity = {
-            "predecessor_schedule_sha256": predecessor_schedule_sha256,
-            "predecessor_activation_id": predecessor_activation_id,
-            "successor_schedule_sha256": successor_schedule_sha256,
-            "successor_activation_id": successor_activation_id,
-            "cutover_at": cutover_at,
-            "authority_receipt_sha256": authority_receipt_sha256,
-        }
-        rollover_id = "OBS-ROLLOVER-" + hashlib.sha256(
-            canonical_json_bytes(identity)
-        ).hexdigest()
+        rollover_id = rollover_id_for(
+            predecessor_schedule_sha256=predecessor_schedule_sha256,
+            predecessor_activation_id=predecessor_activation_id,
+            successor_schedule_sha256=successor_schedule_sha256,
+            successor_activation_id=successor_activation_id,
+            cutover_at=cutover_at,
+            authority_receipt_sha256=authority_receipt_sha256,
+        )
         self._conn.execute(
             """
             INSERT OR IGNORE INTO schedule_rollovers(

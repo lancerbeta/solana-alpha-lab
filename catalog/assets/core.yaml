@@ -33075,7 +33075,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/observation_schedule_lifecycle.py', repository_path: src/solana_alpha_lab/factory/observation_schedule_lifecycle.py}
-  integrity: {kind: sha256, sha256: 56a66d55f53d1a1a0ea4fda9da28ea449f0ca2aa6c998dbe5ecae4bdc4cfd170}
+  integrity: {kind: sha256, sha256: 6bfebec685f84c06a847280aa303e87c094467babc9188fff7be6cb1fb0ceadb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DECLARATIVE-OBSERVATION-SCHEDULE-BRIDGE-001}
@@ -33127,7 +33127,7 @@ records:
   as_of: '2026-08-28'
   truth_owner: DECLARATIVE_OBSERVATION_SCHEDULE_BRIDGE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/observation_schedule.py', repository_path: scripts/observation_schedule.py}
-  integrity: {kind: sha256, sha256: 9b3ee9d190d5277151e8d0a932ff2e71d1802021f416c01cc55952ae86f52d64}
+  integrity: {kind: sha256, sha256: 0f79505eb17d24f73ca5556155ffd7411503ab33a453c74233c2d276d058b35c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-OBSERVATION-SCHEDULE-COMPILER-001}
@@ -33860,7 +33860,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: ALWAYS_ON_LIFECYCLE_COLLECTOR_READINESS_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_read_model.py', repository_path: src/solana_alpha_lab/factory/collector_read_model.py}
-  integrity: {kind: sha256, sha256: 1e7f707e95aab25a111c58be4857fdb59dfbc8cd9cd682cbfb79efe37966fccc}
+  integrity: {kind: sha256, sha256: efec5e4673b88f3ddbb1bc3e0dd46275b429e3bc1f1f1f93849563fec3fc604b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-ALWAYS-ON-LIFECYCLE-COLLECTOR-READINESS-001}
@@ -34244,7 +34244,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: e42639ca56e7fc28f080f6a507a83f9399f37b35e7d5d0950b1e2d81beff813b}
+  integrity: {kind: sha256, sha256: 745541ebe43f0b6a780293074c29687404385fcb793fd9afb647e13ec81b144b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}

@@ -689,6 +689,18 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 producer_git_sha=GIT,
             )
             self.assertEqual(result["terminal"], "ROLLOVER_COMMITTED")
+            current = select_current_activation(store.list_activations(), now=NOW)
+            assert current is not None
+            self.assertEqual(current["activation_id"], "ACT-PRE")
+            self.assertEqual(current["state"], "ACTIVE")
+            predecessor_row = store.get_activation(
+                pred["schedule_sha256"], "ACT-PRE"
+            )
+            assert predecessor_row is not None
+            proof = resolve_late_recovery_proof(
+                data_root, predecessor_row, now=NOW
+            )
+            self.assertEqual(proof["late_recovery_proof"], "NOT_REQUIRED")
             store.close()
 
     def test_read_model_prefers_draining_over_historical_aborted(self) -> None:
@@ -1341,8 +1353,13 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 activation=store.get_activation(
                     current_registered["schedule_sha256"], "ACT-CURRENT"
                 ),
+                data_root=data_root,
             )
-            self.assertEqual(continuity["campaign_successor_state"], "ROLLOVER_READY")
+            # The SQLite rollover row is only a prepared projection until the
+            # immutable predecessor transition is committed.  The authorized
+            # boundary-covering successor still clears the warning, but must
+            # not be mislabeled ROLLOVER_READY before that event exists.
+            self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
             self.assertFalse(continuity["campaign_successor_required"])
             rollover_schedule(
                 root=ROOT,

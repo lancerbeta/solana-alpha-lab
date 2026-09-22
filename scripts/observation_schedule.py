@@ -366,6 +366,7 @@ def main(
             current_report = classify_doctor_current_activation(
                 activations,
                 recovery_proofs=recovery_proofs,
+                now=now,
             )
             current_state = str(current_report.get("current_activation_state") or "")
             live = bool(current_report.get("live_activation"))
