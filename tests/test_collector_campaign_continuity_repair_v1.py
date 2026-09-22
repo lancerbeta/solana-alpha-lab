@@ -875,6 +875,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 now=NOW,
             )
             self.assertEqual(status["collector"]["activation_state"], "ACTIVE")
+            self.assertIn("transition_event_id", status["activations"][0])
             store.close()
 
     def test_read_model_keeps_genuine_current_aborted(self) -> None:

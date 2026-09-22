@@ -2092,6 +2092,9 @@ def status_schedule(
                 "schedule_sha256": row["schedule_sha256"],
                 "activation_id": row["activation_id"],
                 "state": row["state"],
+                "transition_event_id": (
+                    str(row.get("last_transition_event_id") or "") or "UNKNOWN"
+                ),
             }
             for row in activations
         ],

@@ -199,7 +199,15 @@ If `rollover` returns
 `next_action=INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM`, stop
 retrying the SQLite projection. This is a rollover proof check, not the late
 recovery check below. Read both operational `last_transition_event_id` values
-for the predecessor and successor, then inspect both immutable events:
+for the predecessor and successor with the existing read-only `status` command:
+
+```text
+uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <PREDECESSOR_SCHEDULE_SHA256> --activation-id <PREDECESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <SUCCESSOR_SCHEDULE_SHA256> --activation-id <SUCCESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Take `activations[0].transition_event_id` from each JSON result; `UNKNOWN`
+is a terminal proof gap. Then inspect both immutable events:
 
 ```text
 uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); ids={('<PREDECESSOR_SCHEDULE_SHA256>','<PREDECESSOR_ACTIVATION_ID>','<PREDECESSOR_TRANSITION_EVENT_ID>'),('<SUCCESSOR_SCHEDULE_SHA256>','<SUCCESSOR_ACTIVATION_ID>','<SUCCESSOR_TRANSITION_EVENT_ID>')}; print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'transaction_id':r.transaction_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id) in ids], sort_keys=True))"
