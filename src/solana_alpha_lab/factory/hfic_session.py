@@ -4854,6 +4854,10 @@ def apply_revision(
                 "evidence_epoch_sha256": existing.get("evidence_epoch_sha256") or "",
                 "focus_key_sha256": existing.get("focus_key_sha256") or "",
                 "search_key_sha256": existing.get("search_key_sha256") or "",
+                "memory_eligibility_sha256": existing.get(
+                    "memory_eligibility_sha256"
+                )
+                or frozen.get("memory_eligibility_sha256"),
                 "selected_candidate_id": selected_identity.candidate_id,
                 "runner_up_candidate_id": runner_up_id,
                 "rejected_alternative_id": rejected_id,
@@ -5079,6 +5083,8 @@ def persist_primary_kill_awaiting_runner_up(
         "evidence_epoch_sha256": frozen.get("evidence_epoch_sha256") or "",
         "focus_key_sha256": frozen.get("focus_key_sha256") or "",
         "search_key_sha256": frozen.get("search_key_sha256") or "",
+        "memory_eligibility_sha256": frozen.get("memory_eligibility_sha256")
+        or (existing.get("memory_eligibility_sha256") if existing else None),
         "selected_candidate_id": primary_id,
         "runner_up_candidate_id": frozen.get("runner_up_candidate_id"),
         "rejected_alternative_id": frozen.get("rejected_alternative_id"),

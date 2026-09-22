@@ -2199,6 +2199,17 @@ def run_preflight(
         else:
             raise
 
+    # Auto-commission is an in-scope append-only compatibility step, but it
+    # can publish a dataset into the same data root.  The market identity must
+    # describe the bytes that the following lifecycle step will actually
+    # read, not the pre-commission snapshot.
+    forge_input = build_forge_input_receipt(
+        Path(data_root),
+        repo_root=Path(repo_root),
+        evidence_surface_mode=control_mode,
+        owner_focus=focus,
+    )
+
     try:
         if persist:
             store = ResearchStore(Path(data_root))

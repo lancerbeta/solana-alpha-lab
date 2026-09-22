@@ -8,6 +8,7 @@ import sys
 import tempfile
 import unittest
 from contextlib import redirect_stderr
+from datetime import timedelta
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -58,6 +59,49 @@ def critic_result_from_packet_only(
         },
         "non_claims": ["NO_ALPHA", "PACKET_ONLY_CRITIC"],
     }
+
+
+def populate_real_c1_c2(data_root: Path, workspace: Path) -> None:
+    """Build the disposable C1/C2 corpus through the production import path."""
+
+    from solana_alpha_lab.factory.live_cohort_discovery_release import (
+        cohort_id_for_admission,
+        import_live_cohort,
+        seal_live_cohort,
+        write_observation_rdp_source,
+    )
+    from tests.test_live_cohort_discovery_release_series import (
+        CAMPAIGN_STARTS,
+        CAMPAIGN_STOPS,
+        _snapshot_for_week,
+    )
+
+    data_root.mkdir(parents=True, exist_ok=True)
+    for week in range(2):
+        admission = CAMPAIGN_STARTS + timedelta(days=7 * week)
+        as_of = admission + timedelta(days=10)
+        cohort_id = cohort_id_for_admission(
+            admission,
+            starts_at=CAMPAIGN_STARTS,
+            stops_admitting_at=CAMPAIGN_STOPS,
+        )
+        assert cohort_id is not None
+        observation_root = workspace / f"observation-rdp-{week}"
+        release_root = workspace / f"release-{week}"
+        write_observation_rdp_source(observation_root, _snapshot_for_week(week))
+        seal_live_cohort(
+            observation_rdp_root=observation_root,
+            cohort_id=cohort_id,
+            release_root=release_root,
+            sealed_at=as_of,
+            as_of=as_of,
+        )
+        imported = import_live_cohort(
+            release_root=release_root,
+            data_root=data_root,
+            import_time=as_of + timedelta(hours=1),
+        )
+        assert imported["status"] == "IMPORTED"
 
 
 def bind_draft(draft: dict, receipt: dict) -> dict:
@@ -454,8 +498,9 @@ class HficTempRootE2ETests(unittest.TestCase):
         git_before = repository_git_snapshot(ROOT)
         happy = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
         with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp) / "rdp"
-            data_root.mkdir()
+            workspace = Path(tmp)
+            data_root = workspace / "rdp"
+            populate_real_c1_c2(data_root, workspace)
             snapshot_root = Path(tmp) / "snapshot"
             restore_root = Path(tmp) / "restored"
             preflight = run_cli(
@@ -636,7 +681,11 @@ class HficTempRootE2ETests(unittest.TestCase):
                 "json",
                 data_root=data_root,
             )
-            self.assertEqual(resume_runner.returncode, 0, resume_runner.stderr)
+            self.assertEqual(
+                resume_runner.returncode,
+                0,
+                resume_runner.stderr + resume_runner.stdout,
+            )
             resume_runner_payload = json.loads(resume_runner.stdout)
             self.assertEqual(resume_runner_payload["action"], "RESUME_CRITIC")
             c2 = critic_result_from_packet_only(
@@ -750,8 +799,9 @@ class HficTempRootE2ETests(unittest.TestCase):
         git_before = repository_git_snapshot(ROOT)
         happy = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
         with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp) / "rdp"
-            data_root.mkdir()
+            workspace = Path(tmp)
+            data_root = workspace / "rdp"
+            populate_real_c1_c2(data_root, workspace)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
