@@ -162,6 +162,40 @@ Discovery release seal/verify/import (local RDP; zero network):
 | Authorize / activate schedule | exact ObservationSchedule owner phrase from runtime |
 | Live provider calls | only after authorize+activate+credential |
 
+### Proposed bounded owner deploy handoff (not executed by this atom)
+
+Bind `TARGET_SHA` to the exact candidate `git rev-parse HEAD` and exact-head
+CI receipt immediately before the owner deploy gate. The previous live SHA is
+fixed as `ba7f3b725ff4f609e251a4e57751246636e8f8f7`; the canonical host is
+`factory-remote-ops`; and the no-`.git` deploy root is
+`/opt/solana-alpha-lab`. The owner-controlled transport must supply an
+object-bearing checkout for `--repo`; do not infer one from the no-`.git`
+deploy root.
+
+The exact route invocation is:
+
+```
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo <OBJECT_BEARING_CHECKOUT> --deploy-root /opt/solana-alpha-lab --target-sha <TARGET_SHA> --previous-sha ba7f3b725ff4f609e251a4e57751246636e8f8f7
+```
+
+The route's bounded sequence is `DEPLOY_TARGET` → `ROLLBACK_PREVIOUS` →
+`FORWARD_RESTORE`, with `restart=True`; it preserves `local/`, `.venv/`, and
+`.factory_deploy_sha`, then requires final `.factory_deploy_sha == TARGET_SHA`.
+The fixed restarted units are `factory-v1-workbench.service`,
+`factory-remote-health.service`, `factory-paper-heartbeat.timer`, and
+`factory-remote-backup.timer`. The observation schedule timer is not manually
+restarted by this route; the expected collector interruption is therefore
+limited to the fixed units plus the file replacement window, followed by a
+separate live readback. The route itself does not authorize, activate, or call
+a provider.
+
+Rollback is triggered by a non-zero release step, final deploy-pin mismatch,
+failed post-deploy doctor/readback, or failed first healthy tick. Use the same
+route with the bindings inverted (`--target-sha
+ba7f3b725ff4f609e251a4e57751246636e8f8f7 --previous-sha <TARGET_SHA>`) and
+accept only after `.factory_deploy_sha` reads back to the previous live SHA.
+This handoff is proposed evidence only; this atom performs no live action.
+
 ### No-live smoke (safe when no activation)
 
 ```
