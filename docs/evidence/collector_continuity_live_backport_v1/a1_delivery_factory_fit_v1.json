@@ -1,0 +1,31 @@
+{
+  "as_of": "2026-09-22",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "LIVE_COLLECTOR_READBACK_AFTER_OWNER_DEPLOY"
+  },
+  "dimensions": {
+    "build_vs_buy": "PENDING_FINAL_BINDING",
+    "context_efficiency": "PENDING_FINAL_BINDING",
+    "execution_to_cashflow": "PENDING_FINAL_BINDING",
+    "flexibility_and_history": "PENDING_FINAL_BINDING",
+    "mission": "PENDING_FINAL_BINDING",
+    "monitoring_and_recovery": "PENDING_FINAL_BINDING",
+    "owner_operability": "PENDING_FINAL_BINDING",
+    "red_team": "PENDING_FINAL_BINDING",
+    "research_truth": "PENDING_FINAL_BINDING",
+    "security": "PENDING_FINAL_BINDING"
+  },
+  "limits": [
+    "PENDING_FINAL_BINDING"
+  ],
+  "mode": "FULL_REVIEW",
+  "recovery": "PENDING_FINAL_BINDING",
+  "review_id": "COLLECTOR-CONTINUITY-LIVE-BACKPORT-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "UNBOUND",
+  "reviewed_inventory_sha256": "UNBOUND",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "COLLECTOR_CONTINUITY_LIVE_BACKPORT_V1",
+  "verdict": "NOT_READY"
+}
