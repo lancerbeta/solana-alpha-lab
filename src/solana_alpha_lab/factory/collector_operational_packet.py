@@ -113,6 +113,7 @@ def assess_campaign_successor_continuity(
     activation: Mapping[str, Any] | None,
     data_root: Path | None = None,
     activation_selection_ambiguous: bool = False,
+    activation_selection_not_found: bool = False,
 ) -> dict[str, Any]:
     """Owner-facing campaign continuity projection for pre-expiry attention.
 
@@ -139,6 +140,15 @@ def assess_campaign_successor_continuity(
             "campaign_successor_owner_action": (
                 "reconcile ambiguous current activation family scope before "
                 "successor assessment"
+            ),
+        }
+    if activation_selection_not_found:
+        return {
+            **empty,
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "verify exact current activation selector before successor assessment"
             ),
         }
     if activation is None:
@@ -1048,17 +1058,25 @@ def build_collector_operational_packet(
     continuity_selection_ambiguous = activation_selection_status(
         all_activations
     ) == "AMBIGUOUS"
+    continuity_selection_not_found = False
     continuity_activation = None
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
-        if requested is not None:
+        if requested is None:
+            continuity_selection_not_found = True
+            continuity_selection_ambiguous = False
+        else:
             continuity_activation = select_current_activation(
                 activation_rows_with_family_keys(store, [requested]),
                 now=clock,
                 explicit_scope=True,
             )
             continuity_selection_ambiguous = False
-    if continuity_activation is None and not continuity_selection_ambiguous:
+    if (
+        continuity_activation is None
+        and not continuity_selection_ambiguous
+        and not continuity_selection_not_found
+    ):
         continuity_activation = select_current_activation(
             all_activations, now=clock
         )
@@ -1067,6 +1085,7 @@ def build_collector_operational_packet(
         now=clock,
         activation=continuity_activation,
         activation_selection_ambiguous=continuity_selection_ambiguous,
+        activation_selection_not_found=continuity_selection_not_found,
         data_root=(
             Path(observation_rdp)
             if observation_rdp is not None

@@ -948,6 +948,89 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             payload["next_action"], "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
         )
 
+    def test_read_model_unknown_exact_selector_does_not_fallback_to_other_activation(
+        self,
+    ) -> None:
+        document = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-02T00:00:00Z",
+            schedule_key="OBS-OTHER-ACTIVE-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data_root = root / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            self.assertIsNotNone(store.acquire_lease("selector-read-model", clock=NOW))
+            registered = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=document,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            authorize_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=registered["schedule_sha256"],
+                phrase=_phrase(document),
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            activate_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=registered["schedule_sha256"],
+                activation_id="ACT-OTHER-ACTIVE",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            model = build_collector_read_model(
+                store,
+                now=NOW,
+                schedule_sha256="a" * 64,
+                activation_id="ACT-MISSING",
+            )
+            self.assertEqual(model["activation_selection_status"], "NOT_FOUND")
+            self.assertEqual(model["activation_state"], "UNKNOWN")
+            self.assertEqual(model["schedule_sha256"], "a" * 64)
+            self.assertEqual(model["activation_id"], "ACT-MISSING")
+            store.close()
+
+    def test_operational_packet_unknown_exact_selector_keeps_continuity_unknown(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            rdp = root / "rdp"
+            rdp.mkdir()
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            packet = build_collector_operational_packet(
+                root=root,
+                store=store,
+                now=NOW,
+                schedule_sha256="b" * 64,
+                activation_id="ACT-MISSING",
+                observation_rdp=rdp,
+                deploy_git_sha=GIT,
+            )
+            self.assertEqual(packet["activation_selection_status"], "NOT_FOUND")
+            self.assertEqual(packet["activation_state"], "UNKNOWN")
+            self.assertEqual(packet["activation_id"], "ACT-MISSING")
+            self.assertEqual(packet["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(packet["campaign_successor_required"])
+            self.assertIn(
+                "verify exact current activation selector",
+                packet["campaign_successor_owner_action"],
+            )
+            store.close()
+
     def test_read_model_keeps_genuine_current_aborted(self) -> None:
         activations = [
             {

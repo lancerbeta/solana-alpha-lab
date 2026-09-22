@@ -361,6 +361,11 @@ If an exact schedule+activation selector matches no registered activation,
 doctor returns `DOCTOR_SELECTOR_NOT_FOUND` / exit 2 with
 `next_action=VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR`; do not interpret that
 terminal as permission to register or activate a replacement.
+Status/read-model and owner-packet callers using the same exact selector also
+fail closed: `activation_selection_status=NOT_FOUND` and
+`activation_state=UNKNOWN`; continuity remains `UNKNOWN` with
+`CAMPAIGN_SUCCESSOR_REQUIRED` and owner action to verify the selector. They do
+not fall back to another current activation.
 
 ## Secrets
 

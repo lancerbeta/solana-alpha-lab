@@ -452,7 +452,9 @@ def build_collector_read_model(
     selected = None
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
-        if requested is not None:
+        if requested is None:
+            selection_status = "NOT_FOUND"
+        else:
             selected = select_current_activation(
                 activation_rows_with_family_keys(store, [requested]),
                 now=now,
@@ -465,7 +467,7 @@ def build_collector_read_model(
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
     activation_state = (
         "UNKNOWN"
-        if selection_status == "AMBIGUOUS"
+        if selection_status in {"AMBIGUOUS", "NOT_FOUND"}
         else str((selected or {}).get("state") or "NONE")
     )
 
