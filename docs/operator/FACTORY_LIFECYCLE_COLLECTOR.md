@@ -202,15 +202,15 @@ recovery check below. Read both operational `last_transition_event_id` values
 for the predecessor and successor with the existing read-only `status` command:
 
 ```text
-uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <PREDECESSOR_SCHEDULE_SHA256> --activation-id <PREDECESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
-uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <SUCCESSOR_SCHEDULE_SHA256> --activation-id <SUCCESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <PREDECESSOR_SCHEDULE_SHA256> --activation-id <PREDECESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --schedule-sha256 <SUCCESSOR_SCHEDULE_SHA256> --activation-id <SUCCESSOR_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
 ```
 
 Take `activations[0].transition_event_id` from each JSON result; `UNKNOWN`
 is a terminal proof gap. Then inspect both immutable events:
 
 ```text
-uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); ids={('<PREDECESSOR_SCHEDULE_SHA256>','<PREDECESSOR_ACTIVATION_ID>','<PREDECESSOR_TRANSITION_EVENT_ID>'),('<SUCCESSOR_SCHEDULE_SHA256>','<SUCCESSOR_ACTIVATION_ID>','<SUCCESSOR_TRANSITION_EVENT_ID>')}; print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'transaction_id':r.transaction_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id) in ids], sort_keys=True))"
+/usr/bin/uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); ids={('<PREDECESSOR_SCHEDULE_SHA256>','<PREDECESSOR_ACTIVATION_ID>','<PREDECESSOR_TRANSITION_EVENT_ID>'),('<SUCCESSOR_SCHEDULE_SHA256>','<SUCCESSOR_ACTIVATION_ID>','<SUCCESSOR_TRANSITION_EVENT_ID>')}; print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'transaction_id':r.transaction_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id) in ids], sort_keys=True))"
 ```
 
 The predecessor event must be `DRAINING` with
@@ -276,7 +276,7 @@ Not expected:
    `late_recovery_event_id` with this read-only check:
 
 ```text
-uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); rows,_=s.iter_lifecycle_records_bounded(schedule_sha256='<SCHEDULE_SHA256>', activation_id='<ACTIVATION_ID>'); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in rows if r.record_id == '<LATE_RECOVERY_EVENT_ID>'], sort_keys=True))"
+/usr/bin/uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); rows,_=s.iter_lifecycle_records_bounded(schedule_sha256='<SCHEDULE_SHA256>', activation_id='<ACTIVATION_ID>'); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in rows if r.record_id == '<LATE_RECOVERY_EVENT_ID>'], sort_keys=True))"
 ```
 
 If it prints no matching immutable event or the payload is not the committed
@@ -287,12 +287,12 @@ reports `APPEND_ONLY_DRAINING_TRANSITION`. The existing CLI flow is:
 
 ```text
 SCHEDULE=<forward-successor-yaml>
-uv run --locked --managed-python python -B scripts/observation_schedule.py validate --schedule "$SCHEDULE"
-uv run --locked --managed-python python -B scripts/observation_schedule.py register --schedule "$SCHEDULE" --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py validate --schedule "$SCHEDULE"
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py register --schedule "$SCHEDULE" --runtime-config configs/observation_schedule_runtime_v1.yaml
 # Take schedule_sha256 from the REGISTERED JSON, then print the exact owner phrase:
-uv run --locked --managed-python python -B -c "from pathlib import Path; from solana_alpha_lab.factory.observation_schedule import load_observation_schedule; from solana_alpha_lab.factory.observation_schedule_lifecycle import build_authority_request; d=load_observation_schedule(Path('.'), '<forward-successor-yaml>'); print(build_authority_request(root=Path('.'), document=d)['exact_owner_phrase'])"
-uv run --locked --managed-python python -B scripts/observation_schedule.py authorize --schedule-sha256 <SCHEDULE_SHA256> --phrase '<EXACT_OWNER_PHRASE>' --runtime-config configs/observation_schedule_runtime_v1.yaml
-uv run --locked --managed-python python -B scripts/observation_schedule.py activate --schedule-sha256 <SCHEDULE_SHA256> --activation-id <OWNER_SELECTED_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B -c "from pathlib import Path; from solana_alpha_lab.factory.observation_schedule import load_observation_schedule; from solana_alpha_lab.factory.observation_schedule_lifecycle import build_authority_request; d=load_observation_schedule(Path('.'), '<forward-successor-yaml>'); print(build_authority_request(root=Path('.'), document=d)['exact_owner_phrase'])"
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py authorize --schedule-sha256 <SCHEDULE_SHA256> --phrase '<EXACT_OWNER_PHRASE>' --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py activate --schedule-sha256 <SCHEDULE_SHA256> --activation-id <OWNER_SELECTED_ACTIVATION_ID> --runtime-config configs/observation_schedule_runtime_v1.yaml
 ```
 
 The exact phrase and activation ID remain owner-controlled; this repair does
@@ -317,6 +317,13 @@ When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
 2. Register the successor schedule if missing, then **authorize** it before
    expiry (or commit in-window `rollover` while admission is still open).
+   For an in-window cutover, use the exact registered identities and the
+   chosen cutover timestamp:
+
+```text
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py rollover --predecessor-schedule-sha256 <PREDECESSOR_SCHEDULE_SHA256> --predecessor-activation-id <PREDECESSOR_ACTIVATION_ID> --successor-schedule-sha256 <SUCCESSOR_SCHEDULE_SHA256> --successor-activation-id <SUCCESSOR_ACTIVATION_ID> --cutover-at <CUTOVER_AT> --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
 3. Attention clears once a continuity-valid state is `AUTHORIZED` or
    `ROLLOVER_READY`; the Telegram card is `FACTORY / ATTENTION — ACTION` with
    `MESSAGE_TYPE=ATTENTION` and `ATTENTION=CAMPAIGN_SUCCESSOR_REQUIRED`, rather

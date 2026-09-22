@@ -29,10 +29,10 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     open_dir,
     project_7d_disk_used,
 )
-from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
-from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+from solana_alpha_lab.factory.observation_schedule import (
     cohort_family_key,
-    rollover_research_event_proven,
+    parse_utc,
+    render_utc,
 )
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.offhost_backup import offhost_health_snapshot
@@ -67,6 +67,16 @@ _PUBLICATION_EXPECTATION_COUNT_FIELDS = (
     "actually_overdue_count",
     "in_flight_count",
 )
+
+
+def _rollover_research_event_proven(*args: Any, **kwargs: Any) -> bool:
+    """Load the parquet-backed proof path only when a rollover is present."""
+
+    from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+        rollover_research_event_proven,
+    )
+
+    return rollover_research_event_proven(*args, **kwargs)
 
 HEALTH_CLASSES = (
     "PROCESS_OK",
@@ -257,7 +267,7 @@ def assess_campaign_successor_continuity(
                 successor_reg["document"], current_stops
             ) and _rollover_proves_continuity(
                 item, successor_sha, successor_reg["document"]
-            ) and rollover_research_event_proven(
+            ) and _rollover_research_event_proven(
                 data_root,
                 item=item,
                 predecessor_document=registered["document"],

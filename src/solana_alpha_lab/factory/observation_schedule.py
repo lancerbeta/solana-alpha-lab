@@ -61,6 +61,21 @@ def canonical_sha256(value: object) -> str:
     return hashlib.sha256(canonical_json_bytes(value)).hexdigest()
 
 
+def cohort_family_key(document: Mapping[str, Any]) -> str:
+    """Identity of the scientific cohort, independent of horizon or key."""
+
+    population = document["population"]
+    return canonical_sha256(
+        {
+            "seed": document["sampling"]["seed"],
+            "source_poll": document["source_poll"],
+            "source_predicates": population["source_predicates"],
+            "x_eligibility_predicates": population["x_eligibility_predicates"],
+            "x_point": document["x_point"],
+        }
+    )
+
+
 def canonical_sha256_array(items: Iterable[object]) -> str:
     """Streaming equivalent of canonical_sha256(list(items))."""
     digest = hashlib.sha256()
@@ -283,6 +298,7 @@ __all__ = [
     "ObservationScheduleError",
     "canonical_json_bytes",
     "canonical_sha256",
+    "cohort_family_key",
     "collection_projection",
     "load_observation_schedule",
     "parse_utc",

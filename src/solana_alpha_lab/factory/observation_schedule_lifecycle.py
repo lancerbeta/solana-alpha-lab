@@ -24,6 +24,7 @@ from solana_alpha_lab.factory.observation_primitive_registry import (
 )
 from solana_alpha_lab.factory.observation_schedule import (
     canonical_sha256,
+    cohort_family_key as schedule_cohort_family_key,
     parse_utc,
     render_utc,
     schedule_sha256 as compute_schedule_sha256,
@@ -850,16 +851,8 @@ def _require_live_authority(
 
 def cohort_family_key(document: Mapping[str, Any]) -> str:
     """Identity of the scientific cohort, independent of Y horizon / schedule_key."""
-    population = document["population"]
-    return canonical_sha256(
-        {
-            "seed": document["sampling"]["seed"],
-            "source_poll": document["source_poll"],
-            "source_predicates": population["source_predicates"],
-            "x_eligibility_predicates": population["x_eligibility_predicates"],
-            "x_point": document["x_point"],
-        }
-    )
+
+    return schedule_cohort_family_key(document)
 
 
 def _cohort_family_key(document: Mapping[str, Any]) -> str:
