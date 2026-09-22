@@ -46,6 +46,7 @@ from solana_alpha_lab.factory.hfic_session import (
     evidence_epoch_sha256,
     focus_key_sha256,
     search_key_sha256,
+    list_scientific_slot_admissions,
 )
 from solana_alpha_lab.factory.hfic_prior_memory import (
     build_prior_memory_snapshot,
@@ -765,15 +766,6 @@ def forge_control_ready(
     coverage = str(labels.get("discovery_coverage_class") or "")
     _require(coverage != "GAP_CONFIRMED", "COVERAGE_CONFIRMED_BROKEN")
     material = evidence_epoch_material(repo_root=repo_root, data_root=data_root)
-    epoch = evidence_epoch_sha256(material)
-    sessions = _query_hfic_sessions(Path(data_root))
-    blocking = [
-        item
-        for item in sessions
-        if str(item.get("session_state") or "") in BROKEN_SESSION_STATES
-        and str(item.get("evidence_epoch_sha256") or "") == epoch
-    ]
-    _require(not blocking, "HFIC_SESSION_BLOCKED")
     store: ExistingResearchStoreReader | None
     try:
         store = ExistingResearchStoreReader(Path(data_root))
@@ -788,6 +780,29 @@ def forge_control_ready(
             repo_root=repo_root,
         )
         blocked = set(quarantined_session_ids(store))
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        compute_split_identity,
+    )
+
+    try:
+        split = compute_split_identity(
+            Path(repo_root), Path(data_root), store=store
+        )
+    except EvidenceIdentityError as exc:
+        _require(False, str(exc))
+        raise AssertionError("unreachable")
+    market_epoch = str(split["market_evidence_epoch_sha256"])
+    capability_epoch = str(split["capability_epoch_sha256"])
+    legacy_epoch = str(split["legacy_combined_evidence_epoch_sha256"])
+    sessions = _query_hfic_sessions(Path(data_root))
+    blocking = [
+        item
+        for item in sessions
+        if str(item.get("session_state") or "") in BROKEN_SESSION_STATES
+        and str(item.get("market_evidence_epoch_sha256") or "") == market_epoch
+    ]
+    _require(not blocking, "HFIC_SESSION_BLOCKED")
     for capsule in prior.get("capsules") or []:
         if not isinstance(capsule, Mapping):
             continue
@@ -805,18 +820,27 @@ def forge_control_ready(
     focus_key = focus_key_sha256(focus)
     memory_eligibility = str(policy_head.get("memory_eligibility_sha256") or "0" * 64)
     search_key = search_key_sha256(
-        epoch, focus, PROMPT_VERSION, memory_eligibility, CURRENT_REPRESENTATION_CONTROL_V1
+        market_epoch,
+        focus,
+        PROMPT_VERSION,
+        memory_eligibility,
+        CURRENT_REPRESENTATION_CONTROL_V1,
     )
+    reservations = list_scientific_slot_admissions(store) if store is not None else []
     action, _bound = decide_preflight_action(
         sessions,
         search_key=search_key,
-        evidence_epoch=epoch,
+        evidence_epoch=market_epoch,
         focus_key=focus_key,
         owner_focus=focus,
         memory_eligibility_sha256=memory_eligibility,
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+        representation_id="BASE",
+        representation_semantic_version="HFIC-V1.2",
+        reservations=reservations,
     )
-    _require(action != "STOP", "SEARCH_BUDGET_EXHAUSTED")
+    if action == "STOP":
+        _require(False, str(_bound or "SEARCH_BUDGET_EXHAUSTED"))
     _require(
         action
         in {
@@ -826,6 +850,7 @@ def forge_control_ready(
             "RESUME_CLASSIFY",
             "RESUME_CRITIC",
             "RETURN_EXISTING_SESSION",
+            "RESUME_EXISTING_SESSION",
         },
         "CONTROL_SESSION_NOT_ENTERABLE",
     )
@@ -842,7 +867,10 @@ def forge_control_ready(
         ),
         "min_usable_yield_eligible": MIN_USABLE_YIELD_ELIGIBLE,
         "min_usable_base_x_population": MIN_USABLE_BASE_X_POPULATION,
-        "evidence_epoch_sha256": epoch,
+        "evidence_epoch_sha256": legacy_epoch,
+        "market_evidence_epoch_sha256": market_epoch,
+        "capability_epoch_sha256": capability_epoch,
+        "legacy_combined_evidence_epoch_sha256": legacy_epoch,
         "discovery_coverage_class": coverage or None,
         "enumerate_warnings": list(warnings),
         "next": CONTROL_NEXT,

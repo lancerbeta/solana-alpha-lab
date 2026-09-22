@@ -97,7 +97,7 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
         (
             "market_evidence_epoch: "
             + (
-                str(receipt.get("market_evidence_epoch_sha256"))[:16] + "…"
+                str(receipt.get("market_evidence_epoch_sha256"))
                 if isinstance(receipt.get("market_evidence_epoch_sha256"), str)
                 and len(str(receipt.get("market_evidence_epoch_sha256"))) == 64
                 else "(unset)"
@@ -107,7 +107,7 @@ def format_forge_input_owner_block(receipt: Mapping[str, Any]) -> str:
         (
             "capability_epoch: "
             + (
-                str(receipt.get("capability_epoch_sha256"))[:16] + "…"
+                str(receipt.get("capability_epoch_sha256"))
                 if isinstance(receipt.get("capability_epoch_sha256"), str)
                 and len(str(receipt.get("capability_epoch_sha256"))) == 64
                 else "(unset)"

@@ -38,6 +38,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_session.py
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
   - src/solana_alpha_lab/factory/forge_input_receipt.py
+  - src/solana_alpha_lab/factory/live_cohort_to_forge.py
   - src/solana_alpha_lab/factory/hfic_memory_policy.py
   - src/solana_alpha_lab/factory/fast_lane_snapshot.py
   - schemas/research_memory_projection_v1.sql

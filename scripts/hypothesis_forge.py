@@ -365,6 +365,25 @@ def cmd_forge_run(
             print(readout, file=sys.stderr)
         return emit(payload, exit_code=exit_code)
 
+    def _ladder_error_payload(code: str) -> dict[str, Any]:
+        input_codes = {
+            "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+            "CURRENT_CORPUS_MISSING",
+            "CAPABILITY_PROTOCOL_SURFACE_INCOMPLETE",
+            "CAPABILITY_SEMANTIC_SURFACE_INCOMPLETE",
+            "CAPABILITY_IDENTITY_UNAVAILABLE",
+        }
+        owner_class = "INPUT_NOT_READY" if code in input_codes else "OBSERVABILITY_BLOCKED"
+        return {
+            "schema": "smial.forge-run-receipt",
+            "schema_version": "1.0",
+            "owner_class": owner_class,
+            "next_action": owner_class,
+            "owner_final": owner_class,
+            "blocking_reason_codes": [code],
+            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+        }
+
     try:
         resolved = resolve_existing_data_root(
             repo_root, explicit_data_root=explicit_data_root
@@ -416,26 +435,9 @@ def cmd_forge_run(
             saved_draft_sha256=saved_draft_sha256,
         )
     except LadderError as exc:
-        code = str(exc)
-        if code == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
-            payload = {
-                "schema": "smial.forge-run-receipt",
-                "schema_version": "1.0",
-                "owner_class": "INPUT_NOT_READY",
-                "next_action": "INPUT_NOT_READY",
-                "owner_final": "INPUT_NOT_READY",
-                "blocking_reason_codes": [code],
-                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
-                "owner_readout": (
-                    "FORGE RUN\n"
-                    "status: BLOCKED — incomplete market evidence basis; "
-                    "not a scientific admission\n"
-                    f"blocking: {code}\n"
-                    "NEXT — restore decision-bearing datasets/lineage, then retry"
-                ),
-            }
-            return _emit_run(payload, exit_code=2)
-        raise
+        payload = _ladder_error_payload(str(exc))
+        payload["owner_readout"] = format_forge_run_owner_readout(payload)
+        return _emit_run(payload, exit_code=2)
     payload = {**receipt, "no_write": not persist, "selection_reason": resolved.selection_reason}
     from solana_alpha_lab.factory.hfic_representation_ladder import (
         attach_ladder_freeze_preflight,
@@ -450,13 +452,18 @@ def cmd_forge_run(
         "INPUT_NOT_READY",
         "OBSERVABILITY_BLOCKED",
     }:
-        receipt = evaluate_forge_run(
-            repo_root,
-            resolved.root,
-            owner_focus=owner_focus if owner_focus.strip() else "AUTO",
-            persist=True,
-            saved_draft_sha256=saved_draft_sha256,
-        )
+        try:
+            receipt = evaluate_forge_run(
+                repo_root,
+                resolved.root,
+                owner_focus=owner_focus if owner_focus.strip() else "AUTO",
+                persist=True,
+                saved_draft_sha256=saved_draft_sha256,
+            )
+        except LadderError as exc:
+            payload = _ladder_error_payload(str(exc))
+            payload["owner_readout"] = format_forge_run_owner_readout(payload)
+            return _emit_run(payload, exit_code=2)
         payload = {**receipt, "no_write": False, "selection_reason": resolved.selection_reason}
         payload = attach_ladder_freeze_preflight(
             payload, data_root=resolved.root, store=store

@@ -51,6 +51,7 @@ from solana_alpha_lab.factory.hfic_session import (
     list_hfic_sessions,
     load_session_bundle,
     pick_session,
+    _bundle_ladder_slot,
 )
 from solana_alpha_lab.factory.research_store import (
     RecordKind,
@@ -860,6 +861,19 @@ def control_preflight_from_bundle(
         value = bundle.get(key) or receipt.get(key)
         if isinstance(value, str) and len(value) == 64:
             body[key] = value
+    basis = bundle.get("market_evidence_basis") or receipt.get(
+        "market_evidence_basis"
+    )
+    market = body.get("market_evidence_epoch_sha256")
+    if isinstance(basis, Mapping) and isinstance(market, str) and len(market) == 64:
+        # Readback reuses the persisted A3 basis; freeze rehashes it before
+        # any lifecycle write and stops if the historical identity drifted.
+        body["forge_input_receipt"] = {
+            "forge_runnable": True,
+            "market_evidence_epoch_sha256": market,
+            "market_evidence_basis": dict(basis),
+            "reconstructed_from_session_readback": True,
+        }
     return body
 
 
@@ -906,6 +920,35 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 "BLOCKED — occupied slot has no readable lifecycle row; "
                 "not a scientific negative and not permission to regenerate"
             )
+        elif "SEARCH_BUDGET_EXHAUSTED" in blocking:
+            status = (
+                "STOP — current market search budget is exhausted; "
+                "do not retry or mint a new look"
+            )
+        elif {
+            "SCIENTIFIC_IDENTITY_CONFLICT",
+            "SCIENTIFIC_SLOT_IDENTITY_INVALID",
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            "SCIENTIFIC_SLOT_OCCUPIED",
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+            "REPRESENTATION_SLOT_OCCUPIED",
+            "MARKET_IDENTITY_DRIFT",
+            "MARKET_IDENTITY_BASIS_MISSING",
+            "CAPABILITY_IDENTITY_DRIFT",
+        } & set(blocking):
+            status = (
+                "BLOCKED — identity/readback conflict; "
+                "do not regenerate or reset budget"
+            )
+        elif {
+            "CAPABILITY_IDENTITY_UNAVAILABLE",
+            "CAPABILITY_PROTOCOL_SURFACE_INCOMPLETE",
+            "CAPABILITY_SEMANTIC_SURFACE_INCOMPLETE",
+        } & set(blocking):
+            status = (
+                "BLOCKED — capability identity is unavailable; "
+                "no scientific admission or budget reset"
+            )
         else:
             status = "BLOCKED — stop; not a scientific negative"
     elif next_action == ACTION_RETURN_EXISTING or receipt.get("persisted_receipt_sha256"):
@@ -940,7 +983,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         str(item) for item in (receipt.get("blocking_reason_codes") or [])
     }:
         status = (
-            "NEXT — START CONTROL-compatible BASE for V1 ladder; "
+            "NEXT — CONTROL-compatible BASE required for V1; run "
+            "/hypothesis-forge CURRENT_REPRESENTATION_CONTROL "
+            "(preflight --control-current-representation), then verify START_BASE; "
             "not ordinary evening DONE"
         )
     elif next_action == ACTION_START_BASE:
@@ -968,7 +1013,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         (
             "market_epoch: "
             + (
-                str(receipt.get("market_evidence_epoch_sha256"))[:16]
+                str(receipt.get("market_evidence_epoch_sha256"))
                 if isinstance(receipt.get("market_evidence_epoch_sha256"), str)
                 and len(str(receipt.get("market_evidence_epoch_sha256"))) == 64
                 else "NONE"
@@ -978,7 +1023,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         (
             "capability_epoch: "
             + (
-                str(receipt.get("capability_epoch_sha256"))[:16]
+                str(receipt.get("capability_epoch_sha256"))
                 if isinstance(receipt.get("capability_epoch_sha256"), str)
                 and len(str(receipt.get("capability_epoch_sha256"))) == 64
                 else "NONE"
@@ -988,14 +1033,14 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         (
             "scientific_slot: "
             + (
-                str(receipt.get("scientific_slot_sha256"))[:16]
+                str(receipt.get("scientific_slot_sha256"))
                 if isinstance(receipt.get("scientific_slot_sha256"), str)
                 and len(str(receipt.get("scientific_slot_sha256"))) == 64
                 else "NONE"
             )
             + "  # market+representation+focus"
         ),
-        f"legacy_epoch: {(receipt.get('legacy_epoch_sha256') or 'NONE')[:16]}",
+        f"legacy_epoch: {receipt.get('legacy_epoch_sha256') or 'NONE'}",
         "frozen_versions: "
         + (
             ", ".join(str(item) for item in receipt.get("frozen_representation_versions") or [])
@@ -1004,7 +1049,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         (
             "execution_binding: "
             + (
-                str(receipt.get("execution_binding_sha256"))[:16]
+                str(receipt.get("execution_binding_sha256"))
                 if isinstance(receipt.get("execution_binding_sha256"), str)
                 and len(str(receipt.get("execution_binding_sha256"))) == 64
                 else "UNKNOWN"
@@ -1016,7 +1061,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             continue
         used = ", ".join(stage.get("used_cohort_ids") or []) or "NONE"
         draft = stage.get("draft_sha256")
-        draft_note = f" draft={(draft[:16] if isinstance(draft, str) else 'NONE')}"
+        draft_note = f" draft={(draft if isinstance(draft, str) else 'NONE')}"
         lines.append(
             "stage {id}@{version}: {status} terminal={term} scope={scope} used={used}{draft}".format(
                 id=stage.get("representation_id"),
@@ -1079,6 +1124,40 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: RESTORE_CURRENT_EVIDENCE — restore decision-bearing datasets/lineage, "
             "then retry normal /hypothesis-forge"
         )
+    elif "SEARCH_BUDGET_EXHAUSTED" in blocking:
+        lines.append(
+            "next: STOP_BUDGET — current market slot is occupied/exhausted; "
+            "do not retry or reset counters"
+        )
+    elif {
+        "SCIENTIFIC_IDENTITY_CONFLICT",
+        "SCIENTIFIC_SLOT_IDENTITY_INVALID",
+        "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+        "SCIENTIFIC_SLOT_OCCUPIED",
+        "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+        "REPRESENTATION_SLOT_OCCUPIED",
+        "MARKET_IDENTITY_DRIFT",
+        "MARKET_IDENTITY_BASIS_MISSING",
+        "CAPABILITY_IDENTITY_DRIFT",
+    } & set(blocking):
+        lines.append(
+            "next: RESOLVE_IDENTITY_CONFLICT — restore the authoritative readback; "
+            "do not regenerate or reset budget"
+        )
+    elif {
+        "CAPABILITY_IDENTITY_UNAVAILABLE",
+        "CAPABILITY_PROTOCOL_SURFACE_INCOMPLETE",
+        "CAPABILITY_SEMANTIC_SURFACE_INCOMPLETE",
+    } & set(blocking):
+        lines.append(
+            "next: RESTORE_CAPABILITY_SURFACE — restore the protocol/semantic "
+            "capability surface, then retry; do not reset market budget"
+        )
+    elif "CONTROL_SURFACE_REQUIRED" in blocking:
+        lines.append(
+            "next: CONTROL_ENTRY — run /hypothesis-forge CURRENT_REPRESENTATION_CONTROL "
+            "with --control-current-representation, then verify START_BASE"
+        )
     elif owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
         ACTION_INPUT_NOT_READY,
         ACTION_OBSERVABILITY_BLOCKED,
@@ -1096,7 +1175,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     )
     lines.append(f"persisted: {persist_note}")
     if isinstance(persisted_sha, str) and persisted_sha:
-        lines.append(f"persisted_receipt: {persisted_sha[:16]}")
+        lines.append(f"persisted_receipt: {persisted_sha}")
     pending = receipt.get("ladder_freeze_pending_reason")
     if isinstance(pending, str) and pending.strip():
         # Soft-pend keeps START_V1; integrity stop must not reuse "pending".
@@ -1145,7 +1224,16 @@ def _stage_from_session(
     if not bound:
         bound = _bound_cohort_ids(bundle, packet)
     applicable = bool(bound)
-    status = EXEC_REUSED if state == "SYNTHESIS_COMPLETE" and applicable else EXEC_EXECUTED
+    reusable_terminal = (
+        terminal in PASS_TERMINALS
+        or terminal in CASE_A_TERMINALS
+        or terminal in KNOWN_SCIENTIFIC_NEGATIVES
+    )
+    status = (
+        EXEC_REUSED
+        if state == "SYNTHESIS_COMPLETE" and applicable and reusable_terminal
+        else EXEC_EXECUTED
+    )
     if state in PAUSE_STATES or state in RESUME_STATES:
         status = EXEC_EXECUTED
     stage_ref = _stage_ref_sha256(bundle)
@@ -1604,24 +1692,37 @@ def _session_applicable_to_current_market(
     if not isinstance(current_market_epoch, str) or len(current_market_epoch) != 64:
         return True
     from solana_alpha_lab.factory.hfic_evidence_identity import (
-        DISPOSITION_COMPATIBLE,
-        classify_legacy_session_disposition,
-        session_matches_market_epoch,
+        scientific_slot_sha256,
     )
 
-    if session_matches_market_epoch(bundle, current_market_epoch):
-        return True
-    stamped = bundle.get("market_evidence_epoch_sha256")
-    if isinstance(stamped, str) and stamped:
-        return stamped == current_market_epoch
-    disposition = classify_legacy_session_disposition(
-        bundle,
-        current_market_epoch=current_market_epoch,
-        current_visible_cohort_ids=visible,
+    if bundle.get("identity_binding_status") == "CONFLICT":
+        return False
+    if bundle.get("market_evidence_epoch_sha256") != current_market_epoch:
+        # Missing A5 stamps keep a known historical look occupied, but they
+        # are not enough to make a current lifecycle row reusable.
+        return False
+    receipt = bundle.get("session_receipt")
+    packet = bundle.get("critic_input_packet")
+    representation_id, _parent = _bundle_ladder_slot(bundle, packet)
+    version = (
+        bundle.get("representation_semantic_version")
+        or (receipt.get("representation_semantic_version") if isinstance(receipt, Mapping) else None)
+        or (packet.get("representation_semantic_version") if isinstance(packet, Mapping) else None)
     )
-    # Compatible reuse only. Historical / unresolved must not become REUSED_VALID
-    # for a new market; unresolved also does not free the known look.
-    return disposition.get("disposition") == DISPOSITION_COMPATIBLE
+    focus = (
+        bundle.get("owner_focus")
+        or (receipt.get("owner_focus") if isinstance(receipt, Mapping) else None)
+        or (packet.get("owner_focus") if isinstance(packet, Mapping) else None)
+    )
+    if not isinstance(version, str) or not version.strip() or not isinstance(focus, str) or not focus.strip():
+        return False
+    expected_slot = scientific_slot_sha256(
+        market_evidence_epoch_sha256=current_market_epoch,
+        representation_id=representation_id,
+        representation_semantic_version=version,
+        owner_focus=focus,
+    )
+    return bundle.get("scientific_slot_sha256") == expected_slot
 
 
 def _discover_ladder_stages(
@@ -1997,10 +2098,23 @@ def evaluate_forge_run(
                 except EvidenceIdentityError:
                     market_epoch_for_discovery = None
         if not saved_draft_sha256 and isinstance(market_epoch_for_discovery, str):
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                scientific_slot_sha256 as _scientific_slot_sha256,
+            )
+
+            base_version = representation_semantic_version(registry_doc, "BASE")
             generated = find_generated_draft(
                 store,
                 market_evidence_epoch_sha256=market_epoch_for_discovery,
                 owner_focus=owner_focus,
+                representation_id="BASE",
+                representation_semantic_version=base_version,
+                scientific_slot_sha256=_scientific_slot_sha256(
+                    market_evidence_epoch_sha256=market_epoch_for_discovery,
+                    representation_id="BASE",
+                    representation_semantic_version=base_version,
+                    owner_focus=owner_focus,
+                ),
             )
             if isinstance(generated, Mapping):
                 candidate_sha = generated.get("payload_sha256")
@@ -2067,6 +2181,15 @@ def evaluate_forge_run(
                 owner_focus=owner_focus,
             )
             existing = _lookup_run_artifact(store, legacy_identity)
+            if existing is not None and (
+                existing.get("market_evidence_epoch_sha256") != str(market_epoch)
+                or list(existing.get("frozen_representation_versions") or [])
+                != frozen_representation_versions
+            ):
+                # Versionless run identities are historical-only.  They do
+                # not answer the current semantic ladder after a version
+                # change, even when the market hash happens to match.
+                existing = None
             if existing is not None:
                 run_identity = str(existing.get("run_identity_sha256") or legacy_identity)
     except ResearchStoreError:
@@ -2123,7 +2246,52 @@ def evaluate_forge_run(
                     or representation_semantic_version(registry_doc, active_rep)
                 )
                 break
-    elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE, ACTION_RETURN_EXISTING}:
+    elif next_action in {
+        ACTION_OWNER_CANDIDATE,
+        ACTION_FINISH_RUNNER_UP,
+        ACTION_RETURN_EXISTING,
+    }:
+        order_by_id = {
+            str(row.get("id") or ""): int(row.get("order") or 0)
+            for row in registry_doc.get("representations") or []
+            if isinstance(row, Mapping)
+        }
+        terminal_stages = [
+            row
+            for row in resolved_stages
+            if isinstance(row, Mapping)
+            and str(row.get("representation_id") or "BASE") != "BASE"
+            and (
+                row.get("representation_payload_sha256")
+                or row.get("session_id")
+                or row.get("effective_terminal")
+            )
+        ]
+        terminal_stages.sort(
+            key=lambda row: (
+                order_by_id.get(str(row.get("representation_id") or ""), -1),
+                str(row.get("representation_id") or ""),
+            ),
+            reverse=True,
+        )
+        if terminal_stages:
+            selected = terminal_stages[0]
+            active_rep = str(selected.get("representation_id") or "BASE")
+            active_version = str(
+                selected.get("semantic_version")
+                or representation_semantic_version(registry_doc, active_rep)
+            )
+        else:
+            for row in resolved_stages:
+                rid = str(row.get("representation_id") or "") if isinstance(row, Mapping) else ""
+                if rid == "BASE":
+                    active_rep = "BASE"
+                    active_version = str(
+                        row.get("semantic_version")
+                        or representation_semantic_version(registry_doc, active_rep)
+                    )
+                    break
+    elif next_action in {ACTION_START_BASE, ACTION_RESUME_BASE}:
         for row in resolved_stages:
             rid = str(row.get("representation_id") or "") if isinstance(row, Mapping) else ""
             if rid in {"BASE", "CURRENT_REPRESENTATION_CONTROL_V1", "ORDINARY_BASE"} or rid == "BASE":
@@ -2216,10 +2384,10 @@ def evaluate_forge_run(
                 if isinstance(candidate_model, str) and len(candidate_model) == 64:
                     active_model = candidate_model
                     break
-        # A binding hash is not a substitute for missing execution
-        # provenance.  Keep it UNKNOWN until at least one actual payload,
-        # memory, or model component is present.
-        if active_payload is not None or memory_elig is not None or active_model is not None:
+        # A binding hash is not a substitute for missing representation
+        # execution.  Memory/model metadata alone cannot turn an unexecuted
+        # or no-worthy stage into provenance-bearing work.
+        if active_payload is not None:
             exec_binding = execution_binding_sha256(
                 scientific_slot_sha256=scientific_slot,
                 capability_epoch_sha256=cap_epoch,

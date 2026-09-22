@@ -480,6 +480,11 @@ WHERE record_kind = 'DECISION_EVENT'
 CREATE VIEW hfic_search_budget AS
 SELECT
     evidence_epoch_sha256,
+    market_evidence_epoch_sha256,
+    capability_epoch_sha256,
+    ladder_representation_id,
+    representation_semantic_version,
+    scientific_slot_sha256,
     focus_key_sha256,
     search_key_sha256,
     prompt_version,

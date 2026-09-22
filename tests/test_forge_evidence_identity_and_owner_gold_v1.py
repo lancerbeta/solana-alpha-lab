@@ -51,6 +51,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
     epoch_search_budget_usage,
+    run_preflight,
 )
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
@@ -805,6 +806,33 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     evaluate_forge_run(ROOT, data_root, persist=False)
             self.assertEqual(str(ctx.exception), "MARKET_EVIDENCE_BASIS_INCOMPLETE")
             del store
+
+    def test_g10_current_incomplete_market_persist_true_is_no_write(self) -> None:
+        """A current A3 surface cannot enter legacy commissioning on persist=True."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            broken = dict(_enumerate_live(data_root)[0][0])
+            broken["dataset_fingerprint"] = "not-a-fingerprint"
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                return_value=([broken], []),
+            ):
+                receipt = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    persist=True,
+                )
+            self.assertEqual(receipt["action"], "STOP")
+            self.assertEqual(receipt["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            self.assertEqual(
+                receipt["writes"],
+                {"research_store": 0, "forge_context": 0, "session": 0},
+            )
+            self.assertFalse((data_root / "research").exists())
 
     def test_g10_tamper_outer_key_is_integrity_stop(self) -> None:
         from solana_alpha_lab.factory.hfic_control_integrity import (

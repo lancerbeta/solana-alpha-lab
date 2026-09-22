@@ -196,6 +196,9 @@ def _production_control_preflight(
         "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
         side_effect=_enumerate_production,
     ):
+        from solana_alpha_lab.factory.forge_input_receipt import (
+            build_forge_input_receipt,
+        )
         split = compute_split_identity(repo_root, data_root)
         policy = effective_policy(store)
         market_epoch = str(split["market_evidence_epoch_sha256"])
@@ -221,6 +224,12 @@ def _production_control_preflight(
             persist=True,
             evidence_surface_mode=evidence_surface_mode,
         )
+        forge_input = build_forge_input_receipt(
+            data_root,
+            repo_root=repo_root,
+            evidence_surface_mode=evidence_surface_mode,
+            owner_focus=owner_focus,
+        )
     result: dict[str, object] = {
         "receipt_id": "HFIC-PREFLIGHT-PRODUCTION-001",
         "evidence_epoch_sha256": market_epoch,
@@ -233,6 +242,7 @@ def _production_control_preflight(
         "memory_eligibility_sha256": memory_eligibility,
         "forge_context_packet_sha256": digest,
         "forge_context_packet": packet,
+        "forge_input_receipt": forge_input,
         # Same production split axes as run_preflight / forge-input admission.
         "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
         "capability_epoch_sha256": split["capability_epoch_sha256"],
@@ -902,12 +912,16 @@ class ScopeAndPersistenceTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             ResearchStore(data_root)
-            receipt = evaluate_forge_run(
-                ROOT,
-                data_root,
-                persist=False,
-                stages=[_base(), _v1(execution_status=EXEC_EXECUTED, effective_terminal="NO_WORTHY_HYPOTHESIS", stage_ref_sha256="aa" * 32)],
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                receipt = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    stages=[_base(), _v1(execution_status=EXEC_EXECUTED, effective_terminal="NO_WORTHY_HYPOTHESIS", stage_ref_sha256="aa" * 32)],
+                )
         self.assertIn("REL-C1", receipt["stages"][0]["used_cohort_ids"])
         self.assertEqual(receipt["stages"][1]["used_cohort_ids"], ["REL-C2"])
         self.assertNotEqual(
@@ -930,13 +944,21 @@ class ScopeAndPersistenceTests(unittest.TestCase):
                     stage_ref_sha256="aa" * 32,
                 ),
             ]
-            first = evaluate_forge_run(
-                ROOT, data_root, persist=True, stages=stages, existing_completed=False
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                first = evaluate_forge_run(
+                    ROOT, data_root, persist=True, stages=stages, existing_completed=False
+                )
             self.assertEqual(first["writes"]["forge_run"], 1)
-            second = evaluate_forge_run(
-                ROOT, data_root, persist=False, stages=stages, existing_completed=False
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                second = evaluate_forge_run(
+                    ROOT, data_root, persist=False, stages=stages, existing_completed=False
+                )
             self.assertEqual(second["run_identity_sha256"], first["run_identity_sha256"])
             self.assertEqual(second["next_action"], ACTION_RETURN_EXISTING)
             self.assertEqual(second["owner_final"], ACTION_SEARCH_EXHAUSTED)
@@ -965,17 +987,25 @@ class ScopeAndPersistenceTests(unittest.TestCase):
                     draft_sha256="ab" * 32,
                 )
             ]
-            first = evaluate_forge_run(
-                ROOT, data_root, persist=True, stages=stages, existing_completed=False
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                first = evaluate_forge_run(
+                    ROOT, data_root, persist=True, stages=stages, existing_completed=False
+                )
             self.assertEqual(first["next_action"], ACTION_RESUME_BASE)
-            replay = evaluate_forge_run(
-                ROOT,
-                data_root,
-                persist=False,
-                stages=first["stages"],
-                existing_completed=False,
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                replay = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    stages=first["stages"],
+                    existing_completed=False,
+                )
         self.assertEqual(replay["next_action"], ACTION_RESUME_BASE)
         self.assertNotEqual(replay["next_action"], ACTION_SEARCH_EXHAUSTED)
 

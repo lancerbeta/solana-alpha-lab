@@ -237,6 +237,35 @@ def _stamp_split_identity(
     return target
 
 
+def _market_evidence_basis_from_sources(
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any] | None:
+    """Return the production A3 market basis retained for lifecycle readback."""
+
+    for source in sources:
+        if not isinstance(source, Mapping):
+            continue
+        direct = source.get("market_evidence_basis")
+        if isinstance(direct, Mapping):
+            return dict(direct)
+        nested = source.get("forge_input_receipt")
+        if isinstance(nested, Mapping):
+            basis = nested.get("market_evidence_basis")
+            if isinstance(basis, Mapping):
+                return dict(basis)
+    return None
+
+
+def _stamp_market_evidence_basis(
+    target: dict[str, Any],
+    *sources: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    basis = _market_evidence_basis_from_sources(*sources)
+    if basis is not None:
+        target["market_evidence_basis"] = basis
+    return target
+
+
 def _first_valid_hash(
     sources: Sequence[Mapping[str, Any] | None], key: str
 ) -> str | None:
@@ -335,7 +364,7 @@ def _execution_identity_fields(
         # not be upgraded into a readiness-looking hash.  The parent control
         # session is part of the binding whenever a representation is bound.
         fields["execution_binding_sha256"] = None
-        if capability and (payload_sha or memory_sha or model_sha):
+        if capability and payload_sha:
             fields["execution_binding_sha256"] = execution_binding_sha256(
                 scientific_slot_sha256=slot,
                 capability_epoch_sha256=capability,
@@ -650,23 +679,27 @@ def _validate_split_identity_binding(
     # receipt.  Rehash its market basis instead of trusting a caller-provided
     # stamp.  This also keeps lineage UNKNOWN/FAIL from becoming an admission.
     forge_input = receipt.get("forge_input_receipt")
-    if isinstance(forge_input, Mapping):
-        input_market = forge_input.get("market_evidence_epoch_sha256")
-        if input_market != market:
-            raise HficSessionError("MARKET_IDENTITY_DRIFT")
-        basis = forge_input.get("market_evidence_basis")
-        if not isinstance(basis, Mapping):
-            raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
-        from solana_alpha_lab.factory.hfic_evidence_identity import (
-            EvidenceIdentityError,
-            market_evidence_epoch_sha256,
-        )
+    if not isinstance(forge_input, Mapping):
+        # A caller-provided pair of 64-hex fields is not production market
+        # provenance.  Current lifecycle writes require the no-write A3
+        # input receipt; legacy combined-only rows remain read-only.
+        raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+    input_market = forge_input.get("market_evidence_epoch_sha256")
+    if input_market != market or forge_input.get("forge_runnable") is not True:
+        raise HficSessionError("MARKET_IDENTITY_DRIFT")
+    basis = forge_input.get("market_evidence_basis")
+    if not isinstance(basis, Mapping):
+        raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        EvidenceIdentityError,
+        market_evidence_epoch_sha256,
+    )
 
-        try:
-            if market_evidence_epoch_sha256(basis) != market:
-                raise HficSessionError("MARKET_IDENTITY_DRIFT")
-        except EvidenceIdentityError as exc:
-            raise HficSessionError(str(exc)) from exc
+    try:
+        if market_evidence_epoch_sha256(basis) != market:
+            raise HficSessionError("MARKET_IDENTITY_DRIFT")
+    except EvidenceIdentityError as exc:
+        raise HficSessionError(str(exc)) from exc
 
     from solana_alpha_lab.factory.hfic_evidence_identity import (
         EvidenceIdentityError,
@@ -1612,6 +1645,7 @@ def freeze_draft(
     )
     _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
     _stamp_split_identity(result, bound, preflight_receipt)
+    _stamp_market_evidence_basis(result, bound, preflight_receipt)
     _stamp_execution_identity(result, bound, preflight_receipt)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
@@ -1854,6 +1888,7 @@ def _freeze_no_worthy(
     )
     _stamp_ladder_slot(result, preflight_receipt if isinstance(preflight_receipt, Mapping) else None)
     _stamp_split_identity(result, bound, preflight_receipt)
+    _stamp_market_evidence_basis(result, bound, preflight_receipt)
     _stamp_execution_identity(result, bound, preflight_receipt)
     if closed_or_suppressed_collision_count is not None:
         result["closed_or_suppressed_collision_count"] = (
@@ -2088,6 +2123,19 @@ def persist_no_worthy_session(
             raise HficSessionError("HFIC_NEXT_ACTION_ARTIFACT_MISSING")
         return {"action_type": str(existing.get("next") or "STOP")}
     _assert_scientific_admission(store, frozen)
+    # Admission is the first lifecycle boundary: legacy combined-only input
+    # must receive SCIENTIFIC_ADMISSION_REQUIRED before any current-protocol
+    # provenance diagnosis.  Once the split slot is admissible, recheck the
+    # nested A3 no-write receipt so a caller cannot replace production lineage
+    # with two self-proclaimed 64-hex stamps.
+    if (
+        isinstance(preflight_receipt, Mapping)
+        and isinstance(preflight_receipt.get("forge_input_receipt"), Mapping)
+    ):
+        _validate_split_identity_binding(
+            preflight_receipt,
+            repo_root=Path(repo_root),
+        )
     persist_scientific_slot_admission(
         store,
         frozen,
@@ -2269,6 +2317,11 @@ def persist_no_worthy_session(
                 **_execution_identity_fields(frozen),
                 **_split_identity_fields(frozen),
                 **(
+                    {"market_evidence_basis": dict(frozen["market_evidence_basis"])}
+                    if isinstance(frozen.get("market_evidence_basis"), Mapping)
+                    else {}
+                ),
+                **(
                     {"evidence_surface_mode": frozen["evidence_surface_mode"]}
                     if frozen.get("evidence_surface_mode")
                     else {}
@@ -2439,21 +2492,8 @@ def _existing_scientific_slot_admission(
     store: Any,
     scientific_slot_sha256: str,
 ) -> dict[str, Any] | None:
-    for record in store.iter_committed_records():
-        kind = getattr(record.record_kind, "value", record.record_kind)
-        if kind != "RESEARCH_ARTIFACT":
-            continue
-        try:
-            wrapper = json.loads(record.payload_json)
-            if wrapper.get("artifact_kind") != "SCIENTIFIC_SLOT_ADMISSION":
-                continue
-            raw = wrapper.get("payload_canonical")
-            if not isinstance(raw, str):
-                continue
-            body = json.loads(raw)
-        except (TypeError, ValueError, json.JSONDecodeError):
-            continue
-        if isinstance(body, Mapping) and body.get("scientific_slot_sha256") == scientific_slot_sha256:
+    for body in list_scientific_slot_admissions(store):
+        if body.get("scientific_slot_sha256") == scientific_slot_sha256:
             return dict(body)
     return None
 
@@ -2462,6 +2502,7 @@ def list_scientific_slot_admissions(store: Any) -> list[dict[str, Any]]:
     """Read append-only slot reservations, including pre-freeze reservations."""
 
     rows: dict[str, dict[str, Any]] = {}
+    conflicts: set[str] = set()
     for record in store.iter_committed_records():
         kind = getattr(record.record_kind, "value", record.record_kind)
         if kind != "RESEARCH_ARTIFACT":
@@ -2484,7 +2525,24 @@ def list_scientific_slot_admissions(store: Any) -> list[dict[str, Any]]:
         slot = body.get("scientific_slot_sha256")
         if not isinstance(slot, str) or not re.fullmatch(r"[0-9a-f]{64}", slot):
             continue
+        if hashlib.sha256(_canonical_bytes(body)).hexdigest() != digest:
+            continue
+        wrapper_session = str(wrapper.get("session_id") or "")
+        body_session = str(body.get("session_id") or "")
+        if wrapper_session and body_session and wrapper_session != body_session:
+            conflicts.add(slot)
+            continue
+        observed = rows.get(slot)
+        if observed is not None and observed != dict(body):
+            conflicts.add(slot)
+            continue
         rows[slot] = dict(body)
+    for slot in conflicts:
+        body = dict(rows.get(slot) or {})
+        body["scientific_slot_sha256"] = slot
+        body["identity_binding_status"] = "CONFLICT"
+        body["identity_conflict_fields"] = ["scientific_slot_admission"]
+        rows[slot] = body
     return list(rows.values())
 
 
@@ -2646,6 +2704,8 @@ def find_generated_draft(
     market_evidence_epoch_sha256: str,
     owner_focus: str,
     representation_id: str | None = None,
+    representation_semantic_version: str | None = None,
+    scientific_slot_sha256: str | None = None,
 ) -> dict[str, Any] | None:
     """Read a pre-freeze generator artifact; never treats embedded old drafts as new."""
 
@@ -2668,6 +2728,17 @@ def find_generated_draft(
         if wrapper.get("focus_key_sha256") != wanted_focus:
             continue
         if representation_id is not None and wrapper.get("ladder_representation_id") != representation_id:
+            continue
+        if (
+            representation_semantic_version is not None
+            and wrapper.get("representation_semantic_version")
+            != representation_semantic_version
+        ):
+            continue
+        if (
+            scientific_slot_sha256 is not None
+            and wrapper.get("scientific_slot_sha256") != scientific_slot_sha256
+        ):
             continue
         raw = wrapper.get("payload_canonical")
         digest = wrapper.get("payload_sha256")
@@ -2717,10 +2788,6 @@ def persist_generated_draft(
         raise HficSessionError("PREFLIGHT_RECEIPT_REQUIRED")
     session_id = "HFIC-SESS-" + search_key[:16].upper()
     binding = {**receipt, **fields, "session_id": session_id}
-    _assert_scientific_admission(store, binding)
-    persist_scientific_slot_admission(
-        store, binding, repo_root=repo_root, stage_time=stage_time
-    )
     draft_bytes = _canonical_bytes(draft)
     draft_sha = hashlib.sha256(draft_bytes).hexdigest()
     existing = find_generated_draft(
@@ -2728,11 +2795,21 @@ def persist_generated_draft(
         market_evidence_epoch_sha256=str(receipt.get("market_evidence_epoch_sha256") or receipt.get("evidence_epoch_sha256") or ""),
         owner_focus=str(receipt.get("owner_focus") or "AUTO"),
         representation_id=representation_id,
+        representation_semantic_version=(
+            str(fields.get("representation_semantic_version"))
+            if fields.get("representation_semantic_version") is not None
+            else None
+        ),
+        scientific_slot_sha256=slot,
     )
     if existing is not None:
         if existing.get("payload_sha256") == draft_sha:
             return existing
         raise HficSessionError("GENERATED_DRAFT_CONFLICT")
+    _assert_scientific_admission(store, binding)
+    persist_scientific_slot_admission(
+        store, binding, repo_root=repo_root, stage_time=stage_time
+    )
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
 
@@ -2894,6 +2971,7 @@ def persist_frozen_session(
             }
     _copy_evidence_surface_mode(cycle_payload, frozen)
     _stamp_split_identity(cycle_payload, frozen)
+    _stamp_market_evidence_basis(cycle_payload, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         cycle_payload["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -3234,7 +3312,10 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 current = head.get(key)
                 if current not in (None, "") and current != value:
                     conflicts.add(key)
-                elif not current and key not in conflicts:
+                # A durable ``None`` is an explicit readback fact, not an
+                # invitation to reconstruct identity from an older cycle.
+                # Only a genuinely absent field may be backfilled.
+                elif key not in head and key not in conflicts:
                     head[key] = value
         # An explicit slot must reproduce from its durable market,
         # representation, version and focus fields.  Otherwise this history
@@ -3419,7 +3500,6 @@ def _bound_from_ladder_challenger_preflight(
                 raise HficSessionError("LADDER_CHALLENGER_SCOPE_DRIFT")
         else:
             raise HficSessionError("LADDER_CHALLENGER_COHORT_MISSING")
-        _validate_split_identity_binding(preflight, repo_root=Path(repo_root))
         # Outer freeze identity must equal verified CONTROL / representation keys
         # before any store write; mutable receipt JSON cannot rebind the search.
         epoch = str(preflight.get("evidence_epoch_sha256") or "")
@@ -3435,6 +3515,11 @@ def _bound_from_ladder_challenger_preflight(
         baseline_focus = baseline.focus_key_sha256
         if isinstance(baseline_focus, str) and baseline_focus and focus_key != baseline_focus:
             raise HficSessionError("LADDER_FOCUS_KEY_DRIFT")
+        # Validate the production A3 market/capability receipt only after the
+        # ladder envelope's own immutable keys.  A caller that mutates the
+        # outer search key must receive the precise ladder drift reason before
+        # any market-basis diagnosis, and no write may occur either way.
+        _validate_split_identity_binding(preflight, repo_root=Path(repo_root))
     else:
         epoch = str(preflight.get("evidence_epoch_sha256") or "")
         focus_key = str(preflight.get("focus_key_sha256") or "")
@@ -4286,6 +4371,7 @@ def persist_intermediate_cycle(
     _copy_evidence_surface_mode(intermediate_cycle, source)
     _copy_evidence_surface_mode(intermediate_cycle, frozen)
     _stamp_split_identity(intermediate_cycle, source, frozen)
+    _stamp_market_evidence_basis(intermediate_cycle, source, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         intermediate_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -4638,6 +4724,7 @@ def apply_revision(
     _copy_evidence_surface_mode(revision_cycle, existing)
     _copy_evidence_surface_mode(revision_cycle, frozen)
     _stamp_split_identity(revision_cycle, existing, frozen)
+    _stamp_market_evidence_basis(revision_cycle, existing, frozen)
     if prompt_version == PROMPT_VERSION and repo_root is not None:
         grounded_candidates = _ground_v12_candidates(
             revised_draft.get("candidates") or [],
@@ -4869,6 +4956,7 @@ def persist_primary_kill_awaiting_runner_up(
     _copy_evidence_surface_mode(pending_cycle, existing)
     _copy_evidence_surface_mode(pending_cycle, frozen)
     _stamp_split_identity(pending_cycle, existing, frozen)
+    _stamp_market_evidence_basis(pending_cycle, existing, frozen)
     if isinstance(frozen.get("grounded_candidates"), list):
         pending_cycle["grounded_candidates"] = list(frozen["grounded_candidates"])
     if "closed_or_suppressed_collision_count" in frozen:
@@ -5463,6 +5551,7 @@ def finalize_session(
     }
     _copy_evidence_surface_mode(complete_cycle, frozen)
     _stamp_split_identity(complete_cycle, frozen, existing, receipt)
+    _stamp_market_evidence_basis(complete_cycle, frozen, existing, receipt)
     records.extend(
         [
             event(
@@ -5740,6 +5829,12 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "capability_epoch_sha256": cycle.get("capability_epoch_sha256")
         or (
             session_receipt.get("capability_epoch_sha256")
+            if isinstance(session_receipt, Mapping)
+            else None
+        ),
+        "market_evidence_basis": cycle.get("market_evidence_basis")
+        or (
+            session_receipt.get("market_evidence_basis")
             if isinstance(session_receipt, Mapping)
             else None
         ),

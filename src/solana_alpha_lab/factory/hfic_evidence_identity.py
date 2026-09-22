@@ -30,8 +30,13 @@ _CAPABILITY_PROTOCOL_FILES = (
     "configs/hypothesis_forge_independent_critic_v1.yaml",
     "configs/hfic_representation_ladder_v1.yaml",
     "catalog/schemas/hypothesis_critic_input_v1.schema.json",
+    "catalog/schemas/forge_input_receipt_v1.schema.json",
     "catalog/schemas/experiment_spec.schema.json",
     "catalog/schemas/forge_run_receipt_v1.schema.json",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1.schema.json",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_2.schema.json",
+    "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json",
+    "schemas/research_memory_projection_v1.sql",
     "catalog/query_recipes.yaml",
     "docs/contracts/normalized_trajectory_v1_capability_contract.md",
     "docs/contracts/normalized_trajectory_representation_probe_v1.md",
@@ -109,7 +114,14 @@ def lineage_cohort_bindings(data_root: Path | None) -> list[dict[str, str]]:
             {
                 "cohort_id": cohort_id,
                 "release_id": str(item.get("release_id") or ""),
-                "source_sha256": str(item.get("source_sha256") or ""),
+                # A3's canonical live-corpus lineage names the immutable
+                # release payload `content_sha256`; older fixture/readback
+                # surfaces expose the same binding as `source_sha256`.
+                "source_sha256": str(
+                    item.get("source_sha256")
+                    or item.get("content_sha256")
+                    or ""
+                ),
             }
         )
     rows.sort(key=lambda row: row["cohort_id"])
@@ -181,11 +193,66 @@ def build_market_evidence_basis(
 
 
 def market_evidence_epoch_sha256(basis: Mapping[str, Any]) -> str:
-    if not isinstance(basis, Mapping) or not basis.get("datasets"):
-        if not (basis or {}).get("visible_cohort_ids") and not (
-            basis or {}
-        ).get("lineage_bindings"):
+    if not isinstance(basis, Mapping):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+
+    # A market epoch is an admission identity, not a checksum over whatever
+    # labels happened to be available.  The current manifest, visible release
+    # lineage and dataset fingerprints must form one complete A3 readback.
+    if basis.get("basis_version") != MARKET_BASIS_VERSION:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    current_mid = str(basis.get("current_dataset_manifest_id") or "").strip()
+    visible = {
+        str(item).strip()
+        for item in (basis.get("visible_cohort_ids") or ())
+        if str(item).strip()
+    }
+    datasets = basis.get("datasets")
+    bindings = basis.get("lineage_bindings")
+    if basis.get("corpus_version") is None or not current_mid:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if not isinstance(datasets, Sequence) or isinstance(datasets, (str, bytes)):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if not isinstance(bindings, Sequence) or isinstance(bindings, (str, bytes)):
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+    if not visible or not datasets or not bindings:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+
+    dataset_mids: set[str] = set()
+    for item in datasets:
+        if not isinstance(item, Mapping):
             raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        mid = str(item.get("dataset_manifest_id") or "").strip()
+        dataset_id = str(item.get("dataset_id") or "").strip()
+        fingerprint = str(item.get("dataset_fingerprint") or "").strip()
+        if (
+            not mid
+            or not dataset_id
+            or not re.fullmatch(r"[0-9a-f]{64}", fingerprint)
+            or mid in dataset_mids
+        ):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        dataset_mids.add(mid)
+    if current_mid not in dataset_mids:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+
+    binding_ids: set[str] = set()
+    for item in bindings:
+        if not isinstance(item, Mapping):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        cohort_id = str(item.get("cohort_id") or "").strip()
+        release_id = str(item.get("release_id") or "").strip()
+        source_sha = str(item.get("source_sha256") or "").strip()
+        if (
+            not cohort_id
+            or not release_id
+            or not re.fullmatch(r"[0-9a-f]{64}", source_sha)
+            or cohort_id in binding_ids
+        ):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        binding_ids.add(cohort_id)
+    if binding_ids != visible:
+        raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     return canonical_sha256(dict(basis))
 
 
@@ -475,6 +542,24 @@ def resolve_scientific_admission(
     if same_slot:
         chosen = same_slot[0]
         session_id = str(chosen.get("session_id") or "") or None
+        lifecycle_slot_ids = {
+            str(item.get("session_id") or "")
+            for item in (sessions or [])
+            if isinstance(item, Mapping)
+            and str(item.get("session_id") or "")
+            and session_scientific_slot_sha256(item) == target_slot
+        }
+        # A reservation is durable occupancy, but it is not a resumable
+        # lifecycle row.  Do not turn an orphan reservation into a fresh
+        # session or pretend that its phase is readable after restart.
+        if session_id is None or session_id not in lifecycle_slot_ids:
+            return {
+                "action": "STOP",
+                "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+                "session_id": session_id,
+                "scientific_slot_sha256": target_slot,
+                "occupancy": "OCCUPIED_UNRESOLVED",
+            }
         if _session_slot_matches_execution_context(
             chosen,
             memory_eligibility_sha256=memory_eligibility_sha256,

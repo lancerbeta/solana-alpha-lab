@@ -343,7 +343,8 @@ def build_offline_commission_packet(repo_root: Path) -> dict[str, Any]:
 def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     projection = Path(data_root) / RESEARCH_PROJECTION_LOCATION
     if not projection.is_file() or projection.is_symlink():
-        return _sessions_from_store(data_root)
+        raw = _sessions_from_store(data_root)
+        return raw if raw is not None else []
     connection = duckdb.connect(
         str(projection),
         read_only=True,
@@ -378,7 +379,10 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
                 """
             ).fetchall()
         except duckdb.Error:
-            return _sessions_from_store(data_root)
+            raw = _sessions_from_store(data_root)
+            if raw is None:
+                raise HficPreflightError("RESEARCH_MEMORY_RAW_UNAVAILABLE")
+            return raw
     finally:
         connection.close()
     sessions = []
@@ -409,14 +413,16 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     # ResearchStore is available, use that authoritative projection so a
     # mixed market/slot row cannot silently become an available budget slot.
     raw_sessions = _sessions_from_store(data_root)
-    return raw_sessions or sessions
+    if raw_sessions is None:
+        raise HficPreflightError("RESEARCH_MEMORY_RAW_UNAVAILABLE")
+    return raw_sessions
 
 
-def _sessions_from_store(data_root: Path) -> list[dict[str, Any]]:
+def _sessions_from_store(data_root: Path) -> list[dict[str, Any]] | None:
     try:
         store = ResearchStore(Path(data_root), create_if_missing=False)
     except ResearchStoreError:
-        return []
+        return None
     return list_hfic_sessions(store)
 
 
@@ -2003,7 +2009,22 @@ def _forge_input_requires_preflight_stop(
     codes = [str(item) for item in (forge_input.get("blocking_reason_codes") or [])]
     # Incomplete market is a shared admission stop for ordinary and CONTROL.
     if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
-        return True
+        active = forge_input.get("active_evidence_set")
+        packet = forge_input.get("packet")
+        # Keep the dormant legacy commissioning compatibility path available
+        # when there is no current A3 surface at all.  Once a current
+        # manifest, visible cohort or live packet exists, an incomplete basis
+        # is an admission stop regardless of persist=True.
+        has_current_surface = bool(
+            isinstance(active, Mapping)
+            and (
+                active.get("current_dataset_manifest_id")
+                or active.get("visible_cohort_ids")
+            )
+        ) or bool(forge_input.get("live_corpus")) or bool(
+            isinstance(packet, Mapping) and packet.get("live_corpus_in_packet")
+        )
+        return has_current_surface or control_mode == CURRENT_REPRESENTATION_CONTROL_V1
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         return True
     return str(forge_input.get("owner_class") or "") == OWNER_CLASS_OBSERVABILITY_BLOCKED
@@ -2087,7 +2108,7 @@ def run_preflight(
         owner_focus=focus,
     )
     stop_input = _forge_input_requires_preflight_stop(forge_input, control_mode)
-    if stop_input and not persist:
+    if stop_input:
         focus = owner_focus if owner_focus.strip() else AUTO_FOCUS
         epoch = "0" * 64
         focus_key = focus_key_sha256(focus)
@@ -2110,6 +2131,7 @@ def run_preflight(
             "forge_context_packet": {},
             "forge_input_receipt": forge_input,
             "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
             "authority": {
                 "git_mutation": 0,
                 "experiment_execution": 0,
@@ -2237,6 +2259,7 @@ def run_preflight(
             "forge_context_packet": {},
             "forge_input_receipt": forge_input,
             "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
             "authority": {
                 "git_mutation": 0,
                 "experiment_execution": 0,
@@ -2394,6 +2417,7 @@ def run_preflight(
                 "experiment_execution": 0,
                 "provider_api_rpc_wss_calls": 0,
             },
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
