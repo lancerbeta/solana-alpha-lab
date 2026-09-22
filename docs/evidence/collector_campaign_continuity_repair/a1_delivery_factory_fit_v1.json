@@ -6,8 +6,8 @@
   "task_id": "COLLECTOR_CAMPAIGN_CONTINUITY_REPAIR_V1",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
-  "reviewed_bindings_sha256": "e2a6544769c3e473ed925011ae93bf538ddc6607e2a70fa66eecc9ae446915b6",
-  "reviewed_inventory_sha256": "d1e506661bb68f4b032354ee077abeb19df164ead1305c3ac074eac32641176a",
+  "reviewed_bindings_sha256": "60302494e15961add887cdab19215101d69102d58099bdc09a6c28f17cff736a",
+  "reviewed_inventory_sha256": "4c91ce69de218471dae1a2c2c29d259f5f97ebc625171c88b8cbc3cf063cf1cf",
   "capability_radar": {
     "now": "NONE",
     "watch": "DEPLOY_REPAIRED_MAIN_THEN_LATE_SUCCESSOR_ACTIVATE_IF_STILL_DRAINING"
