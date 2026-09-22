@@ -263,6 +263,7 @@ def cmd_preflight(
         payload = {
             "action": "STOP",
             "terminal": str(exc),
+            "owner_class": "INPUT_NOT_READY",
             "owner_focus": owner_focus,
             **active.redacted_receipt(),
             "next": "RESOLVE_TYPED_PREFLIGHT_BLOCK",
@@ -272,12 +273,32 @@ def cmd_preflight(
                 "session": 0,
             },
         }
+        payload["owner_readout"] = (
+            "PREFLIGHT\n"
+            "status: BLOCKED — preflight не разрешил scientific admission; "
+            "это не научный negative\n"
+            f"reason: {str(exc)}\n"
+            "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
+            "input/readback и повторите normal entry; не создавайте trial вручную\n"
+            "writes: research_store=0 forge_context=0 session=0"
+        )
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
     payload = {
         **active.redacted_receipt(),
         **receipt,
     }
+    if payload.get("action") == "STOP":
+        payload["owner_class"] = "INPUT_NOT_READY"
+        payload["owner_readout"] = (
+            "PREFLIGHT\n"
+            "status: BLOCKED — preflight не разрешил scientific admission; "
+            "это не научный negative\n"
+            f"reason: {payload.get('terminal') or 'PREFLIGHT_BLOCKED'}\n"
+            "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
+            "input/readback и повторите normal entry; не создавайте trial вручную\n"
+            "writes: research_store=0 forge_context=0 session=0"
+        )
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
     exit_code = 0 if receipt["action"] != "STOP" else 2

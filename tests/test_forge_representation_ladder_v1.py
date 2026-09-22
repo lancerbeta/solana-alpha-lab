@@ -89,6 +89,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     EXEC_BLOCKED,
     EXEC_EXECUTED,
     EXEC_NOT_RUN,
+    EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
     EXEC_REUSED,
     EXISTING_V1_CONTROL_SESSION_ID,
     HANDLER_SYNTHETIC_LATER_V2,
@@ -642,7 +643,26 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("occupied slot has no readable lifecycle row", text)
         self.assertIn("RECOVER_EXISTING_READBACK", text)
-        self.assertIn("do not regenerate or reset budget", text)
+        self.assertIn("show-session --session-id <recorded-session-id> --format json", text)
+        self.assertIn("do not rewrite receipts, regenerate, or reset budget", text)
+        self.assertIn("Блокировка не является научным отрицательным результатом", text)
+
+    def test_historical_execution_readback_is_not_readiness(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_RETURN_EXISTING,
+                "owner_final": None,
+                "execution_provenance_status": EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [],
+            }
+        )
+        self.assertIn("historical readback is UNKNOWN", text)
+        self.assertIn("not a readiness receipt", text)
+        self.assertIn("execution_scope: NOT_SCIENTIFIC_EXECUTION", text)
 
     def test_pass_to_classification_resumes_until_classify(self) -> None:
         decision = resolve_next_action(
@@ -1895,6 +1915,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
                 identities=assign_portfolio_ids(v2_draft["candidates"]),
                 draft=v2_draft,
+                representation_registry=_later_registry(),
             )
             packet = v2_frozen["critic_input_packet"]
             assert isinstance(packet, dict)
@@ -2368,6 +2389,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
                 identities=assign_portfolio_ids(v2_draft["candidates"]),
                 draft=v2_draft,
+                representation_registry=_later_registry(),
             )
             packet = v2_frozen["critic_input_packet"]
             assert isinstance(packet, dict)

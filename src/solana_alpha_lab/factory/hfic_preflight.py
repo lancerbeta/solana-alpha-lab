@@ -423,6 +423,16 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     return raw_sessions
 
 
+def query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
+    """Public read-model entry used by A5 consumers.
+
+    Keep the private name as a compatibility shim for older callers, but do
+    not make cross-module production paths depend on a private helper.
+    """
+
+    return _query_hfic_sessions(Path(data_root))
+
+
 def _sessions_from_store(data_root: Path) -> list[dict[str, Any]] | None:
     try:
         store = ResearchStore(Path(data_root), create_if_missing=False)
@@ -449,6 +459,7 @@ def decide_preflight_action(
     reservations: Sequence[Mapping[str, Any]] | None = None,
     generated_draft: Mapping[str, Any] | None = None,
     current_visible_cohort_ids: Sequence[str] | None = None,
+    execution_context: Mapping[str, Any] | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -480,6 +491,7 @@ def decide_preflight_action(
             owner_focus=owner_focus,
             reservations=reservations,
             current_visible_cohort_ids=current_visible_cohort_ids,
+            execution_context=execution_context,
             memory_eligibility_sha256=memory_eligibility_sha256,
             evidence_surface_mode=evidence_surface_mode,
             auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
@@ -1838,7 +1850,7 @@ def compute_slash_packet_identity(
 
     # Scientific admission key is market evidence only (A5). Capability stays
     # in search_key / execution binding via prompt_version and capability stamp.
-    epoch = str(split["evidence_epoch_sha256"])
+    epoch = str(split["market_evidence_epoch_sha256"])
     policy_head = effective_policy(store)
     memory_eligibility = str(policy_head["memory_eligibility_sha256"])
     search_key = search_key_sha256(
@@ -2385,6 +2397,11 @@ def run_preflight(
         reservations=reservations,
         generated_draft=generated_draft,
         current_visible_cohort_ids=visible_cohort_ids,
+        execution_context=(
+            {"capability_epoch_sha256": capability_epoch}
+            if isinstance(capability_epoch, str) and len(capability_epoch) == 64
+            else None
+        ),
     )
     search_budget = epoch_search_budget_usage(
         sessions, evidence_epoch=epoch, reservations=reservations

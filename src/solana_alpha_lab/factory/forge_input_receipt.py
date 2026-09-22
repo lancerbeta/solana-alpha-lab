@@ -400,7 +400,14 @@ def build_forge_input_receipt(
         visible_cohort_ids=visible_ids,
         current_dataset_manifest_id=current_mid,
         corpus_version=corpus_version,
-        lineage_bindings=lineage_cohort_bindings(Path(data_root)),
+        lineage_bindings=lineage_cohort_bindings(
+            Path(data_root),
+            verified_dataset_manifest_ids={
+                str(item.get("dataset_manifest_id") or "")
+                for item in datasets
+                if isinstance(item, Mapping) and item.get("dataset_manifest_id")
+            },
+        ),
     )
     market_epoch: str | None = None
     if lineage_ok and readback is not None:

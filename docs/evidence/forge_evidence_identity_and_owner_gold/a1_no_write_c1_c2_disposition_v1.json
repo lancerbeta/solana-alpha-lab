@@ -32,7 +32,7 @@
   "sessions": [
     {
       "session_id": "HFIC-SESS-0343447C49AC901C",
-      "legacy_evidence_epoch_sha256": "01cc4494506d1825",
+      "legacy_evidence_epoch_sha256": "01cc4494506d18259bf3215475daa5920c1997da80af1968ceaf10b0b46b3aeb",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -46,7 +46,7 @@
     },
     {
       "session_id": "HFIC-SESS-0E507B71155C9DB5",
-      "legacy_evidence_epoch_sha256": "50b9ba184215abc9",
+      "legacy_evidence_epoch_sha256": "50b9ba184215abc953721e595bc60b324010f2d9e16487672015cf7134490958",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -60,7 +60,7 @@
     },
     {
       "session_id": "HFIC-SESS-2226C847FAAB183B",
-      "legacy_evidence_epoch_sha256": "2aa95f2187e076a6",
+      "legacy_evidence_epoch_sha256": "2aa95f2187e076a61c24935e029ca61ea223bdd518c58ad700bd51093fc593ef",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -74,7 +74,7 @@
     },
     {
       "session_id": "HFIC-SESS-5AC5EF9EF56EDCDE",
-      "legacy_evidence_epoch_sha256": "50b9ba184215abc9",
+      "legacy_evidence_epoch_sha256": "50b9ba184215abc953721e595bc60b324010f2d9e16487672015cf7134490958",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -88,7 +88,7 @@
     },
     {
       "session_id": "HFIC-SESS-60FB3DA7C8EB33FC",
-      "legacy_evidence_epoch_sha256": "ba8844147733e442",
+      "legacy_evidence_epoch_sha256": "ba8844147733e4421c2b497b7e70d23f20a22afa95f76e84f6beb3aff753effc",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -116,7 +116,7 @@
     },
     {
       "session_id": "HFIC-SESS-1BA427E1D95C7AEA",
-      "legacy_evidence_epoch_sha256": "e128b07bdcf048dd",
+      "legacy_evidence_epoch_sha256": "e128b07bdcf048dd55ea1ccd75c542d3a6edb8aa8b02a0c653c9af21c28c92f3",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -130,7 +130,7 @@
     },
     {
       "session_id": "HFIC-SESS-4F80F1151844EC1B",
-      "legacy_evidence_epoch_sha256": "456411903174e403",
+      "legacy_evidence_epoch_sha256": "456411903174e403092f115cddf62fd38c9ae1bb943ebba0048c5b6bd070854e",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -144,7 +144,7 @@
     },
     {
       "session_id": "HFIC-SESS-560C4E1A72B4F9E6",
-      "legacy_evidence_epoch_sha256": "ba8844147733e442",
+      "legacy_evidence_epoch_sha256": "ba8844147733e4421c2b497b7e70d23f20a22afa95f76e84f6beb3aff753effc",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -158,7 +158,7 @@
     },
     {
       "session_id": "HFIC-SESS-6DACA4A2F18AB4C0",
-      "legacy_evidence_epoch_sha256": "f2919cf5ffd7a135",
+      "legacy_evidence_epoch_sha256": "f2919cf5ffd7a135a9818119455974c952ae7e6e490b0d388da143af75e8d846",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -172,7 +172,7 @@
     },
     {
       "session_id": "HFIC-SESS-70A72A88EE66CC14",
-      "legacy_evidence_epoch_sha256": "3969923f8470f917",
+      "legacy_evidence_epoch_sha256": "3969923f8470f91743f62ead93beef8625bc71d9eae063a739d96e39d0b71f67",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -186,7 +186,7 @@
     },
     {
       "session_id": "HFIC-SESS-7EDF73F4F41DD032",
-      "legacy_evidence_epoch_sha256": "6f52b6dfb4c87734",
+      "legacy_evidence_epoch_sha256": "6f52b6dfb4c877345cb5b090c4423940d2ad14e7f435c2d0b8c1795492e362dc",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -200,7 +200,7 @@
     },
     {
       "session_id": "HFIC-SESS-8B9B763DC5188358",
-      "legacy_evidence_epoch_sha256": "40dfacbf525c7d6f",
+      "legacy_evidence_epoch_sha256": "40dfacbf525c7d6fb321f095978de09e22783ae3a9fa6b83642036d8dd0b581e",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -214,7 +214,7 @@
     },
     {
       "session_id": "HFIC-SESS-8F4A703030408365",
-      "legacy_evidence_epoch_sha256": "237ee70916824b96",
+      "legacy_evidence_epoch_sha256": "237ee70916824b9616f34e8c8742fa4d59cd183ec1dbaa7b95e707afe1a9c937",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -228,7 +228,7 @@
     },
     {
       "session_id": "HFIC-SESS-B735FBF93AFC82E7",
-      "legacy_evidence_epoch_sha256": "28eab6b9138b53df",
+      "legacy_evidence_epoch_sha256": "28eab6b9138b53df01b978299b9cb5bafb11857dd88a76faa8b13e0d98b3673b",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -242,7 +242,7 @@
     },
     {
       "session_id": "HFIC-SESS-C104993AA68805A0",
-      "legacy_evidence_epoch_sha256": "98fedffd5d91f563",
+      "legacy_evidence_epoch_sha256": "98fedffd5d91f563e0807e8aaed1cee74d200c3adf4938837f60baac38448b8f",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",
@@ -256,7 +256,7 @@
     },
     {
       "session_id": "HFIC-SESS-FC3216E5E68F8D4C",
-      "legacy_evidence_epoch_sha256": "e4e211f8934f8950",
+      "legacy_evidence_epoch_sha256": "e4e211f8934f89500e6320526a0bee0fdb07c06ad0ec2b9c9be0075eaab0f78b",
       "frozen_market_epoch_sha256": null,
       "frozen_scope_cohort_ids": [],
       "terminal": "SYNTHESIS_COMPLETE",

@@ -43,6 +43,7 @@ from solana_alpha_lab.factory.hfic_provenance import is_hfic_record
 from solana_alpha_lab.factory.hfic_session import (
     evidence_epoch_sha256,
     focus_key_sha256,
+    list_scientific_slot_admissions,
     search_key_sha256,
 )
 from solana_alpha_lab.factory.research_store import (
@@ -335,7 +336,7 @@ def preview_control_reconsideration(
     )
     from solana_alpha_lab.factory.live_cohort_discovery_release import CORPUS_DATASET_ID
 
-    from solana_alpha_lab.factory.hfic_preflight import _query_hfic_sessions
+    from solana_alpha_lab.factory.hfic_preflight import query_hfic_sessions
 
     inventory = reopened_inventory(repo_root, data_root)
     resolved = [resolve_reopened_prior(repo_root, item) for item in inventory]
@@ -436,7 +437,7 @@ def preview_control_reconsideration(
         data_root=Path(data_root),
         repo_root=Path(repo_root),
     )
-    sessions = _query_hfic_sessions(Path(data_root))
+    sessions = query_hfic_sessions(Path(data_root))
     session = next(
         (item for item in sessions if item.get("session_id") == defective_session_id),
         None,
@@ -478,6 +479,7 @@ def preview_control_reconsideration(
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
         representation_id="BASE",
         representation_semantic_version="HFIC-V1.2",
+        reservations=list_scientific_slot_admissions(store),
         current_visible_cohort_ids=current_visible_cohort_ids,
     )
     live_present = any(

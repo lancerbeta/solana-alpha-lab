@@ -88,7 +88,11 @@ def _prompt_section_digests(repo_root: Path) -> dict[str, str]:
     return dict(sorted(out.items()))
 
 
-def lineage_cohort_bindings(data_root: Path | None) -> list[dict[str, str]]:
+def lineage_cohort_bindings(
+    data_root: Path | None,
+    *,
+    verified_dataset_manifest_ids: set[str] | None = None,
+) -> list[dict[str, str]]:
     """Canonical cohort→source bindings from live corpus lineage (if present)."""
 
     if data_root is None:
@@ -117,7 +121,11 @@ def lineage_cohort_bindings(data_root: Path | None) -> list[dict[str, str]]:
         ).strip()
         if not re.fullmatch(r"[0-9a-f]{64}", source_sha):
             continue
-        if not _verify_lineage_release_binding(Path(data_root), item):
+        if not _verify_lineage_release_binding(
+            Path(data_root),
+            item,
+            verified_dataset_manifest_ids=verified_dataset_manifest_ids,
+        ):
             # A production lineage row is not market truth merely because its
             # metadata contains 64-hex values.  Keep the row out of the basis
             # so market_evidence_epoch_sha256 fails closed instead of hashing
@@ -142,7 +150,10 @@ def lineage_cohort_bindings(data_root: Path | None) -> list[dict[str, str]]:
 
 
 def _verify_lineage_release_binding(
-    data_root: Path, item: Mapping[str, Any]
+    data_root: Path,
+    item: Mapping[str, Any],
+    *,
+    verified_dataset_manifest_ids: set[str] | None = None,
 ) -> bool:
     """Verify production lineage against immutable release readback.
 
@@ -189,33 +200,24 @@ def _verify_lineage_release_binding(
     ):
         return False
 
-    def _safe_file(relative: Any) -> Path | None:
-        if not isinstance(relative, str) or not relative.strip():
-            return None
-        candidate = Path(data_root) / relative.replace("/", "\\")
-        try:
-            candidate.relative_to(Path(data_root))
-        except ValueError:
-            return None
-        if candidate.is_symlink() or not candidate.is_file():
-            return None
-        return candidate
-
-    for relative_key, sha_key in (
-        ("census_rel", "census_sha256"),
-        ("obs_rel", "observations_sha256"),
+    # A3's enumerate_rdp_datasets owns partition/file integrity.  A5
+    # consumes that verified basis instead of re-reading and re-hashing raw
+    # corpus bytes for every identity consumer invocation.
+    if (
+        verified_dataset_manifest_ids is None
+        or manifest_id not in verified_dataset_manifest_ids
     ):
-        path = _safe_file(item.get(relative_key))
-        expected = str(item.get(sha_key) or "").strip()
-        if (
-            path is None
-            or not re.fullmatch(r"[0-9a-f]{64}", expected)
-            or _sha256_bytes(path.read_bytes()) != expected
-        ):
-            return False
+        return False
 
     published_path = manifests_root / f"{manifest_id}.published"
     validation_path = manifests_root / f"{manifest_id}.validation.json"
+    if (
+        published_path.is_symlink()
+        or validation_path.is_symlink()
+        or not published_path.is_file()
+        or not validation_path.is_file()
+    ):
+        return False
     try:
         published = json.loads(published_path.read_text(encoding="utf-8"))
         validation = json.loads(validation_path.read_text(encoding="utf-8"))
@@ -223,10 +225,7 @@ def _verify_lineage_release_binding(
         return False
     if not isinstance(published, Mapping) or not isinstance(validation, Mapping):
         return False
-    if (
-        published.get("dataset_manifest_id") != manifest_id
-        or published.get("release_id") != release_id
-    ):
+    if published.get("dataset_manifest_id") != manifest_id:
         return False
     cohort_id = str(item.get("cohort_id") or "")
     composition = validation.get("corpus_composition")
@@ -616,11 +615,12 @@ def _session_slot_matches_execution_context(
                 continue
             observed = session.get(key)
             # Missing historical provenance remains UNKNOWN and is not
-            # silently replaced.  A pending exact resume, however, must not
-            # cross into a different known execution context.
-            if isinstance(observed, str) and observed and observed != expected:
+            # silently replaced.  A completed/current reuse must not cross
+            # into a different or unbound known execution context.
+            if not isinstance(observed, str) or not observed:
                 return False
-    return True
+            if observed != expected:
+                return False
     return True
 
 
@@ -631,6 +631,7 @@ def resolve_scientific_admission(
     representation_id: str,
     representation_semantic_version: str,
     owner_focus: str,
+    representation_registry: Mapping[str, Any] | None = None,
     reservations: Sequence[Mapping[str, Any]] | None = None,
     current_visible_cohort_ids: Sequence[str] | None = None,
     memory_eligibility_sha256: str | None = None,
@@ -650,6 +651,30 @@ def resolve_scientific_admission(
     version = str(representation_semantic_version or "").strip()
     if not version:
         raise EvidenceIdentityError("REPRESENTATION_SEMANTIC_VERSION_REQUIRED")
+    registry = representation_registry
+    if registry is None:
+        try:
+            from solana_alpha_lab.factory.hfic_representation_ladder import (
+                load_ladder_registry,
+            )
+
+            registry = load_ladder_registry()
+        except Exception as exc:
+            raise EvidenceIdentityError("REPRESENTATION_REGISTRY_UNAVAILABLE") from exc
+    registered = next(
+        (
+            row
+            for row in (registry.get("representations") or [])
+            if isinstance(row, Mapping) and str(row.get("id") or "") == representation
+        ),
+        None,
+    )
+    if (
+        not isinstance(registered, Mapping)
+        or str(registered.get("status") or "") != "ACTIVE"
+        or str(registered.get("version") or "").strip() != version
+    ):
+        raise EvidenceIdentityError("REPRESENTATION_VERSION_UNREGISTERED")
     target_slot = scientific_slot_sha256(
         market_evidence_epoch_sha256=market_evidence_epoch,
         representation_id=representation,
@@ -679,6 +704,22 @@ def resolve_scientific_admission(
             "session_id": None,
             "scientific_slot_sha256": target_slot,
             "occupancy": "UNRESOLVED_BINDING",
+        }
+    market_occupancy_unresolved = [
+        item
+        for item in all_rows
+        if isinstance(item, Mapping)
+        and session_matches_market_epoch(item, market_evidence_epoch)
+        and session_scientific_slot_sha256(item) is None
+    ]
+    if market_occupancy_unresolved:
+        chosen = market_occupancy_unresolved[0]
+        return {
+            "action": "STOP",
+            "reason_code": "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+            "session_id": str(chosen.get("session_id") or "") or None,
+            "scientific_slot_sha256": target_slot,
+            "occupancy": "OCCUPIED_UNRESOLVED",
         }
     legacy_unresolved = []
     for item in all_rows:
@@ -884,6 +925,7 @@ def compute_market_epoch_for_data_root(
     mid = current_dataset_manifest_id
     version = corpus_version
     cohorts = list(visible_cohort_ids or [])
+    verified_dataset_manifest_ids: set[str] = set()
     if data_root is not None:
         from solana_alpha_lab.factory.hfic_preflight import enumerate_rdp_datasets
         from solana_alpha_lab.factory.live_cohort_discovery_release import (
@@ -891,6 +933,11 @@ def compute_market_epoch_for_data_root(
         )
 
         enumerated, _warnings = enumerate_rdp_datasets(Path(data_root))
+        verified_dataset_manifest_ids = {
+            str(item.get("dataset_manifest_id") or "")
+            for item in enumerated
+            if isinstance(item, Mapping) and item.get("dataset_manifest_id")
+        }
         datasets = list(select_current_datasets_for_forge(enumerated))
         try:
             from solana_alpha_lab.factory.cohort_import_readback import (
@@ -915,7 +962,10 @@ def compute_market_epoch_for_data_root(
                     mid = str(raw_mid) if isinstance(raw_mid, str) and raw_mid else None
                 if version is None:
                     version = readback.get("corpus_version")
-    bindings = lineage_cohort_bindings(data_root)
+    bindings = lineage_cohort_bindings(
+        data_root,
+        verified_dataset_manifest_ids=verified_dataset_manifest_ids,
+    )
     basis = build_market_evidence_basis(
         datasets=datasets,
         visible_cohort_ids=cohorts,
@@ -968,8 +1018,9 @@ def compute_split_identity(
         "capability_epoch_sha256": capability_epoch,
         "legacy_combined_evidence_epoch_sha256": legacy_epoch,
         "legacy_epoch_interpretation": LEGACY_EPOCH_INTERPRETATION,
-        # Admission / budget key for new sessions: market only.
-        "evidence_epoch_sha256": market_epoch,
+        # Historical consumers own the combined epoch.  New A5 admission
+        # callers use the explicit market field above; do not alias the two.
+        "evidence_epoch_sha256": legacy_epoch,
         "market_evidence_basis": market_basis,
         "capability_epoch_basis": {
             "basis_version": capability_basis.get("basis_version"),

@@ -29,7 +29,7 @@ from solana_alpha_lab.factory.scientific_eligibility_projection import (
 from solana_alpha_lab.factory.hfic_preflight import (
     AUTO_FOCUS,
     HficPreflightError,
-    _query_hfic_sessions,
+    query_hfic_sessions,
     decide_preflight_action,
     enumerate_rdp_datasets,
     evidence_epoch_material,
@@ -795,7 +795,7 @@ def forge_control_ready(
     market_epoch = str(split["market_evidence_epoch_sha256"])
     capability_epoch = str(split["capability_epoch_sha256"])
     legacy_epoch = str(split["legacy_combined_evidence_epoch_sha256"])
-    sessions = _query_hfic_sessions(Path(data_root))
+    sessions = query_hfic_sessions(Path(data_root))
     blocking = [
         item
         for item in sessions

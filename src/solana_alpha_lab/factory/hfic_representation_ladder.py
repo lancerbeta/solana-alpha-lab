@@ -1071,7 +1071,13 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             )
         ),
         f"execution_provenance: {receipt.get('execution_provenance_status') or 'UNKNOWN'}",
+        "execution_scope: NOT_SCIENTIFIC_EXECUTION  # provenance binding only; no market Forge",
     ]
+    if receipt.get("execution_provenance_status") == EXEC_PROVENANCE_HISTORICAL_UNKNOWN:
+        lines.append(
+            "execution_provenance_note: historical readback is UNKNOWN; this is "
+            "not a readiness receipt and not permission to rerun"
+        )
     for stage in stages:
         if not isinstance(stage, Mapping):
             continue
@@ -1141,11 +1147,17 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     lines.append(f"owner_final: {receipt.get('owner_final') or 'NONE'}")
     lines.append(f"blocked_by: {', '.join(blocking) if blocking else 'NONE'}")
     if "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING" in blocking:
+        session_id = str(receipt.get("session_id") or "").strip()
+        lookup = (
+            f"hypothesis_forge.py show-session --session-id {session_id} --format json"
+            if session_id
+            else "hypothesis_forge.py show-session --session-id <recorded-session-id> --format json"
+        )
         lines.append(
-            "next: RECOVER_EXISTING_READBACK — operator must inspect the "
-            "authoritative ResearchStore/projection for the recorded session_id "
-            "and stage_ref_sha256, restore that readback or escalate the typed "
-            "integrity failure; then retry; do not regenerate or reset budget"
+            "next: RECOVER_EXISTING_READBACK — run the read-only "
+            + lookup
+            + "; if the recorded row is absent, stop and escalate the typed "
+            "integrity failure; do not rewrite receipts, regenerate, or reset budget"
         )
     elif "MARKET_EVIDENCE_BASIS_INCOMPLETE" in blocking:
         lines.append(
@@ -1230,6 +1242,22 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         "non_claim: scoped search result on completed representations; "
         "not alpha and not proof of generator recall"
     )
+    if status.startswith("BLOCKED") or status.startswith("STOP"):
+        lines.append(
+            "owner_note_ru: Блокировка не является научным отрицательным "
+            "результатом; восстановите указанное readback/evidence и повторите "
+            "только после проверки, без нового trial"
+        )
+    elif status.startswith("READBACK"):
+        lines.append(
+            "owner_note_ru: Это сохранённый ответ для того же market input; "
+            "новый trial не запускать"
+        )
+    elif status.startswith("NEXT"):
+        lines.append(
+            "owner_note_ru: Следующий шаг ещё не является DONE и не разрешает "
+            "научный запуск"
+        )
     return "\n".join(lines)
 
 
@@ -1812,6 +1840,7 @@ def _session_applicable_to_current_market(
     bundle: Mapping[str, Any],
     *,
     current_market_epoch: str | None,
+    current_capability_epoch: str | None = None,
     visible: Sequence[str],
 ) -> bool:
     """True when a discovered session may answer the current market input."""
@@ -1828,6 +1857,27 @@ def _session_applicable_to_current_market(
         # Missing A5 stamps keep a known historical look occupied, but they
         # are not enough to make a current lifecycle row reusable.
         return False
+    if isinstance(current_capability_epoch, str) and len(current_capability_epoch) == 64:
+        receipt_for_identity = (
+            bundle.get("session_receipt")
+            if isinstance(bundle.get("session_receipt"), Mapping)
+            else {}
+        )
+        observed_capability = bundle.get("capability_epoch_sha256")
+        if not isinstance(observed_capability, str):
+            observed_capability = receipt_for_identity.get("capability_epoch_sha256")
+        terminal_for_identity = effective_control_terminal(receipt_for_identity) or effective_control_terminal(bundle)
+        state_for_identity = str(bundle.get("session_state") or "")
+        if (
+            state_for_identity == "SYNTHESIS_COMPLETE"
+            and (terminal_for_identity in PASS_TERMINALS
+                 or terminal_for_identity in CASE_A_TERMINALS
+                 or terminal_for_identity in KNOWN_SCIENTIFIC_NEGATIVES)
+            and observed_capability != current_capability_epoch
+        ):
+            # The old result remains historical/occupied, but a capability
+            # change cannot make it a current REUSED_VALID answer.
+            return False
     receipt = bundle.get("session_receipt")
     packet = bundle.get("critic_input_packet")
     representation_id, _parent = bundle_ladder_slot(bundle, packet)
@@ -1863,6 +1913,7 @@ def _discover_ladder_stages(
     saved_draft_representation_id: str | None = None,
     v1_snapshot: Mapping[str, Any] | None,
     current_market_epoch: str | None = None,
+    current_capability_epoch: str | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, str | None]:
     grouped: dict[str, list[tuple[str, dict[str, Any], Mapping[str, Any]]]] = {}
     for item in list_hfic_sessions(store):
@@ -1904,6 +1955,7 @@ def _discover_ladder_stages(
             if not _session_applicable_to_current_market(
                 bundle,
                 current_market_epoch=current_market_epoch,
+                current_capability_epoch=current_capability_epoch,
                 visible=visible,
             ):
                 break
@@ -1919,6 +1971,7 @@ def _discover_ladder_stages(
             if preferred_bundle is not None and _session_applicable_to_current_market(
                 preferred_bundle,
                 current_market_epoch=current_market_epoch,
+                current_capability_epoch=current_capability_epoch,
                 visible=visible,
             ):
                 packet = _packet_for_bundle(Path(data_root), preferred_bundle, store)
@@ -1943,6 +1996,7 @@ def _discover_ladder_stages(
             if not _session_applicable_to_current_market(
                 bundle,
                 current_market_epoch=current_market_epoch,
+                current_capability_epoch=current_capability_epoch,
                 visible=visible,
             ):
                 continue
@@ -1974,6 +2028,7 @@ def _discover_ladder_stages(
             if not _session_applicable_to_current_market(
                 bundle,
                 current_market_epoch=current_market_epoch,
+                current_capability_epoch=current_capability_epoch,
                 visible=visible,
             ):
                 # Stale ordinary PASS/pending on a prior market remains
@@ -2265,6 +2320,12 @@ def evaluate_forge_run(
                 and len(market_epoch_for_discovery) == 64
                 else None
             ),
+            current_capability_epoch=(
+                str(input_receipt.get("capability_epoch_sha256"))
+                if isinstance(input_receipt.get("capability_epoch_sha256"), str)
+                and len(str(input_receipt.get("capability_epoch_sha256"))) == 64
+                else None
+            ),
         )
         for row in resolved_stages:
             used_cohorts.extend(list(row.get("used_cohort_ids") or []))
@@ -2429,6 +2490,7 @@ def evaluate_forge_run(
                 )
                 break
 
+    cap_epoch = input_receipt.get("capability_epoch_sha256")
     if next_action.startswith("START_"):
         admission = resolve_scientific_admission(
             list_hfic_sessions(store),
@@ -2437,7 +2499,13 @@ def evaluate_forge_run(
             representation_id=active_rep,
             representation_semantic_version=active_version,
             owner_focus=owner_focus,
+            representation_registry=registry_doc,
             current_visible_cohort_ids=visible,
+            execution_context=(
+                {"capability_epoch_sha256": str(cap_epoch)}
+                if isinstance(cap_epoch, str) and len(cap_epoch) == 64
+                else None
+            ),
         )
         if admission.get("action") == "STOP":
             reason = str(

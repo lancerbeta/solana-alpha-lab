@@ -306,6 +306,30 @@ def _consistent_valid_hash(
     return observed[0] if observed else None
 
 
+def _consistent_hash_state(
+    sources: Sequence[Mapping[str, Any] | None], key: str
+) -> tuple[str | None, bool]:
+    """Return (known value, explicit unknown) without resurrecting UNKNOWN."""
+
+    observed: list[str] = []
+    explicit_unknown = False
+    for source in sources:
+        if not isinstance(source, Mapping) or key not in source:
+            continue
+        value = source.get(key)
+        if value in (None, ""):
+            explicit_unknown = True
+            continue
+        if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+            if value not in observed:
+                observed.append(value)
+            continue
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    if len(observed) > 1 or (explicit_unknown and observed):
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    return (observed[0] if observed else None), explicit_unknown
+
+
 def _execution_identity_fields(
     *sources: Mapping[str, Any] | None,
 ) -> dict[str, Any]:
@@ -372,6 +396,9 @@ def _execution_identity_fields(
     payload_sha = _consistent_valid_hash(expanded, "representation_payload_sha256")
     memory_sha = _consistent_valid_hash(expanded, "memory_eligibility_sha256")
     model_sha = _consistent_valid_hash(expanded, "model_provenance_sha256")
+    stored_binding, binding_unknown = _consistent_hash_state(
+        expanded, "execution_binding_sha256"
+    )
     if market and semantic_version:
         from solana_alpha_lab.factory.hfic_evidence_identity import (
             execution_binding_sha256,
@@ -389,9 +416,13 @@ def _execution_identity_fields(
         # tuple of null payload/memory/model fields is still UNKNOWN and must
         # not be upgraded into a readiness-looking hash.  The parent control
         # session is part of the binding whenever a representation is bound.
-        fields["execution_binding_sha256"] = None
-        if capability and payload_sha and memory_sha and model_sha:
-            fields["execution_binding_sha256"] = execution_binding_sha256(
+        fields["execution_binding_sha256"] = stored_binding
+        if binding_unknown:
+            # An explicit durable UNKNOWN is authoritative; complete sibling
+            # fields do not grant permission to mint a new binding.
+            fields["execution_binding_sha256"] = None
+        elif capability and payload_sha and memory_sha and model_sha:
+            expected_binding = execution_binding_sha256(
                 scientific_slot_sha256=slot,
                 capability_epoch_sha256=capability,
                 control_session_id=parent,
@@ -399,6 +430,13 @@ def _execution_identity_fields(
                 memory_eligibility_sha256=memory_sha,
                 model_provenance_sha256=model_sha,
             )
+            if stored_binding is not None and stored_binding != expected_binding:
+                raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+            fields["execution_binding_sha256"] = expected_binding
+        elif stored_binding is None and binding_unknown:
+            fields["execution_binding_sha256"] = None
+    elif stored_binding is not None or binding_unknown:
+        fields["execution_binding_sha256"] = stored_binding
     if payload_sha:
         fields["representation_payload_sha256"] = payload_sha
     if model_sha:
@@ -2611,6 +2649,8 @@ def list_scientific_slot_admissions(store: Any) -> list[dict[str, Any]]:
 def _assert_scientific_admission(
     store: Any,
     binding: Mapping[str, Any],
+    *,
+    representation_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Apply the shared admission rule before freeze/lifecycle writes."""
 
@@ -2645,6 +2685,7 @@ def _assert_scientific_admission(
         representation_id=str(fields.get("ladder_representation_id") or "BASE"),
         representation_semantic_version=version,
         owner_focus=str(binding.get("owner_focus") or "AUTO"),
+        representation_registry=representation_registry,
         memory_eligibility_sha256=(
             str(binding.get("memory_eligibility_sha256"))
             if isinstance(binding.get("memory_eligibility_sha256"), str)
@@ -2712,6 +2753,7 @@ def persist_scientific_slot_admission(
     *,
     repo_root: Any,
     stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Atomically reserve a scientific slot before lifecycle artifacts are written."""
 
@@ -2805,7 +2847,11 @@ def persist_scientific_slot_admission(
             if str(observed.get("session_id") or "") != session_id:
                 raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
             return
-        _assert_scientific_admission(store, binding)
+        _assert_scientific_admission(
+            store,
+            binding,
+            representation_registry=representation_registry,
+        )
 
     for attempt in range(4):
         try:
@@ -2906,6 +2952,7 @@ def persist_generated_draft(
     representation_id: str = "BASE",
     model_provenance_sha256: str | None = None,
     stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Persist generator bytes before freeze so restart resumes the same draft."""
 
@@ -2942,9 +2989,17 @@ def persist_generated_draft(
         if existing.get("payload_sha256") == draft_sha:
             return existing
         raise HficSessionError("GENERATED_DRAFT_CONFLICT")
-    _assert_scientific_admission(store, binding)
+    _assert_scientific_admission(
+        store,
+        binding,
+        representation_registry=representation_registry,
+    )
     persist_scientific_slot_admission(
-        store, binding, repo_root=repo_root, stage_time=stage_time
+        store,
+        binding,
+        repo_root=repo_root,
+        stage_time=stage_time,
+        representation_registry=representation_registry,
     )
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
@@ -3007,6 +3062,7 @@ def persist_frozen_session(
     identities: Sequence[Any],
     draft: Mapping[str, Any] | None = None,
     stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
 ) -> None:
     """Append freeze records to an existing ResearchStore. Optional for unit tests."""
 
@@ -3019,12 +3075,17 @@ def persist_frozen_session(
     existing = load_session_bundle(store, session_id)
     if existing is not None:
         return
-    _assert_scientific_admission(store, frozen)
+    _assert_scientific_admission(
+        store,
+        frozen,
+        representation_registry=representation_registry,
+    )
     persist_scientific_slot_admission(
         store,
         frozen,
         repo_root=repo_root,
         stage_time=stage_time,
+        representation_registry=representation_registry,
     )
     git = repository_git_snapshot(Path(repo_root))
     now = (
@@ -3364,8 +3425,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
             continue
         if payload.get("hfic_protocol") is None or not session_id:
             continue
-        cycles.append(
-            {
+        cycle_row = {
                 "session_id": session_id,
                 "session_state": payload.get("phase"),
                 "phase": payload.get("phase"),
@@ -3397,7 +3457,23 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 ),
                 "model_provenance_sha256": payload.get("model_provenance_sha256"),
             }
-        )
+        cycle_row["_identity_fields_present"] = {
+            key
+            for key in (
+                "evidence_epoch_sha256",
+                "market_evidence_epoch_sha256",
+                "capability_epoch_sha256",
+                "ladder_representation_id",
+                "control_session_id",
+                "representation_semantic_version",
+                "representation_payload_sha256",
+                "scientific_slot_sha256",
+                "execution_binding_sha256",
+                "model_provenance_sha256",
+            )
+            if key in payload
+        }
+        cycles.append(cycle_row)
     latest: dict[str, dict[str, Any]] = {}
     for candidate in cycles:
         session_id = str(candidate["session_id"])
@@ -3431,6 +3507,7 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
         head = latest.get(sid)
         if head is None:
             continue
+        head_present = set(head.pop("_identity_fields_present", set()))
         ordered = sorted(rows, key=lambda item: int(item.get("hfic_cycle_seq") or 0))
         conflicts: set[str] = set()
         for row in ordered:
@@ -3446,12 +3523,15 @@ def list_hfic_sessions(store: Any) -> list[dict[str, Any]]:
                 continue
             for key, value in fields.items():
                 current = head.get(key)
-                if current not in (None, "") and current != value:
-                    conflicts.add(key)
-                # A durable ``None`` is an explicit readback fact, not an
-                # invitation to reconstruct identity from an older cycle.
-                # Only a genuinely absent field may be backfilled.
-                elif key not in head and key not in conflicts:
+                if key in head_present:
+                    if current not in (None, "") and current != value:
+                        conflicts.add(key)
+                    elif current in (None, ""):
+                        # A durable explicit UNKNOWN is not reconstructable
+                        # from an older cycle.  Keep it unknown and surface a
+                        # conflict instead of reviving a current slot.
+                        conflicts.add(key)
+                else:
                     head[key] = value
         # An explicit slot must reproduce from its durable market,
         # representation, version and focus fields.  Otherwise this history
@@ -5841,6 +5921,36 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
             cycle = ranked
     if cycle is None:
         return None
+
+    _MISSING_IDENTITY = object()
+
+    def _historical_identity_value(key: str) -> Any:
+        """Read immutable identity across cycles without reviving explicit UNKNOWN."""
+
+        observed: list[Any] = []
+        explicit_unknown = False
+        for row in cycles:
+            if key not in row:
+                continue
+            value = row.get(key)
+            if value in (None, ""):
+                explicit_unknown = True
+                continue
+            if value not in observed:
+                observed.append(value)
+        if len(observed) > 1 or (explicit_unknown and observed):
+            raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+        if explicit_unknown:
+            return None
+        return observed[0] if observed else _MISSING_IDENTITY
+
+    def _durable_identity_value(key: str) -> Any:
+        value = _historical_identity_value(key)
+        if value is not _MISSING_IDENTITY:
+            return value
+        if isinstance(session_receipt, Mapping) and key in session_receipt:
+            return session_receipt.get(key)
+        return None
     unique_ids: list[str] = []
     for card in candidate_cards:
         item = str(card.get("hypothesis_version_id") or "")
@@ -5972,28 +6082,20 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         "session_state": state,
         "prompt_version": cycle.get("prompt_version") or PROMPT_VERSION,
         "owner_focus": cycle.get("owner_focus") or "AUTO",
-        "evidence_epoch_sha256": cycle.get("evidence_epoch_sha256") or "",
+        "evidence_epoch_sha256": _durable_identity_value("evidence_epoch_sha256")
+        or "",
         "focus_key_sha256": cycle.get("focus_key_sha256") or "",
         "search_key_sha256": cycle.get("search_key_sha256") or "",
-        "memory_eligibility_sha256": cycle.get("memory_eligibility_sha256"),
-        "market_evidence_epoch_sha256": cycle.get("market_evidence_epoch_sha256")
-        or (
-            session_receipt.get("market_evidence_epoch_sha256")
-            if isinstance(session_receipt, Mapping)
-            else None
+        "memory_eligibility_sha256": _durable_identity_value(
+            "memory_eligibility_sha256"
         ),
-        "capability_epoch_sha256": cycle.get("capability_epoch_sha256")
-        or (
-            session_receipt.get("capability_epoch_sha256")
-            if isinstance(session_receipt, Mapping)
-            else None
+        "market_evidence_epoch_sha256": _durable_identity_value(
+            "market_evidence_epoch_sha256"
         ),
-        "market_evidence_basis": cycle.get("market_evidence_basis")
-        or (
-            session_receipt.get("market_evidence_basis")
-            if isinstance(session_receipt, Mapping)
-            else None
+        "capability_epoch_sha256": _durable_identity_value(
+            "capability_epoch_sha256"
         ),
+        "market_evidence_basis": _durable_identity_value("market_evidence_basis"),
         "selected_candidate_id": cycle.get("selected_candidate_id"),
         "runner_up_candidate_id": cycle.get("runner_up_candidate_id"),
         "rejected_alternative_id": cycle.get("rejected_alternative_id"),
@@ -6066,20 +6168,21 @@ def load_session_bundle(store: Any, session_id: str) -> dict[str, Any] | None:
         ),
         "ladder_representation_id": cycle.get("ladder_representation_id"),
         "control_session_id": cycle.get("control_session_id"),
-        "representation_semantic_version": cycle.get(
+        "representation_semantic_version": _durable_identity_value(
             "representation_semantic_version"
-        )
-        or (session_receipt or {}).get("representation_semantic_version"),
-        "representation_payload_sha256": cycle.get(
+        ),
+        "representation_payload_sha256": _durable_identity_value(
             "representation_payload_sha256"
-        )
-        or (session_receipt or {}).get("representation_payload_sha256"),
-        "scientific_slot_sha256": cycle.get("scientific_slot_sha256")
-        or (session_receipt or {}).get("scientific_slot_sha256"),
-        "execution_binding_sha256": cycle.get("execution_binding_sha256")
-        or (session_receipt or {}).get("execution_binding_sha256"),
-        "model_provenance_sha256": cycle.get("model_provenance_sha256")
-        or (session_receipt or {}).get("model_provenance_sha256"),
+        ),
+        "scientific_slot_sha256": _durable_identity_value(
+            "scientific_slot_sha256"
+        ),
+        "execution_binding_sha256": _durable_identity_value(
+            "execution_binding_sha256"
+        ),
+        "model_provenance_sha256": _durable_identity_value(
+            "model_provenance_sha256"
+        ),
         "next_action": None,
         "next_action_status": "LEGACY_NOT_RECORDED",
         "grounded_candidates": cycle.get("grounded_candidates"),

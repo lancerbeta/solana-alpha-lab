@@ -236,6 +236,24 @@ class HficCliContractTests(unittest.TestCase):
                     "STOP",
                 })
 
+    def test_preflight_block_has_owner_recovery_readout(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            completed = run_cli(
+                "preflight",
+                "--owner-focus",
+                "AUTO",
+                "--format",
+                "json",
+                "--no-auto-commission",
+                data_root=Path(tmp),
+            )
+        self.assertNotEqual(completed.returncode, 0, completed.stdout)
+        payload = json.loads(completed.stdout)
+        self.assertEqual(payload["owner_class"], "INPUT_NOT_READY")
+        self.assertIn("owner_readout", payload)
+        self.assertIn("RESOLVE_TYPED_PREFLIGHT_BLOCK", payload["owner_readout"])
+        self.assertIn("не научный", payload["owner_readout"])
+
     def test_preflight_accepts_multiline_owner_focus(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"

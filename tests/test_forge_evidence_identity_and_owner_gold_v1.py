@@ -307,6 +307,63 @@ class IdentityUnitTests(unittest.TestCase):
         self.assertEqual(decision["action"], "STOP")
         self.assertEqual(decision["reason_code"], "SCIENTIFIC_SLOT_IDENTITY_INVALID")
 
+    def test_market_stamped_legacy_row_without_slot_stays_occupied(self) -> None:
+        market = "aa" * 32
+        row = {
+            "session_id": "HFIC-SESS-LEGACY-MARKET",
+            "market_evidence_epoch_sha256": market,
+            "evidence_epoch_sha256": "bb" * 32,
+            "owner_focus": "AUTO",
+        }
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(
+            decision["reason_code"],
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+        )
+        self.assertEqual(decision["occupancy"], "OCCUPIED_UNRESOLVED")
+
+    def test_unregistered_representation_version_fails_closed(self) -> None:
+        with self.assertRaisesRegex(
+            ValueError, "REPRESENTATION_VERSION_UNREGISTERED"
+        ):
+            resolve_scientific_admission(
+                [],
+                market_evidence_epoch="aa" * 32,
+                representation_id="BASE",
+                representation_semantic_version="UNREGISTERED-V9",
+                owner_focus="AUTO",
+            )
+
+    def test_execution_binding_is_positive_and_tamper_checked(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import _execution_identity_fields
+
+        source = {
+            "market_evidence_epoch_sha256": "aa" * 32,
+            "capability_epoch_sha256": "bb" * 32,
+            "memory_eligibility_sha256": "cc" * 32,
+            "model_provenance_sha256": "dd" * 32,
+            "representation_payload_sha256": "ee" * 32,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+        }
+        fields = _execution_identity_fields(source)
+        self.assertRegex(str(fields.get("scientific_slot_sha256")), r"^[0-9a-f]{64}$")
+        self.assertRegex(
+            str(fields.get("execution_binding_sha256")), r"^[0-9a-f]{64}$"
+        )
+        with self.assertRaisesRegex(ValueError, "SCIENTIFIC_IDENTITY_CONFLICT"):
+            _execution_identity_fields(
+                {**source, "execution_binding_sha256": "00" * 32}
+            )
+
     def test_g1_concurrent_slot_writers_have_one_durable_winner(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
@@ -903,9 +960,14 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 started["market_evidence_epoch_sha256"],
                 again["market_evidence_epoch_sha256"],
             )
-            # Occupied CONTROL slot still answers; capability drift ≠ new trial.
-            self.assertEqual(again["next_action"], ACTION_START_V1)
-            self.assertEqual(again["stages"][0]["execution_status"], EXEC_REUSED)
+            # Capability drift keeps the market/run identity but invalidates
+            # current reuse.  The occupied slot must stop before a new trial.
+            self.assertEqual(again["next_action"], "OBSERVABILITY_BLOCKED")
+            self.assertIn(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+                again["blocking_reason_codes"],
+            )
+            self.assertEqual(again["writes"]["research_store"], 0)
 
     def test_g6_interruption_resume_keeps_draft_bytes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -1129,19 +1191,16 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     finished = evaluate_forge_run(
                         ROOT, data_root, persist=False, registry=registry
                     )
-            self.assertEqual(finished["next_action"], "START_SYNTHETIC_LATER_V2")
+            self.assertEqual(finished["next_action"], "OBSERVABILITY_BLOCKED")
+            self.assertIn(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+                finished["blocking_reason_codes"],
+            )
             self.assertEqual(
                 finished["market_evidence_epoch_sha256"],
                 started["market_evidence_epoch_sha256"],
             )
-            self.assertEqual(
-                next(
-                    row
-                    for row in finished["stages"]
-                    if row["representation_id"] == "BASE"
-                )["execution_status"],
-                EXEC_REUSED,
-            )
+            self.assertEqual(finished["writes"]["research_store"], 0)
 
     def test_g1_g5_two_worktrees_share_market_and_replay(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
