@@ -666,7 +666,7 @@ def epoch_search_budget_usage(
     }
 
 
-def _term_set(value: str) -> set[str]:
+def term_set(value: str) -> set[str]:
     return {token for token in value.casefold().replace("_", " ").replace("-", " ").split() if token}
 
 
@@ -682,10 +682,10 @@ def rank_prior_candidate_ids(
         iter_search_memory_hypothesis_payloads,
     )
 
-    focus_terms = _term_set(owner_focus)
+    focus_terms = term_set(owner_focus)
     feature_terms = set()
     for hint in feature_hints:
-        feature_terms.update(_term_set(hint))
+        feature_terms.update(term_set(hint))
     if feature_hints:
         feature_terms.update(
             {"taker", "volume", "mix", "valuation", "liquidity", "divergence"}
@@ -712,7 +712,7 @@ def rank_prior_candidate_ids(
                 "primary_x_family",
             )
         )
-        tokens = _term_set(blob)
+        tokens = term_set(blob)
         score = 3 * len(tokens & feature_terms) + 2 * len(tokens & focus_terms)
         scored.append((score, hyp_id))
     scored.sort(key=lambda item: (-item[0], item[1]))
@@ -2401,7 +2401,7 @@ def run_preflight(
             repo_root=Path(repo_root),
         )
         if gate != "OK":
-            return {
+            return _stamp_split_identity({
                 "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
                 "action": "STOP",
                 "terminal": gate,
@@ -2432,7 +2432,7 @@ def run_preflight(
                     "experiment_execution": 0,
                     "provider_api_rpc_wss_calls": 0,
                 },
-            }
+            })
     sessions = _query_hfic_sessions(data_root)
     from solana_alpha_lab.factory.hfic_session import (
         find_generated_draft,

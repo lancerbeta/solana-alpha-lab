@@ -293,6 +293,20 @@ def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, obje
 
 
 class IdentityUnitTests(unittest.TestCase):
+    def test_capability_epoch_covers_runtime_truth_owners(self) -> None:
+        _digest, basis = compute_capability_epoch_for_repo(ROOT)
+        paths = {str(item["path"]) for item in basis["protocol_files"]}
+        self.assertTrue(
+            {
+                "src/solana_alpha_lab/factory/hfic_evidence_identity.py",
+                "src/solana_alpha_lab/factory/hfic_preflight.py",
+                "src/solana_alpha_lab/factory/hfic_session.py",
+                "src/solana_alpha_lab/factory/hfic_representation_ladder.py",
+                "src/solana_alpha_lab/factory/forge_input_receipt.py",
+                "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py",
+            }.issubset(paths)
+        )
+
     def test_existing_ladder_readback_validates_current_market_before_lookup(self) -> None:
         from solana_alpha_lab.factory.hfic_session import _bind_store_freeze_preflight
 

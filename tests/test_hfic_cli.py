@@ -182,6 +182,31 @@ class HficCliContractTests(unittest.TestCase):
         self.assertNotEqual(completed.returncode, 0, completed.stdout)
         self.assertIn("SCIENCE_REBASE_CONFIRM_REQUIRED", completed.stderr)
 
+    def test_blocked_forge_run_emits_schema_shaped_receipt(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            completed = run_cli(
+                "forge-run",
+                "--format",
+                "json",
+                "--no-write",
+                data_root=Path(tmp),
+            )
+        self.assertEqual(completed.returncode, 2, completed.stdout)
+        payload = json.loads(completed.stdout)
+        for key in (
+            "run_id",
+            "run_identity_sha256",
+            "input_receipt_sha256",
+            "visible_cohort_ids",
+            "frozen_representation_ids",
+            "stages",
+            "legacy_epoch_sha256",
+            "receipt_sha256",
+        ):
+            self.assertIn(key, payload)
+        self.assertEqual(payload["schema"], "smial.forge-run-receipt")
+        self.assertEqual(payload["stages"], [])
+
     def test_apply_provenance_correction_requires_confirm_flag(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             completed = run_cli(

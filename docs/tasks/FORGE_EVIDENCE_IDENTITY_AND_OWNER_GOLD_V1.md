@@ -61,9 +61,12 @@ managed_write_set:
   - tests/test_hfic_search_budget_epoch_guard_v1.py
   - tests/test_hfic_operational_memory_quarantine_v1.py
   - tests/test_hfic_epistemic_memory_semantics.py
+  - tests/test_hfic_censoring_ignorability_diagnostic_v1.py
+  - tests/test_hfic_selection_robustness_gate_v1.py
   - tests/test_hfic_one_frozen_runner_up_failover_v1.py
   - tests/test_forge_input_truth_and_visibility_v1.py
   - tests/test_hfic_reopened_prior_search_routing_v1.py
+  - tests/test_live_cohort_to_forge_operational_closure_v1.py
   - tests/test_hfic_cli.py
   - scripts/hypothesis_forge.py
   - .agents/skills/hypothesis-forge/SKILL.md

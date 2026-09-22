@@ -457,16 +457,38 @@ def _write_stub_live_corpus(data_root: Path, *, cohort_id: str) -> None:
         ),
         encoding="utf-8",
     )
+    release_id = hashlib.sha256(
+        f"live-corpus-stub-release:{cohort_id}".encode("utf-8")
+    ).hexdigest()
+    (manifests / f"{STUB_CORPUS_MANIFEST}.validation.json").write_text(
+        json.dumps(
+            {
+                "corpus_composition": [
+                    {
+                        "cohort_id": cohort_id,
+                        "release_id": release_id,
+                        "content_sha256": file_sha,
+                    }
+                ]
+            },
+            sort_keys=True,
+        ),
+        encoding="utf-8",
+    )
     lineage_path = data_root / "datasets" / "live_lifecycle_corpus" / "lineage.json"
     lineage_path.parent.mkdir(parents=True, exist_ok=True)
     lineage_path.write_text(
         json.dumps(
             {
                 "corpus_dataset_id": CORPUS_DATASET_ID,
+                "current_corpus_version": 1,
                 "current_dataset_manifest_id": STUB_CORPUS_MANIFEST,
                 "cohorts": [
                     {
                         "cohort_id": cohort_id,
+                        "release_id": release_id,
+                        "source_sha256": file_sha,
+                        "dataset_manifest_id": STUB_CORPUS_MANIFEST,
                         "yield_eligible": 20,
                     }
                 ],

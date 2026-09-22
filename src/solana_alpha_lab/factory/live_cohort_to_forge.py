@@ -861,6 +861,9 @@ def forge_control_ready(
         reservations=reservations,
         generated_draft=generated_draft,
         current_visible_cohort_ids=visible_cohort_ids,
+        execution_context={
+            "capability_epoch_sha256": capability_epoch,
+        },
         repo_root=Path(repo_root),
     )
     if action == "STOP":

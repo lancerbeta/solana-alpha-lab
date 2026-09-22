@@ -725,6 +725,44 @@ class ResolveNextActionTests(unittest.TestCase):
             )
         )
 
+    def test_current_reuse_requires_full_visible_cohort_scope(self) -> None:
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            scientific_slot_sha256,
+        )
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            _session_applicable_to_current_market,
+        )
+
+        market = "aa" * 32
+        slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        partial = {
+            "market_evidence_epoch_sha256": market,
+            "scientific_slot_sha256": slot,
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "bound_visible_cohort_ids": ["REL-C1"],
+        }
+        self.assertFalse(
+            _session_applicable_to_current_market(
+                partial,
+                current_market_epoch=market,
+                visible=["REL-C1", "REL-C2"],
+            )
+        )
+        complete = {**partial, "bound_visible_cohort_ids": ["REL-C1", "REL-C2"]}
+        self.assertTrue(
+            _session_applicable_to_current_market(
+                complete,
+                current_market_epoch=market,
+                visible=["REL-C1", "REL-C2"],
+            )
+        )
+
     def test_stage_unknown_readback_is_not_false_done(self) -> None:
         text = format_forge_run_owner_readout(
             {

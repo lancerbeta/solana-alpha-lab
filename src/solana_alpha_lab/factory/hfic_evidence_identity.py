@@ -43,6 +43,20 @@ _CAPABILITY_PROTOCOL_FILES = (
     "catalog/query_recipes.yaml",
     "docs/contracts/normalized_trajectory_v1_capability_contract.md",
     "docs/contracts/normalized_trajectory_representation_probe_v1.md",
+    # Runtime truth owners are part of the capability contract. Hashing only
+    # schemas/docs would let an admission or readback semantic change retain
+    # the old capability identity and make old executions look compatible.
+    "src/solana_alpha_lab/factory/hfic_evidence_identity.py",
+    "src/solana_alpha_lab/factory/hfic_preflight.py",
+    "src/solana_alpha_lab/factory/hfic_session.py",
+    "src/solana_alpha_lab/factory/hfic_representation_ladder.py",
+    "src/solana_alpha_lab/factory/forge_input_receipt.py",
+    "src/solana_alpha_lab/factory/hfic_control_integrity.py",
+    "src/solana_alpha_lab/factory/hfic_representation_probe.py",
+    "src/solana_alpha_lab/factory/hfic_memory_policy.py",
+    "src/solana_alpha_lab/factory/research_store.py",
+    "src/solana_alpha_lab/factory/live_cohort_to_forge.py",
+    "src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py",
 )
 
 _OPERATOR_PACK = (

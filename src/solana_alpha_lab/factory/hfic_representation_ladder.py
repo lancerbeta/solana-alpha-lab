@@ -2012,6 +2012,8 @@ def _session_applicable_to_current_market(
     current_market_epoch: str | None,
     current_capability_epoch: str | None = None,
     visible: Sequence[str],
+    bound_cohort_ids: Sequence[str] | None = None,
+    allow_missing_cohort_scope: bool = False,
 ) -> bool:
     """True when a discovered session may answer the current market input."""
 
@@ -2030,6 +2032,24 @@ def _session_applicable_to_current_market(
     if bundle.get("market_evidence_epoch_sha256") != current_market_epoch:
         # Missing A5 stamps keep a known historical look occupied, but they
         # are not enough to make a current lifecycle row reusable.
+        return False
+    receipt = bundle.get("session_receipt")
+    packet = bundle.get("critic_input_packet")
+    # A current market identity is not sufficient by itself for a new/current
+    # CONTROL row: a partial cohort scope must not answer the full market.
+    bound = (
+        list(bound_cohort_ids)
+        if bound_cohort_ids is not None
+        else _bound_cohort_ids(bundle, packet)
+    )
+    # New CONTROL rows must carry an exact cohort binding.  Older ordinary
+    # rows may predate that stamp: preserve their known same-market
+    # historical readback/restart, but never treat a partial/non-empty binding
+    # as sufficient for the current market.
+    if bound:
+        if not _cohorts_cover_current(bound, visible):
+            return False
+    elif not allow_missing_cohort_scope:
         return False
     if isinstance(current_capability_epoch, str) and len(current_capability_epoch) == 64:
         receipt_for_identity = (
@@ -2052,8 +2072,6 @@ def _session_applicable_to_current_market(
             # The old result remains historical/occupied, but a capability
             # change cannot make it a current REUSED_VALID answer.
             return False
-    receipt = bundle.get("session_receipt")
-    packet = bundle.get("critic_input_packet")
     representation_id, _parent = bundle_ladder_slot(bundle, packet)
     version = (
         bundle.get("representation_semantic_version")
@@ -2131,6 +2149,7 @@ def _discover_ladder_stages(
                 current_market_epoch=current_market_epoch,
                 current_capability_epoch=current_capability_epoch,
                 visible=visible,
+                bound_cohort_ids=stage.get("used_cohort_ids") or [],
             ):
                 break
             chosen = (sid, stage, bundle)
@@ -2172,6 +2191,7 @@ def _discover_ladder_stages(
                 current_market_epoch=current_market_epoch,
                 current_capability_epoch=current_capability_epoch,
                 visible=visible,
+                bound_cohort_ids=bound,
             ):
                 continue
             applicable.append((sid, stage, bundle))
@@ -2204,6 +2224,8 @@ def _discover_ladder_stages(
                 current_market_epoch=current_market_epoch,
                 current_capability_epoch=current_capability_epoch,
                 visible=visible,
+                bound_cohort_ids=stage.get("used_cohort_ids") or [],
+                allow_missing_cohort_scope=True,
             ):
                 # Stale ordinary PASS/pending on a prior market remains
                 # historical; do not present as CURRENT REUSED_VALID.

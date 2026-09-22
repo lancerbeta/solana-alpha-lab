@@ -449,6 +449,14 @@ def preview_control_reconsideration(
     current_market_epoch, _market_basis = compute_market_epoch_for_data_root(
         Path(repo_root), Path(data_root)
     )
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        build_capability_epoch_basis,
+        capability_epoch_sha256,
+    )
+
+    current_capability_epoch = capability_epoch_sha256(
+        build_capability_epoch_basis(Path(repo_root))
+    )
     current_visible_cohort_ids = [
         str(item.get("cohort_id"))
         for item in (packet.get("active_evidence_set", {}).get("visible_cohort_ids") or [])
@@ -481,6 +489,9 @@ def preview_control_reconsideration(
         representation_semantic_version="HFIC-V1.2",
         reservations=list_scientific_slot_admissions(store),
         current_visible_cohort_ids=current_visible_cohort_ids,
+        execution_context={
+            "capability_epoch_sha256": current_capability_epoch,
+        },
         repo_root=Path(repo_root),
     )
     live_present = any(
@@ -737,12 +748,12 @@ def rank_prior_candidate_details(
     feature_hints: Sequence[str],
     limit: int = MAX_RANKED_PRIORS,
 ) -> tuple[list[str], list[dict[str, Any]]]:
-    from solana_alpha_lab.factory.hfic_preflight import _term_set
+    from solana_alpha_lab.factory.hfic_preflight import term_set
 
-    focus_terms = _term_set(owner_focus)
+    focus_terms = term_set(owner_focus)
     feature_terms: set[str] = set()
     for hint in feature_hints:
-        feature_terms.update(_term_set(str(hint)))
+        feature_terms.update(term_set(str(hint)))
     if feature_hints:
         feature_terms.update(
             {"taker", "volume", "mix", "valuation", "liquidity", "divergence"}
@@ -764,7 +775,7 @@ def rank_prior_candidate_details(
                 "primary_x_family",
             )
         )
-        tokens = _term_set(blob)
+        tokens = term_set(blob)
         feature_hit = sorted(tokens & feature_terms)
         focus_hit = sorted(tokens & focus_terms)
         score = 3 * len(feature_hit) + 2 * len(focus_hit)

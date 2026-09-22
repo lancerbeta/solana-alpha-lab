@@ -15,9 +15,12 @@ Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c
 - `forge-input`: `FORGE_INPUT_READY`, `STOP_BEFORE_SYNTHESIS`, receipt
   `d6d1748e9b7b69d8a8b71a65fc475d91b0fcab4c3a5fb58b406a83b6c46b4b91`.
 - `preflight`: planned action `START_NEW_SESSION`, selection
-  `SINGLE_COMMISSIONED`, router `BLOCK_FORGE_SELECTION_RISK`; this is a
-  selection-robustness routing block, not a scientific negative and not
-  permission for a real run. Receipt:
+  `SINGLE_COMMISSIONED`, router `BLOCK_FORGE_SELECTION_RISK`; the gate is a
+  scoped historical caveat (`caveat=true`, `full_lifecycle_equivalent=false`),
+  not a scientific negative and not permission for a real run. The production
+  next is `CONTINUE_WITH_SCOPED_SELECTION_CAVEAT` for the canonical no-write
+  Forge/readback path; if the gate returns a typed STOP, the CLI next is
+  `RESOLVE_SELECTION_GATE` and it must not create a trial. Receipt:
   `c84091ad59d8f67cf22a97c2beb81fc092580b7c5bc585fdddc6fc2bcea47612`.
 - Current market identity:
   `3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9`.
@@ -43,6 +46,23 @@ Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c
 | Restart mid-Critic / mid-classify | `RESUME_BASE` / `RESUME_V1` same session; draft bytes and occupancy remain addressable |
 
 ## Whole-path counters (production APIs)
+
+The following are numeric counters from the disposable production-path owner
+gold (G6/G8), not a scientific run and not manually stamped fixtures:
+
+| Checkpoint | `auto_sessions_used` | `distinct_focus_used` | representation slots | current-market occupancy | readback next |
+|---|---:|---:|---:|---:|---|
+| generated draft / freeze | 1 | 0 | 1 | 1 | `RESUME_EXISTING_SESSION` |
+| after `PASS_TO_CLASSIFICATION` | 1 | 0 | 1 | 1 | same slot |
+| fresh-store completion readback | 1 | 0 | 1 | 1 | `RETURN_EXISTING` |
+| restart before freeze completion | 1 | 0 | 1 | 1 | `RESUME_BASE` / `RESUME_V1` |
+| C3 import after old PASS | 0 for new market | 0 | 0 current; 1 historical | 0 current; old slot retained | `START_BASE` |
+
+Readback calls in the restart and replay rows have
+`research_store=0`, `forge_run=0`, `session=0`; the C3 row retains the old
+session and changes only the current market identity. These are the counters
+that prove Git/capability drift and lifecycle progress do not silently free a
+market slot.
 
 | Phase | market stamp / slot readback | budget occupancy |
 |---|---|---|

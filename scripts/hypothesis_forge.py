@@ -241,10 +241,28 @@ def cmd_preflight(
     def _owner_readout(body: Mapping[str, Any]) -> str:
         terminal = str(body.get("terminal") or "PREFLIGHT_BLOCKED")
         owner_class = str(body.get("owner_class") or "INPUT_NOT_READY")
+        selection_gate = (
+            body.get("selection_gate")
+            if isinstance(body.get("selection_gate"), Mapping)
+            else {}
+        )
+        selection_router = str(
+            body.get("router_decision")
+            or selection_gate.get("router_decision")
+            or ""
+        )
+        selection_caveat = bool(selection_gate.get("caveat"))
         if owner_class == "OBSERVABILITY_BLOCKED":
             next_line = (
                 "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "
                 "не сбрасывайте budget и не создавайте новый trial"
+            )
+        elif selection_router == "BLOCK_FORGE_SELECTION_RISK" or selection_caveat:
+            next_line = (
+                "next: RESOLVE_SELECTION_GATE — normal entry остаётся "
+                "заблокированным до разрешения selection gate; не запускайте "
+                "Forge, не повторяйте trial и не трактуйте caveat как scientific "
+                "negative"
             )
         elif terminal == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
             next_line = (
@@ -256,12 +274,19 @@ def cmd_preflight(
                 "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
                 "input/readback и повторите normal entry"
             )
+        selection_line = (
+            f"selection_router: {selection_router}\n"
+            f"selection_caveat: {str(selection_caveat).lower()}\n"
+            if selection_router or selection_caveat
+            else ""
+        )
         return (
             "PREFLIGHT\n"
             "status: BLOCKED — preflight не разрешил scientific admission; "
             "это не научный negative\n"
             f"reason: {terminal}\n"
-            f"{next_line}; не создавайте trial вручную\n"
+            + selection_line
+            + f"{next_line}; не создавайте trial вручную\n"
             + _writes_note(body)
         )
 
@@ -443,6 +468,31 @@ def cmd_forge_run(
             print(readout, file=sys.stderr)
         return emit(payload, exit_code=exit_code)
 
+    from solana_alpha_lab.factory.run_passport import canonical_sha256
+
+    def _blocked_run_payload(code: str, owner_class: str) -> dict[str, Any]:
+        run_identity = canonical_sha256(
+            {"kind": "FORGE_RUN_BLOCKED", "owner_class": owner_class, "code": code}
+        )
+        body: dict[str, Any] = {
+            "schema": "smial.forge-run-receipt",
+            "schema_version": "1.0",
+            "run_id": f"HFIC-RUN-BLOCKED-{run_identity[:16].upper()}",
+            "run_identity_sha256": run_identity,
+            "owner_class": owner_class,
+            "next_action": owner_class,
+            "owner_final": owner_class,
+            "input_receipt_sha256": None,
+            "visible_cohort_ids": [],
+            "frozen_representation_ids": ["BASE"],
+            "stages": [],
+            "legacy_epoch_sha256": None,
+            "blocking_reason_codes": [code],
+            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+        }
+        body["receipt_sha256"] = canonical_sha256(body)
+        return body
+
     def _ladder_error_payload(code: str) -> dict[str, Any]:
         input_codes = {
             "MARKET_EVIDENCE_BASIS_INCOMPLETE",
@@ -452,15 +502,7 @@ def cmd_forge_run(
             "CAPABILITY_IDENTITY_UNAVAILABLE",
         }
         owner_class = "INPUT_NOT_READY" if code in input_codes else "OBSERVABILITY_BLOCKED"
-        return {
-            "schema": "smial.forge-run-receipt",
-            "schema_version": "1.0",
-            "owner_class": owner_class,
-            "next_action": owner_class,
-            "owner_final": owner_class,
-            "blocking_reason_codes": [code],
-            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
-        }
+        return _blocked_run_payload(code, owner_class)
 
     try:
         resolved = resolve_existing_data_root(
@@ -468,41 +510,25 @@ def cmd_forge_run(
         )
     except DataRootError as exc:
         reason = str(exc)
-        payload = {
-            "schema": "smial.forge-run-receipt",
-            "schema_version": "1.0",
-            "owner_class": "INPUT_NOT_READY",
-            "next_action": "INPUT_NOT_READY",
-            "owner_final": "INPUT_NOT_READY",
-            "blocking_reason_codes": [reason],
-            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
-            "owner_readout": (
-                "FORGE RUN\n"
-                "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
-                f"blocking: {reason}\n"
-                "NEXT — restore the canonical current corpus/data root, then retry /hypothesis-forge\n"
-                "writes: store=0 forge_run=0 session=0"
-            ),
-        }
+        payload = _blocked_run_payload(reason, "INPUT_NOT_READY")
+        payload["owner_readout"] = (
+            "FORGE RUN\n"
+            "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
+            f"blocking: {reason}\n"
+            "NEXT — restore the canonical current corpus/data root, then retry /hypothesis-forge\n"
+            "writes: store=0 forge_run=0 session=0"
+        )
         return _emit_run(payload, exit_code=2)
     if resolved.status != "PRESENT" or resolved.root is None:
         reason = resolved.error or "CURRENT_CORPUS_MISSING"
-        payload = {
-            "schema": "smial.forge-run-receipt",
-            "schema_version": "1.0",
-            "owner_class": "INPUT_NOT_READY",
-            "next_action": "INPUT_NOT_READY",
-            "owner_final": "INPUT_NOT_READY",
-            "blocking_reason_codes": [reason],
-            "writes": {"research_store": 0, "forge_run": 0, "session": 0},
-            "owner_readout": (
-                "FORGE RUN\n"
-                "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
-                f"blocking: {reason}\n"
-                "NEXT — restore/import the canonical current corpus, then retry /hypothesis-forge\n"
-                "writes: store=0 forge_run=0 session=0"
-            ),
-        }
+        payload = _blocked_run_payload(reason, "INPUT_NOT_READY")
+        payload["owner_readout"] = (
+            "FORGE RUN\n"
+            "status: BLOCKED — current corpus/data root unavailable; no scientific admission\n"
+            f"blocking: {reason}\n"
+            "NEXT — restore/import the canonical current corpus, then retry /hypothesis-forge\n"
+            "writes: store=0 forge_run=0 session=0"
+        )
         return _emit_run(payload, exit_code=2)
     try:
         receipt = evaluate_forge_run(
