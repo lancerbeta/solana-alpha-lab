@@ -107,6 +107,8 @@ def assess_campaign_successor_continuity(
 
     empty = {
         "campaign_successor_state": "NONE",
+        "campaign_successor_schedule_sha256": UNKNOWN,
+        "campaign_successor_activation_id": UNKNOWN,
         "stops_admitting_at": UNKNOWN,
         "campaign_time_remaining_seconds": UNKNOWN,
         "campaign_successor_required": False,
@@ -164,6 +166,8 @@ def assess_campaign_successor_continuity(
     family = cohort_family_key(registered["document"])
     successor_state = "NONE"
     continuity_proven = False
+    successor_schedule_sha256: str | None = None
+    successor_activation_id: str | None = None
 
     def _window_covers(document: Mapping[str, Any], boundary: datetime) -> bool:
         try:
@@ -205,6 +209,10 @@ def assess_campaign_successor_continuity(
             if _window_covers(successor_reg["document"], current_stops):
                 successor_state = "ROLLOVER_READY"
                 continuity_proven = True
+                successor_schedule_sha256 = successor_sha
+                successor_activation_id = str(
+                    item.get("successor_activation_id") or ""
+                ) or None
                 break
 
     has_active_peer = False
@@ -218,13 +226,21 @@ def assess_campaign_successor_continuity(
                 continue
             if (
                 str(other.get("state") or "") == "ACTIVE"
+                and _authority_is_live(
+                    other_sha,
+                    str(other.get("authority_receipt_sha256") or "") or None,
+                )
                 and _window_covers(other_reg["document"], current_stops)
             ):
                 has_active_peer = True
                 continuity_proven = True
+                successor_schedule_sha256 = other_sha
+                successor_activation_id = str(
+                    other.get("activation_id") or ""
+                ) or None
                 break
 
-    if successor_state != "ROLLOVER_READY":
+    if successor_state != "ROLLOVER_READY" and not continuity_proven:
         best = "NONE"
         for other_sha in store.list_registered_schedule_digests():
             if other_sha == schedule_sha:
@@ -236,11 +252,15 @@ def assess_campaign_successor_continuity(
                 best = "AUTHORIZED"
                 if _window_covers(other_reg["document"], current_stops):
                     continuity_proven = True
+                    successor_schedule_sha256 = other_sha
                     break
             elif best == "NONE":
                 best = "REGISTERED"
+                successor_schedule_sha256 = other_sha
         if successor_state != "ROLLOVER_READY":
             successor_state = best
+    elif has_active_peer:
+        successor_state = "ACTIVE"
     prepared = continuity_proven or has_active_peer
     required = within_warning_band and not prepared
     if required and successor_state == "AUTHORIZED":
@@ -258,6 +278,8 @@ def assess_campaign_successor_continuity(
         owner_action = UNKNOWN
     return {
         "campaign_successor_state": successor_state,
+        "campaign_successor_schedule_sha256": successor_schedule_sha256 or UNKNOWN,
+        "campaign_successor_activation_id": successor_activation_id or UNKNOWN,
         "stops_admitting_at": stops_raw,
         "campaign_time_remaining_seconds": remaining,
         "campaign_successor_required": required,
@@ -1126,6 +1148,14 @@ def build_collector_operational_packet(
             "campaign_time_remaining_seconds"
         ),
         "campaign_successor_state": continuity.get("campaign_successor_state") or "NONE",
+        "campaign_successor_schedule_sha256": continuity.get(
+            "campaign_successor_schedule_sha256"
+        )
+        or UNKNOWN,
+        "campaign_successor_activation_id": continuity.get(
+            "campaign_successor_activation_id"
+        )
+        or UNKNOWN,
         "campaign_successor_required": bool(
             continuity.get("campaign_successor_required")
         ),

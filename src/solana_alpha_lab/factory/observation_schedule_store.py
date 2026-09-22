@@ -529,13 +529,19 @@ class ObservationScheduleStore:
             """
             SELECT state, schedule_key, authority_receipt_sha256,
                    starts_at, stops_admitting_at, payload_json,
-                   last_transition_event_id
+                   created_at, updated_at, last_transition_event_id
             FROM schedule_activations
             WHERE schedule_sha256 = ? AND activation_id = ?
             """,
             (str(row["schedule_sha256"]), str(row["activation_id"])),
         ).fetchone()
         last_transition_event_id = row.get("last_transition_event_id")
+        if existing is not None:
+            created_at = str(existing["created_at"])
+            updated_at = str(existing["updated_at"])
+        else:
+            created_at = now
+            updated_at = now
         if existing is not None and str(existing["state"]) == "DRAINING":
             if str(row["state"]) != "DRAINING":
                 raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
@@ -615,8 +621,8 @@ class ObservationScheduleStore:
                 starts_at,
                 stops_admitting_at,
                 json.dumps(payload, sort_keys=True),
-                now,
-                now,
+                created_at,
+                updated_at,
                 int(row.get("transition_sequence") or 0),
                 last_transition_event_id,
             ),

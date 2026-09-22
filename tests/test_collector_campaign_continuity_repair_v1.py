@@ -48,9 +48,11 @@ from solana_alpha_lab.factory.observation_schedule_store import (
 )
 from solana_alpha_lab.factory.operability_watch import (
     INCIDENT_GRACE_SECONDS,
+    build_collector_snapshot,
     classify_incidents,
     evaluate_operability,
 )
+from solana_alpha_lab.factory.system_operability import _next_action_for
 from solana_alpha_lab.factory.observation_schedule import canonical_sha256
 
 GIT = "c" * 40
@@ -1007,6 +1009,25 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 now=NOW,
                 deploy_git_sha=GIT,
             )
+            snapshot = build_collector_snapshot(
+                packet,
+                observed_at=render_utc(NOW),
+            )
+            for field in (
+                "activation_id",
+                "stops_admitting_at",
+                "campaign_time_remaining_seconds",
+                "campaign_successor_state",
+                "campaign_successor_schedule_sha256",
+                "campaign_successor_activation_id",
+                "campaign_successor_required",
+                "campaign_successor_owner_action",
+            ):
+                self.assertIn(field, snapshot["packet"])
+            self.assertEqual(
+                snapshot["packet"]["stops_admitting_at"],
+                packet["stops_admitting_at"],
+            )
             self.assertTrue(packet["campaign_successor_required"])
             self.assertEqual(packet["campaign_successor_state"], "NONE")
             health = compose_health_classes(packet)
@@ -1141,6 +1162,25 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             store.close()
 
+    def test_unknown_successor_warning_does_not_claim_expiry_time(self) -> None:
+        found = classify_incidents(
+            {
+                "health_classes": ["CAMPAIGN_SUCCESSOR_REQUIRED"],
+                "activation_id": "ACT-UNKNOWN",
+                "campaign_successor_state": "UNKNOWN",
+                "campaign_time_remaining_seconds": "UNKNOWN",
+                "campaign_successor_owner_action": (
+                    "RECONCILE_CAMPAIGN_SUCCESSOR_STATE"
+                ),
+            }
+        )
+        self.assertIn("UNKNOWN/BLOCKED", found["CAMPAIGN_SUCCESSOR_REQUIRED"])
+        self.assertNotIn("expires soon", found["CAMPAIGN_SUCCESSOR_REQUIRED"])
+        self.assertEqual(
+            _next_action_for("CAMPAIGN_SUCCESSOR_REQUIRED"),
+            "REPAIR_CAMPAIGN_SUCCESSOR_CONTINUITY",
+        )
+
     def test_historical_authorized_same_family_does_not_clear_warning(self) -> None:
         current = _with_window(
             load_observation_schedule(
@@ -1269,7 +1309,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             load_observation_schedule(
                 ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
             ),
-            starts_at="2026-09-01T06:00:00Z",
+            starts_at="2026-09-01T00:00:00Z",
             stops_admitting_at="2026-09-02T12:00:00Z",
             schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-ROLLOVER-001",
         )
@@ -1291,7 +1331,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 predecessor_activation_id="ACT-CURRENT",
                 successor_schedule_sha256=successor_registered["schedule_sha256"],
                 successor_activation_id="ACT-SUCCESSOR",
-                cutover_at="2026-09-01T06:00:00Z",
+                cutover_at=render_utc(NOW),
                 authority_receipt_sha256=successor_authority["receipt_sha256"],
                 clock=NOW,
             )
@@ -1312,7 +1352,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 predecessor_activation_id="ACT-CURRENT",
                 successor_schedule_sha256=successor_registered["schedule_sha256"],
                 successor_activation_id="ACT-SUCCESSOR",
-                cutover_at="2026-09-01T06:00:00Z",
+                cutover_at=render_utc(NOW),
                 now=NOW,
                 producer_git_sha=GIT,
             )

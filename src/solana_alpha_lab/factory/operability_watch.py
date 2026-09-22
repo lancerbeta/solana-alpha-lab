@@ -27,6 +27,7 @@ COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS = (
     WATCH_CADENCE_SECONDS + COLLECTOR_SNAPSHOT_FRESHNESS_GRACE_SECONDS
 )
 COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
+    "activation_id",
     "activation_state",
     "backup_age_seconds",
     "collector_verdict",
@@ -38,6 +39,13 @@ COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
     "projected_97d_status",
     "provider_observations",
     "restore_marker_unresolved",
+    "stops_admitting_at",
+    "campaign_time_remaining_seconds",
+    "campaign_successor_state",
+    "campaign_successor_schedule_sha256",
+    "campaign_successor_activation_id",
+    "campaign_successor_required",
+    "campaign_successor_owner_action",
 )
 COLLECTOR_SNAPSHOT_FILE_MAX_BYTES = 65536
 WATCH_REQUIRED_TIMERS = (
@@ -221,14 +229,23 @@ def classify_incidents(
         found["MATERIAL_COVERAGE_DEGRADATION"] = "Discovery gap confirmed."
     if "CAMPAIGN_SUCCESSOR_REQUIRED" in classes:
         remaining = packet.get("campaign_time_remaining_seconds")
-        found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
-            "Campaign admission expires soon without a prepared successor "
-            f"(activation={packet.get('activation_id')} "
-            f"stops_admitting_at={packet.get('stops_admitting_at')} "
-            f"time_remaining_seconds={remaining} "
-            f"successor_state={packet.get('campaign_successor_state')} "
-            f"owner_action={packet.get('campaign_successor_owner_action')})."
-        )
+        successor_state = str(packet.get("campaign_successor_state") or "UNKNOWN")
+        if successor_state == "UNKNOWN" or remaining in (None, "UNKNOWN"):
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+                "Campaign successor continuity is UNKNOWN/BLOCKED; do not claim "
+                "an expiry time "
+                f"(activation={packet.get('activation_id')} "
+                f"owner_action={packet.get('campaign_successor_owner_action')})."
+            )
+        else:
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+                "Campaign admission expires soon without a prepared successor "
+                f"(activation={packet.get('activation_id')} "
+                f"stops_admitting_at={packet.get('stops_admitting_at')} "
+                f"time_remaining_seconds={remaining} "
+                f"successor_state={successor_state} "
+                f"owner_action={packet.get('campaign_successor_owner_action')})."
+            )
     units = unit_status or {}
     for unit in WATCH_REQUIRED_TIMERS:
         status = units.get(unit)
@@ -309,6 +326,8 @@ def render_incident_message(
                 f"STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
                 f"TIME_REMAINING_SECONDS={packet.get('campaign_time_remaining_seconds')}",
                 f"SUCCESSOR_STATE={packet.get('campaign_successor_state')}",
+                f"SUCCESSOR_SCHEDULE_SHA256={packet.get('campaign_successor_schedule_sha256')}",
+                f"SUCCESSOR_ACTIVATION_ID={packet.get('campaign_successor_activation_id')}",
                 f"CAMPAIGN_OWNER_ACTION={packet.get('campaign_successor_owner_action')}",
             ]
         )

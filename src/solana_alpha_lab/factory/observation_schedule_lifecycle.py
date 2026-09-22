@@ -956,17 +956,53 @@ def _draining_transition_evidence(
         ):
             return None
         admission_window_closed = payload.get("admission_window_closed")
-        rollover_proof = bool(
-            str(payload.get("rollover_id") or "")
-            and str(payload.get("cutover_at") or "")
+        rollover_id = str(payload.get("rollover_id") or "")
+        cutover_raw = str(payload.get("cutover_at") or "")
+        predecessor_schedule = str(
+            payload.get("predecessor_schedule_sha256") or ""
         )
+        predecessor_activation = str(
+            payload.get("predecessor_activation_id") or ""
+        )
+        successor_schedule = str(payload.get("successor_schedule_sha256") or "")
+        successor_activation = str(payload.get("successor_activation_id") or "")
+        successor_starts_raw = str(payload.get("successor_starts_at") or "")
+        successor_stops_raw = str(
+            payload.get("successor_stops_admitting_at") or ""
+        )
+        effective = record.effective_at.astimezone(UTC)
+        rollover_proof = False
+        if all(
+            (
+                rollover_id,
+                cutover_raw,
+                predecessor_schedule == schedule_sha256,
+                predecessor_activation == activation_id,
+                successor_schedule,
+                successor_activation,
+                successor_schedule != schedule_sha256
+                or successor_activation != activation_id,
+                successor_starts_raw,
+                successor_stops_raw,
+            )
+        ):
+            try:
+                cutover = parse_utc(cutover_raw)
+                successor_starts = parse_utc(successor_starts_raw)
+                successor_stops = parse_utc(successor_stops_raw)
+            except Exception:
+                return None
+            rollover_proof = (
+                effective == cutover
+                and starts <= cutover <= stops
+                and successor_starts <= cutover < successor_stops
+            )
         if admission_window_closed is True:
             admission_closed = True
-        elif admission_window_closed is False or rollover_proof:
+        elif rollover_proof:
             admission_closed = False
         else:
             return None
-        effective = record.effective_at.astimezone(UTC)
         if admission_closed and effective < stops:
             return None
         return effective, admission_closed
@@ -1653,6 +1689,36 @@ def rollover_schedule(
                 ],
                 "admission_window_closed": (
                     False if transition["state"] == "DRAINING" else None
+                ),
+                "predecessor_schedule_sha256": (
+                    predecessor_schedule_sha256
+                    if transition["state"] == "DRAINING"
+                    else None
+                ),
+                "predecessor_activation_id": (
+                    predecessor_activation_id
+                    if transition["state"] == "DRAINING"
+                    else None
+                ),
+                "successor_schedule_sha256": (
+                    successor_schedule_sha256
+                    if transition["state"] == "DRAINING"
+                    else None
+                ),
+                "successor_activation_id": (
+                    successor_activation_id
+                    if transition["state"] == "DRAINING"
+                    else None
+                ),
+                "successor_starts_at": (
+                    successor_document["activation"]["starts_at"]
+                    if transition["state"] == "DRAINING"
+                    else None
+                ),
+                "successor_stops_admitting_at": (
+                    successor_document["activation"]["stops_admitting_at"]
+                    if transition["state"] == "DRAINING"
+                    else None
                 ),
             },
             now=now,

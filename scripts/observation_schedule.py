@@ -304,6 +304,16 @@ def main(
         if args.command == "status":
             cli_digest = getattr(args, "schedule_sha256", None)
             cli_activation = getattr(args, "activation_id", None)
+            if bool(cli_digest) != bool(cli_activation):
+                return _emit(
+                    {
+                        "terminal": "STATUS_SELECTOR_INCOMPLETE",
+                        "next_action": (
+                            "PROVIDE_BOTH_SCHEDULE_SHA256_AND_ACTIVATION_ID"
+                        ),
+                    },
+                    2,
+                )
             # Status defaults to the store's deterministic current
             # ACTIVE/DRAINING selection.  Runtime config is not an authority
             # for choosing a historical activation.
@@ -369,6 +379,16 @@ def main(
             }
             cli_digest = getattr(args, "schedule_sha256", None)
             cli_activation = getattr(args, "activation_id", None)
+            if bool(cli_digest) != bool(cli_activation):
+                return _emit(
+                    {
+                        "terminal": "DOCTOR_SELECTOR_INCOMPLETE",
+                        "next_action": (
+                            "PROVIDE_BOTH_SCHEDULE_SHA256_AND_ACTIVATION_ID"
+                        ),
+                    },
+                    2,
+                )
             if cli_digest and cli_activation:
                 collector_digest = str(cli_digest)
                 collector_activation = str(cli_activation)
