@@ -320,12 +320,30 @@ def render_incident_message(
         f"FIRST_SEEN_AT={first_seen_at}",
     ]
     if code == "CAMPAIGN_SUCCESSOR_REQUIRED":
+        successor_state = str(packet.get("campaign_successor_state") or "UNKNOWN")
+        remaining = packet.get("campaign_time_remaining_seconds")
+        continuity_unknown = successor_state == "UNKNOWN" or remaining in (
+            None,
+            "UNKNOWN",
+        )
+        boundary_fields = (
+            [
+                f"CURRENT_STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
+                f"CURRENT_TIME_REMAINING_SECONDS={remaining}",
+                "SUCCESSOR_STOPS_ADMITTING_AT=UNKNOWN",
+                "SUCCESSOR_TIME_REMAINING_SECONDS=UNKNOWN",
+            ]
+            if continuity_unknown
+            else [
+                f"STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
+                f"TIME_REMAINING_SECONDS={remaining}",
+            ]
+        )
         lines.extend(
             [
                 f"ACTIVATION_ID={packet.get('activation_id')}",
-                f"STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
-                f"TIME_REMAINING_SECONDS={packet.get('campaign_time_remaining_seconds')}",
-                f"SUCCESSOR_STATE={packet.get('campaign_successor_state')}",
+                *boundary_fields,
+                f"SUCCESSOR_STATE={successor_state}",
                 f"SUCCESSOR_SCHEDULE_SHA256={packet.get('campaign_successor_schedule_sha256')}",
                 f"SUCCESSOR_ACTIVATION_ID={packet.get('campaign_successor_activation_id')}",
                 f"CAMPAIGN_OWNER_ACTION={packet.get('campaign_successor_owner_action')}",

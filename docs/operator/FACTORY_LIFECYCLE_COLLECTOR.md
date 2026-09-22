@@ -223,7 +223,10 @@ Both immutable `effective_at` values must equal the cutover. If either event
 is missing, malformed, or not bound to the corresponding transition, open a
 separate recovery atom; do not backfill or rewrite immutable history. Retry
 the rollover only after both committed immutable proofs are present and
-revalidated.
+revalidated. The owner handoff for that atom is the exact predecessor and
+successor schedule/activation IDs plus both `last_transition_event_id` values;
+its completion criterion is a fresh read-only status/event inspection that
+proves both bindings before any rollover retry.
 
 A rollover requested after its cutover has already passed returns
 `ROLLOVER_CUTOVER_IN_PAST`; use the forward post-window successor procedure
@@ -281,9 +284,11 @@ Not expected:
 
 If it prints no matching immutable event or the payload is not the committed
 `DRAINING` transition with `admission_window_closed=true`, stop and open a
-separate recovery atom; this repair intentionally does not backfill or rewrite
-history. If the event is present, re-run doctor and continue only when it
-reports `APPEND_ONLY_DRAINING_TRANSITION`. The existing CLI flow is:
+separate recovery atom with the schedule SHA, activation ID, and
+`late_recovery_event_id`; do not retry activation or rewrite history. The
+completion criterion is a fresh doctor readback reporting
+`APPEND_ONLY_DRAINING_TRANSITION`. If the event is present, re-run doctor and
+continue only when it reports that terminal. The existing CLI flow is:
 
 ```text
 SCHEDULE=<forward-successor-yaml>
@@ -310,11 +315,19 @@ whose authorized window can cover the current admission boundary
 operability watch emits one deduped `CAMPAIGN_SUCCESSOR_REQUIRED` attention
 (not `SOURCE_DATA_STALE`). An historical or post-gap authorized schedule does
 not clear the attention. Age `> period*3` remains the sole
-`SOURCE_DATA_STALE` rule.
+`SOURCE_DATA_STALE` rule. The dedupe key remains the stable owner-action code;
+activation identity is context, and a later recovery clears the active warning
+so a genuinely new warning can notify once.
 
 When Telegram fires `CAMPAIGN_SUCCESSOR_REQUIRED`:
 
-1. Read `SUCCESSOR_STATE` / `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS`.
+1. Read `SUCCESSOR_STATE` and the current campaign boundary. In an
+   `UNKNOWN`/`BLOCKED` card, `CURRENT_STOPS_ADMITTING_AT` and
+   `CURRENT_TIME_REMAINING_SECONDS` describe the current predecessor only;
+   `SUCCESSOR_STOPS_ADMITTING_AT` and
+   `SUCCESSOR_TIME_REMAINING_SECONDS` are `UNKNOWN`, never an implied
+   successor expiry. A continuity-proven card keeps the legacy
+   `STOPS_ADMITTING_AT` / `TIME_REMAINING_SECONDS` fields.
 2. Register the successor schedule if missing, then **authorize** it before
    expiry (or commit in-window `rollover` while admission is still open).
    For an in-window cutover, use the exact registered identities and the

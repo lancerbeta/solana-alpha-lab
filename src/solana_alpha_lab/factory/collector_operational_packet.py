@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from solana_alpha_lab.factory.collector_read_model import (
+    activation_rows_with_family_keys,
     build_collector_read_model,
     select_current_activation,
 )
@@ -1035,10 +1036,13 @@ def build_collector_operational_packet(
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
         if requested is not None:
-            continuity_activation = select_current_activation([requested], now=clock)
+            continuity_activation = select_current_activation(
+                activation_rows_with_family_keys(store, [requested]), now=clock
+            )
     if continuity_activation is None:
         continuity_activation = select_current_activation(
-            store.list_activations(), now=clock
+            activation_rows_with_family_keys(store, store.list_activations()),
+            now=clock,
         )
     continuity = assess_campaign_successor_continuity(
         store,

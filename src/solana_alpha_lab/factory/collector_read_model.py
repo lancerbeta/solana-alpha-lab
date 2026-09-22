@@ -23,7 +23,11 @@ from solana_alpha_lab.factory.observation_primitives import (
     HTTP_CLASS_TIMEOUT,
     HTTP_CLASS_TRANSPORT,
 )
-from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
+from solana_alpha_lab.factory.observation_schedule import (
+    cohort_family_key,
+    parse_utc,
+    render_utc,
+)
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 
 DISCOVERY = "PRIM-JUPITER-TOKENS-V2-RECENT-001"
@@ -53,10 +57,37 @@ def _activation_freshness_key(row: MappingLike) -> tuple[str, str, str]:
     )
 
 
+def activation_rows_with_family_keys(
+    store: ObservationScheduleStore,
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+) -> list[dict[str, Any]]:
+    """Attach canonical family identity before current-state selection."""
+
+    enriched: list[dict[str, Any]] = []
+    for raw in activations:
+        row = dict(raw)
+        schedule_sha256 = str(row.get("schedule_sha256") or "")
+        registered = (
+            store.get_registered_schedule(schedule_sha256)
+            if schedule_sha256
+            else None
+        )
+        if registered is not None:
+            try:
+                row["cohort_family_key"] = cohort_family_key(
+                    registered["document"]
+                )
+            except (KeyError, TypeError, ValueError):
+                pass
+        enriched.append(row)
+    return enriched
+
+
 def select_current_activation(
     activations: list[MappingLike] | tuple[MappingLike, ...],
     *,
     now: datetime | None = None,
+    family_key: str | None = None,
 ) -> dict[str, Any] | None:
     """Deterministic current campaign activation for status/doctor/operability.
 
@@ -67,6 +98,8 @@ def select_current_activation(
 
     Historical ABORTED_SAFETY remains selectable only when no ACTIVE/DRAINING
     peer exists; it is never preferred over a live draining campaign.
+    Multiple canonical family keys without an explicit scope are ambiguous and
+    fail closed instead of allowing one family to mask another.
     """
 
     clock = None
@@ -98,6 +131,23 @@ def select_current_activation(
                         else:
                             continue
         rows.append(row)
+    if family_key is not None:
+        rows = [
+            row
+            for row in rows
+            if str(row.get("cohort_family_key") or "") == family_key
+        ]
+    else:
+        family_keys = {
+            str(row.get("cohort_family_key") or "")
+            for row in rows
+            if str(row.get("cohort_family_key") or "")
+        }
+        has_unscoped_rows = any(
+            not str(row.get("cohort_family_key") or "") for row in rows
+        )
+        if len(family_keys) > 1 or (family_keys and has_unscoped_rows):
+            return None
     if not rows:
         return None
     active = [row for row in rows if str(row.get("state") or "") == "ACTIVE"]
@@ -345,12 +395,14 @@ def build_collector_read_model(
         now = now.replace(tzinfo=UTC)
     now = now.astimezone(UTC)
     window_start = now - timedelta(hours=24)
-    activations = store.list_activations()
+    activations = activation_rows_with_family_keys(store, store.list_activations())
     selected = None
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
         if requested is not None:
-            selected = select_current_activation([requested], now=now)
+            selected = select_current_activation(
+                activation_rows_with_family_keys(store, [requested]), now=now
+            )
     elif activations:
         selected = select_current_activation(activations, now=now)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")

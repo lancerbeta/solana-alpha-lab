@@ -348,12 +348,15 @@ def main(
             return _emit(result, 0)
         if args.command == "doctor":
             from solana_alpha_lab.factory.collector_read_model import (
+                activation_rows_with_family_keys,
                 build_collector_read_model,
                 classify_doctor_current_activation,
             )
 
             unresolved = store.restore_marker_unresolved()
-            activations = store.list_activations()
+            activations = activation_rows_with_family_keys(
+                store, store.list_activations()
+            )
             recovery_proofs = {
                 (
                     str(row.get("schedule_sha256") or ""),

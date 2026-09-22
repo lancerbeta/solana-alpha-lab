@@ -54,6 +54,7 @@ from solana_alpha_lab.factory.operability_watch import (
     build_collector_snapshot,
     classify_incidents,
     evaluate_operability,
+    render_incident_message,
 )
 from solana_alpha_lab.factory.system_operability import _next_action_for
 from solana_alpha_lab.factory.observation_schedule import canonical_sha256
@@ -1329,6 +1330,26 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             _next_action_for("CAMPAIGN_SUCCESSOR_REQUIRED"),
             "REPAIR_CAMPAIGN_SUCCESSOR_CONTINUITY",
         )
+        rendered = render_incident_message(
+            kind="ATTENTION",
+            code="CAMPAIGN_SUCCESSOR_REQUIRED",
+            detail=found["CAMPAIGN_SUCCESSOR_REQUIRED"],
+            packet={
+                "activation_id": "ACT-UNKNOWN",
+                "stops_admitting_at": "2026-09-01T12:00:00Z",
+                "campaign_time_remaining_seconds": "UNKNOWN",
+                "campaign_successor_state": "UNKNOWN",
+                "campaign_successor_schedule_sha256": "UNKNOWN",
+                "campaign_successor_activation_id": "UNKNOWN",
+                "campaign_successor_owner_action": "RECONCILE_CAMPAIGN_SUCCESSOR_STATE",
+            },
+            first_seen_at="2026-09-01T00:00:00Z",
+        )
+        self.assertIn("CURRENT_STOPS_ADMITTING_AT=2026-09-01T12:00:00Z", rendered)
+        self.assertIn("CURRENT_TIME_REMAINING_SECONDS=UNKNOWN", rendered)
+        self.assertIn("SUCCESSOR_STOPS_ADMITTING_AT=UNKNOWN", rendered)
+        self.assertIn("SUCCESSOR_TIME_REMAINING_SECONDS=UNKNOWN", rendered)
+        self.assertNotIn("\nSTOPS_ADMITTING_AT=2026-09-01T12:00:00Z\n", rendered)
 
     def test_historical_authorized_same_family_does_not_clear_warning(self) -> None:
         current = _with_window(
