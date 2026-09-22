@@ -140,12 +140,16 @@ def assess_campaign_successor_continuity(
                 "reconcile current activation stops_admitting_at before successor assessment"
             ),
         }
-    remaining = int((stops - now).total_seconds())
+    time_to_stop = stops - now
+    remaining = int(time_to_stop.total_seconds())
+    within_warning_band = timedelta(0) <= time_to_stop <= timedelta(
+        seconds=CAMPAIGN_SUCCESSOR_WARNING_SECONDS
+    )
     schedule_sha = str(activation.get("schedule_sha256") or "")
     activation_id = str(activation.get("activation_id") or "")
     registered = store.get_registered_schedule(schedule_sha) if schedule_sha else None
     if registered is None:
-        required = 0 <= remaining <= CAMPAIGN_SUCCESSOR_WARNING_SECONDS
+        required = within_warning_band
         return {
             "campaign_successor_state": "UNKNOWN",
             "stops_admitting_at": stops_raw,
@@ -238,7 +242,7 @@ def assess_campaign_successor_continuity(
         if successor_state != "ROLLOVER_READY":
             successor_state = best
     prepared = continuity_proven or has_active_peer
-    required = 0 <= remaining <= CAMPAIGN_SUCCESSOR_WARNING_SECONDS and not prepared
+    required = within_warning_band and not prepared
     if required and successor_state == "AUTHORIZED":
         owner_action = (
             "prepare a new same-family successor whose authorized window covers "

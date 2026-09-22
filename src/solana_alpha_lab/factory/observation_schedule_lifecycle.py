@@ -909,12 +909,16 @@ def _draining_transition_evidence(
     schedule_sha256 = str(row.get("schedule_sha256") or "")
     activation_id = str(row.get("activation_id") or "")
     event_id = str(row.get("last_transition_event_id") or "")
+    starts_raw = row.get("starts_at")
     stops_raw = row.get("stops_admitting_at")
     if not schedule_sha256 or not activation_id or not event_id:
+        return None
+    if not isinstance(starts_raw, str) or not starts_raw:
         return None
     if not isinstance(stops_raw, str) or not stops_raw:
         return None
     try:
+        starts = parse_utc(starts_raw)
         stops = parse_utc(stops_raw)
     except Exception:
         return None
@@ -924,7 +928,10 @@ def _draining_transition_evidence(
         ).iter_lifecycle_records_bounded(
             schedule_sha256=schedule_sha256,
             activation_id=activation_id,
-            window_start=stops,
+            # Rollover may drain before the predecessor admission window
+            # closes.  The immutable activation start is the smallest
+            # lifecycle boundary needed to recover that committed event.
+            window_start=starts,
             closure_cutoff=now,
         )
     except ResearchStoreError:
@@ -946,13 +953,23 @@ def _draining_transition_evidence(
             or str(payload.get("activation_id") or "") != activation_id
             or str(payload.get("state") or "") != "DRAINING"
             or str(payload.get("prior_state") or "") != "ACTIVE"
-            or payload.get("admission_window_closed") is not True
         ):
             return None
-        effective = record.effective_at.astimezone(UTC)
-        if effective < stops:
+        admission_window_closed = payload.get("admission_window_closed")
+        rollover_proof = bool(
+            str(payload.get("rollover_id") or "")
+            and str(payload.get("cutover_at") or "")
+        )
+        if admission_window_closed is True:
+            admission_closed = True
+        elif admission_window_closed is False or rollover_proof:
+            admission_closed = False
+        else:
             return None
-        return effective, payload.get("admission_window_closed") is True
+        effective = record.effective_at.astimezone(UTC)
+        if admission_closed and effective < stops:
+            return None
+        return effective, admission_closed
     return None
 
 
@@ -984,15 +1001,25 @@ def resolve_late_recovery_proof(
     """
 
     evidence = _draining_transition_evidence(data_root, row, now=now)
+    event_id = str(row.get("last_transition_event_id") or "") or None
     if evidence is None:
-        return {"late_recovery_at": None, "late_recovery_proof": "UNKNOWN"}
+        return {
+            "late_recovery_at": None,
+            "late_recovery_proof": "UNKNOWN",
+            "late_recovery_event_id": event_id,
+        }
     effective, admission_closed = evidence
     if admission_closed:
         return {
             "late_recovery_at": render_utc(effective),
             "late_recovery_proof": "APPEND_ONLY_DRAINING_TRANSITION",
+            "late_recovery_event_id": event_id,
         }
-    return {"late_recovery_at": None, "late_recovery_proof": "NOT_REQUIRED"}
+    return {
+        "late_recovery_at": None,
+        "late_recovery_proof": "NOT_REQUIRED",
+        "late_recovery_event_id": event_id,
+    }
 
 
 def _require_cohort_cutover_or_unique(
@@ -1624,6 +1651,9 @@ def rollover_schedule(
                 "authority_receipt_sha256": transition[
                     "authority_receipt_sha256"
                 ],
+                "admission_window_closed": (
+                    False if transition["state"] == "DRAINING" else None
+                ),
             },
             now=now,
             producer_git_sha=producer_git_sha,

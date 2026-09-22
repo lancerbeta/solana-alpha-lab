@@ -40,6 +40,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     register_schedule,
     resolve_late_recovery_proof,
     rollover_schedule,
+    status_schedule,
 )
 from solana_alpha_lab.factory.observation_schedule_store import (
     ObservationScheduleStore,
@@ -284,6 +285,30 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 proof["late_recovery_proof"], "APPEND_ONLY_DRAINING_TRANSITION"
             )
             self.assertEqual(proof["late_recovery_at"], "2026-09-02T01:00:00Z")
+            store.upsert_activation(
+                {
+                    "schedule_sha256": pred["schedule_sha256"],
+                    "activation_id": "ACT-PRE",
+                    "schedule_key": predecessor["schedule_key"],
+                    "state": "DRAINING",
+                    "starts_at": predecessor["activation"]["starts_at"],
+                    "stops_admitting_at": predecessor["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {},
+                },
+                clock=late,
+            )
+            preserved = store.get_activation(pred["schedule_sha256"], "ACT-PRE")
+            assert preserved is not None
+            self.assertEqual(
+                preserved["payload"]["transition_event_id"],
+                draining_row["payload"]["transition_event_id"],
+            )
+            self.assertEqual(
+                preserved["last_transition_event_id"],
+                draining_row["last_transition_event_id"],
+            )
             forged_payload = dict(draining_row["payload"])
             forged_payload["transition_effective_at"] = "2026-09-01T00:00:00Z"
             with self.assertRaisesRegex(
@@ -709,6 +734,45 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         assert current is not None
         self.assertEqual(current["activation_id"], "ACT-SUC")
 
+    def test_status_defaults_to_current_activation_not_historical_row(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            self.assertIsNotNone(store.acquire_lease("status-test", clock=NOW))
+            store.upsert_activation(
+                {
+                    "schedule_sha256": "a" * 64,
+                    "activation_id": "ACT-HISTORICAL",
+                    "schedule_key": "OBS-HISTORICAL-001",
+                    "state": "ABORTED_SAFETY",
+                    "starts_at": "2026-08-01T00:00:00Z",
+                    "stops_admitting_at": "2026-08-02T00:00:00Z",
+                    "payload": {"must_not_resume": True},
+                },
+                clock=NOW,
+            )
+            store.upsert_activation(
+                {
+                    "schedule_sha256": "b" * 64,
+                    "activation_id": "ACT-CURRENT",
+                    "schedule_key": "OBS-CURRENT-001",
+                    "state": "ACTIVE",
+                    "starts_at": "2026-09-01T00:00:00Z",
+                    "stops_admitting_at": "2026-09-02T00:00:00Z",
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+            result = status_schedule(
+                store,
+                schedule_sha256=None,
+                activation_id=None,
+                now=NOW,
+                deploy_git_sha=GIT,
+            )
+            self.assertEqual(result["collector"]["activation_id"], "ACT-CURRENT")
+            self.assertEqual(result["collector"]["activation_state"], "ACTIVE")
+            store.close()
+
     def test_read_model_keeps_genuine_current_aborted(self) -> None:
         activations = [
             {
@@ -739,11 +803,21 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             {
                 "activation_id": "ACT-E0CC",
                 "state": "DRAINING",
+                "last_transition_event_id": "OBS-TRANS-ROLLOVER",
                 "updated_at": "2026-09-02T01:00:00Z",
                 "created_at": "2026-09-01T00:10:00Z",
             },
         ]
-        report = classify_doctor_current_activation(activations)
+        report = classify_doctor_current_activation(
+            activations,
+            recovery_proofs={
+                ("", "ACT-E0CC"): {
+                    "late_recovery_at": None,
+                    "late_recovery_proof": "NOT_REQUIRED",
+                    "late_recovery_event_id": "OBS-TRANS-ROLLOVER",
+                }
+            },
+        )
         self.assertEqual(report["terminal"], "DOCTOR_CURRENT_OK")
         self.assertEqual(report["current_activation_state"], "DRAINING")
         self.assertEqual(report["current_activation_id"], "ACT-E0CC")
@@ -767,7 +841,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 }
             ],
             recovery_proofs={
-                "ACT-DRAIN": {
+                ("d" * 64, "ACT-DRAIN"): {
                     "late_recovery_at": "2026-09-02T01:00:00Z",
                     "late_recovery_proof": "APPEND_ONLY_DRAINING_TRANSITION",
                 }
@@ -778,6 +852,82 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         self.assertEqual(
             report["late_recovery_proof"], "APPEND_ONLY_DRAINING_TRANSITION"
         )
+
+    def test_doctor_blocks_when_late_recovery_proof_is_unknown(self) -> None:
+        report = classify_doctor_current_activation(
+            [
+                {
+                    "activation_id": "ACT-DRAIN-UNKNOWN",
+                    "schedule_sha256": "b" * 64,
+                    "state": "DRAINING",
+                    "last_transition_event_id": "OBS-TRANS-MISSING",
+                    "stops_admitting_at": "2026-09-02T00:00:00Z",
+                    "updated_at": "2026-09-02T01:00:00Z",
+                    "created_at": "2026-09-01T00:00:00Z",
+                }
+            ],
+            recovery_proofs={
+                ("b" * 64, "ACT-DRAIN-UNKNOWN"): {
+                    "late_recovery_at": None,
+                    "late_recovery_proof": "UNKNOWN",
+                    "late_recovery_event_id": "OBS-TRANS-MISSING",
+                }
+            },
+        )
+        self.assertEqual(report["terminal"], "DOCTOR_RECOVERY_PROOF_UNAVAILABLE")
+        self.assertEqual(report["next_action"], "REPAIR_DRAINING_RECOVERY_PROOF")
+
+    def test_doctor_does_not_cross_project_recovery_proof_between_schedules(self) -> None:
+        report = classify_doctor_current_activation(
+            [
+                {
+                    "activation_id": "ACT-SAME",
+                    "schedule_sha256": "a" * 64,
+                    "state": "DRAINING",
+                    "last_transition_event_id": "OBS-TRANS-A",
+                    "stops_admitting_at": "2026-09-02T00:00:00Z",
+                    "updated_at": "2026-09-02T01:00:00Z",
+                    "created_at": "2026-09-01T00:00:00Z",
+                }
+            ],
+            recovery_proofs={
+                ("b" * 64, "ACT-SAME"): {
+                    "late_recovery_at": "2026-09-02T01:00:00Z",
+                    "late_recovery_proof": "APPEND_ONLY_DRAINING_TRANSITION",
+                }
+            },
+        )
+        self.assertEqual(report["terminal"], "DOCTOR_RECOVERY_PROOF_UNAVAILABLE")
+        self.assertEqual(report["late_recovery_proof"], "UNKNOWN")
+
+    def test_successor_warning_uses_exact_24_hour_boundary(self) -> None:
+        activation = {
+            "schedule_sha256": "e" * 64,
+            "activation_id": "ACT-BOUNDARY",
+            "state": "ACTIVE",
+            "stops_admitting_at": render_utc(NOW + timedelta(days=1)),
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            outside = assess_campaign_successor_continuity(
+                store,
+                now=NOW - timedelta(microseconds=500_000),
+                activation=activation,
+            )
+            exact = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=activation,
+            )
+            after_expiry = assess_campaign_successor_continuity(
+                store,
+                now=NOW + timedelta(days=1, microseconds=500_000),
+                activation=activation,
+            )
+            self.assertFalse(outside["campaign_successor_required"])
+            self.assertTrue(exact["campaign_successor_required"])
+            self.assertFalse(after_expiry["campaign_successor_required"])
+            store.close()
 
     def test_lifecycle_denials_have_owner_next_actions(self) -> None:
         self.assertEqual(
@@ -1154,6 +1304,26 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             self.assertEqual(continuity["campaign_successor_state"], "ROLLOVER_READY")
             self.assertFalse(continuity["campaign_successor_required"])
+            rollover_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                predecessor_schedule_sha256=current_registered["schedule_sha256"],
+                predecessor_activation_id="ACT-CURRENT",
+                successor_schedule_sha256=successor_registered["schedule_sha256"],
+                successor_activation_id="ACT-SUCCESSOR",
+                cutover_at="2026-09-01T06:00:00Z",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            predecessor_row = store.get_activation(
+                current_registered["schedule_sha256"], "ACT-CURRENT"
+            )
+            assert predecessor_row is not None
+            proof = resolve_late_recovery_proof(
+                data_root, predecessor_row, now=NOW
+            )
+            self.assertEqual(proof["late_recovery_proof"], "NOT_REQUIRED")
             store.close()
 
     def test_source_data_stale_unchanged(self) -> None:

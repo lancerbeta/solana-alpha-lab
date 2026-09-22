@@ -41,6 +41,9 @@ managed_write_set:
   - tests/test_collector_campaign_continuity_repair_v1.py
   - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
   - catalog/assets/core.yaml
+  - catalog/assets/lifecycle.yaml
+  - catalog/generated/asset_edges.json
+  - docs/PROJECT_MAP.md
   - docs/evidence/collector_campaign_continuity_repair/a1_delivery_completion_evidence_v1.json
   - docs/evidence/collector_campaign_continuity_repair/a1_delivery_independent_review_v1.json
   - docs/evidence/collector_campaign_continuity_repair/a1_delivery_factory_fit_v1.json

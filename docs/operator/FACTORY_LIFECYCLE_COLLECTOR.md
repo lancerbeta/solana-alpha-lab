@@ -235,8 +235,20 @@ Not expected:
 
 2. Read `late_recovery_at` from doctor and prepare a **new** successor schedule
    whose `starts_at` is `>=` that point and `<=` actual activation time. If
-   doctor reports `late_recovery_proof=UNKNOWN`, stop and repair/recover the
-   lifecycle proof; do not guess a timestamp. The existing CLI flow is:
+   doctor reports `late_recovery_proof=UNKNOWN`, doctor exits with
+   `DOCTOR_RECOVERY_PROOF_UNAVAILABLE` / code 2. Do not activate or guess a
+   timestamp. First inspect the immutable event named by
+   `late_recovery_event_id` with this read-only check:
+
+```text
+uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); rows,_=s.iter_lifecycle_records_bounded(schedule_sha256='<SCHEDULE_SHA256>', activation_id='<ACTIVATION_ID>'); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in rows if r.record_id == '<LATE_RECOVERY_EVENT_ID>'], sort_keys=True))"
+```
+
+If it prints no matching immutable event or the payload is not the committed
+`DRAINING` transition with `admission_window_closed=true`, stop and open a
+separate recovery atom; this repair intentionally does not backfill or rewrite
+history. If the event is present, re-run doctor and continue only when it
+reports `APPEND_ONLY_DRAINING_TRANSITION`. The existing CLI flow is:
 
 ```text
 SCHEDULE=<forward-successor-yaml>

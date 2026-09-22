@@ -302,10 +302,21 @@ def main(
             )
             return _emit(result, code)
         if args.command == "status":
+            cli_digest = getattr(args, "schedule_sha256", None)
+            cli_activation = getattr(args, "activation_id", None)
+            # Status defaults to the store's deterministic current
+            # ACTIVE/DRAINING selection.  Runtime config is not an authority
+            # for choosing a historical activation.
+            explicit_digest = (
+                str(cli_digest) if cli_digest and cli_activation else None
+            )
+            explicit_activation = (
+                str(cli_activation) if cli_digest and cli_activation else None
+            )
             result = status_schedule(
                 store,
-                schedule_sha256=getattr(args, "schedule_sha256", None) or config.get("schedule_sha256"),
-                activation_id=getattr(args, "activation_id", None) or config.get("activation_id"),
+                schedule_sha256=explicit_digest,
+                activation_id=explicit_activation,
                 now=now,
                 deploy_git_sha=producer,
             )
@@ -334,9 +345,10 @@ def main(
             unresolved = store.restore_marker_unresolved()
             activations = store.list_activations()
             recovery_proofs = {
-                str(row.get("activation_id") or ""): resolve_late_recovery_proof(
-                    data_root, row, now=now
-                )
+                (
+                    str(row.get("schedule_sha256") or ""),
+                    str(row.get("activation_id") or ""),
+                ): resolve_late_recovery_proof(data_root, row, now=now)
                 for row in activations
                 if str(row.get("state") or "") == "DRAINING"
                 and str(row.get("activation_id") or "")
@@ -351,6 +363,9 @@ def main(
                 "stops_admitting_at": current_report.get("stops_admitting_at"),
                 "late_recovery_at": current_report.get("late_recovery_at"),
                 "late_recovery_proof": current_report.get("late_recovery_proof"),
+                "late_recovery_event_id": current_report.get(
+                    "late_recovery_event_id"
+                ),
             }
             cli_digest = getattr(args, "schedule_sha256", None)
             cli_activation = getattr(args, "activation_id", None)
@@ -427,6 +442,23 @@ def main(
                         "activation_count": len(activations),
                         "collector": collector,
                         "next_action": "MUST_NOT_RESUME" if must_not_resume else "RESUME",
+                    },
+                    2,
+                )
+            if current_report["terminal"] == "DOCTOR_RECOVERY_PROOF_UNAVAILABLE":
+                return _emit(
+                    {
+                        **current_timing,
+                        "terminal": "DOCTOR_RECOVERY_PROOF_UNAVAILABLE",
+                        "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state,
+                        "restore_marker_unresolved": False,
+                        "activation_count": len(activations),
+                        "collector": collector,
+                        "next_action": "REPAIR_DRAINING_RECOVERY_PROOF",
                     },
                     2,
                 )

@@ -98,8 +98,12 @@ def classify_doctor_current_activation(
     recovery_proof = None
     if current_state == "DRAINING":
         recovery_proof = "UNKNOWN"
+        recovery_key = (
+            str(current_digest or ""),
+            str(current_id or ""),
+        )
         proof = (
-            recovery_proofs.get(str(current_id))
+            recovery_proofs.get(recovery_key)
             if isinstance(recovery_proofs, MappingLike) and current_id is not None
             else None
         )
@@ -110,6 +114,15 @@ def classify_doctor_current_activation(
         "stops_admitting_at": stops_admitting_at,
         "late_recovery_at": late_recovery_at,
         "late_recovery_proof": recovery_proof,
+        "late_recovery_event_id": (
+            proof.get("late_recovery_event_id")
+            if current_state == "DRAINING" and isinstance(proof, MappingLike)
+            else (
+                (current or {}).get("last_transition_event_id")
+                if current_state == "DRAINING"
+                else None
+            )
+        ),
     }
     if current_state == "ABORTED_SAFETY":
         return {
@@ -130,6 +143,16 @@ def classify_doctor_current_activation(
             "current_schedule_sha256": current_digest,
             "current_activation_state": current_state,
             "next_action": "RESUME",
+        }
+    if current_state == "DRAINING" and recovery_proof == "UNKNOWN":
+        return {
+            **lifecycle_fields,
+            "terminal": "DOCTOR_RECOVERY_PROOF_UNAVAILABLE",
+            "live_activation": False,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": "REPAIR_DRAINING_RECOVERY_PROOF",
         }
     if current_state in {"ACTIVE", "DRAINING"}:
         return {

@@ -527,7 +527,9 @@ class ObservationScheduleStore:
             payload = json.loads(str(row["payload_json"]))
         existing = self._conn.execute(
             """
-            SELECT state, payload_json, last_transition_event_id
+            SELECT state, schedule_key, authority_receipt_sha256,
+                   starts_at, stops_admitting_at, payload_json,
+                   last_transition_event_id
             FROM schedule_activations
             WHERE schedule_sha256 = ? AND activation_id = ?
             """,
@@ -535,17 +537,36 @@ class ObservationScheduleStore:
         ).fetchone()
         last_transition_event_id = row.get("last_transition_event_id")
         if existing is not None and str(existing["state"]) == "DRAINING":
-            existing_payload = json.loads(str(existing["payload_json"]))
+            if str(row["state"]) != "DRAINING":
+                raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
             for key in (
+                "schedule_key",
+                "authority_receipt_sha256",
+                "starts_at",
+                "stops_admitting_at",
+            ):
+                requested = row.get(key)
+                if requested is not None and str(requested) != str(existing[key]):
+                    raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+            existing_payload = json.loads(str(existing["payload_json"]))
+            immutable_payload_keys = (
                 "admission_window_closed",
                 "transition_effective_at",
                 "transition_event_id",
-            ):
+                "prior_state",
+                "new_state",
+                "transition_sequence",
+                "rollover_id",
+                "cutover_at",
+            )
+            for key in immutable_payload_keys:
                 if key not in existing_payload:
                     continue
                 if key in payload and payload[key] != existing_payload[key]:
                     raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
-                payload[key] = existing_payload[key]
+            # A shortened scheduler projection must not erase the immutable
+            # transition proof carried by a DRAINING row.
+            payload = {**existing_payload, **payload}
             existing_event_id = existing["last_transition_event_id"]
             if (
                 existing_event_id
@@ -554,6 +575,15 @@ class ObservationScheduleStore:
             ):
                 raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
             last_transition_event_id = existing_event_id or last_transition_event_id
+            schedule_key = str(existing["schedule_key"])
+            authority_receipt_sha256 = existing["authority_receipt_sha256"]
+            starts_at = str(existing["starts_at"])
+            stops_admitting_at = str(existing["stops_admitting_at"])
+        else:
+            schedule_key = str(row["schedule_key"])
+            authority_receipt_sha256 = row.get("authority_receipt_sha256")
+            starts_at = str(row["starts_at"])
+            stops_admitting_at = str(row["stops_admitting_at"])
         self._conn.execute(
             """
             INSERT INTO schedule_activations(
@@ -579,11 +609,11 @@ class ObservationScheduleStore:
             (
                 str(row["schedule_sha256"]),
                 str(row["activation_id"]),
-                str(row["schedule_key"]),
+                schedule_key,
                 str(row["state"]),
-                row.get("authority_receipt_sha256"),
-                str(row["starts_at"]),
-                str(row["stops_admitting_at"]),
+                authority_receipt_sha256,
+                starts_at,
+                stops_admitting_at,
                 json.dumps(payload, sort_keys=True),
                 now,
                 now,
