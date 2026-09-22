@@ -197,13 +197,25 @@ exact `rollover` cutover binding. In-window rollover semantics are unchanged.
 If `rollover` returns
 `ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE` with
 `next_action=INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM`, stop
-retrying the SQLite projection. Inspect the predecessor
-`last_transition_event_id` and the matching immutable
-`OBSERVATION_SCHEDULE_STATE` event using the read-only ResearchStore check
-below. If the event is missing, malformed, or not bound to the predecessor
-transition and successor authority, open a separate recovery atom; do not
-backfill or rewrite immutable history. Retry the rollover only after the
-committed immutable proof is present and revalidated.
+retrying the SQLite projection. This is a rollover proof check, not the late
+recovery check below. Read both operational `last_transition_event_id` values
+for the predecessor and successor, then inspect both immutable events:
+
+```text
+uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); ids={('<PREDECESSOR_SCHEDULE_SHA256>','<PREDECESSOR_ACTIVATION_ID>','<PREDECESSOR_TRANSITION_EVENT_ID>'),('<SUCCESSOR_SCHEDULE_SHA256>','<SUCCESSOR_ACTIVATION_ID>','<SUCCESSOR_TRANSITION_EVENT_ID>')}; print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'entity_id':r.entity_id,'run_id':r.run_id,'transaction_id':r.transaction_id,'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in s.iter_committed_records() if (str(r.entity_id),str(r.run_id or ''),r.record_id) in ids], sort_keys=True))"
+```
+
+The predecessor event must be `DRAINING` with
+`admission_window_closed=false`; the successor event must be `ACTIVE` with
+`admission_window_closed=null`. Both must have the same canonical
+`rollover_id`/`cutover_at`, predecessor and successor schedule/activation
+identities, successor window bounds, the successor authority receipt, the
+canonical transition event ID, and the exact operational event ID binding.
+Both immutable `effective_at` values must equal the cutover. If either event
+is missing, malformed, or not bound to the corresponding transition, open a
+separate recovery atom; do not backfill or rewrite immutable history. Retry
+the rollover only after both committed immutable proofs are present and
+revalidated.
 
 A rollover requested after its cutover has already passed returns
 `ROLLOVER_CUTOVER_IN_PAST`; use the forward post-window successor procedure
