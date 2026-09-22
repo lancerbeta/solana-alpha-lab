@@ -16,6 +16,7 @@ from typing import Any, Mapping
 
 from solana_alpha_lab.factory.collector_read_model import (
     activation_rows_with_family_keys,
+    activation_selection_status,
     build_collector_read_model,
     select_current_activation,
 )
@@ -111,6 +112,7 @@ def assess_campaign_successor_continuity(
     now: datetime,
     activation: Mapping[str, Any] | None,
     data_root: Path | None = None,
+    activation_selection_ambiguous: bool = False,
 ) -> dict[str, Any]:
     """Owner-facing campaign continuity projection for pre-expiry attention.
 
@@ -129,6 +131,16 @@ def assess_campaign_successor_continuity(
         "campaign_successor_required": False,
         "campaign_successor_owner_action": UNKNOWN,
     }
+    if activation_selection_ambiguous:
+        return {
+            **empty,
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile ambiguous current activation family scope before "
+                "successor assessment"
+            ),
+        }
     if activation is None:
         return empty
     if str(activation.get("state") or "") != "ACTIVE":
@@ -1032,22 +1044,29 @@ def build_collector_operational_packet(
         period_seconds=period_seconds,
         empirical_overlap_seconds=empirical_overlap_seconds,
     )
+    all_activations = activation_rows_with_family_keys(store, store.list_activations())
+    continuity_selection_ambiguous = activation_selection_status(
+        all_activations
+    ) == "AMBIGUOUS"
     continuity_activation = None
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
         if requested is not None:
             continuity_activation = select_current_activation(
-                activation_rows_with_family_keys(store, [requested]), now=clock
+                activation_rows_with_family_keys(store, [requested]),
+                now=clock,
+                explicit_scope=True,
             )
-    if continuity_activation is None:
+            continuity_selection_ambiguous = False
+    if continuity_activation is None and not continuity_selection_ambiguous:
         continuity_activation = select_current_activation(
-            activation_rows_with_family_keys(store, store.list_activations()),
-            now=clock,
+            all_activations, now=clock
         )
     continuity = assess_campaign_successor_continuity(
         store,
         now=clock,
         activation=continuity_activation,
+        activation_selection_ambiguous=continuity_selection_ambiguous,
         data_root=(
             Path(observation_rdp)
             if observation_rdp is not None
@@ -1237,6 +1256,8 @@ def build_collector_operational_packet(
         "schedule_sha256": base.get("schedule_sha256") or UNKNOWN,
         "activation_id": base.get("activation_id") or UNKNOWN,
         "activation_state": base.get("activation_state") or UNKNOWN,
+        "activation_selection_status": base.get("activation_selection_status")
+        or UNKNOWN,
         "campaign_id": campaign_id or UNKNOWN,
         "cohort_id": release.get("cohort_id") or UNKNOWN,
         "stops_admitting_at": continuity.get("stops_admitting_at") or UNKNOWN,

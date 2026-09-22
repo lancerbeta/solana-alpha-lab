@@ -21,6 +21,7 @@ from solana_alpha_lab.factory.collector_operational_packet import (
     compose_health_classes,
 )
 from solana_alpha_lab.factory.collector_read_model import (
+    activation_rows_with_family_keys,
     build_collector_read_model,
     classify_doctor_current_activation,
     select_current_activation,
@@ -694,7 +695,10 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 producer_git_sha=GIT,
             )
             self.assertEqual(result["terminal"], "ROLLOVER_COMMITTED")
-            current = select_current_activation(store.list_activations(), now=NOW)
+            current = select_current_activation(
+                activation_rows_with_family_keys(store, store.list_activations()),
+                now=NOW,
+            )
             assert current is not None
             self.assertEqual(current["activation_id"], "ACT-PRE")
             self.assertEqual(current["state"], "ACTIVE")
@@ -761,12 +765,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             {
                 "activation_id": "ACT-1AC239",
                 "state": "ABORTED_SAFETY",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-10T00:00:00Z",
                 "created_at": "2026-09-01T00:00:00Z",
             },
             {
                 "activation_id": "ACT-E0CC",
                 "state": "DRAINING",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-20T00:00:00Z",
                 "created_at": "2026-09-15T00:00:00Z",
             },
@@ -781,18 +787,21 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             {
                 "activation_id": "ACT-ABORT",
                 "state": "ABORTED_SAFETY",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-21T00:00:00Z",
                 "created_at": "2026-09-01T00:00:00Z",
             },
             {
                 "activation_id": "ACT-DRAIN",
                 "state": "DRAINING",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-20T12:00:00Z",
                 "created_at": "2026-09-10T00:00:00Z",
             },
             {
                 "activation_id": "ACT-SUC",
                 "state": "ACTIVE",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-20T12:05:00Z",
                 "created_at": "2026-09-20T12:05:00Z",
             },
@@ -803,11 +812,45 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
 
     def test_status_defaults_to_current_activation_not_historical_row(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
             store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
             self.assertIsNotNone(store.acquire_lease("status-test", clock=NOW))
+            historical = _with_window(
+                load_observation_schedule(
+                    ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+                ),
+                starts_at="2026-08-01T00:00:00Z",
+                stops_admitting_at="2026-08-02T00:00:00Z",
+                schedule_key="OBS-HISTORICAL-001",
+            )
+            current = _with_window(
+                load_observation_schedule(
+                    ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+                ),
+                starts_at="2026-09-01T00:00:00Z",
+                stops_admitting_at="2026-09-02T00:00:00Z",
+                schedule_key="OBS-CURRENT-001",
+            )
+            registered_historical = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=historical,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            registered_current = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=current,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
             store.upsert_activation(
                 {
-                    "schedule_sha256": "a" * 64,
+                    "schedule_sha256": registered_historical["schedule_sha256"],
                     "activation_id": "ACT-HISTORICAL",
                     "schedule_key": "OBS-HISTORICAL-001",
                     "state": "ABORTED_SAFETY",
@@ -819,7 +862,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             store.upsert_activation(
                 {
-                    "schedule_sha256": "b" * 64,
+                    "schedule_sha256": registered_current["schedule_sha256"],
                     "activation_id": "ACT-CURRENT",
                     "schedule_key": "OBS-CURRENT-001",
                     "state": "ACTIVE",
@@ -884,12 +927,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             {
                 "activation_id": "ACT-OLD",
                 "state": "COMPLETE",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-01T00:00:00Z",
                 "created_at": "2026-09-01T00:00:00Z",
             },
             {
                 "activation_id": "ACT-ABORT",
                 "state": "ABORTED_SAFETY",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-20T00:00:00Z",
                 "created_at": "2026-09-10T00:00:00Z",
             },
@@ -903,12 +948,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             {
                 "activation_id": "ACT-1AC239",
                 "state": "ABORTED_SAFETY",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-08-02T00:00:00Z",
                 "created_at": "2026-08-01T00:00:00Z",
             },
             {
                 "activation_id": "ACT-E0CC",
                 "state": "DRAINING",
+                "cohort_family_key": "TEST-FAMILY",
                 "last_transition_event_id": "OBS-TRANS-ROLLOVER",
                 "updated_at": "2026-09-02T01:00:00Z",
                 "created_at": "2026-09-01T00:10:00Z",
@@ -937,6 +984,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     "activation_id": "ACT-DRAIN",
                     "schedule_sha256": "d" * 64,
                     "state": "DRAINING",
+                    "cohort_family_key": "TEST-FAMILY",
                     "stops_admitting_at": "2026-09-02T00:00:00Z",
                     "updated_at": "2026-09-02T01:00:00Z",
                     "created_at": "2026-09-01T00:00:00Z",
@@ -966,6 +1014,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     "activation_id": "ACT-DRAIN-UNKNOWN",
                     "schedule_sha256": "b" * 64,
                     "state": "DRAINING",
+                    "cohort_family_key": "TEST-FAMILY",
                     "last_transition_event_id": "OBS-TRANS-MISSING",
                     "stops_admitting_at": "2026-09-02T00:00:00Z",
                     "updated_at": "2026-09-02T01:00:00Z",
@@ -990,6 +1039,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     "activation_id": "ACT-SAME",
                     "schedule_sha256": "a" * 64,
                     "state": "DRAINING",
+                    "cohort_family_key": "TEST-FAMILY",
                     "last_transition_event_id": "OBS-TRANS-A",
                     "stops_admitting_at": "2026-09-02T00:00:00Z",
                     "updated_at": "2026-09-02T01:00:00Z",
@@ -1033,6 +1083,20 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertFalse(outside["campaign_successor_required"])
             self.assertTrue(exact["campaign_successor_required"])
             self.assertFalse(after_expiry["campaign_successor_required"])
+            store.close()
+
+    def test_ambiguous_activation_scope_keeps_successor_attention_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            result = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=None,
+                activation_selection_ambiguous=True,
+            )
+            self.assertEqual(result["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(result["campaign_successor_required"])
+            self.assertIn("ambiguous", result["campaign_successor_owner_action"])
             store.close()
 
     def test_lifecycle_denials_have_owner_next_actions(self) -> None:
@@ -1096,12 +1160,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             {
                 "activation_id": "ACT-OLD",
                 "state": "COMPLETE",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-01T00:00:00Z",
                 "created_at": "2026-09-01T00:00:00Z",
             },
             {
                 "activation_id": "ACT-ABORT",
                 "state": "ABORTED_SAFETY",
+                "cohort_family_key": "TEST-FAMILY",
                 "updated_at": "2026-09-20T00:00:00Z",
                 "created_at": "2026-09-10T00:00:00Z",
             },

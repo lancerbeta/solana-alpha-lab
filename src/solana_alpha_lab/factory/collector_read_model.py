@@ -83,11 +83,41 @@ def activation_rows_with_family_keys(
     return enriched
 
 
+def activation_selection_status(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    *,
+    family_key: str | None = None,
+) -> str:
+    """Classify whether current-activation selection has a safe scope.
+
+    An explicit non-empty family key is a caller-provided scope.  Without one,
+    every row must carry the same canonical family identity.  Missing family
+    identity is ambiguity, not evidence that the activation set is empty.
+    """
+
+    if family_key:
+        return "SCOPED"
+    if not activations:
+        return "EMPTY"
+    family_keys = {
+        str(row.get("cohort_family_key") or "")
+        for row in activations
+        if str(row.get("cohort_family_key") or "")
+    }
+    has_unscoped_rows = any(
+        not str(row.get("cohort_family_key") or "") for row in activations
+    )
+    if has_unscoped_rows or len(family_keys) != 1:
+        return "AMBIGUOUS"
+    return "SCOPED"
+
+
 def select_current_activation(
     activations: list[MappingLike] | tuple[MappingLike, ...],
     *,
     now: datetime | None = None,
     family_key: str | None = None,
+    explicit_scope: bool = False,
 ) -> dict[str, Any] | None:
     """Deterministic current campaign activation for status/doctor/operability.
 
@@ -98,8 +128,10 @@ def select_current_activation(
 
     Historical ABORTED_SAFETY remains selectable only when no ACTIVE/DRAINING
     peer exists; it is never preferred over a live draining campaign.
-    Multiple canonical family keys without an explicit scope are ambiguous and
-    fail closed instead of allowing one family to mask another.
+    Missing family identity or multiple canonical family keys without an
+    explicit scope are ambiguous and fail closed instead of allowing one
+    family to mask another.  A caller that already supplied one exact
+    schedule+activation selector may set ``explicit_scope``.
     """
 
     clock = None
@@ -137,17 +169,11 @@ def select_current_activation(
             for row in rows
             if str(row.get("cohort_family_key") or "") == family_key
         ]
-    else:
-        family_keys = {
-            str(row.get("cohort_family_key") or "")
-            for row in rows
-            if str(row.get("cohort_family_key") or "")
-        }
-        has_unscoped_rows = any(
-            not str(row.get("cohort_family_key") or "") for row in rows
-        )
-        if len(family_keys) > 1 or (family_keys and has_unscoped_rows):
-            return None
+    elif (
+        (not explicit_scope or len(rows) != 1)
+        and activation_selection_status(rows) == "AMBIGUOUS"
+    ):
+        return None
     if not rows:
         return None
     active = [row for row in rows if str(row.get("state") or "") == "ACTIVE"]
@@ -169,6 +195,22 @@ def classify_doctor_current_activation(
 
     Historical ABORTED_SAFETY never overrides a current ACTIVE/DRAINING campaign.
     """
+
+    selection_status = activation_selection_status(activations)
+    if selection_status == "AMBIGUOUS":
+        return {
+            "terminal": "DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS",
+            "live_activation": False,
+            "current_activation_id": None,
+            "current_schedule_sha256": None,
+            "current_activation_state": "UNKNOWN",
+            "activation_selection_status": selection_status,
+            "stops_admitting_at": None,
+            "late_recovery_at": None,
+            "late_recovery_proof": "UNKNOWN",
+            "late_recovery_event_id": None,
+            "next_action": "RECONCILE_ACTIVATION_FAMILY_SCOPE",
+        }
 
     current = select_current_activation(activations, now=now)
     current_state = str((current or {}).get("state") or "")
@@ -209,6 +251,7 @@ def classify_doctor_current_activation(
     if current_state == "ABORTED_SAFETY":
         return {
             **lifecycle_fields,
+            "activation_selection_status": selection_status,
             "terminal": "DOCTOR_ABORTED_SAFETY",
             "live_activation": False,
             "current_activation_id": current_id,
@@ -219,6 +262,7 @@ def classify_doctor_current_activation(
     if current_state == "PAUSED_OPERATOR":
         return {
             **lifecycle_fields,
+            "activation_selection_status": selection_status,
             "terminal": "DOCTOR_PAUSED",
             "live_activation": False,
             "current_activation_id": current_id,
@@ -229,6 +273,7 @@ def classify_doctor_current_activation(
     if current_state == "DRAINING" and recovery_proof == "UNKNOWN":
         return {
             **lifecycle_fields,
+            "activation_selection_status": selection_status,
             "terminal": "DOCTOR_RECOVERY_PROOF_UNAVAILABLE",
             "live_activation": False,
             "current_activation_id": current_id,
@@ -239,6 +284,7 @@ def classify_doctor_current_activation(
     if current_state in {"ACTIVE", "DRAINING"}:
         return {
             **lifecycle_fields,
+            "activation_selection_status": selection_status,
             "terminal": "DOCTOR_CURRENT_OK",
             "live_activation": live,
             "current_activation_id": current_id,
@@ -256,6 +302,7 @@ def classify_doctor_current_activation(
         }
     return {
         **lifecycle_fields,
+        "activation_selection_status": selection_status,
         "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
         "live_activation": False,
         "current_activation_id": current_id,
@@ -396,18 +443,26 @@ def build_collector_read_model(
     now = now.astimezone(UTC)
     window_start = now - timedelta(hours=24)
     activations = activation_rows_with_family_keys(store, store.list_activations())
+    selection_status = activation_selection_status(activations)
     selected = None
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
         if requested is not None:
             selected = select_current_activation(
-                activation_rows_with_family_keys(store, [requested]), now=now
+                activation_rows_with_family_keys(store, [requested]),
+                now=now,
+                explicit_scope=True,
             )
+            selection_status = "SCOPED"
     elif activations:
         selected = select_current_activation(activations, now=now)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
-    activation_state = str((selected or {}).get("state") or "NONE")
+    activation_state = (
+        "UNKNOWN"
+        if selection_status == "AMBIGUOUS"
+        else str((selected or {}).get("state") or "NONE")
+    )
 
     due_counts = store.due_counts()
     due_pressure = build_due_pressure_projection(
@@ -544,6 +599,7 @@ def build_collector_read_model(
         "schedule_sha256": digest or None,
         "activation_id": act_id or None,
         "activation_state": activation_state,
+        "activation_selection_status": selection_status,
         "last_tick_at": last_tick_at,
         "last_source_poll_attempt_at": last_source_poll_attempt_at,
         "last_source_poll_success_at": last_source_poll_success_at,
@@ -577,6 +633,7 @@ def build_collector_read_model(
 
 
 __all__ = [
+    "activation_selection_status",
     "build_collector_read_model",
     "build_m1_progress_projection",
     "classify_doctor_current_activation",

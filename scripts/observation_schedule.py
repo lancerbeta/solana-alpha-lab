@@ -486,6 +486,22 @@ def main(
                     },
                     2,
                 )
+            if current_report["terminal"] == "DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS":
+                return _emit(
+                    {
+                        **current_timing,
+                        "terminal": "DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS",
+                        "live_activation": False,
+                        "current_activation_id": None,
+                        "current_activation_state": "UNKNOWN",
+                        "activation_selection_status": "AMBIGUOUS",
+                        "restore_marker_unresolved": False,
+                        "activation_count": len(activations),
+                        "collector": collector,
+                        "next_action": "RECONCILE_ACTIVATION_FAMILY_SCOPE",
+                    },
+                    2,
+                )
             if current_report["terminal"] == "DOCTOR_NO_LIVE_ACTIVATION":
                 return _emit(
                     {

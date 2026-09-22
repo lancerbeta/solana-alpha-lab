@@ -349,6 +349,14 @@ Doctor/status/operability select current activation as:
 `ABORTED_SAFETY` stays historical evidence and must not trip
 `DOCTOR_ABORTED_SAFETY` while a DRAINING/ACTIVE campaign is current.
 
+The unscoped selector is fail-closed: every row must carry the same canonical
+family identity, or the caller must provide one exact schedule+activation
+scope. Missing family identity or multiple families yields
+`DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS` / exit 2 with
+`next_action=RECONCILE_ACTIVATION_FAMILY_SCOPE`; it is not evidence of an empty
+collector. Owner packets keep successor continuity `UNKNOWN` and retain
+`CAMPAIGN_SUCCESSOR_REQUIRED` until the scope is reconciled.
+
 ## Secrets
 
 | Location | Rule |
