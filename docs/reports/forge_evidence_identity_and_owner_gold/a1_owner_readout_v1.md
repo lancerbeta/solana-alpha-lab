@@ -13,16 +13,16 @@
 Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json`
 
 - `forge-input`: `FORGE_INPUT_READY`, `STOP_BEFORE_SYNTHESIS`, receipt
-  `623242a495978a101b6ddff22ede8e03af7b6e36e11d28af60a9dd7cfe15a4d9`.
+  `ed878635e470fc7442122b0b49d94214f22d54297b45ee89b47d26115465fe77`.
 - `preflight`: planned action `START_NEW_SESSION`, selection
   `SINGLE_COMMISSIONED`, router `BLOCK_FORGE_SELECTION_RISK`; this is a
   selection-robustness routing block, not a scientific negative and not
   permission for a real run. Receipt:
-  `339de9f715c9551b593a97236e8f708bad9b1fe57c1e05c86233491eba033617`.
+  `d2043e03fd4ca2d839c6a72193cda85310cb03fdbcc7a083027a6323366fe447`.
 - Current market identity:
-  `2dd54c5cb1254e81da19ab9b345460436ab6f0d0d17e1a835d0a36f4d8ab5340`.
+  `3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9`.
   Capability identity:
-  `d37522c942863cc342492772e61ea3e9a91db4bb90e3b420187c5c8760800ee7`;
+  `995b4ecbe2bc9a7511255e367d8d4ed6a0d4f5005a8323e51260391fbdea1cc2`;
   changing capability does not free the market budget.
 - Inventory is unchanged (`defbc9a5a1794b05` before and after); the read-only
   path reports `scientific_writes=0`, 17 readable sessions, 2 historical

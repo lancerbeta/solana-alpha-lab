@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-22",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "576a93e09bc95b118396ad70cc6afb21d546d228",
+  "git_head": "23798735146b5cf777fce58840e77581af6daad1",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -17,11 +17,13 @@
     "REL-20260902T111900Z-20260909T111900Z",
     "REL-20260909T111900Z-20260916T111900Z"
   ],
-  "current_market_evidence_epoch_sha256": "2dd54c5cb1254e81da19ab9b345460436ab6f0d0d17e1a835d0a36f4d8ab5340",
+  "current_market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
+  "capability_epoch_sha256": "995b4ecbe2bc9a7511255e367d8d4ed6a0d4f5005a8323e51260391fbdea1cc2",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
-    "blocking_reason_codes": []
+    "blocking_reason_codes": [],
+    "receipt_sha256": "ed878635e470fc7442122b0b49d94214f22d54297b45ee89b47d26115465fe77"
   },
   "inventory_sha256_prefix_before": "defbc9a5a1794b05",
   "inventory_sha256_prefix_after": "defbc9a5a1794b05",
@@ -276,12 +278,12 @@
     ],
     "owner_final": null,
     "selected_ordinary_base_session_id": null,
-    "market_evidence_epoch_sha256": "2dd54c5cb1254e81da19ab9b345460436ab6f0d0d17e1a835d0a36f4d8ab5340",
+    "market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
     "scientific_slot_sha256": null,
     "router_decision": "BLOCK_FORGE_SELECTION_RISK",
     "selection_reason": "SINGLE_COMMISSIONED",
     "current_market_occupancy": 0,
-    "receipt_sha256": "339de9f715c9551b593a97236e8f708bad9b1fe57c1e05c86233491eba033617"
+    "receipt_sha256": "d2043e03fd4ca2d839c6a72193cda85310cb03fdbcc7a083027a6323366fe447"
   },
   "disposition_summary": [
     {
