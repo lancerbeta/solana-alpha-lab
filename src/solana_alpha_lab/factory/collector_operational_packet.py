@@ -263,6 +263,10 @@ def assess_campaign_successor_continuity(
                 predecessor_document=registered["document"],
                 successor_document=successor_reg["document"],
                 now=now,
+                predecessor_transition_event_id=str(
+                    activation.get("last_transition_event_id") or ""
+                )
+                or None,
             ):
                 successor_state = "ROLLOVER_READY"
                 continuity_proven = True
@@ -1008,7 +1012,9 @@ def build_collector_operational_packet(
     )
     continuity_activation = None
     if schedule_sha256 and activation_id:
-        continuity_activation = store.get_activation(schedule_sha256, activation_id)
+        requested = store.get_activation(schedule_sha256, activation_id)
+        if requested is not None:
+            continuity_activation = select_current_activation([requested], now=clock)
     if continuity_activation is None:
         continuity_activation = select_current_activation(
             store.list_activations(), now=clock

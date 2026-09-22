@@ -787,6 +787,44 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertEqual(result["collector"]["activation_state"], "ACTIVE")
             store.close()
 
+    def test_explicit_future_transition_is_not_current_before_cutover(self) -> None:
+        schedule_digest = "d" * 64
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            self.assertIsNotNone(store.acquire_lease("future-selector", clock=NOW))
+            store.upsert_activation(
+                {
+                    "schedule_sha256": schedule_digest,
+                    "activation_id": "ACT-FUTURE-DRAIN",
+                    "schedule_key": "OBS-FUTURE-SELECTOR-001",
+                    "state": "DRAINING",
+                    "starts_at": "2026-09-01T00:00:00Z",
+                    "stops_admitting_at": "2026-09-01T12:00:00Z",
+                    "payload": {
+                        "prior_state": "ACTIVE",
+                        "transition_effective_at": "2026-09-01T00:20:00Z",
+                        "transition_sequence": 2,
+                    },
+                },
+                clock=NOW,
+            )
+            model = build_collector_read_model(
+                store,
+                now=NOW,
+                schedule_sha256=schedule_digest,
+                activation_id="ACT-FUTURE-DRAIN",
+            )
+            self.assertEqual(model["activation_id"], "ACT-FUTURE-DRAIN")
+            self.assertEqual(model["activation_state"], "ACTIVE")
+            status = status_schedule(
+                store,
+                schedule_sha256=schedule_digest,
+                activation_id="ACT-FUTURE-DRAIN",
+                now=NOW,
+            )
+            self.assertEqual(status["collector"]["activation_state"], "ACTIVE")
+            store.close()
+
     def test_read_model_keeps_genuine_current_aborted(self) -> None:
         activations = [
             {

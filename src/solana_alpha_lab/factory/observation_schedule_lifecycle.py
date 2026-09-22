@@ -34,6 +34,7 @@ from solana_alpha_lab.factory.observation_schedule_store import (
     ObservationScheduleStore,
     ObservationScheduleStoreError,
     rollover_id_for,
+    transition_event_id_for,
 )
 from solana_alpha_lab.factory.research_store import (
     RecordKind,
@@ -963,6 +964,25 @@ def _draining_transition_evidence(
             return None
         if not isinstance(payload, Mapping):
             return None
+        try:
+            transition_sequence = int(payload["transition_sequence"])
+            expected_event_id = transition_event_id_for(
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                prior_state=str(payload.get("prior_state") or ""),
+                new_state=str(
+                    payload.get("new_state") or payload.get("state") or ""
+                ),
+                transition_sequence=transition_sequence,
+                effective_at=render_utc(record.effective_at.astimezone(UTC)),
+                authority_receipt_sha256=str(
+                    payload.get("authority_receipt_sha256") or ""
+                ),
+            )
+        except (KeyError, TypeError, ValueError):
+            return None
+        if expected_event_id != event_id:
+            return None
         if (
             str(payload.get("state_event_id") or "") != event_id
             or str(payload.get("schedule_sha256") or "") != schedule_sha256
@@ -1065,6 +1085,7 @@ def rollover_research_event_proven(
     predecessor_document: Mapping[str, Any],
     successor_document: Mapping[str, Any],
     now: datetime,
+    predecessor_transition_event_id: str | None,
 ) -> bool:
     """Require the immutable state event behind a prepared rollover row."""
 
@@ -1076,6 +1097,9 @@ def rollover_research_event_proven(
     successor_activation = str(item.get("successor_activation_id") or "")
     authority_receipt = str(item.get("authority_receipt_sha256") or "")
     rollover_id = str(item.get("rollover_id") or "")
+    expected_predecessor_event_id = str(predecessor_transition_event_id or "")
+    if not expected_predecessor_event_id:
+        return False
     try:
         predecessor_starts = parse_utc(
             str(predecessor_document["activation"]["starts_at"])
@@ -1140,6 +1164,7 @@ def rollover_research_event_proven(
             or str(record.run_id or "") != predecessor_activation
             or str(record.transaction_id)
             != f"{expected_transaction_prefix}{record.record_id.upper()}"
+            or str(record.record_id) != expected_predecessor_event_id
             or str(record.producer_capability_id) != PRODUCER_CAPABILITY
             or record.created_at.astimezone(UTC) > now
             or record.first_reliable_available_at.astimezone(UTC) > now
@@ -1152,8 +1177,27 @@ def rollover_research_event_proven(
             continue
         if not isinstance(payload, Mapping):
             continue
+        try:
+            transition_sequence = int(payload["transition_sequence"])
+            expected_event_id = transition_event_id_for(
+                schedule_sha256=predecessor_schedule,
+                activation_id=predecessor_activation,
+                prior_state=str(payload.get("prior_state") or ""),
+                new_state=str(
+                    payload.get("new_state") or payload.get("state") or ""
+                ),
+                transition_sequence=transition_sequence,
+                effective_at=render_utc(record.effective_at.astimezone(UTC)),
+                authority_receipt_sha256=str(
+                    payload.get("authority_receipt_sha256") or ""
+                ),
+            )
+        except (KeyError, TypeError, ValueError):
+            continue
         if (
-            str(payload.get("state_event_id") or "") != str(record.record_id)
+            expected_event_id != str(record.record_id)
+            or str(record.record_id) != expected_predecessor_event_id
+            or str(payload.get("state_event_id") or "") != str(record.record_id)
             or str(payload.get("schedule_sha256") or "") != predecessor_schedule
             or str(payload.get("activation_id") or "") != predecessor_activation
             or str(payload.get("state") or "") != "DRAINING"
@@ -1269,6 +1313,10 @@ def _require_cohort_cutover_or_unique(
                 predecessor_document=other["document"],
                 successor_document=document,
                 now=now,
+                predecessor_transition_event_id=str(
+                    row.get("last_transition_event_id") or ""
+                )
+                or None,
             )
             for item in store.list_rollovers()
         )
@@ -1757,6 +1805,20 @@ def rollover_schedule(
             and str(successor_existing.get("authority_receipt_sha256") or "")
             == str(matching_rollover["authority_receipt_sha256"])
         ):
+            if not rollover_research_event_proven(
+                data_root,
+                item=matching_rollover,
+                predecessor_document=predecessor_document,
+                successor_document=successor_document,
+                now=now,
+                predecessor_transition_event_id=str(
+                    predecessor.get("last_transition_event_id") or ""
+                )
+                or None,
+            ):
+                raise ObservationLifecycleError(
+                    "ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE"
+                )
             return {
                 "terminal": "ROLLOVER_REPLAY",
                 "rollover_id": matching_rollover["rollover_id"],

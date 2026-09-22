@@ -348,7 +348,9 @@ def build_collector_read_model(
     activations = store.list_activations()
     selected = None
     if schedule_sha256 and activation_id:
-        selected = store.get_activation(schedule_sha256, activation_id)
+        requested = store.get_activation(schedule_sha256, activation_id)
+        if requested is not None:
+            selected = select_current_activation([requested], now=now)
     elif activations:
         selected = select_current_activation(activations, now=now)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")

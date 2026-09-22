@@ -89,6 +89,30 @@ def rollover_id_for(
     ).hexdigest()
 
 
+def transition_event_id_for(
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+    prior_state: str,
+    new_state: str,
+    transition_sequence: int,
+    effective_at: str,
+    authority_receipt_sha256: str,
+) -> str:
+    identity = {
+        "schedule_sha256": schedule_sha256,
+        "activation_id": activation_id,
+        "prior_state": prior_state,
+        "new_state": new_state,
+        "transition_sequence": transition_sequence,
+        "effective_at": effective_at,
+        "authority_receipt_sha256": authority_receipt_sha256,
+    }
+    return "OBS-TRANS-" + hashlib.sha256(
+        canonical_json_bytes(identity)
+    ).hexdigest()
+
+
 def _now(clock: datetime | None = None) -> str:
     value = clock.astimezone(UTC) if clock is not None else datetime.now(UTC)
     return render_utc(value)
@@ -726,18 +750,15 @@ class ObservationScheduleStore:
                 actual_stops_at = str(row["stops_admitting_at"])
                 if authority_receipt_sha256 is None:
                     authority_receipt_sha256 = row["authority_receipt_sha256"]
-            transition_identity = {
-                "schedule_sha256": schedule_sha256,
-                "activation_id": activation_id,
-                "prior_state": prior_state,
-                "new_state": new_state,
-                "transition_sequence": sequence,
-                "effective_at": effective,
-                "authority_receipt_sha256": authority_receipt_sha256 or "",
-            }
-            event_id = "OBS-TRANS-" + hashlib.sha256(
-                canonical_json_bytes(transition_identity)
-            ).hexdigest()
+            event_id = transition_event_id_for(
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                prior_state=prior_state,
+                new_state=new_state,
+                transition_sequence=sequence,
+                effective_at=effective,
+                authority_receipt_sha256=authority_receipt_sha256 or "",
+            )
             transition_payload = dict(previous_payload)
             transition_payload.update(dict(payload or {}))
             transition_payload.update(
