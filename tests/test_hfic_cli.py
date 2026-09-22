@@ -205,6 +205,7 @@ class HficCliContractTests(unittest.TestCase):
         ):
             self.assertIn(key, payload)
         self.assertEqual(payload["schema"], "smial.forge-run-receipt")
+        self.assertEqual(payload["owner_focus"], "AUTO")
         self.assertEqual(payload["stages"], [])
 
     def test_apply_provenance_correction_requires_confirm_flag(self) -> None:

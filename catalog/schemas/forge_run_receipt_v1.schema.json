@@ -24,6 +24,7 @@
     "schema_version": {"const": "1.0"},
     "run_id": {"type": "string", "minLength": 1},
     "run_identity_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "owner_focus": {"type": "string", "minLength": 1},
     "owner_class": {
       "enum": [
         "FORGE_RUN_IN_PROGRESS",

@@ -909,6 +909,7 @@ def _next_active_after(
 
 def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     stages = receipt.get("stages") or []
+    owner_focus = str(receipt.get("owner_focus") or "AUTO")
     stage_has_unknown_provenance = any(
         isinstance(stage, Mapping)
         and stage.get("execution_provenance_status")
@@ -1259,10 +1260,21 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "then retry; do not treat this as scientific exhaustion"
         )
     if next_action in {ACTION_RESUME_BASE, ACTION_RESUME_V1}:
+        target_representation = (
+            "NORMALIZED_TRAJECTORY_V1"
+            if next_action == ACTION_RESUME_V1
+            else "BASE"
+        )
+        candidate_stages = [
+            stage
+            for stage in stages
+            if isinstance(stage, Mapping)
+            and str(stage.get("representation_id") or "") == target_representation
+        ] or [stage for stage in stages if isinstance(stage, Mapping)]
         draft_sha = next(
             (
                 str(stage.get("draft_sha256"))
-                for stage in stages
+                for stage in candidate_stages
                 if isinstance(stage, Mapping)
                 and isinstance(stage.get("draft_sha256"), str)
                 and len(str(stage.get("draft_sha256"))) == 64
@@ -1270,14 +1282,35 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             None,
         )
         draft_arg = f" --saved-draft-sha256 {draft_sha}" if draft_sha else ""
+        focus_arg = f" --owner-focus {owner_focus}"
+        classification_pending = bool(
+            {"AWAITING_CLASSIFICATION", "PASS_TO_CLASSIFICATION"}
+            & {
+                str(item)
+                for item in (receipt.get("blocking_reason_codes") or [])
+            }
+            or {"AWAITING_CLASSIFICATION", "PASS_TO_CLASSIFICATION"}
+            & {
+                str(stage.get("reason_code") or "")
+                for stage in stages
+                if isinstance(stage, Mapping)
+            }
+        )
+        recovery_note = (
+            "; then continue classification/finalize in the same session; "
+            "do not re-freeze, regenerate, or create a second trial"
+            if classification_pending
+            else "; then persist/freeze that exact draft inside the "
+            "already-authorized slash; do not regenerate"
+        )
         lines.append(
             "next: RESUME_EXISTING_SESSION — continue the same /hypothesis-forge "
             "slash; read the authoritative path with `"
             + CANONICAL_HFIC_CLI
-            + " forge-run --no-write --format json --owner-focus AUTO"
+            + " forge-run --no-write --format json"
+            + focus_arg
             + draft_arg
-            + "; then persist/freeze that exact draft inside the already-authorized "
-            "slash; do not regenerate"
+            + recovery_note
         )
     lines.append(
         "writes: store={store} forge_run={forge} session={session} "
@@ -2939,6 +2972,7 @@ def evaluate_forge_run(
         "schema_version": SCHEMA_VERSION,
         "run_id": run_id,
         "run_identity_sha256": run_identity,
+        "owner_focus": owner_focus,
         "owner_class": owner_class,
         "next_action": next_action,
         "owner_final": owner_final,

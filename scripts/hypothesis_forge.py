@@ -479,6 +479,7 @@ def cmd_forge_run(
             "schema_version": "1.0",
             "run_id": f"HFIC-RUN-BLOCKED-{run_identity[:16].upper()}",
             "run_identity_sha256": run_identity,
+            "owner_focus": owner_focus if owner_focus.strip() else "AUTO",
             "owner_class": owner_class,
             "next_action": owner_class,
             "owner_final": owner_class,

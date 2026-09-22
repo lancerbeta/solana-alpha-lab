@@ -682,7 +682,14 @@ class ResolveNextActionTests(unittest.TestCase):
                 "owner_class": "FORGE_RUN_IN_PROGRESS",
                 "next_action": ACTION_RESUME_V1,
                 "owner_final": None,
-                "stages": [{"draft_sha256": draft_sha}],
+                "owner_focus": "ALT",
+                "stages": [
+                    {"representation_id": "BASE", "draft_sha256": "cd" * 32},
+                    {
+                        "representation_id": "NORMALIZED_TRAJECTORY_V1",
+                        "draft_sha256": draft_sha,
+                    },
+                ],
                 "writes": {"research_store": 0, "forge_run": 0, "session": 0},
                 "blocking_reason_codes": ["PASS_TO_CLASSIFICATION"],
             }
@@ -693,7 +700,9 @@ class ResolveNextActionTests(unittest.TestCase):
             "uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write",
             text,
         )
-        self.assertIn("persist/freeze that exact draft", text)
+        self.assertIn("--owner-focus ALT", text)
+        self.assertIn("continue classification/finalize in the same session", text)
+        self.assertNotIn("persist/freeze that exact draft", text)
         self.assertIn("forge_context=0", text)
 
     def test_historical_execution_readback_is_not_readiness(self) -> None:
