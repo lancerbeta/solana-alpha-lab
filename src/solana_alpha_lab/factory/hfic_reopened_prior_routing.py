@@ -481,6 +481,7 @@ def preview_control_reconsideration(
         representation_semantic_version="HFIC-V1.2",
         reservations=list_scientific_slot_admissions(store),
         current_visible_cohort_ids=current_visible_cohort_ids,
+        repo_root=Path(repo_root),
     )
     live_present = any(
         str(item.get("dataset_id") or "") == CORPUS_DATASET_ID

@@ -2205,6 +2205,7 @@ def persist_no_worthy_session(
     preflight_receipt: Mapping[str, Any] | None = None,
     next_action_draft: Mapping[str, Any] | None = None,
     stage_time: datetime | None = None,
+    representation_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
@@ -2222,7 +2223,12 @@ def persist_no_worthy_session(
         if referenced:
             raise HficSessionError("HFIC_NEXT_ACTION_ARTIFACT_MISSING")
         return {"action_type": str(existing.get("next") or "STOP")}
-    _assert_scientific_admission(store, frozen)
+    _assert_scientific_admission(
+        store,
+        frozen,
+        repo_root=repo_root,
+        representation_registry=representation_registry,
+    )
     # Admission is the first lifecycle boundary: legacy combined-only input
     # must receive SCIENTIFIC_ADMISSION_REQUIRED before any current-protocol
     # provenance diagnosis.  Once the split slot is admissible, recheck the
@@ -2241,6 +2247,7 @@ def persist_no_worthy_session(
         frozen,
         repo_root=repo_root,
         stage_time=stage_time,
+        representation_registry=representation_registry,
     )
     git = repository_git_snapshot(Path(repo_root))
     now = (
@@ -2650,6 +2657,7 @@ def _assert_scientific_admission(
     store: Any,
     binding: Mapping[str, Any],
     *,
+    repo_root: Any | None = None,
     representation_registry: Mapping[str, Any] | None = None,
 ) -> dict[str, Any] | None:
     """Apply the shared admission rule before freeze/lifecycle writes."""
@@ -2686,6 +2694,7 @@ def _assert_scientific_admission(
         representation_semantic_version=version,
         owner_focus=str(binding.get("owner_focus") or "AUTO"),
         representation_registry=representation_registry,
+        repo_root=Path(repo_root) if repo_root is not None else None,
         memory_eligibility_sha256=(
             str(binding.get("memory_eligibility_sha256"))
             if isinstance(binding.get("memory_eligibility_sha256"), str)
@@ -2850,6 +2859,7 @@ def persist_scientific_slot_admission(
         _assert_scientific_admission(
             store,
             binding,
+            repo_root=repo_root,
             representation_registry=representation_registry,
         )
 
@@ -2992,6 +3002,7 @@ def persist_generated_draft(
     _assert_scientific_admission(
         store,
         binding,
+        repo_root=repo_root,
         representation_registry=representation_registry,
     )
     persist_scientific_slot_admission(
@@ -3078,6 +3089,7 @@ def persist_frozen_session(
     _assert_scientific_admission(
         store,
         frozen,
+        repo_root=repo_root,
         representation_registry=representation_registry,
     )
     persist_scientific_slot_admission(

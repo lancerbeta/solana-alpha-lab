@@ -223,6 +223,17 @@ def cmd_preflight(
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
 ) -> int:
+    def _writes_note(body: Mapping[str, Any]) -> str:
+        writes = body.get("writes") if isinstance(body.get("writes"), Mapping) else {}
+        return (
+            "writes: research_store={research_store} forge_context={forge_context} "
+            "session={session}".format(
+                research_store=int(writes.get("research_store") or 0),
+                forge_context=int(writes.get("forge_context") or 0),
+                session=int(writes.get("session") or 0),
+            )
+        )
+
     _assert_no_path_leak({"owner_focus": owner_focus}, str(repo_root))
     try:
         active = _active_root(repo_root, explicit_data_root)
@@ -280,7 +291,7 @@ def cmd_preflight(
             f"reason: {str(exc)}\n"
             "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
             "input/readback и повторите normal entry; не создавайте trial вручную\n"
-            "writes: research_store=0 forge_context=0 session=0"
+            + _writes_note(payload)
         )
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
@@ -297,7 +308,7 @@ def cmd_preflight(
             f"reason: {payload.get('terminal') or 'PREFLIGHT_BLOCKED'}\n"
             "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
             "input/readback и повторите normal entry; не создавайте trial вручную\n"
-            "writes: research_store=0 forge_context=0 session=0"
+            + _writes_note(payload)
         )
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
@@ -376,6 +387,7 @@ def cmd_forge_run(
     owner_focus: str = "AUTO",
     persist: bool = False,
     saved_draft_sha256: str | None = None,
+    model_provenance_sha256: str | None = None,
 ) -> int:
     """Bounded Forge run receipt. persist=False never writes."""
     from solana_alpha_lab.factory.hfic_representation_ladder import (
@@ -461,6 +473,11 @@ def cmd_forge_run(
             owner_focus=owner_focus if owner_focus.strip() else "AUTO",
             persist=False,
             saved_draft_sha256=saved_draft_sha256,
+            execution_context=(
+                {"model_provenance_sha256": model_provenance_sha256}
+                if model_provenance_sha256
+                else None
+            ),
         )
     except LadderError as exc:
         payload = _ladder_error_payload(str(exc))
@@ -487,6 +504,11 @@ def cmd_forge_run(
                 owner_focus=owner_focus if owner_focus.strip() else "AUTO",
                 persist=True,
                 saved_draft_sha256=saved_draft_sha256,
+                execution_context=(
+                    {"model_provenance_sha256": model_provenance_sha256}
+                    if model_provenance_sha256
+                    else None
+                ),
             )
         except LadderError as exc:
             payload = _ladder_error_payload(str(exc))
@@ -1409,6 +1431,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Resume the exact saved draft; do not regenerate",
     )
+    forge_run.add_argument(
+        "--model-provenance-sha256",
+        default=None,
+        help=(
+            "Optional current model/reasoning provenance for admission readback; "
+            "mismatch blocks reuse and never resets the market budget"
+        ),
+    )
 
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--draft", type=Path, required=True)
@@ -1626,6 +1656,9 @@ def main(argv: list[str] | None = None) -> int:
                 owner_focus=str(getattr(args, "owner_focus", "AUTO") or "AUTO"),
                 persist=bool(getattr(args, "persist", False)),
                 saved_draft_sha256=getattr(args, "saved_draft_sha256", None),
+                model_provenance_sha256=getattr(
+                    args, "model_provenance_sha256", None
+                ),
             )
         if args.command == "freeze":
             return cmd_freeze(

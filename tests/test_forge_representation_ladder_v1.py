@@ -647,6 +647,42 @@ class ResolveNextActionTests(unittest.TestCase):
         self.assertIn("do not rewrite receipts, regenerate, or reset budget", text)
         self.assertIn("Блокировка не является научным отрицательным результатом", text)
 
+    def test_budget_exhaustion_is_final_stop_and_reports_all_read_only_counters(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": ACTION_OBSERVABILITY_BLOCKED,
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["SEARCH_BUDGET_EXHAUSTED"],
+            }
+        )
+        self.assertIn("status: STOP", text)
+        self.assertIn("Лимит поиска", text)
+        self.assertIn("повторять", text)
+        self.assertIn("writes: store=0 forge_run=0 session=0 forge_context=0", text)
+        self.assertNotIn("восстановите указанное readback/evidence", text)
+
+    def test_resume_readout_exposes_exact_draft_recovery_command(self) -> None:
+        draft_sha = "ab" * 32
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_RESUME_V1,
+                "owner_final": None,
+                "stages": [{"draft_sha256": draft_sha}],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["PASS_TO_CLASSIFICATION"],
+            }
+        )
+        self.assertIn("RESUME_EXISTING_SESSION", text)
+        self.assertIn("--saved-draft-sha256 " + draft_sha, text)
+        self.assertIn("persist/freeze that exact draft", text)
+        self.assertIn("forge_context=0", text)
+
     def test_historical_execution_readback_is_not_readiness(self) -> None:
         text = format_forge_run_owner_readout(
             {

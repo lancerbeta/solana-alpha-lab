@@ -861,6 +861,7 @@ def forge_control_ready(
         reservations=reservations,
         generated_draft=generated_draft,
         current_visible_cohort_ids=visible_cohort_ids,
+        repo_root=Path(repo_root),
     )
     if action == "STOP":
         _require(False, str(_bound or "SEARCH_BUDGET_EXHAUSTED"))

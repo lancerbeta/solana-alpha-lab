@@ -460,6 +460,7 @@ def decide_preflight_action(
     generated_draft: Mapping[str, Any] | None = None,
     current_visible_cohort_ids: Sequence[str] | None = None,
     execution_context: Mapping[str, Any] | None = None,
+    repo_root: Path | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -494,6 +495,7 @@ def decide_preflight_action(
             execution_context=execution_context,
             memory_eligibility_sha256=memory_eligibility_sha256,
             evidence_surface_mode=evidence_surface_mode,
+            repo_root=repo_root,
             auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
             max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
         )
@@ -789,6 +791,7 @@ def enumerate_rdp_datasets(
             labels = loaded_labels
         partition_dir = manifests_dir / "partitions"
         matching: list[Path] = []
+        matching_manifests: list[PartitionManifest] = []
         if partition_dir.is_dir():
             for part_path in sorted(partition_dir.glob("*.json")):
                 if _is_symlink_path(part_path):
@@ -796,9 +799,10 @@ def enumerate_rdp_datasets(
                         {
                             "code": "PARTITION_MANIFEST_SYMLINK",
                             "dataset_manifest_id": manifest.dataset_manifest_id,
-                        }
+                    }
                     )
                     matching = []
+                    matching_manifests = []
                     break
                 try:
                     part = PartitionManifest.model_validate_json(part_path.read_bytes())
@@ -806,6 +810,7 @@ def enumerate_rdp_datasets(
                     continue
                 if part.dataset_manifest_id == manifest.dataset_manifest_id:
                     matching.append(part_path)
+                    matching_manifests.append(part)
                     parquet_path = Path(data_root) / part.logical_location
                     if (
                         not parquet_path.is_file()
@@ -820,6 +825,7 @@ def enumerate_rdp_datasets(
                             }
                         )
                         matching = []
+                        matching_manifests = []
                         break
         if not matching:
             if not any(
@@ -834,6 +840,21 @@ def enumerate_rdp_datasets(
                     }
                 )
             continue
+        a3_pit_availability_validation_sha256 = canonical_sha256(
+            {
+                "identity_version": (
+                    "A3_DATASET_MANIFEST_PIT_AVAILABILITY_VALIDATION_V1"
+                ),
+                "dataset_manifest": manifest.model_dump(mode="json"),
+                "partition_manifests": [
+                    item.model_dump(mode="json")
+                    for item in sorted(
+                        matching_manifests,
+                        key=lambda item: item.partition_manifest_id,
+                    )
+                ],
+            }
+        )
         evidence_role = "UNSPECIFIED"
         if labels is not None:
             role = labels.get("evidence_role")
@@ -893,6 +914,9 @@ def enumerate_rdp_datasets(
                 "dataset_id": manifest.dataset_id,
                 "dataset_version": manifest.dataset_version,
                 "dataset_fingerprint": manifest.dataset_fingerprint,
+                "a3_pit_availability_validation_sha256": (
+                    a3_pit_availability_validation_sha256
+                ),
                 "evidence_role": evidence_role,
                 "labels": labels,
                 "yield_eligible": yield_eligible,
@@ -2402,6 +2426,7 @@ def run_preflight(
             if isinstance(capability_epoch, str) and len(capability_epoch) == 64
             else None
         ),
+        repo_root=Path(repo_root),
     )
     search_budget = epoch_search_budget_usage(
         sessions, evidence_epoch=epoch, reservations=reservations

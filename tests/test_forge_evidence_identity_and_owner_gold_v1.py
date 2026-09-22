@@ -13,6 +13,7 @@ import sys
 import tempfile
 import threading
 import unittest
+from datetime import UTC, datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -32,7 +33,10 @@ from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
     compute_capability_epoch_for_repo,
     compute_market_epoch_for_data_root,
     compute_split_identity,
+    build_market_evidence_basis,
+    execution_binding_sha256,
     forge_run_identity_sha256,
+    market_evidence_epoch_sha256,
     resolve_scientific_admission,
     session_scientific_slot_sha256,
     scientific_slot_sha256,
@@ -68,6 +72,9 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     persist_scientific_slot_admission,
     finalize_session,
 )
+from solana_alpha_lab.factory.live_cohort_discovery_release import (  # noqa: E402
+    import_live_cohort,
+)
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
 from solana_alpha_lab.factory.fast_lane_snapshot import (  # noqa: E402
     export_snapshot,
@@ -97,6 +104,9 @@ from tests.test_hfic_session import (  # noqa: E402
 from tests.test_normalized_trajectory_v1_execution_closure_v1 import (  # noqa: E402
     _no_worthy_forge_receipt,
 )
+from tests.test_live_corpus_manifest_contract_repair_v1 import (  # noqa: E402
+    _seal_week,
+)
 
 
 def _enumerate_c3(_data_root: Path):
@@ -125,6 +135,79 @@ def _ordinary_stamped_preflight(data_root: Path, store: ResearchStore) -> dict[s
     packet.pop("evidence_surface_mode", None)
     pre["forge_context_packet"] = packet
     return pre
+
+
+def _actual_production_preflight(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    repo_root: Path = ROOT,
+) -> dict[str, object]:
+    """Use real imported manifests/lineage through the production packet seam."""
+
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+    from solana_alpha_lab.factory.hfic_preflight import build_forge_context_packet
+    from solana_alpha_lab.factory.hfic_session import (
+        PROMPT_VERSION,
+        focus_key_sha256,
+        search_key_sha256,
+    )
+
+    split = compute_split_identity(repo_root, data_root)
+    policy = effective_policy(store)
+    market_epoch = str(split["market_evidence_epoch_sha256"])
+    owner_focus = "AUTO"
+    memory_eligibility = str(policy["memory_eligibility_sha256"])
+    search_key = search_key_sha256(
+        market_epoch,
+        owner_focus,
+        PROMPT_VERSION,
+        memory_eligibility,
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    packet, digest = build_forge_context_packet(
+        repo_root,
+        data_root,
+        owner_focus=owner_focus,
+        evidence_epoch=market_epoch,
+        search_key=search_key,
+        commissioning_status="FAST_LANE_COMMISSIONED",
+        research_memory_as_of="2026-09-16T12:00:00Z",
+        store=store,
+        persist=True,
+        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+    forge_input = build_forge_input_receipt(
+        data_root,
+        repo_root=repo_root,
+        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+        owner_focus=owner_focus,
+    )
+    git = repository_git_snapshot(repo_root)
+    return {
+        "receipt_id": "HFIC-PREFLIGHT-ACTUAL-PRODUCTION-001",
+        "evidence_epoch_sha256": market_epoch,
+        "focus_key_sha256": focus_key_sha256(owner_focus),
+        "search_key_sha256": search_key,
+        "owner_focus": owner_focus,
+        "live_git_head": git.head_sha.lower(),
+        "git_composite_sha256": git.composite_sha256,
+        "session_started_at": "2026-08-27T12:00:00Z",
+        "memory_eligibility_sha256": memory_eligibility,
+        "forge_context_packet_sha256": digest,
+        "forge_context_packet": packet,
+        "forge_input_receipt": forge_input,
+        "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
+        "capability_epoch_sha256": split["capability_epoch_sha256"],
+        "legacy_combined_evidence_epoch_sha256": split[
+            "legacy_combined_evidence_epoch_sha256"
+        ],
+        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
+    }
 
 
 def _no_worthy_base(
@@ -206,6 +289,72 @@ def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, obje
 
 
 class IdentityUnitTests(unittest.TestCase):
+    def test_a3_pit_availability_validation_digest_is_market_identity(self) -> None:
+        common = {
+            "dataset_manifest_id": "MID-CURRENT",
+            "dataset_fingerprint": "aa" * 32,
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+        }
+        basis_a = build_market_evidence_basis(
+            datasets=[
+                {
+                    **common,
+                    "a3_pit_availability_validation_sha256": "11" * 32,
+                }
+            ],
+            visible_cohort_ids=["REL-C1"],
+            current_dataset_manifest_id="MID-CURRENT",
+            corpus_version=1,
+            lineage_bindings=[
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1",
+                    "source_sha256": "bb" * 32,
+                }
+            ],
+        )
+        basis_b = build_market_evidence_basis(
+            datasets=[
+                {
+                    **common,
+                    "a3_pit_availability_validation_sha256": "22" * 32,
+                }
+            ],
+            visible_cohort_ids=["REL-C1"],
+            current_dataset_manifest_id="MID-CURRENT",
+            corpus_version=1,
+            lineage_bindings=[
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1",
+                    "source_sha256": "bb" * 32,
+                }
+            ],
+        )
+        self.assertEqual(
+            basis_a["datasets"][0]["a3_pit_availability_validation_sha256"],
+            "11" * 32,
+        )
+        self.assertNotEqual(
+            market_evidence_epoch_sha256(basis_a),
+            market_evidence_epoch_sha256(basis_b),
+        )
+        incomplete = build_market_evidence_basis(
+            datasets=[common, {**common, "dataset_manifest_id": "MID-OTHER", "a3_pit_availability_validation_sha256": "33" * 32}],
+            visible_cohort_ids=["REL-C1"],
+            current_dataset_manifest_id="MID-CURRENT",
+            corpus_version=1,
+            lineage_bindings=[
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1",
+                    "source_sha256": "bb" * 32,
+                }
+            ],
+        )
+        with self.assertRaisesRegex(ValueError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
+            market_evidence_epoch_sha256(incomplete)
+
     def test_market_epoch_stable_under_docs_only_capability_change_surface(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
@@ -341,6 +490,65 @@ class IdentityUnitTests(unittest.TestCase):
                 owner_focus="AUTO",
             )
 
+    def test_admission_loads_registry_from_exact_repo_root(self) -> None:
+        registry = {
+            "representations": [
+                {"id": "BASE", "status": "ACTIVE", "version": "HFIC-V1.2"}
+            ]
+        }
+        with tempfile.TemporaryDirectory() as tmp, patch(
+            "solana_alpha_lab.factory.hfic_representation_ladder.load_ladder_registry",
+            return_value=registry,
+        ) as loader:
+            decision = resolve_scientific_admission(
+                [],
+                market_evidence_epoch="aa" * 32,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+                repo_root=Path(tmp),
+            )
+        self.assertEqual(decision["action"], "START_NEW_SESSION")
+        loader.assert_called_once_with(
+            Path(tmp) / "configs" / "hfic_representation_ladder_v1.yaml"
+        )
+
+    def test_model_context_drift_blocks_reuse_without_resetting_market_budget(self) -> None:
+        market = "aa" * 32
+        slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        row = {
+            "session_id": "HFIC-SESS-MODEL",
+            "market_evidence_epoch_sha256": market,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "scientific_slot_sha256": slot,
+            "session_state": "SYNTHESIS_COMPLETE",
+            "capability_epoch_sha256": "bb" * 32,
+            "model_provenance_sha256": "11" * 32,
+        }
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+            execution_context={
+                "capability_epoch_sha256": "bb" * 32,
+                "model_provenance_sha256": "22" * 32,
+            },
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(
+            decision["reason_code"],
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+        )
+
     def test_execution_binding_is_positive_and_tamper_checked(self) -> None:
         from solana_alpha_lab.factory.hfic_session import _execution_identity_fields
 
@@ -359,6 +567,36 @@ class IdentityUnitTests(unittest.TestCase):
         self.assertRegex(
             str(fields.get("execution_binding_sha256")), r"^[0-9a-f]{64}$"
         )
+        expected = execution_binding_sha256(
+            scientific_slot_sha256=str(fields["scientific_slot_sha256"]),
+            capability_epoch_sha256=source["capability_epoch_sha256"],
+            control_session_id=None,
+            representation_payload_sha256=source["representation_payload_sha256"],
+            memory_eligibility_sha256=source["memory_eligibility_sha256"],
+            model_provenance_sha256=source["model_provenance_sha256"],
+        )
+        self.assertEqual(fields["execution_binding_sha256"], expected)
+        with self.assertRaisesRegex(
+            ValueError, "EXECUTION_BINDING_PROVENANCE_INCOMPLETE"
+        ):
+            execution_binding_sha256(
+                scientific_slot_sha256=str(fields["scientific_slot_sha256"]),
+                capability_epoch_sha256=source["capability_epoch_sha256"],
+                representation_payload_sha256=None,
+                memory_eligibility_sha256=source["memory_eligibility_sha256"],
+                model_provenance_sha256=source["model_provenance_sha256"],
+            )
+        for key in (
+            "capability_epoch_sha256",
+            "memory_eligibility_sha256",
+            "model_provenance_sha256",
+            "representation_payload_sha256",
+        ):
+            changed = {**source, key: "ff" * 32}
+            self.assertNotEqual(
+                _execution_identity_fields(changed)["execution_binding_sha256"],
+                fields["execution_binding_sha256"],
+            )
         with self.assertRaisesRegex(ValueError, "SCIENTIFIC_IDENTITY_CONFLICT"):
             _execution_identity_fields(
                 {**source, "execution_binding_sha256": "00" * 32}
@@ -1289,6 +1527,63 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertNotEqual(
                 drifted["run_identity_sha256"], matched["run_identity_sha256"]
             )
+
+    def test_g8_production_import_c3_changes_current_market_after_completed_run(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            base = Path(tmp)
+            data_root = base / "rdp"
+            data_root.mkdir()
+            release_c1, _, _ = _seal_week(base, 0)
+            release_c2, _, _ = _seal_week(base, 1)
+            release_c3, _, _ = _seal_week(base, 2)
+            import_live_cohort(
+                release_root=release_c1,
+                data_root=data_root,
+                import_time=datetime(2026, 1, 20, tzinfo=UTC),
+            )
+            import_live_cohort(
+                release_root=release_c2,
+                data_root=data_root,
+                import_time=datetime(2026, 1, 27, tzinfo=UTC),
+            )
+            store = ResearchStore(data_root)
+            preflight = _actual_production_preflight(data_root, store)
+            draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
+            frozen = freeze_draft(
+                draft,
+                preflight_receipt=preflight,
+                repo_root=ROOT,
+            )
+            persist_no_worthy_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+                preflight_receipt=preflight,
+            )
+            store.rebuild_projection()
+            before = evaluate_forge_run(ROOT, data_root, persist=False)
+            self.assertEqual(
+                before["market_evidence_epoch_sha256"],
+                preflight["market_evidence_epoch_sha256"],
+            )
+            self.assertEqual(before["stages"][0]["execution_status"], EXEC_REUSED)
+
+            imported = import_live_cohort(
+                release_root=release_c3,
+                data_root=data_root,
+                import_time=datetime(2026, 2, 3, tzinfo=UTC),
+            )
+            self.assertEqual(imported["status"], "IMPORTED")
+            after = evaluate_forge_run(ROOT, data_root, persist=False)
+            self.assertNotEqual(
+                after["market_evidence_epoch_sha256"],
+                before["market_evidence_epoch_sha256"],
+            )
+            self.assertNotEqual(after["stages"][0]["execution_status"], EXEC_REUSED)
+            self.assertEqual(after["next_action"], ACTION_START_BASE)
+            self.assertEqual(len(list_hfic_sessions(ResearchStore(data_root))), 1)
 
     def test_g9_legacy_ordinary_not_focus_only_current_reuse(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

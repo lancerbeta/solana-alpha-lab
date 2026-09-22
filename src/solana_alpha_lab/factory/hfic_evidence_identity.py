@@ -29,6 +29,9 @@ BASE_REPRESENTATION_VERSION = "HFIC-V1.2"
 _CAPABILITY_PROTOCOL_FILES = (
     "configs/hypothesis_forge_independent_critic_v1.yaml",
     "configs/hfic_representation_ladder_v1.yaml",
+    ".agents/skills/hypothesis-forge/SKILL.md",
+    ".cursor/commands/hypothesis-forge.md",
+    "scripts/hypothesis_forge.py",
     "catalog/schemas/hypothesis_critic_input_v1.schema.json",
     "catalog/schemas/forge_input_receipt_v1.schema.json",
     "catalog/schemas/experiment_spec.schema.json",
@@ -256,6 +259,11 @@ def build_market_evidence_basis(
     dataset_rows: list[dict[str, str]] = []
     invalid_dataset_rows = 0
     seen: set[str] = set()
+    integrity_marker_present = any(
+        isinstance(item, Mapping)
+        and "a3_pit_availability_validation_sha256" in item
+        for item in (datasets or ())
+    )
     for item in datasets or ():
         if not isinstance(item, Mapping):
             invalid_dataset_rows += 1
@@ -266,13 +274,20 @@ def build_market_evidence_basis(
             invalid_dataset_rows += 1
             continue
         seen.add(mid)
-        dataset_rows.append(
-            {
-                "dataset_manifest_id": mid,
-                "dataset_fingerprint": fp,
-                "dataset_id": str(item.get("dataset_id") or ""),
-            }
-        )
+        row = {
+            "dataset_manifest_id": mid,
+            "dataset_fingerprint": fp,
+            "dataset_id": str(item.get("dataset_id") or ""),
+        }
+        if integrity_marker_present:
+            marker = str(
+                item.get("a3_pit_availability_validation_sha256") or ""
+            ).strip()
+            if not re.fullmatch(r"[0-9a-f]{64}", marker):
+                invalid_dataset_rows += 1
+            else:
+                row["a3_pit_availability_validation_sha256"] = marker
+        dataset_rows.append(row)
     dataset_rows.sort(key=lambda row: row["dataset_manifest_id"])
 
     cohorts = sorted(
@@ -311,9 +326,10 @@ def build_market_evidence_basis(
         "datasets": dataset_rows,
         "lineage_bindings": bindings,
     }
-    # Keep the successful A3 split basis byte-compatible.  Integrity markers
-    # enter the basis only on a malformed inventory, where the hash validator
-    # must fail closed rather than silently hashing a reduced projection.
+    # Compact synthetic/legacy fixtures without the A3 marker retain their
+    # historical projection.  Production A3 enumeration supplies the marker
+    # for every selected dataset; a partial marker set is retained as an
+    # invalid basis and the hash validator fails closed.
     if invalid_dataset_rows:
         basis["invalid_dataset_rows"] = invalid_dataset_rows
     if invalid_binding_rows:
@@ -364,12 +380,18 @@ def market_evidence_epoch_sha256(basis: Mapping[str, Any]) -> str:
         raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
 
     dataset_mids: set[str] = set()
+    integrity_markers_present = False
     for item in datasets:
         if not isinstance(item, Mapping):
             raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
         mid = str(item.get("dataset_manifest_id") or "").strip()
         dataset_id = str(item.get("dataset_id") or "").strip()
         fingerprint = str(item.get("dataset_fingerprint") or "").strip()
+        marker = str(
+            item.get("a3_pit_availability_validation_sha256") or ""
+        ).strip()
+        if "a3_pit_availability_validation_sha256" in item:
+            integrity_markers_present = True
         if (
             not mid
             or not dataset_id
@@ -377,7 +399,19 @@ def market_evidence_epoch_sha256(basis: Mapping[str, Any]) -> str:
             or mid in dataset_mids
         ):
             raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        if integrity_markers_present and not re.fullmatch(r"[0-9a-f]{64}", marker):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
         dataset_mids.add(mid)
+    if integrity_markers_present:
+        if any(
+            not isinstance(item, Mapping)
+            or not re.fullmatch(
+                r"[0-9a-f]{64}",
+                str(item.get("a3_pit_availability_validation_sha256") or "").strip(),
+            )
+            for item in datasets
+        ):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
     if current_mid not in dataset_mids:
         raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
 
@@ -479,6 +513,18 @@ def execution_binding_sha256(
     memory_eligibility_sha256: str | None = None,
     model_provenance_sha256: str | None = None,
 ) -> str:
+    required = (
+        scientific_slot_sha256,
+        capability_epoch_sha256,
+        representation_payload_sha256,
+        memory_eligibility_sha256,
+        model_provenance_sha256,
+    )
+    if any(
+        not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None
+        for value in required
+    ):
+        raise EvidenceIdentityError("EXECUTION_BINDING_PROVENANCE_INCOMPLETE")
     return canonical_sha256(
         {
             "binding_version": EXECUTION_BINDING_VERSION,
@@ -637,6 +683,7 @@ def resolve_scientific_admission(
     memory_eligibility_sha256: str | None = None,
     evidence_surface_mode: str | None = None,
     execution_context: Mapping[str, Any] | None = None,
+    repo_root: Path | None = None,
     auto_sessions_per_market: int = 1,
     max_distinct_focuses: int = 3,
 ) -> dict[str, Any]:
@@ -658,7 +705,12 @@ def resolve_scientific_admission(
                 load_ladder_registry,
             )
 
-            registry = load_ladder_registry()
+            registry_path = (
+                Path(repo_root) / "configs" / "hfic_representation_ladder_v1.yaml"
+                if repo_root is not None
+                else None
+            )
+            registry = load_ladder_registry(registry_path)
         except Exception as exc:
             raise EvidenceIdentityError("REPRESENTATION_REGISTRY_UNAVAILABLE") from exc
     registered = next(

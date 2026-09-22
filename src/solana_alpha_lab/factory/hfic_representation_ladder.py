@@ -1156,8 +1156,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         lines.append(
             "next: RECOVER_EXISTING_READBACK — run the read-only "
             + lookup
-            + "; if the recorded row is absent, stop and escalate the typed "
-            "integrity failure; do not rewrite receipts, regenerate, or reset budget"
+            + "; if present, continue the same /hypothesis-forge slash from that "
+            "session/draft; if absent, stop and escalate the typed integrity "
+            "failure; do not rewrite receipts, regenerate, or reset budget"
         )
     elif "MARKET_EVIDENCE_BASIS_INCOMPLETE" in blocking:
         lines.append(
@@ -1220,9 +1221,29 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: RESOLVE_TYPED_BLOCK — resolve the stated input/readback blocker, "
             "then retry; do not treat this as scientific exhaustion"
         )
+    if next_action in {ACTION_RESUME_BASE, ACTION_RESUME_V1}:
+        draft_sha = next(
+            (
+                str(stage.get("draft_sha256"))
+                for stage in stages
+                if isinstance(stage, Mapping)
+                and isinstance(stage.get("draft_sha256"), str)
+                and len(str(stage.get("draft_sha256"))) == 64
+            ),
+            None,
+        )
+        draft_arg = f" --saved-draft-sha256 {draft_sha}" if draft_sha else ""
+        lines.append(
+            "next: RESUME_EXISTING_SESSION — continue the same /hypothesis-forge "
+            "slash; read the authoritative path with `forge-run --no-write "
+            "--format json --owner-focus AUTO"
+            + draft_arg
+            + "; then persist/freeze that exact draft inside the already-authorized "
+            "slash; do not regenerate"
+        )
     lines.append(
         "writes: store={store} forge_run={forge} session={session} "
-        "forge_context=reported_by_preflight".format(
+        "forge_context=0".format(
             store=int(writes.get("research_store") or 0),
             forge=int(writes.get("forge_run") or 0),
             session=int(writes.get("session") or 0),
@@ -1242,7 +1263,12 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         "non_claim: scoped search result on completed representations; "
         "not alpha and not proof of generator recall"
     )
-    if status.startswith("BLOCKED") or status.startswith("STOP"):
+    if status.startswith("STOP"):
+        lines.append(
+            "owner_note_ru: Лимит поиска для текущего market исчерпан; повторять, "
+            "сбрасывать счётчики или создавать новый trial нельзя"
+        )
+    elif status.startswith("BLOCKED"):
         lines.append(
             "owner_note_ru: Блокировка не является научным отрицательным "
             "результатом; восстановите указанное readback/evidence и повторите "
@@ -2230,6 +2256,7 @@ def evaluate_forge_run(
     existing_completed: bool = False,
     saved_draft_sha256: str | None = None,
     v1_snapshot: Mapping[str, Any] | None = None,
+    execution_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Assemble A3 input + existing sessions into one bounded run receipt.
 
@@ -2237,7 +2264,11 @@ def evaluate_forge_run(
     or an already-authorized slash; this delivery does not run science.
     """
 
-    registry_doc = dict(registry) if registry is not None else load_ladder_registry()
+    registry_doc = (
+        dict(registry)
+        if registry is not None
+        else load_ladder_registry(Path(repo_root) / LADDER_CONFIG_RELATIVE)
+    )
     frozen_ids = eligible_representation_ids(registry_doc)
     input_receipt = build_forge_input_receipt(
         Path(data_root), repo_root=Path(repo_root), owner_focus=owner_focus
@@ -2491,6 +2522,9 @@ def evaluate_forge_run(
                 break
 
     cap_epoch = input_receipt.get("capability_epoch_sha256")
+    admission_execution_context = dict(execution_context or {})
+    if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
+        admission_execution_context.setdefault("capability_epoch_sha256", cap_epoch)
     if next_action.startswith("START_"):
         admission = resolve_scientific_admission(
             list_hfic_sessions(store),
@@ -2501,11 +2535,7 @@ def evaluate_forge_run(
             owner_focus=owner_focus,
             representation_registry=registry_doc,
             current_visible_cohort_ids=visible,
-            execution_context=(
-                {"capability_epoch_sha256": str(cap_epoch)}
-                if isinstance(cap_epoch, str) and len(cap_epoch) == 64
-                else None
-            ),
+            execution_context=admission_execution_context or None,
         )
         if admission.get("action") == "STOP":
             reason = str(
