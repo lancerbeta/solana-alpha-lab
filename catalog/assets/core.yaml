@@ -38076,7 +38076,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md', repository_path: docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md}
-  integrity: {kind: sha256, sha256: 60dcce1b635f4f5842f3d6c373835ea306a8fbb82c30073714f541dd833787e8}
+  integrity: {kind: sha256, sha256: 21687bf92e369f5c1fd121ca9a295787bb4d0e03b184c99c0b15696263d024cb}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
