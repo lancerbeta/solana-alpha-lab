@@ -606,6 +606,37 @@ class IdentityUnitTests(unittest.TestCase):
             "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
         )
 
+    def test_malformed_persisted_provenance_does_not_reuse_without_context(self) -> None:
+        market = "aa" * 32
+        slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        row = {
+            "session_id": "HFIC-SESS-MALFORMED-MODEL",
+            "market_evidence_epoch_sha256": market,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "scientific_slot_sha256": slot,
+            "session_state": "SYNTHESIS_COMPLETE",
+            "model_provenance_sha256": "not-a-sha256",
+        }
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(
+            decision["reason_code"],
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+        )
+
     def test_malformed_nested_identity_fails_closed(self) -> None:
         from solana_alpha_lab.factory.hfic_session import _execution_identity_fields
 

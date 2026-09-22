@@ -702,6 +702,22 @@ def _session_slot_matches_execution_context(
                 return False
             if observed != expected:
                 return False
+    # A missing post-split stamp is historical UNKNOWN and remains readable.
+    # A non-empty malformed persisted stamp is different: it is corrupted
+    # provenance and must not be allowed to look like a reusable run merely
+    # because the caller did not provide a fresh execution context.
+    for key in (
+        "capability_epoch_sha256",
+        "representation_payload_sha256",
+        "model_provenance_sha256",
+    ):
+        if key not in session:
+            continue
+        observed = session.get(key)
+        if observed in (None, ""):
+            continue
+        if not isinstance(observed, str) or re.fullmatch(r"[0-9a-f]{64}", observed) is None:
+            return False
     return True
 
 

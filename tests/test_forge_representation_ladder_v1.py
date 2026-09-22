@@ -841,6 +841,15 @@ class ResolveNextActionTests(unittest.TestCase):
         decision = resolve_next_action([_base()], existing_completed=True)
         self.assertEqual(decision["next_action"], ACTION_RETURN_EXISTING)
 
+    def test_input_block_precedes_completed_readback(self) -> None:
+        decision = resolve_next_action(
+            [_base()],
+            existing_completed=True,
+            input_owner_class=OWNER_CLASS_OBSERVABILITY_BLOCKED,
+        )
+        self.assertEqual(decision["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertEqual(decision["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
+
     def test_future_leak_stays_observability(self) -> None:
         decision = resolve_next_action(
             [

@@ -357,12 +357,6 @@ def resolve_next_action(
 ) -> dict[str, Any]:
     """Pure transition: one next action or owner-final from stage receipts."""
 
-    if existing_completed:
-        return {
-            "next_action": ACTION_RETURN_EXISTING,
-            "owner_final": None,
-            "reason_code": "RUN_ALREADY_COMPLETED",
-        }
     if input_owner_class == OWNER_CLASS_INPUT_NOT_READY:
         return {
             "next_action": ACTION_INPUT_NOT_READY,
@@ -374,6 +368,12 @@ def resolve_next_action(
             "next_action": ACTION_OBSERVABILITY_BLOCKED,
             "owner_final": ACTION_OBSERVABILITY_BLOCKED,
             "reason_code": ACTION_OBSERVABILITY_BLOCKED,
+        }
+    if existing_completed:
+        return {
+            "next_action": ACTION_RETURN_EXISTING,
+            "owner_final": None,
+            "reason_code": "RUN_ALREADY_COMPLETED",
         }
 
     active = load_ladder_registry() if registry is None else dict(registry)
@@ -2447,7 +2447,15 @@ def evaluate_forge_run(
                 run_identity = str(existing.get("run_identity_sha256") or legacy_identity)
     except ResearchStoreError:
         existing = None
-    existing_owner_final = bool(existing is not None and existing.get("owner_final"))
+    existing_owner_final = bool(
+        existing is not None
+        and existing.get("owner_final")
+        in {
+            ACTION_OWNER_CANDIDATE,
+            ACTION_SEARCH_EXHAUSTED,
+            ACTION_NON_SCIENTIFIC_STOP,
+        }
+    )
     if existing is not None:
         if not saved_draft_sha256:
             for row in existing.get("stages") or []:
