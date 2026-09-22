@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-22",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "e04fa997cc964ad71ddca04e6bb8bd02ddf9c765",
+  "git_head": "2ebfc24befe1de035a491e0e500d250ac568776b",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
