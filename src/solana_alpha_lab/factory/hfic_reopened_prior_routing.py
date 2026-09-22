@@ -441,14 +441,44 @@ def preview_control_reconsideration(
         (item for item in sessions if item.get("session_id") == defective_session_id),
         None,
     )
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        compute_market_epoch_for_data_root,
+    )
+
+    current_market_epoch, _market_basis = compute_market_epoch_for_data_root(
+        Path(repo_root), Path(data_root)
+    )
+    current_visible_cohort_ids = [
+        str(item.get("cohort_id"))
+        for item in (packet.get("active_evidence_set", {}).get("visible_cohort_ids") or [])
+        if item
+    ] if isinstance(packet.get("active_evidence_set"), Mapping) else []
+    if not current_visible_cohort_ids:
+        try:
+            from solana_alpha_lab.factory.cohort_import_readback import (
+                build_cohort_import_readback,
+            )
+
+            readback = build_cohort_import_readback(Path(data_root))
+        except Exception:
+            readback = None
+        if isinstance(readback, Mapping):
+            current_visible_cohort_ids = [
+                str(item.get("cohort_id"))
+                for item in (readback.get("visible_cohorts") or [])
+                if isinstance(item, Mapping) and item.get("cohort_id")
+            ]
     action, _bound = decide_preflight_action(
         sessions,
         search_key=planned_search_key,
-        evidence_epoch=new_epoch,
+        evidence_epoch=current_market_epoch,
         focus_key=focus_key_sha256(owner_focus),
         owner_focus=owner_focus,
         memory_eligibility_sha256=new_eligibility,
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+        representation_id="BASE",
+        representation_semantic_version="HFIC-V1.2",
+        current_visible_cohort_ids=current_visible_cohort_ids,
     )
     live_present = any(
         str(item.get("dataset_id") or "") == CORPUS_DATASET_ID

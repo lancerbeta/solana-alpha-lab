@@ -442,6 +442,8 @@ def decide_preflight_action(
     representation_id: str | None = None,
     representation_semantic_version: str | None = None,
     reservations: Sequence[Mapping[str, Any]] | None = None,
+    generated_draft: Mapping[str, Any] | None = None,
+    current_visible_cohort_ids: Sequence[str] | None = None,
 ) -> tuple[str, str | None]:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -472,12 +474,20 @@ def decide_preflight_action(
             ),
             owner_focus=owner_focus,
             reservations=reservations,
+            current_visible_cohort_ids=current_visible_cohort_ids,
             memory_eligibility_sha256=memory_eligibility_sha256,
             evidence_surface_mode=evidence_surface_mode,
             auto_sessions_per_market=AUTO_SESSIONS_PER_EPOCH,
             max_distinct_focuses=MAX_DISTINCT_FOCUSES_PER_EPOCH,
         )
         if admission.get("action") == "STOP":
+            if (
+                admission.get("reason_code") == "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+                and isinstance(generated_draft, Mapping)
+            ):
+                draft_session = str(generated_draft.get("session_id") or "")
+                if draft_session:
+                    return ("RESUME_EXISTING_SESSION", draft_session)
             return ("STOP", str(admission.get("reason_code") or "SEARCH_BUDGET_EXHAUSTED"))
         if admission.get("action") == "START_NEW_SESSION":
             return ("START_NEW_SESSION", None)
@@ -2308,6 +2318,7 @@ def run_preflight(
                 "forge_context_packet": {},
                 "forge_input_receipt": forge_input,
                 "owner_forge_input": format_forge_input_owner_block(forge_input),
+                "writes": {"research_store": int(persist), "forge_context": 0, "session": 0},
                 "authority": {
                     "git_mutation": 0,
                     "experiment_execution": 0,
@@ -2315,9 +2326,36 @@ def run_preflight(
                 },
             }
     sessions = _query_hfic_sessions(data_root)
-    from solana_alpha_lab.factory.hfic_session import list_scientific_slot_admissions
+    from solana_alpha_lab.factory.hfic_session import (
+        find_generated_draft,
+        list_scientific_slot_admissions,
+    )
+    from solana_alpha_lab.factory.hfic_evidence_identity import (
+        scientific_slot_sha256,
+    )
 
     reservations = list_scientific_slot_admissions(store)
+    visible_cohort_ids = (
+        forge_input.get("active_evidence_set", {}).get("visible_cohort_ids")
+        if isinstance(forge_input.get("active_evidence_set"), Mapping)
+        else None
+    )
+    generated_draft = None
+    if isinstance(market_epoch, str) and len(market_epoch) == 64:
+        draft_slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market_epoch,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus=focus,
+        )
+        generated_draft = find_generated_draft(
+            store,
+            market_evidence_epoch_sha256=market_epoch,
+            owner_focus=focus,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            scientific_slot_sha256=draft_slot,
+        )
     action, bound_session = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -2329,6 +2367,8 @@ def run_preflight(
         representation_id="BASE",
         representation_semantic_version="HFIC-V1.2",
         reservations=reservations,
+        generated_draft=generated_draft,
+        current_visible_cohort_ids=visible_cohort_ids,
     )
     search_budget = epoch_search_budget_usage(
         sessions, evidence_epoch=epoch, reservations=reservations
@@ -2417,7 +2457,7 @@ def run_preflight(
                 "experiment_execution": 0,
                 "provider_api_rpc_wss_calls": 0,
             },
-            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
+            "writes": {"research_store": int(persist), "forge_context": 0, "session": 0},
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
@@ -2465,6 +2505,7 @@ def run_preflight(
             "compatibility_repair": compatibility_repair,
         },
         "forge_context_packet": {},
+        "writes": {"research_store": int(persist), "forge_context": 0, "session": 0},
         "authority": {
             "git_mutation": 0,
             "experiment_execution": 0,
@@ -2492,6 +2533,18 @@ def run_preflight(
     )
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest
+    receipt_body["writes"] = {
+        "research_store": int(persist),
+        "forge_context": int(persist),
+        "session": 0,
+    }
+    if isinstance(generated_draft, Mapping) and action == "RESUME_EXISTING_SESSION":
+        receipt_body["generated_draft_sha256"] = generated_draft.get("payload_sha256")
+        receipt_body["draft_lifecycle"] = "GENERATED_BEFORE_FREEZE"
+        receipt_body["next"] = (
+            "RESUME_GENERATED_DRAFT — continue freeze from persisted draft; "
+            "do not regenerate"
+        )
     if selection_gate_view and selection_gate_view.get("applicable"):
         receipt_body["router_decision"] = selection_gate_view.get("router_decision")
         receipt_body["selection_gate"] = {

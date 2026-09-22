@@ -287,12 +287,9 @@ def build_forge_input_receipt(
 
     datasets, _warnings = enumerate_rdp_datasets(Path(data_root))
     selected, trunc = select_forge_packet_datasets(datasets)
+    current_datasets = list(select_current_datasets_for_forge(datasets))
     live_in_packet = bool(trunc.get("live_corpus_in_packet"))
-    current_live = [
-        item
-        for item in select_current_datasets_for_forge(datasets)
-        if is_live_corpus_dataset(item)
-    ]
+    current_live = [item for item in current_datasets if is_live_corpus_dataset(item)]
     chosen = None
     for item in selected:
         if is_live_corpus_dataset(item):
@@ -385,7 +382,10 @@ def build_forge_input_receipt(
     )
 
     market_basis = build_market_evidence_basis(
-        datasets=selected,
+        # Packet membership remains bounded; market identity covers every
+        # current logical dataset so an out-of-packet decision-bearing source
+        # cannot change without changing the admission epoch.
+        datasets=current_datasets,
         visible_cohort_ids=visible_ids,
         current_dataset_manifest_id=current_mid,
         corpus_version=corpus_version,

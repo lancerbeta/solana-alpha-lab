@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import re
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -911,6 +912,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     owner_class = str(receipt.get("owner_class") or "")
     owner_final = receipt.get("owner_final")
     blocking = [str(item) for item in (receipt.get("blocking_reason_codes") or []) if item]
+    freeze_pending = receipt.get("ladder_freeze_pending_reason")
     if owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
         ACTION_INPUT_NOT_READY,
         ACTION_OBSERVABILITY_BLOCKED,
@@ -1007,6 +1009,14 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         "FORGE RUN",
         f"status: {status}",
         f"run_id: {receipt.get('run_id')}",
+        "run_identity_sha256: "
+        + (
+            str(receipt.get("run_identity_sha256"))
+            if isinstance(receipt.get("run_identity_sha256"), str)
+            and len(str(receipt.get("run_identity_sha256"))) == 64
+            else "UNKNOWN"
+        ),
+        f"control_session_id: {receipt.get('control_session_id') or 'NONE'}",
         f"owner_class: {receipt.get('owner_class') or 'NONE'}",
         f"visible_cohorts: {', '.join(receipt.get('visible_cohort_ids') or []) or 'NONE'}",
         f"used_cohorts: {', '.join(receipt.get('used_cohort_ids') or []) or 'NONE'}",
@@ -1063,12 +1073,20 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         draft = stage.get("draft_sha256")
         draft_note = f" draft={(draft if isinstance(draft, str) else 'NONE')}"
         lines.append(
-            "stage {id}@{version}: {status} terminal={term} scope={scope} used={used}{draft}".format(
+            "stage {id}@{version}: {status} terminal={term} scope={scope} "
+            "session_id={session} stage_ref_sha256={stage_ref} used={used}{draft}".format(
                 id=stage.get("representation_id"),
                 version=stage.get("representation_semantic_version") or "UNKNOWN",
                 status=stage.get("execution_status"),
                 term=stage.get("effective_terminal") or "NONE",
                 scope=stage.get("input_scope"),
+                session=stage.get("session_id") or "NONE",
+                stage_ref=(
+                    stage.get("stage_ref_sha256")
+                    if isinstance(stage.get("stage_ref_sha256"), str)
+                    and len(str(stage.get("stage_ref_sha256"))) == 64
+                    else "UNKNOWN"
+                ),
                 used=used,
                 draft=draft_note,
             )
@@ -1124,6 +1142,11 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: RESTORE_CURRENT_EVIDENCE — restore decision-bearing datasets/lineage, "
             "then retry normal /hypothesis-forge"
         )
+    elif "FORGE_CONTEXT_ARTIFACT_MISSING" in blocking:
+        lines.append(
+            "next: RESTORE_FORGE_CONTEXT — rerun /hypothesis-forge forge-run "
+            "with the recorded run_id/control_session_id; do not regenerate"
+        )
     elif "SEARCH_BUDGET_EXHAUSTED" in blocking:
         lines.append(
             "next: STOP_BUDGET — current market slot is occupied/exhausted; "
@@ -1158,6 +1181,14 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: CONTROL_ENTRY — run /hypothesis-forge CURRENT_REPRESENTATION_CONTROL "
             "with --control-current-representation, then verify START_BASE"
         )
+    elif isinstance(freeze_pending, str) and freeze_pending.strip() and (
+        owner_class == ACTION_OBSERVABILITY_BLOCKED
+        or next_action == ACTION_OBSERVABILITY_BLOCKED
+    ):
+        lines.append(
+            "next: RESTORE_SESSION_READBACK — use the recorded session_id and "
+            "stage_ref_sha256; restore authoritative readback, then retry"
+        )
     elif owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
         ACTION_INPUT_NOT_READY,
         ACTION_OBSERVABILITY_BLOCKED,
@@ -1176,7 +1207,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     lines.append(f"persisted: {persist_note}")
     if isinstance(persisted_sha, str) and persisted_sha:
         lines.append(f"persisted_receipt: {persisted_sha}")
-    pending = receipt.get("ladder_freeze_pending_reason")
+    pending = freeze_pending
     if isinstance(pending, str) and pending.strip():
         # Soft-pend keeps START_V1; integrity stop must not reuse "pending".
         if next_action == ACTION_OBSERVABILITY_BLOCKED or owner_final == ACTION_OBSERVABILITY_BLOCKED:
@@ -2310,6 +2341,7 @@ def evaluate_forge_run(
             representation_id=active_rep,
             representation_semantic_version=active_version,
             owner_focus=owner_focus,
+            current_visible_cohort_ids=visible,
         )
         if admission.get("action") == "STOP":
             reason = str(
@@ -2353,54 +2385,57 @@ def evaluate_forge_run(
     )
     cap_epoch = input_receipt.get("capability_epoch_sha256")
     exec_binding = None
-    if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
-        active_payload = None
-        active_parent = None
-        for row in resolved_stages:
-            if not isinstance(row, Mapping):
-                continue
-            if str(row.get("representation_id") or "") != active_rep:
-                continue
-            if isinstance(row.get("control_session_id"), str) and row.get(
-                "control_session_id"
+    active_row = next(
+        (
+            row
+            for row in resolved_stages
+            if isinstance(row, Mapping)
+            and str(row.get("representation_id") or "") == active_rep
+        ),
+        None,
+    )
+    if isinstance(active_row, Mapping):
+        active_status = str(active_row.get("execution_status") or EXEC_NOT_RUN)
+        existing_binding = active_row.get("execution_binding_sha256")
+        if (
+            active_status == EXEC_REUSED
+            and isinstance(existing_binding, str)
+            and re.fullmatch(r"[0-9a-f]{64}", existing_binding)
+        ):
+            # Reuse is a readback claim.  Never rebind an old answer to the
+            # current capability/model merely because the receipt is replayed.
+            exec_binding = existing_binding
+        elif active_status == EXEC_EXECUTED:
+            payload = active_row.get("representation_payload_sha256")
+            memory_elig = active_row.get("memory_eligibility_sha256")
+            active_model = active_row.get("model_provenance_sha256")
+            active_capability = active_row.get("capability_epoch_sha256")
+            parent = active_row.get("control_session_id")
+            if (
+                isinstance(payload, str)
+                and re.fullmatch(r"[0-9a-f]{64}", payload)
+                and isinstance(memory_elig, str)
+                and re.fullmatch(r"[0-9a-f]{64}", memory_elig)
+                and isinstance(active_model, str)
+                and re.fullmatch(r"[0-9a-f]{64}", active_model)
+                and isinstance(active_capability, str)
+                and re.fullmatch(r"[0-9a-f]{64}", active_capability)
             ):
-                active_parent = str(row["control_session_id"])
-            value = row.get("representation_payload_sha256")
-            if isinstance(value, str) and len(value) == 64:
-                active_payload = value
-            if active_payload:
-                break
-        memory_elig = None
-        for row in resolved_stages:
-            if isinstance(row, Mapping) and isinstance(
-                row.get("memory_eligibility_sha256"), str
-            ):
-                memory_elig = str(row["memory_eligibility_sha256"])
-                break
-        active_model = None
-        for row in resolved_stages:
-            if isinstance(row, Mapping) and str(row.get("representation_id") or "") == active_rep:
-                candidate_model = row.get("model_provenance_sha256")
-                if isinstance(candidate_model, str) and len(candidate_model) == 64:
-                    active_model = candidate_model
-                    break
-        # A binding hash is not a substitute for missing representation
-        # execution.  Memory/model metadata alone cannot turn an unexecuted
-        # or no-worthy stage into provenance-bearing work.
-        if active_payload is not None:
-            exec_binding = execution_binding_sha256(
-                scientific_slot_sha256=scientific_slot,
-                capability_epoch_sha256=cap_epoch,
-                control_session_id=active_parent,
-                representation_payload_sha256=active_payload,
-                memory_eligibility_sha256=memory_elig,
-                model_provenance_sha256=active_model
-                or (
-                    str(input_receipt.get("model_provenance_sha256"))
-                    if isinstance(input_receipt.get("model_provenance_sha256"), str)
-                    else None
-                ),
-            )
+                exec_binding = (
+                    existing_binding
+                    if isinstance(existing_binding, str)
+                    and re.fullmatch(r"[0-9a-f]{64}", existing_binding)
+                    else execution_binding_sha256(
+                        scientific_slot_sha256=scientific_slot,
+                        capability_epoch_sha256=active_capability,
+                        control_session_id=(
+                            str(parent) if isinstance(parent, str) and parent else None
+                        ),
+                        representation_payload_sha256=payload,
+                        memory_eligibility_sha256=memory_elig,
+                        model_provenance_sha256=active_model,
+                    )
+                )
     if owner_class_input == OWNER_CLASS_INPUT_NOT_READY:
         owner_class = OWNER_CLASS_INPUT_NOT_READY
     elif owner_class_input == OWNER_CLASS_OBSERVABILITY_BLOCKED or next_action == ACTION_OBSERVABILITY_BLOCKED:

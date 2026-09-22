@@ -3273,6 +3273,31 @@
       "target_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001"
     },
     {
+      "source_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "contains",
+      "target_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "depends_on",
+      "target_asset_id": "CTRL-FORGE-REPRESENTATION-LADDER-001"
+    },
+    {
+      "source_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "validated_by",
+      "target_asset_id": "TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001"
+    },
+    {
       "source_asset_id": "CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",
       "relation": "contains",
       "target_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001"
@@ -11263,6 +11288,36 @@
       "target_asset_id": "CTRL-HFIC-CENSORING-IGNORABILITY-DIAGNOSTIC-001"
     },
     {
+      "source_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FORGE-INPUT-RECEIPT-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-REPRESENTATION-LADDER-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001"
+    },
+    {
+      "source_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001"
+    },
+    {
       "source_asset_id": "MODULE-HFIC-RELEASED-TRAJECTORY-PROJECTION-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-HFIC-REPRESENTATION-PROBE-001"
@@ -16471,6 +16526,26 @@
       "source_asset_id": "TEST-FACTORY-V1-PRODUCTION-LITE-RUNTIME-001",
       "relation": "depends_on",
       "target_asset_id": "MODULE-FACTORY-V1-RUNTIME-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-FACTORY-V1-HFIC-SESSION-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-EVIDENCE-IDENTITY-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "depends_on",
+      "target_asset_id": "MODULE-HFIC-PREFLIGHT-ADMISSION-001"
+    },
+    {
+      "source_asset_id": "TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001",
+      "relation": "governed_by",
+      "target_asset_id": "CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001"
     },
     {
       "source_asset_id": "TEST-FORGE-INPUT-TRUTH-AND-VISIBILITY-001",

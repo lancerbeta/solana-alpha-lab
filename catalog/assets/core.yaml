@@ -32287,7 +32287,7 @@ records:
   as_of: '2026-09-17'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/hypothesis_forge.py', repository_path: scripts/hypothesis_forge.py}
-  integrity: {kind: sha256, sha256: 4bb0c9c39b24a78f88a126a99c9af162dcc3bde903c1f226e86094e3dd879b2d}
+  integrity: {kind: sha256, sha256: 92b2b03581c4abfb2b4f9e4dd896aceda845200fdf3ff8d483c39ab2354a5662}
   access: {mode: read_only, method: command, recipe_id: QUERY-HFIC-EXACT-RELATED-PRIOR-001, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: 213e2bc488448449658b695aaabb19b3aeee0912574bc6f7ad9df9f7ef9afaba}
+  integrity: {kind: sha256, sha256: 27369cd0c81dd0fc492068f7423e2c4145cd021e81f89cf6ab78544d6bb0ad51}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -34098,7 +34098,7 @@ records:
   as_of: '2026-09-10'
   truth_owner: LIVE_COHORT_TO_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/live_cohort_to_forge.py', repository_path: src/solana_alpha_lab/factory/live_cohort_to_forge.py}
-  integrity: {kind: sha256, sha256: 6eef3f73055e8d42ef54e8f471e92bf72b3e2c1f0129b35b1aa2e6f63bc04707}
+  integrity: {kind: sha256, sha256: 5d02634a01b7717fc40cc491b9aa8d70e5027d78d41372e7f445989cc518d28a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-LIVE-COHORT-TO-FORGE-OPERATIONAL-CLOSURE-001}
@@ -37337,7 +37337,7 @@ records:
   as_of: '2026-09-15'
   truth_owner: HFIC_REOPENED_PRIOR_SEARCH_ROUTING_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py', repository_path: src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py}
-  integrity: {kind: sha256, sha256: 3e9d9ee025480fdd1cb31d8e8764b6b0e3e8c954241a5882160cb1ba32f2e519}
+  integrity: {kind: sha256, sha256: afb3099a4af82572d7de135f328be1af370cc4c1a1ba4b406cc43e5e6c7454d7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-REOPENED-PRIOR-SEARCH-ROUTING-001}
@@ -37923,7 +37923,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_INPUT_TRUTH_AND_VISIBILITY_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/forge_input_receipt.py', repository_path: src/solana_alpha_lab/factory/forge_input_receipt.py}
-  integrity: {kind: sha256, sha256: 2541b96606b6c8f251a29e719ca9ac15712e0c494e984d5e9e5242b783ad2b98}
+  integrity: {kind: sha256, sha256: 6d6f7ebb093bc948cbdde4802b783e148f7704574ee06cd588ab26ac4dacd400}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
@@ -38017,7 +38017,7 @@ records:
   as_of: '2026-09-20'
   truth_owner: FORGE_REPRESENTATION_LADDER_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_representation_ladder.py', repository_path: src/solana_alpha_lab/factory/hfic_representation_ladder.py}
-  integrity: {kind: sha256, sha256: 1acfc4d5dfa95d1a44b32647a9f2574ea0c91caf68293bd54be6a7a819a3f7d1}
+  integrity: {kind: sha256, sha256: 4e2219896a79f4f015e1807a824b7b8b2ebdf76b1323ad4cd7b3da682b85513b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
@@ -38065,4 +38065,84 @@ records:
   consumers: [FACTORY-001, DIRECT-CURSOR-DELIVERY]
   evidence: []
   search_terms: [G-A4, START_V1, SEARCH_EXHAUSTED_CURRENT_EVIDENCE, ONE_SLASH_ONE_BOUNDED_RUN]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+
+- asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001
+  record_version: '1.0'
+  asset_type: control_document
+  purpose: Exact A5 contract for split market/capability identity, shared admission, lifecycle occupancy, restart readback, and normal owner-gold output.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-22'
+  truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
+  location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md', repository_path: docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md}
+  integrity: {kind: sha256, sha256: 48cfca73a1cc014f5ef0d08156c0ddd8e445372bff5585088f584729b6846425}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: depends_on, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
+  - {relation_type: depends_on, target_asset_id: CTRL-FORGE-REPRESENTATION-LADDER-001}
+  - {relation_type: contains, target_asset_id: MODULE-HFIC-EVIDENCE-IDENTITY-001}
+  - {relation_type: contains, target_asset_id: MODULE-HFIC-PREFLIGHT-ADMISSION-001}
+  - {relation_type: validated_by, target_asset_id: TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
+  consumers: [FACTORY-001, GOAL-OWNER, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  search_terms: [FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1, A5, market identity, scientific slot, owner gold]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-HFIC-EVIDENCE-IDENTITY-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Shared market evidence basis, capability epoch, scientific slot, lineage verification, legacy disposition, and execution provenance identity.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-22'
+  truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_evidence_identity.py', repository_path: src/solana_alpha_lab/factory/hfic_evidence_identity.py}
+  integrity: {kind: sha256, sha256: 131b1b9d1a1be0379658f539e4ee8d44f7df78c083830d3a21970266bb87453a}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FORGE-INPUT-RECEIPT-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-REPRESENTATION-LADDER-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  search_terms: [market_evidence_epoch_sha256, capability_epoch_sha256, scientific_slot_sha256, execution_binding_sha256, lineage]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: MODULE-HFIC-PREFLIGHT-ADMISSION-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: Production preflight admission and no-write/readback routing, including generated-draft restart and legacy/current disposition.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-22'
+  truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
+  location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
+  integrity: {kind: sha256, sha256: b16b963c6318e647218ea1a7342877cd94916275ce7488058ac828040437d368}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-EVIDENCE-IDENTITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SESSION-001}
+  consumers: [FACTORY-001, GOAL-OWNER, HYPOTHESIS-FORGE, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  search_terms: [run_preflight, decide_preflight_action, RESUME_EXISTING_SESSION, no-write, generated draft]
+  classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}
+- asset_id: TEST-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001
+  record_version: '1.0'
+  asset_type: script
+  purpose: A5 whole-path owner-gold tests for normal entry, completed replay, restart occupancy, Git-only change, C3 import, concurrency, and typed no-write disposition.
+  status: IMPLEMENTED_UNVERIFIED
+  origin: REPOSITORY
+  as_of: '2026-09-22'
+  truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
+  location: {kind: git_path, logical_uri: 'repo://tests/test_forge_evidence_identity_and_owner_gold_v1.py', repository_path: tests/test_forge_evidence_identity_and_owner_gold_v1.py}
+  integrity: {kind: sha256, sha256: 938cb8764f57f729f70ee914eec33cc03cdf4a2457b1fc3300521c98e026e6f7}
+  access: {mode: read_only, method: file, network_required: false, secrets_required: false}
+  relations:
+  - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-EVIDENCE-IDENTITY-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-HFIC-PREFLIGHT-ADMISSION-001}
+  - {relation_type: depends_on, target_asset_id: MODULE-FACTORY-V1-HFIC-SESSION-001}
+  consumers: [FACTORY-001, DIRECT-CURSOR-DELIVERY]
+  evidence: []
+  search_terms: [G1, G3, G5, G6, G7, G8, G10, G12, owner gold, restart, C3]
   classification: {contains_secrets: false, contains_raw_data: false, sensitivity: INTERNAL_NON_SECRET}

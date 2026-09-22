@@ -2,7 +2,7 @@
 task_id: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
 task_version: '1.0'
 status: READY
-as_of: '2026-09-21'
+as_of: '2026-09-22'
 owner: GOAL_OWNER
 
 allowed_routes:
@@ -39,6 +39,7 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_representation_ladder.py
   - src/solana_alpha_lab/factory/forge_input_receipt.py
   - src/solana_alpha_lab/factory/live_cohort_to_forge.py
+  - src/solana_alpha_lab/factory/hfic_reopened_prior_routing.py
   - src/solana_alpha_lab/factory/hfic_memory_policy.py
   - src/solana_alpha_lab/factory/fast_lane_snapshot.py
   - schemas/research_memory_projection_v1.sql
@@ -61,6 +62,7 @@ managed_write_set:
   - tests/test_hfic_epistemic_memory_semantics.py
   - tests/test_hfic_one_frozen_runner_up_failover_v1.py
   - tests/test_forge_input_truth_and_visibility_v1.py
+  - tests/test_hfic_reopened_prior_search_routing_v1.py
   - scripts/hypothesis_forge.py
   - .agents/skills/hypothesis-forge/SKILL.md
   - .agents/skills/independent-hypothesis-critic/SKILL.md

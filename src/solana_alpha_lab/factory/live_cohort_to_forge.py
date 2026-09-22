@@ -827,6 +827,27 @@ def forge_control_ready(
         CURRENT_REPRESENTATION_CONTROL_V1,
     )
     reservations = list_scientific_slot_admissions(store) if store is not None else []
+    generated_draft = None
+    visible_cohort_ids = input_receipt.get("active_evidence_set", {}).get(
+        "visible_cohort_ids"
+    ) if isinstance(input_receipt.get("active_evidence_set"), Mapping) else None
+    if store is not None:
+        from solana_alpha_lab.factory.hfic_evidence_identity import scientific_slot_sha256
+        from solana_alpha_lab.factory.hfic_session import find_generated_draft
+
+        generated_draft = find_generated_draft(
+            store,
+            market_evidence_epoch_sha256=market_epoch,
+            owner_focus=focus,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            scientific_slot_sha256=scientific_slot_sha256(
+                market_evidence_epoch_sha256=market_epoch,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus=focus,
+            ),
+        )
     action, _bound = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -838,6 +859,8 @@ def forge_control_ready(
         representation_id="BASE",
         representation_semantic_version="HFIC-V1.2",
         reservations=reservations,
+        generated_draft=generated_draft,
+        current_visible_cohort_ids=visible_cohort_ids,
     )
     if action == "STOP":
         _require(False, str(_bound or "SEARCH_BUDGET_EXHAUSTED"))

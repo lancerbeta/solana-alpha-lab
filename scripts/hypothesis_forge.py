@@ -257,6 +257,7 @@ def cmd_preflight(
                 if control_current_representation
                 else None
             ),
+            persist=auto_commission,
         )
     except HficPreflightError as exc:
         payload = {
@@ -264,6 +265,12 @@ def cmd_preflight(
             "terminal": str(exc),
             "owner_focus": owner_focus,
             **active.redacted_receipt(),
+            "next": "RESOLVE_TYPED_PREFLIGHT_BLOCK",
+            "writes": {
+                "research_store": int(auto_commission),
+                "forge_context": 0,
+                "session": 0,
+            },
         }
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)

@@ -6,6 +6,7 @@ import copy
 import hashlib
 import json
 import re
+import time
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -364,7 +365,7 @@ def _execution_identity_fields(
         # not be upgraded into a readiness-looking hash.  The parent control
         # session is part of the binding whenever a representation is bound.
         fields["execution_binding_sha256"] = None
-        if capability and payload_sha:
+        if capability and payload_sha and memory_sha and model_sha:
             fields["execution_binding_sha256"] = execution_binding_sha256(
                 scientific_slot_sha256=slot,
                 capability_epoch_sha256=capability,
@@ -2563,6 +2564,19 @@ def _assert_scientific_admission(
         resolve_scientific_admission,
     )
 
+    visible_cohort_ids = binding.get("visible_cohort_ids")
+    if not isinstance(visible_cohort_ids, list):
+        input_receipt = binding.get("forge_input_receipt")
+        active_set = (
+            input_receipt.get("active_evidence_set")
+            if isinstance(input_receipt, Mapping)
+            else None
+        )
+        visible_cohort_ids = (
+            active_set.get("visible_cohort_ids")
+            if isinstance(active_set, Mapping)
+            else None
+        )
     admission = resolve_scientific_admission(
         list_hfic_sessions(store),
         reservations=list_scientific_slot_admissions(store),
@@ -2580,8 +2594,34 @@ def _assert_scientific_admission(
             if isinstance(binding.get("evidence_surface_mode"), str)
             else None
         ),
+        current_visible_cohort_ids=(
+            list(visible_cohort_ids or [])
+            if isinstance(visible_cohort_ids, list)
+            else None
+        ),
     )
     action = str(admission.get("action") or "")
+    if action == "STOP" and str(admission.get("reason_code") or "") == (
+        "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING"
+    ):
+        draft = find_generated_draft(
+            store,
+            market_evidence_epoch_sha256=market,
+            owner_focus=str(binding.get("owner_focus") or "AUTO"),
+            representation_id=str(fields.get("ladder_representation_id") or "BASE"),
+            representation_semantic_version=version,
+            scientific_slot_sha256=str(fields.get("scientific_slot_sha256") or ""),
+        )
+        draft_session = str(draft.get("session_id") or "") if draft else ""
+        session_id = str(binding.get("session_id") or "")
+        if draft_session and draft_session == session_id:
+            return {
+                **admission,
+                "action": "RESUME_EXISTING_SESSION",
+                "reason_code": "GENERATED_DRAFT_READBACK",
+                "session_id": session_id,
+                "occupancy": "OCCUPIED_RESUMABLE_DRAFT",
+            }
     if action == "START_NEW_SESSION":
         return admission
     session_id = str(binding.get("session_id") or "")
@@ -2684,17 +2724,26 @@ def persist_scientific_slot_admission(
         producer_git_sha=git.head_sha,
         created_at=now,
     )
-    try:
-        store.append([event], transaction_id=transaction_id)
-    except Exception:
-        # A competing writer may have committed the deterministic slot
-        # transaction between the read and append. Read back before failing.
-        observed = _existing_scientific_slot_admission(store, slot)
-        if observed is not None:
-            if str(observed.get("session_id") or "") != session_id:
-                raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
-            return observed
-        raise
+    for attempt in range(4):
+        try:
+            store.append([event], transaction_id=transaction_id)
+            break
+        except Exception as exc:
+            # A competing writer may hold the lease briefly. Re-read after a
+            # bounded retry so the loser reports the occupied slot instead of
+            # leaking an implementation-level WRITER_BUSY error.
+            observed = _existing_scientific_slot_admission(store, slot)
+            if observed is not None:
+                if str(observed.get("session_id") or "") != session_id:
+                    raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED")
+                return observed
+            if (
+                getattr(exc, "code", None) == "WRITER_BUSY"
+                and attempt < 3
+            ):
+                time.sleep(0.05 * (attempt + 1))
+                continue
+            raise
     return body
 
 
