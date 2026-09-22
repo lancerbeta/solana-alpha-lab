@@ -906,6 +906,17 @@ def _next_active_after(
 
 def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     stages = receipt.get("stages") or []
+    stage_has_unknown_provenance = any(
+        isinstance(stage, Mapping)
+        and stage.get("execution_provenance_status")
+        == EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+        for stage in stages
+    )
+    provenance_unknown = (
+        receipt.get("execution_provenance_status")
+        == EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+        or stage_has_unknown_provenance
+    )
     writes = receipt.get("writes") if isinstance(receipt.get("writes"), Mapping) else {}
     persist_note = (
         "RESEARCH_ARTIFACT FORGE_RUN_RECEIPT"
@@ -960,6 +971,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             status = "BLOCKED — stop; not a scientific negative"
     elif next_action == ACTION_RETURN_EXISTING or receipt.get("persisted_receipt_sha256"):
         status = "READBACK — same run; do not start a second trial"
+        if provenance_unknown:
+            status += "; execution provenance UNKNOWN — not a readiness receipt"
     elif next_action == ACTION_KEEP_PAUSE:
         status = "NEXT — typed pause; evening not success"
     elif next_action == ACTION_CONTROL_REQUIRED:
@@ -1001,6 +1014,8 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         status = "NEXT — continue V1 envelope; do not treat WAIT as done"
     elif owner_final:
         status = "DONE — bounded-run owner-final; do not continue"
+        if provenance_unknown:
+            status += "; execution provenance UNKNOWN — not a readiness receipt"
     elif next_action == ACTION_FINISH_RUNNER_UP:
         status = "NEXT — finish already frozen runner-up; do not start V1"
     else:
@@ -1073,7 +1088,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         f"execution_provenance: {receipt.get('execution_provenance_status') or 'UNKNOWN'}",
         "execution_scope: NOT_SCIENTIFIC_EXECUTION  # provenance binding only; no market Forge",
     ]
-    if receipt.get("execution_provenance_status") == EXEC_PROVENANCE_HISTORICAL_UNKNOWN:
+    if provenance_unknown:
         lines.append(
             "execution_provenance_note: historical readback is UNKNOWN; this is "
             "not a readiness receipt and not permission to rerun"
@@ -2413,8 +2428,7 @@ def evaluate_forge_run(
                 run_identity = str(existing.get("run_identity_sha256") or legacy_identity)
     except ResearchStoreError:
         existing = None
-    if existing is not None and existing.get("owner_final"):
-        return _readback_existing_run(existing)
+    existing_owner_final = bool(existing is not None and existing.get("owner_final"))
     if existing is not None:
         if not saved_draft_sha256:
             for row in existing.get("stages") or []:
@@ -2446,7 +2460,7 @@ def evaluate_forge_run(
             OWNER_CLASS_INPUT_NOT_READY,
             OWNER_CLASS_OBSERVABILITY_BLOCKED,
         } else None,
-        existing_completed=existing_completed,
+        existing_completed=existing_completed or existing_owner_final,
         saved_draft_sha256=saved_draft_sha256,
     )
 
@@ -2525,7 +2539,15 @@ def evaluate_forge_run(
     admission_execution_context = dict(execution_context or {})
     if isinstance(cap_epoch, str) and len(cap_epoch) == 64:
         admission_execution_context.setdefault("capability_epoch_sha256", cap_epoch)
-    if next_action.startswith("START_"):
+    if next_action in {
+        ACTION_START_BASE,
+        ACTION_START_V1,
+        ACTION_RESUME_BASE,
+        ACTION_RESUME_V1,
+        ACTION_FINISH_RUNNER_UP,
+        ACTION_OWNER_CANDIDATE,
+        ACTION_RETURN_EXISTING,
+    }:
         admission = resolve_scientific_admission(
             list_hfic_sessions(store),
             reservations=list_scientific_slot_admissions(store),
@@ -2536,6 +2558,7 @@ def evaluate_forge_run(
             representation_registry=registry_doc,
             current_visible_cohort_ids=visible,
             execution_context=admission_execution_context or None,
+            repo_root=Path(repo_root),
         )
         if admission.get("action") == "STOP":
             reason = str(
@@ -2545,6 +2568,7 @@ def evaluate_forge_run(
                 "next_action": ACTION_OBSERVABILITY_BLOCKED,
                 "owner_final": ACTION_OBSERVABILITY_BLOCKED,
                 "reason_code": reason,
+                "session_id": str(admission.get("session_id") or "") or None,
             }
             next_action = ACTION_OBSERVABILITY_BLOCKED
             owner_final = ACTION_OBSERVABILITY_BLOCKED
@@ -2568,9 +2592,15 @@ def evaluate_forge_run(
                     "next_action": ACTION_OBSERVABILITY_BLOCKED,
                     "owner_final": ACTION_OBSERVABILITY_BLOCKED,
                     "reason_code": reason,
+                    "session_id": admitted_id,
                 }
                 next_action = ACTION_OBSERVABILITY_BLOCKED
                 owner_final = ACTION_OBSERVABILITY_BLOCKED
+    if existing_owner_final and next_action != ACTION_OBSERVABILITY_BLOCKED:
+        # A completed run is a durable readback, not a new forge-run write.
+        # Admission above still verifies the caller's known execution context
+        # before this compatibility readback is returned.
+        return _readback_existing_run(existing)
     scientific_slot = scientific_slot_sha256(
         market_evidence_epoch_sha256=str(market_epoch),
         representation_id=active_rep,
@@ -2753,6 +2783,7 @@ def evaluate_forge_run(
             else None
         ),
         "scientific_slot_sha256": scientific_slot,
+        "session_id": decision.get("session_id"),
         "execution_binding_sha256": exec_binding,
         "execution_provenance_status": exec_provenance_status,
         "control_session_id": control_session_id,

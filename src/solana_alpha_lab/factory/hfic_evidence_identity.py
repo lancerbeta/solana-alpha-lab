@@ -287,6 +287,34 @@ def build_market_evidence_basis(
                 invalid_dataset_rows += 1
             else:
                 row["a3_pit_availability_validation_sha256"] = marker
+            # A3 labels drive logical-dataset selection and feature/terminal
+            # eligibility. Keep their decision surface behind one digest so
+            # changing a label cannot leave the market epoch stable while
+            # changing the effective Forge input. Raw labels stay out of the
+            # admission receipt.
+            row["a3_dataset_label_projection_sha256"] = canonical_sha256(
+                {
+                    "identity_version": "A3_DATASET_LABEL_PROJECTION_V1",
+                    "labels": (
+                        dict(item.get("labels"))
+                        if isinstance(item.get("labels"), Mapping)
+                        else None
+                    ),
+                    "derived": {
+                        key: item.get(key)
+                        for key in (
+                            "evidence_role",
+                            "yield_eligible",
+                            "base_x_population_n",
+                            "yield_missing",
+                            "feature_usable",
+                            "dataset_terminal",
+                            "feature_hint",
+                            "feature_families",
+                        )
+                    },
+                }
+            )
         dataset_rows.append(row)
     dataset_rows.sort(key=lambda row: row["dataset_manifest_id"])
 
@@ -390,6 +418,9 @@ def market_evidence_epoch_sha256(basis: Mapping[str, Any]) -> str:
         marker = str(
             item.get("a3_pit_availability_validation_sha256") or ""
         ).strip()
+        label_projection = str(
+            item.get("a3_dataset_label_projection_sha256") or ""
+        ).strip()
         if "a3_pit_availability_validation_sha256" in item:
             integrity_markers_present = True
         if (
@@ -400,6 +431,10 @@ def market_evidence_epoch_sha256(basis: Mapping[str, Any]) -> str:
         ):
             raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
         if integrity_markers_present and not re.fullmatch(r"[0-9a-f]{64}", marker):
+            raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
+        if integrity_markers_present and not re.fullmatch(
+            r"[0-9a-f]{64}", label_projection
+        ):
             raise EvidenceIdentityError("MARKET_EVIDENCE_BASIS_INCOMPLETE")
         dataset_mids.add(mid)
     if integrity_markers_present:
@@ -733,6 +768,25 @@ def resolve_scientific_admission(
         representation_semantic_version=version,
         owner_focus=owner_focus,
     )
+    if isinstance(execution_context, Mapping):
+        for key in (
+            "capability_epoch_sha256",
+            "representation_payload_sha256",
+            "model_provenance_sha256",
+        ):
+            if key not in execution_context:
+                continue
+            value = execution_context.get(key)
+            if value in (None, ""):
+                continue
+            if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+                return {
+                    "action": "STOP",
+                    "reason_code": "SCIENTIFIC_IDENTITY_CONFLICT",
+                    "session_id": None,
+                    "scientific_slot_sha256": target_slot,
+                    "occupancy": "UNRESOLVED_BINDING",
+                }
     observed_rows: list[Mapping[str, Any]] = []
     seen_rows: set[tuple[str, str]] = set()
     all_rows = [*(sessions or []), *(reservations or [])]

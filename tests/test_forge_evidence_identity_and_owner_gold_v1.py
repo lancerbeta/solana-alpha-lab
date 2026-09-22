@@ -43,7 +43,9 @@ from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
 )
 from solana_alpha_lab.factory.hfic_identity import assign_portfolio_ids  # noqa: E402
 from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
+    ACTION_OBSERVABILITY_BLOCKED,
     ACTION_OWNER_CANDIDATE,
+    ACTION_RESUME_BASE,
     ACTION_RESUME_V1,
     ACTION_RETURN_EXISTING,
     ACTION_SEARCH_EXHAUSTED,
@@ -355,6 +357,61 @@ class IdentityUnitTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
             market_evidence_epoch_sha256(incomplete)
 
+    def test_a3_label_projection_is_market_identity(self) -> None:
+        common = {
+            "dataset_manifest_id": "MID-CURRENT",
+            "dataset_fingerprint": "aa" * 32,
+            "dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+            "a3_pit_availability_validation_sha256": "11" * 32,
+            "labels": {
+                "logical_dataset_id": "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001",
+                "corpus_version": 2,
+                "is_current_corpus_version": True,
+                "yield_eligible": 10,
+            },
+            "yield_eligible": 10,
+            "feature_usable": True,
+            "dataset_terminal": "SAMPLE_VALID",
+        }
+        basis_a = build_market_evidence_basis(
+            datasets=[common],
+            visible_cohort_ids=["REL-C1"],
+            current_dataset_manifest_id="MID-CURRENT",
+            corpus_version=2,
+            lineage_bindings=[
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1",
+                    "source_sha256": "bb" * 32,
+                }
+            ],
+        )
+        changed = {
+            **common,
+            "labels": {**common["labels"], "is_current_corpus_version": False},
+        }
+        basis_b = build_market_evidence_basis(
+            datasets=[changed],
+            visible_cohort_ids=["REL-C1"],
+            current_dataset_manifest_id="MID-CURRENT",
+            corpus_version=2,
+            lineage_bindings=[
+                {
+                    "cohort_id": "REL-C1",
+                    "release_id": "rel-c1",
+                    "source_sha256": "bb" * 32,
+                }
+            ],
+        )
+        self.assertNotEqual(
+            basis_a["datasets"][0]["a3_dataset_label_projection_sha256"],
+            basis_b["datasets"][0]["a3_dataset_label_projection_sha256"],
+        )
+        self.assertNotEqual(
+            market_evidence_epoch_sha256(basis_a),
+            market_evidence_epoch_sha256(basis_b),
+        )
+
     def test_market_epoch_stable_under_docs_only_capability_change_surface(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
@@ -548,6 +605,35 @@ class IdentityUnitTests(unittest.TestCase):
             decision["reason_code"],
             "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
         )
+
+    def test_malformed_nested_identity_fails_closed(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import _execution_identity_fields
+
+        source = {
+            "market_evidence_epoch_sha256": "aa" * 32,
+            "capability_epoch_sha256": "bb" * 32,
+            "memory_eligibility_sha256": "cc" * 32,
+            "model_provenance_sha256": "dd" * 32,
+            "representation_payload_sha256": "ee" * 32,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "forge_context_packet": {"model_provenance_sha256": "not-a-sha256"},
+        }
+        with self.assertRaisesRegex(HficSessionError, "SCIENTIFIC_IDENTITY_CONFLICT"):
+            _execution_identity_fields(source)
+
+    def test_malformed_execution_context_fails_closed(self) -> None:
+        decision = resolve_scientific_admission(
+            [],
+            market_evidence_epoch="aa" * 32,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+            execution_context={"model_provenance_sha256": "not-a-sha256"},
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(decision["reason_code"], "SCIENTIFIC_IDENTITY_CONFLICT")
 
     def test_execution_binding_is_positive_and_tamper_checked(self) -> None:
         from solana_alpha_lab.factory.hfic_session import _execution_identity_fields
@@ -891,6 +977,78 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertTrue(
                 any(item.get("session_id") == base["session_id"] for item in sessions_after)
             )
+
+    def test_g11_completed_replay_checks_known_model_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            _ordinary_pass_base(data_root, store)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                finished = evaluate_forge_run(ROOT, data_root, persist=True)
+                replay = evaluate_forge_run(ROOT, data_root, persist=False)
+                drifted = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    execution_context={"model_provenance_sha256": "22" * 32},
+                )
+        self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
+        self.assertEqual(replay["next_action"], ACTION_RETURN_EXISTING)
+        self.assertEqual(drifted["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertIn(
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            drifted["blocking_reason_codes"],
+        )
+        self.assertEqual(drifted["writes"]["research_store"], 0)
+
+    def test_g11_pending_resume_checks_known_model_context(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                preflight = _ordinary_stamped_preflight(data_root, store)
+                preflight["model_provenance_sha256"] = "11" * 32
+            draft = valid_draft()
+            frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                resumed = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    execution_context={"model_provenance_sha256": "11" * 32},
+                )
+                drifted = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    execution_context={"model_provenance_sha256": "22" * 32},
+                )
+        self.assertEqual(resumed["next_action"], ACTION_RESUME_BASE)
+        self.assertEqual(drifted["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertIn(
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            drifted["blocking_reason_codes"],
+        )
+        self.assertEqual(drifted["writes"]["session"], 0)
 
     def test_g6_generated_draft_restart_keeps_slot_and_rejects_regeneration(self) -> None:
         """A generator crash before freeze resumes bytes, slot, and budget."""

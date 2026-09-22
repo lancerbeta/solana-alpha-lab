@@ -633,6 +633,7 @@ class ResolveNextActionTests(unittest.TestCase):
         text = format_forge_run_owner_readout(
             {
                 "run_id": "FORGE-RUN-TEST",
+                "session_id": "HFIC-SESS-OCCUPIED-READBACK",
                 "owner_class": ACTION_OBSERVABILITY_BLOCKED,
                 "next_action": ACTION_OBSERVABILITY_BLOCKED,
                 "owner_final": ACTION_OBSERVABILITY_BLOCKED,
@@ -643,7 +644,10 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("occupied slot has no readable lifecycle row", text)
         self.assertIn("RECOVER_EXISTING_READBACK", text)
-        self.assertIn("show-session --session-id <recorded-session-id> --format json", text)
+        self.assertIn(
+            "show-session --session-id HFIC-SESS-OCCUPIED-READBACK --format json",
+            text,
+        )
         self.assertIn("do not rewrite receipts, regenerate, or reset budget", text)
         self.assertIn("Блокировка не является научным отрицательным результатом", text)
 
@@ -698,6 +702,29 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("historical readback is UNKNOWN", text)
         self.assertIn("not a readiness receipt", text)
+
+    def test_stage_unknown_readback_is_not_false_done(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "next_action": ACTION_RETURN_EXISTING,
+                "owner_final": ACTION_OWNER_CANDIDATE,
+                "execution_provenance_status": "NOT_APPLICABLE",
+                "stages": [
+                    {
+                        "representation_id": "BASE",
+                        "execution_status": EXEC_REUSED,
+                        "execution_provenance_status": EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+                        "effective_terminal": "PASS",
+                        "input_scope": "ORDINARY_BASE",
+                    }
+                ],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [],
+            }
+        )
+        self.assertIn("execution provenance UNKNOWN — not a readiness receipt", text)
+        self.assertIn("historical readback is UNKNOWN", text)
         self.assertIn("execution_scope: NOT_SCIENTIFIC_EXECUTION", text)
 
     def test_pass_to_classification_resumes_until_classify(self) -> None:
@@ -2236,6 +2263,11 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         )
         self.assertIsNone(v1["session_id"])
         self.assertEqual(v1["execution_status"], EXEC_NOT_RUN)
+        self.assertIsInstance(started.get("session_id"), str)
+        self.assertIn(
+            "show-session --session-id " + str(started["session_id"]),
+            started["owner_readout"],
+        )
 
     def test_g4_marker_only_v1_freeze_is_rejected(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

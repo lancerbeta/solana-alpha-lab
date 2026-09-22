@@ -297,10 +297,19 @@ def _consistent_valid_hash(
     for source in sources:
         if not isinstance(source, Mapping):
             continue
+        if key not in source:
+            continue
         value = source.get(key)
+        if value in (None, ""):
+            continue
         if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
             if value not in observed:
                 observed.append(value)
+            continue
+        # A malformed nested identity is not equivalent to an absent legacy
+        # field.  Silently dropping it could let a valid outer receipt mask a
+        # corrupted production context.
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
     if len(observed) > 1:
         raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
     return observed[0] if observed else None
