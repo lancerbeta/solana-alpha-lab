@@ -1,9 +1,9 @@
 {
   "schema": "smial.forge-evidence-identity-no-write-disposition",
   "schema_version": "1.1",
-  "as_of": "2026-09-21",
+  "as_of": "2026-09-22",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
+  "git_head": "576a93e09bc95b118396ad70cc6afb21d546d228",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -17,14 +17,14 @@
     "REL-20260902T111900Z-20260909T111900Z",
     "REL-20260909T111900Z-20260916T111900Z"
   ],
-  "current_market_evidence_epoch_sha256": "1d4d31ecd4b32b6e",
+  "current_market_evidence_epoch_sha256": "2dd54c5cb1254e81da19ab9b345460436ab6f0d0d17e1a835d0a36f4d8ab5340",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
     "blocking_reason_codes": []
   },
-  "inventory_sha256_prefix_before": "f39ca5d1f2b5ce5b",
-  "inventory_sha256_prefix_after": "f39ca5d1f2b5ce5b",
+  "inventory_sha256_prefix_before": "defbc9a5a1794b05",
+  "inventory_sha256_prefix_after": "defbc9a5a1794b05",
   "scientific_writes": 0,
   "session_count": 17,
   "control_sessions_present": 2,
@@ -270,14 +270,18 @@
     }
   ],
   "first_run": {
-    "next_action": "START_BASE",
+    "next_action": "START_NEW_SESSION",
     "blocking_reason_codes": [
-      "CONTROL_SURFACE_REQUIRED"
+      "BLOCK_FORGE_SELECTION_RISK"
     ],
     "owner_final": null,
     "selected_ordinary_base_session_id": null,
-    "market_evidence_epoch_sha256": "1d4d31ecd4b32b6e",
-    "scientific_slot_sha256": "3c53992eeab4b9cf"
+    "market_evidence_epoch_sha256": "2dd54c5cb1254e81da19ab9b345460436ab6f0d0d17e1a835d0a36f4d8ab5340",
+    "scientific_slot_sha256": null,
+    "router_decision": "BLOCK_FORGE_SELECTION_RISK",
+    "selection_reason": "SINGLE_COMMISSIONED",
+    "current_market_occupancy": 0,
+    "receipt_sha256": "339de9f715c9551b593a97236e8f708bad9b1fe57c1e05c86233491eba033617"
   },
   "disposition_summary": [
     {
