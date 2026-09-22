@@ -73,6 +73,9 @@ RECEIPT_SCHEMA_PATH = (
     Path(__file__).resolve().parents[3]
     / "catalog/schemas/forge_run_receipt_v1.schema.json"
 )
+CANONICAL_HFIC_CLI = (
+    "uv run --locked --managed-python python -B scripts/hypothesis_forge.py"
+)
 
 HANDLER_BASE_HFIC = "BASE_HFIC"
 HANDLER_NORMALIZED_TRAJECTORY_V1 = "NORMALIZED_TRAJECTORY_V1"
@@ -1183,9 +1186,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     if "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING" in blocking:
         session_id = str(receipt.get("session_id") or "").strip()
         lookup = (
-            f"hypothesis_forge.py show-session --session-id {session_id} --format json"
+            f"{CANONICAL_HFIC_CLI} show-session --session-id {session_id} --format json"
             if session_id
-            else "hypothesis_forge.py show-session --session-id <recorded-session-id> --format json"
+            else f"{CANONICAL_HFIC_CLI} show-session --session-id <recorded-session-id> --format json"
         )
         lines.append(
             "next: RECOVER_EXISTING_READBACK — run the read-only "
@@ -1269,8 +1272,9 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         draft_arg = f" --saved-draft-sha256 {draft_sha}" if draft_sha else ""
         lines.append(
             "next: RESUME_EXISTING_SESSION — continue the same /hypothesis-forge "
-            "slash; read the authoritative path with `forge-run --no-write "
-            "--format json --owner-focus AUTO"
+            "slash; read the authoritative path with `"
+            + CANONICAL_HFIC_CLI
+            + " forge-run --no-write --format json --owner-focus AUTO"
             + draft_arg
             + "; then persist/freeze that exact draft inside the already-authorized "
             "slash; do not regenerate"
@@ -2012,7 +2016,11 @@ def _session_applicable_to_current_market(
     """True when a discovered session may answer the current market input."""
 
     if not isinstance(current_market_epoch, str) or len(current_market_epoch) != 64:
-        return True
+        # A missing/invalid current market identity is an UNKNOWN current
+        # applicability result.  Historical occupancy is still retained by
+        # the caller, but UNKNOWN must never select a row for reuse or budget
+        # admission.
+        return False
     from solana_alpha_lab.factory.hfic_evidence_identity import (
         scientific_slot_sha256,
     )

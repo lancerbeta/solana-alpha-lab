@@ -736,8 +736,10 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 git_snapshot=_git_snapshot(),
                 clock=_CLOCK,
             )
-            self.assertEqual(missing["action"], "START_NEW_SESSION")
+            self.assertEqual(missing["action"], "STOP")
+            self.assertEqual(missing["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
             self.assertIsNone(missing.get("router_decision"))
+            self.assertEqual(missing.get("next"), "RESTORE_CURRENT_EVIDENCE")
             self.assertNotEqual(
                 missing.get("next"),
                 "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
@@ -759,11 +761,11 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 clock=_CLOCK,
             )
             self.assertEqual(directory["action"], "STOP")
-            self.assertEqual(directory["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
-            self.assertEqual(directory["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(directory["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            self.assertIsNone(directory.get("router_decision"))
             self.assertEqual(
                 directory["next"],
-                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+                "RESTORE_CURRENT_EVIDENCE",
             )
             artifact.rmdir()
 
@@ -779,11 +781,11 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 clock=_CLOCK,
             )
             self.assertEqual(stale_block["action"], "STOP")
-            self.assertEqual(stale_block["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
-            self.assertEqual(stale_block["router_decision"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(stale_block["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            self.assertIsNone(stale_block.get("router_decision"))
             self.assertEqual(
                 stale_block["next"],
-                "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
+                "RESTORE_CURRENT_EVIDENCE",
             )
             artifact.unlink()
 
@@ -800,7 +802,7 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                 clock=_CLOCK,
             )
             self.assertEqual(stale_allow["action"], "STOP")
-            self.assertEqual(stale_allow["terminal"], BLOCK_FORGE_EVIDENCE_GAP)
+            self.assertEqual(stale_allow["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
             self.assertNotEqual(
                 stale_allow.get("router_decision"),
                 FORGE_ELIGIBLE_WITH_SELECTION_CAVEAT,
@@ -827,6 +829,14 @@ class SelectionRobustnessGateTests(unittest.TestCase):
             self.assertTrue((blocked.get("forge_context_packet") or {}).get(
                 "selection_robustness_caveat"
             ))
+            self.assertEqual(
+                blocked.get("owner_next"),
+                "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
+            )
+            self.assertEqual(
+                (blocked.get("selection_gate") or {}).get("owner_next"),
+                "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
+            )
             self.assertNotEqual(
                 blocked.get("next"),
                 "DO_NOT_START_FORGE_UNTIL_SELECTION_GATE_ALLOWS",
@@ -901,11 +911,8 @@ class SelectionRobustnessGateTests(unittest.TestCase):
                     evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
                 )
             self.assertEqual(control["action"], "STOP")
-            self.assertEqual(control["terminal"], "CONTROL_CORPUS_MANIFEST_MISMATCH")
-            self.assertEqual(
-                control["evidence_surface_mode"],
-                CURRENT_REPRESENTATION_CONTROL_V1,
-            )
+            self.assertEqual(control["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE")
+            self.assertEqual(control["next"], "RESTORE_CURRENT_EVIDENCE")
             self.assertIsNone(control.get("router_decision"))
             self.assertEqual(
                 (control.get("forge_input_receipt") or {}).get("owner_class"),

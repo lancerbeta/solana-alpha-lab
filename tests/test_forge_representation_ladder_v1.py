@@ -651,6 +651,10 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("do not rewrite receipts, regenerate, or reset budget", text)
         self.assertIn("Блокировка не является научным отрицательным результатом", text)
+        self.assertIn(
+            "uv run --locked --managed-python python -B scripts/hypothesis_forge.py show-session",
+            text,
+        )
 
     def test_budget_exhaustion_is_final_stop_and_reports_all_read_only_counters(self) -> None:
         text = format_forge_run_owner_readout(
@@ -685,6 +689,10 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("RESUME_EXISTING_SESSION", text)
         self.assertIn("--saved-draft-sha256 " + draft_sha, text)
+        self.assertIn(
+            "uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write",
+            text,
+        )
         self.assertIn("persist/freeze that exact draft", text)
         self.assertIn("forge_context=0", text)
 
@@ -703,6 +711,19 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("historical readback is UNKNOWN", text)
         self.assertIn("not a readiness receipt", text)
+
+    def test_missing_current_market_identity_is_not_currently_applicable(self) -> None:
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            _session_applicable_to_current_market,
+        )
+
+        self.assertFalse(
+            _session_applicable_to_current_market(
+                {"market_evidence_epoch_sha256": "aa" * 32},
+                current_market_epoch=None,
+                visible=[],
+            )
+        )
 
     def test_stage_unknown_readback_is_not_false_done(self) -> None:
         text = format_forge_run_owner_readout(

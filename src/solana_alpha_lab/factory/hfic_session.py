@@ -3812,6 +3812,18 @@ def _bind_store_freeze_preflight(
 ) -> tuple[Mapping[str, Any], dict[str, Any] | None, dict[str, Any] | None]:
     """Return (receipt, existing_bundle, bound). Ladder slots skip START_NEW_SESSION."""
 
+    # Existing ladder rows are a readback shortcut, not a way around the
+    # current-input identity boundary.  The normal freeze path may reuse a
+    # historical row, but callers that explicitly require current-market
+    # verification must validate it before returning the existing bundle.
+    if _is_ladder_challenger_preflight(preflight_receipt) and verify_current_market_identity:
+        _validate_split_identity_binding(
+            preflight_receipt,
+            repo_root=Path(repo_root),
+            data_root=Path(getattr(store, "_root")),
+            require_current_market_identity=True,
+        )
+
     existing = _lookup_existing_freeze_session(store, preflight_receipt)
     if existing is not None and _is_ladder_challenger_preflight(preflight_receipt):
         return preflight_receipt, existing, None

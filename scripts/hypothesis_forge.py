@@ -223,6 +223,48 @@ def cmd_preflight(
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
 ) -> int:
+    def _owner_class_for_preflight_stop(body: Mapping[str, Any]) -> str:
+        terminal = str(body.get("terminal") or "")
+        router = str(body.get("router_decision") or "")
+        if terminal in {
+            "SEARCH_BUDGET_EXHAUSTED",
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            "SCIENTIFIC_IDENTITY_CONFLICT",
+            "BLOCK_FORGE_EVIDENCE_GAP",
+            "SELECTION_GATE_RECEIPT_UNUSABLE",
+            "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
+        } or router == "BLOCK_FORGE_EVIDENCE_GAP":
+            return "OBSERVABILITY_BLOCKED"
+        return "INPUT_NOT_READY"
+
+    def _owner_readout(body: Mapping[str, Any]) -> str:
+        terminal = str(body.get("terminal") or "PREFLIGHT_BLOCKED")
+        owner_class = str(body.get("owner_class") or "INPUT_NOT_READY")
+        if owner_class == "OBSERVABILITY_BLOCKED":
+            next_line = (
+                "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "
+                "не сбрасывайте budget и не создавайте новый trial"
+            )
+        elif terminal == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+            next_line = (
+                "next: RESTORE_CURRENT_EVIDENCE — восстановите decision-bearing "
+                "datasets/lineage и повторите normal entry"
+            )
+        else:
+            next_line = (
+                "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
+                "input/readback и повторите normal entry"
+            )
+        return (
+            "PREFLIGHT\n"
+            "status: BLOCKED — preflight не разрешил scientific admission; "
+            "это не научный negative\n"
+            f"reason: {terminal}\n"
+            f"{next_line}; не создавайте trial вручную\n"
+            + _writes_note(body)
+        )
+
     def _writes_note(body: Mapping[str, Any]) -> str:
         writes = body.get("writes") if isinstance(body.get("writes"), Mapping) else {}
         return (
@@ -274,7 +316,7 @@ def cmd_preflight(
         payload = {
             "action": "STOP",
             "terminal": str(exc),
-            "owner_class": "INPUT_NOT_READY",
+            "owner_class": _owner_class_for_preflight_stop({"terminal": str(exc)}),
             "owner_focus": owner_focus,
             **active.redacted_receipt(),
             "next": "RESOLVE_TYPED_PREFLIGHT_BLOCK",
@@ -284,15 +326,7 @@ def cmd_preflight(
                 "session": 0,
             },
         }
-        payload["owner_readout"] = (
-            "PREFLIGHT\n"
-            "status: BLOCKED — preflight не разрешил scientific admission; "
-            "это не научный negative\n"
-            f"reason: {str(exc)}\n"
-            "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
-            "input/readback и повторите normal entry; не создавайте trial вручную\n"
-            + _writes_note(payload)
-        )
+        payload["owner_readout"] = _owner_readout(payload)
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
     payload = {
@@ -300,14 +334,18 @@ def cmd_preflight(
         **receipt,
     }
     if payload.get("action") == "STOP":
-        payload["owner_class"] = "INPUT_NOT_READY"
+        payload["owner_class"] = _owner_class_for_preflight_stop(payload)
+        payload["owner_readout"] = _owner_readout(payload)
+    elif isinstance(payload.get("selection_gate"), Mapping) and payload["selection_gate"].get("caveat"):
+        router = str(payload["selection_gate"].get("router_decision") or "UNKNOWN")
         payload["owner_readout"] = (
             "PREFLIGHT\n"
-            "status: BLOCKED — preflight не разрешил scientific admission; "
-            "это не научный negative\n"
-            f"reason: {payload.get('terminal') or 'PREFLIGHT_BLOCKED'}\n"
-            "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
-            "input/readback и повторите normal entry; не создавайте trial вручную\n"
+            "status: READY — normal admission may continue with a scoped "
+            "selection caveat; this is not a selection-robustness claim\n"
+            f"selection_router: {router}\n"
+            "next: CONTINUE_WITH_SCOPED_SELECTION_CAVEAT — run the canonical "
+            "forge-run no-write/readback path; do not launch a new diagnostic "
+            "or treat the caveat as a scientific terminal\n"
             + _writes_note(payload)
         )
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)

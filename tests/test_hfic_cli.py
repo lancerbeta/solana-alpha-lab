@@ -254,7 +254,7 @@ class HficCliContractTests(unittest.TestCase):
         self.assertIn("RESOLVE_TYPED_PREFLIGHT_BLOCK", payload["owner_readout"])
         self.assertIn("не научный", payload["owner_readout"])
 
-    def test_preflight_accepts_multiline_owner_focus(self) -> None:
+    def test_preflight_accepts_multiline_owner_focus_without_legacy_admission(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             completed = run_cli(
@@ -265,9 +265,13 @@ class HficCliContractTests(unittest.TestCase):
                 "json",
                 data_root=data_root,
             )
-            self.assertEqual(completed.returncode, 0, completed.stderr)
+            self.assertEqual(completed.returncode, 2, completed.stderr)
             payload = json.loads(completed.stdout)
-            self.assertEqual(payload["action"], "START_NEW_SESSION")
+            self.assertEqual(payload["action"], "STOP")
+            self.assertEqual(
+                payload["terminal"], "MARKET_EVIDENCE_BASIS_INCOMPLETE"
+            )
+            self.assertIn("Use existing declarative primitives only.", payload["owner_focus"])
             self.assertNotIn(str(data_root), completed.stdout)
             self.assertNotIn(str(ROOT), completed.stdout)
 

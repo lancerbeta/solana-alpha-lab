@@ -293,6 +293,36 @@ def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, obje
 
 
 class IdentityUnitTests(unittest.TestCase):
+    def test_existing_ladder_readback_validates_current_market_before_lookup(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import _bind_store_freeze_preflight
+
+        events: list[str] = []
+        existing = {"session_id": "HFIC-SESS-EXISTING-V1"}
+        preflight = {
+            "forge_context_packet": {
+                "ladder_representation_id": "NORMALIZED_TRAJECTORY_V1",
+                "control_session_id": "HFIC-SESS-BASE",
+            }
+        }
+        fake_store = type("FakeStore", (), {"_root": ROOT})()
+        with patch(
+            "solana_alpha_lab.factory.hfic_session._validate_split_identity_binding",
+            side_effect=lambda *args, **kwargs: events.append("validate"),
+        ), patch(
+            "solana_alpha_lab.factory.hfic_session._lookup_existing_freeze_session",
+            side_effect=lambda *args, **kwargs: events.append("lookup") or existing,
+        ):
+            result = _bind_store_freeze_preflight(
+                {"owner_focus": "AUTO"},
+                preflight,
+                store=fake_store,
+                repo_root=ROOT,
+                memory_as_of="2026-09-01T00:00:00Z",
+                verify_current_market_identity=True,
+            )
+        self.assertEqual(events, ["validate", "lookup"])
+        self.assertIs(result[1], existing)
+
     def test_a3_pit_availability_validation_digest_is_market_identity(self) -> None:
         common = {
             "dataset_manifest_id": "MID-CURRENT",

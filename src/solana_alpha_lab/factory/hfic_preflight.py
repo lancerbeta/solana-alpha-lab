@@ -2118,6 +2118,8 @@ def _forge_input_stop_next(terminal: str, owner_class: object) -> str:
 
     if terminal == "CONTROL_CORPUS_UNRESOLVABLE":
         return "STOP_CORPUS_UNRESOLVABLE"
+    if terminal == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+        return "RESTORE_CURRENT_EVIDENCE"
     if (
         terminal == FORGE_VISION_INTEGRITY_BLOCKED
         or owner_class == OWNER_CLASS_OBSERVABILITY_BLOCKED
@@ -2283,6 +2285,60 @@ def run_preflight(
         proof=proof,
         selection_caveat=None,
     )
+
+    # A legacy combined epoch is useful for historical/search-key continuity,
+    # but it is not a current market admission basis.  Do not let the
+    # compatibility fallback flow into the shared scientific admission
+    # resolver and accidentally mint a START_NEW_SESSION.
+    if ident.get("market_admission_ready") is not True:
+        legacy_epoch = str(ident.get("legacy_combined_evidence_epoch_sha256") or "")
+        stop_epoch = legacy_epoch if len(legacy_epoch) == 64 else "0" * 64
+        stop_focus = str(ident.get("owner_focus") or focus)
+        stop_focus_key = str(ident.get("focus_key") or focus_key_sha256(stop_focus))
+        stop_search_key = str(ident.get("search_key") or "")
+        if len(stop_search_key) != 64:
+            stop_search_key = search_key_sha256(
+                stop_epoch,
+                stop_focus,
+                PROMPT_VERSION,
+                str(ident.get("memory_eligibility") or "0" * 64),
+                control_mode,
+            )
+        return {
+            "receipt_id": "HFIC-PREFLIGHT-" + stop_search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+            "owner_class": forge_input.get("owner_class"),
+            "owner_focus": stop_focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": stop_epoch,
+            "evidence_epoch_kind": "LEGACY_SEARCH_CONTINUITY_ONLY",
+            "focus_key_sha256": stop_focus_key,
+            "search_key_sha256": stop_search_key,
+            "legacy_combined_evidence_epoch_sha256": legacy_epoch or None,
+            "memory_policy_head_sha256": ident["policy_head"]["policy_sha256"],
+            "memory_eligibility_sha256": str(ident["memory_eligibility"]),
+            "next": "RESTORE_CURRENT_EVIDENCE",
+            "session_id": None,
+            "commissioning": {
+                "status": str(proof.get("status") or ""),
+                "auto_commissioned": commissioned_now,
+                "provider_calls_actual": int(proof.get("provider_calls_actual") or 0),
+                "git_mutation_count": int(proof.get("git_mutation_count") or 0),
+                "run_id": proof.get("run_id"),
+                "compatibility_repair": compatibility_repair,
+            },
+            "forge_context_packet": {},
+            "forge_input_receipt": forge_input,
+            "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
+
     epoch = str(ident["evidence_epoch"])
     focus = str(ident["owner_focus"])
     focus_key = str(ident["focus_key"])
@@ -2615,6 +2671,14 @@ def run_preflight(
                 selection_gate_view.get("full_lifecycle_equivalent")
             ),
         }
+        if selection_gate_view.get("caveat"):
+            # The historical gate is scoped evidence, not a second admission
+            # engine.  Make the allowed owner next explicit so a START result
+            # cannot be misread as silently ignoring BLOCK_FORGE_SELECTION_RISK.
+            receipt_body["owner_next"] = "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT"
+            receipt_body["selection_gate"]["owner_next"] = (
+                "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT"
+            )
     try:
         digest = store.diagnostics().committed_inventory_sha256
     except ResearchStoreError as exc:
