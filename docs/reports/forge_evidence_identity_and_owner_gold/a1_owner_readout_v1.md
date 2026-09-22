@@ -18,7 +18,7 @@ Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c
   `SINGLE_COMMISSIONED`, router `BLOCK_FORGE_SELECTION_RISK`; this is a
   selection-robustness routing block, not a scientific negative and not
   permission for a real run. Receipt:
-  `b404350cd3fb95e2b54732d8b61f0794f7b2bb40b61ce88a90975f969b04a8ba`.
+  `202b78a91883bb68a9dae448fe5caf32022dfa3993bbf3600b5bcab706edb12e`.
 - Current market identity:
   `3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9`.
   Capability identity:

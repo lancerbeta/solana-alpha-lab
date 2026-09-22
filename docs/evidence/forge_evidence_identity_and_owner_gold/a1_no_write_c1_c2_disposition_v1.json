@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-22",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "dfe7ee74924ffc751b6801edce369cb885ecc619",
+  "git_head": "09b975fa4eba6b69066898ae51fceb3046fc822f",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -283,7 +283,7 @@
     "router_decision": "BLOCK_FORGE_SELECTION_RISK",
     "selection_reason": "SINGLE_COMMISSIONED",
     "current_market_occupancy": 0,
-    "receipt_sha256": "b404350cd3fb95e2b54732d8b61f0794f7b2bb40b61ce88a90975f969b04a8ba"
+      "receipt_sha256": "202b78a91883bb68a9dae448fe5caf32022dfa3993bbf3600b5bcab706edb12e"
   },
   "disposition_summary": [
     {
