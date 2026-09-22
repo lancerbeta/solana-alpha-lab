@@ -34,10 +34,12 @@ managed_write_set:
   - src/solana_alpha_lab/factory/operability_watch.py
   - src/solana_alpha_lab/factory/system_operability.py
   - src/solana_alpha_lab/factory/research_store.py
+  - src/solana_alpha_lab/factory/remote_ops.py
   - src/solana_alpha_lab/factory/observation_schedule.py
   - scripts/observation_schedule.py
   - tests/test_collector_campaign_continuity_repair_v1.py
   - tests/test_collector_continuity_boundaries_v1.py
+  - tests/test_mutable_backup_zip64_repair_v1.py
   - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
   - catalog/assets/core.yaml
   - catalog/assets/lifecycle.yaml
