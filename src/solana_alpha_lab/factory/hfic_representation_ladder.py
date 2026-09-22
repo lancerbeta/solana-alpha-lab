@@ -912,6 +912,15 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         == EXEC_PROVENANCE_HISTORICAL_UNKNOWN
         for stage in stages
     )
+    stage_has_provenance_conflict = any(
+        isinstance(stage, Mapping)
+        and stage.get("execution_provenance_status") == EXEC_PROVENANCE_CONFLICT
+        for stage in stages
+    )
+    provenance_conflict = (
+        receipt.get("execution_provenance_status") == EXEC_PROVENANCE_CONFLICT
+        or stage_has_provenance_conflict
+    )
     provenance_unknown = (
         receipt.get("execution_provenance_status")
         == EXEC_PROVENANCE_HISTORICAL_UNKNOWN
@@ -929,7 +938,12 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     owner_final = receipt.get("owner_final")
     blocking = [str(item) for item in (receipt.get("blocking_reason_codes") or []) if item]
     freeze_pending = receipt.get("ladder_freeze_pending_reason")
-    if owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
+    if provenance_conflict:
+        status = (
+            "BLOCKED — execution binding conflict; not a readiness receipt; "
+            "do not regenerate or reset budget"
+        )
+    elif owner_class in {ACTION_INPUT_NOT_READY, ACTION_OBSERVABILITY_BLOCKED} or next_action in {
         ACTION_INPUT_NOT_READY,
         ACTION_OBSERVABILITY_BLOCKED,
     }:
@@ -1088,7 +1102,12 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         f"execution_provenance: {receipt.get('execution_provenance_status') or 'UNKNOWN'}",
         "execution_scope: NOT_SCIENTIFIC_EXECUTION  # provenance binding only; no market Forge",
     ]
-    if provenance_unknown:
+    if provenance_conflict:
+        lines.append(
+            "execution_provenance_note: execution binding conflict; this is "
+            "not a readiness receipt and not permission to rerun"
+        )
+    elif provenance_unknown:
         lines.append(
             "execution_provenance_note: historical readback is UNKNOWN; this is "
             "not a readiness receipt and not permission to rerun"

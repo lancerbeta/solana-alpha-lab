@@ -89,6 +89,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     EXEC_BLOCKED,
     EXEC_EXECUTED,
     EXEC_NOT_RUN,
+    EXEC_PROVENANCE_CONFLICT,
     EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
     EXEC_REUSED,
     EXISTING_V1_CONTROL_SESSION_ID,
@@ -726,6 +727,32 @@ class ResolveNextActionTests(unittest.TestCase):
         self.assertIn("execution provenance UNKNOWN — not a readiness receipt", text)
         self.assertIn("historical readback is UNKNOWN", text)
         self.assertIn("execution_scope: NOT_SCIENTIFIC_EXECUTION", text)
+
+    def test_execution_binding_conflict_is_blocked_not_done(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "next_action": ACTION_RETURN_EXISTING,
+                "owner_final": ACTION_OWNER_CANDIDATE,
+                "execution_provenance_status": "NOT_APPLICABLE",
+                "stages": [
+                    {
+                        "representation_id": "BASE",
+                        "execution_status": EXEC_REUSED,
+                        "execution_provenance_status": EXEC_PROVENANCE_CONFLICT,
+                        "effective_terminal": "PASS",
+                        "input_scope": "ORDINARY_BASE",
+                    }
+                ],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [],
+            }
+        )
+        self.assertIn("status: BLOCKED", text)
+        self.assertIn("execution binding conflict", text)
+        self.assertIn("not a readiness receipt", text)
+        self.assertNotIn("status: DONE", text)
+        self.assertNotIn("status: READBACK", text)
 
     def test_pass_to_classification_resumes_until_classify(self) -> None:
         decision = resolve_next_action(
