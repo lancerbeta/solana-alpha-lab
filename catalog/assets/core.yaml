@@ -34244,7 +34244,7 @@ records:
   as_of: '2026-09-01'
   truth_owner: COLLECTOR_OPERABILITY_RETENTION_AND_OWNER_PULSE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/collector_operational_packet.py', repository_path: src/solana_alpha_lab/factory/collector_operational_packet.py}
-  integrity: {kind: sha256, sha256: 00dd2d1b5c87311595f6463cd51c664282da83139d2964cc8d4193267c5f5fee}
+  integrity: {kind: sha256, sha256: 76311b1b722c10844b91e46e110afe5d8813c92cd9abc4e525e9624424b27b62}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-COLLECTOR-OPERABILITY-RETENTION-AND-OWNER-PULSE-001}

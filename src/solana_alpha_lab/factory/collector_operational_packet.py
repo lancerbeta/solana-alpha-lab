@@ -178,8 +178,13 @@ def assess_campaign_successor_continuity(
         return starts <= boundary < stops
 
     def _authority_is_live(
-        schedule_digest: str, receipt_sha256: str | None = None
+        schedule_digest: str,
+        receipt_sha256: str | None = None,
+        *,
+        require_bound_receipt: bool = False,
     ) -> bool:
+        if require_bound_receipt and not receipt_sha256:
+            return False
         authority = (
             store.get_authority(receipt_sha256)
             if receipt_sha256
@@ -229,6 +234,7 @@ def assess_campaign_successor_continuity(
                 and _authority_is_live(
                     other_sha,
                     str(other.get("authority_receipt_sha256") or "") or None,
+                    require_bound_receipt=True,
                 )
                 and _window_covers(other_reg["document"], current_stops)
             ):
