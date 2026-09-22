@@ -883,7 +883,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             run_id = started["run_identity_sha256"]
             # V1 freeze preflight inherits stamps from CONTROL via
             # control_preflight_from_bundle — no manual market/capability writes.
-            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
                 data_root,
                 store,
                 control_session_id=str(base["session_id"]),
@@ -1054,7 +1054,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 base = _no_worthy_base(data_root, store, production_packet=True)
                 started = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(started["next_action"], ACTION_START_V1)
-            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
                 data_root,
                 store,
                 control_session_id=str(base["session_id"]),
