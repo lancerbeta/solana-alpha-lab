@@ -267,6 +267,17 @@ def assess_campaign_successor_continuity(
                     activation.get("last_transition_event_id") or ""
                 )
                 or None,
+                successor_transition_event_id=str(
+                    (
+                        store.get_activation(
+                            successor_sha,
+                            str(item.get("successor_activation_id") or ""),
+                        )
+                        or {}
+                    ).get("last_transition_event_id")
+                    or ""
+                )
+                or None,
             ):
                 successor_state = "ROLLOVER_READY"
                 continuity_proven = True

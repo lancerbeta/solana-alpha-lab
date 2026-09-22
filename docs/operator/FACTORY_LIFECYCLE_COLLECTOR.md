@@ -194,6 +194,21 @@ While the predecessor is still admission-capable (`ACTIVE`, or `DRAINING`
 without proven closed admission), a second same-family activation requires an
 exact `rollover` cutover binding. In-window rollover semantics are unchanged.
 
+If `rollover` returns
+`ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE` with
+`next_action=INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM`, stop
+retrying the SQLite projection. Inspect the predecessor
+`last_transition_event_id` and the matching immutable
+`OBSERVATION_SCHEDULE_STATE` event using the read-only ResearchStore check
+below. If the event is missing, malformed, or not bound to the predecessor
+transition and successor authority, open a separate recovery atom; do not
+backfill or rewrite immutable history. Retry the rollover only after the
+committed immutable proof is present and revalidated.
+
+A rollover requested after its cutover has already passed returns
+`ROLLOVER_CUTOVER_IN_PAST`; use the forward post-window successor procedure
+below instead of backdating the rollover.
+
 ### Late post-window successor recovery
 
 If rollover was missed and the predecessor is proven **NON_ADMITTING**:

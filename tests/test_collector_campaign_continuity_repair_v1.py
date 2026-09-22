@@ -6,6 +6,9 @@ import tempfile
 import unittest
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from contextlib import redirect_stdout
+from io import StringIO
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -54,6 +57,7 @@ from solana_alpha_lab.factory.operability_watch import (
 )
 from solana_alpha_lab.factory.system_operability import _next_action_for
 from solana_alpha_lab.factory.observation_schedule import canonical_sha256
+from scripts.observation_schedule import main as cli_main
 
 GIT = "c" * 40
 NOW = datetime(2026, 9, 1, 0, 10, tzinfo=UTC)
@@ -703,6 +707,54 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertEqual(proof["late_recovery_proof"], "NOT_REQUIRED")
             store.close()
 
+    def test_past_rollover_cutover_requires_forward_successor(self) -> None:
+        predecessor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-PAST-ROLLOVER-CURRENT-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-02T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-PAST-ROLLOVER-SUCCESSOR-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            predecessor_registered, _ = _activate_campaign(
+                store, data_root, predecessor, activation_id="ACT-PRE"
+            )
+            successor_registered, _ = _register_and_authorize(
+                store, data_root, successor
+            )
+            with self.assertRaisesRegex(
+                ObservationLifecycleError, "ROLLOVER_CUTOVER_IN_PAST"
+            ):
+                rollover_schedule(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    predecessor_schedule_sha256=predecessor_registered[
+                        "schedule_sha256"
+                    ],
+                    predecessor_activation_id="ACT-PRE",
+                    successor_schedule_sha256=successor_registered[
+                        "schedule_sha256"
+                    ],
+                    successor_activation_id="ACT-SUC",
+                    cutover_at="2026-09-01T00:05:00Z",
+                    now=NOW,
+                    producer_git_sha=GIT,
+                )
+            store.close()
+
     def test_read_model_prefers_draining_over_historical_aborted(self) -> None:
         activations = [
             {
@@ -989,6 +1041,52 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         self.assertEqual(
             owner_next_action_for_lifecycle_error("LATE_SUCCESSOR_RECOVERY_UNPROVEN"),
             "REVALIDATE_DRAINING_RECOVERY_PROOF",
+        )
+        self.assertEqual(
+            owner_next_action_for_lifecycle_error(
+                "ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE"
+            ),
+            "INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM",
+        )
+
+    def test_cli_rollover_missing_immutable_proof_has_next_action(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            buf = StringIO()
+            with patch(
+                "scripts.observation_schedule.rollover_schedule",
+                side_effect=ObservationLifecycleError(
+                    "ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE"
+                ),
+            ), redirect_stdout(buf):
+                code = cli_main(
+                    [
+                        "rollover",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--predecessor-schedule-sha256",
+                        "a" * 64,
+                        "--predecessor-activation-id",
+                        "ACT-PRE",
+                        "--successor-schedule-sha256",
+                        "b" * 64,
+                        "--successor-activation-id",
+                        "ACT-SUC",
+                        "--cutover-at",
+                        "2026-09-01T00:20:00Z",
+                    ]
+                )
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(code, 2)
+        self.assertEqual(
+            payload["terminal"], "ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE"
+        )
+        self.assertEqual(
+            payload["next_action"],
+            "INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM",
         )
 
     def test_doctor_reports_genuine_current_aborted(self) -> None:
