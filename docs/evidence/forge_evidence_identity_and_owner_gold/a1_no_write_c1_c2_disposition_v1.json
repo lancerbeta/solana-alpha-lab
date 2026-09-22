@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-22",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "09b975fa4eba6b69066898ae51fceb3046fc822f",
+  "git_head": "e04fa997cc964ad71ddca04e6bb8bd02ddf9c765",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -18,12 +18,12 @@
     "REL-20260909T111900Z-20260916T111900Z"
   ],
   "current_market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
-  "capability_epoch_sha256": "995b4ecbe2bc9a7511255e367d8d4ed6a0d4f5005a8323e51260391fbdea1cc2",
+  "capability_epoch_sha256": "0b2626a359495f97785fa3240e6237e633de717665e93525ea1178f15f506e55",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
     "blocking_reason_codes": [],
-    "receipt_sha256": "ed878635e470fc7442122b0b49d94214f22d54297b45ee89b47d26115465fe77"
+    "receipt_sha256": "d6d1748e9b7b69d8a8b71a65fc475d91b0fcab4c3a5fb58b406a83b6c46b4b91"
   },
   "inventory_sha256_prefix_before": "defbc9a5a1794b05",
   "inventory_sha256_prefix_after": "defbc9a5a1794b05",
@@ -283,7 +283,7 @@
     "router_decision": "BLOCK_FORGE_SELECTION_RISK",
     "selection_reason": "SINGLE_COMMISSIONED",
     "current_market_occupancy": 0,
-      "receipt_sha256": "202b78a91883bb68a9dae448fe5caf32022dfa3993bbf3600b5bcab706edb12e"
+      "receipt_sha256": "c84091ad59d8f67cf22a97c2beb81fc092580b7c5bc585fdddc6fc2bcea47612"
   },
   "disposition_summary": [
     {
