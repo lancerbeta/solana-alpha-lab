@@ -108,6 +108,28 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
         self.assertEqual(report["terminal"], "DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS")
         self.assertEqual(report["next_action"], "RECONCILE_ACTIVATION_FAMILY_SCOPE")
 
+    def test_exact_scope_resolves_selection_before_ambiguity_gate(self) -> None:
+        rows = [
+            {
+                "activation_id": "ACT-FAMILY-A",
+                "schedule_sha256": "a" * 64,
+                "state": "ACTIVE",
+                "cohort_family_key": "FAMILY-A",
+            },
+            {
+                "activation_id": "ACT-FAMILY-B",
+                "schedule_sha256": "b" * 64,
+                "state": "ACTIVE",
+                "cohort_family_key": "FAMILY-B",
+            },
+        ]
+        report = classify_doctor_current_activation(
+            [rows[0]],
+            explicit_scope=True,
+        )
+        self.assertEqual(report["terminal"], "DOCTOR_CURRENT_OK")
+        self.assertEqual(report["current_activation_id"], "ACT-FAMILY-A")
+
     def test_operability_watch_import_does_not_eagerly_load_research_dependencies(self) -> None:
         env = dict(os.environ)
         env["PYTHONPATH"] = str(SRC)

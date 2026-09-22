@@ -190,13 +190,16 @@ def classify_doctor_current_activation(
     *,
     recovery_proofs: MappingLike | None = None,
     now: datetime | None = None,
+    explicit_scope: bool = False,
 ) -> dict[str, Any]:
     """Map current activation selection to doctor terminal precedence.
 
     Historical ABORTED_SAFETY never overrides a current ACTIVE/DRAINING campaign.
     """
 
-    selection_status = activation_selection_status(activations)
+    selection_status = (
+        "SCOPED" if explicit_scope else activation_selection_status(activations)
+    )
     if selection_status == "AMBIGUOUS":
         return {
             "terminal": "DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS",
@@ -212,7 +215,9 @@ def classify_doctor_current_activation(
             "next_action": "RECONCILE_ACTIVATION_FAMILY_SCOPE",
         }
 
-    current = select_current_activation(activations, now=now)
+    current = select_current_activation(
+        activations, now=now, explicit_scope=explicit_scope
+    )
     current_state = str((current or {}).get("state") or "")
     current_id = (current or {}).get("activation_id")
     current_digest = (current or {}).get("schedule_sha256")

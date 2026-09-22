@@ -357,30 +357,6 @@ def main(
             activations = activation_rows_with_family_keys(
                 store, store.list_activations()
             )
-            recovery_proofs = {
-                (
-                    str(row.get("schedule_sha256") or ""),
-                    str(row.get("activation_id") or ""),
-                ): resolve_late_recovery_proof(data_root, row, now=now)
-                for row in activations
-                if str(row.get("state") or "") == "DRAINING"
-                and str(row.get("activation_id") or "")
-            }
-            current_report = classify_doctor_current_activation(
-                activations,
-                recovery_proofs=recovery_proofs,
-                now=now,
-            )
-            current_state = str(current_report.get("current_activation_state") or "")
-            live = bool(current_report.get("live_activation"))
-            current_timing = {
-                "stops_admitting_at": current_report.get("stops_admitting_at"),
-                "late_recovery_at": current_report.get("late_recovery_at"),
-                "late_recovery_proof": current_report.get("late_recovery_proof"),
-                "late_recovery_event_id": current_report.get(
-                    "late_recovery_event_id"
-                ),
-            }
             cli_digest = getattr(args, "schedule_sha256", None)
             cli_activation = getattr(args, "activation_id", None)
             if bool(cli_digest) != bool(cli_activation):
@@ -393,6 +369,40 @@ def main(
                     },
                     2,
                 )
+            selection_activations = activations
+            explicit_scope = bool(cli_digest and cli_activation)
+            if explicit_scope:
+                selection_activations = [
+                    row
+                    for row in activations
+                    if str(row.get("schedule_sha256") or "") == str(cli_digest)
+                    and str(row.get("activation_id") or "") == str(cli_activation)
+                ]
+            recovery_proofs = {
+                (
+                    str(row.get("schedule_sha256") or ""),
+                    str(row.get("activation_id") or ""),
+                ): resolve_late_recovery_proof(data_root, row, now=now)
+                for row in activations
+                if str(row.get("state") or "") == "DRAINING"
+                and str(row.get("activation_id") or "")
+            }
+            current_report = classify_doctor_current_activation(
+                selection_activations,
+                recovery_proofs=recovery_proofs,
+                now=now,
+                explicit_scope=explicit_scope,
+            )
+            current_state = str(current_report.get("current_activation_state") or "")
+            live = bool(current_report.get("live_activation"))
+            current_timing = {
+                "stops_admitting_at": current_report.get("stops_admitting_at"),
+                "late_recovery_at": current_report.get("late_recovery_at"),
+                "late_recovery_proof": current_report.get("late_recovery_proof"),
+                "late_recovery_event_id": current_report.get(
+                    "late_recovery_event_id"
+                ),
+            }
             if cli_digest and cli_activation:
                 collector_digest = str(cli_digest)
                 collector_activation = str(cli_activation)
