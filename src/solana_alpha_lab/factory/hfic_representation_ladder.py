@@ -1525,6 +1525,112 @@ def _execution_provenance_status(
     return EXEC_PROVENANCE_VERIFIED if expected == binding else EXEC_PROVENANCE_CONFLICT
 
 
+def _completed_readback_provenance_status(
+    existing: Mapping[str, Any],
+    *,
+    active_row: Mapping[str, Any] | None,
+    scientific_slot_sha256: object,
+) -> str:
+    """Validate provenance before returning a completed artifact readback.
+
+    A completed artifact is a read-only answer, but it is still an identity
+    claim. Reuse may preserve historical UNKNOWN when the old artifact has no
+    post-split binding; it must not silently replay a malformed, contradictory,
+    or mismatched binding as a valid owner result.
+    """
+
+    sources: list[Mapping[str, Any]] = [existing]
+    if isinstance(active_row, Mapping):
+        sources.append(active_row)
+    persisted_stages = existing.get("stages")
+    if isinstance(persisted_stages, Sequence) and not isinstance(
+        persisted_stages, (str, bytes, bytearray)
+    ):
+        active_representation = (
+            str(active_row.get("representation_id") or "")
+            if isinstance(active_row, Mapping)
+            else ""
+        )
+        for row in persisted_stages:
+            if not isinstance(row, Mapping):
+                continue
+            if (
+                active_representation
+                and str(row.get("representation_id") or "") != active_representation
+            ):
+                continue
+            sources.append(row)
+
+    packet = existing.get("critic_input_packet")
+    if isinstance(packet, Mapping):
+        sources.append(packet)
+    session_receipt = existing.get("session_receipt")
+    if isinstance(session_receipt, Mapping):
+        sources.append(session_receipt)
+
+    hash_keys = (
+        "scientific_slot_sha256",
+        "execution_binding_sha256",
+        "capability_epoch_sha256",
+        "representation_payload_sha256",
+        "memory_eligibility_sha256",
+        "model_provenance_sha256",
+    )
+    observed: dict[str, set[str]] = {key: set() for key in hash_keys}
+    for source in sources:
+        for key in hash_keys:
+            if key not in source:
+                continue
+            value = source.get(key)
+            if value in (None, ""):
+                continue
+            if (
+                not isinstance(value, str)
+                or re.fullmatch(r"[0-9a-f]{64}", value) is None
+            ):
+                return EXEC_PROVENANCE_CONFLICT
+            observed[key].add(value)
+        # A persisted conflict is already a terminal integrity signal. Do not
+        # let the replay overlay turn it back into a completed readback.
+        if source.get("execution_provenance_status") == EXEC_PROVENANCE_CONFLICT:
+            return EXEC_PROVENANCE_CONFLICT
+
+    if any(
+        len(values) > 1
+        for key, values in observed.items()
+        if key != "scientific_slot_sha256"
+    ):
+        return EXEC_PROVENANCE_CONFLICT
+    expected_slot = str(scientific_slot_sha256 or "")
+    stored_slots = observed["scientific_slot_sha256"]
+    # The root receipt may retain the BASE/run slot while a completed ladder
+    # result exposes the selected V1 stage slot. Validate that the current
+    # selected slot is present, but do not confuse those two lifecycle scopes.
+    if stored_slots and expected_slot not in stored_slots:
+        return EXEC_PROVENANCE_CONFLICT
+
+    bindings = observed["execution_binding_sha256"]
+    if not bindings:
+        # Historical rows predating the split binding remain readable, but
+        # explicitly UNKNOWN and never a new readiness receipt.
+        return EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+    stored_binding = next(iter(bindings))
+    provenance_bundle = active_row if isinstance(active_row, Mapping) else existing
+    execution_status = str(
+        provenance_bundle.get("execution_status") or EXEC_REUSED
+    )
+    if execution_status in {EXEC_NOT_RUN, EXEC_BLOCKED}:
+        execution_status = EXEC_REUSED
+    return _execution_provenance_status(
+        provenance_bundle,
+        receipt=existing,
+        packet=packet if isinstance(packet, Mapping) else None,
+        scientific_slot_sha256=expected_slot,
+        stored_binding=stored_binding,
+        execution_status=execution_status,
+    )
+
+
 def _candidate_mechanism(bundle: Mapping[str, Any]) -> str | None:
     packet = bundle.get("critic_input_packet")
     if not isinstance(packet, Mapping):
@@ -2623,20 +2729,13 @@ def evaluate_forge_run(
                 }
                 next_action = ACTION_OBSERVABILITY_BLOCKED
                 owner_final = ACTION_OBSERVABILITY_BLOCKED
-    if existing_owner_final and next_action != ACTION_OBSERVABILITY_BLOCKED:
-        # A completed run is a durable readback, not a new forge-run write.
-        # Admission above still verifies the caller's known execution context
-        # before this compatibility readback is returned.
-        return _readback_existing_run(existing)
+
     scientific_slot = scientific_slot_sha256(
         market_evidence_epoch_sha256=str(market_epoch),
         representation_id=active_rep,
         representation_semantic_version=active_version,
         owner_focus=owner_focus,
     )
-    cap_epoch = input_receipt.get("capability_epoch_sha256")
-    exec_binding = None
-    exec_provenance_status = EXEC_PROVENANCE_NOT_APPLICABLE
     active_row = next(
         (
             row
@@ -2646,6 +2745,26 @@ def evaluate_forge_run(
         ),
         None,
     )
+    if existing_owner_final and next_action != ACTION_OBSERVABILITY_BLOCKED:
+        # A completed run is a durable readback, not a new forge-run write.
+        # Admission verifies the caller's known execution context, while this
+        # second check verifies the persisted artifact's own binding before it
+        # can be replayed as a completed owner result.
+        replay_provenance = _completed_readback_provenance_status(
+            existing,
+            active_row=active_row,
+            scientific_slot_sha256=scientific_slot,
+        )
+        if replay_provenance == EXEC_PROVENANCE_CONFLICT:
+            return _readback_existing_run(
+                existing,
+                block_reason="SCIENTIFIC_IDENTITY_CONFLICT",
+                provenance_status=replay_provenance,
+            )
+        return _readback_existing_run(existing, provenance_status=replay_provenance)
+    cap_epoch = input_receipt.get("capability_epoch_sha256")
+    exec_binding = None
+    exec_provenance_status = EXEC_PROVENANCE_NOT_APPLICABLE
     if isinstance(active_row, Mapping):
         active_status = str(active_row.get("execution_status") or EXEC_NOT_RUN)
         existing_binding = active_row.get("execution_binding_sha256")
@@ -2844,10 +2963,34 @@ def evaluate_forge_run(
     return unsigned
 
 
-def _readback_existing_run(existing: Mapping[str, Any]) -> dict[str, Any]:
+def _readback_existing_run(
+    existing: Mapping[str, Any],
+    *,
+    block_reason: str | None = None,
+    provenance_status: str | None = None,
+) -> dict[str, Any]:
     overlay = dict(existing)
     original_sha = overlay.get("receipt_sha256")
-    overlay["next_action"] = ACTION_RETURN_EXISTING
+    overlay["writes"] = {"research_store": 0, "forge_run": 0, "session": 0}
+    if block_reason:
+        overlay["next_action"] = ACTION_OBSERVABILITY_BLOCKED
+        overlay["owner_final"] = ACTION_OBSERVABILITY_BLOCKED
+        overlay["owner_class"] = OWNER_CLASS_OBSERVABILITY_BLOCKED
+        blocking = [
+            str(item)
+            for item in (overlay.get("blocking_reason_codes") or [])
+            if item
+        ]
+        if block_reason not in blocking:
+            blocking.append(block_reason)
+        overlay["blocking_reason_codes"] = blocking
+        overlay["execution_provenance_status"] = (
+            provenance_status or EXEC_PROVENANCE_CONFLICT
+        )
+    else:
+        overlay["next_action"] = ACTION_RETURN_EXISTING
+        if provenance_status:
+            overlay["execution_provenance_status"] = provenance_status
     overlay["persisted_receipt_sha256"] = (
         original_sha if isinstance(original_sha, str) else None
     )

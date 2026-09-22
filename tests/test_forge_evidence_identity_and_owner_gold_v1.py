@@ -24,6 +24,7 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory.data_root import resolve_data_root  # noqa: E402
 from solana_alpha_lab.factory.forge_input_receipt import (  # noqa: E402
+    OWNER_CLASS_OBSERVABILITY_BLOCKED,
     build_forge_input_receipt,
 )
 from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
@@ -51,6 +52,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     ACTION_SEARCH_EXHAUSTED,
     ACTION_START_BASE,
     ACTION_START_V1,
+    EXEC_PROVENANCE_CONFLICT,
     EXEC_REUSED,
     LadderError,
     consume_start_v1_envelope,
@@ -881,7 +883,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             run_id = started["run_identity_sha256"]
             # V1 freeze preflight inherits stamps from CONTROL via
             # control_preflight_from_bundle — no manual market/capability writes.
-            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
                 data_root,
                 store,
                 control_session_id=str(base["session_id"]),
@@ -1035,6 +1037,107 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             drifted["blocking_reason_codes"],
         )
         self.assertEqual(drifted["writes"]["research_store"], 0)
+
+    def test_g11_completed_replay_checks_persisted_binding_before_readback(self) -> None:
+        """A tampered completed artifact cannot bypass the production replay gate."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            from tests.test_fast_lane_classifier import submission
+
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                base = _no_worthy_base(data_root, store, production_packet=True)
+                started = evaluate_forge_run(ROOT, data_root, persist=True)
+            self.assertEqual(started["next_action"], ACTION_START_V1)
+            v1_pre, envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            # The model stamp enters through the production V1 freeze seam;
+            # the test does not hand-build an execution binding.
+            v1_pre["model_provenance_sha256"] = "11" * 32
+            draft = valid_draft()
+            frozen = freeze_draft(
+                draft, preflight_receipt=v1_pre, repo_root=ROOT
+            )
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            packet = frozen["critic_input_packet"]
+            assert isinstance(packet, dict)
+            finalize_session(
+                frozen,
+                critic_result_from_packet_only(packet, "PASS_TO_CLASSIFICATION"),
+                store=store,
+                repo_root=ROOT,
+            )
+            spec = submission()
+            spec["hypothesis_definition_sha256"] = frozen[
+                "selected_definition_sha256"
+            ]
+            apply_classification(
+                frozen,
+                spec,
+                store=store,
+                repo_root=ROOT,
+                data_root=data_root,
+            )
+            store.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ):
+                finished = evaluate_forge_run(ROOT, data_root, persist=True)
+
+            self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
+            self.assertRegex(
+                str(finished.get("execution_binding_sha256")), r"^[0-9a-f]{64}$"
+            )
+
+            from solana_alpha_lab.factory import hfic_representation_ladder as ladder
+
+            real_lookup = ladder._lookup_run_artifact
+
+            def tampered_lookup(
+                current_store: ResearchStore, identity: str
+            ) -> dict[str, object] | None:
+                body = real_lookup(current_store, identity)
+                if body is None:
+                    return None
+                tampered = dict(body)
+                tampered["execution_binding_sha256"] = "00" * 32
+                return tampered
+
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_live,
+            ), patch(
+                "solana_alpha_lab.factory.hfic_representation_ladder._lookup_run_artifact",
+                side_effect=tampered_lookup,
+            ):
+                replay = evaluate_forge_run(ROOT, data_root, persist=False)
+
+        self.assertEqual(replay["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertEqual(replay["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertEqual(replay["owner_class"], OWNER_CLASS_OBSERVABILITY_BLOCKED)
+        self.assertEqual(
+            replay["execution_provenance_status"], EXEC_PROVENANCE_CONFLICT
+        )
+        self.assertIn("SCIENTIFIC_IDENTITY_CONFLICT", replay["blocking_reason_codes"])
+        self.assertEqual(
+            replay["writes"], {"research_store": 0, "forge_run": 0, "session": 0}
+        )
+        self.assertNotIn("status: DONE", replay["owner_readout"])
 
     def test_g11_pending_resume_checks_known_model_context(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
