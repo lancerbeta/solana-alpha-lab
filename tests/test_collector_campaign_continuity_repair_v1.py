@@ -922,6 +922,32 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertIn("transition_event_id", status["activations"][0])
             store.close()
 
+    def test_cli_doctor_unknown_exact_selector_is_not_register_action(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            buf = StringIO()
+            with redirect_stdout(buf):
+                code = cli_main(
+                    [
+                        "doctor",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        "a" * 64,
+                        "--activation-id",
+                        "ACT-MISSING",
+                    ]
+                )
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(code, 2)
+        self.assertEqual(payload["terminal"], "DOCTOR_SELECTOR_NOT_FOUND")
+        self.assertEqual(
+            payload["next_action"], "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
+        )
+
     def test_read_model_keeps_genuine_current_aborted(self) -> None:
         activations = [
             {

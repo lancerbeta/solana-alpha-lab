@@ -357,6 +357,11 @@ scope. Missing family identity or multiple families yields
 collector. Owner packets keep successor continuity `UNKNOWN` and retain
 `CAMPAIGN_SUCCESSOR_REQUIRED` until the scope is reconciled.
 
+If an exact schedule+activation selector matches no registered activation,
+doctor returns `DOCTOR_SELECTOR_NOT_FOUND` / exit 2 with
+`next_action=VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR`; do not interpret that
+terminal as permission to register or activate a replacement.
+
 ## Secrets
 
 | Location | Rule |

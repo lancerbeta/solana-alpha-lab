@@ -151,9 +151,18 @@ def main(
             cmd.add_argument("--successor-schedule-sha256", required=True)
             cmd.add_argument("--successor-activation-id", required=True)
             cmd.add_argument("--cutover-at", required=True)
-        if name in {"authorize", "activate", "pause", "abort", "resume", "snapshot", "status"}:
+        if name in {
+            "authorize",
+            "activate",
+            "pause",
+            "abort",
+            "resume",
+            "snapshot",
+            "status",
+            "doctor",
+        }:
             cmd.add_argument("--schedule-sha256")
-        if name == "status":
+        if name in {"status", "doctor"}:
             cmd.add_argument("--activation-id")
     tick = sub.add_parser("tick")
     tick.add_argument("--once", action="store_true", required=True)
@@ -378,6 +387,16 @@ def main(
                     if str(row.get("schedule_sha256") or "") == str(cli_digest)
                     and str(row.get("activation_id") or "") == str(cli_activation)
                 ]
+                if not selection_activations:
+                    return _emit(
+                        {
+                            "terminal": "DOCTOR_SELECTOR_NOT_FOUND",
+                            "schedule_sha256": str(cli_digest),
+                            "activation_id": str(cli_activation),
+                            "next_action": "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR",
+                        },
+                        2,
+                    )
             recovery_proofs = {
                 (
                     str(row.get("schedule_sha256") or ""),
