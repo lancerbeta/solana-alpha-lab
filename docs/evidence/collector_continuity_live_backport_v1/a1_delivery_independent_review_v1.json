@@ -14,12 +14,12 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "COLLECTOR-CONTINUITY-LIVE-BACKPORT-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "31b34f08495d51054ecec8605ef0ca9c47076364d62f71d0f0c30c1d918c1eff",
-  "reviewed_inventory_sha256": "b1ece6ec8918ae686869bd222d5f37b929ce2fb6fc5ec8619b9e0ae191614ec7",
+  "reviewed_bindings_sha256": "1401bc42e4df7250ceae736378c1d97e005a2277f153b7576f4f006976c71def",
+  "reviewed_inventory_sha256": "871585224fedcd7f6e9597b429daa029c93592631b255fb2c93261c13bd1fd15",
   "reviews": [
     {
       "findings": [
-        "packet_fingerprint_sha256=5ec82d0cf4d042dbfaeeed4d38c7d968eb03533eb3e7dfa43aeb0edf67cbcb43"
+        "packet_fingerprint_sha256=1b7f2be873a65b627c2bff3fb017a2daa2437b0c14666d78616493dd4e32c12e"
       ],
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS"
