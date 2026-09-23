@@ -210,6 +210,7 @@ class ObservationScheduleLifecycleTests(unittest.TestCase):
                 store,
                 schedule_sha256=digest,
                 activation_id="ACT-OBS-LIFE-001",
+                data_root=data_root,
             )
             self.assertEqual(status["terminal"], "STATUS")
             self.assertEqual(status["activations"][0]["state"], "ACTIVE")

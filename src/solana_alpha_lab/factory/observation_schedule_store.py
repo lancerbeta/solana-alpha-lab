@@ -2365,7 +2365,21 @@ class ObservationScheduleStore:
         if row is None:
             return None
         payload = dict(row)
-        payload["document"] = json.loads(payload.pop("document_json"))
+        try:
+            document = json.loads(payload.pop("document_json"))
+            if not isinstance(document, Mapping):
+                return None
+            recomputed_sha256 = hashlib.sha256(
+                canonical_json_bytes(collection_projection(document))
+            ).hexdigest()
+        except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+            return None
+        if (
+            recomputed_sha256 != str(payload.get("schedule_sha256") or "")
+            or recomputed_sha256 != str(payload.get("document_sha256") or "")
+        ):
+            return None
+        payload["document"] = dict(document)
         payload["aliases"] = [
             dict(alias)
             for alias in self._conn.execute(

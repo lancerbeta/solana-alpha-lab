@@ -241,8 +241,55 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             proven = activation_transition_research_event_proven(
                 data_root, row, now=later + timedelta(minutes=1)
             )
+            status = status_schedule(
+                store,
+                schedule_sha256=registered["schedule_sha256"],
+                activation_id="ACT-STALE-ACTIVE",
+                now=later + timedelta(minutes=1),
+                data_root=data_root,
+            )
+            output = StringIO()
+            with (
+                patch(
+                    "scripts.observation_schedule.resolve_clock",
+                    return_value=later + timedelta(minutes=1),
+                ),
+                patch(
+                    "scripts.observation_schedule.ObservationScheduleStore",
+                    return_value=store,
+                ),
+                redirect_stdout(output),
+            ):
+                code = cli_main(
+                    [
+                        "status",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        registered["schedule_sha256"],
+                        "--activation-id",
+                        "ACT-STALE-ACTIVE",
+                    ]
+                )
+            cli_report = json.loads(output.getvalue())
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                cli_report["terminal"],
+                "STATUS_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+            )
+            self.assertEqual(cli_report["collector"]["activation_state"], "UNKNOWN")
+            self.assertEqual(cli_report["activations"][0]["state"], "UNKNOWN")
+            self.assertEqual(
+                cli_report["next_action"], "RECONCILE_ACTIVE_TRANSITION_PROOF"
+            )
             store.close()
             self.assertFalse(proven)
+            self.assertEqual(
+                status["terminal"], "STATUS_ACTIVE_TRANSITION_PROOF_UNAVAILABLE"
+            )
+            self.assertEqual(status["collector"]["activation_state"], "UNKNOWN")
 
     def test_closed_projection_without_committed_drain_event_is_denied(self) -> None:
         predecessor = _with_window(
@@ -1185,7 +1232,11 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 deploy_git_sha=GIT,
             )
             self.assertEqual(result["collector"]["activation_id"], "ACT-CURRENT")
-            self.assertEqual(result["collector"]["activation_state"], "ACTIVE")
+            self.assertEqual(
+                result["terminal"], "STATUS_ACTIVE_TRANSITION_PROOF_UNAVAILABLE"
+            )
+            self.assertEqual(result["collector"]["activation_state"], "UNKNOWN")
+            self.assertEqual(result["activations"][0]["state"], "UNKNOWN")
             store.close()
 
     def test_explicit_future_transition_is_not_current_before_cutover(self) -> None:
@@ -1223,7 +1274,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 activation_id="ACT-FUTURE-DRAIN",
                 now=NOW,
             )
-            self.assertEqual(status["collector"]["activation_state"], "ACTIVE")
+            self.assertEqual(
+                status["terminal"], "STATUS_ACTIVE_TRANSITION_PROOF_UNAVAILABLE"
+            )
+            self.assertEqual(status["collector"]["activation_state"], "UNKNOWN")
+            self.assertEqual(status["activations"][0]["state"], "UNKNOWN")
+            self.assertEqual(
+                status["next_action"], "RECONCILE_ACTIVE_TRANSITION_PROOF"
+            )
             self.assertIn("transition_event_id", status["activations"][0])
             store.close()
 
@@ -1718,6 +1776,143 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         )
         self.assertIn("window_start=parse_utc('<REGISTERED_STARTS_AT>')", command)
         self.assertIn("closure_cutoff=datetime.now(UTC)", command)
+        successor_rule = next(
+            line
+            for line in runbook.splitlines()
+            if "stops_admitting_at - now" in line
+        )
+        self.assertIn("0 <= stops_admitting_at - now <= 24h", successor_rule)
+
+    def test_status_existing_unresolvable_exact_selector_exits_nonzero(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            assert store.acquire_lease("unresolved-status", clock=NOW)
+            digest = "e" * 64
+            store.upsert_activation(
+                {
+                    "schedule_sha256": digest,
+                    "activation_id": "ACT-UNRESOLVABLE",
+                    "schedule_key": "OBS-UNRESOLVABLE-001",
+                    "state": "ACTIVE",
+                    "starts_at": "2026-09-01T00:00:00Z",
+                    "stops_admitting_at": "2026-09-02T00:00:00Z",
+                    "payload": {
+                        "prior_state": "UNRECOGNIZED",
+                        "transition_effective_at": "2026-09-01T00:20:00Z",
+                    },
+                },
+                clock=NOW,
+            )
+            status = status_schedule(
+                store,
+                schedule_sha256=digest,
+                activation_id="ACT-UNRESOLVABLE",
+                now=NOW,
+                data_root=data_root,
+            )
+            self.assertEqual(status["terminal"], "STATUS_ACTIVATION_SELECTION_UNKNOWN")
+            self.assertEqual(status["collector"]["activation_state"], "UNKNOWN")
+            self.assertEqual(
+                status["next_action"], "RECONCILE_ACTIVATION_SELECTION"
+            )
+            output = StringIO()
+            with (
+                patch("scripts.observation_schedule.resolve_clock", return_value=NOW),
+                patch(
+                    "scripts.observation_schedule.ObservationScheduleStore",
+                    return_value=store,
+                ),
+                redirect_stdout(output),
+            ):
+                code = cli_main(
+                    [
+                        "status",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        digest,
+                        "--activation-id",
+                        "ACT-UNRESOLVABLE",
+                    ]
+                )
+            cli_status = json.loads(output.getvalue())
+            self.assertEqual(code, 2)
+            self.assertEqual(
+                cli_status["terminal"], "STATUS_ACTIVATION_SELECTION_UNKNOWN"
+            )
+            self.assertEqual(cli_status["collector"]["activation_state"], "UNKNOWN")
+            self.assertEqual(
+                cli_status["next_action"], "RECONCILE_ACTIVATION_SELECTION"
+            )
+
+    def test_tampered_registered_document_cannot_rebind_campaign_family(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-CONTINUITY-DOCUMENT-BINDING-CURRENT-001",
+        )
+        foreign_successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T12:00:00Z",
+            stops_admitting_at="2026-09-02T12:00:00Z",
+            schedule_key="OBS-CONTINUITY-DOCUMENT-BINDING-SUCCESSOR-001",
+        )
+        foreign_successor["sampling"] = dict(foreign_successor["sampling"])
+        foreign_successor["sampling"]["seed"] = "UNRELATED-CAMPAIGN-SEED"
+        foreign_successor["schedule_sha256"] = schedule_sha256(foreign_successor)
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registered, _ = _activate_campaign(
+                store, data_root, current, activation_id="ACT-DOC-BINDING-CURRENT"
+            )
+            foreign_registered, _ = _register_and_authorize(
+                store, data_root, foreign_successor
+            )
+            assert store.get_registered_schedule(foreign_registered["schedule_sha256"])
+            stored_current = store.get_registered_schedule(
+                current_registered["schedule_sha256"]
+            )
+            assert stored_current is not None
+            tampered_document = stored_current["document"]
+            tampered_document["sampling"] = dict(tampered_document["sampling"])
+            tampered_document["sampling"]["seed"] = foreign_successor["sampling"][
+                "seed"
+            ]
+            store._conn.execute(
+                "UPDATE registered_schedules SET document_json = ? WHERE schedule_sha256 = ?",
+                (
+                    json.dumps(tampered_document, sort_keys=True, ensure_ascii=False),
+                    current_registered["schedule_sha256"],
+                ),
+            )
+            store._conn.commit()
+            self.assertIsNone(
+                store.get_registered_schedule(current_registered["schedule_sha256"])
+            )
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registered["schedule_sha256"],
+                    "ACT-DOC-BINDING-CURRENT",
+                ),
+                data_root=data_root,
+            )
+            store.close()
+            self.assertEqual(continuity["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertIn("registration", continuity["campaign_successor_owner_action"])
 
     def test_operational_packet_unknown_exact_selector_keeps_continuity_unknown(
         self,

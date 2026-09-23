@@ -338,12 +338,13 @@ def main(
                 store,
                 schedule_sha256=explicit_digest,
                 activation_id=explicit_activation,
+                data_root=data_root,
                 now=now,
                 deploy_git_sha=producer,
             )
             return _emit(
                 result,
-                2 if result.get("terminal") == "STATUS_ACTIVATION_NOT_FOUND" else 0,
+                0 if result.get("terminal") == "STATUS" else 2,
             )
         if args.command == "snapshot":
             digest = args.schedule_sha256 or config.get("schedule_sha256")

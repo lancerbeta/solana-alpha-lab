@@ -533,7 +533,7 @@ Predecessor remains `DRAINING` until dues complete.
 ### Pre-expiry owner attention
 
 When the current same-family campaign is `ACTIVE` and
-`stops_admitting_at - now <= 24h` with no prepared successor
+`0 <= stops_admitting_at - now <= 24h` with no prepared successor
 whose authorized window can cover the current admission boundary
 (`AUTHORIZED` / `ROLLOVER_READY`; **REGISTERED alone is not enough**),
 operability watch emits one deduped `CAMPAIGN_SUCCESSOR_REQUIRED` attention

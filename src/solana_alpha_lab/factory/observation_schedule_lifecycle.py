@@ -2333,6 +2333,7 @@ def status_schedule(
     *,
     schedule_sha256: str | None,
     activation_id: str | None,
+    data_root: Path | None = None,
     now: datetime | None = None,
     deploy_git_sha: str | None = None,
 ) -> dict[str, Any]:
@@ -2348,6 +2349,9 @@ def status_schedule(
     from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
 
     clock = now or datetime.now(UTC)
+    if clock.tzinfo is None:
+        clock = clock.replace(tzinfo=UTC)
+    clock = clock.astimezone(UTC)
     collector = build_collector_read_model(
         store,
         now=clock,
@@ -2355,27 +2359,85 @@ def status_schedule(
         activation_id=activation_id,
         deploy_git_sha=deploy_git_sha,
     )
+    terminal = "STATUS"
+    next_action: str | None = None
+    unproven_identity: tuple[str, str] | None = None
+    if exact_activation_missing:
+        terminal = "STATUS_ACTIVATION_NOT_FOUND"
+        next_action = "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
+    elif str(collector.get("activation_selection_status") or "") in {
+        "AMBIGUOUS",
+        "UNKNOWN",
+    }:
+        terminal = "STATUS_ACTIVATION_SELECTION_UNKNOWN"
+        next_action = "RECONCILE_ACTIVATION_SELECTION"
+    elif str(collector.get("activation_state") or "") == "ACTIVE":
+        current_schedule_sha256 = str(
+            collector.get("schedule_sha256") or schedule_sha256 or ""
+        )
+        current_activation_id = str(
+            collector.get("activation_id") or activation_id or ""
+        )
+        current_row = next(
+            (
+                row
+                for row in activations
+                if str(row.get("schedule_sha256") or "")
+                == current_schedule_sha256
+                and str(row.get("activation_id") or "") == current_activation_id
+            ),
+            None,
+        )
+        try:
+            active_transition_proven = (
+                current_row is not None
+                and activation_transition_research_event_proven(
+                    data_root, current_row, now=clock
+                )
+            )
+        except Exception:
+            active_transition_proven = False
+        if not active_transition_proven:
+            terminal = "STATUS_ACTIVE_TRANSITION_PROOF_UNAVAILABLE"
+            next_action = "RECONCILE_ACTIVE_TRANSITION_PROOF"
+            collector["activation_state"] = "UNKNOWN"
+            collector["activation_selection_status"] = "UNKNOWN"
+            unproven_identity = (
+                current_schedule_sha256,
+                current_activation_id,
+            )
+
+    reported_activations: list[dict[str, Any]] = []
+    for row in activations:
+        row_schedule_sha256 = str(row.get("schedule_sha256") or "")
+        row_activation_id = str(row.get("activation_id") or "")
+        projected_state = str(row.get("state") or "UNKNOWN")
+        mask_state = (
+            terminal == "STATUS_ACTIVATION_SELECTION_UNKNOWN"
+            and projected_state in {"ACTIVE", "DRAINING"}
+        ) or (
+            unproven_identity == (row_schedule_sha256, row_activation_id)
+        )
+        activation_report = {
+            "schedule_sha256": row_schedule_sha256,
+            "activation_id": row_activation_id,
+            "state": "UNKNOWN" if mask_state else projected_state,
+            "transition_event_id": (
+                str(row.get("last_transition_event_id") or "") or "UNKNOWN"
+            ),
+        }
+        if mask_state:
+            activation_report["projection_state"] = projected_state
+        reported_activations.append(activation_report)
     result = {
-        "terminal": "STATUS_ACTIVATION_NOT_FOUND"
-        if exact_activation_missing
-        else "STATUS",
-        "activations": [
-            {
-                "schedule_sha256": row["schedule_sha256"],
-                "activation_id": row["activation_id"],
-                "state": row["state"],
-                "transition_event_id": (
-                    str(row.get("last_transition_event_id") or "") or "UNKNOWN"
-                ),
-            }
-            for row in activations
-        ],
+        "terminal": terminal,
+        "activations": reported_activations,
         "due_counts": store.due_counts(),
         "restore_marker_unresolved": store.restore_marker_unresolved(),
         "collector": collector,
     }
-    if exact_activation_missing:
-        result["next_action"] = "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
+    if next_action is not None:
+        result["next_action"] = next_action
     return result
 
 

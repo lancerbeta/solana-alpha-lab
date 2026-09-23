@@ -102,6 +102,35 @@ context_requirements:
 
 # COLLECTOR_CONTINUITY_LIVE_BACKPORT_V1
 
+## TASK_OUTCOME_BRIEF
+
+- **Owner decision:** Decide whether to open the separate owner-gated Factory
+  deploy step for this exact candidate; this task grants no deploy authority.
+- **Product outcome:** A bounded runtime hotfix on the live ZIP64 lineage that
+  restores fail-closed continuity selection, forward late recovery, valid
+  successor attention, and Telegram ATTENTION rendering.
+- **Named consumer:** The Factory operator/owner using lifecycle `status`,
+  `doctor`, and scheduled `tick`, plus the existing Telegram owner surface.
+- **Cheapest falsifier:** Run the targeted continuity and boundary tests,
+  including stale ACTIVE / append-only proof, valid versus historical or
+  post-gap authority, late forward recovery, warning severity, and the ZIP64
+  regression. Any contradicted invariant denies readiness.
+- **Terminal outcomes:** `READY_FOR_BOUNDED_DEPLOY` only with exact-head tests,
+  independent reviews, and harness evidence; `BACKPORT_NOT_BOUNDED` for an
+  unrelated prerequisite or semantic drift; otherwise `BLOCKED_<exact reason>`.
+- **User-visible result:** Exact candidate SHA, bounded path diff, test/review/
+  harness receipts, proposed deploy/restart/rollback method, and an explicit
+  stop before the separate owner deploy gate.
+- **Non-goals:** No VPS mutation or deploy, provider/credential action,
+  authorize/activate, new PR, scientific trial or alpha claim, `SOURCE_DATA_STALE`
+  semantic change, managed-write-set expansion, or `observation_scheduler.py`
+  edit.
+- **Evidence budget:** One candidate on the exact live parent, the listed
+  targeted suites, ZIP64 regression, three required independent review roles,
+  targeted Catalog propagation, then exact-head harness CI/readiness. Run any
+  full Catalog/hash closure at most once and only after the reviews pass, if a
+  final harness gate requires it.
+
 ## DECISION_DELTA
 
 Deliver the already reviewed continuity repair on the exact live lineage
