@@ -164,11 +164,13 @@ Discovery release seal/verify/import (local RDP; zero network):
 
 ### Proposed bounded owner deploy handoff (not executed by this atom)
 
-This handoff has two explicit bindings and one hard stop. `TARGET_SHA` is the
-exact runtime candidate SHA recorded by the final delivery receipt. `SOURCE_REPO`
-is an owner-supplied checkout containing Git objects; the no-`.git` deploy root
-is not a valid source checkout. If either binding is unavailable, stop with
-`BLOCKED_DEPLOY_TRANSPORT_BINDING`; never substitute an unverified path.
+This handoff has two explicit bindings and one hard stop. The exact runtime
+candidate is `53e6b9eb2ecd4367fe019bda05bc253e3130eb13` (`TARGET_SHA`). The final
+delivery receipt separately binds the branch head whose tests and reviews were
+run; this runtime commit is the deploy target recorded there. `SOURCE_REPO` is
+an owner-supplied checkout containing that Git object; the no-`.git` deploy
+root is not a valid source checkout. If either binding is unavailable, stop
+with `BLOCKED_DEPLOY_TRANSPORT_BINDING`; never substitute an unverified path.
 
 Fixed live binding: previous SHA `ba7f3b725ff4f609e251a4e57751246636e8f8f7`,
 host `factory-remote-ops`, deploy root `/opt/solana-alpha-lab`. Owner preflight
@@ -176,9 +178,9 @@ from the object-bearing source checkout:
 
 ```
 SOURCE_REPO=<OWNER_BOUND_OBJECT_BEARING_CHECKOUT>
-TARGET_SHA=<EXACT_TARGET_HOTFIX_SHA_FROM_FINAL_RECEIPT>
-test "$(git -C "$SOURCE_REPO" rev-parse HEAD)" = "$TARGET_SHA"
+TARGET_SHA=53e6b9eb2ecd4367fe019bda05bc253e3130eb13
 git -C "$SOURCE_REPO" cat-file -e "$TARGET_SHA^{commit}"
+test "$(git -C "$SOURCE_REPO" rev-parse "$TARGET_SHA^{commit}")" = "$TARGET_SHA"
 ```
 
 The final candidate SHA must be bound before the owner deploy gate; it is not
