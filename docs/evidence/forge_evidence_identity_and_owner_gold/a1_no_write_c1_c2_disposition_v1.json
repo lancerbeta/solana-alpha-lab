@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-23",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "ef4997d31e320b5390d3077290e67875270ed406",
+  "git_head": "237b2bc7e13e6d186a6f66a3aed93401fd70b451",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -18,12 +18,12 @@
     "REL-20260909T111900Z-20260916T111900Z"
   ],
   "current_market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
-  "capability_epoch_sha256": "447e6e1f7e872ebb2d907e5174e81d5cee0228914ef57abc77f00c8e7563f429",
+  "capability_epoch_sha256": "9ac25552c72899523c17cc45d7bd8a1b100c6942634fb6bb185e0b484e1444bc",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
     "blocking_reason_codes": [],
-    "receipt_sha256": "0fa4b267e783c8899233dbc9a68bf9cca5b79ffbc589af056160f5c270d17940"
+    "receipt_sha256": "f12262b60c4074de40993ae19479cf02d3e165598dfea0193b9965473ec7d198"
   },
   "inventory_sha256_prefix_before": "defbc9a5a1794b05",
   "inventory_sha256_prefix_after": "defbc9a5a1794b05",
@@ -283,13 +283,13 @@
     "router_decision": "BLOCK_FORGE_SELECTION_RISK",
     "selection_reason": "SINGLE_COMMISSIONED",
     "current_market_occupancy": 0,
-    "capability_epoch_sha256": "447e6e1f7e872ebb2d907e5174e81d5cee0228914ef57abc77f00c8e7563f429",
+    "capability_epoch_sha256": "9ac25552c72899523c17cc45d7bd8a1b100c6942634fb6bb185e0b484e1444bc",
     "selection_caveat": true,
     "full_lifecycle_equivalent": false,
     "owner_next": "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
     "preflight_terminal": "NO_GIT_FAST_LANE_PROVEN",
-    "preflight_receipt_sha256": "33b227bb6a263f882c7a7bd5f97e32e914dca582b6b86e34add0bd2715f5616e",
-    "receipt_sha256": "451fee977d5d653d49f414240926d7c17dca055f766420afd705579d437e9424"
+    "preflight_receipt_sha256": "f31f27e6adaada036a1256309992af0dc1a485ccd02821a6230297cf3ee0faf4",
+    "receipt_sha256": "26af73d14a391a411190facc0ce3808d5a148235a0249ffeb732d78444bd7ab1"
   },
   "disposition_summary": [
     {

@@ -13,8 +13,8 @@
 Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json`
 
 - `forge-input`: `FORGE_INPUT_READY`, `STOP_BEFORE_SYNTHESIS`, receipt
-  `0fa4b267e783c8899233dbc9a68bf9cca5b79ffbc589af056160f5c270d17940`;
-  exact no-write Git head `ef4997d31e320b5390d3077290e67875270ed406`.
+  `f12262b60c4074de40993ae19479cf02d3e165598dfea0193b9965473ec7d198`;
+  exact no-write Git head `237b2bc7e13e6d186a6f66a3aed93401fd70b451`.
 - `preflight`: planned action `START_NEW_SESSION`, selection
   `SINGLE_COMMISSIONED`, router `BLOCK_FORGE_SELECTION_RISK`; the gate is a
   scoped historical caveat (`caveat=true`, `full_lifecycle_equivalent=false`),
@@ -22,17 +22,18 @@ Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c
   next is `CONTINUE_WITH_SCOPED_SELECTION_CAVEAT` for the canonical no-write
   Forge/readback path; if the gate returns a typed STOP, the CLI next is
   `RESOLVE_SELECTION_GATE` and it must not create a trial. Receipt:
-  `33b227bb6a263f882c7a7bd5f97e32e914dca582b6b86e34add0bd2715f5616e`.
+  `f31f27e6adaada036a1256309992af0dc1a485ccd02821a6230297cf3ee0faf4`.
 - The direct no-write forge-run readback is `START_BASE` with
   `CONTROL_SURFACE_REQUIRED`, scientific slot
   `212149f7d9afdcffa3dc7a0df69f8f53bea0af080722c4f2cc5cc05813a5299c`,
-  receipt `451fee977d5d653d49f414240926d7c17dca055f766420afd705579d437e9424`,
+  receipt `26af73d14a391a411190facc0ce3808d5a148235a0249ffeb732d78444bd7ab1`,
   and `research_store=0 forge_run=0 session=0 forge_context=0`.
 - Current market identity:
   `3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9`.
   Capability identity:
-  `447e6e1f7e872ebb2d907e5174e81d5cee0228914ef57abc77f00c8e7563f429`;
-  changing capability does not free the market budget.
+  `9ac25552c72899523c17cc45d7bd8a1b100c6942634fb6bb185e0b484e1444bc`;
+  the code-only head change altered capability identity while market identity
+  and budget remained unchanged.
 - Inventory is unchanged (`defbc9a5a1794b05` before and after); the read-only
   path reports `scientific_writes=0`, 17 readable sessions, 2 historical
   CONTROL rows, and zero current-market occupancy.
