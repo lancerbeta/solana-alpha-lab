@@ -37,6 +37,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     ObservationLifecycleError,
     _authority_policy,
     activate_schedule,
+    activation_transition_research_event_proven,
     authorize_schedule,
     drain_expired_admission,
     expected_authority_phrase,
@@ -160,6 +161,91 @@ def _activate_campaign(
 
 
 class CollectorCampaignContinuityRepairTests(unittest.TestCase):
+    def test_committed_active_transition_is_available_for_continuity(self) -> None:
+        document = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            registered, _ = _activate_campaign(
+                store, data_root, document, activation_id="ACT-COMMITTED"
+            )
+            row = store.get_activation(
+                registered["schedule_sha256"], "ACT-COMMITTED"
+            )
+            assert row is not None
+            proven = activation_transition_research_event_proven(
+                data_root, row, now=NOW
+            )
+            store.close()
+            self.assertTrue(proven)
+
+    def test_closed_projection_without_committed_drain_event_is_denied(self) -> None:
+        predecessor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T00:05:00Z",
+            schedule_key="OBS-CONTINUITY-MISSING-DRAIN-EVENT-PRE-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T00:10:00Z",
+            stops_admitting_at="2026-09-02T00:10:00Z",
+            schedule_key="OBS-CONTINUITY-MISSING-DRAIN-EVENT-SUC-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            predecessor_registration = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=predecessor,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            lease_token = store.acquire_lease("missing-drain-event", clock=NOW)
+            assert lease_token is not None
+            store.upsert_activation(
+                {
+                    "schedule_sha256": predecessor_registration["schedule_sha256"],
+                    "activation_id": "ACT-PRE",
+                    "schedule_key": predecessor["schedule_key"],
+                    "state": "DRAINING",
+                    "starts_at": predecessor["activation"]["starts_at"],
+                    "stops_admitting_at": predecessor["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {"admission_window_closed": True},
+                },
+                clock=NOW,
+            )
+            store.release_lease(lease_token)
+            successor_registration, _ = _register_and_authorize(
+                store, data_root, successor
+            )
+
+            with self.assertRaisesRegex(
+                ObservationLifecycleError, "LATE_SUCCESSOR_RECOVERY_UNPROVEN"
+            ):
+                activate_schedule(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule_sha256=successor_registration["schedule_sha256"],
+                    activation_id="ACT-SUC",
+                    now=NOW,
+                    producer_git_sha=GIT,
+                )
+            store.close()
+
     def test_active_peer_still_requires_cutover(self) -> None:
         predecessor = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
@@ -1227,6 +1313,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             ),
             "INSPECT_IMMUTABLE_ROLLOVER_PROOF_AND_OPEN_RECOVERY_ATOM",
         )
+        self.assertEqual(
+            owner_next_action_for_lifecycle_error("ACTIVATION_BEFORE_STARTS_AT"),
+            "WAIT_UNTIL_SUCCESSOR_STARTS_AT",
+        )
+        self.assertEqual(
+            owner_next_action_for_lifecycle_error("ROLLOVER_CUTOVER_IN_PAST"),
+            "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
+        )
 
     def test_cli_rollover_missing_immutable_proof_has_next_action(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -1688,6 +1782,63 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertEqual(continuity["campaign_successor_state"], "REGISTERED")
             self.assertTrue(continuity["campaign_successor_required"])
             store.close()
+
+    def test_future_active_projection_is_not_reported_as_active_successor(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-CONTINUITY-FUTURE-ACTIVE-CURRENT-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T12:00:00Z",
+            stops_admitting_at="2026-09-02T12:00:00Z",
+            schedule_key="OBS-CONTINUITY-FUTURE-ACTIVE-SUCCESSOR-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registration, _ = _activate_campaign(
+                store, data_root, current, activation_id="ACT-CURRENT"
+            )
+            successor_registration, authority = _register_and_authorize(
+                store, data_root, successor
+            )
+            lease_token = store.acquire_lease("future-active-projection", clock=NOW)
+            assert lease_token is not None
+            store.transition_activation(
+                schedule_sha256=successor_registration["schedule_sha256"],
+                activation_id="ACT-SUCCESSOR",
+                new_state="ACTIVE",
+                authority_receipt_sha256=authority["receipt_sha256"],
+                effective_at="2026-09-01T00:20:00Z",
+                starts_at=successor["activation"]["starts_at"],
+                stops_admitting_at=successor["activation"][
+                    "stops_admitting_at"
+                ],
+                schedule_key=successor["schedule_key"],
+                payload={"receipt_sha256": authority["receipt_sha256"]},
+                clock=NOW,
+            )
+            store.release_lease(lease_token)
+
+            continuity = assess_campaign_successor_continuity(
+                store,
+                now=NOW,
+                activation=store.get_activation(
+                    current_registration["schedule_sha256"], "ACT-CURRENT"
+                ),
+                data_root=data_root,
+            )
+            store.close()
+            self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
+            self.assertFalse(continuity["campaign_successor_required"])
 
     def test_existing_active_upsert_refreshes_freshness(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

@@ -164,13 +164,14 @@ Discovery release seal/verify/import (local RDP; zero network):
 
 ### Proposed bounded owner deploy handoff (not executed by this atom)
 
-This handoff has two explicit bindings and one hard stop. The exact runtime
-candidate is `53e6b9eb2ecd4367fe019bda05bc253e3130eb13` (`TARGET_SHA`). The final
-delivery receipt separately binds the branch head whose tests and reviews were
-run; this runtime commit is the deploy target recorded there. `SOURCE_REPO` is
-an owner-supplied checkout containing that Git object; the no-`.git` deploy
-root is not a valid source checkout. If either binding is unavailable, stop
-with `BLOCKED_DEPLOY_TRANSPORT_BINDING`; never substitute an unverified path.
+This handoff has exact source/live bindings and a collector-quiescence gate.
+The exact runtime candidate is `TARGET_HOTFIX_SHA` from this task's final
+handoff. Copy that immutable 40-hex value into `TARGET_SHA`; do not resolve it
+from a moving branch tip. (`TARGET_SHA` is supplied outside this runbook to
+avoid a self-referential commit.) `SOURCE_REPO` is an owner-supplied checkout
+containing both exact Git objects; the no-`.git` deploy root is not a valid
+source checkout. If either object or the source path is unavailable, stop with
+`BLOCKED_DEPLOY_TRANSPORT_BINDING`; never substitute an unverified path.
 
 Fixed live binding: previous SHA `ba7f3b725ff4f609e251a4e57751246636e8f8f7`,
 host `factory-remote-ops`, deploy root `/opt/solana-alpha-lab`. Owner preflight
@@ -178,66 +179,112 @@ from the object-bearing source checkout:
 
 ```
 SOURCE_REPO=<OWNER_BOUND_OBJECT_BEARING_CHECKOUT>
-TARGET_SHA=53e6b9eb2ecd4367fe019bda05bc253e3130eb13
+TARGET_SHA=<COPY_EXACT_TARGET_HOTFIX_SHA_FROM_TASK_HANDOFF>
+PREVIOUS_SHA=ba7f3b725ff4f609e251a4e57751246636e8f8f7
+EXPECTED_SCHEDULE_SHA=<FRESH_DIRECT_STATUS_VALUE>
+EXPECTED_ACTIVATION_ID=<FRESH_DIRECT_STATUS_VALUE>
 git -C "$SOURCE_REPO" cat-file -e "$TARGET_SHA^{commit}"
 test "$(git -C "$SOURCE_REPO" rev-parse "$TARGET_SHA^{commit}")" = "$TARGET_SHA"
+git -C "$SOURCE_REPO" cat-file -e "$PREVIOUS_SHA^{commit}"
+test "$(git -C "$SOURCE_REPO" rev-parse "$PREVIOUS_SHA^{commit}")" = "$PREVIOUS_SHA"
 ```
 
 The final candidate SHA must be bound before the owner deploy gate; it is not
-the mutable branch tip and must not be replaced by a later main commit.
+the mutable branch tip and must not be replaced by a later main commit. On the
+host, first require the live pin to be exactly the expected previous SHA and
+record the current activation's exact `schedule_sha256`, `activation_id`,
+`state`, and `last_transition_event_id` from direct lifecycle `status` output.
+These four values bind the post-deploy selector check; do not infer them from a
+Telegram/read-model alert.
+
+```
+cd /opt/solana-alpha-lab
+test "$(wc -c < .factory_deploy_sha)" -eq 41
+test "$(cat .factory_deploy_sha)" = "$PREVIOUS_SHA"
+test "$(systemctl is-active factory-observation-schedule.timer)" = active
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
+```
+
+Before file replacement, stop only the observation timer so it cannot launch a
+new tick. If `factory-observation-schedule.service` is active, let that
+scheduled invocation reach its terminal; do not stop the service or kill its
+worker. If it does not settle within the unit's configured execution bound,
+stop the release attempt and leave the timer inactive. Verify the timer is
+inactive and the service is inactive before running the release route. Do not
+run a manual tick.
+
+```
+sudo systemctl stop factory-observation-schedule.timer
+test "$(systemctl is-active factory-observation-schedule.timer 2>/dev/null || true)" = inactive
+test "$(systemctl is-active factory-observation-schedule.service 2>/dev/null || true)" = inactive
+```
 
 The exact route invocation is:
 
 ```
-sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo "$SOURCE_REPO" --deploy-root /opt/solana-alpha-lab --target-sha "$TARGET_SHA" --previous-sha ba7f3b725ff4f609e251a4e57751246636e8f8f7
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo "$SOURCE_REPO" --deploy-root /opt/solana-alpha-lab --target-sha "$TARGET_SHA" --previous-sha "$PREVIOUS_SHA"
 ```
 
 The route's bounded sequence is `DEPLOY_TARGET` → `ROLLBACK_PREVIOUS` →
 `FORWARD_RESTORE`, with `restart=True`; it preserves `local/`, `.venv/`, and
 `.factory_deploy_sha`, then requires final `.factory_deploy_sha == TARGET_SHA`.
+The release CLI does not compare the starting pin with `--previous-sha`; the
+exact host-side pin preflight above is mandatory. It invokes
+`factory_remote_doctor.py` after each of its three deploy steps, so the route
+may emit Telegram messages and update dedupe state up to three times. That
+effect must be included in the separate owner deploy gate; this atom does not
+invoke the route or doctor.
 The fixed restarted units are `factory-v1-workbench.service`,
 `factory-remote-health.service`, `factory-paper-heartbeat.timer`, and
 `factory-remote-backup.timer`. The observation schedule timer is not manually
-restarted by this route; the expected collector interruption is therefore
-limited to the fixed units plus the file replacement window, followed by a
-separate live readback. The route itself does not authorize, activate, or call
-a provider.
+managed by this route and must remain stopped across the file-replacement
+sequence. Expected collector interruption is the remainder of any in-flight
+scheduled tick, the bounded route/file-replacement window, and time until the
+owner restarts the observation timer and verifies a healthy scheduled tick.
+The route itself does not authorize, activate, or call a provider.
 
-The owner post-deploy readback is mandatory before declaring success:
+After the route returns successfully, keep the observation timer stopped while
+checking the exact pin, service state, and the same activation selector recorded
+before deployment. Then restart the timer only if it was active before the
+preflight and all exact-SHA/readback checks pass. The owner post-deploy readback
+is mandatory before declaring success:
 
 ```
 cd /opt/solana-alpha-lab
-test "$(head -c 64 .factory_deploy_sha)" = "$TARGET_SHA"
-systemctl is-active factory-observation-schedule.timer
-systemctl is-active factory-observation-schedule.service || test "$?" -eq 3
+test "$(wc -c < .factory_deploy_sha)" -eq 41
+test "$(cat .factory_deploy_sha)" = "$TARGET_SHA"
+test "$(systemctl is-active factory-observation-schedule.timer 2>/dev/null || true)" = inactive
+test "$(systemctl is-active factory-observation-schedule.service 2>/dev/null || true)" = inactive
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
-/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 "$EXPECTED_SCHEDULE_SHA" --activation-id "$EXPECTED_ACTIVATION_ID"
+sudo systemctl start factory-observation-schedule.timer
+test "$(systemctl is-active factory-observation-schedule.timer)" = active
 journalctl -u factory-observation-schedule.service --since "<DEPLOY_READBACK_START_UTC>" --no-pager
 ```
 
-Accept only when the pin equals `TARGET_SHA`, the observation timer is active,
-status/doctor return the exact selector and a healthy live state, and the next
-scheduled terminal is `TICK_COMPLETE` with exit 0. New Jupiter RECENT calls
-must be `HTTP_OK` when an eligible slot is polled; zero provider calls are
-allowed when no slot is due or all work is already satisfied. No new publication
-job is required when the canonical expectation is `PUBLICATION_NOT_EXPECTED`
-and open publication jobs remain zero.
+Accept only when the exact pin matches, `status` and selector-bound `doctor`
+report the recorded schedule/activation pair and healthy lifecycle state, the
+timer is active, and the next scheduled terminal is `TICK_COMPLETE` with exit
+0. New Jupiter RECENT calls must be `HTTP_OK` when an eligible slot is polled;
+zero provider calls are allowed when no slot is due or all work is already
+satisfied. No new publication job is required when the canonical expectation is
+`PUBLICATION_NOT_EXPECTED` and open publication jobs remain zero.
 
-On a non-zero release step, pin mismatch, failed selector/doctor/timer readback,
-or failed next healthy tick: do not retry blindly. Read the pin and unit state
-first. If the pin is already `TARGET_SHA`, finish readback before deciding. If
-the pin is the old live SHA, the release did not commit the candidate. If the pin
-is neither known SHA, stop for manual inspection and do not overwrite it.
-If the observation service is still active, let that scheduled invocation reach
-its terminal and inspect the journal; do not launch a manual tick, stop the unit,
-or restart the timer. If the timer is inactive or the scheduled terminal is not
-TICK_COMPLETE, keep the release blocked and resolve the exact unit/tick state
-before rollback. Do not rerun deployment or rollback while a tick is in flight.
-Rollback uses the same route with `--target-sha
-ba7f3b725ff4f609e251a4e57751246636e8f8f7 --previous-sha "$TARGET_SHA"`; accept
-only after the pin returns to the previous live SHA, the timer is active, and a
-normal scheduled terminal is observed.
-This handoff is proposed evidence only; this atom performs no live action.
+If the release command is interrupted after file replacement begins, the old
+pin does **not** prove the old tree is intact: files are removed/copied before
+the pin is written. A target pin proves the copy phase completed, but not that
+environment sync, unit starts, doctor, or lifecycle readback completed. Keep
+the observation timer stopped, do not infer tree health from the pin alone, and
+do not blindly retry or roll back. First inspect unit/journal state and rehydrate
+the intended exact tree from the verified source objects through an explicitly
+chosen exact-SHA release/rollback route. If source objects or the resulting
+tree cannot be verified, stop for manual inspection; do not overwrite an
+unknown release. Never replace files while the observation service is active.
+Rollback is a separate owner decision and uses the same route with
+`--target-sha "$PREVIOUS_SHA" --previous-sha "$TARGET_SHA"`; keep the timer
+stopped until exact pin, selector, unit, and journal readbacks pass, then resume
+it and observe a normal scheduled terminal. This handoff is proposed evidence
+only; this atom performs no live action.
 
 ### No-live smoke (safe when no activation)
 

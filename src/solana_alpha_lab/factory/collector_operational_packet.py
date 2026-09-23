@@ -233,10 +233,10 @@ def assess_campaign_successor_continuity(
             # Continuity is an authority claim, so use the lifecycle validator
             # rather than trusting only schedule identity and expiry.
             from solana_alpha_lab.factory.observation_schedule_lifecycle import (
-                _require_live_authority,
+                require_live_authority,
             )
 
-            _require_live_authority(
+            require_live_authority(
                 store,
                 root=authority_root,
                 document=document,
@@ -344,23 +344,32 @@ def assess_campaign_successor_continuity(
             other_reg = store.get_registered_schedule(other_sha)
             if other_reg is None or cohort_family_key(other_reg["document"]) != family:
                 continue
-            if (
-                str(other.get("state") or "") == "ACTIVE"
-                and _authority_is_live(
-                    other_sha,
-                    other_reg["document"],
-                    str(other.get("authority_receipt_sha256") or "") or None,
-                    require_bound_receipt=True,
-                )
-                and _window_covers(other_reg["document"], current_stops)
+            if str(other.get("state") or "") != "ACTIVE":
+                continue
+            if not _authority_is_live(
+                other_sha,
+                other_reg["document"],
+                str(other.get("authority_receipt_sha256") or "") or None,
+                require_bound_receipt=True,
             ):
-                has_active_peer = True
-                continuity_proven = True
-                successor_schedule_sha256 = other_sha
-                successor_activation_id = str(
-                    other.get("activation_id") or ""
-                ) or None
-                break
+                continue
+            from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+                activation_transition_research_event_proven,
+            )
+
+            if not activation_transition_research_event_proven(
+                data_root,
+                other,
+                now=now,
+            ):
+                continue
+            if not _window_covers(other_reg["document"], current_stops):
+                continue
+            has_active_peer = True
+            continuity_proven = True
+            successor_schedule_sha256 = other_sha
+            successor_activation_id = str(other.get("activation_id") or "") or None
+            break
 
     if successor_state != "ROLLOVER_READY" and not continuity_proven:
         best = "NONE"

@@ -752,7 +752,7 @@ def authorize_schedule(
     }
 
 
-def _require_live_authority(
+def require_live_authority(
     store: ObservationScheduleStore,
     *,
     root: Path,
@@ -848,6 +848,11 @@ def _require_live_authority(
     if parse_utc(str(receipt["expires_at"])) < required_minimum_expiry:
         raise ObservationLifecycleError("BLOCKED_AUTHORITY")
     return receipt
+
+
+# Preserve the existing internal import used by the scheduler while exposing
+# the lifecycle authority check to other modules through a stable public name.
+_require_live_authority = require_live_authority
 
 
 def cohort_family_key(document: Mapping[str, Any]) -> str:
@@ -1337,6 +1342,133 @@ def resolve_late_recovery_proof(
         "late_recovery_proof": "NOT_REQUIRED",
         "late_recovery_event_id": event_id,
     }
+
+
+def activation_transition_research_event_proven(
+    data_root: Path | None,
+    row: Mapping[str, Any],
+    *,
+    now: datetime,
+) -> bool:
+    """Prove that an ACTIVE projection matches its committed transition.
+
+    SQLite is a mutable operational projection. It may label a transition
+    ACTIVE before the effective time, or without the ResearchStore event that
+    establishes when that lifecycle change became available. Neither case is
+    proof that the activation is currently ACTIVE.
+    """
+
+    if data_root is None or str(row.get("state") or "") != "ACTIVE":
+        return False
+    schedule_sha256 = str(row.get("schedule_sha256") or "")
+    activation_id = str(row.get("activation_id") or "")
+    event_id = str(row.get("last_transition_event_id") or "")
+    if not schedule_sha256 or not activation_id or not event_id:
+        return False
+    payload = row.get("payload")
+    if isinstance(payload, str):
+        try:
+            payload = json.loads(payload)
+        except (TypeError, json.JSONDecodeError):
+            return False
+    if not isinstance(payload, Mapping):
+        return False
+    if (
+        str(payload.get("new_state") or "") != "ACTIVE"
+        or str(payload.get("transition_event_id") or "") != event_id
+    ):
+        return False
+    try:
+        transition_sequence = int(payload["transition_sequence"])
+        effective = parse_utc(str(payload["transition_effective_at"]))
+        starts = parse_utc(str(row["starts_at"]))
+        stops = parse_utc(str(row["stops_admitting_at"]))
+        if int(row.get("transition_sequence") or 0) != transition_sequence:
+            return False
+        authority_receipt_sha256 = str(
+            payload.get("authority_receipt_sha256") or ""
+        )
+        if (
+            not authority_receipt_sha256
+            or effective > now
+            or render_utc(effective) != str(payload["transition_effective_at"])
+        ):
+            return False
+        expected_event_id = transition_event_id_for(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            prior_state=str(payload["prior_state"]),
+            new_state="ACTIVE",
+            transition_sequence=transition_sequence,
+            effective_at=render_utc(effective),
+            authority_receipt_sha256=authority_receipt_sha256,
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
+    if expected_event_id != event_id:
+        return False
+    try:
+        records, _telemetry = ResearchStore(
+            data_root, create_if_missing=False
+        ).iter_lifecycle_records_bounded(
+            schedule_sha256=schedule_sha256,
+            activation_id=activation_id,
+            window_start=starts,
+            closure_cutoff=max(now, stops),
+        )
+    except ResearchStoreError:
+        return False
+    for record in records:
+        if (
+            str(record.record_id) != event_id
+            or str(record.record_kind)
+            != str(RecordKind.OBSERVATION_SCHEDULE_STATE)
+            or str(record.entity_id) != schedule_sha256
+            or str(record.run_id or "") != activation_id
+            or str(record.transaction_id)
+            != f"RESEARCH-TXN-{event_id.upper()}"
+            or str(record.producer_capability_id) != PRODUCER_CAPABILITY
+            or record.created_at.astimezone(UTC) > now
+            or record.first_reliable_available_at.astimezone(UTC) > now
+            or record.effective_at.astimezone(UTC) != effective
+        ):
+            continue
+        try:
+            event_payload = json.loads(record.payload_json)
+        except (TypeError, json.JSONDecodeError):
+            continue
+        if not isinstance(event_payload, Mapping):
+            continue
+        try:
+            event_sequence = int(event_payload["transition_sequence"])
+            event_authority = str(
+                event_payload.get("authority_receipt_sha256") or ""
+            )
+            recomputed_event_id = transition_event_id_for(
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                prior_state=str(event_payload["prior_state"]),
+                new_state=str(event_payload["state"]),
+                transition_sequence=event_sequence,
+                effective_at=render_utc(record.effective_at.astimezone(UTC)),
+                authority_receipt_sha256=event_authority,
+            )
+        except (KeyError, TypeError, ValueError):
+            continue
+        if (
+            recomputed_event_id == event_id
+            and event_sequence == transition_sequence
+            and event_authority == authority_receipt_sha256
+            and str(event_payload.get("state_event_id") or "") == event_id
+            and str(event_payload.get("schedule_sha256") or "")
+            == schedule_sha256
+            and str(event_payload.get("activation_id") or "") == activation_id
+            and str(event_payload.get("state") or "") == "ACTIVE"
+            and str(event_payload.get("prior_state") or "")
+            == str(payload.get("prior_state") or "")
+        ):
+            return True
+    return False
 
 
 def _require_cohort_cutover_or_unique(
