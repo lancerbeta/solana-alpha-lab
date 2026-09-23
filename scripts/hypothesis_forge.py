@@ -252,7 +252,16 @@ def cmd_preflight(
             or ""
         )
         selection_caveat = bool(selection_gate.get("caveat"))
-        if owner_class == "OBSERVABILITY_BLOCKED":
+        if terminal in {
+            "SELECTION_GATE_RECEIPT_UNUSABLE",
+            "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
+        }:
+            next_line = (
+                "next: RESTORE_SELECTION_GATE — восстановите authoritative "
+                "selection-gate receipt и его input identity, затем повторите "
+                "canonical preflight; не создавайте trial и не сбрасывайте budget"
+            )
+        elif owner_class == "OBSERVABILITY_BLOCKED":
             next_line = (
                 "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "
                 "не сбрасывайте budget и не создавайте новый trial"
@@ -309,8 +318,19 @@ def cmd_preflight(
         payload = {
             "action": "STOP",
             "terminal": str(exc),
+            "owner_class": "INPUT_NOT_READY",
             "owner_focus": owner_focus,
             "data_root_instance_fingerprint": None,
+            "owner_readout": (
+                "PREFLIGHT\n"
+                "status: BLOCKED — canonical current corpus/data root unavailable; "
+                "scientific admission did not start\n"
+                f"reason: {exc}\n"
+                "next: RESTORE_CURRENT_DATA_ROOT — restore the canonical current "
+                "corpus/data root, then retry normal /hypothesis-forge; do not "
+                "create a trial manually\n"
+                "writes: research_store=0 forge_context=0 session=0"
+            ),
         }
         _assert_no_path_leak(payload, str(repo_root))
         return emit(payload, exit_code=2)

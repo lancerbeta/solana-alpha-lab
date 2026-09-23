@@ -402,6 +402,13 @@ class IdentityUnitTests(unittest.TestCase):
         )
         with self.assertRaisesRegex(ValueError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"):
             market_evidence_epoch_sha256(incomplete)
+        for invalid_corpus_version in ({"unknown": True}, [], True, "1"):
+            with self.subTest(invalid_corpus_version=invalid_corpus_version):
+                invalid = {**basis_a, "corpus_version": invalid_corpus_version}
+                with self.assertRaisesRegex(
+                    ValueError, "MARKET_EVIDENCE_BASIS_INCOMPLETE"
+                ):
+                    market_evidence_epoch_sha256(invalid)
 
     def test_a3_label_projection_is_market_identity(self) -> None:
         common = {
@@ -699,6 +706,58 @@ class IdentityUnitTests(unittest.TestCase):
         }
         with self.assertRaisesRegex(HficSessionError, "SCIENTIFIC_IDENTITY_CONFLICT"):
             _execution_identity_fields(source)
+
+    def test_conflicting_representation_or_focus_sources_fail_closed(self) -> None:
+        from solana_alpha_lab.factory.hfic_session import _execution_identity_fields
+
+        with self.assertRaisesRegex(HficSessionError, "SCIENTIFIC_IDENTITY_CONFLICT"):
+            _execution_identity_fields(
+                {
+                    "ladder_representation_id": "NORMALIZED_TRAJECTORY_V1",
+                    "owner_focus": "AUTO",
+                },
+                {
+                    "ladder_representation_id": "SYNTHETIC_LATER_V2",
+                    "owner_focus": "ALT",
+                },
+            )
+
+    def test_tampered_pending_execution_binding_blocks_resume(self) -> None:
+        market = "aa" * 32
+        slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        row = {
+            "session_id": "HFIC-SESS-PENDING-TAMPER",
+            "market_evidence_epoch_sha256": market,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "scientific_slot_sha256": slot,
+            "session_state": "FROZEN_AWAITING_CRITIC",
+            "capability_epoch_sha256": "bb" * 32,
+            "representation_payload_sha256": "cc" * 32,
+            "memory_eligibility_sha256": "dd" * 32,
+            "model_provenance_sha256": "ee" * 32,
+            "execution_binding_sha256": "00" * 32,
+        }
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+            memory_eligibility_sha256="dd" * 32,
+            execution_context={"capability_epoch_sha256": "bb" * 32},
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(
+            decision["reason_code"],
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+        )
 
     def test_malformed_execution_context_fails_closed(self) -> None:
         decision = resolve_scientific_admission(

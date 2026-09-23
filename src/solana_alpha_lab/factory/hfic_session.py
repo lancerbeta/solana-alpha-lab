@@ -354,15 +354,25 @@ def _execution_identity_fields(
         if isinstance(normalized, Mapping):
             expanded.append(normalized)
 
-    representation, parent = _preflight_ladder_slot(source_list[0] if source_list else None)
+    initial_representation, initial_parent = _preflight_ladder_slot(
+        source_list[0] if source_list else None
+    )
+    observed_representations: list[str] = []
+    observed_parents: list[str] = []
+    if initial_representation != "BASE":
+        observed_representations.append(initial_representation)
+    if initial_parent:
+        observed_parents.append(initial_parent)
     for source in expanded:
         observed, observed_parent = _mapping_ladder_slot(source)
         if observed != "BASE":
-            representation = observed
+            observed_representations.append(observed)
         if observed_parent:
-            parent = observed_parent
-    if not representation:
-        representation = "BASE"
+            observed_parents.append(observed_parent)
+    if len(set(observed_representations)) > 1 or len(set(observed_parents)) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    representation = observed_representations[0] if observed_representations else "BASE"
+    parent = observed_parents[0] if observed_parents else None
 
     semantic_version: str | None = None
     for source in expanded:
@@ -395,11 +405,14 @@ def _execution_identity_fields(
     market = _consistent_valid_hash(expanded, "market_evidence_epoch_sha256")
     capability = _consistent_valid_hash(expanded, "capability_epoch_sha256")
     focus_key = _consistent_valid_hash(expanded, "focus_key_sha256")
-    owner_focus = "AUTO"
+    focus_values: list[tuple[str, str]] = []
     for source in expanded:
         if isinstance(source, Mapping) and isinstance(source.get("owner_focus"), str):
-            owner_focus = str(source["owner_focus"])
-            break
+            raw_focus = str(source["owner_focus"])
+            focus_values.append((normalize_text(raw_focus), raw_focus))
+    if len({normalized for normalized, _raw in focus_values}) > 1:
+        raise HficSessionError("SCIENTIFIC_IDENTITY_CONFLICT")
+    owner_focus = focus_values[0][1] if focus_values else "AUTO"
     if focus_key is None:
         focus_key = focus_key_sha256(owner_focus)
     payload_sha = _consistent_valid_hash(expanded, "representation_payload_sha256")

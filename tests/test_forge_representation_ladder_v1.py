@@ -656,6 +656,29 @@ class ResolveNextActionTests(unittest.TestCase):
             text,
         )
 
+    def test_execution_binding_conflict_has_exact_readback_recovery(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "session_id": "HFIC-SESS-IDENTITY-CONFLICT",
+                "owner_class": ACTION_OBSERVABILITY_BLOCKED,
+                "next_action": ACTION_OBSERVABILITY_BLOCKED,
+                "owner_final": ACTION_OBSERVABILITY_BLOCKED,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": [
+                    "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"
+                ],
+            }
+        )
+        self.assertIn("RESOLVE_IDENTITY_CONFLICT", text)
+        self.assertIn(
+            "show-session --session-id HFIC-SESS-IDENTITY-CONFLICT --format json",
+            text,
+        )
+        self.assertIn("start a new explicitly authorized /hypothesis-forge slash", text)
+        self.assertIn("do not regenerate or reset budget", text)
+
     def test_budget_exhaustion_is_final_stop_and_reports_all_read_only_counters(self) -> None:
         text = format_forge_run_owner_readout(
             {
@@ -682,7 +705,7 @@ class ResolveNextActionTests(unittest.TestCase):
                 "owner_class": "FORGE_RUN_IN_PROGRESS",
                 "next_action": ACTION_RESUME_V1,
                 "owner_final": None,
-                "owner_focus": "ALT",
+                "owner_focus": "ALT focus",
                 "stages": [
                     {"representation_id": "BASE", "draft_sha256": "cd" * 32},
                     {
@@ -700,7 +723,7 @@ class ResolveNextActionTests(unittest.TestCase):
             "uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write",
             text,
         )
-        self.assertIn("--owner-focus ALT", text)
+        self.assertIn("--owner-focus 'ALT focus'", text)
         self.assertIn("continue classification/finalize in the same session", text)
         self.assertNotIn("persist/freeze that exact draft", text)
         self.assertIn("forge_context=0", text)

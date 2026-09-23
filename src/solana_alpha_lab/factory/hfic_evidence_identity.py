@@ -407,9 +407,11 @@ def market_evidence_epoch_sha256(basis: Mapping[str, Any]) -> str:
         )
         for key in ("invalid_dataset_rows", "invalid_lineage_binding_rows")
     )
+    corpus_version = basis.get("corpus_version")
     if (
-        basis.get("corpus_version") is None
-        or (isinstance(basis.get("corpus_version"), str) and not basis["corpus_version"].strip())
+        corpus_version is None
+        or not isinstance(corpus_version, int)
+        or isinstance(corpus_version, bool)
         or not current_mid
         or not integrity_markers_are_zero
     ):
@@ -691,10 +693,16 @@ def _session_slot_matches_execution_context(
     evidence_surface_mode: str | None,
     execution_context: Mapping[str, Any] | None = None,
 ) -> bool:
-    if memory_eligibility_sha256 is not None and session.get(
-        "memory_eligibility_sha256"
-    ) != memory_eligibility_sha256:
-        return False
+    if memory_eligibility_sha256 is not None:
+        observed_memory_eligibility = session.get("memory_eligibility_sha256")
+        # Historical sessions may predate this stamp.  Their known market /
+        # slot readback remains readable as UNKNOWN provenance; only an
+        # explicitly present, different stamp is an execution mismatch.
+        if (
+            observed_memory_eligibility not in (None, "")
+            and observed_memory_eligibility != memory_eligibility_sha256
+        ):
+            return False
     if evidence_surface_mode is not None and session.get(
         "evidence_surface_mode"
     ) != evidence_surface_mode:
@@ -731,6 +739,47 @@ def _session_slot_matches_execution_context(
         if observed in (None, ""):
             continue
         if not isinstance(observed, str) or re.fullmatch(r"[0-9a-f]{64}", observed) is None:
+            return False
+    stored_binding = session.get("execution_binding_sha256")
+    if stored_binding not in (None, ""):
+        if not isinstance(stored_binding, str) or re.fullmatch(
+            r"[0-9a-f]{64}", stored_binding
+        ) is None:
+            return False
+        slot = session_scientific_slot_sha256(session)
+        binding_parts = {
+            key: session.get(key)
+            for key in (
+                "capability_epoch_sha256",
+                "representation_payload_sha256",
+                "memory_eligibility_sha256",
+                "model_provenance_sha256",
+            )
+        }
+        if (
+            slot is None
+            or any(
+                not isinstance(value, str)
+                or re.fullmatch(r"[0-9a-f]{64}", value) is None
+                for value in binding_parts.values()
+            )
+        ):
+            return False
+        expected_binding = execution_binding_sha256(
+            scientific_slot_sha256=slot,
+            capability_epoch_sha256=binding_parts["capability_epoch_sha256"],
+            control_session_id=(
+                str(session.get("control_session_id"))
+                if session.get("control_session_id")
+                else None
+            ),
+            representation_payload_sha256=binding_parts[
+                "representation_payload_sha256"
+            ],
+            memory_eligibility_sha256=binding_parts["memory_eligibility_sha256"],
+            model_provenance_sha256=binding_parts["model_provenance_sha256"],
+        )
+        if stored_binding != expected_binding:
             return False
     return True
 
@@ -982,10 +1031,15 @@ def resolve_scientific_admission(
         }
 
     if representation == BASE_REPRESENTATION_ID:
-        auto_count = sum(
-            1
-            for item in market_rows
-            if str(item.get("owner_focus") or "AUTO").strip().casefold() == "auto"
+        # AUTO=1 is a market-scoped search admission. A BASE session and its
+        # child representation rows share that admission; counting rows here
+        # would multiply the quota by representation progress.
+        auto_count = int(
+            any(
+                str(item.get("owner_focus") or "AUTO").strip().casefold()
+                == "auto"
+                for item in market_rows
+            )
         )
         if str(owner_focus or "").strip().casefold() == "auto":
             if auto_count >= auto_sessions_per_market:

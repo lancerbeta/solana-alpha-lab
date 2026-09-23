@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import hashlib
 import re
+import shlex
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -1194,19 +1195,21 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         lines.append(
             "next: RECOVER_EXISTING_READBACK — run the read-only "
             + lookup
-            + "; if present, continue the same /hypothesis-forge slash from that "
-            "session/draft; if absent, stop and escalate the typed integrity "
-            "failure; do not rewrite receipts, regenerate, or reset budget"
+            + "; if present, start a new explicitly authorized /hypothesis-forge "
+            "slash for that same session/draft; if absent, stop and escalate the "
+            "typed integrity failure; do not rewrite receipts, regenerate, or "
+            "reset budget"
         )
     elif "MARKET_EVIDENCE_BASIS_INCOMPLETE" in blocking:
         lines.append(
             "next: RESTORE_CURRENT_EVIDENCE — restore decision-bearing datasets/lineage, "
-            "then retry normal /hypothesis-forge"
+            "then start a new explicitly authorized /hypothesis-forge slash"
         )
     elif "FORGE_CONTEXT_ARTIFACT_MISSING" in blocking:
         lines.append(
-            "next: RESTORE_FORGE_CONTEXT — rerun /hypothesis-forge forge-run "
-            "with the recorded run_id/control_session_id; do not regenerate"
+            "next: RESTORE_FORGE_CONTEXT — start a new explicitly authorized "
+            "/hypothesis-forge slash, then rerun forge-run with the recorded "
+            "run_id/control_session_id; do not regenerate"
         )
     elif "SEARCH_BUDGET_EXHAUSTED" in blocking:
         lines.append(
@@ -1224,9 +1227,17 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         "MARKET_IDENTITY_BASIS_MISSING",
         "CAPABILITY_IDENTITY_DRIFT",
     } & set(blocking):
+        session_id = str(receipt.get("session_id") or "").strip()
+        lookup = (
+            f"{CANONICAL_HFIC_CLI} show-session --session-id {session_id} --format json"
+            if session_id
+            else f"{CANONICAL_HFIC_CLI} show-session --session-id <recorded-session-id> --format json"
+        )
         lines.append(
-            "next: RESOLVE_IDENTITY_CONFLICT — restore the authoritative readback; "
-            "do not regenerate or reset budget"
+            "next: RESOLVE_IDENTITY_CONFLICT — run the read-only "
+            + lookup
+            + "; restore the authoritative readback, then start a new explicitly "
+            "authorized /hypothesis-forge slash; do not regenerate or reset budget"
         )
     elif {
         "CAPABILITY_IDENTITY_UNAVAILABLE",
@@ -1282,7 +1293,7 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             None,
         )
         draft_arg = f" --saved-draft-sha256 {draft_sha}" if draft_sha else ""
-        focus_arg = f" --owner-focus {owner_focus}"
+        focus_arg = f" --owner-focus {shlex.quote(owner_focus)}"
         classification_pending = bool(
             {"AWAITING_CLASSIFICATION", "PASS_TO_CLASSIFICATION"}
             & {
@@ -2483,6 +2494,11 @@ def evaluate_forge_run(
         owner_class_input = ""
 
     store = ResearchStore(Path(data_root), create_if_missing=False)
+    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
+
+    current_memory_eligibility = str(
+        effective_policy(store)["memory_eligibility_sha256"]
+    )
     resolved_stages: list[dict[str, Any]]
     control_session_id = None
     legacy_epoch = None
@@ -2754,6 +2770,7 @@ def evaluate_forge_run(
             representation_registry=registry_doc,
             current_visible_cohort_ids=visible,
             execution_context=admission_execution_context or None,
+            memory_eligibility_sha256=current_memory_eligibility,
             repo_root=Path(repo_root),
         )
         if admission.get("action") == "STOP":

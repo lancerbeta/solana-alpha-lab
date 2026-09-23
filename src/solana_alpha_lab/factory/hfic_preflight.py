@@ -568,10 +568,11 @@ def decide_preflight_action(
         sessions_for_market_budget(sessions, market_evidence_epoch=evidence_epoch)
     )
     if _is_auto_focus(owner_focus):
-        auto_count = sum(
-            1
-            for item in same_epoch_for_budget
-            if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+        auto_count = int(
+            any(
+                _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+                for item in same_epoch_for_budget
+            )
         )
         if auto_count >= AUTO_SESSIONS_PER_EPOCH:
             return ("STOP", "SEARCH_BUDGET_EXHAUSTED")
@@ -620,10 +621,13 @@ def epoch_search_budget_usage(
             seen_slots.add(identity)
         deduped_epoch.append(item)
     same_epoch = deduped_epoch
-    auto_used = sum(
-        1
-        for item in same_epoch
-        if _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+    # AUTO=1 is a market-scoped search admission; child representation rows
+    # must not consume another AUTO budget unit.
+    auto_used = int(
+        any(
+            _is_auto_focus(str(item.get("owner_focus") or AUTO_FOCUS))
+            for item in same_epoch
+        )
     )
     distinct = {
         str(item.get("focus_key_sha256") or "")
