@@ -215,6 +215,118 @@ def _active_root(repo_root: Path, explicit_data_root: Path | None):
     )
 
 
+def _owner_class_for_preflight_stop(body: Mapping[str, Any]) -> str:
+    terminal = str(body.get("terminal") or "")
+    router = str(body.get("router_decision") or "")
+    if terminal in {
+        "SEARCH_BUDGET_EXHAUSTED",
+        "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
+        "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+        "SCIENTIFIC_IDENTITY_CONFLICT",
+        "BLOCK_FORGE_EVIDENCE_GAP",
+        "SELECTION_GATE_RECEIPT_UNUSABLE",
+        "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
+    } or router == "BLOCK_FORGE_EVIDENCE_GAP":
+        return "OBSERVABILITY_BLOCKED"
+    return "INPUT_NOT_READY"
+
+
+def _preflight_writes_note(body: Mapping[str, Any]) -> str:
+    writes = body.get("writes") if isinstance(body.get("writes"), Mapping) else {}
+    return (
+        "writes: research_store={research_store} forge_context={forge_context} "
+        "session={session}".format(
+            research_store=int(writes.get("research_store") or 0),
+            forge_context=int(writes.get("forge_context") or 0),
+            session=int(writes.get("session") or 0),
+        )
+    )
+
+
+def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
+    terminal = str(body.get("terminal") or "PREFLIGHT_BLOCKED")
+    owner_class = str(body.get("owner_class") or "INPUT_NOT_READY")
+    selection_gate = (
+        body.get("selection_gate")
+        if isinstance(body.get("selection_gate"), Mapping)
+        else {}
+    )
+    selection_router = str(
+        body.get("router_decision") or selection_gate.get("router_decision") or ""
+    )
+    selection_caveat = bool(selection_gate.get("caveat"))
+    if terminal in {
+        "SELECTION_GATE_RECEIPT_UNUSABLE",
+        "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
+    }:
+        next_line = (
+            "next: RESTORE_SELECTION_GATE — восстановите authoritative "
+            "selection-gate receipt и его input identity, затем повторите "
+            "canonical preflight; не создавайте trial и не сбрасывайте budget"
+        )
+    elif terminal == "SEARCH_BUDGET_EXHAUSTED":
+        next_line = (
+            "next: BUDGET_EXHAUSTED — не повторяйте тот же market/focus, "
+            "не сбрасывайте budget и не создавайте новый trial; дождитесь "
+            "нового market evidence или отдельного owner решения"
+        )
+    elif terminal == "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING":
+        next_line = (
+            "next: RESTORE_SLOT_READBACK — восстановите read-only session "
+            "readback; occupied slot не свободен, не создавайте новый trial "
+            "и не переписывайте receipt"
+        )
+    elif terminal == "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING":
+        next_line = (
+            "next: RESOLVE_EXECUTION_BINDING — восстановите authoritative "
+            "capability/model/payload readback; не перебинживайте старый "
+            "результат и не создавайте новый trial"
+        )
+    elif terminal == "SCIENTIFIC_IDENTITY_CONFLICT":
+        next_line = (
+            "next: RESOLVE_IDENTITY_CONFLICT — восстановите согласованный "
+            "market/representation/focus readback; не регенерируйте и не "
+            "сбрасывайте budget"
+        )
+    elif owner_class == "OBSERVABILITY_BLOCKED":
+        next_line = (
+            "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "
+            "не сбрасывайте budget и не создавайте новый trial"
+        )
+    elif selection_router == "BLOCK_FORGE_SELECTION_RISK" or selection_caveat:
+        next_line = (
+            "next: RESOLVE_SELECTION_GATE — normal entry остаётся "
+            "заблокированным до разрешения selection gate; не запускайте "
+            "Forge, не повторяйте trial и не трактуйте caveat как scientific "
+            "negative"
+        )
+    elif terminal == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
+        next_line = (
+            "next: RESTORE_CURRENT_EVIDENCE — восстановите decision-bearing "
+            "datasets/lineage и повторите normal entry"
+        )
+    else:
+        next_line = (
+            "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
+            "input/readback и повторите normal entry"
+        )
+    selection_line = (
+        f"selection_router: {selection_router}\n"
+        f"selection_caveat: {str(selection_caveat).lower()}\n"
+        if selection_router or selection_caveat
+        else ""
+    )
+    return (
+        "PREFLIGHT\n"
+        "status: BLOCKED — preflight не разрешил scientific admission; "
+        "это не научный negative\n"
+        f"reason: {terminal}\n"
+        + selection_line
+        + f"{next_line}; не создавайте trial вручную\n"
+        + _preflight_writes_note(body)
+    )
+
+
 def cmd_preflight(
     repo_root: Path,
     *,
@@ -223,93 +335,6 @@ def cmd_preflight(
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
 ) -> int:
-    def _owner_class_for_preflight_stop(body: Mapping[str, Any]) -> str:
-        terminal = str(body.get("terminal") or "")
-        router = str(body.get("router_decision") or "")
-        if terminal in {
-            "SEARCH_BUDGET_EXHAUSTED",
-            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
-            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
-            "SCIENTIFIC_IDENTITY_CONFLICT",
-            "BLOCK_FORGE_EVIDENCE_GAP",
-            "SELECTION_GATE_RECEIPT_UNUSABLE",
-            "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
-        } or router == "BLOCK_FORGE_EVIDENCE_GAP":
-            return "OBSERVABILITY_BLOCKED"
-        return "INPUT_NOT_READY"
-
-    def _owner_readout(body: Mapping[str, Any]) -> str:
-        terminal = str(body.get("terminal") or "PREFLIGHT_BLOCKED")
-        owner_class = str(body.get("owner_class") or "INPUT_NOT_READY")
-        selection_gate = (
-            body.get("selection_gate")
-            if isinstance(body.get("selection_gate"), Mapping)
-            else {}
-        )
-        selection_router = str(
-            body.get("router_decision")
-            or selection_gate.get("router_decision")
-            or ""
-        )
-        selection_caveat = bool(selection_gate.get("caveat"))
-        if terminal in {
-            "SELECTION_GATE_RECEIPT_UNUSABLE",
-            "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
-        }:
-            next_line = (
-                "next: RESTORE_SELECTION_GATE — восстановите authoritative "
-                "selection-gate receipt и его input identity, затем повторите "
-                "canonical preflight; не создавайте trial и не сбрасывайте budget"
-            )
-        elif owner_class == "OBSERVABILITY_BLOCKED":
-            next_line = (
-                "next: STOP_TYPED_PREFLIGHT_BLOCK — не повторяйте вход, "
-                "не сбрасывайте budget и не создавайте новый trial"
-            )
-        elif selection_router == "BLOCK_FORGE_SELECTION_RISK" or selection_caveat:
-            next_line = (
-                "next: RESOLVE_SELECTION_GATE — normal entry остаётся "
-                "заблокированным до разрешения selection gate; не запускайте "
-                "Forge, не повторяйте trial и не трактуйте caveat как scientific "
-                "negative"
-            )
-        elif terminal == "MARKET_EVIDENCE_BASIS_INCOMPLETE":
-            next_line = (
-                "next: RESTORE_CURRENT_EVIDENCE — восстановите decision-bearing "
-                "datasets/lineage и повторите normal entry"
-            )
-        else:
-            next_line = (
-                "next: RESOLVE_TYPED_PREFLIGHT_BLOCK — восстановите указанный "
-                "input/readback и повторите normal entry"
-            )
-        selection_line = (
-            f"selection_router: {selection_router}\n"
-            f"selection_caveat: {str(selection_caveat).lower()}\n"
-            if selection_router or selection_caveat
-            else ""
-        )
-        return (
-            "PREFLIGHT\n"
-            "status: BLOCKED — preflight не разрешил scientific admission; "
-            "это не научный negative\n"
-            f"reason: {terminal}\n"
-            + selection_line
-            + f"{next_line}; не создавайте trial вручную\n"
-            + _writes_note(body)
-        )
-
-    def _writes_note(body: Mapping[str, Any]) -> str:
-        writes = body.get("writes") if isinstance(body.get("writes"), Mapping) else {}
-        return (
-            "writes: research_store={research_store} forge_context={forge_context} "
-            "session={session}".format(
-                research_store=int(writes.get("research_store") or 0),
-                forge_context=int(writes.get("forge_context") or 0),
-                session=int(writes.get("session") or 0),
-            )
-        )
-
     _assert_no_path_leak({"owner_focus": owner_focus}, str(repo_root))
     try:
         active = _active_root(repo_root, explicit_data_root)
@@ -371,7 +396,7 @@ def cmd_preflight(
                 "session": 0,
             },
         }
-        payload["owner_readout"] = _owner_readout(payload)
+        payload["owner_readout"] = _preflight_owner_readout(payload)
         _assert_no_path_leak(payload, str(data_root), str(repo_root))
         return emit(payload, exit_code=2)
     payload = {
@@ -380,7 +405,7 @@ def cmd_preflight(
     }
     if payload.get("action") == "STOP":
         payload["owner_class"] = _owner_class_for_preflight_stop(payload)
-        payload["owner_readout"] = _owner_readout(payload)
+        payload["owner_readout"] = _preflight_owner_readout(payload)
     elif isinstance(payload.get("selection_gate"), Mapping) and payload["selection_gate"].get("caveat"):
         router = str(payload["selection_gate"].get("router_decision") or "UNKNOWN")
         payload["owner_readout"] = (
@@ -391,7 +416,7 @@ def cmd_preflight(
             "next: CONTINUE_WITH_SCOPED_SELECTION_CAVEAT — run the canonical "
             "forge-run no-write/readback path; do not launch a new diagnostic "
             "or treat the caveat as a scientific terminal\n"
-            + _writes_note(payload)
+            + _preflight_writes_note(payload)
         )
     payload["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(payload)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))

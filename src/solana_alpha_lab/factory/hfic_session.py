@@ -3678,10 +3678,19 @@ def _lookup_existing_freeze_session(
     if not epoch_hint or not focus_hint:
         return None
     identity = _execution_identity_fields(preflight_receipt)
-    return find_session_by_epoch_focus(
-        store,
-        epoch_hint,
-        focus_hint,
+    execution_context: dict[str, str] = {}
+    for key in (
+        "capability_epoch_sha256",
+        "representation_payload_sha256",
+        "model_provenance_sha256",
+    ):
+        value = preflight_receipt.get(key)
+        if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+            value = identity.get(key)
+        if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
+            execution_context[key] = value
+
+    lookup_args = dict(
         memory_eligibility_sha256=str(
             preflight_receipt.get("memory_eligibility_sha256") or ""
         )
@@ -3693,6 +3702,34 @@ def _lookup_existing_freeze_session(
         representation_semantic_version=identity.get("representation_semantic_version"),
         scientific_slot_sha256=identity.get("scientific_slot_sha256"),
     )
+    existing = find_session_by_epoch_focus(
+        store,
+        epoch_hint,
+        focus_hint,
+        **lookup_args,
+        execution_context=execution_context or None,
+    )
+    if existing is not None or not execution_context:
+        return existing
+    # The slot identity is occupied but the stored execution context is not
+    # compatible with this freeze input.  Re-run the lookup without the
+    # current binding only to distinguish that typed STOP from an available
+    # slot; never let the caller create a second lifecycle row in its place.
+    historical = find_session_by_epoch_focus(
+        store,
+        epoch_hint,
+        focus_hint,
+        **{
+            **lookup_args,
+            "memory_eligibility_sha256": None,
+            "execution_context": None,
+            "ignore_memory_eligibility": True,
+            "ignore_evidence_surface_mode": True,
+        },
+    )
+    if historical is not None:
+        raise HficSessionError("SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING")
+    return None
 
 
 def _bound_from_ladder_challenger_preflight(
@@ -3891,6 +3928,9 @@ def find_session_by_epoch_focus(
     control_session_id: str | None = None,
     representation_semantic_version: str | None = None,
     scientific_slot_sha256: str | None = None,
+    execution_context: Mapping[str, Any] | None = None,
+    ignore_memory_eligibility: bool = False,
+    ignore_evidence_surface_mode: bool = False,
 ) -> dict[str, Any] | None:
     from solana_alpha_lab.factory.hfic_control_integrity import (
         session_evidence_surface_mode,
@@ -3914,12 +3954,29 @@ def find_session_by_epoch_focus(
             continue
         if item.get("focus_key_sha256") != focus_key:
             continue
-        if session_memory_eligibility(item) != session_memory_eligibility(
+        if not ignore_memory_eligibility and session_memory_eligibility(
+            item
+        ) != session_memory_eligibility(
             {"memory_eligibility_sha256": memory_eligibility_sha256}
         ):
             continue
-        if session_evidence_surface_mode(item) != expected_mode:
+        if (
+            not ignore_evidence_surface_mode
+            and session_evidence_surface_mode(item) != expected_mode
+        ):
             continue
+        if isinstance(execution_context, Mapping):
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                _session_slot_matches_execution_context,
+            )
+
+            if not _session_slot_matches_execution_context(
+                item,
+                memory_eligibility_sha256=memory_eligibility_sha256,
+                evidence_surface_mode=expected_mode,
+                execution_context=execution_context,
+            ):
+                continue
         bundle = load_session_bundle(store, str(item.get("session_id") or ""))
         if bundle is None:
             continue

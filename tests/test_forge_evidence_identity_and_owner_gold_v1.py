@@ -566,6 +566,33 @@ class IdentityUnitTests(unittest.TestCase):
         self.assertEqual(decision["action"], "STOP")
         self.assertEqual(decision["reason_code"], "SCIENTIFIC_SLOT_IDENTITY_INVALID")
 
+    def test_malformed_focus_key_is_not_occupancy_evidence(self) -> None:
+        market = "aa" * 32
+        row = {
+            "session_id": "HFIC-SESS-TAMPERED-FOCUS",
+            "market_evidence_epoch_sha256": market,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "focus_key_sha256": "bad",
+            "scientific_slot_sha256": scientific_slot_sha256(
+                market_evidence_epoch_sha256=market,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+            ),
+        }
+        self.assertIsNone(session_scientific_slot_sha256(row))
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(decision["reason_code"], "SCIENTIFIC_SLOT_IDENTITY_INVALID")
+
     def test_market_stamped_legacy_row_without_slot_stays_occupied(self) -> None:
         market = "aa" * 32
         row = {
@@ -1286,6 +1313,51 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             drifted["blocking_reason_codes"],
         )
         self.assertEqual(drifted["writes"]["session"], 0)
+
+    def test_g11_v1_freeze_rejects_changed_execution_binding_without_write(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = _no_worthy_base(data_root, store, production_packet=True)
+            v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            v1_pre["model_provenance_sha256"] = "11" * 32
+            draft = valid_draft()
+            frozen = freeze_draft(
+                draft,
+                preflight_receipt=v1_pre,
+                store=store,
+                repo_root=ROOT,
+            )
+            persist_frozen_session(
+                store,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(draft["candidates"]),
+                draft=draft,
+            )
+            store.rebuild_projection()
+            before = store.diagnostics().committed_inventory_sha256
+            changed = dict(v1_pre)
+            changed["model_provenance_sha256"] = "22" * 32
+            with self.assertRaisesRegex(
+                HficSessionError,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            ):
+                freeze_draft(
+                    draft,
+                    preflight_receipt=changed,
+                    store=store,
+                    repo_root=ROOT,
+                )
+            self.assertEqual(
+                store.diagnostics().committed_inventory_sha256,
+                before,
+            )
 
     def test_g6_generated_draft_restart_keeps_slot_and_rejects_regeneration(self) -> None:
         """A generator crash before freeze resumes bytes, slot, and budget."""

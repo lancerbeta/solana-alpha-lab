@@ -645,8 +645,13 @@ def session_scientific_slot_sha256(session: Mapping[str, Any]) -> str | None:
         normalize_text(focus).encode("utf-8")
     ).hexdigest()
     focus_key = session.get("focus_key_sha256")
-    if isinstance(focus_key, str) and len(focus_key) == 64 and focus_key != derived_focus_key:
-        return None
+    if focus_key not in (None, ""):
+        if (
+            not isinstance(focus_key, str)
+            or re.fullmatch(r"[0-9a-f]{64}", focus_key) is None
+            or focus_key != derived_focus_key
+        ):
+            return None
     derived = scientific_slot_sha256(
         market_evidence_epoch_sha256=market,
         representation_id=representation,
@@ -676,7 +681,18 @@ def _session_slot_identity_is_invalid(session: Mapping[str, Any]) -> bool:
 
 def _session_slot_focus_key(session: Mapping[str, Any]) -> str | None:
     value = session.get("focus_key_sha256")
-    if isinstance(value, str) and len(value) == 64:
+    if value not in (None, ""):
+        if not isinstance(value, str) or re.fullmatch(r"[0-9a-f]{64}", value) is None:
+            return None
+        owner_focus = session.get("owner_focus")
+        if isinstance(owner_focus, str) and owner_focus.strip():
+            from solana_alpha_lab.factory.hfic_identity import normalize_text
+
+            derived = hashlib.sha256(
+                normalize_text(owner_focus).encode("utf-8")
+            ).hexdigest()
+            if value != derived:
+                return None
         return value
     owner_focus = session.get("owner_focus")
     if isinstance(owner_focus, str) and owner_focus.strip():

@@ -17,6 +17,11 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 CLI = ROOT / "scripts" / "hypothesis_forge.py"
+SCRIPTS = ROOT / "scripts"
+if str(SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS))
+
+from hypothesis_forge import _preflight_owner_readout  # noqa: E402
 
 
 def critic_result_from_packet_only(
@@ -279,6 +284,34 @@ class HficCliContractTests(unittest.TestCase):
         self.assertIn("owner_readout", payload)
         self.assertIn("RESOLVE_TYPED_PREFLIGHT_BLOCK", payload["owner_readout"])
         self.assertIn("не научный", payload["owner_readout"])
+
+    def test_typed_preflight_owner_readout_preserves_slot_and_budget(self) -> None:
+        cases = {
+            "SEARCH_BUDGET_EXHAUSTED": "BUDGET_EXHAUSTED",
+            "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING": "RESTORE_SLOT_READBACK",
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING": (
+                "RESOLVE_EXECUTION_BINDING"
+            ),
+            "SCIENTIFIC_IDENTITY_CONFLICT": "RESOLVE_IDENTITY_CONFLICT",
+        }
+        for terminal, expected_next in cases.items():
+            with self.subTest(terminal=terminal):
+                readout = _preflight_owner_readout(
+                    {
+                        "terminal": terminal,
+                        "owner_class": "OBSERVABILITY_BLOCKED",
+                        "writes": {
+                            "research_store": 0,
+                            "forge_context": 0,
+                            "session": 0,
+                        },
+                    }
+                )
+                self.assertIn(expected_next, readout)
+                self.assertIn("не создавайте trial", readout)
+                self.assertIn("writes: research_store=0", readout)
+                if terminal == "SEARCH_BUDGET_EXHAUSTED":
+                    self.assertIn("не сбрасывайте budget", readout)
 
     def test_preflight_accepts_multiline_owner_focus_without_legacy_admission(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
