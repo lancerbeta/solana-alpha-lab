@@ -91,6 +91,7 @@ class ObservationLifecycleError(ValueError):
 
 
 _OWNER_NEXT_ACTION_BY_LIFECYCLE_ERROR = {
+    "ACTIVATION_MISSING": "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR",
     "ACTIVATION_WINDOW_MISMATCH": "RECONCILE_REGISTERED_ACTIVATION_WINDOW",
     "LIVE_PEER_REGISTRATION_UNAVAILABLE": "RECONCILE_LIVE_ACTIVATION_REGISTRATION",
     "LATE_SUCCESSOR_RECOVERY_UNPROVEN": "REVALIDATE_DRAINING_RECOVERY_PROOF",
@@ -1508,6 +1509,28 @@ def activation_transition_research_event_proven(
             and str(event_payload.get("prior_state") or "")
             == str(payload.get("prior_state") or "")
         ):
+            for later in records:
+                if (
+                    str(later.record_id) == event_id
+                    or str(later.record_kind)
+                    != str(RecordKind.OBSERVATION_SCHEDULE_STATE)
+                    or str(later.entity_id) != schedule_sha256
+                    or str(later.run_id or "") != activation_id
+                    or later.created_at.astimezone(UTC) > now
+                    or later.first_reliable_available_at.astimezone(UTC) > now
+                    or later.effective_at.astimezone(UTC) > now
+                ):
+                    continue
+                try:
+                    later_payload = json.loads(later.payload_json)
+                    if not isinstance(later_payload, Mapping):
+                        return False
+                    later_sequence = int(later_payload["transition_sequence"])
+                except (KeyError, TypeError, ValueError, json.JSONDecodeError):
+                    return False
+                later_effective = later.effective_at.astimezone(UTC)
+                if (later_effective, later_sequence) > (effective, transition_sequence):
+                    return False
             return True
     return False
 
@@ -2314,11 +2337,14 @@ def status_schedule(
     deploy_git_sha: str | None = None,
 ) -> dict[str, Any]:
     activations = store.list_activations()
+    exact_activation_missing = False
     if schedule_sha256 and activation_id:
         row = store.get_activation(schedule_sha256, activation_id)
         if row is None:
-            raise ObservationLifecycleError("ACTIVATION_MISSING")
-        activations = [row]
+            exact_activation_missing = True
+            activations = []
+        else:
+            activations = [row]
     from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
 
     clock = now or datetime.now(UTC)
@@ -2329,8 +2355,10 @@ def status_schedule(
         activation_id=activation_id,
         deploy_git_sha=deploy_git_sha,
     )
-    return {
-        "terminal": "STATUS",
+    result = {
+        "terminal": "STATUS_ACTIVATION_NOT_FOUND"
+        if exact_activation_missing
+        else "STATUS",
         "activations": [
             {
                 "schedule_sha256": row["schedule_sha256"],
@@ -2346,6 +2374,9 @@ def status_schedule(
         "restore_marker_unresolved": store.restore_marker_unresolved(),
         "collector": collector,
     }
+    if exact_activation_missing:
+        result["next_action"] = "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
+    return result
 
 
 def snapshot_schedule(

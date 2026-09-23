@@ -496,10 +496,14 @@ Not expected:
    doctor reports `late_recovery_proof=UNKNOWN`, doctor exits with
    `DOCTOR_RECOVERY_PROOF_UNAVAILABLE` / code 2. Do not activate or guess a
    timestamp. First inspect the immutable event named by
-   `late_recovery_event_id` with this read-only check:
+   `late_recovery_event_id` with this read-only check. Use `starts_at` from
+   the exact registered schedule as `window_start`; without it the bounded
+   reader returns only the schedule-registration partition. The fresh UTC
+   inspection time bounds lifecycle partitions and excludes unrelated future
+   partitions:
 
 ```text
-/usr/bin/uv run --locked --managed-python python -B -c "import json; from pathlib import Path; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); rows,_=s.iter_lifecycle_records_bounded(schedule_sha256='<SCHEDULE_SHA256>', activation_id='<ACTIVATION_ID>'); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in rows if r.record_id == '<LATE_RECOVERY_EVENT_ID>'], sort_keys=True))"
+/usr/bin/uv run --locked --managed-python python -B -c "import json; from datetime import UTC, datetime; from pathlib import Path; from solana_alpha_lab.factory.observation_schedule import parse_utc; from solana_alpha_lab.factory.research_store import ResearchStore; s=ResearchStore(Path('<DATA_ROOT>'), create_if_missing=False); rows,_=s.iter_lifecycle_records_bounded(schedule_sha256='<SCHEDULE_SHA256>', activation_id='<ACTIVATION_ID>', window_start=parse_utc('<REGISTERED_STARTS_AT>'), closure_cutoff=datetime.now(UTC)); print(json.dumps([{'record_id':r.record_id,'record_kind':str(r.record_kind),'effective_at':r.effective_at.isoformat(),'payload':json.loads(r.payload_json)} for r in rows if r.record_id == '<LATE_RECOVERY_EVENT_ID>'], sort_keys=True))"
 ```
 
 If it prints no matching immutable event or the payload is not the committed

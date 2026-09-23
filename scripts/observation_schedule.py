@@ -17,6 +17,7 @@ if str(SRC) not in sys.path:
 from solana_alpha_lab.factory.observation_schedule import (  # noqa: E402
     ObservationScheduleError,
     load_observation_schedule,
+    parse_utc,
 )
 from solana_alpha_lab.factory.observation_schedule_compiler import (  # noqa: E402
     compile_schedule_document,
@@ -340,7 +341,10 @@ def main(
                 now=now,
                 deploy_git_sha=producer,
             )
-            return _emit(result, 0)
+            return _emit(
+                result,
+                2 if result.get("terminal") == "STATUS_ACTIVATION_NOT_FOUND" else 0,
+            )
         if args.command == "snapshot":
             digest = args.schedule_sha256 or config.get("schedule_sha256")
             if not digest and args.schedule:
@@ -711,7 +715,8 @@ def main(
                         },
                         2,
                     )
-                if str(activation["state"]) == "ACTIVE":
+                activation_state = str(activation["state"])
+                if activation_state == "ACTIVE":
                     try:
                         active_transition_proven = (
                             activation_transition_research_event_proven(
@@ -732,6 +737,78 @@ def main(
                             },
                             2,
                         )
+                elif activation_state == "DRAINING":
+                    transition_payload = activation.get("payload")
+                    if isinstance(transition_payload, str):
+                        try:
+                            transition_payload = json.loads(transition_payload)
+                        except json.JSONDecodeError:
+                            transition_payload = None
+                    try:
+                        if not isinstance(transition_payload, dict):
+                            raise ValueError("TRANSITION_PAYLOAD_UNAVAILABLE")
+                        transition_effective_at = parse_utc(
+                            str(transition_payload["transition_effective_at"])
+                        )
+                        if (
+                            str(transition_payload.get("new_state") or "")
+                            != "DRAINING"
+                            or str(transition_payload.get("prior_state") or "")
+                            != "ACTIVE"
+                        ):
+                            raise ValueError("TRANSITION_PAYLOAD_INVALID")
+                    except (KeyError, TypeError, ValueError):
+                        return _emit(
+                            {
+                                "terminal": "TICK_REFUSED_DRAINING_TRANSITION_PROOF_UNAVAILABLE",
+                                "schedule_sha256": digest,
+                                "activation_id": activation_id,
+                                "provider_calls": 0,
+                                "credential_reads": 0,
+                                "next_action": "RECONCILE_DRAINING_TRANSITION_PROOF",
+                            },
+                            2,
+                        )
+                    if transition_effective_at > now:
+                        try:
+                            active_transition_proven = (
+                                activation_transition_research_event_proven(
+                                    data_root, activation, now=now
+                                )
+                            )
+                        except Exception:
+                            active_transition_proven = False
+                        if not active_transition_proven:
+                            return _emit(
+                                {
+                                    "terminal": "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                                    "schedule_sha256": digest,
+                                    "activation_id": activation_id,
+                                    "provider_calls": 0,
+                                    "credential_reads": 0,
+                                    "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                                },
+                                2,
+                            )
+                    else:
+                        try:
+                            draining_proof = resolve_late_recovery_proof(
+                                data_root, activation, now=now
+                            )
+                        except Exception:
+                            draining_proof = {"late_recovery_proof": "UNKNOWN"}
+                        if draining_proof.get("late_recovery_proof") == "UNKNOWN":
+                            return _emit(
+                                {
+                                    "terminal": "TICK_REFUSED_DRAINING_TRANSITION_PROOF_UNAVAILABLE",
+                                    "schedule_sha256": digest,
+                                    "activation_id": activation_id,
+                                    "provider_calls": 0,
+                                    "credential_reads": 0,
+                                    "next_action": "RECONCILE_DRAINING_TRANSITION_PROOF",
+                                },
+                                2,
+                            )
                 try:
                     authority = _require_live_authority(
                         store,

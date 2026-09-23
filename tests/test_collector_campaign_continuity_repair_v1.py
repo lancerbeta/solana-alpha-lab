@@ -44,6 +44,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (
     drain_expired_admission,
     expected_authority_phrase,
     owner_next_action_for_lifecycle_error,
+    pause_schedule,
     register_schedule,
     resolve_late_recovery_proof,
     rollover_schedule,
@@ -184,6 +185,64 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             store.close()
             self.assertTrue(proven)
+
+    def test_stale_active_projection_is_denied_after_later_pause_event(self) -> None:
+        document = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            registered, _ = _activate_campaign(
+                store, data_root, document, activation_id="ACT-STALE-ACTIVE"
+            )
+            original_active = store.get_activation(
+                registered["schedule_sha256"], "ACT-STALE-ACTIVE"
+            )
+            assert original_active is not None
+            later = NOW + timedelta(minutes=1)
+            pause_schedule(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=registered["schedule_sha256"],
+                activation_id="ACT-STALE-ACTIVE",
+                now=later,
+                producer_git_sha=GIT,
+            )
+
+            store._conn.execute(
+                """
+                UPDATE schedule_activations
+                SET state = ?, transition_sequence = ?,
+                    last_transition_event_id = ?, payload_json = ?, updated_at = ?
+                WHERE schedule_sha256 = ? AND activation_id = ?
+                """,
+                (
+                    "ACTIVE",
+                    original_active["transition_sequence"],
+                    original_active["last_transition_event_id"],
+                    json.dumps(original_active["payload"], sort_keys=True),
+                    render_utc(NOW),
+                    registered["schedule_sha256"],
+                    "ACT-STALE-ACTIVE",
+                ),
+            )
+            store._conn.commit()
+            row = store.get_activation(
+                registered["schedule_sha256"], "ACT-STALE-ACTIVE"
+            )
+            assert row is not None
+            self.assertEqual(row["state"], "ACTIVE")
+            self.assertEqual(
+                row["last_transition_event_id"],
+                original_active["last_transition_event_id"],
+            )
+            proven = activation_transition_research_event_proven(
+                data_root, row, now=later + timedelta(minutes=1)
+            )
+            store.close()
+            self.assertFalse(proven)
 
     def test_closed_projection_without_committed_drain_event_is_denied(self) -> None:
         predecessor = _with_window(
@@ -1368,6 +1427,179 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         materialize.assert_not_called()
         run_tick.assert_not_called()
 
+    def test_cli_tick_refuses_unproven_future_draining_projection(self) -> None:
+        document = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        future_cutover = render_utc(NOW + timedelta(minutes=1))
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(
+                data_root / "observation_schedule_state.sqlite"
+            )
+            registered, authority = _register_and_authorize(
+                store, data_root, document
+            )
+            assert store.acquire_lease("future-draining-proof", clock=NOW)
+            store.upsert_activation(
+                {
+                    "schedule_sha256": registered["schedule_sha256"],
+                    "activation_id": "ACT-FUTURE-DRAIN-UNPROVEN",
+                    "schedule_key": document["schedule_key"],
+                    "state": "DRAINING",
+                    "authority_receipt_sha256": authority["receipt_sha256"],
+                    "starts_at": document["activation"]["starts_at"],
+                    "stops_admitting_at": document["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "transition_sequence": 2,
+                    "last_transition_event_id": "OBS-STATE-UNCOMMITTED",
+                    "payload": {
+                        "prior_state": "ACTIVE",
+                        "new_state": "DRAINING",
+                        "transition_sequence": 2,
+                        "transition_effective_at": future_cutover,
+                        "transition_event_id": "OBS-STATE-UNCOMMITTED",
+                        "admission_window_closed": False,
+                    },
+                },
+                clock=NOW,
+            )
+            store.close()
+            buf = StringIO()
+            physical = SimpleNamespace(
+                opener=object(),
+                credential_loader=lambda: "unused",
+                pacing_clock=None,
+            )
+            with (
+                patch(
+                    "scripts.observation_schedule.resolve_clock", return_value=NOW
+                ),
+                patch(
+                    "scripts.observation_schedule.materialize_tick_physical_dependencies",
+                    return_value=physical,
+                ) as materialize,
+                patch(
+                    "scripts.observation_schedule.tick_once",
+                    return_value={
+                        "terminal": "TICK_COMPLETE",
+                        "provider_calls": 1,
+                        "credential_reads": 1,
+                    },
+                ) as run_tick,
+                redirect_stdout(buf),
+            ):
+                code = cli_main(
+                    [
+                        "tick",
+                        "--once",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        registered["schedule_sha256"],
+                        "--activation-id",
+                        "ACT-FUTURE-DRAIN-UNPROVEN",
+                    ]
+                )
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(code, 2)
+        self.assertEqual(
+            payload["terminal"], "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE"
+        )
+        self.assertEqual(payload["provider_calls"], 0)
+        self.assertEqual(payload["credential_reads"], 0)
+        self.assertEqual(payload["next_action"], "RECONCILE_ACTIVE_TRANSITION_PROOF")
+        materialize.assert_not_called()
+        run_tick.assert_not_called()
+
+    def test_cli_tick_allows_committed_current_draining_projection(self) -> None:
+        document = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T00:05:00Z",
+            schedule_key="OBS-COMMITTED-DRAINING-TICK-001",
+        )
+        activated_at = datetime(2026, 9, 1, 0, 4, tzinfo=UTC)
+        drained_at = datetime(2026, 9, 1, 0, 6, tzinfo=UTC)
+        tick_at = datetime(2026, 9, 1, 0, 7, tzinfo=UTC)
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(
+                data_root / "observation_schedule_state.sqlite"
+            )
+            registered, _authority = _register_and_authorize(
+                store, data_root, document, now=activated_at
+            )
+            activate_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=registered["schedule_sha256"],
+                activation_id="ACT-COMMITTED-DRAINING",
+                now=activated_at,
+                producer_git_sha=GIT,
+            )
+            drained = drain_expired_admission(
+                data_root=data_root,
+                store=store,
+                schedule_sha256=registered["schedule_sha256"],
+                activation_id="ACT-COMMITTED-DRAINING",
+                now=drained_at,
+                producer_git_sha=GIT,
+            )
+            self.assertEqual(drained["terminal"], "DRAINED")
+            store.close()
+            buf = StringIO()
+            physical = SimpleNamespace(
+                opener=object(),
+                credential_loader=lambda: "unused",
+                pacing_clock=None,
+            )
+            with (
+                patch(
+                    "scripts.observation_schedule.resolve_clock", return_value=tick_at
+                ),
+                patch(
+                    "scripts.observation_schedule.materialize_tick_physical_dependencies",
+                    return_value=physical,
+                ) as materialize,
+                patch(
+                    "scripts.observation_schedule.tick_once",
+                    return_value={
+                        "terminal": "TICK_COMPLETE",
+                        "provider_calls": 0,
+                        "credential_reads": 0,
+                    },
+                ) as run_tick,
+                redirect_stdout(buf),
+            ):
+                code = cli_main(
+                    [
+                        "tick",
+                        "--once",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        registered["schedule_sha256"],
+                        "--activation-id",
+                        "ACT-COMMITTED-DRAINING",
+                    ]
+                )
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(code, 0)
+        self.assertEqual(payload["terminal"], "TICK_COMPLETE")
+        materialize.assert_called_once()
+        run_tick.assert_called_once()
+
     def test_read_model_unknown_exact_selector_does_not_fallback_to_other_activation(
         self,
     ) -> None:
@@ -1422,6 +1654,70 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertEqual(model["schedule_sha256"], "a" * 64)
             self.assertEqual(model["activation_id"], "ACT-MISSING")
             store.close()
+
+    def test_status_unknown_exact_selector_returns_owner_next_action(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            try:
+                report = status_schedule(
+                    store,
+                    schedule_sha256="a" * 64,
+                    activation_id="ACT-MISSING",
+                    now=NOW,
+                )
+            finally:
+                store.close()
+            self.assertEqual(report["terminal"], "STATUS_ACTIVATION_NOT_FOUND")
+            self.assertEqual(
+                report["collector"]["activation_selection_status"], "NOT_FOUND"
+            )
+            self.assertEqual(report["collector"]["activation_state"], "UNKNOWN")
+            self.assertEqual(
+                report["next_action"], "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
+            )
+            self.assertEqual(report["activations"], [])
+            self.assertEqual(
+                owner_next_action_for_lifecycle_error("ACTIVATION_MISSING"),
+                "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR",
+            )
+            cli_data_root = Path(tmp) / "cli-rdp"
+            cli_data_root.mkdir()
+            output = StringIO()
+            with patch(
+                "scripts.observation_schedule.resolve_clock", return_value=NOW
+            ), redirect_stdout(output):
+                code = cli_main(
+                    [
+                        "status",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(cli_data_root.resolve()),
+                        "--schedule-sha256",
+                        "a" * 64,
+                        "--activation-id",
+                        "ACT-MISSING",
+                    ]
+                )
+            cli_report = json.loads(output.getvalue())
+            self.assertEqual(code, 2)
+            self.assertEqual(cli_report["terminal"], "STATUS_ACTIVATION_NOT_FOUND")
+            self.assertEqual(cli_report["collector"]["activation_state"], "UNKNOWN")
+            self.assertEqual(
+                cli_report["next_action"], "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
+            )
+
+    def test_late_recovery_runbook_bounds_immutable_event_lookup(self) -> None:
+        runbook = (ROOT / "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md").read_text(
+            encoding="utf-8"
+        )
+        command = next(
+            line
+            for line in runbook.splitlines()
+            if "iter_lifecycle_records_bounded(" in line
+        )
+        self.assertIn("window_start=parse_utc('<REGISTERED_STARTS_AT>')", command)
+        self.assertIn("closure_cutoff=datetime.now(UTC)", command)
 
     def test_operational_packet_unknown_exact_selector_keeps_continuity_unknown(
         self,
