@@ -1064,6 +1064,158 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertEqual(proof["late_recovery_proof"], "NOT_REQUIRED")
             store.close()
 
+    def test_status_activations_follow_transition_effective_as_of(self) -> None:
+        predecessor = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        successor = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+        )
+        cutover = datetime(2026, 9, 1, 0, 20, tzinfo=UTC)
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            pred = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=predecessor,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            succ = register_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                document=successor,
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            authorize_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=pred["schedule_sha256"],
+                phrase=_phrase(predecessor),
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            authorize_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=succ["schedule_sha256"],
+                phrase=_phrase(successor),
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            activate_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule_sha256=pred["schedule_sha256"],
+                activation_id="ACT-PRE",
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            rollover_schedule(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                predecessor_schedule_sha256=pred["schedule_sha256"],
+                predecessor_activation_id="ACT-PRE",
+                successor_schedule_sha256=succ["schedule_sha256"],
+                successor_activation_id="ACT-SUC",
+                cutover_at=render_utc(cutover),
+                now=NOW,
+                producer_git_sha=GIT,
+            )
+            persisted_predecessor = store.get_activation(
+                pred["schedule_sha256"], "ACT-PRE"
+            )
+            persisted_successor = store.get_activation(
+                succ["schedule_sha256"], "ACT-SUC"
+            )
+            assert persisted_predecessor is not None
+            assert persisted_successor is not None
+            self.assertEqual(persisted_predecessor["state"], "DRAINING")
+            self.assertEqual(persisted_successor["state"], "ACTIVE")
+            predecessor_event = persisted_predecessor["last_transition_event_id"]
+            successor_event = persisted_successor["last_transition_event_id"]
+
+            before = status_schedule(
+                store,
+                schedule_sha256=None,
+                activation_id=None,
+                data_root=data_root,
+                now=NOW,
+            )
+            by_id = {
+                row["activation_id"]: row for row in before["activations"]
+            }
+            self.assertEqual(before["terminal"], "STATUS")
+            self.assertEqual(before["collector"]["activation_id"], "ACT-PRE")
+            self.assertEqual(before["collector"]["activation_state"], "ACTIVE")
+            self.assertEqual(by_id["ACT-PRE"]["state"], "ACTIVE")
+            self.assertTrue(by_id["ACT-PRE"]["future_transition_pending"])
+            self.assertEqual(by_id["ACT-SUC"]["state"], "UNKNOWN")
+            self.assertTrue(by_id["ACT-SUC"]["future_transition_pending"])
+
+            explicit = status_schedule(
+                store,
+                schedule_sha256=succ["schedule_sha256"],
+                activation_id="ACT-SUC",
+                data_root=data_root,
+                now=NOW,
+            )
+            self.assertEqual(explicit["activations"][0]["state"], "UNKNOWN")
+            self.assertTrue(explicit["activations"][0]["future_transition_pending"])
+            self.assertNotEqual(explicit["collector"]["activation_state"], "ACTIVE")
+
+            after = status_schedule(
+                store,
+                schedule_sha256=None,
+                activation_id=None,
+                data_root=data_root,
+                now=cutover,
+            )
+            after_by_id = {
+                row["activation_id"]: row for row in after["activations"]
+            }
+            self.assertEqual(after["terminal"], "STATUS")
+            self.assertEqual(after["collector"]["activation_id"], "ACT-SUC")
+            self.assertEqual(after["collector"]["activation_state"], "ACTIVE")
+            self.assertEqual(after_by_id["ACT-PRE"]["state"], "DRAINING")
+            self.assertNotIn("future_transition_pending", after_by_id["ACT-PRE"])
+            self.assertEqual(after_by_id["ACT-SUC"]["state"], "ACTIVE")
+            self.assertNotIn("future_transition_pending", after_by_id["ACT-SUC"])
+            self.assertEqual(
+                store.get_activation(pred["schedule_sha256"], "ACT-PRE")[
+                    "state"
+                ],
+                "DRAINING",
+            )
+            self.assertEqual(
+                store.get_activation(pred["schedule_sha256"], "ACT-PRE")[
+                    "last_transition_event_id"
+                ],
+                predecessor_event,
+            )
+            self.assertEqual(
+                store.get_activation(succ["schedule_sha256"], "ACT-SUC")[
+                    "state"
+                ],
+                "ACTIVE",
+            )
+            self.assertEqual(
+                store.get_activation(succ["schedule_sha256"], "ACT-SUC")[
+                    "last_transition_event_id"
+                ],
+                successor_event,
+            )
+            store.close()
+
     def test_past_rollover_cutover_requires_forward_successor(self) -> None:
         predecessor = _with_window(
             load_observation_schedule(

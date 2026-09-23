@@ -2346,7 +2346,10 @@ def status_schedule(
             activations = []
         else:
             activations = [row]
-    from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
+    from solana_alpha_lab.factory.collector_read_model import (
+        build_collector_read_model,
+        project_activation_as_of,
+    )
 
     clock = now or datetime.now(UTC)
     if clock.tzinfo is None:
@@ -2409,9 +2412,11 @@ def status_schedule(
 
     reported_activations: list[dict[str, Any]] = []
     for row in activations:
+        visible = project_activation_as_of(row, clock)
         row_schedule_sha256 = str(row.get("schedule_sha256") or "")
         row_activation_id = str(row.get("activation_id") or "")
-        projected_state = str(row.get("state") or "UNKNOWN")
+        projected_state = str(visible.get("state") or "UNKNOWN")
+        future_pending = visible.get("future_transition_pending") is True
         mask_state = (
             terminal == "STATUS_ACTIVATION_SELECTION_UNKNOWN"
             and projected_state in {"ACTIVE", "DRAINING"}
@@ -2426,8 +2431,10 @@ def status_schedule(
                 str(row.get("last_transition_event_id") or "") or "UNKNOWN"
             ),
         }
+        if future_pending:
+            activation_report["future_transition_pending"] = True
         if mask_state:
-            activation_report["projection_state"] = projected_state
+            activation_report["projection_state"] = str(row.get("state") or "UNKNOWN")
         reported_activations.append(activation_report)
     result = {
         "terminal": terminal,

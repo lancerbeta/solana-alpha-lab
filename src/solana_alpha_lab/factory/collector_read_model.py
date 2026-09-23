@@ -148,20 +148,19 @@ def _activation_selection_has_unknown_future(
         if not isinstance(payload, dict):
             payload = {}
         effective_raw = payload.get("transition_effective_at")
-        future_effective = False
-        current_state = str(row.get("state") or "")
         if effective_raw:
             try:
-                future_effective = parse_utc(str(effective_raw)) > clock
+                parse_utc(str(effective_raw))
             except (TypeError, ValueError):
                 return True
-            if future_effective:
-                prior_state = str(payload.get("prior_state") or "")
-                if prior_state in {"ACTIVE", "DRAINING"}:
-                    current_state = prior_state
-                else:
-                    unknown_future_transition = True
-                    continue
+        projected = project_activation_as_of(row, clock)
+        future_effective = projected.get("future_transition_pending") is True
+        current_state = str(
+            projected.get("state") if future_effective else row.get("state") or ""
+        )
+        if future_effective and current_state not in {"ACTIVE", "DRAINING"}:
+            unknown_future_transition = True
+            continue
         known_current_peer = known_current_peer or current_state in {
             "ACTIVE",
             "DRAINING",
@@ -175,6 +174,45 @@ def _activation_selection_has_unknown_future(
             if updated_at > clock and not future_effective:
                 return True
     return unknown_future_transition and not known_current_peer
+
+
+def project_activation_as_of(row: MappingLike, now: datetime) -> dict[str, Any]:
+    """Return the lifecycle state visible at ``now``.
+
+    Persisted bytes stay unchanged. A transition whose effective time is still
+    in the future keeps the prior ACTIVE or DRAINING state. Any other prior,
+    including an unregistered successor, is UNKNOWN until that effective time.
+    """
+
+    clock = now.astimezone(UTC) if now.tzinfo is not None else now.replace(tzinfo=UTC)
+    projected = dict(row)
+    payload = projected.get("payload")
+    if isinstance(payload, str):
+        try:
+            payload = json.loads(payload)
+        except (TypeError, ValueError):
+            return projected
+    if not isinstance(payload, dict):
+        return projected
+    effective_raw = payload.get("transition_effective_at")
+    if not effective_raw:
+        return projected
+    try:
+        effective_at = parse_utc(str(effective_raw))
+    except (TypeError, ValueError):
+        return projected
+    if effective_at <= clock:
+        projected.pop("future_transition_pending", None)
+        return projected
+    prior_state = str(payload.get("prior_state") or "")
+    if prior_state == "ACTIVE":
+        projected["state"] = "ACTIVE"
+    elif prior_state == "DRAINING":
+        projected["state"] = "DRAINING"
+    else:
+        projected["state"] = "UNKNOWN"
+    projected["future_transition_pending"] = True
+    return projected
 
 
 def select_current_activation(
@@ -216,35 +254,19 @@ def select_current_activation(
             return None
     rows: list[dict[str, Any]] = []
     for raw in activations:
-        row = dict(raw)
-        if clock is not None:
-            payload = row.get("payload")
-            if isinstance(payload, str):
-                try:
-                    payload = json.loads(payload)
-                except (TypeError, ValueError):
-                    payload = None
-            if isinstance(payload, dict):
-                effective_raw = payload.get("transition_effective_at")
-                if effective_raw:
-                    try:
-                        effective_at = parse_utc(str(effective_raw))
-                    except (TypeError, ValueError):
-                        effective_at = None
-                    if effective_at is not None and effective_at > clock:
-                        prior_state = str(payload.get("prior_state") or "")
-                        if prior_state in {"ACTIVE", "DRAINING"}:
-                            row["state"] = prior_state
-                            row["future_transition_pending"] = True
-                            row["selection_updated_at"] = render_utc(clock)
-                            created_raw = row.get("created_at")
-                            try:
-                                if created_raw and parse_utc(str(created_raw)) > clock:
-                                    row["selection_created_at"] = render_utc(clock)
-                            except (TypeError, ValueError):
-                                return None
-                        else:
-                            continue
+        row = project_activation_as_of(raw, clock) if clock is not None else dict(raw)
+        if (
+            clock is not None
+            and row.get("future_transition_pending") is True
+            and str(row.get("state") or "") in {"ACTIVE", "DRAINING"}
+        ):
+            row["selection_updated_at"] = render_utc(clock)
+            created_raw = row.get("created_at")
+            try:
+                if created_raw and parse_utc(str(created_raw)) > clock:
+                    row["selection_created_at"] = render_utc(clock)
+            except (TypeError, ValueError):
+                return None
         rows.append(row)
     if family_key is not None:
         rows = [
