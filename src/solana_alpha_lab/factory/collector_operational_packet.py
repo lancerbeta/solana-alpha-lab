@@ -1142,7 +1142,7 @@ def build_collector_operational_packet(
     )
     all_activations = activation_rows_with_family_keys(store, store.list_activations())
     continuity_selection_ambiguous = (
-        activation_selection_status(all_activations) == "AMBIGUOUS"
+        activation_selection_status(all_activations, now=clock) == "AMBIGUOUS"
     )
     continuity_selection_unknown = (
         activation_selection_status(all_activations, now=clock) == "UNKNOWN"

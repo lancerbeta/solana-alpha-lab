@@ -324,6 +324,34 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
         self.assertEqual(selected["activation_id"], "ACT-CURRENT")
         self.assertEqual(selected["state"], "ACTIVE")
 
+    def test_future_other_family_is_not_a_second_live_family(self) -> None:
+        now = datetime(2026, 9, 1, 0, 10, tzinfo=UTC)
+        rows = [
+            {
+                "activation_id": "ACT-CURRENT",
+                "state": "ACTIVE",
+                "cohort_family_key": "FAMILY-A",
+                "updated_at": "2026-09-01T00:00:00Z",
+                "created_at": "2026-08-31T23:00:00Z",
+            },
+            {
+                "activation_id": "ACT-FUTURE-OTHER",
+                "state": "ACTIVE",
+                "cohort_family_key": "FAMILY-B",
+                "updated_at": "2026-09-01T00:09:00Z",
+                "created_at": "2026-09-01T00:09:00Z",
+                "payload": {
+                    "prior_state": "UNREGISTERED",
+                    "transition_effective_at": "2026-09-01T00:20:00Z",
+                },
+            },
+        ]
+        self.assertEqual(activation_selection_status(rows, now=now), "SCOPED")
+        self.assertEqual(activation_selection_status(rows), "AMBIGUOUS")
+        selected = select_current_activation(rows, now=now)
+        assert selected is not None
+        self.assertEqual(selected["activation_id"], "ACT-CURRENT")
+
     def test_due_pressure_ignores_historical_backlog_when_one_active_is_current(self) -> None:
         from solana_alpha_lab.factory.observation_schedule import (
             load_observation_schedule,
