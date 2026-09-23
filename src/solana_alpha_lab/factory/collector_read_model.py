@@ -83,6 +83,40 @@ def activation_rows_with_family_keys(
     return enriched
 
 
+_CURRENT_LIVE_STATES = frozenset({"ACTIVE", "DRAINING"})
+
+
+def _as_of_rows(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    now: datetime | None,
+) -> list[dict[str, Any]]:
+    if now is None:
+        return [dict(row) for row in activations]
+    clock = now.astimezone(UTC) if now.tzinfo is not None else now.replace(tzinfo=UTC)
+    return [project_activation_as_of(row, clock) for row in activations]
+
+
+def _current_live_family_status(rows: list[MappingLike] | tuple[MappingLike, ...]) -> str:
+    """Scope ambiguity only across rows that are live after as-of projection."""
+
+    live = [
+        row
+        for row in rows
+        if str(row.get("state") or "") in _CURRENT_LIVE_STATES
+    ]
+    if not live:
+        return "NO_LIVE" if rows else "EMPTY"
+    family_keys = {
+        str(row.get("cohort_family_key") or "")
+        for row in live
+        if str(row.get("cohort_family_key") or "")
+    }
+    missing_family = any(not str(row.get("cohort_family_key") or "") for row in live)
+    if missing_family or len(family_keys) != 1:
+        return "AMBIGUOUS"
+    return "SCOPED"
+
+
 def activation_selection_status(
     activations: list[MappingLike] | tuple[MappingLike, ...],
     *,
@@ -92,8 +126,9 @@ def activation_selection_status(
     """Classify whether current-activation selection has a safe scope.
 
     An explicit non-empty family key is a caller-provided scope.  Without one,
-    every row must carry the same canonical family identity.  Missing family
-    identity is ambiguity, not evidence that the activation set is empty.
+    only as-of ACTIVE/DRAINING rows must share one canonical family.  Historical
+    terminal rows from other families do not create scope ambiguity, and a set
+    with no live row stays a no-live projection instead of AMBIGUOUS.
     """
 
     candidates = (
@@ -111,19 +146,7 @@ def activation_selection_status(
         return "UNKNOWN"
     if family_key:
         return "SCOPED"
-    if not activations:
-        return "EMPTY"
-    family_keys = {
-        str(row.get("cohort_family_key") or "")
-        for row in activations
-        if str(row.get("cohort_family_key") or "")
-    }
-    has_unscoped_rows = any(
-        not str(row.get("cohort_family_key") or "") for row in activations
-    )
-    if has_unscoped_rows or len(family_keys) != 1:
-        return "AMBIGUOUS"
-    return "SCOPED"
+    return _current_live_family_status(_as_of_rows(candidates, now))
 
 
 def _activation_selection_has_unknown_future(
@@ -628,6 +651,13 @@ def build_collector_read_model(
         payload = call.get("payload") or {}
         if isinstance(payload, str):
             continue
+        if isinstance(payload, dict) and (digest or act_id):
+            call_digest = str(payload.get("schedule_sha256") or "")
+            call_activation = str(payload.get("activation_id") or "")
+            if call_digest and digest and call_digest != digest:
+                continue
+            if call_activation and act_id and call_activation != act_id:
+                continue
         updated = _safe_parse(call.get("updated_at") or call.get("created_at"))
         if updated is None:
             current_state_calls.append(call)
