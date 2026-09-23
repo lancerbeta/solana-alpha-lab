@@ -1,31 +1,33 @@
 {
-  "as_of": "2026-09-22",
+  "as_of": "2026-09-24",
   "capability_radar": {
     "now": "NONE",
     "watch": "LIVE_COLLECTOR_READBACK_AFTER_OWNER_DEPLOY"
   },
   "dimensions": {
-    "build_vs_buy": "PENDING_FINAL_BINDING",
-    "context_efficiency": "PENDING_FINAL_BINDING",
-    "execution_to_cashflow": "PENDING_FINAL_BINDING",
-    "flexibility_and_history": "PENDING_FINAL_BINDING",
-    "mission": "PENDING_FINAL_BINDING",
-    "monitoring_and_recovery": "PENDING_FINAL_BINDING",
-    "owner_operability": "PENDING_FINAL_BINDING",
-    "red_team": "PENDING_FINAL_BINDING",
-    "research_truth": "PENDING_FINAL_BINDING",
-    "security": "PENDING_FINAL_BINDING"
+    "build_vs_buy": "REUSE_EXISTING_LIFECYCLE_AND_STORE",
+    "context_efficiency": "TARGETED_SUITES_ONLY",
+    "execution_to_cashflow": "STOPPED_BEFORE_DEPLOY",
+    "flexibility_and_history": "ZIP64_LINEAGE_PRESERVED_NO_HISTORY_REWRITE",
+    "mission": "BOUNDED_LIVE_LINEAGE_HOTFIX",
+    "monitoring_and_recovery": "DRAINING_STOP_AND_POST_CUTOVER_DRAIN_PRESERVED",
+    "owner_operability": "STATUS_AS_OF_FAILS_CLOSED_BEFORE_EFFECTIVE_TIME",
+    "red_team": "FUTURE_SUCCESSOR_NOT_SHOWN_ACTIVE",
+    "research_truth": "SQLITE_REMAINS_PROJECTION",
+    "security": "NO_CREDENTIAL_OR_AUTHORITY_CHANGE"
   },
   "limits": [
-    "PENDING_FINAL_BINDING"
+    "NO_DEPLOY",
+    "NO_PROVIDER",
+    "NO_VPS"
   ],
   "mode": "FULL_REVIEW",
-  "recovery": "PENDING_FINAL_BINDING",
+  "recovery": "REVERT_CANDIDATE_BEFORE_ANY_DEPLOY",
   "review_id": "COLLECTOR-CONTINUITY-LIVE-BACKPORT-FACTORY-FIT-001",
-  "reviewed_bindings_sha256": "UNBOUND",
-  "reviewed_inventory_sha256": "UNBOUND",
+  "reviewed_bindings_sha256": "31b34f08495d51054ecec8605ef0ca9c47076364d62f71d0f0c30c1d918c1eff",
+  "reviewed_inventory_sha256": "b1ece6ec8918ae686869bd222d5f37b929ce2fb6fc5ec8619b9e0ae191614ec7",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "COLLECTOR_CONTINUITY_LIVE_BACKPORT_V1",
-  "verdict": "NOT_READY"
+  "verdict": "PASS"
 }

@@ -1,12 +1,12 @@
 {
-  "as_of": "2026-09-22",
+  "as_of": "2026-09-24",
   "non_claims": [
+    "NO_CANONICAL_DONE",
     "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
-    "NO_LIVE_PROVIDER_CALLS",
     "NO_LIVE_DEPLOYMENT_OR_COMMISSIONING",
+    "NO_LIVE_PROVIDER_CALLS",
     "NO_OBSERVATION_SCHEDULE_AUTHORIZE_OR_ACTIVATE",
-    "NO_SCIENTIFIC_OUTCOME_OR_ALPHA",
-    "NO_CANONICAL_DONE"
+    "NO_SCIENTIFIC_OUTCOME_OR_ALPHA"
   ],
   "required_roles": [
     "ARCHITECTURE_CRITIC",
@@ -14,27 +14,33 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "COLLECTOR-CONTINUITY-LIVE-BACKPORT-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "UNBOUND",
-  "reviewed_inventory_sha256": "UNBOUND",
+  "reviewed_bindings_sha256": "31b34f08495d51054ecec8605ef0ca9c47076364d62f71d0f0c30c1d918c1eff",
+  "reviewed_inventory_sha256": "b1ece6ec8918ae686869bd222d5f37b929ce2fb6fc5ec8619b9e0ae191614ec7",
   "reviews": [
     {
-      "findings": ["REVIEW_PENDING_FINAL_BINDING"],
-      "role": "CODE_REVIEWER",
-      "verdict": "NOT_READY"
-    },
-    {
-      "findings": ["REVIEW_PENDING_FINAL_BINDING"],
-      "role": "GOAL_DOD_CRITIC",
-      "verdict": "NOT_READY"
-    },
-    {
-      "findings": ["REVIEW_PENDING_FINAL_BINDING"],
+      "findings": [
+        "packet_fingerprint_sha256=5ec82d0cf4d042dbfaeeed4d38c7d968eb03533eb3e7dfa43aeb0edf67cbcb43"
+      ],
       "role": "ARCHITECTURE_CRITIC",
-      "verdict": "NOT_READY"
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "NO_MATERIAL_DEFECT"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "NO_MATERIAL_GAP"
+      ],
+      "role": "GOAL_DOD_CRITIC",
+      "verdict": "PASS"
     }
   ],
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "task_id": "COLLECTOR_CONTINUITY_LIVE_BACKPORT_V1",
-  "verdict": "NOT_READY"
+  "verdict": "PASS"
 }
