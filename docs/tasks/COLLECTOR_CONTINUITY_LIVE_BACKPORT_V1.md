@@ -36,8 +36,10 @@ managed_write_set:
   - src/solana_alpha_lab/factory/research_store.py
   - src/solana_alpha_lab/factory/remote_ops.py
   - src/solana_alpha_lab/factory/observation_schedule.py
+  - src/solana_alpha_lab/factory/observation_scheduler.py
   - scripts/observation_schedule.py
   - tests/test_collector_campaign_continuity_repair_v1.py
+  - tests/test_observation_schedule_lifecycle.py
   - tests/test_collector_continuity_boundaries_v1.py
   - tests/test_mutable_backup_zip64_repair_v1.py
   - docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md
@@ -122,9 +124,11 @@ context_requirements:
   harness receipts, proposed deploy/restart/rollback method, and an explicit
   stop before the separate owner deploy gate.
 - **Non-goals:** No VPS mutation or deploy, provider/credential action,
-  authorize/activate, new PR, scientific trial or alpha claim, `SOURCE_DATA_STALE`
-  semantic change, managed-write-set expansion, or `observation_scheduler.py`
-  edit.
+  authorize/activate, scientific trial or alpha claim, or `SOURCE_DATA_STALE`
+  semantic change. The only write-set additions are the owner-authorized
+  pre-cutover `DRAINING` operational-stop seam in `observation_scheduler.py`
+  and the already-required `tests/test_observation_schedule_lifecycle.py`
+  proof adaptation. No other scheduler behavior changes.
 - **Evidence budget:** One candidate on the exact live parent, the listed
   targeted suites, ZIP64 regression, three required independent review roles,
   targeted Catalog propagation, then exact-head harness CI/readiness. Run any

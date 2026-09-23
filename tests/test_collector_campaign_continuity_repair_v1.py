@@ -3013,6 +3013,317 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         self.assertIn("SOURCE_DATA_STALE", found)
         self.assertIn("CAMPAIGN_SUCCESSOR_REQUIRED", found)
 
+    def test_draining_pre_cutover_stop_keeps_lifecycle_and_skips_repeat_discovery(
+        self,
+    ) -> None:
+        predecessor = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        successor = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+        )
+        cutover = "2026-09-01T06:00:00Z"
+        first_tick = datetime(2026, 9, 1, 1, 0, tzinfo=UTC)
+        second_tick = datetime(2026, 9, 1, 2, 0, tzinfo=UTC)
+        after_cutover = datetime(2026, 9, 1, 6, 30, tzinfo=UTC)
+        sell = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001"
+        due_mint = "MintDrain11111111111111111111111111111111"
+        hold_mint = "MintHold111111111111111111111111111111111"
+
+        class _Opener:
+            def __init__(self) -> None:
+                self.urls: list[str] = []
+
+            def open(self, url: str) -> dict:
+                self.urls.append(url)
+                if "/swap/v2/order" in url:
+                    return {"http_status": 200, "body": {"outAmount": "9900000"}}
+                return {"http_status": 200, "body": []}
+
+        def _proof(row: dict) -> tuple[str, str, str]:
+            payload = row["payload"]
+            return (
+                str(row["state"]),
+                str(row["last_transition_event_id"]),
+                str(payload["transition_event_id"]),
+            )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            self.addCleanup(store.close)
+
+            def _bind(document: dict, activation_id: str, target_store, target_root: Path):
+                registered, authority = _register_and_authorize(
+                    target_store, target_root, document
+                )
+                target_store.upsert_activation(
+                    {
+                        "schedule_sha256": registered["schedule_sha256"],
+                        "activation_id": activation_id,
+                        "schedule_key": document["schedule_key"],
+                        "state": "ACTIVE",
+                        "authority_receipt_sha256": authority["receipt_sha256"],
+                        "starts_at": document["activation"]["starts_at"],
+                        "stops_admitting_at": document["activation"][
+                            "stops_admitting_at"
+                        ],
+                        "payload": {},
+                    },
+                    clock=NOW,
+                )
+                return registered
+
+            registered = _bind(predecessor, "ACT-PRE", store, data_root)
+            _bind(successor, "ACT-SUC", store, data_root)
+            current = store.get_activation(registered["schedule_sha256"], "ACT-PRE")
+            assert current is not None
+            store.persist_rollover(
+                predecessor_schedule_sha256=predecessor["schedule_sha256"],
+                predecessor_activation_id="ACT-PRE",
+                successor_schedule_sha256=successor["schedule_sha256"],
+                successor_activation_id="ACT-SUC",
+                cutover_at=cutover,
+                authority_receipt_sha256=str(current["authority_receipt_sha256"]),
+                clock=NOW,
+            )
+            store.transition_activation(
+                schedule_sha256=predecessor["schedule_sha256"],
+                activation_id="ACT-PRE",
+                new_state="DRAINING",
+                clock=NOW,
+            )
+            drained = store.get_activation(predecessor["schedule_sha256"], "ACT-PRE")
+            assert drained is not None
+            original_proof = _proof(drained)
+            with self.assertRaisesRegex(
+                ObservationScheduleStoreError, "DENY_RETROACTIVE_MUTATION"
+            ):
+                store.upsert_activation(
+                    {
+                        "schedule_sha256": predecessor["schedule_sha256"],
+                        "activation_id": "ACT-PRE",
+                        "schedule_key": drained["schedule_key"],
+                        "state": "BLOCKED_BUDGET",
+                        "authority_receipt_sha256": drained.get(
+                            "authority_receipt_sha256"
+                        ),
+                        "starts_at": drained["starts_at"],
+                        "stops_admitting_at": drained["stops_admitting_at"],
+                        "payload": {"reason": "BLOCKED_BUDGET"},
+                    },
+                    clock=first_tick,
+                )
+            store.save_lifetime(
+                schedule_sha256=predecessor["schedule_sha256"],
+                activation_id="ACT-PRE",
+                provider_calls=int(
+                    predecessor["budgets"]["provider_calls_lifetime_max"]
+                ),
+                canonical_bytes=0,
+                clock=first_tick,
+            )
+            opener = _Opener()
+            discover_calls = {"n": 0}
+            from solana_alpha_lab.factory import observation_scheduler as scheduler_mod
+
+            real_discover = scheduler_mod._discover
+
+            def _counting_discover(*args, **kwargs):
+                discover_calls["n"] += 1
+                return real_discover(*args, **kwargs)
+
+            with patch.object(scheduler_mod, "_discover", _counting_discover):
+                first = tick_once(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule=predecessor,
+                    activation_id="ACT-PRE",
+                    now=first_tick,
+                    opener=opener,
+                    producer_git_sha=GIT,
+                )
+                self.assertEqual(first["terminal"], "BLOCKED_BUDGET")
+                self.assertEqual(first["activation_state"], "DRAINING")
+                self.assertEqual(discover_calls["n"], 1)
+                self.assertEqual(opener.urls, [])
+                held = store.get_activation(predecessor["schedule_sha256"], "ACT-PRE")
+                assert held is not None
+                self.assertEqual(_proof(held), original_proof)
+                self.assertEqual(
+                    held["payload"]["pre_cutover_operational_stop"],
+                    "BLOCKED_BUDGET",
+                )
+                store.save_lifetime(
+                    schedule_sha256=predecessor["schedule_sha256"],
+                    activation_id="ACT-PRE",
+                    provider_calls=0,
+                    canonical_bytes=0,
+                    clock=second_tick,
+                )
+                second = tick_once(
+                    root=ROOT,
+                    data_root=data_root,
+                    store=store,
+                    schedule=predecessor,
+                    activation_id="ACT-PRE",
+                    now=second_tick,
+                    opener=opener,
+                    producer_git_sha=GIT,
+                )
+                self.assertEqual(second["terminal"], "BLOCKED_BUDGET")
+                self.assertEqual(second["provider_calls"], 0)
+                self.assertEqual(discover_calls["n"], 1)
+                self.assertEqual(opener.urls, [])
+                still = store.get_activation(predecessor["schedule_sha256"], "ACT-PRE")
+                assert still is not None
+                self.assertEqual(_proof(still), original_proof)
+
+            for entity, due_at in (
+                (due_mint, "2026-09-01T06:10:00Z"),
+                (hold_mint, "2026-09-01T08:00:00Z"),
+            ):
+                store.insert_due(
+                    {
+                        "schedule_sha256": predecessor["schedule_sha256"],
+                        "activation_id": "ACT-PRE",
+                        "entity_id": entity,
+                        "point_id": "Y900",
+                        "primitive_id": sell,
+                        "state": "PENDING",
+                        "due_at": due_at,
+                        "deadline_at": "2026-09-01T09:00:00Z",
+                        "payload": {"buy_out_amount": "9900000"},
+                    },
+                    clock=after_cutover,
+                )
+            drained_tick = tick_once(
+                root=ROOT,
+                data_root=data_root,
+                store=store,
+                schedule=predecessor,
+                activation_id="ACT-PRE",
+                now=after_cutover,
+                opener=opener,
+                producer_git_sha=GIT,
+                discovery_rows=[],
+            )
+            self.assertEqual(discover_calls["n"], 1)
+            self.assertTrue(any("/swap/v2/order" in url for url in opener.urls))
+            self.assertNotEqual(drained_tick["terminal"], "DENY_RETROACTIVE_MUTATION")
+            observed = store.get_due(
+                {
+                    "schedule_sha256": predecessor["schedule_sha256"],
+                    "activation_id": "ACT-PRE",
+                    "entity_id": due_mint,
+                    "point_id": "Y900",
+                    "primitive_id": sell,
+                }
+            )
+            assert observed is not None
+            self.assertEqual(observed["state"], "OBSERVED")
+            after = store.get_activation(predecessor["schedule_sha256"], "ACT-PRE")
+            assert after is not None
+            self.assertEqual(after["state"], "DRAINING")
+            self.assertEqual(_proof(after), original_proof)
+            self.assertEqual(
+                after["payload"]["pre_cutover_operational_stop"],
+                "BLOCKED_BUDGET",
+            )
+
+            safety_calls = {"n": 0}
+
+            def _safety_discover(*args, **kwargs):
+                safety_calls["n"] += 1
+                if safety_calls["n"] > 1:
+                    raise AssertionError("repeated pre-cutover discovery")
+                return (
+                    [],
+                    "CHANGE_LANE_SAFETY_CONTRACT_GAP",
+                    0,
+                    None,
+                    False,
+                    {},
+                )
+
+            safety_doc = predecessor
+            safety_successor = successor
+            safety_root = Path(tmp) / "safety"
+            safety_data = safety_root / "rdp"
+            safety_data.mkdir(parents=True)
+            safety_store = ObservationScheduleStore(safety_root / "ops.sqlite")
+            self.addCleanup(safety_store.close)
+            safety_registered = _bind(
+                safety_doc, "ACT-SAFE", safety_store, safety_data
+            )
+            _bind(safety_successor, "ACT-SAFE-SUC", safety_store, safety_data)
+            safety_row = safety_store.get_activation(
+                safety_registered["schedule_sha256"], "ACT-SAFE"
+            )
+            assert safety_row is not None
+            safety_store.persist_rollover(
+                predecessor_schedule_sha256=safety_doc["schedule_sha256"],
+                predecessor_activation_id="ACT-SAFE",
+                successor_schedule_sha256=safety_successor["schedule_sha256"],
+                successor_activation_id="ACT-SAFE-SUC",
+                cutover_at=cutover,
+                authority_receipt_sha256=str(safety_row["authority_receipt_sha256"]),
+                clock=NOW,
+            )
+            safety_store.transition_activation(
+                schedule_sha256=safety_doc["schedule_sha256"],
+                activation_id="ACT-SAFE",
+                new_state="DRAINING",
+                clock=NOW,
+            )
+            safety_drained = safety_store.get_activation(
+                safety_doc["schedule_sha256"], "ACT-SAFE"
+            )
+            assert safety_drained is not None
+            safety_proof = _proof(safety_drained)
+            with patch.object(scheduler_mod, "_discover", _safety_discover):
+                safety_first = tick_once(
+                    root=ROOT,
+                    data_root=safety_root / "rdp",
+                    store=safety_store,
+                    schedule=safety_doc,
+                    activation_id="ACT-SAFE",
+                    now=first_tick,
+                    opener=_Opener(),
+                    producer_git_sha=GIT,
+                )
+                safety_second = tick_once(
+                    root=ROOT,
+                    data_root=safety_root / "rdp",
+                    store=safety_store,
+                    schedule=safety_doc,
+                    activation_id="ACT-SAFE",
+                    now=second_tick,
+                    opener=_Opener(),
+                    producer_git_sha=GIT,
+                )
+            self.assertEqual(
+                safety_first["terminal"], "CHANGE_LANE_SAFETY_CONTRACT_GAP"
+            )
+            self.assertEqual(safety_first["activation_state"], "DRAINING")
+            self.assertEqual(
+                safety_second["terminal"], "CHANGE_LANE_SAFETY_CONTRACT_GAP"
+            )
+            self.assertEqual(safety_calls["n"], 1)
+            safety_held = safety_store.get_activation(
+                safety_doc["schedule_sha256"], "ACT-SAFE"
+            )
+            assert safety_held is not None
+            self.assertEqual(_proof(safety_held), safety_proof)
+            self.assertEqual(
+                safety_held["payload"]["pre_cutover_operational_stop"],
+                "CHANGE_LANE_SAFETY_CONTRACT_GAP",
+            )
+            store.close()
+            safety_store.close()
+
 
 if __name__ == "__main__":
     unittest.main()

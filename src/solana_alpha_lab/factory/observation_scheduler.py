@@ -77,6 +77,13 @@ OWNER = "tick-once"
 RECOVERED_CLAIMED_PAGE_SIZE = 256
 SEARCH = "PRIM-JUPITER-TOKENS-V2-SEARCH-001"
 DISCOVERY = "PRIM-JUPITER-TOKENS-V2-RECENT-001"
+# Operational stops that the unchanged discovery path used to write as
+# activation.state. A DRAINING row cannot accept that write. The marker stays
+# in the existing payload and does not replace lifecycle state or transition proof.
+_PRE_CUTOVER_OPERATIONAL_STOPS = frozenset(
+    {"BLOCKED_BUDGET", "CHANGE_LANE_SAFETY_CONTRACT_GAP"}
+)
+_PRE_CUTOVER_OPERATIONAL_STOP_KEY = "pre_cutover_operational_stop"
 DEPENDENT_SELL = "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001"
 QUOTE_BUY = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-001"
 BUY_1M = "PRIM-JUPITER-SWAP-V2-QUOTE-BUY-1M-001"
@@ -1025,6 +1032,51 @@ def _discover(
     )
 
 
+def _activation_payload(activation: Mapping[str, Any]) -> dict[str, Any]:
+    payload = activation.get("payload") or {}
+    if isinstance(payload, str):
+        payload = json.loads(payload)
+    if not isinstance(payload, Mapping):
+        return {}
+    return dict(payload)
+
+
+def _pre_cutover_operational_stop(activation: Mapping[str, Any]) -> str | None:
+    if str(activation.get("state") or "") != "DRAINING":
+        return None
+    marker = _activation_payload(activation).get(_PRE_CUTOVER_OPERATIONAL_STOP_KEY)
+    if marker in _PRE_CUTOVER_OPERATIONAL_STOPS:
+        return str(marker)
+    return None
+
+
+def _persist_draining_pre_cutover_stop(
+    store: ObservationScheduleStore,
+    activation: Mapping[str, Any],
+    stop_reason: str,
+    *,
+    clock: datetime,
+) -> None:
+    """Record a discovery stop on a DRAINING row without a lifecycle transition."""
+
+    payload = _activation_payload(activation)
+    payload[_PRE_CUTOVER_OPERATIONAL_STOP_KEY] = stop_reason
+    store.upsert_activation(
+        {
+            "schedule_sha256": activation["schedule_sha256"],
+            "activation_id": activation["activation_id"],
+            "schedule_key": activation["schedule_key"],
+            "state": "DRAINING",
+            "authority_receipt_sha256": activation.get("authority_receipt_sha256"),
+            "starts_at": activation["starts_at"],
+            "stops_admitting_at": activation["stops_admitting_at"],
+            "last_transition_event_id": activation.get("last_transition_event_id"),
+            "payload": payload,
+        },
+        clock=clock,
+    )
+
+
 def tick_once(
     *,
     root,
@@ -1197,6 +1249,17 @@ def tick_once(
             or (state == "DRAINING" and predecessor_before_cutover)
         )
         poll_enabled = bool(schedule.get("source_poll", {}).get("enabled", True))
+        if state == "DRAINING" and predecessor_before_cutover:
+            current_activation = store.get_activation(digest, activation_id) or activation
+            held_stop = _pre_cutover_operational_stop(current_activation)
+            if held_stop is not None:
+                return {
+                    "terminal": held_stop,
+                    "provider_calls": 0,
+                    "credential_reads": 0,
+                    "source_poll_reused": False,
+                    "activation_state": "DRAINING",
+                }
         matured_due_count = store.count_due_in_states(
             ("PENDING", "DUE", "CLAIMED"),
             schedule_sha256=digest,
@@ -1248,7 +1311,24 @@ def tick_once(
                 )
             if holder_disc is not None:
                 redact_with = holder_disc
-            if stop_reason in {"BLOCKED_BUDGET", "CHANGE_LANE_SAFETY_CONTRACT_GAP"}:
+            if stop_reason in _PRE_CUTOVER_OPERATIONAL_STOPS:
+                if state == "DRAINING":
+                    current_activation = (
+                        store.get_activation(digest, activation_id) or activation
+                    )
+                    _persist_draining_pre_cutover_stop(
+                        store,
+                        current_activation,
+                        stop_reason,
+                        clock=now,
+                    )
+                    return {
+                        "terminal": stop_reason,
+                        "provider_calls": accounts.tick_calls,
+                        "credential_reads": credential_reads,
+                        "source_poll_reused": source_poll_reused,
+                        "activation_state": "DRAINING",
+                    }
                 store.upsert_activation(
                     {
                         "schedule_sha256": digest,
