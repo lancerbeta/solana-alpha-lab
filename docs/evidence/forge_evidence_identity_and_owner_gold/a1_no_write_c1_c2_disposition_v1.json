@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-23",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "24468a34856c2bef4f4caec68c0c673573dd8c60",
+  "git_head": "ef4997d31e320b5390d3077290e67875270ed406",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -18,12 +18,12 @@
     "REL-20260909T111900Z-20260916T111900Z"
   ],
   "current_market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
-  "capability_epoch_sha256": "114623c29589e149c791491fb54732f91b0d530c799eef33401168a360c67e0a",
+  "capability_epoch_sha256": "447e6e1f7e872ebb2d907e5174e81d5cee0228914ef57abc77f00c8e7563f429",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
     "blocking_reason_codes": [],
-    "receipt_sha256": "af5b740e90baf5e2da6dd931638c6b4c2d71186f5729f209edb4ee656563e3a3"
+    "receipt_sha256": "0fa4b267e783c8899233dbc9a68bf9cca5b79ffbc589af056160f5c270d17940"
   },
   "inventory_sha256_prefix_before": "defbc9a5a1794b05",
   "inventory_sha256_prefix_after": "defbc9a5a1794b05",
@@ -272,24 +272,24 @@
     }
   ],
   "first_run": {
-    "next_action": "START_NEW_SESSION",
+    "next_action": "START_BASE",
     "blocking_reason_codes": [
-      "BLOCK_FORGE_SELECTION_RISK"
+      "CONTROL_SURFACE_REQUIRED"
     ],
     "owner_final": null,
     "selected_ordinary_base_session_id": null,
     "market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
-    "scientific_slot_sha256": null,
+    "scientific_slot_sha256": "212149f7d9afdcffa3dc7a0df69f8f53bea0af080722c4f2cc5cc05813a5299c",
     "router_decision": "BLOCK_FORGE_SELECTION_RISK",
     "selection_reason": "SINGLE_COMMISSIONED",
     "current_market_occupancy": 0,
-    "capability_epoch_sha256": "114623c29589e149c791491fb54732f91b0d530c799eef33401168a360c67e0a",
+    "capability_epoch_sha256": "447e6e1f7e872ebb2d907e5174e81d5cee0228914ef57abc77f00c8e7563f429",
     "selection_caveat": true,
     "full_lifecycle_equivalent": false,
     "owner_next": "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
     "preflight_terminal": "NO_GIT_FAST_LANE_PROVEN",
-    "preflight_receipt_sha256": "10a333bb26eb5053e86570b51e11689d299d65a89529f8044565775f2d910ef9",
-    "receipt_sha256": "10a333bb26eb5053e86570b51e11689d299d65a89529f8044565775f2d910ef9"
+    "preflight_receipt_sha256": "33b227bb6a263f882c7a7bd5f97e32e914dca582b6b86e34add0bd2715f5616e",
+    "receipt_sha256": "451fee977d5d653d49f414240926d7c17dca055f766420afd705579d437e9424"
   },
   "disposition_summary": [
     {
