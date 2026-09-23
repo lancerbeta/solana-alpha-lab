@@ -313,6 +313,32 @@ class HficCliContractTests(unittest.TestCase):
                 if terminal == "SEARCH_BUDGET_EXHAUSTED":
                     self.assertIn("не сбрасывайте budget", readout)
 
+    def test_selection_gate_integrity_stop_routes_outside_a5_without_trial(self) -> None:
+        for terminal in (
+            "SELECTION_GATE_RECEIPT_UNUSABLE",
+            "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
+        ):
+            with self.subTest(terminal=terminal):
+                readout = _preflight_owner_readout(
+                    {
+                        "terminal": terminal,
+                        "owner_class": "OBSERVABILITY_BLOCKED",
+                        "writes": {
+                            "research_store": 0,
+                            "forge_context": 0,
+                            "session": 0,
+                        },
+                    }
+                )
+                self.assertIn("RESTORE_SELECTION_GATE", readout)
+                self.assertIn(
+                    "docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md",
+                    readout,
+                )
+                self.assertIn("не запускайте diagnostic в рамках A5", readout)
+                self.assertIn("не создавайте trial", readout)
+                self.assertIn("не сбрасывайте budget", readout)
+
     def test_preflight_accepts_multiline_owner_focus_without_legacy_admission(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"

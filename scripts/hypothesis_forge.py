@@ -260,9 +260,12 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
         "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
     }:
         next_line = (
-            "next: RESTORE_SELECTION_GATE — восстановите authoritative "
-            "selection-gate receipt и его input identity, затем повторите "
-            "canonical preflight; не создавайте trial и не сбрасывайте budget"
+            "next: RESTORE_SELECTION_GATE — STOP; не создавайте trial, "
+            "не сбрасывайте budget и не редактируйте receipt. Следуйте "
+            "owning procedure "
+            "docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md "
+            "только после отдельной авторизации; не запускайте diagnostic "
+            "в рамках A5. После восстановления повторите canonical preflight"
         )
     elif terminal == "SEARCH_BUDGET_EXHAUSTED":
         next_line = (

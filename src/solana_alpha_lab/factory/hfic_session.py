@@ -683,10 +683,26 @@ def bind_preflight_receipt(
     expected_hash = canonical_preflight_receipt_sha256(receipt)
     if observed_hash != expected_hash:
         raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
-    if draft.get("preflight_receipt_id") != receipt.get("receipt_id"):
-        raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
-    if draft.get("preflight_receipt_sha256") != observed_hash:
-        raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
+    if action == "RESUME_EXISTING_SESSION":
+        # A generated draft is immutable across restart. Its reference points
+        # to the original preflight, while this newly issued receipt records
+        # the verified restart/readback. Persist both links; never rewrite the
+        # draft merely to make its bytes resemble the restart receipt.
+        source_receipt_id = receipt.get(
+            "generated_draft_source_preflight_receipt_id"
+        )
+        source_receipt_hash = receipt.get(
+            "generated_draft_source_preflight_receipt_sha256"
+        )
+        if draft.get("preflight_receipt_id") != source_receipt_id:
+            raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+        if draft.get("preflight_receipt_sha256") != source_receipt_hash:
+            raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
+    else:
+        if draft.get("preflight_receipt_id") != receipt.get("receipt_id"):
+            raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+        if draft.get("preflight_receipt_sha256") != observed_hash:
+            raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
     _authority_zero(receipt.get("authority"))
     _authority_zero(draft.get("authority"))
     commissioning = receipt.get("commissioning")
@@ -2994,6 +3010,20 @@ def persist_generated_draft(
     receipt["ladder_representation_id"] = representation_id
     if model_provenance_sha256 is not None:
         receipt["model_provenance_sha256"] = model_provenance_sha256
+    source_receipt_id = receipt.get("receipt_id")
+    source_receipt_hash = receipt.get("preflight_receipt_sha256")
+    if not isinstance(source_receipt_id, str) or not source_receipt_id:
+        raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+    if (
+        not isinstance(source_receipt_hash, str)
+        or re.fullmatch(r"[0-9a-f]{64}", source_receipt_hash) is None
+        or source_receipt_hash != canonical_preflight_receipt_sha256(preflight_receipt)
+    ):
+        raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
+    if draft.get("preflight_receipt_id") != source_receipt_id:
+        raise HficSessionError("PREFLIGHT_RECEIPT_ID_MISMATCH")
+    if draft.get("preflight_receipt_sha256") != source_receipt_hash:
+        raise HficSessionError("PREFLIGHT_RECEIPT_HASH_MISMATCH")
     fields = _execution_identity_fields(receipt)
     slot = fields.get("scientific_slot_sha256")
     if not isinstance(slot, str) or len(slot) != 64:
@@ -3050,6 +3080,8 @@ def persist_generated_draft(
         "hfic_protocol": str(receipt.get("prompt_version") or PROMPT_VERSION),
         "artifact_kind": "FORGE_DRAFT",
         "draft_lifecycle": "GENERATED_BEFORE_FREEZE",
+        "source_preflight_receipt_id": source_receipt_id,
+        "source_preflight_receipt_sha256": source_receipt_hash,
         "ladder_representation_id": representation_id,
         "scientific_slot_sha256": slot,
         "market_evidence_epoch_sha256": receipt.get("market_evidence_epoch_sha256")

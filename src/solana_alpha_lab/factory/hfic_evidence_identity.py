@@ -666,12 +666,22 @@ def session_scientific_slot_sha256(session: Mapping[str, Any]) -> str | None:
     return derived
 
 
-def _session_slot_identity_is_invalid(session: Mapping[str, Any]) -> bool:
-    """Return true for a present slot stamp that cannot be recomputed."""
+def _session_market_epoch_is_invalid(session: Mapping[str, Any]) -> bool:
+    market = session.get("market_evidence_epoch_sha256")
+    return market not in (None, "") and (
+        not isinstance(market, str)
+        or re.fullmatch(r"[0-9a-f]{64}", market) is None
+    )
+
+
+def _session_identity_is_invalid(session: Mapping[str, Any]) -> bool:
+    """Return true for present market/slot identity that cannot be trusted."""
 
     if not isinstance(session, Mapping):
         return False
     if session.get("identity_binding_status") == "CONFLICT":
+        return True
+    if _session_market_epoch_is_invalid(session):
         return True
     explicit = session.get("scientific_slot_sha256")
     if explicit in (None, ""):
@@ -888,13 +898,14 @@ def resolve_scientific_admission(
     invalid_rows = [
         item
         for item in all_rows
-        if isinstance(item, Mapping) and _session_slot_identity_is_invalid(item)
+        if isinstance(item, Mapping) and _session_identity_is_invalid(item)
     ]
     if invalid_rows:
         reason = (
             "SCIENTIFIC_IDENTITY_CONFLICT"
             if any(
                 item.get("identity_binding_status") == "CONFLICT"
+                or _session_market_epoch_is_invalid(item)
                 for item in invalid_rows
             )
             else "SCIENTIFIC_SLOT_IDENTITY_INVALID"
@@ -1270,8 +1281,14 @@ def classify_legacy_session_disposition(
     reasons: list[str] = []
     if require_control_mode and mode != CURRENT_REPRESENTATION_CONTROL_V1:
         reasons.append("NOT_CONTROL_SURFACE")
-    if isinstance(frozen_market, str) and frozen_market:
-        if frozen_market == current_market_epoch:
+    if frozen_market not in (None, ""):
+        if (
+            not isinstance(frozen_market, str)
+            or re.fullmatch(r"[0-9a-f]{64}", frozen_market) is None
+        ):
+            disposition = DISPOSITION_UNRESOLVED
+            reasons.append("MALFORMED_MARKET_EPOCH_BINDING")
+        elif frozen_market == current_market_epoch:
             disposition = DISPOSITION_COMPATIBLE
         else:
             disposition = DISPOSITION_HISTORICAL_ONLY
@@ -1346,7 +1363,11 @@ def session_matches_market_epoch(
     """
 
     stamped = session.get("market_evidence_epoch_sha256")
-    if isinstance(stamped, str) and len(stamped) == 64:
+    if (
+        isinstance(stamped, str)
+        and re.fullmatch(r"[0-9a-f]{64}", stamped) is not None
+        and re.fullmatch(r"[0-9a-f]{64}", market_evidence_epoch) is not None
+    ):
         return stamped == market_evidence_epoch
     return False
 
@@ -1361,11 +1382,15 @@ def session_matches_epoch_for_lookup(
     counters (``sessions_for_market_budget``).
     """
 
-    if session_matches_market_epoch(session, epoch):
-        return True
     stamped = session.get("market_evidence_epoch_sha256")
-    if isinstance(stamped, str) and stamped:
-        return False
+    if stamped not in (None, ""):
+        if (
+            not isinstance(stamped, str)
+            or re.fullmatch(r"[0-9a-f]{64}", stamped) is None
+            or re.fullmatch(r"[0-9a-f]{64}", epoch) is None
+        ):
+            return False
+        return stamped == epoch
     return session.get("evidence_epoch_sha256") == epoch
 
 

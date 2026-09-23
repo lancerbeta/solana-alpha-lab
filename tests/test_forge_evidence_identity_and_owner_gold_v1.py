@@ -7,13 +7,14 @@ Does not execute Prompt A/B/C, real Independent Critic, or scientific market For
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import subprocess
 import sys
 import tempfile
 import threading
 import unittest
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from unittest.mock import patch
 
@@ -60,7 +61,9 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     prepare_ladder_freeze_preflight,
 )
 from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
+    build_offline_commission_packet,
     epoch_search_budget_usage,
+    enumerate_rdp_datasets as _enumerate_repository_datasets,
     run_preflight,
 )
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
@@ -97,7 +100,6 @@ from tests.test_forge_representation_ladder_v1 import (  # noqa: E402
     _git,
     _init_repo,
     _later_registry,
-    _production_control_preflight,
     _representation_fixture_rel_c2,
     _v1_freeze_preflight_from_envelope,
 )
@@ -114,7 +116,7 @@ from tests.test_live_corpus_manifest_contract_repair_v1 import (  # noqa: E402
 
 
 def _enumerate_c3(_data_root: Path):
-    live = _enumerate_live(_data_root)[0]
+    live = _enumerate_production_fixture(_data_root)[0]
     extra = dict(live[0])
     extra["dataset_manifest_id"] = "MID-C3"
     extra["labels"] = {**dict(extra.get("labels") or {}), "cohort_id": "REL-C3"}
@@ -130,110 +132,195 @@ def _append_c3(data_root: Path) -> None:
     lineage_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
 
-def _ordinary_stamped_preflight(data_root: Path, store: ResearchStore) -> dict[str, object]:
-    """Ordinary BASE freeze receipt: production split stamps, no CONTROL surface."""
+def _commission_fixture(repo_root: Path, data_root: Path) -> None:
+    script_path = repo_root / "scripts/hypothesis_fast_lane.py"
+    spec = importlib.util.spec_from_file_location(
+        "a5_owner_gold_fast_lane_fixture", script_path
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError("FAST_LANE_NOT_COMMISSIONABLE")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    packet_path = data_root / "offline_commission.json"
+    packet_path.write_text(
+        json.dumps(build_offline_commission_packet(repo_root)), encoding="utf-8"
+    )
+    module.execute_commission_offline(repo_root, data_root, packet_path)
 
-    pre = dict(_production_control_preflight(data_root, store))
-    pre.pop("evidence_surface_mode", None)
-    packet = dict(pre.get("forge_context_packet") or {})
-    packet.pop("evidence_surface_mode", None)
-    pre["forge_context_packet"] = packet
-    return pre
+
+def _with_control_projection_rows(datasets: list[dict[str, object]]):
+    from solana_alpha_lab.factory.scientific_eligibility_projection import (
+        X_FIELD_ID,
+        X_POINT_ID,
+    )
+
+    enriched = []
+    anchor = datetime(2026, 8, 25, 12, 0, tzinfo=UTC)
+    anchor_text = anchor.isoformat().replace("+00:00", "Z")
+    census_rows = []
+    observation_rows = []
+    for index in range(10):
+        mint = f"A5-C1-C2-{index:02d}"
+        census_rows.append(
+            {
+                "mint": mint,
+                "candidate_state": "X_ELIGIBLE",
+                "denominator_state": "observed",
+                "authoritative_anchor": anchor_text,
+            }
+        )
+        observation_rows.append(
+            {
+                "mint": mint,
+                "point_id": X_POINT_ID,
+                "field_id": X_FIELD_ID,
+                "state": "OBSERVED",
+                "first_reliable_available_at": (
+                    anchor + timedelta(seconds=300)
+                ).isoformat().replace("+00:00", "Z"),
+            }
+        )
+    for item in datasets:
+        row = dict(item)
+        row.setdefault("evidence_role", "UNSPECIFIED")
+        row.setdefault("feature_families", [])
+        row.setdefault("feature_hint", None)
+        row.setdefault("feature_usable", True)
+        row.setdefault("yield_missing", 0)
+        row.setdefault("dataset_terminal", None)
+        # The A4 CONTROL readiness resolver needs actual X300 eligibility
+        # rows, not a hand-entered yield count. Keep the fixture deterministic
+        # and tiny; production projection computes the ten-member result.
+        row.setdefault("census_rows", census_rows)
+        row.setdefault("observation_rows", observation_rows)
+        enriched.append(row)
+    return enriched
+
+
+def _enumerate_production_fixture(root: Path):
+    live, warnings = _enumerate_live(root)
+    return _with_control_projection_rows(live), warnings
+
+
+def _enumerate_imported_control_fixture(root: Path):
+    datasets, warnings = _enumerate_repository_datasets(root)
+    return _with_control_projection_rows(list(datasets)), warnings
+
+
+def _run_production_preflight(
+    data_root: Path,
+    *,
+    repo_root: Path = ROOT,
+    evidence_surface_mode: str | None = None,
+    enumerator=_enumerate_production_fixture,
+) -> dict[str, object]:
+    """Run production preflight over synthetic C1/C2 evidence."""
+
+    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+    from tests.test_hfic_preflight import _CLOCK
+
+    _commission_fixture(repo_root, data_root)
+    snapshot = repository_git_snapshot(repo_root)
+    with patch(
+        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+        side_effect=enumerator,
+    ):
+        return run_preflight(
+            repo_root,
+            data_root,
+            owner_focus="AUTO",
+            auto_commission=False,
+            git_snapshot={
+                "head_sha": snapshot.head_sha,
+                "composite_sha256": snapshot.composite_sha256,
+            },
+            clock=_CLOCK,
+            evidence_surface_mode=evidence_surface_mode,
+        )
+
+
+def _ordinary_stamped_preflight(
+    data_root: Path, _store: ResearchStore, *, repo_root: Path = ROOT
+) -> dict[str, object]:
+    """Ordinary non-CONTROL production entry over synthetic C1/C2 evidence."""
+
+    return _run_production_preflight(data_root, repo_root=repo_root)
+
+
+def _control_stamped_preflight(
+    data_root: Path, store: ResearchStore, *, repo_root: Path = ROOT
+) -> dict[str, object]:
+    """A4 CONTROL surface created through the production preflight API."""
+
+    from solana_alpha_lab.factory.hfic_control_integrity import (
+        CURRENT_REPRESENTATION_CONTROL_V1,
+    )
+
+    return _run_production_preflight(
+        data_root,
+        repo_root=repo_root,
+        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+    )
 
 
 def _actual_production_preflight(
     data_root: Path,
-    store: ResearchStore,
     *,
     repo_root: Path = ROOT,
 ) -> dict[str, object]:
-    """Use real imported manifests/lineage through the production packet seam."""
+    """Use imported manifests plus production preflight/projection bindings."""
 
-    from solana_alpha_lab.factory.document_runner import repository_git_snapshot
     from solana_alpha_lab.factory.hfic_control_integrity import (
         CURRENT_REPRESENTATION_CONTROL_V1,
     )
-    from solana_alpha_lab.factory.hfic_memory_policy import effective_policy
-    from solana_alpha_lab.factory.hfic_preflight import build_forge_context_packet
-    from solana_alpha_lab.factory.hfic_session import (
-        PROMPT_VERSION,
-        focus_key_sha256,
-        search_key_sha256,
-    )
 
-    split = compute_split_identity(repo_root, data_root)
-    policy = effective_policy(store)
-    market_epoch = str(split["market_evidence_epoch_sha256"])
-    owner_focus = "AUTO"
-    memory_eligibility = str(policy["memory_eligibility_sha256"])
-    search_key = search_key_sha256(
-        market_epoch,
-        owner_focus,
-        PROMPT_VERSION,
-        memory_eligibility,
-        CURRENT_REPRESENTATION_CONTROL_V1,
-    )
-    packet, digest = build_forge_context_packet(
-        repo_root,
-        data_root,
-        owner_focus=owner_focus,
-        evidence_epoch=market_epoch,
-        search_key=search_key,
-        commissioning_status="FAST_LANE_COMMISSIONED",
-        research_memory_as_of="2026-09-16T12:00:00Z",
-        store=store,
-        persist=True,
-        evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
-    )
-    forge_input = build_forge_input_receipt(
+    receipt = _run_production_preflight(
         data_root,
         repo_root=repo_root,
         evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
-        owner_focus=owner_focus,
+        enumerator=_enumerate_imported_control_fixture,
     )
-    git = repository_git_snapshot(repo_root)
-    return {
-        "receipt_id": "HFIC-PREFLIGHT-ACTUAL-PRODUCTION-001",
-        "evidence_epoch_sha256": market_epoch,
-        "focus_key_sha256": focus_key_sha256(owner_focus),
-        "search_key_sha256": search_key,
-        "owner_focus": owner_focus,
-        "live_git_head": git.head_sha.lower(),
-        "git_composite_sha256": git.composite_sha256,
-        "session_started_at": "2026-08-27T12:00:00Z",
-        "memory_eligibility_sha256": memory_eligibility,
-        "forge_context_packet_sha256": digest,
-        "forge_context_packet": packet,
-        "forge_input_receipt": forge_input,
-        "market_evidence_epoch_sha256": split["market_evidence_epoch_sha256"],
-        "capability_epoch_sha256": split["capability_epoch_sha256"],
-        "legacy_combined_evidence_epoch_sha256": split[
-            "legacy_combined_evidence_epoch_sha256"
-        ],
-        "evidence_surface_mode": CURRENT_REPRESENTATION_CONTROL_V1,
-    }
+    if receipt.get("action") == "STOP":
+        raise AssertionError(
+            "Imported C1/C2 production preflight stopped: "
+            f"{receipt.get('terminal')} / {receipt.get('next')}"
+        )
+    return receipt
 
 
 def _no_worthy_base(
     data_root: Path,
     store: ResearchStore,
     *,
-    production_packet: bool = False,
+    production_preflight: bool = False,
     repo_root: Path = ROOT,
 ) -> dict[str, object]:
-    draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
-    # Stamps come from production CONTROL preflight (compute_split_identity),
-    # not a separate test-only post-hoc stamp injection.
-    with patch(
-        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-        side_effect=_enumerate_live,
-    ):
-        preflight = (
-            _production_control_preflight(data_root, store, repo_root=repo_root)
-            if production_packet
-            else _control_preflight(data_root, store, repo_root=repo_root)
-        )
-        if not production_packet:
+    draft_path = (
+        ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json"
+        if production_preflight
+        else NO_WORTHY_DRAFT
+    )
+    draft = json.loads(draft_path.read_text(encoding="utf-8"))
+    # The A4 candidate-path acceptance uses production run_preflight; the
+    # legacy CONTROL helper remains only for focused control-seam tests.
+    if production_preflight:
+        # A4 ladder acceptance needs the existing CONTROL input surface, but
+        # the receipt and its identity must come from production run_preflight.
+        preflight = _control_stamped_preflight(data_root, store, repo_root=repo_root)
+        if preflight.get("action") == "STOP":
+            raise AssertionError(
+                "A4 production run_preflight stopped: "
+                f"{preflight.get('terminal')} / {preflight.get('next')}"
+            )
+        from tests.test_hfic_cli import bind_draft
+
+        draft = bind_draft(draft, preflight)
+    else:
+        with patch(
+            "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+            side_effect=_enumerate_production_fixture,
+        ):
+            preflight = _control_preflight(data_root, store, repo_root=repo_root)
             split = compute_split_identity(repo_root, data_root)
             preflight = dict(preflight)
             preflight["market_evidence_epoch_sha256"] = split[
@@ -263,10 +350,17 @@ def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, obje
 
     with patch(
         "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-        side_effect=_enumerate_live,
+        side_effect=_enumerate_production_fixture,
     ):
         preflight = _ordinary_stamped_preflight(data_root, store)
-    draft = valid_draft()
+    from tests.test_hfic_cli import bind_draft
+
+    draft = json.loads(
+        (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    draft = bind_draft(draft, preflight)
     frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
     persist_frozen_session(
         store,
@@ -285,6 +379,10 @@ def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, obje
     )
     spec = submission()
     spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+    selected = frozen["critic_input_packet"]["selected_candidate"]
+    spec["experiment_spec"]["required_feature_ids"] = list(
+        selected.get("required_feature_ids") or []
+    )
     apply_classification(
         frozen, spec, store=store, repo_root=ROOT, data_root=data_root
     )
@@ -471,7 +569,7 @@ class IdentityUnitTests(unittest.TestCase):
             _write_lineage(data_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 before = compute_split_identity(ROOT, data_root)
                 receipt = build_forge_input_receipt(data_root, repo_root=ROOT)
@@ -614,6 +712,37 @@ class IdentityUnitTests(unittest.TestCase):
             "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
         )
         self.assertEqual(decision["occupancy"], "OCCUPIED_UNRESOLVED")
+
+    def test_malformed_market_stamp_without_slot_cannot_free_market_budget(self) -> None:
+        market = "aa" * 32
+        malformed = "g" + "a" * 63
+        row = {
+            "session_id": "HFIC-SESS-MALFORMED-MARKET",
+            "market_evidence_epoch_sha256": malformed,
+            "evidence_epoch_sha256": "bb" * 32,
+            "owner_focus": "AUTO",
+            "forge_context_packet": {
+                "bound_visible_cohort_ids": ["REL-C1", "REL-C2"]
+            },
+        }
+        disposition = classify_legacy_session_disposition(
+            row,
+            current_market_epoch=market,
+            current_visible_cohort_ids=["REL-C1", "REL-C2"],
+        )
+        self.assertEqual(disposition["disposition"], DISPOSITION_UNRESOLVED)
+        self.assertIn("MALFORMED_MARKET_EPOCH_BINDING", disposition["reasons"])
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+            current_visible_cohort_ids=["REL-C1", "REL-C2"],
+        )
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(decision["reason_code"], "SCIENTIFIC_IDENTITY_CONFLICT")
+        self.assertEqual(decision["occupancy"], "UNRESOLVED_BINDING")
 
     def test_unregistered_representation_version_fails_closed(self) -> None:
         with self.assertRaisesRegex(
@@ -912,7 +1041,7 @@ class IdentityUnitTests(unittest.TestCase):
             _write_lineage(data_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ), patch(
                 "solana_alpha_lab.factory_semantic_operability.semantic_capability_digest_for_repo",
                 side_effect=SemanticOperabilityError("SEMANTIC_PROJECTION_INVALID"),
@@ -965,6 +1094,23 @@ class IdentityUnitTests(unittest.TestCase):
 class OwnerGoldSequentialTests(unittest.TestCase):
     """G1–G12 sequential family on production bindings (synthetic replies)."""
 
+    def test_ordinary_stamped_preflight_uses_normal_run_preflight(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            preflight = _ordinary_stamped_preflight(data_root, store)
+
+        self.assertIn("action", preflight)
+        self.assertNotEqual(preflight["action"], "STOP")
+        self.assertEqual(preflight.get("owner_focus"), "AUTO")
+        self.assertIsInstance(preflight.get("market_evidence_epoch_sha256"), str)
+        self.assertIsInstance(preflight.get("capability_epoch_sha256"), str)
+        self.assertNotIn("evidence_surface_mode", preflight)
+        packet = preflight.get("forge_context_packet")
+        self.assertIsInstance(packet, dict)
+        self.assertNotIn("evidence_surface_mode", packet)
+
     def test_g1_g2_import_and_normal_entry_stamps_market(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
@@ -972,7 +1118,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             store = ResearchStore(data_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 receipt_a = build_forge_input_receipt(data_root, repo_root=ROOT)
                 receipt_b = build_forge_input_receipt(data_root, repo_root=ROOT)
@@ -1002,10 +1148,14 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = _no_worthy_base(data_root, store, production_packet=True)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
+            self.assertEqual(
+                base.get("evidence_surface_mode"),
+                "CURRENT_REPRESENTATION_CONTROL_V1",
+            )
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 started = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(started["next_action"], ACTION_START_V1)
@@ -1110,7 +1260,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             )
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 finished = evaluate_forge_run(ROOT, data_root, persist=True)
                 retry = evaluate_forge_run(ROOT, data_root, persist=False)
@@ -1149,7 +1299,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             _ordinary_pass_base(data_root, store)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 finished = evaluate_forge_run(ROOT, data_root, persist=True)
                 replay = evaluate_forge_run(ROOT, data_root, persist=False)
@@ -1179,9 +1329,9 @@ class OwnerGoldSequentialTests(unittest.TestCase):
 
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
-                base = _no_worthy_base(data_root, store, production_packet=True)
+                base = _no_worthy_base(data_root, store, production_preflight=True)
                 started = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(started["next_action"], ACTION_START_V1)
             v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
@@ -1225,7 +1375,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             store.rebuild_projection()
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 finished = evaluate_forge_run(ROOT, data_root, persist=True)
 
@@ -1250,7 +1400,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
 
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ), patch(
                 "solana_alpha_lab.factory.hfic_representation_ladder._lookup_run_artifact",
                 side_effect=tampered_lookup,
@@ -1274,25 +1424,90 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            with patch(
-                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+            from solana_alpha_lab.factory.hfic_control_integrity import (
+                CURRENT_REPRESENTATION_CONTROL_V1,
+            )
+            from tests.test_hfic_preflight import _CLOCK, _git_snapshot
+
+            preflight = _control_stamped_preflight(data_root, store)
+            from tests.test_hfic_cli import bind_draft
+
+            draft = json.loads(
+                (
+                    ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
+                ).read_text(encoding="utf-8")
+            )
+            draft = bind_draft(draft, preflight)
+            inventory_before_invalid_receipt = (
+                store.diagnostics().committed_inventory_sha256
+            )
+            tampered_preflight = dict(preflight)
+            tampered_preflight["owner_focus"] = "CHANGED_AFTER_RECEIPT"
+            with self.assertRaisesRegex(
+                HficSessionError, "PREFLIGHT_RECEIPT_HASH_MISMATCH"
             ):
-                preflight = _ordinary_stamped_preflight(data_root, store)
-                preflight["model_provenance_sha256"] = "11" * 32
-            draft = valid_draft()
-            frozen = freeze_draft(draft, preflight_receipt=preflight, repo_root=ROOT)
-            persist_frozen_session(
+                persist_generated_draft(
+                    store,
+                    draft,
+                    preflight_receipt=tampered_preflight,
+                    repo_root=ROOT,
+                    model_provenance_sha256="11" * 32,
+                )
+            self.assertEqual(
+                store.diagnostics().committed_inventory_sha256,
+                inventory_before_invalid_receipt,
+            )
+            generated = persist_generated_draft(
                 store,
-                frozen,
+                draft,
+                preflight_receipt=preflight,
                 repo_root=ROOT,
-                identities=assign_portfolio_ids(draft["candidates"]),
-                draft=draft,
+                model_provenance_sha256="11" * 32,
             )
             store.rebuild_projection()
+            self.assertEqual(generated.get("draft_lifecycle"), "GENERATED_BEFORE_FREEZE")
+            self.assertEqual(len(list_scientific_slot_admissions(store)), 1)
+            reloaded = ResearchStore(data_root, create_if_missing=False)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
+            ):
+                resumed_preflight = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    git_snapshot=_git_snapshot(),
+                    clock=_CLOCK,
+                    evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1,
+                    persist=False,
+                )
+            self.assertEqual(resumed_preflight["action"], "RESUME_EXISTING_SESSION")
+            self.assertEqual(
+                resumed_preflight.get("generated_draft_sha256"),
+                generated.get("payload_sha256"),
+            )
+            self.assertEqual(
+                resumed_preflight.get("model_provenance_sha256"), "11" * 32
+            )
+            saved_draft = json.loads(str(generated["payload_canonical"]))
+            frozen = freeze_draft(
+                saved_draft,
+                preflight_receipt=resumed_preflight,
+                store=reloaded,
+                repo_root=ROOT,
+            )
+            persist_frozen_session(
+                reloaded,
+                frozen,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(saved_draft["candidates"]),
+                draft=saved_draft,
+            )
+            reloaded.rebuild_projection()
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
             ):
                 resumed = evaluate_forge_run(
                     ROOT,
@@ -1306,7 +1521,20 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     persist=False,
                     execution_context={"model_provenance_sha256": "22" * 32},
                 )
-        self.assertEqual(resumed["next_action"], ACTION_RESUME_BASE)
+        self.assertEqual(
+            resumed["next_action"],
+            ACTION_RESUME_BASE,
+            json.dumps(
+                {
+                    "blocking_reason_codes": resumed.get("blocking_reason_codes"),
+                    "scientific_identity_status": resumed.get(
+                        "scientific_identity_status"
+                    ),
+                    "stages": resumed.get("stages"),
+                },
+                sort_keys=True,
+            ),
+        )
         self.assertEqual(drifted["next_action"], ACTION_OBSERVABILITY_BLOCKED)
         self.assertIn(
             "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
@@ -1319,7 +1547,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = _no_worthy_base(data_root, store, production_packet=True)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
             v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
                 data_root,
                 store,
@@ -1397,7 +1625,9 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     clock=_CLOCK,
                 )
             store = ResearchStore(data_root)
-            draft = valid_draft()
+            from tests.test_hfic_cli import bind_draft
+
+            draft = bind_draft(valid_draft(), preflight)
             generated = persist_generated_draft(
                 store,
                 draft,
@@ -1508,7 +1738,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             )
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 matched = evaluate_forge_run(ROOT, data_root, persist=False)
             market_before = matched["market_evidence_epoch_sha256"]
@@ -1549,10 +1779,10 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = _no_worthy_base(data_root, store, production_packet=True)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 started = evaluate_forge_run(ROOT, data_root, persist=False)
             draft = _distinct_no_worthy_draft(label="V1")
@@ -1573,7 +1803,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             store.rebuild_projection()
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 finished = evaluate_forge_run(ROOT, data_root, persist=True)
                 retry = evaluate_forge_run(ROOT, data_root, persist=False)
@@ -1586,7 +1816,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root.mkdir()
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            _no_worthy_base(data_root, store, production_packet=True)
+            _no_worthy_base(data_root, store, production_preflight=True)
             clone = Path(tmp) / "repo"
             current_branch = subprocess.check_output(
                 ["git", "branch", "--show-current"], cwd=ROOT, text=True
@@ -1622,7 +1852,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 )
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 before = compute_split_identity(ROOT, data_root)
                 started = evaluate_forge_run(ROOT, data_root, persist=False)
@@ -1646,7 +1876,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             _git(clone, "commit", "-m", "test: change capability document")
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 after = compute_split_identity(clone, data_root)
                 again = evaluate_forge_run(clone, data_root, persist=False)
@@ -1679,10 +1909,10 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = _no_worthy_base(data_root, store, production_packet=True)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 started = evaluate_forge_run(ROOT, data_root, persist=True)
             v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
@@ -1705,7 +1935,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertEqual(len(str(draft_sha)), 64)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 # Restart without re-injecting draft: discovery must find pending V1.
                 mid = evaluate_forge_run(ROOT, data_root, persist=True)
@@ -1733,7 +1963,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             }
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 again = evaluate_forge_run(ROOT, data_root, persist=False)
             self.assertEqual(again["next_action"], ACTION_RESUME_V1)
@@ -1837,11 +2067,11 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = _no_worthy_base(data_root, store, production_packet=True)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
             draft = _distinct_no_worthy_draft(label="V1")
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 started = evaluate_forge_run(ROOT, data_root, persist=False)
             v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
@@ -1863,7 +2093,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             registry = _later_registry()
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 with_vn = evaluate_forge_run(
                     ROOT, data_root, persist=False, registry=registry
@@ -1891,7 +2121,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             ):
                 with patch(
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                    side_effect=_enumerate_live,
+                    side_effect=_enumerate_production_fixture,
                 ):
                     finished = evaluate_forge_run(
                         ROOT, data_root, persist=False, registry=registry
@@ -1925,7 +2155,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store = ResearchStore(data_root)
                 with patch(
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                    side_effect=_enumerate_live,
+                    side_effect=_enumerate_production_fixture,
                 ):
                     from_a = build_forge_input_receipt(data_root, repo_root=principal)
                     from_b = build_forge_input_receipt(data_root, repo_root=linked)
@@ -1934,11 +2164,11 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     from_b["market_evidence_epoch_sha256"],
                 )
                 base = _no_worthy_base(
-                    data_root, store, production_packet=True, repo_root=principal
+                    data_root, store, production_preflight=True, repo_root=principal
                 )
                 with patch(
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                    side_effect=_enumerate_live,
+                    side_effect=_enumerate_production_fixture,
                 ):
                     started = evaluate_forge_run(principal, data_root, persist=True)
                 self.assertEqual(started["next_action"], ACTION_START_V1)
@@ -1947,7 +2177,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store_b = ResearchStore(data_root)
                 with patch(
                     "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                    side_effect=_enumerate_live,
+                    side_effect=_enumerate_production_fixture,
                 ):
                     replay = evaluate_forge_run(linked, data_root, persist=False)
                 self.assertEqual(
@@ -1965,10 +2195,10 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            frozen = _no_worthy_base(data_root, store, production_packet=True)
+            frozen = _no_worthy_base(data_root, store, production_preflight=True)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 matched = evaluate_forge_run(ROOT, data_root, persist=False)
             self.assertEqual(matched["control_session_id"], frozen["session_id"])
@@ -2014,8 +2244,16 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 import_time=datetime(2026, 1, 27, tzinfo=UTC),
             )
             store = ResearchStore(data_root)
-            preflight = _actual_production_preflight(data_root, store)
-            draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
+            preflight = _actual_production_preflight(data_root)
+            from tests.test_hfic_cli import bind_draft
+
+            draft = json.loads(
+                (
+                    ROOT
+                    / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json"
+                ).read_text(encoding="utf-8")
+            )
+            draft = bind_draft(draft, preflight)
             frozen = freeze_draft(
                 draft,
                 preflight_receipt=preflight,
@@ -2085,7 +2323,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertEqual(list_scientific_slot_admissions(store), [])
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 split = compute_split_identity(ROOT, data_root)
                 current = evaluate_forge_run(ROOT, data_root, persist=False)
@@ -2115,13 +2353,13 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             store = ResearchStore(data_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 before = build_forge_input_receipt(data_root, repo_root=ROOT)
-            _no_worthy_base(data_root, store, production_packet=True)
+            _no_worthy_base(data_root, store, production_preflight=True)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 after = build_forge_input_receipt(data_root, repo_root=ROOT)
             self.assertEqual(
@@ -2137,10 +2375,10 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root.mkdir()
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            base = _no_worthy_base(data_root, store, production_packet=True)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 before = evaluate_forge_run(ROOT, data_root, persist=True)
             exported = export_snapshot(data_root, snap)
@@ -2150,7 +2388,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             _write_lineage(restore_root)
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-                side_effect=_enumerate_live,
+                side_effect=_enumerate_production_fixture,
             ):
                 after = evaluate_forge_run(ROOT, restore_root, persist=False)
             self.assertEqual(before["run_identity_sha256"], after["run_identity_sha256"])

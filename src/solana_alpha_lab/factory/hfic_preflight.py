@@ -2659,6 +2659,18 @@ def run_preflight(
     if isinstance(generated_draft, Mapping) and action == "RESUME_EXISTING_SESSION":
         receipt_body["generated_draft_sha256"] = generated_draft.get("payload_sha256")
         receipt_body["draft_lifecycle"] = "GENERATED_BEFORE_FREEZE"
+        receipt_body["generated_draft_source_preflight_receipt_id"] = (
+            generated_draft.get("source_preflight_receipt_id")
+        )
+        receipt_body["generated_draft_source_preflight_receipt_sha256"] = (
+            generated_draft.get("source_preflight_receipt_sha256")
+        )
+        # Model provenance was bound when the generator reply was persisted.
+        # Carry that known identity through restart so freeze cannot silently
+        # downgrade the resumed execution to an unknown model context.
+        model_provenance = generated_draft.get("model_provenance_sha256")
+        if isinstance(model_provenance, str):
+            receipt_body["model_provenance_sha256"] = model_provenance
         receipt_body["next"] = (
             "RESUME_GENERATED_DRAFT — continue freeze from persisted draft; "
             "do not regenerate"
