@@ -55,6 +55,23 @@ def observation_ops_store_path(data_root: Path) -> Path:
     return Path(data_root) / OPS_STORE_FILENAME
 
 
+def _activation_window_matches_registered(
+    row: Mapping[str, Any], document: Mapping[str, Any]
+) -> bool:
+    """Compare mutable activation window fields with its immutable registration."""
+
+    try:
+        registered = document["activation"]
+        return (
+            parse_utc(str(row["starts_at"]))
+            == parse_utc(str(registered["starts_at"]))
+            and parse_utc(str(row["stops_admitting_at"]))
+            == parse_utc(str(registered["stops_admitting_at"]))
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
+
+
 def require_production_producer_git_sha(producer_git_sha: str | None) -> str:
     """Fail closed when a durable write has no explicit producer Git SHA.
 
@@ -74,6 +91,7 @@ class ObservationLifecycleError(ValueError):
 
 
 _OWNER_NEXT_ACTION_BY_LIFECYCLE_ERROR = {
+    "ACTIVATION_WINDOW_MISMATCH": "RECONCILE_REGISTERED_ACTIVATION_WINDOW",
     "LATE_SUCCESSOR_RECOVERY_UNPROVEN": "REVALIDATE_DRAINING_RECOVERY_PROOF",
     "LATE_SUCCESSOR_BACKDATED": "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
     "ACTIVATION_BEFORE_STARTS_AT": "WAIT_UNTIL_SUCCESSOR_STARTS_AT",
@@ -450,6 +468,11 @@ def drain_expired_admission(
     existing = store.get_activation(schedule_sha256, activation_id)
     if existing is None:
         return None
+    registered = store.get_registered_schedule(schedule_sha256)
+    if registered is None:
+        raise ObservationLifecycleError("SCHEDULE_NOT_REGISTERED")
+    if not _activation_window_matches_registered(existing, registered["document"]):
+        raise ObservationLifecycleError("ACTIVATION_WINDOW_MISMATCH")
     if existing["state"] != "ACTIVE":
         return {
             "terminal": "NOT_ACTIVE",
@@ -1501,6 +1524,8 @@ def _require_cohort_cutover_or_unique(
             continue
         if _cohort_family_key(other["document"]) != family:
             continue
+        if not _activation_window_matches_registered(row, other["document"]):
+            raise ObservationLifecycleError("ACTIVATION_WINDOW_MISMATCH")
         if _activation_is_non_admitting(row, now=now):
             peer_stops = parse_utc(str(row["stops_admitting_at"]))
             recovery_at = _non_admitting_recovery_at(data_root, row, now=now)

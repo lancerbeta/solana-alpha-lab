@@ -178,6 +178,7 @@ host `factory-remote-ops`, deploy root `/opt/solana-alpha-lab`. Owner preflight
 from the object-bearing source checkout:
 
 ```
+set -euo pipefail
 SOURCE_REPO=<OWNER_BOUND_OBJECT_BEARING_CHECKOUT>
 TARGET_SHA=<COPY_EXACT_TARGET_HOTFIX_SHA_FROM_TASK_HANDOFF>
 PREVIOUS_SHA=ba7f3b725ff4f609e251a4e57751246636e8f8f7
@@ -198,6 +199,7 @@ These four values bind the post-deploy selector check; do not infer them from a
 Telegram/read-model alert.
 
 ```
+set -euo pipefail
 cd /opt/solana-alpha-lab
 test "$(wc -c < .factory_deploy_sha)" -eq 41
 test "$(cat .factory_deploy_sha)" = "$PREVIOUS_SHA"
@@ -214,14 +216,24 @@ inactive and the service is inactive before running the release route. Do not
 run a manual tick.
 
 ```
+set -euo pipefail
 sudo systemctl stop factory-observation-schedule.timer
 test "$(systemctl is-active factory-observation-schedule.timer 2>/dev/null || true)" = inactive
 test "$(systemctl is-active factory-observation-schedule.service 2>/dev/null || true)" = inactive
 ```
 
+If the timer was stopped but the release command has **not** been invoked—for
+example, the observation oneshot did not settle before the owner canceled the
+attempt—keep it stopped until the service is inactive. Confirm the live pin is
+still exactly `PREVIOUS_SHA`, then repeat direct `status` and the exact-selector
+`doctor` readback and confirm the recorded activation tuple is unchanged. Only
+then may the timer be restored, and only if it was active at preflight. If the
+release command may have started, this cancellation path no longer applies.
+
 The exact route invocation is:
 
 ```
+set -euo pipefail
 sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo "$SOURCE_REPO" --deploy-root /opt/solana-alpha-lab --target-sha "$TARGET_SHA" --previous-sha "$PREVIOUS_SHA"
 ```
 
@@ -250,6 +262,7 @@ preflight and all exact-SHA/readback checks pass. The owner post-deploy readback
 is mandatory before declaring success:
 
 ```
+set -euo pipefail
 cd /opt/solana-alpha-lab
 test "$(wc -c < .factory_deploy_sha)" -eq 41
 test "$(cat .factory_deploy_sha)" = "$TARGET_SHA"
@@ -257,9 +270,6 @@ test "$(systemctl is-active factory-observation-schedule.timer 2>/dev/null || tr
 test "$(systemctl is-active factory-observation-schedule.service 2>/dev/null || true)" = inactive
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
 /usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 "$EXPECTED_SCHEDULE_SHA" --activation-id "$EXPECTED_ACTIVATION_ID"
-sudo systemctl start factory-observation-schedule.timer
-test "$(systemctl is-active factory-observation-schedule.timer)" = active
-journalctl -u factory-observation-schedule.service --since "<DEPLOY_READBACK_START_UTC>" --no-pager
 ```
 
 Accept only when the exact pin matches, `status` and selector-bound `doctor`
@@ -270,20 +280,70 @@ zero provider calls are allowed when no slot is due or all work is already
 satisfied. No new publication job is required when the canonical expectation is
 `PUBLICATION_NOT_EXPECTED` and open publication jobs remain zero.
 
+Do not copy a timer-start command from the same block as the checks above. First
+review both direct readbacks and verify the exact selector, lifecycle state,
+pin, and inactive service. Since this preflight requires the timer to have been
+active, restore it only after those checks pass, in a separate action, then
+inspect the journal:
+
+```
+set -euo pipefail
+sudo systemctl start factory-observation-schedule.timer
+test "$(systemctl is-active factory-observation-schedule.timer)" = active
+journalctl -u factory-observation-schedule.service --since "<DEPLOY_READBACK_START_UTC>" --no-pager
+```
+
 If the release command is interrupted after file replacement begins, the old
 pin does **not** prove the old tree is intact: files are removed/copied before
 the pin is written. A target pin proves the copy phase completed, but not that
 environment sync, unit starts, doctor, or lifecycle readback completed. Keep
 the observation timer stopped, do not infer tree health from the pin alone, and
-do not blindly retry or roll back. First inspect unit/journal state and rehydrate
-the intended exact tree from the verified source objects through an explicitly
-chosen exact-SHA release/rollback route. If source objects or the resulting
-tree cannot be verified, stop for manual inspection; do not overwrite an
-unknown release. Never replace files while the observation service is active.
-Rollback is a separate owner decision and uses the same route with
-`--target-sha "$PREVIOUS_SHA" --previous-sha "$TARGET_SHA"`; keep the timer
-stopped until exact pin, selector, unit, and journal readbacks pass, then resume
-it and observe a normal scheduled terminal. This handoff is proposed evidence
+do not blindly retry or roll back. Use this recovery decision table; every
+branch keeps the timer stopped until its stated readbacks pass:
+
+| Observed condition | Allowed next step |
+|---|---|
+| Release command definitely never started; service is inactive; pin is exactly `PREVIOUS_SHA`; exact selector is unchanged | Treat files as untouched. Repeat direct `status` and selector-bound `doctor`; restore the timer only if it was active at preflight. |
+| Release command started, or start/copy status is uncertain; pin is absent, invalid, or still `PREVIOUS_SHA` | The tree is unknown even if the pin looks old. Inspect process, unit, and journal state. Do not use the cancellation path or run rollback. If the exact tree cannot be established from source objects, stop for manual inspection. |
+| Release command completed the copy phase and pin is exactly `TARGET_SHA`, but a later sync/start/doctor/readback failed | Keep the timer stopped and inspect unit/journal state. The owner must explicitly choose recovery forward to `TARGET_SHA` or rollback; do not infer that choice from the pin. |
+
+Never replace files while the observation service is active. For owner-selected
+forward recovery, verify both exact source objects again and rehydrate the
+target through the exact route below. It intentionally does not assume that an
+old pin proves an intact tree. For owner-selected rollback, require the current
+pin to be exactly `TARGET_SHA` and both observation units inactive in the same
+fail-fast block as the rollback command. This check is mandatory; an old or
+missing pin is not a rollback precondition.
+
+Owner-selected forward rehydration:
+
+```
+set -euo pipefail
+cd /opt/solana-alpha-lab
+test "$(systemctl is-active factory-observation-schedule.timer 2>/dev/null || true)" = inactive
+test "$(systemctl is-active factory-observation-schedule.service 2>/dev/null || true)" = inactive
+git -C "$SOURCE_REPO" cat-file -e "$TARGET_SHA^{commit}"
+git -C "$SOURCE_REPO" cat-file -e "$PREVIOUS_SHA^{commit}"
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo "$SOURCE_REPO" --deploy-root /opt/solana-alpha-lab --target-sha "$TARGET_SHA" --previous-sha "$PREVIOUS_SHA"
+```
+
+Rollback command:
+
+```
+set -euo pipefail
+cd /opt/solana-alpha-lab
+test "$(wc -c < .factory_deploy_sha)" -eq 41
+test "$(cat .factory_deploy_sha)" = "$TARGET_SHA"
+test "$(systemctl is-active factory-observation-schedule.timer 2>/dev/null || true)" = inactive
+test "$(systemctl is-active factory-observation-schedule.service 2>/dev/null || true)" = inactive
+git -C "$SOURCE_REPO" cat-file -e "$TARGET_SHA^{commit}"
+git -C "$SOURCE_REPO" cat-file -e "$PREVIOUS_SHA^{commit}"
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo "$SOURCE_REPO" --deploy-root /opt/solana-alpha-lab --target-sha "$PREVIOUS_SHA" --previous-sha "$TARGET_SHA"
+```
+
+Keep the timer stopped after either recovery route until exact pin, selector,
+unit, and journal readbacks pass; restore it only if it was active at preflight,
+then observe a normal scheduled terminal. This handoff is proposed evidence
 only; this atom performs no live action.
 
 ### No-live smoke (safe when no activation)

@@ -51,8 +51,8 @@ def _activation_freshness_key(row: MappingLike) -> tuple[str, str, str]:
     """Canonical freshness order for current-activation selection."""
 
     return (
-        str(row.get("updated_at") or ""),
-        str(row.get("created_at") or ""),
+        str(row.get("selection_updated_at") or row.get("updated_at") or ""),
+        str(row.get("selection_created_at") or row.get("created_at") or ""),
         str(row.get("activation_id") or ""),
     )
 
@@ -87,6 +87,7 @@ def activation_selection_status(
     activations: list[MappingLike] | tuple[MappingLike, ...],
     *,
     family_key: str | None = None,
+    now: datetime | None = None,
 ) -> str:
     """Classify whether current-activation selection has a safe scope.
 
@@ -95,6 +96,19 @@ def activation_selection_status(
     identity is ambiguity, not evidence that the activation set is empty.
     """
 
+    candidates = (
+        [
+            row
+            for row in activations
+            if str(row.get("cohort_family_key") or "") == family_key
+        ]
+        if family_key
+        else activations
+    )
+    if now is not None and _activation_selection_has_unknown_future(
+        candidates, now
+    ):
+        return "UNKNOWN"
     if family_key:
         return "SCOPED"
     if not activations:
@@ -110,6 +124,57 @@ def activation_selection_status(
     if has_unscoped_rows or len(family_keys) != 1:
         return "AMBIGUOUS"
     return "SCOPED"
+
+
+def _activation_selection_has_unknown_future(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    now: datetime,
+) -> bool:
+    """Reject lifecycle projections that cannot be interpreted as of ``now``."""
+
+    clock = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
+    clock = clock.astimezone(UTC)
+    unknown_future_transition = False
+    known_current_peer = False
+    for row in activations:
+        payload = row.get("payload")
+        if isinstance(payload, str):
+            try:
+                payload = json.loads(payload)
+            except (TypeError, ValueError):
+                return True
+        if payload is not None and not isinstance(payload, dict):
+            return True
+        if not isinstance(payload, dict):
+            payload = {}
+        effective_raw = payload.get("transition_effective_at")
+        future_effective = False
+        current_state = str(row.get("state") or "")
+        if effective_raw:
+            try:
+                future_effective = parse_utc(str(effective_raw)) > clock
+            except (TypeError, ValueError):
+                return True
+            if future_effective:
+                prior_state = str(payload.get("prior_state") or "")
+                if prior_state in {"ACTIVE", "DRAINING"}:
+                    current_state = prior_state
+                else:
+                    unknown_future_transition = True
+                    continue
+        known_current_peer = known_current_peer or current_state in {
+            "ACTIVE",
+            "DRAINING",
+        }
+        updated_raw = row.get("updated_at")
+        if updated_raw:
+            try:
+                updated_at = parse_utc(str(updated_raw))
+            except (TypeError, ValueError):
+                return True
+            if updated_at > clock and not future_effective:
+                return True
+    return unknown_future_transition and not known_current_peer
 
 
 def select_current_activation(
@@ -138,6 +203,17 @@ def select_current_activation(
     if now is not None:
         clock = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
         clock = clock.astimezone(UTC)
+        candidates = (
+            [
+                row
+                for row in activations
+                if str(row.get("cohort_family_key") or "") == family_key
+            ]
+            if family_key is not None
+            else activations
+        )
+        if _activation_selection_has_unknown_future(candidates, clock):
+            return None
     rows: list[dict[str, Any]] = []
     for raw in activations:
         row = dict(raw)
@@ -160,6 +236,13 @@ def select_current_activation(
                         if prior_state in {"ACTIVE", "DRAINING"}:
                             row["state"] = prior_state
                             row["future_transition_pending"] = True
+                            row["selection_updated_at"] = render_utc(clock)
+                            created_raw = row.get("created_at")
+                            try:
+                                if created_raw and parse_utc(str(created_raw)) > clock:
+                                    row["selection_created_at"] = render_utc(clock)
+                            except (TypeError, ValueError):
+                                return None
                         else:
                             continue
         rows.append(row)
@@ -169,10 +252,9 @@ def select_current_activation(
             for row in rows
             if str(row.get("cohort_family_key") or "") == family_key
         ]
-    elif (
-        (not explicit_scope or len(rows) != 1)
-        and activation_selection_status(rows) == "AMBIGUOUS"
-    ):
+    elif (not explicit_scope or len(rows) != 1) and activation_selection_status(
+        rows
+    ) in {"AMBIGUOUS", "UNKNOWN"}:
         return None
     if not rows:
         return None
@@ -198,8 +280,28 @@ def classify_doctor_current_activation(
     """
 
     selection_status = (
-        "SCOPED" if explicit_scope else activation_selection_status(activations)
+        "SCOPED"
+        if explicit_scope
+        else activation_selection_status(activations, now=now)
     )
+    if explicit_scope and activation_selection_status(
+        activations, now=now
+    ) == "UNKNOWN":
+        selection_status = "UNKNOWN"
+    if selection_status == "UNKNOWN":
+        return {
+            "terminal": "DOCTOR_ACTIVATION_SELECTION_UNKNOWN",
+            "live_activation": False,
+            "current_activation_id": None,
+            "current_schedule_sha256": None,
+            "current_activation_state": "UNKNOWN",
+            "activation_selection_status": selection_status,
+            "stops_admitting_at": None,
+            "late_recovery_at": None,
+            "late_recovery_proof": "UNKNOWN",
+            "late_recovery_event_id": None,
+            "next_action": "RECONCILE_FUTURE_ACTIVATION_TRANSITION",
+        }
     if selection_status == "AMBIGUOUS":
         return {
             "terminal": "DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS",
@@ -448,7 +550,7 @@ def build_collector_read_model(
     now = now.astimezone(UTC)
     window_start = now - timedelta(hours=24)
     activations = activation_rows_with_family_keys(store, store.list_activations())
-    selection_status = activation_selection_status(activations)
+    selection_status = activation_selection_status(activations, now=now)
     selected = None
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
@@ -460,14 +562,14 @@ def build_collector_read_model(
                 now=now,
                 explicit_scope=True,
             )
-            selection_status = "SCOPED"
+            selection_status = "SCOPED" if selected is not None else "UNKNOWN"
     elif activations:
         selected = select_current_activation(activations, now=now)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
     activation_state = (
         "UNKNOWN"
-        if selection_status in {"AMBIGUOUS", "NOT_FOUND"}
+        if selection_status in {"AMBIGUOUS", "NOT_FOUND", "UNKNOWN"}
         else str((selected or {}).get("state") or "NONE")
     )
 

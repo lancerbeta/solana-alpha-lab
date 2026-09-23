@@ -22,7 +22,7 @@ from solana_alpha_lab.factory.collector_read_model import (  # noqa: E402
 
 class CollectorContinuityBoundaryTests(unittest.TestCase):
     def test_active_selection_prefers_freshest_peer(self) -> None:
-        now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
+        now = datetime(2026, 9, 1, 0, 6, tzinfo=UTC)
         rows = [
             {
                 "activation_id": "ACT-OLD",
@@ -45,7 +45,7 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
         )
 
     def test_draining_selection_prefers_freshest_peer(self) -> None:
-        now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
+        now = datetime(2026, 9, 1, 0, 6, tzinfo=UTC)
         rows = [
             {
                 "activation_id": "ACT-DRAIN-OLD",
@@ -68,7 +68,7 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
         )
 
     def test_current_selection_does_not_cross_family_without_scope(self) -> None:
-        now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
+        now = datetime(2026, 9, 1, 0, 6, tzinfo=UTC)
         rows = [
             {
                 "activation_id": "ACT-FAMILY-A-DRAINING",
@@ -92,6 +92,63 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
             ],
             "ACT-FAMILY-A-DRAINING",
         )
+
+    def test_future_updated_activation_fails_selection_closed(self) -> None:
+        now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
+        rows = [
+            {
+                "activation_id": "ACT-CURRENT",
+                "state": "ACTIVE",
+                "cohort_family_key": "FAMILY-A",
+                "updated_at": "2026-09-01T00:00:00Z",
+                "created_at": "2026-08-31T23:00:00Z",
+            },
+            {
+                "activation_id": "ACT-FUTURE-PROJECTION",
+                "state": "ACTIVE",
+                "cohort_family_key": "FAMILY-A",
+                "updated_at": "2026-09-01T00:05:00Z",
+                "created_at": "2026-09-01T00:01:00Z",
+            },
+        ]
+
+        self.assertIsNone(select_current_activation(rows, now=now))
+        report = classify_doctor_current_activation(rows, now=now)
+        self.assertEqual(report["current_activation_state"], "UNKNOWN")
+        self.assertEqual(report["terminal"], "DOCTOR_ACTIVATION_SELECTION_UNKNOWN")
+        self.assertEqual(
+            report["next_action"], "RECONCILE_FUTURE_ACTIVATION_TRANSITION"
+        )
+
+    def test_future_transition_without_prior_state_does_not_hide_current_peer(
+        self,
+    ) -> None:
+        now = datetime(2026, 9, 1, 0, 10, tzinfo=UTC)
+        rows = [
+            {
+                "activation_id": "ACT-CURRENT",
+                "state": "ACTIVE",
+                "cohort_family_key": "FAMILY-A",
+                "updated_at": "2026-09-01T00:00:00Z",
+                "created_at": "2026-08-31T23:00:00Z",
+            },
+            {
+                "activation_id": "ACT-FUTURE-UNKNOWN",
+                "state": "DRAINING",
+                "cohort_family_key": "FAMILY-A",
+                "updated_at": "2026-09-01T00:10:00Z",
+                "created_at": "2026-09-01T00:01:00Z",
+                "payload": {"transition_effective_at": "2026-09-01T00:20:00Z"},
+            },
+        ]
+
+        current = select_current_activation(rows, now=now)
+        assert current is not None
+        self.assertEqual(current["activation_id"], "ACT-CURRENT")
+        report = classify_doctor_current_activation(rows, now=now)
+        self.assertEqual(report["current_activation_state"], "ACTIVE")
+        self.assertEqual(report["terminal"], "DOCTOR_CURRENT_OK")
+        self.assertEqual(report["current_activation_id"], "ACT-CURRENT")
 
     def test_current_selection_fails_closed_without_family_identity(self) -> None:
         now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)

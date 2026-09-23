@@ -115,6 +115,7 @@ def assess_campaign_successor_continuity(
     authority_root: Path | None = None,
     activation_selection_ambiguous: bool = False,
     activation_selection_not_found: bool = False,
+    activation_selection_unknown: bool = False,
 ) -> dict[str, Any]:
     """Owner-facing campaign continuity projection for pre-expiry attention.
 
@@ -150,6 +151,15 @@ def assess_campaign_successor_continuity(
             "campaign_successor_required": True,
             "campaign_successor_owner_action": (
                 "verify exact current activation selector before successor assessment"
+            ),
+        }
+    if activation_selection_unknown:
+        return {
+            **empty,
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile future activation transition proof before successor assessment"
             ),
         }
     if activation is None:
@@ -382,9 +392,8 @@ def assess_campaign_successor_continuity(
             if _authority_is_live(other_sha, other_reg["document"]):
                 best = "AUTHORIZED"
                 if _window_covers(other_reg["document"], current_stops):
-                    continuity_proven = True
-                    successor_schedule_sha256 = other_sha
-                    break
+                    if successor_schedule_sha256 is None:
+                        successor_schedule_sha256 = other_sha
             elif best == "NONE":
                 best = "REGISTERED"
                 successor_schedule_sha256 = other_sha
@@ -1080,9 +1089,12 @@ def build_collector_operational_packet(
         empirical_overlap_seconds=empirical_overlap_seconds,
     )
     all_activations = activation_rows_with_family_keys(store, store.list_activations())
-    continuity_selection_ambiguous = activation_selection_status(
-        all_activations
-    ) == "AMBIGUOUS"
+    continuity_selection_ambiguous = (
+        activation_selection_status(all_activations) == "AMBIGUOUS"
+    )
+    continuity_selection_unknown = (
+        activation_selection_status(all_activations, now=clock) == "UNKNOWN"
+    )
     continuity_selection_not_found = False
     continuity_activation = None
     if schedule_sha256 and activation_id:
@@ -1097,9 +1109,11 @@ def build_collector_operational_packet(
                 explicit_scope=True,
             )
             continuity_selection_ambiguous = False
+            continuity_selection_unknown = continuity_activation is None
     if (
         continuity_activation is None
         and not continuity_selection_ambiguous
+        and not continuity_selection_unknown
         and not continuity_selection_not_found
     ):
         continuity_activation = select_current_activation(
@@ -1111,6 +1125,7 @@ def build_collector_operational_packet(
         activation=continuity_activation,
         activation_selection_ambiguous=continuity_selection_ambiguous,
         activation_selection_not_found=continuity_selection_not_found,
+        activation_selection_unknown=continuity_selection_unknown,
         data_root=(
             Path(observation_rdp)
             if observation_rdp is not None

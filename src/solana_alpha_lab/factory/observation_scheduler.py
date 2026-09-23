@@ -1249,16 +1249,23 @@ def tick_once(
             if holder_disc is not None:
                 redact_with = holder_disc
             if stop_reason in {"BLOCKED_BUDGET", "CHANGE_LANE_SAFETY_CONTRACT_GAP"}:
+                activation_state = str(activation.get("state") or "")
+                persisted_payload = dict(activation.get("payload") or {})
+                persisted_payload["reason"] = stop_reason
                 store.upsert_activation(
                     {
                         "schedule_sha256": digest,
                         "activation_id": activation_id,
                         "schedule_key": activation["schedule_key"],
-                        "state": stop_reason,
+                        "state": (
+                            "DRAINING"
+                            if activation_state == "DRAINING"
+                            else stop_reason
+                        ),
                         "authority_receipt_sha256": activation.get("authority_receipt_sha256"),
                         "starts_at": activation["starts_at"],
                         "stops_admitting_at": activation["stops_admitting_at"],
-                        "payload": {"reason": stop_reason},
+                        "payload": persisted_payload,
                     },
                     clock=now,
                 )
