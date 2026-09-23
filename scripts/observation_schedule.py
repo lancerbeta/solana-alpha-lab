@@ -25,6 +25,7 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     ObservationLifecycleError,
     _require_live_authority,
     activate_schedule,
+    activation_transition_research_event_proven,
     abort_schedule,
     authorize_schedule,
     pause_schedule,
@@ -531,6 +532,61 @@ def main(
                     },
                     2,
                 )
+            if current_report["terminal"] == "DOCTOR_ACTIVATION_SELECTION_UNKNOWN":
+                return _emit(
+                    {
+                        **current_timing,
+                        "terminal": "DOCTOR_ACTIVATION_SELECTION_UNKNOWN",
+                        "live_activation": False,
+                        "current_activation_id": None,
+                        "current_activation_state": "UNKNOWN",
+                        "activation_selection_status": "UNKNOWN",
+                        "restore_marker_unresolved": False,
+                        "activation_count": len(activations),
+                        "collector": collector,
+                        "next_action": "RECONCILE_FUTURE_ACTIVATION_TRANSITION",
+                    },
+                    2,
+                )
+            if current_state == "ACTIVE":
+                current_row = next(
+                    (
+                        row
+                        for row in selection_activations
+                        if str(row.get("schedule_sha256") or "")
+                        == str(current_report.get("current_schedule_sha256") or "")
+                        and str(row.get("activation_id") or "")
+                        == str(current_report.get("current_activation_id") or "")
+                    ),
+                    None,
+                )
+                try:
+                    active_transition_proven = (
+                        current_row is not None
+                        and activation_transition_research_event_proven(
+                            data_root, current_row, now=now
+                        )
+                    )
+                except Exception:
+                    active_transition_proven = False
+                if not active_transition_proven:
+                    return _emit(
+                        {
+                            **current_timing,
+                            "terminal": "DOCTOR_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                            "live_activation": False,
+                            "current_activation_id": current_report.get(
+                                "current_activation_id"
+                            ),
+                            "current_activation_state": "UNKNOWN",
+                            "activation_selection_status": "UNKNOWN",
+                            "restore_marker_unresolved": False,
+                            "activation_count": len(activations),
+                            "collector": collector,
+                            "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                        },
+                        2,
+                    )
             if current_report["terminal"] == "DOCTOR_NO_LIVE_ACTIVATION":
                 return _emit(
                     {
@@ -655,6 +711,27 @@ def main(
                         },
                         2,
                     )
+                if str(activation["state"]) == "ACTIVE":
+                    try:
+                        active_transition_proven = (
+                            activation_transition_research_event_proven(
+                                data_root, activation, now=now
+                            )
+                        )
+                    except Exception:
+                        active_transition_proven = False
+                    if not active_transition_proven:
+                        return _emit(
+                            {
+                                "terminal": "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE",
+                                "schedule_sha256": digest,
+                                "activation_id": activation_id,
+                                "provider_calls": 0,
+                                "credential_reads": 0,
+                                "next_action": "RECONCILE_ACTIVE_TRANSITION_PROOF",
+                            },
+                            2,
+                        )
                 try:
                     authority = _require_live_authority(
                         store,

@@ -273,11 +273,17 @@ test "$(systemctl is-active factory-observation-schedule.service 2>/dev/null || 
 ```
 
 Accept only when the exact pin matches, `status` and selector-bound `doctor`
-report the recorded schedule/activation pair and healthy lifecycle state, the
-timer is active, and the next scheduled terminal is `TICK_COMPLETE` with exit
-0. New Jupiter RECENT calls must be `HTTP_OK` when an eligible slot is polled;
-zero provider calls are allowed when no slot is due or all work is already
-satisfied. No new publication job is required when the canonical expectation is
+report the recorded schedule/activation pair, the exact pre-deploy `state`
+and `last_transition_event_id`, and healthy lifecycle state. Deployment must
+not write lifecycle history: if any of those four recorded values differs,
+keep the observation timer stopped and reconcile before continuing. Only after
+those checks pass may the timer be restored. Then wait for one timer-driven
+tick (the configured observation timer interval is 60 seconds; allow up to two
+minutes) and require the scheduled terminal to be `TICK_COMPLETE` with exit 0.
+Never invoke a manual tick for this acceptance check. New Jupiter RECENT calls
+must be `HTTP_OK` when an eligible slot is polled; zero provider calls are
+allowed when no slot is due or all work is already satisfied. No new
+publication job is required when the canonical expectation is
 `PUBLICATION_NOT_EXPECTED` and open publication jobs remain zero.
 
 Do not copy a timer-start command from the same block as the checks above. First
@@ -288,10 +294,17 @@ inspect the journal:
 
 ```
 set -euo pipefail
+DEPLOY_READBACK_START_UTC="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 sudo systemctl start factory-observation-schedule.timer
 test "$(systemctl is-active factory-observation-schedule.timer)" = active
-journalctl -u factory-observation-schedule.service --since "<DEPLOY_READBACK_START_UTC>" --no-pager
+journalctl -u factory-observation-schedule.service --since "$DEPLOY_READBACK_START_UTC" --no-pager
 ```
+
+The journal command may run before the next timer-driven tick has completed.
+Wait up to two minutes (the configured interval is 60 seconds), then read the
+journal again from the same UTC boundary. Require a timer-triggered
+`TICK_COMPLETE` terminal with exit 0; never run `tick --once` to manufacture
+the acceptance evidence.
 
 If the release command is interrupted after file replacement begins, the old
 pin does **not** prove the old tree is intact: files are removed/copied before
@@ -304,7 +317,7 @@ branch keeps the timer stopped until its stated readbacks pass:
 | Observed condition | Allowed next step |
 |---|---|
 | Release command definitely never started; service is inactive; pin is exactly `PREVIOUS_SHA`; exact selector is unchanged | Treat files as untouched. Repeat direct `status` and selector-bound `doctor`; restore the timer only if it was active at preflight. |
-| Release command started, or start/copy status is uncertain; pin is absent, invalid, or still `PREVIOUS_SHA` | The tree is unknown even if the pin looks old. Inspect process, unit, and journal state. Do not use the cancellation path or run rollback. If the exact tree cannot be established from source objects, stop for manual inspection. |
+| Release command started, or start/copy status is uncertain; pin is absent, invalid, or still `PREVIOUS_SHA` | The tree is unknown even if the pin looks old. Do not use the cancellation path or run rollback. Under the separate owner deploy gate, the bounded recovery is forward rehydration to `TARGET_SHA` through the exact route below, after both source objects are verified and both observation units are inactive. If either prerequisite is unavailable, keep the timer stopped and stop for manual inspection. |
 | Release command completed the copy phase and pin is exactly `TARGET_SHA`, but a later sync/start/doctor/readback failed | Keep the timer stopped and inspect unit/journal state. The owner must explicitly choose recovery forward to `TARGET_SHA` or rollback; do not infer that choice from the pin. |
 
 Never replace files while the observation service is active. For owner-selected

@@ -320,6 +320,20 @@ def render_incident_message(
         f"FIRST_SEEN_AT={first_seen_at}",
     ]
     if code == "CAMPAIGN_SUCCESSOR_REQUIRED":
+        campaign_owner_action = str(
+            packet.get("campaign_successor_owner_action") or "UNKNOWN"
+        )
+        if campaign_owner_action == "RECONCILE_CAMPAIGN_SUCCESSOR_STATE":
+            campaign_next_step = (
+                "Review direct lifecycle status and exact-selector doctor; "
+                "resolve their state before preparing a successor."
+            )
+        elif campaign_owner_action in {"", "UNKNOWN", "NONE"}:
+            campaign_next_step = (
+                "Review direct lifecycle status and successor continuity before acting."
+            )
+        else:
+            campaign_next_step = campaign_owner_action
         successor_state = str(packet.get("campaign_successor_state") or "UNKNOWN")
         remaining = packet.get("campaign_time_remaining_seconds")
         continuity_unknown = successor_state == "UNKNOWN" or remaining in (
@@ -346,7 +360,8 @@ def render_incident_message(
                 f"SUCCESSOR_STATE={successor_state}",
                 f"SUCCESSOR_SCHEDULE_SHA256={packet.get('campaign_successor_schedule_sha256')}",
                 f"SUCCESSOR_ACTIVATION_ID={packet.get('campaign_successor_activation_id')}",
-                f"CAMPAIGN_OWNER_ACTION={packet.get('campaign_successor_owner_action')}",
+                f"CAMPAIGN_OWNER_ACTION={campaign_owner_action}",
+                f"CAMPAIGN_NEXT_STEP={campaign_next_step}",
             ]
         )
     if recovered_at:

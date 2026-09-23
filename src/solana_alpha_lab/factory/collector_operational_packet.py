@@ -211,6 +211,57 @@ def assess_campaign_successor_continuity(
                 else UNKNOWN
             ),
         }
+    registered_document = registered["document"]
+    registered_activation = registered_document.get("activation")
+    canonical_starts = (
+        str(registered_activation.get("starts_at") or "")
+        if isinstance(registered_activation, Mapping)
+        else ""
+    )
+    canonical_stops = (
+        str(registered_activation.get("stops_admitting_at") or "")
+        if isinstance(registered_activation, Mapping)
+        else ""
+    )
+    if (
+        not canonical_starts
+        or not canonical_stops
+        or str(activation.get("starts_at") or "") != canonical_starts
+        or str(activation.get("stops_admitting_at") or "") != canonical_stops
+    ):
+        return {
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_schedule_sha256": UNKNOWN,
+            "campaign_successor_activation_id": UNKNOWN,
+            "stops_admitting_at": canonical_stops or UNKNOWN,
+            "campaign_time_remaining_seconds": UNKNOWN,
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile current activation window against its immutable registered document"
+            ),
+        }
+    from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+        activation_transition_research_event_proven,
+    )
+
+    try:
+        active_transition_proven = activation_transition_research_event_proven(
+            data_root, activation, now=now
+        )
+    except Exception:
+        active_transition_proven = False
+    if not active_transition_proven:
+        return {
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_schedule_sha256": UNKNOWN,
+            "campaign_successor_activation_id": UNKNOWN,
+            "stops_admitting_at": canonical_stops,
+            "campaign_time_remaining_seconds": remaining,
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile current ACTIVE transition against its append-only lifecycle proof"
+            ),
+        }
     family = cohort_family_key(registered["document"])
     authority_root = (
         Path(authority_root)
@@ -392,8 +443,9 @@ def assess_campaign_successor_continuity(
             if _authority_is_live(other_sha, other_reg["document"]):
                 best = "AUTHORIZED"
                 if _window_covers(other_reg["document"], current_stops):
-                    if successor_schedule_sha256 is None:
-                        successor_schedule_sha256 = other_sha
+                    continuity_proven = True
+                    successor_schedule_sha256 = other_sha
+                    break
             elif best == "NONE":
                 best = "REGISTERED"
                 successor_schedule_sha256 = other_sha

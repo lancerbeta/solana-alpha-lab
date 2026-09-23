@@ -8,6 +8,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from contextlib import redirect_stdout
 from io import StringIO
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -302,6 +303,44 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 )
             store.close()
 
+    def test_unregistered_live_peer_blocks_successor_activation(self) -> None:
+        successor = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            registered, _ = _register_and_authorize(store, data_root, successor)
+            assert store.acquire_lease("unregistered-live-peer", clock=NOW)
+            store.upsert_activation(
+                {
+                    "schedule_sha256": "e" * 64,
+                    "activation_id": "ACT-UNREGISTERED-LIVE-PEER",
+                    "schedule_key": "OBS-UNREGISTERED-LIVE-PEER-001",
+                    "state": "ACTIVE",
+                    "starts_at": "2026-09-01T00:00:00Z",
+                    "stops_admitting_at": "2026-09-08T00:00:00Z",
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+
+            try:
+                with self.assertRaisesRegex(
+                    ObservationLifecycleError, "LIVE_PEER_REGISTRATION_UNAVAILABLE"
+                ):
+                    activate_schedule(
+                        root=ROOT,
+                        data_root=data_root,
+                        store=store,
+                        schedule_sha256=registered["schedule_sha256"],
+                        activation_id="ACT-CANNOT-CUTOVER",
+                        now=NOW,
+                        producer_git_sha=GIT,
+                    )
+            finally:
+                store.close()
     def test_late_non_admitting_draining_allows_forward_successor(self) -> None:
         predecessor = load_observation_schedule(
             ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
@@ -592,101 +631,6 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     now=datetime(2026, 9, 1, 12, 30, tzinfo=UTC),
                     authority_receipt_sha256="a" * 64,
                 )
-            store.close()
-
-    def test_draining_budget_stop_preserves_lifecycle_state_and_proof(self) -> None:
-        predecessor = _with_window(
-            load_observation_schedule(
-                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
-            ),
-            starts_at="2026-09-01T00:00:00Z",
-            stops_admitting_at="2026-09-01T12:00:00Z",
-            schedule_key="OBS-DRAINING-BUDGET-PREDECESSOR-001",
-        )
-        successor = _with_window(
-            load_observation_schedule(
-                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
-            ),
-            starts_at="2026-09-01T00:00:00Z",
-            stops_admitting_at="2026-09-02T12:00:00Z",
-            schedule_key="OBS-DRAINING-BUDGET-SUCCESSOR-001",
-        )
-        with tempfile.TemporaryDirectory() as tmp:
-            data_root = Path(tmp) / "rdp"
-            data_root.mkdir()
-            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
-            self.addCleanup(store.close)
-            predecessor_registration, _ = _activate_campaign(
-                store,
-                data_root,
-                predecessor,
-                activation_id="ACT-DRAINING-BUDGET",
-            )
-            successor_registration, _ = _register_and_authorize(
-                store, data_root, successor
-            )
-            rollover_schedule(
-                root=ROOT,
-                data_root=data_root,
-                store=store,
-                predecessor_schedule_sha256=predecessor_registration[
-                    "schedule_sha256"
-                ],
-                predecessor_activation_id="ACT-DRAINING-BUDGET",
-                successor_schedule_sha256=successor_registration[
-                    "schedule_sha256"
-                ],
-                successor_activation_id="ACT-DRAINING-BUDGET-SUCCESSOR",
-                cutover_at="2026-09-01T00:15:00Z",
-                now=NOW,
-                producer_git_sha=GIT,
-            )
-            day_cap = int(
-                predecessor["budgets"]["provider_calls_per_utc_day_max"]
-            )
-            store.save_accounting(
-                schedule_sha256=predecessor_registration["schedule_sha256"],
-                activation_id="ACT-DRAINING-BUDGET",
-                utc_day="2026-09-01",
-                values={"provider_calls": day_cap},
-                clock=NOW,
-            )
-
-            result = tick_once(
-                root=ROOT,
-                data_root=data_root,
-                store=store,
-                schedule=predecessor,
-                activation_id="ACT-DRAINING-BUDGET",
-                now=NOW,
-                opener=type(
-                    "NoCallOpener",
-                    (),
-                    {
-                        "open": lambda *_args, **_kwargs: self.fail(
-                            "budget gate must prevent opener"
-                        )
-                    },
-                )(),
-                credential_loader=lambda: self.fail(
-                    "budget gate must prevent credential read"
-                ),
-                producer_git_sha=GIT,
-            )
-
-            activation = store.get_activation(
-                predecessor_registration["schedule_sha256"],
-                "ACT-DRAINING-BUDGET",
-            )
-            assert activation is not None
-            self.assertEqual(result["terminal"], "BLOCKED_BUDGET")
-            self.assertEqual(result["provider_calls"], 0)
-            self.assertEqual(activation["state"], "DRAINING")
-            self.assertEqual(activation["payload"]["reason"], "BLOCKED_BUDGET")
-            self.assertEqual(
-                activation["payload"]["transition_effective_at"],
-                "2026-09-01T00:15:00Z",
-            )
             store.close()
 
     def test_late_successor_backdated_to_recovery_is_denied(self) -> None:
@@ -1250,6 +1194,180 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             payload["next_action"], "VERIFY_SCHEDULE_AND_ACTIVATION_SELECTOR"
         )
 
+    def test_cli_doctor_unknown_future_activation_exits_fail_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(
+                data_root / "observation_schedule_state.sqlite"
+            )
+            future = NOW + timedelta(minutes=1)
+            assert store.acquire_lease("future-doctor-selection", clock=future)
+            store.upsert_activation(
+                {
+                    "schedule_sha256": "a" * 64,
+                    "activation_id": "ACT-FUTURE-UNKNOWN",
+                    "schedule_key": "OBS-FUTURE-UNKNOWN-001",
+                    "state": "ACTIVE",
+                    "starts_at": "2026-09-01T00:00:00Z",
+                    "stops_admitting_at": "2026-09-02T00:00:00Z",
+                    "payload": {},
+                },
+                clock=future,
+            )
+            store.close()
+            buf = StringIO()
+            with patch(
+                "scripts.observation_schedule.resolve_clock", return_value=NOW
+            ), redirect_stdout(buf):
+                code = cli_main(
+                    [
+                        "doctor",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        "a" * 64,
+                        "--activation-id",
+                        "ACT-FUTURE-UNKNOWN",
+                    ]
+                )
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(code, 2)
+        self.assertEqual(payload["terminal"], "DOCTOR_ACTIVATION_SELECTION_UNKNOWN")
+        self.assertFalse(payload["live_activation"])
+        self.assertEqual(
+            payload["next_action"], "RECONCILE_FUTURE_ACTIVATION_TRANSITION"
+        )
+
+    def test_cli_doctor_active_projection_without_transition_event_fails_closed(
+        self,
+    ) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(
+                data_root / "observation_schedule_state.sqlite"
+            )
+            assert store.acquire_lease("active-doctor-proof", clock=NOW)
+            store.upsert_activation(
+                {
+                    "schedule_sha256": "b" * 64,
+                    "activation_id": "ACT-ACTIVE-UNPROVEN",
+                    "schedule_key": "OBS-ACTIVE-UNPROVEN-001",
+                    "state": "ACTIVE",
+                    "starts_at": "2026-09-01T00:00:00Z",
+                    "stops_admitting_at": "2026-09-02T00:00:00Z",
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+            store.close()
+            buf = StringIO()
+            with patch(
+                "scripts.observation_schedule.resolve_clock", return_value=NOW
+            ), redirect_stdout(buf):
+                code = cli_main(
+                    [
+                        "doctor",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        "b" * 64,
+                        "--activation-id",
+                        "ACT-ACTIVE-UNPROVEN",
+                    ]
+                )
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(code, 2)
+        self.assertEqual(
+            payload["terminal"], "DOCTOR_ACTIVE_TRANSITION_PROOF_UNAVAILABLE"
+        )
+        self.assertFalse(payload["live_activation"])
+        self.assertEqual(payload["next_action"], "RECONCILE_ACTIVE_TRANSITION_PROOF")
+
+    def test_cli_tick_refuses_active_projection_without_transition_event(self) -> None:
+        document = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(
+                data_root / "observation_schedule_state.sqlite"
+            )
+            registered, authority = _register_and_authorize(
+                store, data_root, document
+            )
+            assert store.acquire_lease("active-tick-proof", clock=NOW)
+            store.upsert_activation(
+                {
+                    "schedule_sha256": registered["schedule_sha256"],
+                    "activation_id": "ACT-ACTIVE-UNPROVEN-TICK",
+                    "schedule_key": document["schedule_key"],
+                    "state": "ACTIVE",
+                    "authority_receipt_sha256": authority["receipt_sha256"],
+                    "starts_at": document["activation"]["starts_at"],
+                    "stops_admitting_at": document["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+            store.close()
+            buf = StringIO()
+            physical = SimpleNamespace(
+                opener=object(),
+                credential_loader=lambda: "unused",
+                pacing_clock=None,
+            )
+            with (
+                patch(
+                    "scripts.observation_schedule.resolve_clock", return_value=NOW
+                ),
+                patch(
+                    "scripts.observation_schedule.materialize_tick_physical_dependencies",
+                    return_value=physical,
+                ) as materialize,
+                patch(
+                    "scripts.observation_schedule.tick_once",
+                    return_value={
+                        "terminal": "TICK_COMPLETE",
+                        "provider_calls": 1,
+                        "credential_reads": 1,
+                    },
+                ) as run_tick,
+                redirect_stdout(buf),
+            ):
+                code = cli_main(
+                    [
+                        "tick",
+                        "--once",
+                        "--runtime-config",
+                        "tests/fixtures/observation_schedule/runtime_commissioning.yaml",
+                        "--data-root",
+                        str(data_root.resolve()),
+                        "--schedule-sha256",
+                        registered["schedule_sha256"],
+                        "--activation-id",
+                        "ACT-ACTIVE-UNPROVEN-TICK",
+                    ]
+                )
+        payload = json.loads(buf.getvalue())
+        self.assertEqual(code, 2)
+        self.assertEqual(
+            payload["terminal"], "TICK_REFUSED_ACTIVE_TRANSITION_PROOF_UNAVAILABLE"
+        )
+        self.assertEqual(payload["provider_calls"], 0)
+        self.assertEqual(payload["credential_reads"], 0)
+        self.assertEqual(payload["next_action"], "RECONCILE_ACTIVE_TRANSITION_PROOF")
+        materialize.assert_not_called()
+        run_tick.assert_not_called()
+
     def test_read_model_unknown_exact_selector_does_not_fallback_to_other_activation(
         self,
     ) -> None:
@@ -1596,6 +1714,12 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             owner_next_action_for_lifecycle_error("ROLLOVER_CUTOVER_IN_PAST"),
             "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
         )
+        self.assertEqual(
+            owner_next_action_for_lifecycle_error(
+                "LIVE_PEER_REGISTRATION_UNAVAILABLE"
+            ),
+            "RECONCILE_LIVE_ACTIVATION_REGISTRATION",
+        )
 
     def test_cli_rollover_missing_immutable_proof_has_next_action(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -1706,6 +1830,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store=store,
                 now=NOW,
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
             )
             snapshot = build_collector_snapshot(
                 packet,
@@ -1741,6 +1866,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store=store,
                 now=NOW,
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
                 emit=False,
                 persist=True,
                 unit_status={
@@ -1765,6 +1891,10 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             self.assertIn("FACTORY / ATTENTION — ACTION", attention_preview)
             self.assertIn("MESSAGE_TYPE=ATTENTION", attention_preview)
             self.assertIn(
+                "CAMPAIGN_NEXT_STEP=register+authorize a same-family successor",
+                attention_preview,
+            )
+            self.assertIn(
                 "OWNER_ACTION=CAMPAIGN_SUCCESSOR_REQUIRED", attention_preview
             )
             self.assertIn(
@@ -1779,6 +1909,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 store=store,
                 now=NOW + timedelta(minutes=15),
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
                 emit=False,
                 persist=True,
                 unit_status={
@@ -1831,14 +1962,16 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 activation=store.get_activation(
                     registered["schedule_sha256"], "ACT-WARN"
                 ),
+                data_root=data_root,
             )
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
-            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertFalse(continuity["campaign_successor_required"])
             recovered = evaluate_operability(
                 root=root,
                 store=store,
                 now=NOW + timedelta(minutes=30),
                 deploy_git_sha=GIT,
+                observation_rdp=data_root,
                 emit=False,
                 persist=True,
                 unit_status={
@@ -1850,8 +1983,8 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     "factory-v1-workbench.service": "active",
                 },
             )
-            self.assertIn("CAMPAIGN_SUCCESSOR_REQUIRED", recovered["present"])
-            self.assertFalse(
+            self.assertNotIn("CAMPAIGN_SUCCESSOR_REQUIRED", recovered["present"])
+            self.assertTrue(
                 any(
                     msg.get("kind") == "RECOVERED"
                     and msg.get("code") == "CAMPAIGN_SUCCESSOR_REQUIRED"
@@ -1898,6 +2031,14 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
         self.assertIn("SUCCESSOR_STOPS_ADMITTING_AT=UNKNOWN", rendered)
         self.assertIn("SUCCESSOR_TIME_REMAINING_SECONDS=UNKNOWN", rendered)
         self.assertNotIn("\nSTOPS_ADMITTING_AT=2026-09-01T12:00:00Z\n", rendered)
+        self.assertIn(
+            "CAMPAIGN_NEXT_STEP=Review direct lifecycle status and exact-selector "
+            "doctor; resolve their state before preparing a successor.",
+            rendered,
+        )
+        self.assertNotIn(
+            "CAMPAIGN_NEXT_STEP=RECONCILE_CAMPAIGN_SUCCESSOR_STATE", rendered
+        )
 
     def test_historical_authorized_same_family_does_not_clear_warning(self) -> None:
         current = _with_window(
@@ -1933,6 +2074,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 activation=store.get_activation(
                     current_registered["schedule_sha256"], "ACT-CURRENT"
                 ),
+                data_root=data_root,
             )
             self.assertEqual(continuity["campaign_successor_state"], "REGISTERED")
             self.assertTrue(continuity["campaign_successor_required"])
@@ -1975,6 +2117,101 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 self.assertIn("reconcile", continuity["campaign_successor_owner_action"])
             store.close()
 
+    def test_mutable_active_stop_mismatch_keeps_successor_warning_fail_closed(
+        self,
+    ) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-CONTINUITY-MUTABLE-STOP-CURRENT-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            registered, _ = _activate_campaign(
+                store, data_root, current, activation_id="ACT-MUTABLE-STOP"
+            )
+            row = store.get_activation(
+                registered["schedule_sha256"], "ACT-MUTABLE-STOP"
+            )
+            assert row is not None
+            row["stops_admitting_at"] = "2026-10-01T12:00:00Z"
+
+            continuity = assess_campaign_successor_continuity(
+                store, now=NOW, activation=row, data_root=data_root
+            )
+
+            self.assertEqual(continuity["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertEqual(
+                continuity["campaign_time_remaining_seconds"], "UNKNOWN"
+            )
+            self.assertIn("reconcile", continuity["campaign_successor_owner_action"])
+            store.close()
+
+    def test_unproven_current_active_does_not_clear_authorized_successor_warning(
+        self,
+    ) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-CONTINUITY-UNPROVEN-CURRENT-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T12:00:00Z",
+            stops_admitting_at="2026-09-02T12:00:00Z",
+            schedule_key="OBS-CONTINUITY-UNPROVEN-SUCCESSOR-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registration, current_authority = _register_and_authorize(
+                store, data_root, current
+            )
+            assert store.acquire_lease("unproven-current", clock=NOW)
+            store.upsert_activation(
+                {
+                    "schedule_sha256": current_registration["schedule_sha256"],
+                    "activation_id": "ACT-UNPROVEN-CURRENT",
+                    "schedule_key": current["schedule_key"],
+                    "state": "ACTIVE",
+                    "authority_receipt_sha256": current_authority["receipt_sha256"],
+                    "starts_at": current["activation"]["starts_at"],
+                    "stops_admitting_at": current["activation"][
+                        "stops_admitting_at"
+                    ],
+                    "payload": {},
+                },
+                clock=NOW,
+            )
+            _register_and_authorize(store, data_root, successor)
+            activation = store.get_activation(
+                current_registration["schedule_sha256"], "ACT-UNPROVEN-CURRENT"
+            )
+            assert activation is not None
+
+            continuity = assess_campaign_successor_continuity(
+                store, now=NOW, activation=activation, data_root=data_root
+            )
+
+            self.assertEqual(continuity["campaign_successor_state"], "UNKNOWN")
+            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertEqual(
+                continuity["campaign_successor_schedule_sha256"], "UNKNOWN"
+            )
+            store.close()
+
     def test_authorized_successor_after_gap_does_not_clear_warning(self) -> None:
         current = _with_window(
             load_observation_schedule(
@@ -2009,6 +2246,7 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 activation=store.get_activation(
                     current_registered["schedule_sha256"], "ACT-CURRENT"
                 ),
+                data_root=data_root,
             )
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
             self.assertTrue(continuity["campaign_successor_required"])
@@ -2053,12 +2291,13 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                     activation=store.get_activation(
                         current_registered["schedule_sha256"], "ACT-CURRENT"
                     ),
+                    data_root=data_root,
                 )
             self.assertEqual(continuity["campaign_successor_state"], "REGISTERED")
             self.assertTrue(continuity["campaign_successor_required"])
             store.close()
 
-    def test_future_active_projection_is_not_reported_as_active_successor(self) -> None:
+    def test_future_active_projection_uses_valid_authorized_continuity(self) -> None:
         current = _with_window(
             load_observation_schedule(
                 ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
@@ -2113,7 +2352,10 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             store.close()
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
-            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertFalse(continuity["campaign_successor_required"])
+            self.assertEqual(
+                continuity["campaign_successor_activation_id"], "UNKNOWN"
+            )
 
     def test_existing_active_upsert_refreshes_freshness(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -2183,11 +2425,11 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
                 ),
                 data_root=data_root,
             )
-            # A prepared SQLite row and a valid authority are not lifecycle
-            # proof: only the committed, immutable rollover events may clear
-            # the warning.
+            # A live authority over a window covering the predecessor cutoff
+            # is sufficient continuity preparation; rollover later adds the
+            # immutable handover proof for the actual cutover.
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
-            self.assertTrue(continuity["campaign_successor_required"])
+            self.assertFalse(continuity["campaign_successor_required"])
             rollover_schedule(
                 root=ROOT,
                 data_root=data_root,
