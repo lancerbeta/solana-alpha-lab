@@ -112,6 +112,7 @@ def assess_campaign_successor_continuity(
     now: datetime,
     activation: Mapping[str, Any] | None,
     data_root: Path | None = None,
+    authority_root: Path | None = None,
     activation_selection_ambiguous: bool = False,
     activation_selection_not_found: bool = False,
 ) -> dict[str, Any]:
@@ -201,6 +202,11 @@ def assess_campaign_successor_continuity(
             ),
         }
     family = cohort_family_key(registered["document"])
+    authority_root = (
+        Path(authority_root)
+        if authority_root is not None
+        else Path(__file__).resolve().parents[3]
+    )
     successor_state = "NONE"
     continuity_proven = False
     successor_schedule_sha256: str | None = None
@@ -216,23 +222,31 @@ def assess_campaign_successor_continuity(
 
     def _authority_is_live(
         schedule_digest: str,
+        document: Mapping[str, Any],
         receipt_sha256: str | None = None,
         *,
         require_bound_receipt: bool = False,
     ) -> bool:
         if require_bound_receipt and not receipt_sha256:
             return False
-        authority = (
-            store.get_authority(receipt_sha256)
-            if receipt_sha256
-            else store.latest_authority_for_schedule(schedule_digest)
-        )
-        if authority is None or str(authority.get("schedule_sha256") or "") != schedule_digest:
-            return False
         try:
-            return parse_utc(str(authority["expires_at"])) > now
-        except (KeyError, TypeError, ValueError):
+            # Continuity is an authority claim, so use the lifecycle validator
+            # rather than trusting only schedule identity and expiry.
+            from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+                _require_live_authority,
+            )
+
+            _require_live_authority(
+                store,
+                root=authority_root,
+                document=document,
+                schedule_sha256=schedule_digest,
+                now=now,
+                receipt_sha256=receipt_sha256,
+            )
+        except Exception:
             return False
+        return True
 
     def _rollover_proves_continuity(
         item: Mapping[str, Any],
@@ -253,6 +267,7 @@ def assess_campaign_successor_continuity(
             )
             or not _authority_is_live(
                 successor_sha,
+                successor_document,
                 receipt_sha,
                 require_bound_receipt=True,
             )
@@ -333,6 +348,7 @@ def assess_campaign_successor_continuity(
                 str(other.get("state") or "") == "ACTIVE"
                 and _authority_is_live(
                     other_sha,
+                    other_reg["document"],
                     str(other.get("authority_receipt_sha256") or "") or None,
                     require_bound_receipt=True,
                 )
@@ -354,7 +370,7 @@ def assess_campaign_successor_continuity(
             other_reg = store.get_registered_schedule(other_sha)
             if other_reg is None or cohort_family_key(other_reg["document"]) != family:
                 continue
-            if _authority_is_live(other_sha):
+            if _authority_is_live(other_sha, other_reg["document"]):
                 best = "AUTHORIZED"
                 if _window_covers(other_reg["document"], current_stops):
                     continuity_proven = True

@@ -584,7 +584,14 @@ class ObservationScheduleStore:
         last_transition_event_id = row.get("last_transition_event_id")
         if existing is not None:
             created_at = str(existing["created_at"])
-            updated_at = str(existing["updated_at"])
+            # Refresh mutable live projections, but keep the immutable
+            # DRAINING transition timestamp stable for recovery/freshness
+            # proofs and current-state selection.
+            updated_at = (
+                str(existing["updated_at"])
+                if str(existing["state"]) == "DRAINING"
+                else now
+            )
         else:
             created_at = now
             updated_at = now

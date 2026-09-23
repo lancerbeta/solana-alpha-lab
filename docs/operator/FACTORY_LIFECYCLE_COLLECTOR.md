@@ -164,18 +164,30 @@ Discovery release seal/verify/import (local RDP; zero network):
 
 ### Proposed bounded owner deploy handoff (not executed by this atom)
 
-Bind `TARGET_SHA` to the exact candidate `git rev-parse HEAD` and exact-head
-CI receipt immediately before the owner deploy gate. The previous live SHA is
-fixed as `ba7f3b725ff4f609e251a4e57751246636e8f8f7`; the canonical host is
-`factory-remote-ops`; and the no-`.git` deploy root is
-`/opt/solana-alpha-lab`. The owner-controlled transport must supply an
-object-bearing checkout for `--repo`; do not infer one from the no-`.git`
-deploy root.
+This handoff has two explicit bindings and one hard stop. `TARGET_SHA` is the
+exact runtime candidate SHA recorded by the final delivery receipt. `SOURCE_REPO`
+is an owner-supplied checkout containing Git objects; the no-`.git` deploy root
+is not a valid source checkout. If either binding is unavailable, stop with
+`BLOCKED_DEPLOY_TRANSPORT_BINDING`; never substitute an unverified path.
+
+Fixed live binding: previous SHA `ba7f3b725ff4f609e251a4e57751246636e8f8f7`,
+host `factory-remote-ops`, deploy root `/opt/solana-alpha-lab`. Owner preflight
+from the object-bearing source checkout:
+
+```
+SOURCE_REPO=<OWNER_BOUND_OBJECT_BEARING_CHECKOUT>
+TARGET_SHA=<EXACT_TARGET_HOTFIX_SHA_FROM_FINAL_RECEIPT>
+test "$(git -C "$SOURCE_REPO" rev-parse HEAD)" = "$TARGET_SHA"
+git -C "$SOURCE_REPO" cat-file -e "$TARGET_SHA^{commit}"
+```
+
+The final candidate SHA must be bound before the owner deploy gate; it is not
+the mutable branch tip and must not be replaced by a later main commit.
 
 The exact route invocation is:
 
 ```
-sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo <OBJECT_BEARING_CHECKOUT> --deploy-root /opt/solana-alpha-lab --target-sha <TARGET_SHA> --previous-sha ba7f3b725ff4f609e251a4e57751246636e8f8f7
+sudo /usr/bin/uv run --locked --managed-python python -B scripts/factory_live_release.py --repo "$SOURCE_REPO" --deploy-root /opt/solana-alpha-lab --target-sha "$TARGET_SHA" --previous-sha ba7f3b725ff4f609e251a4e57751246636e8f8f7
 ```
 
 The route's bounded sequence is `DEPLOY_TARGET` → `ROLLBACK_PREVIOUS` →
@@ -189,11 +201,40 @@ limited to the fixed units plus the file replacement window, followed by a
 separate live readback. The route itself does not authorize, activate, or call
 a provider.
 
-Rollback is triggered by a non-zero release step, final deploy-pin mismatch,
-failed post-deploy doctor/readback, or failed first healthy tick. Use the same
-route with the bindings inverted (`--target-sha
-ba7f3b725ff4f609e251a4e57751246636e8f8f7 --previous-sha <TARGET_SHA>`) and
-accept only after `.factory_deploy_sha` reads back to the previous live SHA.
+The owner post-deploy readback is mandatory before declaring success:
+
+```
+cd /opt/solana-alpha-lab
+test "$(head -c 64 .factory_deploy_sha)" = "$TARGET_SHA"
+systemctl is-active factory-observation-schedule.timer
+systemctl is-active factory-observation-schedule.service || test "$?" -eq 3
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml
+journalctl -u factory-observation-schedule.service --since "<DEPLOY_READBACK_START_UTC>" --no-pager
+```
+
+Accept only when the pin equals `TARGET_SHA`, the observation timer is active,
+status/doctor return the exact selector and a healthy live state, and the next
+scheduled terminal is `TICK_COMPLETE` with exit 0. New Jupiter RECENT calls
+must be `HTTP_OK` when an eligible slot is polled; zero provider calls are
+allowed when no slot is due or all work is already satisfied. No new publication
+job is required when the canonical expectation is `PUBLICATION_NOT_EXPECTED`
+and open publication jobs remain zero.
+
+On a non-zero release step, pin mismatch, failed selector/doctor/timer readback,
+or failed next healthy tick: do not retry blindly. Read the pin and unit state
+first. If the pin is already `TARGET_SHA`, finish readback before deciding. If
+the pin is the old live SHA, the release did not commit the candidate. If the pin
+is neither known SHA, stop for manual inspection and do not overwrite it.
+If the observation service is still active, let that scheduled invocation reach
+its terminal and inspect the journal; do not launch a manual tick, stop the unit,
+or restart the timer. If the timer is inactive or the scheduled terminal is not
+TICK_COMPLETE, keep the release blocked and resolve the exact unit/tick state
+before rollback. Do not rerun deployment or rollback while a tick is in flight.
+Rollback uses the same route with `--target-sha
+ba7f3b725ff4f609e251a4e57751246636e8f8f7 --previous-sha "$TARGET_SHA"`; accept
+only after the pin returns to the previous live SHA, the timer is active, and a
+normal scheduled terminal is observed.
 This handoff is proposed evidence only; this atom performs no live action.
 
 ### No-live smoke (safe when no activation)
@@ -227,6 +268,29 @@ is `DOCTOR_OK` with `current_activation_state=DRAINING` and
 While the predecessor is still admission-capable (`ACTIVE`, or `DRAINING`
 without proven closed admission), a second same-family activation requires an
 exact `rollover` cutover binding. In-window rollover semantics are unchanged.
+
+A `DRAINING` row without the matching immutable rollover transition cannot be
+retrofitted into a new in-window rollover: its original transition timestamp
+and payload are lifecycle evidence and must not be rewritten. A retry is
+allowed only when the exact persisted rollover and its append-only transition
+proof already exist. Otherwise stop on
+`ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE` and inspect the original transition;
+do not create an alternate selector or edit the SQLite projection. Forward
+successor recovery is available only when admission closure and its recovery
+point are independently proven.
+
+For selector readback after `DOCTOR_ACTIVATION_SCOPE_AMBIGUOUS`,
+`DOCTOR_SELECTOR_NOT_FOUND`, or an incomplete selector, first run `status`
+without a selector. Its JSON lists every recorded `(schedule_sha256,
+activation_id, state, transition_event_id)` pair. Use a selector-specific
+`doctor` only after those identifiers match the intended registered campaign;
+if the family or binding cannot be established, stop and reconcile the owner
+scope instead of choosing the freshest row by guess:
+
+```
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py status --runtime-config configs/observation_schedule_runtime_v1.yaml
+/usr/bin/uv run --locked --managed-python python -B scripts/observation_schedule.py doctor --runtime-config configs/observation_schedule_runtime_v1.yaml --schedule-sha256 <REGISTERED_SCHEDULE_SHA256> --activation-id <ACTIVATION_ID>
+```
 
 If `rollover` returns
 `ROLLOVER_IMMUTABLE_PROOF_UNAVAILABLE` with

@@ -1210,6 +1210,10 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
 
     def test_lifecycle_denials_have_owner_next_actions(self) -> None:
         self.assertEqual(
+            owner_next_action_for_lifecycle_error("COHORT_CUTOVER_REQUIRED"),
+            "REGISTER_AUTHORIZE_ROLLOVER_SUCCESSOR",
+        )
+        self.assertEqual(
             owner_next_action_for_lifecycle_error("LATE_SUCCESSOR_BACKDATED"),
             "REGISTER_AUTHORIZE_FORWARD_SUCCESSOR_FROM_LATE_RECOVERY",
         )
@@ -1639,6 +1643,71 @@ class CollectorCampaignContinuityRepairTests(unittest.TestCase):
             )
             self.assertEqual(continuity["campaign_successor_state"], "AUTHORIZED")
             self.assertTrue(continuity["campaign_successor_required"])
+            store.close()
+
+    def test_partial_authority_receipt_does_not_clear_warning(self) -> None:
+        current = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+            ),
+            starts_at="2026-09-01T00:00:00Z",
+            stops_admitting_at="2026-09-01T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-AUTH-CURRENT-001",
+        )
+        successor = _with_window(
+            load_observation_schedule(
+                ROOT, "tests/fixtures/observation_schedule/successor_y259200.yaml"
+            ),
+            starts_at="2026-09-01T12:00:00Z",
+            stops_admitting_at="2026-09-02T12:00:00Z",
+            schedule_key="OBS-EARLY-PUMPFUN-CONTINUITY-AUTH-SUCCESSOR-001",
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp) / "rdp"
+            data_root.mkdir()
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            current_registered, _ = _activate_campaign(
+                store, data_root, current, activation_id="ACT-CURRENT"
+            )
+            _register_and_authorize(store, data_root, successor)
+            with patch.object(
+                store,
+                "latest_authority_for_schedule",
+                return_value={
+                    "schedule_sha256": "f" * 64,
+                    "expires_at": "2026-09-02T00:00:00Z",
+                },
+            ):
+                continuity = assess_campaign_successor_continuity(
+                    store,
+                    now=NOW,
+                    activation=store.get_activation(
+                        current_registered["schedule_sha256"], "ACT-CURRENT"
+                    ),
+                )
+            self.assertEqual(continuity["campaign_successor_state"], "REGISTERED")
+            self.assertTrue(continuity["campaign_successor_required"])
+            store.close()
+
+    def test_existing_active_upsert_refreshes_freshness(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ObservationScheduleStore(Path(tmp) / "ops.sqlite")
+            store.acquire_lease("freshness", clock=NOW)
+            row = {
+                "schedule_sha256": "a" * 64,
+                "activation_id": "ACT-FRESH",
+                "schedule_key": "OBS-FRESH-001",
+                "state": "ACTIVE",
+                "starts_at": "2026-09-01T00:00:00Z",
+                "stops_admitting_at": "2026-09-02T00:00:00Z",
+                "payload": {},
+            }
+            store.upsert_activation(row, clock=NOW)
+            later = NOW + timedelta(seconds=5)
+            store.upsert_activation(row, clock=later)
+            current = store.get_activation("a" * 64, "ACT-FRESH")
+            assert current is not None
+            self.assertEqual(current["updated_at"], render_utc(later))
             store.close()
 
     def test_valid_rollover_clears_warning(self) -> None:

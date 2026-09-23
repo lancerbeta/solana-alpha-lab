@@ -1627,7 +1627,11 @@ class ResearchStore:
             research_event_records_decoded=decoded,
             research_event_payload_bytes_read=payload_bytes,
             used_bounded_lifecycle_route=True,
-            full_committed_payload_scan=bool(unknown_bounds > 0),
+            # Unknown bounds cause those partitions to be opened conservatively;
+            # this route still does not decode every committed payload in the
+            # store. Keep the full-scan claim false and expose the precise
+            # fallback scope through the counters below.
+            full_committed_payload_scan=False,
             research_event_partitions_skipped_by_time=skipped_by_time,
             research_event_partitions_opened_unknown_bounds=unknown_bounds,
             research_event_lifecycle_partitions_total=lifecycle_total,
