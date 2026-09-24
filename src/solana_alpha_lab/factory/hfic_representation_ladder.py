@@ -1610,7 +1610,7 @@ def _execution_provenance_status(
     slot = str(scientific_slot_sha256 or "")
     sources = [packet, receipt, bundle]
 
-    def _hash_value(key: str) -> str | None:
+    def _known_hashes(key: str) -> list[str]:
         observed: list[str] = []
         for source in sources:
             if isinstance(source, Mapping):
@@ -1618,26 +1618,41 @@ def _execution_provenance_status(
                 if isinstance(value, str) and re.fullmatch(r"[0-9a-f]{64}", value):
                     if value not in observed:
                         observed.append(value)
-        if len(observed) > 1:
-            return None
-        return observed[0] if observed else None
+        return observed
 
-    capability = _hash_value("capability_epoch_sha256")
-    payload = _hash_value("representation_payload_sha256")
-    memory = _hash_value("memory_eligibility_sha256")
-    model = _hash_value("model_provenance_sha256")
-    parent = None
+    hash_fields = (
+        "capability_epoch_sha256",
+        "representation_payload_sha256",
+        "memory_eligibility_sha256",
+        "model_provenance_sha256",
+    )
+    known_hashes = {key: _known_hashes(key) for key in hash_fields}
+    if any(len(values) > 1 for values in known_hashes.values()):
+        return EXEC_PROVENANCE_CONFLICT
+    parents: list[str] = []
+    parent_missing = False
     for source in sources:
-        if isinstance(source, Mapping):
-            value = source.get("control_session_id")
-            if isinstance(value, str) and value:
-                parent = value
-                break
+        if not isinstance(source, Mapping):
+            continue
+        value = source.get("control_session_id")
+        if isinstance(value, str) and value.strip():
+            if value not in parents:
+                parents.append(value)
+        else:
+            parent_missing = True
+    if len(parents) > 1:
+        return EXEC_PROVENANCE_CONFLICT
+    if parent_missing or not parents:
+        return EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+    capability, payload, memory, model = (
+        known_hashes[key][0] if known_hashes[key] else None for key in hash_fields
+    )
     if not all(
         re.fullmatch(r"[0-9a-f]{64}", value or "")
         for value in (slot, capability, payload, memory, model)
     ):
         return EXEC_PROVENANCE_HISTORICAL_UNKNOWN
+    parent = parents[0]
     from solana_alpha_lab.factory.hfic_evidence_identity import execution_binding_sha256
 
     expected = execution_binding_sha256(

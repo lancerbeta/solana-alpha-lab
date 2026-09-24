@@ -190,10 +190,14 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      existing freeze identity) **or** pending classify after
      `PASS_TO_CLASSIFICATION`. Do **not** call `consume_start_v1_envelope`
      (that helper is START_V1 only).
-   - `START_BASE` → continue to preflight `START_NEW_SESSION` / Prompt A.
-     When `blocking_reason_codes` includes `CONTROL_SURFACE_REQUIRED`, use
-     CONTROL-compatible BASE (`evidence_surface_mode=
-     CURRENT_REPRESENTATION_CONTROL_V1`) inside this same slash — print
+   - `START_BASE` from a no-write diagnostic (`forge-run --no-write` or
+     `forge-input --no-write`) is not slash authority. When
+     `blocking_reason_codes` includes `CONTROL_SURFACE_REQUIRED`, the factual
+     next state is CONTROL required and `next:` is `STOP_BEFORE_SYNTHESIS`:
+     STOP. Do **not** launch `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL`.
+     Inside an already owner-authorized `/hypothesis-forge` bounded run, the
+     same state still continues CONTROL-compatible BASE
+     (`evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1`) — print
      `owner_readout` (`status: NEXT`); do **not** treat it as evening DONE.
      Fresh empty stores and ordinary V1-trigger negatives both emit this code
      so the first generation is CONTROL-compatible; do **not** invent a second
@@ -210,8 +214,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      `owner_readout` and stop — do **not** start V1 and do **not** report
      evening DONE / success. Persisted pause must not lock the run as
      completed readback; later slash re-resolves from live session state.
-   - Do **not** treat a missing CONTROL surface as owner-final: that path is
-     `START_BASE` + `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) above.
+   - Do **not** treat a missing CONTROL surface as owner-final. On a no-write
+     diagnostic that state is `STOP_BEFORE_SYNTHESIS`, not a CONTROL launch.
+     Inside the authorized slash it remains `START_BASE` +
+     `CONTROL_SURFACE_REQUIRED` (`status: NEXT`) above.
      `/hypothesis-forge CURRENT_REPRESENTATION_CONTROL` remains expert-only
      and is not a separate owner evening.
    Technical / visibility failures stay `OBSERVABILITY_BLOCKED`, never

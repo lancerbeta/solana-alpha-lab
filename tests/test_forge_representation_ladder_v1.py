@@ -74,6 +74,9 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
 )
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
 from solana_alpha_lab.factory.run_passport import canonical_sha256  # noqa: E402
+from solana_alpha_lab.factory.hfic_evidence_identity import (  # noqa: E402
+    execution_binding_sha256,
+)
 from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     ACTION_CONTROL_REQUIRED,
     ACTION_FINISH_RUNNER_UP,
@@ -92,6 +95,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     EXEC_NOT_RUN,
     EXEC_PROVENANCE_CONFLICT,
     EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+    EXEC_PROVENANCE_VERIFIED,
     EXEC_REUSED,
     EXISTING_V1_CONTROL_SESSION_ID,
     HANDLER_SYNTHETIC_LATER_V2,
@@ -100,6 +104,7 @@ from solana_alpha_lab.factory.hfic_representation_ladder import (  # noqa: E402
     consume_start_v1_envelope,
     control_preflight_from_bundle,
     evaluate_forge_run,
+    _execution_provenance_status,
     format_forge_run_owner_readout,
     load_ladder_registry,
     prepare_ladder_freeze_preflight,
@@ -511,6 +516,46 @@ def _v1(**kwargs: object) -> dict[str, object]:
     return row
 
 
+def _provenance_status(**overrides: str | None) -> str:
+    slot = "aa" * 32
+    parent = "HFIC-SESS-BASE"
+    fields = {
+        "capability_epoch_sha256": "11" * 32,
+        "representation_payload_sha256": "33" * 32,
+        "memory_eligibility_sha256": "44" * 32,
+        "model_provenance_sha256": "55" * 32,
+    }
+    binding = execution_binding_sha256(
+        scientific_slot_sha256=slot,
+        control_session_id=parent,
+        **fields,
+    )
+    packet = {"control_session_id": parent, **fields}
+    receipt = {"control_session_id": parent, **fields}
+    bundle = {
+        "control_session_id": parent,
+        "execution_binding_sha256": binding,
+        **fields,
+    }
+    if "control_session_id" in overrides:
+        packet["control_session_id"] = overrides.pop("control_session_id")
+    for key, value in overrides.items():
+        if value is None:
+            packet.pop(key, None)
+            receipt.pop(key, None)
+            bundle.pop(key, None)
+        else:
+            packet[key] = value
+    return _execution_provenance_status(
+        bundle,
+        receipt=receipt,
+        packet=packet,
+        scientific_slot_sha256=slot,
+        stored_binding=binding,
+        execution_status=EXEC_EXECUTED,
+    )
+
+
 class ResolveNextActionTests(unittest.TestCase):
     def test_positive_base_candidate_skips_v1(self) -> None:
         decision = resolve_next_action(
@@ -705,6 +750,33 @@ class ResolveNextActionTests(unittest.TestCase):
         self.assertIn("next: CONTROL_ENTRY", text)
         self.assertIn("/hypothesis-forge CURRENT_REPRESENTATION_CONTROL", text)
         self.assertNotIn("STOP_BEFORE_SYNTHESIS", text)
+
+    def test_known_hash_mismatch_is_execution_binding_conflict(self) -> None:
+        fields = (
+            "capability_epoch_sha256",
+            "representation_payload_sha256",
+            "memory_eligibility_sha256",
+            "model_provenance_sha256",
+        )
+        for key in fields:
+            with self.subTest(key=key):
+                status = _provenance_status(**{key: "22" * 32})
+                self.assertEqual(status, EXEC_PROVENANCE_CONFLICT)
+
+    def test_differing_control_session_id_is_conflict(self) -> None:
+        self.assertEqual(
+            _provenance_status(control_session_id="HFIC-SESS-OTHER"),
+            EXEC_PROVENANCE_CONFLICT,
+        )
+
+    def test_missing_historical_hash_is_not_a_false_conflict(self) -> None:
+        self.assertEqual(
+            _provenance_status(model_provenance_sha256=None),
+            EXEC_PROVENANCE_HISTORICAL_UNKNOWN,
+        )
+
+    def test_matching_known_provenance_stays_verified(self) -> None:
+        self.assertEqual(_provenance_status(), EXEC_PROVENANCE_VERIFIED)
 
     def test_occupied_slot_readback_block_has_owner_recovery_next(self) -> None:
         text = format_forge_run_owner_readout(
