@@ -1,0 +1,73 @@
+{
+  "acceptance_id": "FACTORY-LIVE-MAIN-PARITY-COMPLETION-001",
+  "active_stop_conditions": [],
+  "as_of": "2026-09-24",
+  "base_main": "11bdb4349071f1309ca3cd48760d707bbdd06a56",
+  "owner_approvals": [
+    "OK FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1"
+  ],
+  "capability_radar_now": "NONE",
+  "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
+  "cloud_bundle_required_by_harness": false,
+  "cloud_bundle_smoke_required": false,
+  "factory_fit": {
+    "path": "docs/evidence/factory_live_main_parity_convergence_v1/delivery_factory_fit_v1.json",
+    "sha256": "6efba93f5ebaa8dd5c453b0a289a3b2663d971fe632524ee32f77027bf3646e1",
+    "verdict": "PASS"
+  },
+  "implementation_bindings": {
+    "catalog/assets/core.yaml": "0c0881bdae6eb02ee6d379a706b2b927038b6cb768f8113eee2a57bbebe4c1d0",
+    "docs/operator/FACTORY_LIFECYCLE_COLLECTOR.md": "9e6095f0a855c0e7d8bd6bf962a2a722e4a4c6feba5852aee8cf073c438e1796",
+    "docs/tasks/FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1.md": "f5ce78c14fe6ddead30d51a11d7517f3b67808d95cacec7fe855fa1a1ea6f225",
+    "src/solana_alpha_lab/factory/collector_operational_packet.py": "47ae0ad0409040737fba234053ee7141accb57d608411bc3ecb972ea42a84bc2",
+    "src/solana_alpha_lab/factory/collector_read_model.py": "06562fe74d2bf4be2f4e828dfaa2bb2465c39a3940e250da05e37e62265e978d",
+    "src/solana_alpha_lab/factory/observation_schedule_lifecycle.py": "c6c9854822689903fc190978b8d6f4abef261839a1990854413e0476592e3cd7",
+    "src/solana_alpha_lab/factory/observation_scheduler.py": "8b3725348d0e78923180fbaff57ec376275f17d18a494873d2323551279faa25",
+    "src/solana_alpha_lab/factory/offhost_backup.py": "43e18bec23e1d0093211ba7f19f6863b7fef010bbec70865279a2b0303a3dc30",
+    "src/solana_alpha_lab/factory/remote_ops.py": "ee06a3eb46c20fefacf405a8ba9b9a66fbc31eb0dc90422f352d98ca99a13fea",
+    "tests/test_collector_continuity_boundaries_v1.py": "53a13e4183230f8fc59007557ae462c5e341d7a31b680973ae556ea17f3e5c22",
+    "tests/test_factory_offhost_backup.py": "5c4a5f86aa3ae563702a0c3370fd4b3a855bbe40dfc7bc7a4e6a625d8d88ba5a",
+    "tests/test_factory_remote_operations.py": "e68e4f3b42732169423108eb97b9caabd1e570c80e4980f90e47f4006aaf835d"
+  },
+  "non_claims": [
+    "NO_DEPLOY",
+    "NO_VPS_OR_DRIVE_MUTATION",
+    "NO_NEW_SCIENCE",
+    "PR_331_NOT_MERGED"
+  ],
+  "owner_attention_triggers": {
+    "auth_or_access_recovery": false,
+    "external_material_action": false,
+    "material_owner_decision": false,
+    "unresolved_safety_or_truth_conflict": false,
+    "user_only_activation": false
+  },
+  "project_sources_disposition": {
+    "kind": "NO_CHANGE"
+  },
+  "schema": "smial.delivery-completion-evidence",
+  "schema_version": "1.0",
+  "side_effects": {
+    "cash_spend_usd_cents": 0,
+    "credential_reads": 0,
+    "fallbacks": 0,
+    "provider_requests": 0,
+    "retries": 0,
+    "wallet_signer_transaction_actions": 0
+  },
+  "state_change": "MAIN_PARITY_CANDIDATE_READY_FOR_OWNER_MERGE",
+  "task_id": "FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1",
+  "validation": {
+    "targeted": "PASS_BACKUP_AND_CONTINUITY_TESTS",
+    "independent_review": {
+      "path": "docs/evidence/factory_live_main_parity_convergence_v1/delivery_independent_review_v1.json",
+      "sha256": "3173aac1f13db666f8d26b6c9ef3db7f1890ca8f3e41aa1161724accb8350081",
+      "verdict": "PASS"
+    },
+    "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
+    "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
+    "project_checks": [
+      "PASS_TARGETED_BACKUP_AND_CONTINUITY_TESTS"
+    ]
+  }
+}

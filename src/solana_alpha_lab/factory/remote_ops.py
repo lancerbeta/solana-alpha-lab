@@ -748,24 +748,136 @@ def _backup_source_paths(
     return result
 
 
+def _is_publication_job_path(relative: str) -> bool:
+    normalized = str(relative).replace("\\", "/")
+    return "/datasets/publication_jobs/" in f"/{normalized}"
+
+
+def _publication_job_roots(root: Path, loaded: Mapping[str, Any]) -> list[str]:
+    _sources, recursive = _effective_backup_lists(root, loaded)
+    roots: list[str] = []
+    for relative in recursive:
+        normalized = str(relative).replace("\\", "/").rstrip("/")
+        if normalized.endswith("datasets/publication_jobs"):
+            roots.append(normalized)
+            continue
+        nested = f"{normalized}/datasets/publication_jobs"
+        candidate = _safe_relative(root, nested)
+        if candidate.is_dir():
+            roots.append(nested)
+    return roots
+
+
+class BackupPayloadSnapshot:
+    """Bytes captured once for mutable publication jobs.
+
+    Inventory and packaging both read this capture. The live pathname is
+    not opened again after the file has been copied into the snapshot.
+    """
+
+    def __init__(self, captured: Mapping[str, Mapping[str, Any]]) -> None:
+        self._captured = {
+            str(path).replace("\\", "/"): dict(item) for path, item in captured.items()
+        }
+
+    def owns(self, relative: str) -> bool:
+        return _is_publication_job_path(relative)
+
+    def has(self, relative: str) -> bool:
+        return str(relative).replace("\\", "/") in self._captured
+
+    def entry(self, relative: str) -> dict[str, Any]:
+        key = str(relative).replace("\\", "/")
+        try:
+            return dict(self._captured[key])
+        except KeyError as exc:
+            raise RemoteOpsError("SNAPSHOT_BYTES_MISSING") from exc
+
+    def staged_path(self, relative: str) -> Path:
+        staged = self.entry(relative).get("staged")
+        if not isinstance(staged, Path):
+            raise RemoteOpsError("SNAPSHOT_BYTES_MISSING")
+        return staged
+
+    def items(self) -> list[tuple[str, dict[str, Any]]]:
+        return sorted(self._captured.items(), key=lambda item: item[0])
+
+
+def _capture_mutable_file(live: Path, dest: Path) -> tuple[str, int] | None:
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    digest = hashlib.sha256()
+    size = 0
+    try:
+        with live.open("rb") as src, dest.open("wb") as out:
+            while True:
+                chunk = src.read(BACKUP_STREAM_CHUNK)
+                if not chunk:
+                    break
+                out.write(chunk)
+                digest.update(chunk)
+                size += len(chunk)
+            out.flush()
+            os.fsync(out.fileno())
+    except FileNotFoundError:
+        dest.unlink(missing_ok=True)
+        return None
+    return digest.hexdigest(), size
+
+
+@contextmanager
+def backup_payload_snapshot(
+    root: Path,
+    loaded: Mapping[str, Any],
+) -> Iterator[BackupPayloadSnapshot]:
+    """Stage the publication-job subtree for the rest of this backup run."""
+
+    captured: dict[str, dict[str, Any]] = {}
+    with tempfile.TemporaryDirectory(prefix="factory-mutable-snapshot-") as staging_name:
+        staging = Path(staging_name)
+        for job_root in _publication_job_roots(root, loaded):
+            source_root = _safe_relative(root, job_root)
+            if source_root.is_dir() is False:
+                continue
+            for live in sorted(path for path in source_root.rglob("*") if path.is_file()):
+                relative = live.relative_to(root).as_posix()
+                staged = staging / relative
+                copied = _capture_mutable_file(live, staged)
+                if copied is None:
+                    continue
+                digest, size = copied
+                captured[relative] = {
+                    "sha256": digest,
+                    "bytes": size,
+                    "staged": staged,
+                    "kind": "FILE_SNAPSHOT",
+                }
+        yield BackupPayloadSnapshot(captured)
+
+
 def scan_backup_inventory(
     root: Path,
     *,
     config: Mapping[str, Any] | None = None,
+    snapshot: BackupPayloadSnapshot | None = None,
 ) -> dict[str, Any]:
     loaded = dict(config) if config is not None else load_config(root)
     loaded = _select_v1_1_config(root, loaded)
+    if snapshot is None:
+        with backup_payload_snapshot(root, loaded) as owned:
+            return scan_backup_inventory(root, config=loaded, snapshot=owned)
     sources = _backup_source_paths(root, loaded)
     entries: list[dict[str, Any]] = []
     with tempfile.TemporaryDirectory(prefix="factory-inventory-") as staging_name:
         staging = Path(staging_name)
         for relative, source, is_sqlite in sources:
+            if snapshot.owns(relative):
+                continue
             if is_sqlite and str(loaded.get("schema_version")) == "1.1":
-                snapshot = staging / relative
-                snapshot.parent.mkdir(parents=True, exist_ok=True)
-                consistent_sqlite_backup(source, snapshot)
-                digest = _sha256_file(snapshot)
-                size = snapshot.stat().st_size
+                sqlite_snapshot = staging / relative
+                sqlite_snapshot.parent.mkdir(parents=True, exist_ok=True)
+                consistent_sqlite_backup(source, sqlite_snapshot)
+                digest = _sha256_file(sqlite_snapshot)
+                size = sqlite_snapshot.stat().st_size
                 kind = "SQLITE_BACKUP_API"
             else:
                 digest = _sha256_file(source)
@@ -777,6 +889,15 @@ def scan_backup_inventory(
                     "sha256": digest,
                     "bytes": size,
                     "kind": kind,
+                }
+            )
+        for relative, captured in snapshot.items():
+            entries.append(
+                {
+                    "path": relative,
+                    "sha256": captured["sha256"],
+                    "bytes": captured["bytes"],
+                    "kind": captured["kind"],
                 }
             )
     return {
@@ -793,6 +914,7 @@ def package_backup(
     environ: Mapping[str, str] | None = None,
     acquire_lock: bool = True,
     prune_superseded: bool | None = None,
+    snapshot: BackupPayloadSnapshot | None = None,
 ) -> dict[str, Any]:
     if acquire_lock:
         with backup_plane_lock(root):
@@ -803,9 +925,21 @@ def package_backup(
                 environ=environ,
                 acquire_lock=False,
                 prune_superseded=prune_superseded,
+                snapshot=snapshot,
             )
     loaded = dict(config) if config is not None else load_config(root)
     loaded = _select_v1_1_config(root, loaded)
+    if snapshot is None:
+        with backup_payload_snapshot(root, loaded) as owned:
+            return package_backup(
+                root,
+                config=loaded,
+                sink_override=sink_override,
+                environ=environ,
+                acquire_lock=False,
+                prune_superseded=prune_superseded,
+                snapshot=owned,
+            )
     if sink_override is not None:
         raw_sink = sink_override.absolute()
         _reject_symlink_components(raw_sink)
@@ -830,10 +964,12 @@ def package_backup(
                 allowZip64=True,
             ) as archive:
                 for relative, source, is_sqlite in sources:
-                    snapshot = staging / relative
+                    if snapshot.owns(relative):
+                        continue
+                    sqlite_snapshot = staging / relative
                     if is_sqlite and str(loaded.get("schema_version")) == "1.1":
-                        consistent_sqlite_backup(source, snapshot)
-                        digest, size = _stream_zip_entry(archive, relative, snapshot)
+                        consistent_sqlite_backup(source, sqlite_snapshot)
+                        digest, size = _stream_zip_entry(archive, relative, sqlite_snapshot)
                         kind = "SQLITE_BACKUP_API"
                     else:
                         digest, size = _stream_zip_entry(archive, relative, source)
@@ -844,6 +980,20 @@ def package_backup(
                             "sha256": digest,
                             "bytes": size,
                             "kind": kind,
+                        }
+                    )
+                for relative, captured in snapshot.items():
+                    digest, size = _stream_zip_entry(
+                        archive, relative, snapshot.staged_path(relative)
+                    )
+                    if digest != str(captured["sha256"]) or size != int(captured["bytes"]):
+                        raise RemoteOpsError("SNAPSHOT_BYTES_MISMATCH")
+                    entries.append(
+                        {
+                            "path": relative,
+                            "sha256": digest,
+                            "bytes": size,
+                            "kind": str(captured["kind"]),
                         }
                     )
                 rdp_entries = [
@@ -939,6 +1089,7 @@ def package_delta_backup(
     current_entries: Sequence[Mapping[str, Any]],
     sink: Path,
     acquire_lock: bool = False,
+    snapshot: BackupPayloadSnapshot | None = None,
 ) -> dict[str, Any]:
     if acquire_lock:
         with backup_plane_lock(root):
@@ -948,6 +1099,7 @@ def package_delta_backup(
                 current_entries=current_entries,
                 sink=sink,
                 acquire_lock=False,
+                snapshot=snapshot,
             )
     sink.mkdir(parents=True, exist_ok=True)
     base_by_path = {
@@ -988,18 +1140,29 @@ def package_delta_backup(
             packed_changed: list[dict[str, Any]] = []
             for item in changed:
                 relative = str(item["path"])
-                source = _safe_relative(root, relative)
+                if snapshot is not None and snapshot.owns(relative):
+                    source = snapshot.staged_path(relative)
+                elif _is_publication_job_path(relative):
+                    raise RemoteOpsError("MUTABLE_SNAPSHOT_REQUIRED")
+                else:
+                    source = _safe_relative(root, relative)
                 if relative.endswith(".sqlite"):
-                    snapshot = tmp.parent / f".sqlite-{os.getpid()}-{time.time_ns()}"
+                    sqlite_snapshot = tmp.parent / f".sqlite-{os.getpid()}-{time.time_ns()}"
                     try:
-                        consistent_sqlite_backup(source, snapshot)
-                        digest, size = _stream_zip_entry(archive, relative, snapshot)
+                        consistent_sqlite_backup(source, sqlite_snapshot)
+                        digest, size = _stream_zip_entry(archive, relative, sqlite_snapshot)
                     finally:
-                        snapshot.unlink(missing_ok=True)
+                        sqlite_snapshot.unlink(missing_ok=True)
                     kind = "SQLITE_BACKUP_API"
                 else:
                     digest, size = _stream_zip_entry(archive, relative, source)
                     kind = "FILE_SNAPSHOT"
+                if snapshot is not None and snapshot.owns(relative):
+                    expected = snapshot.entry(relative)
+                    if digest != str(expected["sha256"]) or size != int(expected["bytes"]):
+                        raise RemoteOpsError("SNAPSHOT_BYTES_MISMATCH")
+                    if digest != str(item.get("sha256")) or size != int(item.get("bytes") or -1):
+                        raise RemoteOpsError("SNAPSHOT_BYTES_MISMATCH")
                 packed_changed.append(
                     {"path": relative, "sha256": digest, "bytes": size, "kind": kind}
                 )

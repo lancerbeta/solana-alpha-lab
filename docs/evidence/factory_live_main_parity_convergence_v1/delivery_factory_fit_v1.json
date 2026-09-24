@@ -1,0 +1,33 @@
+{
+  "as_of": "2026-09-24",
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
+  "dimensions": {
+    "build_vs_buy": "PASS_REUSE_PROVEN_LIVE_INVARIANTS",
+    "context_efficiency": "PASS_ONE_TASK_CONTRACT",
+    "execution_to_cashflow": "NOT_APPLICABLE",
+    "flexibility_and_history": "PASS_PR330_SELECTION_KEPT",
+    "mission": "PASS_MAIN_PARITY_WITH_PROVEN_LIVE_RECOVERY",
+    "monitoring_and_recovery": "PASS_NO_VPS_OR_DRIVE_MUTATION",
+    "owner_operability": "PASS_NO_NEW_OPERATOR_SURFACE",
+    "red_team": "PASS_NO_REMOTE_DELETE_OR_SECRET_IN_RECEIPTS",
+    "research_truth": "PASS_NO_NEW_ESTIMAND",
+    "security": "PASS_SECRET_FREE_TRACKED_EVIDENCE"
+  },
+  "limits": [
+    "NO_DEPLOY",
+    "NO_VPS_OR_DRIVE_MUTATION",
+    "PR_331_NOT_MERGED"
+  ],
+  "mode": "FAST_PATH",
+  "recovery": "REVERT_THIS_BRANCH_ONLY",
+  "review_id": "FACTORY-LIVE-MAIN-PARITY-FACTORY-FIT-001",
+  "reviewed_bindings_sha256": "ad5059b852ac0dfcc9824b7f5ca563bb67a5ee602e5fbb707f1e785630a53ebb",
+  "reviewed_inventory_sha256": "874d1dd4b83c57e3272b4550c02578efab42f10bba247248289c5aec7b487ba2",
+  "schema": "smial.delivery-harness-factory-fit",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1",
+  "verdict": "PASS"
+}

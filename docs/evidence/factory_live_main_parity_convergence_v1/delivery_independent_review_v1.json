@@ -1,0 +1,39 @@
+{
+  "as_of": "2026-09-24",
+  "non_claims": [
+    "NO_CRYPTOGRAPHIC_REVIEWER_IDENTITY",
+    "REVIEW_IS_NOT_SEMANTIC_DONE",
+    "NO_DEPLOY"
+  ],
+  "required_roles": [
+    "CODE_REVIEWER",
+    "ARCHITECTURE_CRITIC"
+  ],
+  "review_id": "FACTORY-LIVE-MAIN-PARITY-INDEPENDENT-REVIEW-001",
+  "reviewed_bindings_sha256": "ad5059b852ac0dfcc9824b7f5ca563bb67a5ee602e5fbb707f1e785630a53ebb",
+  "reviewed_inventory_sha256": "874d1dd4b83c57e3272b4550c02578efab42f10bba247248289c5aec7b487ba2",
+  "reviews": [
+    {
+      "findings": [
+        "CHECKED_PUBLICATION_JOB_CAPTURE_IS_NOT_REREAD",
+        "CHECKED_CHAIN_TIP_MOVES_ONLY_AFTER_VERIFIED_RECEIPT",
+        "CHECKED_HISTORICAL_FAMILIES_DO_NOT_BLANK_CURRENT_ACTIVE"
+      ],
+      "role": "CODE_REVIEWER",
+      "verdict": "PASS"
+    },
+    {
+      "findings": [
+        "CHECKED_AS_OF_SELECTION_KEEPS_CURRENT_AHEAD_OF_NOT_YET_EFFECTIVE_SUCCESSOR",
+        "CHECKED_PENDING_CURRENT_STAYS_AHEAD_OF_HISTORICAL_ROWS",
+        "CHECKED_NO_VPS_OR_DRIVE_COUPLING"
+      ],
+      "role": "ARCHITECTURE_CRITIC",
+      "verdict": "PASS"
+    }
+  ],
+  "schema": "smial.delivery-independent-review-evidence",
+  "schema_version": "1.0",
+  "task_id": "FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1",
+  "verdict": "PASS"
+}
