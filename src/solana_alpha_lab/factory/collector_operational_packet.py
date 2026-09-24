@@ -16,6 +16,7 @@ from typing import Any, Mapping
 
 from solana_alpha_lab.factory.collector_read_model import (
     build_collector_read_model,
+    activation_rows_with_family_keys,
     select_current_activation,
 )
 from solana_alpha_lab.factory.due_pressure import backlog_risk_from_due_pressure
@@ -1025,10 +1026,15 @@ def build_collector_operational_packet(
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
         if requested is not None:
-            continuity_activation = select_current_activation([requested], now=clock)
+            continuity_activation = select_current_activation(
+                activation_rows_with_family_keys(store, [requested]),
+                now=clock,
+                explicit_scope=True,
+            )
     if continuity_activation is None:
         continuity_activation = select_current_activation(
-            store.list_activations(), now=clock
+            activation_rows_with_family_keys(store, store.list_activations()),
+            now=clock,
         )
     continuity = assess_campaign_successor_continuity(
         store,
@@ -1223,6 +1229,7 @@ def build_collector_operational_packet(
         "schedule_sha256": base.get("schedule_sha256") or UNKNOWN,
         "activation_id": base.get("activation_id") or UNKNOWN,
         "activation_state": base.get("activation_state") or UNKNOWN,
+        "activation_selection_status": base.get("activation_selection_status") or UNKNOWN,
         "campaign_id": campaign_id or UNKNOWN,
         "cohort_id": release.get("cohort_id") or UNKNOWN,
         "stops_admitting_at": continuity.get("stops_admitting_at") or UNKNOWN,

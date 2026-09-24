@@ -53,10 +53,180 @@ def _activation_freshness_key(row: MappingLike) -> tuple[str, str, str]:
     )
 
 
+_CURRENT_LIVE_STATES = frozenset({"ACTIVE", "DRAINING"})
+
+
+def activation_rows_with_family_keys(
+    store: ObservationScheduleStore,
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+) -> list[dict[str, Any]]:
+    """Attach canonical family identity before current-state selection."""
+
+    from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+        cohort_family_key,
+    )
+
+    enriched: list[dict[str, Any]] = []
+    for raw in activations:
+        row = dict(raw)
+        schedule_sha256 = str(row.get("schedule_sha256") or "")
+        registered = (
+            store.get_registered_schedule(schedule_sha256) if schedule_sha256 else None
+        )
+        if registered is not None:
+            try:
+                row["cohort_family_key"] = cohort_family_key(registered["document"])
+            except (KeyError, TypeError, ValueError):
+                row["cohort_family_key"] = ""
+        enriched.append(row)
+    return enriched
+
+
+def project_activation_as_of(row: MappingLike, now: datetime) -> dict[str, Any]:
+    """Return the lifecycle state visible at ``now``.
+
+    Persisted bytes stay unchanged. A transition whose effective time is still
+    in the future keeps the prior ACTIVE or DRAINING state. Any other prior,
+    including an unregistered successor, is UNKNOWN until that effective time.
+    """
+
+    clock = now.astimezone(UTC) if now.tzinfo is not None else now.replace(tzinfo=UTC)
+    projected = dict(row)
+    payload = projected.get("payload")
+    if isinstance(payload, str):
+        try:
+            payload = json.loads(payload)
+        except (TypeError, ValueError):
+            return projected
+    if not isinstance(payload, dict):
+        return projected
+    effective_raw = payload.get("transition_effective_at")
+    if not effective_raw:
+        return projected
+    try:
+        effective_at = parse_utc(str(effective_raw))
+    except (TypeError, ValueError):
+        return projected
+    if effective_at <= clock:
+        projected.pop("future_transition_pending", None)
+        return projected
+    prior_state = str(payload.get("prior_state") or "")
+    if prior_state == "ACTIVE":
+        projected["state"] = "ACTIVE"
+    elif prior_state == "DRAINING":
+        projected["state"] = "DRAINING"
+    else:
+        projected["state"] = "UNKNOWN"
+    projected["future_transition_pending"] = True
+    return projected
+
+
+def _as_of_rows(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    now: datetime | None,
+) -> list[dict[str, Any]]:
+    if now is None:
+        return [dict(row) for row in activations]
+    clock = now.astimezone(UTC) if now.tzinfo is not None else now.replace(tzinfo=UTC)
+    return [project_activation_as_of(row, clock) for row in activations]
+
+
+def _current_live_family_status(rows: list[MappingLike] | tuple[MappingLike, ...]) -> str:
+    live = [row for row in rows if str(row.get("state") or "") in _CURRENT_LIVE_STATES]
+    if not live:
+        return "NO_LIVE" if rows else "EMPTY"
+    if not any("cohort_family_key" in row for row in live):
+        return "SCOPED"
+    family_keys = {
+        str(row.get("cohort_family_key") or "")
+        for row in live
+        if str(row.get("cohort_family_key") or "")
+    }
+    missing_family = any(not str(row.get("cohort_family_key") or "") for row in live)
+    if missing_family or len(family_keys) != 1:
+        return "AMBIGUOUS"
+    return "SCOPED"
+
+
+def _activation_selection_has_unknown_future(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    now: datetime,
+) -> bool:
+    clock = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
+    clock = clock.astimezone(UTC)
+    unknown_future_transition = False
+    known_current_peer = False
+    for row in activations:
+        payload = row.get("payload")
+        if isinstance(payload, str):
+            try:
+                payload = json.loads(payload)
+            except (TypeError, ValueError):
+                return True
+        if payload is not None and not isinstance(payload, dict):
+            return True
+        if not isinstance(payload, dict):
+            payload = {}
+        effective_raw = payload.get("transition_effective_at")
+        if effective_raw:
+            try:
+                parse_utc(str(effective_raw))
+            except (TypeError, ValueError):
+                return True
+        projected = project_activation_as_of(row, clock)
+        future_effective = projected.get("future_transition_pending") is True
+        current_state = str(
+            projected.get("state") if future_effective else row.get("state") or ""
+        )
+        if future_effective and current_state not in _CURRENT_LIVE_STATES:
+            unknown_future_transition = True
+            continue
+        known_current_peer = known_current_peer or current_state in _CURRENT_LIVE_STATES
+        updated_raw = row.get("updated_at")
+        if updated_raw:
+            try:
+                updated_at = parse_utc(str(updated_raw))
+            except (TypeError, ValueError):
+                return True
+            if updated_at > clock and not future_effective:
+                return True
+    return unknown_future_transition and not known_current_peer
+
+
+def activation_selection_status(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    *,
+    family_key: str | None = None,
+    now: datetime | None = None,
+) -> str:
+    """Classify whether current-activation selection has a safe scope.
+
+    Only as-of ACTIVE/DRAINING rows participate. Historical terminal rows from
+    other families do not create ambiguity. No live row is NO_LIVE, not AMBIGUOUS.
+    """
+
+    candidates = (
+        [
+            row
+            for row in activations
+            if str(row.get("cohort_family_key") or "") == family_key
+        ]
+        if family_key
+        else activations
+    )
+    if now is not None and _activation_selection_has_unknown_future(candidates, now):
+        return "UNKNOWN"
+    if family_key:
+        return "SCOPED"
+    return _current_live_family_status(_as_of_rows(candidates, now))
+
+
 def select_current_activation(
     activations: list[MappingLike] | tuple[MappingLike, ...],
     *,
     now: datetime | None = None,
+    family_key: str | None = None,
+    explicit_scope: bool = False,
 ) -> dict[str, Any] | None:
     """Deterministic current campaign activation for status/doctor/operability.
 
@@ -73,31 +243,32 @@ def select_current_activation(
     if now is not None:
         clock = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
         clock = clock.astimezone(UTC)
+    if clock is not None and _activation_selection_has_unknown_future(
+        activations if family_key is None else [
+            row for row in activations if str(row.get("cohort_family_key") or "") == family_key
+        ],
+        clock,
+    ):
+        return None
     rows: list[dict[str, Any]] = []
     for raw in activations:
-        row = dict(raw)
-        if clock is not None:
-            payload = row.get("payload")
-            if isinstance(payload, str):
-                try:
-                    payload = json.loads(payload)
-                except (TypeError, ValueError):
-                    payload = None
-            if isinstance(payload, dict):
-                effective_raw = payload.get("transition_effective_at")
-                if effective_raw:
-                    try:
-                        effective_at = parse_utc(str(effective_raw))
-                    except (TypeError, ValueError):
-                        effective_at = None
-                    if effective_at is not None and effective_at > clock:
-                        prior_state = str(payload.get("prior_state") or "")
-                        if prior_state in {"ACTIVE", "DRAINING"}:
-                            row["state"] = prior_state
-                            row["future_transition_pending"] = True
-                        else:
-                            continue
+        row = project_activation_as_of(raw, clock) if clock is not None else dict(raw)
+        if (
+            clock is not None
+            and row.get("future_transition_pending") is True
+            and str(row.get("state") or "") in _CURRENT_LIVE_STATES
+        ):
+            row["selection_updated_at"] = render_utc(clock)
         rows.append(row)
+    if family_key is not None:
+        rows = [
+            row for row in rows if str(row.get("cohort_family_key") or "") == family_key
+        ]
+    elif (not explicit_scope or len(rows) != 1) and activation_selection_status(rows) in {
+        "AMBIGUOUS",
+        "UNKNOWN",
+    }:
+        return None
     if not rows:
         return None
     active = [row for row in rows if str(row.get("state") or "") == "ACTIVE"]
@@ -345,14 +516,19 @@ def build_collector_read_model(
         now = now.replace(tzinfo=UTC)
     now = now.astimezone(UTC)
     window_start = now - timedelta(hours=24)
-    activations = store.list_activations()
+    activations = activation_rows_with_family_keys(store, store.list_activations())
     selected = None
     if schedule_sha256 and activation_id:
         requested = store.get_activation(schedule_sha256, activation_id)
         if requested is not None:
-            selected = select_current_activation([requested], now=now)
+            selected = select_current_activation(
+                activation_rows_with_family_keys(store, [requested]),
+                now=now,
+                explicit_scope=True,
+            )
     elif activations:
         selected = select_current_activation(activations, now=now)
+    selection_status = activation_selection_status(activations, now=now)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
     activation_state = str((selected or {}).get("state") or "NONE")
@@ -390,6 +566,13 @@ def build_collector_read_model(
         payload = call.get("payload") or {}
         if isinstance(payload, str):
             continue
+        if isinstance(payload, dict) and (digest or act_id):
+            call_digest = str(payload.get("schedule_sha256") or "")
+            call_activation = str(payload.get("activation_id") or "")
+            if call_digest and digest and call_digest != digest:
+                continue
+            if call_activation and act_id and call_activation != act_id:
+                continue
         updated = _safe_parse(call.get("updated_at") or call.get("created_at"))
         if updated is None:
             current_state_calls.append(call)
@@ -492,6 +675,7 @@ def build_collector_read_model(
         "schedule_sha256": digest or None,
         "activation_id": act_id or None,
         "activation_state": activation_state,
+        "activation_selection_status": selection_status,
         "last_tick_at": last_tick_at,
         "last_source_poll_attempt_at": last_source_poll_attempt_at,
         "last_source_poll_success_at": last_source_poll_success_at,
