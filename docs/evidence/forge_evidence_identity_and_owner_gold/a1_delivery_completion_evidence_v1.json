@@ -5,7 +5,7 @@
   "as_of": "2026-09-23",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
   "state_change": "CANONICAL_FORGE_MARKET_CAPABILITY_IDENTITY",
-  "base_main": "11bdb4349071f1309ca3cd48760d707bbdd06a56",
+  "base_main": "0b4c933c1f3143b7772fab943f45a8dfec309c0b",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
@@ -15,7 +15,7 @@
     ".agents/skills/independent-hypothesis-critic/SKILL.md": "da7f74c9992bc95fd333930c53a1b5c3f2968e390a9ed138e65362f5846b1eae",
     ".cursor/commands/hypothesis-forge.md": "9c4e3b39c134721e86f76f48a752ddae88f1a962eded96d6e10d34d9b005b583",
     ".github/workflows/ci.yml": "cd70443f40c5542adb3357e6f5f1d15721ff55d8166943363b4d73c00f710e60",
-    "catalog/assets/core.yaml": "e906e458e400a3c8a8bfac2f23e653b5cc8dec1d76d28fa1c0655cac9ac2ff4e",
+    "catalog/assets/core.yaml": "c1360fb78646c796b8fd6783fe67811d4d7b997c0e282823482227970eb03110",
     "catalog/assets/lifecycle.yaml": "849f50e97008c987ad55015a3bdd5cbb4d5af3d996598559002bea66b27fef81",
     "catalog/catalog_manifest.yaml": "7987567fb94130c6bcfa4093bb8ff0c7b4f63f5a2bde3bc1f0235f8961f4c627",
     "catalog/generated/asset_edges.json": "44a1e30724a6063d4d42683d652a9fea605a4b218de1be9e82ade0384c24d1a7",
@@ -27,10 +27,10 @@
     "catalog/schemas/hypothesis_forge_session_receipt_v1_3.schema.json": "8b418bd89ce70138b35b700655d86a8b8cc38533d41ad2aef9e12fb36929ee9c",
     "docs/PROJECT_MAP.md": "c89475b7ec8d6311d7c2ea965ed4e89d469993c11fe69efe064b1a4c72f886b0",
     "docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json": "0ddde59323698cee263a90811c27bca80f773ee26b58f39b3b921834c5e5a18a",
-    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "bfaf39b24bcefeac83e4f7fbe6cc0c9e0571c431771213b8305ea2d05d5b9278",
+    "docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json": "c5a7fd833cc4ed15d418f4f53c79361be909212e7cd1b377f5b063e8922c8d4a",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "455173a16935fcaf74cfe52e8d4d6e9d5c83b529c800623f62139a0794696bf1",
     "docs/reports/forge_evidence_identity_and_owner_gold/a1_owner_readout_v1.md": "3a6db12f13900bdb0714d15ce6a52d807c700cbfa05567f7b90b85971e2bfb08",
-    "docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md": "7be52142318e33b9f43ec96e2c1cbe43b19ba16beaabd1201aff32cdc8f2ac62",
+    "docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md": "ca5db6dd299006e13e392902b2c7b83753b8ff199a3db7f765cbb792479cbbcd",
     "schemas/research_memory_projection_v1.sql": "bd2933b0a0423fc80830dff8f43c861444e8357f066a35226a0b94827fb0c035",
     "scripts/hypothesis_forge.py": "ef336627d3d6ad099ad70352db4d1071ee305e4a0905ed49bac2fdb0044ec357",
     "scripts/validate_ci.py": "097f7d68cb403aab70c9aa981dc4efdc7d801fba45fcf456f42118ee4b920620",
@@ -65,14 +65,14 @@
   },
   "factory_fit": {
     "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_factory_fit_v1.json",
-    "sha256": "9628157069702c0d486ad3a874ddaf1fc7d9ffe6476aad01ce40595e6d634b42",
+    "sha256": "a2217bbc62cab1a09bc064b32ca11b628045f68f314e2ffa1722c8857e8f3594",
     "verdict": "PASS"
   },
   "validation": {
     "targeted": "PASS_FORGE_EVIDENCE_IDENTITY_OWNER_GOLD_FOCUSED_SUITE",
     "independent_review": {
       "path": "docs/evidence/forge_evidence_identity_and_owner_gold/a1_delivery_independent_review_v1.json",
-      "sha256": "8a92d57bef00dda7a84fba47b16a620640c896d19aead5944670f4ca5e4f8e94",
+      "sha256": "30cc70a73f005981d906260fa228ea411f903aaa3f531c6c017c6a57b1bc068c",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
