@@ -17,7 +17,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     list_hfic_sessions,
 )
 from solana_alpha_lab.factory.research_store import ResearchStore
-from tests.test_hfic_cli import bind_draft, run_cli  # noqa: E402
+from tests.test_hfic_cli import bind_draft, run_cli, seed_minimal_market_basis  # noqa: E402
 
 DRAFT_V11 = ROOT / "tests/fixtures/hypothesis_forge/draft_happy_path_v1.json"
 DRAFT_V12 = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
@@ -45,6 +45,7 @@ class FreshSessionVersionLockTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -81,6 +82,7 @@ class FreshSessionVersionLockTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -142,6 +144,7 @@ class FreshSessionVersionLockTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",

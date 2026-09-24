@@ -788,60 +788,21 @@ def _validate_split_identity_binding(
     market = receipt.get("market_evidence_epoch_sha256")
     capability = receipt.get("capability_epoch_sha256")
     forge_input = receipt.get("forge_input_receipt")
-    active = (
-        forge_input.get("active_evidence_set")
-        if isinstance(forge_input, Mapping)
-        else None
-    )
-    blocking = [
-        str(item)
-        for item in (
-            (forge_input.get("blocking_reason_codes") or [])
-            if isinstance(forge_input, Mapping)
-            else []
-        )
-    ]
-    no_current_surface = not (
-        isinstance(active, Mapping)
-        and (active.get("current_dataset_manifest_id") or active.get("visible_cohort_ids"))
-    )
-    legacy_commission = no_current_surface and set(blocking) <= {
-        "CURRENT_CORPUS_MISSING",
-        "MARKET_EVIDENCE_BASIS_INCOMPLETE",
-    }
     if not isinstance(market, str) or re.fullmatch(r"[0-9a-f]{64}", market) is None:
-        if legacy_commission and re.fullmatch(
-            r"[0-9a-f]{64}", str(receipt.get("evidence_epoch_sha256") or "")
-        ):
-            market = str(receipt.get("evidence_epoch_sha256"))
-        else:
-            raise HficSessionError("MARKET_IDENTITY_UNAVAILABLE")
+        raise HficSessionError("MARKET_IDENTITY_UNAVAILABLE")
     if not isinstance(capability, str) or re.fullmatch(r"[0-9a-f]{64}", capability) is None:
-        if legacy_commission:
-            from solana_alpha_lab.factory.hfic_evidence_identity import (
-                compute_capability_epoch_for_repo,
-            )
-
-            capability, _basis = compute_capability_epoch_for_repo(repo_root)
-        else:
-            raise HficSessionError("CAPABILITY_IDENTITY_UNAVAILABLE")
+        raise HficSessionError("CAPABILITY_IDENTITY_UNAVAILABLE")
 
     # The normal production preflight carries the no-write Forge-input
     # receipt.  Rehash its market basis instead of trusting a caller-provided
     # stamp.  This also keeps lineage UNKNOWN/FAIL from becoming an admission.
     if not isinstance(forge_input, Mapping):
-        if not legacy_commission:
-            raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
-        return
+        raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
     input_market = forge_input.get("market_evidence_epoch_sha256")
-    if input_market is None and legacy_commission:
-        input_market = market
     if input_market != market:
         raise HficSessionError("MARKET_IDENTITY_DRIFT")
-    if forge_input.get("forge_runnable") is not True and not legacy_commission:
+    if forge_input.get("forge_runnable") is not True:
         raise HficSessionError("MARKET_IDENTITY_DRIFT")
-    if legacy_commission:
-        return
     basis = forge_input.get("market_evidence_basis")
     if not isinstance(basis, Mapping):
         raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
@@ -2318,13 +2279,6 @@ def persist_no_worthy_session(
             preflight_receipt,
             repo_root=Path(repo_root),
         )
-    persist_scientific_slot_admission(
-        store,
-        frozen,
-        repo_root=repo_root,
-        stage_time=stage_time,
-        representation_registry=representation_registry,
-    )
     git = repository_git_snapshot(Path(repo_root))
     now = (
         _stage_datetime(lambda: stage_time)
@@ -2390,6 +2344,13 @@ def persist_no_worthy_session(
         identities=identities,
         repo_root=Path(repo_root),
         created_at=created_at,
+    )
+    persist_scientific_slot_admission(
+        store,
+        frozen,
+        repo_root=repo_root,
+        stage_time=stage_time,
+        representation_registry=representation_registry,
     )
     action_bytes = _canonical_bytes(action)
     action_sha = hashlib.sha256(action_bytes).hexdigest()
@@ -3140,6 +3101,9 @@ def persist_scientific_slot_admission(
     now = (
         _stage_datetime(lambda: stage_time)
         if stage_time is not None
+        else bound_session_started_at(binding)
+        if isinstance(binding.get("session_started_at"), str)
+        and str(binding.get("session_started_at") or "").strip()
         else _stage_datetime(None)
     )
     git = repository_git_snapshot(Path(repo_root))
@@ -3759,6 +3723,8 @@ def persist_frozen_session(
     existing = load_session_bundle(store, session_id)
     if existing is not None:
         return
+    if stage_time is not None:
+        _stage_datetime(lambda: stage_time)
     _assert_scientific_admission(
         store,
         frozen,

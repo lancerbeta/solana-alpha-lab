@@ -424,6 +424,58 @@ def _query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     return raw_sessions
 
 
+_ADMITTED_SESSION_READBACK_ACTIONS = frozenset(
+    {
+        "RETURN_EXISTING_SESSION",
+        "RESUME_EXISTING_SESSION",
+        "RESUME_CRITIC",
+        "RESUME_FINALIZE",
+        "RESUME_REVISE",
+        "RESUME_CLASSIFY",
+    }
+)
+
+
+def _exact_admitted_session_readback(
+    sessions: list[dict[str, Any]],
+    *,
+    action: str,
+    session_id: str | None,
+    search_key: str,
+    focus_key: str,
+    has_current_surface: bool,
+) -> bool:
+    """Incomplete-market bypass for one already-admitted session only.
+
+    Store occupancy is not enough. A different focus, slot, or search key
+    cannot reuse the bypass, and a current surface that is still not an
+    admissible market basis cannot inherit an older session.
+    """
+
+    if action not in _ADMITTED_SESSION_READBACK_ACTIONS:
+        return False
+    if not session_id or has_current_surface:
+        return False
+    chosen = next(
+        (
+            item
+            for item in sessions
+            if str(item.get("session_id") or "") == session_id
+        ),
+        None,
+    )
+    if chosen is None:
+        return False
+    slot = chosen.get("scientific_slot_sha256")
+    if not isinstance(slot, str) or len(slot) != 64:
+        return False
+    if str(chosen.get("search_key_sha256") or "") != search_key:
+        return False
+    if str(chosen.get("focus_key_sha256") or "") != focus_key:
+        return False
+    return True
+
+
 def query_hfic_sessions(data_root: Path) -> list[dict[str, Any]]:
     """Public read-model entry used by A5 consumers.
 
@@ -2107,19 +2159,12 @@ def _forge_input_requires_preflight_stop(
 
     if forge_input.get("forge_runnable"):
         return False
-    # CONTROL yield owns this mode. An early market stop would hide
-    # CONTROL_YIELD_BELOW_MIN / START_NEW_SESSION.
-    if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
-        return False
     codes = [str(item) for item in (forge_input.get("blocking_reason_codes") or [])]
-    # Incomplete market is a shared admission stop for ordinary and CONTROL.
+    # Incomplete market stops before CONTROL yield. Yield owns CONTROL only
+    # after the market basis is complete.
     if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
         active = forge_input.get("active_evidence_set")
         packet = forge_input.get("packet")
-        # Keep the dormant legacy commissioning compatibility path available
-        # when there is no current A3 surface at all.  Once a current
-        # manifest, visible cohort or live packet exists, an incomplete basis
-        # is an admission stop regardless of persist=True.
         has_current_surface = bool(
             isinstance(active, Mapping)
             and (
@@ -2129,9 +2174,11 @@ def _forge_input_requires_preflight_stop(
         ) or bool(forge_input.get("live_corpus")) or bool(
             isinstance(packet, Mapping) and packet.get("live_corpus_in_packet")
         )
-        return has_current_surface or control_mode == CURRENT_REPRESENTATION_CONTROL_V1
+        if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+            return True
+        return has_current_surface
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
-        return True
+        return False
     return str(forge_input.get("owner_class") or "") == OWNER_CLASS_OBSERVABILITY_BLOCKED
 
 
@@ -2344,12 +2391,9 @@ def run_preflight(
         selection_caveat=None,
     )
 
-    # A legacy combined epoch is useful for historical/search-key continuity,
-    # but it is not a current market admission basis.  Do not let the
-    # compatibility fallback flow into the shared scientific admission
-    # resolver and accidentally mint a START_NEW_SESSION once a current
-    # A3 surface exists.  An empty commissioning store has no such surface
-    # and keeps the legacy start path.
+    # A legacy combined epoch is search continuity only. Incomplete market
+    # cannot mint START_NEW_SESSION. Exact readback of an already-admitted
+    # session is decided after session lookup.
     active_surface = forge_input.get("active_evidence_set")
     input_packet = forge_input.get("packet")
     has_current_surface = bool(
@@ -2361,61 +2405,7 @@ def run_preflight(
     ) or bool(forge_input.get("live_corpus")) or bool(
         isinstance(input_packet, Mapping) and input_packet.get("live_corpus_in_packet")
     )
-    fresh_auto_commission = (
-        focus == AUTO_FOCUS and commissioned_now and not has_current_surface
-    )
-    if (
-        ident.get("market_admission_ready") is not True
-        and control_mode != CURRENT_REPRESENTATION_CONTROL_V1
-        and not fresh_auto_commission
-    ):
-        legacy_epoch = str(ident.get("legacy_combined_evidence_epoch_sha256") or "")
-        stop_epoch = legacy_epoch if len(legacy_epoch) == 64 else "0" * 64
-        stop_focus = str(ident.get("owner_focus") or focus)
-        stop_focus_key = str(ident.get("focus_key") or focus_key_sha256(stop_focus))
-        stop_search_key = str(ident.get("search_key") or "")
-        if len(stop_search_key) != 64:
-            stop_search_key = search_key_sha256(
-                stop_epoch,
-                stop_focus,
-                PROMPT_VERSION,
-                str(ident.get("memory_eligibility") or "0" * 64),
-                control_mode,
-            )
-        return {
-            "receipt_id": "HFIC-PREFLIGHT-" + stop_search_key[:16].upper(),
-            "action": "STOP",
-            "terminal": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
-            "owner_class": forge_input.get("owner_class"),
-            "owner_focus": stop_focus,
-            "prompt_version": PROMPT_VERSION,
-            "evidence_epoch_sha256": stop_epoch,
-            "evidence_epoch_kind": "LEGACY_SEARCH_CONTINUITY_ONLY",
-            "focus_key_sha256": stop_focus_key,
-            "search_key_sha256": stop_search_key,
-            "legacy_combined_evidence_epoch_sha256": legacy_epoch or None,
-            "memory_policy_head_sha256": ident["policy_head"]["policy_sha256"],
-            "memory_eligibility_sha256": str(ident["memory_eligibility"]),
-            "next": "RESTORE_CURRENT_EVIDENCE",
-            "session_id": None,
-            "commissioning": {
-                "status": str(proof.get("status") or ""),
-                "auto_commissioned": commissioned_now,
-                "provider_calls_actual": int(proof.get("provider_calls_actual") or 0),
-                "git_mutation_count": int(proof.get("git_mutation_count") or 0),
-                "run_id": proof.get("run_id"),
-                "compatibility_repair": compatibility_repair,
-            },
-            "forge_context_packet": {},
-            "forge_input_receipt": forge_input,
-            "owner_forge_input": format_forge_input_owner_block(forge_input),
-            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
-            "authority": {
-                "git_mutation": 0,
-                "experiment_execution": 0,
-                "provider_api_rpc_wss_calls": 0,
-            },
-        }
+    market_admission_ready = ident.get("market_admission_ready") is True
 
     epoch = str(ident["evidence_epoch"])
     focus = str(ident["owner_focus"])
@@ -2567,6 +2557,70 @@ def run_preflight(
         execution_context=execution_context or None,
         repo_root=Path(repo_root),
     )
+    if (
+        not market_admission_ready
+        and not _exact_admitted_session_readback(
+            sessions,
+            action=action,
+            session_id=bound_session,
+            search_key=search_key,
+            focus_key=focus_key,
+            has_current_surface=has_current_surface,
+        )
+    ):
+        return {
+            "receipt_id": "HFIC-PREFLIGHT-" + search_key[:16].upper(),
+            "action": "STOP",
+            "terminal": "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+            "owner_class": forge_input.get("owner_class"),
+            "owner_focus": focus,
+            "prompt_version": PROMPT_VERSION,
+            "evidence_epoch_sha256": epoch,
+            "evidence_epoch_kind": "LEGACY_SEARCH_CONTINUITY_ONLY",
+            "focus_key_sha256": focus_key,
+            "search_key_sha256": search_key,
+            "legacy_combined_evidence_epoch_sha256": legacy_combined_epoch or None,
+            "memory_policy_head_sha256": policy_head["policy_sha256"],
+            "memory_eligibility_sha256": memory_eligibility,
+            "next": "RESTORE_CURRENT_EVIDENCE",
+            "session_id": None,
+            "commissioning": {
+                "status": str(proof.get("status") or ""),
+                "auto_commissioned": commissioned_now,
+                "provider_calls_actual": int(proof.get("provider_calls_actual") or 0),
+                "git_mutation_count": int(proof.get("git_mutation_count") or 0),
+                "run_id": proof.get("run_id"),
+                "compatibility_repair": compatibility_repair,
+            },
+            "forge_context_packet": {},
+            "forge_input_receipt": forge_input,
+            "owner_forge_input": format_forge_input_owner_block(forge_input),
+            "writes": {"research_store": 0, "forge_context": 0, "session": 0},
+            "authority": {
+                "git_mutation": 0,
+                "experiment_execution": 0,
+                "provider_api_rpc_wss_calls": 0,
+            },
+        }
+    if not market_admission_ready and bound_session:
+        frozen = next(
+            (
+                item
+                for item in sessions
+                if str(item.get("session_id") or "") == bound_session
+            ),
+            None,
+        )
+        if frozen is not None:
+            saved_market = frozen.get("market_evidence_epoch_sha256")
+            saved_capability = frozen.get("capability_epoch_sha256")
+            saved_evidence = frozen.get("evidence_epoch_sha256")
+            if isinstance(saved_market, str) and len(saved_market) == 64:
+                market_epoch = saved_market
+            if isinstance(saved_capability, str) and len(saved_capability) == 64:
+                capability_epoch = saved_capability
+            if isinstance(saved_evidence, str) and len(saved_evidence) == 64:
+                epoch = saved_evidence
     search_budget = epoch_search_budget_usage(
         sessions, evidence_epoch=epoch, reservations=reservations
     )

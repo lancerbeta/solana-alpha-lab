@@ -28,7 +28,7 @@ from solana_alpha_lab.factory.hfic_session import (
     prove_runtime,
 )
 from solana_alpha_lab.factory.research_store import ResearchStore
-from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli
+from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli, seed_minimal_market_basis
 from tests.test_hfic_session import _persist_frozen_portfolio, _preflight_receipt, valid_draft
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -490,6 +490,7 @@ class HficOneFrozenRunnerUpFailoverTests(unittest.TestCase):
         draft = json.loads(HAPPY.read_text(encoding="utf-8"))
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",

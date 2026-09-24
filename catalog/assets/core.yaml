@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: d9df2097bac555eee26f9b1d592a106028c4f91022728653acc3f6f0ddd62f7c}
+  integrity: {kind: sha256, sha256: e4cc51535c319358e02e2651188fbee50113f97480509a70e57dcfe110787029}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -32666,7 +32666,7 @@ records:
   as_of: '2026-08-27'
   truth_owner: HFIC_DISCOVERY_PROSPECT_MEMORY_AND_NEXT_ACTION_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_discovery_prospects_and_next_action.py', repository_path: tests/test_hfic_discovery_prospects_and_next_action.py}
-  integrity: {kind: sha256, sha256: 98acc0fb221c08a300b72a73a6961c7bb22957af3fd5a45d2c89a3776c3a34a2}
+  integrity: {kind: sha256, sha256: 559686676b3513f1a5a82f99bdb866f30743758a39c95664c83d749469e7b5f6}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-DISCOVERY-PROSPECT-MEMORY-AND-NEXT-ACTION-001}
@@ -33215,7 +33215,7 @@ records:
   as_of: '2026-08-30'
   truth_owner: HFIC_EPISTEMIC_MEMORY_SEMANTICS_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_hfic_epistemic_memory_semantics.py', repository_path: tests/test_hfic_epistemic_memory_semantics.py}
-  integrity: {kind: sha256, sha256: 5b68898ff92fa7a61cc87cc46f7c0a7cb830db774413db8db6485d364411554b}
+  integrity: {kind: sha256, sha256: 1fa856dc6e6041fb1817ffb3b00c43a972c2c792193b628ef152ffe26b38fc9a}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HFIC-EPISTEMIC-MEMORY-SEMANTICS-001}
@@ -38077,7 +38077,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md', repository_path: docs/tasks/FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1.md}
-  integrity: {kind: sha256, sha256: ca5db6dd299006e13e392902b2c7b83753b8ff199a3db7f765cbb792479cbbcd}
+  integrity: {kind: sha256, sha256: 0850eaa05f33145c5004209bcf3dc7e25b5298ce16e6cdb5227bb6a4808aa7d0}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: CTRL-FORGE-INPUT-TRUTH-AND-VISIBILITY-001}
@@ -38117,7 +38117,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: 1d395a952a8b84c7ca6743f68962a0d9e05560e7e24c7a6d9ef132e0bf82f967}
+  integrity: {kind: sha256, sha256: a648ffebd93dfac3085883c3e4d33b1ed82e85cf7766185d73512e0d701fc6d2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}

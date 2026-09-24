@@ -30,6 +30,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     freeze_draft,
 )
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
+from tests.test_hfic_cli import seed_minimal_market_basis
 from tests.test_hfic_forge_context_and_no_worthy import bind_draft, run_cli  # noqa: E402
 from tests.test_hfic_session import critic_result_from_packet_only  # noqa: E402
 
@@ -320,6 +321,7 @@ class VerticalE2ETests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",

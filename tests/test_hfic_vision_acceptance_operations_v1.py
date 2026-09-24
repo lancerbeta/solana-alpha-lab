@@ -26,7 +26,7 @@ from solana_alpha_lab.factory.hfic_reopened_prior_routing import (  # noqa: E402
     preview_control_reconsideration,
 )
 from solana_alpha_lab.factory.research_store import ResearchStore  # noqa: E402
-from tests.test_hfic_cli import run_cli  # noqa: E402
+from tests.test_hfic_cli import run_cli, seed_minimal_market_basis  # noqa: E402
 from tests.test_hfic_operational_memory_quarantine_v1 import (  # noqa: E402
     _session_records,
 )
@@ -48,6 +48,7 @@ class VisionAcceptanceOperationTests(unittest.TestCase):
     def test_preview_is_read_only_and_idempotent(self) -> None:
         with tempfile.TemporaryDirectory() as raw:
             store = _store_with_defective_session(raw)
+            seed_minimal_market_basis(Path(raw))
             first = preview_control_reconsideration(
                 store,
                 ROOT,

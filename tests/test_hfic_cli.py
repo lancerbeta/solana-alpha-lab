@@ -111,6 +111,26 @@ def populate_real_c1_c2(data_root: Path, workspace: Path) -> None:
         assert imported["status"] == "IMPORTED"
 
 
+def seed_minimal_market_basis(data_root: Path) -> None:
+    """Attach a synthetic live corpus so a legacy fixture can pass A5 admission.
+
+    Empty RDP is not a scientific market. Tests of version lock, replay, or
+    clock identity call this before preflight; they do not weaken the
+    production incomplete-market stop.
+    """
+
+    from test_live_cohort_to_forge_operational_closure_v1 import (
+        _commission,
+        _write_stub_live_corpus,
+    )
+
+    data_root.mkdir(parents=True, exist_ok=True)
+    if (data_root / "datasets" / "manifests").is_dir():
+        return
+    _commission(data_root)
+    _write_stub_live_corpus(data_root, cohort_id="COHORT-A5-MIN-001")
+
+
 def bind_draft(draft: dict, receipt: dict) -> dict:
     bound = dict(draft)
     bound["preflight_receipt_id"] = receipt["receipt_id"]

@@ -28,7 +28,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
 )
 from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent, ResearchStore  # noqa: E402
 from solana_alpha_lab.storage.manifests import canonical_manifest_bytes  # noqa: E402
-from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli  # noqa: E402
+from tests.test_hfic_cli import bind_draft, critic_result_from_packet_only, run_cli, seed_minimal_market_basis  # noqa: E402
 
 HAPPY = ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json"
 TAKER_FAMILY = "CLOSE_EARLY_TAKER_VOLUME_MIX_FAMILY"
@@ -165,6 +165,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -266,6 +267,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -297,6 +299,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             preflight = run_cli(
                 "preflight",
                 "--owner-focus",
@@ -323,6 +326,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "33" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -368,6 +372,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "44" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -430,6 +435,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "77" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -484,6 +490,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "88" * 32
             _publish_labeled_dataset(
                 data_root,
@@ -522,6 +529,7 @@ class EpistemicMemorySemanticsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp) / "rdp"
             data_root.mkdir()
+            seed_minimal_market_basis(data_root)
             fingerprint = "66" * 32
             _publish_labeled_dataset(
                 data_root,
