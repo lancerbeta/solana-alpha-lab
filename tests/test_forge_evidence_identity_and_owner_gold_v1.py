@@ -2933,6 +2933,9 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             # Keep Git metadata inside the disposable test directory.  The
             # real checkout may be sandboxed against worktree-admin writes.
             _git(ROOT, "clone", "--no-local", str(ROOT), str(principal))
+            # A detached source clone has HEAD but no refs/heads entry.
+            # for-each-ref then looks empty and the write fence fails closed.
+            _git(principal, "checkout", "-B", "a5-ci-snapshot")
             _git(principal, "worktree", "add", "--detach", str(linked), "HEAD")
             shared_data_root = Path(tmp) / "shared-data-plane"
             env = {"SMIAL_DATA_ROOT": str(shared_data_root)}

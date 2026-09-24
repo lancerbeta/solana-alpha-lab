@@ -2107,6 +2107,10 @@ def _forge_input_requires_preflight_stop(
 
     if forge_input.get("forge_runnable"):
         return False
+    # CONTROL yield owns this mode. An early market stop would hide
+    # CONTROL_YIELD_BELOW_MIN / START_NEW_SESSION.
+    if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
+        return False
     codes = [str(item) for item in (forge_input.get("blocking_reason_codes") or [])]
     # Incomplete market is a shared admission stop for ordinary and CONTROL.
     if "MARKET_EVIDENCE_BASIS_INCOMPLETE" in codes:
@@ -2357,8 +2361,13 @@ def run_preflight(
     ) or bool(forge_input.get("live_corpus")) or bool(
         isinstance(input_packet, Mapping) and input_packet.get("live_corpus_in_packet")
     )
-    if ident.get("market_admission_ready") is not True and (
-        has_current_surface or focus != AUTO_FOCUS
+    fresh_auto_commission = (
+        focus == AUTO_FOCUS and commissioned_now and not has_current_surface
+    )
+    if (
+        ident.get("market_admission_ready") is not True
+        and control_mode != CURRENT_REPRESENTATION_CONTROL_V1
+        and not fresh_auto_commission
     ):
         legacy_epoch = str(ident.get("legacy_combined_evidence_epoch_sha256") or "")
         stop_epoch = legacy_epoch if len(legacy_epoch) == 64 else "0" * 64
