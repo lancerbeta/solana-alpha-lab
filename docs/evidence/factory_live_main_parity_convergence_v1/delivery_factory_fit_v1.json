@@ -1,6 +1,9 @@
 {
   "as_of": "2026-09-24",
-  "capability_radar": {"now": "NONE", "watch": "NONE"},
+  "capability_radar": {
+    "now": "NONE",
+    "watch": "NONE"
+  },
   "dimensions": {
     "build_vs_buy": "PASS_REUSE_PROVEN_LIVE_INVARIANTS",
     "context_efficiency": "PASS_ONE_TASK_CONTRACT",
@@ -13,12 +16,16 @@
     "research_truth": "PASS_NO_NEW_ESTIMAND",
     "security": "PASS_SECRET_FREE_TRACKED_EVIDENCE"
   },
-  "limits": ["NO_DEPLOY", "NO_VPS_OR_DRIVE_MUTATION", "PR_331_NOT_MERGED"],
+  "limits": [
+    "NO_DEPLOY",
+    "NO_VPS_OR_DRIVE_MUTATION",
+    "PR_331_NOT_MERGED"
+  ],
   "mode": "FAST_PATH",
   "recovery": "REVERT_THIS_BRANCH_ONLY",
   "review_id": "FACTORY-LIVE-MAIN-PARITY-FACTORY-FIT-001",
-  "reviewed_bindings_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
-  "reviewed_inventory_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "reviewed_bindings_sha256": "44a53855208496926493fe2be56e378c0d2f2092bd2a42553a2639eb3cc29873",
+  "reviewed_inventory_sha256": "4b9d77924637c7878a246a006984f0207c2c25c220c6a94fe7ae7a860bbb3b8c",
   "schema": "smial.delivery-harness-factory-fit",
   "schema_version": "1.0",
   "task_id": "FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1",
