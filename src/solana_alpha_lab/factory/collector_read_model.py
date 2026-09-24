@@ -271,9 +271,19 @@ def select_current_activation(
         return None
     if not rows:
         return None
-    selectable = [
-        row for row in rows if row.get("future_transition_pending") is not True
-    ] or rows
+    non_pending_live = [
+        row
+        for row in rows
+        if row.get("future_transition_pending") is not True
+        and str(row.get("state") or "") in _CURRENT_LIVE_STATES
+    ]
+    pending_live = [
+        row
+        for row in rows
+        if row.get("future_transition_pending") is True
+        and str(row.get("state") or "") in _CURRENT_LIVE_STATES
+    ]
+    selectable = non_pending_live or pending_live or rows
     active = [row for row in selectable if str(row.get("state") or "") == "ACTIVE"]
     if active:
         return max(active, key=_activation_freshness_key)

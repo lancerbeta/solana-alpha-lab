@@ -145,6 +145,23 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
         assert selected is not None
         self.assertEqual(selected["activation_id"], "ACT-NOW")
 
+    def test_pending_predecessor_is_not_replaced_by_historical_row(self) -> None:
+        now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
+        rows = [
+            _row("ACT-OLD", "ABORTED_SAFETY", "FAMILY-A", "2026-09-01T00:30:00Z"),
+            {
+                **_row("ACT-NOW", "ACTIVE", "FAMILY-A", "2026-09-01T00:00:00Z"),
+                "payload": {
+                    "prior_state": "ACTIVE",
+                    "transition_effective_at": "2026-09-02T00:00:00Z",
+                },
+            },
+        ]
+        selected = select_current_activation(rows, now=now)
+        assert selected is not None
+        self.assertEqual(selected["activation_id"], "ACT-NOW")
+        self.assertEqual(selected["state"], "ACTIVE")
+
     def test_status_projects_predecessor_before_effective_time(self) -> None:
         now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
         row = {
