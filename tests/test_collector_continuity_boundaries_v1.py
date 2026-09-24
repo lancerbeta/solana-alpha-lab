@@ -148,7 +148,7 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
     def test_pending_predecessor_is_not_replaced_by_historical_row(self) -> None:
         now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
         rows = [
-            _row("ACT-OLD", "ABORTED_SAFETY", "FAMILY-A", "2026-09-01T00:30:00Z"),
+            _row("ACT-OLD", "ABORTED_SAFETY", "FAMILY-A", "2026-08-01T00:30:00Z"),
             {
                 **_row("ACT-NOW", "ACTIVE", "FAMILY-A", "2026-09-01T00:00:00Z"),
                 "payload": {
