@@ -419,6 +419,101 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
             self.assertNotIn("BACKLOG_RISK", model["health_flags"])
             store.close()
 
+    def test_operational_packet_does_not_inherit_historical_publication_stall(self) -> None:
+        from solana_alpha_lab.factory.collector_operational_packet import (
+            build_collector_operational_packet,
+        )
+        from solana_alpha_lab.factory.observation_schedule import (
+            load_observation_schedule,
+            schedule_sha256,
+        )
+        from solana_alpha_lab.factory.observation_schedule_store import (
+            ObservationScheduleStore,
+        )
+        from solana_alpha_lab.factory.operability_watch import classify_incidents
+
+        now = datetime(2026, 9, 23, 12, 0, tzinfo=UTC)
+        live = load_observation_schedule(
+            ROOT, "tests/fixtures/observation_schedule/x300_y900.yaml"
+        )
+        historical = json.loads(json.dumps(live))
+        historical["sampling"] = dict(historical["sampling"])
+        historical["sampling"]["seed"] = 99002
+        historical["schedule_key"] = "OBS-HISTORICAL-PUBLICATION"
+        historical.pop("schedule_sha256", None)
+        historical["schedule_sha256"] = schedule_sha256(historical)
+        aborted = json.loads(json.dumps(live))
+        aborted["sampling"] = dict(aborted["sampling"])
+        aborted["sampling"]["seed"] = 99003
+        aborted["schedule_key"] = "OBS-ABORTED-FAMILY"
+        aborted.pop("schedule_sha256", None)
+        aborted["schedule_sha256"] = schedule_sha256(aborted)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            store = ObservationScheduleStore(root / "ops.sqlite")
+            self.addCleanup(store.close)
+            for document, activation_id, state in (
+                (live, "ACT-LIVE", "ACTIVE"),
+                (historical, "ACT-OLD", "COMPLETE"),
+                (aborted, "ACT-ABORT", "ABORTED_SAFETY"),
+            ):
+                store.persist_registered_schedule(
+                    schedule_sha256=document["schedule_sha256"],
+                    schedule_key=document["schedule_key"],
+                    document=document,
+                    clock=now,
+                )
+                store.upsert_activation(
+                    {
+                        "schedule_sha256": document["schedule_sha256"],
+                        "activation_id": activation_id,
+                        "schedule_key": document["schedule_key"],
+                        "state": state,
+                        "starts_at": document["activation"]["starts_at"],
+                        "stops_admitting_at": document["activation"]["stops_admitting_at"],
+                        "payload": {},
+                    },
+                    clock=now,
+                )
+            store.insert_due(
+                {
+                    "schedule_sha256": historical["schedule_sha256"],
+                    "activation_id": "ACT-OLD",
+                    "entity_id": "MintOldPub111111111111111111111111111111",
+                    "point_id": "Y900",
+                    "primitive_id": "PRIM-JUPITER-SWAP-V2-DEPENDENT-REVERSE-SELL-001",
+                    "state": "PENDING",
+                    "due_at": "2026-09-01T00:00:00Z",
+                    "deadline_at": "2026-09-01T00:05:00Z",
+                    "payload": {},
+                },
+                clock=now,
+            )
+            rdp = root / "observation_rdp"
+            marker = rdp / "datasets" / "manifests"
+            marker.mkdir(parents=True)
+            published = marker / "historical.published"
+            published.write_text("historical\n", encoding="utf-8")
+            os.utime(published, (now.timestamp() - 8 * 3600, now.timestamp() - 8 * 3600))
+            packet = build_collector_operational_packet(
+                root=root,
+                store=store,
+                now=now,
+                observation_rdp=rdp,
+                remote_config={"backup": {}},
+                environ={},
+            )
+            self.assertEqual(packet["activation_selection_status"], "SCOPED")
+            self.assertEqual(packet["activation_id"], "ACT-LIVE")
+            self.assertEqual(packet["activation_state"], "ACTIVE")
+            self.assertEqual(packet["due_pressure"]["due_now_count"], 0)
+            self.assertEqual(packet["due_pressure"]["actually_overdue_count"], 0)
+            self.assertEqual(packet["publication_jobs_open_count"], 0)
+            classes = set(packet["health_classes"])
+            self.assertNotIn("RDP_PUBLICATION_STALE", classes)
+            self.assertNotIn("PUBLICATION_STUCK", classify_incidents(packet))
+            store.close()
+
     def test_operability_watch_import_does_not_eagerly_load_research_dependencies(self) -> None:
         env = dict(os.environ)
         env["PYTHONPATH"] = str(SRC)
