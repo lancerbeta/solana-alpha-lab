@@ -17,7 +17,7 @@ required_review_roles:
 expected_repository: lancerbeta/solana-alpha-lab
 
 git_binding:
-  expected_base: 5f658ad9a7a80a33db51dbd83b5e109e0deac1e8
+  expected_base: 11bdb4349071f1309ca3cd48760d707bbdd06a56
   expected_upstream: origin/main
   expected_upstream_oid: 11bdb4349071f1309ca3cd48760d707bbdd06a56
   expected_branch: cursor/forge-evidence-identity-and-owner-gold-v1

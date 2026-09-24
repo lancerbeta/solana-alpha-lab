@@ -67,6 +67,52 @@ class ObservationScheduleStoreError(ValueError):
     """Typed operational store failure."""
 
 
+def rollover_id_for(
+    *,
+    predecessor_schedule_sha256: str,
+    predecessor_activation_id: str,
+    successor_schedule_sha256: str,
+    successor_activation_id: str,
+    cutover_at: str,
+    authority_receipt_sha256: str,
+) -> str:
+    identity = {
+        "predecessor_schedule_sha256": predecessor_schedule_sha256,
+        "predecessor_activation_id": predecessor_activation_id,
+        "successor_schedule_sha256": successor_schedule_sha256,
+        "successor_activation_id": successor_activation_id,
+        "cutover_at": cutover_at,
+        "authority_receipt_sha256": authority_receipt_sha256,
+    }
+    return "OBS-ROLLOVER-" + hashlib.sha256(
+        canonical_json_bytes(identity)
+    ).hexdigest()
+
+
+def transition_event_id_for(
+    *,
+    schedule_sha256: str,
+    activation_id: str,
+    prior_state: str,
+    new_state: str,
+    transition_sequence: int,
+    effective_at: str,
+    authority_receipt_sha256: str,
+) -> str:
+    identity = {
+        "schedule_sha256": schedule_sha256,
+        "activation_id": activation_id,
+        "prior_state": prior_state,
+        "new_state": new_state,
+        "transition_sequence": transition_sequence,
+        "effective_at": effective_at,
+        "authority_receipt_sha256": authority_receipt_sha256,
+    }
+    return "OBS-TRANS-" + hashlib.sha256(
+        canonical_json_bytes(identity)
+    ).hexdigest()
+
+
 def _now(clock: datetime | None = None) -> str:
     value = clock.astimezone(UTC) if clock is not None else datetime.now(UTC)
     return render_utc(value)
@@ -525,6 +571,71 @@ class ObservationScheduleStore:
         payload = dict(row.get("payload") or {})
         if not payload and row.get("payload_json"):
             payload = json.loads(str(row["payload_json"]))
+        existing = self._conn.execute(
+            """
+            SELECT state, schedule_key, authority_receipt_sha256,
+                   starts_at, stops_admitting_at, payload_json,
+                   created_at, updated_at, last_transition_event_id
+            FROM schedule_activations
+            WHERE schedule_sha256 = ? AND activation_id = ?
+            """,
+            (str(row["schedule_sha256"]), str(row["activation_id"])),
+        ).fetchone()
+        last_transition_event_id = row.get("last_transition_event_id")
+        if existing is not None:
+            created_at = str(existing["created_at"])
+            updated_at = str(existing["updated_at"])
+        else:
+            created_at = now
+            updated_at = now
+        if existing is not None and str(existing["state"]) == "DRAINING":
+            if str(row["state"]) != "DRAINING":
+                raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+            for key in (
+                "schedule_key",
+                "authority_receipt_sha256",
+                "starts_at",
+                "stops_admitting_at",
+            ):
+                requested = row.get(key)
+                if requested is not None and str(requested) != str(existing[key]):
+                    raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+            existing_payload = json.loads(str(existing["payload_json"]))
+            immutable_payload_keys = (
+                "admission_window_closed",
+                "transition_effective_at",
+                "transition_event_id",
+                "prior_state",
+                "new_state",
+                "transition_sequence",
+                "rollover_id",
+                "cutover_at",
+            )
+            for key in immutable_payload_keys:
+                if key not in existing_payload:
+                    continue
+                if key in payload and payload[key] != existing_payload[key]:
+                    raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+            # A shortened scheduler projection must not erase the immutable
+            # transition proof carried by a DRAINING row.
+            payload = {**existing_payload, **payload}
+            existing_event_id = existing["last_transition_event_id"]
+            if (
+                existing_event_id
+                and last_transition_event_id is not None
+                and str(last_transition_event_id) != str(existing_event_id)
+            ):
+                raise ObservationScheduleStoreError("DENY_RETROACTIVE_MUTATION")
+            last_transition_event_id = existing_event_id or last_transition_event_id
+            schedule_key = str(existing["schedule_key"])
+            authority_receipt_sha256 = existing["authority_receipt_sha256"]
+            starts_at = str(existing["starts_at"])
+            stops_admitting_at = str(existing["stops_admitting_at"])
+        else:
+            schedule_key = str(row["schedule_key"])
+            authority_receipt_sha256 = row.get("authority_receipt_sha256")
+            starts_at = str(row["starts_at"])
+            stops_admitting_at = str(row["stops_admitting_at"])
         self._conn.execute(
             """
             INSERT INTO schedule_activations(
@@ -550,16 +661,16 @@ class ObservationScheduleStore:
             (
                 str(row["schedule_sha256"]),
                 str(row["activation_id"]),
-                str(row["schedule_key"]),
+                schedule_key,
                 str(row["state"]),
-                row.get("authority_receipt_sha256"),
-                str(row["starts_at"]),
-                str(row["stops_admitting_at"]),
+                authority_receipt_sha256,
+                starts_at,
+                stops_admitting_at,
                 json.dumps(payload, sort_keys=True),
-                now,
-                now,
+                created_at,
+                updated_at,
                 int(row.get("transition_sequence") or 0),
-                row.get("last_transition_event_id"),
+                last_transition_event_id,
             ),
         )
         self._conn.commit()
@@ -639,18 +750,15 @@ class ObservationScheduleStore:
                 actual_stops_at = str(row["stops_admitting_at"])
                 if authority_receipt_sha256 is None:
                     authority_receipt_sha256 = row["authority_receipt_sha256"]
-            transition_identity = {
-                "schedule_sha256": schedule_sha256,
-                "activation_id": activation_id,
-                "prior_state": prior_state,
-                "new_state": new_state,
-                "transition_sequence": sequence,
-                "effective_at": effective,
-                "authority_receipt_sha256": authority_receipt_sha256 or "",
-            }
-            event_id = "OBS-TRANS-" + hashlib.sha256(
-                canonical_json_bytes(transition_identity)
-            ).hexdigest()
+            event_id = transition_event_id_for(
+                schedule_sha256=schedule_sha256,
+                activation_id=activation_id,
+                prior_state=prior_state,
+                new_state=new_state,
+                transition_sequence=sequence,
+                effective_at=effective,
+                authority_receipt_sha256=authority_receipt_sha256 or "",
+            )
             transition_payload = dict(previous_payload)
             transition_payload.update(dict(payload or {}))
             transition_payload.update(
@@ -739,17 +847,14 @@ class ObservationScheduleStore:
         clock: datetime | None = None,
     ) -> str:
         self._require_write_lease(clock)
-        identity = {
-            "predecessor_schedule_sha256": predecessor_schedule_sha256,
-            "predecessor_activation_id": predecessor_activation_id,
-            "successor_schedule_sha256": successor_schedule_sha256,
-            "successor_activation_id": successor_activation_id,
-            "cutover_at": cutover_at,
-            "authority_receipt_sha256": authority_receipt_sha256,
-        }
-        rollover_id = "OBS-ROLLOVER-" + hashlib.sha256(
-            canonical_json_bytes(identity)
-        ).hexdigest()
+        rollover_id = rollover_id_for(
+            predecessor_schedule_sha256=predecessor_schedule_sha256,
+            predecessor_activation_id=predecessor_activation_id,
+            successor_schedule_sha256=successor_schedule_sha256,
+            successor_activation_id=successor_activation_id,
+            cutover_at=cutover_at,
+            authority_receipt_sha256=authority_receipt_sha256,
+        )
         self._conn.execute(
             """
             INSERT OR IGNORE INTO schedule_rollovers(
@@ -2267,6 +2372,15 @@ class ObservationScheduleStore:
             ).fetchall()
         ]
         return payload
+
+    def list_registered_schedule_digests(self) -> list[str]:
+        rows = self._conn.execute(
+            """
+            SELECT schedule_sha256 FROM registered_schedules
+            ORDER BY schedule_sha256 ASC
+            """
+        ).fetchall()
+        return [str(row["schedule_sha256"]) for row in rows]
 
     def get_registered_schedule_by_key(self, schedule_key: str) -> dict[str, Any] | None:
         rows = self._conn.execute(

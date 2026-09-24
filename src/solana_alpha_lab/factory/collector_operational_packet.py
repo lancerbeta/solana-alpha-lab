@@ -14,7 +14,10 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, Mapping
 
-from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
+from solana_alpha_lab.factory.collector_read_model import (
+    build_collector_read_model,
+    select_current_activation,
+)
 from solana_alpha_lab.factory.due_pressure import backlog_risk_from_due_pressure
 from solana_alpha_lab.factory.hot90_activation import load_hot90_activation
 from solana_alpha_lab.factory.hot90_closed_day_loop import archive_backlog, read_receipt
@@ -27,6 +30,10 @@ from solana_alpha_lab.factory.observation_publication_jobs import (
     project_7d_disk_used,
 )
 from solana_alpha_lab.factory.observation_schedule import parse_utc, render_utc
+from solana_alpha_lab.factory.observation_schedule_lifecycle import (
+    cohort_family_key,
+    rollover_research_event_proven,
+)
 from solana_alpha_lab.factory.observation_schedule_store import ObservationScheduleStore
 from solana_alpha_lab.factory.offhost_backup import offhost_health_snapshot
 from solana_alpha_lab.factory.remote_ops import (
@@ -47,6 +54,7 @@ CORPUS_DATASET_ID = "DATASET-LIVE-LIFECYCLE-DISCOVERY-CORPUS-001"
 DISK_WARNING_EARLY_PCT = 70
 DISK_WARNING_PCT = 80
 DISK_CRITICAL_PCT = 85  # hard safety reference; matches remote-ops max
+CAMPAIGN_SUCCESSOR_WARNING_SECONDS = 24 * 3600
 
 STORAGE_HISTORY_RELATIVE = "local/factory_v1/collector_storage_history.jsonl"
 
@@ -82,7 +90,274 @@ HEALTH_CLASSES = (
     "DISK_RUNWAY_TARGET40",
     "DISK_RUNWAY_HARD50",
     "RELEASE_BLOCKED",
+    "CAMPAIGN_SUCCESSOR_REQUIRED",
 )
+
+
+def assess_campaign_successor_continuity(
+    store: ObservationScheduleStore,
+    *,
+    now: datetime,
+    activation: Mapping[str, Any] | None,
+    data_root: Path | None = None,
+) -> dict[str, Any]:
+    """Owner-facing campaign continuity projection for pre-expiry attention.
+
+    Only a successor that can cover the current admission boundary suppresses
+    CAMPAIGN_SUCCESSOR_REQUIRED.  A same-family REGISTERED/AUTHORIZED record
+    is useful state, but it is not continuity proof when its window is
+    historical or starts after the predecessor expires.
+    """
+
+    empty = {
+        "campaign_successor_state": "NONE",
+        "campaign_successor_schedule_sha256": UNKNOWN,
+        "campaign_successor_activation_id": UNKNOWN,
+        "stops_admitting_at": UNKNOWN,
+        "campaign_time_remaining_seconds": UNKNOWN,
+        "campaign_successor_required": False,
+        "campaign_successor_owner_action": UNKNOWN,
+    }
+    if activation is None:
+        return empty
+    if str(activation.get("state") or "") != "ACTIVE":
+        return {
+            **empty,
+            "stops_admitting_at": str(activation.get("stops_admitting_at") or UNKNOWN),
+        }
+    stops_raw = activation.get("stops_admitting_at")
+    if not isinstance(stops_raw, str) or not stops_raw:
+        return {
+            **empty,
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile current activation stops_admitting_at before successor assessment"
+            ),
+        }
+    try:
+        stops = parse_utc(stops_raw)
+    except Exception:
+        return {
+            **empty,
+            "campaign_successor_state": "UNKNOWN",
+            "campaign_successor_required": True,
+            "campaign_successor_owner_action": (
+                "reconcile current activation stops_admitting_at before successor assessment"
+            ),
+        }
+    time_to_stop = stops - now
+    remaining = int(time_to_stop.total_seconds())
+    within_warning_band = timedelta(0) <= time_to_stop <= timedelta(
+        seconds=CAMPAIGN_SUCCESSOR_WARNING_SECONDS
+    )
+    schedule_sha = str(activation.get("schedule_sha256") or "")
+    activation_id = str(activation.get("activation_id") or "")
+    registered = store.get_registered_schedule(schedule_sha) if schedule_sha else None
+    if registered is None:
+        required = within_warning_band
+        return {
+            "campaign_successor_state": "UNKNOWN",
+            "stops_admitting_at": stops_raw,
+            "campaign_time_remaining_seconds": remaining,
+            "campaign_successor_required": required,
+            "campaign_successor_owner_action": (
+                "reconcile active schedule registration before successor assessment"
+                if required
+                else UNKNOWN
+            ),
+        }
+    family = cohort_family_key(registered["document"])
+    successor_state = "NONE"
+    continuity_proven = False
+    successor_schedule_sha256: str | None = None
+    successor_activation_id: str | None = None
+
+    def _window_covers(document: Mapping[str, Any], boundary: datetime) -> bool:
+        try:
+            starts = parse_utc(str(document["activation"]["starts_at"]))
+            stops = parse_utc(str(document["activation"]["stops_admitting_at"]))
+        except (KeyError, TypeError, ValueError):
+            return False
+        return starts <= boundary < stops
+
+    def _authority_is_live(
+        schedule_digest: str,
+        receipt_sha256: str | None = None,
+        *,
+        require_bound_receipt: bool = False,
+    ) -> bool:
+        if require_bound_receipt and not receipt_sha256:
+            return False
+        authority = (
+            store.get_authority(receipt_sha256)
+            if receipt_sha256
+            else store.latest_authority_for_schedule(schedule_digest)
+        )
+        if authority is None or str(authority.get("schedule_sha256") or "") != schedule_digest:
+            return False
+        try:
+            return parse_utc(str(authority["expires_at"])) > now
+        except (KeyError, TypeError, ValueError):
+            return False
+
+    def _rollover_proves_continuity(
+        item: Mapping[str, Any],
+        successor_sha: str,
+        successor_document: Mapping[str, Any],
+    ) -> bool:
+        receipt_sha = str(item.get("authority_receipt_sha256") or "")
+        rollover_id = str(item.get("rollover_id") or "")
+        successor_activation = str(item.get("successor_activation_id") or "")
+        if (
+            not rollover_id
+            or not receipt_sha
+            or not successor_sha
+            or not successor_activation
+            or (
+                successor_sha == schedule_sha
+                and successor_activation == activation_id
+            )
+            or not _authority_is_live(
+                successor_sha,
+                receipt_sha,
+                require_bound_receipt=True,
+            )
+        ):
+            return False
+        try:
+            predecessor_starts = parse_utc(
+                str(registered["document"]["activation"]["starts_at"])
+            )
+            cutover = parse_utc(str(item["cutover_at"]))
+            successor_starts = parse_utc(
+                str(successor_document["activation"]["starts_at"])
+            )
+            successor_stops = parse_utc(
+                str(successor_document["activation"]["stops_admitting_at"])
+            )
+        except (KeyError, TypeError, ValueError):
+            return False
+        return (
+            predecessor_starts <= cutover <= current_stops
+            and successor_starts <= cutover < successor_stops
+        )
+
+    current_stops = stops
+    for item in store.list_rollovers():
+        if (
+            str(item.get("predecessor_schedule_sha256") or "") == schedule_sha
+            and str(item.get("predecessor_activation_id") or "") == activation_id
+        ):
+            successor_sha = str(item.get("successor_schedule_sha256") or "")
+            successor_reg = store.get_registered_schedule(successor_sha)
+            if successor_reg is None or cohort_family_key(successor_reg["document"]) != family:
+                continue
+            if _window_covers(
+                successor_reg["document"], current_stops
+            ) and _rollover_proves_continuity(
+                item, successor_sha, successor_reg["document"]
+            ) and rollover_research_event_proven(
+                data_root,
+                item=item,
+                predecessor_document=registered["document"],
+                successor_document=successor_reg["document"],
+                now=now,
+                predecessor_transition_event_id=str(
+                    activation.get("last_transition_event_id") or ""
+                )
+                or None,
+                successor_transition_event_id=str(
+                    (
+                        store.get_activation(
+                            successor_sha,
+                            str(item.get("successor_activation_id") or ""),
+                        )
+                        or {}
+                    ).get("last_transition_event_id")
+                    or ""
+                )
+                or None,
+            ):
+                successor_state = "ROLLOVER_READY"
+                continuity_proven = True
+                successor_schedule_sha256 = successor_sha
+                successor_activation_id = str(
+                    item.get("successor_activation_id") or ""
+                ) or None
+                break
+
+    has_active_peer = False
+    if not continuity_proven:
+        for other in store.list_activations():
+            other_sha = str(other.get("schedule_sha256") or "")
+            if other_sha == schedule_sha:
+                continue
+            other_reg = store.get_registered_schedule(other_sha)
+            if other_reg is None or cohort_family_key(other_reg["document"]) != family:
+                continue
+            if (
+                str(other.get("state") or "") == "ACTIVE"
+                and _authority_is_live(
+                    other_sha,
+                    str(other.get("authority_receipt_sha256") or "") or None,
+                    require_bound_receipt=True,
+                )
+                and _window_covers(other_reg["document"], current_stops)
+            ):
+                has_active_peer = True
+                continuity_proven = True
+                successor_schedule_sha256 = other_sha
+                successor_activation_id = str(
+                    other.get("activation_id") or ""
+                ) or None
+                break
+
+    if successor_state != "ROLLOVER_READY" and not continuity_proven:
+        best = "NONE"
+        for other_sha in store.list_registered_schedule_digests():
+            if other_sha == schedule_sha:
+                continue
+            other_reg = store.get_registered_schedule(other_sha)
+            if other_reg is None or cohort_family_key(other_reg["document"]) != family:
+                continue
+            if _authority_is_live(other_sha):
+                best = "AUTHORIZED"
+                if _window_covers(other_reg["document"], current_stops):
+                    continuity_proven = True
+                    successor_schedule_sha256 = other_sha
+                    break
+            elif best == "NONE":
+                best = "REGISTERED"
+                successor_schedule_sha256 = other_sha
+        if successor_state != "ROLLOVER_READY":
+            successor_state = best
+    elif has_active_peer:
+        successor_state = "ACTIVE"
+    prepared = continuity_proven or has_active_peer
+    required = within_warning_band and not prepared
+    if required and successor_state == "AUTHORIZED":
+        owner_action = (
+            "prepare a new same-family successor whose authorized window covers "
+            "the current stops_admitting_at; this AUTHORIZED window is not continuous"
+        )
+    elif required:
+        owner_action = (
+            "register+authorize a same-family successor whose window covers "
+            "the current stops_admitting_at (REGISTERED alone insufficient); "
+            "in-window use rollover, post-window late activate after NON_ADMITTING"
+        )
+    else:
+        owner_action = UNKNOWN
+    return {
+        "campaign_successor_state": successor_state,
+        "campaign_successor_schedule_sha256": successor_schedule_sha256 or UNKNOWN,
+        "campaign_successor_activation_id": successor_activation_id or UNKNOWN,
+        "stops_admitting_at": stops_raw,
+        "campaign_time_remaining_seconds": remaining,
+        "campaign_successor_required": required,
+        "campaign_successor_owner_action": owner_action,
+    }
 
 
 def _safe_parse(raw: object) -> datetime | None:
@@ -671,6 +946,9 @@ def compose_health_classes(packet: Mapping[str, Any]) -> list[str]:
         if "RELEASE_BLOCKED" not in flags:
             flags.append("RELEASE_BLOCKED")
 
+    if packet.get("campaign_successor_required") is True:
+        flags.append("CAMPAIGN_SUCCESSOR_REQUIRED")
+
     # Preserve order of HEALTH_CLASSES
     ordered = [name for name in HEALTH_CLASSES if name in set(flags)]
     return ordered
@@ -699,6 +977,7 @@ def collector_verdict(health_classes: list[str]) -> str:
         "DISK_WARNING",
         "IMMUTABLE_ARCHIVE_STALE",
         "DISK_RUNWAY_TARGET40",
+        "CAMPAIGN_SUCCESSOR_REQUIRED",
     }
     classes = set(health_classes)
     if classes & action:
@@ -741,6 +1020,25 @@ def build_collector_operational_packet(
         deploy_git_sha=deploy_git_sha,
         period_seconds=period_seconds,
         empirical_overlap_seconds=empirical_overlap_seconds,
+    )
+    continuity_activation = None
+    if schedule_sha256 and activation_id:
+        requested = store.get_activation(schedule_sha256, activation_id)
+        if requested is not None:
+            continuity_activation = select_current_activation([requested], now=clock)
+    if continuity_activation is None:
+        continuity_activation = select_current_activation(
+            store.list_activations(), now=clock
+        )
+    continuity = assess_campaign_successor_continuity(
+        store,
+        now=clock,
+        activation=continuity_activation,
+        data_root=(
+            Path(observation_rdp)
+            if observation_rdp is not None
+            else root / "local/factory_v1/observation_rdp"
+        ),
     )
 
     loaded = dict(remote_config) if remote_config is not None else None
@@ -927,6 +1225,26 @@ def build_collector_operational_packet(
         "activation_state": base.get("activation_state") or UNKNOWN,
         "campaign_id": campaign_id or UNKNOWN,
         "cohort_id": release.get("cohort_id") or UNKNOWN,
+        "stops_admitting_at": continuity.get("stops_admitting_at") or UNKNOWN,
+        "campaign_time_remaining_seconds": continuity.get(
+            "campaign_time_remaining_seconds"
+        ),
+        "campaign_successor_state": continuity.get("campaign_successor_state") or "NONE",
+        "campaign_successor_schedule_sha256": continuity.get(
+            "campaign_successor_schedule_sha256"
+        )
+        or UNKNOWN,
+        "campaign_successor_activation_id": continuity.get(
+            "campaign_successor_activation_id"
+        )
+        or UNKNOWN,
+        "campaign_successor_required": bool(
+            continuity.get("campaign_successor_required")
+        ),
+        "campaign_successor_owner_action": continuity.get(
+            "campaign_successor_owner_action"
+        )
+        or UNKNOWN,
         # COLLECTION
         "last_tick_at": base.get("last_tick_at") or UNKNOWN,
         "last_source_poll_attempt_at": base.get("last_source_poll_attempt_at") or UNKNOWN,
@@ -1100,6 +1418,7 @@ def build_collector_operational_packet(
 
 
 __all__ = [
+    "CAMPAIGN_SUCCESSOR_WARNING_SECONDS",
     "DISK_CRITICAL_PCT",
     "DISK_WARNING_EARLY_PCT",
     "DISK_WARNING_PCT",
@@ -1111,6 +1430,7 @@ __all__ = [
     "PUBLICATION_EXPECTATION_UNKNOWN",
     "PUBLICATION_NOT_EXPECTED",
     "append_storage_history",
+    "assess_campaign_successor_continuity",
     "build_collector_operational_packet",
     "classify_publication_expectation",
     "collector_verdict",

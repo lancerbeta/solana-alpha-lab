@@ -27,6 +27,7 @@ COLLECTOR_SNAPSHOT_FRESH_MAX_AGE_SECONDS = (
     WATCH_CADENCE_SECONDS + COLLECTOR_SNAPSHOT_FRESHNESS_GRACE_SECONDS
 )
 COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
+    "activation_id",
     "activation_state",
     "backup_age_seconds",
     "collector_verdict",
@@ -38,6 +39,13 @@ COLLECTOR_SNAPSHOT_PACKET_FIELDS = (
     "projected_97d_status",
     "provider_observations",
     "restore_marker_unresolved",
+    "stops_admitting_at",
+    "campaign_time_remaining_seconds",
+    "campaign_successor_state",
+    "campaign_successor_schedule_sha256",
+    "campaign_successor_activation_id",
+    "campaign_successor_required",
+    "campaign_successor_owner_action",
 )
 COLLECTOR_SNAPSHOT_FILE_MAX_BYTES = 65536
 WATCH_REQUIRED_TIMERS = (
@@ -69,7 +77,9 @@ INCIDENT_GRACE_SECONDS = {
     "REQUIRED_TIMER_FAILED": 900,
     "WORKBENCH_SERVICE_DOWN": 0,
     "ALERTING_UNAVAILABLE": 0,
+    "CAMPAIGN_SUCCESSOR_REQUIRED": 0,
 }
+OWNER_ATTENTION_CODES = frozenset({"CAMPAIGN_SUCCESSOR_REQUIRED"})
 
 
 def _atomic_write_json(path: Path, payload: Mapping[str, Any]) -> None:
@@ -217,6 +227,25 @@ def classify_incidents(
         found["SUSTAINED_PROVIDER_FAILURE"] = "Provider errors are material."
     if "DISCOVERY_GAP" in classes:
         found["MATERIAL_COVERAGE_DEGRADATION"] = "Discovery gap confirmed."
+    if "CAMPAIGN_SUCCESSOR_REQUIRED" in classes:
+        remaining = packet.get("campaign_time_remaining_seconds")
+        successor_state = str(packet.get("campaign_successor_state") or "UNKNOWN")
+        if successor_state == "UNKNOWN" or remaining in (None, "UNKNOWN"):
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+                "Campaign successor continuity is UNKNOWN/BLOCKED; do not claim "
+                "an expiry time "
+                f"(activation={packet.get('activation_id')} "
+                f"owner_action={packet.get('campaign_successor_owner_action')})."
+            )
+        else:
+            found["CAMPAIGN_SUCCESSOR_REQUIRED"] = (
+                "Campaign admission expires soon without a prepared successor "
+                f"(activation={packet.get('activation_id')} "
+                f"stops_admitting_at={packet.get('stops_admitting_at')} "
+                f"time_remaining_seconds={remaining} "
+                f"successor_state={successor_state} "
+                f"owner_action={packet.get('campaign_successor_owner_action')})."
+            )
     units = unit_status or {}
     for unit in WATCH_REQUIRED_TIMERS:
         status = units.get(unit)
@@ -254,7 +283,7 @@ def render_incident_message(
     first_seen_at: str,
     recovered_at: str | None = None,
 ) -> str:
-    state = "ACTION" if kind == "INCIDENT" else "OK"
+    state = "ACTION" if kind in {"INCIDENT", "ATTENTION"} else "OK"
     backup_age = packet.get("backup_age_seconds")
     if isinstance(backup_age, int):
         backup_state = f"{backup_age // 3600}h" if backup_age >= 3600 else f"{backup_age // 60}m"
@@ -263,6 +292,11 @@ def render_incident_message(
     verified_day = packet.get("immutable_archive_latest_verified_day")
     if verified_day is None or verified_day == "":
         verified_day = "UNKNOWN"
+    machine_code = (
+        f"ATTENTION={code}"
+        if code in OWNER_ATTENTION_CODES
+        else f"INCIDENT={code}"
+    )
     lines = [
         f"FACTORY / {kind} — {state}",
         "",
@@ -274,17 +308,29 @@ def render_incident_message(
         "```",
         f"MESSAGE_TYPE={kind}",
         f"STATE={state}",
-        f"INCIDENT={code}",
+        machine_code,
         f"COLLECTOR_STATE={packet.get('activation_state')}",
         f"LIFECYCLE_STATE={packet.get('cohort_readiness_state')}",
         f"ARCHIVE_LAST_VERIFIED_DAY={verified_day}",
         f"ARCHIVE_BACKLOG_DAYS={packet.get('immutable_archive_backlog_days')}",
         f"MUTABLE_BACKUP_STATE={backup_state}",
         f"PROJECTED_97D_BYTES={packet.get('projected_97d_bytes')}",
-        f"OWNER_ACTION={code if kind == 'INCIDENT' else 'NONE'}",
+        f"OWNER_ACTION={code if kind in {'INCIDENT', 'ATTENTION'} else 'NONE'}",
         f"DEDUP_KEY={code}",
         f"FIRST_SEEN_AT={first_seen_at}",
     ]
+    if code == "CAMPAIGN_SUCCESSOR_REQUIRED":
+        lines.extend(
+            [
+                f"ACTIVATION_ID={packet.get('activation_id')}",
+                f"STOPS_ADMITTING_AT={packet.get('stops_admitting_at')}",
+                f"TIME_REMAINING_SECONDS={packet.get('campaign_time_remaining_seconds')}",
+                f"SUCCESSOR_STATE={packet.get('campaign_successor_state')}",
+                f"SUCCESSOR_SCHEDULE_SHA256={packet.get('campaign_successor_schedule_sha256')}",
+                f"SUCCESSOR_ACTIVATION_ID={packet.get('campaign_successor_activation_id')}",
+                f"CAMPAIGN_OWNER_ACTION={packet.get('campaign_successor_owner_action')}",
+            ]
+        )
     if recovered_at:
         lines.append(f"RECOVERED_AT={recovered_at}")
     lines.extend(["```", ""])
@@ -336,16 +382,26 @@ def evaluate_operability(
         ).total_seconds()
         grace = INCIDENT_GRACE_SECONDS.get(code, 1800)
         if elapsed >= grace and record.get("notified") is not True:
+            message_kind = (
+                "ATTENTION" if code in OWNER_ATTENTION_CODES else "INCIDENT"
+            )
             text = render_incident_message(
-                kind="INCIDENT",
+                kind=message_kind,
                 code=code,
                 detail=detail,
                 packet=packet,
                 first_seen_at=first,
             )
-            pending.append({"kind": "INCIDENT", "code": code, "text": text, "first_seen_at": first})
+            pending.append(
+                {
+                    "kind": message_kind,
+                    "code": code,
+                    "text": text,
+                    "first_seen_at": first,
+                }
+            )
             record["notified"] = True
-            messages.append({"kind": "INCIDENT", "code": code})
+            messages.append({"kind": message_kind, "code": code})
         active[code] = record
 
     for code in list(active):

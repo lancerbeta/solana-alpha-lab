@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping as MappingLike
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -40,6 +41,178 @@ def _payload_missing_reason(row: MappingLike) -> object:
     if isinstance(payload, dict):
         return payload.get("missing_reason")
     return None
+
+
+def _activation_freshness_key(row: MappingLike) -> tuple[str, str, str]:
+    """Canonical freshness order for current-activation selection."""
+
+    return (
+        str(row.get("updated_at") or ""),
+        str(row.get("created_at") or ""),
+        str(row.get("activation_id") or ""),
+    )
+
+
+def select_current_activation(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    *,
+    now: datetime | None = None,
+) -> dict[str, Any] | None:
+    """Deterministic current campaign activation for status/doctor/operability.
+
+    Precedence:
+    1. current ACTIVE (freshest if several)
+    2. otherwise current DRAINING (freshest if several)
+    3. otherwise latest relevant activation by canonical freshness order
+
+    Historical ABORTED_SAFETY remains selectable only when no ACTIVE/DRAINING
+    peer exists; it is never preferred over a live draining campaign.
+    """
+
+    clock = None
+    if now is not None:
+        clock = now if now.tzinfo is not None else now.replace(tzinfo=UTC)
+        clock = clock.astimezone(UTC)
+    rows: list[dict[str, Any]] = []
+    for raw in activations:
+        row = dict(raw)
+        if clock is not None:
+            payload = row.get("payload")
+            if isinstance(payload, str):
+                try:
+                    payload = json.loads(payload)
+                except (TypeError, ValueError):
+                    payload = None
+            if isinstance(payload, dict):
+                effective_raw = payload.get("transition_effective_at")
+                if effective_raw:
+                    try:
+                        effective_at = parse_utc(str(effective_raw))
+                    except (TypeError, ValueError):
+                        effective_at = None
+                    if effective_at is not None and effective_at > clock:
+                        prior_state = str(payload.get("prior_state") or "")
+                        if prior_state in {"ACTIVE", "DRAINING"}:
+                            row["state"] = prior_state
+                            row["future_transition_pending"] = True
+                        else:
+                            continue
+        rows.append(row)
+    if not rows:
+        return None
+    active = [row for row in rows if str(row.get("state") or "") == "ACTIVE"]
+    if active:
+        return max(active, key=_activation_freshness_key)
+    draining = [row for row in rows if str(row.get("state") or "") == "DRAINING"]
+    if draining:
+        return max(draining, key=_activation_freshness_key)
+    return max(rows, key=_activation_freshness_key)
+
+
+def classify_doctor_current_activation(
+    activations: list[MappingLike] | tuple[MappingLike, ...],
+    *,
+    recovery_proofs: MappingLike | None = None,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Map current activation selection to doctor terminal precedence.
+
+    Historical ABORTED_SAFETY never overrides a current ACTIVE/DRAINING campaign.
+    """
+
+    current = select_current_activation(activations, now=now)
+    current_state = str((current or {}).get("state") or "")
+    current_id = (current or {}).get("activation_id")
+    current_digest = (current or {}).get("schedule_sha256")
+    live = current_state == "ACTIVE"
+    stops_admitting_at = (current or {}).get("stops_admitting_at")
+    late_recovery_at = None
+    recovery_proof = None
+    if current_state == "DRAINING":
+        recovery_proof = "UNKNOWN"
+        recovery_key = (
+            str(current_digest or ""),
+            str(current_id or ""),
+        )
+        proof = (
+            recovery_proofs.get(recovery_key)
+            if isinstance(recovery_proofs, MappingLike) and current_id is not None
+            else None
+        )
+        if isinstance(proof, MappingLike):
+            late_recovery_at = proof.get("late_recovery_at")
+            recovery_proof = proof.get("late_recovery_proof") or "UNKNOWN"
+    lifecycle_fields = {
+        "stops_admitting_at": stops_admitting_at,
+        "late_recovery_at": late_recovery_at,
+        "late_recovery_proof": recovery_proof,
+        "late_recovery_event_id": (
+            proof.get("late_recovery_event_id")
+            if current_state == "DRAINING" and isinstance(proof, MappingLike)
+            else (
+                (current or {}).get("last_transition_event_id")
+                if current_state == "DRAINING"
+                else None
+            )
+        ),
+    }
+    if current_state == "ABORTED_SAFETY":
+        return {
+            **lifecycle_fields,
+            "terminal": "DOCTOR_ABORTED_SAFETY",
+            "live_activation": False,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": "MUST_NOT_RESUME",
+        }
+    if current_state == "PAUSED_OPERATOR":
+        return {
+            **lifecycle_fields,
+            "terminal": "DOCTOR_PAUSED",
+            "live_activation": False,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": "RESUME",
+        }
+    if current_state == "DRAINING" and recovery_proof == "UNKNOWN":
+        return {
+            **lifecycle_fields,
+            "terminal": "DOCTOR_RECOVERY_PROOF_UNAVAILABLE",
+            "live_activation": False,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": "REPAIR_DRAINING_RECOVERY_PROOF",
+        }
+    if current_state in {"ACTIVE", "DRAINING"}:
+        return {
+            **lifecycle_fields,
+            "terminal": "DOCTOR_CURRENT_OK",
+            "live_activation": live,
+            "current_activation_id": current_id,
+            "current_schedule_sha256": current_digest,
+            "current_activation_state": current_state,
+            "next_action": (
+                "TICK_ONCE"
+                if (
+                    current_state == "ACTIVE"
+                    or late_recovery_at is not None
+                    or recovery_proof == "NOT_REQUIRED"
+                )
+                else "REPAIR_DRAINING_RECOVERY_PROOF"
+            ),
+        }
+    return {
+        **lifecycle_fields,
+        "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
+        "live_activation": False,
+        "current_activation_id": current_id,
+        "current_schedule_sha256": current_digest,
+        "current_activation_state": current_state or None,
+        "next_action": "REGISTER_AUTHORIZE_ACTIVATE",
+    }
 
 
 def _safe_parse(raw: object) -> datetime | None:
@@ -175,10 +348,11 @@ def build_collector_read_model(
     activations = store.list_activations()
     selected = None
     if schedule_sha256 and activation_id:
-        selected = store.get_activation(schedule_sha256, activation_id)
+        requested = store.get_activation(schedule_sha256, activation_id)
+        if requested is not None:
+            selected = select_current_activation([requested], now=now)
     elif activations:
-        live = [row for row in activations if row.get("state") == "ACTIVE"]
-        selected = live[0] if live else activations[0]
+        selected = select_current_activation(activations, now=now)
     digest = str((selected or {}).get("schedule_sha256") or schedule_sha256 or "")
     act_id = str((selected or {}).get("activation_id") or activation_id or "")
     activation_state = str((selected or {}).get("state") or "NONE")
@@ -353,7 +527,9 @@ def build_collector_read_model(
 __all__ = [
     "build_collector_read_model",
     "build_m1_progress_projection",
+    "classify_doctor_current_activation",
     "derive_current_provider_state",
+    "select_current_activation",
 ]
 
 

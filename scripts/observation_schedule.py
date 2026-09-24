@@ -29,10 +29,12 @@ from solana_alpha_lab.factory.observation_schedule_lifecycle import (  # noqa: E
     authorize_schedule,
     pause_schedule,
     register_schedule,
+    resolve_late_recovery_proof,
     resume_schedule,
     rollover_schedule,
     snapshot_schedule,
     status_schedule,
+    owner_next_action_for_lifecycle_error,
 )
 from solana_alpha_lab.factory.observation_schedule_composition import (  # noqa: E402
     CompositionParityError,
@@ -300,10 +302,31 @@ def main(
             )
             return _emit(result, code)
         if args.command == "status":
+            cli_digest = getattr(args, "schedule_sha256", None)
+            cli_activation = getattr(args, "activation_id", None)
+            if bool(cli_digest) != bool(cli_activation):
+                return _emit(
+                    {
+                        "terminal": "STATUS_SELECTOR_INCOMPLETE",
+                        "next_action": (
+                            "PROVIDE_BOTH_SCHEDULE_SHA256_AND_ACTIVATION_ID"
+                        ),
+                    },
+                    2,
+                )
+            # Status defaults to the store's deterministic current
+            # ACTIVE/DRAINING selection.  Runtime config is not an authority
+            # for choosing a historical activation.
+            explicit_digest = (
+                str(cli_digest) if cli_digest and cli_activation else None
+            )
+            explicit_activation = (
+                str(cli_activation) if cli_digest and cli_activation else None
+            )
             result = status_schedule(
                 store,
-                schedule_sha256=getattr(args, "schedule_sha256", None) or config.get("schedule_sha256"),
-                activation_id=getattr(args, "activation_id", None) or config.get("activation_id"),
+                schedule_sha256=explicit_digest,
+                activation_id=explicit_activation,
                 now=now,
                 deploy_git_sha=producer,
             )
@@ -326,25 +349,74 @@ def main(
         if args.command == "doctor":
             from solana_alpha_lab.factory.collector_read_model import (
                 build_collector_read_model,
+                classify_doctor_current_activation,
             )
 
             unresolved = store.restore_marker_unresolved()
             activations = store.list_activations()
-            live = any(row["state"] == "ACTIVE" for row in activations)
+            recovery_proofs = {
+                (
+                    str(row.get("schedule_sha256") or ""),
+                    str(row.get("activation_id") or ""),
+                ): resolve_late_recovery_proof(data_root, row, now=now)
+                for row in activations
+                if str(row.get("state") or "") == "DRAINING"
+                and str(row.get("activation_id") or "")
+            }
+            current_report = classify_doctor_current_activation(
+                activations,
+                recovery_proofs=recovery_proofs,
+                now=now,
+            )
+            current_state = str(current_report.get("current_activation_state") or "")
+            live = bool(current_report.get("live_activation"))
+            current_timing = {
+                "stops_admitting_at": current_report.get("stops_admitting_at"),
+                "late_recovery_at": current_report.get("late_recovery_at"),
+                "late_recovery_proof": current_report.get("late_recovery_proof"),
+                "late_recovery_event_id": current_report.get(
+                    "late_recovery_event_id"
+                ),
+            }
+            cli_digest = getattr(args, "schedule_sha256", None)
+            cli_activation = getattr(args, "activation_id", None)
+            if bool(cli_digest) != bool(cli_activation):
+                return _emit(
+                    {
+                        "terminal": "DOCTOR_SELECTOR_INCOMPLETE",
+                        "next_action": (
+                            "PROVIDE_BOTH_SCHEDULE_SHA256_AND_ACTIVATION_ID"
+                        ),
+                    },
+                    2,
+                )
+            if cli_digest and cli_activation:
+                collector_digest = str(cli_digest)
+                collector_activation = str(cli_activation)
+            else:
+                collector_digest = (
+                    str(current_report.get("current_schedule_sha256") or "") or None
+                )
+                collector_activation = (
+                    str(current_report.get("current_activation_id") or "") or None
+                )
             collector = build_collector_read_model(
                 store,
                 now=now,
-                schedule_sha256=getattr(args, "schedule_sha256", None)
-                or config.get("schedule_sha256"),
-                activation_id=getattr(args, "activation_id", None)
-                or config.get("activation_id"),
+                schedule_sha256=collector_digest,
+                activation_id=collector_activation,
                 deploy_git_sha=producer,
             )
             if unresolved:
                 return _emit(
                     {
+                        **current_timing,
                         "terminal": "DOCTOR_RESTORE_MARKER_UNRESOLVED",
                         "live_activation": live,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state or None,
                         "restore_marker_unresolved": True,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -352,12 +424,16 @@ def main(
                     },
                     2,
                 )
-            aborted = any(row["state"] == "ABORTED_SAFETY" for row in activations)
-            if aborted and not live:
+            if current_report["terminal"] == "DOCTOR_ABORTED_SAFETY":
                 return _emit(
                     {
+                        **current_timing,
                         "terminal": "DOCTOR_ABORTED_SAFETY",
                         "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -365,18 +441,24 @@ def main(
                     },
                     2,
                 )
-            paused = any(row["state"] == "PAUSED_OPERATOR" for row in activations)
-            if paused and not live:
+            if current_report["terminal"] == "DOCTOR_PAUSED":
                 must_not_resume = any(
                     dict(row.get("payload") or {}).get("must_not_resume") is True
                     or str(dict(row.get("payload") or {}).get("abort_reason") or "").strip()
                     for row in activations
                     if row["state"] == "PAUSED_OPERATOR"
+                    and str(row.get("activation_id") or "")
+                    == str(current_report.get("current_activation_id") or "")
                 )
                 return _emit(
                     {
+                        **current_timing,
                         "terminal": "DOCTOR_PAUSED",
                         "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -384,11 +466,33 @@ def main(
                     },
                     2,
                 )
-            if not live:
+            if current_report["terminal"] == "DOCTOR_RECOVERY_PROOF_UNAVAILABLE":
                 return _emit(
                     {
+                        **current_timing,
+                        "terminal": "DOCTOR_RECOVERY_PROOF_UNAVAILABLE",
+                        "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state,
+                        "restore_marker_unresolved": False,
+                        "activation_count": len(activations),
+                        "collector": collector,
+                        "next_action": "REPAIR_DRAINING_RECOVERY_PROOF",
+                    },
+                    2,
+                )
+            if current_report["terminal"] == "DOCTOR_NO_LIVE_ACTIVATION":
+                return _emit(
+                    {
+                        **current_timing,
                         "terminal": "DOCTOR_NO_LIVE_ACTIVATION",
                         "live_activation": False,
+                        "current_activation_id": current_report.get(
+                            "current_activation_id"
+                        ),
+                        "current_activation_state": current_state or None,
                         "restore_marker_unresolved": False,
                         "activation_count": len(activations),
                         "collector": collector,
@@ -398,7 +502,7 @@ def main(
                 )
             health = list(collector.get("health_flags") or [])
             terminal = "DOCTOR_OK"
-            next_action = "TICK_ONCE"
+            next_action = str(current_report.get("next_action") or "TICK_ONCE")
             if "PROVIDER_FAILED" in health:
                 terminal = "DOCTOR_PROVIDER_FAILED"
                 next_action = "INSPECT_HTTP_CLASS"
@@ -413,8 +517,11 @@ def main(
             code = 0 if terminal == "DOCTOR_OK" else 2
             return _emit(
                 {
+                    **current_timing,
                     "terminal": terminal,
-                    "live_activation": True,
+                    "live_activation": live,
+                    "current_activation_id": current_report.get("current_activation_id"),
+                    "current_activation_state": current_state,
                     "restore_marker_unresolved": False,
                     "activation_count": len(activations),
                     "collector": collector,
@@ -574,7 +681,11 @@ def main(
         PrimitiveRegistryError,
         CompositionParityError,
     ) as exc:
-        return _emit({"terminal": str(exc)}, 2)
+        payload = {"terminal": str(exc)}
+        next_action = owner_next_action_for_lifecycle_error(str(exc))
+        if next_action is not None:
+            payload["next_action"] = next_action
+        return _emit(payload, 2)
     finally:
         if "store" in locals():
             store.close()
