@@ -1119,6 +1119,7 @@ def run_offhost_checkpoint(
             )
             base = chain.get("base_full") if isinstance(chain.get("base_full"), dict) else None
             ordered = list(chain.get("ordered_deltas") or [])
+            chain_last_weekly = chain.get("last_weekly_date")
             checkpoint_terminal = "NO_CHANGES_VERIFIED"
             weekly_full_state = "OK"
             packed: dict[str, Any] | None = None
@@ -1168,7 +1169,7 @@ def run_offhost_checkpoint(
                         "sha256": base["sha256"],
                         "bytes": base.get("bytes"),
                     }
-                    persist_chain(last_weekly=clock.date().isoformat())
+                    chain_last_weekly = clock.date().isoformat()
                     skip_daily = True
                 else:
                     full = ensure_full()
@@ -1191,7 +1192,7 @@ def run_offhost_checkpoint(
                         ordered = []
                         source_full = full
                         prune_superseded_local_backups(sink, sink / str(full["bundle"]))
-                        persist_chain(last_weekly=clock.date().isoformat())
+                        chain_last_weekly = clock.date().isoformat()
                         skip_daily = True
 
             if mode == "daily" and skip_daily is False:
@@ -1290,7 +1291,7 @@ def run_offhost_checkpoint(
                                 delta_path.unlink()
                             except OSError:
                                 pass
-                persist_chain(last_weekly=chain.get("last_weekly_date"))
+                chain_last_weekly = chain.get("last_weekly_date")
 
             if base is None:
                 raise OffhostBackupError("BASE_FULL_MISSING")
@@ -1354,6 +1355,7 @@ def run_offhost_checkpoint(
                 "deploy_git_sha": deploy_git_sha,
             }
             write_offhost_receipt(root, offhost, receipt)
+            persist_chain(last_weekly=chain_last_weekly)
             return receipt
 
 
