@@ -665,7 +665,46 @@ class ResolveNextActionTests(unittest.TestCase):
         )
         self.assertIn("status: NEXT", text)
         self.assertIn("CONTROL-compatible BASE", text)
+        self.assertIn("/hypothesis-forge CURRENT_REPRESENTATION_CONTROL", text)
         self.assertNotIn("status: DONE", text)
+        self.assertNotIn("STOP_BEFORE_SYNTHESIS", text)
+
+    def test_no_write_control_required_readout_is_not_slash_authority(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_START_BASE,
+                "owner_final": None,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["CONTROL_SURFACE_REQUIRED"],
+                "no_write": True,
+            }
+        )
+        self.assertIn("START_BASE", text)
+        self.assertIn("CONTROL_SURFACE_REQUIRED", text)
+        self.assertIn("next: STOP_BEFORE_SYNTHESIS", text)
+        self.assertNotIn("/hypothesis-forge", text)
+        self.assertNotIn("CONTROL_ENTRY", text)
+
+    def test_authorized_control_required_readout_keeps_slash_action(self) -> None:
+        text = format_forge_run_owner_readout(
+            {
+                "run_id": "FORGE-RUN-TEST",
+                "owner_class": "FORGE_RUN_IN_PROGRESS",
+                "next_action": ACTION_START_BASE,
+                "owner_final": None,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "blocking_reason_codes": ["CONTROL_SURFACE_REQUIRED"],
+                "no_write": False,
+            }
+        )
+        self.assertIn("CONTROL-compatible BASE", text)
+        self.assertIn("next: CONTROL_ENTRY", text)
+        self.assertIn("/hypothesis-forge CURRENT_REPRESENTATION_CONTROL", text)
+        self.assertNotIn("STOP_BEFORE_SYNTHESIS", text)
 
     def test_occupied_slot_readback_block_has_owner_recovery_next(self) -> None:
         text = format_forge_run_owner_readout(

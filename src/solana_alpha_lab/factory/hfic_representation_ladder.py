@@ -1069,12 +1069,18 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
     elif next_action == ACTION_START_BASE and "CONTROL_SURFACE_REQUIRED" in {
         str(item) for item in (receipt.get("blocking_reason_codes") or [])
     }:
-        status = (
-            "NEXT — CONTROL-compatible BASE required for V1; run "
-            "/hypothesis-forge CURRENT_REPRESENTATION_CONTROL "
-            "(preflight --control-current-representation), then verify START_BASE; "
-            "not ordinary evening DONE"
-        )
+        if receipt.get("no_write") is True:
+            status = (
+                "NEXT — START_BASE; CONTROL_SURFACE_REQUIRED; "
+                "no-write diagnostic is not slash authority"
+            )
+        else:
+            status = (
+                "NEXT — CONTROL-compatible BASE required for V1; run "
+                "/hypothesis-forge CURRENT_REPRESENTATION_CONTROL "
+                "(preflight --control-current-representation), then verify START_BASE; "
+                "not ordinary evening DONE"
+            )
     elif next_action == ACTION_START_BASE:
         status = "NEXT — START BASE (new scientific look on this market)"
     elif next_action == ACTION_START_V1:
@@ -1309,10 +1315,16 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "capability surface, then retry; do not reset market budget"
         )
     elif "CONTROL_SURFACE_REQUIRED" in blocking:
-        lines.append(
-            "next: CONTROL_ENTRY — run /hypothesis-forge CURRENT_REPRESENTATION_CONTROL "
-            "with --control-current-representation, then verify START_BASE"
-        )
+        if receipt.get("no_write") is True:
+            lines.append(
+                "next: STOP_BEFORE_SYNTHESIS — CONTROL_SURFACE_REQUIRED remains "
+                "the scientific next state; this diagnostic does not grant slash authority"
+            )
+        else:
+            lines.append(
+                "next: CONTROL_ENTRY — run /hypothesis-forge CURRENT_REPRESENTATION_CONTROL "
+                "with --control-current-representation, then verify START_BASE"
+            )
     elif isinstance(freeze_pending, str) and freeze_pending.strip() and (
         owner_class == ACTION_OBSERVABILITY_BLOCKED
         or next_action == ACTION_OBSERVABILITY_BLOCKED

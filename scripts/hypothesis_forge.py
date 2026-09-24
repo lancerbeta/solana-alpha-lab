@@ -517,7 +517,7 @@ def cmd_forge_run(
     )
 
     def _emit_run(payload: dict[str, Any], *, exit_code: int) -> int:
-        if not payload.get("owner_readout"):
+        if payload.get("no_write") is True or not payload.get("owner_readout"):
             payload["owner_readout"] = format_forge_run_owner_readout(payload)
         _assert_no_path_leak(payload, str(repo_root))
         readout = payload.get("owner_readout")
