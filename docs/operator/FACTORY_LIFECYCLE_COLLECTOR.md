@@ -1014,6 +1014,7 @@ machine readback only. Canonical Git:
 
 - **`FACTORY_BACKUP_SINK`** remains the optional **absolute other-volume** first-stage sink env name. Empty → git-side parent-independent sink under `local/factory_v1_backup_sink` (same volume, different parent). Google Drive is **never** `FACTORY_BACKUP_SINK`.
 - **Copy-only:** `rclone copyto` only. **No** delete, move, purge, sync-delete, or FUSE mount.
+- **Publication-job snapshot:** inventory and full/delta packaging share one staged capture of `datasets/publication_jobs`. After that capture, the run does not reopen the live job path. A job that disappears during the capture itself is absent from the snapshot. A job that disappears after capture is packed from the captured bytes. SQLite still uses the SQLite backup API.
 - **Google Drive outage** must not invalidate a successful local backup artifact; stage 1 stays independently diagnosable.
 
 ### Fixed off-host constants (VPS)

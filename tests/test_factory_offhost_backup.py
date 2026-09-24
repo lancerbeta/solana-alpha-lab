@@ -230,6 +230,10 @@ class FactoryOffhostBackupTests(unittest.TestCase):
         receipt = read_offhost_receipt(self.root, self.config)
         assert receipt is not None
         self.assertEqual(receipt["terminal"], "COPY_FAILED")
+        self.assertEqual(receipt["rclone_returncode"], 1)
+        self.assertEqual(receipt["rclone_failure_class"], "UNCLASSIFIED")
+        self.assertEqual(len(receipt["stderr_sha256"]), 64)
+        self.assertNotIn("copy failed", json.dumps(receipt))
         health = offhost_health_snapshot(self.root, config=self.config)
         self.assertEqual(health["offhost_backup_state"], "FAILED")
 

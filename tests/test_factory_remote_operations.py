@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import sqlite3
 import subprocess
 import sys
 import tempfile
 import unittest
+import zipfile
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -19,16 +21,20 @@ if str(SRC) not in sys.path:
 
 from solana_alpha_lab.factory.remote_ops import (
     RemoteOpsError,
+    apply_delta_bundle,
+    backup_payload_snapshot,
     doctor_packet,
     emit_alert,
     emit_health_alert,
     format_alert,
     load_config,
     package_backup,
+    package_delta_backup,
     project_health,
     prove_git_side,
     require_secret,
     restore_backup_isolated,
+    scan_backup_inventory,
     verify_security_templates,
     write_heartbeat,
 )
@@ -482,6 +488,97 @@ class FactoryRemoteOperationsTests(unittest.TestCase):
         )
         self.assertEqual(completed.returncode, 2)
         self.assertIn("APPLY_REQUIRES_OWNER_PACKET", completed.stdout)
+
+    def _mutable_job_root(self) -> tuple[Path, dict, Path, bytes]:
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        root = _copy_tree(Path(tmp.name) / "src")
+        _seed_stores(root)
+        loaded = load_config(root)
+        loaded["backup"]["recursive_relative_paths"] = [
+            "local/factory_v1/observation_rdp"
+        ]
+        job = (
+            root
+            / "local/factory_v1/observation_rdp/datasets/publication_jobs/open/job.json"
+        )
+        payload = b'{"state":"open"}'
+        job.parent.mkdir(parents=True, exist_ok=True)
+        job.write_bytes(payload)
+        return root, loaded, job, payload
+
+    def test_delta_uses_captured_publication_job_after_live_delete(self) -> None:
+        root, loaded, job, payload = self._mutable_job_root()
+        sink = root / "local/factory_v1_backup_sink"
+        relative = job.relative_to(root).as_posix()
+        with backup_payload_snapshot(root, loaded) as snapshot:
+            scanned = scan_backup_inventory(root, config=loaded, snapshot=snapshot)
+            captured = next(item for item in scanned["entries"] if item["path"] == relative)
+            self.assertEqual(captured["sha256"], hashlib.sha256(payload).hexdigest())
+            job.unlink()
+            self.assertFalse(job.exists())
+            base_entries = [item for item in scanned["entries"] if item["path"] != relative]
+            packed = package_delta_backup(
+                root,
+                base_manifest={
+                    "entries": base_entries,
+                    "inventory_sha256": "0" * 64,
+                },
+                current_entries=scanned["entries"],
+                sink=sink,
+                snapshot=snapshot,
+            )
+        self.assertEqual(packed["terminal"], "DELTA_PACKAGED")
+        with zipfile.ZipFile(sink / packed["bundle"]) as archive:
+            self.assertEqual(archive.read(relative), payload)
+            manifest = json.loads(archive.read("DELTA_MANIFEST.json"))
+        changed = next(item for item in manifest["changed"] if item["path"] == relative)
+        self.assertEqual(changed["sha256"], hashlib.sha256(payload).hexdigest())
+        self.assertEqual(manifest["result_inventory_sha256"], scanned["inventory_sha256"])
+        restored = Path(root.parent) / "delta-restore"
+        apply_delta_bundle(sink / packed["bundle"], restored)
+        self.assertEqual((restored / relative).read_bytes(), payload)
+
+    def test_full_backup_uses_captured_publication_job_after_live_delete(self) -> None:
+        root, loaded, job, payload = self._mutable_job_root()
+        relative = job.relative_to(root).as_posix()
+        with backup_payload_snapshot(root, loaded) as snapshot:
+            job.unlink()
+            packed = package_backup(
+                root,
+                config=loaded,
+                acquire_lock=False,
+                snapshot=snapshot,
+                prune_superseded=False,
+            )
+        manifest_entry = next(item for item in packed["entries"] if item["path"] == relative)
+        self.assertEqual(manifest_entry["sha256"], hashlib.sha256(payload).hexdigest())
+        restored = Path(root.parent) / "full-restore"
+        restore_backup_isolated(
+            bundle=root / "local/factory_v1_backup_sink" / packed["bundle"],
+            dest_root=restored,
+        )
+        self.assertEqual((restored / relative).read_bytes(), payload)
+
+    def test_delta_refuses_live_reread_without_snapshot(self) -> None:
+        root, loaded, job, _payload = self._mutable_job_root()
+        relative = job.relative_to(root).as_posix()
+        sink = root / "local/factory_v1_backup_sink"
+        with self.assertRaisesRegex(RemoteOpsError, "MUTABLE_SNAPSHOT_REQUIRED"):
+            package_delta_backup(
+                root,
+                base_manifest={"entries": [], "inventory_sha256": "0" * 64},
+                current_entries=[
+                    {
+                        "path": relative,
+                        "sha256": "a" * 64,
+                        "bytes": 1,
+                        "kind": "FILE_SNAPSHOT",
+                    }
+                ],
+                sink=sink,
+            )
+        self.assertEqual(list(sink.glob("DELTA_*.zip")), [])
 
 
 if __name__ == "__main__":
