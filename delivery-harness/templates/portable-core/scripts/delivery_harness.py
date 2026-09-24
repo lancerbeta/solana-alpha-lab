@@ -9,7 +9,6 @@ import json
 import os
 import re
 import subprocess
-import unicodedata
 from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
 
@@ -86,30 +85,6 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-_WINDOWS_RESERVED_DEVICE_STEMS = frozenset(
-    {
-        "con",
-        "prn",
-        "aux",
-        "nul",
-        *(f"com{index}" for index in range(1, 10)),
-        *(f"lpt{index}" for index in range(1, 10)),
-    }
-)
-
-
-def windows_reserved_device_alias(segment: str) -> bool:
-    """Same disposition as the live gate: NFKC superscripts are device aliases."""
-
-    if not isinstance(segment, str) or segment == "":
-        return False
-    normalized = unicodedata.normalize("NFKC", segment).casefold().rstrip(" .")
-    if normalized == "":
-        return False
-    stem = normalized.split(".", 1)[0].rstrip(" .")
-    return stem in _WINDOWS_RESERVED_DEVICE_STEMS
-
-
 def safe_relative(value: str) -> str:
     if not isinstance(value, str) or not value or "\x00" in value:
         raise ValueError("UNSAFE_RELATIVE_PATH")
@@ -118,8 +93,6 @@ def safe_relative(value: str) -> str:
         raise ValueError("UNSAFE_RELATIVE_PATH")
     parts = normalized.split("/")
     if any(part in {"", ".", ".."} for part in parts):
-        raise ValueError("UNSAFE_RELATIVE_PATH")
-    if any(windows_reserved_device_alias(part) for part in parts):
         raise ValueError("UNSAFE_RELATIVE_PATH")
     return PurePosixPath(*parts).as_posix()
 

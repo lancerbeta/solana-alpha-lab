@@ -20,7 +20,7 @@ from solana_alpha_lab.semantic_premise_review import (  # noqa: E402
     evaluate_fixture_premise,
     load_profile,
     map_semantic_verdict_to_architecture,
-    authorize_architecture_critic_launch,
+    validate_launch_inputs,
     validate_packet_against_candidate,
 )
 
@@ -210,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
                     "risk_dimensions": list(args.risk_dimension)
                     or list(classification.get("risk_dimensions") or []),
                 }
-            result = authorize_architecture_critic_launch(
+            result = validate_launch_inputs(
                 classification=classification,
                 packet=packet,
                 repo_root=root,

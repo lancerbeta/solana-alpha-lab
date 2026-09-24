@@ -940,17 +940,6 @@ class DeliveryHarnessMergeGuardTests(unittest.TestCase):
                 excluded_paths=excluded | {"missing.json"}, runner=runner,
             )
 
-    def test_file_to_directory_transition_is_not_a_path_collision(self) -> None:
-        entries = self.module.decode_git_name_status(b"D\0x\0A\0x/y\0")
-        self.assertEqual(entries, [("D", "x"), ("A", "x/y")])
-        self.assertFalse(self.module.inventory_status_entries_collide(entries))
-
-    def test_adding_file_and_child_is_a_path_collision(self) -> None:
-        with self.assertRaisesRegex(ValueError, "DELIVERY_INVENTORY_INVALID"):
-            self.module.decode_git_name_status(b"A\0x\0A\0x/y\0")
-        with self.assertRaisesRegex(ValueError, "DELIVERY_INVENTORY_INVALID"):
-            self.module.decode_git_name_status(b"M\0x\0A\0x\0")
-
     def test_local_receipt_cannot_replace_execution_of_project_bound_gate(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

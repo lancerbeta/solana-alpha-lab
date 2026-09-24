@@ -316,32 +316,6 @@ class BindEvidenceIntegrationTests(unittest.TestCase):
         self.assertEqual(verify.returncode, 0, verify.stderr)
         impl.write_bytes(committed)
 
-    def test_evidence_path_outside_managed_write_set_refuses_before_write(self) -> None:
-        original_root = harness_sync.ROOT
-        harness_sync.ROOT = self.worktree.resolve()
-        self.addCleanup(setattr, harness_sync, "ROOT", original_root)
-        task_path = (
-            self.worktree
-            / "docs/tasks/CTRL-HARNESS-SYNC-DELIVERY-EVIDENCE-BINDINGS-V1.md"
-        )
-        text = task_path.read_text(encoding="utf-8")
-        old = (
-            "    DELIVERY_EVIDENCE:\n"
-            "      - docs/evidence/control/a1_harness_sync_delivery_evidence_bindings_completion_v1.json\n"
-        )
-        new = (
-            "    DELIVERY_EVIDENCE:\n"
-            "      - docs/evidence/not_in_write_set/evil.json\n"
-        )
-        self.assertIn(old, text)
-        task_path.write_text(text.replace(old, new, 1), encoding="utf-8")
-        with self.assertRaises(harness_sync.HarnessSyncError) as ctx:
-            harness_sync.compute_evidence_chain(
-                task_id="CTRL-HARNESS-SYNC-DELIVERY-EVIDENCE-BINDINGS-V1",
-                head=self.head,
-            )
-        self.assertIn("EVIDENCE_PATH_OUTSIDE_MANAGED_WRITE_SET", str(ctx.exception))
-
 
 if __name__ == "__main__":
     unittest.main()

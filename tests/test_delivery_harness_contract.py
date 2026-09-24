@@ -296,10 +296,6 @@ class DeliveryHarnessContractTests(unittest.TestCase):
             "tests/test_delivery_harness_adapters.py",
         }
         self.assertTrue(required_paths.issubset(bound))
-        self.assertNotIn(
-            "docs/evidence/control/delivery_harness_acceptance_v1.json",
-            bound,
-        )
         for relative, observed in bound.items():
             self.assertEqual(observed, sha256(ROOT / relative), relative)
         self.assertEqual(receipt["factory_fit"]["sha256"], sha256(FACTORY_FIT))

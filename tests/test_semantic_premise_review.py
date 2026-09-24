@@ -17,7 +17,6 @@ from solana_alpha_lab.semantic_premise_review import (  # noqa: E402
     load_profile,
     map_semantic_verdict_to_architecture,
     packet_is_stale,
-    authorize_architecture_critic_launch,
     require_packet_fingerprint_in_findings,
     validate_launch_inputs,
 )
@@ -188,14 +187,6 @@ class SemanticPremiseReviewTests(unittest.TestCase):
                 repo_root=ROOT,
             )
         self.assertIn("SEMANTIC_PACKET_REQUIRED", str(ctx.exception))
-        with self.assertRaises(SemanticPremiseReviewError) as blocked:
-            authorize_architecture_critic_launch(
-                classification=classification,
-                packet=None,
-                repo_root=ROOT,
-            )
-        self.assertIn("SEMANTIC_PACKET_REQUIRED", str(blocked.exception))
-        self.assertNotIn("findings", str(blocked.exception).casefold())
 
         packet = _minimal_packet()
         ok = validate_launch_inputs(
@@ -221,30 +212,6 @@ class SemanticPremiseReviewTests(unittest.TestCase):
         )
         self.assertTrue(ok["ok"])
         self.assertEqual(ok["packet_fingerprint_sha256"], packet["packet_fingerprint_sha256"])
-        token = authorize_architecture_critic_launch(
-            classification=classification,
-            packet=packet,
-            repo_root=ROOT,
-            task_contract_bytes=b"task-v1",
-            base="a" * 40,
-            head="b" * 40,
-            diff_bytes=b"diff-v1",
-            semantic_claims=[
-                {"claim_id": "C1", "claim": "bounded", "scope": "exact"}
-            ],
-            non_claims=["family remains UNKNOWN"],
-            evidence=[
-                {
-                    "asset_id": None,
-                    "logical_ref": "x",
-                    "sha256_or_fingerprint": "1" * 64,
-                }
-            ],
-            risk_dimensions=["HYPOTHESIS_OR_FAMILY_CLOSURE"],
-        )
-        self.assertTrue(token["launch_authorized"])
-        self.assertFalse(token["critic_invoked"])
-        self.assertNotIn("findings", token)
 
         with self.assertRaises(SemanticPremiseReviewError) as stale_ctx:
             validate_launch_inputs(
@@ -339,8 +306,6 @@ class SemanticPremiseReviewTests(unittest.TestCase):
         self.assertIn("packet_fingerprint_sha256=", text)
         self.assertIn("implementation transcript", text.casefold())
         self.assertNotIn("SEMANTIC_PREMISE_CRITIC", text)
-        self.assertIn("LAUNCH_NOT_AUTHORIZED", text)
-        self.assertIn("validate-launch", text)
 
     def test_delivery_review_requires_validate_launch(self) -> None:
         text = (ROOT / ".cursor/commands/delivery-review.md").read_text(encoding="utf-8")

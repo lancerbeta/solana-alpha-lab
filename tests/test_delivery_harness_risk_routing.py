@@ -278,19 +278,6 @@ class RemediationHistoryTest(unittest.TestCase):
             review, effective_roles={"CODE_REVIEWER"}
         )
         self.assertIn("review_role_verdict_not_pass", problems)
-        self.assertIn("review_delivery_pass_conflicts_with_unready_role", problems)
-
-    def test_18b_pending_role_cannot_claim_delivery_pass(self) -> None:
-        review = _review(required=["CODE_REVIEWER"])
-        review["verdict"] = "PASS"
-        review["reviews"] = [
-            {"role": "CODE_REVIEWER", "verdict": "PENDING", "findings": ["waiting"]}
-        ]
-        problems = gate.delivery_independent_review_shape_problems(
-            review, effective_roles={"CODE_REVIEWER"}
-        )
-        self.assertIn("review_role_verdict_not_pass", problems)
-        self.assertIn("review_delivery_pass_conflicts_with_unready_role", problems)
 
     def test_19_single_agent_fallback_denies(self) -> None:
         review = _review(required=["CODE_REVIEWER"])

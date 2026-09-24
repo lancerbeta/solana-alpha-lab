@@ -1297,25 +1297,7 @@ def _managed_write_set(metadata: dict[str, Any]) -> list[str]:
     return normalized
 
 
-def _evidence_write_path(relative: str, managed: list[str]) -> str:
-    """Refuse an evidence write that leaves the exact managed write set."""
-
-    from owner_attention_gate import safe_evidence_json_path
-
-    if not isinstance(relative, str):
-        raise HarnessSyncError("EVIDENCE_PATH_OUTSIDE_MANAGED_WRITE_SET")
-    try:
-        normalized = safe_evidence_json_path(relative.replace("\\", "/"))
-    except ValueError as exc:
-        raise HarnessSyncError("EVIDENCE_PATH_OUTSIDE_MANAGED_WRITE_SET") from exc
-    if not _path_in_managed_write_set(normalized, managed):
-        raise HarnessSyncError("EVIDENCE_PATH_OUTSIDE_MANAGED_WRITE_SET")
-    return normalized
-
-
-def _delivery_evidence_paths(
-    metadata: dict[str, Any], managed: list[str]
-) -> tuple[str, str, str]:
+def _delivery_evidence_paths(metadata: dict[str, Any]) -> tuple[str, str, str]:
     requirements = metadata.get("context_requirements")
     if not isinstance(requirements, dict):
         raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
@@ -1329,8 +1311,7 @@ def _delivery_evidence_paths(
     for relative in delivery_paths:
         if not isinstance(relative, str):
             raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
-        relative = _evidence_write_path(relative, managed)
-        path = ROOT / relative
+        path = ROOT / relative.replace("\\", "/")
         if not path.is_file():
             raise HarnessSyncError("DELIVERY_EVIDENCE_PATHS_INCOMPLETE")
         payload = json.loads(path.read_text(encoding="utf-8"))
@@ -1520,7 +1501,7 @@ def compute_evidence_chain(
     if re.fullmatch(r"[0-9a-f]{40}", head) is None:
         raise HarnessSyncError("HEAD_INVALID")
     managed = _managed_write_set(metadata)
-    completion_path, review_path, fit_path = _delivery_evidence_paths(metadata, managed)
+    completion_path, review_path, fit_path = _delivery_evidence_paths(metadata)
     excluded = {completion_path, review_path, fit_path}
     bindings = build_implementation_bindings(
         expected_base=expected_base,

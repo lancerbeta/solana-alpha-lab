@@ -16308,7 +16308,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/owner_attention_gate.py', repository_path: scripts/owner_attention_gate.py}
-  integrity: {kind: sha256, sha256: f5dde78ade37a843cfdd03acbfe73af8c540b543629ae3e688fa24896c01f2bc}
+  integrity: {kind: sha256, sha256: e5976193d7bb9ee7adb2063fb38955cf2f0a38bea28539854d571950cb74e1fe}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: POLICY-OWNER-ATTENTION-GATE-002}
@@ -19821,7 +19821,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://scripts/delivery_harness.py', repository_path: scripts/delivery_harness.py}
-  integrity: {kind: sha256, sha256: a212e501778c26183050926491cca79b28aa11f3f61789c5ae3b52e6b030551d}
+  integrity: {kind: sha256, sha256: 88303e36bfc8e0b4a2b1c9757401962905cef7d691467725ae98280be6a5114c}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
@@ -19875,7 +19875,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://.agents/skills/delivery-harness/SKILL.md', repository_path: .agents/skills/delivery-harness/SKILL.md}
-  integrity: {kind: sha256, sha256: b4ca2543e057bef2c6c97d204b7b061625bc0df88f42edc8077b0e4bbb565bbe}
+  integrity: {kind: sha256, sha256: 627f5a8047a655768838ebf0e7a211a00dfc35db05ddf5727f9ea80244c3d4c8}
   access: *t25_read_file
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-DELIVERY-HARNESS-001}
@@ -19965,7 +19965,7 @@ records:
   as_of: '2026-08-14'
   truth_owner: CTRL-DELIVERY-HARNESS-001
   location: {kind: git_path, logical_uri: 'repo://tests/test_delivery_harness_contract.py', repository_path: tests/test_delivery_harness_contract.py}
-  integrity: {kind: sha256, sha256: 20458c53fce67556a7dcbfbed9ecaa94d00b2b6c753e98cfa32aa75ade893e00}
+  integrity: {kind: sha256, sha256: 3a11dc66bbb2b107c8cd010917a5ed1cf3652fed70f1da6677bcb01a086fcc79}
   access: *t25_read_file
   relations:
   - {relation_type: depends_on, target_asset_id: CONFIG-DELIVERY-HARNESS-001}
@@ -34639,7 +34639,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: SEMANTIC_PREMISE_REVIEW_PROFILE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/semantic_premise_review.py', repository_path: src/solana_alpha_lab/semantic_premise_review.py}
-  integrity: {kind: sha256, sha256: d0f7d6bdadba87bbd23cad55c7dfe1348084467b8f11f7c1cf93b70239832d37}
+  integrity: {kind: sha256, sha256: fddfd7d13be45c624a919d4833344bccff906728faa3c4970ad4fd3e03ac3ea2}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SEMANTIC-PREMISE-REVIEW-PROFILE-001}
@@ -34657,7 +34657,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: SEMANTIC_PREMISE_REVIEW_PROFILE_V1
   location: {kind: git_path, logical_uri: 'repo://scripts/semantic_premise_review_cli.py', repository_path: scripts/semantic_premise_review_cli.py}
-  integrity: {kind: sha256, sha256: 42fcb00037542342c353f75162605dd0e32e629a4e80a79d57331484ad48afce}
+  integrity: {kind: sha256, sha256: a93d32b8c9d765a2a59730f3960f3c33808e7d2a593d4a4acd0f54510fea4ff1}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: depends_on, target_asset_id: MODULE-SEMANTIC-PREMISE-REVIEW-001}
@@ -34674,7 +34674,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: SEMANTIC_PREMISE_REVIEW_PROFILE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_semantic_premise_review.py', repository_path: tests/test_semantic_premise_review.py}
-  integrity: {kind: sha256, sha256: c7c072e3e58183aac976c91e0a3623efca2832155d09d516eff90af13ad74cde}
+  integrity: {kind: sha256, sha256: 421620037ec75b5855bb310a165972e1f1a777f1190795da01759544056d747f}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-SEMANTIC-PREMISE-REVIEW-PROFILE-001}
