@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 8bb97dec11d09beb491eb1c7e5de041fe82172312fc9070ebd2ea1f522a19ad0
+    sha256: 76254f6aa95794c2752c702576499fdc990190d3cecc06fe1ad75a382f338c6a
   access:
     mode: read_only
     method: file
@@ -32309,7 +32309,7 @@ records:
   as_of: '2026-08-26'
   truth_owner: HYPOTHESIS_FORGE_OPERATIONAL_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_session.py', repository_path: src/solana_alpha_lab/factory/hfic_session.py}
-  integrity: {kind: sha256, sha256: c754bed5fdb252b902909df1ba09fb819efb656854b807afd994ae50c890e7ce}
+  integrity: {kind: sha256, sha256: d9df2097bac555eee26f9b1d592a106028c4f91022728653acc3f6f0ddd62f7c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-HYPOTHESIS-FORGE-OPERATIONAL-CLOSURE-001}
@@ -38117,7 +38117,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: fa4af0c471d9a6c743bb36370d446b6bd4db76379208581d5bc884072224f4ea}
+  integrity: {kind: sha256, sha256: dfdc05ab43be9d4b7e386fc57ac5b77fc0786971631f92bebbffbdbdb45852c7}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}

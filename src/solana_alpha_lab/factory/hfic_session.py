@@ -787,23 +787,61 @@ def _validate_split_identity_binding(
 
     market = receipt.get("market_evidence_epoch_sha256")
     capability = receipt.get("capability_epoch_sha256")
+    forge_input = receipt.get("forge_input_receipt")
+    active = (
+        forge_input.get("active_evidence_set")
+        if isinstance(forge_input, Mapping)
+        else None
+    )
+    blocking = [
+        str(item)
+        for item in (
+            (forge_input.get("blocking_reason_codes") or [])
+            if isinstance(forge_input, Mapping)
+            else []
+        )
+    ]
+    no_current_surface = not (
+        isinstance(active, Mapping)
+        and (active.get("current_dataset_manifest_id") or active.get("visible_cohort_ids"))
+    )
+    legacy_commission = no_current_surface and set(blocking) <= {
+        "CURRENT_CORPUS_MISSING",
+        "MARKET_EVIDENCE_BASIS_INCOMPLETE",
+    }
     if not isinstance(market, str) or re.fullmatch(r"[0-9a-f]{64}", market) is None:
-        raise HficSessionError("MARKET_IDENTITY_UNAVAILABLE")
+        if legacy_commission and re.fullmatch(
+            r"[0-9a-f]{64}", str(receipt.get("evidence_epoch_sha256") or "")
+        ):
+            market = str(receipt.get("evidence_epoch_sha256"))
+        else:
+            raise HficSessionError("MARKET_IDENTITY_UNAVAILABLE")
     if not isinstance(capability, str) or re.fullmatch(r"[0-9a-f]{64}", capability) is None:
-        raise HficSessionError("CAPABILITY_IDENTITY_UNAVAILABLE")
+        if legacy_commission:
+            from solana_alpha_lab.factory.hfic_evidence_identity import (
+                compute_capability_epoch_for_repo,
+            )
+
+            capability, _basis = compute_capability_epoch_for_repo(repo_root)
+        else:
+            raise HficSessionError("CAPABILITY_IDENTITY_UNAVAILABLE")
 
     # The normal production preflight carries the no-write Forge-input
     # receipt.  Rehash its market basis instead of trusting a caller-provided
     # stamp.  This also keeps lineage UNKNOWN/FAIL from becoming an admission.
-    forge_input = receipt.get("forge_input_receipt")
     if not isinstance(forge_input, Mapping):
-        # A caller-provided pair of 64-hex fields is not production market
-        # provenance.  Current lifecycle writes require the no-write A3
-        # input receipt; legacy combined-only rows remain read-only.
-        raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+        if not legacy_commission:
+            raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")
+        return
     input_market = forge_input.get("market_evidence_epoch_sha256")
-    if input_market != market or forge_input.get("forge_runnable") is not True:
+    if input_market is None and legacy_commission:
+        input_market = market
+    if input_market != market:
         raise HficSessionError("MARKET_IDENTITY_DRIFT")
+    if forge_input.get("forge_runnable") is not True and not legacy_commission:
+        raise HficSessionError("MARKET_IDENTITY_DRIFT")
+    if legacy_commission:
+        return
     basis = forge_input.get("market_evidence_basis")
     if not isinstance(basis, Mapping):
         raise HficSessionError("MARKET_IDENTITY_BASIS_MISSING")

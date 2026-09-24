@@ -1896,11 +1896,18 @@ def compute_slash_packet_identity(
         search_key = search_key_sha256(
             legacy_epoch, focus, PROMPT_VERSION, memory_eligibility, control_mode
         )
+        from solana_alpha_lab.factory.hfic_evidence_identity import (
+            compute_capability_epoch_for_repo,
+        )
+
+        capability_epoch, _capability_basis = compute_capability_epoch_for_repo(
+            Path(repo_root)
+        )
         return {
             "owner_focus": focus,
             "evidence_epoch": legacy_epoch,
-            "market_evidence_epoch_sha256": None,
-            "capability_epoch_sha256": None,
+            "market_evidence_epoch_sha256": legacy_epoch,
+            "capability_epoch_sha256": capability_epoch,
             "legacy_combined_evidence_epoch_sha256": legacy_epoch,
             "search_key": search_key,
             "commissioning_status": str(proof.get("status") or ""),
@@ -2336,8 +2343,21 @@ def run_preflight(
     # A legacy combined epoch is useful for historical/search-key continuity,
     # but it is not a current market admission basis.  Do not let the
     # compatibility fallback flow into the shared scientific admission
-    # resolver and accidentally mint a START_NEW_SESSION.
-    if ident.get("market_admission_ready") is not True:
+    # resolver and accidentally mint a START_NEW_SESSION once a current
+    # A3 surface exists.  An empty commissioning store has no such surface
+    # and keeps the legacy start path.
+    active_surface = forge_input.get("active_evidence_set")
+    input_packet = forge_input.get("packet")
+    has_current_surface = bool(
+        isinstance(active_surface, Mapping)
+        and (
+            active_surface.get("current_dataset_manifest_id")
+            or active_surface.get("visible_cohort_ids")
+        )
+    ) or bool(forge_input.get("live_corpus")) or bool(
+        isinstance(input_packet, Mapping) and input_packet.get("live_corpus_in_packet")
+    )
+    if ident.get("market_admission_ready") is not True and has_current_surface:
         legacy_epoch = str(ident.get("legacy_combined_evidence_epoch_sha256") or "")
         stop_epoch = legacy_epoch if len(legacy_epoch) == 64 else "0" * 64
         stop_focus = str(ident.get("owner_focus") or focus)
