@@ -271,13 +271,16 @@ def select_current_activation(
         return None
     if not rows:
         return None
-    active = [row for row in rows if str(row.get("state") or "") == "ACTIVE"]
+    selectable = [
+        row for row in rows if row.get("future_transition_pending") is not True
+    ] or rows
+    active = [row for row in selectable if str(row.get("state") or "") == "ACTIVE"]
     if active:
         return max(active, key=_activation_freshness_key)
-    draining = [row for row in rows if str(row.get("state") or "") == "DRAINING"]
+    draining = [row for row in selectable if str(row.get("state") or "") == "DRAINING"]
     if draining:
         return max(draining, key=_activation_freshness_key)
-    return max(rows, key=_activation_freshness_key)
+    return max(selectable, key=_activation_freshness_key)
 
 
 def classify_doctor_current_activation(

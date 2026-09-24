@@ -129,6 +129,22 @@ class CollectorContinuityBoundaryTests(unittest.TestCase):
             "AMBIGUOUS",
         )
 
+    def test_future_same_family_successor_does_not_outrank_predecessor(self) -> None:
+        now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
+        rows = [
+            _row("ACT-NOW", "ACTIVE", "FAMILY-A", "2026-09-01T00:00:00Z"),
+            {
+                **_row("ACT-LATER", "ACTIVE", "FAMILY-A", "2026-09-01T00:30:00Z"),
+                "payload": {
+                    "prior_state": "ACTIVE",
+                    "transition_effective_at": "2026-09-02T00:00:00Z",
+                },
+            },
+        ]
+        selected = select_current_activation(rows, now=now)
+        assert selected is not None
+        self.assertEqual(selected["activation_id"], "ACT-NOW")
+
     def test_status_projects_predecessor_before_effective_time(self) -> None:
         now = datetime(2026, 9, 1, 0, 0, tzinfo=UTC)
         row = {
