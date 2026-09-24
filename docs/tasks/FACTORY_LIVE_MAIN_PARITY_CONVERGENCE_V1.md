@@ -51,7 +51,8 @@ stop_conditions:
   - PR_331_MERGE
 context_requirements:
   catalog_asset_ids: []
-  l2_roles: []
+  l2_roles:
+    - DELIVERY_EVIDENCE
   l3_roles: []
   roadmap_path: null
   exact_role_paths:
