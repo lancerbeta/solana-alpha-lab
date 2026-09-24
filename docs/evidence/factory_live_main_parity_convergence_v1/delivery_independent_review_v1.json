@@ -10,8 +10,8 @@
     "ARCHITECTURE_CRITIC"
   ],
   "review_id": "FACTORY-LIVE-MAIN-PARITY-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "44a53855208496926493fe2be56e378c0d2f2092bd2a42553a2639eb3cc29873",
-  "reviewed_inventory_sha256": "4b9d77924637c7878a246a006984f0207c2c25c220c6a94fe7ae7a860bbb3b8c",
+  "reviewed_bindings_sha256": "ad5059b852ac0dfcc9824b7f5ca563bb67a5ee602e5fbb707f1e785630a53ebb",
+  "reviewed_inventory_sha256": "874d1dd4b83c57e3272b4550c02578efab42f10bba247248289c5aec7b487ba2",
   "reviews": [
     {
       "findings": [
