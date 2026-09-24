@@ -38117,7 +38117,7 @@ records:
   as_of: '2026-09-22'
   truth_owner: FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1
   location: {kind: git_path, logical_uri: 'repo://src/solana_alpha_lab/factory/hfic_preflight.py', repository_path: src/solana_alpha_lab/factory/hfic_preflight.py}
-  integrity: {kind: sha256, sha256: dfdc05ab43be9d4b7e386fc57ac5b77fc0786971631f92bebbffbdbdb45852c7}
+  integrity: {kind: sha256, sha256: 39e556c4d7a0f60cd44904bdfc8095fc88a4a91791a2ee09b8a4c930a177169b}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-001}

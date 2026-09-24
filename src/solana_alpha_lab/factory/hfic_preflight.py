@@ -2357,7 +2357,9 @@ def run_preflight(
     ) or bool(forge_input.get("live_corpus")) or bool(
         isinstance(input_packet, Mapping) and input_packet.get("live_corpus_in_packet")
     )
-    if ident.get("market_admission_ready") is not True and has_current_surface:
+    if ident.get("market_admission_ready") is not True and (
+        has_current_surface or focus != AUTO_FOCUS
+    ):
         legacy_epoch = str(ident.get("legacy_combined_evidence_epoch_sha256") or "")
         stop_epoch = legacy_epoch if len(legacy_epoch) == 64 else "0" * 64
         stop_focus = str(ident.get("owner_focus") or focus)
