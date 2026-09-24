@@ -40,6 +40,7 @@ from solana_alpha_lab.factory.hfic_session import (
     PROMPT_VERSION,
     evidence_epoch_sha256,
     focus_key_sha256,
+    generated_draft_matches_preflight_context,
     list_hfic_sessions,
     load_session_bundle,
     pick_session,
@@ -505,8 +506,46 @@ def decide_preflight_action(
                 and isinstance(generated_draft, Mapping)
             ):
                 draft_session = str(generated_draft.get("session_id") or "")
-                if draft_session:
-                    return ("RESUME_EXISTING_SESSION", draft_session)
+                admission_session = str(admission.get("session_id") or "")
+                model_provenance = (
+                    execution_context.get("model_provenance_sha256")
+                    if isinstance(execution_context, Mapping)
+                    else None
+                )
+                if draft_session and draft_session == admission_session:
+                    draft_matches = generated_draft_matches_preflight_context(
+                        generated_draft,
+                        market_evidence_epoch_sha256=evidence_epoch,
+                        scientific_slot_sha256=str(
+                            admission.get("scientific_slot_sha256") or ""
+                        ),
+                        representation_id=representation_id,
+                        representation_semantic_version=(
+                            representation_semantic_version or PROMPT_VERSION
+                        ),
+                        owner_focus=owner_focus,
+                        capability_epoch_sha256=(
+                            str(execution_context.get("capability_epoch_sha256"))
+                            if isinstance(execution_context, Mapping)
+                            and isinstance(
+                                execution_context.get("capability_epoch_sha256"), str
+                            )
+                            else None
+                        ),
+                        memory_eligibility_sha256=memory_eligibility_sha256,
+                        evidence_surface_mode=evidence_surface_mode,
+                        model_provenance_sha256=(
+                            str(model_provenance)
+                            if isinstance(model_provenance, str)
+                            else None
+                        ),
+                    )
+                    if draft_matches:
+                        return ("RESUME_EXISTING_SESSION", draft_session)
+                    return (
+                        "STOP",
+                        "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+                    )
             return ("STOP", str(admission.get("reason_code") or "SEARCH_BUDGET_EXHAUSTED"))
         if admission.get("action") == "START_NEW_SESSION":
             return ("START_NEW_SESSION", None)
@@ -2142,6 +2181,7 @@ def run_preflight(
     git_snapshot: Mapping[str, Any] | None = None,
     clock: Clock | None = None,
     evidence_surface_mode: str | None = None,
+    model_provenance_sha256: str | None = None,
     persist: bool = True,
 ) -> dict[str, Any]:
     from solana_alpha_lab.factory.forge_input_receipt import (
@@ -2250,6 +2290,9 @@ def run_preflight(
         repo_root=Path(repo_root),
         evidence_surface_mode=control_mode,
         owner_focus=focus,
+    )
+    pre_context_store_writes = int(commissioned_now) + int(
+        compatibility_repair.get("appended") or 0
     )
 
     try:
@@ -2430,7 +2473,11 @@ def run_preflight(
                 "forge_context_packet": {},
                 "forge_input_receipt": forge_input,
                 "owner_forge_input": format_forge_input_owner_block(forge_input),
-                "writes": {"research_store": int(persist), "forge_context": 0, "session": 0},
+                "writes": {
+                    "research_store": pre_context_store_writes,
+                    "forge_context": 0,
+                    "session": 0,
+                },
                 "authority": {
                     "git_mutation": 0,
                     "experiment_execution": 0,
@@ -2468,6 +2515,11 @@ def run_preflight(
             representation_semantic_version="HFIC-V1.2",
             scientific_slot_sha256=draft_slot,
         )
+    execution_context: dict[str, Any] = {}
+    if isinstance(capability_epoch, str) and len(capability_epoch) == 64:
+        execution_context["capability_epoch_sha256"] = capability_epoch
+    if model_provenance_sha256 is not None:
+        execution_context["model_provenance_sha256"] = model_provenance_sha256
     action, bound_session = decide_preflight_action(
         sessions,
         search_key=search_key,
@@ -2481,11 +2533,7 @@ def run_preflight(
         reservations=reservations,
         generated_draft=generated_draft,
         current_visible_cohort_ids=visible_cohort_ids,
-        execution_context=(
-            {"capability_epoch_sha256": capability_epoch}
-            if isinstance(capability_epoch, str) and len(capability_epoch) == 64
-            else None
-        ),
+        execution_context=execution_context or None,
         repo_root=Path(repo_root),
     )
     search_budget = epoch_search_budget_usage(
@@ -2575,7 +2623,11 @@ def run_preflight(
                 "experiment_execution": 0,
                 "provider_api_rpc_wss_calls": 0,
             },
-            "writes": {"research_store": int(persist), "forge_context": 0, "session": 0},
+            "writes": {
+                "research_store": pre_context_store_writes,
+                "forge_context": 0,
+                "session": 0,
+            },
         }
         if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
             stop_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
@@ -2623,7 +2675,7 @@ def run_preflight(
             "compatibility_repair": compatibility_repair,
         },
         "forge_context_packet": {},
-        "writes": {"research_store": int(persist), "forge_context": 0, "session": 0},
+        "writes": {"research_store": pre_context_store_writes, "forge_context": 0, "session": 0},
         "authority": {
             "git_mutation": 0,
             "experiment_execution": 0,
@@ -2632,9 +2684,12 @@ def run_preflight(
     }
     if control_mode == CURRENT_REPRESENTATION_CONTROL_V1:
         receipt_body["evidence_surface_mode"] = CURRENT_REPRESENTATION_CONTROL_V1
+    if model_provenance_sha256 is not None:
+        receipt_body["model_provenance_sha256"] = model_provenance_sha256
     if action == "STOP" and bound_session == "SEARCH_BUDGET_EXHAUSTED":
         receipt_body["terminal"] = "SEARCH_BUDGET_EXHAUSTED"
         receipt_body["session_id"] = None
+    persist_context_packet = bool(persist and action != "STOP")
     packet, packet_digest = build_forge_context_packet(
         repo_root,
         data_root,
@@ -2646,14 +2701,14 @@ def run_preflight(
         store=store,
         stage_time=session_started,
         evidence_surface_mode=control_mode,
-        persist=persist,
+        persist=persist_context_packet,
         selection_caveat=selection_caveat,
     )
     receipt_body["forge_context_packet"] = packet
     receipt_body["forge_context_packet_sha256"] = packet_digest
     receipt_body["writes"] = {
-        "research_store": int(persist),
-        "forge_context": int(persist),
+        "research_store": pre_context_store_writes + int(persist_context_packet),
+        "forge_context": int(persist_context_packet),
         "session": 0,
     }
     if isinstance(generated_draft, Mapping) and action == "RESUME_EXISTING_SESSION":

@@ -648,6 +648,8 @@ def safe_relative_path(value: str, *, code: str = "UNSAFE_RELATIVE_PATH") -> str
     parts = normalized.split("/")
     if any(part in {"", ".", ".."} for part in parts):
         raise ValueError(code)
+    if any(_load_gate_module().windows_reserved_device_alias(part) for part in parts):
+        raise ValueError(code)
     return PurePosixPath(*parts).as_posix()
 
 

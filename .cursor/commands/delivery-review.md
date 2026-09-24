@@ -30,9 +30,11 @@ When the result profile is `SEMANTIC_PREMISE`:
    `build-packet` (live args or fixture). Packet independence fields attest
    `PACKET_INFORMATION_PATH` only — not live parent-prompt isolation.
 2. Run fail-closed `validate-launch` with the classification JSON, packet, and
-   exact candidate binding (task/base/head/diff/claims). Stale or missing packet
-   blocks architecture launch.
-3. Launch `architecture-critic` in isolated context with that packet + exact
+   exact candidate binding (task/base/head/diff/claims). A missing or invalid
+   packet exits non-zero with `SEMANTIC_PACKET_REQUIRED` before any critic.
+   Stop there. Do not launch the architecture critic to notice the gap.
+3. Launch `architecture-critic` only when that command returned
+   `launch_authorized=true`, in isolated context with that packet + exact
    diff + named claim files only. Do not pass the implementation transcript.
 4. Architecture findings must include
    `packet_fingerprint_sha256=<exact fingerprint>`.

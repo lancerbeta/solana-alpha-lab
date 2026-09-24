@@ -7,9 +7,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
-from contextlib import redirect_stderr
+from contextlib import redirect_stderr, redirect_stdout
 from datetime import timedelta
 from pathlib import Path
+from types import SimpleNamespace
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
@@ -145,6 +147,8 @@ def run_cli(*args: str, data_root: Path, env: dict[str, str] | None = None) -> s
         env=merged,
         capture_output=True,
         text=True,
+        encoding="utf-8",
+        errors="strict",
         check=False,
     )
 
@@ -155,6 +159,7 @@ class HficCliContractTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, completed.stderr)
         for command in (
             "preflight",
+            "persist-draft",
             "freeze",
             "finalize",
             "show-session",
@@ -314,15 +319,26 @@ class HficCliContractTests(unittest.TestCase):
                     self.assertIn("не сбрасывайте budget", readout)
 
     def test_selection_gate_integrity_stop_routes_outside_a5_without_trial(self) -> None:
-        for terminal in (
-            "SELECTION_GATE_RECEIPT_UNUSABLE",
-            "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
-        ):
-            with self.subTest(terminal=terminal):
+        cases = [
+            ("SELECTION_GATE_RECEIPT_UNUSABLE", {}),
+            ("SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH", {}),
+            (
+                "BLOCK_FORGE_EVIDENCE_GAP",
+                {
+                    "selection_gate": {
+                        "integrity_invalid": True,
+                        "router_decision": "BLOCK_FORGE_EVIDENCE_GAP",
+                    }
+                },
+            ),
+        ]
+        for terminal, extra in cases:
+            with self.subTest(terminal=terminal, extra=extra):
                 readout = _preflight_owner_readout(
                     {
                         "terminal": terminal,
                         "owner_class": "OBSERVABILITY_BLOCKED",
+                        **extra,
                         "writes": {
                             "research_store": 0,
                             "forge_context": 0,
@@ -338,6 +354,62 @@ class HficCliContractTests(unittest.TestCase):
                 self.assertIn("не запускайте diagnostic в рамках A5", readout)
                 self.assertIn("не создавайте trial", readout)
                 self.assertIn("не сбрасывайте budget", readout)
+
+    def test_forge_run_passes_model_context_into_freeze_preflight(self) -> None:
+        from hypothesis_forge import cmd_forge_run
+        from solana_alpha_lab.factory.hfic_representation_ladder import (
+            ACTION_START_V1,
+        )
+        from solana_alpha_lab.factory.research_store import ResearchStore
+
+        model_sha = "ab" * 32
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            ResearchStore(data_root)
+            resolved = SimpleNamespace(
+                status="PRESENT",
+                root=data_root,
+                error=None,
+                selection_reason="explicit-test-root",
+            )
+            payload = {
+                "owner_class": "IN_PROGRESS",
+                "next_action": ACTION_START_V1,
+                "owner_final": None,
+                "stages": [],
+                "writes": {"research_store": 0, "forge_run": 0, "session": 0},
+                "owner_readout": "test readout",
+            }
+            with (
+                patch(
+                    "hypothesis_forge.resolve_existing_data_root",
+                    return_value=resolved,
+                ),
+                patch(
+                    "solana_alpha_lab.factory.hfic_representation_ladder.evaluate_forge_run",
+                    return_value=payload,
+                ) as evaluate,
+                patch(
+                    "solana_alpha_lab.factory.hfic_representation_ladder.attach_ladder_freeze_preflight",
+                    side_effect=lambda value, **_kwargs: value,
+                ) as attach,
+                redirect_stdout(io.StringIO()),
+                redirect_stderr(io.StringIO()),
+            ):
+                result = cmd_forge_run(
+                    ROOT,
+                    explicit_data_root=data_root,
+                    model_provenance_sha256=model_sha,
+                )
+
+        self.assertEqual(result, 0)
+        expected_context = {"model_provenance_sha256": model_sha}
+        self.assertEqual(
+            evaluate.call_args.kwargs["execution_context"], expected_context
+        )
+        self.assertEqual(
+            attach.call_args.kwargs["execution_context"], expected_context
+        )
 
     def test_preflight_accepts_multiline_owner_focus_without_legacy_admission(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

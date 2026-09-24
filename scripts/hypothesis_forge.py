@@ -71,6 +71,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     freeze_draft,
     list_hfic_sessions,
     lookup_prior,
+    persist_generated_draft,
     prove_runtime,
     show_session,
 )
@@ -255,7 +256,7 @@ def _preflight_owner_readout(body: Mapping[str, Any]) -> str:
         body.get("router_decision") or selection_gate.get("router_decision") or ""
     )
     selection_caveat = bool(selection_gate.get("caveat"))
-    if terminal in {
+    if selection_gate.get("integrity_invalid") or terminal in {
         "SELECTION_GATE_RECEIPT_UNUSABLE",
         "SELECTION_GATE_RECEIPT_INPUT_IDENTITY_MISMATCH",
     }:
@@ -337,8 +338,15 @@ def cmd_preflight(
     auto_commission: bool,
     explicit_data_root: Path | None,
     control_current_representation: bool = False,
+    model_provenance_sha256: str | None = None,
 ) -> int:
-    _assert_no_path_leak({"owner_focus": owner_focus}, str(repo_root))
+    _assert_no_path_leak(
+        {
+            "owner_focus": owner_focus,
+            "model_provenance_sha256": model_provenance_sha256,
+        },
+        str(repo_root),
+    )
     try:
         active = _active_root(repo_root, explicit_data_root)
         data_root = active.root
@@ -383,6 +391,7 @@ def cmd_preflight(
                 if control_current_representation
                 else None
             ),
+            model_provenance_sha256=model_provenance_sha256,
             persist=auto_commission,
         )
     except HficPreflightError as exc:
@@ -553,6 +562,12 @@ def cmd_forge_run(
         owner_class = "INPUT_NOT_READY" if code in input_codes else "OBSERVABILITY_BLOCKED"
         return _blocked_run_payload(code, owner_class)
 
+    execution_context = (
+        {"model_provenance_sha256": model_provenance_sha256}
+        if model_provenance_sha256
+        else None
+    )
+
     try:
         resolved = resolve_existing_data_root(
             repo_root, explicit_data_root=explicit_data_root
@@ -586,11 +601,7 @@ def cmd_forge_run(
             owner_focus=owner_focus if owner_focus.strip() else "AUTO",
             persist=False,
             saved_draft_sha256=saved_draft_sha256,
-            execution_context=(
-                {"model_provenance_sha256": model_provenance_sha256}
-                if model_provenance_sha256
-                else None
-            ),
+            execution_context=execution_context,
         )
     except LadderError as exc:
         payload = _ladder_error_payload(str(exc))
@@ -604,7 +615,10 @@ def cmd_forge_run(
 
     store = ResearchStore(resolved.root, create_if_missing=False)
     payload = attach_ladder_freeze_preflight(
-        payload, data_root=resolved.root, store=store
+        payload,
+        data_root=resolved.root,
+        store=store,
+        execution_context=execution_context,
     )
     if persist and payload.get("owner_class") not in {
         "INPUT_NOT_READY",
@@ -617,11 +631,7 @@ def cmd_forge_run(
                 owner_focus=owner_focus if owner_focus.strip() else "AUTO",
                 persist=True,
                 saved_draft_sha256=saved_draft_sha256,
-                execution_context=(
-                    {"model_provenance_sha256": model_provenance_sha256}
-                    if model_provenance_sha256
-                    else None
-                ),
+                execution_context=execution_context,
             )
         except LadderError as exc:
             payload = _ladder_error_payload(str(exc))
@@ -629,7 +639,10 @@ def cmd_forge_run(
             return _emit_run(payload, exit_code=2)
         payload = {**receipt, "no_write": False, "selection_reason": resolved.selection_reason}
         payload = attach_ladder_freeze_preflight(
-            payload, data_root=resolved.root, store=store
+            payload,
+            data_root=resolved.root,
+            store=store,
+            execution_context=execution_context,
         )
     _assert_no_path_leak(payload, str(resolved.root), str(repo_root))
     return _emit_run(payload, exit_code=(
@@ -1079,6 +1092,53 @@ def cmd_freeze(
     return emit(frozen)
 
 
+def cmd_persist_draft(
+    repo_root: Path,
+    draft_path: Path,
+    preflight_path: Path,
+    explicit_data_root: Path | None,
+    *,
+    representation_id: str,
+    model_provenance_sha256: str | None,
+) -> int:
+    git_before = repository_git_snapshot(repo_root)
+    draft = _load_json_file(draft_path)
+    receipt = _load_json_file(preflight_path)
+    _assert_no_path_leak(draft, str(repo_root))
+    _assert_no_path_leak(receipt, str(repo_root))
+    data_root = _existing_data_root(repo_root, explicit_data_root)
+    store = ResearchStore(data_root, create_if_missing=False)
+    before_digest = store.diagnostics().committed_inventory_sha256
+    generated = persist_generated_draft(
+        store,
+        draft,
+        preflight_receipt=receipt,
+        repo_root=repo_root,
+        representation_id=representation_id,
+        model_provenance_sha256=model_provenance_sha256,
+    )
+    git_after = repository_git_snapshot(repo_root)
+    if not git_before.unchanged(git_after):
+        raise HficCliError("GIT_MUTATION_DETECTED")
+    after_digest = ResearchStore(data_root, create_if_missing=False).diagnostics().committed_inventory_sha256
+    payload = {
+        **generated,
+        "writes": {
+            "research_store": int(after_digest != before_digest),
+            "forge_context": 0,
+            "session": 0,
+        },
+        "authority": {
+            "git_mutation": 0,
+            "experiment_execution": 0,
+            "provider_api_rpc_wss_calls": 0,
+        },
+        "model_provenance_semantics": "CALLER_SUPPLIED_DIGEST_NOT_MODEL_ATTESTATION",
+    }
+    _assert_no_path_leak(payload, str(data_root), str(repo_root))
+    return emit(payload)
+
+
 def cmd_prospects(
     repo_root: Path,
     *,
@@ -1508,6 +1568,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="CURRENT_REPRESENTATION_CONTROL_V1 evidence-surface mode",
     )
+    preflight.add_argument(
+        "--model-provenance-sha256",
+        default=None,
+        help=(
+            "Caller-supplied model/reasoning provenance digest; retained for "
+            "reuse checks, not an attestation of the model actually used"
+        ),
+    )
 
     forge_input = subparsers.add_parser(
         "forge-input",
@@ -1548,10 +1616,24 @@ def build_parser() -> argparse.ArgumentParser:
         "--model-provenance-sha256",
         default=None,
         help=(
-            "Optional current model/reasoning provenance for admission readback; "
-            "mismatch blocks reuse and never resets the market budget"
+            "Optional caller-supplied model/reasoning provenance for admission "
+            "readback; mismatch blocks reuse and never resets market budget"
         ),
     )
+
+    persist_draft = subparsers.add_parser(
+        "persist-draft",
+        help="Durably bind generated draft bytes to their source preflight before freeze",
+    )
+    persist_draft.add_argument("--draft", type=Path, required=True)
+    persist_draft.add_argument("--preflight-receipt", type=Path, required=True)
+    persist_draft.add_argument("--representation-id", default="BASE")
+    persist_draft.add_argument(
+        "--model-provenance-sha256",
+        default=None,
+        help="Caller-supplied digest, not model attestation",
+    )
+    persist_draft.add_argument("--format", choices=("json",), default="json")
 
     freeze = subparsers.add_parser("freeze")
     freeze.add_argument("--draft", type=Path, required=True)
@@ -1755,6 +1837,9 @@ def main(argv: list[str] | None = None) -> int:
                 control_current_representation=bool(
                     getattr(args, "control_current_representation", False)
                 ),
+                model_provenance_sha256=getattr(
+                    args, "model_provenance_sha256", None
+                ),
             )
         if args.command == "forge-input":
             return cmd_forge_input(
@@ -1769,6 +1854,17 @@ def main(argv: list[str] | None = None) -> int:
                 owner_focus=str(getattr(args, "owner_focus", "AUTO") or "AUTO"),
                 persist=bool(getattr(args, "persist", False)),
                 saved_draft_sha256=getattr(args, "saved_draft_sha256", None),
+                model_provenance_sha256=getattr(
+                    args, "model_provenance_sha256", None
+                ),
+            )
+        if args.command == "persist-draft":
+            return cmd_persist_draft(
+                repo_root,
+                args.draft,
+                args.preflight_receipt,
+                args.data_root,
+                representation_id=str(args.representation_id),
                 model_provenance_sha256=getattr(
                     args, "model_provenance_sha256", None
                 ),

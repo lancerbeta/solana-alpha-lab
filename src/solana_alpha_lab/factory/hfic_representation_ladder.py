@@ -45,6 +45,7 @@ from solana_alpha_lab.factory.hfic_representation_probe import (
     representation_status,
 )
 from solana_alpha_lab.factory.hfic_session import (
+    PROMPT_VERSION,
     RUNNER_UP_AWAITING_CRITIC,
     RUNNER_UP_REVISION_REQUIRED,
     focus_key_sha256,
@@ -590,6 +591,8 @@ def prepare_ladder_freeze_preflight(
     control_session_id: str,
     challenger: Mapping[str, Any] | None = None,
     control_receipt: Mapping[str, Any] | None = None,
+    model_provenance_sha256: str | None = None,
+    action: str = "START_NEW_SESSION",
 ) -> dict[str, Any]:
     """Copy CONTROL preflight into a freeze receipt that cannot collide with BASE.
 
@@ -603,7 +606,17 @@ def prepare_ladder_freeze_preflight(
         raise LadderError("LADDER_FREEZE_PREFLIGHT_REPRESENTATION_INVALID")
     if not isinstance(control_session_id, str) or not control_session_id:
         raise LadderError("LADDER_FREEZE_PREFLIGHT_CONTROL_REQUIRED")
+    if action not in {"START_NEW_SESSION", "RESUME_EXISTING_SESSION"}:
+        raise LadderError("LADDER_FREEZE_PREFLIGHT_ACTION_INVALID")
+    if model_provenance_sha256 is not None:
+        if (
+            not isinstance(model_provenance_sha256, str)
+            or re.fullmatch(r"[0-9a-f]{64}", model_provenance_sha256) is None
+        ):
+            raise LadderError("MODEL_PROVENANCE_SHA256_INVALID")
     receipt = dict(control_preflight)
+    if model_provenance_sha256 is not None:
+        receipt["model_provenance_sha256"] = model_provenance_sha256
     packet = dict(receipt.get("forge_context_packet") or {})
     packet[LADDER_REPRESENTATION_PACKET_KEY] = representation_id
     packet["control_session_id"] = control_session_id
@@ -629,6 +642,7 @@ def prepare_ladder_freeze_preflight(
         if not isinstance(search, str) or len(search) != 64:
             raise LadderError("LADDER_FREEZE_CHALLENGER_SEARCH_KEY_MISSING")
         receipt["search_key_sha256"] = search
+        packet["search_key_sha256"] = search
     else:
         base_key = str(receipt.get("search_key_sha256") or "")
         receipt["search_key_sha256"] = hashlib.sha256(
@@ -645,6 +659,19 @@ def prepare_ladder_freeze_preflight(
             packet["representation_semantic_version"] = str(version)
     receipt.pop("evidence_surface_mode", None)
     receipt.pop("forge_context_packet_sha256", None)
+    receipt["action"] = action
+    search_key = str(receipt.get("search_key_sha256") or "")
+    if re.fullmatch(r"[0-9a-f]{64}", search_key) is None:
+        raise LadderError("LADDER_FREEZE_PREFLIGHT_SEARCH_KEY_MISSING")
+    receipt["receipt_id"] = "HFIC-PREFLIGHT-" + search_key[:16].upper()
+    receipt["prompt_version"] = str(receipt.get("prompt_version") or PROMPT_VERSION)
+    memory_as_of = receipt.get("research_memory_as_of") or packet.get(
+        "research_memory_as_of"
+    )
+    if isinstance(memory_as_of, str) and memory_as_of.strip():
+        receipt["research_memory_as_of"] = memory_as_of.strip()
+    receipt.pop("preflight_receipt_sha256", None)
+    receipt["preflight_receipt_sha256"] = canonical_sha256(receipt)
     return receipt
 
 
@@ -743,6 +770,7 @@ def attach_ladder_freeze_preflight(
     *,
     data_root: Path,
     store: ResearchStore,
+    execution_context: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Attach freeze receipt for START_V1/RESUME_V1/later ACTIVE, or block."""
 
@@ -765,6 +793,11 @@ def attach_ladder_freeze_preflight(
         challenger = payload.get("ladder_challenger") or payload.get("challenger")
         if not isinstance(challenger, Mapping):
             challenger = None
+        model_provenance = (
+            execution_context.get("model_provenance_sha256")
+            if isinstance(execution_context, Mapping)
+            else None
+        )
         try:
             payload["ladder_freeze_preflight"] = prepare_ladder_freeze_preflight(
                 control_preflight_from_bundle(bundle, packet),
@@ -773,6 +806,14 @@ def attach_ladder_freeze_preflight(
                 challenger=challenger,
                 control_receipt=control_receipt_from_bundle(
                     Path(data_root), bundle, store=store
+                ),
+                model_provenance_sha256=(
+                    model_provenance if isinstance(model_provenance, str) else None
+                ),
+                action=(
+                    "RESUME_EXISTING_SESSION"
+                    if next_action == ACTION_RESUME_V1
+                    else "START_NEW_SESSION"
                 ),
             )
         except LadderError as exc:
@@ -866,6 +907,9 @@ def control_preflight_from_bundle(
         or receipt.get("forge_context_packet_sha256"),
         "memory_eligibility_sha256": bundle.get("memory_eligibility_sha256")
         or receipt.get("memory_eligibility_sha256"),
+        "prompt_version": bundle.get("prompt_version") or receipt.get("prompt_version"),
+        "research_memory_as_of": receipt.get("research_memory_as_of")
+        or (packet.get("research_memory_as_of") if isinstance(packet, Mapping) else None),
     }
     for key in ("market_evidence_epoch_sha256", "capability_epoch_sha256"):
         value = bundle.get(key) or receipt.get(key)
@@ -962,10 +1006,14 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
                 "STOP — current market search budget is exhausted; "
                 "do not retry or mint a new look"
             )
+        elif "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING" in blocking:
+            status = (
+                "BLOCKED — completed slot has no proven execution compatibility; "
+                "historical readback is retained; do not replay or regenerate"
+            )
         elif {
             "SCIENTIFIC_IDENTITY_CONFLICT",
             "SCIENTIFIC_SLOT_IDENTITY_INVALID",
-            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
             "SCIENTIFIC_SLOT_OCCUPIED",
             "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
             "REPRESENTATION_SLOT_OCCUPIED",
@@ -1216,10 +1264,22 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
             "next: STOP_BUDGET — current market slot is occupied/exhausted; "
             "do not retry or reset counters"
         )
+    elif "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING" in blocking:
+        session_id = str(receipt.get("session_id") or "").strip()
+        lookup = (
+            f"{CANONICAL_HFIC_CLI} show-session --session-id {session_id} --format json"
+            if session_id
+            else f"{CANONICAL_HFIC_CLI} show-session --session-id <recorded-session-id> --format json"
+        )
+        lines.append(
+            "next: VERIFY_EXECUTION_COMPATIBILITY — run the read-only "
+            + lookup
+            + "; historical result remains occupied, but current model/execution "
+            "compatibility is not proven; do not replay, regenerate, or reset budget"
+        )
     elif {
         "SCIENTIFIC_IDENTITY_CONFLICT",
         "SCIENTIFIC_SLOT_IDENTITY_INVALID",
-        "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
         "SCIENTIFIC_SLOT_OCCUPIED",
         "SCIENTIFIC_SLOT_OCCUPIED_READBACK_MISSING",
         "REPRESENTATION_SLOT_OCCUPIED",
@@ -1349,6 +1409,12 @@ def format_forge_run_owner_readout(receipt: Mapping[str, Any]) -> str:
         lines.append(
             "owner_note_ru: Лимит поиска для текущего market исчерпан; повторять, "
             "сбрасывать счётчики или создавать новый trial нельзя"
+        )
+    elif "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING" in blocking:
+        lines.append(
+            "owner_note_ru: Исторический результат сохранён и слот остаётся "
+            "занятым, но совместимость текущего model/execution binding не "
+            "доказана; не повторяйте, не пересоздавайте и не сбрасывайте лимит"
         )
     elif status.startswith("BLOCKED"):
         lines.append(

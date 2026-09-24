@@ -712,7 +712,7 @@ def _session_slot_focus_key(session: Mapping[str, Any]) -> str | None:
     return None
 
 
-def _session_slot_matches_execution_context(
+def session_slot_matches_execution_context(
     session: Mapping[str, Any],
     *,
     memory_eligibility_sha256: str | None,
@@ -895,11 +895,37 @@ def resolve_scientific_admission(
     observed_rows: list[Mapping[str, Any]] = []
     seen_rows: set[tuple[str, str]] = set()
     all_rows = [*(sessions or []), *(reservations or [])]
-    invalid_rows = [
-        item
-        for item in all_rows
-        if isinstance(item, Mapping) and _session_identity_is_invalid(item)
-    ]
+    invalid_rows = []
+    for item in all_rows:
+        if not isinstance(item, Mapping) or not _session_identity_is_invalid(item):
+            continue
+        observed_market = item.get("market_evidence_epoch_sha256")
+        conflict_markets = item.get("identity_conflict_market_epochs")
+        if isinstance(conflict_markets, list):
+            known_markets = {
+                value
+                for value in conflict_markets
+                if isinstance(value, str)
+                and re.fullmatch(r"[0-9a-f]{64}", value) is not None
+            }
+            if (
+                item.get("identity_conflict_market_scope_complete") is True
+                and known_markets
+                and market_evidence_epoch not in known_markets
+            ):
+                # A conflicting lifecycle history is scoped only when every
+                # A5-bearing cycle has a known market identity.  Latest-cycle
+                # market alone cannot dismiss an older matching conflict.
+                continue
+        elif (
+            isinstance(observed_market, str)
+            and re.fullmatch(r"[0-9a-f]{64}", observed_market) is not None
+            and observed_market != market_evidence_epoch
+        ):
+            # Legacy conflict rows without per-cycle market provenance can be
+            # scoped only by their single durable, internally consistent hash.
+            continue
+        invalid_rows.append(item)
     if invalid_rows:
         reason = (
             "SCIENTIFIC_IDENTITY_CONFLICT"
@@ -1009,24 +1035,52 @@ def resolve_scientific_admission(
                 "scientific_slot_sha256": target_slot,
                 "occupancy": "OCCUPIED_UNRESOLVED",
             }
-        if _session_slot_matches_execution_context(
+        context_matches = session_slot_matches_execution_context(
             chosen,
             memory_eligibility_sha256=memory_eligibility_sha256,
             evidence_surface_mode=evidence_surface_mode,
             execution_context=execution_context,
-        ):
-            state = str(chosen.get("session_state") or chosen.get("phase") or "")
-            pending = {
-                "PREFLIGHT_PROVEN",
-                "DRAFT_VALIDATED",
-                "FROZEN_AWAITING_CRITIC",
-                "REVISED_AWAITING_CRITIC",
-                "RUNNER_UP_AWAITING_CRITIC",
-                "REVISION_REQUIRED",
-                "AWAITING_CLASSIFICATION",
-                "CRITIC_RESULT_READY",
-                "RESERVED",
-            }
+        )
+        state = str(chosen.get("session_state") or chosen.get("phase") or "")
+        pending = {
+            "PREFLIGHT_PROVEN",
+            "DRAFT_VALIDATED",
+            "FROZEN_AWAITING_CRITIC",
+            "REVISED_AWAITING_CRITIC",
+            "RUNNER_UP_AWAITING_CRITIC",
+            "REVISION_REQUIRED",
+            "AWAITING_CLASSIFICATION",
+            "CRITIC_RESULT_READY",
+            "RESERVED",
+        }
+        if context_matches and state not in pending:
+            # A known model on either side must be present on both and equal.
+            # A stored representation payload is compared only when the caller
+            # supplies one (session_slot_matches_execution_context). Two absent
+            # models stay UNKNOWN, not a different binding.
+            for key in (
+                "model_provenance_sha256",
+            ):
+                observed = chosen.get(key)
+                expected = (
+                    execution_context.get(key)
+                    if isinstance(execution_context, Mapping)
+                    else None
+                )
+                observed_known = (
+                    isinstance(observed, str)
+                    and re.fullmatch(r"[0-9a-f]{64}", observed) is not None
+                )
+                expected_known = (
+                    isinstance(expected, str)
+                    and re.fullmatch(r"[0-9a-f]{64}", expected) is not None
+                )
+                if (observed_known or expected_known) and not (
+                    observed_known and expected_known and observed == expected
+                ):
+                    context_matches = False
+                    break
+        if context_matches:
             action = "RESUME_EXISTING_SESSION" if state in pending else "RETURN_EXISTING_SESSION"
             return {
                 "action": action,
@@ -1418,6 +1472,7 @@ __all__ = [
     "market_evidence_epoch_sha256",
     "scientific_slot_sha256",
     "session_scientific_slot_sha256",
+    "session_slot_matches_execution_context",
     "representation_identity_from_session",
     "resolve_scientific_admission",
     "session_matches_epoch_for_lookup",

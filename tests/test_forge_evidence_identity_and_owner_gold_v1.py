@@ -8,6 +8,7 @@ Does not execute Prompt A/B/C, real Independent Critic, or scientific market For
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import subprocess
 import sys
@@ -69,6 +70,7 @@ from solana_alpha_lab.factory.hfic_preflight import (  # noqa: E402
 from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     HficSessionError,
     apply_classification,
+    canonical_preflight_receipt_sha256,
     freeze_draft,
     list_scientific_slot_admissions,
     list_hfic_sessions,
@@ -98,15 +100,52 @@ from tests.test_forge_representation_ladder_v1 import (  # noqa: E402
     _cohort_readiness_receipt_rel_c2,
     _distinct_no_worthy_draft,
     _git,
-    _init_repo,
     _later_registry,
     _representation_fixture_rel_c2,
+    _submission_for_frozen,
     _v1_freeze_preflight_from_envelope,
 )
 from tests.test_hfic_session import (  # noqa: E402
     critic_result_from_packet_only,
-    valid_draft,
 )
+
+
+def _fresh_v12_draft(preflight: dict | None = None) -> dict:
+    """Generator reply for a fresh HFIC-V1.2 START_NEW_SESSION.
+
+    Labels are prefixed so a second current-prompt session does not collide
+    with the no-worthy V1.2 control cards in the same store. Historical
+    packet 1.1 stays on ``valid_draft()``.
+    """
+
+    draft = json.loads(
+        (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    renamed: dict[str, str] = {}
+    for card in draft.get("candidates") or []:
+        if not isinstance(card, dict):
+            continue
+        claim = str(card.get("claim") or "")
+        card["claim"] = f"Selected-session variant. {claim}".strip()
+        old = str(card.get("label") or "")
+        new = f"SEL-{old}" if old else old
+        card["label"] = new
+        renamed[old] = new
+    for key in (
+        "selected_candidate_ref",
+        "runner_up_candidate_ref",
+        "strongest_rejected_alternative",
+    ):
+        current = draft.get(key)
+        if isinstance(current, str) and current in renamed:
+            draft[key] = renamed[current]
+    if preflight is None:
+        return draft
+    from tests.test_hfic_cli import bind_draft
+
+    return bind_draft(draft, preflight)
 from tests.test_normalized_trajectory_v1_execution_closure_v1 import (  # noqa: E402
     _no_worthy_forge_receipt,
 )
@@ -213,6 +252,7 @@ def _run_production_preflight(
     repo_root: Path = ROOT,
     evidence_surface_mode: str | None = None,
     enumerator=_enumerate_production_fixture,
+    model_provenance_sha256: str | None = None,
 ) -> dict[str, object]:
     """Run production preflight over synthetic C1/C2 evidence."""
 
@@ -236,15 +276,24 @@ def _run_production_preflight(
             },
             clock=_CLOCK,
             evidence_surface_mode=evidence_surface_mode,
+            model_provenance_sha256=model_provenance_sha256,
         )
 
 
 def _ordinary_stamped_preflight(
-    data_root: Path, _store: ResearchStore, *, repo_root: Path = ROOT
+    data_root: Path,
+    _store: ResearchStore,
+    *,
+    repo_root: Path = ROOT,
+    model_provenance_sha256: str | None = None,
 ) -> dict[str, object]:
     """Ordinary non-CONTROL production entry over synthetic C1/C2 evidence."""
 
-    return _run_production_preflight(data_root, repo_root=repo_root)
+    return _run_production_preflight(
+        data_root,
+        repo_root=repo_root,
+        model_provenance_sha256=model_provenance_sha256,
+    )
 
 
 def _control_stamped_preflight(
@@ -343,16 +392,25 @@ def _no_worthy_base(
     return frozen
 
 
-def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, object]:
+def _ordinary_pass_base(
+    data_root: Path,
+    store: ResearchStore,
+    *,
+    preflight: dict[str, object] | None = None,
+    model_provenance_sha256: str | None = None,
+) -> dict[str, object]:
     """Ordinary BASE final PASS via freeze→Critic→classify (no CONTROL surface)."""
 
-    from tests.test_fast_lane_classifier import submission
-
-    with patch(
-        "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
-        side_effect=_enumerate_production_fixture,
-    ):
-        preflight = _ordinary_stamped_preflight(data_root, store)
+    if preflight is None:
+        with patch(
+            "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+            side_effect=_enumerate_production_fixture,
+        ):
+            preflight = _ordinary_stamped_preflight(
+                data_root,
+                store,
+                model_provenance_sha256=model_provenance_sha256,
+            )
     from tests.test_hfic_cli import bind_draft
 
     draft = json.loads(
@@ -377,8 +435,7 @@ def _ordinary_pass_base(data_root: Path, store: ResearchStore) -> dict[str, obje
         store=store,
         repo_root=ROOT,
     )
-    spec = submission()
-    spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+    spec = _submission_for_frozen(frozen)
     selected = frozen["critic_input_packet"]["selected_candidate"]
     spec["experiment_spec"]["required_feature_ids"] = list(
         selected.get("required_feature_ids") or []
@@ -642,6 +699,345 @@ class IdentityUnitTests(unittest.TestCase):
         )
         self.assertEqual(slot, other)
         self.assertEqual(len(cap_a), 64)
+
+    def test_completed_slot_requires_known_current_model_for_reuse(self) -> None:
+        market = "aa" * 32
+        capability = "bb" * 32
+        payload = "cc" * 32
+        memory = "dd" * 32
+        model = "ee" * 32
+        slot = scientific_slot_sha256(
+            market_evidence_epoch_sha256=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        row = {
+            "session_id": "HFIC-SESS-KNOWN-MODEL",
+            "session_state": "SYNTHESIS_COMPLETE",
+            "market_evidence_epoch_sha256": market,
+            "scientific_slot_sha256": slot,
+            "ladder_representation_id": "BASE",
+            "representation_semantic_version": "HFIC-V1.2",
+            "owner_focus": "AUTO",
+            "capability_epoch_sha256": capability,
+            "representation_payload_sha256": payload,
+            "memory_eligibility_sha256": memory,
+            "model_provenance_sha256": model,
+            "execution_binding_sha256": execution_binding_sha256(
+                scientific_slot_sha256=slot,
+                capability_epoch_sha256=capability,
+                representation_payload_sha256=payload,
+                memory_eligibility_sha256=memory,
+                model_provenance_sha256=model,
+            ),
+        }
+        unknown = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+            execution_context={"capability_epoch_sha256": capability},
+        )
+        self.assertEqual(unknown["action"], "STOP")
+        self.assertEqual(
+            unknown["reason_code"],
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+        )
+        exact = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+            execution_context={
+                "capability_epoch_sha256": capability,
+                "model_provenance_sha256": model,
+            },
+        )
+        self.assertEqual(exact["action"], "RETURN_EXISTING_SESSION")
+
+    def test_corrupt_slot_reservation_remains_unresolved_occupancy(self) -> None:
+        from solana_alpha_lab.factory.research_store import (
+            RecordKind,
+            ResearchEvent,
+        )
+
+        def malformed_event(market: str) -> tuple[str, ResearchEvent]:
+            slot = scientific_slot_sha256(
+                market_evidence_epoch_sha256=market,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+            )
+            body = {
+                "schema": "smial.scientific-slot-admission",
+                "schema_version": "1.0",
+                "scientific_slot_sha256": slot,
+                "session_id": "HFIC-SESS-CORRUPT-RESERVATION",
+                "market_evidence_epoch_sha256": market,
+                "ladder_representation_id": "BASE",
+                "representation_semantic_version": "HFIC-V1.2",
+                "owner_focus": "AUTO",
+                "admission_state": "RESERVED",
+            }
+            raw = json.dumps(body, sort_keys=True, separators=(",", ":"))
+            wrapper = {
+                "research_artifact_id": f"HFIC-ART-SLOT-ADMISSION-{slot.upper()}",
+                "session_id": body["session_id"],
+                "artifact_kind": "SCIENTIFIC_SLOT_ADMISSION",
+                "payload_canonical": raw,
+                # Outer committed record valid; only the artifact self-hash is
+                # corrupted, matching the production reader failure mode.
+                "payload_sha256": "00" * 32,
+            }
+            payload_json = json.dumps(wrapper, sort_keys=True, separators=(",", ":"))
+            now = datetime(2026, 9, 1, tzinfo=UTC)
+            return slot, ResearchEvent(
+                record_id=f"HFIC-ART-SLOT-ADMISSION-{slot.upper()}",
+                record_kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id=f"HFIC-ART-SLOT-ADMISSION-{slot.upper()}",
+                hypothesis_version_id=None,
+                run_id=None,
+                transaction_id=f"RESEARCH-TXN-CORRUPT-SLOT-{slot.upper()}",
+                effective_at=now,
+                first_reliable_available_at=now,
+                supersedes_record_id=None,
+                payload_json=payload_json,
+                payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+                schema_version="1.0",
+                producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+                producer_git_sha="a" * 40,
+                created_at=now,
+            )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            from tests.test_hfic_preflight import _CLOCK, _commission, _git_snapshot
+
+            _commission(data_root)
+            store = ResearchStore(data_root)
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                initial = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    git_snapshot=_git_snapshot(),
+                    clock=_CLOCK,
+                    persist=False,
+                )
+            market = str(initial["market_evidence_epoch_sha256"])
+            _slot, event = malformed_event(market)
+            store.append([event], transaction_id=event.transaction_id)
+            reservations = list_scientific_slot_admissions(store)
+            self.assertEqual(len(reservations), 1)
+            self.assertEqual(
+                reservations[0].get("identity_binding_status"), "CONFLICT"
+            )
+            decision = resolve_scientific_admission(
+                [],
+                market_evidence_epoch=market,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+                reservations=reservations,
+            )
+            before = store.diagnostics().committed_inventory_sha256
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                blocked = run_preflight(
+                    ROOT,
+                    data_root,
+                    owner_focus="AUTO",
+                    auto_commission=False,
+                    git_snapshot=_git_snapshot(),
+                    clock=_CLOCK,
+                    persist=True,
+                )
+            after = ResearchStore(data_root).diagnostics().committed_inventory_sha256
+        self.assertEqual(blocked["action"], "STOP")
+        self.assertEqual(blocked["terminal"], "SCIENTIFIC_IDENTITY_CONFLICT")
+        self.assertEqual(
+            blocked["writes"],
+            {"research_store": 0, "forge_context": 0, "session": 0},
+        )
+        self.assertEqual(after, before)
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(decision["reason_code"], "SCIENTIFIC_IDENTITY_CONFLICT")
+
+    def test_identity_conflict_in_different_market_does_not_globally_block(self) -> None:
+        current_market = "aa" * 32
+        historical_market = "bb" * 32
+        row = {
+            "session_id": "HFIC-SESS-HISTORICAL-CONFLICT",
+            "market_evidence_epoch_sha256": historical_market,
+            "scientific_slot_sha256": "bad",
+            "identity_binding_status": "CONFLICT",
+            "identity_conflict_fields": ["scientific_slot_sha256"],
+            "owner_focus": "ALT",
+        }
+        decision = resolve_scientific_admission(
+            [row],
+            market_evidence_epoch=current_market,
+            representation_id="BASE",
+            representation_semantic_version="HFIC-V1.2",
+            owner_focus="AUTO",
+        )
+        self.assertEqual(decision["action"], "START_NEW_SESSION")
+
+    def test_corrupt_reservation_slot_identity_remains_unscoped_occupancy(self) -> None:
+        """A valid-looking market in a mismatched body cannot free any budget."""
+
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            record_slot = "aa" * 32
+            body_slot = "bb" * 32
+            body = {
+                "schema": "smial.scientific-slot-admission",
+                "schema_version": "1.0",
+                "scientific_slot_sha256": body_slot,
+                "session_id": "HFIC-SESS-CORRUPT-RESERVATION",
+                "market_evidence_epoch_sha256": "cc" * 32,
+                "admission_state": "RESERVED",
+            }
+            canonical = json.dumps(
+                body, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            )
+            digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+            record_id = f"HFIC-ART-SLOT-ADMISSION-{record_slot.upper()}"
+            wrapper = {
+                "research_artifact_id": record_id,
+                "session_id": body["session_id"],
+                "artifact_kind": "SCIENTIFIC_SLOT_ADMISSION",
+                "payload_canonical": canonical,
+                "payload_sha256": digest,
+            }
+            payload_json = json.dumps(
+                wrapper, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+            )
+            timestamp = datetime(2026, 9, 22, tzinfo=UTC)
+            event = ResearchEvent(
+                record_id=record_id,
+                record_kind=RecordKind.RESEARCH_ARTIFACT,
+                entity_id=record_id,
+                hypothesis_version_id=None,
+                run_id=None,
+                transaction_id="RESEARCH-TXN-CORRUPT-RESERVATION",
+                effective_at=timestamp,
+                first_reliable_available_at=timestamp,
+                supersedes_record_id=None,
+                payload_json=payload_json,
+                payload_sha256=hashlib.sha256(payload_json.encode("utf-8")).hexdigest(),
+                schema_version="1.0",
+                producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+                producer_git_sha="0" * 40,
+                created_at=timestamp,
+            )
+            store.append(
+                [event], transaction_id="RESEARCH-TXN-CORRUPT-RESERVATION"
+            )
+
+            decision = resolve_scientific_admission(
+                [],
+                reservations=list_scientific_slot_admissions(store),
+                market_evidence_epoch="dd" * 32,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+            )
+
+        self.assertEqual(decision["action"], "STOP")
+        self.assertEqual(decision["occupancy"], "UNRESOLVED_BINDING")
+
+    def test_history_market_conflict_blocks_known_market_without_global_veto(self) -> None:
+        from solana_alpha_lab.factory.research_store import RecordKind, ResearchEvent
+        from solana_alpha_lab.factory.hfic_session import focus_key_sha256
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            market_a, market_b, market_c = "aa" * 32, "bb" * 32, "cc" * 32
+            focus = focus_key_sha256("AUTO")
+            timestamp = datetime(2026, 9, 22, tzinfo=UTC)
+            events = []
+            for sequence, market in ((1, market_a), (2, market_b)):
+                slot = scientific_slot_sha256(
+                    market_evidence_epoch_sha256=market,
+                    representation_id="BASE",
+                    representation_semantic_version="HFIC-V1.2",
+                    owner_focus="AUTO",
+                )
+                body = {
+                    "hfic_protocol": "HFIC-V1.2",
+                    "session_id": "HFIC-SESS-MARKET-HISTORY-CONFLICT",
+                    "phase": "FROZEN_AWAITING_CRITIC",
+                    "evidence_epoch_sha256": market,
+                    "market_evidence_epoch_sha256": market,
+                    "capability_epoch_sha256": "dd" * 32,
+                    "focus_key_sha256": focus,
+                    "search_key_sha256": f"{sequence:064x}",
+                    "memory_eligibility_sha256": "ee" * 32,
+                    "prompt_version": "HFIC-V1.2",
+                    "owner_focus": "AUTO",
+                    "hfic_cycle_seq": sequence,
+                    "ladder_representation_id": "BASE",
+                    "representation_semantic_version": "HFIC-V1.2",
+                    "scientific_slot_sha256": slot,
+                }
+                record_id = f"HFIC-CYCLE-MARKET-CONFLICT-{sequence}"
+                payload_json = json.dumps(
+                    body, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+                )
+                events.append(
+                    ResearchEvent(
+                        record_id=record_id,
+                        record_kind=RecordKind.RESEARCH_CYCLE,
+                        entity_id=body["session_id"],
+                        hypothesis_version_id=None,
+                        run_id=None,
+                        transaction_id="RESEARCH-TXN-MARKET-HISTORY-CONFLICT",
+                        effective_at=timestamp,
+                        first_reliable_available_at=timestamp,
+                        supersedes_record_id=None,
+                        payload_json=payload_json,
+                        payload_sha256=hashlib.sha256(
+                            payload_json.encode("utf-8")
+                        ).hexdigest(),
+                        schema_version="1.0",
+                        producer_capability_id="CAP-OFFLINE-CANONICAL-RECEIPT-REPLAY-001",
+                        producer_git_sha="0" * 40,
+                        created_at=timestamp,
+                    )
+                )
+            store.append(events, transaction_id="RESEARCH-TXN-MARKET-HISTORY-CONFLICT")
+            rows = list_hfic_sessions(store)
+            blocked = resolve_scientific_admission(
+                rows,
+                market_evidence_epoch=market_a,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+            )
+            unrelated = resolve_scientific_admission(
+                rows,
+                market_evidence_epoch=market_c,
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                owner_focus="AUTO",
+            )
+
+        self.assertEqual(blocked["action"], "STOP")
+        self.assertEqual(blocked["reason_code"], "SCIENTIFIC_IDENTITY_CONFLICT")
+        self.assertEqual(unrelated["action"], "START_NEW_SESSION")
 
     def test_tampered_slot_stamp_is_not_occupancy_evidence(self) -> None:
         market = "aa" * 32
@@ -1094,6 +1490,258 @@ class IdentityUnitTests(unittest.TestCase):
 class OwnerGoldSequentialTests(unittest.TestCase):
     """G1–G12 sequential family on production bindings (synthetic replies)."""
 
+    def test_g6_v1_generated_draft_persists_from_representation_receipt(self) -> None:
+        """A V1 start exposes a hash-bound receipt consumable by persist-draft."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
+            v1_preflight, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+                model_provenance_sha256="11" * 32,
+            )
+
+            self.assertEqual(v1_preflight.get("action"), "START_NEW_SESSION")
+            receipt_id = str(v1_preflight.get("receipt_id") or "")
+            self.assertTrue(receipt_id.startswith("HFIC-PREFLIGHT-"))
+            self.assertEqual(
+                v1_preflight.get("preflight_receipt_sha256"),
+                canonical_preflight_receipt_sha256(v1_preflight),
+            )
+            self.assertEqual(
+                v1_preflight["forge_context_packet"].get("search_key_sha256"),
+                v1_preflight["search_key_sha256"],
+            )
+            draft = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                .read_text(encoding="utf-8")
+            )
+            from tests.test_hfic_cli import bind_draft
+
+            draft = bind_draft(draft, v1_preflight)
+            draft["preflight_receipt_id"] = receipt_id
+            draft["preflight_receipt_sha256"] = v1_preflight[
+                "preflight_receipt_sha256"
+            ]
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                saved = persist_generated_draft(
+                    store,
+                    draft,
+                    preflight_receipt=v1_preflight,
+                    repo_root=ROOT,
+                    representation_id="NORMALIZED_TRAJECTORY_V1",
+                    model_provenance_sha256="11" * 32,
+                )
+            admissions = list_scientific_slot_admissions(store)
+            expected_slot = scientific_slot_sha256(
+                market_evidence_epoch_sha256=str(
+                    v1_preflight["market_evidence_epoch_sha256"]
+                ),
+                representation_id="NORMALIZED_TRAJECTORY_V1",
+                representation_semantic_version=str(
+                    v1_preflight["representation_semantic_version"]
+                ),
+                owner_focus=str(v1_preflight["owner_focus"]),
+            )
+
+        self.assertEqual(saved["draft_lifecycle"], "GENERATED_BEFORE_FREEZE")
+        self.assertEqual(saved["model_provenance_sha256"], "11" * 32)
+        self.assertIn(
+            expected_slot,
+            {str(row.get("scientific_slot_sha256")) for row in admissions},
+        )
+
+    def test_g6_invalid_generated_draft_cannot_reserve_scientific_slot(self) -> None:
+        """Schema-invalid model output leaves both draft and slot budget untouched."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            base = _no_worthy_base(data_root, store, production_preflight=True)
+            v1_preflight, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+            )
+            draft = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                .read_text(encoding="utf-8")
+            )
+            from tests.test_hfic_cli import bind_draft
+
+            draft = bind_draft(draft, v1_preflight)
+            draft["preflight_receipt_id"] = v1_preflight["receipt_id"]
+            draft["preflight_receipt_sha256"] = v1_preflight[
+                "preflight_receipt_sha256"
+            ]
+            draft.pop("candidates")
+            inventory_before = store.diagnostics().committed_inventory_sha256
+            admissions_before = list_scientific_slot_admissions(store)
+
+            with self.assertRaisesRegex(HficSessionError, "HFIC_PROTOCOL_INVALID"):
+                persist_generated_draft(
+                    store,
+                    draft,
+                    preflight_receipt=v1_preflight,
+                    repo_root=ROOT,
+                    representation_id="NORMALIZED_TRAJECTORY_V1",
+                )
+
+            self.assertEqual(
+                store.diagnostics().committed_inventory_sha256, inventory_before
+            )
+            self.assertEqual(
+                list_scientific_slot_admissions(store), admissions_before
+            )
+
+    def test_g6_orphan_reservation_rejects_same_session_execution_drift(self) -> None:
+        """A crash reservation cannot be completed under a different model bind."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            _write_lineage(data_root)
+            store = ResearchStore(data_root)
+            original = _ordinary_stamped_preflight(
+                data_root, store, model_provenance_sha256="11" * 32
+            )
+            session_id = "HFIC-SESS-" + str(original["search_key_sha256"])[
+                :16
+            ].upper()
+            binding = {**original, "session_id": session_id}
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                persist_scientific_slot_admission(
+                    store, binding, repo_root=ROOT
+                )
+
+            drifted = dict(original)
+            drifted["model_provenance_sha256"] = "22" * 32
+            drifted["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(
+                drifted
+            )
+            draft = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                .read_text(encoding="utf-8")
+            )
+            from tests.test_hfic_cli import bind_draft
+
+            draft = bind_draft(draft, drifted)
+            inventory_before = store.diagnostics().committed_inventory_sha256
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ), self.assertRaisesRegex(
+                HficSessionError,
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            ):
+                persist_generated_draft(
+                    store,
+                    draft,
+                    preflight_receipt=drifted,
+                    repo_root=ROOT,
+                    model_provenance_sha256="22" * 32,
+                )
+
+            self.assertEqual(
+                store.diagnostics().committed_inventory_sha256, inventory_before
+            )
+
+    def test_g8_v1_persist_rejects_c1c2_receipt_after_production_c3_import(self) -> None:
+        """A saved V1 draft cannot reserve stale C1+C2 after real C3 import."""
+
+        with tempfile.TemporaryDirectory() as tmp:
+            base_dir = Path(tmp)
+            data_root = base_dir / "rdp"
+            data_root.mkdir()
+            release_c1, _, _ = _seal_week(base_dir, 0)
+            release_c2, _, _ = _seal_week(base_dir, 1)
+            release_c3, _, _ = _seal_week(base_dir, 2)
+            import_live_cohort(
+                release_root=release_c1,
+                data_root=data_root,
+                import_time=datetime(2026, 1, 20, tzinfo=UTC),
+            )
+            import_live_cohort(
+                release_root=release_c2,
+                data_root=data_root,
+                import_time=datetime(2026, 1, 27, tzinfo=UTC),
+            )
+            store = ResearchStore(data_root)
+            control_preflight = _actual_production_preflight(data_root)
+            control_draft = json.loads(
+                (
+                    ROOT
+                    / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json"
+                ).read_text(encoding="utf-8")
+            )
+            from tests.test_hfic_cli import bind_draft
+
+            control_draft = bind_draft(control_draft, control_preflight)
+            control = freeze_draft(
+                control_draft,
+                preflight_receipt=control_preflight,
+                store=store,
+                repo_root=ROOT,
+            )
+            persist_no_worthy_session(
+                store,
+                control,
+                repo_root=ROOT,
+                identities=assign_portfolio_ids(control_draft["candidates"]),
+                draft=control_draft,
+                preflight_receipt=control_preflight,
+            )
+            store.rebuild_projection()
+            v1_preflight, _envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(control["session_id"]),
+                model_provenance_sha256="11" * 32,
+            )
+            v1_draft = json.loads(
+                (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json")
+                .read_text(encoding="utf-8")
+            )
+            v1_draft = bind_draft(v1_draft, v1_preflight)
+            v1_draft["preflight_receipt_id"] = v1_preflight["receipt_id"]
+            v1_draft["preflight_receipt_sha256"] = v1_preflight[
+                "preflight_receipt_sha256"
+            ]
+            imported = import_live_cohort(
+                release_root=release_c3,
+                data_root=data_root,
+                import_time=datetime(2026, 2, 3, tzinfo=UTC),
+            )
+            self.assertEqual(imported["status"], "IMPORTED")
+            inventory_before = store.diagnostics().committed_inventory_sha256
+
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_imported_control_fixture,
+            ), self.assertRaisesRegex(HficSessionError, "MARKET_IDENTITY_DRIFT"):
+                persist_generated_draft(
+                    store,
+                    v1_draft,
+                    preflight_receipt=v1_preflight,
+                    repo_root=ROOT,
+                    representation_id="NORMALIZED_TRAJECTORY_V1",
+                    model_provenance_sha256="11" * 32,
+                )
+
+            self.assertEqual(
+                store.diagnostics().committed_inventory_sha256, inventory_before
+            )
+
     def test_ordinary_stamped_preflight_uses_normal_run_preflight(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
@@ -1142,8 +1790,6 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertEqual(len(list_hfic_sessions(store)), 0)
 
     def test_g3_g5_candidate_path_completed_replay(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -1169,9 +1815,13 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 control_session_id=str(base["session_id"]),
             )
             self.assertEqual(v1_pre.get("market_evidence_epoch_sha256"), market)
-            draft = valid_draft()
+            draft = _fresh_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             self.assertEqual(frozen.get("market_evidence_epoch_sha256"), market)
+            scientific_slot = str(frozen.get("scientific_slot_sha256") or "")
+            capability_epoch = str(frozen.get("capability_epoch_sha256") or "")
+            self.assertRegex(scientific_slot, r"^[0-9a-f]{64}$")
+            self.assertRegex(capability_epoch, r"^[0-9a-f]{64}$")
             persist_frozen_session(
                 store,
                 frozen,
@@ -1186,6 +1836,8 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 if item.get("session_id") == frozen["session_id"]
             )
             self.assertEqual(listed_freeze.get("market_evidence_epoch_sha256"), market)
+            self.assertEqual(listed_freeze.get("scientific_slot_sha256"), scientific_slot)
+            self.assertEqual(listed_freeze.get("capability_epoch_sha256"), capability_epoch)
             self.assertIsInstance(
                 listed_freeze.get("representation_semantic_version"), str
             )
@@ -1199,6 +1851,11 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             usage_freeze = epoch_search_budget_usage(
                 list_hfic_sessions(store), evidence_epoch=market
             )
+            market_slots_freeze = {
+                row["scientific_slot_sha256"]
+                for row in usage_freeze["representation_slots"]
+            }
+            self.assertIn(scientific_slot, market_slots_freeze)
             self.assertGreaterEqual(
                 usage_freeze["auto_sessions_used"] + usage_freeze["distinct_focus_used"],
                 1,
@@ -1218,14 +1875,29 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 if item.get("session_id") == frozen["session_id"]
             )
             self.assertEqual(listed_mid.get("market_evidence_epoch_sha256"), market)
+            self.assertEqual(listed_mid.get("scientific_slot_sha256"), scientific_slot)
+            self.assertEqual(listed_mid.get("capability_epoch_sha256"), capability_epoch)
             usage_mid = epoch_search_budget_usage(
                 list_hfic_sessions(store), evidence_epoch=market
+            )
+            self.assertEqual(
+                {
+                    row["scientific_slot_sha256"]
+                    for row in usage_mid["representation_slots"]
+                },
+                market_slots_freeze,
             )
             self.assertGreaterEqual(
                 usage_mid["auto_sessions_used"] + usage_mid["distinct_focus_used"], 1
             )
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(frozen)
+            from solana_alpha_lab.factory.document_runner import repository_git_snapshot
+
+            self.assertEqual(
+                frozen.get("git_composite_sha256"),
+                repository_git_snapshot(ROOT).composite_sha256,
+                "Git composite drifted before classification",
+            )
             apply_classification(
                 frozen,
                 spec,
@@ -1242,18 +1914,28 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 if item.get("session_id") == frozen["session_id"]
             )
             self.assertEqual(listed_done.get("market_evidence_epoch_sha256"), market)
+            self.assertEqual(listed_done.get("scientific_slot_sha256"), scientific_slot)
+            self.assertEqual(listed_done.get("capability_epoch_sha256"), capability_epoch)
             bundle = load_session_bundle(store_reloaded, frozen["session_id"])
             assert bundle is not None
             self.assertEqual(bundle.get("market_evidence_epoch_sha256"), market)
             self.assertEqual(
-                bundle.get("scientific_slot_sha256"), listed_done.get("scientific_slot_sha256")
+                bundle.get("scientific_slot_sha256"), scientific_slot
             )
+            self.assertEqual(bundle.get("capability_epoch_sha256"), capability_epoch)
             self.assertEqual(
                 bundle.get("execution_binding_sha256"),
                 listed_done.get("execution_binding_sha256"),
             )
             usage_done = epoch_search_budget_usage(
                 list_hfic_sessions(store_reloaded), evidence_epoch=market
+            )
+            self.assertEqual(
+                {
+                    row["scientific_slot_sha256"]
+                    for row in usage_done["representation_slots"]
+                },
+                market_slots_freeze,
             )
             self.assertGreaterEqual(
                 usage_done["auto_sessions_used"] + usage_done["distinct_focus_used"], 1
@@ -1265,6 +1947,11 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 finished = evaluate_forge_run(ROOT, data_root, persist=True)
                 retry = evaluate_forge_run(ROOT, data_root, persist=False)
             self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
+            self.assertEqual(finished["owner_final"], ACTION_OWNER_CANDIDATE)
+            self.assertNotIn(
+                "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+                finished.get("blocking_reason_codes") or [],
+            )
             self.assertEqual(finished["run_identity_sha256"], run_id)
             self.assertEqual(finished["market_evidence_epoch_sha256"], market)
             # Execution binding uses actual representation payload when present.
@@ -1287,6 +1974,21 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertTrue(
                 any(item.get("session_id") == frozen["session_id"] for item in sessions_after)
             )
+            restarted = next(
+                item for item in sessions_after if item.get("session_id") == frozen["session_id"]
+            )
+            self.assertEqual(restarted.get("scientific_slot_sha256"), scientific_slot)
+            self.assertEqual(restarted.get("capability_epoch_sha256"), capability_epoch)
+            restarted_usage = epoch_search_budget_usage(
+                sessions_after, evidence_epoch=market
+            )
+            self.assertEqual(
+                {
+                    row["scientific_slot_sha256"]
+                    for row in restarted_usage["representation_slots"]
+                },
+                market_slots_freeze,
+            )
             self.assertTrue(
                 any(item.get("session_id") == base["session_id"] for item in sessions_after)
             )
@@ -1296,13 +1998,27 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            _ordinary_pass_base(data_root, store)
+            model = "11" * 32
+            _ordinary_pass_base(
+                data_root, store, model_provenance_sha256=model
+            )
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_production_fixture,
             ):
-                finished = evaluate_forge_run(ROOT, data_root, persist=True)
-                replay = evaluate_forge_run(ROOT, data_root, persist=False)
+                finished = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=True,
+                    execution_context={"model_provenance_sha256": model},
+                )
+                replay = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    execution_context={"model_provenance_sha256": model},
+                )
+                unknown = evaluate_forge_run(ROOT, data_root, persist=False)
                 drifted = evaluate_forge_run(
                     ROOT,
                     data_root,
@@ -1311,6 +2027,11 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 )
         self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
         self.assertEqual(replay["next_action"], ACTION_RETURN_EXISTING)
+        self.assertEqual(unknown["next_action"], ACTION_OBSERVABILITY_BLOCKED)
+        self.assertIn(
+            "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
+            unknown["blocking_reason_codes"],
+        )
         self.assertEqual(drifted["next_action"], ACTION_OBSERVABILITY_BLOCKED)
         self.assertIn(
             "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
@@ -1325,8 +2046,6 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             data_root = Path(tmp)
             _write_lineage(data_root)
             store = ResearchStore(data_root)
-            from tests.test_fast_lane_classifier import submission
-
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_production_fixture,
@@ -1338,11 +2057,10 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 data_root,
                 store,
                 control_session_id=str(base["session_id"]),
+                model_provenance_sha256="11" * 32,
             )
-            # The model stamp enters through the production V1 freeze seam;
-            # the test does not hand-build an execution binding.
-            v1_pre["model_provenance_sha256"] = "11" * 32
-            draft = valid_draft()
+            self.assertEqual(v1_pre.get("model_provenance_sha256"), "11" * 32)
+            draft = _fresh_v12_draft(v1_pre)
             frozen = freeze_draft(
                 draft, preflight_receipt=v1_pre, repo_root=ROOT
             )
@@ -1361,10 +2079,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store=store,
                 repo_root=ROOT,
             )
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen[
-                "selected_definition_sha256"
-            ]
+            spec = _submission_for_frozen(frozen)
             apply_classification(
                 frozen,
                 spec,
@@ -1377,7 +2092,12 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_production_fixture,
             ):
-                finished = evaluate_forge_run(ROOT, data_root, persist=True)
+                finished = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=True,
+                    execution_context={"model_provenance_sha256": "11" * 32},
+                )
 
             self.assertEqual(finished["next_action"], ACTION_OWNER_CANDIDATE)
             self.assertRegex(
@@ -1405,7 +2125,12 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 "solana_alpha_lab.factory.hfic_representation_ladder._lookup_run_artifact",
                 side_effect=tampered_lookup,
             ):
-                replay = evaluate_forge_run(ROOT, data_root, persist=False)
+                replay = evaluate_forge_run(
+                    ROOT,
+                    data_root,
+                    persist=False,
+                    execution_context={"model_provenance_sha256": "11" * 32},
+                )
 
         self.assertEqual(replay["next_action"], ACTION_OBSERVABILITY_BLOCKED)
         self.assertEqual(replay["owner_final"], ACTION_OBSERVABILITY_BLOCKED)
@@ -1457,13 +2182,17 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store.diagnostics().committed_inventory_sha256,
                 inventory_before_invalid_receipt,
             )
-            generated = persist_generated_draft(
-                store,
-                draft,
-                preflight_receipt=preflight,
-                repo_root=ROOT,
-                model_provenance_sha256="11" * 32,
-            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production_fixture,
+            ):
+                generated = persist_generated_draft(
+                    store,
+                    draft,
+                    preflight_receipt=preflight,
+                    repo_root=ROOT,
+                    model_provenance_sha256="11" * 32,
+                )
             store.rebuild_projection()
             self.assertEqual(generated.get("draft_lifecycle"), "GENERATED_BEFORE_FREEZE")
             self.assertEqual(len(list_scientific_slot_admissions(store)), 1)
@@ -1552,9 +2281,9 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 data_root,
                 store,
                 control_session_id=str(base["session_id"]),
+                model_provenance_sha256="11" * 32,
             )
-            v1_pre["model_provenance_sha256"] = "11" * 32
-            draft = valid_draft()
+            draft = _fresh_v12_draft(v1_pre)
             frozen = freeze_draft(
                 draft,
                 preflight_receipt=v1_pre,
@@ -1570,8 +2299,12 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             )
             store.rebuild_projection()
             before = store.diagnostics().committed_inventory_sha256
-            changed = dict(v1_pre)
-            changed["model_provenance_sha256"] = "22" * 32
+            changed, _changed_envelope = _v1_freeze_preflight_from_envelope(
+                data_root,
+                store,
+                control_session_id=str(base["session_id"]),
+                model_provenance_sha256="22" * 32,
+            )
             with self.assertRaisesRegex(
                 HficSessionError,
                 "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING",
@@ -1612,6 +2345,8 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     enriched.append(row)
                 return enriched, warnings
 
+            store = ResearchStore(data_root)
+            model_provenance = "11" * 32
             with patch(
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_production,
@@ -1624,17 +2359,35 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                     git_snapshot=_git_snapshot(),
                     clock=_CLOCK,
                 )
-            store = ResearchStore(data_root)
-            from tests.test_hfic_cli import bind_draft
-
-            draft = bind_draft(valid_draft(), preflight)
-            generated = persist_generated_draft(
-                store,
-                draft,
-                preflight_receipt=preflight,
-                repo_root=ROOT,
-            )
+                draft = _fresh_v12_draft(preflight)
+                generated = persist_generated_draft(
+                    store,
+                    draft,
+                    preflight_receipt=preflight,
+                    repo_root=ROOT,
+                    model_provenance_sha256=model_provenance,
+                )
             draft_sha = str(generated["payload_sha256"])
+            self.assertEqual(generated["model_provenance_sha256"], model_provenance)
+            self.assertEqual(
+                generated["capability_epoch_sha256"],
+                preflight["capability_epoch_sha256"],
+            )
+            generated_records = list(store.iter_committed_records())
+            reservation_record = next(
+                row
+                for row in generated_records
+                if row.record_id.startswith("HFIC-ART-SLOT-ADMISSION-")
+            )
+            draft_record = next(
+                row
+                for row in generated_records
+                if json.loads(row.payload_json).get("artifact_kind")
+                == "FORGE_DRAFT"
+            )
+            self.assertEqual(
+                reservation_record.transaction_id, draft_record.transaction_id
+            )
             admissions = list_scientific_slot_admissions(store)
             self.assertEqual(len(admissions), 1)
             self.assertEqual(admissions[0]["admission_state"], "RESERVED")
@@ -1674,8 +2427,37 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 resumed_preflight.get("generated_draft_sha256"), draft_sha
             )
             self.assertEqual(
+                resumed_preflight.get("model_provenance_sha256"), model_provenance
+            )
+            self.assertEqual(
                 resumed_preflight["writes"],
                 {"research_store": 0, "forge_context": 0, "session": 0},
+            )
+
+            from solana_alpha_lab.factory.hfic_preflight import decide_preflight_action
+
+            drifted_action = decide_preflight_action(
+                [],
+                search_key=str(preflight["search_key_sha256"]),
+                evidence_epoch=str(preflight["market_evidence_epoch_sha256"]),
+                focus_key=str(preflight["focus_key_sha256"]),
+                owner_focus="AUTO",
+                memory_eligibility_sha256=str(
+                    preflight["memory_eligibility_sha256"]
+                ),
+                representation_id="BASE",
+                representation_semantic_version="HFIC-V1.2",
+                reservations=admissions,
+                generated_draft=generated,
+                current_visible_cohort_ids=list(
+                    preflight.get("visible_cohort_ids") or []
+                ),
+                execution_context={"capability_epoch_sha256": "ff" * 32},
+                repo_root=ROOT,
+            )
+            self.assertEqual(
+                drifted_action,
+                ("STOP", "SCIENTIFIC_SLOT_OCCUPIED_DIFFERENT_EXECUTION_BINDING"),
             )
             generated_draft = json.loads(str(generated["payload_canonical"]))
             frozen = freeze_draft(
@@ -1713,14 +2495,21 @@ class OwnerGoldSequentialTests(unittest.TestCase):
             self.assertEqual(len(str(base_stage["scientific_slot_sha256"])), 64)
 
             changed = dict(draft)
-            changed["owner_focus"] = "ALT"
-            with self.assertRaises(HficSessionError) as ctx:
-                persist_generated_draft(
-                    store,
-                    changed,
-                    preflight_receipt=preflight,
-                    repo_root=ROOT,
-                )
+            changed["candidates"] = [dict(card) for card in draft["candidates"]]
+            changed["candidates"][0]["claim"] = (
+                "Different generator bytes for the same preflight focus."
+            )
+            with patch(
+                "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
+                side_effect=_enumerate_production,
+            ):
+                with self.assertRaises(HficSessionError) as ctx:
+                    persist_generated_draft(
+                        store,
+                        changed,
+                        preflight_receipt=preflight,
+                        repo_root=ROOT,
+                    )
             self.assertEqual(str(ctx.exception), "GENERATED_DRAFT_CONFLICT")
 
     def test_f1a_ordinary_pass_then_c3_does_not_reuse_stale_market(self) -> None:
@@ -1784,7 +2573,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 "solana_alpha_lab.factory.hfic_preflight.enumerate_rdp_datasets",
                 side_effect=_enumerate_production_fixture,
             ):
-                started = evaluate_forge_run(ROOT, data_root, persist=False)
+                evaluate_forge_run(ROOT, data_root, persist=False)
             draft = _distinct_no_worthy_draft(label="V1")
             v1_pre, _envelope = _v1_freeze_preflight_from_envelope(
                 data_root,
@@ -1920,7 +2709,7 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 store,
                 control_session_id=str(base["session_id"]),
             )
-            draft = valid_draft()
+            draft = _fresh_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -2244,36 +3033,22 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 import_time=datetime(2026, 1, 27, tzinfo=UTC),
             )
             store = ResearchStore(data_root)
-            preflight = _actual_production_preflight(data_root)
-            from tests.test_hfic_cli import bind_draft
-
-            draft = json.loads(
-                (
-                    ROOT
-                    / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json"
-                ).read_text(encoding="utf-8")
+            preflight = _run_production_preflight(
+                data_root,
+                enumerator=_enumerate_imported_control_fixture,
+                model_provenance_sha256="11" * 32,
             )
-            draft = bind_draft(draft, preflight)
-            frozen = freeze_draft(
-                draft,
-                preflight_receipt=preflight,
-                repo_root=ROOT,
-            )
-            persist_no_worthy_session(
-                store,
-                frozen,
-                repo_root=ROOT,
-                identities=assign_portfolio_ids(draft["candidates"]),
-                draft=draft,
-                preflight_receipt=preflight,
-            )
+            self.assertEqual(preflight["action"], "START_NEW_SESSION")
+            frozen = _ordinary_pass_base(data_root, store, preflight=preflight)
             store.rebuild_projection()
-            before = evaluate_forge_run(ROOT, data_root, persist=False)
+            old_bundle = load_session_bundle(store, str(frozen["session_id"]))
+            assert old_bundle is not None
+            self.assertEqual(old_bundle.get("session_state"), "SYNTHESIS_COMPLETE")
             self.assertEqual(
-                before["market_evidence_epoch_sha256"],
-                preflight["market_evidence_epoch_sha256"],
+                (old_bundle.get("critic_result") or {}).get("critic_terminal"),
+                "PASS_FAST_LANE_READY",
             )
-            self.assertEqual(before["stages"][0]["execution_status"], EXEC_REUSED)
+            old_market = str(preflight["market_evidence_epoch_sha256"])
 
             imported = import_live_cohort(
                 release_root=release_c3,
@@ -2281,13 +3056,20 @@ class OwnerGoldSequentialTests(unittest.TestCase):
                 import_time=datetime(2026, 2, 3, tzinfo=UTC),
             )
             self.assertEqual(imported["status"], "IMPORTED")
-            after = evaluate_forge_run(ROOT, data_root, persist=False)
+            from tests.test_hfic_cli import run_cli
+
+            after_process = run_cli(
+                "forge-run", "--no-write", "--format", "json", data_root=data_root
+            )
+            self.assertEqual(after_process.returncode, 0, after_process.stderr)
+            after = json.loads(after_process.stdout)
             self.assertNotEqual(
-                after["market_evidence_epoch_sha256"],
-                before["market_evidence_epoch_sha256"],
+                after["market_evidence_epoch_sha256"], old_market
             )
             self.assertNotEqual(after["stages"][0]["execution_status"], EXEC_REUSED)
             self.assertEqual(after["next_action"], ACTION_START_BASE)
+            self.assertNotIn("RETURN_EXISTING_RUN", after["owner_readout"])
+            self.assertIn("START_BASE", after["owner_readout"])
             self.assertEqual(len(list_hfic_sessions(ResearchStore(data_root))), 1)
 
     def test_g9_legacy_ordinary_not_focus_only_current_reuse(self) -> None:

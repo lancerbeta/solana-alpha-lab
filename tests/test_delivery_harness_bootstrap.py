@@ -851,6 +851,78 @@ class DeliveryHarnessBootstrapTests(unittest.TestCase):
             self.assertIn("standard", text, path)
             self.assertIn("library", text, path)
 
+    def test_live_portable_and_bootstrap_reject_reserved_device_aliases(self) -> None:
+        gate_spec = importlib.util.spec_from_file_location(
+            "owner_attention_gate_device_alias",
+            ROOT / "scripts/owner_attention_gate.py",
+        )
+        if gate_spec is None or gate_spec.loader is None:
+            self.fail("live gate is not loadable")
+        gate = importlib.util.module_from_spec(gate_spec)
+        gate_spec.loader.exec_module(gate)
+        portable_spec = importlib.util.spec_from_file_location(
+            "portable_delivery_harness_device_alias",
+            ROOT / "delivery-harness/templates/portable-core/scripts/delivery_harness.py",
+        )
+        if portable_spec is None or portable_spec.loader is None:
+            self.fail("portable harness is not loadable")
+        portable = importlib.util.module_from_spec(portable_spec)
+        portable_spec.loader.exec_module(portable)
+        denied = [
+            "COM1",
+            "com2.txt",
+            "COM\u00b9",
+            "COM\u00b2",
+            "COM\u00b3",
+            "LPT\u00b9",
+            "LPT\u00b2",
+            "LPT\u00b3",
+            "LPT1",
+            "docs/NUL",
+            "aux",
+            "PRN.",
+            "CON.txt",
+            "docs/COM\u00b9/file.json",
+        ]
+        allowed = [
+            "docs/tasks/PORTABLE-TEST.md",
+            "README.md",
+            "docs/commerce.md",
+            "COM10",
+            "scripts/delivery_harness.py",
+        ]
+
+        def dispositions(path: str) -> tuple[bool, bool, bool]:
+            live_ok = portable_ok = bootstrap_ok = True
+            try:
+                gate.safe_repo_path(path)
+            except ValueError:
+                live_ok = False
+            try:
+                portable.safe_relative(path)
+            except ValueError:
+                portable_ok = False
+            try:
+                self.module.safe_relative_path(
+                    path, code="INITIALIZATION_PATH_INVALID"
+                )
+            except ValueError:
+                bootstrap_ok = False
+            return live_ok, portable_ok, bootstrap_ok
+
+        for path in denied:
+            self.assertEqual(
+                dispositions(path),
+                (False, False, False),
+                path,
+            )
+        for path in allowed:
+            self.assertEqual(
+                dispositions(path),
+                (True, True, True),
+                path,
+            )
+
 
 if __name__ == "__main__":
     unittest.main()

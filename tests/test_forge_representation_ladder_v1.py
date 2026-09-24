@@ -38,6 +38,7 @@ from solana_alpha_lab.factory.hfic_session import (  # noqa: E402
     RUNNER_UP_AWAITING_CRITIC,
     HficSessionError,
     apply_classification,
+    canonical_preflight_receipt_sha256,
     focus_key_sha256,
     find_session_by_epoch_focus,
     freeze_draft,
@@ -127,6 +128,39 @@ from tests.test_hfic_session import (  # noqa: E402
     finalize_kill_complete,
     valid_draft,
 )
+
+
+def _submission_for_frozen(frozen: Mapping[str, object]) -> dict[str, object]:
+    """Classifier packet grounded to the frozen candidate's required features."""
+
+    from tests.test_fast_lane_classifier import submission
+
+    packet = submission()
+    spec = dict(packet["experiment_spec"])
+    critic = frozen.get("critic_input_packet")
+    selected = critic.get("selected_candidate") if isinstance(critic, Mapping) else None
+    feats = list(selected.get("required_feature_ids") or []) if isinstance(selected, Mapping) else []
+    if feats:
+        spec["required_feature_ids"] = feats
+    bound = dict(packet)
+    bound["experiment_spec"] = spec
+    bound["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+    return bound
+
+
+def _current_v12_draft(preflight: Mapping[str, object] | None = None) -> dict[str, object]:
+    """Fresh HFIC-V1.2 generator reply. V1.1 ``valid_draft()`` stays historical."""
+
+    draft = json.loads(
+        (ROOT / "tests/fixtures/hypothesis_forge/draft_v1_2_valid.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    if preflight is None:
+        return draft
+    from tests.test_hfic_cli import bind_draft
+
+    return bind_draft(draft, preflight)
 
 NO_WORTHY_DRAFT = ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1.json"
 
@@ -383,6 +417,7 @@ def _v1_freeze_preflight_from_envelope(
     control_session_id: str,
     control_preflight: Mapping[str, object] | None = None,
     repo_root: Path = ROOT,
+    model_provenance_sha256: str | None = None,
 ) -> tuple[dict[str, object], dict[str, object]]:
     """Envelope → representation-aware freeze preflight (production binding path).
 
@@ -422,6 +457,7 @@ def _v1_freeze_preflight_from_envelope(
         control_session_id=parent,
         challenger=challenger,
         control_receipt=control_receipt,
+        model_provenance_sha256=model_provenance_sha256,
     )
     packet = v1_pre["forge_context_packet"]
     assert isinstance(packet, dict)
@@ -431,6 +467,7 @@ def _v1_freeze_preflight_from_envelope(
         data_root, packet, store=store, repo_root=repo_root
     )
     v1_pre["forge_context_packet_sha256"] = digest
+    v1_pre["preflight_receipt_sha256"] = canonical_preflight_receipt_sha256(v1_pre)
     return v1_pre, envelope
 
 
@@ -671,13 +708,14 @@ class ResolveNextActionTests(unittest.TestCase):
                 ],
             }
         )
-        self.assertIn("RESOLVE_IDENTITY_CONFLICT", text)
+        self.assertIn("VERIFY_EXECUTION_COMPATIBILITY", text)
         self.assertIn(
             "show-session --session-id HFIC-SESS-IDENTITY-CONFLICT --format json",
             text,
         )
-        self.assertIn("start a new explicitly authorized /hypothesis-forge slash", text)
-        self.assertIn("do not regenerate or reset budget", text)
+        self.assertIn("historical result remains occupied", text)
+        self.assertIn("do not replay, regenerate, or reset budget", text)
+        self.assertNotIn("start a new explicitly authorized /hypothesis-forge slash", text)
 
     def test_budget_exhaustion_is_final_stop_and_reports_all_read_only_counters(self) -> None:
         text = format_forge_run_owner_readout(
@@ -1753,7 +1791,13 @@ def _v2_preflight(
 
 
 def _distinct_no_worthy_draft(*, label: str) -> dict[str, object]:
-    draft = json.loads(NO_WORTHY_DRAFT.read_text(encoding="utf-8"))
+    """Current-prompt no-worthy reply. Historical 1.1 lives in NO_WORTHY_DRAFT."""
+
+    draft = json.loads(
+        (ROOT / "tests/fixtures/hypothesis_forge/draft_no_worthy_v1_2.json").read_text(
+            encoding="utf-8"
+        )
+    )
     for card in draft.get("candidates") or []:
         if isinstance(card, dict):
             claim = str(card.get("claim") or "")
@@ -1939,8 +1983,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(alt_focus["next_action"], ACTION_START_BASE)
 
     def test_f2_v1_candidate_from_real_artifacts_then_readback(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -1964,7 +2006,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 v1_pre["forge_context_packet"].get("representation_payload_sha256"),
                 envelope["challenger"].get("representation_payload_sha256"),
             )
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -1999,8 +2041,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             self.assertEqual(pending["next_action"], ACTION_RESUME_V1)
             self.assertIsNone(pending["owner_final"])
             self.assertIn("classify then finalize", pending["owner_readout"])
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(frozen)
             done = apply_classification(
                 frozen,
                 spec,
@@ -2078,8 +2119,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(retry["next_action"], ACTION_RETURN_EXISTING)
 
     def test_f3_completed_v2_is_not_restarted_on_normal_entry(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -2116,8 +2155,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
             )
             self.assertEqual(awaiting["session_state"], "AWAITING_CLASSIFICATION")
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = v2_frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(v2_frozen)
             apply_classification(
                 v2_frozen,
                 spec,
@@ -2165,7 +2203,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 control_session_id=str(base["session_id"]),
                 control_preflight=control,
             )
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -2199,8 +2237,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(found_base_again["session_id"], base["session_id"])
 
     def test_f2_cli_preflight_store_freeze_is_distinct_from_control(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -2243,7 +2279,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             self.assertEqual(packet.get("ladder_representation_id"), "NORMALIZED_TRAJECTORY_V1")
             self.assertIsNone(base.get("critic_input_packet"))
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(
                 draft,
                 preflight_receipt=v1_pre,
@@ -2285,8 +2321,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 pending = evaluate_forge_run(ROOT, data_root, persist=True)
             self.assertEqual(pending["next_action"], ACTION_RESUME_V1)
             self.assertIsNone(pending["owner_final"])
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(frozen)
             done = apply_classification(
                 frozen,
                 spec,
@@ -2363,7 +2398,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 data_root, packet, store=store, repo_root=ROOT
             )
             orphan_pre["forge_context_packet_sha256"] = digest
-            draft = valid_draft()
+            draft = _current_v12_draft(orphan_pre)
             frozen = freeze_draft(draft, preflight_receipt=orphan_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -2499,8 +2534,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
     def test_g4_classify_after_store_reload_keeps_ladder_slot(self) -> None:
         """PASS_TO_CLASSIFICATION intermediate must stamp slot before classify reload."""
 
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -2511,7 +2544,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 store,
                 control_session_id=str(base["session_id"]),
             )
-            draft = valid_draft()
+            draft = _current_v12_draft(v1_pre)
             frozen = freeze_draft(draft, preflight_receipt=v1_pre, repo_root=ROOT)
             persist_frozen_session(
                 store,
@@ -2538,8 +2571,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
             )
             self.assertEqual(awaiting.get("control_session_id"), base["session_id"])
             # Classify from store-reloaded bundle only (no in-memory freeze object).
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = awaiting["selected_definition_sha256"]
+            spec = _submission_for_frozen(awaiting)
             done = apply_classification(
                 awaiting,
                 spec,
@@ -2627,8 +2659,6 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
         self.assertEqual(base["reason_code"], "CONTROL_SURFACE_REQUIRED")
 
     def test_n1_ordinary_final_pass_is_honest_candidate_readback(self) -> None:
-        from tests.test_fast_lane_classifier import submission
-
         with tempfile.TemporaryDirectory() as tmp:
             data_root = Path(tmp)
             _write_lineage(data_root)
@@ -2652,8 +2682,7 @@ class ProductionPathAcceptanceTests(unittest.TestCase):
                 repo_root=ROOT,
             )
             store.rebuild_projection()
-            spec = submission()
-            spec["hypothesis_definition_sha256"] = frozen["selected_definition_sha256"]
+            spec = _submission_for_frozen(frozen)
             done = apply_classification(
                 frozen,
                 spec,

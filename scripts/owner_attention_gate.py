@@ -10,6 +10,7 @@ import json
 import re
 import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 from pathlib import PurePosixPath, PureWindowsPath
 from typing import Any
@@ -421,7 +422,7 @@ def delivery_independent_review_shape_problems(
             continue
         if not (
             isinstance(item.get("role"), str)
-            and item.get("verdict") in {"PASS", "NOT_READY"}
+            and item.get("verdict") in {"PASS", "NOT_READY", "PENDING"}
             and isinstance(item.get("findings"), list)
             and all(isinstance(finding, str) and bool(finding) for finding in item["findings"])
         ):
@@ -437,6 +438,12 @@ def delivery_independent_review_shape_problems(
         for role in expected_roles
     ):
         problems.append("review_role_verdict_not_pass")
+        if review.get("verdict") == "PASS" and any(
+            reviews_by_role[role][0]["verdict"] in {"NOT_READY", "PENDING"}
+            for role in expected_roles
+            if reviews_by_role.get(role)
+        ):
+            problems.append("review_delivery_pass_conflicts_with_unready_role")
     if review_records_single_agent_fallback(review):
         problems.append("review_single_agent_fallback")
     return problems
@@ -639,6 +646,62 @@ def _candidate_paths_for_roles(
     }
 
 
+_WINDOWS_RESERVED_DEVICE_STEMS = frozenset(
+    {
+        "con",
+        "prn",
+        "aux",
+        "nul",
+        *(f"com{index}" for index in range(1, 10)),
+        *(f"lpt{index}" for index in range(1, 10)),
+    }
+)
+
+
+def windows_reserved_device_alias(segment: str) -> bool:
+    """True when one path segment is a Windows reserved device name.
+
+    NFKC maps compatibility digits, including superscripts, onto ASCII digits
+    before the stem check, so ``COM¹`` is the same alias as ``COM1``.
+    """
+
+    if not isinstance(segment, str) or segment == "":
+        return False
+    normalized = unicodedata.normalize("NFKC", segment).casefold().rstrip(" .")
+    if normalized == "":
+        return False
+    stem = normalized.split(".", 1)[0].rstrip(" .")
+    return stem in _WINDOWS_RESERVED_DEVICE_STEMS
+
+
+def repo_path_has_reserved_device_alias(value: str) -> bool:
+    body = value[:-3] if value.endswith("/**") else value
+    return any(windows_reserved_device_alias(part) for part in body.split("/"))
+
+
+def inventory_status_entries_collide(entries: list[tuple[str, str]]) -> bool:
+    """True for same-path repeats and for file/directory pairs that cannot coexist.
+
+    A file-to-directory transition (``D x`` together with ``A x/y``) is not a
+    collision. Adding or modifying ``x`` while also touching ``x/y`` is.
+    """
+
+    seen: dict[str, str] = {}
+    for status, path in entries:
+        if path in seen:
+            return True
+        seen[path] = status
+    for parent, parent_status in seen.items():
+        prefix = parent + "/"
+        for child, child_status in seen.items():
+            if not child.startswith(prefix):
+                continue
+            if parent_status == "D" and child_status == "A":
+                continue
+            return True
+    return False
+
+
 def safe_repo_path(value: str, *, allow_prefix: bool = False) -> str:
     if not isinstance(value, str) or not value or "\x00" in value or "\\" in value:
         raise ValueError("MANAGED_WRITE_SET_INVALID")
@@ -651,6 +714,8 @@ def safe_repo_path(value: str, *, allow_prefix: bool = False) -> str:
         raise ValueError("MANAGED_WRITE_SET_INVALID")
     parts = value.split("/")
     if any(part in {"", ".", ".."} for part in parts) or parts[0].casefold() == ".git":
+        raise ValueError("MANAGED_WRITE_SET_INVALID")
+    if any(windows_reserved_device_alias(part) for part in parts):
         raise ValueError("MANAGED_WRITE_SET_INVALID")
     normalized = PurePosixPath(*parts).as_posix()
     return normalized + ("/**" if prefix else "")
@@ -690,16 +755,14 @@ def decode_git_name_status(value: bytes) -> list[tuple[str, str]]:
     if len(fields) % 2:
         raise ValueError("DELIVERY_INVENTORY_INVALID")
     entries: list[tuple[str, str]] = []
-    observed: set[str] = set()
     for index in range(0, len(fields), 2):
         status, raw_path = fields[index : index + 2]
         if status not in {"A", "M", "T", "D"}:
             raise ValueError("DELIVERY_INVENTORY_INVALID")
         path = safe_repo_path(raw_path)
-        if path in observed:
-            raise ValueError("DELIVERY_INVENTORY_INVALID")
-        observed.add(path)
         entries.append((status, path))
+    if inventory_status_entries_collide(entries):
+        raise ValueError("DELIVERY_INVENTORY_INVALID")
     return entries
 
 

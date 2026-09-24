@@ -3,7 +3,7 @@
   "schema_version": "1.1",
   "as_of": "2026-09-23",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "git_head": "237b2bc7e13e6d186a6f66a3aed93401fd70b451",
+  "git_head": "4e3dfa795868fb6686f3b40a76d9a3bcb59e0645",
   "a4_post_merge": {
     "pr": 328,
     "merge_commit": "5f658ad9a7a80a33db51dbd83b5e109e0deac1e8",
@@ -18,15 +18,17 @@
     "REL-20260909T111900Z-20260916T111900Z"
   ],
   "current_market_evidence_epoch_sha256": "3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9",
-  "capability_epoch_sha256": "9ac25552c72899523c17cc45d7bd8a1b100c6942634fb6bb185e0b484e1444bc",
+  "capability_epoch_sha256": "41b602e4780d4f1e3de1928fda74af1d02a6311c7c4e95843a9944adbdbbe163",
   "forge_input": {
     "owner_class": "FORGE_INPUT_READY",
     "forge_runnable": true,
     "blocking_reason_codes": [],
-    "receipt_sha256": "f12262b60c4074de40993ae19479cf02d3e165598dfea0193b9965473ec7d198"
+    "receipt_sha256": "4fa553e6b1187279911308574c4c25be8400601d3c3a8b239476c766fc0798b3"
   },
   "inventory_sha256_prefix_before": "defbc9a5a1794b05",
   "inventory_sha256_prefix_after": "defbc9a5a1794b05",
+  "inventory_sha256_before": "defbc9a5a1794b05c23b5b63ef0eeb0a0f53708e6de18fa3752800d3a64191ef",
+  "inventory_sha256_after": "defbc9a5a1794b05c23b5b63ef0eeb0a0f53708e6de18fa3752800d3a64191ef",
   "scientific_writes": 0,
   "session_count": 17,
   "control_sessions_present": 2,
@@ -283,13 +285,13 @@
     "router_decision": "BLOCK_FORGE_SELECTION_RISK",
     "selection_reason": "SINGLE_COMMISSIONED",
     "current_market_occupancy": 0,
-    "capability_epoch_sha256": "9ac25552c72899523c17cc45d7bd8a1b100c6942634fb6bb185e0b484e1444bc",
+    "capability_epoch_sha256": "41b602e4780d4f1e3de1928fda74af1d02a6311c7c4e95843a9944adbdbbe163",
     "selection_caveat": true,
     "full_lifecycle_equivalent": false,
     "owner_next": "CONTINUE_WITH_SCOPED_SELECTION_CAVEAT",
     "preflight_terminal": "NO_GIT_FAST_LANE_PROVEN",
-    "preflight_receipt_sha256": "f31f27e6adaada036a1256309992af0dc1a485ccd02821a6230297cf3ee0faf4",
-    "receipt_sha256": "26af73d14a391a411190facc0ce3808d5a148235a0249ffeb732d78444bd7ab1"
+    "preflight_receipt_sha256": "b9519153a17d47ef4babc0b968640bbf3433d5bb9fd1f24e0c49cefc43434e1d",
+    "receipt_sha256": "8e0e5eaa727b48be96849a0299b3eb6f0270842cde61e369ecbb2384430089d4"
   },
   "disposition_summary": [
     {

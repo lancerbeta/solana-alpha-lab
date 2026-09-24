@@ -13,9 +13,12 @@ alternatives. Do not design a generic platform.
 
 Default profile is `STANDARD`.
 
-When the delivery review classifier selects `SEMANTIC_PREMISE`, or when a frozen
-`smial.semantic-premise-review-packet` is supplied, operate in
-`SEMANTIC_PREMISE` profile:
+When the parent already has `launch_authorized=true` for `SEMANTIC_PREMISE`,
+operate in that profile. If that token is absent, reply only
+`LAUNCH_NOT_AUTHORIZED` and stop. Do not read the diff to discover a missing
+packet; `validate-launch` owns that failure before this critic starts.
+
+When authorized, operate in `SEMANTIC_PREMISE` profile:
 
 1. Accept only the exact packet + exact diff + named files required to verify
    disputed claims. Do not accept an implementation transcript, parent chat, or

@@ -77,8 +77,11 @@ a role missing from the frozen plan; strengthening requires replan, never
 weakening.
 Launch critics in isolated context. Before architecture review, classify
 `scripts/semantic_premise_review_cli.py classify`. On `SEMANTIC_PREMISE`, build a
-frozen packet, run fail-closed `validate-launch`, launch the architecture critic
-with packet+diff only (no implementation transcript), and bind
+frozen packet and run fail-closed `validate-launch`. A missing or invalid packet
+is `SEMANTIC_PACKET_REQUIRED` at that gate: do not launch the architecture
+critic, and do not ask the critic to discover the missing packet. Only a result
+with `launch_authorized=true` may start the critic, with packet+diff only (no
+implementation transcript). Bind
 `packet_fingerprint_sha256=<hex>` in architecture findings. Packet independence
 attests `PACKET_INFORMATION_PATH` only; launch isolation remains
 `PROCESS_OBLIGATION`. Canonical independent-review evidence still uses role

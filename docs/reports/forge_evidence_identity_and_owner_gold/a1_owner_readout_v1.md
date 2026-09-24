@@ -13,8 +13,8 @@
 Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c2_disposition_v1.json`
 
 - `forge-input`: `FORGE_INPUT_READY`, `STOP_BEFORE_SYNTHESIS`, receipt
-  `f12262b60c4074de40993ae19479cf02d3e165598dfea0193b9965473ec7d198`;
-  exact no-write Git head `237b2bc7e13e6d186a6f66a3aed93401fd70b451`.
+  `4fa553e6b1187279911308574c4c25be8400601d3c3a8b239476c766fc0798b3`;
+  exact no-write Git head `4e3dfa795868fb6686f3b40a76d9a3bcb59e0645`.
 - `preflight`: planned action `START_NEW_SESSION`, selection
   `SINGLE_COMMISSIONED`, router `BLOCK_FORGE_SELECTION_RISK`; the gate is a
   scoped historical caveat (`caveat=true`, `full_lifecycle_equivalent=false`),
@@ -22,19 +22,27 @@ Evidence: `docs/evidence/forge_evidence_identity_and_owner_gold/a1_no_write_c1_c
   next is `CONTINUE_WITH_SCOPED_SELECTION_CAVEAT` for the canonical no-write
   Forge/readback path; if the gate returns a typed STOP, the CLI next is
   `RESOLVE_SELECTION_GATE` and it must not create a trial. Receipt:
-  `f31f27e6adaada036a1256309992af0dc1a485ccd02821a6230297cf3ee0faf4`.
+  `b9519153a17d47ef4babc0b968640bbf3433d5bb9fd1f24e0c49cefc43434e1d`.
+- If preflight reports an unusable or input-mismatched selection-gate receipt
+  (including `selection_gate.integrity_invalid=true` paired with the generic
+  `BLOCK_FORGE_EVIDENCE_GAP` terminal),
+  STOP: do not edit/recreate it or create a trial. Follow the owning procedure
+  in `docs/reports/hfic_selection_robustness_gate/a1_owner_readout_v1.md` only
+  after separate authorization; A5 does not run that diagnostic. Then repeat
+  canonical preflight.
 - The direct no-write forge-run readback is `START_BASE` with
   `CONTROL_SURFACE_REQUIRED`, scientific slot
   `212149f7d9afdcffa3dc7a0df69f8f53bea0af080722c4f2cc5cc05813a5299c`,
-  receipt `26af73d14a391a411190facc0ce3808d5a148235a0249ffeb732d78444bd7ab1`,
+  receipt `8e0e5eaa727b48be96849a0299b3eb6f0270842cde61e369ecbb2384430089d4`,
   and `research_store=0 forge_run=0 session=0 forge_context=0`.
 - Current market identity:
   `3792e874db5a0af2082fc0fe9fbd37a02a7aa55f4b1505f9366064c0d5fee2a9`.
   Capability identity:
-  `9ac25552c72899523c17cc45d7bd8a1b100c6942634fb6bb185e0b484e1444bc`;
+  `41b602e4780d4f1e3de1928fda74af1d02a6311c7c4e95843a9944adbdbbe163`;
   the code-only head change altered capability identity while market identity
   and budget remained unchanged.
-- Inventory is unchanged (`defbc9a5a1794b05` before and after); the read-only
+- Inventory is unchanged (`defbc9a5a1794b05c23b5b63ef0eeb0a0f53708e6de18fa3752800d3a64191ef`
+  before and after); the read-only
   path reports `scientific_writes=0`, 17 readable sessions, 2 historical
   CONTROL rows, and zero current-market occupancy.
 
@@ -84,4 +92,5 @@ market slot.
 - No scientific market Forge / Prompt A–C / real Critic
 - No A6, provider/VPS, historical rewrite, science or quota expansion
 - Fixture gold is not alpha and production bindings are not replaced by fixture results
+- A model provenance digest is caller-supplied compatibility input, not an attestation of the model that actually ran
 - Merge requires the separate machine-rendered A5 owner phrase after readiness

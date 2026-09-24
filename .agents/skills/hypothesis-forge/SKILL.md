@@ -100,6 +100,11 @@ commissioning when Fast Lane proof is absent and safe, design packets.
 Happy path — no owner copy/paste between the slash command and the final terminal:
 
 1. Run `uv run --locked --managed-python python -B scripts/hypothesis_forge.py preflight --owner-focus <AUTO|text> --format json`.
+   If the executing model provenance digest is available from the caller,
+   pass `--model-provenance-sha256 <64-hex>`; this is a caller-supplied
+   compatibility label, not an attestation that the model actually ran.
+   Missing model identity remains UNKNOWN and cannot authorize completed-result
+   reuse.
    For the preregistered unchanged-representation CONTROL only, add
    `--control-current-representation` so the receipt carries
    `evidence_surface_mode=CURRENT_REPRESENTATION_CONTROL_V1`. Do not use this
@@ -125,6 +130,10 @@ Happy path — no owner copy/paste between the slash command and the final termi
    `NOT_EVALUATED` is not a READY basis. Do not invent `NO_WORTHY`.
    Then resolve the bounded run (default no-write diagnostic; persist only
    when this slash continues past READY):
+
+   If the available model-provenance digest was supplied to `preflight`, pass
+   the exact same `--model-provenance-sha256 <64-hex>` to `forge-run`; omitting
+   or changing it makes completed-result compatibility UNKNOWN/blocked.
 
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
@@ -163,9 +172,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
      A present-but-corrupt challenger or CONTROL bind failure is
      `OBSERVABILITY_BLOCKED` (`status: BLOCKED`, `freeze_block:`) — stop; not
      soft-pend. Do **not** freeze from a CONTROL
-     packet copy with only a V1 marker. After a generator draft exists,
-     immediately `forge-run --persist --saved-draft-sha256 <hash>` before
-     freeze so retry is `RESUME_V1`. Freeze/Critic only after a V1 candidate
+     packet copy with only a V1 marker. Persist a generated V1 draft with
+     `persist-draft --representation-id NORMALIZED_TRAJECTORY_V1` before
+     freeze; `forge-run --persist` records only the aggregate receipt and is
+     not a substitute for storing draft bytes. Freeze/Critic only after a V1 candidate
      exists on that envelope (fixture stubs allowed). After freeze/finalize,
      if terminal is `PASS_TO_CLASSIFICATION`, run network-free
      `classify` then finalize — that intermediate is `RESUME_V1`, not
@@ -258,7 +268,19 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-inp
    Prompt A search still uses only the bounded `ranked_prior_candidate_ids`
    shortlist; do not change candidate-generation strategy to recover omitted priors.
    Do **not** query prospects or include prospect IDs/research text in Prompt A.
-4. Write machine `FORGE_DRAFT` to an OS temp file.
+4. Write machine `FORGE_DRAFT` to an OS temp file, then immediately persist
+   those exact bytes against their source preflight before freeze:
+
+   ```text
+   uv run --locked --managed-python python -B scripts/hypothesis_forge.py persist-draft --draft <temp> --preflight-receipt <preflight-temp> --representation-id BASE --format json
+   ```
+
+   For the V1 envelope path, use the prepared representation-aware receipt and
+   `--representation-id NORMALIZED_TRAJECTORY_V1`. Pass
+   `--model-provenance-sha256 <64-hex>` only when that digest is actually
+   supplied by the caller. The command revalidates current market/capability
+   identity and atomically persists slot occupancy plus draft when the slot is
+   new. Freeze must consume the same draft bytes and original preflight receipt.
 5. If Prompt A returned `NO_WORTHY_HYPOTHESIS` (empty `selected_candidate_ref`):
    - query `uv run --locked --managed-python python -B scripts/hypothesis_forge.py prospects --trigger POST_NO_WORTHY_REVIEW --max-results 3 --format json`;
    - run **PROMPT C** (`HFIC-NEXT-V1.0`) from the operator pack using only the

@@ -386,6 +386,52 @@ def validate_launch_inputs(
     return validated
 
 
+def authorize_architecture_critic_launch(
+    *,
+    classification: dict[str, Any],
+    packet: dict[str, Any] | None,
+    repo_root: Path,
+    task_contract_bytes: bytes | None = None,
+    base: str | None = None,
+    head: str | None = None,
+    diff_bytes: bytes | None = None,
+    semantic_claims: list[dict[str, str]] | None = None,
+    non_claims: list[str] | None = None,
+    evidence: list[dict[str, Any]] | None = None,
+    risk_dimensions: list[str] | None = None,
+) -> dict[str, Any]:
+    """Block architecture-critic launch before the critic runs.
+
+    A missing or stale SEMANTIC_PREMISE packet raises here. This function does
+    not produce critic findings.
+    """
+
+    authorized = validate_launch_inputs(
+        classification=classification,
+        packet=packet,
+        repo_root=repo_root,
+        task_contract_bytes=task_contract_bytes,
+        base=base,
+        head=head,
+        diff_bytes=diff_bytes,
+        semantic_claims=semantic_claims,
+        non_claims=non_claims,
+        evidence=evidence,
+        risk_dimensions=risk_dimensions,
+    )
+    token = {
+        "ok": True,
+        "launch_authorized": True,
+        "critic_invoked": False,
+        "profile": authorized["profile"],
+        "packet_required": authorized.get("packet_required", False),
+        "authority_granted": False,
+    }
+    if authorized.get("packet_fingerprint_sha256"):
+        token["packet_fingerprint_sha256"] = authorized["packet_fingerprint_sha256"]
+    return token
+
+
 def require_packet_fingerprint_in_findings(
     findings_text: str, packet: dict[str, Any]
 ) -> None:

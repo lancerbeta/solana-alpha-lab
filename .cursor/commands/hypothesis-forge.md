@@ -74,6 +74,10 @@ stop; do not synthesize even if ordinary `action` is `START_NEW_SESSION`. Typed
 `STOP_BEFORE_SYNTHESIS` (FORGE INPUT visibility, not slash authority, not
 CONTROL next, not an observability halt). Always show `evidence_surface_mode`
 (`ordinary` when JSON is null).
+When the caller supplies a model provenance digest, pass it to `preflight` and
+`forge-run`; the digest is only a caller-supplied compatibility label, not
+model attestation. Without a known matching model digest, completed-session
+reuse is blocked rather than inferred.
 No-write diagnostic (same `--owner-focus` as preflight):
 
 ```
@@ -95,8 +99,10 @@ execution). Bare `forge-run` without envelope may leave
 `ladder_freeze_pending_reason` and print `freeze_pending:` while
 `next_action` stays `START_V1` (continue envelope). Present-but-corrupt
 challenger / CONTROL bind failure is `OBSERVABILITY_BLOCKED` (`status:
-BLOCKED`, `freeze_block:`) — stop, not soft-pend. After a draft, `forge-run --persist
---saved-draft-sha256`. Freeze/Critic only after a V1 candidate exists
+BLOCKED`, `freeze_block:`) — stop, not soft-pend. Persist actual generated
+draft bytes with `persist-draft --representation-id NORMALIZED_TRAJECTORY_V1`
+before freeze; `forge-run --persist` records only the aggregate receipt and
+does not save those bytes. Freeze/Critic only after a V1 candidate exists
 (fixture stubs allowed). `PASS_TO_CLASSIFICATION` → classify then finalize
 (`RESUME_V1`, not owner-final); then re-run `forge-run` to read real V1
 artifacts. That wiring does not execute the scientific V1 probe. Do not
@@ -118,6 +124,10 @@ uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run
 ```
 uv run --locked --managed-python python -B scripts/hypothesis_forge.py forge-run --no-write --format json --owner-focus AUTO
 ```
+
+When the caller supplied `--model-provenance-sha256` to `preflight`, repeat
+the exact same digest on `forge-run`; missing or changed model provenance
+blocks completed-result reuse as UNKNOWN.
 
 ## Representation mode boundary
 
