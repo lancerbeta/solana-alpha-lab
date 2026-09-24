@@ -4,8 +4,8 @@
   "review_id": "FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-INDEPENDENT-REVIEW-001",
   "as_of": "2026-09-24",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "reviewed_bindings_sha256": "b0ca9820bab5c2a87b6cf14889c78d59a4fb84529dbed57c46088f5ed01abd69",
-  "reviewed_inventory_sha256": "61353493bc089606cd5c5b68a38f24649e0b66965065c4388c84d9e3a8484880",
+  "reviewed_bindings_sha256": "ad7c8d9845bead027275fd56b3f20ae867b3d2d1f1d56340f1adb8ebd6375268",
+  "reviewed_inventory_sha256": "d45506097b382a2dcb0672822cdc63ef8a6258adde6324acfd51ac7dcb5ea35e",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,7 +17,7 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=bb1eb1c7d57444db548d0a190a97f68683d717157c0628e00b1777ffde591d5a",
+        "packet_fingerprint_sha256=eef7ab314422da931d29c08137b0de365610f1f793caba5d2ce7cbe210d92312",
         "PASS_VERSION_LOCK",
         "PASS_PENDING_RESUME_REUSES_SAVED_DRAFT",
         "PASS_KNOWN_PROVENANCE_MISMATCH_IS_CONFLICT",
