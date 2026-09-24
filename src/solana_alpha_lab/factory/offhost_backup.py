@@ -21,6 +21,7 @@ from solana_alpha_lab.factory.remote_ops import (
     _backup_newest,
     _sha256_file,
     backup_domain_for,
+    backup_payload_snapshot,
     backup_plane_lock,
     load_config_v1_1,
     logical_inventory_sha256,
@@ -643,6 +644,7 @@ def copy_offhost_backup(
                 "remote_bytes": None,
                 "terminal": "COPY_FAILED",
                 "deploy_git_sha": deploy_git_sha,
+                **_rclone_failure_fields(completed),
             },
         )
         raise OffhostBackupError("OFFHOST_COPY_FAILED")
@@ -830,6 +832,26 @@ def payload_bytes_snapshot(root: Path, config: OffhostConfig) -> dict[str, Any]:
     }
 
 
+def _rclone_failure_fields(completed: subprocess.CompletedProcess[str]) -> dict[str, Any]:
+    """Machine fields only. Raw stderr can contain credential echoes."""
+
+    stderr = completed.stderr or ""
+    if isinstance(stderr, bytes):
+        stderr = stderr.decode("utf-8", "replace")
+    lowered = stderr.lower()
+    if "directory not found" in lowered or "object not found" in lowered:
+        failure_class = "REMOTE_OBJECT_ABSENT"
+    elif "quota" in lowered or "rate limit" in lowered or "ratelimit" in lowered:
+        failure_class = "QUOTA"
+    else:
+        failure_class = "UNCLASSIFIED"
+    return {
+        "rclone_returncode": int(completed.returncode),
+        "stderr_sha256": hashlib.sha256(stderr.encode("utf-8")).hexdigest(),
+        "rclone_failure_class": failure_class,
+    }
+
+
 def copy_local_object(
     *,
     local_path: Path,
@@ -860,6 +882,7 @@ def copy_local_object(
             "verified_payload_bytes": 0,
             "already_present_payload_bytes": 0,
             "remote_bytes": None,
+            **_rclone_failure_fields(completed),
         }
     remote_bytes = _remote_size(config, remote_object, runner)
     if remote_bytes != size:
@@ -891,6 +914,7 @@ def _reuse_or_package_full(
     sink: Path,
     current_inventory: str,
     current_entries: Sequence[Mapping[str, Any]],
+    snapshot: Any = None,
 ) -> dict[str, Any]:
     newest = _backup_newest(sink)
     if newest is not None:
@@ -912,6 +936,7 @@ def _reuse_or_package_full(
         environ=env,
         acquire_lock=False,
         prune_superseded=False,
+        snapshot=snapshot,
     )
     packed["reused"] = False
     return packed
@@ -1082,130 +1107,97 @@ def run_offhost_checkpoint(
     loaded = load_config_v1_1(root)
     sink = resolve_backup_sink(root, loaded, env)
     with backup_plane_lock(root):
-        scanned = scan_backup_inventory(root, config=loaded)
-        current_entries = list(scanned["entries"])
-        current_inventory = str(scanned["inventory_sha256"])
-        chain = read_chain_state(root, offhost)
-        weekly_due = mode == "weekly" or (
-            mode == "daily"
-            and clock.weekday() == 6
-            and str(chain.get("last_weekly_date") or "") != clock.date().isoformat()
-        )
-        base = chain.get("base_full") if isinstance(chain.get("base_full"), dict) else None
-        ordered = list(chain.get("ordered_deltas") or [])
-        checkpoint_terminal = "NO_CHANGES_VERIFIED"
-        weekly_full_state = "OK"
-        packed: dict[str, Any] | None = None
-        source_full: dict[str, Any] | None = None
-
-        def ensure_full() -> dict[str, Any]:
-            nonlocal packed
-            if packed is None:
-                packed = _reuse_or_package_full(
-                    root=root,
-                    loaded=loaded,
-                    env=env,
-                    sink=sink,
-                    current_inventory=current_inventory,
-                    current_entries=current_entries,
-                )
-            return packed
-
-        def adopt_full(full: Mapping[str, Any]) -> dict[str, Any]:
-            return {
-                "filename": full["bundle"],
-                "sha256": full["sha256"],
-                "inventory_sha256": current_inventory,
-                "bytes": full["bytes"],
-            }
-
-        def persist_chain(*, last_weekly: Any) -> None:
-            write_chain_state(
-                root,
-                offhost,
-                {
-                    "base_full": base,
-                    "ordered_deltas": ordered,
-                    "last_weekly_date": last_weekly,
-                    "tip_entries": current_entries,
-                    "tip_inventory_sha256": current_inventory,
-                },
+        with backup_payload_snapshot(root, loaded) as snapshot:
+            scanned = scan_backup_inventory(root, config=loaded, snapshot=snapshot)
+            current_entries = list(scanned["entries"])
+            current_inventory = str(scanned["inventory_sha256"])
+            chain = read_chain_state(root, offhost)
+            weekly_due = mode == "weekly" or (
+                mode == "daily"
+                and clock.weekday() == 6
+                and str(chain.get("last_weekly_date") or "") != clock.date().isoformat()
             )
+            base = chain.get("base_full") if isinstance(chain.get("base_full"), dict) else None
+            ordered = list(chain.get("ordered_deltas") or [])
+            checkpoint_terminal = "NO_CHANGES_VERIFIED"
+            weekly_full_state = "OK"
+            packed: dict[str, Any] | None = None
+            source_full: dict[str, Any] | None = None
 
-        skip_daily = False
-        if weekly_due:
-            if base and str(base.get("inventory_sha256")) == current_inventory:
-                checkpoint_terminal = "FULL_COVERAGE_RECONFIRMED_NO_CHANGE"
-                source_full = {
-                    "bundle": base["filename"],
-                    "sha256": base["sha256"],
-                    "bytes": base.get("bytes"),
+            def ensure_full() -> dict[str, Any]:
+                nonlocal packed
+                if packed is None:
+                    packed = _reuse_or_package_full(
+                        root=root,
+                        loaded=loaded,
+                        env=env,
+                        sink=sink,
+                        current_inventory=current_inventory,
+                        current_entries=current_entries,
+                        snapshot=snapshot,
+                    )
+                return packed
+
+            def adopt_full(full: Mapping[str, Any]) -> dict[str, Any]:
+                return {
+                    "filename": full["bundle"],
+                    "sha256": full["sha256"],
+                    "inventory_sha256": current_inventory,
+                    "bytes": full["bytes"],
                 }
-                persist_chain(last_weekly=clock.date().isoformat())
-                skip_daily = True
-            else:
-                full = ensure_full()
-                copied_payload = _accounted_copy(
-                    root=root,
-                    config=offhost,
-                    runner=invoke,
-                    clock=clock,
-                    local_path=sink / str(full["bundle"]),
-                    remote_object=offhost.remote_object(str(full["bundle"])),
+
+            def persist_chain(*, last_weekly: Any) -> None:
+                write_chain_state(
+                    root,
+                    offhost,
+                    {
+                        "base_full": base,
+                        "ordered_deltas": ordered,
+                        "last_weekly_date": last_weekly,
+                        "tip_entries": current_entries,
+                        "tip_inventory_sha256": current_inventory,
+                    },
                 )
-                if copied_payload["terminal"] == "COPY_FAILED":
-                    weekly_full_state = "DEGRADED"
-                    if mode == "weekly" or base is None:
-                        raise OffhostBackupError("OFFHOST_COPY_FAILED")
-                    skip_daily = False
-                else:
-                    checkpoint_terminal = "WEEKLY_FULL_VERIFIED"
-                    base = adopt_full(full)
-                    ordered = []
-                    source_full = full
-                    prune_superseded_local_backups(sink, sink / str(full["bundle"]))
+
+            skip_daily = False
+            if weekly_due:
+                if base and str(base.get("inventory_sha256")) == current_inventory:
+                    checkpoint_terminal = "FULL_COVERAGE_RECONFIRMED_NO_CHANGE"
+                    source_full = {
+                        "bundle": base["filename"],
+                        "sha256": base["sha256"],
+                        "bytes": base.get("bytes"),
+                    }
                     persist_chain(last_weekly=clock.date().isoformat())
                     skip_daily = True
-
-        if mode == "daily" and skip_daily is False:
-            tip_entries = chain.get("tip_entries") if isinstance(chain.get("tip_entries"), list) else None
-            tip_inventory = str(chain.get("tip_inventory_sha256") or "")
-            if base is None:
-                full = ensure_full()
-                copied_payload = _accounted_copy(
-                    root=root,
-                    config=offhost,
-                    runner=invoke,
-                    clock=clock,
-                    local_path=sink / str(full["bundle"]),
-                    remote_object=offhost.remote_object(str(full["bundle"])),
-                )
-                if copied_payload["terminal"] == "COPY_FAILED":
-                    raise OffhostBackupError("OFFHOST_COPY_FAILED")
-                base = adopt_full(full)
-                ordered = []
-                source_full = full
-                checkpoint_terminal = "WEEKLY_FULL_VERIFIED"
-                prune_superseded_local_backups(sink, sink / str(full["bundle"]))
-            elif tip_inventory == current_inventory or str(base.get("inventory_sha256")) == current_inventory:
-                checkpoint_terminal = "NO_CHANGES_VERIFIED"
-                source_full = {
-                    "bundle": base["filename"],
-                    "sha256": base["sha256"],
-                    "bytes": base.get("bytes"),
-                }
-            else:
-                parent_manifest: dict[str, Any] | None = None
-                if tip_entries:
-                    parent_manifest = {
-                        "entries": tip_entries,
-                        "inventory_sha256": tip_inventory or logical_inventory_sha256(tip_entries),
-                    }
                 else:
-                    base_bundle = sink / str(base["filename"])
-                    if base_bundle.is_file():
-                        parent_manifest = read_backup_manifest(base_bundle)
-                if parent_manifest is None:
+                    full = ensure_full()
+                    copied_payload = _accounted_copy(
+                        root=root,
+                        config=offhost,
+                        runner=invoke,
+                        clock=clock,
+                        local_path=sink / str(full["bundle"]),
+                        remote_object=offhost.remote_object(str(full["bundle"])),
+                    )
+                    if copied_payload["terminal"] == "COPY_FAILED":
+                        weekly_full_state = "DEGRADED"
+                        if mode == "weekly" or base is None:
+                            raise OffhostBackupError("OFFHOST_COPY_FAILED")
+                        skip_daily = False
+                    else:
+                        checkpoint_terminal = "WEEKLY_FULL_VERIFIED"
+                        base = adopt_full(full)
+                        ordered = []
+                        source_full = full
+                        prune_superseded_local_backups(sink, sink / str(full["bundle"]))
+                        persist_chain(last_weekly=clock.date().isoformat())
+                        skip_daily = True
+
+            if mode == "daily" and skip_daily is False:
+                tip_entries = chain.get("tip_entries") if isinstance(chain.get("tip_entries"), list) else None
+                tip_inventory = str(chain.get("tip_inventory_sha256") or "")
+                if base is None:
                     full = ensure_full()
                     copied_payload = _accounted_copy(
                         root=root,
@@ -1222,111 +1214,147 @@ def run_offhost_checkpoint(
                     source_full = full
                     checkpoint_terminal = "WEEKLY_FULL_VERIFIED"
                     prune_superseded_local_backups(sink, sink / str(full["bundle"]))
-                else:
-                    delta = package_delta_backup(
-                        root,
-                        base_manifest=parent_manifest,
-                        current_entries=current_entries,
-                        sink=sink,
-                        acquire_lock=False,
-                    )
+                elif tip_inventory == current_inventory or str(base.get("inventory_sha256")) == current_inventory:
+                    checkpoint_terminal = "NO_CHANGES_VERIFIED"
                     source_full = {
                         "bundle": base["filename"],
                         "sha256": base["sha256"],
                         "bytes": base.get("bytes"),
                     }
-                    if int(delta.get("delta_payload_bytes") or 0) == 0:
-                        checkpoint_terminal = "NO_CHANGES_VERIFIED"
+                else:
+                    parent_manifest: dict[str, Any] | None = None
+                    if tip_entries:
+                        parent_manifest = {
+                            "entries": tip_entries,
+                            "inventory_sha256": tip_inventory or logical_inventory_sha256(tip_entries),
+                        }
                     else:
-                        delta_path = Path(delta["path"])
+                        base_bundle = sink / str(base["filename"])
+                        if base_bundle.is_file():
+                            parent_manifest = read_backup_manifest(base_bundle)
+                    if parent_manifest is None:
+                        full = ensure_full()
                         copied_payload = _accounted_copy(
                             root=root,
                             config=offhost,
                             runner=invoke,
                             clock=clock,
-                            local_path=delta_path,
-                            remote_object=offhost.remote_object(str(delta["bundle"])),
+                            local_path=sink / str(full["bundle"]),
+                            remote_object=offhost.remote_object(str(full["bundle"])),
                         )
                         if copied_payload["terminal"] == "COPY_FAILED":
                             raise OffhostBackupError("OFFHOST_COPY_FAILED")
-                        ordered.append(
-                            {
-                                "filename": delta["bundle"],
-                                "sha256": delta["sha256"],
-                                "result_inventory_sha256": delta["result_inventory_sha256"],
-                                "bytes": delta["bytes"],
-                            }
+                        base = adopt_full(full)
+                        ordered = []
+                        source_full = full
+                        checkpoint_terminal = "WEEKLY_FULL_VERIFIED"
+                        prune_superseded_local_backups(sink, sink / str(full["bundle"]))
+                    else:
+                        delta = package_delta_backup(
+                            root,
+                            base_manifest=parent_manifest,
+                            current_entries=current_entries,
+                            sink=sink,
+                            acquire_lock=False,
+                            snapshot=snapshot,
                         )
-                        checkpoint_terminal = "DAILY_DELTA_VERIFIED"
-                        try:
-                            delta_path.unlink()
-                        except OSError:
-                            pass
-            persist_chain(last_weekly=chain.get("last_weekly_date"))
+                        source_full = {
+                            "bundle": base["filename"],
+                            "sha256": base["sha256"],
+                            "bytes": base.get("bytes"),
+                        }
+                        if int(delta.get("delta_payload_bytes") or 0) == 0:
+                            checkpoint_terminal = "NO_CHANGES_VERIFIED"
+                        else:
+                            delta_path = Path(delta["path"])
+                            copied_payload = _accounted_copy(
+                                root=root,
+                                config=offhost,
+                                runner=invoke,
+                                clock=clock,
+                                local_path=delta_path,
+                                remote_object=offhost.remote_object(str(delta["bundle"])),
+                            )
+                            if copied_payload["terminal"] == "COPY_FAILED":
+                                raise OffhostBackupError("OFFHOST_COPY_FAILED")
+                            ordered.append(
+                                {
+                                    "filename": delta["bundle"],
+                                    "sha256": delta["sha256"],
+                                    "result_inventory_sha256": delta["result_inventory_sha256"],
+                                    "bytes": delta["bytes"],
+                                }
+                            )
+                            checkpoint_terminal = "DAILY_DELTA_VERIFIED"
+                            try:
+                                delta_path.unlink()
+                            except OSError:
+                                pass
+                persist_chain(last_weekly=chain.get("last_weekly_date"))
 
-        if base is None:
-            raise OffhostBackupError("BASE_FULL_MISSING")
-        if source_full is None:
-            source_full = {
-                "bundle": base["filename"],
-                "sha256": base["sha256"],
-                "bytes": base.get("bytes"),
-            }
-        checkpoint_body = {
-            "source_backup_sha256": source_full["sha256"],
-            "result_inventory_sha256": current_inventory,
-            "base_full": {
-                "filename": base["filename"],
-                "sha256": base["sha256"],
-                "inventory_sha256": base["inventory_sha256"],
-            },
-            "ordered_deltas": [
-                {
-                    "filename": item["filename"],
-                    "sha256": item["sha256"],
-                    "result_inventory_sha256": item["result_inventory_sha256"],
+            if base is None:
+                raise OffhostBackupError("BASE_FULL_MISSING")
+            if source_full is None:
+                source_full = {
+                    "bundle": base["filename"],
+                    "sha256": base["sha256"],
+                    "bytes": base.get("bytes"),
                 }
-                for item in ordered
-            ],
-            "checkpoint_terminal": checkpoint_terminal,
-            "weekly_full_state": weekly_full_state,
-            "deploy_git_sha": deploy_git_sha,
-        }
-        published = publish_recovery_checkpoint(
-            root=root,
-            config=offhost,
-            runner=invoke,
-            clock=clock,
-            checkpoint=checkpoint_body,
-            sink=sink,
-        )
-        _record_traffic(
-            root,
-            offhost,
-            clock=clock,
-            attempted_payload_bytes=int(published["copy"]["attempted_payload_bytes"]),
-            verified_payload_bytes=int(published["copy"]["verified_payload_bytes"]),
-            already_present_payload_bytes=0,
-            terminal=str(published["copy"]["terminal"]),
-        )
-        timestamp = clock.isoformat(timespec="seconds").replace("+00:00", "Z")
-        receipt = {
-            "uploaded_at": timestamp,
-            "verified_at": timestamp,
-            "source_backup_filename": source_full["bundle"],
-            "source_sha256": source_full["sha256"],
-            "source_bytes": source_full.get("bytes"),
-            "remote_logical_path": published["remote_logical_path"],
-            "remote_bytes": published["copy"].get("remote_bytes"),
-            "terminal": checkpoint_terminal,
-            "checkpoint_filename": published["filename"],
-            "checkpoint_sha256": published["sha256"],
-            "weekly_full_state": weekly_full_state,
-            "rclone_version": _rclone_version(offhost, invoke),
-            "deploy_git_sha": deploy_git_sha,
-        }
-        write_offhost_receipt(root, offhost, receipt)
-        return receipt
+            checkpoint_body = {
+                "source_backup_sha256": source_full["sha256"],
+                "result_inventory_sha256": current_inventory,
+                "base_full": {
+                    "filename": base["filename"],
+                    "sha256": base["sha256"],
+                    "inventory_sha256": base["inventory_sha256"],
+                },
+                "ordered_deltas": [
+                    {
+                        "filename": item["filename"],
+                        "sha256": item["sha256"],
+                        "result_inventory_sha256": item["result_inventory_sha256"],
+                    }
+                    for item in ordered
+                ],
+                "checkpoint_terminal": checkpoint_terminal,
+                "weekly_full_state": weekly_full_state,
+                "deploy_git_sha": deploy_git_sha,
+            }
+            published = publish_recovery_checkpoint(
+                root=root,
+                config=offhost,
+                runner=invoke,
+                clock=clock,
+                checkpoint=checkpoint_body,
+                sink=sink,
+            )
+            _record_traffic(
+                root,
+                offhost,
+                clock=clock,
+                attempted_payload_bytes=int(published["copy"]["attempted_payload_bytes"]),
+                verified_payload_bytes=int(published["copy"]["verified_payload_bytes"]),
+                already_present_payload_bytes=0,
+                terminal=str(published["copy"]["terminal"]),
+            )
+            timestamp = clock.isoformat(timespec="seconds").replace("+00:00", "Z")
+            receipt = {
+                "uploaded_at": timestamp,
+                "verified_at": timestamp,
+                "source_backup_filename": source_full["bundle"],
+                "source_sha256": source_full["sha256"],
+                "source_bytes": source_full.get("bytes"),
+                "remote_logical_path": published["remote_logical_path"],
+                "remote_bytes": published["copy"].get("remote_bytes"),
+                "terminal": checkpoint_terminal,
+                "checkpoint_filename": published["filename"],
+                "checkpoint_sha256": published["sha256"],
+                "weekly_full_state": weekly_full_state,
+                "rclone_version": _rclone_version(offhost, invoke),
+                "deploy_git_sha": deploy_git_sha,
+            }
+            write_offhost_receipt(root, offhost, receipt)
+            return receipt
 
 
 __all__ = [
