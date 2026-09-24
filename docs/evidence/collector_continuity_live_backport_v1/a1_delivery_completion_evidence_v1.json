@@ -29,7 +29,7 @@
     "src/solana_alpha_lab/factory/research_store.py": "412c5554f9efd11aeff6b2143b7471b7929e45cc40f2794051b03a21f4c1180f",
     "src/solana_alpha_lab/factory/system_operability.py": "4bbf2dcafbe2a4f931d47d729e798b0c881859f88f0b3e232f0c572eb22792c7",
     "tests/test_collector_campaign_continuity_repair_v1.py": "642d892cb7c17c698f210ca37c5aa247cf7bfc8e6cb621afe0489240be544156",
-    "tests/test_collector_continuity_boundaries_v1.py": "a9d2456d2c4c32062091eedf143628faeac01fafc97ebc8570f8db820d5b5e2a",
+    "tests/test_collector_continuity_boundaries_v1.py": "e34f73777e6488ebb1baa6a4d06d67aed4ef64581d7add4555e15f94b691b360",
     "tests/test_mutable_backup_zip64_repair_v1.py": "c226fbd1383a517976efc5019ca00370d11e73c5b5d5b3976cd5806357a9f6c3",
     "tests/test_observation_schedule_lifecycle.py": "bcc2b7fc16dc5dd9986f09a794647a7fdee531481df68bfe1fd3ce696c256b92"
   },
@@ -43,21 +43,21 @@
   },
   "factory_fit": {
     "path": "docs/evidence/collector_continuity_live_backport_v1/a1_delivery_factory_fit_v1.json",
-    "sha256": "8aff119274faea2ea2814930c2d971eecd8ce2c5c17503d643074848c5eaedf5",
+    "sha256": "55a3ec0e99417489406c29110a1ba182da5923ef98a1767485b8c052888619ac",
     "verdict": "PASS"
   },
   "validation": {
-    "targeted": "PASS_79_CONTINUITY_LIFECYCLE_PLUS_SELECTION_SCOPE",
+    "targeted": "PASS_SELECTION_SCOPE_AND_HISTORICAL_PUBLICATION_STALL",
     "independent_review": {
       "path": "docs/evidence/collector_continuity_live_backport_v1/a1_delivery_independent_review_v1.json",
-      "sha256": "173fb681bd7e60ffebd33d3a39c363968fdec4caf1c7019151f67ee1b24e4025",
+      "sha256": "e0b63fc69bd73402bb3a550a73c76e8b5d52be15a4c127a67b6d842e85f10df2",
       "verdict": "PASS"
     },
     "full_gate": "ENFORCED_BY_PROJECT_BOUND_VALIDATION",
     "github_ci": "ENFORCED_LIVE_AT_GUARDED_MERGE",
     "project_checks": [
       "PASS_DELIVERY_HARNESS_CHECK",
-      "PASS_TARGETED_79_CONTINUITY_LIFECYCLE_PLUS_SELECTION_SCOPE"
+      "PASS_TARGETED_SELECTION_SCOPE_AND_HISTORICAL_PUBLICATION_STALL"
     ]
   },
   "non_claims": [

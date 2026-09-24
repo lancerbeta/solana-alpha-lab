@@ -14,8 +14,8 @@
     "GOAL_DOD_CRITIC"
   ],
   "review_id": "COLLECTOR-CONTINUITY-LIVE-BACKPORT-INDEPENDENT-REVIEW-001",
-  "reviewed_bindings_sha256": "1401bc42e4df7250ceae736378c1d97e005a2277f153b7576f4f006976c71def",
-  "reviewed_inventory_sha256": "871585224fedcd7f6e9597b429daa029c93592631b255fb2c93261c13bd1fd15",
+  "reviewed_bindings_sha256": "a109b5d48c40f96ffa1caaba816a0afcb2f7a97d0a2ee5cb59253e57dbb8f219",
+  "reviewed_inventory_sha256": "b7c063762ce8665ca5b4ea0526a03929484c7b2047094024fa31f040286d00d3",
   "reviews": [
     {
       "findings": [
