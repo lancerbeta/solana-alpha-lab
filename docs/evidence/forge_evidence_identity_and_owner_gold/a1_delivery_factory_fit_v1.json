@@ -4,8 +4,8 @@
   "review_id": "FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-FACTORY-FIT-001",
   "as_of": "2026-09-23",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "reviewed_bindings_sha256": "d1fc47e3fd183d1514008251844f2f430f6700e138ec3e7b5ee8003b16031f2a",
-  "reviewed_inventory_sha256": "f9d5c915d149a823f6cf39859060b5f8ca620e7c4fc395362144b01393153b42",
+  "reviewed_bindings_sha256": "1cc165968f3c42e6e50c3d1da306512d65d72b3a8dcc7c63f555e70a736165ef",
+  "reviewed_inventory_sha256": "f7fd1b0ed026017805e83b62e7690642c99dd67e2641871e905494ec20364ff8",
   "mode": "FULL_REVIEW",
   "verdict": "PASS",
   "dimensions": {
