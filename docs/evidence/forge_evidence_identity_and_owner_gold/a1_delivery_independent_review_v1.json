@@ -2,10 +2,10 @@
   "schema": "smial.delivery-independent-review-evidence",
   "schema_version": "1.0",
   "review_id": "FORGE-EVIDENCE-IDENTITY-AND-OWNER-GOLD-INDEPENDENT-REVIEW-001",
-  "as_of": "2026-09-21",
+  "as_of": "2026-09-24",
   "task_id": "FORGE_EVIDENCE_IDENTITY_AND_OWNER_GOLD_V1",
-  "reviewed_bindings_sha256": "037b9546a274e4fc4895241dc2626e6407270aed9e68dfc5648d196453386181",
-  "reviewed_inventory_sha256": "40314ca67834b5d65e591383fc280472dca601e0336b072861093c378f96e7c6",
+  "reviewed_bindings_sha256": "b0ca9820bab5c2a87b6cf14889c78d59a4fb84529dbed57c46088f5ed01abd69",
+  "reviewed_inventory_sha256": "61353493bc089606cd5c5b68a38f24649e0b66965065c4388c84d9e3a8484880",
   "required_roles": [
     "ARCHITECTURE_CRITIC",
     "CODE_REVIEWER",
@@ -17,46 +17,38 @@
       "role": "ARCHITECTURE_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "packet_fingerprint_sha256=248ad5954b6441077c550e6394faa05b49acce531e2fa9afe88779fe7a56bc7e",
-        "PASS_MARKET_STAMP_ONLY_BUDGET",
-        "PASS_INCOMPLETE_MARKET_PREFLIGHT_STOP",
-        "PASS_SLOT_BINDING_RECEIPT_GLOSS",
-        "PASS_LOOKUP_BRIDGE_SEPARATE_FROM_BUDGET",
-        "PASS_NO_COMMISSIONING_EMPTY_DIGEST"
+        "packet_fingerprint_sha256=bb1eb1c7d57444db548d0a190a97f68683d717157c0628e00b1777ffde591d5a",
+        "PASS_VERSION_LOCK",
+        "PASS_PENDING_RESUME_REUSES_SAVED_DRAFT",
+        "PASS_KNOWN_PROVENANCE_MISMATCH_IS_CONFLICT",
+        "PASS_DIAGNOSTIC_STOP_BEFORE_SYNTHESIS"
       ]
     },
     {
       "role": "CODE_REVIEWER",
       "verdict": "PASS",
       "findings": [
-        "PASS_FORGE_INPUT_NO_SOFT_MARKET_FALLBACK",
-        "PASS_G10_INCOMPLETE_AND_TAMPER",
-        "PASS_CLI_BLOCKED_INCOMPLETE_MARKET",
-        "PASS_SLOT_AND_BINDING_STAMPED",
-        "PASS_SHARED_ADMISSION_WIRING",
-        "PASS_REVIEW_PLAN_COMPLETE"
+        "PASS_KNOWN_HASH_MISMATCH_IS_CONFLICT",
+        "PASS_MISSING_HISTORICAL_STAYS_UNKNOWN",
+        "PASS_DIAGNOSTIC_STOP_AND_AUTHORIZED_CONTROL_ENTRY"
       ]
     },
     {
       "role": "GOAL_DOD_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_DISPOSITION_SESSIONS_TABLE",
-        "PASS_BEYOND_TWO_HASHES",
-        "PASS_OWNER_GOLD_G1_G12",
-        "PASS_NON_GOALS_HELD",
-        "PASS_CHEAPEST_FALSIFIERS_EXERCISED"
+        "PASS_VERSION_LOCK",
+        "PASS_UNKNOWN_MODEL_NOT_DIFFERENT_BINDING",
+        "PASS_PENDING_RESUME_KEEPS_SAVED_DRAFT",
+        "PASS_NO_WRITE_STOP_BEFORE_SYNTHESIS"
       ]
     },
     {
       "role": "OWNER_UX_CRITIC",
       "verdict": "PASS",
       "findings": [
-        "PASS_START_RESUME_REUSED_GLOSS",
-        "PASS_OPERATOR_SLASH_A5_NOTE",
-        "PASS_INCOMPLETE_MARKET_BLOCKED_NEXT",
-        "PASS_EPOCH_LINES_OWNER_MEANING",
-        "PASS_MERGE_VS_SCIENCE_SEPARATE"
+        "PASS_DIAGNOSTIC_NO_EXECUTABLE_CONTROL",
+        "PASS_AUTHORIZED_SLASH_KEEPS_A4_CONTINUATION"
       ]
     }
   ],
