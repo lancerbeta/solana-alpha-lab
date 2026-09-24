@@ -2075,7 +2075,10 @@ def status_schedule(
         if row is None:
             raise ObservationLifecycleError("ACTIVATION_MISSING")
         activations = [row]
-    from solana_alpha_lab.factory.collector_read_model import build_collector_read_model
+    from solana_alpha_lab.factory.collector_read_model import (
+        build_collector_read_model,
+        project_activation_as_of,
+    )
 
     clock = now or datetime.now(UTC)
     collector = build_collector_read_model(
@@ -2091,7 +2094,11 @@ def status_schedule(
             {
                 "schedule_sha256": row["schedule_sha256"],
                 "activation_id": row["activation_id"],
-                "state": row["state"],
+                "state": str(project_activation_as_of(row, clock).get("state") or "UNKNOWN"),
+                "future_transition_pending": project_activation_as_of(row, clock).get(
+                    "future_transition_pending"
+                )
+                is True,
                 "transition_event_id": (
                     str(row.get("last_transition_event_id") or "") or "UNKNOWN"
                 ),
