@@ -5,7 +5,7 @@
   "as_of": "2026-09-25",
   "task_id": "HFIC_LEGACY_READBACK_HONESTY_V1",
   "state_change": "LEGACY_HFIC_HISTORY_READS_AS_TYPED_TRUTH",
-  "base_main": "971e0a09e600ae3210b07094dd071824708d6bbd",
+  "base_main": "94a4ea74afb6c921f4972312840be2de5eeba4f9",
   "capability_radar_now": "NONE",
   "cloud_bundle_mode": "OWNER_MANAGED_OPTIONAL_EXPORT",
   "cloud_bundle_required_by_harness": false,
