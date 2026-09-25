@@ -9,6 +9,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = str(ROOT / "scripts")
@@ -320,6 +321,56 @@ class RunCiTestShardTests(unittest.TestCase):
                 capture.getvalue().count(runner.STALE_PROFILE_WARNING),
                 1,
             )
+
+    def test_module_timings_stream_and_soft_budget_only_warns(self) -> None:
+        bodies = {
+            "test_timing_fast": "self.assertTrue(True)",
+            "test_timing_slow": "time.sleep(0.2)",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            tests = root / "tests"
+            tests.mkdir()
+            for name, body in bodies.items():
+                (tests / f"{name}.py").write_text(
+                    "import time\nimport unittest\n\n\n"
+                    "class T(unittest.TestCase):\n"
+                    "    def test_case(self):\n"
+                    f"        {body}\n",
+                    encoding="utf-8",
+                )
+            plan = partition.plan_shards(
+                {f"tests/{name}.py": 1.0 for name in bodies},
+                shard_count=1,
+                source_profile_sha256="x",
+            )
+            plan_path = root / "plan.json"
+            partition.write_plan(plan_path, plan)
+            tests_dir = str(tests.resolve())
+            outputs: dict[int, str] = {}
+            try:
+                for budget in (3600, 0):
+                    capture = io.StringIO()
+                    with mock.patch.object(
+                        runner, "SHARD_SOFT_BUDGET_SECONDS", budget
+                    ), contextlib.redirect_stdout(capture):
+                        code = runner.run_shard(
+                            index=0, count=1, plan_path=plan_path, root=root
+                        )
+                    self.assertEqual(code, 0)
+                    outputs[budget] = capture.getvalue()
+                    for name in bodies:
+                        sys.modules.pop(name, None)
+            finally:
+                while tests_dir in sys.path:
+                    sys.path.remove(tests_dir)
+        quiet, loud = outputs[3600], outputs[0]
+        done = [line for line in quiet.splitlines() if line.startswith("module_done ")]
+        slow = [line for line in quiet.splitlines() if line.startswith("slow_module ")]
+        self.assertEqual(len(done), 2)
+        self.assertTrue(slow[0].endswith("module=test_timing_slow"))
+        self.assertNotIn(runner.SHARD_OVER_SOFT_BUDGET, quiet)
+        self.assertIn(f"::warning title={runner.SHARD_OVER_SOFT_BUDGET}::", loud)
 
     def test_reserved_manifest_excludes_execution_modules_from_general_union(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

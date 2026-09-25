@@ -897,7 +897,7 @@ records:
     repository_path: .github/workflows/ci.yml
   integrity:
     kind: sha256
-    sha256: 7193e103eebcf1e7cb805b243d84f3bf54717dde453e8419affc8a6d6de23573
+    sha256: 9f11ee664ac75970e035c575eb71dd2ac1410fbc116d99bca6ca5514cba7c439
   access:
     mode: read_only
     method: file
@@ -936,7 +936,7 @@ records:
     repository_path: scripts/validate_ci.py
   integrity:
     kind: sha256
-    sha256: ec0e6edd08c39627ec1a8e5583c139da32437ebbc8c09fd74b0629f040ba47d0
+    sha256: bc9ea327fb96e00496355d3328ecaf71ae26d95e6c3dd9fb1b7700de140177b5
   access:
     mode: read_only
     method: command
@@ -34533,7 +34533,7 @@ records:
   as_of: '2026-09-02'
   truth_owner: FACTORY_SEMANTIC_OPERABILITY_CLOSURE_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_factory_semantic_operability.py', repository_path: tests/test_factory_semantic_operability.py}
-  integrity: {kind: sha256, sha256: b8f24838669a39877fac49990c27b27a2e4bc246e2fe7df811d0c5e318f504fb}
+  integrity: {kind: sha256, sha256: efe9eeb816ca02e19b7abb5e286f75520ea2d05e74cadb1e181681e02c74768c}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-FACTORY-SEMANTIC-OPERABILITY-001}
