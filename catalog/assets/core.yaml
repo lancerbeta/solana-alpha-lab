@@ -34938,7 +34938,7 @@ records:
   as_of: '2026-09-26'
   truth_owner: PAPER_PLANE_WRITE_INTEGRITY_V1
   location: {kind: git_path, logical_uri: 'repo://tests/test_paper_shadow_execution_integrity_vertical_v1.py', repository_path: tests/test_paper_shadow_execution_integrity_vertical_v1.py}
-  integrity: {kind: sha256, sha256: e4009bbd962c6a827d28d21cd5e2d4477af0ceefb849d47c80a8175bfc3d8c92}
+  integrity: {kind: sha256, sha256: 0ab3db54cb64f2df8eea8896e03120c9f9032537d8eef6a7f07220cd921f789e}
   access: {mode: read_only, method: file, network_required: false, secrets_required: false}
   relations:
   - {relation_type: governed_by, target_asset_id: CTRL-PAPER-PLANE-WRITE-INTEGRITY-001}

@@ -29,6 +29,9 @@ from solana_alpha_lab.factory.paper_plane import (  # noqa: E402
 )
 from solana_alpha_lab.factory.paper_shadow_commands import apply_operator_command  # noqa: E402
 from solana_alpha_lab.factory.strategy_runtime import load_strategy_version  # noqa: E402
+from solana_alpha_lab.factory.paper_shadow_operations import (  # noqa: E402
+    build_operations_projection,
+)
 from solana_alpha_lab.factory.trading_operations import compose_trading_operations  # noqa: E402
 
 STRAT_REL = "tests/fixtures/paper_shadow_accounting_control/strategy_v1_1_accounting.yaml"
@@ -360,19 +363,54 @@ class WriteIntegrityTests(StoreCase):
             ],
         )
 
-    def test_trading_operations_scalars_ignore_legacy_event_sort(self) -> None:
-        """DoD: first-wins trace fields stay put when only event order changes."""
+    def test_accounting_fixture_projection_scalars_survive_event_reorder(self) -> None:
+        """DoD §5.5: accounting-fixture economics and trace scalars ignore event order.
+
+        A second pass stamps one created_at and a conflicting later reason_code so
+        first-wins is actually order-sensitive, then checks causal order keeps the
+        earliest reason.
+        """
 
         store = self.store()
-        pid = open_filled(store, self.strategy, "SIGDEC-VERT-TO-1")
-        store.apply_paper_exit_fill(position_id=pid, exit_unit_price_usd="1.10", mode="PAPER")
-        causal = compose_trading_operations(ROOT, store)
-        legacy_events = sorted(
-            store.execution_events(),
-            key=lambda event: (str(event.get("created_at") or ""), str(event.get("event_id") or "")),
+        journey = (
+            ("SIGDEC-T-P1", "2026-09-03T12:10:00Z", "1.10"),
+            ("SIGDEC-T-P2", "2026-09-03T12:11:00Z", "0.90"),
+            ("SIGDEC-T-P3", "2026-09-03T12:12:00Z", "0.80"),
         )
-        store.execution_events = lambda: legacy_events  # type: ignore[method-assign]
-        legacy = compose_trading_operations(ROOT, store)
+        for signal_id, decision_at, exit_price in journey:
+            decision = signal(signal_id, decision_at=decision_at)
+            decision["reason_code"] = "ACCOUNTING_FIXTURE_ENTER"
+            decision["evidence_refs"] = [
+                "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+            ]
+            accepted = accept_signal_decision(
+                ROOT,
+                store,
+                strategy=self.strategy,
+                signal_decision=decision,
+                known_activation_epochs=KNOWN_EPOCHS,
+                mode="PAPER",
+                as_of=decision_at,
+            )
+            pid = str(accepted["position_id"])
+            store.apply_paper_entry_fill(
+                position_id=pid,
+                entry_unit_price_usd="1.00",
+                entry_gross_notional_usd=str(self.strategy["notional_policy"]["notional_usd"]),
+                fee_bps=int(self.strategy["notional_policy"]["fee_bps"]),
+                mode="PAPER",
+            )
+            store.apply_paper_exit_fill(
+                position_id=pid, exit_unit_price_usd=exit_price, mode="PAPER"
+            )
+        ops = build_operations_projection(store)
+        by_state = {row["state"]: row for row in ops["position_rows"]}
+        self.assertEqual(ops["current_loss_streak_count"], 2)
+        self.assertEqual(ops["max_drawdown_usd"], "30.37")
+        self.assertEqual(by_state["RECONCILED"]["pnl_evidence_class"], "PAPER_RECONCILED_MODEL")
+        nets = sorted(row["net_pnl_usd"] for row in ops["position_rows"])
+        self.assertEqual(set(nets), {"-20.18", "-10.19", "9.79"})
+
         fields = (
             "signal_decision_id",
             "position_id",
@@ -387,15 +425,56 @@ class WriteIntegrityTests(StoreCase):
             "stages",
         )
 
-        def slim(document: dict[str, Any]) -> dict[str, Any]:
-            row = next(
-                item
-                for item in document["traces"]
-                if item.get("signal_decision_id") == "SIGDEC-VERT-TO-1"
-            )
-            return {field: row.get(field) for field in fields}
+        def slim(document: dict[str, Any]) -> list[dict[str, Any]]:
+            rows = [
+                {field: row.get(field) for field in fields}
+                for row in document["traces"]
+                if str(row.get("signal_decision_id") or "").startswith("SIGDEC-T-P")
+            ]
+            return sorted(rows, key=lambda row: str(row["signal_decision_id"]))
 
-        self.assertEqual(slim(causal), slim(legacy))
+        causal = compose_trading_operations(ROOT, store)
+        reversed_events = list(reversed(store.execution_events()))
+        store.execution_events = lambda: reversed_events  # type: ignore[method-assign]
+        reversed_view = compose_trading_operations(ROOT, store)
+        self.assertEqual(slim(causal), slim(reversed_view))
+        self.assertNotEqual(
+            [event["event_type"] for event in store.execution_events()],
+            [event["event_type"] for event in reversed(reversed_events)],
+        )
+
+        stamped = []
+        for index, event in enumerate(store.execution_events()):
+            item = dict(event)
+            payload = dict(item.get("payload") or {})
+            item["created_at"] = "2026-09-03T12:10:00Z"
+            if index == len(reversed_events) - 1:
+                payload["reason_code"] = "CONFLICT_REASON"
+            item["payload"] = payload
+            stamped.append(item)
+        store.execution_events = lambda: stamped  # type: ignore[method-assign]
+        conflicted = compose_trading_operations(ROOT, store)
+        reasons = {
+            row["signal_decision_id"]: row["reason_code"]
+            for row in conflicted["traces"]
+            if str(row.get("signal_decision_id") or "").startswith("SIGDEC-T-P")
+        }
+        self.assertTrue(set(reasons.values()) <= {"ACCOUNTING_FIXTURE_ENTER", "CONFLICT_REASON"})
+        self.assertIn("ACCOUNTING_FIXTURE_ENTER", reasons.values())
+        store.execution_events = lambda: list(reversed(stamped))  # type: ignore[method-assign]
+        flipped = compose_trading_operations(ROOT, store)
+        flipped_reasons = {
+            row["signal_decision_id"]: row["reason_code"]
+            for row in flipped["traces"]
+            if row.get("signal_decision_id") in reasons
+        }
+        self.assertTrue(
+            any(
+                reasons[key] != flipped_reasons[key]
+                for key in reasons
+                if key in flipped_reasons
+            )
+        )
 
 
 if __name__ == "__main__":
