@@ -1341,7 +1341,8 @@ def cmd_prove_runtime(
     store = ResearchStore(data_root)
     payload = prove_runtime(store, session_id, repo_root=repo_root)
     _assert_no_path_leak(payload, str(data_root), str(repo_root))
-    return emit(payload)
+    exit_code = 1 if payload.get("proof_status") == "NOT_A_PROOF" else 0
+    return emit(payload, exit_code=exit_code)
 
 
 def cmd_inventory_placeholder_times(

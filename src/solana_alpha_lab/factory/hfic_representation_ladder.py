@@ -975,9 +975,10 @@ def _history_readout_line(
         f"{item.get('session_suffix')}:{item.get('code')}" for item in unreadable
     ) or "none"
     readable = int(census.get("sessions_readable") or 0)
+    drift = " inventory_digest_drift=true" if census.get("inventory_digest_drift") else ""
     return (
         f"history: readable {readable}/{listed}; unresolved {unresolved} ({unresolved_codes}); "
-        f"skipped {len(unreadable)} ({skip_codes}); provenance: {store_provenance_label(store)}"
+        f"skipped {len(unreadable)} ({skip_codes}); provenance: {store_provenance_label(store)}{drift}"
     )
 
 

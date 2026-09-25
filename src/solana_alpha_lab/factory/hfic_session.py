@@ -7300,11 +7300,14 @@ def prove_runtime(
     if bundle is None:
         raise HficSessionError("SESSION_NOT_FOUND")
     if bundle.get("identity_status") == "UNRESOLVED_BINDING":
+        from solana_alpha_lab.factory.hfic_provenance import store_provenance_label
+
         shown = show_session(store, session_id, repo_root=repo_root)
         return {
             **shown,
             "runtime_no_git": "UNRESOLVED_BINDING",
-            "store_provenance_time_status": "NOT_A_PROOF",
+            "proof_status": "NOT_A_PROOF",
+            "store_provenance_time_status": store_provenance_label(store),
         }
     receipt = bundle.get("session_receipt")
     if not isinstance(receipt, Mapping):
@@ -7385,6 +7388,7 @@ def prove_runtime(
     payload = {
         **shown,
         "runtime_no_git": "PROVEN",
+        "proof_status": "PROVEN",
         "provider_calls_actual": provider_calls,
         "git_composite_unchanged": True,
         "candidates_retrievable": shown["candidates_retrievable"],
@@ -7394,7 +7398,7 @@ def prove_runtime(
         "owner_readout": str(shown.get("owner_readout") or "") + warning,
         "recovered_exact_time": False,
     }
-    if provenance_status == PROVENANCE_CORRECTED or store_provenance == PROVENANCE_CORRECTED:
+    if provenance_status == PROVENANCE_CORRECTED:
         payload["original_exact_time_status"] = "UNKNOWN"
         payload["chronological_use_forbidden"] = True
     return payload

@@ -196,6 +196,22 @@ success after retry of `validate-tests (3)` on run 36153861551. Route
   `INVALID` provenance is `STOP` before Prompt A; everything else is a visible
   warning. `FIRST_REAL_RUN_READINESS` comes from the rehearsal.
 
+## Why identity coverage is stronger than an inventory-hash equality
+
+A correction written by an earlier protocol names the placeholder rows it
+actually saw: `record_id` plus `payload_sha256`. That pair is the identity of
+a committed record. Requiring the stored `inventory_sha256` to equal today's
+inventory makes a later, still-covered store look corrupt whenever the hash
+input grew or shrank, even though every current placeholder is named. Identity
+coverage checks the invariant directly: every current placeholder pair is in
+`affected_records`. The inventory hash remains a visible confirmation
+(`inventory_digest_drift` when it disagrees) and is not a second admission
+key. Extra `affected_records` are conservative only when each one still
+points at a committed record with that same payload hash. A pair that was
+never committed is a phantom and stays `PROVENANCE_CORRECTION_CORRUPT`. An
+extra real historical row cannot grant coverage to a current row that is
+absent, and it cannot invent a payload the store does not hold.
+
 ## Provenance-clock test edit
 
 `tests/test_hfic_provenance_clock.py` is edited only for the R5 coupling that

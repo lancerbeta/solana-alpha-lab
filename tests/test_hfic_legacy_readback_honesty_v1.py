@@ -398,3 +398,92 @@ class LegacyReadbackHonestyTests(unittest.TestCase):
                 concrete and any(item in (None, "") for item in values),
                 name,
             )
+
+    def test_fresh_session_does_not_inherit_store_corrected_flags(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            session_id = _fresh_completed(store)
+            txn = "RESEARCH-TXN-STORECORR"
+            store.append(
+                [
+                    _placeholder_event(
+                        "HFIC-ART-OTHER-CORR",
+                        "HFIC-SESS-OTHERCORR01",
+                        transaction_id=txn,
+                    )
+                ],
+                transaction_id=txn,
+            )
+            _append_correction(store, _l1_covering(store))
+            proven = prove_runtime(store, session_id, repo_root=ROOT)
+        self.assertEqual(proven["proof_status"], "PROVEN")
+        self.assertEqual(proven["provenance_time_status"], "VALID")
+        self.assertEqual(proven["store_provenance_time_status"], "CORRECTED_ORIGINAL_UNKNOWN")
+        self.assertNotIn("original_exact_time_status", proven)
+        self.assertNotIn("chronological_use_forbidden", proven)
+
+    def test_unresolved_proof_is_not_a_proof_and_cli_exits(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            data_root = Path(tmp)
+            session_id = _append_l2(ResearchStore(data_root))
+            proven = prove_runtime(ResearchStore(data_root), session_id, repo_root=ROOT)
+            completed = run_cli("prove-runtime", "--session-id", session_id, "--format", "json", data_root=data_root)
+        self.assertEqual(proven["proof_status"], "NOT_A_PROOF")
+        self.assertEqual(proven["runtime_no_git"], "UNRESOLVED_BINDING")
+        self.assertNotEqual(proven["store_provenance_time_status"], "NOT_A_PROOF")
+        self.assertNotEqual(completed.returncode, 0)
+        payload = json.loads(completed.stdout)
+        self.assertEqual(payload["proof_status"], "NOT_A_PROOF")
+
+    def test_phantom_affected_record_is_corrupt_and_digest_drift_is_visible(self) -> None:
+        from solana_alpha_lab.factory.hfic_provenance import (
+            inventory_digest_drift,
+            resolve_provenance_status,
+        )
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            txn = "RESEARCH-TXN-DRIFT01"
+            store.append(
+                [
+                    _placeholder_event(
+                        "HFIC-ART-DRIFT-A",
+                        "HFIC-SESS-DRIFT0001",
+                        transaction_id=txn,
+                    )
+                ],
+                transaction_id=txn,
+            )
+            body = _l1_covering(store)
+            phantom = dict(body)
+            phantom["affected_records"] = list(body["affected_records"]) + [
+                {
+                    "record_id": "HFIC-ART-PHANTOM",
+                    "payload_sha256": "ab" * 32,
+                    "record_kind": "RESEARCH_ARTIFACT",
+                    "affected_fields": ["created_at"],
+                }
+            ]
+            _append_correction(store, phantom)
+            with self.assertRaises(HficSessionError) as raised:
+                resolve_provenance_status(store)
+            self.assertEqual(str(raised.exception), "PROVENANCE_CORRECTION_CORRUPT")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            store = ResearchStore(Path(tmp))
+            txn = "RESEARCH-TXN-DRIFT02"
+            store.append(
+                [
+                    _placeholder_event(
+                        "HFIC-ART-DRIFT-B",
+                        "HFIC-SESS-DRIFT0002",
+                        transaction_id=txn,
+                    )
+                ],
+                transaction_id=txn,
+            )
+            body = _l1_covering(store)
+            body["inventory_sha256"] = "cd" * 32
+            _append_correction(store, body)
+            self.assertEqual(resolve_provenance_status(store), "CORRECTED_ORIGINAL_UNKNOWN")
+            self.assertTrue(inventory_digest_drift(store))

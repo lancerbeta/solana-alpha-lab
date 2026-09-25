@@ -468,12 +468,15 @@ def session_read_census(store: Any) -> dict[str, Any]:
             unresolved += 1
         else:
             readable += 1
+    from solana_alpha_lab.factory.hfic_provenance import inventory_digest_drift
+
     return {
         "sessions_listed": len(listed),
         "sessions_readable": readable,
         "sessions_unresolved": unresolved,
         "sessions_unreadable": unreadable,
         "provenance_time_status": store_provenance_label(store),
+        "inventory_digest_drift": inventory_digest_drift(store),
     }
 
 
