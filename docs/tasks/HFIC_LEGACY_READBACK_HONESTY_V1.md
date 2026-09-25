@@ -41,7 +41,9 @@ managed_write_set:
   - src/solana_alpha_lab/factory/hfic_grounding.py
   - scripts/hypothesis_forge.py
   - tests/test_hfic_legacy_readback_honesty_v1.py
-  - tests/fixtures/hypothesis_forge/legacy_shapes/
+  - tests/fixtures/hypothesis_forge/legacy_shapes/l1_provenance_correction_v1_1.json
+  - tests/fixtures/hypothesis_forge/legacy_shapes/l2_runner_up_identity_cycles.json
+  - tests/fixtures/hypothesis_forge/legacy_shapes/l3_hypothesis_placeholder_created_at.json
   - tests/test_hfic_provenance_clock.py
   - .agents/skills/hypothesis-forge/SKILL.md
   - docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md

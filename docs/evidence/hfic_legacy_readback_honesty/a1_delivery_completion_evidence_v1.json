@@ -18,7 +18,7 @@
     "docs/evidence/hfic_legacy_readback_honesty/a1_real_copy_rehearsal_v1.json": "d48be5547bbce68a2d38e60b2795c897b8aa5a8d765c72fc5fc394b8e83423ef",
     "docs/operator/HYPOTHESIS_FORGE_AND_INDEPENDENT_CRITIC_OPERATOR_V1.md": "a14eeae4f23b7bfe6d9d03f4cea31bd2d772155549725c44a8a8e90ee11795e6",
     "docs/reports/hfic_legacy_readback_honesty/a1_owner_readout_v1.md": "fe54c33c0dac7d4139092caac35cb8551e1c61ae33d49814ecb07ceee447fd7a",
-    "docs/tasks/HFIC_LEGACY_READBACK_HONESTY_V1.md": "52444e6f58288fd58d0a8d0c7052b8b74747e0324a926c7580c5d01ea4a592a7",
+    "docs/tasks/HFIC_LEGACY_READBACK_HONESTY_V1.md": "999c453fbcb9ed52dffcaad37baf16426d206eb614bcd6a98513a72a0f40f759",
     "scripts/hypothesis_forge.py": "1212ac45a662c29aadc4fdf026165ebde06c6bb0f5cc791980f1a5d1bfe84c54",
     "src/solana_alpha_lab/factory/hfic_grounding.py": "75c27310030535b09a4713f363e265cb39ccd47af9e0bd1855d7f89860dfa4b2",
     "src/solana_alpha_lab/factory/hfic_provenance.py": "17303a652b572d47a8c406bffbfad0a7c87e926e9507578ba48cf040a1b41fc9",
