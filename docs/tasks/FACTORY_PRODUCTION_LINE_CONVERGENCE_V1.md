@@ -27,6 +27,7 @@ managed_write_set:
   - docs/tasks/FACTORY_LIVE_MAIN_PARITY_CONVERGENCE_V1.md
   - docs/operator/FACTORY_REMOTE_HOST.md
   - catalog/assets/core.yaml
+  - docs/evidence/task21/owner_pulse_read_model_acceptance_v1.json
   - docs/evidence/factory_production_line_convergence_v1/live_delta_disposition_v1.json
   - scripts/factory_live_release.py
   - scripts/observation_schedule.py
